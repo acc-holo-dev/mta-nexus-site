@@ -1,0 +1,25 @@
+{
+  "name": "mta-nexus",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter @nexus/web dev",
+    "build": "pnpm --filter @nexus/web build",
+    "start": "pnpm --filter @nexus/web start",
+    "lint": "pnpm --filter @nexus/web lint",
+    "test": "vitest run",
+    "typecheck": "tsc -b",
+    "db:generate": "pnpm --filter @nexus/db generate",
+    "db:migrate": "pnpm --filter @nexus/db migrate"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

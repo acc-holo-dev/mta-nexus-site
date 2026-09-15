@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "paths": {
+      "@nexus/domain": ["./packages/domain/src"],
+      "@nexus/domain/*": ["./packages/domain/src/*"],
+      "@nexus/validation": ["./packages/validation/src"],
+      "@nexus/validation/*": ["./packages/validation/src/*"],
+      "@nexus/security": ["./packages/security/src"],
+      "@nexus/security/*": ["./packages/security/src/*"],
+      "@nexus/storage": ["./packages/storage/src"],
+      "@nexus/storage/*": ["./packages/storage/src/*"],
+      "@nexus/config": ["./packages/config/src"],
+      "@nexus/config/*": ["./packages/config/src/*"],
+      "@nexus/db": ["./packages/db/src"],
+      "@nexus/db/*": ["./packages/db/src/*"],
+      "@nexus/ui": ["./packages/ui/src"],
+      "@nexus/ui/*": ["./packages/ui/src/*"]
+    }
+  },
+  "exclude": ["node_modules", ".next", "dist"]
+}

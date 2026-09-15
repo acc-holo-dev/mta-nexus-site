@@ -1,0 +1,62 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@nexus/config": [
+        "../../packages/config/src"
+      ],
+      "@nexus/domain": [
+        "../../packages/domain/src"
+      ],
+      "@nexus/validation": [
+        "../../packages/validation/src"
+      ],
+      "@nexus/security": [
+        "../../packages/security/src"
+      ],
+      "@nexus/storage": [
+        "../../packages/storage/src"
+      ],
+      "@nexus/db": [
+        "../../packages/db/src"
+      ],
+      "@nexus/ui": [
+        "../../packages/ui/src"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
