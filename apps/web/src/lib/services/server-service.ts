@@ -52,13 +52,7 @@ export class ServerService {
       actor: { id: actor.id, type: "user" },
       aggregateId: id,
       aggregateType: "server",
-      payload: {
-        serverId: id,
-        name: server.name,
-        ownerId: actor.id,
-        ip: server.ipAddress,
-        port: server.port,
-      },
+      payload: { serverId: id, name: server.name, ownerId: actor.id, ip: server.ipAddress, port: server.port },
     });
 
     return server;
@@ -67,7 +61,7 @@ export class ServerService {
   async registerInstallation(
     serverId: string,
     actor: User,
-    moduleVersion = "1.0.0"
+    moduleVersion = "0.1.0"
   ): Promise<ServerInstallation & { apiKey?: string }> {
     const server = await serverRepository.findById(serverId);
     if (!server) throw new NotFoundError("Server", serverId);
@@ -76,12 +70,11 @@ export class ServerService {
     }
 
     const instId = generateId("ins");
-
-    // Generate a one-time plaintext API key; only its SHA-256 hash is persisted
-    const apiKey = `nxk_${crypto.randomBytes(24).toString("hex")}`;
+    const apiKey = "nxk_" + crypto.randomBytes(24).toString("hex");
     const apiKeyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
 
-    const installation = await serverRepository.createInstallation({
+    // A replacement key atomically revokes the previous key for this server.
+    const installation = await serverRepository.replaceActiveInstallation({
       id: instId,
       serverId,
       apiKeyHash,
@@ -90,7 +83,7 @@ export class ServerService {
       os: "linux",
       status: "active",
       lastHeartbeatAt: new Date(),
-      capabilities: ["entitlements_v1", "telemetry_v1", "hot_reload"],
+      capabilities: ["telemetry_v1"],
     });
 
     await auditRepository.record({
@@ -100,7 +93,7 @@ export class ServerService {
       action: "server.installation_registered",
       targetId: instId,
       targetType: "server_installation",
-      details: { moduleVersion },
+      details: { moduleVersion, replacesPreviousKey: true },
     });
 
     await eventBus.publish({
@@ -111,11 +104,7 @@ export class ServerService {
       actor: { id: actor.id, type: "user" },
       aggregateId: instId,
       aggregateType: "server_installation",
-      payload: {
-        installationId: instId,
-        serverId,
-        moduleVersion,
-      },
+      payload: { installationId: instId, serverId, moduleVersion },
     });
 
     return { ...installation, apiKey };

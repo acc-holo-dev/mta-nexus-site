@@ -5,7 +5,7 @@ import type { Server, ServerInstallation } from "@nexus/domain";
 
 export class ServerRepository {
   async listActivePublic(): Promise<Server[]> {
-        const rows = await db
+    const rows = await db
       .select()
       .from(servers)
       .where(
@@ -29,34 +29,42 @@ export class ServerRepository {
   }
 
   async findById(id: string): Promise<Server | null> {
-        const rows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
+    const rows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
     return (rows[0] as unknown as Server) || null;
   }
 
   async findBySlug(slug: string): Promise<Server | null> {
-        const rows = await db.select().from(servers).where(eq(servers.slug, slug)).limit(1);
+    const rows = await db.select().from(servers).where(eq(servers.slug, slug)).limit(1);
     return (rows[0] as unknown as Server) || null;
   }
 
   async create(server: Omit<Server, "createdAt" | "updatedAt">): Promise<Server> {
-    const values = {
-      ...server,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-        const rows = await db.insert(servers).values(values).returning();
+    const values = { ...server, createdAt: new Date(), updatedAt: new Date() };
+    const rows = await db.insert(servers).values(values).returning();
     return rows[0] as unknown as Server;
   }
 
-  async createInstallation(inst: Omit<ServerInstallation, "createdAt">): Promise<ServerInstallation> {
-    const values = {
-      ...inst,
-      createdAt: new Date(),
-    };
+  async replaceActiveInstallation(
+    inst: Omit<ServerInstallation, "createdAt">
+  ): Promise<ServerInstallation> {
+    return db.transaction(async (tx) => {
+      await tx
+        .update(serverInstallations)
+        .set({ status: "revoked" })
+        .where(
+          and(
+            eq(serverInstallations.serverId, inst.serverId),
+            eq(serverInstallations.status, "active")
+          )
+        );
 
-        const rows = await db.insert(serverInstallations).values(values).returning();
-    return rows[0] as unknown as ServerInstallation;
+      const rows = await tx
+        .insert(serverInstallations)
+        .values({ ...inst, createdAt: new Date() })
+        .returning();
+
+      return rows[0] as unknown as ServerInstallation;
+    });
   }
 }
 
