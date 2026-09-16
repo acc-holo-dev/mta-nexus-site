@@ -53,6 +53,23 @@ export class EntitlementRepository {
     return false;
   }
 
+  async listBySubject(subject: {
+    type: "user" | "server" | "organization";
+    id: string;
+  }): Promise<Entitlement[]> {
+    const rows = await db
+      .select()
+      .from(entitlements)
+      .where(
+        and(
+          eq(entitlements.subjectType, subject.type),
+          eq(entitlements.subjectId, subject.id),
+          or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, new Date()))
+        )
+      );
+    return rows as unknown as Entitlement[];
+  }
+
   async create(data: Omit<Entitlement, "createdAt">): Promise<Entitlement> {
     const values = {
       ...data,

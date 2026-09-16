@@ -19,6 +19,15 @@ export class ServerRepository {
     return rows as unknown as Server[];
   }
 
+  async listByOwner(ownerId: string): Promise<Server[]> {
+    const rows = await db
+      .select()
+      .from(servers)
+      .where(eq(servers.ownerId, ownerId))
+      .orderBy(desc(servers.updatedAt));
+    return rows as unknown as Server[];
+  }
+
   async findById(id: string): Promise<Server | null> {
         const rows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
     return (rows[0] as unknown as Server) || null;
