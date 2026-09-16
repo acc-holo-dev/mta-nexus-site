@@ -1,6 +1,6 @@
 import { productRepository, buildRepository, auditRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
-import { NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
+import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Product, Build, User, ProductType } from "@nexus/domain";
 
 export interface ProductFilters {
@@ -18,19 +18,21 @@ export class ProductService {
     return productRepository.list({
       type: filters.type,
       featuredOnly: filters.featuredOnly,
-      minPrice: filters.minPrice,
-      maxPrice: filters.maxPrice,
+      minPrice: 0,
+      maxPrice: 0,
       sort: filters.sort,
       query: filters.query,
     });
   }
 
   async getProductBySlug(slug: string): Promise<Product | null> {
-    return productRepository.findBySlug(slug);
+    const product = await productRepository.findBySlug(slug);
+    return product?.price === 0 ? product : null;
   }
 
   async getProductById(id: string): Promise<Product | null> {
-    return productRepository.findById(id);
+    const product = await productRepository.findById(id);
+    return product?.price === 0 ? product : null;
   }
 
   async getProductBuilds(productId: string): Promise<Build[]> {
@@ -41,6 +43,14 @@ export class ProductService {
     input: Omit<Product, "id" | "ratingAverage" | "ratingCount" | "salesCount" | "createdAt" | "updatedAt">,
     actor: User
   ): Promise<Product> {
+    if (input.price !== 0) {
+      throw new AppError(
+        "Paid resources are disabled during the closed beta",
+        422,
+        "PAID_RESOURCES_DISABLED"
+      );
+    }
+
     if (!can(actor, "product.create")) {
       throw new ForbiddenError("You must have developer privileges to create products");
     }
@@ -49,6 +59,9 @@ export class ProductService {
     const product = await productRepository.create({
       ...input,
       id,
+      price: 0,
+      currency: "USD",
+      licenseModel: "unlimited",
       ratingAverage: 0,
       ratingCount: 0,
       salesCount: 0,
@@ -97,6 +110,13 @@ export class ProductService {
   ): Promise<Build> {
     const product = await productRepository.findById(input.productId);
     if (!product) throw new NotFoundError("Product", input.productId);
+    if (product.price !== 0) {
+      throw new AppError(
+        "Build releases for paid resources are disabled during the closed beta",
+        422,
+        "PAID_RESOURCES_DISABLED"
+      );
+    }
 
     if (!can(actor, "build.release", product)) {
       throw new ForbiddenError("Not authorized to publish builds for this product");

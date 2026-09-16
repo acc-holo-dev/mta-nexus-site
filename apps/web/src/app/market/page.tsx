@@ -22,8 +22,6 @@ const SORTS = [
   { id: "popular", label: "Popular" },
   { id: "newest", label: "New" },
   { id: "rating", label: "Top Rated" },
-  { id: "price_asc", label: "Price ↑" },
-  { id: "price_desc", label: "Price ↓" },
 ];
 
 export default async function MarketPage({

@@ -4,8 +4,7 @@ import { Library, Star, Tag } from "lucide-react";
 import type { Product } from "@nexus/domain";
 
 export function ProductCard({ product }: { product: Product }) {
-  const formattedPrice =
-    product.price === 0 ? "Free" : `$${(product.price / 100).toFixed(2)}`;
+  const formattedPrice = "Free";
 
   const updatedDate = new Date(product.updatedAt).toLocaleDateString("en-US", {
     month: "short",

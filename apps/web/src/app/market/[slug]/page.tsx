@@ -79,8 +79,7 @@ export default async function ProductDetailPage({
   const builds = await productService.getProductBuilds(product.id);
   const reviews = await contentService.getComments({ productId: product.id });
 
-  const formattedPrice =
-    product.price === 0 ? "Free" : `$${(product.price / 100).toFixed(2)}`;
+  const formattedPrice = "Free";
 
   return (
     <div className="space-y-10">
@@ -275,7 +274,7 @@ export default async function ProductDetailPage({
                     href={`/checkout?productId=${product.id}`}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
                   >
-                    <span>{product.price === 0 ? "Add to library" : "Paid checkout unavailable"}</span>
+                    <span>Add to library</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                   <p className="text-[11px] text-center text-neutral-500">
