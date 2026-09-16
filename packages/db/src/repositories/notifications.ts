@@ -50,14 +50,22 @@ export class NotificationRepository {
     }
   }
 
-  async markAsRead(id: string): Promise<void> {
+  async markAsRead(id: string, recipientId: string): Promise<boolean> {
     try {
-      await db
+      // Ownership enforcement: only the recipient can mark their own notification
+      const rows = await db
         .update(notifications)
         .set({ isRead: true })
-        .where(eq(notifications.id, id));
+        .where(
+          and(
+            eq(notifications.id, id),
+            eq(notifications.recipientId, recipientId)
+          )
+        )
+        .returning();
+      return rows.length > 0;
     } catch {
-      // ignore
+      return false;
     }
   }
 

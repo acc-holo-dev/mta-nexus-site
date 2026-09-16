@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
-import { productRepository, serverRepository, reportRepository, auditRepository } from "@nexus/db";
-import { can, generateId } from "@nexus/security";
+import {
+  productRepository,
+  reportRepository,
+  auditRepository,
+  verificationRepository,
+} from "@nexus/db";
+import { can, generateId, rateLimiter } from "@nexus/security";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +14,16 @@ export async function POST(request: NextRequest) {
     const user = await authService.getSession(token);
 
     if (!user || !can(user, "admin.moderation")) {
-      return NextResponse.json({ error: "Forbidden: Admin or moderator privilege required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Forbidden: Admin or moderator privilege required" },
+        { status: 403 }
+      );
+    }
+
+    // Admin actions are rate limited
+    const rl = await rateLimiter.consume(`admin-action:${user.id}`, 60, 60);
+    if (!rl.success) {
+      return NextResponse.json({ error: "Too many admin actions" }, { status: 429 });
     }
 
     const { targetType, targetId, action, notes } = await request.json();
@@ -32,6 +46,23 @@ export async function POST(request: NextRequest) {
       if (action === "resolve" || action === "dismiss") {
         await reportRepository.resolve(targetId, action === "resolve" ? "resolved" : "dismissed", notes || "");
       }
+    } else if (targetType === "verification") {
+      // Verification can only be granted through the moderation workflow
+      if (action === "approve" || action === "reject") {
+        const resolved = await verificationRepository.resolveRequest({
+          id: targetId,
+          reviewerId: user.id,
+          decision: action === "approve" ? "approved" : "rejected",
+          reviewNotes: notes,
+        });
+
+        if (!resolved) {
+          return NextResponse.json(
+            { error: "Verification request not found or already resolved" },
+            { status: 404 }
+          );
+        }
+      }
     }
 
     await auditRepository.record({
@@ -46,9 +77,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, action, targetId });
   } catch (error: any) {
+    console.error("Admin action error:", error.message);
     return NextResponse.json(
-      { error: error.message || "Failed to execute administrative action" },
-      { status: 500 }
+      { error: error.statusCode ? error.message : "Failed to execute administrative action" },
+      { status: error.statusCode || 500 }
     );
   }
 }

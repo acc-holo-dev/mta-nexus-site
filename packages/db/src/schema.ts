@@ -473,3 +473,37 @@ export const moderationCases = pgTable("moderation_cases", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// 25. Verification Requests (Trust Layer — admin review workflow)
+export const verificationRequests = pgTable("verification_requests", {
+  id: text("id").primaryKey(),
+  requesterId: text("requester_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  targetType: text("target_type").notNull(), // user, developer, organization, server
+  targetId: text("target_id").notNull(),
+  status: text("status").notNull().default("pending"), // pending, approved, rejected
+  proofUrl: text("proof_url"),
+  notes: text("notes"),
+  reviewerId: text("reviewer_id").references(() => users.id, { onDelete: "set null" }),
+  reviewNotes: text("review_notes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+});
+
+// 26. Server Heartbeats (Telemetry & Analytics Foundation)
+export const serverHeartbeats = pgTable("server_heartbeats", {
+  id: text("id").primaryKey(),
+  installationId: text("installation_id")
+    .notNull()
+    .references(() => serverInstallations.id, { onDelete: "cascade" }),
+  serverId: text("server_id")
+    .notNull()
+    .references(() => servers.id, { onDelete: "cascade" }),
+  status: text("status").notNull().default("online"), // online, offline, maintenance
+  currentPlayers: integer("current_players").notNull().default(0),
+  maxPlayers: integer("max_players").notNull().default(0),
+  moduleVersion: text("module_version"),
+  mtaVersion: text("mta_version"),
+  recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
+});

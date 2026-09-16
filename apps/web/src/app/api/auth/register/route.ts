@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { registerSchema } from "@nexus/validation";
+import { rateLimiter } from "@nexus/security";
 
 export async function POST(request: NextRequest) {
   try {
+    // Abuse protection: limit registrations per IP
+    const ip = request.headers.get("x-forwarded-for") || "local";
+    const rl = await rateLimiter.consume(`register:${ip}`, 5, 3600);
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: "Too many registration attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const parsed = registerSchema.safeParse(body);
 

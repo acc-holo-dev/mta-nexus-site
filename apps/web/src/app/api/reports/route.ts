@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import { reportRepository, auditRepository } from "@nexus/db";
 import { createReportSchema } from "@nexus/validation";
-import { generateId, can } from "@nexus/security";
+import { generateId, can, rateLimiter } from "@nexus/security";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("nexus_session")?.value;
@@ -23,6 +23,15 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "Authentication required to submit report" }, { status: 401 });
+    }
+
+    // Abuse protection: limit report spam per user
+    const rl = await rateLimiter.consume(`report:${user.id}`, 10, 3600);
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: "Too many reports submitted. Please try again later." },
+        { status: 429 }
+      );
     }
 
     const body = await request.json();

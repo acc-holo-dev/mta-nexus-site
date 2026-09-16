@@ -27,3 +27,5 @@
 | `audit_events` | `aud_...` | Immutable audit log with actor ID, action, target, timestamp |
 | `reports` | `rpt_...` | Reporter foreign key to `users.id`, evidence URLs, status |
 | `moderation_cases` | `mod_...` | Foreign key to `reports.id`, moderator foreign key to `users.id` |
+| `verification_requests` | `ver_...` | Trust layer workflow: requester, target type/id, status, reviewer, resolution notes |
+| `server_heartbeats` | `ins_...` | Telemetry snapshots: installation, players, module version, recorded timestamp |

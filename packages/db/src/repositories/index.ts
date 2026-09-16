@@ -14,3 +14,5 @@ export * from "./audit";
 export * from "./reports";
 export * from "./notifications";
 export * from "./social";
+export * from "./telemetry";
+export * from "./verification";

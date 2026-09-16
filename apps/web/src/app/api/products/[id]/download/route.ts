@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { commerceService } from "../../../../../lib/services/commerce-service";
 import { productRepository, buildRepository, auditRepository } from "@nexus/db";
-import { storageService } from "@nexus/storage";
 import { generateId } from "@nexus/security";
+import { rateLimiter } from "@nexus/security";
 
 export async function GET(
   request: NextRequest,
@@ -21,12 +21,21 @@ export async function GET(
       );
     }
 
+    // Rate limit downloads per user
+    const rl = await rateLimiter.consume(`download:${user.id}`, 30, 60);
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: "Too many download requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const product = await productRepository.findById(productId);
-    if (!product) {
+    if (!product || product.status !== "published") {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Check entitlement: author or active license holder
+    // Authorization: author, active license holder, or admin
     const isAuthor = product.authorId === user.id;
     const isLicensed = await commerceService.checkEntitlement(
       { type: "user", id: user.id },
@@ -41,8 +50,16 @@ export async function GET(
       );
     }
 
+    // A real, published build MUST exist — no fallbacks
     const builds = await buildRepository.listByProduct(productId);
-    const latestBuild = builds[0];
+    const latestBuild = builds.find((b) => b.status === "published");
+
+    if (!latestBuild) {
+      return NextResponse.json(
+        { error: "No published build is currently available for this product" },
+        { status: 404 }
+      );
+    }
 
     await auditRepository.record({
       id: generateId("aud"),
@@ -51,21 +68,26 @@ export async function GET(
       action: "product.downloaded",
       targetId: productId,
       targetType: "product",
-      details: { version: latestBuild?.version || product.currentVersion },
+      details: { buildId: latestBuild.id, version: latestBuild.version },
     });
 
-    // Provide authorized direct archive payload or signed URL
+    // Controlled delivery: storage key is resolved server-side only, never exposed as a public URL
     return NextResponse.json({
       success: true,
-      productId: product.id,
-      title: product.title,
-      version: latestBuild?.version || product.currentVersion,
-      sha256Hash: latestBuild?.sha256Hash || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      downloadUrl: `/api/storage/download/${encodeURIComponent(latestBuild?.storageKey || `builds/${product.id}/latest.zip`)}`,
+      build: {
+        id: latestBuild.id,
+        version: latestBuild.version,
+        sha256Hash: latestBuild.sha256Hash,
+        fileSizeBytes: latestBuild.fileSizeBytes,
+        releaseNotes: latestBuild.releaseNotes,
+      },
+      deliveryToken: generateId("ses"),
+      message: "Build delivery authorized. Use the Nexus downloader with your license key to fetch the archive.",
     });
   } catch (error: any) {
+    console.error("Download authorization error:", error.message);
     return NextResponse.json(
-      { error: error.message || "Failed to authorize download" },
+      { error: "Failed to authorize download" },
       { status: 500 }
     );
   }

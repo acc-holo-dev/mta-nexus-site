@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { db } from "../client";
 import { content, comments } from "../schema";
 import type { Content, Comment } from "@nexus/domain";
@@ -86,6 +86,19 @@ export class ContentRepository {
       return rows[0] as unknown as Comment;
     } catch {
       return values as unknown as Comment;
+    }
+  }
+
+  async hasReviewFromUser(productId: string, authorId: string): Promise<boolean> {
+    try {
+      const rows = await db
+        .select()
+        .from(comments)
+        .where(and(eq(comments.productId, productId), eq(comments.authorId, authorId)))
+        .limit(1);
+      return rows.length > 0;
+    } catch {
+      return false;
     }
   }
 }

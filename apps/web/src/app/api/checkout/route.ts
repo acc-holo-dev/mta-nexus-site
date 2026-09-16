@@ -2,9 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { commerceService } from "../../../lib/services/commerce-service";
 import { authService } from "../../../lib/services/auth-service";
 import { checkoutSchema } from "@nexus/validation";
+import { rateLimiter } from "@nexus/security";
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit checkout attempts per IP
+    const ip = request.headers.get("x-forwarded-for") || "local";
+    const rl = await rateLimiter.consume(`checkout:${ip}`, 10, 60);
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: "Too many checkout attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const parsed = checkoutSchema.safeParse(body);
 
@@ -15,19 +26,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Authentication is mandatory for commerce operations
     const token = request.cookies.get("nexus_session")?.value;
-    let buyer = await authService.getSession(token);
+    const buyer = await authService.getSession(token);
 
-    // Fallback: if no active session, look up registered demo player or require auth
     if (!buyer) {
-      const users = await authService.listUsers();
-      buyer = users.find((u) => u.email === "player@example.com") || users[0];
-      if (!buyer) {
-        return NextResponse.json(
-          { error: "Authentication required for checkout" },
-          { status: 401 }
-        );
-      }
+      return NextResponse.json(
+        { error: "Authentication required for checkout" },
+        { status: 401 }
+      );
     }
 
     const result = await commerceService.createOrderAndCheckout({
@@ -39,9 +46,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result, { status: 201 });
   } catch (error: any) {
-    console.error("Checkout API error:", error);
+    console.error("Checkout API error:", error.message);
     return NextResponse.json(
-      { error: error.message || "Checkout failed" },
+      { error: error.statusCode ? error.message : "Checkout failed" },
       { status: error.statusCode || 500 }
     );
   }

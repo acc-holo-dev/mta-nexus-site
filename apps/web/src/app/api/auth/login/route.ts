@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { loginSchema } from "@nexus/validation";
+import { rateLimiter } from "@nexus/security";
 
 export async function POST(request: NextRequest) {
   try {
+    // Brute-force mitigation: strict per-IP limit on login attempts
+    const ip = request.headers.get("x-forwarded-for") || "local";
+    const rl = await rateLimiter.consume(`login:${ip}`, 8, 300);
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please try again in a few minutes." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const parsed = loginSchema.safeParse(body);
 

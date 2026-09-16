@@ -1,5 +1,6 @@
-import { serverRepository, auditRepository } from "@nexus/db";
+import { serverRepository, auditRepository, telemetryRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
+import crypto from "node:crypto";
 import { NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Server, ServerInstallation, User } from "@nexus/domain";
 
@@ -62,15 +63,20 @@ export class ServerService {
     return server;
   }
 
-  async registerInstallation(serverId: string, moduleVersion = "1.0.0"): Promise<ServerInstallation> {
+  async registerInstallation(serverId: string, moduleVersion = "1.0.0"): Promise<ServerInstallation & { apiKey?: string }> {
     const server = await serverRepository.findById(serverId);
     if (!server) throw new NotFoundError("Server", serverId);
 
     const instId = generateId("ins");
+
+    // Generate a one-time plaintext API key; only its SHA-256 hash is persisted
+    const apiKey = `nxk_${crypto.randomBytes(24).toString("hex")}`;
+    const apiKeyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
+
     const installation = await serverRepository.createInstallation({
       id: instId,
       serverId,
-      apiKeyHash: "hash_" + generateId("ses"),
+      apiKeyHash,
       moduleVersion,
       mtaVersion: "1.6.0",
       os: "linux",
@@ -104,7 +110,25 @@ export class ServerService {
       },
     });
 
-    return installation;
+    return { ...installation, apiKey };
+  }
+
+  async getServerTelemetry(serverId: string) {
+    const server = await serverRepository.findById(serverId);
+    if (!server) throw new NotFoundError("Server", serverId);
+
+    const heartbeats = await telemetryRepository.listRecentHeartbeats(serverId, 24);
+    const peakPlayers = await telemetryRepository.getPeakPlayers(serverId, 24);
+
+    return {
+      serverId,
+      currentStatus: server.status,
+      currentPlayers: server.currentPlayers,
+      maxPlayers: server.maxPlayers,
+      peakPlayers24h: peakPlayers,
+      recentHeartbeats: heartbeats.length,
+      lastHeartbeatAt: heartbeats[0]?.recordedAt || null,
+    };
   }
 }
 

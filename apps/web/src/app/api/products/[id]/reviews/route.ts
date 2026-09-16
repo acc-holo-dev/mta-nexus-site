@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../../lib/services/auth-service";
-import { commerceService } from "../../../../../lib/services/commerce-service";
 import {
   contentRepository,
   productRepository,
@@ -9,6 +8,7 @@ import {
 } from "@nexus/db";
 import { addCommentSchema } from "@nexus/validation";
 import { generateId } from "@nexus/security";
+import { rateLimiter } from "@nexus/security";
 
 export async function GET(
   request: NextRequest,
@@ -32,6 +32,15 @@ export async function POST(
       return NextResponse.json({ error: "Authentication required to review" }, { status: 401 });
     }
 
+    // Rate limit reviews per user
+    const rl = await rateLimiter.consume(`review:${user.id}`, 5, 300);
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: "Too many review submissions. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const parsed = addCommentSchema.safeParse(body);
 
@@ -47,9 +56,33 @@ export async function POST(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Verify purchase
+    // Review integrity rule 1: no self-reviews
+    if (product.authorId === user.id) {
+      return NextResponse.json(
+        { error: "You cannot review your own product" },
+        { status: 403 }
+      );
+    }
+
+    // Review integrity rule 2: one review per user per product
+    const hasExisting = await contentRepository.hasReviewFromUser(productId, user.id);
+    if (hasExisting) {
+      return NextResponse.json(
+        { error: "You have already reviewed this product" },
+        { status: 409 }
+      );
+    }
+
+    // Review integrity rule 3: paid products require a completed purchase
     const userLicenses = await licenseRepository.listByUser(user.id);
     const hasBought = userLicenses.some((l) => l.productId === productId);
+
+    if (!hasBought && product.price > 0) {
+      return NextResponse.json(
+        { error: "A verified purchase is required to review this product" },
+        { status: 403 }
+      );
+    }
 
     const rating = Math.min(5, Math.max(1, parsed.data.rating || 5));
 
@@ -62,7 +95,7 @@ export async function POST(
       isVerifiedPurchase: hasBought,
     });
 
-    // Recalculate true rating average from database reviews
+    // Recalculate true rating average from database reviews (source of truth)
     const allReviews = await contentRepository.listComments({ productId });
     const reviewsWithRating = allReviews.filter((r) => r.rating !== undefined && r.rating !== null);
 
@@ -90,9 +123,10 @@ export async function POST(
       { status: 201 }
     );
   } catch (error: any) {
+    console.error("Review submission error:", error.message);
     return NextResponse.json(
-      { error: error.message || "Failed to submit review" },
-      { status: 500 }
+      { error: error.statusCode ? error.message : "Failed to submit review" },
+      { status: error.statusCode || 500 }
     );
   }
 }

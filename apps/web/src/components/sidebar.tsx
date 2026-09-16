@@ -20,6 +20,7 @@ import {
   Building2,
   User as UserIcon,
   ShieldAlert,
+  DollarSign,
 } from "lucide-react";
 
 export function Sidebar({
@@ -43,6 +44,7 @@ export function Sidebar({
     { href: "/workspace", label: "Overview", icon: LayoutDashboard },
     { href: "/workspace/purchases", label: "Purchases", icon: CreditCard },
     { href: "/workspace/licenses", label: "Licenses", icon: Key },
+    { href: "/workspace/sales", label: "Sales", icon: DollarSign },
     { href: "/workspace/saved", label: "Saved", icon: Bookmark },
     { href: "/notifications", label: "Notifications", icon: Bell },
   ];
@@ -64,7 +66,7 @@ export function Sidebar({
               <span className="font-extrabold tracking-wider text-white text-xs">
                 MTA <span className="text-blue-500">NEXUS</span>
               </span>
-              <span className="text-[9px] text-neutral-500 -mt-0.5 font-mono">1.2 PUBLIC</span>
+              <span className="text-[9px] text-neutral-500 -mt-0.5 font-mono">1.3 TRUST</span>
             </div>
           </Link>
         )}

@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { db } from "../client";
-import { orders, orderItems } from "../schema";
+import { orders, orderItems, products } from "../schema";
 import type { Order, OrderItem } from "@nexus/domain";
 
 export class OrderRepository {
@@ -77,6 +77,37 @@ export class OrderRepository {
         .where(eq(orders.id, id));
     } catch {
       // ignore
+    }
+  }
+
+  /**
+   * Seller-side commerce history: all completed orders containing products
+   * authored by the given seller, with buyer-privacy preserved.
+   */
+  async listSalesBySeller(sellerId: string, limit = 100) {
+    try {
+      const rows = await db
+        .select({
+          orderId: orders.id,
+          orderNumber: orders.orderNumber,
+          orderStatus: orders.status,
+          createdAt: orders.createdAt,
+          productId: orderItems.productId,
+          unitPrice: orderItems.unitPrice,
+          currency: orderItems.currency,
+          productTitle: products.title,
+          productSlug: products.slug,
+        })
+        .from(orderItems)
+        .innerJoin(orders, eq(orderItems.orderId, orders.id))
+        .innerJoin(products, eq(orderItems.productId, products.id))
+        .where(eq(products.authorId, sellerId))
+        .orderBy(desc(orders.createdAt))
+        .limit(limit);
+
+      return rows.filter((r) => r.orderStatus === "completed");
+    } catch {
+      return [];
     }
   }
 }

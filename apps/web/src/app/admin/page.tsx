@@ -1,4 +1,4 @@
-import { userRepository } from "@nexus/db";
+import { userRepository, verificationRepository } from "@nexus/db";
 import { adminService } from "../../lib/services/admin-service";
 import {
   ShieldAlert,
@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   History,
   CheckCircle2,
+  BadgeCheck,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +33,7 @@ export default async function AdminPage() {
   const health = await adminService.getSystemHealthMetrics(adminUser);
   const reports = await adminService.listReports(adminUser);
   const auditLogs = await adminService.listAuditLogs(adminUser);
+  const verificationRequests = await verificationRepository.listAll();
 
   return (
     <div className="space-y-10">
@@ -78,6 +80,64 @@ export default async function AdminPage() {
         <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
           <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Open Reports</div>
           <div className="text-2xl font-black text-amber-400 mt-1">{health.counts.reportsOpen}</div>
+        </div>
+      </div>
+
+      {/* Verification Queue */}
+      <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
+        <div className="flex items-center justify-between border-b border-[#232838] pb-3">
+          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            <BadgeCheck className="w-4 h-4 text-blue-400" />
+            <span>Verification Requests Queue</span>
+          </h2>
+          <span className="text-[11px] text-neutral-500">
+            Approve / Reject through moderation workflow
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          {verificationRequests.length > 0 ? (
+            verificationRequests.map((vr) => (
+              <div
+                key={vr.id}
+                className="p-4 rounded-lg bg-neutral-900 border border-[#232838] flex flex-col md:flex-row md:items-center justify-between gap-4"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                      {vr.targetType}
+                    </span>
+                    <span className="text-xs font-bold text-white font-mono">{vr.targetId}</span>
+                  </div>
+                  <p className="text-[11px] text-neutral-400">
+                    Requester: {vr.requesterId} • {new Date(vr.createdAt).toLocaleDateString()}
+                  </p>
+                  {vr.notes && <p className="text-[11px] text-neutral-500">Notes: {vr.notes}</p>}
+                  {vr.reviewNotes && (
+                    <p className="text-[11px] text-neutral-500 font-mono">
+                      Review: {vr.reviewNotes}
+                    </p>
+                  )}
+                </div>
+
+                <span
+                  className={`px-2.5 py-1 rounded text-xs font-mono font-bold shrink-0 ${
+                    vr.status === "approved"
+                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                      : vr.status === "rejected"
+                        ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                        : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                  }`}
+                >
+                  {vr.status.toUpperCase()}
+                </span>
+              </div>
+            ))
+          ) : (
+            <p className="text-xs text-neutral-500 py-4 text-center">
+              No verification requests submitted.
+            </p>
+          )}
         </div>
       </div>
 

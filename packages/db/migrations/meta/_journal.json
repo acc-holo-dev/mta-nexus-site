@@ -8,6 +8,13 @@
       "when": 1789516695395,
       "tag": "0000_large_paladin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789528210862,
+      "tag": "0001_purple_sauron",
+      "breakpoints": true
     }
   ]
 }

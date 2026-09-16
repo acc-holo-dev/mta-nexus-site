@@ -13,7 +13,14 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json().catch(() => ({}));
     if (body.id) {
-      await notificationRepository.markAsRead(body.id);
+      // IDOR protection: only mark notifications owned by the current user
+      const updated = await notificationRepository.markAsRead(body.id, user.id);
+      if (!updated) {
+        return NextResponse.json(
+          { error: "Notification not found or not owned by you" },
+          { status: 404 }
+        );
+      }
     } else {
       await notificationRepository.markAllAsRead(user.id);
     }

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   CreditCard,
@@ -10,17 +10,37 @@ import {
   Lock,
   ArrowRight,
   Key,
-  Server,
 } from "lucide-react";
+
+interface ProductInfo {
+  id: string;
+  title: string;
+  price: number;
+  currency: string;
+  licenseModel: string;
+  currentVersion: string;
+}
 
 function CheckoutContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const productId = searchParams.get("productId") || "prd_inv_pro";
+  const productId = searchParams.get("productId");
 
+  const [product, setProduct] = useState<ProductInfo | null>(null);
+  const [productError, setProductError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!productId) return;
+    fetch(`/api/products/${productId}`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error("Product not found");
+        return res.json();
+      })
+      .then(setProduct)
+      .catch((e) => setProductError(e.message));
+  }, [productId]);
 
   const handlePay = async () => {
     setLoading(true);
@@ -31,7 +51,7 @@ function CheckoutContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productIds: [productId],
-          paymentProvider: "mock",
+          paymentProvider: "sandbox",
         }),
       });
 
@@ -57,15 +77,14 @@ function CheckoutContent() {
           </div>
           <h1 className="text-2xl font-black text-white">Payment Completed!</h1>
           <p className="text-xs text-neutral-400">
-            Order #{completed.order?.orderNumber} has been verified and settled in the immutable ledger.
+            Order #{completed.order?.orderNumber} has been settled in the ledger.
           </p>
 
-          {/* Provisioned License */}
           {completed.licenses && completed.licenses.length > 0 && (
             <div className="p-4 rounded-xl bg-neutral-900 border border-[#232838] text-left space-y-2 mt-6">
               <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
                 <Key className="w-4 h-4 text-blue-400" />
-                <span>Your Cryptographic License Key</span>
+                <span>Your License Key</span>
               </div>
               <div className="font-mono text-sm text-emerald-400 select-all p-3 rounded bg-black/60 border border-neutral-800">
                 {completed.licenses[0].key}
@@ -78,10 +97,10 @@ function CheckoutContent() {
 
           <div className="pt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/workspace"
+              href="/workspace/licenses"
               className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors"
             >
-              Go to My Workspace
+              Go to My Licenses
             </Link>
             <Link
               href="/market"
@@ -95,6 +114,35 @@ function CheckoutContent() {
     );
   }
 
+  if (!productId || productError) {
+    return (
+      <div className="max-w-xl mx-auto py-16 text-center space-y-4">
+        <h1 className="text-xl font-black text-white">
+          {productError || "No product selected"}
+        </h1>
+        <p className="text-xs text-neutral-400">
+          Choose a resource in the marketplace to proceed to checkout.
+        </p>
+        <Link
+          href="/market"
+          className="inline-block px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors"
+        >
+          Browse Marketplace
+        </Link>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 text-center text-xs text-neutral-400">
+        Loading product details...
+      </div>
+    );
+  }
+
+  const formattedPrice = product.price === 0 ? "Free" : `$${(product.price / 100).toFixed(2)}`;
+
   return (
     <div className="max-w-2xl mx-auto py-8 space-y-8">
       <div className="border-b border-[#232838] pb-4">
@@ -103,7 +151,7 @@ function CheckoutContent() {
           <span>Secure Checkout</span>
         </h1>
         <p className="text-xs text-neutral-400 mt-1">
-          Instant cryptographic license provisioning with Escrow protection.
+          Instant license provisioning after payment confirmation.
         </p>
       </div>
 
@@ -113,37 +161,37 @@ function CheckoutContent() {
         </div>
       )}
 
-      {/* Order Summary */}
+      {/* Order Summary — real product data */}
       <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
         <h2 className="text-sm font-bold text-white uppercase tracking-wider">Order Summary</h2>
         <div className="flex items-center justify-between py-2 border-b border-neutral-800 text-sm">
-          <span className="text-neutral-200">Selected Resource Product</span>
-          <span className="font-bold font-mono text-white">$34.99</span>
+          <span className="text-neutral-200">{product.title}</span>
+          <span className="font-bold font-mono text-white">{formattedPrice}</span>
         </div>
         <div className="flex items-center justify-between py-1 text-xs text-neutral-400">
-          <span>Platform Processing Fee (Included)</span>
-          <span className="font-mono">$2.45</span>
+          <span className="capitalize">License model: {product.licenseModel.replace(/_/g, " ")}</span>
+          <span className="font-mono">v{product.currentVersion}</span>
         </div>
         <div className="flex items-center justify-between pt-2 text-base font-black text-white">
           <span>Total Due</span>
-          <span className="font-mono text-emerald-400">$34.99</span>
+          <span className="font-mono text-emerald-400">{formattedPrice}</span>
         </div>
       </div>
 
       {/* Payment Selector */}
       <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
         <h2 className="text-sm font-bold text-white uppercase tracking-wider">Payment Method</h2>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="p-4 rounded-lg border-2 border-blue-500 bg-blue-950/20 text-white cursor-pointer space-y-1">
+        <div className="grid grid-cols-1 gap-3">
+          <div className="p-4 rounded-lg border-2 border-blue-500 bg-blue-950/20 text-white space-y-1">
             <div className="font-bold text-xs flex items-center gap-1.5">
               <CreditCard className="w-4 h-4 text-blue-400" />
-              <span>Instant Sandbox / Card</span>
+              <span>Sandbox / Card Checkout</span>
             </div>
-            <div className="text-[11px] text-neutral-400">Direct simulated checkout</div>
+            <div className="text-[11px] text-neutral-400">Instant activation in development environment</div>
           </div>
-          <div className="p-4 rounded-lg border border-neutral-800 bg-neutral-900/50 text-neutral-400 space-y-1 opacity-70">
-            <div className="font-bold text-xs">Crypto (USDT / TON)</div>
-            <div className="text-[11px] text-neutral-500">Available on mainnet</div>
+          <div className="p-4 rounded-lg border border-neutral-800 bg-neutral-900/50 text-neutral-500 space-y-1 opacity-60">
+            <div className="font-bold text-xs">Cryptocurrency</div>
+            <div className="text-[11px] text-neutral-600">Coming soon</div>
           </div>
         </div>
       </div>
@@ -158,7 +206,7 @@ function CheckoutContent() {
           <span>Authorizing & Recording Ledger...</span>
         ) : (
           <>
-            <span>Authorize & Pay $34.99</span>
+            <span>Authorize & Pay {formattedPrice}</span>
             <ArrowRight className="w-4 h-4" />
           </>
         )}
@@ -166,7 +214,7 @@ function CheckoutContent() {
 
       <div className="flex items-center justify-center gap-2 text-xs text-neutral-500">
         <ShieldCheck className="w-4 h-4 text-emerald-500" />
-        <span>256-Bit SSL Encrypted & Double-Entry Ledger Protection</span>
+        <span>Secured transaction & double-entry ledger protection</span>
       </div>
     </div>
   );
