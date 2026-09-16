@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { productService } from "../../../../../lib/services/product-service";
+import { productService } from "../../../../lib/services/product-service";
 
 export async function GET(
   _request: NextRequest,
