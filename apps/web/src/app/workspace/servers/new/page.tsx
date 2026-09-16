@@ -49,7 +49,7 @@ export default function RegisterServerPage() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ moduleVersion: "1.0.0" }),
+          body: JSON.stringify({ moduleVersion: "0.1.0" }),
         }
       );
       const installationData = await installationResponse.json();
@@ -87,8 +87,8 @@ export default function RegisterServerPage() {
             </code>
             . The server appears publicly only after a fresh authenticated heartbeat.
           </p>
-          <Link href="/workspace" className="inline-block text-sm font-semibold text-accent">
-            Return to workspace
+          <Link href={"/workspace/servers/" + installation.serverId} className="inline-block text-sm font-semibold text-accent">
+            Open server management
           </Link>
         </div>
       </div>
