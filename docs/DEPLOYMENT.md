@@ -1,17 +1,17 @@
 # Production deployment
 
-This guide targets one small Linux VPS, which fits the initial **$20–30/month** budget better than a distributed platform. Use one application process, PostgreSQL 16, a persistent upload volume, and Caddy or another TLS reverse proxy.
+This guide targets one small Linux VPS and the initial **$20–30/month** ceiling. The closed beta is designed for one application process, PostgreSQL 16, a local upload directory on the system disk, and a TLS reverse proxy.
 
-## Required external inputs
+## Chosen target
 
-Before production can be started, the owner must provide:
+- provider: Hetzner Cloud;
+- location: Finland or Germany;
+- baseline: shared instance with 4 GB RAM;
+- primary domain: `nexus-mta.com`;
+- fallback domain: `nexus-mta.pro`;
+- email: disabled until an SMTP provider is deliberately connected.
 
-1. a domain and DNS control;
-2. the chosen VPS/provider and access method;
-3. SMTP credentials and a verified sender address;
-4. backup destination and retention preference.
-
-Paid commerce additionally requires jurisdiction/legal terms and a selected payment provider. It is not part of the free closed beta.
+Use the plan selector at creation time: pricing changes, but the instance plus provider backups must remain within the $30/month ceiling.
 
 ## Runtime requirements
 
@@ -30,28 +30,22 @@ The application port must only be reachable from the local reverse proxy, never 
 - reject request bodies larger than **65 MiB** before they reach Next.js;
 - apply reasonable connection and request timeouts.
 
-The application independently enforces a 64 MiB asset limit, but multipart parsing can allocate memory before application validation. The proxy body limit is therefore a production requirement, not an optional optimization.
+The application independently enforces a 64 MiB asset limit, but multipart parsing can allocate memory before application validation. The proxy body limit is therefore a production requirement.
 
 ## Production environment
-
-Production validation is fail-closed. At minimum configure:
 
 ```dotenv
 NODE_ENV=production
 PORT=3000
-NEXT_PUBLIC_APP_URL=https://nexus.example.com
+NEXT_PUBLIC_APP_URL=https://nexus-mta.com
 DATABASE_URL=postgres://USER:PASSWORD@HOST:5432/DATABASE
 AUTH_SECRET=GENERATE_A_UNIQUE_SECRET_OF_AT_LEAST_32_CHARACTERS
 
 STORAGE_PROVIDER=local
 STORAGE_LOCAL_PATH=/var/lib/mta-nexus/uploads
 
-EMAIL_PROVIDER=smtp
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=...
-SMTP_PASS=...
-SMTP_FROM=noreply@example.com
+EMAIL_PROVIDER=disabled
+SMTP_FROM=no-reply@nexus-mta.invalid
 ```
 
 The S3 option is reserved but not implemented. Selecting it raises an explicit runtime error; it never silently stores data on the application disk.
@@ -67,6 +61,12 @@ NODE_ENV=production pnpm start
 
 Check `GET /api/health` through the HTTPS domain after startup.
 
+## Backups
+
+Enable Hetzner Cloud Backups. They create daily copies and keep seven slots, but do not include attached volumes. Keep PostgreSQL and `/var/lib/mta-nexus/uploads` on the backed-up system disk in this phase.
+
+Also create a daily archive of the database and uploads, then test a restore before inviting users. Provider backups and a tested restore are the minimum, not a substitute for checking that data can be recovered.
+
 ## Upgrade
 
 ```bash
@@ -78,15 +78,6 @@ pnpm db:migrate
 pnpm check
 sudo systemctl restart mta-nexus
 ```
-
-Never deploy before a database backup. Database migrations are forward-only; test restore procedures before the closed beta.
-
-## Backup minimum
-
-- nightly PostgreSQL dump;
-- daily snapshot or archive of `/var/lib/mta-nexus/uploads`;
-- seven daily copies plus four weekly copies;
-- one restore drill before inviting users.
 
 ## Single-instance limitations
 

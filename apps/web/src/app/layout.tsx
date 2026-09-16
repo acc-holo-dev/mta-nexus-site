@@ -4,20 +4,19 @@ import { NexusShell } from "../components/nexus-shell";
 
 export const metadata: Metadata = {
   title: {
-    default: "MTA NEXUS — Resource Marketplace & Server Ecosystem for MTA:SA",
+    default: "MTA NEXUS — Live Servers, Community & Free Resources",
     template: "%s | MTA NEXUS",
   },
   description:
-    "Buy, license, and publish Multi Theft Auto resources. Discover servers, developers, and verified scripts with cryptographic licensing.",
+    "Discover live Multi Theft Auto servers, community updates, and free resources during the MTA Nexus closed beta.",
   openGraph: {
-    title: "MTA NEXUS — Resource Marketplace & Server Ecosystem",
+    title: "MTA NEXUS — Live Servers, Community & Free Resources",
     description:
-      "The unified platform for MTA:SA servers, scripters, studios, and players.",
+      "A player-first platform for what is happening in MTA right now.",
     type: "website",
   },
 };
 
-// Theme init: apply persisted theme before paint to avoid flash
 const themeInitScript = `
 (function() {
   try {

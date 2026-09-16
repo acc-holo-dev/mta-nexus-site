@@ -39,7 +39,7 @@ export const envSchema = z
     STORAGE_S3_ACCESS_KEY: z.string(),
     STORAGE_S3_SECRET_KEY: z.string(),
     STORAGE_S3_REGION: z.string(),
-    EMAIL_PROVIDER: z.enum(["log", "smtp"]),
+    EMAIL_PROVIDER: z.enum(["disabled", "log", "smtp"]),
     SMTP_HOST: z.string(),
     SMTP_PORT: z.coerce.number().int().positive().max(65535),
     SMTP_USER: z.string(),
@@ -86,7 +86,7 @@ export const envSchema = z
         addIssue("STORAGE_LOCAL_PATH", "Production local storage must use an absolute mounted path");
       }
       if (value.EMAIL_PROVIDER === "log") {
-        addIssue("EMAIL_PROVIDER", "Production must use a real email provider");
+        addIssue("EMAIL_PROVIDER", "Production email must be disabled or use SMTP");
       }
     }
   });
@@ -107,11 +107,12 @@ export function getEnvConfig(env: Record<string, string | undefined> = process.e
         STORAGE_S3_ACCESS_KEY: "",
         STORAGE_S3_SECRET_KEY: "",
         STORAGE_S3_REGION: "us-east-1",
+        EMAIL_PROVIDER: "disabled",
         SMTP_HOST: "",
         SMTP_PORT: "1025",
         SMTP_USER: "",
         SMTP_PASS: "",
-        SMTP_FROM: "no-reply@mta-nexus.invalid",
+        SMTP_FROM: "no-reply@nexus-mta.invalid",
         ...env,
       }
     : { ...developmentDefaults, ...env };

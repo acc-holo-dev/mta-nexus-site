@@ -30,6 +30,20 @@ describe("production configuration", () => {
     expect(config.EMAIL_PROVIDER).toBe("smtp");
   });
 
+  it("allows production email to be explicitly disabled for closed beta", () => {
+    const config = getEnvConfig({
+      NODE_ENV: "production",
+      NEXT_PUBLIC_APP_URL: "https://nexus-mta.com",
+      DATABASE_URL: "postgres://nexus:secret@db.example.com:5432/nexus",
+      AUTH_SECRET: "a-production-secret-with-at-least-32-characters",
+      STORAGE_PROVIDER: "local",
+      STORAGE_LOCAL_PATH: "/var/lib/mta-nexus/uploads",
+      EMAIL_PROVIDER: "disabled",
+    });
+
+    expect(config.EMAIL_PROVIDER).toBe("disabled");
+  });
+
   it("rejects localhost and log-only email in production", () => {
     expect(() =>
       getEnvConfig({

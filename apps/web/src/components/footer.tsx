@@ -33,6 +33,11 @@ export function Footer() {
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 border-t border-base flex flex-col sm:flex-row items-center justify-between text-faint gap-2">
         <div className="font-caption">© 2026 MTA Nexus · Closed beta</div>
+        <div className="flex items-center gap-3 font-caption">
+          <Link href="/terms" className="hover:text-primary">Terms</Link>
+          <Link href="/privacy" className="hover:text-primary">Privacy</Link>
+          <Link href="/copyright" className="hover:text-primary">Copyright</Link>
+        </div>
         <div className="font-caption">Not affiliated with Rockstar Games, Take-Two Interactive, or Multi Theft Auto.</div>
       </div>
     </footer>
