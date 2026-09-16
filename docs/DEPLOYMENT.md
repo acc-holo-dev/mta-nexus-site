@@ -21,6 +21,17 @@ Paid commerce additionally requires jurisdiction/legal terms and a selected paym
 - HTTPS reverse proxy
 - persistent directories for PostgreSQL and resource uploads
 
+## Reverse-proxy security contract
+
+The application port must only be reachable from the local reverse proxy, never directly from the internet. The proxy must:
+
+- terminate HTTPS and redirect HTTP to HTTPS;
+- replace, rather than append to, inbound `X-Forwarded-For` and `X-Real-IP` headers;
+- reject request bodies larger than **65 MiB** before they reach Next.js;
+- apply reasonable connection and request timeouts.
+
+The application independently enforces a 64 MiB asset limit, but multipart parsing can allocate memory before application validation. The proxy body limit is therefore a production requirement, not an optional optimization.
+
 ## Production environment
 
 Production validation is fail-closed. At minimum configure:

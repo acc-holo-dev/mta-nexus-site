@@ -5,7 +5,8 @@ import { generateId } from "@nexus/security";
 import { ValidationError } from "@nexus/domain";
 import type { StorageObjectMeta } from "./types";
 
-const MAX_FILE_SIZE_BYTES = 250 * 1024 * 1024; // 250 MB
+export const MAX_FILE_SIZE_BYTES = 64 * 1024 * 1024;
+
 const ALLOWED_EXTENSIONS = new Set([
   ".zip",
   ".rar",
@@ -31,6 +32,9 @@ export class StorageService {
     userId: string;
     isPrivate?: boolean;
   }): Promise<StorageObjectMeta & { id: string }> {
+    if (input.data.byteLength === 0) {
+      throw new ValidationError("Empty files are not permitted");
+    }
     if (input.data.byteLength > MAX_FILE_SIZE_BYTES) {
       throw new ValidationError(
         `File exceeds maximum permitted size of ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB`
@@ -38,8 +42,12 @@ export class StorageService {
     }
 
     const ext = path.extname(input.fileName).toLowerCase();
-    if (ext && !ALLOWED_EXTENSIONS.has(ext)) {
-      throw new ValidationError(`File type '${ext}' is not permitted in MTA Nexus storage`);
+    if (!ext || !ALLOWED_EXTENSIONS.has(ext)) {
+      throw new ValidationError(
+        ext
+          ? `File type '${ext}' is not permitted in MTA Nexus storage`
+          : "A permitted file extension is required"
+      );
     }
 
     const sha256Hash = crypto.createHash("sha256").update(input.data).digest("hex");

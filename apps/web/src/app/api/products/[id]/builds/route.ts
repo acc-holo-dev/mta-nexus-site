@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { productService } from "../../../../../lib/services/product-service";
 import { authService } from "../../../../../lib/services/auth-service";
-import { storageService } from "@nexus/storage";
+import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
 import { rateLimiter } from "@nexus/security";
+import { AppError } from "@nexus/domain";
+
+const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
 
 const buildMetadataSchema = z.object({
   version: z
@@ -28,6 +31,17 @@ export async function POST(
       return NextResponse.json({ error: "Build upload limit exceeded" }, { status: 429 });
     }
 
+    const declaredLength = Number(request.headers.get("content-length"));
+    if (
+      Number.isFinite(declaredLength) &&
+      declaredLength > MAX_FILE_SIZE_BYTES + MULTIPART_OVERHEAD_BYTES
+    ) {
+      return NextResponse.json(
+        { error: "Build archive exceeds the 64MB closed-beta limit" },
+        { status: 413 }
+      );
+    }
+
     const form = await request.formData();
     const file = form.get("file");
     const parsed = buildMetadataSchema.safeParse({
@@ -38,6 +52,12 @@ export async function POST(
       return NextResponse.json(
         { error: "A valid build archive and semantic version are required" },
         { status: 400 }
+      );
+    }
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: "Build archive exceeds the 64MB closed-beta limit" },
+        { status: 413 }
       );
     }
 
@@ -68,14 +88,13 @@ export async function POST(
       throw error;
     }
   } catch (error: unknown) {
-    const appError =
-      error instanceof Error && "statusCode" in error
-        ? (error as Error & { statusCode: number })
-        : null;
     console.error("Build upload error:", error);
-    return NextResponse.json(
-      { error: appError?.message || "Could not publish build" },
-      { status: appError?.statusCode || 500 }
-    );
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode }
+      );
+    }
+    return NextResponse.json({ error: "Could not publish build" }, { status: 500 });
   }
 }
