@@ -19,6 +19,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
   let userA: User;
   let userB: User;
   let author: User;
+  let admin: User;
   let product: Product;
 
   beforeAll(async () => {
@@ -44,6 +45,14 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       username: `sec_auth_${ts}`,
       displayName: "Security Author",
       role: "developer",
+    });
+
+    admin = await userRepository.create({
+      id: `usr_sec_admin_${ts}`,
+      email: `sec_admin_${ts}@nexus.test`,
+      username: `sec_admin_${ts}`,
+      displayName: "Security Admin",
+      role: "admin",
     });
 
     product = await productRepository.create({
@@ -205,7 +214,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     // Reject first
     const rejected = await verificationRepository.resolveRequest({
       id: request.id,
-      reviewerId: "usr_admin_001",
+      reviewerId: admin.id,
       decision: "rejected",
       reviewNotes: "Insufficient proof",
     });
@@ -214,7 +223,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     // Rejected request cannot be resolved again
     const secondAttempt = await verificationRepository.resolveRequest({
       id: request.id,
-      reviewerId: "usr_admin_001",
+      reviewerId: admin.id,
       decision: "approved",
     });
     expect(secondAttempt).toBeNull();
@@ -228,7 +237,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     });
     const approved = await verificationRepository.resolveRequest({
       id: request2.id,
-      reviewerId: "usr_admin_001",
+      reviewerId: admin.id,
       decision: "approved",
       reviewNotes: "Portfolio verified",
     });

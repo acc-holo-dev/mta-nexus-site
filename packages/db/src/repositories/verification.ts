@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { and, eq, desc } from "drizzle-orm";
 import { db } from "../client";
 import { verificationRequests, users, organizations, servers } from "../schema";
 import { generateId } from "@nexus/security";
@@ -33,7 +33,7 @@ export class VerificationRepository {
     const rows = await db
       .select()
       .from(verificationRequests)
-      .where(eq(verificationRequests.id, id))
+      .where(and(eq(verificationRequests.id, id), eq(verificationRequests.status, "pending")))
       .limit(1);
     return rows[0] || null;
   }
@@ -55,8 +55,8 @@ export class VerificationRepository {
   }
 
   /**
-   * Resolve a verification request and apply the verified flag to the target entity.
-   * Verification can only be granted through this moderation workflow.
+   * Atomically resolve a pending request and apply verification to its target.
+   * The conditional update prevents two moderators from resolving the same request.
    */
   async resolveRequest(input: {
     id: string;
@@ -64,36 +64,41 @@ export class VerificationRepository {
     decision: "approved" | "rejected";
     reviewNotes?: string;
   }) {
-    const request = await this.findPendingById(input.id);
-    if (!request) return null;
-    if (request.status !== "pending") return null;
+    return db.transaction(async (tx) => {
+      const rows = await tx
+        .update(verificationRequests)
+        .set({
+          status: input.decision,
+          reviewerId: input.reviewerId,
+          reviewNotes: input.reviewNotes,
+          resolvedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(verificationRequests.id, input.id),
+            eq(verificationRequests.status, "pending")
+          )
+        )
+        .returning();
 
-    const rows = await db
-      .update(verificationRequests)
-      .set({
-        status: input.decision,
-        reviewerId: input.reviewerId,
-        reviewNotes: input.reviewNotes,
-        resolvedAt: new Date(),
-      })
-      .where(eq(verificationRequests.id, input.id))
-      .returning();
+      const request = rows[0];
+      if (!request) return null;
 
-    // Apply the verified flag to the target entity upon approval
-    if (input.decision === "approved") {
-      if (request.targetType === "user" || request.targetType === "developer") {
-        await db.update(users).set({ isVerified: true }).where(eq(users.id, request.targetId));
-      } else if (request.targetType === "organization") {
-        await db
-          .update(organizations)
-          .set({ isVerified: true })
-          .where(eq(organizations.id, request.targetId));
-      } else if (request.targetType === "server") {
-        await db.update(servers).set({ isVerified: true }).where(eq(servers.id, request.targetId));
+      if (input.decision === "approved") {
+        if (request.targetType === "user" || request.targetType === "developer") {
+          await tx.update(users).set({ isVerified: true }).where(eq(users.id, request.targetId));
+        } else if (request.targetType === "organization") {
+          await tx
+            .update(organizations)
+            .set({ isVerified: true })
+            .where(eq(organizations.id, request.targetId));
+        } else if (request.targetType === "server") {
+          await tx.update(servers).set({ isVerified: true }).where(eq(servers.id, request.targetId));
+        }
       }
-    }
 
-    return rows[0];
+      return request;
+    });
   }
 }
 
