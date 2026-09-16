@@ -74,8 +74,7 @@ export default async function AdminPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-          <span className="font-label text-success uppercase">Operational</span>
+          <span className="font-label text-muted uppercase">Authorized admin session</span>
         </div>
       </div>
 
