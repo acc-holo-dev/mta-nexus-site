@@ -2,7 +2,7 @@ import {
   userRepository,
   sessionRepository,
   organizationRepository,
-  auditRepository,
+  authRepository,
 } from "@nexus/db";
 import { generateId, generateSessionToken, hashPassword, verifyPassword } from "@nexus/security";
 import {
@@ -12,6 +12,15 @@ import {
   ForbiddenError,
 } from "@nexus/domain";
 import type { User } from "@nexus/domain";
+
+function isUniqueConstraintError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: string }).code === "23505"
+  );
+}
 
 export class AuthService {
   async register(input: {
@@ -32,39 +41,41 @@ export class AuthService {
 
     const userId = generateId("usr");
     const passwordHash = await hashPassword(input.password);
-
-    const user = await userRepository.create({
-      id: userId,
-      email: input.email.toLowerCase(),
-      username: input.username,
-      displayName: input.displayName || input.username,
-      passwordHash,
-      role: "user",
-      isVerified: false,
-      emailVerified: false,
-    });
-
     const token = generateSessionToken();
     const expiresAt = new Date(Date.now() + 86400000 * 14);
 
-    await sessionRepository.create({
-      id: generateId("ses"),
-      userId: user.id,
-      token,
-      expiresAt,
-    });
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: user.id,
-      actorType: "user",
-      action: "user.registered",
-      targetId: user.id,
-      targetType: "user",
-      details: { email: user.email },
-    });
-
-    return { user, token };
+    try {
+      const user = await authRepository.registerAccount({
+        user: {
+          id: userId,
+          email: input.email,
+          username: input.username,
+          displayName: input.displayName || input.username,
+          passwordHash,
+        },
+        session: {
+          id: generateId("ses"),
+          userId,
+          token,
+          expiresAt,
+        },
+        audit: {
+          id: generateId("aud"),
+          actorId: userId,
+          actorType: "user",
+          action: "user.registered",
+          targetId: userId,
+          targetType: "user",
+          details: { email: input.email.toLowerCase() },
+        },
+      });
+      return { user, token };
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        throw new ConflictError("Email or username is already registered");
+      }
+      throw error;
+    }
   }
 
   async login(input: {
@@ -84,22 +95,23 @@ export class AuthService {
     const token = generateSessionToken();
     const expiresAt = new Date(Date.now() + 86400000 * 14);
 
-    await sessionRepository.create({
-      id: generateId("ses"),
-      userId: userWithHash.id,
-      token,
-      expiresAt,
-    });
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: userWithHash.id,
-      actorType: "user",
-      action: "user.logged_in",
-      targetId: userWithHash.id,
-      targetType: "user",
-      details: { email: userWithHash.email },
-    });
+    await authRepository.createLoginSession(
+      {
+        id: generateId("ses"),
+        userId: userWithHash.id,
+        token,
+        expiresAt,
+      },
+      {
+        id: generateId("aud"),
+        actorId: userWithHash.id,
+        actorType: "user",
+        action: "user.logged_in",
+        targetId: userWithHash.id,
+        targetType: "user",
+        details: { email: userWithHash.email },
+      }
+    );
 
     const { passwordHash: _, ...user } = userWithHash;
     return { user: user as User, token };
@@ -113,17 +125,19 @@ export class AuthService {
 
   async logout(token: string): Promise<void> {
     const session = await sessionRepository.findValidSession(token);
-    if (session) {
-      await auditRepository.record({
-        id: generateId("aud"),
-        actorId: session.user.id,
-        actorType: "user",
-        action: "user.logged_out",
-        targetId: session.user.id,
-        targetType: "user",
-      });
+    if (!session) {
+      await sessionRepository.delete(token);
+      return;
     }
-    await sessionRepository.delete(token);
+
+    await authRepository.revokeSession(token, {
+      id: generateId("aud"),
+      actorId: session.user.id,
+      actorType: "user",
+      action: "user.logged_out",
+      targetId: session.user.id,
+      targetType: "user",
+    });
   }
 
   async switchContext(userId: string, contextId: string): Promise<User> {

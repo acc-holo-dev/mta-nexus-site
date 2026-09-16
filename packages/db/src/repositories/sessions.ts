@@ -14,7 +14,7 @@ export interface SessionRecord {
   createdAt: Date;
 }
 
-function digestSessionToken(token: string): string {
+export function digestSessionToken(token: string): string {
   return crypto.createHash("sha256").update(token, "utf8").digest("hex");
 }
 
