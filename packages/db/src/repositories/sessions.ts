@@ -1,4 +1,4 @@
-import { eq, and, gt } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "../client";
 import { sessions, users } from "../schema";
 import type { User } from "@nexus/domain";
@@ -32,46 +32,34 @@ export class SessionRepository {
       createdAt: new Date(),
     };
 
-    try {
-      const rows = await db.insert(sessions).values(values).returning();
-      return rows[0] as SessionRecord;
-    } catch {
-      return values as SessionRecord;
-    }
+    const rows = await db.insert(sessions).values(values).returning();
+    return rows[0] as SessionRecord;
   }
 
   async findValidSession(token: string): Promise<{ session: SessionRecord; user: User } | null> {
-    try {
-      const rows = await db
-        .select({
-          session: sessions,
-          user: users,
-        })
-        .from(sessions)
-        .innerJoin(users, eq(sessions.userId, users.id))
-        .where(eq(sessions.token, token))
-        .limit(1);
+    const rows = await db
+      .select({
+        session: sessions,
+        user: users,
+      })
+      .from(sessions)
+      .innerJoin(users, eq(sessions.userId, users.id))
+      .where(eq(sessions.token, token))
+      .limit(1);
 
-      if (!rows.length) return null;
-      const session = rows[0].session as SessionRecord;
-      if (new Date(session.expiresAt).getTime() <= Date.now()) {
-        return null;
-      }
-      return {
-        session,
-        user: rows[0].user as unknown as User,
-      };
-    } catch {
+    if (!rows.length) return null;
+    const session = rows[0].session as SessionRecord;
+    if (new Date(session.expiresAt).getTime() <= Date.now()) {
       return null;
     }
+    return {
+      session,
+      user: rows[0].user as unknown as User,
+    };
   }
 
   async delete(token: string): Promise<void> {
-    try {
-      await db.delete(sessions).where(eq(sessions.token, token));
-    } catch {
-      // ignore
-    }
+    await db.delete(sessions).where(eq(sessions.token, token));
   }
 }
 
