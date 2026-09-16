@@ -4,12 +4,9 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
-  CreditCard,
   ShieldCheck,
   CheckCircle2,
   Lock,
-  ArrowRight,
-  Key,
 } from "lucide-react";
 
 interface ProductInfo {
@@ -43,26 +40,28 @@ function CheckoutContent() {
   }, [productId]);
 
   const handlePay = async () => {
+    if (!product || product.price > 0) {
+      setError("Paid checkout is not available yet.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/checkout", {
+      const res = await fetch("/api/resources/claim", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productIds: [productId],
-          paymentProvider: "sandbox",
-        }),
+        body: JSON.stringify({ productId: product.id }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Payment failed");
+        throw new Error(data.error || "Could not add the resource");
       }
 
       setCompleted(data);
     } catch (err: any) {
-      setError(err.message || "An unexpected error occurred during checkout");
+      setError(err.message || "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -75,25 +74,10 @@ function CheckoutContent() {
           <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-10 h-10" />
           </div>
-          <h1 className="text-2xl font-black text-white">Payment Completed!</h1>
+          <h1 className="text-2xl font-black text-white">Resource added</h1>
           <p className="text-xs text-neutral-400">
-            Order #{completed.order?.orderNumber} has been settled in the ledger.
+            This free resource is now available in your library.
           </p>
-
-          {completed.licenses && completed.licenses.length > 0 && (
-            <div className="p-4 rounded-xl bg-neutral-900 border border-base text-left space-y-2 mt-6">
-              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
-                <Key className="w-4 h-4 text-blue-400" />
-                <span>Your License Key</span>
-              </div>
-              <div className="font-mono text-sm text-emerald-400 select-all p-3 rounded bg-black/60 border border-neutral-800">
-                {completed.licenses[0].key}
-              </div>
-              <p className="text-[11px] text-neutral-500">
-                Insert this key into your server&apos;s <code className="text-neutral-300">nexus.json</code> or module config to activate.
-              </p>
-            </div>
-          )}
 
           <div className="pt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
@@ -151,7 +135,7 @@ function CheckoutContent() {
           <span>Secure Checkout</span>
         </h1>
         <p className="text-xs text-neutral-400 mt-1">
-          Instant license provisioning after payment confirmation.
+          Free resources can be added instantly. Paid checkout will open after a real provider is connected.
         </p>
       </div>
 
@@ -178,43 +162,33 @@ function CheckoutContent() {
         </div>
       </div>
 
-      {/* Payment Selector */}
-      <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider">Payment Method</h2>
-        <div className="grid grid-cols-1 gap-3">
-          <div className="p-4 rounded-lg border-2 border-blue-500 bg-blue-950/20 text-white space-y-1">
-            <div className="font-bold text-xs flex items-center gap-1.5">
-              <CreditCard className="w-4 h-4 text-blue-400" />
-              <span>Sandbox / Card Checkout</span>
-            </div>
-            <div className="text-[11px] text-neutral-400">Instant activation in development environment</div>
-          </div>
-          <div className="p-4 rounded-lg border border-neutral-800 bg-neutral-900/50 text-neutral-500 space-y-1 opacity-60">
-            <div className="font-bold text-xs">Cryptocurrency</div>
-            <div className="text-[11px] text-neutral-600">Coming soon</div>
-          </div>
-        </div>
+      <div className="p-6 rounded-xl border border-base bg-surface space-y-2">
+        <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+          {product.price === 0 ? "Free resource" : "Paid checkout"}
+        </h2>
+        <p className="text-xs text-neutral-400">
+          {product.price === 0
+            ? "No payment details are required."
+            : "Paid purchases are temporarily disabled until a production payment provider is connected."}
+        </p>
       </div>
 
       {/* Submit Button */}
       <button
         onClick={handlePay}
-        disabled={loading}
+        disabled={loading || product.price > 0}
         className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-xl shadow-blue-500/20 transition-all cursor-pointer disabled:opacity-50"
       >
-        {loading ? (
-          <span>Authorizing & Recording Ledger...</span>
-        ) : (
-          <>
-            <span>Authorize & Pay {formattedPrice}</span>
-            <ArrowRight className="w-4 h-4" />
-          </>
-        )}
+        {loading
+          ? "Adding resource..."
+          : product.price === 0
+            ? "Add to library"
+            : "Paid checkout unavailable"}
       </button>
 
       <div className="flex items-center justify-center gap-2 text-xs text-neutral-500">
         <ShieldCheck className="w-4 h-4 text-emerald-500" />
-        <span>Secured transaction & double-entry ledger protection</span>
+        <span>No simulated payments or fabricated settlements</span>
       </div>
     </div>
   );

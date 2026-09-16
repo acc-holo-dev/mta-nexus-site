@@ -1,6 +1,7 @@
-import { eq, and, or, gt, isNull } from "drizzle-orm";
+import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { entitlements, licenses } from "../schema";
+import { entitlements, licenses, products } from "../schema";
+import { NotFoundError, ValidationError } from "@nexus/domain";
 import type { Entitlement } from "@nexus/domain";
 
 export class EntitlementRepository {
@@ -60,6 +61,76 @@ export class EntitlementRepository {
 
     const rows = await db.insert(entitlements).values(values).returning();
     return rows[0] as unknown as Entitlement;
+  }
+
+  async claimFreeResource(input: {
+    entitlementId: string;
+    userId: string;
+    productId: string;
+  }): Promise<{ entitlement: Entitlement; alreadyClaimed: boolean }> {
+    return db.transaction(async (tx) => {
+      const lockKey = `free-resource:${input.userId}:${input.productId}`;
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`);
+
+      const productRows = await tx
+        .select()
+        .from(products)
+        .where(eq(products.id, input.productId))
+        .limit(1);
+      const product = productRows[0];
+
+      if (!product || product.status !== "published") {
+        throw new NotFoundError("Resource", input.productId);
+      }
+      if (product.price !== 0) {
+        throw new ValidationError("Only free resources can be claimed without a payment provider");
+      }
+
+      const existingRows = await tx
+        .select()
+        .from(entitlements)
+        .where(
+          and(
+            eq(entitlements.subjectType, "user"),
+            eq(entitlements.subjectId, input.userId),
+            eq(entitlements.resourceId, input.productId),
+            eq(entitlements.permission, "product.download")
+          )
+        )
+        .limit(1);
+
+      if (existingRows[0]) {
+        return {
+          entitlement: existingRows[0] as unknown as Entitlement,
+          alreadyClaimed: true,
+        };
+      }
+
+      const rows = await tx
+        .insert(entitlements)
+        .values({
+          id: input.entitlementId,
+          subjectType: "user",
+          subjectId: input.userId,
+          permission: "product.download",
+          resourceId: input.productId,
+          createdAt: new Date(),
+        })
+        .returning();
+
+      await tx
+        .update(products)
+        .set({
+          salesCount: sql`${products.salesCount} + 1`,
+          updatedAt: new Date(),
+        })
+        .where(eq(products.id, input.productId));
+
+      return {
+        entitlement: rows[0] as unknown as Entitlement,
+        alreadyClaimed: false,
+      };
+    });
   }
 }
 

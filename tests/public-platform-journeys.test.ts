@@ -42,7 +42,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
       type: "script",
       status: "published",
       authorId: devUser.id,
-      price: 2000,
+      price: 0,
       currency: "USD",
       licenseModel: "single_server",
       tags: ["journey"],
@@ -84,7 +84,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     expect(unread).toBeGreaterThanOrEqual(1);
   });
 
-  it("Commerce & Entitlement Journey: Purchase product, receive license and download entitlement", async () => {
+  it("Resource Journey: Claim a free product and receive a download entitlement", async () => {
     // 1. Before purchase: check entitlement -> false
     const hasInitial = await commerceService.checkEntitlement(
       { type: "user", id: playerUser.id },
@@ -93,18 +93,16 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     );
     expect(hasInitial).toBe(false);
 
-    // 2. Complete order checkout
-    const checkout = await commerceService.createOrderAndCheckout({
-      buyer: playerUser,
-      productIds: [testProduct.id],
-      paymentProvider: "mock",
+    // 2. Claim the free resource
+    const claim = await commerceService.claimFreeResource({
+      user: playerUser,
+      productId: testProduct.id,
     });
 
-    expect(checkout.order.status).toBe("completed");
-    expect(checkout.licenses).toHaveLength(1);
-    expect(checkout.licenses[0].status).toBe("active");
+    expect(claim.alreadyClaimed).toBe(false);
+    expect(claim.entitlement.permission).toBe("product.download");
 
-    // 3. After purchase: check entitlement -> true
+    // 3. After acquisition: check entitlement -> true
     const hasEntitled = await commerceService.checkEntitlement(
       { type: "user", id: playerUser.id },
       testProduct.id,

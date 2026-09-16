@@ -63,7 +63,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       type: "script",
       status: "published",
       authorId: author.id,
-      price: 1500,
+      price: 0,
       currency: "USD",
       licenseModel: "single_server",
       tags: ["security"],
@@ -103,10 +103,9 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     expect(hasBought).toBe(false);
 
     // After purchase, user B can review
-    await commerceService.createOrderAndCheckout({
-      buyer: userB,
-      productIds: [product.id],
-      paymentProvider: "sandbox",
+    await commerceService.claimFreeResource({
+      user: userB,
+      productId: product.id,
     });
 
     const review = await contentRepository.addComment({

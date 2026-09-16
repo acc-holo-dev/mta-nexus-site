@@ -102,6 +102,11 @@ export const createBuildSchema = z.object({
   mtaVersionTarget: z.string().optional(),
 });
 
+// --- Resource acquisition ---
+export const claimResourceSchema = z.object({
+  productId: z.string().min(1),
+});
+
 // --- Checkout & Orders ---
 export const checkoutSchema = z.object({
   items: z.array(
