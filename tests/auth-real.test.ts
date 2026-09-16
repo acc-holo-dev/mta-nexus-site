@@ -1,4 +1,6 @@
 import { describe, it, expect } from "vitest";
+import { sessionRepository } from "@nexus/db";
+import { generateId, generateSessionToken } from "@nexus/security";
 import { authService } from "../apps/web/src/lib/services/auth-service";
 
 describe("Real Auth & Session Engine", () => {
@@ -14,12 +16,23 @@ describe("Real Auth & Session Engine", () => {
     expect(result.user).toBeDefined();
     expect(result.user.email).toBe(testUser.email.toLowerCase());
     expect(result.user.username).toBe(testUser.username);
-    expect(result.token).toBeDefined();
+    expect(result.token).toMatch(/^ses_[A-Za-z0-9_-]{43}$/);
 
-    // Verify session retrieval
     const sessionUser = await authService.getSession(result.token);
     expect(sessionUser).toBeDefined();
     expect(sessionUser?.id).toBe(result.user.id);
+
+    const rawProbeToken = generateSessionToken();
+    const stored = await sessionRepository.create({
+      id: generateId("ses"),
+      userId: result.user.id,
+      token: rawProbeToken,
+      expiresAt: new Date(Date.now() + 60_000),
+    });
+    expect(stored.token).not.toBe(rawProbeToken);
+    expect(stored.token).toMatch(/^[a-f0-9]{64}$/);
+    expect((await authService.getSession(rawProbeToken))?.id).toBe(result.user.id);
+    await sessionRepository.delete(rawProbeToken);
   });
 
   it("should reject duplicate email during registration", async () => {
@@ -46,7 +59,7 @@ describe("Real Auth & Session Engine", () => {
       password: testUser.password,
     });
     expect(result.user).toBeDefined();
-    expect(result.token).toBeDefined();
+    expect(result.token).toMatch(/^ses_[A-Za-z0-9_-]{43}$/);
   });
 
   it("should reject login with wrong password", async () => {

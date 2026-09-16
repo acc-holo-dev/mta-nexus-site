@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { loginSchema } from "@nexus/validation";
-import { rateLimiter } from "@nexus/security";
+import { getClientIp, rateLimiter } from "@nexus/security";
+import { AppError } from "@nexus/domain";
 
 export async function POST(request: NextRequest) {
   try {
-    // Brute-force mitigation: strict per-IP limit on login attempts
-    const ip = request.headers.get("x-forwarded-for") || "local";
+    const ip = getClientIp(request.headers);
     const rl = await rateLimiter.consume(`login:${ip}`, 8, 300);
     if (!rl.success) {
       return NextResponse.json(
@@ -32,15 +32,20 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 14, // 14 days
+      maxAge: 60 * 60 * 24 * 14,
       path: "/",
     });
 
     return response;
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to log in" },
-      { status: error.statusCode || 401 }
-    );
+  } catch (error: unknown) {
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode }
+      );
+    }
+
+    console.error("Login failed", error);
+    return NextResponse.json({ error: "Failed to log in" }, { status: 500 });
   }
 }

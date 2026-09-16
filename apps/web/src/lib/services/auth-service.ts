@@ -4,7 +4,7 @@ import {
   organizationRepository,
   auditRepository,
 } from "@nexus/db";
-import { generateId, hashPassword, verifyPassword } from "@nexus/security";
+import { generateId, generateSessionToken, hashPassword, verifyPassword } from "@nexus/security";
 import {
   NotFoundError,
   UnauthorizedError,
@@ -44,8 +44,8 @@ export class AuthService {
       emailVerified: false,
     });
 
-    const token = generateId("ses");
-    const expiresAt = new Date(Date.now() + 86400000 * 14); // 14 days
+    const token = generateSessionToken();
+    const expiresAt = new Date(Date.now() + 86400000 * 14);
 
     await sessionRepository.create({
       id: generateId("ses"),
@@ -81,7 +81,7 @@ export class AuthService {
       throw new UnauthorizedError("Invalid email or password");
     }
 
-    const token = generateId("ses");
+    const token = generateSessionToken();
     const expiresAt = new Date(Date.now() + 86400000 * 14);
 
     await sessionRepository.create({
@@ -101,7 +101,6 @@ export class AuthService {
       details: { email: userWithHash.email },
     });
 
-    // Strip passwordHash from returned DTO
     const { passwordHash: _, ...user } = userWithHash;
     return { user: user as User, token };
   }

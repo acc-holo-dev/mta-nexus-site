@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { registerSchema } from "@nexus/validation";
-import { rateLimiter } from "@nexus/security";
+import { getClientIp, rateLimiter } from "@nexus/security";
+import { AppError } from "@nexus/domain";
 
 export async function POST(request: NextRequest) {
   try {
-    // Abuse protection: limit registrations per IP
-    const ip = request.headers.get("x-forwarded-for") || "local";
+    const ip = getClientIp(request.headers);
     const rl = await rateLimiter.consume(`register:${ip}`, 5, 3600);
     if (!rl.success) {
       return NextResponse.json(
@@ -37,10 +37,15 @@ export async function POST(request: NextRequest) {
     });
 
     return response;
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to register" },
-      { status: error.statusCode || 400 }
-    );
+  } catch (error: unknown) {
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode }
+      );
+    }
+
+    console.error("Registration failed", error);
+    return NextResponse.json({ error: "Failed to register" }, { status: 500 });
   }
 }

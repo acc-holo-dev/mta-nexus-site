@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { eq } from "drizzle-orm";
 import { db } from "../client";
 import { sessions, users } from "../schema";
@@ -13,6 +14,10 @@ export interface SessionRecord {
   createdAt: Date;
 }
 
+function digestSessionToken(token: string): string {
+  return crypto.createHash("sha256").update(token, "utf8").digest("hex");
+}
+
 export class SessionRepository {
   async create(data: {
     id: string;
@@ -25,7 +30,7 @@ export class SessionRepository {
     const values = {
       id: data.id,
       userId: data.userId,
-      token: data.token,
+      token: digestSessionToken(data.token),
       expiresAt: data.expiresAt,
       ipAddress: data.ipAddress || null,
       userAgent: data.userAgent || null,
@@ -44,7 +49,7 @@ export class SessionRepository {
       })
       .from(sessions)
       .innerJoin(users, eq(sessions.userId, users.id))
-      .where(eq(sessions.token, token))
+      .where(eq(sessions.token, digestSessionToken(token)))
       .limit(1);
 
     if (!rows.length) return null;
@@ -59,7 +64,7 @@ export class SessionRepository {
   }
 
   async delete(token: string): Promise<void> {
-    await db.delete(sessions).where(eq(sessions.token, token));
+    await db.delete(sessions).where(eq(sessions.token, digestSessionToken(token)));
   }
 }
 
