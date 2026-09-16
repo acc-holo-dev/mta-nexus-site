@@ -3,20 +3,27 @@ import { db } from "../client";
 import { users } from "../schema";
 import type { User } from "@nexus/domain";
 
+type UserRow = typeof users.$inferSelect;
+
+function toPublicUser(row: UserRow): User {
+  const { passwordHash: _, ...user } = row;
+  return user as unknown as User;
+}
+
 export class UserRepository {
   async findById(id: string): Promise<User | null> {
-        const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
-    return (rows[0] as unknown as User) || null;
+    const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return rows[0] ? toPublicUser(rows[0]) : null;
   }
 
   async findByEmail(email: string): Promise<(User & { passwordHash?: string | null }) | null> {
-        const rows = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
+    const rows = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
     return (rows[0] as unknown as (User & { passwordHash?: string | null })) || null;
   }
 
   async findByUsername(username: string): Promise<User | null> {
-        const rows = await db.select().from(users).where(eq(users.username, username)).limit(1);
-    return (rows[0] as unknown as User) || null;
+    const rows = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return rows[0] ? toPublicUser(rows[0]) : null;
   }
 
   async create(user: {
@@ -48,22 +55,22 @@ export class UserRepository {
       updatedAt: new Date(),
     };
 
-        const rows = await db.insert(users).values(values).returning();
-    return rows[0] as unknown as User;
+    const rows = await db.insert(users).values(values).returning();
+    return toPublicUser(rows[0]);
   }
 
   async update(id: string, updates: Partial<User>): Promise<User | null> {
-        const rows = await db
+    const rows = await db
       .update(users)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning();
-    return (rows[0] as unknown as User) || null;
+    return rows[0] ? toPublicUser(rows[0]) : null;
   }
 
   async listAll(): Promise<User[]> {
-        const rows = await db.select().from(users);
-    return rows as unknown as User[];
+    const rows = await db.select().from(users);
+    return rows.map(toPublicUser);
   }
 }
 
