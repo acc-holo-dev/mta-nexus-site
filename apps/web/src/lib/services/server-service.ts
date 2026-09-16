@@ -1,21 +1,19 @@
-import { store } from "./store";
+import { serverRepository, auditRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Server, ServerInstallation, User } from "@nexus/domain";
 
 export class ServerService {
   async listServers(): Promise<Server[]> {
-    return Array.from(store.servers.values())
-      .filter((s) => s.status === "active" && s.visibility === "public")
-      .sort((a, b) => b.currentPlayers - a.currentPlayers);
+    return serverRepository.listActivePublic();
   }
 
   async getServerBySlug(slug: string): Promise<Server | null> {
-    return Array.from(store.servers.values()).find((s) => s.slug === slug) || null;
+    return serverRepository.findBySlug(slug);
   }
 
   async getServerById(id: string): Promise<Server | null> {
-    return store.servers.get(id) || null;
+    return serverRepository.findById(id);
   }
 
   async createServer(
@@ -27,16 +25,22 @@ export class ServerService {
     }
 
     const id = generateId("srv");
-    const server: Server = {
+    const server = await serverRepository.create({
       ...input,
       id,
       currentPlayers: 0,
       isVerified: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    });
 
-    store.servers.set(id, server);
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "user",
+      action: "server.created",
+      targetId: id,
+      targetType: "server",
+      details: { name: server.name, ip: server.ipAddress, port: server.port },
+    });
 
     await eventBus.publish({
       id: generateId("evt"),
@@ -59,11 +63,11 @@ export class ServerService {
   }
 
   async registerInstallation(serverId: string, moduleVersion = "1.0.0"): Promise<ServerInstallation> {
-    const server = store.servers.get(serverId);
+    const server = await serverRepository.findById(serverId);
     if (!server) throw new NotFoundError("Server", serverId);
 
     const instId = generateId("ins");
-    const installation: ServerInstallation = {
+    const installation = await serverRepository.createInstallation({
       id: instId,
       serverId,
       apiKeyHash: "hash_" + generateId("ses"),
@@ -73,8 +77,17 @@ export class ServerService {
       status: "active",
       lastHeartbeatAt: new Date(),
       capabilities: ["entitlements_v1", "telemetry_v1", "hot_reload"],
-      createdAt: new Date(),
-    };
+    });
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: serverId,
+      actorType: "system",
+      action: "server.installation_registered",
+      targetId: instId,
+      targetType: "server_installation",
+      details: { moduleVersion },
+    });
 
     await eventBus.publish({
       id: generateId("evt"),

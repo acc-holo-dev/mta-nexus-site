@@ -1,6 +1,16 @@
-import { store } from "./store";
+import {
+  userRepository,
+  sessionRepository,
+  organizationRepository,
+  auditRepository,
+} from "@nexus/db";
 import { generateId, hashPassword, verifyPassword } from "@nexus/security";
-import { NotFoundError, UnauthorizedError, ConflictError } from "@nexus/domain";
+import {
+  NotFoundError,
+  UnauthorizedError,
+  ConflictError,
+  ForbiddenError,
+} from "@nexus/domain";
 import type { User } from "@nexus/domain";
 
 export class AuthService {
@@ -10,41 +20,48 @@ export class AuthService {
     password: string;
     displayName?: string;
   }): Promise<{ user: User; token: string }> {
-    const existingEmail = Array.from(store.users.values()).find(
-      (u) => u.email.toLowerCase() === input.email.toLowerCase()
-    );
+    const existingEmail = await userRepository.findByEmail(input.email);
     if (existingEmail) {
       throw new ConflictError("A user with this email already exists");
     }
 
-    const existingUser = Array.from(store.users.values()).find(
-      (u) => u.username.toLowerCase() === input.username.toLowerCase()
-    );
-    if (existingUser) {
+    const existingUsername = await userRepository.findByUsername(input.username);
+    if (existingUsername) {
       throw new ConflictError("This username is already taken");
     }
 
     const userId = generateId("usr");
-    const user: User = {
+    const passwordHash = await hashPassword(input.password);
+
+    const user = await userRepository.create({
       id: userId,
       email: input.email.toLowerCase(),
       username: input.username,
       displayName: input.displayName || input.username,
+      passwordHash,
       role: "user",
       isVerified: false,
       emailVerified: false,
-      twoFactorEnabled: false,
-      activeContextId: "personal",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    store.users.set(userId, user);
+    });
 
     const token = generateId("ses");
-    store.sessions.set(token, {
-      userId,
-      expiresAt: new Date(Date.now() + 86400000 * 14), // 14 days
+    const expiresAt = new Date(Date.now() + 86400000 * 14); // 14 days
+
+    await sessionRepository.create({
+      id: generateId("ses"),
+      userId: user.id,
+      token,
+      expiresAt,
+    });
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: user.id,
+      actorType: "user",
+      action: "user.registered",
+      targetId: user.id,
+      targetType: "user",
+      details: { email: user.email },
     });
 
     return { user, token };
@@ -52,55 +69,87 @@ export class AuthService {
 
   async login(input: {
     email: string;
-    password?: string;
+    password: string;
   }): Promise<{ user: User; token: string }> {
-    const user = Array.from(store.users.values()).find(
-      (u) => u.email.toLowerCase() === input.email.toLowerCase()
-    );
-
-    if (!user) {
+    const userWithHash = await userRepository.findByEmail(input.email);
+    if (!userWithHash || !userWithHash.passwordHash) {
       throw new UnauthorizedError("Invalid email or password");
     }
 
-    // For demonstration, password check succeeds or validates
+    const isMatch = await verifyPassword(input.password, userWithHash.passwordHash);
+    if (!isMatch) {
+      throw new UnauthorizedError("Invalid email or password");
+    }
+
     const token = generateId("ses");
-    store.sessions.set(token, {
-      userId: user.id,
-      expiresAt: new Date(Date.now() + 86400000 * 14),
+    const expiresAt = new Date(Date.now() + 86400000 * 14);
+
+    await sessionRepository.create({
+      id: generateId("ses"),
+      userId: userWithHash.id,
+      token,
+      expiresAt,
     });
 
-    return { user, token };
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: userWithHash.id,
+      actorType: "user",
+      action: "user.logged_in",
+      targetId: userWithHash.id,
+      targetType: "user",
+      details: { email: userWithHash.email },
+    });
+
+    // Strip passwordHash from returned DTO
+    const { passwordHash: _, ...user } = userWithHash;
+    return { user: user as User, token };
   }
 
   async getSession(token?: string | null): Promise<User | null> {
     if (!token) return null;
-    const session = store.sessions.get(token);
-    if (!session || session.expiresAt < new Date()) {
-      return null;
-    }
-    return store.users.get(session.userId) || null;
+    const result = await sessionRepository.findValidSession(token);
+    return result ? result.user : null;
   }
 
   async logout(token: string): Promise<void> {
-    store.sessions.delete(token);
+    const session = await sessionRepository.findValidSession(token);
+    if (session) {
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: session.user.id,
+        actorType: "user",
+        action: "user.logged_out",
+        targetId: session.user.id,
+        targetType: "user",
+      });
+    }
+    await sessionRepository.delete(token);
   }
 
   async switchContext(userId: string, contextId: string): Promise<User> {
-    const user = store.users.get(userId);
+    const user = await userRepository.findById(userId);
     if (!user) throw new NotFoundError("User", userId);
 
-    user.activeContextId = contextId;
-    user.updatedAt = new Date();
-    store.users.set(userId, user);
-    return user;
+    if (contextId !== "personal") {
+      const memberships = await organizationRepository.listUserMemberships(userId);
+      const isMember = memberships.some((m) => m.organizationId === contextId);
+      if (!isMember) {
+        throw new ForbiddenError("Not authorized to switch to this organization context");
+      }
+    }
+
+    const updated = await userRepository.update(userId, { activeContextId: contextId });
+    if (!updated) throw new NotFoundError("User", userId);
+    return updated;
   }
 
   async getUserById(id: string): Promise<User | null> {
-    return store.users.get(id) || null;
+    return userRepository.findById(id);
   }
 
   async listUsers(): Promise<User[]> {
-    return Array.from(store.users.values());
+    return userRepository.listAll();
   }
 }
 

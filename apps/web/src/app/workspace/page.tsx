@@ -1,5 +1,9 @@
-import { store } from "../../lib/services/store";
-import { commerceService } from "../../lib/services/commerce-service";
+import {
+  licenseRepository,
+  serverRepository,
+  productRepository,
+  ledgerRepository,
+} from "@nexus/db";
 import Link from "next/link";
 import {
   Key,
@@ -16,10 +20,14 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function WorkspacePage() {
-  const licenses = Array.from(store.licenses.values());
-  const servers = Array.from(store.servers.values());
-  const products = Array.from(store.products.values());
-  const ledger = [...store.ledgerEntries].reverse().slice(0, 10);
+  const [licenses, servers, products, ledger] = await Promise.all([
+    licenseRepository.listAll(),
+    serverRepository.listActivePublic(),
+    productRepository.list(),
+    ledgerRepository.listRecent(10),
+  ]);
+
+  const productMap = new Map(products.map((p) => [p.id, p]));
 
   return (
     <div className="space-y-10">
@@ -39,9 +47,12 @@ export default async function WorkspacePage() {
           >
             Browse Resources
           </Link>
-          <button className="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white transition-colors">
+          <Link
+            href="/market"
+            className="px-3.5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white transition-colors"
+          >
             + New Build
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -58,34 +69,40 @@ export default async function WorkspacePage() {
           </div>
 
           <div className="space-y-3">
-            {licenses.map((lic) => {
-              const product = store.products.get(lic.productId);
-              return (
-                <div
-                  key={lic.id}
-                  className="p-3.5 rounded-lg bg-neutral-900 border border-[#232838] space-y-2"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white">
-                      {product?.title || "MTA Resource"}
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                      {lic.status.toUpperCase()}
-                    </span>
-                  </div>
+            {licenses.length > 0 ? (
+              licenses.map((lic) => {
+                const product = productMap.get(lic.productId);
+                return (
+                  <div
+                    key={lic.id}
+                    className="p-3.5 rounded-lg bg-neutral-900 border border-[#232838] space-y-2"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-white">
+                        {product?.title || "MTA Resource"}
+                      </span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        {lic.status.toUpperCase()}
+                      </span>
+                    </div>
 
-                  <div className="flex items-center justify-between font-mono text-xs text-neutral-300 bg-black/50 p-2 rounded border border-neutral-800">
-                    <span className="select-all">{lic.key}</span>
-                    <button className="text-[11px] text-blue-400 hover:underline">Copy</button>
-                  </div>
+                    <div className="flex items-center justify-between font-mono text-xs text-neutral-300 bg-black/50 p-2 rounded border border-neutral-800">
+                      <span className="select-all">{lic.key}</span>
+                      <span className="text-[11px] text-blue-400">Active</span>
+                    </div>
 
-                  <div className="flex items-center justify-between text-[11px] text-neutral-500 pt-1">
-                    <span>Model: {lic.model}</span>
-                    <span>Server: {lic.serverId || "Unbound (Floating)"}</span>
+                    <div className="flex items-center justify-between text-[11px] text-neutral-500 pt-1">
+                      <span>Model: {lic.model}</span>
+                      <span>Server: {lic.serverId || "Unbound (Floating)"}</span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })
+            ) : (
+              <p className="text-xs text-neutral-500 py-4 text-center">
+                No active licenses found. Browse the marketplace to acquire resources.
+              </p>
+            )}
           </div>
         </div>
 
@@ -102,25 +119,31 @@ export default async function WorkspacePage() {
           </div>
 
           <div className="space-y-3">
-            {servers.map((s) => (
-              <div
-                key={s.id}
-                className="p-3.5 rounded-lg bg-neutral-900 border border-[#232838] flex items-center justify-between"
-              >
-                <div>
-                  <div className="text-xs font-bold text-white">{s.name}</div>
-                  <div className="text-[11px] text-neutral-500 font-mono">
-                    {s.ipAddress}:{s.port}
+            {servers.length > 0 ? (
+              servers.map((s) => (
+                <div
+                  key={s.id}
+                  className="p-3.5 rounded-lg bg-neutral-900 border border-[#232838] flex items-center justify-between"
+                >
+                  <div>
+                    <div className="text-xs font-bold text-white">{s.name}</div>
+                    <div className="text-[11px] text-neutral-500 font-mono">
+                      {s.ipAddress}:{s.port}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs font-bold text-emerald-400">
+                      {s.currentPlayers} / {s.maxPlayers}
+                    </div>
+                    <div className="text-[10px] text-neutral-500">Live Players</div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-xs font-bold text-emerald-400">
-                    {s.currentPlayers} / {s.maxPlayers}
-                  </div>
-                  <div className="text-[10px] text-neutral-500">Live Players</div>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-xs text-neutral-500 py-4 text-center">
+                No servers registered. Connect your server to Nexus Telemetry.
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -147,23 +170,31 @@ export default async function WorkspacePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-800/60 font-mono text-neutral-300">
-              {ledger.map((entry) => (
-                <tr key={entry.id}>
-                  <td className="py-2.5 text-neutral-500">
-                    {new Date(entry.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="text-neutral-400">{entry.accountId}</td>
-                  <td>{entry.description}</td>
-                  <td className="text-neutral-500">{entry.referenceId}</td>
-                  <td
-                    className={`text-right font-bold ${
-                      entry.amount >= 0 ? "text-emerald-400" : "text-neutral-400"
-                    }`}
-                  >
-                    {entry.amount >= 0 ? "+" : ""}${(entry.amount / 100).toFixed(2)}
+              {ledger.length > 0 ? (
+                ledger.map((entry) => (
+                  <tr key={entry.id}>
+                    <td className="py-2.5 text-neutral-500">
+                      {new Date(entry.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="text-neutral-400">{entry.accountId}</td>
+                    <td>{entry.description}</td>
+                    <td className="text-neutral-500">{entry.referenceId}</td>
+                    <td
+                      className={`text-right font-bold ${
+                        entry.amount >= 0 ? "text-emerald-400" : "text-neutral-400"
+                      }`}
+                    >
+                      {entry.amount >= 0 ? "+" : ""}${(entry.amount / 100).toFixed(2)}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="py-4 text-center text-neutral-500">
+                    No ledger transactions recorded yet.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

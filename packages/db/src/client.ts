@@ -12,4 +12,8 @@ const queryClient = postgres(config.DATABASE_URL, {
 
 export const db = drizzle(queryClient, { schema });
 
+export async function checkDatabaseConnection(): Promise<void> {
+  await queryClient`SELECT 1`;
+}
+
 export * from "./schema";

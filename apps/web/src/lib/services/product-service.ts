@@ -1,4 +1,4 @@
-import { store } from "./store";
+import { productRepository, buildRepository, auditRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Product, Build, User, ProductType } from "@nexus/domain";
@@ -15,57 +15,26 @@ export interface ProductFilters {
 
 export class ProductService {
   async listProducts(filters: ProductFilters = {}): Promise<Product[]> {
-    let items = Array.from(store.products.values()).filter((p) => p.status === "published");
-
-    if (filters.query) {
-      const q = filters.query.toLowerCase();
-      items = items.filter(
-        (p) =>
-          p.title.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.toLowerCase().includes(q))
-      );
-    }
-
-    if (filters.type) {
-      items = items.filter((p) => p.type === filters.type);
-    }
-
-    if (filters.featuredOnly) {
-      items = items.filter((p) => p.isFeatured);
-    }
-
-    if (filters.minPrice !== undefined) {
-      items = items.filter((p) => p.price >= filters.minPrice!);
-    }
-
-    if (filters.maxPrice !== undefined) {
-      items = items.filter((p) => p.price <= filters.maxPrice!);
-    }
-
-    // Deterministic Sorting
-    items.sort((a, b) => {
-      if (filters.sort === "popular") return b.salesCount - a.salesCount;
-      if (filters.sort === "rating") return b.ratingAverage - a.ratingAverage;
-      if (filters.sort === "price_asc") return a.price - b.price;
-      if (filters.sort === "price_desc") return b.price - a.price;
-      // Default: newest
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    return productRepository.list({
+      type: filters.type,
+      featuredOnly: filters.featuredOnly,
+      minPrice: filters.minPrice,
+      maxPrice: filters.maxPrice,
+      sort: filters.sort,
+      query: filters.query,
     });
-
-    return items;
   }
 
   async getProductBySlug(slug: string): Promise<Product | null> {
-    return Array.from(store.products.values()).find((p) => p.slug === slug) || null;
+    return productRepository.findBySlug(slug);
   }
 
   async getProductById(id: string): Promise<Product | null> {
-    return store.products.get(id) || null;
+    return productRepository.findById(id);
   }
 
   async getProductBuilds(productId: string): Promise<Build[]> {
-    return Array.from(store.builds.values()).filter((b) => b.productId === productId);
+    return buildRepository.listByProduct(productId);
   }
 
   async createProduct(
@@ -77,17 +46,23 @@ export class ProductService {
     }
 
     const id = generateId("prd");
-    const product: Product = {
+    const product = await productRepository.create({
       ...input,
       id,
       ratingAverage: 0,
       ratingCount: 0,
       salesCount: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    });
 
-    store.products.set(id, product);
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "user",
+      action: "product.created",
+      targetId: id,
+      targetType: "product",
+      details: { title: product.title, price: product.price },
+    });
 
     await eventBus.publish({
       id: generateId("evt"),
@@ -120,7 +95,7 @@ export class ProductService {
     },
     actor: User
   ): Promise<Build> {
-    const product = store.products.get(input.productId);
+    const product = await productRepository.findById(input.productId);
     if (!product) throw new NotFoundError("Product", input.productId);
 
     if (!can(actor, "build.release", product)) {
@@ -128,7 +103,7 @@ export class ProductService {
     }
 
     const buildId = generateId("bld");
-    const build: Build = {
+    const build = await buildRepository.create({
       id: buildId,
       productId: input.productId,
       version: input.version,
@@ -138,14 +113,19 @@ export class ProductService {
       sha256Hash: input.sha256Hash,
       fileSizeBytes: input.fileSizeBytes,
       isSigned: true,
-      createdAt: new Date(),
-    };
+    });
 
-    store.builds.set(buildId, build);
+    await productRepository.update(product.id, { currentVersion: input.version });
 
-    product.currentVersion = input.version;
-    product.updatedAt = new Date();
-    store.products.set(product.id, product);
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "user",
+      action: "build.released",
+      targetId: buildId,
+      targetType: "build",
+      details: { productId: product.id, version: input.version },
+    });
 
     await eventBus.publish({
       id: generateId("evt"),

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { commerceService } from "../../../lib/services/commerce-service";
-import { store } from "../../../lib/services/store";
+import { authService } from "../../../lib/services/auth-service";
 import { checkoutSchema } from "@nexus/validation";
 
 export async function POST(request: NextRequest) {
@@ -15,8 +15,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Default to player user for demo checkouts
-    const buyer = store.users.get("usr_player_001") || Array.from(store.users.values())[0];
+    const token = request.cookies.get("nexus_session")?.value;
+    let buyer = await authService.getSession(token);
+
+    // Fallback: if no active session, look up registered demo player or require auth
+    if (!buyer) {
+      const users = await authService.listUsers();
+      buyer = users.find((u) => u.email === "player@example.com") || users[0];
+      if (!buyer) {
+        return NextResponse.json(
+          { error: "Authentication required for checkout" },
+          { status: 401 }
+        );
+      }
+    }
 
     const result = await commerceService.createOrderAndCheckout({
       buyer,

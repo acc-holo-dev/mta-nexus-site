@@ -1,6 +1,14 @@
-import { store } from "./store";
+import {
+  orderRepository,
+  paymentRepository,
+  licenseRepository,
+  ledgerRepository,
+  entitlementRepository,
+  productRepository,
+  auditRepository,
+} from "@nexus/db";
 import { generateId } from "@nexus/security";
-import { NotFoundError, ConflictError, eventBus } from "@nexus/domain";
+import { NotFoundError, eventBus } from "@nexus/domain";
 import type { Order, Payment, License, LedgerEntry, User } from "@nexus/domain";
 
 export class CommerceService {
@@ -10,17 +18,19 @@ export class CommerceService {
     paymentProvider?: string;
     serverId?: string;
   }): Promise<{ order: Order; payment: Payment; licenses: License[] }> {
-    const products = input.productIds.map((id) => {
-      const p = store.products.get(id);
+    const products = [];
+    for (const id of input.productIds) {
+      const p = await productRepository.findById(id);
       if (!p) throw new NotFoundError("Product", id);
-      return p;
-    });
+      products.push(p);
+    }
 
     const totalAmount = products.reduce((acc, p) => acc + p.price, 0);
     const orderId = generateId("ord");
     const orderNumber = `NX-${Math.floor(100000 + Math.random() * 900000)}`;
 
-    const order: Order = {
+    // 1. Create Order in Database
+    const order = await orderRepository.create({
       id: orderId,
       orderNumber,
       buyerId: input.buyer.id,
@@ -34,87 +44,78 @@ export class CommerceService {
         unitPrice: p.price,
         currency: "USD",
       })),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    });
 
-    store.orders.set(orderId, order);
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: input.buyer.id,
+      actorType: "user",
+      action: "order.created",
+      targetId: orderId,
+      targetType: "order",
+      details: { orderNumber, totalAmount },
+    });
 
-    // 1. Payment State Machine Initiation
+    // 2. Payment State Machine Initiation & Completion
     const paymentId = generateId("pay");
-    const payment: Payment = {
+    const payment = await paymentRepository.create({
       id: paymentId,
       orderId,
       amount: totalAmount,
       currency: "USD",
       provider: input.paymentProvider || "mock",
       providerTransactionId: "txn_" + generateId("ses"),
-      status: "authorized",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+      status: "completed",
+    });
 
-    // 2. Transition Payment to COMPLETED
-    payment.status = "completed";
-    payment.updatedAt = new Date();
-    store.payments.set(paymentId, payment);
-
+    await orderRepository.updateStatus(orderId, "completed");
     order.status = "completed";
-    order.updatedAt = new Date();
-    store.orders.set(orderId, order);
 
-    // 3. Append-Only Financial Ledger entries
-    // Platform fee: 7%
+    // 3. Append-Only Financial Ledger (Double-Entry)
     const platformFee = Math.round(totalAmount * 0.07);
     const sellerEarnings = totalAmount - platformFee;
 
-    const ledgerBuyer: LedgerEntry = {
-      id: generateId("ldg"),
-      accountId: `user:${input.buyer.id}`,
-      amount: -totalAmount,
-      currency: "USD",
-      referenceType: "order",
-      referenceId: orderId,
-      balanceAfter: 0,
-      description: `Purchase of order ${orderNumber}`,
-      createdAt: new Date(),
-    };
-
-    const ledgerSeller: LedgerEntry = {
-      id: generateId("ldg"),
-      accountId: `developer:${products[0]?.authorId || "nexus"}`,
-      amount: sellerEarnings,
-      currency: "USD",
-      referenceType: "order",
-      referenceId: orderId,
-      balanceAfter: sellerEarnings,
-      description: `Payout for order ${orderNumber}`,
-      createdAt: new Date(),
-    };
-
-    const ledgerNexus: LedgerEntry = {
-      id: generateId("ldg"),
-      accountId: "platform:nexus",
-      amount: platformFee,
-      currency: "USD",
-      referenceType: "fee",
-      referenceId: orderId,
-      balanceAfter: platformFee,
-      description: `Platform fee for order ${orderNumber}`,
-      createdAt: new Date(),
-    };
-
-    store.ledgerEntries.push(ledgerBuyer, ledgerSeller, ledgerNexus);
+    const ledgerEntries = await ledgerRepository.append([
+      {
+        id: generateId("ldg"),
+        accountId: `user:${input.buyer.id}`,
+        amount: -totalAmount,
+        currency: "USD",
+        referenceType: "order",
+        referenceId: orderId,
+        balanceAfter: 0,
+        description: `Purchase of order ${orderNumber}`,
+      },
+      {
+        id: generateId("ldg"),
+        accountId: `developer:${products[0]?.authorId || "nexus"}`,
+        amount: sellerEarnings,
+        currency: "USD",
+        referenceType: "order",
+        referenceId: orderId,
+        balanceAfter: sellerEarnings,
+        description: `Payout for order ${orderNumber}`,
+      },
+      {
+        id: generateId("ldg"),
+        accountId: "platform:nexus",
+        amount: platformFee,
+        currency: "USD",
+        referenceType: "fee",
+        referenceId: orderId,
+        balanceAfter: platformFee,
+        description: `Platform fee for order ${orderNumber}`,
+      },
+    ]);
 
     // 4. Provision Licenses and Entitlements
     const issuedLicenses: License[] = [];
     for (const prod of products) {
-      prod.salesCount += 1;
-      store.products.set(prod.id, prod);
+      await productRepository.update(prod.id, { salesCount: prod.salesCount + 1 });
 
       const licenseKey = `NX-${prod.type.slice(0, 3).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
 
-      const license: License = {
+      const license = await licenseRepository.create({
         id: generateId("lic"),
         key: licenseKey,
         productId: prod.id,
@@ -123,12 +124,38 @@ export class CommerceService {
         model: prod.licenseModel,
         status: "active",
         entitlements: ["server.run", "updates.download", "support.priority"],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+      });
 
-      store.licenses.set(license.id, license);
+      // Create explicit Entitlements
+      await entitlementRepository.create({
+        id: generateId("ent"),
+        subjectType: "user",
+        subjectId: input.buyer.id,
+        permission: "product.download",
+        resourceId: prod.id,
+      });
+
+      if (input.serverId) {
+        await entitlementRepository.create({
+          id: generateId("ent"),
+          subjectType: "server",
+          subjectId: input.serverId,
+          permission: "server.run",
+          resourceId: prod.id,
+        });
+      }
+
       issuedLicenses.push(license);
+
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: input.buyer.id,
+        actorType: "user",
+        action: "license.issued",
+        targetId: license.id,
+        targetType: "license",
+        details: { key: license.key, productId: prod.id },
+      });
 
       await eventBus.publish({
         id: generateId("evt"),
@@ -168,11 +195,11 @@ export class CommerceService {
   }
 
   async getUserLicenses(userId: string): Promise<License[]> {
-    return Array.from(store.licenses.values()).filter((l) => l.userId === userId);
+    return licenseRepository.listByUser(userId);
   }
 
   async verifyLicense(key: string, serverId?: string): Promise<{ valid: boolean; license?: License; reason?: string }> {
-    const license = Array.from(store.licenses.values()).find((l) => l.key === key);
+    const license = await licenseRepository.findByKey(key);
     if (!license) return { valid: false, reason: "Invalid license key" };
     if (license.status !== "active") return { valid: false, reason: `License is ${license.status}` };
     if (license.expiresAt && license.expiresAt < new Date()) return { valid: false, reason: "License has expired" };
@@ -181,6 +208,14 @@ export class CommerceService {
     }
 
     return { valid: true, license };
+  }
+
+  async checkEntitlement(
+    subject: { type: "user" | "server" | "organization"; id: string },
+    resourceId: string,
+    permission: string
+  ): Promise<boolean> {
+    return entitlementRepository.hasEntitlement(subject, resourceId, permission);
   }
 }
 

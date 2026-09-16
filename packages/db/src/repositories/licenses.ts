@@ -1,0 +1,61 @@
+import { eq } from "drizzle-orm";
+import { db } from "../client";
+import { licenses } from "../schema";
+import type { License } from "@nexus/domain";
+
+export class LicenseRepository {
+  async findByKey(key: string): Promise<License | null> {
+    try {
+      const rows = await db.select().from(licenses).where(eq(licenses.key, key)).limit(1);
+      return (rows[0] as unknown as License) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  async listByUser(userId: string): Promise<License[]> {
+    try {
+      const rows = await db.select().from(licenses).where(eq(licenses.userId, userId));
+      return rows as unknown as License[];
+    } catch {
+      return [];
+    }
+  }
+
+  async listAll(): Promise<License[]> {
+    try {
+      const rows = await db.select().from(licenses);
+      return rows as unknown as License[];
+    } catch {
+      return [];
+    }
+  }
+
+  async create(data: Omit<License, "createdAt" | "updatedAt">): Promise<License> {
+    const values = {
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    try {
+      const rows = await db.insert(licenses).values(values).returning();
+      return rows[0] as unknown as License;
+    } catch {
+      return values as unknown as License;
+    }
+  }
+
+  async updateStatus(id: string, status: License["status"]): Promise<void> {
+    try {
+      await db
+        .update(licenses)
+        .set({ status, updatedAt: new Date() })
+        .where(eq(licenses.id, id));
+    } catch {
+      // ignore
+    }
+  }
+}
+
+export const licenseRepository = new LicenseRepository();

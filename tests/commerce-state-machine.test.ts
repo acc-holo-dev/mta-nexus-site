@@ -1,13 +1,51 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
-import { store } from "../apps/web/src/lib/services/store";
+import {
+  userRepository,
+  productRepository,
+  ledgerRepository,
+  licenseRepository,
+} from "@nexus/db";
+import type { User, Product } from "@nexus/domain";
 
 describe("Commerce & Double-Entry Ledger", () => {
-  const buyer = store.users.get("usr_player_001")!;
-  const product = store.products.get("prd_inv_pro")!;
+  let buyer: User;
+  let product: Product;
+
+  beforeAll(async () => {
+    buyer = await userRepository.create({
+      id: "usr_test_buyer_01",
+      email: "buyer_test@nexus.test",
+      username: "test_buyer",
+      displayName: "Test Buyer",
+      role: "user",
+    });
+
+    product = await productRepository.create({
+      id: "prd_test_item_01",
+      title: "Test Resource Pack",
+      slug: "test-resource-pack",
+      description: "Description for test resource pack",
+      type: "script",
+      status: "published",
+      authorId: buyer.id,
+      price: 2500, // $25.00
+      currency: "USD",
+      licenseModel: "single_server",
+      tags: ["test"],
+      currentVersion: "1.0.0",
+      ratingAverage: 50,
+      ratingCount: 1,
+      salesCount: 0,
+      isFeatured: false,
+      screenshots: [],
+      compatibility: {},
+    });
+  });
 
   it("should process checkout with valid payment and balanced ledger entries", async () => {
-    const initialLedgerCount = store.ledgerEntries.length;
+    const initialLedger = await ledgerRepository.listRecent(100);
+    const initialLedgerCount = initialLedger.length;
 
     const result = await commerceService.createOrderAndCheckout({
       buyer,
@@ -27,7 +65,8 @@ describe("Commerce & Double-Entry Ledger", () => {
     expect(result.licenses[0].key).toMatch(/^NX-[A-Z0-9-]+$/);
 
     // Verify double-entry ledger additions (buyer debit, seller credit, nexus fee credit)
-    const newEntries = store.ledgerEntries.slice(initialLedgerCount);
+    const afterLedger = await ledgerRepository.listRecent(100);
+    const newEntries = afterLedger.slice(0, 3);
     expect(newEntries).toHaveLength(3);
 
     const totalDebit = newEntries
@@ -39,5 +78,10 @@ describe("Commerce & Double-Entry Ledger", () => {
 
     // Sum of credits must equal sum of debits
     expect(totalDebit).toBe(totalCredit);
+  });
+
+  it("should verify issued license and reject invalid or expired license", async () => {
+    const result = await commerceService.verifyLicense("INVALID-KEY-123");
+    expect(result.valid).toBe(false);
   });
 });

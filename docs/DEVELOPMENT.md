@@ -1,35 +1,36 @@
-# MTA NEXUS — Local Development Guide
+# MTA NEXUS 1.1 — Local Development Guide
 
 ## 1. Quick Start
 
 ```bash
-# 1. Install dependencies across monorepo
-pnpm install
+# 1. Start database container
+docker compose up -d
 
-# 2. Run unit and integration tests
-pnpm test
+# 2. Run migrations
+pnpm db:migrate
 
-# 3. Check types
-pnpm typecheck
+# 3. Seed baseline records
+pnpm db:seed
 
-# 4. Start Next.js development server
+# 4. Run quality checks
+pnpm check
+
+# 5. Start development server
 pnpm dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to view the application.
 
 ## 2. Testing Credentials
-- **Master Admin:** `admin@mta-nexus.com`
-- **Developer:** `horizon@mta-nexus.com`
-- **Server Owner:** `owner@sadrift.com`
-- **Player:** `player@example.com`
+- **Master Admin:** `admin@mta-nexus.com` (password: `password123`)
+- **Developer:** `horizon@mta-nexus.com` (password: `password123`)
+- **Server Owner:** `owner@sadrift.com` (password: `password123`)
+- **Player:** `player@example.com` (password: `password123`)
 
-## 3. Project Structure
-- `apps/web`: Next.js 16 App Router application
-- `packages/domain`: Entities, event contracts, domain errors
-- `packages/db`: Drizzle ORM schema, migrations, connection pool
-- `packages/validation`: Zod schemas for all domain entities and endpoints
-- `packages/security`: `can()` server policy engine, ID generation, password hashing
-- `packages/storage`: Pluggable storage providers and upload integrity pipeline
-- `packages/ui`: Nexus UI component design system
-- `packages/config`: Type-safe environment validation
+## 3. Quality Gate Commands
+```bash
+pnpm check      # Runs typecheck, tests, and production build
+pnpm test       # Runs Vitest unit & integration test suites
+pnpm db:migrate # Applies Drizzle SQL migrations
+pnpm db:seed    # Populates test baseline data
+```

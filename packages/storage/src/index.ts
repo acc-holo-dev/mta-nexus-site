@@ -19,3 +19,4 @@ export function getStorageProvider(): StorageProvider {
 
 export * from "./types";
 export * from "./local-provider";
+export * from "./storage-service";

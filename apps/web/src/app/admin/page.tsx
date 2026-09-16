@@ -1,4 +1,4 @@
-import { store } from "../../lib/services/store";
+import { userRepository } from "@nexus/db";
 import { adminService } from "../../lib/services/admin-service";
 import {
   ShieldAlert,
@@ -15,7 +15,20 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const adminUser = store.users.get("usr_admin_001")!;
+  const users = await userRepository.listAll();
+  const adminUser = users.find((u) => u.role === "admin") || {
+    id: "usr_admin_system",
+    role: "admin" as const,
+    email: "admin@mta-nexus.com",
+    username: "admin",
+    displayName: "Admin",
+    isVerified: true,
+    emailVerified: true,
+    twoFactorEnabled: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   const health = await adminService.getSystemHealthMetrics(adminUser);
   const reports = await adminService.listReports(adminUser);
   const auditLogs = await adminService.listAuditLogs(adminUser);
@@ -79,33 +92,39 @@ export default async function AdminPage() {
         </div>
 
         <div className="space-y-3">
-          {reports.map((r) => (
-            <div
-              key={r.id}
-              className="p-4 rounded-lg bg-neutral-900 border border-[#232838] flex flex-col md:flex-row md:items-center justify-between gap-4"
-            >
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                    {r.type}
-                  </span>
-                  <span className="text-xs font-bold text-white">Target ID: {r.targetId}</span>
+          {reports.length > 0 ? (
+            reports.map((r) => (
+              <div
+                key={r.id}
+                className="p-4 rounded-lg bg-neutral-900 border border-[#232838] flex flex-col md:flex-row md:items-center justify-between gap-4"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                      {r.type}
+                    </span>
+                    <span className="text-xs font-bold text-white">Target ID: {r.targetId}</span>
+                  </div>
+                  <p className="text-xs text-neutral-300">{r.reason}</p>
+                  {r.moderatorNotes && (
+                    <p className="text-[11px] text-neutral-500 font-mono">
+                      Notes: {r.moderatorNotes}
+                    </p>
+                  )}
                 </div>
-                <p className="text-xs text-neutral-300">{r.reason}</p>
-                {r.moderatorNotes && (
-                  <p className="text-[11px] text-neutral-500 font-mono">
-                    Notes: {r.moderatorNotes}
-                  </p>
-                )}
-              </div>
 
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-neutral-800 text-neutral-300">
-                  {r.status.toUpperCase()}
-                </span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-neutral-800 text-neutral-300">
+                    {r.status.toUpperCase()}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-xs text-neutral-500 py-4 text-center">
+              No reports in moderation queue.
+            </p>
+          )}
         </div>
       </div>
 
@@ -131,17 +150,25 @@ export default async function AdminPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-800/60 font-mono text-neutral-300">
-              {auditLogs.map((log) => (
-                <tr key={log.id}>
-                  <td className="py-2.5 text-neutral-500">
-                    {new Date(log.createdAt).toISOString()}
+              {auditLogs.length > 0 ? (
+                auditLogs.map((log) => (
+                  <tr key={log.id}>
+                    <td className="py-2.5 text-neutral-500">
+                      {new Date(log.createdAt).toISOString()}
+                    </td>
+                    <td className="text-purple-400">{log.actorId}</td>
+                    <td className="font-bold text-white">{log.action}</td>
+                    <td className="text-neutral-400">{log.targetType}:{log.targetId}</td>
+                    <td className="text-neutral-500">{log.ipAddress || "internal"}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="py-4 text-center text-neutral-500">
+                    No security audit events recorded.
                   </td>
-                  <td className="text-purple-400">{log.actorId}</td>
-                  <td className="font-bold text-white">{log.action}</td>
-                  <td className="text-neutral-400">{log.targetType}:{log.targetId}</td>
-                  <td className="text-neutral-500">{log.ipAddress || "internal"}</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

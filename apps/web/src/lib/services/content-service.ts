@@ -1,37 +1,31 @@
-import { store } from "./store";
+import {
+  contentRepository,
+  productRepository,
+  serverRepository,
+  auditRepository,
+} from "@nexus/db";
 import { generateId } from "@nexus/security";
-import { NotFoundError, eventBus } from "@nexus/domain";
-import type { Content, Comment, User } from "@nexus/domain";
+import { eventBus } from "@nexus/domain";
+import type { Content, Comment, User, Product, Server } from "@nexus/domain";
 
 export class ContentService {
   async listArticles(): Promise<Content[]> {
-    return Array.from(store.content.values())
-      .filter((c) => c.status === "published")
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return contentRepository.listPublished();
   }
 
   async getArticleBySlug(slug: string): Promise<Content | null> {
-    const item = Array.from(store.content.values()).find((c) => c.slug === slug);
-    if (item) {
-      item.viewCount += 1;
-      store.content.set(item.id, item);
-    }
-    return item || null;
+    return contentRepository.findBySlug(slug);
   }
 
   async getComments(target: { contentId?: string; productId?: string }): Promise<Comment[]> {
-    return Array.from(store.comments.values()).filter((c) => {
-      if (target.contentId && c.contentId === target.contentId) return true;
-      if (target.productId && c.productId === target.productId) return true;
-      return false;
-    });
+    return contentRepository.listComments(target);
   }
 
   async addComment(
     input: { contentId?: string; productId?: string; text: string; rating?: number },
     actor: User
   ): Promise<Comment> {
-    const comment: Comment = {
+    const comment = await contentRepository.addComment({
       id: generateId("cmt"),
       contentId: input.contentId,
       productId: input.productId,
@@ -39,26 +33,28 @@ export class ContentService {
       text: input.text,
       rating: input.rating,
       isVerifiedPurchase: true,
-      createdAt: new Date(),
-    };
-
-    store.comments.set(comment.id, comment);
+    });
 
     if (input.contentId) {
-      const c = store.content.get(input.contentId);
-      if (c) {
-        c.commentCount += 1;
-        store.content.set(c.id, c);
-      }
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: "user",
+        action: "content.comment_added",
+        targetId: input.contentId,
+        targetType: "content",
+      });
     }
 
     if (input.productId && input.rating) {
-      const p = store.products.get(input.productId);
-      if (p) {
-        const newCount = p.ratingCount + 1;
-        p.ratingAverage = Math.round((p.ratingAverage * p.ratingCount + input.rating * 10) / newCount);
-        p.ratingCount = newCount;
-        store.products.set(p.id, p);
+      const prod = await productRepository.findById(input.productId);
+      if (prod) {
+        const newCount = prod.ratingCount + 1;
+        const newAvg = Math.round((prod.ratingAverage * prod.ratingCount + input.rating * 10) / newCount);
+        await productRepository.update(prod.id, {
+          ratingCount: newCount,
+          ratingAverage: newAvg,
+        });
       }
     }
 
@@ -66,24 +62,19 @@ export class ContentService {
   }
 
   async getFeed(): Promise<{
-    featuredProducts: any[];
-    trendingServers: any[];
+    featuredProducts: Product[];
+    trendingServers: Server[];
     recentArticles: Content[];
   }> {
-    const featuredProducts = Array.from(store.products.values())
-      .filter((p) => p.status === "published")
-      .slice(0, 4);
+    const featuredProducts = await productRepository.list({ featuredOnly: true });
+    const allServers = await serverRepository.listActivePublic();
+    const recentArticles = await contentRepository.listPublished();
 
-    const trendingServers = Array.from(store.servers.values())
-      .filter((s) => s.status === "active")
-      .sort((a, b) => b.currentPlayers - a.currentPlayers)
-      .slice(0, 3);
-
-    const recentArticles = Array.from(store.content.values())
-      .filter((c) => c.status === "published")
-      .slice(0, 3);
-
-    return { featuredProducts, trendingServers, recentArticles };
+    return {
+      featuredProducts: featuredProducts.slice(0, 4),
+      trendingServers: allServers.slice(0, 3),
+      recentArticles: recentArticles.slice(0, 3),
+    };
   }
 }
 

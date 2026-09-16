@@ -1,5 +1,9 @@
-import { store } from "./store";
-import type { Product, Server, Content, User } from "@nexus/domain";
+import {
+  productRepository,
+  serverRepository,
+  contentRepository,
+  userRepository,
+} from "@nexus/db";
 
 export interface SearchResultItem {
   id: string;
@@ -20,25 +24,21 @@ export class DiscoveryService {
     const results: SearchResultItem[] = [];
 
     // Search Products
-    for (const p of store.products.values()) {
-      if (
-        p.title.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q) ||
-        p.tags.some((t) => t.toLowerCase().includes(q))
-      ) {
-        results.push({
-          id: p.id,
-          type: "product",
-          title: p.title,
-          description: p.shortDescription || p.description.slice(0, 100),
-          url: `/market/${p.slug}`,
-          badge: `$${(p.price / 100).toFixed(2)}`,
-        });
-      }
+    const products = await productRepository.list({ query });
+    for (const p of products) {
+      results.push({
+        id: p.id,
+        type: "product",
+        title: p.title,
+        description: p.shortDescription || p.description.slice(0, 100),
+        url: `/market/${p.slug}`,
+        badge: `$${(p.price / 100).toFixed(2)}`,
+      });
     }
 
     // Search Servers
-    for (const s of store.servers.values()) {
+    const servers = await serverRepository.listActivePublic();
+    for (const s of servers) {
       if (
         s.name.toLowerCase().includes(q) ||
         s.description?.toLowerCase().includes(q) ||
@@ -56,7 +56,8 @@ export class DiscoveryService {
     }
 
     // Search Articles
-    for (const a of store.content.values()) {
+    const articles = await contentRepository.listPublished();
+    for (const a of articles) {
       if (
         a.title.toLowerCase().includes(q) ||
         a.body.toLowerCase().includes(q) ||
@@ -74,7 +75,8 @@ export class DiscoveryService {
     }
 
     // Search Developers
-    for (const u of store.users.values()) {
+    const users = await userRepository.listAll();
+    for (const u of users) {
       if (
         u.role === "developer" &&
         (u.username.toLowerCase().includes(q) ||
