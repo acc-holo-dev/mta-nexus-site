@@ -1,93 +1,87 @@
-# MTA NEXUS 1.1 — HTTP API Reference
+# MTA NEXUS HTTP API
 
-## 1. System Health Checks
+This reference documents the public integration contract that exists in the closed beta. The platform is player-first; marketplace checkout, balance, payouts, crypto and entitlement APIs are deliberately **not** available in this release.
 
-### `GET /api/health`
-Returns global health status, active version, uptime, and environment.
+All endpoints return JSON. Error objects expose a short, safe `error` message; callers must not rely on internal implementation details.
 
-### `GET /api/health/db`
-Verifies live connectivity to the PostgreSQL database (`SELECT 1`) and returns round-trip latency.
-
-### `GET /api/health/storage`
-Verifies availability of the configured storage provider (`local` / `s3`).
-
-## 2. Authentication Endpoints
+## Authentication
 
 ### `POST /api/auth/register`
-Creates a new user record with salted scrypt hashing, opens a session, and sets an `httpOnly` cookie.
-- **Request Body:**
-  ```json
-  {
-    "email": "developer@example.com",
-    "username": "mta_dev",
-    "password": "Password123!",
-    "displayName": "MTA Developer"
-  }
-  ```
+
+Creates an account, starts a session and sets the HTTP-only session cookie.
 
 ### `POST /api/auth/login`
-Validates credentials against PostgreSQL, registers a session record, and sets an `httpOnly` cookie.
-- **Request Body:**
-  ```json
-  {
-    "email": "admin@mta-nexus.com",
-    "password": "password123"
-  }
-  ```
+
+Validates credentials, creates a session and sets the HTTP-only session cookie.
 
 ### `GET /api/auth/session`
-Returns the currently authenticated user based on the incoming session cookie.
+
+Returns the current authenticated user without password material.
 
 ### `DELETE /api/auth/session`
-Invalidates the current session in PostgreSQL and clears the session cookie.
 
-## 3. Discovery & Search
+Invalidates the current session and clears its cookie.
 
-### `GET /api/search?q=:query`
-Unified search engine querying across Products, Servers, Articles, and Developers directly from PostgreSQL.
+## Server installation
 
-## 4. Commerce Endpoints
+### `POST /api/servers/:id/installations`
 
-### `POST /api/checkout`
-Requires an authenticated session (401 otherwise). Validates checkout input, creates an order, transitions payment state to `completed`, appends balanced entries to the double-entry financial ledger, and provisions cryptographic licenses and entitlements. Rate limited.
+Creates an installation key for a server owned by the signed-in user.
 
-## 5. Product Endpoints
+Request body (optional):
 
-### `GET /api/products/:id`
-Public product DTO (title, price, currency, license model, version). Returns 404 for unpublished products.
+```json
+{ "moduleVersion": "0.1.0" }
+```
 
-### `GET /api/products/:id/download`
-Authorized build delivery. Requires session + entitlement/license/ownership. Returns the real published build metadata (version, SHA-256) or 404 when no published build exists. Fallback builds and synthetic hashes are prohibited. Rate limited.
+Successful response (`201`) includes `installationId`, `serverId`, `moduleVersion`, and a plaintext `apiKey`. The key is returned exactly once. Store it only in the MTA server's local `config.lua`.
 
-### `GET /api/products/:id/reviews`
-Public review list for a product.
-
-### `POST /api/products/:id/reviews`
-Review submission with integrity enforcement: verified purchase required for paid products, one review per user per product, self-reviews rejected. Recalculates the product rating from real review records. Rate limited.
-
-## 6. Social & Notification Endpoints
-
-### `GET/POST/DELETE /api/follow`
-Follow/unfollow with target validation — target types restricted to `user`, `server`, `product`, `organization`, and the target must exist. Self-follow rejected. Notifies followed users.
-
-### `GET /api/notifications`
-Returns the authenticated user's notifications and unread count.
-
-### `POST /api/notifications/mark-read`
-IDOR-protected: a notification can only be marked read by its recipient (404 otherwise).
-
-## 7. Trust & Moderation Endpoints
-
-### `GET/POST /api/verification`
-Submit and list verification requests (user, developer, organization, server). Rate limited to 3 per day.
-
-### `GET/POST /api/reports`
-Report submission with rate limiting; listing restricted to moderators.
-
-### `POST /api/admin/actions`
-Moderator-only actions: product feature/suspend/restore, report resolve/dismiss, verification approve/reject. Every action is audit logged.
-
-## 8. Server Telemetry Endpoints
+Rate limit: 5 new installation keys per user per hour.
 
 ### `POST /api/server/installations/heartbeat`
-Installation authentication via SHA-256 hashed API key. Records telemetry snapshots (players, status, module version), updates live server statistics, and records the last heartbeat. Rate limited.
+
+Accepts a heartbeat from an active installation. The MTA NEXUS Agent sends this endpoint automatically.
+
+```json
+{
+  "apiKey": "installation-key-shown-once",
+  "status": "online",
+  "currentPlayers": 42,
+  "maxPlayers": 128,
+  "moduleVersion": "0.1.0"
+}
+```
+
+Rules:
+
+- `apiKey` must be an active installation key and is never returned by this endpoint.
+- `status` is `online`, `offline`, or `maintenance`; it defaults to `online`.
+- `currentPlayers` is an integer from 0 to 4096 and cannot exceed `maxPlayers`.
+- `maxPlayers` is an integer from 1 to 4096.
+- `moduleVersion` and `mtaVersion` are optional strings of at most 32 characters.
+
+A successful response is:
+
+```json
+{
+  "success": true,
+  "serverId": "server-id",
+  "recordedAt": "2026-09-16T20:00:00.000Z"
+}
+```
+
+Rate limit: 120 requests per IP address per minute.
+
+## Discovery
+
+### `GET /api/search?q=:query`
+
+Searches the publicly visible NEXUS catalogue.
+
+## Trust and safety
+
+The closed beta provides reporting, moderation and verification routes for platform operations. Their internal administration contracts are intentionally not public integration APIs.
+
+## MTA resource
+
+The reference implementation is in [resources/mta-nexus-agent](../resources/mta-nexus-agent). It sends only server status and counts over HTTPS.
