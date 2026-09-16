@@ -65,8 +65,8 @@ describe("Commerce & Double-Entry Ledger", () => {
     expect(result.licenses[0].key).toMatch(/^NX-[A-Z0-9-]+$/);
 
     // Verify double-entry ledger additions (buyer debit, seller credit, nexus fee credit)
-    const afterLedger = await ledgerRepository.listRecent(100);
-    const newEntries = afterLedger.slice(0, 3);
+    const afterLedger = await ledgerRepository.listRecent(200);
+    const newEntries = afterLedger.filter((e) => e.referenceId === result.order.id);
     expect(newEntries).toHaveLength(3);
 
     const totalDebit = newEntries

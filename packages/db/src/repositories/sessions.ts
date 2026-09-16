@@ -49,12 +49,16 @@ export class SessionRepository {
         })
         .from(sessions)
         .innerJoin(users, eq(sessions.userId, users.id))
-        .where(and(eq(sessions.token, token), gt(sessions.expiresAt, new Date())))
+        .where(eq(sessions.token, token))
         .limit(1);
 
       if (!rows.length) return null;
+      const session = rows[0].session as SessionRecord;
+      if (new Date(session.expiresAt).getTime() <= Date.now()) {
+        return null;
+      }
       return {
-        session: rows[0].session as SessionRecord,
+        session,
         user: rows[0].user as unknown as User,
       };
     } catch {

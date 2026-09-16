@@ -4,7 +4,7 @@ export const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().default(3000),
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
-  DATABASE_URL: z.string().min(1).default(process.env.DATABASE_URL || "postgres://mtamarket:dev_password@localhost:5432/mta_nexus"),
+  DATABASE_URL: z.string().min(1).default(process.env.DATABASE_URL || "postgres://nexus:nexus_secret@127.0.0.1:5432/mta_nexus"),
   AUTH_SECRET: z.string().min(16).default("super-secure-random-32-character-secret-key-mta-nexus"),
   DISCORD_CLIENT_ID: z.string().optional().default(""),
   DISCORD_CLIENT_SECRET: z.string().optional().default(""),

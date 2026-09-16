@@ -17,6 +17,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { CommandPalette } from "./command-palette";
+import { NotificationBell } from "./notification-bell";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -164,6 +165,9 @@ export function Navbar() {
               <ShieldAlert className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Admin</span>
             </Link>
+
+            {/* Notifications Bell */}
+            <NotificationBell />
 
             {/* Sign In Link */}
             <Link

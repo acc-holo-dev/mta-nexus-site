@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { productService } from "../../../lib/services/product-service";
 import { contentService } from "../../../lib/services/content-service";
+import { authService } from "../../../lib/services/auth-service";
+import { commerceService } from "../../../lib/services/commerce-service";
 import {
   Star,
   Download,
@@ -13,6 +16,7 @@ import {
   ArrowRight,
   MessageSquare,
   AlertCircle,
+  Key,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +32,21 @@ export default async function ProductDetailPage({
   if (!product) {
     notFound();
   }
+
+  const cookieStore = await cookies();
+  const token = cookieStore.get("nexus_session")?.value;
+  const user = await authService.getSession(token);
+
+  const isAuthor = user ? product.authorId === user.id : false;
+  const isLicensed = user
+    ? await commerceService.checkEntitlement(
+        { type: "user", id: user.id },
+        product.id,
+        "product.download"
+      )
+    : false;
+
+  const hasAccess = isAuthor || isLicensed || product.price === 0 || user?.role === "admin";
 
   const builds = await productService.getProductBuilds(product.id);
   const reviews = await contentService.getComments({ productId: product.id });
@@ -46,7 +65,7 @@ export default async function ProductDetailPage({
         <span className="text-neutral-200">{product.title}</span>
       </div>
 
-      {/* Hero section */}
+      {/* Main product presentation */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Gallery & Description */}
         <div className="lg:col-span-2 space-y-6">
@@ -96,10 +115,14 @@ export default async function ProductDetailPage({
 
           {/* Release History & Builds */}
           <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
-            <h2 className="text-base font-bold text-white border-b border-[#232838] pb-3 flex items-center gap-2">
-              <Layers className="w-4 h-4 text-blue-400" />
-              <span>Immutable Release History</span>
+            <h2 className="text-base font-bold text-white border-b border-[#232838] pb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-blue-400" />
+                <span>Immutable Release History</span>
+              </div>
+              <span className="text-[11px] text-neutral-500 font-mono">SHA-256 Validated</span>
             </h2>
+
             {builds.length > 0 ? (
               <div className="space-y-4">
                 {builds.map((b) => (
@@ -109,9 +132,20 @@ export default async function ProductDetailPage({
                   >
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-bold font-mono text-white">Version {b.version}</span>
-                      <span className="text-neutral-500 font-mono text-[11px]">
-                        SHA-256: {b.sha256Hash.slice(0, 16)}...
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-neutral-500 font-mono text-[11px]">
+                          SHA-256: {b.sha256Hash.slice(0, 16)}...
+                        </span>
+                        {hasAccess && (
+                          <a
+                            href={`/api/products/${product.id}/download`}
+                            className="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold"
+                          >
+                            <Download className="w-3 h-3" />
+                            <span>Download</span>
+                          </a>
+                        )}
+                      </div>
                     </div>
                     {b.releaseNotes && (
                       <div className="text-xs text-neutral-300 whitespace-pre-line font-mono bg-black/40 p-2.5 rounded border border-neutral-800">
@@ -167,7 +201,7 @@ export default async function ProductDetailPage({
           </div>
         </div>
 
-        {/* Pricing & Checkout Sidebar */}
+        {/* Pricing & Ownership Sidebar */}
         <div className="space-y-6">
           <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-6 sticky top-24">
             <div>
@@ -177,17 +211,50 @@ export default async function ProductDetailPage({
               </div>
             </div>
 
+            {/* Ownership / Action Box */}
             <div className="space-y-3 pt-4 border-t border-[#1e2230]">
-              <Link
-                href={`/checkout?productId=${product.id}`}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
-              >
-                <span>Instant Checkout</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <p className="text-[11px] text-center text-neutral-500">
-                Automatic cryptographic key provisioning & instant download access
-              </p>
+              {hasAccess ? (
+                <div className="space-y-3">
+                  <div className="p-3.5 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs font-bold">
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>{isAuthor ? "Author Ownership" : "Active License Entitlement"}</span>
+                    </div>
+                    <p className="text-[11px] text-neutral-400">
+                      You hold an active license to deploy and update this resource.
+                    </p>
+                  </div>
+
+                  <a
+                    href={`/api/products/${product.id}/download`}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download Build v{product.currentVersion}</span>
+                  </a>
+
+                  <Link
+                    href="/workspace/licenses"
+                    className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-[#232838] text-neutral-300 text-xs font-semibold transition-colors"
+                  >
+                    <Key className="w-3.5 h-3.5" />
+                    <span>Manage License Key</span>
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <Link
+                    href={`/checkout?productId=${product.id}`}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
+                  >
+                    <span>Instant Checkout</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                  <p className="text-[11px] text-center text-neutral-500">
+                    Automatic cryptographic key provisioning & instant download access
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Specifications Matrix */}

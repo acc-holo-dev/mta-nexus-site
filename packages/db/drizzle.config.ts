@@ -5,6 +5,6 @@ export default defineConfig({
   out: "./migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL || "postgres://nexus:nexus_secret@localhost:5432/mta_nexus",
+    url: process.env.DATABASE_URL || "postgres://nexus:nexus_secret@127.0.0.1:5432/mta_nexus",
   },
 });

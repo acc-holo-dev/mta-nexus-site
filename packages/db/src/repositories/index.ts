@@ -12,3 +12,5 @@ export * from "./ledger";
 export * from "./content";
 export * from "./audit";
 export * from "./reports";
+export * from "./notifications";
+export * from "./social";
