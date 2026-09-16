@@ -13,6 +13,11 @@ import {
 } from "@nexus/domain";
 import type { User } from "@nexus/domain";
 
+function toPublicUser(user: User & { passwordHash?: string | null }): User {
+  const { passwordHash: _, ...publicUser } = user;
+  return publicUser as User;
+}
+
 function isUniqueConstraintError(error: unknown): boolean {
   return (
     typeof error === "object" &&
@@ -69,7 +74,7 @@ export class AuthService {
           details: { email: input.email.toLowerCase() },
         },
       });
-      return { user, token };
+      return { user: toPublicUser(user), token };
     } catch (error) {
       if (isUniqueConstraintError(error)) {
         throw new ConflictError("Email or username is already registered");
@@ -113,14 +118,13 @@ export class AuthService {
       }
     );
 
-    const { passwordHash: _, ...user } = userWithHash;
-    return { user: user as User, token };
+    return { user: toPublicUser(userWithHash), token };
   }
 
   async getSession(token?: string | null): Promise<User | null> {
     if (!token) return null;
     const result = await sessionRepository.findValidSession(token);
-    return result ? result.user : null;
+    return result ? toPublicUser(result.user) : null;
   }
 
   async logout(token: string): Promise<void> {
@@ -154,15 +158,17 @@ export class AuthService {
 
     const updated = await userRepository.update(userId, { activeContextId: contextId });
     if (!updated) throw new NotFoundError("User", userId);
-    return updated;
+    return toPublicUser(updated);
   }
 
   async getUserById(id: string): Promise<User | null> {
-    return userRepository.findById(id);
+    const user = await userRepository.findById(id);
+    return user ? toPublicUser(user) : null;
   }
 
   async listUsers(): Promise<User[]> {
-    return userRepository.listAll();
+    const users = await userRepository.listAll();
+    return users.map((user) => toPublicUser(user));
   }
 }
 

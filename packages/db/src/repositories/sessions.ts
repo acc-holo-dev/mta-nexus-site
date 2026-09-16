@@ -57,9 +57,10 @@ export class SessionRepository {
     if (new Date(session.expiresAt).getTime() <= Date.now()) {
       return null;
     }
+    const { passwordHash: _, ...publicUser } = rows[0].user;
     return {
       session,
-      user: rows[0].user as unknown as User,
+      user: publicUser as unknown as User,
     };
   }
 

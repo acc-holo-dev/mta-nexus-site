@@ -16,11 +16,13 @@ describe("Real Auth & Session Engine", () => {
     expect(result.user).toBeDefined();
     expect(result.user.email).toBe(testUser.email.toLowerCase());
     expect(result.user.username).toBe(testUser.username);
+    expect(result.user).not.toHaveProperty("passwordHash");
     expect(result.token).toMatch(/^ses_[A-Za-z0-9_-]{43}$/);
 
     const sessionUser = await authService.getSession(result.token);
     expect(sessionUser).toBeDefined();
     expect(sessionUser?.id).toBe(result.user.id);
+    expect(sessionUser).not.toHaveProperty("passwordHash");
 
     const rawProbeToken = generateSessionToken();
     const stored = await sessionRepository.create({
@@ -59,6 +61,7 @@ describe("Real Auth & Session Engine", () => {
       password: testUser.password,
     });
     expect(result.user).toBeDefined();
+    expect(result.user).not.toHaveProperty("passwordHash");
     expect(result.token).toMatch(/^ses_[A-Za-z0-9_-]{43}$/);
   });
 
