@@ -170,7 +170,6 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
         ipAddress: "127.0.0.1",
         port: 22003,
         maxPlayers: 100,
-        status: "active",
         visibility: "public",
         ownerId: author.id,
       },

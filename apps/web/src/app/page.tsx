@@ -5,147 +5,164 @@ import { contentService } from "../lib/services/content-service";
 import { ProductCard } from "../components/product-card";
 import { ServerCard } from "../components/server-card";
 import { ArticleCard } from "../components/article-card";
-import { SectionHeader, StatCard, TrustBadge } from "@nexus/ui";
+import { SectionHeader, StatCard } from "@nexus/ui";
 import {
   ArrowRight,
   Box,
+  Radio,
   Server as ServerIcon,
   Users,
-  KeyRound,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [featured, popular, servers, articles] = await Promise.all([
-    productService.listProducts({ featuredOnly: true }),
-    productService.listProducts({ sort: "popular" }),
+  const [servers, freeResources, articles] = await Promise.all([
     serverService.listServers(),
+    productService.listProducts({ maxPrice: 0, sort: "popular" }),
     contentService.listArticles(),
   ]);
 
-  const totalOnlinePlayers = servers.reduce((acc, s) => acc + s.currentPlayers, 0);
+  const totalOnlinePlayers = servers.reduce(
+    (total, server) => total + server.currentPlayers,
+    0
+  );
 
   return (
-    <div className="space-y-10">
-      {/* Featured Nexus panel — visually distinct from organic content (TASK-010) */}
-      {featured.length > 0 && (
-        <section>
-          <div className="nexus-panel p-5">
-            <div className="flex items-center justify-between mb-4">
-              <TrustBadge variant="featured" />
-              <Link
-                href="/market"
-                className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
-              >
-                <span>Browse all</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {featured.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+    <div className="space-y-12">
+      <section className="nexus-panel overflow-hidden">
+        <div className="p-7 sm:p-10 space-y-5 max-w-4xl">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-400">
+            <Radio className="w-4 h-4" />
+            Live MTA ecosystem
           </div>
-        </section>
-      )}
-
-      {/* Ecosystem metrics strip */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Players Online"
-          value={totalOnlinePlayers.toLocaleString()}
-          tone="success"
-          icon={<Users className="w-4 h-4" />}
-          context="across connected servers"
-        />
-        <StatCard
-          label="Active Servers"
-          value={servers.length}
-          tone="accent"
-          icon={<ServerIcon className="w-4 h-4" />}
-          context="live telemetry"
-        />
-        <StatCard
-          label="Marketplace Items"
-          value={popular.length}
-          icon={<Box className="w-4 h-4" />}
-          context="scripts, models, UI"
-        />
-        <StatCard
-          label="Licenses Issued"
-          value={popular.reduce((acc, p) => acc + p.salesCount, 0)}
-          tone="purple"
-          icon={<KeyRound className="w-4 h-4" />}
-          context="cryptographic keys"
-        />
-      </section>
-
-      {/* Marketplace */}
-      <section>
-        <SectionHeader
-          title="Marketplace"
-          description="Verified scripts, vehicle packs, maps and UI modules"
-          action={
+          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+            What is happening in MTA right now?
+          </h1>
+          <p className="text-sm sm:text-base text-neutral-300 max-w-2xl leading-relaxed">
+            Find active servers, see where players are gathering, follow community updates,
+            and add useful resources without a fake checkout flow.
+          </p>
+          <div className="flex flex-wrap gap-3">
             <Link
-              href="/market"
-              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
+              href="/servers"
+              className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-colors"
             >
-              <span>View all</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              Explore live servers
             </Link>
-          }
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {popular.slice(0, 4).map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
+            <Link
+              href="/market?maxPrice=0"
+              className="px-5 py-2.5 rounded-lg border border-base bg-neutral-900 hover:bg-neutral-800 text-neutral-200 text-sm font-semibold transition-colors"
+            >
+              Browse free resources
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Servers */}
+      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          label="Players online"
+          value={totalOnlinePlayers.toLocaleString()}
+          tone="success"
+          icon={<Users className="w-4 h-4" />}
+          context="from fresh server heartbeats"
+        />
+        <StatCard
+          label="Live servers"
+          value={servers.length}
+          tone="accent"
+          icon={<ServerIcon className="w-4 h-4" />}
+          context="reporting in the last minutes"
+        />
+        <StatCard
+          label="Free resources"
+          value={freeResources.length}
+          tone="purple"
+          icon={<Box className="w-4 h-4" />}
+          context="available without payment"
+        />
+      </section>
+
       <section>
         <SectionHeader
-          title="Live Servers"
-          description="Real-time multiplayer communities on the Nexus network"
+          title="Live servers"
+          description="Fresh telemetry from active MTA communities"
           action={
             <Link
               href="/servers"
               className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
             >
-              <span>Server directory</span>
+              <span>Open directory</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           }
         />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {servers.slice(0, 3).map((s) => (
-            <ServerCard key={s.id} server={s} />
-          ))}
-        </div>
+        {servers.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {servers.slice(0, 6).map((server) => (
+              <ServerCard key={server.id} server={server} />
+            ))}
+          </div>
+        ) : (
+          <div className="nexus-panel p-8 text-center text-sm text-neutral-400">
+            No servers have sent a fresh heartbeat yet.
+          </div>
+        )}
       </section>
 
-      {/* Community / Articles */}
       <section>
         <SectionHeader
-          title="Community & Articles"
-          description="Technical guides, devlogs and ecosystem news"
+          title="Free resources"
+          description="Community resources you can add without payment"
+          action={
+            <Link
+              href="/market?maxPrice=0"
+              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
+            >
+              <span>View all free resources</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          }
+        />
+        {freeResources.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {freeResources.slice(0, 4).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="nexus-panel p-8 text-center text-sm text-neutral-400">
+            The first free resources are being prepared.
+          </div>
+        )}
+      </section>
+
+      <section>
+        <SectionHeader
+          title="Community updates"
+          description="News, guides, and development notes from the MTA ecosystem"
           action={
             <Link
               href="/articles"
               className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
             >
-              <span>All articles</span>
+              <span>All updates</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           }
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {articles.slice(0, 2).map((a) => (
-            <ArticleCard key={a.id} article={a} />
-          ))}
-        </div>
+        {articles.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {articles.slice(0, 4).map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+        ) : (
+          <div className="nexus-panel p-8 text-center text-sm text-neutral-400">
+            No community updates have been published yet.
+          </div>
+        )}
       </section>
     </div>
   );

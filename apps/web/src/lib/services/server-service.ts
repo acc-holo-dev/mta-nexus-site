@@ -18,7 +18,7 @@ export class ServerService {
   }
 
   async createServer(
-    input: Omit<Server, "id" | "currentPlayers" | "isVerified" | "createdAt" | "updatedAt">,
+    input: Omit<Server, "id" | "status" | "currentPlayers" | "isVerified" | "createdAt" | "updatedAt">,
     actor: User
   ): Promise<Server> {
     if (!can(actor, "server.create")) {
@@ -29,6 +29,7 @@ export class ServerService {
     const server = await serverRepository.create({
       ...input,
       id,
+      status: "inactive",
       currentPlayers: 0,
       isVerified: false,
     });
