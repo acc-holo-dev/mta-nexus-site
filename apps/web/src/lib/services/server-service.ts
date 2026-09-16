@@ -63,9 +63,16 @@ export class ServerService {
     return server;
   }
 
-  async registerInstallation(serverId: string, moduleVersion = "1.0.0"): Promise<ServerInstallation & { apiKey?: string }> {
+  async registerInstallation(
+    serverId: string,
+    actor: User,
+    moduleVersion = "1.0.0"
+  ): Promise<ServerInstallation & { apiKey?: string }> {
     const server = await serverRepository.findById(serverId);
     if (!server) throw new NotFoundError("Server", serverId);
+    if (server.ownerId !== actor.id && actor.role !== "admin") {
+      throw new ForbiddenError("Only the server owner can register an installation");
+    }
 
     const instId = generateId("ins");
 
@@ -87,8 +94,8 @@ export class ServerService {
 
     await auditRepository.record({
       id: generateId("aud"),
-      actorId: serverId,
-      actorType: "system",
+      actorId: actor.id,
+      actorType: "user",
       action: "server.installation_registered",
       targetId: instId,
       targetType: "server_installation",
@@ -100,7 +107,7 @@ export class ServerService {
       type: "server.installation.activated",
       version: 1,
       timestamp: new Date().toISOString(),
-      actor: { id: serverId, type: "server" },
+      actor: { id: actor.id, type: "user" },
       aggregateId: instId,
       aggregateType: "server_installation",
       payload: {

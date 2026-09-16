@@ -1,29 +1,32 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { telemetryRepository, serverRepository } from "@nexus/db";
 import { z } from "zod";
 import { rateLimiter } from "@nexus/security";
 
-const heartbeatSchema = z.object({
-  apiKey: z.string().min(10),
-  status: z.enum(["online", "offline", "maintenance"]).default("online"),
-  currentPlayers: z.coerce.number().int().min(0).max(65535).default(0),
-  maxPlayers: z.coerce.number().int().min(0).max(65535).default(0),
-  moduleVersion: z.string().optional(),
-  mtaVersion: z.string().optional(),
-});
+const heartbeatSchema = z
+  .object({
+    apiKey: z.string().min(10),
+    status: z.enum(["online", "offline", "maintenance"]).default("online"),
+    currentPlayers: z.coerce.number().int().min(0).max(4096).default(0),
+    maxPlayers: z.coerce.number().int().min(1).max(4096),
+    moduleVersion: z.string().max(32).optional(),
+    mtaVersion: z.string().max(32).optional(),
+  })
+  .refine((value) => value.currentPlayers <= value.maxPlayers, {
+    message: "Current players cannot exceed maximum players",
+    path: ["currentPlayers"],
+  });
 
 export async function POST(request: NextRequest) {
   try {
-    // Heartbeats arrive frequently — generous but bounded
     const ip = request.headers.get("x-forwarded-for") || "local";
-    const rl = await rateLimiter.consume(`heartbeat:${ip}`, 120, 60);
-    if (!rl.success) {
+    const rateLimit = await rateLimiter.consume(`heartbeat:${ip}`, 120, 60);
+    if (!rateLimit.success) {
       return NextResponse.json({ error: "Heartbeat rate exceeded" }, { status: 429 });
     }
 
-    const body = await request.json();
-    const parsed = heartbeatSchema.safeParse(body);
-
+    const parsed = heartbeatSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid heartbeat payload", details: parsed.error.format() },
@@ -31,10 +34,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Authenticate the installation by its API key hash
-    const installation = await telemetryRepository.findInstallationByApiKey(parsed.data.apiKey);
-    if (!installation || installation.status === "revoked") {
-      return NextResponse.json({ error: "Invalid or revoked installation credentials" }, { status: 401 });
+    const apiKeyHash = crypto
+      .createHash("sha256")
+      .update(parsed.data.apiKey)
+      .digest("hex");
+    const installation =
+      await telemetryRepository.findInstallationByApiKeyHash(apiKeyHash);
+    if (!installation || installation.status !== "active") {
+      return NextResponse.json(
+        { error: "Invalid or inactive installation credentials" },
+        { status: 401 }
+      );
     }
 
     const server = await serverRepository.findById(installation.serverId);
@@ -57,8 +67,8 @@ export async function POST(request: NextRequest) {
       serverId: installation.serverId,
       recordedAt: new Date().toISOString(),
     });
-  } catch (error: any) {
-    console.error("Heartbeat error:", error.message);
+  } catch (error: unknown) {
+    console.error("Heartbeat error:", error);
     return NextResponse.json({ error: "Failed to process heartbeat" }, { status: 500 });
   }
 }

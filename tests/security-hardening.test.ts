@@ -177,7 +177,11 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       author
     );
 
-    const installation = await serverService.registerInstallation(server.id, "1.0.0");
+    await expect(
+      serverService.registerInstallation(server.id, userA, "1.0.0")
+    ).rejects.toMatchObject({ statusCode: 403 });
+
+    const installation = await serverService.registerInstallation(server.id, author, "1.0.0");
     expect(installation.apiKey).toBeDefined();
     expect(installation.apiKeyHash).not.toContain("nxk_");
 

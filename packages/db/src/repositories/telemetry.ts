@@ -1,4 +1,4 @@
-import { eq, desc, and, gte, sql } from "drizzle-orm";
+import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "../client";
 import { serverHeartbeats, serverInstallations, servers } from "../schema";
 import { generateId } from "@nexus/security";
@@ -15,8 +15,9 @@ export interface HeartbeatInput {
 
 export class TelemetryRepository {
   async recordHeartbeat(input: HeartbeatInput) {
+    const recordedAt = new Date();
     const values = {
-      id: generateId("ins"),
+      id: generateId("hbt"),
       installationId: input.installationId,
       serverId: input.serverId,
       status: input.status,
@@ -24,32 +25,30 @@ export class TelemetryRepository {
       maxPlayers: input.maxPlayers,
       moduleVersion: input.moduleVersion,
       mtaVersion: input.mtaVersion,
-      recordedAt: new Date(),
+      recordedAt,
     };
 
-    await db.insert(serverHeartbeats).values(values);
-
-    // Update live server statistics from real telemetry
-    await db
-      .update(servers)
-      .set({
-        currentPlayers: input.currentPlayers,
-        maxPlayers: input.maxPlayers,
-        status: input.status === "online" ? "active" : input.status,
-        updatedAt: new Date(),
-      })
-      .where(eq(servers.id, input.serverId));
-
-    // Touch installation last heartbeat
-    await db
-      .update(serverInstallations)
-      .set({ lastHeartbeatAt: new Date(), status: "active" })
-      .where(eq(serverInstallations.id, input.installationId));
+    await db.transaction(async (tx) => {
+      await tx.insert(serverHeartbeats).values(values);
+      await tx
+        .update(servers)
+        .set({
+          currentPlayers: input.currentPlayers,
+          maxPlayers: input.maxPlayers,
+          status: input.status === "online" ? "active" : input.status,
+          updatedAt: recordedAt,
+        })
+        .where(eq(servers.id, input.serverId));
+      await tx
+        .update(serverInstallations)
+        .set({ lastHeartbeatAt: recordedAt, status: "active" })
+        .where(eq(serverInstallations.id, input.installationId));
+    });
 
     return values;
   }
 
-  async findInstallationByApiKey(apiKeyHash: string) {
+  async findInstallationByApiKeyHash(apiKeyHash: string) {
     const rows = await db
       .select()
       .from(serverInstallations)
@@ -59,13 +58,12 @@ export class TelemetryRepository {
   }
 
   async listRecentHeartbeats(serverId: string, limit = 24) {
-    const rows = await db
+    return db
       .select()
       .from(serverHeartbeats)
       .where(eq(serverHeartbeats.serverId, serverId))
       .orderBy(desc(serverHeartbeats.recordedAt))
       .limit(limit);
-    return rows;
   }
 
   async getPeakPlayers(serverId: string, hours = 24): Promise<number> {
