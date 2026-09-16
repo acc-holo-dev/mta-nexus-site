@@ -168,7 +168,12 @@ export default async function WorkspacePage() {
                       {server.ipAddress}:{server.port}
                     </div>
                   </div>
-                  <StatusBadge status={isOnline ? "online" : "offline"} tone={isOnline ? "success" : "neutral"} />
+                  <div className="flex items-center gap-3">
+                    <Link href={"/workspace/servers/" + server.id} className="text-xs font-semibold text-accent">
+                      Manage
+                    </Link>
+                    <StatusBadge status={isOnline ? "online" : "offline"} tone={isOnline ? "success" : "neutral"} />
+                  </div>
                 </div>
               );
             })}

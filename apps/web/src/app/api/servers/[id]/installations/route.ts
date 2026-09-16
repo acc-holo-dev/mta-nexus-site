@@ -5,7 +5,7 @@ import { authService } from "../../../../../lib/services/auth-service";
 import { rateLimiter } from "@nexus/security";
 
 const installationSchema = z.object({
-  moduleVersion: z.string().min(1).max(32).default("1.0.0"),
+  moduleVersion: z.string().min(1).max(32).default("0.1.0"),
 });
 
 export async function POST(
@@ -15,11 +15,9 @@ export async function POST(
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
-    if (!user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
-    }
+    if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
-    const rateLimit = await rateLimiter.consume(`installation-create:${user.id}`, 5, 3600);
+    const rateLimit = await rateLimiter.consume("installation-create:" + user.id, 5, 3600);
     if (!rateLimit.success) {
       return NextResponse.json({ error: "Installation key limit exceeded" }, { status: 429 });
     }
@@ -33,11 +31,7 @@ export async function POST(
     }
 
     const { id } = await params;
-    const installation = await serverService.registerInstallation(
-      id,
-      user,
-      parsed.data.moduleVersion
-    );
+    const installation = await serverService.registerInstallation(id, user, parsed.data.moduleVersion);
 
     return NextResponse.json(
       {
@@ -45,7 +39,7 @@ export async function POST(
         apiKey: installation.apiKey,
         serverId: installation.serverId,
         moduleVersion: installation.moduleVersion,
-        warning: "This API key is shown only once. Store it securely.",
+        warning: "This key is shown only once and revokes the previous active key. Store it securely.",
       },
       { status: 201 }
     );
