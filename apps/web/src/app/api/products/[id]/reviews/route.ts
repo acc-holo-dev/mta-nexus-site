@@ -3,7 +3,7 @@ import { authService } from "../../../../../lib/services/auth-service";
 import {
   contentRepository,
   productRepository,
-  licenseRepository,
+  entitlementRepository,
   auditRepository,
 } from "@nexus/db";
 import { addCommentSchema } from "@nexus/validation";
@@ -73,13 +73,16 @@ export async function POST(
       );
     }
 
-    // Review integrity rule 3: paid products require a completed purchase
-    const userLicenses = await licenseRepository.listByUser(user.id);
-    const hasBought = userLicenses.some((l) => l.productId === productId);
+    // Review integrity rule 3: the reviewer must have acquired the resource
+    const hasAcquired = await entitlementRepository.hasEntitlement(
+      { type: "user", id: user.id },
+      productId,
+      "product.download"
+    );
 
-    if (!hasBought && product.price > 0) {
+    if (!hasAcquired) {
       return NextResponse.json(
-        { error: "A verified purchase is required to review this product" },
+        { error: "Add this resource to your library before reviewing it" },
         { status: 403 }
       );
     }
@@ -92,7 +95,7 @@ export async function POST(
       authorId: user.id,
       text: parsed.data.text,
       rating,
-      isVerifiedPurchase: hasBought,
+      isVerifiedPurchase: hasAcquired,
     });
 
     // Recalculate true rating average from database reviews (source of truth)
@@ -115,7 +118,7 @@ export async function POST(
       action: "product.review_submitted",
       targetId: productId,
       targetType: "product",
-      details: { rating, isVerifiedPurchase: hasBought },
+      details: { rating, verifiedAcquisition: hasAcquired },
     });
 
     return NextResponse.json(
