@@ -5,34 +5,26 @@ import type { Notification } from "@nexus/domain";
 
 export class NotificationRepository {
   async listByUser(recipientId: string, limit = 50): Promise<Notification[]> {
-    try {
-      const rows = await db
-        .select()
-        .from(notifications)
-        .where(eq(notifications.recipientId, recipientId))
-        .orderBy(desc(notifications.createdAt))
-        .limit(limit);
-      return rows as unknown as Notification[];
-    } catch {
-      return [];
-    }
+        const rows = await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.recipientId, recipientId))
+      .orderBy(desc(notifications.createdAt))
+      .limit(limit);
+    return rows as unknown as Notification[];
   }
 
   async countUnread(recipientId: string): Promise<number> {
-    try {
-      const rows = await db
-        .select()
-        .from(notifications)
-        .where(
-          and(
-            eq(notifications.recipientId, recipientId),
-            eq(notifications.isRead, false)
-          )
-        );
-      return rows.length;
-    } catch {
-      return 0;
-    }
+        const rows = await db
+      .select()
+      .from(notifications)
+      .where(
+        and(
+          eq(notifications.recipientId, recipientId),
+          eq(notifications.isRead, false)
+        )
+      );
+    return rows.length;
   }
 
   async create(data: Omit<Notification, "createdAt" | "isRead">): Promise<Notification> {
@@ -42,42 +34,30 @@ export class NotificationRepository {
       createdAt: new Date(),
     };
 
-    try {
-      const rows = await db.insert(notifications).values(values).returning();
-      return rows[0] as unknown as Notification;
-    } catch {
-      return values as unknown as Notification;
-    }
+        const rows = await db.insert(notifications).values(values).returning();
+    return rows[0] as unknown as Notification;
   }
 
   async markAsRead(id: string, recipientId: string): Promise<boolean> {
-    try {
-      // Ownership enforcement: only the recipient can mark their own notification
-      const rows = await db
-        .update(notifications)
-        .set({ isRead: true })
-        .where(
-          and(
-            eq(notifications.id, id),
-            eq(notifications.recipientId, recipientId)
-          )
+        // Ownership enforcement: only the recipient can mark their own notification
+    const rows = await db
+      .update(notifications)
+      .set({ isRead: true })
+      .where(
+        and(
+          eq(notifications.id, id),
+          eq(notifications.recipientId, recipientId)
         )
-        .returning();
-      return rows.length > 0;
-    } catch {
-      return false;
-    }
+      )
+      .returning();
+    return rows.length > 0;
   }
 
   async markAllAsRead(recipientId: string): Promise<void> {
-    try {
-      await db
-        .update(notifications)
-        .set({ isRead: true })
-        .where(eq(notifications.recipientId, recipientId));
-    } catch {
-      // ignore
-    }
+        await db
+      .update(notifications)
+      .set({ isRead: true })
+      .where(eq(notifications.recipientId, recipientId));
   }
 }
 

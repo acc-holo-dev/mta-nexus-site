@@ -5,30 +5,18 @@ import type { User } from "@nexus/domain";
 
 export class UserRepository {
   async findById(id: string): Promise<User | null> {
-    try {
-      const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
-      return (rows[0] as unknown as User) || null;
-    } catch {
-      return null;
-    }
+        const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return (rows[0] as unknown as User) || null;
   }
 
   async findByEmail(email: string): Promise<(User & { passwordHash?: string | null }) | null> {
-    try {
-      const rows = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
-      return (rows[0] as unknown as (User & { passwordHash?: string | null })) || null;
-    } catch {
-      return null;
-    }
+        const rows = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
+    return (rows[0] as unknown as (User & { passwordHash?: string | null })) || null;
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    try {
-      const rows = await db.select().from(users).where(eq(users.username, username)).limit(1);
-      return (rows[0] as unknown as User) || null;
-    } catch {
-      return null;
-    }
+        const rows = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return (rows[0] as unknown as User) || null;
   }
 
   async create(user: {
@@ -60,34 +48,22 @@ export class UserRepository {
       updatedAt: new Date(),
     };
 
-    try {
-      const rows = await db.insert(users).values(values).returning();
-      return rows[0] as unknown as User;
-    } catch {
-      return values as unknown as User;
-    }
+        const rows = await db.insert(users).values(values).returning();
+    return rows[0] as unknown as User;
   }
 
   async update(id: string, updates: Partial<User>): Promise<User | null> {
-    try {
-      const rows = await db
-        .update(users)
-        .set({ ...updates, updatedAt: new Date() })
-        .where(eq(users.id, id))
-        .returning();
-      return (rows[0] as unknown as User) || null;
-    } catch {
-      return null;
-    }
+        const rows = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return (rows[0] as unknown as User) || null;
   }
 
   async listAll(): Promise<User[]> {
-    try {
-      const rows = await db.select().from(users);
-      return rows as unknown as User[];
-    } catch {
-      return [];
-    }
+        const rows = await db.select().from(users);
+    return rows as unknown as User[];
   }
 }
 

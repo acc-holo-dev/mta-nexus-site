@@ -10,25 +10,17 @@ export class AuditRepository {
       createdAt: new Date(),
     };
 
-    try {
-      await db.insert(auditEvents).values(values);
-      return values;
-    } catch {
-      return values;
-    }
+        await db.insert(auditEvents).values(values);
+    return values;
   }
 
   async listRecent(limit = 50): Promise<AuditEvent[]> {
-    try {
-      const rows = await db
-        .select()
-        .from(auditEvents)
-        .orderBy(desc(auditEvents.createdAt))
-        .limit(limit);
-      return rows as unknown as AuditEvent[];
-    } catch {
-      return [];
-    }
+        const rows = await db
+      .select()
+      .from(auditEvents)
+      .orderBy(desc(auditEvents.createdAt))
+      .limit(limit);
+    return rows as unknown as AuditEvent[];
   }
 }
 

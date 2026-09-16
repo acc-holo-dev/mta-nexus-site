@@ -5,16 +5,12 @@ import type { Build } from "@nexus/domain";
 
 export class BuildRepository {
   async listByProduct(productId: string): Promise<Build[]> {
-    try {
-      const rows = await db
-        .select()
-        .from(builds)
-        .where(eq(builds.productId, productId))
-        .orderBy(desc(builds.createdAt));
-      return rows as unknown as Build[];
-    } catch {
-      return [];
-    }
+        const rows = await db
+      .select()
+      .from(builds)
+      .where(eq(builds.productId, productId))
+      .orderBy(desc(builds.createdAt));
+    return rows as unknown as Build[];
   }
 
   async create(data: Omit<Build, "createdAt">): Promise<Build> {
@@ -23,12 +19,8 @@ export class BuildRepository {
       createdAt: new Date(),
     };
 
-    try {
-      const rows = await db.insert(builds).values(values).returning();
-      return rows[0] as unknown as Build;
-    } catch {
-      return values as unknown as Build;
-    }
+        const rows = await db.insert(builds).values(values).returning();
+    return rows[0] as unknown as Build;
   }
 }
 

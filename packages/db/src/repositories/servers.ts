@@ -5,34 +5,22 @@ import type { Server, ServerInstallation } from "@nexus/domain";
 
 export class ServerRepository {
   async listActivePublic(): Promise<Server[]> {
-    try {
-      const rows = await db
-        .select()
-        .from(servers)
-        .where(eq(servers.visibility, "public"))
-        .orderBy(desc(servers.currentPlayers));
-      return rows as unknown as Server[];
-    } catch {
-      return [];
-    }
+        const rows = await db
+      .select()
+      .from(servers)
+      .where(eq(servers.visibility, "public"))
+      .orderBy(desc(servers.currentPlayers));
+    return rows as unknown as Server[];
   }
 
   async findById(id: string): Promise<Server | null> {
-    try {
-      const rows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
-      return (rows[0] as unknown as Server) || null;
-    } catch {
-      return null;
-    }
+        const rows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
+    return (rows[0] as unknown as Server) || null;
   }
 
   async findBySlug(slug: string): Promise<Server | null> {
-    try {
-      const rows = await db.select().from(servers).where(eq(servers.slug, slug)).limit(1);
-      return (rows[0] as unknown as Server) || null;
-    } catch {
-      return null;
-    }
+        const rows = await db.select().from(servers).where(eq(servers.slug, slug)).limit(1);
+    return (rows[0] as unknown as Server) || null;
   }
 
   async create(server: Omit<Server, "createdAt" | "updatedAt">): Promise<Server> {
@@ -42,12 +30,8 @@ export class ServerRepository {
       updatedAt: new Date(),
     };
 
-    try {
-      const rows = await db.insert(servers).values(values).returning();
-      return rows[0] as unknown as Server;
-    } catch {
-      return values as unknown as Server;
-    }
+        const rows = await db.insert(servers).values(values).returning();
+    return rows[0] as unknown as Server;
   }
 
   async createInstallation(inst: Omit<ServerInstallation, "createdAt">): Promise<ServerInstallation> {
@@ -56,12 +40,8 @@ export class ServerRepository {
       createdAt: new Date(),
     };
 
-    try {
-      const rows = await db.insert(serverInstallations).values(values).returning();
-      return rows[0] as unknown as ServerInstallation;
-    } catch {
-      return values as unknown as ServerInstallation;
-    }
+        const rows = await db.insert(serverInstallations).values(values).returning();
+    return rows[0] as unknown as ServerInstallation;
   }
 }
 
