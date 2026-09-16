@@ -74,13 +74,13 @@ export default async function ProductDetailPage({
       )
     : false;
 
-  const hasAccess = isAuthor || isLicensed || product.price === 0 || user?.role === "admin";
+  const hasAccess = isAuthor || isLicensed || user?.role === "admin";
 
   const builds = await productService.getProductBuilds(product.id);
   const reviews = await contentService.getComments({ productId: product.id });
 
   const formattedPrice =
-    product.price === 0 ? "Free Download" : `$${(product.price / 100).toFixed(2)}`;
+    product.price === 0 ? "Free" : `$${(product.price / 100).toFixed(2)}`;
 
   return (
     <div className="space-y-10">
@@ -146,7 +146,7 @@ export default async function ProductDetailPage({
             <h2 className="text-base font-bold text-white border-b border-base pb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-blue-400" />
-                <span>Immutable Release History</span>
+                <span>Release history</span>
               </div>
               <span className="text-[11px] text-neutral-500 font-mono">SHA-256 Validated</span>
             </h2>
@@ -192,7 +192,7 @@ export default async function ProductDetailPage({
           <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
             <h2 className="text-base font-bold text-white border-b border-base pb-3 flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-amber-400" />
-              <span>Verified Customer Reviews</span>
+              <span>Community Reviews</span>
             </h2>
             {reviews.length > 0 ? (
               <div className="space-y-4">
@@ -211,7 +211,7 @@ export default async function ProductDetailPage({
                         {rev.isVerifiedPurchase && (
                           <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
                             <CheckCircle2 className="w-3 h-3" />
-                            Verified Purchase
+                            Verified Acquisition
                           </span>
                         )}
                       </div>
@@ -246,10 +246,10 @@ export default async function ProductDetailPage({
                   <div className="p-3.5 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 space-y-1">
                     <div className="flex items-center gap-1.5 text-xs font-bold">
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>{isAuthor ? "Author Ownership" : "Active License Entitlement"}</span>
+                      <span>{isAuthor ? "Author ownership" : "In your library"}</span>
                     </div>
                     <p className="text-[11px] text-neutral-400">
-                      You hold an active license to deploy and update this resource.
+                      You are authorized to download this published build.
                     </p>
                   </div>
 
@@ -262,11 +262,11 @@ export default async function ProductDetailPage({
                   </a>
 
                   <Link
-                    href="/workspace/licenses"
+                    href="/workspace"
                     className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-base text-neutral-300 text-xs font-semibold transition-colors"
                   >
                     <Key className="w-3.5 h-3.5" />
-                    <span>Manage License Key</span>
+                    <span>Open resource library</span>
                   </Link>
                 </div>
               ) : (
@@ -275,11 +275,11 @@ export default async function ProductDetailPage({
                     href={`/checkout?productId=${product.id}`}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
                   >
-                    <span>Instant Checkout</span>
+                    <span>{product.price === 0 ? "Add to library" : "Paid checkout unavailable"}</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                   <p className="text-[11px] text-center text-neutral-500">
-                    Automatic cryptographic key provisioning & instant download access
+                    Free resources require a signed-in library claim before download
                   </p>
                 </div>
               )}
@@ -304,7 +304,7 @@ export default async function ProductDetailPage({
                   </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">Downloads / Sales</span>
+                  <span className="text-neutral-400">Library additions</span>
                   <span className="font-mono text-neutral-200">{product.salesCount}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-800">
@@ -320,7 +320,7 @@ export default async function ProductDetailPage({
             <div className="p-3 rounded-lg bg-blue-950/20 border border-blue-900/30 flex items-start gap-2.5 text-xs">
               <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
               <div className="text-neutral-300 text-[11px] leading-relaxed">
-                Protected by Nexus Platform Escrow and SHA-256 binary validation.
+                Build integrity is published with a SHA-256 checksum. Downloads are entitlement-gated.
               </div>
             </div>
           </div>

@@ -62,13 +62,22 @@ export default async function WorkspacePage() {
             @{user.username} · your resources and servers
           </p>
         </div>
-        <Link
-          href="/workspace/servers/new"
-          className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          Register server
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/workspace/resources/new"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Publish resource
+          </Link>
+          <Link
+            href="/workspace/servers/new"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Register server
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

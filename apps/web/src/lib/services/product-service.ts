@@ -115,7 +115,7 @@ export class ProductService {
       isSigned: true,
     });
 
-    await productRepository.update(product.id, { currentVersion: input.version });
+    await productRepository.update(product.id, {\n      currentVersion: input.version,\n      status: "published",\n    });
 
     await auditRepository.record({
       id: generateId("aud"),

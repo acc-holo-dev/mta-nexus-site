@@ -40,6 +40,7 @@ export default async function MarketPage({
     type: activeType === "all" ? undefined : (activeType as any),
     sort: activeSort as any,
     query,
+    maxPrice: 0,
   });
 
   const buildHref = (type: string, sort: string) =>
@@ -52,10 +53,10 @@ export default async function MarketPage({
         <div>
           <h1 className="font-display text-primary flex items-center gap-2.5">
             <ShoppingBag className="w-6 h-6 text-accent" />
-            <span>Marketplace</span>
+            <span>Free Resource Library</span>
           </h1>
           <p className="font-caption text-muted mt-0.5">
-            {products.length} resource{products.length === 1 ? "" : "s"} with verified licensing
+            {products.length} free resource{products.length === 1 ? "" : "s"} ready for your library
           </p>
         </div>
       </div>

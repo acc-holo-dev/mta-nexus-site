@@ -58,6 +58,11 @@ export class StorageService {
     };
   }
 
+  async deleteAsset(key: string): Promise<void> {
+    const provider = getStorageProvider();
+    await provider.delete(key);
+  }
+
   async getDownloadStream(key: string) {
     const provider = getStorageProvider();
     const exists = await provider.exists(key);
