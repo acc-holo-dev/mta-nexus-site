@@ -17,7 +17,7 @@ export class TelemetryRepository {
   async recordHeartbeat(input: HeartbeatInput) {
     const recordedAt = new Date();
     const values = {
-      id: generateId("hbt"),
+      id: generateId("ins"),
       installationId: input.installationId,
       serverId: input.serverId,
       status: input.status,
