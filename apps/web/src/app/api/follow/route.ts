@@ -103,11 +103,9 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, follow });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to follow" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    console.error("Follow API error:", error);
+    return NextResponse.json({ error: "Follow request failed" }, { status: 500 });
   }
 }
 
@@ -129,10 +127,8 @@ export async function DELETE(request: NextRequest) {
     await socialRepository.unfollow(user.id, targetType, targetId);
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to unfollow" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    console.error("Follow API error:", error);
+    return NextResponse.json({ error: "Follow request failed" }, { status: 500 });
   }
 }

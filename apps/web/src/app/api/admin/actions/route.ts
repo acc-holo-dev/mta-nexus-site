@@ -76,11 +76,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, action, targetId });
-  } catch (error: any) {
-    console.error("Admin action error:", error.message);
-    return NextResponse.json(
-      { error: error.statusCode ? error.message : "Failed to execute administrative action" },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error: unknown) {
+    console.error("Admin action error:", error);
+    return NextResponse.json({ error: "Failed to execute administrative action" }, { status: 500 });
   }
 }

@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { telemetryRepository, serverRepository } from "@nexus/db";
 import { z } from "zod";
-import { rateLimiter } from "@nexus/security";
+import { getClientIp, rateLimiter } from "@nexus/security";
 
 const heartbeatSchema = z
   .object({
@@ -20,7 +20,7 @@ const heartbeatSchema = z
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get("x-forwarded-for") || "local";
+    const ip = getClientIp(request.headers);
     const rateLimit = await rateLimiter.consume(`heartbeat:${ip}`, 120, 60);
     if (!rateLimit.success) {
       return NextResponse.json({ error: "Heartbeat rate exceeded" }, { status: 429 });

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { serverService } from "../../../lib/services/server-service";
 import { authService } from "../../../lib/services/auth-service";
 import { createServerSchema } from "@nexus/validation";
-import { rateLimiter } from "@nexus/security";
+import { getClientIp, rateLimiter } from "@nexus/security";
 
 export async function GET() {
   const servers = await serverService.listServers();
@@ -11,7 +11,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get("x-forwarded-for") || "local";
+    const ip = getClientIp(request.headers);
     const rateLimit = await rateLimiter.consume(`server-create:${ip}`, 5, 3600);
     if (!rateLimit.success) {
       return NextResponse.json({ error: "Server registration limit exceeded" }, { status: 429 });

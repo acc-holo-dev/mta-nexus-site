@@ -125,11 +125,8 @@ export async function POST(
       { success: true, review: comment, newRating: { ratingAverage, ratingCount } },
       { status: 201 }
     );
-  } catch (error: any) {
-    console.error("Review submission error:", error.message);
-    return NextResponse.json(
-      { error: error.statusCode ? error.message : "Failed to submit review" },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error: unknown) {
+    console.error("Review submission error:", error);
+    return NextResponse.json({ error: "Failed to submit review" }, { status: 500 });
   }
 }

@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { commerceService } from "../../../lib/services/commerce-service";
 import { authService } from "../../../lib/services/auth-service";
 import { checkoutSchema } from "@nexus/validation";
-import { rateLimiter } from "@nexus/security";
+import { getClientIp, rateLimiter } from "@nexus/security";
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get("x-forwarded-for") || "local";
+    const ip = getClientIp(request.headers);
     const rateLimit = await rateLimiter.consume(`checkout:${ip}`, 10, 60);
     if (!rateLimit.success) {
       return NextResponse.json(

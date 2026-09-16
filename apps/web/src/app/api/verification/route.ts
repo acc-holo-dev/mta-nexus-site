@@ -60,10 +60,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, request: verificationRequest }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to submit verification request" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    console.error("Verification request error:", error);
+    return NextResponse.json({ error: "Failed to submit verification request" }, { status: 500 });
   }
 }

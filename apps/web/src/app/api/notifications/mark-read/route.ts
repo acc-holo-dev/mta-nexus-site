@@ -26,10 +26,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to mark notifications read" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    console.error("Notification update error:", error);
+    return NextResponse.json({ error: "Failed to mark notifications read" }, { status: 500 });
   }
 }
