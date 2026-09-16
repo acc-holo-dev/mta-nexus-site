@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { getStorageProvider } from "./index";
 import { generateId } from "@nexus/security";
-import { ValidationError, ForbiddenError } from "@nexus/domain";
+import { ValidationError } from "@nexus/domain";
 import type { StorageObjectMeta } from "./types";
 
 const MAX_FILE_SIZE_BYTES = 250 * 1024 * 1024; // 250 MB
