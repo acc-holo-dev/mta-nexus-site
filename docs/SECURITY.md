@@ -48,5 +48,17 @@ Audit event recorded
 ## 7. Installation Credential Security
 Server installations authenticate with a one-time displayed API key (`nxk_...`). Only the SHA-256 hash is persisted; the plaintext key cannot be recovered from the database.
 
-## 8. Audit Logging
+## 8. UI Data Isolation
+Server components enforce session isolation at the page level, not only in API routes:
+- `/workspace`, `/workspace/purchases`, `/workspace/licenses`, `/workspace/sales`, `/workspace/saved` render only the authenticated user's records; anonymous visitors receive a "Sign in required" state.
+- `/admin` requires a real admin/moderator session (verified via `can(user, "admin.access")`); no synthetic or fallback admin identities exist.
+
+## 9. Audit Logging
 Critical platform actions (`LOGIN`, `LOGOUT`, `ORDER_CREATED`, `PAYMENT_COMPLETED`, `LICENSE_ISSUED`, `PRODUCT_DOWNLOADED`, `REVIEW_SUBMITTED`, `ADMIN_*`) are persisted to `audit_events` with actor, target, and metadata.
+
+## 10. Known Security Limitations
+- **Rate limiter is in-memory (`MemoryRateLimit­er`)** — per-process, resets on restart, not shared across multiple instances. Redis is deliberately deferred until horizontal scaling is actually required.
+- **Payment provider** — sandbox implementation only; no external PSP integration yet.
+- **Email flows** (verification, password reset) are not implemented.
+- **2FA** — schema foundation only, no flow.
+- Development seed contains demo statistics; production data comes exclusively from real flows (heartbeat, orders).

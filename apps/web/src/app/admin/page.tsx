@@ -1,5 +1,9 @@
-﻿import { userRepository, verificationRepository } from "@nexus/db";
+﻿import { cookies } from "next/headers";
+import Link from "next/link";
+import { userRepository, verificationRepository } from "@nexus/db";
+import { authService } from "../../lib/services/auth-service";
 import { adminService } from "../../lib/services/admin-service";
+import { can } from "@nexus/security";
 import {
   StatCard,
   SectionHeader,
@@ -23,20 +27,32 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const users = await userRepository.listAll();
-  const adminUser = users.find((u) => u.role === "admin") || {
-    id: "usr_admin_system",
-    role: "admin" as const,
-    email: "admin@mta-nexus.com",
-    username: "admin",
-    displayName: "Admin",
-    isVerified: true,
-    emailVerified: true,
-    twoFactorEnabled: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
+  // Authorization: the page renders only for real admin/moderator sessions
+  const cookieStore = await cookies();
+  const token = cookieStore.get("nexus_session")?.value;
+  const currentUser = await authService.getSession(token);
 
+  if (!currentUser || !can(currentUser, "admin.access")) {
+    return (
+      <div className="max-w-md mx-auto py-20 text-center space-y-4">
+        <div className="w-14 h-14 rounded-xl bg-danger-soft text-danger flex items-center justify-center mx-auto">
+          <ShieldAlert className="w-7 h-7" />
+        </div>
+        <h1 className="font-display text-primary">Access denied</h1>
+        <p className="font-caption text-muted">
+          Administration requires an admin or moderator account.
+        </p>
+        <Link
+          href="/auth/login"
+          className="inline-block px-4 py-2 rounded-md bg-accent hover:bg-[var(--nexus-accent-hover)] text-white text-xs font-semibold transition-colors"
+        >
+          Sign In
+        </Link>
+      </div>
+    );
+  }
+
+  const adminUser = currentUser;
   const health = await adminService.getSystemHealthMetrics(adminUser);
   const reports = await adminService.listReports(adminUser);
   const auditLogs = await adminService.listAuditLogs(adminUser);

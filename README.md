@@ -1,20 +1,23 @@
-# MTA NEXUS 1.0
+# MTA NEXUS 1.4
 
-> **Unified Infrastructure & Resource Ecosystem for Multi Theft Auto: San Andreas**
+> **Resource Marketplace, Licensing Platform & Server Ecosystem for Multi Theft Auto: San Andreas**
 
-MTA Nexus is an end-to-end production platform connecting MTA:SA players, server owners, scripters, 3D artists, and studios into a cohesive, high-performance ecosystem.
+MTA Nexus is a production-oriented platform connecting MTA:SA players, server owners, scripters, 3D artists, and studios. All data is persisted in PostgreSQL — there are no in-memory mock stores in the runtime.
 
 ---
 
-## Key Highlights
+## What actually works
 
-- **Modular Monolith Architecture:** App Router + Domain modules in `packages/*`.
-- **Relational PostgreSQL 18 & Drizzle ORM:** Comprehensive schema with constraints, indexes, and full-text search.
-- **Cryptographic Licensing & Entitlements:** Server IP & hardware-bound licenses with automated provisioning.
-- **Double-Entry Financial Ledger:** Append-only ledger entries for transparent, tamper-proof transaction audits.
-- **Nexus Runtime Module Support:** Dedicated entity models and API handshake foundation for native MTA C++ runtime modules.
-- **Universal Content & Discovery Engine:** Event-driven social feeds, articles, devlogs, verified reviews, and instant cross-domain search (`Ctrl+K`).
-- **Production UI System:** Built with Tailwind CSS v4, accessible UI components, dark-mode first, desktop-responsive layout.
+- **Real database core** — PostgreSQL + Drizzle ORM, 26 tables, SQL migrations (`pnpm db:migrate`) and a development seed (`pnpm db:seed`).
+- **Real authentication** — registration, login with scrypt password hashing, DB-backed sessions, httpOnly cookies, logout, session invalidation.
+- **Marketplace** — products, categories, sorting, immutable build history with SHA-256, verified purchase reviews with rating recalculation.
+- **Commerce** — orders, payment state machine, append-only double-entry ledger, automatic license provisioning, server-bound entitlements.
+- **Server ecosystem** — server directory, ownership, API-key installation, heartbeat telemetry updating live player statistics.
+- **Trust layer** — verification requests with admin approve/reject workflow, reports, moderation actions, audit trail.
+- **User platform** — profiles, organizations, workspace (private by design), purchases, licenses, saved items, notifications, follow system.
+- **Design system** — light & dark themes on a shared token system, collapsible sidebar, command palette (`Ctrl+K`), global cross-domain search.
+
+An honest status audit of every implementation plan (what was claimed vs. what is real) is kept in [`docs/PLAN-STATUS.md`](docs/PLAN-STATUS.md).
 
 ---
 
@@ -24,33 +27,34 @@ MTA Nexus is an end-to-end production platform connecting MTA:SA players, server
 mta-nexus-site/
 │
 ├── apps/
-│   └── web/                # Next.js 16 App Router application & API routes
+│   └── web/                # Next.js 16 App Router application, pages & API routes
 │
 ├── packages/
-│   ├── domain/             # Core entity models, event bus, and domain errors
-│   ├── validation/         # Zod schemas for forms, APIs, and entities
-│   ├── security/           # can() policy engine, prefixed IDs, password hashing
-│   ├── storage/            # StorageProvider abstraction, local & S3 adapters, SHA-256
-│   ├── db/                 # Drizzle ORM PostgreSQL schema & client
-│   ├── ui/                 # Nexus design system primitives
-│   └── config/             # Type-safe environment configuration
+│   ├── domain/             # Entities, typed event bus, domain errors
+│   ├── validation/         # Zod schemas for all inputs
+│   ├── security/           # can() policy engine, opaque IDs, password hashing, rate limiter
+│   ├── storage/            # StorageProvider abstraction, SHA-256 integrity, upload service
+│   ├── db/                 # Drizzle schema, migrations, 18 repositories, seed
+│   ├── ui/                 # Design system: tokens, primitives, StatCard, TrustBadge, DataTable
+│   └── config/             # Type-safe environment validation
 │
-├── docs/                   # Complete architectural and operations documentation
+├── docs/
+│   ├── PLAN/               # Original implementation plans (PLAN-001 … PLAN-005)
+│   ├── PLAN-STATUS.md      # Audit: plan claims vs actual implementation
 │   ├── STACK.md            # Verified dependency matrix
-│   ├── DECISIONS.md        # Architecture Decision Records (ADRs)
+│   ├── DECISIONS.md        # Architecture Decision Records
 │   ├── ARCHITECTURE.md     # System design & bounded contexts
-│   ├── SECURITY.md         # Threat model, policies & controls
+│   ├── SECURITY.md         # Security model, rate limits, IDOR protections
 │   ├── DATA_MODEL.md       # Database schema & entity tables
-│   ├── API.md              # HTTP API documentation
+│   ├── API.md              # HTTP API reference
 │   ├── STORAGE.md          # Storage abstraction & integrity
-│   ├── AUTH.md             # Identity, roles & permissions
-│   ├── DEPLOYMENT.md       # Production deployment instructions
-│   └── DEVELOPMENT.md      # Local engineering workflow
+│   ├── AUTH.md             # Identity, sessions, authorization
+│   ├── DEPLOYMENT.md       # Production deployment
+│   └── DEVELOPMENT.md      # Local development & design system guide
 │
-├── tests/                  # Vitest unit & integration test suites
-├── compose.yaml            # Local Docker infrastructure (PostgreSQL, MinIO, Mailpit)
-├── .env.example            # Environment variables template
-└── package.json            # Root workspace scripts
+├── tests/                  # Vitest suites (31 tests: auth, commerce, entitlements, security)
+├── compose.yaml            # Local infrastructure (PostgreSQL)
+└── package.json            # Workspace scripts
 ```
 
 ---
@@ -58,17 +62,39 @@ mta-nexus-site/
 ## Quick Start
 
 ```bash
-# 1. Install dependencies
-pnpm install
+# 1. Start infrastructure
+docker compose up -d
 
-# 2. Run test suite
-pnpm test
+# 2. Apply database migrations
+pnpm db:migrate
 
-# 3. Build production bundle
-pnpm build
+# 3. (Optional) seed development data
+pnpm db:seed
 
-# 4. Start local development server
-pnpm dev
+# 4. Quality gates — must all pass
+pnpm check        # typecheck + 31 tests + production build
+
+# 5. Run
+pnpm dev          # development — http://localhost:3000
+pnpm build && pnpm start   # production
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+## Development Accounts (seeded, password `password123`)
+
+| Role | Email |
+|---|---|
+| Master Admin | `admin@mta-nexus.com` |
+| Developer | `horizon@mta-nexus.com` |
+| Server Owner | `owner@sadrift.com` |
+| Player | `player@example.com` |
+
+## Known Limitations
+
+Honest list — see [`docs/PLAN-STATUS.md`](docs/PLAN-STATUS.md) for the full audit:
+- Rate limiter is in-memory (single-process); Redis deliberately deferred.
+- Payment provider is a sandbox implementation; external providers not yet connected.
+- Build delivery returns authorized metadata + token; binary delivery requires an S3 provider.
+- Email flows (verification, reset) are not implemented yet.
+- 2FA is a schema foundation only.
+
+Not affiliated with Rockstar Games or Take-Two Interactive.

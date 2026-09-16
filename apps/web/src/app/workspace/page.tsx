@@ -1,11 +1,22 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import {
   licenseRepository,
   serverRepository,
   productRepository,
   ledgerRepository,
+  orderRepository,
 } from "@nexus/db";
-import { StatCard, SectionHeader, DataTable, DataTableHeader, DataTableBody, DataTableEmpty, StatusBadge } from "@nexus/ui";
+import { authService } from "../../lib/services/auth-service";
+import {
+  StatCard,
+  SectionHeader,
+  DataTable,
+  DataTableHeader,
+  DataTableBody,
+  DataTableEmpty,
+  StatusBadge,
+} from "@nexus/ui";
 import {
   Key,
   Server as ServerIcon,
@@ -13,16 +24,40 @@ import {
   Plus,
   DollarSign,
   Users,
+  ShoppingBag,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function WorkspacePage() {
-  const [licenses, servers, products, ledger] = await Promise.all([
-    licenseRepository.listAll(),
+  // Session isolation: overview shows only the current user's data
+  const cookieStore = await cookies();
+  const token = cookieStore.get("nexus_session")?.value;
+  const user = await authService.getSession(token);
+
+  if (!user) {
+    return (
+      <div className="max-w-md mx-auto py-20 text-center space-y-4">
+        <h1 className="font-display text-primary">Sign in required</h1>
+        <p className="font-caption text-muted">
+          The workspace contains your private licenses, purchases and financial records.
+        </p>
+        <Link
+          href="/auth/login"
+          className="inline-block px-4 py-2 rounded-md bg-accent hover:bg-[var(--nexus-accent-hover)] text-white text-xs font-semibold transition-colors"
+        >
+          Sign In
+        </Link>
+      </div>
+    );
+  }
+
+  const [licenses, servers, products, ledger, sales] = await Promise.all([
+    licenseRepository.listByUser(user.id),
     serverRepository.listActivePublic(),
     productRepository.list(),
     ledgerRepository.listRecent(10),
+    orderRepository.listSalesBySeller(user.id),
   ]);
 
   const productMap = new Map(products.map((p) => [p.id, p]));
@@ -36,7 +71,7 @@ export default async function WorkspacePage() {
         <div>
           <h1 className="font-display text-primary">Workspace</h1>
           <p className="font-caption text-muted mt-0.5">
-            Your licenses, servers, purchases and financial activity in one place.
+            Signed in as @{user.username} — your licenses, purchases and financial activity.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -56,7 +91,7 @@ export default async function WorkspacePage() {
         </div>
       </div>
 
-      {/* Dashboard metrics (TASK-018 unified StatCard format) */}
+      {/* Dashboard metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Active Licenses"
@@ -66,11 +101,11 @@ export default async function WorkspacePage() {
           context={`${licenses.length} total`}
         />
         <StatCard
-          label="Servers"
-          value={servers.length}
-          tone="success"
-          icon={<ServerIcon className="w-4 h-4" />}
-          context={`${totalPlayers.toLocaleString()} players online`}
+          label="Your Sales"
+          value={sales.length}
+          tone="purple"
+          icon={<ShoppingBag className="w-4 h-4" />}
+          context="completed orders"
         />
         <StatCard
           label="Ledger Records"
@@ -79,11 +114,11 @@ export default async function WorkspacePage() {
           context="recent activity"
         />
         <StatCard
-          label="Sales"
-          value={ledger.filter((e) => e.amount > 0).length}
-          tone="purple"
-          icon={<DollarSign className="w-4 h-4" />}
-          context="credit entries"
+          label="Servers Online"
+          value={servers.length}
+          tone="success"
+          icon={<ServerIcon className="w-4 h-4" />}
+          context={`${totalPlayers.toLocaleString()} players`}
         />
       </div>
 
@@ -91,7 +126,7 @@ export default async function WorkspacePage() {
         {/* Licenses */}
         <section>
           <SectionHeader
-            title="Licenses"
+            title="Your Licenses"
             description="Hardware & IP bound entitlements"
             action={
               <Link href="/workspace/licenses" className="text-xs font-semibold text-accent hover:underline">
@@ -109,7 +144,10 @@ export default async function WorkspacePage() {
                       <span className="text-xs font-heading text-primary truncate">
                         {product?.title || "MTA Resource"}
                       </span>
-                      <StatusBadge status={lic.status} tone={lic.status === "active" ? "success" : "warning"} />
+                      <StatusBadge
+                        status={lic.status}
+                        tone={lic.status === "active" ? "success" : "warning"}
+                      />
                     </div>
                     <div className="flex items-center justify-between nexus-inset px-2.5 py-1.5 font-code text-[11px] text-success">
                       <span className="select-all truncate">{lic.key}</span>
@@ -129,52 +167,42 @@ export default async function WorkspacePage() {
           </div>
         </section>
 
-        {/* Servers */}
+        {/* Recent Purchases */}
         <section>
           <SectionHeader
-            title="Servers"
-            description="Live telemetry from your servers"
+            title="Recent Purchases"
+            description="Your latest completed orders"
             action={
-              <Link href="/servers" className="text-xs font-semibold text-accent hover:underline">
-                Directory
+              <Link href="/workspace/purchases" className="text-xs font-semibold text-accent hover:underline">
+                Full history
               </Link>
             }
           />
           <div className="space-y-2.5">
-            {servers.length > 0 ? (
-              servers.slice(0, 4).map((s) => (
-                <Link
-                  key={s.id}
-                  href={`/servers/${s.slug}`}
-                  className="nexus-panel p-3.5 flex items-center justify-between hover:border-strong transition-colors"
-                >
+            {sales.length > 0 ? (
+              sales.slice(0, 4).map((s) => (
+                <div key={`${s.orderId}-${s.productId}`} className="nexus-panel p-3.5 flex items-center justify-between">
                   <div className="min-w-0">
-                    <div className="text-xs font-heading text-primary truncate">{s.name}</div>
-                    <div className="font-code text-[11px] text-muted">
-                      {s.ipAddress}:{s.port}
+                    <div className="text-xs font-heading text-primary truncate">{s.productTitle}</div>
+                    <div className="font-caption text-faint">
+                      Order #{s.orderNumber} • {new Date(s.createdAt).toLocaleDateString()}
                     </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <div className="font-numeric text-xs font-bold text-success">
-                      {s.currentPlayers} / {s.maxPlayers}
-                    </div>
-                    <div className="font-caption text-faint flex items-center gap-1 justify-end">
-                      <Users className="w-3 h-3" />
-                      online
-                    </div>
+                  <div className="font-numeric text-xs font-bold text-success shrink-0">
+                    ${(s.unitPrice / 100).toFixed(2)}
                   </div>
-                </Link>
+                </div>
               ))
             ) : (
               <div className="py-8 text-center nexus-panel">
-                <p className="font-caption text-muted">No servers registered.</p>
+                <p className="font-caption text-muted">No purchases yet.</p>
               </div>
             )}
           </div>
         </section>
       </div>
 
-      {/* Ledger (unified DataTable — TASK-019) */}
+      {/* Ledger */}
       <section>
         <SectionHeader
           title="Financial Ledger"
