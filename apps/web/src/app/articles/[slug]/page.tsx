@@ -1,10 +1,36 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
 import { Calendar, Eye, ThumbsUp, MessageSquare, ArrowLeft, Tag } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await contentService.getArticleBySlug(slug);
+
+  if (!article) {
+    return { title: "Article not found" };
+  }
+
+  return {
+    title: article.title,
+    description: article.excerpt || article.body.slice(0, 155),
+    alternates: { canonical: `/articles/${article.slug}` },
+    openGraph: {
+      title: article.title,
+      description: article.excerpt || article.body.slice(0, 155),
+      type: "article",
+      images: article.coverImageUrl ? [{ url: article.coverImageUrl }] : undefined,
+    },
+  };
+}
 
 export default async function ArticleDetailPage({
   params,
@@ -72,7 +98,7 @@ export default async function ArticleDetailPage({
 
       {/* Cover Image */}
       {article.coverImageUrl && (
-        <div className="aspect-[21/9] w-full rounded-xl overflow-hidden border border-[#232838]">
+        <div className="aspect-[21/9] w-full rounded-xl overflow-hidden border border-base">
           <img
             src={article.coverImageUrl}
             alt={article.title}
@@ -82,17 +108,17 @@ export default async function ArticleDetailPage({
       )}
 
       {/* Body Content */}
-      <div className="p-8 rounded-xl border border-[#232838] bg-[#11131a] prose prose-invert max-w-none text-neutral-200 text-sm leading-relaxed whitespace-pre-line space-y-4 font-sans">
+      <div className="p-8 rounded-xl border border-base bg-surface prose prose-invert max-w-none text-neutral-200 text-sm leading-relaxed whitespace-pre-line space-y-4 font-sans">
         {article.body}
       </div>
 
       {/* Tags & Reactions */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl border border-[#232838] bg-[#11131a]">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl border border-base bg-surface">
         <div className="flex flex-wrap items-center gap-2">
           {article.tags.map((t) => (
             <span
               key={t}
-              className="px-2.5 py-1 rounded bg-neutral-900 border border-[#232838] text-xs text-neutral-400"
+              className="px-2.5 py-1 rounded bg-neutral-900 border border-base text-xs text-neutral-400"
             >
               #{t}
             </span>
@@ -100,7 +126,7 @@ export default async function ArticleDetailPage({
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-[#232838] text-xs font-semibold text-neutral-300">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-base text-xs font-semibold text-neutral-300">
             <ThumbsUp className="w-3.5 h-3.5 text-amber-400" />
             <span>{article.likeCount} Upvotes</span>
           </button>
@@ -108,7 +134,7 @@ export default async function ArticleDetailPage({
       </div>
 
       {/* Comments Section */}
-      <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-6">
+      <div className="p-6 rounded-xl border border-base bg-surface space-y-6">
         <h3 className="text-base font-bold text-white flex items-center gap-2">
           <MessageSquare className="w-4 h-4 text-amber-400" />
           <span>Discussion & Comments ({comments.length})</span>
@@ -119,7 +145,7 @@ export default async function ArticleDetailPage({
             {comments.map((c) => (
               <div
                 key={c.id}
-                className="p-4 rounded-lg bg-neutral-900 border border-[#232838] space-y-1.5"
+                className="p-4 rounded-lg bg-neutral-900 border border-base space-y-1.5"
               >
                 <div className="flex items-center justify-between text-xs text-neutral-400">
                   <span className="font-semibold text-neutral-200">Community Member</span>

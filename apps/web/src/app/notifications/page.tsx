@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -40,7 +40,7 @@ export default function NotificationCenterPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#232838] pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-base pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs text-neutral-400 mb-2">
             <Link href="/workspace" className="hover:text-white flex items-center gap-1">
@@ -62,7 +62,7 @@ export default function NotificationCenterPage() {
         {notifications.some((n) => !n.isRead) && (
           <button
             onClick={markAllRead}
-            className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-xs font-semibold text-blue-400 border border-[#232838] transition-colors cursor-pointer"
+            className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-xs font-semibold text-blue-400 border border-base transition-colors cursor-pointer"
           >
             <CheckCheck className="w-4 h-4" />
             <span>Mark All as Read</span>
@@ -77,7 +77,7 @@ export default function NotificationCenterPage() {
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
             filter === "all"
               ? "bg-blue-600 text-white"
-              : "bg-neutral-900 text-neutral-400 hover:text-white border border-[#232838]"
+              : "bg-neutral-900 text-neutral-400 hover:text-white border border-base"
           }`}
         >
           All ({notifications.length})
@@ -87,7 +87,7 @@ export default function NotificationCenterPage() {
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
             filter === "unread"
               ? "bg-blue-600 text-white"
-              : "bg-neutral-900 text-neutral-400 hover:text-white border border-[#232838]"
+              : "bg-neutral-900 text-neutral-400 hover:text-white border border-base"
           }`}
         >
           Unread ({notifications.filter((n) => !n.isRead).length})
@@ -102,15 +102,15 @@ export default function NotificationCenterPage() {
           filtered.map((n) => (
             <div
               key={n.id}
-              className={`p-4 rounded-xl border border-[#232838] transition-colors ${
-                !n.isRead ? "bg-blue-950/20 border-blue-900/40" : "bg-[#11131a]"
+              className={`p-4 rounded-xl border border-base transition-colors ${
+                !n.isRead ? "bg-blue-950/20 border-blue-900/40" : "bg-surface"
               }`}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-white">{n.title}</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-neutral-900 border border-[#232838] text-neutral-400">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-neutral-900 border border-base text-neutral-400">
                       {n.type}
                     </span>
                   </div>
@@ -135,7 +135,7 @@ export default function NotificationCenterPage() {
             </div>
           ))
         ) : (
-          <div className="py-16 text-center rounded-xl border border-dashed border-[#232838] bg-[#11131a]/40">
+          <div className="py-16 text-center rounded-xl border border-dashed border-base bg-surface/40">
             <p className="text-sm text-neutral-400">No notifications to display.</p>
           </div>
         )}

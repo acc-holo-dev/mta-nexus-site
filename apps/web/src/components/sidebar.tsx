@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -14,14 +14,29 @@ import {
   CreditCard,
   Bookmark,
   Bell,
+  DollarSign,
   ChevronLeft,
   ChevronRight,
-  ShieldCheck,
-  Building2,
-  User as UserIcon,
   ShieldAlert,
-  DollarSign,
+  BadgeCheck,
 } from "lucide-react";
+
+const PRIMARY_NAV = [
+  { href: "/explore", label: "Explore", icon: Compass },
+  { href: "/market", label: "Market", icon: ShoppingBag },
+  { href: "/servers", label: "Servers", icon: Server },
+  { href: "/developers", label: "Developers", icon: Code2 },
+  { href: "/articles", label: "Articles", icon: BookOpen },
+];
+
+const WORKSPACE_NAV = [
+  { href: "/workspace", label: "Overview", icon: LayoutDashboard },
+  { href: "/workspace/purchases", label: "Purchases", icon: CreditCard },
+  { href: "/workspace/licenses", label: "Licenses", icon: Key },
+  { href: "/workspace/sales", label: "Sales", icon: DollarSign },
+  { href: "/workspace/saved", label: "Saved", icon: Bookmark },
+  { href: "/notifications", label: "Notifications", icon: Bell },
+];
 
 export function Sidebar({
   isCollapsed,
@@ -32,80 +47,69 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
 
-  const primaryNav = [
-    { href: "/explore", label: "Explore", icon: Compass },
-    { href: "/market", label: "Market", icon: ShoppingBag },
-    { href: "/servers", label: "Servers", icon: Server },
-    { href: "/developers", label: "Developers", icon: Code2 },
-    { href: "/articles", label: "Articles", icon: BookOpen },
-  ];
-
-  const workspaceNav = [
-    { href: "/workspace", label: "Overview", icon: LayoutDashboard },
-    { href: "/workspace/purchases", label: "Purchases", icon: CreditCard },
-    { href: "/workspace/licenses", label: "Licenses", icon: Key },
-    { href: "/workspace/sales", label: "Sales", icon: DollarSign },
-    { href: "/workspace/saved", label: "Saved", icon: Bookmark },
-    { href: "/notifications", label: "Notifications", icon: Bell },
-  ];
+  const isActive = (href: string) =>
+    href === "/workspace"
+      ? pathname === "/workspace"
+      : pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
 
   return (
     <aside
-      className={`hidden lg:flex flex-col border-r border-[#232838] bg-[#0c0e14] transition-all duration-300 z-30 select-none ${
-        isCollapsed ? "w-16" : "w-60"
+      className={`hidden lg:flex flex-col border-r border-base bg-surface transition-all duration-200 z-30 select-none shrink-0 ${
+        isCollapsed ? "w-14" : "w-56"
       }`}
     >
-      {/* Brand area */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-[#232838]">
-        {!isCollapsed && (
-          <Link href="/" className="flex items-center space-x-2.5">
-            <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-xs shadow-md shadow-blue-500/20">
-              NX
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold tracking-wider text-white text-xs">
-                MTA <span className="text-blue-500">NEXUS</span>
-              </span>
-              <span className="text-[9px] text-neutral-500 -mt-0.5 font-mono">1.3 TRUST</span>
-            </div>
-          </Link>
-        )}
-        {isCollapsed && (
-          <Link href="/" className="mx-auto">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-black text-white text-xs shadow-md shadow-blue-500/20">
+      {/* Brand */}
+      <div className="h-14 flex items-center justify-between px-3 border-b border-base shrink-0">
+        {isCollapsed ? (
+          <Link href="/" className="mx-auto" aria-label="MTA Nexus home">
+            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center font-black text-white text-xs shadow-nexus-sm">
               NX
             </div>
           </Link>
+        ) : (
+          <>
+            <Link href="/" className="flex items-center space-x-2 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center font-black text-white text-xs shadow-nexus-sm shrink-0">
+                NX
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="font-heading text-primary leading-tight">
+                  MTA <span className="text-accent">NEXUS</span>
+                </span>
+                <span className="font-caption text-faint leading-tight">1.4</span>
+              </div>
+            </Link>
+            <button
+              onClick={onToggle}
+              className="p-1 rounded-md text-muted hover:text-primary hover:bg-hover transition-colors shrink-0"
+              aria-label="Collapse sidebar"
+              title="Collapse sidebar"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          </>
         )}
-        <button
-          onClick={onToggle}
-          className="p-1 rounded-md text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
-          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-        </button>
       </div>
 
-      <div className="flex-1 py-4 px-2 space-y-6 overflow-y-auto">
-        {/* Main Platform Section */}
-        <div className="space-y-1">
+      <nav className="flex-1 py-3 px-2 space-y-5 overflow-y-auto" aria-label="Main navigation">
+        {/* Ecosystem */}
+        <div className="space-y-0.5">
           {!isCollapsed && (
-            <div className="px-3 pb-1 text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
-              Ecosystem
-            </div>
+            <div className="px-2.5 pb-1.5 font-label text-faint uppercase">Ecosystem</div>
           )}
-          {primaryNav.map((item) => {
+          {PRIMARY_NAV.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+            const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 title={isCollapsed ? item.label : undefined}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                  isActive
-                    ? "bg-blue-600 text-white font-semibold shadow-sm"
-                    : "text-neutral-400 hover:text-white hover:bg-neutral-900"
+                aria-current={active ? "page" : undefined}
+                className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  active
+                    ? "bg-accent-soft text-accent font-semibold"
+                    : "text-secondary hover:text-primary hover:bg-hover"
                 } ${isCollapsed ? "justify-center px-0" : ""}`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
@@ -115,25 +119,24 @@ export function Sidebar({
           })}
         </div>
 
-        {/* Workspace Section */}
-        <div className="space-y-1 pt-2 border-t border-[#1e2230]">
+        {/* Workspace */}
+        <div className="space-y-0.5 pt-3 border-t border-base">
           {!isCollapsed && (
-            <div className="px-3 pb-1 text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">
-              Workspace
-            </div>
+            <div className="px-2.5 pb-1.5 font-label text-faint uppercase">Workspace</div>
           )}
-          {workspaceNav.map((item) => {
+          {WORKSPACE_NAV.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const active = isActive(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 title={isCollapsed ? item.label : undefined}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                  isActive
-                    ? "bg-neutral-800 text-white font-semibold"
-                    : "text-neutral-400 hover:text-white hover:bg-neutral-900"
+                aria-current={active ? "page" : undefined}
+                className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  active
+                    ? "bg-accent-soft text-accent font-semibold"
+                    : "text-secondary hover:text-primary hover:bg-hover"
                 } ${isCollapsed ? "justify-center px-0" : ""}`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
@@ -143,20 +146,36 @@ export function Sidebar({
           })}
         </div>
 
-        {/* Admin Section */}
-        <div className="space-y-1 pt-2 border-t border-[#1e2230]">
+        {/* Admin */}
+        <div className="space-y-0.5 pt-3 border-t border-base">
           <Link
             href="/admin"
-            title={isCollapsed ? "Admin Control" : undefined}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium text-red-400 hover:bg-neutral-900 transition-colors ${
-              pathname.startsWith("/admin") ? "bg-red-950/30 font-semibold" : ""
+            title={isCollapsed ? "Admin" : undefined}
+            aria-current={pathname.startsWith("/admin") ? "page" : undefined}
+            className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              pathname.startsWith("/admin")
+                ? "bg-danger-soft text-danger font-semibold"
+                : "text-secondary hover:text-primary hover:bg-hover"
             } ${isCollapsed ? "justify-center px-0" : ""}`}
           >
             <ShieldAlert className="w-4 h-4 shrink-0" />
-            {!isCollapsed && <span>Admin Control</span>}
+            {!isCollapsed && <span>Admin</span>}
           </Link>
         </div>
-      </div>
+      </nav>
+
+      {/* Expand button when collapsed */}
+      {isCollapsed && (
+        <div className="p-2 border-t border-base">
+          <button
+            onClick={onToggle}
+            className="w-full p-1.5 rounded-md text-muted hover:text-primary hover:bg-hover transition-colors flex justify-center"
+            aria-label="Expand sidebar"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

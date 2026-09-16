@@ -1,15 +1,22 @@
-import { userRepository, verificationRepository } from "@nexus/db";
+﻿import { userRepository, verificationRepository } from "@nexus/db";
 import { adminService } from "../../lib/services/admin-service";
 import {
+  StatCard,
+  SectionHeader,
+  DataTable,
+  DataTableHeader,
+  DataTableBody,
+  DataTableEmpty,
+  StatusBadge,
+} from "@nexus/ui";
+import {
   ShieldAlert,
-  Activity,
   Users,
   Box,
   Server,
-  FileText,
+  KeyRound,
+  ShoppingBag,
   AlertTriangle,
-  History,
-  CheckCircle2,
   BadgeCheck,
 } from "lucide-react";
 
@@ -34,205 +41,143 @@ export default async function AdminPage() {
   const reports = await adminService.listReports(adminUser);
   const auditLogs = await adminService.listAuditLogs(adminUser);
   const verificationRequests = await verificationRepository.listAll();
+  const pendingVerifications = verificationRequests.filter((v) => v.status === "pending");
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="border-b border-[#232838] pb-6 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-2.5">
-            <ShieldAlert className="w-7 h-7 text-red-500" />
-            <span>Nexus Master Administration</span>
+          <h1 className="font-display text-primary flex items-center gap-2.5">
+            <ShieldAlert className="w-6 h-6 text-danger" />
+            <span>Administration</span>
           </h1>
-          <p className="text-xs text-neutral-400 mt-1">
-            Global ecosystem telemetry, moderation cases, reports queue, and tamper-proof audit trails.
+          <p className="font-caption text-muted mt-0.5">
+            Platform moderation, verification queue and audit trail.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs font-mono text-emerald-400 uppercase font-bold">System Healthy</span>
+          <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+          <span className="font-label text-success uppercase">Operational</span>
         </div>
       </div>
 
-      {/* Metrics Row */}
+      {/* Metrics (unified StatCard) */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
-          <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Users</div>
-          <div className="text-2xl font-black text-white mt-1">{health.counts.users}</div>
-        </div>
-        <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
-          <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Servers</div>
-          <div className="text-2xl font-black text-emerald-400 mt-1">{health.counts.servers}</div>
-        </div>
-        <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
-          <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Products</div>
-          <div className="text-2xl font-black text-blue-400 mt-1">{health.counts.products}</div>
-        </div>
-        <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
-          <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Licenses</div>
-          <div className="text-2xl font-black text-purple-400 mt-1">{health.counts.licenses}</div>
-        </div>
-        <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
-          <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Orders</div>
-          <div className="text-2xl font-black text-white mt-1">{health.counts.orders}</div>
-        </div>
-        <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
-          <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Open Reports</div>
-          <div className="text-2xl font-black text-amber-400 mt-1">{health.counts.reportsOpen}</div>
-        </div>
+        <StatCard label="Users" value={health.counts.users} icon={<Users className="w-4 h-4" />} />
+        <StatCard label="Servers" value={health.counts.servers} tone="success" icon={<Server className="w-4 h-4" />} />
+        <StatCard label="Products" value={health.counts.products} tone="accent" icon={<Box className="w-4 h-4" />} />
+        <StatCard label="Licenses" value={health.counts.licenses} tone="purple" icon={<KeyRound className="w-4 h-4" />} />
+        <StatCard label="Orders" value={health.counts.orders} icon={<ShoppingBag className="w-4 h-4" />} />
+        <StatCard label="Open Reports" value={health.counts.reportsOpen} tone="warning" icon={<AlertTriangle className="w-4 h-4" />} />
       </div>
 
       {/* Verification Queue */}
-      <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
-        <div className="flex items-center justify-between border-b border-[#232838] pb-3">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <BadgeCheck className="w-4 h-4 text-blue-400" />
-            <span>Verification Requests Queue</span>
-          </h2>
-          <span className="text-[11px] text-neutral-500">
-            Approve / Reject through moderation workflow
-          </span>
-        </div>
-
-        <div className="space-y-3">
+      <section>
+        <SectionHeader
+          title="Verification Queue"
+          description={`${pendingVerifications.length} pending request${pendingVerifications.length === 1 ? "" : "s"}`}
+          action={<BadgeCheck className="w-4 h-4 text-accent" />}
+        />
+        <div className="space-y-2.5">
           {verificationRequests.length > 0 ? (
             verificationRequests.map((vr) => (
-              <div
-                key={vr.id}
-                className="p-4 rounded-lg bg-neutral-900 border border-[#232838] flex flex-col md:flex-row md:items-center justify-between gap-4"
-              >
-                <div className="space-y-1">
+              <div key={vr.id} className="nexus-panel p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-accent-soft text-accent">
                       {vr.targetType}
                     </span>
-                    <span className="text-xs font-bold text-white font-mono">{vr.targetId}</span>
+                    <span className="text-xs font-heading text-primary font-code truncate">{vr.targetId}</span>
                   </div>
-                  <p className="text-[11px] text-neutral-400">
-                    Requester: {vr.requesterId} • {new Date(vr.createdAt).toLocaleDateString()}
+                  <p className="font-caption text-muted">
+                    Requester {vr.requesterId} • {new Date(vr.createdAt).toLocaleDateString()}
                   </p>
-                  {vr.notes && <p className="text-[11px] text-neutral-500">Notes: {vr.notes}</p>}
-                  {vr.reviewNotes && (
-                    <p className="text-[11px] text-neutral-500 font-mono">
-                      Review: {vr.reviewNotes}
-                    </p>
-                  )}
+                  {vr.notes && <p className="font-caption text-faint">{vr.notes}</p>}
+                  {vr.reviewNotes && <p className="font-caption text-faint font-code">Review: {vr.reviewNotes}</p>}
                 </div>
 
-                <span
-                  className={`px-2.5 py-1 rounded text-xs font-mono font-bold shrink-0 ${
-                    vr.status === "approved"
-                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                      : vr.status === "rejected"
-                        ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                        : "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-                  }`}
-                >
-                  {vr.status.toUpperCase()}
-                </span>
+                <StatusBadge
+                  status={vr.status}
+                  tone={vr.status === "approved" ? "success" : vr.status === "rejected" ? "danger" : "warning"}
+                />
               </div>
             ))
           ) : (
-            <p className="text-xs text-neutral-500 py-4 text-center">
-              No verification requests submitted.
-            </p>
+            <div className="py-6 text-center nexus-panel">
+              <p className="font-caption text-muted">No verification requests submitted.</p>
+            </div>
           )}
         </div>
-      </div>
+      </section>
 
-      {/* Moderation Cases & Reports */}
-      <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
-        <div className="flex items-center justify-between border-b border-[#232838] pb-3">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-amber-400" />
-            <span>Moderation & Copyright Cases</span>
-          </h2>
-          <span className="text-xs text-neutral-500">Immutable Case History</span>
-        </div>
-
-        <div className="space-y-3">
+      {/* Reports */}
+      <section>
+        <SectionHeader
+          title="Reports & Moderation"
+          description="Immutable case history"
+        />
+        <div className="space-y-2.5">
           {reports.length > 0 ? (
             reports.map((r) => (
-              <div
-                key={r.id}
-                className="p-4 rounded-lg bg-neutral-900 border border-[#232838] flex flex-col md:flex-row md:items-center justify-between gap-4"
-              >
-                <div className="space-y-1">
+              <div key={r.id} className="nexus-panel p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-warning-soft text-warning">
                       {r.type}
                     </span>
-                    <span className="text-xs font-bold text-white">Target ID: {r.targetId}</span>
+                    <span className="text-xs font-heading text-primary font-code">{r.targetId}</span>
                   </div>
-                  <p className="text-xs text-neutral-300">{r.reason}</p>
+                  <p className="font-caption text-secondary">{r.reason}</p>
                   {r.moderatorNotes && (
-                    <p className="text-[11px] text-neutral-500 font-mono">
-                      Notes: {r.moderatorNotes}
-                    </p>
+                    <p className="font-caption text-faint font-code">Notes: {r.moderatorNotes}</p>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                  <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-neutral-800 text-neutral-300">
-                    {r.status.toUpperCase()}
-                  </span>
-                </div>
+                <StatusBadge
+                  status={r.status}
+                  tone={r.status === "resolved" ? "success" : r.status === "dismissed" ? "neutral" : "warning"}
+                />
               </div>
             ))
           ) : (
-            <p className="text-xs text-neutral-500 py-4 text-center">
-              No reports in moderation queue.
-            </p>
+            <div className="py-6 text-center nexus-panel">
+              <p className="font-caption text-muted">No reports in the moderation queue.</p>
+            </div>
           )}
         </div>
-      </div>
+      </section>
 
       {/* Audit Trail */}
-      <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
-        <div className="flex items-center justify-between border-b border-[#232838] pb-3">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
-            <History className="w-4 h-4 text-blue-400" />
-            <span>Platform Security Audit Log</span>
-          </h2>
-          <span className="text-[11px] text-neutral-500">Cryptographically Recorded Events</span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="text-[11px] text-neutral-500 uppercase border-b border-neutral-800">
-              <tr>
-                <th className="py-2.5">Timestamp</th>
-                <th>Actor</th>
-                <th>Action</th>
-                <th>Target</th>
-                <th>IP</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-neutral-800/60 font-mono text-neutral-300">
+      <section>
+        <SectionHeader
+          title="Security Audit Log"
+          description="Most recent platform events"
+        />
+        <div className="nexus-panel p-4">
+          <DataTable>
+            <DataTableHeader columns={["Timestamp", "Actor", "Action", "Target", "IP"]} />
+            <DataTableBody>
               {auditLogs.length > 0 ? (
                 auditLogs.map((log) => (
                   <tr key={log.id}>
-                    <td className="py-2.5 text-neutral-500">
+                    <td className="py-2.5 pr-4 text-faint">
                       {new Date(log.createdAt).toISOString()}
                     </td>
-                    <td className="text-purple-400">{log.actorId}</td>
-                    <td className="font-bold text-white">{log.action}</td>
-                    <td className="text-neutral-400">{log.targetType}:{log.targetId}</td>
-                    <td className="text-neutral-500">{log.ipAddress || "internal"}</td>
+                    <td className="pr-4 text-purple">{log.actorId}</td>
+                    <td className="pr-4 text-primary font-semibold">{log.action}</td>
+                    <td className="pr-4 text-muted">{log.targetType}:{log.targetId}</td>
+                    <td className="text-right text-faint">{log.ipAddress || "internal"}</td>
                   </tr>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={5} className="py-4 text-center text-neutral-500">
-                    No security audit events recorded.
-                  </td>
-                </tr>
+                <DataTableEmpty colSpan={5} message="No audit events recorded." />
               )}
-            </tbody>
-          </table>
+            </DataTableBody>
+          </DataTable>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

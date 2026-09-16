@@ -4,6 +4,15 @@ import { organizations, organizationMembers } from "../schema";
 import type { Organization, OrganizationMember } from "@nexus/domain";
 
 export class OrganizationRepository {
+  async listAll(): Promise<Organization[]> {
+    try {
+      const rows = await db.select().from(organizations);
+      return rows as unknown as Organization[];
+    } catch {
+      return [];
+    }
+  }
+
   async findById(id: string): Promise<Organization | null> {
     try {
       const rows = await db.select().from(organizations).where(eq(organizations.id, id)).limit(1);

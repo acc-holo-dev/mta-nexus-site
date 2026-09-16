@@ -3,11 +3,12 @@ import {
   serverRepository,
   contentRepository,
   userRepository,
+  organizationRepository,
 } from "@nexus/db";
 
 export interface SearchResultItem {
   id: string;
-  type: "product" | "server" | "developer" | "article";
+  type: "product" | "server" | "developer" | "organization" | "article";
   title: string;
   description: string;
   url: string;
@@ -90,6 +91,25 @@ export class DiscoveryService {
           description: u.bio || `@${u.username}`,
           url: `/developers/${u.username}`,
           badge: "Developer",
+        });
+      }
+    }
+
+    // Search Organizations
+    const organizations = await organizationRepository.listAll();
+    for (const o of organizations) {
+      if (
+        o.name.toLowerCase().includes(q) ||
+        o.slug.toLowerCase().includes(q) ||
+        o.description?.toLowerCase().includes(q)
+      ) {
+        results.push({
+          id: o.id,
+          type: "organization",
+          title: o.name,
+          description: o.description?.slice(0, 100) || `@${o.slug}`,
+          url: `/organizations/${o.slug}`,
+          badge: o.isVerified ? "Verified Studio" : "Studio",
         });
       }
     }

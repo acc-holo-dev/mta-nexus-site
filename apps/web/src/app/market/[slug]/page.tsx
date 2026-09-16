@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
 import { productService } from "../../../lib/services/product-service";
 import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
@@ -20,6 +21,33 @@ import {
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await productService.getProductBySlug(slug);
+
+  if (!product) {
+    return { title: "Product not found" };
+  }
+
+  return {
+    title: product.title,
+    description:
+      product.shortDescription ||
+      product.description.slice(0, 155),
+    alternates: { canonical: `/market/${product.slug}` },
+    openGraph: {
+      title: product.title,
+      description: product.shortDescription || product.description.slice(0, 155),
+      type: "website",
+      images: product.thumbnailUrl ? [{ url: product.thumbnailUrl }] : undefined,
+    },
+  };
+}
 
 export default async function ProductDetailPage({
   params,
@@ -69,7 +97,7 @@ export default async function ProductDetailPage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Gallery & Description */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="relative aspect-video w-full rounded-xl bg-neutral-900 border border-[#232838] overflow-hidden shadow-2xl">
+          <div className="relative aspect-video w-full rounded-xl bg-neutral-900 border border-base overflow-hidden shadow-2xl">
             {product.thumbnailUrl ? (
               <img
                 src={product.thumbnailUrl}
@@ -92,8 +120,8 @@ export default async function ProductDetailPage({
           </div>
 
           {/* Description */}
-          <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
-            <h2 className="text-base font-bold text-white border-b border-[#232838] pb-3">
+          <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
+            <h2 className="text-base font-bold text-white border-b border-base pb-3">
               Resource Overview
             </h2>
             <div className="text-sm text-neutral-300 leading-relaxed whitespace-pre-line">
@@ -101,11 +129,11 @@ export default async function ProductDetailPage({
             </div>
 
             {/* Tags */}
-            <div className="flex flex-wrap gap-2 pt-4 border-t border-[#1e2230]">
+            <div className="flex flex-wrap gap-2 pt-4 border-t border-base">
               {product.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2.5 py-1 rounded-md text-xs bg-neutral-900 text-neutral-400 border border-[#232838]"
+                  className="px-2.5 py-1 rounded-md text-xs bg-neutral-900 text-neutral-400 border border-base"
                 >
                   #{tag}
                 </span>
@@ -114,8 +142,8 @@ export default async function ProductDetailPage({
           </div>
 
           {/* Release History & Builds */}
-          <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
-            <h2 className="text-base font-bold text-white border-b border-[#232838] pb-3 flex items-center justify-between">
+          <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
+            <h2 className="text-base font-bold text-white border-b border-base pb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-blue-400" />
                 <span>Immutable Release History</span>
@@ -128,7 +156,7 @@ export default async function ProductDetailPage({
                 {builds.map((b) => (
                   <div
                     key={b.id}
-                    className="p-4 rounded-lg bg-neutral-900 border border-[#232838] space-y-2"
+                    className="p-4 rounded-lg bg-neutral-900 border border-base space-y-2"
                   >
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-bold font-mono text-white">Version {b.version}</span>
@@ -161,8 +189,8 @@ export default async function ProductDetailPage({
           </div>
 
           {/* Customer Reviews */}
-          <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
-            <h2 className="text-base font-bold text-white border-b border-[#232838] pb-3 flex items-center gap-2">
+          <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
+            <h2 className="text-base font-bold text-white border-b border-base pb-3 flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-amber-400" />
               <span>Verified Customer Reviews</span>
             </h2>
@@ -171,7 +199,7 @@ export default async function ProductDetailPage({
                 {reviews.map((rev) => (
                   <div
                     key={rev.id}
-                    className="p-4 rounded-lg bg-neutral-900 border border-[#232838] space-y-2"
+                    className="p-4 rounded-lg bg-neutral-900 border border-base space-y-2"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
@@ -203,7 +231,7 @@ export default async function ProductDetailPage({
 
         {/* Pricing & Ownership Sidebar */}
         <div className="space-y-6">
-          <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-6 sticky top-24">
+          <div className="p-6 rounded-xl border border-base bg-surface space-y-6 sticky top-24">
             <div>
               <div className="text-3xl font-black text-white">{formattedPrice}</div>
               <div className="text-xs text-neutral-400 mt-1 capitalize">
@@ -212,7 +240,7 @@ export default async function ProductDetailPage({
             </div>
 
             {/* Ownership / Action Box */}
-            <div className="space-y-3 pt-4 border-t border-[#1e2230]">
+            <div className="space-y-3 pt-4 border-t border-base">
               {hasAccess ? (
                 <div className="space-y-3">
                   <div className="p-3.5 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 space-y-1">
@@ -235,7 +263,7 @@ export default async function ProductDetailPage({
 
                   <Link
                     href="/workspace/licenses"
-                    className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-[#232838] text-neutral-300 text-xs font-semibold transition-colors"
+                    className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-base text-neutral-300 text-xs font-semibold transition-colors"
                   >
                     <Key className="w-3.5 h-3.5" />
                     <span>Manage License Key</span>
@@ -258,7 +286,7 @@ export default async function ProductDetailPage({
             </div>
 
             {/* Specifications Matrix */}
-            <div className="space-y-3 pt-4 border-t border-[#1e2230] text-xs">
+            <div className="space-y-3 pt-4 border-t border-base text-xs">
               <h4 className="font-bold text-white text-xs uppercase tracking-wider">
                 Technical Compatibility
               </h4>

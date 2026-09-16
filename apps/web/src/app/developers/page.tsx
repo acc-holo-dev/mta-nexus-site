@@ -1,4 +1,4 @@
-import { authService } from "../../lib/services/auth-service";
+﻿import { authService } from "../../lib/services/auth-service";
 import Link from "next/link";
 import { Code2, Award, ShieldCheck, CheckCircle2 } from "lucide-react";
 
@@ -11,7 +11,7 @@ export default async function DevelopersPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="border-b border-[#232838] pb-6">
+      <div className="border-b border-base pb-6">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-2.5">
           <Code2 className="w-7 h-7 text-purple-500" />
           <span>MTA Developer & Studio Network</span>
@@ -26,7 +26,7 @@ export default async function DevelopersPage() {
           <Link
             key={dev.id}
             href={`/developers/${dev.username}`}
-            className="group flex flex-col p-6 rounded-xl border border-[#232838] bg-[#11131a] hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/5 transition-all"
+            className="group flex flex-col p-6 rounded-xl border border-base bg-surface hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/5 transition-all"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-full overflow-hidden bg-neutral-800 border border-neutral-700">
@@ -55,13 +55,13 @@ export default async function DevelopersPage() {
               {dev.bio || "MTA Community contributor and resource author."}
             </p>
 
-            <div className="flex items-center justify-between pt-4 border-t border-[#1e2230] text-xs">
+            <div className="flex items-center justify-between pt-4 border-t border-base text-xs">
               <span className="flex items-center gap-1 text-emerald-400 font-medium">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 Verified Seller
               </span>
               <span className="text-purple-400 font-semibold group-hover:underline">
-                View Portfolio →
+                View Portfolio в†’
               </span>
             </div>
           </Link>

@@ -1,4 +1,4 @@
-import { contentService } from "../../lib/services/content-service";
+﻿import { contentService } from "../../lib/services/content-service";
 import { ArticleCard } from "../../components/article-card";
 import Link from "next/link";
 import { BookOpen, PenSquare } from "lucide-react";
@@ -11,7 +11,7 @@ export default async function ArticlesPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#232838] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-base pb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-2.5">
             <BookOpen className="w-7 h-7 text-amber-500" />

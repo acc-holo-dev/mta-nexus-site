@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { orderRepository, productRepository } from "@nexus/db";
 import { CreditCard, ArrowLeft, PackageCheck, ExternalLink } from "lucide-react";
 
@@ -12,7 +12,7 @@ export default async function PurchasesPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#232838] pb-6">
+      <div className="flex items-center justify-between border-b border-base pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs text-neutral-400 mb-2">
             <Link href="/workspace" className="hover:text-white flex items-center gap-1">
@@ -38,7 +38,7 @@ export default async function PurchasesPage() {
           orders.map((order) => (
             <div
               key={order.id}
-              className="p-5 rounded-xl border border-[#232838] bg-[#11131a] space-y-3"
+              className="p-5 rounded-xl border border-base bg-surface space-y-3"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-800/80 pb-3">
                 <div className="flex items-center gap-2">
@@ -92,13 +92,13 @@ export default async function PurchasesPage() {
                   href="/workspace/licenses"
                   className="text-xs text-blue-400 hover:underline font-semibold"
                 >
-                  View Active License →
+                  View Active License в†’
                 </Link>
               </div>
             </div>
           ))
         ) : (
-          <div className="py-16 text-center rounded-xl border border-dashed border-[#232838] bg-[#11131a]/40">
+          <div className="py-16 text-center rounded-xl border border-dashed border-base bg-surface/40">
             <p className="text-sm text-neutral-400">No purchase records found.</p>
             <Link
               href="/market"

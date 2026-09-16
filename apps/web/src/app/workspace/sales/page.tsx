@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { orderRepository, productRepository, ledgerRepository } from "@nexus/db";
 import { DollarSign, ShoppingBag, ArrowLeft, TrendingUp } from "lucide-react";
 
@@ -25,7 +25,7 @@ export default async function SellerSalesPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#232838] pb-6">
+      <div className="flex items-center justify-between border-b border-base pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs text-neutral-400 mb-2">
             <Link href="/workspace" className="hover:text-white flex items-center gap-1">
@@ -47,25 +47,25 @@ export default async function SellerSalesPage() {
 
       {/* Revenue Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
+        <div className="p-4 rounded-xl border border-base bg-surface">
           <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Gross Sales</div>
           <div className="text-2xl font-black text-white mt-1 font-mono">
             ${(totalRevenue / 100).toFixed(2)}
           </div>
         </div>
-        <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
+        <div className="p-4 rounded-xl border border-base bg-surface">
           <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Platform Fee (7%)</div>
           <div className="text-2xl font-black text-amber-400 mt-1 font-mono">
             ${(platformFees / 100).toFixed(2)}
           </div>
         </div>
-        <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
+        <div className="p-4 rounded-xl border border-base bg-surface">
           <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Net Earnings</div>
           <div className="text-2xl font-black text-emerald-400 mt-1 font-mono">
             ${(netEarnings / 100).toFixed(2)}
           </div>
         </div>
-        <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a]">
+        <div className="p-4 rounded-xl border border-base bg-surface">
           <div className="text-[11px] text-neutral-500 uppercase tracking-wider">Payout Balance</div>
           <div className="text-2xl font-black text-blue-400 mt-1 font-mono">
             ${(payoutBalance / 100).toFixed(2)}
@@ -74,8 +74,8 @@ export default async function SellerSalesPage() {
       </div>
 
       {/* Sales History */}
-      <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
-        <div className="flex items-center justify-between border-b border-[#232838] pb-3">
+      <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
+        <div className="flex items-center justify-between border-b border-base pb-3">
           <h2 className="text-sm font-bold text-white flex items-center gap-2">
             <ShoppingBag className="w-4 h-4 text-emerald-400" />
             <span>Completed Sales ({sales.length})</span>

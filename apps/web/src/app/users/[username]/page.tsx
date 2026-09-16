@@ -1,11 +1,31 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { userRepository, productRepository, serverRepository } from "@nexus/db";
 import { ProductCard } from "../../../components/product-card";
 import { ServerCard } from "../../../components/server-card";
 import { ShieldCheck, Calendar, User as UserIcon, Building2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const { username } = await params;
+  const user = await userRepository.findByUsername(username);
+
+  if (!user) {
+    return { title: "User not found" };
+  }
+
+  return {
+    title: `${user.displayName} (@${user.username})`,
+    description: user.bio?.slice(0, 155) || `MTA Nexus profile of ${user.displayName}`,
+    alternates: { canonical: `/users/${user.username}` },
+  };
+}
 
 export default async function UserProfilePage({
   params,
@@ -35,7 +55,7 @@ export default async function UserProfilePage({
   return (
     <div className="space-y-10">
       {/* Profile Header */}
-      <div className="p-8 rounded-2xl border border-[#232838] bg-[#11131a] flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
+      <div className="p-8 rounded-2xl border border-base bg-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
         <div className="flex items-center gap-6">
           <div className="w-20 h-20 rounded-full overflow-hidden bg-neutral-800 border-2 border-blue-500/50 shadow-xl shrink-0">
             <img
@@ -68,11 +88,11 @@ export default async function UserProfilePage({
         </div>
 
         <div className="flex gap-3">
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-[#232838] text-center min-w-24">
+          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center min-w-24">
             <div className="text-lg font-bold text-white">{userProducts.length}</div>
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Resources</div>
           </div>
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-[#232838] text-center min-w-24">
+          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center min-w-24">
             <div className="text-lg font-bold text-emerald-400">{userServers.length}</div>
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Servers</div>
           </div>

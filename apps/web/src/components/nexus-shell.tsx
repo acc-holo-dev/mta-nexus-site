@@ -1,25 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sidebar } from "./sidebar";
 import { Navbar } from "./navbar";
 import { Footer } from "./footer";
 
 export function NexusShell({ children }: { children: React.ReactNode }) {
+  // Persist sidebar collapse state across sessions (TASK-005)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  return (
-    <div className="min-h-screen flex bg-[#090a0f] text-[#f1f5f9]">
-      {/* Desktop Collapsible Sidebar */}
-      <Sidebar
-        isCollapsed={isSidebarCollapsed}
-        onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-      />
+  useEffect(() => {
+    const stored = localStorage.getItem("nexus-sidebar-collapsed");
+    if (stored === "true") setIsSidebarCollapsed(true);
+  }, []);
 
-      {/* Main Content Area */}
+  const toggle = () => {
+    setIsSidebarCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem("nexus-sidebar-collapsed", String(next));
+      return next;
+    });
+  };
+
+  return (
+    <div className="min-h-screen flex bg-page text-primary">
+      <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggle} />
+
       <div className="flex-1 flex flex-col min-w-0">
         <Navbar />
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
           {children}
         </main>
         <Footer />

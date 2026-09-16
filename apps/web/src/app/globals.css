@@ -1,47 +1,186 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: #090a0f;
-    --foreground: #f1f5f9;
-    --card: #11131a;
-    --card-foreground: #f8fafc;
-    --primary: #2563eb;
-    --primary-foreground: #ffffff;
-    --secondary: #1e2230;
-    --secondary-foreground: #e2e8f0;
-    --muted: #1e2230;
-    --muted-foreground: #94a3b8;
-    --accent: #3b82f6;
-    --accent-foreground: #ffffff;
-    --destructive: #ef4444;
-    --border: #232838;
-    --input: #1b1f2e;
-    --ring: #3b82f6;
-    --radius: 0.5rem;
-  }
+/* ============================================================
+   NEXUS DESIGN TOKENS — TASK-002/003/026/027
+   Light theme is the reference design (TASK-026).
+   Dark theme shares the same token system (TASK-027).
+   ============================================================ */
 
+:root {
+  /* Surfaces */
+  --nexus-page: #f6f7f9;
+  --nexus-surface: #ffffff;
+  --nexus-elevated: #ffffff;
+  --nexus-inset: #eef0f3;
+  --nexus-hover: #f1f3f6;
+
+  /* Borders */
+  --nexus-border: #dfe3e8;
+  --nexus-border-strong: #c8cdd4;
+
+  /* Text */
+  --nexus-text: #10151c;
+  --nexus-text-secondary: #3f4a57;
+  --nexus-text-muted: #6b7684;
+  --nexus-text-faint: #98a1ad;
+
+  /* Accent */
+  --nexus-accent: #2456d9;
+  --nexus-accent-hover: #1d47b8;
+  --nexus-accent-soft: #e8eefc;
+  --nexus-accent-text: #1d47b8;
+
+  /* Status */
+  --nexus-success: #0e8a54;
+  --nexus-success-soft: #e3f5ec;
+  --nexus-warning: #b47407;
+  --nexus-warning-soft: #fcf2df;
+  --nexus-danger: #cf3030;
+  --nexus-danger-soft: #fdeaea;
+  --nexus-purple: #7239d3;
+  --nexus-purple-soft: #f0eafc;
+
+  /* Typography scale */
+  --font-display: 700 1.375rem/1.25 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: 650 1rem/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: 400 0.8125rem/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-label: 600 0.6875rem/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-caption: 400 0.6875rem/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-numeric: 650 0.875rem/1.2 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  --font-code: 400 0.75rem/1.5 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+
+  /* Radius scale */
+  --nexus-radius-sm: 0.375rem;
+  --nexus-radius: 0.5rem;
+  --nexus-radius-lg: 0.75rem;
+
+  /* Shadows */
+  --nexus-shadow-sm: 0 1px 2px rgba(16, 21, 28, 0.06);
+  --nexus-shadow: 0 2px 8px rgba(16, 21, 28, 0.08);
+  --nexus-shadow-lg: 0 8px 24px rgba(16, 21, 28, 0.12);
+}
+
+.dark {
+  --nexus-page: #090a0f;
+  --nexus-surface: #11131a;
+  --nexus-elevated: #161923;
+  --nexus-inset: #0d0f17;
+  --nexus-hover: #1a1e2b;
+
+  --nexus-border: #232838;
+  --nexus-border-strong: #333b52;
+
+  --nexus-text: #f1f5f9;
+  --nexus-text-secondary: #c3ccd8;
+  --nexus-text-muted: #8a94a4;
+  --nexus-text-faint: #5c6675;
+
+  --nexus-accent: #3b82f6;
+  --nexus-accent-hover: #2f6fe0;
+  --nexus-accent-soft: rgba(59, 130, 246, 0.12);
+  --nexus-accent-text: #6aa5f8;
+
+  --nexus-success: #34d399;
+  --nexus-success-soft: rgba(52, 211, 153, 0.12);
+  --nexus-warning: #fbbf24;
+  --nexus-warning-soft: rgba(251, 191, 36, 0.12);
+  --nexus-danger: #f87171;
+  --nexus-danger-soft: rgba(248, 113, 113, 0.12);
+  --nexus-purple: #a78bfa;
+  --nexus-purple-soft: rgba(167, 139, 250, 0.12);
+
+  --nexus-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --nexus-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --nexus-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+@layer base {
   body {
-    background-color: var(--background);
-    color: var(--foreground);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--nexus-page);
+    color: var(--nexus-text);
+    font: var(--font-body);
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
   }
+
+  ::selection {
+    background: var(--nexus-accent);
+    color: #fff;
+  }
 }
 
-/* Custom Scrollbar */
+@layer utilities {
+  /* Semantic surface utilities — use these instead of hardcoded hex */
+  .bg-page { background-color: var(--nexus-page); }
+  .bg-surface { background-color: var(--nexus-surface); }
+  .bg-elevated { background-color: var(--nexus-elevated); }
+  .bg-inset { background-color: var(--nexus-inset); }
+  .bg-hover { background-color: var(--nexus-hover); }
+
+  .border-base { border-color: var(--nexus-border); }
+  .border-strong { border-color: var(--nexus-border-strong); }
+
+  .text-primary { color: var(--nexus-text); }
+  .text-secondary { color: var(--nexus-text-secondary); }
+  .text-muted { color: var(--nexus-text-muted); }
+  .text-faint { color: var(--nexus-text-faint); }
+
+  .text-accent { color: var(--nexus-accent-text); }
+  .text-success { color: var(--nexus-success); }
+  .text-warning { color: var(--nexus-warning); }
+  .text-danger { color: var(--nexus-danger); }
+  .text-purple { color: var(--nexus-purple); }
+
+  .bg-accent { background-color: var(--nexus-accent); }
+  .bg-accent-soft { background-color: var(--nexus-accent-soft); }
+  .bg-success-soft { background-color: var(--nexus-success-soft); }
+  .bg-warning-soft { background-color: var(--nexus-warning-soft); }
+  .bg-danger-soft { background-color: var(--nexus-danger-soft); }
+  .bg-purple-soft { background-color: var(--nexus-purple-soft); }
+
+  .shadow-nexus-sm { box-shadow: var(--nexus-shadow-sm); }
+  .shadow-nexus { box-shadow: var(--nexus-shadow); }
+  .shadow-nexus-lg { box-shadow: var(--nexus-shadow-lg); }
+
+  /* Typography utilities */
+  .font-display { font: var(--font-display); }
+  .font-heading { font: var(--font-heading); }
+  .font-label { font: var(--font-label); letter-spacing: 0.04em; }
+  .font-caption { font: var(--font-caption); }
+  .font-numeric { font: var(--font-numeric); }
+  .font-code { font: var(--font-code); }
+
+  .nexus-panel {
+    background-color: var(--nexus-surface);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius-lg);
+  }
+
+  .nexus-inset {
+    background-color: var(--nexus-inset);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius);
+  }
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0d1017;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #232838;
+  background: var(--nexus-border-strong);
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #333b52;
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

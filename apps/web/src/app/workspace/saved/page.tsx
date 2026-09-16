@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { productRepository, serverRepository } from "@nexus/db";
 import { ProductCard } from "../../../components/product-card";
 import { ServerCard } from "../../../components/server-card";
@@ -15,7 +15,7 @@ export default async function SavedPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#232838] pb-6">
+      <div className="flex items-center justify-between border-b border-base pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs text-neutral-400 mb-2">
             <Link href="/workspace" className="hover:text-white flex items-center gap-1">

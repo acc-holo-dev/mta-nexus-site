@@ -26,7 +26,7 @@ export default async function DeveloperProfilePage({
   return (
     <div className="space-y-10">
       {/* Header Profile card */}
-      <div className="p-8 rounded-2xl border border-[#232838] bg-[#11131a] flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="p-8 rounded-2xl border border-base bg-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-6">
           <div className="w-20 h-20 rounded-full overflow-hidden bg-neutral-800 border-2 border-purple-500/50 shadow-xl">
             <img
@@ -50,11 +50,11 @@ export default async function DeveloperProfilePage({
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-[#232838] text-center">
+          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center">
             <div className="text-lg font-bold text-white">{authorProducts.length}</div>
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Resources</div>
           </div>
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-[#232838] text-center">
+          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center">
             <div className="text-lg font-bold text-emerald-400">100%</div>
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Reputation</div>
           </div>

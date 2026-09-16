@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -58,7 +58,7 @@ export default function RegisterPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4 shadow-xl">
+      <form onSubmit={handleSubmit} className="p-6 rounded-xl border border-base bg-surface space-y-4 shadow-xl">
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider">
             Email Address
@@ -70,7 +70,7 @@ export default function RegisterPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-10 pl-9 pr-3 rounded-lg bg-neutral-900 border border-[#232838] text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
+              className="w-full h-10 pl-9 pr-3 rounded-lg bg-neutral-900 border border-base text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
               placeholder="developer@example.com"
             />
           </div>
@@ -87,7 +87,7 @@ export default function RegisterPage() {
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full h-10 pl-9 pr-3 rounded-lg bg-neutral-900 border border-[#232838] text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
+              className="w-full h-10 pl-9 pr-3 rounded-lg bg-neutral-900 border border-base text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
               placeholder="mta_scripter"
             />
           </div>
@@ -101,7 +101,7 @@ export default function RegisterPage() {
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full h-10 px-3 rounded-lg bg-neutral-900 border border-[#232838] text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
+            className="w-full h-10 px-3 rounded-lg bg-neutral-900 border border-base text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
             placeholder="John Doe"
           />
         </div>
@@ -118,8 +118,8 @@ export default function RegisterPage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-10 pl-9 pr-3 rounded-lg bg-neutral-900 border border-[#232838] text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
-              placeholder="••••••••"
+              className="w-full h-10 pl-9 pr-3 rounded-lg bg-neutral-900 border border-base text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
+              placeholder="вЂўвЂўвЂўвЂўвЂўвЂўвЂўвЂў"
             />
           </div>
         </div>

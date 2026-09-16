@@ -1,4 +1,4 @@
-import { productService } from "../../lib/services/product-service";
+﻿import { productService } from "../../lib/services/product-service";
 import { serverService } from "../../lib/services/server-service";
 import { contentService } from "../../lib/services/content-service";
 import { ProductCard } from "../../components/product-card";
@@ -16,7 +16,7 @@ export default async function ExplorePage() {
   return (
     <div className="space-y-12">
       {/* Header */}
-      <div className="border-b border-[#232838] pb-6">
+      <div className="border-b border-base pb-6">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-2.5">
           <Compass className="w-7 h-7 text-blue-500" />
           <span>Explore the MTA Ecosystem</span>

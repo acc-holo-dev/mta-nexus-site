@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { licenseRepository, productRepository } from "@nexus/db";
 import { Key, ArrowLeft, Download, ShieldCheck, Server } from "lucide-react";
 
@@ -12,7 +12,7 @@ export default async function LicensesPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-[#232838] pb-6">
+      <div className="flex items-center justify-between border-b border-base pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs text-neutral-400 mb-2">
             <Link href="/workspace" className="hover:text-white flex items-center gap-1">
@@ -39,7 +39,7 @@ export default async function LicensesPage() {
             return (
               <div
                 key={lic.id}
-                className="p-5 rounded-xl border border-[#232838] bg-[#11131a] space-y-4"
+                className="p-5 rounded-xl border border-base bg-surface space-y-4"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-800 pb-3">
                   <div>
@@ -47,7 +47,7 @@ export default async function LicensesPage() {
                       {product?.title || "MTA Resource"}
                     </h3>
                     <div className="text-xs text-neutral-500 capitalize">
-                      Model: {lic.model.replace(/_/g, " ")} • Status: {lic.status}
+                      Model: {lic.model.replace(/_/g, " ")} вЂў Status: {lic.status}
                     </div>
                   </div>
                   <span className="self-start sm:self-auto px-2.5 py-1 rounded text-xs font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
@@ -76,7 +76,7 @@ export default async function LicensesPage() {
                     {product && (
                       <Link
                         href={`/market/${product.slug}`}
-                        className="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-[#232838] transition-colors"
+                        className="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-200 border border-base transition-colors"
                       >
                         Product Page
                       </Link>
@@ -94,7 +94,7 @@ export default async function LicensesPage() {
             );
           })
         ) : (
-          <div className="py-16 text-center rounded-xl border border-dashed border-[#232838] bg-[#11131a]/40">
+          <div className="py-16 text-center rounded-xl border border-dashed border-base bg-surface/40">
             <p className="text-sm text-neutral-400">No active licenses found.</p>
           </div>
         )}

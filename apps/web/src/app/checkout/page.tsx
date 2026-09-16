@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
@@ -71,7 +71,7 @@ function CheckoutContent() {
   if (completed) {
     return (
       <div className="max-w-xl mx-auto py-12 space-y-6">
-        <div className="p-8 rounded-2xl border border-emerald-500/30 bg-[#11131a] text-center space-y-4 shadow-2xl">
+        <div className="p-8 rounded-2xl border border-emerald-500/30 bg-surface text-center space-y-4 shadow-2xl">
           <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-10 h-10" />
           </div>
@@ -81,7 +81,7 @@ function CheckoutContent() {
           </p>
 
           {completed.licenses && completed.licenses.length > 0 && (
-            <div className="p-4 rounded-xl bg-neutral-900 border border-[#232838] text-left space-y-2 mt-6">
+            <div className="p-4 rounded-xl bg-neutral-900 border border-base text-left space-y-2 mt-6">
               <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
                 <Key className="w-4 h-4 text-blue-400" />
                 <span>Your License Key</span>
@@ -104,7 +104,7 @@ function CheckoutContent() {
             </Link>
             <Link
               href="/market"
-              className="px-5 py-2.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-[#232838] font-semibold text-xs transition-colors"
+              className="px-5 py-2.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-base font-semibold text-xs transition-colors"
             >
               Continue Shopping
             </Link>
@@ -145,7 +145,7 @@ function CheckoutContent() {
 
   return (
     <div className="max-w-2xl mx-auto py-8 space-y-8">
-      <div className="border-b border-[#232838] pb-4">
+      <div className="border-b border-base pb-4">
         <h1 className="text-2xl font-black text-white flex items-center gap-2">
           <Lock className="w-5 h-5 text-blue-500" />
           <span>Secure Checkout</span>
@@ -161,8 +161,8 @@ function CheckoutContent() {
         </div>
       )}
 
-      {/* Order Summary — real product data */}
-      <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
+      {/* Order Summary вЂ” real product data */}
+      <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
         <h2 className="text-sm font-bold text-white uppercase tracking-wider">Order Summary</h2>
         <div className="flex items-center justify-between py-2 border-b border-neutral-800 text-sm">
           <span className="text-neutral-200">{product.title}</span>
@@ -179,7 +179,7 @@ function CheckoutContent() {
       </div>
 
       {/* Payment Selector */}
-      <div className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4">
+      <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
         <h2 className="text-sm font-bold text-white uppercase tracking-wider">Payment Method</h2>
         <div className="grid grid-cols-1 gap-3">
           <div className="p-4 rounded-lg border-2 border-blue-500 bg-blue-950/20 text-white space-y-1">

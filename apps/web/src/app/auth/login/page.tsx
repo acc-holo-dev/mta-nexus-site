@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
@@ -62,7 +62,7 @@ export default function LoginPage() {
       )}
 
       {/* Quick Demo Credentials Switcher */}
-      <div className="p-4 rounded-xl border border-[#232838] bg-[#11131a] space-y-2.5">
+      <div className="p-4 rounded-xl border border-base bg-surface space-y-2.5">
         <div className="flex items-center gap-1.5 text-xs font-bold text-white uppercase tracking-wider">
           <UserCheck className="w-4 h-4 text-blue-400" />
           <span>Quick Demo Logins</span>
@@ -74,7 +74,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setDemoAccount("admin@mta-nexus.com")}
-            className="p-2 rounded bg-neutral-900 hover:bg-neutral-800 border border-[#232838] text-left text-neutral-200"
+            className="p-2 rounded bg-neutral-900 hover:bg-neutral-800 border border-base text-left text-neutral-200"
           >
             <div className="font-bold text-red-400">Master Admin</div>
             <div className="text-[10px] text-neutral-500 truncate">admin@mta-nexus.com</div>
@@ -82,7 +82,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setDemoAccount("horizon@mta-nexus.com")}
-            className="p-2 rounded bg-neutral-900 hover:bg-neutral-800 border border-[#232838] text-left text-neutral-200"
+            className="p-2 rounded bg-neutral-900 hover:bg-neutral-800 border border-base text-left text-neutral-200"
           >
             <div className="font-bold text-purple-400">Developer</div>
             <div className="text-[10px] text-neutral-500 truncate">horizon@mta-nexus.com</div>
@@ -90,7 +90,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setDemoAccount("owner@sadrift.com")}
-            className="p-2 rounded bg-neutral-900 hover:bg-neutral-800 border border-[#232838] text-left text-neutral-200"
+            className="p-2 rounded bg-neutral-900 hover:bg-neutral-800 border border-base text-left text-neutral-200"
           >
             <div className="font-bold text-emerald-400">Server Owner</div>
             <div className="text-[10px] text-neutral-500 truncate">owner@sadrift.com</div>
@@ -98,7 +98,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setDemoAccount("player@example.com")}
-            className="p-2 rounded bg-neutral-900 hover:bg-neutral-800 border border-[#232838] text-left text-neutral-200"
+            className="p-2 rounded bg-neutral-900 hover:bg-neutral-800 border border-base text-left text-neutral-200"
           >
             <div className="font-bold text-blue-400">Player</div>
             <div className="text-[10px] text-neutral-500 truncate">player@example.com</div>
@@ -107,7 +107,7 @@ export default function LoginPage() {
       </div>
 
       {/* Login Form */}
-      <form onSubmit={handleSubmit} className="p-6 rounded-xl border border-[#232838] bg-[#11131a] space-y-4 shadow-xl">
+      <form onSubmit={handleSubmit} className="p-6 rounded-xl border border-base bg-surface space-y-4 shadow-xl">
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider">
             Email Address
@@ -119,7 +119,7 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-10 pl-9 pr-3 rounded-lg bg-neutral-900 border border-[#232838] text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
+              className="w-full h-10 pl-9 pr-3 rounded-lg bg-neutral-900 border border-base text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
               placeholder="name@example.com"
             />
           </div>
@@ -138,8 +138,8 @@ export default function LoginPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-10 pl-9 pr-3 rounded-lg bg-neutral-900 border border-[#232838] text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
-              placeholder="••••••••"
+              className="w-full h-10 pl-9 pr-3 rounded-lg bg-neutral-900 border border-base text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-blue-500"
+              placeholder="вЂўвЂўвЂўвЂўвЂўвЂўвЂўвЂў"
             />
           </div>
         </div>

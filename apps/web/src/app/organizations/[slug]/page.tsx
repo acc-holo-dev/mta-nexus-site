@@ -46,7 +46,7 @@ export default async function OrganizationProfilePage({
   return (
     <div className="space-y-10">
       {/* Organization Banner / Header */}
-      <div className="p-8 rounded-2xl border border-[#232838] bg-[#11131a] flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
+      <div className="p-8 rounded-2xl border border-base bg-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
         <div className="flex items-center gap-6">
           <div className="w-20 h-20 rounded-2xl overflow-hidden bg-neutral-900 border-2 border-amber-500/50 shadow-xl p-2 shrink-0">
             <img
@@ -87,11 +87,11 @@ export default async function OrganizationProfilePage({
         </div>
 
         <div className="flex gap-3">
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-[#232838] text-center min-w-24">
+          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center min-w-24">
             <div className="text-lg font-bold text-white">{orgProducts.length}</div>
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Releases</div>
           </div>
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-[#232838] text-center min-w-24">
+          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center min-w-24">
             <div className="text-lg font-bold text-emerald-400">{orgServers.length}</div>
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Servers</div>
           </div>

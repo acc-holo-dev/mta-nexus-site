@@ -1,9 +1,30 @@
+import Link from "next/link";
 import { productService } from "../../lib/services/product-service";
 import { ProductCard } from "../../components/product-card";
-import Link from "next/link";
-import { ShoppingBag, Filter, ArrowUpDown } from "lucide-react";
+import { SectionHeader } from "@nexus/ui";
+import { ShoppingBag } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+const CATEGORIES = [
+  { id: "all", label: "All" },
+  { id: "script", label: "Scripts" },
+  { id: "vehicle", label: "Vehicles" },
+  { id: "model", label: "Models" },
+  { id: "map", label: "Maps" },
+  { id: "ui", label: "UI" },
+  { id: "plugin", label: "Plugins" },
+  { id: "bundle", label: "Bundles" },
+  { id: "service", label: "Services" },
+];
+
+const SORTS = [
+  { id: "popular", label: "Popular" },
+  { id: "newest", label: "New" },
+  { id: "rating", label: "Top Rated" },
+  { id: "price_asc", label: "Price ↑" },
+  { id: "price_desc", label: "Price ↓" },
+];
 
 export default async function MarketPage({
   searchParams,
@@ -21,98 +42,80 @@ export default async function MarketPage({
     query,
   });
 
-  const categories = [
-    { id: "all", label: "All Items" },
-    { id: "script", label: "Scripts" },
-    { id: "model", label: "3D Models" },
-    { id: "vehicle", label: "Vehicles" },
-    { id: "map", label: "Maps" },
-    { id: "ui", label: "UI / CEF" },
-    { id: "plugin", label: "Plugins" },
-  ];
+  const buildHref = (type: string, sort: string) =>
+    `/market?type=${type}&sort=${sort}${query ? `&q=${query}` : ""}`;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#232838] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-1">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-2.5">
-            <ShoppingBag className="w-7 h-7 text-blue-500" />
-            <span>MTA Resource Marketplace</span>
+          <h1 className="font-display text-primary flex items-center gap-2.5">
+            <ShoppingBag className="w-6 h-6 text-accent" />
+            <span>Marketplace</span>
           </h1>
-          <p className="text-xs text-neutral-400 mt-1">
-            Browse verified scripts, vehicle packs, maps, and CEF interfaces with instant cryptographic licensing.
+          <p className="font-caption text-muted mt-0.5">
+            {products.length} resource{products.length === 1 ? "" : "s"} with verified licensing
           </p>
         </div>
-
-        {/* Sell / Submit CTA */}
-        <Link
-          href="/workspace"
-          className="self-start md:self-auto px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors"
-        >
-          Publish Resource
-        </Link>
       </div>
 
-      {/* Filter Tabs & Controls */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        {/* Categories */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto">
-          {categories.map((c) => {
-            const isActive = activeType === c.id;
-            return (
-              <Link
-                key={c.id}
-                href={`/market?type=${c.id}&sort=${activeSort}${query ? `&q=${query}` : ""}`}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                  isActive
-                    ? "bg-blue-600 text-white font-semibold shadow"
-                    : "bg-[#11131a] text-neutral-400 hover:text-white border border-[#232838]"
-                }`}
-              >
-                {c.label}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Sort Options */}
-        <div className="flex items-center gap-2 self-end sm:self-auto text-xs text-neutral-400">
-          <ArrowUpDown className="w-3.5 h-3.5" />
-          <span>Sort:</span>
-          <Link
-            href={`/market?type=${activeType}&sort=popular${query ? `&q=${query}` : ""}`}
-            className={`hover:text-white ${activeSort === "popular" ? "text-blue-400 font-bold" : ""}`}
-          >
-            Popular
-          </Link>
-          <span>•</span>
-          <Link
-            href={`/market?type=${activeType}&sort=newest${query ? `&q=${query}` : ""}`}
-            className={`hover:text-white ${activeSort === "newest" ? "text-blue-400 font-bold" : ""}`}
-          >
-            Newest
-          </Link>
-          <span>•</span>
-          <Link
-            href={`/market?type=${activeType}&sort=rating${query ? `&q=${query}` : ""}`}
-            className={`hover:text-white ${activeSort === "rating" ? "text-blue-400 font-bold" : ""}`}
-          >
-            Rating
-          </Link>
-        </div>
+      {/* Sort tabs */}
+      <div className="flex items-center gap-1 border-b border-base overflow-x-auto">
+        {SORTS.map((s) => {
+          const isActive = activeSort === s.id;
+          return (
+            <Link
+              key={s.id}
+              href={buildHref(activeType, s.id)}
+              className={`px-3.5 py-2 text-xs font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap ${
+                isActive
+                  ? "border-accent text-accent"
+                  : "border-transparent text-muted hover:text-primary"
+              }`}
+            >
+              {s.label}
+            </Link>
+          );
+        })}
       </div>
 
-      {/* Grid */}
+      {/* Category filter chips */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {CATEGORIES.map((c) => {
+          const isActive = activeType === c.id;
+          return (
+            <Link
+              key={c.id}
+              href={buildHref(c.id, activeSort)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                isActive
+                  ? "bg-accent text-white font-semibold"
+                  : "bg-surface border border-base text-secondary hover:text-primary hover:border-strong"
+              }`}
+            >
+              {c.label}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Product grid */}
       {products.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>
       ) : (
-        <div className="py-20 text-center rounded-xl border border-dashed border-[#232838] bg-[#11131a]/50">
-          <p className="text-sm text-neutral-400">No resources found in this category.</p>
+        <div className="py-16 text-center nexus-panel">
+          <p className="font-caption text-muted">No resources found in this category.</p>
+          <Link
+            href="/market"
+            className="inline-block mt-3 px-4 py-2 rounded-md bg-accent hover:bg-[var(--nexus-accent-hover)] text-white text-xs font-semibold transition-colors"
+          >
+            Clear Filters
+          </Link>
         </div>
       )}
     </div>

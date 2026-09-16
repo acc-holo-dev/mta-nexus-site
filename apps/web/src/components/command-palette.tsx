@@ -1,21 +1,65 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, X, Box, Server, BookOpen, User, ExternalLink } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Search,
+  X,
+  Box,
+  Server,
+  BookOpen,
+  User,
+  Building2,
+  CornerDownLeft,
+  LayoutDashboard,
+  CreditCard,
+  Key,
+  Bell,
+  Compass,
+  ShoppingBag,
+} from "lucide-react";
 import type { SearchResultItem } from "../lib/services/discovery-service";
 
+interface Command {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  action: () => void;
+  section: string;
+}
+
 export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Navigation commands (TASK-008)
+  const commands: Command[] = [
+    { id: "go-market", label: "Go to Marketplace", icon: ShoppingBag, section: "Navigate", action: () => router.push("/market") },
+    { id: "go-servers", label: "Go to Servers", icon: Server, section: "Navigate", action: () => router.push("/servers") },
+    { id: "go-explore", label: "Go to Explore", icon: Compass, section: "Navigate", action: () => router.push("/explore") },
+    { id: "go-workspace", label: "Open Workspace", icon: LayoutDashboard, section: "Workspace", action: () => router.push("/workspace") },
+    { id: "go-purchases", label: "Open Purchases", icon: CreditCard, section: "Workspace", action: () => router.push("/workspace/purchases") },
+    { id: "go-licenses", label: "Open Licenses", icon: Key, section: "Workspace", action: () => router.push("/workspace/licenses") },
+    { id: "go-notifications", label: "Open Notifications", icon: Bell, section: "Workspace", action: () => router.push("/notifications") },
+  ];
+
+  const filteredCommands = query
+    ? commands.filter((c) => c.label.toLowerCase().includes(query.toLowerCase()))
+    : commands;
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         if (isOpen) onClose();
-        else setResults([]);
+        else {
+          setQuery("");
+          setResults([]);
+          setActiveIndex(0);
+        }
       }
       if (e.key === "Escape" && isOpen) {
         onClose();
@@ -37,8 +81,8 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
         const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
         const data = await res.json();
         setResults(data.results || []);
-      } catch (e) {
-        console.error("Search error:", e);
+      } catch {
+        setResults([]);
       } finally {
         setLoading(false);
       }
@@ -49,109 +93,154 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
 
   if (!isOpen) return null;
 
+  const totalItems = filteredCommands.length + results.length;
+  const showResults = query.trim().length > 0;
+
+  const handleResultNav = (url: string) => {
+    onClose();
+    router.push(url);
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="w-full max-w-2xl bg-[#11131a] border border-[#232838] rounded-xl shadow-2xl overflow-hidden flex flex-col">
-        <div className="flex items-center px-4 py-3.5 border-b border-[#232838]">
-          <Search className="w-5 h-5 text-neutral-400 mr-3" />
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] px-4 bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+      role="dialog"
+      aria-label="Command palette"
+    >
+      <div
+        className="w-full max-w-xl bg-elevated border border-strong rounded-xl shadow-nexus-lg overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Search input */}
+        <div className="flex items-center px-4 py-3 border-b border-base">
+          <Search className="w-4 h-4 text-muted mr-3" />
           <input
             autoFocus
             type="text"
-            placeholder="Search MTA products, servers, articles, developers... (Esc to close)"
+            placeholder="Search or jump to..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full bg-transparent text-sm text-neutral-100 placeholder-neutral-500 focus:outline-none"
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setActiveIndex(0);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setActiveIndex((i) => Math.min(i + 1, totalItems - 1));
+              }
+              if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setActiveIndex((i) => Math.max(i - 1, 0));
+              }
+              if (e.key === "Enter") {
+                e.preventDefault();
+                if (activeIndex < filteredCommands.length) {
+                  filteredCommands[activeIndex]?.action();
+                  onClose();
+                } else {
+                  const r = results[activeIndex - filteredCommands.length];
+                  if (r) handleResultNav(r.url);
+                }
+              }
+            }}
+            className="w-full bg-transparent text-sm text-primary placeholder-muted focus:outline-none"
+            aria-label="Search query"
           />
-          {query && (
-            <button onClick={() => setQuery("")} className="text-neutral-400 hover:text-white mr-2">
-              <X className="w-4 h-4" />
-            </button>
-          )}
-          <button
-            onClick={onClose}
-            className="text-xs px-2 py-1 bg-neutral-800 text-neutral-400 rounded hover:text-white"
-          >
+          <button onClick={onClose} className="text-[10px] px-1.5 py-0.5 bg-inset text-muted rounded border border-base font-numeric">
             ESC
           </button>
         </div>
 
         <div className="max-h-96 overflow-y-auto p-2">
-          {loading && <div className="text-center py-6 text-sm text-neutral-400">Searching MTA ecosystem...</div>}
-
-          {!loading && query && results.length === 0 && (
-            <div className="text-center py-8 text-sm text-neutral-500">
-              No results matching &ldquo;{query}&rdquo;
-            </div>
+          {/* Loading */}
+          {loading && showResults && (
+            <div className="text-center py-4 font-caption text-muted">Searching...</div>
           )}
 
-          {!loading && !query && (
-            <div className="p-4 text-xs text-neutral-500 flex flex-wrap gap-2">
-              <span>Quick tags:</span>
-              <button
-                onClick={() => setQuery("inventory")}
-                className="px-2 py-0.5 bg-neutral-800 rounded hover:text-neutral-200"
-              >
-                #inventory
-              </button>
-              <button
-                onClick={() => setQuery("drift")}
-                className="px-2 py-0.5 bg-neutral-800 rounded hover:text-neutral-200"
-              >
-                #drift
-              </button>
-              <button
-                onClick={() => setQuery("cef")}
-                className="px-2 py-0.5 bg-neutral-800 rounded hover:text-neutral-200"
-              >
-                #cef
-              </button>
-              <button
-                onClick={() => setQuery("roleplay")}
-                className="px-2 py-0.5 bg-neutral-800 rounded hover:text-neutral-200"
-              >
-                #roleplay
-              </button>
-            </div>
-          )}
-
-          <div className="space-y-1">
-            {results.map((item) => {
-              const icon =
-                item.type === "product" ? (
-                  <Box className="w-4 h-4 text-blue-400" />
-                ) : item.type === "server" ? (
-                  <Server className="w-4 h-4 text-emerald-400" />
-                ) : item.type === "article" ? (
-                  <BookOpen className="w-4 h-4 text-amber-400" />
-                ) : (
-                  <User className="w-4 h-4 text-purple-400" />
-                );
-
-              return (
-                <Link
-                  key={item.id}
-                  href={item.url}
-                  onClick={onClose}
-                  className="flex items-center justify-between p-3 rounded-lg hover:bg-neutral-800/60 transition-colors group"
-                >
-                  <div className="flex items-center space-x-3 overflow-hidden">
-                    <div className="p-2 rounded-md bg-neutral-800">{icon}</div>
-                    <div className="overflow-hidden">
-                      <div className="text-sm font-medium text-neutral-200 group-hover:text-white truncate">
-                        {item.title}
-                      </div>
-                      <div className="text-xs text-neutral-400 truncate">{item.description}</div>
+          {/* Commands */}
+          {filteredCommands.length > 0 && (
+            <div className="mb-1">
+              <div className="px-2 py-1 font-label text-faint uppercase">Commands</div>
+              {filteredCommands.map((cmd, idx) => {
+                const Icon = cmd.icon;
+                const active = idx === activeIndex;
+                return (
+                  <button
+                    key={cmd.id}
+                    onClick={() => {
+                      cmd.action();
+                      onClose();
+                    }}
+                    onMouseEnter={() => setActiveIndex(idx)}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                      active ? "bg-accent-soft" : "hover:bg-hover"
+                    }`}
+                  >
+                    <div className="p-1.5 rounded-md bg-inset">
+                      <Icon className="w-3.5 h-3.5 text-accent" />
                     </div>
-                  </div>
-                  {item.badge && (
-                    <span className="text-xs px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 ml-2 whitespace-nowrap">
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+                    <span className="text-xs text-primary font-medium">{cmd.label}</span>
+                    {active && <CornerDownLeft className="w-3 h-3 text-muted ml-auto" />}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Search results grouped by type */}
+          {showResults && results.length > 0 && (
+            <div>
+              <div className="px-2 py-1 font-label text-faint uppercase">Results</div>
+              {results.map((item, idx) => {
+                const commandCount = filteredCommands.length;
+                const active = idx + commandCount === activeIndex;
+                const icon =
+                  item.type === "product" ? (
+                    <Box className="w-3.5 h-3.5 text-accent" />
+                  ) : item.type === "server" ? (
+                    <Server className="w-3.5 h-3.5 text-success" />
+                  ) : item.type === "article" ? (
+                    <BookOpen className="w-3.5 h-3.5 text-warning" />
+                  ) : item.type === "organization" ? (
+                    <Building2 className="w-3.5 h-3.5 text-purple" />
+                  ) : (
+                    <User className="w-3.5 h-3.5 text-purple" />
+                  );
+
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleResultNav(item.url)}
+                    onMouseEnter={() => setActiveIndex(idx + commandCount)}
+                    className={`w-full flex items-center justify-between p-2.5 rounded-lg transition-colors text-left ${
+                      active ? "bg-accent-soft" : "hover:bg-hover"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <div className="p-1.5 rounded-md bg-inset shrink-0">{icon}</div>
+                      <div className="overflow-hidden">
+                        <div className="text-xs font-medium text-primary truncate">{item.title}</div>
+                        <div className="text-[11px] text-muted truncate">{item.description}</div>
+                      </div>
+                    </div>
+                    {item.badge && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-inset text-secondary font-numeric ml-2 shrink-0">
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Empty state */}
+          {showResults && !loading && results.length === 0 && filteredCommands.length === 0 && (
+            <div className="text-center py-8 font-caption text-muted">
+              No results for &ldquo;{query}&rdquo;
+            </div>
+          )}
         </div>
       </div>
     </div>
