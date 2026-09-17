@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { can } from "@nexus/security";
+import { can, getStaticCapabilities } from "@nexus/security";
 import type { User, Product, Server } from "@nexus/domain";
 
 describe("Security Policy Engine can()", () => {
@@ -42,6 +42,19 @@ describe("Security Policy Engine can()", () => {
     updatedAt: new Date(),
   };
 
+  const moderatorUser: User = {
+    id: "usr_moderator",
+    email: "moderator@nexus.test",
+    username: "moderator",
+    displayName: "Moderator",
+    role: "moderator",
+    isVerified: true,
+    emailVerified: true,
+    twoFactorEnabled: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   const ownedProduct: Partial<Product> = {
     id: "prd_1",
     authorId: "usr_dev",
@@ -62,6 +75,13 @@ describe("Security Policy Engine can()", () => {
     expect(can(devUser, "admin.access")).toBe(false);
     expect(can(regularUser, "admin.access")).toBe(false);
     expect(can(null, "admin.access")).toBe(false);
+  });
+
+  it("should grant moderators queue access without exposing audit history", () => {
+    expect(can(moderatorUser, "admin.access")).toBe(true);
+    expect(can(moderatorUser, "admin.moderation")).toBe(true);
+    expect(can(moderatorUser, "admin.audit")).toBe(false);
+    expect(getStaticCapabilities("moderator")).toContain("admin.moderation");
   });
 
   it("should permit product author to update their product", () => {
