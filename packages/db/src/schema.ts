@@ -221,6 +221,8 @@ export const builds = pgTable("builds", {
   storageKey: text("storage_key").notNull(),
   sha256Hash: text("sha256_hash").notNull(),
   fileSizeBytes: integer("file_size_bytes").notNull(),
+  fileName: text("file_name").notNull().default("resource.zip"),
+  mimeType: text("mime_type").notNull().default("application/octet-stream"),
   mtaVersionTarget: text("mta_version_target"),
   isSigned: boolean("is_signed").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
