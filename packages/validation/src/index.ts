@@ -82,9 +82,27 @@ export const createProductSchema = z.object({
   organizationId: z.string().optional(),
   compatibility: z
     .object({
-      mtaMinVersion: z.string().optional(),
-      moduleMinVersion: z.string().optional(),
-      dependencies: z.array(z.string()).optional(),
+      mtaMinVersion: z
+        .string()
+        .regex(/^1\\.\\d+(\\.\\d+)?$/, "Use an MTA version such as 1.6 or 1.6.0")
+        .optional(),
+      dependencies: z
+        .array(z.string().min(3).max(120).regex(/^[a-z0-9][a-z0-9._-]*$/, "Use a resource slug"))
+        .max(25)
+        .default([])
+        .superRefine((dependencies, context) => {
+          const seen = new Set<string>();
+          dependencies.forEach((dependency, index) => {
+            if (seen.has(dependency)) {
+              context.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Dependencies must be unique",
+                path: [index],
+              });
+            }
+            seen.add(dependency);
+          });
+        }),
     })
     .default({}),
 });
