@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       viewCount: 0,
       likeCount: 0,
       commentCount: 0,
-      publishedAt: status === "published" ? new Date() : undefined,
+      ...(status === "published" ? { publishedAt: new Date() } : {}),
     });
 
     await auditRepository.record({
