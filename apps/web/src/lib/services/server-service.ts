@@ -33,7 +33,8 @@ export class ServerService {
     const server = await serverRepository.create({
       ...input,
       id,
-      status: "inactive",
+      // A listing is editorially active immediately; live availability is sourced separately from the official MTA directory.
+      status: "active",
       currentPlayers: 0,
       isVerified: false,
     });
