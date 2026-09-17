@@ -10,9 +10,16 @@ import {
 import { createContentSchema } from "@nexus/validation";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 
-export async function GET() {
-  const content = await contentRepository.listPublished();
-  return NextResponse.json({ content });
+export async function GET(request: NextRequest) {
+  const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "50");
+  const limit = Number.isFinite(requestedLimit)
+    ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
+    : 50;
+  const content = await contentRepository.listPublished(limit);
+  return NextResponse.json(
+    { content, limit },
+    { headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=120" } }
+  );
 }
 
 export async function POST(request: NextRequest) {
