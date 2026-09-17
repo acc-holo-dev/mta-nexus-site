@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Bell, CheckCheck, ExternalLink, ShieldAlert, ArrowLeft } from "lucide-react";
+import { Bell, CheckCheck, ExternalLink, ArrowLeft, Settings } from "lucide-react";
 import type { Notification } from "@nexus/domain";
 
 export default function NotificationCenterPage() {
@@ -55,11 +55,19 @@ export default function NotificationCenterPage() {
             <span>Notification Center</span>
           </h1>
           <p className="text-xs text-neutral-400 mt-1">
-            Track license activations, build updates, followed servers, and security alerts.
+            Track resource updates, followed servers, and security alerts.
           </p>
         </div>
 
-        {notifications.some((n) => !n.isRead) && (
+        <div className="flex items-center gap-2">
+          <Link
+            href="/settings"
+            className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-xs font-semibold text-neutral-300 border border-base transition-colors"
+          >
+            <Settings className="w-4 h-4" />
+            <span>Settings</span>
+          </Link>
+          {notifications.some((n) => !n.isRead) && (
           <button
             onClick={markAllRead}
             className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-xs font-semibold text-blue-400 border border-base transition-colors cursor-pointer"
@@ -67,7 +75,8 @@ export default function NotificationCenterPage() {
             <CheckCheck className="w-4 h-4" />
             <span>Mark All as Read</span>
           </button>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Filter Tabs */}
