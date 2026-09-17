@@ -42,6 +42,8 @@ export type BuildStatus =
   | "deprecated"
   | "retired";
 
+export type BuildScanStatus = "not_scanned" | "clean" | "malicious" | "error";
+
 export type UploadStatus =
   | "initiated"
   | "uploading"
@@ -226,6 +228,9 @@ export interface Build {
   fileSizeBytes: number;
   fileName: string;
   mimeType: string;
+  scanStatus: BuildScanStatus;
+  scanner?: string;
+  scannedAt?: Date;
   mtaVersionTarget?: string;
   isSigned: boolean;
   createdAt: Date;
