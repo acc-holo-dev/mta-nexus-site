@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Resource creation limit exceeded" }, { status: 429 });
     }
 
-    const parsed = createProductSchema.safeParse(await request.json());
+    const parsed = createProductSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid resource details", details: parsed.error.format() },
