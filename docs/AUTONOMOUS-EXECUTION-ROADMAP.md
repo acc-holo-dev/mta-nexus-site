@@ -57,7 +57,7 @@ Let a player safely claim and download free MTA resources while keeping the syst
 - [x] Add a distinct build review state and moderator approval/rejection path.
 - [x] Preserve sanitized build filename and server-derived media type as trusted metadata.
 - [x] Add deterministic build retirement semantics with owner/admin authorization and audit records.
-- [ ] Add safe antivirus/scanner adapter contract; keep it disabled until infrastructure exists.
+- [x] Add safe antivirus/scanner adapter contract; it remains explicitly disabled until infrastructure exists.
 - [x] Add resource compatibility validation and dependency declarations.
 - [ ] Surface release notes, checksum and compatibility on resource pages.
 
