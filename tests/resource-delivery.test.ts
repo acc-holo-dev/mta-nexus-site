@@ -79,6 +79,7 @@ describe("free resource delivery lifecycle", () => {
       author
     );
     expect(build.status).toBe("published");
+    expect(build.isSigned).toBe(false);
 
     const publishedBuilds = await buildRepository.listByProduct(product.id);
     expect(publishedBuilds.some((candidate) => candidate.id === build.id)).toBe(true);
