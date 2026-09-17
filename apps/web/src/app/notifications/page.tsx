@@ -13,7 +13,8 @@ export default function NotificationCenterPage() {
   const loadNotifications = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/notifications");
+      const query = filter === "unread" ? "?limit=100&unreadOnly=true" : "?limit=100";
+      const res = await fetch(`/api/notifications${query}`);
       if (res.ok) {
         const data = await res.json();
         setNotifications(data.notifications || []);
@@ -27,7 +28,7 @@ export default function NotificationCenterPage() {
 
   useEffect(() => {
     loadNotifications();
-  }, []);
+  }, [filter]);
 
   const markAllRead = async () => {
     await fetch("/api/notifications/mark-read", { method: "POST" });
