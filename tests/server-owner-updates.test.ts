@@ -12,6 +12,7 @@ describe("server owner updates", () => {
     expect(route).not.toContain("ownerId:");
     expect(route).not.toContain("status: z.");
     expect(service).toContain('can(actor, "server.manage", server)');
+    expect(service).toContain("organizationRepository.listUserMemberships(actor.id)");
     expect(service).toContain('action: "server.updated"');
   });
 });
