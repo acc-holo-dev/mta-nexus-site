@@ -86,6 +86,9 @@ describe("free resource delivery lifecycle", () => {
         fileSizeBytes: asset.sizeBytes,
         fileName: "delivery-test.zip",
         mimeType: "application/zip",
+        scanStatus: "not_scanned",
+        scanner: "disabled",
+        scannedAt: new Date(),
       },
       author
     );
