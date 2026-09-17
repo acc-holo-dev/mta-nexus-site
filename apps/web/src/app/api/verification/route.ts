@@ -8,7 +8,7 @@ import {
   userRepository,
   verificationRepository,
 } from "@nexus/db";
-import { generateId, rateLimiter } from "@nexus/security";
+import { consumeRateLimit, generateId } from "@nexus/security";
 import { z } from "zod";
 
 const verificationRequestSchema = z.object({
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Limit verification request spam
-    const rl = await rateLimiter.consume(`verification:${user.id}`, 3, 86400);
+    const rl = await consumeRateLimit("verification", user.id);
     if (!rl.success) {
       return NextResponse.json(
         { error: "Too many verification requests. Please try again tomorrow." },
