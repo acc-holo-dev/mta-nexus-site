@@ -20,6 +20,39 @@ export type Action =
   | "content.delete"
   | "organization.manage";
 
+export const ACTIONS = [
+  "admin.access",
+  "admin.moderation",
+  "admin.audit",
+  "product.create",
+  "product.update",
+  "product.delete",
+  "product.publish",
+  "build.release",
+  "build.retire",
+  "server.create",
+  "server.manage",
+  "server.delete",
+  "license.view",
+  "license.revoke",
+  "content.create",
+  "content.update",
+  "content.delete",
+  "organization.manage",
+] as const satisfies readonly Action[];
+
+const STATIC_ROLE_CAPABILITIES: Record<User["role"], readonly Action[]> = {
+  user: ["server.create", "content.create"],
+  developer: ["product.create", "server.create", "content.create"],
+  server_owner: ["server.create", "content.create"],
+  moderator: ["admin.access", "admin.moderation", "content.create"],
+  admin: ACTIONS,
+};
+
+export function getStaticCapabilities(role: User["role"]): readonly Action[] {
+  return STATIC_ROLE_CAPABILITIES[role];
+}
+
 export interface PolicyContext {
   organizationMemberships?: { organizationId: string; role: string; permissions: string[] }[];
 }
@@ -42,11 +75,8 @@ export function can(
     return true;
   }
 
-  // Moderator permissions
-  if (user.role === "moderator") {
-    if (action === "admin.moderation" || action === "admin.access") {
-      return true;
-    }
+  if (getStaticCapabilities(user.role).includes(action)) {
+    return true;
   }
 
   // Base permission checks by action
