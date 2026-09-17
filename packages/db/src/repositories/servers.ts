@@ -1,7 +1,7 @@
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "../client";
-import { servers, serverInstallations } from "../schema";
-import type { Server, ServerInstallation } from "@nexus/domain";
+import { servers } from "../schema";
+import type { Server } from "@nexus/domain";
 
 export class ServerRepository {
   async listActivePublic(): Promise<Server[]> {
@@ -55,28 +55,6 @@ export class ServerRepository {
     return (rows[0] as unknown as Server) || null;
   }
 
-  async replaceActiveInstallation(
-    inst: Omit<ServerInstallation, "createdAt">
-  ): Promise<ServerInstallation> {
-    return db.transaction(async (tx) => {
-      await tx
-        .update(serverInstallations)
-        .set({ status: "revoked" })
-        .where(
-          and(
-            eq(serverInstallations.serverId, inst.serverId),
-            eq(serverInstallations.status, "active")
-          )
-        );
-
-      const rows = await tx
-        .insert(serverInstallations)
-        .values({ ...inst, createdAt: new Date() })
-        .returning();
-
-      return rows[0] as unknown as ServerInstallation;
-    });
-  }
 }
 
 export const serverRepository = new ServerRepository();
