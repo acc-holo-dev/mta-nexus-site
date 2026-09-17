@@ -2,6 +2,7 @@ import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { productService } from "../../../../../lib/services/product-service";
+import { buildScannerService } from "../../../../../lib/services/build-scanner-service";
 import { authService } from "../../../../../lib/services/auth-service";
 import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
 import { rateLimiter } from "@nexus/security";
@@ -99,6 +100,15 @@ export async function POST(
         { status: 415 }
       );
     }
+
+    const scan = await buildScannerService.scan({ bytes: fileBytes, fileName: safeFileName });
+    if (scan.status === "malicious") {
+      return NextResponse.json(
+        { error: "Build was rejected by the malware scanner", scanner: scan.scanner },
+        { status: 422 }
+      );
+    }
+
     const asset = await storageService.uploadAsset({
       data: fileBytes,
       fileName: safeFileName,
@@ -118,6 +128,9 @@ export async function POST(
           fileSizeBytes: asset.sizeBytes,
           fileName: safeFileName,
           mimeType: BUILD_MIME_TYPES[extension],
+          scanStatus: scan.status,
+          scanner: scan.scanner,
+          scannedAt: scan.scannedAt,
         },
         user
       );
