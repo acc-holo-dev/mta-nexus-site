@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AgentSetupSnippet } from "./agent-setup-snippet";
 
 type InstallationResponse = {
   apiKey: string;
@@ -36,10 +37,10 @@ export function InstallationKeyRotation({ serverId }: { serverId: string }) {
   return (
     <div className="space-y-3">
       {installation ? (
-        <div className="nexus-inset p-4 space-y-2">
+        <div className="space-y-3">
           <div className="text-xs text-amber-300">{installation.warning}</div>
-          <code className="block text-sm text-emerald-400 break-all select-all">{installation.apiKey}</code>
-          <div className="text-xs text-neutral-500">Copy it into resources/mta-nexus-agent/config.lua on the MTA server.</div>
+          <AgentSetupSnippet apiKey={installation.apiKey} />
+          <div className="text-xs text-neutral-500">Restart the MTA resource after saving the local configuration. The first heartbeat is sent within a minute.</div>
         </div>
       ) : (
         <button
