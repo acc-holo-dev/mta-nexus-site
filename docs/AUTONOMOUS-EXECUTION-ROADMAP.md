@@ -33,8 +33,8 @@ A listing, a live master-list observation, a resource build, a purchase entitlem
 | --- | --- | --- | --- |
 | 0 | Product boundary and legacy removal | complete | Blueprint exists; heartbeat/agent flow removed from active surface |
 | 1 | Official MTA live directory | complete | Parser, cache, bounds, public API and paginated UI exist |
-| 2 | Free resource delivery hardening | active | Safe upload, build lifecycle, entitlement delivery and moderation-ready states |
-| 3 | Identity, access and trust | planned | Capability checks, profile verification, audit and abuse controls |
+| 2 | Free resource delivery hardening | complete | Safe upload, build lifecycle, entitlement delivery and moderation-ready states |
+| 3 | Identity, access and trust | active | Capability checks, profile verification, audit and abuse controls |
 | 4 | Communities and content | planned | Community spaces, posts, discussions, notifications and discovery |
 | 5 | Editorial server profiles | planned | Owner-managed profile data safely linked to official observations |
 | 6 | Marketplace quality | planned | Review rules, build scanning/signing-ready workflow, compatibility and creator operations |
@@ -59,7 +59,7 @@ Let a player safely claim and download free MTA resources while keeping the syst
 - [x] Add deterministic build retirement semantics with owner/admin authorization and audit records.
 - [x] Add safe antivirus/scanner adapter contract; it remains explicitly disabled until infrastructure exists.
 - [x] Add resource compatibility validation and dependency declarations.
-- [ ] Surface release notes, checksum and compatibility on resource pages.
+- [x] Surface release notes, checksum and compatibility on resource pages.
 
 ### Exit criteria
 
@@ -79,10 +79,10 @@ Replace role-string assumptions with durable, auditable authorization decisions.
 - [x] Introduce a capability matrix for player, developer, server owner, moderator and administrator contexts.
 - Add owner-context switching only where an organization relationship permits it.
 - [x] Complete verification request workflow with ownership checks, duplicate protection, reviewer notes, audit events and moderator notifications.
-- Add rate limits per risk category: authentication, resource upload, content creation, follow, report and download.
+- [x] Add rate limits per risk category: authentication, resource upload, content creation, follow, report and download.
 - [x] Add abuse-report entities, validation, moderator notifications and a queue.
 - Add notification preferences and privacy-safe profile controls.
-- Add account security checks: session revocation, password changes, email verification and recovery readiness.
+- [x] Add account security checks: session revocation and password changes. Email verification and recovery readiness remain planned.
 
 ### Exit criteria
 
