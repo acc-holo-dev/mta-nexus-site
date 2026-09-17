@@ -120,7 +120,9 @@ export function parseMtaMasterList(data: ArrayBuffer): MtaMasterServer[] {
   const servers: MtaMasterServer[] = [];
 
   for (let index = 0; index < count; index++) {
-    if (reader.remaining < 2) {\n      throw new Error("Truncated MTA master-list server entry");\n    }
+    if (reader.remaining < 2) {
+      throw new Error("Truncated MTA master-list server entry");
+    }
     const entryStart = reader.position;
     const entryLength = reader.u16();
     const entryEnd = entryStart + entryLength;
