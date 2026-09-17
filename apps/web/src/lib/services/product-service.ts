@@ -169,6 +169,48 @@ export class ProductService {
 
     return build;
   }
+  async retireBuild(
+    input: { productId: string; buildId: string; reason?: string },
+    actor: User
+  ): Promise<Build> {
+    const product = await productRepository.findById(input.productId);
+    if (!product) throw new NotFoundError("Product", input.productId);
+    if (!can(actor, "build.retire", product)) {
+      throw new ForbiddenError("Not authorized to retire builds for this product");
+    }
+
+    const build = await buildRepository.findById(input.buildId);
+    if (!build || build.productId !== product.id) {
+      throw new NotFoundError("Build", input.buildId);
+    }
+    if (build.status === "retired") {
+      throw new AppError("This build is already retired", 409, "BUILD_ALREADY_RETIRED");
+    }
+
+    const retired = await buildRepository.updateStatus(build.id, "retired");
+    if (!retired) throw new NotFoundError("Build", input.buildId);
+
+    const remainingPublished = (await buildRepository.listByProduct(product.id)).find(
+      (candidate) => candidate.id !== build.id && candidate.status === "published"
+    );
+    await productRepository.update(product.id, remainingPublished
+      ? { currentVersion: remainingPublished.version }
+      : { status: "draft" }
+    );
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: actor.role === "admin" ? "admin" : "user",
+      action: "build.retired",
+      targetId: build.id,
+      targetType: "build",
+      details: { productId: product.id, version: build.version, reason: input.reason },
+    });
+
+    return retired;
+  }
+
 }
 
 export const productService = new ProductService();
