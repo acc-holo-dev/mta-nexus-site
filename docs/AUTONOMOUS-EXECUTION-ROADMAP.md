@@ -76,7 +76,7 @@ Replace role-string assumptions with durable, auditable authorization decisions.
 
 ### Work items
 
-- Introduce a capability matrix for player, developer, server owner, moderator and administrator contexts.
+- [x] Introduce a capability matrix for player, developer, server owner, moderator and administrator contexts.
 - Add owner-context switching only where an organization relationship permits it.
 - Complete verification request workflow with evidence metadata, reviewer notes and immutable audit events.
 - Add rate limits per risk category: authentication, resource upload, content creation, follow, report and download.
