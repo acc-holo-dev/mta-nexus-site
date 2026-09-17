@@ -1,4 +1,4 @@
-import { and, desc, eq, gte } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "../client";
 import { servers, serverInstallations } from "../schema";
 import type { Server, ServerInstallation } from "@nexus/domain";
@@ -11,11 +11,10 @@ export class ServerRepository {
       .where(
         and(
           eq(servers.visibility, "public"),
-          eq(servers.status, "active"),
-          gte(servers.lastHeartbeatAt, new Date(Date.now() - 3 * 60 * 1000))
+          eq(servers.status, "active")
         )
       )
-      .orderBy(desc(servers.currentPlayers));
+      .orderBy(desc(servers.updatedAt));
     return rows as unknown as Server[];
   }
 
