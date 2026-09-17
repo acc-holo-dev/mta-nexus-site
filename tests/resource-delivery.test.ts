@@ -75,6 +75,8 @@ describe("free resource delivery lifecycle", () => {
         storageKey: asset.key,
         sha256Hash: asset.sha256Hash,
         fileSizeBytes: asset.sizeBytes,
+        fileName: "delivery-test.zip",
+        mimeType: "application/zip",
       },
       author
     );
