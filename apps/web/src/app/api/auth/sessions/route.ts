@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authService } from "../../../../../lib/services/auth-service";
+import { authService } from "../../../../lib/services/auth-service";
 import { consumeRateLimit } from "@nexus/security";
 
 export async function GET(request: NextRequest) {
