@@ -88,6 +88,19 @@ Claims a free published resource for the signed-in player and creates the
 download entitlement. Paid resources and checkout remain disabled in the
 closed beta.
 
+## Community content
+
+### `GET /api/content`
+
+Returns publicly published articles, updates and posts.
+
+### `POST /api/content`
+
+Creates content for the authenticated author. Player and creator submissions are
+stored as `draft`; only an authorized moderator can request immediate
+publication. Linked server, resource and organization IDs must exist. The
+operation is rate limited per account.
+
 ## Notifications
 
 ### `GET /api/notifications`
