@@ -50,7 +50,7 @@ export default async function ServerDetailPage({
   try {
     const directory = await mtaMasterDirectoryService.getDirectory();
     observedServer = directory.servers.find(
-      (item) => item.address === server.ipAddress && item.port === server.port
+      (item) => matchesMtaEndpoint(server, item)
     );
     directoryIsStale = directory.isStale;
   } catch {
