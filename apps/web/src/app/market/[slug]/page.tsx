@@ -296,10 +296,12 @@ export default async function ProductDetailPage({
                     &gt;= {product.compatibility.mtaMinVersion || "1.5.8"}
                   </span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">Nexus Module</span>
-                  <span className="font-mono text-neutral-200">
-                    {product.compatibility.moduleMinVersion || "Optional"}
+                <div className="flex justify-between gap-4 py-1 border-b border-neutral-800">
+                  <span className="text-neutral-400">Dependencies</span>
+                  <span className="font-mono text-right text-neutral-200">
+                    {product.compatibility.dependencies?.length
+                      ? product.compatibility.dependencies.join(", ")
+                      : "None declared"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-800">
