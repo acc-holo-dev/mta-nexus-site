@@ -44,7 +44,8 @@ export default async function ServerDetailPage({
 
   const isOnline =
     server.status === "active" &&
-    new Date(server.updatedAt).getTime() >= Date.now() - HEARTBEAT_FRESHNESS_MS;
+    server.lastHeartbeatAt &&
+    new Date(server.lastHeartbeatAt).getTime() >= Date.now() - HEARTBEAT_FRESHNESS_MS;
   const currentPlayers = isOnline ? server.currentPlayers : 0;
   const occupancyPercent = Math.round((currentPlayers / server.maxPlayers) * 100);
   const connectUri = "mtasa://" + server.ipAddress + ":" + server.port;

@@ -5,6 +5,7 @@ import { Activity, KeyRound, Server, Users } from "lucide-react";
 import { authService } from "../../../../lib/services/auth-service";
 import { serverService } from "../../../../lib/services/server-service";
 import { InstallationKeyRotation } from "../../../../components/installation-key-rotation";
+import { ServerDetailsForm } from "../../../../components/server-details-form";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,8 @@ export default async function ServerManagementPage({
   const telemetry = await serverService.getServerTelemetry(server.id);
   const hasFreshHeartbeat =
     server.status === "active" &&
-    server.updatedAt.getTime() >= Date.now() - 3 * 60 * 1000;
+    server.lastHeartbeatAt &&
+    server.lastHeartbeatAt.getTime() >= Date.now() - 3 * 60 * 1000;
 
   return (
     <div className="max-w-4xl mx-auto py-8 space-y-6">
@@ -66,6 +68,14 @@ export default async function ServerManagementPage({
           <div className="mt-2 text-lg font-bold text-white">{telemetry.peakPlayers24h}</div>
         </div>
       </div>
+
+      <section className="nexus-panel p-6 space-y-4">
+        <div>
+          <h2 className="text-lg font-bold text-white">Public server details</h2>
+          <p className="mt-1 text-sm text-neutral-400">These details appear in the player catalogue. Live status and player count are always controlled by the MTA agent.</p>
+        </div>
+        <ServerDetailsForm server={server} />
+      </section>
 
       <section className="nexus-panel p-6 space-y-3">
         <div>

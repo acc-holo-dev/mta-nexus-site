@@ -46,7 +46,8 @@ export default async function WorkspacePage() {
   const onlineServers = ownedServers.filter(
     (server) =>
       server.status === "active" &&
-      new Date(server.updatedAt).getTime() >= Date.now() - 3 * 60 * 1000
+      server.lastHeartbeatAt &&
+      new Date(server.lastHeartbeatAt).getTime() >= Date.now() - 3 * 60 * 1000
   );
   const onlinePlayers = onlineServers.reduce(
     (total, server) => total + server.currentPlayers,

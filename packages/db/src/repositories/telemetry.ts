@@ -36,6 +36,7 @@ export class TelemetryRepository {
           currentPlayers: input.currentPlayers,
           maxPlayers: input.maxPlayers,
           status: input.status === "online" ? "active" : input.status,
+          lastHeartbeatAt: recordedAt,
           updatedAt: recordedAt,
         })
         .where(eq(servers.id, input.serverId));

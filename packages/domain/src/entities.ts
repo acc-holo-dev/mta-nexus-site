@@ -160,6 +160,7 @@ export interface Server {
   isVerified: boolean;
   bannerUrl?: string;
   logoUrl?: string;
+  lastHeartbeatAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }

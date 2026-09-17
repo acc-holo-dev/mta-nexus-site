@@ -4,6 +4,13 @@ import crypto from "node:crypto";
 import { NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Server, ServerInstallation, User } from "@nexus/domain";
 
+type ServerDetailsUpdate = Partial<
+  Pick<
+    Server,
+    "name" | "description" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility"
+  >
+>;
+
 export class ServerService {
   async listServers(): Promise<Server[]> {
     return serverRepository.listActivePublic();
@@ -21,9 +28,7 @@ export class ServerService {
     input: Omit<Server, "id" | "status" | "currentPlayers" | "isVerified" | "createdAt" | "updatedAt">,
     actor: User
   ): Promise<Server> {
-    if (!can(actor, "server.create")) {
-      throw new ForbiddenError("Not authorized to create server");
-    }
+    if (!can(actor, "server.create")) throw new ForbiddenError("Not authorized to create server");
 
     const id = generateId("srv");
     const server = await serverRepository.create({
@@ -58,6 +63,29 @@ export class ServerService {
     return server;
   }
 
+  async updateServer(serverId: string, updates: ServerDetailsUpdate, actor: User): Promise<Server> {
+    const server = await serverRepository.findById(serverId);
+    if (!server) throw new NotFoundError("Server", serverId);
+    if (!can(actor, "server.manage", server)) {
+      throw new ForbiddenError("Only the server owner can update its details");
+    }
+
+    const updated = await serverRepository.update(serverId, updates);
+    if (!updated) throw new NotFoundError("Server", serverId);
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "user",
+      action: "server.updated",
+      targetId: serverId,
+      targetType: "server",
+      details: { fields: Object.keys(updates) },
+    });
+
+    return updated;
+  }
+
   async registerInstallation(
     serverId: string,
     actor: User,
@@ -65,7 +93,7 @@ export class ServerService {
   ): Promise<ServerInstallation & { apiKey?: string }> {
     const server = await serverRepository.findById(serverId);
     if (!server) throw new NotFoundError("Server", serverId);
-    if (server.ownerId !== actor.id && actor.role !== "admin") {
+    if (!can(actor, "server.manage", server)) {
       throw new ForbiddenError("Only the server owner can register an installation");
     }
 
@@ -73,7 +101,6 @@ export class ServerService {
     const apiKey = "nxk_" + crypto.randomBytes(24).toString("hex");
     const apiKeyHash = crypto.createHash("sha256").update(apiKey).digest("hex");
 
-    // A replacement key atomically revokes the previous key for this server.
     const installation = await serverRepository.replaceActiveInstallation({
       id: instId,
       serverId,

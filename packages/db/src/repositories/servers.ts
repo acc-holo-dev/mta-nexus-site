@@ -12,7 +12,7 @@ export class ServerRepository {
         and(
           eq(servers.visibility, "public"),
           eq(servers.status, "active"),
-          gte(servers.updatedAt, new Date(Date.now() - 3 * 60 * 1000))
+          gte(servers.lastHeartbeatAt, new Date(Date.now() - 3 * 60 * 1000))
         )
       )
       .orderBy(desc(servers.currentPlayers));
@@ -42,6 +42,18 @@ export class ServerRepository {
     const values = { ...server, createdAt: new Date(), updatedAt: new Date() };
     const rows = await db.insert(servers).values(values).returning();
     return rows[0] as unknown as Server;
+  }
+
+  async update(
+    id: string,
+    updates: Partial<Pick<Server, "name" | "description" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility">>
+  ): Promise<Server | null> {
+    const rows = await db
+      .update(servers)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(servers.id, id))
+      .returning();
+    return (rows[0] as unknown as Server) || null;
   }
 
   async replaceActiveInstallation(

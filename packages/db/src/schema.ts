@@ -138,6 +138,7 @@ export const servers = pgTable(
     isVerified: boolean("is_verified").notNull().default(false),
     bannerUrl: text("banner_url"),
     logoUrl: text("logo_url"),
+    lastHeartbeatAt: timestamp("last_heartbeat_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
