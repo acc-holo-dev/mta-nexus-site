@@ -74,9 +74,11 @@ export default async function ProductDetailPage({
       )
     : false;
 
-  const hasAccess = isAuthor || isLicensed || user?.role === "admin";
+  const isAdmin = user?.role === "admin";
+  const hasAccess = isAuthor || isLicensed || isAdmin;
+  const canInspectBuilds = isAuthor || isAdmin;
 
-  const builds = await productService.getProductBuilds(product.id);
+  const builds = await productService.getProductBuilds(product.id, canInspectBuilds);
   const reviews = await contentService.getComments({ productId: product.id });
 
   const formattedPrice = "Free";
@@ -158,12 +160,19 @@ export default async function ProductDetailPage({
                     className="p-4 rounded-lg bg-neutral-900 border border-base space-y-2"
                   >
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold font-mono text-white">Version {b.version}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold font-mono text-white">Version {b.version}</span>
+                        {canInspectBuilds && b.status !== "published" && (
+                          <span className="rounded bg-amber-950/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-300">
+                            {b.status.replace(/_/g, " ")}
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-3">
                         <span className="text-neutral-500 font-mono text-[11px]">
                           SHA-256: {b.sha256Hash.slice(0, 16)}...
                         </span>
-                        {hasAccess && (
+                        {hasAccess && b.status === "published" && (
                           <a
                             href={`/api/products/${product.id}/download`}
                             className="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold"
