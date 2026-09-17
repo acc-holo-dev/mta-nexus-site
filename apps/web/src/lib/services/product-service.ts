@@ -124,6 +124,10 @@ export class ProductService {
       throw new ForbiddenError("Not authorized to publish builds for this product");
     }
 
+    const hasPublishedBuild = (await buildRepository.listByProduct(product.id)).some(
+      (candidate) => candidate.status === "published"
+    );
+
     const buildId = generateId("bld");
     const build = await buildRepository.create({
       id: buildId,
@@ -140,10 +144,12 @@ export class ProductService {
       isSigned: false,
     });
 
-    await productRepository.update(product.id, {
-      currentVersion: input.version,
-      status: "pending_review",
-    });
+    if (!hasPublishedBuild) {
+      await productRepository.update(product.id, {
+        currentVersion: input.version,
+        status: "pending_review",
+      });
+    }
 
     await auditRepository.record({
       id: generateId("aud"),
