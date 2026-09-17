@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { and, eq, desc } from "drizzle-orm";
 import { db } from "../client";
 import { reports, moderationCases } from "../schema";
 import type { Report, ModerationCase } from "@nexus/domain";
@@ -11,6 +11,26 @@ export class ReportRepository {
 
   async findById(id: string): Promise<Report | null> {
         const rows = await db.select().from(reports).where(eq(reports.id, id)).limit(1);
+    return (rows[0] as unknown as Report) || null;
+  }
+
+  async findOpenByReporterAndTarget(
+    reporterId: string,
+    targetType: Report["targetType"],
+    targetId: string
+  ): Promise<Report | null> {
+    const rows = await db
+      .select()
+      .from(reports)
+      .where(
+        and(
+          eq(reports.reporterId, reporterId),
+          eq(reports.targetType, targetType),
+          eq(reports.targetId, targetId),
+          eq(reports.status, "open")
+        )
+      )
+      .limit(1);
     return (rows[0] as unknown as Report) || null;
   }
 
