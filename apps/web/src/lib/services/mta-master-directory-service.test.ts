@@ -65,6 +65,22 @@ describe("parseMtaMasterList", () => {
     ]);
   });
 
+  it("accepts endpoint-only entries when optional flags are absent", () => {
+    const payload = new Uint8Array([
+      0, 0, 0, 2,
+      ...u32(0),
+      ...u32(0),
+      ...u32(1),
+      ...u16(6),
+      203, 0, 113, 7,
+      ...u16(22003),
+    ]).buffer;
+
+    expect(parseMtaMasterList(payload)).toEqual([
+      { address: "203.0.113.7", port: 22003 },
+    ]);
+  });
+
   it("rejects an incomplete payload", () => {
     expect(() => parseMtaMasterList(new Uint8Array([0, 0]).buffer)).toThrow("Unsupported MTA master-list format");
   });
