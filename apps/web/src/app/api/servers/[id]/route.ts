@@ -32,7 +32,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Server update limit exceeded" }, { status: 429 });
     }
 
-    const parsed = serverUpdateSchema.safeParse(await request.json());
+    const parsed = serverUpdateSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid server details", details: parsed.error.format() },
