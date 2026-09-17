@@ -1,7 +1,11 @@
 import { eq, desc, and } from "drizzle-orm";
 import { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
-import type { Notification, NotificationPreferences } from "@nexus/domain";
+import type {
+  Notification,
+  NotificationCategory,
+  NotificationPreferences,
+} from "@nexus/domain";
 
 export class NotificationRepository {
   private defaultPreferences(userId: string): NotificationPreferences {
@@ -99,18 +103,29 @@ export class NotificationRepository {
     data: Omit<Notification, "createdAt" | "isRead">
   ): Promise<Notification | null> {
     const preferences = await this.getPreferences(data.recipientId);
-    const preferenceKey =
+    const category = data.category ?? (
       data.type === "order" || data.type === "license"
-        ? "commerceEnabled"
+        ? "commerce"
         : data.type === "content"
-          ? "contentEnabled"
+          ? "content"
           : data.type === "server"
+            ? "server"
+            : data.type === "security"
+              ? "security"
+              : "system"
+    ) as NotificationCategory;
+    const preferenceKey =
+      category === "follow"
+        ? "followsEnabled"
+        : category === "content"
+          ? "contentEnabled"
+          : category === "server"
             ? "serverEnabled"
-            : data.type === "system"
-              ? "systemEnabled"
-              : data.type === "security"
-                ? null
-                : "systemEnabled";
+            : category === "commerce"
+              ? "commerceEnabled"
+              : category === "system"
+                ? "systemEnabled"
+                : null;
 
     if (preferenceKey && !preferences[preferenceKey]) {
       return null;
@@ -118,6 +133,7 @@ export class NotificationRepository {
 
     const values = {
       ...data,
+      category,
       isRead: false,
       createdAt: new Date(),
     };
