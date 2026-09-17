@@ -33,7 +33,7 @@ export async function POST(
     }
 
     // Rate limit reviews per user
-    const rl = await rateLimiter.consume(`review:${user.id}`, 5, 300);
+    const rl = await consumeRateLimit("reviewSubmission", user.id);
     if (!rl.success) {
       return NextResponse.json(
         { error: "Too many review submissions. Please try again later." },
@@ -41,7 +41,7 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const parsed = addCommentSchema.safeParse(body);
 
     if (!parsed.success) {
