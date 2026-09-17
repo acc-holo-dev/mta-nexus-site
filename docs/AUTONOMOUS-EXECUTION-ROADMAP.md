@@ -80,7 +80,7 @@ Replace role-string assumptions with durable, auditable authorization decisions.
 - Add owner-context switching only where an organization relationship permits it.
 - Complete verification request workflow with evidence metadata, reviewer notes and immutable audit events.
 - Add rate limits per risk category: authentication, resource upload, content creation, follow, report and download.
-- Add abuse-report entities and a moderator queue.
+- [x] Add abuse-report entities, validation, moderator notifications and a queue.
 - Add notification preferences and privacy-safe profile controls.
 - Add account security checks: session revocation, password changes, email verification and recovery readiness.
 
