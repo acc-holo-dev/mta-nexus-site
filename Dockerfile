@@ -10,7 +10,7 @@ ENV NODE_ENV=production \
     EMAIL_PROVIDER=disabled \
     SMTP_FROM=no-reply@nexus-mta.com
 COPY . .
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --prod=false
 RUN pnpm build
 
 FROM node:22-alpine AS runtime
