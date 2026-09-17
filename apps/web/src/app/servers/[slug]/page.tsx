@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { serverService } from "../../../lib/services/server-service";
+import { mtaMasterDirectoryService } from "../../../lib/services/mta-master-directory-service";
 import { Cpu, ShieldCheck, Users } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -42,12 +43,24 @@ export default async function ServerDetailPage({
 
   if (!server) notFound();
 
-  const isOnline =
-    server.status === "active" &&
-    server.lastHeartbeatAt &&
-    new Date(server.lastHeartbeatAt).getTime() >= Date.now() - HEARTBEAT_FRESHNESS_MS;
-  const currentPlayers = isOnline ? server.currentPlayers : 0;
-  const occupancyPercent = Math.round((currentPlayers / server.maxPlayers) * 100);
+  let observedServer: Awaited<ReturnType<typeof mtaMasterDirectoryService.getDirectory>>["servers"][number] | undefined;
+  let directoryIsStale = false;
+  try {
+    const directory = await mtaMasterDirectoryService.getDirectory();
+    observedServer = directory.servers.find(
+      (item) => item.address === server.ipAddress && item.port === server.port
+    );
+    directoryIsStale = directory.isStale;
+  } catch {
+    // The editorial server profile remains available when the public directory is unavailable.
+  }
+
+  const isOnline = observedServer?.responding !== false;
+  const currentPlayers = observedServer?.players;
+  const maxPlayers = observedServer?.maxPlayers ?? server.maxPlayers;
+  const occupancyPercent = currentPlayers == null || maxPlayers === 0
+    ? 0
+    : Math.min(100, Math.round((currentPlayers / maxPlayers) * 100));
   const connectUri = "mtasa://" + server.ipAddress + ":" + server.port;
   const statusClass = isOnline
     ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
@@ -75,7 +88,7 @@ export default async function ServerDetailPage({
             <div className="flex items-center gap-2">
               <span className={"px-2.5 py-1 rounded-full text-xs font-mono font-bold border flex items-center gap-1.5 " + statusClass}>
                 <span className={"w-2 h-2 rounded-full " + dotClass} />
-                <span>{isOnline ? "ONLINE" : "OFFLINE"}</span>
+                <span>{observedServer ? (isOnline ? "ONLINE" : "OFFLINE") : "UNKNOWN"}</span>
               </span>
               {server.isVerified && (
                 <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1">
@@ -104,13 +117,16 @@ export default async function ServerDetailPage({
             <Users className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-3xl font-black text-white">
-            {currentPlayers} <span className="text-base font-normal text-neutral-500">/ {server.maxPlayers}</span>
+            {currentPlayers ?? "—"} <span className="text-base font-normal text-neutral-500">/ {maxPlayers}</span>
           </div>
           <div className="w-full h-2 bg-neutral-800 rounded-full overflow-hidden">
             <div className="h-full bg-emerald-500 rounded-full" style={{ width: occupancyPercent + "%" }} />
           </div>
-          {!isOnline && (
-            <div className="text-[11px] text-neutral-500">Waiting for a fresh server heartbeat.</div>
+          {!observedServer && (
+            <div className="text-[11px] text-neutral-500">No current observation in the official MTA directory.</div>
+          )}
+          {directoryIsStale && (
+            <div className="text-[11px] text-amber-400">Showing the latest available directory snapshot.</div>
           )}
         </div>
 
@@ -126,10 +142,10 @@ export default async function ServerDetailPage({
           <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Runtime & Module</div>
           <div className="flex items-center gap-2">
             <Cpu className="w-4 h-4 text-blue-400" />
-            <span className="text-sm font-semibold text-white">NEXUS heartbeat agent</span>
+            <span className="text-sm font-semibold text-white">Official MTA directory</span>
           </div>
           <div className="text-[11px] text-neutral-400">
-            Live status is shown only while authenticated telemetry is fresh.
+            Live status is based on the latest public MTA directory observation. Editorial server details are managed separately.
           </div>
         </div>
       </div>
