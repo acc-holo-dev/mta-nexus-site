@@ -8,7 +8,6 @@ export interface BuildScanner {
   scan(input: {
     bytes: Uint8Array;
     fileName: string;
-    sha256Hash: string;
   }): Promise<BuildScanResult>;
 }
 
