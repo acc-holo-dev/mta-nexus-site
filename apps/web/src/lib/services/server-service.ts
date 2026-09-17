@@ -1,4 +1,4 @@
-import { serverRepository, auditRepository } from "@nexus/db";
+import { serverRepository, auditRepository, organizationRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Server, User } from "@nexus/domain";
