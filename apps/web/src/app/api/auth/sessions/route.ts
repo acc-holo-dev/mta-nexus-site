@@ -41,6 +41,12 @@ export async function DELETE(request: NextRequest) {
     }
 
     const body = await request.json().catch(() => ({}));
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json(
+        { error: "Request body must be an object" },
+        { status: 400 }
+      );
+    }
     if (body.allOther === true) {
       const revokedCount = await authService.revokeOtherSessions(user.id, token);
       return NextResponse.json({ success: true, revokedCount });
