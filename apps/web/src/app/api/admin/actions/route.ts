@@ -42,18 +42,26 @@ export async function POST(request: NextRequest) {
     const { targetType, targetId, action, notes } = parsed.data;
 
     if (targetType === "product") {
-      if (action === "feature") {
-        await productRepository.update(targetId, { isFeatured: true });
-      } else if (action === "unfeature") {
-        await productRepository.update(targetId, { isFeatured: false });
-      } else if (action === "suspend") {
-        await productRepository.update(targetId, { status: "suspended" });
-      } else if (action === "restore") {
-        await productRepository.update(targetId, { status: "published" });
+      const updated = action === "feature"
+        ? await productRepository.update(targetId, { isFeatured: true })
+        : action === "unfeature"
+          ? await productRepository.update(targetId, { isFeatured: false })
+          : action === "suspend"
+            ? await productRepository.update(targetId, { status: "suspended" })
+            : await productRepository.update(targetId, { status: "published" });
+      if (!updated) {
+        return NextResponse.json({ error: "Product not found" }, { status: 404 });
       }
     } else if (targetType === "report") {
       if (action === "resolve" || action === "dismiss") {
-        await reportRepository.resolve(targetId, action === "resolve" ? "resolved" : "dismissed", notes || "");
+        const resolved = await reportRepository.resolve(
+          targetId,
+          action === "resolve" ? "resolved" : "dismissed",
+          notes || ""
+        );
+        if (!resolved) {
+          return NextResponse.json({ error: "Report not found" }, { status: 404 });
+        }
       }
     } else if (targetType === "verification") {
       // Verification can only be granted through the moderation workflow
