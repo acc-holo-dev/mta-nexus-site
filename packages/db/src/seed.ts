@@ -104,7 +104,7 @@ export async function runSeed() {
     id: "srv_horizon_rp",
     name: "Horizon Roleplay: Los Santos 2026",
     slug: "horizon-roleplay",
-    description: "Hardcore text & voice roleplay server powered by Nexus Runtime Module with dynamic economy, inventory physics, faction warfare, and authentic government mechanics.",
+    description: "Hardcore text & voice roleplay server with dynamic economy, inventory physics, faction warfare, and authentic government mechanics.",
     ipAddress: "rp.horizon-mta.com",
     port: 22003,
     httpPort: 22005,
