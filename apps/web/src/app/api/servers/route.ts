@@ -2,11 +2,41 @@ import { NextRequest, NextResponse } from "next/server";
 import { serverService } from "../../../lib/services/server-service";
 import { authService } from "../../../lib/services/auth-service";
 import { createServerSchema } from "@nexus/validation";
-import { consumeRateLimit, getClientIp } from "@nexus/security";
+import { consumeRateLimit, getClientIp } from "@nexus/security";\nimport { matchesMtaEndpoint, mtaMasterDirectoryService, type MtaMasterServer } from "../../../lib/services/mta-master-directory-service";
 
 export async function GET() {
   const servers = await serverService.listServers();
-  return NextResponse.json({ servers });
+  let observations: MtaMasterServer[] = [];
+  let directoryIsStale = false;
+
+  try {
+    const directory = await mtaMasterDirectoryService.getDirectory();
+    observations = directory.servers;
+    directoryIsStale = directory.isStale;
+  } catch {
+    // Editorial listings remain available when the official directory is unavailable.
+  }
+
+  const enrichedServers = servers.map((server) => {
+    const liveObservation = observations.find((observation) =>
+      matchesMtaEndpoint(server, observation)
+    );
+
+    return {
+      ...server,
+      liveObservation: liveObservation ?? null,
+      liveStatus: liveObservation
+        ? liveObservation.responding === false
+          ? "offline"
+          : "online"
+        : "unknown",
+    };
+  });
+
+  return NextResponse.json(
+    { servers: enrichedServers, directoryIsStale },
+    { headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=120" } }
+  );
 }
 
 export async function POST(request: NextRequest) {
