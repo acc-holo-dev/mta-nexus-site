@@ -29,6 +29,26 @@ export class VerificationRepository {
     return rows[0];
   }
 
+  async findPendingForTarget(
+    requesterId: string,
+    targetType: VerificationTargetType,
+    targetId: string
+  ) {
+    const rows = await db
+      .select()
+      .from(verificationRequests)
+      .where(
+        and(
+          eq(verificationRequests.requesterId, requesterId),
+          eq(verificationRequests.targetType, targetType),
+          eq(verificationRequests.targetId, targetId),
+          eq(verificationRequests.status, "pending")
+        )
+      )
+      .limit(1);
+    return rows[0] || null;
+  }
+
   async findPendingById(id: string) {
     const rows = await db
       .select()
