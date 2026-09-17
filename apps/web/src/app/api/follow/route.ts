@@ -61,7 +61,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Too many follow requests. Please try again shortly." }, { status: 429 });
     }
 
-    const { targetType, targetId } = await request.json();
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Request body must be an object" }, { status: 400 });
+    }
+    const { targetType, targetId } = body as {
+      targetType?: unknown;
+      targetId?: unknown;
+    };
 
     if (!ALLOWED_TARGET_TYPES.includes(targetType)) {
       return NextResponse.json(
@@ -122,7 +129,14 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const { targetType, targetId } = await request.json();
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Request body must be an object" }, { status: 400 });
+    }
+    const { targetType, targetId } = body as {
+      targetType?: unknown;
+      targetId?: unknown;
+    };
 
     if (!ALLOWED_TARGET_TYPES.includes(targetType)) {
       return NextResponse.json({ error: "Invalid target type" }, { status: 400 });
