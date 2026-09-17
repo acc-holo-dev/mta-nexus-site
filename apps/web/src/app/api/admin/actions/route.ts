@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";
+import { productService } from "../../../../lib/services/product-service";
 import {
   productRepository,
   reportRepository,
@@ -13,6 +14,7 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
   z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional() }),
   z.object({ targetType: z.literal("report"), targetId: z.string().min(1), action: z.enum(["resolve", "dismiss"]), notes: z.string().max(2000).optional() }),
   z.object({ targetType: z.literal("verification"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("build"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().max(2000).optional() }),
 ]);
 
 export async function POST(request: NextRequest) {
@@ -70,6 +72,12 @@ export async function POST(request: NextRequest) {
           );
         }
       }
+    } else if (targetType === "build") {
+      await productService.reviewBuild({
+        buildId: targetId,
+        decision: action,
+        notes,
+      }, user);
     }
 
     await auditRepository.record({
