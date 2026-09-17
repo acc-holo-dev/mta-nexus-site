@@ -10,7 +10,7 @@ describe("resource download delivery", () => {
     );
 
     expect(route).toContain("const DOWNLOAD_EXTENSIONS");
-    expect(route).toContain("getDownloadExtension(latestBuild.storageKey)");
+    expect(route).toContain("getDownloadExtension(latestBuild.fileName)");
     expect(route).toContain('"X-Content-Type-Options": "nosniff"');
   });
 });
