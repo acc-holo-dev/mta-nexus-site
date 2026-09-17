@@ -152,6 +152,8 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       storageKey: `builds/${product.id}/v1.0.0.zip`,
       sha256Hash: "a".repeat(64),
       fileSizeBytes: 1024,
+      fileName: "security-test.zip",
+      mimeType: "application/zip",
       isSigned: true,
     });
 
