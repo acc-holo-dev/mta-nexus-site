@@ -35,9 +35,12 @@ export class NotificationRepository {
       >
     >
   ): Promise<NotificationPreferences> {
+    const current = await this.getPreferences(userId);
     const values = {
-      ...this.defaultPreferences(userId),
+      ...current,
       ...updates,
+      id: current.id || `npr_${userId}`,
+      userId,
       updatedAt: new Date(),
     };
     const rows = await db
