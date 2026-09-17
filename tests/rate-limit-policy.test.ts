@@ -1,0 +1,26 @@
+import { describe, expect, it } from "vitest";
+import { getRateLimitPolicy, RATE_LIMIT_POLICIES } from "@nexus/security";
+
+describe("risk-based rate limit policy", () => {
+  it("defines bounded policies for every protected mutation category", () => {
+    expect(Object.keys(RATE_LIMIT_POLICIES)).toEqual([
+      "authLogin",
+      "authRegistration",
+      "buildUpload",
+      "download",
+      "follow",
+      "report",
+    ]);
+
+    for (const policy of Object.values(RATE_LIMIT_POLICIES)) {
+      expect(policy.limit).toBeGreaterThan(0);
+      expect(policy.windowSeconds).toBeGreaterThan(0);
+    }
+  });
+
+  it("keeps high-volume download traffic separate from abuse-prone mutations", () => {
+    expect(getRateLimitPolicy("download")).toEqual({ limit: 30, windowSeconds: 60 });
+    expect(getRateLimitPolicy("report")).toEqual({ limit: 10, windowSeconds: 3600 });
+    expect(getRateLimitPolicy("follow")).toEqual({ limit: 30, windowSeconds: 60 });
+  });
+});
