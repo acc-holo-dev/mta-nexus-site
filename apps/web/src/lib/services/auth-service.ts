@@ -145,6 +145,37 @@ export class AuthService {
     });
   }
 
+  async changePassword(input: {
+    userId: string;
+    currentPassword: string;
+    newPassword: string;
+    currentToken: string;
+  }): Promise<number> {
+    const user = await userRepository.findById(input.userId);
+    if (!user) throw new NotFoundError("User", input.userId);
+
+    const stored = await userRepository.findByEmail(user.email);
+    if (!stored?.passwordHash || !(await verifyPassword(input.currentPassword, stored.passwordHash))) {
+      throw new UnauthorizedError("Current password is incorrect");
+    }
+
+    const passwordHash = await hashPassword(input.newPassword);
+    const updated = await userRepository.updatePassword(input.userId, passwordHash);
+    if (!updated) throw new NotFoundError("User", input.userId);
+
+    const revokedCount = await sessionRepository.deleteOtherSessions(input.userId, input.currentToken);
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: input.userId,
+      actorType: "user",
+      action: "user.password_changed",
+      targetId: input.userId,
+      targetType: "user",
+      details: { revokedSessionCount: revokedCount },
+    });
+    return revokedCount;
+  }
+
   async listSessions(userId: string) {
     return sessionRepository.listByUser(userId);
   }
