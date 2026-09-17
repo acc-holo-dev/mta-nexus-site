@@ -163,7 +163,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
   it("Server management: live availability is sourced from the official directory", async () => {
     const source = await import("../apps/web/src/lib/services/mta-master-directory-service");
     expect(source.mtaMasterDirectoryService).toBeDefined();
-    expect(typeof source.mtaMasterDirectoryService.listServers).toBe("function");
+    expect(typeof source.mtaMasterDirectoryService.getDirectory).toBe("function");
   });
 
   it("Verification workflow: isVerified can only be granted through moderation approval", async () => {
