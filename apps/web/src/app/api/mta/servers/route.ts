@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { mtaMasterDirectoryService } from "../../../lib/services/mta-master-directory-service";
+import { mtaMasterDirectoryService } from "@/lib/services/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";
 
