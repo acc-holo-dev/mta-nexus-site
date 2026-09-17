@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const parsed = registerSchema.safeParse(body);
 
     if (!parsed.success) {
