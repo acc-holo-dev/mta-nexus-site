@@ -176,6 +176,12 @@ export class AuthService {
     return revokedCount;
   }
 
+  async getCurrentSessionId(token?: string | null): Promise<string | null> {
+    if (!token) return null;
+    const current = await sessionRepository.findValidSession(token);
+    return current?.session.id ?? null;
+  }
+
   async listSessions(userId: string) {
     return sessionRepository.listByUser(userId);
   }
