@@ -8,7 +8,7 @@ import {
   organizationRepository,
   notificationRepository,
 } from "@nexus/db";
-import { generateId } from "@nexus/security";
+import { consumeRateLimit, generateId } from "@nexus/security";
 
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;
 type TargetType = (typeof ALLOWED_TARGET_TYPES)[number];
@@ -56,6 +56,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
+    const rateLimit = await consumeRateLimit("follow", user.id);
+    if (!rateLimit.success) {
+      return NextResponse.json({ error: "Too many follow requests. Please try again shortly." }, { status: 429 });
+    }
+
     const { targetType, targetId } = await request.json();
 
     if (!ALLOWED_TARGET_TYPES.includes(targetType)) {
@@ -69,7 +74,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Target ID required" }, { status: 400 });
     }
 
-    // Target must actually exist — no arbitrary references
     if (!(await targetExists(targetType as TargetType, targetId))) {
       return NextResponse.json({ error: "Target does not exist" }, { status: 404 });
     }
@@ -90,7 +94,6 @@ export async function POST(request: NextRequest) {
       targetId,
     });
 
-    // Notify target user if following a user/developer
     if (targetType === "user" && targetId !== user.id) {
       await notificationRepository.create({
         id: generateId("not"),
