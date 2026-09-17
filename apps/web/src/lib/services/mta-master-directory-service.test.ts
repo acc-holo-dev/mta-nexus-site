@@ -69,8 +69,7 @@ describe("parseMtaMasterList", () => {
       0, 0, 0, 2,
       ...u32(0),
       ...u32(1),
-      ...u32(2),
-      0, 0,
+      ...u32(1),
     ]).buffer;
 
     expect(() => parseMtaMasterList(payload)).toThrow("Truncated MTA master-list server entry");
