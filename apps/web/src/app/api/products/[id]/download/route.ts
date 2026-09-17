@@ -1,3 +1,4 @@
+import path from "node:path";
 import { Readable } from "node:stream";
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../../lib/services/auth-service";
@@ -5,6 +6,13 @@ import { commerceService } from "../../../../../lib/services/commerce-service";
 import { productRepository, buildRepository, auditRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";
 import { generateId, rateLimiter } from "@nexus/security";
+
+const DOWNLOAD_EXTENSIONS = new Set([".zip", ".rar", ".7z", ".lua"]);
+
+function getDownloadExtension(storageKey: string): string {
+  const extension = path.extname(storageKey).toLowerCase();
+  return DOWNLOAD_EXTENSIONS.has(extension) ? extension : ".zip";
+}
 
 export async function GET(
   request: NextRequest,
@@ -64,7 +72,7 @@ export async function GET(
     });
 
     const stream = Readable.toWeb(stored.stream as Readable) as ReadableStream;
-    const fileName = `${product.slug}-${latestBuild.version}.zip`;
+    const fileName = `${product.slug}-${latestBuild.version}${getDownloadExtension(latestBuild.storageKey)}`;
     return new NextResponse(stream, {
       headers: {
         "Content-Type": stored.meta?.mimeType || "application/octet-stream",
@@ -72,6 +80,7 @@ export async function GET(
         "Content-Length": String(stored.meta?.sizeBytes || latestBuild.fileSizeBytes),
         "X-Content-SHA256": latestBuild.sha256Hash,
         "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error: unknown) {
