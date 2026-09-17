@@ -64,6 +64,17 @@ describe("parseMtaMasterList", () => {
   it("rejects an incomplete payload", () => {
     expect(() => parseMtaMasterList(new Uint8Array([0, 0]).buffer)).toThrow("Unsupported MTA master-list format");
   });
+  it("rejects an unsafe declared server count", () => {
+    const payload = new Uint8Array([
+      0, 0, 0, 2,
+      ...u32(0),
+      ...u32(1),
+      ...u32(10001),
+    ]).buffer;
+
+    expect(() => parseMtaMasterList(payload)).toThrow("server count exceeds safety limit");
+  });
+
   it("rejects a declared server count when an entry is missing", () => {
     const payload = new Uint8Array([
       0, 0, 0, 2,
