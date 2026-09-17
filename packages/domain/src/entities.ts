@@ -217,6 +217,8 @@ export interface Build {
   storageKey: string;
   sha256Hash: string;
   fileSizeBytes: number;
+  fileName: string;
+  mimeType: string;
   mtaVersionTarget?: string;
   isSigned: boolean;
   createdAt: Date;
