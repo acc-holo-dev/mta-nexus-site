@@ -45,11 +45,23 @@ export async function POST(request: NextRequest) {
     if (parsed.data.productId && !(await productRepository.findById(parsed.data.productId))) {
       return NextResponse.json({ error: "Linked resource was not found" }, { status: 404 });
     }
-    if (
-      parsed.data.organizationId &&
-      !(await organizationRepository.findById(parsed.data.organizationId))
-    ) {
-      return NextResponse.json({ error: "Linked organization was not found" }, { status: 404 });
+    if (parsed.data.organizationId) {
+      const organization = await organizationRepository.findById(parsed.data.organizationId);
+      if (!organization) {
+        return NextResponse.json({ error: "Linked organization was not found" }, { status: 404 });
+      }
+
+      const memberships = await organizationRepository.listUserMemberships(user.id);
+      const membership = memberships.find((item) => item.organizationId === parsed.data.organizationId);
+      const canManageOrganization =
+        organization.ownerId === user.id ||
+        membership?.role === "owner" ||
+        membership?.role === "admin" ||
+        membership?.role === "developer";
+
+      if (!canManageOrganization) {
+        return NextResponse.json({ error: "You do not manage this organization" }, { status: 403 });
+      }
     }
 
     const requestedStatus = parsed.data.status;
