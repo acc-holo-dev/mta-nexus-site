@@ -85,6 +85,8 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       type: "system",
     });
 
+    if (!notification) throw new Error("Expected system notification to be delivered");
+
     // User B attempts to mark user A's notification — must be rejected
     const updatedByB = await notificationRepository.markAsRead(notification.id, userB.id);
     expect(updatedByB).toBe(false);
