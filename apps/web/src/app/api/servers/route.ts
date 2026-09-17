@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const parsed = createServerSchema.safeParse(await request.json());
+    const parsed = createServerSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid server details", details: parsed.error.format() },
