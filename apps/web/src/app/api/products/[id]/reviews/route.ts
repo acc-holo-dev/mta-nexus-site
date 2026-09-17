@@ -7,8 +7,7 @@ import {
   auditRepository,
 } from "@nexus/db";
 import { addCommentSchema } from "@nexus/validation";
-import { generateId } from "@nexus/security";
-import { rateLimiter } from "@nexus/security";
+import { generateId, consumeRateLimit } from "@nexus/security";
 
 export async function GET(
   request: NextRequest,
