@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authService } from "../../../../../lib/services/auth-service";
+import { authService } from "../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
 import { notificationPreferencesSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
