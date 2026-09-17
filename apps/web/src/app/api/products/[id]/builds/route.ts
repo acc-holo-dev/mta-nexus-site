@@ -7,6 +7,7 @@ import { rateLimiter } from "@nexus/security";
 import { AppError } from "@nexus/domain";
 
 const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
+const ALLOWED_BUILD_EXTENSIONS = new Set(["zip", "rar", "7z", "lua"]);
 
 const buildMetadataSchema = z.object({
   version: z
@@ -52,6 +53,13 @@ export async function POST(
       return NextResponse.json(
         { error: "A valid build archive and semantic version are required" },
         { status: 400 }
+      );
+    }
+    const extension = file.name.split(".").pop()?.toLowerCase();
+    if (!extension || !ALLOWED_BUILD_EXTENSIONS.has(extension)) {
+      return NextResponse.json(
+        { error: "Only .zip, .rar, .7z, and .lua resource builds are allowed" },
+        { status: 415 }
       );
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
