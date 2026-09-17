@@ -99,7 +99,19 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     });
     expect(suppressed).toBeNull();
 
-    await notificationRepository.updatePreferences(devUser.id, { followsEnabled: true });
+    await notificationRepository.updatePreferences(devUser.id, { followsEnabled: true, systemEnabled: false });
+    const securityNotification = await notificationRepository.create({
+      id: `not_security_${Date.now()}`,
+      recipientId: devUser.id,
+      title: "Security alert",
+      message: "Security notifications cannot be disabled.",
+      type: "security",
+      category: "security",
+      link: "/settings",
+    });
+    expect(securityNotification).not.toBeNull();
+
+    await notificationRepository.updatePreferences(devUser.id, { systemEnabled: true });
   });
 
   it("Resource Journey: Claim a free product and receive a download entitlement", async () => {
