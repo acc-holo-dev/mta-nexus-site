@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { productService } from "../../../lib/services/product-service";
 import { authService } from "../../../lib/services/auth-service";
 import { createProductSchema } from "@nexus/validation";
-import { rateLimiter } from "@nexus/security";
+import { consumeRateLimit } from "@nexus/security";
 
 export async function GET() {
   const products = await productService.listProducts({ maxPrice: 0, sort: "popular" });
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const rateLimit = await rateLimiter.consume(`product-create:${user.id}`, 10, 3600);
+    const rateLimit = await consumeRateLimit("contentCreation", user.id);
     if (!rateLimit.success) {
       return NextResponse.json({ error: "Resource creation limit exceeded" }, { status: 429 });
     }
