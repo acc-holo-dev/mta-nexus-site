@@ -9,6 +9,7 @@ export type Action =
   | "product.delete"
   | "product.publish"
   | "build.release"
+  | "build.retire"
   | "server.create"
   | "server.manage"
   | "server.delete"
@@ -61,7 +62,8 @@ export function can(
     case "product.update":
     case "product.delete":
     case "product.publish":
-    case "build.release": {
+    case "build.release":
+    case "build.retire": {
       if (!resource) return false;
       const product = resource as Partial<Product>;
       if (product.authorId === user.id) return true;
