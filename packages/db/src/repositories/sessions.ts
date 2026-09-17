@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, desc, eq, ne } from "drizzle-orm";
 import { db } from "../client";
 import { sessions, users } from "../schema";
 import type { User } from "@nexus/domain";
@@ -62,6 +62,43 @@ export class SessionRepository {
       session,
       user: publicUser as unknown as User,
     };
+  }
+
+  async listByUser(userId: string): Promise<Array<Omit<SessionRecord, "token">>> {
+    const rows = await db
+      .select({
+        id: sessions.id,
+        userId: sessions.userId,
+        expiresAt: sessions.expiresAt,
+        ipAddress: sessions.ipAddress,
+        userAgent: sessions.userAgent,
+        createdAt: sessions.createdAt,
+      })
+      .from(sessions)
+      .where(eq(sessions.userId, userId))
+      .orderBy(desc(sessions.createdAt));
+    return rows as Array<Omit<SessionRecord, "token">>;
+  }
+
+  async deleteById(id: string, userId: string): Promise<boolean> {
+    const rows = await db
+      .delete(sessions)
+      .where(and(eq(sessions.id, id), eq(sessions.userId, userId)))
+      .returning({ id: sessions.id });
+    return rows.length > 0;
+  }
+
+  async deleteOtherSessions(userId: string, currentToken: string): Promise<number> {
+    const rows = await db
+      .delete(sessions)
+      .where(
+        and(
+          eq(sessions.userId, userId),
+          ne(sessions.token, digestSessionToken(currentToken))
+        )
+      )
+      .returning({ id: sessions.id });
+    return rows.length;
   }
 
   async delete(token: string): Promise<void> {
