@@ -4,13 +4,24 @@ import { notifications } from "../schema";
 import type { Notification } from "@nexus/domain";
 
 export class NotificationRepository {
-  async listByUser(recipientId: string, limit = 50): Promise<Notification[]> {
-        const rows = await db
+  async listByUser(
+    recipientId: string,
+    limit = 50,
+    unreadOnly = false
+  ): Promise<Notification[]> {
+    const rows = await db
       .select()
       .from(notifications)
-      .where(eq(notifications.recipientId, recipientId))
+      .where(
+        unreadOnly
+          ? and(
+              eq(notifications.recipientId, recipientId),
+              eq(notifications.isRead, false)
+            )
+          : eq(notifications.recipientId, recipientId)
+      )
       .orderBy(desc(notifications.createdAt))
-      .limit(limit);
+      .limit(Math.min(Math.max(limit, 1), 100));
     return rows as unknown as Notification[];
   }
 
