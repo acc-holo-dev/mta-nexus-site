@@ -38,6 +38,20 @@ export type MtaMasterServer = {
   responding?: boolean;
 };
 
+export function normalizeMtaAddress(address: string): string {
+  return address.trim().toLowerCase().replace(/\.$/, "");
+}
+
+export function matchesMtaEndpoint(
+  editorial: { ipAddress: string; port: number },
+  observation: Pick<MtaMasterServer, "address" | "port">
+): boolean {
+  return (
+    editorial.port === observation.port &&
+    normalizeMtaAddress(editorial.ipAddress) === normalizeMtaAddress(observation.address)
+  );
+}
+
 export type MtaMasterDirectory = {
   servers: MtaMasterServer[];
   fetchedAt: string;
