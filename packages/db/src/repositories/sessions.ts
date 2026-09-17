@@ -14,6 +14,11 @@ export interface SessionRecord {
   createdAt: Date;
 }
 
+export type SessionSummary = Pick<
+  SessionRecord,
+  "id" | "expiresAt" | "ipAddress" | "userAgent" | "createdAt"
+>;
+
 export function digestSessionToken(token: string): string {
   return crypto.createHash("sha256").update(token, "utf8").digest("hex");
 }
@@ -64,11 +69,10 @@ export class SessionRepository {
     };
   }
 
-  async listByUser(userId: string): Promise<Array<Omit<SessionRecord, "token">>> {
+  async listByUser(userId: string): Promise<SessionSummary[]> {
     const rows = await db
       .select({
         id: sessions.id,
-        userId: sessions.userId,
         expiresAt: sessions.expiresAt,
         ipAddress: sessions.ipAddress,
         userAgent: sessions.userAgent,
@@ -81,7 +85,7 @@ export class SessionRepository {
       ...row,
       ipAddress: row.ipAddress ?? undefined,
       userAgent: row.userAgent ?? undefined,
-    }));
+    })) as SessionSummary[];
   }
 
   async deleteById(id: string, userId: string): Promise<boolean> {
