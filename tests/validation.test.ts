@@ -3,6 +3,7 @@ import {
   createServerSchema,
   createProductSchema,
   checkoutSchema,
+  changePasswordSchema,
 } from "@nexus/validation";
 
 describe("Validation Schemas", () => {
@@ -57,6 +58,18 @@ describe("Validation Schemas", () => {
     expect(createProductSchema.safeParse({
       ...base,
       compatibility: { dependencies: ["core-ui", "core-ui"] },
+    }).success).toBe(false);
+  });
+
+  it("should reject password reuse and accept a strong replacement", () => {
+    expect(changePasswordSchema.safeParse({
+      currentPassword: "old-password",
+      newPassword: "new-password",
+    }).success).toBe(true);
+
+    expect(changePasswordSchema.safeParse({
+      currentPassword: "same-password",
+      newPassword: "same-password",
     }).success).toBe(false);
   });
 
