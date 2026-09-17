@@ -8,11 +8,12 @@ const serverPage = readFileSync(
 );
 
 describe("public server live status", () => {
-  it("does not present stale telemetry as an online server", () => {
+  it("derives online state from a fresh heartbeat", () => {
     expect(serverPage).toContain("HEARTBEAT_FRESHNESS_MS");
     expect(serverPage).toContain('server.status === "active"');
-    expect(serverPage).toContain("new Date(server.updatedAt).getTime()");
+    expect(serverPage).toContain("server.lastHeartbeatAt");
     expect(serverPage).toContain('{isOnline ? "ONLINE" : "OFFLINE"}');
+    expect(serverPage).not.toContain("new Date(server.updatedAt).getTime()");
   });
 
   it("does not label the closed-beta heartbeat agent as entitlement enforcement", () => {
