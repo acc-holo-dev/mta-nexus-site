@@ -12,7 +12,10 @@ export async function GET(request: NextRequest) {
 
   const sessions = await authService.listSessions(user.id);
   return NextResponse.json(
-    { sessions },
+    { sessions: sessions.map((session) => ({
+      ...session,
+      isCurrent: session.id === await authService.getCurrentSessionId(token),
+    })) },
     { headers: { "Cache-Control": "private, no-store" } }
   );
 }
