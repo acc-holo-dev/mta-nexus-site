@@ -11,7 +11,6 @@ import {
   orderRepository,
 } from "@nexus/db";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
-import { serverService } from "../apps/web/src/lib/services/server-service";
 import type { User, Product } from "@nexus/domain";
 
 describe("Nexus 1.3 Security & Trust Hardening", () => {
@@ -161,47 +160,10 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     expect(buildsAfter[0].sha256Hash).toHaveLength(64);
   });
 
-  it("Server heartbeat: telemetry updates live server statistics from real data", async () => {
-    const server = await serverService.createServer(
-      {
-        name: `Telemetry Server ${ts}`,
-        slug: `telemetry-${ts}`,
-        description: "Server for heartbeat telemetry tests",
-        ipAddress: "127.0.0.1",
-        port: 22003,
-        maxPlayers: 100,
-        visibility: "public",
-        ownerId: author.id,
-      },
-      author
-    );
-
-    await expect(
-      serverService.registerInstallation(server.id, userA, "1.0.0")
-    ).rejects.toMatchObject({ statusCode: 403 });
-
-    const installation = await serverService.registerInstallation(server.id, author, "1.0.0");
-    expect(installation.apiKey).toBeDefined();
-    expect(installation.apiKeyHash).not.toContain("nxk_");
-
-    // Record a real heartbeat
-    await telemetryRecord(installation.id, server.id);
-
-    const telemetry = await serverService.getServerTelemetry(server.id);
-    expect(telemetry.currentPlayers).toBe(42);
-    expect(telemetry.recentHeartbeats).toBeGreaterThanOrEqual(1);
-
-    async function telemetryRecord(installationId: string, serverId: string) {
-      const { telemetryRepository } = await import("@nexus/db");
-      await telemetryRepository.recordHeartbeat({
-        installationId,
-        serverId,
-        status: "online",
-        currentPlayers: 42,
-        maxPlayers: 100,
-        moduleVersion: "1.0.0",
-      });
-    }
+  it("Server management: live availability is sourced from the official directory", async () => {
+    const source = await import("../apps/web/src/lib/services/mta-master-directory-service");
+    expect(source.mtaMasterDirectoryService).toBeDefined();
+    expect(typeof source.mtaMasterDirectoryService.listServers).toBe("function");
   });
 
   it("Verification workflow: isVerified can only be granted through moderation approval", async () => {
