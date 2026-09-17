@@ -54,7 +54,7 @@ export default async function ServerDetailPage({
     // The editorial server profile remains available when the public directory is unavailable.
   }
 
-  const isOnline = observedServer?.responding !== false;
+  const isOnline = observedServer != null && observedServer.responding !== false;
   const currentPlayers = observedServer?.players;
   const maxPlayers = observedServer?.maxPlayers ?? server.maxPlayers;
   const occupancyPercent = currentPlayers == null || maxPlayers === 0
