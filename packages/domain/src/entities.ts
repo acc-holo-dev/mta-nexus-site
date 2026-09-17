@@ -33,7 +33,14 @@ export type LicenseModel =
 
 export type LicenseStatus = "active" | "expired" | "revoked" | "suspended";
 
-export type BuildStatus = "draft" | "testing" | "published" | "deprecated" | "retired";
+export type BuildStatus =
+  | "draft"
+  | "testing"
+  | "pending_review"
+  | "published"
+  | "rejected"
+  | "deprecated"
+  | "retired";
 
 export type UploadStatus =
   | "initiated"
