@@ -22,6 +22,11 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -149,7 +154,7 @@ export default async function ProductDetailPage({
                 <Layers className="w-4 h-4 text-blue-400" />
                 <span>Release history</span>
               </div>
-              <span className="text-[11px] text-neutral-500 font-mono">SHA-256 Validated</span>
+              <span className="text-[11px] text-neutral-500 font-mono">SHA-256 recorded</span>
             </h2>
 
             {builds.length > 0 ? (
@@ -182,6 +187,11 @@ export default async function ProductDetailPage({
                           </a>
                         )}
                       </div>
+                    </div>
+                    <div className="grid grid-cols-1 gap-1 text-[11px] text-neutral-400 sm:grid-cols-3">
+                      <span className="truncate" title={b.fileName}>File: {b.fileName}</span>
+                      <span>Size: {formatFileSize(b.fileSizeBytes)}</span>
+                      <span>{b.isSigned ? "Signature: present" : "Signature: not available"}</span>
                     </div>
                     {b.releaseNotes && (
                       <div className="text-xs text-neutral-300 whitespace-pre-line font-mono bg-black/40 p-2.5 rounded border border-neutral-800">
@@ -330,7 +340,7 @@ export default async function ProductDetailPage({
             <div className="p-3 rounded-lg bg-blue-950/20 border border-blue-900/30 flex items-start gap-2.5 text-xs">
               <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
               <div className="text-neutral-300 text-[11px] leading-relaxed">
-                Build integrity is published with a SHA-256 checksum. Downloads are entitlement-gated.
+                Every release records its SHA-256 checksum, file size and compatibility. Downloads are entitlement-gated; a recorded checksum is not a malware verdict or signature.
               </div>
             </div>
           </div>
