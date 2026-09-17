@@ -35,8 +35,10 @@ export class ProductService {
     return product?.price === 0 ? product : null;
   }
 
-  async getProductBuilds(productId: string): Promise<Build[]> {
-    return buildRepository.listByProduct(productId);
+  async getProductBuilds(productId: string, includeNonPublic = false): Promise<Build[]> {
+    return includeNonPublic
+      ? buildRepository.listByProduct(productId)
+      : buildRepository.listPublishedByProduct(productId);
   }
 
   async createProduct(
