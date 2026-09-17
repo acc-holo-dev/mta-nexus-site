@@ -18,6 +18,7 @@ type Session = {
   ipAddress?: string;
   userAgent?: string;
   createdAt: string;
+  isCurrent?: boolean;
 };
 
 const preferenceLabels: Array<{ key: keyof Preferences; label: string; description: string }> = [
@@ -110,7 +111,7 @@ export default function SettingsPage() {
     });
     const data = await response.json();
     if (response.ok) {
-      setSessions(sessions.slice(0, 1));
+      setSessions(sessions.filter((session) => session.isCurrent));
       setMessage(`Revoked ${data.revokedCount} other session(s).`);
     } else {
       setMessage(data.error || "Could not revoke other sessions.");
@@ -215,9 +216,13 @@ export default function SettingsPage() {
                 <div className="text-xs text-primary truncate">{session.userAgent || "Unknown device"}</div>
                 <div className="text-[11px] text-muted">{session.ipAddress || "Unknown IP"} · {new Date(session.createdAt).toLocaleString()}</div>
               </div>
-              <button onClick={() => revokeSession(session.id)} title="Revoke session" className="p-1.5 text-muted hover:text-danger">
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
+              {session.isCurrent ? (
+                <span className="text-[11px] text-accent font-semibold">Current</span>
+              ) : (
+                <button onClick={() => revokeSession(session.id)} title="Revoke session" className="p-1.5 text-muted hover:text-danger">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           ))}
           {sessions.length === 0 && <p className="text-sm text-muted">No active sessions found.</p>}
