@@ -27,7 +27,7 @@ Last reviewed: 2026-09-16
 
 - Primary domain: `nexus-mta.com`; fallback: `nexus-mta.pro`.
 - Hosting: one Hetzner Cloud instance in Finland or Germany with 4 GB RAM.
-- Backups: Hetzner daily backups plus a daily local archive of PostgreSQL and uploads. Confirm restore before inviting users.
+- Backups: VDS-provider backups are the owner’s backup mechanism. Confirm a restore before inviting users; Nexus must not claim an untested backup policy.
 - Email: disabled for closed beta; do not expose flows that imply email delivery.
 
 ## Owner inputs still required before deployment
