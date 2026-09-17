@@ -159,7 +159,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       scanStatus: "not_scanned",
       scanner: "disabled",
       scannedAt: new Date(),
-      isSigned: true,
+      isSigned: false,
     });
 
     const buildsAfter = await buildRepository.listByProduct(product.id);
