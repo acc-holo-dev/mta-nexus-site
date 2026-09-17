@@ -14,7 +14,7 @@ Last reviewed: 2026-09-16
 | Mock paid settlement removed | Pass | paid checkout returns `PAYMENTS_NOT_CONFIGURED` |
 | Free resource claim | Pass | idempotent transaction + entitlement |
 | Binary build delivery | Pass | authenticated entitlement-gated stream |
-| Server heartbeat authentication | Pass | SHA-256 API-key lookup + owner-only key creation |
+| Official MTA live directory | Pass | bounded master-list parser, cache and paginated API |
 | Workspace isolation | Pass | owner-scoped servers and user-scoped entitlements |
 | Privacy, terms, copyright pages | Pass | closed-beta pages linked from footer |
 | Browser E2E smoke test | Pending | run against the production candidate |
