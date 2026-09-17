@@ -105,6 +105,8 @@ export class ProductService {
       storageKey: string;
       sha256Hash: string;
       fileSizeBytes: number;
+      fileName: string;
+      mimeType: string;
     },
     actor: User
   ): Promise<Build> {
@@ -132,6 +134,8 @@ export class ProductService {
       storageKey: input.storageKey,
       sha256Hash: input.sha256Hash,
       fileSizeBytes: input.fileSizeBytes,
+      fileName: input.fileName,
+      mimeType: input.mimeType,
       // Signing is a separate release-pipeline step; never claim a user upload is signed.
       isSigned: false,
     });
