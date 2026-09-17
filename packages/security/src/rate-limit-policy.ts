@@ -1,0 +1,21 @@
+import { rateLimiter } from "./ratelimit";
+
+export const RATE_LIMIT_POLICIES = {
+  authLogin: { limit: 8, windowSeconds: 300 },
+  authRegistration: { limit: 5, windowSeconds: 3600 },
+  buildUpload: { limit: 10, windowSeconds: 3600 },
+  download: { limit: 30, windowSeconds: 60 },
+  follow: { limit: 30, windowSeconds: 60 },
+  report: { limit: 10, windowSeconds: 3600 },
+} as const;
+
+export type RateLimitPolicy = keyof typeof RATE_LIMIT_POLICIES;
+
+export function getRateLimitPolicy(policy: RateLimitPolicy) {
+  return RATE_LIMIT_POLICIES[policy];
+}
+
+export function consumeRateLimit(policy: RateLimitPolicy, subject: string) {
+  const { limit, windowSeconds } = getRateLimitPolicy(policy);
+  return rateLimiter.consume(`${policy}:${subject}`, limit, windowSeconds);
+}
