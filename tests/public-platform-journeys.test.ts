@@ -82,6 +82,10 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
 
     const unread = await notificationRepository.countUnread(devUser.id);
     expect(unread).toBeGreaterThanOrEqual(1);
+
+    const unreadFeed = await notificationRepository.listByUser(devUser.id, 1, true);
+    expect(unreadFeed).toHaveLength(1);
+    expect(unreadFeed[0].isRead).toBe(false);
   });
 
   it("Resource Journey: Claim a free product and receive a download entitlement", async () => {
