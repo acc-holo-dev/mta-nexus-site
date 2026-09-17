@@ -53,6 +53,14 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const currentSessionId = await authService.getCurrentSessionId(token);
+    if (body.sessionId === currentSessionId) {
+      return NextResponse.json(
+        { error: "The current session cannot be revoked here; use logout instead" },
+        { status: 409 }
+      );
+    }
+
     const revoked = await authService.revokeSession(user.id, body.sessionId);
     if (!revoked) {
       return NextResponse.json(
