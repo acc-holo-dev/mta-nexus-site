@@ -3,6 +3,7 @@ import {
   sessionRepository,
   organizationRepository,
   authRepository,
+  auditRepository,
 } from "@nexus/db";
 import { generateId, generateSessionToken, hashPassword, verifyPassword } from "@nexus/security";
 import {
@@ -142,6 +143,42 @@ export class AuthService {
       targetId: session.user.id,
       targetType: "user",
     });
+  }
+
+  async listSessions(userId: string) {
+    return sessionRepository.listByUser(userId);
+  }
+
+  async revokeSession(userId: string, sessionId: string): Promise<boolean> {
+    const revoked = await sessionRepository.deleteById(sessionId, userId);
+    if (revoked) {
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: userId,
+        actorType: "user",
+        action: "user.session_revoked",
+        targetId: userId,
+        targetType: "user",
+        details: { sessionId },
+      });
+    }
+    return revoked;
+  }
+
+  async revokeOtherSessions(userId: string, currentToken: string): Promise<number> {
+    const revokedCount = await sessionRepository.deleteOtherSessions(userId, currentToken);
+    if (revokedCount > 0) {
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: userId,
+        actorType: "user",
+        action: "user.other_sessions_revoked",
+        targetId: userId,
+        targetType: "user",
+        details: { revokedCount },
+      });
+    }
+    return revokedCount;
   }
 
   async switchContext(userId: string, contextId: string): Promise<User> {
