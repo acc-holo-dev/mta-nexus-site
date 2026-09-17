@@ -10,7 +10,7 @@ This document records the official technology stack choices, verified releases, 
 
 | Component | Target Version | Status | Notes |
 |---|---|---|---|
-| **Node.js** | `v24.20.0` LTS | Verified Installed | Active LTS. Native Web Crypto, fetch, streams, test runner support |
+| **Node.js** | `v22` (Docker/CI baseline) | Baseline | Active LTS. Native Web Crypto, fetch, streams, test runner support |
 | **pnpm** | `9.15.9` | Verified Installed | Strict dependency isolation, workspace protocol (`workspace:*`) |
 | **TypeScript** | `^5.7.0` | Verified Target | Strict mode enabled, project references, modern ECMAScript target |
 
@@ -21,8 +21,8 @@ This document records the official technology stack choices, verified releases, 
 | Library | Version | Role / Justification |
 |---|---|---|
 | **Next.js** | `16.3.5` | Monolithic application layer, App Router, React Server Components by default, Route Handlers, Server Actions |
-| **React** | `19.3.0` | Modern React primitives (`useActionState`, `useOptimistic`, Actions, Server Components) |
-| **React DOM** | `19.3.0` | React DOM renderer |
+| **React** | `19.x` | Modern React primitives (`useActionState`, `useOptimistic`, Actions, Server Components) |
+| **React DOM** | `19.x` | React DOM renderer |
 
 ---
 
@@ -30,7 +30,7 @@ This document records the official technology stack choices, verified releases, 
 
 | Library | Version | Role / Justification |
 |---|---|---|
-| **PostgreSQL** | `18.x` | Production relational database, transactions, constraints, full-text search, append-only ledgers |
+| **PostgreSQL** | `16.x` | Production relational database, transactions, constraints, full-text search, append-only ledgers |
 | **Drizzle ORM** | `0.45.2` | Type-safe SQL builder & ORM, migration engine, zero runtime bloat, explicit schema definitions |
 | **Drizzle Kit** | `^0.31.0` | Schema migrations and introspection tooling |
 | **pg** / **postgres** | `^3.4.0` | Fast PostgreSQL driver with connection pooling |
@@ -41,7 +41,7 @@ This document records the official technology stack choices, verified releases, 
 
 | Library | Version | Role / Justification |
 |---|---|---|
-| **Better Auth** | `1.7.5` | Modern TypeScript auth engine, session cookies (HttpOnly, SameSite), Discord OAuth, 2FA foundation, organization plugins |
+| **Authentication** | Current local session/auth services | httpOnly sessions and scrypt password hashing; external OAuth is a later gate |
 | **Argon2** / WebCrypto | Native / `argon2` | Secure password hashing, brute-force resistance |
 
 ---
@@ -61,7 +61,7 @@ This document records the official technology stack choices, verified releases, 
 
 | Library | Version | Role / Justification |
 |---|---|---|
-| **Zod** | `4.6.5` / `3.24.x` | Source-of-truth schemas for forms, API inputs, server actions, webhooks, domain validation |
+| **Zod** | `3.24.x` | Source-of-truth schemas for forms, API inputs, server actions, webhooks, domain validation |
 
 ---
 
