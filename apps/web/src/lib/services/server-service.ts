@@ -29,6 +29,23 @@ export class ServerService {
   ): Promise<Server> {
     if (!can(actor, "server.create")) throw new ForbiddenError("Not authorized to create server");
 
+    if (input.organizationId) {
+      const organization = await organizationRepository.findById(input.organizationId);
+      if (!organization) throw new NotFoundError("Organization", input.organizationId);
+
+      const memberships = await organizationRepository.listUserMemberships(actor.id);
+      const membership = memberships.find((item) => item.organizationId === input.organizationId);
+      const canManageOrganization =
+        organization.ownerId === actor.id ||
+        membership?.role === "owner" ||
+        membership?.role === "admin" ||
+        membership?.role === "developer";
+
+      if (!canManageOrganization) {
+        throw new ForbiddenError("You do not manage this organization");
+      }
+    }
+
     const id = generateId("srv");
     const server = await serverRepository.create({
       ...input,
