@@ -72,10 +72,10 @@ export async function GET(
     });
 
     const stream = Readable.toWeb(stored.stream as Readable) as ReadableStream;
-    const fileName = `${product.slug}-${latestBuild.version}${getDownloadExtension(latestBuild.storageKey)}`;
+    const fileName = `${product.slug}-${latestBuild.version}${getDownloadExtension(latestBuild.fileName)}`;
     return new NextResponse(stream, {
       headers: {
-        "Content-Type": stored.meta?.mimeType || "application/octet-stream",
+        "Content-Type": latestBuild.mimeType || stored.meta?.mimeType || "application/octet-stream",
         "Content-Disposition": `attachment; filename="${fileName}"`,
         "Content-Length": String(stored.meta?.sizeBytes || latestBuild.fileSizeBytes),
         "X-Content-SHA256": latestBuild.sha256Hash,
