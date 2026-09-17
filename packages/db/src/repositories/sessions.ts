@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { and, desc, eq, ne } from "drizzle-orm";
+import { and, desc, eq, gt, ne } from "drizzle-orm";
 import { db } from "../client";
 import { sessions, users } from "../schema";
 import type { User } from "@nexus/domain";
@@ -79,7 +79,7 @@ export class SessionRepository {
         createdAt: sessions.createdAt,
       })
       .from(sessions)
-      .where(eq(sessions.userId, userId))
+      .where(and(eq(sessions.userId, userId), gt(sessions.expiresAt, new Date())))
       .orderBy(desc(sessions.createdAt));
     return rows.map((row) => ({
       ...row,
