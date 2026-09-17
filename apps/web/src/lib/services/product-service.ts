@@ -130,7 +130,7 @@ export class ProductService {
       productId: input.productId,
       version: input.version,
       releaseNotes: input.releaseNotes,
-      status: "published",
+      status: "pending_review",
       storageKey: input.storageKey,
       sha256Hash: input.sha256Hash,
       fileSizeBytes: input.fileSizeBytes,
@@ -142,14 +142,14 @@ export class ProductService {
 
     await productRepository.update(product.id, {
       currentVersion: input.version,
-      status: "published",
+      status: "pending_review",
     });
 
     await auditRepository.record({
       id: generateId("aud"),
       actorId: actor.id,
       actorType: "user",
-      action: "build.released",
+      action: "build.submitted_for_review",
       targetId: buildId,
       targetType: "build",
       details: { productId: product.id, version: input.version },
@@ -173,6 +173,55 @@ export class ProductService {
 
     return build;
   }
+  async reviewBuild(
+    input: { buildId: string; decision: "approve" | "reject"; notes?: string },
+    actor: User
+  ): Promise<Build> {
+    if (!can(actor, "admin.moderation")) {
+      throw new ForbiddenError("Moderator privilege is required to review builds");
+    }
+
+    const build = await buildRepository.findById(input.buildId);
+    if (!build) throw new NotFoundError("Build", input.buildId);
+    if (build.status !== "pending_review") {
+      throw new AppError("Only pending builds can be reviewed", 409, "BUILD_NOT_PENDING_REVIEW");
+    }
+
+    const product = await productRepository.findById(build.productId);
+    if (!product) throw new NotFoundError("Product", build.productId);
+
+    const status = input.decision === "approve" ? "published" : "rejected";
+    const reviewed = await buildRepository.updateStatus(build.id, status);
+    if (!reviewed) throw new NotFoundError("Build", build.id);
+
+    if (input.decision === "approve") {
+      await productRepository.update(product.id, {
+        currentVersion: build.version,
+        status: "published",
+      });
+    } else {
+      const fallback = (await buildRepository.listByProduct(product.id)).find(
+        (candidate) => candidate.id !== build.id && candidate.status === "published"
+      );
+      await productRepository.update(product.id, fallback
+        ? { currentVersion: fallback.version, status: "published" }
+        : { status: "draft" }
+      );
+    }
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: actor.role === "admin" ? "admin" : "user",
+      action: input.decision === "approve" ? "build.approved" : "build.rejected",
+      targetId: build.id,
+      targetType: "build",
+      details: { productId: product.id, version: build.version, notes: input.notes },
+    });
+
+    return reviewed;
+  }
+
   async retireBuild(
     input: { productId: string; buildId: string; reason?: string },
     actor: User
