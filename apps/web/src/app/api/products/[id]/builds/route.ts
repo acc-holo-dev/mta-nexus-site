@@ -5,7 +5,7 @@ import { productService } from "../../../../../lib/services/product-service";
 import { buildScannerService } from "../../../../../lib/services/build-scanner-service";
 import { authService } from "../../../../../lib/services/auth-service";
 import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
-import { rateLimiter } from "@nexus/security";
+import { consumeRateLimit } from "@nexus/security";
 import { AppError } from "@nexus/domain";
 
 const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
@@ -45,7 +45,7 @@ export async function POST(
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const rateLimit = await rateLimiter.consume(`build-upload:${user.id}`, 10, 3600);
+    const rateLimit = await consumeRateLimit("buildUpload", user.id);
     if (!rateLimit.success) {
       return NextResponse.json({ error: "Build upload limit exceeded" }, { status: 429 });
     }
