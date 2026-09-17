@@ -109,6 +109,9 @@ export class ProductService {
       fileSizeBytes: number;
       fileName: string;
       mimeType: string;
+      scanStatus: Build["scanStatus"];
+      scanner?: string;
+      scannedAt?: Date;
     },
     actor: User
   ): Promise<Build> {
@@ -142,6 +145,9 @@ export class ProductService {
       fileSizeBytes: input.fileSizeBytes,
       fileName: input.fileName,
       mimeType: input.mimeType,
+      scanStatus: input.scanStatus,
+      scanner: input.scanner,
+      scannedAt: input.scannedAt,
       // Signing is a separate release-pipeline step; never claim a user upload is signed.
       isSigned: false,
     });
@@ -197,6 +203,9 @@ export class ProductService {
 
     const product = await productRepository.findById(build.productId);
     if (!product) throw new NotFoundError("Product", build.productId);
+    if (input.decision === "approve" && build.scanStatus === "malicious") {
+      throw new AppError("A malicious build cannot be approved", 422, "BUILD_SCAN_MALICIOUS");
+    }
 
     const status = input.decision === "approve" ? "published" : "rejected";
     const reviewed = await buildRepository.updateStatus(build.id, status);
