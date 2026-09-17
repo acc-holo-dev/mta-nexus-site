@@ -34,6 +34,32 @@ describe("Validation Schemas", () => {
     expect(result.success).toBe(false);
   });
 
+  it("should validate resource compatibility and reject duplicate dependencies", () => {
+    const base = {
+      title: "Compatible Resource",
+      slug: "compatible-resource",
+      description: "A resource with an explicit MTA compatibility manifest",
+      type: "script",
+      price: 0,
+      licenseModel: "unlimited",
+    };
+
+    expect(createProductSchema.safeParse({
+      ...base,
+      compatibility: { mtaMinVersion: "1.6.0", dependencies: ["core-ui", "vehicle-pack"] },
+    }).success).toBe(true);
+
+    expect(createProductSchema.safeParse({
+      ...base,
+      compatibility: { mtaMinVersion: "latest", dependencies: ["core-ui"] },
+    }).success).toBe(false);
+
+    expect(createProductSchema.safeParse({
+      ...base,
+      compatibility: { dependencies: ["core-ui", "core-ui"] },
+    }).success).toBe(false);
+  });
+
   it("should require at least one item for checkout", () => {
     const emptyCheckout = {
       items: [],
