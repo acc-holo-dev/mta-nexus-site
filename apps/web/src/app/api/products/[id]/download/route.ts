@@ -5,7 +5,7 @@ import { authService } from "../../../../../lib/services/auth-service";
 import { commerceService } from "../../../../../lib/services/commerce-service";
 import { productRepository, buildRepository, auditRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";
-import { generateId, rateLimiter } from "@nexus/security";
+import { consumeRateLimit, generateId } from "@nexus/security";
 
 const DOWNLOAD_EXTENSIONS = new Set([".zip", ".rar", ".7z", ".lua"]);
 
@@ -29,7 +29,7 @@ export async function GET(
       );
     }
 
-    const rateLimit = await rateLimiter.consume(`download:${user.id}`, 30, 60);
+    const rateLimit = await consumeRateLimit("download", user.id);
     if (!rateLimit.success) {
       return NextResponse.json({ error: "Too many download requests" }, { status: 429 });
     }
