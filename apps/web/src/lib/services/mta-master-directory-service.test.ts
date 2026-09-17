@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { parseMtaMasterList } from "./mta-master-directory-service";
+import {
+  matchesMtaEndpoint,
+  normalizeMtaAddress,
+  parseMtaMasterList,
+} from "./mta-master-directory-service";
 
 const FLAGS = 0x0004 | 0x0008 | 0x0020 | 0x0040 | 0x0080 | 0x0100 | 0x0200 | 0x1000 | 0x080000;
 
@@ -84,5 +88,22 @@ describe("parseMtaMasterList", () => {
     ]).buffer;
 
     expect(() => parseMtaMasterList(payload)).toThrow("Truncated MTA master-list server entry");
+  });
+});
+
+describe("editorial/live endpoint matching", () => {
+  it("normalizes case, whitespace and a trailing hostname dot", () => {
+    expect(normalizeMtaAddress("  Play.Example.COM. ")).toBe("play.example.com");
+    expect(matchesMtaEndpoint(
+      { ipAddress: " PLAY.EXAMPLE.COM. ", port: 22003 },
+      { address: "play.example.com", port: 22003 }
+    )).toBe(true);
+  });
+
+  it("never matches a different port", () => {
+    expect(matchesMtaEndpoint(
+      { ipAddress: "127.0.0.1", port: 22003 },
+      { address: "127.0.0.1", port: 22004 }
+    )).toBe(false);
   });
 });
