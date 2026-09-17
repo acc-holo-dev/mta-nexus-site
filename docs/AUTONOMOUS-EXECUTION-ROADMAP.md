@@ -36,7 +36,7 @@ A listing, a live master-list observation, a resource build, a purchase entitlem
 | 2 | Free resource delivery hardening | complete | Safe upload, build lifecycle, entitlement delivery and moderation-ready states |
 | 3 | Identity, access and trust | active | Capability checks, profile verification, audit and abuse controls |
 | 4 | Communities and content | planned | Community spaces, posts, discussions, notifications and discovery |
-| 5 | Editorial server profiles | planned | Owner-managed profile data safely linked to official observations |
+| 5 | Editorial server profiles | active | Owner-managed profile data safely linked to official observations |
 | 6 | Marketplace quality | planned | Review rules, build scanning/signing-ready workflow, compatibility and creator operations |
 | 7 | Financial domain foundation | planned | Immutable ledger and provider-neutral payment/payout contracts, disabled by default |
 | 8 | Docker/VDS release operations | planned | Runbooks, secrets model, health checks, migrations, backups and recovery |
@@ -129,7 +129,9 @@ Make server pages useful without pretending NEXUS controls the server runtime.
 
 ### Work items
 
-- Match editorial profiles to observations by normalized address/port.
+- [x] Match editorial profiles to observations by normalized address/port.
+- [x] Expose editorial listings with an explicit `liveObservation`/`liveStatus` layer; missing directory data remains neutral.
+- Ensure new listings are editorially active without implying live availability.
 - Add claim/verification workflow instead of automatic ownership claims.
 - Add profile links, media, language, region and gameplay taxonomy.
 - Add favorites/follows and player-safe reporting.
