@@ -4,12 +4,13 @@ import { content, comments } from "../schema";
 import type { Content, Comment } from "@nexus/domain";
 
 export class ContentRepository {
-  async listPublished(): Promise<Content[]> {
+  async listPublished(limit = 50): Promise<Content[]> {
         const rows = await db
       .select()
       .from(content)
       .where(eq(content.status, "published"))
-      .orderBy(desc(content.createdAt));
+      .orderBy(desc(content.createdAt))
+      .limit(Math.min(Math.max(limit, 1), 100));
     return rows as unknown as Content[];
   }
 
