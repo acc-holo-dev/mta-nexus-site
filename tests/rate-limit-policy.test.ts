@@ -12,6 +12,7 @@ describe("risk-based rate limit policy", () => {
       "report",
       "sessionManagement",
       "passwordChange",
+      "notificationMutation",
     ]);
 
     for (const policy of Object.values(RATE_LIMIT_POLICIES)) {
@@ -26,5 +27,6 @@ describe("risk-based rate limit policy", () => {
     expect(getRateLimitPolicy("follow")).toEqual({ limit: 30, windowSeconds: 60 });
     expect(getRateLimitPolicy("sessionManagement")).toEqual({ limit: 20, windowSeconds: 300 });
     expect(getRateLimitPolicy("passwordChange")).toEqual({ limit: 5, windowSeconds: 3600 });
+    expect(getRateLimitPolicy("notificationMutation")).toEqual({ limit: 30, windowSeconds: 60 });
   });
 });
