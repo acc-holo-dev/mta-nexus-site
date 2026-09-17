@@ -328,7 +328,7 @@ Initial topology:
 
 - server creation;
 - ownership claim;
-- heartbeat and status history;
+- official MTA master-list observations;
 - news and updates;
 - follow notifications;
 - verified review eligibility.
@@ -360,9 +360,9 @@ Initial topology:
 - seller receivables;
 - controlled payouts.
 
-### Phase 6: Nexus Agent
+### Phase 6: External server integration (deferred)
 
-Begin with a minimal Lua integration for server identity, heartbeat, review eligibility, and entitlement contracts. Native C++ is introduced only for capabilities that cannot be delivered safely and reliably through supported scripting interfaces.
+NEXUS does not require Lua, C++, config.lua, heartbeat agents, or runtime code on third-party servers. Future integrations may be evaluated separately only after the player-first platform and operational model prove themselves.
 
 ## Definition of foundation complete
 
