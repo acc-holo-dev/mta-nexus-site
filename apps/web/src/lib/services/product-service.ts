@@ -132,7 +132,8 @@ export class ProductService {
       storageKey: input.storageKey,
       sha256Hash: input.sha256Hash,
       fileSizeBytes: input.fileSizeBytes,
-      isSigned: true,
+      // Signing is a separate release-pipeline step; never claim a user upload is signed.
+      isSigned: false,
     });
 
     await productRepository.update(product.id, {
