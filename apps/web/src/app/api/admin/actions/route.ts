@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";
 import {
   productRepository,
@@ -7,6 +8,12 @@ import {
   verificationRepository,
 } from "@nexus/db";
 import { can, generateId, rateLimiter } from "@nexus/security";
+
+const adminActionSchema = z.discriminatedUnion("targetType", [
+  z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("report"), targetId: z.string().min(1), action: z.enum(["resolve", "dismiss"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("verification"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().max(2000).optional() }),
+]);
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,11 +33,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Too many admin actions" }, { status: 429 });
     }
 
-    const { targetType, targetId, action, notes } = await request.json();
-
-    if (!targetType || !targetId || !action) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    const parsed = adminActionSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid moderation action", details: parsed.error.format() }, { status: 400 });
     }
+    const { targetType, targetId, action, notes } = parsed.data;
 
     if (targetType === "product") {
       if (action === "feature") {
