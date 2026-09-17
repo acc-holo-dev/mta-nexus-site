@@ -86,6 +86,20 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     const unreadFeed = await notificationRepository.listByUser(devUser.id, 1, true);
     expect(unreadFeed).toHaveLength(1);
     expect(unreadFeed[0].isRead).toBe(false);
+
+    await notificationRepository.updatePreferences(devUser.id, { followsEnabled: false });
+    const suppressed = await notificationRepository.create({
+      id: `not_suppressed_${Date.now()}`,
+      recipientId: devUser.id,
+      title: "Suppressed follow",
+      message: "This should honor follow preferences.",
+      type: "system",
+      category: "follow",
+      link: "/users/player",
+    });
+    expect(suppressed).toBeNull();
+
+    await notificationRepository.updatePreferences(devUser.id, { followsEnabled: true });
   });
 
   it("Resource Journey: Claim a free product and receive a download entitlement", async () => {
