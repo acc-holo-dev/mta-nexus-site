@@ -1,6 +1,8 @@
 const MTA_MASTER_URL = "https://master.multitheftauto.com/ase/mta/";
 const CACHE_TTL_MS = 60_000;
 const STALE_CACHE_TTL_MS = 15 * 60_000;
+const MAX_MASTER_PAYLOAD_BYTES = 8 * 1024 * 1024;
+const MAX_MASTER_SERVERS = 10_000;
 
 const FLAG = {
   players: 0x0004,
@@ -117,6 +119,9 @@ export function parseMtaMasterList(data: ArrayBuffer): MtaMasterServer[] {
   const flags = reader.u32();
   reader.u32(); // sequence number
   const count = reader.u32();
+  if (count > MAX_MASTER_SERVERS) {
+    throw new Error("MTA master-list server count exceeds safety limit");
+  }
   const servers: MtaMasterServer[] = [];
 
   for (let index = 0; index < count; index++) {
@@ -179,7 +184,12 @@ async function requestDirectory(): Promise<MtaMasterDirectory> {
     throw new Error(`MTA master-list request failed with ${response.status}`);
   }
 
-  const servers = parseMtaMasterList(await response.arrayBuffer())
+  const payload = await response.arrayBuffer();
+  if (payload.byteLength > MAX_MASTER_PAYLOAD_BYTES) {
+    throw new Error("MTA master-list payload exceeds safety limit");
+  }
+
+  const servers = parseMtaMasterList(payload)
     .filter((server) => server.responding !== false)
     .sort((a, b) => (b.players ?? 0) - (a.players ?? 0));
 
