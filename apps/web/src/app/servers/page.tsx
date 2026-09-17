@@ -1,13 +1,9 @@
 import Link from "next/link";
 import { Server as ServerIcon, Plus } from "lucide-react";
-import { mtaMasterDirectoryService } from "../../lib/services/mta-master-directory-service";
 import { MtaMasterServerDirectory } from "../../components/mta-master-server-directory";
 
-export const dynamic = "force-dynamic";
 
 export default async function ServersPage() {
-  const directory = await mtaMasterDirectoryService.getDirectory().catch(() => null);
-
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-base pb-6">
@@ -24,11 +20,7 @@ export default async function ServersPage() {
         </Link>
       </div>
 
-      {directory ? (
-        <MtaMasterServerDirectory directory={directory} />
-      ) : (
-        <div className="nexus-panel p-6 text-sm text-neutral-400">The official MTA server directory is temporarily unavailable. Try again shortly.</div>
-      )}
+      <MtaMasterServerDirectory />
     </div>
   );
 }
