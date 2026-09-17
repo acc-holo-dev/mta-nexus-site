@@ -370,6 +370,17 @@ export interface Follow {
   createdAt: Date;
 }
 
+export interface NotificationPreferences {
+  id: string;
+  userId: string;
+  followsEnabled: boolean;
+  contentEnabled: boolean;
+  serverEnabled: boolean;
+  commerceEnabled: boolean;
+  systemEnabled: boolean;
+  updatedAt: Date;
+}
+
 export interface Notification {
   id: string;
   recipientId: string;
