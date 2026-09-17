@@ -16,7 +16,16 @@ describe("account security API", () => {
     expect(route).not.toContain("session.token");
   });
 
-  it("excludes expired sessions from the active-session list", () => {\n    const sessions = readFileSync(\n      resolve(process.cwd(), "packages/db/src/repositories/sessions.ts"),\n      "utf8"\n    );\n\n    expect(sessions).toContain("gt(sessions.expiresAt, new Date())");\n  });\n\n  it("requires the current password before rotating credentials", () => {
+  it("excludes expired sessions from the active-session list", () => {
+    const sessions = readFileSync(
+      resolve(process.cwd(), "packages/db/src/repositories/sessions.ts"),
+      "utf8"
+    );
+
+    expect(sessions).toContain("gt(sessions.expiresAt, new Date())");
+  });
+
+  it("requires the current password before rotating credentials", () => {
     const route = readFileSync(
       resolve(process.cwd(), "apps/web/src/app/api/auth/password/route.ts"),
       "utf8"
