@@ -133,7 +133,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const body = await request.json().catch(() => null);
+    const rateLimit = await consumeRateLimit("follow", user.id);\n    if (!rateLimit.success) {\n      return NextResponse.json({ error: "Too many follow requests. Please try again shortly." }, { status: 429 });\n    }\n\n    const body = await request.json().catch(() => null);
     if (!body || typeof body !== "object" || Array.isArray(body)) {
       return NextResponse.json({ error: "Request body must be an object" }, { status: 400 });
     }
