@@ -9,6 +9,16 @@ import { AppError } from "@nexus/domain";
 const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
 const ALLOWED_BUILD_EXTENSIONS = new Set(["zip", "rar", "7z", "lua"]);
 
+function hasExpectedSignature(extension: string, bytes: Uint8Array): boolean {
+  if (extension === "lua") return true;
+  const signature = Array.from(bytes.slice(0, 6));
+  if (extension === "zip") return signature[0] === 0x50 && signature[1] === 0x4b;
+  if (extension === "rar") {
+    return signature[0] === 0x52 && signature[1] === 0x61 && signature[2] === 0x72 && signature[3] === 0x21;
+  }
+  return signature.join(",") === "55,122,188,175,39,28";
+}
+
 const buildMetadataSchema = z.object({
   version: z
     .string()
@@ -70,8 +80,15 @@ export async function POST(
     }
 
     const { id: productId } = await params;
+    const fileBytes = new Uint8Array(await file.arrayBuffer());
+    if (!hasExpectedSignature(extension, fileBytes)) {
+      return NextResponse.json(
+        { error: "Build content does not match its file extension" },
+        { status: 415 }
+      );
+    }
     const asset = await storageService.uploadAsset({
-      data: new Uint8Array(await file.arrayBuffer()),
+      data: fileBytes,
       fileName: file.name,
       mimeType: file.type || "application/octet-stream",
       userId: user.id,
