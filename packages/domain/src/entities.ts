@@ -370,6 +370,14 @@ export interface Follow {
   createdAt: Date;
 }
 
+export type NotificationCategory =
+  | "follow"
+  | "content"
+  | "server"
+  | "commerce"
+  | "system"
+  | "security";
+
 export interface NotificationPreferences {
   id: string;
   userId: string;
@@ -388,6 +396,7 @@ export interface Notification {
   message: string;
   link?: string;
   type: "system" | "order" | "license" | "content" | "server" | "security";
+  category?: NotificationCategory;
   isRead: boolean;
   createdAt: Date;
 }
