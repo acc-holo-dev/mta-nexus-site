@@ -1,9 +1,63 @@
 import { eq, desc, and } from "drizzle-orm";
 import { db } from "../client";
-import { notifications } from "../schema";
-import type { Notification } from "@nexus/domain";
+import { notificationPreferences, notifications } from "../schema";
+import type { Notification, NotificationPreferences } from "@nexus/domain";
 
 export class NotificationRepository {
+  private defaultPreferences(userId: string): NotificationPreferences {
+    return {
+      id: `npr_${userId}`,
+      userId,
+      followsEnabled: true,
+      contentEnabled: true,
+      serverEnabled: true,
+      commerceEnabled: true,
+      systemEnabled: true,
+      updatedAt: new Date(),
+    };
+  }
+
+  async getPreferences(userId: string): Promise<NotificationPreferences> {
+    const rows = await db
+      .select()
+      .from(notificationPreferences)
+      .where(eq(notificationPreferences.userId, userId))
+      .limit(1);
+    return (rows[0] as unknown as NotificationPreferences) || this.defaultPreferences(userId);
+  }
+
+  async updatePreferences(
+    userId: string,
+    updates: Partial<
+      Pick<
+        NotificationPreferences,
+        "followsEnabled" | "contentEnabled" | "serverEnabled" | "commerceEnabled" | "systemEnabled"
+      >
+    >
+  ): Promise<NotificationPreferences> {
+    const values = {
+      ...this.defaultPreferences(userId),
+      ...updates,
+      updatedAt: new Date(),
+    };
+    const rows = await db
+      .insert(notificationPreferences)
+      .values(values)
+      .onConflictDoUpdate({
+        target: notificationPreferences.userId,
+        set: {
+          followsEnabled: values.followsEnabled,
+          contentEnabled: values.contentEnabled,
+          serverEnabled: values.serverEnabled,
+          commerceEnabled: values.commerceEnabled,
+          systemEnabled: values.systemEnabled,
+          updatedAt: values.updatedAt,
+        },
+      })
+      .returning();
+    return rows[0] as unknown as NotificationPreferences;
+  }
+
   async listByUser(
     recipientId: string,
     limit = 50,
@@ -38,14 +92,34 @@ export class NotificationRepository {
     return rows.length;
   }
 
-  async create(data: Omit<Notification, "createdAt" | "isRead">): Promise<Notification> {
+  async create(
+    data: Omit<Notification, "createdAt" | "isRead">
+  ): Promise<Notification | null> {
+    const preferences = await this.getPreferences(data.recipientId);
+    const preferenceKey =
+      data.type === "order" || data.type === "license"
+        ? "commerceEnabled"
+        : data.type === "content"
+          ? "contentEnabled"
+          : data.type === "server"
+            ? "serverEnabled"
+            : data.type === "system"
+              ? "systemEnabled"
+              : data.type === "security"
+                ? null
+                : "systemEnabled";
+
+    if (preferenceKey && !preferences[preferenceKey]) {
+      return null;
+    }
+
     const values = {
       ...data,
       isRead: false,
       createdAt: new Date(),
     };
 
-        const rows = await db.insert(notifications).values(values).returning();
+    const rows = await db.insert(notifications).values(values).returning();
     return rows[0] as unknown as Notification;
   }
 
