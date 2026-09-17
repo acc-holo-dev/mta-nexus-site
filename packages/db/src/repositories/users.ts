@@ -68,6 +68,15 @@ export class UserRepository {
     return rows[0] ? toPublicUser(rows[0]) : null;
   }
 
+  async updatePassword(id: string, passwordHash: string): Promise<boolean> {
+    const rows = await db
+      .update(users)
+      .set({ passwordHash, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning({ id: users.id });
+    return rows.length > 0;
+  }
+
   async listAll(): Promise<User[]> {
     const rows = await db.select().from(users);
     return rows.map(toPublicUser);
