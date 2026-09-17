@@ -55,7 +55,7 @@ Target:
 | Product vision and daily experience | ADAPT | docs/product | Phase 0 | Rewrite for Nexus naming and current scope |
 | Player-first home feed | ADAPT | apps/web home + activity read model | Phase 1 | Bounded public events only |
 | Server directory and pages | ADAPT | server domain | Phase 1-2 | Preserve private/public boundaries |
-| Heartbeat and status samples | ADAPT | server telemetry | Phase 2 | Add retention and aggregation |
+| Heartbeat and status samples | RETAIN-HISTORICAL | legacy telemetry tables | Deferred | Official MTA master-list is the only live source |
 | Server ownership verification | ADAPT | server access | Phase 2 | Must prove control |
 | Server news and updates | ADAPT | content/server domain | Phase 2 | One source object, multiple surfaces |
 | Server review tokens | ADAPT | server review eligibility | Phase 2 | Short-lived and single-use |
@@ -195,15 +195,15 @@ Acceptance:
 Source lessons:
 
 - legacy server management;
-- integration heartbeat;
+- legacy integration heartbeat (removed from active surface);
 - review-token model.
 
 Nexus work:
 
 - server create;
 - ownership claim;
-- installation credential;
-- heartbeat;
+- historical installation credential;
+- historical heartbeat;
 - public page;
 - follow;
 - update notification;
