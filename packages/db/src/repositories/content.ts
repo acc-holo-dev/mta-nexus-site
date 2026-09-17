@@ -13,6 +13,11 @@ export class ContentRepository {
     return rows as unknown as Content[];
   }
 
+  async findById(id: string): Promise<Content | null> {
+    const rows = await db.select().from(content).where(eq(content.id, id)).limit(1);
+    return (rows[0] as unknown as Content) || null;
+  }
+
   async findBySlug(slug: string): Promise<Content | null> {
         const rows = await db.select().from(content).where(eq(content.slug, slug)).limit(1);
     if (!rows.length) return null;
