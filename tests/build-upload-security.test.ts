@@ -12,5 +12,8 @@ describe("build upload hardening", () => {
     expect(route).toContain("hasExpectedSignature");
     expect(route).toContain("Build content does not match its file extension");
     expect(route).toContain("const fileBytes = new Uint8Array(await file.arrayBuffer())");
+    expect(route).toContain("BUILD_MIME_TYPES");
+    expect(route).toContain("path.basename(file.name)");
+    expect(route).toContain("fileName: safeFileName");
   });
 });
