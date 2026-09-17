@@ -1,5 +1,6 @@
 const MTA_MASTER_URL = "https://master.multitheftauto.com/ase/mta/";
 const CACHE_TTL_MS = 60_000;
+const STALE_CACHE_TTL_MS = 15 * 60_000;
 
 const FLAG = {
   players: 0x0004,
@@ -38,10 +39,12 @@ export type MtaMasterServer = {
 export type MtaMasterDirectory = {
   servers: MtaMasterServer[];
   fetchedAt: string;
+  isStale: boolean;
 };
 
 let cachedDirectory: MtaMasterDirectory | null = null;
 let cacheExpiresAt = 0;
+let staleCacheExpiresAt = 0;
 let pendingDirectory: Promise<MtaMasterDirectory> | null = null;
 
 class MasterListReader {
@@ -105,7 +108,7 @@ class MasterListReader {
   }
 }
 
-function parseExtendedList(data: ArrayBuffer): MtaMasterServer[] {
+export function parseMtaMasterList(data: ArrayBuffer): MtaMasterServer[] {
   const reader = new MasterListReader(data);
   if (reader.remaining < 16 || reader.u16() !== 0 || reader.u16() !== 2) {
     throw new Error("Unsupported MTA master-list format");
@@ -174,27 +177,36 @@ async function requestDirectory(): Promise<MtaMasterDirectory> {
     throw new Error(`MTA master-list request failed with ${response.status}`);
   }
 
-  const servers = parseExtendedList(await response.arrayBuffer())
+  const servers = parseMtaMasterList(await response.arrayBuffer())
     .filter((server) => server.responding !== false)
     .sort((a, b) => (b.players ?? 0) - (a.players ?? 0));
 
-  return { servers, fetchedAt: new Date().toISOString() };
+  return { servers, fetchedAt: new Date().toISOString(), isStale: false };
 }
 
 export const mtaMasterDirectoryService = {
   async getDirectory(): Promise<MtaMasterDirectory> {
     if (cachedDirectory && Date.now() < cacheExpiresAt) return cachedDirectory;
+
     if (!pendingDirectory) {
       pendingDirectory = requestDirectory()
         .then((directory) => {
           cachedDirectory = directory;
           cacheExpiresAt = Date.now() + CACHE_TTL_MS;
+          staleCacheExpiresAt = Date.now() + STALE_CACHE_TTL_MS;
           return directory;
+        })
+        .catch((error) => {
+          if (cachedDirectory && Date.now() < staleCacheExpiresAt) {
+            return { ...cachedDirectory, isStale: true };
+          }
+          throw error;
         })
         .finally(() => {
           pendingDirectory = null;
         });
     }
+
     return pendingDirectory;
   },
 };
