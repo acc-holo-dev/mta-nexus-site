@@ -70,3 +70,6 @@ jobs:
 
       - name: Verify project
         run: pnpm check
+
+      - name: Build production image
+        run: docker build --tag mta-nexus:ci .
