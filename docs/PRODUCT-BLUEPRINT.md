@@ -543,3 +543,11 @@ Vanity metrics вроде общего числа пользователей, п
 ---
 
 **Статус документа:** предложение на утверждение. После подтверждения его стоит перенести в `mta-nexus-site/docs/PRODUCT-BLUEPRINT.md`, связать с `README` и использовать как верхнеуровневый фильтр для следующих implementation plans.
+
+
+## Build trust contract (closed beta)
+
+- Every uploaded build is validated against its declared archive format before it is stored.
+- ZIP, RAR, and 7z uploads must contain their expected magic bytes; Lua resources remain text uploads.
+- A user upload is never marked as cryptographically signed by default. `isSigned` stays false until a separate trusted signing pipeline exists.
+- The closed beta may publish free resources for delivery, but “published” and “signed” are intentionally separate states.
