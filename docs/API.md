@@ -69,7 +69,7 @@ The response also reports whether the directory snapshot is stale.
 ### `GET /api/servers/directory`
 
 Returns a bounded, paginated view of the official MTA master-list. Supported
-query parameters include `page`, `limit`, `query`, and `minPlayers`.
+query parameters include `offset`, `limit`, `query`, and `minPlayers`.
 The endpoint exposes live observations only; editorial server profiles remain
 under `/api/servers`.
 
