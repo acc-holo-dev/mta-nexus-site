@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { commerceService } from "../../../../lib/services/commerce-service";
 import { authService } from "../../../../lib/services/auth-service";
 import { claimResourceSchema } from "@nexus/validation";
-import { getClientIp, rateLimiter } from "@nexus/security";
+import { consumeRateLimit, getClientIp } from "@nexus/security";
 
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request.headers);
-    const rateLimit = await rateLimiter.consume(`resource-claim:${ip}`, 20, 60);
+    const rateLimit = await consumeRateLimit("resourceClaim", ip);
     if (!rateLimit.success) {
       return NextResponse.json(
         { error: "Too many resource claims. Please try again later." },
