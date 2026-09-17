@@ -435,7 +435,26 @@ export const notifications = pgTable("notifications", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// 22. Audit Events
+// 22. Notification Preferences
+export const notificationPreferences = pgTable(
+  "notification_preferences",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .unique()
+      .references(() => users.id, { onDelete: "cascade" }),
+    followsEnabled: boolean("follows_enabled").notNull().default(true),
+    contentEnabled: boolean("content_enabled").notNull().default(true),
+    serverEnabled: boolean("server_enabled").notNull().default(true),
+    commerceEnabled: boolean("commerce_enabled").notNull().default(true),
+    systemEnabled: boolean("system_enabled").notNull().default(true),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex("notification_preferences_user_idx").on(table.userId)]
+);
+
+// 23. Audit Events
 export const auditEvents = pgTable("audit_events", {
   id: text("id").primaryKey(),
   actorId: text("actor_id").notNull(),
@@ -449,7 +468,7 @@ export const auditEvents = pgTable("audit_events", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// 23. Reports
+// 24. Reports
 export const reports = pgTable("reports", {
   id: text("id").primaryKey(),
   reporterId: text("reporter_id")
@@ -466,7 +485,7 @@ export const reports = pgTable("reports", {
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
 });
 
-// 24. Moderation Cases
+// 25. Moderation Cases
 export const moderationCases = pgTable("moderation_cases", {
   id: text("id").primaryKey(),
   reportId: text("report_id").references(() => reports.id, { onDelete: "set null" }),
@@ -480,7 +499,7 @@ export const moderationCases = pgTable("moderation_cases", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// 25. Verification Requests (Trust Layer — admin review workflow)
+// 26. Verification Requests (Trust Layer — admin review workflow)
 export const verificationRequests = pgTable("verification_requests", {
   id: text("id").primaryKey(),
   requesterId: text("requester_id")
@@ -497,7 +516,7 @@ export const verificationRequests = pgTable("verification_requests", {
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
 });
 
-// 26. Server Heartbeats (Telemetry & Analytics Foundation)
+// 27. Server Heartbeats (Telemetry & Analytics Foundation)
 export const serverHeartbeats = pgTable("server_heartbeats", {
   id: text("id").primaryKey(),
   installationId: text("installation_id")
