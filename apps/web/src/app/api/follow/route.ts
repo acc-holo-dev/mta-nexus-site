@@ -13,6 +13,10 @@ import { consumeRateLimit, generateId } from "@nexus/security";
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;
 type TargetType = (typeof ALLOWED_TARGET_TYPES)[number];
 
+function isTargetType(value: unknown): value is TargetType {
+  return typeof value === "string" && ALLOWED_TARGET_TYPES.includes(value as TargetType);
+}
+
 async function targetExists(targetType: TargetType, targetId: string): Promise<boolean> {
   switch (targetType) {
     case "user":
@@ -70,7 +74,7 @@ export async function POST(request: NextRequest) {
       targetId?: unknown;
     };
 
-    if (!ALLOWED_TARGET_TYPES.includes(targetType)) {
+    if (!isTargetType(targetType)) {
       return NextResponse.json(
         { error: `Invalid target type. Allowed: ${ALLOWED_TARGET_TYPES.join(", ")}` },
         { status: 400 }
@@ -81,7 +85,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Target ID required" }, { status: 400 });
     }
 
-    if (!(await targetExists(targetType as TargetType, targetId))) {
+    if (!(await targetExists(targetType, targetId))) {
       return NextResponse.json({ error: "Target does not exist" }, { status: 404 });
     }
 
@@ -138,8 +142,11 @@ export async function DELETE(request: NextRequest) {
       targetId?: unknown;
     };
 
-    if (!ALLOWED_TARGET_TYPES.includes(targetType)) {
+    if (!isTargetType(targetType)) {
       return NextResponse.json({ error: "Invalid target type" }, { status: 400 });
+    }
+    if (typeof targetId !== "string" || targetId.length === 0) {
+      return NextResponse.json({ error: "Target ID required" }, { status: 400 });
     }
 
     await socialRepository.unfollow(user.id, targetType, targetId);
