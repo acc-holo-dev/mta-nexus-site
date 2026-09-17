@@ -31,6 +31,7 @@ export function MtaMasterServerDirectory({ directory }: Props) {
           <h2 className="text-lg font-bold text-white">MTA Network</h2>
           <p className="text-xs text-neutral-400 mt-1">
             {directory.servers.length.toLocaleString()} public servers · updated {new Date(directory.fetchedAt).toLocaleTimeString()}
+            {directory.isStale ? " · showing the latest available snapshot" : ""}
           </p>
         </div>
         <label className="relative w-full md:w-80">
