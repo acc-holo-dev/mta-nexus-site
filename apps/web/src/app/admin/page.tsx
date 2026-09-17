@@ -1,6 +1,6 @@
 ﻿import { cookies } from "next/headers";
 import Link from "next/link";
-import { userRepository, verificationRepository } from "@nexus/db";
+import { buildRepository, verificationRepository } from "@nexus/db";
 import { authService } from "../../lib/services/auth-service";
 import { adminService } from "../../lib/services/admin-service";
 import { can } from "@nexus/security";
@@ -22,6 +22,7 @@ import {
   ShoppingBag,
   AlertTriangle,
   BadgeCheck,
+  PackageCheck,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -58,6 +59,7 @@ export default async function AdminPage() {
   const auditLogs = await adminService.listAuditLogs(adminUser);
   const verificationRequests = await verificationRepository.listAll();
   const pendingVerifications = verificationRequests.filter((v) => v.status === "pending");
+  const pendingBuilds = await buildRepository.listPendingReview();
 
   return (
     <div className="space-y-8">
@@ -122,6 +124,45 @@ export default async function AdminPage() {
           ) : (
             <div className="py-6 text-center nexus-panel">
               <p className="font-caption text-muted">No verification requests submitted.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Resource Build Queue */}
+      <section>
+        <SectionHeader
+          title="Resource Build Queue"
+          description={`${pendingBuilds.length} build${pendingBuilds.length === 1 ? "" : "s"} awaiting review`}
+          action={<PackageCheck className="w-4 h-4 text-amber-400" />}
+        />
+        <div className="space-y-2.5">
+          {pendingBuilds.length > 0 ? (
+            pendingBuilds.map((build) => (
+              <div key={build.id} className="nexus-panel p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-warning-soft text-warning">
+                      pending review
+                    </span>
+                    <span className="text-xs font-heading text-primary font-code truncate">
+                      {build.fileName} · v{build.version}
+                    </span>
+                  </div>
+                  <p className="font-caption text-muted">
+                    Resource {build.productId} • {(build.fileSizeBytes / 1024 / 1024).toFixed(1)} MB
+                  </p>
+                  <p className="font-caption text-faint">
+                    Scan: {build.scanStatus.replace(/_/g, " ")} · SHA-256 {build.sha256Hash.slice(0, 16)}…
+                  </p>
+                  {build.releaseNotes && <p className="font-caption text-faint">{build.releaseNotes}</p>}
+                </div>
+                <StatusBadge status={build.scanStatus} tone={build.scanStatus === "malicious" ? "danger" : "warning"} />
+              </div>
+            ))
+          ) : (
+            <div className="py-6 text-center nexus-panel">
+              <p className="font-caption text-muted">No resource builds are waiting for review.</p>
             </div>
           )}
         </div>
