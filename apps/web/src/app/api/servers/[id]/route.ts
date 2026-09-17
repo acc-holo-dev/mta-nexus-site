@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";
 import { serverService } from "../../../../lib/services/server-service";
-import { rateLimiter } from "@nexus/security";
+import { consumeRateLimit } from "@nexus/security";
 
 const serverUpdateSchema = z
   .object({
@@ -27,7 +27,7 @@ export async function PATCH(
     const user = await authService.getSession(token);
     if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
-    const rateLimit = await rateLimiter.consume("server-update:" + user.id, 30, 3600);
+    const rateLimit = await consumeRateLimit("serverMutation", user.id);
     if (!rateLimit.success) {
       return NextResponse.json({ error: "Server update limit exceeded" }, { status: 429 });
     }
