@@ -12,6 +12,7 @@ describe("free resource delivery lifecycle", () => {
   let author: User;
   let player: User;
   let product: Product;
+  let moderator: User;
   let storageKey: string | undefined;
 
   beforeAll(async () => {
@@ -28,6 +29,14 @@ describe("free resource delivery lifecycle", () => {
       username: `delivery_player_${suffix}`,
       displayName: "Delivery Player",
       role: "user",
+    });
+
+    moderator = await userRepository.create({
+      id: `usr_delivery_moderator_${suffix}`,
+      email: `delivery_moderator_${suffix}@nexus.test`,
+      username: `delivery_moderator_${suffix}`,
+      displayName: "Delivery Moderator",
+      role: "moderator",
     });
 
     product = await productService.createProduct(
@@ -80,8 +89,14 @@ describe("free resource delivery lifecycle", () => {
       },
       author
     );
-    expect(build.status).toBe("published");
+    expect(build.status).toBe("pending_review");
     expect(build.isSigned).toBe(false);
+
+    const approved = await productService.reviewBuild(
+      { buildId: build.id, decision: "approve", notes: "Archive verified for closed beta" },
+      moderator
+    );
+    expect(approved.status).toBe("published");
 
     const publishedBuilds = await buildRepository.listByProduct(product.id);
     expect(publishedBuilds.some((candidate) => candidate.id === build.id)).toBe(true);
