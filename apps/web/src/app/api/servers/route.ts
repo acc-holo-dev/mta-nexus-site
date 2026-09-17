@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { serverService } from "../../../lib/services/server-service";
 import { authService } from "../../../lib/services/auth-service";
 import { createServerSchema } from "@nexus/validation";
-import { consumeRateLimit, getClientIp } from "@nexus/security";\nimport { matchesMtaEndpoint, mtaMasterDirectoryService, type MtaMasterServer } from "../../../lib/services/mta-master-directory-service";
+import { consumeRateLimit, getClientIp } from "@nexus/security";
+import { matchesMtaEndpoint, mtaMasterDirectoryService, type MtaMasterServer } from "../../../lib/services/mta-master-directory-service";
 
 export async function GET() {
   const servers = await serverService.listServers();
