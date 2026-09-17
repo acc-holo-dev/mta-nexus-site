@@ -7,8 +7,8 @@ The product answers one primary question: **what is happening in MTA right now?*
 ## Current closed-beta scope
 
 - PostgreSQL-backed registration, login, sessions, and authorization
-- live server directory driven by authenticated heartbeat telemetry
-- owner-scoped server registration and one-time installation API keys
+- live server directory driven by the official MTA master-list
+- owner-scoped editorial server profiles and verification workflow (no server agent required)
 - free resource creation, private build storage, SHA-256 integrity, library claims, and entitlement-gated binary downloads
 - articles, profiles, follows, notifications, reports, and moderation foundations
 - fail-closed production configuration
@@ -21,6 +21,7 @@ The product answers one primary question: **what is happening in MTA right now?*
 - production email until SMTP is configured
 - multi-instance rate limiting
 - malware scanning of uploaded archives
+- MTA server-side installation, heartbeat agents, or runtime scripts
 
 ## Stack
 
