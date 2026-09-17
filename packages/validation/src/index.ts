@@ -35,6 +35,19 @@ export const changePasswordSchema = z
     }
   });
 
+export const notificationPreferencesSchema = z
+  .object({
+    followsEnabled: z.boolean().optional(),
+    contentEnabled: z.boolean().optional(),
+    serverEnabled: z.boolean().optional(),
+    commerceEnabled: z.boolean().optional(),
+    systemEnabled: z.boolean().optional(),
+  })
+  .strict()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: "At least one notification preference is required",
+  });
+
 export const updateProfileSchema = z.object({
   displayName: z.string().min(2).max(50).optional(),
   bio: z.string().max(500).optional(),
