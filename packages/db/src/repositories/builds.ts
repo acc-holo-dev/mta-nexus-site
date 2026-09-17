@@ -13,6 +13,16 @@ export class BuildRepository {
     return rows as unknown as Build[];
   }
 
+  async findById(id: string): Promise<Build | null> {
+    const rows = await db.select().from(builds).where(eq(builds.id, id)).limit(1);
+    return (rows[0] as unknown as Build) || null;
+  }
+
+  async updateStatus(id: string, status: Build["status"]): Promise<Build | null> {
+    const rows = await db.update(builds).set({ status }).where(eq(builds.id, id)).returning();
+    return (rows[0] as unknown as Build) || null;
+  }
+
   async create(data: Omit<Build, "createdAt">): Promise<Build> {
     const values = {
       ...data,
