@@ -56,7 +56,8 @@ export default async function AdminPage() {
   const adminUser = currentUser;
   const health = await adminService.getSystemHealthMetrics(adminUser);
   const reports = await adminService.listReports(adminUser);
-  const auditLogs = await adminService.listAuditLogs(adminUser);
+  const canViewAudit = can(adminUser, "admin.audit");
+  const auditLogs = canViewAudit ? await adminService.listAuditLogs(adminUser) : [];
   const verificationRequests = await verificationRepository.listAll();
   const pendingVerifications = verificationRequests.filter((v) => v.status === "pending");
   const pendingBuilds = await buildRepository.listPendingReview();
@@ -205,35 +206,37 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      {/* Audit Trail */}
-      <section>
-        <SectionHeader
-          title="Security Audit Log"
-          description="Most recent platform events"
-        />
-        <div className="nexus-panel p-4">
-          <DataTable>
-            <DataTableHeader columns={["Timestamp", "Actor", "Action", "Target", "IP"]} />
-            <DataTableBody>
-              {auditLogs.length > 0 ? (
-                auditLogs.map((log) => (
-                  <tr key={log.id}>
-                    <td className="py-2.5 pr-4 text-faint">
-                      {new Date(log.createdAt).toISOString()}
-                    </td>
-                    <td className="pr-4 text-purple">{log.actorId}</td>
-                    <td className="pr-4 text-primary font-semibold">{log.action}</td>
-                    <td className="pr-4 text-muted">{log.targetType}:{log.targetId}</td>
-                    <td className="text-right text-faint">{log.ipAddress || "internal"}</td>
-                  </tr>
-                ))
-              ) : (
-                <DataTableEmpty colSpan={5} message="No audit events recorded." />
-              )}
-            </DataTableBody>
-          </DataTable>
-        </div>
-      </section>
+      {/* Audit Trail — reserved for administrators because it can contain sensitive security context */}
+      {canViewAudit && (
+        <section>
+          <SectionHeader
+            title="Security Audit Log"
+            description="Most recent platform events"
+          />
+          <div className="nexus-panel p-4">
+            <DataTable>
+              <DataTableHeader columns={["Timestamp", "Actor", "Action", "Target", "IP"]} />
+              <DataTableBody>
+                {auditLogs.length > 0 ? (
+                  auditLogs.map((log) => (
+                    <tr key={log.id}>
+                      <td className="py-2.5 pr-4 text-faint">
+                        {new Date(log.createdAt).toISOString()}
+                      </td>
+                      <td className="pr-4 text-purple">{log.actorId}</td>
+                      <td className="pr-4 text-primary font-semibold">{log.action}</td>
+                      <td className="pr-4 text-muted">{log.targetType}:{log.targetId}</td>
+                      <td className="text-right text-faint">{log.ipAddress || "internal"}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <DataTableEmpty colSpan={5} message="No audit events recorded." />
+                )}
+              </DataTableBody>
+            </DataTable>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
