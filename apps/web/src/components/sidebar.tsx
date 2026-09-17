@@ -17,6 +17,7 @@ import {
   ChevronRight,
   ShieldAlert,
   BadgeCheck,
+  Settings,
 } from "lucide-react";
 
 const PRIMARY_NAV = [
@@ -33,6 +34,7 @@ const WORKSPACE_NAV = [
   { href: "/workspace/servers/new", label: "Register Server", icon: Server },
   { href: "/workspace/saved", label: "Saved", icon: Bookmark },
   { href: "/notifications", label: "Notifications", icon: Bell },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar({
