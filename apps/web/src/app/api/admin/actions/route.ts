@@ -8,7 +8,7 @@ import {
   auditRepository,
   verificationRepository,
 } from "@nexus/db";
-import { can, generateId, rateLimiter } from "@nexus/security";
+import { can, consumeRateLimit, generateId } from "@nexus/security";
 
 const adminActionSchema = z.discriminatedUnion("targetType", [
   z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional() }),
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Admin actions are rate limited
-    const rl = await rateLimiter.consume(`admin-action:${user.id}`, 60, 60);
+    const rl = await consumeRateLimit("moderationAction", user.id);
     if (!rl.success) {
       return NextResponse.json({ error: "Too many admin actions" }, { status: 429 });
     }
