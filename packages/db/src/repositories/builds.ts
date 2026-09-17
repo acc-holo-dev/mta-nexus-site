@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { and, eq, desc } from "drizzle-orm";
 import { db } from "../client";
 import { builds } from "../schema";
 import type { Build } from "@nexus/domain";
@@ -9,6 +9,15 @@ export class BuildRepository {
       .select()
       .from(builds)
       .where(eq(builds.productId, productId))
+      .orderBy(desc(builds.createdAt));
+    return rows as unknown as Build[];
+  }
+
+  async listPublishedByProduct(productId: string): Promise<Build[]> {
+    const rows = await db
+      .select()
+      .from(builds)
+      .where(and(eq(builds.productId, productId), eq(builds.status, "published")))
       .orderBy(desc(builds.createdAt));
     return rows as unknown as Build[];
   }
