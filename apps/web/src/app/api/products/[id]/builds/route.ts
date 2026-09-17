@@ -1,3 +1,4 @@
+import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { productService } from "../../../../../lib/services/product-service";
@@ -8,6 +9,12 @@ import { AppError } from "@nexus/domain";
 
 const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
 const ALLOWED_BUILD_EXTENSIONS = new Set(["zip", "rar", "7z", "lua"]);
+const BUILD_MIME_TYPES: Record<string, string> = {
+  zip: "application/zip",
+  rar: "application/vnd.rar",
+  "7z": "application/x-7z-compressed",
+  lua: "text/plain; charset=utf-8",
+};
 
 function hasExpectedSignature(extension: string, bytes: Uint8Array): boolean {
   if (extension === "lua") return true;
@@ -79,6 +86,11 @@ export async function POST(
       );
     }
 
+    const safeFileName = path.basename(file.name).replace(/[^a-zA-Z0-9._-]/g, "_");
+    if (!safeFileName) {
+      return NextResponse.json({ error: "A valid build file name is required" }, { status: 400 });
+    }
+
     const { id: productId } = await params;
     const fileBytes = new Uint8Array(await file.arrayBuffer());
     if (!hasExpectedSignature(extension, fileBytes)) {
@@ -89,8 +101,8 @@ export async function POST(
     }
     const asset = await storageService.uploadAsset({
       data: fileBytes,
-      fileName: file.name,
-      mimeType: file.type || "application/octet-stream",
+      fileName: safeFileName,
+      mimeType: BUILD_MIME_TYPES[extension],
       userId: user.id,
       isPrivate: true,
     });
@@ -104,6 +116,8 @@ export async function POST(
           storageKey: asset.key,
           sha256Hash: asset.sha256Hash,
           fileSizeBytes: asset.sizeBytes,
+          fileName: safeFileName,
+          mimeType: BUILD_MIME_TYPES[extension],
         },
         user
       );
