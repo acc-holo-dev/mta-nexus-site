@@ -145,7 +145,7 @@ export function parseMtaMasterList(data: ArrayBuffer): MtaMasterServer[] {
     const entryStart = reader.position;
     const entryLength = reader.u16();
     const entryEnd = entryStart + entryLength;
-    if (entryLength < 6 || entryEnd > data.byteLength) {
+    if (entryLength < 8 || entryEnd > data.byteLength) {
       throw new Error("Invalid MTA master-list entry length");
     }
 
