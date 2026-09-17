@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { loginSchema } from "@nexus/validation";
-import { getClientIp, rateLimiter } from "@nexus/security";
+import { consumeRateLimit, getClientIp } from "@nexus/security";
 import { AppError } from "@nexus/domain";
 
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request.headers);
-    const rl = await rateLimiter.consume(`login:${ip}`, 8, 300);
+    const rl = await consumeRateLimit("authLogin", ip);
     if (!rl.success) {
       return NextResponse.json(
         { error: "Too many login attempts. Please try again in a few minutes." },
