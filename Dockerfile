@@ -1,6 +1,14 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 RUN corepack enable
+ENV NODE_ENV=production \
+    NEXT_PUBLIC_APP_URL=https://nexus-mta.com \
+    DATABASE_URL=postgres://nexus:build-only@127.0.0.1:5432/mta_nexus \
+    AUTH_SECRET=build-only-secret-that-is-long-enough-for-validation \
+    STORAGE_PROVIDER=local \
+    STORAGE_LOCAL_PATH=/data/uploads \
+    EMAIL_PROVIDER=disabled \
+    SMTP_FROM=no-reply@nexus-mta.com
 COPY . .
 RUN pnpm install --frozen-lockfile
 RUN pnpm build
