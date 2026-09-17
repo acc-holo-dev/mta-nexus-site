@@ -8,6 +8,7 @@ export const RATE_LIMIT_POLICIES = {
   follow: { limit: 30, windowSeconds: 60 },
   report: { limit: 10, windowSeconds: 3600 },
   sessionManagement: { limit: 20, windowSeconds: 300 },
+  passwordChange: { limit: 5, windowSeconds: 3600 },
 } as const;
 
 export type RateLimitPolicy = keyof typeof RATE_LIMIT_POLICIES;
