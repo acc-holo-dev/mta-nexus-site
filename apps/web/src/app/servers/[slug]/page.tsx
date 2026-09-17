@@ -7,7 +7,6 @@ import { Cpu, ShieldCheck, Users } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-const HEARTBEAT_FRESHNESS_MS = 3 * 60 * 1000;
 
 export async function generateMetadata({
   params,
