@@ -1,4 +1,3 @@
-import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
@@ -9,7 +8,7 @@ import {
   userRepository,
   verificationRepository,
 } from "@nexus/db";
-import { rateLimiter } from "@nexus/security";
+import { generateId, rateLimiter } from "@nexus/security";
 import { z } from "zod";
 
 const verificationRequestSchema = z.object({
@@ -81,7 +80,10 @@ export async function POST(request: NextRequest) {
       }
       const memberships = await organizationRepository.listUserMemberships(user.id);
       const membership = memberships.find((candidate) => candidate.organizationId === organization.id);
-      if (organization.ownerId !== user.id && !membership) {
+      if (
+        organization.ownerId !== user.id &&
+        (!membership || (membership.role !== "owner" && membership.role !== "admin"))
+      ) {
         return NextResponse.json({ error: "You do not manage this organization" }, { status: 403 });
       }
       targetIsVerified = organization.isVerified;
@@ -112,7 +114,7 @@ export async function POST(request: NextRequest) {
     });
 
     await auditRepository.record({
-      id: crypto.randomUUID(),
+      id: generateId("aud"),
       actorId: user.id,
       actorType: "user",
       action: "verification.requested",
@@ -127,7 +129,7 @@ export async function POST(request: NextRequest) {
     await Promise.all(
       moderators.map((moderator) =>
         notificationRepository.create({
-          id: crypto.randomUUID(),
+          id: generateId("not"),
           recipientId: moderator.id,
           title: "New verification request",
           message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
