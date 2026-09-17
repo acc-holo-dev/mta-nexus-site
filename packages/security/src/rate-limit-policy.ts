@@ -14,7 +14,8 @@ export const RATE_LIMIT_POLICIES = {
   verification: { limit: 3, windowSeconds: 86400 },
   moderationAction: { limit: 60, windowSeconds: 60 },
   serverMutation: { limit: 20, windowSeconds: 3600 },
-  contentCreation: { limit: 20, windowSeconds: 3600 },\n  reviewSubmission: { limit: 5, windowSeconds: 300 },
+  contentCreation: { limit: 20, windowSeconds: 3600 },
+  reviewSubmission: { limit: 5, windowSeconds: 300 },
 } as const;
 
 export type RateLimitPolicy = keyof typeof RATE_LIMIT_POLICIES;
