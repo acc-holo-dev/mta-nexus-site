@@ -10,11 +10,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401 });
   }
 
-  const sessions = await authService.listSessions(user.id);
+  const [sessions, currentSessionId] = await Promise.all([
+    authService.listSessions(user.id),
+    authService.getCurrentSessionId(token),
+  ]);
   return NextResponse.json(
     { sessions: sessions.map((session) => ({
       ...session,
-      isCurrent: session.id === await authService.getCurrentSessionId(token),
+      isCurrent: session.id === currentSessionId,
     })) },
     { headers: { "Cache-Control": "private, no-store" } }
   );
