@@ -55,7 +55,7 @@ Let a player safely claim and download free MTA resources while keeping the syst
 - [x] Keep uploaded builds unsigned until a real signing pipeline exists.
 - [x] Restrict downloads to the author, administrators or valid entitlement holders.
 - [ ] Add a distinct build review state and moderator approval path.
-- [ ] Preserve original build filename and media type as trusted metadata.
+- [x] Preserve sanitized build filename and server-derived media type as trusted metadata.
 - [x] Add deterministic build retirement semantics with owner/admin authorization and audit records.
 - [ ] Add safe antivirus/scanner adapter contract; keep it disabled until infrastructure exists.
 - [ ] Add resource compatibility validation and dependency declarations.
