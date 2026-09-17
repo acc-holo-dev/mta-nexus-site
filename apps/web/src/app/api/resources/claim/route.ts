@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const parsed = claimResourceSchema.safeParse(await request.json());
+    const parsed = claimResourceSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid resource claim", details: parsed.error.format() },
