@@ -77,7 +77,11 @@ export class SessionRepository {
       .from(sessions)
       .where(eq(sessions.userId, userId))
       .orderBy(desc(sessions.createdAt));
-    return rows as Array<Omit<SessionRecord, "token">>;
+    return rows.map((row) => ({
+      ...row,
+      ipAddress: row.ipAddress ?? undefined,
+      userAgent: row.userAgent ?? undefined,
+    }));
   }
 
   async deleteById(id: string, userId: string): Promise<boolean> {
