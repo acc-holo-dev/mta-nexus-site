@@ -20,6 +20,21 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required").max(128),
+    newPassword: z.string().min(8, "Password must be at least 8 characters").max(128),
+  })
+  .superRefine((value, context) => {
+    if (value.currentPassword === value.newPassword) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["newPassword"],
+        message: "New password must be different from the current password",
+      });
+    }
+  });
+
 export const updateProfileSchema = z.object({
   displayName: z.string().min(2).max(50).optional(),
   bio: z.string().max(500).optional(),
