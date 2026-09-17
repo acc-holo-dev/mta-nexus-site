@@ -14,7 +14,7 @@ describe("resource build lifecycle", () => {
     );
 
     expect(service).toContain('async retireBuild(');
-    expect(service).toContain('status: "retired"');
+    expect(service).toContain('updateStatus(build.id, "retired")');
     expect(service).toContain('{ status: "draft" }');
     expect(service).toContain('action: "build.retired"');
     expect(route).toContain('action: z.literal("retire")');
