@@ -9,11 +9,12 @@ describe("community content API", () => {
       "utf8"
     );
 
-    expect(route).toContain("contentRepository.listPublished()");
+    expect(route).toContain("contentRepository.listPublished(limit)");
     expect(route).toContain('consumeRateLimit("contentCreation", user.id)');
     expect(route).toContain(': "draft";');
     expect(route).toContain('can(user, "admin.moderation")');
     expect(route).toContain("Linked server");
+    expect(route).toContain("stale-while-revalidate=120");
     expect(route).toContain("organizationRepository.listUserMemberships(user.id)");
   });
 });
