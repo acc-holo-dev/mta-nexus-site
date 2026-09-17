@@ -1,4 +1,4 @@
-import { productRepository, buildRepository, auditRepository } from "@nexus/db";
+import { productRepository, buildRepository, auditRepository, organizationRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Product, Build, User, ProductType } from "@nexus/domain";
@@ -55,6 +55,23 @@ export class ProductService {
 
     if (!can(actor, "product.create")) {
       throw new ForbiddenError("You must have developer privileges to create products");
+    }
+
+    if (input.organizationId) {
+      const organization = await organizationRepository.findById(input.organizationId);
+      if (!organization) throw new NotFoundError("Organization", input.organizationId);
+
+      const memberships = await organizationRepository.listUserMemberships(actor.id);
+      const membership = memberships.find((item) => item.organizationId === input.organizationId);
+      const canManageOrganization =
+        organization.ownerId === actor.id ||
+        membership?.role === "owner" ||
+        membership?.role === "admin" ||
+        membership?.role === "developer";
+
+      if (!canManageOrganization) {
+        throw new ForbiddenError("You do not manage this organization");
+      }
     }
 
     const id = generateId("prd");
