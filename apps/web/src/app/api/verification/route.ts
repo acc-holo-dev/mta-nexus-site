@@ -1,6 +1,14 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
-import { verificationRepository } from "@nexus/db";
+import {
+  auditRepository,
+  notificationRepository,
+  organizationRepository,
+  serverRepository,
+  userRepository,
+  verificationRepository,
+} from "@nexus/db";
 import { rateLimiter } from "@nexus/security";
 import { z } from "zod";
 
@@ -51,6 +59,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let targetIsVerified = false;
+    if (parsed.data.targetType === "user" || parsed.data.targetType === "developer") {
+      if (parsed.data.targetId !== user.id) {
+        return NextResponse.json({ error: "You can only verify your own profile" }, { status: 403 });
+      }
+      targetIsVerified = user.isVerified;
+    } else if (parsed.data.targetType === "server") {
+      const server = await serverRepository.findById(parsed.data.targetId);
+      if (!server) {
+        return NextResponse.json({ error: "Server was not found" }, { status: 404 });
+      }
+      if (server.ownerId !== user.id) {
+        return NextResponse.json({ error: "You do not own this server" }, { status: 403 });
+      }
+      targetIsVerified = server.isVerified;
+    } else {
+      const organization = await organizationRepository.findById(parsed.data.targetId);
+      if (!organization) {
+        return NextResponse.json({ error: "Organization was not found" }, { status: 404 });
+      }
+      const memberships = await organizationRepository.listUserMemberships(user.id);
+      const membership = memberships.find((candidate) => candidate.organizationId === organization.id);
+      if (organization.ownerId !== user.id && !membership) {
+        return NextResponse.json({ error: "You do not manage this organization" }, { status: 403 });
+      }
+      targetIsVerified = organization.isVerified;
+    }
+
+    if (targetIsVerified) {
+      return NextResponse.json({ error: "This target is already verified" }, { status: 409 });
+    }
+
+    const duplicate = await verificationRepository.findPendingForTarget(
+      user.id,
+      parsed.data.targetType,
+      parsed.data.targetId
+    );
+    if (duplicate) {
+      return NextResponse.json(
+        { error: "A verification request is already pending", requestId: duplicate.id },
+        { status: 409 }
+      );
+    }
+
     const verificationRequest = await verificationRepository.createRequest({
       requesterId: user.id,
       targetType: parsed.data.targetType,
@@ -58,6 +110,32 @@ export async function POST(request: NextRequest) {
       proofUrl: parsed.data.proofUrl || undefined,
       notes: parsed.data.notes,
     });
+
+    await auditRepository.record({
+      id: crypto.randomUUID(),
+      actorId: user.id,
+      actorType: "user",
+      action: "verification.requested",
+      targetId: verificationRequest.id,
+      targetType: "verification",
+      details: { targetType: parsed.data.targetType, targetId: parsed.data.targetId },
+    });
+
+    const moderators = (await userRepository.listAll()).filter(
+      (candidate) => candidate.role === "moderator" || candidate.role === "admin"
+    );
+    await Promise.all(
+      moderators.map((moderator) =>
+        notificationRepository.create({
+          id: crypto.randomUUID(),
+          recipientId: moderator.id,
+          title: "New verification request",
+          message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
+          link: "/admin",
+          type: "security",
+        })
+      )
+    );
 
     return NextResponse.json({ success: true, request: verificationRequest }, { status: 201 });
   } catch (error: unknown) {
