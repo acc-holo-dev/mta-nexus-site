@@ -14,5 +14,6 @@ describe("community content API", () => {
     expect(route).toContain(': "draft";');
     expect(route).toContain('can(user, "admin.moderation")');
     expect(route).toContain("Linked server");
+    expect(route).toContain("organizationRepository.listUserMemberships(user.id)");
   });
 });
