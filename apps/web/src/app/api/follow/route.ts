@@ -101,6 +101,7 @@ export async function POST(request: NextRequest) {
         title: "New Follower",
         message: `@${user.username} started following your activity.`,
         type: "system",
+        category: "follow",
         link: `/users/${user.username}`,
       });
     }
