@@ -78,7 +78,7 @@ Replace role-string assumptions with durable, auditable authorization decisions.
 
 - [x] Introduce a capability matrix for player, developer, server owner, moderator and administrator contexts.
 - Add owner-context switching only where an organization relationship permits it.
-- Complete verification request workflow with evidence metadata, reviewer notes and immutable audit events.
+- [x] Complete verification request workflow with ownership checks, duplicate protection, reviewer notes, audit events and moderator notifications.
 - Add rate limits per risk category: authentication, resource upload, content creation, follow, report and download.
 - [x] Add abuse-report entities, validation, moderator notifications and a queue.
 - Add notification preferences and privacy-safe profile controls.
