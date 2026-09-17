@@ -13,6 +13,11 @@ describe("risk-based rate limit policy", () => {
       "sessionManagement",
       "passwordChange",
       "notificationMutation",
+      "resourceClaim",
+      "verification",
+      "moderationAction",
+      "serverMutation",
+      "contentCreation",
     ]);
 
     for (const policy of Object.values(RATE_LIMIT_POLICIES)) {
@@ -28,5 +33,10 @@ describe("risk-based rate limit policy", () => {
     expect(getRateLimitPolicy("sessionManagement")).toEqual({ limit: 20, windowSeconds: 300 });
     expect(getRateLimitPolicy("passwordChange")).toEqual({ limit: 5, windowSeconds: 3600 });
     expect(getRateLimitPolicy("notificationMutation")).toEqual({ limit: 30, windowSeconds: 60 });
+    expect(getRateLimitPolicy("resourceClaim")).toEqual({ limit: 20, windowSeconds: 60 });
+    expect(getRateLimitPolicy("verification")).toEqual({ limit: 3, windowSeconds: 86400 });
+    expect(getRateLimitPolicy("moderationAction")).toEqual({ limit: 60, windowSeconds: 60 });
+    expect(getRateLimitPolicy("serverMutation")).toEqual({ limit: 20, windowSeconds: 3600 });
+    expect(getRateLimitPolicy("contentCreation")).toEqual({ limit: 20, windowSeconds: 3600 });
   });
 });
