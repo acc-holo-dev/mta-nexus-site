@@ -55,6 +55,15 @@ All other sessions are revoked. Password changes are audited and rate limited.
 }
 ```
 
+## Server profiles and live state
+
+### `GET /api/servers`
+
+Returns active editorial server profiles. Each profile includes an explicit
+`liveObservation` (or `null`) and `liveStatus` (`online`, `offline` or
+`unknown`) matched to the official MTA master-list by normalized address/port.
+The response also reports whether the directory snapshot is stale.
+
 ## Live MTA directory
 
 ### `GET /api/servers/directory`
