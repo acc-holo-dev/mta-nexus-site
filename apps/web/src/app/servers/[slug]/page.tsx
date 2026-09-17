@@ -2,7 +2,10 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { serverService } from "../../../lib/services/server-service";
-import { mtaMasterDirectoryService } from "../../../lib/services/mta-master-directory-service";
+import {
+  matchesMtaEndpoint,
+  mtaMasterDirectoryService,
+} from "../../../lib/services/mta-master-directory-service";
 import { Cpu, ShieldCheck, Users } from "lucide-react";
 
 export const dynamic = "force-dynamic";
