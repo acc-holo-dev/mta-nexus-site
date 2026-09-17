@@ -4,6 +4,7 @@ import {
   createProductSchema,
   checkoutSchema,
   changePasswordSchema,
+  notificationPreferencesSchema,
 } from "@nexus/validation";
 
 describe("Validation Schemas", () => {
@@ -71,6 +72,12 @@ describe("Validation Schemas", () => {
       currentPassword: "same-password",
       newPassword: "same-password",
     }).success).toBe(false);
+  });
+
+  it("should validate partial notification preference updates", () => {
+    expect(notificationPreferencesSchema.safeParse({ followsEnabled: false }).success).toBe(true);
+    expect(notificationPreferencesSchema.safeParse({ followsEnabled: "false" }).success).toBe(false);
+    expect(notificationPreferencesSchema.safeParse({}).success).toBe(false);
   });
 
   it("should require at least one item for checkout", () => {
