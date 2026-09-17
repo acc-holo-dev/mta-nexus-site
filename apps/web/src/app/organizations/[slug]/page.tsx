@@ -30,7 +30,7 @@ export default async function OrganizationProfilePage({
     notFound();
   }
 
-  const [allProducts, allServers, allArticles] = await Promise.all([
+  const [allProducts, allArticles] = await Promise.all([
     productRepository.list(),
     contentRepository.listPublished(),
   ]);
