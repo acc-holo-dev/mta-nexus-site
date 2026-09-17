@@ -10,6 +10,7 @@ describe("risk-based rate limit policy", () => {
       "download",
       "follow",
       "report",
+      "sessionManagement",
     ]);
 
     for (const policy of Object.values(RATE_LIMIT_POLICIES)) {
@@ -22,5 +23,6 @@ describe("risk-based rate limit policy", () => {
     expect(getRateLimitPolicy("download")).toEqual({ limit: 30, windowSeconds: 60 });
     expect(getRateLimitPolicy("report")).toEqual({ limit: 10, windowSeconds: 3600 });
     expect(getRateLimitPolicy("follow")).toEqual({ limit: 30, windowSeconds: 60 });
+    expect(getRateLimitPolicy("sessionManagement")).toEqual({ limit: 20, windowSeconds: 300 });
   });
 });
