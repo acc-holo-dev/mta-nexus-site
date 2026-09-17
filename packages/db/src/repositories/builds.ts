@@ -13,6 +13,16 @@ export class BuildRepository {
     return rows as unknown as Build[];
   }
 
+  async listPendingReview(limit = 100): Promise<Build[]> {
+    const rows = await db
+      .select()
+      .from(builds)
+      .where(eq(builds.status, "pending_review"))
+      .orderBy(desc(builds.createdAt))
+      .limit(limit);
+    return rows as unknown as Build[];
+  }
+
   async listPublishedByProduct(productId: string): Promise<Build[]> {
     const rows = await db
       .select()
