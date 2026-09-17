@@ -27,6 +27,13 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function formatScanStatus(status: string): string {
+  if (status === "clean") return "Scan: clean";
+  if (status === "not_scanned") return "Scan: manual review required";
+  if (status === "error") return "Scan: unavailable";
+  return "Scan: blocked";
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -192,6 +199,7 @@ export default async function ProductDetailPage({
                       <span className="truncate" title={b.fileName}>File: {b.fileName}</span>
                       <span>Size: {formatFileSize(b.fileSizeBytes)}</span>
                       <span>{b.isSigned ? "Signature: present" : "Signature: not available"}</span>
+                      <span>{formatScanStatus(b.scanStatus)}</span>
                     </div>
                     {b.releaseNotes && (
                       <div className="text-xs text-neutral-300 whitespace-pre-line font-mono bg-black/40 p-2.5 rounded border border-neutral-800">
