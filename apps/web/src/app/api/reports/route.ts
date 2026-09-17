@@ -10,7 +10,7 @@ import {
   userRepository,
 } from "@nexus/db";
 import { createReportSchema } from "@nexus/validation";
-import { generateId, can, rateLimiter } from "@nexus/security";
+import { generateId, can, consumeRateLimit } from "@nexus/security";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("nexus_session")?.value;
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Abuse protection: limit report spam per user
-    const rl = await rateLimiter.consume(`report:${user.id}`, 10, 3600);
+    const rl = await consumeRateLimit("report", user.id);
     if (!rl.success) {
       return NextResponse.json(
         { error: "Too many reports submitted. Please try again later." },
