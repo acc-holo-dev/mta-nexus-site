@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Too many admin actions" }, { status: 429 });
     }
 
-    const parsed = adminActionSchema.safeParse(await request.json());
+    const parsed = adminActionSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
       return NextResponse.json({ error: "Invalid moderation action", details: parsed.error.format() }, { status: 400 });
     }
