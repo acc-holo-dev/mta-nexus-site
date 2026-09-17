@@ -154,6 +154,9 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       fileSizeBytes: 1024,
       fileName: "security-test.zip",
       mimeType: "application/zip",
+      scanStatus: "not_scanned",
+      scanner: "disabled",
+      scannedAt: new Date(),
       isSigned: true,
     });
 
