@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
-import { reportRepository, auditRepository } from "@nexus/db";
+import {
+  auditRepository,
+  contentRepository,
+  notificationRepository,
+  productRepository,
+  reportRepository,
+  serverRepository,
+  userRepository,
+} from "@nexus/db";
 import { createReportSchema } from "@nexus/validation";
 import { generateId, can, rateLimiter } from "@nexus/security";
 
@@ -44,6 +52,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (parsed.data.targetType === "user" && parsed.data.targetId === user.id) {
+      return NextResponse.json({ error: "You cannot report your own account" }, { status: 422 });
+    }
+
+    const targetExists = parsed.data.targetType === "product"
+      ? await productRepository.findById(parsed.data.targetId)
+      : parsed.data.targetType === "server"
+        ? await serverRepository.findById(parsed.data.targetId)
+        : parsed.data.targetType === "content"
+          ? await contentRepository.findById(parsed.data.targetId)
+          : await userRepository.findById(parsed.data.targetId);
+    if (!targetExists) {
+      return NextResponse.json({ error: "Report target was not found" }, { status: 404 });
+    }
+
+    const duplicate = await reportRepository.findOpenByReporterAndTarget(
+      user.id,
+      parsed.data.targetType,
+      parsed.data.targetId
+    );
+    if (duplicate) {
+      return NextResponse.json(
+        { error: "You already have an open report for this target", reportId: duplicate.id },
+        { status: 409 }
+      );
+    }
+
     const reportId = generateId("rpt");
     const report = await reportRepository.create({
       id: reportId,
@@ -65,6 +100,22 @@ export async function POST(request: NextRequest) {
       targetType: "report",
       details: { type: parsed.data.type, targetType: parsed.data.targetType },
     });
+
+    const moderators = (await userRepository.listAll()).filter(
+      (candidate) => candidate.role === "moderator" || candidate.role === "admin"
+    );
+    await Promise.all(
+      moderators.map((moderator) =>
+        notificationRepository.create({
+          id: generateId("not"),
+          recipientId: moderator.id,
+          title: "New report requires review",
+          message: `${parsed.data.type} report for ${parsed.data.targetType}:${parsed.data.targetId}`,
+          link: "/admin",
+          type: "security",
+        })
+      )
+    );
 
     return NextResponse.json({ success: true, report }, { status: 201 });
   } catch (error: unknown) {
