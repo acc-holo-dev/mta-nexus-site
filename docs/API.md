@@ -1,87 +1,137 @@
 # MTA NEXUS HTTP API
 
-This reference documents the public integration contract that exists in the closed beta. The platform is player-first; marketplace checkout, balance, payouts, crypto and entitlement APIs are deliberately **not** available in this release.
+This reference documents the current closed-beta API. The platform is player-first:
+live server data comes from the official MTA master-list. NEXUS does not require an
+in-game resource, heartbeat agent, `config.lua`, or runtime code on third-party
+MTA servers.
 
-All endpoints return JSON. Error objects expose a short, safe `error` message; callers must not rely on internal implementation details.
+All endpoints return JSON. Error objects expose a short, safe `error` message;
+callers must not rely on internal implementation details.
 
 ## Authentication
 
 ### `POST /api/auth/register`
 
-Creates an account, starts a session and sets the HTTP-only session cookie.
+Creates an account, starts a session and sets the HTTP-only `nexus_session` cookie.
+Registration is rate limited per client IP.
 
 ### `POST /api/auth/login`
 
 Validates credentials, creates a session and sets the HTTP-only session cookie.
+Failed attempts are rate limited per client IP.
 
 ### `GET /api/auth/session`
 
 Returns the current authenticated user without password material.
 
-### `DELETE /api/auth/session`
+### `GET /api/auth/sessions`
 
-Invalidates the current session and clears its cookie.
+Returns metadata for the authenticated user's sessions. Session tokens are never
+returned. The response is private and not cacheable.
 
-## Server installation
+### `DELETE /api/auth/sessions`
 
-### `POST /api/servers/:id/installations`
-
-Creates an installation key for a server owned by the signed-in user.
-
-Request body (optional):
+Revoke one owned session:
 
 ```json
-{ "moduleVersion": "0.1.0" }
+{ "sessionId": "ses_..." }
 ```
 
-Successful response (`201`) includes `installationId`, `serverId`, `moduleVersion`, and a plaintext `apiKey`. The key is returned exactly once. Store it only in the MTA server's local `config.lua`.
-
-Rate limit: 5 new installation keys per user per hour.
-
-### `POST /api/server/installations/heartbeat`
-
-Accepts a heartbeat from an active installation. The MTA NEXUS Agent sends this endpoint automatically.
+Or revoke every other session while keeping the current session:
 
 ```json
-{
-  "apiKey": "installation-key-shown-once",
-  "status": "online",
-  "currentPlayers": 42,
-  "maxPlayers": 128,
-  "moduleVersion": "0.1.0"
-}
+{ "allOther": true }
 ```
 
-Rules:
+### `POST /api/auth/password`
 
-- `apiKey` must be an active installation key and is never returned by this endpoint.
-- `status` is `online`, `offline`, or `maintenance`; it defaults to `online`.
-- `currentPlayers` is an integer from 0 to 4096 and cannot exceed `maxPlayers`.
-- `maxPlayers` is an integer from 1 to 4096.
-- `moduleVersion` and `mtaVersion` are optional strings of at most 32 characters.
-
-A successful response is:
+Changes the authenticated user's password after verifying the current password.
+All other sessions are revoked. Password changes are audited and rate limited.
 
 ```json
 {
-  "success": true,
-  "serverId": "server-id",
-  "recordedAt": "2026-09-16T20:00:00.000Z"
+  "currentPassword": "old password",
+  "newPassword": "new password"
 }
 ```
 
-Rate limit: 120 requests per IP address per minute.
+## Live MTA directory
 
-## Discovery
+### `GET /api/servers/directory`
 
-### `GET /api/search?q=:query`
+Returns a bounded, paginated view of the official MTA master-list. Supported
+query parameters include `page`, `limit`, `query`, and `minPlayers`.
+The endpoint exposes live observations only; editorial server profiles remain
+under `/api/servers`.
 
-Searches the publicly visible NEXUS catalogue.
+When the official directory is unavailable, the endpoint returns `503` with
+`Retry-After` and does not invent offline or zero-player data.
+
+## Resources
+
+### `POST /api/products/:id/builds`
+
+Uploads a free resource build for review. The server validates the archive
+signature, size, extension, filename and derived MIME type before private
+storage. New builds begin in `pending_review`, remain unsigned, and expose
+scanner state honestly.
+
+### `GET /api/products/:id/download`
+
+Requires authentication and a valid entitlement (or resource ownership). Only
+the latest published build is downloadable. The response includes the recorded
+SHA-256 checksum, trusted MIME type and `nosniff` protection.
+
+### `POST /api/resources/claim`
+
+Claims a free published resource for the signed-in player and creates the
+download entitlement. Paid resources and checkout remain disabled in the
+closed beta.
+
+## Notifications
+
+### `GET /api/notifications`
+
+Returns the authenticated user's notification feed. Use `limit` (bounded to
+100) and `unreadOnly=true` for a focused feed. Responses are private and
+not cacheable.
+
+### `POST /api/notifications/mark-read`
+
+Marks one owned notification read using `{ "id": "..." }`, or marks all of the
+user's notifications read with an empty body. Mutations are rate limited.
+
+### `GET /api/notifications/preferences`
+
+Returns the authenticated user's in-app notification preferences.
+
+### `PATCH /api/notifications/preferences`
+
+Updates one or more preference flags:
+
+```json
+{
+  "followsEnabled": false,
+  "contentEnabled": true,
+  "serverEnabled": true,
+  "commerceEnabled": true,
+  "systemEnabled": true
+}
+```
+
+Security notifications are always delivered.
 
 ## Trust and safety
 
-The closed beta provides reporting, moderation and verification routes for platform operations. Their internal administration contracts are intentionally not public integration APIs.
+### `POST /api/reports`
 
-## MTA resource
+Creates a validated abuse report for an existing user, server, product or content
+target. Duplicate open reports by the same reporter and target are rejected.
 
-The reference implementation is in [resources/mta-nexus-agent](../resources/mta-nexus-agent). It sends only server status and counts over HTTPS.
+### `POST /api/verification`
+
+Submits an ownership/identity verification request. Moderators process requests
+through the protected moderation queue.
+
+No endpoint in this release activates payments, crypto settlement, seller
+balances, payouts, or MTA server-side software.
