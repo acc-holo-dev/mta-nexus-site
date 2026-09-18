@@ -131,8 +131,11 @@ closed beta.
 
 Searches published resources, public servers, published content, developers and
 organizations. The query is limited to 100 characters and the optional `limit`
-is capped at 50. Empty queries return an empty result set; repeated searches are
-rate limited per client IP and successful responses use short public caching.
+is capped at 50. Use the optional `type` facet (`product`, `server`,
+`developer`, `organization` or `article`) to restrict results. Empty queries
+return an empty result set; repeated searches are rate limited per client IP and
+successful responses use short public caching. Server player badges are shown
+only when the official MTA directory has a matching observation.
 
 ## Community content
 
