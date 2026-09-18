@@ -1,34 +1,29 @@
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { db } from "../client";
 import { users } from "../schema";
 import type { User } from "@nexus/domain";
 
+type UserRow = typeof users.$inferSelect;
+
+function toPublicUser(row: UserRow): User {
+  const { passwordHash: _, ...user } = row;
+  return user as unknown as User;
+}
+
 export class UserRepository {
   async findById(id: string): Promise<User | null> {
-    try {
-      const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
-      return (rows[0] as unknown as User) || null;
-    } catch {
-      return null;
-    }
+    const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return rows[0] ? toPublicUser(rows[0]) : null;
   }
 
   async findByEmail(email: string): Promise<(User & { passwordHash?: string | null }) | null> {
-    try {
-      const rows = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
-      return (rows[0] as unknown as (User & { passwordHash?: string | null })) || null;
-    } catch {
-      return null;
-    }
+    const rows = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
+    return (rows[0] as unknown as (User & { passwordHash?: string | null })) || null;
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    try {
-      const rows = await db.select().from(users).where(eq(users.username, username)).limit(1);
-      return (rows[0] as unknown as User) || null;
-    } catch {
-      return null;
-    }
+    const rows = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return rows[0] ? toPublicUser(rows[0]) : null;
   }
 
   async create(user: {
@@ -60,34 +55,50 @@ export class UserRepository {
       updatedAt: new Date(),
     };
 
-    try {
-      const rows = await db.insert(users).values(values).returning();
-      return rows[0] as unknown as User;
-    } catch {
-      return values as unknown as User;
-    }
+    const rows = await db.insert(users).values(values).returning();
+    return toPublicUser(rows[0]);
   }
 
   async update(id: string, updates: Partial<User>): Promise<User | null> {
-    try {
-      const rows = await db
-        .update(users)
-        .set({ ...updates, updatedAt: new Date() })
-        .where(eq(users.id, id))
-        .returning();
-      return (rows[0] as unknown as User) || null;
-    } catch {
-      return null;
-    }
+    const rows = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
+    return rows[0] ? toPublicUser(rows[0]) : null;
   }
 
-  async listAll(): Promise<User[]> {
-    try {
-      const rows = await db.select().from(users);
-      return rows as unknown as User[];
-    } catch {
-      return [];
-    }
+  async updatePassword(id: string, passwordHash: string): Promise<boolean> {
+    const rows = await db
+      .update(users)
+      .set({ passwordHash, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning({ id: users.id });
+    return rows.length > 0;
+  }
+
+  async listAll(limit?: number): Promise<User[]> {
+    const query = db.select().from(users);
+    const boundedLimit =
+      limit === undefined
+        ? undefined
+        : Number.isFinite(limit)
+          ? Math.min(Math.max(Math.floor(limit), 1), 100)
+          : 100;
+    const rows = boundedLimit === undefined ? await query : await query.limit(boundedLimit);
+    return rows.map(toPublicUser);
+  }
+
+  async listDevelopers(limit = 100): Promise<User[]> {
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 100)
+      : 100;
+    const rows = await db
+      .select()
+      .from(users)
+      .where(or(eq(users.role, "developer"), eq(users.role, "admin")))
+      .limit(boundedLimit);
+    return rows.map(toPublicUser);
   }
 }
 

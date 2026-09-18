@@ -3,18 +3,23 @@ import { authService } from "../../../../../lib/services/auth-service";
 import {
   contentRepository,
   productRepository,
-  licenseRepository,
+  entitlementRepository,
   auditRepository,
 } from "@nexus/db";
 import { addCommentSchema } from "@nexus/validation";
-import { generateId } from "@nexus/security";
-import { rateLimiter } from "@nexus/security";
+import { generateId, consumeRateLimit } from "@nexus/security";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: productId } = await params;
+  const product = await productRepository.findById(productId);
+
+  if (!product || product.status !== "published") {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+
   const reviews = await contentRepository.listComments({ productId });
   return NextResponse.json({ reviews });
 }
@@ -33,7 +38,7 @@ export async function POST(
     }
 
     // Rate limit reviews per user
-    const rl = await rateLimiter.consume(`review:${user.id}`, 5, 300);
+    const rl = await consumeRateLimit("reviewSubmission", user.id);
     if (!rl.success) {
       return NextResponse.json(
         { error: "Too many review submissions. Please try again later." },
@@ -41,7 +46,7 @@ export async function POST(
       );
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const parsed = addCommentSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -52,7 +57,7 @@ export async function POST(
     }
 
     const product = await productRepository.findById(productId);
-    if (!product) {
+    if (!product || product.status !== "published") {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
@@ -73,13 +78,16 @@ export async function POST(
       );
     }
 
-    // Review integrity rule 3: paid products require a completed purchase
-    const userLicenses = await licenseRepository.listByUser(user.id);
-    const hasBought = userLicenses.some((l) => l.productId === productId);
+    // Review integrity rule 3: the reviewer must have acquired the resource
+    const hasAcquired = await entitlementRepository.hasEntitlement(
+      { type: "user", id: user.id },
+      productId,
+      "product.download"
+    );
 
-    if (!hasBought && product.price > 0) {
+    if (!hasAcquired) {
       return NextResponse.json(
-        { error: "A verified purchase is required to review this product" },
+        { error: "Add this resource to your library before reviewing it" },
         { status: 403 }
       );
     }
@@ -92,7 +100,7 @@ export async function POST(
       authorId: user.id,
       text: parsed.data.text,
       rating,
-      isVerifiedPurchase: hasBought,
+      isVerifiedPurchase: hasAcquired,
     });
 
     // Recalculate true rating average from database reviews (source of truth)
@@ -115,18 +123,23 @@ export async function POST(
       action: "product.review_submitted",
       targetId: productId,
       targetType: "product",
-      details: { rating, isVerifiedPurchase: hasBought },
+      details: { rating, verifiedAcquisition: hasAcquired },
     });
 
     return NextResponse.json(
       { success: true, review: comment, newRating: { ratingAverage, ratingCount } },
       { status: 201 }
     );
-  } catch (error: any) {
-    console.error("Review submission error:", error.message);
-    return NextResponse.json(
-      { error: error.statusCode ? error.message : "Failed to submit review" },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error: unknown) {
+    const databaseError = error as { code?: unknown };
+    if (databaseError.code === "23505") {
+      return NextResponse.json(
+        { error: "You have already reviewed this product" },
+        { status: 409 }
+      );
+    }
+
+    console.error("Review submission error:", error);
+    return NextResponse.json({ error: "Failed to submit review" }, { status: 500 });
   }
 }

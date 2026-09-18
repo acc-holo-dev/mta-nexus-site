@@ -8,8 +8,6 @@ export type ServerStatus = "active" | "inactive" | "maintenance" | "suspended";
 
 export type ServerVisibility = "public" | "unlisted" | "private";
 
-export type InstallationStatus = "pending" | "active" | "revoked" | "offline";
-
 export type ProductType =
   | "script"
   | "model"
@@ -26,14 +24,22 @@ export type ProductStatus = "draft" | "pending_review" | "published" | "suspende
 export type LicenseModel =
   | "single_server"
   | "multiple_servers"
-  | "per_installation"
   | "organization"
   | "subscription"
   | "unlimited";
 
 export type LicenseStatus = "active" | "expired" | "revoked" | "suspended";
 
-export type BuildStatus = "draft" | "testing" | "published" | "deprecated" | "retired";
+export type BuildStatus =
+  | "draft"
+  | "testing"
+  | "pending_review"
+  | "published"
+  | "rejected"
+  | "deprecated"
+  | "retired";
+
+export type BuildScanStatus = "not_scanned" | "clean" | "malicious" | "error";
 
 export type UploadStatus =
   | "initiated"
@@ -146,34 +152,47 @@ export interface Server {
   name: string;
   slug: string;
   description?: string;
+  websiteUrl?: string;
+  discordUrl?: string;
+  rulesUrl?: string;
+  mediaUrls?: string[];
+  language?: string;
+  region?: string;
+  gameplayTags?: string[];
   ipAddress: string;
   port: number;
   httpPort?: number;
   gameMode?: string;
   mapName?: string;
-  maxPlayers: number;
-  currentPlayers: number;
-  ownerId: string;
+  maxPlayers?: number;
+  currentPlayers?: number;
+  ownerId?: string;
   organizationId?: string;
   status: ServerStatus;
   visibility: ServerVisibility;
   isVerified: boolean;
   bannerUrl?: string;
   logoUrl?: string;
+  lastObservedAt?: Date;
+  observationSource?: "mta_master" | "mta_query";
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface ServerInstallation {
+export interface ServerObservation {
   id: string;
   serverId: string;
-  apiKeyHash: string;
-  moduleVersion: string;
-  mtaVersion: string;
-  os: string;
-  status: InstallationStatus;
-  lastHeartbeatAt?: Date;
-  capabilities: string[];
+  source: "mta_master" | "mta_query";
+  sourceSequence?: string;
+  name?: string;
+  gameMode?: string;
+  mapName?: string;
+  mtaVersion?: string;
+  currentPlayers?: number;
+  maxPlayers?: number;
+  passworded?: boolean;
+  responding?: boolean;
+  observedAt: Date;
   createdAt: Date;
 }
 
@@ -200,7 +219,6 @@ export interface Product {
   screenshots: string[];
   compatibility: {
     mtaMinVersion?: string;
-    moduleMinVersion?: string;
     dependencies?: string[];
   };
   createdAt: Date;
@@ -216,6 +234,11 @@ export interface Build {
   storageKey: string;
   sha256Hash: string;
   fileSizeBytes: number;
+  fileName: string;
+  mimeType: string;
+  scanStatus: BuildScanStatus;
+  scanner?: string;
+  scannedAt?: Date;
   mtaVersionTarget?: string;
   isSigned: boolean;
   createdAt: Date;
@@ -355,6 +378,25 @@ export interface Follow {
   createdAt: Date;
 }
 
+export type NotificationCategory =
+  | "follow"
+  | "content"
+  | "server"
+  | "commerce"
+  | "system"
+  | "security";
+
+export interface NotificationPreferences {
+  id: string;
+  userId: string;
+  followsEnabled: boolean;
+  contentEnabled: boolean;
+  serverEnabled: boolean;
+  commerceEnabled: boolean;
+  systemEnabled: boolean;
+  updatedAt: Date;
+}
+
 export interface Notification {
   id: string;
   recipientId: string;
@@ -362,6 +404,7 @@ export interface Notification {
   message: string;
   link?: string;
   type: "system" | "order" | "license" | "content" | "server" | "security";
+  category?: NotificationCategory;
   isRead: boolean;
   createdAt: Date;
 }
@@ -382,7 +425,7 @@ export interface AuditEvent {
 export interface Report {
   id: string;
   reporterId: string;
-  targetType: "product" | "server" | "content" | "user";
+  targetType: "product" | "server" | "content" | "comment" | "user";
   targetId: string;
   type: ReportType;
   reason: string;

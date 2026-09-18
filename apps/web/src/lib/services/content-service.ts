@@ -4,35 +4,79 @@ import {
   serverRepository,
   auditRepository,
 } from "@nexus/db";
-import { generateId } from "@nexus/security";
-import { eventBus } from "@nexus/domain";
+import { can, generateId } from "@nexus/security";
+import { eventBus, ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
 import type { Content, Comment, User, Product, Server } from "@nexus/domain";
 
 export class ContentService {
-  async listArticles(): Promise<Content[]> {
-    return contentRepository.listPublished();
+  async listArticles(limit = 50): Promise<Content[]> {
+    return contentRepository.listPublished(limit);
   }
 
-  async getArticleBySlug(slug: string): Promise<Content | null> {
-    return contentRepository.findBySlug(slug);
+  async listCommunityTopics(limit = 50): Promise<Content[]> {
+    return contentRepository.listPublishedByTypes(["post", "question"], limit);
   }
 
-  async getComments(target: { contentId?: string; productId?: string }): Promise<Comment[]> {
-    return contentRepository.listComments(target);
+  async getArticleBySlug(
+    slug: string,
+    options: { incrementView?: boolean } = {}
+  ): Promise<Content | null> {
+    return contentRepository.findPublishedBySlug(slug, options);
+  }
+
+  async getComments(
+    target: { contentId?: string; productId?: string },
+    limit = 100
+  ): Promise<Comment[]> {
+    return contentRepository.listComments(target, limit);
   }
 
   async addComment(
-    input: { contentId?: string; productId?: string; text: string; rating?: number },
+    input: {
+      contentId?: string;
+      productId?: string;
+      parentId?: string;
+      text: string;
+      rating?: number;
+    },
     actor: User
   ): Promise<Comment> {
+    if (input.contentId) {
+      const target = await contentRepository.findById(input.contentId);
+      if (!target || target.status !== "published") {
+        throw new NotFoundError("Content", input.contentId);
+      }
+    }
+
+    if (input.parentId) {
+      if (!input.contentId) {
+        throw new AppError(
+          "Parent comments are only supported for article discussions",
+          400,
+          "COMMENT_PARENT_TARGET_INVALID"
+        );
+      }
+      const parent = await contentRepository.findCommentById(input.parentId);
+      if (!parent || parent.contentId !== input.contentId) {
+        throw new AppError(
+          "Parent comment was not found for this article",
+          400,
+          "COMMENT_PARENT_NOT_FOUND"
+        );
+      }
+    }
+
     const comment = await contentRepository.addComment({
       id: generateId("cmt"),
       contentId: input.contentId,
       productId: input.productId,
+      parentId: input.parentId,
       authorId: actor.id,
       text: input.text,
       rating: input.rating,
-      isVerifiedPurchase: true,
+      // Article comments are not product acquisitions. Product review routes
+      // set this flag only after an entitlement check.
+      isVerifiedPurchase: false,
     });
 
     if (input.contentId) {
@@ -61,19 +105,72 @@ export class ContentService {
     return comment;
   }
 
+  async moderateContent(
+    contentId: string,
+    decision: "publish" | "archive",
+    actor: User,
+    notes?: string
+  ): Promise<Content> {
+    if (!can(actor, "admin.moderation")) {
+      throw new ForbiddenError("Moderator privilege is required to moderate content");
+    }
+
+    const current = await contentRepository.findById(contentId);
+    if (!current) throw new NotFoundError("Content", contentId);
+
+    const targetStatus: Content["status"] =
+      decision === "publish" ? "published" : "archived";
+    if (current.status === targetStatus) {
+      throw new AppError(
+        `Content is already ${targetStatus}`,
+        409,
+        "CONTENT_ALREADY_IN_STATE"
+      );
+    }
+
+    const updated = await contentRepository.updateStatus(
+      contentId,
+      targetStatus,
+      current.status
+    );
+    if (!updated) {
+      throw new AppError(
+        "Content changed before moderation completed",
+        409,
+        "CONTENT_STATE_CHANGED"
+      );
+    }
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "admin",
+      action: decision === "publish" ? "content.published" : "content.archived",
+      targetId: contentId,
+      targetType: "content",
+      details: { from: current.status, to: targetStatus, notes },
+    });
+
+    return updated;
+  }
+
   async getFeed(): Promise<{
     featuredProducts: Product[];
     trendingServers: Server[];
     recentArticles: Content[];
   }> {
-    const featuredProducts = await productRepository.list({ featuredOnly: true });
-    const allServers = await serverRepository.listActivePublic();
-    const recentArticles = await contentRepository.listPublished();
+    const featuredProducts = await productRepository.list({
+      featuredOnly: true,
+      maxPrice: 0,
+      limit: 4,
+    });
+    const trendingServers = await serverRepository.listActivePublic(3);
+    const recentArticles = await contentRepository.listPublished(3);
 
     return {
-      featuredProducts: featuredProducts.slice(0, 4),
-      trendingServers: allServers.slice(0, 3),
-      recentArticles: recentArticles.slice(0, 3),
+      featuredProducts,
+      trendingServers,
+      recentArticles,
     };
   }
 }

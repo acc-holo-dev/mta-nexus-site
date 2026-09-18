@@ -120,16 +120,21 @@ export const servers = pgTable(
     name: text("name").notNull(),
     slug: text("slug").notNull().unique(),
     description: text("description"),
+    websiteUrl: text("website_url"),
+    discordUrl: text("discord_url"),
+    rulesUrl: text("rules_url"),
+    mediaUrls: jsonb("media_urls").$type<string[]>().default([]).notNull(),
+    language: text("language"),
+    region: text("region"),
+    gameplayTags: jsonb("gameplay_tags").$type<string[]>().default([]).notNull(),
     ipAddress: text("ip_address").notNull(),
     port: integer("port").notNull().default(22003),
     httpPort: integer("http_port").default(22005),
     gameMode: text("game_mode"),
     mapName: text("map_name"),
-    maxPlayers: integer("max_players").notNull().default(128),
-    currentPlayers: integer("current_players").notNull().default(0),
-    ownerId: text("owner_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "restrict" }),
+    maxPlayers: integer("max_players"),
+    currentPlayers: integer("current_players"),
+    ownerId: text("owner_id").references(() => users.id, { onDelete: "set null" }),
     organizationId: text("organization_id").references(() => organizations.id, {
       onDelete: "set null",
     }),
@@ -138,6 +143,8 @@ export const servers = pgTable(
     isVerified: boolean("is_verified").notNull().default(false),
     bannerUrl: text("banner_url"),
     logoUrl: text("logo_url"),
+    lastObservedAt: timestamp("last_observed_at", { withTimezone: true }),
+    observationSource: text("observation_source"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -145,24 +152,33 @@ export const servers = pgTable(
     uniqueIndex("servers_slug_idx").on(table.slug),
     index("servers_status_idx").on(table.status),
     index("servers_owner_idx").on(table.ownerId),
+    uniqueIndex("servers_endpoint_idx").on(table.ipAddress, table.port),
+    index("servers_last_observed_idx").on(table.lastObservedAt),
   ]
 );
 
-// 7. Server Installations (Nexus Module runtime binding)
-export const serverInstallations = pgTable("server_installations", {
+// 7. Immutable observations fetched by NEXUS from public MTA sources.
+export const serverObservations = pgTable("server_observations", {
   id: text("id").primaryKey(),
   serverId: text("server_id")
     .notNull()
     .references(() => servers.id, { onDelete: "cascade" }),
-  apiKeyHash: text("api_key_hash").notNull(),
-  moduleVersion: text("module_version").notNull().default("1.0.0"),
-  mtaVersion: text("mta_version").notNull().default("1.6.0"),
-  os: text("os").notNull().default("linux"),
-  status: text("status").notNull().default("pending"), // pending, active, revoked, offline
-  lastHeartbeatAt: timestamp("last_heartbeat_at", { withTimezone: true }),
-  capabilities: jsonb("capabilities").$type<string[]>().default([]).notNull(),
+  source: text("source").notNull(),
+  sourceSequence: text("source_sequence"),
+  name: text("name"),
+  gameMode: text("game_mode"),
+  mapName: text("map_name"),
+  mtaVersion: text("mta_version"),
+  currentPlayers: integer("current_players"),
+  maxPlayers: integer("max_players"),
+  passworded: boolean("passworded"),
+  responding: boolean("responding"),
+  observedAt: timestamp("observed_at", { withTimezone: true }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  index("server_observations_server_time_idx").on(table.serverId, table.observedAt),
+  uniqueIndex("server_observations_source_sequence_idx").on(table.source, table.sourceSequence, table.serverId),
+]);
 
 // 8. Products
 export const products = pgTable(
@@ -193,7 +209,7 @@ export const products = pgTable(
     thumbnailUrl: text("thumbnail_url"),
     screenshots: jsonb("screenshots").$type<string[]>().default([]).notNull(),
     compatibility: jsonb("compatibility")
-      .$type<{ mtaMinVersion?: string; moduleMinVersion?: string; dependencies?: string[] }>()
+      .$type<{ mtaMinVersion?: string; dependencies?: string[] }>()
       .default({})
       .notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -220,10 +236,18 @@ export const builds = pgTable("builds", {
   storageKey: text("storage_key").notNull(),
   sha256Hash: text("sha256_hash").notNull(),
   fileSizeBytes: integer("file_size_bytes").notNull(),
+  fileName: text("file_name").notNull().default("resource.zip"),
+  mimeType: text("mime_type").notNull().default("application/octet-stream"),
+  scanStatus: text("scan_status").notNull().default("not_scanned"),
+  scanner: text("scanner"),
+  scannedAt: timestamp("scanned_at", { withTimezone: true }),
   mtaVersionTarget: text("mta_version_target"),
   isSigned: boolean("is_signed").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  uniqueIndex("builds_product_version_idx").on(table.productId, table.version),
+  index("builds_product_status_idx").on(table.productId, table.status),
+]);
 
 // 10. Assets
 export const assets = pgTable("assets", {
@@ -372,19 +396,27 @@ export const content = pgTable(
 );
 
 // 18. Comments
-export const comments = pgTable("comments", {
-  id: text("id").primaryKey(),
-  contentId: text("content_id").references(() => content.id, { onDelete: "cascade" }),
-  productId: text("product_id").references(() => products.id, { onDelete: "cascade" }),
-  authorId: text("author_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  parentId: text("parent_id"),
-  text: text("text").notNull(),
-  isVerifiedPurchase: boolean("is_verified_purchase").notNull().default(false),
-  rating: integer("rating"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+export const comments = pgTable(
+  "comments",
+  {
+    id: text("id").primaryKey(),
+    contentId: text("content_id").references(() => content.id, { onDelete: "cascade" }),
+    productId: text("product_id").references(() => products.id, { onDelete: "cascade" }),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    parentId: text("parent_id"),
+    text: text("text").notNull(),
+    isVerifiedPurchase: boolean("is_verified_purchase").notNull().default(false),
+    rating: integer("rating"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // Nullable product_id keeps article comments independent while enforcing
+    // one product review per author for non-null product_id rows.
+    uniqueIndex("comments_product_author_idx").on(table.productId, table.authorId),
+  ]
+);
 
 // 19. Reactions
 export const reactions = pgTable("reactions", {
@@ -425,11 +457,31 @@ export const notifications = pgTable("notifications", {
   message: text("message").notNull(),
   link: text("link"),
   type: text("type").notNull().default("system"),
+  category: text("category").notNull().default("system"),
   isRead: boolean("is_read").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// 22. Audit Events
+// 22. Notification Preferences
+export const notificationPreferences = pgTable(
+  "notification_preferences",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .unique()
+      .references(() => users.id, { onDelete: "cascade" }),
+    followsEnabled: boolean("follows_enabled").notNull().default(true),
+    contentEnabled: boolean("content_enabled").notNull().default(true),
+    serverEnabled: boolean("server_enabled").notNull().default(true),
+    commerceEnabled: boolean("commerce_enabled").notNull().default(true),
+    systemEnabled: boolean("system_enabled").notNull().default(true),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [uniqueIndex("notification_preferences_user_idx").on(table.userId)]
+);
+
+// 23. Audit Events
 export const auditEvents = pgTable("audit_events", {
   id: text("id").primaryKey(),
   actorId: text("actor_id").notNull(),
@@ -443,7 +495,7 @@ export const auditEvents = pgTable("audit_events", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// 23. Reports
+// 24. Reports
 export const reports = pgTable("reports", {
   id: text("id").primaryKey(),
   reporterId: text("reporter_id")
@@ -460,7 +512,7 @@ export const reports = pgTable("reports", {
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
 });
 
-// 24. Moderation Cases
+// 25. Moderation Cases
 export const moderationCases = pgTable("moderation_cases", {
   id: text("id").primaryKey(),
   reportId: text("report_id").references(() => reports.id, { onDelete: "set null" }),
@@ -474,7 +526,7 @@ export const moderationCases = pgTable("moderation_cases", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-// 25. Verification Requests (Trust Layer — admin review workflow)
+// 26. Verification Requests (Trust Layer — admin review workflow)
 export const verificationRequests = pgTable("verification_requests", {
   id: text("id").primaryKey(),
   requesterId: text("requester_id")
@@ -489,21 +541,4 @@ export const verificationRequests = pgTable("verification_requests", {
   reviewNotes: text("review_notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
-});
-
-// 26. Server Heartbeats (Telemetry & Analytics Foundation)
-export const serverHeartbeats = pgTable("server_heartbeats", {
-  id: text("id").primaryKey(),
-  installationId: text("installation_id")
-    .notNull()
-    .references(() => serverInstallations.id, { onDelete: "cascade" }),
-  serverId: text("server_id")
-    .notNull()
-    .references(() => servers.id, { onDelete: "cascade" }),
-  status: text("status").notNull().default("online"), // online, offline, maintenance
-  currentPlayers: integer("current_players").notNull().default(0),
-  maxPlayers: integer("max_players").notNull().default(0),
-  moduleVersion: text("module_version"),
-  mtaVersion: text("mta_version"),
-  recordedAt: timestamp("recorded_at", { withTimezone: true }).notNull().defaultNow(),
 });

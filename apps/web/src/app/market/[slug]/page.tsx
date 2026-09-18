@@ -22,6 +22,18 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatScanStatus(status: string): string {
+  if (status === "clean") return "Scan: clean";
+  if (status === "not_scanned") return "Scan: manual review required";
+  if (status === "error") return "Scan: unavailable";
+  return "Scan: blocked";
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -55,17 +67,17 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await productService.getProductBySlug(slug);
+  const cookieStore = await cookies();
+  const token = cookieStore.get("nexus_session")?.value;
+  const user = await authService.getSession(token);
+  const product = await productService.getProductPreviewBySlug(slug, user);
 
   if (!product) {
     notFound();
   }
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get("nexus_session")?.value;
-  const user = await authService.getSession(token);
-
   const isAuthor = user ? product.authorId === user.id : false;
+  const isPublished = product.status === "published";
   const isLicensed = user
     ? await commerceService.checkEntitlement(
         { type: "user", id: user.id },
@@ -74,16 +86,22 @@ export default async function ProductDetailPage({
       )
     : false;
 
-  const hasAccess = isAuthor || isLicensed || product.price === 0 || user?.role === "admin";
+  const isAdmin = user?.role === "admin";
+  const hasAccess = isPublished && (isAuthor || isLicensed || isAdmin);
+  const canInspectBuilds = isAuthor || isAdmin;
 
-  const builds = await productService.getProductBuilds(product.id);
+  const builds = await productService.getProductBuilds(product.id, canInspectBuilds);
   const reviews = await contentService.getComments({ productId: product.id });
 
-  const formattedPrice =
-    product.price === 0 ? "Free Download" : `$${(product.price / 100).toFixed(2)}`;
+  const formattedPrice = "Free";
 
   return (
     <div className="space-y-10">
+      {!isPublished && (
+        <div className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-4 text-sm text-amber-200">
+          Private creator preview · resource status: {product.status.replace(/_/g, " ")}. It is not visible in the public catalogue and cannot be downloaded until approval.
+        </div>
+      )}
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-neutral-400">
         <Link href="/market" className="hover:text-white">Market</Link>
@@ -146,9 +164,9 @@ export default async function ProductDetailPage({
             <h2 className="text-base font-bold text-white border-b border-base pb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-blue-400" />
-                <span>Immutable Release History</span>
+                <span>Release history</span>
               </div>
-              <span className="text-[11px] text-neutral-500 font-mono">SHA-256 Validated</span>
+              <span className="text-[11px] text-neutral-500 font-mono">SHA-256 recorded</span>
             </h2>
 
             {builds.length > 0 ? (
@@ -159,12 +177,19 @@ export default async function ProductDetailPage({
                     className="p-4 rounded-lg bg-neutral-900 border border-base space-y-2"
                   >
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold font-mono text-white">Version {b.version}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold font-mono text-white">Version {b.version}</span>
+                        {canInspectBuilds && b.status !== "published" && (
+                          <span className="rounded bg-amber-950/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-300">
+                            {b.status.replace(/_/g, " ")}
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-3">
                         <span className="text-neutral-500 font-mono text-[11px]">
                           SHA-256: {b.sha256Hash.slice(0, 16)}...
                         </span>
-                        {hasAccess && (
+                        {hasAccess && b.status === "published" && (
                           <a
                             href={`/api/products/${product.id}/download`}
                             className="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold"
@@ -174,6 +199,13 @@ export default async function ProductDetailPage({
                           </a>
                         )}
                       </div>
+                    </div>
+                    <div className="grid grid-cols-1 gap-1 text-[11px] text-neutral-400 sm:grid-cols-3">
+                      <span className="truncate" title={b.fileName}>File: {b.fileName}</span>
+                      <span>Size: {formatFileSize(b.fileSizeBytes)}</span>
+                      <span>MTA: {b.mtaVersionTarget ? `>= ${b.mtaVersionTarget}` : "Not declared"}</span>
+                      <span>{b.isSigned ? "Signature: present" : "Signature: not available"}</span>
+                      <span>{formatScanStatus(b.scanStatus)}</span>
                     </div>
                     {b.releaseNotes && (
                       <div className="text-xs text-neutral-300 whitespace-pre-line font-mono bg-black/40 p-2.5 rounded border border-neutral-800">
@@ -192,7 +224,7 @@ export default async function ProductDetailPage({
           <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
             <h2 className="text-base font-bold text-white border-b border-base pb-3 flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-amber-400" />
-              <span>Verified Customer Reviews</span>
+              <span>Community Reviews</span>
             </h2>
             {reviews.length > 0 ? (
               <div className="space-y-4">
@@ -211,7 +243,7 @@ export default async function ProductDetailPage({
                         {rev.isVerifiedPurchase && (
                           <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
                             <CheckCircle2 className="w-3 h-3" />
-                            Verified Purchase
+                            Verified Acquisition
                           </span>
                         )}
                       </div>
@@ -246,10 +278,10 @@ export default async function ProductDetailPage({
                   <div className="p-3.5 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 space-y-1">
                     <div className="flex items-center gap-1.5 text-xs font-bold">
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>{isAuthor ? "Author Ownership" : "Active License Entitlement"}</span>
+                      <span>{isAuthor ? "Author ownership" : "In your library"}</span>
                     </div>
                     <p className="text-[11px] text-neutral-400">
-                      You hold an active license to deploy and update this resource.
+                      You are authorized to download this published build.
                     </p>
                   </div>
 
@@ -262,11 +294,11 @@ export default async function ProductDetailPage({
                   </a>
 
                   <Link
-                    href="/workspace/licenses"
+                    href="/workspace"
                     className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-base text-neutral-300 text-xs font-semibold transition-colors"
                   >
                     <Key className="w-3.5 h-3.5" />
-                    <span>Manage License Key</span>
+                    <span>Open resource library</span>
                   </Link>
                 </div>
               ) : (
@@ -275,11 +307,11 @@ export default async function ProductDetailPage({
                     href={`/checkout?productId=${product.id}`}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
                   >
-                    <span>Instant Checkout</span>
+                    <span>Add to library</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                   <p className="text-[11px] text-center text-neutral-500">
-                    Automatic cryptographic key provisioning & instant download access
+                    Free resources require a signed-in library claim before download
                   </p>
                 </div>
               )}
@@ -294,17 +326,21 @@ export default async function ProductDetailPage({
                 <div className="flex justify-between py-1 border-b border-neutral-800">
                   <span className="text-neutral-400">MTA Version</span>
                   <span className="font-mono text-neutral-200">
-                    &gt;= {product.compatibility.mtaMinVersion || "1.5.8"}
+                    {product.compatibility.mtaMinVersion
+                      ? `>= ${product.compatibility.mtaMinVersion}`
+                      : "Not declared"}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4 py-1 border-b border-neutral-800">
+                  <span className="text-neutral-400">Dependencies</span>
+                  <span className="font-mono text-right text-neutral-200">
+                    {product.compatibility.dependencies?.length
+                      ? product.compatibility.dependencies.join(", ")
+                      : "None declared"}
                   </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">Nexus Module</span>
-                  <span className="font-mono text-neutral-200">
-                    {product.compatibility.moduleMinVersion || "Optional"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">Downloads / Sales</span>
+                  <span className="text-neutral-400">Library additions</span>
                   <span className="font-mono text-neutral-200">{product.salesCount}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-800">
@@ -320,7 +356,7 @@ export default async function ProductDetailPage({
             <div className="p-3 rounded-lg bg-blue-950/20 border border-blue-900/30 flex items-start gap-2.5 text-xs">
               <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
               <div className="text-neutral-300 text-[11px] leading-relaxed">
-                Protected by Nexus Platform Escrow and SHA-256 binary validation.
+                Every release records its SHA-256 checksum, file size and compatibility. Downloads are entitlement-gated; a recorded checksum is not a malware verdict or signature.
               </div>
             </div>
           </div>

@@ -3,11 +3,9 @@ import Link from "next/link";
 import {
   organizationRepository,
   productRepository,
-  serverRepository,
   contentRepository,
 } from "@nexus/db";
 import { ProductCard } from "../../../components/product-card";
-import { ServerCard } from "../../../components/server-card";
 import { ArticleCard } from "../../../components/article-card";
 import {
   Building2,
@@ -15,8 +13,7 @@ import {
   Globe,
   ExternalLink,
   Users,
-  Box,
-  Server,
+  Box
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -33,14 +30,12 @@ export default async function OrganizationProfilePage({
     notFound();
   }
 
-  const [allProducts, allServers, allArticles] = await Promise.all([
+  const [allProducts, allArticles] = await Promise.all([
     productRepository.list(),
-    serverRepository.listActivePublic(),
     contentRepository.listPublished(),
   ]);
 
   const orgProducts = allProducts.filter((p) => p.organizationId === org.id);
-  const orgServers = allServers.filter((s) => s.organizationId === org.id);
   const orgArticles = allArticles.filter((a) => a.organizationId === org.id);
 
   return (
@@ -64,12 +59,12 @@ export default async function OrganizationProfilePage({
                 </span>
               )}
               <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                STUDIO
+                COMMUNITY
               </span>
             </div>
             <div className="text-xs text-neutral-500">@{org.slug}</div>
             <p className="text-xs text-neutral-300 max-w-xl">
-              {org.description || "Official MTA development team & resource publisher."}
+              {org.description || "MTA community, creator collective, or resource publisher."}
             </p>
             {org.websiteUrl && (
               <a
@@ -91,10 +86,6 @@ export default async function OrganizationProfilePage({
             <div className="text-lg font-bold text-white">{orgProducts.length}</div>
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Releases</div>
           </div>
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center min-w-24">
-            <div className="text-lg font-bold text-emerald-400">{orgServers.length}</div>
-            <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Servers</div>
-          </div>
         </div>
       </div>
 
@@ -107,20 +98,6 @@ export default async function OrganizationProfilePage({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {orgProducts.map((p) => (
               <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Organization Servers */}
-      {orgServers.length > 0 && (
-        <section className="space-y-4">
-          <h2 className="text-base font-bold text-white uppercase tracking-wider">
-            Connected Servers ({orgServers.length})
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {orgServers.map((s) => (
-              <ServerCard key={s.id} server={s} />
             ))}
           </div>
         </section>

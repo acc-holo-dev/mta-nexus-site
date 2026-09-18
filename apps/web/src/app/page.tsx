@@ -1,151 +1,65 @@
 import Link from "next/link";
 import { productService } from "../lib/services/product-service";
-import { serverService } from "../lib/services/server-service";
 import { contentService } from "../lib/services/content-service";
+import { mtaMasterDirectoryService } from "../lib/services/mta-master-directory-service";
 import { ProductCard } from "../components/product-card";
-import { ServerCard } from "../components/server-card";
 import { ArticleCard } from "../components/article-card";
-import { SectionHeader, StatCard, TrustBadge } from "@nexus/ui";
-import {
-  ArrowRight,
-  Box,
-  Server as ServerIcon,
-  Users,
-  KeyRound,
-} from "lucide-react";
+import { SectionHeader, StatCard } from "@nexus/ui";
+import { ArrowRight, Box, Radio, Server as ServerIcon, Users } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [featured, popular, servers, articles] = await Promise.all([
-    productService.listProducts({ featuredOnly: true }),
-    productService.listProducts({ sort: "popular" }),
-    serverService.listServers(),
-    contentService.listArticles(),
+  const [directory, freeResources, articles] = await Promise.all([
+    mtaMasterDirectoryService.getDirectory().catch(() => null),
+    productService.listProducts({ maxPrice: 0, sort: "popular", limit: 4 }),
+    contentService.listArticles(4),
   ]);
-
-  const totalOnlinePlayers = servers.reduce((acc, s) => acc + s.currentPlayers, 0);
+  const playersOnline = directory?.servers.reduce((total, server) => total + (server.players ?? 0), 0) ?? 0;
 
   return (
-    <div className="space-y-10">
-      {/* Featured Nexus panel — visually distinct from organic content (TASK-010) */}
-      {featured.length > 0 && (
-        <section>
-          <div className="nexus-panel p-5">
-            <div className="flex items-center justify-between mb-4">
-              <TrustBadge variant="featured" />
-              <Link
-                href="/market"
-                className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
-              >
-                <span>Browse all</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {featured.slice(0, 4).map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
+    <div className="space-y-12">
+      <section className="nexus-panel overflow-hidden">
+        <div className="p-7 sm:p-10 space-y-5 max-w-4xl">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-400"><Radio className="w-4 h-4" />Live MTA ecosystem</div>
+          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">What is happening in MTA right now?</h1>
+          <p className="text-sm sm:text-base text-neutral-300 max-w-2xl leading-relaxed">Find public MTA servers from the official directory, follow community updates, and add useful resources without a fake checkout flow.</p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/servers" className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-colors">Explore MTA servers</Link>
+            <Link href="/market?maxPrice=0" className="px-5 py-2.5 rounded-lg border border-base bg-neutral-900 hover:bg-neutral-800 text-neutral-200 text-sm font-semibold transition-colors">Browse free resources</Link>
           </div>
-        </section>
-      )}
-
-      {/* Ecosystem metrics strip */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          label="Players Online"
-          value={totalOnlinePlayers.toLocaleString()}
-          tone="success"
-          icon={<Users className="w-4 h-4" />}
-          context="across connected servers"
-        />
-        <StatCard
-          label="Active Servers"
-          value={servers.length}
-          tone="accent"
-          icon={<ServerIcon className="w-4 h-4" />}
-          context="live telemetry"
-        />
-        <StatCard
-          label="Marketplace Items"
-          value={popular.length}
-          icon={<Box className="w-4 h-4" />}
-          context="scripts, models, UI"
-        />
-        <StatCard
-          label="Licenses Issued"
-          value={popular.reduce((acc, p) => acc + p.salesCount, 0)}
-          tone="purple"
-          icon={<KeyRound className="w-4 h-4" />}
-          context="cryptographic keys"
-        />
-      </section>
-
-      {/* Marketplace */}
-      <section>
-        <SectionHeader
-          title="Marketplace"
-          description="Verified scripts, vehicle packs, maps and UI modules"
-          action={
-            <Link
-              href="/market"
-              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
-            >
-              <span>View all</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          }
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {popular.slice(0, 4).map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
         </div>
       </section>
 
-      {/* Servers */}
-      <section>
-        <SectionHeader
-          title="Live Servers"
-          description="Real-time multiplayer communities on the Nexus network"
-          action={
-            <Link
-              href="/servers"
-              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
-            >
-              <span>Server directory</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          }
-        />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {servers.slice(0, 3).map((s) => (
-            <ServerCard key={s.id} server={s} />
-          ))}
-        </div>
+      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard label="Players online" value={playersOnline.toLocaleString()} tone="success" icon={<Users className="w-4 h-4" />} context={directory ? "from the official MTA directory" : "directory temporarily unavailable"} />
+        <StatCard label="Public servers" value={directory?.servers.length ?? "—"} tone="accent" icon={<ServerIcon className="w-4 h-4" />} context={directory?.isStale ? "latest available snapshot" : "from the official MTA directory"} />
+        <StatCard label="Free resources" value={freeResources.length} tone="purple" icon={<Box className="w-4 h-4" />} context="available without payment" />
       </section>
 
-      {/* Community / Articles */}
       <section>
-        <SectionHeader
-          title="Community & Articles"
-          description="Technical guides, devlogs and ecosystem news"
-          action={
-            <Link
-              href="/articles"
-              className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
-            >
-              <span>All articles</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          }
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {articles.slice(0, 2).map((a) => (
-            <ArticleCard key={a.id} article={a} />
-          ))}
-        </div>
+        <SectionHeader title="MTA Network" description="The most populated public servers from the official MTA master-list" action={<Link href="/servers" className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"><span>Open directory</span><ArrowRight className="w-3.5 h-3.5" /></Link>} />
+        {directory ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {directory.servers.slice(0, 6).map((server) => (
+              <a key={server.address + ":" + server.port} href={"mtasa://" + server.address + ":" + server.port} className="nexus-panel p-5 hover:border-emerald-500/70 transition-colors">
+                <div className="text-sm font-bold text-white truncate">{server.name || server.address + ":" + server.port}</div>
+                <div className="mt-1 text-xs text-neutral-400 truncate">{[server.gameMode, server.mapName].filter(Boolean).join(" · ") || server.address + ":" + server.port}</div>
+                <div className="mt-4 text-sm font-semibold text-emerald-400">{server.players ?? 0} / {server.maxPlayers ?? "?"} players</div>
+              </a>
+            ))}
+          </div>
+        ) : <div className="nexus-panel p-8 text-center text-sm text-neutral-400">The official MTA directory is temporarily unavailable.</div>}
+      </section>
+
+      <section>
+        <SectionHeader title="Free resources" description="Community resources you can add without payment" action={<Link href="/market?maxPrice=0" className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"><span>View all free resources</span><ArrowRight className="w-3.5 h-3.5" /></Link>} />
+        {freeResources.length > 0 ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">{freeResources.slice(0, 4).map((product) => <ProductCard key={product.id} product={product} />)}</div> : <div className="nexus-panel p-8 text-center text-sm text-neutral-400">The first free resources are being prepared.</div>}
+      </section>
+
+      <section>
+        <SectionHeader title="Community updates" description="News, guides, and development notes from the MTA ecosystem" action={<Link href="/articles" className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline"><span>All updates</span><ArrowRight className="w-3.5 h-3.5" /></Link>} />
+        {articles.length > 0 ? <div className="grid grid-cols-1 md:grid-cols-2 gap-5">{articles.slice(0, 4).map((article) => <ArticleCard key={article.id} article={article} />)}</div> : <div className="nexus-panel p-8 text-center text-sm text-neutral-400">No community updates have been published yet.</div>}
       </section>
     </div>
   );

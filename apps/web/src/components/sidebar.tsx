@@ -5,37 +5,38 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Compass,
-  ShoppingBag,
+  Library,
   Server,
   Code2,
   BookOpen,
   LayoutDashboard,
-  Key,
-  CreditCard,
+  Plus,
   Bookmark,
   Bell,
-  DollarSign,
   ChevronLeft,
   ChevronRight,
   ShieldAlert,
   BadgeCheck,
+  Settings,
+  MessageSquare,
 } from "lucide-react";
 
 const PRIMARY_NAV = [
+  { href: "/servers", label: "Live Servers", icon: Server },
   { href: "/explore", label: "Explore", icon: Compass },
-  { href: "/market", label: "Market", icon: ShoppingBag },
-  { href: "/servers", label: "Servers", icon: Server },
-  { href: "/developers", label: "Developers", icon: Code2 },
-  { href: "/articles", label: "Articles", icon: BookOpen },
+  { href: "/market", label: "Free Resources", icon: Library },
+  { href: "/community", label: "Community", icon: MessageSquare },
+  { href: "/articles", label: "Updates", icon: BookOpen },
+  { href: "/developers", label: "Creators", icon: Code2 },
 ];
 
 const WORKSPACE_NAV = [
   { href: "/workspace", label: "Overview", icon: LayoutDashboard },
-  { href: "/workspace/purchases", label: "Purchases", icon: CreditCard },
-  { href: "/workspace/licenses", label: "Licenses", icon: Key },
-  { href: "/workspace/sales", label: "Sales", icon: DollarSign },
+  { href: "/workspace/resources/new", label: "Publish Resource", icon: Plus },
+  { href: "/workspace/servers/new", label: "Register Server", icon: Server },
   { href: "/workspace/saved", label: "Saved", icon: Bookmark },
   { href: "/notifications", label: "Notifications", icon: Bell },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar({
@@ -76,7 +77,7 @@ export function Sidebar({
                 <span className="font-heading text-primary leading-tight">
                   MTA <span className="text-accent">NEXUS</span>
                 </span>
-                <span className="font-caption text-faint leading-tight">1.4</span>
+                <span className="font-caption text-faint leading-tight">Closed beta</span>
               </div>
             </Link>
             <button

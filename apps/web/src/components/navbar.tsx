@@ -46,7 +46,7 @@ function NavbarSearchTrigger() {
       >
         <span className="flex items-center gap-2">
           <Search className="w-3.5 h-3.5" />
-          <span>Search products, servers, developers...</span>
+          <span>Search servers, resources, creators...</span>
         </span>
         <kbd className="px-1.5 py-0.5 text-[10px] font-numeric bg-elevated text-muted rounded border border-base">
           Ctrl K

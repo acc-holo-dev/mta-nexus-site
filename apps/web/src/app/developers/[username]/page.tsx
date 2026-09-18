@@ -3,7 +3,7 @@ import Link from "next/link";
 import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
 import { ProductCard } from "../../../components/product-card";
-import { ShieldCheck, Calendar, Award, ExternalLink } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -13,14 +13,13 @@ export default async function DeveloperProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-  const users = await authService.listUsers();
-  const user = users.find((u) => u.username.toLowerCase() === username.toLowerCase());
+  const user = await authService.getUserByUsername(username);
 
-  if (!user) {
+  if (!user || (user.role !== "developer" && user.role !== "admin")) {
     notFound();
   }
 
-  const allProducts = await productService.listProducts();
+  const allProducts = await productService.listProducts({ limit: 100 });
   const authorProducts = allProducts.filter((p) => p.authorId === user.id);
 
   return (
@@ -39,7 +38,7 @@ export default async function DeveloperProfilePage({
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-black text-white">{user.displayName}</h1>
               {user.isVerified && (
-                <span title="Verified Member">
+                <span title="Verified identity">
                   <ShieldCheck className="w-5 h-5 text-purple-400" />
                 </span>
               )}
@@ -55,8 +54,8 @@ export default async function DeveloperProfilePage({
             <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Resources</div>
           </div>
           <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center">
-            <div className="text-lg font-bold text-emerald-400">100%</div>
-            <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Reputation</div>
+            <div className="text-lg font-bold text-emerald-400">{user.isVerified ? "Verified" : "Public"}</div>
+            <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Profile status</div>
           </div>
         </div>
       </div>

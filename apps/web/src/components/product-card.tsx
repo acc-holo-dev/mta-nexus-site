@@ -1,12 +1,10 @@
 import React from "react";
 import Link from "next/link";
-import { Star, Download, Tag } from "lucide-react";
-import { TrustBadge } from "@nexus/ui";
+import { Library, Star, Tag } from "lucide-react";
 import type { Product } from "@nexus/domain";
 
 export function ProductCard({ product }: { product: Product }) {
-  const formattedPrice =
-    product.price === 0 ? "Free" : `$${(product.price / 100).toFixed(2)}`;
+  const formattedPrice = "Free";
 
   const updatedDate = new Date(product.updatedAt).toLocaleDateString("en-US", {
     month: "short",
@@ -51,7 +49,7 @@ export function ProductCard({ product }: { product: Product }) {
             <span className="text-faint">({product.ratingCount})</span>
           </div>
           <div className="flex items-center gap-1 text-muted">
-            <Download className="w-3 h-3" />
+            <Library className="w-3 h-3" />
             <span className="font-numeric">{product.salesCount}</span>
           </div>
         </div>

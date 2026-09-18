@@ -2,9 +2,10 @@ import {
   userRepository,
   sessionRepository,
   organizationRepository,
+  authRepository,
   auditRepository,
 } from "@nexus/db";
-import { generateId, hashPassword, verifyPassword } from "@nexus/security";
+import { generateId, generateSessionToken, hashPassword, verifyPassword } from "@nexus/security";
 import {
   NotFoundError,
   UnauthorizedError,
@@ -12,6 +13,20 @@ import {
   ForbiddenError,
 } from "@nexus/domain";
 import type { User } from "@nexus/domain";
+
+function toPublicUser(user: User & { passwordHash?: string | null }): User {
+  const { passwordHash: _, ...publicUser } = user;
+  return publicUser as User;
+}
+
+function isUniqueConstraintError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: string }).code === "23505"
+  );
+}
 
 export class AuthService {
   async register(input: {
@@ -32,39 +47,41 @@ export class AuthService {
 
     const userId = generateId("usr");
     const passwordHash = await hashPassword(input.password);
+    const token = generateSessionToken();
+    const expiresAt = new Date(Date.now() + 86400000 * 14);
 
-    const user = await userRepository.create({
-      id: userId,
-      email: input.email.toLowerCase(),
-      username: input.username,
-      displayName: input.displayName || input.username,
-      passwordHash,
-      role: "user",
-      isVerified: false,
-      emailVerified: false,
-    });
-
-    const token = generateId("ses");
-    const expiresAt = new Date(Date.now() + 86400000 * 14); // 14 days
-
-    await sessionRepository.create({
-      id: generateId("ses"),
-      userId: user.id,
-      token,
-      expiresAt,
-    });
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: user.id,
-      actorType: "user",
-      action: "user.registered",
-      targetId: user.id,
-      targetType: "user",
-      details: { email: user.email },
-    });
-
-    return { user, token };
+    try {
+      const user = await authRepository.registerAccount({
+        user: {
+          id: userId,
+          email: input.email,
+          username: input.username,
+          displayName: input.displayName || input.username,
+          passwordHash,
+        },
+        session: {
+          id: generateId("ses"),
+          userId,
+          token,
+          expiresAt,
+        },
+        audit: {
+          id: generateId("aud"),
+          actorId: userId,
+          actorType: "user",
+          action: "user.registered",
+          targetId: userId,
+          targetType: "user",
+          details: { email: input.email.toLowerCase() },
+        },
+      });
+      return { user: toPublicUser(user), token };
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        throw new ConflictError("Email or username is already registered");
+      }
+      throw error;
+    }
   }
 
   async login(input: {
@@ -81,75 +98,180 @@ export class AuthService {
       throw new UnauthorizedError("Invalid email or password");
     }
 
-    const token = generateId("ses");
+    const token = generateSessionToken();
     const expiresAt = new Date(Date.now() + 86400000 * 14);
 
-    await sessionRepository.create({
-      id: generateId("ses"),
-      userId: userWithHash.id,
-      token,
-      expiresAt,
-    });
+    await authRepository.createLoginSession(
+      {
+        id: generateId("ses"),
+        userId: userWithHash.id,
+        token,
+        expiresAt,
+      },
+      {
+        id: generateId("aud"),
+        actorId: userWithHash.id,
+        actorType: "user",
+        action: "user.logged_in",
+        targetId: userWithHash.id,
+        targetType: "user",
+        details: { email: userWithHash.email },
+      }
+    );
 
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: userWithHash.id,
-      actorType: "user",
-      action: "user.logged_in",
-      targetId: userWithHash.id,
-      targetType: "user",
-      details: { email: userWithHash.email },
-    });
-
-    // Strip passwordHash from returned DTO
-    const { passwordHash: _, ...user } = userWithHash;
-    return { user: user as User, token };
+    return { user: toPublicUser(userWithHash), token };
   }
 
   async getSession(token?: string | null): Promise<User | null> {
     if (!token) return null;
     const result = await sessionRepository.findValidSession(token);
-    return result ? result.user : null;
+    return result ? toPublicUser(result.user) : null;
   }
 
   async logout(token: string): Promise<void> {
     const session = await sessionRepository.findValidSession(token);
-    if (session) {
+    if (!session) {
+      await sessionRepository.delete(token);
+      return;
+    }
+
+    await authRepository.revokeSession(token, {
+      id: generateId("aud"),
+      actorId: session.user.id,
+      actorType: "user",
+      action: "user.logged_out",
+      targetId: session.user.id,
+      targetType: "user",
+    });
+  }
+
+  async changePassword(input: {
+    userId: string;
+    currentPassword: string;
+    newPassword: string;
+    currentToken: string;
+  }): Promise<number> {
+    const user = await userRepository.findById(input.userId);
+    if (!user) throw new NotFoundError("User", input.userId);
+
+    const stored = await userRepository.findByEmail(user.email);
+    if (!stored?.passwordHash || !(await verifyPassword(input.currentPassword, stored.passwordHash))) {
+      throw new UnauthorizedError("Current password is incorrect");
+    }
+
+    const passwordHash = await hashPassword(input.newPassword);
+    const updated = await userRepository.updatePassword(input.userId, passwordHash);
+    if (!updated) throw new NotFoundError("User", input.userId);
+
+    const revokedCount = await sessionRepository.deleteOtherSessions(input.userId, input.currentToken);
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: input.userId,
+      actorType: "user",
+      action: "user.password_changed",
+      targetId: input.userId,
+      targetType: "user",
+      details: { revokedSessionCount: revokedCount },
+    });
+    return revokedCount;
+  }
+
+  async getCurrentSessionId(token?: string | null): Promise<string | null> {
+    if (!token) return null;
+    const current = await sessionRepository.findValidSession(token);
+    return current?.session.id ?? null;
+  }
+
+  async listSessions(userId: string) {
+    return sessionRepository.listByUser(userId);
+  }
+
+  async revokeSession(userId: string, sessionId: string): Promise<boolean> {
+    const revoked = await sessionRepository.deleteById(sessionId, userId);
+    if (revoked) {
       await auditRepository.record({
         id: generateId("aud"),
-        actorId: session.user.id,
+        actorId: userId,
         actorType: "user",
-        action: "user.logged_out",
-        targetId: session.user.id,
+        action: "user.session_revoked",
+        targetId: userId,
         targetType: "user",
+        details: { sessionId },
       });
     }
-    await sessionRepository.delete(token);
+    return revoked;
+  }
+
+  async revokeOtherSessions(userId: string, currentToken: string): Promise<number> {
+    const revokedCount = await sessionRepository.deleteOtherSessions(userId, currentToken);
+    if (revokedCount > 0) {
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: userId,
+        actorType: "user",
+        action: "user.other_sessions_revoked",
+        targetId: userId,
+        targetType: "user",
+        details: { revokedCount },
+      });
+    }
+    return revokedCount;
   }
 
   async switchContext(userId: string, contextId: string): Promise<User> {
     const user = await userRepository.findById(userId);
     if (!user) throw new NotFoundError("User", userId);
 
-    if (contextId !== "personal") {
+    const nextContextId = contextId.trim();
+    if (!nextContextId) {
+      throw new ForbiddenError("A context is required");
+    }
+
+    if (nextContextId !== "personal") {
       const memberships = await organizationRepository.listUserMemberships(userId);
-      const isMember = memberships.some((m) => m.organizationId === contextId);
+      const isMember = memberships.some((m) => m.organizationId === nextContextId);
       if (!isMember) {
         throw new ForbiddenError("Not authorized to switch to this organization context");
       }
     }
 
-    const updated = await userRepository.update(userId, { activeContextId: contextId });
+    const previousContextId = user.activeContextId ?? "personal";
+    const updated = await userRepository.update(userId, { activeContextId: nextContextId });
     if (!updated) throw new NotFoundError("User", userId);
-    return updated;
+
+    if (previousContextId !== nextContextId) {
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: userId,
+        actorType: "user",
+        action: "user.context_switched",
+        targetId: userId,
+        targetType: "user",
+        details: { from: previousContextId, to: nextContextId },
+      });
+    }
+
+    return toPublicUser(updated);
   }
 
   async getUserById(id: string): Promise<User | null> {
-    return userRepository.findById(id);
+    const user = await userRepository.findById(id);
+    return user ? toPublicUser(user) : null;
+  }
+
+  async getUserByUsername(username: string): Promise<User | null> {
+    const user = await userRepository.findByUsername(username);
+    return user ? toPublicUser(user) : null;
+  }
+
+  async listDevelopers(limit = 100): Promise<User[]> {
+    const users = await userRepository.listDevelopers(limit);
+    return users.map((user) => toPublicUser(user));
   }
 
   async listUsers(): Promise<User[]> {
-    return userRepository.listAll();
+    const users = await userRepository.listAll();
+    return users.map((user) => toPublicUser(user));
   }
 }
 

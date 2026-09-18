@@ -5,15 +5,24 @@ import crypto from "node:crypto";
 import type { StorageProvider, StorageObjectMeta } from "./types";
 
 export class LocalStorageProvider implements StorageProvider {
-  private baseDir: string;
+  private readonly baseDir: string;
 
   constructor(baseDir = "./uploads") {
     this.baseDir = path.resolve(baseDir);
   }
 
   private resolvePath(key: string): string {
-    const safeKey = key.replace(/(\.\.[\/\\])+/g, "");
-    return path.join(this.baseDir, safeKey);
+    if (!key || key.includes("\0") || path.isAbsolute(key)) {
+      throw new Error("Invalid storage key");
+    }
+
+    const resolved = path.resolve(this.baseDir, key);
+    const relative = path.relative(this.baseDir, resolved);
+    if (relative.startsWith("..") || path.isAbsolute(relative)) {
+      throw new Error("Storage key escapes the configured storage directory");
+    }
+
+    return resolved;
   }
 
   async put(key: string, data: Buffer | Uint8Array, mimeType: string): Promise<StorageObjectMeta> {
@@ -50,8 +59,12 @@ export class LocalStorageProvider implements StorageProvider {
     const filePath = this.resolvePath(key);
     try {
       await fs.unlink(filePath);
-    } catch (e: any) {
-      if (e.code !== "ENOENT") throw e;
+    } catch (error: unknown) {
+      if (
+        !(error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "ENOENT")
+      ) {
+        throw error;
+      }
     }
   }
 
@@ -59,12 +72,20 @@ export class LocalStorageProvider implements StorageProvider {
     try {
       await fs.access(this.resolvePath(key));
       return true;
-    } catch {
-      return false;
+    } catch (error: unknown) {
+      if (
+        error instanceof Error &&
+        "code" in error &&
+        (error as NodeJS.ErrnoException).code === "ENOENT"
+      ) {
+        return false;
+      }
+      throw error;
     }
   }
 
   async getSignedDownloadUrl(key: string, _expiresInSeconds = 3600): Promise<string> {
+    this.resolvePath(key);
     return `/api/storage/download/${encodeURIComponent(key)}`;
   }
 }

@@ -10,9 +10,9 @@ This document records the official technology stack choices, verified releases, 
 
 | Component | Target Version | Status | Notes |
 |---|---|---|---|
-| **Node.js** | `v24.20.0` LTS | Verified Installed | Active LTS. Native Web Crypto, fetch, streams, test runner support |
-| **pnpm** | `9.15.9` | Verified Installed | Strict dependency isolation, workspace protocol (`workspace:*`) |
-| **TypeScript** | `^5.7.0` | Verified Target | Strict mode enabled, project references, modern ECMAScript target |
+| **Node.js** | `v26` (Docker/CI baseline) | Verified Target | Current release. Native Web Crypto, fetch, streams, test runner support |
+| **pnpm** | `12.4.2` | Verified Installed | Strict dependency isolation, workspace protocol (`workspace:*`) |
+| **TypeScript** | `7.0.2` | Verified Target | Strict mode enabled, project references, modern ECMAScript target |
 
 ---
 
@@ -32,8 +32,8 @@ This document records the official technology stack choices, verified releases, 
 |---|---|---|
 | **PostgreSQL** | `18.x` | Production relational database, transactions, constraints, full-text search, append-only ledgers |
 | **Drizzle ORM** | `0.45.2` | Type-safe SQL builder & ORM, migration engine, zero runtime bloat, explicit schema definitions |
-| **Drizzle Kit** | `^0.31.0` | Schema migrations and introspection tooling |
-| **pg** / **postgres** | `^3.4.0` | Fast PostgreSQL driver with connection pooling |
+| **Drizzle Kit** | `0.31.10` | Schema migrations and introspection tooling |
+| **postgres** | `3.4.9` | Fast PostgreSQL driver with connection pooling |
 
 ---
 
@@ -41,7 +41,7 @@ This document records the official technology stack choices, verified releases, 
 
 | Library | Version | Role / Justification |
 |---|---|---|
-| **Better Auth** | `1.7.5` | Modern TypeScript auth engine, session cookies (HttpOnly, SameSite), Discord OAuth, 2FA foundation, organization plugins |
+| **Authentication** | Current local session/auth services | httpOnly sessions and scrypt password hashing; external OAuth is a later gate |
 | **Argon2** / WebCrypto | Native / `argon2` | Secure password hashing, brute-force resistance |
 
 ---
@@ -52,7 +52,7 @@ This document records the official technology stack choices, verified releases, 
 |---|---|---|
 | **Tailwind CSS** | `4.3.3` | Next-gen CSS-first compiler, CSS variables for design tokens (light/dark/system) |
 | **Base UI / Radix primitives** | Current stable | Accessible unstyled primitives for Dialog, Dropdown, Tabs, Tooltip, Sheet |
-| **Lucide React** | `1.46.0` | Unified, consistent iconography across all modules |
+| **Lucide React** | `1.47.0` | Unified, consistent iconography across all modules |
 | **clsx & tailwind-merge** | `2.1.1` & `3.7.0` | Predictable class concatenation and conflict resolution |
 
 ---
@@ -61,7 +61,7 @@ This document records the official technology stack choices, verified releases, 
 
 | Library | Version | Role / Justification |
 |---|---|---|
-| **Zod** | `4.6.5` / `3.24.x` | Source-of-truth schemas for forms, API inputs, server actions, webhooks, domain validation |
+| **Zod** | `4.6.5` | Source-of-truth schemas for forms, API inputs, server actions, webhooks, domain validation |
 
 ---
 

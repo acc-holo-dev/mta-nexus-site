@@ -1,93 +1,246 @@
-# MTA NEXUS 1.1 — HTTP API Reference
+# MTA NEXUS HTTP API
 
-## 1. System Health Checks
+This reference documents the current closed-beta API. The platform is player-first:
+live server data comes from the official MTA master-list. NEXUS does not require an
+in-game resource, heartbeat agent, `config.lua`, or runtime code on third-party
+MTA servers.
 
-### `GET /api/health`
-Returns global health status, active version, uptime, and environment.
+All endpoints return JSON. Error objects expose a short, safe `error` message;
+callers must not rely on internal implementation details.
 
-### `GET /api/health/db`
-Verifies live connectivity to the PostgreSQL database (`SELECT 1`) and returns round-trip latency.
-
-### `GET /api/health/storage`
-Verifies availability of the configured storage provider (`local` / `s3`).
-
-## 2. Authentication Endpoints
+## Authentication
 
 ### `POST /api/auth/register`
-Creates a new user record with salted scrypt hashing, opens a session, and sets an `httpOnly` cookie.
-- **Request Body:**
-  ```json
-  {
-    "email": "developer@example.com",
-    "username": "mta_dev",
-    "password": "Password123!",
-    "displayName": "MTA Developer"
-  }
-  ```
+
+Creates an account, starts a session and sets the HTTP-only `nexus_session` cookie.
+Registration is rate limited per client IP.
 
 ### `POST /api/auth/login`
-Validates credentials against PostgreSQL, registers a session record, and sets an `httpOnly` cookie.
-- **Request Body:**
-  ```json
-  {
-    "email": "admin@mta-nexus.com",
-    "password": "password123"
-  }
-  ```
+
+Validates credentials, creates a session and sets the HTTP-only session cookie.
+Failed attempts are rate limited per client IP.
 
 ### `GET /api/auth/session`
-Returns the currently authenticated user based on the incoming session cookie.
 
-### `DELETE /api/auth/session`
-Invalidates the current session in PostgreSQL and clears the session cookie.
+Returns the current authenticated user without password material.
 
-## 3. Discovery & Search
+### `GET /api/auth/sessions`
 
-### `GET /api/search?q=:query`
-Unified search engine querying across Products, Servers, Articles, and Developers directly from PostgreSQL.
+Returns metadata for the authenticated user's sessions. Session tokens are never
+returned. The response is private and not cacheable.
 
-## 4. Commerce Endpoints
+### `GET /api/auth/context`
 
-### `POST /api/checkout`
-Requires an authenticated session (401 otherwise). Validates checkout input, creates an order, transitions payment state to `completed`, appends balanced entries to the double-entry financial ledger, and provisions cryptographic licenses and entitlements. Rate limited.
+Returns the authenticated user's available contexts: a personal context plus
+organization memberships (bounded to 50). The response is private and never
+cached.
 
-## 5. Product Endpoints
+### `POST /api/auth/context`
 
-### `GET /api/products/:id`
-Public product DTO (title, price, currency, license model, version). Returns 404 for unpublished products.
+Switches the active account context after verifying organization membership:
+
+```json
+{ "contextId": "org_..." }
+```
+
+Use `"personal"` to return to the personal context. Switches are rate limited
+and recorded in the audit log; selecting an organization never grants permissions
+beyond that membership.
+
+### `DELETE /api/auth/sessions`
+
+Revoke one owned session:
+
+```json
+{ "sessionId": "ses_..." }
+```
+
+Or revoke every other session while keeping the current session:
+
+```json
+{ "allOther": true }
+```
+
+### `POST /api/auth/password`
+
+Changes the authenticated user's password after verifying the current password.
+All other sessions are revoked. Password changes are audited and rate limited.
+
+```json
+{
+  "currentPassword": "old password",
+  "newPassword": "new password"
+}
+```
+
+## Server profiles and live state
+
+### `GET /api/servers`
+
+Returns up to 100 active editorial server profiles (use the optional `limit`
+parameter for a smaller page). Each profile includes an explicit
+`liveObservation` (or `null`) and `liveStatus` (`online`, `offline` or
+`unknown`) matched to the official MTA master-list by normalized address/port.
+The response also reports whether the directory snapshot is stale. Editorial
+metadata may include validated website, Discord and rules links, up to eight media
+URLs, language, region and up to twelve gameplay tags; these fields never
+override the live observation.
+
+## Live MTA directory
+
+### `GET /api/servers/directory`
+
+Returns a bounded, paginated view of the official MTA master-list. Supported
+query parameters include `offset`, `limit`, `query`, and `minPlayers`.
+The endpoint exposes live observations only; editorial server profiles remain
+under `/api/servers`.
+
+When the official directory is unavailable, the endpoint returns `503` with
+`Retry-After` and does not invent offline or zero-player data.
+
+## Resources
+
+### `GET /api/products`
+
+Returns the free published resource catalog. The optional `limit` parameter is
+bounded to 100 and successful responses use short public caching. Paid products
+remain unavailable in the closed beta.
+
+### `POST /api/products/:id/builds`
+
+Uploads a free resource build for review. The server validates the archive
+signature, size, extension, filename and derived MIME type before private
+storage. New builds begin in `pending_review`, remain unsigned, and expose
+scanner state honestly.
 
 ### `GET /api/products/:id/download`
-Authorized build delivery. Requires session + entitlement/license/ownership. Returns the real published build metadata (version, SHA-256) or 404 when no published build exists. Fallback builds and synthetic hashes are prohibited. Rate limited.
+
+Requires authentication and a valid entitlement (or resource ownership). Only
+the latest published build is downloadable. The response includes the recorded
+SHA-256 checksum, trusted MIME type and `nosniff` protection.
+
+### `POST /api/resources/claim`
+
+Claims a free published resource for the signed-in player and creates the
+download entitlement. Paid resources and checkout remain disabled in the
+closed beta.
+
+
+## Product reviews
 
 ### `GET /api/products/:id/reviews`
-Public review list for a product.
+
+Returns up to 100 newest reviews for a published free resource. Draft and
+archived resources return `404`.
 
 ### `POST /api/products/:id/reviews`
-Review submission with integrity enforcement: verified purchase required for paid products, one review per user per product, self-reviews rejected. Recalculates the product rating from real review records. Rate limited.
 
-## 6. Social & Notification Endpoints
+Requires authentication, a valid `product.download` entitlement and a published
+resource. Authors cannot review their own resource, and the database enforces one
+review per user/resource even when concurrent submissions race.
 
-### `GET/POST/DELETE /api/follow`
-Follow/unfollow with target validation — target types restricted to `user`, `server`, `product`, `organization`, and the target must exist. Self-follow rejected. Notifies followed users.
+## Search
+
+### `GET /api/search?q=...`
+
+Searches published resources, public servers, published content, developers and
+organizations. The query is limited to 100 characters and the optional `limit`
+is capped at 50. Use the optional `type` facet (`product`, `server`,
+`developer`, `organization` or `article`) to restrict results. Empty queries
+return an empty result set; repeated searches are rate limited per client IP and
+successful responses use short public caching. Server player badges are shown
+only when the official MTA directory has a matching observation.
+
+
+## Creator profiles
+
+### `GET /developers/:username`
+
+Renders a public creator profile only for developer/admin accounts and bounds
+published resource reads to 100. Identity verification is shown only when the
+account's verification state is true; seller or reputation badges are not inferred.
+
+## Community content
+
+### `GET /api/content`
+
+Returns publicly published articles, updates and posts. The optional `limit`
+parameter is bounded to 100 items.
+
+### `GET /api/content/:slug`
+
+Returns one published article and up to 100 newest comments. Draft and archived
+slugs return `404`; metadata reads do not increment the article view counter a
+second time.
+
+### `POST /api/content/:slug/comments`
+
+Adds an authenticated comment or reply to a published article. Parent comments
+must belong to the same article; writes are rate limited, update the comment
+counter transactionally and notify the article author.
+
+### `POST /api/content`
+
+Creates content for the authenticated author. Player and creator submissions are
+stored as `draft`; only an authorized moderator can request immediate
+publication. Linked server, resource and organization IDs must exist. The
+operation is rate limited per account.
+
+### `POST /api/admin/actions` for content
+
+Moderators can transition a submitted content draft with:
+
+```json
+{ "targetType": "content", "targetId": "cnt_...", "action": "publish" }
+```
+
+Use `archive` to reject/archive a draft. Both transitions require the moderation
+capability and create an audit event.
+
+## Notifications
 
 ### `GET /api/notifications`
-Returns the authenticated user's notifications and unread count.
+
+Returns the authenticated user's notification feed. Use `limit` (bounded to
+100) and `unreadOnly=true` for a focused feed. Responses are private and
+not cacheable.
 
 ### `POST /api/notifications/mark-read`
-IDOR-protected: a notification can only be marked read by its recipient (404 otherwise).
 
-## 7. Trust & Moderation Endpoints
+Marks one owned notification read using `{ "id": "..." }`, or marks all of the
+user's notifications read with an empty body. Mutations are rate limited.
 
-### `GET/POST /api/verification`
-Submit and list verification requests (user, developer, organization, server). Rate limited to 3 per day.
+### `GET /api/notifications/preferences`
 
-### `GET/POST /api/reports`
-Report submission with rate limiting; listing restricted to moderators.
+Returns the authenticated user's in-app notification preferences.
 
-### `POST /api/admin/actions`
-Moderator-only actions: product feature/suspend/restore, report resolve/dismiss, verification approve/reject. Every action is audit logged.
+### `PATCH /api/notifications/preferences`
 
-## 8. Server Telemetry Endpoints
+Updates one or more preference flags:
 
-### `POST /api/server/installations/heartbeat`
-Installation authentication via SHA-256 hashed API key. Records telemetry snapshots (players, status, module version), updates live server statistics, and records the last heartbeat. Rate limited.
+```json
+{
+  "followsEnabled": false,
+  "contentEnabled": true,
+  "serverEnabled": true,
+  "commerceEnabled": true,
+  "systemEnabled": true
+}
+```
+
+Security notifications are always delivered.
+
+## Trust and safety
+
+### `POST /api/reports`
+
+Creates a validated abuse report for an existing user, server, product, content
+or comment target. Duplicate open reports by the same reporter and target are rejected.
+
+### `POST /api/verification`
+
+Submits an ownership/identity verification request. Moderators process requests
+through the protected moderation queue.
+
+No endpoint in this release activates payments, crypto settlement, seller
+balances, payouts, or MTA server-side software.

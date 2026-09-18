@@ -5,8 +5,7 @@ import { Code2, Award, ShieldCheck, CheckCircle2 } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function DevelopersPage() {
-  const allUsers = await authService.listUsers();
-  const developers = allUsers.filter((u) => u.role === "developer" || u.role === "admin");
+  const developers = await authService.listDevelopers(100);
 
   return (
     <div className="space-y-8">
@@ -42,7 +41,7 @@ export default async function DevelopersPage() {
                     {dev.displayName}
                   </h3>
                   {dev.isVerified && (
-                    <span title="Verified Developer">
+                    <span title="Verified identity">
                       <ShieldCheck className="w-4 h-4 text-purple-400" />
                     </span>
                   )}
@@ -58,10 +57,10 @@ export default async function DevelopersPage() {
             <div className="flex items-center justify-between pt-4 border-t border-base text-xs">
               <span className="flex items-center gap-1 text-emerald-400 font-medium">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                Verified Seller
+                {dev.isVerified ? "Verified identity" : "Creator profile"}
               </span>
               <span className="text-purple-400 font-semibold group-hover:underline">
-                View Portfolio в†’
+                View Portfolio →
               </span>
             </div>
           </Link>

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
 import { Calendar, Eye, ThumbsUp, MessageSquare, ArrowLeft, Tag } from "lucide-react";
+import { ContentCommentForm } from "../../../components/content-comment-form";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const article = await contentService.getArticleBySlug(slug);
+  // Metadata generation must not count as a second article view.
+  const article = await contentService.getArticleBySlug(slug, { incrementView: false });
 
   if (!article) {
     return { title: "Article not found" };
@@ -45,7 +47,7 @@ export default async function ArticleDetailPage({
   }
 
   const author = await authService.getUserById(article.authorId);
-  const comments = await contentService.getComments({ contentId: article.id });
+  const comments = await contentService.getComments({ contentId: article.id }, 100);
 
   const formattedDate = new Date(article.createdAt).toLocaleDateString("en-US", {
     month: "long",
@@ -139,6 +141,8 @@ export default async function ArticleDetailPage({
           <MessageSquare className="w-4 h-4 text-amber-400" />
           <span>Discussion & Comments ({comments.length})</span>
         </h3>
+
+        <ContentCommentForm slug={article.slug} />
 
         {comments.length > 0 ? (
           <div className="space-y-4">

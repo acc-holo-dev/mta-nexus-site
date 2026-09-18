@@ -9,12 +9,12 @@ export function getStorageProvider(): StorageProvider {
 
   if (config.STORAGE_PROVIDER === "local") {
     instance = new LocalStorageProvider(config.STORAGE_LOCAL_PATH);
-  } else {
-    // S3 fallback to local or mocked S3 provider
-    instance = new LocalStorageProvider(config.STORAGE_LOCAL_PATH);
+    return instance;
   }
 
-  return instance;
+  throw new Error(
+    "S3 storage is configured but no S3 adapter is installed. Refusing to fall back to local storage."
+  );
 }
 
 export * from "./types";

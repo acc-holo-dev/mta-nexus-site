@@ -5,30 +5,18 @@ import type { License } from "@nexus/domain";
 
 export class LicenseRepository {
   async findByKey(key: string): Promise<License | null> {
-    try {
-      const rows = await db.select().from(licenses).where(eq(licenses.key, key)).limit(1);
-      return (rows[0] as unknown as License) || null;
-    } catch {
-      return null;
-    }
+        const rows = await db.select().from(licenses).where(eq(licenses.key, key)).limit(1);
+    return (rows[0] as unknown as License) || null;
   }
 
   async listByUser(userId: string): Promise<License[]> {
-    try {
-      const rows = await db.select().from(licenses).where(eq(licenses.userId, userId));
-      return rows as unknown as License[];
-    } catch {
-      return [];
-    }
+        const rows = await db.select().from(licenses).where(eq(licenses.userId, userId));
+    return rows as unknown as License[];
   }
 
   async listAll(): Promise<License[]> {
-    try {
-      const rows = await db.select().from(licenses);
-      return rows as unknown as License[];
-    } catch {
-      return [];
-    }
+        const rows = await db.select().from(licenses);
+    return rows as unknown as License[];
   }
 
   async create(data: Omit<License, "createdAt" | "updatedAt">): Promise<License> {
@@ -38,23 +26,15 @@ export class LicenseRepository {
       updatedAt: new Date(),
     };
 
-    try {
-      const rows = await db.insert(licenses).values(values).returning();
-      return rows[0] as unknown as License;
-    } catch {
-      return values as unknown as License;
-    }
+        const rows = await db.insert(licenses).values(values).returning();
+    return rows[0] as unknown as License;
   }
 
   async updateStatus(id: string, status: License["status"]): Promise<void> {
-    try {
-      await db
-        .update(licenses)
-        .set({ status, updatedAt: new Date() })
-        .where(eq(licenses.id, id));
-    } catch {
-      // ignore
-    }
+        await db
+      .update(licenses)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(licenses.id, id));
   }
 }
 

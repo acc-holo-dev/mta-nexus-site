@@ -104,7 +104,7 @@ export async function runSeed() {
     id: "srv_horizon_rp",
     name: "Horizon Roleplay: Los Santos 2026",
     slug: "horizon-roleplay",
-    description: "Hardcore text & voice roleplay server powered by Nexus Runtime Module with dynamic economy, inventory physics, faction warfare, and authentic government mechanics.",
+    description: "Hardcore text & voice roleplay server with dynamic economy, inventory physics, faction warfare, and authentic government mechanics.",
     ipAddress: "rp.horizon-mta.com",
     port: 22003,
     httpPort: 22005,
@@ -132,9 +132,9 @@ export async function runSeed() {
     status: "published",
     authorId: dev.id,
     organizationId: "org_horizon",
-    price: 3499,
+    price: 0,
     currency: "USD",
-    licenseModel: "single_server",
+    licenseModel: "unlimited",
     tags: ["inventory", "crafting", "ui", "roleplay", "networking"],
     currentVersion: "3.2.0",
     ratingAverage: 49,
@@ -147,8 +147,7 @@ export async function runSeed() {
     ],
     compatibility: {
       mtaMinVersion: "1.6.0",
-      moduleMinVersion: "1.0.0",
-      dependencies: ["nexus_module"],
+      dependencies: [],
     },
   });
 
@@ -162,9 +161,9 @@ export async function runSeed() {
     status: "published",
     authorId: dev.id,
     organizationId: "org_horizon",
-    price: 1999,
+    price: 0,
     currency: "USD",
-    licenseModel: "single_server",
+    licenseModel: "unlimited",
     tags: ["drift", "handling", "vehicles", "physics", "telemetry"],
     currentVersion: "2.1.4",
     ratingAverage: 48,
@@ -192,7 +191,12 @@ export async function runSeed() {
     sha256Hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     fileSizeBytes: 4829104,
     mtaVersionTarget: "1.6.0",
-    isSigned: true,
+    fileName: "resource.zip",
+    mimeType: "application/zip",
+    scanStatus: "clean",
+    scanner: "seed-manual-review",
+    scannedAt: new Date(),
+    isSigned: false,
   });
 
   // 6. Licenses

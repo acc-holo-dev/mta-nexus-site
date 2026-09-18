@@ -9,7 +9,7 @@
 | `organizations` | `org_...` | Unique slug, owner foreign key to `users.id` |
 | `organization_members` | `mem_...` | Unique `(orgId, userId)`, role (owner, admin, developer, member) |
 | `servers` | `srv_...` | Unique slug, foreign key to `users.id` and optional `organizations.id` |
-| `server_installations` | `ins_...` | Foreign key to `servers.id`, module version, heartbeat timestamp |
+| `server_observations` | `obs_...` | Immutable public MTA observation, source, captured server fields and timestamp |
 | `products` | `prd_...` | Unique slug, foreign key to `users.id`, price in cents, license model |
 | `builds` | `bld_...` | Foreign key to `products.id`, SHA-256 hash, unique `(productId, version)` |
 | `assets` | `ast_...` | Foreign key to `users.id`, storage key, mime type, size, SHA-256 hash |
@@ -28,4 +28,3 @@
 | `reports` | `rpt_...` | Reporter foreign key to `users.id`, evidence URLs, status |
 | `moderation_cases` | `mod_...` | Foreign key to `reports.id`, moderator foreign key to `users.id` |
 | `verification_requests` | `ver_...` | Trust layer workflow: requester, target type/id, status, reviewer, resolution notes |
-| `server_heartbeats` | `ins_...` | Telemetry snapshots: installation, players, module version, recorded timestamp |

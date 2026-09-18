@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { registerSchema } from "@nexus/validation";
-import { rateLimiter } from "@nexus/security";
+import { consumeRateLimit, getClientIp } from "@nexus/security";
+import { AppError } from "@nexus/domain";
 
 export async function POST(request: NextRequest) {
   try {
-    // Abuse protection: limit registrations per IP
-    const ip = request.headers.get("x-forwarded-for") || "local";
-    const rl = await rateLimiter.consume(`register:${ip}`, 5, 3600);
+    const ip = getClientIp(request.headers);
+    const rl = await consumeRateLimit("authRegistration", ip);
     if (!rl.success) {
       return NextResponse.json(
         { error: "Too many registration attempts. Please try again later." },
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const parsed = registerSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -37,10 +37,15 @@ export async function POST(request: NextRequest) {
     });
 
     return response;
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to register" },
-      { status: error.statusCode || 400 }
-    );
+  } catch (error: unknown) {
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode }
+      );
+    }
+
+    console.error("Registration failed", error);
+    return NextResponse.json({ error: "Failed to register" }, { status: 500 });
   }
 }

@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";
+import { productService } from "../../../../lib/services/product-service";
+import { contentService } from "../../../../lib/services/content-service";
 import {
   productRepository,
   reportRepository,
   auditRepository,
   verificationRepository,
 } from "@nexus/db";
-import { can, generateId, rateLimiter } from "@nexus/security";
+import { can, consumeRateLimit, generateId } from "@nexus/security";
+
+const adminActionSchema = z.discriminatedUnion("targetType", [
+  z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("report"), targetId: z.string().min(1), action: z.enum(["resolve", "dismiss"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("verification"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("build"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("content"), targetId: z.string().min(1), action: z.enum(["publish", "archive"]), notes: z.string().max(2000).optional() }),
+]);
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,30 +32,38 @@ export async function POST(request: NextRequest) {
     }
 
     // Admin actions are rate limited
-    const rl = await rateLimiter.consume(`admin-action:${user.id}`, 60, 60);
+    const rl = await consumeRateLimit("moderationAction", user.id);
     if (!rl.success) {
       return NextResponse.json({ error: "Too many admin actions" }, { status: 429 });
     }
 
-    const { targetType, targetId, action, notes } = await request.json();
-
-    if (!targetType || !targetId || !action) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    const parsed = adminActionSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid moderation action", details: parsed.error.format() }, { status: 400 });
     }
+    const { targetType, targetId, action, notes } = parsed.data;
 
     if (targetType === "product") {
-      if (action === "feature") {
-        await productRepository.update(targetId, { isFeatured: true });
-      } else if (action === "unfeature") {
-        await productRepository.update(targetId, { isFeatured: false });
-      } else if (action === "suspend") {
-        await productRepository.update(targetId, { status: "suspended" });
-      } else if (action === "restore") {
-        await productRepository.update(targetId, { status: "published" });
+      const updated = action === "feature"
+        ? await productRepository.update(targetId, { isFeatured: true })
+        : action === "unfeature"
+          ? await productRepository.update(targetId, { isFeatured: false })
+          : action === "suspend"
+            ? await productRepository.update(targetId, { status: "suspended" })
+            : await productRepository.update(targetId, { status: "published" });
+      if (!updated) {
+        return NextResponse.json({ error: "Product not found" }, { status: 404 });
       }
     } else if (targetType === "report") {
       if (action === "resolve" || action === "dismiss") {
-        await reportRepository.resolve(targetId, action === "resolve" ? "resolved" : "dismissed", notes || "");
+        const resolved = await reportRepository.resolve(
+          targetId,
+          action === "resolve" ? "resolved" : "dismissed",
+          notes || ""
+        );
+        if (!resolved) {
+          return NextResponse.json({ error: "Report not found" }, { status: 404 });
+        }
       }
     } else if (targetType === "verification") {
       // Verification can only be granted through the moderation workflow
@@ -63,6 +82,14 @@ export async function POST(request: NextRequest) {
           );
         }
       }
+    } else if (targetType === "build") {
+      await productService.reviewBuild({
+        buildId: targetId,
+        decision: action,
+        notes,
+      }, user);
+    } else if (targetType === "content") {
+      await contentService.moderateContent(targetId, action, user, notes);
     }
 
     await auditRepository.record({
@@ -76,11 +103,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, action, targetId });
-  } catch (error: any) {
-    console.error("Admin action error:", error.message);
-    return NextResponse.json(
-      { error: error.statusCode ? error.message : "Failed to execute administrative action" },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error: unknown) {
+    console.error("Admin action error:", error);
+    return NextResponse.json({ error: "Failed to execute administrative action" }, { status: 500 });
   }
 }

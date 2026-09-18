@@ -49,9 +49,9 @@ export type ServerUpdatedEvent = DomainEvent<
   { serverId: string; updatedFields: string[] }
 >;
 
-export type ServerInstallationActivatedEvent = DomainEvent<
-  "server.installation.activated",
-  { installationId: string; serverId: string; moduleVersion: string }
+export type ServerObservedEvent = DomainEvent<
+  "server.observed",
+  { serverId: string; source: "mta_master" | "mta_query"; observedAt: string }
 >;
 
 export type OrderCreatedEvent = DomainEvent<
@@ -91,7 +91,7 @@ export type NexusDomainEvent =
   | BuildReleasedEvent
   | ServerCreatedEvent
   | ServerUpdatedEvent
-  | ServerInstallationActivatedEvent
+  | ServerObservedEvent
   | OrderCreatedEvent
   | PaymentCompletedEvent
   | LicenseIssuedEvent

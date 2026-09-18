@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
+import { consumeRateLimit } from "@nexus/security";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,6 +10,14 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rateLimit = await consumeRateLimit("notificationMutation", user.id);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: "Too many notification updates. Please try again shortly." },
+        { status: 429 }
+      );
     }
 
     const body = await request.json().catch(() => ({}));
@@ -26,10 +35,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to mark notifications read" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    console.error("Notification update error:", error);
+    return NextResponse.json({ error: "Failed to mark notifications read" }, { status: 500 });
   }
 }

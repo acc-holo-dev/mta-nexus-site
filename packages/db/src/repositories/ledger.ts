@@ -5,48 +5,35 @@ import type { LedgerEntry } from "@nexus/domain";
 
 export class LedgerRepository {
   async append(entries: Omit<LedgerEntry, "createdAt">[]): Promise<LedgerEntry[]> {
-    const results: LedgerEntry[] = [];
+    const records: LedgerEntry[] = entries.map((entry) => ({
+      ...entry,
+      createdAt: new Date(),
+    }));
 
-    for (const e of entries) {
-      const record: LedgerEntry = {
-        ...e,
-        createdAt: new Date(),
-      };
-
-      try {
-        await db.insert(ledgerEntries).values(record);
-        results.push(record);
-      } catch {
-        results.push(record);
+    await db.transaction(async (tx) => {
+      for (const record of records) {
+        await tx.insert(ledgerEntries).values(record);
       }
-    }
+    });
 
-    return results;
+    return records;
   }
 
   async listRecent(limit = 20): Promise<LedgerEntry[]> {
-    try {
-      const rows = await db
-        .select()
-        .from(ledgerEntries)
-        .orderBy(desc(ledgerEntries.createdAt))
-        .limit(limit);
-      return rows as unknown as LedgerEntry[];
-    } catch {
-      return [];
-    }
+    const rows = await db
+      .select()
+      .from(ledgerEntries)
+      .orderBy(desc(ledgerEntries.createdAt))
+      .limit(limit);
+    return rows as unknown as LedgerEntry[];
   }
 
   async getAccountBalance(accountId: string): Promise<number> {
-    try {
-      const rows = await db
-        .select()
-        .from(ledgerEntries)
-        .where(eq(ledgerEntries.accountId, accountId));
-      return rows.reduce((sum, r) => sum + r.amount, 0);
-    } catch {
-      return 0;
-    }
+    const rows = await db
+      .select()
+      .from(ledgerEntries)
+      .where(eq(ledgerEntries.accountId, accountId));
+    return rows.reduce((sum, row) => sum + row.amount, 0);
   }
 }
 

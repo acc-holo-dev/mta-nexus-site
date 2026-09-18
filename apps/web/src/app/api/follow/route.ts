@@ -8,19 +8,26 @@ import {
   organizationRepository,
   notificationRepository,
 } from "@nexus/db";
-import { generateId } from "@nexus/security";
+import { consumeRateLimit, generateId } from "@nexus/security";
 
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;
 type TargetType = (typeof ALLOWED_TARGET_TYPES)[number];
+
+function isTargetType(value: unknown): value is TargetType {
+  return typeof value === "string" && ALLOWED_TARGET_TYPES.includes(value as TargetType);
+}
 
 async function targetExists(targetType: TargetType, targetId: string): Promise<boolean> {
   switch (targetType) {
     case "user":
       return (await userRepository.findById(targetId)) !== null;
     case "server":
-      return (await serverRepository.findById(targetId)) !== null;
-    case "product":
-      return (await productRepository.findById(targetId)) !== null;
+      const server = await serverRepository.findById(targetId);
+      return server !== null && server.visibility !== "private" && server.status !== "suspended";
+    case "product": {
+      const product = await productRepository.findById(targetId);
+      return product !== null && product.status === "published" && product.price === 0;
+    }
     case "organization":
       return (await organizationRepository.findById(targetId)) !== null;
     default:
@@ -56,9 +63,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const { targetType, targetId } = await request.json();
+    const rateLimit = await consumeRateLimit("follow", user.id);
+    if (!rateLimit.success) {
+      return NextResponse.json({ error: "Too many follow requests. Please try again shortly." }, { status: 429 });
+    }
 
-    if (!ALLOWED_TARGET_TYPES.includes(targetType)) {
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Request body must be an object" }, { status: 400 });
+    }
+    const { targetType, targetId } = body as {
+      targetType?: unknown;
+      targetId?: unknown;
+    };
+
+    if (!isTargetType(targetType)) {
       return NextResponse.json(
         { error: `Invalid target type. Allowed: ${ALLOWED_TARGET_TYPES.join(", ")}` },
         { status: 400 }
@@ -69,18 +88,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Target ID required" }, { status: 400 });
     }
 
-    // Target must actually exist — no arbitrary references
-    if (!(await targetExists(targetType as TargetType, targetId))) {
+    if (!(await targetExists(targetType, targetId))) {
       return NextResponse.json({ error: "Target does not exist" }, { status: 404 });
     }
 
     if (targetType === "user" && targetId === user.id) {
       return NextResponse.json({ error: "Cannot follow yourself" }, { status: 400 });
-    }
-
-    const alreadyFollowing = await socialRepository.isFollowing(user.id, targetType, targetId);
-    if (alreadyFollowing) {
-      return NextResponse.json({ error: "Already following this target" }, { status: 409 });
     }
 
     const follow = await socialRepository.follow({
@@ -89,8 +102,10 @@ export async function POST(request: NextRequest) {
       targetType,
       targetId,
     });
+    if (!follow) {
+      return NextResponse.json({ error: "Already following this target" }, { status: 409 });
+    }
 
-    // Notify target user if following a user/developer
     if (targetType === "user" && targetId !== user.id) {
       await notificationRepository.create({
         id: generateId("not"),
@@ -98,16 +113,15 @@ export async function POST(request: NextRequest) {
         title: "New Follower",
         message: `@${user.username} started following your activity.`,
         type: "system",
+        category: "follow",
         link: `/users/${user.username}`,
       });
     }
 
     return NextResponse.json({ success: true, follow });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to follow" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    console.error("Follow API error:", error);
+    return NextResponse.json({ error: "Follow request failed" }, { status: 500 });
   }
 }
 
@@ -120,19 +134,32 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const { targetType, targetId } = await request.json();
+    const rateLimit = await consumeRateLimit("follow", user.id);
+    if (!rateLimit.success) {
+      return NextResponse.json({ error: "Too many follow requests. Please try again shortly." }, { status: 429 });
+    }
 
-    if (!ALLOWED_TARGET_TYPES.includes(targetType)) {
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ error: "Request body must be an object" }, { status: 400 });
+    }
+    const { targetType, targetId } = body as {
+      targetType?: unknown;
+      targetId?: unknown;
+    };
+
+    if (!isTargetType(targetType)) {
       return NextResponse.json({ error: "Invalid target type" }, { status: 400 });
+    }
+    if (typeof targetId !== "string" || targetId.length === 0) {
+      return NextResponse.json({ error: "Target ID required" }, { status: 400 });
     }
 
     await socialRepository.unfollow(user.id, targetType, targetId);
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to unfollow" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    console.error("Follow API error:", error);
+    return NextResponse.json({ error: "Follow request failed" }, { status: 500 });
   }
 }

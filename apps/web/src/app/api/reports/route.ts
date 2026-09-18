@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
-import { reportRepository, auditRepository } from "@nexus/db";
+import {
+  auditRepository,
+  contentRepository,
+  notificationRepository,
+  productRepository,
+  reportRepository,
+  serverRepository,
+  userRepository,
+} from "@nexus/db";
 import { createReportSchema } from "@nexus/validation";
-import { generateId, can, rateLimiter } from "@nexus/security";
+import { generateId, can, consumeRateLimit } from "@nexus/security";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("nexus_session")?.value;
@@ -26,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Abuse protection: limit report spam per user
-    const rl = await rateLimiter.consume(`report:${user.id}`, 10, 3600);
+    const rl = await consumeRateLimit("report", user.id);
     if (!rl.success) {
       return NextResponse.json(
         { error: "Too many reports submitted. Please try again later." },
@@ -34,13 +42,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
     const parsed = createReportSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Validation error", details: parsed.error.format() },
         { status: 400 }
+      );
+    }
+
+    if (parsed.data.targetType === "user" && parsed.data.targetId === user.id) {
+      return NextResponse.json({ error: "You cannot report your own account" }, { status: 422 });
+    }
+
+    const targetExists = parsed.data.targetType === "product"
+      ? await productRepository.findById(parsed.data.targetId)
+      : parsed.data.targetType === "server"
+        ? await serverRepository.findById(parsed.data.targetId)
+        : parsed.data.targetType === "content"
+          ? await contentRepository.findById(parsed.data.targetId)
+          : parsed.data.targetType === "comment"
+            ? await contentRepository.findCommentById(parsed.data.targetId)
+            : await userRepository.findById(parsed.data.targetId);
+    if (!targetExists) {
+      return NextResponse.json({ error: "Report target was not found" }, { status: 404 });
+    }
+
+    const duplicate = await reportRepository.findOpenByReporterAndTarget(
+      user.id,
+      parsed.data.targetType,
+      parsed.data.targetId
+    );
+    if (duplicate) {
+      return NextResponse.json(
+        { error: "You already have an open report for this target", reportId: duplicate.id },
+        { status: 409 }
       );
     }
 
@@ -66,11 +103,25 @@ export async function POST(request: NextRequest) {
       details: { type: parsed.data.type, targetType: parsed.data.targetType },
     });
 
-    return NextResponse.json({ success: true, report }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to submit report" },
-      { status: 500 }
+    const moderators = (await userRepository.listAll()).filter(
+      (candidate) => candidate.role === "moderator" || candidate.role === "admin"
     );
+    await Promise.all(
+      moderators.map((moderator) =>
+        notificationRepository.create({
+          id: generateId("not"),
+          recipientId: moderator.id,
+          title: "New report requires review",
+          message: `${parsed.data.type} report for ${parsed.data.targetType}:${parsed.data.targetId}`,
+          link: "/admin",
+          type: "security",
+        })
+      )
+    );
+
+    return NextResponse.json({ success: true, report }, { status: 201 });
+  } catch (error: unknown) {
+    console.error("Report submission error:", error);
+    return NextResponse.json({ error: "Failed to submit report" }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 # MTA NEXUS — Статус выполнения планов (аудит реальности)
 
-**Дата аудита:** по состоянию коммита `e183d54` + последующие исправления изоляции данных.
+**Дата аудита:** 2026-09-18, ветка `dev`; актуализировано после перехода на публичные MTA-наблюдения и защищённый lifecycle ресурсов.
 **Метод:** сверка каждого требования планов PLAN-001…PLAN-004 с фактическим кодом и runtime-проверками (HTTP-запросы, тесты, анализ импортов).
 
 > Важный принцип документа: здесь фиксируется **что реально работает**, а не то, что планировалось.
@@ -87,8 +87,8 @@
 - **IDOR в notifications:** `markAsRead(id, recipientId)` — проверка владельца на уровне SQL. Подтверждено тестом (user B не может отметить уведомление user A — получает `false`).
 - **Social validation:** Follow принимает только enum-типы, проверяет существование цели, запрещает self-follow и дубли.
 - **Review integrity:** verified purchase обязателен для платных продуктов, дубликаты и self-review отклоняются. Подтверждено тестами.
-- **Rate limiting:** login 8/5м, register 5/ч, checkout 10/мин, downloads 30/мин, reviews 5/5м, reports 10/ч, verification 3/сут, heartbeat 120/мин, admin 60/мин.
-- **Heartbeat:** `POST /api/server/installations/heartbeat` с SHA-256 хешем API-ключа (plaintext показывается один раз), обновление live-статистики, таблица `server_heartbeats`, peak за 24ч.
+- **Rate limiting:** login 8/5м, register 5/ч, checkout 10/мин, downloads 30/мин, reviews 5/5м, reports 10/ч, verification 3/сут, admin 60/мин.
+- **Наблюдения серверов:** NEXUS сам получает публичные данные MTA, сохраняет источник и время наблюдения; игровой сервер не устанавливает агент и не передаёт API-ключ.
 - **Verification workflow:** `verification_requests`, approve/reject только через админ-действие, `isVerified` применяется только по решению модератора. Подтверждено тестом.
 - **Seller dashboard:** `/workspace/sales` из реальных completed-ордеров и ledger-записей.
 
@@ -97,7 +97,7 @@
 | # | Требование плана | Фактическое состояние | Почему не блокер |
 |---|---|---|---|
 | 1 | TASK-039: rate limiting | `MemoryRateLimiter` — **in-memory, per-process**: сбрасывается при перезапуске и не разделяется между инстансами | Для single-instance deployment соответствуют плану; вынос в Redis осознанно отложен (план запрещал добавлять Redis без необходимости) |
-| 2 | TASK-016: «не использовать hardcoded currentPlayers в production records» | Development seed содержит демо-значения игроков (342, 789) | Seed используется только для разработки; production-данные приходят из heartbeat API |
+| 2 | TASK-016: «не использовать hardcoded currentPlayers в production records» | Development seed содержит демо-значения игроков (342, 789) | Seed используется только для разработки; production-данные приходят из публичных MTA-наблюдений |
 
 ---
 
@@ -111,14 +111,15 @@
 5. Follow → Notification получателю ✅
 6. Report → Admin resolve → Audit event ✅
 7. Verification request → Admin approve → isVerified применён ✅
-8. Heartbeat → live server statistics update ✅
+8. Official MTA directory observation → sourced live server statistics ✅
 
 ### Известные ограничения платформы (честный список)
 - Rate limiter in-memory (см. выше).
-- Payment provider — только `sandbox` (внутренний mock, помечен как таковой в UI). Внешние платёжные провайдеры не подключены.
-- Download delivery возвращает метаданные + delivery token; реальная отдача бинарного архива через signed URL требует подключения S3-провайдера.
+- Платные ресурсы, checkout с деньгами и внешние платёжные провайдеры отключены; closed beta поддерживает только бесплатное добавление в библиотеку.
+- Download delivery потоково отдаёт приватный бинарный архив после проверки entitlement. Production пока использует смонтированное локальное хранилище; S3-compatible provider отложен.
+- Production-публикация сборок требует ClamAV; при недоступном или неоднозначном сканировании одобрение fail-closed.
 - Email-уведомления не реализованы (планировались только в поздних планах; Mailpit в compose для будущего использования).
-- `currentPlayers` серверов без активных heartbeat показывают 0 (реальное, не фейковое поведение).
+- `currentPlayers` без свежего публичного наблюдения имеет состояние `unknown`, а не фиктивный ноль.
 - 2FA, email verification, password reset — foundation есть в схеме, flows не реализованы.
 
 ---
@@ -126,7 +127,7 @@
 ## Команда проверки (воспроизведение)
 
 ```bash
-pnpm check          # typecheck + 31 тест + build
+pnpm check          # typecheck + полный Vitest-набор + production build
 pnpm db:migrate     # применение миграций (26 таблиц)
 pnpm db:seed        # development-данные
 pnpm dev            # http://localhost:3000

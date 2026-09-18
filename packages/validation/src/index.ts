@@ -20,6 +20,34 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required").max(128),
+    newPassword: z.string().min(8, "Password must be at least 8 characters").max(128),
+  })
+  .superRefine((value, context) => {
+    if (value.currentPassword === value.newPassword) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["newPassword"],
+        message: "New password must be different from the current password",
+      });
+    }
+  });
+
+export const notificationPreferencesSchema = z
+  .object({
+    followsEnabled: z.boolean().optional(),
+    contentEnabled: z.boolean().optional(),
+    serverEnabled: z.boolean().optional(),
+    commerceEnabled: z.boolean().optional(),
+    systemEnabled: z.boolean().optional(),
+  })
+  .strict()
+  .refine((value) => Object.keys(value).length > 0, {
+    message: "At least one notification preference is required",
+  });
+
 export const updateProfileSchema = z.object({
   displayName: z.string().min(2).max(50).optional(),
   bio: z.string().max(500).optional(),
@@ -39,6 +67,13 @@ export const createServerSchema = z.object({
   name: z.string().min(3).max(100),
   slug: z.string().min(3).max(100).regex(/^[a-z0-9-]+$/),
   description: z.string().max(5000).optional(),
+  websiteUrl: z.string().url().max(500).optional().or(z.literal("")),
+  discordUrl: z.string().url().max(500).optional().or(z.literal("")),
+  rulesUrl: z.string().url().max(500).optional().or(z.literal("")),
+  mediaUrls: z.array(z.string().url().max(500)).max(8).default([]),
+  language: z.string().trim().max(64).optional(),
+  region: z.string().trim().max(64).optional(),
+  gameplayTags: z.array(z.string().trim().min(1).max(32)).max(12).default([]),
   ipAddress: z.string().min(1, "Server IP address or hostname is required"),
   port: z.coerce.number().int().min(1).max(65535).default(22003),
   httpPort: z.coerce.number().int().min(1).max(65535).default(22005),
@@ -73,7 +108,6 @@ export const createProductSchema = z.object({
   licenseModel: z.enum([
     "single_server",
     "multiple_servers",
-    "per_installation",
     "organization",
     "subscription",
     "unlimited",
@@ -82,11 +116,29 @@ export const createProductSchema = z.object({
   organizationId: z.string().optional(),
   compatibility: z
     .object({
-      mtaMinVersion: z.string().optional(),
-      moduleMinVersion: z.string().optional(),
-      dependencies: z.array(z.string()).optional(),
+      mtaMinVersion: z
+        .string()
+        .regex(/^1\.\d+(\.\d+)?$/, "Use an MTA version such as 1.6 or 1.6.0")
+        .optional(),
+      dependencies: z
+        .array(z.string().min(3).max(120).regex(/^[a-z0-9][a-z0-9._-]*$/, "Use a resource slug"))
+        .max(25)
+        .default([])
+        .superRefine((dependencies, context) => {
+          const seen = new Set<string>();
+          dependencies.forEach((dependency, index) => {
+            if (seen.has(dependency)) {
+              context.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Dependencies must be unique",
+                path: [index],
+              });
+            }
+            seen.add(dependency);
+          });
+        }),
     })
-    .default({}),
+    .default({ dependencies: [] }),
 });
 
 export const updateProductSchema = createProductSchema.partial();
@@ -100,6 +152,11 @@ export const createBuildSchema = z.object({
   sha256Hash: z.string().length(64, "SHA-256 hash must be 64 characters"),
   fileSizeBytes: z.number().int().positive(),
   mtaVersionTarget: z.string().optional(),
+});
+
+// --- Resource acquisition ---
+export const claimResourceSchema = z.object({
+  productId: z.string().min(1),
 });
 
 // --- Checkout & Orders ---
@@ -145,9 +202,16 @@ export const addCommentSchema = z.object({
   rating: z.coerce.number().int().min(1).max(5).optional(),
 });
 
+export const createContentCommentSchema = z
+  .object({
+    parentId: z.string().min(1).optional(),
+    text: z.string().trim().min(1).max(2000),
+  })
+  .strict();
+
 // --- Moderation & Reports ---
 export const createReportSchema = z.object({
-  targetType: z.enum(["product", "server", "content", "user"]),
+  targetType: z.enum(["product", "server", "content", "comment", "user"]),
   targetId: z.string().min(1),
   type: z.enum([
     "scam",

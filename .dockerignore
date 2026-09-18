@@ -1,0 +1,12 @@
+.git
+.github
+node_modules
+.next
+coverage
+temp
+tmp
+.env
+.env.*
+!.env.example
+**/uploads
+**/.DS_Store

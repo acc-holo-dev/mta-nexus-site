@@ -1,36 +1,21 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import {
-  licenseRepository,
-  serverRepository,
+  entitlementRepository,
   productRepository,
-  ledgerRepository,
-  orderRepository,
+  serverRepository,
 } from "@nexus/db";
 import { authService } from "../../lib/services/auth-service";
 import {
-  StatCard,
-  SectionHeader,
-  DataTable,
-  DataTableHeader,
-  DataTableBody,
-  DataTableEmpty,
-  StatusBadge,
-} from "@nexus/ui";
-import {
-  Key,
-  Server as ServerIcon,
-  History,
-  Plus,
-  DollarSign,
-  Users,
-  ShoppingBag,
-} from "lucide-react";
+  matchesMtaEndpoint,
+  mtaMasterDirectoryService,
+} from "../../lib/services/mta-master-directory-service";
+import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
+import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function WorkspacePage() {
-  // Session isolation: overview shows only the current user's data
   const cookieStore = await cookies();
   const token = cookieStore.get("nexus_session")?.value;
   const user = await authService.getSession(token);
@@ -40,202 +25,183 @@ export default async function WorkspacePage() {
       <div className="max-w-md mx-auto py-20 text-center space-y-4">
         <h1 className="font-display text-primary">Sign in required</h1>
         <p className="font-caption text-muted">
-          The workspace contains your private licenses, purchases and financial records.
+          Sign in to manage your resource library and MTA servers.
         </p>
         <Link
           href="/auth/login"
-          className="inline-block px-4 py-2 rounded-md bg-accent hover:bg-[var(--nexus-accent-hover)] text-white text-xs font-semibold transition-colors"
+          className="inline-block px-4 py-2 rounded-md bg-accent text-white text-xs font-semibold"
         >
-          Sign In
+          Sign in
         </Link>
       </div>
     );
   }
 
-  const [licenses, servers, products, ledger, sales] = await Promise.all([
-    licenseRepository.listByUser(user.id),
-    serverRepository.listActivePublic(),
+  const [entitlements, ownedServers, products, directory] = await Promise.all([
+    entitlementRepository.listBySubject({ type: "user", id: user.id }),
+    serverRepository.listByOwner(user.id),
     productRepository.list(),
-    ledgerRepository.listRecent(10),
-    orderRepository.listSalesBySeller(user.id),
+    mtaMasterDirectoryService.getDirectory().catch(() => null),
   ]);
 
-  const productMap = new Map(products.map((p) => [p.id, p]));
-  const activeLicenses = licenses.filter((l) => l.status === "active");
-  const totalPlayers = servers.reduce((acc, s) => acc + s.currentPlayers, 0);
+  const productMap = new Map(products.map((product) => [product.id, product]));
+  const downloadable = entitlements.filter(
+    (entitlement) => entitlement.permission === "product.download"
+  );
+  const observations = directory?.servers ?? [];
+  const liveByServerId = new Map(
+    ownedServers.map((server) => [
+      server.id,
+      observations.find((observation) => matchesMtaEndpoint(server, observation)) ?? null,
+    ])
+  );
+  const onlineServers = ownedServers.filter((server) => {
+    const observation = liveByServerId.get(server.id);
+    return Boolean(observation && observation.responding !== false);
+  });
+  const onlinePlayers = onlineServers.reduce(
+    (total, server) => total + (liveByServerId.get(server.id)?.players ?? 0),
+    0
+  );
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-primary">Workspace</h1>
           <p className="font-caption text-muted mt-0.5">
-            Signed in as @{user.username} — your licenses, purchases and financial activity.
+            @{user.username} · your resources and servers
+          </p>
+          <p className="font-caption text-faint mt-1">
+            Live status comes only from the official MTA master-list; missing observations stay unknown.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link
-            href="/market"
-            className="px-3.5 py-2 rounded-md bg-elevated border border-base text-secondary hover:text-primary text-xs font-semibold transition-colors"
-          >
-            Browse Resources
-          </Link>
-          <Link
-            href="/workspace/licenses"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-md bg-accent hover:bg-[var(--nexus-accent-hover)] text-white text-xs font-semibold transition-colors"
+            href="/workspace/resources/new"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>New License</span>
+            Publish resource
+          </Link>
+          <Link
+            href="/workspace/servers/new"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Register server
           </Link>
         </div>
       </div>
 
-      {/* Dashboard metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
-          label="Active Licenses"
-          value={activeLicenses.length}
-          tone="accent"
-          icon={<Key className="w-4 h-4" />}
-          context={`${licenses.length} total`}
-        />
-        <StatCard
-          label="Your Sales"
-          value={sales.length}
+          label="Resources"
+          value={downloadable.length}
           tone="purple"
-          icon={<ShoppingBag className="w-4 h-4" />}
-          context="completed orders"
+          icon={<Box className="w-4 h-4" />}
+          context="in your library"
         />
         <StatCard
-          label="Ledger Records"
-          value={ledger.length}
-          icon={<History className="w-4 h-4" />}
-          context="recent activity"
-        />
-        <StatCard
-          label="Servers Online"
-          value={servers.length}
-          tone="success"
+          label="Your servers"
+          value={ownedServers.length}
+          tone="accent"
           icon={<ServerIcon className="w-4 h-4" />}
-          context={`${totalPlayers.toLocaleString()} players`}
+          context={`${onlineServers.length} online`}
+        />
+        <StatCard
+          label="Players online"
+          value={onlinePlayers}
+          tone="success"
+          icon={<Users className="w-4 h-4" />}
+          context="on your servers"
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Licenses */}
-        <section>
-          <SectionHeader
-            title="Your Licenses"
-            description="Hardware & IP bound entitlements"
-            action={
-              <Link href="/workspace/licenses" className="text-xs font-semibold text-accent hover:underline">
-                View all
-              </Link>
-            }
-          />
-          <div className="space-y-2.5">
-            {licenses.length > 0 ? (
-              licenses.slice(0, 4).map((lic) => {
-                const product = productMap.get(lic.productId);
-                return (
-                  <div key={lic.id} className="nexus-panel p-3.5 space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-heading text-primary truncate">
-                        {product?.title || "MTA Resource"}
-                      </span>
-                      <StatusBadge
-                        status={lic.status}
-                        tone={lic.status === "active" ? "success" : "warning"}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between nexus-inset px-2.5 py-1.5 font-code text-[11px] text-success">
-                      <span className="select-all truncate">{lic.key}</span>
-                      <span className="font-caption text-faint shrink-0 ml-2">{lic.model}</span>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="py-8 text-center nexus-panel">
-                <p className="font-caption text-muted">No licenses yet.</p>
-                <Link href="/market" className="inline-block mt-2 text-xs font-semibold text-accent hover:underline">
-                  Explore marketplace
-                </Link>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Recent Purchases */}
-        <section>
-          <SectionHeader
-            title="Recent Purchases"
-            description="Your latest completed orders"
-            action={
-              <Link href="/workspace/purchases" className="text-xs font-semibold text-accent hover:underline">
-                Full history
-              </Link>
-            }
-          />
-          <div className="space-y-2.5">
-            {sales.length > 0 ? (
-              sales.slice(0, 4).map((s) => (
-                <div key={`${s.orderId}-${s.productId}`} className="nexus-panel p-3.5 flex items-center justify-between">
-                  <div className="min-w-0">
-                    <div className="text-xs font-heading text-primary truncate">{s.productTitle}</div>
-                    <div className="font-caption text-faint">
-                      Order #{s.orderNumber} • {new Date(s.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                  <div className="font-numeric text-xs font-bold text-success shrink-0">
-                    ${(s.unitPrice / 100).toFixed(2)}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="py-8 text-center nexus-panel">
-                <p className="font-caption text-muted">No purchases yet.</p>
-              </div>
-            )}
-          </div>
-        </section>
-      </div>
-
-      {/* Ledger */}
       <section>
         <SectionHeader
-          title="Financial Ledger"
-          description="Append-only transaction records"
+          title="Resource library"
+          description="Free resources you have added"
           action={
-            <Link href="/workspace/purchases" className="text-xs font-semibold text-accent hover:underline">
-              Purchase history
+            <Link href="/market?maxPrice=0" className="text-xs font-semibold text-accent">
+              Browse free resources
             </Link>
           }
         />
-        <div className="nexus-panel p-4">
-          <DataTable>
-            <DataTableHeader columns={["Date", "Account", "Description", "Amount"]} />
-            <DataTableBody>
-              {ledger.length > 0 ? (
-                ledger.map((entry) => (
-                  <tr key={entry.id}>
-                    <td className="py-2.5 pr-4 text-faint">
-                      {new Date(entry.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="pr-4 text-muted">{entry.accountId}</td>
-                    <td className="pr-4 text-secondary">{entry.description}</td>
-                    <td className={`text-right font-bold ${entry.amount >= 0 ? "text-success" : "text-muted"}`}>
-                      {entry.amount >= 0 ? "+" : ""}${(entry.amount / 100).toFixed(2)}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <DataTableEmpty colSpan={4} message="No ledger transactions recorded yet." />
-              )}
-            </DataTableBody>
-          </DataTable>
-        </div>
+        {downloadable.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {downloadable.map((entitlement) => {
+              const product = productMap.get(entitlement.resourceId);
+              return (
+                <div key={entitlement.id} className="nexus-panel p-4 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold text-white truncate">
+                      {product?.title || "Unavailable resource"}
+                    </div>
+                    <div className="text-xs text-neutral-500">
+                      Added {new Date(entitlement.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  {product && (
+                    <Link href={`/market/${product.slug}`} className="text-xs font-semibold text-accent">
+                      Open
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="nexus-panel p-8 text-center text-sm text-neutral-400">
+            Your library is empty.
+          </div>
+        )}
+      </section>
+
+      <section>
+        <SectionHeader
+          title="Your servers"
+          description="Only servers owned by your account"
+          action={
+            <Link href="/workspace/servers/new" className="text-xs font-semibold text-accent">
+              Register server
+            </Link>
+          }
+        />
+        {ownedServers.length > 0 ? (
+          <div className="space-y-3">
+            {ownedServers.map((server) => {
+              const observation = liveByServerId.get(server.id);
+              const isOnline = Boolean(observation && observation.responding !== false);
+              const isOffline = Boolean(observation && observation.responding === false);
+              return (
+                <div key={server.id} className="nexus-panel p-4 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <Link href={`/servers/${server.slug}`} className="text-sm font-semibold text-white hover:text-accent">
+                      {server.name}
+                    </Link>
+                    <div className="text-xs text-neutral-500 font-mono">
+                      {server.ipAddress}:{server.port}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Link href={"/workspace/servers/" + server.id} className="text-xs font-semibold text-accent">
+                      Manage
+                    </Link>
+                    <StatusBadge
+                      status={isOnline ? "online" : isOffline ? "offline" : "unknown"}
+                      tone={isOnline ? "success" : "neutral"}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="nexus-panel p-8 text-center text-sm text-neutral-400">
+            You have not registered a server yet.
+          </div>
+        )}
       </section>
     </div>
   );

@@ -15,6 +15,12 @@ describe("Storage Abstraction & Integrity", () => {
     }
   });
 
+  it("rejects path traversal outside the storage root", async () => {
+    await expect(
+      provider.put("../escaped.zip", Buffer.from("unsafe"), "application/zip")
+    ).rejects.toThrow("escapes the configured storage directory");
+  });
+
   it("should upload a binary buffer, compute valid SHA-256 hash and verify presence", async () => {
     const payload = Buffer.from("Multi Theft Auto Nexus Resource Archive Content");
     const meta = await provider.put("resources/test-pkg.zip", payload, "application/zip");

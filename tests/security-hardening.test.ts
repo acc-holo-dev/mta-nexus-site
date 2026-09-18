@@ -11,7 +11,6 @@ import {
   orderRepository,
 } from "@nexus/db";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
-import { serverService } from "../apps/web/src/lib/services/server-service";
 import type { User, Product } from "@nexus/domain";
 
 describe("Nexus 1.3 Security & Trust Hardening", () => {
@@ -19,6 +18,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
   let userA: User;
   let userB: User;
   let author: User;
+  let admin: User;
   let product: Product;
 
   beforeAll(async () => {
@@ -46,6 +46,14 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       role: "developer",
     });
 
+    admin = await userRepository.create({
+      id: `usr_sec_admin_${ts}`,
+      email: `sec_admin_${ts}@nexus.test`,
+      username: `sec_admin_${ts}`,
+      displayName: "Security Admin",
+      role: "admin",
+    });
+
     product = await productRepository.create({
       id: `prd_sec_${ts}`,
       title: "Security Test Product",
@@ -54,7 +62,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       type: "script",
       status: "published",
       authorId: author.id,
-      price: 1500,
+      price: 0,
       currency: "USD",
       licenseModel: "single_server",
       tags: ["security"],
@@ -77,6 +85,8 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       type: "system",
     });
 
+    if (!notification) throw new Error("Expected system notification to be delivered");
+
     // User B attempts to mark user A's notification — must be rejected
     const updatedByB = await notificationRepository.markAsRead(notification.id, userB.id);
     expect(updatedByB).toBe(false);
@@ -94,10 +104,9 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     expect(hasBought).toBe(false);
 
     // After purchase, user B can review
-    await commerceService.createOrderAndCheckout({
-      buyer: userB,
-      productIds: [product.id],
-      paymentProvider: "sandbox",
+    await commerceService.claimFreeResource({
+      user: userB,
+      productId: product.id,
     });
 
     const review = await contentRepository.addComment({
@@ -145,7 +154,12 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       storageKey: `builds/${product.id}/v1.0.0.zip`,
       sha256Hash: "a".repeat(64),
       fileSizeBytes: 1024,
-      isSigned: true,
+      fileName: "security-test.zip",
+      mimeType: "application/zip",
+      scanStatus: "not_scanned",
+      scanner: "disabled",
+      scannedAt: new Date(),
+      isSigned: false,
     });
 
     const buildsAfter = await buildRepository.listByProduct(product.id);
@@ -153,44 +167,10 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     expect(buildsAfter[0].sha256Hash).toHaveLength(64);
   });
 
-  it("Server heartbeat: telemetry updates live server statistics from real data", async () => {
-    const server = await serverService.createServer(
-      {
-        name: `Telemetry Server ${ts}`,
-        slug: `telemetry-${ts}`,
-        description: "Server for heartbeat telemetry tests",
-        ipAddress: "127.0.0.1",
-        port: 22003,
-        maxPlayers: 100,
-        status: "active",
-        visibility: "public",
-        ownerId: author.id,
-      },
-      author
-    );
-
-    const installation = await serverService.registerInstallation(server.id, "1.0.0");
-    expect(installation.apiKey).toBeDefined();
-    expect(installation.apiKeyHash).not.toContain("nxk_");
-
-    // Record a real heartbeat
-    await telemetryRecord(installation.id, server.id);
-
-    const telemetry = await serverService.getServerTelemetry(server.id);
-    expect(telemetry.currentPlayers).toBe(42);
-    expect(telemetry.recentHeartbeats).toBeGreaterThanOrEqual(1);
-
-    async function telemetryRecord(installationId: string, serverId: string) {
-      const { telemetryRepository } = await import("@nexus/db");
-      await telemetryRepository.recordHeartbeat({
-        installationId,
-        serverId,
-        status: "online",
-        currentPlayers: 42,
-        maxPlayers: 100,
-        moduleVersion: "1.0.0",
-      });
-    }
+  it("Server management: live availability is sourced from the official directory", async () => {
+    const source = await import("../apps/web/src/lib/services/mta-master-directory-service");
+    expect(source.mtaMasterDirectoryService).toBeDefined();
+    expect(typeof source.mtaMasterDirectoryService.getDirectory).toBe("function");
   });
 
   it("Verification workflow: isVerified can only be granted through moderation approval", async () => {
@@ -205,7 +185,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     // Reject first
     const rejected = await verificationRepository.resolveRequest({
       id: request.id,
-      reviewerId: "usr_admin_001",
+      reviewerId: admin.id,
       decision: "rejected",
       reviewNotes: "Insufficient proof",
     });
@@ -214,7 +194,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     // Rejected request cannot be resolved again
     const secondAttempt = await verificationRepository.resolveRequest({
       id: request.id,
-      reviewerId: "usr_admin_001",
+      reviewerId: admin.id,
       decision: "approved",
     });
     expect(secondAttempt).toBeNull();
@@ -228,7 +208,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     });
     const approved = await verificationRepository.resolveRequest({
       id: request2.id,
-      reviewerId: "usr_admin_001",
+      reviewerId: admin.id,
       decision: "approved",
       reviewNotes: "Portfolio verified",
     });

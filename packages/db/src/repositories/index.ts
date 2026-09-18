@@ -1,7 +1,9 @@
 export * from "./users";
 export * from "./sessions";
+export * from "./auth";
 export * from "./organizations";
 export * from "./servers";
+export * from "./server-observations";
 export * from "./products";
 export * from "./builds";
 export * from "./licenses";
@@ -14,5 +16,4 @@ export * from "./audit";
 export * from "./reports";
 export * from "./notifications";
 export * from "./social";
-export * from "./telemetry";
 export * from "./verification";

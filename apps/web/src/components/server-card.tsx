@@ -5,8 +5,11 @@ import { TrustBadge } from "@nexus/ui";
 import type { Server } from "@nexus/domain";
 
 export function ServerCard({ server }: { server: Server }) {
-  const occupancyPercent = Math.round((server.currentPlayers / Math.max(1, server.maxPlayers)) * 100);
-  const isOnline = server.status === "active" || server.currentPlayers > 0;
+  const hasLiveData = server.currentPlayers != null && server.maxPlayers != null;
+  const occupancyPercent = hasLiveData
+    ? Math.round((server.currentPlayers! / Math.max(1, server.maxPlayers!)) * 100)
+    : null;
+  const isOnline = hasLiveData && server.status === "active";
 
   return (
     <Link
@@ -29,7 +32,7 @@ export function ServerCard({ server }: { server: Server }) {
           <span
             className={`w-2 h-2 rounded-full ${isOnline ? "bg-emerald-400 animate-pulse" : "bg-neutral-400"}`}
           />
-          <span>{isOnline ? "ONLINE" : "OFFLINE"}</span>
+          <span>{hasLiveData ? (isOnline ? "ONLINE" : "OFFLINE") : "UNKNOWN"}</span>
         </div>
         {server.isVerified && (
           <div className="absolute bottom-2 left-2">
@@ -57,15 +60,15 @@ export function ServerCard({ server }: { server: Server }) {
             <span className="flex items-center gap-1 text-secondary font-medium">
               <Users className="w-3.5 h-3.5" />
               <span className="font-numeric">
-                {server.currentPlayers} / {server.maxPlayers}
+                {hasLiveData ? `${server.currentPlayers} / ${server.maxPlayers}` : "Unknown"}
               </span>
             </span>
-            <span className="font-numeric text-faint">{occupancyPercent}%</span>
+            <span className="font-numeric text-faint">{occupancyPercent == null ? "—" : `${occupancyPercent}%`}</span>
           </div>
           <div className="w-full h-1 bg-inset rounded-full overflow-hidden">
             <div
               className="h-full bg-success rounded-full transition-all duration-500"
-              style={{ width: `${Math.min(100, occupancyPercent)}%` }}
+              style={{ width: `${occupancyPercent == null ? 0 : Math.min(100, occupancyPercent)}%` }}
             />
           </div>
         </div>
