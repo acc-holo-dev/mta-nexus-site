@@ -196,6 +196,13 @@ export const addCommentSchema = z.object({
   rating: z.coerce.number().int().min(1).max(5).optional(),
 });
 
+export const createContentCommentSchema = z
+  .object({
+    parentId: z.string().min(1).optional(),
+    text: z.string().trim().min(1).max(2000),
+  })
+  .strict();
+
 // --- Moderation & Reports ---
 export const createReportSchema = z.object({
   targetType: z.enum(["product", "server", "content", "user"]),
