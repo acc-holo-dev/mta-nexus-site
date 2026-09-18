@@ -1,6 +1,6 @@
 # MTA NEXUS — Статус выполнения планов (аудит реальности)
 
-**Дата аудита:** по состоянию коммита `e183d54` + последующие исправления изоляции данных.
+**Дата аудита:** 2026-09-18, ветка `dev`; актуализировано после перехода на публичные MTA-наблюдения и защищённый lifecycle ресурсов.
 **Метод:** сверка каждого требования планов PLAN-001…PLAN-004 с фактическим кодом и runtime-проверками (HTTP-запросы, тесты, анализ импортов).
 
 > Важный принцип документа: здесь фиксируется **что реально работает**, а не то, что планировалось.
@@ -111,12 +111,13 @@
 5. Follow → Notification получателю ✅
 6. Report → Admin resolve → Audit event ✅
 7. Verification request → Admin approve → isVerified применён ✅
-8. Heartbeat → live server statistics update ✅
+8. Official MTA directory observation → sourced live server statistics ✅
 
 ### Известные ограничения платформы (честный список)
 - Rate limiter in-memory (см. выше).
-- Payment provider — только `sandbox` (внутренний mock, помечен как таковой в UI). Внешние платёжные провайдеры не подключены.
-- Download delivery возвращает метаданные + delivery token; реальная отдача бинарного архива через signed URL требует подключения S3-провайдера.
+- Платные ресурсы, checkout с деньгами и внешние платёжные провайдеры отключены; closed beta поддерживает только бесплатное добавление в библиотеку.
+- Download delivery потоково отдаёт приватный бинарный архив после проверки entitlement. Production пока использует смонтированное локальное хранилище; S3-compatible provider отложен.
+- Production-публикация сборок требует ClamAV; при недоступном или неоднозначном сканировании одобрение fail-closed.
 - Email-уведомления не реализованы (планировались только в поздних планах; Mailpit в compose для будущего использования).
 - `currentPlayers` без свежего публичного наблюдения имеет состояние `unknown`, а не фиктивный ноль.
 - 2FA, email verification, password reset — foundation есть в схеме, flows не реализованы.
@@ -126,7 +127,7 @@
 ## Команда проверки (воспроизведение)
 
 ```bash
-pnpm check          # typecheck + 31 тест + build
+pnpm check          # typecheck + полный Vitest-набор + production build
 pnpm db:migrate     # применение миграций (26 таблиц)
 pnpm db:seed        # development-данные
 pnpm dev            # http://localhost:3000

@@ -57,7 +57,7 @@ Let a player safely claim and download free MTA resources while keeping the syst
 - [x] Add a distinct build review state and moderator approval/rejection path.
 - [x] Preserve sanitized build filename and server-derived media type as trusted metadata.
 - [x] Add deterministic build retirement semantics with owner/admin authorization and audit records.
-- [x] Add safe antivirus/scanner adapter contract; it remains explicitly disabled until infrastructure exists.
+- [x] Add a fail-closed ClamAV adapter; production Compose requires a healthy scanner before the app starts.
 - [x] Add resource compatibility validation and dependency declarations.
 - [x] Surface release notes, checksum and compatibility on resource pages.
 
@@ -162,7 +162,7 @@ Turn free resource delivery into a trusted catalogue before money enters the sys
 - [x] Gate reviews on real entitlement and published state; enforce one review per user/resource atomically.
 - Resource versions, compatibility, dependencies, deprecation and changelogs.
 - Moderator review queue for product and build states.
-- Malware/scanner adapter and manual-review fallback.
+- [x] Malware scanner adapter with clean-only moderator approval; disabled/error states remain non-publishable.
 - Signing pipeline design: detached signature, public verification key, signer identity and revocation.
 - Download integrity display: checksum, size, release date, compatibility.
 - Optional reproducible build metadata where authors can provide it.
@@ -211,7 +211,7 @@ Make the future deployment boring, observable and recoverable on one modest VDS.
 
 ### Work items
 
-- Production compose review: app, PostgreSQL and Caddy only.
+- Production compose review: app, PostgreSQL, ClamAV and Caddy only.
 - Required secrets inventory and validation at startup.
 - Docker health endpoints and container health checks.
 - Migration runbook with backup/rollback decision points.

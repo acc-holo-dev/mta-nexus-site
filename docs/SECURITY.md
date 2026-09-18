@@ -12,7 +12,7 @@
 - **Download Authorization:** Downloads reference a real published build only; fallback hashes and synthetic storage keys are prohibited.
 
 ## 3. Social Target Validation
-`Follow` operations accept only contract-controlled target types (`user`, `server`, `product`, `organization`) and validate that the target exists in the database before persisting. Self-follow is rejected.
+`Follow` operations accept only contract-controlled target types (`user`, `server`, `product`, `organization`). Products must be published and free; private/suspended servers are rejected. Duplicate creation is resolved atomically at the unique database boundary, and self-follow is rejected.
 
 ## 4. Review Integrity
 - Paid products require a completed purchase (license) before a review can be submitted.
@@ -30,7 +30,9 @@
 | Reviews | 5 submissions | 5 min per user |
 | Reports | 10 submissions | 1 hour per user |
 | Verification requests | 3 requests | 24 hours per user |
-| Heartbeat | 120 requests | 1 min per IP |
+| Build uploads | 10 requests | 1 hour per user |
+| Follow mutations | 30 requests | 1 min per user |
+| Public search | 60 requests | 1 min per IP |
 | Admin actions | 60 actions | 1 min per user |
 
 ## 6. Verification Workflow
@@ -58,7 +60,8 @@ Critical platform actions (`LOGIN`, `LOGOUT`, `ORDER_CREATED`, `PAYMENT_COMPLETE
 
 ## 10. Known Security Limitations
 - **Rate limiter is in-memory (`MemoryRateLimit­er`)** — per-process, resets on restart, not shared across multiple instances. Redis is deliberately deferred until horizontal scaling is actually required.
-- **Payment provider** — sandbox implementation only; no external PSP integration yet.
+- **Payments** — paid resources and money movement are disabled; no external PSP is configured.
+- **Private storage** — production currently uses a mounted local volume; an S3-compatible provider remains deferred.
 - **Email flows** (verification, password reset) are not implemented.
 - **2FA** — schema foundation only, no flow.
 - Development seed contains demo statistics; production server activity comes exclusively from sourced public observations.
