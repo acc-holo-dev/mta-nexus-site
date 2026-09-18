@@ -11,8 +11,8 @@ type ServerDetailsUpdate = Partial<
 >;
 
 export class ServerService {
-  async listServers(): Promise<Server[]> {
-    return serverRepository.listActivePublic();
+  async listServers(limit = 100): Promise<Server[]> {
+    return serverRepository.listActivePublic(limit);
   }
 
   async getServerBySlug(slug: string): Promise<Server | null> {
