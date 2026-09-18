@@ -18,6 +18,7 @@ describe("risk-based rate limit policy", () => {
       "moderationAction",
       "serverMutation",
       "contentCreation",
+      "commentCreation",
       "reviewSubmission",
       "search",
     ]);
@@ -40,6 +41,7 @@ describe("risk-based rate limit policy", () => {
     expect(getRateLimitPolicy("moderationAction")).toEqual({ limit: 60, windowSeconds: 60 });
     expect(getRateLimitPolicy("serverMutation")).toEqual({ limit: 20, windowSeconds: 3600 });
     expect(getRateLimitPolicy("contentCreation")).toEqual({ limit: 20, windowSeconds: 3600 });
+    expect(getRateLimitPolicy("commentCreation")).toEqual({ limit: 20, windowSeconds: 300 });
     expect(getRateLimitPolicy("reviewSubmission")).toEqual({ limit: 5, windowSeconds: 300 });
     expect(getRateLimitPolicy("search")).toEqual({ limit: 60, windowSeconds: 60 });
   });
