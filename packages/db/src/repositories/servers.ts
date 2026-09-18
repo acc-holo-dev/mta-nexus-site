@@ -52,7 +52,7 @@ export class ServerRepository {
 
   async update(
     id: string,
-    updates: Partial<Pick<Server, "name" | "description" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility">>
+    updates: Partial<Pick<Server, "name" | "description" | "websiteUrl" | "discordUrl" | "rulesUrl" | "mediaUrls" | "language" | "region" | "gameplayTags" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility">>
   ): Promise<Server | null> {
     const rows = await db
       .update(servers)
