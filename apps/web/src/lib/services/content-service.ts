@@ -28,13 +28,45 @@ export class ContentService {
   }
 
   async addComment(
-    input: { contentId?: string; productId?: string; text: string; rating?: number },
+    input: {
+      contentId?: string;
+      productId?: string;
+      parentId?: string;
+      text: string;
+      rating?: number;
+    },
     actor: User
   ): Promise<Comment> {
+    if (input.contentId) {
+      const target = await contentRepository.findById(input.contentId);
+      if (!target || target.status !== "published") {
+        throw new NotFoundError("Content", input.contentId);
+      }
+    }
+
+    if (input.parentId) {
+      if (!input.contentId) {
+        throw new AppError(
+          "Parent comments are only supported for article discussions",
+          400,
+          "COMMENT_PARENT_TARGET_INVALID"
+        );
+      }
+      const parent = await contentRepository.findCommentById(input.parentId);
+      if (!parent || parent.contentId !== input.contentId) {
+        throw new AppError(
+          "Parent comment was not found for this article",
+          400,
+          "COMMENT_PARENT_NOT_FOUND"
+        );
+      }
+    }
+
     const comment = await contentRepository.addComment({
       id: generateId("cmt"),
       contentId: input.contentId,
       productId: input.productId,
+      parentId: input.parentId,
       authorId: actor.id,
       text: input.text,
       rating: input.rating,
