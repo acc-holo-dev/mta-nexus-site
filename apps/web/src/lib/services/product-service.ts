@@ -11,6 +11,7 @@ export interface ProductFilters {
   maxPrice?: number;
   sort?: "popular" | "newest" | "price_asc" | "price_desc" | "rating" | "relevance";
   featuredOnly?: boolean;
+  limit?: number;
 }
 
 export class ProductService {
@@ -22,6 +23,7 @@ export class ProductService {
       maxPrice: 0,
       sort: filters.sort,
       query: filters.query,
+      limit: filters.limit,
     });
   }
 
