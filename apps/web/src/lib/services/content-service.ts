@@ -13,12 +13,18 @@ export class ContentService {
     return contentRepository.listPublished();
   }
 
-  async getArticleBySlug(slug: string): Promise<Content | null> {
-    return contentRepository.findBySlug(slug);
+  async getArticleBySlug(
+    slug: string,
+    options: { incrementView?: boolean } = {}
+  ): Promise<Content | null> {
+    return contentRepository.findPublishedBySlug(slug, options);
   }
 
-  async getComments(target: { contentId?: string; productId?: string }): Promise<Comment[]> {
-    return contentRepository.listComments(target);
+  async getComments(
+    target: { contentId?: string; productId?: string },
+    limit = 100
+  ): Promise<Comment[]> {
+    return contentRepository.listComments(target, limit);
   }
 
   async addComment(
@@ -32,7 +38,9 @@ export class ContentService {
       authorId: actor.id,
       text: input.text,
       rating: input.rating,
-      isVerifiedPurchase: true,
+      // Article comments are not product acquisitions. Product review routes
+      // set this flag only after an entitlement check.
+      isVerifiedPurchase: false,
     });
 
     if (input.contentId) {
