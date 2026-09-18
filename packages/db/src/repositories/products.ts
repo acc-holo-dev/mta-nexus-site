@@ -10,6 +10,7 @@ export interface ProductQueryOptions {
   maxPrice?: number;
   sort?: "popular" | "newest" | "price_asc" | "price_desc" | "rating" | "relevance";
   query?: string;
+  limit?: number;
 }
 
 export class ProductRepository {
@@ -48,6 +49,13 @@ export class ProductRepository {
       if (options.sort === "price_desc") return b.price - a.price;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
+
+    if (options.limit !== undefined) {
+      const boundedLimit = Number.isFinite(options.limit)
+        ? Math.min(Math.max(Math.floor(options.limit), 1), 100)
+        : 100;
+      items = items.slice(0, boundedLimit);
+    }
 
     return items;
   }
