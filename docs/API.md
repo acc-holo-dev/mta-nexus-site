@@ -78,6 +78,12 @@ When the official directory is unavailable, the endpoint returns `503` with
 
 ## Resources
 
+### `GET /api/products`
+
+Returns the free published resource catalog. The optional `limit` parameter is
+bounded to 100 and successful responses use short public caching. Paid products
+remain unavailable in the closed beta.
+
 ### `POST /api/products/:id/builds`
 
 Uploads a free resource build for review. The server validates the archive
