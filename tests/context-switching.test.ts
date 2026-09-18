@@ -23,7 +23,12 @@ describe("account context switching", () => {
       resolve(process.cwd(), "apps/web/src/lib/services/auth-service.ts"),
       "utf8"
     );
+    const settings = readFileSync(
+      resolve(process.cwd(), "apps/web/src/app/settings/page.tsx"),
+      "utf8"
+    );
 
+    expect(settings).toContain("ContextSwitcher");
     expect(service).toContain("organizationRepository.listUserMemberships(userId)");
     expect(service).toContain("Not authorized to switch to this organization context");
     expect(service).toContain('action: "user.context_switched"');
