@@ -71,7 +71,8 @@ export class VerificationRepository {
       .select()
       .from(verificationRequests)
       .where(eq(verificationRequests.requesterId, requesterId))
-      .orderBy(desc(verificationRequests.createdAt));
+      .orderBy(desc(verificationRequests.createdAt))
+      .limit(100);
   }
 
   /**
