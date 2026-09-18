@@ -77,8 +77,15 @@ export class UserRepository {
     return rows.length > 0;
   }
 
-  async listAll(): Promise<User[]> {
-    const rows = await db.select().from(users);
+  async listAll(limit?: number): Promise<User[]> {
+    const query = db.select().from(users);
+    const boundedLimit =
+      limit === undefined
+        ? undefined
+        : Number.isFinite(limit)
+          ? Math.min(Math.max(Math.floor(limit), 1), 100)
+          : 100;
+    const rows = boundedLimit === undefined ? await query : await query.limit(boundedLimit);
     return rows.map(toPublicUser);
   }
 }
