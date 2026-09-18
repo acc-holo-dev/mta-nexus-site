@@ -222,16 +222,35 @@ export class AuthService {
     const user = await userRepository.findById(userId);
     if (!user) throw new NotFoundError("User", userId);
 
-    if (contextId !== "personal") {
+    const nextContextId = contextId.trim();
+    if (!nextContextId) {
+      throw new ForbiddenError("A context is required");
+    }
+
+    if (nextContextId !== "personal") {
       const memberships = await organizationRepository.listUserMemberships(userId);
-      const isMember = memberships.some((m) => m.organizationId === contextId);
+      const isMember = memberships.some((m) => m.organizationId === nextContextId);
       if (!isMember) {
         throw new ForbiddenError("Not authorized to switch to this organization context");
       }
     }
 
-    const updated = await userRepository.update(userId, { activeContextId: contextId });
+    const previousContextId = user.activeContextId ?? "personal";
+    const updated = await userRepository.update(userId, { activeContextId: nextContextId });
     if (!updated) throw new NotFoundError("User", userId);
+
+    if (previousContextId !== nextContextId) {
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: userId,
+        actorType: "user",
+        action: "user.context_switched",
+        targetId: userId,
+        targetType: "user",
+        details: { from: previousContextId, to: nextContextId },
+      });
+    }
+
     return toPublicUser(updated);
   }
 
