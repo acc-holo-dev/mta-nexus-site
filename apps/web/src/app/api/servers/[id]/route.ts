@@ -8,6 +8,13 @@ const serverUpdateSchema = z
   .object({
     name: z.string().min(3).max(100).optional(),
     description: z.string().max(5000).optional(),
+    websiteUrl: z.string().url().max(500).optional().or(z.literal("")),
+    discordUrl: z.string().url().max(500).optional().or(z.literal("")),
+    rulesUrl: z.string().url().max(500).optional().or(z.literal("")),
+    mediaUrls: z.array(z.string().url().max(500)).max(8).optional(),
+    language: z.string().trim().max(64).optional(),
+    region: z.string().trim().max(64).optional(),
+    gameplayTags: z.array(z.string().trim().min(1).max(32)).max(12).optional(),
     ipAddress: z.string().min(1).optional(),
     port: z.coerce.number().int().min(1).max(65535).optional(),
     httpPort: z.coerce.number().int().min(1).max(65535).optional(),
