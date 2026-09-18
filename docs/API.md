@@ -59,7 +59,8 @@ All other sessions are revoked. Password changes are audited and rate limited.
 
 ### `GET /api/servers`
 
-Returns active editorial server profiles. Each profile includes an explicit
+Returns up to 100 active editorial server profiles (use the optional `limit`
+parameter for a smaller page). Each profile includes an explicit
 `liveObservation` (or `null`) and `liveStatus` (`online`, `offline` or
 `unknown`) matched to the official MTA master-list by normalized address/port.
 The response also reports whether the directory snapshot is stale.
