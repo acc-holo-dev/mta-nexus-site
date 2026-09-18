@@ -20,6 +20,19 @@ export default function RegisterServerPage() {
           name: String(form.get("name") || ""),
           slug: String(form.get("slug") || ""),
           description: String(form.get("description") || ""),
+          websiteUrl: String(form.get("websiteUrl") || ""),
+          discordUrl: String(form.get("discordUrl") || ""),
+          rulesUrl: String(form.get("rulesUrl") || ""),
+          mediaUrls: String(form.get("mediaUrls") || "")
+            .split(String.fromCharCode(10))
+            .map((value) => value.trim())
+            .filter(Boolean),
+          language: String(form.get("language") || ""),
+          region: String(form.get("region") || ""),
+          gameplayTags: String(form.get("gameplayTags") || "")
+            .split(",")
+            .map((value) => value.trim())
+            .filter(Boolean),
           ipAddress: String(form.get("ipAddress") || ""),
           port: Number(form.get("port") || 22003),
           httpPort: Number(form.get("httpPort") || 22005),
@@ -48,6 +61,13 @@ export default function RegisterServerPage() {
         <label className="space-y-1"><span className="text-xs text-neutral-300">Name</span><input name="name" required minLength={3} className="w-full nexus-inset px-3 py-2 text-sm" /></label>
         <label className="space-y-1"><span className="text-xs text-neutral-300">Slug</span><input name="slug" required pattern="[a-z0-9-]+" className="w-full nexus-inset px-3 py-2 text-sm" /></label>
         <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Description</span><textarea name="description" rows={4} className="w-full nexus-inset px-3 py-2 text-sm" /></label>
+        <label className="space-y-1"><span className="text-xs text-neutral-300">Website URL</span><input name="websiteUrl" type="url" placeholder="https://..." className="w-full nexus-inset px-3 py-2 text-sm" /></label>
+        <label className="space-y-1"><span className="text-xs text-neutral-300">Discord URL</span><input name="discordUrl" type="url" placeholder="https://discord.gg/..." className="w-full nexus-inset px-3 py-2 text-sm" /></label>
+        <label className="space-y-1"><span className="text-xs text-neutral-300">Rules URL</span><input name="rulesUrl" type="url" placeholder="https://..." className="w-full nexus-inset px-3 py-2 text-sm" /></label>
+        <label className="space-y-1"><span className="text-xs text-neutral-300">Language</span><input name="language" maxLength={64} placeholder="English" className="w-full nexus-inset px-3 py-2 text-sm" /></label>
+        <label className="space-y-1"><span className="text-xs text-neutral-300">Region</span><input name="region" maxLength={64} placeholder="Europe" className="w-full nexus-inset px-3 py-2 text-sm" /></label>
+        <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Gameplay tags</span><input name="gameplayTags" placeholder="roleplay, economy, freeroam" className="w-full nexus-inset px-3 py-2 text-sm" /></label>
+        <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Media URLs (one per line)</span><textarea name="mediaUrls" rows={3} placeholder="https://..." className="w-full nexus-inset px-3 py-2 text-sm" /></label>
         <label className="space-y-1"><span className="text-xs text-neutral-300">IP address or hostname</span><input name="ipAddress" required className="w-full nexus-inset px-3 py-2 text-sm" /></label>
         <label className="space-y-1"><span className="text-xs text-neutral-300">Game mode</span><input name="gameMode" className="w-full nexus-inset px-3 py-2 text-sm" /></label>
         <label className="space-y-1"><span className="text-xs text-neutral-300">Game port</span><input name="port" type="number" min={1} max={65535} defaultValue={22003} className="w-full nexus-inset px-3 py-2 text-sm" /></label>
