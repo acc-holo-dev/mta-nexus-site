@@ -259,6 +259,16 @@ export class AuthService {
     return user ? toPublicUser(user) : null;
   }
 
+  async getUserByUsername(username: string): Promise<User | null> {
+    const user = await userRepository.findByUsername(username);
+    return user ? toPublicUser(user) : null;
+  }
+
+  async listDevelopers(limit = 100): Promise<User[]> {
+    const users = await userRepository.listDevelopers(limit);
+    return users.map((user) => toPublicUser(user));
+  }
+
   async listUsers(): Promise<User[]> {
     const users = await userRepository.listAll();
     return users.map((user) => toPublicUser(user));
