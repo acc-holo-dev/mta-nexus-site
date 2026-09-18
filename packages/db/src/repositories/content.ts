@@ -19,19 +19,39 @@ export class ContentRepository {
     return (rows[0] as unknown as Content) || null;
   }
 
-  async findBySlug(slug: string): Promise<Content | null> {
-        const rows = await db.select().from(content).where(eq(content.slug, slug)).limit(1);
+  /**
+   * Public-safe slug lookup. Draft and archived content never leave the repository
+   * through the normal article read path.
+   */
+  async findPublishedBySlug(
+    slug: string,
+    options: { incrementView?: boolean } = {}
+  ): Promise<Content | null> {
+    const rows = await db
+      .select()
+      .from(content)
+      .where(and(eq(content.slug, slug), eq(content.status, "published")))
+      .limit(1);
     if (!rows.length) return null;
     const item = rows[0] as unknown as Content;
 
-    // Increment view count
-    await db
-      .update(content)
-      .set({ viewCount: item.viewCount + 1 })
-      .where(eq(content.id, item.id));
+    if (options.incrementView !== false) {
+      await db
+        .update(content)
+        .set({ viewCount: item.viewCount + 1 })
+        .where(eq(content.id, item.id));
 
-    item.viewCount += 1;
+      item.viewCount += 1;
+    }
+
     return item;
+  }
+
+  async findBySlug(
+    slug: string,
+    options: { incrementView?: boolean } = {}
+  ): Promise<Content | null> {
+    return this.findPublishedBySlug(slug, options);
   }
 
   async create(data: Omit<Content, "createdAt" | "updatedAt">): Promise<Content> {
@@ -45,13 +65,21 @@ export class ContentRepository {
     return rows[0] as unknown as Content;
   }
 
-  async listComments(target: { contentId?: string; productId?: string }): Promise<Comment[]> {
-        if (target.contentId) {
+  async listComments(
+    target: { contentId?: string; productId?: string },
+    limit = 100
+  ): Promise<Comment[]> {
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 100)
+      : 100;
+
+    if (target.contentId) {
       const rows = await db
         .select()
         .from(comments)
         .where(eq(comments.contentId, target.contentId))
-        .orderBy(desc(comments.createdAt));
+        .orderBy(desc(comments.createdAt))
+        .limit(boundedLimit);
       return rows as unknown as Comment[];
     }
     if (target.productId) {
@@ -59,7 +87,8 @@ export class ContentRepository {
         .select()
         .from(comments)
         .where(eq(comments.productId, target.productId))
-        .orderBy(desc(comments.createdAt));
+        .orderBy(desc(comments.createdAt))
+        .limit(boundedLimit);
       return rows as unknown as Comment[];
     }
     return [];
