@@ -5,6 +5,10 @@ import {
   userRepository,
   organizationRepository,
 } from "@nexus/db";
+import {
+  matchesMtaEndpoint,
+  mtaMasterDirectoryService,
+} from "./mta-master-directory-service";
 
 export interface SearchResultItem {
   id: string;
@@ -15,8 +19,14 @@ export interface SearchResultItem {
   badge?: string;
 }
 
+export type SearchResultType = SearchResultItem["type"];
+
 export class DiscoveryService {
-  async search(query: string, limit = 50): Promise<SearchResultItem[]> {
+  async search(
+    query: string,
+    limit = 50,
+    type?: SearchResultType
+  ): Promise<SearchResultItem[]> {
     const normalizedQuery = query.trim();
     if (normalizedQuery.length === 0) {
       return [];
@@ -41,9 +51,17 @@ export class DiscoveryService {
       });
     }
 
-    // Search Servers
+    // Search Servers. Player counts are shown only when the official directory has an observation.
+    let observations: Awaited<ReturnType<typeof mtaMasterDirectoryService.getDirectory>>["servers"] = [];
+    try {
+      observations = (await mtaMasterDirectoryService.getDirectory()).servers;
+    } catch {
+      // Search remains available when the official directory is unavailable.
+    }
+
     const servers = await serverRepository.listActivePublic(boundedLimit);
     for (const s of servers) {
+      const observation = observations.find((item) => matchesMtaEndpoint(s, item));
       if (
         s.name.toLowerCase().includes(q) ||
         s.description?.toLowerCase().includes(q) ||
@@ -55,7 +73,9 @@ export class DiscoveryService {
           title: s.name,
           description: s.description?.slice(0, 100) || `${s.gameMode || "MTA"} Server`,
           url: `/servers/${s.slug}`,
-          badge: `${s.currentPlayers}/${s.maxPlayers} players`,
+          badge: observation
+            ? `${observation.players ?? 0}/${observation.maxPlayers ?? s.maxPlayers} players`
+            : "MTA server",
         });
       }
     }
@@ -118,7 +138,9 @@ export class DiscoveryService {
       }
     }
 
-    return results.slice(0, boundedLimit);
+    return results
+      .filter((item) => !type || item.type === type)
+      .slice(0, boundedLimit);
   }
 }
 
