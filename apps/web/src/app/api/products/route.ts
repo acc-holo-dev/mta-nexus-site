@@ -4,9 +4,21 @@ import { authService } from "../../../lib/services/auth-service";
 import { createProductSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
 
-export async function GET() {
-  const products = await productService.listProducts({ maxPrice: 0, sort: "popular" });
-  return NextResponse.json({ products });
+export async function GET(request: NextRequest) {
+  const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "50");
+  const limit = Number.isFinite(requestedLimit)
+    ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
+    : 50;
+  const products = await productService.listProducts({
+    maxPrice: 0,
+    sort: "popular",
+    limit,
+  });
+
+  return NextResponse.json(
+    { products, limit },
+    { headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=120" } }
+  );
 }
 
 export async function POST(request: NextRequest) {
