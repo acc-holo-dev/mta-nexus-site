@@ -81,7 +81,10 @@ Returns up to 100 active editorial server profiles (use the optional `limit`
 parameter for a smaller page). Each profile includes an explicit
 `liveObservation` (or `null`) and `liveStatus` (`online`, `offline` or
 `unknown`) matched to the official MTA master-list by normalized address/port.
-The response also reports whether the directory snapshot is stale.
+The response also reports whether the directory snapshot is stale. Editorial
+metadata may include validated website, Discord and rules links, up to eight media
+URLs, language, region and up to twelve gameplay tags; these fields never
+override the live observation.
 
 ## Live MTA directory
 
