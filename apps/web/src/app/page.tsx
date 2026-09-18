@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const [directory, freeResources, articles] = await Promise.all([
     mtaMasterDirectoryService.getDirectory().catch(() => null),
-    productService.listProducts({ maxPrice: 0, sort: "popular" }),
-    contentService.listArticles(),
+    productService.listProducts({ maxPrice: 0, sort: "popular", limit: 4 }),
+    contentService.listArticles(4),
   ]);
   const playersOnline = directory?.servers.reduce((total, server) => total + (server.players ?? 0), 0) ?? 0;
 
