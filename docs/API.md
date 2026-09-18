@@ -187,8 +187,8 @@ Security notifications are always delivered.
 
 ### `POST /api/reports`
 
-Creates a validated abuse report for an existing user, server, product or content
-target. Duplicate open reports by the same reporter and target are rejected.
+Creates a validated abuse report for an existing user, server, product, content
+or comment target. Duplicate open reports by the same reporter and target are rejected.
 
 ### `POST /api/verification`
 
