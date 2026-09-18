@@ -13,6 +13,10 @@ export class ContentService {
     return contentRepository.listPublished(limit);
   }
 
+  async listCommunityTopics(limit = 50): Promise<Content[]> {
+    return contentRepository.listPublishedByTypes(["post", "question"], limit);
+  }
+
   async getArticleBySlug(
     slug: string,
     options: { incrementView?: boolean } = {}

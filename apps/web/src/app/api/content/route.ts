@@ -72,7 +72,9 @@ export async function POST(request: NextRequest) {
     }
 
     const requestedStatus = parsed.data.status;
-    const status = requestedStatus === "published" && can(user, "admin.moderation")
+    const isCommunityTopic = parsed.data.type === "post" || parsed.data.type === "question";
+    const status = requestedStatus === "published" &&
+      (isCommunityTopic || can(user, "admin.moderation"))
       ? "published"
       : "draft";
     const contentItem = await contentRepository.create({

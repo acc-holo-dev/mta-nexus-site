@@ -18,12 +18,14 @@ import {
   ShieldAlert,
   BadgeCheck,
   Settings,
+  MessageSquare,
 } from "lucide-react";
 
 const PRIMARY_NAV = [
   { href: "/servers", label: "Live Servers", icon: Server },
   { href: "/explore", label: "Explore", icon: Compass },
   { href: "/market", label: "Free Resources", icon: Library },
+  { href: "/community", label: "Community", icon: MessageSquare },
   { href: "/articles", label: "Updates", icon: BookOpen },
   { href: "/developers", label: "Creators", icon: Code2 },
 ];

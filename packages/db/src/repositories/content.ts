@@ -1,4 +1,4 @@
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, desc, and, sql, inArray } from "drizzle-orm";
 import { db } from "../client";
 import { content, comments } from "../schema";
 import type { Content, Comment } from "@nexus/domain";
@@ -11,6 +11,17 @@ export class ContentRepository {
       .where(eq(content.status, "published"))
       .orderBy(desc(content.createdAt))
       .limit(Math.min(Math.max(limit, 1), 100));
+    return rows as unknown as Content[];
+  }
+
+  async listPublishedByTypes(types: Content["type"][], limit = 50): Promise<Content[]> {
+    if (types.length === 0) return [];
+    const rows = await db
+      .select()
+      .from(content)
+      .where(and(eq(content.status, "published"), inArray(content.type, types)))
+      .orderBy(desc(content.updatedAt))
+      .limit(Math.min(Math.max(Math.floor(limit), 1), 100));
     return rows as unknown as Content[];
   }
 
