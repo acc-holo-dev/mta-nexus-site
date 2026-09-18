@@ -205,7 +205,7 @@ export const createContentCommentSchema = z
 
 // --- Moderation & Reports ---
 export const createReportSchema = z.object({
-  targetType: z.enum(["product", "server", "content", "user"]),
+  targetType: z.enum(["product", "server", "content", "comment", "user"]),
   targetId: z.string().min(1),
   type: z.enum([
     "scam",
