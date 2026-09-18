@@ -13,7 +13,8 @@ describe("editorial server API", () => {
       "utf8"
     );
 
-    expect(route).toContain("serverService.listServers()");
+    expect(route).toContain("serverService.listServers(limit)");
+    expect(route).toContain("Math.min(Math.max(Math.floor(requestedLimit), 1), 100)");
     expect(route).toContain("mtaMasterDirectoryService.getDirectory()");
     expect(route).toContain("matchesMtaEndpoint(server, observation)");
     expect(route).toContain("liveObservation: liveObservation ?? null");
