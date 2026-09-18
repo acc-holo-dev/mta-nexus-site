@@ -1,6 +1,6 @@
 ﻿import { cookies } from "next/headers";
 import Link from "next/link";
-import { buildRepository, verificationRepository } from "@nexus/db";
+import { buildRepository, contentRepository, verificationRepository } from "@nexus/db";
 import { authService } from "../../lib/services/auth-service";
 import { adminService } from "../../lib/services/admin-service";
 import { can } from "@nexus/security";
@@ -61,6 +61,7 @@ export default async function AdminPage() {
   const verificationRequests = await verificationRepository.listAll();
   const pendingVerifications = verificationRequests.filter((v) => v.status === "pending");
   const pendingBuilds = await buildRepository.listPendingReview();
+  const pendingContent = await contentRepository.listByStatus("draft", 100);
 
   return (
     <div className="space-y-8">
@@ -164,6 +165,39 @@ export default async function AdminPage() {
           ) : (
             <div className="py-6 text-center nexus-panel">
               <p className="font-caption text-muted">No resource builds are waiting for review.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Community Content Queue */}
+      <section>
+        <SectionHeader
+          title="Community Content Queue"
+          description={`${pendingContent.length} draft${pendingContent.length === 1 ? "" : "s"} awaiting moderation`}
+        />
+        <div className="space-y-2.5">
+          {pendingContent.length > 0 ? (
+            pendingContent.map((item) => (
+              <div key={item.id} className="nexus-panel p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-warning-soft text-warning">
+                      {item.type}
+                    </span>
+                    <span className="text-xs font-heading text-primary truncate">{item.title}</span>
+                  </div>
+                  <p className="font-caption text-muted">
+                    Author {item.authorId} • {new Date(item.createdAt).toLocaleDateString()}
+                  </p>
+                  {item.excerpt && <p className="font-caption text-faint truncate">{item.excerpt}</p>}
+                </div>
+                <span className="font-caption text-warning">Use content moderation action</span>
+              </div>
+            ))
+          ) : (
+            <div className="py-6 text-center nexus-panel">
+              <p className="font-caption text-muted">No community drafts are waiting for review.</p>
             </div>
           )}
         </div>
