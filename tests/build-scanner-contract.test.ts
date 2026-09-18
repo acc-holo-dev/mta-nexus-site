@@ -21,6 +21,6 @@ describe("resource build scanner contract", () => {
     expect(scanner).toContain('scanner: "disabled"');
     expect(upload).toContain("buildScannerService.scan");
     expect(upload).toContain('scan.status === "malicious"');
-    expect(service).toContain('build.scanStatus === "malicious"');
+    expect(service).toContain('build.scanStatus !== "clean"');
   });
 });

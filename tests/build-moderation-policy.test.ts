@@ -14,6 +14,9 @@ describe("resource build moderation", () => {
     );
 
     expect(service).toContain('status: "pending_review"');
+    expect(service).toContain('build.scanStatus !== "clean"');
+    expect(service).toContain('updateStatus(build.id, status, "pending_review")');
+    expect(service).toContain("BUILD_STATE_CHANGED");
     expect(service).toContain("async reviewBuild(");
     expect(service).toContain('"BUILD_NOT_PENDING_REVIEW"');
     expect(service).toContain('action: input.decision === "approve" ? "build.approved" : "build.rejected"');

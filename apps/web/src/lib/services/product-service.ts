@@ -234,13 +234,23 @@ export class ProductService {
 
     const product = await productRepository.findById(build.productId);
     if (!product) throw new NotFoundError("Product", build.productId);
-    if (input.decision === "approve" && build.scanStatus === "malicious") {
-      throw new AppError("A malicious build cannot be approved", 422, "BUILD_SCAN_MALICIOUS");
+    if (input.decision === "approve" && build.scanStatus !== "clean") {
+      throw new AppError(
+        "Only a clean malware scan can be approved",
+        422,
+        "BUILD_SCAN_NOT_CLEAN"
+      );
     }
 
     const status = input.decision === "approve" ? "published" : "rejected";
-    const reviewed = await buildRepository.updateStatus(build.id, status);
-    if (!reviewed) throw new NotFoundError("Build", build.id);
+    const reviewed = await buildRepository.updateStatus(build.id, status, "pending_review");
+    if (!reviewed) {
+      throw new AppError(
+        "Build state changed before moderation completed",
+        409,
+        "BUILD_STATE_CHANGED"
+      );
+    }
 
     if (input.decision === "approve") {
       await productRepository.update(product.id, {
@@ -288,8 +298,10 @@ export class ProductService {
       throw new AppError("This build is already retired", 409, "BUILD_ALREADY_RETIRED");
     }
 
-    const retired = await buildRepository.updateStatus(build.id, "retired");
-    if (!retired) throw new NotFoundError("Build", input.buildId);
+    const retired = await buildRepository.updateStatus(build.id, "retired", build.status);
+    if (!retired) {
+      throw new AppError("Build state changed before retirement", 409, "BUILD_STATE_CHANGED");
+    }
 
     const remainingPublished = (await buildRepository.listByProduct(product.id)).find(
       (candidate) => candidate.id !== build.id && candidate.status === "published"

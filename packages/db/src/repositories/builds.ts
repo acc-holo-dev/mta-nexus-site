@@ -37,8 +37,15 @@ export class BuildRepository {
     return (rows[0] as unknown as Build) || null;
   }
 
-  async updateStatus(id: string, status: Build["status"]): Promise<Build | null> {
-    const rows = await db.update(builds).set({ status }).where(eq(builds.id, id)).returning();
+  async updateStatus(
+    id: string,
+    status: Build["status"],
+    expectedStatus?: Build["status"]
+  ): Promise<Build | null> {
+    const condition = expectedStatus
+      ? and(eq(builds.id, id), eq(builds.status, expectedStatus))
+      : eq(builds.id, id);
+    const rows = await db.update(builds).set({ status }).where(condition).returning();
     return (rows[0] as unknown as Build) || null;
   }
 
