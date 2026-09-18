@@ -137,7 +137,7 @@ Make server pages useful without pretending NEXUS controls the server runtime.
 - [x] Expose editorial listings with an explicit `liveObservation`/`liveStatus` layer; missing directory data remains neutral.
 - [x] Ensure new listings are editorially active without implying live availability.
 - Add claim/verification workflow instead of automatic ownership claims.
-- Add profile links, media, language, region and gameplay taxonomy.
+- [x] Add bounded profile links, media, language, region and gameplay taxonomy without overwriting live observations.
 - Add favorites/follows and player-safe reporting.
 - Add search facets and server detail telemetry transparency.
 - [x] Keep owner workspace live counters sourced from the official directory; missing observations remain neutral.
