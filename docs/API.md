@@ -125,6 +125,20 @@ Claims a free published resource for the signed-in player and creates the
 download entitlement. Paid resources and checkout remain disabled in the
 closed beta.
 
+
+## Product reviews
+
+### `GET /api/products/:id/reviews`
+
+Returns up to 100 newest reviews for a published free resource. Draft and
+archived resources return `404`.
+
+### `POST /api/products/:id/reviews`
+
+Requires authentication, a valid `product.download` entitlement and a published
+resource. Authors cannot review their own resource, and the database enforces one
+review per user/resource even when concurrent submissions race.
+
 ## Search
 
 ### `GET /api/search?q=...`
