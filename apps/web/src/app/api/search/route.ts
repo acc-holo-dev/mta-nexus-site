@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { consumeRateLimit, getClientIp } from "@nexus/security";
-import { discoveryService } from "../../../lib/services/discovery-service";
+import {
+  discoveryService,
+  type SearchResultType,
+} from "../../../lib/services/discovery-service";
 
 const MAX_QUERY_LENGTH = 100;
 const DEFAULT_LIMIT = 50;
+
+const SEARCH_TYPES = new Set<SearchResultType>([
+  "product",
+  "server",
+  "developer",
+  "organization",
+  "article",
+]);
 
 export async function GET(request: NextRequest) {
   const query = (request.nextUrl.searchParams.get("q") || "").trim();
@@ -19,10 +30,18 @@ export async function GET(request: NextRequest) {
   const limit = Number.isFinite(requestedLimit)
     ? Math.min(Math.max(Math.floor(requestedLimit), 1), DEFAULT_LIMIT)
     : DEFAULT_LIMIT;
+  const requestedType = request.nextUrl.searchParams.get("type");
+  if (requestedType && !SEARCH_TYPES.has(requestedType as SearchResultType)) {
+    return NextResponse.json(
+      { error: "Unknown search type" },
+      { status: 400 }
+    );
+  }
+  const type = requestedType as SearchResultType | null;
 
   if (query.length === 0) {
     return NextResponse.json(
-      { query, count: 0, results: [], limit },
+      { query, type, count: 0, results: [], limit },
       { headers: { "Cache-Control": "public, max-age=15, stale-while-revalidate=60" } }
     );
   }
@@ -35,9 +54,9 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const results = await discoveryService.search(query, limit);
+  const results = await discoveryService.search(query, limit, type || undefined);
   return NextResponse.json(
-    { query, count: results.length, results, limit },
+    { query, type, count: results.length, results, limit },
     { headers: { "Cache-Control": "public, max-age=15, stale-while-revalidate=60" } }
   );
 }
