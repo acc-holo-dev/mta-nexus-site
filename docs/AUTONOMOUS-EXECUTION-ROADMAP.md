@@ -158,7 +158,7 @@ Turn free resource delivery into a trusted catalogue before money enters the sys
 ### Work items
 
 - [x] Creator public pages with bounded reads and honest identity status; no synthetic seller or reputation claims.
-- Resource review eligibility based on real entitlement; one review per user/resource.
+- [x] Gate reviews on real entitlement and published state; enforce one review per user/resource atomically.
 - Resource versions, compatibility, dependencies, deprecation and changelogs.
 - Moderator review queue for product and build states.
 - Malware/scanner adapter and manual-review fallback.
