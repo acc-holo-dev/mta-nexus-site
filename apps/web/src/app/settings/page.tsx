@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
+import { ContextSwitcher } from "../../components/context-switcher";
 import { Bell, KeyRound, Monitor, ShieldCheck, Trash2 } from "lucide-react";
 
 type Preferences = {
@@ -142,6 +143,8 @@ export default function SettingsPage() {
       </div>
 
       {message && <div className="rounded-md border border-base bg-surface px-4 py-3 text-sm text-secondary">{message}</div>}
+
+      <ContextSwitcher />
 
       <section className="nexus-panel p-5 space-y-4">
         <div className="flex items-center gap-2">
