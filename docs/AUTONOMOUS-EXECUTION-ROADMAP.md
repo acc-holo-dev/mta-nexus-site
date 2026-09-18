@@ -79,7 +79,7 @@ Replace role-string assumptions with durable, auditable authorization decisions.
 - [x] Introduce a capability matrix for player, developer, server owner, moderator and administrator contexts.
 - Add owner-context switching only where an organization relationship permits it.
 - [x] Complete verification request workflow with ownership checks, duplicate protection, reviewer notes, audit events and moderator notifications.
-- [x] Add rate limits per risk category: authentication, resource upload, content creation, follow, report, download, verification, moderation and public search.
+- [x] Add rate limits per risk category: authentication, resource upload, content creation, comment creation, follow, report, download, verification, moderation and public search.
 - [x] Add abuse-report entities, validation, moderator notifications and a queue.
 - [x] Add notification preferences; privacy-safe profile controls remain planned.
 - [x] Add account security checks: session revocation and password changes. Email verification and recovery readiness remain planned.
@@ -108,6 +108,7 @@ Create the social layer that gives players a reason to return when they are not 
 - [x] Enforce published-only article list/detail reads and keep metadata from double-counting views.
 - [x] Bound public search, catalog, editorial-server and home-feed reads; keep search rate limited per client IP.
 - [x] Route player/creator drafts through an audited moderator publish/archive transition and queue.
+- [x] Add authenticated article comments/replies with same-article parent checks, author notifications and transactional counters.
 
 ### Exit criteria
 
