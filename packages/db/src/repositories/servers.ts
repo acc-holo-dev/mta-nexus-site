@@ -4,8 +4,8 @@ import { servers } from "../schema";
 import type { Server } from "@nexus/domain";
 
 export class ServerRepository {
-  async listActivePublic(): Promise<Server[]> {
-    const rows = await db
+  async listActivePublic(limit?: number): Promise<Server[]> {
+    const query = db
       .select()
       .from(servers)
       .where(
@@ -15,6 +15,13 @@ export class ServerRepository {
         )
       )
       .orderBy(desc(servers.updatedAt));
+    const boundedLimit =
+      limit === undefined
+        ? undefined
+        : Number.isFinite(limit)
+          ? Math.min(Math.max(Math.floor(limit), 1), 100)
+          : 100;
+    const rows = boundedLimit === undefined ? await query : await query.limit(boundedLimit);
     return rows as unknown as Server[];
   }
 
