@@ -31,7 +31,7 @@ A listing, a live master-list observation, a resource build, a purchase entitlem
 
 | Wave | Scope | Status | Definition of done |
 | --- | --- | --- | --- |
-| 0 | Product boundary and legacy removal | complete | Blueprint exists; heartbeat/agent flow removed from active surface |
+| 0 | Product boundary and legacy removal | complete | Blueprint exists; agent schema and active flow are replaced by sourced public observations |
 | 1 | Official MTA live directory | complete | Parser, cache, bounds, public API and paginated UI exist |
 | 2 | Free resource delivery hardening | complete | Safe upload, build lifecycle, entitlement delivery and moderation-ready states |
 | 3 | Identity, access and trust | active | Capability checks, profile verification, audit and abuse controls |

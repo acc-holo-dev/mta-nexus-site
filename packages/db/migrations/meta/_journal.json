@@ -71,6 +71,13 @@
       "when": 1789537000000,
       "tag": "0009_review_author_uniqueness",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1789538000000,
+      "tag": "0010_public_server_observations",
+      "breakpoints": true
     }
   ]
 }

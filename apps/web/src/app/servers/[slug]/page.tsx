@@ -60,7 +60,7 @@ export default async function ServerDetailPage({
   const isOnline = observedServer != null && observedServer.responding !== false;
   const currentPlayers = observedServer?.players;
   const maxPlayers = observedServer?.maxPlayers ?? server.maxPlayers;
-  const occupancyPercent = currentPlayers == null || maxPlayers === 0
+  const occupancyPercent = currentPlayers == null || maxPlayers == null || maxPlayers === 0
     ? 0
     : Math.min(100, Math.round((currentPlayers / maxPlayers) * 100));
   const connectUri = "mtasa://" + server.ipAddress + ":" + server.port;

@@ -147,7 +147,6 @@ export async function runSeed() {
     ],
     compatibility: {
       mtaMinVersion: "1.6.0",
-      moduleMinVersion: "1.0.0",
       dependencies: [],
     },
   });

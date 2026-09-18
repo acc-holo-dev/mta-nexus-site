@@ -8,8 +8,6 @@ export type ServerStatus = "active" | "inactive" | "maintenance" | "suspended";
 
 export type ServerVisibility = "public" | "unlisted" | "private";
 
-export type InstallationStatus = "pending" | "active" | "revoked" | "offline";
-
 export type ProductType =
   | "script"
   | "model"
@@ -26,7 +24,6 @@ export type ProductStatus = "draft" | "pending_review" | "published" | "suspende
 export type LicenseModel =
   | "single_server"
   | "multiple_servers"
-  | "per_installation"
   | "organization"
   | "subscription"
   | "unlimited";
@@ -167,30 +164,35 @@ export interface Server {
   httpPort?: number;
   gameMode?: string;
   mapName?: string;
-  maxPlayers: number;
-  currentPlayers: number;
-  ownerId: string;
+  maxPlayers?: number;
+  currentPlayers?: number;
+  ownerId?: string;
   organizationId?: string;
   status: ServerStatus;
   visibility: ServerVisibility;
   isVerified: boolean;
   bannerUrl?: string;
   logoUrl?: string;
-  lastHeartbeatAt?: Date;
+  lastObservedAt?: Date;
+  observationSource?: "mta_master" | "mta_query";
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface ServerInstallation {
+export interface ServerObservation {
   id: string;
   serverId: string;
-  apiKeyHash: string;
-  moduleVersion: string;
-  mtaVersion: string;
-  os: string;
-  status: InstallationStatus;
-  lastHeartbeatAt?: Date;
-  capabilities: string[];
+  source: "mta_master" | "mta_query";
+  sourceSequence?: string;
+  name?: string;
+  gameMode?: string;
+  mapName?: string;
+  mtaVersion?: string;
+  currentPlayers?: number;
+  maxPlayers?: number;
+  passworded?: boolean;
+  responding?: boolean;
+  observedAt: Date;
   createdAt: Date;
 }
 
@@ -217,7 +219,6 @@ export interface Product {
   screenshots: string[];
   compatibility: {
     mtaMinVersion?: string;
-    moduleMinVersion?: string;
     dependencies?: string[];
   };
   createdAt: Date;

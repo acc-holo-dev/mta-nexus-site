@@ -17,7 +17,7 @@ type EditableServer = {
   ipAddress: string;
   port: number;
   gameMode?: string;
-  maxPlayers: number;
+  maxPlayers?: number;
   visibility: "public" | "unlisted" | "private";
 };
 

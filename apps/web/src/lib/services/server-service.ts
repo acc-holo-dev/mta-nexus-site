@@ -52,7 +52,6 @@ export class ServerService {
       id,
       // A listing is editorially active immediately; live availability is sourced separately from the official MTA directory.
       status: "active",
-      currentPlayers: 0,
       isVerified: false,
     });
 

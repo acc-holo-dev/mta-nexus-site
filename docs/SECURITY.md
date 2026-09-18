@@ -46,7 +46,7 @@ Audit event recorded
 ```
 
 ## 7. Installation Credential Security
-Server installations authenticate with a one-time displayed API key (`nxk_...`). Only the SHA-256 hash is persisted; the plaintext key cannot be recovered from the database.
+NEXUS does not accept telemetry credentials or runtime heartbeats from game servers. Live facts are collected by the platform from public MTA sources and stored with their source and observation time.
 
 ## 8. UI Data Isolation
 Server components enforce session isolation at the page level, not only in API routes:
@@ -61,4 +61,4 @@ Critical platform actions (`LOGIN`, `LOGOUT`, `ORDER_CREATED`, `PAYMENT_COMPLETE
 - **Payment provider** — sandbox implementation only; no external PSP integration yet.
 - **Email flows** (verification, password reset) are not implemented.
 - **2FA** — schema foundation only, no flow.
-- Development seed contains demo statistics; production data comes exclusively from real flows (heartbeat, orders).
+- Development seed contains demo statistics; production server activity comes exclusively from sourced public observations.

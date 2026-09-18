@@ -108,7 +108,6 @@ export const createProductSchema = z.object({
   licenseModel: z.enum([
     "single_server",
     "multiple_servers",
-    "per_installation",
     "organization",
     "subscription",
     "unlimited",

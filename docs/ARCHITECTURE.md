@@ -23,7 +23,7 @@ MTA Nexus 1.1 is implemented as a production-grade modular monolith. Rather than
 
 1. **Identity & Sessions (`@nexus/db/src/repositories/users.ts`, `sessions.ts`):** Real user accounts with salted scrypt password hashing, session tokens persisted in PostgreSQL, secure `httpOnly` cookies, context switching between Personal and Organization profiles.
 2. **Catalog & Builds (`@nexus/db/src/repositories/products.ts`, `builds.ts`):** Complete marketplace resources, versioned builds with SHA-256 binary validation, deterministic sorting (popular, newest, price, rating).
-3. **Game Servers (`@nexus/db/src/repositories/servers.ts`):** Live server directory, telemetry load tracking, and runtime module installations.
+3. **Game Servers (`@nexus/db/src/repositories/servers.ts`):** Public MTA discovery, separately claimed editorial profiles, and sourced observation history without server-installed code.
 4. **Commerce & Double-Entry Ledger (`@nexus/db/src/repositories/orders.ts`, `payments.ts`, `ledger.ts`):** Strict finite state machines, transactional append-only ledger entries for double-entry fiscal accounting.
 5. **Licensing & Entitlement Engine (`@nexus/db/src/repositories/licenses.ts`, `entitlements.ts`):** Cryptographic keys, server IP/hardware binding, and server-side `hasEntitlement(subject, resource, permission)` verification.
 6. **Content & Discovery (`@nexus/db/src/repositories/content.ts`):** Articles, devlogs, verified reviews, and instant cross-domain search (`Ctrl+K`).

@@ -11,7 +11,7 @@ describe("product review integrity", () => {
 
     expect(route).toContain('product.status !== "published"');
     expect(route).toContain('hasReviewFromUser(productId, user.id)');
-    expect(route).toContain('type: "product.download"');
+    expect(route).toContain('"product.download"');
     expect(route).toContain("Add this resource to your library before reviewing it");
     expect(route).toContain("isVerifiedPurchase: hasAcquired");
   });

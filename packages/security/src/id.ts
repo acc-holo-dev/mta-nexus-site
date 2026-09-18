@@ -6,6 +6,7 @@ export type EntityPrefix =
   | "mem"
   | "dev"
   | "srv"
+  | "obs"
   | "ins"
   | "prd"
   | "bld"
