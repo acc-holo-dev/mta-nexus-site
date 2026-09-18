@@ -54,6 +54,38 @@ export class ContentRepository {
     return this.findPublishedBySlug(slug, options);
   }
 
+  async listByStatus(
+    status: Content["status"],
+    limit = 100
+  ): Promise<Content[]> {
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 100)
+      : 100;
+    const rows = await db
+      .select()
+      .from(content)
+      .where(eq(content.status, status))
+      .orderBy(desc(content.createdAt))
+      .limit(boundedLimit);
+    return rows as unknown as Content[];
+  }
+
+  async updateStatus(
+    id: string,
+    status: Content["status"]
+  ): Promise<Content | null> {
+    const rows = await db
+      .update(content)
+      .set({
+        status,
+        publishedAt: status === "published" ? new Date() : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(content.id, id))
+      .returning();
+    return (rows[0] as unknown as Content) || null;
+  }
+
   async create(data: Omit<Content, "createdAt" | "updatedAt">): Promise<Content> {
     const values = {
       ...data,
