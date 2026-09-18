@@ -35,7 +35,7 @@ A listing, a live master-list observation, a resource build, a purchase entitlem
 | 1 | Official MTA live directory | complete | Parser, cache, bounds, public API and paginated UI exist |
 | 2 | Free resource delivery hardening | complete | Safe upload, build lifecycle, entitlement delivery and moderation-ready states |
 | 3 | Identity, access and trust | active | Capability checks, profile verification, audit and abuse controls |
-| 4 | Communities and content | planned | Community spaces, posts, discussions, notifications and discovery |
+| 4 | Communities and content | active | Community spaces, posts, discussions, notifications and discovery; public reads are bounded and publication-safe |
 | 5 | Editorial server profiles | active | Owner-managed profile data safely linked to official observations |
 | 6 | Marketplace quality | planned | Review rules, build scanning/signing-ready workflow, compatibility and creator operations |
 | 7 | Financial domain foundation | planned | Immutable ledger and provider-neutral payment/payout contracts, disabled by default |
@@ -105,6 +105,8 @@ Create the social layer that gives players a reason to return when they are not 
 - Notification center and digest-ready events.
 - Tags, search and ranking based on real activity rather than vanity counters.
 - SEO metadata and stable public URLs.
+- [x] Enforce published-only article list/detail reads and keep metadata from double-counting views.
+- [x] Bound public search, catalog, editorial-server and home-feed reads; keep search rate limited per client IP.
 
 ### Exit criteria
 
