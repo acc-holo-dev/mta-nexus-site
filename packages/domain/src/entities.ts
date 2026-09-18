@@ -155,6 +155,13 @@ export interface Server {
   name: string;
   slug: string;
   description?: string;
+  websiteUrl?: string;
+  discordUrl?: string;
+  rulesUrl?: string;
+  mediaUrls?: string[];
+  language?: string;
+  region?: string;
+  gameplayTags?: string[];
   ipAddress: string;
   port: number;
   httpPort?: number;
