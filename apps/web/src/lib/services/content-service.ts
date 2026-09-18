@@ -9,8 +9,8 @@ import { eventBus } from "@nexus/domain";
 import type { Content, Comment, User, Product, Server } from "@nexus/domain";
 
 export class ContentService {
-  async listArticles(): Promise<Content[]> {
-    return contentRepository.listPublished();
+  async listArticles(limit = 50): Promise<Content[]> {
+    return contentRepository.listPublished(limit);
   }
 
   async getArticleBySlug(
@@ -74,14 +74,18 @@ export class ContentService {
     trendingServers: Server[];
     recentArticles: Content[];
   }> {
-    const featuredProducts = await productRepository.list({ featuredOnly: true });
-    const allServers = await serverRepository.listActivePublic();
-    const recentArticles = await contentRepository.listPublished();
+    const featuredProducts = await productRepository.list({
+      featuredOnly: true,
+      maxPrice: 0,
+      limit: 4,
+    });
+    const trendingServers = await serverRepository.listActivePublic(3);
+    const recentArticles = await contentRepository.listPublished(3);
 
     return {
-      featuredProducts: featuredProducts.slice(0, 4),
-      trendingServers: allServers.slice(0, 3),
-      recentArticles: recentArticles.slice(0, 3),
+      featuredProducts,
+      trendingServers,
+      recentArticles,
     };
   }
 }
