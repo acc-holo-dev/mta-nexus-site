@@ -138,7 +138,7 @@ export const createProductSchema = z.object({
           });
         }),
     })
-    .default({}),
+    .default({ dependencies: [] }),
 });
 
 export const updateProductSchema = createProductSchema.partial();

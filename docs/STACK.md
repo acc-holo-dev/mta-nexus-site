@@ -10,9 +10,9 @@ This document records the official technology stack choices, verified releases, 
 
 | Component | Target Version | Status | Notes |
 |---|---|---|---|
-| **Node.js** | `v22` (Docker/CI baseline) | Baseline | Active LTS. Native Web Crypto, fetch, streams, test runner support |
-| **pnpm** | `9.15.9` | Verified Installed | Strict dependency isolation, workspace protocol (`workspace:*`) |
-| **TypeScript** | `^5.7.0` | Verified Target | Strict mode enabled, project references, modern ECMAScript target |
+| **Node.js** | `v26` (Docker/CI baseline) | Verified Target | Current release. Native Web Crypto, fetch, streams, test runner support |
+| **pnpm** | `12.4.2` | Verified Installed | Strict dependency isolation, workspace protocol (`workspace:*`) |
+| **TypeScript** | `7.0.2` | Verified Target | Strict mode enabled, project references, modern ECMAScript target |
 
 ---
 
@@ -21,8 +21,8 @@ This document records the official technology stack choices, verified releases, 
 | Library | Version | Role / Justification |
 |---|---|---|
 | **Next.js** | `16.3.5` | Monolithic application layer, App Router, React Server Components by default, Route Handlers, Server Actions |
-| **React** | `19.x` | Modern React primitives (`useActionState`, `useOptimistic`, Actions, Server Components) |
-| **React DOM** | `19.x` | React DOM renderer |
+| **React** | `19.3.0` | Modern React primitives (`useActionState`, `useOptimistic`, Actions, Server Components) |
+| **React DOM** | `19.3.0` | React DOM renderer |
 
 ---
 
@@ -30,10 +30,10 @@ This document records the official technology stack choices, verified releases, 
 
 | Library | Version | Role / Justification |
 |---|---|---|
-| **PostgreSQL** | `16.x` | Production relational database, transactions, constraints, full-text search, append-only ledgers |
+| **PostgreSQL** | `18.x` | Production relational database, transactions, constraints, full-text search, append-only ledgers |
 | **Drizzle ORM** | `0.45.2` | Type-safe SQL builder & ORM, migration engine, zero runtime bloat, explicit schema definitions |
-| **Drizzle Kit** | `^0.31.0` | Schema migrations and introspection tooling |
-| **pg** / **postgres** | `^3.4.0` | Fast PostgreSQL driver with connection pooling |
+| **Drizzle Kit** | `0.31.10` | Schema migrations and introspection tooling |
+| **postgres** | `3.4.9` | Fast PostgreSQL driver with connection pooling |
 
 ---
 
@@ -52,7 +52,7 @@ This document records the official technology stack choices, verified releases, 
 |---|---|---|
 | **Tailwind CSS** | `4.3.3` | Next-gen CSS-first compiler, CSS variables for design tokens (light/dark/system) |
 | **Base UI / Radix primitives** | Current stable | Accessible unstyled primitives for Dialog, Dropdown, Tabs, Tooltip, Sheet |
-| **Lucide React** | `1.46.0` | Unified, consistent iconography across all modules |
+| **Lucide React** | `1.47.0` | Unified, consistent iconography across all modules |
 | **clsx & tailwind-merge** | `2.1.1` & `3.7.0` | Predictable class concatenation and conflict resolution |
 
 ---
@@ -61,7 +61,7 @@ This document records the official technology stack choices, verified releases, 
 
 | Library | Version | Role / Justification |
 |---|---|---|
-| **Zod** | `3.24.x` | Source-of-truth schemas for forms, API inputs, server actions, webhooks, domain validation |
+| **Zod** | `4.6.5` | Source-of-truth schemas for forms, API inputs, server actions, webhooks, domain validation |
 
 ---
 

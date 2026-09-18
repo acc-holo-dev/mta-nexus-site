@@ -5,7 +5,7 @@
 - **Rationale:** Avoids network overhead, distributed transactions, and deployment sprawl for the closed beta. Allows clear domain boundaries that can be split into separate services in future phases if scaling requires it.
 
 ## ADR-002: PostgreSQL as Universal Relational Foundation
-- **Decision:** All core domains (identity, organizations, catalog, builds, entitlements, community, and moderation) reside in PostgreSQL 16.
+- **Decision:** All core domains (identity, organizations, catalog, builds, entitlements, community, and moderation) reside in PostgreSQL 18.
 - **Rationale:** Provides referential integrity, ACID transactions, and built-in query capability without prematurely adding Elasticsearch or Redis.
 
 ## ADR-003: Drizzle ORM for Data Access
@@ -25,7 +25,7 @@
 - **Rationale:** A public URL must never be treated as a license.
 
 ## ADR-007: Closed-Beta Infrastructure
-- **Decision:** Target one Hetzner Cloud instance in Finland or Germany with 4 GB RAM, a single application process, PostgreSQL 16, and provider-managed daily backups. Primary production name is `nexus-mta.com`; `nexus-mta.pro` is the fallback.
+- **Decision:** Target one Hetzner Cloud instance in Finland or Germany with at least 4 GB RAM, a single application process, PostgreSQL 18, ClamAV 1.5, and provider-managed daily backups. Primary production name is `nexus-mta.com`; `nexus-mta.pro` is the fallback.
 - **Rationale:** It fits the $30/month ceiling and keeps operations simple. Hetzner backups retain seven daily disk copies, but attached volumes are excluded, so closed-beta uploads remain on the backed-up system disk and database/resource archives are created daily.
 
 ## ADR-008: Email Deferred, Not Faked

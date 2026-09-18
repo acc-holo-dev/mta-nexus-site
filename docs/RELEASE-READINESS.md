@@ -6,7 +6,7 @@ Last reviewed: 2026-09-16
 
 | Gate | Status | Evidence / action |
 |---|---|---|
-| Clean database migrations | Pass | GitHub CI applies migrations to PostgreSQL 16 |
+| Clean database migrations | Pass | GitHub CI applies migrations to PostgreSQL 18 |
 | TypeScript | Pass | `pnpm typecheck` in CI |
 | Automated tests | Pass | `pnpm test` against PostgreSQL |
 | Production build | Pass | `pnpm build` in CI |

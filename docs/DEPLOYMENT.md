@@ -5,11 +5,12 @@ This is the single-VDS deployment for the closed beta. It does not deploy automa
 ## What runs on the VDS
 
 - Next.js application;
-- PostgreSQL 16, reachable only from the application container;
+- PostgreSQL 18, reachable only from the application container;
+- ClamAV 1.5, reachable only from the application container;
 - Caddy, which obtains TLS certificates and exposes only ports 80/443;
 - Docker named volumes for database, uploads, and Caddy certificates.
 
-The target remains a 4 GB RAM VDS within the $20–30/month ceiling. No SMTP or payment provider is required.
+The target requires at least 4 GB RAM because ClamAV loads its signature database in memory. No SMTP or payment provider is required.
 
 ## Prepare the host
 
@@ -50,8 +51,10 @@ Before inviting beta users, test restoring both artefacts on a disposable VDS. P
 
 ## Upgrade
 
+PostgreSQL major-version upgrades require a tested dump/restore or `pg_upgrade`; never attach an existing PostgreSQL 16 data volume directly to PostgreSQL 18.
+
 ```bash
-git checkout dev
+git checkout main
 git pull --ff-only
 docker compose -f compose.production.yaml up -d --build
 docker compose -f compose.production.yaml ps

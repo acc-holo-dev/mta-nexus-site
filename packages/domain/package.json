@@ -7,6 +7,6 @@
   "types": "./src/index.ts",
   "dependencies": {},
   "devDependencies": {
-    "typescript": "^5.7.3"
+    "typescript": "^7.0.2"
   }
 }

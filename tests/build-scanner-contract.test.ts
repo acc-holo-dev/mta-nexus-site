@@ -34,7 +34,7 @@ describe("resource build scanner contract", () => {
     expect(scanner).toContain('socket.write("zINSTREAM');
     expect(scanner).toContain("writeUInt32BE");
     expect(scanner).toContain('status: "clean", scanner: "clamav"');
-    expect(compose).toContain("clamav/clamav:1.4");
+    expect(compose).toContain("clamav/clamav:1.5");
     expect(config).toContain("Production resource publishing requires ClamAV");
   });
 });

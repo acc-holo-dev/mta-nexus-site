@@ -1,6 +1,6 @@
 services:
   clamav:
-    image: clamav/clamav:1.4
+    image: clamav/clamav:1.5
     restart: unless-stopped
     volumes:
       - clamav_data:/var/lib/clamav
@@ -12,7 +12,7 @@ services:
       start_period: 90s
 
   postgres:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-nexus}

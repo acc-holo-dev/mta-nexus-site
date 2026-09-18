@@ -12,7 +12,7 @@ The product answers one primary question: **what is happening in MTA right now?*
 - free resource creation, private build storage, SHA-256 integrity, library claims, and entitlement-gated binary downloads
 - articles, profiles, follows, notifications, reports, and moderation foundations
 - fail-closed production configuration
-- CI on a clean PostgreSQL 16 database: migrations, typecheck, tests, and production build
+- CI on a clean PostgreSQL 18 database: migrations, typecheck, tests, and production build
 
 ## Explicitly not available
 
@@ -20,16 +20,15 @@ The product answers one primary question: **what is happening in MTA right now?*
 - S3 storage adapter (configuration fails loudly instead of falling back)
 - production email until SMTP is configured
 - multi-instance rate limiting
-- malware scanning of uploaded archives
 - MTA server-side installation, heartbeat agents, or runtime scripts
 
 ## Stack
 
-- Node.js 22+
-- pnpm 9
-- Next.js 16 / React 19 / TypeScript
-- PostgreSQL 16 / Drizzle ORM
-- Vitest
+- Node.js 26+
+- pnpm 12
+- Next.js 16 / React 19 / TypeScript 7
+- PostgreSQL 18 / Drizzle ORM
+- Vitest 5
 
 ## Local development
 
@@ -50,7 +49,7 @@ The local site runs at `http://localhost:3000`.
 - `main`: stable release history
 - `dev`: active development and the source branch for the draft release PR
 
-Do not merge `dev` until the closed-beta checklist in [docs/RELEASE-READINESS.md](docs/RELEASE-READINESS.md) is complete.
+Promote `dev` to `main` only after the dependency audit, migrations, typecheck, tests, application build, and production image build are green.
 
 ## Documentation
 

@@ -296,8 +296,8 @@ NEXUS должен:
 | Заявление | Фактическое состояние |
 |---|---|
 | «Better Auth» | В коде собственные password/session flows, Better Auth в зависимостях отсутствует |
-| Node 24 / PostgreSQL 18 | Docker и CI используют Node 22 и PostgreSQL 16 |
-| Zod 4 | Web-приложение использует Zod 3.24 |
+| Node 24 / PostgreSQL 18 | Docker и CI используют Node 26 и PostgreSQL 18; Node обновлён сверх исходного плана |
+| Zod 4 | Реализовано: workspace использует Zod 4.6.5 |
 | «серверный агент удалён» | Активные API, сервисы и UI используют официальный MTA master-list; legacy installations/heartbeats сохранены только для безопасной миграции данных |
 | «полноценный server ecosystem» | Есть каталог и страница, но нет законченных server news/community/claim flows без агента |
 | «build подписан» | `isSigned: true` ставится при обычной загрузке без криптографической подписи |
