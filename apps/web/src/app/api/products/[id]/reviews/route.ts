@@ -14,6 +14,12 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: productId } = await params;
+  const product = await productRepository.findById(productId);
+
+  if (!product || product.status !== "published") {
+    return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  }
+
   const reviews = await contentRepository.listComments({ productId });
   return NextResponse.json({ reviews });
 }
@@ -51,7 +57,7 @@ export async function POST(
     }
 
     const product = await productRepository.findById(productId);
-    if (!product) {
+    if (!product || product.status !== "published") {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
@@ -125,6 +131,14 @@ export async function POST(
       { status: 201 }
     );
   } catch (error: unknown) {
+    const databaseError = error as { code?: unknown };
+    if (databaseError.code === "23505") {
+      return NextResponse.json(
+        { error: "You have already reviewed this product" },
+        { status: 409 }
+      );
+    }
+
     console.error("Review submission error:", error);
     return NextResponse.json({ error: "Failed to submit review" }, { status: 500 });
   }
