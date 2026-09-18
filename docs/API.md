@@ -133,6 +133,17 @@ stored as `draft`; only an authorized moderator can request immediate
 publication. Linked server, resource and organization IDs must exist. The
 operation is rate limited per account.
 
+### `POST /api/admin/actions` for content
+
+Moderators can transition a submitted content draft with:
+
+```json
+{ "targetType": "content", "targetId": "cnt_...", "action": "publish" }
+```
+
+Use `archive` to reject/archive a draft. Both transitions require the moderation
+capability and create an audit event.
+
 ## Notifications
 
 ### `GET /api/notifications`
