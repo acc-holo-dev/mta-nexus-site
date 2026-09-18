@@ -29,6 +29,24 @@ Returns the current authenticated user without password material.
 Returns metadata for the authenticated user's sessions. Session tokens are never
 returned. The response is private and not cacheable.
 
+### `GET /api/auth/context`
+
+Returns the authenticated user's available contexts: a personal context plus
+organization memberships (bounded to 50). The response is private and never
+cached.
+
+### `POST /api/auth/context`
+
+Switches the active account context after verifying organization membership:
+
+```json
+{ "contextId": "org_..." }
+```
+
+Use `"personal"` to return to the personal context. Switches are rate limited
+and recorded in the audit log; selecting an organization never grants permissions
+beyond that membership.
+
 ### `DELETE /api/auth/sessions`
 
 Revoke one owned session:
