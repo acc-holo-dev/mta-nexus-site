@@ -11,6 +11,8 @@ describe("public search hardening", () => {
 
     expect(route).toContain('consumeRateLimit("search", getClientIp(request.headers))');
     expect(route).toContain("MAX_QUERY_LENGTH");
+    expect(route).toContain("SEARCH_TYPES");
+    expect(route).toContain("Unknown search type");
     expect(route).toContain("Math.min(Math.max(Math.floor(requestedLimit), 1), DEFAULT_LIMIT)");
     expect(route).toContain("stale-while-revalidate=60");
   });
@@ -26,6 +28,10 @@ describe("public search hardening", () => {
     expect(service).toContain("contentRepository.listPublished(boundedLimit)");
     expect(service).toContain("userRepository.listAll(boundedLimit)");
     expect(service).toContain("organizationRepository.listAll(boundedLimit)");
-    expect(service).toContain("return results.slice(0, boundedLimit)");
+    expect(service).toContain("mtaMasterDirectoryService.getDirectory()");
+    expect(service).toContain("badge: observation");
+    expect(service).toContain(".filter((item) => !type || item.type === type)");
+    expect(service).not.toContain("currentPlayers");
+    expect(service).toContain("return results");
   });
 });
