@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
 import { Calendar, Eye, ThumbsUp, MessageSquare, ArrowLeft, Tag } from "lucide-react";
+import { ContentCommentForm } from "../../../components/content-comment-form";
 
 export const dynamic = "force-dynamic";
 
@@ -140,6 +141,8 @@ export default async function ArticleDetailPage({
           <MessageSquare className="w-4 h-4 text-amber-400" />
           <span>Discussion & Comments ({comments.length})</span>
         </h3>
+
+        <ContentCommentForm slug={article.slug} />
 
         {comments.length > 0 ? (
           <div className="space-y-4">
