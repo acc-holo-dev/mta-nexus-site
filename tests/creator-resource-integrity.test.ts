@@ -30,4 +30,16 @@ describe("creator resource integrity", () => {
     expect(page).toContain("moderator approval");
     expect(page).not.toContain(">Resource published<");
   });
+
+  it("commits build state, product state and audit evidence atomically", () => {
+    const repository = read("packages/db/src/repositories/builds.ts");
+    const service = read("apps/web/src/lib/services/product-service.ts");
+    expect(repository).toContain("async submitForReview(");
+    expect(repository).toContain("async moderatePending(");
+    expect(repository).toContain("async retireAndRefreshProduct(");
+    expect(repository.match(/db\.transaction/g)).toHaveLength(3);
+    expect(repository.match(/tx\.insert\(auditEvents\)/g)).toHaveLength(3);
+    expect(service).toContain("buildRepository.submitForReview(");
+    expect(service).not.toContain('action: "build.submitted_for_review"\n    });');
+  });
 });

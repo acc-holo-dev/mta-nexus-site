@@ -148,30 +148,38 @@ export class ProductService {
       throw new ForbiddenError("Not authorized to publish builds for this product");
     }
 
-    const hasPublishedBuild = (await buildRepository.listByProduct(product.id)).some(
-      (candidate) => candidate.status === "published"
-    );
-
     const buildId = generateId("bld");
+    const auditId = generateId("aud");
     let build: Build;
     try {
-      build = await buildRepository.create({
-        id: buildId,
-        productId: input.productId,
-        version: input.version,
-        releaseNotes: input.releaseNotes,
-        status: "pending_review",
-        storageKey: input.storageKey,
-        sha256Hash: input.sha256Hash,
-        fileSizeBytes: input.fileSizeBytes,
-        fileName: input.fileName,
-        mimeType: input.mimeType,
-        scanStatus: input.scanStatus,
-        scanner: input.scanner,
-        scannedAt: input.scannedAt,
-        // Signing is a separate release-pipeline step; never claim a user upload is signed.
-        isSigned: false,
-      });
+      build = await buildRepository.submitForReview(
+        {
+          id: buildId,
+          productId: input.productId,
+          version: input.version,
+          releaseNotes: input.releaseNotes,
+          status: "pending_review",
+          storageKey: input.storageKey,
+          sha256Hash: input.sha256Hash,
+          fileSizeBytes: input.fileSizeBytes,
+          fileName: input.fileName,
+          mimeType: input.mimeType,
+          scanStatus: input.scanStatus,
+          scanner: input.scanner,
+          scannedAt: input.scannedAt,
+          // Signing is a separate release-pipeline step; never claim a user upload is signed.
+          isSigned: false,
+        },
+        {
+          id: auditId,
+          actorId: actor.id,
+          actorType: "user",
+          action: "build.submitted_for_review",
+          targetId: buildId,
+          targetType: "build",
+          details: { productId: product.id, version: input.version },
+        }
+      );
     } catch (error: unknown) {
       if ((error as { code?: string }).code === "23505") {
         throw new AppError(
@@ -182,23 +190,6 @@ export class ProductService {
       }
       throw error;
     }
-
-    if (!hasPublishedBuild) {
-      await productRepository.update(product.id, {
-        currentVersion: input.version,
-        status: "pending_review",
-      });
-    }
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: actor.id,
-      actorType: "user",
-      action: "build.submitted_for_review",
-      targetId: buildId,
-      targetType: "build",
-      details: { productId: product.id, version: input.version },
-    });
 
     await eventBus.publish({
       id: generateId("evt"),
@@ -242,16 +233,7 @@ export class ProductService {
       );
     }
 
-    const reviewed = await buildRepository.moderatePending(build.id, input.decision);
-    if (!reviewed) {
-      throw new AppError(
-        "Build state changed before moderation completed",
-        409,
-        "BUILD_STATE_CHANGED"
-      );
-    }
-
-    await auditRepository.record({
+    const reviewed = await buildRepository.moderatePending(build.id, input.decision, {
       id: generateId("aud"),
       actorId: actor.id,
       actorType: actor.role === "admin" ? "admin" : "user",
@@ -260,6 +242,13 @@ export class ProductService {
       targetType: "build",
       details: { productId: product.id, version: build.version, notes: input.notes },
     });
+    if (!reviewed) {
+      throw new AppError(
+        "Build state changed before moderation completed",
+        409,
+        "BUILD_STATE_CHANGED"
+      );
+    }
 
     return reviewed;
   }
@@ -282,12 +271,7 @@ export class ProductService {
       throw new AppError("This build is already retired", 409, "BUILD_ALREADY_RETIRED");
     }
 
-    const retired = await buildRepository.retireAndRefreshProduct(build.id, build.status);
-    if (!retired) {
-      throw new AppError("Build state changed before retirement", 409, "BUILD_STATE_CHANGED");
-    }
-
-    await auditRepository.record({
+    const retired = await buildRepository.retireAndRefreshProduct(build.id, build.status, {
       id: generateId("aud"),
       actorId: actor.id,
       actorType: actor.role === "admin" ? "admin" : "user",
@@ -296,6 +280,9 @@ export class ProductService {
       targetType: "build",
       details: { productId: product.id, version: build.version, reason: input.reason },
     });
+    if (!retired) {
+      throw new AppError("Build state changed before retirement", 409, "BUILD_STATE_CHANGED");
+    }
 
     return retired;
   }

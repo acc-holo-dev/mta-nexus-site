@@ -4,13 +4,14 @@ import { resolve } from "node:path";
 
 describe("build review continuity", () => {
   it("keeps the latest approved release public while a newer build is reviewed", () => {
-    const service = readFileSync(
-      resolve(process.cwd(), "apps/web/src/lib/services/product-service.ts"),
+    const repository = readFileSync(
+      resolve(process.cwd(), "packages/db/src/repositories/builds.ts"),
       "utf8"
     );
 
-    expect(service).toContain("const hasPublishedBuild");
-    expect(service).toContain("if (!hasPublishedBuild)");
-    expect(service).toContain('status: "pending_review"');
+    expect(repository).toContain('eq(builds.status, "published")');
+    expect(repository).toContain("if (!published[0])");
+    expect(repository).toContain('status: "pending_review"');
+    expect(repository).toContain("db.transaction");
   });
 });

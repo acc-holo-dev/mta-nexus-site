@@ -14,7 +14,7 @@ describe("resource build lifecycle", () => {
     );
 
     expect(service).toContain('async retireBuild(');
-    expect(service).toContain('retireAndRefreshProduct(build.id, build.status)');
+    expect(service).toContain('retireAndRefreshProduct(build.id, build.status, {');
     expect(service).toContain('action: "build.retired"');
     expect(route).toContain('action: z.literal("retire")');
     expect(route).toContain("productService.retireBuild");

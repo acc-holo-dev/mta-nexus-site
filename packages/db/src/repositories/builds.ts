@@ -1,7 +1,7 @@
 import { and, eq, desc, ne } from "drizzle-orm";
 import { db } from "../client";
-import { builds, products } from "../schema";
-import type { Build } from "@nexus/domain";
+import { auditEvents, builds, products } from "../schema";
+import type { AuditEvent, Build } from "@nexus/domain";
 
 export class BuildRepository {
   async listByProduct(productId: string): Promise<Build[]> {
@@ -49,9 +49,46 @@ export class BuildRepository {
     return (rows[0] as unknown as Build) || null;
   }
 
+  async submitForReview(
+    data: Omit<Build, "createdAt">,
+    audit: Omit<AuditEvent, "createdAt">
+  ): Promise<Build> {
+    return db.transaction(async (tx) => {
+      const createdAt = new Date();
+      const rows = await tx
+        .insert(builds)
+        .values({ ...data, createdAt })
+        .returning();
+      const build = rows[0];
+
+      const published = await tx
+        .select({ id: builds.id })
+        .from(builds)
+        .where(and(
+          eq(builds.productId, data.productId),
+          eq(builds.status, "published")
+        ))
+        .limit(1);
+      if (!published[0]) {
+        await tx
+          .update(products)
+          .set({
+            currentVersion: data.version,
+            status: "pending_review",
+            updatedAt: createdAt,
+          })
+          .where(eq(products.id, data.productId));
+      }
+
+      await tx.insert(auditEvents).values({ ...audit, createdAt });
+      return build as unknown as Build;
+    });
+  }
+
   async moderatePending(
     id: string,
-    decision: "approve" | "reject"
+    decision: "approve" | "reject",
+    audit: Omit<AuditEvent, "createdAt">
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
       const targetStatus = decision === "approve" ? "published" : "rejected";
@@ -95,13 +132,15 @@ export class BuildRepository {
           .where(eq(products.id, reviewed.productId));
       }
 
+      await tx.insert(auditEvents).values({ ...audit, createdAt: new Date() });
       return reviewed as unknown as Build;
     });
   }
 
   async retireAndRefreshProduct(
     id: string,
-    expectedStatus: Build["status"]
+    expectedStatus: Build["status"],
+    audit: Omit<AuditEvent, "createdAt">
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
       const rows = await tx
@@ -130,6 +169,7 @@ export class BuildRepository {
         )
         .where(eq(products.id, retired.productId));
 
+      await tx.insert(auditEvents).values({ ...audit, createdAt: new Date() });
       return retired as unknown as Build;
     });
   }
