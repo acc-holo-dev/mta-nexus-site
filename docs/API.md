@@ -97,6 +97,15 @@ Claims a free published resource for the signed-in player and creates the
 download entitlement. Paid resources and checkout remain disabled in the
 closed beta.
 
+## Search
+
+### `GET /api/search?q=...`
+
+Searches published resources, public servers, published content, developers and
+organizations. The query is limited to 100 characters and the optional `limit`
+is capped at 50. Empty queries return an empty result set; repeated searches are
+rate limited per client IP and successful responses use short public caching.
+
 ## Community content
 
 ### `GET /api/content`
