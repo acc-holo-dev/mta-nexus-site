@@ -1,6 +1,6 @@
 FROM node:26-alpine AS build
 WORKDIR /app
-RUN corepack enable
+RUN npm install --global pnpm@12.4.2
 ENV NODE_ENV=production \
     NEXT_PUBLIC_APP_URL=https://nexus-mta.com \
     DATABASE_URL=postgres://nexus:build-only@127.0.0.1:5432/mta_nexus \
@@ -19,7 +19,7 @@ RUN pnpm build
 FROM node:26-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
-RUN corepack enable
+RUN npm install --global pnpm@12.4.2
 COPY --from=build /app /app
 RUN mkdir -p /data/uploads && chown -R node:node /data/uploads
 USER node
