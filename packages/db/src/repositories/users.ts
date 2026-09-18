@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 import { db } from "../client";
 import { users } from "../schema";
 import type { User } from "@nexus/domain";
@@ -86,6 +86,18 @@ export class UserRepository {
           ? Math.min(Math.max(Math.floor(limit), 1), 100)
           : 100;
     const rows = boundedLimit === undefined ? await query : await query.limit(boundedLimit);
+    return rows.map(toPublicUser);
+  }
+
+  async listDevelopers(limit = 100): Promise<User[]> {
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 100)
+      : 100;
+    const rows = await db
+      .select()
+      .from(users)
+      .where(or(eq(users.role, "developer"), eq(users.role, "admin")))
+      .limit(boundedLimit);
     return rows.map(toPublicUser);
   }
 }
