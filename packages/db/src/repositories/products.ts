@@ -1,4 +1,4 @@
-import { eq, desc, asc, and } from "drizzle-orm";
+import { eq, desc, asc, and, gte, lte, ilike, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { products } from "../schema";
 import type { Product, ProductType } from "@nexus/domain";
@@ -15,49 +15,40 @@ export interface ProductQueryOptions {
 
 export class ProductRepository {
   async list(options: ProductQueryOptions = {}): Promise<Product[]> {
-        let query = db.select().from(products);
-    const rows = await query;
-    let items = (rows as unknown as Product[]).filter((p) => p.status === "published");
-
-    if (options.type) {
-      items = items.filter((p) => p.type === options.type);
-    }
-    if (options.featuredOnly) {
-      items = items.filter((p) => p.isFeatured);
-    }
-    if (options.minPrice !== undefined) {
-      items = items.filter((p) => p.price >= options.minPrice!);
-    }
-    if (options.maxPrice !== undefined) {
-      items = items.filter((p) => p.price <= options.maxPrice!);
-    }
-    if (options.query) {
-      const q = options.query.toLowerCase();
-      items = items.filter(
-        (p) =>
-          p.title.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.toLowerCase().includes(q))
-      );
+    const conditions = [eq(products.status, "published")];
+    if (options.type) conditions.push(eq(products.type, options.type));
+    if (options.featuredOnly) conditions.push(eq(products.isFeatured, true));
+    if (options.minPrice !== undefined) conditions.push(gte(products.price, options.minPrice));
+    if (options.maxPrice !== undefined) conditions.push(lte(products.price, options.maxPrice));
+    if (options.query?.trim()) {
+      const pattern = `%${options.query.trim()}%`;
+      conditions.push(or(
+        ilike(products.title, pattern),
+        ilike(products.description, pattern),
+        sql`${products.tags}::text ILIKE ${pattern}`
+      )!);
     }
 
-    // Sort
-    items.sort((a, b) => {
-      if (options.sort === "popular") return b.salesCount - a.salesCount;
-      if (options.sort === "rating") return b.ratingAverage - a.ratingAverage;
-      if (options.sort === "price_asc") return a.price - b.price;
-      if (options.sort === "price_desc") return b.price - a.price;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+    const order = options.sort === "popular"
+      ? desc(products.salesCount)
+      : options.sort === "rating"
+        ? desc(products.ratingAverage)
+        : options.sort === "price_asc"
+          ? asc(products.price)
+          : options.sort === "price_desc"
+            ? desc(products.price)
+            : desc(products.createdAt);
+    const limit = options.limit === undefined || !Number.isFinite(options.limit)
+      ? 100
+      : Math.min(Math.max(Math.floor(options.limit), 1), 100);
 
-    if (options.limit !== undefined) {
-      const boundedLimit = Number.isFinite(options.limit)
-        ? Math.min(Math.max(Math.floor(options.limit), 1), 100)
-        : 100;
-      items = items.slice(0, boundedLimit);
-    }
-
-    return items;
+    const rows = await db
+      .select()
+      .from(products)
+      .where(and(...conditions))
+      .orderBy(order)
+      .limit(limit);
+    return rows as unknown as Product[];
   }
 
   async findById(id: string): Promise<Product | null> {

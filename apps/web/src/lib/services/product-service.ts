@@ -153,23 +153,35 @@ export class ProductService {
     );
 
     const buildId = generateId("bld");
-    const build = await buildRepository.create({
-      id: buildId,
-      productId: input.productId,
-      version: input.version,
-      releaseNotes: input.releaseNotes,
-      status: "pending_review",
-      storageKey: input.storageKey,
-      sha256Hash: input.sha256Hash,
-      fileSizeBytes: input.fileSizeBytes,
-      fileName: input.fileName,
-      mimeType: input.mimeType,
-      scanStatus: input.scanStatus,
-      scanner: input.scanner,
-      scannedAt: input.scannedAt,
-      // Signing is a separate release-pipeline step; never claim a user upload is signed.
-      isSigned: false,
-    });
+    let build: Build;
+    try {
+      build = await buildRepository.create({
+        id: buildId,
+        productId: input.productId,
+        version: input.version,
+        releaseNotes: input.releaseNotes,
+        status: "pending_review",
+        storageKey: input.storageKey,
+        sha256Hash: input.sha256Hash,
+        fileSizeBytes: input.fileSizeBytes,
+        fileName: input.fileName,
+        mimeType: input.mimeType,
+        scanStatus: input.scanStatus,
+        scanner: input.scanner,
+        scannedAt: input.scannedAt,
+        // Signing is a separate release-pipeline step; never claim a user upload is signed.
+        isSigned: false,
+      });
+    } catch (error: unknown) {
+      if ((error as { code?: string }).code === "23505") {
+        throw new AppError(
+          "This resource version already exists",
+          409,
+          "BUILD_VERSION_EXISTS"
+        );
+      }
+      throw error;
+    }
 
     if (!hasPublishedBuild) {
       await productRepository.update(product.id, {

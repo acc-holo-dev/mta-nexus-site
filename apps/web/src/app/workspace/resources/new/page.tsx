@@ -72,12 +72,12 @@ export default function NewResourcePage() {
   if (resultSlug) {
     return (
       <div className="max-w-xl mx-auto py-12 nexus-panel p-6 space-y-4">
-        <h1 className="text-2xl font-black text-white">Resource published</h1>
+        <h1 className="text-2xl font-black text-white">Resource submitted for review</h1>
         <p className="text-sm text-neutral-400">
-          The build is stored privately and downloads require an entitlement.
+          The build is stored privately. It will become public only after malware scanning and moderator approval.
         </p>
         <Link href={`/market/${resultSlug}`} className="text-sm font-semibold text-accent">
-          Open resource page
+          Open resource status
         </Link>
       </div>
     );
@@ -103,7 +103,7 @@ export default function NewResourcePage() {
         <label className="space-y-1"><span className="text-xs text-neutral-300">Minimum MTA version</span><input name="mtaMinVersion" defaultValue="1.6.0" className="w-full nexus-inset px-3 py-2" /></label>
         <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Build archive</span><input name="file" type="file" accept=".zip,.rar,.7z,.lua" required className="w-full text-sm text-neutral-300" /></label>
         <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Release notes</span><textarea name="releaseNotes" rows={3} className="w-full nexus-inset px-3 py-2" /></label>
-        <button disabled={loading} className="sm:col-span-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-sm">{loading ? "Publishing..." : "Publish free resource"}</button>
+        <button disabled={loading} className="sm:col-span-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-sm">{loading ? "Submitting..." : "Submit free resource for review"}</button>
       </form>
     </div>
   );

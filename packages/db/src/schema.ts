@@ -244,7 +244,10 @@ export const builds = pgTable("builds", {
   mtaVersionTarget: text("mta_version_target"),
   isSigned: boolean("is_signed").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  uniqueIndex("builds_product_version_idx").on(table.productId, table.version),
+  index("builds_product_status_idx").on(table.productId, table.status),
+]);
 
 // 10. Assets
 export const assets = pgTable("assets", {
@@ -539,4 +542,3 @@ export const verificationRequests = pgTable("verification_requests", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
 });
-
