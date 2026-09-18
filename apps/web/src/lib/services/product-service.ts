@@ -242,28 +242,12 @@ export class ProductService {
       );
     }
 
-    const status = input.decision === "approve" ? "published" : "rejected";
-    const reviewed = await buildRepository.updateStatus(build.id, status, "pending_review");
+    const reviewed = await buildRepository.moderatePending(build.id, input.decision);
     if (!reviewed) {
       throw new AppError(
         "Build state changed before moderation completed",
         409,
         "BUILD_STATE_CHANGED"
-      );
-    }
-
-    if (input.decision === "approve") {
-      await productRepository.update(product.id, {
-        currentVersion: build.version,
-        status: "published",
-      });
-    } else {
-      const fallback = (await buildRepository.listByProduct(product.id)).find(
-        (candidate) => candidate.id !== build.id && candidate.status === "published"
-      );
-      await productRepository.update(product.id, fallback
-        ? { currentVersion: fallback.version, status: "published" }
-        : { status: "draft" }
       );
     }
 
@@ -298,18 +282,10 @@ export class ProductService {
       throw new AppError("This build is already retired", 409, "BUILD_ALREADY_RETIRED");
     }
 
-    const retired = await buildRepository.updateStatus(build.id, "retired", build.status);
+    const retired = await buildRepository.retireAndRefreshProduct(build.id, build.status);
     if (!retired) {
       throw new AppError("Build state changed before retirement", 409, "BUILD_STATE_CHANGED");
     }
-
-    const remainingPublished = (await buildRepository.listByProduct(product.id)).find(
-      (candidate) => candidate.id !== build.id && candidate.status === "published"
-    );
-    await productRepository.update(product.id, remainingPublished
-      ? { currentVersion: remainingPublished.version }
-      : { status: "draft" }
-    );
 
     await auditRepository.record({
       id: generateId("aud"),

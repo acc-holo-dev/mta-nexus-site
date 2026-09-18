@@ -14,10 +14,17 @@ describe("resource build lifecycle", () => {
     );
 
     expect(service).toContain('async retireBuild(');
-    expect(service).toContain('updateStatus(build.id, "retired", build.status)');
-    expect(service).toContain('{ status: "draft" }');
+    expect(service).toContain('retireAndRefreshProduct(build.id, build.status)');
     expect(service).toContain('action: "build.retired"');
     expect(route).toContain('action: z.literal("retire")');
     expect(route).toContain("productService.retireBuild");
+
+    const repository = readFileSync(
+      resolve(process.cwd(), "packages/db/src/repositories/builds.ts"),
+      "utf8"
+    );
+    expect(repository).toContain("async retireAndRefreshProduct(");
+    expect(repository).toContain('status: "draft"');
+    expect(repository).toContain("db.transaction");
   });
 });

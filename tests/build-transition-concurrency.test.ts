@@ -15,7 +15,11 @@ describe("build state transition concurrency", () => {
 
     expect(repository).toContain("expectedStatus?: Build");
     expect(repository).toContain("eq(builds.status, expectedStatus)");
-    expect(service).toContain('updateStatus(build.id, status, "pending_review")');
-    expect(service).toContain('updateStatus(build.id, "retired", build.status)');
+    expect(repository).toContain("async moderatePending(");
+    expect(repository).toContain('eq(builds.status, "pending_review")');
+    expect(repository).toContain("async retireAndRefreshProduct(");
+    expect(repository).toContain("db.transaction");
+    expect(service).toContain("moderatePending(build.id, input.decision)");
+    expect(service).toContain("retireAndRefreshProduct(build.id, build.status)");
   });
 });
