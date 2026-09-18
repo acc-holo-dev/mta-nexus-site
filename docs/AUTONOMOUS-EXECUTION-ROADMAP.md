@@ -139,7 +139,7 @@ Make server pages useful without pretending NEXUS controls the server runtime.
 - Add claim/verification workflow instead of automatic ownership claims.
 - [x] Add bounded profile links, media, language, region and gameplay taxonomy without overwriting live observations.
 - Add favorites/follows and player-safe reporting.
-- Add search facets and server detail telemetry transparency.
+- [x] Add bounded search type facets and keep server telemetry sourced transparently from official observations.
 - [x] Keep owner workspace live counters sourced from the official directory; missing observations remain neutral.
 - Keep missing observations neutral: “no current observation,” never “offline” unless official data says so.
 
