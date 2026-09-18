@@ -417,7 +417,7 @@ export interface AuditEvent {
 export interface Report {
   id: string;
   reporterId: string;
-  targetType: "product" | "server" | "content" | "user";
+  targetType: "product" | "server" | "content" | "comment" | "user";
   targetId: string;
   type: ReportType;
   reason: string;
