@@ -28,6 +28,8 @@ describe("content moderation workflow", () => {
     expect(service).toContain('action: decision === "publish" ? "content.published" : "content.archived"');
     expect(repository).toContain("listByStatus");
     expect(repository).toContain("updateStatus");
+    expect(repository).toContain("expectedStatus");
+    expect(service).toContain("CONTENT_STATE_CHANGED");
     expect(page).toContain('contentRepository.listByStatus("draft", 100)');
     expect(page).toContain("Community Content Queue");
   });
