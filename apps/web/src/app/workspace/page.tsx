@@ -6,6 +6,10 @@ import {
   serverRepository,
 } from "@nexus/db";
 import { authService } from "../../lib/services/auth-service";
+import {
+  matchesMtaEndpoint,
+  mtaMasterDirectoryService,
+} from "../../lib/services/mta-master-directory-service";
 import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
 import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
 
@@ -33,24 +37,30 @@ export default async function WorkspacePage() {
     );
   }
 
-  const [entitlements, ownedServers, products] = await Promise.all([
+  const [entitlements, ownedServers, products, directory] = await Promise.all([
     entitlementRepository.listBySubject({ type: "user", id: user.id }),
     serverRepository.listByOwner(user.id),
     productRepository.list(),
+    mtaMasterDirectoryService.getDirectory().catch(() => null),
   ]);
 
   const productMap = new Map(products.map((product) => [product.id, product]));
   const downloadable = entitlements.filter(
     (entitlement) => entitlement.permission === "product.download"
   );
-  const onlineServers = ownedServers.filter(
-    (server) =>
-      server.status === "active" &&
-      server.lastHeartbeatAt &&
-      new Date(server.lastHeartbeatAt).getTime() >= Date.now() - 3 * 60 * 1000
+  const observations = directory?.servers ?? [];
+  const liveByServerId = new Map(
+    ownedServers.map((server) => [
+      server.id,
+      observations.find((observation) => matchesMtaEndpoint(server, observation)) ?? null,
+    ])
   );
+  const onlineServers = ownedServers.filter((server) => {
+    const observation = liveByServerId.get(server.id);
+    return Boolean(observation && observation.responding !== false);
+  });
   const onlinePlayers = onlineServers.reduce(
-    (total, server) => total + server.currentPlayers,
+    (total, server) => total + (liveByServerId.get(server.id)?.players ?? 0),
     0
   );
 
@@ -61,6 +71,9 @@ export default async function WorkspacePage() {
           <h1 className="font-display text-primary">Workspace</h1>
           <p className="font-caption text-muted mt-0.5">
             @{user.username} · your resources and servers
+          </p>
+          <p className="font-caption text-faint mt-1">
+            Live status comes only from the official MTA master-list; missing observations stay unknown.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -158,7 +171,9 @@ export default async function WorkspacePage() {
         {ownedServers.length > 0 ? (
           <div className="space-y-3">
             {ownedServers.map((server) => {
-              const isOnline = onlineServers.some((online) => online.id === server.id);
+              const observation = liveByServerId.get(server.id);
+              const isOnline = Boolean(observation && observation.responding !== false);
+              const isOffline = Boolean(observation && observation.responding === false);
               return (
                 <div key={server.id} className="nexus-panel p-4 flex items-center justify-between gap-3">
                   <div className="min-w-0">
@@ -173,7 +188,10 @@ export default async function WorkspacePage() {
                     <Link href={"/workspace/servers/" + server.id} className="text-xs font-semibold text-accent">
                       Manage
                     </Link>
-                    <StatusBadge status={isOnline ? "online" : "offline"} tone={isOnline ? "success" : "neutral"} />
+                    <StatusBadge
+                      status={isOnline ? "online" : isOffline ? "offline" : "unknown"}
+                      tone={isOnline ? "success" : "neutral"}
+                    />
                   </div>
                 </div>
               );
