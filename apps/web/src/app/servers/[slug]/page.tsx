@@ -112,6 +112,34 @@ export default async function ServerDetailPage({
         </div>
       </div>
 
+      {(server.language || server.region || server.websiteUrl || server.discordUrl || server.rulesUrl || server.gameplayTags?.length || server.mediaUrls?.length) && (
+        <section className="nexus-panel p-5 space-y-4">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-300">
+            {server.language && <span className="px-2 py-1 rounded bg-neutral-800 border border-base">Language: {server.language}</span>}
+            {server.region && <span className="px-2 py-1 rounded bg-neutral-800 border border-base">Region: {server.region}</span>}
+            {server.gameplayTags?.map((tag) => (
+              <span key={tag} className="px-2 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">#{tag}</span>
+            ))}
+          </div>
+          {(server.websiteUrl || server.discordUrl || server.rulesUrl) && (
+            <div className="flex flex-wrap gap-3 text-xs font-semibold">
+              {server.websiteUrl && <a href={server.websiteUrl} target="_blank" rel="noreferrer" className="text-accent hover:underline">Website ↗</a>}
+              {server.discordUrl && <a href={server.discordUrl} target="_blank" rel="noreferrer" className="text-accent hover:underline">Discord ↗</a>}
+              {server.rulesUrl && <a href={server.rulesUrl} target="_blank" rel="noreferrer" className="text-accent hover:underline">Rules ↗</a>}
+            </div>
+          )}
+          {server.mediaUrls && server.mediaUrls.length > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {server.mediaUrls.slice(0, 8).map((mediaUrl) => (
+                <a key={mediaUrl} href={mediaUrl} target="_blank" rel="noreferrer" className="block rounded-lg border border-base bg-neutral-900 px-3 py-4 text-center text-[11px] text-neutral-400 hover:text-white hover:border-strong">
+                  Open media ↗
+                </a>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
           <div className="flex items-center justify-between text-xs text-neutral-400">
