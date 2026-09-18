@@ -92,8 +92,18 @@ export class ContentService {
       );
     }
 
-    const updated = await contentRepository.updateStatus(contentId, targetStatus);
-    if (!updated) throw new NotFoundError("Content", contentId);
+    const updated = await contentRepository.updateStatus(
+      contentId,
+      targetStatus,
+      current.status
+    );
+    if (!updated) {
+      throw new AppError(
+        "Content changed before moderation completed",
+        409,
+        "CONTENT_STATE_CHANGED"
+      );
+    }
 
     await auditRepository.record({
       id: generateId("aud"),
