@@ -137,6 +137,15 @@ return an empty result set; repeated searches are rate limited per client IP and
 successful responses use short public caching. Server player badges are shown
 only when the official MTA directory has a matching observation.
 
+
+## Creator profiles
+
+### `GET /developers/:username`
+
+Renders a public creator profile only for developer/admin accounts and bounds
+published resource reads to 100. Identity verification is shown only when the
+account's verification state is true; seller or reputation badges are not inferred.
+
 ## Community content
 
 ### `GET /api/content`
