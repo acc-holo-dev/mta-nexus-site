@@ -29,12 +29,26 @@ export class ProductService {
 
   async getProductBySlug(slug: string): Promise<Product | null> {
     const product = await productRepository.findBySlug(slug);
-    return product?.price === 0 ? product : null;
+    return product?.price === 0 && product.status === "published" ? product : null;
+  }
+
+  async getProductPreviewBySlug(slug: string, actor: User | null): Promise<Product | null> {
+    const product = await productRepository.findBySlug(slug);
+    if (!product || product.price !== 0) return null;
+    if (product.status === "published") return product;
+    if (!actor) return null;
+
+    const organizationMemberships = product.organizationId
+      ? await organizationRepository.listUserMemberships(actor.id)
+      : [];
+    return can(actor, "product.update", product, { organizationMemberships })
+      ? product
+      : null;
   }
 
   async getProductById(id: string): Promise<Product | null> {
     const product = await productRepository.findById(id);
-    return product?.price === 0 ? product : null;
+    return product?.price === 0 && product.status === "published" ? product : null;
   }
 
   async getProductBuilds(productId: string, includeNonPublic = false): Promise<Build[]> {
@@ -123,6 +137,7 @@ export class ProductService {
       productId: string;
       version: string;
       releaseNotes?: string;
+      mtaVersionTarget?: string;
       storageKey: string;
       sha256Hash: string;
       fileSizeBytes: number;
@@ -158,6 +173,7 @@ export class ProductService {
           productId: input.productId,
           version: input.version,
           releaseNotes: input.releaseNotes,
+          mtaVersionTarget: input.mtaVersionTarget,
           status: "pending_review",
           storageKey: input.storageKey,
           sha256Hash: input.sha256Hash,

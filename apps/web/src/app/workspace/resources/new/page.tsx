@@ -33,6 +33,10 @@ export default function NewResourcePage() {
             .filter(Boolean),
           compatibility: {
             mtaMinVersion: String(form.get("mtaMinVersion") || "") || undefined,
+            dependencies: String(form.get("dependencies") || "")
+              .split(",")
+              .map((dependency) => dependency.trim().toLowerCase())
+              .filter(Boolean),
           },
         }),
       });
@@ -44,6 +48,7 @@ export default function NewResourcePage() {
       const buildForm = new FormData();
       buildForm.set("version", String(form.get("version") || "1.0.0"));
       buildForm.set("releaseNotes", String(form.get("releaseNotes") || ""));
+      buildForm.set("mtaVersionTarget", String(form.get("mtaMinVersion") || ""));
       const file = form.get("file");
       if (!(file instanceof File) || file.size === 0) {
         throw new Error("Choose a build archive");
@@ -101,6 +106,7 @@ export default function NewResourcePage() {
         <label className="space-y-1"><span className="text-xs text-neutral-300">Tags, comma separated</span><input name="tags" className="w-full nexus-inset px-3 py-2" /></label>
         <label className="space-y-1"><span className="text-xs text-neutral-300">Version</span><input name="version" defaultValue="1.0.0" required className="w-full nexus-inset px-3 py-2" /></label>
         <label className="space-y-1"><span className="text-xs text-neutral-300">Minimum MTA version</span><input name="mtaMinVersion" defaultValue="1.6.0" className="w-full nexus-inset px-3 py-2" /></label>
+        <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Resource dependencies, comma separated slugs</span><input name="dependencies" placeholder="core-ui, vehicle-pack" className="w-full nexus-inset px-3 py-2" /></label>
         <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Build archive</span><input name="file" type="file" accept=".zip,.rar,.7z,.lua" required className="w-full text-sm text-neutral-300" /></label>
         <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Release notes</span><textarea name="releaseNotes" rows={3} className="w-full nexus-inset px-3 py-2" /></label>
         <button disabled={loading} className="sm:col-span-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-sm">{loading ? "Submitting..." : "Submit free resource for review"}</button>

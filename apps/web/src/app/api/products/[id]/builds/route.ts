@@ -32,6 +32,11 @@ const buildMetadataSchema = z.object({
     .string()
     .regex(/^v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?$/, "Semantic version expected"),
   releaseNotes: z.string().max(5000).optional(),
+  mtaVersionTarget: z
+    .string()
+    .regex(/^1\.\d+(\.\d+)?$/, "Use an MTA version such as 1.6 or 1.6.0")
+    .optional()
+    .or(z.literal("")),
 });
 
 export async function POST(
@@ -66,6 +71,7 @@ export async function POST(
     const parsed = buildMetadataSchema.safeParse({
       version: form.get("version"),
       releaseNotes: form.get("releaseNotes") || undefined,
+      mtaVersionTarget: form.get("mtaVersionTarget") || undefined,
     });
     if (!parsed.success || !(file instanceof File) || file.size === 0) {
       return NextResponse.json(
@@ -123,6 +129,7 @@ export async function POST(
           productId,
           version: parsed.data.version.replace(/^v/, ""),
           releaseNotes: parsed.data.releaseNotes,
+          mtaVersionTarget: parsed.data.mtaVersionTarget || undefined,
           storageKey: asset.key,
           sha256Hash: asset.sha256Hash,
           fileSizeBytes: asset.sizeBytes,

@@ -20,7 +20,12 @@ describe("resource build visibility", () => {
     expect(repository).toContain("listPublishedByProduct");
     expect(service).toContain("includeNonPublic = false");
     expect(service).toContain("buildRepository.listPublishedByProduct");
+    expect(service).toContain('product.status === "published"');
+    expect(service).toContain("getProductPreviewBySlug");
+    expect(service).toContain('can(actor, "product.update", product');
     expect(page).toContain("const canInspectBuilds = isAuthor || isAdmin");
+    expect(page).toContain("Private creator preview");
+    expect(page).toContain("const hasAccess = isPublished &&");
     expect(page).toContain("b.status === \"published\"");
   });
 });

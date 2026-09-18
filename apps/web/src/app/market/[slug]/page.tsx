@@ -67,17 +67,17 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = await productService.getProductBySlug(slug);
+  const cookieStore = await cookies();
+  const token = cookieStore.get("nexus_session")?.value;
+  const user = await authService.getSession(token);
+  const product = await productService.getProductPreviewBySlug(slug, user);
 
   if (!product) {
     notFound();
   }
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get("nexus_session")?.value;
-  const user = await authService.getSession(token);
-
   const isAuthor = user ? product.authorId === user.id : false;
+  const isPublished = product.status === "published";
   const isLicensed = user
     ? await commerceService.checkEntitlement(
         { type: "user", id: user.id },
@@ -87,7 +87,7 @@ export default async function ProductDetailPage({
     : false;
 
   const isAdmin = user?.role === "admin";
-  const hasAccess = isAuthor || isLicensed || isAdmin;
+  const hasAccess = isPublished && (isAuthor || isLicensed || isAdmin);
   const canInspectBuilds = isAuthor || isAdmin;
 
   const builds = await productService.getProductBuilds(product.id, canInspectBuilds);
@@ -97,6 +97,11 @@ export default async function ProductDetailPage({
 
   return (
     <div className="space-y-10">
+      {!isPublished && (
+        <div className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-4 text-sm text-amber-200">
+          Private creator preview · resource status: {product.status.replace(/_/g, " ")}. It is not visible in the public catalogue and cannot be downloaded until approval.
+        </div>
+      )}
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-neutral-400">
         <Link href="/market" className="hover:text-white">Market</Link>
@@ -198,6 +203,7 @@ export default async function ProductDetailPage({
                     <div className="grid grid-cols-1 gap-1 text-[11px] text-neutral-400 sm:grid-cols-3">
                       <span className="truncate" title={b.fileName}>File: {b.fileName}</span>
                       <span>Size: {formatFileSize(b.fileSizeBytes)}</span>
+                      <span>MTA: {b.mtaVersionTarget ? `>= ${b.mtaVersionTarget}` : "Not declared"}</span>
                       <span>{b.isSigned ? "Signature: present" : "Signature: not available"}</span>
                       <span>{formatScanStatus(b.scanStatus)}</span>
                     </div>
@@ -320,7 +326,9 @@ export default async function ProductDetailPage({
                 <div className="flex justify-between py-1 border-b border-neutral-800">
                   <span className="text-neutral-400">MTA Version</span>
                   <span className="font-mono text-neutral-200">
-                    &gt;= {product.compatibility.mtaMinVersion || "1.5.8"}
+                    {product.compatibility.mtaMinVersion
+                      ? `>= ${product.compatibility.mtaMinVersion}`
+                      : "Not declared"}
                   </span>
                 </div>
                 <div className="flex justify-between gap-4 py-1 border-b border-neutral-800">
