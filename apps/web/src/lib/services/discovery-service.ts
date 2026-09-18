@@ -16,16 +16,20 @@ export interface SearchResultItem {
 }
 
 export class DiscoveryService {
-  async search(query: string): Promise<SearchResultItem[]> {
-    if (!query || query.trim().length === 0) {
+  async search(query: string, limit = 50): Promise<SearchResultItem[]> {
+    const normalizedQuery = query.trim();
+    if (normalizedQuery.length === 0) {
       return [];
     }
 
-    const q = query.toLowerCase();
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 50)
+      : 50;
+    const q = normalizedQuery.toLowerCase();
     const results: SearchResultItem[] = [];
 
-    // Search Products
-    const products = await productRepository.list({ query });
+    // Keep each source bounded so one public query cannot materialize every row.
+    const products = await productRepository.list({ query: normalizedQuery, limit: boundedLimit });
     for (const p of products) {
       results.push({
         id: p.id,
@@ -38,7 +42,7 @@ export class DiscoveryService {
     }
 
     // Search Servers
-    const servers = await serverRepository.listActivePublic();
+    const servers = await serverRepository.listActivePublic(boundedLimit);
     for (const s of servers) {
       if (
         s.name.toLowerCase().includes(q) ||
@@ -57,7 +61,7 @@ export class DiscoveryService {
     }
 
     // Search Articles
-    const articles = await contentRepository.listPublished();
+    const articles = await contentRepository.listPublished(boundedLimit);
     for (const a of articles) {
       if (
         a.title.toLowerCase().includes(q) ||
@@ -76,7 +80,7 @@ export class DiscoveryService {
     }
 
     // Search Developers
-    const users = await userRepository.listAll();
+    const users = await userRepository.listAll(boundedLimit);
     for (const u of users) {
       if (
         u.role === "developer" &&
@@ -96,7 +100,7 @@ export class DiscoveryService {
     }
 
     // Search Organizations
-    const organizations = await organizationRepository.listAll();
+    const organizations = await organizationRepository.listAll(boundedLimit);
     for (const o of organizations) {
       if (
         o.name.toLowerCase().includes(q) ||
@@ -114,7 +118,7 @@ export class DiscoveryService {
       }
     }
 
-    return results;
+    return results.slice(0, boundedLimit);
   }
 }
 
