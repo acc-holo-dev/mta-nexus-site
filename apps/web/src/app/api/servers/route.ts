@@ -5,8 +5,12 @@ import { createServerSchema } from "@nexus/validation";
 import { consumeRateLimit, getClientIp } from "@nexus/security";
 import { matchesMtaEndpoint, mtaMasterDirectoryService, type MtaMasterServer } from "../../../lib/services/mta-master-directory-service";
 
-export async function GET() {
-  const servers = await serverService.listServers();
+export async function GET(request: NextRequest) {
+  const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "100");
+  const limit = Number.isFinite(requestedLimit)
+    ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
+    : 100;
+  const servers = await serverService.listServers(limit);
   let observations: MtaMasterServer[] = [];
   let directoryIsStale = false;
 
@@ -35,7 +39,7 @@ export async function GET() {
   });
 
   return NextResponse.json(
-    { servers: enrichedServers, directoryIsStale },
+    { servers: enrichedServers, directoryIsStale, limit },
     { headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=120" } }
   );
 }
