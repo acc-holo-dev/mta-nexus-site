@@ -1,4 +1,4 @@
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import { db } from "../client";
 import { content, comments } from "../schema";
 import type { Content, Comment } from "@nexus/domain";
@@ -101,6 +101,15 @@ export class ContentRepository {
     return rows[0] as unknown as Content;
   }
 
+  async findCommentById(id: string): Promise<Comment | null> {
+    const rows = await db
+      .select()
+      .from(comments)
+      .where(eq(comments.id, id))
+      .limit(1);
+    return (rows[0] as unknown as Comment) || null;
+  }
+
   async listComments(
     target: { contentId?: string; productId?: string },
     limit = 100
@@ -136,8 +145,19 @@ export class ContentRepository {
       createdAt: new Date(),
     };
 
-        const rows = await db.insert(comments).values(values).returning();
-    return rows[0] as unknown as Comment;
+    return db.transaction(async (tx) => {
+      const rows = await tx.insert(comments).values(values).returning();
+      if (data.contentId) {
+        await tx
+          .update(content)
+          .set({
+            commentCount: sql`${content.commentCount} + 1`,
+            updatedAt: new Date(),
+          })
+          .where(eq(content.id, data.contentId));
+      }
+      return rows[0] as unknown as Comment;
+    });
   }
 
   async hasReviewFromUser(productId: string, authorId: string): Promise<boolean> {
