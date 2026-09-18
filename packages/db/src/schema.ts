@@ -385,19 +385,27 @@ export const content = pgTable(
 );
 
 // 18. Comments
-export const comments = pgTable("comments", {
-  id: text("id").primaryKey(),
-  contentId: text("content_id").references(() => content.id, { onDelete: "cascade" }),
-  productId: text("product_id").references(() => products.id, { onDelete: "cascade" }),
-  authorId: text("author_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  parentId: text("parent_id"),
-  text: text("text").notNull(),
-  isVerifiedPurchase: boolean("is_verified_purchase").notNull().default(false),
-  rating: integer("rating"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+export const comments = pgTable(
+  "comments",
+  {
+    id: text("id").primaryKey(),
+    contentId: text("content_id").references(() => content.id, { onDelete: "cascade" }),
+    productId: text("product_id").references(() => products.id, { onDelete: "cascade" }),
+    authorId: text("author_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    parentId: text("parent_id"),
+    text: text("text").notNull(),
+    isVerifiedPurchase: boolean("is_verified_purchase").notNull().default(false),
+    rating: integer("rating"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    // Nullable product_id keeps article comments independent while enforcing
+    // one product review per author for non-null product_id rows.
+    uniqueIndex("comments_product_author_idx").on(table.productId, table.authorId),
+  ]
+);
 
 // 19. Reactions
 export const reactions = pgTable("reactions", {
