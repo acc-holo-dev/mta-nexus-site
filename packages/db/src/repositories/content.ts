@@ -72,8 +72,12 @@ export class ContentRepository {
 
   async updateStatus(
     id: string,
-    status: Content["status"]
+    status: Content["status"],
+    expectedStatus?: Content["status"]
   ): Promise<Content | null> {
+    const condition = expectedStatus
+      ? and(eq(content.id, id), eq(content.status, expectedStatus))
+      : eq(content.id, id);
     const rows = await db
       .update(content)
       .set({
@@ -81,7 +85,7 @@ export class ContentRepository {
         publishedAt: status === "published" ? new Date() : null,
         updatedAt: new Date(),
       })
-      .where(eq(content.id, id))
+      .where(condition)
       .returning();
     return (rows[0] as unknown as Content) || null;
   }
