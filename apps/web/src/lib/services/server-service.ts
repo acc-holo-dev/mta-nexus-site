@@ -6,7 +6,7 @@ import type { Server, User } from "@nexus/domain";
 type ServerDetailsUpdate = Partial<
   Pick<
     Server,
-    "name" | "description" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility"
+    "name" | "description" | "websiteUrl" | "discordUrl" | "rulesUrl" | "mediaUrls" | "language" | "region" | "gameplayTags" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility"
   >
 >;
 
