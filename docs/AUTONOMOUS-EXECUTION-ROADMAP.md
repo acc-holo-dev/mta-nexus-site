@@ -140,6 +140,7 @@ Make server pages useful without pretending NEXUS controls the server runtime.
 - Add profile links, media, language, region and gameplay taxonomy.
 - Add favorites/follows and player-safe reporting.
 - Add search facets and server detail telemetry transparency.
+- [x] Keep owner workspace live counters sourced from the official directory; missing observations remain neutral.
 - Keep missing observations neutral: “no current observation,” never “offline” unless official data says so.
 
 ### Exit criteria
