@@ -101,7 +101,14 @@ closed beta.
 
 ### `GET /api/content`
 
-Returns publicly published articles, updates and posts.
+Returns publicly published articles, updates and posts. The optional `limit`
+parameter is bounded to 100 items.
+
+### `GET /api/content/:slug`
+
+Returns one published article and up to 100 newest comments. Draft and archived
+slugs return `404`; metadata reads do not increment the article view counter a
+second time.
 
 ### `POST /api/content`
 
