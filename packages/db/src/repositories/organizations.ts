@@ -4,8 +4,15 @@ import { organizations, organizationMembers } from "../schema";
 import type { Organization, OrganizationMember } from "@nexus/domain";
 
 export class OrganizationRepository {
-  async listAll(): Promise<Organization[]> {
-        const rows = await db.select().from(organizations);
+  async listAll(limit?: number): Promise<Organization[]> {
+    const query = db.select().from(organizations);
+    const boundedLimit =
+      limit === undefined
+        ? undefined
+        : Number.isFinite(limit)
+          ? Math.min(Math.max(Math.floor(limit), 1), 100)
+          : 100;
+    const rows = boundedLimit === undefined ? await query : await query.limit(boundedLimit);
     return rows as unknown as Organization[];
   }
 
