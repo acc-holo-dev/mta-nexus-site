@@ -62,7 +62,9 @@ export async function POST(request: NextRequest) {
         ? await serverRepository.findById(parsed.data.targetId)
         : parsed.data.targetType === "content"
           ? await contentRepository.findById(parsed.data.targetId)
-          : await userRepository.findById(parsed.data.targetId);
+          : parsed.data.targetType === "comment"
+            ? await contentRepository.findCommentById(parsed.data.targetId)
+            : await userRepository.findById(parsed.data.targetId);
     if (!targetExists) {
       return NextResponse.json({ error: "Report target was not found" }, { status: 404 });
     }
