@@ -157,7 +157,7 @@ Turn free resource delivery into a trusted catalogue before money enters the sys
 
 ### Work items
 
-- Creator public pages, developer profile completeness and verification badges.
+- [x] Creator public pages with bounded reads and honest identity status; no synthetic seller or reputation claims.
 - Resource review eligibility based on real entitlement; one review per user/resource.
 - Resource versions, compatibility, dependencies, deprecation and changelogs.
 - Moderator review queue for product and build states.
