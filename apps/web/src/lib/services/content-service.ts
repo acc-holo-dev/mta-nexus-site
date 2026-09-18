@@ -81,15 +81,18 @@ export class ContentService {
 
     const current = await contentRepository.findById(contentId);
     if (!current) throw new NotFoundError("Content", contentId);
-    if (current.status === decision) {
+
+    const targetStatus: Content["status"] =
+      decision === "publish" ? "published" : "archived";
+    if (current.status === targetStatus) {
       throw new AppError(
-        `Content is already ${decision}`,
+        `Content is already ${targetStatus}`,
         409,
         "CONTENT_ALREADY_IN_STATE"
       );
     }
 
-    const updated = await contentRepository.updateStatus(contentId, decision);
+    const updated = await contentRepository.updateStatus(contentId, targetStatus);
     if (!updated) throw new NotFoundError("Content", contentId);
 
     await auditRepository.record({
@@ -99,7 +102,7 @@ export class ContentService {
       action: decision === "publish" ? "content.published" : "content.archived",
       targetId: contentId,
       targetType: "content",
-      details: { from: current.status, to: decision, notes },
+      details: { from: current.status, to: targetStatus, notes },
     });
 
     return updated;
