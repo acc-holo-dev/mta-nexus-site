@@ -126,6 +126,12 @@ Returns one published article and up to 100 newest comments. Draft and archived
 slugs return `404`; metadata reads do not increment the article view counter a
 second time.
 
+### `POST /api/content/:slug/comments`
+
+Adds an authenticated comment or reply to a published article. Parent comments
+must belong to the same article; writes are rate limited, update the comment
+counter transactionally and notify the article author.
+
 ### `POST /api/content`
 
 Creates content for the authenticated author. Player and creator submissions are
