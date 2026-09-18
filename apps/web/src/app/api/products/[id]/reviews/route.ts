@@ -94,26 +94,17 @@ export async function POST(
 
     const rating = Math.min(5, Math.max(1, parsed.data.rating || 5));
 
-    const comment = await contentRepository.addComment({
+    const {
+      review: comment,
+      ratingCount,
+      ratingAverage,
+    } = await contentRepository.addProductReview({
       id: generateId("cmt"),
       productId,
       authorId: user.id,
       text: parsed.data.text,
       rating,
       isVerifiedPurchase: hasAcquired,
-    });
-
-    // Recalculate true rating average from database reviews (source of truth)
-    const allReviews = await contentRepository.listComments({ productId });
-    const reviewsWithRating = allReviews.filter((r) => r.rating !== undefined && r.rating !== null);
-
-    const ratingCount = reviewsWithRating.length;
-    const ratingSum = reviewsWithRating.reduce((sum, r) => sum + (r.rating || 0), 0);
-    const ratingAverage = ratingCount > 0 ? Math.round((ratingSum / ratingCount) * 10) : 0;
-
-    await productRepository.update(productId, {
-      ratingCount,
-      ratingAverage,
     });
 
     await auditRepository.record({
@@ -131,6 +122,10 @@ export async function POST(
       { status: 201 }
     );
   } catch (error: unknown) {
+    if (error instanceof Error && error.message === "PRODUCT_NOT_PUBLISHED") {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
     const databaseError = error as { code?: unknown };
     if (databaseError.code === "23505") {
       return NextResponse.json(
