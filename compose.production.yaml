@@ -1,4 +1,16 @@
 services:
+  clamav:
+    image: clamav/clamav:1.4
+    restart: unless-stopped
+    volumes:
+      - clamav_data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
@@ -28,11 +40,16 @@ services:
       STORAGE_PROVIDER: local
       STORAGE_LOCAL_PATH: /data/uploads
       EMAIL_PROVIDER: disabled
+      BUILD_SCANNER: clamav
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: 3310
       SMTP_FROM: no-reply@${DOMAIN}
     volumes:
       - uploads:/data/uploads
     depends_on:
       postgres:
+        condition: service_healthy
+      clamav:
         condition: service_healthy
     command: ["sh", "-c", "pnpm db:migrate && pnpm start"]
     healthcheck:
@@ -63,3 +80,4 @@ volumes:
   uploads:
   caddy_data:
   caddy_config:
+  clamav_data:

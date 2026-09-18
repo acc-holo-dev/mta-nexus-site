@@ -8,6 +8,9 @@ ENV NODE_ENV=production \
     STORAGE_PROVIDER=local \
     STORAGE_LOCAL_PATH=/data/uploads \
     EMAIL_PROVIDER=disabled \
+    BUILD_SCANNER=clamav \
+    CLAMAV_HOST=clamav \
+    CLAMAV_PORT=3310 \
     SMTP_FROM=no-reply@nexus-mta.com
 COPY . .
 RUN pnpm install --frozen-lockfile --prod=false

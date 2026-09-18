@@ -21,6 +21,8 @@ describe("production configuration", () => {
       STORAGE_S3_SECRET_KEY: "secret-key",
       STORAGE_S3_REGION: "eu-central-1",
       EMAIL_PROVIDER: "smtp",
+      BUILD_SCANNER: "clamav",
+      CLAMAV_HOST: "clamav.internal",
       SMTP_HOST: "smtp.example.com",
       SMTP_FROM: "noreply@example.com",
     });
@@ -39,6 +41,8 @@ describe("production configuration", () => {
       STORAGE_PROVIDER: "local",
       STORAGE_LOCAL_PATH: "/var/lib/mta-nexus/uploads",
       EMAIL_PROVIDER: "disabled",
+      BUILD_SCANNER: "clamav",
+      CLAMAV_HOST: "clamav",
     });
 
     expect(config.EMAIL_PROVIDER).toBe("disabled");
@@ -56,5 +60,18 @@ describe("production configuration", () => {
         EMAIL_PROVIDER: "log",
       })
     ).toThrow("Invalid configuration parameters");
+  });
+
+  it("fails closed when production resource scanning is disabled", () => {
+    expect(() => getEnvConfig({
+      NODE_ENV: "production",
+      NEXT_PUBLIC_APP_URL: "https://nexus-mta.com",
+      DATABASE_URL: "postgres://nexus:secret@db:5432/nexus",
+      AUTH_SECRET: "a-production-secret-with-at-least-32-characters",
+      STORAGE_PROVIDER: "local",
+      STORAGE_LOCAL_PATH: "/data/uploads",
+      EMAIL_PROVIDER: "disabled",
+      BUILD_SCANNER: "disabled",
+    })).toThrow("Invalid configuration parameters");
   });
 });

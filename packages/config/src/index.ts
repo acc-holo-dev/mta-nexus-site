@@ -16,6 +16,9 @@ const developmentDefaults = {
   STORAGE_S3_SECRET_KEY: "",
   STORAGE_S3_REGION: "us-east-1",
   EMAIL_PROVIDER: "log",
+  BUILD_SCANNER: "disabled",
+  CLAMAV_HOST: "",
+  CLAMAV_PORT: "3310",
   SMTP_HOST: "",
   SMTP_PORT: "1025",
   SMTP_USER: "",
@@ -40,6 +43,9 @@ export const envSchema = z
     STORAGE_S3_SECRET_KEY: z.string(),
     STORAGE_S3_REGION: z.string(),
     EMAIL_PROVIDER: z.enum(["disabled", "log", "smtp"]),
+    BUILD_SCANNER: z.enum(["disabled", "clamav"]),
+    CLAMAV_HOST: z.string(),
+    CLAMAV_PORT: z.coerce.number().int().positive().max(65535),
     SMTP_HOST: z.string(),
     SMTP_PORT: z.coerce.number().int().positive().max(65535),
     SMTP_USER: z.string(),
@@ -73,6 +79,9 @@ export const envSchema = z
     if (value.EMAIL_PROVIDER === "smtp" && (!value.SMTP_HOST || !value.SMTP_FROM)) {
       addIssue("SMTP_HOST", "SMTP email requires a host and sender address");
     }
+    if (value.BUILD_SCANNER === "clamav" && !value.CLAMAV_HOST) {
+      addIssue("CLAMAV_HOST", "ClamAV scanning requires a host");
+    }
 
     if (value.NODE_ENV === "production") {
       const appUrl = new URL(value.NEXT_PUBLIC_APP_URL);
@@ -87,6 +96,9 @@ export const envSchema = z
       }
       if (value.EMAIL_PROVIDER === "log") {
         addIssue("EMAIL_PROVIDER", "Production email must be disabled or use SMTP");
+      }
+      if (value.BUILD_SCANNER !== "clamav") {
+        addIssue("BUILD_SCANNER", "Production resource publishing requires ClamAV");
       }
     }
   });
@@ -108,6 +120,9 @@ export function getEnvConfig(env: Record<string, string | undefined> = process.e
         STORAGE_S3_SECRET_KEY: "",
         STORAGE_S3_REGION: "us-east-1",
         EMAIL_PROVIDER: "disabled",
+        BUILD_SCANNER: "disabled",
+        CLAMAV_HOST: "",
+        CLAMAV_PORT: "3310",
         SMTP_HOST: "",
         SMTP_PORT: "1025",
         SMTP_USER: "",
