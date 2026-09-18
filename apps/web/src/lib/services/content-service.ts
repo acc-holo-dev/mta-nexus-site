@@ -4,8 +4,8 @@ import {
   serverRepository,
   auditRepository,
 } from "@nexus/db";
-import { generateId } from "@nexus/security";
-import { eventBus } from "@nexus/domain";
+import { can, generateId } from "@nexus/security";
+import { eventBus, ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
 import type { Content, Comment, User, Product, Server } from "@nexus/domain";
 
 export class ContentService {
@@ -67,6 +67,42 @@ export class ContentService {
     }
 
     return comment;
+  }
+
+  async moderateContent(
+    contentId: string,
+    decision: "publish" | "archive",
+    actor: User,
+    notes?: string
+  ): Promise<Content> {
+    if (!can(actor, "admin.moderation")) {
+      throw new ForbiddenError("Moderator privilege is required to moderate content");
+    }
+
+    const current = await contentRepository.findById(contentId);
+    if (!current) throw new NotFoundError("Content", contentId);
+    if (current.status === decision) {
+      throw new AppError(
+        `Content is already ${decision}`,
+        409,
+        "CONTENT_ALREADY_IN_STATE"
+      );
+    }
+
+    const updated = await contentRepository.updateStatus(contentId, decision);
+    if (!updated) throw new NotFoundError("Content", contentId);
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "admin",
+      action: decision === "publish" ? "content.published" : "content.archived",
+      targetId: contentId,
+      targetType: "content",
+      details: { from: current.status, to: decision, notes },
+    });
+
+    return updated;
   }
 
   async getFeed(): Promise<{
