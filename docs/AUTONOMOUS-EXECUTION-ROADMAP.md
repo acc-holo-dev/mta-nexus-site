@@ -100,7 +100,7 @@ Create the social layer that gives players a reason to return when they are not 
 
 - Community profile, ownership and membership roles.
 - News, guides, updates and creator posts with draft/published/moderated states.
-- Discussions/comments with report and moderation controls.
+- [x] Discussions/comments with report and moderation controls.
 - Follow graph for users, communities, servers and resources.
 - Notification center and digest-ready events.
 - Tags, search and ranking based on real activity rather than vanity counters.
