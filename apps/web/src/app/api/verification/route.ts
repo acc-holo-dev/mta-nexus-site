@@ -69,8 +69,8 @@ export async function POST(request: NextRequest) {
       if (!server) {
         return NextResponse.json({ error: "Server was not found" }, { status: 404 });
       }
-      if (server.ownerId !== user.id) {
-        return NextResponse.json({ error: "You do not own this server" }, { status: 403 });
+      if (server.ownerId && server.ownerId !== user.id) {
+        return NextResponse.json({ error: "This server is already claimed" }, { status: 409 });
       }
       targetIsVerified = server.isVerified;
     } else {

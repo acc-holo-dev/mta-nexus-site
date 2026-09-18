@@ -130,6 +130,7 @@ Make server pages useful without pretending NEXUS controls the server runtime.
 | Name, description, images, links, rules, community association | Verified owner/editorial workflow | Profile data |
 | Verified ownership | Moderator decision | Trust state |
 | Availability | Latest official observation | Never an owner heartbeat |
+| Ownership | Approved server claim | An unowned observed server is assigned atomically during moderation; an existing owner cannot be overwritten |
 
 ### Work items
 

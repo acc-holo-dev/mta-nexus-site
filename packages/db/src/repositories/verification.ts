@@ -1,4 +1,4 @@
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq, desc, sql } from "drizzle-orm";
 import { db } from "../client";
 import { verificationRequests, users, organizations, servers } from "../schema";
 import { generateId } from "@nexus/security";
@@ -114,7 +114,27 @@ export class VerificationRepository {
             .set({ isVerified: true })
             .where(eq(organizations.id, request.targetId));
         } else if (request.targetType === "server") {
-          await tx.update(servers).set({ isVerified: true }).where(eq(servers.id, request.targetId));
+          // A server claim is finalized only by moderation. The conditional
+          // ownership update prevents approving a stale request after another
+          // claimant has already become the owner.
+          const claimed = await tx
+            .update(servers)
+            .set({
+              ownerId: request.requesterId,
+              isVerified: true,
+              updatedAt: new Date(),
+            })
+            .where(
+              and(
+                eq(servers.id, request.targetId),
+                sql`${servers.ownerId} IS NULL OR ${servers.ownerId} = ${request.requesterId}`
+              )
+            )
+            .returning({ id: servers.id });
+
+          if (!claimed[0]) {
+            throw new Error("Server claim target is already owned by another user");
+          }
         }
       }
 
