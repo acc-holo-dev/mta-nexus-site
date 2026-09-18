@@ -13,7 +13,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const article = await contentService.getArticleBySlug(slug);
+  // Metadata generation must not count as a second article view.
+  const article = await contentService.getArticleBySlug(slug, { incrementView: false });
 
   if (!article) {
     return { title: "Article not found" };
@@ -45,7 +46,7 @@ export default async function ArticleDetailPage({
   }
 
   const author = await authService.getUserById(article.authorId);
-  const comments = await contentService.getComments({ contentId: article.id });
+  const comments = await contentService.getComments({ contentId: article.id }, 100);
 
   const formattedDate = new Date(article.createdAt).toLocaleDateString("en-US", {
     month: "long",
