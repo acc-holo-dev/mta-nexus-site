@@ -22,9 +22,12 @@ async function targetExists(targetType: TargetType, targetId: string): Promise<b
     case "user":
       return (await userRepository.findById(targetId)) !== null;
     case "server":
-      return (await serverRepository.findById(targetId)) !== null;
-    case "product":
-      return (await productRepository.findById(targetId)) !== null;
+      const server = await serverRepository.findById(targetId);
+      return server !== null && server.visibility !== "private" && server.status !== "suspended";
+    case "product": {
+      const product = await productRepository.findById(targetId);
+      return product !== null && product.status === "published" && product.price === 0;
+    }
     case "organization":
       return (await organizationRepository.findById(targetId)) !== null;
     default:
@@ -93,17 +96,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Cannot follow yourself" }, { status: 400 });
     }
 
-    const alreadyFollowing = await socialRepository.isFollowing(user.id, targetType, targetId);
-    if (alreadyFollowing) {
-      return NextResponse.json({ error: "Already following this target" }, { status: 409 });
-    }
-
     const follow = await socialRepository.follow({
       id: generateId("fol"),
       followerId: user.id,
       targetType,
       targetId,
     });
+    if (!follow) {
+      return NextResponse.json({ error: "Already following this target" }, { status: 409 });
+    }
 
     if (targetType === "user" && targetId !== user.id) {
       await notificationRepository.create({

@@ -23,14 +23,18 @@ export class SocialRepository {
     return rows.length > 0;
   }
 
-  async follow(followData: Omit<Follow, "createdAt">): Promise<Follow> {
+  async follow(followData: Omit<Follow, "createdAt">): Promise<Follow | null> {
     const values = {
       ...followData,
       createdAt: new Date(),
     };
 
-        const rows = await db.insert(follows).values(values).returning();
-    return rows[0] as unknown as Follow;
+    const rows = await db
+      .insert(follows)
+      .values(values)
+      .onConflictDoNothing()
+      .returning();
+    return (rows[0] as unknown as Follow) || null;
   }
 
   async unfollow(followerId: string, targetType: string, targetId: string): Promise<void> {
