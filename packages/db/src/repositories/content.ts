@@ -1,6 +1,6 @@
 import { eq, desc, and, sql, inArray } from "drizzle-orm";
 import { db } from "../client";
-import { content, comments } from "../schema";
+import { content, comments, products } from "../schema";
 import type { Content, Comment } from "@nexus/domain";
 
 export class ContentRepository {
@@ -171,8 +171,57 @@ export class ContentRepository {
     });
   }
 
+  async addProductReview(
+    data: Omit<Comment, "createdAt"> & { productId: string; rating: number }
+  ): Promise<{ review: Comment; ratingCount: number; ratingAverage: number }> {
+    const values = {
+      ...data,
+      createdAt: new Date(),
+    };
+
+    return db.transaction(async (tx) => {
+      // Serialize review aggregation per product. Without a product-row lock,
+      // two concurrent reviewers can both calculate aggregates from incomplete
+      // snapshots and the last writer can overwrite the correct counters.
+      const lockedProduct = await tx
+        .update(products)
+        .set({ updatedAt: sql`${products.updatedAt}` })
+        .where(and(eq(products.id, data.productId), eq(products.status, "published")))
+        .returning({ id: products.id });
+
+      if (!lockedProduct.length) {
+        throw new Error("PRODUCT_NOT_PUBLISHED");
+      }
+
+      const rows = await tx.insert(comments).values(values).returning();
+      const review = rows[0] as unknown as Comment;
+
+      const aggregateRows = await tx
+        .select({
+          ratingCount: sql<number>`count(${comments.rating})::int`,
+          ratingAverage: sql<number>`coalesce(round(avg(${comments.rating}) * 10), 0)::int`,
+        })
+        .from(comments)
+        .where(eq(comments.productId, data.productId));
+
+      const ratingCount = aggregateRows[0]?.ratingCount ?? 0;
+      const ratingAverage = aggregateRows[0]?.ratingAverage ?? 0;
+
+      await tx
+        .update(products)
+        .set({
+          ratingCount,
+          ratingAverage,
+          updatedAt: new Date(),
+        })
+        .where(eq(products.id, data.productId));
+
+      return { review, ratingCount, ratingAverage };
+    });
+  }
+
   async hasReviewFromUser(productId: string, authorId: string): Promise<boolean> {
-        const rows = await db
+    const rows = await db
       .select()
       .from(comments)
       .where(and(eq(comments.productId, productId), eq(comments.authorId, authorId)))
