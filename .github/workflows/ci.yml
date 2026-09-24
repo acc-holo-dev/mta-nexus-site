@@ -90,3 +90,58 @@ jobs:
         run: node --test scripts/tests/postgres-persistence.node-test.mjs
       - name: Recreate PostgreSQL with its named volume
         run: node scripts/check-postgres-persistence.mjs
+
+  local-compose:
+    name: Local Docker startup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # A dedicated disposable hosted runner and project. Never use production data.
+    env:
+      COMPOSE_PROJECT_NAME: nexus-local-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      NEXUS_DEV_PORT: 3000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Build and start the documented local stack
+        run: |
+          test ! -f .env
+          docker compose --env-file /dev/null -f compose.yaml config --quiet
+          docker compose --env-file /dev/null -f compose.yaml up --build --detach --wait --wait-timeout 600
+      - name: Check readiness, HTTP and local-only exposure
+        run: |
+          test "$(docker compose --env-file /dev/null -f compose.yaml exec -T app id -u)" != "0"
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node --test scripts/tests/local-readiness.node-test.mjs
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node scripts/check-local-readiness.mjs
+          curl --fail --silent --show-error --max-time 90 http://127.0.0.1:3000/ -o /tmp/nexus-local-home.html
+          grep -qi '<html' /tmp/nexus-local-home.html
+          for service in postgres clamav; do
+            id=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet "$service")
+            test -n "$id"
+            test -z "$(docker port "$id")"
+          done
+          app=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          test "$(docker port "$app" 3000/tcp)" = "127.0.0.1:3000"
+          echo 'PASS: HTTP home, database, writable uploads, non-root app, loopback-only port'
+      - name: Check migrations and preserve data across app replacement
+        run: |
+          rows=$(docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT count(*) FROM drizzle.__drizzle_migrations')
+          test "$rows" -gt 0
+          docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -v ON_ERROR_STOP=1 -U nexus -d mta_nexus -c "CREATE TABLE beta002_ci_probe (id integer PRIMARY KEY, value text); INSERT INTO beta002_ci_probe VALUES (1, 'preserved');"
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node --input-type=module -e "import {writeFileSync} from 'node:fs'; writeFileSync('/data/uploads/beta002-ci-probe', 'preserved', {flag:'wx'});"
+          before=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          docker compose --env-file /dev/null -f compose.yaml up --detach --force-recreate --no-deps --wait --wait-timeout 180 app
+          after=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          test -n "$after"
+          test "$before" != "$after"
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node scripts/check-local-readiness.mjs
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs'; assert.equal(readFileSync('/data/uploads/beta002-ci-probe', 'utf8'), 'preserved');"
+          test "$(docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT value FROM beta002_ci_probe WHERE id=1')" = "preserved"
+          echo 'PASS: migrations applied, app replaced, database and uploads retained'
+      - name: Show local test diagnostics
+        if: always()
+        run: |
+          docker compose --env-file /dev/null -f compose.yaml ps --all
+          docker compose --env-file /dev/null -f compose.yaml logs --no-color --tail 80
+      - name: Remove only the disposable CI project
+        if: always()
+        run: docker compose --env-file /dev/null -f compose.yaml down --volumes --timeout 15

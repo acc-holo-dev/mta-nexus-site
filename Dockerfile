@@ -1,3 +1,17 @@
+# A separate local target: no host Node/pnpm, host mounts or production bypasses.
+FROM node:26-alpine AS development
+WORKDIR /app
+ENV NODE_ENV=development NEXT_TELEMETRY_DISABLED=1
+RUN npm install --global pnpm@12.4.2
+COPY . .
+RUN pnpm install --frozen-lockfile --prod=false \
+    && mkdir -p /data/uploads \
+    && chown -R node:node /app /data/uploads
+USER node
+EXPOSE 3000
+# A migration failure stops the container before Next.js can accept requests.
+CMD ["sh", "-c", "pnpm db:migrate && exec pnpm --filter @nexus/web dev --hostname 0.0.0.0"]
+
 FROM node:26-alpine AS build
 WORKDIR /app
 RUN npm install --global pnpm@12.4.2
