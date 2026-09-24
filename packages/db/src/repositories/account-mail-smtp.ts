@@ -37,6 +37,7 @@ export type AccountMailSmtpOptions = Readonly<{
   port: number;
   servername: string;
   from: string;
+  envelopeFrom?: string;
   mode?: AccountMailSmtpMode;
   authMode?: AccountMailSmtpAuthMode;
   username?: string;
@@ -73,6 +74,7 @@ function validateOptions(options: AccountMailSmtpOptions) {
     || !Number.isInteger(options.port) || options.port < 1 || options.port > 65535
     || !validNetworkHost(options.servername)
     || !validAddress(options.from)
+    || (options.envelopeFrom !== undefined && !validAddress(options.envelopeFrom))
     || !["implicit_tls", "starttls"].includes(options.mode ?? "implicit_tls")
     || !["auto", "plain", "login"].includes(options.authMode ?? "auto")) {
     throw new Error("Invalid SMTP transport configuration");
@@ -372,7 +374,9 @@ export class AccountMailSmtpTransport {
         }
       }
 
+      const envelopeFrom = this.#options.envelopeFrom ?? this.#options.from;
       const needsSmtpUtf8 = containsNonAscii(this.#options.from)
+        || containsNonAscii(envelopeFrom)
         || containsNonAscii(input.recipient)
         || containsNonAscii(input.subject);
       const needs8BitMime = containsNonAscii(input.text);
@@ -391,7 +395,7 @@ export class AccountMailSmtpTransport {
       stage = "mail_from";
       const mailFrom = await command(
         session,
-        `MAIL FROM:<${this.#options.from}>${mailParameters ? ` ${mailParameters}` : ""}`,
+        `MAIL FROM:<${envelopeFrom}>${mailParameters ? ` ${mailParameters}` : ""}`,
       );
       let result = requireStage(mailFrom.code, 250, stage, "retry");
       if (result) return result;
@@ -415,6 +419,8 @@ export class AccountMailSmtpTransport {
         `Subject: ${input.subject}`,
         `Date: ${new Date().toUTCString()}`,
         `Message-ID: <${input.messageId}@${fromDomain}>`,
+        "Auto-Submitted: auto-generated",
+        "X-Auto-Response-Suppress: All",
         "MIME-Version: 1.0",
         "Content-Type: text/plain; charset=UTF-8",
         needs8BitMime ? "Content-Transfer-Encoding: 8bit" : "Content-Transfer-Encoding: 7bit",
