@@ -20,6 +20,8 @@ export type AccountMailSmtpOptions = Readonly<{
   port: number;
   servername: string;
   from: string;
+  username?: string;
+  password?: string;
   ca?: string | Buffer;
   timeoutMs?: number;
 }>;
@@ -35,6 +37,13 @@ function validateOptions(options: AccountMailSmtpOptions) {
     || !Number.isInteger(options.port) || options.port < 1 || options.port > 65535
     || typeof options.servername !== "string" || options.servername.length < 1 || options.servername.length > 253
     || !validAddress(options.from)) throw new Error("Invalid SMTP transport configuration");
+  const hasUsername = typeof options.username === "string" && options.username.length > 0;
+  const hasPassword = typeof options.password === "string" && options.password.length > 0;
+  if (hasUsername !== hasPassword
+    || (hasUsername && (options.username!.length > 320 || /[\r\n\0]/.test(options.username!)))
+    || (hasPassword && (options.password!.length > 1024 || /[\r\n\0]/.test(options.password!)))) {
+    throw new Error("Invalid SMTP authentication configuration");
+  }
   const timeout = options.timeoutMs ?? 5_000;
   if (!Number.isInteger(timeout) || timeout < 100 || timeout > 30_000) {
     throw new Error("Invalid SMTP transport timeout");
@@ -122,6 +131,13 @@ export class AccountMailSmtpTransport {
       code = await command(`EHLO ${this.#options.servername}`);
       result = requireStage(code, 250);
       if (result) return result;
+
+      if (this.#options.username && this.#options.password) {
+        const auth = Buffer.from(`\0${this.#options.username}\0${this.#options.password}`, "utf8").toString("base64");
+        code = await command(`AUTH PLAIN ${auth}`);
+        result = requireStage(code, 235);
+        if (result) return result;
+      }
 
       code = await command(`MAIL FROM:<${this.#options.from}>`);
       result = requireStage(code, 250);

@@ -44,6 +44,8 @@ export ACCOUNT_MAIL_SMTP_HOST=localhost
 export ACCOUNT_MAIL_SMTP_PORT=2465
 export ACCOUNT_MAIL_SMTP_SERVERNAME=localhost
 export ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test
+export ACCOUNT_MAIL_SMTP_USERNAME=nexus-ci-user
+export ACCOUNT_MAIL_SMTP_PASSWORD=nexus-ci-password
 export COMPOSE_DISABLE_ENV_FILE=true
 
 phase=compose-contract
@@ -78,6 +80,8 @@ start_worker() {
     --env ACCOUNT_MAIL_SMTP_PORT=2465 \
     --env ACCOUNT_MAIL_SMTP_SERVERNAME=localhost \
     --env ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test \
+    --env ACCOUNT_MAIL_SMTP_USERNAME=nexus-ci-user \
+    --env ACCOUNT_MAIL_SMTP_PASSWORD=nexus-ci-password \
     --env ACCOUNT_MAIL_SMTP_CA="$ca" \
     --env ACCOUNT_MAIL_SMTP_TIMEOUT_MS=1000 \
     --env ACCOUNT_MAIL_BATCH_SIZE=2 \
@@ -108,6 +112,7 @@ test -z "$(docker port "$worker")"
 ! docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$worker" | grep -q '^AUTH_SECRET='
 ! docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$worker" | grep -q '^ACCOUNT_RECOVERY_ABUSE_KEY='
 ! docker logs "$worker" 2>&1 | grep -F "$mail_key"
+! docker logs "$worker" 2>&1 | grep -F 'nexus-ci-password'
 
 phase=tls-settlement
 echo 'D5 phase: wait for TLS acceptance and DB settlement'
@@ -143,6 +148,7 @@ test "$restarted" = 1
 test "$(docker inspect --format '{{.Image}}' "$worker")" = "$image_id"
 test -z "$(docker port "$worker")"
 ! docker logs "$worker" 2>&1 | grep -F "$mail_key"
+! docker logs "$worker" 2>&1 | grep -F 'nexus-ci-password'
 
 phase=graceful-recreate
 echo 'D5 phase: graceful stop and same-image recreate'

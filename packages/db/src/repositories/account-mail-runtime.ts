@@ -11,6 +11,8 @@ export type AccountMailRuntimeConfig = Readonly<{
   smtpPort: number;
   smtpServername: string;
   smtpFrom: string;
+  smtpUsername?: string;
+  smtpPassword?: string;
   smtpCa?: string;
   smtpTimeoutMs: number;
   batchSize: number;
@@ -79,6 +81,11 @@ export function readAccountMailRuntimeConfig(
   const smtpHost = required(env, "ACCOUNT_MAIL_SMTP_HOST");
   const smtpServername = required(env, "ACCOUNT_MAIL_SMTP_SERVERNAME");
   const smtpFrom = required(env, "ACCOUNT_MAIL_SMTP_FROM");
+  const smtpUsername = env.ACCOUNT_MAIL_SMTP_USERNAME || undefined;
+  const smtpPassword = env.ACCOUNT_MAIL_SMTP_PASSWORD || undefined;
+  if (Boolean(smtpUsername) !== Boolean(smtpPassword)) {
+    throw new Error("Account mail SMTP username and password must be configured together");
+  }
   const smtpCa = env.ACCOUNT_MAIL_SMTP_CA;
   if (smtpCa !== undefined && smtpCa.length > 32_768) throw new Error("Invalid account mail SMTP CA");
   return Object.freeze({
@@ -89,6 +96,8 @@ export function readAccountMailRuntimeConfig(
     smtpPort: integer(env.ACCOUNT_MAIL_SMTP_PORT, 465, 1, 65535, "ACCOUNT_MAIL_SMTP_PORT"),
     smtpServername,
     smtpFrom,
+    smtpUsername,
+    smtpPassword,
     smtpCa,
     smtpTimeoutMs: integer(env.ACCOUNT_MAIL_SMTP_TIMEOUT_MS, 5_000, 100, 30_000, "ACCOUNT_MAIL_SMTP_TIMEOUT_MS"),
     batchSize: integer(env.ACCOUNT_MAIL_BATCH_SIZE, 10, 1, 100, "ACCOUNT_MAIL_BATCH_SIZE"),
@@ -100,7 +109,8 @@ export function createAccountMailDispatcher(config: AccountMailRuntimeConfig): A
   const cipher = new AccountMailCipher(config.activeKeyId, config.keys);
   const transport = new AccountMailSmtpTransport({
     host: config.smtpHost, port: config.smtpPort, servername: config.smtpServername,
-    from: config.smtpFrom, ca: config.smtpCa, timeoutMs: config.smtpTimeoutMs,
+    from: config.smtpFrom, username: config.smtpUsername, password: config.smtpPassword,
+    ca: config.smtpCa, timeoutMs: config.smtpTimeoutMs,
   });
   return new AccountMailDispatcher({ cipher, transport, appUrl: config.appUrl });
 }
@@ -160,6 +170,6 @@ export function runtimeFingerprint(config: AccountMailRuntimeConfig): string {
   return createHash("sha256").update(JSON.stringify({
     keyId: config.activeKeyId, appUrl: config.appUrl, smtpHost: config.smtpHost,
     smtpPort: config.smtpPort, smtpServername: config.smtpServername, smtpFrom: config.smtpFrom,
-    smtpTimeoutMs: config.smtpTimeoutMs, batchSize: config.batchSize, pollIntervalMs: config.pollIntervalMs,
+    smtpAuth: Boolean(config.smtpUsername), smtpTimeoutMs: config.smtpTimeoutMs, batchSize: config.batchSize, pollIntervalMs: config.pollIntervalMs,
   })).digest("hex").slice(0, 16);
 }

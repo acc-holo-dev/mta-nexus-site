@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { randomBytes } from "node:crypto";
-import { readAccountMailRuntimeConfig, readAccountRecoveryAbuseKey, runAccountMailLoop } from "./account-mail-runtime";
+import { readAccountMailRuntimeConfig, readAccountRecoveryAbuseKey, runAccountMailLoop, runtimeFingerprint } from "./account-mail-runtime";
 
 const key = randomBytes(32).toString("base64url");
 const baseEnv = {
@@ -33,6 +33,28 @@ describe("D2d account mail runtime", () => {
     expect(config.smtpPort).toBe(465);
     expect(config.smtpTimeoutMs).toBe(5000);
     expect(config.batchSize).toBe(10);
+  });
+
+  it("requires SMTP authentication credentials as a pair and keeps them out of the fingerprint", () => {
+    expect(() => readAccountMailRuntimeConfig({
+      ...baseEnv, ACCOUNT_MAIL_SMTP_USERNAME: "ci-user",
+    })).toThrow("username and password");
+    expect(() => readAccountMailRuntimeConfig({
+      ...baseEnv, ACCOUNT_MAIL_SMTP_PASSWORD: "ci-password",
+    })).toThrow("username and password");
+    const first = readAccountMailRuntimeConfig({
+      ...baseEnv,
+      ACCOUNT_MAIL_SMTP_USERNAME: "ci-user",
+      ACCOUNT_MAIL_SMTP_PASSWORD: "ci-password-one",
+    });
+    const second = readAccountMailRuntimeConfig({
+      ...baseEnv,
+      ACCOUNT_MAIL_SMTP_USERNAME: "ci-user",
+      ACCOUNT_MAIL_SMTP_PASSWORD: "ci-password-two",
+    });
+    expect(first.smtpUsername).toBe("ci-user");
+    expect(first.smtpPassword).toBe("ci-password-one");
+    expect(runtimeFingerprint(first)).toBe(runtimeFingerprint(second));
   });
 
   it("runs exactly one bounded batch in once mode", async () => {

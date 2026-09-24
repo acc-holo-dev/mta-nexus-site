@@ -28,6 +28,35 @@ const accepted = await send("accept@example.invalid");
 assert.equal(accepted.outcome, "accepted");
 assert.equal(accepted.uncertain, false);
 
+const authenticated = await new AccountMailSmtpTransport({
+  ...common,
+  username: "nexus-ci-user",
+  password: "nexus-ci-password",
+  timeoutMs: 1000,
+}).send({
+  recipient: "auth@example.invalid",
+  subject: "Synthetic D5 authenticated transport check",
+  text: "No production delivery.",
+  sendBefore: new Date(Date.now() + 5_000),
+});
+assert.equal(authenticated.outcome, "accepted");
+assert.equal(authenticated.uncertain, false);
+
+const authRejected = await new AccountMailSmtpTransport({
+  ...common,
+  username: "nexus-ci-user",
+  password: "wrong-ci-password",
+  timeoutMs: 1000,
+}).send({
+  recipient: "auth-rejected@example.invalid",
+  subject: "Synthetic D5 rejected authentication check",
+  text: "No production delivery.",
+  sendBefore: new Date(Date.now() + 5_000),
+});
+assert.equal(authRejected.outcome, "discard");
+assert.equal(authRejected.uncertain, false);
+assert.equal(authRejected.code, 535);
+
 const temporary = await send("retry4xx@example.invalid");
 assert.equal(temporary.outcome, "retry");
 assert.equal(temporary.uncertain, false);
@@ -87,4 +116,4 @@ try {
   if (userId) await db.delete(users).where(eq(users.id, userId));
 }
 
-process.stdout.write("PASS: isolated TLS SMTP acceptance, refusal, timeout, uncertainty, trust and DB dispatcher\n");
+process.stdout.write("PASS: isolated TLS SMTP acceptance, AUTH, refusal, timeout, uncertainty, trust and DB dispatcher\n");

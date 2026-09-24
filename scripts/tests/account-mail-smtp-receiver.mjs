@@ -4,6 +4,8 @@ import { readFileSync } from "node:fs";
 const port = Number(process.env.SMTP_TEST_PORT || 2465);
 const cert = readFileSync(process.env.SMTP_TEST_CERT || "/certs/cert.pem");
 const key = readFileSync(process.env.SMTP_TEST_KEY || "/certs/key.pem");
+const authUser = process.env.SMTP_TEST_USERNAME || "nexus-ci-user";
+const authPass = process.env.SMTP_TEST_PASSWORD || "nexus-ci-password";
 
 const server = tls.createServer({ cert, key }, (socket) => {
   socket.setEncoding("utf8");
@@ -39,7 +41,14 @@ const server = tls.createServer({ cert, key }, (socket) => {
       }
       if (/^EHLO /i.test(line)) {
         reply("250-nexus-test");
+        reply("250-AUTH PLAIN");
         reply("250 SIZE 32768");
+      } else if (/^AUTH PLAIN /i.test(line)) {
+        const encoded = line.slice("AUTH PLAIN ".length).trim();
+        let decoded = "";
+        try { decoded = Buffer.from(encoded, "base64").toString("utf8"); } catch {}
+        const expected = `\0${authUser}\0${authPass}`;
+        reply(decoded === expected ? "235 2.7.0 authenticated" : "535 5.7.8 authentication failed");
       } else if (/^MAIL FROM:/i.test(line)) {
         reply("250 2.1.0 ok");
       } else if (/^RCPT TO:/i.test(line)) {
