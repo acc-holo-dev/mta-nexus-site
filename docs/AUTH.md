@@ -39,6 +39,16 @@ A repeated selected-target request cannot delete the row or create another succe
 
 `/api/auth/password`, `/api/auth/session`, and `/api/auth/sessions` return private, non-storable responses. Settings distinguishes a 401 authentication requirement from temporary unavailability. A failure to refresh the list after a confirmed mutation must not be presented as a failed mutation or an empty successful list. Loss of an HTTP response is still an uncertain client result, even when the database transaction is atomic; reload settings before retrying an uncertain revocation.
 
+## Forgotten-password recovery — BETA-005d planning only
+
+The [recovery design and acceptance plan](ACCOUNT-RECOVERY.md) records the D0 audit at `03465c6a76f5949897ab0367f591f2fa04d715a3`. No recovery endpoint, email sender, activation gate or data migration is implemented by that document. Production Compose still fixes `EMAIL_PROVIDER` to `disabled`; SMTP configuration fields are not evidence of delivery.
+
+Registration currently creates an active session with `emailVerified: false`. Moderator verification (`isVerified`) is separate from mailbox ownership. The proposed recovery channel must be explicitly bound to the account through an authenticated, reauthenticated email-verification flow; neither an unverified address nor a legacy boolean is automatically trusted. Existing accounts must not be bulk-verified, deleted or silently locked out. Activation, transition and unsupported-account policies require a release-owner decision before rollout.
+
+The proposal separates email-verification tokens, reset tokens and session tokens. A future successful reset would consume its proof, replace the password, invalidate outstanding proofs and all old sessions, record audit and queue a notification atomically; it would not create a full login session automatically. This is distinct from the already implemented known-password change, which rotates and retains the initiating session. Opening a link alone must not mutate either flow.
+
+D1 is the next bounded implementation task: persisted bindings/challenges, credential-version binding and atomic single-use tests on an isolated database, without SMTP, public reset routes or changes to existing credentials. Mail delivery, enrollment, reset UI/HTTP, timing/abuse checks and real-environment acceptance follow separately. R4 remains open until a working process and the agreed rollout policy are verified; a design or successful old CI does not close it.
+
 ## Verification and open work
 
 - `tests/password-change-transaction.test.ts`: actual PostgreSQL checks for wrong-password rejection, rotation/expiry, foreign-session rejection, rollback on an audit conflict, competing changes, and stale login snapshots.
