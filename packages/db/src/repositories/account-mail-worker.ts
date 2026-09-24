@@ -127,7 +127,7 @@ export class AccountMailWorkerRepository {
         : await tx.delete(accountMailOutbox).where(owned).returning({ id: accountMailOutbox.id });
       if (!changed.length) return false;
       await tx.insert(auditEvents).values({
-        id: auditId, actorType: "system", action: outcome === "accepted"
+        id: auditId, actorId: "system:account-mail-worker", actorType: "system", action: outcome === "accepted"
           ? "auth.mail_transport_accepted" : retry ? "auth.mail_retry_scheduled" : "auth.mail_discarded",
         targetId: lease.id, targetType: "account_mail",
         details: { attempt: item.mail.attempts, purpose: item.proof.purpose }, createdAt: sql`clock_timestamp()`,
