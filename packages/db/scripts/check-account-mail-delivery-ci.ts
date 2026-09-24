@@ -11,7 +11,7 @@ if (process.env.GITHUB_ACTIONS !== "true"
 }
 const challengeId = process.argv[2] ?? "";
 const mailId = process.argv[3] ?? "";
-if (!/^ach_[A-Za-z0-9_-]+$/.test(challengeId) || !/^aml_[A-Za-z0-9_-]+$/.test(mailId)) {
+if (!/^ach_[A-Za-z0-9_-]+$/.test(challengeId) || !/^ame_[A-Za-z0-9_-]+$/.test(mailId)) {
   throw new Error("Synthetic CI identifiers required");
 }
 
