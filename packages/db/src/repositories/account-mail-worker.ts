@@ -7,6 +7,7 @@ import { accountMailOutbox } from "../account-mail-schema";
 import { AccountMailCipher } from "./account-mail-crypto";
 import type { MailContext, MailPayload } from "./account-mail-crypto";
 import { digestAccountChallenge } from "./account-challenges";
+import type { AccountMailTransportStage } from "./account-mail-smtp";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export type MailLease = Readonly<{ id: string; token: string; attempt: number; expiresAt: Date }>;
@@ -112,7 +113,11 @@ export class AccountMailWorkerRepository {
     lease: MailLease,
     outcome: "accepted" | "retry" | "discard",
     auditId = `aud_${randomUUID()}`,
-    transport?: Readonly<{ smtpCode?: number; uncertain?: boolean }>,
+    transport?: Readonly<{
+      smtpCode?: number;
+      uncertain?: boolean;
+      stage?: AccountMailTransportStage;
+    }>,
   ): Promise<boolean> {
     const digest = leaseDigest(lease);
     checkId(auditId);
@@ -123,6 +128,11 @@ export class AccountMailWorkerRepository {
     }
     if (transport?.uncertain !== undefined && typeof transport.uncertain !== "boolean") {
       throw new Error("Invalid SMTP uncertainty flag");
+    }
+    if (transport?.stage !== undefined
+      && !["connect", "greeting", "ehlo", "starttls", "auth", "mail_from", "rcpt_to", "data", "final_reply"]
+        .includes(transport.stage)) {
+      throw new Error("Invalid SMTP transport stage");
     }
     return transaction(async (tx) => {
       const item = await this.lockLiveMail(tx, lease.id);
@@ -146,6 +156,7 @@ export class AccountMailWorkerRepository {
           purpose: item.proof.purpose,
           ...(transport?.smtpCode !== undefined ? { smtpCode: transport.smtpCode } : {}),
           ...(transport?.uncertain === true ? { uncertain: true } : {}),
+          ...(transport?.stage !== undefined ? { stage: transport.stage } : {}),
         },
         createdAt: sql`clock_timestamp()`,
       });
