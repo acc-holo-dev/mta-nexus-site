@@ -5,6 +5,7 @@ import { auditEvents, db, notifications, sessions } from "../client";
 import { accountMailOutbox } from "../account-mail-schema";
 import { authChallenges } from "../account-recovery-schema";
 import { AccountMailCipher } from "./account-mail-crypto";
+import { accountChallengeRepository } from "./account-challenges";
 import { authService } from "../../../../apps/web/src/lib/services/auth-service";
 import { userRepository } from "./users";
 import { generateId } from "@nexus/security";
@@ -98,10 +99,15 @@ describe("D4a password reset service", () => {
     const a = await account();
     await enroll(a);
     const proof = await resetProof(a.email);
-    const extraVerification = await authService.requestRecoveryEmailVerification({
-      userId: a.userId, currentToken: a.firstToken, currentPassword: oldPassword,
+    const stored = await userRepository.findByEmail(a.email);
+    if (!stored?.passwordHash) throw new Error("stored password hash missing");
+    const extraVerification = await accountChallengeRepository.issue({
+      purpose: "email_verify",
+      userId: a.userId,
+      currentToken: a.firstToken,
+      expectedPasswordHash: stored.passwordHash,
+      auditId: generateId("aud"),
     });
-    if (!extraVerification.challengeId) throw new Error("extra verification missing");
 
     const result = await authService.confirmPasswordReset({
       challengeId: proof.id, token: proof.token, newPassword,
@@ -114,7 +120,7 @@ describe("D4a password reset service", () => {
 
     const [resetRow] = await db.select().from(authChallenges).where(eq(authChallenges.id, proof.id));
     expect(resetRow.consumedAt).not.toBeNull();
-    const [otherRow] = await db.select().from(authChallenges).where(eq(authChallenges.id, extraVerification.challengeId));
+    const [otherRow] = await db.select().from(authChallenges).where(eq(authChallenges.id, extraVerification.id));
     expect(otherRow.revokedAt).not.toBeNull();
     expect(await db.select().from(auditEvents).where(and(
       eq(auditEvents.actorId, a.userId), eq(auditEvents.action, "user.password_reset"),
