@@ -30,6 +30,7 @@ export type AccountMailTransportResult = Readonly<{
 }>;
 
 export type AccountMailSmtpMode = "implicit_tls" | "starttls";
+export type AccountMailSmtpAuthMode = "auto" | "plain" | "login";
 
 export type AccountMailSmtpOptions = Readonly<{
   host: string;
@@ -37,6 +38,7 @@ export type AccountMailSmtpOptions = Readonly<{
   servername: string;
   from: string;
   mode?: AccountMailSmtpMode;
+  authMode?: AccountMailSmtpAuthMode;
   username?: string;
   password?: string;
   ca?: string | Buffer;
@@ -60,7 +62,8 @@ function validateOptions(options: AccountMailSmtpOptions) {
     || !Number.isInteger(options.port) || options.port < 1 || options.port > 65535
     || typeof options.servername !== "string" || options.servername.length < 1 || options.servername.length > 253
     || !validAddress(options.from)
-    || !["implicit_tls", "starttls"].includes(options.mode ?? "implicit_tls")) {
+    || !["implicit_tls", "starttls"].includes(options.mode ?? "implicit_tls")
+    || !["auto", "plain", "login"].includes(options.authMode ?? "auto")) {
     throw new Error("Invalid SMTP transport configuration");
   }
   const hasUsername = typeof options.username === "string" && options.username.length > 0;
@@ -147,11 +150,27 @@ function advertisesStartTls(lines: string[]): boolean {
   return lines.some((line) => /^STARTTLS(?:\s|$)/i.test(line.trim()));
 }
 
-function advertisesAuthPlain(lines: string[]): boolean {
-  return lines.some((line) => {
+function advertisedAuthMechanisms(lines: string[]): Set<string> {
+  const mechanisms = new Set<string>();
+  for (const line of lines) {
     const match = /^AUTH(?:=|\s+)(.*)$/i.exec(line.trim());
-    return Boolean(match?.[1]?.split(/\s+/).some((mechanism) => mechanism.toUpperCase() === "PLAIN"));
-  });
+    if (!match?.[1]) continue;
+    for (const mechanism of match[1].split(/\s+/)) {
+      if (mechanism) mechanisms.add(mechanism.toUpperCase());
+    }
+  }
+  return mechanisms;
+}
+
+function chooseAuthMechanism(
+  mode: AccountMailSmtpAuthMode,
+  mechanisms: ReadonlySet<string>,
+): "PLAIN" | "LOGIN" | null {
+  if (mode === "plain") return mechanisms.has("PLAIN") ? "PLAIN" : null;
+  if (mode === "login") return mechanisms.has("LOGIN") ? "LOGIN" : null;
+  if (mechanisms.has("PLAIN")) return "PLAIN";
+  if (mechanisms.has("LOGIN")) return "LOGIN";
+  return null;
 }
 
 function advertisesCapability(lines: string[], capability: string): boolean {
@@ -170,11 +189,17 @@ export class AccountMailSmtpTransport {
   #options: AccountMailSmtpOptions;
   #timeoutMs: number;
   #mode: AccountMailSmtpMode;
+  #authMode: AccountMailSmtpAuthMode;
 
   constructor(options: AccountMailSmtpOptions) {
     this.#timeoutMs = validateOptions(options);
     this.#mode = options.mode ?? "implicit_tls";
-    this.#options = Object.freeze({ ...options, mode: this.#mode });
+    this.#authMode = options.authMode ?? "auto";
+    this.#options = Object.freeze({
+      ...options,
+      mode: this.#mode,
+      authMode: this.#authMode,
+    });
   }
 
   async send(input: AccountMailTransportInput): Promise<AccountMailTransportResult> {
@@ -283,18 +308,42 @@ export class AccountMailSmtpTransport {
       if (!session) throw new Error("SMTP session unavailable");
 
       if (this.#options.username && this.#options.password) {
-        if (!advertisesAuthPlain(capabilities)) {
+        const mechanism = chooseAuthMechanism(
+          this.#authMode,
+          advertisedAuthMechanisms(capabilities),
+        );
+        if (!mechanism) {
           return { outcome: "retry", uncertain: false, stage: "auth" };
         }
-        const auth = Buffer.from(
-          `\0${this.#options.username}\0${this.#options.password}`,
-          "utf8",
-        ).toString("base64");
-        ensureWithinDeadline();
+
         stage = "auth";
-        const authReply = await command(session, `AUTH PLAIN ${auth}`);
-        const result = requireStage(authReply.code, 235, stage, "retry");
-        if (result) return result;
+        ensureWithinDeadline();
+
+        if (mechanism === "PLAIN") {
+          const auth = Buffer.from(
+            `\0${this.#options.username}\0${this.#options.password}`,
+            "utf8",
+          ).toString("base64");
+          const authReply = await command(session, `AUTH PLAIN ${auth}`);
+          const result = requireStage(authReply.code, 235, stage, "retry");
+          if (result) return result;
+        } else {
+          const start = await command(session, "AUTH LOGIN");
+          let result = requireStage(start.code, 334, stage, "retry");
+          if (result) return result;
+
+          ensureWithinDeadline();
+          const username = Buffer.from(this.#options.username, "utf8").toString("base64");
+          const usernameReply = await command(session, username);
+          result = requireStage(usernameReply.code, 334, stage, "retry");
+          if (result) return result;
+
+          ensureWithinDeadline();
+          const password = Buffer.from(this.#options.password, "utf8").toString("base64");
+          const passwordReply = await command(session, password);
+          result = requireStage(passwordReply.code, 235, stage, "retry");
+          if (result) return result;
+        }
       }
 
       const needsSmtpUtf8 = containsNonAscii(this.#options.from)
