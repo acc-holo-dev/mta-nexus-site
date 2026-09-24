@@ -306,8 +306,20 @@ export class AuthService {
     challengeId: string;
     token: string;
     newPassword: string;
+    ip: string;
     consumeAuditId?: string;
   }): Promise<{ revokedSessionCount: number }> {
+    const confirmLimit = await accountRecoveryAbuseLimitRepository.consume({
+      scope: "password_reset_confirm",
+      subject: `ip:${input.ip.trim() || "unknown"}`,
+      key: getPinnedAccountRecoveryAbuseKey(),
+      limit: 30,
+      windowSeconds: 15 * 60,
+    });
+    if (!confirmLimit.success) {
+      throw new RateLimitExceededError("Invalid or expired password reset");
+    }
+
     // Reject random/expired/replayed proofs before doing the expensive password
     // hash. The final consume transaction still repeats all security checks.
     await accountPasswordResetRepository.assertLiveProof({
