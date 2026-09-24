@@ -1,6 +1,7 @@
 import { rename, rm, writeFile } from "node:fs/promises";
 import { checkDatabaseConnection, closeDatabaseConnection } from "../src/client";
 import { accountMailOutboxRepository } from "../src/repositories/account-mail-outbox";
+import { accountRecoveryAbuseLimitRepository } from "../src/repositories/account-recovery-abuse";
 import {
   createAccountMailDispatcher,
   readAccountMailRuntimeConfig,
@@ -21,6 +22,7 @@ let healthWrite: Promise<void> = Promise.resolve();
 let healthFailure: unknown = null;
 let healthStatus: "starting" | "ready" = "starting";
 let healthBatch = 0;
+let nextAbuseCleanupAt = 0;
 
 function emit(event: Record<string, unknown>) {
   process.stdout.write(JSON.stringify(event) + "\n");
@@ -106,6 +108,18 @@ try {
     onBatch: async ({ batch, result }) => {
       healthBatch = batch;
       await queueHealth();
+
+      if (!controller.signal.aborted && Date.now() >= nextAbuseCleanupAt) {
+        const removed = await accountRecoveryAbuseLimitRepository.cleanup(100);
+        nextAbuseCleanupAt = Date.now() + 60_000;
+        if (removed > 0) {
+          emit({
+            status: "maintenance",
+            config: fingerprint,
+            abuseLimitsRemoved: removed,
+          });
+        }
+      }
 
       const activity = result.accepted + result.retried + result.discarded
         + result.skipped + result.unsettled + result.cleaned;
