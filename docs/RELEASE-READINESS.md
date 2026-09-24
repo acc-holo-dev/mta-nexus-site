@@ -1,8 +1,8 @@
 # MTA NEXUS — карта бесплатной закрытой беты
 
-Дата сверки: **2026-09-24**. Проверенный код D2d: **e7dd6d8e18ca27dd5bcb233b8f5b9ebaf794d10c**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35959455823), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35959455937) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35959455879). Vitest — **247 тестов в 63 файлах**; Verify также подтвердил D2c TLS integration и D2d standalone worker lifecycle.
+Дата сверки: **2026-09-24**. Проверенный код D3: **81656e71665c537d55b358aae5974e2a6ec10100**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35961489810), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35961489834) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35961489808). Vitest — **252 теста в 64 файлах**; Chromium D3-01 подтвердил authenticated recovery-email enrollment/confirmation без внешнего SMTP.
 
-**Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1–D2d добавляют proofs, очередь, leases, закрытый TLS transport, явный standalone worker runtime и durable abuse-limit primitive. **Реальная почта пользователям, enrollment и сценарий «Забыли пароль» по-прежнему не включены**. R4 остаётся открытым. Процент готовности не назначается.
+**Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1–D3 добавляют proofs, очередь, leases, закрытый TLS transport/runtime, durable limit и authenticated verified-email binding. **Реальная почта пользователям и сценарий «Забыли пароль» по-прежнему не включены в production**. R4 остаётся открытым. Процент готовности не назначается.
 
 Полный аудит файлов, безопасности и старых идей не выполнен. Существующие среды с данными не обследованы и не считаются пустыми. В этом шаге `main`, рабочие серверы, существующие аккаунты, почтовые провайдеры, реальные ключи/секреты и платёжные настройки не менялись; публичного развёртывания не было.
 
@@ -74,7 +74,7 @@
 | R1 — PostgreSQL | Старый mount исправлен, новые тома проверены; старые среды требуют инвентаризации, backup и плана переноса. |
 | R2 — Docker-only | Local/production-пути проверены в CI, рабочая среда не принята. |
 | R3 — scanner | Старт проверен; вердикты и fail-closed публикация требуют отдельной приёмки. Модерация не заменяет scanner молча. |
-| R4 — восстановление аккаунта | D0–D2d закрывают проект, proofs, очередь, leases, закрытый TLS transport, explicit worker runtime и DB-backed abuse-limit primitive. Public enrollment/reset, реальный provider, политика лимитов/перехода и эксплуатация не приняты. Следующий D3 — verified email binding; R4 открыт. |
+| R4 — восстановление аккаунта | D0–D3 закрывают внутренний pipeline и authenticated verified-email binding для ordinary password accounts. Anonymous forgot/reset, real provider/production delivery и privileged/MFA/legacy rollout не приняты. Следующий D4 — password reset; R4 открыт. |
 | R5 — выпуск | Разработка в dev, выпуск только по явно одобренному SHA/тегу main; совпадение веток не означает deploy. |
 | R6 — удобство | Ограниченные английские сценарии пройдены; RU/EN, визуальная и полная доступность открыты. |
 | R7 — эксплуатация | Домен/VDS/контакты/backup не подтверждены; проверить фактическую среду. |
@@ -95,7 +95,7 @@
 | BETA-003 | Production startup в CI: выполнено в описанных границах, не deploy. |
 | BETA-004 | Функциональная browser-часть J1 выполнена; полный J1 открыт. |
 | BETA-005a/b/c | Перечисленные операции аккаунта/пароля/сессий выполнены, не весь J2. |
-| BETA-005d — в работе | D0/D1/D2a/D2b/D2c/D2d выполнены в своих границах. **Следующий D3:** authenticated email enrollment и verified recovery binding без автоматического доверия legacy flags. |
+| BETA-005d — в работе | D0–D3 выполнены в своих границах. **Следующий D4:** anonymous forgot-password request и proof-confirmed password reset без production mail activation. |
 | Остальные BETA-005 | Recovery, onboarding автора, scanner и HTTP delivery: отдельные задачи. J2/J4/J5 целиком не закрыты. |
 | BETA-006 | J3/J6/J7: заявки, публикации/подписки, модерация и негативные проверки. |
 | BETA-007 | RU/EN, доступность, тексты и ручная визуальная приёмка обязательных путей. |
@@ -198,19 +198,35 @@ Vitest вырос с 236 до **247/247 tests, 63/63 files**: 6 runtime tests и
 
 **Ограничения:** worker не supervised и не включён в production; реальные provider credentials/AUTH/STARTTLS не проверены; ключи не размещались в VDS secret store и ротация не репетировалась; abuse primitive ещё не связан с public route, поэтому отсутствуют final normalization, IP/email composition, timing-enumeration и response policy. Нет D3 binding, D4 reset, inbox delivery, реального scheduler/service manager или backup restore.
 
-### Следующий ограниченный шаг — D3
+### BETA-005d/D3 — verified recovery email enrollment
 
-Для обычного password-account реализовать проверяемую привязку recovery email: authenticated session + current password, enqueue `email_verify`, нейтральный confirm flow и атомарное создание binding только после одноразового proof. Использовать durable limit primitive до выдачи proof и не доверять legacy `emailVerified`/`isVerified`. Сначала HTTP/service + PostgreSQL acceptance, затем browser flow; production mail activation и правила privileged/MFA/legacy accounts остаются отдельными решениями.
+**Выполнено на `81656e71665c537d55b358aae5974e2a6ec10100`.** D3a добавляет authenticated GET/POST/PATCH contract и provenance-backed binding; D3b — Settings UI, explicit confirmation page и real Chromium acceptance. Production Compose не активирован.
+
+POST доступен только действующей сессии обычного password-account, требует current password и durable limit до issue. Он ставит encrypted `email_verify` envelope через существующий atomic D1/D2 producer и не возвращает challenge/token. GET status private/no-store и read-only. PATCH consume + binding + consume audit + binding audit выполняются в защищённой транзакции; другой аккаунт и replay rejected. Legacy verification flags не считаются mailbox ownership; admin/moderator/MFA остаются gated.
+
+Confirmation link использует query challenge + fragment token. Chromium проверил, что fragment удаляется из history до user action, token не находится в URL/localStorage/sessionStorage/rendered body, а открытие страницы не меняет verified state. Confirm выполняется keyboard Enter на 390×844 viewport, после чего status verified=true, replay rejected и Settings показывает verified state без повторной кнопки.
+
+CI-only delivery fixture не является почтовым provider: disposable overlay получает случайные masked producer/abuse keys, а guarded helper внутри disposable app-container расшифровывает только synthetic `@example.invalid` outbox row. Token не выводится в test reports/summary/artifacts. D2c отдельно остаётся evidence SMTP/TLS transport; D3 не переобъявляет его inbox delivery.
+
+D3a `3ade27d` впервые дал 252/252 Vitest tests, 64 files и семь зелёных jobs. Финальный `81656e7` сохранил **252/252, 64/64**, и все семь jobs зелёные. Account browser: D3-01 + J2-01..11 success; password/session suite success; Directory browser success.
+
+История отказов сохранена: `eba13dc` — test TypeScript optional challenge ID; `4faebd9` — optional proof narrowing на confirmation retry; `06ac564` — duplicate accessible `Current password` label сломал старую password acceptance. Финальное distinct label исправило UI, не locators старого теста.
+
+**Ограничения:** standard production Compose не получает mail/abuse keys, держит email disabled и не запускает dispatcher. Нет real provider/inbox, anonymous forgot endpoint, reset mutation, final email/IP anti-enumeration policy, privileged/MFA recovery, legacy account transition, production secret storage/rotation или manual visual/RU acceptance.
+
+### Следующий ограниченный шаг — D4
+
+Реализовать anonymous forgot-password request только через существующий verified binding, с нейтральным ответом и измеряемым timing/enumeration contract, durable subject/IP limits и encrypted `password_reset` outbox. Затем explicit reset page должна consume proof и атомарно заменить password, отозвать все sessions/прочие proofs, записать audit и enqueue security notification; автоматический login после reset не делать. Production provider остаётся отдельным gate.
 
 ## 7. Условия допуска к выпуску
 
 | Условие | Сейчас |
 |---|---|
-| Проверки точного кандидата | Семь заданий успешны на e7dd6d8; SHA не объявлен релизом, после изменений проверки повторяются. |
+| Проверки точного кандидата | Семь заданий успешны на 81656e7; SHA не объявлен релизом, после изменений проверки повторяются. |
 | Хранение и запуск | BETA-001–003 и повтор D2b подтверждены в CI; рабочая среда не принята. |
 | Полные J1–J7 | Частично подтверждены, не закрыты перечнем подзадач. |
 | Scanner и безопасный путь архива | Runtime-приёмка не завершена. |
-| Восстановление аккаунта | R4 открыт: verified binding, public recovery/reset и real-provider эксплуатация ещё не приняты. |
+| Восстановление аккаунта | R4 открыт: verified binding принят в CI, но anonymous forgot/reset и real-provider эксплуатация ещё не приняты. |
 | RU/EN, доступность и визуальное качество | Общая приёмка открыта. |
 | Восстановление БД и приватных файлов | Не проверено; сохранение тома не равно backup restore. |
 | Security/dependency review, секреты, журналирование и контакты | Полный аудит не выполнен; страницы privacy/terms не заменяют проверку содержания. |
@@ -220,7 +236,7 @@ Vitest вырос с 236 до **247/247 tests, 63/63 files**: 6 runtime tests и
 
 Перед изменением существующей среды нужны версия БД, фактические data_directory/mounts, проверенный backup и план переноса/восстановления. Запрещены `docker compose down -v`, `docker volume prune` и `docker system prune --volumes` на среде с существующими либо неизвестными данными. Очистка CI ограничена собственными одноразовыми ресурсами.
 
-Платная коммерция — отдельный закрытый этап: модель деятельности, провайдеры, условия/возвраты, webhook verification, идемпотентность, сверка, выплаты и обязанности по продавцам проверяются отдельно. D2d его не включает и не подтверждает.
+Платная коммерция — отдельный закрытый этап: модель деятельности, провайдеры, условия/возвраты, webhook verification, идемпотентность, сверка, выплаты и обязанности по продавцам проверяются отдельно. D3 его не включает и не подтверждает.
 
 ## 8. Как обновлять карту
 

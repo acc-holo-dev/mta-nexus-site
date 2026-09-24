@@ -14,7 +14,7 @@ This is the proposed single-VDS deployment for the closed beta. It does not depl
 - Caddy, which obtains TLS certificates and publishes ports 80/443;
 - Docker named volumes for database, uploads, and Caddy certificates.
 
-The previous sizing target is at least 4 GB RAM with ClamAV included. Capacity and scanner startup must be measured on the chosen host; this is not a verified resource guarantee. Paid commerce and production email remain disabled; the account-recovery policy still needs an explicit decision in the release map.
+The previous sizing target is at least 4 GB RAM with ClamAV included. Capacity and scanner startup must be measured on the chosen host; this is not a verified resource guarantee. Paid commerce and production email remain disabled. D3 enrollment is verified only in disposable CI: the standard production Compose intentionally omits the mail-encryption/abuse keys and dispatcher, so enrollment POST fails closed until a separately approved mail rollout.
 
 ## Prepare the host — only after the release gates pass
 
@@ -50,7 +50,7 @@ Do not publish a fully rendered Compose configuration: it can contain secrets. T
 
 The existing CI workflow runs `scripts/check-production-startup.sh` only on a disposable GitHub-hosted runner using its default Docker daemon. The script rejects other environments. It combines `compose.production.yaml` with the explicit `compose.production-ci.yaml` overlay; do not use that overlay on the VDS.
 
-The overlay selects the real Dockerfile `runtime` target and leaves application production validation enabled. It changes only test infrastructure: disposable credentials/domain/volumes, restart policy, loopback ports 8080/8443, and a test Caddyfile. The latter is derived from the production file by adding `local_certs` and `skip_install_trust`; proxy and body-limit directives remain unchanged. The original production Caddyfile is adapted first to detect missing environment wiring.
+The overlay selects the real Dockerfile `runtime` target and leaves application production validation enabled. It changes only test infrastructure: disposable credentials/domain/volumes, synthetic D3 mail/abuse keys, restart policy, loopback ports 8080/8443, and a test Caddyfile. The synthetic keys exist only to exercise encrypted enrollment in browser CI; they are not a production secret-provisioning design. The latter is derived from the production file by adding `local_certs` and `skip_install_trust`; proxy and body-limit directives remain unchanged. The original production Caddyfile is adapted first to detect missing environment wiring.
 
 Before starting Caddy, the test verifies that every explicit certificate issuer is internal. HTTPS requests use the copied disposable root certificate with `curl --cacert` and the reserved test hostname; certificate verification is not disabled. Public ACME accounts, real domains and working databases are not used. See [Caddy local_certs](https://caddyserver.com/docs/caddyfile/options#local-certs) and [Compose override semantics](https://docs.docker.com/reference/compose-file/merge/). The overlay requires Compose 2.24.4 or later for `!override`, so public production ports cannot accidentally remain exposed alongside test ports.
 

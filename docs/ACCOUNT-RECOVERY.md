@@ -1,6 +1,6 @@
 # Восстановление доступа — BETA-005d
 
-Сверка: **2026-09-24**. D0 — проект; D1 — одноразовые подтверждения; D2a — атомарная зашифрованная очередь; D2b — lease/retry; D2c — закрытый TLS transport; D2d — явный standalone runtime и durable abuse-limit primitive. Фактические результаты и точные SHA — в [карте релиза](RELEASE-READINESS.md). **Пользовательского восстановления ещё нет, R4 открыт.** Public request/reset, реальный SMTP provider и новые правила активации не включены.
+Сверка: **2026-09-24**. D0–D2d подготовили proofs, очередь, transport/runtime и durable limits; D3 добавил проверяемую привязку текущего email для обычного password-account. Фактические результаты и точные SHA — в [карте релиза](RELEASE-READINESS.md). **Forgot-password/reset ещё нет, R4 открыт.** Реальный SMTP provider и production mail rollout также не включены.
 
 Сохранены [проект D0](https://github.com/acc-holo-dev/mta-nexus-site/blob/435bb05601115c22afb5ad7d609da35f4868decc/docs/ACCOUNT-RECOVERY.md), [контракт D1](https://github.com/acc-holo-dev/mta-nexus-site/blob/3758215102e063e4e1f73706f1984bdefc372341/docs/ACCOUNT-RECOVERY.md) и [подробный контракт D2a](https://github.com/acc-holo-dev/mta-nexus-site/blob/2a1b9e567d6ba626a4f53e9d1a947b06d369f1ce/docs/ACCOUNT-RECOVERY.md). Уточнения D2b ниже не переобъявляют старые проверки результатами нового SHA. Очередь работы и допуск к выпуску остаются в RELEASE-READINESS, не в параллельном roadmap.
 
@@ -92,6 +92,30 @@ Loop выполняет bounded batch, затем bounded cleanup и poll. SIGTE
 
 На `e7dd6d8e18ca27dd5bcb233b8f5b9ebaf794d10c` Verify подтвердил runtime integration, миграцию и 247/247 Vitest tests в 63 файлах; все семь CI/browser jobs прошли. До зелёного результата были сохранены четыре полезных отказа: malformed workflow на `d7592bf`; отсутствие явного DB pool shutdown на `252e3cb`; unsafe RowList cast на `04fe45f`; передача Date напрямую в raw postgres-js timestamptz parameters на `eeffccb`. Исправления не удаляли assertions и не включали production mail.
 
-**Следующий D3:** реальная привязка recovery email для обычного password-account: authenticated session + повторное подтверждение текущим password → enqueue email_verify через D1/D2 → применение одноразового proof → создание binding. Нужны neutral/retry UX, durable request limits и browser/HTTP evidence. Старые `emailVerified`/`isVerified` не становятся trusted binding автоматически. Admin/moderator/MFA и transition существующих аккаунтов остаются отдельным решением.
+D3 использует этот runtime/limit фундамент для authenticated enrollment; фактический результат приведён в следующем разделе.
+
+## 8. D3 — verified recovery email binding
+
+D3 реализует только подтверждение **уже сохранённого на аккаунте email** для обычного password-account. `GET /api/auth/email-verification` возвращает приватный no-store status и ничего не меняет. `POST` требует действующую `nexus_session`, текущий пароль, eligible account и отдельные runtime keys. До выдачи proof расходуется durable `email_verify_request` limit: сейчас 5 попыток на час для subject `user:<id>`, сохранённого как keyed HMAC digest. Ошибка пароля также тратит эту квоту, но proof/outbox не создаёт.
+
+После правильного пароля D1/D2a одной транзакцией создают/заменяют `email_verify` proof, audit и encrypted mail envelope. HTTP response содержит только `accepted/alreadyVerified/expiresAt`; challenge ID и token наружу из request endpoint не возвращаются. Сам recipient/token остаётся в AES-GCM outbox до worker/terminal cleanup.
+
+`PATCH /api/auth/email-verification` требует ту же authenticated account context. `AccountChallengeRepository.consume` повторно проверяет user/email/credential version/session/time; callback в той же транзакции создаёт или заменяет `account_recovery_bindings` с provenance на consumed `email_verify` proof и пишет `auth.recovery_email_verified`. Replay proof и proof другого signed-in account отклоняются. Legacy `emailVerified` и moderator `isVerified` не создают binding. Admin/moderator и MFA-enabled остаются gated.
+
+Страница `/auth/verify-email` не подтверждает email на GET/load. Она читает `challenge` из query и secret token из `#token=...`, сразу удаляет fragment через `history.replaceState`, не кладёт token в localStorage/sessionStorage и показывает явную кнопку Confirm email. После PATCH success token больше не сохраняется в React state. Browser acceptance проверил пустой hash, отсутствие token в URL/storage/rendered text, GET-status=false до клика, keyboard Enter, узкий viewport без horizontal overflow, success status и replay rejection.
+
+Для Chromium CI внешний SMTP намеренно не используется повторно: D2c уже проверяет transport. Disposable production overlay получает сгенерированные mail/abuse keys, а GitHub-hosted-only helper через `docker exec` расшифровывает только synthetic `@example.invalid` outbox entry. Guard требует `GITHUB_ACTIONS=true`, `RUNNER_ENVIRONMENT=github-hosted` и отдельный test flag. Proof передаётся только в память browser-test процесса и не записывается в summary/results/artifacts.
+
+D3a впервые стал полностью зелёным на `3ade27dec7e9da8a8a180e456b9bc5b0f660c331`: все семь jobs, Vitest **252/252 в 64 файлах**. Финальный D3 UI/browser SHA — `81656e71665c537d55b358aae5974e2a6ec10100`: все семь jobs success; D3-01 и прежние J2/password/session/directory regressions зелёные, Vitest остаётся **252/252, 64/64**.
+
+Сохранённая история отказов D3:
+- `eba13dc`: новый DB test остановился на TypeScript optional `challengeId`; server assertions ещё не выполнялись.
+- `4faebd9`: confirmation-page retry branch имел недостаточно узкий TypeScript proof type; production image build остановился.
+- `06ac564`: новый recovery form повторил accessible label `Current password` и справедливо сломал строгие существующие password-browser locators. Поле переименовано в `Current password for recovery email`; старые tests не ослаблены.
+- `81656e7`: полный зелёный результат.
+
+**Production rollout не выполнен.** Основной `compose.production.yaml` всё ещё не передаёт `ACCOUNT_MAIL_KEY`/`ACCOUNT_RECOVERY_ABUSE_KEY`, держит `EMAIL_PROVIDER=disabled` и не запускает standalone dispatcher. Поэтому D3 не доказывает real inbox delivery, provider AUTH/TLS, VDS secret storage, key rotation или эксплуатационную доставку.
+
+**Следующий D4:** anonymous forgot-password request для verified binding с нейтральным anti-enumeration response/timing policy, durable email/IP limits, `password_reset` proof и явная reset page. Successful reset обязан одной согласованной операцией заменить password hash, отозвать все sessions и остальные proofs, записать audit и поставить security notification; после него требуется обычный login. Privileged/MFA/legacy transition и production provider rollout остаются отдельными решениями.
 
 Основания: [PostgreSQL 18 locking](https://www.postgresql.org/docs/18/explicit-locking.html), [SELECT/SKIP LOCKED](https://www.postgresql.org/docs/18/sql-select.html), [wall-clock time](https://www.postgresql.org/docs/18/functions-datetime.html), [Drizzle transactions](https://orm.drizzle.team/docs/transactions). Сверены 2026-09-24; внешняя документация не заменяет проверку реализации. Источники D0/D1/D2a сохранены в закреплённых документах выше.

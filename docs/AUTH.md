@@ -39,9 +39,9 @@ A repeated selected-target request cannot delete the row or create another succe
 
 `/api/auth/password`, `/api/auth/session`, and `/api/auth/sessions` return private, non-storable responses. Settings distinguishes a 401 authentication requirement from temporary unavailability. A failure to refresh the list after a confirmed mutation must not be presented as a failed mutation or an empty successful list. Loss of an HTTP response is still an uncertain client result, even when the database transaction is atomic; reload settings before retrying an uncertain revocation.
 
-## Forgotten-password recovery — internal D1/D2a/D2b only
+## Recovery email enrollment and forgotten-password recovery
 
-[ACCOUNT-RECOVERY.md](ACCOUNT-RECOVERY.md) separates the retained design, implemented proof/queue/lease primitives and remaining SMTP, enrollment and reset work. There is no public recovery endpoint, email sender, running dispatcher, activation gate or password-reset UI as a result of these tasks. Production Compose still fixes `EMAIL_PROVIDER` to `disabled`.
+[ACCOUNT-RECOVERY.md](ACCOUNT-RECOVERY.md) separates the implemented enrollment/proof/delivery primitives from the remaining forgotten-password and operational work. D3 exposes authenticated status/request/confirm routes and UI for verifying the account's current email, but there is still no anonymous forgot-password request or password-reset UI. Production Compose fixes `EMAIL_PROVIDER` to `disabled`, does not start the dispatcher, and does not provision the D3 producer/abuse keys.
 
 Registration still creates an active session with `emailVerified: false`. Moderator verification is not mailbox ownership. Private recovery tables do not bulk-trust legacy flags, alter existing passwords or add credential versions to public User payloads. An email-verification proof requires a valid initiating session and an internally verified password snapshot; a reset proof requires a current binding with a consumed verification from the same account/address. Admin/moderator and MFA-enabled recovery remain gated; existing login is unchanged.
 
@@ -69,7 +69,13 @@ The worker can run once or poll in bounded batches. SIGTERM/SIGINT stop future b
 
 D2d also adds a PostgreSQL-backed abuse-limit primitive for the future `email_verify_request` and `password_reset_request` entry points. Subjects such as future normalized email/IP-derived keys are stored only as a keyed HMAC digest, with scope-separated windows, row locking, bounded cleanup and an independent 32-byte abuse key. This primitive is not yet attached to an HTTP endpoint and does not define the final public policy by itself.
 
-**D3 is next:** authenticated email-channel enrollment using the current password/session, D1 proof, D2 delivery pipeline and durable abuse limits. Production SMTP/provider activation remains separate. Future reset must consume its proof, replace credentials, invalidate proofs and all sessions, audit and enqueue notification together; it then requires ordinary login. GET/mail preview must not mutate accounts.
+D3 adds authenticated recovery-email enrollment for ordinary password accounts. The Settings request requires the live session and current password, consumes the persisted `email_verify_request` limit, then atomically issues the proof plus encrypted outbox envelope. The HTTP response returns acceptance/expiry only; it does not return the challenge ID or token. GET status is read-only.
+
+The confirmation page reads the challenge ID from the query and token from the URL fragment, immediately removes the fragment from browser history, keeps the token only in memory, and waits for an explicit **Confirm email** action. The PATCH is bound to the signed-in account/session. Consuming the one-time proof, writing the provenance-backed recovery binding and audits share the protected transaction; replay and another account are rejected. Legacy `emailVerified`/`isVerified` flags remain non-authoritative, and admin/moderator/MFA enrollment stays unavailable.
+
+Production SMTP/provider activation remains separate. `compose.production.yaml` still sets `EMAIL_PROVIDER=disabled` and does not provide the mail/abuse keys, so production enrollment requests fail closed until an explicit rollout. Only the disposable CI overlay receives generated synthetic keys.
+
+**D4 is next:** anonymous forgotten-password request plus proof-confirmed password replacement, with neutral anti-enumeration behavior, durable request limits, full session/proof revocation, audit and notification effects. GET/mail preview must never mutate accounts.
 
 Existing accounts must not be bulk-verified, deleted or silently locked out. Activation, transition, unsupported-account and privileged/MFA policies require a release-owner decision before rollout. R4 remains open until a working process and its rollout policy are verified.
 
@@ -80,8 +86,9 @@ Existing accounts must not be bulk-verified, deleted or silently locked out. Act
 - `account-mail-worker.test.ts`: candidate/claim/lease/retry/outcome transactions, context revalidation, rollback and a child-process SIGKILL fixture. Retry/lease times are accelerated only on synthetic rows.
 - `account-mail-dispatcher.test.ts` plus `packages/db/scripts/check-account-mail-smtp.ts`: dispatcher outcome/link tests and closed-Docker TLS transport integration. The integration uses synthetic recipients and a disposable account; it does not contact external SMTP or prove inbox delivery.
 - `account-mail-runtime.test.ts` and the CI standalone process check: dedicated-key parsing, fail-closed configuration, one-shot execution, SIGTERM shutdown and secret-safe output.
-- `account-recovery-abuse.test.ts`: persisted scope-separated keyed-digest limits, concurrent attempts, expiry/reset, cleanup and invalid-input rejection on real PostgreSQL. It is a future request primitive, not an active endpoint policy. See RELEASE-READINESS for the verified SHA and exact results.
-- Existing account/password/directory browser suites remain regression checks of their earlier routes, not new recovery browser acceptance. The prior P10 explicitly mocks only a 503 response for the settings error view.
+- `account-recovery-abuse.test.ts`: persisted scope-separated keyed-digest limits, concurrent attempts, expiry/reset, cleanup and invalid-input rejection on real PostgreSQL. D3 now uses the `email_verify_request` scope at 5 attempts/hour per authenticated user subject; this is not the future anonymous reset policy.
+- `account-email-enrollment.test.ts`: encrypted enqueue with no pre-confirm binding, current-password requirement, atomic proof/binding/audit confirmation, replay rejection, legacy-flag distrust, privileged/MFA gate and missing-key fail-closed behavior.
+- Account browser D3-01 performs the real Chromium enrollment path against production TLS/Next/PostgreSQL: settings request, CI-only encrypted-outbox proof retrieval, foreign-account rejection, fragment stripping, non-mutating GET, keyboard confirmation on a narrow viewport, one-time replay rejection and verified status. Existing password/session and directory suites remain regression checks. See RELEASE-READINESS for the verified SHA and exact results.
 
 Database tests do not cover every HTTP race, lost response at commit, logout interleaving, already authorized in-flight request, external message delivery or all history/cache states. Full security/dependency, CSRF/XSS/session, MFA, private-route, RU/EN, visual/accessibility, real key management and environment/restore reviews remain open. An audit event or queued envelope is not a delivered security notification.
 
