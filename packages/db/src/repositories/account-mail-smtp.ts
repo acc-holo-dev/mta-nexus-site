@@ -95,11 +95,19 @@ function dotStuff(text: string): string {
     .map((line) => line.startsWith(".") ? `.${line}` : line).join("\r\n");
 }
 
+function hasOversizedDataLine(text: string): boolean {
+  return text.replace(/\r?\n/g, "\n").split("\n").some((line) => {
+    const stuffedBytes = Buffer.byteLength(line, "utf8") + (line.startsWith(".") ? 1 : 0);
+    return stuffedBytes > 998;
+  });
+}
+
 function validateMessage(input: AccountMailTransportInput) {
   if (!input || !validAddress(input.recipient)
     || typeof input.subject !== "string" || input.subject.length < 1 || input.subject.length > 160
     || /[\r\n]/.test(input.subject)
     || typeof input.text !== "string" || Buffer.byteLength(input.text, "utf8") > 16_384
+    || hasOversizedDataLine(input.text)
     || typeof input.messageId !== "string" || !/^ame_[A-Za-z0-9_-]{1,96}$/.test(input.messageId)
     || !(input.sendBefore instanceof Date) || !Number.isFinite(input.sendBefore.getTime())) {
     throw new Error("Invalid account mail message");
@@ -122,6 +130,9 @@ async function readReply(session: SmtpSession): Promise<{ code: number; lines: s
   for (;;) {
     const next = await session.iterator.next();
     if (next.done || typeof next.value !== "string") throw new Error("SMTP connection closed");
+    if (Buffer.byteLength(next.value, "utf8") > 2_048 || replyLines.length >= 100) {
+      throw new Error("SMTP response exceeds bounds");
+    }
     const match = /^(\d{3})([ -])(.*)$/.exec(next.value);
     if (!match) throw new Error("Invalid SMTP response");
     expected ||= match[1];
