@@ -33,6 +33,17 @@ AUTH_SECRET=generate-a-unique-secret-of-at-least-32-characters
 
 Keep `.env` outside git. Do not expose port 5432 in a firewall or Docker mapping. Record the chosen commit and image identifiers in the deployment record. Local-development credentials must not be used in production.
 
+## Optional recovery overlays — not approved for production use yet
+
+The base `compose.production.yaml` intentionally keeps account recovery delivery fail-closed. D5 introduces two optional files that must never be added implicitly:
+
+- `compose.recovery.yaml` gives the application only the active account-mail encryption key and the durable recovery-abuse key needed to issue encrypted verification/reset mail.
+- `compose.mail-worker.yaml` starts an image-only standalone dispatcher with the active mail key, an optional single previous decrypt-only key for a bounded rotation drain window, and SMTP/TLS settings. It does not receive `AUTH_SECRET` or the abuse key and exposes no ports or volumes.
+
+The SMTP adapter now has optional `AUTH PLAIN` support only after the implicit TLS connection and certificate verification have succeeded. Username/password must be configured together. This does not select or approve a provider, and it is not inbox-delivery evidence.
+
+The overlays are **implemented but not accepted**. Current D5 GitHub Actions check jobs terminate before runner steps are allocated, so no operator should use them as production instructions yet. The last verified recovery candidate remains D4 as recorded in the release map. Before enabling these overlays on a host, D5 requires an executable full CI pass on the exact candidate, real-provider test accounts, provider-specific TLS/AUTH acceptance, secret storage/rotation rehearsal and explicit rollout approval.
+
 ## Validate and start — only for an approved environment
 
 The CI checks are not approval to execute this recipe on a real host. Existing or unknown data requires inventory and a tested recovery/transfer plan before a volume-layout change; all deployments require an approved release candidate. Public DNS/ACME, sizing, backup restoration and user journeys still need environment-specific acceptance.
