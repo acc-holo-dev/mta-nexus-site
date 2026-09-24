@@ -64,13 +64,24 @@ try {
   fingerprint = runtimeFingerprint(config);
   const dispatcher = createAccountMailDispatcher(config);
 
+  const assertQueueKeyCoverage = async () => {
+    const requiredKeyIds = await accountMailOutboxRepository.requiredKeyIds();
+    if (requiredKeyIds.some((keyId) => !(keyId in config.keys))) {
+      throw new Error("Account mail queue requires an unavailable encryption key");
+    }
+  };
+
+  const guardedDispatcher = {
+    runBatch: async (limit?: number, signal?: AbortSignal) => {
+      await assertQueueKeyCoverage();
+      return dispatcher.runBatch(limit, signal);
+    },
+  };
+
   await queueHealth();
   await checkDatabaseConnection();
 
-  const requiredKeyIds = await accountMailOutboxRepository.requiredKeyIds();
-  if (requiredKeyIds.some((keyId) => !(keyId in config.keys))) {
-    throw new Error("Account mail queue requires an unavailable encryption key");
-  }
+  await assertQueueKeyCoverage();
 
   healthStatus = "ready";
   await queueHealth();
@@ -87,7 +98,7 @@ try {
   heartbeatTimer.unref();
 
   const summary = await runAccountMailLoop({
-    dispatcher,
+    dispatcher: guardedDispatcher,
     signal: controller.signal,
     batchSize: config.batchSize,
     pollIntervalMs: config.pollIntervalMs,
