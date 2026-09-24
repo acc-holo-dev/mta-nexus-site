@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ ${GITHUB_ACTIONS:-} == true && ${RUNNER_ENVIRONMENT:-} == github-hosted ]] || {
+  echo 'Refusing: D5 mail-worker acceptance requires a disposable GitHub-hosted runner.' >&2
+  exit 1
+}
+[[ -z ${DOCKER_HOST:-} && -z ${DOCKER_CONTEXT:-} && $(docker context show) == default ]] || {
+  echo 'Refusing a non-default or remote Docker daemon.' >&2
+  exit 1
+}
+cd "$(dirname "$0")/.."
+
+image=${NEXUS_D5_IMAGE:-mta-nexus:ci}
+receiver="nexus-smtp-${GITHUB_RUN_ID:?}-${GITHUB_RUN_ATTEMPT:?}"
+worker="nexus-mail-worker-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+mail_key=$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("base64url"))')
+abuse_key=$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("base64url"))')
+test_password="D5-$(openssl rand -hex 24)"
+for value in "$mail_key" "$abuse_key" "$test_password"; do echo "::add-mask::$value"; done
+cleanup() { docker rm -f "$worker" >/dev/null 2>&1 || true; }
+trap cleanup EXIT
+
+export NEXUS_MAIL_IMAGE="$image"
+export DOMAIN=nexus-ci.test
+export ACME_EMAIL=ci@nexus-ci.test
+export POSTGRES_USER=nexus
+export POSTGRES_PASSWORD=nexus_test_secret
+export POSTGRES_DB=mta_nexus_test
+export ACCOUNT_MAIL_KEY_ID=ci
+export ACCOUNT_MAIL_KEY="$mail_key"
+export ACCOUNT_MAIL_APP_URL=https://nexus-mta.test
+export ACCOUNT_MAIL_SMTP_HOST=localhost
+export ACCOUNT_MAIL_SMTP_PORT=2465
+export ACCOUNT_MAIL_SMTP_SERVERNAME=localhost
+export ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test
+export COMPOSE_DISABLE_ENV_FILE=true
+
+docker compose --env-file /dev/null -f compose.production.yaml -f compose.mail-worker.yaml config --format json > /tmp/nexus-d5-worker-compose.json
+node scripts/tests/mail-worker-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json
+
+seed=$(NEXUS_D5_MAIL_SEED=true NEXUS_D5_TEST_PASSWORD="$test_password" \
+  ACCOUNT_RECOVERY_ABUSE_KEY="$abuse_key" \
+  node --import tsx packages/db/scripts/seed-account-mail-ci.ts)
+challenge=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ach_/.test(x.challengeId)) process.exit(1); process.stdout.write(x.challengeId)' "$seed")
+mail=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^aml_/.test(x.mailId)) process.exit(1); process.stdout.write(x.mailId)' "$seed")
+
+smtp_host=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$receiver")
+test -n "$smtp_host"
+ca=$(cat /tmp/nexus-smtp-ci/cert.pem)
+
+start_worker() {
+  docker run --detach --name "$worker" \
+    --add-host host.docker.internal:host-gateway \
+    --env NODE_ENV=production \
+    --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/mta_nexus_test \
+    --env ACCOUNT_MAIL_KEY_ID=ci \
+    --env ACCOUNT_MAIL_KEY="$mail_key" \
+    --env ACCOUNT_MAIL_APP_URL=https://nexus-mta.test \
+    --env ACCOUNT_MAIL_SMTP_HOST="$smtp_host" \
+    --env ACCOUNT_MAIL_SMTP_PORT=2465 \
+    --env ACCOUNT_MAIL_SMTP_SERVERNAME=localhost \
+    --env ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test \
+    --env ACCOUNT_MAIL_SMTP_CA="$ca" \
+    --env ACCOUNT_MAIL_SMTP_TIMEOUT_MS=1000 \
+    --env ACCOUNT_MAIL_BATCH_SIZE=2 \
+    --env ACCOUNT_MAIL_POLL_INTERVAL_MS=60000 \
+    "$image" node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --ready >/dev/null
+}
+
+wait_ready() {
+  for attempt in $(seq 1 100); do
+    if docker logs "$worker" 2>&1 | grep -q '"status":"ready"'; then return 0; fi
+    docker inspect --format '{{.State.Running}}' "$worker" 2>/dev/null | grep -qx true || break
+    sleep 0.1
+  done
+  docker logs "$worker" 2>&1 || true
+  return 1
+}
+
+start_worker
+wait_ready
+worker_id=$(docker inspect --format '{{.Id}}' "$worker")
+image_id=$(docker inspect --format '{{.Image}}' "$worker")
+test "$(docker exec "$worker" id -u)" != "0"
+test -z "$(docker port "$worker")"
+! docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$worker" | grep -q '^AUTH_SECRET='
+! docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$worker" | grep -q '^ACCOUNT_RECOVERY_ABUSE_KEY='
+! docker logs "$worker" 2>&1 | grep -F "$mail_key"
+
+accepted=0
+for attempt in $(seq 1 40); do
+  set +e
+  NEXUS_D5_MAIL_CHECK=true node --import tsx packages/db/scripts/check-account-mail-delivery-ci.ts "$challenge" "$mail" > /tmp/nexus-d5-check.out 2> /tmp/nexus-d5-check.err
+  code=$?
+  set -e
+  if [[ $code == 0 ]] && grep -q '^PASS$' /tmp/nexus-d5-check.out; then accepted=1; break; fi
+  sleep 0.25
+done
+test "$accepted" = 1
+test ! -s /tmp/nexus-d5-check.err
+
+docker stop --time 10 "$worker" >/dev/null
+test "$(docker inspect --format '{{.State.ExitCode}}' "$worker")" = "0"
+docker rm "$worker" >/dev/null
+start_worker
+wait_ready
+test "$(docker inspect --format '{{.Id}}' "$worker")" != "$worker_id"
+test "$(docker inspect --format '{{.Image}}' "$worker")" = "$image_id"
+docker stop --time 10 "$worker" >/dev/null
+test "$(docker inspect --format '{{.State.ExitCode}}' "$worker")" = "0"
+docker rm "$worker" >/dev/null
+
+set +e
+docker run --rm --add-host host.docker.internal:host-gateway \
+  --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/mta_nexus_test \
+  --env ACCOUNT_MAIL_KEY_ID=ci --env ACCOUNT_MAIL_KEY= \
+  --env ACCOUNT_MAIL_APP_URL=https://nexus-mta.test \
+  --env ACCOUNT_MAIL_SMTP_HOST="$smtp_host" --env ACCOUNT_MAIL_SMTP_PORT=2465 \
+  --env ACCOUNT_MAIL_SMTP_SERVERNAME=localhost --env ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test \
+  "$image" node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --once \
+  > /tmp/nexus-d5-missing.out 2> /tmp/nexus-d5-missing.err
+code=$?
+set -e
+test "$code" -ne 0
+grep -Fxq 'Account mail dispatcher failed' /tmp/nexus-d5-missing.err
+! grep -F "$mail_key" /tmp/nexus-d5-missing.err
+! grep -F nexus_test_secret /tmp/nexus-d5-missing.err
+
+trap - EXIT
+cleanup
+echo 'PASS: opt-in production-image mail worker accepted synthetic TLS mail, exposed no ports/auth/abuse secrets, stopped cleanly, recreated on the same image and failed closed without its mail key.'
