@@ -4,7 +4,7 @@ import { db } from "../client";
 import { auditEvents, sessions, users } from "../schema";
 import { accountAuthState, accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
 import { accountMailOutbox } from "../account-mail-schema";
-import { AccountMailCipher } from "./account-mail-crypto";
+import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import type { MailContext, MailPayload } from "./account-mail-crypto";
 import { digestAccountChallenge } from "./account-challenges";
 import type { AccountMailTransportStage } from "./account-mail-smtp";
@@ -110,7 +110,8 @@ export class AccountMailWorkerRepository {
           || digestAccountChallenge(item.proof.purpose, decoded.token) !== item.proof.tokenDigest) {
           throw new Error("Payload does not match proof");
         }
-      } catch {
+      } catch (error) {
+        if (error instanceof AccountMailKeyUnavailableError) throw error;
         // No raw crypto error, SQL, recipient, ciphertext or token in the error.
         // Keep the lease for explicit retry/discard or bounded expiry recovery.
         throw new Error("Account mail payload is unavailable");
@@ -118,6 +119,31 @@ export class AccountMailWorkerRepository {
       const sendBefore = new Date(Math.min(item.mail.leaseExpiresAt!.getTime(), item.validUntil.getTime()));
       if (sendBefore <= await clock(tx)) return null;
       return Object.freeze({ ...context, ...decoded, sendBefore });
+    });
+  }
+
+  async releaseForMissingKey(lease: MailLease): Promise<boolean> {
+    const digest = leaseDigest(lease);
+    return transaction(async (tx) => {
+      const item = await this.lockLiveMail(tx, lease.id);
+      if (!item || !this.owns(item, lease, digest)) return false;
+
+      const retryAt = new Date(Math.min(
+        item.now.getTime() + 30_000,
+        item.validUntil.getTime(),
+      ));
+      const changed = await tx.update(accountMailOutbox).set({
+        attempts: Math.max(0, lease.attempt - 1),
+        availableAt: retryAt,
+        leaseTokenDigest: null,
+        leaseExpiresAt: null,
+      }).where(and(
+        eq(accountMailOutbox.id, lease.id),
+        eq(accountMailOutbox.leaseTokenDigest, digest),
+        eq(accountMailOutbox.attempts, lease.attempt),
+        gt(accountMailOutbox.leaseExpiresAt, sql`clock_timestamp()`),
+      )).returning({ id: accountMailOutbox.id });
+      return changed.length === 1;
     });
   }
 
