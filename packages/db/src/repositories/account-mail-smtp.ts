@@ -287,8 +287,9 @@ export class AccountMailSmtpTransport {
         await once(plain, "connect");
         session = createSession(plain);
 
+        stage = "greeting";
         const greeting = await readReply(session);
-        let result = requireStage(greeting.code, 220, "retry");
+        let result = requireStage(greeting.code, 220, stage, "retry");
         if (result) return result;
 
         ensureWithinDeadline();
