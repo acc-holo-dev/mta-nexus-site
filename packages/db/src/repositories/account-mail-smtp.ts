@@ -131,6 +131,15 @@ function advertisesAuthPlain(lines: string[]): boolean {
   });
 }
 
+function advertisesCapability(lines: string[], capability: string): boolean {
+  const expected = capability.toUpperCase();
+  return lines.some((line) => line.trim().split(/\s+/, 1)[0]?.toUpperCase() === expected);
+}
+
+function containsNonAscii(value: string): boolean {
+  return /[^\x00-\x7f]/.test(value);
+}
+
 // SMTP transport for account recovery mail. It supports either implicit TLS
 // or mandatory STARTTLS upgrade. AUTH/envelope/message data are never sent on
 // the plaintext side of a STARTTLS connection. There is no plaintext fallback.
@@ -258,8 +267,26 @@ export class AccountMailSmtpTransport {
         if (result) return result;
       }
 
+      const needsSmtpUtf8 = containsNonAscii(this.#options.from)
+        || containsNonAscii(input.recipient)
+        || containsNonAscii(input.subject);
+      const needs8BitMime = containsNonAscii(input.text);
+      if (needsSmtpUtf8 && !advertisesCapability(capabilities, "SMTPUTF8")) {
+        return { outcome: "discard", uncertain: false };
+      }
+      if (needs8BitMime && !advertisesCapability(capabilities, "8BITMIME")) {
+        return { outcome: "discard", uncertain: false };
+      }
+      const mailParameters = [
+        needsSmtpUtf8 ? "SMTPUTF8" : "",
+        needs8BitMime ? "BODY=8BITMIME" : "",
+      ].filter(Boolean).join(" ");
+
       ensureWithinDeadline();
-      const mailFrom = await command(session, `MAIL FROM:<${this.#options.from}>`);
+      const mailFrom = await command(
+        session,
+        `MAIL FROM:<${this.#options.from}>${mailParameters ? ` ${mailParameters}` : ""}`,
+      );
       let result = requireStage(mailFrom.code, 250);
       if (result) return result;
 
@@ -279,7 +306,7 @@ export class AccountMailSmtpTransport {
         `Subject: ${input.subject}`,
         "MIME-Version: 1.0",
         "Content-Type: text/plain; charset=UTF-8",
-        "Content-Transfer-Encoding: 8bit",
+        needs8BitMime ? "Content-Transfer-Encoding: 8bit" : "Content-Transfer-Encoding: 7bit",
         "",
         dotStuff(input.text),
         ".",
