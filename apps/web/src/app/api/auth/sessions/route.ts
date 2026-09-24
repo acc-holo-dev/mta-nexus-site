@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { consumeRateLimit } from "@nexus/security";
+import { AppError } from "@nexus/domain";
 
 function json(body: unknown, status = 200) {
   return NextResponse.json(body, {
@@ -49,10 +50,13 @@ export async function DELETE(request: NextRequest) {
     if (body.sessionId === currentSessionId) {
       return json({ error: "The current session cannot be revoked here; use logout instead" }, 409);
     }
-    const revoked = await authService.revokeSession(user.id, body.sessionId);
+    const revoked = await authService.revokeSession(user.id, body.sessionId, token);
     if (!revoked) return json({ error: "Session not found or not owned by you" }, 404);
     return json({ success: true });
-  } catch {
+  } catch (error: unknown) {
+    if (error instanceof AppError) {
+      return json({ error: error.message, code: error.code }, error.statusCode);
+    }
     console.error("Session update could not be confirmed");
     return json({ error: "Could not confirm the session update. Reload settings before retrying." }, 503);
   }

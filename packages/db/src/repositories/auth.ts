@@ -15,6 +15,7 @@ interface SessionWrite {
 }
 
 type AuditWrite = Omit<AuditEvent, "createdAt">;
+type AuthTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export class AuthRepository {
   async registerAccount(data: {
@@ -109,6 +110,70 @@ export class AuthRepository {
       });
       return { revokedSessionCount, expiresAt: current.expiresAt };
     });
+  }
+
+  async revokeOwnedSession(data: {
+    userId: string;
+    currentToken: string;
+    sessionId: string;
+    auditId: string;
+  }): Promise<boolean> {
+    return db.transaction(async (tx) => {
+      const current = await this.lockSessionActor(tx, data.userId, data.currentToken);
+      if (data.sessionId === current.id) {
+        throw new ConflictError("The current session cannot be revoked here; use logout instead");
+      }
+      const revoked = await tx.delete(sessions).where(and(
+        eq(sessions.id, data.sessionId), eq(sessions.userId, data.userId)
+      )).returning({ id: sessions.id });
+      if (revoked.length === 0) return false;
+      await tx.insert(auditEvents).values({
+        id: data.auditId, actorId: data.userId, actorType: "user",
+        action: "user.session_revoked", targetId: data.userId, targetType: "user",
+        details: { sessionId: data.sessionId }, createdAt: new Date(),
+      });
+      return true;
+    });
+  }
+
+  async revokeOtherSessions(data: {
+    userId: string;
+    currentToken: string;
+    auditId: string;
+  }): Promise<number> {
+    return db.transaction(async (tx) => {
+      const current = await this.lockSessionActor(tx, data.userId, data.currentToken);
+      const cutoff = Date.now();
+      const revoked = await tx.delete(sessions).where(and(
+        eq(sessions.userId, data.userId), ne(sessions.id, current.id)
+      )).returning({ expiresAt: sessions.expiresAt });
+      if (revoked.length === 0) return 0;
+      // Expired rows are removed too, but are not presented as active logins.
+      const revokedCount = revoked.filter((row) => row.expiresAt.getTime() > cutoff).length;
+      await tx.insert(auditEvents).values({
+        id: data.auditId, actorId: data.userId, actorType: "user",
+        action: "user.other_sessions_revoked", targetId: data.userId, targetType: "user",
+        details: { revokedCount, removedSessionCount: revoked.length }, createdAt: new Date(),
+      });
+      return revokedCount;
+    });
+  }
+
+  private async lockSessionActor(tx: AuthTransaction, userId: string, token: string) {
+    // Match login/password-change lock order: user first, then current session.
+    // Recheck AFTER any lock wait; the route's earlier authorization may be stale.
+    const [user] = await tx.select({ id: users.id }).from(users)
+      .where(eq(users.id, userId)).for("update");
+    if (!user) throw new UnauthorizedError("Authentication required");
+    const [current] = await tx.select({ id: sessions.id, expiresAt: sessions.expiresAt })
+      .from(sessions).where(and(
+        eq(sessions.userId, userId), eq(sessions.token, digestSessionToken(token)),
+        gt(sessions.expiresAt, new Date())
+      )).for("update");
+    if (!current || current.expiresAt.getTime() <= Date.now()) {
+      throw new UnauthorizedError("Authentication required");
+    }
+    return current;
   }
 
   async revokeSession(token: string, audit: AuditWrite): Promise<void> {

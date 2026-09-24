@@ -190,36 +190,16 @@ export class AuthService {
     return sessionRepository.listByUser(userId);
   }
 
-  async revokeSession(userId: string, sessionId: string): Promise<boolean> {
-    const revoked = await sessionRepository.deleteById(sessionId, userId);
-    if (revoked) {
-      await auditRepository.record({
-        id: generateId("aud"),
-        actorId: userId,
-        actorType: "user",
-        action: "user.session_revoked",
-        targetId: userId,
-        targetType: "user",
-        details: { sessionId },
-      });
-    }
-    return revoked;
+  async revokeSession(userId: string, sessionId: string, currentToken: string): Promise<boolean> {
+    return authRepository.revokeOwnedSession({
+      userId, sessionId, currentToken, auditId: generateId("aud"),
+    });
   }
 
   async revokeOtherSessions(userId: string, currentToken: string): Promise<number> {
-    const revokedCount = await sessionRepository.deleteOtherSessions(userId, currentToken);
-    if (revokedCount > 0) {
-      await auditRepository.record({
-        id: generateId("aud"),
-        actorId: userId,
-        actorType: "user",
-        action: "user.other_sessions_revoked",
-        targetId: userId,
-        targetType: "user",
-        details: { revokedCount },
-      });
-    }
-    return revokedCount;
+    return authRepository.revokeOtherSessions({
+      userId, currentToken, auditId: generateId("aud"),
+    });
   }
 
   async switchContext(userId: string, contextId: string): Promise<User> {
