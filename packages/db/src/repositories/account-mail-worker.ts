@@ -166,7 +166,7 @@ export class AccountMailWorkerRepository {
     const digest = leaseDigest(lease);
     return transaction(async (tx) => {
       const item = await this.lockLiveMail(tx, lease.id);
-      if (!item || !this.owns(item, lease, digest)) return false;
+      if (!item || !this.matchesLease(item, lease, digest)) return false;
 
       const retryAt = new Date(Math.min(
         item.now.getTime() + 30_000,
@@ -181,7 +181,6 @@ export class AccountMailWorkerRepository {
         eq(accountMailOutbox.id, lease.id),
         eq(accountMailOutbox.leaseTokenDigest, digest),
         eq(accountMailOutbox.attempts, lease.attempt),
-        gt(accountMailOutbox.leaseExpiresAt, sql`clock_timestamp()`),
       )).returning({ id: accountMailOutbox.id });
       return changed.length === 1;
     });
@@ -203,7 +202,7 @@ export class AccountMailWorkerRepository {
     }
     return transaction(async (tx) => {
       const item = await this.lockLiveMail(tx, lease.id);
-      if (!item || !this.owns(item, lease, digest)) return false;
+      if (!item || !this.matchesLease(item, lease, digest)) return false;
 
       const [gate] = await tx.select().from(accountMailQueueGate)
         .where(eq(accountMailQueueGate.singleton, true)).for("update");
@@ -232,7 +231,6 @@ export class AccountMailWorkerRepository {
         eq(accountMailOutbox.id, lease.id),
         eq(accountMailOutbox.leaseTokenDigest, digest),
         eq(accountMailOutbox.attempts, lease.attempt),
-        gt(accountMailOutbox.leaseExpiresAt, sql`clock_timestamp()`),
       )).returning({ id: accountMailOutbox.id });
       if (changed.length !== 1) return false;
 
