@@ -134,6 +134,7 @@ try {
           skipped: result.skipped,
           unsettled: result.unsettled,
           cleaned: result.cleaned,
+          ...(result.providerDeferred === true ? { providerDeferred: true } : {}),
         });
       }
     },
