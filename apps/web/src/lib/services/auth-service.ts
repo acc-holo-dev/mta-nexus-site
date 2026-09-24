@@ -116,7 +116,8 @@ export class AuthService {
         targetId: userWithHash.id,
         targetType: "user",
         details: { email: userWithHash.email },
-      }
+      },
+      userWithHash.passwordHash
     );
 
     return { user: toPublicUser(userWithHash), token };
@@ -150,7 +151,7 @@ export class AuthService {
     currentPassword: string;
     newPassword: string;
     currentToken: string;
-  }): Promise<number> {
+  }): Promise<{ revokedSessionCount: number; token: string; expiresAt: Date }> {
     const user = await userRepository.findById(input.userId);
     if (!user) throw new NotFoundError("User", input.userId);
 
@@ -160,20 +161,23 @@ export class AuthService {
     }
 
     const passwordHash = await hashPassword(input.newPassword);
-    const updated = await userRepository.updatePassword(input.userId, passwordHash);
-    if (!updated) throw new NotFoundError("User", input.userId);
-
-    const revokedCount = await sessionRepository.deleteOtherSessions(input.userId, input.currentToken);
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: input.userId,
-      actorType: "user",
-      action: "user.password_changed",
-      targetId: input.userId,
-      targetType: "user",
-      details: { revokedSessionCount: revokedCount },
+    const token = generateSessionToken();
+    const changed = await authRepository.changePassword({
+      userId: input.userId,
+      expectedPasswordHash: stored.passwordHash,
+      passwordHash,
+      currentToken: input.currentToken,
+      nextToken: token,
+      audit: {
+        id: generateId("aud"),
+        actorId: input.userId,
+        actorType: "user",
+        action: "user.password_changed",
+        targetId: input.userId,
+        targetType: "user",
+      },
     });
-    return revokedCount;
+    return { ...changed, token };
   }
 
   async getCurrentSessionId(token?: string | null): Promise<string | null> {

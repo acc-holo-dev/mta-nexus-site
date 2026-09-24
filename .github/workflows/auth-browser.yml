@@ -15,9 +15,19 @@ concurrency:
 
 jobs:
   account-browser:
-    name: Account access and logout
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: account
+            name: Account access and logout
+          - suite: password
+            name: Password and session security
+    env:
+      NEXUS_ACCOUNT_SUITE: ${{ matrix.suite }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -38,7 +48,7 @@ jobs:
           echo "NEXUS_BROWSER_TOOLS=$tools" >> "$GITHUB_ENV"
           echo "PLAYWRIGHT_BROWSERS_PATH=$PLAYWRIGHT_BROWSERS_PATH" >> "$GITHUB_ENV"
           echo "NEXUS_BROWSER_REPORT_DIR=$RUNNER_TEMP/nexus-auth-report" >> "$GITHUB_ENV"
-      - name: Verify real registration, isolation and revoked-session replay
+      - name: Verify real account security on a fresh database
         id: acceptance
         run: bash scripts/check-auth-browser.sh
       - name: Preserve credential-free textual evidence
@@ -48,32 +58,32 @@ jobs:
           ACCEPTANCE_OUTCOME: ${{ steps.acceptance.outcome }}
         run: |
           report="$RUNNER_TEMP/nexus-auth-report"
+          if [ "$NEXUS_ACCOUNT_SUITE" = password ]; then
+            json_files='password-sessions.json'
+            summary='password-summary.md'
+          else
+            json_files='results.json private-profile.json'
+            summary='summary.md'
+          fi
           if [ "$ACCEPTANCE_OUTCOME" = success ]; then
-            test -s "$report/results.json"
-            test -s "$report/summary.md"
-            test -s "$report/private-profile.json"
+            test -s "$report/$summary"
+            for file in $json_files; do test -s "$report/$file"; done
           fi
-          if [ -f "$report/summary.md" ]; then
-            tee -a "$GITHUB_STEP_SUMMARY" < "$report/summary.md"
+          if [ -f "$report/$summary" ]; then
+            tee -a "$GITHUB_STEP_SUMMARY" < "$report/$summary"
           fi
-          if [ -f "$report/results.json" ]; then cat "$report/results.json"; fi
-          if [ -f "$report/private-profile.json" ]; then
-            {
-              echo
-              echo "## Private profile boundary"
-              echo '```json'
-              cat "$report/private-profile.json"
-              echo
-              echo '```'
-            } | tee -a "$GITHUB_STEP_SUMMARY"
-          fi
+          for file in $json_files; do
+            if [ -f "$report/$file" ]; then
+              { echo; echo '```json'; cat "$report/$file"; echo; echo '```'; } | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
+          done
       - name: Keep optional anonymous-page screenshots
         id: evidence
         if: always()
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: account-browser-${{ github.sha }}
+          name: account-browser-${{ matrix.suite }}-${{ github.sha }}
           path: ${{ runner.temp }}/nexus-auth-report
           if-no-files-found: warn
           retention-days: 3
@@ -81,5 +91,5 @@ jobs:
         if: always() && steps.evidence.outcome == 'failure'
         shell: bash
         run: |
-          echo '::warning::Optional screenshot upload failed; mandatory auth assertions and textual evidence retain their result.'
+          echo '::warning::Optional screenshot upload failed; mandatory assertions and textual evidence retain their result.'
           echo 'WARNING: screenshot upload failed; no image-based visual approval is implied.' >> "$GITHUB_STEP_SUMMARY"
