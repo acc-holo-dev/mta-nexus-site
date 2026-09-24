@@ -13,4 +13,4 @@ assert.equal(worker.environment?.AUTH_SECRET, undefined);
 assert.equal(worker.environment?.ACCOUNT_RECOVERY_ABUSE_KEY, undefined);
 assert.equal(worker.environment?.EMAIL_PROVIDER, undefined);
 assert.equal(worker.environment?.NODE_ENV, "production");
-assert(Array.isArray(worker.command) && worker.command.includes("run-account-mail-dispatcher.ts"));
+assert(Array.isArray(worker.command) && worker.command.some((part) => String(part).endsWith("/run-account-mail-dispatcher.ts")));
