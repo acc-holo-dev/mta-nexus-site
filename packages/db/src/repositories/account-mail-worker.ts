@@ -286,12 +286,19 @@ export class AccountMailWorkerRepository {
     }
     return transaction(async (tx) => {
       const item = await this.lockLiveMail(tx, lease.id);
-      if (!item || !this.owns(item, lease, digest)) return false;
+      // Settlement may arrive just after the nominal lease deadline. Accept it
+      // only while the same token/attempt still owns the row. If another worker
+      // has already reclaimed the expired lease, the token digest no longer
+      // matches and this stale result loses safely.
+      if (!item || !this.matchesLease(item, lease, digest)) return false;
       const retryAt = new Date(item.now.getTime() + retryDelayMs(item.mail.id, item.mail.attempts));
       const retry = outcome === "retry" && item.mail.attempts < ACCOUNT_MAIL_MAX_ATTEMPTS
         && retryAt < item.validUntil;
-      const owned = and(eq(accountMailOutbox.id, lease.id), eq(accountMailOutbox.leaseTokenDigest, digest),
-        eq(accountMailOutbox.attempts, lease.attempt), gt(accountMailOutbox.leaseExpiresAt, sql`clock_timestamp()`));
+      const owned = and(
+        eq(accountMailOutbox.id, lease.id),
+        eq(accountMailOutbox.leaseTokenDigest, digest),
+        eq(accountMailOutbox.attempts, lease.attempt),
+      );
       const changed = retry
         ? await tx.update(accountMailOutbox).set({ availableAt: retryAt,
             leaseTokenDigest: null, leaseExpiresAt: null }).where(owned).returning({ id: accountMailOutbox.id })
@@ -374,10 +381,17 @@ export class AccountMailWorkerRepository {
     });
   }
 
+  private matchesLease(item: NonNullable<Awaited<ReturnType<AccountMailWorkerRepository["lockLiveMail"]>>>,
+    lease: MailLease, digest: string): boolean {
+    return item.mail.leaseTokenDigest === digest
+      && item.mail.attempts === lease.attempt
+      && item.mail.leaseExpiresAt !== null;
+  }
+
   private owns(item: NonNullable<Awaited<ReturnType<AccountMailWorkerRepository["lockLiveMail"]>>>,
     lease: MailLease, digest: string): boolean {
-    return item.mail.leaseTokenDigest === digest && item.mail.attempts === lease.attempt
-      && item.mail.leaseExpiresAt !== null && item.mail.leaseExpiresAt > item.now;
+    return this.matchesLease(item, lease, digest)
+      && item.mail.leaseExpiresAt! > item.now;
   }
 
   private async lockLiveMail(tx: Tx, id: string) {
