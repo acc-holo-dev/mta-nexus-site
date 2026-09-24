@@ -10,7 +10,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # PostgreSQL 18 uses a version-specific PGDATA below this parent.
+      # Existing databases require inventory and backup before changing layout.
+      - pgdata:/var/lib/postgresql
 
 volumes:
   pgdata:

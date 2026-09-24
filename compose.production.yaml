@@ -19,7 +19,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: ${POSTGRES_DB:-mta_nexus}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # PostgreSQL 18 uses a version-specific PGDATA below this parent.
+      # Existing databases require inventory and backup before changing layout.
+      - pgdata:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
