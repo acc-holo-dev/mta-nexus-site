@@ -3,12 +3,24 @@
 services:
   mail-worker:
     image: ${NEXUS_MAIL_IMAGE:?set NEXUS_MAIL_IMAGE to the approved application image}
+    user: node
+    init: true
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
     stop_signal: SIGTERM
-    stop_grace_period: 45s
+    stop_grace_period: 75s
     command: ["node", "--import", "tsx", "packages/db/scripts/run-account-mail-dispatcher.ts", "--ready"]
     environment:
       NODE_ENV: production
+      HOME: /tmp
+      TMPDIR: /tmp
       DATABASE_URL: postgres://${POSTGRES_USER:-nexus}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mta_nexus}
       ACCOUNT_MAIL_KEY_ID: ${ACCOUNT_MAIL_KEY_ID:?set ACCOUNT_MAIL_KEY_ID}
       ACCOUNT_MAIL_KEY: ${ACCOUNT_MAIL_KEY:-}
