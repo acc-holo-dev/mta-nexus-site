@@ -15,6 +15,12 @@ let failed = false;
 try {
   const config = readAccountMailRuntimeConfig();
   const dispatcher = createAccountMailDispatcher(config);
+  if (process.argv.includes("--ready")) {
+    process.stdout.write(JSON.stringify({
+      status: "ready",
+      config: runtimeFingerprint(config),
+    }) + "\n");
+  }
   const summary = await runAccountMailLoop({
     dispatcher,
     signal: controller.signal,
