@@ -15,6 +15,18 @@ export type PreparedAccountMail = Readonly<MailContext & MailPayload & { sendBef
 export const ACCOUNT_MAIL_MAX_ATTEMPTS = 5;
 const leaseMs = 60_000;
 const backoffMs = [5_000, 30_000, 120_000, 300_000] as const;
+
+function retryDelayMs(id: string, attempt: number): number {
+  const base = backoffMs[Math.min(Math.max(attempt - 1, 0), backoffMs.length - 1)];
+  const digest = createHash("sha256")
+    .update(`nexus:account-mail-backoff:v1\0${id}\0${attempt}`)
+    .digest();
+  // Stable 80–120% spread prevents a provider outage from making every row
+  // eligible on the same second, while keeping the schedule deterministic.
+  const fraction = digest.readUInt32BE(0) / 0xffffffff;
+  const factor = 0.8 + fraction * 0.4;
+  return Math.max(1_000, Math.round(base * factor));
+}
 const availableLease = () => or(isNull(accountMailOutbox.leaseExpiresAt),
   lte(accountMailOutbox.leaseExpiresAt, sql`clock_timestamp()`));
 function checkId(id: string) {
@@ -137,7 +149,7 @@ export class AccountMailWorkerRepository {
     return transaction(async (tx) => {
       const item = await this.lockLiveMail(tx, lease.id);
       if (!item || !this.owns(item, lease, digest)) return false;
-      const retryAt = new Date(item.now.getTime() + backoffMs[Math.min(item.mail.attempts - 1, 3)]);
+      const retryAt = new Date(item.now.getTime() + retryDelayMs(item.mail.id, item.mail.attempts));
       const retry = outcome === "retry" && item.mail.attempts < ACCOUNT_MAIL_MAX_ATTEMPTS
         && retryAt < item.validUntil;
       const owned = and(eq(accountMailOutbox.id, lease.id), eq(accountMailOutbox.leaseTokenDigest, digest),
