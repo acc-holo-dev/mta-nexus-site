@@ -18,7 +18,9 @@ function readProof(): Proof | null {
   const challengeId = url.searchParams.get("challenge") ?? "";
   const fragment = new URLSearchParams(url.hash.startsWith("#") ? url.hash.slice(1) : url.hash);
   const token = fragment.get("token") ?? "";
-  window.history.replaceState(null, "", url.pathname + url.search);
+  // Keep both the secret fragment and correlation-only challenge ID out of
+  // browser history/referrers after the proof has been copied into memory.
+  window.history.replaceState(null, "", url.pathname);
   if (!/^ach_[A-Za-z0-9_-]{1,96}$/.test(challengeId) || !/^[A-Za-z0-9_-]{43}$/.test(token)) return null;
   return { challengeId, token };
 }
@@ -53,7 +55,12 @@ export default function ResetPasswordPage() {
       });
       const data = await response.json().catch(() => null);
       if (!response.ok || data?.success !== true) {
-        throw new Error(data?.error || "Invalid or expired password reset");
+        if (response.status >= 400 && response.status < 500) {
+          setPasswords({ next: "", confirm: "" });
+          setState({ kind: "invalid" });
+          return;
+        }
+        throw new Error(data?.error || "Could not reset the password.");
       }
       setPasswords({ next: "", confirm: "" });
       setState({ kind: "success" });
