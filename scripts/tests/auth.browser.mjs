@@ -20,6 +20,7 @@ const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
 const execute = promisify(execFile);
 const nonce = randomBytes(5).toString('hex');
 const password = `Ci-${randomBytes(24).toString('hex')}`;
+const resetPassword = `Reset-${randomBytes(24).toString('hex')}`;
 const people = ['a', 'b'].map((suffix) => ({
   username: `beta_${suffix}_${nonce}`, email: `beta-${suffix}-${nonce}@example.invalid`, password,
 }));
@@ -94,7 +95,7 @@ async function request(actor, path, method = 'GET', body) {
   }, { path, method, body });
 }
 
-async function readSyntheticVerificationProof(email) {
+async function readSyntheticProof(email, purpose = 'email_verify') {
   const { stdout, stderr } = await execute('docker', [
     'exec',
     '-e', 'GITHUB_ACTIONS=true',
@@ -104,6 +105,7 @@ async function readSyntheticVerificationProof(email) {
     'node', '--import', 'tsx',
     'packages/db/scripts/read-account-email-verification-ci.ts',
     email,
+    purpose,
   ], { timeout: 30_000, maxBuffer: 16 * 1024 });
   assert.equal(stderr, '', 'CI proof reader must not emit diagnostics');
   const proof = JSON.parse(stdout);
@@ -184,7 +186,7 @@ check('D3-01 recovery email enrollment requires password and one-time browser co
     'Request response must not expose confirmation identifiers or tokens');
   await expect(alice.page.getByRole('status')).toContainText('Verification email queued');
 
-  const proof = await readSyntheticVerificationProof(people[0].email);
+  const proof = await readSyntheticProof(people[0].email);
   const foreign = await request(bob, '/api/auth/email-verification', 'PATCH', proof);
   assert.equal(foreign.status, 401, 'Another signed-in account cannot consume this proof');
 
@@ -350,3 +352,75 @@ check('J2-10 keyboard and narrow login form plus agent-browser snapshot', async 
     await execute(agent, [...args, 'close'], { timeout: 10_000 }).catch(() => {});
   }
 });
+
+check('D4-01 anonymous neutral request and one-time password reset', async () => {
+  const resetSessionA = await actor();
+  const resetSessionB = await actor();
+  for (const who of [resetSessionA, resetSessionB]) {
+    const logged = await request(who, '/api/auth/login', 'POST', { email: people[0].email, password });
+    assert.equal(logged.status, 200);
+    assert.equal((await request(who, '/api/auth/session')).data.user.id, aliceUser.id);
+  }
+
+  await guest.page.setViewportSize({ width: 390, height: 844 });
+  await guest.page.goto('/auth/forgot-password');
+  await expect(guest.page.getByRole('heading', { name: 'Forgot password', exact: true })).toBeVisible();
+
+  async function forgot(email) {
+    await guest.page.getByLabel('Email address', { exact: true }).fill(email);
+    const started = Date.now();
+    const responsePromise = guest.page.waitForResponse((response) =>
+      response.url().endsWith('/api/auth/password-reset') && response.request().method() === 'POST');
+    await guest.page.getByRole('button', { name: 'Send reset link', exact: true }).click();
+    const response = await responsePromise;
+    const elapsed = Date.now() - started;
+    const body = await response.json();
+    assert.equal(response.status(), 202);
+    assert.deepEqual(body, {
+      accepted: true,
+      message: 'If an eligible account uses that email, a password reset link will be sent.',
+    });
+    assert(elapsed >= 300, 'Neutral reset response must respect the timing floor');
+    await expect(guest.page.getByRole('status')).toContainText('If an eligible account uses that email');
+    return { elapsed, body };
+  }
+
+  const missing = await forgot(`missing-reset-${nonce}@example.invalid`);
+  const known = await forgot(people[0].email);
+  assert.deepEqual(known.body, missing.body, 'Known and unknown addresses must receive the same public body');
+
+  const proof = await readSyntheticProof(people[0].email, 'password_reset');
+  await guest.page.goto(`/auth/reset-password?challenge=${encodeURIComponent(proof.challengeId)}#token=${encodeURIComponent(proof.token)}`);
+  await expect(guest.page.getByRole('heading', { name: 'Reset password', exact: true })).toBeVisible();
+  await guest.page.waitForFunction(() => location.hash === '');
+  const retained = await guest.page.evaluate(() => JSON.stringify({
+    local: { ...localStorage }, session: { ...sessionStorage }, url: location.href, text: document.body.innerText,
+  }));
+  assert(!retained.includes(proof.token), 'Reset token must not be rendered or persisted in browser storage/URL');
+  assert.equal((await request(resetSessionA, '/api/auth/session')).data.user.id, aliceUser.id,
+    'Opening the reset page must not mutate credentials or sessions');
+
+  await guest.page.getByLabel('New password', { exact: true }).fill(resetPassword);
+  await guest.page.getByLabel('Confirm new password', { exact: true }).fill(resetPassword);
+  await guest.page.getByRole('button', { name: 'Reset password', exact: true }).focus();
+  await guest.page.keyboard.press('Enter');
+  await expect(guest.page.getByRole('status')).toContainText('Password reset. All existing sessions were signed out.');
+  assert(await guest.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+    'Reset page should not overflow a narrow viewport');
+
+  const anonymousAfterReset = await request(guest, '/api/auth/session');
+  assert.equal(anonymousAfterReset.data.authenticated, false, 'Reset must not automatically sign in the browser');
+  assert(!(await guest.context.cookies()).some((item) => item.name === 'nexus_session'),
+    'Reset confirmation must not issue a session cookie');
+  for (const who of [resetSessionA, resetSessionB]) {
+    assert.equal((await request(who, '/api/auth/sessions')).status, 401, 'All pre-reset sessions must be revoked');
+  }
+  assert.equal((await request(guest, '/api/auth/login', 'POST', { email: people[0].email, password })).status, 401,
+    'Old password must stop working');
+  assert.equal((await request(guest, '/api/auth/login', 'POST', { email: people[0].email, password: resetPassword })).status, 200,
+    'New password must require an explicit normal login');
+  assert.equal((await request(guest, '/api/auth/password-reset', 'PATCH', {
+    challengeId: proof.challengeId, token: proof.token, newPassword: `Replay-${resetPassword}`,
+  })).status, 401, 'Consumed reset proof cannot replay');
+});
+

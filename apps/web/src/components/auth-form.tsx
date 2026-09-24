@@ -91,7 +91,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
           {loading ? (registering ? "Creating account..." : "Signing in...") : (registering ? "Create account" : "Sign In")}
         </button>
       </form>
-      <p className="text-sm text-muted">{registering ? "Already have an account? " : "New to MTA Nexus? "}<Link href={registering ? "/auth/login" : "/auth/register"} className="font-semibold text-accent underline">{registering ? "Sign In" : "Create an account"}</Link></p>
+      <div className="space-y-2 text-sm text-muted">
+        {!registering && <p><Link href="/auth/forgot-password" className="font-semibold text-accent underline">Forgot password?</Link></p>}
+        <p>{registering ? "Already have an account? " : "New to MTA Nexus? "}<Link href={registering ? "/auth/login" : "/auth/register"} className="font-semibold text-accent underline">{registering ? "Sign In" : "Create an account"}</Link></p>
+      </div>
     </div>
   );
 }

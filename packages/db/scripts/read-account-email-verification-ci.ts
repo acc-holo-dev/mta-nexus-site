@@ -1,4 +1,4 @@
-import { eq, desc } from "drizzle-orm";
+import { and, eq, desc } from "drizzle-orm";
 import { db, closeDatabaseConnection } from "../src/client";
 import { users } from "../src/schema";
 import { authChallenges } from "../src/account-recovery-schema";
@@ -11,8 +11,12 @@ if (process.env.GITHUB_ACTIONS !== "true"
   throw new Error("Refusing account mail test read outside disposable CI");
 }
 const email = process.argv[2]?.toLowerCase();
+const purpose = process.argv[3] ?? "email_verify";
 if (!email || !email.endsWith("@example.invalid")) {
   throw new Error("Synthetic CI recipient required");
+}
+if (purpose !== "email_verify" && purpose !== "password_reset") {
+  throw new Error("Synthetic CI purpose required");
 }
 
 try {
@@ -22,7 +26,7 @@ try {
     id: authChallenges.id,
     expiresAt: authChallenges.expiresAt,
   }).from(authChallenges)
-    .where(eq(authChallenges.userId, user.id))
+    .where(and(eq(authChallenges.userId, user.id), eq(authChallenges.purpose, purpose)))
     .orderBy(desc(authChallenges.createdAt))
     .limit(1);
   if (!challenge) throw new Error("Synthetic CI challenge not found");
