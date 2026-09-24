@@ -10,7 +10,7 @@ const audit = (userId: string, id = generateId("aud")) => ({
   action: "user.password_changed", targetId: userId, targetType: "user",
 });
 async function account() {
-  const username = `pw_${generateId("t").slice(-18)}`;
+  const username = `pw_${generateId("usr").slice(-18)}`;
   const input = { username, email: `${username}@example.invalid`, password: oldPassword };
   const first = await authService.register(input);
   const second = await authService.login(input);
