@@ -24,6 +24,25 @@ export class AccountPasswordResetRepository {
     return { challengeId: queued.challengeId, expiresAt: queued.expiresAt };
   }
 
+  async assertLiveProof(input: {
+    challengeId: string;
+    token: string;
+  }): Promise<void> {
+    const tokenDigest = digestAccountChallenge("password_reset", input.token);
+    const [candidate] = await db.select({ id: authChallenges.id })
+      .from(authChallenges)
+      .where(and(
+        eq(authChallenges.id, input.challengeId),
+        eq(authChallenges.purpose, "password_reset"),
+        eq(authChallenges.tokenDigest, tokenDigest),
+        sql`${authChallenges.consumedAt} is null`,
+        sql`${authChallenges.revokedAt} is null`,
+        sql`${authChallenges.expiresAt} > clock_timestamp()`,
+      ))
+      .limit(1);
+    if (!candidate) throw invalid();
+  }
+
   async confirm(input: {
     challengeId: string;
     token: string;
