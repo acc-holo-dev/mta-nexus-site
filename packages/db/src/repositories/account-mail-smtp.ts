@@ -124,6 +124,13 @@ function advertisesStartTls(lines: string[]): boolean {
   return lines.some((line) => /^STARTTLS(?:\s|$)/i.test(line.trim()));
 }
 
+function advertisesAuthPlain(lines: string[]): boolean {
+  return lines.some((line) => {
+    const match = /^AUTH(?:=|\s+)(.*)$/i.exec(line.trim());
+    return Boolean(match?.[1]?.split(/\s+/).some((mechanism) => mechanism.toUpperCase() === "PLAIN"));
+  });
+}
+
 // SMTP transport for account recovery mail. It supports either implicit TLS
 // or mandatory STARTTLS upgrade. AUTH/envelope/message data are never sent on
 // the plaintext side of a STARTTLS connection. There is no plaintext fallback.
@@ -144,6 +151,7 @@ export class AccountMailSmtpTransport {
     if (remaining <= 0) return { outcome: "retry", uncertain: false };
     const budget = Math.max(1, Math.min(this.#timeoutMs, remaining));
     let dataSent = false;
+    let capabilities: string[] = [];
     let session: SmtpSession | null = null;
     let socket: net.Socket | null = null;
 
@@ -172,6 +180,7 @@ export class AccountMailSmtpTransport {
         const ehlo = await command(session, `EHLO ${this.#options.servername}`);
         result = requireStage(ehlo.code, 250);
         if (result) return result;
+        capabilities = ehlo.lines;
       } else {
         const plain = net.connect({
           host: this.#options.host,
@@ -215,11 +224,15 @@ export class AccountMailSmtpTransport {
         const secureEhlo = await command(session, `EHLO ${this.#options.servername}`);
         result = requireStage(secureEhlo.code, 250);
         if (result) return result;
+        capabilities = secureEhlo.lines;
       }
 
       if (!session) throw new Error("SMTP session unavailable");
 
       if (this.#options.username && this.#options.password) {
+        if (!advertisesAuthPlain(capabilities)) {
+          return { outcome: "discard", uncertain: false };
+        }
         const auth = Buffer.from(
           `\0${this.#options.username}\0${this.#options.password}`,
           "utf8",
