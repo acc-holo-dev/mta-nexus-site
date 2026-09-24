@@ -6,8 +6,8 @@ import {
   auditRepository,
   accountEmailEnrollmentRepository,
   accountRecoveryAbuseLimitRepository,
-  createAccountMailProducerCipher,
-  readAccountRecoveryAbuseKey,
+  getPinnedAccountMailProducerCipher,
+  getPinnedAccountRecoveryAbuseKey,
   accountPasswordResetRepository,
 } from "@nexus/db";
 import {
@@ -209,7 +209,7 @@ export class AuthService {
     const limit = await accountRecoveryAbuseLimitRepository.consume({
       scope: "email_verify_request",
       subject: `user:${input.userId}`,
-      key: readAccountRecoveryAbuseKey(),
+      key: getPinnedAccountRecoveryAbuseKey(),
       limit: 5,
       windowSeconds: 3600,
     });
@@ -225,7 +225,7 @@ export class AuthService {
       currentToken: input.currentToken,
       expectedPasswordHash: stored.passwordHash,
       auditId: generateId("aud"),
-      cipher: createAccountMailProducerCipher(),
+      cipher: getPinnedAccountMailProducerCipher(),
     });
     return { accepted: true, alreadyVerified: false, challengeId: queued.challengeId, expiresAt: queued.expiresAt };
   }
@@ -258,8 +258,8 @@ export class AuthService {
   }): Promise<{ accepted: true }> {
     // Read dedicated configuration before account lookup so missing production
     // wiring cannot reveal whether a valid address exists.
-    const cipher = createAccountMailProducerCipher();
-    const abuseKey = readAccountRecoveryAbuseKey();
+    const cipher = getPinnedAccountMailProducerCipher();
+    const abuseKey = getPinnedAccountRecoveryAbuseKey();
     const email = input.email.trim().toLowerCase();
     const abuseEmail = normalizeEmailForAbuse(input.email);
     const ip = input.ip.trim() || "unknown";
