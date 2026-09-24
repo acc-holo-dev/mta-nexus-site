@@ -9,6 +9,7 @@ export type AccountMailRuntimeConfig = Readonly<{
   appUrl: string;
   previousKeyId?: string;
   smtpHost: string;
+  smtpMode: "implicit_tls" | "starttls";
   smtpPort: number;
   smtpServername: string;
   smtpFrom: string;
@@ -98,6 +99,11 @@ export function readAccountMailRuntimeConfig(
     throw new Error("Invalid account mail application URL");
   }
   const smtpHost = required(env, "ACCOUNT_MAIL_SMTP_HOST");
+  const smtpModeRaw = env.ACCOUNT_MAIL_SMTP_MODE || "implicit_tls";
+  if (smtpModeRaw !== "implicit_tls" && smtpModeRaw !== "starttls") {
+    throw new Error("Invalid account mail SMTP mode");
+  }
+  const smtpMode = smtpModeRaw;
   const smtpServername = required(env, "ACCOUNT_MAIL_SMTP_SERVERNAME");
   const smtpFrom = required(env, "ACCOUNT_MAIL_SMTP_FROM");
   const smtpUsername = env.ACCOUNT_MAIL_SMTP_USERNAME || undefined;
@@ -113,7 +119,14 @@ export function readAccountMailRuntimeConfig(
     previousKeyId,
     appUrl: parsedUrl.toString().replace(/\/$/, ""),
     smtpHost,
-    smtpPort: integer(env.ACCOUNT_MAIL_SMTP_PORT, 465, 1, 65535, "ACCOUNT_MAIL_SMTP_PORT"),
+    smtpMode,
+    smtpPort: integer(
+      env.ACCOUNT_MAIL_SMTP_PORT,
+      smtpMode === "starttls" ? 587 : 465,
+      1,
+      65535,
+      "ACCOUNT_MAIL_SMTP_PORT",
+    ),
     smtpServername,
     smtpFrom,
     smtpUsername,
@@ -129,7 +142,8 @@ export function createAccountMailDispatcher(config: AccountMailRuntimeConfig): A
   const cipher = new AccountMailCipher(config.activeKeyId, config.keys);
   const transport = new AccountMailSmtpTransport({
     host: config.smtpHost, port: config.smtpPort, servername: config.smtpServername,
-    from: config.smtpFrom, username: config.smtpUsername, password: config.smtpPassword,
+    from: config.smtpFrom, mode: config.smtpMode,
+    username: config.smtpUsername, password: config.smtpPassword,
     ca: config.smtpCa, timeoutMs: config.smtpTimeoutMs,
   });
   return new AccountMailDispatcher({ cipher, transport, appUrl: config.appUrl });
@@ -189,7 +203,7 @@ export async function runAccountMailLoop(input: {
 export function runtimeFingerprint(config: AccountMailRuntimeConfig): string {
   return createHash("sha256").update(JSON.stringify({
     keyId: config.activeKeyId, keyRingSize: Object.keys(config.keys).length,
-    appUrl: config.appUrl, smtpHost: config.smtpHost,
+    appUrl: config.appUrl, smtpHost: config.smtpHost, smtpMode: config.smtpMode,
     smtpPort: config.smtpPort, smtpServername: config.smtpServername, smtpFrom: config.smtpFrom,
     smtpAuth: Boolean(config.smtpUsername), smtpTimeoutMs: config.smtpTimeoutMs, batchSize: config.batchSize, pollIntervalMs: config.pollIntervalMs,
   })).digest("hex").slice(0, 16);
