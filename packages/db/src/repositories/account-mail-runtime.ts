@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { lstatSync, readFileSync } from "node:fs";
+import { closeSync, constants, fstatSync, openSync, readSync } from "node:fs";
 import { isAbsolute } from "node:path";
 import { AccountMailCipher } from "./account-mail-crypto";
 import { AccountMailDispatcher } from "./account-mail-dispatcher";
@@ -54,19 +54,35 @@ function secretSource(
     throw new Error(`Invalid ${label} file path`);
   }
 
+  const maxBytes = options.maxBytes ?? 4096;
   let bytes: Buffer;
   try {
-    const stat = lstatSync(file);
-    if (!stat.isFile() || stat.isSymbolicLink() || (stat.mode & 0o002) !== 0) {
-      throw new Error("unsafe secret file");
+    // Open once: validating a path and reading it later can observe different
+    // files if a secret is rotated or the path is replaced between operations.
+    // O_NONBLOCK also keeps a replaced FIFO from hanging startup.
+    const fd = openSync(file, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+    try {
+      const stat = fstatSync(fd);
+      if (!stat.isFile() || (stat.mode & 0o002) !== 0
+        || stat.size < 1 || stat.size > maxBytes) {
+        throw new Error("unsafe secret file");
+      }
+      const buffer = Buffer.alloc(maxBytes + 1);
+      let length = 0;
+      while (length < buffer.length) {
+        const count = readSync(fd, buffer, length, buffer.length - length, null);
+        if (count === 0) break;
+        length += count;
+      }
+      if (length < 1 || length > maxBytes) {
+        throw new Error("unsafe secret file size");
+      }
+      bytes = buffer.subarray(0, length);
+    } finally {
+      closeSync(fd);
     }
-    bytes = readFileSync(file);
   } catch {
     throw new Error(`Could not read safe ${label} file`);
-  }
-  const maxBytes = options.maxBytes ?? 4096;
-  if (bytes.length < 1 || bytes.length > maxBytes) {
-    throw new Error(`Invalid ${label} file size`);
   }
   const value = bytes.toString("utf8").replace(/\r?\n$/, "");
   if (!value || value.includes("\0")) throw new Error(`Invalid ${label} file contents`);
