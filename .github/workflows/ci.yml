@@ -73,3 +73,19 @@ jobs:
 
       - name: Build production image
         run: docker build --tag mta-nexus:ci .
+
+  postgres-persistence:
+    name: PostgreSQL persistence
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26.0.0
+      - name: Check persistence test isolation
+        run: node --test scripts/tests/postgres-persistence.test.mjs
+      - name: Recreate PostgreSQL with its named volume
+        run: node scripts/check-postgres-persistence.mjs
