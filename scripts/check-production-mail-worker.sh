@@ -45,7 +45,7 @@ seed=$(NEXUS_D5_MAIL_SEED=true NEXUS_D5_TEST_PASSWORD="$test_password" \
   ACCOUNT_RECOVERY_ABUSE_KEY="$abuse_key" \
   node --import tsx packages/db/scripts/seed-account-mail-ci.ts)
 challenge=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ach_/.test(x.challengeId)) process.exit(1); process.stdout.write(x.challengeId)' "$seed")
-mail=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^aml_/.test(x.mailId)) process.exit(1); process.stdout.write(x.mailId)' "$seed")
+mail=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ame_/.test(x.mailId)) process.exit(1); process.stdout.write(x.mailId)' "$seed")
 
 echo 'D5 phase: resolve closed TLS receiver'
 smtp_host=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$receiver")
