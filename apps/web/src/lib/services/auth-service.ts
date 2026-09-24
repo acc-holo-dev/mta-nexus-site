@@ -4,6 +4,10 @@ import {
   organizationRepository,
   authRepository,
   auditRepository,
+  accountEmailEnrollmentRepository,
+  accountRecoveryAbuseLimitRepository,
+  createAccountMailProducerCipher,
+  readAccountRecoveryAbuseKey,
 } from "@nexus/db";
 import { generateId, generateSessionToken, hashPassword, verifyPassword } from "@nexus/security";
 import {
@@ -11,6 +15,7 @@ import {
   UnauthorizedError,
   ConflictError,
   ForbiddenError,
+  RateLimitExceededError,
 } from "@nexus/domain";
 import type { User } from "@nexus/domain";
 
@@ -178,6 +183,66 @@ export class AuthService {
       },
     });
     return { ...changed, token };
+  }
+
+  async getRecoveryEmailStatus(userId: string) {
+    return accountEmailEnrollmentRepository.status(userId);
+  }
+
+  async requestRecoveryEmailVerification(input: {
+    userId: string;
+    currentToken: string;
+    currentPassword: string;
+  }): Promise<{ accepted: boolean; alreadyVerified: boolean; challengeId?: string; expiresAt?: Date }> {
+    const status = await accountEmailEnrollmentRepository.status(input.userId);
+    if (!status) throw new NotFoundError("User", input.userId);
+    if (!status.eligible) throw new ForbiddenError("Recovery email verification is unavailable for this account");
+    if (status.verified) return { accepted: false, alreadyVerified: true };
+
+    const limit = await accountRecoveryAbuseLimitRepository.consume({
+      scope: "email_verify_request",
+      subject: `user:${input.userId}`,
+      key: readAccountRecoveryAbuseKey(),
+      limit: 5,
+      windowSeconds: 3600,
+    });
+    if (!limit.success) throw new RateLimitExceededError("Too many email verification attempts. Please try again later.");
+
+    const stored = await userRepository.findByEmail(status.email);
+    if (!stored?.passwordHash || !(await verifyPassword(input.currentPassword, stored.passwordHash))) {
+      throw new UnauthorizedError("Current password is incorrect");
+    }
+
+    const queued = await accountEmailEnrollmentRepository.request({
+      userId: input.userId,
+      currentToken: input.currentToken,
+      expectedPasswordHash: stored.passwordHash,
+      auditId: generateId("aud"),
+      cipher: createAccountMailProducerCipher(),
+    });
+    return { accepted: true, alreadyVerified: false, challengeId: queued.challengeId, expiresAt: queued.expiresAt };
+  }
+
+  async confirmRecoveryEmailVerification(input: {
+    userId: string;
+    currentToken: string;
+    challengeId: string;
+    token: string;
+  }): Promise<{ email: string; verifiedAt: Date }> {
+    const status = await accountEmailEnrollmentRepository.status(input.userId);
+    if (!status) throw new NotFoundError("User", input.userId);
+    if (!status.eligible) throw new ForbiddenError("Recovery email verification is unavailable for this account");
+    const stored = await userRepository.findByEmail(status.email);
+    if (!stored?.passwordHash) throw new ForbiddenError("Recovery email verification is unavailable for this account");
+    return accountEmailEnrollmentRepository.confirm({
+      userId: input.userId,
+      currentToken: input.currentToken,
+      expectedPasswordHash: stored.passwordHash,
+      challengeId: input.challengeId,
+      token: input.token,
+      consumeAuditId: generateId("aud"),
+      bindingAuditId: generateId("aud"),
+    });
   }
 
   async getCurrentSessionId(token?: string | null): Promise<string | null> {

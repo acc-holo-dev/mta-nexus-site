@@ -35,6 +35,15 @@ export const changePasswordSchema = z
     }
   });
 
+export const requestRecoveryEmailVerificationSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required").max(128),
+}).strict();
+
+export const confirmRecoveryEmailVerificationSchema = z.object({
+  challengeId: z.string().min(1).max(100).regex(/^ach_[A-Za-z0-9_-]+$/, "Invalid confirmation identifier"),
+  token: z.string().length(43).regex(/^[A-Za-z0-9_-]+$/, "Invalid confirmation token"),
+}).strict();
+
 export const notificationPreferencesSchema = z
   .object({
     followsEnabled: z.boolean().optional(),

@@ -48,6 +48,19 @@ export function readAccountRecoveryAbuseKey(
   return decodeKey(raw, "account recovery abuse key");
 }
 
+export function createAccountMailProducerCipher(
+  env: Record<string, string | undefined> = process.env,
+): AccountMailCipher {
+  const rawKey = required(env, "ACCOUNT_MAIL_KEY");
+  if (env.AUTH_SECRET && rawKey === env.AUTH_SECRET) {
+    throw new Error("Account mail encryption key must not reuse AUTH_SECRET");
+  }
+  const activeKeyId = required(env, "ACCOUNT_MAIL_KEY_ID");
+  if (!/^[A-Za-z0-9_-]{1,32}$/.test(activeKeyId)) throw new Error("Invalid account mail key identifier");
+  const activeKey = decodeKey(rawKey, "account mail encryption key");
+  return new AccountMailCipher(activeKeyId, Object.freeze({ [activeKeyId]: activeKey }));
+}
+
 export function readAccountMailRuntimeConfig(
   env: Record<string, string | undefined> = process.env,
 ): AccountMailRuntimeConfig {
