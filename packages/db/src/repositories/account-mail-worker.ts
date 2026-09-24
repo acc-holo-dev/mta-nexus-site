@@ -170,14 +170,43 @@ export class AccountMailWorkerRepository {
     checkLimit(limit);
     return transaction(async (tx) => {
       // Terminal cleanup needs only outbox locks and never acquires parent locks.
-      const rows = await tx.select({ id: accountMailOutbox.id }).from(accountMailOutbox).where(or(
+      // It must still leave a non-sensitive audit trail when a crashed worker
+      // never reached explicit settle on the final attempt.
+      const now = await clock(tx);
+      const rows = await tx.select({
+        id: accountMailOutbox.id,
+        attempts: accountMailOutbox.attempts,
+        expiresAt: accountMailOutbox.expiresAt,
+      }).from(accountMailOutbox).where(or(
         lte(accountMailOutbox.expiresAt, sql`clock_timestamp()`),
         and(eq(accountMailOutbox.attempts, ACCOUNT_MAIL_MAX_ATTEMPTS), availableLease())
       )).orderBy(accountMailOutbox.expiresAt, accountMailOutbox.id).limit(limit)
         .for("update", { skipLocked: true });
       if (!rows.length) return 0;
+
       const removed = await tx.delete(accountMailOutbox)
-        .where(inArray(accountMailOutbox.id, rows.map((row) => row.id))).returning({ id: accountMailOutbox.id });
+        .where(inArray(accountMailOutbox.id, rows.map((row) => row.id)))
+        .returning({ id: accountMailOutbox.id });
+      if (!removed.length) return 0;
+
+      const removedIds = new Set(removed.map((row) => row.id));
+      const terminal = rows.filter((row) => removedIds.has(row.id));
+      await tx.insert(auditEvents).values(terminal.map((row) => {
+        const expired = row.expiresAt <= now;
+        return {
+          id: `aud_${randomUUID()}`,
+          actorId: "system:account-mail-worker",
+          actorType: "system" as const,
+          action: expired ? "auth.mail_expired" : "auth.mail_attempts_exhausted",
+          targetId: row.id,
+          targetType: "account_mail",
+          details: {
+            attempts: row.attempts,
+            terminalReason: expired ? "expired" : "attempts_exhausted",
+          },
+          createdAt: sql`clock_timestamp()`,
+        };
+      }));
       return removed.length;
     });
   }
