@@ -114,7 +114,7 @@ D3a впервые стал полностью зелёным на `3ade27dec7e9
 - `06ac564`: новый recovery form добавил второй accessible label `Current password`, и строгие старые password-browser locators стали неоднозначными. Финальный `6894251` сузил только старые locators к форме `Change password`; продуктовый label и security contract не ослаблялись.
 - `81656e7`: полный зелёный результат.
 
-**Production rollout не выполнен.** Основной `compose.production.yaml` всё ещё не передаёт `ACCOUNT_MAIL_KEY`/`ACCOUNT_RECOVERY_ABUSE_KEY`, держит `EMAIL_PROVIDER=disabled` и не запускает standalone dispatcher. Поэтому D3 не доказывает real inbox delivery, provider AUTH/TLS, VDS secret storage, key rotation или эксплуатационную доставку.
+**Production rollout не выполнен.** Основной `compose.production.yaml` по-прежнему fail-closed: он не передаёт recovery keys и не запускает standalone dispatcher. D5 добавил только opt-in overlays: `compose.recovery.yaml` даёт app active mail key + abuse key, а `compose.mail-worker.yaml` даёт worker active/previous mail keys + SMTP settings без abuse key/AUTH_SECRET. Эти overlays не включаются основным production Compose автоматически и ещё не имеют исполнившегося D5 CI acceptance.
 
 ## 9. D4 — anonymous forgot-password и proof-confirmed reset
 
@@ -141,6 +141,6 @@ CI-only proof reader остаётся жёстко ограниченным GitH
 
 **Ограничения D4:** нет real provider/inbox delivery, production mail keys, supervised dispatcher/service manager, production secret storage/rotation, полноценного статистического timing-enumeration/load теста, privileged/MFA recovery, legacy rollout, RU/EN или manual visual acceptance. In-app security notification не равна доставленному внешнему уведомлению.
 
-**Следующий D5:** эксплуатационная сквозная приёмка recovery delivery и rollout policy — реальный provider/AUTH/TLS режим, supervised worker, secret/key lifecycle, inbox delivery, очереди/повторы/наблюдаемость, backup/restore implications и явные правила privileged/MFA/legacy accounts. До этого production recovery остаётся fail-closed.
+**D5 в работе:** реализованы opt-in producer/worker wiring, synthetic SMTP AUTH PLAIN capability, crash/restart harness и active+previous key rotation window. Последний принятый recovery SHA остаётся D4 `bb1ea0aaff2ce0909499ba822c389e44840ab9fa`: текущие D5 GitHub jobs завершаются до выделения runner (`steps: null`), поэтому эти изменения не считаются проверенными. Следующий D5e — полный исполняемый CI на точном D5 SHA, затем real provider/inbox, host secret lifecycle и rollout policy.
 
 Основания: [PostgreSQL 18 locking](https://www.postgresql.org/docs/18/explicit-locking.html), [SELECT/SKIP LOCKED](https://www.postgresql.org/docs/18/sql-select.html), [wall-clock time](https://www.postgresql.org/docs/18/functions-datetime.html), [Drizzle transactions](https://orm.drizzle.team/docs/transactions). Сверены 2026-09-24; внешняя документация не заменяет проверку реализации. Источники D0/D1/D2a сохранены в закреплённых документах выше.
