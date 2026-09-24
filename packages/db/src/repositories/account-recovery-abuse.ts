@@ -45,7 +45,8 @@ export class AccountRecoveryAbuseLimitRepository {
         await tx.execute(sql`
           insert into "account_recovery_abuse_limits"
             ("scope","subject_digest","count","window_started_at","expires_at")
-          values (${input.scope}, ${subjectDigest}, 1, ${now}, ${resetAt})
+          values (${input.scope}, ${subjectDigest}, 1,
+            ${now.toISOString()}::timestamptz, ${resetAt.toISOString()}::timestamptz)
           on conflict ("scope","subject_digest") do update
           set "count" = 1, "window_started_at" = excluded."window_started_at",
               "expires_at" = excluded."expires_at"
