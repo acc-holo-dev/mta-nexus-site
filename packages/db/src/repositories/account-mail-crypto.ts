@@ -10,6 +10,14 @@ export type SealedMail = Readonly<{
   version: 1; keyId: string; nonce: string; ciphertext: string; tag: string;
 }>;
 const keyIdPattern = /^[A-Za-z0-9_-]{1,32}$/;
+
+export class AccountMailKeyUnavailableError extends Error {
+  constructor() {
+    super("Account mail encryption key is unavailable");
+    this.name = "AccountMailKeyUnavailableError";
+  }
+}
+
 const invalid = () => new Error("Invalid account mail payload or key");
 
 function decode(value: unknown, bytes?: number): Buffer {
@@ -79,14 +87,16 @@ export class AccountMailCipher {
       if (Object.keys(e).sort().join(",") !== "ciphertext,keyId,nonce,tag,version"
         || e.version !== 1 || typeof e.keyId !== "string" || !keyIdPattern.test(e.keyId)) throw invalid();
       const key = this.#keys.get(e.keyId);
-      if (!key) throw invalid();
+      if (!key) throw new AccountMailKeyUnavailableError();
       const decipher = createDecipheriv("aes-256-gcm", key, decode(e.nonce, 12), { authTagLength: 16 });
       decipher.setAAD(aad(context, e.keyId));
       decipher.setAuthTag(decode(e.tag, 16));
       plain = Buffer.concat([decipher.update(decode(e.ciphertext)), decipher.final()]);
       if (plain.length > 1024) throw invalid();
       return Object.freeze(payload(JSON.parse(plain.toString("utf8"))));
-    } catch { throw invalid(); }
-    finally { plain?.fill(0); }
+    } catch (error) {
+      if (error instanceof AccountMailKeyUnavailableError) throw error;
+      throw invalid();
+    } finally { plain?.fill(0); }
   }
 }
