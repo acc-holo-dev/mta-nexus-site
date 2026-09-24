@@ -8,7 +8,8 @@
   "scripts": {
     "generate": "drizzle-kit generate",
     "migrate": "tsx src/migrate.ts",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "mail:dispatch": "tsx scripts/run-account-mail-dispatcher.ts"
   },
   "dependencies": {
     "@nexus/config": "workspace:*",
