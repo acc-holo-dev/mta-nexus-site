@@ -17,8 +17,12 @@ image="${project}:candidate"
 domain=nexus-ci.test
 password=$(openssl rand -hex 24)
 secret=$(openssl rand -hex 32)
+mail_key=$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("base64url"))')
+abuse_key=$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("base64url"))')
 echo "::add-mask::$password"
 echo "::add-mask::$secret"
+echo "::add-mask::$mail_key"
+echo "::add-mask::$abuse_key"
 export NEXUS_CI_CADDYFILE="$work/Caddyfile"
 node --input-type=module <<'NODE'
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -29,6 +33,7 @@ NODE
 pc=(env -i "PATH=$PATH" "HOME=$HOME" COMPOSE_DISABLE_ENV_FILE=true
   "DOMAIN=$domain" ACME_EMAIL=ci@nexus-ci.test POSTGRES_USER=nexus POSTGRES_DB=mta_nexus
   "POSTGRES_PASSWORD=$password" "AUTH_SECRET=$secret" "NEXUS_CI_IMAGE=$image"
+  "NEXUS_CI_ACCOUNT_MAIL_KEY=$mail_key" "NEXUS_CI_ACCOUNT_RECOVERY_ABUSE_KEY=$abuse_key"
   "NEXUS_CI_CADDYFILE=$NEXUS_CI_CADDYFILE"
   docker compose --env-file /dev/null -p "$project"
   -f compose.production.yaml -f compose.production-ci.yaml)

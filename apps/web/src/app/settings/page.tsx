@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ContextSwitcher } from "../../components/context-switcher";
-import { Bell, KeyRound, Monitor, ShieldCheck } from "lucide-react";
+import { Bell, KeyRound, MailCheck, Monitor, ShieldCheck } from "lucide-react";
 
 type Preferences = {
   followsEnabled: boolean;
@@ -15,6 +15,12 @@ type Preferences = {
 type Session = {
   id: string; expiresAt: string; ipAddress?: string; userAgent?: string;
   createdAt: string; isCurrent?: boolean;
+};
+type RecoveryEmail = {
+  email: string;
+  verified: boolean;
+  verifiedAt: string | null;
+  eligible: boolean;
 };
 type Notice = { text: string; error: boolean };
 class SettingsError extends Error {
@@ -53,6 +59,8 @@ export default function SettingsPage() {
   const [pending, setPending] = useState(false);
   const actionInFlight = useRef(false);
   const [password, setPassword] = useState({ currentPassword: "", newPassword: "" });
+  const [recoveryEmail, setRecoveryEmail] = useState<RecoveryEmail | null>(null);
+  const [recoveryPassword, setRecoveryPassword] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -62,17 +70,23 @@ export default function SettingsPage() {
     Promise.all([
       request<{ preferences: Preferences }>("/api/notifications/preferences"),
       request<{ sessions: Session[] }>("/api/auth/sessions"),
-    ]).then(([p, s]) => {
+      request<RecoveryEmail>("/api/auth/email-verification"),
+    ]).then(([p, s, recovery]) => {
       if (!active) return;
-      if (!p.preferences || !Array.isArray(s.sessions)) throw new Error("Invalid settings response");
+      if (!p.preferences || !Array.isArray(s.sessions)
+        || typeof recovery.email !== "string" || typeof recovery.verified !== "boolean"
+        || typeof recovery.eligible !== "boolean") throw new Error("Invalid settings response");
       setPreferences(p.preferences);
       setSessions(s.sessions);
+      setRecoveryEmail(recovery);
       setSignedOut(false);
     }).catch((error: unknown) => {
       if (!active) return;
       setPreferences(null);
       setSessions(null);
+      setRecoveryEmail(null);
       setPassword({ currentPassword: "", newPassword: "" });
+      setRecoveryPassword("");
       if (error instanceof SettingsError && error.status === 401) setSignedOut(true);
       else {
         setLoadError(true);
@@ -93,7 +107,9 @@ export default function SettingsPage() {
         setSignedOut(true);
         setSessions(null);
         setPreferences(null);
+        setRecoveryEmail(null);
         setPassword({ currentPassword: "", newPassword: "" });
+        setRecoveryPassword("");
       }
       setNotice({ error: true, text: error instanceof SettingsError ? error.message
         : "The request could not be confirmed. Reload settings before retrying." });
@@ -114,6 +130,27 @@ export default function SettingsPage() {
       setSessions(null);
       setNotice({ text: `${text} The session list could not be refreshed. Reload settings to check it.`, error: true });
     }
+  };
+
+  const requestRecoveryEmail = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    void perform(async () => {
+      const data = await request<{ accepted: boolean; alreadyVerified: boolean; expiresAt?: string }>(
+        "/api/auth/email-verification", "POST", { currentPassword: recoveryPassword },
+      );
+      setRecoveryPassword("");
+      if (data.alreadyVerified) {
+        const refreshed = await request<RecoveryEmail>("/api/auth/email-verification");
+        setRecoveryEmail(refreshed);
+        setNotice({ text: "This recovery email is already verified.", error: false });
+        return;
+      }
+      if (data.accepted !== true) throw new Error("Unconfirmed email verification request");
+      setNotice({
+        text: "Verification email queued. Open the link in that email while this sign-in is still active.",
+        error: false,
+      });
+    });
   };
 
   const changePassword = (event: FormEvent<HTMLFormElement>) => {
@@ -182,6 +219,54 @@ export default function SettingsPage() {
             </label>
           ))}
         </div>
+      </section>
+      <section aria-labelledby="recovery-email-heading" className="nexus-panel p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <MailCheck className="w-4 h-4 text-accent" aria-hidden="true" />
+          <h2 id="recovery-email-heading" className="text-sm font-semibold text-primary">Recovery email</h2>
+        </div>
+        {recoveryEmail && (
+          <>
+            <div className="rounded-md border border-base bg-inset px-3 py-3">
+              <div className="text-sm text-primary break-all">{recoveryEmail.email}</div>
+              <div className="mt-1 text-xs text-muted">
+                {recoveryEmail.verified
+                  ? `Verified for recovery${recoveryEmail.verifiedAt ? ` on ${new Date(recoveryEmail.verifiedAt).toLocaleString()}` : ""}.`
+                  : recoveryEmail.eligible
+                    ? "Not verified for recovery yet."
+                    : "Recovery email verification is unavailable for this account."}
+              </div>
+            </div>
+            {!recoveryEmail.verified && recoveryEmail.eligible && (
+              <form onSubmit={requestRecoveryEmail} aria-label="Verify recovery email" className="space-y-3">
+                <p id="recovery-email-policy" className="text-sm text-muted">
+                  Enter your current password. We will queue a confirmation link for the email already stored on this account.
+                </p>
+                <div className="max-w-sm space-y-1">
+                  <label htmlFor="recovery-current-password" className="block text-sm text-primary">Current password</label>
+                  <input
+                    id="recovery-current-password"
+                    name="currentPassword"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    minLength={1}
+                    maxLength={128}
+                    disabled={pending}
+                    value={recoveryPassword}
+                    onChange={(event) => setRecoveryPassword(event.target.value)}
+                    aria-describedby="recovery-email-policy"
+                    className="w-full h-10 rounded-md bg-inset border border-base px-3 text-sm text-primary"
+                  />
+                </div>
+                <button type="submit" disabled={pending}
+                  className="px-4 py-2 rounded-md bg-accent text-white text-xs font-semibold disabled:opacity-50">
+                  Send verification email
+                </button>
+              </form>
+            )}
+          </>
+        )}
       </section>
       <section aria-labelledby="password-heading" className="nexus-panel p-5 space-y-4">
         <div className="flex items-center gap-2">

@@ -6,6 +6,10 @@ services:
     build:
       target: runtime
     restart: "no"
+    environment:
+      ACCOUNT_MAIL_KEY_ID: ci
+      ACCOUNT_MAIL_KEY: ${NEXUS_CI_ACCOUNT_MAIL_KEY:?use scripts/check-production-startup.sh}
+      ACCOUNT_RECOVERY_ABUSE_KEY: ${NEXUS_CI_ACCOUNT_RECOVERY_ABUSE_KEY:?use scripts/check-production-startup.sh}
   postgres:
     restart: "no"
   clamav:

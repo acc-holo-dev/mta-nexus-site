@@ -10,6 +10,8 @@ source "$(dirname "$0")/check-production-startup.sh"
 : "${NEXUS_BROWSER_REPORT_DIR:?A report directory is required}"
 export NEXUS_BROWSER_BASE_URL="https://$domain:8443"
 export NEXUS_BROWSER_HOME="$work/auth-browser-home"
+export NEXUS_BROWSER_APP_CONTAINER="$("${pc[@]}" ps -q app)"
+test -n "$NEXUS_BROWSER_APP_CONTAINER"
 mkdir -p "$NEXUS_BROWSER_HOME/.pki/nssdb"
 certutil -d "sql:$NEXUS_BROWSER_HOME/.pki/nssdb" -N --empty-password
 certutil -d "sql:$NEXUS_BROWSER_HOME/.pki/nssdb" -A -n nexus-auth-ci -t 'C,,' -i "$work/root.crt"

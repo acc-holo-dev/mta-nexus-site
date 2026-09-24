@@ -15,6 +15,7 @@ const { chromium, expect } = require('@playwright/test');
 const baseURL = process.env.NEXUS_BROWSER_BASE_URL;
 assert.equal(baseURL, 'https://nexus-ci.test:8443', 'Only the disposable CI site is allowed');
 assert(process.env.NEXUS_BROWSER_REPORT_DIR && process.env.NEXUS_BROWSER_HOME);
+assert(process.env.NEXUS_BROWSER_APP_CONTAINER, 'Disposable app container is required');
 const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
 const execute = promisify(execFile);
 const nonce = randomBytes(5).toString('hex');
@@ -60,7 +61,7 @@ after(async () => {
   for (const actor of contexts) await actor.context.close();
   if (browser) await browser.close();
   await writeFile(join(output, 'results.json'), JSON.stringify({ commit: process.env.GITHUB_SHA, results }, null, 2));
-  await writeFile(join(output, 'summary.md'), `# BETA-005a authentication acceptance\n\nCommit: ${process.env.GITHUB_SHA}\n\n${results.map((r) => `- ${r.status}: ${r.name}`).join('\n')}\n\nReal Chromium, production TLS, database sessions and HTTP endpoints. No auth/session/ownership responses are mocked. Synthetic accounts and private listings only. No tokens, passwords, cookies or storage state are retained in reports. Not a full auth audit, recovery/password-change test, real deployment or visual approval.\n`);
+  await writeFile(join(output, 'summary.md'), `# BETA-005a/D3 authentication acceptance\n\nCommit: ${process.env.GITHUB_SHA}\n\n${results.map((r) => `- ${r.status}: ${r.name}`).join('\n')}\n\nReal Chromium, production TLS, database sessions and HTTP endpoints. No auth/session/ownership responses are mocked. Synthetic accounts and private listings only. No tokens, passwords, cookies or storage state are retained in reports. Includes the controlled D3 recovery-email enrollment browser path; it is not a password-reset test, real inbox delivery, real deployment or full visual/accessibility approval.\n`);
 });
 
 function check(name, body) {
@@ -91,6 +92,24 @@ async function request(actor, path, method = 'GET', body) {
     try { data = JSON.parse(text); } catch { /* HTML is checked by its caller. */ }
     return { status: response.status, data, text, cacheControl: response.headers.get('cache-control') };
   }, { path, method, body });
+}
+
+async function readSyntheticVerificationProof(email) {
+  const { stdout, stderr } = await execute('docker', [
+    'exec',
+    '-e', 'GITHUB_ACTIONS=true',
+    '-e', 'RUNNER_ENVIRONMENT=github-hosted',
+    '-e', 'NEXUS_ACCOUNT_MAIL_TEST_READ=true',
+    process.env.NEXUS_BROWSER_APP_CONTAINER,
+    'node', '--import', 'tsx',
+    'packages/db/scripts/read-account-email-verification-ci.ts',
+    email,
+  ], { timeout: 30_000, maxBuffer: 16 * 1024 });
+  assert.equal(stderr, '', 'CI proof reader must not emit diagnostics');
+  const proof = JSON.parse(stdout);
+  assert(/^ach_[A-Za-z0-9_-]+$/.test(proof.challengeId));
+  assert(/^[A-Za-z0-9_-]{43}$/.test(proof.token));
+  return proof;
 }
 
 async function register(actor, person, displayName) {
@@ -146,6 +165,62 @@ check('J2-03 second browser account cannot inherit the first session', async () 
   assert((await request(alice, '/api/auth/session')).data.user.id === aliceUser.id);
   const guestSession = await request(guest, '/api/auth/session');
   assert(guestSession.data.authenticated === false && guestSession.data.user === null);
+});
+
+check('D3-01 recovery email enrollment requires password and one-time browser confirmation', async () => {
+  await alice.page.goto('/settings');
+  await expect(alice.page.getByRole('heading', { name: 'Recovery email', exact: true })).toBeVisible();
+  await expect(alice.page.getByText(people[0].email, { exact: true })).toBeVisible();
+  await expect(alice.page.getByText('Not verified for recovery yet.', { exact: true })).toBeVisible();
+
+  const requestPromise = alice.page.waitForResponse((response) =>
+    response.url().endsWith('/api/auth/email-verification') && response.request().method() === 'POST');
+  await alice.page.getByLabel('Current password', { exact: true }).nth(0).fill(password);
+  await alice.page.getByRole('button', { name: 'Send verification email', exact: true }).click();
+  const queued = await requestPromise;
+  assert.equal(queued.status(), 202);
+  const queuedBody = await queued.text();
+  assert(!queuedBody.includes('ach_') && !queuedBody.includes('#token='),
+    'Request response must not expose confirmation identifiers or tokens');
+  await expect(alice.page.getByRole('status')).toContainText('Verification email queued');
+
+  const proof = await readSyntheticVerificationProof(people[0].email);
+  const foreign = await request(bob, '/api/auth/email-verification', 'PATCH', proof);
+  assert.equal(foreign.status, 401, 'Another signed-in account cannot consume this proof');
+
+  await alice.page.setViewportSize({ width: 390, height: 844 });
+  await alice.page.goto(`/auth/verify-email?challenge=${encodeURIComponent(proof.challengeId)}#token=${encodeURIComponent(proof.token)}`);
+  await expect(alice.page.getByRole('heading', { name: 'Confirm recovery email', exact: true })).toBeVisible();
+  await expect(alice.page.getByRole('button', { name: 'Confirm email', exact: true })).toBeVisible();
+  await alice.page.waitForFunction(() => location.hash === '');
+  assert.equal(await alice.page.evaluate(() => location.hash), '', 'Secret fragment must be stripped from browser history');
+  const retained = await alice.page.evaluate(() => JSON.stringify({
+    local: { ...localStorage }, session: { ...sessionStorage }, url: location.href, text: document.body.innerText,
+  }));
+  assert(!retained.includes(proof.token), 'Confirmation token must not be rendered or persisted in browser storage/URL');
+
+  const before = await request(alice, '/api/auth/email-verification');
+  assert.equal(before.status, 200);
+  assert.equal(before.data.verified, false, 'Opening the GET page must not verify the address');
+
+  await alice.page.getByRole('button', { name: 'Confirm email', exact: true }).focus();
+  await alice.page.keyboard.press('Enter');
+  await expect(alice.page.getByRole('status')).toContainText(`Recovery email verified: ${people[0].email}`);
+  assert(await alice.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+    'Email confirmation should not overflow a narrow viewport');
+
+  const after = await request(alice, '/api/auth/email-verification');
+  assert.equal(after.status, 200);
+  assert.equal(after.data.verified, true);
+  assert.equal(after.data.email, people[0].email);
+  assert(/private/.test(after.cacheControl) && /no-store/.test(after.cacheControl));
+  assert.equal((await request(alice, '/api/auth/email-verification', 'PATCH', proof)).status, 401,
+    'Consumed confirmation proof cannot replay');
+
+  await alice.page.goto('/settings');
+  await expect(alice.page.getByText(/Verified for recovery/)).toBeVisible();
+  await expect(alice.page.getByRole('button', { name: 'Send verification email', exact: true })).toHaveCount(0);
+  await alice.page.setViewportSize({ width: 1440, height: 1000 });
 });
 
 check('J2-04 nonempty session lists are private and another account cannot revoke them', async () => {
