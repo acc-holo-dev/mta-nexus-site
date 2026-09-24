@@ -1,6 +1,7 @@
 import { rename, rm, writeFile } from "node:fs/promises";
 import { checkDatabaseConnection, closeDatabaseConnection } from "../src/client";
 import { accountMailOutboxRepository } from "../src/repositories/account-mail-outbox";
+import { accountMailWorkerRepository } from "../src/repositories/account-mail-worker";
 import { accountRecoveryAbuseLimitRepository } from "../src/repositories/account-recovery-abuse";
 import {
   createAccountMailDispatcher,
@@ -22,6 +23,9 @@ let healthWrite: Promise<void> = Promise.resolve();
 let healthFailure: unknown = null;
 let healthStatus: "starting" | "ready" = "starting";
 let healthBatch = 0;
+let healthProviderBlocked = false;
+let healthProviderBlockedUntil: string | null = null;
+let healthProviderFailureStreak = 0;
 let nextAbuseCleanupAt = 0;
 
 function emit(event: Record<string, unknown>) {
@@ -46,6 +50,9 @@ const writeHealthSnapshot = async () => {
     batch: healthBatch,
     heartbeatAt: new Date().toISOString(),
     staleAfterMs: STALE_AFTER_MS,
+    providerBlocked: healthProviderBlocked,
+    providerBlockedUntil: healthProviderBlockedUntil,
+    providerFailureStreak: healthProviderFailureStreak,
   });
   await writeFile(HEALTH_TMP, payload, { encoding: "utf8", mode: 0o600 });
   await rename(HEALTH_TMP, HEALTH_FILE);
@@ -80,10 +87,31 @@ try {
     },
   };
 
+  const refreshProviderGate = async (emitChange = false) => {
+    const state = await accountMailWorkerRepository.providerGateStatus();
+    const blockedUntil = state.blockedUntil?.toISOString() ?? null;
+    const changed = state.blocked !== healthProviderBlocked
+      || blockedUntil !== healthProviderBlockedUntil
+      || state.failureStreak !== healthProviderFailureStreak;
+    healthProviderBlocked = state.blocked;
+    healthProviderBlockedUntil = blockedUntil;
+    healthProviderFailureStreak = state.failureStreak;
+    if (emitChange && changed) {
+      emit({
+        status: "provider_gate",
+        config: fingerprint,
+        blocked: state.blocked,
+        blockedUntil,
+        failureStreak: state.failureStreak,
+      });
+    }
+  };
+
   await queueHealth();
   await checkDatabaseConnection();
 
   await assertQueueKeyCoverage();
+  await refreshProviderGate();
 
   healthStatus = "ready";
   await queueHealth();
@@ -107,6 +135,7 @@ try {
     once: process.argv.includes("--once"),
     onBatch: async ({ batch, result }) => {
       healthBatch = batch;
+      await refreshProviderGate(true);
       await queueHealth();
 
       if (!controller.signal.aborted && Date.now() >= nextAbuseCleanupAt) {

@@ -64,7 +64,28 @@ async function transaction<T>(work: (tx: Tx) => Promise<T>): Promise<T> {
 // Internal DB delivery protocol only. Not exported from @nexus/db, scheduled, or
 // connected to SMTP/HTTP. Each call commits before any future network operation.
 // Lease tokens and prepared plaintext must never be logged or sent to a client.
+export type AccountMailProviderGateStatus = Readonly<{
+  blocked: boolean;
+  blockedUntil: Date | null;
+  failureStreak: number;
+}>;
+
 export class AccountMailWorkerRepository {
+  async providerGateStatus(): Promise<AccountMailProviderGateStatus> {
+    const [gate] = await db.select({
+      blocked: sql<boolean>`${accountMailQueueGate.providerBlockedUntil} is not null
+        and ${accountMailQueueGate.providerBlockedUntil} > clock_timestamp()`,
+      blockedUntil: accountMailQueueGate.providerBlockedUntil,
+      failureStreak: accountMailQueueGate.providerFailureStreak,
+    }).from(accountMailQueueGate).where(eq(accountMailQueueGate.singleton, true)).limit(1);
+    if (!gate) throw new Error("Account mail queue gate is unavailable");
+    return Object.freeze({
+      blocked: gate.blocked,
+      blockedUntil: gate.blockedUntil,
+      failureStreak: gate.failureStreak,
+    });
+  }
+
   async candidates(limit = 20): Promise<string[]> {
     checkLimit(limit);
     const [gate] = await db.select({
