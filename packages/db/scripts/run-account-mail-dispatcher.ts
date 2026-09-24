@@ -32,6 +32,12 @@ let healthQueueLeased = 0;
 let healthQueueCapacity = 0;
 let healthQueueOldestAgeSeconds = 0;
 let healthQueuePressure = false;
+let healthDeliveryWindowMinutes = 30;
+let healthDeliveryAccepted = 0;
+let healthDeliveryRetried = 0;
+let healthDeliveryDiscarded = 0;
+let healthDeliveryProviderDeferred = 0;
+let healthDeliveryUncertain = 0;
 let nextAbuseCleanupAt = 0;
 
 function emit(event: Record<string, unknown>) {
@@ -65,6 +71,12 @@ const writeHealthSnapshot = async () => {
     queueCapacity: healthQueueCapacity,
     queueOldestAgeSeconds: healthQueueOldestAgeSeconds,
     queuePressure: healthQueuePressure,
+    deliveryWindowMinutes: healthDeliveryWindowMinutes,
+    deliveryAccepted: healthDeliveryAccepted,
+    deliveryRetried: healthDeliveryRetried,
+    deliveryDiscarded: healthDeliveryDiscarded,
+    deliveryProviderDeferred: healthDeliveryProviderDeferred,
+    deliveryUncertain: healthDeliveryUncertain,
   });
   await writeFile(HEALTH_TMP, payload, { encoding: "utf8", mode: 0o600 });
   await rename(HEALTH_TMP, HEALTH_FILE);
@@ -119,6 +131,16 @@ try {
     }
   };
 
+  const refreshDeliveryStats = async () => {
+    const stats = await accountMailWorkerRepository.deliveryStats(30);
+    healthDeliveryWindowMinutes = stats.windowMinutes;
+    healthDeliveryAccepted = stats.accepted;
+    healthDeliveryRetried = stats.retried;
+    healthDeliveryDiscarded = stats.discarded;
+    healthDeliveryProviderDeferred = stats.providerDeferred;
+    healthDeliveryUncertain = stats.uncertain;
+  };
+
   const refreshQueueStats = async (emitChange = false) => {
     const stats = await accountMailOutboxRepository.stats();
     const pressure = stats.pending * 100 >= stats.capacity * 80;
@@ -149,6 +171,7 @@ try {
   await assertQueueKeyCoverage();
   await refreshProviderGate();
   await refreshQueueStats();
+  await refreshDeliveryStats();
 
   healthStatus = "ready";
   await queueHealth();
@@ -174,6 +197,7 @@ try {
       healthBatch = batch;
       await refreshProviderGate(true);
       await refreshQueueStats(true);
+      await refreshDeliveryStats();
       await queueHealth();
 
       if (!controller.signal.aborted && Date.now() >= nextAbuseCleanupAt) {

@@ -24,6 +24,13 @@ try {
   const queueOldestAgeSeconds = Number(data?.queueOldestAgeSeconds);
   const queuePressure = data?.queuePressure;
 
+  const deliveryWindowMinutes = Number(data?.deliveryWindowMinutes);
+  const deliveryAccepted = Number(data?.deliveryAccepted);
+  const deliveryRetried = Number(data?.deliveryRetried);
+  const deliveryDiscarded = Number(data?.deliveryDiscarded);
+  const deliveryProviderDeferred = Number(data?.deliveryProviderDeferred);
+  const deliveryUncertain = Number(data?.deliveryUncertain);
+
   const providerStateValid = typeof providerBlocked === "boolean"
     && Number.isInteger(providerFailureStreak)
     && providerFailureStreak >= 0
@@ -43,6 +50,10 @@ try {
     && typeof queuePressure === "boolean"
     && queuePressure === (queuePending * 100 >= queueCapacity * 80);
 
+  const deliveryStateValid = deliveryWindowMinutes === 30
+    && [deliveryAccepted, deliveryRetried, deliveryDiscarded, deliveryProviderDeferred, deliveryUncertain]
+      .every((value) => Number.isInteger(value) && value >= 0);
+
   if (data?.status !== "ready"
     || !Number.isFinite(heartbeatAt)
     || !Number.isInteger(staleAfterMs)
@@ -52,6 +63,7 @@ try {
     || pid < 1
     || !providerStateValid
     || !queueStateValid
+    || !deliveryStateValid
     || Date.now() - heartbeatAt > staleAfterMs) {
     process.exitCode = 1;
   }

@@ -103,7 +103,40 @@ export type AccountMailProviderGateStatus = Readonly<{
   failureStreak: number;
 }>;
 
+export type AccountMailDeliveryStats = Readonly<{
+  windowMinutes: number;
+  accepted: number;
+  retried: number;
+  discarded: number;
+  providerDeferred: number;
+  uncertain: number;
+}>;
+
 export class AccountMailWorkerRepository {
+  async deliveryStats(windowMinutes = 30): Promise<AccountMailDeliveryStats> {
+    if (!Number.isInteger(windowMinutes) || windowMinutes < 1 || windowMinutes > 1440) {
+      throw new Error("Invalid account mail delivery stats window");
+    }
+    const [row] = await db.execute(sql`
+      select
+        count(*) filter (where "outcome" = 'accepted')::int as "accepted",
+        count(*) filter (where "outcome" = 'retry')::int as "retried",
+        count(*) filter (where "outcome" = 'discard')::int as "discarded",
+        count(*) filter (where "outcome" = 'provider_deferred')::int as "provider_deferred",
+        count(*) filter (where "uncertain" = true)::int as "uncertain"
+      from "account_mail_delivery_events"
+      where "created_at" >= clock_timestamp() - (${windowMinutes} * interval '1 minute')
+    `);
+    return Object.freeze({
+      windowMinutes,
+      accepted: Number(row?.accepted ?? 0),
+      retried: Number(row?.retried ?? 0),
+      discarded: Number(row?.discarded ?? 0),
+      providerDeferred: Number(row?.provider_deferred ?? 0),
+      uncertain: Number(row?.uncertain ?? 0),
+    });
+  }
+
   async providerGateStatus(): Promise<AccountMailProviderGateStatus> {
     const [gate] = await db.select({
       blocked: sql<boolean>`${accountMailQueueGate.providerBlockedUntil} is not null
