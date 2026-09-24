@@ -38,8 +38,10 @@ describe("D3a verified recovery email enrollment", () => {
       userId: a.userId, currentToken: a.token, currentPassword: password,
     });
     expect(result.accepted).toBe(true);
+    if (!result.challengeId) throw new Error("Accepted verification must expose its internal challenge ID");
+    const challengeId = result.challengeId;
     const mail = await db.select().from(accountMailOutbox);
-    const row = mail.find((item) => item.challengeId === result.challengeId);
+    const row = mail.find((item) => item.challengeId === challengeId);
     expect(row).toBeTruthy();
     expect(JSON.stringify(row)).not.toContain(a.email);
     expect(await db.select().from(accountRecoveryBindings).where(eq(accountRecoveryBindings.userId, a.userId))).toHaveLength(0);
@@ -60,7 +62,9 @@ describe("D3a verified recovery email enrollment", () => {
     const queued = await authService.requestRecoveryEmailVerification({
       userId: a.userId, currentToken: a.token, currentPassword: password,
     });
-    const [mail] = await db.select().from(accountMailOutbox).where(eq(accountMailOutbox.challengeId, queued.challengeId));
+    if (!queued.challengeId) throw new Error("Accepted verification must expose its internal challenge ID");
+    const challengeId = queued.challengeId;
+    const [mail] = await db.select().from(accountMailOutbox).where(eq(accountMailOutbox.challengeId, challengeId));
     expect(mail).toBeTruthy();
     const payload = cipher.open({
       id: mail.id, challengeId: mail.challengeId, userId: a.userId,
@@ -68,24 +72,24 @@ describe("D3a verified recovery email enrollment", () => {
     }, mail.payload);
     const confirmed = await authService.confirmRecoveryEmailVerification({
       userId: a.userId, currentToken: a.token,
-      challengeId: queued.challengeId, token: payload.token,
+      challengeId, token: payload.token,
     });
     expect(confirmed.email).toBe(a.email);
     const status = await authService.getRecoveryEmailStatus(a.userId);
     expect(status?.verified).toBe(true);
     const [binding] = await db.select().from(accountRecoveryBindings).where(eq(accountRecoveryBindings.userId, a.userId));
     expect(binding.verifiedEmail).toBe(a.email);
-    expect(binding.proofChallengeId).toBe(queued.challengeId);
-    const [proof] = await db.select().from(authChallenges).where(eq(authChallenges.id, queued.challengeId));
+    expect(binding.proofChallengeId).toBe(challengeId);
+    const [proof] = await db.select().from(authChallenges).where(eq(authChallenges.id, challengeId));
     expect(proof.consumedAt).not.toBeNull();
-    expect(await db.select().from(accountMailOutbox).where(eq(accountMailOutbox.challengeId, queued.challengeId))).toHaveLength(0);
+    expect(await db.select().from(accountMailOutbox).where(eq(accountMailOutbox.challengeId, challengeId))).toHaveLength(0);
     const events = await db.select().from(auditEvents).where(and(
       eq(auditEvents.actorId, a.userId), eq(auditEvents.action, "auth.recovery_email_verified"),
     ));
     expect(events).toHaveLength(1);
     await expect(authService.confirmRecoveryEmailVerification({
       userId: a.userId, currentToken: a.token,
-      challengeId: queued.challengeId, token: payload.token,
+      challengeId, token: payload.token,
     })).rejects.toThrow("Invalid or expired account confirmation");
   });
 
