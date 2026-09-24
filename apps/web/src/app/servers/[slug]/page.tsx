@@ -19,7 +19,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const server = await serverService.getServerBySlug(slug);
 
-  if (!server) return { title: "Server not found" };
+  if (!server || server.visibility === "private") return { title: "Server not found" };
 
   const description = server.description?.slice(0, 155) || (server.gameMode || "MTA") + " server";
   return {
@@ -43,7 +43,7 @@ export default async function ServerDetailPage({
   const { slug } = await params;
   const server = await serverService.getServerBySlug(slug);
 
-  if (!server) notFound();
+  if (!server || server.visibility === "private") notFound();
 
   let observedServer: Awaited<ReturnType<typeof mtaMasterDirectoryService.getDirectory>>["servers"][number] | undefined;
   let directoryIsStale = false;
@@ -102,7 +102,6 @@ export default async function ServerDetailPage({
             <h1 className="text-2xl md:text-4xl font-black text-white">{server.name}</h1>
             <p className="text-xs text-neutral-400 max-w-2xl">{server.description}</p>
           </div>
-
           <a
             href={connectUri}
             className="px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all"
