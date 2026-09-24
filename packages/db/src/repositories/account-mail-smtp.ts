@@ -65,10 +65,10 @@ function validateOptions(options: AccountMailSmtpOptions) {
   return timeout;
 }
 
-function classify(code: number, uncertain = false): AccountMailTransportResult {
-  if (code >= 200 && code < 300) return { outcome: "accepted", uncertain, code };
-  if (code >= 400 && code < 500) return { outcome: "retry", uncertain, code };
-  return { outcome: "discard", uncertain, code };
+function classify(code: number, permanent: "retry" | "discard" = "discard"): AccountMailTransportResult {
+  if (code >= 200 && code < 300) return { outcome: "accepted", uncertain: false, code };
+  if (code >= 400 && code < 500) return { outcome: "retry", uncertain: false, code };
+  return { outcome: permanent, uncertain: false, code };
 }
 
 function dotStuff(text: string): string {
@@ -117,9 +117,13 @@ async function command(session: SmtpSession, value: string) {
   return readReply(session);
 }
 
-function requireStage(code: number, expected: number | number[]) {
+function requireStage(
+  code: number,
+  expected: number | number[],
+  permanent: "retry" | "discard" = "discard",
+) {
   const allowed = Array.isArray(expected) ? expected : [expected];
-  return allowed.includes(code) ? null : classify(code);
+  return allowed.includes(code) ? null : classify(code, permanent);
 }
 
 function advertisesStartTls(lines: string[]): boolean {
@@ -196,12 +200,12 @@ export class AccountMailSmtpTransport {
 
         ensureWithinDeadline();
         const greeting = await readReply(session);
-        let result = requireStage(greeting.code, 220);
+        let result = requireStage(greeting.code, 220, "retry");
         if (result) return result;
 
         ensureWithinDeadline();
         const ehlo = await command(session, `EHLO ${this.#options.servername}`);
-        result = requireStage(ehlo.code, 250);
+        result = requireStage(ehlo.code, 250, "retry");
         if (result) return result;
         capabilities = ehlo.lines;
       } else {
@@ -215,20 +219,20 @@ export class AccountMailSmtpTransport {
         session = createSession(plain);
 
         const greeting = await readReply(session);
-        let result = requireStage(greeting.code, 220);
+        let result = requireStage(greeting.code, 220, "retry");
         if (result) return result;
 
         ensureWithinDeadline();
         const plainEhlo = await command(session, `EHLO ${this.#options.servername}`);
-        result = requireStage(plainEhlo.code, 250);
+        result = requireStage(plainEhlo.code, 250, "retry");
         if (result) return result;
         if (!advertisesStartTls(plainEhlo.lines)) {
-          return { outcome: "discard", uncertain: false };
+          return { outcome: "retry", uncertain: false };
         }
 
         ensureWithinDeadline();
         const startTls = await command(session, "STARTTLS");
-        result = requireStage(startTls.code, 220);
+        result = requireStage(startTls.code, 220, "retry");
         if (result) return result;
 
         closeSession(session);
@@ -248,7 +252,7 @@ export class AccountMailSmtpTransport {
 
         ensureWithinDeadline();
         const secureEhlo = await command(session, `EHLO ${this.#options.servername}`);
-        result = requireStage(secureEhlo.code, 250);
+        result = requireStage(secureEhlo.code, 250, "retry");
         if (result) return result;
         capabilities = secureEhlo.lines;
       }
@@ -257,7 +261,7 @@ export class AccountMailSmtpTransport {
 
       if (this.#options.username && this.#options.password) {
         if (!advertisesAuthPlain(capabilities)) {
-          return { outcome: "discard", uncertain: false };
+          return { outcome: "retry", uncertain: false };
         }
         const auth = Buffer.from(
           `\0${this.#options.username}\0${this.#options.password}`,
@@ -265,7 +269,7 @@ export class AccountMailSmtpTransport {
         ).toString("base64");
         ensureWithinDeadline();
         const authReply = await command(session, `AUTH PLAIN ${auth}`);
-        const result = requireStage(authReply.code, 235);
+        const result = requireStage(authReply.code, 235, "retry");
         if (result) return result;
       }
 
@@ -289,7 +293,7 @@ export class AccountMailSmtpTransport {
         session,
         `MAIL FROM:<${this.#options.from}>${mailParameters ? ` ${mailParameters}` : ""}`,
       );
-      let result = requireStage(mailFrom.code, 250);
+      let result = requireStage(mailFrom.code, 250, "retry");
       if (result) return result;
 
       ensureWithinDeadline();
@@ -324,7 +328,7 @@ export class AccountMailSmtpTransport {
       ensureWithinDeadline();
       const accepted = await readReply(session);
       result = requireStage(accepted.code, 250);
-      if (result) return { ...result, uncertain: true };
+      if (result) return result;
 
       try { await command(session, "QUIT"); } catch { /* acceptance already confirmed */ }
       return { outcome: "accepted", uncertain: false, code: accepted.code };
