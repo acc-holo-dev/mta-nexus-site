@@ -2,7 +2,7 @@
 
 Дата сверки: **2026-09-24**. Проверенный код D4: **bb1ea0aaff2ce0909499ba822c389e44840ab9fa**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648476), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648596) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648416). Vitest — **257 тестов в 65 файлах**; Chromium D3-01 и D4-01 подтвердили enrollment и anonymous one-time password reset без внешнего SMTP.
 
-**Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1–D4 добавляют proofs, очередь, leases, закрытый TLS transport/runtime, durable limits, verified-email binding и tested forgot/reset application flow. **Production recovery по-прежнему не включён:** реальный provider/inbox, production keys, supervised dispatcher и rollout policy не приняты. R4 остаётся открытым. Процент готовности не назначается.
+**Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1–D4 добавляют proofs, очередь, leases, закрытый TLS transport/runtime, durable limits, verified-email binding и tested forgot/reset application flow. D5a–d уже реализуют opt-in producer/worker wiring, SMTP AUTH capability, supervised restart checks и bounded key rotation, но **не считаются принятыми**: текущие GitHub Actions jobs создаются без runner steps и завершаются до исполнения. **Production recovery по-прежнему не включён:** реальный provider/inbox, production keys и rollout policy не приняты. R4 остаётся открытым. Процент готовности не назначается.
 
 Полный аудит файлов, безопасности и старых идей не выполнен. Существующие среды с данными не обследованы и не считаются пустыми. В этом шаге `main`, рабочие серверы, существующие аккаунты, почтовые провайдеры, реальные ключи/секреты и платёжные настройки не менялись; публичного развёртывания не было.
 
@@ -230,9 +230,25 @@ Verify на финальном SHA: **257/257 tests, 65/65 files**. Все се�
 
 **Ограничения:** 350 ms floor — заданный контракт, не полный статистический side-channel/load аудит. Нет real provider/inbox delivery, SMTP provider AUTH rollout, production recovery keys, supervised worker/service manager, secret/key rotation rehearsal, privileged/MFA recovery, legacy transition, manual visual/RU acceptance или environment backup/restore evidence. In-app security notification не доказывает внешнюю security-mail доставку.
 
-### Следующий ограниченный шаг — D5
+### BETA-005d/D5 — production recovery delivery: реализовано частично, acceptance заблокирован runner
 
-Провести эксплуатационную сквозную приёмку recovery delivery без публичного deploy: выбрать/сконфигурировать реальный provider mode, проверить AUTH/TLS и inbox delivery на тестовых адресах, supervised standalone dispatcher, restart/drain/observability, secret/key lifecycle и rotation/recovery; затем явно принять policy для privileged/MFA/legacy accounts и anti-enumeration/load bounds. Production activation остаётся отдельным release gate.
+**Последний принятый recovery-кандидат остаётся D4 `bb1ea0aaff2ce0909499ba822c389e44840ab9fa`.** D5-коммиты на `dev` пока не являются release evidence.
+
+На D5a–d реализовано:
+- отдельный opt-in `compose.mail-worker.yaml`: image-only worker, `restart: unless-stopped`, без портов/volumes, `AUTH_SECRET` и abuse key;
+- отдельный opt-in `compose.recovery.yaml`: app получает только active mail key + durable abuse key; SMTP credentials и previous decrypt-only key остаются у worker;
+- production-image harness с synthetic queue -> TLS SMTP -> accepted settlement, graceful stop/recreate, missing-key fail-closed и crash/restart проверкой;
+- corrected persisted outbox prefix `ame_` в D5 settlement checker;
+- optional implicit-TLS SMTP `AUTH PLAIN`; username/password обязательны парой, password не входит в runtime fingerprint и не логируется transport;
+- bounded rotation: producer шифрует только active key, worker может временно читать active + один previous key; previous key должен иметь другой ID/material и не может reuse `AUTH_SECRET`. D5 harness ставит synthetic envelope старым key и требует drain новым worker key ring.
+
+Кодовая последовательность D5 включает `e3ee40e` (исправление `ame_`), `1d81623` (реальный crash/restart assertion), `f261717` (secret-safe phase diagnostics), `b316687` (SMTP AUTH), `375f30b` (rotation) и `7d62bf4` (least-privilege producer/worker overlays).
+
+**Acceptance отсутствует.** На последних D5 SHA GitHub создаёт все семь check jobs, но они завершаются за несколько секунд с `steps: null`; даже повтор отдельного job не получает runner. Это не считается test failure приложения и не считается success. До восстановления исполняемого GitHub-hosted runner нельзя утверждать, что новые TypeScript/Vitest/Compose/Docker/browser assertions прошли.
+
+### Следующий ограниченный шаг — D5e
+
+Получить исполняемый полный CI на точном D5 SHA и требовать семь зелёных jobs. После этого отдельно проверить реальный SMTP provider: provider-specific AUTH/TLS, тестовые inbox delivery, секреты на целевом host, restart/drain/наблюдаемость и rehearsal ротации. Затем принять policy для privileged/MFA/legacy accounts и anti-enumeration/load bounds. Public deployment и production activation остаются отдельными release gates.
 
 ## 7. Условия допуска к выпуску
 
