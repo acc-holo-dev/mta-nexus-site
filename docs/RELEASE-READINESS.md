@@ -1,8 +1,8 @@
 # MTA NEXUS — карта бесплатной закрытой беты
 
-Дата сверки: **2026-09-24**. Проверенный код D2b: **`1aaeef2c2a8f5becf5f2d22d3a55f4ad8b2f076c`**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35956587917), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35956587930) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35956587944). Vitest — **229 тестов в 60 файлах**, включая **29 новых PostgreSQL-проверок D2b**.
+Дата сверки: **2026-09-24**. Проверенный код D2c: **7b2629d34101101602125a79ef5c111a33cb7a6f**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35957799862), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35957799856) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35957799835). Vitest — **236 тестов в 61 файле**; дополнительно Verify выполнил закрытую TLS SMTP integration-проверку queue -> worker -> receiver.
 
-**Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1/D2a/D2b добавляют внутренние подтверждения, зашифрованную очередь и протокол обработчика, **не отправку писем и не работающий сценарий «Забыли пароль»**. R4 остаётся открытым. Процент готовности не назначается.
+**Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1/D2a/D2b/D2c добавляют внутренние подтверждения, очередь, lease-протокол и проверенный закрытый TLS transport. **Реальная почта пользователям и сценарий «Забыли пароль» по-прежнему не включены**. R4 остаётся открытым. Процент готовности не назначается.
 
 Полный аудит файлов, безопасности и старых идей не выполнен. Существующие среды с данными не обследованы и не считаются пустыми. В этом шаге `main`, рабочие серверы, существующие аккаунты, почтовые провайдеры, реальные ключи/секреты и платёжные настройки не менялись; публичного развёртывания не было.
 
@@ -74,7 +74,7 @@
 | R1 — PostgreSQL | Старый mount исправлен, новые тома проверены; старые среды требуют инвентаризации, backup и плана переноса. |
 | R2 — Docker-only | Local/production-пути проверены в CI, рабочая среда не принята. |
 | R3 — scanner | Старт проверен; вердикты и fail-closed публикация требуют отдельной приёмки. Модерация не заменяет scanner молча. |
-| R4 — восстановление аккаунта | D0 — проект, D1 — proofs, D2a — очередь, D2b — leases/retry. SMTP, полный recovery и политика перехода не приняты. Следующий D2c — изолированный транспорт; R4 открыт. |
+| R4 — восстановление аккаунта | D0 — проект, D1 — proofs, D2a — очередь, D2b — leases/retry, D2c — закрытая TLS SMTP integration. Реальный provider/scheduler, abuse limits, enrollment/reset и политика перехода не приняты. Следующий D2d — runtime provisioning/dispatcher lifecycle; R4 открыт. |
 | R5 — выпуск | Разработка в dev, выпуск только по явно одобренному SHA/тегу main; совпадение веток не означает deploy. |
 | R6 — удобство | Ограниченные английские сценарии пройдены; RU/EN, визуальная и полная доступность открыты. |
 | R7 — эксплуатация | Домен/VDS/контакты/backup не подтверждены; проверить фактическую среду. |
@@ -162,17 +162,33 @@
 
 Нет реального подтверждения ящика, полного reset со всеми эффектами, приёмки D3/D4 и политики включения. Весь J2, security/dependency review, RU/EN, визуальная приёмка, другие платформы и рабочая среда остаются открытыми. Миграция применялась только в тестовых средах; реальные аккаунты не подтверждены, не удалены и не заблокированы автоматически.
 
-### Следующий ограниченный шаг — D2c
+### BETA-005d/D2c — закрытая TLS SMTP integration
 
-SMTP-адаптер и ограниченный dispatcher с закрытым Docker-приёмником без пересылки в интернет. Приёмка: TLS/сертификат и отказ при недоверии, сетевой тайм-аут/отмена по sendBefore, отказ/неопределённое acceptance, повтор того же сообщения, остановка/возобновление, периодическая ограниченная очистка и отсутствие секретов в диагностике. SMTP вне write-транзакции; никакой отправки реальным пользователям или активации production-почты.
+**Выполнено в границах тестового транспорта и dispatcher на 7b2629d34101101602125a79ef5c111a33cb7a6f.** Добавлены внутренние AccountMailSmtpTransport и AccountMailDispatcher, unit-тесты dispatcher, закрытый Docker receiver и отдельная integration-проверка в Verify. Production Compose, публичные HTTP routes, зависимости приложения и реальные SMTP credentials не включены.
 
-Долговременные лимиты на адрес/IP, безопасное снабжение ключами и нейтральные public request остаются обязательными до выставления endpoints. Дальше D3 — привязка канала, D4 — полный HTTP/UI reset, D5 — сквозная и эксплуатационная приёмка. Ответственный принимает правила неподтверждённой/потерянной почты, новых/старых и привилегированных/MFA-аккаунтов. Документ, таблица binding и тестовое письмо сами по себе R4 не закрывают.
+SMTP использует implicit TLS с проверкой сертификата и без plaintext fallback. Сетевой I/O начинается после commit D2b prepare и заканчивается до отдельного settle, поэтому DB write transaction не удерживается во время SMTP. 4xx планируется как retry, 5xx как discard. Ошибка/timeout после передачи DATA помечается retry + uncertain: это не ложный success, но возможна повторная доставка того же письма. После подтверждённого 250 settle удаляет outbox и пишет существующий system audit.
+
+Dispatcher строит только фиксированные account-security шаблоны. Base URL обязан быть HTTPS; challenge ID передаётся как query metadata, token — во fragment. Summary содержит только счётчики. Receiver и integration harness не печатают recipient, token или body. Нет доказательства, что внешняя почтовая система/ящик получил сообщение.
+
+Закрытый receiver запускается как disposable node:26-alpine на loopback host port. Runner генерирует однодневный self-signed certificate с SAN localhost и передаёт его test client как явный CA только в положительных случаях. Проверены: accepted 250, temporary 451, permanent 550, потеря соединения после DATA, delayed final response/timeout, реальное отклонение self-signed cert без CA и disposable queue -> worker -> SMTP -> accepted audit/removal. Container удаляется через if: always() и не имеет внешнего relay.
+
+account-mail-dispatcher.test.ts добавляет 7 unit-проверок; общий Vitest вырос с 229 до **236/236, 61/61 файлов**. Закрытая SMTP integration — отдельный шаг Verify и не входит в это число. Все четыре CI jobs, два Account browser jobs и Directory browser job прошли на том же SHA.
+
+Первый D2c SHA d6c19cd не дошёл до assertions: root integration script не мог разрешить package-local drizzle-orm при strict pnpm layout. 6dc1245 затем обнаружил ложный negative-TLS test: helper с default CA возвращал доверие при undefined. Окончательное исправление 7b2629d запускает harness из @nexus/db и создаёт untrusted client действительно без CA. Эти два красных прогона не считаются подтверждением функции; тесты/requirements ради зелёного результата не удалялись.
+
+**Ограничения:** SMTP AUTH и STARTTLS не реализованы; выбран только тестируемый implicit-TLS контракт. Нет production key loading, provider secret lifecycle, background scheduler/process supervision, реальной ротации ключей, адресных/IP abuse limits, публичного нейтрального request endpoint, измерения timing enumeration, D3 enrollment или D4 reset. Успешный SMTP 250 означает acceptance тестовым receiver, не inbox delivery. Реальные пользователи и рабочие данные не затронуты.
+
+### Следующий ограниченный шаг — D2d
+
+Явное runtime provision отдельного mail-encryption key и transport settings, bounded standalone dispatcher loop с graceful shutdown/cleanup и долговременные abuse limits. Никакого AUTH_SECRET fallback. Provider-specific SMTP AUTH/TLS включается только после выбора и проверки провайдера; production email остаётся disabled.
+
+После D2d: D3 — проверяемая привязка email; D4 — полный HTTP/UI reset; D5 — сквозная и эксплуатационная приёмка. Ответственный отдельно принимает правила неподтверждённой/потерянной почты, существующих аккаунтов и privileged/MFA. R4 остаётся открытым.
 
 ## 7. Условия допуска к выпуску
 
 | Условие | Сейчас |
 |---|---|
-| Проверки точного кандидата | Семь заданий успешны на 1aaeef2; SHA не объявлен релизом, после изменений проверки повторяются. |
+| Проверки точного кандидата | Семь заданий успешны на 7b2629d; SHA не объявлен релизом, после изменений проверки повторяются. |
 | Хранение и запуск | BETA-001–003 и повтор D2b подтверждены в CI; рабочая среда не принята. |
 | Полные J1–J7 | Частично подтверждены, не закрыты перечнем подзадач. |
 | Scanner и безопасный путь архива | Runtime-приёмка не завершена. |
