@@ -7,6 +7,7 @@ export type AccountMailRuntimeConfig = Readonly<{
   activeKeyId: string;
   keys: Readonly<Record<string, Uint8Array>>;
   appUrl: string;
+  previousKeyId?: string;
   smtpHost: string;
   smtpPort: number;
   smtpServername: string;
@@ -73,6 +74,24 @@ export function readAccountMailRuntimeConfig(
   const activeKeyId = required(env, "ACCOUNT_MAIL_KEY_ID");
   if (!/^[A-Za-z0-9_-]{1,32}$/.test(activeKeyId)) throw new Error("Invalid account mail key identifier");
   const activeKey = decodeKey(rawKey, "account mail encryption key");
+  const previousKeyId = env.ACCOUNT_MAIL_PREVIOUS_KEY_ID || undefined;
+  const previousRawKey = env.ACCOUNT_MAIL_PREVIOUS_KEY || undefined;
+  if (Boolean(previousKeyId) !== Boolean(previousRawKey)) {
+    throw new Error("Previous account mail key ID and key must be configured together");
+  }
+  if (previousKeyId && (!/^[A-Za-z0-9_-]{1,32}$/.test(previousKeyId) || previousKeyId === activeKeyId)) {
+    throw new Error("Invalid previous account mail key identifier");
+  }
+  if (previousRawKey && env.AUTH_SECRET && previousRawKey === env.AUTH_SECRET) {
+    throw new Error("Previous account mail encryption key must not reuse AUTH_SECRET");
+  }
+  const previousKey = previousRawKey ? decodeKey(previousRawKey, "previous account mail encryption key") : undefined;
+  if (previousKey && Buffer.from(previousKey).equals(Buffer.from(activeKey))) {
+    throw new Error("Previous account mail encryption key must differ from active key");
+  }
+  const keys = previousKeyId && previousKey
+    ? Object.freeze({ [activeKeyId]: activeKey, [previousKeyId]: previousKey })
+    : Object.freeze({ [activeKeyId]: activeKey });
   const appUrl = required(env, "ACCOUNT_MAIL_APP_URL");
   const parsedUrl = new URL(appUrl);
   if (parsedUrl.protocol !== "https:" || parsedUrl.username || parsedUrl.password || parsedUrl.search || parsedUrl.hash) {
@@ -90,7 +109,8 @@ export function readAccountMailRuntimeConfig(
   if (smtpCa !== undefined && smtpCa.length > 32_768) throw new Error("Invalid account mail SMTP CA");
   return Object.freeze({
     activeKeyId,
-    keys: Object.freeze({ [activeKeyId]: activeKey }),
+    keys,
+    previousKeyId,
     appUrl: parsedUrl.toString().replace(/\/$/, ""),
     smtpHost,
     smtpPort: integer(env.ACCOUNT_MAIL_SMTP_PORT, 465, 1, 65535, "ACCOUNT_MAIL_SMTP_PORT"),
@@ -168,7 +188,8 @@ export async function runAccountMailLoop(input: {
 
 export function runtimeFingerprint(config: AccountMailRuntimeConfig): string {
   return createHash("sha256").update(JSON.stringify({
-    keyId: config.activeKeyId, appUrl: config.appUrl, smtpHost: config.smtpHost,
+    keyId: config.activeKeyId, keyRingSize: Object.keys(config.keys).length,
+    appUrl: config.appUrl, smtpHost: config.smtpHost,
     smtpPort: config.smtpPort, smtpServername: config.smtpServername, smtpFrom: config.smtpFrom,
     smtpAuth: Boolean(config.smtpUsername), smtpTimeoutMs: config.smtpTimeoutMs, batchSize: config.batchSize, pollIntervalMs: config.pollIntervalMs,
   })).digest("hex").slice(0, 16);

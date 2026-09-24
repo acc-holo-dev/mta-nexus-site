@@ -25,9 +25,10 @@ image=${NEXUS_D5_IMAGE:-mta-nexus:ci}
 receiver="nexus-smtp-${GITHUB_RUN_ID:?}-${GITHUB_RUN_ATTEMPT:?}"
 worker="nexus-mail-worker-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
 mail_key=$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("base64url"))')
+previous_mail_key=$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("base64url"))')
 abuse_key=$(node -e 'process.stdout.write(require("node:crypto").randomBytes(32).toString("base64url"))')
 test_password="D5-$(openssl rand -hex 24)"
-for value in "$mail_key" "$abuse_key" "$test_password"; do echo "::add-mask::$value"; done
+for value in "$mail_key" "$previous_mail_key" "$abuse_key" "$test_password"; do echo "::add-mask::$value"; done
 cleanup() { docker rm -f "$worker" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 
@@ -39,6 +40,8 @@ export POSTGRES_PASSWORD=nexus_test_secret
 export POSTGRES_DB=mta_nexus_test
 export ACCOUNT_MAIL_KEY_ID=ci
 export ACCOUNT_MAIL_KEY="$mail_key"
+export ACCOUNT_MAIL_PREVIOUS_KEY_ID=ci-previous
+export ACCOUNT_MAIL_PREVIOUS_KEY="$previous_mail_key"
 export ACCOUNT_MAIL_APP_URL=https://nexus-mta.test
 export ACCOUNT_MAIL_SMTP_HOST=localhost
 export ACCOUNT_MAIL_SMTP_PORT=2465
@@ -57,6 +60,7 @@ phase=seed-synthetic-mail
 echo 'D5 phase: seed synthetic mail'
 seed=$(NEXUS_D5_MAIL_SEED=true NEXUS_D5_TEST_PASSWORD="$test_password" \
   ACCOUNT_RECOVERY_ABUSE_KEY="$abuse_key" \
+  ACCOUNT_MAIL_KEY_ID=ci-previous ACCOUNT_MAIL_KEY="$previous_mail_key" \
   node --import tsx packages/db/scripts/seed-account-mail-ci.ts)
 challenge=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ach_/.test(x.challengeId)) process.exit(1); process.stdout.write(x.challengeId)' "$seed")
 mail=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ame_/.test(x.mailId)) process.exit(1); process.stdout.write(x.mailId)' "$seed")
@@ -75,6 +79,8 @@ start_worker() {
     --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/mta_nexus_test \
     --env ACCOUNT_MAIL_KEY_ID=ci \
     --env ACCOUNT_MAIL_KEY="$mail_key" \
+    --env ACCOUNT_MAIL_PREVIOUS_KEY_ID=ci-previous \
+    --env ACCOUNT_MAIL_PREVIOUS_KEY="$previous_mail_key" \
     --env ACCOUNT_MAIL_APP_URL=https://nexus-mta.test \
     --env ACCOUNT_MAIL_SMTP_HOST="$smtp_host" \
     --env ACCOUNT_MAIL_SMTP_PORT=2465 \
@@ -112,6 +118,7 @@ test -z "$(docker port "$worker")"
 ! docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$worker" | grep -q '^AUTH_SECRET='
 ! docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$worker" | grep -q '^ACCOUNT_RECOVERY_ABUSE_KEY='
 ! docker logs "$worker" 2>&1 | grep -F "$mail_key"
+! docker logs "$worker" 2>&1 | grep -F "$previous_mail_key"
 ! docker logs "$worker" 2>&1 | grep -F 'nexus-ci-password'
 
 phase=tls-settlement
@@ -148,6 +155,7 @@ test "$restarted" = 1
 test "$(docker inspect --format '{{.Image}}' "$worker")" = "$image_id"
 test -z "$(docker port "$worker")"
 ! docker logs "$worker" 2>&1 | grep -F "$mail_key"
+! docker logs "$worker" 2>&1 | grep -F "$previous_mail_key"
 ! docker logs "$worker" 2>&1 | grep -F 'nexus-ci-password'
 
 phase=graceful-recreate

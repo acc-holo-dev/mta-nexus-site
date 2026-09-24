@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { randomBytes } from "node:crypto";
-import { readAccountMailRuntimeConfig, readAccountRecoveryAbuseKey, runAccountMailLoop, runtimeFingerprint } from "./account-mail-runtime";
+import { createAccountMailProducerCipher, readAccountMailRuntimeConfig, readAccountRecoveryAbuseKey, runAccountMailLoop, runtimeFingerprint } from "./account-mail-runtime";
 
 const key = randomBytes(32).toString("base64url");
 const baseEnv = {
@@ -55,6 +55,54 @@ describe("D2d account mail runtime", () => {
     expect(first.smtpUsername).toBe("ci-user");
     expect(first.smtpPassword).toBe("ci-password-one");
     expect(runtimeFingerprint(first)).toBe(runtimeFingerprint(second));
+  });
+
+  it("supports one previous mail key for bounded rotation while producers stay on the active key", () => {
+    const previousKey = randomBytes(32).toString("base64url");
+    expect(() => readAccountMailRuntimeConfig({
+      ...baseEnv,
+      ACCOUNT_MAIL_PREVIOUS_KEY_ID: "old",
+    })).toThrow("configured together");
+    expect(() => readAccountMailRuntimeConfig({
+      ...baseEnv,
+      ACCOUNT_MAIL_PREVIOUS_KEY: previousKey,
+    })).toThrow("configured together");
+    expect(() => readAccountMailRuntimeConfig({
+      ...baseEnv,
+      ACCOUNT_MAIL_PREVIOUS_KEY_ID: "test",
+      ACCOUNT_MAIL_PREVIOUS_KEY: previousKey,
+    })).toThrow("identifier");
+    expect(() => readAccountMailRuntimeConfig({
+      ...baseEnv,
+      ACCOUNT_MAIL_PREVIOUS_KEY_ID: "old",
+      ACCOUNT_MAIL_PREVIOUS_KEY: key,
+    })).toThrow("must differ");
+
+    const config = readAccountMailRuntimeConfig({
+      ...baseEnv,
+      ACCOUNT_MAIL_PREVIOUS_KEY_ID: "old",
+      ACCOUNT_MAIL_PREVIOUS_KEY: previousKey,
+    });
+    expect(config.previousKeyId).toBe("old");
+    expect(Object.keys(config.keys).sort()).toEqual(["old", "test"]);
+    expect(runtimeFingerprint(config)).not.toBe(runtimeFingerprint(readAccountMailRuntimeConfig(baseEnv)));
+
+    const producer = createAccountMailProducerCipher({
+      ...baseEnv,
+      ACCOUNT_MAIL_PREVIOUS_KEY_ID: "old",
+      ACCOUNT_MAIL_PREVIOUS_KEY: previousKey,
+    });
+    const sealed = producer.seal({
+      id: "ame_rotation_test",
+      challengeId: "ach_rotation_test",
+      userId: "usr_rotation_test",
+      purpose: "email_verify",
+      expiresAt: new Date("2026-09-25T00:00:00.000Z"),
+    }, {
+      recipient: "rotation@example.invalid",
+      token: randomBytes(32).toString("base64url"),
+    });
+    expect(sealed.keyId).toBe("test");
   });
 
   it("runs exactly one bounded batch in once mode", async () => {
