@@ -4,3 +4,4 @@ export * from "./policy";
 export * from "./ratelimit";
 export * from "./rate-limit-policy";
 export * from "./request-ip";
+export * from "./identity-normalization";

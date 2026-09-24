@@ -10,7 +10,13 @@ import {
   readAccountRecoveryAbuseKey,
   accountPasswordResetRepository,
 } from "@nexus/db";
-import { generateId, generateSessionToken, hashPassword, verifyPassword } from "@nexus/security";
+import {
+  generateId,
+  generateSessionToken,
+  hashPassword,
+  normalizeEmailForAbuse,
+  verifyPassword,
+} from "@nexus/security";
 import {
   NotFoundError,
   UnauthorizedError,
@@ -255,12 +261,13 @@ export class AuthService {
     const cipher = createAccountMailProducerCipher();
     const abuseKey = readAccountRecoveryAbuseKey();
     const email = input.email.trim().toLowerCase();
+    const abuseEmail = normalizeEmailForAbuse(input.email);
     const ip = input.ip.trim() || "unknown";
 
     const [emailLimit, ipLimit] = await Promise.all([
       accountRecoveryAbuseLimitRepository.consume({
         scope: "password_reset_request",
-        subject: `email:${email}`,
+        subject: `email:${abuseEmail}`,
         key: abuseKey,
         limit: 3,
         windowSeconds: 3600,
