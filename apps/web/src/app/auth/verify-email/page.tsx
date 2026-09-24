@@ -18,9 +18,9 @@ function readProof(): Proof | null {
   const challengeId = url.searchParams.get("challenge") ?? "";
   const fragment = new URLSearchParams(url.hash.startsWith("#") ? url.hash.slice(1) : url.hash);
   const token = fragment.get("token") ?? "";
-  // Strip the secret before any user action. URL fragments are not sent to the
-  // server, but keeping them in browser history would unnecessarily retain it.
-  window.history.replaceState(null, "", url.pathname + url.search);
+  // Strip both the secret fragment and correlation-only challenge ID before
+  // any user action so neither remains in browser history or future referrers.
+  window.history.replaceState(null, "", url.pathname);
   if (!/^ach_[A-Za-z0-9_-]{1,96}$/.test(challengeId) || !/^[A-Za-z0-9_-]{43}$/.test(token)) {
     return null;
   }
@@ -48,7 +48,11 @@ export default function VerifyEmailPage() {
       });
       const data = await response.json().catch(() => null);
       if (!response.ok || data?.success !== true || typeof data.email !== "string") {
-        throw new Error(data?.error || "This email confirmation is invalid or expired.");
+        if (response.status >= 400 && response.status < 500) {
+          setState({ kind: "invalid" });
+          return;
+        }
+        throw new Error(data?.error || "Could not confirm this email. Please try again.");
       }
       setState({ kind: "success", email: data.email });
     } catch (error: unknown) {
