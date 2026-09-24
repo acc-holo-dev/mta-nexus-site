@@ -45,6 +45,11 @@ function checkedBaseUrl(value: string): URL {
   return url;
 }
 
+function isProviderWideRetry(result: AccountMailTransportResult): boolean {
+  return result.outcome === "retry"
+    && ["connect", "greeting", "ehlo", "starttls", "auth", "mail_from"].includes(result.stage);
+}
+
 function messageFor(mail: PreparedAccountMail, base: URL): AccountMailTransportInput {
   const path = mail.purpose === "email_verify" ? "/auth/verify-email" : "/auth/reset-password";
   const url = new URL(path, base);
@@ -119,6 +124,11 @@ export class AccountMailDispatcher {
       } else {
         summary.discarded++;
       }
+
+      // A transport/provider-wide retry should not burn an attempt on every
+      // queued message in the same batch. Settle the current lease, then leave
+      // remaining rows untouched for a later poll/backoff window.
+      if (settled && isProviderWideRetry(result)) break;
     }
     // Cleanup is opportunistic maintenance. During shutdown, skip extra DB work
     // so exit latency is bounded by the single in-flight delivery.
