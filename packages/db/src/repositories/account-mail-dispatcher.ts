@@ -98,6 +98,8 @@ export class AccountMailDispatcher {
   async runBatch(limit = 10, signal?: AbortSignal): Promise<AccountMailDispatchSummary> {
     if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new Error("Invalid dispatch batch limit");
     const summary = { accepted: 0, retried: 0, discarded: 0, skipped: 0, unsettled: 0, cleaned: 0 };
+    // Shutdown may have arrived while the caller was checking queue key coverage.
+    if (signal?.aborted) return Object.freeze(summary);
     let providerDeferred = false;
     const ids = await this.#worker.candidates(limit);
     for (const id of ids) {

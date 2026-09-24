@@ -21,7 +21,7 @@ let fingerprint = "";
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
 let healthWrite: Promise<void> = Promise.resolve();
 let healthFailure: unknown = null;
-let healthStatus: "starting" | "ready" = "starting";
+let healthStatus: "starting" | "ready" | "stopping" = "starting";
 let healthBatch = 0;
 let healthProviderBlocked = false;
 let healthProviderBlockedUntil: string | null = null;
@@ -47,8 +47,14 @@ function emit(event: Record<string, unknown>) {
 function stop(signal: "SIGTERM" | "SIGINT") {
   if (stopping) return;
   stopping = true;
+  healthStatus = "stopping";
   emit({ status: "stopping", signal });
   controller.abort();
+  if (heartbeatTimer) {
+    void queueHealth().catch(() => {
+      // queueHealth records any failure for the main shutdown path.
+    });
+  }
 }
 
 process.once("SIGTERM", () => stop("SIGTERM"));
@@ -86,6 +92,7 @@ const queueHealth = (): Promise<void> => {
   const next = healthWrite.then(writeHealthSnapshot);
   healthWrite = next.catch((error) => {
     healthFailure = error;
+    healthStatus = "stopping";
     controller.abort();
   });
   return next;
@@ -98,6 +105,7 @@ try {
   const dispatcher = createAccountMailDispatcher(config);
 
   const assertQueueKeyCoverage = async () => {
+    if (controller.signal.aborted) return;
     const requiredKeyIds = await accountMailOutboxRepository.requiredKeyIds();
     if (requiredKeyIds.some((keyId) => !(keyId in config.keys))) {
       throw new Error("Account mail queue requires an unavailable encryption key");
@@ -112,6 +120,7 @@ try {
   };
 
   const refreshProviderGate = async (emitChange = false) => {
+    if (controller.signal.aborted) return;
     const state = await accountMailWorkerRepository.providerGateStatus();
     const blockedUntil = state.blockedUntil?.toISOString() ?? null;
     const changed = state.blocked !== healthProviderBlocked
@@ -132,6 +141,7 @@ try {
   };
 
   const refreshDeliveryStats = async () => {
+    if (controller.signal.aborted) return;
     const stats = await accountMailWorkerRepository.deliveryStats(30);
     healthDeliveryWindowMinutes = stats.windowMinutes;
     healthDeliveryAccepted = stats.accepted;
@@ -142,6 +152,7 @@ try {
   };
 
   const refreshQueueStats = async (emitChange = false) => {
+    if (controller.signal.aborted) return;
     const stats = await accountMailOutboxRepository.stats();
     const pressure = stats.pending * 100 >= stats.capacity * 80;
     const pressureChanged = pressure !== healthQueuePressure;
@@ -166,26 +177,30 @@ try {
   };
 
   await queueHealth();
-  await checkDatabaseConnection();
+  if (!controller.signal.aborted) await checkDatabaseConnection();
 
   await assertQueueKeyCoverage();
   await refreshProviderGate();
   await refreshQueueStats();
   await refreshDeliveryStats();
 
-  healthStatus = "ready";
-  await queueHealth();
-  if (process.argv.includes("--ready")) {
-    emit({ status: "ready", config: fingerprint });
+  if (!controller.signal.aborted) {
+    healthStatus = "ready";
+    await queueHealth();
   }
-
-  heartbeatTimer = setInterval(() => {
-    void queueHealth().catch(() => {
-      // queueHealth records the failure and aborts the main loop. Avoid an
-      // unhandled rejection from the timer; the main path will fail closed.
-    });
-  }, HEARTBEAT_INTERVAL_MS);
-  heartbeatTimer.unref();
+  // A stop signal can arrive while the ready snapshot is being written.
+  if (!controller.signal.aborted) {
+    if (process.argv.includes("--ready")) {
+      emit({ status: "ready", config: fingerprint });
+    }
+    heartbeatTimer = setInterval(() => {
+      void queueHealth().catch(() => {
+        // queueHealth records the failure and aborts the main loop. Avoid an
+        // unhandled rejection from the timer; the main path will fail closed.
+      });
+    }, HEARTBEAT_INTERVAL_MS);
+    heartbeatTimer.unref();
+  }
 
   const summary = await runAccountMailLoop({
     dispatcher: guardedDispatcher,
@@ -198,7 +213,7 @@ try {
       await refreshProviderGate(true);
       await refreshQueueStats(true);
       await refreshDeliveryStats();
-      await queueHealth();
+      if (!controller.signal.aborted) await queueHealth();
 
       if (!controller.signal.aborted && Date.now() >= nextAbuseCleanupAt) {
         const removed = await accountRecoveryAbuseLimitRepository.cleanup(100);
@@ -254,6 +269,8 @@ try {
   process.exitCode = 1;
 } finally {
   if (heartbeatTimer) clearInterval(heartbeatTimer);
+  // A late signal must not enqueue a snapshot after health-file cleanup begins.
+  heartbeatTimer = null;
 
   try {
     await healthWrite;

@@ -98,13 +98,12 @@ function classify(
   stage: AccountMailTransportStage,
   permanent: "retry" | "discard" = "discard",
 ): AccountMailTransportResult {
-  // Only the expected reply for the current stage can confirm progress. An
-  // unexpected 2xx must never settle unsent mail as accepted; after DATA its
-  // meaning is ambiguous, so preserve the uncertainty for operators.
-  if (code >= 200 && code < 300) return { outcome: "retry", uncertain: stage === "final_reply", stage, code };
+  // requireStage calls this only for unexpected replies. A 4xx/5xx response
+  // explicitly rejects the operation. Other replies do not confirm acceptance;
+  // after DATA, preserve the uncertainty about the message's delivery.
   if (code >= 400 && code < 500) return { outcome: "retry", uncertain: false, stage, code };
   if (code >= 500 && code < 600) return { outcome: permanent, uncertain: false, stage, code };
-  return { outcome: "retry", uncertain: false, stage, code };
+  return { outcome: "retry", uncertain: stage === "final_reply", stage, code };
 }
 
 function dotStuff(text: string): string {
@@ -150,7 +149,8 @@ async function readReply(session: SmtpSession): Promise<{ code: number; lines: s
     if (Buffer.byteLength(next.value, "utf8") > 2_048 || replyLines.length >= 100) {
       throw new Error("SMTP response exceeds bounds");
     }
-    const match = /^(\d{3})([ -])(.*)$/.exec(next.value);
+    // Reject invalid code classes before they can reach persisted SMTP metadata.
+    const match = /^([2-5]\d{2})([ -])(.*)$/.exec(next.value);
     if (!match) throw new Error("Invalid SMTP response");
     expected ||= match[1];
     if (match[1] !== expected) throw new Error("Invalid SMTP response sequence");
