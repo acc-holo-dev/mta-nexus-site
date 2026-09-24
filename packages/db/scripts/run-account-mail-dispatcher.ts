@@ -1,7 +1,6 @@
+import { closeDatabaseConnection } from "../src/client";
 import { createAccountMailDispatcher, readAccountMailRuntimeConfig, runAccountMailLoop, runtimeFingerprint } from "../src/repositories/account-mail-runtime";
 
-const config = readAccountMailRuntimeConfig();
-const dispatcher = createAccountMailDispatcher(config);
 const controller = new AbortController();
 let stopping = false;
 const stop = () => {
@@ -12,7 +11,10 @@ const stop = () => {
 process.once("SIGTERM", stop);
 process.once("SIGINT", stop);
 
+let failed = false;
 try {
+  const config = readAccountMailRuntimeConfig();
+  const dispatcher = createAccountMailDispatcher(config);
   const summary = await runAccountMailLoop({
     dispatcher,
     signal: controller.signal,
@@ -32,7 +34,16 @@ try {
     cleaned: summary.cleaned,
   }) + "\n");
 } catch {
-  // Do not echo environment, recipient, token, transport response or ciphertext.
+  failed = true;
   process.stderr.write("Account mail dispatcher failed\n");
   process.exitCode = 1;
+} finally {
+  try {
+    await closeDatabaseConnection();
+  } catch {
+    if (!failed) {
+      process.stderr.write("Account mail dispatcher failed\n");
+      process.exitCode = 1;
+    }
+  }
 }
