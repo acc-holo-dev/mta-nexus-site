@@ -98,7 +98,10 @@ function classify(
   stage: AccountMailTransportStage,
   permanent: "retry" | "discard" = "discard",
 ): AccountMailTransportResult {
-  if (code >= 200 && code < 300) return { outcome: "accepted", uncertain: false, stage, code };
+  // Only the expected reply for the current stage can confirm progress. An
+  // unexpected 2xx must never settle unsent mail as accepted; after DATA its
+  // meaning is ambiguous, so preserve the uncertainty for operators.
+  if (code >= 200 && code < 300) return { outcome: "retry", uncertain: stage === "final_reply", stage, code };
   if (code >= 400 && code < 500) return { outcome: "retry", uncertain: false, stage, code };
   if (code >= 500 && code < 600) return { outcome: permanent, uncertain: false, stage, code };
   return { outcome: "retry", uncertain: false, stage, code };
