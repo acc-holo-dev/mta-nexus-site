@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -Eeuo pipefail
 
+phase=bootstrap
+on_error() {
+  code=$?
+  printf 'D5 FAIL: phase=%s line=%s exit=%s\n' "$phase" "${BASH_LINENO[0]:-unknown}" "$code" >&2
+  exit "$code"
+}
+trap on_error ERR
+
+phase=runner-guard
 [[ ${GITHUB_ACTIONS:-} == true && ${RUNNER_ENVIRONMENT:-} == github-hosted ]] || {
   echo 'Refusing: D5 mail-worker acceptance requires a disposable GitHub-hosted runner.' >&2
   exit 1
@@ -11,6 +20,7 @@ set -euo pipefail
 }
 cd "$(dirname "$0")/.."
 
+phase=synthetic-secrets
 image=${NEXUS_D5_IMAGE:-mta-nexus:ci}
 receiver="nexus-smtp-${GITHUB_RUN_ID:?}-${GITHUB_RUN_ATTEMPT:?}"
 worker="nexus-mail-worker-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
@@ -36,10 +46,12 @@ export ACCOUNT_MAIL_SMTP_SERVERNAME=localhost
 export ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test
 export COMPOSE_DISABLE_ENV_FILE=true
 
+phase=compose-contract
 echo 'D5 phase: compose contract'
 docker compose --env-file /dev/null -f compose.production.yaml -f compose.mail-worker.yaml config --format json > /tmp/nexus-d5-worker-compose.json
 node scripts/tests/mail-worker-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json
 
+phase=seed-synthetic-mail
 echo 'D5 phase: seed synthetic mail'
 seed=$(NEXUS_D5_MAIL_SEED=true NEXUS_D5_TEST_PASSWORD="$test_password" \
   ACCOUNT_RECOVERY_ABUSE_KEY="$abuse_key" \
@@ -47,6 +59,7 @@ seed=$(NEXUS_D5_MAIL_SEED=true NEXUS_D5_TEST_PASSWORD="$test_password" \
 challenge=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ach_/.test(x.challengeId)) process.exit(1); process.stdout.write(x.challengeId)' "$seed")
 mail=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ame_/.test(x.mailId)) process.exit(1); process.stdout.write(x.mailId)' "$seed")
 
+phase=resolve-tls-receiver
 echo 'D5 phase: resolve closed TLS receiver'
 smtp_host=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$receiver")
 test -n "$smtp_host"
@@ -82,9 +95,11 @@ wait_ready() {
   return 1
 }
 
+phase=start-worker
 echo 'D5 phase: start production-image worker'
 start_worker
 wait_ready
+phase=inspect-worker-isolation
 echo 'D5 phase: inspect worker isolation'
 worker_id=$(docker inspect --format '{{.Id}}' "$worker")
 image_id=$(docker inspect --format '{{.Image}}' "$worker")
@@ -94,6 +109,7 @@ test -z "$(docker port "$worker")"
 ! docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$worker" | grep -q '^ACCOUNT_RECOVERY_ABUSE_KEY='
 ! docker logs "$worker" 2>&1 | grep -F "$mail_key"
 
+phase=tls-settlement
 echo 'D5 phase: wait for TLS acceptance and DB settlement'
 accepted=0
 for attempt in $(seq 1 40); do
@@ -107,6 +123,7 @@ done
 test "$accepted" = 1
 test ! -s /tmp/nexus-d5-check.err
 
+phase=supervised-crash-restart
 echo 'D5 phase: supervised crash restart'
 restart_before=$(docker inspect --format '{{.RestartCount}}' "$worker")
 ready_before=$(docker logs "$worker" 2>&1 | grep -c '"status":"ready"' || true)
@@ -127,6 +144,7 @@ test "$(docker inspect --format '{{.Image}}' "$worker")" = "$image_id"
 test -z "$(docker port "$worker")"
 ! docker logs "$worker" 2>&1 | grep -F "$mail_key"
 
+phase=graceful-recreate
 echo 'D5 phase: graceful stop and same-image recreate'
 docker stop --time 10 "$worker" >/dev/null
 test "$(docker inspect --format '{{.State.ExitCode}}' "$worker")" = "0"
@@ -139,6 +157,7 @@ docker stop --time 10 "$worker" >/dev/null
 test "$(docker inspect --format '{{.State.ExitCode}}' "$worker")" = "0"
 docker rm "$worker" >/dev/null
 
+phase=missing-key-fail-closed
 echo 'D5 phase: missing-key fail-closed'
 set +e
 docker run --rm --add-host host.docker.internal:host-gateway \
@@ -156,6 +175,8 @@ grep -Fxq 'Account mail dispatcher failed' /tmp/nexus-d5-missing.err
 ! grep -F "$mail_key" /tmp/nexus-d5-missing.err
 ! grep -F nexus_test_secret /tmp/nexus-d5-missing.err
 
+phase=cleanup
 trap - EXIT
 cleanup
+trap - ERR
 echo 'PASS: opt-in production-image mail worker accepted synthetic TLS mail, exposed no ports/auth/abuse secrets, stopped cleanly, recreated on the same image and failed closed without its mail key.'
