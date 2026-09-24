@@ -39,19 +39,44 @@ jobs:
           echo "PLAYWRIGHT_BROWSERS_PATH=$PLAYWRIGHT_BROWSERS_PATH" >> "$GITHUB_ENV"
           echo "NEXUS_BROWSER_REPORT_DIR=$RUNNER_TEMP/nexus-directory-report" >> "$GITHUB_ENV"
       - name: Check the real production page in Chromium
+        id: browser-check
         run: bash scripts/check-directory-browser.sh
-      - name: Publish browser acceptance summary
+      - name: Publish textual evidence independently of artifact storage
         if: always()
         shell: bash
+        env:
+          ACCEPTANCE_OUTCOME: ${{ steps.browser-check.outcome }}
         run: |
-          if [ -f "$RUNNER_TEMP/nexus-directory-report/summary.md" ]; then
-            cat "$RUNNER_TEMP/nexus-directory-report/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          report="$RUNNER_TEMP/nexus-directory-report"
+          if [ "$ACCEPTANCE_OUTCOME" = success ]; then
+            test -s "$report/results.json"
+            test -s "$report/summary.md"
           fi
-      - name: Keep screenshots and exact browser results
+          if [ -f "$report/summary.md" ]; then
+            tee -a "$GITHUB_STEP_SUMMARY" < "$report/summary.md"
+          fi
+          for file in results.json live-source.json agent-browser-snapshot.txt; do
+            if [ -f "$report/$file" ]; then
+              echo "Evidence: $file"
+              cat "$report/$file"
+              echo
+            fi
+          done
+      # Screenshots supplement the mandatory assertions and text evidence.
+      # A quota failure must be visible, but is not a failed browser assertion.
+      - name: Keep optional screenshots and browser reports
+        id: browser-artifact
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: directory-browser-${{ github.sha }}
           path: ${{ runner.temp }}/nexus-directory-report
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 3
+      - name: Report missing screenshot artifacts explicitly
+        if: ${{ always() && steps.browser-artifact.outcome == 'failure' }}
+        shell: bash
+        run: |
+          echo '::warning::Browser artifact upload failed. Screenshots are unavailable; inspect the upload step. Mandatory browser assertions and textual evidence retain their own result.'
+          echo 'WARNING: screenshot/report artifact upload failed. Use the textual evidence in this run; no screenshot-based visual approval is implied. Existing artifacts and storage settings were not changed.' >> "$GITHUB_STEP_SUMMARY"
