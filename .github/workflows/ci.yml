@@ -156,15 +156,197 @@ jobs:
           ! grep -F "$AUTH_SECRET" /tmp/account-mail-missing.err
           echo "PASS: dedicated keys, one-shot worker, SIGTERM shutdown and secret-safe failure"
 
-      - name: Stop isolated TLS SMTP receiver
-        if: always()
-        run: docker rm --force "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}" >/dev/null 2>&1 || true
-
       - name: Verify project
         run: pnpm check
 
       - name: Build production image
         run: docker build --tag mta-nexus:ci .
+
+      - name: Verify opt-in production mail worker
+        run: |
+          mail_key=$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('base64url'))")
+          abuse_key=$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('base64url'))")
+          test_password="D5-$(openssl rand -hex 24)"
+          echo "::add-mask::$mail_key"
+          echo "::add-mask::$abuse_key"
+          echo "::add-mask::$test_password"
+
+          export NEXUS_MAIL_IMAGE=mta-nexus:ci
+          export DOMAIN=nexus-ci.test
+          export ACME_EMAIL=ci@nexus-ci.test
+          export POSTGRES_USER=nexus
+          export POSTGRES_PASSWORD=nexus_test_secret
+          export POSTGRES_DB=mta_nexus_test
+          export ACCOUNT_MAIL_KEY_ID=ci
+          export ACCOUNT_MAIL_KEY="$mail_key"
+          export ACCOUNT_MAIL_APP_URL=https://nexus-mta.test
+          export ACCOUNT_MAIL_SMTP_HOST=localhost
+          export ACCOUNT_MAIL_SMTP_PORT=2465
+          export ACCOUNT_MAIL_SMTP_SERVERNAME=localhost
+          export ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test
+          export COMPOSE_DISABLE_ENV_FILE=true
+
+          docker compose --env-file /dev/null -f compose.production.yaml -f compose.mail-worker.yaml config --format json > /tmp/mail-worker-compose.json
+          node scripts/tests/mail-worker-compose.node-test.mjs /tmp/mail-worker-compose.json
+
+          seed=$(GITHUB_ACTIONS=true RUNNER_ENVIRONMENT=github-hosted NEXUS_D5_MAIL_SEED=true             NEXUS_D5_TEST_PASSWORD="$test_password" ACCOUNT_RECOVERY_ABUSE_KEY="$abuse_key"             node --import tsx packages/db/scripts/seed-account-mail-ci.ts)
+          challenge=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ach_/.test(x.challengeId)) process.exit(1); process.stdout.write(x.challengeId)' "$seed")
+          mail=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^aml_/.test(x.mailId)) process.exit(1); process.stdout.write(x.mailId)' "$seed")
+
+          receiver="nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}"
+          smtp_host=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$receiver")
+          test -n "$smtp_host"
+          worker="nexus-mail-worker-${{ github.run_id }}-${{ github.run_attempt }}"
+          cleanup_worker() { docker rm -f "$worker" >/dev/null 2>&1 || true; }
+          trap cleanup_worker EXIT
+
+          start_worker() {
+            docker run --detach --name "$worker"               --add-host host.docker.internal:host-gateway               --env NODE_ENV=production               --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/mta_nexus_test               --env ACCOUNT_MAIL_KEY_ID=ci               --env ACCOUNT_MAIL_KEY="$mail_key"               --env ACCOUNT_MAIL_APP_URL=https://nexus-mta.test               --env ACCOUNT_MAIL_SMTP_HOST="$smtp_host"               --env ACCOUNT_MAIL_SMTP_PORT=2465               --env ACCOUNT_MAIL_SMTP_SERVERNAME=localhost               --env ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test               --env ACCOUNT_MAIL_SMTP_CA="$(cat /tmp/nexus-smtp-ci/cert.pem)"               --env ACCOUNT_MAIL_SMTP_TIMEOUT_MS=1000               --env ACCOUNT_MAIL_BATCH_SIZE=2               --env ACCOUNT_MAIL_POLL_INTERVAL_MS=60000               mta-nexus:ci node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --ready >/dev/null
+          }
+
+          start_worker
+          worker_id=$(docker inspect --format '{{.Id}}' "$worker")
+          image_id=$(docker inspect --format '{{.Image}}' "$worker")
+          test "$(docker exec "$worker" id -u)" != "0"
+          test -z "$(docker port "$worker")"
+          ! docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$worker" | grep -q '^AUTH_SECRET='
+          ! docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$worker" | grep -q '^ACCOUNT_RECOVERY_ABUSE_KEY='
+          for attempt in $(seq 1 100); do
+            docker logs "$worker" 2>&1 | grep -q '"status":"ready"' && break
+            sleep 0.1
+          done
+          docker logs "$worker" 2>&1 | grep -q '"status":"ready"'
+          ! docker logs "$worker" 2>&1 | grep -F "$mail_key"
+
+          accepted=0
+          for attempt in $(seq 1 40); do
+            set +e
+            GITHUB_ACTIONS=true RUNNER_ENVIRONMENT=github-hosted NEXUS_D5_MAIL_CHECK=true               node --import tsx packages/db/scripts/check-account-mail-delivery-ci.ts "$challenge" "$mail"               >/tmp/d5-mail-check.out 2>/tmp/d5-mail-check.err
+            code=$?
+            set -e
+            if [ "$code" -eq 0 ] && grep -q '^PASS
+  postgres-persistence:
+    name: PostgreSQL persistence
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26.0.0
+      # Explicit Node runner; the filename must not match Vitest's *.test.mjs glob.
+      - name: Check persistence test isolation
+        run: node --test scripts/tests/postgres-persistence.node-test.mjs
+      - name: Recreate PostgreSQL with its named volume
+        run: node scripts/check-postgres-persistence.mjs
+
+  local-compose:
+    name: Local Docker startup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # A dedicated disposable hosted runner and project. Never use production data.
+    env:
+      COMPOSE_PROJECT_NAME: nexus-local-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      NEXUS_DEV_PORT: 3000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Build and start the documented local stack
+        run: |
+          test ! -f .env
+          docker compose --env-file /dev/null -f compose.yaml config --quiet
+          docker compose --env-file /dev/null -f compose.yaml up --build --detach --wait --wait-timeout 600
+      - name: Check readiness, HTTP and local-only exposure
+        run: |
+          test "$(docker compose --env-file /dev/null -f compose.yaml exec -T app id -u)" != "0"
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node --test scripts/tests/local-readiness.node-test.mjs
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node scripts/check-local-readiness.mjs
+          curl --fail --silent --show-error --max-time 90 http://127.0.0.1:3000/ -o /tmp/nexus-local-home.html
+          grep -qi '<html' /tmp/nexus-local-home.html
+          for service in postgres clamav; do
+            id=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet "$service")
+            test -n "$id"
+            test -z "$(docker port "$id")"
+          done
+          app=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          test "$(docker port "$app" 3000/tcp)" = "127.0.0.1:3000"
+          echo 'PASS: HTTP home, database, writable uploads, non-root app, loopback-only port'
+      - name: Check migrations and preserve data across app replacement
+        run: |
+          rows=$(docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT count(*) FROM drizzle.__drizzle_migrations')
+          test "$rows" -gt 0
+          docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -v ON_ERROR_STOP=1 -U nexus -d mta_nexus -c "CREATE TABLE beta002_ci_probe (id integer PRIMARY KEY, value text); INSERT INTO beta002_ci_probe VALUES (1, 'preserved');"
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node --input-type=module -e "import {writeFileSync} from 'node:fs'; writeFileSync('/data/uploads/beta002-ci-probe', 'preserved', {flag:'wx'});"
+          before=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          docker compose --env-file /dev/null -f compose.yaml up --detach --force-recreate --no-deps --wait --wait-timeout 180 app
+          after=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          test -n "$after"
+          test "$before" != "$after"
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node scripts/check-local-readiness.mjs
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs'; assert.equal(readFileSync('/data/uploads/beta002-ci-probe', 'utf8'), 'preserved');"
+          test "$(docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT value FROM beta002_ci_probe WHERE id=1')" = "preserved"
+          echo 'PASS: migrations applied, app replaced, database and uploads retained'
+      - name: Show local test diagnostics
+        if: always()
+        run: |
+          docker compose --env-file /dev/null -f compose.yaml ps --all
+          docker compose --env-file /dev/null -f compose.yaml logs --no-color --tail 80
+      - name: Remove only the disposable CI project
+        if: always()
+        run: docker compose --env-file /dev/null -f compose.yaml down --volumes --timeout 15
+
+  production-compose:
+    name: Production Docker startup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26.0.0
+      - name: Verify production smoke isolation
+        run: node --test scripts/tests/production-smoke.node-test.mjs
+      - name: Verify production TLS, persistence and failure paths
+        run: bash scripts/check-production-startup.sh
+ /tmp/d5-mail-check.out; then accepted=1; break; fi
+            sleep 0.25
+          done
+          test "$accepted" = 1
+          test ! -s /tmp/d5-mail-check.err
+
+          docker stop --time 10 "$worker" >/dev/null
+          test "$(docker inspect --format '{{.State.ExitCode}}' "$worker")" = "0"
+          docker rm "$worker" >/dev/null
+          start_worker
+          test "$(docker inspect --format '{{.Id}}' "$worker")" != "$worker_id"
+          test "$(docker inspect --format '{{.Image}}' "$worker")" = "$image_id"
+          for attempt in $(seq 1 100); do
+            docker logs "$worker" 2>&1 | grep -q '"status":"ready"' && break
+            sleep 0.1
+          done
+          docker logs "$worker" 2>&1 | grep -q '"status":"ready"'
+          docker stop --time 10 "$worker" >/dev/null
+          test "$(docker inspect --format '{{.State.ExitCode}}' "$worker")" = "0"
+          docker rm "$worker" >/dev/null
+
+          set +e
+          docker run --rm --add-host host.docker.internal:host-gateway             --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/mta_nexus_test             --env ACCOUNT_MAIL_KEY_ID=ci --env ACCOUNT_MAIL_KEY=             --env ACCOUNT_MAIL_APP_URL=https://nexus-mta.test             --env ACCOUNT_MAIL_SMTP_HOST="$smtp_host" --env ACCOUNT_MAIL_SMTP_PORT=2465             --env ACCOUNT_MAIL_SMTP_SERVERNAME=localhost --env ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test             mta-nexus:ci node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --once             >/tmp/d5-missing.out 2>/tmp/d5-missing.err
+          code=$?
+          set -e
+          test "$code" -ne 0
+          grep -Fxq 'Account mail dispatcher failed' /tmp/d5-missing.err
+          ! grep -F "$mail_key" /tmp/d5-missing.err
+          trap - EXIT
+          cleanup_worker
+          echo 'PASS: opt-in production-image mail worker accepted a synthetic TLS message, exposed no ports/auth/abuse secrets, stopped cleanly, recreated on the same image and failed closed without its mail key.'
+
+      - name: Stop isolated TLS SMTP receiver
+        if: always()
+        run: docker rm --force "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}" >/dev/null 2>&1 || true
 
   postgres-persistence:
     name: PostgreSQL persistence
