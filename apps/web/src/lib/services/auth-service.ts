@@ -308,7 +308,14 @@ export class AuthService {
     newPassword: string;
     consumeAuditId?: string;
   }): Promise<{ revokedSessionCount: number }> {
-    // Hash before entering the proof transaction: scrypt must not hold DB locks.
+    // Reject random/expired/replayed proofs before doing the expensive password
+    // hash. The final consume transaction still repeats all security checks.
+    await accountPasswordResetRepository.assertLiveProof({
+      challengeId: input.challengeId,
+      token: input.token,
+    });
+
+    // Hash outside the proof transaction: scrypt must not hold DB locks.
     const passwordHash = await hashPassword(input.newPassword);
     return accountPasswordResetRepository.confirm({
       challengeId: input.challengeId,
