@@ -145,3 +145,19 @@ jobs:
       - name: Remove only the disposable CI project
         if: always()
         run: docker compose --env-file /dev/null -f compose.yaml down --volumes --timeout 15
+
+  production-compose:
+    name: Production Docker startup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26.0.0
+      - name: Verify production smoke isolation
+        run: node --test scripts/tests/production-smoke.node-test.mjs
+      - name: Verify production TLS, persistence and failure paths
+        run: bash scripts/check-production-startup.sh
