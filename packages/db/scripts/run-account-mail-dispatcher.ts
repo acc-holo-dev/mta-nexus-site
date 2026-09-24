@@ -1,5 +1,6 @@
 import { rename, rm, writeFile } from "node:fs/promises";
 import { checkDatabaseConnection, closeDatabaseConnection } from "../src/client";
+import { accountMailOutboxRepository } from "../src/repositories/account-mail-outbox";
 import {
   createAccountMailDispatcher,
   readAccountMailRuntimeConfig,
@@ -65,6 +66,11 @@ try {
 
   await queueHealth();
   await checkDatabaseConnection();
+
+  const requiredKeyIds = await accountMailOutboxRepository.requiredKeyIds();
+  if (requiredKeyIds.some((keyId) => !(keyId in config.keys))) {
+    throw new Error("Account mail queue requires an unavailable encryption key");
+  }
 
   healthStatus = "ready";
   await queueHealth();
