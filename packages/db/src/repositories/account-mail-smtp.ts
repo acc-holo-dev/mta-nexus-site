@@ -150,16 +150,26 @@ export class AccountMailSmtpTransport {
     const remaining = input.sendBefore.getTime() - Date.now();
     if (remaining <= 0) return { outcome: "retry", uncertain: false };
     const budget = Math.max(1, Math.min(this.#timeoutMs, remaining));
+    const deadlineAt = Date.now() + Math.max(1, remaining);
     let dataSent = false;
     let capabilities: string[] = [];
     let session: SmtpSession | null = null;
     let socket: net.Socket | null = null;
 
     const applyTimeout = (target: net.Socket) => {
-      target.setTimeout(budget, () => target.destroy(new Error("SMTP timeout")));
+      target.setTimeout(budget, () => target.destroy(new Error("SMTP inactivity timeout")));
+    };
+    const deadlineTimer = setTimeout(() => {
+      socket?.destroy(new Error("SMTP send deadline exceeded"));
+    }, Math.max(1, deadlineAt - Date.now()));
+    deadlineTimer.unref();
+
+    const ensureWithinDeadline = () => {
+      if (Date.now() >= deadlineAt) throw new Error("SMTP send deadline exceeded");
     };
 
     try {
+      ensureWithinDeadline();
       if (this.#mode === "implicit_tls") {
         const secure = tls.connect({
           host: this.#options.host,
@@ -173,10 +183,12 @@ export class AccountMailSmtpTransport {
         await once(secure, "secureConnect");
         session = createSession(secure);
 
+        ensureWithinDeadline();
         const greeting = await readReply(session);
         let result = requireStage(greeting.code, 220);
         if (result) return result;
 
+        ensureWithinDeadline();
         const ehlo = await command(session, `EHLO ${this.#options.servername}`);
         result = requireStage(ehlo.code, 250);
         if (result) return result;
@@ -195,6 +207,7 @@ export class AccountMailSmtpTransport {
         let result = requireStage(greeting.code, 220);
         if (result) return result;
 
+        ensureWithinDeadline();
         const plainEhlo = await command(session, `EHLO ${this.#options.servername}`);
         result = requireStage(plainEhlo.code, 250);
         if (result) return result;
@@ -202,6 +215,7 @@ export class AccountMailSmtpTransport {
           return { outcome: "discard", uncertain: false };
         }
 
+        ensureWithinDeadline();
         const startTls = await command(session, "STARTTLS");
         result = requireStage(startTls.code, 220);
         if (result) return result;
@@ -221,6 +235,7 @@ export class AccountMailSmtpTransport {
         await once(secure, "secureConnect");
         session = createSession(secure);
 
+        ensureWithinDeadline();
         const secureEhlo = await command(session, `EHLO ${this.#options.servername}`);
         result = requireStage(secureEhlo.code, 250);
         if (result) return result;
@@ -237,19 +252,23 @@ export class AccountMailSmtpTransport {
           `\0${this.#options.username}\0${this.#options.password}`,
           "utf8",
         ).toString("base64");
+        ensureWithinDeadline();
         const authReply = await command(session, `AUTH PLAIN ${auth}`);
         const result = requireStage(authReply.code, 235);
         if (result) return result;
       }
 
+      ensureWithinDeadline();
       const mailFrom = await command(session, `MAIL FROM:<${this.#options.from}>`);
       let result = requireStage(mailFrom.code, 250);
       if (result) return result;
 
+      ensureWithinDeadline();
       const recipient = await command(session, `RCPT TO:<${input.recipient}>`);
       result = requireStage(recipient.code, [250, 251]);
       if (result) return result;
 
+      ensureWithinDeadline();
       const data = await command(session, "DATA");
       result = requireStage(data.code, 354);
       if (result) return result;
@@ -267,8 +286,10 @@ export class AccountMailSmtpTransport {
         "",
       ].join("\r\n");
 
+      ensureWithinDeadline();
       dataSent = true;
       if (!session.socket.write(message, "utf8")) await once(session.socket, "drain");
+      ensureWithinDeadline();
       const accepted = await readReply(session);
       result = requireStage(accepted.code, 250);
       if (result) return { ...result, uncertain: true };
@@ -278,6 +299,7 @@ export class AccountMailSmtpTransport {
     } catch {
       return { outcome: "retry", uncertain: dataSent };
     } finally {
+      clearTimeout(deadlineTimer);
       closeSession(session);
       socket?.destroy();
     }
