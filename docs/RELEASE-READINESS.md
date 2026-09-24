@@ -1,8 +1,8 @@
 # MTA NEXUS — карта бесплатной закрытой беты
 
-Дата сверки: **2026-09-24**. Проверенный код D3: **68942511d666e970f28b7686deca5939cd9064df**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543966), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962544024) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543980). Vitest — **252 теста в 64 файлах**; Chromium D3-01 подтвердил authenticated recovery-email enrollment/confirmation без внешнего SMTP.
+Дата сверки: **2026-09-24**. Проверенный код D4: **bb1ea0aaff2ce0909499ba822c389e44840ab9fa**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648476), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648596) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648416). Vitest — **257 тестов в 65 файлах**; Chromium D3-01 и D4-01 подтвердили enrollment и anonymous one-time password reset без внешнего SMTP.
 
-**Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1–D3 добавляют proofs, очередь, leases, закрытый TLS transport/runtime, durable limit и authenticated verified-email binding. **Реальная почта пользователям и сценарий «Забыли пароль» по-прежнему не включены в production**. R4 остаётся открытым. Процент готовности не назначается.
+**Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1–D4 добавляют proofs, очередь, leases, закрытый TLS transport/runtime, durable limits, verified-email binding и tested forgot/reset application flow. **Production recovery по-прежнему не включён:** реальный provider/inbox, production keys, supervised dispatcher и rollout policy не приняты. R4 остаётся открытым. Процент готовности не назначается.
 
 Полный аудит файлов, безопасности и старых идей не выполнен. Существующие среды с данными не обследованы и не считаются пустыми. В этом шаге `main`, рабочие серверы, существующие аккаунты, почтовые провайдеры, реальные ключи/секреты и платёжные настройки не менялись; публичного развёртывания не было.
 
@@ -33,17 +33,17 @@
 
 ## 3. Подтверждённая автоматическая база
 
-Текущие результаты относятся к **`68942511d666e970f28b7686deca5939cd9064df`**, а не к следующему документационному коммиту или одобренному релизу.
+Текущие результаты относятся к **`bb1ea0aaff2ce0909499ba822c389e44840ab9fa`**, а не к следующему документационному коммиту или одобренному релизу.
 
 | Проверка | Свидетельство | Граница вывода |
 |---|---|---|
-| Миграции, TypeScript, Vitest, сборки приложения и production-образа | [Verify](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543966/job/107514020814): success; 252/252 тестов, 64/64 файлов | Не полный dependency/security audit. |
-| PostgreSQL и сохранность нового тома | [PostgreSQL persistence](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543966/job/107514020578): success | Не перенос рабочей БД и не backup restore. |
-| Docker-only локальный запуск | [Local Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543966/job/107514020729): success | Linux x86_64, миграции, HTTP/storage и замена app; другие платформы не приняты. |
-| Production-образ, Caddy/TLS и зависимости | [Production Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543966/job/107514020823): success | Новые тома, CI-надстройка, loopback и временный CA; не public DNS/ACME/VDS. |
-| Регистрация, вход, выход и выбранная private-граница | [Account access and logout](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962544024/job/107514020988): success; D3-01 + J2-01..11 | Реальный Chromium/production TLS/DB; не весь auth/security audit и не real inbox. |
-| Известный пароль и сессии | [Password and session security](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962544024/job/107514020804): success; P1..P11 | Не HTTP reset; P10 явно подменяет только 503 для UI. |
-| Каталог в браузере | [Guest server directory](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543980/job/107514020731): success | Управляемые ответы directory API не доказывают весь backend-путь и MTA-клиент. |
+| Миграции, TypeScript, Vitest, сборки приложения и production-образа | [Verify](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648476/job/107603645793): success; 257/257 тестов, 65/65 файлов | Не полный dependency/security audit. |
+| PostgreSQL и сохранность нового тома | [PostgreSQL persistence](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648476/job/107603646580): success | Не перенос рабочей БД и не backup restore. |
+| Docker-only локальный запуск | [Local Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648476/job/107603646360): success | Linux x86_64, миграции, HTTP/storage и замена app; другие платформы не приняты. |
+| Production-образ, Caddy/TLS и зависимости | [Production Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648476/job/107603646407): success | Новые тома, CI-надстройка, loopback и временный CA; не public DNS/ACME/VDS. |
+| Регистрация, вход, выход и выбранная private-граница | [Account access and logout](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648596/job/107603646349): success; D3-01, D4-01 и J2-01..11 | Реальный Chromium/production TLS/DB; synthetic recovery delivery, не real inbox. |
+| Известный пароль и сессии | [Password and session security](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648596/job/107603646769): success; P1..P11 | D4 отдельно проверяет reset; P10 всё ещё явно подменяет только 503 для UI. |
+| Каталог в браузере | [Guest server directory](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35990648416/job/107603645214): success | Управляемые ответы directory API не доказывают весь backend-путь и MTA-клиент. |
 | Proofs D1 и зашифрованная постановка D2a | Прежние 27 + 15 + 15 тестов проходят в том же Verify | Синтетические аккаунты/привязки, не реальное владение почтой. |
 | Получение, retry и завершение задания D2b | account-mail-worker.test.ts: 29/29 в Verify | DB-протокол, включая остановку дочернего процесса; SMTP и естественное ожидание всех интервалов не проверялись. |
 | Скриншоты и ручная визуальная приёмка | Не выполнены этим шагом | Историческая проблема квоты не устранялась; успех browser job не подтверждает доставку/просмотр изображения. |
@@ -74,7 +74,7 @@
 | R1 — PostgreSQL | Старый mount исправлен, новые тома проверены; старые среды требуют инвентаризации, backup и плана переноса. |
 | R2 — Docker-only | Local/production-пути проверены в CI, рабочая среда не принята. |
 | R3 — scanner | Старт проверен; вердикты и fail-closed публикация требуют отдельной приёмки. Модерация не заменяет scanner молча. |
-| R4 — восстановление аккаунта | D0–D3 закрывают внутренний pipeline и authenticated verified-email binding для ordinary password accounts. Anonymous forgot/reset, real provider/production delivery и privileged/MFA/legacy rollout не приняты. Следующий D4 — password reset; R4 открыт. |
+| R4 — восстановление аккаунта | D0–D4 закрывают application-side pipeline для ordinary password accounts: verified binding, neutral forgot request и one-time reset проверены в CI/browser. Real provider/inbox, production keys/supervised worker и privileged/MFA/legacy rollout не приняты. Следующий D5 — operational delivery/rollout; R4 открыт. |
 | R5 — выпуск | Разработка в dev, выпуск только по явно одобренному SHA/тегу main; совпадение веток не означает deploy. |
 | R6 — удобство | Ограниченные английские сценарии пройдены; RU/EN, визуальная и полная доступность открыты. |
 | R7 — эксплуатация | Домен/VDS/контакты/backup не подтверждены; проверить фактическую среду. |
@@ -95,7 +95,7 @@
 | BETA-003 | Production startup в CI: выполнено в описанных границах, не deploy. |
 | BETA-004 | Функциональная browser-часть J1 выполнена; полный J1 открыт. |
 | BETA-005a/b/c | Перечисленные операции аккаунта/пароля/сессий выполнены, не весь J2. |
-| BETA-005d — в работе | D0–D3 выполнены в своих границах. **Следующий D4:** anonymous forgot-password request и proof-confirmed password reset без production mail activation. |
+| BETA-005d — в работе | D0–D4 выполнены в своих границах. **Следующий D5:** real-provider delivery, worker supervision/key lifecycle и rollout policy; production mail пока disabled. |
 | Остальные BETA-005 | Recovery, onboarding автора, scanner и HTTP delivery: отдельные задачи. J2/J4/J5 целиком не закрыты. |
 | BETA-006 | J3/J6/J7: заявки, публикации/подписки, модерация и негативные проверки. |
 | BETA-007 | RU/EN, доступность, тексты и ручная визуальная приёмка обязательных путей. |
@@ -214,19 +214,35 @@ D3a `3ade27d` впервые дал 252/252 Vitest tests, 64 files и семь �
 
 **Ограничения:** standard production Compose не получает mail/abuse keys, держит email disabled и не запускает dispatcher. Нет real provider/inbox, anonymous forgot endpoint, reset mutation, final email/IP anti-enumeration policy, privileged/MFA recovery, legacy account transition, production secret storage/rotation или manual visual/RU acceptance.
 
-### Следующий ограниченный шаг — D4
+### BETA-005d/D4 — anonymous forgot-password и password reset
 
-Реализовать anonymous forgot-password request только через существующий verified binding, с нейтральным ответом и измеряемым timing/enumeration contract, durable subject/IP limits и encrypted `password_reset` outbox. Затем explicit reset page должна consume proof и атомарно заменить password, отозвать все sessions/прочие proofs, записать audit и enqueue security notification; автоматический login после reset не делать. Production provider остаётся отдельным gate.
+**Выполнено на `bb1ea0aaff2ce0909499ba822c389e44840ab9fa`.** D4a добавляет neutral anonymous POST/PATCH service и atomic reset repository; D4b — forgot/reset UI и real Chromium acceptance. Standard production Compose не получает recovery keys и не запускает dispatcher.
+
+Для валидного email POST возвращает одинаковый HTTP 202/body для eligible verified binding, unknown, unverified и rate-limited subjects. Route держит минимальный 350 ms response-time floor. До account lookup читаются отдельные mail/abuse keys. Durable keyed-digest limits: 3/hour для normalized email subject и 20/hour для IP subject; raw email/IP в limit table не хранится. Только current D3 binding может породить encrypted `password_reset` envelope.
+
+PATCH использует one-time proof. Password hash считается до DB write transaction. Внутри protected consume одной транзакцией выполняются proof consumption, password update, удаление всех sessions, credential-trigger revocation остальных pending proofs, `user.password_reset` audit и in-app security notification. Audit-conflict regression подтверждает rollback password/session/proof/notification вместе. Reset не создаёт session; обычный login обязателен.
+
+Browser D4-01 на production Next/TLS/PostgreSQL проверяет neutral body для известного/неизвестного адреса, timing floor, query challenge + fragment token, удаление fragment до действия, отсутствие token в storage/rendered URL, non-mutating page load, keyboard submit на 390×844, all-session revocation, no auto-login, отказ старого password, обычный login новым и replay rejection. Proof извлекается только guarded GitHub-hosted helper из synthetic `@example.invalid` encrypted outbox; внешний SMTP не используется.
+
+Verify на финальном SHA: **257/257 tests, 65/65 files**. Все семь jobs success: CI `35990648476`, Account browser `35990648596`, Directory browser `35990648416`.
+
+Сохранённая D4 история включает server/service и browser harness итерации. На `dbf646a` D4-01 дошёл до reset proof retrieval и выявил реальный test-fixture mismatch: helper выбрал `password_reset` row, но передал cipher AAD purpose `email_verify`; authenticated decrypt правильно отказал. Финальный `bb1ea0a` передаёт фактический purpose, не ослабляя production cipher. Прежние J2/password/session/directory regressions на финальном SHA зелёные.
+
+**Ограничения:** 350 ms floor — заданный контракт, не полный статистический side-channel/load аудит. Нет real provider/inbox delivery, SMTP provider AUTH rollout, production recovery keys, supervised worker/service manager, secret/key rotation rehearsal, privileged/MFA recovery, legacy transition, manual visual/RU acceptance или environment backup/restore evidence. In-app security notification не доказывает внешнюю security-mail доставку.
+
+### Следующий ограниченный шаг — D5
+
+Провести эксплуатационную сквозную приёмку recovery delivery без публичного deploy: выбрать/сконфигурировать реальный provider mode, проверить AUTH/TLS и inbox delivery на тестовых адресах, supervised standalone dispatcher, restart/drain/observability, secret/key lifecycle и rotation/recovery; затем явно принять policy для privileged/MFA/legacy accounts и anti-enumeration/load bounds. Production activation остаётся отдельным release gate.
 
 ## 7. Условия допуска к выпуску
 
 | Условие | Сейчас |
 |---|---|
-| Проверки точного кандидата | Семь заданий успешны на 6894251; SHA не объявлен релизом, после изменений проверки повторяются. |
+| Проверки точного кандидата | Семь заданий успешны на bb1ea0a; SHA не объявлен релизом, после изменений проверки повторяются. |
 | Хранение и запуск | BETA-001–003 и повтор D2b подтверждены в CI; рабочая среда не принята. |
 | Полные J1–J7 | Частично подтверждены, не закрыты перечнем подзадач. |
 | Scanner и безопасный путь архива | Runtime-приёмка не завершена. |
-| Восстановление аккаунта | R4 открыт: verified binding принят в CI, но anonymous forgot/reset и real-provider эксплуатация ещё не приняты. |
+| Восстановление аккаунта | R4 открыт: application-side binding + forgot/reset приняты в CI/browser, но real-provider/production delivery и rollout policy ещё не приняты. |
 | RU/EN, доступность и визуальное качество | Общая приёмка открыта. |
 | Восстановление БД и приватных файлов | Не проверено; сохранение тома не равно backup restore. |
 | Security/dependency review, секреты, журналирование и контакты | Полный аудит не выполнен; страницы privacy/terms не заменяют проверку содержания. |
@@ -236,7 +252,7 @@ D3a `3ade27d` впервые дал 252/252 Vitest tests, 64 files и семь �
 
 Перед изменением существующей среды нужны версия БД, фактические data_directory/mounts, проверенный backup и план переноса/восстановления. Запрещены `docker compose down -v`, `docker volume prune` и `docker system prune --volumes` на среде с существующими либо неизвестными данными. Очистка CI ограничена собственными одноразовыми ресурсами.
 
-Платная коммерция — отдельный закрытый этап: модель деятельности, провайдеры, условия/возвраты, webhook verification, идемпотентность, сверка, выплаты и обязанности по продавцам проверяются отдельно. D3 его не включает и не подтверждает.
+Платная коммерция — отдельный закрытый этап: модель деятельности, провайдеры, условия/возвраты, webhook verification, идемпотентность, сверка, выплаты и обязанности по продавцам проверяются отдельно. D4 его не включает и не подтверждает.
 
 ## 8. Как обновлять карту
 
