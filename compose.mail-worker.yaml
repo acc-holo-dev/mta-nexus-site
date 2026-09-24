@@ -3,10 +3,6 @@
 services:
   mail-worker:
     image: ${NEXUS_MAIL_IMAGE:?set NEXUS_MAIL_IMAGE to the approved application image}
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runtime
     restart: unless-stopped
     command: ["node", "--import", "tsx", "packages/db/scripts/run-account-mail-dispatcher.ts", "--ready"]
     environment:
