@@ -85,7 +85,8 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 26.0.0
+      # Explicit Node runner; the filename must not match Vitest's *.test.mjs glob.
       - name: Check persistence test isolation
-        run: node --test scripts/tests/postgres-persistence.test.mjs
+        run: node --test scripts/tests/postgres-persistence.node-test.mjs
       - name: Recreate PostgreSQL with its named volume
         run: node scripts/check-postgres-persistence.mjs
