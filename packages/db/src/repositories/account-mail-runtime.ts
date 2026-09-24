@@ -154,11 +154,17 @@ export type AccountMailLoopSummary = Readonly<{
   skipped: number; unsettled: number; cleaned: number;
 }>;
 
+export type AccountMailBatchResult = Readonly<{
+  accepted: number;
+  retried: number;
+  discarded: number;
+  skipped: number;
+  unsettled: number;
+  cleaned: number;
+}>;
+
 type BatchRunner = Readonly<{
-  runBatch(limit?: number): Promise<Readonly<{
-    accepted: number; retried: number; discarded: number;
-    skipped: number; unsettled: number; cleaned: number;
-  }>>;
+  runBatch(limit?: number): Promise<AccountMailBatchResult>;
 }>;
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
@@ -176,7 +182,16 @@ function sleep(ms: number, signal: AbortSignal): Promise<void> {
 }
 
 export async function runAccountMailLoop(input: {
-  dispatcher: BatchRunner; signal: AbortSignal; batchSize: number; pollIntervalMs: number; once?: boolean;
+  dispatcher: BatchRunner;
+  signal: AbortSignal;
+  batchSize: number;
+  pollIntervalMs: number;
+  once?: boolean;
+  onBatch?: (input: Readonly<{
+    batch: number;
+    result: AccountMailBatchResult;
+    total: AccountMailLoopSummary;
+  }>) => void | Promise<void>;
 }): Promise<AccountMailLoopSummary> {
   if (!input?.dispatcher || !input?.signal
     || !Number.isInteger(input.batchSize) || input.batchSize < 1 || input.batchSize > 100
@@ -194,6 +209,13 @@ export async function runAccountMailLoop(input: {
     total.skipped += result.skipped;
     total.unsettled += result.unsettled;
     total.cleaned += result.cleaned;
+    if (input.onBatch) {
+      await input.onBatch({
+        batch: total.batches,
+        result,
+        total: Object.freeze({ ...total }),
+      });
+    }
     if (input.once || input.signal.aborted) break;
     await sleep(input.pollIntervalMs, input.signal);
   } while (!input.signal.aborted);

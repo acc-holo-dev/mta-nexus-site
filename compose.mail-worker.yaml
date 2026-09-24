@@ -23,6 +23,12 @@ services:
       ACCOUNT_MAIL_SMTP_TIMEOUT_MS: ${ACCOUNT_MAIL_SMTP_TIMEOUT_MS:-5000}
       ACCOUNT_MAIL_BATCH_SIZE: ${ACCOUNT_MAIL_BATCH_SIZE:-10}
       ACCOUNT_MAIL_POLL_INTERVAL_MS: ${ACCOUNT_MAIL_POLL_INTERVAL_MS:-5000}
+    healthcheck:
+      test: ["CMD", "node", "scripts/check-account-mail-worker-health.mjs"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
     depends_on:
       postgres:
         condition: service_healthy
