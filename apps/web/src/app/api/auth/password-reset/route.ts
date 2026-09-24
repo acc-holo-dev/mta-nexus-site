@@ -20,6 +20,15 @@ async function floor(startedAt: number) {
   if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
 }
 
+function recoveryClientIp(request: NextRequest): string {
+  const secret = process.env.TRUSTED_PROXY_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV !== "production") return "local-direct";
+    throw new Error("Trusted proxy secret is unavailable");
+  }
+  return getClientIp(request.headers, secret);
+}
+
 export async function POST(request: NextRequest) {
   const startedAt = performance.now();
   const parsed = requestPasswordResetSchema.safeParse(await request.json().catch(() => null));
@@ -30,7 +39,7 @@ export async function POST(request: NextRequest) {
   try {
     await authService.requestPasswordReset({
       email: parsed.data.email,
-      ip: getClientIp(request.headers),
+      ip: recoveryClientIp(request),
     });
     await floor(startedAt);
     return json(neutral, 202);

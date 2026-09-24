@@ -39,6 +39,7 @@ services:
       NEXT_PUBLIC_APP_URL: https://${DOMAIN:?set DOMAIN in .env}
       DATABASE_URL: postgres://${POSTGRES_USER:-nexus}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mta_nexus}
       AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET in .env}
+      TRUSTED_PROXY_SECRET: ${TRUSTED_PROXY_SECRET:?set TRUSTED_PROXY_SECRET in .env}
       STORAGE_PROVIDER: local
       STORAGE_LOCAL_PATH: /data/uploads
       EMAIL_PROVIDER: disabled
@@ -67,6 +68,7 @@ services:
     environment:
       DOMAIN: ${DOMAIN:?set DOMAIN in .env}
       ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
+      TRUSTED_PROXY_SECRET: ${TRUSTED_PROXY_SECRET:?set TRUSTED_PROXY_SECRET in .env}
     ports:
       - "80:80"
       - "443:443"
