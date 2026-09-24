@@ -36,15 +36,18 @@ export ACCOUNT_MAIL_SMTP_SERVERNAME=localhost
 export ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test
 export COMPOSE_DISABLE_ENV_FILE=true
 
+echo 'D5 phase: compose contract'
 docker compose --env-file /dev/null -f compose.production.yaml -f compose.mail-worker.yaml config --format json > /tmp/nexus-d5-worker-compose.json
 node scripts/tests/mail-worker-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json
 
+echo 'D5 phase: seed synthetic mail'
 seed=$(NEXUS_D5_MAIL_SEED=true NEXUS_D5_TEST_PASSWORD="$test_password" \
   ACCOUNT_RECOVERY_ABUSE_KEY="$abuse_key" \
   node --import tsx packages/db/scripts/seed-account-mail-ci.ts)
 challenge=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^ach_/.test(x.challengeId)) process.exit(1); process.stdout.write(x.challengeId)' "$seed")
 mail=$(node -e 'const x=JSON.parse(process.argv[1]); if(!/^aml_/.test(x.mailId)) process.exit(1); process.stdout.write(x.mailId)' "$seed")
 
+echo 'D5 phase: resolve closed TLS receiver'
 smtp_host=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$receiver")
 test -n "$smtp_host"
 ca=$(cat /tmp/nexus-smtp-ci/cert.pem)
@@ -78,8 +81,10 @@ wait_ready() {
   return 1
 }
 
+echo 'D5 phase: start production-image worker'
 start_worker
 wait_ready
+echo 'D5 phase: inspect worker isolation'
 worker_id=$(docker inspect --format '{{.Id}}' "$worker")
 image_id=$(docker inspect --format '{{.Image}}' "$worker")
 test "$(docker exec "$worker" id -u)" != "0"
@@ -88,6 +93,7 @@ test -z "$(docker port "$worker")"
 ! docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$worker" | grep -q '^ACCOUNT_RECOVERY_ABUSE_KEY='
 ! docker logs "$worker" 2>&1 | grep -F "$mail_key"
 
+echo 'D5 phase: wait for TLS acceptance and DB settlement'
 accepted=0
 for attempt in $(seq 1 40); do
   set +e
@@ -100,6 +106,7 @@ done
 test "$accepted" = 1
 test ! -s /tmp/nexus-d5-check.err
 
+echo 'D5 phase: graceful stop and same-image recreate'
 docker stop --time 10 "$worker" >/dev/null
 test "$(docker inspect --format '{{.State.ExitCode}}' "$worker")" = "0"
 docker rm "$worker" >/dev/null
@@ -111,6 +118,7 @@ docker stop --time 10 "$worker" >/dev/null
 test "$(docker inspect --format '{{.State.ExitCode}}' "$worker")" = "0"
 docker rm "$worker" >/dev/null
 
+echo 'D5 phase: missing-key fail-closed'
 set +e
 docker run --rm --add-host host.docker.internal:host-gateway \
   --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/mta_nexus_test \
