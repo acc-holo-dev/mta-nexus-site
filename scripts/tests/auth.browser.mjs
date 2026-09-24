@@ -58,11 +58,35 @@ before(async () => {
   [alice, bob, guest] = contexts;
 });
 
+async function freshActor() {
+  const context = await browser.newContext({
+    baseURL,
+    ignoreHTTPSErrors: false,
+    locale: 'en-GB',
+    viewport: { width: 1440, height: 1000 },
+  });
+  const page = await context.newPage();
+  const errors = [];
+  const networkErrors = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() !== 'error') return;
+    const location = message.location().url;
+    if (/Failed to load resource/.test(message.text())
+      && /\/api\/(auth|servers)|\/workspace\/servers\//.test(location)
+      && /\b(400|401|403|404|409)\b/.test(message.text())) networkErrors.push(message.text());
+    else errors.push(message.text());
+  });
+  const actor = { context, page, errors, networkErrors };
+  contexts.push(actor);
+  return actor;
+}
+
 after(async () => {
   for (const actor of contexts) await actor.context.close();
   if (browser) await browser.close();
   await writeFile(join(output, 'results.json'), JSON.stringify({ commit: process.env.GITHUB_SHA, results }, null, 2));
-  await writeFile(join(output, 'summary.md'), `# BETA-005a/D3 authentication acceptance\n\nCommit: ${process.env.GITHUB_SHA}\n\n${results.map((r) => `- ${r.status}: ${r.name}`).join('\n')}\n\nReal Chromium, production TLS, database sessions and HTTP endpoints. No auth/session/ownership responses are mocked. Synthetic accounts and private listings only. No tokens, passwords, cookies or storage state are retained in reports. Includes the controlled D3 recovery-email enrollment browser path; it is not a password-reset test, real inbox delivery, real deployment or full visual/accessibility approval.\n`);
+  await writeFile(join(output, 'summary.md'), `# BETA-005a/D3 authentication acceptance\n\nCommit: ${process.env.GITHUB_SHA}\n\n${results.map((r) => `- ${r.status}: ${r.name}`).join('\n')}\n\nReal Chromium, production TLS, database sessions and HTTP endpoints. No auth/session/ownership responses are mocked. Synthetic accounts and private listings only. No tokens, passwords, cookies or storage state are retained in reports. Includes controlled D3 recovery-email enrollment and D4 password-reset browser paths; no external inbox/provider delivery, real deployment or full visual/accessibility approval is implied.\n`);
 });
 
 function check(name, body) {
@@ -354,8 +378,8 @@ check('J2-10 keyboard and narrow login form plus agent-browser snapshot', async 
 });
 
 check('D4-01 anonymous neutral request and one-time password reset', async () => {
-  const resetSessionA = await actor();
-  const resetSessionB = await actor();
+  const resetSessionA = await freshActor();
+  const resetSessionB = await freshActor();
   for (const who of [resetSessionA, resetSessionB]) {
     const logged = await request(who, '/api/auth/login', 'POST', { email: people[0].email, password });
     assert.equal(logged.status, 200);
