@@ -120,6 +120,13 @@
       "when": 1790240000000,
       "tag": "0016_password_reset_confirm_limit",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790244000000,
+      "tag": "0017_account_mail_provider_gate",
+      "breakpoints": true
     }
   ]
 }

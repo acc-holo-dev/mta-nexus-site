@@ -3,7 +3,7 @@ import { and, eq, gt, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, sessions, users } from "../schema";
 import { accountAuthState, accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
-import { accountMailOutbox } from "../account-mail-schema";
+import { accountMailOutbox, accountMailQueueGate } from "../account-mail-schema";
 import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import type { MailContext, MailPayload } from "./account-mail-crypto";
 import { digestAccountChallenge } from "./account-challenges";
@@ -15,6 +15,11 @@ export type PreparedAccountMail = Readonly<MailContext & MailPayload & { sendBef
 export const ACCOUNT_MAIL_MAX_ATTEMPTS = 5;
 const leaseMs = 60_000;
 const backoffMs = [5_000, 30_000, 120_000, 300_000] as const;
+const providerBackoffMs = [30_000, 60_000, 120_000, 300_000, 600_000] as const;
+
+function providerRetryDelayMs(streak: number): number {
+  return providerBackoffMs[Math.min(Math.max(streak - 1, 0), providerBackoffMs.length - 1)];
+}
 
 function retryDelayMs(id: string, attempt: number): number {
   const base = backoffMs[Math.min(Math.max(attempt - 1, 0), backoffMs.length - 1)];
@@ -62,6 +67,13 @@ async function transaction<T>(work: (tx: Tx) => Promise<T>): Promise<T> {
 export class AccountMailWorkerRepository {
   async candidates(limit = 20): Promise<string[]> {
     checkLimit(limit);
+    const [gate] = await db.select({
+      blocked: sql<boolean>`${accountMailQueueGate.providerBlockedUntil} is not null
+        and ${accountMailQueueGate.providerBlockedUntil} > clock_timestamp()`,
+    }).from(accountMailQueueGate).where(eq(accountMailQueueGate.singleton, true)).limit(1);
+    if (!gate) throw new Error("Account mail queue gate is unavailable");
+    if (gate.blocked) return [];
+
     const rows = await db.select({ id: accountMailOutbox.id }).from(accountMailOutbox)
       .where(and(lte(accountMailOutbox.availableAt, sql`clock_timestamp()`), availableLease(),
         gt(accountMailOutbox.expiresAt, sql`clock_timestamp()`),
@@ -77,6 +89,12 @@ export class AccountMailWorkerRepository {
       const item = await this.lockLiveMail(tx, id);
       if (!item) return null;
       const { mail, now, validUntil } = item;
+      const [providerGate] = await tx.select({
+        blocked: sql<boolean>`${accountMailQueueGate.providerBlockedUntil} is not null
+          and ${accountMailQueueGate.providerBlockedUntil} > clock_timestamp()`,
+      }).from(accountMailQueueGate).where(eq(accountMailQueueGate.singleton, true)).limit(1);
+      if (!providerGate) throw new Error("Account mail queue gate is unavailable");
+      if (providerGate.blocked) return null;
       if (mail.leaseExpiresAt && mail.leaseExpiresAt > now) return null;
       if (mail.attempts >= ACCOUNT_MAIL_MAX_ATTEMPTS) {
         await tx.delete(accountMailOutbox).where(eq(accountMailOutbox.id, id));
@@ -165,8 +183,15 @@ export class AccountMailWorkerRepository {
       const item = await this.lockLiveMail(tx, lease.id);
       if (!item || !this.owns(item, lease, digest)) return false;
 
+      const [gate] = await tx.select().from(accountMailQueueGate)
+        .where(eq(accountMailQueueGate.singleton, true)).for("update");
+      if (!gate) throw new Error("Account mail queue gate is unavailable");
+      const providerFailureStreak = Math.min(gate.providerFailureStreak + 1, 10);
+      const providerBlockedUntil = new Date(
+        item.now.getTime() + providerRetryDelayMs(providerFailureStreak),
+      );
       const retryAt = new Date(Math.min(
-        item.now.getTime() + 30_000,
+        providerBlockedUntil.getTime(),
         item.validUntil.getTime(),
       ));
       const changed = await tx.update(accountMailOutbox).set({
@@ -181,6 +206,11 @@ export class AccountMailWorkerRepository {
         gt(accountMailOutbox.leaseExpiresAt, sql`clock_timestamp()`),
       )).returning({ id: accountMailOutbox.id });
       if (changed.length !== 1) return false;
+
+      await tx.update(accountMailQueueGate).set({
+        providerBlockedUntil,
+        providerFailureStreak,
+      }).where(eq(accountMailQueueGate.singleton, true));
 
       await tx.insert(auditEvents).values({
         id: auditId,
@@ -238,6 +268,17 @@ export class AccountMailWorkerRepository {
             leaseTokenDigest: null, leaseExpiresAt: null }).where(owned).returning({ id: accountMailOutbox.id })
         : await tx.delete(accountMailOutbox).where(owned).returning({ id: accountMailOutbox.id });
       if (!changed.length) return false;
+      if (transport?.stage !== undefined) {
+        const [gate] = await tx.select().from(accountMailQueueGate)
+          .where(eq(accountMailQueueGate.singleton, true)).for("update");
+        if (!gate) throw new Error("Account mail queue gate is unavailable");
+        if (gate.providerBlockedUntil !== null || gate.providerFailureStreak !== 0) {
+          await tx.update(accountMailQueueGate).set({
+            providerBlockedUntil: null,
+            providerFailureStreak: 0,
+          }).where(eq(accountMailQueueGate.singleton, true));
+        }
+      }
       await tx.insert(auditEvents).values({
         id: auditId, actorId: "system:account-mail-worker", actorType: "system", action: outcome === "accepted"
           ? "auth.mail_transport_accepted" : retry ? "auth.mail_retry_scheduled" : "auth.mail_discarded",

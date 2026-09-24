@@ -7,9 +7,15 @@ import type { SealedMail } from "./repositories/account-mail-crypto";
 export const accountMailQueueGate = pgTable("account_mail_queue_gate", {
   singleton: boolean("singleton").primaryKey().default(true),
   capacity: integer("capacity").notNull().default(1000),
+  providerBlockedUntil: timestamp("provider_blocked_until", { withTimezone: true }),
+  providerFailureStreak: integer("provider_failure_streak").notNull().default(0),
 }, (t) => [
   check("account_mail_gate_singleton", sql`${t.singleton} = true`),
   check("account_mail_capacity_bounds", sql`${t.capacity} between 1 and 1000`),
+  check("account_mail_provider_failure_streak_bounds", sql`${t.providerFailureStreak} between 0 and 10`),
+  check("account_mail_provider_gate_state", sql`
+    (${t.providerBlockedUntil} is null and ${t.providerFailureStreak} = 0)
+    or (${t.providerBlockedUntil} is not null and ${t.providerFailureStreak} between 1 and 10)`),
 ]);
 
 export const accountMailOutbox = pgTable("account_mail_outbox", {
