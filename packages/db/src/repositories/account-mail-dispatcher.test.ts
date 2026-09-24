@@ -45,9 +45,9 @@ function fixture(result: AccountMailTransportResult, options: { prepareError?: b
 
 describe("D2c account mail dispatcher", () => {
   it.each([
-    ["accepted", { outcome: "accepted", uncertain: false } as const, "accepted"],
-    ["retry", { outcome: "retry", uncertain: false } as const, "retried"],
-    ["discard", { outcome: "discard", uncertain: false } as const, "discarded"],
+    ["accepted", { outcome: "accepted", uncertain: false, stage: "final_reply" } as const, "accepted"],
+    ["retry", { outcome: "retry", uncertain: false, stage: "connect" } as const, "retried"],
+    ["discard", { outcome: "discard", uncertain: false, stage: "rcpt_to" } as const, "discarded"],
   ])("settles %s transport outcomes", async (_name, result, count) => {
     const f = fixture(result);
     const summary = await f.dispatcher.runBatch();
@@ -56,7 +56,7 @@ describe("D2c account mail dispatcher", () => {
   });
 
   it("keeps the token out of the request URL query", async () => {
-    const f = fixture({ outcome: "accepted", uncertain: false });
+    const f = fixture({ outcome: "accepted", uncertain: false, stage: "final_reply" });
     await f.dispatcher.runBatch();
     const sent = f.sent();
     expect(sent).toBeTruthy();
@@ -69,7 +69,7 @@ describe("D2c account mail dispatcher", () => {
   });
 
   it("turns prepare failures into an explicit retry without exposing plaintext", async () => {
-    const f = fixture({ outcome: "accepted", uncertain: false }, { prepareError: true });
+    const f = fixture({ outcome: "accepted", uncertain: false, stage: "final_reply" }, { prepareError: true });
     const summary = await f.dispatcher.runBatch();
     expect(f.outcomes).toEqual(["retry"]);
     expect(summary.retried).toBe(1);
@@ -87,7 +87,11 @@ describe("D2c account mail dispatcher", () => {
     const w = workerFixture();
     expect(() => new AccountMailDispatcher({
       worker: w.worker, cipher,
-      transport: { send: async () => ({ outcome: "accepted" as const, uncertain: false }) },
+      transport: { send: async () => ({
+        outcome: "accepted" as const,
+        uncertain: false,
+        stage: "final_reply" as const,
+      }) },
       appUrl: "http://localhost:3000",
     })).toThrow("Invalid account mail application URL");
   });
