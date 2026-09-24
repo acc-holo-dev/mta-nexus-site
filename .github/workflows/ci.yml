@@ -98,7 +98,7 @@ jobs:
         env:
           SMTP_TEST_CA_FILE: /tmp/nexus-smtp-ci/cert.pem
           SMTP_TEST_PORT: 2465
-        run: pnpm exec tsx scripts/check-account-mail-smtp.ts
+        run: pnpm --filter @nexus/db exec tsx scripts/check-account-mail-smtp.ts
 
       - name: Stop isolated TLS SMTP receiver
         if: always()
