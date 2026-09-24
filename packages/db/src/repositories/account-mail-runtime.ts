@@ -86,8 +86,28 @@ function decodeKey(value: string, label: string): Uint8Array {
   return new Uint8Array(decoded);
 }
 
-export function readAccountRecoveryAbuseKey(
-  env: Record<string, string | undefined> = process.env,
+function readActiveMailKeyMaterial(
+  env: Record<string, string | undefined>,
+): { activeKeyId: string; activeKey: Uint8Array } {
+  const rawKey = secretSource(
+    env,
+    "ACCOUNT_MAIL_KEY",
+    "ACCOUNT_MAIL_KEY_FILE",
+    "account mail encryption key",
+    { required: true },
+  )!;
+  if (env.AUTH_SECRET && rawKey === env.AUTH_SECRET) {
+    throw new Error("Account mail encryption key must not reuse AUTH_SECRET");
+  }
+  const activeKeyId = required(env, "ACCOUNT_MAIL_KEY_ID");
+  if (!/^[A-Za-z0-9_-]{1,32}$/.test(activeKeyId)) {
+    throw new Error("Invalid account mail key identifier");
+  }
+  return { activeKeyId, activeKey: decodeKey(rawKey, "account mail encryption key") };
+}
+
+function readRecoveryAbuseKeyMaterial(
+  env: Record<string, string | undefined>,
 ): Uint8Array {
   const raw = secretSource(
     env,
@@ -102,41 +122,75 @@ export function readAccountRecoveryAbuseKey(
   return decodeKey(raw, "account recovery abuse key");
 }
 
+function keyFingerprint(label: string, key: Uint8Array, keyId = ""): string {
+  return createHash("sha256")
+    .update(label)
+    .update("\0")
+    .update(keyId)
+    .update("\0")
+    .update(key)
+    .digest("hex");
+}
+
+let productionProducerPin:
+  | { fingerprint: string; cipher: AccountMailCipher }
+  | undefined;
+let productionAbusePin:
+  | { fingerprint: string; key: Uint8Array }
+  | undefined;
+
+export function readAccountRecoveryAbuseKey(
+  env: Record<string, string | undefined> = process.env,
+): Uint8Array {
+  return readRecoveryAbuseKeyMaterial(env);
+}
+
+export function getPinnedAccountRecoveryAbuseKey(
+  env: Record<string, string | undefined> = process.env,
+): Uint8Array {
+  const key = readRecoveryAbuseKeyMaterial(env);
+  if (env.NODE_ENV !== "production") return key;
+
+  const fingerprint = keyFingerprint("recovery-abuse", key);
+  if (!productionAbusePin) {
+    productionAbusePin = { fingerprint, key: new Uint8Array(key) };
+  } else if (productionAbusePin.fingerprint !== fingerprint) {
+    throw new Error("Account recovery abuse key changed; restart required");
+  }
+  return new Uint8Array(productionAbusePin.key);
+}
+
 export function createAccountMailProducerCipher(
   env: Record<string, string | undefined> = process.env,
 ): AccountMailCipher {
-  const rawKey = secretSource(
-    env,
-    "ACCOUNT_MAIL_KEY",
-    "ACCOUNT_MAIL_KEY_FILE",
-    "account mail encryption key",
-    { required: true },
-  )!;
-  if (env.AUTH_SECRET && rawKey === env.AUTH_SECRET) {
-    throw new Error("Account mail encryption key must not reuse AUTH_SECRET");
-  }
-  const activeKeyId = required(env, "ACCOUNT_MAIL_KEY_ID");
-  if (!/^[A-Za-z0-9_-]{1,32}$/.test(activeKeyId)) throw new Error("Invalid account mail key identifier");
-  const activeKey = decodeKey(rawKey, "account mail encryption key");
+  const { activeKeyId, activeKey } = readActiveMailKeyMaterial(env);
   return new AccountMailCipher(activeKeyId, Object.freeze({ [activeKeyId]: activeKey }));
+}
+
+export function getPinnedAccountMailProducerCipher(
+  env: Record<string, string | undefined> = process.env,
+): AccountMailCipher {
+  const { activeKeyId, activeKey } = readActiveMailKeyMaterial(env);
+  if (env.NODE_ENV !== "production") {
+    return new AccountMailCipher(activeKeyId, Object.freeze({ [activeKeyId]: activeKey }));
+  }
+
+  const fingerprint = keyFingerprint("mail-producer", activeKey, activeKeyId);
+  if (!productionProducerPin) {
+    productionProducerPin = {
+      fingerprint,
+      cipher: new AccountMailCipher(activeKeyId, Object.freeze({ [activeKeyId]: activeKey })),
+    };
+  } else if (productionProducerPin.fingerprint !== fingerprint) {
+    throw new Error("Account mail producer key changed; restart required");
+  }
+  return productionProducerPin.cipher;
 }
 
 export function readAccountMailRuntimeConfig(
   env: Record<string, string | undefined> = process.env,
 ): AccountMailRuntimeConfig {
-  const rawKey = secretSource(
-    env,
-    "ACCOUNT_MAIL_KEY",
-    "ACCOUNT_MAIL_KEY_FILE",
-    "account mail encryption key",
-    { required: true },
-  )!;
-  if (env.AUTH_SECRET && rawKey === env.AUTH_SECRET) {
-    throw new Error("Account mail encryption key must not reuse AUTH_SECRET");
-  }
-  const activeKeyId = required(env, "ACCOUNT_MAIL_KEY_ID");
-  if (!/^[A-Za-z0-9_-]{1,32}$/.test(activeKeyId)) throw new Error("Invalid account mail key identifier");
-  const activeKey = decodeKey(rawKey, "account mail encryption key");
+  const { activeKeyId, activeKey } = readActiveMailKeyMaterial(env);
   const previousKeyId = env.ACCOUNT_MAIL_PREVIOUS_KEY_ID || undefined;
   const previousRawKey = secretSource(
     env,
