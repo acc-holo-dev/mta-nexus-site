@@ -93,7 +93,7 @@ export default function VerifyEmailPage() {
           <>
             <p role="alert" className="text-sm text-muted">{state.message}</p>
             {state.proof && (
-              <button type="button" onClick={() => void confirm(state.proof)}
+              <button type="button" onClick={() => void confirm(state.proof!)}
                 className="px-4 py-2 rounded-md bg-accent text-white text-sm font-semibold">Try again</button>
             )}
             <Link href="/settings" className="block text-sm font-semibold text-accent">Back to Settings</Link>
