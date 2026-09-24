@@ -234,6 +234,7 @@ export class AccountMailSmtpTransport {
           port: this.#options.port,
           servername: this.#options.servername,
           ca: this.#options.ca,
+          minVersion: "TLSv1.2",
           rejectUnauthorized: true,
         });
         socket = secure;
@@ -290,6 +291,7 @@ export class AccountMailSmtpTransport {
           socket: plain,
           servername: this.#options.servername,
           ca: this.#options.ca,
+          minVersion: "TLSv1.2",
           rejectUnauthorized: true,
         });
         socket = secure;
