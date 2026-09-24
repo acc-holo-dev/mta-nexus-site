@@ -1,6 +1,6 @@
 # Восстановление доступа — BETA-005d
 
-Сверка: **2026-09-24**. D0–D2d подготовили proofs, очередь, transport/runtime и durable limits; D3 добавил проверяемую привязку текущего email для обычного password-account. Фактические результаты и точные SHA — в [карте релиза](RELEASE-READINESS.md). **Forgot-password/reset ещё нет, R4 открыт.** Реальный SMTP provider и production mail rollout также не включены.
+Сверка: **2026-09-24**. D0–D2d подготовили proofs, очередь, transport/runtime и durable limits; D3 добавил проверяемую привязку текущего email; D4 — anonymous forgot-password request и одноразовый password reset для обычного password-account с verified binding. Фактические результаты и точные SHA — в [карте релиза](RELEASE-READINESS.md). **R4 остаётся открыт из-за production delivery/rollout, а не из-за отсутствия reset UI.** Реальный SMTP provider и production mail rollout не включены.
 
 Сохранены [проект D0](https://github.com/acc-holo-dev/mta-nexus-site/blob/435bb05601115c22afb5ad7d609da35f4868decc/docs/ACCOUNT-RECOVERY.md), [контракт D1](https://github.com/acc-holo-dev/mta-nexus-site/blob/3758215102e063e4e1f73706f1984bdefc372341/docs/ACCOUNT-RECOVERY.md) и [подробный контракт D2a](https://github.com/acc-holo-dev/mta-nexus-site/blob/2a1b9e567d6ba626a4f53e9d1a947b06d369f1ce/docs/ACCOUNT-RECOVERY.md). Уточнения D2b ниже не переобъявляют старые проверки результатами нового SHA. Очередь работы и допуск к выпуску остаются в RELEASE-READINESS, не в параллельном roadmap.
 
@@ -116,6 +116,31 @@ D3a впервые стал полностью зелёным на `3ade27dec7e9
 
 **Production rollout не выполнен.** Основной `compose.production.yaml` всё ещё не передаёт `ACCOUNT_MAIL_KEY`/`ACCOUNT_RECOVERY_ABUSE_KEY`, держит `EMAIL_PROVIDER=disabled` и не запускает standalone dispatcher. Поэтому D3 не доказывает real inbox delivery, provider AUTH/TLS, VDS secret storage, key rotation или эксплуатационную доставку.
 
-**Следующий D4:** anonymous forgot-password request для verified binding с нейтральным anti-enumeration response/timing policy, durable email/IP limits, `password_reset` proof и явная reset page. Successful reset обязан одной согласованной операцией заменить password hash, отозвать все sessions и остальные proofs, записать audit и поставить security notification; после него требуется обычный login. Privileged/MFA/legacy transition и production provider rollout остаются отдельными решениями.
+## 9. D4 — anonymous forgot-password и proof-confirmed reset
+
+D4 принимает только синтаксически валидный email через `POST /api/auth/password-reset`. Для eligible verified binding, неизвестного адреса, неподтверждённого аккаунта и исчерпанного durable limit внешний успешный контракт одинаков: HTTP 202 и нейтральный текст без признака существования аккаунта. Route держит минимальный response-time floor 350 ms. Это снижает прямой enumeration-сигнал, но не считается полным статистическим timing/load аудитом.
+
+До любого account lookup читаются отдельные `ACCOUNT_MAIL_KEY` и `ACCOUNT_RECOVERY_ABUSE_KEY`; их отсутствие даёт address-independent 503. Durable `password_reset_request` расходуется отдельно для keyed-HMAC subjects `email:<normalized>` (3/hour) и `ip:<client>` (20/hour). Raw email/IP в limit table не хранится. Только ordinary password-account с текущим D3 binding/provenance получает новый encrypted `password_reset` outbox envelope; unknown/unverified/gated accounts внешне получают тот же 202.
+
+`/auth/reset-password?challenge=...#token=...` не меняет credentials на GET/load. UI читает token из fragment, сразу удаляет hash из history, не хранит token в localStorage/sessionStorage и отправляет его только явным PATCH вместе с новым password. Password hash вычисляется до DB-транзакции.
+
+В protected consume transaction D4:
+1. повторно проверяет reset proof, binding, credential version, address и expiry;
+2. помечает proof consumed;
+3. меняет password hash;
+4. удаляет **все** существующие sessions;
+5. credential trigger отзывает остальные pending proofs;
+6. пишет `user.password_reset` audit;
+7. создаёт in-app security notification.
+
+Ошибка внутри транзакции откатывает password, sessions, proof consumption и notification вместе. Успешный reset не создаёт session/cookie: нужен обычный login. Старый пароль больше не проходит, новый работает только через явный login, consumed proof replay отклоняется.
+
+На `bb1ea0aaff2ce0909499ba822c389e44840ab9fa` Verify прошёл **257/257 tests, 65/65 files**; все семь CI/browser jobs success. Chromium D4-01 использовал production Next/TLS/PostgreSQL и synthetic CI outbox: сравнил одинаковый public body для известного и неизвестного адреса, проверил timing floor, fragment stripping, отсутствие token в URL/storage/rendered text, non-mutating page load, keyboard submit на 390×844, отзыв двух pre-reset sessions, отсутствие auto-login, отказ старого пароля, нормальный login новым и replay rejection.
+
+CI-only proof reader остаётся жёстко ограниченным GitHub-hosted disposable environment и `@example.invalid`. Финальный красный прогон `dbf646a` выявил, что helper выбирал `password_reset`, но аутентифицировал ciphertext AAD как `email_verify`; crypto корректно отказал. `bb1ea0a` передаёт фактический purpose в AAD. Производственный cipher/route ради теста не ослаблялись. Предыдущие D4 browser-итерации также сохранены в истории; password/session regressions и Directory на финальном SHA зелёные.
+
+**Ограничения D4:** нет real provider/inbox delivery, production mail keys, supervised dispatcher/service manager, production secret storage/rotation, полноценного статистического timing-enumeration/load теста, privileged/MFA recovery, legacy rollout, RU/EN или manual visual acceptance. In-app security notification не равна доставленному внешнему уведомлению.
+
+**Следующий D5:** эксплуатационная сквозная приёмка recovery delivery и rollout policy — реальный provider/AUTH/TLS режим, supervised worker, secret/key lifecycle, inbox delivery, очереди/повторы/наблюдаемость, backup/restore implications и явные правила privileged/MFA/legacy accounts. До этого production recovery остаётся fail-closed.
 
 Основания: [PostgreSQL 18 locking](https://www.postgresql.org/docs/18/explicit-locking.html), [SELECT/SKIP LOCKED](https://www.postgresql.org/docs/18/sql-select.html), [wall-clock time](https://www.postgresql.org/docs/18/functions-datetime.html), [Drizzle transactions](https://orm.drizzle.team/docs/transactions). Сверены 2026-09-24; внешняя документация не заменяет проверку реализации. Источники D0/D1/D2a сохранены в закреплённых документах выше.
