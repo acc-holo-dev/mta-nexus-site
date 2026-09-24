@@ -46,7 +46,13 @@ const timedOut = await send("slow@example.invalid", 250);
 assert.equal(timedOut.outcome, "retry");
 assert.equal(timedOut.uncertain, true);
 
-const untrusted = await send("accept@example.invalid", 1000, undefined);
+const untrusted = await new AccountMailSmtpTransport({
+  host: "127.0.0.1", port, servername: "localhost",
+  from: "no-reply@nexus-mta.test", timeoutMs: 1000,
+}).send({
+  recipient: "accept@example.invalid", subject: "Synthetic D2c untrusted certificate check",
+  text: "No production delivery.", sendBefore: new Date(Date.now() + 5_000),
+});
 assert.equal(untrusted.outcome, "retry");
 assert.equal(untrusted.uncertain, false);
 
