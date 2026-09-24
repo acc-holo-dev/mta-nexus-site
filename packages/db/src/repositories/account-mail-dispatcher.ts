@@ -23,6 +23,10 @@ type Worker = Readonly<{
   ): Promise<boolean>;
   discardUnavailable(limit?: number): Promise<number>;
   releaseForMissingKey?(lease: MailLease): Promise<boolean>;
+  deferProviderFailure?(
+    lease: MailLease,
+    transport: Readonly<{ smtpCode?: number; stage: AccountMailTransportStage }>,
+  ): Promise<boolean>;
 }>;
 
 type Transport = Readonly<{
@@ -118,6 +122,21 @@ export class AccountMailDispatcher {
       }
       if (!prepared) { summary.skipped++; continue; }
       const result = await this.#transport.send(messageFor(prepared, this.#baseUrl));
+
+      if (isProviderWideRetry(result) && this.#worker.deferProviderFailure) {
+        const deferred = await this.#worker.deferProviderFailure(
+          lease,
+          { smtpCode: result.code, stage: result.stage },
+        );
+        if (deferred) {
+          summary.retried++;
+          providerDeferred = true;
+        } else {
+          summary.unsettled++;
+        }
+        break;
+      }
+
       const settled = await this.#worker.settle(
         lease,
         result.outcome,
@@ -134,9 +153,8 @@ export class AccountMailDispatcher {
         summary.discarded++;
       }
 
-      // A transport/provider-wide retry should not burn an attempt on every
-      // queued message in the same batch. Settle the current lease, then leave
-      // remaining rows untouched for a later poll/backoff window.
+      // Workers without the provider-defer extension still stop the batch after
+      // a provider-wide retry so subsequent rows keep their attempts.
       if (settled && isProviderWideRetry(result)) {
         providerDeferred = true;
         break;
