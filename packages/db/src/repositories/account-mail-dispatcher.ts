@@ -45,7 +45,13 @@ function messageFor(mail: PreparedAccountMail, base: URL): AccountMailTransportI
   const text = mail.purpose === "email_verify"
     ? `Confirm this email address for your MTA NEXUS account:\n\n${url.toString()}\n\nIf you did not request this, ignore this message.`
     : `Use this link to reset your MTA NEXUS password:\n\n${url.toString()}\n\nIf you did not request this, ignore this message.`;
-  return { recipient: mail.recipient, subject, text, sendBefore: mail.sendBefore };
+  return {
+    recipient: mail.recipient,
+    subject,
+    text,
+    sendBefore: mail.sendBefore,
+    messageId: mail.id,
+  };
 }
 
 // No scheduler and no SMTP configuration are hidden here. The caller owns both.

@@ -8,6 +8,7 @@ export type AccountMailTransportInput = Readonly<{
   subject: string;
   text: string;
   sendBefore: Date;
+  messageId: string;
 }>;
 
 export type AccountMailTransportResult = Readonly<{
@@ -80,6 +81,7 @@ function validateMessage(input: AccountMailTransportInput) {
     || typeof input.subject !== "string" || input.subject.length < 1 || input.subject.length > 160
     || /[\r\n]/.test(input.subject)
     || typeof input.text !== "string" || Buffer.byteLength(input.text, "utf8") > 16_384
+    || typeof input.messageId !== "string" || !/^ame_[A-Za-z0-9_-]{1,96}$/.test(input.messageId)
     || !(input.sendBefore instanceof Date) || !Number.isFinite(input.sendBefore.getTime())) {
     throw new Error("Invalid account mail message");
   }
@@ -300,10 +302,13 @@ export class AccountMailSmtpTransport {
       result = requireStage(data.code, 354);
       if (result) return result;
 
+      const fromDomain = this.#options.from.slice(this.#options.from.lastIndexOf("@") + 1);
       const message = [
         `From: <${this.#options.from}>`,
         `To: <${input.recipient}>`,
         `Subject: ${input.subject}`,
+        `Date: ${new Date().toUTCString()}`,
+        `Message-ID: <${input.messageId}@${fromDomain}>`,
         "MIME-Version: 1.0",
         "Content-Type: text/plain; charset=UTF-8",
         needs8BitMime ? "Content-Transfer-Encoding: 8bit" : "Content-Transfer-Encoding: 7bit",
