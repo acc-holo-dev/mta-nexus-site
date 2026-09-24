@@ -41,6 +41,25 @@ export class AccountMailOutboxRepository {
     });
   }
 
+  async requiredKeyIds(): Promise<string[]> {
+    const rows = await db.execute(sql`
+      select distinct
+        "payload" ->> 'keyId' as "key_id",
+        "payload" ->> 'version' as "version"
+      from "account_mail_outbox"
+    `);
+    const ids = new Set<string>();
+    for (const row of rows) {
+      const keyId = typeof row.key_id === "string" ? row.key_id : "";
+      const version = typeof row.version === "string" ? row.version : "";
+      if (version !== "1" || !/^[A-Za-z0-9_-]{1,32}$/.test(keyId)) {
+        throw new Error("Account mail queue contains unsupported payload metadata");
+      }
+      ids.add(keyId);
+    }
+    return [...ids].sort();
+  }
+
   // Bounded cleanup for the future worker; not scheduled or called by HTTP yet.
   // Only expired pending envelopes are removed, never proof provenance or users.
   async discardExpired(limit = 100): Promise<number> {
