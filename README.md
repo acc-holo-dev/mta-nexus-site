@@ -8,7 +8,7 @@ The product answers one primary question: **what is happening in MTA right now?*
 
 Read the [free closed-beta release map / карту бесплатной беты](docs/RELEASE-READINESS.md) first. It separates intended user journeys, existing evidence, unverified behavior, release blockers, and the next small tasks. The [Product Blueprint](docs/PRODUCT-BLUEPRINT.md) describes the broader product; a roadmap checkbox is not evidence of release readiness.
 
-The baseline at `58ef2d452a5bd375b9f7aa7e1b7d6b46785e56ed` passed [CI #859](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35936732240), including the production image build. This does not establish that the complete Compose environment, browser journeys, scanner, or backup restore work. Closed-beta release approval is still pending.
+The baseline at `58ef2d452a5bd375b9f7aa7e1b7d6b46785e56ed` passed [CI #859](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35936732240), including the production image build. BETA-001 subsequently reproduced and fixed PostgreSQL 18 startup with the old volume path; persistence on fresh named volumes is verified in an isolated CI job. See the release map for exact commits, results, and limitations. Neither result establishes that the complete Compose environment, browser journeys, scanner, or backup restore work. Closed-beta release approval is still pending.
 
 ## Implemented foundation to verify for closed beta
 
@@ -19,6 +19,7 @@ The baseline at `58ef2d452a5bd375b9f7aa7e1b7d6b46785e56ed` passed [CI #859](http
 - articles, profiles, follows, notifications, reports, and moderation foundations
 - fail-closed production configuration and a ClamAV adapter requiring runtime verification
 - CI on a clean PostgreSQL 18 database: migrations, typecheck, tests, application build, and production image build
+- an isolated PostgreSQL named-volume persistence check for both Compose storage configurations
 
 These are implementation areas, not a claim that all end-to-end journeys have passed acceptance. Use the release map for evidence and limitations.
 
@@ -40,9 +41,9 @@ These are implementation areas, not a claim that all end-to-end journeys have pa
 
 ## Local development — validation required
 
-**Do not use the following historical recipe on an environment with existing or unknown data until BETA-001 in the release map is resolved.** Both Compose files currently mount PostgreSQL 18 at the legacy data-volume path. Existing data must be inspected before any volume-path change. Never delete volumes to resolve a startup error without identifying their contents and recovery plan.
+**Do not apply a volume-layout change to an environment with existing or unknown data without inventory and a tested recovery plan.** Both Compose files now mount PostgreSQL 18 at `/var/lib/postgresql`; earlier revisions used `/var/lib/postgresql/data`. BETA-001 verifies fresh volumes only. It neither migrates existing databases nor proves their backup/restore. Never delete volumes to resolve a startup error without identifying their contents and recovery plan.
 
-The historical workflow below runs only PostgreSQL in Docker and the application on the host. It does **not** meet the Docker-only project requirement. A verified Docker-only quickstart is tracked as BETA-002; this documentation change does not implement it.
+The historical workflow below runs only PostgreSQL in Docker and the application on the host. It does **not** meet the Docker-only project requirement. A verified Docker-only quickstart is the next task, BETA-002; the storage fix does not implement it.
 
 ```bash
 cp .env.example .env
