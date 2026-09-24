@@ -108,11 +108,22 @@ export class AccountMailWorkerRepository {
     });
   }
 
-  async settle(lease: MailLease, outcome: "accepted" | "retry" | "discard",
-    auditId = `aud_${randomUUID()}`): Promise<boolean> {
+  async settle(
+    lease: MailLease,
+    outcome: "accepted" | "retry" | "discard",
+    auditId = `aud_${randomUUID()}`,
+    transport?: Readonly<{ smtpCode?: number; uncertain?: boolean }>,
+  ): Promise<boolean> {
     const digest = leaseDigest(lease);
     checkId(auditId);
     if (!["accepted", "retry", "discard"].includes(outcome)) throw new Error("Invalid account mail outcome");
+    if (transport?.smtpCode !== undefined
+      && (!Number.isInteger(transport.smtpCode) || transport.smtpCode < 200 || transport.smtpCode > 599)) {
+      throw new Error("Invalid SMTP transport code");
+    }
+    if (transport?.uncertain !== undefined && typeof transport.uncertain !== "boolean") {
+      throw new Error("Invalid SMTP uncertainty flag");
+    }
     return transaction(async (tx) => {
       const item = await this.lockLiveMail(tx, lease.id);
       if (!item || !this.owns(item, lease, digest)) return false;
@@ -130,7 +141,13 @@ export class AccountMailWorkerRepository {
         id: auditId, actorId: "system:account-mail-worker", actorType: "system", action: outcome === "accepted"
           ? "auth.mail_transport_accepted" : retry ? "auth.mail_retry_scheduled" : "auth.mail_discarded",
         targetId: lease.id, targetType: "account_mail",
-        details: { attempt: item.mail.attempts, purpose: item.proof.purpose }, createdAt: sql`clock_timestamp()`,
+        details: {
+          attempt: item.mail.attempts,
+          purpose: item.proof.purpose,
+          ...(transport?.smtpCode !== undefined ? { smtpCode: transport.smtpCode } : {}),
+          ...(transport?.uncertain === true ? { uncertain: true } : {}),
+        },
+        createdAt: sql`clock_timestamp()`,
       });
       // "accepted" is the trusted transport caller's report, NOT inbox delivery.
       // A lost response after commit remains uncertain; do not invent success.

@@ -7,7 +7,12 @@ type Worker = Readonly<{
   candidates(limit?: number): Promise<string[]>;
   claim(id: string): Promise<MailLease | null>;
   prepare(lease: MailLease, cipher: AccountMailCipher): Promise<PreparedAccountMail | null>;
-  settle(lease: MailLease, outcome: "accepted" | "retry" | "discard"): Promise<boolean>;
+  settle(
+    lease: MailLease,
+    outcome: "accepted" | "retry" | "discard",
+    auditId?: string,
+    transport?: Readonly<{ smtpCode?: number; uncertain?: boolean }>,
+  ): Promise<boolean>;
   discardUnavailable(limit?: number): Promise<number>;
 }>;
 
@@ -88,7 +93,12 @@ export class AccountMailDispatcher {
       }
       if (!prepared) { summary.skipped++; continue; }
       const result = await this.#transport.send(messageFor(prepared, this.#baseUrl));
-      const settled = await this.#worker.settle(lease, result.outcome);
+      const settled = await this.#worker.settle(
+        lease,
+        result.outcome,
+        undefined,
+        { smtpCode: result.code, uncertain: result.uncertain },
+      );
       if (!settled) {
         summary.unsettled++;
       } else if (result.outcome === "accepted") {
