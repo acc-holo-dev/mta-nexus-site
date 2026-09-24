@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { lstatSync, readFileSync } from "node:fs";
 import { isAbsolute } from "node:path";
 import { AccountMailCipher } from "./account-mail-crypto";
 import { AccountMailDispatcher } from "./account-mail-dispatcher";
@@ -48,15 +48,19 @@ function secretSource(
     return undefined;
   }
   if (direct) return direct;
-  if (!file || !isAbsolute(file)) {
+  if (!file || !isAbsolute(file) || file.length > 4096) {
     throw new Error(`Invalid ${label} file path`);
   }
 
   let bytes: Buffer;
   try {
+    const stat = lstatSync(file);
+    if (!stat.isFile() || stat.isSymbolicLink() || (stat.mode & 0o002) !== 0) {
+      throw new Error("unsafe secret file");
+    }
     bytes = readFileSync(file);
   } catch {
-    throw new Error(`Could not read ${label} file`);
+    throw new Error(`Could not read safe ${label} file`);
   }
   const maxBytes = options.maxBytes ?? 4096;
   if (bytes.length < 1 || bytes.length > maxBytes) {
