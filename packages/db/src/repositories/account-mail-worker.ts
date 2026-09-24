@@ -3,7 +3,7 @@ import { and, eq, gt, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, sessions, users } from "../schema";
 import { accountAuthState, accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
-import { accountMailOutbox, accountMailQueueGate } from "../account-mail-schema";
+import { accountMailDeliveryEvents, accountMailOutbox, accountMailQueueGate } from "../account-mail-schema";
 import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import type { MailContext, MailPayload } from "./account-mail-crypto";
 import { digestAccountChallenge } from "./account-challenges";
@@ -17,6 +17,7 @@ const leaseMs = 60_000;
 const backoffMs = [5_000, 30_000, 120_000, 300_000] as const;
 const providerBackoffMs = [30_000, 60_000, 120_000, 300_000, 600_000] as const;
 const providerFailureRetentionMs = 600_000;
+const deliveryHistoryRetentionDays = 30;
 
 function providerRetryDelayMs(streak: number): number {
   return providerBackoffMs[Math.min(Math.max(streak - 1, 0), providerBackoffMs.length - 1)];
@@ -60,6 +61,37 @@ async function transaction<T>(work: (tx: Tx) => Promise<T>): Promise<T> {
     await tx.execute(sql`set local statement_timeout = '10s'`);
     return work(tx);
   }, { isolationLevel: "read committed" });
+}
+
+type DeliveryHistoryOutcome =
+  | "accepted"
+  | "retry"
+  | "discard"
+  | "provider_deferred"
+  | "expired"
+  | "attempts_exhausted";
+
+async function recordDeliveryEvent(tx: Tx, input: Readonly<{
+  messageId: string;
+  purpose?: "email_verify" | "password_reset";
+  outcome: DeliveryHistoryOutcome;
+  attempt: number;
+  smtpStage?: AccountMailTransportStage;
+  smtpCode?: number;
+  uncertain?: boolean;
+}>) {
+  await tx.insert(accountMailDeliveryEvents).values({
+    id: `amde_${randomUUID()}`,
+    messageId: input.messageId,
+    purpose: input.purpose ?? null,
+    outcome: input.outcome,
+    attempt: input.attempt,
+    smtpStage: input.smtpStage ?? null,
+    smtpCode: input.smtpCode ?? null,
+    uncertain: input.uncertain === true,
+    createdAt: sql`clock_timestamp()`,
+    expiresAt: sql`clock_timestamp() + (${deliveryHistoryRetentionDays} * interval '1 day')`,
+  });
 }
 
 // Internal DB delivery protocol only. Not exported from @nexus/db, scheduled, or
@@ -255,6 +287,14 @@ export class AccountMailWorkerRepository {
         },
         createdAt: sql`clock_timestamp()`,
       });
+      await recordDeliveryEvent(tx, {
+        messageId: lease.id,
+        purpose: item.proof.purpose,
+        outcome: "provider_deferred",
+        attempt: lease.attempt,
+        smtpStage: transport.stage,
+        smtpCode: transport.smtpCode,
+      });
       return true;
     });
   }
@@ -333,6 +373,15 @@ export class AccountMailWorkerRepository {
         },
         createdAt: sql`clock_timestamp()`,
       });
+      await recordDeliveryEvent(tx, {
+        messageId: lease.id,
+        purpose: item.proof.purpose,
+        outcome: retry ? "retry" : outcome,
+        attempt: lease.attempt,
+        smtpStage: transport?.stage,
+        smtpCode: transport?.smtpCode,
+        uncertain: transport?.uncertain,
+      });
       if (recoveredProviderGate) {
         await tx.insert(auditEvents).values({
           id: `aud_${randomUUID()}`,
@@ -361,6 +410,20 @@ export class AccountMailWorkerRepository {
   async discardUnavailable(limit = 100): Promise<number> {
     checkLimit(limit);
     return transaction(async (tx) => {
+      // Delivery history is bounded independently from audit/outbox retention.
+      // Clean at most the same small batch so an idle queue cannot accumulate
+      // operational transport metadata forever.
+      const expiredHistory = await tx.select({ id: accountMailDeliveryEvents.id })
+        .from(accountMailDeliveryEvents)
+        .where(lte(accountMailDeliveryEvents.expiresAt, sql`clock_timestamp()`))
+        .orderBy(accountMailDeliveryEvents.expiresAt, accountMailDeliveryEvents.id)
+        .limit(limit)
+        .for("update", { skipLocked: true });
+      if (expiredHistory.length) {
+        await tx.delete(accountMailDeliveryEvents)
+          .where(inArray(accountMailDeliveryEvents.id, expiredHistory.map((row) => row.id)));
+      }
+
       // Terminal cleanup needs only outbox locks and never acquires parent locks.
       // It must still leave a non-sensitive audit trail when a crashed worker
       // never reached explicit settle on the final attempt.
@@ -399,6 +462,21 @@ export class AccountMailWorkerRepository {
             terminalReason: expired ? "expired" : "attempts_exhausted",
           },
           createdAt: sql`clock_timestamp()`,
+        };
+      }));
+      await tx.insert(accountMailDeliveryEvents).values(terminal.map((row) => {
+        const expired = row.expiresAt <= now;
+        return {
+          id: `amde_${randomUUID()}`,
+          messageId: row.id,
+          purpose: null,
+          outcome: expired ? "expired" : "attempts_exhausted",
+          attempt: row.attempts,
+          smtpStage: null,
+          smtpCode: null,
+          uncertain: false,
+          createdAt: sql`clock_timestamp()`,
+          expiresAt: sql`clock_timestamp() + (${deliveryHistoryRetentionDays} * interval '1 day')`,
         };
       }));
       return removed.length;

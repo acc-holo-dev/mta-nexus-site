@@ -127,6 +127,13 @@
       "when": 1790244000000,
       "tag": "0017_account_mail_provider_gate",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1790248000000,
+      "tag": "0018_account_mail_delivery_events",
+      "breakpoints": true
     }
   ]
 }

@@ -41,3 +41,32 @@ export const accountMailOutbox = pgTable("account_mail_outbox", {
   check("account_mail_payload_bounds", sql`jsonb_typeof(${t.payload}) = 'object'
     and octet_length(${t.payload}::text) between 1 and 2048`),
 ]);
+
+
+export const accountMailDeliveryEvents = pgTable("account_mail_delivery_events", {
+  id: text("id").primaryKey(),
+  messageId: text("message_id").notNull(),
+  purpose: text("purpose"),
+  outcome: text("outcome").notNull(),
+  attempt: integer("attempt").notNull(),
+  smtpStage: text("smtp_stage"),
+  smtpCode: integer("smtp_code"),
+  uncertain: boolean("uncertain").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+}, (t) => [
+  index("account_mail_delivery_message_idx").on(t.messageId, t.createdAt),
+  index("account_mail_delivery_expiry_idx").on(t.expiresAt),
+  check("account_mail_delivery_message_id_check", sql`${t.messageId} ~ '^ame_[A-Za-z0-9_-]+$'`),
+  check("account_mail_delivery_purpose_check", sql`
+    ${t.purpose} is null or ${t.purpose} in ('email_verify', 'password_reset')`),
+  check("account_mail_delivery_outcome_check", sql`
+    ${t.outcome} in ('accepted','retry','discard','provider_deferred','expired','attempts_exhausted')`),
+  check("account_mail_delivery_attempt_check", sql`${t.attempt} between 0 and 5`),
+  check("account_mail_delivery_stage_check", sql`
+    ${t.smtpStage} is null or ${t.smtpStage} in
+      ('connect','greeting','ehlo','starttls','auth','mail_from','rcpt_to','data','final_reply')`),
+  check("account_mail_delivery_code_check", sql`
+    ${t.smtpCode} is null or ${t.smtpCode} between 200 and 599`),
+  check("account_mail_delivery_expiry_check", sql`${t.expiresAt} > ${t.createdAt}`),
+]);
