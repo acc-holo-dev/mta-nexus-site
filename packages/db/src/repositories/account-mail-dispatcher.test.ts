@@ -77,7 +77,7 @@ describe("D2c account mail dispatcher", () => {
   });
 
   it("returns only counters when there is no work", async () => {
-    const f = fixture({ outcome: "accepted", uncertain: false }, { candidate: false });
+    const f = fixture({ outcome: "accepted", uncertain: false, stage: "final_reply" }, { candidate: false });
     expect(await f.dispatcher.runBatch()).toEqual({
       accepted: 0, retried: 0, discarded: 0, skipped: 0, unsettled: 0, cleaned: 0,
     });
