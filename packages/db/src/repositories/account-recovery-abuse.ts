@@ -78,11 +78,13 @@ export class AccountRecoveryAbuseLimitRepository {
         for update skip locked
       `);
       let removed = 0;
-      for (const row of rows as Array<{ scope: string; subject_digest: string }>) {
+      for (const row of rows) {
+        const scope = String(row.scope);
+        const subjectDigest = String(row.subject_digest);
         const deleted = await tx.execute(sql`
           delete from "account_recovery_abuse_limits"
-          where "scope" = ${row.scope}
-            and "subject_digest" = ${row.subject_digest}
+          where "scope" = ${scope}
+            and "subject_digest" = ${subjectDigest}
             and "expires_at" <= clock_timestamp()
           returning "scope"
         `);
