@@ -8,6 +8,7 @@ import {
   accountRecoveryAbuseLimitRepository,
   createAccountMailProducerCipher,
   readAccountRecoveryAbuseKey,
+  accountPasswordResetRepository,
 } from "@nexus/db";
 import { generateId, generateSessionToken, hashPassword, verifyPassword } from "@nexus/security";
 import {
@@ -242,6 +243,73 @@ export class AuthService {
       token: input.token,
       consumeAuditId: generateId("aud"),
       bindingAuditId: generateId("aud"),
+    });
+  }
+
+  async requestPasswordReset(input: {
+    email: string;
+    ip: string;
+  }): Promise<{ accepted: true }> {
+    // Read dedicated configuration before account lookup so missing production
+    // wiring cannot reveal whether a valid address exists.
+    const cipher = createAccountMailProducerCipher();
+    const abuseKey = readAccountRecoveryAbuseKey();
+    const email = input.email.trim().toLowerCase();
+    const ip = input.ip.trim() || "unknown";
+
+    const [emailLimit, ipLimit] = await Promise.all([
+      accountRecoveryAbuseLimitRepository.consume({
+        scope: "password_reset_request",
+        subject: `email:${email}`,
+        key: abuseKey,
+        limit: 3,
+        windowSeconds: 3600,
+      }),
+      accountRecoveryAbuseLimitRepository.consume({
+        scope: "password_reset_request",
+        subject: `ip:${ip}`,
+        key: abuseKey,
+        limit: 20,
+        windowSeconds: 3600,
+      }),
+    ]);
+
+    if (!emailLimit.success || !ipLimit.success) return { accepted: true };
+
+    const user = await userRepository.findByEmail(email);
+    if (!user) return { accepted: true };
+    const status = await accountEmailEnrollmentRepository.status(user.id);
+    if (!status?.verified || !status.eligible) return { accepted: true };
+
+    try {
+      await accountPasswordResetRepository.request({
+        userId: user.id,
+        auditId: generateId("aud"),
+        cipher,
+      });
+    } catch {
+      // Queue/binding races after the neutral eligibility check must not become
+      // an address-existence oracle. Operational health is monitored separately.
+      console.error("Password reset mail could not be queued");
+    }
+    return { accepted: true };
+  }
+
+  async confirmPasswordReset(input: {
+    challengeId: string;
+    token: string;
+    newPassword: string;
+    consumeAuditId?: string;
+  }): Promise<{ revokedSessionCount: number }> {
+    // Hash before entering the proof transaction: scrypt must not hold DB locks.
+    const passwordHash = await hashPassword(input.newPassword);
+    return accountPasswordResetRepository.confirm({
+      challengeId: input.challengeId,
+      token: input.token,
+      passwordHash,
+      consumeAuditId: input.consumeAuditId ?? generateId("aud"),
+      resetAuditId: generateId("aud"),
+      notificationId: generateId("not"),
     });
   }
 

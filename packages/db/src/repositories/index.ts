@@ -20,3 +20,4 @@ export * from "./verification";
 export * from "./account-email-enrollment";
 export * from "./account-recovery-abuse";
 export * from "./account-mail-runtime";
+export * from "./account-password-reset";
