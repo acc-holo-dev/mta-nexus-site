@@ -9,6 +9,7 @@ set -euo pipefail
   echo 'Refusing a non-default or remote Docker daemon.' >&2; exit 1;
 }
 cd "$(dirname "$0")/.."
+node --test scripts/tests/production-entrypoint.node-test.mjs
 umask 077
 work=$(mktemp -d)
 project="nexus-prod-ci-$(node -p 'require("node:crypto").randomUUID()')"

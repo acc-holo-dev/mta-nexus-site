@@ -33,9 +33,9 @@ RUN pnpm build
 FROM node:26-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
-RUN npm install --global pnpm@12.4.2
 COPY --from=build /app /app
 RUN mkdir -p /data/uploads && chown -R node:node /data/uploads
 USER node
 EXPOSE 3000
-CMD ["pnpm", "start"]
+# Execute installed tools directly; keep application code and dependencies root-owned.
+CMD ["sh", "scripts/start-production.sh"]

@@ -53,7 +53,7 @@ services:
         condition: service_healthy
       clamav:
         condition: service_healthy
-    command: ["sh", "-c", "pnpm db:migrate && pnpm start"]
+    # Use the image's single production entrypoint: migrations, then Next.js.
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
