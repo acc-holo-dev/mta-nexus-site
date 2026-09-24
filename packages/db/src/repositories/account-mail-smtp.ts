@@ -56,11 +56,22 @@ function validAddress(value: string): boolean {
     && !/[\r\n]/.test(value) && /^[^\s@<>]+@[^\s@<>]+$/.test(value);
 }
 
+function validNetworkHost(value: string): boolean {
+  if (typeof value !== "string" || value.length < 1 || value.length > 253) return false;
+  if (net.isIP(value)) return true;
+  const normalized = value.endsWith(".") ? value.slice(0, -1) : value;
+  if (!normalized) return false;
+  return normalized.split(".").every((label) =>
+    label.length >= 1 && label.length <= 63
+    && /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/.test(label));
+}
+
+
 function validateOptions(options: AccountMailSmtpOptions) {
   if (!options || typeof options !== "object"
-    || typeof options.host !== "string" || options.host.length < 1 || options.host.length > 253
+    || !validNetworkHost(options.host)
     || !Number.isInteger(options.port) || options.port < 1 || options.port > 65535
-    || typeof options.servername !== "string" || options.servername.length < 1 || options.servername.length > 253
+    || !validNetworkHost(options.servername)
     || !validAddress(options.from)
     || !["implicit_tls", "starttls"].includes(options.mode ?? "implicit_tls")
     || !["auto", "plain", "login"].includes(options.authMode ?? "auto")) {
@@ -87,7 +98,8 @@ function classify(
 ): AccountMailTransportResult {
   if (code >= 200 && code < 300) return { outcome: "accepted", uncertain: false, stage, code };
   if (code >= 400 && code < 500) return { outcome: "retry", uncertain: false, stage, code };
-  return { outcome: permanent, uncertain: false, stage, code };
+  if (code >= 500 && code < 600) return { outcome: permanent, uncertain: false, stage, code };
+  return { outcome: "retry", uncertain: false, stage, code };
 }
 
 function dotStuff(text: string): string {
