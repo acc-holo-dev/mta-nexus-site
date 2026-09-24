@@ -183,10 +183,9 @@ export class AccountMailWorkerRepository {
       if (!providerGate) throw new Error("Account mail queue gate is unavailable");
       if (providerGate.blocked) return null;
       if (mail.leaseExpiresAt && mail.leaseExpiresAt > now) return null;
-      if (mail.attempts >= ACCOUNT_MAIL_MAX_ATTEMPTS) {
-        await tx.delete(accountMailOutbox).where(eq(accountMailOutbox.id, id));
-        return null;
-      }
+      // A stale candidate may already have exhausted its attempts. Leave its
+      // deletion to discardUnavailable so audit and delivery history are kept.
+      if (mail.attempts >= ACCOUNT_MAIL_MAX_ATTEMPTS) return null;
       if (mail.availableAt > now) return null;
       const token = randomBytes(32).toString("base64url");
       const lease: MailLease = { id, token, attempt: mail.attempts + 1,
