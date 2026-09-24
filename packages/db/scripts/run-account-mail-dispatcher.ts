@@ -26,6 +26,12 @@ let healthBatch = 0;
 let healthProviderBlocked = false;
 let healthProviderBlockedUntil: string | null = null;
 let healthProviderFailureStreak = 0;
+let healthQueuePending = 0;
+let healthQueueDue = 0;
+let healthQueueLeased = 0;
+let healthQueueCapacity = 0;
+let healthQueueOldestAgeSeconds = 0;
+let healthQueuePressure = false;
 let nextAbuseCleanupAt = 0;
 
 function emit(event: Record<string, unknown>) {
@@ -53,6 +59,12 @@ const writeHealthSnapshot = async () => {
     providerBlocked: healthProviderBlocked,
     providerBlockedUntil: healthProviderBlockedUntil,
     providerFailureStreak: healthProviderFailureStreak,
+    queuePending: healthQueuePending,
+    queueDue: healthQueueDue,
+    queueLeased: healthQueueLeased,
+    queueCapacity: healthQueueCapacity,
+    queueOldestAgeSeconds: healthQueueOldestAgeSeconds,
+    queuePressure: healthQueuePressure,
   });
   await writeFile(HEALTH_TMP, payload, { encoding: "utf8", mode: 0o600 });
   await rename(HEALTH_TMP, HEALTH_FILE);
@@ -107,11 +119,36 @@ try {
     }
   };
 
+  const refreshQueueStats = async (emitChange = false) => {
+    const stats = await accountMailOutboxRepository.stats();
+    const pressure = stats.pending * 100 >= stats.capacity * 80;
+    const pressureChanged = pressure !== healthQueuePressure;
+    healthQueuePending = stats.pending;
+    healthQueueDue = stats.due;
+    healthQueueLeased = stats.leased;
+    healthQueueCapacity = stats.capacity;
+    healthQueueOldestAgeSeconds = stats.oldestAgeSeconds;
+    healthQueuePressure = pressure;
+    if (emitChange && pressureChanged) {
+      emit({
+        status: "queue_pressure",
+        config: fingerprint,
+        active: pressure,
+        pending: stats.pending,
+        due: stats.due,
+        leased: stats.leased,
+        capacity: stats.capacity,
+        oldestAgeSeconds: stats.oldestAgeSeconds,
+      });
+    }
+  };
+
   await queueHealth();
   await checkDatabaseConnection();
 
   await assertQueueKeyCoverage();
   await refreshProviderGate();
+  await refreshQueueStats();
 
   healthStatus = "ready";
   await queueHealth();
@@ -136,6 +173,7 @@ try {
     onBatch: async ({ batch, result }) => {
       healthBatch = batch;
       await refreshProviderGate(true);
+      await refreshQueueStats(true);
       await queueHealth();
 
       if (!controller.signal.aborted && Date.now() >= nextAbuseCleanupAt) {

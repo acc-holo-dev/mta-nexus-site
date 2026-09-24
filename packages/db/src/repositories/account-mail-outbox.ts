@@ -14,7 +14,58 @@ export class AccountMailQueueFullError extends Error {
 // Queue acceptance is not SMTP acceptance or delivery. This producer is internal
 // and returns no token/recipient. All producers must use the same persisted gate.
 // No network calls or runtime configuration changes are made by this module.
+export type AccountMailQueueStats = Readonly<{
+  pending: number;
+  due: number;
+  leased: number;
+  capacity: number;
+  oldestAgeSeconds: number;
+}>;
+
 export class AccountMailOutboxRepository {
+  async stats(): Promise<AccountMailQueueStats> {
+    const rows = await db.execute(sql`
+      select
+        g."capacity"::integer as "capacity",
+        count(o."id")::integer as "pending",
+        count(o."id") filter (
+          where o."expires_at" > clock_timestamp()
+            and o."attempts" < 5
+            and o."available_at" <= clock_timestamp()
+            and (o."lease_expires_at" is null or o."lease_expires_at" <= clock_timestamp())
+        )::integer as "due",
+        count(o."id") filter (
+          where o."lease_expires_at" > clock_timestamp()
+        )::integer as "leased",
+        coalesce(
+          greatest(
+            0,
+            floor(extract(epoch from (clock_timestamp() - min(o."created_at"))))
+          ),
+          0
+        )::integer as "oldest_age_seconds"
+      from "account_mail_queue_gate" g
+      left join "account_mail_outbox" o on true
+      where g."singleton" = true
+      group by g."capacity"
+    `);
+    if (rows.length !== 1) throw new Error("Account mail queue gate is unavailable");
+    const row = rows[0];
+    const result = {
+      pending: Number(row.pending),
+      due: Number(row.due),
+      leased: Number(row.leased),
+      capacity: Number(row.capacity),
+      oldestAgeSeconds: Number(row.oldest_age_seconds),
+    };
+    if (!Object.values(result).every((value) => Number.isInteger(value) && value >= 0)
+      || result.capacity < 1 || result.pending > result.capacity
+      || result.due > result.pending || result.leased > result.pending) {
+      throw new Error("Account mail queue statistics are invalid");
+    }
+    return Object.freeze(result);
+  }
+
   async enqueue(input: ChallengeIntent, cipher: AccountMailCipher): Promise<{
     id: string; challengeId: string; expiresAt: Date;
   }> {
