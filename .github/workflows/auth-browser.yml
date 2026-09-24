@@ -51,11 +51,22 @@ jobs:
           if [ "$ACCEPTANCE_OUTCOME" = success ]; then
             test -s "$report/results.json"
             test -s "$report/summary.md"
+            test -s "$report/private-profile.json"
           fi
           if [ -f "$report/summary.md" ]; then
             tee -a "$GITHUB_STEP_SUMMARY" < "$report/summary.md"
           fi
           if [ -f "$report/results.json" ]; then cat "$report/results.json"; fi
+          if [ -f "$report/private-profile.json" ]; then
+            {
+              echo
+              echo "## Private profile boundary"
+              echo '```json'
+              cat "$report/private-profile.json"
+              echo
+              echo '```'
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Keep optional anonymous-page screenshots
         id: evidence
         if: always()

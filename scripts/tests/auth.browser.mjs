@@ -215,7 +215,7 @@ check('J2-07 wrong credentials show a generic error without creating a session',
   await guest.page.getByLabel('Email address', { exact: true }).fill(people[0].email);
   await guest.page.getByLabel('Password', { exact: true }).fill('not-the-correct-password');
   await guest.page.getByRole('button', { name: 'Sign In', exact: true }).click();
-  await expect(guest.page.getByRole('alert')).toContainText('Invalid email or password');
+  await expect(guest.page.locator('form').getByRole('alert')).toContainText('Invalid email or password');
   assert(!(await guest.context.cookies()).some((item) => item.name === 'nexus_session'));
   const missing = await request(guest, '/api/auth/login', 'POST', { email: `absent-${nonce}@example.invalid`, password: 'not-the-correct-password' });
   assert.equal(missing.status, 401);
