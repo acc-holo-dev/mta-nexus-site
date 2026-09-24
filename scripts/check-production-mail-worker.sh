@@ -54,6 +54,7 @@ ca=$(cat /tmp/nexus-smtp-ci/cert.pem)
 
 start_worker() {
   docker run --detach --name "$worker" \
+    --restart unless-stopped \
     --add-host host.docker.internal:host-gateway \
     --env NODE_ENV=production \
     --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/mta_nexus_test \
@@ -105,6 +106,26 @@ for attempt in $(seq 1 40); do
 done
 test "$accepted" = 1
 test ! -s /tmp/nexus-d5-check.err
+
+echo 'D5 phase: supervised crash restart'
+restart_before=$(docker inspect --format '{{.RestartCount}}' "$worker")
+ready_before=$(docker logs "$worker" 2>&1 | grep -c '"status":"ready"' || true)
+docker kill --signal KILL "$worker" >/dev/null
+restarted=0
+for attempt in $(seq 1 100); do
+  running=$(docker inspect --format '{{.State.Running}}' "$worker" 2>/dev/null || true)
+  restart_now=$(docker inspect --format '{{.RestartCount}}' "$worker" 2>/dev/null || echo 0)
+  ready_now=$(docker logs "$worker" 2>&1 | grep -c '"status":"ready"' || true)
+  if [[ "$running" == true && "$restart_now" -gt "$restart_before" && "$ready_now" -gt "$ready_before" ]]; then
+    restarted=1
+    break
+  fi
+  sleep 0.1
+done
+test "$restarted" = 1
+test "$(docker inspect --format '{{.Image}}' "$worker")" = "$image_id"
+test -z "$(docker port "$worker")"
+! docker logs "$worker" 2>&1 | grep -F "$mail_key"
 
 echo 'D5 phase: graceful stop and same-image recreate'
 docker stop --time 10 "$worker" >/dev/null
