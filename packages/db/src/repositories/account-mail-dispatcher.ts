@@ -35,6 +35,7 @@ export type AccountMailDispatchSummary = Readonly<{
   skipped: number;
   unsettled: number;
   cleaned: number;
+  providerDeferred?: boolean;
 }>;
 
 function checkedBaseUrl(value: string): URL {
@@ -92,6 +93,7 @@ export class AccountMailDispatcher {
   async runBatch(limit = 10, signal?: AbortSignal): Promise<AccountMailDispatchSummary> {
     if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new Error("Invalid dispatch batch limit");
     const summary = { accepted: 0, retried: 0, discarded: 0, skipped: 0, unsettled: 0, cleaned: 0 };
+    let providerDeferred = false;
     const ids = await this.#worker.candidates(limit);
     for (const id of ids) {
       // Shutdown is a drain boundary, not cancellation of an already-claimed
@@ -128,13 +130,19 @@ export class AccountMailDispatcher {
       // A transport/provider-wide retry should not burn an attempt on every
       // queued message in the same batch. Settle the current lease, then leave
       // remaining rows untouched for a later poll/backoff window.
-      if (settled && isProviderWideRetry(result)) break;
+      if (settled && isProviderWideRetry(result)) {
+        providerDeferred = true;
+        break;
+      }
     }
     // Cleanup is opportunistic maintenance. During shutdown, skip extra DB work
     // so exit latency is bounded by the single in-flight delivery.
     if (!signal?.aborted) {
       summary.cleaned = await this.#worker.discardUnavailable(Math.min(limit, 100));
     }
-    return Object.freeze(summary);
+    return Object.freeze({
+      ...summary,
+      ...(providerDeferred ? { providerDeferred: true } : {}),
+    });
   }
 }
