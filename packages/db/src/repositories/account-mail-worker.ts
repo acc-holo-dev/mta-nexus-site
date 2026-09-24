@@ -121,7 +121,7 @@ export class AccountMailWorkerRepository {
       select
         count(*) filter (where "outcome" = 'accepted')::int as "accepted",
         count(*) filter (where "outcome" = 'retry')::int as "retried",
-        count(*) filter (where "outcome" = 'discard')::int as "discarded",
+        count(*) filter (where "outcome" in ('discard', 'expired', 'attempts_exhausted'))::int as "discarded",
         count(*) filter (where "outcome" = 'provider_deferred')::int as "provider_deferred",
         count(*) filter (where "uncertain" = true)::int as "uncertain"
       from "account_mail_delivery_events"
@@ -367,6 +367,14 @@ export class AccountMailWorkerRepository {
       const retryAt = new Date(item.now.getTime() + retryDelayMs(item.mail.id, item.mail.attempts));
       const retry = outcome === "retry" && item.mail.attempts < ACCOUNT_MAIL_MAX_ATTEMPTS
         && retryAt < item.validUntil;
+      // History records the persisted disposition, including a retryable SMTP
+      // result that becomes terminal because no further attempt can be queued.
+      let deliveryOutcome: DeliveryHistoryOutcome = outcome;
+      if (outcome === "retry" && !retry) {
+        deliveryOutcome = item.mail.attempts >= ACCOUNT_MAIL_MAX_ATTEMPTS
+          ? "attempts_exhausted"
+          : "discard";
+      }
       const owned = and(
         eq(accountMailOutbox.id, lease.id),
         eq(accountMailOutbox.leaseTokenDigest, digest),
@@ -409,7 +417,7 @@ export class AccountMailWorkerRepository {
       await recordDeliveryEvent(tx, {
         messageId: lease.id,
         purpose: item.proof.purpose,
-        outcome: retry ? "retry" : outcome,
+        outcome: deliveryOutcome,
         attempt: lease.attempt,
         smtpStage: transport?.stage,
         smtpCode: transport?.smtpCode,
