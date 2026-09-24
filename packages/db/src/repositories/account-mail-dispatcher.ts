@@ -1,4 +1,4 @@
-import { AccountMailCipher } from "./account-mail-crypto";
+import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import { accountMailWorkerRepository } from "./account-mail-worker";
 import type { MailLease, PreparedAccountMail } from "./account-mail-worker";
 import type {
@@ -22,6 +22,7 @@ type Worker = Readonly<{
     }>,
   ): Promise<boolean>;
   discardUnavailable(limit?: number): Promise<number>;
+  releaseForMissingKey?(lease: MailLease): Promise<boolean>;
 }>;
 
 type Transport = Readonly<{
@@ -104,7 +105,13 @@ export class AccountMailDispatcher {
       let prepared: PreparedAccountMail | null;
       try {
         prepared = await this.#worker.prepare(lease, this.#cipher);
-      } catch {
+      } catch (error) {
+        if (error instanceof AccountMailKeyUnavailableError) {
+          if (this.#worker.releaseForMissingKey) {
+            await this.#worker.releaseForMissingKey(lease);
+          }
+          throw new Error("Account mail worker key ring is unavailable");
+        }
         const settled = await this.#worker.settle(lease, "retry");
         if (settled) summary.retried++; else summary.unsettled++;
         continue;
