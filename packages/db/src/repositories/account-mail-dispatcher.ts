@@ -1,7 +1,11 @@
 import { AccountMailCipher } from "./account-mail-crypto";
 import { accountMailWorkerRepository } from "./account-mail-worker";
 import type { MailLease, PreparedAccountMail } from "./account-mail-worker";
-import type { AccountMailTransportInput, AccountMailTransportResult } from "./account-mail-smtp";
+import type {
+  AccountMailTransportInput,
+  AccountMailTransportResult,
+  AccountMailTransportStage,
+} from "./account-mail-smtp";
 
 type Worker = Readonly<{
   candidates(limit?: number): Promise<string[]>;
@@ -11,7 +15,11 @@ type Worker = Readonly<{
     lease: MailLease,
     outcome: "accepted" | "retry" | "discard",
     auditId?: string,
-    transport?: Readonly<{ smtpCode?: number; uncertain?: boolean }>,
+    transport?: Readonly<{
+      smtpCode?: number;
+      uncertain?: boolean;
+      stage?: AccountMailTransportStage;
+    }>,
   ): Promise<boolean>;
   discardUnavailable(limit?: number): Promise<number>;
 }>;
@@ -100,7 +108,7 @@ export class AccountMailDispatcher {
         lease,
         result.outcome,
         undefined,
-        { smtpCode: result.code, uncertain: result.uncertain },
+        { smtpCode: result.code, uncertain: result.uncertain, stage: result.stage },
       );
       if (!settled) {
         summary.unsettled++;
