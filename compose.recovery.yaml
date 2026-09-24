@@ -1,0 +1,10 @@
+# Optional production recovery producer wiring. Do not include this file until
+# recovery mail rollout is explicitly approved. It enables only application-side
+# proof/outbox issuance; SMTP credentials and previous decrypt-only keys belong
+# to the separate mail-worker overlay.
+services:
+  app:
+    environment:
+      ACCOUNT_MAIL_KEY_ID: ${ACCOUNT_MAIL_KEY_ID:?set ACCOUNT_MAIL_KEY_ID}
+      ACCOUNT_MAIL_KEY: ${ACCOUNT_MAIL_KEY:?set ACCOUNT_MAIL_KEY}
+      ACCOUNT_RECOVERY_ABUSE_KEY: ${ACCOUNT_RECOVERY_ABUSE_KEY:?set ACCOUNT_RECOVERY_ABUSE_KEY}

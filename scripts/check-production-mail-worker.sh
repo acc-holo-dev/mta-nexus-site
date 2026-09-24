@@ -40,6 +40,7 @@ export POSTGRES_PASSWORD=nexus_test_secret
 export POSTGRES_DB=mta_nexus_test
 export ACCOUNT_MAIL_KEY_ID=ci
 export ACCOUNT_MAIL_KEY="$mail_key"
+export ACCOUNT_RECOVERY_ABUSE_KEY="$abuse_key"
 export ACCOUNT_MAIL_PREVIOUS_KEY_ID=ci-previous
 export ACCOUNT_MAIL_PREVIOUS_KEY="$previous_mail_key"
 export ACCOUNT_MAIL_APP_URL=https://nexus-mta.test
@@ -53,8 +54,11 @@ export COMPOSE_DISABLE_ENV_FILE=true
 
 phase=compose-contract
 echo 'D5 phase: compose contract'
-docker compose --env-file /dev/null -f compose.production.yaml -f compose.mail-worker.yaml config --format json > /tmp/nexus-d5-worker-compose.json
+docker compose --env-file /dev/null \
+  -f compose.production.yaml -f compose.recovery.yaml -f compose.mail-worker.yaml \
+  config --format json > /tmp/nexus-d5-worker-compose.json
 node scripts/tests/mail-worker-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json
+node scripts/tests/recovery-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json
 
 phase=seed-synthetic-mail
 echo 'D5 phase: seed synthetic mail'
