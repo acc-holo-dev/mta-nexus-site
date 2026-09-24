@@ -106,12 +106,12 @@ D3 реализует только подтверждение **уже сохр�
 
 Для Chromium CI внешний SMTP намеренно не используется повторно: D2c уже проверяет transport. Disposable production overlay получает сгенерированные mail/abuse keys, а GitHub-hosted-only helper через `docker exec` расшифровывает только synthetic `@example.invalid` outbox entry. Guard требует `GITHUB_ACTIONS=true`, `RUNNER_ENVIRONMENT=github-hosted` и отдельный test flag. Proof передаётся только в память browser-test процесса и не записывается в summary/results/artifacts.
 
-D3a впервые стал полностью зелёным на `3ade27dec7e9da8a8a180e456b9bc5b0f660c331`: все семь jobs, Vitest **252/252 в 64 файлах**. Финальный D3 UI/browser SHA — `81656e71665c537d55b358aae5974e2a6ec10100`: все семь jobs success; D3-01 и прежние J2/password/session/directory regressions зелёные, Vitest остаётся **252/252, 64/64**.
+D3a впервые стал полностью зелёным на `3ade27dec7e9da8a8a180e456b9bc5b0f660c331`: все семь jobs, Vitest **252/252 в 64 файлах**. Финальный D3 UI/browser SHA — `68942511d666e970f28b7686deca5939cd9064df`: все семь jobs success; D3-01 и прежние J2/password/session/directory regressions зелёные, Vitest остаётся **252/252, 64/64**.
 
 Сохранённая история отказов D3:
 - `eba13dc`: новый DB test остановился на TypeScript optional `challengeId`; server assertions ещё не выполнялись.
 - `4faebd9`: confirmation-page retry branch имел недостаточно узкий TypeScript proof type; production image build остановился.
-- `06ac564`: новый recovery form повторил accessible label `Current password` и справедливо сломал строгие существующие password-browser locators. Поле переименовано в `Current password for recovery email`; старые tests не ослаблены.
+- `06ac564`: новый recovery form добавил второй accessible label `Current password`, и строгие старые password-browser locators стали неоднозначными. Финальный `6894251` сузил только старые locators к форме `Change password`; продуктовый label и security contract не ослаблялись.
 - `81656e7`: полный зелёный результат.
 
 **Production rollout не выполнен.** Основной `compose.production.yaml` всё ещё не передаёт `ACCOUNT_MAIL_KEY`/`ACCOUNT_RECOVERY_ABUSE_KEY`, держит `EMAIL_PROVIDER=disabled` и не запускает standalone dispatcher. Поэтому D3 не доказывает real inbox delivery, provider AUTH/TLS, VDS secret storage, key rotation или эксплуатационную доставку.
