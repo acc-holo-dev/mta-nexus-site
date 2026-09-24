@@ -11,9 +11,21 @@ export type AccountMailTransportInput = Readonly<{
   messageId: string;
 }>;
 
+export type AccountMailTransportStage =
+  | "connect"
+  | "greeting"
+  | "ehlo"
+  | "starttls"
+  | "auth"
+  | "mail_from"
+  | "rcpt_to"
+  | "data"
+  | "final_reply";
+
 export type AccountMailTransportResult = Readonly<{
   outcome: "accepted" | "retry" | "discard";
   uncertain: boolean;
+  stage: AccountMailTransportStage;
   code?: number;
 }>;
 
@@ -65,10 +77,14 @@ function validateOptions(options: AccountMailSmtpOptions) {
   return timeout;
 }
 
-function classify(code: number, permanent: "retry" | "discard" = "discard"): AccountMailTransportResult {
-  if (code >= 200 && code < 300) return { outcome: "accepted", uncertain: false, code };
-  if (code >= 400 && code < 500) return { outcome: "retry", uncertain: false, code };
-  return { outcome: permanent, uncertain: false, code };
+function classify(
+  code: number,
+  stage: AccountMailTransportStage,
+  permanent: "retry" | "discard" = "discard",
+): AccountMailTransportResult {
+  if (code >= 200 && code < 300) return { outcome: "accepted", uncertain: false, stage, code };
+  if (code >= 400 && code < 500) return { outcome: "retry", uncertain: false, stage, code };
+  return { outcome: permanent, uncertain: false, stage, code };
 }
 
 function dotStuff(text: string): string {
@@ -120,10 +136,11 @@ async function command(session: SmtpSession, value: string) {
 function requireStage(
   code: number,
   expected: number | number[],
+  stage: AccountMailTransportStage,
   permanent: "retry" | "discard" = "discard",
 ) {
   const allowed = Array.isArray(expected) ? expected : [expected];
-  return allowed.includes(code) ? null : classify(code, permanent);
+  return allowed.includes(code) ? null : classify(code, stage, permanent);
 }
 
 function advertisesStartTls(lines: string[]): boolean {
@@ -163,10 +180,11 @@ export class AccountMailSmtpTransport {
   async send(input: AccountMailTransportInput): Promise<AccountMailTransportResult> {
     validateMessage(input);
     const remaining = input.sendBefore.getTime() - Date.now();
-    if (remaining <= 0) return { outcome: "retry", uncertain: false };
+    if (remaining <= 0) return { outcome: "retry", uncertain: false, stage: "connect" };
     const budget = Math.max(1, Math.min(this.#timeoutMs, remaining));
     const deadlineAt = Date.now() + Math.max(1, remaining);
     let dataSent = false;
+    let stage: AccountMailTransportStage = "connect";
     let capabilities: string[] = [];
     let session: SmtpSession | null = null;
     let socket: net.Socket | null = null;
@@ -199,13 +217,15 @@ export class AccountMailSmtpTransport {
         session = createSession(secure);
 
         ensureWithinDeadline();
+        stage = "greeting";
         const greeting = await readReply(session);
-        let result = requireStage(greeting.code, 220, "retry");
+        let result = requireStage(greeting.code, 220, stage, "retry");
         if (result) return result;
 
         ensureWithinDeadline();
+        stage = "ehlo";
         const ehlo = await command(session, `EHLO ${this.#options.servername}`);
-        result = requireStage(ehlo.code, 250, "retry");
+        result = requireStage(ehlo.code, 250, stage, "retry");
         if (result) return result;
         capabilities = ehlo.lines;
       } else {
@@ -223,16 +243,18 @@ export class AccountMailSmtpTransport {
         if (result) return result;
 
         ensureWithinDeadline();
+        stage = "ehlo";
         const plainEhlo = await command(session, `EHLO ${this.#options.servername}`);
-        result = requireStage(plainEhlo.code, 250, "retry");
+        result = requireStage(plainEhlo.code, 250, stage, "retry");
         if (result) return result;
         if (!advertisesStartTls(plainEhlo.lines)) {
-          return { outcome: "retry", uncertain: false };
+          return { outcome: "retry", uncertain: false, stage: "starttls" };
         }
 
         ensureWithinDeadline();
+        stage = "starttls";
         const startTls = await command(session, "STARTTLS");
-        result = requireStage(startTls.code, 220, "retry");
+        result = requireStage(startTls.code, 220, stage, "retry");
         if (result) return result;
 
         closeSession(session);
@@ -251,8 +273,9 @@ export class AccountMailSmtpTransport {
         session = createSession(secure);
 
         ensureWithinDeadline();
+        stage = "ehlo";
         const secureEhlo = await command(session, `EHLO ${this.#options.servername}`);
-        result = requireStage(secureEhlo.code, 250, "retry");
+        result = requireStage(secureEhlo.code, 250, stage, "retry");
         if (result) return result;
         capabilities = secureEhlo.lines;
       }
@@ -261,15 +284,16 @@ export class AccountMailSmtpTransport {
 
       if (this.#options.username && this.#options.password) {
         if (!advertisesAuthPlain(capabilities)) {
-          return { outcome: "retry", uncertain: false };
+          return { outcome: "retry", uncertain: false, stage: "auth" };
         }
         const auth = Buffer.from(
           `\0${this.#options.username}\0${this.#options.password}`,
           "utf8",
         ).toString("base64");
         ensureWithinDeadline();
+        stage = "auth";
         const authReply = await command(session, `AUTH PLAIN ${auth}`);
-        const result = requireStage(authReply.code, 235, "retry");
+        const result = requireStage(authReply.code, 235, stage, "retry");
         if (result) return result;
       }
 
@@ -278,10 +302,10 @@ export class AccountMailSmtpTransport {
         || containsNonAscii(input.subject);
       const needs8BitMime = containsNonAscii(input.text);
       if (needsSmtpUtf8 && !advertisesCapability(capabilities, "SMTPUTF8")) {
-        return { outcome: "discard", uncertain: false };
+        return { outcome: "discard", uncertain: false, stage: "mail_from" };
       }
       if (needs8BitMime && !advertisesCapability(capabilities, "8BITMIME")) {
-        return { outcome: "discard", uncertain: false };
+        return { outcome: "discard", uncertain: false, stage: "mail_from" };
       }
       const mailParameters = [
         needsSmtpUtf8 ? "SMTPUTF8" : "",
@@ -289,21 +313,24 @@ export class AccountMailSmtpTransport {
       ].filter(Boolean).join(" ");
 
       ensureWithinDeadline();
+      stage = "mail_from";
       const mailFrom = await command(
         session,
         `MAIL FROM:<${this.#options.from}>${mailParameters ? ` ${mailParameters}` : ""}`,
       );
-      let result = requireStage(mailFrom.code, 250, "retry");
+      let result = requireStage(mailFrom.code, 250, stage, "retry");
       if (result) return result;
 
       ensureWithinDeadline();
+      stage = "rcpt_to";
       const recipient = await command(session, `RCPT TO:<${input.recipient}>`);
-      result = requireStage(recipient.code, [250, 251]);
+      result = requireStage(recipient.code, [250, 251], stage);
       if (result) return result;
 
       ensureWithinDeadline();
+      stage = "data";
       const data = await command(session, "DATA");
-      result = requireStage(data.code, 354);
+      result = requireStage(data.code, 354, stage);
       if (result) return result;
 
       const fromDomain = this.#options.from.slice(this.#options.from.lastIndexOf("@") + 1);
@@ -326,14 +353,15 @@ export class AccountMailSmtpTransport {
       dataSent = true;
       if (!session.socket.write(message, "utf8")) await once(session.socket, "drain");
       ensureWithinDeadline();
+      stage = "final_reply";
       const accepted = await readReply(session);
-      result = requireStage(accepted.code, 250);
+      result = requireStage(accepted.code, 250, stage);
       if (result) return result;
 
       try { await command(session, "QUIT"); } catch { /* acceptance already confirmed */ }
-      return { outcome: "accepted", uncertain: false, code: accepted.code };
+      return { outcome: "accepted", uncertain: false, stage: "final_reply", code: accepted.code };
     } catch {
-      return { outcome: "retry", uncertain: dataSent };
+      return { outcome: "retry", uncertain: dataSent, stage };
     } finally {
       clearTimeout(deadlineTimer);
       closeSession(session);
