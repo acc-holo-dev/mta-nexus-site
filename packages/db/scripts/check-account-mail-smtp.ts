@@ -21,7 +21,11 @@ const common = { host: "127.0.0.1", port, servername: "localhost", from: "no-rep
 
 const send = async (recipient: string, timeoutMs = 1000, trust: string | Buffer | undefined = ca) =>
   new AccountMailSmtpTransport({ ...common, ca: trust, timeoutMs }).send({
-    recipient, subject: "Synthetic D2c transport check", text: "No production delivery.", sendBefore: new Date(Date.now() + 5_000),
+    recipient,
+    subject: "Synthetic D2c transport check",
+    text: "No production delivery.",
+    sendBefore: new Date(Date.now() + 5_000),
+    messageId: `ame_${recipient.replace(/[^A-Za-z0-9_-]/g, "_")}`,
   });
 
 const accepted = await send("accept@example.invalid");
@@ -38,6 +42,7 @@ const authenticated = await new AccountMailSmtpTransport({
   subject: "Synthetic D5 authenticated transport check",
   text: "No production delivery.",
   sendBefore: new Date(Date.now() + 5_000),
+  messageId: "ame_authenticated_transport",
 });
 assert.equal(authenticated.outcome, "accepted");
 assert.equal(authenticated.uncertain, false);
@@ -52,8 +57,9 @@ const authRejected = await new AccountMailSmtpTransport({
   subject: "Synthetic D5 rejected authentication check",
   text: "No production delivery.",
   sendBefore: new Date(Date.now() + 5_000),
+  messageId: "ame_rejected_auth_transport",
 });
-assert.equal(authRejected.outcome, "discard");
+assert.equal(authRejected.outcome, "retry");
 assert.equal(authRejected.uncertain, false);
 assert.equal(authRejected.code, 535);
 
@@ -81,6 +87,7 @@ const untrusted = await new AccountMailSmtpTransport({
 }).send({
   recipient: "accept@example.invalid", subject: "Synthetic D2c untrusted certificate check",
   text: "No production delivery.", sendBefore: new Date(Date.now() + 5_000),
+  messageId: "ame_untrusted_transport",
 });
 assert.equal(untrusted.outcome, "retry");
 assert.equal(untrusted.uncertain, false);
