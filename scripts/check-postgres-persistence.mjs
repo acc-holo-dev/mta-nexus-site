@@ -73,6 +73,7 @@ function run() {
   ].filter((key) => process.env[key] !== undefined).map((key) => [key, process.env[key]]));
   Object.assign(env, {
     COMPOSE_DISABLE_ENV_FILE: 'true', DOMAIN: 'persistence.invalid',
+    ACME_EMAIL: 'ci@persistence.invalid',
     AUTH_SECRET: 'disposable-persistence-test-not-a-production-secret',
     POSTGRES_USER: 'nexus_probe', POSTGRES_DB: 'nexus_probe',
     POSTGRES_PASSWORD: 'disposable-config-render-only',
