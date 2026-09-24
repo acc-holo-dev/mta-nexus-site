@@ -1,20 +1,24 @@
-# Production deployment
+# Production deployment — validation required
 
-This is the single-VDS deployment for the closed beta. It does not deploy automatically; run it only after DNS for `nexus-mta.com` points to the VDS.
+> **Release is not approved by this document.** See the [release map](RELEASE-READINESS.md), reviewed 2026-09-24. The recipes below are an existing operational draft, not a verified runbook.
+>
+> **PostgreSQL 18 data-volume warning:** both current Compose files mount `pgdata` at `/var/lib/postgresql/data`, while the official 18 image uses a version-specific directory below `/var/lib/postgresql`. Before starting, recreating, or upgrading an environment with existing or unknown data, identify the actual `PGDATA`, mounted volumes, database version, and recovery path. Do not change the mount blindly and do not delete volumes to fix startup. BETA-001 tracks an isolated persistence check; no data migration is performed by this documentation update. See the [official image documentation](https://github.com/docker-library/docs/blob/master/postgres/content.md#pgdata).
+
+This is the proposed single-VDS deployment for the closed beta. It does not deploy automatically. Production execution requires all release gates, owner approval, and DNS for the chosen domain pointing to the intended VDS; DNS alone is insufficient.
 
 ## What runs on the VDS
 
 - Next.js application;
-- PostgreSQL 18, reachable only from the application container;
-- ClamAV 1.5, reachable only from the application container;
-- Caddy, which obtains TLS certificates and exposes only ports 80/443;
+- PostgreSQL 18, reachable through the Compose network and not published to the host;
+- ClamAV 1.5, reachable through the Compose network and not published to the host;
+- Caddy, which obtains TLS certificates and publishes ports 80/443;
 - Docker named volumes for database, uploads, and Caddy certificates.
 
-The target requires at least 4 GB RAM because ClamAV loads its signature database in memory. No SMTP or payment provider is required.
+The previous sizing target is at least 4 GB RAM with ClamAV included. Capacity and scanner startup must be measured on the chosen host; this is not a verified resource guarantee. Paid commerce and production email remain disabled; the account-recovery policy still needs an explicit decision in the release map.
 
-## Prepare the host
+## Prepare the host — only after the release gates pass
 
-Install Docker Engine with Compose plugin, clone the `dev` branch, then create `.env` from `.env.example`. Set these production-only values:
+Install Docker Engine with the Compose plugin and check out the explicitly approved release SHA/tag from `main`, not the moving `dev` branch. Create `.env` from `.env.example` and set these production-only values:
 
 ```dotenv
 DOMAIN=nexus-mta.com
@@ -25,9 +29,11 @@ POSTGRES_DB=mta_nexus
 AUTH_SECRET=generate-a-unique-secret-of-at-least-32-characters
 ```
 
-Keep `.env` outside git. Do not expose port 5432 in a firewall or Docker mapping.
+Keep `.env` outside git. Do not expose port 5432 in a firewall or Docker mapping. Record the chosen commit and image identifiers in the deployment record.
 
-## Validate and start
+## Validate and start — historical recipe pending verification
+
+Do not execute this recipe on existing or unknown data until BETA-001 is resolved and a tested release candidate is approved.
 
 ```bash
 docker compose -f compose.production.yaml config
@@ -36,28 +42,25 @@ docker compose -f compose.production.yaml ps
 curl -fsS https://nexus-mta.com/api/health
 ```
 
-The app applies database migrations before it starts. Caddy terminates TLS and rejects request bodies above 65 MiB before they reach Next.js.
+Do not publish the rendered Compose configuration: it can contain secrets. The current app command applies database migrations before startup; migration failure and recovery need their own rehearsal. A successful `/api/health` response alone does not prove database, storage, scanner, or user-journey readiness. The Caddy request-size and proxy configuration also belong in runtime verification.
 
 ## Backups and restore drill
 
-Enable VDS provider backups as chosen. In addition, regularly export the database and preserve uploads:
+VDS-provider backups remain the chosen backup mechanism. Confirm what the actual provider backup covers and restore both the database and private uploads on a disposable environment before inviting users. No restore has been demonstrated by this document.
+
+The following exports are retained as reference tools for a planned restore drill, not a newly mandated parallel backup service. First identify the real uploads volume from the running Compose project; the volume name in an example must never be assumed to match the host.
 
 ```bash
+# Reference only: use the actual configured user/database.
 docker compose -f compose.production.yaml exec -T postgres pg_dump -U nexus mta_nexus > mta-nexus.sql
-docker run --rm -v mta-nexus-site_uploads:/data -v "$PWD":/backup alpine tar czf /backup/uploads.tar.gz -C /data .
 ```
 
-Before inviting beta users, test restoring both artefacts on a disposable VDS. Provider backups are not a substitute for a restore drill.
+A database dump alone does not contain uploaded archives. The verified runbook must capture and restore the actual uploads volume, account for consistency between database and files, protect exported private data, and validate a sample authorized download after restoration.
 
 ## Upgrade
 
-PostgreSQL major-version upgrades require a tested dump/restore or `pg_upgrade`; never attach an existing PostgreSQL 16 data volume directly to PostgreSQL 18.
+Use an explicitly approved SHA/tag from `main` for upgrades as well as first installation. Record the previous candidate and a recovery plan before migrations. A code rollback alone does not necessarily undo a database migration.
 
-```bash
-git checkout main
-git pull --ff-only
-docker compose -f compose.production.yaml up -d --build
-docker compose -f compose.production.yaml ps
-```
+PostgreSQL major-version upgrades require a tested dump/restore or `pg_upgrade`; never attach an existing PostgreSQL 16 data volume directly to PostgreSQL 18. Changing the YAML mount path is not an upgrade procedure. The release map requires a separate restore rehearsal before this operational draft can be marked verified.
 
-Never run multiple application replicas yet: rate limiting is intentionally in-memory for this single-instance beta.
+Never run multiple application replicas yet: rate limiting is intentionally in-memory for the single-instance beta. Deployment, volume cleanup, data migration, and paid-provider activation require their own explicit approval and are not authorized by a documentation update.
