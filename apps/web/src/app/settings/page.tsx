@@ -243,7 +243,7 @@ export default function SettingsPage() {
                   Enter your current password. We will queue a confirmation link for the email already stored on this account.
                 </p>
                 <div className="max-w-sm space-y-1">
-                  <label htmlFor="recovery-current-password" className="block text-sm text-primary">Current password</label>
+                  <label htmlFor="recovery-current-password" className="block text-sm text-primary">Current password for recovery email</label>
                   <input
                     id="recovery-current-password"
                     name="currentPassword"

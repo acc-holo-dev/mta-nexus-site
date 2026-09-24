@@ -175,7 +175,7 @@ check('D3-01 recovery email enrollment requires password and one-time browser co
 
   const requestPromise = alice.page.waitForResponse((response) =>
     response.url().endsWith('/api/auth/email-verification') && response.request().method() === 'POST');
-  await alice.page.getByLabel('Current password', { exact: true }).nth(0).fill(password);
+  await alice.page.getByLabel('Current password for recovery email', { exact: true }).fill(password);
   await alice.page.getByRole('button', { name: 'Send verification email', exact: true }).click();
   const queued = await requestPromise;
   assert.equal(queued.status(), 202);
