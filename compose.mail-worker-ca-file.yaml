@@ -1,0 +1,11 @@
+# Optional custom SMTP CA bundle mount for providers/private PKI that need it.
+services:
+  mail-worker:
+    environment:
+      ACCOUNT_MAIL_SMTP_CA: ""
+      ACCOUNT_MAIL_SMTP_CA_FILE: /run/secrets/nexus-recovery/smtp-ca.pem
+    volumes:
+      - type: bind
+        source: ${NEXUS_ACCOUNT_MAIL_SMTP_CA_HOST_FILE:?set NEXUS_ACCOUNT_MAIL_SMTP_CA_HOST_FILE}
+        target: /run/secrets/nexus-recovery/smtp-ca.pem
+        read_only: true
