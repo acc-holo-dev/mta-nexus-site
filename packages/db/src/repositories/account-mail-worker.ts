@@ -249,6 +249,8 @@ export class AccountMailWorkerRepository {
         details: {
           purpose: item.proof.purpose,
           stage: transport.stage,
+          providerFailureStreak,
+          providerBlockedUntil: providerBlockedUntil.toISOString(),
           ...(transport.smtpCode !== undefined ? { smtpCode: transport.smtpCode } : {}),
         },
         createdAt: sql`clock_timestamp()`,
@@ -302,11 +304,16 @@ export class AccountMailWorkerRepository {
             leaseTokenDigest: null, leaseExpiresAt: null }).where(owned).returning({ id: accountMailOutbox.id })
         : await tx.delete(accountMailOutbox).where(owned).returning({ id: accountMailOutbox.id });
       if (!changed.length) return false;
+      let recoveredProviderGate: { failureStreak: number; blockedUntil: Date | null } | null = null;
       if (transport?.stage !== undefined) {
         const [gate] = await tx.select().from(accountMailQueueGate)
           .where(eq(accountMailQueueGate.singleton, true)).for("update");
         if (!gate) throw new Error("Account mail queue gate is unavailable");
         if (gate.providerBlockedUntil !== null || gate.providerFailureStreak !== 0) {
+          recoveredProviderGate = {
+            failureStreak: gate.providerFailureStreak,
+            blockedUntil: gate.providerBlockedUntil,
+          };
           await tx.update(accountMailQueueGate).set({
             providerBlockedUntil: null,
             providerFailureStreak: 0,
@@ -326,6 +333,25 @@ export class AccountMailWorkerRepository {
         },
         createdAt: sql`clock_timestamp()`,
       });
+      if (recoveredProviderGate) {
+        await tx.insert(auditEvents).values({
+          id: `aud_${randomUUID()}`,
+          actorId: "system:account-mail-worker",
+          actorType: "system",
+          action: "auth.mail_provider_recovered",
+          targetId: lease.id,
+          targetType: "account_mail",
+          details: {
+            failureStreak: recoveredProviderGate.failureStreak,
+            ...(recoveredProviderGate.blockedUntil
+              ? { blockedUntil: recoveredProviderGate.blockedUntil.toISOString() }
+              : {}),
+            ...(transport?.stage !== undefined ? { stage: transport.stage } : {}),
+            ...(transport?.smtpCode !== undefined ? { smtpCode: transport.smtpCode } : {}),
+          },
+          createdAt: sql`clock_timestamp()`,
+        });
+      }
       // "accepted" is the trusted transport caller's report, NOT inbox delivery.
       // A lost response after commit remains uncertain; do not invent success.
       return true;
