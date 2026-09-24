@@ -7,6 +7,7 @@ const config = JSON.parse(readFileSync(path, "utf8"));
 const worker = config.services?.["mail-worker"];
 assert(worker, "mail-worker service missing");
 assert.equal(worker.restart, "unless-stopped");
+assert.equal(worker.build, undefined, "mail-worker must use the explicitly approved image, never a build fallback");
 assert.deepEqual(worker.ports ?? [], []);
 assert.deepEqual(worker.volumes ?? [], []);
 assert.equal(worker.environment?.AUTH_SECRET, undefined);
