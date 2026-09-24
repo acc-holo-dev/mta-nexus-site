@@ -1,6 +1,6 @@
 # MTA NEXUS — карта бесплатной закрытой беты
 
-Дата сверки: **2026-09-24**. Проверенный код D3: **81656e71665c537d55b358aae5974e2a6ec10100**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35961489810), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35961489834) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35961489808). Vitest — **252 теста в 64 файлах**; Chromium D3-01 подтвердил authenticated recovery-email enrollment/confirmation без внешнего SMTP.
+Дата сверки: **2026-09-24**. Проверенный код D3: **68942511d666e970f28b7686deca5939cd9064df**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543966), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962544024) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543980). Vitest — **252 теста в 64 файлах**; Chromium D3-01 подтвердил authenticated recovery-email enrollment/confirmation без внешнего SMTP.
 
 **Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1–D3 добавляют proofs, очередь, leases, закрытый TLS transport/runtime, durable limit и authenticated verified-email binding. **Реальная почта пользователям и сценарий «Забыли пароль» по-прежнему не включены в production**. R4 остаётся открытым. Процент готовности не назначается.
 
@@ -33,17 +33,17 @@
 
 ## 3. Подтверждённая автоматическая база
 
-Текущие результаты относятся к **`1aaeef2c2a8f5becf5f2d22d3a55f4ad8b2f076c`**, а не к следующему документационному коммиту или одобренному релизу.
+Текущие результаты относятся к **`68942511d666e970f28b7686deca5939cd9064df`**, а не к следующему документационному коммиту или одобренному релизу.
 
 | Проверка | Свидетельство | Граница вывода |
 |---|---|---|
-| Миграции, TypeScript, Vitest, сборки приложения и production-образа | [Verify](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35956587917/job/107496106282): success; 229/229 тестов, 60/60 файлов | Не полный dependency/security audit. |
-| PostgreSQL и сохранность нового тома | [PostgreSQL persistence](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35956587917/job/107496106550): success | Не перенос рабочей БД и не backup restore. |
-| Docker-only локальный запуск | [Local Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35956587917/job/107496106449): success | Linux x86_64, миграции, HTTP/storage и замена app; другие платформы не приняты. |
-| Production-образ, Caddy/TLS и зависимости | [Production Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35956587917/job/107496106438): success | Новые тома, CI-надстройка, loopback и временный CA; не public DNS/ACME/VDS. |
-| Регистрация, вход, выход и выбранная private-граница | [Account access and logout](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35956587930/job/107496236661): success | Повтор существующих сценариев, не все приватные сущности. |
-| Известный пароль и сессии | [Password and session security](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35956587930/job/107496236434): success | Прежний browser-набор, не HTTP reset; P10 явно подменяет только 503 для UI. |
-| Каталог в браузере | [Guest server directory](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35956587944/job/107496211052): success | Управляемые ответы directory API не доказывают весь backend-путь и MTA-клиент. |
+| Миграции, TypeScript, Vitest, сборки приложения и production-образа | [Verify](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543966/job/107514020814): success; 252/252 тестов, 64/64 файлов | Не полный dependency/security audit. |
+| PostgreSQL и сохранность нового тома | [PostgreSQL persistence](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543966/job/107514020578): success | Не перенос рабочей БД и не backup restore. |
+| Docker-only локальный запуск | [Local Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543966/job/107514020729): success | Linux x86_64, миграции, HTTP/storage и замена app; другие платформы не приняты. |
+| Production-образ, Caddy/TLS и зависимости | [Production Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543966/job/107514020823): success | Новые тома, CI-надстройка, loopback и временный CA; не public DNS/ACME/VDS. |
+| Регистрация, вход, выход и выбранная private-граница | [Account access and logout](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962544024/job/107514020988): success; D3-01 + J2-01..11 | Реальный Chromium/production TLS/DB; не весь auth/security audit и не real inbox. |
+| Известный пароль и сессии | [Password and session security](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962544024/job/107514020804): success; P1..P11 | Не HTTP reset; P10 явно подменяет только 503 для UI. |
+| Каталог в браузере | [Guest server directory](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35962543980/job/107514020731): success | Управляемые ответы directory API не доказывают весь backend-путь и MTA-клиент. |
 | Proofs D1 и зашифрованная постановка D2a | Прежние 27 + 15 + 15 тестов проходят в том же Verify | Синтетические аккаунты/привязки, не реальное владение почтой. |
 | Получение, retry и завершение задания D2b | account-mail-worker.test.ts: 29/29 в Verify | DB-протокол, включая остановку дочернего процесса; SMTP и естественное ожидание всех интервалов не проверялись. |
 | Скриншоты и ручная визуальная приёмка | Не выполнены этим шагом | Историческая проблема квоты не устранялась; успех browser job не подтверждает доставку/просмотр изображения. |
@@ -200,7 +200,7 @@ Vitest вырос с 236 до **247/247 tests, 63/63 files**: 6 runtime tests и
 
 ### BETA-005d/D3 — verified recovery email enrollment
 
-**Выполнено на `81656e71665c537d55b358aae5974e2a6ec10100`.** D3a добавляет authenticated GET/POST/PATCH contract и provenance-backed binding; D3b — Settings UI, explicit confirmation page и real Chromium acceptance. Production Compose не активирован.
+**Выполнено на `68942511d666e970f28b7686deca5939cd9064df`.** D3a добавляет authenticated GET/POST/PATCH contract и provenance-backed binding; D3b — Settings UI, explicit confirmation page и real Chromium acceptance. Production Compose не активирован.
 
 POST доступен только действующей сессии обычного password-account, требует current password и durable limit до issue. Он ставит encrypted `email_verify` envelope через существующий atomic D1/D2 producer и не возвращает challenge/token. GET status private/no-store и read-only. PATCH consume + binding + consume audit + binding audit выполняются в защищённой транзакции; другой аккаунт и replay rejected. Legacy verification flags не считаются mailbox ownership; admin/moderator/MFA остаются gated.
 
@@ -208,9 +208,9 @@ Confirmation link использует query challenge + fragment token. Chromiu
 
 CI-only delivery fixture не является почтовым provider: disposable overlay получает случайные masked producer/abuse keys, а guarded helper внутри disposable app-container расшифровывает только synthetic `@example.invalid` outbox row. Token не выводится в test reports/summary/artifacts. D2c отдельно остаётся evidence SMTP/TLS transport; D3 не переобъявляет его inbox delivery.
 
-D3a `3ade27d` впервые дал 252/252 Vitest tests, 64 files и семь зелёных jobs. Финальный `81656e7` сохранил **252/252, 64/64**, и все семь jobs зелёные. Account browser: D3-01 + J2-01..11 success; password/session suite success; Directory browser success.
+D3a `3ade27d` впервые дал 252/252 Vitest tests, 64 files и семь зелёных jobs. Финальный `6894251` сохранил **252/252, 64/64**, и все семь jobs зелёные. Account browser: D3-01 + J2-01..11 success; password/session suite success; Directory browser success.
 
-История отказов сохранена: `eba13dc` — test TypeScript optional challenge ID; `4faebd9` — optional proof narrowing на confirmation retry; `06ac564` — duplicate accessible `Current password` label сломал старую password acceptance. Финальное distinct label исправило UI, не locators старого теста.
+История отказов сохранена: `eba13dc` — test TypeScript optional challenge ID; `4faebd9` — optional proof narrowing на confirmation retry; `06ac564` — новый recovery form добавил второй доступный label `Current password`, из-за чего строгие старые Playwright locators стали неоднозначными и каскадно сорвали password suite. Финальный `6894251` сузил только старые browser locators к форме `Change password`; продуктовый label и security semantics не ослаблялись.
 
 **Ограничения:** standard production Compose не получает mail/abuse keys, держит email disabled и не запускает dispatcher. Нет real provider/inbox, anonymous forgot endpoint, reset mutation, final email/IP anti-enumeration policy, privileged/MFA recovery, legacy account transition, production secret storage/rotation или manual visual/RU acceptance.
 
@@ -222,7 +222,7 @@ D3a `3ade27d` впервые дал 252/252 Vitest tests, 64 files и семь �
 
 | Условие | Сейчас |
 |---|---|
-| Проверки точного кандидата | Семь заданий успешны на 81656e7; SHA не объявлен релизом, после изменений проверки повторяются. |
+| Проверки точного кандидата | Семь заданий успешны на 6894251; SHA не объявлен релизом, после изменений проверки повторяются. |
 | Хранение и запуск | BETA-001–003 и повтор D2b подтверждены в CI; рабочая среда не принята. |
 | Полные J1–J7 | Частично подтверждены, не закрыты перечнем подзадач. |
 | Scanner и безопасный путь архива | Runtime-приёмка не завершена. |
