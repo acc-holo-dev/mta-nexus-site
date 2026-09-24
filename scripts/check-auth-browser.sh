@@ -12,3 +12,6 @@ mkdir -p "$NEXUS_BROWSER_HOME/.pki/nssdb"
 certutil -d "sql:$NEXUS_BROWSER_HOME/.pki/nssdb" -N --empty-password
 certutil -d "sql:$NEXUS_BROWSER_HOME/.pki/nssdb" -A -n nexus-auth-ci -t 'C,,' -i "$work/root.crt"
 node --test scripts/tests/auth.browser.mjs
+
+# A separate process checks the public route as well as the owner workspace.
+node --test scripts/tests/private-server.browser.mjs
