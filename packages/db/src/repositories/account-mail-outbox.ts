@@ -47,6 +47,8 @@ export class AccountMailOutboxRepository {
         "payload" ->> 'keyId' as "key_id",
         "payload" ->> 'version' as "version"
       from "account_mail_outbox"
+      where "expires_at" > clock_timestamp()
+        and "attempts" < 5
     `);
     const ids = new Set<string>();
     for (const row of rows) {
