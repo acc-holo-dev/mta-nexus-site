@@ -15,6 +15,7 @@ export type AccountMailRuntimeConfig = Readonly<{
   smtpPort: number;
   smtpServername: string;
   smtpFrom: string;
+  smtpAuthMode: "auto" | "plain" | "login";
   smtpUsername?: string;
   smtpPassword?: string;
   smtpCa?: string;
@@ -227,6 +228,11 @@ export function readAccountMailRuntimeConfig(
   const smtpMode = smtpModeRaw;
   const smtpServername = required(env, "ACCOUNT_MAIL_SMTP_SERVERNAME");
   const smtpFrom = required(env, "ACCOUNT_MAIL_SMTP_FROM");
+  const smtpAuthModeRaw = env.ACCOUNT_MAIL_SMTP_AUTH_MODE || "auto";
+  if (!["auto", "plain", "login"].includes(smtpAuthModeRaw)) {
+    throw new Error("Invalid account mail SMTP auth mode");
+  }
+  const smtpAuthMode = smtpAuthModeRaw as "auto" | "plain" | "login";
   const smtpUsername = env.ACCOUNT_MAIL_SMTP_USERNAME || undefined;
   const smtpPassword = secretSource(
     env,
@@ -261,6 +267,7 @@ export function readAccountMailRuntimeConfig(
     ),
     smtpServername,
     smtpFrom,
+    smtpAuthMode,
     smtpUsername,
     smtpPassword,
     smtpCa,
@@ -274,7 +281,7 @@ export function createAccountMailDispatcher(config: AccountMailRuntimeConfig): A
   const cipher = new AccountMailCipher(config.activeKeyId, config.keys);
   const transport = new AccountMailSmtpTransport({
     host: config.smtpHost, port: config.smtpPort, servername: config.smtpServername,
-    from: config.smtpFrom, mode: config.smtpMode,
+    from: config.smtpFrom, mode: config.smtpMode, authMode: config.smtpAuthMode,
     username: config.smtpUsername, password: config.smtpPassword,
     ca: config.smtpCa, timeoutMs: config.smtpTimeoutMs,
   });
@@ -363,6 +370,6 @@ export function runtimeFingerprint(config: AccountMailRuntimeConfig): string {
     keyId: config.activeKeyId, keyRingSize: Object.keys(config.keys).length,
     appUrl: config.appUrl, smtpHost: config.smtpHost, smtpMode: config.smtpMode,
     smtpPort: config.smtpPort, smtpServername: config.smtpServername, smtpFrom: config.smtpFrom,
-    smtpAuth: Boolean(config.smtpUsername), smtpTimeoutMs: config.smtpTimeoutMs, batchSize: config.batchSize, pollIntervalMs: config.pollIntervalMs,
+    smtpAuth: Boolean(config.smtpUsername), smtpAuthMode: config.smtpAuthMode, smtpTimeoutMs: config.smtpTimeoutMs, batchSize: config.batchSize, pollIntervalMs: config.pollIntervalMs,
   })).digest("hex").slice(0, 16);
 }
