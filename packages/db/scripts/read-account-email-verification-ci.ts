@@ -37,7 +37,7 @@ try {
     id: mail.id,
     challengeId: mail.challengeId,
     userId: user.id,
-    purpose: "email_verify",
+    purpose,
     expiresAt: mail.expiresAt,
   }, mail.payload);
   if (payload.recipient !== email) throw new Error("Synthetic CI recipient mismatch");
