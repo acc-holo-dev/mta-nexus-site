@@ -68,6 +68,42 @@ jobs:
       - name: Apply database migrations
         run: pnpm db:migrate
 
+      - name: Start isolated TLS SMTP receiver
+        run: |
+          mkdir -p /tmp/nexus-smtp-ci
+          openssl req -x509 -newkey rsa:2048 -nodes \
+            -keyout /tmp/nexus-smtp-ci/key.pem \
+            -out /tmp/nexus-smtp-ci/cert.pem \
+            -subj '/CN=localhost' \
+            -addext 'subjectAltName=DNS:localhost' \
+            -days 1 >/dev/null 2>&1
+          docker run --detach --rm \
+            --name "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}" \
+            --publish 127.0.0.1:2465:2465 \
+            --env SMTP_TEST_PORT=2465 \
+            --volume "$PWD:/repo:ro" \
+            --volume "/tmp/nexus-smtp-ci:/certs:ro" \
+            node:26-alpine \
+            node /repo/scripts/tests/account-mail-smtp-receiver.mjs
+          for attempt in $(seq 1 30); do
+            if docker logs "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}" 2>&1 | grep -q '^READY$'; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}"
+          exit 1
+
+      - name: Verify isolated SMTP transport and dispatcher
+        env:
+          SMTP_TEST_CA_FILE: /tmp/nexus-smtp-ci/cert.pem
+          SMTP_TEST_PORT: 2465
+        run: pnpm exec tsx scripts/check-account-mail-smtp.ts
+
+      - name: Stop isolated TLS SMTP receiver
+        if: always()
+        run: docker rm --force "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}" >/dev/null 2>&1 || true
+
       - name: Verify project
         run: pnpm check
 
