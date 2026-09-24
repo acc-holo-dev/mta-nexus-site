@@ -59,7 +59,10 @@ export async function PATCH(request: NextRequest) {
   const parsed = confirmPasswordResetSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return json({ error: "Invalid or expired password reset" }, 400);
   try {
-    await authService.confirmPasswordReset(parsed.data);
+    await authService.confirmPasswordReset({
+      ...parsed.data,
+      ip: getTrustedRequestIp(request),
+    });
     return json({ success: true });
   } catch (error: unknown) {
     if (error instanceof AppError) return json({ error: "Invalid or expired password reset" }, 400);
