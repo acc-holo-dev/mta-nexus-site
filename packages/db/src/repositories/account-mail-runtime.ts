@@ -1,4 +1,6 @@
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { isAbsolute } from "node:path";
 import { AccountMailCipher } from "./account-mail-crypto";
 import { AccountMailDispatcher } from "./account-mail-dispatcher";
 import { AccountMailSmtpTransport } from "./account-mail-smtp";
@@ -27,6 +29,44 @@ function required(env: Record<string, string | undefined>, key: string): string 
   return value;
 }
 
+function secretSource(
+  env: Record<string, string | undefined>,
+  valueKey: string,
+  fileKey: string,
+  label: string,
+  options: { required?: boolean; maxBytes?: number } = {},
+): string | undefined {
+  const direct = env[valueKey] || undefined;
+  const file = env[fileKey] || undefined;
+  if (direct && file) {
+    throw new Error(`${label} must use either ${valueKey} or ${fileKey}, not both`);
+  }
+  if (!direct && !file) {
+    if (options.required) {
+      throw new Error(`Missing account mail configuration: ${valueKey} or ${fileKey}`);
+    }
+    return undefined;
+  }
+  if (direct) return direct;
+  if (!file || !isAbsolute(file)) {
+    throw new Error(`Invalid ${label} file path`);
+  }
+
+  let bytes: Buffer;
+  try {
+    bytes = readFileSync(file);
+  } catch {
+    throw new Error(`Could not read ${label} file`);
+  }
+  const maxBytes = options.maxBytes ?? 4096;
+  if (bytes.length < 1 || bytes.length > maxBytes) {
+    throw new Error(`Invalid ${label} file size`);
+  }
+  const value = bytes.toString("utf8").replace(/\r?\n$/, "");
+  if (!value || value.includes("\0")) throw new Error(`Invalid ${label} file contents`);
+  return value;
+}
+
 function integer(value: string | undefined, fallback: number, min: number, max: number, name: string): number {
   const parsed = value === undefined || value === "" ? fallback : Number(value);
   if (!Number.isInteger(parsed) || parsed < min || parsed > max) {
@@ -45,7 +85,13 @@ function decodeKey(value: string, label: string): Uint8Array {
 export function readAccountRecoveryAbuseKey(
   env: Record<string, string | undefined> = process.env,
 ): Uint8Array {
-  const raw = required(env, "ACCOUNT_RECOVERY_ABUSE_KEY");
+  const raw = secretSource(
+    env,
+    "ACCOUNT_RECOVERY_ABUSE_KEY",
+    "ACCOUNT_RECOVERY_ABUSE_KEY_FILE",
+    "account recovery abuse key",
+    { required: true },
+  )!;
   if (env.AUTH_SECRET && raw === env.AUTH_SECRET) {
     throw new Error("Account recovery abuse key must not reuse AUTH_SECRET");
   }
@@ -55,7 +101,13 @@ export function readAccountRecoveryAbuseKey(
 export function createAccountMailProducerCipher(
   env: Record<string, string | undefined> = process.env,
 ): AccountMailCipher {
-  const rawKey = required(env, "ACCOUNT_MAIL_KEY");
+  const rawKey = secretSource(
+    env,
+    "ACCOUNT_MAIL_KEY",
+    "ACCOUNT_MAIL_KEY_FILE",
+    "account mail encryption key",
+    { required: true },
+  )!;
   if (env.AUTH_SECRET && rawKey === env.AUTH_SECRET) {
     throw new Error("Account mail encryption key must not reuse AUTH_SECRET");
   }
@@ -68,7 +120,13 @@ export function createAccountMailProducerCipher(
 export function readAccountMailRuntimeConfig(
   env: Record<string, string | undefined> = process.env,
 ): AccountMailRuntimeConfig {
-  const rawKey = required(env, "ACCOUNT_MAIL_KEY");
+  const rawKey = secretSource(
+    env,
+    "ACCOUNT_MAIL_KEY",
+    "ACCOUNT_MAIL_KEY_FILE",
+    "account mail encryption key",
+    { required: true },
+  )!;
   if (env.AUTH_SECRET && rawKey === env.AUTH_SECRET) {
     throw new Error("Account mail encryption key must not reuse AUTH_SECRET");
   }
@@ -76,7 +134,12 @@ export function readAccountMailRuntimeConfig(
   if (!/^[A-Za-z0-9_-]{1,32}$/.test(activeKeyId)) throw new Error("Invalid account mail key identifier");
   const activeKey = decodeKey(rawKey, "account mail encryption key");
   const previousKeyId = env.ACCOUNT_MAIL_PREVIOUS_KEY_ID || undefined;
-  const previousRawKey = env.ACCOUNT_MAIL_PREVIOUS_KEY || undefined;
+  const previousRawKey = secretSource(
+    env,
+    "ACCOUNT_MAIL_PREVIOUS_KEY",
+    "ACCOUNT_MAIL_PREVIOUS_KEY_FILE",
+    "previous account mail encryption key",
+  );
   if (Boolean(previousKeyId) !== Boolean(previousRawKey)) {
     throw new Error("Previous account mail key ID and key must be configured together");
   }
@@ -107,11 +170,22 @@ export function readAccountMailRuntimeConfig(
   const smtpServername = required(env, "ACCOUNT_MAIL_SMTP_SERVERNAME");
   const smtpFrom = required(env, "ACCOUNT_MAIL_SMTP_FROM");
   const smtpUsername = env.ACCOUNT_MAIL_SMTP_USERNAME || undefined;
-  const smtpPassword = env.ACCOUNT_MAIL_SMTP_PASSWORD || undefined;
+  const smtpPassword = secretSource(
+    env,
+    "ACCOUNT_MAIL_SMTP_PASSWORD",
+    "ACCOUNT_MAIL_SMTP_PASSWORD_FILE",
+    "account mail SMTP password",
+  );
   if (Boolean(smtpUsername) !== Boolean(smtpPassword)) {
     throw new Error("Account mail SMTP username and password must be configured together");
   }
-  const smtpCa = env.ACCOUNT_MAIL_SMTP_CA;
+  const smtpCa = secretSource(
+    env,
+    "ACCOUNT_MAIL_SMTP_CA",
+    "ACCOUNT_MAIL_SMTP_CA_FILE",
+    "account mail SMTP CA",
+    { maxBytes: 32_768 },
+  );
   if (smtpCa !== undefined && smtpCa.length > 32_768) throw new Error("Invalid account mail SMTP CA");
   return Object.freeze({
     activeKeyId,
