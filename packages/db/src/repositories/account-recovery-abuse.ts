@@ -2,10 +2,13 @@ import { createHmac } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { db } from "../client";
 
-export type AccountRecoveryAbuseScope = "email_verify_request" | "password_reset_request";
+export type AccountRecoveryAbuseScope =
+  | "email_verify_request"
+  | "password_reset_request"
+  | "password_reset_confirm";
 
 function digest(scope: AccountRecoveryAbuseScope, subject: string, key: Uint8Array): string {
-  if (!["email_verify_request", "password_reset_request"].includes(scope)
+  if (!["email_verify_request", "password_reset_request", "password_reset_confirm"].includes(scope)
     || typeof subject !== "string" || subject.length < 1 || subject.length > 512
     || !(key instanceof Uint8Array) || key.byteLength !== 32) {
     throw new Error("Invalid account recovery abuse-limit input");
