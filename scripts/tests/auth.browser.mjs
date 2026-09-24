@@ -381,6 +381,7 @@ check('D4-01 anonymous neutral request and one-time password reset', async () =>
   const resetSessionA = await freshActor();
   const resetSessionB = await freshActor();
   for (const who of [resetSessionA, resetSessionB]) {
+    await who.page.goto('/auth/login');
     const logged = await request(who, '/api/auth/login', 'POST', { email: people[0].email, password });
     assert.equal(logged.status, 200);
     assert.equal((await request(who, '/api/auth/session')).data.user.id, aliceUser.id);
