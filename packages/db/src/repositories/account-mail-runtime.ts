@@ -293,6 +293,7 @@ export type AccountMailBatchResult = Readonly<{
   skipped: number;
   unsettled: number;
   cleaned: number;
+  providerDeferred?: boolean;
 }>;
 
 type BatchRunner = Readonly<{
@@ -349,7 +350,10 @@ export async function runAccountMailLoop(input: {
       });
     }
     if (input.once || input.signal.aborted) break;
-    await sleep(input.pollIntervalMs, input.signal);
+    const waitMs = result.providerDeferred
+      ? Math.max(input.pollIntervalMs, 30_000)
+      : input.pollIntervalMs;
+    await sleep(waitMs, input.signal);
   } while (!input.signal.aborted);
   return Object.freeze(total);
 }
