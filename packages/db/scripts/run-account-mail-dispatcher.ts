@@ -1,5 +1,5 @@
 import { rename, rm, writeFile } from "node:fs/promises";
-import { closeDatabaseConnection } from "../src/client";
+import { checkDatabaseConnection, closeDatabaseConnection } from "../src/client";
 import {
   createAccountMailDispatcher,
   readAccountMailRuntimeConfig,
@@ -9,10 +9,17 @@ import {
 
 const HEALTH_FILE = "/tmp/nexus-account-mail-worker-health.json";
 const HEALTH_TMP = `${HEALTH_FILE}.${process.pid}.tmp`;
+const HEARTBEAT_INTERVAL_MS = 15_000;
+const STALE_AFTER_MS = 60_000;
+
 const controller = new AbortController();
 let stopping = false;
-let readyEmitted = false;
 let fingerprint = "";
+let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+let healthWrite: Promise<void> = Promise.resolve();
+let healthFailure: unknown = null;
+let healthStatus: "starting" | "ready" = "starting";
+let healthBatch = 0;
 
 function emit(event: Record<string, unknown>) {
   process.stdout.write(JSON.stringify(event) + "\n");
@@ -28,36 +35,50 @@ function stop(signal: "SIGTERM" | "SIGINT") {
 process.once("SIGTERM", () => stop("SIGTERM"));
 process.once("SIGINT", () => stop("SIGINT"));
 
+const writeHealthSnapshot = async () => {
+  const payload = JSON.stringify({
+    status: healthStatus,
+    config: fingerprint,
+    pid: process.pid,
+    batch: healthBatch,
+    heartbeatAt: new Date().toISOString(),
+    staleAfterMs: STALE_AFTER_MS,
+  });
+  await writeFile(HEALTH_TMP, payload, { encoding: "utf8", mode: 0o600 });
+  await rename(HEALTH_TMP, HEALTH_FILE);
+};
+
+const queueHealth = (): Promise<void> => {
+  const next = healthWrite.then(writeHealthSnapshot);
+  healthWrite = next.catch((error) => {
+    healthFailure = error;
+    controller.abort();
+  });
+  return next;
+};
+
 let failed = false;
 try {
   const config = readAccountMailRuntimeConfig();
   fingerprint = runtimeFingerprint(config);
   const dispatcher = createAccountMailDispatcher(config);
-  const staleAfterMs = Math.min(
-    600_000,
-    Math.max(
-      60_000,
-      config.batchSize * config.smtpTimeoutMs + config.pollIntervalMs + 30_000,
-    ),
-  );
 
-  const writeHealth = async (
-    status: "starting" | "ready",
-    batch = 0,
-  ) => {
-    const payload = JSON.stringify({
-      status,
-      config: fingerprint,
-      pid: process.pid,
-      batch,
-      heartbeatAt: new Date().toISOString(),
-      staleAfterMs,
+  await queueHealth();
+  await checkDatabaseConnection();
+
+  healthStatus = "ready";
+  await queueHealth();
+  if (process.argv.includes("--ready")) {
+    emit({ status: "ready", config: fingerprint });
+  }
+
+  heartbeatTimer = setInterval(() => {
+    void queueHealth().catch(() => {
+      // queueHealth records the failure and aborts the main loop. Avoid an
+      // unhandled rejection from the timer; the main path will fail closed.
     });
-    await writeFile(HEALTH_TMP, payload, { encoding: "utf8", mode: 0o600 });
-    await rename(HEALTH_TMP, HEALTH_FILE);
-  };
-
-  await writeHealth("starting");
+  }, HEARTBEAT_INTERVAL_MS);
+  heartbeatTimer.unref();
 
   const summary = await runAccountMailLoop({
     dispatcher,
@@ -66,11 +87,9 @@ try {
     pollIntervalMs: config.pollIntervalMs,
     once: process.argv.includes("--once"),
     onBatch: async ({ batch, result }) => {
-      await writeHealth("ready", batch);
-      if (process.argv.includes("--ready") && !readyEmitted) {
-        readyEmitted = true;
-        emit({ status: "ready", config: fingerprint });
-      }
+      healthBatch = batch;
+      await queueHealth();
+
       const activity = result.accepted + result.retried + result.discarded
         + result.skipped + result.unsettled + result.cleaned;
       if (activity > 0) {
@@ -88,6 +107,9 @@ try {
       }
     },
   });
+
+  await healthWrite;
+  if (healthFailure) throw new Error("Account mail worker heartbeat failed");
 
   emit({
     status: "stopped",
@@ -108,6 +130,14 @@ try {
   }) + "\n");
   process.exitCode = 1;
 } finally {
+  if (heartbeatTimer) clearInterval(heartbeatTimer);
+
+  try {
+    await healthWrite;
+  } catch {
+    // The generic failure event above is the only diagnostic exposed.
+  }
+
   try {
     await rm(HEALTH_TMP, { force: true });
     await rm(HEALTH_FILE, { force: true });

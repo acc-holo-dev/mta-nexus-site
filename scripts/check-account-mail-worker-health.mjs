@@ -12,8 +12,8 @@ try {
   if (data?.status !== "ready"
     || !Number.isFinite(heartbeatAt)
     || !Number.isInteger(staleAfterMs)
-    || staleAfterMs < 10_000
-    || staleAfterMs > 600_000
+    || staleAfterMs < 30_000
+    || staleAfterMs > 120_000
     || !Number.isInteger(pid)
     || pid < 1
     || Date.now() - heartbeatAt > staleAfterMs) {
