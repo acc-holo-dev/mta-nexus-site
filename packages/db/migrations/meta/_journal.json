@@ -92,6 +92,13 @@
       "when": 1790218800000,
       "tag": "0012_account_recovery_proofs",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790226000000,
+      "tag": "0013_account_mail_outbox",
+      "breakpoints": true
     }
   ]
 }

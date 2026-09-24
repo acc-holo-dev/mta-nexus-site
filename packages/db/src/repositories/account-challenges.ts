@@ -8,13 +8,17 @@ import { digestSessionToken } from "./sessions";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export type ChallengePurpose = "email_verify" | "password_reset";
-type Intent = { userId: string; auditId: string } & (
+export type ChallengeIntent = { userId: string; auditId: string } & (
   | { purpose: "email_verify"; currentToken: string; expectedPasswordHash: string }
   | { purpose: "password_reset" }
 );
+type Intent = ChallengeIntent;
 export type ConsumedProof = Readonly<{
   id: string; userId: string; purpose: ChallengePurpose; email: string;
   credentialVersion: number; bindingId: string | null;
+}>;
+type IssuedProof = Readonly<{
+  id: string; token: string; userId: string; purpose: ChallengePurpose; email: string; expiresAt: Date;
 }>;
 const lifetimeMs = { email_verify: 24 * 60 * 60_000, password_reset: 30 * 60_000 } as const;
 const invalid = () => new UnauthorizedError("Invalid or expired account confirmation");
@@ -31,6 +35,17 @@ export function digestAccountChallenge(purpose: ChallengePurpose, token: string)
 // No SMTP/network/side effects or detached promises inside transaction callbacks.
 export class AccountChallengeRepository {
   async issue(input: Intent): Promise<{ id: string; token: string; expiresAt: Date }> {
+    return this.issueAtomic(input, async (_tx, proof) => ({
+      id: proof.id, token: proof.token, expiresAt: proof.expiresAt,
+    }));
+  }
+
+  // Delivery must be persisted via this transaction, never after issue commits.
+  async issueForDelivery<T>(input: Intent, persist: (tx: Tx, proof: IssuedProof) => Promise<T>): Promise<T> {
+    return this.issueAtomic(input, persist);
+  }
+
+  private async issueAtomic<T>(input: Intent, persist: (tx: Tx, proof: IssuedProof) => Promise<T>): Promise<T> {
     const token = randomBytes(32).toString("base64url");
     const tokenDigest = digestAccountChallenge(input.purpose, token);
     return db.transaction(async (tx) => {
@@ -50,9 +65,18 @@ export class AccountChallengeRepository {
         bindingId, createdAt, expiresAt,
       });
       await this.audit(tx, input, id, "auth.challenge_issued");
-      // Sensitive return is server-internal only; do not log or serialize it to a client.
-      return { id, token, expiresAt };
-    });
+      const result = await persist(tx, Object.freeze({ id, token, expiresAt,
+        userId: user.id, email: user.email, purpose: input.purpose }));
+      // A queue-capacity lock can add a later wait: recheck time after it too.
+      await this.checkSessionExpiry(tx, sessionExpiresAt);
+      const [live] = await tx.select({ id: authChallenges.id }).from(authChallenges).where(and(
+        eq(authChallenges.id, id), isNull(authChallenges.consumedAt), isNull(authChallenges.revokedAt),
+        gt(authChallenges.expiresAt, sql`clock_timestamp()`)
+      ));
+      if (!live) throw invalid();
+      // Sensitive proof data is internal only; queued callers return metadata.
+      return result;
+    }, { isolationLevel: "read committed" });
   }
 
   async consume<T>(input: Intent & { id: string; token: string },
