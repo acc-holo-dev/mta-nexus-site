@@ -1,0 +1,27 @@
+# Optional production mail worker. Do not include this file until recovery mail
+# rollout has been explicitly approved and all required secrets/provider settings exist.
+services:
+  mail-worker:
+    image: ${NEXUS_MAIL_IMAGE:?set NEXUS_MAIL_IMAGE to the approved application image}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    restart: unless-stopped
+    command: ["node", "--import", "tsx", "packages/db/scripts/run-account-mail-dispatcher.ts", "--ready"]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://${POSTGRES_USER:-nexus}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mta_nexus}
+      ACCOUNT_MAIL_KEY_ID: ${ACCOUNT_MAIL_KEY_ID:?set ACCOUNT_MAIL_KEY_ID}
+      ACCOUNT_MAIL_KEY: ${ACCOUNT_MAIL_KEY:?set ACCOUNT_MAIL_KEY}
+      ACCOUNT_MAIL_APP_URL: ${ACCOUNT_MAIL_APP_URL:?set ACCOUNT_MAIL_APP_URL}
+      ACCOUNT_MAIL_SMTP_HOST: ${ACCOUNT_MAIL_SMTP_HOST:?set ACCOUNT_MAIL_SMTP_HOST}
+      ACCOUNT_MAIL_SMTP_PORT: ${ACCOUNT_MAIL_SMTP_PORT:-465}
+      ACCOUNT_MAIL_SMTP_SERVERNAME: ${ACCOUNT_MAIL_SMTP_SERVERNAME:?set ACCOUNT_MAIL_SMTP_SERVERNAME}
+      ACCOUNT_MAIL_SMTP_FROM: ${ACCOUNT_MAIL_SMTP_FROM:?set ACCOUNT_MAIL_SMTP_FROM}
+      ACCOUNT_MAIL_SMTP_TIMEOUT_MS: ${ACCOUNT_MAIL_SMTP_TIMEOUT_MS:-5000}
+      ACCOUNT_MAIL_BATCH_SIZE: ${ACCOUNT_MAIL_BATCH_SIZE:-10}
+      ACCOUNT_MAIL_POLL_INTERVAL_MS: ${ACCOUNT_MAIL_POLL_INTERVAL_MS:-5000}
+    depends_on:
+      postgres:
+        condition: service_healthy
