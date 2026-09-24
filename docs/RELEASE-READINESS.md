@@ -1,8 +1,8 @@
 # MTA NEXUS — карта бесплатной закрытой беты
 
-Дата сверки: **2026-09-24**. Проверенный код D2c: **7b2629d34101101602125a79ef5c111a33cb7a6f**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35957799862), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35957799856) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35957799835). Vitest — **236 тестов в 61 файле**; дополнительно Verify выполнил закрытую TLS SMTP integration-проверку queue -> worker -> receiver.
+Дата сверки: **2026-09-24**. Проверенный код D2d: **e7dd6d8e18ca27dd5bcb233b8f5b9ebaf794d10c**. Все семь заданий прошли: четыре в [основном CI](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35959455823), два в [Account browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35959455937) и [Directory browser](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35959455879). Vitest — **247 тестов в 63 файлах**; Verify также подтвердил D2c TLS integration и D2d standalone worker lifecycle.
 
-**Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1/D2a/D2b/D2c добавляют внутренние подтверждения, очередь, lease-протокол и проверенный закрытый TLS transport. **Реальная почта пользователям и сценарий «Забыли пароль» по-прежнему не включены**. R4 остаётся открытым. Процент готовности не назначается.
+**Решение о публичном выпуске не принято.** BETA-001–003 подтверждают хранение и запуск в CI; BETA-004 — ограниченный путь каталога; BETA-005a/b/c — перечисленные операции аккаунта. D1–D2d добавляют proofs, очередь, leases, закрытый TLS transport, явный standalone worker runtime и durable abuse-limit primitive. **Реальная почта пользователям, enrollment и сценарий «Забыли пароль» по-прежнему не включены**. R4 остаётся открытым. Процент готовности не назначается.
 
 Полный аудит файлов, безопасности и старых идей не выполнен. Существующие среды с данными не обследованы и не считаются пустыми. В этом шаге `main`, рабочие серверы, существующие аккаунты, почтовые провайдеры, реальные ключи/секреты и платёжные настройки не менялись; публичного развёртывания не было.
 
@@ -74,7 +74,7 @@
 | R1 — PostgreSQL | Старый mount исправлен, новые тома проверены; старые среды требуют инвентаризации, backup и плана переноса. |
 | R2 — Docker-only | Local/production-пути проверены в CI, рабочая среда не принята. |
 | R3 — scanner | Старт проверен; вердикты и fail-closed публикация требуют отдельной приёмки. Модерация не заменяет scanner молча. |
-| R4 — восстановление аккаунта | D0 — проект, D1 — proofs, D2a — очередь, D2b — leases/retry, D2c — закрытая TLS SMTP integration. Реальный provider/scheduler, abuse limits, enrollment/reset и политика перехода не приняты. Следующий D2d — runtime provisioning/dispatcher lifecycle; R4 открыт. |
+| R4 — восстановление аккаунта | D0–D2d закрывают проект, proofs, очередь, leases, закрытый TLS transport, explicit worker runtime и DB-backed abuse-limit primitive. Public enrollment/reset, реальный provider, политика лимитов/перехода и эксплуатация не приняты. Следующий D3 — verified email binding; R4 открыт. |
 | R5 — выпуск | Разработка в dev, выпуск только по явно одобренному SHA/тегу main; совпадение веток не означает deploy. |
 | R6 — удобство | Ограниченные английские сценарии пройдены; RU/EN, визуальная и полная доступность открыты. |
 | R7 — эксплуатация | Домен/VDS/контакты/backup не подтверждены; проверить фактическую среду. |
@@ -95,7 +95,7 @@
 | BETA-003 | Production startup в CI: выполнено в описанных границах, не deploy. |
 | BETA-004 | Функциональная browser-часть J1 выполнена; полный J1 открыт. |
 | BETA-005a/b/c | Перечисленные операции аккаунта/пароля/сессий выполнены, не весь J2. |
-| BETA-005d — в работе | D0/D1/D2a/D2b выполнены в своих границах. **Следующий D2c:** SMTP-адаптер/dispatcher и закрытый приёмник без пересылки в интернет. |
+| BETA-005d — в работе | D0/D1/D2a/D2b/D2c/D2d выполнены в своих границах. **Следующий D3:** authenticated email enrollment и verified recovery binding без автоматического доверия legacy flags. |
 | Остальные BETA-005 | Recovery, onboarding автора, scanner и HTTP delivery: отдельные задачи. J2/J4/J5 целиком не закрыты. |
 | BETA-006 | J3/J6/J7: заявки, публикации/подписки, модерация и негативные проверки. |
 | BETA-007 | RU/EN, доступность, тексты и ручная визуальная приёмка обязательных путей. |
@@ -178,21 +178,39 @@ account-mail-dispatcher.test.ts добавляет 7 unit-проверок; об
 
 **Ограничения:** SMTP AUTH и STARTTLS не реализованы; выбран только тестируемый implicit-TLS контракт. Нет production key loading, provider secret lifecycle, background scheduler/process supervision, реальной ротации ключей, адресных/IP abuse limits, публичного нейтрального request endpoint, измерения timing enumeration, D3 enrollment или D4 reset. Успешный SMTP 250 означает acceptance тестовым receiver, не inbox delivery. Реальные пользователи и рабочие данные не затронуты.
 
-### Следующий ограниченный шаг — D2d
+### BETA-005d/D2d — explicit runtime и durable abuse limits
 
-Явное runtime provision отдельного mail-encryption key и transport settings, bounded standalone dispatcher loop с graceful shutdown/cleanup и долговременные abuse limits. Никакого AUTH_SECRET fallback. Provider-specific SMTP AUTH/TLS включается только после выбора и проверки провайдера; production email остаётся disabled.
+**Выполнено на `e7dd6d8e18ca27dd5bcb233b8f5b9ebaf794d10c`.** Добавлены standalone runtime parser/loop, отдельное закрытие DB pool, migration 0015 и PostgreSQL-backed abuse-limit repository. Production Compose и app process worker не запускают.
 
-После D2d: D3 — проверяемая привязка email; D4 — полный HTTP/UI reset; D5 — сквозная и эксплуатационная приёмка. Ответственный отдельно принимает правила неподтверждённой/потерянной почты, существующих аккаунтов и privileged/MFA. R4 остаётся открытым.
+Runtime требует отдельный 32-byte base64url mail key и key ID; совпадение с AUTH_SECRET запрещено. App URL обязан быть HTTPS, SMTP identity/port/servername/from и timeout заданы явно. CI генерирует одноразовые synthetic mail/abuse keys, запускает worker one-shot, затем continuous loop, посылает SIGTERM и проверяет быстрый clean exit. Missing mail key fail-closed; stdout/stderr проверены на отсутствие тестовых ключей. D2c receiver остаётся закрытым и не relay наружу.
+
+Migration 0015 хранит request scope, keyed HMAC subject digest, count и fixed window timestamps. В новых тестах разные scopes/keys разделены; два repository instances видят один persisted limit; шесть concurrent attempts при limit=3 дают ровно три success и три reject; synthetic expiry reset и bounded cleanup проверены. Raw synthetic subject не находится в subject_digest. Этот repository пока не вызывается HTTP-кодом, поэтому не считается активной anti-abuse policy.
+
+Vitest вырос с 236 до **247/247 tests, 63/63 files**: 6 runtime tests и 5 abuse-limit tests. Verify также прошёл migrations, typecheck, Next build, production image и отдельные D2c/D2d integration steps. Local Docker, PostgreSQL persistence, Production Docker, два Account browser jobs и Directory browser — success на том же SHA.
+
+История отказов сохранена:
+- `d7592bf`: malformed CI insertion не создала основной workflow jobs; исправлено восстановлением known-good YAML.
+- `252e3cb`: loop обработал SIGTERM, но Node process удерживал postgres-js pool до idle timeout; добавлен explicit close.
+- `04fe45f`: runtime step прошёл, typecheck нашёл unsafe RowList cast; исправлена структурная типизация.
+- `eeffccb`: typecheck прошёл, PostgreSQL test выявил несовместимую передачу Date в raw postgres-js timestamptz parameters; теперь ISO + explicit cast.
+
+Ни один из этих промежуточных прогонов не считается D2d acceptance. Assertions, TLS checks и browser regressions не отключались.
+
+**Ограничения:** worker не supervised и не включён в production; реальные provider credentials/AUTH/STARTTLS не проверены; ключи не размещались в VDS secret store и ротация не репетировалась; abuse primitive ещё не связан с public route, поэтому отсутствуют final normalization, IP/email composition, timing-enumeration и response policy. Нет D3 binding, D4 reset, inbox delivery, реального scheduler/service manager или backup restore.
+
+### Следующий ограниченный шаг — D3
+
+Для обычного password-account реализовать проверяемую привязку recovery email: authenticated session + current password, enqueue `email_verify`, нейтральный confirm flow и атомарное создание binding только после одноразового proof. Использовать durable limit primitive до выдачи proof и не доверять legacy `emailVerified`/`isVerified`. Сначала HTTP/service + PostgreSQL acceptance, затем browser flow; production mail activation и правила privileged/MFA/legacy accounts остаются отдельными решениями.
 
 ## 7. Условия допуска к выпуску
 
 | Условие | Сейчас |
 |---|---|
-| Проверки точного кандидата | Семь заданий успешны на 7b2629d; SHA не объявлен релизом, после изменений проверки повторяются. |
+| Проверки точного кандидата | Семь заданий успешны на e7dd6d8; SHA не объявлен релизом, после изменений проверки повторяются. |
 | Хранение и запуск | BETA-001–003 и повтор D2b подтверждены в CI; рабочая среда не принята. |
 | Полные J1–J7 | Частично подтверждены, не закрыты перечнем подзадач. |
 | Scanner и безопасный путь архива | Runtime-приёмка не завершена. |
-| Восстановление аккаунта | R4 открыт: DB-протокол доставки не равен SMTP или пользовательскому recovery. |
+| Восстановление аккаунта | R4 открыт: verified binding, public recovery/reset и real-provider эксплуатация ещё не приняты. |
 | RU/EN, доступность и визуальное качество | Общая приёмка открыта. |
 | Восстановление БД и приватных файлов | Не проверено; сохранение тома не равно backup restore. |
 | Security/dependency review, секреты, журналирование и контакты | Полный аудит не выполнен; страницы privacy/terms не заменяют проверку содержания. |
@@ -202,7 +220,7 @@ account-mail-dispatcher.test.ts добавляет 7 unit-проверок; об
 
 Перед изменением существующей среды нужны версия БД, фактические data_directory/mounts, проверенный backup и план переноса/восстановления. Запрещены `docker compose down -v`, `docker volume prune` и `docker system prune --volumes` на среде с существующими либо неизвестными данными. Очистка CI ограничена собственными одноразовыми ресурсами.
 
-Платная коммерция — отдельный закрытый этап: модель деятельности, провайдеры, условия/возвраты, webhook verification, идемпотентность, сверка, выплаты и обязанности по продавцам проверяются отдельно. D2b его не включает и не подтверждает.
+Платная коммерция — отдельный закрытый этап: модель деятельности, провайдеры, условия/возвраты, webhook verification, идемпотентность, сверка, выплаты и обязанности по продавцам проверяются отдельно. D2d его не включает и не подтверждает.
 
 ## 8. Как обновлять карту
 
