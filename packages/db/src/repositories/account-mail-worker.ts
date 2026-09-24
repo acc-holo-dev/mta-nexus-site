@@ -147,6 +147,59 @@ export class AccountMailWorkerRepository {
     });
   }
 
+  async deferProviderFailure(
+    lease: MailLease,
+    transport: Readonly<{ smtpCode?: number; stage: AccountMailTransportStage }>,
+    auditId = `aud_${randomUUID()}`,
+  ): Promise<boolean> {
+    const digest = leaseDigest(lease);
+    checkId(auditId);
+    if (!["connect", "greeting", "ehlo", "starttls", "auth", "mail_from"].includes(transport.stage)) {
+      throw new Error("Invalid provider-wide SMTP stage");
+    }
+    if (transport.smtpCode !== undefined
+      && (!Number.isInteger(transport.smtpCode) || transport.smtpCode < 200 || transport.smtpCode > 599)) {
+      throw new Error("Invalid SMTP transport code");
+    }
+    return transaction(async (tx) => {
+      const item = await this.lockLiveMail(tx, lease.id);
+      if (!item || !this.owns(item, lease, digest)) return false;
+
+      const retryAt = new Date(Math.min(
+        item.now.getTime() + 30_000,
+        item.validUntil.getTime(),
+      ));
+      const changed = await tx.update(accountMailOutbox).set({
+        attempts: Math.max(0, lease.attempt - 1),
+        availableAt: retryAt,
+        leaseTokenDigest: null,
+        leaseExpiresAt: null,
+      }).where(and(
+        eq(accountMailOutbox.id, lease.id),
+        eq(accountMailOutbox.leaseTokenDigest, digest),
+        eq(accountMailOutbox.attempts, lease.attempt),
+        gt(accountMailOutbox.leaseExpiresAt, sql`clock_timestamp()`),
+      )).returning({ id: accountMailOutbox.id });
+      if (changed.length !== 1) return false;
+
+      await tx.insert(auditEvents).values({
+        id: auditId,
+        actorId: "system:account-mail-worker",
+        actorType: "system",
+        action: "auth.mail_provider_deferred",
+        targetId: lease.id,
+        targetType: "account_mail",
+        details: {
+          purpose: item.proof.purpose,
+          stage: transport.stage,
+          ...(transport.smtpCode !== undefined ? { smtpCode: transport.smtpCode } : {}),
+        },
+        createdAt: sql`clock_timestamp()`,
+      });
+      return true;
+    });
+  }
+
   async settle(
     lease: MailLease,
     outcome: "accepted" | "retry" | "discard",
