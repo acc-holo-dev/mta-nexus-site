@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { loginSchema } from "@nexus/validation";
-import { consumeRateLimit, getClientIp } from "@nexus/security";
+import { consumeRateLimit } from "@nexus/security";
 import { AppError } from "@nexus/domain";
+import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = getClientIp(request.headers);
+    const ip = getTrustedRequestIp(request);
     const rl = await consumeRateLimit("authLogin", ip);
     if (!rl.success) {
       return NextResponse.json(

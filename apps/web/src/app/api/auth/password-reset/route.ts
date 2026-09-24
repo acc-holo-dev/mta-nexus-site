@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { confirmPasswordResetSchema, requestPasswordResetSchema } from "@nexus/validation";
-import { getClientIp } from "@nexus/security";
 import { AppError } from "@nexus/domain";
+import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
 
 const neutral = {
   accepted: true,
@@ -20,14 +20,6 @@ async function floor(startedAt: number) {
   if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
 }
 
-function recoveryClientIp(request: NextRequest): string {
-  const secret = process.env.TRUSTED_PROXY_SECRET;
-  if (!secret) {
-    if (process.env.NODE_ENV !== "production") return "local-direct";
-    throw new Error("Trusted proxy secret is unavailable");
-  }
-  return getClientIp(request.headers, secret);
-}
 
 export async function POST(request: NextRequest) {
   const startedAt = performance.now();
@@ -39,7 +31,7 @@ export async function POST(request: NextRequest) {
   try {
     await authService.requestPasswordReset({
       email: parsed.data.email,
-      ip: recoveryClientIp(request),
+      ip: getTrustedRequestIp(request),
     });
     await floor(startedAt);
     return json(neutral, 202);
