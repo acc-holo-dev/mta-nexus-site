@@ -59,7 +59,7 @@ export class AccountMailOutboxRepository {
       oldestAgeSeconds: Number(row.oldest_age_seconds),
     };
     if (!Object.values(result).every((value) => Number.isInteger(value) && value >= 0)
-      || result.capacity < 1 || result.pending > result.capacity
+      || result.capacity < 1
       || result.due > result.pending || result.leased > result.pending) {
       throw new Error("Account mail queue statistics are invalid");
     }

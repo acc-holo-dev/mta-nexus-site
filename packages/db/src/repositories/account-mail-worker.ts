@@ -16,6 +16,7 @@ export const ACCOUNT_MAIL_MAX_ATTEMPTS = 5;
 const leaseMs = 60_000;
 const backoffMs = [5_000, 30_000, 120_000, 300_000] as const;
 const providerBackoffMs = [30_000, 60_000, 120_000, 300_000, 600_000] as const;
+const providerFailureRetentionMs = 600_000;
 
 function providerRetryDelayMs(streak: number): number {
   return providerBackoffMs[Math.min(Math.max(streak - 1, 0), providerBackoffMs.length - 1)];
@@ -207,7 +208,11 @@ export class AccountMailWorkerRepository {
       const [gate] = await tx.select().from(accountMailQueueGate)
         .where(eq(accountMailQueueGate.singleton, true)).for("update");
       if (!gate) throw new Error("Account mail queue gate is unavailable");
-      const providerFailureStreak = Math.min(gate.providerFailureStreak + 1, 10);
+      const previousFailureStreak = gate.providerBlockedUntil
+        && gate.providerBlockedUntil.getTime() + providerFailureRetentionMs > item.now.getTime()
+        ? gate.providerFailureStreak
+        : 0;
+      const providerFailureStreak = Math.min(previousFailureStreak + 1, 10);
       const providerBlockedUntil = new Date(
         item.now.getTime() + providerRetryDelayMs(providerFailureStreak),
       );
