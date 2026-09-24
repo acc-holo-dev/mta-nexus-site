@@ -9,7 +9,11 @@ const neutral = {
   accepted: true,
   message: "If an eligible account uses that email, a password reset link will be sent.",
 } as const;
-const headers = { "Cache-Control": "private, no-store" };
+const headers = {
+  "Cache-Control": "private, no-store",
+  Pragma: "no-cache",
+  "X-Content-Type-Options": "nosniff",
+};
 const requestFloorMinMs = 900;
 const requestFloorJitterMs = 300;
 
@@ -55,10 +59,10 @@ export async function PATCH(request: NextRequest) {
   const parsed = confirmPasswordResetSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return json({ error: "Invalid or expired password reset" }, 400);
   try {
-    const result = await authService.confirmPasswordReset(parsed.data);
-    return json({ success: true, revokedSessionCount: result.revokedSessionCount });
+    await authService.confirmPasswordReset(parsed.data);
+    return json({ success: true });
   } catch (error: unknown) {
-    if (error instanceof AppError) return json({ error: "Invalid or expired password reset" }, error.statusCode);
+    if (error instanceof AppError) return json({ error: "Invalid or expired password reset" }, 400);
     console.error("Password reset could not be confirmed");
     return json({ error: "Could not reset the password. Request a new link and try again." }, 503);
   }
