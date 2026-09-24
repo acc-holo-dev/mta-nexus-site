@@ -184,7 +184,6 @@ export class AccountMailWorkerRepository {
       // Terminal cleanup needs only outbox locks and never acquires parent locks.
       // It must still leave a non-sensitive audit trail when a crashed worker
       // never reached explicit settle on the final attempt.
-      const now = await clock(tx);
       const rows = await tx.select({
         id: accountMailOutbox.id,
         attempts: accountMailOutbox.attempts,
@@ -196,6 +195,9 @@ export class AccountMailWorkerRepository {
         .for("update", { skipLocked: true });
       if (!rows.length) return 0;
 
+      // Evaluate terminal reason after every selected row lock is held. A DB
+      // wait must not leave us classifying expiry against a stale timestamp.
+      const now = await clock(tx);
       const removed = await tx.delete(accountMailOutbox)
         .where(inArray(accountMailOutbox.id, rows.map((row) => row.id)))
         .returning({ id: accountMailOutbox.id });
