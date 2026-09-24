@@ -208,13 +208,16 @@ export class AccountMailWorkerRepository {
       const [gate] = await tx.select().from(accountMailQueueGate)
         .where(eq(accountMailQueueGate.singleton, true)).for("update");
       if (!gate) throw new Error("Account mail queue gate is unavailable");
+      // Re-read the DB clock after waiting on the shared gate lock. Using the
+      // earlier mail-lock timestamp would shorten the cooldown under contention.
+      const providerNow = await clock(tx);
       const previousFailureStreak = gate.providerBlockedUntil
-        && gate.providerBlockedUntil.getTime() + providerFailureRetentionMs > item.now.getTime()
+        && gate.providerBlockedUntil.getTime() + providerFailureRetentionMs > providerNow.getTime()
         ? gate.providerFailureStreak
         : 0;
       const providerFailureStreak = Math.min(previousFailureStreak + 1, 10);
       const providerBlockedUntil = new Date(
-        item.now.getTime() + providerRetryDelayMs(providerFailureStreak),
+        providerNow.getTime() + providerRetryDelayMs(providerFailureStreak),
       );
       const retryAt = new Date(Math.min(
         providerBlockedUntil.getTime(),
