@@ -56,10 +56,13 @@ const session = (who) => request(who, '/api/auth/session');
 const list = (who) => request(who, '/api/auth/sessions');
 const cookie = async (who) => (await who.context.cookies()).find((item) => item.name === 'nexus_session');
 const rows = (who) => who.page.locator('[data-session-id]');
+const passwordForm = (who) => who.page.getByRole('form', { name: 'Change password', exact: true });
+const currentPasswordField = (who) => passwordForm(who).getByLabel('Current password', { exact: true });
+const newPasswordField = (who) => passwordForm(who).getByLabel('New password', { exact: true });
 async function settings(who) {
   await who.page.goto('/settings');
   await expect(who.page.getByRole('heading', { name: 'Settings', exact: true })).toBeVisible();
-  await expect(who.page.getByLabel('Current password', { exact: true })).toBeVisible();
+  await expect(currentPasswordField(who)).toBeVisible();
 }
 async function login(who, password = newPassword) {
   const result = await request(who, '/api/auth/login', 'POST', { email: aliceInput.email, password });
@@ -113,8 +116,8 @@ check('P1 three real sessions and a separate account', async () => {
 
 check('P2 wrong current password changes neither credentials nor sessions', async () => {
   const previous = (await list(alice)).data.sessions.map((s) => s.id).sort();
-  await alice.page.getByLabel('Current password', { exact: true }).fill(secret());
-  await alice.page.getByLabel('New password', { exact: true }).fill(newPassword);
+  await currentPasswordField(alice).fill(secret());
+  await newPasswordField(alice).fill(newPassword);
   const response = alice.page.waitForResponse((r) => r.url().endsWith('/api/auth/password') && r.request().method() === 'POST');
   await alice.page.getByRole('button', { name: 'Update password', exact: true }).click();
   assert.equal((await response).status(), 401);
@@ -133,8 +136,8 @@ check('P3 unchanged and too-short passwords are rejected; anonymous requests den
 });
 
 check('P4 UI password change rotates current cookie and invalidates every prior token', async () => {
-  await alice.page.getByLabel('Current password', { exact: true }).fill(oldPassword);
-  await alice.page.getByLabel('New password', { exact: true }).fill(newPassword);
+  await currentPasswordField(alice).fill(oldPassword);
+  await newPasswordField(alice).fill(newPassword);
   const response = alice.page.waitForResponse((r) => r.url().endsWith('/api/auth/password') && r.request().method() === 'POST');
   await alice.page.getByRole('button', { name: 'Update password', exact: true }).click();
   const changed = await response;
@@ -150,8 +153,8 @@ check('P4 UI password change rotates current cookie and invalidates every prior 
   assert(!(await alice.page.evaluate(() => document.cookie)).includes('nexus_session='));
   await expect(alice.page.locator('#settings-notice')).toContainText('Password changed.');
   await expect(rows(alice)).toHaveCount(1);
-  assert((await alice.page.getByLabel('Current password', { exact: true }).inputValue()) === '');
-  assert((await alice.page.getByLabel('New password', { exact: true }).inputValue()) === '');
+  assert((await currentPasswordField(alice).inputValue()) === '');
+  assert((await newPasswordField(alice).inputValue()) === '');
   for (const a of [second, third]) assert.equal((await list(a)).status, 401);
   const replay = await actor();
   await replay.context.addCookies([originalCookie]);
@@ -212,9 +215,9 @@ check('P8 current and foreign sessions are protected and a body userId cannot ta
 check('P9 narrow settings and keyboard password controls', async () => {
   await alice.page.setViewportSize({ width: 390, height: 844 });
   await settings(alice);
-  await alice.page.getByLabel('Current password', { exact: true }).focus();
+  await currentPasswordField(alice).focus();
   await alice.page.keyboard.press('Tab');
-  await expect(alice.page.getByLabel('New password', { exact: true })).toBeFocused();
+  await expect(newPasswordField(alice)).toBeFocused();
   await alice.page.keyboard.press('Tab');
   await expect(alice.page.getByRole('button', { name: 'Update password', exact: true })).toBeFocused();
   assert(await alice.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Settings should not overflow horizontally');
