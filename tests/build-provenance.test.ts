@@ -61,6 +61,9 @@ describe("build provenance presentation", () => {
     expect(
       formatProvenanceTimestamp(new Date("2026-09-25T01:02:03.000Z")),
     ).toBe("2026-09-25 01:02:03 UTC");
+    expect(
+      formatProvenanceTimestamp(new Date("2026-09-25T01:02:03.987Z")),
+    ).toBe("2026-09-25 01:02:03 UTC");
     expect(formatProvenanceTimestamp(undefined)).toBe("Not recorded");
   });
 });
