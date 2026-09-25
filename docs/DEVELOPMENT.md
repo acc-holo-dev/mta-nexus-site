@@ -27,6 +27,27 @@ CI also runs `PostgreSQL persistence` and `Local Docker startup`. The latter use
 
 Node infrastructure tests use `*.node-test.mjs` filenames and explicit `node --test` execution so that Vitest does not collect them as its own suites.
 
+### Disposable local verification fallback
+
+When GitHub Actions is unavailable, the repository can run a narrower verification locally without using host Node/pnpm and without touching the normal `nexus-local` database. This fallback does **not** replace production/browser/release acceptance; it only checks migrations, TypeScript, Vitest and a production Next.js build on a fresh disposable PostgreSQL volume.
+
+Bash / WSL / Git Bash:
+
+```bash
+NEXUS_LOCAL_VERIFY=true bash scripts/check-local-verification.sh
+```
+
+PowerShell:
+
+```powershell
+$env:NEXUS_LOCAL_VERIFY = "true"
+./scripts/check-local-verification.ps1
+```
+
+Both wrappers require the default local Docker context, reject `DOCKER_HOST`/`DOCKER_CONTEXT` overrides and generate a unique `nexus-verify-*` Compose project. They render `compose.verify.yaml`, build the development tool image, create a fresh PostgreSQL volume, run migrations/typecheck/tests/build, then remove only the generated project and its volumes. The verification Compose file publishes no host ports and does not start ClamAV or an HTTP server.
+
+Do not reinterpret a local PASS as GitHub Actions evidence, BETA acceptance, production Docker acceptance, browser acceptance or release approval.
+
 ## 4. Evidence and limitations
 
 BETA-002 startup evidence: [CI №865, Local Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35940008117/job/107445602459), commit `bc048baaea71985e74d00faed4f66095dd518926`, Linux x86_64. Five readiness-helper tests passed locally on Node 22.16.0 and inside the development container in CI. The container run is the evidence for the project runtime; local helper tests do not prove Docker startup.
