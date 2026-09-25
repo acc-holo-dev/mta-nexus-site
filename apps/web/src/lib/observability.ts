@@ -23,6 +23,16 @@ type StructuredLogInput = Readonly<{
 }>;
 
 const blockedFieldNames = /(?:authorization|cookie|token|secret|password|email|ip|headers|body|query|url)/iu;
+const reservedFieldNames = new Set([
+  "timestamp",
+  "level",
+  "event",
+  "requestId",
+  "method",
+  "path",
+  "status",
+  "error",
+]);
 
 function cleanText(value: string, maxLength = 160): string {
   return value.replace(/[\r\n\t]+/gu, " ").slice(0, maxLength);
@@ -68,7 +78,7 @@ export function createStructuredLogEntry(input: StructuredLogInput) {
   const fields: Record<string, Exclude<LogValue, undefined>> = {};
 
   for (const [key, value] of Object.entries(input.fields ?? {})) {
-    if (value === undefined || blockedFieldNames.test(key)) continue;
+    if (value === undefined || blockedFieldNames.test(key) || reservedFieldNames.has(key)) continue;
     fields[key] = typeof value === "string" ? cleanText(value) : value;
   }
 
