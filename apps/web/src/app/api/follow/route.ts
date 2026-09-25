@@ -11,6 +11,8 @@ import {
 import { consumeRateLimit, generateId } from "@nexus/security";
 
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;
+const privateHeaders = { "Cache-Control": "private, no-store" };
+
 type TargetType = (typeof ALLOWED_TARGET_TYPES)[number];
 
 function isTargetType(value: unknown): value is TargetType {
@@ -36,22 +38,41 @@ async function targetExists(targetType: TargetType, targetId: string): Promise<b
 }
 
 export async function GET(request: NextRequest) {
+  const targetType = request.nextUrl.searchParams.get("targetType") || "";
+  const targetId = request.nextUrl.searchParams.get("targetId") || "";
+
+  if (!isTargetType(targetType)) {
+    return NextResponse.json(
+      { error: "Invalid target type" },
+      { status: 400, headers: privateHeaders },
+    );
+  }
+  if (!targetId || targetId.length > 128) {
+    return NextResponse.json(
+      { error: "Target ID required" },
+      { status: 400, headers: privateHeaders },
+    );
+  }
+
   const token = request.cookies.get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
   if (!user) {
-    return NextResponse.json({ following: false });
+    return NextResponse.json(
+      { authenticated: false, following: false },
+      { headers: privateHeaders },
+    );
   }
 
-  const targetType = request.nextUrl.searchParams.get("targetType") || "";
-  const targetId = request.nextUrl.searchParams.get("targetId") || "";
-
-  if (!ALLOWED_TARGET_TYPES.includes(targetType as TargetType)) {
-    return NextResponse.json({ error: "Invalid target type" }, { status: 400 });
-  }
-
-  const following = await socialRepository.isFollowing(user.id, targetType, targetId);
-  return NextResponse.json({ following });
+  const following = await socialRepository.isFollowing(
+    user.id,
+    targetType,
+    targetId,
+  );
+  return NextResponse.json(
+    { authenticated: true, following },
+    { headers: privateHeaders },
+  );
 }
 
 export async function POST(request: NextRequest) {
