@@ -29,6 +29,15 @@ describe("moderation atomicity surface", () => {
     expect(route).not.toContain("auditRepository.record(");
   });
 
+  it("distinguishes missing moderation targets from stale final state", () => {
+    const route = read("apps/web/src/app/api/admin/actions/route.ts");
+
+    expect(route).toContain('"REPORT_STATE_CHANGED"');
+    expect(route).toContain('"VERIFICATION_STATE_CHANGED"');
+    expect(route).toContain('"Report not found"');
+    expect(route).toContain('"Verification request not found"');
+  });
+
   it("prevents restore from becoming a generic publication shortcut", () => {
     const repository = read("packages/db/src/repositories/products.ts");
 
