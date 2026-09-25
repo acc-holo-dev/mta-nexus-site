@@ -30,13 +30,10 @@ export default async function OrganizationProfilePage({
     notFound();
   }
 
-  const [allProducts, allArticles] = await Promise.all([
-    productRepository.list(),
-    contentRepository.listPublished(),
+  const [orgProducts, orgArticles] = await Promise.all([
+    productRepository.listPublishedByOrganization(org.id, 100),
+    contentRepository.listPublishedByOrganization(org.id, 100),
   ]);
-
-  const orgProducts = allProducts.filter((p) => p.organizationId === org.id);
-  const orgArticles = allArticles.filter((a) => a.organizationId === org.id);
 
   return (
     <div className="space-y-10">
