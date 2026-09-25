@@ -16,6 +16,21 @@ export class OrganizationRepository {
     return rows as unknown as Organization[];
   }
 
+  async listOwnedByUser(
+    userId: string,
+    limit = 50,
+  ): Promise<Organization[]> {
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 100)
+      : 50;
+    const rows = await db
+      .select()
+      .from(organizations)
+      .where(eq(organizations.ownerId, userId))
+      .limit(boundedLimit);
+    return rows as unknown as Organization[];
+  }
+
   async findById(id: string): Promise<Organization | null> {
         const rows = await db.select().from(organizations).where(eq(organizations.id, id)).limit(1);
     return (rows[0] as unknown as Organization) || null;
