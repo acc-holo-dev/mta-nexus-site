@@ -1,0 +1,67 @@
+# Disposable developer verification stack.
+# This is not the normal local app and is not a production deployment file.
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: "no"
+    environment:
+      POSTGRES_USER: nexus
+      POSTGRES_PASSWORD: nexus_verify_secret
+      POSTGRES_DB: mta_nexus_verify
+    volumes:
+      - verify_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "nexus", "-d", "mta_nexus_verify"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  verify:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    init: true
+    restart: "no"
+    environment:
+      NODE_ENV: test
+      PORT: 3000
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      DATABASE_URL: postgres://nexus:nexus_verify_secret@postgres:5432/mta_nexus_verify
+      AUTH_SECRET: local-verify-secret-that-is-long-enough-only-for-disposable-tests
+      STORAGE_PROVIDER: local
+      STORAGE_LOCAL_PATH: /data/uploads
+      EMAIL_PROVIDER: log
+      BUILD_SCANNER: disabled
+      CLAMAV_HOST: ""
+      CLAMAV_PORT: 3310
+      SMTP_FROM: no-reply@nexus-mta.test
+    volumes:
+      - verify_uploads:/data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - sh
+      - -ec
+      - |
+        pnpm db:migrate
+        pnpm typecheck
+        pnpm test
+        env \
+          NODE_ENV=production \
+          NEXT_PUBLIC_APP_URL=https://nexus-mta.test \
+          AUTH_SECRET=local-verify-production-build-secret-long-enough \
+          STORAGE_PROVIDER=local \
+          STORAGE_LOCAL_PATH=/data/uploads \
+          EMAIL_PROVIDER=disabled \
+          BUILD_SCANNER=clamav \
+          CLAMAV_HOST=clamav \
+          CLAMAV_PORT=3310 \
+          SMTP_FROM=no-reply@nexus-mta.test \
+          pnpm build
+
+volumes:
+  verify_pgdata:
+  verify_uploads:
