@@ -97,3 +97,18 @@ The public organization profile queries published resources and content by `orga
 It must not load a global top-N catalogue/feed and then filter in application memory. That pattern can hide valid organization releases when unrelated global records fill the upstream limit first.
 
 Both organization profile queries remain public-only and bounded to 100 rows per content family in this beta surface.
+
+
+## Account context ownership
+
+Organization context discovery and switching treat direct `organizations.ownerId` as authoritative even when no `organization_members` row exists.
+
+The context list:
+
+- includes directly owned organizations first;
+- merges additional membership-backed organizations;
+- de-duplicates an organization if the owner also has a membership row;
+- reports the direct owner role as `owner`;
+- remains bounded to 50 organization contexts.
+
+The authoritative switch operation repeats the same owner-or-membership check before changing `activeContextId`.
