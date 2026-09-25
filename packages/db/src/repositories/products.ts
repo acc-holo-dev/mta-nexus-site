@@ -1,6 +1,6 @@
 import { eq, desc, asc, and, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
 import { db } from "../client";
-import { products } from "../schema";
+import { builds, products } from "../schema";
 import type { Product, ProductType } from "@nexus/domain";
 
 export interface ProductQueryOptions {
@@ -130,6 +130,64 @@ export class ProductRepository {
       .where(eq(products.id, id))
       .returning();
     return (rows[0] as unknown as Product) || null;
+  }
+
+  async suspendPublished(id: string): Promise<Product | null> {
+    const rows = await db
+      .update(products)
+      .set({ status: "suspended", updatedAt: new Date() })
+      .where(
+        and(
+          eq(products.id, id),
+          eq(products.status, "published"),
+        ),
+      )
+      .returning();
+    return (rows[0] as unknown as Product) || null;
+  }
+
+  async restoreSuspendedWithPublishedBuild(
+    id: string,
+  ): Promise<"restored" | "not_found" | "invalid_state" | "no_published_build"> {
+    return db.transaction(async (tx) => {
+      const existing = await tx
+        .select({ id: products.id, status: products.status })
+        .from(products)
+        .where(eq(products.id, id))
+        .limit(1);
+      if (!existing[0]) return "not_found" as const;
+      if (existing[0].status !== "suspended") {
+        return "invalid_state" as const;
+      }
+
+      const publishedBuild = await tx
+        .select({ id: builds.id })
+        .from(builds)
+        .where(
+          and(
+            eq(builds.productId, id),
+            eq(builds.status, "published"),
+          ),
+        )
+        .orderBy(desc(builds.createdAt), desc(builds.id))
+        .limit(1);
+      if (!publishedBuild[0]) {
+        return "no_published_build" as const;
+      }
+
+      const restored = await tx
+        .update(products)
+        .set({ status: "published", updatedAt: new Date() })
+        .where(
+          and(
+            eq(products.id, id),
+            eq(products.status, "suspended"),
+          ),
+        )
+        .returning({ id: products.id });
+
+      return restored[0] ? ("restored" as const) : ("invalid_state" as const);
+    });
   }
 }
 
