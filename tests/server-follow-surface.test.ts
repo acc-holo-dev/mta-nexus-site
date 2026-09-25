@@ -12,6 +12,7 @@ describe("server follow surface", () => {
     expect(route).toContain('{ authenticated: false, following: false }');
     expect(route).toContain('{ authenticated: true, following }');
     expect(route).toContain('"Cache-Control": "private, no-store"');
+    expect(route).toContain('Vary: "Cookie"');
     expect(route).toContain("isTargetType(targetType)");
     expect(route).toContain("targetId.length > 128");
   });
