@@ -4,17 +4,45 @@ import {
   selectServerHistoryChartPoints,
   serverHistoryBarPercent,
 } from "../lib/server-history-presentation";
-import type { serverHistoryService } from "../lib/services/server-history-service";
-
-type History = NonNullable<
-  Awaited<ReturnType<typeof serverHistoryService.getHistory>>
->;
+import type { ServerHistoryResult } from "../lib/services/server-history-service";
 
 function metric(value: number | null) {
   return value == null ? "—" : String(value);
 }
 
-export function ServerHistoryPanel({ history }: { history: History }) {
+export function ServerHistoryPanel({
+  history,
+}: {
+  history: ServerHistoryResult | null;
+}) {
+  if (!history) {
+    return (
+      <section
+        className="nexus-panel p-5 md:p-6"
+        aria-labelledby="server-history-title"
+      >
+        <div className="flex items-start gap-3">
+          <Clock3
+            className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500"
+            aria-hidden="true"
+          />
+          <div className="space-y-1">
+            <h2
+              id="server-history-title"
+              className="text-sm font-bold uppercase tracking-wider text-white"
+            >
+              Observed player history
+            </h2>
+            <p className="text-xs text-neutral-400">
+              Stored history is temporarily unavailable. Live directory status
+              remains separate from historical observations.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   const points = selectServerHistoryChartPoints(history.observations, 24);
   const peak = history.summary.peakPlayers;
 
