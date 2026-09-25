@@ -5,6 +5,7 @@ import {
   appendFileSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   rmSync,
   statSync,
   writeFileSync,
@@ -127,7 +128,9 @@ function run() {
   const result = {
     status: "FAIL",
     sourceDestroyedBeforeRestore: false,
+    backupChecksumsVerified: false,
     databaseRowsRestored: false,
+    applicationSchemaRestored: false,
     uploadFilesRestored: false,
     cleanupComplete: false,
   };
@@ -266,6 +269,78 @@ function run() {
         ]),
       ).trim();
 
+    const migrationsDir = join(root, "packages", "db", "migrations");
+    const migrationFiles = readdirSync(migrationsDir)
+      .filter((name) => /^\\d+.*\\.sql$/u.test(name))
+      .sort((a, b) => a.localeCompare(b));
+    assert(migrationFiles.length > 0, "No SQL migrations were found");
+
+    for (const migration of migrationFiles) {
+      docker(
+        [
+          "exec",
+          "-i",
+          sourceContainer,
+          "psql",
+          "-X",
+          "-v",
+          "ON_ERROR_STOP=1",
+          "-U",
+          "nexus_backup",
+          "-d",
+          "nexus_backup",
+          "-f",
+          "-",
+        ],
+        { input: readFileSync(join(migrationsDir, migration)) },
+      );
+    }
+
+    result.migrationsApplied = migrationFiles.length;
+    result.latestMigration = migrationFiles.at(-1);
+
+    const schemaFingerprint = (container) => ({
+      columns: sql(
+        container,
+        "SELECT md5(string_agg(" +
+          "table_name || ':' || column_name || ':' || data_type || ':' || " +
+          "is_nullable || ':' || coalesce(column_default, ''), E'\\n' " +
+          "ORDER BY table_name, ordinal_position)) " +
+          "FROM information_schema.columns WHERE table_schema = 'public';",
+      ),
+      tableCount: Number(
+        sql(
+          container,
+          "SELECT count(*) FROM information_schema.tables " +
+            "WHERE table_schema = 'public' AND table_type = 'BASE TABLE';",
+        ),
+      ),
+      indexCount: Number(
+        sql(
+          container,
+          "SELECT count(*) FROM pg_indexes WHERE schemaname = 'public';",
+        ),
+      ),
+      constraintCount: Number(
+        sql(
+          container,
+          "SELECT count(*) FROM pg_constraint c " +
+            "JOIN pg_namespace n ON n.oid = c.connamespace " +
+            "WHERE n.nspname = 'public';",
+        ),
+      ),
+    });
+
+    const sourceSchemaFingerprint = schemaFingerprint(sourceContainer);
+    assert(
+      sourceSchemaFingerprint.columns &&
+        sourceSchemaFingerprint.tableCount > 0 &&
+        sourceSchemaFingerprint.indexCount > 0 &&
+        sourceSchemaFingerprint.constraintCount > 0,
+      "Application migrations did not produce a complete schema fingerprint",
+    );
+    result.sourceSchemaFingerprint = sourceSchemaFingerprint;
+
     sql(
       sourceContainer,
       "CREATE TABLE backup_probe (id integer PRIMARY KEY, value text NOT NULL); " +
@@ -325,6 +400,18 @@ function run() {
     removeOwnedVolume(sourcePg, sourceToken);
     removeOwnedVolume(sourceUploads, sourceToken);
     result.sourceDestroyedBeforeRestore = true;
+
+    assert.equal(
+      sha256(dbBackup),
+      result.databaseBackupSha256,
+      "Database backup checksum changed after source destruction",
+    );
+    assert.equal(
+      sha256(uploadsBackup),
+      result.uploadsBackupSha256,
+      "Uploads backup checksum changed after source destruction",
+    );
+    result.backupChecksumsVerified = true;
 
     const restoreToken = randomUUID();
     const restoreProject = "nexus-backup-restore-" + restoreToken;
@@ -405,6 +492,15 @@ function run() {
     );
     assert.equal(rows, "1:alpha,2:beta");
     result.databaseRowsRestored = true;
+
+    const restoredSchemaFingerprint = schemaFingerprint(restoreContainer);
+    assert.deepEqual(
+      restoredSchemaFingerprint,
+      sourceSchemaFingerprint,
+      "Restored application schema does not match the migrated source schema",
+    );
+    result.applicationSchemaRestored = true;
+    result.restoredSchemaFingerprint = restoredSchemaFingerprint;
 
     const restoredFiles = String(
       helper(imageId, restoreUploads, restoreToken, [
