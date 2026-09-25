@@ -21,23 +21,56 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Authentication required" }, { status: 401, headers: privateHeaders });
   }
 
-  const memberships = await organizationRepository.listUserMemberships(user.id);
-  const organizationContexts = (
-    await Promise.all(
-      memberships.slice(0, 50).map(async (membership) => {
-        const organization = await organizationRepository.findById(membership.organizationId);
-        if (!organization) return null;
+  const [ownedOrganizations, memberships] = await Promise.all([
+    organizationRepository.listOwnedByUser(user.id, 50),
+    organizationRepository.listUserMemberships(user.id),
+  ]);
 
-        return {
-          id: organization.id,
-          type: "organization" as const,
-          name: organization.name,
-          slug: organization.slug,
-          role: membership.role,
-        };
-      })
-    )
-  ).filter((context): context is NonNullable<typeof context> => Boolean(context));
+  const contextsById = new Map<
+    string,
+    {
+      id: string;
+      type: "organization";
+      name: string;
+      slug: string;
+      role: string;
+    }
+  >();
+
+  for (const organization of ownedOrganizations) {
+    contextsById.set(organization.id, {
+      id: organization.id,
+      type: "organization",
+      name: organization.name,
+      slug: organization.slug,
+      role: "owner",
+    });
+  }
+
+  const remainingMemberships = memberships
+    .filter((membership) => !contextsById.has(membership.organizationId))
+    .slice(0, Math.max(0, 50 - contextsById.size));
+  const memberOrganizations = await Promise.all(
+    remainingMemberships.map(async (membership) => ({
+      membership,
+      organization: await organizationRepository.findById(
+        membership.organizationId,
+      ),
+    })),
+  );
+
+  for (const { membership, organization } of memberOrganizations) {
+    if (!organization) continue;
+    contextsById.set(organization.id, {
+      id: organization.id,
+      type: "organization",
+      name: organization.name,
+      slug: organization.slug,
+      role: membership.role,
+    });
+  }
+
+  const organizationContexts = Array.from(contextsById.values()).slice(0, 50);
 
   return NextResponse.json(
     {
