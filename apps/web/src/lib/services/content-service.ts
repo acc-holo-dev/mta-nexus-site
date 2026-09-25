@@ -5,7 +5,7 @@ import {
   auditRepository,
 } from "@nexus/db";
 import { can, generateId } from "@nexus/security";
-import { eventBus, ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
+import { ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
 import type { Content, Comment, User, Product, Server } from "@nexus/domain";
 import { notifyServerFollowersOfPublishedContent } from "./server-follow-notification-service";
 
