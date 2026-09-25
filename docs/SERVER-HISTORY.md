@@ -78,10 +78,12 @@ Until that collector is accepted, an empty history means only that NEXUS has no 
 The stacked SERVER-002 candidate adds an explicit source-tree command:
 
 ```bash
-NEXUS_SERVER_OBSERVATION_CAPTURE=true pnpm server:observations:capture
+docker compose -p nexus-local -f compose.yaml exec \
+  -e NEXUS_SERVER_OBSERVATION_CAPTURE=true app \
+  pnpm server:observations:capture
 ```
 
-The command is guarded before database/config imports. It refuses GitHub Actions and requires `NODE_ENV=development` or `NODE_ENV=production`, an explicit `DATABASE_URL`, and the opt-in flag above.
+The command is guarded before database/config imports. This initial candidate is deliberately development-only: it refuses GitHub Actions, requires `NODE_ENV=development`, requires the exact canonical local Docker database URL from `compose.yaml`, and requires the explicit opt-in flag above. Production capture is not enabled by this PR.
 
 One invocation:
 
