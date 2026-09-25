@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../../lib/services/auth-service";
 import {
   contentRepository,
-  productRepository,
   entitlementRepository,
 } from "@nexus/db";
+import { productService } from "../../../../../lib/services/product-service";
 import { addCommentSchema } from "@nexus/validation";
 import { generateId, consumeRateLimit } from "@nexus/security";
 
@@ -13,9 +13,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: productId } = await params;
-  const product = await productRepository.findById(productId);
+  const product = await productService.getProductById(productId);
 
-  if (!product || product.status !== "published") {
+  if (!product) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
@@ -55,16 +55,17 @@ export async function POST(
       );
     }
 
-    const product = await productRepository.findById(productId);
-    if (!product || product.status !== "published") {
+    const product = await productService.getProductById(productId);
+    if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Review integrity rule 1: no self-reviews
-    if (product.authorId === user.id) {
+    // Review integrity rule 1: current product managers cannot review
+    // resources they control. Historical author attribution is not authority.
+    if (await productService.canManageProduct(product, user)) {
       return NextResponse.json(
-        { error: "You cannot review your own product" },
-        { status: 403 }
+        { error: "You cannot review a product you manage" },
+        { status: 403 },
       );
     }
 
