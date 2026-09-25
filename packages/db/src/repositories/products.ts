@@ -247,6 +247,7 @@ export class ProductRepository {
           and(
             eq(builds.productId, id),
             eq(builds.status, "published"),
+            eq(builds.scanStatus, "clean"),
           ),
         )
         .orderBy(desc(builds.createdAt), desc(builds.id))
