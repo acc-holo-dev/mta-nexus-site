@@ -96,7 +96,7 @@ export function can(
     case "build.retire": {
       if (!resource) return false;
       const product = resource as Partial<Product>;
-      if (product.authorId === user.id) return true;
+      if (!product.organizationId && product.authorId === user.id) return true;
       if (product.organizationId && context?.organizationMemberships) {
         const mem = context.organizationMemberships.find(
           (m) => m.organizationId === product.organizationId
