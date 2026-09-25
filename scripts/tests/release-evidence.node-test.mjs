@@ -49,6 +49,22 @@ test("failed gates outrank blocked gates", () => {
   assert.deepEqual(summary.blockedGates, ["migrations"]);
 });
 
+test("empty or unknown gate states remain blocked", () => {
+  const empty = summarizeReleaseEvidence({
+    dirty: false,
+    gates: [],
+  });
+  assert.equal(empty.status, "blocked");
+  assert.equal(empty.noGatesRecorded, true);
+
+  const unknown = summarizeReleaseEvidence({
+    dirty: false,
+    gates: [{ name: "future_gate", status: "skipped" }],
+  });
+  assert.equal(unknown.status, "blocked");
+  assert.deepEqual(unknown.incompleteGates, ["future_gate"]);
+});
+
 test("migration evidence is sorted and hashed without file contents", () => {
   const dir = mkdtempSync(join(tmpdir(), "nexus-release-evidence-"));
   writeFileSync(join(dir, "0002_b.sql"), "select 2;\n");
