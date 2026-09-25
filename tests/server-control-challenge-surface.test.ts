@@ -28,12 +28,40 @@ describe("server control proof surface", () => {
     );
   });
 
-  it("blocks the old generic server verification path", () => {
+  it("blocks generic and repository-level server verification bypasses", () => {
     const route = read("apps/web/src/app/api/verification/route.ts");
+    const repository = read(
+      "packages/db/src/repositories/verification.ts",
+    );
 
     expect(route).toContain("SERVER_CONTROL_CHALLENGE_REQUIRED");
     expect(route).toContain(
       "Server ownership verification requires the MTA control challenge flow.",
+    );
+    expect(repository).toContain(
+      "Server ownership verification requires a verified MTA control challenge.",
+    );
+    expect(repository).toContain(
+      '"SERVER_CONTROL_CHALLENGE_REQUIRED"',
+    );
+  });
+
+  it("requires consumed durable proof before moderator approval assigns ownership", () => {
+    const repository = read(
+      "packages/db/src/repositories/verification.ts",
+    );
+
+    expect(repository).toContain(
+      "serverClaimChallenges.verificationRequestId",
+    );
+    expect(repository).toContain(
+      "serverClaimChallenges.consumedAt",
+    );
+    expect(repository).toContain(
+      "serverClaimChallenges.sourceFetchedAt",
+    );
+    expect(repository).toContain(
+      "Verified MTA server control proof is required before approval",
     );
   });
 
