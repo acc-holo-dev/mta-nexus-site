@@ -241,7 +241,7 @@ export class ProductRepository {
       }
 
       const publishedBuild = await tx
-        .select({ id: builds.id })
+        .select({ id: builds.id, version: builds.version })
         .from(builds)
         .where(
           and(
@@ -259,7 +259,11 @@ export class ProductRepository {
       const now = new Date();
       const restored = await tx
         .update(products)
-        .set({ status: "published", updatedAt: now })
+        .set({
+          status: "published",
+          currentVersion: publishedBuild[0].version,
+          updatedAt: now,
+        })
         .where(
           and(
             eq(products.id, id),
