@@ -1,4 +1,4 @@
-import { eq, desc, asc, and, gte, lte, ilike, or, sql } from "drizzle-orm";
+import { eq, desc, asc, and, gte, lte, ilike, or, sql, inArray } from "drizzle-orm";
 import { db } from "../client";
 import { products } from "../schema";
 import type { Product, ProductType } from "@nexus/domain";
@@ -59,6 +59,30 @@ export class ProductRepository {
   async findBySlug(slug: string): Promise<Product | null> {
         const rows = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
     return (rows[0] as unknown as Product) || null;
+  }
+
+  async findPublishedFreeBySlugs(slugs: readonly string[]): Promise<Product[]> {
+    const normalized = Array.from(
+      new Set(
+        slugs
+          .map((slug) => slug.trim().toLowerCase())
+          .filter(Boolean),
+      ),
+    ).slice(0, 25);
+    if (normalized.length === 0) return [];
+
+    const rows = await db
+      .select()
+      .from(products)
+      .where(
+        and(
+          inArray(products.slug, normalized),
+          eq(products.status, "published"),
+          eq(products.price, 0),
+        ),
+      )
+      .limit(25);
+    return rows as unknown as Product[];
   }
 
   async create(data: Omit<Product, "createdAt" | "updatedAt">): Promise<Product> {
