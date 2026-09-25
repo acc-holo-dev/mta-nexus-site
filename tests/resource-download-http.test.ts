@@ -31,15 +31,7 @@ const state = vi.hoisted(() => ({
 }));
 
 const auditRecord = vi.hoisted(() => vi.fn(async () => undefined));
-const downloadStream = vi.hoisted(() =>
-  vi.fn(async () => ({
-    stream: Readable.from(Buffer.from("nexus-build")),
-    meta: {
-      sizeBytes: Buffer.byteLength("nexus-build"),
-      mimeType: "application/zip",
-    },
-  })),
-);
+const downloadStream = vi.hoisted(() => vi.fn());
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
@@ -121,6 +113,13 @@ describe("resource download HTTP contract", () => {
       fileSizeBytes: Buffer.byteLength("nexus-build"),
       mimeType: "application/zip",
     };
+    downloadStream.mockResolvedValue({
+      stream: Readable.from(Buffer.from("nexus-build")),
+      meta: {
+        sizeBytes: Buffer.byteLength("nexus-build"),
+        mimeType: "application/zip",
+      },
+    });
   });
 
   it("returns 401 for an anonymous download", async () => {
