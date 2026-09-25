@@ -264,5 +264,11 @@ describe("resource download HTTP contract", () => {
       "assets/http-resource.zip",
     );
     expect(auditRecord).toHaveBeenCalledTimes(1);
+    expect(auditRecord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: "product.download_started",
+        targetId: "prd_http",
+      }),
+    );
   });
 });
