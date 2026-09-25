@@ -13,7 +13,10 @@
     "check": "pnpm typecheck && pnpm test && pnpm build",
     "db:generate": "pnpm --filter @nexus/db generate",
     "db:migrate": "pnpm --filter @nexus/db migrate",
-    "db:seed": "pnpm --filter @nexus/db seed"
+    "db:seed": "pnpm --filter @nexus/db seed",
+    "scenario:list": "pnpm --filter @nexus/db scenario:list",
+    "scenario:create": "pnpm --filter @nexus/db scenario:create",
+    "scenario:cleanup": "pnpm --filter @nexus/db scenario:cleanup"
   },
   "devDependencies": {
     "@types/node": "^26.6.1",
