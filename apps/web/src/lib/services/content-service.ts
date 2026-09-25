@@ -2,7 +2,6 @@ import {
   contentRepository,
   productRepository,
   serverRepository,
-  auditRepository,
 } from "@nexus/db";
 import { can, generateId } from "@nexus/security";
 import { ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
@@ -71,29 +70,30 @@ export class ContentService {
       }
     }
 
-    const comment = await contentRepository.addComment({
-      id: generateId("cmt"),
-      contentId: input.contentId,
-      productId: input.productId,
-      parentId: input.parentId,
-      authorId: actor.id,
-      text: input.text,
-      rating: input.rating,
-      // Article comments are not product acquisitions. Product review routes
-      // set this flag only after an entitlement check.
-      isVerifiedPurchase: false,
-    });
-
-    if (input.contentId) {
-      await auditRepository.record({
-        id: generateId("aud"),
-        actorId: actor.id,
-        actorType: "user",
-        action: "content.comment_added",
-        targetId: input.contentId,
-        targetType: "content",
-      });
-    }
+    const comment = await contentRepository.addComment(
+      {
+        id: generateId("cmt"),
+        contentId: input.contentId,
+        productId: input.productId,
+        parentId: input.parentId,
+        authorId: actor.id,
+        text: input.text,
+        rating: input.rating,
+        // Article comments are not product acquisitions. Product review routes
+        // set this flag only after an entitlement check.
+        isVerifiedPurchase: false,
+      },
+      input.contentId
+        ? {
+            id: generateId("aud"),
+            actorId: actor.id,
+            actorType: "user",
+            action: "content.comment_added",
+            targetId: input.contentId,
+            targetType: "content",
+          }
+        : undefined,
+    );
 
     if (input.productId && input.rating) {
       const prod = await productRepository.findById(input.productId);
