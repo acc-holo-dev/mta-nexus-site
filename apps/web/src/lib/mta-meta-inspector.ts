@@ -186,6 +186,42 @@ function tagItems(
   return extraction.items;
 }
 
+function containedTagItems(
+  source: string,
+  containerTagName: string,
+  tagName: string,
+  issues: MetaInspectionIssue[],
+): AttributeMap[] {
+  const items: AttributeMap[] = [];
+  let truncated = false;
+
+  outer: for (const contents of containerContents(source, containerTagName)) {
+    const extraction = tags(contents, tagName);
+    for (const item of extraction.items) {
+      if (items.length >= MAX_TAG_ENTRIES_PER_KIND) {
+        truncated = true;
+        break outer;
+      }
+      items.push(item);
+    }
+    if (extraction.truncated) {
+      truncated = true;
+      break;
+    }
+  }
+
+  if (truncated) {
+    issue(
+      issues,
+      `${tagName.toUpperCase()}_ENTRY_LIMIT_REACHED`,
+      "warning",
+      `Only the first ${MAX_TAG_ENTRIES_PER_KIND} <${tagName}> entries were inspected.`,
+    );
+  }
+
+  return items;
+}
+
 function normalizedScriptType(
   value: string | undefined,
 ): "client" | "server" | "shared" | "unknown" {
@@ -361,12 +397,18 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
   });
 
   const html = tagItems(source, "html", issues);
-  const settings = containerContents(source, "settings").flatMap((contents) =>
-    tagItems(contents, "setting", issues),
+  const settings = containedTagItems(
+    source,
+    "settings",
+    "setting",
+    issues,
   );
   const minVersionTag = tagItems(source, "min_mta_version", issues)[0] ?? null;
-  const aclRights = containerContents(source, "aclrequest").flatMap((contents) =>
-    tagItems(contents, "right", issues),
+  const aclRights = containedTagItems(
+    source,
+    "aclrequest",
+    "right",
+    issues,
   );
 
   const dependencyResources = Array.from(
