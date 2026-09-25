@@ -11,6 +11,7 @@ function exercise(migrationExit, serverExit = 0) {
     mkdirSync(join(root, 'scripts'));
     mkdirSync(join(root, 'bin'));
     mkdirSync(join(root, 'apps/web'), { recursive: true });
+    mkdirSync(join(root, 'packages/db'), { recursive: true });
     copyFileSync(new URL('../start-production.sh', import.meta.url), join(root, 'scripts/start-production.sh'));
     writeFileSync(join(root, 'bin/node'), `#!/bin/sh
 printf '%s|%s\\n' "$PWD" "$*" >> "$PROBE_LOG"
@@ -27,12 +28,12 @@ exit "$SERVER_EXIT"
   } finally { rmSync(root, { recursive: true, force: true }); }
 }
 
-test('runs migrations before Next.js from the correct directories, without pnpm', () => {
+test('runs migrations before the standalone server from isolated runtime directories, without pnpm', () => {
   const result = exercise(0);
   assert.equal(result.status, 0);
   assert.deepEqual(result.calls, [
-    `${result.root}|--import tsx packages/db/src/migrate.ts`,
-    `${result.root}/apps/web|node_modules/next/dist/bin/next start --hostname 0.0.0.0`,
+    `${result.root}/packages/db|--import tsx src/migrate.ts`,
+    `${result.root}/apps/web|server.js`,
   ]);
 });
 
