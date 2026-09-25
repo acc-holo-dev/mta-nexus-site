@@ -7,11 +7,19 @@ import {
 
 describe("free resource claim idempotency", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
+  const authorId = `usr_claim_author_${suffix}`;
   const userId = `usr_claim_${suffix}`;
   const otherUserId = `usr_claim_other_${suffix}`;
   const productId = `prd_claim_${suffix}`;
 
   beforeAll(async () => {
+    await userRepository.create({
+      id: authorId,
+      email: `claim_author_${suffix}@nexus.test`,
+      username: `claim_author_${suffix}`,
+      displayName: "Claim Resource Author",
+      role: "developer",
+    });
     await userRepository.create({
       id: userId,
       email: `claim_${suffix}@nexus.test`,
@@ -34,7 +42,7 @@ describe("free resource claim idempotency", () => {
       description: "Resource used to prove idempotent free claims.",
       type: "script",
       status: "published",
-      authorId: userId,
+      authorId,
       price: 0,
       currency: "USD",
       licenseModel: "unlimited",
