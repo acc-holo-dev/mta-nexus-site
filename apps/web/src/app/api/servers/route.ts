@@ -68,7 +68,10 @@ export async function POST(request: NextRequest) {
     }
 
     const server = await serverService.createServer(
-      { ...parsed.data, ownerId: user.id },
+      {
+        ...parsed.data,
+        ownerId: parsed.data.organizationId ? undefined : user.id,
+      },
       user
     );
     return NextResponse.json({ server }, { status: 201 });

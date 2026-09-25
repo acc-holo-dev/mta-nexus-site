@@ -15,6 +15,26 @@ export interface ProductFilters {
 }
 
 export class ProductService {
+  async canManageProduct(
+    product: Product,
+    actor: User,
+    action: "product.update" | "build.release" | "build.retire" = "product.update",
+  ): Promise<boolean> {
+    if (can(actor, action, product)) return true;
+    if (!product.organizationId) return false;
+
+    const [organization, organizationMemberships] = await Promise.all([
+      organizationRepository.findById(product.organizationId),
+      organizationRepository.listUserMemberships(actor.id),
+    ]);
+
+    if (organization?.ownerId === actor.id) return true;
+
+    return can(actor, action, product, {
+      organizationMemberships,
+    });
+  }
+
   async listProducts(filters: ProductFilters = {}): Promise<Product[]> {
     return productRepository.list({
       type: filters.type,
@@ -38,10 +58,7 @@ export class ProductService {
     if (product.status === "published") return product;
     if (!actor) return null;
 
-    const organizationMemberships = product.organizationId
-      ? await organizationRepository.listUserMemberships(actor.id)
-      : [];
-    return can(actor, "product.update", product, { organizationMemberships })
+    return (await this.canManageProduct(product, actor))
       ? product
       : null;
   }
@@ -159,7 +176,7 @@ export class ProductService {
       );
     }
 
-    if (!can(actor, "build.release", product)) {
+    if (!(await this.canManageProduct(product, actor, "build.release"))) {
       throw new ForbiddenError("Not authorized to publish builds for this product");
     }
 
@@ -275,7 +292,7 @@ export class ProductService {
   ): Promise<Build> {
     const product = await productRepository.findById(input.productId);
     if (!product) throw new NotFoundError("Product", input.productId);
-    if (!can(actor, "build.retire", product)) {
+    if (!(await this.canManageProduct(product, actor, "build.retire"))) {
       throw new ForbiddenError("Not authorized to retire builds for this product");
     }
 

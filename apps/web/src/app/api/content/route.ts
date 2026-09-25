@@ -5,8 +5,9 @@ import {
   contentRepository,
   organizationRepository,
   productRepository,
-  serverRepository,
 } from "@nexus/db";
+import { serverService } from "../../../lib/services/server-service";
+import { productService } from "../../../lib/services/product-service";
 import { createContentSchema } from "@nexus/validation";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 
@@ -46,11 +47,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (parsed.data.serverId && !(await serverRepository.findById(parsed.data.serverId))) {
-      return NextResponse.json({ error: "Linked server was not found" }, { status: 404 });
+    if (parsed.data.serverId) {
+      const linkedServer = await serverService.getServerById(parsed.data.serverId);
+      if (!linkedServer) {
+        return NextResponse.json(
+          { error: "Linked server was not found" },
+          { status: 404 },
+        );
+      }
+      if (!(await serverService.canManageServer(linkedServer, user))) {
+        return NextResponse.json(
+          { error: "You do not manage the linked server" },
+          { status: 403 },
+        );
+      }
     }
-    if (parsed.data.productId && !(await productRepository.findById(parsed.data.productId))) {
-      return NextResponse.json({ error: "Linked resource was not found" }, { status: 404 });
+
+    if (parsed.data.productId) {
+      const linkedProduct = await productRepository.findById(parsed.data.productId);
+      if (!linkedProduct) {
+        return NextResponse.json(
+          { error: "Linked resource was not found" },
+          { status: 404 },
+        );
+      }
+      if (!(await productService.canManageProduct(linkedProduct, user))) {
+        return NextResponse.json(
+          { error: "You do not manage the linked resource" },
+          { status: 403 },
+        );
+      }
     }
     if (parsed.data.organizationId) {
       const organization = await organizationRepository.findById(parsed.data.organizationId);
