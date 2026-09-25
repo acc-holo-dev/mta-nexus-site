@@ -90,7 +90,7 @@ export async function GET(
         id: generateId("aud"),
         actorId: user.id,
         actorType: "user",
-        action: "product.downloaded",
+        action: "product.download_started",
         targetId: productId,
         targetType: "product",
         details: { buildId: latestBuild.id, version: latestBuild.version },
