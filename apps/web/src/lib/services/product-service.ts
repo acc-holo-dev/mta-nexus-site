@@ -2,6 +2,8 @@ import { productRepository, buildRepository, auditRepository, organizationReposi
 import { generateId, can } from "@nexus/security";
 import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Product, Build, User, ProductType } from "@nexus/domain";
+import { buildProductDependencyResolution } from "../product-dependency-resolution";
+import { buildReverseDependencySummary, reverseDependencyLimits } from "../reverse-dependency-summary";
 
 export interface ProductFilters {
   query?: string;
@@ -72,6 +74,31 @@ export class ProductService {
     return includeNonPublic
       ? buildRepository.listByProduct(productId)
       : buildRepository.listPublishedByProduct(productId);
+  }
+
+  async getDependencyResolution(
+    product: Pick<Product, "slug" | "compatibility">,
+  ) {
+    const declared = product.compatibility.dependencies ?? [];
+    if (declared.length === 0) {
+      return buildProductDependencyResolution(product, []);
+    }
+
+    const publishedDependencies =
+      await productRepository.findPublishedFreeBySlugs(declared);
+    return buildProductDependencyResolution(
+      product,
+      publishedDependencies,
+    );
+  }
+
+  async getReverseDependencySummary(productSlug: string) {
+    const dependents =
+      await productRepository.listPublishedFreeDependingOnSlug(
+        productSlug,
+        reverseDependencyLimits.query,
+      );
+    return buildReverseDependencySummary(productSlug, dependents);
   }
 
   async createProduct(
