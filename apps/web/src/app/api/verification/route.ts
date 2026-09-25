@@ -95,17 +95,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "This target is already verified" }, { status: 409 });
     }
 
-    const duplicate =
-      parsed.data.targetType === "server"
-        ? await verificationRepository.findPendingForAnyRequester(
-            parsed.data.targetType,
-            parsed.data.targetId,
-          )
-        : await verificationRepository.findPendingForTarget(
-            user.id,
-            parsed.data.targetType,
-            parsed.data.targetId,
-          );
+    const duplicate = await verificationRepository.findPendingForTarget(
+      user.id,
+      parsed.data.targetType,
+      parsed.data.targetId,
+    );
     if (duplicate) {
       return NextResponse.json(
         { error: "A verification request is already pending", requestId: duplicate.id },
