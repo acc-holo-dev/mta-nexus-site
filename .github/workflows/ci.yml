@@ -65,6 +65,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify observation capture mutation guard
+        run: node --test scripts/tests/server-observation-capture.node-test.mjs
+
       - name: Apply database migrations
         run: pnpm db:migrate
 
