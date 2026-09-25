@@ -133,3 +133,50 @@ test("invalid NEXUS_DEV_PORT fails without probing an arbitrary port", async () 
     await rm(root, { recursive: true, force: true });
   }
 });
+
+
+test("compose validation does not forward application secrets", async () => {
+  const root = await fixtureRoot();
+  let composeEnvironment;
+  const values = {
+    "pnpm --version": { ok: true, stdout: "12.4.2" },
+    "docker version --format {{.Server.Version}}": { ok: true, stdout: "29.0.0" },
+    "docker info --format {{.OSType}}": { ok: true, stdout: "linux" },
+    "docker compose version --short": { ok: true, stdout: "2.40.0" },
+    "docker context show": { ok: true, stdout: "default" },
+    "docker compose -f compose.yaml config --quiet": { ok: true, stdout: "" },
+  };
+
+  try {
+    await collectDoctor({
+      repositoryRoot: root,
+      nodeVersion: "26.1.0",
+      memoryBytes: 8 * 1024 ** 3,
+      env: {
+        PATH: "/usr/bin:/bin",
+        HOME: "/tmp/nexus-doctor-home",
+        NEXUS_DEV_PORT: "3001",
+        AUTH_SECRET: "must-not-be-forwarded",
+        DATABASE_URL: "must-not-be-forwarded",
+        ACCOUNT_MAIL_KEY: "must-not-be-forwarded",
+      },
+      pathExists: async () => true,
+      probePort: async () => ({ available: true, code: null }),
+      runCommand: async (command, args, options = {}) => {
+        const key = [command, ...args].join(" ");
+        if (key === "docker compose -f compose.yaml config --quiet") {
+          composeEnvironment = options.env;
+        }
+        return values[key] ?? { ok: false, stdout: "" };
+      },
+    });
+
+    assert.equal(composeEnvironment.NEXUS_DEV_PORT, "3001");
+    assert.equal(composeEnvironment.COMPOSE_DISABLE_ENV_FILE, "true");
+    assert.equal(composeEnvironment.AUTH_SECRET, undefined);
+    assert.equal(composeEnvironment.DATABASE_URL, undefined);
+    assert.equal(composeEnvironment.ACCOUNT_MAIL_KEY, undefined);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
