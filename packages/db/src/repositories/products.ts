@@ -51,6 +51,28 @@ export class ProductRepository {
     return rows as unknown as Product[];
   }
 
+  async listPublishedByOrganization(
+    organizationId: string,
+    limit = 100,
+  ): Promise<Product[]> {
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 100)
+      : 100;
+
+    const rows = await db
+      .select()
+      .from(products)
+      .where(
+        and(
+          eq(products.organizationId, organizationId),
+          eq(products.status, "published"),
+        ),
+      )
+      .orderBy(desc(products.createdAt), desc(products.id))
+      .limit(boundedLimit);
+    return rows as unknown as Product[];
+  }
+
   async findById(id: string): Promise<Product | null> {
         const rows = await db.select().from(products).where(eq(products.id, id)).limit(1);
     return (rows[0] as unknown as Product) || null;
