@@ -1,8 +1,8 @@
-import { and, eq, desc, sql } from "drizzle-orm";
+import { and, eq, desc, isNotNull, sql } from "drizzle-orm";
 import { db } from "../client";
-import { verificationRequests, users, organizations, servers } from "../schema";
+import { verificationRequests, users, organizations, servers, serverClaimChallenges } from "../schema";
 import { generateId } from "@nexus/security";
-import { ConflictError, NotFoundError } from "@nexus/domain";
+import { AppError, ConflictError } from "@nexus/domain";
 
 const VALID_TARGET_TYPES = ["user", "developer", "organization", "server"] as const;
 export type VerificationTargetType = (typeof VALID_TARGET_TYPES)[number];
@@ -15,6 +15,14 @@ export class VerificationRepository {
     proofUrl?: string;
     notes?: string;
   }) {
+    if (input.targetType === "server") {
+      throw new AppError(
+        "Server ownership verification requires a verified MTA control challenge.",
+        422,
+        "SERVER_CONTROL_CHALLENGE_REQUIRED",
+      );
+    }
+
     const values = {
       id: generateId("ver"),
       requesterId: input.requesterId,
@@ -26,55 +34,11 @@ export class VerificationRepository {
       createdAt: new Date(),
     };
 
-    if (input.targetType !== "server") {
-      const rows = await db.insert(verificationRequests).values(values).returning();
-      return rows[0];
-    }
-
-    return db.transaction(async (tx) => {
-      const lockKey = `verification:server:${input.targetId}`;
-      await tx.execute(
-        sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`,
-      );
-
-      const serverRows = await tx
-        .select()
-        .from(servers)
-        .where(eq(servers.id, input.targetId))
-        .limit(1);
-      const server = serverRows[0];
-      if (!server) {
-        throw new NotFoundError("Server", input.targetId);
-      }
-      if (server.ownerId && server.ownerId !== input.requesterId) {
-        throw new ConflictError("This server is already claimed");
-      }
-      if (server.isVerified) {
-        throw new ConflictError("This target is already verified");
-      }
-
-      const pendingRows = await tx
-        .select()
-        .from(verificationRequests)
-        .where(
-          and(
-            eq(verificationRequests.targetType, "server"),
-            eq(verificationRequests.targetId, input.targetId),
-            eq(verificationRequests.status, "pending"),
-          ),
-        )
-        .limit(1);
-
-      if (pendingRows[0]) {
-        throw new ConflictError("A server ownership request is already pending");
-      }
-
-      const rows = await tx
-        .insert(verificationRequests)
-        .values(values)
-        .returning();
-      return rows[0];
-    });
+    const rows = await db
+      .insert(verificationRequests)
+      .values(values)
+      .returning();
+    return rows[0];
   }
 
   async findPendingForTarget(
@@ -180,6 +144,33 @@ export class VerificationRepository {
             .set({ isVerified: true })
             .where(eq(organizations.id, request.targetId));
         } else if (request.targetType === "server") {
+          const [proof] = await tx
+            .select({ id: serverClaimChallenges.id })
+            .from(serverClaimChallenges)
+            .where(
+              and(
+                eq(
+                  serverClaimChallenges.verificationRequestId,
+                  request.id,
+                ),
+                eq(serverClaimChallenges.serverId, request.targetId),
+                eq(
+                  serverClaimChallenges.requesterId,
+                  request.requesterId,
+                ),
+                eq(serverClaimChallenges.proofVersion, 1),
+                isNotNull(serverClaimChallenges.consumedAt),
+                isNotNull(serverClaimChallenges.sourceFetchedAt),
+              ),
+            )
+            .limit(1);
+
+          if (!proof) {
+            throw new ConflictError(
+              "Verified MTA server control proof is required before approval",
+            );
+          }
+
           // A server claim is finalized only by moderation. The conditional
           // ownership update prevents approving a stale request after another
           // claimant has already become the owner.
