@@ -9,7 +9,7 @@ import { consumeRateLimit, generateId } from "@nexus/security";
 import { decideResourceDownloadAccess } from "../../../../../lib/resource-download-policy";
 
 const DOWNLOAD_EXTENSIONS = new Set([".zip", ".rar", ".7z", ".lua"]);
-const privateHeaders = { ...privateHeaders, Vary: "Cookie" };
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
 function getDownloadExtension(storageKey: string): string {
   const extension = path.extname(storageKey).toLowerCase();
