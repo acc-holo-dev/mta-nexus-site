@@ -25,10 +25,10 @@ export class ServerRepository {
     return rows as unknown as Server[];
   }
 
-  async listObservable(limit = 500): Promise<Server[]> {
+  async listObservable(limit = 501): Promise<Server[]> {
     const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 500)
-      : 500;
+      ? Math.min(Math.max(Math.floor(limit), 1), 501)
+      : 501;
     const rows = await db
       .select()
       .from(servers)
