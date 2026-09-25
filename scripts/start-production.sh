@@ -1,9 +1,12 @@
 #!/bin/sh
 set -eu
 
-# Dependencies are installed in the build stage, never at container startup.
-# A migration error exits before the HTTP server starts.
-cd "$(dirname "$0")/.."
-node --import tsx packages/db/src/migrate.ts
-cd apps/web
-exec node node_modules/next/dist/bin/next start --hostname 0.0.0.0
+# The runtime image contains two self-contained production payloads:
+# the deployed database package for migrations/workers and Next.js standalone for HTTP.
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+
+cd "$root/packages/db"
+node --import tsx src/migrate.ts
+
+cd "$root/apps/web"
+exec node server.js
