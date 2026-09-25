@@ -11,6 +11,7 @@ export const RATE_LIMIT_POLICIES = {
   passwordChange: { limit: 5, windowSeconds: 3600 },
   notificationMutation: { limit: 30, windowSeconds: 60 },
   resourceClaim: { limit: 20, windowSeconds: 60 },
+  resourceInspection: { limit: 30, windowSeconds: 60 },
   verification: { limit: 3, windowSeconds: 86400 },
   moderationAction: { limit: 60, windowSeconds: 60 },
   serverMutation: { limit: 20, windowSeconds: 3600 },
