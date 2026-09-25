@@ -9,6 +9,8 @@ import { commerceService } from "../../../lib/services/commerce-service";
 import { BuildProvenanceDetails } from "../../../components/build-provenance-details";
 import { ProductDependencyList } from "../../../components/product-dependency-list";
 import { ReverseDependencyList } from "../../../components/reverse-dependency-list";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   Star,
   Download,
@@ -30,11 +32,14 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function formatScanStatus(status: string): string {
-  if (status === "clean") return "Scan: clean";
-  if (status === "not_scanned") return "Scan: manual review required";
-  if (status === "error") return "Scan: unavailable";
-  return "Scan: blocked";
+function formatScanStatus(
+  status: string,
+  copy: ReturnType<typeof getDictionary>["product"],
+): string {
+  if (status === "clean") return copy.scanClean;
+  if (status === "not_scanned") return copy.scanReview;
+  if (status === "error") return copy.scanUnavailable;
+  return copy.scanBlocked;
 }
 
 export async function generateMetadata({
@@ -43,10 +48,12 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
   const product = await productService.getProductBySlug(slug);
 
   if (!product) {
-    return { title: "Product not found" };
+    return { title: dictionary.product.notFound };
   }
 
   return {
@@ -70,6 +77,9 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.product;
   const cookieStore = await cookies();
   const token = cookieStore.get("nexus_session")?.value;
   const user = await authService.getSession(token);
@@ -108,18 +118,18 @@ export default async function ProductDetailPage({
     productService.getReverseDependencySummary(product.slug).catch(() => null),
   ]);
 
-  const formattedPrice = "Free";
+  const formattedPrice = copy.free;
 
   return (
     <div className="space-y-10">
       {!isPublished && (
         <div className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-4 text-sm text-amber-200">
-          Private creator preview · resource status: {product.status.replace(/_/g, " ")}. It is not visible in the public catalogue and cannot be downloaded until approval.
+          {copy.privatePreview} · resource status: {product.status.replace(/_/g, " ")}. {copy.notPublic}
         </div>
       )}
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-neutral-400">
-        <Link href="/market" className="hover:text-white">Market</Link>
+        <Link href="/market" className="hover:text-white">{copy.market}</Link>
         <span>/</span>
         <span className="capitalize">{product.type}</span>
         <span>/</span>
@@ -139,7 +149,7 @@ export default async function ProductDetailPage({
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-neutral-600">
-                Preview Unavailable
+                {copy.previewUnavailable}
               </div>
             )}
             <div className="absolute top-4 left-4 flex gap-2">
@@ -155,7 +165,7 @@ export default async function ProductDetailPage({
           {/* Description */}
           <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
             <h2 className="text-base font-bold text-white border-b border-base pb-3">
-              Resource Overview
+              {copy.overview}
             </h2>
             <div className="text-sm text-neutral-300 leading-relaxed whitespace-pre-line">
               {product.description}
@@ -179,9 +189,9 @@ export default async function ProductDetailPage({
             <h2 className="text-base font-bold text-white border-b border-base pb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-blue-400" />
-                <span>Release history</span>
+                <span>{copy.releaseHistory}</span>
               </div>
-              <span className="text-[11px] text-neutral-500 font-mono">SHA-256 recorded</span>
+              <span className="text-[11px] text-neutral-500 font-mono">{copy.shaRecorded}</span>
             </h2>
 
             {builds.length > 0 ? (
@@ -193,7 +203,7 @@ export default async function ProductDetailPage({
                   >
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold font-mono text-white">Version {b.version}</span>
+                        <span className="font-bold font-mono text-white">{copy.version} {b.version}</span>
                         {canInspectBuilds && b.status !== "published" && (
                           <span className="rounded bg-amber-950/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-300">
                             {b.status.replace(/_/g, " ")}
@@ -210,17 +220,17 @@ export default async function ProductDetailPage({
                             className="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold"
                           >
                             <Download className="w-3 h-3" />
-                            <span>Download</span>
+                            <span>{copy.download}</span>
                           </a>
                         )}
                       </div>
                     </div>
                     <div className="grid grid-cols-1 gap-1 text-[11px] text-neutral-400 sm:grid-cols-3">
-                      <span className="truncate" title={b.fileName}>File: {b.fileName}</span>
-                      <span>Size: {formatFileSize(b.fileSizeBytes)}</span>
-                      <span>MTA: {b.mtaVersionTarget ? `>= ${b.mtaVersionTarget}` : "Not declared"}</span>
-                      <span>{b.isSigned ? "Signature: present" : "Signature: not available"}</span>
-                      <span>{formatScanStatus(b.scanStatus)}</span>
+                      <span className="truncate" title={b.fileName}>{copy.file}: {b.fileName}</span>
+                      <span>{copy.size}: {formatFileSize(b.fileSizeBytes)}</span>
+                      <span>MTA: {b.mtaVersionTarget ? `>= ${b.mtaVersionTarget}` : copy.notDeclared}</span>
+                      <span>{b.isSigned ? copy.signaturePresent : copy.signatureMissing}</span>
+                      <span>{formatScanStatus(b.scanStatus, copy)}</span>
                     </div>
                     <BuildProvenanceDetails build={b} />
                     {b.releaseNotes && (
@@ -232,13 +242,13 @@ export default async function ProductDetailPage({
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-neutral-500">No public builds recorded yet.</p>
+              <p className="text-xs text-neutral-500">{copy.noBuilds}</p>
             )}
           </div>
 
           <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
             <h2 className="text-base font-bold text-white border-b border-base pb-3">
-              Used by published resources
+              {copy.usedBy}
             </h2>
             <ReverseDependencyList summary={reverseDependencySummary} />
           </div>
@@ -247,7 +257,7 @@ export default async function ProductDetailPage({
           <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
             <h2 className="text-base font-bold text-white border-b border-base pb-3 flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-amber-400" />
-              <span>Community Reviews</span>
+              <span>{copy.reviews}</span>
             </h2>
             {reviews.length > 0 ? (
               <div className="space-y-4">
@@ -266,7 +276,7 @@ export default async function ProductDetailPage({
                         {rev.isVerifiedPurchase && (
                           <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
                             <CheckCircle2 className="w-3 h-3" />
-                            Verified Acquisition
+                            {copy.verifiedAcquisition}
                           </span>
                         )}
                       </div>
@@ -279,7 +289,7 @@ export default async function ProductDetailPage({
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-neutral-500">No reviews yet for this resource.</p>
+              <p className="text-xs text-neutral-500">{copy.noReviews}</p>
             )}
           </div>
         </div>
@@ -290,7 +300,7 @@ export default async function ProductDetailPage({
             <div>
               <div className="text-3xl font-black text-white">{formattedPrice}</div>
               <div className="text-xs text-neutral-400 mt-1 capitalize">
-                License model: {product.licenseModel.replace(/_/g, " ")}
+                {copy.licenseModel}: {product.licenseModel.replace(/_/g, " ")}
               </div>
             </div>
 
@@ -301,10 +311,10 @@ export default async function ProductDetailPage({
                   <div className="p-3.5 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 space-y-1">
                     <div className="flex items-center gap-1.5 text-xs font-bold">
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>{canManageProduct ? "Management access" : "In your library"}</span>
+                      <span>{canManageProduct ? "{copy.managementAccess}" : "{copy.inLibrary}"}</span>
                     </div>
                     <p className="text-[11px] text-neutral-400">
-                      You are authorized to download this published build.
+                      {copy.authorized}
                     </p>
                   </div>
 
@@ -313,7 +323,7 @@ export default async function ProductDetailPage({
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
                   >
                     <Download className="w-4 h-4" />
-                    <span>Download Build v{product.currentVersion}</span>
+                    <span>{copy.downloadBuild} v{product.currentVersion}</span>
                   </a>
 
                   <Link
@@ -321,7 +331,7 @@ export default async function ProductDetailPage({
                     className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-base text-neutral-300 text-xs font-semibold transition-colors"
                   >
                     <Key className="w-3.5 h-3.5" />
-                    <span>Open resource library</span>
+                    <span>{copy.openLibrary}</span>
                   </Link>
                 </div>
               ) : (
@@ -330,11 +340,11 @@ export default async function ProductDetailPage({
                     href={`/checkout?productId=${product.id}`}
                     className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
                   >
-                    <span>Add to library</span>
+                    <span>{copy.addToLibrary}</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                   <p className="text-[11px] text-center text-neutral-500">
-                    Free resources require a signed-in library claim before download
+                    {copy.claimRequired}
                   </p>
                 </div>
               )}
@@ -343,30 +353,30 @@ export default async function ProductDetailPage({
             {/* Specifications Matrix */}
             <div className="space-y-3 pt-4 border-t border-base text-xs">
               <h4 className="font-bold text-white text-xs uppercase tracking-wider">
-                Technical Compatibility
+                {copy.compatibility}
               </h4>
               <div className="space-y-2">
                 <div className="flex justify-between py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">MTA Version</span>
+                  <span className="text-neutral-400">{copy.mtaVersion}</span>
                   <span className="font-mono text-neutral-200">
                     {product.compatibility.mtaMinVersion
                       ? `>= ${product.compatibility.mtaMinVersion}`
-                      : "Not declared"}
+                      : copy.notDeclared}
                   </span>
                 </div>
                 <div className="flex justify-between gap-4 py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">Dependencies</span>
+                  <span className="text-neutral-400">{copy.dependencies}</span>
                   <ProductDependencyList
                     declared={product.compatibility.dependencies ?? []}
                     resolution={dependencyResolution}
                   />
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">Library additions</span>
+                  <span className="text-neutral-400">{copy.libraryAdditions}</span>
                   <span className="font-mono text-neutral-200">{product.salesCount}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">Rating</span>
+                  <span className="text-neutral-400">{copy.rating}</span>
                   <span className="font-mono text-amber-400">
                     {(product.ratingAverage / 10).toFixed(1)} / 5.0 ({product.ratingCount})
                   </span>
@@ -378,7 +388,7 @@ export default async function ProductDetailPage({
             <div className="p-3 rounded-lg bg-blue-950/20 border border-blue-900/30 flex items-start gap-2.5 text-xs">
               <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
               <div className="text-neutral-300 text-[11px] leading-relaxed">
-                Every release records its SHA-256 checksum, file size and compatibility. Downloads are entitlement-gated; a recorded checksum is not a malware verdict or signature.
+                {copy.security}
               </div>
             </div>
           </div>
