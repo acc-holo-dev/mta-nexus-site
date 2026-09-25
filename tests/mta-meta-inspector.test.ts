@@ -137,6 +137,13 @@ describe("MTA meta.xml inspector", () => {
     );
   });
 
+  it("keeps invalid numeric entities inert instead of throwing RangeError", () => {
+    const result = inspectMtaMetaXml(
+      '<meta><info name="&#999999999999999999999;" /></meta>',
+    );
+    expect(result.info?.name).toBe("&#999999999999999999999;");
+  });
+
   it("reports when a complete meta root is not confirmed", () => {
     const result = inspectMtaMetaXml('<script src="standalone.lua" />');
     expect(result.root).toBe("unknown");
