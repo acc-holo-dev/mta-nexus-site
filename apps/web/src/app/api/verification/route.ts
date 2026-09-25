@@ -4,7 +4,6 @@ import {
   auditRepository,
   notificationRepository,
   organizationRepository,
-  serverRepository,
   userRepository,
   verificationRepository,
 } from "@nexus/db";
@@ -26,7 +25,10 @@ export async function GET(request: NextRequest) {
   const user = await authService.getSession(token);
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: privateHeaders });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401, headers: privateHeaders },
+    );
   }
 
   const requests = await verificationRepository.listByRequester(user.id);
@@ -61,21 +63,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (parsed.data.targetType === "server") {
+      return NextResponse.json(
+        {
+          error:
+            "Server ownership verification requires the MTA control challenge flow.",
+          code: "SERVER_CONTROL_CHALLENGE_REQUIRED",
+        },
+        { status: 422 },
+      );
+    }
+
     let targetIsVerified = false;
     if (parsed.data.targetType === "user" || parsed.data.targetType === "developer") {
       if (parsed.data.targetId !== user.id) {
         return NextResponse.json({ error: "You can only verify your own profile" }, { status: 403 });
       }
       targetIsVerified = user.isVerified;
-    } else if (parsed.data.targetType === "server") {
-      const server = await serverRepository.findById(parsed.data.targetId);
-      if (!server) {
-        return NextResponse.json({ error: "Server was not found" }, { status: 404 });
-      }
-      if (server.ownerId && server.ownerId !== user.id) {
-        return NextResponse.json({ error: "This server is already claimed" }, { status: 409 });
-      }
-      targetIsVerified = server.isVerified;
     } else {
       const organization = await organizationRepository.findById(parsed.data.targetId);
       if (!organization) {
@@ -96,17 +100,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "This target is already verified" }, { status: 409 });
     }
 
-    const duplicate =
-      parsed.data.targetType === "server"
-        ? await verificationRepository.findPendingForAnyRequester(
-            parsed.data.targetType,
-            parsed.data.targetId,
-          )
-        : await verificationRepository.findPendingForTarget(
-            user.id,
-            parsed.data.targetType,
-            parsed.data.targetId,
-          );
+    const duplicate = await verificationRepository.findPendingForTarget(
+      user.id,
+      parsed.data.targetType,
+      parsed.data.targetId,
+    );
     if (duplicate) {
       return NextResponse.json(
         { error: "A verification request is already pending", requestId: duplicate.id },
