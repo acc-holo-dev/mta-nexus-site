@@ -95,18 +95,6 @@ export class ContentService {
         : undefined,
     );
 
-    if (input.productId && input.rating) {
-      const prod = await productRepository.findById(input.productId);
-      if (prod) {
-        const newCount = prod.ratingCount + 1;
-        const newAvg = Math.round((prod.ratingAverage * prod.ratingCount + input.rating * 10) / newCount);
-        await productRepository.update(prod.id, {
-          ratingCount: newCount,
-          ratingAverage: newAvg,
-        });
-      }
-    }
-
     return comment;
   }
 
