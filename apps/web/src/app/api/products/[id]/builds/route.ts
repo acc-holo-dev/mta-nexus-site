@@ -124,6 +124,15 @@ export async function POST(
         { status: 422 }
       );
     }
+    if (scan.status === "error") {
+      return NextResponse.json(
+        {
+          error:
+            "Malware scanning is temporarily unavailable. No build was stored; retry the upload later.",
+        },
+        { status: 503, headers: { "Retry-After": "30" } }
+      );
+    }
 
     const asset = await storageService.uploadAsset({
       data: fileBytes,
