@@ -8,9 +8,14 @@ import { buildMasterObservationCandidates } from "./server-observation-matching"
 export async function captureKnownServerObservations(options?: {
   limit?: number;
 }) {
-  const limit = options?.limit ?? 500;
+  const requestedLimit = options?.limit ?? 500;
+  const limit = Number.isFinite(requestedLimit)
+    ? Math.min(Math.max(Math.floor(requestedLimit), 1), 500)
+    : 500;
   const directory = await mtaMasterDirectoryService.getDirectory();
-  const knownServers = await serverRepository.listObservable(limit);
+  const fetchedServers = await serverRepository.listObservable(limit + 1);
+  const knownServerLimitReached = fetchedServers.length > limit;
+  const knownServers = fetchedServers.slice(0, limit);
   const candidates = buildMasterObservationCandidates(
     knownServers,
     directory,
@@ -25,6 +30,8 @@ export async function captureKnownServerObservations(options?: {
     sourceFetchedAt: directory.fetchedAt,
     sourceWasStale: directory.isStale,
     knownServers: knownServers.length,
+    knownServerLimit: limit,
+    knownServerLimitReached,
     matchedServers: candidates.length,
     notListedServers: knownServers.length - candidates.length,
     absenceMeansOffline: false as const,
