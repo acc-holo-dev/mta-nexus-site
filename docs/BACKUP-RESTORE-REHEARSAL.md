@@ -37,12 +37,14 @@ The source phase:
 1. validates the production PostgreSQL image and named-volume topology;
 2. creates new disposable PostgreSQL and uploads volumes;
 3. starts PostgreSQL 18 with synthetic credentials;
-4. writes two database probe rows;
-5. writes two private-upload probe files;
-6. creates a custom-format `pg_dump`;
-7. creates a compressed uploads archive;
-8. records SHA-256 for both backup files;
-9. destroys the source containers and source volumes.
+4. applies every current `packages/db/migrations/*.sql` migration with `ON_ERROR_STOP=1`;
+5. writes two database probe rows and records a schema fingerprint;
+6. writes two private-upload probe files;
+7. creates a custom-format `pg_dump` containing the current application schema plus probe data;
+8. creates a compressed uploads archive;
+9. records SHA-256 for both backup files;
+10. destroys the source containers and source volumes;
+11. re-checks both backup SHA-256 values after source destruction, before restore.
 
 Only after the source volumes are confirmed removed does the restore phase begin.
 
@@ -53,8 +55,9 @@ The restore phase:
 3. restores the database using `pg_restore`;
 4. extracts the uploads archive into the fresh uploads volume;
 5. verifies the exact database rows;
-6. verifies both upload file contents;
-7. removes all restore containers and owned volumes.
+6. compares restored table/column/index/constraint fingerprint with the migrated source database;
+7. verifies both upload file contents;
+8. removes all restore containers and owned volumes.
 
 The temporary backup files are removed when the rehearsal completes.
 
@@ -75,7 +78,9 @@ This separation matters: container persistence and backup restore are different 
 A green run on a specific SHA would prove that, in the disposable GitHub-hosted environment:
 
 - the current production storage topology can be recognized;
-- PostgreSQL 18 custom dump/restore preserves the synthetic data;
+- all current SQL migrations can be applied to the disposable source database;
+- PostgreSQL 18 custom dump/restore preserves the current migrated application schema and synthetic data;
+- backup files retain their recorded SHA-256 after source volumes are destroyed;
 - the private uploads volume can be archived and restored into a fresh volume;
 - the restore works after source volumes have actually been deleted;
 - the cleanup guard removes only owned disposable volumes.
