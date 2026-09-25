@@ -243,6 +243,24 @@ jobs:
         if: always()
         run: docker compose --env-file /dev/null -f compose.yaml down --volumes --timeout 15
 
+  backup-restore:
+    name: Disposable backup restore
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26.0.0
+      - name: Verify backup restore isolation contract
+        run: node --test scripts/tests/backup-restore.node-test.mjs scripts/tests/backup-restore-surface.node-test.mjs
+      - name: Rehearse database and uploads backup restore
+        run: node scripts/check-backup-restore.mjs
+
   production-compose:
     name: Production Docker startup
     runs-on: ubuntu-latest
