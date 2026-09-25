@@ -1,7 +1,7 @@
 import { eq, desc, asc, and, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
 import { db } from "../client";
-import { builds, products } from "../schema";
-import type { Product, ProductType } from "@nexus/domain";
+import { auditEvents, builds, products } from "../schema";
+import type { AuditEvent, Product, ProductType } from "@nexus/domain";
 
 export interface ProductQueryOptions {
   type?: ProductType;
@@ -132,22 +132,61 @@ export class ProductRepository {
     return (rows[0] as unknown as Product) || null;
   }
 
-  async suspendPublished(id: string): Promise<Product | null> {
-    const rows = await db
-      .update(products)
-      .set({ status: "suspended", updatedAt: new Date() })
-      .where(
-        and(
-          eq(products.id, id),
-          eq(products.status, "published"),
-        ),
-      )
-      .returning();
-    return (rows[0] as unknown as Product) || null;
+  async updateWithAudit(
+    id: string,
+    updates: Partial<Product>,
+    audit: Omit<AuditEvent, "createdAt">,
+  ): Promise<Product | null> {
+    return db.transaction(async (tx) => {
+      const now = new Date();
+      const rows = await tx
+        .update(products)
+        .set({ ...updates, updatedAt: now })
+        .where(eq(products.id, id))
+        .returning();
+      const updated = rows[0];
+      if (!updated) return null;
+
+      await tx.insert(auditEvents).values({
+        ...audit,
+        createdAt: now,
+      });
+      return updated as unknown as Product;
+    });
+  }
+
+  async suspendPublished(
+    id: string,
+    audit?: Omit<AuditEvent, "createdAt">,
+  ): Promise<Product | null> {
+    return db.transaction(async (tx) => {
+      const now = new Date();
+      const rows = await tx
+        .update(products)
+        .set({ status: "suspended", updatedAt: now })
+        .where(
+          and(
+            eq(products.id, id),
+            eq(products.status, "published"),
+          ),
+        )
+        .returning();
+      const suspended = rows[0];
+      if (!suspended) return null;
+
+      if (audit) {
+        await tx.insert(auditEvents).values({
+          ...audit,
+          createdAt: now,
+        });
+      }
+      return suspended as unknown as Product;
+    });
   }
 
   async restoreSuspendedWithPublishedBuild(
     id: string,
+    audit?: Omit<AuditEvent, "createdAt">,
   ): Promise<"restored" | "not_found" | "invalid_state" | "no_published_build"> {
     return db.transaction(async (tx) => {
       const existing = await tx
@@ -175,9 +214,10 @@ export class ProductRepository {
         return "no_published_build" as const;
       }
 
+      const now = new Date();
       const restored = await tx
         .update(products)
-        .set({ status: "published", updatedAt: new Date() })
+        .set({ status: "published", updatedAt: now })
         .where(
           and(
             eq(products.id, id),
@@ -186,7 +226,16 @@ export class ProductRepository {
         )
         .returning({ id: products.id });
 
-      return restored[0] ? ("restored" as const) : ("invalid_state" as const);
+      if (!restored[0]) return "invalid_state" as const;
+
+      if (audit) {
+        await tx.insert(auditEvents).values({
+          ...audit,
+          createdAt: now,
+        });
+      }
+
+      return "restored" as const;
     });
   }
 }
