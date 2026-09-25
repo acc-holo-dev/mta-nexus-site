@@ -5,6 +5,7 @@ import { Server } from "lucide-react";
 import { authService } from "../../../../lib/services/auth-service";
 import { serverService } from "../../../../lib/services/server-service";
 import { ServerDetailsForm } from "../../../../components/server-details-form";
+import { ServerClaimControlPanel } from "../../../../components/server-claim-control-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,13 @@ export default async function ServerManagementPage({ params }: { params: Promise
         <Server className="w-5 h-5 text-emerald-400" />
         <p className="text-sm text-neutral-300">This is an owner-managed listing. Public MTA availability is sourced independently from the official MTA master-list.</p>
       </div>
+
+      {!server.isVerified && (
+        <ServerClaimControlPanel
+          serverId={server.id}
+          serverName={server.name}
+        />
+      )}
 
       <section className="nexus-panel p-6 space-y-4">
         <div>
