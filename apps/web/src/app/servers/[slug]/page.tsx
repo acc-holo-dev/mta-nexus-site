@@ -139,7 +139,7 @@ export default async function ServerDetailPage({
         </section>
       )}
 
-      {history && <ServerHistoryPanel history={history} />}
+      <ServerHistoryPanel history={history} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
