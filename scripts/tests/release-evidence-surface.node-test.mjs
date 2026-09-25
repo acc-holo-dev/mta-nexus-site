@@ -17,6 +17,24 @@ test("CI uses the evidence-producing core verification command", () => {
   assert.doesNotMatch(workflow, /name: Verify project\n\s+run: pnpm check/u);
 });
 
+test("core release evidence records lint as its own gate", () => {
+  const script = read("scripts/release-evidence.mjs");
+  const pkg = JSON.parse(read("package.json"));
+
+  assert.equal(
+    pkg.scripts.check,
+    "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+  );
+  assert.match(
+    script,
+    /runGate\("lint", pnpmCommand, \["lint"\]\)/u,
+  );
+  assert.match(
+    script,
+    /runGate\("typecheck", pnpmCommand, \["typecheck"\]\)/u,
+  );
+});
+
 test("generated release evidence is not tracked by default", () => {
   const gitignore = read(".gitignore");
   assert.match(gitignore, /^artifacts\/$/mu);
