@@ -16,12 +16,9 @@ import {
   Download,
   ShieldCheck,
   CheckCircle2,
-  Box,
-  FileCode,
   Layers,
   ArrowRight,
   MessageSquare,
-  AlertCircle,
   Key,
 } from "lucide-react";
 
@@ -281,7 +278,9 @@ export default async function ProductDetailPage({
                         )}
                       </div>
                       <span className="text-[11px] text-neutral-500 font-mono">
-                        {new Date(rev.createdAt).toLocaleDateString()}
+                        {new Date(rev.createdAt).toLocaleDateString(
+                          locale === "ru" ? "ru-RU" : "en-US",
+                        )}
                       </span>
                     </div>
                     <p className="text-xs text-neutral-300 leading-relaxed">{rev.text}</p>
@@ -311,7 +310,7 @@ export default async function ProductDetailPage({
                   <div className="p-3.5 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 space-y-1">
                     <div className="flex items-center gap-1.5 text-xs font-bold">
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>{canManageProduct ? "{copy.managementAccess}" : "{copy.inLibrary}"}</span>
+                      <span>{canManageProduct ? copy.managementAccess : copy.inLibrary}</span>
                     </div>
                     <p className="text-[11px] text-neutral-400">
                       {copy.authorized}
