@@ -14,11 +14,8 @@ export function BuildProvenanceDetails({
 }: {
   build: Pick<
     Build,
-    | "id"
-    | "version"
     | "status"
     | "sha256Hash"
-    | "fileSizeBytes"
     | "fileName"
     | "mimeType"
     | "scanStatus"
