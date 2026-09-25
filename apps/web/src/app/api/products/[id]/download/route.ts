@@ -6,6 +6,7 @@ import { commerceService } from "../../../../../lib/services/commerce-service";
 import { productRepository, buildRepository, auditRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";
 import { consumeRateLimit, generateId } from "@nexus/security";
+import { decideResourceDownloadAccess } from "../../../../../lib/resource-download-policy";
 
 const DOWNLOAD_EXTENSIONS = new Set([".zip", ".rar", ".7z", ".lua"]);
 
@@ -35,19 +36,32 @@ export async function GET(
     }
 
     const product = await productRepository.findById(productId);
-    if (!product || product.status !== "published") {
+    if (!product) {
       return NextResponse.json({ error: "Resource not found" }, { status: 404 });
     }
 
-    const hasAccess =
-      product.authorId === user.id ||
-      user.role === "admin" ||
-      (await commerceService.checkEntitlement(
-        { type: "user", id: user.id },
-        productId,
-        "product.download"
-      ));
-    if (!hasAccess) {
+    const isPrivileged =
+      product.authorId === user.id || user.role === "admin";
+    const hasEntitlement = isPrivileged
+      ? false
+      : await commerceService.checkEntitlement(
+          { type: "user", id: user.id },
+          productId,
+          "product.download"
+        );
+    const access = decideResourceDownloadAccess(
+      user,
+      product,
+      hasEntitlement,
+    );
+
+    if (!access.allowed) {
+      if (access.reason === "resource_not_published") {
+        return NextResponse.json(
+          { error: "Resource not found" },
+          { status: 404 },
+        );
+      }
       return NextResponse.json(
         { error: "Add this resource to your library before downloading it" },
         { status: 403 }
