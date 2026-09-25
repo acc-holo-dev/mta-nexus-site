@@ -20,14 +20,19 @@ describe("product restore scan guard", () => {
       'eq(builds.scanStatus, "clean")',
       publishedBuild,
     );
-    const restoreWrite = repository.indexOf(
-      '.set({ status: "published", updatedAt: now })',
+    const selectedVersion = repository.indexOf(
+      "version: builds.version",
       cleanScan,
+    );
+    const restoreWrite = repository.indexOf(
+      "currentVersion: publishedBuild[0].version",
+      selectedVersion,
     );
 
     expect(restore).toBeGreaterThan(-1);
     expect(publishedBuild).toBeGreaterThan(restore);
     expect(cleanScan).toBeGreaterThan(publishedBuild);
-    expect(restoreWrite).toBeGreaterThan(cleanScan);
+    expect(selectedVersion).toBeGreaterThan(cleanScan);
+    expect(restoreWrite).toBeGreaterThan(selectedVersion);
   });
 });
