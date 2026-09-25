@@ -39,4 +39,16 @@ describe("verification moderation controls surface", () => {
       "serverClaimChallenges.verificationRequestId",
     );
   });
+  it("enforces verification review notes at the HTTP boundary", () => {
+    const route = read(
+      "apps/web/src/app/api/admin/actions/route.ts",
+    );
+    expect(route).toContain(
+      'targetType: z.literal("verification")',
+    );
+    expect(route).toContain(
+      'notes: z.string().trim().min(3).max(2000)',
+    );
+  });
+
 });
