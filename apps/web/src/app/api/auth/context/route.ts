@@ -11,14 +11,14 @@ const contextSchema = z
   })
   .strict();
 
-const privateHeaders = { "Cache-Control": "private, no-store" };
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
   if (!user) {
-    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    return NextResponse.json({ error: "Authentication required" }, { status: 401, headers: privateHeaders });
   }
 
   const memberships = await organizationRepository.listUserMemberships(user.id);
