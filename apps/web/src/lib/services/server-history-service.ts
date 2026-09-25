@@ -108,3 +108,7 @@ export const serverHistoryService = {
     });
   },
 };
+
+export type ServerHistoryResult = NonNullable<
+  Awaited<ReturnType<(typeof serverHistoryService)["getHistory"]>>
+>;
