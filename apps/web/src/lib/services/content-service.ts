@@ -17,6 +17,10 @@ export class ContentService {
     return contentRepository.listPublishedByTypes(["post", "question"], limit);
   }
 
+  async listServerUpdates(serverId: string, limit = 6): Promise<Content[]> {
+    return contentRepository.listPublishedByServer(serverId, limit);
+  }
+
   async getArticleBySlug(
     slug: string,
     options: { incrementView?: boolean } = {}
