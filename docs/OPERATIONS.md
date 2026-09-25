@@ -98,4 +98,4 @@ A release is not accepted merely because code exists on `main`. Acceptance requi
 - backup/restore confidence for data-changing releases;
 - explicit deployment decision.
 
-The version `1.2.0-beta.1` represents this repository consolidation and hardening update; it is not a statement that public production rollout has occurred.
+The version `1.2.0-beta.2` represents the consolidated mainline hardening, public-resource correctness and RU/EN expansion update; it is not a statement that public production rollout has occurred.
