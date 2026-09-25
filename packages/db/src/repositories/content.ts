@@ -50,7 +50,9 @@ export class ContentRepository {
           inArray(content.type, publicServerUpdateTypes),
         ),
       )
-      .orderBy(desc(content.publishedAt), desc(content.updatedAt))
+      .orderBy(
+        desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`),
+      )
       .limit(boundedLimit);
     return rows as unknown as Content[];
   }
