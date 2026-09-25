@@ -17,7 +17,13 @@
     "format": "biome format . --write",
     "format:check": "biome format .",
     "nexus:doctor": "node scripts/nexus-doctor.mjs",
-    "nexus:doctor:test": "node --test scripts/tests/nexus-doctor.node-test.mjs"
+    "nexus:doctor:test": "node --test scripts/tests/nexus-doctor.node-test.mjs",
+    "scenario:list": "pnpm --filter @nexus/db scenario:list",
+    "scenario:create": "pnpm --filter @nexus/db scenario:create",
+    "scenario:cleanup": "pnpm --filter @nexus/db scenario:cleanup",
+    "server:observations:capture": "pnpm --filter @nexus/web server:observations:capture",
+    "server:observations:guard:test": "node --test scripts/tests/server-observation-capture.node-test.mjs",
+    "release:verify": "node scripts/release-evidence.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.1",
