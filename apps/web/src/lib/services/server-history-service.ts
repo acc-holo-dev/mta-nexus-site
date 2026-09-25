@@ -76,40 +76,9 @@ type CaptureResult = Readonly<{
 async function captureCurrentMasterObservation(
   server: Server,
 ): Promise<CaptureResult> {
+  let directory;
   try {
-    const directory = await mtaMasterDirectoryService.getDirectory();
-    const observed = directory.servers.find((item) =>
-      matchesMtaEndpoint(server, item),
-    );
-
-    if (!observed) {
-      return Object.freeze({
-        status: "not_listed",
-        sourceFetchedAt: directory.fetchedAt,
-        sourceWasStale: directory.isStale,
-      });
-    }
-
-    await serverObservationRepository.record({
-      serverId: server.id,
-      source: "mta_master",
-      sourceSequence: directory.fetchedAt,
-      name: observed.name,
-      gameMode: observed.gameMode,
-      mapName: observed.mapName,
-      mtaVersion: observed.version,
-      currentPlayers: observed.players,
-      maxPlayers: observed.maxPlayers,
-      passworded: observed.passworded,
-      responding: observed.responding,
-      observedAt: new Date(directory.fetchedAt),
-    });
-
-    return Object.freeze({
-      status: "recorded",
-      sourceFetchedAt: directory.fetchedAt,
-      sourceWasStale: directory.isStale,
-    });
+    directory = await mtaMasterDirectoryService.getDirectory();
   } catch {
     return Object.freeze({
       status: "upstream_unavailable",
@@ -117,6 +86,39 @@ async function captureCurrentMasterObservation(
       sourceWasStale: null,
     });
   }
+
+  const observed = directory.servers.find((item) =>
+    matchesMtaEndpoint(server, item),
+  );
+
+  if (!observed) {
+    return Object.freeze({
+      status: "not_listed",
+      sourceFetchedAt: directory.fetchedAt,
+      sourceWasStale: directory.isStale,
+    });
+  }
+
+  await serverObservationRepository.record({
+    serverId: server.id,
+    source: "mta_master",
+    sourceSequence: directory.fetchedAt,
+    name: observed.name,
+    gameMode: observed.gameMode,
+    mapName: observed.mapName,
+    mtaVersion: observed.version,
+    currentPlayers: observed.players,
+    maxPlayers: observed.maxPlayers,
+    passworded: observed.passworded,
+    responding: observed.responding,
+    observedAt: new Date(directory.fetchedAt),
+  });
+
+  return Object.freeze({
+    status: "recorded",
+    sourceFetchedAt: directory.fetchedAt,
+    sourceWasStale: directory.isStale,
+  });
 }
 
 export const serverHistoryService = {
