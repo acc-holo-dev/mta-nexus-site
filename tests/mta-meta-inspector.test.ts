@@ -151,6 +151,27 @@ describe("MTA meta.xml inspector", () => {
     );
   });
 
+  it("applies one global limit across repeated nested settings containers", () => {
+    const first = Array.from(
+      { length: 300 },
+      (_, index) => `<setting name="a${index}" value="1" />`,
+    ).join("");
+    const second = Array.from(
+      { length: 300 },
+      (_, index) => `<setting name="b${index}" value="1" />`,
+    ).join("");
+    const result = inspectMtaMetaXml(
+      `<meta><settings>${first}</settings><settings>${second}</settings></meta>`,
+    );
+
+    expect(result.settings).toHaveLength(metaInspectionLimits.maxEntriesPerKind);
+    expect(result.issues).toContainEqual(
+      expect.objectContaining({
+        code: "SETTING_ENTRY_LIMIT_REACHED",
+      }),
+    );
+  });
+
   it("bounds repeated manifest entries and reports truncation", () => {
     const repeated = Array.from(
       { length: metaInspectionLimits.maxEntriesPerKind + 25 },
