@@ -1,4 +1,4 @@
-import { and, eq, desc, ne, sql } from "drizzle-orm";
+import { and, eq, desc, isNotNull, ne, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
@@ -45,6 +45,9 @@ export class BuildRepository {
         and(
           eq(builds.productId, productId),
           eq(builds.status, "published"),
+          eq(builds.scanStatus, "clean"),
+          isNotNull(builds.scanner),
+          isNotNull(builds.scannedAt),
         ),
       )
       .orderBy(desc(builds.createdAt), desc(builds.id))
@@ -108,7 +111,13 @@ export class BuildRepository {
     return db.transaction(async (tx) => {
       const targetStatus = decision === "approve" ? "published" : "rejected";
       const conditions = [eq(builds.id, id), eq(builds.status, "pending_review")];
-      if (decision === "approve") conditions.push(eq(builds.scanStatus, "clean"));
+      if (decision === "approve") {
+        conditions.push(
+          eq(builds.scanStatus, "clean"),
+          isNotNull(builds.scanner),
+          isNotNull(builds.scannedAt),
+        );
+      }
 
       const rows = await tx
         .update(builds)
