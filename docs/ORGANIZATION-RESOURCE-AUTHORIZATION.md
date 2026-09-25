@@ -16,7 +16,7 @@ AUTHZ-001 adds the equivalent `productService.canManageProduct()` and uses the t
 
 `productService.canManageProduct(product, actor, action)` permits:
 
-- the direct product author;
+- the direct product author for personal products only;
 - administrators through the existing policy override;
 - the direct owner of the product's organization;
 - organization members accepted by the existing product policy, including `manage_products`.
@@ -61,3 +61,19 @@ For a request with `organizationId`:
 For a personal server without `organizationId`, the creator remains the direct `ownerId`.
 
 This keeps delegated organization permissions from becoming permanent personal ownership by accident.
+
+
+## Organization product authority revocation
+
+For a product with `organizationId`, `authorId` is attribution only. It does not grant permanent management authority.
+
+Organization product authority follows the current organization relationship:
+
+- direct organization owner;
+- organization owner/admin membership;
+- explicit `manage_products` permission;
+- administrator override.
+
+If a delegated creator loses the membership or `manage_products` permission that allowed them to manage the organization resource, they can no longer preview the draft or release/retire builds merely because their user ID remains in `authorId`.
+
+Personal products without `organizationId` keep the existing direct-author management rule.
