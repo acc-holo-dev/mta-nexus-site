@@ -1,13 +1,9 @@
-export interface ClamAvInstreamSocket {
-  write(chunk: string | Uint8Array): boolean;
-  end(): void;
-  once(event: "drain", listener: () => void): this;
-  once(event: "close", listener: () => void): this;
-  once(event: "error", listener: (error: Error) => void): this;
-  off(event: "drain", listener: () => void): this;
-  off(event: "close", listener: () => void): this;
-  off(event: "error", listener: (error: Error) => void): this;
-}
+import type { Socket } from "node:net";
+
+export type ClamAvInstreamSocket = Pick<
+  Socket,
+  "write" | "end" | "once" | "off"
+>;
 
 const CLAMAV_CHUNK_BYTES = 64 * 1024;
 
