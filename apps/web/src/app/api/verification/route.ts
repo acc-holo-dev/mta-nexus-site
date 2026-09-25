@@ -10,6 +10,7 @@ import {
 } from "@nexus/db";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import { z } from "zod";
+import { AppError } from "@nexus/domain";
 
 const verificationRequestSchema = z.object({
   targetType: z.enum(["user", "developer", "organization", "server"]),
@@ -93,11 +94,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "This target is already verified" }, { status: 409 });
     }
 
-    const duplicate = await verificationRepository.findPendingForTarget(
-      user.id,
-      parsed.data.targetType,
-      parsed.data.targetId
-    );
+    const duplicate =
+      parsed.data.targetType === "server"
+        ? await verificationRepository.findPendingForAnyRequester(
+            parsed.data.targetType,
+            parsed.data.targetId,
+          )
+        : await verificationRepository.findPendingForTarget(
+            user.id,
+            parsed.data.targetType,
+            parsed.data.targetId,
+          );
     if (duplicate) {
       return NextResponse.json(
         { error: "A verification request is already pending", requestId: duplicate.id },
@@ -141,6 +148,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, request: verificationRequest }, { status: 201 });
   } catch (error: unknown) {
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode },
+      );
+    }
     console.error("Verification request error:", error);
     return NextResponse.json({ error: "Failed to submit verification request" }, { status: 500 });
   }
