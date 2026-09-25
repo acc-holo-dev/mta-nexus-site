@@ -175,6 +175,32 @@ describe("resource download HTTP contract", () => {
     expect(downloadStream).not.toHaveBeenCalled();
   });
 
+  it("destroys an opened storage stream when the required audit write fails", async () => {
+    const openedStream = Readable.from(Buffer.from("audit-failure"));
+    downloadStream.mockResolvedValueOnce({
+      stream: openedStream,
+      meta: {
+        sizeBytes: Buffer.byteLength("audit-failure"),
+        mimeType: "application/zip",
+      },
+    });
+    auditRecord.mockRejectedValueOnce(new Error("audit unavailable"));
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    try {
+      const response = await GET(request(), context);
+
+      expect(response.status).toBe(500);
+      expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+      expect(response.headers.get("Vary")).toBe("Cookie");
+      expect(openedStream.destroyed).toBe(true);
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+
   it("streams the published build with integrity and private-cache headers", async () => {
     const response = await GET(request(), context);
 
