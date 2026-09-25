@@ -7,6 +7,7 @@ import { productRepository, buildRepository, auditRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import { decideResourceDownloadAccess } from "../../../../../lib/resource-download-policy";
+import { productService } from "../../../../../lib/services/product-service";
 
 const DOWNLOAD_EXTENSIONS = new Set([".zip", ".rar", ".7z", ".lua"]);
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -49,7 +50,8 @@ export async function GET(
     }
 
     const isPrivileged =
-      product.authorId === user.id || user.role === "admin";
+      user.role === "admin" ||
+      (await productService.canManageProduct(product, user));
     const hasEntitlement = isPrivileged
       ? false
       : await commerceService.checkEntitlement(
