@@ -9,6 +9,7 @@ import { consumeRateLimit, generateId } from "@nexus/security";
 import { decideResourceDownloadAccess } from "../../../../../lib/resource-download-policy";
 
 const DOWNLOAD_EXTENSIONS = new Set([".zip", ".rar", ".7z", ".lua"]);
+const privateHeaders = { ...privateHeaders, Vary: "Cookie" };
 
 function getDownloadExtension(storageKey: string): string {
   const extension = path.extname(storageKey).toLowerCase();
@@ -26,18 +27,18 @@ export async function GET(
     if (!user) {
       return NextResponse.json(
         { error: "Authentication required to download resource builds" },
-        { status: 401 }
+        { status: 401, headers: privateHeaders }
       );
     }
 
     const rateLimit = await consumeRateLimit("download", user.id);
     if (!rateLimit.success) {
-      return NextResponse.json({ error: "Too many download requests" }, { status: 429 });
+      return NextResponse.json({ error: "Too many download requests" }, { status: 429, headers: privateHeaders });
     }
 
     const product = await productRepository.findById(productId);
     if (!product) {
-      return NextResponse.json({ error: "Resource not found" }, { status: 404 });
+      return NextResponse.json({ error: "Resource not found" }, { status: 404, headers: privateHeaders });
     }
 
     const isPrivileged =
@@ -59,19 +60,19 @@ export async function GET(
       if (access.reason === "resource_not_published") {
         return NextResponse.json(
           { error: "Resource not found" },
-          { status: 404 },
+          { status: 404, headers: privateHeaders },
         );
       }
       return NextResponse.json(
         { error: "Add this resource to your library before downloading it" },
-        { status: 403 }
+        { status: 403, headers: privateHeaders }
       );
     }
 
     const latestBuild =
       await buildRepository.findLatestPublishedByProduct(productId);
     if (!latestBuild) {
-      return NextResponse.json({ error: "No published build is available" }, { status: 404 });
+      return NextResponse.json({ error: "No published build is available" }, { status: 404, headers: privateHeaders });
     }
 
     const stored = await storageService.getDownloadStream(latestBuild.storageKey);
@@ -93,12 +94,12 @@ export async function GET(
         "Content-Disposition": `attachment; filename="${fileName}"`,
         "Content-Length": String(stored.meta?.sizeBytes || latestBuild.fileSizeBytes),
         "X-Content-SHA256": latestBuild.sha256Hash,
-        "Cache-Control": "private, no-store",
+        ...privateHeaders,
         "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error: unknown) {
     console.error("Download error:", error);
-    return NextResponse.json({ error: "Failed to deliver resource build" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to deliver resource build" }, { status: 500, headers: privateHeaders });
   }
 }
