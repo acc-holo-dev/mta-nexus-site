@@ -54,8 +54,8 @@ export async function GET(
       );
     }
 
-    const builds = await buildRepository.listByProduct(productId);
-    const latestBuild = builds.find((build) => build.status === "published");
+    const latestBuild =
+      await buildRepository.findLatestPublishedByProduct(productId);
     if (!latestBuild) {
       return NextResponse.json({ error: "No published build is available" }, { status: 404 });
     }
