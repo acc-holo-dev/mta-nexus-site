@@ -7,7 +7,7 @@
     "dev": "pnpm --filter @nexus/web dev",
     "build": "pnpm --filter @nexus/web build",
     "start": "pnpm --filter @nexus/web start",
-    "lint": "biome check .",
+    "lint": "biome lint .",
     "test": "vitest run",
     "typecheck": "tsc -b",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
