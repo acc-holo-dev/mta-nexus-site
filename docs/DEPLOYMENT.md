@@ -55,7 +55,7 @@ docker compose -f compose.production.yaml ps
 curl -fsS https://nexus-mta.com/api/health
 ```
 
-Do not publish a fully rendered Compose configuration: it can contain secrets. The production app command applies migrations before startup. A failing migration must stop startup; a code rollback alone does not undo a partially applied database change. A successful `/api/health` response proves neither storage nor scanner verdicts or user-journey readiness. The Caddy request-size rule still needs boundary testing with the real upload flow.
+Do not publish a fully rendered Compose configuration: it can contain secrets. The production app command applies migrations before startup. A failing migration must stop startup; a code rollback alone does not undo a partially applied database change. A successful `/api/health` response proves neither storage nor scanner verdicts or user-journey readiness. The production Caddyfile now uses an explicit 68,157,440-byte (65 MiB) request envelope: 64 MiB maximum stored build plus 1 MiB multipart overhead. The disposable production smoke includes an HTTPS request one byte above that proxy limit and expects HTTP 413 before application processing. This test is implementation evidence only until the exact candidate run executes successfully.
 
 ## BETA-003 production smoke — not a deployment command
 
@@ -65,7 +65,7 @@ The overlay selects the real Dockerfile `runtime` target and leaves application 
 
 Before starting Caddy, the test verifies that every explicit certificate issuer is internal. HTTPS requests use the copied disposable root certificate with `curl --cacert` and the reserved test hostname; certificate verification is not disabled. Public ACME accounts, real domains and working databases are not used. See [Caddy local_certs](https://caddyserver.com/docs/caddyfile/options#local-certs) and [Compose override semantics](https://docs.docker.com/reference/compose-file/merge/). The overlay requires Compose 2.24.4 or later for `!override`, so public production ports cannot accidentally remain exposed alongside test ports.
 
-The smoke checks production startup, migrations, HTTPS proxy health/home, HTTP redirect, non-root application, private dependency ports, read/write uploads, app replacement with retained database/file probes, refusal of invalid configuration and migration failure, and database outage/recovery. Consult CI and the release map for what actually passed; a test being present is not a passing result. Its cleanup removes only the newly created UUID project. It is not a cleanup recipe for user environments.
+The smoke checks production startup, migrations, HTTPS proxy health/home, HTTP redirect, the 65 MiB Caddy request-body boundary, non-root application, private dependency ports, read/write uploads, app replacement with retained database/file probes, refusal of invalid configuration and migration failure, and database outage/recovery. Consult CI and the release map for what actually passed; a test being present is not a passing result. Its cleanup removes only the newly created UUID project. It is not a cleanup recipe for user environments.
 
 ## Existing database inventory — before any layout change
 
