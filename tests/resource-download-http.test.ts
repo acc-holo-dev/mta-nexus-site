@@ -130,6 +130,7 @@ describe("resource download HTTP contract", () => {
     expect(response.status).toBe(401);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("Vary")).toBe("Cookie");
     expect(await response.json()).toEqual({
       error: "Authentication required to download resource builds",
     });
