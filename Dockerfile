@@ -28,14 +28,29 @@ ENV NODE_ENV=production \
     SMTP_FROM=no-reply@nexus-mta.com
 COPY . .
 RUN pnpm install --frozen-lockfile --prod=false
-RUN pnpm build
+RUN pnpm build \
+    && test -f apps/web/.next/standalone/apps/web/server.js \
+    && test -d apps/web/.next/static
+# Migrations and the optional mail worker intentionally remain TypeScript.
+# Deploy only their production dependency graph instead of copying the whole workspace.
+RUN pnpm --filter @nexus/db --prod deploy /runtime/db \
+    && test -f /runtime/db/src/migrate.ts \
+    && test -f /runtime/db/scripts/run-account-mail-dispatcher.ts \
+    && test -f /runtime/db/node_modules/tsx/package.json
 
 FROM node:26-alpine AS runtime
 WORKDIR /app
-ENV NODE_ENV=production
-COPY --from=build /app /app
+ENV NODE_ENV=production HOSTNAME=0.0.0.0
+# The standalone tree contains the traced Next.js server and runtime dependencies.
+COPY --from=build /app/apps/web/.next/standalone/ /app/
+COPY --from=build /app/apps/web/.next/static /app/apps/web/.next/static
+# Keep the database runtime independently portable for migrations and the opt-in mail worker.
+COPY --from=build /runtime/db /app/packages/db
+COPY --from=build /app/scripts/start-production.sh /app/scripts/start-production.sh
+COPY --from=build /app/scripts/check-local-readiness.mjs /app/scripts/check-local-readiness.mjs
+COPY --from=build /app/scripts/check-account-mail-worker-health.mjs /app/scripts/check-account-mail-worker-health.mjs
 RUN mkdir -p /data/uploads && chown -R node:node /data/uploads
 USER node
 EXPOSE 3000
-# Execute installed tools directly; keep application code and dependencies root-owned.
+# Execute installed runtime tools directly; no package manager is needed in this image.
 CMD ["sh", "scripts/start-production.sh"]
