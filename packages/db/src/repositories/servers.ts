@@ -1,7 +1,7 @@
 import { and, desc, eq, ne } from "drizzle-orm";
 import { db } from "../client";
-import { servers } from "../schema";
-import type { Server } from "@nexus/domain";
+import { auditEvents, servers } from "../schema";
+import type { AuditEvent, Server } from "@nexus/domain";
 
 export class ServerRepository {
   async listActivePublic(limit?: number): Promise<Server[]> {
@@ -68,6 +68,24 @@ export class ServerRepository {
     return rows[0] as unknown as Server;
   }
 
+  async createWithAudit(
+    server: Omit<Server, "createdAt" | "updatedAt">,
+    audit: Omit<AuditEvent, "createdAt">,
+  ): Promise<Server> {
+    return db.transaction(async (tx) => {
+      const now = new Date();
+      const rows = await tx
+        .insert(servers)
+        .values({ ...server, createdAt: now, updatedAt: now })
+        .returning();
+      const created = rows[0];
+      if (!created) throw new Error("Server insert did not return a row");
+
+      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      return created as unknown as Server;
+    });
+  }
+
   async update(
     id: string,
     updates: Partial<Pick<Server, "name" | "description" | "websiteUrl" | "discordUrl" | "rulesUrl" | "mediaUrls" | "language" | "region" | "gameplayTags" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility">>
@@ -78,6 +96,26 @@ export class ServerRepository {
       .where(eq(servers.id, id))
       .returning();
     return (rows[0] as unknown as Server) || null;
+  }
+
+  async updateWithAudit(
+    id: string,
+    updates: Partial<Pick<Server, "name" | "description" | "websiteUrl" | "discordUrl" | "rulesUrl" | "mediaUrls" | "language" | "region" | "gameplayTags" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility">>,
+    audit: Omit<AuditEvent, "createdAt">,
+  ): Promise<Server | null> {
+    return db.transaction(async (tx) => {
+      const now = new Date();
+      const rows = await tx
+        .update(servers)
+        .set({ ...updates, updatedAt: now })
+        .where(eq(servers.id, id))
+        .returning();
+      const updated = rows[0];
+      if (!updated) return null;
+
+      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      return updated as unknown as Server;
+    });
   }
 
 }
