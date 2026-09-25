@@ -113,7 +113,7 @@ export function ServerHistoryPanel({ history }: { history: History }) {
                 >
                   <div className="flex h-full w-full items-end">
                     <div
-                      className="w-full min-h-0.5 rounded-t bg-blue-400/80"
+                      className={point.currentPlayers == null ? "w-full min-h-0.5 rounded-t bg-neutral-700/70" : "w-full min-h-0.5 rounded-t bg-blue-400/80"}
                       style={{ height: `${Math.max(percent, 2)}%` }}
                       aria-hidden="true"
                     />
@@ -135,7 +135,8 @@ export function ServerHistoryPanel({ history }: { history: History }) {
             <Activity className="h-3.5 w-3.5" aria-hidden="true" />
             <span>
               Bars are sampled evenly from stored observations and scaled to
-              the peak stored player count, not to server capacity.
+              the peak stored player count, not to server capacity. Neutral
+              bars mean the player count was unknown.
             </span>
           </div>
         </div>
