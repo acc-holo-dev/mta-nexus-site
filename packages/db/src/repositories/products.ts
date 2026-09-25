@@ -4,6 +4,19 @@ import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
 import type { AuditEvent, Product, ProductType } from "@nexus/domain";
 
+function hasSafePublishedBuild() {
+  return sql`exists (
+    select 1
+    from ${builds}
+    where ${builds.productId} = ${products.id}
+      and ${builds.status} = 'published'
+      and ${builds.scanStatus} = 'clean'
+      and ${builds.scanner} is not null
+      and btrim(${builds.scanner}) <> ''
+      and ${builds.scannedAt} is not null
+  )`;
+}
+
 export interface ProductQueryOptions {
   type?: ProductType;
   featuredOnly?: boolean;
@@ -16,7 +29,11 @@ export interface ProductQueryOptions {
 
 export class ProductRepository {
   async list(options: ProductQueryOptions = {}): Promise<Product[]> {
-    const conditions = [eq(products.status, "published")];
+    const conditions = [
+      eq(products.status, "published"),
+      eq(products.price, 0),
+      hasSafePublishedBuild(),
+    ];
     if (options.type) conditions.push(eq(products.type, options.type));
     if (options.featuredOnly) conditions.push(eq(products.isFeatured, true));
     if (options.minPrice !== undefined) conditions.push(gte(products.price, options.minPrice));
@@ -68,6 +85,7 @@ export class ProductRepository {
           eq(products.organizationId, organizationId),
           eq(products.status, "published"),
           eq(products.price, 0),
+          hasSafePublishedBuild(),
         ),
       )
       .orderBy(desc(products.createdAt), desc(products.id))
@@ -103,6 +121,7 @@ export class ProductRepository {
           inArray(products.slug, normalized),
           eq(products.status, "published"),
           eq(products.price, 0),
+          hasSafePublishedBuild(),
         ),
       )
       .limit(25);
@@ -127,6 +146,7 @@ export class ProductRepository {
         and(
           eq(products.status, "published"),
           eq(products.price, 0),
+          hasSafePublishedBuild(),
           ne(products.slug, normalized),
           sql`coalesce(${products.compatibility}->'dependencies', '[]'::jsonb) @> ${JSON.stringify([normalized])}::jsonb`,
         ),
