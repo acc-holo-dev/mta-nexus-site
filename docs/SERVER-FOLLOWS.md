@@ -55,3 +55,23 @@ The follow-state GET:
 - does not mutate state.
 
 POST still verifies the target exists and rejects private/suspended server targets. DELETE remains idempotent so stale follows can be cleaned up even when a target is no longer publicly followable.
+
+## SERVER-005 moderated publication notifications
+
+SERVER-005 adds one concrete notification producer to server follows: when a moderator changes server-linked content from a non-published state to `published`, followers can receive a `type=server`, `category=server` notification linking to that published content.
+
+This does **not** change the meaning of live server monitoring. It still does not produce online/offline, uptime, player-count threshold or master-list alerts.
+
+### Safety and delivery rules
+
+- direct community-content creation does not invoke this fan-out;
+- only the audited moderator publication path invokes it;
+- private or suspended servers are skipped;
+- the content author is not notified about their own publication;
+- `serverEnabled=false` suppresses delivery through the existing notification preference repository;
+- delivery is capped at 100 eligible followers per publication;
+- notification work runs in batches of at most 10 concurrent deliveries;
+- the cap reports a truncation sentinel internally instead of pretending all followers were processed;
+- a notification failure is secondary and cannot turn an already-completed publication into a failed moderation response.
+
+This first fan-out is synchronous and best-effort. It is suitable for the closed-beta scale but is not a durable high-volume notification system. A future large-scale design should move publication fan-out to an accepted transactional outbox/worker rather than increasing the synchronous cap.
