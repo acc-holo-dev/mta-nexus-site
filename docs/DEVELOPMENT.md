@@ -27,6 +27,38 @@ CI also runs `PostgreSQL persistence` and `Local Docker startup`. The latter use
 
 Node infrastructure tests use `*.node-test.mjs` filenames and explicit `node --test` execution so that Vitest does not collect them as its own suites.
 
+### Scenario Lab
+
+Scenario Lab creates small, deterministic UI/backend states in the **canonical Docker-only local development database**. It is intentionally narrower than the legacy broad seed and must never be used on production, CI, a remote database or a customized database URL.
+
+List available scenarios without touching the database:
+
+```bash
+docker compose -p nexus-local -f compose.yaml exec app pnpm scenario:list
+```
+
+Apply one scenario with an explicit opt-in:
+
+```bash
+docker compose -p nexus-local -f compose.yaml exec \\
+  -e NEXUS_SCENARIO_LAB=true app \\
+  pnpm scenario:create moderation-queue
+```
+
+Clean only that scenario's namespaced records:
+
+```bash
+docker compose -p nexus-local -f compose.yaml exec \\
+  -e NEXUS_SCENARIO_LAB=true app \\
+  pnpm scenario:cleanup moderation-queue
+```
+
+Initial scenarios are `expired-session`, `private-server-owner`, `moderation-queue` and `resource-scan-pending`. Apply is idempotent: the selected scenario's own `scn_*` records are removed and recreated inside one transaction. Cleanup addresses explicit scenario IDs; there is no blanket truncate/reset operation.
+
+Active-session scenarios print a freshly generated local `nexus_session` token to stdout for manual browser testing. They create no password credential and persist no plaintext secret in the repository. Treat the token as a temporary credential and clean the scenario when finished.
+
+The guard requires `NODE_ENV=development`, `NEXUS_SCENARIO_LAB=true`, disabled email delivery, the exact canonical local Compose database URL and an HTTP localhost application URL. It also refuses GitHub Actions. Scenario Lab is development convenience, not test evidence or release acceptance.
+
 ## 4. Evidence and limitations
 
 BETA-002 startup evidence: [CI №865, Local Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35940008117/job/107445602459), commit `bc048baaea71985e74d00faed4f66095dd518926`, Linux x86_64. Five readiness-helper tests passed locally on Node 22.16.0 and inside the development container in CI. The container run is the evidence for the project runtime; local helper tests do not prove Docker startup.
