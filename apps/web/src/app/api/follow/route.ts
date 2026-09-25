@@ -11,7 +11,7 @@ import {
 import { consumeRateLimit, generateId } from "@nexus/security";
 
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;
-const privateHeaders = { "Cache-Control": "private, no-store" };
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
 type TargetType = (typeof ALLOWED_TARGET_TYPES)[number];
 
