@@ -62,7 +62,9 @@ describe("MTA server control challenge integration", () => {
   it("requires a fresh live name token and creates exactly one moderation request", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
     const userId = `usr_control_${suffix}`;
+    const attackerId = `usr_control_attacker_${suffix}`;
     const sessionToken = `tok_control_${suffix}`;
+    const attackerToken = `tok_control_attacker_${suffix}`;
     const serverId = `srv_control_${suffix}`;
     const address = "198.51.100.211";
     const port = 18_000 + ((Date.now() + process.pid) % 30_000);
@@ -78,6 +80,19 @@ describe("MTA server control challenge integration", () => {
       id: `ses_control_${suffix}`,
       userId,
       token: sessionToken,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
+    await userRepository.create({
+      id: attackerId,
+      email: `server_control_attacker_${suffix}@nexus.test`,
+      username: `server_control_attacker_${suffix}`,
+      displayName: "Server Control Attacker",
+      role: "user",
+    });
+    await sessionRepository.create({
+      id: `ses_control_attacker_${suffix}`,
+      userId: attackerId,
+      token: attackerToken,
       expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
     await serverRepository.create({
@@ -120,6 +135,31 @@ describe("MTA server control challenge integration", () => {
     expect(storedChallenge?.tokenDigest).toMatch(/^[0-9a-f]{64}$/u);
     expect(storedChallenge?.tokenDigest).not.toBe(controlToken);
     expect(JSON.stringify(storedChallenge)).not.toContain(controlToken);
+
+    directoryState.current = {
+      fetchedAt: new Date(Date.now() + 4_000).toISOString(),
+      isStale: false,
+      servers: [
+        {
+          address,
+          port,
+          name: `Control Challenge Server ${controlToken}`,
+          responding: true,
+        },
+      ],
+    };
+    const stolenToken = await verifyChallenge(
+      post(
+        `http://nexus.test/api/servers/${serverId}/claim-challenge/verify`,
+        attackerToken,
+        { challengeId, token: controlToken },
+      ),
+      { params: Promise.resolve({ id: serverId }) },
+    );
+    expect(stolenToken.status).toBe(400);
+    expect(await stolenToken.json()).toMatchObject({
+      code: "INVALID_SERVER_CONTROL_CHALLENGE",
+    });
 
     const bypass = await genericVerification(
       post(
