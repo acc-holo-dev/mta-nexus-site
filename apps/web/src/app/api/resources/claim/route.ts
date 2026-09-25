@@ -5,6 +5,8 @@ import { claimResourceSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
 import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
 
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+
 export async function POST(request: NextRequest) {
   try {
     const ip = getTrustedRequestIp(request);
@@ -12,22 +14,27 @@ export async function POST(request: NextRequest) {
     if (!rateLimit.success) {
       return NextResponse.json(
         { error: "Too many resource claims. Please try again later." },
-        { status: 429 }
-      );
-    }
-
-    const parsed = claimResourceSchema.safeParse(await request.json().catch(() => null));
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid resource claim", details: parsed.error.format() },
-        { status: 400 }
+        { status: 429, headers: privateHeaders }
       );
     }
 
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401, headers: privateHeaders },
+      );
+    }
+
+    const parsed = claimResourceSchema.safeParse(
+      await request.json().catch(() => null),
+    );
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid resource claim", details: parsed.error.format() },
+        { status: 400, headers: privateHeaders },
+      );
     }
 
     const result = await commerceService.claimFreeResource({
@@ -35,7 +42,10 @@ export async function POST(request: NextRequest) {
       productId: parsed.data.productId,
     });
 
-    return NextResponse.json(result, { status: result.alreadyClaimed ? 200 : 201 });
+    return NextResponse.json(result, {
+      status: result.alreadyClaimed ? 200 : 201,
+      headers: privateHeaders,
+    });
   } catch (error: unknown) {
     const appError =
       error instanceof Error && "statusCode" in error
@@ -44,7 +54,7 @@ export async function POST(request: NextRequest) {
     console.error("Resource claim API error:", error);
     return NextResponse.json(
       { error: appError?.message || "Resource claim failed" },
-      { status: appError?.statusCode || 500 }
+      { status: appError?.statusCode || 500, headers: privateHeaders }
     );
   }
 }
