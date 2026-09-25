@@ -12,16 +12,18 @@ import {
 import { createReportSchema } from "@nexus/validation";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
 
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
   if (!user || !can(user, "admin.moderation")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 403, headers: privateHeaders });
   }
 
   const reports = await reportRepository.listAll();
-  return NextResponse.json({ reports });
+  return NextResponse.json({ reports }, { headers: privateHeaders });
 }
 
 export async function POST(request: NextRequest) {
