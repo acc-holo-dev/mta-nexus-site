@@ -7,7 +7,6 @@ import { contentService } from "../../../../lib/services/content-service";
 import {
   productRepository,
   reportRepository,
-  auditRepository,
   verificationRepository,
 } from "@nexus/db";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
@@ -44,11 +43,23 @@ export async function POST(request: NextRequest) {
     }
     const { targetType, targetId, action, notes } = parsed.data;
 
+    const makeAudit = () => ({
+      id: generateId("aud"),
+      actorId: user.id,
+      actorType: "admin" as const,
+      action: `admin.${action}`,
+      targetId,
+      targetType,
+      details: { notes },
+    });
+
     if (targetType === "product") {
       if (action === "feature" || action === "unfeature") {
-        const updated = await productRepository.update(targetId, {
-          isFeatured: action === "feature",
-        });
+        const updated = await productRepository.updateWithAudit(
+          targetId,
+          { isFeatured: action === "feature" },
+          makeAudit(),
+        );
         if (!updated) {
           return NextResponse.json(
             { error: "Product not found" },
@@ -56,7 +67,10 @@ export async function POST(request: NextRequest) {
           );
         }
       } else if (action === "suspend") {
-        const suspended = await productRepository.suspendPublished(targetId);
+        const suspended = await productRepository.suspendPublished(
+          targetId,
+          makeAudit(),
+        );
         if (!suspended) {
           const current = await productRepository.findById(targetId);
           if (!current) {
@@ -74,6 +88,7 @@ export async function POST(request: NextRequest) {
       } else {
         const restore = await productRepository.restoreSuspendedWithPublishedBuild(
           targetId,
+          makeAudit(),
         );
         if (restore === "not_found") {
           return NextResponse.json(
@@ -101,7 +116,8 @@ export async function POST(request: NextRequest) {
         const resolved = await reportRepository.resolve(
           targetId,
           action === "resolve" ? "resolved" : "dismissed",
-          notes || ""
+          notes || "",
+          makeAudit(),
         );
         if (!resolved) {
           return NextResponse.json({ error: "Report not found" }, { status: 404 });
@@ -110,12 +126,15 @@ export async function POST(request: NextRequest) {
     } else if (targetType === "verification") {
       // Verification can only be granted through the moderation workflow
       if (action === "approve" || action === "reject") {
-        const resolved = await verificationRepository.resolveRequest({
-          id: targetId,
-          reviewerId: user.id,
-          decision: action === "approve" ? "approved" : "rejected",
-          reviewNotes: notes,
-        });
+        const resolved = await verificationRepository.resolveRequest(
+          {
+            id: targetId,
+            reviewerId: user.id,
+            decision: action === "approve" ? "approved" : "rejected",
+            reviewNotes: notes,
+          },
+          makeAudit(),
+        );
 
         if (!resolved) {
           return NextResponse.json(
@@ -132,18 +151,6 @@ export async function POST(request: NextRequest) {
       }, user);
     } else if (targetType === "content") {
       await contentService.moderateContent(targetId, action, user, notes);
-    }
-
-    if (targetType !== "build") {
-      await auditRepository.record({
-        id: generateId("aud"),
-        actorId: user.id,
-        actorType: "admin",
-        action: `admin.${action}`,
-        targetId,
-        targetType,
-        details: { notes },
-      });
     }
 
     return NextResponse.json({ success: true, action, targetId });
