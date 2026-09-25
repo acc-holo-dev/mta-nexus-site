@@ -27,7 +27,15 @@ export class BuildRepository {
     const rows = await db
       .select()
       .from(builds)
-      .where(and(eq(builds.productId, productId), eq(builds.status, "published")))
+      .where(
+        and(
+          eq(builds.productId, productId),
+          eq(builds.status, "published"),
+          eq(builds.scanStatus, "clean"),
+          isNotNull(builds.scanner),
+          isNotNull(builds.scannedAt),
+        ),
+      )
       .orderBy(desc(builds.createdAt), desc(builds.id));
     return rows as unknown as Build[];
   }
@@ -84,7 +92,10 @@ export class BuildRepository {
         .from(builds)
         .where(and(
           eq(builds.productId, data.productId),
-          eq(builds.status, "published")
+          eq(builds.status, "published"),
+            eq(builds.scanStatus, "clean"),
+            isNotNull(builds.scanner),
+            isNotNull(builds.scannedAt)
         ))
         .limit(1);
       if (!published[0]) {
@@ -147,6 +158,9 @@ export class BuildRepository {
             and(
               eq(builds.productId, reviewed.productId),
               eq(builds.status, "published"),
+              eq(builds.scanStatus, "clean"),
+              isNotNull(builds.scanner),
+              isNotNull(builds.scannedAt),
             ),
           )
           .orderBy(desc(builds.createdAt), desc(builds.id))
@@ -170,7 +184,10 @@ export class BuildRepository {
           .where(and(
             eq(builds.productId, reviewed.productId),
             ne(builds.id, reviewed.id),
-            eq(builds.status, "published")
+            eq(builds.status, "published"),
+            eq(builds.scanStatus, "clean"),
+            isNotNull(builds.scanner),
+            isNotNull(builds.scannedAt)
           ))
           .orderBy(desc(builds.createdAt), desc(builds.id))
           .limit(1);
@@ -217,7 +234,10 @@ export class BuildRepository {
         .where(and(
           eq(builds.productId, retired.productId),
           ne(builds.id, retired.id),
-          eq(builds.status, "published")
+          eq(builds.status, "published"),
+            eq(builds.scanStatus, "clean"),
+            isNotNull(builds.scanner),
+            isNotNull(builds.scannedAt)
         ))
         .orderBy(desc(builds.createdAt), desc(builds.id))
         .limit(1);
