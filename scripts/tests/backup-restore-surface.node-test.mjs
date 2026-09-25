@@ -5,6 +5,15 @@ import test from "node:test";
 
 const read = (path) => readFileSync(resolve(process.cwd(), path), "utf8");
 
+function expectSourceOrder(source, needles) {
+  let previous = -1;
+  for (const needle of needles) {
+    const index = source.indexOf(needle);
+    assert(index > previous, `Expected source order for: ${needle}`);
+    previous = index;
+  }
+}
+
 test("backup restore rehearsal refuses non-disposable Docker environments", () => {
   const script = read("scripts/check-backup-restore.mjs");
 
@@ -25,6 +34,23 @@ test("backup restore rehearsal never targets repository or production volume nam
   assert.match(script, /"volume", "rm", name/u);
   assert.doesNotMatch(script, /docker\s+volume\s+prune/u);
   assert.doesNotMatch(script, /down", "--volumes/u);
+});
+
+test("new volumes enter the cleanup registry before post-create validation", () => {
+  const script = read("scripts/check-backup-restore.mjs");
+  const createStart = script.indexOf("function createOwnedVolume");
+  const createEnd = script.indexOf("function removeOwnedVolume", createStart);
+  const section = script.slice(createStart, createEnd);
+
+  expectSourceOrder(section, [
+    "docker([",
+    '"volume",',
+    '"create",',
+    "createdVolumes.push({ name, token })",
+    "assert.equal(created, name)",
+    'docker(["volume", "inspect", name])',
+    "assertOwnedVolume(inspected, name, token)",
+  ]);
 });
 
 test("rehearsal covers migrated application database and private uploads transfer", () => {
