@@ -88,3 +88,12 @@ For organization-owned servers, a historical personal `ownerId` value is not an 
 For organization-owned products, `authorId` remains attribution and likewise does not override current organization permissions.
 
 This means revoking organization authority is effective even when legacy attribution/ownership columns still contain the former manager's user ID.
+
+
+## Public organization profile query boundary
+
+The public organization profile queries published resources and content by `organizationId` in PostgreSQL before applying the display limit.
+
+It must not load a global top-N catalogue/feed and then filter in application memory. That pattern can hide valid organization releases when unrelated global records fill the upstream limit first.
+
+Both organization profile queries remain public-only and bounded to 100 rows per content family in this beta surface.
