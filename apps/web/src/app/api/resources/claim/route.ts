@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { commerceService } from "../../../../lib/services/commerce-service";
 import { authService } from "../../../../lib/services/auth-service";
 import { claimResourceSchema } from "@nexus/validation";
-import { consumeRateLimit, getClientIp } from "@nexus/security";
+import { consumeRateLimit } from "@nexus/security";
+import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = getClientIp(request.headers);
+    const ip = getTrustedRequestIp(request);
     const rateLimit = await consumeRateLimit("resourceClaim", ip);
     if (!rateLimit.success) {
       return NextResponse.json(
