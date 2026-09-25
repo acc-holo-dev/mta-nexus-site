@@ -77,3 +77,14 @@ Organization product authority follows the current organization relationship:
 If a delegated creator loses the membership or `manage_products` permission that allowed them to manage the organization resource, they can no longer preview the draft or release/retire builds merely because their user ID remains in `authorId`.
 
 Personal products without `organizationId` keep the existing direct-author management rule.
+
+
+## Legacy organization ownership fields
+
+Authority follows the organization whenever `organizationId` is present.
+
+For organization-owned servers, a historical personal `ownerId` value is not an authority override. This protects migrated/legacy rows created before organization server creation stopped assigning the submitting user as personal owner.
+
+For organization-owned products, `authorId` remains attribution and likewise does not override current organization permissions.
+
+This means revoking organization authority is effective even when legacy attribution/ownership columns still contain the former manager's user ID.
