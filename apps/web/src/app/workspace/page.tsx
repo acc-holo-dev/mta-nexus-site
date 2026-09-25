@@ -35,7 +35,7 @@ export default async function WorkspacePage() {
           href="/auth/login"
           className="inline-block px-4 py-2 rounded-md bg-accent text-white text-xs font-semibold"
         >
-          Sign in
+          {dictionary.workspace.signIn}
         </Link>
       </div>
     );
@@ -148,7 +148,7 @@ export default async function WorkspacePage() {
                   </div>
                   {product && (
                     <Link href={`/market/${product.slug}`} className="text-xs font-semibold text-accent">
-                      Open
+                      {dictionary.workspace.open}
                     </Link>
                   )}
                 </div>
@@ -190,7 +190,7 @@ export default async function WorkspacePage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <Link href={"/workspace/servers/" + server.id} className="text-xs font-semibold text-accent">
-                      Manage
+                      {dictionary.workspace.manage}
                     </Link>
                     <StatusBadge
                       status={isOnline ? "online" : isOffline ? "offline" : "unknown"}
