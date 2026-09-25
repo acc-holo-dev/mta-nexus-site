@@ -2,11 +2,7 @@ import {
   serverObservationRepository,
   serverRepository,
 } from "@nexus/db";
-import type { Server, ServerObservation } from "@nexus/domain";
-import {
-  matchesMtaEndpoint,
-  mtaMasterDirectoryService,
-} from "./mta-master-directory-service";
+import type { ServerObservation } from "@nexus/domain";
 
 export const serverHistoryWindows = {
   "24h": 24,
@@ -67,60 +63,6 @@ export function summarizeServerObservations(
   });
 }
 
-type CaptureResult = Readonly<{
-  status: "recorded" | "not_listed" | "upstream_unavailable";
-  sourceFetchedAt: string | null;
-  sourceWasStale: boolean | null;
-}>;
-
-async function captureCurrentMasterObservation(
-  server: Server,
-): Promise<CaptureResult> {
-  let directory;
-  try {
-    directory = await mtaMasterDirectoryService.getDirectory();
-  } catch {
-    return Object.freeze({
-      status: "upstream_unavailable",
-      sourceFetchedAt: null,
-      sourceWasStale: null,
-    });
-  }
-
-  const observed = directory.servers.find((item) =>
-    matchesMtaEndpoint(server, item),
-  );
-
-  if (!observed) {
-    return Object.freeze({
-      status: "not_listed",
-      sourceFetchedAt: directory.fetchedAt,
-      sourceWasStale: directory.isStale,
-    });
-  }
-
-  await serverObservationRepository.record({
-    serverId: server.id,
-    source: "mta_master",
-    sourceSequence: directory.fetchedAt,
-    name: observed.name,
-    gameMode: observed.gameMode,
-    mapName: observed.mapName,
-    mtaVersion: observed.version,
-    currentPlayers: observed.players,
-    maxPlayers: observed.maxPlayers,
-    passworded: observed.passworded,
-    responding: observed.responding,
-    observedAt: new Date(directory.fetchedAt),
-  });
-
-  return Object.freeze({
-    status: "recorded",
-    sourceFetchedAt: directory.fetchedAt,
-    sourceWasStale: directory.isStale,
-  });
-}
-
 export const serverHistoryService = {
   async getHistory(
     serverId: string,
@@ -129,7 +71,6 @@ export const serverHistoryService = {
     const server = await serverRepository.findById(serverId);
     if (!server || server.visibility === "private") return null;
 
-    const capture = await captureCurrentMasterObservation(server);
     const hours = serverHistoryWindows[window];
     const observations = await serverObservationRepository.listWindow(
       server.id,
@@ -145,9 +86,9 @@ export const serverHistoryService = {
       },
       source: "mta_master" as const,
       window,
-      coverage: "demand_driven_confirmed_listings" as const,
+      coverage: "stored_confirmed_observations" as const,
+      collectionMode: "collector_required" as const,
       absenceMeansOffline: false as const,
-      capture,
       summary: summarizeServerObservations(observations),
       observations: observations.map((observation) => ({
         observedAt: new Date(observation.observedAt).toISOString(),
