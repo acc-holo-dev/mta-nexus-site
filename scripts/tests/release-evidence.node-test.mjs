@@ -6,6 +6,24 @@ import { join, resolve } from "node:path";
 import { test } from "node:test";
 
 const root = resolve(import.meta.dirname, "../..");
+const evidenceEnvNames = [
+  "NEXUS_EVIDENCE_VERIFY",
+  "NEXUS_EVIDENCE_ACCOUNT_BROWSER",
+  "NEXUS_EVIDENCE_DIRECTORY_BROWSER",
+  "NEXUS_EVIDENCE_POSTGRES_PERSISTENCE",
+  "NEXUS_EVIDENCE_LOCAL_DOCKER",
+  "NEXUS_EVIDENCE_PRODUCTION_DOCKER",
+  "NEXUS_EVIDENCE_COMMIT",
+  "NEXUS_EVIDENCE_REF",
+  "NEXUS_EVIDENCE_PRODUCTION_IMAGE_DIGEST",
+  "NEXUS_EVIDENCE_OUTPUT_DIR",
+];
+
+function cleanEnvironment() {
+  const env = { ...process.env };
+  for (const name of evidenceEnvNames) delete env[name];
+  return env;
+}
 
 test("release evidence stays descriptive even when every recorded gate passes", async () => {
   const output = await mkdtemp(join(tmpdir(), "nexus-release-evidence-"));
@@ -18,7 +36,7 @@ test("release evidence stays descriptive even when every recorded gate passes", 
         cwd: root,
         encoding: "utf8",
         env: {
-          ...process.env,
+          ...cleanEnvironment(),
           NEXUS_EVIDENCE_OUTPUT_DIR: output,
           NEXUS_EVIDENCE_COMMIT: "0123456789abcdef",
           NEXUS_EVIDENCE_REF: "test-ref",
@@ -65,7 +83,7 @@ test("unrecorded gates keep the evidence incomplete", async () => {
       cwd: root,
       encoding: "utf8",
       env: {
-        ...process.env,
+        ...cleanEnvironment(),
         NEXUS_EVIDENCE_OUTPUT_DIR: output,
         NEXUS_EVIDENCE_COMMIT: "fedcba9876543210",
         NEXUS_EVIDENCE_REF: "partial-test",
