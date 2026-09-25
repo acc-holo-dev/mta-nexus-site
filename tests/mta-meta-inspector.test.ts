@@ -151,6 +151,25 @@ describe("MTA meta.xml inspector", () => {
     );
   });
 
+  it("bounds repeated manifest entries and reports truncation", () => {
+    const repeated = Array.from(
+      { length: metaInspectionLimits.maxEntriesPerKind + 25 },
+      (_, index) => `<file src="file-${index}.dat" />`,
+    ).join("");
+    const result = inspectMtaMetaXml(`<meta>${repeated}</meta>`);
+
+    expect(result.files).toHaveLength(metaInspectionLimits.maxEntriesPerKind);
+    expect(result.issues).toContainEqual(
+      expect.objectContaining({
+        code: "FILE_ENTRY_LIMIT_REACHED",
+        severity: "warning",
+      }),
+    );
+    expect(result.issues.length).toBeLessThanOrEqual(
+      metaInspectionLimits.maxIssues,
+    );
+  });
+
   it("keeps invalid numeric entities inert instead of throwing RangeError", () => {
     const result = inspectMtaMetaXml(
       '<meta><info name="&#999999999999999999999;" /></meta>',
