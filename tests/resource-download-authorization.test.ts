@@ -3,56 +3,35 @@ import { decideResourceDownloadAccess } from "../apps/web/src/lib/resource-downl
 
 describe("resource download authorization matrix", () => {
   const published = {
-    authorId: "usr_author",
     status: "published" as const,
   };
 
-  it("allows author, admin and entitled users for published resources", () => {
+  it("allows current resource managers and entitled users", () => {
     expect(
-      decideResourceDownloadAccess(
-        { id: "usr_author", role: "developer" },
-        published,
-        false,
-      ),
-    ).toEqual({ allowed: true, reason: "author" });
+      decideResourceDownloadAccess(published, true, false),
+    ).toEqual({ allowed: true, reason: "manager" });
 
     expect(
-      decideResourceDownloadAccess(
-        { id: "usr_admin", role: "admin" },
-        published,
-        false,
-      ),
-    ).toEqual({ allowed: true, reason: "admin" });
-
-    expect(
-      decideResourceDownloadAccess(
-        { id: "usr_player", role: "user" },
-        published,
-        true,
-      ),
+      decideResourceDownloadAccess(published, false, true),
     ).toEqual({ allowed: true, reason: "entitlement" });
   });
 
-  it("denies an unentitled other user", () => {
+  it("denies a non-manager without entitlement", () => {
     expect(
-      decideResourceDownloadAccess(
-        { id: "usr_player", role: "user" },
-        published,
-        false,
-      ),
+      decideResourceDownloadAccess(published, false, false),
     ).toEqual({ allowed: false, reason: "entitlement_required" });
   });
 
-  it("fails closed for unpublished resources even for author/admin/entitled users", () => {
+  it("fails closed for unpublished resources regardless of management or entitlement", () => {
     for (const input of [
-      { user: { id: "usr_author", role: "developer" as const }, entitlement: false },
-      { user: { id: "usr_admin", role: "admin" as const }, entitlement: false },
-      { user: { id: "usr_player", role: "user" as const }, entitlement: true },
+      { manager: true, entitlement: false },
+      { manager: false, entitlement: true },
+      { manager: true, entitlement: true },
     ]) {
       expect(
         decideResourceDownloadAccess(
-          input.user,
-          { authorId: "usr_author", status: "draft" },
+          { status: "draft" },
+          input.manager,
           input.entitlement,
         ),
       ).toEqual({
