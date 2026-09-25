@@ -134,6 +134,13 @@
       "when": 1790248000000,
       "tag": "0018_account_mail_delivery_events",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1790252000000,
+      "tag": "0019_server_claim_challenges",
+      "breakpoints": true
     }
   ]
 }
