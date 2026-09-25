@@ -150,8 +150,16 @@ function run() {
         name,
       ]),
     ).trim();
-    assert.equal(created, name);
+
+    // Register cleanup immediately after Docker reports success. Any later
+    // assertion must still leave finally() able to remove this exact volume.
     createdVolumes.push({ name, token });
+    assert.equal(created, name);
+
+    const inspected = JSON.parse(
+      String(docker(["volume", "inspect", name])),
+    )[0];
+    assertOwnedVolume(inspected, name, token);
   }
 
   function removeOwnedVolume(name, token) {
