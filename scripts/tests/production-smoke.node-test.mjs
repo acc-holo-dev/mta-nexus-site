@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { localCertificateConfig, assertIsolatedProduction, assertInternalIssuer } from '../production-smoke-contract.mjs';
 const project = 'nexus-prod-ci-11111111-1111-1111-1111-111111111111';
@@ -15,6 +16,14 @@ const fixture = () => ({
       { host_ip: '127.0.0.1', published: '8443', target: 443 },
     ], volumes: [{ type: 'bind', source: '/tmp/test/Caddyfile', target: '/etc/caddy/Caddyfile', read_only: true }] },
   }, volumes: { uploads: { name: `${project}_uploads` } }, networks: { default: { name: `${project}_default` } },
+});
+test('production Caddy upload limit uses the binary application envelope', () => {
+  const caddy = readFileSync(
+    new URL('../../deploy/Caddyfile', import.meta.url),
+    'utf8',
+  );
+  assert.match(caddy, /max_size\s+65MiB\b/);
+  assert.doesNotMatch(caddy, /max_size\s+65MB\b/);
 });
 test('only adds a local CA policy, preserving production proxy text', () => {
   const source = '{\n  email {$ACME_EMAIL}\n}\n{$DOMAIN} {\n  reverse_proxy app:3000\n}\n';
