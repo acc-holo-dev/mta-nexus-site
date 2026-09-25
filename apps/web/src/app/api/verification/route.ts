@@ -4,7 +4,6 @@ import {
   auditRepository,
   notificationRepository,
   organizationRepository,
-  serverRepository,
   userRepository,
   verificationRepository,
 } from "@nexus/db";
@@ -59,21 +58,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (parsed.data.targetType === "server") {
+      return NextResponse.json(
+        {
+          error:
+            "Server ownership verification requires the MTA control challenge flow.",
+          code: "SERVER_CONTROL_CHALLENGE_REQUIRED",
+        },
+        { status: 422 },
+      );
+    }
+
     let targetIsVerified = false;
     if (parsed.data.targetType === "user" || parsed.data.targetType === "developer") {
       if (parsed.data.targetId !== user.id) {
         return NextResponse.json({ error: "You can only verify your own profile" }, { status: 403 });
       }
       targetIsVerified = user.isVerified;
-    } else if (parsed.data.targetType === "server") {
-      const server = await serverRepository.findById(parsed.data.targetId);
-      if (!server) {
-        return NextResponse.json({ error: "Server was not found" }, { status: 404 });
-      }
-      if (server.ownerId && server.ownerId !== user.id) {
-        return NextResponse.json({ error: "This server is already claimed" }, { status: 409 });
-      }
-      targetIsVerified = server.isVerified;
     } else {
       const organization = await organizationRepository.findById(parsed.data.targetId);
       if (!organization) {
