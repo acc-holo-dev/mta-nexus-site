@@ -59,7 +59,7 @@ The restore phase:
 7. verifies both upload file contents;
 8. removes all restore containers and owned volumes.
 
-The temporary backup files are removed when the rehearsal completes.
+Both temporary backup files are forced to owner-only mode `0600` before restore. The workflow checkout also disables persisted Git credentials. The temporary backup files are removed when the rehearsal completes.
 
 ## CI job
 
