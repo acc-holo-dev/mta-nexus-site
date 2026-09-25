@@ -19,6 +19,9 @@ describe("server update feed surface", () => {
     expect(repository).toContain('"announcement"');
     expect(repository).toContain('eq(content.status, "published")');
     expect(repository).toContain("inArray(content.type, publicServerUpdateTypes)");
+    expect(repository).toContain(
+      "coalesce(${content.publishedAt}, ${content.updatedAt})",
+    );
     expect(repository).not.toContain(
       'publicServerUpdateTypes: Content["type"][] = ["post"',
     );
