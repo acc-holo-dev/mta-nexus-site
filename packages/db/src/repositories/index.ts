@@ -4,6 +4,7 @@ export * from "./auth";
 export * from "./organizations";
 export * from "./servers";
 export * from "./server-observations";
+export * from "./server-claim-challenges";
 export * from "./products";
 export * from "./builds";
 export * from "./licenses";
