@@ -92,6 +92,4 @@ export const clamAvScanner: BuildScanner = {
 export const buildScannerService = config.BUILD_SCANNER === "clamav"
   ? clamAvScanner
   : disabledScanner;
-import net from "node:net";
-import { config } from "@nexus/config";
 
