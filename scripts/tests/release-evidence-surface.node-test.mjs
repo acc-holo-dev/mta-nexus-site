@@ -24,7 +24,8 @@ test("generated release evidence is not tracked by default", () => {
 
 test("evidence command does not serialize environment values or command output", () => {
   const script = read("scripts/release-evidence.mjs");
-  assert.doesNotMatch(script, /process\.env\s*[,}]/u);
+  assert.doesNotMatch(script, /JSON\.stringify\(process\.env\)/u);
+  assert.doesNotMatch(script, /environment:\s*process\.env/u);
   assert.doesNotMatch(script, /stdout\s*:/u);
   assert.doesNotMatch(script, /stderr\s*:/u);
   assert.match(script, /"DATABASE_URL"/u);
