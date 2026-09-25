@@ -3,6 +3,7 @@ import { generateId, can } from "@nexus/security";
 import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Product, Build, User, ProductType } from "@nexus/domain";
 import { buildProductDependencyResolution } from "../product-dependency-resolution";
+import { buildReverseDependencySummary, reverseDependencyLimits } from "../reverse-dependency-summary";
 
 export interface ProductFilters {
   query?: string;
@@ -72,6 +73,15 @@ export class ProductService {
       product,
       publishedDependencies,
     );
+  }
+
+  async getReverseDependencySummary(productSlug: string) {
+    const dependents =
+      await productRepository.listPublishedFreeDependingOnSlug(
+        productSlug,
+        reverseDependencyLimits.query,
+      );
+    return buildReverseDependencySummary(productSlug, dependents);
   }
 
   async createProduct(
