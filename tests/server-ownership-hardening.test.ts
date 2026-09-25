@@ -59,6 +59,22 @@ describe("server ownership hardening surface", () => {
     expect(route).toContain("error instanceof AppError");
   });
 
+  it("preserves private cache semantics on the authenticated verification GET", () => {
+    const route = read(
+      "apps/web/src/app/api/verification/route.ts",
+    );
+
+    expect(route).toContain(
+      'const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" }',
+    );
+    expect(route).toContain(
+      'return NextResponse.json({ requests }, { headers: privateHeaders })',
+    );
+    expect(route).toContain(
+      '{ status: 401, headers: privateHeaders }',
+    );
+  });
+
   it("does not claim automatic proof or live-ownership acceptance", () => {
     const route = read(
       "apps/web/src/app/api/verification/route.ts",
