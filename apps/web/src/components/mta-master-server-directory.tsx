@@ -128,7 +128,11 @@ function ServerCard({
   );
 }
 
-export function MtaMasterServerDirectory({ locale }: { locale: Locale }) {
+export function MtaMasterServerDirectory({
+  locale = "en",
+}: {
+  locale?: Locale;
+}) {
   const dictionary = getDictionary(locale);
   const copy = dictionary.servers;
   const [query, setQuery] = useState("");
