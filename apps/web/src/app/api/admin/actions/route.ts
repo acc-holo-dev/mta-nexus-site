@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AppError } from "@nexus/domain";
 import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
@@ -104,6 +105,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, action, targetId });
   } catch (error: unknown) {
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode },
+      );
+    }
     console.error("Admin action error:", error);
     return NextResponse.json({ error: "Failed to execute administrative action" }, { status: 500 });
   }
