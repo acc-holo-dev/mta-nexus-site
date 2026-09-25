@@ -27,6 +27,20 @@ CI also runs `PostgreSQL persistence` and `Local Docker startup`. The latter use
 
 Node infrastructure tests use `*.node-test.mjs` filenames and explicit `node --test` execution so that Vitest does not collect them as its own suites.
 
+### Environment doctor
+
+For a non-destructive host-side prerequisite check, run:
+
+```bash
+pnpm nexus:doctor
+# or without pnpm:
+node scripts/nexus-doctor.mjs
+```
+
+Use `--json` for machine-readable output. The doctor reads no secret values and performs no container/database mutations. It checks required project files, Node/pnpm alignment, Docker/Compose availability, Linux-container mode, Docker context, local Compose rendering, development-port availability and host-memory context. A warning is advisory; a failure makes the command exit non-zero. Host RAM does not prove Docker's configured memory limit, and a busy port may simply mean an existing NEXUS instance is already running.
+
+The doctor is a convenience diagnostic, not release evidence and not a replacement for the disposable CI startup checks.
+
 ## 4. Evidence and limitations
 
 BETA-002 startup evidence: [CI №865, Local Docker startup](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35940008117/job/107445602459), commit `bc048baaea71985e74d00faed4f66095dd518926`, Linux x86_64. Five readiness-helper tests passed locally on Node 22.16.0 and inside the development container in CI. The container run is the evidence for the project runtime; local helper tests do not prove Docker startup.
