@@ -1,7 +1,7 @@
 import { eq, desc, and, sql, inArray } from "drizzle-orm";
 import { db } from "../client";
-import { content, comments, products } from "../schema";
-import type { Content, Comment } from "@nexus/domain";
+import { auditEvents, content, comments, products } from "../schema";
+import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
 export class ContentRepository {
   async listPublished(limit = 50): Promise<Content[]> {
@@ -133,6 +133,39 @@ export class ContentRepository {
     return (rows[0] as unknown as Content) || null;
   }
 
+  async moderateStatusWithAudit(
+    id: string,
+    status: Content["status"],
+    expectedStatus: Content["status"],
+    audit: Omit<AuditEvent, "createdAt">,
+  ): Promise<Content | null> {
+    return db.transaction(async (tx) => {
+      const now = new Date();
+      const rows = await tx
+        .update(content)
+        .set({
+          status,
+          publishedAt: status === "published" ? now : null,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            eq(content.id, id),
+            eq(content.status, expectedStatus),
+          ),
+        )
+        .returning();
+      const updated = rows[0];
+      if (!updated) return null;
+
+      await tx.insert(auditEvents).values({
+        ...audit,
+        createdAt: now,
+      });
+      return updated as unknown as Content;
+    });
+  }
+
   async create(data: Omit<Content, "createdAt" | "updatedAt">): Promise<Content> {
     const values = {
       ...data,
@@ -142,6 +175,24 @@ export class ContentRepository {
 
         const rows = await db.insert(content).values(values).returning();
     return rows[0] as unknown as Content;
+  }
+
+  async createWithAudit(
+    data: Omit<Content, "createdAt" | "updatedAt">,
+    audit: Omit<AuditEvent, "createdAt">,
+  ): Promise<Content> {
+    return db.transaction(async (tx) => {
+      const now = new Date();
+      const rows = await tx
+        .insert(content)
+        .values({ ...data, createdAt: now, updatedAt: now })
+        .returning();
+      const created = rows[0];
+      if (!created) throw new Error("Content insert did not return a row");
+
+      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      return created as unknown as Content;
+    });
   }
 
   async findCommentById(id: string): Promise<Comment | null> {
@@ -182,7 +233,10 @@ export class ContentRepository {
     return [];
   }
 
-  async addComment(data: Omit<Comment, "createdAt">): Promise<Comment> {
+  async addComment(
+    data: Omit<Comment, "createdAt">,
+    audit?: Omit<AuditEvent, "createdAt">,
+  ): Promise<Comment> {
     const values = {
       ...data,
       createdAt: new Date(),
@@ -199,12 +253,20 @@ export class ContentRepository {
           })
           .where(eq(content.id, data.contentId));
       }
+      if (audit) {
+        await tx.insert(auditEvents).values({
+          ...audit,
+          createdAt: values.createdAt,
+        });
+      }
+
       return rows[0] as unknown as Comment;
     });
   }
 
   async addProductReview(
-    data: Omit<Comment, "createdAt"> & { productId: string; rating: number }
+    data: Omit<Comment, "createdAt"> & { productId: string; rating: number },
+    audit?: Omit<AuditEvent, "createdAt">,
   ): Promise<{ review: Comment; ratingCount: number; ratingAverage: number }> {
     const values = {
       ...data,
@@ -247,6 +309,13 @@ export class ContentRepository {
           updatedAt: new Date(),
         })
         .where(eq(products.id, data.productId));
+
+      if (audit) {
+        await tx.insert(auditEvents).values({
+          ...audit,
+          createdAt: values.createdAt,
+        });
+      }
 
       return { review, ratingCount, ratingAverage };
     });

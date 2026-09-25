@@ -141,9 +141,13 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     expect(hasEntitled).toBe(true);
   });
 
-  it("Review & Rating Journey: Submit verified review and recalculate rating", async () => {
-    // Submit review with 5 stars
-    const review = await contentRepository.addComment({
+  it("Review & Rating Journey: Submit verified review through the serialized aggregate path", async () => {
+    await commerceService.claimFreeResource({
+      user: playerUser,
+      productId: testProduct.id,
+    });
+
+    const result = await contentRepository.addProductReview({
       id: `cmt_${Date.now()}`,
       productId: testProduct.id,
       authorId: playerUser.id,
@@ -151,13 +155,10 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
       rating: 5,
       isVerifiedPurchase: true,
     });
-    expect(review.isVerifiedPurchase).toBe(true);
 
-    // Update product rating
-    await productRepository.update(testProduct.id, {
-      ratingCount: 1,
-      ratingAverage: 50, // 5.0
-    });
+    expect(result.review.isVerifiedPurchase).toBe(true);
+    expect(result.ratingCount).toBe(1);
+    expect(result.ratingAverage).toBe(50);
 
     const updated = await productRepository.findById(testProduct.id);
     expect(updated?.ratingCount).toBe(1);

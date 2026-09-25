@@ -4,7 +4,6 @@ import {
   contentRepository,
   productRepository,
   entitlementRepository,
-  auditRepository,
 } from "@nexus/db";
 import { addCommentSchema } from "@nexus/validation";
 import { generateId, consumeRateLimit } from "@nexus/security";
@@ -98,24 +97,25 @@ export async function POST(
       review: comment,
       ratingCount,
       ratingAverage,
-    } = await contentRepository.addProductReview({
-      id: generateId("cmt"),
-      productId,
-      authorId: user.id,
-      text: parsed.data.text,
-      rating,
-      isVerifiedPurchase: hasAcquired,
-    });
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: user.id,
-      actorType: "user",
-      action: "product.review_submitted",
-      targetId: productId,
-      targetType: "product",
-      details: { rating, verifiedAcquisition: hasAcquired },
-    });
+    } = await contentRepository.addProductReview(
+      {
+        id: generateId("cmt"),
+        productId,
+        authorId: user.id,
+        text: parsed.data.text,
+        rating,
+        isVerifiedPurchase: hasAcquired,
+      },
+      {
+        id: generateId("aud"),
+        actorId: user.id,
+        actorType: "user",
+        action: "product.review_submitted",
+        targetId: productId,
+        targetType: "product",
+        details: { rating, verifiedAcquisition: hasAcquired },
+      },
+    );
 
     return NextResponse.json(
       { success: true, review: comment, newRating: { ratingAverage, ratingCount } },

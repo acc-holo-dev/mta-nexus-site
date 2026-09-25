@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
-  auditRepository,
   contentRepository,
   organizationRepository,
   productRepository,
@@ -103,26 +102,28 @@ export async function POST(request: NextRequest) {
       (isCommunityTopic || can(user, "admin.moderation"))
       ? "published"
       : "draft";
-    const contentItem = await contentRepository.create({
-      ...parsed.data,
-      status,
-      id: generateId("cnt"),
-      authorId: user.id,
-      viewCount: 0,
-      likeCount: 0,
-      commentCount: 0,
-      ...(status === "published" ? { publishedAt: new Date() } : {}),
-    });
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: user.id,
-      actorType: "user",
-      action: "content.created",
-      targetId: contentItem.id,
-      targetType: "content",
-      details: { status, type: contentItem.type },
-    });
+    const contentId = generateId("cnt");
+    const contentItem = await contentRepository.createWithAudit(
+      {
+        ...parsed.data,
+        status,
+        id: contentId,
+        authorId: user.id,
+        viewCount: 0,
+        likeCount: 0,
+        commentCount: 0,
+        ...(status === "published" ? { publishedAt: new Date() } : {}),
+      },
+      {
+        id: generateId("aud"),
+        actorId: user.id,
+        actorType: "user",
+        action: "content.created",
+        targetId: contentId,
+        targetType: "content",
+        details: { status, type: parsed.data.type },
+      },
+    );
 
     return NextResponse.json({ content: contentItem }, { status: 201 });
   } catch (error: unknown) {

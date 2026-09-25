@@ -60,15 +60,17 @@ export async function POST(
     );
 
     if (article.authorId !== user.id) {
-      await notificationRepository.create({
-        id: generateId("not"),
-        recipientId: article.authorId,
-        title: "New article comment",
-        message: `@${user.username} commented on “${article.title}”.`,
-        type: "content",
-        category: "content",
-        link: `/articles/${article.slug}`,
-      });
+      await notificationRepository
+        .create({
+          id: generateId("not"),
+          recipientId: article.authorId,
+          title: "New article comment",
+          message: `@${user.username} commented on “${article.title}”.`,
+          type: "content",
+          category: "content",
+          link: `/articles/${article.slug}`,
+        })
+        .catch(() => undefined);
     }
 
     return NextResponse.json(

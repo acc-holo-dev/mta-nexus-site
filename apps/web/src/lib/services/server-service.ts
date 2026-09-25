@@ -1,4 +1,4 @@
-import { serverRepository, auditRepository, organizationRepository } from "@nexus/db";
+import { serverRepository, organizationRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Server, User } from "@nexus/domain";
@@ -51,23 +51,24 @@ export class ServerService {
     }
 
     const id = generateId("srv");
-    const server = await serverRepository.create({
-      ...input,
-      id,
-      // A listing is editorially active immediately; live availability is sourced separately from the official MTA directory.
-      status: "active",
-      isVerified: false,
-    });
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: actor.id,
-      actorType: "user",
-      action: "server.created",
-      targetId: id,
-      targetType: "server",
-      details: { name: server.name, ip: server.ipAddress, port: server.port },
-    });
+    const server = await serverRepository.createWithAudit(
+      {
+        ...input,
+        id,
+        // A listing is editorially active immediately; live availability is sourced separately from the official MTA directory.
+        status: "active",
+        isVerified: false,
+      },
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: "user",
+        action: "server.created",
+        targetId: id,
+        targetType: "server",
+        details: { name: input.name, ip: input.ipAddress, port: input.port },
+      },
+    );
 
     await eventBus.publish({
       id: generateId("evt"),
@@ -113,18 +114,20 @@ export class ServerService {
       throw new ForbiddenError("You do not manage this server");
     }
 
-    const updated = await serverRepository.update(serverId, updates);
+    const updated = await serverRepository.updateWithAudit(
+      serverId,
+      updates,
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: "user",
+        action: "server.updated",
+        targetId: serverId,
+        targetType: "server",
+        details: { fields: Object.keys(updates) },
+      },
+    );
     if (!updated) throw new NotFoundError("Server", serverId);
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: actor.id,
-      actorType: "user",
-      action: "server.updated",
-      targetId: serverId,
-      targetType: "server",
-      details: { fields: Object.keys(updates) },
-    });
 
     return updated;
   }
