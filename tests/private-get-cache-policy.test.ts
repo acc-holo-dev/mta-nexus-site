@@ -93,4 +93,18 @@ describe("private GET cache policy", () => {
       'const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };',
     );
   });
+
+  it("marks follow-state GET responses private because following is session-specific", () => {
+    const route = read("apps/web/src/app/api/follow/route.ts");
+
+    expect(route).toContain(
+      'const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" }',
+    );
+    expect(route).toContain(
+      'return NextResponse.json({ following: false }, { headers: privateHeaders })',
+    );
+    expect(route).toContain(
+      'return NextResponse.json({ following }, { headers: privateHeaders })',
+    );
+  });
 });
