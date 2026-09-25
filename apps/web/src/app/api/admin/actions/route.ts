@@ -15,7 +15,7 @@ import { can, consumeRateLimit, generateId } from "@nexus/security";
 const adminActionSchema = z.discriminatedUnion("targetType", [
   z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional() }),
   z.object({ targetType: z.literal("report"), targetId: z.string().min(1), action: z.enum(["resolve", "dismiss"]), notes: z.string().max(2000).optional() }),
-  z.object({ targetType: z.literal("verification"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("verification"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().trim().min(3).max(2000) }),
   z.object({ targetType: z.literal("build"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().trim().min(3).max(2000) }),
   z.object({ targetType: z.literal("content"), targetId: z.string().min(1), action: z.enum(["publish", "archive"]), notes: z.string().max(2000).optional() }),
 ]);
