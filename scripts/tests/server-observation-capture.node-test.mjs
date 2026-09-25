@@ -7,7 +7,7 @@ const base = {
   NODE_ENV: "development",
   NEXUS_SERVER_OBSERVATION_CAPTURE: "true",
   GITHUB_ACTIONS: "false",
-  DATABASE_URL: "postgres://nexus:local@postgres:5432/mta_nexus",
+  DATABASE_URL: "postgres://nexus:nexus_secret@postgres:5432/mta_nexus",
 };
 
 test("capture requires explicit opt-in before application imports", () => {
@@ -32,15 +32,17 @@ test("capture refuses GitHub Actions", () => {
   );
 });
 
-test("capture accepts only development or production runtime modes", () => {
+test("capture is development-only until production collection is accepted", () => {
   assert.doesNotThrow(() =>
     assertServerObservationCaptureEnvironment(base),
   );
-  assert.doesNotThrow(() =>
-    assertServerObservationCaptureEnvironment({
-      ...base,
-      NODE_ENV: "production",
-    }),
+  assert.throws(
+    () =>
+      assertServerObservationCaptureEnvironment({
+        ...base,
+        NODE_ENV: "production",
+      }),
+    /NODE_ENV must be development/u,
   );
   assert.throws(
     () =>
@@ -48,17 +50,24 @@ test("capture accepts only development or production runtime modes", () => {
         ...base,
         NODE_ENV: "test",
       }),
-    /NODE_ENV must be development or production/u,
+    /NODE_ENV must be development/u,
   );
 });
 
-test("capture requires an explicit database URL", () => {
-  assert.throws(
-    () =>
-      assertServerObservationCaptureEnvironment({
-        ...base,
-        DATABASE_URL: "",
-      }),
-    /DATABASE_URL is required/u,
-  );
+test("capture refuses non-canonical databases", () => {
+  for (const database of [
+    "",
+    "postgres://nexus:other@postgres:5432/mta_nexus",
+    "postgres://nexus:nexus_secret@localhost:5432/mta_nexus",
+    "postgres://nexus:nexus_secret@postgres:5432/production",
+  ]) {
+    assert.throws(
+      () =>
+        assertServerObservationCaptureEnvironment({
+          ...base,
+          DATABASE_URL: database,
+        }),
+      /canonical local Docker database/u,
+    );
+  }
 });
