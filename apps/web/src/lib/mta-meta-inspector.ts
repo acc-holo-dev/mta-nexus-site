@@ -69,13 +69,30 @@ function byteLength(value: string): number {
   return new TextEncoder().encode(value).byteLength;
 }
 
+function decodeCodePoint(
+  whole: string,
+  raw: string,
+  radix: 10 | 16,
+): string {
+  const value = Number.parseInt(raw, radix);
+  if (
+    !Number.isInteger(value) ||
+    value < 0 ||
+    value > 0x10ffff ||
+    (value >= 0xd800 && value <= 0xdfff)
+  ) {
+    return whole;
+  }
+  return String.fromCodePoint(value);
+}
+
 function decodeXmlEntities(value: string): string {
   return value
-    .replace(/&#x([0-9a-f]+);/giu, (_, hex: string) =>
-      String.fromCodePoint(Number.parseInt(hex, 16)),
+    .replace(/&#x([0-9a-f]+);/giu, (whole: string, hex: string) =>
+      decodeCodePoint(whole, hex, 16),
     )
-    .replace(/&#([0-9]+);/gu, (_, decimal: string) =>
-      String.fromCodePoint(Number.parseInt(decimal, 10)),
+    .replace(/&#([0-9]+);/gu, (whole: string, decimal: string) =>
+      decodeCodePoint(whole, decimal, 10),
     )
     .replace(/&quot;/giu, '"')
     .replace(/&apos;/giu, "'")
