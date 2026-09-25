@@ -15,7 +15,9 @@
     "db:migrate": "pnpm --filter @nexus/db migrate",
     "db:seed": "pnpm --filter @nexus/db seed",
     "format": "biome format . --write",
-    "format:check": "biome format ."
+    "format:check": "biome format .",
+    "nexus:doctor": "node scripts/nexus-doctor.mjs",
+    "nexus:doctor:test": "node --test scripts/tests/nexus-doctor.node-test.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.1",
