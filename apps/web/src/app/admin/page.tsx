@@ -4,6 +4,7 @@ import { buildRepository, contentRepository, verificationRepository } from "@nex
 import { authService } from "../../lib/services/auth-service";
 import { adminService } from "../../lib/services/admin-service";
 import { can } from "@nexus/security";
+import { BuildModerationControls } from "../../components/build-moderation-controls";
 import {
   StatCard,
   SectionHeader,
@@ -159,7 +160,22 @@ export default async function AdminPage() {
                   </p>
                   {build.releaseNotes && <p className="font-caption text-faint">{build.releaseNotes}</p>}
                 </div>
-                <StatusBadge status={build.scanStatus} tone={build.scanStatus === "malicious" ? "danger" : "warning"} />
+                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
+                  <StatusBadge
+                    status={build.scanStatus}
+                    tone={
+                      build.scanStatus === "clean"
+                        ? "success"
+                        : build.scanStatus === "malicious"
+                          ? "danger"
+                          : "warning"
+                    }
+                  />
+                  <BuildModerationControls
+                    buildId={build.id}
+                    scanStatus={build.scanStatus}
+                  />
+                </div>
               </div>
             ))
           ) : (
