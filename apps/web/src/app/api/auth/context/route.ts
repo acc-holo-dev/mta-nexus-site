@@ -72,9 +72,18 @@ export async function GET(request: NextRequest) {
 
   const organizationContexts = Array.from(contextsById.values()).slice(0, 50);
 
+  const requestedActiveContextId = user.activeContextId ?? "personal";
+  const activeContextId =
+    requestedActiveContextId === "personal" ||
+    organizationContexts.some(
+      (organization) => organization.id === requestedActiveContextId,
+    )
+      ? requestedActiveContextId
+      : "personal";
+
   return NextResponse.json(
     {
-      activeContextId: user.activeContextId ?? "personal",
+      activeContextId,
       contexts: [
         {
           id: "personal",
