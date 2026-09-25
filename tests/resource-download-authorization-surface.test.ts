@@ -24,17 +24,20 @@ describe("resource download route policy surface", () => {
     expect(storage).toBeGreaterThan(latestBuild);
   });
 
-  it("does not query entitlement for author or admin fast paths", () => {
+  it("uses canonical management authority before skipping entitlement checks", () => {
     const route = readFileSync(
       resolve(process.cwd(), "apps/web/src/app/api/products/[id]/download/route.ts"),
       "utf8",
     );
 
     expect(route).toContain(
-      'product.authorId === user.id || user.role === "admin"',
+      "productService.canManageProduct(product, user)",
     );
     expect(route).toContain("const hasEntitlement = isPrivileged");
     expect(route).toContain("? false");
+    expect(route).not.toContain(
+      'product.authorId === user.id || user.role === "admin"',
+    );
   });
 
   it("maps unpublished resources to 404 and missing entitlement to 403", () => {
