@@ -85,4 +85,15 @@ describe("canonical organization resource authorization surface", () => {
       'membership?.role === "developer"',
     );
   });
+
+  it("treats authorId as attribution rather than permanent authority on organization products", () => {
+    const policy = read("packages/security/src/policy.ts");
+
+    expect(policy).toContain(
+      "!product.organizationId && product.authorId === user.id",
+    );
+    expect(policy).toContain(
+      'mem.permissions.includes("manage_products")',
+    );
+  });
 });
