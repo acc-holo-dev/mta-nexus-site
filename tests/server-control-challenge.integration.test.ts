@@ -43,6 +43,7 @@ import {
 import { POST as issueChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/route";
 import { POST as verifyChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/verify/route";
 import { POST as genericVerification } from "../apps/web/src/app/api/verification/route";
+import { POST as adminAction } from "../apps/web/src/app/api/admin/actions/route";
 
 function post(
   url: string,
@@ -64,8 +65,10 @@ describe("MTA server control challenge integration", () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
     const userId = `usr_control_${suffix}`;
     const attackerId = `usr_control_attacker_${suffix}`;
+    const moderatorId = `usr_control_moderator_${suffix}`;
     const sessionToken = `tok_control_${suffix}`;
     const attackerToken = `tok_control_attacker_${suffix}`;
+    const moderatorToken = `tok_control_moderator_${suffix}`;
     const serverId = `srv_control_${suffix}`;
     const address = "198.51.100.211";
     const port = 18_000 + ((Date.now() + process.pid) % 30_000);
@@ -94,6 +97,19 @@ describe("MTA server control challenge integration", () => {
       id: `ses_control_attacker_${suffix}`,
       userId: attackerId,
       token: attackerToken,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
+    await userRepository.create({
+      id: moderatorId,
+      email: `server_control_moderator_${suffix}@nexus.test`,
+      username: `server_control_moderator_${suffix}`,
+      displayName: "Server Control Moderator",
+      role: "moderator",
+    });
+    await sessionRepository.create({
+      id: `ses_control_moderator_${suffix}`,
+      userId: moderatorId,
+      token: moderatorToken,
       expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
     await serverRepository.create({
@@ -345,6 +361,10 @@ describe("MTA server control challenge integration", () => {
     );
     expect(request?.notes).not.toContain(controlToken);
 
+    const beforeModeration = await serverRepository.findById(serverId);
+    expect(beforeModeration?.ownerId).toBeFalsy();
+    expect(beforeModeration?.isVerified).toBe(false);
+
     const retry = await verifyChallenge(
       post(
         `http://nexus.test/api/servers/${serverId}/claim-challenge/verify`,
@@ -357,6 +377,37 @@ describe("MTA server control challenge integration", () => {
     expect(await retry.json()).toMatchObject({
       code: "INVALID_SERVER_CONTROL_CHALLENGE",
     });
+
+    const approved = await adminAction(
+      post(
+        "http://nexus.test/api/admin/actions",
+        moderatorToken,
+        {
+          targetType: "verification",
+          targetId: verifiedBody.verificationRequest.id,
+          action: "approve",
+          notes: "Live MTA control proof reviewed.",
+        },
+      ),
+    );
+    expect(approved.status).toBe(200);
+
+    const owned = await serverRepository.findById(serverId);
+    expect(owned?.ownerId).toBe(userId);
+    expect(owned?.isVerified).toBe(true);
+
+    const [resolvedRequest] = await db
+      .select()
+      .from(verificationRequests)
+      .where(
+        eq(
+          verificationRequests.id,
+          verifiedBody.verificationRequest.id,
+        ),
+      )
+      .limit(1);
+    expect(resolvedRequest?.status).toBe("approved");
+    expect(resolvedRequest?.reviewerId).toBe(moderatorId);
   });
 
   it("fails closed when a legacy pending server request has no consumed control proof", async () => {
