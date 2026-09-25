@@ -2,6 +2,7 @@ import { and, eq, desc, sql } from "drizzle-orm";
 import { db } from "../client";
 import { verificationRequests, users, organizations, servers } from "../schema";
 import { generateId } from "@nexus/security";
+import { ConflictError, NotFoundError } from "@nexus/domain";
 
 const VALID_TARGET_TYPES = ["user", "developer", "organization", "server"] as const;
 export type VerificationTargetType = (typeof VALID_TARGET_TYPES)[number];
@@ -25,8 +26,55 @@ export class VerificationRepository {
       createdAt: new Date(),
     };
 
-    const rows = await db.insert(verificationRequests).values(values).returning();
-    return rows[0];
+    if (input.targetType !== "server") {
+      const rows = await db.insert(verificationRequests).values(values).returning();
+      return rows[0];
+    }
+
+    return db.transaction(async (tx) => {
+      const lockKey = `verification:server:${input.targetId}`;
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`,
+      );
+
+      const serverRows = await tx
+        .select()
+        .from(servers)
+        .where(eq(servers.id, input.targetId))
+        .limit(1);
+      const server = serverRows[0];
+      if (!server) {
+        throw new NotFoundError("Server", input.targetId);
+      }
+      if (server.ownerId && server.ownerId !== input.requesterId) {
+        throw new ConflictError("This server is already claimed");
+      }
+      if (server.isVerified) {
+        throw new ConflictError("This target is already verified");
+      }
+
+      const pendingRows = await tx
+        .select()
+        .from(verificationRequests)
+        .where(
+          and(
+            eq(verificationRequests.targetType, "server"),
+            eq(verificationRequests.targetId, input.targetId),
+            eq(verificationRequests.status, "pending"),
+          ),
+        )
+        .limit(1);
+
+      if (pendingRows[0]) {
+        throw new ConflictError("A server ownership request is already pending");
+      }
+
+      const rows = await tx
+        .insert(verificationRequests)
+        .values(values)
+        .returning();
+      return rows[0];
+    });
   }
 
   async findPendingForTarget(
@@ -44,6 +92,24 @@ export class VerificationRepository {
           eq(verificationRequests.targetId, targetId),
           eq(verificationRequests.status, "pending")
         )
+      )
+      .limit(1);
+    return rows[0] || null;
+  }
+
+  async findPendingForAnyRequester(
+    targetType: VerificationTargetType,
+    targetId: string,
+  ) {
+    const rows = await db
+      .select()
+      .from(verificationRequests)
+      .where(
+        and(
+          eq(verificationRequests.targetType, targetType),
+          eq(verificationRequests.targetId, targetId),
+          eq(verificationRequests.status, "pending"),
+        ),
       )
       .limit(1);
     return rows[0] || null;
