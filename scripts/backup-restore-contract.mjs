@@ -21,7 +21,7 @@ export function extractBackupRestoreSpec(config) {
   const pgMount = postgresMounts[0];
   assert.equal(pgMount.type, "volume");
   assert.equal(pgMount.source, "pgdata");
-  assert.equal(pgMount.read_only, undefined);
+  assert(!pgMount.read_only, "PostgreSQL backup source must be writable");
   assert(
     ["/var/lib/postgresql", "/var/lib/postgresql/data"].includes(pgMount.target),
     "Unexpected PostgreSQL mount target",
@@ -38,7 +38,7 @@ export function extractBackupRestoreSpec(config) {
   const uploadMount = uploadMounts[0];
   assert.equal(uploadMount.type, "volume");
   assert.equal(uploadMount.source, "uploads");
-  assert.equal(uploadMount.read_only, undefined);
+  assert(!uploadMount.read_only, "Uploads backup source must be writable");
 
   return Object.freeze({
     postgresImage: postgres.image,
