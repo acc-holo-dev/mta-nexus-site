@@ -276,4 +276,66 @@ describe("organization resource management integration", () => {
     if (!owner) return;
     expect(await productService.canManageProduct(product, owner)).toBe(true);
   });
+
+  it("ignores legacy personal ownerId on organization servers after organization authority is revoked", async () => {
+    const suffix = `${Date.now().toString(36)}_${process.pid}`;
+    const orgOwnerId = `usr_legacy_org_owner_${suffix}`;
+    const legacyOwnerId = `usr_legacy_server_owner_${suffix}`;
+    const organizationId = `org_legacy_server_${suffix}`;
+
+    await userRepository.create({
+      id: orgOwnerId,
+      email: `legacy_org_owner_${suffix}@nexus.test`,
+      username: `legacy_org_owner_${suffix}`,
+      displayName: "Legacy Org Owner",
+      role: "user",
+    });
+    await userRepository.create({
+      id: legacyOwnerId,
+      email: `legacy_server_owner_${suffix}@nexus.test`,
+      username: `legacy_server_owner_${suffix}`,
+      displayName: "Legacy Server Owner",
+      role: "user",
+    });
+
+    await organizationRepository.create({
+      id: organizationId,
+      name: "Legacy Server Organization",
+      slug: `legacy-server-organization-${suffix}`,
+      ownerId: orgOwnerId,
+    });
+
+    const legacy = await serverService.createServer(
+      {
+        name: "Legacy Organization Server",
+        slug: `legacy-organization-server-${suffix}`,
+        ipAddress: "198.51.100.230",
+        port: 22003 + (process.pid % 1000),
+        organizationId,
+        visibility: "private",
+        gameplayTags: [],
+        mediaUrls: [],
+      },
+      (await userRepository.findById(orgOwnerId))!,
+    );
+
+    const withLegacyOwner = await (await import("@nexus/db")).serverRepository.update(
+      legacy.id,
+      { ownerId: legacyOwnerId },
+    );
+    expect(withLegacyOwner?.organizationId).toBe(organizationId);
+    expect(withLegacyOwner?.ownerId).toBe(legacyOwnerId);
+
+    const legacyOwner = await userRepository.findById(legacyOwnerId);
+    const orgOwner = await userRepository.findById(orgOwnerId);
+    expect(legacyOwner && orgOwner && withLegacyOwner).toBeTruthy();
+    if (!legacyOwner || !orgOwner || !withLegacyOwner) return;
+
+    expect(
+      await serverService.canManageServer(withLegacyOwner, legacyOwner),
+    ).toBe(false);
+    expect(await serverService.canManageServer(withLegacyOwner, orgOwner)).toBe(
+      true,
+    );
+  });
 });
