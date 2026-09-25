@@ -7,6 +7,7 @@ import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
 import { ProductDependencyList } from "../../../components/product-dependency-list";
+import { ReverseDependencyList } from "../../../components/reverse-dependency-list";
 import {
   Star,
   Download,
@@ -91,10 +92,16 @@ export default async function ProductDetailPage({
   const hasAccess = isPublished && (isAuthor || isLicensed || isAdmin);
   const canInspectBuilds = isAuthor || isAdmin;
 
-  const [builds, reviews, dependencyResolution] = await Promise.all([
+  const [
+    builds,
+    reviews,
+    dependencyResolution,
+    reverseDependencySummary,
+  ] = await Promise.all([
     productService.getProductBuilds(product.id, canInspectBuilds),
     contentService.getComments({ productId: product.id }),
     productService.getDependencyResolution(product).catch(() => null),
+    productService.getReverseDependencySummary(product.slug).catch(() => null),
   ]);
 
   const formattedPrice = "Free";
@@ -222,6 +229,13 @@ export default async function ProductDetailPage({
             ) : (
               <p className="text-xs text-neutral-500">No public builds recorded yet.</p>
             )}
+          </div>
+
+          <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
+            <h2 className="text-base font-bold text-white border-b border-base pb-3">
+              Used by published resources
+            </h2>
+            <ReverseDependencyList summary={reverseDependencySummary} />
           </div>
 
           {/* Customer Reviews */}
