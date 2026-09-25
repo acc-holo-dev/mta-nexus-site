@@ -89,6 +89,15 @@ export class VerificationRepository {
     return rows[0] || null;
   }
 
+  async findById(id: string) {
+    const rows = await db
+      .select()
+      .from(verificationRequests)
+      .where(eq(verificationRequests.id, id))
+      .limit(1);
+    return rows[0] || null;
+  }
+
   async listAll() {
     return db
       .select()
