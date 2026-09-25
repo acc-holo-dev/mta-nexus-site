@@ -14,9 +14,9 @@
   "dependencies": {
     "@nexus/config": "workspace:*",
     "@nexus/domain": "workspace:*",
-    "drizzle-orm": "^0.45.2",
+    "drizzle-orm": "^0.45.3",
     "postgres": "^3.4.9",
-    "tsx": "^4.23.13"
+    "tsx": "^4.23.15"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.10",
