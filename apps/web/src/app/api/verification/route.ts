@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
-  auditRepository,
   notificationRepository,
   organizationRepository,
   userRepository,
@@ -112,23 +111,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const verificationRequest = await verificationRepository.createRequest({
-      requesterId: user.id,
-      targetType: parsed.data.targetType,
-      targetId: parsed.data.targetId,
-      proofUrl: parsed.data.proofUrl || undefined,
-      notes: parsed.data.notes,
-    });
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: user.id,
-      actorType: "user",
-      action: "verification.requested",
-      targetId: verificationRequest.id,
-      targetType: "verification",
-      details: { targetType: parsed.data.targetType, targetId: parsed.data.targetId },
-    });
+    const verificationRequestId = generateId("ver");
+    const verificationRequest = await verificationRepository.createRequest(
+      {
+        requesterId: user.id,
+        targetType: parsed.data.targetType,
+        targetId: parsed.data.targetId,
+        proofUrl: parsed.data.proofUrl || undefined,
+        notes: parsed.data.notes,
+      },
+      {
+        id: generateId("aud"),
+        actorId: user.id,
+        actorType: "user",
+        action: "verification.requested",
+        targetId: verificationRequestId,
+        targetType: "verification",
+        details: {
+          targetType: parsed.data.targetType,
+          targetId: parsed.data.targetId,
+        },
+      },
+    );
 
     const moderators = (await userRepository.listAll()).filter(
       (candidate) => candidate.role === "moderator" || candidate.role === "admin"
