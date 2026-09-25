@@ -34,15 +34,19 @@ export class ServerService {
       if (!organization) throw new NotFoundError("Organization", input.organizationId);
 
       const memberships = await organizationRepository.listUserMemberships(actor.id);
-      const membership = memberships.find((item) => item.organizationId === input.organizationId);
-      const canManageOrganization =
+      const membership = memberships.find(
+        (item) => item.organizationId === input.organizationId,
+      );
+      const canManageServers =
         organization.ownerId === actor.id ||
         membership?.role === "owner" ||
         membership?.role === "admin" ||
-        membership?.role === "developer";
+        membership?.permissions.includes("manage_servers");
 
-      if (!canManageOrganization) {
-        throw new ForbiddenError("You do not manage this organization");
+      if (!canManageServers) {
+        throw new ForbiddenError(
+          "You do not have permission to create servers for this organization",
+        );
       }
     }
 
