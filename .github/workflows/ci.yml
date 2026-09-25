@@ -199,6 +199,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+      - name: Validate developer verification Compose
+        run: COMPOSE_DISABLE_ENV_FILE=true docker compose -f compose.verify.yaml config --quiet
       - name: Build and start the documented local stack
         run: |
           test ! -f .env
