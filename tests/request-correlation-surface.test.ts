@@ -26,12 +26,9 @@ describe("request correlation surface", () => {
       const source = readFileSync(resolve(process.cwd(), routePath), "utf8");
       const loggerCalls = source.match(/logRequestEvent\(\{[\s\S]*?\}\);/gu) ?? [];
       for (const call of loggerCalls) {
-        expect(call, routePath).not.toMatch(/authorization/iu);
-        expect(call, routePath).not.toMatch(/cookie/iu);
-        expect(call, routePath).not.toMatch(/password/iu);
-        expect(call, routePath).not.toMatch(/email/iu);
-        expect(call, routePath).not.toMatch(/clientIp/iu);
-        expect(call, routePath).not.toMatch(/\bbody\b/iu);
+        expect(call, routePath).not.toMatch(
+          /(?:authorization|cookie|token|secret|password|email|clientIp|headers|body|query|url)\s*:/iu,
+        );
       }
     }
   });
