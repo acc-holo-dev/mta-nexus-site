@@ -14,7 +14,7 @@ describe("verification trust workflow", () => {
     );
 
     expect(route).toContain("You can only verify your own profile");
-    expect(route).toContain("This server is already claimed");
+    expect(route).toContain("SERVER_CONTROL_CHALLENGE_REQUIRED");
     expect(route).toContain("A verification request is already pending");
     expect(route).toContain("notificationRepository.create");
     expect(route).toContain('action: "verification.requested"');

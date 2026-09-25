@@ -175,38 +175,30 @@ describe("server ownership hardening integration", () => {
     });
   });
 
-  it("serializes competing ownership claims so only one requester becomes pending", async () => {
+  it("blocks the legacy generic server-claim path at HTTP and repository boundaries", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
-    const firstId = `usr_claim_a_${suffix}`;
-    const secondId = `usr_claim_b_${suffix}`;
-    const firstToken = `tok_claim_a_${suffix}`;
-    const secondToken = `tok_claim_b_${suffix}`;
-    const serverId = `srv_claim_race_${suffix}`;
+    const userId = `usr_claim_blocked_${suffix}`;
+    const token = `tok_claim_blocked_${suffix}`;
+    const serverId = `srv_claim_blocked_${suffix}`;
     const port = 14_000 + ((Date.now() + process.pid) % 40_000);
 
-    for (const [id, label, token] of [
-      [firstId, "a", firstToken],
-      [secondId, "b", secondToken],
-    ] as const) {
-      await userRepository.create({
-        id,
-        email: `srv_claim_${label}_${suffix}@nexus.test`,
-        username: `srv_claim_${label}_${suffix}`,
-        displayName: `Server Claim ${label}`,
-        role: "user",
-      });
-      await sessionRepository.create({
-        id: `ses_claim_${label}_${suffix}`,
-        userId: id,
-        token,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-      });
-    }
-
+    await userRepository.create({
+      id: userId,
+      email: `srv_claim_blocked_${suffix}@nexus.test`,
+      username: `srv_claim_blocked_${suffix}`,
+      displayName: "Blocked Legacy Server Claim",
+      role: "user",
+    });
+    await sessionRepository.create({
+      id: `ses_claim_blocked_${suffix}`,
+      userId,
+      token,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
     await serverRepository.create({
       id: serverId,
-      name: "Unowned Claim Target",
-      slug: `unowned-claim-target-${suffix}`,
+      name: "Challenge Required Server",
+      slug: `challenge-required-${suffix}`,
       ipAddress: "198.51.100.203",
       port,
       status: "active",
@@ -216,57 +208,41 @@ describe("server ownership hardening integration", () => {
       mediaUrls: [],
     });
 
-    const [first, second] = await Promise.all([
-      requestVerification(
-        jsonRequest(
-          "http://nexus.test/api/verification",
-          "POST",
-          firstToken,
-          {
-            targetType: "server",
-            targetId: serverId,
-            proofUrl: "https://example.test/proof/a",
-            notes: "First ownership claim evidence.",
-          },
-        ),
-      ),
-      requestVerification(
-        jsonRequest(
-          "http://nexus.test/api/verification",
-          "POST",
-          secondToken,
-          {
-            targetType: "server",
-            targetId: serverId,
-            proofUrl: "https://example.test/proof/b",
-            notes: "Second ownership claim evidence.",
-          },
-        ),
-      ),
-    ]);
-
-    expect([first.status, second.status].sort()).toEqual([201, 409]);
-
-    const pending = await verificationRepository.findPendingForAnyRequester(
-      "server",
-      serverId,
-    );
-    expect(pending).toBeTruthy();
-    expect([firstId, secondId]).toContain(pending?.requesterId);
-
-    const sameRequesterRetry = await requestVerification(
+    const response = await requestVerification(
       jsonRequest(
         "http://nexus.test/api/verification",
         "POST",
-        pending?.requesterId === firstId ? firstToken : secondToken,
+        token,
         {
           targetType: "server",
           targetId: serverId,
-          proofUrl: "https://example.test/proof/retry",
-          notes: "Duplicate claim retry.",
+          proofUrl: "https://example.test/legacy-proof",
         },
       ),
     );
-    expect(sameRequesterRetry.status).toBe(409);
+
+    expect(response.status).toBe(422);
+    expect(await response.json()).toMatchObject({
+      code: "SERVER_CONTROL_CHALLENGE_REQUIRED",
+    });
+
+    await expect(
+      verificationRepository.createRequest({
+        requesterId: userId,
+        targetType: "server",
+        targetId: serverId,
+        proofUrl: "https://example.test/internal-bypass",
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 422,
+      code: "SERVER_CONTROL_CHALLENGE_REQUIRED",
+    });
+
+    expect(
+      await verificationRepository.findPendingForAnyRequester(
+        "server",
+        serverId,
+      ),
+    ).toBeNull();
   });
 });
