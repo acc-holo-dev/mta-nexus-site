@@ -17,7 +17,7 @@ export class VerificationRepository {
       proofUrl?: string;
       notes?: string;
     },
-    audit?: Omit<AuditEvent, "createdAt">,
+    audit?: Omit<AuditEvent, "createdAt" | "targetId" | "targetType">,
   ) {
     if (input.targetType === "server") {
       throw new AppError(
@@ -51,6 +51,8 @@ export class VerificationRepository {
       if (audit) {
         await tx.insert(auditEvents).values({
           ...audit,
+          targetId: request.id,
+          targetType: "verification",
           createdAt: values.createdAt,
         });
       }
