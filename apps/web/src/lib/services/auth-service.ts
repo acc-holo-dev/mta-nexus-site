@@ -371,10 +371,18 @@ export class AuthService {
     }
 
     if (nextContextId !== "personal") {
-      const memberships = await organizationRepository.listUserMemberships(userId);
-      const isMember = memberships.some((m) => m.organizationId === nextContextId);
-      if (!isMember) {
-        throw new ForbiddenError("Not authorized to switch to this organization context");
+      const [organization, memberships] = await Promise.all([
+        organizationRepository.findById(nextContextId),
+        organizationRepository.listUserMemberships(userId),
+      ]);
+      const isMember = memberships.some(
+        (membership) => membership.organizationId === nextContextId,
+      );
+      const isOwner = organization?.ownerId === userId;
+      if (!organization || (!isOwner && !isMember)) {
+        throw new ForbiddenError(
+          "Not authorized to switch to this organization context",
+        );
       }
     }
 
