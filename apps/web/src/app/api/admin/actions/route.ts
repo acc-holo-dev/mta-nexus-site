@@ -45,15 +45,56 @@ export async function POST(request: NextRequest) {
     const { targetType, targetId, action, notes } = parsed.data;
 
     if (targetType === "product") {
-      const updated = action === "feature"
-        ? await productRepository.update(targetId, { isFeatured: true })
-        : action === "unfeature"
-          ? await productRepository.update(targetId, { isFeatured: false })
-          : action === "suspend"
-            ? await productRepository.update(targetId, { status: "suspended" })
-            : await productRepository.update(targetId, { status: "published" });
-      if (!updated) {
-        return NextResponse.json({ error: "Product not found" }, { status: 404 });
+      if (action === "feature" || action === "unfeature") {
+        const updated = await productRepository.update(targetId, {
+          isFeatured: action === "feature",
+        });
+        if (!updated) {
+          return NextResponse.json(
+            { error: "Product not found" },
+            { status: 404 },
+          );
+        }
+      } else if (action === "suspend") {
+        const suspended = await productRepository.suspendPublished(targetId);
+        if (!suspended) {
+          const current = await productRepository.findById(targetId);
+          if (!current) {
+            return NextResponse.json(
+              { error: "Product not found" },
+              { status: 404 },
+            );
+          }
+          throw new AppError(
+            "Only a published resource can be suspended",
+            409,
+            "PRODUCT_STATE_CHANGED",
+          );
+        }
+      } else {
+        const restore = await productRepository.restoreSuspendedWithPublishedBuild(
+          targetId,
+        );
+        if (restore === "not_found") {
+          return NextResponse.json(
+            { error: "Product not found" },
+            { status: 404 },
+          );
+        }
+        if (restore === "no_published_build") {
+          throw new AppError(
+            "A suspended resource cannot be restored without a published build",
+            409,
+            "PRODUCT_RESTORE_NO_PUBLISHED_BUILD",
+          );
+        }
+        if (restore === "invalid_state") {
+          throw new AppError(
+            "Only a suspended resource can be restored",
+            409,
+            "PRODUCT_STATE_CHANGED",
+          );
+        }
       }
     } else if (targetType === "report") {
       if (action === "resolve" || action === "dismiss") {
