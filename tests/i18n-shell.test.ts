@@ -18,6 +18,10 @@ describe("RU/EN shell foundation", () => {
     expect(en.nav.liveServers).not.toBe(ru.nav.liveServers);
     expect(en.home.title).not.toBe(ru.home.title);
     expect(en.footer.summary).not.toBe(ru.footer.summary);
+    expect(en.market.title).not.toBe(ru.market.title);
+    expect(en.workspace.title).not.toBe(ru.workspace.title);
+    expect(en.servers.title).not.toBe(ru.servers.title);
+    expect(en.auth.loginTitle).not.toBe(ru.auth.loginTitle);
   });
 
   it("keeps mobile navigation and locale switching in the global shell", () => {
