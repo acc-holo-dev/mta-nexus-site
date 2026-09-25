@@ -123,14 +123,16 @@ export class ProductService {
 
       const memberships = await organizationRepository.listUserMemberships(actor.id);
       const membership = memberships.find((item) => item.organizationId === input.organizationId);
-      const canManageOrganization =
+      const canManageProducts =
         organization.ownerId === actor.id ||
         membership?.role === "owner" ||
         membership?.role === "admin" ||
-        membership?.role === "developer";
+        membership?.permissions.includes("manage_products");
 
-      if (!canManageOrganization) {
-        throw new ForbiddenError("You do not manage this organization");
+      if (!canManageProducts) {
+        throw new ForbiddenError(
+          "You do not have permission to create resources for this organization",
+        );
       }
     }
 
