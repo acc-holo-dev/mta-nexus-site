@@ -5,6 +5,7 @@ import { authService } from "../../lib/services/auth-service";
 import { adminService } from "../../lib/services/admin-service";
 import { can } from "@nexus/security";
 import { BuildModerationControls } from "../../components/build-moderation-controls";
+import { VerificationModerationControls } from "../../components/verification-moderation-controls";
 import {
   StatCard,
   SectionHeader,
@@ -118,10 +119,15 @@ export default async function AdminPage() {
                   {vr.reviewNotes && <p className="font-caption text-faint font-code">Review: {vr.reviewNotes}</p>}
                 </div>
 
-                <StatusBadge
-                  status={vr.status}
-                  tone={vr.status === "approved" ? "success" : vr.status === "rejected" ? "danger" : "warning"}
-                />
+                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
+                  <StatusBadge
+                    status={vr.status}
+                    tone={vr.status === "approved" ? "success" : vr.status === "rejected" ? "danger" : "warning"}
+                  />
+                  {vr.status === "pending" && (
+                    <VerificationModerationControls requestId={vr.id} />
+                  )}
+                </div>
               </div>
             ))
           ) : (
