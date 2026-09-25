@@ -1,9 +1,10 @@
 import { randomInt } from "node:crypto";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { confirmPasswordResetSchema, requestPasswordResetSchema } from "@nexus/validation";
 import { AppError } from "@nexus/domain";
 import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
+import { createRequestLogContext, jsonWithRequestId, logRequestEvent, type RequestLogContext } from "../../../../lib/observability";
 
 const neutral = {
   accepted: true,
@@ -17,8 +18,8 @@ const headers = {
 const requestFloorMinMs = 900;
 const requestFloorJitterMs = 300;
 
-function json(body: unknown, status = 200) {
-  return NextResponse.json(body, { status, headers });
+function json(context: RequestLogContext, body: unknown, status = 200) {
+  return jsonWithRequestId(context, body, { status, headers });
 }
 
 function requestTargetMs(): number {
@@ -32,11 +33,12 @@ async function floor(startedAt: number, targetMs: number) {
 
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   const startedAt = performance.now();
   const targetMs = requestTargetMs();
   const parsed = requestPasswordResetSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return json({ error: "Enter a valid email address." }, 400);
+    return json(context, { error: "Enter a valid email address." }, 400);
   }
 
   try {
@@ -45,28 +47,40 @@ export async function POST(request: NextRequest) {
       ip: getTrustedRequestIp(request),
     });
     await floor(startedAt, targetMs);
-    return json(neutral, 202);
+    return json(context, neutral, 202);
   } catch {
     // Missing dedicated keys or shared persistence failure makes recovery
     // unavailable for every address; do not expose account-specific detail.
-    console.error("Password reset request service is unavailable");
+    logRequestEvent({
+      level: "error",
+      event: "auth.password_reset.request_unavailable",
+      context,
+      status: 503,
+    });
     await floor(startedAt, targetMs);
-    return json({ error: "Password reset is temporarily unavailable. Please try again later." }, 503);
+    return json(context, { error: "Password reset is temporarily unavailable. Please try again later." }, 503);
   }
 }
 
 export async function PATCH(request: NextRequest) {
+  const context = createRequestLogContext(request);
   const parsed = confirmPasswordResetSchema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return json({ error: "Invalid or expired password reset" }, 400);
+  if (!parsed.success) return json(context, { error: "Invalid or expired password reset" }, 400);
   try {
     await authService.confirmPasswordReset({
       ...parsed.data,
       ip: getTrustedRequestIp(request),
     });
-    return json({ success: true });
+    return json(context, { success: true });
   } catch (error: unknown) {
-    if (error instanceof AppError) return json({ error: "Invalid or expired password reset" }, 400);
-    console.error("Password reset could not be confirmed");
-    return json({ error: "Could not reset the password. Request a new link and try again." }, 503);
+    if (error instanceof AppError) return json(context, { error: "Invalid or expired password reset" }, 400);
+    logRequestEvent({
+      level: "error",
+      event: "auth.password_reset.confirm_failed",
+      context,
+      status: 503,
+      error,
+    });
+    return json(context, { error: "Could not reset the password. Request a new link and try again." }, 503);
   }
 }
