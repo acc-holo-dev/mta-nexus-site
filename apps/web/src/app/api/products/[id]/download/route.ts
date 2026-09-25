@@ -60,8 +60,8 @@ export async function GET(
           "product.download"
         );
     const access = decideResourceDownloadAccess(
-      user,
       product,
+      isPrivileged,
       hasEntitlement,
     );
 
