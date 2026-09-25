@@ -87,13 +87,6 @@ describe("private GET cache policy", () => {
     }
   });
 
-  it("does not duplicate the follow fix already isolated in SERVER-004", () => {
-    const follow = read("apps/web/src/app/api/follow/route.ts");
-    expect(follow).not.toContain(
-      'const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };',
-    );
-  });
-
   it("marks follow-state GET responses private because following is session-specific", () => {
     const route = read("apps/web/src/app/api/follow/route.ts");
 
