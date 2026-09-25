@@ -14,7 +14,7 @@
     "db:generate": "pnpm --filter @nexus/db generate",
     "db:migrate": "pnpm --filter @nexus/db migrate",
     "db:seed": "pnpm --filter @nexus/db seed",
-    "server:observations:capture": "node --import tsx scripts/capture-server-observations.ts",
+    "server:observations:capture": "pnpm --filter @nexus/web server:observations:capture",
     "server:observations:guard:test": "node --test scripts/tests/server-observation-capture.node-test.mjs"
   },
   "devDependencies": {
