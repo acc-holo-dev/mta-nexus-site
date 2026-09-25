@@ -111,7 +111,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const verificationRequestId = generateId("ver");
     const verificationRequest = await verificationRepository.createRequest(
       {
         requesterId: user.id,
@@ -125,8 +124,6 @@ export async function POST(request: NextRequest) {
         actorId: user.id,
         actorType: "user",
         action: "verification.requested",
-        targetId: verificationRequestId,
-        targetType: "verification",
         details: {
           targetType: parsed.data.targetType,
           targetId: parsed.data.targetId,
@@ -137,7 +134,7 @@ export async function POST(request: NextRequest) {
     const moderators = (await userRepository.listAll()).filter(
       (candidate) => candidate.role === "moderator" || candidate.role === "admin"
     );
-    await Promise.all(
+    await Promise.allSettled(
       moderators.map((moderator) =>
         notificationRepository.create({
           id: generateId("not"),
@@ -146,8 +143,8 @@ export async function POST(request: NextRequest) {
           message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
           link: "/admin",
           type: "security",
-        })
-      )
+        }),
+      ),
     );
 
     return NextResponse.json({ success: true, request: verificationRequest }, { status: 201 });
