@@ -2,74 +2,83 @@ import React from "react";
 import Link from "next/link";
 import { Library, Star, Tag } from "lucide-react";
 import type { Product } from "@nexus/domain";
+import { getDictionary, type Locale } from "../lib/i18n";
 
-export function ProductCard({ product }: { product: Product }) {
-  const formattedPrice = "Free";
-
-  const updatedDate = new Date(product.updatedAt).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
+export function ProductCard({
+  product,
+  locale = "en",
+}: {
+  product: Product;
+  locale?: Locale;
+}) {
+  const dictionary = getDictionary(locale);
+  const updatedDate = new Date(product.updatedAt).toLocaleDateString(
+    locale === "ru" ? "ru-RU" : "en-US",
+    { month: "short", day: "numeric" },
+  );
 
   return (
     <Link
       href={`/market/${product.slug}`}
-      className="group flex flex-col nexus-panel overflow-hidden hover:border-strong hover:shadow-nexus transition-all"
+      className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus"
     >
-      {/* Cover */}
-      <div className="relative aspect-video w-full bg-inset overflow-hidden">
+      <div className="relative aspect-video w-full overflow-hidden bg-inset">
         {product.thumbnailUrl ? (
           <img
             src={product.thumbnailUrl}
             alt={product.title}
             loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center font-caption text-faint">
-            No preview
+          <div className="flex h-full w-full items-center justify-center font-caption text-faint">
+            {dictionary.market.noPreview}
           </div>
         )}
-        <div className="absolute top-2 left-2 flex gap-1.5">
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-accent text-white">
+        <div className="absolute left-2 top-2 flex gap-1.5">
+          <span className="rounded bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
             {product.type}
           </span>
         </div>
-        <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded font-numeric text-xs font-bold bg-black/70 text-white">
-          {formattedPrice}
+        <div className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-0.5 font-numeric text-xs font-bold text-white">
+          {dictionary.market.free}
         </div>
       </div>
 
-      {/* Body */}
-      <div className="flex flex-col flex-1 p-3.5 gap-2">
+      <div className="flex flex-1 flex-col gap-2 p-3.5">
         <div className="flex items-center justify-between font-caption">
-          <div className="flex items-center gap-1 text-warning font-semibold">
-            <Star className="w-3.5 h-3.5 fill-current" />
-            <span className="font-numeric">{(product.ratingAverage / 10).toFixed(1)}</span>
+          <div className="flex items-center gap-1 font-semibold text-warning">
+            <Star className="h-3.5 w-3.5 fill-current" />
+            <span className="font-numeric">
+              {(product.ratingAverage / 10).toFixed(1)}
+            </span>
             <span className="text-faint">({product.ratingCount})</span>
           </div>
           <div className="flex items-center gap-1 text-muted">
-            <Library className="w-3 h-3" />
+            <Library className="h-3 w-3" />
             <span className="font-numeric">{product.salesCount}</span>
           </div>
         </div>
 
-        <h3 className="text-xs font-heading text-primary group-hover:text-accent transition-colors line-clamp-1">
+        <h3 className="line-clamp-1 text-xs font-heading text-primary transition-colors group-hover:text-accent">
           {product.title}
         </h3>
 
-        <p className="font-caption text-muted line-clamp-2 flex-1">
+        <p className="line-clamp-2 flex-1 font-caption text-muted">
           {product.shortDescription || product.description}
         </p>
 
-        {/* Decision signals footer */}
-        <div className="flex items-center justify-between pt-2.5 border-t border-base font-caption text-faint">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <Tag className="w-3 h-3 shrink-0" />
-            <span className="truncate">{product.tags.slice(0, 2).join(", ")}</span>
+        <div className="flex items-center justify-between border-t border-base pt-2.5 font-caption text-faint">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <Tag className="h-3 w-3 shrink-0" />
+            <span className="truncate">
+              {product.tags.slice(0, 2).join(", ")}
+            </span>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span>upd {updatedDate}</span>
+          <div className="flex shrink-0 items-center gap-2">
+            <span>
+              {dictionary.market.updated} {updatedDate}
+            </span>
             <span className="font-numeric">v{product.currentVersion}</span>
           </div>
         </div>
