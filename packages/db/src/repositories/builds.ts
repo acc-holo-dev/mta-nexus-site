@@ -27,7 +27,13 @@ export class BuildRepository {
     const rows = await db
       .select()
       .from(builds)
-      .where(and(eq(builds.productId, productId), eq(builds.status, "published")))
+      .where(
+        and(
+          eq(builds.productId, productId),
+          eq(builds.status, "published"),
+          eq(builds.scanStatus, "clean"),
+        ),
+      )
       .orderBy(desc(builds.createdAt), desc(builds.id));
     return rows as unknown as Build[];
   }
