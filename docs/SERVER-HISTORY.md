@@ -92,7 +92,8 @@ One invocation:
 3. normalizes and matches `address:port`;
 4. records only matched/confirmed listings;
 5. uses the master fetch timestamp as the source sequence so retries of the same snapshot remain idempotent;
-6. reports counts only: known, matched, not-listed and record attempts.
+6. reports counts only: known, matched, not-listed and record attempts;
+7. reports whether the 500-profile collection cap was reached, so incomplete coverage is explicit.
 
 `notListedServers` is not an offline count. Missing endpoints produce no observation row.
 
