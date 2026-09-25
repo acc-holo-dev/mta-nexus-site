@@ -79,7 +79,9 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  const isAuthor = user ? product.authorId === user.id : false;
+  const canManageProduct = user
+    ? await productService.canManageProduct(product, user)
+    : false;
   const isPublished = product.status === "published";
   const isLicensed = user
     ? await commerceService.checkEntitlement(
@@ -90,8 +92,9 @@ export default async function ProductDetailPage({
     : false;
 
   const isAdmin = user?.role === "admin";
-  const hasAccess = isPublished && (isAuthor || isLicensed || isAdmin);
-  const canInspectBuilds = isAuthor || isAdmin;
+  const hasAccess =
+    isPublished && (canManageProduct || isLicensed || isAdmin);
+  const canInspectBuilds = canManageProduct || isAdmin;
 
   const [
     builds,
@@ -298,7 +301,7 @@ export default async function ProductDetailPage({
                   <div className="p-3.5 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 space-y-1">
                     <div className="flex items-center gap-1.5 text-xs font-bold">
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>{isAuthor ? "Author ownership" : "In your library"}</span>
+                      <span>{canManageProduct ? "Management access" : "In your library"}</span>
                     </div>
                     <p className="text-[11px] text-neutral-400">
                       You are authorized to download this published build.
