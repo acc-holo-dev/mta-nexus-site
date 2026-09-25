@@ -46,20 +46,64 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (parsed.data.serverId && !(await serverRepository.findById(parsed.data.serverId))) {
-      return NextResponse.json({ error: "Linked server was not found" }, { status: 404 });
+    let memberships:
+      | Awaited<ReturnType<typeof organizationRepository.listUserMemberships>>
+      | null = null;
+    const getMemberships = async () => {
+      memberships ??= await organizationRepository.listUserMemberships(user.id);
+      return memberships;
+    };
+
+    if (parsed.data.serverId) {
+      const linkedServer = await serverRepository.findById(parsed.data.serverId);
+      if (!linkedServer) {
+        return NextResponse.json({ error: "Linked server was not found" }, { status: 404 });
+      }
+      const organizationMemberships = linkedServer.organizationId
+        ? await getMemberships()
+        : [];
+      if (
+        !can(user, "server.manage", linkedServer, {
+          organizationMemberships,
+        })
+      ) {
+        return NextResponse.json(
+          { error: "You do not manage the linked server" },
+          { status: 403 },
+        );
+      }
     }
-    if (parsed.data.productId && !(await productRepository.findById(parsed.data.productId))) {
-      return NextResponse.json({ error: "Linked resource was not found" }, { status: 404 });
+
+    if (parsed.data.productId) {
+      const linkedProduct = await productRepository.findById(parsed.data.productId);
+      if (!linkedProduct) {
+        return NextResponse.json({ error: "Linked resource was not found" }, { status: 404 });
+      }
+      const organizationMemberships = linkedProduct.organizationId
+        ? await getMemberships()
+        : [];
+      if (
+        !can(user, "product.update", linkedProduct, {
+          organizationMemberships,
+        })
+      ) {
+        return NextResponse.json(
+          { error: "You do not manage the linked resource" },
+          { status: 403 },
+        );
+      }
     }
+
     if (parsed.data.organizationId) {
       const organization = await organizationRepository.findById(parsed.data.organizationId);
       if (!organization) {
         return NextResponse.json({ error: "Linked organization was not found" }, { status: 404 });
       }
 
-      const memberships = await organizationRepository.listUserMemberships(user.id);
-      const membership = memberships.find((item) => item.organizationId === parsed.data.organizationId);
+      const organizationMemberships = await getMemberships();
+      const membership = organizationMemberships.find(
+        (item) => item.organizationId === parsed.data.organizationId,
+      );
       const canManageOrganization =
         organization.ownerId === user.id ||
         membership?.role === "owner" ||
