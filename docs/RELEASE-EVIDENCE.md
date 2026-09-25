@@ -23,9 +23,10 @@ The command executes and records these gates:
 1. repository/runtime identity;
 2. release-evidence harness self-test;
 3. database migrations;
-4. TypeScript typecheck;
-5. Vitest;
-6. Next.js production build.
+4. Biome lint/check;
+5. TypeScript typecheck;
+6. Vitest;
+7. Next.js production build.
 
 A gate record contains only:
 
@@ -71,8 +72,9 @@ Environment variable values, database URLs, auth secrets, SMTP credentials and t
 
 The core CI Verify job uses `pnpm release:verify` instead of `pnpm check`.
 
-This does **not** weaken the old gate:
+This does **not** weaken the standard project gate inherited from DEVX-001:
 
+- `pnpm lint` runs and is recorded separately;
 - `pnpm typecheck` still runs;
 - `pnpm test` still runs;
 - `pnpm build` still runs.
