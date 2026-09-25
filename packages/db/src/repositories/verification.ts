@@ -137,12 +137,27 @@ export class VerificationRepository {
 
       if (input.decision === "approved") {
         if (request.targetType === "user" || request.targetType === "developer") {
-          await tx.update(users).set({ isVerified: true }).where(eq(users.id, request.targetId));
+          const verifiedUsers = await tx
+            .update(users)
+            .set({ isVerified: true })
+            .where(eq(users.id, request.targetId))
+            .returning({ id: users.id });
+          if (!verifiedUsers[0]) {
+            throw new ConflictError(
+              "Verification target no longer exists",
+            );
+          }
         } else if (request.targetType === "organization") {
-          await tx
+          const verifiedOrganizations = await tx
             .update(organizations)
             .set({ isVerified: true })
-            .where(eq(organizations.id, request.targetId));
+            .where(eq(organizations.id, request.targetId))
+            .returning({ id: organizations.id });
+          if (!verifiedOrganizations[0]) {
+            throw new ConflictError(
+              "Verification target no longer exists",
+            );
+          }
         } else if (request.targetType === "server") {
           const [proof] = await tx
             .select({ id: serverClaimChallenges.id })
