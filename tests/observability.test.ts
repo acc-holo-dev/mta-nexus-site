@@ -64,6 +64,8 @@ describe("structured observability", () => {
         password: "secret",
         token: "abc",
         clientIp: "203.0.113.2",
+        requestId: "attacker-controlled",
+        event: "overridden.event",
       },
     });
 
@@ -83,6 +85,10 @@ describe("structured observability", () => {
     expect(serialized).not.toContain("203.0.113.2");
     expect(serialized).not.toContain('"token"');
     expect(serialized).not.toContain('"password"');
+    expect(entry.requestId).toBe("req-log");
+    expect(entry.event).toBe("auth.login.failed");
+    expect(serialized).not.toContain("attacker-controlled");
+    expect(serialized).not.toContain("overridden.event");
   });
 
   it("does not echo arbitrary thrown values", () => {
