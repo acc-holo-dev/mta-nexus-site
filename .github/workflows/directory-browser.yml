@@ -51,6 +51,7 @@ jobs:
           if [ "$ACCEPTANCE_OUTCOME" = success ]; then
             test -s "$report/results.json"
             test -s "$report/summary.md"
+            test -s "$report/playwright-report.json"
           fi
           if [ -f "$report/summary.md" ]; then
             tee -a "$GITHUB_STEP_SUMMARY" < "$report/summary.md"
