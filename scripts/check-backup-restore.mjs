@@ -271,7 +271,7 @@ function run() {
 
     const migrationsDir = join(root, "packages", "db", "migrations");
     const migrationFiles = readdirSync(migrationsDir)
-      .filter((name) => /^\\d+.*\\.sql$/u.test(name))
+      .filter((name) => /^\d+.*\.sql$/u.test(name))
       .sort((a, b) => a.localeCompare(b));
     assert(migrationFiles.length > 0, "No SQL migrations were found");
 
@@ -331,6 +331,12 @@ function run() {
       ),
     });
 
+    sql(
+      sourceContainer,
+      "CREATE TABLE backup_probe (id integer PRIMARY KEY, value text NOT NULL); " +
+        "INSERT INTO backup_probe VALUES (1, 'alpha'), (2, 'beta');",
+    );
+
     const sourceSchemaFingerprint = schemaFingerprint(sourceContainer);
     assert(
       sourceSchemaFingerprint.columns &&
@@ -340,12 +346,6 @@ function run() {
       "Application migrations did not produce a complete schema fingerprint",
     );
     result.sourceSchemaFingerprint = sourceSchemaFingerprint;
-
-    sql(
-      sourceContainer,
-      "CREATE TABLE backup_probe (id integer PRIMARY KEY, value text NOT NULL); " +
-        "INSERT INTO backup_probe VALUES (1, 'alpha'), (2, 'beta');",
-    );
 
     helper(imageId, sourceUploads, sourceToken, [
       "-eu",
