@@ -26,7 +26,7 @@
     "release:verify": "node scripts/release-evidence.mjs"
   },
   "devDependencies": {
-    "@types/node": "^26.6.1",
+    "@types/node": "^26.6.2",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1",

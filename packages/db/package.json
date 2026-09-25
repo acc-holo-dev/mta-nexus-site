@@ -22,7 +22,7 @@
     "tsx": "^4.23.13"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.10",
+    "drizzle-kit": "^0.31.11",
     "typescript": "^7.0.2"
   }
 }
