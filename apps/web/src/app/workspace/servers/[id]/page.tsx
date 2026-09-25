@@ -24,7 +24,8 @@ export default async function ServerManagementPage({ params }: { params: Promise
   }
 
   const server = await serverService.getServerById(id);
-  if (!server || (server.ownerId !== user.id && user.role !== "admin")) notFound();
+  if (!server) notFound();
+  if (!(await serverService.canManageServer(server, user))) notFound();
 
   return (
     <div className="max-w-4xl mx-auto py-8 space-y-6">
