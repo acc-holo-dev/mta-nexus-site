@@ -45,6 +45,7 @@ export class BuildRepository {
         and(
           eq(builds.productId, productId),
           eq(builds.status, "published"),
+          eq(builds.scanStatus, "clean"),
         ),
       )
       .orderBy(desc(builds.createdAt), desc(builds.id))
