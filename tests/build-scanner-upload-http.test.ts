@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 const scan = vi.hoisted(() => vi.fn());
 const uploadAsset = vi.hoisted(() => vi.fn());
 const deleteAsset = vi.hoisted(() => vi.fn());
+const preflight = vi.hoisted(() => vi.fn());
 const releaseBuild = vi.hoisted(() => vi.fn());
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -23,7 +24,10 @@ vi.mock("../apps/web/src/lib/services/build-scanner-service", () => ({
 }));
 
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
-  productService: { releaseBuild },
+  productService: {
+    assertCanReleaseBuild: preflight,
+    releaseBuild,
+  },
 }));
 
 vi.mock("@nexus/storage", () => ({
@@ -73,6 +77,10 @@ const context = {
 describe("build upload scanner HTTP behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    preflight.mockResolvedValue({
+      id: "prd_scanner",
+      price: 0,
+    });
     uploadAsset.mockResolvedValue({
       id: "ast_scanner",
       key: "assets/usr_scanner_author/ast_scanner_resource.zip",
@@ -122,6 +130,7 @@ describe("build upload scanner HTTP behavior", () => {
 
     expect(response.status).toBe(503);
     expect(response.headers.get("Retry-After")).toBe("30");
+    expect(response.headers.get("X-Request-Id")).toBeTruthy();
     expect(await response.json()).toEqual({
       error:
         "Malware scanning is temporarily unavailable. No build was stored; retry the upload later.",
@@ -142,6 +151,7 @@ describe("build upload scanner HTTP behavior", () => {
     const response = await POST(uploadRequest(), context);
 
     expect(response.status).toBe(201);
+    expect(preflight).toHaveBeenCalledTimes(1);
     expect(scan).toHaveBeenCalledTimes(1);
     expect(uploadAsset).toHaveBeenCalledTimes(1);
     expect(releaseBuild).toHaveBeenCalledWith(
