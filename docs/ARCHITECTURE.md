@@ -88,9 +88,13 @@ The global shell resolves `en` or `ru` from the `nexus_locale` cookie. The local
 - footer;
 - home page;
 - global not-found/error messaging;
-- mobile navigation.
+- mobile navigation;
+- free-resource catalog and cards;
+- workspace;
+- public server directory;
+- login and registration.
 
-Feature pages can migrate additional copy into the same dictionary incrementally. Do not introduce a second localization mechanism.
+Remaining feature-specific copy must migrate into the same dictionary incrementally. Do not introduce a second localization mechanism.
 
 ## 5. UI architecture
 
