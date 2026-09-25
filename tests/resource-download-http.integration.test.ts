@@ -1,7 +1,10 @@
 import { afterAll, describe, expect, it } from "vitest";
+import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import {
+  auditEvents,
   buildRepository,
+  db,
   entitlementRepository,
   productRepository,
   sessionRepository,
@@ -168,6 +171,21 @@ describe("resource download HTTP integration", () => {
     expect(
       new Uint8Array(await success.arrayBuffer()),
     ).toEqual(bytes);
+
+    const downloadAudits = await db
+      .select()
+      .from(auditEvents)
+      .where(eq(auditEvents.targetId, publishedProductId));
+    expect(
+      downloadAudits.some(
+        (audit) => audit.action === "product.download_started",
+      ),
+    ).toBe(true);
+    expect(
+      downloadAudits.some(
+        (audit) => audit.action === "product.downloaded",
+      ),
+    ).toBe(false);
 
     const noEntitlementInput = request(
       publishedProductId,

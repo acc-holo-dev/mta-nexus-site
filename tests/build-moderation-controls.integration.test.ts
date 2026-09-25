@@ -193,6 +193,24 @@ describe("build moderation route integration", () => {
         Buffer.from(await reviewerDownload.arrayBuffer()),
       ).toEqual(bytes);
 
+      const reviewerAudits = await db
+        .select()
+        .from(auditEvents)
+        .where(eq(auditEvents.targetId, cleanBuildId));
+      expect(
+        reviewerAudits.some(
+          (audit) =>
+            audit.action ===
+            "build.review_artifact_download_started",
+        ),
+      ).toBe(true);
+      expect(
+        reviewerAudits.some(
+          (audit) =>
+            audit.action === "build.review_artifact_downloaded",
+        ),
+      ).toBe(false);
+
       const missingNote = await moderate(
         moderationRequest(
           moderatorToken,

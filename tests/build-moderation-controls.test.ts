@@ -33,6 +33,9 @@ describe("build moderation control surface", () => {
     expect(route).toContain('"Cache-Control": "private, no-store"');
     expect(route).toContain('Vary: "Cookie"');
     expect(route).toContain("destroyOpenedStream(stored.stream)");
+    expect(route).toContain(
+      'action: "build.review_artifact_download_started"',
+    );
   });
 
   it("requires review context and disables approve for non-clean scans in the admin UI", () => {
