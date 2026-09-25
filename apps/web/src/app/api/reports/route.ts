@@ -15,15 +15,26 @@ import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
-  const token = request.cookies.get("nexus_session")?.value;
-  const user = await authService.getSession(token);
+  try {
+    const token = request.cookies.get("nexus_session")?.value;
+    const user = await authService.getSession(token);
 
-  if (!user || !can(user, "admin.moderation")) {
-    return jsonWithRequestId(context, { error: "Unauthorized" }, { status: 403 });
+    if (!user || !can(user, "admin.moderation")) {
+      return jsonWithRequestId(context, { error: "Unauthorized" }, { status: 403 });
+    }
+
+    const reports = await reportRepository.listAll();
+    return jsonWithRequestId(context, { reports });
+  } catch (error: unknown) {
+    logRequestEvent({
+      level: "error",
+      event: "moderation.report.list_failed",
+      context,
+      status: 500,
+      error,
+    });
+    return jsonWithRequestId(context, { error: "Failed to load reports" }, { status: 500 });
   }
-
-  const reports = await reportRepository.listAll();
-  return jsonWithRequestId(context, { reports });
 }
 
 export async function POST(request: NextRequest) {
