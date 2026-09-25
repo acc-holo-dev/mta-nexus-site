@@ -37,6 +37,7 @@ import {
   serverRepository,
   sessionRepository,
   userRepository,
+  verificationRepository,
   verificationRequests,
 } from "@nexus/db";
 import { POST as issueChallenge } from "../apps/web/src/app/api/servers/[id]/claim-challenge/route";
@@ -356,5 +357,86 @@ describe("MTA server control challenge integration", () => {
     expect(await retry.json()).toMatchObject({
       code: "INVALID_SERVER_CONTROL_CHALLENGE",
     });
+  });
+
+  it("fails closed when a legacy pending server request has no consumed control proof", async () => {
+    const suffix = `${Date.now().toString(36)}_${process.pid}`;
+    const requesterId = `usr_legacy_claim_${suffix}`;
+    const reviewerId = `usr_legacy_reviewer_${suffix}`;
+    const serverId = `srv_legacy_claim_${suffix}`;
+    const requestId = `ver_legacy_claim_${suffix}`;
+    const port = 19_000 + ((Date.now() + process.pid) % 30_000);
+
+    await userRepository.create({
+      id: requesterId,
+      email: `legacy_claim_${suffix}@nexus.test`,
+      username: `legacy_claim_${suffix}`,
+      displayName: "Legacy Claim Requester",
+      role: "user",
+    });
+    await userRepository.create({
+      id: reviewerId,
+      email: `legacy_reviewer_${suffix}@nexus.test`,
+      username: `legacy_reviewer_${suffix}`,
+      displayName: "Legacy Claim Reviewer",
+      role: "moderator",
+    });
+    await serverRepository.create({
+      id: serverId,
+      name: "Legacy Pending Claim",
+      slug: `legacy-pending-claim-${suffix}`,
+      ipAddress: "198.51.100.212",
+      port,
+      status: "active",
+      visibility: "public",
+      isVerified: false,
+      gameplayTags: [],
+      mediaUrls: [],
+    });
+
+    await db.insert(verificationRequests).values({
+      id: requestId,
+      requesterId,
+      targetType: "server",
+      targetId: serverId,
+      status: "pending",
+      notes: "Legacy pre-challenge ownership request.",
+      createdAt: new Date(),
+    });
+
+    await expect(
+      verificationRepository.resolveRequest({
+        id: requestId,
+        reviewerId,
+        decision: "approved",
+        reviewNotes: "Must not approve without durable control proof.",
+      }),
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      code: "CONFLICT",
+    });
+
+    const [stillPending] = await db
+      .select()
+      .from(verificationRequests)
+      .where(eq(verificationRequests.id, requestId))
+      .limit(1);
+    expect(stillPending?.status).toBe("pending");
+
+    const afterFailedApproval = await serverRepository.findById(serverId);
+    expect(afterFailedApproval?.ownerId).toBeFalsy();
+    expect(afterFailedApproval?.isVerified).toBe(false);
+
+    const rejected = await verificationRepository.resolveRequest({
+      id: requestId,
+      reviewerId,
+      decision: "rejected",
+      reviewNotes: "Re-submit through the live control challenge.",
+    });
+    expect(rejected?.status).toBe("rejected");
+
+    const afterRejection = await serverRepository.findById(serverId);
+    expect(afterRejection?.ownerId).toBeFalsy();
+    expect(afterRejection?.isVerified).toBe(false);
   });
 });
