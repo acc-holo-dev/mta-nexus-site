@@ -28,8 +28,16 @@ echo "::add-mask::$abuse_key"
 export NEXUS_CI_CADDYFILE="$work/Caddyfile"
 node --input-type=module <<'NODE'
 import { readFileSync, writeFileSync } from 'node:fs';
-import { localCertificateConfig } from './scripts/production-smoke-contract.mjs';
-writeFileSync(process.env.NEXUS_CI_CADDYFILE, localCertificateConfig(readFileSync('deploy/Caddyfile', 'utf8')));
+import {
+  assertProductionUploadBodyLimit,
+  localCertificateConfig,
+} from './scripts/production-smoke-contract.mjs';
+const productionCaddy = readFileSync('deploy/Caddyfile', 'utf8');
+assertProductionUploadBodyLimit(productionCaddy);
+writeFileSync(
+  process.env.NEXUS_CI_CADDYFILE,
+  localCertificateConfig(productionCaddy),
+);
 NODE
 # Explicit test values, no repository .env or inherited application credentials.
 pc=(env -i "PATH=$PATH" "HOME=$HOME" COMPOSE_DISABLE_ENV_FILE=true
@@ -109,9 +117,24 @@ assert.equal(value.status, 'ok'); assert.equal(value.database, 'reachable');
 NODE
 "${https[@]}" --fail "https://$domain:8443/" > "$work/home.html"
 grep -qi '<html' "$work/home.html"
+
+# The proxy must reject a request one byte above the 65 MiB upload envelope
+# before the application can parse or buffer it.
+proxy_upload_limit=$((65 * 1024 * 1024))
+truncate -s $((proxy_upload_limit + 1)) "$work/oversized-request.bin"
+oversized_code=$("${https[@]}" \
+  -H 'Content-Type: application/octet-stream' \
+  -H 'Expect: 100-continue' \
+  --data-binary @"$work/oversized-request.bin" \
+  -o /dev/null \
+  -w '%{http_code}' \
+  "https://$domain:8443/api/health")
+[[ $oversized_code == 413 ]]
+rm -f -- "$work/oversized-request.bin"
+
 redirect=$(curl --silent --show-error --noproxy '*' --max-time 10 --resolve "$domain:8080:127.0.0.1" -o /dev/null -w '%{http_code} %{redirect_url}' "http://$domain:8080/")
 [[ $redirect == "308 https://$domain"* ]]
-echo 'PASS: production image, trusted test TLS, HTTP redirect, proxy, database, writable uploads and private ports'
+echo 'PASS: production image, trusted test TLS, HTTP redirect, 65 MiB proxy body limit, database, writable uploads and private ports'
 
 sql() { "${pc[@]}" exec -T postgres psql -X -v ON_ERROR_STOP=1 -U nexus -d mta_nexus -Atc "$1"; }
 [[ $(sql 'SELECT count(*) FROM drizzle.__drizzle_migrations') -gt 0 ]]
@@ -159,6 +182,7 @@ echo 'PASS: database outage returns 503 through HTTPS proxy; service recovers wi
   echo "Commit: ${GITHUB_SHA:-unknown}"
   echo "Application image: $image_before"
   echo 'PASS: HTTPS with an explicitly trusted disposable internal CA; production proxy directives retained.'
+  echo 'PASS: production Caddy rejects request bodies above the 65 MiB build-upload envelope with HTTP 413.'
   echo 'PASS: standalone HTTP runtime, deployed migration runtime, no runtime pnpm, non-root app, private ports, read/write storage, replacement and retained probes.'
   echo 'PASS: rejected invalid secret, HTTP URL, disabled scanner and failing migration; database 503 and recovery.'
   echo 'Not covered: public ACME/DNS, browser journeys, malware verdicts, existing databases or backup restore.'
