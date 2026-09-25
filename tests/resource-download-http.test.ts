@@ -17,6 +17,7 @@ const state = vi.hoisted(() => ({
     status: "published" | "draft" | "suspended" | "archived";
   },
   entitled: false,
+  managementAccess: false,
   build: null as null | {
     id: string;
     productId: string;
@@ -42,6 +43,12 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
   commerceService: {
     checkEntitlement: vi.fn(async () => state.entitled),
+  },
+}));
+
+vi.mock("../apps/web/src/lib/services/product-service", () => ({
+  productService: {
+    canManageProduct: vi.fn(async () => state.managementAccess),
   },
 }));
 
@@ -102,6 +109,7 @@ describe("resource download HTTP contract", () => {
       status: "published",
     };
     state.entitled = true;
+    state.managementAccess = false;
     state.build = {
       id: "bld_http",
       productId: "prd_http",
@@ -165,6 +173,37 @@ describe("resource download HTTP contract", () => {
       error: "Add this resource to your library before downloading it",
     });
     expect(downloadStream).not.toHaveBeenCalled();
+  });
+
+  it("does not treat stale author attribution as management access", async () => {
+    state.user = {
+      id: "usr_author",
+      email: "former-manager@nexus.test",
+      username: "former-manager",
+      displayName: "Former Manager",
+      role: "developer",
+    };
+    state.product = {
+      ...state.product!,
+      authorId: "usr_author",
+    };
+    state.managementAccess = false;
+    state.entitled = false;
+
+    const response = await GET(request(), context);
+
+    expect(response.status).toBe(403);
+    expect(downloadStream).not.toHaveBeenCalled();
+  });
+
+  it("allows a current resource manager without requiring a library entitlement", async () => {
+    state.managementAccess = true;
+    state.entitled = false;
+
+    const response = await GET(request(), context);
+
+    expect(response.status).toBe(200);
+    expect(downloadStream).toHaveBeenCalledTimes(1);
   });
 
   it("returns 404 when access exists but no published build is available", async () => {
