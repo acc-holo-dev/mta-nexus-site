@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { and, eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import {
   db,
@@ -96,6 +97,75 @@ describe("organization owner context switching integration", () => {
       (context: { id: string }) => context.id === organizationId,
     );
     expect(repeated).toHaveLength(1);
-    expect(repeated[0]).toMatchObject({ role: "owner" });
+    expect(repeated[0]).
+
+  it("falls back to personal when a previously selected membership context is revoked", async () => {
+    const suffix = `${Date.now().toString(36)}_${process.pid}`;
+    const ownerId = `usr_context_revoke_owner_${suffix}`;
+    const memberId = `usr_context_revoke_member_${suffix}`;
+    const organizationId = `org_context_revoke_${suffix}`;
+    const token = `tok_context_revoke_${suffix}`;
+
+    await userRepository.create({
+      id: ownerId,
+      email: `context_revoke_owner_${suffix}@nexus.test`,
+      username: `context_revoke_owner_${suffix}`,
+      displayName: "Context Revoke Owner",
+      role: "user",
+    });
+    await userRepository.create({
+      id: memberId,
+      email: `context_revoke_member_${suffix}@nexus.test`,
+      username: `context_revoke_member_${suffix}`,
+      displayName: "Context Revoke Member",
+      role: "user",
+    });
+    await organizationRepository.create({
+      id: organizationId,
+      name: "Context Revoke Organization",
+      slug: `context-revoke-org-${suffix}`,
+      ownerId,
+    });
+    await db.insert(organizationMembers).values({
+      id: `om_context_revoke_${suffix}`,
+      organizationId,
+      userId: memberId,
+      role: "member",
+      permissions: [],
+      createdAt: new Date(),
+    });
+    await sessionRepository.create({
+      id: `ses_context_revoke_${suffix}`,
+      userId: memberId,
+      token,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
+
+    const switched = await authService.switchContext(memberId, organizationId);
+    expect(switched.activeContextId).toBe(organizationId);
+
+    await db
+      .delete(organizationMembers)
+      .where(
+        and(
+          eq(organizationMembers.organizationId, organizationId),
+          eq(organizationMembers.userId, memberId),
+        ),
+      );
+
+    const response = await getContexts(
+      new NextRequest("http://nexus.test/api/auth/context", {
+        headers: { cookie: `nexus_session=${token}` },
+      }),
+    );
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    expect(body.activeContextId).toBe("personal");
+    expect(
+      body.contexts.some(
+        (context: { id: string }) => context.id === organizationId,
+      ),
+    ).toBe(false);
+  });toMatchObject({ role: "owner" });
   });
 });
