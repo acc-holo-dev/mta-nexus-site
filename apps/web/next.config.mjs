@@ -1,6 +1,12 @@
+import { fileURLToPath } from "node:url";
+
+const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: "standalone",
+  outputFileTracingRoot: repositoryRoot,
   transpilePackages: [
     "@nexus/config",
     "@nexus/domain",

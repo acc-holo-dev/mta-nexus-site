@@ -5,12 +5,18 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { test } from 'node:test';
 
-function exercise(migrationExit, serverExit = 0) {
+function exercise(migrationExit, serverExit = 0, { withMigrations = true } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'nexus-entrypoint-'));
   try {
     mkdirSync(join(root, 'scripts'));
     mkdirSync(join(root, 'bin'));
     mkdirSync(join(root, 'apps/web'), { recursive: true });
+    mkdirSync(join(root, 'packages/db'), { recursive: true });
+    if (withMigrations) {
+      mkdirSync(join(root, 'packages/db/migrations'), { recursive: true });
+      writeFileSync(join(root, 'packages/db/migrations/0000_test.sql'), 'select 1;\n');
+    }
+    writeFileSync(join(root, 'calls'), '');
     copyFileSync(new URL('../start-production.sh', import.meta.url), join(root, 'scripts/start-production.sh'));
     writeFileSync(join(root, 'bin/node'), `#!/bin/sh
 printf '%s|%s\\n' "$PWD" "$*" >> "$PROBE_LOG"
@@ -23,16 +29,17 @@ exit "$SERVER_EXIT"
         MIGRATION_EXIT: String(migrationExit), SERVER_EXIT: String(serverExit) },
     });
     assert.ifError(result.error);
-    return { status: result.status, calls: readFileSync(join(root, 'calls'), 'utf8').trim().split('\n'), root };
+    const callText = readFileSync(join(root, 'calls'), 'utf8').trim();
+    return { status: result.status, calls: callText ? callText.split('\n') : [], root };
   } finally { rmSync(root, { recursive: true, force: true }); }
 }
 
-test('runs migrations before Next.js from the correct directories, without pnpm', () => {
+test('runs migrations before the standalone server from isolated runtime directories, without pnpm', () => {
   const result = exercise(0);
   assert.equal(result.status, 0);
   assert.deepEqual(result.calls, [
-    `${result.root}|--import tsx packages/db/src/migrate.ts`,
-    `${result.root}/apps/web|node_modules/next/dist/bin/next start --hostname 0.0.0.0`,
+    `${result.root}/packages/db|--import tsx src/migrate.ts`,
+    `${result.root}/apps/web|server.js`,
   ]);
 });
 
@@ -44,4 +51,10 @@ test('migration failure preserves the failure code and never starts HTTP', () =>
 
 test('propagates server failure instead of reporting successful startup', () => {
   assert.equal(exercise(0, 9).status, 9);
+});
+
+test('missing deployed SQL migrations fails before migration or HTTP node processes start', () => {
+  const result = exercise(0, 0, { withMigrations: false });
+  assert.notEqual(result.status, 0);
+  assert.deepEqual(result.calls, []);
 });

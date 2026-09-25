@@ -19,4 +19,8 @@ assert.equal(typeof worker.environment?.ACCOUNT_MAIL_PREVIOUS_KEY, "string");
 assert(worker.environment.ACCOUNT_MAIL_PREVIOUS_KEY.length >= 43);
 assert.equal(worker.environment?.ACCOUNT_MAIL_SMTP_USERNAME, "nexus-ci-user");
 assert.equal(worker.environment?.ACCOUNT_MAIL_SMTP_PASSWORD, "nexus-ci-password");
-assert(Array.isArray(worker.command) && worker.command.some((part) => String(part).endsWith("/run-account-mail-dispatcher.ts")));
+assert.deepEqual(worker.command, [
+  "sh",
+  "-c",
+  "cd /app/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --ready",
+]);

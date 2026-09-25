@@ -96,7 +96,7 @@ start_worker() {
     --env ACCOUNT_MAIL_SMTP_TIMEOUT_MS=1000 \
     --env ACCOUNT_MAIL_BATCH_SIZE=2 \
     --env ACCOUNT_MAIL_POLL_INTERVAL_MS=60000 \
-    "$image" node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --ready >/dev/null
+    "$image" sh -c 'cd /app/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --ready' >/dev/null
 }
 
 wait_ready() {
@@ -184,7 +184,7 @@ docker run --rm --add-host host.docker.internal:host-gateway \
   --env ACCOUNT_MAIL_APP_URL=https://nexus-mta.test \
   --env ACCOUNT_MAIL_SMTP_HOST="$smtp_host" --env ACCOUNT_MAIL_SMTP_PORT=2465 \
   --env ACCOUNT_MAIL_SMTP_SERVERNAME=localhost --env ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test \
-  "$image" node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --once \
+  "$image" sh -c 'cd /app/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --once' \
   > /tmp/nexus-d5-missing.out 2> /tmp/nexus-d5-missing.err
 code=$?
 set -e
