@@ -114,7 +114,19 @@ export async function collectDoctor(options = {}) {
     );
   }
 
-  const packageJson = JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
+  let packageJson = {};
+  try {
+    packageJson = JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
+  } catch {
+    addCheck(
+      checks,
+      "package-json",
+      "fail",
+      "package.json could not be read as valid JSON.",
+      "Restore a valid repository package.json before running host-side project commands.",
+    );
+  }
+
   const nodeMajor = parseVersion(nodeVersion)?.[0] ?? 0;
   addCheck(
     checks,
@@ -136,14 +148,20 @@ export async function collectDoctor(options = {}) {
     );
   } else {
     facts.pnpm = pnpmResult.stdout;
+    const pinned = Boolean(pinnedPnpm);
+    const matchesPin = pinned && pnpmResult.stdout === pinnedPnpm;
     addCheck(
       checks,
       "pnpm",
-      pnpmResult.stdout === pinnedPnpm ? "pass" : "warn",
-      `pnpm ${pnpmResult.stdout}; repository pins ${pinnedPnpm}.`,
-      pnpmResult.stdout === pinnedPnpm
+      matchesPin ? "pass" : "warn",
+      pinned
+        ? `pnpm ${pnpmResult.stdout}; repository pins ${pinnedPnpm}.`
+        : `pnpm ${pnpmResult.stdout}; repository packageManager pin is unavailable.`,
+      matchesPin
         ? undefined
-        : `Use pnpm ${pinnedPnpm} for reproducible host-side commands.`,
+        : pinned
+          ? `Use pnpm ${pinnedPnpm} for reproducible host-side commands.`
+          : "Restore package.json before relying on host-side pnpm commands.",
     );
   }
 
