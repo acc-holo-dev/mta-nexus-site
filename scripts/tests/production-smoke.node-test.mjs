@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { localCertificateConfig, assertIsolatedProduction, assertInternalIssuer } from '../production-smoke-contract.mjs';
+import {
+  PRODUCTION_UPLOAD_ENVELOPE_BYTES,
+  assertProductionUploadBodyLimit,
+  localCertificateConfig,
+  assertIsolatedProduction,
+  assertInternalIssuer,
+} from '../production-smoke-contract.mjs';
 const project = 'nexus-prod-ci-11111111-1111-1111-1111-111111111111';
 const fixture = () => ({
   name: project,
@@ -43,4 +50,16 @@ test('rejects public or implicit ACME issuers before Caddy starts', () => {
   assert.doesNotThrow(() => assertInternalIssuer({ apps: { tls: { automation: { policies: [{ issuers: [{ module: 'internal' }] }] } } } }));
   assert.throws(() => assertInternalIssuer({}));
   assert.throws(() => assertInternalIssuer({ apps: { tls: { automation: { policies: [{ issuers: [{ module: 'acme' }] }] } } } }));
+});
+
+
+test('pins the production proxy body limit to the application build envelope', () => {
+  const caddy = readFileSync('deploy/Caddyfile', 'utf8');
+  const storage = readFileSync('packages/storage/src/storage-service.ts', 'utf8');
+  const uploadRoute = readFileSync('apps/web/src/app/api/products/[id]/builds/route.ts', 'utf8');
+  assert.equal(PRODUCTION_UPLOAD_ENVELOPE_BYTES, 65 * 1024 * 1024);
+  assert.doesNotThrow(() => assertProductionUploadBodyLimit(caddy));
+  assert.match(storage, /MAX_FILE_SIZE_BYTES\s*=\s*64\s*\*\s*1024\s*\*\s*1024/u);
+  assert.match(uploadRoute, /MULTIPART_OVERHEAD_BYTES\s*=\s*1024\s*\*\s*1024/u);
+  assert.throws(() => assertProductionUploadBodyLimit(caddy.replace('68157440', '65000000')), /65 MiB build-upload envelope/u);
 });
