@@ -45,6 +45,9 @@ describe("build scanner fail-closed upload flow", () => {
 
     expect(scanner).toContain("writeClamAvInstream(socket, bytes)");
     expect(scanner).not.toContain("socket.write(length)");
+    expect(scanner.match(/import net from "node:net";/gu)).toHaveLength(1);
+    expect(scanner).toContain("const CLAMAV_MAX_RESPONSE_BYTES = 8 * 1024");
+    expect(scanner).toContain("Scanner response exceeded limit");
     expect(transport).toContain('socket.once("drain"');
     expect(transport).toContain("await waitForDrain(socket)");
     expect(transport).toContain("64 * 1024");
