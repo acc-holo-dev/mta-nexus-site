@@ -96,4 +96,12 @@ describe("canonical organization resource authorization surface", () => {
       'mem.permissions.includes("manage_products")',
     );
   });
+
+  it("does not let legacy personal ownership bypass organization server authority", () => {
+    const policy = read("packages/security/src/policy.ts");
+
+    expect(policy).toContain(
+      "!server.organizationId && server.ownerId === user.id",
+    );
+  });
 });
