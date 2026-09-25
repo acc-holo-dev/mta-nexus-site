@@ -13,7 +13,9 @@
     "check": "pnpm typecheck && pnpm test && pnpm build",
     "db:generate": "pnpm --filter @nexus/db generate",
     "db:migrate": "pnpm --filter @nexus/db migrate",
-    "db:seed": "pnpm --filter @nexus/db seed"
+    "db:seed": "pnpm --filter @nexus/db seed",
+    "server:observations:capture": "node --import tsx scripts/capture-server-observations.ts",
+    "server:observations:guard:test": "node --test scripts/tests/server-observation-capture.node-test.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.1",
