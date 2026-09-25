@@ -65,8 +65,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify observation capture mutation guard
+        run: node --test scripts/tests/server-observation-capture.node-test.mjs
+
       - name: Apply database migrations
         run: pnpm db:migrate
+
+      - name: Verify Scenario Lab database idempotency
+        run: pnpm --filter @nexus/db exec tsx scripts/scenario-lab-db.integration.ts
 
       - name: Start isolated TLS SMTP receiver
         run: |
@@ -156,8 +162,11 @@ jobs:
           ! grep -F "$AUTH_SECRET" /tmp/account-mail-missing.err
           echo "PASS: dedicated keys, one-shot worker, SIGTERM shutdown and secret-safe failure"
 
-      - name: Verify project
-        run: pnpm check
+      - name: Verify Scenario Lab safety contract
+        run: node --test packages/db/scripts/scenario-lab-contract.node-test.mjs
+
+      - name: Verify project and write core release evidence
+        run: pnpm release:verify
 
       - name: Build production image
         run: docker build --tag mta-nexus:ci .
@@ -199,6 +208,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+      - name: Validate developer verification Compose
+        run: COMPOSE_DISABLE_ENV_FILE=true docker compose -f compose.verify.yaml config --quiet
       - name: Build and start the documented local stack
         run: |
           test ! -f .env
