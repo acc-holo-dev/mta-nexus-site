@@ -1,6 +1,18 @@
 import assert from 'node:assert/strict';
 
+export const PRODUCTION_UPLOAD_ENVELOPE_BYTES = 65 * 1024 * 1024;
+
 // Preserve every production proxy directive; change only the test CA policy.
+export function assertProductionUploadBodyLimit(source) {
+  const match = source.match(/request_body\s*\{[\s\S]*?max_size\s+(\d+)[\s\S]*?\}/u);
+  assert(match, 'Production Caddyfile must declare a request_body max_size');
+  assert.equal(
+    Number(match[1]),
+    PRODUCTION_UPLOAD_ENVELOPE_BYTES,
+    'Production proxy body limit must equal the 65 MiB build-upload envelope',
+  );
+}
+
 export function localCertificateConfig(source) {
   assert(source.startsWith('{\n'), 'Review the Caddy global block before changing this fixture');
   assert(!/\b(local_certs|acme_ca|tls)\b/.test(source), 'Explicit TLS settings require fixture review');
