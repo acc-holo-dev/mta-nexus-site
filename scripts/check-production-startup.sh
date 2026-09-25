@@ -77,7 +77,14 @@ NODE
 app=$("${pc[@]}" ps -q app)
 caddy=$("${pc[@]}" ps -q caddy)
 [[ $("${pc[@]}" exec -T app id -u) != 0 ]]
-"${pc[@]}" exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; assert.equal(process.env.NODE_ENV, 'production'); assert.equal(process.env.BUILD_SCANNER, 'clamav');"
+"${pc[@]}" exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; assert.equal(process.env.NODE_ENV, 'production'); assert.equal(process.env.HOSTNAME, '0.0.0.0'); assert.equal(process.env.BUILD_SCANNER, 'clamav');"
+"${pc[@]}" exec -T app test -f /app/apps/web/server.js
+"${pc[@]}" exec -T app test -f /app/packages/db/src/migrate.ts
+"${pc[@]}" exec -T app test -f /app/packages/db/node_modules/tsx/package.json
+if "${pc[@]}" exec -T app sh -c 'command -v pnpm >/dev/null 2>&1'; then
+  echo 'FAIL: production runtime unexpectedly contains pnpm' >&2
+  exit 1
+fi
 "${pc[@]}" exec -T app node scripts/check-local-readiness.mjs
 for service in app postgres clamav; do
   id=$("${pc[@]}" ps -q "$service")
@@ -150,7 +157,7 @@ echo 'PASS: database outage returns 503 through HTTPS proxy; service recovers wi
   echo "Commit: ${GITHUB_SHA:-unknown}"
   echo "Application image: $image_before"
   echo 'PASS: HTTPS with an explicitly trusted disposable internal CA; production proxy directives retained.'
-  echo 'PASS: migrations, non-root app, private ports, read/write storage, replacement and retained probes.'
+  echo 'PASS: standalone HTTP runtime, deployed migration runtime, no runtime pnpm, non-root app, private ports, read/write storage, replacement and retained probes.'
   echo 'PASS: rejected invalid secret, HTTP URL, disabled scanner and failing migration; database 503 and recovery.'
   echo 'Not covered: public ACME/DNS, browser journeys, malware verdicts, existing databases or backup restore.'
 } | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}"
