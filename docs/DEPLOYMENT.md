@@ -77,7 +77,9 @@ For an existing database, verify a backup and rehearse a version-appropriate tra
 
 ## Backups and restore drill
 
-VDS-provider backups remain the chosen backup mechanism. Confirm what the actual provider backup covers and restore both the database and private uploads on a disposable environment before inviting users. No restore has been demonstrated by this document. Keeping the same named volumes while replacing containers is not a backup restore.
+VDS-provider backups remain the chosen backup mechanism. Confirm what the actual provider backup covers and restore both the database and private uploads on a disposable environment before inviting users. No real-environment restore has been demonstrated by this document. Keeping the same named volumes while replacing containers is not a backup restore.
+
+OPS-001 adds a CI-only disposable database + uploads dump/restore rehearsal described in [Disposable backup and restore rehearsal](BACKUP-RESTORE-REHEARSAL.md). Its presence is not acceptance: until that exact candidate has a successful GitHub-hosted run, the restore gate remains unverified. Even a green synthetic rehearsal would not replace a provider/VDS restore drill with real operational backup policy.
 
 The following exports are retained as reference tools for a planned restore drill, not a newly mandated parallel backup service. First identify the real uploads volume from the running Compose project; the volume name in an example must never be assumed to match the host.
 
