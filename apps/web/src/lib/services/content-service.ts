@@ -133,10 +133,19 @@ export class ContentService {
       );
     }
 
-    const updated = await contentRepository.updateStatus(
+    const updated = await contentRepository.moderateStatusWithAudit(
       contentId,
       targetStatus,
-      current.status
+      current.status,
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: "admin",
+        action: decision === "publish" ? "content.published" : "content.archived",
+        targetId: contentId,
+        targetType: "content",
+        details: { from: current.status, to: targetStatus, notes },
+      },
     );
     if (!updated) {
       throw new AppError(
@@ -145,16 +154,6 @@ export class ContentService {
         "CONTENT_STATE_CHANGED"
       );
     }
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: actor.id,
-      actorType: "admin",
-      action: decision === "publish" ? "content.published" : "content.archived",
-      targetId: contentId,
-      targetType: "content",
-      details: { from: current.status, to: targetStatus, notes },
-    });
 
     if (decision === "publish" && updated.serverId) {
       await notifyServerFollowersOfPublishedContent(updated).catch(
