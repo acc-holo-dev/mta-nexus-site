@@ -57,6 +57,9 @@ export async function POST(
       return jsonWithRequestId(context, { error: "Build upload limit exceeded" }, { status: 429 });
     }
 
+    const { id: productId } = await params;
+    await productService.assertCanReleaseBuild(productId, user);
+
     const declaredLength = Number(request.headers.get("content-length"));
     if (
       Number.isFinite(declaredLength) &&
@@ -65,6 +68,16 @@ export async function POST(
       return jsonWithRequestId(context, 
         { error: "Build archive exceeds the 64MB closed-beta limit" },
         { status: 413 }
+      );
+    }
+
+    const contentType =
+      request.headers.get("content-type")?.toLowerCase() ?? "";
+    if (!contentType.startsWith("multipart/form-data")) {
+      return jsonWithRequestId(
+        context,
+        { error: "Build upload requires multipart/form-data" },
+        { status: 415 },
       );
     }
 
@@ -100,7 +113,6 @@ export async function POST(
       return jsonWithRequestId(context, { error: "A valid build file name is required" }, { status: 400 });
     }
 
-    const { id: productId } = await params;
     const fileBytes = new Uint8Array(await file.arrayBuffer());
     if (!hasExpectedSignature(extension, fileBytes)) {
       return jsonWithRequestId(context, 
