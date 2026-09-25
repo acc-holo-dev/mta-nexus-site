@@ -16,4 +16,8 @@ export async function checkDatabaseConnection(): Promise<void> {
   await queryClient`SELECT 1`;
 }
 
+export async function closeDatabaseConnection(): Promise<void> {
+  await queryClient.end({ timeout: 5 });
+}
+
 export * from "./schema";

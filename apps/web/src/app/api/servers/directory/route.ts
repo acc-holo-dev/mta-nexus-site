@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
 import { mtaMasterDirectoryService } from "../../../../lib/services/mta-master-directory-service";
+import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../../lib/observability";
 
 export const dynamic = "force-dynamic";
 
@@ -12,11 +13,12 @@ const directoryQuerySchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
+  const context = createRequestLogContext(request);
   const parsedQuery = directoryQuerySchema.safeParse(
     Object.fromEntries(request.nextUrl.searchParams)
   );
   if (!parsedQuery.success) {
-    return NextResponse.json(
+    return jsonWithRequestId(context, 
       { error: "Invalid directory query", details: parsedQuery.error.flatten() },
       { status: 400 }
     );
@@ -37,7 +39,7 @@ export async function GET(request: NextRequest) {
         .includes(term);
     });
 
-    return NextResponse.json(
+    return jsonWithRequestId(context, 
       {
         servers: matchingServers.slice(offset, offset + limit),
         total: matchingServers.length,
@@ -53,8 +55,14 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error("MTA directory API error:", error);
-    return NextResponse.json(
+    logRequestEvent({
+      level: "error",
+      event: "directory.fetch_failed",
+      context,
+      status: 503,
+      error,
+    });
+    return jsonWithRequestId(context, 
       { error: "The official MTA server directory is temporarily unavailable" },
       { status: 503, headers: { "Retry-After": "30" } }
     );

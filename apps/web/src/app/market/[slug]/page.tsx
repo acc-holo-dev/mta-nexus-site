@@ -6,6 +6,9 @@ import { productService } from "../../../lib/services/product-service";
 import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
+import { BuildProvenanceDetails } from "../../../components/build-provenance-details";
+import { ProductDependencyList } from "../../../components/product-dependency-list";
+import { ReverseDependencyList } from "../../../components/reverse-dependency-list";
 import {
   Star,
   Download,
@@ -90,8 +93,17 @@ export default async function ProductDetailPage({
   const hasAccess = isPublished && (isAuthor || isLicensed || isAdmin);
   const canInspectBuilds = isAuthor || isAdmin;
 
-  const builds = await productService.getProductBuilds(product.id, canInspectBuilds);
-  const reviews = await contentService.getComments({ productId: product.id });
+  const [
+    builds,
+    reviews,
+    dependencyResolution,
+    reverseDependencySummary,
+  ] = await Promise.all([
+    productService.getProductBuilds(product.id, canInspectBuilds),
+    contentService.getComments({ productId: product.id }),
+    productService.getDependencyResolution(product).catch(() => null),
+    productService.getReverseDependencySummary(product.slug).catch(() => null),
+  ]);
 
   const formattedPrice = "Free";
 
@@ -207,6 +219,7 @@ export default async function ProductDetailPage({
                       <span>{b.isSigned ? "Signature: present" : "Signature: not available"}</span>
                       <span>{formatScanStatus(b.scanStatus)}</span>
                     </div>
+                    <BuildProvenanceDetails build={b} />
                     {b.releaseNotes && (
                       <div className="text-xs text-neutral-300 whitespace-pre-line font-mono bg-black/40 p-2.5 rounded border border-neutral-800">
                         {b.releaseNotes}
@@ -218,6 +231,13 @@ export default async function ProductDetailPage({
             ) : (
               <p className="text-xs text-neutral-500">No public builds recorded yet.</p>
             )}
+          </div>
+
+          <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
+            <h2 className="text-base font-bold text-white border-b border-base pb-3">
+              Used by published resources
+            </h2>
+            <ReverseDependencyList summary={reverseDependencySummary} />
           </div>
 
           {/* Customer Reviews */}
@@ -333,11 +353,10 @@ export default async function ProductDetailPage({
                 </div>
                 <div className="flex justify-between gap-4 py-1 border-b border-neutral-800">
                   <span className="text-neutral-400">Dependencies</span>
-                  <span className="font-mono text-right text-neutral-200">
-                    {product.compatibility.dependencies?.length
-                      ? product.compatibility.dependencies.join(", ")
-                      : "None declared"}
-                  </span>
+                  <ProductDependencyList
+                    declared={product.compatibility.dependencies ?? []}
+                    resolution={dependencyResolution}
+                  />
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-800">
                   <span className="text-neutral-400">Library additions</span>

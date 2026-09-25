@@ -5,10 +5,11 @@
 {$DOMAIN} {
   encode zstd gzip
   request_body {
-    max_size 65MB
+    max_size 68157440
   }
   reverse_proxy app:3000 {
     header_up X-Forwarded-For {remote_host}
     header_up X-Real-IP {remote_host}
+    header_up X-Nexus-Proxy-Secret {$TRUSTED_PROXY_SECRET}
   }
 }

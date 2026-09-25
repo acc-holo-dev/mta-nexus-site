@@ -1,5 +1,5 @@
 import path from "node:path";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { z } from "zod";
 import { productService } from "../../../../../lib/services/product-service";
 import { buildScannerService } from "../../../../../lib/services/build-scanner-service";
@@ -7,6 +7,7 @@ import { authService } from "../../../../../lib/services/auth-service";
 import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
 import { consumeRateLimit } from "@nexus/security";
 import { AppError } from "@nexus/domain";
+import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../../../lib/observability";
 
 const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
 const ALLOWED_BUILD_EXTENSIONS = new Set(["zip", "rar", "7z", "lua"]);
@@ -43,26 +44,40 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      return jsonWithRequestId(context, { error: "Authentication required" }, { status: 401 });
     }
 
     const rateLimit = await consumeRateLimit("buildUpload", user.id);
     if (!rateLimit.success) {
-      return NextResponse.json({ error: "Build upload limit exceeded" }, { status: 429 });
+      return jsonWithRequestId(context, { error: "Build upload limit exceeded" }, { status: 429 });
     }
+
+    const { id: productId } = await params;
+    await productService.assertCanReleaseBuild(productId, user);
 
     const declaredLength = Number(request.headers.get("content-length"));
     if (
       Number.isFinite(declaredLength) &&
       declaredLength > MAX_FILE_SIZE_BYTES + MULTIPART_OVERHEAD_BYTES
     ) {
-      return NextResponse.json(
+      return jsonWithRequestId(context, 
         { error: "Build archive exceeds the 64MB closed-beta limit" },
         { status: 413 }
+      );
+    }
+
+    const contentType =
+      request.headers.get("content-type")?.toLowerCase() ?? "";
+    if (!contentType.startsWith("multipart/form-data")) {
+      return jsonWithRequestId(
+        context,
+        { error: "Build upload requires multipart/form-data" },
+        { status: 415 },
       );
     }
 
@@ -74,20 +89,20 @@ export async function POST(
       mtaVersionTarget: form.get("mtaVersionTarget") || undefined,
     });
     if (!parsed.success || !(file instanceof File) || file.size === 0) {
-      return NextResponse.json(
+      return jsonWithRequestId(context, 
         { error: "A valid build archive and semantic version are required" },
         { status: 400 }
       );
     }
     const extension = file.name.split(".").pop()?.toLowerCase();
     if (!extension || !ALLOWED_BUILD_EXTENSIONS.has(extension)) {
-      return NextResponse.json(
+      return jsonWithRequestId(context, 
         { error: "Only .zip, .rar, .7z, and .lua resource builds are allowed" },
         { status: 415 }
       );
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      return NextResponse.json(
+      return jsonWithRequestId(context, 
         { error: "Build archive exceeds the 64MB closed-beta limit" },
         { status: 413 }
       );
@@ -95,13 +110,12 @@ export async function POST(
 
     const safeFileName = path.basename(file.name).replace(/[^a-zA-Z0-9._-]/g, "_");
     if (!safeFileName) {
-      return NextResponse.json({ error: "A valid build file name is required" }, { status: 400 });
+      return jsonWithRequestId(context, { error: "A valid build file name is required" }, { status: 400 });
     }
 
-    const { id: productId } = await params;
     const fileBytes = new Uint8Array(await file.arrayBuffer());
     if (!hasExpectedSignature(extension, fileBytes)) {
-      return NextResponse.json(
+      return jsonWithRequestId(context, 
         { error: "Build content does not match its file extension" },
         { status: 415 }
       );
@@ -109,9 +123,34 @@ export async function POST(
 
     const scan = await buildScannerService.scan({ bytes: fileBytes, fileName: safeFileName });
     if (scan.status === "malicious") {
-      return NextResponse.json(
+      logRequestEvent({
+        level: "warn",
+        event: "resource.build.rejected_malware",
+        context,
+        status: 422,
+        fields: { scanner: scan.scanner },
+      });
+      return jsonWithRequestId(
+        context,
         { error: "Build was rejected by the malware scanner", scanner: scan.scanner },
         { status: 422 }
+      );
+    }
+    if (scan.status === "error") {
+      logRequestEvent({
+        level: "warn",
+        event: "resource.build.scanner_unavailable",
+        context,
+        status: 503,
+        fields: { scanner: scan.scanner },
+      });
+      return jsonWithRequestId(
+        context,
+        {
+          error:
+            "Malware scanning is temporarily unavailable. No build was stored; retry the upload later.",
+        },
+        { status: 503, headers: { "Retry-After": "30" } },
       );
     }
 
@@ -141,19 +180,27 @@ export async function POST(
         },
         user
       );
-      return NextResponse.json({ build }, { status: 201 });
+      return jsonWithRequestId(context, { build }, { status: 201 });
     } catch (error) {
       await storageService.deleteAsset(asset.key);
       throw error;
     }
   } catch (error: unknown) {
-    console.error("Build upload error:", error);
+    if (!(error instanceof AppError)) {
+      logRequestEvent({
+        level: "error",
+        event: "resource.build.upload_failed",
+        context,
+        status: 500,
+        error,
+      });
+    }
     if (error instanceof AppError) {
-      return NextResponse.json(
+      return jsonWithRequestId(context, 
         { error: error.message, code: error.code },
         { status: error.statusCode }
       );
     }
-    return NextResponse.json({ error: "Could not publish build" }, { status: 500 });
+    return jsonWithRequestId(context, { error: "Could not publish build" }, { status: 500 });
   }
 }

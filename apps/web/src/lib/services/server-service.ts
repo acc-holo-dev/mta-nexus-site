@@ -34,15 +34,19 @@ export class ServerService {
       if (!organization) throw new NotFoundError("Organization", input.organizationId);
 
       const memberships = await organizationRepository.listUserMemberships(actor.id);
-      const membership = memberships.find((item) => item.organizationId === input.organizationId);
-      const canManageOrganization =
+      const membership = memberships.find(
+        (item) => item.organizationId === input.organizationId,
+      );
+      const canManageServers =
         organization.ownerId === actor.id ||
         membership?.role === "owner" ||
         membership?.role === "admin" ||
-        membership?.role === "developer";
+        membership?.permissions.includes("manage_servers");
 
-      if (!canManageOrganization) {
-        throw new ForbiddenError("You do not manage this organization");
+      if (!canManageServers) {
+        throw new ForbiddenError(
+          "You do not have permission to create servers for this organization",
+        );
       }
     }
 
@@ -73,17 +77,40 @@ export class ServerService {
       actor: { id: actor.id, type: "user" },
       aggregateId: id,
       aggregateType: "server",
-      payload: { serverId: id, name: server.name, ownerId: actor.id, ip: server.ipAddress, port: server.port },
+      payload: {
+        serverId: id,
+        name: server.name,
+        ownerId: server.ownerId,
+        organizationId: server.organizationId,
+        ip: server.ipAddress,
+        port: server.port,
+      },
     });
 
     return server;
   }
 
+  async canManageServer(server: Server, actor: User): Promise<boolean> {
+    if (can(actor, "server.manage", server)) return true;
+    if (!server.organizationId) return false;
+
+    const [organization, organizationMemberships] = await Promise.all([
+      organizationRepository.findById(server.organizationId),
+      organizationRepository.listUserMemberships(actor.id),
+    ]);
+
+    if (organization?.ownerId === actor.id) return true;
+
+    return can(actor, "server.manage", server, {
+      organizationMemberships,
+    });
+  }
+
   async updateServer(serverId: string, updates: ServerDetailsUpdate, actor: User): Promise<Server> {
     const server = await serverRepository.findById(serverId);
     if (!server) throw new NotFoundError("Server", serverId);
-    if (!can(actor, "server.manage", server)) {
-      throw new ForbiddenError("Only the server owner can update its details");
+    if (!(await this.canManageServer(server, actor))) {
+      throw new ForbiddenError("You do not manage this server");
     }
 
     const updated = await serverRepository.update(serverId, updates);

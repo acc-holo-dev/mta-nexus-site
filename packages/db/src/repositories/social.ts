@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { db } from "../client";
 import { follows } from "../schema";
 import type { Follow } from "@nexus/domain";
@@ -47,6 +47,28 @@ export class SocialRepository {
           eq(follows.targetId, targetId)
         )
       );
+  }
+
+  async listFollowersByTarget(
+    targetType: Follow["targetType"],
+    targetId: string,
+    limit = 100,
+  ): Promise<Follow[]> {
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 500)
+      : 100;
+    const rows = await db
+      .select()
+      .from(follows)
+      .where(
+        and(
+          eq(follows.targetType, targetType),
+          eq(follows.targetId, targetId),
+        ),
+      )
+      .orderBy(desc(follows.createdAt))
+      .limit(boundedLimit);
+    return rows as unknown as Follow[];
   }
 
   async listFollows(followerId: string, targetType?: string): Promise<Follow[]> {

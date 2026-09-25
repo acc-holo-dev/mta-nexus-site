@@ -1,0 +1,51 @@
+# Optional production mail worker. Do not include this file until recovery mail
+# rollout has been explicitly approved and all required secrets/provider settings exist.
+services:
+  mail-worker:
+    image: ${NEXUS_MAIL_IMAGE:?set NEXUS_MAIL_IMAGE to the approved application image}
+    user: node
+    init: true
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    stop_signal: SIGTERM
+    stop_grace_period: 75s
+    command: ["sh", "-c", "cd /app/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --ready"]
+    environment:
+      NODE_ENV: production
+      HOME: /tmp
+      TMPDIR: /tmp
+      DATABASE_URL: postgres://${POSTGRES_USER:-nexus}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mta_nexus}
+      ACCOUNT_MAIL_KEY_ID: ${ACCOUNT_MAIL_KEY_ID:?set ACCOUNT_MAIL_KEY_ID}
+      ACCOUNT_MAIL_KEY: ${ACCOUNT_MAIL_KEY:-}
+      ACCOUNT_MAIL_PREVIOUS_KEY_ID: ${ACCOUNT_MAIL_PREVIOUS_KEY_ID:-}
+      ACCOUNT_MAIL_PREVIOUS_KEY: ${ACCOUNT_MAIL_PREVIOUS_KEY:-}
+      ACCOUNT_MAIL_APP_URL: ${ACCOUNT_MAIL_APP_URL:?set ACCOUNT_MAIL_APP_URL}
+      ACCOUNT_MAIL_SMTP_HOST: ${ACCOUNT_MAIL_SMTP_HOST:?set ACCOUNT_MAIL_SMTP_HOST}
+      ACCOUNT_MAIL_SMTP_MODE: ${ACCOUNT_MAIL_SMTP_MODE:-implicit_tls}
+      ACCOUNT_MAIL_SMTP_PORT: ${ACCOUNT_MAIL_SMTP_PORT:-}
+      ACCOUNT_MAIL_SMTP_SERVERNAME: ${ACCOUNT_MAIL_SMTP_SERVERNAME:?set ACCOUNT_MAIL_SMTP_SERVERNAME}
+      ACCOUNT_MAIL_SMTP_FROM: ${ACCOUNT_MAIL_SMTP_FROM:?set ACCOUNT_MAIL_SMTP_FROM}
+      ACCOUNT_MAIL_SMTP_ENVELOPE_FROM: ${ACCOUNT_MAIL_SMTP_ENVELOPE_FROM:-}
+      ACCOUNT_MAIL_SMTP_AUTH_MODE: ${ACCOUNT_MAIL_SMTP_AUTH_MODE:-auto}
+      ACCOUNT_MAIL_SMTP_USERNAME: ${ACCOUNT_MAIL_SMTP_USERNAME:-}
+      ACCOUNT_MAIL_SMTP_PASSWORD: ${ACCOUNT_MAIL_SMTP_PASSWORD:-}
+      ACCOUNT_MAIL_SMTP_CA: ${ACCOUNT_MAIL_SMTP_CA:-}
+      ACCOUNT_MAIL_SMTP_TIMEOUT_MS: ${ACCOUNT_MAIL_SMTP_TIMEOUT_MS:-5000}
+      ACCOUNT_MAIL_BATCH_SIZE: ${ACCOUNT_MAIL_BATCH_SIZE:-10}
+      ACCOUNT_MAIL_POLL_INTERVAL_MS: ${ACCOUNT_MAIL_POLL_INTERVAL_MS:-5000}
+    healthcheck:
+      test: ["CMD", "node", "scripts/check-account-mail-worker-health.mjs"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    depends_on:
+      postgres:
+        condition: service_healthy

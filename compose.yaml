@@ -1,16 +1,71 @@
+# Local development only. Production uses compose.production.yaml explicitly.
 services:
   postgres:
     image: postgres:18-alpine
-    container_name: nexus-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: nexus
       POSTGRES_PASSWORD: nexus_secret
       POSTGRES_DB: mta_nexus
-    ports:
-      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # Existing data layouts still require inventory before an upgrade.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "nexus", "-d", "mta_nexus"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  clamav:
+    image: clamav/clamav:1.5
+    restart: unless-stopped
+    volumes:
+      - clamav_data:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 48
+      start_period: 60s
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    init: true
+    # Leave a failed migration visible instead of restarting it indefinitely.
+    restart: "no"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      NEXT_PUBLIC_APP_URL: http://localhost:${NEXUS_DEV_PORT:-3000}
+      DATABASE_URL: postgres://nexus:nexus_secret@postgres:5432/mta_nexus
+      AUTH_SECRET: development-only-secret-change-before-production
+      STORAGE_PROVIDER: local
+      STORAGE_LOCAL_PATH: /data/uploads
+      EMAIL_PROVIDER: disabled
+      BUILD_SCANNER: clamav
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: 3310
+    ports:
+      - "127.0.0.1:${NEXUS_DEV_PORT:-3000}:3000"
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clamav:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "scripts/check-local-readiness.mjs"]
+      interval: 15s
+      timeout: 15s
+      retries: 12
+      start_period: 60s
 
 volumes:
   pgdata:
+  uploads:
+  clamav_data:

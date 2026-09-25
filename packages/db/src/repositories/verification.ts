@@ -1,7 +1,8 @@
-import { and, eq, desc, sql } from "drizzle-orm";
+import { and, eq, desc, isNotNull, sql } from "drizzle-orm";
 import { db } from "../client";
-import { verificationRequests, users, organizations, servers } from "../schema";
+import { verificationRequests, users, organizations, servers, serverClaimChallenges } from "../schema";
 import { generateId } from "@nexus/security";
+import { AppError, ConflictError } from "@nexus/domain";
 
 const VALID_TARGET_TYPES = ["user", "developer", "organization", "server"] as const;
 export type VerificationTargetType = (typeof VALID_TARGET_TYPES)[number];
@@ -14,6 +15,14 @@ export class VerificationRepository {
     proofUrl?: string;
     notes?: string;
   }) {
+    if (input.targetType === "server") {
+      throw new AppError(
+        "Server ownership verification requires a verified MTA control challenge.",
+        422,
+        "SERVER_CONTROL_CHALLENGE_REQUIRED",
+      );
+    }
+
     const values = {
       id: generateId("ver"),
       requesterId: input.requesterId,
@@ -25,7 +34,10 @@ export class VerificationRepository {
       createdAt: new Date(),
     };
 
-    const rows = await db.insert(verificationRequests).values(values).returning();
+    const rows = await db
+      .insert(verificationRequests)
+      .values(values)
+      .returning();
     return rows[0];
   }
 
@@ -44,6 +56,24 @@ export class VerificationRepository {
           eq(verificationRequests.targetId, targetId),
           eq(verificationRequests.status, "pending")
         )
+      )
+      .limit(1);
+    return rows[0] || null;
+  }
+
+  async findPendingForAnyRequester(
+    targetType: VerificationTargetType,
+    targetId: string,
+  ) {
+    const rows = await db
+      .select()
+      .from(verificationRequests)
+      .where(
+        and(
+          eq(verificationRequests.targetType, targetType),
+          eq(verificationRequests.targetId, targetId),
+          eq(verificationRequests.status, "pending"),
+        ),
       )
       .limit(1);
     return rows[0] || null;
@@ -114,6 +144,33 @@ export class VerificationRepository {
             .set({ isVerified: true })
             .where(eq(organizations.id, request.targetId));
         } else if (request.targetType === "server") {
+          const [proof] = await tx
+            .select({ id: serverClaimChallenges.id })
+            .from(serverClaimChallenges)
+            .where(
+              and(
+                eq(
+                  serverClaimChallenges.verificationRequestId,
+                  request.id,
+                ),
+                eq(serverClaimChallenges.serverId, request.targetId),
+                eq(
+                  serverClaimChallenges.requesterId,
+                  request.requesterId,
+                ),
+                eq(serverClaimChallenges.proofVersion, 1),
+                isNotNull(serverClaimChallenges.consumedAt),
+                isNotNull(serverClaimChallenges.sourceFetchedAt),
+              ),
+            )
+            .limit(1);
+
+          if (!proof) {
+            throw new ConflictError(
+              "Verified MTA server control proof is required before approval",
+            );
+          }
+
           // A server claim is finalized only by moderation. The conditional
           // ownership update prevents approving a stale request after another
           // claimant has already become the owner.
@@ -133,7 +190,7 @@ export class VerificationRepository {
             .returning({ id: servers.id });
 
           if (!claimed[0]) {
-            throw new Error("Server claim target is already owned by another user");
+            throw new ConflictError("Server claim target is already owned by another user");
           }
         }
       }

@@ -1,25 +1,36 @@
 {
   "name": "mta-nexus",
-  "version": "1.0.0",
+  "version": "1.1.0-beta.1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter @nexus/web dev",
     "build": "pnpm --filter @nexus/web build",
     "start": "pnpm --filter @nexus/web start",
-    "lint": "pnpm --filter @nexus/web lint",
+    "lint": "biome lint .",
     "test": "vitest run",
     "typecheck": "tsc -b",
-    "check": "pnpm typecheck && pnpm test && pnpm build",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "db:generate": "pnpm --filter @nexus/db generate",
     "db:migrate": "pnpm --filter @nexus/db migrate",
-    "db:seed": "pnpm --filter @nexus/db seed"
+    "db:seed": "pnpm --filter @nexus/db seed",
+    "format": "biome format . --write",
+    "format:check": "biome format .",
+    "nexus:doctor": "node scripts/nexus-doctor.mjs",
+    "nexus:doctor:test": "node --test scripts/tests/nexus-doctor.node-test.mjs",
+    "scenario:list": "pnpm --filter @nexus/db scenario:list",
+    "scenario:create": "pnpm --filter @nexus/db scenario:create",
+    "scenario:cleanup": "pnpm --filter @nexus/db scenario:cleanup",
+    "server:observations:capture": "pnpm --filter @nexus/web server:observations:capture",
+    "server:observations:guard:test": "node --test scripts/tests/server-observation-capture.node-test.mjs",
+    "release:verify": "node scripts/release-evidence.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.1",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.1",
+    "@biomejs/biome": "2.5.14"
   },
   "engines": {
     "node": ">=26.0.0",

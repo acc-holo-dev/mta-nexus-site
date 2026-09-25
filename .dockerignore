@@ -1,12 +1,17 @@
 .git
 .github
 node_modules
+**/node_modules
 .next
+**/.next
+**/*.tsbuildinfo
 coverage
 temp
 tmp
 .env
 .env.*
+**/.env
+**/.env.*
 !.env.example
 **/uploads
 **/.DS_Store

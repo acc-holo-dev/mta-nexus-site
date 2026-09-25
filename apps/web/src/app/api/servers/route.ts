@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { serverService } from "../../../lib/services/server-service";
 import { authService } from "../../../lib/services/auth-service";
 import { createServerSchema } from "@nexus/validation";
-import { consumeRateLimit, getClientIp } from "@nexus/security";
+import { consumeRateLimit } from "@nexus/security";
+import { getTrustedRequestIp } from "../../../lib/request-client-ip";
 import { matchesMtaEndpoint, mtaMasterDirectoryService, type MtaMasterServer } from "../../../lib/services/mta-master-directory-service";
 
 export async function GET(request: NextRequest) {
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = getClientIp(request.headers);
+    const ip = getTrustedRequestIp(request);
     const rateLimit = await consumeRateLimit("serverMutation", ip);
     if (!rateLimit.success) {
       return NextResponse.json({ error: "Server registration limit exceeded" }, { status: 429 });
@@ -67,7 +68,10 @@ export async function POST(request: NextRequest) {
     }
 
     const server = await serverService.createServer(
-      { ...parsed.data, ownerId: user.id },
+      {
+        ...parsed.data,
+        ownerId: parsed.data.organizationId ? undefined : user.id,
+      },
       user
     );
     return NextResponse.json({ server }, { status: 201 });

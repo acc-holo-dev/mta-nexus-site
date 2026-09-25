@@ -1,0 +1,12 @@
+# Optional custom SMTP CA bundle for providers/private PKI that need it.
+secrets:
+  nexus_account_mail_smtp_ca:
+    file: ${NEXUS_ACCOUNT_MAIL_SMTP_CA_HOST_FILE:?set NEXUS_ACCOUNT_MAIL_SMTP_CA_HOST_FILE}
+
+services:
+  mail-worker:
+    environment:
+      ACCOUNT_MAIL_SMTP_CA: ""
+      ACCOUNT_MAIL_SMTP_CA_FILE: /run/secrets/nexus_account_mail_smtp_ca
+    secrets:
+      - nexus_account_mail_smtp_ca

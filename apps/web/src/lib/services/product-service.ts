@@ -2,6 +2,8 @@ import { productRepository, buildRepository, auditRepository, organizationReposi
 import { generateId, can } from "@nexus/security";
 import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Product, Build, User, ProductType } from "@nexus/domain";
+import { buildProductDependencyResolution } from "../product-dependency-resolution";
+import { buildReverseDependencySummary, reverseDependencyLimits } from "../reverse-dependency-summary";
 
 export interface ProductFilters {
   query?: string;
@@ -15,6 +17,26 @@ export interface ProductFilters {
 }
 
 export class ProductService {
+  async canManageProduct(
+    product: Product,
+    actor: User,
+    action: "product.update" | "build.release" | "build.retire" = "product.update",
+  ): Promise<boolean> {
+    if (can(actor, action, product)) return true;
+    if (!product.organizationId) return false;
+
+    const [organization, organizationMemberships] = await Promise.all([
+      organizationRepository.findById(product.organizationId),
+      organizationRepository.listUserMemberships(actor.id),
+    ]);
+
+    if (organization?.ownerId === actor.id) return true;
+
+    return can(actor, action, product, {
+      organizationMemberships,
+    });
+  }
+
   async listProducts(filters: ProductFilters = {}): Promise<Product[]> {
     return productRepository.list({
       type: filters.type,
@@ -38,10 +60,7 @@ export class ProductService {
     if (product.status === "published") return product;
     if (!actor) return null;
 
-    const organizationMemberships = product.organizationId
-      ? await organizationRepository.listUserMemberships(actor.id)
-      : [];
-    return can(actor, "product.update", product, { organizationMemberships })
+    return (await this.canManageProduct(product, actor))
       ? product
       : null;
   }
@@ -55,6 +74,31 @@ export class ProductService {
     return includeNonPublic
       ? buildRepository.listByProduct(productId)
       : buildRepository.listPublishedByProduct(productId);
+  }
+
+  async getDependencyResolution(
+    product: Pick<Product, "slug" | "compatibility">,
+  ) {
+    const declared = product.compatibility.dependencies ?? [];
+    if (declared.length === 0) {
+      return buildProductDependencyResolution(product, []);
+    }
+
+    const publishedDependencies =
+      await productRepository.findPublishedFreeBySlugs(declared);
+    return buildProductDependencyResolution(
+      product,
+      publishedDependencies,
+    );
+  }
+
+  async getReverseDependencySummary(productSlug: string) {
+    const dependents =
+      await productRepository.listPublishedFreeDependingOnSlug(
+        productSlug,
+        reverseDependencyLimits.query,
+      );
+    return buildReverseDependencySummary(productSlug, dependents);
   }
 
   async createProduct(
@@ -79,14 +123,16 @@ export class ProductService {
 
       const memberships = await organizationRepository.listUserMemberships(actor.id);
       const membership = memberships.find((item) => item.organizationId === input.organizationId);
-      const canManageOrganization =
+      const canManageProducts =
         organization.ownerId === actor.id ||
         membership?.role === "owner" ||
         membership?.role === "admin" ||
-        membership?.role === "developer";
+        membership?.permissions.includes("manage_products");
 
-      if (!canManageOrganization) {
-        throw new ForbiddenError("You do not manage this organization");
+      if (!canManageProducts) {
+        throw new ForbiddenError(
+          "You do not have permission to create resources for this organization",
+        );
       }
     }
 
@@ -132,6 +178,25 @@ export class ProductService {
     return product;
   }
 
+  async assertCanReleaseBuild(
+    productId: string,
+    actor: User,
+  ): Promise<Product> {
+    const product = await productRepository.findById(productId);
+    if (!product) throw new NotFoundError("Product", productId);
+    if (product.price !== 0) {
+      throw new AppError(
+        "Build releases for paid resources are disabled during the closed beta",
+        422,
+        "PAID_RESOURCES_DISABLED"
+      );
+    }
+    if (!(await this.canManageProduct(product, actor, "build.release"))) {
+      throw new ForbiddenError("Not authorized to publish builds for this product");
+    }
+    return product;
+  }
+
   async releaseBuild(
     input: {
       productId: string;
@@ -149,19 +214,10 @@ export class ProductService {
     },
     actor: User
   ): Promise<Build> {
-    const product = await productRepository.findById(input.productId);
-    if (!product) throw new NotFoundError("Product", input.productId);
-    if (product.price !== 0) {
-      throw new AppError(
-        "Build releases for paid resources are disabled during the closed beta",
-        422,
-        "PAID_RESOURCES_DISABLED"
-      );
-    }
-
-    if (!can(actor, "build.release", product)) {
-      throw new ForbiddenError("Not authorized to publish builds for this product");
-    }
+    const product = await this.assertCanReleaseBuild(
+      input.productId,
+      actor,
+    );
 
     const buildId = generateId("bld");
     const auditId = generateId("aud");
@@ -275,7 +331,7 @@ export class ProductService {
   ): Promise<Build> {
     const product = await productRepository.findById(input.productId);
     if (!product) throw new NotFoundError("Product", input.productId);
-    if (!can(actor, "build.retire", product)) {
+    if (!(await this.canManageProduct(product, actor, "build.retire"))) {
       throw new ForbiddenError("Not authorized to retire builds for this product");
     }
 

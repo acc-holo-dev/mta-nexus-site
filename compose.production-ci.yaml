@@ -1,0 +1,24 @@
+# CI overlay only. The runner supplies disposable values and unique project names.
+# Requires Compose >= 2.24.4 for !override; never use this for a public deployment.
+services:
+  app:
+    image: ${NEXUS_CI_IMAGE:?use scripts/check-production-startup.sh}
+    build:
+      target: runtime
+    restart: "no"
+    environment:
+      ACCOUNT_MAIL_KEY_ID: ci
+      ACCOUNT_MAIL_KEY: ${NEXUS_CI_ACCOUNT_MAIL_KEY:?use scripts/check-production-startup.sh}
+      ACCOUNT_RECOVERY_ABUSE_KEY: ${NEXUS_CI_ACCOUNT_RECOVERY_ABUSE_KEY:?use scripts/check-production-startup.sh}
+  postgres:
+    restart: "no"
+  clamav:
+    restart: "no"
+  caddy:
+    restart: "no"
+    ports: !override
+      - "127.0.0.1:8080:80"
+      - "127.0.0.1:8443:443"
+    volumes:
+      - ${NEXUS_CI_CADDYFILE:?use scripts/check-production-startup.sh}:/etc/caddy/Caddyfile:ro
+      - ./deploy/Caddyfile:/etc/caddy/ProductionCaddyfile:ro

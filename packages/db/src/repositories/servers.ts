@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, ne } from "drizzle-orm";
 import { db } from "../client";
 import { servers } from "../schema";
 import type { Server } from "@nexus/domain";
@@ -22,6 +22,24 @@ export class ServerRepository {
           ? Math.min(Math.max(Math.floor(limit), 1), 100)
           : 100;
     const rows = boundedLimit === undefined ? await query : await query.limit(boundedLimit);
+    return rows as unknown as Server[];
+  }
+
+  async listObservable(limit = 501): Promise<Server[]> {
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 501)
+      : 501;
+    const rows = await db
+      .select()
+      .from(servers)
+      .where(
+        and(
+          eq(servers.status, "active"),
+          ne(servers.visibility, "private"),
+        ),
+      )
+      .orderBy(desc(servers.updatedAt))
+      .limit(boundedLimit);
     return rows as unknown as Server[];
   }
 

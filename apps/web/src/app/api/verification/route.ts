@@ -4,12 +4,14 @@ import {
   auditRepository,
   notificationRepository,
   organizationRepository,
-  serverRepository,
   userRepository,
   verificationRepository,
 } from "@nexus/db";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import { z } from "zod";
+import { AppError } from "@nexus/domain";
+
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
 const verificationRequestSchema = z.object({
   targetType: z.enum(["user", "developer", "organization", "server"]),
@@ -23,11 +25,14 @@ export async function GET(request: NextRequest) {
   const user = await authService.getSession(token);
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401, headers: privateHeaders },
+    );
   }
 
   const requests = await verificationRepository.listByRequester(user.id);
-  return NextResponse.json({ requests });
+  return NextResponse.json({ requests }, { headers: privateHeaders });
 }
 
 export async function POST(request: NextRequest) {
@@ -58,21 +63,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (parsed.data.targetType === "server") {
+      return NextResponse.json(
+        {
+          error:
+            "Server ownership verification requires the MTA control challenge flow.",
+          code: "SERVER_CONTROL_CHALLENGE_REQUIRED",
+        },
+        { status: 422 },
+      );
+    }
+
     let targetIsVerified = false;
     if (parsed.data.targetType === "user" || parsed.data.targetType === "developer") {
       if (parsed.data.targetId !== user.id) {
         return NextResponse.json({ error: "You can only verify your own profile" }, { status: 403 });
       }
       targetIsVerified = user.isVerified;
-    } else if (parsed.data.targetType === "server") {
-      const server = await serverRepository.findById(parsed.data.targetId);
-      if (!server) {
-        return NextResponse.json({ error: "Server was not found" }, { status: 404 });
-      }
-      if (server.ownerId && server.ownerId !== user.id) {
-        return NextResponse.json({ error: "This server is already claimed" }, { status: 409 });
-      }
-      targetIsVerified = server.isVerified;
     } else {
       const organization = await organizationRepository.findById(parsed.data.targetId);
       if (!organization) {
@@ -96,7 +103,7 @@ export async function POST(request: NextRequest) {
     const duplicate = await verificationRepository.findPendingForTarget(
       user.id,
       parsed.data.targetType,
-      parsed.data.targetId
+      parsed.data.targetId,
     );
     if (duplicate) {
       return NextResponse.json(
@@ -141,6 +148,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, request: verificationRequest }, { status: 201 });
   } catch (error: unknown) {
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode },
+      );
+    }
     console.error("Verification request error:", error);
     return NextResponse.json({ error: "Failed to submit verification request" }, { status: 500 });
   }

@@ -11,6 +11,7 @@ import {
 
 interface ProductInfo {
   id: string;
+  slug: string;
   title: string;
   price: number;
   currency: string;
@@ -81,16 +82,16 @@ function CheckoutContent() {
 
           <div className="pt-6 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/workspace/licenses"
+              href={`/market/${product?.slug ?? ""}`}
               className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition-colors"
             >
-              Go to My Licenses
+              Open resource
             </Link>
             <Link
-              href="/market"
+              href="/workspace"
               className="px-5 py-2.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-base font-semibold text-xs transition-colors"
             >
-              Continue Shopping
+              Open resource library
             </Link>
           </div>
         </div>

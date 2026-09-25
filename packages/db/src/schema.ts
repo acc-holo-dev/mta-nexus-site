@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -7,6 +8,7 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  check,
 } from "drizzle-orm/pg-core";
 
 // 1. Users
@@ -542,3 +544,68 @@ export const verificationRequests = pgTable("verification_requests", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
 });
+
+
+export const serverClaimChallenges = pgTable(
+  "server_claim_challenges",
+  {
+    id: text("id").primaryKey(),
+    serverId: text("server_id")
+      .notNull()
+      .references(() => servers.id, { onDelete: "cascade" }),
+    requesterId: text("requester_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tokenDigest: text("token_digest").notNull(),
+    proofVersion: integer("proof_version").notNull().default(1),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    consumedAt: timestamp("consumed_at", { withTimezone: true }),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    sourceFetchedAt: timestamp("source_fetched_at", { withTimezone: true }),
+    verificationRequestId: text("verification_request_id"),
+  },
+  (table) => [
+    uniqueIndex("server_claim_challenge_digest_unique").on(table.tokenDigest),
+    uniqueIndex("server_claim_challenge_active_requester_unique")
+      .on(table.serverId, table.requesterId)
+      .where(sql`${table.consumedAt} is null and ${table.revokedAt} is null`),
+    uniqueIndex("server_claim_challenge_verification_unique").on(
+      table.verificationRequestId,
+    ),
+    index("server_claim_challenge_server_idx").on(table.serverId, table.createdAt),
+    index("server_claim_challenge_expiry_idx").on(table.expiresAt),
+    check(
+      "server_claim_challenge_id_check",
+      sql`${table.id} ~ '^scc_[0-9a-f-]{36}$'`,
+    ),
+    check(
+      "server_claim_challenge_digest_check",
+      sql`${table.tokenDigest} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "server_claim_challenge_version_check",
+      sql`${table.proofVersion} = 1`,
+    ),
+    check(
+      "server_claim_challenge_expiry_check",
+      sql`${table.expiresAt} > ${table.createdAt}`,
+    ),
+    check(
+      "server_claim_challenge_terminal_check",
+      sql`not (${table.consumedAt} is not null and ${table.revokedAt} is not null)`,
+    ),
+    check(
+      "server_claim_challenge_evidence_check",
+      sql`(
+        ${table.consumedAt} is null
+        and ${table.sourceFetchedAt} is null
+        and ${table.verificationRequestId} is null
+      ) or (
+        ${table.consumedAt} is not null
+        and ${table.sourceFetchedAt} is not null
+        and ${table.verificationRequestId} is not null
+      )`,
+    ),
+  ],
+);

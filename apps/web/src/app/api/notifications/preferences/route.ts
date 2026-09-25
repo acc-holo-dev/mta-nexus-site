@@ -4,18 +4,20 @@ import { notificationRepository } from "@nexus/db";
 import { notificationPreferencesSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
 
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
   if (!user) {
-    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    return NextResponse.json({ error: "Authentication required" }, { status: 401, headers: privateHeaders });
   }
 
   const preferences = await notificationRepository.getPreferences(user.id);
   return NextResponse.json(
     { preferences },
-    { headers: { "Cache-Control": "private, no-store" } }
+    { headers: privateHeaders }
   );
 }
 

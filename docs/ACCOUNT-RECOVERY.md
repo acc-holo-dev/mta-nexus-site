@@ -1,0 +1,146 @@
+# Восстановление доступа — BETA-005d
+
+Сверка: **2026-09-24**. D0–D2d подготовили proofs, очередь, transport/runtime и durable limits; D3 добавил проверяемую привязку текущего email; D4 — anonymous forgot-password request и одноразовый password reset для обычного password-account с verified binding. Фактические результаты и точные SHA — в [карте релиза](RELEASE-READINESS.md). **R4 остаётся открыт из-за production delivery/rollout, а не из-за отсутствия reset UI.** Реальный SMTP provider и production mail rollout не включены.
+
+Сохранены [проект D0](https://github.com/acc-holo-dev/mta-nexus-site/blob/435bb05601115c22afb5ad7d609da35f4868decc/docs/ACCOUNT-RECOVERY.md), [контракт D1](https://github.com/acc-holo-dev/mta-nexus-site/blob/3758215102e063e4e1f73706f1984bdefc372341/docs/ACCOUNT-RECOVERY.md) и [подробный контракт D2a](https://github.com/acc-holo-dev/mta-nexus-site/blob/2a1b9e567d6ba626a4f53e9d1a947b06d369f1ce/docs/ACCOUNT-RECOVERY.md). Уточнения D2b ниже не переобъявляют старые проверки результатами нового SHA. Очередь работы и допуск к выпуску остаются в RELEASE-READINESS, не в параллельном roadmap.
+
+## 1. Неизменные правила подтверждений и постановки письма
+
+Приватные `account_auth_state`, `auth_challenges`, `account_recovery_bindings` не входят в публичный User. Legacy-флаги emailVerified/isVerified не создают доверенную привязку. Для email_verify будущий сервис сначала проверяет пароль; примитив связывает proof с текущей сессией и снимком реквизитов. Для password_reset нужен binding на текущий адрес с происхождением от погашенного email_verify того же аккаунта. Admin/moderator и MFA-enabled не поддерживаются примитивом до отдельного решения; обычный вход не меняется.
+
+Одноразовый token — 32 случайных байта, base64url; в challenge хранится разделённый по назначению SHA-256 digest. Начальные сроки — 24 часа для email_verify и 30 минут для password_reset: проектные значения, не принятая эксплуатационная политика. `consume` проверяет контекст и время после ожидания блокировок, погашает proof, выполняет обязательный DB-callback через предоставленный `tx` и записывает аудит одной транзакцией. Отказ должен выбрасывать исключение. SMTP, внешние эффекты, отдельные транзакции и отделённые promises внутри запрещены.
+
+Реальная смена password_hash/email через SQL увеличивает приватную версию и отзывает открытые proofs; смена адреса удаляет binding. Изменение обычного профиля или присваивание прежних реквизитов этого не делает. Trigger откатывается вместе с основной транзакцией и не защищает от администратора БД, отключившего его. Погашенные proofs сохраняются, пока на них основан binding; их удаление каскадно удалит привязку.
+
+`AccountMailOutboxRepository.enqueue` через `issueForDelivery` сохраняет proof, отзыв предыдущего, аудит и encrypted envelope в одной READ COMMITTED транзакции. Постоянная gate-строка ограничивает все ещё находящиеся в очереди задания, включая leased и истёкшие до очистки. Default 1000, SQL-границы 1–1000. Это предохранитель, не измеренная производительность. Отказ очереди/шифрования/вставки откатывает выдачу и удаление прежнего задания. Результат enqueue — ID задания/proof и expiry, без token/recipient. Отдельная вставка письма после commit обычного `issue` по-прежнему запрещена.
+
+AES-256-GCM envelope связывает ciphertext с ID задания, proof, user, назначением, точным expiry и keyId. Ключ — явно предоставленный версионированный 32-байтовый ключ, без AUTH_SECRET/default/plaintext fallback; nonce 12 байт, tag 16 байт. Получатель и token зашифрованы в задании, но это не шифрование всех адресов во всех таблицах. Key ring допускает до восьми ключей. Реальное снабжение ключами, ротация и восстановление не приняты этим кодом. Полное стирание всех копий строк из памяти JavaScript не гарантируется.
+
+SQL-trigger удаления mail при погашении/отзыве proof действует и для leased-задания. Ошибка callback/аудита восстанавливает оба состояния. Миграции 0012/0013 и новая 0014 не подтверждают старые аккаунты и не запускают отправку. Custom functions/triggers нужно сохранить при последующих миграциях; production-роли/search_path/права, последующая генерация diff/snapshots и backup restore остаются отдельными проверками.
+
+## 2. D2b — протокол обработчика, не запущенный сервис
+
+Добавлены [AccountMailWorkerRepository](../packages/db/src/repositories/account-mail-worker.ts), [миграция 0014](../packages/db/migrations/0014_account_mail_leases.sql), поля модели и regression-тесты. Репозиторий не экспортирован из общего `@nexus/db`, не подключён к HTTP, расписанию или SMTP. Временный дочерний процесс теста — fixture, не production-worker.
+
+| Внутренний вызов | Контракт |
+|---|---|
+| `candidates(limit)` | Возвращает только ID не более 100 готовых кандидатов; по умолчанию 20. Это подсказка, не резервирование. |
+| `claim(id)` | После повторной проверки контекста выдаёт исключительный ограниченный lease, увеличивает attempts и возвращает ID, новый секрет lease, номер попытки и expiry. |
+| `prepare(lease, cipher)` | Заново проверяет lease и полный контекст, расшифровывает и сверяет получателя/token с proof; возвращает чувствительные данные только внутреннему транспорту и `sendBefore`. |
+| `settle(lease, outcome)` | Для текущего непросроченного lease атомарно сохраняет retry либо удаляет задание и пишет минимальный аудит; stale/replay не подтверждает результат. |
+| `discardUnavailable(limit)` | Ограниченно удаляет истёкшие или исчерпавшие попытки задания без действующего lease, не удаляя proof/binding provenance. Не запускается автоматически. |
+
+Lease действует **не более 60 секунд** и не дольше proof или инициирующей сессии. В БД хранится его отдельный SHA-256 digest; session/proof/lease tokens не взаимозаменяемы. Номер попытки и текущий digest проверяются совместно. Caller не может продлить реальный lease, подставив более поздний expiresAt в объекте запроса: используется состояние БД.
+
+Допускается максимум **пять получений задания**, включая получение обработчиком, погибшим до отправки. После явного retry доступны задержки 5, 30, 120 и 300 секунд; время следующей попытки сохраняется в PostgreSQL. Это внутренние параметры, не подтверждённый SLA доставки. При исчерпании попыток или невозможности повторить до окончания контекста ciphertext удаляется. Живой пятый lease ещё может завершить отправку; очистка не удаляет его только из-за счётчика 5.
+
+Если процесс умер после commit claim, задание остаётся в PostgreSQL; после expiry lease другой экземпляр может получить его с новым секретом. Старый обработчик больше не может подготовить payload, изменить расписание или записать acceptance. Повтор использует прежние ID задания/proof, token и ciphertext; срок самого proof не продлевается. Потеря ответа на claim может потратить попытку без отправки — это сознательная безопасная граница.
+
+## 3. Повторная проверка и порядок блокировок
+
+Нельзя сначала заблокировать outbox, а затем ждать пользователя: смена реквизитов держит user и удаляет outbox через trigger. Worker сначала читает ID без блокировки, затем блокирует user, приватное состояние, сессию/binding и provenance, proof, наконец mail. Это согласовано с существующими producer/password/proof-операциями. Для рабочего пути установлены локальные lock timeout 5 секунд и statement timeout 10 секунд. Кандидаты не обещают строгий FIFO или отсутствие ожидания; пропуск/повтор обработки timeout должен выполняться будущим dispatcher без busy loop.
+
+Перед claim/prepare/settle проверяются аккаунт, наличие пароля, ограничения роли/MFA, текущий адрес и версия, назначение, исходная session или тот же binding с допустимым provenance, отсутствие consumed/revoked и оба expiry. Срок сессии, proof и lease читается по wall clock БД **после всех потенциальных ожиданий**. SQL завершения дополнительно требует ещё не истёкший lease. Недопустимый контекст удаляет только ciphertext, не меняет пароль и не подтверждает почту.
+
+`prepare` проверяет не только GCM: расшифрованный recipient должен совпасть с адресом proof, а token — с его purpose-separated digest. Ошибка ключа/содержимого выдаёт общее сообщение без исходных секретов и оставляет lease для явного retry/discard либо истечения. Обработчик не получает права игнорировать эту ошибку.
+
+## 4. Состояние БД и внешняя доставка — разные гарантии
+
+`accepted` означает **отчёт доверенного транспортного кода о принятии письма сервером**, не факт получения письма человеком. Сейчас SMTP-кода нет; tests передают этот outcome явно и проверяют только транзакцию. В аудите используется фиксированный системный исполнитель `system:account-mail-worker`, а не личность получателя. События содержат тип операции, ID задания, назначение и номер попытки — не адрес, token, ciphertext или сырой ответ SMTP.
+
+Изменение очереди и запись события имеют общий commit. Ошибка аудита откатывает удаление или новое расписание. Повтор завершённого settle не создаёт второй успех. Неопределённый ответ после commit не означает rollback; отправитель должен перечитать состояние и не выдумывать подтверждение.
+
+**Lease ограждает запись результата в БД, но сам по себе не может оградить внешний SMTP.** После возврата prepare и освобождения блокировок состояние может измениться; ранее выданный plaintext нельзя отозвать из памяти зависшего процесса. Будущий transport должен повторно готовить данные непосредственно перед отправкой, соблюдать sendBefore, ограничивать сетевое время и отменять попытку при истечении. Нельзя удерживать DB-транзакцию во время SMTP или обещать exactly-once. Повтор после потерянного SMTP acceptance может доставить то же письмо ещё раз; право по ссылке всё равно одноразовое и проверяется сервером при применении.
+
+Успешный transport acceptance, terminal discard или исчерпание retry удаляет живое encrypted задание, но не расходует proof: письмо могло уже попасть адресату при предыдущем неопределённом результате. Окончательное право на аккаунт определяется проверками proof, а не состоянием очереди.
+
+## 5. Тесты, миграция и очистка
+
+Новый DB-набор охватывает конкурирующие claim, разделение аккаунтов, stale lease, retry/backoff без продления proof, лимит попыток, три rollback-варианта аудита, session/role/MFA/version/binding/provenance, неправильный ключ/token, reissue и proof consumption, а также четыре наблюдаемых ожидания блокировок. Фактический успех и количество тестов фиксируются только после CI в карте релиза.
+
+Одна проверка запускает настоящий дочерний Node-процесс, получает через приватный IPC результат committed claim и завершает процесс SIGKILL. Затем **время lease у синтетической строки ускоряется SQL-изменением**, и другой экземпляр получает то же задание. Это реальная остановка процесса и проверка восстановления сохранённого состояния, но не ожидание 60 секунд и не сбой во время SMTP. Plaintext письма в ребёнок не передаётся; lease из IPC не печатается в отчётах.
+
+Повторы ускоряют только availableAt тестовой записи; они не доказывают ожидание всех production-задержек в реальном времени. Три ошибки аудита — настоящие конфликты PostgreSQL 23505. Наблюдаемые lock waits используют pg_blocking_pids, а не угаданную паузу. Контрольная миграция применяет те же SQL-файлы в уникальной схеме и проверяет сохранение старого pending payload/пользователя; это не clone рабочей БД.
+
+`discardUnavailable` использует SKIP LOCKED и верхнюю границу 100 строк. Он удаляет только outbox, не приобретает затем parent locks и не разрушает proof provenance. Прежний `discardExpired` сохраняется. Полный scheduler, удержание истории, очистка proof/аудита и измерение нагрузки не добавлены. Удаление живой строки не стирает WAL/backups; не все варианты очистки/блокировок проверены новым набором.
+
+## 6. D2c — закрытая TLS-доставка и следующий шаг
+
+**D2c выполнен только для изолированного транспорта.** Добавлены минимальный implicit-TLS SMTP adapter и bounded dispatcher. Dispatcher использует D2b lease/prepare, выходит из DB-транзакции перед сетью и только после результата вызывает settle. Поэтому SMTP не держит user/outbox locks. Финальный ответ после DATA имеет отдельную границу: если соединение/тайм-аут потеряны после отправки тела, результат — retry + uncertain, а не подтверждённая доставка. Повтор использует тот же proof/token/expiry и может доставить то же письмо дважды; серверная одноразовость подтверждения остаётся авторитетной защитой.
+
+Adapter принимает только явные host/port/servername/from/CA/timeout, использует Node TLS с проверкой сертификата и не имеет plaintext fallback. В D2c не добавлены SMTP AUTH, provider-specific режимы, чтение ключей/паролей из env или production wiring. Ссылка строится только от HTTPS app URL: challenge ID находится в query, secret token — во fragment, чтобы начальный HTTP/proxy request не видел token. Будущий UI всё ещё обязан удалить fragment до confirm и не сохранять его в localStorage/аналитике.
+
+В Verify поднимается отдельный Docker node:26-alpine receiver с синтетическим однодневным localhost-сертификатом, сгенерированным runner. Он не имеет relay в интернет и пишет только READY. Интеграция проверяет 250 acceptance, 451 retry, 550 discard, timeout после DATA, потерю соединения после DATA, отказ недоверенному сертификату и реальный disposable путь queue -> lease -> decrypt -> SMTP -> atomic accepted audit/removal. Адреса и token не печатаются тестовым receiver/скриптом.
+
+Первые два D2c Verify были красными и сохранены как история: d6c19cd запускал integration harness из корня workspace и упёрся в pnpm strict resolution drizzle-orm; 6dc1245 обнаружил ошибку самого negative-TLS теста — helper с default CA фактически доверял сертификату. В 7b2629d harness выполняется из @nexus/db, а untrusted case действительно создаёт клиент без CA. Assertions и обязательные jobs не отключались.
+
+На 7b2629d34101101602125a79ef5c111a33cb7a6f закрытый SMTP integration прошёл, Vitest — 236/236 в 61 файле, а все семь CI/browser jobs завершились success. Это не реальный SMTP provider, не mailbox delivery, не scheduler и не production rollout.
+
+**Следующий D2d:** явное runtime provision ключа шифрования/transport config без AUTH_SECRET fallback, ограниченный standalone dispatcher loop с graceful shutdown и периодической cleanup, устойчивые лимиты злоупотреблений до публичного request. Provider-specific AUTH/STARTTLS/implicit-TLS выбираются после решения по реальному провайдеру; production EMAIL_PROVIDER не включается заранее.
+
+После D2d: D3 — привязка почты с сессией, текущим паролем и реальным подтверждением; D4 — полный reset и HTTP/UI; D5 — сквозная, затем эксплуатационная приёмка. Reset должен согласованно изменить пароль, отозвать все сессии и другие proofs, сохранить аудит и уведомление, после чего человек входит обычным способом. GET/mail preview ничего не меняет. Token не должен попасть в proxy URL, referrer, localStorage, аналитику или диагностические артефакты.
+
+Ответственный за выпуск отдельно принимает правила новых/старых, неподтверждённых/потерянных адресов и привилегированных/MFA-аккаунтов. Нет массового подтверждения, удаления данных, скрытого административного обхода и внезапной блокировки старых пользователей. R4 закрывается только работающим проверенным процессом и принятой политикой, не тестовым SMTP acceptance.
+
+## 7. D2d — runtime worker и durable abuse limits
+
+D2d не включает worker в app-контейнер или production Compose. Отдельный процесс `packages/db/scripts/run-account-mail-dispatcher.ts` запускается только явно. Для него обязательны отдельный `ACCOUNT_MAIL_KEY` (32 bytes base64url) и key ID; совпадение с `AUTH_SECRET` отклоняется. Transport-настройки также явные. В current Compose `EMAIL_PROVIDER` остаётся disabled, эти переменные туда не передаются.
+
+Loop выполняет bounded batch, затем bounded cleanup и poll. SIGTERM/SIGINT запрещают следующий batch. После one-shot, сигнала или ошибки процесс явно закрывает postgres-js pool; это исправлено после CI, где корректно остановленный loop оставался жив до DB idle timeout. Итог worker содержит только счётчики и fingerprint конфигурации без ключей, recipient/token/ciphertext. Missing key завершается общим secret-safe сообщением.
+
+Миграция 0015 добавляет `account_recovery_abuse_limits`. Примитив разделяет `email_verify_request` и `password_reset_request`, хранит только HMAC-SHA256 digest subject с отдельным 32-byte key, использует PostgreSQL row lock для конкурентных consume и удаляет истёкшие строки bounded cleanup до 100. Raw email/IP в эту таблицу не записываются. Как именно нормализовать и комбинировать будущие email/IP/device subjects, какие лимиты назначить и как отвечать публичному requester — это D3/D4 policy, а не уже принятое поведение.
+
+На `e7dd6d8e18ca27dd5bcb233b8f5b9ebaf794d10c` Verify подтвердил runtime integration, миграцию и 247/247 Vitest tests в 63 файлах; все семь CI/browser jobs прошли. До зелёного результата были сохранены четыре полезных отказа: malformed workflow на `d7592bf`; отсутствие явного DB pool shutdown на `252e3cb`; unsafe RowList cast на `04fe45f`; передача Date напрямую в raw postgres-js timestamptz parameters на `eeffccb`. Исправления не удаляли assertions и не включали production mail.
+
+D3 использует этот runtime/limit фундамент для authenticated enrollment; фактический результат приведён в следующем разделе.
+
+## 8. D3 — verified recovery email binding
+
+D3 реализует только подтверждение **уже сохранённого на аккаунте email** для обычного password-account. `GET /api/auth/email-verification` возвращает приватный no-store status и ничего не меняет. `POST` требует действующую `nexus_session`, текущий пароль, eligible account и отдельные runtime keys. До выдачи proof расходуется durable `email_verify_request` limit: сейчас 5 попыток на час для subject `user:<id>`, сохранённого как keyed HMAC digest. Ошибка пароля также тратит эту квоту, но proof/outbox не создаёт.
+
+После правильного пароля D1/D2a одной транзакцией создают/заменяют `email_verify` proof, audit и encrypted mail envelope. HTTP response содержит только `accepted/alreadyVerified/expiresAt`; challenge ID и token наружу из request endpoint не возвращаются. Сам recipient/token остаётся в AES-GCM outbox до worker/terminal cleanup.
+
+`PATCH /api/auth/email-verification` требует ту же authenticated account context. `AccountChallengeRepository.consume` повторно проверяет user/email/credential version/session/time; callback в той же транзакции создаёт или заменяет `account_recovery_bindings` с provenance на consumed `email_verify` proof и пишет `auth.recovery_email_verified`. Replay proof и proof другого signed-in account отклоняются. Legacy `emailVerified` и moderator `isVerified` не создают binding. Admin/moderator и MFA-enabled остаются gated.
+
+Страница `/auth/verify-email` не подтверждает email на GET/load. Она читает `challenge` из query и secret token из `#token=...`, сразу удаляет fragment через `history.replaceState`, не кладёт token в localStorage/sessionStorage и показывает явную кнопку Confirm email. После PATCH success token больше не сохраняется в React state. Browser acceptance проверил пустой hash, отсутствие token в URL/storage/rendered text, GET-status=false до клика, keyboard Enter, узкий viewport без horizontal overflow, success status и replay rejection.
+
+Для Chromium CI внешний SMTP намеренно не используется повторно: D2c уже проверяет transport. Disposable production overlay получает сгенерированные mail/abuse keys, а GitHub-hosted-only helper через `docker exec` расшифровывает только synthetic `@example.invalid` outbox entry. Guard требует `GITHUB_ACTIONS=true`, `RUNNER_ENVIRONMENT=github-hosted` и отдельный test flag. Proof передаётся только в память browser-test процесса и не записывается в summary/results/artifacts.
+
+D3a впервые стал полностью зелёным на `3ade27dec7e9da8a8a180e456b9bc5b0f660c331`: все семь jobs, Vitest **252/252 в 64 файлах**. Финальный D3 UI/browser SHA — `68942511d666e970f28b7686deca5939cd9064df`: все семь jobs success; D3-01 и прежние J2/password/session/directory regressions зелёные, Vitest остаётся **252/252, 64/64**.
+
+Сохранённая история отказов D3:
+- `eba13dc`: новый DB test остановился на TypeScript optional `challengeId`; server assertions ещё не выполнялись.
+- `4faebd9`: confirmation-page retry branch имел недостаточно узкий TypeScript proof type; production image build остановился.
+- `06ac564`: новый recovery form добавил второй accessible label `Current password`, и строгие старые password-browser locators стали неоднозначными. Финальный `6894251` сузил только старые locators к форме `Change password`; продуктовый label и security contract не ослаблялись.
+- `81656e7`: полный зелёный результат.
+
+**Production rollout не выполнен.** Основной `compose.production.yaml` по-прежнему fail-closed: он не передаёт recovery keys и не запускает standalone dispatcher. D5 добавил только opt-in overlays: `compose.recovery.yaml` даёт app active mail key + abuse key, а `compose.mail-worker.yaml` даёт worker active/previous mail keys + SMTP settings без abuse key/AUTH_SECRET. Эти overlays не включаются основным production Compose автоматически и ещё не имеют исполнившегося D5 CI acceptance.
+
+## 9. D4 — anonymous forgot-password и proof-confirmed reset
+
+D4 принимает только синтаксически валидный email через `POST /api/auth/password-reset`. Для eligible verified binding, неизвестного адреса, неподтверждённого аккаунта и исчерпанного durable limit внешний успешный контракт одинаков: HTTP 202 и нейтральный текст без признака существования аккаунта. Route держит минимальный response-time floor 350 ms. Это снижает прямой enumeration-сигнал, но не считается полным статистическим timing/load аудитом.
+
+До любого account lookup читаются отдельные `ACCOUNT_MAIL_KEY` и `ACCOUNT_RECOVERY_ABUSE_KEY`; их отсутствие даёт address-independent 503. Durable `password_reset_request` расходуется отдельно для keyed-HMAC subjects `email:<normalized>` (3/hour) и `ip:<client>` (20/hour). Raw email/IP в limit table не хранится. Только ordinary password-account с текущим D3 binding/provenance получает новый encrypted `password_reset` outbox envelope; unknown/unverified/gated accounts внешне получают тот же 202.
+
+`/auth/reset-password?challenge=...#token=...` не меняет credentials на GET/load. UI читает token из fragment, сразу удаляет hash из history, не хранит token в localStorage/sessionStorage и отправляет его только явным PATCH вместе с новым password. Password hash вычисляется до DB-транзакции.
+
+В protected consume transaction D4:
+1. повторно проверяет reset proof, binding, credential version, address и expiry;
+2. помечает proof consumed;
+3. меняет password hash;
+4. удаляет **все** существующие sessions;
+5. credential trigger отзывает остальные pending proofs;
+6. пишет `user.password_reset` audit;
+7. создаёт in-app security notification.
+
+Ошибка внутри транзакции откатывает password, sessions, proof consumption и notification вместе. Успешный reset не создаёт session/cookie: нужен обычный login. Старый пароль больше не проходит, новый работает только через явный login, consumed proof replay отклоняется.
+
+На `bb1ea0aaff2ce0909499ba822c389e44840ab9fa` Verify прошёл **257/257 tests, 65/65 files**; все семь CI/browser jobs success. Chromium D4-01 использовал production Next/TLS/PostgreSQL и synthetic CI outbox: сравнил одинаковый public body для известного и неизвестного адреса, проверил timing floor, fragment stripping, отсутствие token в URL/storage/rendered text, non-mutating page load, keyboard submit на 390×844, отзыв двух pre-reset sessions, отсутствие auto-login, отказ старого пароля, нормальный login новым и replay rejection.
+
+CI-only proof reader остаётся жёстко ограниченным GitHub-hosted disposable environment и `@example.invalid`. Финальный красный прогон `dbf646a` выявил, что helper выбирал `password_reset`, но аутентифицировал ciphertext AAD как `email_verify`; crypto корректно отказал. `bb1ea0a` передаёт фактический purpose в AAD. Производственный cipher/route ради теста не ослаблялись. Предыдущие D4 browser-итерации также сохранены в истории; password/session regressions и Directory на финальном SHA зелёные.
+
+**Ограничения D4:** нет real provider/inbox delivery, production mail keys, supervised dispatcher/service manager, production secret storage/rotation, полноценного статистического timing-enumeration/load теста, privileged/MFA recovery, legacy rollout, RU/EN или manual visual acceptance. In-app security notification не равна доставленному внешнему уведомлению.
+
+**D5 в работе:** реализованы opt-in producer/worker wiring, synthetic SMTP AUTH PLAIN capability, crash/restart harness и active+previous key rotation window. Последний принятый recovery SHA остаётся D4 `bb1ea0aaff2ce0909499ba822c389e44840ab9fa`: текущие D5 GitHub jobs завершаются до выделения runner (`steps: null`), поэтому эти изменения не считаются проверенными. Следующий D5e — полный исполняемый CI на точном D5 SHA, затем real provider/inbox, host secret lifecycle и rollout policy.
+
+Основания: [PostgreSQL 18 locking](https://www.postgresql.org/docs/18/explicit-locking.html), [SELECT/SKIP LOCKED](https://www.postgresql.org/docs/18/sql-select.html), [wall-clock time](https://www.postgresql.org/docs/18/functions-datetime.html), [Drizzle transactions](https://orm.drizzle.team/docs/transactions). Сверены 2026-09-24; внешняя документация не заменяет проверку реализации. Источники D0/D1/D2a сохранены в закреплённых документах выше.

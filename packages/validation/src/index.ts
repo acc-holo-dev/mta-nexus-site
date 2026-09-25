@@ -35,6 +35,25 @@ export const changePasswordSchema = z
     }
   });
 
+export const requestRecoveryEmailVerificationSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required").max(128),
+}).strict();
+
+export const confirmRecoveryEmailVerificationSchema = z.object({
+  challengeId: z.string().min(1).max(100).regex(/^ach_[A-Za-z0-9_-]+$/, "Invalid confirmation identifier"),
+  token: z.string().length(43).regex(/^[A-Za-z0-9_-]+$/, "Invalid confirmation token"),
+}).strict();
+
+export const requestPasswordResetSchema = z.object({
+  email: z.string().trim().email("Invalid email address").max(320).transform((value) => value.toLowerCase()),
+}).strict();
+
+export const confirmPasswordResetSchema = z.object({
+  challengeId: z.string().min(1).max(100).regex(/^ach_[A-Za-z0-9_-]+$/, "Invalid reset identifier"),
+  token: z.string().length(43).regex(/^[A-Za-z0-9_-]+$/, "Invalid reset token"),
+  newPassword: z.string().min(8, "Password must be at least 8 characters").max(128),
+}).strict();
+
 export const notificationPreferencesSchema = z
   .object({
     followsEnabled: z.boolean().optional(),

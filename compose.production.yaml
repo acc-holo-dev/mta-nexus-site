@@ -19,7 +19,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: ${POSTGRES_DB:-mta_nexus}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      # PostgreSQL 18 uses a version-specific PGDATA below this parent.
+      # Existing databases require inventory and backup before changing layout.
+      - pgdata:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
@@ -37,6 +39,7 @@ services:
       NEXT_PUBLIC_APP_URL: https://${DOMAIN:?set DOMAIN in .env}
       DATABASE_URL: postgres://${POSTGRES_USER:-nexus}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mta_nexus}
       AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET in .env}
+      TRUSTED_PROXY_SECRET: ${TRUSTED_PROXY_SECRET:?set TRUSTED_PROXY_SECRET in .env}
       STORAGE_PROVIDER: local
       STORAGE_LOCAL_PATH: /data/uploads
       EMAIL_PROVIDER: disabled
@@ -51,7 +54,7 @@ services:
         condition: service_healthy
       clamav:
         condition: service_healthy
-    command: ["sh", "-c", "pnpm db:migrate && pnpm start"]
+    # Use the image's single production entrypoint: migrations, then Next.js.
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
@@ -64,6 +67,8 @@ services:
     restart: unless-stopped
     environment:
       DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL in .env}
+      TRUSTED_PROXY_SECRET: ${TRUSTED_PROXY_SECRET:?set TRUSTED_PROXY_SECRET in .env}
     ports:
       - "80:80"
       - "443:443"

@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { MtaMetaInspectorPanel } from "../../../../components/mta-meta-inspector-panel";
 
 export default function NewResourcePage() {
   const [loading, setLoading] = useState(false);
@@ -97,6 +98,7 @@ export default function NewResourcePage() {
         </p>
       </div>
       {error && <div className="p-4 border border-red-900 bg-red-950/30 text-red-300 text-sm">{error}</div>}
+      <MtaMetaInspectorPanel />
       <form onSubmit={submit} className="nexus-panel p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <label className="space-y-1"><span className="text-xs text-neutral-300">Title</span><input name="title" required minLength={3} className="w-full nexus-inset px-3 py-2" /></label>
         <label className="space-y-1"><span className="text-xs text-neutral-300">Slug</span><input name="slug" required pattern="[a-z0-9-]+" className="w-full nexus-inset px-3 py-2" /></label>

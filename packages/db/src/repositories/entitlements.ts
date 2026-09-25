@@ -103,6 +103,7 @@ export class EntitlementRepository {
         throw new ValidationError("Only free resources can be claimed without a payment provider");
       }
 
+      const now = new Date();
       const existingRows = await tx
         .select()
         .from(entitlements)
@@ -111,7 +112,8 @@ export class EntitlementRepository {
             eq(entitlements.subjectType, "user"),
             eq(entitlements.subjectId, input.userId),
             eq(entitlements.resourceId, input.productId),
-            eq(entitlements.permission, "product.download")
+            eq(entitlements.permission, "product.download"),
+            or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, now)),
           )
         )
         .limit(1);

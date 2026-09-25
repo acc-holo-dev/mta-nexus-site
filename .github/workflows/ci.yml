@@ -65,11 +65,225 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify observation capture mutation guard
+        run: node --test scripts/tests/server-observation-capture.node-test.mjs
+
       - name: Apply database migrations
         run: pnpm db:migrate
 
-      - name: Verify project
-        run: pnpm check
+      - name: Verify Scenario Lab database idempotency
+        run: pnpm --filter @nexus/db exec tsx scripts/scenario-lab-db.integration.ts
+
+      - name: Start isolated TLS SMTP receiver
+        run: |
+          mkdir -p /tmp/nexus-smtp-ci
+          openssl req -x509 -newkey rsa:2048 -nodes \
+            -keyout /tmp/nexus-smtp-ci/key.pem \
+            -out /tmp/nexus-smtp-ci/cert.pem \
+            -subj '/CN=localhost' \
+            -addext 'subjectAltName=DNS:localhost' \
+            -days 1 >/dev/null 2>&1
+          docker run --detach --rm \
+            --name "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}" \
+            --publish 127.0.0.1:2465:2465 \
+            --env SMTP_TEST_PORT=2465 \
+            --volume "$PWD:/repo:ro" \
+            --volume "/tmp/nexus-smtp-ci:/certs:ro" \
+            node:26-alpine \
+            node /repo/scripts/tests/account-mail-smtp-receiver.mjs
+          for attempt in $(seq 1 30); do
+            if docker logs "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}" 2>&1 | grep -q '^READY$'; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}"
+          exit 1
+
+      - name: Verify isolated SMTP transport and dispatcher
+        env:
+          SMTP_TEST_CA_FILE: /tmp/nexus-smtp-ci/cert.pem
+          SMTP_TEST_PORT: 2465
+        run: pnpm --filter @nexus/db exec tsx scripts/check-account-mail-smtp.ts
+
+      - name: Verify explicit worker runtime configuration and graceful shutdown
+        run: |
+          mail_key=$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('base64url'))")
+          abuse_key=$(node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('base64url'))")
+          export ACCOUNT_MAIL_KEY_ID=ci
+          export ACCOUNT_MAIL_KEY="$mail_key"
+          export ACCOUNT_RECOVERY_ABUSE_KEY="$abuse_key"
+          export ACCOUNT_MAIL_APP_URL=https://nexus-mta.test
+          export ACCOUNT_MAIL_SMTP_HOST=127.0.0.1
+          export ACCOUNT_MAIL_SMTP_PORT=2465
+          export ACCOUNT_MAIL_SMTP_SERVERNAME=localhost
+          export ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test
+          export ACCOUNT_MAIL_SMTP_CA="$(cat /tmp/nexus-smtp-ci/cert.pem)"
+          export ACCOUNT_MAIL_SMTP_TIMEOUT_MS=1000
+          export ACCOUNT_MAIL_BATCH_SIZE=2
+          export ACCOUNT_MAIL_POLL_INTERVAL_MS=60000
+
+          node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --once > /tmp/account-mail-once.json
+          grep -q '"status":"ok"' /tmp/account-mail-once.json
+          ! grep -F "$mail_key" /tmp/account-mail-once.json
+          ! grep -F "$abuse_key" /tmp/account-mail-once.json
+
+          node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --ready > /tmp/account-mail-loop.json 2>/tmp/account-mail-loop.err &
+          worker=$!
+          ready=0
+          for attempt in $(seq 1 100); do
+            if grep -q '"status":"ready"' /tmp/account-mail-loop.json 2>/dev/null; then
+              ready=1
+              break
+            fi
+            kill -0 "$worker" 2>/dev/null || break
+            sleep 0.1
+          done
+          test "$ready" = 1
+          kill -0 "$worker"
+          kill -TERM "$worker"
+          for attempt in $(seq 1 50); do
+            if ! kill -0 "$worker" 2>/dev/null; then break; fi
+            sleep 0.1
+          done
+          ! kill -0 "$worker" 2>/dev/null
+          wait "$worker"
+          grep -q '"status":"ready"' /tmp/account-mail-loop.json
+          grep -q '"status":"ok"' /tmp/account-mail-loop.json
+          test ! -s /tmp/account-mail-loop.err
+          ! grep -F "$mail_key" /tmp/account-mail-loop.json
+          ! grep -F "$abuse_key" /tmp/account-mail-loop.json
+
+          if env -u ACCOUNT_MAIL_KEY node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --once >/tmp/account-mail-missing.out 2>/tmp/account-mail-missing.err; then
+            echo "worker unexpectedly accepted missing mail key"
+            exit 1
+          fi
+          grep -Fxq "Account mail dispatcher failed" /tmp/account-mail-missing.err
+          ! grep -F "$AUTH_SECRET" /tmp/account-mail-missing.err
+          echo "PASS: dedicated keys, one-shot worker, SIGTERM shutdown and secret-safe failure"
+
+      - name: Verify Scenario Lab safety contract
+        run: node --test packages/db/scripts/scenario-lab-contract.node-test.mjs
+
+      - name: Verify project and write core release evidence
+        run: pnpm release:verify
 
       - name: Build production image
         run: docker build --tag mta-nexus:ci .
+
+      - name: Verify opt-in production mail worker
+        env:
+          NEXUS_D5_IMAGE: mta-nexus:ci
+        run: bash scripts/check-production-mail-worker.sh
+
+      - name: Stop isolated TLS SMTP receiver
+        if: always()
+        run: docker rm --force "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}" >/dev/null 2>&1 || true
+
+  postgres-persistence:
+    name: PostgreSQL persistence
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26.0.0
+      # Explicit Node runner; the filename must not match Vitest's *.test.mjs glob.
+      - name: Check persistence test isolation
+        run: node --test scripts/tests/postgres-persistence.node-test.mjs
+      - name: Recreate PostgreSQL with its named volume
+        run: node scripts/check-postgres-persistence.mjs
+
+  local-compose:
+    name: Local Docker startup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # A dedicated disposable hosted runner and project. Never use production data.
+    env:
+      COMPOSE_PROJECT_NAME: nexus-local-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      NEXUS_DEV_PORT: 3000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Validate developer verification Compose
+        run: COMPOSE_DISABLE_ENV_FILE=true docker compose -f compose.verify.yaml config --quiet
+      - name: Build and start the documented local stack
+        run: |
+          test ! -f .env
+          docker compose --env-file /dev/null -f compose.yaml config --quiet
+          docker compose --env-file /dev/null -f compose.yaml up --build --detach --wait --wait-timeout 600
+      - name: Check readiness, HTTP and local-only exposure
+        run: |
+          test "$(docker compose --env-file /dev/null -f compose.yaml exec -T app id -u)" != "0"
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node --test scripts/tests/local-readiness.node-test.mjs
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node scripts/check-local-readiness.mjs
+          curl --fail --silent --show-error --max-time 90 http://127.0.0.1:3000/ -o /tmp/nexus-local-home.html
+          grep -qi '<html' /tmp/nexus-local-home.html
+          for service in postgres clamav; do
+            id=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet "$service")
+            test -n "$id"
+            test -z "$(docker port "$id")"
+          done
+          app=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          test "$(docker port "$app" 3000/tcp)" = "127.0.0.1:3000"
+          echo 'PASS: HTTP home, database, writable uploads, non-root app, loopback-only port'
+      - name: Check migrations and preserve data across app replacement
+        run: |
+          rows=$(docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT count(*) FROM drizzle.__drizzle_migrations')
+          test "$rows" -gt 0
+          docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -v ON_ERROR_STOP=1 -U nexus -d mta_nexus -c "CREATE TABLE beta002_ci_probe (id integer PRIMARY KEY, value text); INSERT INTO beta002_ci_probe VALUES (1, 'preserved');"
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node --input-type=module -e "import {writeFileSync} from 'node:fs'; writeFileSync('/data/uploads/beta002-ci-probe', 'preserved', {flag:'wx'});"
+          before=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          docker compose --env-file /dev/null -f compose.yaml up --detach --force-recreate --no-deps --wait --wait-timeout 180 app
+          after=$(docker compose --env-file /dev/null -f compose.yaml ps --quiet app)
+          test -n "$after"
+          test "$before" != "$after"
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node scripts/check-local-readiness.mjs
+          docker compose --env-file /dev/null -f compose.yaml exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs'; assert.equal(readFileSync('/data/uploads/beta002-ci-probe', 'utf8'), 'preserved');"
+          test "$(docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT value FROM beta002_ci_probe WHERE id=1')" = "preserved"
+          echo 'PASS: migrations applied, app replaced, database and uploads retained'
+      - name: Show local test diagnostics
+        if: always()
+        run: |
+          docker compose --env-file /dev/null -f compose.yaml ps --all
+          docker compose --env-file /dev/null -f compose.yaml logs --no-color --tail 80
+      - name: Remove only the disposable CI project
+        if: always()
+        run: docker compose --env-file /dev/null -f compose.yaml down --volumes --timeout 15
+
+  backup-restore:
+    name: Disposable backup restore
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26.0.0
+      - name: Verify backup restore isolation contract
+        run: node --test scripts/tests/backup-restore.node-test.mjs scripts/tests/backup-restore-surface.node-test.mjs
+      - name: Rehearse database and uploads backup restore
+        run: node scripts/check-backup-restore.mjs
+
+  production-compose:
+    name: Production Docker startup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26.0.0
+      - name: Verify production smoke isolation
+        run: node --test scripts/tests/production-smoke.node-test.mjs
+      - name: Verify production TLS, persistence and failure paths
+        run: bash scripts/check-production-startup.sh
