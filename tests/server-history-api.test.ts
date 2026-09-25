@@ -17,24 +17,25 @@ describe("server observation history API", () => {
     expect(route).toContain('z.enum(["24h", "7d", "30d"])');
     expect(route).toContain('"Cache-Control": "no-store"');
     expect(service).toContain(
-      'coverage: "demand_driven_confirmed_listings"',
+      'coverage: "stored_confirmed_observations"',
     );
+    expect(service).toContain('collectionMode: "collector_required"');
     expect(service).toContain("absenceMeansOffline: false");
-    expect(service).toContain('status: "not_listed"');
-    expect(service).not.toContain('status: "offline"');
+    expect(service).not.toContain("mtaMasterDirectoryService");
+    expect(service).not.toContain("serverObservationRepository.record");
   });
 
-  it("deduplicates demand-driven master snapshots by fetchedAt", () => {
+  it("keeps the GET history surface read-only", () => {
+    const route = read(
+      "apps/web/src/app/api/servers/[id]/history/route.ts",
+    );
     const service = read(
       "apps/web/src/lib/services/server-history-service.ts",
     );
-    const repository = read(
-      "packages/db/src/repositories/server-observations.ts",
-    );
 
-    expect(service).toContain("sourceSequence: directory.fetchedAt");
-    expect(service).toContain("observedAt: new Date(directory.fetchedAt)");
-    expect(repository).toContain("onConflictDoNothing()");
+    expect(route).toContain("serverHistoryService.getHistory");
+    expect(service).not.toContain(".record(");
+    expect(service).not.toContain("getDirectory()");
   });
 
   it("keeps master-list metadata from overwriting editorial profile fields", () => {
