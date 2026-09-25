@@ -25,6 +25,38 @@ export class ContentRepository {
     return rows as unknown as Content[];
   }
 
+  async listPublishedByServer(
+    serverId: string,
+    limit = 6,
+  ): Promise<Content[]> {
+    const publicServerUpdateTypes: Content["type"][] = [
+      "article",
+      "news",
+      "devlog",
+      "update",
+      "announcement",
+    ];
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 12)
+      : 6;
+
+    const rows = await db
+      .select()
+      .from(content)
+      .where(
+        and(
+          eq(content.serverId, serverId),
+          eq(content.status, "published"),
+          inArray(content.type, publicServerUpdateTypes),
+        ),
+      )
+      .orderBy(
+        desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`),
+      )
+      .limit(boundedLimit);
+    return rows as unknown as Content[];
+  }
+
   async findById(id: string): Promise<Content | null> {
     const rows = await db.select().from(content).where(eq(content.id, id)).limit(1);
     return (rows[0] as unknown as Content) || null;
