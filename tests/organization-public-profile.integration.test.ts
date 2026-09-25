@@ -69,6 +69,15 @@ describe("organization public listing integration", () => {
     });
     await productRepository.create({
       ...baseProduct,
+      id: `prd_org_a_paid_${suffix}`,
+      title: "A Legacy Paid Resource",
+      slug: `a-legacy-paid-resource-${suffix}`,
+      organizationId: orgAId,
+      status: "published",
+      price: 100,
+    });
+    await productRepository.create({
+      ...baseProduct,
       id: `prd_org_b_pub_${suffix}`,
       title: "B Published Resource",
       slug: `b-published-resource-${suffix}`,
