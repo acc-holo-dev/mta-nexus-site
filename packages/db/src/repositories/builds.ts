@@ -1,4 +1,4 @@
-import { and, eq, desc, ne } from "drizzle-orm";
+import { and, eq, desc, ne, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
@@ -9,7 +9,7 @@ export class BuildRepository {
       .select()
       .from(builds)
       .where(eq(builds.productId, productId))
-      .orderBy(desc(builds.createdAt));
+      .orderBy(desc(builds.createdAt), desc(builds.id));
     return rows as unknown as Build[];
   }
 
@@ -28,12 +28,27 @@ export class BuildRepository {
       .select()
       .from(builds)
       .where(and(eq(builds.productId, productId), eq(builds.status, "published")))
-      .orderBy(desc(builds.createdAt));
+      .orderBy(desc(builds.createdAt), desc(builds.id));
     return rows as unknown as Build[];
   }
 
   async findById(id: string): Promise<Build | null> {
     const rows = await db.select().from(builds).where(eq(builds.id, id)).limit(1);
+    return (rows[0] as unknown as Build) || null;
+  }
+
+  async findLatestPublishedByProduct(productId: string): Promise<Build | null> {
+    const rows = await db
+      .select()
+      .from(builds)
+      .where(
+        and(
+          eq(builds.productId, productId),
+          eq(builds.status, "published"),
+        ),
+      )
+      .orderBy(desc(builds.createdAt), desc(builds.id))
+      .limit(1);
     return (rows[0] as unknown as Build) || null;
   }
 
@@ -103,11 +118,38 @@ export class BuildRepository {
       const reviewed = rows[0];
       if (!reviewed) return null;
 
+      const lockedProduct = await tx
+        .update(products)
+        .set({ updatedAt: sql`${products.updatedAt}` })
+        .where(eq(products.id, reviewed.productId))
+        .returning({ id: products.id });
+      if (!lockedProduct[0]) {
+        throw new Error("Build product disappeared during moderation");
+      }
+
       if (decision === "approve") {
+        const latestPublished = await tx
+          .select({
+            id: builds.id,
+            version: builds.version,
+          })
+          .from(builds)
+          .where(
+            and(
+              eq(builds.productId, reviewed.productId),
+              eq(builds.status, "published"),
+            ),
+          )
+          .orderBy(desc(builds.createdAt), desc(builds.id))
+          .limit(1);
+        if (!latestPublished[0]) {
+          throw new Error("Published build disappeared during moderation");
+        }
+
         await tx
           .update(products)
           .set({
-            currentVersion: reviewed.version,
+            currentVersion: latestPublished[0].version,
             status: "published",
             updatedAt: new Date(),
           })
@@ -121,7 +163,7 @@ export class BuildRepository {
             ne(builds.id, reviewed.id),
             eq(builds.status, "published")
           ))
-          .orderBy(desc(builds.createdAt))
+          .orderBy(desc(builds.createdAt), desc(builds.id))
           .limit(1);
         await tx
           .update(products)
@@ -151,6 +193,15 @@ export class BuildRepository {
       const retired = rows[0];
       if (!retired) return null;
 
+      const lockedProduct = await tx
+        .update(products)
+        .set({ updatedAt: sql`${products.updatedAt}` })
+        .where(eq(products.id, retired.productId))
+        .returning({ id: products.id });
+      if (!lockedProduct[0]) {
+        throw new Error("Build product disappeared during retirement");
+      }
+
       const fallback = await tx
         .select({ version: builds.version })
         .from(builds)
@@ -159,7 +210,7 @@ export class BuildRepository {
           ne(builds.id, retired.id),
           eq(builds.status, "published")
         ))
-        .orderBy(desc(builds.createdAt))
+        .orderBy(desc(builds.createdAt), desc(builds.id))
         .limit(1);
       await tx
         .update(products)
