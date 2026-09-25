@@ -24,6 +24,7 @@ SECURITY-001 covers:
 - `GET /api/notifications`;
 - `GET /api/reports`;
 - `GET /api/verification`;
+- `GET /api/follow`;
 - `GET /api/products/:id/download`.
 
 The download route applies the same private policy to JSON denial/error responses and to the successful artifact stream.
@@ -32,9 +33,9 @@ Existing account routes such as session status, session management and recovery-
 
 ## Follow route
 
-`GET /api/follow` also depends on the current session, but its fix is isolated in SERVER-004 (#15). SECURITY-001 deliberately does not duplicate that branch change.
+`GET /api/follow` is covered directly by SECURITY-001 because its representation changes with the current session. Anonymous, authenticated and validation-error responses all carry the private cache contract.
 
-Before promotion, the accepted version of SERVER-004 should use the same route-privacy contract.
+SERVER-004 (#15) may still touch the same route for product behavior and must preserve these headers when rebased.
 
 ## Public routes
 
