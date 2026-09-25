@@ -9,13 +9,16 @@ const VALID_TARGET_TYPES = ["user", "developer", "organization", "server"] as co
 export type VerificationTargetType = (typeof VALID_TARGET_TYPES)[number];
 
 export class VerificationRepository {
-  async createRequest(input: {
-    requesterId: string;
-    targetType: VerificationTargetType;
-    targetId: string;
-    proofUrl?: string;
-    notes?: string;
-  }) {
+  async createRequest(
+    input: {
+      requesterId: string;
+      targetType: VerificationTargetType;
+      targetId: string;
+      proofUrl?: string;
+      notes?: string;
+    },
+    audit?: Omit<AuditEvent, "createdAt">,
+  ) {
     if (input.targetType === "server") {
       throw new AppError(
         "Server ownership verification requires a verified MTA control challenge.",
@@ -35,11 +38,25 @@ export class VerificationRepository {
       createdAt: new Date(),
     };
 
-    const rows = await db
-      .insert(verificationRequests)
-      .values(values)
-      .returning();
-    return rows[0];
+    return db.transaction(async (tx) => {
+      const rows = await tx
+        .insert(verificationRequests)
+        .values(values)
+        .returning();
+      const request = rows[0];
+      if (!request) {
+        throw new Error("Verification request insert did not return a row");
+      }
+
+      if (audit) {
+        await tx.insert(auditEvents).values({
+          ...audit,
+          createdAt: values.createdAt,
+        });
+      }
+
+      return request;
+    });
   }
 
   async findPendingForTarget(
