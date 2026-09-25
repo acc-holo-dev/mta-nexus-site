@@ -7,6 +7,7 @@ import {
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
 import { Cpu, ShieldCheck, Users } from "lucide-react";
+import { ServerFollowButton } from "../../../components/server-follow-button";
 
 export const dynamic = "force-dynamic";
 
@@ -102,12 +103,15 @@ export default async function ServerDetailPage({
             <h1 className="text-2xl md:text-4xl font-black text-white">{server.name}</h1>
             <p className="text-xs text-neutral-400 max-w-2xl">{server.description}</p>
           </div>
-          <a
-            href={connectUri}
-            className="px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all"
-          >
-            Connect to Server
-          </a>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <ServerFollowButton serverId={server.id} serverName={server.name} />
+            <a
+              href={connectUri}
+              className="inline-flex min-h-11 items-center justify-center px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all"
+            >
+              Connect to Server
+            </a>
+          </div>
         </div>
       </div>
 
