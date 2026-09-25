@@ -28,8 +28,16 @@ echo "::add-mask::$abuse_key"
 export NEXUS_CI_CADDYFILE="$work/Caddyfile"
 node --input-type=module <<'NODE'
 import { readFileSync, writeFileSync } from 'node:fs';
-import { localCertificateConfig } from './scripts/production-smoke-contract.mjs';
-writeFileSync(process.env.NEXUS_CI_CADDYFILE, localCertificateConfig(readFileSync('deploy/Caddyfile', 'utf8')));
+import {
+  assertProductionUploadBodyLimit,
+  localCertificateConfig,
+} from './scripts/production-smoke-contract.mjs';
+const productionCaddy = readFileSync('deploy/Caddyfile', 'utf8');
+assertProductionUploadBodyLimit(productionCaddy);
+writeFileSync(
+  process.env.NEXUS_CI_CADDYFILE,
+  localCertificateConfig(productionCaddy),
+);
 NODE
 # Explicit test values, no repository .env or inherited application credentials.
 pc=(env -i "PATH=$PATH" "HOME=$HOME" COMPOSE_DISABLE_ENV_FILE=true
