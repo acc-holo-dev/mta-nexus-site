@@ -1,7 +1,7 @@
 import { and, eq, desc, inArray } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, reports, moderationCases } from "../schema";
-import type { AuditEvent, Report, ModerationCase } from "@nexus/domain";
+import { auditEvents, reports } from "../schema";
+import type { AuditEvent, Report } from "@nexus/domain";
 
 export class ReportRepository {
   async listAll(): Promise<Report[]> {
