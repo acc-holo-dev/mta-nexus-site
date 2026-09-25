@@ -144,6 +144,7 @@ const gates = [
             "DATABASE_URL is required to prove migrations against a database.",
         },
   ),
+  runGate("lint", pnpmCommand, ["lint"]),
   runGate("typecheck", pnpmCommand, ["typecheck"]),
   runGate("tests", pnpmCommand, ["test"]),
   runGate("next_build", pnpmCommand, ["build"]),
