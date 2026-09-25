@@ -23,7 +23,7 @@ The command executes and records these gates:
 1. repository/runtime identity;
 2. release-evidence harness self-test;
 3. database migrations;
-4. Biome lint/check;
+4. Biome lint;
 5. TypeScript typecheck;
 6. Vitest;
 7. Next.js production build.
