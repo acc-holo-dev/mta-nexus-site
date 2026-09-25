@@ -1,6 +1,6 @@
 # Release evidence
 
-DEVX-001 adds a machine-readable **core application** release-evidence bundle.
+REL-001 adds a machine-readable **core application** release-evidence bundle.
 
 Run:
 
