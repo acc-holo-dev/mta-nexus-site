@@ -80,6 +80,8 @@ caddy=$("${pc[@]}" ps -q caddy)
 "${pc[@]}" exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; assert.equal(process.env.NODE_ENV, 'production'); assert.equal(process.env.HOSTNAME, '0.0.0.0'); assert.equal(process.env.BUILD_SCANNER, 'clamav');"
 "${pc[@]}" exec -T app test -f /app/apps/web/server.js
 "${pc[@]}" exec -T app test -f /app/packages/db/src/migrate.ts
+"${pc[@]}" exec -T app test -d /app/packages/db/migrations
+"${pc[@]}" exec -T app sh -c 'test -n "$(find /app/packages/db/migrations -type f -name "*.sql" -print -quit)"'
 "${pc[@]}" exec -T app test -f /app/packages/db/node_modules/tsx/package.json
 if "${pc[@]}" exec -T app sh -c 'command -v pnpm >/dev/null 2>&1'; then
   echo 'FAIL: production runtime unexpectedly contains pnpm' >&2
