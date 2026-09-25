@@ -123,6 +123,24 @@ export class ProductRepository {
     return rows[0] as unknown as Product;
   }
 
+  async createWithAudit(
+    data: Omit<Product, "createdAt" | "updatedAt">,
+    audit: Omit<AuditEvent, "createdAt">,
+  ): Promise<Product> {
+    return db.transaction(async (tx) => {
+      const now = new Date();
+      const rows = await tx
+        .insert(products)
+        .values({ ...data, createdAt: now, updatedAt: now })
+        .returning();
+      const product = rows[0];
+      if (!product) throw new Error("Product insert did not return a row");
+
+      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      return product as unknown as Product;
+    });
+  }
+
   async update(id: string, updates: Partial<Product>): Promise<Product | null> {
         const rows = await db
       .update(products)
