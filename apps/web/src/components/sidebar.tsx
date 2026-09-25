@@ -1,179 +1,175 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Compass,
-  Library,
-  Server,
-  Code2,
-  BookOpen,
-  LayoutDashboard,
-  Plus,
-  Bookmark,
   Bell,
+  Bookmark,
+  BookOpen,
   ChevronLeft,
   ChevronRight,
-  ShieldAlert,
-  BadgeCheck,
-  Settings,
+  Code2,
+  Compass,
+  LayoutDashboard,
+  Library,
   MessageSquare,
+  Plus,
+  Server,
+  Settings,
+  ShieldAlert,
 } from "lucide-react";
-
-const PRIMARY_NAV = [
-  { href: "/servers", label: "Live Servers", icon: Server },
-  { href: "/explore", label: "Explore", icon: Compass },
-  { href: "/market", label: "Free Resources", icon: Library },
-  { href: "/community", label: "Community", icon: MessageSquare },
-  { href: "/articles", label: "Updates", icon: BookOpen },
-  { href: "/developers", label: "Creators", icon: Code2 },
-];
-
-const WORKSPACE_NAV = [
-  { href: "/workspace", label: "Overview", icon: LayoutDashboard },
-  { href: "/workspace/resources/new", label: "Publish Resource", icon: Plus },
-  { href: "/workspace/servers/new", label: "Register Server", icon: Server },
-  { href: "/workspace/saved", label: "Saved", icon: Bookmark },
-  { href: "/notifications", label: "Notifications", icon: Bell },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
+import { getDictionary, type Locale } from "../lib/i18n";
 
 export function Sidebar({
+  locale,
   isCollapsed,
   onToggle,
 }: {
+  locale: Locale;
   isCollapsed: boolean;
   onToggle: () => void;
 }) {
   const pathname = usePathname();
+  const dictionary = getDictionary(locale);
+
+  const primaryNav = [
+    { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
+    { href: "/explore", label: dictionary.nav.explore, icon: Compass },
+    { href: "/market", label: dictionary.nav.freeResources, icon: Library },
+    { href: "/community", label: dictionary.nav.community, icon: MessageSquare },
+    { href: "/articles", label: dictionary.nav.updates, icon: BookOpen },
+    { href: "/developers", label: dictionary.nav.creators, icon: Code2 },
+  ];
+
+  const workspaceNav = [
+    { href: "/workspace", label: dictionary.nav.overview, icon: LayoutDashboard },
+    { href: "/workspace/resources/new", label: dictionary.nav.publishResource, icon: Plus },
+    { href: "/workspace/servers/new", label: dictionary.nav.registerServer, icon: Server },
+    { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
+    { href: "/notifications", label: dictionary.nav.notifications, icon: Bell },
+    { href: "/settings", label: dictionary.nav.settings, icon: Settings },
+  ];
 
   const isActive = (href: string) =>
     href === "/workspace"
       ? pathname === "/workspace"
-      : pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
+      : pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+
+  const renderItems = (
+    items: Array<{
+      href: string;
+      label: string;
+      icon: typeof Server;
+    }>,
+  ) =>
+    items.map((item) => {
+      const Icon = item.icon;
+      const active = isActive(item.href);
+      return (
+        <Link
+          key={item.href}
+          href={item.href}
+          title={isCollapsed ? item.label : undefined}
+          aria-current={active ? "page" : undefined}
+          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+            active
+              ? "bg-accent-soft font-semibold text-accent"
+              : "text-secondary hover:bg-hover hover:text-primary"
+          } ${isCollapsed ? "justify-center px-0" : ""}`}
+        >
+          <Icon className="h-4 w-4 shrink-0" />
+          {!isCollapsed && <span>{item.label}</span>}
+        </Link>
+      );
+    });
 
   return (
     <aside
-      className={`hidden lg:flex flex-col border-r border-base bg-surface transition-all duration-200 z-30 select-none shrink-0 ${
+      className={`z-30 hidden shrink-0 select-none flex-col border-r border-base bg-surface transition-all duration-200 lg:flex ${
         isCollapsed ? "w-14" : "w-56"
       }`}
     >
-      {/* Brand */}
-      <div className="h-14 flex items-center justify-between px-3 border-b border-base shrink-0">
+      <div className="flex h-14 shrink-0 items-center justify-between border-b border-base px-3">
         {isCollapsed ? (
-          <Link href="/" className="mx-auto" aria-label="MTA Nexus home">
-            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center font-black text-white text-xs shadow-nexus-sm">
+          <Link href="/" className="mx-auto" aria-label="MTA Nexus">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-xs font-black text-white shadow-nexus-sm">
               NX
             </div>
           </Link>
         ) : (
           <>
-            <Link href="/" className="flex items-center space-x-2 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center font-black text-white text-xs shadow-nexus-sm shrink-0">
+            <Link href="/" className="flex min-w-0 items-center space-x-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-xs font-black text-white shadow-nexus-sm">
                 NX
               </div>
-              <div className="flex flex-col min-w-0">
-                <span className="font-heading text-primary leading-tight">
+              <div className="flex min-w-0 flex-col">
+                <span className="font-heading leading-tight text-primary">
                   MTA <span className="text-accent">NEXUS</span>
                 </span>
-                <span className="font-caption text-faint leading-tight">Closed beta</span>
+                <span className="font-caption leading-tight text-faint">
+                  {dictionary.nav.closedBeta}
+                </span>
               </div>
             </Link>
             <button
+              type="button"
               onClick={onToggle}
-              className="p-1 rounded-md text-muted hover:text-primary hover:bg-hover transition-colors shrink-0"
-              aria-label="Collapse sidebar"
-              title="Collapse sidebar"
+              className="shrink-0 rounded-md p-1 text-muted transition-colors hover:bg-hover hover:text-primary"
+              aria-label={dictionary.nav.collapse}
+              title={dictionary.nav.collapse}
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="h-4 w-4" />
             </button>
           </>
         )}
       </div>
 
-      <nav className="flex-1 py-3 px-2 space-y-5 overflow-y-auto" aria-label="Main navigation">
-        {/* Ecosystem */}
+      <nav className="flex-1 space-y-5 overflow-y-auto px-2 py-3" aria-label={dictionary.nav.ecosystem}>
         <div className="space-y-0.5">
           {!isCollapsed && (
-            <div className="px-2.5 pb-1.5 font-label text-faint uppercase">Ecosystem</div>
+            <div className="px-2.5 pb-1.5 font-label uppercase text-faint">
+              {dictionary.nav.ecosystem}
+            </div>
           )}
-          {PRIMARY_NAV.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                title={isCollapsed ? item.label : undefined}
-                aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                  active
-                    ? "bg-accent-soft text-accent font-semibold"
-                    : "text-secondary hover:text-primary hover:bg-hover"
-                } ${isCollapsed ? "justify-center px-0" : ""}`}
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                {!isCollapsed && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
+          {renderItems(primaryNav)}
         </div>
 
-        {/* Workspace */}
-        <div className="space-y-0.5 pt-3 border-t border-base">
+        <div className="space-y-0.5 border-t border-base pt-3">
           {!isCollapsed && (
-            <div className="px-2.5 pb-1.5 font-label text-faint uppercase">Workspace</div>
+            <div className="px-2.5 pb-1.5 font-label uppercase text-faint">
+              {dictionary.nav.workspace}
+            </div>
           )}
-          {WORKSPACE_NAV.map((item) => {
-            const Icon = item.icon;
-            const active = isActive(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                title={isCollapsed ? item.label : undefined}
-                aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                  active
-                    ? "bg-accent-soft text-accent font-semibold"
-                    : "text-secondary hover:text-primary hover:bg-hover"
-                } ${isCollapsed ? "justify-center px-0" : ""}`}
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                {!isCollapsed && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
+          {renderItems(workspaceNav)}
         </div>
 
-        {/* Admin */}
-        <div className="space-y-0.5 pt-3 border-t border-base">
+        <div className="space-y-0.5 border-t border-base pt-3">
           <Link
             href="/admin"
-            title={isCollapsed ? "Admin" : undefined}
+            title={isCollapsed ? dictionary.nav.admin : undefined}
             aria-current={pathname.startsWith("/admin") ? "page" : undefined}
-            className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors ${
+            className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
               pathname.startsWith("/admin")
-                ? "bg-danger-soft text-danger font-semibold"
-                : "text-secondary hover:text-primary hover:bg-hover"
+                ? "bg-danger-soft font-semibold text-danger"
+                : "text-secondary hover:bg-hover hover:text-primary"
             } ${isCollapsed ? "justify-center px-0" : ""}`}
           >
-            <ShieldAlert className="w-4 h-4 shrink-0" />
-            {!isCollapsed && <span>Admin</span>}
+            <ShieldAlert className="h-4 w-4 shrink-0" />
+            {!isCollapsed && <span>{dictionary.nav.admin}</span>}
           </Link>
         </div>
       </nav>
 
-      {/* Expand button when collapsed */}
       {isCollapsed && (
-        <div className="p-2 border-t border-base">
+        <div className="border-t border-base p-2">
           <button
+            type="button"
             onClick={onToggle}
-            className="w-full p-1.5 rounded-md text-muted hover:text-primary hover:bg-hover transition-colors flex justify-center"
-            aria-label="Expand sidebar"
+            className="flex w-full justify-center rounded-md p-1.5 text-muted transition-colors hover:bg-hover hover:text-primary"
+            aria-label={dictionary.nav.expand}
+            title={dictionary.nav.expand}
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       )}

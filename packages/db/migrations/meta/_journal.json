@@ -141,6 +141,13 @@
       "when": 1790252000000,
       "tag": "0019_server_claim_challenges",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1790337600000,
+      "tag": "0020_build_safety_invariants",
+      "breakpoints": true
     }
   ]
 }

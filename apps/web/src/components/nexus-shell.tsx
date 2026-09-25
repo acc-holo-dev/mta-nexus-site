@@ -1,12 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Sidebar } from "./sidebar";
-import { Navbar } from "./navbar";
+import React, { useEffect, useState } from "react";
 import { Footer } from "./footer";
+import { MobileNav } from "./mobile-nav";
+import { Navbar } from "./navbar";
+import { Sidebar } from "./sidebar";
+import type { Locale } from "../lib/i18n";
 
-export function NexusShell({ children }: { children: React.ReactNode }) {
-  // Persist sidebar collapse state across sessions (TASK-005)
+export function NexusShell({
+  children,
+  locale,
+}: {
+  children: React.ReactNode;
+  locale: Locale;
+}) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
@@ -15,24 +22,31 @@ export function NexusShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggle = () => {
-    setIsSidebarCollapsed((prev) => {
-      const next = !prev;
+    setIsSidebarCollapsed((previous) => {
+      const next = !previous;
       localStorage.setItem("nexus-sidebar-collapsed", String(next));
       return next;
     });
   };
 
   return (
-    <div className="min-h-screen flex bg-page text-primary">
-      <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggle} />
+    <div className="min-h-screen bg-page text-primary">
+      <div className="flex min-h-screen">
+        <Sidebar
+          locale={locale}
+          isCollapsed={isSidebarCollapsed}
+          onToggle={toggle}
+        />
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <Navbar />
-        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 py-6">
-          {children}
-        </main>
-        <Footer />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <Navbar locale={locale} />
+          <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 pb-24 sm:px-6 lg:pb-6">
+            {children}
+          </main>
+          <Footer locale={locale} />
+        </div>
       </div>
+      <MobileNav locale={locale} />
     </div>
   );
 }

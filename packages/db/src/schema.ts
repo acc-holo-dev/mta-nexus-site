@@ -234,7 +234,7 @@ export const builds = pgTable("builds", {
     .references(() => products.id, { onDelete: "cascade" }),
   version: text("version").notNull(),
   releaseNotes: text("release_notes"),
-  status: text("status").notNull().default("draft"), // draft, testing, published, deprecated, retired
+  status: text("status").notNull().default("draft"), // draft, testing, pending_review, published, rejected, deprecated, retired
   storageKey: text("storage_key").notNull(),
   sha256Hash: text("sha256_hash").notNull(),
   fileSizeBytes: integer("file_size_bytes").notNull(),
@@ -249,6 +249,23 @@ export const builds = pgTable("builds", {
 }, (table) => [
   uniqueIndex("builds_product_version_idx").on(table.productId, table.version),
   index("builds_product_status_idx").on(table.productId, table.status),
+  check(
+    "builds_clean_scan_provenance_check",
+    sql`${table.scanStatus} <> 'clean' OR (
+      ${table.scanner} IS NOT NULL
+      AND btrim(${table.scanner}) <> ''
+      AND ${table.scannedAt} IS NOT NULL
+    )`,
+  ),
+  check(
+    "builds_published_safe_check",
+    sql`${table.status} <> 'published' OR (
+      ${table.scanStatus} = 'clean'
+      AND ${table.scanner} IS NOT NULL
+      AND btrim(${table.scanner}) <> ''
+      AND ${table.scannedAt} IS NOT NULL
+    )`,
+  ),
 ]);
 
 // 10. Assets

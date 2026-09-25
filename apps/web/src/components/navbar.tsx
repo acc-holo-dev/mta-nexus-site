@@ -1,18 +1,38 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Search } from "lucide-react";
+import { AccountControls } from "./account-controls";
 import { CommandPalette } from "./command-palette";
+import { LocaleSwitcher } from "./locale-switcher";
 import { NotificationBell } from "./notification-bell";
 import { ThemeToggle } from "./theme-toggle";
-import { AccountControls } from "./account-controls";
+import { getDictionary, type Locale } from "../lib/i18n";
 
-export function Navbar() {
+export function Navbar({ locale }: { locale: Locale }) {
+  const dictionary = getDictionary(locale);
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-base bg-surface/95 backdrop-blur">
-      <div className="px-4 sm:px-6 min-h-14 py-2 flex flex-wrap items-center justify-between gap-3">
-        <div className="min-w-0 flex-1 max-w-xl"><NavbarSearchTrigger /></div>
+      <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6">
+        <Link
+          href="/"
+          className="flex items-center gap-2 lg:hidden"
+          aria-label="MTA NEXUS"
+        >
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-xs font-black text-white shadow-nexus-sm">
+            NX
+          </span>
+          <span className="hidden text-sm font-bold text-primary sm:inline">
+            MTA NEXUS
+          </span>
+        </Link>
+        <div className="order-3 min-w-0 basis-full sm:order-none sm:flex-1 lg:max-w-xl">
+          <NavbarSearchTrigger placeholder={dictionary.nav.search} />
+        </div>
         <div className="flex items-center gap-2">
+          <LocaleSwitcher locale={locale} />
           <ThemeToggle />
           <NotificationBell />
           <AccountControls />
@@ -22,21 +42,28 @@ export function Navbar() {
   );
 }
 
-function NavbarSearchTrigger() {
+function NavbarSearchTrigger({ placeholder }: { placeholder: string }) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+
   return (
     <>
       <button
+        type="button"
         onClick={() => setIsSearchOpen(true)}
-        className="w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-md bg-inset border border-base text-muted text-xs hover:border-strong transition-colors cursor-pointer"
+        className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-base bg-inset px-3 py-1.5 text-xs text-muted transition-colors hover:border-strong"
       >
         <span className="flex min-w-0 items-center gap-2">
-          <Search className="w-3.5 h-3.5 shrink-0" />
-          <span className="truncate">Search servers, resources, creators...</span>
+          <Search className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{placeholder}</span>
         </span>
-        <kbd className="hidden sm:block shrink-0 px-1.5 py-0.5 text-[10px] font-numeric bg-elevated text-muted rounded border border-base">Ctrl K</kbd>
+        <kbd className="hidden shrink-0 rounded border border-base bg-elevated px-1.5 py-0.5 font-numeric text-[10px] text-muted sm:block">
+          Ctrl K
+        </kbd>
       </button>
-      <CommandPalette isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <CommandPalette
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
     </>
   );
 }

@@ -1,4 +1,4 @@
-# A separate local target: no host Node/pnpm, host mounts or production bypasses.
+# Local development image. Compose bind-mounts source directories for hot reload while keeping dependencies inside the image.
 FROM node:26-alpine AS development
 WORKDIR /app
 ENV NODE_ENV=development NEXT_TELEMETRY_DISABLED=1

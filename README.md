@@ -1,91 +1,91 @@
-# MTA Nexus
+# MTA NEXUS
 
-MTA Nexus is a player-first discovery and resource platform for Multi Theft Auto: San Andreas.
+MTA NEXUS is a player-first Multi Theft Auto: San Andreas platform for live server discovery, community updates, and safe free-resource distribution.
 
-The product answers one primary question: **what is happening in MTA right now?** Fresh server activity comes first, followed by community updates and a free resource library. Paid commerce remains disabled until a real payment provider and legal operating model are ready.
+**Current repository version:** `1.2.0-beta.1`  
+**Active development branch:** `main` only.
 
-## Start here / С чего начать
+Русский интерфейс и English interface use the same application. Change the language with the language button in the top navigation; the preference is stored in the `nexus_locale` cookie.
 
-[Карта бесплатной беты](docs/RELEASE-READINESS.md) описывает сценарии пользователей, доказательства, ограничения и ближайшую задачу. [Product Blueprint](docs/PRODUCT-BLUEPRINT.md) описывает более широкий продукт; галочка в roadmap не означает готовность релиза.
+## Local development / Локальная разработка
 
-BETA-001 проверила PostgreSQL на новых именованных томах. BETA-002 добавила Docker-only запуск приложения, базы и ClamAV. Локальный запуск проверен в [CI №865](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/35940008117/job/107445602459) на `bc048baaea71985e74d00faed4f66095dd518926`. Это не разрешение на публичный выпуск и не проверка всех пользовательских сценариев.
-
-## Local development / Локальный запуск через Docker
-
-Нужны доступ к репозиторию, Git и работающий Docker с Compose v2 в режиме Linux containers. Node, pnpm и PostgreSQL на компьютер устанавливать не нужно. Проверенное окружение — Linux x86_64 в CI; Docker Desktop на Windows/macOS отдельно не проверялся. Для загрузки образов, пакетов и обновлений ClamAV нужен доступ к сети.
-
-ClamAV требует заметного объёма памяти: [официальная документация](https://docs.clamav.net/manual/Installing/Docker.html) рекомендует 4 GiB для него; приложению, базе и Docker также нужна память. Это не гарантия достаточности 4 GB для всей платформы и не рекомендация размера production-VDS.
-
-Для новой локальной копии:
+Recommended path: Docker Compose. Host Node.js, pnpm and PostgreSQL are not required.
 
 ```bash
-git clone --branch dev --single-branch https://github.com/acc-holo-dev/mta-nexus-site.git
+git clone https://github.com/acc-holo-dev/mta-nexus-site.git
 cd mta-nexus-site
 docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-timeout 600
 ```
 
-Откройте `http://localhost:3000`. Флаг `--wait` ожидает готовности сервисов; `600` — предел ожидания, а не обещание времени запуска. Создавать `.env` для стандартного локального запуска не требуется. В CI используется тот же `compose.yaml`, но отдельное имя проекта и пустой env-файл, чтобы не обращаться к чужим данным.
+Open `http://localhost:3000`.
 
-**Существующие данные:** используйте имя `nexus-local` только для своей локальной среды. Если проект с таким именем или его тома уже существуют, сначала выясните их назначение. Не подключайте production-тома. Изменение имени проекта создаёт другую среду, а не переносит старые данные. Предыдущие раскладки PostgreSQL требуют инвентаризации и плана восстановления — см. [Deployment](docs/DEPLOYMENT.md).
+The development stack starts PostgreSQL, ClamAV and the Next.js application. Database migrations run before Next.js starts. Application and workspace `src` directories are bind-mounted read-only into the container, so normal source edits hot-reload without rebuilding the image.
 
-### Что происходит при запуске
-
-Docker собирает development-образ с зависимостями из lockfile. PostgreSQL и ClamAV должны пройти health checks, затем приложение выполняет миграции и запускает Next.js. При ошибке миграций сайт не запускается. Seed автоматически не выполняется: первоначальная база не содержит демонстрационных аккаунтов и публикаций.
-
-Приложение работает не от root. Только его порт опубликован на `127.0.0.1`; база и ClamAV не публикуют порты на компьютер. Данные и файлы находятся в отдельных именованных томах. Проверка готовности приложения проверяет `/api/health` с доступом к БД и чтение/запись в `/data/uploads`.
-
-Это режим разработки с локальными тестовыми реквизитами, **не конфигурация для размещения в интернете**. Production использует отдельный `compose.production.yaml`; его проверки HTTPS, секретов и обязательного scanner не ослаблены.
-
-### Проверка, журналы и остановка
+If port 3000 is busy:
 
 ```bash
-docker compose -p nexus-local -f compose.yaml ps
-docker compose -p nexus-local -f compose.yaml logs --tail 100 app postgres clamav
-docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs
+NEXUS_DEV_PORT=3001 docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-timeout 600
 ```
 
-Остановить локальные контейнеры, сохранив именованные тома:
+Useful commands:
 
 ```bash
+# health/readiness
+docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs
+
+# logs
+docker compose -p nexus-local -f compose.yaml logs --tail 100 --follow app postgres clamav
+
+# stop, preserving data volumes
 docker compose -p nexus-local -f compose.yaml down
 ```
 
-Для повторного запуска или применения изменённого кода повторите команду `up --build` выше. Исходники включены в образ; автоматическая синхронизация файлов с компьютера пока не настроена. Не добавляйте `--volumes` к остановке и не используйте очистку томов для исправления ошибок запуска.
+Changes to package manifests, Dockerfile, installed dependencies or image-level tooling still require `up --build`. Migration changes require the app startup path to run again; do not point this stack at production data.
 
-Если порт 3000 занят, задайте `NEXUS_DEV_PORT=3001` в локальном `.env`, не перезаписывая другие настройки, и повторите запуск. Адрес станет `http://localhost:3001`. При ошибке readiness сначала смотрите журналы: запуск ClamAV, миграции, доступ к базе и права на файлы.
+Host-side commands are also available when Node 26 and pnpm 12 are installed:
 
-Подробнее о проверках и правилах изменений: [Development](docs/DEVELOPMENT.md).
+```bash
+pnpm dev
+pnpm check
+pnpm nexus:doctor
+```
 
-## Implemented foundation to verify for closed beta
+## Development rules / Правила разработки
 
-- PostgreSQL-backed registration, login, sessions, and authorization;
-- live server directory driven by the official MTA master-list;
-- owner-scoped editorial server profiles and verification workflow, without a server agent;
-- free resources, private builds, SHA-256 integrity, library claims, and entitlement-gated downloads;
-- articles, profiles, follows, notifications, reports, and moderation foundations.
+- `main` is the only maintained development branch.
+- Do not interpret a merged commit as production acceptance.
+- Paid checkout, stored-value balances, payouts and crypto settlement stay disabled.
+- A resource build is publicly usable only when it is published and has a trusted clean scan with scanner identity and scan timestamp.
+- Free-resource claims require an actually downloadable safe build.
+- Production configuration stays fail-closed; development defaults must never be reused as production secrets.
+- Do not force production data into local migrations or test flows.
 
-These are implementation areas, not a claim that every end-to-end journey has passed. Startup and health checks do not prove upload scanning, account recovery, UI usability, authorization journeys, or production readiness.
+## Project map
 
-## Explicitly not available
-
-Paid checkout, spendable balances, payouts, refunds and crypto settlement remain disabled. The S3 adapter, verified production email/recovery flow, shared multi-instance rate limiting, and MTA server-side installation are not available. Local email is disabled. Existing environments and backup restoration remain unverified.
-
-## Stack
-
-Node.js 26 / pnpm 12; Next.js 16 / React 19 / TypeScript 7; PostgreSQL 18 / Drizzle; Vitest 5. Exact dependency resolutions are in `pnpm-lock.yaml`; this change does not upgrade dependencies.
-
-## Branch policy
-
-`dev` contains small development changes. `main` contains reviewed release history, but a commit being present there does not mean it was deployed or accepted for users. Promote reviewed changes through a pull request. Release only an explicitly approved SHA/tag from `main` after the [release gates](docs/RELEASE-READINESS.md) pass. Never force-reset a branch merely to synchronize its appearance.
+```text
+apps/web/          Next.js application, routes and UI
+packages/db/       PostgreSQL schema, migrations and repositories
+packages/domain/   domain types, errors and events
+packages/security/ authorization, IDs and rate limiting
+packages/storage/  private local storage abstraction
+packages/ui/       shared UI primitives
+packages/config/   environment validation
+packages/validation/ request schemas
+scripts/           operational and verification tooling
+tests/             unit, integration and contract tests
+```
 
 ## Documentation
 
-- [Release map and next tasks](docs/RELEASE-READINESS.md)
-- [Development guide](docs/DEVELOPMENT.md)
-- [Product Blueprint](docs/PRODUCT-BLUEPRINT.md)
-- [Implementation roadmap — not release evidence](docs/AUTONOMOUS-EXECUTION-ROADMAP.md)
-- [Foundation audit](docs/FOUNDATION-AUDIT.md)
-- [Legacy migration map](docs/LEGACY-MIGRATION-MAP.md)
-- [Deployment guide — validation required](docs/DEPLOYMENT.md)
+Only two long-form documents are maintained:
 
-MTA Nexus is not affiliated with Rockstar Games, Take-Two Interactive, or the Multi Theft Auto project.
+- [Architecture / Архитектура](docs/ARCHITECTURE.md)
+- [Operations / Эксплуатация](docs/OPERATIONS.md)
+
+Everything else should be represented by executable code, migrations, tests, commit history, or issues instead of additional standalone planning documents.
+
+## Release state
+
+This repository is a closed-beta codebase. Production deployment is a separate operational decision and requires successful verification of the exact `main` SHA, backup/restore readiness, configured production secrets, TLS, storage, malware scanning and recovery delivery.
+
+MTA NEXUS is not affiliated with Rockstar Games, Take-Two Interactive, or the Multi Theft Auto project.

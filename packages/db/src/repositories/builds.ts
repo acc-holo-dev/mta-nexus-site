@@ -1,4 +1,5 @@
 import { and, eq, desc, ne, sql } from "drizzle-orm";
+import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
@@ -27,7 +28,7 @@ export class BuildRepository {
     const rows = await db
       .select()
       .from(builds)
-      .where(and(eq(builds.productId, productId), eq(builds.status, "published")))
+      .where(safePublishedBuildCondition(productId))
       .orderBy(desc(builds.createdAt), desc(builds.id));
     return rows as unknown as Build[];
   }
@@ -41,12 +42,7 @@ export class BuildRepository {
     const rows = await db
       .select()
       .from(builds)
-      .where(
-        and(
-          eq(builds.productId, productId),
-          eq(builds.status, "published"),
-        ),
-      )
+      .where(safePublishedBuildCondition(productId))
       .orderBy(desc(builds.createdAt), desc(builds.id))
       .limit(1);
     return (rows[0] as unknown as Build) || null;
@@ -79,10 +75,7 @@ export class BuildRepository {
       const published = await tx
         .select({ id: builds.id })
         .from(builds)
-        .where(and(
-          eq(builds.productId, data.productId),
-          eq(builds.status, "published")
-        ))
+        .where(safePublishedBuildCondition(data.productId))
         .limit(1);
       if (!published[0]) {
         await tx
@@ -107,13 +100,19 @@ export class BuildRepository {
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
       const targetStatus = decision === "approve" ? "published" : "rejected";
-      const conditions = [eq(builds.id, id), eq(builds.status, "pending_review")];
-      if (decision === "approve") conditions.push(eq(builds.scanStatus, "clean"));
+      const reviewCondition =
+        decision === "approve"
+          ? and(
+              eq(builds.id, id),
+              eq(builds.status, "pending_review"),
+              trustedCleanScanCondition(),
+            )
+          : and(eq(builds.id, id), eq(builds.status, "pending_review"));
 
       const rows = await tx
         .update(builds)
         .set({ status: targetStatus })
-        .where(and(...conditions))
+        .where(reviewCondition)
         .returning();
       const reviewed = rows[0];
       if (!reviewed) return null;
@@ -134,12 +133,7 @@ export class BuildRepository {
             version: builds.version,
           })
           .from(builds)
-          .where(
-            and(
-              eq(builds.productId, reviewed.productId),
-              eq(builds.status, "published"),
-            ),
-          )
+          .where(safePublishedBuildCondition(reviewed.productId))
           .orderBy(desc(builds.createdAt), desc(builds.id))
           .limit(1);
         if (!latestPublished[0]) {
@@ -158,11 +152,12 @@ export class BuildRepository {
         const fallback = await tx
           .select({ version: builds.version })
           .from(builds)
-          .where(and(
-            eq(builds.productId, reviewed.productId),
-            ne(builds.id, reviewed.id),
-            eq(builds.status, "published")
-          ))
+          .where(
+            and(
+              safePublishedBuildCondition(reviewed.productId),
+              ne(builds.id, reviewed.id),
+            ),
+          )
           .orderBy(desc(builds.createdAt), desc(builds.id))
           .limit(1);
         await tx
@@ -205,11 +200,12 @@ export class BuildRepository {
       const fallback = await tx
         .select({ version: builds.version })
         .from(builds)
-        .where(and(
-          eq(builds.productId, retired.productId),
-          ne(builds.id, retired.id),
-          eq(builds.status, "published")
-        ))
+        .where(
+          and(
+            safePublishedBuildCondition(retired.productId),
+            ne(builds.id, retired.id),
+          ),
+        )
         .orderBy(desc(builds.createdAt), desc(builds.id))
         .limit(1);
       await tx

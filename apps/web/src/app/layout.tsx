@@ -1,21 +1,26 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { NexusShell } from "../components/nexus-shell";
+import { getDictionary } from "../lib/i18n";
+import { getRequestLocale } from "../lib/i18n-server";
 
-export const metadata: Metadata = {
-  title: {
-    default: "MTA NEXUS — Live Servers, Community & Free Resources",
-    template: "%s | MTA NEXUS",
-  },
-  description:
-    "Discover live Multi Theft Auto servers, community updates, and free resources during the MTA Nexus closed beta.",
-  openGraph: {
-    title: "MTA NEXUS — Live Servers, Community & Free Resources",
-    description:
-      "A player-first platform for what is happening in MTA right now.",
-    type: "website",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+
+  return {
+    title: {
+      default: dictionary.meta.title,
+      template: "%s | MTA NEXUS",
+    },
+    description: dictionary.meta.description,
+    openGraph: {
+      title: dictionary.meta.title,
+      description: dictionary.meta.description,
+      type: "website",
+    },
+  };
+}
 
 const themeInitScript = `
 (function() {
@@ -32,18 +37,20 @@ const themeInitScript = `
 })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getRequestLocale();
+
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang={locale} className="dark" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="min-h-screen bg-page text-primary antialiased">
-        <NexusShell>{children}</NexusShell>
+        <NexusShell locale={locale}>{children}</NexusShell>
       </body>
     </html>
   );

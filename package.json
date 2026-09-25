@@ -1,6 +1,6 @@
 {
   "name": "mta-nexus",
-  "version": "1.1.0-beta.5",
+  "version": "1.2.0-beta.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -23,7 +23,12 @@
     "scenario:cleanup": "pnpm --filter @nexus/db scenario:cleanup",
     "server:observations:capture": "pnpm --filter @nexus/web server:observations:capture",
     "server:observations:guard:test": "node --test scripts/tests/server-observation-capture.node-test.mjs",
-    "release:verify": "node scripts/release-evidence.mjs"
+    "release:verify": "node scripts/release-evidence.mjs",
+    "dev:docker": "docker compose -p nexus-local -f compose.yaml up --build",
+    "dev:docker:up": "docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-timeout 600",
+    "dev:docker:down": "docker compose -p nexus-local -f compose.yaml down",
+    "dev:docker:logs": "docker compose -p nexus-local -f compose.yaml logs --tail 100 --follow app postgres clamav",
+    "dev:docker:check": "docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",

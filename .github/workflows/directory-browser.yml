@@ -2,9 +2,9 @@ name: Directory browser
 
 on:
   push:
-    branches: [dev, main]
+    branches: [main]
   pull_request:
-    branches: [dev, main]
+    branches: [main]
 
 permissions:
   contents: read

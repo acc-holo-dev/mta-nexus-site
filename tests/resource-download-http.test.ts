@@ -23,6 +23,9 @@ const state = vi.hoisted(() => ({
     productId: string;
     version: string;
     status: "published";
+    scanStatus: "not_scanned" | "clean" | "malicious" | "error";
+    scanner?: string;
+    scannedAt?: Date;
     storageKey: string;
     sha256Hash: string;
     fileName: string;
@@ -115,6 +118,9 @@ describe("resource download HTTP contract", () => {
       productId: "prd_http",
       version: "1.2.3",
       status: "published",
+      scanStatus: "clean",
+      scanner: "test-scanner",
+      scannedAt: new Date(),
       storageKey: "assets/http-resource.zip",
       sha256Hash: "a".repeat(64),
       fileName: "http-resource.zip",
@@ -218,6 +224,23 @@ describe("resource download HTTP contract", () => {
       error: "No published build is available",
     });
     expect(downloadStream).not.toHaveBeenCalled();
+  });
+
+  it("fails closed when a published build has no trusted scan provenance", async () => {
+    state.build = {
+      ...state.build!,
+      scanner: undefined,
+      scannedAt: undefined,
+    };
+
+    const response = await GET(request(), context);
+
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({
+      error: "Published build is not cleared for delivery",
+    });
+    expect(downloadStream).not.toHaveBeenCalled();
+    expect(auditRecord).not.toHaveBeenCalled();
   });
 
   it("destroys an opened storage stream when the required audit write fails", async () => {

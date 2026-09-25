@@ -180,6 +180,9 @@ export default async function AdminPage() {
                   <BuildModerationControls
                     buildId={build.id}
                     scanStatus={build.scanStatus}
+                    hasScanProvenance={Boolean(
+                      build.scanner?.trim() && build.scannedAt,
+                    )}
                   />
                 </div>
               </div>

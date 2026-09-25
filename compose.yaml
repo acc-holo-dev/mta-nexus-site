@@ -49,10 +49,23 @@ services:
       BUILD_SCANNER: clamav
       CLAMAV_HOST: clamav
       CLAMAV_PORT: 3310
+      NEXT_TELEMETRY_DISABLED: "1"
+      WATCHPACK_POLLING: "true"
     ports:
       - "127.0.0.1:${NEXUS_DEV_PORT:-3000}:3000"
     volumes:
       - uploads:/data/uploads
+      # Keep dependency installation inside the image, but hot-reload application
+      # and workspace source files from the host.
+      - ./apps/web/src:/app/apps/web/src:ro
+      - ./packages/config/src:/app/packages/config/src:ro
+      - ./packages/db/src:/app/packages/db/src:ro
+      - ./packages/db/migrations:/app/packages/db/migrations:ro
+      - ./packages/domain/src:/app/packages/domain/src:ro
+      - ./packages/security/src:/app/packages/security/src:ro
+      - ./packages/storage/src:/app/packages/storage/src:ro
+      - ./packages/ui/src:/app/packages/ui/src:ro
+      - ./packages/validation/src:/app/packages/validation/src:ro
     depends_on:
       postgres:
         condition: service_healthy

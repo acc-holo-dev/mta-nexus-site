@@ -298,9 +298,16 @@ export class ProductService {
 
     const product = await productRepository.findById(build.productId);
     if (!product) throw new NotFoundError("Product", build.productId);
-    if (input.decision === "approve" && build.scanStatus !== "clean") {
+    if (
+      input.decision === "approve" &&
+      (
+        build.scanStatus !== "clean" ||
+        !build.scanner?.trim() ||
+        !build.scannedAt
+      )
+    ) {
       throw new AppError(
-        "Only a clean malware scan can be approved",
+        "Only a provenance-backed clean malware scan can be approved",
         422,
         "BUILD_SCAN_NOT_CLEAN"
       );

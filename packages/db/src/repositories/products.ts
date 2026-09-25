@@ -1,4 +1,5 @@
 import { eq, desc, asc, and, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
+import { safePublishedBuildCondition } from "./build-safety";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
 import type { AuditEvent, Product, ProductType } from "@nexus/domain";
@@ -241,14 +242,9 @@ export class ProductRepository {
       }
 
       const publishedBuild = await tx
-        .select({ id: builds.id })
+        .select({ id: builds.id, version: builds.version })
         .from(builds)
-        .where(
-          and(
-            eq(builds.productId, id),
-            eq(builds.status, "published"),
-          ),
-        )
+        .where(safePublishedBuildCondition(id))
         .orderBy(desc(builds.createdAt), desc(builds.id))
         .limit(1);
       if (!publishedBuild[0]) {
@@ -258,7 +254,11 @@ export class ProductRepository {
       const now = new Date();
       const restored = await tx
         .update(products)
-        .set({ status: "published", updatedAt: now })
+        .set({
+          status: "published",
+          currentVersion: publishedBuild[0].version,
+          updatedAt: now,
+        })
         .where(
           and(
             eq(products.id, id),

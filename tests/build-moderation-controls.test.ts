@@ -27,6 +27,8 @@ describe("build moderation control surface", () => {
     expect(route).toContain('can(actor, "admin.moderation")');
     expect(route).toContain('build.status !== "pending_review"');
     expect(route).toContain('build.scanStatus !== "clean"');
+    expect(route).toContain("!build.scanner?.trim()");
+    expect(route).toContain("!build.scannedAt");
     expect(route).toContain('"Content-Type": "application/octet-stream"');
     expect(route).toContain('"Content-Disposition"');
     expect(route).toContain('"X-Content-SHA256": build.sha256Hash');
@@ -46,9 +48,12 @@ describe("build moderation control surface", () => {
 
     expect(component).toContain("notes.trim().length >= 3");
     expect(component).toContain('scanStatus === "clean"');
-    expect(component).toContain("Artifact download requires clean scan");
+    expect(component).toContain("hasScanProvenance");
+    expect(component).toContain("hasTrustedCleanScan");
+    expect(component).toContain("Artifact download requires a trusted clean scan");
     expect(component).toContain('moderate("approve")');
     expect(component).toContain('moderate("reject")');
     expect(page).toContain("<BuildModerationControls");
+    expect(page).toContain("hasScanProvenance={Boolean(");
   });
 });

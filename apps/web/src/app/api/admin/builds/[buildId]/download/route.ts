@@ -69,9 +69,13 @@ export async function GET(
         { status: 409, headers: privateHeaders },
       );
     }
-    if (build.scanStatus !== "clean") {
+    if (
+      build.scanStatus !== "clean" ||
+      !build.scanner?.trim() ||
+      !build.scannedAt
+    ) {
       return NextResponse.json(
-        { error: "Reviewer download requires a clean malware scan" },
+        { error: "Reviewer download requires a provenance-backed clean malware scan" },
         { status: 422, headers: privateHeaders },
       );
     }

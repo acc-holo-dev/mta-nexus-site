@@ -1,44 +1,52 @@
 import Link from "next/link";
+import { getDictionary, type Locale } from "../lib/i18n";
 
-export function Footer() {
+export function Footer({ locale }: { locale: Locale }) {
+  const dictionary = getDictionary(locale);
+
   return (
-    <footer className="border-t border-base bg-surface mt-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-xs">
+    <footer className="mb-16 mt-12 border-t border-base bg-surface lg:mb-0">
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 py-10 text-xs sm:px-6 lg:grid-cols-4 lg:px-8">
         <div className="col-span-2">
-          <div className="flex items-center space-x-2 mb-3">
-            <div className="w-6 h-6 rounded bg-accent flex items-center justify-center font-bold text-white text-[10px]">NX</div>
+          <div className="mb-3 flex items-center space-x-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded bg-accent text-[10px] font-bold text-white">
+              NX
+            </div>
             <span className="font-heading text-primary">MTA NEXUS</span>
           </div>
-          <p className="text-muted max-w-sm leading-relaxed">
-            Live MTA server activity, community updates, and free resources in one place.
-            Paid commerce is not enabled during the closed beta.
+          <p className="max-w-sm leading-relaxed text-muted">
+            {dictionary.footer.summary}
           </p>
         </div>
         <div>
-          <h4 className="font-label text-primary uppercase mb-3">Discover</h4>
+          <h4 className="mb-3 font-label uppercase text-primary">
+            {dictionary.footer.discover}
+          </h4>
           <ul className="space-y-2 text-muted">
-            <li><Link href="/servers" className="hover:text-primary">Live servers</Link></li>
-            <li><Link href="/market" className="hover:text-primary">Free resources</Link></li>
-            <li><Link href="/articles" className="hover:text-primary">Community updates</Link></li>
+            <li><Link href="/servers" className="hover:text-primary">{dictionary.footer.liveServers}</Link></li>
+            <li><Link href="/market" className="hover:text-primary">{dictionary.footer.freeResources}</Link></li>
+            <li><Link href="/articles" className="hover:text-primary">{dictionary.footer.communityUpdates}</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-label text-primary uppercase mb-3">Contribute</h4>
+          <h4 className="mb-3 font-label uppercase text-primary">
+            {dictionary.footer.contribute}
+          </h4>
           <ul className="space-y-2 text-muted">
-            <li><Link href="/workspace/servers/new" className="hover:text-primary">Register a server</Link></li>
-            <li><Link href="/workspace/resources/new" className="hover:text-primary">Publish a resource</Link></li>
-            <li><Link href="/workspace" className="hover:text-primary">Workspace</Link></li>
+            <li><Link href="/workspace/servers/new" className="hover:text-primary">{dictionary.footer.registerServer}</Link></li>
+            <li><Link href="/workspace/resources/new" className="hover:text-primary">{dictionary.footer.publishResource}</Link></li>
+            <li><Link href="/workspace" className="hover:text-primary">{dictionary.footer.workspace}</Link></li>
           </ul>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 border-t border-base flex flex-col sm:flex-row items-center justify-between text-faint gap-2">
-        <div className="font-caption">© 2026 MTA Nexus · Closed beta</div>
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 border-t border-base px-4 py-4 text-faint sm:flex-row sm:px-6 lg:px-8">
+        <div className="font-caption">© 2026 MTA Nexus · {dictionary.nav.closedBeta}</div>
         <div className="flex items-center gap-3 font-caption">
-          <Link href="/terms" className="hover:text-primary">Terms</Link>
-          <Link href="/privacy" className="hover:text-primary">Privacy</Link>
-          <Link href="/copyright" className="hover:text-primary">Copyright</Link>
+          <Link href="/terms" className="hover:text-primary">{dictionary.footer.terms}</Link>
+          <Link href="/privacy" className="hover:text-primary">{dictionary.footer.privacy}</Link>
+          <Link href="/copyright" className="hover:text-primary">{dictionary.footer.copyright}</Link>
         </div>
-        <div className="font-caption">Not affiliated with Rockstar Games, Take-Two Interactive, or Multi Theft Auto.</div>
+        <div className="font-caption">{dictionary.footer.disclaimer}</div>
       </div>
     </footer>
   );

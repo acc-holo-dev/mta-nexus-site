@@ -83,6 +83,16 @@ export async function GET(
     if (!latestBuild) {
       return NextResponse.json({ error: "No published build is available" }, { status: 404, headers: privateHeaders });
     }
+    if (
+      latestBuild.scanStatus !== "clean" ||
+      !latestBuild.scanner?.trim() ||
+      !latestBuild.scannedAt
+    ) {
+      return NextResponse.json(
+        { error: "Published build is not cleared for delivery" },
+        { status: 409, headers: privateHeaders },
+      );
+    }
 
     const stored = await storageService.getDownloadStream(latestBuild.storageKey);
     try {

@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import {
+  buildRepository,
   entitlementRepository,
   productRepository,
   userRepository,
@@ -54,6 +55,22 @@ describe("free resource claim idempotency", () => {
       isFeatured: false,
       screenshots: [],
       compatibility: { dependencies: [] },
+    });
+
+    await buildRepository.create({
+      id: `bld_claim_safe_${suffix}`,
+      productId: productId,
+      version: "1.0.0",
+      status: "published",
+      storageKey: `assets/test/claim-safe-${suffix}.zip`,
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 16,
+      fileName: "claim-safe.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "integration-test",
+      scannedAt: new Date(),
+      isSigned: false,
     });
   });
 

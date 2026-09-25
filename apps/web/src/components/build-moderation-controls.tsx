@@ -7,9 +7,11 @@ import { useState } from "react";
 export function BuildModerationControls({
   buildId,
   scanStatus,
+  hasScanProvenance,
 }: {
   buildId: string;
   scanStatus: string;
+  hasScanProvenance: boolean;
 }) {
   const router = useRouter();
   const [notes, setNotes] = useState("");
@@ -17,11 +19,12 @@ export function BuildModerationControls({
   const [error, setError] = useState<string | null>(null);
 
   const hasNotes = notes.trim().length >= 3;
-  const canApprove = scanStatus === "clean" && hasNotes && pending === null;
+  const hasTrustedCleanScan = scanStatus === "clean" && hasScanProvenance;
+  const canApprove = hasTrustedCleanScan && hasNotes && pending === null;
   const canReject = hasNotes && pending === null;
 
   async function moderate(action: "approve" | "reject") {
-    if (pending || !hasNotes || (action === "approve" && scanStatus !== "clean")) {
+    if (pending || !hasNotes || (action === "approve" && !hasTrustedCleanScan)) {
       return;
     }
 
@@ -79,7 +82,7 @@ export function BuildModerationControls({
       </label>
 
       <div className="flex flex-wrap gap-2">
-        {scanStatus === "clean" ? (
+        {hasTrustedCleanScan ? (
           <a
             href={`/api/admin/builds/${encodeURIComponent(buildId)}/download`}
             className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-base bg-neutral-900 px-3 py-2 text-[11px] font-semibold text-neutral-200 hover:bg-neutral-800"
@@ -89,7 +92,7 @@ export function BuildModerationControls({
           </a>
         ) : (
           <span className="inline-flex min-h-9 items-center rounded-md border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[11px] text-amber-300">
-            Artifact download requires clean scan
+            Artifact download requires a trusted clean scan
           </span>
         )}
 
