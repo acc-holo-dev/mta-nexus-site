@@ -156,6 +156,9 @@ jobs:
           ! grep -F "$AUTH_SECRET" /tmp/account-mail-missing.err
           echo "PASS: dedicated keys, one-shot worker, SIGTERM shutdown and secret-safe failure"
 
+      - name: Verify Scenario Lab safety contract
+        run: node --test packages/db/scripts/scenario-lab-contract.node-test.mjs
+
       - name: Verify project
         run: pnpm check
 
