@@ -32,7 +32,7 @@ export type ScenarioResult = Readonly<{
   notes?: readonly string[];
 }>;
 
-type ScenarioTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+type ScenarioTransaction = Pick<typeof db, "delete" | "insert">;
 
 const ids = {
   expiredSession: {
