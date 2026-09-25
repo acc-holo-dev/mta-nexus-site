@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { getDictionary, type Locale } from "../lib/i18n";
 
 type AuthMode = "login" | "register";
 
@@ -16,7 +17,15 @@ function responseError(value: unknown, fallback: string): string {
   return typeof data.error === "string" ? data.error : fallback;
 }
 
-export function AuthForm({ mode }: { mode: AuthMode }) {
+export function AuthForm({
+  mode,
+  locale,
+}: {
+  mode: AuthMode;
+  locale: Locale;
+}) {
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.auth;
   const registering = mode === "register";
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +50,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) {
-        setError(responseError(data, "The request could not be completed. Please try again."));
+        setError(responseError(data, copy.genericError));
         setLoading(false);
         return;
       }
@@ -49,9 +58,7 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       // Replace the document so a previous account's router cache is not reused.
       window.location.replace("/workspace");
     } catch {
-      setError(registering
-        ? "We could not confirm registration. Try signing in before registering again."
-        : "We could not confirm sign in. Check your connection and try again.");
+      setError(registering ? copy.registerError : copy.loginError);
       setLoading(false);
     }
   }
@@ -61,39 +68,39 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
   return (
     <div className="mx-auto max-w-md space-y-6 py-10">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-primary">{registering ? "Create your Nexus account" : "Sign in to MTA Nexus"}</h1>
-        <p className="text-sm text-muted">{registering ? "Save free resources and manage your MTA server listings." : "Open your resource library and manage your server listings."}</p>
+        <h1 className="text-2xl font-bold text-primary">{registering ? copy.registerTitle : copy.loginTitle}</h1>
+        <p className="text-sm text-muted">{registering ? copy.registerDescription : copy.loginDescription}</p>
       </div>
       <form onSubmit={submit} aria-busy={loading} aria-describedby={error ? "auth-error" : undefined} className="nexus-panel space-y-4 p-5">
         {error && <p id="auth-error" role="alert" className="rounded-lg border border-base p-3 text-sm text-primary">{error}</p>}
         <div className="space-y-1.5">
-          <label htmlFor="auth-email" className={label}>Email address</label>
+          <label htmlFor="auth-email" className={label}>{copy.email}</label>
           <input id="auth-email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} required className={input} />
         </div>
         {registering && <>
           <div className="space-y-1.5">
-            <label htmlFor="auth-username" className={label}>Username</label>
+            <label htmlFor="auth-username" className={label}>{copy.username}</label>
             <input id="auth-username" name="username" autoComplete="username" autoCapitalize="none" spellCheck={false} required minLength={3} maxLength={32} pattern="[a-zA-Z0-9_\-]+" aria-describedby="username-hint" className={input} />
-            <p id="username-hint" className="text-xs text-muted">3-32 letters, numbers, underscores or hyphens.</p>
+            <p id="username-hint" className="text-xs text-muted">{copy.usernameHint}</p>
           </div>
           <div className="space-y-1.5">
-            <label htmlFor="auth-display-name" className={label}>Display name (optional)</label>
+            <label htmlFor="auth-display-name" className={label}>{copy.displayName}</label>
             <input id="auth-display-name" name="displayName" autoComplete="nickname" minLength={2} maxLength={50} aria-describedby="display-name-hint" className={input} />
-            <p id="display-name-hint" className="text-xs text-muted">Leave blank to use your username.</p>
+            <p id="display-name-hint" className="text-xs text-muted">{copy.displayNameHint}</p>
           </div>
         </>}
         <div className="space-y-1.5">
-          <label htmlFor="auth-password" className={label}>Password</label>
+          <label htmlFor="auth-password" className={label}>{copy.password}</label>
           <input id="auth-password" name="password" type="password" required minLength={registering ? 8 : 1} maxLength={128} autoComplete={registering ? "new-password" : "current-password"} aria-describedby={registering ? "password-hint" : undefined} className={input} />
-          {registering && <p id="password-hint" className="text-xs text-muted">8-128 characters. Use a unique password.</p>}
+          {registering && <p id="password-hint" className="text-xs text-muted">{copy.passwordHint}</p>}
         </div>
         <button type="submit" disabled={loading} className="w-full rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] disabled:opacity-50">
-          {loading ? (registering ? "Creating account..." : "Signing in...") : (registering ? "Create account" : "Sign In")}
+          {loading ? (registering ? copy.creating : copy.signingIn) : (registering ? copy.create : copy.signIn)}
         </button>
       </form>
       <div className="space-y-2 text-sm text-muted">
-        {!registering && <p><Link href="/auth/forgot-password" className="font-semibold text-accent underline">Forgot password?</Link></p>}
-        <p>{registering ? "Already have an account? " : "New to MTA Nexus? "}<Link href={registering ? "/auth/login" : "/auth/register"} className="font-semibold text-accent underline">{registering ? "Sign In" : "Create an account"}</Link></p>
+        {!registering && <p><Link href="/auth/forgot-password" className="font-semibold text-accent underline">{copy.forgot}</Link></p>}
+        <p>{registering ? `${copy.already} ` : `${copy.newUser} `}<Link href={registering ? "/auth/login" : "/auth/register"} className="font-semibold text-accent underline">{registering ? copy.signIn : copy.create}</Link></p>
       </div>
     </div>
   );
