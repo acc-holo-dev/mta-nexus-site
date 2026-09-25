@@ -149,6 +149,25 @@ export class ProductService {
     return product;
   }
 
+  async assertCanReleaseBuild(
+    productId: string,
+    actor: User,
+  ): Promise<Product> {
+    const product = await productRepository.findById(productId);
+    if (!product) throw new NotFoundError("Product", productId);
+    if (product.price !== 0) {
+      throw new AppError(
+        "Build releases for paid resources are disabled during the closed beta",
+        422,
+        "PAID_RESOURCES_DISABLED"
+      );
+    }
+    if (!(await this.canManageProduct(product, actor, "build.release"))) {
+      throw new ForbiddenError("Not authorized to publish builds for this product");
+    }
+    return product;
+  }
+
   async releaseBuild(
     input: {
       productId: string;
@@ -166,19 +185,10 @@ export class ProductService {
     },
     actor: User
   ): Promise<Build> {
-    const product = await productRepository.findById(input.productId);
-    if (!product) throw new NotFoundError("Product", input.productId);
-    if (product.price !== 0) {
-      throw new AppError(
-        "Build releases for paid resources are disabled during the closed beta",
-        422,
-        "PAID_RESOURCES_DISABLED"
-      );
-    }
-
-    if (!(await this.canManageProduct(product, actor, "build.release"))) {
-      throw new ForbiddenError("Not authorized to publish builds for this product");
-    }
+    const product = await this.assertCanReleaseBuild(
+      input.productId,
+      actor,
+    );
 
     const buildId = generateId("bld");
     const auditId = generateId("aud");
