@@ -46,11 +46,24 @@ test("rehearsal covers migrated application database and private uploads transfe
   assert.match(script, /uploadFilesRestored/u);
 });
 
+test("temporary backup artifacts are forced to private file permissions", () => {
+  const script = read("scripts/check-backup-restore.mjs");
+
+  assert.match(script, /writeFileSync\(dbBackup, dump, \{ mode: 0o600 \}\)/u);
+  assert.match(script, /chmodSync\(uploadsBackup, 0o600\)/u);
+  assert.match(script, /Database backup must remain private/u);
+  assert.match(script, /Uploads backup must remain private/u);
+});
+
 test("workflow runs backup restore as a separate disposable job", () => {
   const workflow = read(".github/workflows/ci.yml");
 
   assert.match(workflow, /^  backup-restore:/mu);
   assert.match(workflow, /name: Disposable backup restore/u);
+  assert.match(
+    workflow,
+    /backup-restore:[\s\S]*?uses: actions\/checkout@v7[\s\S]*?persist-credentials: false/u,
+  );
   assert.match(workflow, /node scripts\/check-backup-restore\.mjs/u);
 });
 
