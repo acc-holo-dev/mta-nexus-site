@@ -22,6 +22,8 @@ describe("RU/EN shell foundation", () => {
     expect(en.workspace.title).not.toBe(ru.workspace.title);
     expect(en.servers.title).not.toBe(ru.servers.title);
     expect(en.auth.loginTitle).not.toBe(ru.auth.loginTitle);
+    expect(en.product.addToLibrary).not.toBe(ru.product.addToLibrary);
+    expect(en.checkout.title).not.toBe(ru.checkout.title);
   });
 
   it("keeps mobile navigation and locale switching in the global shell", () => {
