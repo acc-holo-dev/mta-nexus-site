@@ -3,6 +3,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import {
   appendFileSync,
+  chmodSync,
   mkdtempSync,
   readFileSync,
   readdirSync,
@@ -373,6 +374,11 @@ function run() {
     );
     writeFileSync(dbBackup, dump, { mode: 0o600 });
     assert(statSync(dbBackup).size > 0, "Database dump is empty");
+    assert.equal(
+      statSync(dbBackup).mode & 0o777,
+      0o600,
+      "Database backup must remain private",
+    );
 
     const uploadsBackup = join(temp, "uploads.tar.gz");
     docker([
@@ -392,6 +398,12 @@ function run() {
       "tar -C /data -czf /backup/uploads.tar.gz .",
     ]);
     assert(statSync(uploadsBackup).size > 0, "Uploads archive is empty");
+    chmodSync(uploadsBackup, 0o600);
+    assert.equal(
+      statSync(uploadsBackup).mode & 0o777,
+      0o600,
+      "Uploads backup must remain private",
+    );
 
     result.databaseBackupSha256 = sha256(dbBackup);
     result.uploadsBackupSha256 = sha256(uploadsBackup);
