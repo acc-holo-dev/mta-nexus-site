@@ -16,6 +16,12 @@ describe("build publication consistency surface", () => {
       ".orderBy(desc(builds.createdAt), desc(builds.id))",
     );
     expect(repository).toContain("latestPublished[0].version");
+    expect(repository).toContain(
+      '.set({ updatedAt: sql`\${products.updatedAt}\` })',
+    );
+    expect(repository).toContain(
+      "Build product disappeared during moderation",
+    );
     expect(repository).not.toContain("currentVersion: reviewed.version");
   });
 
