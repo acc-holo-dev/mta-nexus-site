@@ -1,4 +1,4 @@
-import { productRepository, buildRepository, auditRepository, organizationRepository } from "@nexus/db";
+import { productRepository, buildRepository, organizationRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Product, Build, User, ProductType } from "@nexus/domain";
@@ -137,26 +137,27 @@ export class ProductService {
     }
 
     const id = generateId("prd");
-    const product = await productRepository.create({
-      ...input,
-      id,
-      price: 0,
-      currency: "USD",
-      licenseModel: "unlimited",
-      ratingAverage: 0,
-      ratingCount: 0,
-      salesCount: 0,
-    });
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: actor.id,
-      actorType: "user",
-      action: "product.created",
-      targetId: id,
-      targetType: "product",
-      details: { title: product.title, price: product.price },
-    });
+    const product = await productRepository.createWithAudit(
+      {
+        ...input,
+        id,
+        price: 0,
+        currency: "USD",
+        licenseModel: "unlimited",
+        ratingAverage: 0,
+        ratingCount: 0,
+        salesCount: 0,
+      },
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: "user",
+        action: "product.created",
+        targetId: id,
+        targetType: "product",
+        details: { title: input.title, price: 0 },
+      },
+    );
 
     await eventBus.publish({
       id: generateId("evt"),
