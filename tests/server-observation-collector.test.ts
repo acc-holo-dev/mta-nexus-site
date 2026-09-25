@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildMasterObservationCandidates } from "../apps/web/src/lib/services/server-observation-collector";
+import { buildMasterObservationCandidates } from "../apps/web/src/lib/services/server-observation-matching";
 
 describe("server observation collector", () => {
   it("matches known endpoints once and records only confirmed listings", () => {
