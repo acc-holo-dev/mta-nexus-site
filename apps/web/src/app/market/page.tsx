@@ -1,34 +1,37 @@
 import Link from "next/link";
 import { productService } from "../../lib/services/product-service";
 import { ProductCard } from "../../components/product-card";
-import { SectionHeader } from "@nexus/ui";
 import { ShoppingBag } from "lucide-react";
+import { getDictionary } from "../../lib/i18n";
+import { getRequestLocale } from "../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
 const CATEGORIES = [
-  { id: "all", label: "All" },
-  { id: "script", label: "Scripts" },
-  { id: "vehicle", label: "Vehicles" },
-  { id: "model", label: "Models" },
-  { id: "map", label: "Maps" },
-  { id: "ui", label: "UI" },
-  { id: "plugin", label: "Plugins" },
-  { id: "bundle", label: "Bundles" },
-  { id: "service", label: "Services" },
-];
+  { id: "all", key: "all" },
+  { id: "script", key: "scripts" },
+  { id: "vehicle", key: "vehicles" },
+  { id: "model", key: "models" },
+  { id: "map", key: "maps" },
+  { id: "ui", key: "ui" },
+  { id: "plugin", key: "plugins" },
+  { id: "bundle", key: "bundles" },
+  { id: "service", key: "services" },
+] as const;
 
 const SORTS = [
-  { id: "popular", label: "Popular" },
-  { id: "newest", label: "New" },
-  { id: "rating", label: "Top Rated" },
-];
+  { id: "popular", key: "popular" },
+  { id: "newest", key: "newest" },
+  { id: "rating", key: "rating" },
+] as const;
 
 export default async function MarketPage({
   searchParams,
 }: {
   searchParams: Promise<{ type?: string; sort?: string; q?: string }>;
 }) {
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
   const params = await searchParams;
   const activeType = params.type || "all";
   const activeSort = params.sort || "popular";
@@ -42,78 +45,79 @@ export default async function MarketPage({
   });
 
   const buildHref = (type: string, sort: string) =>
-    `/market?type=${type}&sort=${sort}${query ? `&q=${query}` : ""}`;
+    `/market?type=${type}&sort=${sort}${query ? `&q=${encodeURIComponent(query)}` : ""}`;
+
+  const countLabel =
+    products.length === 1
+      ? dictionary.market.readySingle
+      : dictionary.market.ready;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-1">
+      <div className="flex flex-col justify-between gap-3 pb-1 md:flex-row md:items-center">
         <div>
-          <h1 className="font-display text-primary flex items-center gap-2.5">
-            <ShoppingBag className="w-6 h-6 text-accent" />
-            <span>Free Resource Library</span>
+          <h1 className="flex items-center gap-2.5 font-display text-primary">
+            <ShoppingBag className="h-6 w-6 text-accent" />
+            <span>{dictionary.market.title}</span>
           </h1>
-          <p className="font-caption text-muted mt-0.5">
-            {products.length} free resource{products.length === 1 ? "" : "s"} ready for your library
+          <p className="mt-0.5 font-caption text-muted">
+            {products.length} {countLabel}
           </p>
         </div>
       </div>
 
-      {/* Sort tabs */}
-      <div className="flex items-center gap-1 border-b border-base overflow-x-auto">
-        {SORTS.map((s) => {
-          const isActive = activeSort === s.id;
+      <div className="flex items-center gap-1 overflow-x-auto border-b border-base">
+        {SORTS.map((sort) => {
+          const isActive = activeSort === sort.id;
           return (
             <Link
-              key={s.id}
-              href={buildHref(activeType, s.id)}
-              className={`px-3.5 py-2 text-xs font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap ${
+              key={sort.id}
+              href={buildHref(activeType, sort.id)}
+              className={`-mb-px whitespace-nowrap border-b-2 px-3.5 py-2 text-xs font-semibold transition-colors ${
                 isActive
                   ? "border-accent text-accent"
                   : "border-transparent text-muted hover:text-primary"
               }`}
             >
-              {s.label}
+              {dictionary.market[sort.key]}
             </Link>
           );
         })}
       </div>
 
-      {/* Category filter chips */}
-      <div className="flex items-center gap-1.5 flex-wrap">
-        {CATEGORIES.map((c) => {
-          const isActive = activeType === c.id;
+      <div className="flex flex-wrap items-center gap-1.5">
+        {CATEGORIES.map((category) => {
+          const isActive = activeType === category.id;
           return (
             <Link
-              key={c.id}
-              href={buildHref(c.id, activeSort)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              key={category.id}
+              href={buildHref(category.id, activeSort)}
+              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                 isActive
-                  ? "bg-accent text-white font-semibold"
-                  : "bg-surface border border-base text-secondary hover:text-primary hover:border-strong"
+                  ? "bg-accent font-semibold text-white"
+                  : "border border-base bg-surface text-secondary hover:border-strong hover:text-primary"
               }`}
             >
-              {c.label}
+              {dictionary.market[category.key]}
             </Link>
           );
         })}
       </div>
 
-      {/* Product grid */}
       {products.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} locale={locale} />
           ))}
         </div>
       ) : (
-        <div className="py-16 text-center nexus-panel">
-          <p className="font-caption text-muted">No resources found in this category.</p>
+        <div className="nexus-panel py-16 text-center">
+          <p className="font-caption text-muted">{dictionary.market.empty}</p>
           <Link
             href="/market"
-            className="inline-block mt-3 px-4 py-2 rounded-md bg-accent hover:bg-[var(--nexus-accent-hover)] text-white text-xs font-semibold transition-colors"
+            className="mt-3 inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
           >
-            Clear Filters
+            {dictionary.market.clear}
           </Link>
         </div>
       )}
