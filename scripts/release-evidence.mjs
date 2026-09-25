@@ -27,12 +27,18 @@ function runCaptured(command, args) {
     encoding: "utf8",
     shell: false,
   });
-  if (result.status !== 0) return null;
-  return result.stdout.trim() || null;
+  return Object.freeze({
+    ok: result.status === 0 && !result.error,
+    output:
+      result.status === 0 && !result.error
+        ? result.stdout.trim()
+        : "",
+  });
 }
 
 function runGate(name, command, args, options = {}) {
-  const commandText = [command, ...args].join(" ");
+  const commandText =
+    command === "internal" ? "internal identity checks" : [command, ...args].join(" ");
   if (options.blockedReason) {
     return Object.freeze({
       name,
@@ -42,6 +48,17 @@ function runGate(name, command, args, options = {}) {
       signal: null,
       durationMs: 0,
       reason: options.blockedReason,
+    });
+  }
+
+  if (command === "internal") {
+    return Object.freeze({
+      name,
+      command: commandText,
+      status: "passed",
+      exitCode: 0,
+      signal: null,
+      durationMs: 0,
     });
   }
 
@@ -70,17 +87,48 @@ function runGate(name, command, args, options = {}) {
   });
 }
 
-const gitSha = runCaptured("git", ["rev-parse", "HEAD"]);
+const gitShaResult = runCaptured("git", ["rev-parse", "HEAD"]);
+const gitBranchResult = runCaptured("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
+const gitStatusResult = runCaptured("git", ["status", "--porcelain"]);
+const pnpmVersionResult = runCaptured(pnpmCommand, ["--version"]);
+const gitVersionResult = runCaptured("git", ["--version"]);
+
+const gitSha = gitShaResult.output || null;
 const branchName =
   process.env.GITHUB_HEAD_REF ||
   process.env.GITHUB_REF_NAME ||
-  runCaptured("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
-const gitStatus = runCaptured("git", ["status", "--porcelain"]);
-const dirty = Boolean(gitStatus);
-const pnpmVersion = runCaptured(pnpmCommand, ["--version"]);
-const gitVersion = runCaptured("git", ["--version"]);
+  gitBranchResult.output ||
+  null;
+const dirty = gitStatusResult.ok ? Boolean(gitStatusResult.output) : true;
+const pnpmVersion = pnpmVersionResult.output || null;
+const gitVersion = gitVersionResult.output || null;
+const githubShaMatches =
+  !process.env.GITHUB_SHA || process.env.GITHUB_SHA === gitSha;
+const identityComplete =
+  gitShaResult.ok &&
+  gitStatusResult.ok &&
+  pnpmVersionResult.ok &&
+  gitVersionResult.ok &&
+  Boolean(gitSha && branchName && pnpmVersion && gitVersion) &&
+  githubShaMatches;
 
 const gates = [
+  runGate(
+    "repository_identity",
+    "internal",
+    [],
+    identityComplete
+      ? {}
+      : {
+          blockedReason:
+            "Git/pnpm identity is incomplete or GITHUB_SHA does not match the checked-out commit.",
+        },
+  ),
+  runGate(
+    "release_evidence_harness",
+    "node",
+    ["--test", "scripts/tests/release-evidence.node-test.mjs"],
+  ),
   runGate(
     "database_migrations",
     pnpmCommand,
@@ -109,6 +157,7 @@ const evidenceCore = {
     githubSha: process.env.GITHUB_SHA || null,
     githubRunId: process.env.GITHUB_RUN_ID || null,
     githubRunAttempt: process.env.GITHUB_RUN_ATTEMPT || null,
+    githubShaMatches,
   },
   runtime: {
     node: process.version,
