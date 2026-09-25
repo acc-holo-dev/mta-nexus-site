@@ -130,7 +130,6 @@ describe("resource download HTTP contract", () => {
     expect(response.status).toBe(401);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
-    expect(response.headers.get("Vary")).toBe("Cookie");
     expect(await response.json()).toEqual({
       error: "Authentication required to download resource builds",
     });
@@ -146,6 +145,8 @@ describe("resource download HTTP contract", () => {
     const response = await GET(request(), context);
 
     expect(response.status).toBe(404);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("Vary")).toBe("Cookie");
     expect(await response.json()).toEqual({
       error: "Resource not found",
     });
@@ -158,6 +159,8 @@ describe("resource download HTTP contract", () => {
     const response = await GET(request(), context);
 
     expect(response.status).toBe(403);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("Vary")).toBe("Cookie");
     expect(await response.json()).toEqual({
       error: "Add this resource to your library before downloading it",
     });
@@ -170,6 +173,8 @@ describe("resource download HTTP contract", () => {
     const response = await GET(request(), context);
 
     expect(response.status).toBe(404);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("Vary")).toBe("Cookie");
     expect(await response.json()).toEqual({
       error: "No published build is available",
     });
