@@ -57,6 +57,8 @@ curl -fsS https://nexus-mta.com/api/health
 
 Do not publish a fully rendered Compose configuration: it can contain secrets. The production app command applies migrations before startup. A failing migration must stop startup; a code rollback alone does not undo a partially applied database change. A successful `/api/health` response proves neither storage nor scanner verdicts or user-journey readiness. The Caddy request-size rule still needs boundary testing with the real upload flow.
 
+The current DEVX-004 candidate changes only the image layout: the HTTP process uses Next.js standalone output, while migrations and the optional recovery mail worker use a separate production-only `@nexus/db` deploy payload. The runtime image is not expected to contain pnpm. This preserves the migration-before-HTTP rule and the existing image-only worker contract while avoiding a full workspace copy. Treat this as an unaccepted optimization until the production startup and D5 worker checks actually execute on the same candidate image.
+
 ## BETA-003 production smoke — not a deployment command
 
 The existing CI workflow runs `scripts/check-production-startup.sh` only on a disposable GitHub-hosted runner using its default Docker daemon. The script rejects other environments. It combines `compose.production.yaml` with the explicit `compose.production-ci.yaml` overlay; do not use that overlay on the VDS.
