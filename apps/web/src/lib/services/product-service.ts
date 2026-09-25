@@ -51,7 +51,11 @@ export class ProductService {
 
   async getProductBySlug(slug: string): Promise<Product | null> {
     const product = await productRepository.findBySlug(slug);
-    return product?.price === 0 && product.status === "published" ? product : null;
+    if (!product || product.price !== 0 || product.status !== "published") {
+      return null;
+    }
+    const build = await buildRepository.findLatestPublishedByProduct(product.id);
+    return build ? product : null;
   }
 
   async getProductPreviewBySlug(slug: string, actor: User | null): Promise<Product | null> {
@@ -67,7 +71,11 @@ export class ProductService {
 
   async getProductById(id: string): Promise<Product | null> {
     const product = await productRepository.findById(id);
-    return product?.price === 0 && product.status === "published" ? product : null;
+    if (!product || product.price !== 0 || product.status !== "published") {
+      return null;
+    }
+    const build = await buildRepository.findLatestPublishedByProduct(product.id);
+    return build ? product : null;
   }
 
   async getProductBuilds(productId: string, includeNonPublic = false): Promise<Build[]> {
