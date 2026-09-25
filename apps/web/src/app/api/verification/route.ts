@@ -12,6 +12,8 @@ import { consumeRateLimit, generateId } from "@nexus/security";
 import { z } from "zod";
 import { AppError } from "@nexus/domain";
 
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+
 const verificationRequestSchema = z.object({
   targetType: z.enum(["user", "developer", "organization", "server"]),
   targetId: z.string().min(1),
@@ -24,11 +26,11 @@ export async function GET(request: NextRequest) {
   const user = await authService.getSession(token);
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: privateHeaders });
   }
 
   const requests = await verificationRepository.listByRequester(user.id);
-  return NextResponse.json({ requests });
+  return NextResponse.json({ requests }, { headers: privateHeaders });
 }
 
 export async function POST(request: NextRequest) {
