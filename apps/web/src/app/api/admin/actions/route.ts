@@ -120,7 +120,18 @@ export async function POST(request: NextRequest) {
           makeAudit(),
         );
         if (!resolved) {
-          return NextResponse.json({ error: "Report not found" }, { status: 404 });
+          const current = await reportRepository.findById(targetId);
+          if (!current) {
+            return NextResponse.json(
+              { error: "Report not found" },
+              { status: 404 },
+            );
+          }
+          throw new AppError(
+            "Report state changed before moderation completed",
+            409,
+            "REPORT_STATE_CHANGED",
+          );
         }
       }
     } else if (targetType === "verification") {
@@ -137,9 +148,17 @@ export async function POST(request: NextRequest) {
         );
 
         if (!resolved) {
-          return NextResponse.json(
-            { error: "Verification request not found or already resolved" },
-            { status: 404 }
+          const current = await verificationRepository.findById(targetId);
+          if (!current) {
+            return NextResponse.json(
+              { error: "Verification request not found" },
+              { status: 404 },
+            );
+          }
+          throw new AppError(
+            "Verification request state changed before moderation completed",
+            409,
+            "VERIFICATION_STATE_CHANGED",
           );
         }
       }
