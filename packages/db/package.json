@@ -9,7 +9,10 @@
     "generate": "drizzle-kit generate",
     "migrate": "tsx src/migrate.ts",
     "seed": "tsx src/seed.ts",
-    "mail:dispatch": "tsx scripts/run-account-mail-dispatcher.ts"
+    "mail:dispatch": "tsx scripts/run-account-mail-dispatcher.ts",
+    "scenario:list": "tsx scripts/run-scenario-lab.ts list",
+    "scenario:create": "tsx scripts/run-scenario-lab.ts apply",
+    "scenario:cleanup": "tsx scripts/run-scenario-lab.ts cleanup"
   },
   "dependencies": {
     "@nexus/config": "workspace:*",
