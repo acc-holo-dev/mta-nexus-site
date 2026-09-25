@@ -14,6 +14,31 @@ export class ContentRepository {
     return rows as unknown as Content[];
   }
 
+  async listPublishedByOrganization(
+    organizationId: string,
+    limit = 100,
+  ): Promise<Content[]> {
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 100)
+      : 100;
+
+    const rows = await db
+      .select()
+      .from(content)
+      .where(
+        and(
+          eq(content.organizationId, organizationId),
+          eq(content.status, "published"),
+        ),
+      )
+      .orderBy(
+        desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`),
+        desc(content.id),
+      )
+      .limit(boundedLimit);
+    return rows as unknown as Content[];
+  }
+
   async listPublishedByTypes(types: Content["type"][], limit = 50): Promise<Content[]> {
     if (types.length === 0) return [];
     const rows = await db
