@@ -72,3 +72,26 @@ The next step is an explicit collector that:
 6. has explicit runtime/frequency/resource limits before scheduling is enabled.
 
 Until that collector is accepted, an empty history means only that NEXUS has no stored observations for the requested window.
+
+## SERVER-002 one-shot collector candidate
+
+The stacked SERVER-002 candidate adds an explicit source-tree command:
+
+```bash
+NEXUS_SERVER_OBSERVATION_CAPTURE=true pnpm server:observations:capture
+```
+
+The command is guarded before database/config imports. It refuses GitHub Actions and requires `NODE_ENV=development` or `NODE_ENV=production`, an explicit `DATABASE_URL`, and the opt-in flag above.
+
+One invocation:
+
+1. fetches the official master-list once;
+2. loads at most 500 active, non-private NEXUS server profiles;
+3. normalizes and matches `address:port`;
+4. records only matched/confirmed listings;
+5. uses the master fetch timestamp as the source sequence so retries of the same snapshot remain idempotent;
+6. reports counts only: known, matched, not-listed and record attempts.
+
+`notListedServers` is not an offline count. Missing endpoints produce no observation row.
+
+The candidate does not add cron, a long-running worker, a production Compose service, or an HTTP mutation endpoint. Scheduling frequency, retention, resource cost and operational ownership remain separate acceptance work.
