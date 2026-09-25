@@ -7,6 +7,7 @@ import {
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
 import { Cpu, ShieldCheck, Users } from "lucide-react";
+import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -110,6 +111,13 @@ export default async function ServerDetailPage({
           </a>
         </div>
       </div>
+
+      {!server.ownerId && !server.isVerified && (
+        <ServerClaimControlPanel
+          serverId={server.id}
+          serverName={server.name}
+        />
+      )}
 
       {(server.language || server.region || server.websiteUrl || server.discordUrl || server.rulesUrl || server.gameplayTags?.length || server.mediaUrls?.length) && (
         <section className="nexus-panel p-5 space-y-4">
