@@ -6,6 +6,7 @@ import { productService } from "../../../lib/services/product-service";
 import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
+import { ProductDependencyList } from "../../../components/product-dependency-list";
 import {
   Star,
   Download,
@@ -90,8 +91,11 @@ export default async function ProductDetailPage({
   const hasAccess = isPublished && (isAuthor || isLicensed || isAdmin);
   const canInspectBuilds = isAuthor || isAdmin;
 
-  const builds = await productService.getProductBuilds(product.id, canInspectBuilds);
-  const reviews = await contentService.getComments({ productId: product.id });
+  const [builds, reviews, dependencyResolution] = await Promise.all([
+    productService.getProductBuilds(product.id, canInspectBuilds),
+    contentService.getComments({ productId: product.id }),
+    productService.getDependencyResolution(product).catch(() => null),
+  ]);
 
   const formattedPrice = "Free";
 
@@ -333,11 +337,10 @@ export default async function ProductDetailPage({
                 </div>
                 <div className="flex justify-between gap-4 py-1 border-b border-neutral-800">
                   <span className="text-neutral-400">Dependencies</span>
-                  <span className="font-mono text-right text-neutral-200">
-                    {product.compatibility.dependencies?.length
-                      ? product.compatibility.dependencies.join(", ")
-                      : "None declared"}
-                  </span>
+                  <ProductDependencyList
+                    declared={product.compatibility.dependencies ?? []}
+                    resolution={dependencyResolution}
+                  />
                 </div>
                 <div className="flex justify-between py-1 border-b border-neutral-800">
                   <span className="text-neutral-400">Library additions</span>
