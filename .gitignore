@@ -31,3 +31,6 @@ tmp/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Generated release evidence
+artifacts/
