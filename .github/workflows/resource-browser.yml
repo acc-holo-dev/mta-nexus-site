@@ -63,7 +63,7 @@ jobs:
         id: evidence
         if: always()
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: resource-browser-${{ github.sha }}
           path: ${{ runner.temp }}/nexus-resource-report
