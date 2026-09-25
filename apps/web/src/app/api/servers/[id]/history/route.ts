@@ -31,20 +31,36 @@ export async function GET(
     );
   }
 
-  const { id } = await params;
-  const history = await serverHistoryService.getHistory(id, parsed.data.window);
-  if (!history) {
+  try {
+    const { id } = await params;
+    const history = await serverHistoryService.getHistory(
+      id,
+      parsed.data.window,
+    );
+    if (!history) {
+      return NextResponse.json(
+        { error: "Server not found" },
+        {
+          status: 404,
+          headers: { "Cache-Control": "no-store" },
+        },
+      );
+    }
+
+    return NextResponse.json(history, {
+      status: 200,
+      headers: { "Cache-Control": "no-store" },
+    });
+  } catch {
     return NextResponse.json(
-      { error: "Server not found" },
+      { error: "Server history is temporarily unavailable" },
       {
-        status: 404,
-        headers: { "Cache-Control": "no-store" },
+        status: 503,
+        headers: {
+          "Cache-Control": "no-store",
+          "Retry-After": "30",
+        },
       },
     );
   }
-
-  return NextResponse.json(history, {
-    status: 200,
-    headers: { "Cache-Control": "no-store" },
-  });
 }
