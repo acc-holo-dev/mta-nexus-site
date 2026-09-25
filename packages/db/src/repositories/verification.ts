@@ -199,7 +199,7 @@ export class VerificationRepository {
             .returning({ id: servers.id });
 
           if (!claimed[0]) {
-            throw new Error("Server claim target is already owned by another user");
+            throw new ConflictError("Server claim target is already owned by another user");
           }
         }
       }
