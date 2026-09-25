@@ -1,3 +1,7 @@
+import net from "node:net";
+import { config } from "@nexus/config";
+import { writeClamAvInstream } from "./clamav-instream";
+
 export type BuildScanResult =
   | { status: "not_scanned"; scanner: "disabled"; scannedAt: Date }
   | { status: "clean"; scanner: string; scannedAt: Date }
@@ -27,7 +31,6 @@ const disabledScanner: BuildScanner = {
   },
 };
 
-const CLAMAV_CHUNK_BYTES = 64 * 1024;
 const CLAMAV_TIMEOUT_MS = 30_000;
 
 export const clamAvScanner: BuildScanner = {
@@ -46,15 +49,17 @@ export const clamAvScanner: BuildScanner = {
 
       socket.setTimeout(CLAMAV_TIMEOUT_MS);
       socket.on("connect", () => {
-        socket.write("zINSTREAM\0");
-        for (let offset = 0; offset < bytes.length; offset += CLAMAV_CHUNK_BYTES) {
-          const chunk = bytes.subarray(offset, offset + CLAMAV_CHUNK_BYTES);
-          const length = Buffer.allocUnsafe(4);
-          length.writeUInt32BE(chunk.length);
-          socket.write(length);
-          socket.write(chunk);
-        }
-        socket.end(Buffer.alloc(4));
+        void writeClamAvInstream(socket, bytes).catch((error: unknown) => {
+          finish({
+            status: "error",
+            scanner: "clamav",
+            scannedAt,
+            reason:
+              error instanceof Error
+                ? error.message
+                : "Scanner stream failed",
+          });
+        });
       });
       socket.on("data", (chunk) => { response += chunk.toString("utf8"); });
       socket.on("end", () => {
