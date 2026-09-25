@@ -81,7 +81,8 @@ export class BuildRepository {
         .from(builds)
         .where(and(
           eq(builds.productId, data.productId),
-          eq(builds.status, "published")
+          eq(builds.status, "published"),
+          eq(builds.scanStatus, "clean"),
         ))
         .limit(1);
       if (!published[0]) {
@@ -138,6 +139,7 @@ export class BuildRepository {
             and(
               eq(builds.productId, reviewed.productId),
               eq(builds.status, "published"),
+              eq(builds.scanStatus, "clean"),
             ),
           )
           .orderBy(desc(builds.createdAt), desc(builds.id))
@@ -161,7 +163,8 @@ export class BuildRepository {
           .where(and(
             eq(builds.productId, reviewed.productId),
             ne(builds.id, reviewed.id),
-            eq(builds.status, "published")
+            eq(builds.status, "published"),
+            eq(builds.scanStatus, "clean"),
           ))
           .orderBy(desc(builds.createdAt), desc(builds.id))
           .limit(1);
@@ -208,7 +211,8 @@ export class BuildRepository {
         .where(and(
           eq(builds.productId, retired.productId),
           ne(builds.id, retired.id),
-          eq(builds.status, "published")
+          eq(builds.status, "published"),
+          eq(builds.scanStatus, "clean"),
         ))
         .orderBy(desc(builds.createdAt), desc(builds.id))
         .limit(1);
