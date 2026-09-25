@@ -5,6 +5,7 @@ import {
   organizationMembers,
   organizationRepository,
   productRepository,
+  serverRepository,
   userRepository,
 } from "@nexus/db";
 import { productService } from "../apps/web/src/lib/services/product-service";
@@ -319,10 +320,9 @@ describe("organization resource management integration", () => {
       (await userRepository.findById(orgOwnerId))!,
     );
 
-    const withLegacyOwner = await (await import("@nexus/db")).serverRepository.update(
-      legacy.id,
-      { ownerId: legacyOwnerId },
-    );
+    const withLegacyOwner = await serverRepository.update(legacy.id, {
+      ownerId: legacyOwnerId,
+    });
     expect(withLegacyOwner?.organizationId).toBe(organizationId);
     expect(withLegacyOwner?.ownerId).toBe(legacyOwnerId);
 
