@@ -27,14 +27,22 @@ test("backup restore rehearsal never targets repository or production volume nam
   assert.doesNotMatch(script, /down", "--volumes/u);
 });
 
-test("rehearsal covers database and private uploads transfer", () => {
+test("rehearsal covers migrated application database and private uploads transfer", () => {
   const script = read("scripts/check-backup-restore.mjs");
 
+  assert.match(script, /packages", "db", "migrations/u);
+  assert.match(script, /readdirSync\(migrationsDir\)/u);
+  assert.match(script, /ON_ERROR_STOP=1/u);
+  assert.match(script, /sourceSchemaFingerprint/u);
+  assert.match(script, /restoredSchemaFingerprint/u);
+  assert.match(script, /assert\.deepEqual\(/u);
   assert.match(script, /"pg_dump"/u);
   assert.match(script, /"pg_restore"/u);
   assert.match(script, /uploads\.tar\.gz/u);
   assert.match(script, /sourceDestroyedBeforeRestore/u);
+  assert.match(script, /backupChecksumsVerified/u);
   assert.match(script, /databaseRowsRestored/u);
+  assert.match(script, /applicationSchemaRestored/u);
   assert.match(script, /uploadFilesRestored/u);
 });
 
