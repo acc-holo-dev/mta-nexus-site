@@ -66,6 +66,7 @@ export class ProductRepository {
         and(
           eq(products.organizationId, organizationId),
           eq(products.status, "published"),
+          eq(products.price, 0),
         ),
       )
       .orderBy(desc(products.createdAt), desc(products.id))
