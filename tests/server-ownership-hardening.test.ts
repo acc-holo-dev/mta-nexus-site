@@ -49,6 +49,9 @@ describe("server ownership hardening surface", () => {
     expect(repository).toContain(
       "A server ownership request is already pending",
     );
+    expect(repository).toContain(
+      'throw new ConflictError("Server claim target is already owned by another user")',
+    );
     expect(repository).toContain("findPendingForAnyRequester");
     expect(route).toContain(
       "verificationRepository.findPendingForAnyRequester",
