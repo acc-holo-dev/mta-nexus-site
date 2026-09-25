@@ -1,6 +1,6 @@
 {
   "name": "mta-nexus",
-  "version": "1.1.0-beta.1",
+  "version": "1.1.0-beta.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -26,7 +26,7 @@
     "release:verify": "node scripts/release-evidence.mjs"
   },
   "devDependencies": {
-    "@types/node": "^26.6.1",
+    "@types/node": "^26.6.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1",
