@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "pnpm --workspace-root exec biome check apps/web"
+    "lint": "pnpm --workspace-root exec biome lint apps/web"
   },
   "dependencies": {
     "@nexus/config": "workspace:*",
