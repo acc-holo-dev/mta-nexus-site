@@ -1,8 +1,9 @@
 import { and, eq, desc, isNotNull, sql } from "drizzle-orm";
 import { db } from "../client";
-import { verificationRequests, users, organizations, servers, serverClaimChallenges } from "../schema";
+import { auditEvents, verificationRequests, users, organizations, servers, serverClaimChallenges } from "../schema";
 import { generateId } from "@nexus/security";
 import { AppError, ConflictError } from "@nexus/domain";
+import type { AuditEvent } from "@nexus/domain";
 
 const VALID_TARGET_TYPES = ["user", "developer", "organization", "server"] as const;
 export type VerificationTargetType = (typeof VALID_TARGET_TYPES)[number];
@@ -109,12 +110,15 @@ export class VerificationRepository {
    * Atomically resolve a pending request and apply verification to its target.
    * The conditional update prevents two moderators from resolving the same request.
    */
-  async resolveRequest(input: {
-    id: string;
-    reviewerId: string;
-    decision: "approved" | "rejected";
-    reviewNotes?: string;
-  }) {
+  async resolveRequest(
+    input: {
+      id: string;
+      reviewerId: string;
+      decision: "approved" | "rejected";
+      reviewNotes?: string;
+    },
+    audit?: Omit<AuditEvent, "createdAt">,
+  ) {
     return db.transaction(async (tx) => {
       const rows = await tx
         .update(verificationRequests)
@@ -208,6 +212,13 @@ export class VerificationRepository {
             throw new ConflictError("Server claim target is already owned by another user");
           }
         }
+      }
+
+      if (audit) {
+        await tx.insert(auditEvents).values({
+          ...audit,
+          createdAt: new Date(),
+        });
       }
 
       return request;
