@@ -1,4 +1,4 @@
-import { eq, desc, asc, and, gte, lte, ilike, or, sql, inArray } from "drizzle-orm";
+import { eq, desc, asc, and, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
 import { db } from "../client";
 import { products } from "../schema";
 import type { Product, ProductType } from "@nexus/domain";
@@ -103,6 +103,7 @@ export class ProductRepository {
         and(
           eq(products.status, "published"),
           eq(products.price, 0),
+          ne(products.slug, normalized),
           sql`coalesce(${products.compatibility}->'dependencies', '[]'::jsonb) @> ${JSON.stringify([normalized])}::jsonb`,
         ),
       )
