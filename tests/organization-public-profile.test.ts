@@ -27,6 +27,7 @@ describe("organization public profile queries", () => {
     expect(products).toContain("listPublishedByOrganization(");
     expect(products).toContain("eq(products.organizationId, organizationId)");
     expect(products).toContain('eq(products.status, "published")');
+    expect(products).toContain("eq(products.price, 0)");
     expect(products).toContain(".limit(boundedLimit)");
 
     expect(content).toContain("listPublishedByOrganization(");
