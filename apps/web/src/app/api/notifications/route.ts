@@ -2,13 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
 
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user) {
-      return NextResponse.json({ notifications: [], unreadCount: 0 });
+      return NextResponse.json({ notifications: [], unreadCount: 0 }, { headers: privateHeaders });
     }
 
     const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "50");
@@ -24,10 +26,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { notifications, unreadCount, limit, unreadOnly },
-      { headers: { "Cache-Control": "private, no-store" } }
+      { headers: privateHeaders }
     );
   } catch (error: unknown) {
     console.error("Notification fetch error:", error);
-    return NextResponse.json({ error: "Failed to fetch notifications" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch notifications" }, { status: 500, headers: privateHeaders });
   }
 }
