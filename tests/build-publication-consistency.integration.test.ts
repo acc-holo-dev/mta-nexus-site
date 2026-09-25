@@ -113,6 +113,89 @@ describe("published build/currentVersion consistency", () => {
     expect(product?.status).toBe("published");
   });
 
+  it("serializes concurrent approvals through the product row", async () => {
+    const concurrentProductId = `prd_build_concurrent_${suffix}`;
+    const firstId = `bld_concurrent_a_${suffix}`;
+    const secondId = `bld_concurrent_z_${suffix}`;
+
+    await productRepository.create({
+      id: concurrentProductId,
+      title: "Concurrent Build Resource",
+      slug: `concurrent-build-${suffix}`,
+      description: "Resource used to prove concurrent moderation consistency.",
+      type: "script",
+      status: "draft",
+      authorId,
+      price: 0,
+      currency: "USD",
+      licenseModel: "unlimited",
+      tags: [],
+      currentVersion: "0.1.0",
+      ratingAverage: 0,
+      ratingCount: 0,
+      salesCount: 0,
+      isFeatured: false,
+      screenshots: [],
+      compatibility: { dependencies: [] },
+    });
+
+    const common = {
+      productId: concurrentProductId,
+      releaseNotes: "concurrent test",
+      status: "pending_review" as const,
+      fileSizeBytes: 10,
+      mimeType: "application/zip",
+      scanStatus: "clean" as const,
+      scanner: "test-scanner",
+      scannedAt: new Date(),
+      isSigned: false,
+    };
+
+    await buildRepository.create({
+      ...common,
+      id: firstId,
+      version: "3.0.0",
+      storageKey: `assets/test/${firstId}.zip`,
+      sha256Hash: "c".repeat(64),
+      fileName: "first.zip",
+    });
+    await buildRepository.create({
+      ...common,
+      id: secondId,
+      version: "4.0.0",
+      storageKey: `assets/test/${secondId}.zip`,
+      sha256Hash: "d".repeat(64),
+      fileName: "second.zip",
+    });
+
+    await Promise.all([
+      buildRepository.moderatePending(firstId, "approve", {
+        id: `aud_concurrent_a_${suffix}`,
+        actorId: authorId,
+        actorType: "admin",
+        action: "build.approved",
+        targetId: firstId,
+        targetType: "build",
+      }),
+      buildRepository.moderatePending(secondId, "approve", {
+        id: `aud_concurrent_z_${suffix}`,
+        actorId: authorId,
+        actorType: "admin",
+        action: "build.approved",
+        targetId: secondId,
+        targetType: "build",
+      }),
+    ]);
+
+    const product = await productRepository.findById(concurrentProductId);
+    const latest = await buildRepository.findLatestPublishedByProduct(
+      concurrentProductId,
+    );
+
+    expect(latest?.id).toBe(secondId);
+    expect(product?.currentVersion).toBe(latest?.version);
+  });
+
   it("moves currentVersion to the same fallback that download will resolve after retirement", async () => {
     const retired = await buildRepository.retireAndRefreshProduct(
       newerBuildId,
