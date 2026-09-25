@@ -85,6 +85,32 @@ export class ProductRepository {
     return rows as unknown as Product[];
   }
 
+  async listPublishedFreeDependingOnSlug(
+    dependencySlug: string,
+    limit = 51,
+  ): Promise<Product[]> {
+    const normalized = dependencySlug.trim().toLowerCase();
+    if (!normalized) return [];
+
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 51)
+      : 51;
+
+    const rows = await db
+      .select()
+      .from(products)
+      .where(
+        and(
+          eq(products.status, "published"),
+          eq(products.price, 0),
+          sql`coalesce(${products.compatibility}->'dependencies', '[]'::jsonb) @> ${JSON.stringify([normalized])}::jsonb`,
+        ),
+      )
+      .orderBy(desc(products.updatedAt))
+      .limit(boundedLimit);
+    return rows as unknown as Product[];
+  }
+
   async create(data: Omit<Product, "createdAt" | "updatedAt">): Promise<Product> {
     const values = {
       ...data,
