@@ -177,6 +177,24 @@ export class ContentRepository {
     return rows[0] as unknown as Content;
   }
 
+  async createWithAudit(
+    data: Omit<Content, "createdAt" | "updatedAt">,
+    audit: Omit<AuditEvent, "createdAt">,
+  ): Promise<Content> {
+    return db.transaction(async (tx) => {
+      const now = new Date();
+      const rows = await tx
+        .insert(content)
+        .values({ ...data, createdAt: now, updatedAt: now })
+        .returning();
+      const created = rows[0];
+      if (!created) throw new Error("Content insert did not return a row");
+
+      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      return created as unknown as Content;
+    });
+  }
+
   async findCommentById(id: string): Promise<Comment | null> {
     const rows = await db
       .select()
