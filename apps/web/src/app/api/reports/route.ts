@@ -11,6 +11,8 @@ import {
 } from "@nexus/db";
 import { createReportSchema } from "@nexus/validation";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
+
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../lib/observability";
 
 export async function GET(request: NextRequest) {
