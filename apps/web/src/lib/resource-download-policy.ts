@@ -1,15 +1,15 @@
-import type { Product, User } from "@nexus/domain";
+import type { Product } from "@nexus/domain";
 
 export type ResourceDownloadDecision =
-  | Readonly<{ allowed: true; reason: "author" | "admin" | "entitlement" }>
+  | Readonly<{ allowed: true; reason: "manager" | "entitlement" }>
   | Readonly<{
       allowed: false;
       reason: "resource_not_published" | "entitlement_required";
     }>;
 
 export function decideResourceDownloadAccess(
-  user: Pick<User, "id" | "role">,
-  product: Pick<Product, "authorId" | "status">,
+  product: Pick<Product, "status">,
+  hasManagementAccess: boolean,
   hasEntitlement: boolean,
 ): ResourceDownloadDecision {
   if (product.status !== "published") {
@@ -19,12 +19,8 @@ export function decideResourceDownloadAccess(
     });
   }
 
-  if (product.authorId === user.id) {
-    return Object.freeze({ allowed: true, reason: "author" });
-  }
-
-  if (user.role === "admin") {
-    return Object.freeze({ allowed: true, reason: "admin" });
+  if (hasManagementAccess) {
+    return Object.freeze({ allowed: true, reason: "manager" });
   }
 
   if (hasEntitlement) {
