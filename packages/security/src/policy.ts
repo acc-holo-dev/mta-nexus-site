@@ -115,7 +115,7 @@ export function can(
     case "server.delete": {
       if (!resource) return false;
       const server = resource as Partial<Server>;
-      if (server.ownerId === user.id) return true;
+      if (!server.organizationId && server.ownerId === user.id) return true;
       if (server.organizationId && context?.organizationMemberships) {
         const mem = context.organizationMemberships.find(
           (m) => m.organizationId === server.organizationId
