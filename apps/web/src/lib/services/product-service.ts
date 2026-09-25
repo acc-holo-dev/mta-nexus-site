@@ -265,7 +265,7 @@ export class ProductService {
 
     await eventBus.publish({
       id: generateId("evt"),
-      type: "build.released",
+      type: "build.submitted_for_review",
       version: 1,
       timestamp: new Date().toISOString(),
       actor: { id: actor.id, type: "user" },
@@ -320,6 +320,24 @@ export class ProductService {
         409,
         "BUILD_STATE_CHANGED"
       );
+    }
+
+    if (input.decision === "approve") {
+      await eventBus.publish({
+        id: generateId("evt"),
+        type: "build.released",
+        version: 1,
+        timestamp: new Date().toISOString(),
+        actor: { id: actor.id, type: "user" },
+        aggregateId: reviewed.id,
+        aggregateType: "build",
+        payload: {
+          buildId: reviewed.id,
+          productId: reviewed.productId,
+          version: reviewed.version,
+          hash: reviewed.sha256Hash,
+        },
+      });
     }
 
     return reviewed;
