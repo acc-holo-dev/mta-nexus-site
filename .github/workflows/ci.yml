@@ -68,6 +68,9 @@ jobs:
       - name: Apply database migrations
         run: pnpm db:migrate
 
+      - name: Verify Scenario Lab database idempotency
+        run: pnpm --filter @nexus/db exec tsx scripts/scenario-lab-db.integration.ts
+
       - name: Start isolated TLS SMTP receiver
         run: |
           mkdir -p /tmp/nexus-smtp-ci
