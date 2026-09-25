@@ -137,12 +137,20 @@ export async function POST(
       );
     }
     if (scan.status === "error") {
-      return NextResponse.json(
+      logRequestEvent({
+        level: "warn",
+        event: "resource.build.scanner_unavailable",
+        context,
+        status: 503,
+        fields: { scanner: scan.scanner },
+      });
+      return jsonWithRequestId(
+        context,
         {
           error:
             "Malware scanning is temporarily unavailable. No build was stored; retry the upload later.",
         },
-        { status: 503, headers: { "Retry-After": "30" } }
+        { status: 503, headers: { "Retry-After": "30" } },
       );
     }
 
