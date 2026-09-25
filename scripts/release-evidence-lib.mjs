@@ -28,11 +28,23 @@ export function summarizeReleaseEvidence({ dirty, gates }) {
   const passedGates = gates
     .filter((gate) => gate.status === "passed")
     .map((gate) => gate.name);
+  const incompleteGates = gates
+    .filter(
+      (gate) =>
+        gate.status !== "passed" &&
+        gate.status !== "failed" &&
+        gate.status !== "blocked",
+    )
+    .map((gate) => gate.name);
+  const noGatesRecorded = gates.length === 0;
 
   const status =
     failedGates.length > 0
       ? "failed"
-      : dirty || blockedGates.length > 0
+      : dirty ||
+          blockedGates.length > 0 ||
+          incompleteGates.length > 0 ||
+          noGatesRecorded
         ? "blocked"
         : "passed";
 
@@ -40,9 +52,11 @@ export function summarizeReleaseEvidence({ dirty, gates }) {
     status,
     releaseCandidate: status === "passed",
     dirtyWorkingTree: dirty,
+    noGatesRecorded,
     passedGates,
     failedGates,
     blockedGates,
+    incompleteGates,
   });
 }
 
