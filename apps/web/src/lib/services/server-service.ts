@@ -77,7 +77,14 @@ export class ServerService {
       actor: { id: actor.id, type: "user" },
       aggregateId: id,
       aggregateType: "server",
-      payload: { serverId: id, name: server.name, ownerId: actor.id, ip: server.ipAddress, port: server.port },
+      payload: {
+        serverId: id,
+        name: server.name,
+        ownerId: server.ownerId,
+        organizationId: server.organizationId,
+        ip: server.ipAddress,
+        port: server.port,
+      },
     });
 
     return server;
