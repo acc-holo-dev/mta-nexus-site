@@ -6,6 +6,7 @@ import { productService } from "../../../lib/services/product-service";
 import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
+import { BuildProvenanceDetails } from "../../../components/build-provenance-details";
 import {
   Star,
   Download,
@@ -207,6 +208,7 @@ export default async function ProductDetailPage({
                       <span>{b.isSigned ? "Signature: present" : "Signature: not available"}</span>
                       <span>{formatScanStatus(b.scanStatus)}</span>
                     </div>
+                    <BuildProvenanceDetails build={b} />
                     {b.releaseNotes && (
                       <div className="text-xs text-neutral-300 whitespace-pre-line font-mono bg-black/40 p-2.5 rounded border border-neutral-800">
                         {b.releaseNotes}
