@@ -82,7 +82,7 @@ export async function GET(
         id: generateId("aud"),
         actorId: actor.id,
         actorType: actor.role === "admin" ? "admin" : "user",
-        action: "build.review_artifact_downloaded",
+        action: "build.review_artifact_download_started",
         targetId: build.id,
         targetType: "build",
         details: {
