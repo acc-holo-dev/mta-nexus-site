@@ -12,10 +12,14 @@ import {
 } from "../../lib/services/mta-master-directory-service";
 import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
 import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
+import { getDictionary } from "../../lib/i18n";
+import { getRequestLocale } from "../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
 export default async function WorkspacePage() {
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
   const cookieStore = await cookies();
   const token = cookieStore.get("nexus_session")?.value;
   const user = await authService.getSession(token);
@@ -23,9 +27,9 @@ export default async function WorkspacePage() {
   if (!user) {
     return (
       <div className="max-w-md mx-auto py-20 text-center space-y-4">
-        <h1 className="font-display text-primary">Sign in required</h1>
+        <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
         <p className="font-caption text-muted">
-          Sign in to manage your resource library and MTA servers.
+          {dictionary.workspace.signInMessage}
         </p>
         <Link
           href="/auth/login"
@@ -68,12 +72,12 @@ export default async function WorkspacePage() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-primary">Workspace</h1>
+          <h1 className="font-display text-primary">{dictionary.workspace.title}</h1>
           <p className="font-caption text-muted mt-0.5">
-            @{user.username} · your resources and servers
+            @{user.username} · {dictionary.workspace.subtitle}
           </p>
           <p className="font-caption text-faint mt-1">
-            Live status comes only from the official MTA master-list; missing observations stay unknown.
+            {dictionary.workspace.liveNote}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -82,49 +86,49 @@ export default async function WorkspacePage() {
             className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold"
           >
             <Plus className="w-3.5 h-3.5" />
-            Publish resource
+            {dictionary.workspace.publishResource}
           </Link>
           <Link
             href="/workspace/servers/new"
             className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
           >
             <Plus className="w-3.5 h-3.5" />
-            Register server
+            {dictionary.workspace.registerServer}
           </Link>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
-          label="Resources"
+          label={dictionary.workspace.resources}
           value={downloadable.length}
           tone="purple"
           icon={<Box className="w-4 h-4" />}
-          context="in your library"
+          context={dictionary.workspace.inLibrary}
         />
         <StatCard
-          label="Your servers"
+          label={dictionary.workspace.yourServers}
           value={ownedServers.length}
           tone="accent"
           icon={<ServerIcon className="w-4 h-4" />}
-          context={`${onlineServers.length} online`}
+          context={`${onlineServers.length} ${dictionary.workspace.online}`}
         />
         <StatCard
-          label="Players online"
+          label={dictionary.workspace.playersOnline}
           value={onlinePlayers}
           tone="success"
           icon={<Users className="w-4 h-4" />}
-          context="on your servers"
+          context={dictionary.workspace.onServers}
         />
       </div>
 
       <section>
         <SectionHeader
-          title="Resource library"
-          description="Free resources you have added"
+          title={dictionary.workspace.libraryTitle}
+          description={dictionary.workspace.libraryDescription}
           action={
             <Link href="/market?maxPrice=0" className="text-xs font-semibold text-accent">
-              Browse free resources
+              {dictionary.workspace.browseResources}
             </Link>
           }
         />
@@ -136,10 +140,10 @@ export default async function WorkspacePage() {
                 <div key={entitlement.id} className="nexus-panel p-4 flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div className="text-sm font-semibold text-white truncate">
-                      {product?.title || "Unavailable resource"}
+                      {product?.title || dictionary.workspace.unavailableResource}
                     </div>
                     <div className="text-xs text-neutral-500">
-                      Added {new Date(entitlement.createdAt).toLocaleDateString()}
+                      {dictionary.workspace.added} {new Date(entitlement.createdAt).toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US")}
                     </div>
                   </div>
                   {product && (
@@ -153,18 +157,18 @@ export default async function WorkspacePage() {
           </div>
         ) : (
           <div className="nexus-panel p-8 text-center text-sm text-neutral-400">
-            Your library is empty.
+            {dictionary.workspace.emptyLibrary}
           </div>
         )}
       </section>
 
       <section>
         <SectionHeader
-          title="Your servers"
-          description="Only servers owned by your account"
+          title={dictionary.workspace.yourServers}
+          description={dictionary.workspace.serversDescription}
           action={
             <Link href="/workspace/servers/new" className="text-xs font-semibold text-accent">
-              Register server
+              {dictionary.workspace.registerServer}
             </Link>
           }
         />
@@ -199,7 +203,7 @@ export default async function WorkspacePage() {
           </div>
         ) : (
           <div className="nexus-panel p-8 text-center text-sm text-neutral-400">
-            You have not registered a server yet.
+            {dictionary.workspace.noServers}
           </div>
         )}
       </section>
