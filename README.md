@@ -2,10 +2,10 @@
 
 MTA NEXUS is a player-first Multi Theft Auto: San Andreas platform for live server discovery, community updates, and safe free-resource distribution.
 
-**Current repository version:** `1.2.0-beta.1`  
+**Current repository version:** `1.2.0-beta.2`  
 **Active development branch:** `main` only.
 
-Русский интерфейс и English interface use the same application. Change the language with the language button in the top navigation; the preference is stored in the `nexus_locale` cookie.
+Русский интерфейс и English interface use the same application. Change the language with the language button in the top navigation; the preference is stored in the `nexus_locale` cookie. The global shell, home, resource catalog/cards, workspace, server directory, authentication, errors and metadata now use the shared dictionary.
 
 ## Local development / Локальная разработка
 
