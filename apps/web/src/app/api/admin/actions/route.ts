@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AppError } from "@nexus/domain";
 import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
@@ -15,7 +16,7 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
   z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional() }),
   z.object({ targetType: z.literal("report"), targetId: z.string().min(1), action: z.enum(["resolve", "dismiss"]), notes: z.string().max(2000).optional() }),
   z.object({ targetType: z.literal("verification"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().max(2000).optional() }),
-  z.object({ targetType: z.literal("build"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("build"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().trim().min(3).max(2000) }),
   z.object({ targetType: z.literal("content"), targetId: z.string().min(1), action: z.enum(["publish", "archive"]), notes: z.string().max(2000).optional() }),
 ]);
 
@@ -92,18 +93,26 @@ export async function POST(request: NextRequest) {
       await contentService.moderateContent(targetId, action, user, notes);
     }
 
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: user.id,
-      actorType: "admin",
-      action: `admin.${action}`,
-      targetId,
-      targetType,
-      details: { notes },
-    });
+    if (targetType !== "build") {
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: user.id,
+        actorType: "admin",
+        action: `admin.${action}`,
+        targetId,
+        targetType,
+        details: { notes },
+      });
+    }
 
     return NextResponse.json({ success: true, action, targetId });
   } catch (error: unknown) {
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { error: error.message, code: error.code },
+        { status: error.statusCode },
+      );
+    }
     console.error("Admin action error:", error);
     return NextResponse.json({ error: "Failed to execute administrative action" }, { status: 500 });
   }
