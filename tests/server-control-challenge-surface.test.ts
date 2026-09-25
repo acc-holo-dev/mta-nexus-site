@@ -20,8 +20,11 @@ describe("server control proof surface", () => {
     expect(service).toContain("directory.isStale");
     expect(service).toContain("observed.responding === false");
     expect(service).toContain("observed.name.includes(input.token)");
-    expect(service).toContain(
+    expect(repository).toContain(
       'proofMethod: "mta_master_name_challenge"',
+    );
+    expect(service).toContain(
+      'method: "mta_master_name_challenge"',
     );
   });
 
