@@ -36,14 +36,12 @@ function requireDisposableRunner() {
     "github-hosted",
     "Backup/restore rehearsal requires a disposable GitHub-hosted runner",
   );
-  assert.equal(
-    process.env.DOCKER_HOST,
-    undefined,
+  assert(
+    !process.env.DOCKER_HOST,
     "Remote Docker hosts are not allowed",
   );
-  assert.equal(
-    process.env.DOCKER_CONTEXT,
-    undefined,
+  assert(
+    !process.env.DOCKER_CONTEXT,
     "Alternate Docker contexts are not allowed",
   );
   const context = execFileSync("docker", ["context", "show"], {
