@@ -125,6 +125,14 @@ function tags(source: string, tagName: string): AttributeMap[] {
   );
 }
 
+function containerContents(source: string, tagName: string): string[] {
+  const pattern = new RegExp(
+    `<\\s*${tagName}\\b[^>]*>([\\s\\S]*?)<\\/\\s*${tagName}\\s*>`,
+    "giu",
+  );
+  return Array.from(source.matchAll(pattern), (match) => match[1] ?? "");
+}
+
 function issue(
   issues: MetaInspectionIssue[],
   code: string,
@@ -309,9 +317,13 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
   });
 
   const html = tags(source, "html");
-  const settings = tags(source, "setting");
+  const settings = containerContents(source, "settings").flatMap((contents) =>
+    tags(contents, "setting"),
+  );
   const minVersionTag = tags(source, "min_mta_version")[0] ?? null;
-  const aclRights = tags(source, "right");
+  const aclRights = containerContents(source, "aclrequest").flatMap((contents) =>
+    tags(contents, "right"),
+  );
 
   const dependencyResources = Array.from(
     new Set(
