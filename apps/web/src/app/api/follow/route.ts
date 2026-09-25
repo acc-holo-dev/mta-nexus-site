@@ -11,6 +11,7 @@ import {
 import { consumeRateLimit, generateId } from "@nexus/security";
 
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 type TargetType = (typeof ALLOWED_TARGET_TYPES)[number];
 
 function isTargetType(value: unknown): value is TargetType {
@@ -40,18 +41,21 @@ export async function GET(request: NextRequest) {
   const user = await authService.getSession(token);
 
   if (!user) {
-    return NextResponse.json({ following: false });
+    return NextResponse.json({ following: false }, { headers: privateHeaders });
   }
 
   const targetType = request.nextUrl.searchParams.get("targetType") || "";
   const targetId = request.nextUrl.searchParams.get("targetId") || "";
 
   if (!ALLOWED_TARGET_TYPES.includes(targetType as TargetType)) {
-    return NextResponse.json({ error: "Invalid target type" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid target type" },
+      { status: 400, headers: privateHeaders },
+    );
   }
 
   const following = await socialRepository.isFollowing(user.id, targetType, targetId);
-  return NextResponse.json({ following });
+  return NextResponse.json({ following }, { headers: privateHeaders });
 }
 
 export async function POST(request: NextRequest) {
