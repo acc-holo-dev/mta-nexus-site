@@ -1,6 +1,6 @@
-import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
+import { and, eq, gt, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { entitlements, licenses, products } from "../schema";
+import { builds, entitlements, licenses, products } from "../schema";
 import { NotFoundError, ValidationError } from "@nexus/domain";
 import type { Entitlement } from "@nexus/domain";
 
@@ -101,6 +101,25 @@ export class EntitlementRepository {
       }
       if (product.price !== 0) {
         throw new ValidationError("Only free resources can be claimed without a payment provider");
+      }
+
+      const safeBuildRows = await tx
+        .select({ id: builds.id })
+        .from(builds)
+        .where(
+          and(
+            eq(builds.productId, input.productId),
+            eq(builds.status, "published"),
+            eq(builds.scanStatus, "clean"),
+            isNotNull(builds.scanner),
+            isNotNull(builds.scannedAt),
+          ),
+        )
+        .limit(1);
+      if (!safeBuildRows[0]) {
+        throw new ValidationError(
+          "Resource is not currently available for download",
+        );
       }
 
       const now = new Date();
