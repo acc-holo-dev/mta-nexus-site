@@ -233,7 +233,10 @@ export class ContentRepository {
     return [];
   }
 
-  async addComment(data: Omit<Comment, "createdAt">): Promise<Comment> {
+  async addComment(
+    data: Omit<Comment, "createdAt">,
+    audit?: Omit<AuditEvent, "createdAt">,
+  ): Promise<Comment> {
     const values = {
       ...data,
       createdAt: new Date(),
@@ -250,12 +253,20 @@ export class ContentRepository {
           })
           .where(eq(content.id, data.contentId));
       }
+      if (audit) {
+        await tx.insert(auditEvents).values({
+          ...audit,
+          createdAt: values.createdAt,
+        });
+      }
+
       return rows[0] as unknown as Comment;
     });
   }
 
   async addProductReview(
-    data: Omit<Comment, "createdAt"> & { productId: string; rating: number }
+    data: Omit<Comment, "createdAt"> & { productId: string; rating: number },
+    audit?: Omit<AuditEvent, "createdAt">,
   ): Promise<{ review: Comment; ratingCount: number; ratingAverage: number }> {
     const values = {
       ...data,
@@ -298,6 +309,13 @@ export class ContentRepository {
           updatedAt: new Date(),
         })
         .where(eq(products.id, data.productId));
+
+      if (audit) {
+        await tx.insert(auditEvents).values({
+          ...audit,
+          createdAt: values.createdAt,
+        });
+      }
 
       return { review, ratingCount, ratingAverage };
     });
