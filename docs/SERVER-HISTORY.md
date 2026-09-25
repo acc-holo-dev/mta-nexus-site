@@ -72,3 +72,21 @@ The next step is an explicit collector that:
 6. has explicit runtime/frequency/resource limits before scheduling is enabled.
 
 Until that collector is accepted, an empty history means only that NEXUS has no stored observations for the requested window.
+
+
+## SERVER-003 server-detail UI candidate
+
+The stacked SERVER-003 candidate renders the 24-hour stored history directly in the server detail Server Component.
+
+The UI deliberately distinguishes:
+
+- an empty valid history window;
+- a temporary history-storage failure;
+- a stored observation whose player count is unknown;
+- a real zero-player observation.
+
+It shows sample count, peak, observed average and latest stored player count. The compact graph uses at most 24 evenly selected points from the bounded history result and requires no client-side chart library.
+
+The graph is descriptive rather than uptime-oriented. It repeats that missing observations do not mean offline, scales bars to the peak stored player count, and renders neutral bars for samples where the player count was unknown.
+
+Live master-list status and stored history are requested in parallel after the editorial server profile is resolved. A history failure does not remove live status, and a live-directory failure does not erase stored history.
