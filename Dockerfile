@@ -35,6 +35,8 @@ RUN pnpm build \
 # Deploy only their production dependency graph instead of copying the whole workspace.
 RUN pnpm --filter @nexus/db --prod deploy /runtime/db \
     && test -f /runtime/db/src/migrate.ts \
+    && test -d /runtime/db/migrations \
+    && test -n "$(find /runtime/db/migrations -type f -name '*.sql' -print -quit)" \
     && test -f /runtime/db/scripts/run-account-mail-dispatcher.ts \
     && test -f /runtime/db/node_modules/tsx/package.json
 
