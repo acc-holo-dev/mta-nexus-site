@@ -16,6 +16,13 @@ function getDownloadExtension(storageKey: string): string {
   return DOWNLOAD_EXTENSIONS.has(extension) ? extension : ".zip";
 }
 
+function destroyOpenedStream(stream: NodeJS.ReadableStream): void {
+  const destroyable = stream as NodeJS.ReadableStream & {
+    destroy?: (error?: Error) => void;
+  };
+  destroyable.destroy?.();
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -76,15 +83,20 @@ export async function GET(
     }
 
     const stored = await storageService.getDownloadStream(latestBuild.storageKey);
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: user.id,
-      actorType: "user",
-      action: "product.downloaded",
-      targetId: productId,
-      targetType: "product",
-      details: { buildId: latestBuild.id, version: latestBuild.version },
-    });
+    try {
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: user.id,
+        actorType: "user",
+        action: "product.downloaded",
+        targetId: productId,
+        targetType: "product",
+        details: { buildId: latestBuild.id, version: latestBuild.version },
+      });
+    } catch (error) {
+      destroyOpenedStream(stored.stream);
+      throw error;
+    }
 
     const stream = Readable.toWeb(stored.stream as Readable) as ReadableStream;
     const fileName = `${product.slug}-${latestBuild.version}${getDownloadExtension(latestBuild.fileName)}`;
