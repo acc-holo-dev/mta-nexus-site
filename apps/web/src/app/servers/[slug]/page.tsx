@@ -8,6 +8,11 @@ import {
 } from "../../../lib/services/mta-master-directory-service";
 import { Cpu, ShieldCheck, Users } from "lucide-react";
 import { ServerFollowButton } from "../../../components/server-follow-button";
+import { serverHistoryService } from "../../../lib/services/server-history-service";
+import { ServerHistoryPanel } from "../../../components/server-history-panel";
+import { contentService } from "../../../lib/services/content-service";
+import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
+import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -46,17 +51,16 @@ export default async function ServerDetailPage({
 
   if (!server || server.visibility === "private") notFound();
 
-  let observedServer: Awaited<ReturnType<typeof mtaMasterDirectoryService.getDirectory>>["servers"][number] | undefined;
-  let directoryIsStale = false;
-  try {
-    const directory = await mtaMasterDirectoryService.getDirectory();
-    observedServer = directory.servers.find(
-      (item) => matchesMtaEndpoint(server, item)
-    );
-    directoryIsStale = directory.isStale;
-  } catch {
-    // The editorial server profile remains available when the public directory is unavailable.
-  }
+  const [directory, history, serverUpdates] = await Promise.all([
+    mtaMasterDirectoryService.getDirectory().catch(() => null),
+    serverHistoryService.getHistory(server.id, "24h").catch(() => null),
+    contentService.listServerUpdates(server.id, 6).catch(() => null),
+  ]);
+
+  const observedServer = directory?.servers.find(
+    (item) => matchesMtaEndpoint(server, item),
+  );
+  const directoryIsStale = directory?.isStale ?? false;
 
   const isOnline = observedServer != null && observedServer.responding !== false;
   const currentPlayers = observedServer?.players;
@@ -115,6 +119,13 @@ export default async function ServerDetailPage({
         </div>
       </div>
 
+      {!server.ownerId && !server.isVerified && (
+        <ServerClaimControlPanel
+          serverId={server.id}
+          serverName={server.name}
+        />
+      )}
+
       {(server.language || server.region || server.websiteUrl || server.discordUrl || server.rulesUrl || server.gameplayTags?.length || server.mediaUrls?.length) && (
         <section className="nexus-panel p-5 space-y-4">
           <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-300">
@@ -143,7 +154,11 @@ export default async function ServerDetailPage({
         </section>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <ServerHistoryPanel history={history} />
+
+      <ServerUpdatesPanel updates={serverUpdates} />
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
           <div className="flex items-center justify-between text-xs text-neutral-400">
             <span className="font-semibold uppercase tracking-wider">Live Player Load</span>
