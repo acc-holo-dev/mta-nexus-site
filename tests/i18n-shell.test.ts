@@ -24,6 +24,13 @@ describe("RU/EN shell foundation", () => {
     expect(en.auth.loginTitle).not.toBe(ru.auth.loginTitle);
     expect(en.product.addToLibrary).not.toBe(ru.product.addToLibrary);
     expect(en.checkout.title).not.toBe(ru.checkout.title);
+    expect(en.checkout.title).toBe("Secure Checkout");
+    expect(en.checkout.addToLibrary).toBe("Add to library");
+    expect(en.checkout.resourceAdded).toBe("Resource added");
+    expect(en.checkout.openResource).toBe("Open resource");
+    expect(en.product.downloadBuild).toBe("Download Build");
+    expect(en.product.inLibrary).toBe("In your library");
+    expect(en.product.addToLibrary).toBe("Add to library");
   });
 
   it("keeps mobile navigation and locale switching in the global shell", () => {
