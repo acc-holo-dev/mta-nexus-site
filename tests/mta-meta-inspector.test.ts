@@ -92,6 +92,20 @@ describe("MTA meta.xml inspector", () => {
     expect(result.scripts[0]?.src).toBe("real.lua");
   });
 
+  it("counts settings and ACL rights only inside their documented containers", () => {
+    const result = inspectMtaMetaXml(`<meta>
+<right name="outside" access="true" />
+<setting name="outside" value="1" />
+<aclrequest><right name="function.startResource" access="true" /></aclrequest>
+<settings><setting name="rounds" value="[5]" /></settings>
+</meta>`);
+
+    expect(result.summary.aclRightCount).toBe(1);
+    expect(result.aclRights[0]?.name).toBe("function.startResource");
+    expect(result.summary.settingCount).toBe(1);
+    expect(result.settings[0]?.name).toBe("rounds");
+  });
+
   it("returns bounded structural issues for incomplete entries", () => {
     const result = inspectMtaMetaXml(`<meta>
 <script type="mystery" />
