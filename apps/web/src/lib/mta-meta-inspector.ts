@@ -1,4 +1,6 @@
 const MAX_META_XML_BYTES = 256 * 1024;
+const MAX_TAG_ENTRIES_PER_KIND = 500;
+const MAX_INSPECTION_ISSUES = 200;
 
 type InspectionSeverity = "warning" | "error";
 
@@ -115,14 +117,24 @@ function parseAttributes(source: string): AttributeMap {
   return Object.freeze(attributes);
 }
 
-function tags(source: string, tagName: string): AttributeMap[] {
+function tags(
+  source: string,
+  tagName: string,
+): Readonly<{ items: AttributeMap[]; truncated: boolean }> {
   const pattern = new RegExp(
     `<\\s*${tagName}\\b([^<>]*?)(?:\\/\\s*)?>`,
     "giu",
   );
-  return Array.from(source.matchAll(pattern), (match) =>
-    parseAttributes(match[1] ?? ""),
-  );
+  const items: AttributeMap[] = [];
+
+  for (const match of source.matchAll(pattern)) {
+    if (items.length >= MAX_TAG_ENTRIES_PER_KIND) {
+      return Object.freeze({ items, truncated: true });
+    }
+    items.push(parseAttributes(match[1] ?? ""));
+  }
+
+  return Object.freeze({ items, truncated: false });
 }
 
 function containerContents(source: string, tagName: string): string[] {
@@ -130,7 +142,10 @@ function containerContents(source: string, tagName: string): string[] {
     `<\\s*${tagName}\\b[^>]*>([\\s\\S]*?)<\\/\\s*${tagName}\\s*>`,
     "giu",
   );
-  return Array.from(source.matchAll(pattern), (match) => match[1] ?? "");
+  return Array.from(source.matchAll(pattern), (match) => match[1] ?? "").slice(
+    0,
+    MAX_TAG_ENTRIES_PER_KIND,
+  );
 }
 
 function issue(
@@ -139,7 +154,36 @@ function issue(
   severity: InspectionSeverity,
   message: string,
 ) {
+  if (issues.length >= MAX_INSPECTION_ISSUES) return;
+  if (issues.length === MAX_INSPECTION_ISSUES - 1) {
+    issues.push(
+      Object.freeze({
+        code: "ISSUE_LIMIT_REACHED",
+        severity: "warning" as const,
+        message:
+          "Additional structural notes were omitted after the inspection issue limit was reached.",
+      }),
+    );
+    return;
+  }
   issues.push(Object.freeze({ code, severity, message }));
+}
+
+function tagItems(
+  source: string,
+  tagName: string,
+  issues: MetaInspectionIssue[],
+): AttributeMap[] {
+  const extraction = tags(source, tagName);
+  if (extraction.truncated) {
+    issue(
+      issues,
+      `${tagName.toUpperCase()}_ENTRY_LIMIT_REACHED`,
+      "warning",
+      `Only the first ${MAX_TAG_ENTRIES_PER_KIND} <${tagName}> entries were inspected.`,
+    );
+  }
+  return extraction.items;
 }
 
 function normalizedScriptType(
@@ -209,7 +253,7 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
     );
   }
 
-  const infoTags = tags(source, "info");
+  const infoTags = tagItems(source, "info", issues);
   if (infoTags.length === 0) {
     issue(
       issues,
@@ -226,7 +270,7 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
     );
   }
 
-  const scriptTags = tags(source, "script");
+  const scriptTags = tagItems(source, "script", issues);
   const scripts = scriptTags.map((attributes, index) => {
     const src = attributes.src?.trim() || null;
     const typeDeclared = Boolean(attributes.type?.trim());
@@ -256,7 +300,7 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
     });
   });
 
-  const files = tags(source, "file");
+  const files = tagItems(source, "file", issues);
   files.forEach((attributes, index) => {
     if (!attributes.src?.trim()) {
       issue(
@@ -268,7 +312,7 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
     }
   });
 
-  const maps = tags(source, "map");
+  const maps = tagItems(source, "map", issues);
   maps.forEach((attributes, index) => {
     if (!attributes.src?.trim()) {
       issue(
@@ -280,7 +324,7 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
     }
   });
 
-  const includes = tags(source, "include");
+  const includes = tagItems(source, "include", issues);
   includes.forEach((attributes, index) => {
     if (!attributes.resource?.trim()) {
       issue(
@@ -292,8 +336,8 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
     }
   });
 
-  const configs = tags(source, "config");
-  const exports = tags(source, "export");
+  const configs = tagItems(source, "config", issues);
+  const exports = tagItems(source, "export", issues);
   exports.forEach((attributes, index) => {
     if (!attributes.function?.trim()) {
       issue(
@@ -316,13 +360,13 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
     }
   });
 
-  const html = tags(source, "html");
+  const html = tagItems(source, "html", issues);
   const settings = containerContents(source, "settings").flatMap((contents) =>
-    tags(contents, "setting"),
+    tagItems(contents, "setting", issues),
   );
-  const minVersionTag = tags(source, "min_mta_version")[0] ?? null;
+  const minVersionTag = tagItems(source, "min_mta_version", issues)[0] ?? null;
   const aclRights = containerContents(source, "aclrequest").flatMap((contents) =>
-    tags(contents, "right"),
+    tagItems(contents, "right", issues),
   );
 
   const dependencyResources = Array.from(
@@ -385,4 +429,6 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
 
 export const metaInspectionLimits = Object.freeze({
   maxBytes: MAX_META_XML_BYTES,
+  maxEntriesPerKind: MAX_TAG_ENTRIES_PER_KIND,
+  maxIssues: MAX_INSPECTION_ISSUES,
 });
