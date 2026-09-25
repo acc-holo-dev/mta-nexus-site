@@ -1,4 +1,4 @@
-import { and, eq, desc, ne } from "drizzle-orm";
+import { and, eq, desc, ne, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
@@ -118,6 +118,15 @@ export class BuildRepository {
       const reviewed = rows[0];
       if (!reviewed) return null;
 
+      const lockedProduct = await tx
+        .update(products)
+        .set({ updatedAt: sql`${products.updatedAt}` })
+        .where(eq(products.id, reviewed.productId))
+        .returning({ id: products.id });
+      if (!lockedProduct[0]) {
+        throw new Error("Build product disappeared during moderation");
+      }
+
       if (decision === "approve") {
         const latestPublished = await tx
           .select({
@@ -183,6 +192,15 @@ export class BuildRepository {
         .returning();
       const retired = rows[0];
       if (!retired) return null;
+
+      const lockedProduct = await tx
+        .update(products)
+        .set({ updatedAt: sql`${products.updatedAt}` })
+        .where(eq(products.id, retired.productId))
+        .returning({ id: products.id });
+      if (!lockedProduct[0]) {
+        throw new Error("Build product disappeared during retirement");
+      }
 
       const fallback = await tx
         .select({ version: builds.version })
