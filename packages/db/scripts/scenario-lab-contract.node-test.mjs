@@ -6,7 +6,7 @@ import {
   assertScenarioId,
   isScenarioId,
   scenarioCatalog,
-} from "../scenario-lab-contract.mjs";
+} from "./scenario-lab-contract.mjs";
 
 const canonical = {
   NODE_ENV: "development",
