@@ -212,6 +212,13 @@ export class ServerClaimChallengeRepository {
       if (challenge.expiresAt <= consumedAt) {
         throw invalidChallenge();
       }
+      if (input.sourceFetchedAt < challenge.createdAt) {
+        throw new AppError(
+          "The MTA directory snapshot predates this server control challenge.",
+          409,
+          "SERVER_CONTROL_SNAPSHOT_TOO_OLD",
+        );
+      }
 
       const [pendingVerification] = await tx
         .select({ id: verificationRequests.id })
