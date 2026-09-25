@@ -29,13 +29,42 @@ function parseDevPort(value) {
   return Number.isInteger(port) && port >= 1 && port <= 65535 ? port : null;
 }
 
+function safeCommandEnvironment(source = process.env) {
+  const names = [
+    "PATH",
+    "Path",
+    "HOME",
+    "USERPROFILE",
+    "SystemRoot",
+    "SYSTEMROOT",
+    "ComSpec",
+    "PATHEXT",
+    "TMPDIR",
+    "TEMP",
+    "TMP",
+    "DOCKER_CONFIG",
+    "XDG_CONFIG_HOME",
+    "DOCKER_HOST",
+    "DOCKER_CONTEXT",
+    "DOCKER_TLS_VERIFY",
+    "DOCKER_CERT_PATH",
+    "COMPOSE_DISABLE_ENV_FILE",
+    "NEXUS_DEV_PORT",
+  ];
+  const safe = {};
+  for (const name of names) {
+    if (source[name] !== undefined) safe[name] = source[name];
+  }
+  return safe;
+}
+
 async function defaultRunCommand(command, args, options = {}) {
   const executable =
     process.platform === "win32" && command === "pnpm" ? "pnpm.cmd" : command;
   try {
     const result = await execFileAsync(executable, args, {
       cwd: options.cwd ?? repositoryRoot,
-      env: options.env ?? process.env,
+      env: safeCommandEnvironment(options.env ?? process.env),
       encoding: "utf8",
       timeout: options.timeout ?? 15_000,
       maxBuffer: 256 * 1024,
@@ -276,7 +305,7 @@ export async function collectDoctor(options = {}) {
 
   if (dockerVersion.ok && composeVersion.ok && port !== null) {
     const composeEnv = {
-      ...env,
+      ...safeCommandEnvironment(env),
       COMPOSE_DISABLE_ENV_FILE: "true",
       NEXUS_DEV_PORT: String(port),
     };
