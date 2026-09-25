@@ -85,6 +85,10 @@ Server ownership requests must originate from the control-challenge flow so a ma
 
 Historical verification records remain readable/moderatable.
 
+The repository boundary also rejects any new direct `createRequest(... targetType=server)` call. The HTTP route is therefore not the only anti-bypass control.
+
+For migration-era safety, moderator **approval** of a server request requires a durable consumed challenge row whose `verification_request_id`, server ID and requester ID match that exact pending request. A historical pending server request created before this protocol cannot assign ownership merely because it still exists in the moderation queue. It remains rejectable so moderators can close it and ask the requester to use the live-control challenge flow.
+
 ## UI surfaces
 
 The control panel appears:
