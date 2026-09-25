@@ -127,7 +127,11 @@ const gates = [
   runGate(
     "release_evidence_harness",
     "node",
-    ["--test", "scripts/tests/release-evidence.node-test.mjs"],
+    [
+      "--test",
+      "scripts/tests/release-evidence.node-test.mjs",
+      "scripts/tests/release-evidence-surface.node-test.mjs",
+    ],
   ),
   runGate(
     "database_migrations",
