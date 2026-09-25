@@ -13,19 +13,38 @@ export function assertServerObservationCaptureEnvironment(
     );
   }
 
-  if (env.NODE_ENV !== "development" && env.NODE_ENV !== "production") {
+  if (env.NODE_ENV !== "development") {
     throw new Error(
-      "Server observation capture refused: NODE_ENV must be development or production",
+      "Server observation capture refused: NODE_ENV must be development",
     );
   }
 
-  if (!env.DATABASE_URL) {
+  let database;
+  try {
+    database = new URL(env.DATABASE_URL ?? "");
+  } catch {
     throw new Error(
-      "Server observation capture refused: DATABASE_URL is required",
+      "Server observation capture refused: DATABASE_URL must be the canonical local Docker database",
+    );
+  }
+
+  const canonicalDatabase =
+    database.protocol === "postgres:" &&
+    database.hostname === "postgres" &&
+    (database.port === "" || database.port === "5432") &&
+    database.username === "nexus" &&
+    database.password === "nexus_secret" &&
+    database.pathname === "/mta_nexus";
+
+  if (!canonicalDatabase) {
+    throw new Error(
+      "Server observation capture refused: DATABASE_URL must be the canonical local Docker database",
     );
   }
 
   return Object.freeze({
-    environment: env.NODE_ENV,
+    environment: "development",
+    databaseHost: database.hostname,
+    databaseName: database.pathname.slice(1),
   });
 }
