@@ -1,14 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Sun, Moon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
+import { useNexusLocale } from "./locale-context";
 
 export function ThemeToggle() {
+  const { dictionary } = useNexusLocale();
+  const copy = dictionary.theme;
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
     const stored = localStorage.getItem("nexus-theme");
-    const initial = stored === "light" || stored === "dark" ? stored : "dark";
+    const initial =
+      stored === "light" || stored === "dark" ? stored : "dark";
     setTheme(initial);
   }, []);
 
@@ -19,14 +23,22 @@ export function ThemeToggle() {
     document.documentElement.classList.toggle("dark", next === "dark");
   };
 
+  const label =
+    theme === "dark" ? copy.switchToLight : copy.switchToDark;
+
   return (
     <button
+      type="button"
       onClick={toggle}
-      className="p-2 rounded-lg bg-elevated border-base border text-muted hover:text-primary hover:bg-hover transition-colors cursor-pointer"
-      aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-      title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+      className="cursor-pointer rounded-lg border border-base bg-elevated p-2 text-muted transition-colors hover:bg-hover hover:text-primary"
+      aria-label={label}
+      title={label}
     >
-      {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+      {theme === "dark" ? (
+        <Sun className="h-4 w-4" aria-hidden="true" />
+      ) : (
+        <Moon className="h-4 w-4" aria-hidden="true" />
+      )}
     </button>
   );
 }

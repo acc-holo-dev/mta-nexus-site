@@ -1,231 +1,339 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Search,
-  X,
-  Box,
-  Server,
+  Bell,
   BookOpen,
-  User,
+  Box,
   Building2,
+  Compass,
   CornerDownLeft,
   LayoutDashboard,
-  CreditCard,
-  Key,
-  Bell,
-  Compass,
-  ShoppingBag,
+  MessageSquare,
+  Search,
+  Server,
+  Settings,
+  Star,
+  User,
 } from "lucide-react";
 import type { SearchResultItem } from "../lib/services/discovery-service";
+import { useNexusLocale } from "./locale-context";
 
 interface Command {
   id: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   action: () => void;
-  section: string;
 }
 
-export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function CommandPalette({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   const router = useRouter();
+  const { dictionary } = useNexusLocale();
+  const copy = dictionary.commandPalette;
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Navigation commands (TASK-008)
   const commands: Command[] = [
-    { id: "go-market", label: "Go to Marketplace", icon: ShoppingBag, section: "Navigate", action: () => router.push("/market") },
-    { id: "go-servers", label: "Go to Servers", icon: Server, section: "Navigate", action: () => router.push("/servers") },
-    { id: "go-explore", label: "Go to Explore", icon: Compass, section: "Navigate", action: () => router.push("/explore") },
-    { id: "go-workspace", label: "Open Workspace", icon: LayoutDashboard, section: "Workspace", action: () => router.push("/workspace") },
-    { id: "go-purchases", label: "Open Purchases", icon: CreditCard, section: "Workspace", action: () => router.push("/workspace/purchases") },
-    { id: "go-licenses", label: "Open Licenses", icon: Key, section: "Workspace", action: () => router.push("/workspace/licenses") },
-    { id: "go-notifications", label: "Open Notifications", icon: Bell, section: "Workspace", action: () => router.push("/notifications") },
+    {
+      id: "go-market",
+      label: copy.goMarket,
+      icon: Star,
+      action: () => router.push("/market"),
+    },
+    {
+      id: "go-servers",
+      label: copy.goServers,
+      icon: Server,
+      action: () => router.push("/servers"),
+    },
+    {
+      id: "go-explore",
+      label: copy.goExplore,
+      icon: Compass,
+      action: () => router.push("/explore"),
+    },
+    {
+      id: "go-community",
+      label: copy.goCommunity,
+      icon: MessageSquare,
+      action: () => router.push("/community"),
+    },
+    {
+      id: "open-workspace",
+      label: copy.openWorkspace,
+      icon: LayoutDashboard,
+      action: () => router.push("/workspace"),
+    },
+    {
+      id: "open-saved",
+      label: copy.openSaved,
+      icon: BookOpen,
+      action: () => router.push("/workspace/saved"),
+    },
+    {
+      id: "open-notifications",
+      label: copy.openNotifications,
+      icon: Bell,
+      action: () => router.push("/notifications"),
+    },
+    {
+      id: "open-settings",
+      label: copy.openSettings,
+      icon: Settings,
+      action: () => router.push("/settings"),
+    },
   ];
 
-  const filteredCommands = query
-    ? commands.filter((c) => c.label.toLowerCase().includes(query.toLowerCase()))
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredCommands = normalizedQuery
+    ? commands.filter((command) =>
+        command.label.toLowerCase().includes(normalizedQuery),
+      )
     : commands;
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        if (isOpen) onClose();
-        else {
-          setQuery("");
-          setResults([]);
-          setActiveIndex(0);
-        }
-      }
-      if (e.key === "Escape" && isOpen) {
-        onClose();
-      }
+    if (!isOpen) return;
+
+    setQuery("");
+    setResults([]);
+    setLoading(false);
+    setActiveIndex(0);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
     };
+
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (!query.trim()) {
+    if (!isOpen || !query.trim()) {
       setResults([]);
+      setLoading(false);
       return;
     }
 
-    const timer = setTimeout(async () => {
+    const controller = new AbortController();
+    let requestTimeout: number | undefined;
+
+    const timer = window.setTimeout(async () => {
       setLoading(true);
+      requestTimeout = window.setTimeout(
+        () => controller.abort(),
+        10_000,
+      );
+
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
-        const data = await res.json();
-        setResults(data.results || []);
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(query.trim())}`,
+          {
+            cache: "no-store",
+            credentials: "same-origin",
+            signal: controller.signal,
+          },
+        );
+        const data = await response.json().catch(() => null);
+        if (!response.ok || !Array.isArray(data?.results)) {
+          throw new Error("Search unavailable");
+        }
+        setResults(data.results);
       } catch {
-        setResults([]);
+        if (!controller.signal.aborted) setResults([]);
       } finally {
-        setLoading(false);
+        if (requestTimeout !== undefined) {
+          window.clearTimeout(requestTimeout);
+        }
+        if (!controller.signal.aborted) setLoading(false);
       }
     }, 200);
 
-    return () => clearTimeout(timer);
-  }, [query]);
+    return () => {
+      window.clearTimeout(timer);
+      if (requestTimeout !== undefined) {
+        window.clearTimeout(requestTimeout);
+      }
+      controller.abort();
+    };
+  }, [isOpen, query]);
 
   if (!isOpen) return null;
 
   const totalItems = filteredCommands.length + results.length;
   const showResults = query.trim().length > 0;
 
-  const handleResultNav = (url: string) => {
+  function navigate(url: string) {
     onClose();
     router.push(url);
-  };
+  }
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh] px-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 px-4 pt-[12vh] backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
-      aria-label="Command palette"
+      aria-modal="true"
+      aria-label={copy.dialogLabel}
     >
       <div
-        className="w-full max-w-xl bg-elevated border border-strong rounded-xl shadow-nexus-lg overflow-hidden flex flex-col"
-        onClick={(e) => e.stopPropagation()}
+        className="flex w-full max-w-xl flex-col overflow-hidden rounded-xl border border-strong bg-elevated shadow-nexus-lg"
+        onClick={(event) => event.stopPropagation()}
       >
-        {/* Search input */}
-        <div className="flex items-center px-4 py-3 border-b border-base">
-          <Search className="w-4 h-4 text-muted mr-3" />
+        <div className="flex items-center border-b border-base px-4 py-3">
+          <Search className="mr-3 h-4 w-4 text-muted" aria-hidden="true" />
           <input
             autoFocus
-            type="text"
-            placeholder="Search or jump to..."
+            type="search"
+            placeholder={copy.searchPlaceholder}
             value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
+            onChange={(event) => {
+              setQuery(event.target.value);
               setActiveIndex(0);
             }}
-            onKeyDown={(e) => {
-              if (e.key === "ArrowDown") {
-                e.preventDefault();
-                setActiveIndex((i) => Math.min(i + 1, totalItems - 1));
+            onKeyDown={(event) => {
+              if (event.key === "ArrowDown" && totalItems > 0) {
+                event.preventDefault();
+                setActiveIndex((index) =>
+                  Math.min(index + 1, totalItems - 1),
+                );
               }
-              if (e.key === "ArrowUp") {
-                e.preventDefault();
-                setActiveIndex((i) => Math.max(i - 1, 0));
+              if (event.key === "ArrowUp" && totalItems > 0) {
+                event.preventDefault();
+                setActiveIndex((index) => Math.max(index - 1, 0));
               }
-              if (e.key === "Enter") {
-                e.preventDefault();
+              if (event.key === "Enter" && totalItems > 0) {
+                event.preventDefault();
                 if (activeIndex < filteredCommands.length) {
                   filteredCommands[activeIndex]?.action();
                   onClose();
                 } else {
-                  const r = results[activeIndex - filteredCommands.length];
-                  if (r) handleResultNav(r.url);
+                  const result =
+                    results[activeIndex - filteredCommands.length];
+                  if (result) navigate(result.url);
                 }
               }
             }}
-            className="w-full bg-transparent text-sm text-primary placeholder-muted focus:outline-none"
-            aria-label="Search query"
+            className="w-full bg-transparent text-sm text-primary placeholder:text-muted focus:outline-none"
+            aria-label={copy.searchLabel}
           />
-          <button onClick={onClose} className="text-[10px] px-1.5 py-0.5 bg-inset text-muted rounded border border-base font-numeric">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded border border-base bg-inset px-1.5 py-0.5 font-numeric text-[10px] text-muted"
+            aria-label={copy.close}
+          >
             ESC
           </button>
         </div>
 
         <div className="max-h-96 overflow-y-auto p-2">
-          {/* Loading */}
           {loading && showResults && (
-            <div className="text-center py-4 font-caption text-muted">Searching...</div>
+            <div role="status" className="py-4 text-center font-caption text-muted">
+              {copy.searching}
+            </div>
           )}
 
-          {/* Commands */}
           {filteredCommands.length > 0 && (
             <div className="mb-1">
-              <div className="px-2 py-1 font-label text-faint uppercase">Commands</div>
-              {filteredCommands.map((cmd, idx) => {
-                const Icon = cmd.icon;
-                const active = idx === activeIndex;
+              <div className="px-2 py-1 font-label uppercase text-faint">
+                {copy.commands}
+              </div>
+              {filteredCommands.map((command, index) => {
+                const Icon = command.icon;
+                const active = index === activeIndex;
+
                 return (
                   <button
-                    key={cmd.id}
+                    key={command.id}
+                    type="button"
                     onClick={() => {
-                      cmd.action();
+                      command.action();
                       onClose();
                     }}
-                    onMouseEnter={() => setActiveIndex(idx)}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                    onMouseEnter={() => setActiveIndex(index)}
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
                       active ? "bg-accent-soft" : "hover:bg-hover"
                     }`}
                   >
-                    <div className="p-1.5 rounded-md bg-inset">
-                      <Icon className="w-3.5 h-3.5 text-accent" />
-                    </div>
-                    <span className="text-xs text-primary font-medium">{cmd.label}</span>
-                    {active && <CornerDownLeft className="w-3 h-3 text-muted ml-auto" />}
+                    <span className="rounded-md bg-inset p-1.5">
+                      <Icon className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+                    </span>
+                    <span className="text-xs font-medium text-primary">
+                      {command.label}
+                    </span>
+                    {active && (
+                      <CornerDownLeft
+                        className="ml-auto h-3 w-3 text-muted"
+                        aria-hidden="true"
+                      />
+                    )}
                   </button>
                 );
               })}
             </div>
           )}
 
-          {/* Search results grouped by type */}
           {showResults && results.length > 0 && (
             <div>
-              <div className="px-2 py-1 font-label text-faint uppercase">Results</div>
-              {results.map((item, idx) => {
+              <div className="px-2 py-1 font-label uppercase text-faint">
+                {copy.results}
+              </div>
+              {results.map((item, index) => {
                 const commandCount = filteredCommands.length;
-                const active = idx + commandCount === activeIndex;
+                const active = index + commandCount === activeIndex;
                 const icon =
                   item.type === "product" ? (
-                    <Box className="w-3.5 h-3.5 text-accent" />
+                    <Box className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
                   ) : item.type === "server" ? (
-                    <Server className="w-3.5 h-3.5 text-success" />
+                    <Server className="h-3.5 w-3.5 text-success" aria-hidden="true" />
                   ) : item.type === "article" ? (
-                    <BookOpen className="w-3.5 h-3.5 text-warning" />
+                    <BookOpen className="h-3.5 w-3.5 text-warning" aria-hidden="true" />
                   ) : item.type === "organization" ? (
-                    <Building2 className="w-3.5 h-3.5 text-purple" />
+                    <Building2 className="h-3.5 w-3.5 text-purple" aria-hidden="true" />
                   ) : (
-                    <User className="w-3.5 h-3.5 text-purple" />
+                    <User className="h-3.5 w-3.5 text-purple" aria-hidden="true" />
                   );
 
                 return (
                   <button
                     key={item.id}
-                    onClick={() => handleResultNav(item.url)}
-                    onMouseEnter={() => setActiveIndex(idx + commandCount)}
-                    className={`w-full flex items-center justify-between p-2.5 rounded-lg transition-colors text-left ${
+                    type="button"
+                    onClick={() => navigate(item.url)}
+                    onMouseEnter={() =>
+                      setActiveIndex(index + commandCount)
+                    }
+                    className={`flex w-full items-center justify-between rounded-lg p-2.5 text-left transition-colors ${
                       active ? "bg-accent-soft" : "hover:bg-hover"
                     }`}
                   >
-                    <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="p-1.5 rounded-md bg-inset shrink-0">{icon}</div>
-                      <div className="overflow-hidden">
-                        <div className="text-xs font-medium text-primary truncate">{item.title}</div>
-                        <div className="text-[11px] text-muted truncate">{item.description}</div>
-                      </div>
-                    </div>
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="shrink-0 rounded-md bg-inset p-1.5">
+                        {icon}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate text-xs font-medium text-primary">
+                          {item.title}
+                        </span>
+                        <span className="block truncate text-[11px] text-muted">
+                          {item.description}
+                        </span>
+                      </span>
+                    </span>
                     {item.badge && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-inset text-secondary font-numeric ml-2 shrink-0">
+                      <span className="ml-2 shrink-0 rounded bg-inset px-1.5 py-0.5 font-numeric text-[10px] text-secondary">
                         {item.badge}
                       </span>
                     )}
@@ -235,12 +343,14 @@ export function CommandPalette({ isOpen, onClose }: { isOpen: boolean; onClose: 
             </div>
           )}
 
-          {/* Empty state */}
-          {showResults && !loading && results.length === 0 && filteredCommands.length === 0 && (
-            <div className="text-center py-8 font-caption text-muted">
-              No results for &ldquo;{query}&rdquo;
-            </div>
-          )}
+          {showResults &&
+            !loading &&
+            results.length === 0 &&
+            filteredCommands.length === 0 && (
+              <div className="py-8 text-center font-caption text-muted">
+                {copy.noResults} &ldquo;{query}&rdquo;
+              </div>
+            )}
         </div>
       </div>
     </div>
