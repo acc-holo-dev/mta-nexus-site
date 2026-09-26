@@ -25,11 +25,10 @@ describe("reverse dependency surface", () => {
 
     expect(page).toContain("reverseDependencySummary");
     expect(page).toContain(
-      "productService.getReverseDependencySummary(product.slug).catch(() => null)",
+      "productService.getReverseDependencySummary(product.slug)",
     );
-    expect(page).toContain(
-      "<ReverseDependencyList summary={reverseDependencySummary} />",
-    );
+    expect(page).toContain("<ReverseDependencyList");
+    expect(page).toContain("locale={locale}");
   });
 
   it("does not present direct dependency declarations as compatibility proof", () => {
@@ -37,10 +36,8 @@ describe("reverse dependency surface", () => {
       "apps/web/src/components/reverse-dependency-list.tsx",
     );
 
-    expect(component).toContain("Direct declarations only");
-    expect(component).toContain(
-      "does not imply runtime compatibility",
-    );
+    expect(component).toContain("getDictionary(locale).dependencyUi");
+    expect(component).toContain("copy.reverseNotice");
     expect(component).not.toContain("compatible with");
   });
 });

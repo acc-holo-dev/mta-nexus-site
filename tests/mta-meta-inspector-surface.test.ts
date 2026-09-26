@@ -16,7 +16,7 @@ describe("author-facing MTA meta inspector", () => {
 
     expect(page).toContain("<MtaMetaInspectorPanel />");
     expect(page.indexOf("<MtaMetaInspectorPanel />")).toBeLessThan(
-      page.indexOf("<form onSubmit={submit}"),
+      page.indexOf("<form"),
     );
     expect(panel).toContain('type="button"');
     expect(panel).toContain('fetch("/api/resources/inspect-meta"');
@@ -24,19 +24,20 @@ describe("author-facing MTA meta inspector", () => {
     expect(panel).not.toContain("buildForm");
   });
 
-  it("states that inspection is structural rather than a security scan", () => {
+  it("states through localized copy that inspection is structural rather than a security scan", () => {
     const panel = read(
       "apps/web/src/components/mta-meta-inspector-panel.tsx",
     );
 
-    expect(panel).toContain("does not scan the build archive");
-    expect(panel).toContain("does not produce a security verdict");
-    expect(panel).toContain("Structural notes");
+    expect(panel).toContain("dictionary.metaInspector");
+    expect(panel).toContain("copy.description");
+    expect(panel).toContain("copy.structuralNotes");
+    expect(panel).toContain("copy.note");
     expect(panel).not.toContain("Resource is safe");
     expect(panel).not.toContain("Verified resource");
   });
 
-  it("keeps a client-side size check in addition to the server limit", () => {
+  it("keeps client size and authenticated uncached request guards", () => {
     const panel = read(
       "apps/web/src/components/mta-meta-inspector-panel.tsx",
     );
@@ -44,5 +45,8 @@ describe("author-facing MTA meta inspector", () => {
     expect(panel).toContain("const MAX_META_BYTES = 256 * 1024");
     expect(panel).toContain("file.size > MAX_META_BYTES");
     expect(panel).toContain('accept=".xml,text/xml,text/plain"');
+    expect(panel).toContain('credentials: "same-origin"');
+    expect(panel).toContain('cache: "no-store"');
+    expect(panel).toContain("AbortSignal.timeout(10_000)");
   });
 });

@@ -39,13 +39,11 @@ describe("build provenance chain", () => {
       "apps/web/src/components/build-provenance-details.tsx",
     );
 
-    expect(provenance).toContain("A clean malware");
+    expect(provenance).toContain("copy.explanation");
     expect(provenance).toContain(
-      "is not a cryptographic",
+      "build.isSigned ? copy.recordedAsSigned : copy.notAvailable",
     );
-    expect(provenance).toContain(
-      'build.isSigned ? "Recorded as signed" : "Not available"',
-    );
+    expect(provenance).toContain("getDictionary(locale).provenance");
     expect(provenance).not.toContain("SHA-256 verified");
     expect(provenance).not.toContain("Cryptographically verified");
   });

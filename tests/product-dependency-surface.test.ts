@@ -19,16 +19,15 @@ describe("resource dependency resolution surface", () => {
     expect(repository).toContain(".limit(25)");
   });
 
-  it("loads builds, reviews and dependencies in parallel", () => {
+  it("loads builds, reviews and dependency reads in one parallel group", () => {
     const page = read("apps/web/src/app/market/[slug]/page.tsx");
 
-    expect(page).toContain(
-      "const [builds, reviews, dependencyResolution] = await Promise.all([",
-    );
+    expect(page).toContain("await Promise.all([");
     expect(page).toContain(
       "productService.getDependencyResolution(product).catch(() => null)",
     );
     expect(page).toContain("<ProductDependencyList");
+    expect(page).toContain("locale={locale}");
   });
 
   it("labels unresolved dependencies without claiming incompatibility", () => {
@@ -36,11 +35,10 @@ describe("resource dependency resolution surface", () => {
       "apps/web/src/components/product-dependency-list.tsx",
     );
 
-    expect(component).toContain("not found in public NEXUS catalogue");
-    expect(component).toContain("self reference");
-    expect(component).toContain(
-      "it is not a compatibility guarantee",
-    );
+    expect(component).toContain("getDictionary(locale).dependencyUi");
+    expect(component).toContain("copy.notFound");
+    expect(component).toContain("copy.selfReference");
+    expect(component).toContain("copy.resolutionNotice");
     expect(component).not.toContain("incompatible");
   });
 });

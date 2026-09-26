@@ -286,7 +286,7 @@ export default async function ProductDetailPage({
                       <span>{formatScanStatus(build.scanStatus, copy)}</span>
                     </div>
 
-                    <BuildProvenanceDetails build={build} />
+                    <BuildProvenanceDetails build={build} locale={locale} />
 
                     {build.releaseNotes && (
                       <div className="whitespace-pre-line rounded border border-base bg-surface p-2.5 font-mono text-xs text-secondary">
@@ -305,7 +305,10 @@ export default async function ProductDetailPage({
             <h2 className="border-b border-base pb-3 text-base font-bold text-primary">
               {copy.usedBy}
             </h2>
-            <ReverseDependencyList summary={reverseDependencySummary} />
+            <ReverseDependencyList
+              summary={reverseDependencySummary}
+              locale={locale}
+            />
           </section>
 
           <section className="nexus-panel space-y-4 p-6">
@@ -457,6 +460,7 @@ export default async function ProductDetailPage({
                   <ProductDependencyList
                     declared={product.compatibility.dependencies ?? []}
                     resolution={dependencyResolution}
+                    locale={locale}
                   />
                 </div>
                 <div className="flex justify-between gap-4 border-b border-base py-1">

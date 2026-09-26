@@ -1,26 +1,22 @@
 import Link from "next/link";
 import type { ReverseDependencySummary } from "../lib/reverse-dependency-summary";
+import { getDictionary, type Locale } from "../lib/i18n";
 
 export function ReverseDependencyList({
   summary,
+  locale = "en",
 }: {
   summary: ReverseDependencySummary | null;
+  locale?: Locale;
 }) {
+  const copy = getDictionary(locale).dependencyUi;
+
   if (!summary) {
-    return (
-      <p className="text-xs text-amber-300">
-        Reverse dependency lookup is temporarily unavailable.
-      </p>
-    );
+    return <p className="text-xs text-warning">{copy.reverseUnavailable}</p>;
   }
 
   if (summary.products.length === 0) {
-    return (
-      <p className="text-xs text-neutral-500">
-        No published free NEXUS resources currently declare this resource as a
-        direct dependency.
-      </p>
-    );
+    return <p className="text-xs text-faint">{copy.noDependents}</p>;
   }
 
   return (
@@ -30,25 +26,19 @@ export function ReverseDependencyList({
           <Link
             key={product.id}
             href={`/market/${product.slug}`}
-            className="rounded-md border border-base bg-neutral-900 px-2.5 py-1.5 text-xs text-neutral-300 hover:border-blue-500/50 hover:text-blue-300"
+            className="rounded-md border border-base bg-inset px-2.5 py-1.5 text-xs text-secondary transition-colors hover:border-strong hover:text-accent"
           >
             <span className="font-semibold">{product.title}</span>
-            <span className="ml-1 font-mono text-[10px] text-neutral-500">
+            <span className="ml-1 font-mono text-[10px] text-faint">
               v{product.currentVersion}
             </span>
           </Link>
         ))}
       </div>
       {summary.limitReached && (
-        <p className="text-[10px] text-amber-300">
-          Showing the first 50 published direct dependents. More relationships
-          exist than this beta surface displays.
-        </p>
+        <p className="text-[10px] text-warning">{copy.limitReached}</p>
       )}
-      <p className="text-[10px] text-neutral-500">
-        Direct declarations only. This does not imply runtime compatibility or
-        successful installation.
-      </p>
+      <p className="text-[10px] text-faint">{copy.reverseNotice}</p>
     </div>
   );
 }

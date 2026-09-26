@@ -5,7 +5,7 @@ import {
 } from "../apps/web/src/lib/build-provenance";
 
 describe("build provenance presentation", () => {
-  it("keeps clean scan, scanner identity and scan time as separate facts", () => {
+  it("keeps scan status, scanner identity and scan time as separate facts", () => {
     const provenance = getBuildProvenance({
       scanStatus: "clean",
       scanner: "clamav",
@@ -13,9 +13,9 @@ describe("build provenance presentation", () => {
     });
 
     expect(provenance).toEqual({
-      scanLabel: "Clean scan recorded",
-      scanDetail: "Scanner: clamav",
+      scanStatus: "clean",
       scanTone: "positive",
+      scanner: "clamav",
       scannedAtLabel: "2026-09-25 12:34:56 UTC",
     });
   });
@@ -28,8 +28,10 @@ describe("build provenance presentation", () => {
         scannedAt: undefined,
       }),
     ).toMatchObject({
-      scanLabel: "Scan not recorded",
+      scanStatus: "not_scanned",
       scanTone: "neutral",
+      scanner: null,
+      scannedAtLabel: null,
     });
 
     expect(
@@ -39,12 +41,12 @@ describe("build provenance presentation", () => {
         scannedAt: undefined,
       }),
     ).toMatchObject({
-      scanLabel: "Scanner unavailable",
+      scanStatus: "error",
       scanTone: "warning",
     });
   });
 
-  it("keeps malicious verdict explicit", () => {
+  it("keeps malicious verdict explicit as a fact", () => {
     expect(
       getBuildProvenance({
         scanStatus: "malicious",
@@ -52,18 +54,22 @@ describe("build provenance presentation", () => {
         scannedAt: new Date("2026-09-25T00:00:00.000Z"),
       }),
     ).toMatchObject({
-      scanLabel: "Blocked as malicious",
+      scanStatus: "malicious",
       scanTone: "danger",
     });
   });
 
-  it("formats timestamps deterministically", () => {
+  it("formats timestamps deterministically without embedding locale copy", () => {
     expect(
-      formatProvenanceTimestamp(new Date("2026-09-25T01:02:03.000Z")),
+      formatProvenanceTimestamp(
+        new Date("2026-09-25T01:02:03.000Z"),
+      ),
     ).toBe("2026-09-25 01:02:03 UTC");
     expect(
-      formatProvenanceTimestamp(new Date("2026-09-25T01:02:03.987Z")),
+      formatProvenanceTimestamp(
+        new Date("2026-09-25T01:02:03.987Z"),
+      ),
     ).toBe("2026-09-25 01:02:03 UTC");
-    expect(formatProvenanceTimestamp(undefined)).toBe("Not recorded");
+    expect(formatProvenanceTimestamp(undefined)).toBeNull();
   });
 });

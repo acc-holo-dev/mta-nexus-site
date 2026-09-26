@@ -1,59 +1,35 @@
 import type { Build } from "@nexus/domain";
 
 export type BuildProvenance = Readonly<{
-  scanLabel: string;
-  scanDetail: string;
+  scanStatus: Build["scanStatus"];
   scanTone: "positive" | "neutral" | "warning" | "danger";
-  scannedAtLabel: string;
+  scanner: string | null;
+  scannedAtLabel: string | null;
 }>;
 
-export function formatProvenanceTimestamp(value?: Date): string {
-  if (!value) return "Not recorded";
+export function formatProvenanceTimestamp(value?: Date): string | null {
+  if (!value) return null;
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Not recorded";
+  if (Number.isNaN(date.getTime())) return null;
   return date.toISOString().replace("T", " ").replace(/\.\d{3}Z$/u, " UTC");
 }
 
 export function getBuildProvenance(
   build: Pick<Build, "scanStatus" | "scanner" | "scannedAt">,
 ): BuildProvenance {
-  if (build.scanStatus === "clean") {
-    return Object.freeze({
-      scanLabel: "Clean scan recorded",
-      scanDetail: build.scanner
-        ? `Scanner: ${build.scanner}`
-        : "Scanner identity not recorded",
-      scanTone: "positive",
-      scannedAtLabel: formatProvenanceTimestamp(build.scannedAt),
-    });
-  }
-
-  if (build.scanStatus === "malicious") {
-    return Object.freeze({
-      scanLabel: "Blocked as malicious",
-      scanDetail: build.scanner
-        ? `Scanner: ${build.scanner}`
-        : "Scanner identity not recorded",
-      scanTone: "danger",
-      scannedAtLabel: formatProvenanceTimestamp(build.scannedAt),
-    });
-  }
-
-  if (build.scanStatus === "error") {
-    return Object.freeze({
-      scanLabel: "Scanner unavailable",
-      scanDetail: build.scanner
-        ? `Scanner: ${build.scanner}`
-        : "No successful scanner verdict recorded",
-      scanTone: "warning",
-      scannedAtLabel: formatProvenanceTimestamp(build.scannedAt),
-    });
-  }
+  const scanTone =
+    build.scanStatus === "clean"
+      ? "positive"
+      : build.scanStatus === "malicious"
+        ? "danger"
+        : build.scanStatus === "error"
+          ? "warning"
+          : "neutral";
 
   return Object.freeze({
-    scanLabel: "Scan not recorded",
-    scanDetail: "This build does not have a clean scanner verdict.",
-    scanTone: "neutral",
-    scannedAtLabel: "Not recorded",
+    scanStatus: build.scanStatus,
+    scanTone,
+    scanner: build.scanner?.trim() || null,
+    scannedAtLabel: formatProvenanceTimestamp(build.scannedAt),
   });
 }

@@ -2,6 +2,7 @@
 
 import { FileSearch, LoaderCircle } from "lucide-react";
 import { useState } from "react";
+import { useNexusLocale } from "./locale-context";
 
 type InspectionResponse = {
   inspection?: {
@@ -35,23 +36,35 @@ type InspectionResponse = {
   securityVerdict?: null;
   note?: string;
   error?: string;
+  code?: string;
 };
 
 const MAX_META_BYTES = 256 * 1024;
 
 export function MtaMetaInspectorPanel() {
+  const { dictionary } = useNexusLocale();
+  const copy = dictionary.metaInspector;
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<InspectionResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
+  function responseError(data: InspectionResponse | null): string {
+    if (data?.code === "META_TOO_LARGE") return copy.tooLarge;
+    if (data?.code === "META_FORBIDDEN_XML_FEATURE") {
+      return copy.forbiddenXml;
+    }
+    return copy.unavailable;
+  }
+
   async function inspect() {
     if (!file || loading) return;
+
     setLoading(true);
     setResult(null);
 
     try {
       if (file.size > MAX_META_BYTES) {
-        setResult({ error: "meta.xml is larger than the 256 KiB inspection limit." });
+        setResult({ error: copy.tooLarge });
         return;
       }
 
@@ -59,6 +72,7 @@ export function MtaMetaInspectorPanel() {
       const response = await fetch("/api/resources/inspect-meta", {
         method: "POST",
         cache: "no-store",
+        credentials: "same-origin",
         headers: { "Content-Type": "text/plain; charset=utf-8" },
         body: source,
         signal: AbortSignal.timeout(10_000),
@@ -68,15 +82,13 @@ export function MtaMetaInspectorPanel() {
         | null;
 
       if (!response.ok || !data) {
-        setResult({
-          error: data?.error || "meta.xml inspection is temporarily unavailable.",
-        });
+        setResult({ error: responseError(data) });
         return;
       }
 
       setResult(data);
     } catch {
-      setResult({ error: "meta.xml inspection is temporarily unavailable." });
+      setResult({ error: copy.unavailable });
     } finally {
       setLoading(false);
     }
@@ -86,25 +98,30 @@ export function MtaMetaInspectorPanel() {
 
   return (
     <section
-      className="nexus-panel p-5 space-y-4"
+      className="nexus-panel space-y-4 p-5"
       aria-labelledby="meta-inspector-heading"
     >
       <div className="flex items-start gap-3">
-        <FileSearch className="mt-0.5 h-5 w-5 text-blue-400" aria-hidden="true" />
+        <FileSearch
+          className="mt-0.5 h-5 w-5 text-accent"
+          aria-hidden="true"
+        />
         <div>
-          <h2 id="meta-inspector-heading" className="text-sm font-bold text-white">
-            Inspect meta.xml
+          <h2
+            id="meta-inspector-heading"
+            className="text-sm font-bold text-primary"
+          >
+            {copy.title}
           </h2>
-          <p className="mt-1 text-xs leading-relaxed text-neutral-400">
-            Optional static manifest preview. It does not scan the build archive
-            and does not produce a security verdict.
+          <p className="mt-1 text-xs leading-relaxed text-muted">
+            {copy.description}
           </p>
         </div>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-        <label className="min-w-0 flex-1 space-y-1">
-          <span className="text-xs text-neutral-300">meta.xml file</span>
+        <label className="min-w-0 flex-1 space-y-1.5">
+          <span className="text-xs text-secondary">{copy.fileLabel}</span>
           <input
             type="file"
             accept=".xml,text/xml,text/plain"
@@ -112,24 +129,31 @@ export function MtaMetaInspectorPanel() {
               setFile(event.target.files?.[0] ?? null);
               setResult(null);
             }}
-            className="w-full text-sm text-neutral-300"
+            className="w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent"
           />
         </label>
+
         <button
           type="button"
           disabled={!file || loading}
-          onClick={inspect}
-          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-neutral-800 px-4 py-2 text-xs font-bold text-white hover:bg-neutral-700 disabled:opacity-50"
+          onClick={() => void inspect()}
+          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[var(--nexus-accent-hover)] disabled:opacity-50"
         >
           {loading && (
-            <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />
+            <LoaderCircle
+              className="h-4 w-4 animate-spin"
+              aria-hidden="true"
+            />
           )}
-          {loading ? "Inspecting..." : "Inspect manifest"}
+          {loading ? copy.inspecting : copy.inspect}
         </button>
       </div>
 
       {result?.error && (
-        <p role="alert" className="text-xs text-amber-300">
+        <p
+          role="alert"
+          className="rounded-lg border border-[color:var(--nexus-warning)]/20 bg-warning-soft p-3 text-xs text-warning"
+        >
           {result.error}
         </p>
       )}
@@ -137,39 +161,48 @@ export function MtaMetaInspectorPanel() {
       {inspection && (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <div className="rounded-lg border border-base bg-neutral-950/50 p-3">
-              <div className="text-[10px] uppercase text-neutral-500">Scripts</div>
-              <div className="mt-1 text-lg font-black text-white">
+            <div className="rounded-lg border border-base bg-inset p-3">
+              <div className="font-label uppercase text-faint">
+                {copy.scripts}
+              </div>
+              <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.scriptCount}
               </div>
-              <div className="text-[10px] text-neutral-500">
-                {inspection.summary.serverScripts} server ·{" "}
-                {inspection.summary.clientScripts} client ·{" "}
-                {inspection.summary.sharedScripts} shared
+              <div className="text-[10px] text-faint">
+                {inspection.summary.serverScripts} {copy.server} ·{" "}
+                {inspection.summary.clientScripts} {copy.client} ·{" "}
+                {inspection.summary.sharedScripts} {copy.shared}
               </div>
             </div>
-            <div className="rounded-lg border border-base bg-neutral-950/50 p-3">
-              <div className="text-[10px] uppercase text-neutral-500">Files</div>
-              <div className="mt-1 text-lg font-black text-white">
+
+            <div className="rounded-lg border border-base bg-inset p-3">
+              <div className="font-label uppercase text-faint">
+                {copy.files}
+              </div>
+              <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.fileCount}
               </div>
             </div>
-            <div className="rounded-lg border border-base bg-neutral-950/50 p-3">
-              <div className="text-[10px] uppercase text-neutral-500">
-                Dependencies
+
+            <div className="rounded-lg border border-base bg-inset p-3">
+              <div className="font-label uppercase text-faint">
+                {copy.dependencies}
               </div>
-              <div className="mt-1 text-lg font-black text-white">
+              <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.dependencyCount}
               </div>
             </div>
-            <div className="rounded-lg border border-base bg-neutral-950/50 p-3">
-              <div className="text-[10px] uppercase text-neutral-500">Exports</div>
-              <div className="mt-1 text-lg font-black text-white">
+
+            <div className="rounded-lg border border-base bg-inset p-3">
+              <div className="font-label uppercase text-faint">
+                {copy.exports}
+              </div>
+              <div className="mt-1 text-lg font-black text-primary">
                 {inspection.summary.exportCount}
               </div>
               {inspection.summary.httpExportCount > 0 && (
-                <div className="text-[10px] text-amber-300">
-                  {inspection.summary.httpExportCount} HTTP-enabled
+                <div className="text-[10px] text-warning">
+                  {inspection.summary.httpExportCount} {copy.httpEnabled}
                 </div>
               )}
             </div>
@@ -181,30 +214,34 @@ export function MtaMetaInspectorPanel() {
             <dl className="grid gap-2 text-xs sm:grid-cols-[8rem_minmax(0,1fr)]">
               {inspection.info?.name && (
                 <>
-                  <dt className="text-neutral-500">Resource name</dt>
-                  <dd className="text-neutral-200">{inspection.info.name}</dd>
+                  <dt className="text-faint">{copy.resourceName}</dt>
+                  <dd className="text-secondary">
+                    {inspection.info.name}
+                  </dd>
                 </>
               )}
               {inspection.info?.author && (
                 <>
-                  <dt className="text-neutral-500">Declared author</dt>
-                  <dd className="text-neutral-200">{inspection.info.author}</dd>
+                  <dt className="text-faint">{copy.declaredAuthor}</dt>
+                  <dd className="text-secondary">
+                    {inspection.info.author}
+                  </dd>
                 </>
               )}
               {inspection.minMtaVersion && (
                 <>
-                  <dt className="text-neutral-500">Minimum MTA</dt>
-                  <dd className="font-mono text-neutral-200">
+                  <dt className="text-faint">{copy.minimumMta}</dt>
+                  <dd className="font-mono text-secondary">
                     {inspection.minMtaVersion.both ||
                       [
                         inspection.minMtaVersion.server &&
-                          `server ${inspection.minMtaVersion.server}`,
+                          `${copy.server} ${inspection.minMtaVersion.server}`,
                         inspection.minMtaVersion.client &&
-                          `client ${inspection.minMtaVersion.client}`,
+                          `${copy.client} ${inspection.minMtaVersion.client}`,
                       ]
                         .filter(Boolean)
                         .join(" · ") ||
-                      "Not declared"}
+                      copy.notDeclared}
                   </dd>
                 </>
               )}
@@ -213,14 +250,14 @@ export function MtaMetaInspectorPanel() {
 
           {inspection.dependencyResources.length > 0 && (
             <div>
-              <div className="text-[10px] uppercase tracking-wider text-neutral-500">
-                Included resources
+              <div className="font-label uppercase text-faint">
+                {copy.includedResources}
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {inspection.dependencyResources.map((dependency) => (
                   <span
                     key={dependency}
-                    className="rounded border border-base bg-neutral-900 px-2 py-1 font-mono text-[10px] text-neutral-300"
+                    className="rounded border border-base bg-inset px-2 py-1 font-mono text-[10px] text-secondary"
                   >
                     {dependency}
                   </span>
@@ -231,8 +268,8 @@ export function MtaMetaInspectorPanel() {
 
           {inspection.issues.length > 0 && (
             <div className="space-y-2">
-              <div className="text-[10px] uppercase tracking-wider text-neutral-500">
-                Structural notes
+              <div className="font-label uppercase text-faint">
+                {copy.structuralNotes}
               </div>
               <ul className="space-y-1.5">
                 {inspection.issues.map((issue, index) => (
@@ -240,8 +277,8 @@ export function MtaMetaInspectorPanel() {
                     key={`${issue.code}-${index}`}
                     className={
                       issue.severity === "error"
-                        ? "text-xs text-red-300"
-                        : "text-xs text-amber-300"
+                        ? "text-xs text-danger"
+                        : "text-xs text-warning"
                     }
                   >
                     {issue.message}
@@ -251,8 +288,8 @@ export function MtaMetaInspectorPanel() {
             </div>
           )}
 
-          <p className="text-[10px] leading-relaxed text-neutral-500">
-            {result.note}
+          <p className="text-[10px] leading-relaxed text-faint">
+            {copy.note}
           </p>
         </div>
       )}
