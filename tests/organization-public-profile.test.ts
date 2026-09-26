@@ -10,14 +10,14 @@ describe("organization public profile queries", () => {
     const page = read("apps/web/src/app/organizations/[slug]/page.tsx");
 
     expect(page).toContain(
-      "productRepository.listPublishedByOrganization(org.id, 100)",
+      "productRepository.listPublishedByOrganization(organization.id, 100)",
     );
     expect(page).toContain(
-      "contentRepository.listPublishedByOrganization(org.id, 100)",
+      "contentRepository.listPublishedByOrganization(organization.id, 100)",
     );
     expect(page).not.toContain("productRepository.list()");
     expect(page).not.toContain("contentRepository.listPublished()");
-    expect(page).not.toContain(".filter((p) => p.organizationId === org.id)");
+    expect(page).not.toContain(".filter((p) => p.organizationId === organization.id)");
   });
 
   it("keeps public organization repositories status-scoped and bounded", () => {
