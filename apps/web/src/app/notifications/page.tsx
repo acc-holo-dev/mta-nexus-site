@@ -1,153 +1,255 @@
-﻿"use client";
+"use client";
 
-import React, { useState, useEffect } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import Link from "next/link";
-import { Bell, CheckCheck, ExternalLink, ArrowLeft, Settings } from "lucide-react";
+import {
+  ArrowLeft,
+  Bell,
+  CheckCheck,
+  ExternalLink,
+  Settings,
+} from "lucide-react";
+import { Button, EmptyState, Skeleton } from "@nexus/ui";
 import type { Notification } from "@nexus/domain";
+import { useNexusLocale } from "../../components/locale-context";
 
 export default function NotificationCenterPage() {
+  const { locale, dictionary } = useNexusLocale();
+  const copy = dictionary.notifications;
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [marking, setMarking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "unread">("all");
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const query = filter === "unread" ? "?limit=100&unreadOnly=true" : "?limit=100";
-      const res = await fetch(`/api/notifications${query}`);
-      if (res.ok) {
-        const data = await res.json();
-        setNotifications(data.notifications || []);
+      const query =
+        filter === "unread"
+          ? "?limit=100&unreadOnly=true"
+          : "?limit=100";
+      const response = await fetch(`/api/notifications${query}`, {
+        cache: "no-store",
+        credentials: "same-origin",
+        signal: AbortSignal.timeout(15_000),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !Array.isArray(data?.notifications)) {
+        throw new Error(data?.error || copy.loadError);
       }
-    } catch {
-      // ignore
+      setNotifications(data.notifications);
+    } catch (caught) {
+      setNotifications([]);
+      setError(
+        caught instanceof Error && caught.message
+          ? caught.message
+          : copy.loadError,
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter, copy.loadError]);
 
   useEffect(() => {
-    loadNotifications();
-  }, [filter]);
+    void loadNotifications();
+  }, [loadNotifications]);
 
-  const markAllRead = async () => {
-    await fetch("/api/notifications/mark-read", { method: "POST" });
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-  };
+  async function markAllRead() {
+    if (marking) return;
+    setMarking(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/notifications/mark-read", {
+        method: "POST",
+        cache: "no-store",
+        credentials: "same-origin",
+        signal: AbortSignal.timeout(15_000),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(data?.error || copy.markError);
+      }
+      setNotifications((previous) =>
+        previous.map((notification) => ({
+          ...notification,
+          isRead: true,
+        })),
+      );
+    } catch (caught) {
+      setError(
+        caught instanceof Error && caught.message
+          ? caught.message
+          : copy.markError,
+      );
+    } finally {
+      setMarking(false);
+    }
+  }
 
+  const unreadCount = useMemo(
+    () => notifications.filter((notification) => !notification.isRead).length,
+    [notifications],
+  );
   const filtered =
-    filter === "unread" ? notifications.filter((n) => !n.isRead) : notifications;
+    filter === "unread"
+      ? notifications.filter((notification) => !notification.isRead)
+      : notifications;
+  const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-base pb-6">
+    <div className="mx-auto max-w-4xl space-y-8">
+      <header className="flex flex-col justify-between gap-4 border-b border-base pb-6 sm:flex-row sm:items-center">
         <div>
-          <div className="flex items-center gap-2 text-xs text-neutral-400 mb-2">
-            <Link href="/workspace" className="hover:text-white flex items-center gap-1">
-              <ArrowLeft className="w-3 h-3" />
-              <span>Workspace</span>
+          <div className="mb-2 flex items-center gap-2 text-xs text-muted">
+            <Link
+              href="/workspace"
+              className="flex items-center gap-1 transition-colors hover:text-primary"
+            >
+              <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+              <span>{copy.workspace}</span>
             </Link>
-            <span>/</span>
-            <span className="text-neutral-200">Notifications</span>
+            <span aria-hidden="true">/</span>
+            <span className="text-secondary">{dictionary.nav.notifications}</span>
           </div>
-          <h1 className="text-2xl font-black text-white flex items-center gap-2.5">
-            <Bell className="w-6 h-6 text-blue-500" />
-            <span>Notification Center</span>
+          <h1 className="flex items-center gap-2.5 font-display text-primary">
+            <Bell className="h-6 w-6 text-accent" aria-hidden="true" />
+            <span>{copy.title}</span>
           </h1>
-          <p className="text-xs text-neutral-400 mt-1">
-            Track resource updates, followed servers, and security alerts.
-          </p>
+          <p className="mt-1 text-sm text-muted">{copy.description}</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link
             href="/settings"
-            className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-xs font-semibold text-neutral-300 border border-base transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-base bg-surface px-3.5 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
           >
-            <Settings className="w-4 h-4" />
-            <span>Settings</span>
+            <Settings className="h-4 w-4" aria-hidden="true" />
+            <span>{copy.settings}</span>
           </Link>
-          {notifications.some((n) => !n.isRead) && (
-          <button
-            onClick={markAllRead}
-            className="self-start sm:self-auto flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-xs font-semibold text-blue-400 border border-base transition-colors cursor-pointer"
-          >
-            <CheckCheck className="w-4 h-4" />
-            <span>Mark All as Read</span>
-          </button>
+          {unreadCount > 0 && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              isLoading={marking}
+              onClick={() => void markAllRead()}
+            >
+              <CheckCheck className="h-4 w-4" aria-hidden="true" />
+              <span>{copy.markAllRead}</span>
+            </Button>
           )}
         </div>
+      </header>
+
+      <div className="flex items-center gap-2" role="tablist">
+        {(["all", "unread"] as const).map((item) => {
+          const active = filter === item;
+          const count =
+            item === "all" ? notifications.length : unreadCount;
+          return (
+            <button
+              key={item}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => setFilter(item)}
+              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                active
+                  ? "border-[color:var(--nexus-accent)] bg-accent text-white"
+                  : "border-base bg-surface text-muted hover:bg-hover hover:text-primary"
+              }`}
+            >
+              {item === "all" ? copy.all : copy.unread} ({count})
+            </button>
+          );
+        })}
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-            filter === "all"
-              ? "bg-blue-600 text-white"
-              : "bg-neutral-900 text-neutral-400 hover:text-white border border-base"
-          }`}
+      {error && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
         >
-          All ({notifications.length})
-        </button>
-        <button
-          onClick={() => setFilter("unread")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-            filter === "unread"
-              ? "bg-blue-600 text-white"
-              : "bg-neutral-900 text-neutral-400 hover:text-white border border-base"
-          }`}
-        >
-          Unread ({notifications.filter((n) => !n.isRead).length})
-        </button>
-      </div>
+          <span>{error}</span>
+          <button
+            type="button"
+            onClick={() => void loadNotifications()}
+            className="shrink-0 font-semibold underline"
+          >
+            {dictionary.errors.retry}
+          </button>
+        </div>
+      )}
 
-      {/* Notifications List */}
       <div className="space-y-3">
         {loading ? (
-          <div className="py-12 text-center text-xs text-neutral-400">Loading notifications...</div>
+          Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="nexus-panel space-y-3 p-4">
+              <Skeleton className="h-4 w-2/5" />
+              <Skeleton className="h-3 w-4/5" />
+              <Skeleton className="h-3 w-1/4" />
+            </div>
+          ))
         ) : filtered.length > 0 ? (
-          filtered.map((n) => (
-            <div
-              key={n.id}
-              className={`p-4 rounded-xl border border-base transition-colors ${
-                !n.isRead ? "bg-blue-950/20 border-blue-900/40" : "bg-surface"
+          filtered.map((notification) => (
+            <article
+              key={notification.id}
+              className={`rounded-xl border p-4 transition-colors ${
+                !notification.isRead
+                  ? "border-[color:var(--nexus-accent)]/25 bg-accent-soft"
+                  : "border-base bg-surface"
               }`}
             >
               <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-white">{n.title}</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-neutral-900 border border-base text-neutral-400">
-                      {n.type}
+                <div className="min-w-0 space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-sm font-bold text-primary">
+                      {notification.title}
+                    </h2>
+                    <span className="rounded border border-base bg-inset px-2 py-0.5 font-numeric text-[10px] uppercase text-muted">
+                      {notification.type}
                     </span>
                   </div>
-                  <p className="text-xs text-neutral-300 leading-relaxed">{n.message}</p>
+                  <p className="text-xs leading-relaxed text-secondary">
+                    {notification.message}
+                  </p>
                 </div>
 
-                <div className="flex flex-col items-end gap-2 shrink-0">
-                  <span className="text-[11px] text-neutral-500 font-mono">
-                    {new Date(n.createdAt).toLocaleDateString()}
-                  </span>
-                  {n.link && (
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  <time
+                    dateTime={new Date(notification.createdAt).toISOString()}
+                    className="font-numeric text-[11px] text-faint"
+                  >
+                    {new Date(notification.createdAt).toLocaleDateString(
+                      dateLocale,
+                    )}
+                  </time>
+                  {notification.link && (
                     <Link
-                      href={n.link}
-                      className="inline-flex items-center gap-1 text-xs text-blue-400 hover:underline"
+                      href={notification.link}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline"
                     >
-                      <span>View</span>
-                      <ExternalLink className="w-3 h-3" />
+                      <span>{copy.view}</span>
+                      <ExternalLink className="h-3 w-3" aria-hidden="true" />
                     </Link>
                   )}
                 </div>
               </div>
-            </div>
+            </article>
           ))
         ) : (
-          <div className="py-16 text-center rounded-xl border border-dashed border-base bg-surface/40">
-            <p className="text-sm text-neutral-400">No notifications to display.</p>
-          </div>
+          <EmptyState
+            title={copy.empty}
+            description={copy.description}
+            icon={<Bell className="h-6 w-6" />}
+          />
         )}
       </div>
     </div>
