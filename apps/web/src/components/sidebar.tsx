@@ -17,6 +17,7 @@ import {
   Server,
   Settings,
   ShieldAlert,
+  Wrench,
 } from "lucide-react";
 import { getDictionary, type Locale } from "../lib/i18n";
 
@@ -48,6 +49,9 @@ export function Sidebar({
     { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
     { href: "/notifications", label: dictionary.nav.notifications, icon: Bell },
     { href: "/settings", label: dictionary.nav.settings, icon: Settings },
+    ...(process.env.NODE_ENV !== "production"
+      ? [{ href: "/dev", label: dictionary.nav.devTools, icon: Wrench }]
+      : []),
   ];
 
   const isActive = (href: string) =>

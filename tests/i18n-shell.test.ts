@@ -24,6 +24,9 @@ describe("RU/EN shell foundation", () => {
     expect(en.auth.loginTitle).not.toBe(ru.auth.loginTitle);
     expect(en.product.addToLibrary).not.toBe(ru.product.addToLibrary);
     expect(en.checkout.title).not.toBe(ru.checkout.title);
+    expect(en.admin.title).not.toBe(ru.admin.title);
+    expect(en.dev.title).not.toBe(ru.dev.title);
+    expect(en.nav.devTools).not.toBe(ru.nav.devTools);
     expect(en.checkout.title).toBe("Secure Checkout");
     expect(en.checkout.addToLibrary).toBe("Add to library");
     expect(en.checkout.resourceAdded).toBe("Resource added");

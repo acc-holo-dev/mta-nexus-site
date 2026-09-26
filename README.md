@@ -19,6 +19,8 @@ docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-
 
 Open `http://localhost:3000`.
 
+In development, `/dev` shows a sanitized runtime status panel for the application, database, storage, scanner and email mode. The route is intentionally unavailable when `NODE_ENV=production`.
+
 The development stack starts PostgreSQL, ClamAV and the Next.js application. Database migrations run before Next.js starts. Application and workspace `src` directories are bind-mounted read-only into the container, so normal source edits hot-reload without rebuilding the image.
 
 If port 3000 is busy:
