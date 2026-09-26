@@ -1,8 +1,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
 import {
+  buildRepository,
   entitlementRepository,
-  ledgerRepository,
   productRepository,
   userRepository,
 } from "@nexus/db";
@@ -62,6 +62,22 @@ describe("safe resource acquisition", () => {
       slug: `paid-test-resource-${suffix}`,
       price: 2500,
     });
+
+    await buildRepository.create({
+      id: `bld_free_${suffix}`,
+      productId: freeResource.id,
+      version: "1.0.0",
+      status: "published",
+      storageKey: `assets/test/free-${suffix}.zip`,
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 16,
+      fileName: "free-resource.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "integration-test",
+      scannedAt: new Date(),
+      isSigned: false,
+    });
   });
 
   it("claims a free resource idempotently", async () => {
@@ -86,22 +102,16 @@ describe("safe resource acquisition", () => {
     ).toBe(true);
   });
 
-  it("never fabricates a completed paid checkout", async () => {
-    const ledgerBefore = await ledgerRepository.listRecent(100);
-
-    await expect(commerceService.createOrderAndCheckout()).rejects.toMatchObject({
-      statusCode: 503,
-      code: "PAYMENTS_NOT_CONFIGURED",
-    });
-
-    const ledgerAfter = await ledgerRepository.listRecent(100);
-    expect(ledgerAfter).toHaveLength(ledgerBefore.length);
+  it("does not expose a paid checkout primitive in the closed-beta runtime", async () => {
+    expect("createOrderAndCheckout" in commerceService).toBe(false);
+    expect("verifyLicense" in commerceService).toBe(false);
+    expect("getUserLicenses" in commerceService).toBe(false);
     expect(
       await entitlementRepository.hasEntitlement(
         { type: "user", id: player.id },
         paidResource.id,
-        "product.download"
-      )
+        "product.download",
+      ),
     ).toBe(false);
   });
 

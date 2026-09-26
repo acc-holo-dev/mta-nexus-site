@@ -766,9 +766,8 @@ const en = {
     authorizedSession: "Authorized admin session",
     users: "Users",
     servers: "Servers",
-    products: "Products",
-    licenses: "Licenses",
-    orders: "Orders",
+    products: "Resources",
+    publishedContent: "Published content",
     openReports: "Open reports",
     verificationQueue: "Verification queue",
     pendingRequests: "pending requests",
@@ -861,7 +860,7 @@ const en = {
     serverUpdatesDescription: "Updates related to followed MTA servers.",
     resourceActivity: "Resource activity",
     resourceActivityDescription:
-      "Claims, licenses and resource delivery events.",
+      "Library additions and resource delivery events.",
     systemNotifications: "System notifications",
     systemNotificationsDescription:
       "Important non-security account messages.",
@@ -1787,8 +1786,7 @@ const ru: typeof en = {
     users: "Пользователи",
     servers: "Серверы",
     products: "Ресурсы",
-    licenses: "Лицензии",
-    orders: "Заказы",
+    publishedContent: "Опубликованный контент",
     openReports: "Открытые жалобы",
     verificationQueue: "Очередь верификации",
     pendingRequests: "запросов ожидают решения",
@@ -1881,7 +1879,7 @@ const ru: typeof en = {
     serverUpdatesDescription: "События серверов MTA, за которыми вы следите.",
     resourceActivity: "События ресурсов",
     resourceActivityDescription:
-      "Добавления, лицензии и события доставки ресурсов.",
+      "Добавления в библиотеку и события доставки ресурсов.",
     systemNotifications: "Системные уведомления",
     systemNotificationsDescription:
       "Важные сообщения аккаунта, не связанные напрямую с безопасностью.",

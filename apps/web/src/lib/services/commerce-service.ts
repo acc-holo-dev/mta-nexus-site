@@ -1,17 +1,16 @@
-import { entitlementRepository, licenseRepository } from "@nexus/db";
+import { entitlementRepository } from "@nexus/db";
 import { generateId } from "@nexus/security";
-import { AppError } from "@nexus/domain";
-import type { Entitlement, License, User } from "@nexus/domain";
+import type { Entitlement, User } from "@nexus/domain";
 
+/**
+ * Closed-beta resource access service.
+ *
+ * The historical CommerceService export name is kept to avoid unnecessary
+ * import churn, but paid checkout/license operations are intentionally absent.
+ * Legacy database records remain readable through entitlement compatibility
+ * logic in the repository layer.
+ */
 export class CommerceService {
-  async createOrderAndCheckout(): Promise<never> {
-    throw new AppError(
-      "Paid checkout is unavailable until a real payment provider is configured",
-      503,
-      "PAYMENTS_NOT_CONFIGURED"
-    );
-  }
-
   async claimFreeResource(input: {
     user: User;
     productId: string;
@@ -23,33 +22,19 @@ export class CommerceService {
     });
   }
 
-  async getUserLicenses(userId: string): Promise<License[]> {
-    return licenseRepository.listByUser(userId);
-  }
-
-  async verifyLicense(
-    key: string,
-    serverId?: string
-  ): Promise<{ valid: boolean; license?: License; reason?: string }> {
-    const license = await licenseRepository.findByKey(key);
-    if (!license) return { valid: false, reason: "Invalid license key" };
-    if (license.status !== "active") return { valid: false, reason: `License is ${license.status}` };
-    if (license.expiresAt && license.expiresAt < new Date()) {
-      return { valid: false, reason: "License has expired" };
-    }
-    if (license.serverId && serverId && license.serverId !== serverId) {
-      return { valid: false, reason: "License is locked to a different server identity" };
-    }
-
-    return { valid: true, license };
-  }
-
   async checkEntitlement(
-    subject: { type: "user" | "server" | "organization"; id: string },
+    subject: {
+      type: "user" | "server" | "organization";
+      id: string;
+    },
     resourceId: string,
-    permission: string
+    permission: string,
   ): Promise<boolean> {
-    return entitlementRepository.hasEntitlement(subject, resourceId, permission);
+    return entitlementRepository.hasEntitlement(
+      subject,
+      resourceId,
+      permission,
+    );
   }
 }
 

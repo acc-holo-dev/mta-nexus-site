@@ -9,12 +9,11 @@ import { can } from "@nexus/security";
 import {
   AlertTriangle,
   BadgeCheck,
+  BookOpen,
   Box,
-  KeyRound,
   PackageCheck,
   Server,
   ShieldAlert,
-  ShoppingBag,
   Users,
 } from "lucide-react";
 import {
@@ -103,7 +102,7 @@ export default async function AdminPage() {
         </span>
       </header>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
         <StatCard
           label={copy.users}
           value={health.counts.users}
@@ -122,15 +121,10 @@ export default async function AdminPage() {
           icon={<Box className="h-4 w-4" />}
         />
         <StatCard
-          label={copy.licenses}
-          value={health.counts.licenses}
+          label={copy.publishedContent}
+          value={health.counts.publishedContent}
           tone="purple"
-          icon={<KeyRound className="h-4 w-4" />}
-        />
-        <StatCard
-          label={copy.orders}
-          value={health.counts.orders}
-          icon={<ShoppingBag className="h-4 w-4" />}
+          icon={<BookOpen className="h-4 w-4" />}
         />
         <StatCard
           label={copy.openReports}

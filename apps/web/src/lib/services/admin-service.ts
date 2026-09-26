@@ -1,16 +1,14 @@
 import {
-  userRepository,
-  serverRepository,
-  productRepository,
-  licenseRepository,
-  orderRepository,
-  contentRepository,
-  reportRepository,
   auditRepository,
+  contentRepository,
+  productRepository,
+  reportRepository,
+  serverRepository,
+  userRepository,
 } from "@nexus/db";
-import { generateId, can } from "@nexus/security";
+import { can, generateId } from "@nexus/security";
 import { ForbiddenError, NotFoundError } from "@nexus/domain";
-import type { Report, AuditEvent, User } from "@nexus/domain";
+import type { AuditEvent, Report, User } from "@nexus/domain";
 
 export class AdminService {
   async getSystemHealthMetrics(actor: User) {
@@ -18,15 +16,14 @@ export class AdminService {
       throw new ForbiddenError("Admin access required");
     }
 
-    const [users, servers, products, licenses, orders, content, reports] = await Promise.all([
-      userRepository.listAll(),
-      serverRepository.listActivePublic(),
-      productRepository.list(),
-      licenseRepository.listAll(),
-      orderRepository.listAll(),
-      contentRepository.listPublished(),
-      reportRepository.listAll(),
-    ]);
+    const [users, servers, products, content, reports] =
+      await Promise.all([
+        userRepository.listAll(),
+        serverRepository.listActivePublic(),
+        productRepository.list(),
+        contentRepository.listPublished(),
+        reportRepository.listAll(),
+      ]);
 
     return {
       status: "healthy",
@@ -37,10 +34,10 @@ export class AdminService {
         users: users.length,
         servers: servers.length,
         products: products.length,
-        licenses: licenses.length,
-        orders: orders.length,
-        articles: content.length,
-        reportsOpen: reports.filter((r) => r.status === "open").length,
+        publishedContent: content.length,
+        reportsOpen: reports.filter(
+          (report) => report.status === "open",
+        ).length,
       },
     };
   }
@@ -63,14 +60,21 @@ export class AdminService {
 
   async resolveReport(
     reportId: string,
-    input: { status: "resolved" | "dismissed"; moderatorNotes: string },
-    actor: User
+    input: {
+      status: "resolved" | "dismissed";
+      moderatorNotes: string;
+    },
+    actor: User,
   ): Promise<Report> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError("Moderator access required");
     }
 
-    const report = await reportRepository.resolve(reportId, input.status, input.moderatorNotes);
+    const report = await reportRepository.resolve(
+      reportId,
+      input.status,
+      input.moderatorNotes,
+    );
     if (!report) throw new NotFoundError("Report", reportId);
 
     await auditRepository.record({
@@ -80,7 +84,10 @@ export class AdminService {
       action: "report.resolved",
       targetId: reportId,
       targetType: "report",
-      details: { resolution: input.status, notes: input.moderatorNotes },
+      details: {
+        resolution: input.status,
+        notes: input.moderatorNotes,
+      },
     });
 
     return report;
