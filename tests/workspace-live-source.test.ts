@@ -6,13 +6,16 @@ describe("workspace live telemetry source", () => {
   it("uses the official MTA directory and keeps missing observations neutral", () => {
     const page = readFileSync(
       resolve(process.cwd(), "apps/web/src/app/workspace/page.tsx"),
-      "utf8"
+      "utf8",
     );
 
-    expect(page).toContain("mtaMasterDirectoryService.getDirectory()");
+    expect(page).toContain(
+      "mtaMasterDirectoryService.getDirectory().catch(() => null)",
+    );
     expect(page).toContain("matchesMtaEndpoint(server, observation)");
-    expect(page).toContain('status={isOnline ? "online" : isOffline ? "offline" : "unknown"}');
-    expect(page).toContain("missing observations stay unknown");
+    expect(page).toContain("dictionary.servers.online");
+    expect(page).toContain("dictionary.servers.offline");
+    expect(page).toContain("dictionary.servers.unknown");
     expect(page).not.toContain("lastHeartbeatAt");
     expect(page).not.toContain("server.currentPlayers");
   });

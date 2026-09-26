@@ -778,7 +778,99 @@ const en = {
       "The session list could not be refreshed. Reload settings to check it.",
     started: "Started",
   },
+  legal: {
+    closedBeta: "Closed beta",
+    lastUpdated: "Last updated",
+    terms: {
+      metadataTitle: "Closed Beta Terms",
+      title: "Terms of use",
+      lead: "Effective for the MTA Nexus closed beta.",
+      updated: "16 September 2026",
+      sections: [
+        {
+          title: "What the beta provides",
+          body:
+            "MTA Nexus provides discovery features, community content, server listings, and free resources for Multi Theft Auto. Paid resources, balances, payouts, and cryptocurrency settlement are not available in this beta.",
+        },
+        {
+          title: "Your account and content",
+          body:
+            "You are responsible for activity under your account and for content you submit. Do not upload malware, stolen resources, personal data you do not have the right to share, or content that infringes intellectual-property rights.",
+        },
+        {
+          title: "Beta availability",
+          body:
+            "The service is experimental and may change, be paused, or have data removed while it is being developed. Keep your own copy of every uploaded resource. We do not promise uninterrupted availability during the closed beta.",
+        },
+        {
+          title: "Moderation",
+          body:
+            "We may remove content, limit access, or suspend accounts when needed to protect users, the platform, or rights holders. We will use reasonable judgment and keep an audit trail for moderation actions.",
+        },
+      ],
+      contactLabel: "Questions about these terms",
+      contactEmail: "legal@nexus-mta.com",
+    },
+    privacy: {
+      metadataTitle: "Privacy notice",
+      title: "Privacy notice",
+      lead:
+        "This notice describes the data used to operate and protect the MTA Nexus closed beta.",
+      updated: "16 September 2026",
+      sections: [
+        {
+          title: "Data we use",
+          body:
+            "We process account details such as email address, username, display name, password hash, session security data, and any profile, server, resource, or community content you choose to submit. Public server observations may include availability, player counts, MTA version, game mode, map, and the time and public source of the observation.",
+        },
+        {
+          title: "Why we use it",
+          body:
+            "We use this data to operate accounts, prevent abuse, deliver requested resources, display public profiles and servers, maintain security logs, and moderate content. Passwords are never stored in readable form.",
+        },
+        {
+          title: "Visibility and retention",
+          body:
+            "Profile, server, and published resource information can be public according to your chosen visibility settings. Security and audit records are retained only as long as reasonably needed to operate and protect the beta. We do not sell personal data.",
+        },
+        {
+          title: "Your choices",
+          body:
+            "You may request access, correction, or deletion of your account data by contacting us. Some limited data may need to remain temporarily for security, fraud prevention, or legal claims.",
+        },
+      ],
+      contactLabel: "Privacy requests",
+      contactEmail: "legal@nexus-mta.com",
+    },
+    copyright: {
+      metadataTitle: "Copyright & abuse",
+      title: "Copyright & abuse reports",
+      lead:
+        "Use this process to report harmful, stolen, or rights-infringing material on MTA Nexus.",
+      updated: "16 September 2026",
+      sections: [
+        {
+          title: "Report harmful or infringing content",
+          body:
+            "Use this channel to report copyright infringement, impersonation, malware, stolen resources, or other abuse. Include the URL or resource identifier, a clear explanation, and material supporting your report. Do not send passwords or private keys.",
+        },
+        {
+          title: "Our response",
+          body:
+            "We review reports, preserve relevant audit evidence, and may temporarily restrict content or accounts while investigating. Repeat or serious violations may lead to removal and suspension.",
+        },
+        {
+          title: "Important platform notice",
+          body:
+            "MTA Nexus is an independent community platform. It is not affiliated with Rockstar Games, Take-Two Interactive, or the Multi Theft Auto project.",
+        },
+      ],
+      contactLabel: "Copyright and abuse reports",
+      contactEmail: "abuse@nexus-mta.com",
+    },
+  },
   errors: {
+    loading: "Loading content",
     title: "Something went wrong",
     message:
       "An unexpected error occurred while loading this page. Retry the request or return to the home page.",
@@ -1562,7 +1654,99 @@ const ru: typeof en = {
       "Не удалось обновить список сессий. Обновите настройки, чтобы проверить его.",
     started: "Начало",
   },
+  legal: {
+    closedBeta: "Закрытая бета",
+    lastUpdated: "Последнее обновление",
+    terms: {
+      metadataTitle: "Условия закрытой беты",
+      title: "Условия использования",
+      lead: "Действуют для закрытой беты MTA Nexus.",
+      updated: "16 сентября 2026",
+      sections: [
+        {
+          title: "Что предоставляет бета",
+          body:
+            "MTA Nexus предоставляет поиск серверов и ресурсов, материалы сообщества, карточки серверов и бесплатные ресурсы для Multi Theft Auto. Платные ресурсы, балансы, выплаты и расчёты в криптовалюте в этой бете недоступны.",
+        },
+        {
+          title: "Ваш аккаунт и контент",
+          body:
+            "Вы отвечаете за действия в своём аккаунте и за отправляемый контент. Не загружайте вредоносный код, украденные ресурсы, персональные данные без права на их публикацию или материалы, нарушающие права интеллектуальной собственности.",
+        },
+        {
+          title: "Доступность беты",
+          body:
+            "Сервис является экспериментальным и во время разработки может меняться, приостанавливаться или удалять данные. Храните собственную копию каждого загруженного ресурса. В закрытой бете непрерывная доступность не гарантируется.",
+        },
+        {
+          title: "Модерация",
+          body:
+            "Мы можем удалять контент, ограничивать доступ или приостанавливать аккаунты, когда это необходимо для защиты пользователей, платформы или правообладателей. Решения модерации фиксируются в журнале аудита.",
+        },
+      ],
+      contactLabel: "Вопросы по условиям",
+      contactEmail: "legal@nexus-mta.com",
+    },
+    privacy: {
+      metadataTitle: "Конфиденциальность",
+      title: "Уведомление о конфиденциальности",
+      lead:
+        "Здесь описаны данные, используемые для работы и защиты закрытой беты MTA Nexus.",
+      updated: "16 сентября 2026",
+      sections: [
+        {
+          title: "Какие данные мы используем",
+          body:
+            "Мы обрабатываем данные аккаунта, включая email, имя пользователя, отображаемое имя, хэш пароля и данные безопасности сессий, а также профиль, серверы, ресурсы и материалы сообщества, которые вы решаете отправить. Публичные наблюдения серверов могут включать доступность, число игроков, версию MTA, игровой режим, карту, время и публичный источник наблюдения.",
+        },
+        {
+          title: "Зачем мы их используем",
+          body:
+            "Данные используются для работы аккаунтов, предотвращения злоупотреблений, выдачи запрошенных ресурсов, отображения публичных профилей и серверов, журналов безопасности и модерации. Пароли никогда не хранятся в читаемом виде.",
+        },
+        {
+          title: "Публичность и хранение",
+          body:
+            "Данные профиля, сервера и опубликованного ресурса могут быть публичными в соответствии с выбранной видимостью. Записи безопасности и аудита хранятся только столько, сколько обоснованно необходимо для работы и защиты беты. Мы не продаём персональные данные.",
+        },
+        {
+          title: "Ваши возможности",
+          body:
+            "Вы можете запросить доступ, исправление или удаление данных аккаунта. Ограниченная часть данных может временно сохраняться для безопасности, предотвращения мошенничества или юридических требований.",
+        },
+      ],
+      contactLabel: "Запросы по конфиденциальности",
+      contactEmail: "legal@nexus-mta.com",
+    },
+    copyright: {
+      metadataTitle: "Авторские права и злоупотребления",
+      title: "Авторские права и жалобы",
+      lead:
+        "Используйте этот порядок, чтобы сообщить о вредоносных, украденных или нарушающих права материалах в MTA Nexus.",
+      updated: "16 сентября 2026",
+      sections: [
+        {
+          title: "Сообщить о вредоносном или нарушающем права контенте",
+          body:
+            "Через этот канал можно сообщить о нарушении авторских прав, выдаче себя за другое лицо, вредоносном коде, украденных ресурсах или других злоупотреблениях. Укажите URL или идентификатор ресурса, понятное описание и подтверждающие материалы. Не отправляйте пароли или приватные ключи.",
+        },
+        {
+          title: "Как мы реагируем",
+          body:
+            "Мы рассматриваем обращения, сохраняем относящиеся к делу данные аудита и можем временно ограничить контент или аккаунт на время проверки. Повторные или серьёзные нарушения могут привести к удалению контента и блокировке.",
+        },
+        {
+          title: "Важное уведомление о платформе",
+          body:
+            "MTA Nexus — независимая платформа сообщества. Она не связана с Rockstar Games, Take-Two Interactive или проектом Multi Theft Auto.",
+        },
+      ],
+      contactLabel: "Жалобы по авторским правам и злоупотреблениям",
+      contactEmail: "abuse@nexus-mta.com",
+    },
+  },
   errors: {
+    loading: "Загрузка содержимого",
     title: "Что-то пошло не так",
     message:
       "При загрузке страницы произошла непредвиденная ошибка. Повторите запрос или вернитесь на главную.",

@@ -5,13 +5,13 @@ import {
   productRepository,
   serverRepository,
 } from "@nexus/db";
+import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
+import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
 import { authService } from "../../lib/services/auth-service";
 import {
   matchesMtaEndpoint,
   mtaMasterDirectoryService,
 } from "../../lib/services/mta-master-directory-service";
-import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
-import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 
@@ -20,20 +20,21 @@ export const dynamic = "force-dynamic";
 export default async function WorkspacePage() {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
-  const cookieStore = await cookies();
-  const token = cookieStore.get("nexus_session")?.value;
+  const token = (await cookies()).get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
   if (!user) {
     return (
-      <div className="max-w-md mx-auto py-20 text-center space-y-4">
-        <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
+      <div className="mx-auto max-w-md space-y-4 py-20 text-center">
+        <h1 className="font-display text-primary">
+          {dictionary.workspace.signInRequired}
+        </h1>
         <p className="font-caption text-muted">
           {dictionary.workspace.signInMessage}
         </p>
         <Link
           href="/auth/login"
-          className="inline-block px-4 py-2 rounded-md bg-accent text-white text-xs font-semibold"
+          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
         >
           {dictionary.workspace.signIn}
         </Link>
@@ -50,74 +51,81 @@ export default async function WorkspacePage() {
 
   const productMap = new Map(products.map((product) => [product.id, product]));
   const downloadable = entitlements.filter(
-    (entitlement) => entitlement.permission === "product.download"
+    (entitlement) => entitlement.permission === "product.download",
   );
   const observations = directory?.servers ?? [];
   const liveByServerId = new Map(
     ownedServers.map((server) => [
       server.id,
-      observations.find((observation) => matchesMtaEndpoint(server, observation)) ?? null,
-    ])
+      observations.find((observation) =>
+        matchesMtaEndpoint(server, observation),
+      ) ?? null,
+    ]),
   );
   const onlineServers = ownedServers.filter((server) => {
     const observation = liveByServerId.get(server.id);
     return Boolean(observation && observation.responding !== false);
   });
   const onlinePlayers = onlineServers.reduce(
-    (total, server) => total + (liveByServerId.get(server.id)?.players ?? 0),
-    0
+    (total, server) =>
+      total + (liveByServerId.get(server.id)?.players ?? 0),
+    0,
   );
+  const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <header className="flex flex-col justify-between gap-4 border-b border-base pb-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-display text-primary">{dictionary.workspace.title}</h1>
-          <p className="font-caption text-muted mt-0.5">
+          <h1 className="font-display text-primary">
+            {dictionary.workspace.title}
+          </h1>
+          <p className="mt-0.5 font-caption text-muted">
             @{user.username} · {dictionary.workspace.subtitle}
           </p>
-          <p className="font-caption text-faint mt-1">
+          <p className="mt-1 max-w-2xl font-caption text-faint">
             {dictionary.workspace.liveNote}
           </p>
         </div>
+
         <div className="flex flex-wrap gap-2">
           <Link
             href="/workspace/resources/new"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold"
+            className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
             {dictionary.workspace.publishResource}
           </Link>
           <Link
             href="/workspace/servers/new"
-            className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"
+            className="flex items-center gap-1.5 rounded-md border border-base bg-surface px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:border-strong hover:bg-hover hover:text-primary"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
             {dictionary.workspace.registerServer}
           </Link>
         </div>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           label={dictionary.workspace.resources}
           value={downloadable.length}
           tone="purple"
-          icon={<Box className="w-4 h-4" />}
+          icon={<Box className="h-4 w-4" />}
           context={dictionary.workspace.inLibrary}
         />
         <StatCard
           label={dictionary.workspace.yourServers}
           value={ownedServers.length}
           tone="accent"
-          icon={<ServerIcon className="w-4 h-4" />}
+          icon={<ServerIcon className="h-4 w-4" />}
           context={`${onlineServers.length} ${dictionary.workspace.online}`}
         />
         <StatCard
           label={dictionary.workspace.playersOnline}
           value={onlinePlayers}
           tone="success"
-          icon={<Users className="w-4 h-4" />}
+          icon={<Users className="h-4 w-4" />}
           context={dictionary.workspace.onServers}
         />
       </div>
@@ -127,36 +135,50 @@ export default async function WorkspacePage() {
           title={dictionary.workspace.libraryTitle}
           description={dictionary.workspace.libraryDescription}
           action={
-            <Link href="/market?maxPrice=0" className="text-xs font-semibold text-accent">
+            <Link
+              href="/market?maxPrice=0"
+              className="text-xs font-semibold text-accent hover:underline"
+            >
               {dictionary.workspace.browseResources}
             </Link>
           }
         />
+
         {downloadable.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {downloadable.map((entitlement) => {
               const product = productMap.get(entitlement.resourceId);
               return (
-                <div key={entitlement.id} className="nexus-panel p-4 flex items-center justify-between gap-3">
+                <article
+                  key={entitlement.id}
+                  className="nexus-panel flex items-center justify-between gap-3 p-4"
+                >
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-white truncate">
-                      {product?.title || dictionary.workspace.unavailableResource}
+                    <div className="truncate text-sm font-semibold text-primary">
+                      {product?.title ||
+                        dictionary.workspace.unavailableResource}
                     </div>
-                    <div className="text-xs text-neutral-500">
-                      {dictionary.workspace.added} {new Date(entitlement.createdAt).toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US")}
+                    <div className="text-xs text-faint">
+                      {dictionary.workspace.added}{" "}
+                      {new Date(entitlement.createdAt).toLocaleDateString(
+                        dateLocale,
+                      )}
                     </div>
                   </div>
                   {product && (
-                    <Link href={`/market/${product.slug}`} className="text-xs font-semibold text-accent">
+                    <Link
+                      href={`/market/${product.slug}`}
+                      className="shrink-0 text-xs font-semibold text-accent hover:underline"
+                    >
                       {dictionary.workspace.open}
                     </Link>
                   )}
-                </div>
+                </article>
               );
             })}
           </div>
         ) : (
-          <div className="nexus-panel p-8 text-center text-sm text-neutral-400">
+          <div className="nexus-panel p-8 text-center text-sm text-muted">
             {dictionary.workspace.emptyLibrary}
           </div>
         )}
@@ -167,42 +189,72 @@ export default async function WorkspacePage() {
           title={dictionary.workspace.yourServers}
           description={dictionary.workspace.serversDescription}
           action={
-            <Link href="/workspace/servers/new" className="text-xs font-semibold text-accent">
+            <Link
+              href="/workspace/servers/new"
+              className="text-xs font-semibold text-accent hover:underline"
+            >
               {dictionary.workspace.registerServer}
             </Link>
           }
         />
+
         {ownedServers.length > 0 ? (
           <div className="space-y-3">
             {ownedServers.map((server) => {
               const observation = liveByServerId.get(server.id);
-              const isOnline = Boolean(observation && observation.responding !== false);
-              const isOffline = Boolean(observation && observation.responding === false);
+              const isOnline = Boolean(
+                observation && observation.responding !== false,
+              );
+              const isOffline = Boolean(
+                observation && observation.responding === false,
+              );
+              const status = isOnline
+                ? dictionary.servers.online
+                : isOffline
+                  ? dictionary.servers.offline
+                  : dictionary.servers.unknown;
+
               return (
-                <div key={server.id} className="nexus-panel p-4 flex items-center justify-between gap-3">
+                <article
+                  key={server.id}
+                  className="nexus-panel flex flex-wrap items-center justify-between gap-3 p-4"
+                >
                   <div className="min-w-0">
-                    <Link href={`/servers/${server.slug}`} className="text-sm font-semibold text-white hover:text-accent">
+                    <Link
+                      href={`/servers/${server.slug}`}
+                      className="text-sm font-semibold text-primary transition-colors hover:text-accent"
+                    >
                       {server.name}
                     </Link>
-                    <div className="text-xs text-neutral-500 font-mono">
+                    <div className="font-mono text-xs text-faint">
                       {server.ipAddress}:{server.port}
                     </div>
                   </div>
+
                   <div className="flex items-center gap-3">
-                    <Link href={"/workspace/servers/" + server.id} className="text-xs font-semibold text-accent">
+                    <Link
+                      href={`/workspace/servers/${server.id}`}
+                      className="text-xs font-semibold text-accent hover:underline"
+                    >
                       {dictionary.workspace.manage}
                     </Link>
                     <StatusBadge
-                      status={isOnline ? "online" : isOffline ? "offline" : "unknown"}
-                      tone={isOnline ? "success" : "neutral"}
+                      status={status}
+                      tone={
+                        isOnline
+                          ? "success"
+                          : isOffline
+                            ? "danger"
+                            : "neutral"
+                      }
                     />
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>
         ) : (
-          <div className="nexus-panel p-8 text-center text-sm text-neutral-400">
+          <div className="nexus-panel p-8 text-center text-sm text-muted">
             {dictionary.workspace.noServers}
           </div>
         )}
