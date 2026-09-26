@@ -10,7 +10,14 @@ import { notifyServerFollowersOfPublishedContent } from "./server-follow-notific
 
 export class ContentService {
   async listArticles(limit = 50): Promise<Content[]> {
-    return contentRepository.listPublished(limit);
+    const editorialTypes: Content["type"][] = [
+      "article",
+      "news",
+      "devlog",
+      "update",
+      "announcement",
+    ];
+    return contentRepository.listPublishedByTypes(editorialTypes, limit);
   }
 
   async listCommunityTopics(limit = 50): Promise<Content[]> {
