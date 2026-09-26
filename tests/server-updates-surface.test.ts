@@ -12,13 +12,21 @@ describe("server update feed surface", () => {
     );
 
     expect(repository).toContain("listPublishedByServer");
-    expect(repository).toContain('"article"');
-    expect(repository).toContain('"news"');
-    expect(repository).toContain('"devlog"');
-    expect(repository).toContain('"update"');
-    expect(repository).toContain('"announcement"');
-    expect(repository).toContain('eq(content.status, "published")');
-    expect(repository).toContain("inArray(content.type, publicServerUpdateTypes)");
+    for (const type of [
+      '"article"',
+      '"news"',
+      '"devlog"',
+      '"update"',
+      '"announcement"',
+    ]) {
+      expect(repository).toContain(type);
+    }
+    expect(repository).toContain(
+      'eq(content.status, "published")',
+    );
+    expect(repository).toContain(
+      "inArray(content.type, publicServerUpdateTypes)",
+    );
     expect(repository).toContain(
       "coalesce(${content.publishedAt}, ${content.updatedAt})",
     );
@@ -27,23 +35,36 @@ describe("server update feed surface", () => {
     );
   });
 
-  it("loads official directory status and content feed in parallel", () => {
-    const page = read("apps/web/src/app/servers/[slug]/page.tsx");
+  it("loads official directory status, history and content feed in parallel", () => {
+    const page = read(
+      "apps/web/src/app/servers/[slug]/page.tsx",
+    );
 
-    expect(page).toContain("const [directory, serverUpdates] = await Promise.all([");
-    expect(page).toContain("mtaMasterDirectoryService.getDirectory().catch(() => null)");
-    expect(page).toContain("contentService.listServerUpdates(server.id, 6).catch(() => null)");
-    expect(page).toContain("<ServerUpdatesPanel updates={serverUpdates} />");
+    expect(page).toContain(
+      "const [directory, history, serverUpdates] = await Promise.all([",
+    );
+    expect(page).toContain(
+      "mtaMasterDirectoryService.getDirectory().catch(() => null)",
+    );
+    expect(page).toContain(
+      "contentService.listServerUpdates(server.id, 6).catch(() => null)",
+    );
+    expect(page).toContain("<ServerUpdatesPanel");
+    expect(page).toContain("updates={serverUpdates}");
+    expect(page).toContain("locale={locale}");
   });
 
-  it("distinguishes empty and unavailable update feeds", () => {
+  it("distinguishes empty and unavailable update feeds through locale copy", () => {
     const panel = read(
       "apps/web/src/components/server-updates-panel.tsx",
     );
 
-    expect(panel).toContain("Server updates are temporarily unavailable");
-    expect(panel).toContain("No published server updates yet");
-    expect(panel).toContain("Moderated content");
+    expect(panel).toContain(
+      "getDictionary(locale).serverUpdates",
+    );
+    expect(panel).toContain("copy.unavailable");
+    expect(panel).toContain("copy.empty");
+    expect(panel).toContain("copy.moderated");
     expect(panel).toContain("<ArticleCard");
   });
 });

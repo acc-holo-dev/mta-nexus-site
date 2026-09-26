@@ -2,18 +2,26 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+const read = (path: string) =>
+  readFileSync(resolve(process.cwd(), path), "utf8");
+
 describe("editorial server detail live linkage", () => {
   it("keeps live observations separate and matches by normalized public endpoint", () => {
-    const page = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/servers/[slug]/page.tsx"),
-      "utf8"
+    const page = read(
+      "apps/web/src/app/servers/[slug]/page.tsx",
     );
 
     expect(page).toContain("matchesMtaEndpoint");
-    expect(page).toContain("mtaMasterDirectoryService.getDirectory()");
-    expect(page).toContain("No current observation in the official MTA directory.");
-    expect(page).toContain('<span>{observedServer ? (isOnline ? "ONLINE" : "OFFLINE") : "UNKNOWN"}</span>');
-    expect(page).not.toContain("item.address === server.ipAddress");
+    expect(page).toContain(
+      "mtaMasterDirectoryService.getDirectory()",
+    );
+    expect(page).toContain("copy.noObservation");
+    expect(page).toContain("serverCopy.online");
+    expect(page).toContain("serverCopy.offline");
+    expect(page).toContain("serverCopy.unknown");
+    expect(page).not.toContain(
+      "item.address === server.ipAddress",
+    );
     expect(page).not.toContain("heartbeat");
   });
 });

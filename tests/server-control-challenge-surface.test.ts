@@ -16,10 +16,14 @@ describe("server control proof surface", () => {
 
     expect(repository).toContain("tokenDigest");
     expect(repository).not.toContain("token: input.token");
-    expect(repository).toContain("SERVER_CONTROL_SNAPSHOT_TOO_OLD");
+    expect(repository).toContain(
+      "SERVER_CONTROL_SNAPSHOT_TOO_OLD",
+    );
     expect(service).toContain("directory.isStale");
     expect(service).toContain("observed.responding === false");
-    expect(service).toContain("observed.name.includes(input.token)");
+    expect(service).toContain(
+      "observed.name.includes(input.token)",
+    );
     expect(repository).toContain(
       'proofMethod: "mta_master_name_challenge"',
     );
@@ -29,12 +33,16 @@ describe("server control proof surface", () => {
   });
 
   it("blocks generic and repository-level server verification bypasses", () => {
-    const route = read("apps/web/src/app/api/verification/route.ts");
+    const route = read(
+      "apps/web/src/app/api/verification/route.ts",
+    );
     const repository = read(
       "packages/db/src/repositories/verification.ts",
     );
 
-    expect(route).toContain("SERVER_CONTROL_CHALLENGE_REQUIRED");
+    expect(route).toContain(
+      "SERVER_CONTROL_CHALLENGE_REQUIRED",
+    );
     expect(route).toContain(
       "Server ownership verification requires the MTA control challenge flow.",
     );
@@ -65,7 +73,7 @@ describe("server control proof surface", () => {
     );
   });
 
-  it("exposes proof UI for unowned public listings and managed unverified listings", () => {
+  it("exposes localized proof UI for eligible listings", () => {
     const publicPage = read(
       "apps/web/src/app/servers/[slug]/page.tsx",
     );
@@ -82,9 +90,8 @@ describe("server control proof surface", () => {
     expect(publicPage).toContain("<ServerClaimControlPanel");
     expect(workspacePage).toContain("!server.isVerified");
     expect(workspacePage).toContain("<ServerClaimControlPanel");
-    expect(panel).toContain("Master-list presence alone is not treated as proof");
-    expect(panel).toContain(
-      "Control proof does not assign ownership by itself",
-    );
+    expect(panel).toContain("copy.exactEndpoint");
+    expect(panel).toContain("copy.moderationSeparate");
+    expect(panel).toContain("dictionary.serverClaim");
   });
 });
