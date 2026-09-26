@@ -446,3 +446,11 @@ At that point:
 - Codex owns continuation, debugging, verification and release preparation;
 - the human owner retains the final decision for destructive data operations and production deployment.
 
+
+### 7.8 Social-state verification slice
+
+The follow and notification-read routes now return the server-confirmed target and resulting state. The server-follow control checks the target identity and state before showing a successful change; it does not treat HTTP 409 alone as proof. Notification read requests reject ambiguous bodies before any bulk update. The notification surfaces reload the inbox after a confirmed bulk change and discard older in-flight responses, so a concurrent notification is not silently marked read in the UI.
+
+The verification approach for this slice is a small state matrix plus HTTP route tests: malformed bodies must not trigger bulk writes, an unrelated conflict must not confirm a follow, delivery failure after a committed follow must not report that follow as failed, and another user's notification must remain inaccessible. These checks cover observable behavior and are additive to browser acceptance. They are **not** release evidence until executed successfully against an exact current `main` SHA.
+
+Next: restore executed CI jobs (the zero-step runner blocker), run the focused HTTP/state tests and then the full verification commands from Stage 2 on the same SHA. Validate desktop/mobile RU/EN follow and inbox flows in Stage 4. Branch cleanup in Stage 1 remains open until remote refs can be safely deleted after comparison.

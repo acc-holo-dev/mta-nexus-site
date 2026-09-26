@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNexusLocale } from "./locale-context";
+import { confirmsFollowMutation } from "../lib/follow-confirmation";
 
 type FollowState =
   | "checking"
@@ -95,16 +96,21 @@ export function ServerFollowButton({
         setState("anonymous");
         return;
       }
-      if (response.status === 409 && state === "not-following") {
-        setState("following");
-        return;
-      }
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true) {
-        throw new Error("Follow mutation failed");
+      const expectedFollowing = state !== "following";
+      if (
+        !confirmsFollowMutation(
+          response.status,
+          data,
+          "server",
+          serverId,
+          expectedFollowing,
+        )
+      ) {
+        throw new Error("Follow mutation could not be confirmed");
       }
 
-      setState(state === "following" ? "not-following" : "following");
+      setState(expectedFollowing ? "following" : "not-following");
     } catch {
       setState("error");
     } finally {

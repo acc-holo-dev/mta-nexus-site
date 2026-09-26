@@ -63,9 +63,9 @@ describe("mutation confirmation contracts", () => {
       "apps/web/src/components/server-follow-button.tsx",
     );
 
-    expect(source).toContain("data?.success !== true");
-    expect(source.indexOf("data?.success !== true")).toBeLessThan(
-      source.lastIndexOf("setState("),
+    expect(source).toContain("confirmsFollowMutation(");
+    expect(source.indexOf("confirmsFollowMutation(")).toBeLessThan(
+      source.indexOf("setState(expectedFollowing"),
     );
   });
 

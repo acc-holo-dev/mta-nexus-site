@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import Link from "next/link";
@@ -26,8 +27,10 @@ export default function NotificationCenterPage() {
   const [marking, setMarking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "unread">("all");
+  const requestGeneration = useRef(0);
 
   const loadNotifications = useCallback(async () => {
+    const generation = ++requestGeneration.current;
     setLoading(true);
     setError(null);
     try {
@@ -44,8 +47,9 @@ export default function NotificationCenterPage() {
       if (!response.ok || !Array.isArray(data?.notifications)) {
         throw new Error(data?.error || copy.loadError);
       }
-      setNotifications(data.notifications);
+      if (generation === requestGeneration.current) setNotifications(data.notifications);
     } catch (caught) {
+      if (generation !== requestGeneration.current) return;
       setNotifications([]);
       setError(
         caught instanceof Error && caught.message
@@ -53,7 +57,7 @@ export default function NotificationCenterPage() {
           : copy.loadError,
       );
     } finally {
-      setLoading(false);
+      if (generation === requestGeneration.current) setLoading(false);
     }
   }, [filter, copy.loadError]);
 
@@ -63,6 +67,7 @@ export default function NotificationCenterPage() {
 
   async function markAllRead() {
     if (marking) return;
+    requestGeneration.current += 1;
     setMarking(true);
     setError(null);
     try {
@@ -73,15 +78,11 @@ export default function NotificationCenterPage() {
         signal: AbortSignal.timeout(15_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true) {
+      if (!response.ok || data?.success !== true || data?.scope !== "all") {
         throw new Error(data?.error || copy.markError);
       }
-      setNotifications((previous) =>
-        previous.map((notification) => ({
-          ...notification,
-          isRead: true,
-        })),
-      );
+      // Confirm the state from the server, including notifications added concurrently.
+      await loadNotifications();
     } catch (caught) {
       setError(
         caught instanceof Error && caught.message

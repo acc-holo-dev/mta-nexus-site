@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   AlertTriangle,
@@ -20,12 +20,14 @@ export function NotificationBell() {
   const [error, setError] = useState<string | null>(null);
   const [marking, setMarking] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const mutationGeneration = useRef(0);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   useEffect(() => {
     let active = true;
 
     async function fetchNotifications() {
+      const generation = mutationGeneration.current;
       try {
         const response = await fetch("/api/notifications?limit=6", {
           cache: "no-store",
@@ -41,13 +43,13 @@ export function NotificationBell() {
           throw new Error(copy.loadError);
         }
 
-        if (active) {
+        if (active && generation === mutationGeneration.current) {
           setNotifications(data.notifications);
           setUnreadCount(data.unreadCount);
           setError(null);
         }
       } catch {
-        if (active) setError(copy.loadError);
+        if (active && generation === mutationGeneration.current) setError(copy.loadError);
       }
     }
 
@@ -75,6 +77,7 @@ export function NotificationBell() {
   async function markAllRead() {
     if (marking || unreadCount === 0) return;
 
+    mutationGeneration.current += 1;
     setMarking(true);
     setError(null);
     try {
@@ -85,17 +88,12 @@ export function NotificationBell() {
         signal: AbortSignal.timeout(10_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true) {
+      if (!response.ok || data?.success !== true || data?.scope !== "all") {
         throw new Error(copy.markError);
       }
 
-      setUnreadCount(0);
-      setNotifications((previous) =>
-        previous.map((notification) => ({
-          ...notification,
-          isRead: true,
-        })),
-      );
+      // Read the server state again; a notification may arrive during this request.
+      setAttempt((value) => value + 1);
     } catch {
       setError(copy.markError);
     } finally {

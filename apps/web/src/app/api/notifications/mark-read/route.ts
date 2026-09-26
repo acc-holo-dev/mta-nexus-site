@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
 import { consumeRateLimit } from "@nexus/security";
+import { parseNotificationReadTarget } from "../../../../lib/notification-read";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -32,21 +33,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json().catch(() => ({}));
-    if (body.id) {
-      // IDOR protection: only mark notifications owned by the current user
-      const updated = await notificationRepository.markAsRead(body.id, user.id);
+    const target = parseNotificationReadTarget(await request.text());
+    if (!target) {
+      return json({ error: "Invalid notification target" }, 400);
+    }
+    if (target.scope === "single") {
+      // IDOR protection: only mark notifications owned by the current user.
+      const updated = await notificationRepository.markAsRead(target.id, user.id);
       if (!updated) {
-        return json(
-          { error: "Notification not found or not owned by you" },
-          404 
-        );
+        return json({ error: "Notification not found or not owned by you" }, 404);
       }
-    } else {
-      await notificationRepository.markAllAsRead(user.id);
+      return json({ success: true, scope: "single", id: target.id });
     }
 
-    return json({ success: true });
+    await notificationRepository.markAllAsRead(user.id);
+    return json({ success: true, scope: "all" });
   } catch (error: unknown) {
     console.error("Notification update error:", error);
     return json({ error: "Failed to mark notifications read" }, 500 );

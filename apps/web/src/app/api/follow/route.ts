@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!targetId || typeof targetId !== "string") {
+    if (typeof targetId !== "string" || targetId.length === 0 || targetId.length > 128) {
       return privateJson({ error: "Target ID required" }, { status: 400 });
     }
 
@@ -128,11 +128,16 @@ export async function POST(request: NextRequest) {
       targetId,
     });
     if (!follow) {
-      return privateJson({ error: "Already following this target" }, { status: 409 });
+      const following = await socialRepository.isFollowing(user.id, targetType, targetId);
+      return privateJson(
+        { error: following ? "Already following this target" : "Could not confirm follow", targetType, targetId, following },
+        { status: following ? 409 : 503 },
+      );
     }
 
     if (targetType === "user" && targetId !== user.id) {
-      await notificationRepository.create({
+      try {
+        await notificationRepository.create({
         id: generateId("not"),
         recipientId: targetId,
         title: "New Follower",
@@ -140,10 +145,14 @@ export async function POST(request: NextRequest) {
         type: "system",
         category: "follow",
         link: `/users/${user.username}`,
-      });
+        });
+      } catch (error) {
+        // The follow already committed. Notification delivery must not turn it into a failed mutation.
+        console.error("Follow notification delivery failed:", error);
+      }
     }
 
-    return privateJson({ success: true, follow });
+    return privateJson({ success: true, targetType, targetId, following: true, follow });
   } catch (error: unknown) {
     console.error("Follow API error:", error);
     return privateJson({ error: "Follow request failed" }, { status: 500 });
@@ -176,13 +185,13 @@ export async function DELETE(request: NextRequest) {
     if (!isTargetType(targetType)) {
       return privateJson({ error: "Invalid target type" }, { status: 400 });
     }
-    if (typeof targetId !== "string" || targetId.length === 0) {
+    if (typeof targetId !== "string" || targetId.length === 0 || targetId.length > 128) {
       return privateJson({ error: "Target ID required" }, { status: 400 });
     }
 
     await socialRepository.unfollow(user.id, targetType, targetId);
 
-    return privateJson({ success: true });
+    return privateJson({ success: true, targetType, targetId, following: false });
   } catch (error: unknown) {
     console.error("Follow API error:", error);
     return privateJson({ error: "Follow request failed" }, { status: 500 });
