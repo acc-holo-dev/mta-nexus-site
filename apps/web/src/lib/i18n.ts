@@ -325,6 +325,46 @@ const en = {
     registerError: "We could not confirm registration. Try signing in before registering again.",
     loginError: "We could not confirm sign in. Check your connection and try again.",
   },
+  recovery: {
+    forgotTitle: "Forgot password",
+    forgotDescription:
+      "Enter your account email. For privacy, the response is the same whether or not that address can be used for recovery.",
+    email: "Email address",
+    submitting: "Submitting...",
+    sendReset: "Send reset link",
+    unavailable: "Password reset is temporarily unavailable.",
+    accepted:
+      "If an eligible account uses that email, a password reset link will be sent.",
+    backToSignIn: "Back to sign in",
+    resetTitle: "Reset password",
+    checkingReset: "Checking this reset link...",
+    invalidReset: "This reset link is incomplete or invalid.",
+    requestNew: "Request a new link",
+    resetDescription:
+      "Choose a new password. A successful reset signs out every existing session.",
+    passwordsMismatch: "Passwords do not match.",
+    resetFailed: "Could not reset the password.",
+    newPassword: "New password",
+    confirmPassword: "Confirm new password",
+    resetting: "Resetting...",
+    reset: "Reset password",
+    resetSuccess:
+      "Password reset. All existing sessions were signed out. Sign in with your new password.",
+    signIn: "Sign in",
+    verifyTitle: "Confirm recovery email",
+    checkingVerification: "Checking this confirmation link...",
+    invalidVerification:
+      "This confirmation link is incomplete or invalid. Request a new one from Settings.",
+    backToSettings: "Back to Settings",
+    verifyDescription:
+      "Confirming verifies the email currently stored on your account for future recovery. It does not change your password or sign you out.",
+    confirming: "Confirming...",
+    confirmEmail: "Confirm email",
+    verifyFailed: "Could not confirm this email. Please try again.",
+    retry: "Try again",
+    verifiedPrefix: "Recovery email verified:",
+    confirmationConsumed: "The confirmation cannot be used again.",
+  },
   product: {
     notFound: "Product not found",
     privatePreview: "Private creator preview",
@@ -1054,6 +1094,46 @@ const ru: typeof en = {
     genericError: "Не удалось выполнить запрос. Попробуйте ещё раз.",
     registerError: "Не удалось подтвердить регистрацию. Перед повторной регистрацией попробуйте войти.",
     loginError: "Не удалось подтвердить вход. Проверьте соединение и попробуйте ещё раз.",
+  },
+  recovery: {
+    forgotTitle: "Забыли пароль",
+    forgotDescription:
+      "Введите email аккаунта. Для защиты приватности ответ будет одинаковым независимо от того, можно ли использовать этот адрес для восстановления.",
+    email: "Email",
+    submitting: "Отправка...",
+    sendReset: "Отправить ссылку",
+    unavailable: "Восстановление пароля временно недоступно.",
+    accepted:
+      "Если подходящий аккаунт использует этот email, ссылка для сброса пароля будет отправлена.",
+    backToSignIn: "Назад ко входу",
+    resetTitle: "Сброс пароля",
+    checkingReset: "Проверка ссылки сброса...",
+    invalidReset: "Ссылка сброса неполная или недействительна.",
+    requestNew: "Запросить новую ссылку",
+    resetDescription:
+      "Выберите новый пароль. После успешного сброса все существующие сессии будут завершены.",
+    passwordsMismatch: "Пароли не совпадают.",
+    resetFailed: "Не удалось сбросить пароль.",
+    newPassword: "Новый пароль",
+    confirmPassword: "Подтвердите новый пароль",
+    resetting: "Сброс...",
+    reset: "Сбросить пароль",
+    resetSuccess:
+      "Пароль сброшен. Все существующие сессии завершены. Войдите с новым паролем.",
+    signIn: "Войти",
+    verifyTitle: "Подтвердить email восстановления",
+    checkingVerification: "Проверка ссылки подтверждения...",
+    invalidVerification:
+      "Ссылка подтверждения неполная или недействительна. Запросите новую в настройках.",
+    backToSettings: "Назад к настройкам",
+    verifyDescription:
+      "Подтверждение закрепит текущий email аккаунта для будущего восстановления. Пароль и текущая сессия не изменятся.",
+    confirming: "Подтверждение...",
+    confirmEmail: "Подтвердить email",
+    verifyFailed: "Не удалось подтвердить email. Попробуйте ещё раз.",
+    retry: "Повторить",
+    verifiedPrefix: "Email восстановления подтверждён:",
+    confirmationConsumed: "Эту ссылку подтверждения нельзя использовать повторно.",
   },
   product: {
     notFound: "Ресурс не найден",

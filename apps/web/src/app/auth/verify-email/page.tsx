@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MailCheck } from "lucide-react";
+import { Button } from "@nexus/ui";
+import { useNexusLocale } from "../../../components/locale-context";
 
 type Proof = { challengeId: string; token: string };
 type State =
@@ -16,18 +18,25 @@ type State =
 function readProof(): Proof | null {
   const url = new URL(window.location.href);
   const challengeId = url.searchParams.get("challenge") ?? "";
-  const fragment = new URLSearchParams(url.hash.startsWith("#") ? url.hash.slice(1) : url.hash);
+  const fragment = new URLSearchParams(
+    url.hash.startsWith("#") ? url.hash.slice(1) : url.hash,
+  );
   const token = fragment.get("token") ?? "";
-  // Strip both the secret fragment and correlation-only challenge ID before
-  // any user action so neither remains in browser history or future referrers.
+
   window.history.replaceState(null, "", url.pathname);
-  if (!/^ach_[A-Za-z0-9_-]{1,96}$/.test(challengeId) || !/^[A-Za-z0-9_-]{43}$/.test(token)) {
+
+  if (
+    !/^ach_[A-Za-z0-9_-]{1,96}$/.test(challengeId) ||
+    !/^[A-Za-z0-9_-]{43}$/.test(token)
+  ) {
     return null;
   }
   return { challengeId, token };
 }
 
 export default function VerifyEmailPage() {
+  const { dictionary } = useNexusLocale();
+  const copy = dictionary.recovery;
   const [state, setState] = useState<State>({ kind: "loading" });
 
   useEffect(() => {
@@ -37,6 +46,7 @@ export default function VerifyEmailPage() {
 
   async function confirm(proof: Proof) {
     setState({ kind: "submitting", proof });
+
     try {
       const response = await fetch("/api/auth/email-verification", {
         method: "PATCH",
@@ -47,67 +57,123 @@ export default function VerifyEmailPage() {
         signal: AbortSignal.timeout(15_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true || typeof data.email !== "string") {
+
+      if (
+        !response.ok ||
+        data?.success !== true ||
+        typeof data.email !== "string"
+      ) {
         if (response.status >= 400 && response.status < 500) {
           setState({ kind: "invalid" });
           return;
         }
-        throw new Error(data?.error || "Could not confirm this email. Please try again.");
+        throw new Error(data?.error || copy.verifyFailed);
       }
+
       setState({ kind: "success", email: data.email });
     } catch (error: unknown) {
       setState({
         kind: "error",
         proof,
-        message: error instanceof Error ? error.message : "Could not confirm this email. Please try again.",
+        message:
+          error instanceof Error && error.message
+            ? error.message
+            : copy.verifyFailed,
       });
     }
   }
 
   return (
-    <div className="max-w-lg mx-auto py-16">
-      <section aria-labelledby="verify-email-heading" className="nexus-panel p-6 space-y-5">
+    <div className="mx-auto max-w-lg py-16">
+      <section
+        aria-labelledby="verify-email-heading"
+        className="nexus-panel space-y-5 p-6 shadow-nexus-sm"
+      >
         <div className="flex items-center gap-3">
-          <MailCheck className="w-5 h-5 text-accent" aria-hidden="true" />
-          <h1 id="verify-email-heading" className="font-display text-primary">Confirm recovery email</h1>
+          <MailCheck className="h-5 w-5 text-accent" aria-hidden="true" />
+          <h1
+            id="verify-email-heading"
+            className="font-display text-primary"
+          >
+            {copy.verifyTitle}
+          </h1>
         </div>
-        {state.kind === "loading" && <p role="status" className="text-sm text-muted">Checking this confirmation link...</p>}
+
+        {state.kind === "loading" && (
+          <p role="status" className="text-sm text-muted">
+            {copy.checkingVerification}
+          </p>
+        )}
+
         {state.kind === "invalid" && (
           <>
-            <p role="alert" className="text-sm text-muted">This confirmation link is incomplete or invalid. Request a new one from Settings.</p>
-            <Link href="/settings" className="inline-block text-sm font-semibold text-accent">Back to Settings</Link>
+            <p role="alert" className="text-sm text-muted">
+              {copy.invalidVerification}
+            </p>
+            <Link
+              href="/settings"
+              className="inline-block text-sm font-semibold text-accent hover:underline"
+            >
+              {copy.backToSettings}
+            </Link>
           </>
         )}
+
         {(state.kind === "ready" || state.kind === "submitting") && (
           <>
-            <p className="text-sm text-muted">
-              Confirming verifies the email currently stored on your account for future recovery. It does not change your password or sign you out.
+            <p className="text-sm leading-relaxed text-muted">
+              {copy.verifyDescription}
             </p>
-            <button
+            <Button
               type="button"
-              disabled={state.kind === "submitting"}
+              isLoading={state.kind === "submitting"}
               onClick={() => void confirm(state.proof)}
-              className="px-4 py-2 rounded-md bg-accent text-white text-sm font-semibold disabled:opacity-50"
             >
-              {state.kind === "submitting" ? "Confirming..." : "Confirm email"}
-            </button>
+              {state.kind === "submitting"
+                ? copy.confirming
+                : copy.confirmEmail}
+            </Button>
           </>
         )}
+
         {state.kind === "error" && (
           <>
-            <p role="alert" className="text-sm text-muted">{state.message}</p>
+            <p
+              role="alert"
+              className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-3 text-sm text-danger"
+            >
+              {state.message}
+            </p>
             {state.proof && (
-              <button type="button" onClick={() => void confirm(state.proof!)}
-                className="px-4 py-2 rounded-md bg-accent text-white text-sm font-semibold">Try again</button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => void confirm(state.proof!)}
+              >
+                {copy.retry}
+              </Button>
             )}
-            <Link href="/settings" className="block text-sm font-semibold text-accent">Back to Settings</Link>
+            <Link
+              href="/settings"
+              className="block text-sm font-semibold text-accent hover:underline"
+            >
+              {copy.backToSettings}
+            </Link>
           </>
         )}
+
         {state.kind === "success" && (
           <>
-            <p role="status" className="text-sm text-primary">Recovery email verified: {state.email}</p>
-            <p className="text-xs text-muted">The confirmation cannot be used again.</p>
-            <Link href="/settings" className="inline-block text-sm font-semibold text-accent">Back to Settings</Link>
+            <p role="status" className="text-sm text-success">
+              {copy.verifiedPrefix} {state.email}
+            </p>
+            <p className="text-xs text-muted">{copy.confirmationConsumed}</p>
+            <Link
+              href="/settings"
+              className="inline-block text-sm font-semibold text-accent hover:underline"
+            >
+              {copy.backToSettings}
+            </Link>
           </>
         )}
       </section>
