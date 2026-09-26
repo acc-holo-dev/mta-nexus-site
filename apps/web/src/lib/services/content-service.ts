@@ -170,7 +170,7 @@ export class ContentService {
       limit: 4,
     });
     const trendingServers = await serverRepository.listActivePublic(3);
-    const recentArticles = await contentRepository.listPublished(3);
+    const recentArticles = await this.listArticles(3);
 
     return {
       featuredProducts,
