@@ -1,16 +1,27 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { type FormEvent, useState } from "react";
 import Link from "next/link";
+import { Button } from "@nexus/ui";
 import { MtaMetaInspectorPanel } from "../../../../components/mta-meta-inspector-panel";
+import { useNexusLocale } from "../../../../components/locale-context";
+
+const fieldClass =
+  "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
+const labelClass = "space-y-1.5";
+const labelTextClass = "font-label text-secondary";
 
 export default function NewResourcePage() {
+  const { dictionary } = useNexusLocale();
+  const copy = dictionary.publishing;
   const [loading, setLoading] = useState(false);
   const [resultSlug, setResultSlug] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading) return;
+
     setLoading(true);
     setError(null);
     const form = new FormData(event.currentTarget);
@@ -18,12 +29,14 @@ export default function NewResourcePage() {
     try {
       const productResponse = await fetch("/api/products", {
         method: "POST",
+        cache: "no-store",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: String(form.get("title") || ""),
-          slug: String(form.get("slug") || ""),
-          shortDescription: String(form.get("shortDescription") || ""),
-          description: String(form.get("description") || ""),
+          title: String(form.get("title") || "").trim(),
+          slug: String(form.get("slug") || "").trim().toLowerCase(),
+          shortDescription: String(form.get("shortDescription") || "").trim(),
+          description: String(form.get("description") || "").trim(),
           type: String(form.get("type") || "script"),
           price: 0,
           currency: "USD",
@@ -33,43 +46,60 @@ export default function NewResourcePage() {
             .map((tag) => tag.trim())
             .filter(Boolean),
           compatibility: {
-            mtaMinVersion: String(form.get("mtaMinVersion") || "") || undefined,
+            mtaMinVersion:
+              String(form.get("mtaMinVersion") || "").trim() || undefined,
             dependencies: String(form.get("dependencies") || "")
               .split(",")
               .map((dependency) => dependency.trim().toLowerCase())
               .filter(Boolean),
           },
         }),
+        signal: AbortSignal.timeout(15_000),
       });
-      const productData = await productResponse.json();
-      if (!productResponse.ok) {
-        throw new Error(productData.error || "Could not create resource");
+      const productData = await productResponse.json().catch(() => null);
+      if (!productResponse.ok || !productData?.product?.id) {
+        throw new Error(productData?.error || copy.createError);
       }
 
       const buildForm = new FormData();
-      buildForm.set("version", String(form.get("version") || "1.0.0"));
-      buildForm.set("releaseNotes", String(form.get("releaseNotes") || ""));
-      buildForm.set("mtaVersionTarget", String(form.get("mtaMinVersion") || ""));
+      buildForm.set("version", String(form.get("version") || "1.0.0").trim());
+      buildForm.set(
+        "releaseNotes",
+        String(form.get("releaseNotes") || "").trim(),
+      );
+      buildForm.set(
+        "mtaVersionTarget",
+        String(form.get("mtaMinVersion") || "").trim(),
+      );
+
       const file = form.get("file");
       if (!(file instanceof File) || file.size === 0) {
-        throw new Error("Choose a build archive");
+        throw new Error(copy.chooseArchive);
       }
       buildForm.set("file", file);
 
       const buildResponse = await fetch(
-        `/api/products/${productData.product.id}/builds`,
-        { method: "POST", body: buildForm }
+        `/api/products/${encodeURIComponent(productData.product.id)}/builds`,
+        {
+          method: "POST",
+          cache: "no-store",
+          credentials: "same-origin",
+          body: buildForm,
+          signal: AbortSignal.timeout(60_000),
+        },
       );
-      const buildData = await buildResponse.json();
+      const buildData = await buildResponse.json().catch(() => null);
       if (!buildResponse.ok) {
-        throw new Error(
-          buildData.error || "Resource was created, but the build could not be published"
-        );
+        throw new Error(buildData?.error || copy.buildError);
       }
 
       setResultSlug(productData.product.slug);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unexpected publishing error");
+      setError(
+        caught instanceof Error && caught.message
+          ? caught.message
+          : copy.unexpectedError,
+      );
     } finally {
       setLoading(false);
     }
@@ -77,41 +107,175 @@ export default function NewResourcePage() {
 
   if (resultSlug) {
     return (
-      <div className="max-w-xl mx-auto py-12 nexus-panel p-6 space-y-4">
-        <h1 className="text-2xl font-black text-white">Resource submitted for review</h1>
-        <p className="text-sm text-neutral-400">
-          The build is stored privately. It will become public only after malware scanning and moderator approval.
-        </p>
-        <Link href={`/market/${resultSlug}`} className="text-sm font-semibold text-accent">
-          Open resource status
-        </Link>
+      <div className="mx-auto max-w-xl space-y-4 py-12">
+        <div className="nexus-panel space-y-4 p-6 shadow-nexus-sm">
+          <div className="inline-flex rounded-full bg-success-soft px-2.5 py-1 font-label text-success">
+            {dictionary.nav.closedBeta}
+          </div>
+          <h1 className="text-2xl font-black text-primary">
+            {copy.submittedTitle}
+          </h1>
+          <p className="text-sm leading-relaxed text-muted">
+            {copy.submittedDescription}
+          </p>
+          <Link
+            href={`/market/${resultSlug}`}
+            className="inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
+          >
+            {copy.openStatus}
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 space-y-6">
-      <div>
-        <h1 className="text-2xl font-black text-white">Publish a free resource</h1>
-        <p className="text-sm text-neutral-400 mt-1">
-          Paid publishing stays disabled until real payments and legal terms are ready.
+    <div className="mx-auto max-w-2xl space-y-6 py-8">
+      <div className="space-y-1.5">
+        <h1 className="font-display text-primary">{copy.resourceTitle}</h1>
+        <p className="max-w-xl text-sm leading-relaxed text-muted">
+          {copy.resourceDescription}
         </p>
       </div>
-      {error && <div className="p-4 border border-red-900 bg-red-950/30 text-red-300 text-sm">{error}</div>}
+
+      {error && (
+        <div
+          role="alert"
+          className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
+        >
+          {error}
+        </div>
+      )}
+
       <MtaMetaInspectorPanel />
-      <form onSubmit={submit} className="nexus-panel p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <label className="space-y-1"><span className="text-xs text-neutral-300">Title</span><input name="title" required minLength={3} className="w-full nexus-inset px-3 py-2" /></label>
-        <label className="space-y-1"><span className="text-xs text-neutral-300">Slug</span><input name="slug" required pattern="[a-z0-9-]+" className="w-full nexus-inset px-3 py-2" /></label>
-        <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Short description</span><input name="shortDescription" className="w-full nexus-inset px-3 py-2" /></label>
-        <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Description</span><textarea name="description" required minLength={10} rows={6} className="w-full nexus-inset px-3 py-2" /></label>
-        <label className="space-y-1"><span className="text-xs text-neutral-300">Type</span><select name="type" className="w-full nexus-inset px-3 py-2"><option value="script">Script</option><option value="map">Map</option><option value="vehicle">Vehicle</option><option value="model">Model</option><option value="ui">UI</option><option value="plugin">Plugin</option></select></label>
-        <label className="space-y-1"><span className="text-xs text-neutral-300">Tags, comma separated</span><input name="tags" className="w-full nexus-inset px-3 py-2" /></label>
-        <label className="space-y-1"><span className="text-xs text-neutral-300">Version</span><input name="version" defaultValue="1.0.0" required className="w-full nexus-inset px-3 py-2" /></label>
-        <label className="space-y-1"><span className="text-xs text-neutral-300">Minimum MTA version</span><input name="mtaMinVersion" defaultValue="1.6.0" className="w-full nexus-inset px-3 py-2" /></label>
-        <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Resource dependencies, comma separated slugs</span><input name="dependencies" placeholder="core-ui, vehicle-pack" className="w-full nexus-inset px-3 py-2" /></label>
-        <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Build archive</span><input name="file" type="file" accept=".zip,.rar,.7z,.lua" required className="w-full text-sm text-neutral-300" /></label>
-        <label className="space-y-1 sm:col-span-2"><span className="text-xs text-neutral-300">Release notes</span><textarea name="releaseNotes" rows={3} className="w-full nexus-inset px-3 py-2" /></label>
-        <button disabled={loading} className="sm:col-span-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-sm">{loading ? "Submitting..." : "Submit free resource for review"}</button>
+
+      <form
+        onSubmit={submit}
+        aria-busy={loading}
+        className="nexus-panel grid grid-cols-1 gap-4 p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
+      >
+        <label className={labelClass}>
+          <span className={labelTextClass}>{copy.title}</span>
+          <input
+            name="title"
+            required
+            minLength={3}
+            maxLength={120}
+            className={fieldClass}
+          />
+        </label>
+
+        <label className={labelClass}>
+          <span className={labelTextClass}>{copy.slug}</span>
+          <input
+            name="slug"
+            required
+            minLength={3}
+            maxLength={120}
+            pattern="[a-z0-9-]+"
+            autoCapitalize="none"
+            spellCheck={false}
+            className={fieldClass}
+          />
+        </label>
+
+        <label className={`${labelClass} sm:col-span-2`}>
+          <span className={labelTextClass}>{copy.shortDescription}</span>
+          <input
+            name="shortDescription"
+            maxLength={240}
+            className={fieldClass}
+          />
+        </label>
+
+        <label className={`${labelClass} sm:col-span-2`}>
+          <span className={labelTextClass}>{copy.description}</span>
+          <textarea
+            name="description"
+            required
+            minLength={10}
+            maxLength={20_000}
+            rows={6}
+            className={fieldClass}
+          />
+        </label>
+
+        <label className={labelClass}>
+          <span className={labelTextClass}>{copy.type}</span>
+          <select name="type" className={fieldClass}>
+            <option value="script">{copy.typeScript}</option>
+            <option value="map">{copy.typeMap}</option>
+            <option value="vehicle">{copy.typeVehicle}</option>
+            <option value="model">{copy.typeModel}</option>
+            <option value="ui">{copy.typeUi}</option>
+            <option value="plugin">{copy.typePlugin}</option>
+          </select>
+        </label>
+
+        <label className={labelClass}>
+          <span className={labelTextClass}>{copy.tags}</span>
+          <input name="tags" maxLength={500} className={fieldClass} />
+        </label>
+
+        <label className={labelClass}>
+          <span className={labelTextClass}>{copy.version}</span>
+          <input
+            name="version"
+            defaultValue="1.0.0"
+            required
+            maxLength={64}
+            className={fieldClass}
+          />
+        </label>
+
+        <label className={labelClass}>
+          <span className={labelTextClass}>{copy.minMtaVersion}</span>
+          <input
+            name="mtaMinVersion"
+            defaultValue="1.6.0"
+            maxLength={64}
+            className={fieldClass}
+          />
+        </label>
+
+        <label className={`${labelClass} sm:col-span-2`}>
+          <span className={labelTextClass}>{copy.dependencies}</span>
+          <input
+            name="dependencies"
+            maxLength={1000}
+            placeholder="core-ui, vehicle-pack"
+            className={fieldClass}
+          />
+        </label>
+
+        <label className={`${labelClass} sm:col-span-2`}>
+          <span className={labelTextClass}>{copy.buildArchive}</span>
+          <input
+            name="file"
+            type="file"
+            accept=".zip,.rar,.7z,.lua"
+            required
+            className="w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent"
+          />
+        </label>
+
+        <label className={`${labelClass} sm:col-span-2`}>
+          <span className={labelTextClass}>{copy.releaseNotes}</span>
+          <textarea
+            name="releaseNotes"
+            rows={3}
+            maxLength={5000}
+            className={fieldClass}
+          />
+        </label>
+
+        <Button
+          type="submit"
+          isLoading={loading}
+          className="sm:col-span-2"
+        >
+          {loading ? copy.submitting : copy.submit}
+        </Button>
       </form>
     </div>
   );
