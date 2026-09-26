@@ -1,17 +1,23 @@
 import * as React from "react";
 import { cn } from "./utils";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   label?: string;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type = "text", error, label, id, ...props }, ref) => {
+    const errorId = id && error ? `${id}-error` : undefined;
+
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label htmlFor={id} className="block text-xs font-semibold text-neutral-300 uppercase tracking-wider">
+          <label
+            htmlFor={id}
+            className="block font-label uppercase text-secondary"
+          >
             {label}
           </label>
         )}
@@ -19,18 +25,26 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           id={id}
           type={type}
           ref={ref}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={errorId}
           className={cn(
-            "w-full h-10 px-3 py-2 bg-neutral-900 border rounded-lg text-sm text-neutral-100 placeholder-neutral-500",
-            "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors",
-            error ? "border-red-500 focus:ring-red-500" : "border-neutral-700",
-            className
+            "h-10 w-full rounded-lg border bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)]",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]",
+            error
+              ? "border-[color:var(--nexus-danger)]"
+              : "border-base hover:border-strong",
+            className,
           )}
           {...props}
         />
-        {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+        {error && (
+          <p id={errorId} className="mt-1 text-xs text-danger">
+            {error}
+          </p>
+        )}
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = "Input";
