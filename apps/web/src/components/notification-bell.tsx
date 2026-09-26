@@ -38,7 +38,8 @@ export function NotificationBell() {
         if (
           !response.ok ||
           !Array.isArray(data?.notifications) ||
-          typeof data?.unreadCount !== "number"
+          !Number.isSafeInteger(data?.unreadCount) ||
+          data.unreadCount < 0
         ) {
           throw new Error(copy.loadError);
         }
@@ -53,13 +54,16 @@ export function NotificationBell() {
       }
     }
 
-    void fetchNotifications();
-    const interval = window.setInterval(() => {
-      void fetchNotifications();
-    }, 30_000);
+    const refreshIfVisible = () => {
+      if (document.visibilityState === "visible") void fetchNotifications();
+    };
+    refreshIfVisible();
+    document.addEventListener("visibilitychange", refreshIfVisible);
+    const interval = window.setInterval(refreshIfVisible, 30_000);
 
     return () => {
       active = false;
+      document.removeEventListener("visibilitychange", refreshIfVisible);
       window.clearInterval(interval);
     };
   }, [attempt, copy.loadError]);
@@ -95,6 +99,8 @@ export function NotificationBell() {
       // Read the server state again; a notification may arrive during this request.
       setAttempt((value) => value + 1);
     } catch {
+      // Recheck the server after an ambiguous response or timeout.
+      setAttempt((value) => value + 1);
       setError(copy.markError);
     } finally {
       setMarking(false);

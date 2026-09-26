@@ -3,7 +3,6 @@
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -23,6 +22,7 @@ export default function NotificationCenterPage() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.notifications;
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [marking, setMarking] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,13 +44,22 @@ export default function NotificationCenterPage() {
         signal: AbortSignal.timeout(15_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok || !Array.isArray(data?.notifications)) {
+      if (
+        !response.ok ||
+        !Array.isArray(data?.notifications) ||
+        !Number.isSafeInteger(data?.unreadCount) ||
+        data.unreadCount < 0
+      ) {
         throw new Error(data?.error || copy.loadError);
       }
-      if (generation === requestGeneration.current) setNotifications(data.notifications);
+      if (generation === requestGeneration.current) {
+        setNotifications(data.notifications);
+        setUnreadCount(data.unreadCount);
+      }
     } catch (caught) {
       if (generation !== requestGeneration.current) return;
       setNotifications([]);
+      setUnreadCount(0);
       setError(
         caught instanceof Error && caught.message
           ? caught.message
@@ -84,6 +93,8 @@ export default function NotificationCenterPage() {
       // Confirm the state from the server, including notifications added concurrently.
       await loadNotifications();
     } catch (caught) {
+      // The write might have succeeded even if its response was lost.
+      await loadNotifications();
       setError(
         caught instanceof Error && caught.message
           ? caught.message
@@ -94,10 +105,6 @@ export default function NotificationCenterPage() {
     }
   }
 
-  const unreadCount = useMemo(
-    () => notifications.filter((notification) => !notification.isRead).length,
-    [notifications],
-  );
   const filtered =
     filter === "unread"
       ? notifications.filter((notification) => !notification.isRead)
@@ -156,8 +163,7 @@ export default function NotificationCenterPage() {
       >
         {(["all", "unread"] as const).map((item) => {
           const active = filter === item;
-          const count =
-            item === "all" ? notifications.length : unreadCount;
+
           return (
             <button
               key={item}
@@ -171,7 +177,7 @@ export default function NotificationCenterPage() {
                   : "border-base bg-surface text-muted hover:bg-hover hover:text-primary"
               }`}
             >
-              {item === "all" ? copy.all : copy.unread} ({count})
+              {item === "all" ? copy.all : `${copy.unread} (${unreadCount})`}
             </button>
           );
         })}

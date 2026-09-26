@@ -33,6 +33,8 @@ vi.mock("@nexus/db", () => ({
     unfollow: vi.fn(async () => undefined),
   },
   notificationRepository: {
+    listByUser: vi.fn(async () => Array.from({ length: 100 }, (_, index) => ({ id: "not_" + index, isRead: true }))),
+    countUnread: vi.fn(async () => 137),
     create: createNotification,
     markAsRead: markSingle,
     markAllAsRead: markAll,
@@ -41,6 +43,7 @@ vi.mock("@nexus/db", () => ({
 
 import { POST as follow, DELETE as unfollow } from "../apps/web/src/app/api/follow/route";
 import { POST as markRead } from "../apps/web/src/app/api/notifications/mark-read/route";
+import { GET as listNotifications } from "../apps/web/src/app/api/notifications/route";
 
 const makeRequest = (path: string, method: string, body?: string) =>
   new NextRequest("http://nexus.test" + path, {
@@ -97,6 +100,15 @@ describe("social and notification HTTP state contract", () => {
     }
     expect(markAll).not.toHaveBeenCalled();
     expect(markSingle).not.toHaveBeenCalled();
+  });
+
+  it("reports the global unread total beyond the 100-item inbox window", async () => {
+    const response = await listNotifications(makeRequest("/api/notifications?limit=100", "GET"));
+    const data = await response.json();
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(data.notifications).toHaveLength(100);
+    expect(data.unreadCount).toBe(137);
   });
 
   it("keeps single ownership errors separate from confirmed bulk operations", async () => {

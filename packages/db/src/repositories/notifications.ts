@@ -1,4 +1,4 @@
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, count } from "drizzle-orm";
 import { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
 import type {
@@ -87,16 +87,16 @@ export class NotificationRepository {
   }
 
   async countUnread(recipientId: string): Promise<number> {
-        const rows = await db
-      .select()
+    const [result] = await db
+      .select({ total: count() })
       .from(notifications)
       .where(
         and(
           eq(notifications.recipientId, recipientId),
-          eq(notifications.isRead, false)
-        )
+          eq(notifications.isRead, false),
+        ),
       );
-    return rows.length;
+    return result.total;
   }
 
   async create(
@@ -158,10 +158,15 @@ export class NotificationRepository {
   }
 
   async markAllAsRead(recipientId: string): Promise<void> {
-        await db
+    await db
       .update(notifications)
       .set({ isRead: true })
-      .where(eq(notifications.recipientId, recipientId));
+      .where(
+        and(
+          eq(notifications.recipientId, recipientId),
+          eq(notifications.isRead, false),
+        ),
+      );
   }
 }
 
