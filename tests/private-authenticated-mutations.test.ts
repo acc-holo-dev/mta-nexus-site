@@ -8,6 +8,8 @@ const read = (path: string) =>
 describe("private authenticated mutation responses", () => {
   it.each([
     "apps/web/src/app/api/auth/context/route.ts",
+    "apps/web/src/app/api/auth/login/route.ts",
+    "apps/web/src/app/api/auth/register/route.ts",
     "apps/web/src/app/api/verification/route.ts",
     "apps/web/src/app/api/notifications/preferences/route.ts",
   ])("%s uses one private no-store response contract", (path) => {
@@ -16,6 +18,21 @@ describe("private authenticated mutation responses", () => {
     expect(source).toContain('"Cache-Control": "private, no-store"');
     expect(source).toContain('Vary: "Cookie"');
     expect(source).toContain("headers: privateHeaders");
+  });
+
+  it("keeps login and registration session cookies hardened", () => {
+    for (const path of [
+      "apps/web/src/app/api/auth/login/route.ts",
+      "apps/web/src/app/api/auth/register/route.ts",
+    ]) {
+      const source = read(path);
+      expect(source).toContain('httpOnly: true');
+      expect(source).toContain(
+        'secure: process.env.NODE_ENV === "production"',
+      );
+      expect(source).toContain('sameSite: "lax"');
+      expect(source).toContain('path: "/"');
+    }
   });
 
   it("keeps context switching non-optimistic", () => {

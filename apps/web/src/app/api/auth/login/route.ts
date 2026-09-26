@@ -4,7 +4,28 @@ import { loginSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
 import { AppError } from "@nexus/domain";
 import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
-import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../../lib/observability";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../lib/observability";
+
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
+    status,
+    headers: privateHeaders,
+  });
+}
 
 export async function POST(request: NextRequest) {
   const context = createRequestLogContext(request);
@@ -18,10 +39,13 @@ export async function POST(request: NextRequest) {
         context,
         status: 429,
       });
-      return jsonWithRequestId(
+      return json(
         context,
-        { error: "Too many login attempts. Please try again in a few minutes." },
-        { status: 429 }
+        {
+          error:
+            "Too many login attempts. Please try again in a few minutes.",
+        },
+        429,
       );
     }
 
@@ -29,16 +53,19 @@ export async function POST(request: NextRequest) {
     const parsed = loginSchema.safeParse(body);
 
     if (!parsed.success) {
-      return jsonWithRequestId(
+      return json(
         context,
-        { error: "Invalid login credentials", details: parsed.error.format() },
-        { status: 400 }
+        {
+          error: "Invalid login credentials",
+          details: parsed.error.format(),
+        },
+        400,
       );
     }
 
     const { user, token } = await authService.login(parsed.data);
 
-    const response = jsonWithRequestId(context, { success: true, user });
+    const response = json(context, { success: true, user });
     response.cookies.set("nexus_session", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -50,10 +77,10 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return jsonWithRequestId(
+      return json(
         context,
         { error: error.message, code: error.code },
-        { status: error.statusCode }
+        error.statusCode,
       );
     }
 
@@ -64,6 +91,6 @@ export async function POST(request: NextRequest) {
       status: 500,
       error,
     });
-    return jsonWithRequestId(context, { error: "Failed to log in" }, { status: 500 });
+    return json(context, { error: "Failed to log in" }, 500);
   }
 }
