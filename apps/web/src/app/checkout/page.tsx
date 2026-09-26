@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Lock, ShieldCheck } from "lucide-react";
-import { getDictionary, resolveLocale, type Locale } from "../../lib/i18n";
+import { useNexusLocale } from "../../components/locale-context";
 
 interface ProductInfo {
   id: string;
@@ -16,27 +16,17 @@ interface ProductInfo {
   currentVersion: string;
 }
 
-function readBrowserLocale(): Locale {
-  if (typeof document === "undefined") return "en";
-  const match = document.cookie.match(/(?:^|; )nexus_locale=([^;]+)/);
-  return resolveLocale(match?.[1]);
-}
-
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
-  const [locale, setLocale] = useState<Locale>("en");
+  const { locale, dictionary } = useNexusLocale();
   const [product, setProduct] = useState<ProductInfo | null>(null);
   const [productError, setProductError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLocale(readBrowserLocale());
-  }, []);
-
-  const copy = getDictionary(locale).checkout;
+  const copy = dictionary.checkout;
 
   useEffect(() => {
     if (!productId) return;
