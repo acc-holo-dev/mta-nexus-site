@@ -3,20 +3,32 @@ import { authService } from "../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
 import { consumeRateLimit } from "@nexus/security";
 
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function json(body: unknown, status = 200) {
+  return NextResponse.json(body, {
+    status,
+    headers: privateHeaders,
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return json({ error: "Unauthorized" }, 401 );
     }
 
     const rateLimit = await consumeRateLimit("notificationMutation", user.id);
     if (!rateLimit.success) {
-      return NextResponse.json(
+      return json(
         { error: "Too many notification updates. Please try again shortly." },
-        { status: 429 }
+        429 
       );
     }
 
@@ -25,18 +37,18 @@ export async function POST(request: NextRequest) {
       // IDOR protection: only mark notifications owned by the current user
       const updated = await notificationRepository.markAsRead(body.id, user.id);
       if (!updated) {
-        return NextResponse.json(
+        return json(
           { error: "Notification not found or not owned by you" },
-          { status: 404 }
+          404 
         );
       }
     } else {
       await notificationRepository.markAllAsRead(user.id);
     }
 
-    return NextResponse.json({ success: true });
+    return json({ success: true });
   } catch (error: unknown) {
     console.error("Notification update error:", error);
-    return NextResponse.json({ error: "Failed to mark notifications read" }, { status: 500 });
+    return json({ error: "Failed to mark notifications read" }, 500 );
   }
 }

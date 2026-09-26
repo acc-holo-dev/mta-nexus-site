@@ -4,6 +4,18 @@ import { authService } from "../../../lib/services/auth-service";
 import { createProductSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
 
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function privateJson(body: unknown, status = 200) {
+  return NextResponse.json(body, {
+    status,
+    headers: privateHeaders,
+  });
+}
+
 export async function GET(request: NextRequest) {
   const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "50");
   const limit = Number.isFinite(requestedLimit)
@@ -26,25 +38,25 @@ export async function POST(request: NextRequest) {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      return privateJson({ error: "Authentication required" }, 401 );
     }
 
     const rateLimit = await consumeRateLimit("contentCreation", user.id);
     if (!rateLimit.success) {
-      return NextResponse.json({ error: "Resource creation limit exceeded" }, { status: 429 });
+      return privateJson({ error: "Resource creation limit exceeded" }, 429 );
     }
 
     const parsed = createProductSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
-      return NextResponse.json(
+      return privateJson(
         { error: "Invalid resource details", details: parsed.error.format() },
-        { status: 400 }
+        400 
       );
     }
     if (parsed.data.price !== 0) {
-      return NextResponse.json(
+      return privateJson(
         { error: "Paid resources are disabled until a payment provider is configured" },
-        { status: 422 }
+        422 
       );
     }
 
@@ -60,16 +72,16 @@ export async function POST(request: NextRequest) {
       user
     );
 
-    return NextResponse.json({ product }, { status: 201 });
+    return privateJson({ product }, 201 );
   } catch (error: unknown) {
     const appError =
       error instanceof Error && "statusCode" in error
         ? (error as Error & { statusCode: number })
         : null;
     console.error("Resource creation error:", error);
-    return NextResponse.json(
+    return privateJson(
       { error: appError?.message || "Could not create resource" },
-      { status: appError?.statusCode || 500 }
+      appError?.statusCode || 500 
     );
   }
 }

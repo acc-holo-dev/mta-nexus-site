@@ -6,6 +6,18 @@ import { consumeRateLimit } from "@nexus/security";
 import { getTrustedRequestIp } from "../../../lib/request-client-ip";
 import { matchesMtaEndpoint, mtaMasterDirectoryService, type MtaMasterServer } from "../../../lib/services/mta-master-directory-service";
 
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function privateJson(body: unknown, status = 200) {
+  return NextResponse.json(body, {
+    status,
+    headers: privateHeaders,
+  });
+}
+
 export async function GET(request: NextRequest) {
   const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "100");
   const limit = Number.isFinite(requestedLimit)
@@ -50,20 +62,20 @@ export async function POST(request: NextRequest) {
     const ip = getTrustedRequestIp(request);
     const rateLimit = await consumeRateLimit("serverMutation", ip);
     if (!rateLimit.success) {
-      return NextResponse.json({ error: "Server registration limit exceeded" }, { status: 429 });
+      return privateJson({ error: "Server registration limit exceeded" }, 429 );
     }
 
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      return privateJson({ error: "Authentication required" }, 401 );
     }
 
     const parsed = createServerSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
-      return NextResponse.json(
+      return privateJson(
         { error: "Invalid server details", details: parsed.error.format() },
-        { status: 400 }
+        400 
       );
     }
 
@@ -74,16 +86,16 @@ export async function POST(request: NextRequest) {
       },
       user
     );
-    return NextResponse.json({ server }, { status: 201 });
+    return privateJson({ server }, 201 );
   } catch (error: unknown) {
     const appError =
       error instanceof Error && "statusCode" in error
         ? (error as Error & { statusCode: number })
         : null;
     console.error("Server registration error:", error);
-    return NextResponse.json(
+    return privateJson(
       { error: appError?.message || "Could not register server" },
-      { status: appError?.statusCode || 500 }
+      appError?.statusCode || 500 
     );
   }
 }

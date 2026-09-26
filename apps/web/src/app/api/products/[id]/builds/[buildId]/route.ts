@@ -4,6 +4,18 @@ import { AppError } from "@nexus/domain";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { productService } from "../../../../../../lib/services/product-service";
 
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function json(body: unknown, status = 200) {
+  return NextResponse.json(body, {
+    status,
+    headers: privateHeaders,
+  });
+}
+
 const retireBuildSchema = z.object({
   action: z.literal("retire"),
   reason: z.string().trim().min(3).max(2_000).optional(),
@@ -17,14 +29,14 @@ export async function PATCH(
     const token = request.cookies.get("nexus_session")?.value;
     const actor = await authService.getSession(token);
     if (!actor) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      return json({ error: "Authentication required" }, 401 );
     }
 
     const parsed = retireBuildSchema.safeParse(await request.json());
     if (!parsed.success) {
-      return NextResponse.json(
+      return json(
         { error: "Invalid build lifecycle action", details: parsed.error.flatten() },
-        { status: 400 }
+        400 
       );
     }
 
@@ -33,15 +45,15 @@ export async function PATCH(
       { productId, buildId, reason: parsed.data.reason },
       actor
     );
-    return NextResponse.json({ build });
+    return json({ build });
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return NextResponse.json(
+      return json(
         { error: error.message, code: error.code },
-        { status: error.statusCode }
+        error.statusCode 
       );
     }
     console.error("Build lifecycle error:", error);
-    return NextResponse.json({ error: "Could not update build lifecycle" }, { status: 500 });
+    return json({ error: "Could not update build lifecycle" }, 500 );
   }
 }

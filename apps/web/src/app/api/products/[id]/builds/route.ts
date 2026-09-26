@@ -18,6 +18,26 @@ const BUILD_MIME_TYPES: Record<string, string> = {
   lua: "text/plain; charset=utf-8",
 };
 
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function privateJson(
+  context: ReturnType<typeof createRequestLogContext>,
+  body: unknown,
+  init: ResponseInit = {},
+) {
+  const headers = new Headers(privateHeaders);
+  new Headers(init.headers).forEach((value, key) => {
+    headers.set(key, value);
+  });
+  return jsonWithRequestId(context, body, {
+    ...init,
+    headers,
+  });
+}
+
 function hasExpectedSignature(extension: string, bytes: Uint8Array): boolean {
   if (extension === "lua") return true;
   const signature = Array.from(bytes.slice(0, 6));
@@ -49,12 +69,12 @@ export async function POST(
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
-      return jsonWithRequestId(context, { error: "Authentication required" }, { status: 401 });
+      return privateJson(context, { error: "Authentication required" }, { status: 401 });
     }
 
     const rateLimit = await consumeRateLimit("buildUpload", user.id);
     if (!rateLimit.success) {
-      return jsonWithRequestId(context, { error: "Build upload limit exceeded" }, { status: 429 });
+      return privateJson(context, { error: "Build upload limit exceeded" }, { status: 429 });
     }
 
     const { id: productId } = await params;
@@ -65,7 +85,7 @@ export async function POST(
       Number.isFinite(declaredLength) &&
       declaredLength > MAX_FILE_SIZE_BYTES + MULTIPART_OVERHEAD_BYTES
     ) {
-      return jsonWithRequestId(context, 
+      return privateJson(context, 
         { error: "Build archive exceeds the 64MB closed-beta limit" },
         { status: 413 }
       );
@@ -74,7 +94,7 @@ export async function POST(
     const contentType =
       request.headers.get("content-type")?.toLowerCase() ?? "";
     if (!contentType.startsWith("multipart/form-data")) {
-      return jsonWithRequestId(
+      return privateJson(
         context,
         { error: "Build upload requires multipart/form-data" },
         { status: 415 },
@@ -89,20 +109,20 @@ export async function POST(
       mtaVersionTarget: form.get("mtaVersionTarget") || undefined,
     });
     if (!parsed.success || !(file instanceof File) || file.size === 0) {
-      return jsonWithRequestId(context, 
+      return privateJson(context, 
         { error: "A valid build archive and semantic version are required" },
         { status: 400 }
       );
     }
     const extension = file.name.split(".").pop()?.toLowerCase();
     if (!extension || !ALLOWED_BUILD_EXTENSIONS.has(extension)) {
-      return jsonWithRequestId(context, 
+      return privateJson(context, 
         { error: "Only .zip, .rar, .7z, and .lua resource builds are allowed" },
         { status: 415 }
       );
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      return jsonWithRequestId(context, 
+      return privateJson(context, 
         { error: "Build archive exceeds the 64MB closed-beta limit" },
         { status: 413 }
       );
@@ -110,12 +130,12 @@ export async function POST(
 
     const safeFileName = path.basename(file.name).replace(/[^a-zA-Z0-9._-]/g, "_");
     if (!safeFileName) {
-      return jsonWithRequestId(context, { error: "A valid build file name is required" }, { status: 400 });
+      return privateJson(context, { error: "A valid build file name is required" }, { status: 400 });
     }
 
     const fileBytes = new Uint8Array(await file.arrayBuffer());
     if (!hasExpectedSignature(extension, fileBytes)) {
-      return jsonWithRequestId(context, 
+      return privateJson(context, 
         { error: "Build content does not match its file extension" },
         { status: 415 }
       );
@@ -130,7 +150,7 @@ export async function POST(
         status: 422,
         fields: { scanner: scan.scanner },
       });
-      return jsonWithRequestId(
+      return privateJson(
         context,
         { error: "Build was rejected by the malware scanner", scanner: scan.scanner },
         { status: 422 }
@@ -144,7 +164,7 @@ export async function POST(
         status: 503,
         fields: { scanner: scan.scanner },
       });
-      return jsonWithRequestId(
+      return privateJson(
         context,
         {
           error:
@@ -180,7 +200,7 @@ export async function POST(
         },
         user
       );
-      return jsonWithRequestId(context, { build }, { status: 201 });
+      return privateJson(context, { build }, { status: 201 });
     } catch (error) {
       await storageService.deleteAsset(asset.key);
       throw error;
@@ -196,11 +216,11 @@ export async function POST(
       });
     }
     if (error instanceof AppError) {
-      return jsonWithRequestId(context, 
+      return privateJson(context, 
         { error: error.message, code: error.code },
         { status: error.statusCode }
       );
     }
-    return jsonWithRequestId(context, { error: "Could not publish build" }, { status: 500 });
+    return privateJson(context, { error: "Could not publish build" }, { status: 500 });
   }
 }

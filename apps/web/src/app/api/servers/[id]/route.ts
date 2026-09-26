@@ -4,6 +4,18 @@ import { authService } from "../../../../lib/services/auth-service";
 import { serverService } from "../../../../lib/services/server-service";
 import { consumeRateLimit } from "@nexus/security";
 
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function json(body: unknown, status = 200) {
+  return NextResponse.json(body, {
+    status,
+    headers: privateHeaders,
+  });
+}
+
 const serverUpdateSchema = z
   .object({
     name: z.string().min(3).max(100).optional(),
@@ -32,32 +44,32 @@ export async function PATCH(
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
-    if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    if (!user) return json({ error: "Authentication required" }, 401 );
 
     const rateLimit = await consumeRateLimit("serverMutation", user.id);
     if (!rateLimit.success) {
-      return NextResponse.json({ error: "Server update limit exceeded" }, { status: 429 });
+      return json({ error: "Server update limit exceeded" }, 429 );
     }
 
     const parsed = serverUpdateSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
-      return NextResponse.json(
+      return json(
         { error: "Invalid server details", details: parsed.error.format() },
-        { status: 400 }
+        400 
       );
     }
 
     const { id } = await params;
     const server = await serverService.updateServer(id, parsed.data, user);
-    return NextResponse.json({ server });
+    return json({ server });
   } catch (error: unknown) {
     const appError = error instanceof Error && "statusCode" in error
       ? (error as Error & { statusCode: number })
       : null;
     console.error("Server update error:", error);
-    return NextResponse.json(
+    return json(
       { error: appError?.message || "Could not update server" },
-      { status: appError?.statusCode || 500 }
+      appError?.statusCode || 500 
     );
   }
 }

@@ -11,6 +11,18 @@ import {
 } from "@nexus/db";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function json(body: unknown, status = 200) {
+  return NextResponse.json(body, {
+    status,
+    headers: privateHeaders,
+  });
+}
+
 const adminActionSchema = z.discriminatedUnion("targetType", [
   z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional() }),
   z.object({ targetType: z.literal("report"), targetId: z.string().min(1), action: z.enum(["resolve", "dismiss"]), notes: z.string().max(2000).optional() }),
@@ -25,21 +37,21 @@ export async function POST(request: NextRequest) {
     const user = await authService.getSession(token);
 
     if (!user || !can(user, "admin.moderation")) {
-      return NextResponse.json(
+      return json(
         { error: "Forbidden: Admin or moderator privilege required" },
-        { status: 403 }
+        403 
       );
     }
 
     // Admin actions are rate limited
     const rl = await consumeRateLimit("moderationAction", user.id);
     if (!rl.success) {
-      return NextResponse.json({ error: "Too many admin actions" }, { status: 429 });
+      return json({ error: "Too many admin actions" }, 429 );
     }
 
     const parsed = adminActionSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid moderation action", details: parsed.error.format() }, { status: 400 });
+      return json({ error: "Invalid moderation action", details: parsed.error.format() }, 400 );
     }
     const { targetType, targetId, action, notes } = parsed.data;
 
@@ -61,9 +73,9 @@ export async function POST(request: NextRequest) {
           makeAudit(),
         );
         if (!updated) {
-          return NextResponse.json(
+          return json(
             { error: "Product not found" },
-            { status: 404 },
+            404 ,
           );
         }
       } else if (action === "suspend") {
@@ -74,9 +86,9 @@ export async function POST(request: NextRequest) {
         if (!suspended) {
           const current = await productRepository.findById(targetId);
           if (!current) {
-            return NextResponse.json(
+            return json(
               { error: "Product not found" },
-              { status: 404 },
+              404 ,
             );
           }
           throw new AppError(
@@ -91,9 +103,9 @@ export async function POST(request: NextRequest) {
           makeAudit(),
         );
         if (restore === "not_found") {
-          return NextResponse.json(
+          return json(
             { error: "Product not found" },
-            { status: 404 },
+            404 ,
           );
         }
         if (restore === "no_published_build") {
@@ -122,9 +134,9 @@ export async function POST(request: NextRequest) {
         if (!resolved) {
           const current = await reportRepository.findById(targetId);
           if (!current) {
-            return NextResponse.json(
+            return json(
               { error: "Report not found" },
-              { status: 404 },
+              404 ,
             );
           }
           throw new AppError(
@@ -150,9 +162,9 @@ export async function POST(request: NextRequest) {
         if (!resolved) {
           const current = await verificationRepository.findById(targetId);
           if (!current) {
-            return NextResponse.json(
+            return json(
               { error: "Verification request not found" },
-              { status: 404 },
+              404 ,
             );
           }
           throw new AppError(
@@ -172,15 +184,15 @@ export async function POST(request: NextRequest) {
       await contentService.moderateContent(targetId, action, user, notes);
     }
 
-    return NextResponse.json({ success: true, action, targetId });
+    return json({ success: true, action, targetId });
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return NextResponse.json(
+      return json(
         { error: error.message, code: error.code },
-        { status: error.statusCode },
+        error.statusCode ,
       );
     }
     console.error("Admin action error:", error);
-    return NextResponse.json({ error: "Failed to execute administrative action" }, { status: 500 });
+    return json({ error: "Failed to execute administrative action" }, 500 );
   }
 }

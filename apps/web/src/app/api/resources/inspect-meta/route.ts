@@ -9,6 +9,7 @@ import {
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
+  Vary: "Cookie",
 };
 
 function contentLengthTooLarge(request: NextRequest): boolean {
