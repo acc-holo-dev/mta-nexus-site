@@ -338,6 +338,11 @@ const en = {
     discussion: "Discussion & comments",
     communityMember: "Community member",
     firstComment: "Be the first to leave a comment on this article.",
+    joinDiscussion: "Join the discussion",
+    commentPlaceholder: "Write a useful, respectful response…",
+    publishingComment: "Publishing…",
+    publishComment: "Publish comment",
+    commentError: "Could not publish the comment",
   },
   developers: {
     title: "MTA Developer & Studio Network",
@@ -700,6 +705,11 @@ const ru: typeof en = {
     discussion: "Обсуждение и комментарии",
     communityMember: "Участник сообщества",
     firstComment: "Оставьте первый комментарий к этой статье.",
+    joinDiscussion: "Присоединиться к обсуждению",
+    commentPlaceholder: "Напишите полезный и уважительный ответ…",
+    publishingComment: "Публикация…",
+    publishComment: "Опубликовать комментарий",
+    commentError: "Не удалось опубликовать комментарий",
   },
   developers: {
     title: "Разработчики и студии MTA",
