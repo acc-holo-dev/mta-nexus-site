@@ -2,25 +2,39 @@ import * as React from "react";
 import { cn } from "./utils";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: "default" | "secondary" | "success" | "warning" | "danger" | "outline";
+  variant?:
+    | "default"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "danger"
+    | "outline";
 }
 
-export function Badge({ className, variant = "default", ...props }: BadgeProps) {
+export function Badge({
+  className,
+  variant = "default",
+  ...props
+}: BadgeProps) {
   const variants = {
-    default: "bg-blue-600/20 text-blue-400 border-blue-500/30",
-    secondary: "bg-neutral-800 text-neutral-300 border-neutral-700",
-    success: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-    warning: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    danger: "bg-red-500/20 text-red-400 border-red-500/30",
-    outline: "text-neutral-400 border-neutral-700",
+    default:
+      "border-[color:var(--nexus-accent)]/20 bg-accent-soft text-accent",
+    secondary: "border-base bg-inset text-secondary",
+    success:
+      "border-[color:var(--nexus-success)]/20 bg-success-soft text-success",
+    warning:
+      "border-[color:var(--nexus-warning)]/20 bg-warning-soft text-warning",
+    danger:
+      "border-[color:var(--nexus-danger)]/20 bg-danger-soft text-danger",
+    outline: "border-base bg-transparent text-secondary",
   };
 
   return (
     <span
       className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors",
+        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors",
         variants[variant],
-        className
+        className,
       )}
       {...props}
     />
