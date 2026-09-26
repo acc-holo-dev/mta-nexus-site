@@ -1,62 +1,81 @@
 import React from "react";
 import Link from "next/link";
-import { ThumbsUp, MessageSquare, Calendar } from "lucide-react";
+import { Calendar, MessageSquare, ThumbsUp } from "lucide-react";
 import type { Content } from "@nexus/domain";
+import { getDictionary, type Locale } from "../lib/i18n";
 
-export function ArticleCard({ article }: { article: Content }) {
-  const formattedDate = new Date(article.createdAt).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+export function ArticleCard({
+  article,
+  locale = "en",
+}: {
+  article: Content;
+  locale?: Locale;
+}) {
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.articles;
+  const formattedDate = new Date(article.createdAt).toLocaleDateString(
+    locale === "ru" ? "ru-RU" : "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    },
+  );
 
   return (
     <Link
       href={`/articles/${article.slug}`}
-      className="group flex flex-col nexus-panel overflow-hidden hover:border-strong hover:shadow-nexus transition-all"
+      className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus"
     >
       {article.coverImageUrl && (
-        <div className="relative aspect-[16/9] w-full bg-inset overflow-hidden">
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-inset">
           <img
             src={article.coverImageUrl}
             alt={article.title}
+            width={640}
+            height={360}
             loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            decoding="async"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-accent text-white">
+          <div className="absolute left-2 top-2 rounded bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
             {article.type}
           </div>
         </div>
       )}
 
-      <div className="p-3.5 flex flex-col flex-1 gap-2">
+      <div className="flex flex-1 flex-col gap-2 p-3.5">
         <div className="flex items-center gap-2 font-caption text-faint">
-          <Calendar className="w-3 h-3" />
+          <Calendar className="h-3 w-3" aria-hidden="true" />
           <span>{formattedDate}</span>
-          <span>•</span>
-          <span className="font-numeric">{article.viewCount} views</span>
+          <span aria-hidden="true">•</span>
+          <span className="font-numeric">
+            {article.viewCount} {copy.views}
+          </span>
         </div>
 
-        <h3 className="text-xs font-heading text-primary group-hover:text-accent transition-colors line-clamp-2">
+        <h3 className="line-clamp-2 text-xs font-heading text-primary transition-colors group-hover:text-accent">
           {article.title}
         </h3>
 
-        <p className="font-caption text-muted line-clamp-2 flex-1">
+        <p className="line-clamp-2 flex-1 font-caption text-muted">
           {article.excerpt || article.body}
         </p>
 
-        <div className="flex items-center justify-between pt-2.5 border-t border-base font-caption">
+        <div className="flex items-center justify-between border-t border-base pt-2.5 font-caption">
           <div className="flex items-center gap-3 text-muted">
             <span className="flex items-center gap-1">
-              <ThumbsUp className="w-3.5 h-3.5" />
+              <ThumbsUp className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="font-numeric">{article.likeCount}</span>
             </span>
             <span className="flex items-center gap-1">
-              <MessageSquare className="w-3.5 h-3.5" />
+              <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="font-numeric">{article.commentCount}</span>
             </span>
           </div>
-          <span className="text-accent group-hover:underline font-semibold">Read →</span>
+          <span className="font-semibold text-accent group-hover:underline">
+            {copy.read} →
+          </span>
         </div>
       </div>
     </Link>
