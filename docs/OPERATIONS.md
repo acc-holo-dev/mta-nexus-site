@@ -454,3 +454,9 @@ The follow and notification-read routes now return the server-confirmed target a
 The verification approach for this slice is a small state matrix plus HTTP route tests: malformed bodies must not trigger bulk writes, an unrelated conflict must not confirm a follow, delivery failure after a committed follow must not report that follow as failed, and another user's notification must remain inaccessible. These checks cover observable behavior and are additive to browser acceptance. They are **not** release evidence until executed successfully against an exact current `main` SHA.
 
 Next: restore executed CI jobs (the zero-step runner blocker), run the focused HTTP/state tests and then the full verification commands from Stage 2 on the same SHA. Validate desktop/mobile RU/EN follow and inbox flows in Stage 4. Branch cleanup in Stage 1 remains open until remote refs can be safely deleted after comparison.
+
+### 7.9 Session revocation command integrity
+
+Session revocation now accepts exactly one command: `{ "sessionId": "..." }` for a single owned non-current session, or `{ "allOther": true }` for every other session. Mixed, malformed and extra-key requests return 400 without a revocation. Responses identify the completed scope, and the Settings page verifies that scope and the exact session ID before showing success. The current session remains protected by the server-side check; use logout for it.
+
+The focused HTTP tests cover the request matrix, ownership, current-session protection, anonymous and rate-limited calls, and private response headers. Execute them with the full account/browser and database verification on an exact `main` SHA before release acceptance.

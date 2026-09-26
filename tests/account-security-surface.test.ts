@@ -7,7 +7,8 @@ describe("account security API", () => {
     const route = readFileSync(resolve(process.cwd(), "apps/web/src/app/api/auth/sessions/route.ts"), "utf8");
     expect(route).toContain("authService.listSessions");
     expect(route).toContain("getCurrentSessionId");
-    expect(route).toContain("body.allOther === true");
+    expect(route).toContain('command.scope === "others"');
+    expect(route).toContain("parseSessionRevocation");
     expect(route).toContain("The current session cannot be revoked");
     expect(route).not.toContain("session.token");
   });

@@ -1,0 +1,102 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
+import { parseSessionRevocation } from "../apps/web/src/lib/session-revocation";
+
+const state = vi.hoisted(() => ({
+  user: { id: "usr_owner" } as { id: string } | null,
+  currentSessionId: "ses_current",
+  owned: true,
+  revokedCount: 2,
+  allowed: true,
+}));
+const revokeSession = vi.hoisted(() => vi.fn(async () => state.owned));
+const revokeOthers = vi.hoisted(() => vi.fn(async () => state.revokedCount));
+
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+  authService: {
+    getSession: vi.fn(async () => state.user),
+    getCurrentSessionId: vi.fn(async () => state.currentSessionId),
+    revokeSession,
+    revokeOtherSessions: revokeOthers,
+  },
+}));
+vi.mock("@nexus/security", () => ({
+  consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
+}));
+vi.mock("@nexus/domain", () => ({
+  AppError: class AppError extends Error {},
+}));
+
+import { DELETE } from "../apps/web/src/app/api/auth/sessions/route";
+
+function request(body: unknown) {
+  return new NextRequest("http://nexus.test/api/auth/sessions", {
+    method: "DELETE",
+    headers: { "content-type": "application/json", cookie: "nexus_session=token_owner" },
+    body: JSON.stringify(body),
+  });
+}
+
+describe("session revocation command matrix", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    state.user = { id: "usr_owner" };
+    state.currentSessionId = "ses_current";
+    state.owned = true;
+    state.revokedCount = 2;
+    state.allowed = true;
+  });
+
+  it.each([
+    null, [], {}, { allOther: false }, { allOther: true, sessionId: "ses_other" },
+    { sessionId: "" }, { sessionId: " ".repeat(4) },
+    { sessionId: "s".repeat(129) }, { sessionId: 42 },
+    { sessionId: "ses_other", extra: true }, JSON.parse('{"__proto__":{}}'),
+  ])("rejects ambiguous or invalid command %j without revoking anything", async (body) => {
+    expect(parseSessionRevocation(body)).toBeNull();
+    const response = await DELETE(request(body));
+    expect(response.status).toBe(400);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(revokeSession).not.toHaveBeenCalled();
+    expect(revokeOthers).not.toHaveBeenCalled();
+  });
+
+  it("returns the exact owned session ID after single revocation", async () => {
+    const response = await DELETE(request({ sessionId: "ses_other" }));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      success: true, scope: "single", sessionId: "ses_other",
+    });
+    expect(revokeSession).toHaveBeenCalledWith("usr_owner", "ses_other", "token_owner");
+    expect(revokeOthers).not.toHaveBeenCalled();
+  });
+
+  it("blocks current and unowned sessions", async () => {
+    const current = await DELETE(request({ sessionId: "ses_current" }));
+    expect(current.status).toBe(409);
+    expect(revokeSession).not.toHaveBeenCalled();
+
+    state.owned = false;
+    const unowned = await DELETE(request({ sessionId: "ses_foreign" }));
+    expect(unowned.status).toBe(404);
+    expect(revokeOthers).not.toHaveBeenCalled();
+  });
+
+  it("revokes only other sessions when requested explicitly", async () => {
+    const response = await DELETE(request({ allOther: true }));
+    expect(await response.json()).toEqual({
+      success: true, scope: "others", revokedCount: 2,
+    });
+    expect(revokeOthers).toHaveBeenCalledWith("usr_owner", "token_owner");
+    expect(revokeSession).not.toHaveBeenCalled();
+  });
+
+  it("does not revoke when unauthenticated or rate limited", async () => {
+    state.user = null;
+    expect((await DELETE(request({ allOther: true }))).status).toBe(401);
+    state.user = { id: "usr_owner" };
+    state.allowed = false;
+    expect((await DELETE(request({ allOther: true }))).status).toBe(429);
+    expect(revokeOthers).not.toHaveBeenCalled();
+  });
+});

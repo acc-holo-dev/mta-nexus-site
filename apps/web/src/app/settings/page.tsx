@@ -352,12 +352,12 @@ export default function SettingsPage() {
 
   function revokeSession(sessionId: string) {
     void perform(async () => {
-      const data = await requestSettings<{ success: boolean }>(
-        "/api/auth/sessions",
-        "DELETE",
-        { sessionId },
-      );
-      if (data.success !== true) {
+      const data = await requestSettings<{
+        success: boolean;
+        scope: string;
+        sessionId: string;
+      }>("/api/auth/sessions", "DELETE", { sessionId });
+      if (data.success !== true || data.scope !== "single" || data.sessionId !== sessionId) {
         throw new SettingsError(copy.unconfirmedSessionRevocation, 502);
       }
       await refreshAfterSuccess(copy.sessionEnded);
@@ -368,10 +368,16 @@ export default function SettingsPage() {
     void perform(async () => {
       const data = await requestSettings<{
         success: boolean;
+        scope: string;
         revokedCount: number;
       }>("/api/auth/sessions", "DELETE", { allOther: true });
 
-      if (data.success !== true) {
+      if (
+        data.success !== true ||
+        data.scope !== "others" ||
+        !Number.isSafeInteger(data.revokedCount) ||
+        data.revokedCount < 0
+      ) {
         throw new SettingsError(copy.unconfirmedSessionRevocation, 502);
       }
 
