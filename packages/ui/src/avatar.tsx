@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { cn } from "./utils";
 
@@ -8,21 +10,28 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "sm" | "md" | "lg";
 }
 
-export function Avatar({ src, alt, fallback, size = "md", className, ...props }: AvatarProps) {
+export function Avatar({
+  src,
+  alt,
+  fallback,
+  size = "md",
+  className,
+  ...props
+}: AvatarProps) {
   const [imageFailed, setImageFailed] = React.useState(false);
 
   const sizes = {
-    sm: "w-8 h-8 text-xs",
-    md: "w-10 h-10 text-sm",
-    lg: "w-14 h-14 text-base",
+    sm: "h-8 w-8 text-xs",
+    md: "h-10 w-10 text-sm",
+    lg: "h-14 w-14 text-base",
   };
 
   return (
     <div
       className={cn(
-        "relative inline-flex items-center justify-center rounded-full bg-neutral-800 border border-neutral-700 overflow-hidden font-semibold text-neutral-200 select-none",
+        "relative inline-flex select-none items-center justify-center overflow-hidden rounded-full border border-base bg-inset font-semibold text-secondary",
         sizes[size],
-        className
+        className,
       )}
       {...props}
     >
@@ -31,10 +40,12 @@ export function Avatar({ src, alt, fallback, size = "md", className, ...props }:
           src={src}
           alt={alt || fallback}
           onError={() => setImageFailed(true)}
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
         />
       ) : (
-        <span>{fallback.slice(0, 2).toUpperCase()}</span>
+        <span aria-hidden="true">
+          {fallback.slice(0, 2).toUpperCase()}
+        </span>
       )}
     </div>
   );
