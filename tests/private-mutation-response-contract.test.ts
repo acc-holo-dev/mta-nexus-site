@@ -8,6 +8,7 @@ const read = (path: string) =>
 describe("authenticated mutation response privacy", () => {
   it.each([
     "apps/web/src/app/api/admin/actions/route.ts",
+    "apps/web/src/app/api/follow/route.ts",
     "apps/web/src/app/api/content/[slug]/comments/route.ts",
     "apps/web/src/app/api/notifications/mark-read/route.ts",
     "apps/web/src/app/api/products/[id]/builds/[buildId]/route.ts",
@@ -22,6 +23,18 @@ describe("authenticated mutation response privacy", () => {
 
     expect(source).toContain('"Cache-Control": "private, no-store"');
     expect(source).toContain('Vary: "Cookie"');
+  });
+
+  it("keeps every follow mutation response private, including failures", () => {
+    const source = read("apps/web/src/app/api/follow/route.ts");
+    const post = source.slice(source.indexOf("export async function POST"));
+    const deletion = source.slice(source.indexOf("export async function DELETE"));
+
+    expect(source).toContain("return NextResponse.json(body, { ...init, headers: privateHeaders });");
+    expect(post).toContain("privateJson(");
+    expect(deletion).toContain("privateJson(");
+    expect(post).not.toContain("NextResponse.json(");
+    expect(deletion).not.toContain("NextResponse.json(");
   });
 
   it("keeps public resource and server GET responses publicly cacheable", () => {
