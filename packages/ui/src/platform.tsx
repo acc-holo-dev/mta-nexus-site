@@ -75,6 +75,7 @@ export type TrustBadgeVariant =
 
 export interface TrustBadgeProps {
   variant: TrustBadgeVariant;
+  label?: string;
   className?: string;
 }
 
@@ -119,7 +120,7 @@ const TRUST_CONFIG: Record<
   },
 };
 
-export function TrustBadge({ variant, className }: TrustBadgeProps) {
+export function TrustBadge({ variant, label, className }: TrustBadgeProps) {
   const config = TRUST_CONFIG[variant];
   const Icon = config.icon;
 
@@ -132,7 +133,7 @@ export function TrustBadge({ variant, className }: TrustBadgeProps) {
       )}
     >
       <Icon className="w-3 h-3" />
-      <span>{config.label}</span>
+      <span>{label ?? config.label}</span>
     </span>
   );
 }
