@@ -1,22 +1,30 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import {
+  Building2,
+  ExternalLink,
+  Globe,
+  ShieldCheck,
+} from "lucide-react";
+import { StatCard } from "@nexus/ui";
+import {
+  contentRepository,
   organizationRepository,
   productRepository,
-  contentRepository,
 } from "@nexus/db";
 import { ProductCard } from "../../../components/product-card";
 import { ArticleCard } from "../../../components/article-card";
-import {
-  Building2,
-  ShieldCheck,
-  Globe,
-  ExternalLink,
-  Users,
-  Box
-} from "lucide-react";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
+
+const EDITORIAL_TYPES = new Set([
+  "article",
+  "news",
+  "devlog",
+  "update",
+  "announcement",
+]);
 
 export default async function OrganizationProfilePage({
   params,
@@ -24,91 +32,121 @@ export default async function OrganizationProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const org = await organizationRepository.findBySlug(slug);
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.organizations;
+  const organization = await organizationRepository.findBySlug(slug);
 
-  if (!org) {
+  if (!organization) {
     notFound();
   }
 
-  const [orgProducts, orgArticles] = await Promise.all([
-    productRepository.listPublishedByOrganization(org.id, 100),
-    contentRepository.listPublishedByOrganization(org.id, 100),
+  const [products, publishedContent] = await Promise.all([
+    productRepository.listPublishedByOrganization(organization.id, 100),
+    contentRepository.listPublishedByOrganization(organization.id, 100),
   ]);
+  const articles = publishedContent.filter((item) =>
+    EDITORIAL_TYPES.has(item.type),
+  );
 
   return (
     <div className="space-y-10">
-      {/* Organization Banner / Header */}
-      <div className="p-8 rounded-2xl border border-base bg-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
-        <div className="flex items-center gap-6">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden bg-neutral-900 border-2 border-amber-500/50 shadow-xl p-2 shrink-0">
-            <img
-              src={org.logoUrl || `https://api.dicebear.com/7.x/shapes/svg?seed=${org.slug}`}
-              alt={org.name}
-              className="w-full h-full object-contain"
-            />
+      <section className="nexus-panel flex flex-col justify-between gap-6 p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
+        <div className="flex min-w-0 items-center gap-5 sm:gap-6">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-base bg-inset text-muted shadow-nexus-sm">
+            {organization.logoUrl ? (
+              <img
+                src={organization.logoUrl}
+                alt={organization.name}
+                width={80}
+                height={80}
+                decoding="async"
+                className="h-full w-full object-contain p-2"
+              />
+            ) : (
+              <Building2 className="h-8 w-8" aria-hidden="true" />
+            )}
           </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-white">{org.name}</h1>
-              {org.isVerified && (
-                <span title="Verified Organization">
-                  <ShieldCheck className="w-5 h-5 text-blue-400" />
+
+          <div className="min-w-0 space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="truncate text-2xl font-black text-primary">
+                {organization.name}
+              </h1>
+              {organization.isVerified && (
+                <span title={copy.verified}>
+                  <ShieldCheck
+                    className="h-5 w-5 text-success"
+                    aria-hidden="true"
+                  />
                 </span>
               )}
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                COMMUNITY
+              <span className="rounded border border-[color:var(--nexus-warning)]/20 bg-warning-soft px-2 py-0.5 font-label uppercase text-warning">
+                {copy.community}
               </span>
             </div>
-            <div className="text-xs text-neutral-500">@{org.slug}</div>
-            <p className="text-xs text-neutral-300 max-w-xl">
-              {org.description || "MTA community, creator collective, or resource publisher."}
+
+            <div className="truncate text-xs text-faint">
+              @{organization.slug}
+            </div>
+
+            <p className="max-w-xl text-sm leading-relaxed text-muted">
+              {organization.description || copy.fallback}
             </p>
-            {org.websiteUrl && (
+
+            {organization.websiteUrl && (
               <a
-                href={org.websiteUrl}
+                href={organization.websiteUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:underline pt-1"
+                className="inline-flex max-w-full items-center gap-1.5 pt-1 text-xs font-semibold text-accent hover:underline"
               >
-                <Globe className="w-3.5 h-3.5" />
-                <span>{org.websiteUrl}</span>
-                <ExternalLink className="w-2.5 h-2.5" />
+                <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <span className="truncate">{organization.websiteUrl}</span>
+                <ExternalLink className="h-2.5 w-2.5 shrink-0" aria-hidden="true" />
               </a>
             )}
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center min-w-24">
-            <div className="text-lg font-bold text-white">{orgProducts.length}</div>
-            <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Releases</div>
-          </div>
+        <div className="min-w-28">
+          <StatCard
+            label={copy.releases}
+            value={products.length}
+            tone="accent"
+          />
         </div>
-      </div>
+      </section>
 
-      {/* Organization Releases */}
-      {orgProducts.length > 0 && (
+      {products.length > 0 && (
         <section className="space-y-4">
-          <h2 className="text-base font-bold text-white uppercase tracking-wider">
-            Studio Marketplace Releases ({orgProducts.length})
+          <h2 className="font-heading text-primary">
+            {copy.marketplaceReleases} ({products.length})
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {orgProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                locale={locale}
+              />
             ))}
           </div>
         </section>
       )}
 
-      {/* Organization Articles */}
-      {orgArticles.length > 0 && (
+      {articles.length > 0 && (
         <section className="space-y-4">
-          <h2 className="text-base font-bold text-white uppercase tracking-wider">
-            Technical Articles & Devlogs ({orgArticles.length})
+          <h2 className="font-heading text-primary">
+            {copy.articles} ({articles.length})
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {orgArticles.map((a) => (
-              <ArticleCard key={a.id} article={a} />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {articles.map((article) => (
+              <ArticleCard
+                key={article.id}
+                article={article}
+                locale={locale}
+              />
             ))}
           </div>
         </section>
