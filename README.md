@@ -106,6 +106,8 @@ Only two long-form documents are maintained:
 
 Everything else should be represented by executable code, migrations, tests, commit history, or issues instead of additional standalone planning documents.
 
+**Development handoff:** subsequent implementation ownership and the ordered Codex continuation plan are recorded in [Operations / Эксплуатация](docs/OPERATIONS.md#7-codex-handoff--передача-разработки-codex).
+
 ## Release state
 
 This repository is a closed-beta codebase. Production deployment is a separate operational decision and requires successful verification of the exact `main` SHA, backup/restore readiness, configured production secrets, TLS, storage, malware scanning and recovery delivery.
