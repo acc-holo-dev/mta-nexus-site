@@ -10,8 +10,8 @@ describe("creator profile trust signals", () => {
     );
 
     expect(page).toContain("authService.listDevelopers(100)");
-    expect(page).toContain("Verified identity");
-    expect(page).toContain("Creator profile");
+    expect(page).toContain("copy.verifiedIdentity");
+    expect(page).toContain("copy.creatorProfile");
     expect(page).not.toContain("Verified Seller");
     expect(page).not.toContain("Verified Developer");
   });
