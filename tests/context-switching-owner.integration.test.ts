@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { and, eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import {
+  auditEvents,
+  authRepository,
   db,
   organizationMembers,
   organizationRepository,
@@ -97,7 +99,20 @@ describe("organization owner context switching integration", () => {
       (context: { id: string }) => context.id === organizationId,
     );
     expect(repeated).toHaveLength(1);
-    expect(repeated[0]).
+    expect(repeated[0]).toMatchObject({ role: "owner" });
+    await authService.switchContext(ownerId, organizationId);
+    const events = await db.select().from(auditEvents).where(
+      and(
+        eq(auditEvents.actorId, ownerId),
+        eq(auditEvents.action, "user.context_switched"),
+      ),
+    );
+    expect(events).toHaveLength(1);
+    expect(events[0]?.details).toEqual({
+      from: "personal",
+      to: organizationId,
+    });
+  });
 
   it("falls back to personal when a previously selected membership context is revoked", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -161,11 +176,49 @@ describe("organization owner context switching integration", () => {
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.activeContextId).toBe("personal");
+    await expect(authService.switchContext(memberId, organizationId))
+      .rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
     expect(
       body.contexts.some(
         (context: { id: string }) => context.id === organizationId,
       ),
     ).toBe(false);
-  });toMatchObject({ role: "owner" });
   });
+  it("rolls back a context write when the audit insert fails", async () => {
+    const suffix = `${Date.now().toString(36)}_${process.pid}`;
+    const userId = `usr_context_atomic_${suffix}`;
+    const auditId = `aud_context_atomic_${suffix}`;
+    await userRepository.create({
+      id: userId,
+      email: `context_atomic_${suffix}@nexus.test`,
+      username: `context_atomic_${suffix}`,
+      displayName: "Context Audit Test",
+      role: "user",
+    });
+    await db.insert(auditEvents).values({
+      id: auditId,
+      actorId: userId,
+      actorType: "user",
+      action: "test.audit_collision",
+      targetId: userId,
+      targetType: "user",
+      createdAt: new Date(),
+    });
+
+    await expect(authRepository.switchContext({
+      userId, contextId: "personal", auditId,
+    })).resolves.toMatchObject({ activeContextId: "personal" });
+    const orgId = `org_context_atomic_${suffix}`;
+    await organizationRepository.create({
+      id: orgId,
+      name: "Context Audit Rollback",
+      slug: `context-atomic-${suffix}`,
+      ownerId: userId,
+    });
+    await expect(authRepository.switchContext({
+      userId, contextId: orgId, auditId,
+    })).rejects.toThrow();
+    expect((await userRepository.findById(userId))?.activeContextId).toBe("personal");
+  });
+
 });

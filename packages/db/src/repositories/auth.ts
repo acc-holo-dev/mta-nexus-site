@@ -1,7 +1,7 @@
 import { and, eq, gt, ne } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, sessions, users } from "../schema";
-import { ConflictError, UnauthorizedError } from "@nexus/domain";
+import { auditEvents, organizationMembers, organizations, sessions, users } from "../schema";
+import { ConflictError, ForbiddenError, NotFoundError, UnauthorizedError } from "@nexus/domain";
 import type { AuditEvent, User } from "@nexus/domain";
 import { digestSessionToken } from "./sessions";
 
@@ -109,6 +109,59 @@ export class AuthRepository {
         createdAt: new Date(),
       });
       return { revokedSessionCount, expiresAt: current.expiresAt };
+    });
+  }
+
+  async switchContext(data: {
+    userId: string;
+    contextId: string;
+    auditId: string;
+  }): Promise<User> {
+    return db.transaction(async (tx) => {
+      // Serialize changes to this user's active context. Authorization is checked
+      // after the user lock, together with the context write and audit insertion.
+      const [user] = await tx.select().from(users)
+        .where(eq(users.id, data.userId)).for("update");
+      if (!user) throw new NotFoundError("User", data.userId);
+
+      if (data.contextId !== "personal") {
+        // SHARE locks hold owner changes, organization deletion and membership
+        // revocation until this transaction commits.
+        const [organization] = await tx.select({ ownerId: organizations.ownerId })
+          .from(organizations).where(eq(organizations.id, data.contextId))
+          .for("share");
+        if (!organization) {
+          throw new ForbiddenError("Not authorized to switch to this organization context");
+        }
+        if (organization.ownerId !== data.userId) {
+          const [membership] = await tx.select({ id: organizationMembers.id })
+            .from(organizationMembers).where(and(
+              eq(organizationMembers.organizationId, data.contextId),
+              eq(organizationMembers.userId, data.userId),
+            )).for("share");
+          if (!membership) {
+            throw new ForbiddenError("Not authorized to switch to this organization context");
+          }
+        }
+      }
+
+      const previousContextId = user.activeContextId ?? "personal";
+      if (previousContextId === data.contextId) return user as User;
+
+      const [updated] = await tx.update(users)
+        .set({ activeContextId: data.contextId, updatedAt: new Date() })
+        .where(eq(users.id, data.userId)).returning();
+      await tx.insert(auditEvents).values({
+        id: data.auditId,
+        actorId: data.userId,
+        actorType: "user",
+        action: "user.context_switched",
+        targetId: data.userId,
+        targetType: "user",
+        details: { from: previousContextId, to: data.contextId },
+        createdAt: new Date(),
+      });
+      return updated as User;
     });
   }
 

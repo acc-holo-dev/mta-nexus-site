@@ -362,46 +362,14 @@ export class AuthService {
   }
 
   async switchContext(userId: string, contextId: string): Promise<User> {
-    const user = await userRepository.findById(userId);
-    if (!user) throw new NotFoundError("User", userId);
-
     const nextContextId = contextId.trim();
-    if (!nextContextId) {
-      throw new ForbiddenError("A context is required");
-    }
+    if (!nextContextId) throw new ForbiddenError("A context is required");
 
-    if (nextContextId !== "personal") {
-      const [organization, memberships] = await Promise.all([
-        organizationRepository.findById(nextContextId),
-        organizationRepository.listUserMemberships(userId),
-      ]);
-      const isMember = memberships.some(
-        (membership) => membership.organizationId === nextContextId,
-      );
-      const isOwner = organization?.ownerId === userId;
-      if (!organization || (!isOwner && !isMember)) {
-        throw new ForbiddenError(
-          "Not authorized to switch to this organization context",
-        );
-      }
-    }
-
-    const previousContextId = user.activeContextId ?? "personal";
-    const updated = await userRepository.update(userId, { activeContextId: nextContextId });
-    if (!updated) throw new NotFoundError("User", userId);
-
-    if (previousContextId !== nextContextId) {
-      await auditRepository.record({
-        id: generateId("aud"),
-        actorId: userId,
-        actorType: "user",
-        action: "user.context_switched",
-        targetId: userId,
-        targetType: "user",
-        details: { from: previousContextId, to: nextContextId },
-      });
-    }
-
+    const updated = await authRepository.switchContext({
+      userId,
+      contextId: nextContextId,
+      auditId: generateId("aud"),
+    });
     return toPublicUser(updated);
   }
 

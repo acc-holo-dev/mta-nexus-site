@@ -75,6 +75,10 @@ Expired entitlements are not accepted by authorization checks. License fallback 
 
 Authorization is evaluated from current actor context, resource ownership and organization membership. Historical `authorId`/owner attribution is not a permanent bypass after ownership changes.
 
+A context switch locks the user and the relevant organization/membership row, checks current access, updates `activeContextId` and records `user.context_switched` in one PostgreSQL transaction. Audit insertion failure rolls the context update back. A repeated switch to the same context creates no new audit event. Resource actions must still check their own authorization at execution time.
+
+При смене контекста проверка доступа, запись выбранного контекста и аудит выполняются в одной транзакции. Ошибка аудита откатывает изменение; доступ к ресурсу всегда проверяется заново при самом действии.
+
 ### Audit semantics
 
 Audit event names describe what is actually known. For binary responses, the pre-stream events are `*_download_started`; response creation is not represented as completed delivery.

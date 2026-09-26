@@ -11,7 +11,7 @@ describe("account context switching", () => {
 
     expect(route).toContain("contextSchema");
     expect(route).toContain(".strict()");
-    expect(route).toContain('consumeRateLimit("sessionManagement", user.id)');
+    expect(route).toMatch(/consumeRateLimit\(\s*"sessionManagement",\s*user\.id/);
     expect(route).toContain("authService.switchContext");
     expect(route).toContain("organizationRepository.listOwnedByUser(user.id, 50)");
     expect(route).toContain("contextsById");
@@ -24,6 +24,10 @@ describe("account context switching", () => {
   it("accepts a direct organization owner or a real membership and audits changed context", () => {
     const service = readFileSync(
       resolve(process.cwd(), "apps/web/src/lib/services/auth-service.ts"),
+      "utf8"
+    );
+    const repository = readFileSync(
+      resolve(process.cwd(), "packages/db/src/repositories/auth.ts"),
       "utf8"
     );
     const settings = readFileSync(
@@ -41,11 +45,12 @@ describe("account context switching", () => {
     expect(switcher.indexOf("setActiveContextId(data.activeContextId)")).toBeGreaterThan(
       switcher.indexOf("data?.success !== true"),
     );
-    expect(service).toContain("organizationRepository.findById(nextContextId)");
-    expect(service).toContain("organization?.ownerId === userId");
-    expect(service).toContain("organizationRepository.listUserMemberships(userId)");
-    expect(service).toContain("Not authorized to switch to this organization context");
-    expect(service).toContain('action: "user.context_switched"');
-    expect(service).toContain('targetType: "user"');
+    expect(service).toContain("authRepository.switchContext");
+    expect(repository).toContain("db.transaction(async (tx) =>");
+    expect(repository).toContain("organization.ownerId !== data.userId");
+    expect(repository).toContain("eq(organizationMembers.userId, data.userId)");
+    expect(repository).toContain("Not authorized to switch to this organization context");
+    expect(repository).toContain('action: "user.context_switched"');
+    expect(repository).toContain('targetType: "user"');
   });
 });
