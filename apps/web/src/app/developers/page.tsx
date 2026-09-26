@@ -1,71 +1,92 @@
-﻿import { authService } from "../../lib/services/auth-service";
 import Link from "next/link";
-import { Code2, Award, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Code2, ShieldCheck } from "lucide-react";
+import { Avatar, EmptyState } from "@nexus/ui";
+import { authService } from "../../lib/services/auth-service";
+import { getDictionary } from "../../lib/i18n";
+import { getRequestLocale } from "../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
 export default async function DevelopersPage() {
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.developers;
   const developers = await authService.listDevelopers(100);
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="border-b border-base pb-6">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-2.5">
-          <Code2 className="w-7 h-7 text-purple-500" />
-          <span>MTA Developer & Studio Network</span>
+        <h1 className="flex items-center gap-2.5 text-2xl font-extrabold text-primary sm:text-3xl">
+          <Code2 className="h-7 w-7 text-purple" aria-hidden="true" />
+          <span>{copy.title}</span>
         </h1>
-        <p className="text-xs text-neutral-400 mt-1">
-          Connect with veteran MTA:SA scripters, 3D modelers, UI designers, and systems architects.
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
+          {copy.description}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {developers.map((dev) => (
-          <Link
-            key={dev.id}
-            href={`/developers/${dev.username}`}
-            className="group flex flex-col p-6 rounded-xl border border-base bg-surface hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/5 transition-all"
-          >
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-neutral-800 border border-neutral-700">
-                <img
-                  src={dev.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${dev.username}`}
-                  alt={dev.displayName}
-                  className="w-full h-full object-cover"
+      {developers.length > 0 ? (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {developers.map((developer) => (
+            <Link
+              key={developer.id}
+              href={`/developers/${developer.username}`}
+              className="group flex flex-col rounded-xl border border-base bg-surface p-6 shadow-nexus-sm transition-all hover:border-strong hover:shadow-nexus"
+            >
+              <div className="mb-4 flex items-center gap-4">
+                <Avatar
+                  src={developer.avatarUrl || undefined}
+                  alt={developer.displayName}
+                  fallback={developer.displayName || developer.username}
+                  size="lg"
                 />
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <h3 className="text-sm font-bold text-white group-hover:text-purple-400 transition-colors">
-                    {dev.displayName}
-                  </h3>
-                  {dev.isVerified && (
-                    <span title="Verified identity">
-                      <ShieldCheck className="w-4 h-4 text-purple-400" />
-                    </span>
-                  )}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="truncate text-sm font-bold text-primary transition-colors group-hover:text-accent">
+                      {developer.displayName}
+                    </h3>
+                    {developer.isVerified && (
+                      <span title={copy.verifiedIdentity}>
+                        <ShieldCheck
+                          className="h-4 w-4 text-success"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    )}
+                  </div>
+                  <div className="truncate text-xs text-faint">
+                    @{developer.username}
+                  </div>
                 </div>
-                <div className="text-xs text-neutral-500">@{dev.username}</div>
               </div>
-            </div>
 
-            <p className="text-xs text-neutral-400 line-clamp-2 mb-4 flex-1">
-              {dev.bio || "MTA Community contributor and resource author."}
-            </p>
+              <p className="mb-4 line-clamp-2 flex-1 text-xs leading-relaxed text-muted">
+                {developer.bio || copy.bioFallback}
+              </p>
 
-            <div className="flex items-center justify-between pt-4 border-t border-base text-xs">
-              <span className="flex items-center gap-1 text-emerald-400 font-medium">
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                {dev.isVerified ? "Verified identity" : "Creator profile"}
-              </span>
-              <span className="text-purple-400 font-semibold group-hover:underline">
-                View Portfolio →
-              </span>
-            </div>
-          </Link>
-        ))}
-      </div>
+              <div className="flex items-center justify-between gap-3 border-t border-base pt-4 text-xs">
+                <span className="flex min-w-0 items-center gap-1 font-medium text-success">
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                  <span className="truncate">
+                    {developer.isVerified
+                      ? copy.verifiedIdentity
+                      : copy.creatorProfile}
+                  </span>
+                </span>
+                <span className="shrink-0 font-semibold text-accent group-hover:underline">
+                  {copy.viewPortfolio} →
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          title={copy.empty}
+          description={copy.description}
+          icon={<Code2 className="h-6 w-6" />}
+        />
+      )}
     </div>
   );
 }
