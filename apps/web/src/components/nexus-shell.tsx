@@ -6,6 +6,7 @@ import { MobileNav } from "./mobile-nav";
 import { Navbar } from "./navbar";
 import { Sidebar } from "./sidebar";
 import type { Locale } from "../lib/i18n";
+import { LocaleProvider } from "./locale-context";
 
 export function NexusShell({
   children,
@@ -30,7 +31,8 @@ export function NexusShell({
   };
 
   return (
-    <div className="min-h-screen bg-page text-primary">
+    <LocaleProvider locale={locale}>
+      <div className="min-h-screen bg-page text-primary">
       <div className="flex min-h-screen">
         <Sidebar
           locale={locale}
@@ -46,7 +48,8 @@ export function NexusShell({
           <Footer locale={locale} />
         </div>
       </div>
-      <MobileNav locale={locale} />
-    </div>
+        <MobileNav locale={locale} />
+      </div>
+    </LocaleProvider>
   );
 }
