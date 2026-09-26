@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
+import { ShieldCheck } from "lucide-react";
+import { Avatar, EmptyState, StatCard } from "@nexus/ui";
 import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
 import { ProductCard } from "../../../components/product-card";
-import { ShieldCheck } from "lucide-react";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +15,9 @@ export default async function DeveloperProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.developers;
   const user = await authService.getUserByUsername(username);
 
   if (!user || (user.role !== "developer" && user.role !== "admin")) {
@@ -20,59 +25,79 @@ export default async function DeveloperProfilePage({
   }
 
   const allProducts = await productService.listProducts({ limit: 100 });
-  const authorProducts = allProducts.filter((p) => p.authorId === user.id);
+  const authorProducts = allProducts.filter(
+    (product) => product.authorId === user.id,
+  );
 
   return (
     <div className="space-y-10">
-      {/* Header Profile card */}
-      <div className="p-8 rounded-2xl border border-base bg-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div className="flex items-center gap-6">
-          <div className="w-20 h-20 rounded-full overflow-hidden bg-neutral-800 border-2 border-purple-500/50 shadow-xl">
-            <img
-              src={user.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.username}`}
-              alt={user.displayName}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="space-y-1.5">
+      <section className="nexus-panel flex flex-col justify-between gap-6 p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
+        <div className="flex min-w-0 items-center gap-5 sm:gap-6">
+          <Avatar
+            src={user.avatarUrl || undefined}
+            alt={user.displayName}
+            fallback={user.displayName || user.username}
+            size="lg"
+            className="h-20 w-20 shrink-0 border-2 border-[color:var(--nexus-accent)]/30"
+          />
+          <div className="min-w-0 space-y-1.5">
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-white">{user.displayName}</h1>
+              <h1 className="truncate text-2xl font-black text-primary">
+                {user.displayName}
+              </h1>
               {user.isVerified && (
-                <span title="Verified identity">
-                  <ShieldCheck className="w-5 h-5 text-purple-400" />
+                <span title={copy.verifiedIdentity}>
+                  <ShieldCheck
+                    className="h-5 w-5 text-success"
+                    aria-hidden="true"
+                  />
                 </span>
               )}
             </div>
-            <div className="text-xs text-neutral-500">@{user.username}</div>
-            <p className="text-xs text-neutral-300 max-w-xl">{user.bio}</p>
+            <div className="truncate text-xs text-faint">
+              @{user.username}
+            </div>
+            <p className="max-w-xl text-sm leading-relaxed text-muted">
+              {user.bio || copy.bioFallback}
+            </p>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center">
-            <div className="text-lg font-bold text-white">{authorProducts.length}</div>
-            <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Resources</div>
-          </div>
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center">
-            <div className="text-lg font-bold text-emerald-400">{user.isVerified ? "Verified" : "Public"}</div>
-            <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Profile status</div>
-          </div>
+        <div className="grid min-w-48 grid-cols-2 gap-3">
+          <StatCard
+            label={copy.resources}
+            value={authorProducts.length}
+            tone="accent"
+          />
+          <StatCard
+            label={copy.profileStatus}
+            value={user.isVerified ? copy.verified : copy.public}
+            tone={user.isVerified ? "success" : "default"}
+          />
         </div>
-      </div>
+      </section>
 
-      {/* Authored Products */}
-      <div className="space-y-6">
-        <h2 className="text-lg font-bold text-white">Marketplace Releases by {user.displayName}</h2>
+      <section className="space-y-6">
+        <h2 className="font-heading text-primary">
+          {copy.releasesBy} {user.displayName}
+        </h2>
         {authorProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {authorProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {authorProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                locale={locale}
+              />
             ))}
           </div>
         ) : (
-          <p className="text-xs text-neutral-500">No public releases yet.</p>
+          <EmptyState
+            title={copy.noReleases}
+            description={copy.bioFallback}
+          />
         )}
-      </div>
+      </section>
     </div>
   );
 }
