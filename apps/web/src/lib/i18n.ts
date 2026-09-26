@@ -108,6 +108,21 @@ const en = {
     noPreview: "No preview",
     updated: "upd",
   },
+  savedPage: {
+    signInRequired: "Sign in required",
+    signInMessage: "Your saved items are private. Sign in to view them.",
+    signIn: "Sign in",
+    workspace: "Workspace",
+    breadcrumb: "Saved",
+    title: "Saved items",
+    description:
+      "Resources and servers you follow. Use the Follow button on any page to save it here.",
+    resources: "Saved resources",
+    servers: "Saved servers",
+    noResources: "No saved resources yet.",
+    noServers: "No saved servers yet.",
+    discoverServers: "Discover servers",
+  },
   workspace: {
     signInRequired: "Sign in required",
     signInMessage: "Sign in to manage your resource library and MTA servers.",
@@ -877,6 +892,21 @@ const ru: typeof en = {
     free: "Бесплатно",
     noPreview: "Нет превью",
     updated: "обн.",
+  },
+  savedPage: {
+    signInRequired: "Требуется вход",
+    signInMessage: "Сохранённые элементы приватны. Войдите, чтобы открыть их.",
+    signIn: "Войти",
+    workspace: "Рабочая зона",
+    breadcrumb: "Сохранённое",
+    title: "Сохранённые элементы",
+    description:
+      "Ресурсы и серверы, на которые вы подписались. Используйте кнопку подписки на их страницах, чтобы сохранить их здесь.",
+    resources: "Сохранённые ресурсы",
+    servers: "Сохранённые серверы",
+    noResources: "Сохранённых ресурсов пока нет.",
+    noServers: "Сохранённых серверов пока нет.",
+    discoverServers: "Найти серверы",
   },
   workspace: {
     signInRequired: "Требуется вход",

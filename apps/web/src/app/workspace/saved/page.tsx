@@ -1,113 +1,143 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { cookies } from "next/headers";
-import { socialRepository, productRepository, serverRepository } from "@nexus/db";
+import {
+  productRepository,
+  serverRepository,
+  socialRepository,
+} from "@nexus/db";
+import { ArrowLeft, Bookmark, Compass } from "lucide-react";
+import { EmptyState } from "@nexus/ui";
 import { authService } from "../../../lib/services/auth-service";
 import { ProductCard } from "../../../components/product-card";
 import { ServerCard } from "../../../components/server-card";
-import { Bookmark, ArrowLeft, Compass } from "lucide-react";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
 export default async function SavedPage() {
-  // Session isolation: real saved targets (follows) for the current user
-  const cookieStore = await cookies();
-  const token = cookieStore.get("nexus_session")?.value;
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.savedPage;
+
+  const token = (await cookies()).get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
   if (!user) {
     return (
-      <div className="max-w-md mx-auto py-20 text-center space-y-4">
-        <h1 className="font-display text-primary">Sign in required</h1>
-        <p className="font-caption text-muted">
-          Your saved items are private. Sign in to view them.
-        </p>
+      <div className="mx-auto max-w-md space-y-4 py-20 text-center">
+        <Bookmark className="mx-auto h-9 w-9 text-accent" aria-hidden="true" />
+        <h1 className="font-display text-primary">{copy.signInRequired}</h1>
+        <p className="font-caption text-muted">{copy.signInMessage}</p>
         <Link
           href="/auth/login"
-          className="inline-block px-4 py-2 rounded-md bg-accent hover:bg-[var(--nexus-accent-hover)] text-white text-xs font-semibold transition-colors"
+          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
         >
-          Sign In
+          {copy.signIn}
         </Link>
       </div>
     );
   }
 
-  const follows = await socialRepository.listFollows(user.id);
-  const [products, servers] = await Promise.all([
+  const [follows, products, servers] = await Promise.all([
+    socialRepository.listFollows(user.id),
     productRepository.list(),
     serverRepository.listActivePublic(),
   ]);
 
   const savedProductIds = new Set(
-    follows.filter((f) => f.targetType === "product").map((f) => f.targetId)
+    follows
+      .filter((follow) => follow.targetType === "product")
+      .map((follow) => follow.targetId),
   );
   const savedServerIds = new Set(
-    follows.filter((f) => f.targetType === "server").map((f) => f.targetId)
+    follows
+      .filter((follow) => follow.targetType === "server")
+      .map((follow) => follow.targetId),
   );
 
-  const savedProducts = products.filter((p) => savedProductIds.has(p.id));
-  const savedServers = servers.filter((s) => savedServerIds.has(s.id));
+  const savedProducts = products.filter((product) =>
+    savedProductIds.has(product.id),
+  );
+  const savedServers = servers.filter((server) =>
+    savedServerIds.has(server.id),
+  );
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-base pb-6">
-        <div>
-          <div className="flex items-center gap-2 text-xs text-muted mb-2">
-            <Link href="/workspace" className="hover:text-primary flex items-center gap-1">
-              <ArrowLeft className="w-3 h-3" />
-              <span>Workspace</span>
-            </Link>
-            <span>/</span>
-            <span className="text-secondary">Saved</span>
-          </div>
-          <h1 className="font-display text-primary flex items-center gap-2.5">
-            <Bookmark className="w-6 h-6 text-purple" />
-            <span>Saved Items</span>
-          </h1>
-          <p className="font-caption text-muted mt-1">
-            Products and servers you follow. Use the Follow button on any page to save it here.
-          </p>
+      <header className="border-b border-base pb-6">
+        <div className="mb-2 flex items-center gap-2 text-xs text-muted">
+          <Link
+            href="/workspace"
+            className="flex items-center gap-1 transition-colors hover:text-primary"
+          >
+            <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+            <span>{copy.workspace}</span>
+          </Link>
+          <span aria-hidden="true">/</span>
+          <span className="text-secondary">{copy.breadcrumb}</span>
         </div>
-      </div>
+        <h1 className="flex items-center gap-2.5 font-display text-primary">
+          <Bookmark className="h-6 w-6 text-purple" aria-hidden="true" />
+          <span>{copy.title}</span>
+        </h1>
+        <p className="mt-1 max-w-2xl font-caption text-muted">
+          {copy.description}
+        </p>
+      </header>
 
-      {/* Saved Products */}
       <section className="space-y-4">
-        <h2 className="font-label text-muted uppercase">
-          Saved Resources ({savedProducts.length})
+        <h2 className="font-label uppercase text-muted">
+          {copy.resources} ({savedProducts.length})
         </h2>
         {savedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {savedProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {savedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                locale={locale}
+              />
             ))}
           </div>
         ) : (
-          <div className="py-10 text-center nexus-panel">
-            <p className="font-caption text-muted">No saved resources yet.</p>
-          </div>
+          <EmptyState
+            title={copy.noResources}
+            description={dictionary.market.empty}
+            icon={<Bookmark className="h-6 w-6" />}
+          />
         )}
       </section>
 
-      {/* Saved Servers */}
       <section className="space-y-4">
-        <h2 className="font-label text-muted uppercase">Saved Servers ({savedServers.length})</h2>
+        <h2 className="font-label uppercase text-muted">
+          {copy.servers} ({savedServers.length})
+        </h2>
         {savedServers.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {savedServers.map((s) => (
-              <ServerCard key={s.id} server={s} />
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {savedServers.map((server) => (
+              <ServerCard
+                key={server.id}
+                server={server}
+                locale={locale}
+              />
             ))}
           </div>
         ) : (
-          <div className="py-10 text-center nexus-panel">
-            <p className="font-caption text-muted">No saved servers yet.</p>
-            <Link
-              href="/servers"
-              className="inline-flex items-center gap-1.5 mt-3 text-xs font-semibold text-accent hover:underline"
-            >
-              <Compass className="w-3.5 h-3.5" />
-              <span>Discover servers</span>
-            </Link>
-          </div>
+          <EmptyState
+            title={copy.noServers}
+            description={dictionary.servers.description}
+            icon={<Compass className="h-6 w-6" />}
+            action={
+              <Link
+                href="/servers"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white"
+              >
+                <Compass className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>{copy.discoverServers}</span>
+              </Link>
+            }
+          />
         )}
       </section>
     </div>
