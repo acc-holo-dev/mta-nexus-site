@@ -64,6 +64,7 @@ Required properties include:
 - HTTPS public URL;
 - unique strong authentication and proxy secrets;
 - persistent private storage;
+- container health that verifies HTTP/database readiness and real read/write access to the mounted private storage before the public proxy depends on the app;
 - PostgreSQL backup and restore procedure;
 - ClamAV enabled and reachable;
 - no development placeholder secrets;

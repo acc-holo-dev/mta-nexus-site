@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// Local container readiness only; do not change the public production health API.
+// Container runtime readiness. Keep storage probing internal to the container; do not expand the public health API.
 export async function checkLocalReadiness({
   storagePath = process.env.STORAGE_LOCAL_PATH,
   fetchFn = globalThis.fetch,
