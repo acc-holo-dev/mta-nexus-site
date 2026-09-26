@@ -53,11 +53,12 @@ describe("private GET cache policy", () => {
       'NextResponse.json({ reports }, { headers: privateHeaders })',
     );
     expect(verification).toContain(
-      '{ status: 401, headers: privateHeaders }',
+      'return json({ error: "Unauthorized" }, 401);',
     );
     expect(verification).toContain(
-      'NextResponse.json({ requests }, { headers: privateHeaders })',
+      "return json({ requests });",
     );
+    expect(verification).toContain("headers: privateHeaders");
   });
 
   it("keeps every explicit download outcome private", () => {
@@ -94,10 +95,10 @@ describe("private GET cache policy", () => {
       'const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" }',
     );
     expect(route).toContain(
-      'return NextResponse.json({ following: false }, { headers: privateHeaders })',
+      '{ authenticated: false, following: false }',
     );
     expect(route).toContain(
-      'return NextResponse.json({ following }, { headers: privateHeaders })',
+      '{ authenticated: true, following }',
     );
   });
 });

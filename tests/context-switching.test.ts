@@ -17,6 +17,7 @@ describe("account context switching", () => {
     expect(route).toContain("contextsById");
     expect(route).toContain('role: "owner"');
     expect(route).toContain('Cache-Control": "private, no-store"');
+    expect(route).toContain("function json");
     expect(route).toContain('type: "personal"');
   });
 
@@ -31,6 +32,15 @@ describe("account context switching", () => {
     );
 
     expect(settings).toContain("ContextSwitcher");
+    const switcher = readFileSync(
+      resolve(process.cwd(), "apps/web/src/components/context-switcher.tsx"),
+      "utf8",
+    );
+    expect(switcher).toContain("data?.success !== true");
+    expect(switcher).toContain("data.activeContextId !== contextId");
+    expect(switcher.indexOf("setActiveContextId(data.activeContextId)")).toBeGreaterThan(
+      switcher.indexOf("data?.success !== true"),
+    );
     expect(service).toContain("organizationRepository.findById(nextContextId)");
     expect(service).toContain("organization?.ownerId === userId");
     expect(service).toContain("organizationRepository.listUserMemberships(userId)");

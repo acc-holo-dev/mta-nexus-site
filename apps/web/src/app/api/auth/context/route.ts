@@ -11,14 +11,24 @@ const contextSchema = z
   })
   .strict();
 
-const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function json(body: unknown, status = 200) {
+  return NextResponse.json(body, {
+    status,
+    headers: privateHeaders,
+  });
+}
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
   if (!user) {
-    return NextResponse.json({ error: "Authentication required" }, { status: 401, headers: privateHeaders });
+    return json({ error: "Authentication required" }, 401);
   }
 
   const [ownedOrganizations, memberships] = await Promise.all([
@@ -48,8 +58,12 @@ export async function GET(request: NextRequest) {
   }
 
   const remainingMemberships = memberships
-    .filter((membership) => !contextsById.has(membership.organizationId))
+    .filter(
+      (membership) =>
+        !contextsById.has(membership.organizationId),
+    )
     .slice(0, Math.max(0, 50 - contextsById.size));
+
   const memberOrganizations = await Promise.all(
     remainingMemberships.map(async (membership) => ({
       membership,
@@ -70,32 +84,33 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const organizationContexts = Array.from(contextsById.values()).slice(0, 50);
+  const organizationContexts = Array.from(
+    contextsById.values(),
+  ).slice(0, 50);
 
-  const requestedActiveContextId = user.activeContextId ?? "personal";
+  const requestedActiveContextId =
+    user.activeContextId ?? "personal";
   const activeContextId =
     requestedActiveContextId === "personal" ||
     organizationContexts.some(
-      (organization) => organization.id === requestedActiveContextId,
+      (organization) =>
+        organization.id === requestedActiveContextId,
     )
       ? requestedActiveContextId
       : "personal";
 
-  return NextResponse.json(
-    {
-      activeContextId,
-      contexts: [
-        {
-          id: "personal",
-          type: "personal" as const,
-          name: user.displayName,
-          role: "personal" as const,
-        },
-        ...organizationContexts,
-      ],
-    },
-    { headers: privateHeaders }
-  );
+  return json({
+    activeContextId,
+    contexts: [
+      {
+        id: "personal",
+        type: "personal" as const,
+        name: user.displayName,
+        role: "personal" as const,
+      },
+      ...organizationContexts,
+    ],
+  });
 }
 
 export async function POST(request: NextRequest) {
@@ -104,43 +119,55 @@ export async function POST(request: NextRequest) {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      return json({ error: "Authentication required" }, 401);
     }
 
-    const rateLimit = await consumeRateLimit("sessionManagement", user.id);
-    if (!rateLimit.success) {
-      return NextResponse.json(
-        { error: "Too many context switches. Please try again shortly." },
-        { status: 429 }
-      );
-    }
-
-    const parsed = contextSchema.safeParse(await request.json().catch(() => null));
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid context", details: parsed.error.format() },
-        { status: 400 }
-      );
-    }
-
-    const updated = await authService.switchContext(user.id, parsed.data.contextId);
-    return NextResponse.json(
-      {
-        success: true,
-        activeContextId: updated.activeContextId ?? "personal",
-        user: updated,
-      },
-      { headers: privateHeaders }
+    const rateLimit = await consumeRateLimit(
+      "sessionManagement",
+      user.id,
     );
+    if (!rateLimit.success) {
+      return json(
+        {
+          error:
+            "Too many context switches. Please try again shortly.",
+        },
+        429,
+      );
+    }
+
+    const parsed = contextSchema.safeParse(
+      await request.json().catch(() => null),
+    );
+    if (!parsed.success) {
+      return json(
+        {
+          error: "Invalid context",
+          details: parsed.error.format(),
+        },
+        400,
+      );
+    }
+
+    const updated = await authService.switchContext(
+      user.id,
+      parsed.data.contextId,
+    );
+
+    return json({
+      success: true,
+      activeContextId: updated.activeContextId ?? "personal",
+      user: updated,
+    });
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return NextResponse.json(
+      return json(
         { error: error.message, code: error.code },
-        { status: error.statusCode }
+        error.statusCode,
       );
     }
 
     console.error("Context switch error:", error);
-    return NextResponse.json({ error: "Failed to switch context" }, { status: 500 });
+    return json({ error: "Failed to switch context" }, 500);
   }
 }

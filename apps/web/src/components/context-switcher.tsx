@@ -61,8 +61,6 @@ export function ContextSwitcher() {
   async function switchContext(contextId: string) {
     if (saving || contextId === activeContextId) return;
 
-    const previousContextId = activeContextId;
-    setActiveContextId(contextId);
     setSaving(true);
     setError(null);
 
@@ -77,15 +75,19 @@ export function ContextSwitcher() {
       });
       const data = await response.json().catch(() => null);
 
-      if (!response.ok) {
-        setActiveContextId(previousContextId);
+      if (
+        !response.ok ||
+        data?.success !== true ||
+        typeof data.activeContextId !== "string" ||
+        data.activeContextId !== contextId
+      ) {
         setError(data?.error || copy.switchError);
         return;
       }
 
+      setActiveContextId(data.activeContextId);
       router.refresh();
     } catch {
-      setActiveContextId(previousContextId);
       setError(copy.switchError);
     } finally {
       setSaving(false);
