@@ -23,6 +23,6 @@ describe("closed beta product policy", () => {
 
     expect(market).not.toContain('id: "price_asc"');
     expect(market).not.toContain('id: "price_desc"');
-    expect(card).toContain('const formattedPrice = "Free"');
+    expect(card).toContain("dictionary.market.free");
   });
 });

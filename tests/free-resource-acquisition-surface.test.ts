@@ -6,16 +6,23 @@ const read = (path: string) =>
   readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("free resource acquisition surface", () => {
-  it("uses the free claim endpoint rather than the disabled paid checkout API", () => {
-    const page = read("apps/web/src/app/checkout/page.tsx");
+  it("uses a dedicated acquisition route and the free claim endpoint", () => {
+    const page = read("apps/web/src/app/acquire/page.tsx");
+    const legacy = read("apps/web/src/app/checkout/page.tsx");
 
     expect(page).toContain('fetch("/api/resources/claim"');
     expect(page).not.toContain('fetch("/api/checkout"');
     expect(page).toContain("copy.addToLibrary");
+    expect(page).toContain('credentials: "same-origin"');
+    expect(page).toContain('cache: "no-store"');
+
+    expect(legacy).toContain('redirect(');
+    expect(legacy).toContain('/acquire?productId=');
+    expect(legacy).not.toContain("/api/resources/claim");
   });
 
-  it("returns users directly to the resource or resource library after a successful claim", () => {
-    const page = read("apps/web/src/app/checkout/page.tsx");
+  it("returns users directly to the resource or library after a successful claim", () => {
+    const page = read("apps/web/src/app/acquire/page.tsx");
 
     expect(page).toContain('href={`/market/${product?.slug ?? ""}`}');
     expect(page).toContain('href="/workspace"');

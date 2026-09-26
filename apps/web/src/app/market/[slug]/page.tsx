@@ -2,8 +2,17 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import type { Metadata } from "next";
-import { productService } from "../../../lib/services/product-service";
+import {
+  CheckCircle2,
+  Download,
+  Key,
+  Layers,
+  MessageSquare,
+  ShieldCheck,
+  Star,
+} from "lucide-react";
 import { contentService } from "../../../lib/services/content-service";
+import { productService } from "../../../lib/services/product-service";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
 import { BuildProvenanceDetails } from "../../../components/build-provenance-details";
@@ -11,21 +20,13 @@ import { ProductDependencyList } from "../../../components/product-dependency-li
 import { ReverseDependencyList } from "../../../components/reverse-dependency-list";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import {
-  Star,
-  Download,
-  ShieldCheck,
-  CheckCircle2,
-  Layers,
-  ArrowRight,
-  MessageSquare,
-  Key,
-} from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 function formatFileSize(bytes: number): string {
-  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  if (bytes < 1024 * 1024) {
+    return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  }
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
@@ -37,6 +38,32 @@ function formatScanStatus(
   if (status === "not_scanned") return copy.scanReview;
   if (status === "error") return copy.scanUnavailable;
   return copy.scanBlocked;
+}
+
+function formatProductStatus(
+  status: string,
+  copy: ReturnType<typeof getDictionary>["product"],
+): string {
+  if (status === "draft") return copy.statusDraft;
+  if (status === "pending_review") return copy.statusPendingReview;
+  if (status === "published") return copy.statusPublished;
+  if (status === "suspended") return copy.statusSuspended;
+  if (status === "archived") return copy.statusArchived;
+  return status.replace(/_/g, " ");
+}
+
+function formatBuildStatus(
+  status: string,
+  copy: ReturnType<typeof getDictionary>["product"],
+): string {
+  if (status === "draft") return copy.buildDraft;
+  if (status === "testing") return copy.buildTesting;
+  if (status === "pending_review") return copy.buildPendingReview;
+  if (status === "published") return copy.buildPublished;
+  if (status === "rejected") return copy.buildRejected;
+  if (status === "deprecated") return copy.buildDeprecated;
+  if (status === "retired") return copy.buildRetired;
+  return status.replace(/_/g, " ");
 }
 
 export async function generateMetadata({
@@ -53,17 +80,20 @@ export async function generateMetadata({
     return { title: dictionary.product.notFound };
   }
 
+  const description =
+    product.shortDescription || product.description.slice(0, 155);
+
   return {
     title: product.title,
-    description:
-      product.shortDescription ||
-      product.description.slice(0, 155),
+    description,
     alternates: { canonical: `/market/${product.slug}` },
     openGraph: {
       title: product.title,
-      description: product.shortDescription || product.description.slice(0, 155),
+      description,
       type: "website",
-      images: product.thumbnailUrl ? [{ url: product.thumbnailUrl }] : undefined,
+      images: product.thumbnailUrl
+        ? [{ url: product.thumbnailUrl }]
+        : undefined,
     },
   };
 }
@@ -77,8 +107,7 @@ export default async function ProductDetailPage({
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const copy = dictionary.product;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("nexus_session")?.value;
+  const token = (await cookies()).get("nexus_session")?.value;
   const user = await authService.getSession(token);
   const product = await productService.getProductPreviewBySlug(slug, user);
 
@@ -94,10 +123,9 @@ export default async function ProductDetailPage({
     ? await commerceService.checkEntitlement(
         { type: "user", id: user.id },
         product.id,
-        "product.download"
+        "product.download",
       )
     : false;
-
   const isAdmin = user?.role === "admin";
   const hasAccess =
     isPublished && (canManageProduct || isLicensed || isAdmin);
@@ -112,286 +140,352 @@ export default async function ProductDetailPage({
     productService.getProductBuilds(product.id, canInspectBuilds),
     contentService.getComments({ productId: product.id }),
     productService.getDependencyResolution(product).catch(() => null),
-    productService.getReverseDependencySummary(product.slug).catch(() => null),
+    productService
+      .getReverseDependencySummary(product.slug)
+      .catch(() => null),
   ]);
 
-  const formattedPrice = copy.free;
+  const formattedPrice =
+    product.price === 0
+      ? copy.free
+      : dictionary.checkout.paidUnavailable;
+  const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   return (
     <div className="space-y-10">
       {!isPublished && (
-        <div className="rounded-xl border border-amber-800/60 bg-amber-950/30 p-4 text-sm text-amber-200">
-          {copy.privatePreview} · resource status: {product.status.replace(/_/g, " ")}. {copy.notPublic}
+        <div className="rounded-xl border border-[color:var(--nexus-warning)]/25 bg-warning-soft p-4 text-sm text-warning">
+          <strong>{copy.privatePreview}</strong> · {copy.resourceStatus}:{" "}
+          {formatProductStatus(product.status, copy)}. {copy.notPublic}
         </div>
       )}
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-neutral-400">
-        <Link href="/market" className="hover:text-white">{copy.market}</Link>
-        <span>/</span>
+
+      <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+        <Link
+          href="/market"
+          className="transition-colors hover:text-primary"
+        >
+          {copy.market}
+        </Link>
+        <span aria-hidden="true">/</span>
         <span className="capitalize">{product.type}</span>
-        <span>/</span>
-        <span className="text-neutral-200">{product.title}</span>
+        <span aria-hidden="true">/</span>
+        <span className="text-secondary">{product.title}</span>
       </div>
 
-      {/* Main product presentation */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Gallery & Description */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="relative aspect-video w-full rounded-xl bg-neutral-900 border border-base overflow-hidden shadow-2xl">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-base bg-inset shadow-nexus-lg">
             {product.thumbnailUrl ? (
               <img
                 src={product.thumbnailUrl}
                 alt={product.title}
-                className="w-full h-full object-cover"
+                width={1280}
+                height={720}
+                fetchPriority="high"
+                decoding="async"
+                className="h-full w-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-neutral-600">
+              <div className="flex h-full w-full items-center justify-center text-sm text-faint">
                 {copy.previewUnavailable}
               </div>
             )}
-            <div className="absolute top-4 left-4 flex gap-2">
-              <span className="px-2.5 py-1 rounded text-xs font-bold uppercase tracking-wider bg-blue-600 text-white shadow">
+            <div className="absolute left-4 top-4 flex gap-2">
+              <span className="rounded bg-accent px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-nexus-sm">
                 {product.type}
               </span>
-              <span className="px-2.5 py-1 rounded text-xs font-mono font-bold bg-black/80 text-white backdrop-blur border border-neutral-700">
+              <span className="rounded border border-white/15 bg-black/70 px-2.5 py-1 font-numeric text-xs font-bold text-white backdrop-blur">
                 v{product.currentVersion}
               </span>
             </div>
           </div>
 
-          {/* Description */}
-          <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
-            <h2 className="text-base font-bold text-white border-b border-base pb-3">
+          <section className="nexus-panel space-y-4 p-6">
+            <h2 className="border-b border-base pb-3 text-base font-bold text-primary">
               {copy.overview}
             </h2>
-            <div className="text-sm text-neutral-300 leading-relaxed whitespace-pre-line">
+            <div className="whitespace-pre-line text-sm leading-relaxed text-secondary">
               {product.description}
             </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 pt-4 border-t border-base">
+            <div className="flex flex-wrap gap-2 border-t border-base pt-4">
               {product.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2.5 py-1 rounded-md text-xs bg-neutral-900 text-neutral-400 border border-base"
+                  className="rounded-md border border-base bg-inset px-2.5 py-1 text-xs text-muted"
                 >
                   #{tag}
                 </span>
               ))}
             </div>
-          </div>
+          </section>
 
-          {/* Release History & Builds */}
-          <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
-            <h2 className="text-base font-bold text-white border-b border-base pb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Layers className="w-4 h-4 text-blue-400" />
+          <section className="nexus-panel space-y-4 p-6">
+            <div className="flex flex-col justify-between gap-2 border-b border-base pb-3 sm:flex-row sm:items-center">
+              <h2 className="flex items-center gap-2 text-base font-bold text-primary">
+                <Layers className="h-4 w-4 text-accent" aria-hidden="true" />
                 <span>{copy.releaseHistory}</span>
-              </div>
-              <span className="text-[11px] text-neutral-500 font-mono">{copy.shaRecorded}</span>
-            </h2>
+              </h2>
+              <span className="font-numeric text-[11px] text-faint">
+                {copy.shaRecorded}
+              </span>
+            </div>
+
+            <p className="text-xs leading-relaxed text-muted">
+              {copy.latestBuildNotice}
+            </p>
 
             {builds.length > 0 ? (
               <div className="space-y-4">
-                {builds.map((b) => (
-                  <div
-                    key={b.id}
-                    className="p-4 rounded-lg bg-neutral-900 border border-base space-y-2"
+                {builds.map((build) => (
+                  <article
+                    key={build.id}
+                    className="space-y-3 rounded-lg border border-base bg-inset p-4"
                   >
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold font-mono text-white">{copy.version} {b.version}</span>
-                        {canInspectBuilds && b.status !== "published" && (
-                          <span className="rounded bg-amber-950/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-amber-300">
-                            {b.status.replace(/_/g, " ")}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-neutral-500 font-mono text-[11px]">
-                          SHA-256: {b.sha256Hash.slice(0, 16)}...
+                    <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono font-bold text-primary">
+                          {copy.version} {build.version}
                         </span>
-                        {hasAccess && b.status === "published" && (
-                          <a
-                            href={`/api/products/${product.id}/download`}
-                            className="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold"
-                          >
-                            <Download className="w-3 h-3" />
-                            <span>{copy.download}</span>
-                          </a>
-                        )}
+                        <span
+                          className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${
+                            build.status === "published"
+                              ? "bg-success-soft text-success"
+                              : build.status === "rejected"
+                                ? "bg-danger-soft text-danger"
+                                : "bg-warning-soft text-warning"
+                          }`}
+                        >
+                          {formatBuildStatus(build.status, copy)}
+                        </span>
                       </div>
+                      <span className="font-numeric text-[11px] text-faint">
+                        SHA-256: {build.sha256Hash.slice(0, 16)}…
+                      </span>
                     </div>
-                    <div className="grid grid-cols-1 gap-1 text-[11px] text-neutral-400 sm:grid-cols-3">
-                      <span className="truncate" title={b.fileName}>{copy.file}: {b.fileName}</span>
-                      <span>{copy.size}: {formatFileSize(b.fileSizeBytes)}</span>
-                      <span>MTA: {b.mtaVersionTarget ? `>= ${b.mtaVersionTarget}` : copy.notDeclared}</span>
-                      <span>{b.isSigned ? copy.signaturePresent : copy.signatureMissing}</span>
-                      <span>{formatScanStatus(b.scanStatus, copy)}</span>
+
+                    <div className="grid grid-cols-1 gap-1 text-[11px] text-muted sm:grid-cols-3">
+                      <span className="truncate" title={build.fileName}>
+                        {copy.file}: {build.fileName}
+                      </span>
+                      <span>
+                        {copy.size}: {formatFileSize(build.fileSizeBytes)}
+                      </span>
+                      <span>
+                        MTA:{" "}
+                        {build.mtaVersionTarget
+                          ? `>= ${build.mtaVersionTarget}`
+                          : copy.notDeclared}
+                      </span>
+                      <span>
+                        {build.isSigned
+                          ? copy.signaturePresent
+                          : copy.signatureMissing}
+                      </span>
+                      <span>{formatScanStatus(build.scanStatus, copy)}</span>
                     </div>
-                    <BuildProvenanceDetails build={b} />
-                    {b.releaseNotes && (
-                      <div className="text-xs text-neutral-300 whitespace-pre-line font-mono bg-black/40 p-2.5 rounded border border-neutral-800">
-                        {b.releaseNotes}
+
+                    <BuildProvenanceDetails build={build} />
+
+                    {build.releaseNotes && (
+                      <div className="whitespace-pre-line rounded border border-base bg-surface p-2.5 font-mono text-xs text-secondary">
+                        {build.releaseNotes}
                       </div>
                     )}
-                  </div>
+                  </article>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-neutral-500">{copy.noBuilds}</p>
+              <p className="text-xs text-faint">{copy.noBuilds}</p>
             )}
-          </div>
+          </section>
 
-          <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
-            <h2 className="text-base font-bold text-white border-b border-base pb-3">
+          <section className="nexus-panel space-y-4 p-6">
+            <h2 className="border-b border-base pb-3 text-base font-bold text-primary">
               {copy.usedBy}
             </h2>
             <ReverseDependencyList summary={reverseDependencySummary} />
-          </div>
+          </section>
 
-          {/* Customer Reviews */}
-          <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
-            <h2 className="text-base font-bold text-white border-b border-base pb-3 flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-amber-400" />
+          <section className="nexus-panel space-y-4 p-6">
+            <h2 className="flex items-center gap-2 border-b border-base pb-3 text-base font-bold text-primary">
+              <MessageSquare
+                className="h-4 w-4 text-warning"
+                aria-hidden="true"
+              />
               <span>{copy.reviews}</span>
             </h2>
+
             {reviews.length > 0 ? (
               <div className="space-y-4">
-                {reviews.map((rev) => (
-                  <div
-                    key={rev.id}
-                    className="p-4 rounded-lg bg-neutral-900 border border-base space-y-2"
+                {reviews.map((review) => (
+                  <article
+                    key={review.id}
+                    className="space-y-2 rounded-lg border border-base bg-inset p-4"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex text-amber-400">
-                          {Array.from({ length: rev.rating || 5 }).map((_, i) => (
-                            <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex text-warning">
+                          {Array.from({
+                            length: review.rating || 5,
+                          }).map((_, index) => (
+                            <Star
+                              key={index}
+                              className="h-3.5 w-3.5 fill-current"
+                              aria-hidden="true"
+                            />
                           ))}
                         </div>
-                        {rev.isVerifiedPurchase && (
-                          <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-medium">
-                            <CheckCircle2 className="w-3 h-3" />
+                        {review.isVerifiedPurchase && (
+                          <span className="flex items-center gap-1 text-[11px] font-medium text-success">
+                            <CheckCircle2
+                              className="h-3 w-3"
+                              aria-hidden="true"
+                            />
                             {copy.verifiedAcquisition}
                           </span>
                         )}
                       </div>
-                      <span className="text-[11px] text-neutral-500 font-mono">
-                        {new Date(rev.createdAt).toLocaleDateString(
-                          locale === "ru" ? "ru-RU" : "en-US",
+                      <time
+                        dateTime={new Date(review.createdAt).toISOString()}
+                        className="font-numeric text-[11px] text-faint"
+                      >
+                        {new Date(review.createdAt).toLocaleDateString(
+                          dateLocale,
                         )}
-                      </span>
+                      </time>
                     </div>
-                    <p className="text-xs text-neutral-300 leading-relaxed">{rev.text}</p>
-                  </div>
+                    <p className="text-xs leading-relaxed text-secondary">
+                      {review.text}
+                    </p>
+                  </article>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-neutral-500">{copy.noReviews}</p>
+              <p className="text-xs text-faint">{copy.noReviews}</p>
             )}
-          </div>
+          </section>
         </div>
 
-        {/* Pricing & Ownership Sidebar */}
-        <div className="space-y-6">
-          <div className="p-6 rounded-xl border border-base bg-surface space-y-6 sticky top-24">
+        <aside className="space-y-6">
+          <div className="nexus-panel sticky top-24 space-y-6 p-6 shadow-nexus-sm">
             <div>
-              <div className="text-3xl font-black text-white">{formattedPrice}</div>
-              <div className="text-xs text-neutral-400 mt-1 capitalize">
-                {copy.licenseModel}: {product.licenseModel.replace(/_/g, " ")}
+              <div className="text-3xl font-black text-primary">
+                {formattedPrice}
+              </div>
+              <div className="mt-1 text-xs text-muted">
+                {copy.licenseModel}:{" "}
+                <span className="capitalize">
+                  {product.licenseModel.replace(/_/g, " ")}
+                </span>
               </div>
             </div>
 
-            {/* Ownership / Action Box */}
-            <div className="space-y-3 pt-4 border-t border-base">
+            <div className="space-y-3 border-t border-base pt-4">
               {hasAccess ? (
                 <div className="space-y-3">
-                  <div className="p-3.5 rounded-lg bg-emerald-950/30 border border-emerald-900/40 text-emerald-400 space-y-1">
-                    <div className="flex items-center gap-1.5 text-xs font-bold">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>{canManageProduct ? copy.managementAccess : copy.inLibrary}</span>
+                  <div className="space-y-1 rounded-lg border border-[color:var(--nexus-success)]/20 bg-success-soft p-3.5">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-success">
+                      <CheckCircle2
+                        className="h-4 w-4"
+                        aria-hidden="true"
+                      />
+                      <span>
+                        {canManageProduct
+                          ? copy.managementAccess
+                          : copy.inLibrary}
+                      </span>
                     </div>
-                    <p className="text-[11px] text-neutral-400">
+                    <p className="text-[11px] text-muted">
                       {copy.authorized}
                     </p>
                   </div>
 
                   <a
                     href={`/api/products/${product.id}/download`}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--nexus-success)] py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90"
                   >
-                    <Download className="w-4 h-4" />
-                    <span>{copy.downloadBuild} v{product.currentVersion}</span>
+                    <Download className="h-4 w-4" aria-hidden="true" />
+                    <span>
+                      {copy.downloadBuild} v{product.currentVersion}
+                    </span>
                   </a>
 
                   <Link
                     href="/workspace"
-                    className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-base text-neutral-300 text-xs font-semibold transition-colors"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-base bg-surface py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
                   >
-                    <Key className="w-3.5 h-3.5" />
+                    <Key className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>{copy.openLibrary}</span>
                   </Link>
                 </div>
-              ) : (
+              ) : product.price === 0 ? (
                 <div className="space-y-3">
                   <Link
-                    href={`/checkout?productId=${product.id}`}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-500/20 transition-all cursor-pointer"
+                    href={`/acquire?productId=${product.id}`}
+                    className="flex w-full items-center justify-center rounded-lg bg-accent py-3 text-sm font-bold text-white shadow-nexus transition-colors hover:bg-[var(--nexus-accent-hover)]"
                   >
-                    <span>{copy.addToLibrary}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    {copy.addToLibrary}
                   </Link>
-                  <p className="text-[11px] text-center text-neutral-500">
+                  <p className="text-center text-[11px] text-faint">
                     {copy.claimRequired}
                   </p>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-[color:var(--nexus-warning)]/20 bg-warning-soft p-4 text-xs text-warning">
+                  {dictionary.checkout.paidDisabled}
                 </div>
               )}
             </div>
 
-            {/* Specifications Matrix */}
-            <div className="space-y-3 pt-4 border-t border-base text-xs">
-              <h4 className="font-bold text-white text-xs uppercase tracking-wider">
+            <div className="space-y-3 border-t border-base pt-4 text-xs">
+              <h4 className="font-label uppercase text-primary">
                 {copy.compatibility}
               </h4>
               <div className="space-y-2">
-                <div className="flex justify-between py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">{copy.mtaVersion}</span>
-                  <span className="font-mono text-neutral-200">
+                <div className="flex justify-between gap-4 border-b border-base py-1">
+                  <span className="text-muted">{copy.mtaVersion}</span>
+                  <span className="font-mono text-secondary">
                     {product.compatibility.mtaMinVersion
                       ? `>= ${product.compatibility.mtaMinVersion}`
                       : copy.notDeclared}
                   </span>
                 </div>
-                <div className="flex justify-between gap-4 py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">{copy.dependencies}</span>
+                <div className="flex justify-between gap-4 border-b border-base py-1">
+                  <span className="text-muted">{copy.dependencies}</span>
                   <ProductDependencyList
                     declared={product.compatibility.dependencies ?? []}
                     resolution={dependencyResolution}
                   />
                 </div>
-                <div className="flex justify-between py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">{copy.libraryAdditions}</span>
-                  <span className="font-mono text-neutral-200">{product.salesCount}</span>
+                <div className="flex justify-between gap-4 border-b border-base py-1">
+                  <span className="text-muted">{copy.libraryAdditions}</span>
+                  <span className="font-mono text-secondary">
+                    {product.salesCount}
+                  </span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-neutral-800">
-                  <span className="text-neutral-400">{copy.rating}</span>
-                  <span className="font-mono text-amber-400">
-                    {(product.ratingAverage / 10).toFixed(1)} / 5.0 ({product.ratingCount})
+                <div className="flex justify-between gap-4 border-b border-base py-1">
+                  <span className="text-muted">{copy.rating}</span>
+                  <span className="font-mono text-warning">
+                    {(product.ratingAverage / 10).toFixed(1)} / 5.0 (
+                    {product.ratingCount})
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Security Guarantee */}
-            <div className="p-3 rounded-lg bg-blue-950/20 border border-blue-900/30 flex items-start gap-2.5 text-xs">
-              <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-              <div className="text-neutral-300 text-[11px] leading-relaxed">
+            <div className="flex items-start gap-2.5 rounded-lg border border-[color:var(--nexus-accent)]/20 bg-accent-soft p-3 text-xs">
+              <ShieldCheck
+                className="mt-0.5 h-4 w-4 shrink-0 text-accent"
+                aria-hidden="true"
+              />
+              <div className="text-[11px] leading-relaxed text-secondary">
                 {copy.security}
               </div>
             </div>
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );
