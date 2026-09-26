@@ -19,6 +19,6 @@ describe("bounded home feed reads", () => {
     expect(service).toContain("maxPrice: 0");
     expect(service).toContain("limit: 4");
     expect(service).toContain("listActivePublic(3)");
-    expect(service).toContain("listPublished(3)");
+    expect(service).toContain("this.listArticles(3)");
   });
 });
