@@ -33,7 +33,10 @@ export function ContentCommentForm({ slug }: { slug: string }) {
         },
       );
       const payload = await response.json().catch(() => null);
-      if (!response.ok) {
+      if (
+        !response.ok ||
+        typeof payload?.comment?.id !== "string"
+      ) {
         throw new Error(payload?.error || copy.commentError);
       }
 

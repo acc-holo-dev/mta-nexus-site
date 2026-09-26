@@ -80,7 +80,11 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         },
       );
       const data = await response.json().catch(() => null);
-      if (!response.ok) {
+      if (
+        !response.ok ||
+        typeof data?.server?.id !== "string" ||
+        data.server.id !== server.id
+      ) {
         throw new Error(data?.error || copy.saveError);
       }
 

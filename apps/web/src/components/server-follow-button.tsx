@@ -99,7 +99,10 @@ export function ServerFollowButton({
         setState("following");
         return;
       }
-      if (!response.ok) throw new Error("Follow mutation failed");
+      const data = await response.json().catch(() => null);
+      if (!response.ok || data?.success !== true) {
+        throw new Error("Follow mutation failed");
+      }
 
       setState(state === "following" ? "not-following" : "following");
     } catch {

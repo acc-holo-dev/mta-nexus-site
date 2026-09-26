@@ -43,7 +43,10 @@ describe("follow GET cache privacy", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ following: false });
+    expect(await response.json()).toEqual({
+      authenticated: false,
+      following: false,
+    });
     expect(response.headers.get("Cache-Control")).toBe(
       "private, no-store",
     );
@@ -68,7 +71,10 @@ describe("follow GET cache privacy", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ following: true });
+    expect(await response.json()).toEqual({
+      authenticated: true,
+      following: true,
+    });
     expect(isFollowing).toHaveBeenCalledWith(
       "usr_follow",
       "server",

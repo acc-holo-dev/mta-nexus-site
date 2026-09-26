@@ -20,6 +20,7 @@ describe("admin content moderation UI", () => {
     expect(controls).toContain('moderate("publish")');
     expect(controls).toContain('moderate("archive")');
     expect(controls).toContain('credentials: "same-origin"');
+    expect(controls).toContain("data?.success !== true");
     expect(route).toContain('targetType: z.literal("content")');
     expect(route).toContain('z.enum(["publish", "archive"])');
   });

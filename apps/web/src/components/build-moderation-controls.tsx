@@ -55,7 +55,7 @@ export function BuildModerationControls({
         signal: AbortSignal.timeout(10_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok) {
+      if (!response.ok || data?.success !== true) {
         setError(data?.error || copy.buildFailed);
         return;
       }

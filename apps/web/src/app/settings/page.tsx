@@ -15,6 +15,25 @@ type Preferences = {
   systemEnabled: boolean;
 };
 
+const preferenceKeys = [
+  "followsEnabled",
+  "contentEnabled",
+  "serverEnabled",
+  "commerceEnabled",
+  "systemEnabled",
+] as const;
+
+function isPreferences(value: unknown): value is Preferences {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  return preferenceKeys.every(
+    (key) => typeof record[key] === "boolean",
+  );
+}
+
 type Session = {
   id: string;
   expiresAt: string;
@@ -177,7 +196,7 @@ export default function SettingsPage() {
       .then(([preferenceData, sessionData, recovery]) => {
         if (!active) return;
         if (
-          !preferenceData.preferences ||
+          !isPreferences(preferenceData.preferences) ||
           !Array.isArray(sessionData.sessions) ||
           typeof recovery.email !== "string" ||
           typeof recovery.verified !== "boolean" ||
@@ -302,7 +321,7 @@ export default function SettingsPage() {
       }
 
       if (data.accepted !== true) {
-        throw new Error(copy.unconfirmedVerification);
+        throw new SettingsError(copy.unconfirmedVerification, 502);
       }
 
       setNotice({
@@ -321,7 +340,7 @@ export default function SettingsPage() {
       }>("/api/auth/password", "POST", password);
 
       if (data.success !== true) {
-        throw new Error(copy.unconfirmedPasswordChange);
+        throw new SettingsError(copy.unconfirmedPasswordChange, 502);
       }
 
       setPassword({ currentPassword: "", newPassword: "" });
@@ -339,7 +358,7 @@ export default function SettingsPage() {
         { sessionId },
       );
       if (data.success !== true) {
-        throw new Error(copy.unconfirmedSessionRevocation);
+        throw new SettingsError(copy.unconfirmedSessionRevocation, 502);
       }
       await refreshAfterSuccess(copy.sessionEnded);
     });
@@ -353,7 +372,7 @@ export default function SettingsPage() {
       }>("/api/auth/sessions", "DELETE", { allOther: true });
 
       if (data.success !== true) {
-        throw new Error(copy.unconfirmedSessionRevocation);
+        throw new SettingsError(copy.unconfirmedSessionRevocation, 502);
       }
 
       await refreshAfterSuccess(
@@ -364,12 +383,21 @@ export default function SettingsPage() {
 
   function updatePreference(key: keyof Preferences, value: boolean) {
     void perform(async () => {
-      await requestSettings("/api/notifications/preferences", "PATCH", {
+      const data = await requestSettings<{
+        success: boolean;
+        preferences: Preferences;
+      }>("/api/notifications/preferences", "PATCH", {
         [key]: value,
       });
-      setPreferences((previous) =>
-        previous ? { ...previous, [key]: value } : previous,
-      );
+
+      if (
+        data.success !== true ||
+        !isPreferences(data.preferences)
+      ) {
+        throw new SettingsError(copy.requestUnconfirmed, 502);
+      }
+
+      setPreferences(data.preferences);
       setNotice({
         text: copy.preferenceSaved,
         error: false,

@@ -27,6 +27,7 @@ describe("server follow surface", () => {
     );
     expect(component).toContain('targetType: "server"');
     expect(component).toContain('method: state === "following" ? "DELETE" : "POST"');
+    expect(component).toContain("data?.success !== true");
     expect(component).toContain("Follow server");
     expect(component).toContain("Following");
     expect(component).not.toMatch(/alert|notify|notification/iu);
