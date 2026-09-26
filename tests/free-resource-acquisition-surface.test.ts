@@ -11,7 +11,7 @@ describe("free resource acquisition surface", () => {
 
     expect(page).toContain('fetch("/api/resources/claim"');
     expect(page).not.toContain('fetch("/api/checkout"');
-    expect(page).toContain('"Add to library"');
+    expect(page).toContain("copy.addToLibrary");
   });
 
   it("returns users directly to the resource or resource library after a successful claim", () => {
@@ -19,7 +19,7 @@ describe("free resource acquisition surface", () => {
 
     expect(page).toContain('href={`/market/${product?.slug ?? ""}`}');
     expect(page).toContain('href="/workspace"');
-    expect(page).toContain("Open resource library");
+    expect(page).toContain("copy.openLibrary");
     expect(page).not.toContain("Go to My Licenses");
   });
 
