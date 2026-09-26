@@ -199,12 +199,13 @@ const en = {
   workspaceContext: {
     title: "Active workspace context",
     description:
-      "Switch between your personal workspace and organizations where you are a member.",
+      "Switch between your personal workspace and organizations you own or belong to.",
     label: "Context",
     loadError: "Could not load account contexts.",
+    retry: "Try again",
     switchError: "Could not switch context.",
     note:
-      "Context switching changes the active workspace only; permissions still come from membership.",
+      "Context switching changes the active workspace only; permissions still depend on ownership or membership.",
   },
   serverDetail: {
     notFound: "Server not found",
@@ -1218,12 +1219,13 @@ const ru: typeof en = {
   workspaceContext: {
     title: "Активный контекст рабочей зоны",
     description:
-      "Переключайтесь между личной рабочей зоной и организациями, в которых вы состоите.",
+      "Переключайтесь между личной рабочей зоной и организациями, которыми владеете или в которых состоите.",
     label: "Контекст",
     loadError: "Не удалось загрузить контексты аккаунта.",
+    retry: "Повторить",
     switchError: "Не удалось переключить контекст.",
     note:
-      "Переключение меняет только активную рабочую зону; права по-прежнему определяются членством.",
+      "Переключение меняет только активную рабочую зону; права определяются владением или членством.",
   },
   serverDetail: {
     notFound: "Сервер не найден",

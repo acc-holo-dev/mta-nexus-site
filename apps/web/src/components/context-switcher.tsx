@@ -21,9 +21,12 @@ export function ContextSwitcher() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
 
     fetch("/api/auth/context", {
       cache: "no-store",
@@ -56,7 +59,7 @@ export function ContextSwitcher() {
     return () => {
       cancelled = true;
     };
-  }, [copy.loadError]);
+  }, [copy.loadError, reload]);
 
   async function switchContext(contextId: string) {
     if (saving || contextId === activeContextId) return;
@@ -94,7 +97,7 @@ export function ContextSwitcher() {
     }
   }
 
-  if (loading || contexts.length <= 1) return null;
+  if (loading || (contexts.length <= 1 && !error)) return null;
 
   return (
     <section className="nexus-panel space-y-3 p-5">
@@ -103,7 +106,7 @@ export function ContextSwitcher() {
         <p className="mt-1 text-xs text-muted">{copy.description}</p>
       </div>
 
-      <label className="block space-y-1.5">
+      {contexts.length > 1 && <label className="block space-y-1.5">
         <span className="text-xs text-muted">{copy.label}</span>
         <select
           value={activeContextId}
@@ -119,12 +122,20 @@ export function ContextSwitcher() {
             </option>
           ))}
         </select>
-      </label>
+      </label>}
 
       {error && (
-        <p role="alert" className="text-xs text-danger">
-          {error}
-        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <p role="alert" className="text-xs text-danger">{error}</p>
+          <button
+            type="button"
+            onClick={() => setReload((value) => value + 1)}
+            disabled={loading || saving}
+            className="rounded-md border border-base px-3 py-1.5 text-xs font-medium text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)] disabled:opacity-60"
+          >
+            {copy.retry}
+          </button>
+        </div>
       )}
 
       <p className="text-[11px] text-faint">{copy.note}</p>
