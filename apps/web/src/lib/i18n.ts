@@ -429,6 +429,76 @@ const en = {
     marketplaceReleases: "Marketplace releases",
     articles: "Technical articles & devlogs",
   },
+  settings: {
+    title: "Settings",
+    description: "Control notifications and protect your account.",
+    loading: "Loading account settings...",
+    signInRequired: "Sign in required",
+    signInAgain: "Sign in again to manage your account security.",
+    signIn: "Sign in",
+    unavailable: "Account settings unavailable",
+    retry: "Try again",
+    saving: "Saving account changes...",
+    notificationPreferences: "Notification preferences",
+    notificationDescription:
+      "These preferences do not control security-related messages.",
+    newFollowers: "New followers",
+    newFollowersDescription: "When another player follows your activity.",
+    contentUpdates: "Content updates",
+    contentUpdatesDescription: "News, articles and creator updates.",
+    serverUpdates: "Server updates",
+    serverUpdatesDescription: "Updates related to followed MTA servers.",
+    resourceActivity: "Resource activity",
+    resourceActivityDescription:
+      "Claims, licenses and resource delivery events.",
+    systemNotifications: "System notifications",
+    systemNotificationsDescription:
+      "Important non-security account messages.",
+    recoveryEmail: "Recovery email",
+    recoveryNotVerified: "Not verified for recovery yet.",
+    recoveryUnavailable:
+      "Recovery email verification is unavailable for this account.",
+    recoveryPassword: "Current password for recovery email",
+    verifyRecoveryEmail: "Verify recovery email",
+    recoveryAlreadyVerified: "This recovery email is already verified.",
+    unconfirmedVerification: "Unconfirmed email verification request",
+    verificationQueued:
+      "Verification email queued. Open the link in that email while this sign-in is still active.",
+    changePassword: "Change password",
+    passwordDescription:
+      "Enter your current password. Changing it ends all other sessions and renews this browser's sign-in token.",
+    currentPassword: "Current password",
+    newPassword: "New password",
+    passwordHint: "8 to 128 characters; different from your current password.",
+    updatePassword: "Update password",
+    unconfirmedPasswordChange: "Unconfirmed password change",
+    activeSessions: "Active sessions",
+    reloadSettings: "Reload settings",
+    sessionsDescription:
+      "End an unfamiliar session to remove its access. This browser stays signed in; use Sign out in the header to leave it.",
+    endOtherSessions: "End other sessions",
+    thisBrowser: "This browser",
+    deviceUnavailable: "Device details unavailable",
+    ipUnavailable: "IP unavailable",
+    endSession: "End session",
+    unconfirmedSessionRevocation: "Unconfirmed session revocation",
+    sessionEnded:
+      "Session ended. That sign-in can no longer access your account.",
+    sessionUnavailable:
+      "The session list is unavailable. Reload settings to check it.",
+    noSessions:
+      "No active sessions found. Reload settings to confirm your sign-in.",
+    preferenceSaved: "Notification preference saved.",
+    backendUnavailable: "Account settings are temporarily unavailable.",
+    unreadableResponse: "The server returned an unreadable response.",
+    invalidResponse: "Invalid settings response",
+    loadFailed:
+      "Could not load account settings. Your sign-in status has not been confirmed.",
+    authRequired: "Authentication required",
+    requestUnconfirmed:
+      "The request could not be confirmed. Reload settings before retrying.",
+    invalidSessionResponse: "Invalid session response",
+  },
   errors: {
     title: "Something went wrong",
     message:
@@ -864,6 +934,75 @@ const ru: typeof en = {
     releases: "Релизы",
     marketplaceReleases: "Релизы в каталоге",
     articles: "Технические статьи и devlog",
+  },
+  settings: {
+    title: "Настройки",
+    description: "Управляйте уведомлениями и защитой аккаунта.",
+    loading: "Загрузка настроек аккаунта...",
+    signInRequired: "Требуется вход",
+    signInAgain: "Войдите снова, чтобы управлять безопасностью аккаунта.",
+    signIn: "Войти",
+    unavailable: "Настройки аккаунта недоступны",
+    retry: "Повторить",
+    saving: "Сохранение изменений...",
+    notificationPreferences: "Настройки уведомлений",
+    notificationDescription:
+      "Эти параметры не отключают сообщения, связанные с безопасностью.",
+    newFollowers: "Новые подписчики",
+    newFollowersDescription: "Когда другой пользователь подписывается на вас.",
+    contentUpdates: "Обновления контента",
+    contentUpdatesDescription: "Новости, статьи и обновления авторов.",
+    serverUpdates: "Обновления серверов",
+    serverUpdatesDescription: "События серверов MTA, за которыми вы следите.",
+    resourceActivity: "События ресурсов",
+    resourceActivityDescription:
+      "Добавления, лицензии и события доставки ресурсов.",
+    systemNotifications: "Системные уведомления",
+    systemNotificationsDescription:
+      "Важные сообщения аккаунта, не связанные напрямую с безопасностью.",
+    recoveryEmail: "Email для восстановления",
+    recoveryNotVerified: "Email для восстановления ещё не подтверждён.",
+    recoveryUnavailable:
+      "Подтверждение email для восстановления недоступно для этого аккаунта.",
+    recoveryPassword: "Текущий пароль для подтверждения email",
+    verifyRecoveryEmail: "Подтвердить email для восстановления",
+    recoveryAlreadyVerified: "Email для восстановления уже подтверждён.",
+    unconfirmedVerification: "Запрос подтверждения email не подтверждён",
+    verificationQueued:
+      "Письмо для подтверждения поставлено в очередь. Откройте ссылку из письма, пока эта сессия активна.",
+    changePassword: "Изменить пароль",
+    passwordDescription:
+      "Введите текущий пароль. После изменения остальные сессии завершатся, а токен этого браузера будет обновлён.",
+    currentPassword: "Текущий пароль",
+    newPassword: "Новый пароль",
+    passwordHint: "От 8 до 128 символов; новый пароль должен отличаться от текущего.",
+    updatePassword: "Обновить пароль",
+    unconfirmedPasswordChange: "Изменение пароля не подтверждено",
+    activeSessions: "Активные сессии",
+    reloadSettings: "Обновить настройки",
+    sessionsDescription:
+      "Завершите незнакомую сессию, чтобы отозвать её доступ. Этот браузер останется авторизован; для выхода используйте кнопку в шапке.",
+    endOtherSessions: "Завершить другие сессии",
+    thisBrowser: "Этот браузер",
+    deviceUnavailable: "Данные устройства недоступны",
+    ipUnavailable: "IP недоступен",
+    endSession: "Завершить сессию",
+    unconfirmedSessionRevocation: "Завершение сессии не подтверждено",
+    sessionEnded: "Сессия завершена и больше не имеет доступа к аккаунту.",
+    sessionUnavailable:
+      "Список сессий недоступен. Обновите настройки, чтобы проверить его.",
+    noSessions:
+      "Активные сессии не найдены. Обновите настройки, чтобы подтвердить состояние входа.",
+    preferenceSaved: "Настройка уведомлений сохранена.",
+    backendUnavailable: "Настройки аккаунта временно недоступны.",
+    unreadableResponse: "Сервер вернул нечитаемый ответ.",
+    invalidResponse: "Некорректный ответ настроек",
+    loadFailed:
+      "Не удалось загрузить настройки аккаунта. Статус входа не подтверждён.",
+    authRequired: "Требуется авторизация",
+    requestUnconfirmed:
+      "Не удалось подтвердить запрос. Обновите настройки перед повторной попыткой.",
+    invalidSessionResponse: "Некорректный ответ списка сессий",
   },
   errors: {
     title: "Что-то пошло не так",
