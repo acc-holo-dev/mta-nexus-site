@@ -1,10 +1,16 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import type { Metadata } from "next";
-import { userRepository, productRepository, serverRepository } from "@nexus/db";
+import { Calendar, ShieldCheck } from "lucide-react";
+import { Avatar, StatCard } from "@nexus/ui";
+import {
+  productRepository,
+  serverRepository,
+  userRepository,
+} from "@nexus/db";
 import { ProductCard } from "../../../components/product-card";
 import { ServerCard } from "../../../components/server-card";
-import { ShieldCheck, Calendar, User as UserIcon, Building2 } from "lucide-react";
+import { getDictionary } from "../../../lib/i18n";
+import { getRequestLocale } from "../../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
@@ -14,15 +20,19 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
+  const locale = await getRequestLocale();
+  const copy = getDictionary(locale).profiles;
   const user = await userRepository.findByUsername(username);
 
   if (!user) {
-    return { title: "User not found" };
+    return { title: copy.userNotFound };
   }
 
   return {
     title: `${user.displayName} (@${user.username})`,
-    description: user.bio?.slice(0, 155) || `MTA Nexus profile of ${user.displayName}`,
+    description:
+      user.bio?.slice(0, 155) ||
+      `${copy.profileDescription} ${user.displayName}`,
     alternates: { canonical: `/users/${user.username}` },
   };
 }
@@ -33,6 +43,9 @@ export default async function UserProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.profiles;
   const user = await userRepository.findByUsername(username);
 
   if (!user) {
@@ -43,85 +56,106 @@ export default async function UserProfilePage({
     productRepository.list(),
     serverRepository.listActivePublic(),
   ]);
-
-  const userProducts = allProducts.filter((p) => p.authorId === user.id);
-  const userServers = allServers.filter((s) => s.ownerId === user.id);
-
-  const formattedDate = new Date(user.createdAt).toLocaleDateString("en-US", {
-    month: "long",
-    year: "numeric",
-  });
+  const userProducts = allProducts.filter(
+    (product) => product.authorId === user.id,
+  );
+  const userServers = allServers.filter(
+    (server) => server.ownerId === user.id,
+  );
+  const formattedDate = new Date(user.createdAt).toLocaleDateString(
+    locale === "ru" ? "ru-RU" : "en-US",
+    {
+      month: "long",
+      year: "numeric",
+    },
+  );
 
   return (
     <div className="space-y-10">
-      {/* Profile Header */}
-      <div className="p-8 rounded-2xl border border-base bg-surface flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-xl">
-        <div className="flex items-center gap-6">
-          <div className="w-20 h-20 rounded-full overflow-hidden bg-neutral-800 border-2 border-blue-500/50 shadow-xl shrink-0">
-            <img
-              src={user.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.username}`}
-              alt={user.displayName}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-white">{user.displayName}</h1>
+      <section className="nexus-panel flex flex-col justify-between gap-6 p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
+        <div className="flex min-w-0 items-center gap-5 sm:gap-6">
+          <Avatar
+            src={user.avatarUrl || undefined}
+            alt={user.displayName}
+            fallback={user.displayName || user.username}
+            size="lg"
+            className="h-20 w-20 shrink-0 border-2 border-[color:var(--nexus-accent)]/30"
+          />
+          <div className="min-w-0 space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="truncate text-2xl font-black text-primary">
+                {user.displayName}
+              </h1>
               {user.isVerified && (
-                <span title="Verified Member">
-                  <ShieldCheck className="w-5 h-5 text-blue-400" />
+                <span title={copy.verifiedMember}>
+                  <ShieldCheck
+                    className="h-5 w-5 text-success"
+                    aria-hidden="true"
+                  />
                 </span>
               )}
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-neutral-800 text-neutral-300">
+              <span className="rounded border border-base bg-inset px-2 py-0.5 font-numeric text-[10px] font-bold uppercase tracking-wider text-secondary">
                 {user.role}
               </span>
             </div>
-            <div className="text-xs text-neutral-500">@{user.username}</div>
-            <p className="text-xs text-neutral-300 max-w-xl">
-              {user.bio || "MTA Community member and platform explorer."}
+            <div className="truncate text-xs text-faint">
+              @{user.username}
+            </div>
+            <p className="max-w-xl text-sm leading-relaxed text-muted">
+              {user.bio || copy.memberFallback}
             </p>
-            <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 pt-1">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>Joined {formattedDate}</span>
+            <div className="flex items-center gap-1.5 pt-1 text-[11px] text-faint">
+              <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
+              <span>
+                {copy.joined} {formattedDate}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="flex gap-3">
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center min-w-24">
-            <div className="text-lg font-bold text-white">{userProducts.length}</div>
-            <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Resources</div>
-          </div>
-          <div className="px-4 py-2.5 rounded-lg bg-neutral-900 border border-base text-center min-w-24">
-            <div className="text-lg font-bold text-emerald-400">{userServers.length}</div>
-            <div className="text-[10px] text-neutral-500 uppercase tracking-wider">Servers</div>
-          </div>
+        <div className="grid min-w-52 grid-cols-2 gap-3">
+          <StatCard
+            label={copy.resources}
+            value={userProducts.length}
+            tone="accent"
+          />
+          <StatCard
+            label={copy.servers}
+            value={userServers.length}
+            tone="success"
+          />
         </div>
-      </div>
+      </section>
 
-      {/* Authored Resources */}
       {userProducts.length > 0 && (
         <section className="space-y-4">
-          <h2 className="text-base font-bold text-white uppercase tracking-wider">
-            Authored Resources ({userProducts.length})
+          <h2 className="font-heading text-primary">
+            {copy.authoredResources} ({userProducts.length})
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {userProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {userProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                locale={locale}
+              />
             ))}
           </div>
         </section>
       )}
 
-      {/* Operated Servers */}
       {userServers.length > 0 && (
         <section className="space-y-4">
-          <h2 className="text-base font-bold text-white uppercase tracking-wider">
-            Operated Servers ({userServers.length})
+          <h2 className="font-heading text-primary">
+            {copy.operatedServers} ({userServers.length})
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {userServers.map((s) => (
-              <ServerCard key={s.id} server={s} />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {userServers.map((server) => (
+              <ServerCard
+                key={server.id}
+                server={server}
+                locale={locale}
+              />
             ))}
           </div>
         </section>
