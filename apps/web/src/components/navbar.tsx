@@ -15,10 +15,10 @@ export function Navbar({ locale }: { locale: Locale }) {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-base bg-surface/95 backdrop-blur">
-      <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6">
+      <div className="flex min-h-14 flex-wrap items-center justify-between gap-2 px-3 py-2 sm:gap-3 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2 lg:hidden"
+          className="flex items-center gap-2 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] lg:hidden"
           aria-label="MTA NEXUS"
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-xs font-black text-white shadow-nexus-sm">
@@ -33,7 +33,7 @@ export function Navbar({ locale }: { locale: Locale }) {
           <NavbarSearchTrigger placeholder={dictionary.nav.search} />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2">
           <LocaleSwitcher locale={locale} />
           <ThemeToggle />
           <NotificationBell />
@@ -64,7 +64,7 @@ function NavbarSearchTrigger({ placeholder }: { placeholder: string }) {
       <button
         type="button"
         onClick={() => setIsSearchOpen(true)}
-        className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-base bg-inset px-3 py-1.5 text-xs text-muted transition-colors hover:border-strong"
+        className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-md border border-base bg-inset px-3 py-1.5 text-xs text-muted transition-colors hover:border-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         aria-haspopup="dialog"
         aria-expanded={isSearchOpen}
       >

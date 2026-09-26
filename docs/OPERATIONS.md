@@ -5,11 +5,21 @@ This document covers development startup, verification and production boundaries
 
 ## 1. Supported DEV startup
 
-Use the root `compose.yaml`:
+Use the root `compose.yaml` directly when you want a Docker-only startup:
 
 ```bash
 docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-timeout 600
 ```
+
+When Node.js 26+ and the pinned pnpm are installed, the supported convenience entrypoint is:
+
+```bash
+pnpm dev
+```
+
+It runs `pnpm dev:preflight` first and then starts the same full Compose development stack. The preflight checks required repository files, Docker/Compose availability, Linux containers, the selected local port and whether `compose.yaml` renders without implicitly importing application secrets.
+
+`pnpm dev:host` is intentionally different: it starts only the Next.js development server. Use it only when PostgreSQL, storage and scanner dependencies are already configured externally.
 
 The stack contains:
 
@@ -98,4 +108,4 @@ A release is not accepted merely because code exists on `main`. Acceptance requi
 - backup/restore confidence for data-changing releases;
 - explicit deployment decision.
 
-The version `1.2.0-beta.2` represents the consolidated mainline hardening, public-resource correctness and RU/EN expansion update; it is not a statement that public production rollout has occurred.
+The version `1.2.0-beta.3` represents the consolidated mainline hardening, RU/EN UI completion, free-resource acquisition cleanup, accessibility pass and deterministic DEV startup contract; it is not a statement that public production rollout has occurred.

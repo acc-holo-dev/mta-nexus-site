@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LogOut, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useNexusLocale } from "./locale-context";
@@ -100,16 +101,19 @@ export function AccountControls() {
   }
 
   const control =
-    "rounded-md border border-base bg-elevated px-3 py-2 text-xs font-semibold text-primary transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]";
+    "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-base bg-elevated px-2 text-xs font-semibold text-primary transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] sm:px-2.5";
 
   return (
     <div
       aria-label={copy.groupLabel}
       role="group"
-      className="relative flex min-w-0 items-center gap-2"
+      className="relative flex min-w-0 items-center gap-1.5 sm:gap-2"
     >
       {checking ? (
-        <span role="status" className="text-xs text-muted">
+        <span
+          role="status"
+          className="hidden max-w-28 truncate text-xs text-muted sm:block"
+        >
           {copy.checking}
         </span>
       ) : account ? (
@@ -119,7 +123,8 @@ export function AccountControls() {
             aria-label={`${copy.workspaceFor} ${account.username}`}
             className={control}
           >
-            <span className="block max-w-24 truncate">
+            <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden max-w-24 truncate sm:block">
               @{account.username}
             </span>
           </Link>
@@ -127,9 +132,14 @@ export function AccountControls() {
             type="button"
             onClick={() => void signOut()}
             disabled={signingOut}
+            aria-label={signingOut ? copy.signingOut : copy.signOut}
+            title={signingOut ? copy.signingOut : copy.signOut}
             className={`${control} disabled:opacity-50`}
           >
-            {signingOut ? copy.signingOut : copy.signOut}
+            <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:block">
+              {signingOut ? copy.signingOut : copy.signOut}
+            </span>
           </button>
         </>
       ) : error ? (
@@ -138,11 +148,15 @@ export function AccountControls() {
           onClick={() => setAttempt((value) => value + 1)}
           className={control}
         >
-          {copy.retry}
+          <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
+          <span className="hidden sm:block">{copy.retry}</span>
+          <span className="sr-only sm:hidden">{copy.retry}</span>
         </button>
       ) : (
         <Link href="/auth/login" className={control}>
-          {copy.signIn}
+          <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
+          <span className="hidden sm:block">{copy.signIn}</span>
+          <span className="sr-only sm:hidden">{copy.signIn}</span>
         </Link>
       )}
 

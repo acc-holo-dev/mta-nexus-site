@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Library, LayoutDashboard, MessageSquare, Server } from "lucide-react";
+import {
+  Home,
+  LayoutDashboard,
+  Library,
+  MessageSquare,
+  Server,
+} from "lucide-react";
 import { getDictionary, type Locale } from "../lib/i18n";
 
 export function MobileNav({ locale }: { locale: Locale }) {
@@ -12,8 +18,16 @@ export function MobileNav({ locale }: { locale: Locale }) {
     { href: "/", label: dictionary.nav.home, icon: Home },
     { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
     { href: "/market", label: dictionary.nav.freeResources, icon: Library },
-    { href: "/community", label: dictionary.nav.community, icon: MessageSquare },
-    { href: "/workspace", label: dictionary.nav.workspace, icon: LayoutDashboard },
+    {
+      href: "/community",
+      label: dictionary.nav.community,
+      icon: MessageSquare,
+    },
+    {
+      href: "/workspace",
+      label: dictionary.nav.workspace,
+      icon: LayoutDashboard,
+    },
   ];
 
   const isActive = (href: string) =>
@@ -29,18 +43,19 @@ export function MobileNav({ locale }: { locale: Locale }) {
       {items.map((item) => {
         const Icon = item.icon;
         const active = isActive(item.href);
+
         return (
           <Link
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`flex min-w-0 flex-col items-center gap-1 rounded-md px-1 py-2 text-[10px] font-semibold transition-colors ${
+            className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-[10px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
               active
                 ? "bg-accent-soft text-accent"
                 : "text-muted hover:bg-hover hover:text-primary"
             }`}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="h-4 w-4" aria-hidden="true" />
             <span className="max-w-full truncate">{item.label}</span>
           </Link>
         );

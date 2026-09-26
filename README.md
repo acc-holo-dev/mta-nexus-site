@@ -2,14 +2,14 @@
 
 MTA NEXUS is a player-first Multi Theft Auto: San Andreas platform for live server discovery, community updates, and safe free-resource distribution.
 
-**Current repository version:** `1.2.0-beta.2`  
+**Current repository version:** `1.2.0-beta.3`  
 **Active development branch:** `main` only.
 
 Русский интерфейс и English interface use the same application. Change the language with the language button in the top navigation; the preference is stored in the `nexus_locale` cookie. The global shell, home, resource catalog/cards, workspace, server directory, authentication, errors and metadata now use the shared dictionary.
 
 ## Local development / Локальная разработка
 
-Recommended path: Docker Compose. Host Node.js, pnpm and PostgreSQL are not required.
+Recommended zero-host-dependency path: Docker Compose. Host Node.js, pnpm and PostgreSQL are not required.
 
 ```bash
 git clone https://github.com/acc-holo-dev/mta-nexus-site.git
@@ -18,6 +18,14 @@ docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-
 ```
 
 Open `http://localhost:3000`.
+
+If Node.js 26+ and the pinned pnpm are installed, `pnpm dev` now starts the same full Docker development stack after running the repository doctor:
+
+```bash
+pnpm dev
+```
+
+Use `pnpm dev:host` only when PostgreSQL, storage, scanner settings and the rest of the development environment are already configured outside Compose. It starts only the Next.js app and intentionally does not provision dependencies.
 
 In development, `/dev` shows a sanitized runtime status panel for the application, database, storage, scanner and email mode. The route is intentionally unavailable when `NODE_ENV=production`.
 
@@ -44,10 +52,22 @@ docker compose -p nexus-local -f compose.yaml down
 
 Changes to package manifests, Dockerfile, installed dependencies or image-level tooling still require `up --build`. Migration changes require the app startup path to run again; do not point this stack at production data.
 
-Host-side commands are also available when Node 26 and pnpm 12 are installed:
+Useful host-side commands when Node 26 and pnpm 12 are installed:
 
 ```bash
+# preflight: Docker, Compose, port, required files and local compose rendering
+pnpm dev:preflight
+
+# full foreground development stack
 pnpm dev
+
+# detached full development stack
+pnpm dev:docker:up
+
+# Next.js only; external dependencies must already be configured
+pnpm dev:host
+
+# project verification
 pnpm check
 pnpm nexus:doctor
 ```

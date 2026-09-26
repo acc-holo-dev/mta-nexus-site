@@ -23,9 +23,9 @@ export function Footer({ locale }: { locale: Locale }) {
             {dictionary.footer.discover}
           </h4>
           <ul className="space-y-2 text-muted">
-            <li><Link href="/servers" className="hover:text-primary">{dictionary.footer.liveServers}</Link></li>
-            <li><Link href="/market" className="hover:text-primary">{dictionary.footer.freeResources}</Link></li>
-            <li><Link href="/articles" className="hover:text-primary">{dictionary.footer.communityUpdates}</Link></li>
+            <li><Link href="/servers" className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">{dictionary.footer.liveServers}</Link></li>
+            <li><Link href="/market" className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">{dictionary.footer.freeResources}</Link></li>
+            <li><Link href="/articles" className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">{dictionary.footer.communityUpdates}</Link></li>
           </ul>
         </div>
         <div>
@@ -33,18 +33,18 @@ export function Footer({ locale }: { locale: Locale }) {
             {dictionary.footer.contribute}
           </h4>
           <ul className="space-y-2 text-muted">
-            <li><Link href="/workspace/servers/new" className="hover:text-primary">{dictionary.footer.registerServer}</Link></li>
-            <li><Link href="/workspace/resources/new" className="hover:text-primary">{dictionary.footer.publishResource}</Link></li>
-            <li><Link href="/workspace" className="hover:text-primary">{dictionary.footer.workspace}</Link></li>
+            <li><Link href="/workspace/servers/new" className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">{dictionary.footer.registerServer}</Link></li>
+            <li><Link href="/workspace/resources/new" className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">{dictionary.footer.publishResource}</Link></li>
+            <li><Link href="/workspace" className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">{dictionary.footer.workspace}</Link></li>
           </ul>
         </div>
       </div>
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 border-t border-base px-4 py-4 text-faint sm:flex-row sm:px-6 lg:px-8">
         <div className="font-caption">© 2026 MTA Nexus · {dictionary.nav.closedBeta}</div>
         <div className="flex items-center gap-3 font-caption">
-          <Link href="/terms" className="hover:text-primary">{dictionary.footer.terms}</Link>
-          <Link href="/privacy" className="hover:text-primary">{dictionary.footer.privacy}</Link>
-          <Link href="/copyright" className="hover:text-primary">{dictionary.footer.copyright}</Link>
+          <Link href="/terms" className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">{dictionary.footer.terms}</Link>
+          <Link href="/privacy" className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">{dictionary.footer.privacy}</Link>
+          <Link href="/copyright" className="rounded-sm transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]">{dictionary.footer.copyright}</Link>
         </div>
         <div className="font-caption">{dictionary.footer.disclaimer}</div>
       </div>

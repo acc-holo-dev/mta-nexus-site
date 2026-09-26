@@ -30,7 +30,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      className="cursor-pointer rounded-lg border border-base bg-elevated p-2 text-muted transition-colors hover:bg-hover hover:text-primary"
+      className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-base bg-elevated p-0 text-muted transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       aria-label={label}
       title={label}
     >

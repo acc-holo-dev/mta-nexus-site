@@ -74,14 +74,15 @@ export function Sidebar({
           key={item.href}
           href={item.href}
           title={isCollapsed ? item.label : undefined}
+          aria-label={isCollapsed ? item.label : undefined}
           aria-current={active ? "page" : undefined}
-          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
             active
               ? "bg-accent-soft font-semibold text-accent"
               : "text-secondary hover:bg-hover hover:text-primary"
           } ${isCollapsed ? "justify-center px-0" : ""}`}
         >
-          <Icon className="h-4 w-4 shrink-0" />
+          <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
           {!isCollapsed && <span>{item.label}</span>}
         </Link>
       );
@@ -95,14 +96,21 @@ export function Sidebar({
     >
       <div className="flex h-14 shrink-0 items-center justify-between border-b border-base px-3">
         {isCollapsed ? (
-          <Link href="/" className="mx-auto" aria-label="MTA Nexus">
+          <Link
+            href="/"
+            className="mx-auto rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            aria-label="MTA Nexus"
+          >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-xs font-black text-white shadow-nexus-sm">
               NX
             </div>
           </Link>
         ) : (
           <>
-            <Link href="/" className="flex min-w-0 items-center space-x-2">
+            <Link
+              href="/"
+              className="flex min-w-0 items-center space-x-2 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            >
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-xs font-black text-white shadow-nexus-sm">
                 NX
               </div>
@@ -118,11 +126,11 @@ export function Sidebar({
             <button
               type="button"
               onClick={onToggle}
-              className="shrink-0 rounded-md p-1 text-muted transition-colors hover:bg-hover hover:text-primary"
+              className="shrink-0 rounded-md p-1 text-muted transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               aria-label={dictionary.nav.collapse}
               title={dictionary.nav.collapse}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </button>
           </>
         )}
@@ -151,14 +159,15 @@ export function Sidebar({
           <Link
             href="/admin"
             title={isCollapsed ? dictionary.nav.admin : undefined}
+            aria-label={isCollapsed ? dictionary.nav.admin : undefined}
             aria-current={pathname.startsWith("/admin") ? "page" : undefined}
-            className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+            className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
               pathname.startsWith("/admin")
                 ? "bg-danger-soft font-semibold text-danger"
                 : "text-secondary hover:bg-hover hover:text-primary"
             } ${isCollapsed ? "justify-center px-0" : ""}`}
           >
-            <ShieldAlert className="h-4 w-4 shrink-0" />
+            <ShieldAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
             {!isCollapsed && <span>{dictionary.nav.admin}</span>}
           </Link>
         </div>
@@ -169,11 +178,11 @@ export function Sidebar({
           <button
             type="button"
             onClick={onToggle}
-            className="flex w-full justify-center rounded-md p-1.5 text-muted transition-colors hover:bg-hover hover:text-primary"
+            className="flex w-full justify-center rounded-md p-1.5 text-muted transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             aria-label={dictionary.nav.expand}
             title={dictionary.nav.expand}
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       )}

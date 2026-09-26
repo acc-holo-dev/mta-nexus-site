@@ -113,7 +113,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
-        className="relative cursor-pointer rounded-md border border-base bg-elevated p-2 text-secondary transition-colors hover:bg-hover hover:text-primary"
+        className="relative inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-md border border-base bg-elevated p-0 text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         aria-label={bellLabel}
         aria-expanded={isOpen}
         aria-haspopup="dialog"
@@ -138,7 +138,7 @@ export function NotificationBell() {
           <button
             type="button"
             aria-label={copy.title}
-            className="fixed inset-0 z-40 cursor-default"
+            className="fixed inset-0 z-40 cursor-default focus:outline-none"
             onClick={() => setIsOpen(false)}
           />
           <div

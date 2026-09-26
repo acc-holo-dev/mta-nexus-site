@@ -73,7 +73,7 @@ export default function NotificationCenterPage() {
         signal: AbortSignal.timeout(15_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok) {
+      if (!response.ok || data?.success !== true) {
         throw new Error(data?.error || copy.markError);
       }
       setNotifications((previous) =>
@@ -148,7 +148,11 @@ export default function NotificationCenterPage() {
         </div>
       </header>
 
-      <div className="flex items-center gap-2" role="tablist">
+      <div
+        className="flex items-center gap-2"
+        role="tablist"
+        aria-label={copy.title}
+      >
         {(["all", "unread"] as const).map((item) => {
           const active = filter === item;
           const count =
@@ -160,7 +164,7 @@ export default function NotificationCenterPage() {
               role="tab"
               aria-selected={active}
               onClick={() => setFilter(item)}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${
                 active
                   ? "border-[color:var(--nexus-accent)] bg-accent text-white"
                   : "border-base bg-surface text-muted hover:bg-hover hover:text-primary"
@@ -181,7 +185,7 @@ export default function NotificationCenterPage() {
           <button
             type="button"
             onClick={() => void loadNotifications()}
-            className="shrink-0 font-semibold underline"
+            className="shrink-0 rounded-sm font-semibold underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-danger)]"
           >
             {dictionary.errors.retry}
           </button>
