@@ -176,7 +176,7 @@ export default async function HomePage() {
         {articles.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {articles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
+              <ArticleCard key={article.id} article={article} locale={locale} />
             ))}
           </div>
         ) : (
