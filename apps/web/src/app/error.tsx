@@ -27,14 +27,14 @@ export default function GlobalError({
         <button
           type="button"
           onClick={reset}
-          className="flex cursor-pointer items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+          className="flex cursor-pointer items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
           <span>{dictionary.errors.retry}</span>
         </button>
         <Link
           href="/"
-          className="flex items-center gap-1.5 rounded-md border border-base bg-elevated px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+          className="flex items-center gap-1.5 rounded-md border border-base bg-elevated px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
           <Home className="h-3.5 w-3.5" aria-hidden="true" />
           <span>{dictionary.errors.home}</span>

@@ -10,7 +10,7 @@ export default async function NotFound() {
   return (
     <div className="mx-auto max-w-lg space-y-5 py-20 text-center">
       <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-accent-soft text-accent">
-        <SearchX className="h-7 w-7" />
+        <SearchX className="h-7 w-7" aria-hidden="true" />
       </div>
       <div className="space-y-2">
         <h1 className="font-display text-primary">
@@ -23,16 +23,16 @@ export default async function NotFound() {
       <div className="flex items-center justify-center gap-3">
         <Link
           href="/market"
-          className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+          className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
-          <Compass className="h-3.5 w-3.5" />
+          <Compass className="h-3.5 w-3.5" aria-hidden="true" />
           <span>{dictionary.errors.resourceLibrary}</span>
         </Link>
         <Link
           href="/"
-          className="flex items-center gap-1.5 rounded-md border border-base bg-elevated px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+          className="flex items-center gap-1.5 rounded-md border border-base bg-elevated px-4 py-2 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
         >
-          <Home className="h-3.5 w-3.5" />
+          <Home className="h-3.5 w-3.5" aria-hidden="true" />
           <span>{dictionary.errors.home}</span>
         </Link>
       </div>

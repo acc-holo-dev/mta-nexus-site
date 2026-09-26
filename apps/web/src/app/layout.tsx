@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { NexusShell } from "../components/nexus-shell";
 import { getDictionary } from "../lib/i18n";
@@ -46,10 +47,12 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className="dark" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-      </head>
       <body className="min-h-screen bg-page text-primary antialiased">
+        <Script
+          id="nexus-theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+        />
         <NexusShell locale={locale}>{children}</NexusShell>
       </body>
     </html>
