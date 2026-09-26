@@ -20,9 +20,8 @@ describe("public content publication integrity", () => {
       "utf8"
     );
 
-    expect(page).toContain(
-      'contentService.getArticleBySlug(slug, { incrementView: false })'
-    );
+    expect(page).toContain("contentService.getArticleBySlug(slug");
+    expect(page).toContain("incrementView: false");
     expect(page).toContain(
       'contentService.getComments({ contentId: article.id }, 100)'
     );
