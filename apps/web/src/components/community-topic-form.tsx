@@ -47,12 +47,15 @@ export function CommunityTopicForm() {
             .split(",")
             .map((tag) => tag.trim())
             .filter(Boolean),
-          status: "published",
         }),
         signal: AbortSignal.timeout(15_000),
       });
       const payload = await response.json().catch(() => null);
-      if (!response.ok || !payload?.content?.slug) {
+      if (
+        !response.ok ||
+        payload?.success !== true ||
+        typeof payload?.content?.slug !== "string"
+      ) {
         throw new Error(payload?.error || copy.createError);
       }
       router.push(

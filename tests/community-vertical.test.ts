@@ -20,6 +20,8 @@ describe("community vertical", () => {
     const sidebar = read("apps/web/src/components/sidebar.tsx");
     expect(page).toContain("listCommunityTopics");
     expect(form).toContain('fetch("/api/content"');
+    expect(form).not.toContain('status: "published"');
+    expect(form).toContain("payload?.success !== true");
     expect(form).toContain("/articles/${encodeURIComponent(payload.content.slug)}");
     expect(sidebar).toContain('{ href: "/community", label: dictionary.nav.community');
   });

@@ -15,6 +15,10 @@ describe("community content API", () => {
     expect(route).toContain('can(user, "admin.moderation")');
     expect(route).toContain("Linked server");
     expect(route).toContain("stale-while-revalidate=120");
-    expect(route).toContain("organizationRepository.listUserMemberships(user.id)");
+    expect(route).toContain("organizationRepository.listUserMemberships(");
+    expect(route).toContain('const privateHeaders = {');
+    expect(route).toContain('"Cache-Control": "private, no-store"');
+    expect(route).toContain('Vary: "Cookie"');
+    expect(route).toContain("privateJson(");
   });
 });

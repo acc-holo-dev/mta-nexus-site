@@ -210,7 +210,7 @@ export const createContentSchema = z.object({
   serverId: z.string().optional(),
   productId: z.string().optional(),
   organizationId: z.string().optional(),
-  status: z.enum(["draft", "published"]).default("published"),
+  status: z.enum(["draft", "published"]).default("draft"),
 });
 
 export const addCommentSchema = z.object({
