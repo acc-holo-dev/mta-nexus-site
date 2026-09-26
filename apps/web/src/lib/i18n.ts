@@ -498,6 +498,17 @@ const en = {
     requestUnconfirmed:
       "The request could not be confirmed. Reload settings before retrying.",
     invalidSessionResponse: "Invalid session response",
+    recoveryPolicy:
+      "Enter your current password. We will queue a confirmation link for the email already stored on this account.",
+    sendVerification: "Send verification email",
+    verifiedForRecovery: "Verified for recovery",
+    verifiedOn: "on",
+    passwordChanged: "Password changed.",
+    otherSessionsEnded: "Other sessions ended",
+    browserRemainsSignedIn: "This browser remains signed in.",
+    sessionRefreshFailed:
+      "The session list could not be refreshed. Reload settings to check it.",
+    started: "Started",
   },
   errors: {
     title: "Something went wrong",
@@ -1003,6 +1014,17 @@ const ru: typeof en = {
     requestUnconfirmed:
       "Не удалось подтвердить запрос. Обновите настройки перед повторной попыткой.",
     invalidSessionResponse: "Некорректный ответ списка сессий",
+    recoveryPolicy:
+      "Введите текущий пароль. Мы поставим в очередь ссылку подтверждения для email, уже сохранённого в аккаунте.",
+    sendVerification: "Отправить письмо подтверждения",
+    verifiedForRecovery: "Подтверждён для восстановления",
+    verifiedOn: "от",
+    passwordChanged: "Пароль изменён.",
+    otherSessionsEnded: "Завершено других сессий",
+    browserRemainsSignedIn: "Этот браузер остаётся авторизован.",
+    sessionRefreshFailed:
+      "Не удалось обновить список сессий. Обновите настройки, чтобы проверить его.",
+    started: "Начало",
   },
   errors: {
     title: "Что-то пошло не так",
