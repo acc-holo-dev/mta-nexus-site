@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNexusLocale } from "./locale-context";
 
 type FollowState =
   | "checking"
@@ -18,6 +19,8 @@ export function ServerFollowButton({
   serverId: string;
   serverName: string;
 }) {
+  const { dictionary } = useNexusLocale();
+  const copy = dictionary.follow;
   const [state, setState] = useState<FollowState>("checking");
   const [pending, setPending] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -32,6 +35,7 @@ export function ServerFollowButton({
       `/api/follow?targetType=server&targetId=${encodeURIComponent(serverId)}`,
       {
         cache: "no-store",
+        credentials: "same-origin",
         signal: controller.signal,
       },
     )
@@ -78,6 +82,7 @@ export function ServerFollowButton({
       const response = await fetch("/api/follow", {
         method: state === "following" ? "DELETE" : "POST",
         cache: "no-store",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           targetType: "server",
@@ -90,12 +95,10 @@ export function ServerFollowButton({
         setState("anonymous");
         return;
       }
-
       if (response.status === 409 && state === "not-following") {
         setState("following");
         return;
       }
-
       if (!response.ok) throw new Error("Follow mutation failed");
 
       setState(state === "following" ? "not-following" : "following");
@@ -113,10 +116,10 @@ export function ServerFollowButton({
     return (
       <Link
         href="/auth/login"
-        className={`${baseClass} border-base bg-neutral-900 text-neutral-200 hover:bg-neutral-800`}
+        className={`${baseClass} border-base bg-surface text-secondary hover:bg-hover hover:text-primary`}
       >
         <Bookmark className="h-4 w-4" aria-hidden="true" />
-        Sign in to follow
+        {copy.signIn}
       </Link>
     );
   }
@@ -126,9 +129,9 @@ export function ServerFollowButton({
       <button
         type="button"
         onClick={() => setAttempt((value) => value + 1)}
-        className={`${baseClass} border-amber-500/30 bg-amber-500/10 text-amber-300`}
+        className={`${baseClass} border-[color:var(--nexus-warning)]/25 bg-warning-soft text-warning`}
       >
-        Retry follow status
+        {copy.retry}
       </button>
     );
   }
@@ -143,15 +146,15 @@ export function ServerFollowButton({
       aria-pressed={state === "checking" ? undefined : following}
       aria-label={
         state === "checking"
-          ? `Checking follow status for ${serverName}`
+          ? `${copy.checkingAria} ${serverName}`
           : following
-            ? `Unfollow ${serverName}`
-            : `Follow ${serverName}`
+            ? `${copy.unfollowAria} ${serverName}`
+            : `${copy.followAria} ${serverName}`
       }
       className={`${baseClass} disabled:cursor-wait disabled:opacity-60 ${
         following
-          ? "border-blue-500/30 bg-blue-500/15 text-blue-300 hover:bg-blue-500/20"
-          : "border-base bg-neutral-900 text-neutral-200 hover:bg-neutral-800"
+          ? "border-[color:var(--nexus-accent)]/30 bg-accent-soft text-accent hover:opacity-80"
+          : "border-base bg-surface text-secondary hover:bg-hover hover:text-primary"
       }`}
     >
       {pending || state === "checking" ? (
@@ -162,12 +165,12 @@ export function ServerFollowButton({
         <Bookmark className="h-4 w-4" aria-hidden="true" />
       )}
       {state === "checking"
-        ? "Checking..."
+        ? copy.checking
         : pending
-          ? "Saving..."
+          ? copy.saving
           : following
-            ? "Following"
-            : "Follow server"}
+            ? copy.following
+            : copy.follow}
     </button>
   );
 }
