@@ -93,5 +93,12 @@ describe("server control proof surface", () => {
     expect(panel).toContain("copy.exactEndpoint");
     expect(panel).toContain("copy.moderationSeparate");
     expect(panel).toContain("dictionary.serverClaim");
+    expect(panel).toContain(
+      "data.challenge.server?.id !== serverId",
+    );
+    expect(panel).toContain("data?.success !== true");
+    expect(panel).toContain(
+      "data?.proof?.challengeId !== challenge.challengeId",
+    );
   });
 });
