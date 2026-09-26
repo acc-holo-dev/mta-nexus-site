@@ -163,7 +163,11 @@ export function MtaMasterServerDirectory({
     setDirectory(null);
 
     const scheduled = window.setTimeout(() => {
-      fetch("/api/servers/directory?" + params, { signal: controller.signal })
+      fetch("/api/servers/directory?" + params, {
+        cache: "no-store",
+        credentials: "same-origin",
+        signal: controller.signal,
+      })
         .then(async (response) => {
           if (!response.ok) throw new Error("Directory request failed");
           return (await response.json()) as DirectoryResponse;
@@ -183,13 +187,7 @@ export function MtaMasterServerDirectory({
         .catch(() => {
           if (!active) return;
           setError(
-            timedOut
-              ? locale === "ru"
-                ? "Каталог MTA слишком долго не отвечал. Попробуйте ещё раз."
-                : "The MTA directory took too long to respond. Please try again."
-              : locale === "ru"
-                ? "Каталог MTA временно недоступен. Попробуйте ещё раз."
-                : "The MTA directory is temporarily unavailable. Please try again.",
+            timedOut ? copy.directoryTimeout : copy.directoryFetchError,
           );
         })
         .finally(() => {
@@ -245,7 +243,7 @@ export function MtaMasterServerDirectory({
             ) : directory ? (
               <>
                 {directory.total.toLocaleString(dateLocale)}{" "}
-                {locale === "ru" ? "публичных серверов." : "public servers."}{" "}
+                {copy.publicServersLabel}.{" "}
                 {validDate ? (
                   <>
                     {copy.updated}{" "}

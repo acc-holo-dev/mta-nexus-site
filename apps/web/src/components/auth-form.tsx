@@ -45,8 +45,12 @@ export function AuthForm({
     setError(null);
     try {
       const response = await fetch(`/api/auth/${mode}`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body), signal: AbortSignal.timeout(15_000),
+        method: "POST",
+        cache: "no-store",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(15_000),
       });
       const data = await response.json().catch(() => null);
       if (!response.ok) {
@@ -72,7 +76,15 @@ export function AuthForm({
         <p className="text-sm text-muted">{registering ? copy.registerDescription : copy.loginDescription}</p>
       </div>
       <form onSubmit={submit} aria-busy={loading} aria-describedby={error ? "auth-error" : undefined} className="nexus-panel space-y-4 p-5">
-        {error && <p id="auth-error" role="alert" className="rounded-lg border border-base p-3 text-sm text-primary">{error}</p>}
+        {error && (
+          <p
+            id="auth-error"
+            role="alert"
+            className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-3 text-sm text-danger"
+          >
+            {error}
+          </p>
+        )}
         <div className="space-y-1.5">
           <label htmlFor="auth-email" className={label}>{copy.email}</label>
           <input id="auth-email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} required className={input} />

@@ -189,6 +189,21 @@ const en = {
     unknown: "Unknown",
     freeroam: "Freeroam",
     verifiedServer: "Verified server",
+    directoryTimeout:
+      "The MTA directory took too long to respond. Please try again.",
+    directoryFetchError:
+      "The MTA directory is temporarily unavailable. Please try again.",
+    publicServersLabel: "public servers",
+  },
+  workspaceContext: {
+    title: "Active workspace context",
+    description:
+      "Switch between your personal workspace and organizations where you are a member.",
+    label: "Context",
+    loadError: "Could not load account contexts.",
+    switchError: "Could not switch context.",
+    note:
+      "Context switching changes the active workspace only; permissions still come from membership.",
   },
   serverDetail: {
     notFound: "Server not found",
@@ -1066,6 +1081,21 @@ const ru: typeof en = {
     unknown: "Неизвестно",
     freeroam: "Свободная игра",
     verifiedServer: "Проверенный сервер",
+    directoryTimeout:
+      "Каталог MTA слишком долго не отвечал. Попробуйте ещё раз.",
+    directoryFetchError:
+      "Каталог MTA временно недоступен. Попробуйте ещё раз.",
+    publicServersLabel: "публичных серверов",
+  },
+  workspaceContext: {
+    title: "Активный контекст рабочей зоны",
+    description:
+      "Переключайтесь между личной рабочей зоной и организациями, в которых вы состоите.",
+    label: "Контекст",
+    loadError: "Не удалось загрузить контексты аккаунта.",
+    switchError: "Не удалось переключить контекст.",
+    note:
+      "Переключение меняет только активную рабочую зону; права по-прежнему определяются членством.",
   },
   serverDetail: {
     notFound: "Сервер не найден",
