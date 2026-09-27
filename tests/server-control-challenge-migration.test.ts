@@ -25,16 +25,17 @@ describe("server control challenge migration contract", () => {
     );
   });
 
-  it("registers migration 0019 after the existing migration chain", () => {
+  it("keeps migration 0019 in sequence when later migrations are added", () => {
     const journal = JSON.parse(
       read("packages/db/migrations/meta/_journal.json"),
     );
-    const latest = journal.entries.at(-1);
-
-    expect(latest).toMatchObject({
+    const challenge = journal.entries.find((entry: { tag: string }) => entry.tag === "0019_server_claim_challenges");
+    expect(challenge).toMatchObject({
       idx: 19,
       tag: "0019_server_claim_challenges",
       breakpoints: true,
     });
+    expect(journal.entries[18].idx).toBe(18);
+    expect(journal.entries[20].idx).toBe(20);
   });
 });

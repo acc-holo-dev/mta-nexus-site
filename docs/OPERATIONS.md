@@ -55,6 +55,8 @@ CI also owns disposable PostgreSQL persistence, backup/restore, local Compose, p
 
 A workflow object with zero executed steps is infrastructure evidence, not an application test result. Release acceptance must name the exact tested `main` SHA.
 
+For changes to the official MTA directory and search, run `pnpm test:directory` first. It checks parser boundaries, stale data, API filtering and pagination, RU/EN surfaces, and search without a local database. The API checks call the real route handler with a controlled directory response; the full `pnpm check` still requires PostgreSQL and is the release gate. A focused pass is not a release acceptance result.
+
 ## 3. Production boundary
 
 Production must use explicit production Compose/configuration, not the local development stack.

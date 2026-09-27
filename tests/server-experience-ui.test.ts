@@ -31,7 +31,7 @@ describe("server experience UI", () => {
       "await serverService.canManageServer(server, user)",
     );
     expect(page).toContain("getRequestLocale");
-    expect(page).toContain("dictionary.serverManagement");
+    expect(page).toContain("getDictionary(locale).serverManagement");
   });
 
   it("hardens authenticated server mutations and follow state requests", () => {

@@ -9,6 +9,7 @@
     "start": "pnpm --filter @nexus/web start",
     "lint": "biome lint .",
     "test": "vitest run",
+    "test:directory": "vitest run apps/web/src/lib/services/mta-master-directory-service.test.ts tests/server-directory-api.test.ts tests/server-directory-surface.test.ts tests/server-experience-ui.test.ts tests/server-control-challenge-migration.test.ts tests/discovery-search-behavior.test.ts tests/search-pattern.test.ts",
     "typecheck": "tsc -b",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "db:generate": "pnpm --filter @nexus/db generate",
