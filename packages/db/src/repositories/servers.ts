@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, ne, or } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, ne, or } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, servers } from "../schema";
@@ -64,6 +64,30 @@ export class ServerRepository {
       .where(eq(servers.ownerId, ownerId))
       .orderBy(desc(servers.updatedAt));
     return rows as unknown as Server[];
+  }
+
+  async listActivePublicByOwner(ownerId: string): Promise<Server[]> {
+    const rows = await db.select().from(servers).where(and(
+      eq(servers.ownerId, ownerId),
+      eq(servers.visibility, "public"),
+      eq(servers.status, "active"),
+    )).orderBy(desc(servers.updatedAt), desc(servers.id));
+    return rows as unknown as Server[];
+  }
+
+  async listActivePublicByIds(ids: readonly string[]): Promise<Server[]> {
+    const uniqueIds = [...new Set(ids)];
+    if (uniqueIds.length === 0) return [];
+    const result: Server[] = [];
+    for (let offset = 0; offset < uniqueIds.length; offset += 500) {
+      const rows = await db.select().from(servers).where(and(
+        inArray(servers.id, uniqueIds.slice(offset, offset + 500)),
+        eq(servers.visibility, "public"),
+        eq(servers.status, "active"),
+      ));
+      result.push(...rows as unknown as Server[]);
+    }
+    return result;
   }
 
   async findById(id: string): Promise<Server | null> {

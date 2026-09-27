@@ -94,6 +94,32 @@ export class ProductRepository {
     return rows as unknown as Product[];
   }
 
+  async listPublishedFreeByAuthor(authorId: string): Promise<Product[]> {
+    const rows = await db.select().from(products).where(and(
+      eq(products.authorId, authorId),
+      eq(products.status, "published"),
+      eq(products.price, 0),
+      hasSafePublishedBuild(),
+    )).orderBy(desc(products.createdAt), desc(products.id));
+    return rows as unknown as Product[];
+  }
+
+  async listPublishedFreeByIds(ids: readonly string[]): Promise<Product[]> {
+    const uniqueIds = [...new Set(ids)];
+    if (uniqueIds.length === 0) return [];
+    const result: Product[] = [];
+    for (let offset = 0; offset < uniqueIds.length; offset += 500) {
+      const rows = await db.select().from(products).where(and(
+        inArray(products.id, uniqueIds.slice(offset, offset + 500)),
+        eq(products.status, "published"),
+        eq(products.price, 0),
+        hasSafePublishedBuild(),
+      ));
+      result.push(...rows as unknown as Product[]);
+    }
+    return result;
+  }
+
   async findById(id: string): Promise<Product | null> {
         const rows = await db.select().from(products).where(eq(products.id, id)).limit(1);
     return (rows[0] as unknown as Product) || null;

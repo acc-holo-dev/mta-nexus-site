@@ -61,6 +61,16 @@ export function matchesMtaEndpoint(
   );
 }
 
+export function indexMtaObservations(servers: readonly MtaMasterServer[]) {
+  const byEndpoint = new Map<string, MtaMasterServer>();
+  for (const server of servers) {
+    const key = `${normalizeMtaAddress(server.address)}:${server.port}`;
+    if (!byEndpoint.has(key)) byEndpoint.set(key, server);
+  }
+  return (editorial: { ipAddress: string; port: number }) =>
+    byEndpoint.get(`${normalizeMtaAddress(editorial.ipAddress)}:${editorial.port}`);
+}
+
 export type MtaMasterDirectory = {
   servers: MtaMasterServer[];
   fetchedAt: string;

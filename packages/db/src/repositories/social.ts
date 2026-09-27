@@ -81,13 +81,14 @@ export class SocialRepository {
             eq(follows.followerId, followerId),
             eq(follows.targetType, targetType)
           )
-        );
+        ).orderBy(desc(follows.createdAt));
       return rows as unknown as Follow[];
     }
     const rows = await db
       .select()
       .from(follows)
-      .where(eq(follows.followerId, followerId));
+      .where(eq(follows.followerId, followerId))
+      .orderBy(desc(follows.createdAt));
     return rows as unknown as Follow[];
   }
 }

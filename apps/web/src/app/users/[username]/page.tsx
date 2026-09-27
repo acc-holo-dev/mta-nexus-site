@@ -11,6 +11,7 @@ import { ProductCard } from "../../../components/product-card";
 import { ServerCard } from "../../../components/server-card";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { indexMtaObservations, mtaMasterDirectoryService } from "../../../lib/services/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";
 
@@ -52,16 +53,14 @@ export default async function UserProfilePage({
     notFound();
   }
 
-  const [allProducts, allServers] = await Promise.all([
-    productRepository.list(),
-    serverRepository.listActivePublic(),
+  const [userProducts, userServers] = await Promise.all([
+    productRepository.listPublishedFreeByAuthor(user.id),
+    serverRepository.listActivePublicByOwner(user.id),
   ]);
-  const userProducts = allProducts.filter(
-    (product) => product.authorId === user.id,
-  );
-  const userServers = allServers.filter(
-    (server) => server.ownerId === user.id,
-  );
+  const directory = userServers.length > 0
+    ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
+    : null;
+  const observationFor = indexMtaObservations(directory?.servers ?? []);
   const formattedDate = new Date(user.createdAt).toLocaleDateString(
     locale === "ru" ? "ru-RU" : "en-US",
     {
@@ -155,6 +154,8 @@ export default async function UserProfilePage({
                 key={server.id}
                 server={server}
                 locale={locale}
+                observation={observationFor(server)}
+                isStale={directory?.isStale}
               />
             ))}
           </div>

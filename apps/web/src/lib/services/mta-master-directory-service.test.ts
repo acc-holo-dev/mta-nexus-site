@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  indexMtaObservations,
   matchesMtaEndpoint,
   mtaLiveStatus,
   mtaMasterDirectoryService,
@@ -126,6 +127,12 @@ describe("parseMtaMasterList", () => {
 });
 
 describe("editorial/live endpoint matching", () => {
+  it("indexes one shared snapshot, preserving the first observation for duplicate endpoints", () => {
+    const first = { address: "play.example.com", port: 22003, players: 12 };
+    const lookup = indexMtaObservations([first, { ...first, players: 99 }]);
+    expect(lookup({ ipAddress: " PLAY.EXAMPLE.COM. ", port: 22003 })).toBe(first);
+    expect(lookup({ ipAddress: "play.example.com", port: 22004 })).toBeUndefined();
+  });
   it("normalizes case, whitespace and a trailing hostname dot", () => {
     expect(normalizeMtaAddress("  Play.Example.COM. ")).toBe("play.example.com");
     expect(matchesMtaEndpoint(

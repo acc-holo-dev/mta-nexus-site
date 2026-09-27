@@ -38,7 +38,7 @@ describe("server follow surface", () => {
     expect(component).toContain(
       'method: state === "following" ? "DELETE" : "POST"',
     );
-    expect(component).toContain("data?.success !== true");
+    expect(component).toContain("confirmsFollowMutation(");
     expect(component).toContain("copy.following");
     expect(component).toContain("copy.follow");
     expect(en.follow).not.toBe(ru.follow);

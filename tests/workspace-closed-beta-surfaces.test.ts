@@ -12,8 +12,9 @@ describe("closed-beta workspace surfaces", () => {
 
     expect(page).toContain("authService.getSession(token)");
     expect(page).toContain("socialRepository.listFollows(user.id)");
-    expect(page).toContain("productRepository.list()");
-    expect(page).toContain("serverRepository.listActivePublic()");
+    expect(page).toContain("productRepository.listPublishedFreeByIds([...savedProductIds])");
+    expect(page).toContain("serverRepository.listActivePublicByIds([...savedServerIds])");
+    expect(page).toContain("observation={observationFor(server)}");
     expect(page).toContain("locale={locale}");
     expect(page).toContain("dictionary.savedPage");
 

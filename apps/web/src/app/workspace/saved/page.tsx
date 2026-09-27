@@ -12,6 +12,7 @@ import { ProductCard } from "../../../components/product-card";
 import { ServerCard } from "../../../components/server-card";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { indexMtaObservations, mtaMasterDirectoryService } from "../../../lib/services/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";
 
@@ -39,11 +40,7 @@ export default async function SavedPage() {
     );
   }
 
-  const [follows, products, servers] = await Promise.all([
-    socialRepository.listFollows(user.id),
-    productRepository.list(),
-    serverRepository.listActivePublic(),
-  ]);
+  const follows = await socialRepository.listFollows(user.id);
 
   const savedProductIds = new Set(
     follows
@@ -56,12 +53,20 @@ export default async function SavedPage() {
       .map((follow) => follow.targetId),
   );
 
-  const savedProducts = products.filter((product) =>
-    savedProductIds.has(product.id),
-  );
-  const savedServers = servers.filter((server) =>
-    savedServerIds.has(server.id),
-  );
+  const [products, servers] = await Promise.all([
+    productRepository.listPublishedFreeByIds([...savedProductIds]),
+    serverRepository.listActivePublicByIds([...savedServerIds]),
+  ]);
+  const productOrder = new Map([...savedProductIds].map((id, index) => [id, index]));
+  const serverOrder = new Map([...savedServerIds].map((id, index) => [id, index]));
+  const savedProducts = products.sort((a, b) =>
+    (productOrder.get(a.id) ?? 0) - (productOrder.get(b.id) ?? 0));
+  const savedServers = servers.sort((a, b) =>
+    (serverOrder.get(a.id) ?? 0) - (serverOrder.get(b.id) ?? 0));
+  const directory = savedServers.length > 0
+    ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
+    : null;
+  const observationFor = indexMtaObservations(directory?.servers ?? []);
 
   return (
     <div className="space-y-8">
@@ -120,6 +125,8 @@ export default async function SavedPage() {
                 key={server.id}
                 server={server}
                 locale={locale}
+                observation={observationFor(server)}
+                isStale={directory?.isStale}
               />
             ))}
           </div>
