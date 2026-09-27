@@ -16,7 +16,9 @@ export interface SearchResultItem {
   title: string;
   description: string;
   url: string;
-  badge?: string;
+  players?: number;
+  maxPlayers?: number;
+  verified?: boolean;
 }
 
 export type SearchResultType = SearchResultItem["type"];
@@ -62,7 +64,6 @@ export class DiscoveryService {
         title: p.title,
         description: p.shortDescription || p.description.slice(0, 100),
         url: `/market/${p.slug}`,
-        badge: `$${(p.price / 100).toFixed(2)}`,
       })),
       servers.map((s) => ({
         id: s.id,
@@ -70,7 +71,6 @@ export class DiscoveryService {
         title: s.name,
         description: s.description?.slice(0, 100) || `${s.gameMode || "MTA"} Server`,
         url: `/servers/${s.slug}`,
-        badge: "MTA server",
       })),
       articles.map((a) => ({
         id: a.id,
@@ -78,7 +78,6 @@ export class DiscoveryService {
         title: a.title,
         description: a.excerpt || a.body.slice(0, 100),
         url: `/articles/${a.slug}`,
-        badge: a.type,
       })),
       users.map((u) => ({
         id: u.id,
@@ -86,7 +85,6 @@ export class DiscoveryService {
         title: u.displayName,
         description: u.bio || `@${u.username}`,
         url: `/developers/${u.username}`,
-        badge: "Developer",
       })),
       organizations.map((o) => ({
         id: o.id,
@@ -94,7 +92,7 @@ export class DiscoveryService {
         title: o.name,
         description: o.description?.slice(0, 100) || `@${o.slug}`,
         url: `/organizations/${o.slug}`,
-        badge: o.isVerified ? "Verified Studio" : "Studio",
+        verified: o.isVerified,
       })),
     ];
 
@@ -125,7 +123,8 @@ export class DiscoveryService {
               matchesMtaEndpoint(server, candidate),
             );
             if (observation?.players != null) {
-              item.badge = `${observation.players}/${observation.maxPlayers ?? server?.maxPlayers ?? "?"} players`;
+              item.players = observation.players;
+              item.maxPlayers = observation.maxPlayers;
             }
           }
         }

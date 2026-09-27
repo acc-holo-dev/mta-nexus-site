@@ -38,7 +38,7 @@ describe("discovery search", () => {
     const results = await discoveryService.search("  nexus  ", 1, "server");
 
     expect(sources.servers).toHaveBeenCalledWith("nexus", 1);
-    expect(results).toMatchObject([{ id: "old-server", badge: "7/32 players" }]);
+    expect(results).toMatchObject([{ id: "old-server", players: 7, maxPlayers: 32 }]);
     expect(sources.directory).toHaveBeenCalledOnce();
     expect(sources.products).not.toHaveBeenCalled();
     expect(sources.articles).not.toHaveBeenCalled();
@@ -64,7 +64,7 @@ describe("discovery search", () => {
     expect(sources.products).toHaveBeenCalledWith({ query: "Match", limit: 5 });
     expect(sources.servers).toHaveBeenCalledWith("Match", 5);
     expect(sources.articles).toHaveBeenCalledWith("Match", 5);
-    expect(results[1].badge).toBe("MTA server");
+    expect(results[1].players).toBeUndefined();
   });
 
   it("fills the result limit from one category and avoids directory calls without servers", async () => {
@@ -87,7 +87,7 @@ describe("discovery search", () => {
       isStale: false, servers: [{ address: "203.0.113.1", port: 22003 }],
     });
 
-    expect((await discoveryService.search("Match", 1, "server"))[0].badge).toBe("MTA server");
-    expect((await discoveryService.search("Match", 1, "server"))[0].badge).toBe("MTA server");
+    expect((await discoveryService.search("Match", 1, "server"))[0].players).toBeUndefined();
+    expect((await discoveryService.search("Match", 1, "server"))[0].players).toBeUndefined();
   });
 });

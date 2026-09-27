@@ -18,6 +18,7 @@ import {
   User,
 } from "lucide-react";
 import type { SearchResultItem } from "../lib/services/discovery-service";
+import { searchResultLabel } from "../lib/search-result-label";
 import { useNexusLocale } from "./locale-context";
 
 interface Command {
@@ -35,7 +36,7 @@ export function CommandPalette({
   onClose: () => void;
 }) {
   const router = useRouter();
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.commandPalette;
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResultItem[]>([]);
@@ -343,11 +344,9 @@ export function CommandPalette({
                         </span>
                       </span>
                     </span>
-                    {item.badge && (
-                      <span className="ml-2 shrink-0 rounded bg-inset px-1.5 py-0.5 font-numeric text-[10px] text-secondary">
-                        {item.badge}
-                      </span>
-                    )}
+                    <span className="ml-2 shrink-0 rounded bg-inset px-1.5 py-0.5 font-numeric text-[10px] text-secondary">
+                      {searchResultLabel(item, locale)}
+                    </span>
                   </button>
                 );
               })}

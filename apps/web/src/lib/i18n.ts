@@ -675,6 +675,9 @@ const en = {
   },
   commandPalette: {
     dialogLabel: "Command palette",
+    articleResult: "Article",
+    developerResult: "Developer",
+    organizationResult: "Studio",
     searchPlaceholder: "Search or jump to...",
     searchLabel: "Search query",
     close: "Close command palette",
@@ -1700,6 +1703,9 @@ const ru: typeof en = {
   },
   commandPalette: {
     dialogLabel: "Палитра команд",
+    articleResult: "Статья",
+    developerResult: "Разработчик",
+    organizationResult: "Студия",
     searchPlaceholder: "Поиск или быстрый переход...",
     searchLabel: "Поисковый запрос",
     close: "Закрыть палитру команд",
