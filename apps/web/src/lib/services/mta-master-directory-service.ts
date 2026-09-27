@@ -3,6 +3,7 @@ const CACHE_TTL_MS = 60_000;
 const STALE_CACHE_TTL_MS = 15 * 60_000;
 const MAX_MASTER_PAYLOAD_BYTES = 8 * 1024 * 1024;
 const MAX_MASTER_SERVERS = 10_000;
+const MASTER_LIST_EOF_MARKER = 0x12345679;
 
 const FLAG = {
   players: 0x0004,
@@ -182,6 +183,12 @@ export function parseMtaMasterList(data: ArrayBuffer): MtaMasterServer[] {
 
     reader.seek(entryEnd);
     servers.push(server);
+  }
+
+  // The official MTA client validates this marker before using a version 2
+  // list. Without it, a truncated final entry can look like a valid snapshot.
+  if (reader.remaining !== 4 || reader.u32() !== MASTER_LIST_EOF_MARKER) {
+    throw new Error("Invalid MTA master-list EOF marker");
   }
 
   return servers;

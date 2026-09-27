@@ -76,6 +76,7 @@ describe("parseMtaMasterList", () => {
       ...u16(8),
       203, 0, 113, 7,
       ...u16(22003),
+      ...u32(0x12345679),
     ]).buffer;
 
     expect(parseMtaMasterList(payload)).toEqual([
@@ -106,6 +107,20 @@ describe("parseMtaMasterList", () => {
     ]).buffer;
 
     expect(() => parseMtaMasterList(payload)).toThrow("Truncated MTA master-list server entry");
+  });
+
+  it("rejects a truncated or corrupted version 2 EOF marker", () => {
+    const valid = new Uint8Array(fixture());
+    expect(() => parseMtaMasterList(valid.slice(0, -1).buffer)).toThrow("EOF marker");
+    valid[valid.length - 1] ^= 1;
+    expect(() => parseMtaMasterList(valid.buffer)).toThrow("EOF marker");
+  });
+
+  it("rejects bytes after the version 2 EOF marker", () => {
+    const valid = new Uint8Array(fixture());
+    const extra = new Uint8Array(valid.length + 1);
+    extra.set(valid);
+    expect(() => parseMtaMasterList(extra.buffer)).toThrow("EOF marker");
   });
 });
 
