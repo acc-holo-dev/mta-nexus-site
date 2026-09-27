@@ -11,7 +11,9 @@ describe("moderation action integrity", () => {
 
     expect(route).toContain('{ error: "Product not found" }');
     expect(route).toContain('{ error: "Report not found" }');
-    expect(route).toContain("const updated = action ===");
+    expect(route).toContain("productRepository.updateWithAudit(");
+    expect(route).toContain("productRepository.suspendPublished(");
+    expect(route).toContain("productRepository.restoreSuspendedWithPublishedBuild(");
     expect(route).toContain("const resolved = await reportRepository.resolve");
   });
 });

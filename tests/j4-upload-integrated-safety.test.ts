@@ -129,9 +129,9 @@ describe("integrated J4 build upload safety contract", () => {
     expect(repository).toContain(
       "currentVersion: latestPublished[0].version",
     );
-    expect(service).toContain(
-      'input.decision === "approve" && build.scanStatus !== "clean"',
-    );
+    expect(service).toMatch(/input\.decision === "approve" &&\s*\([\s\S]*?build\.scanStatus !== "clean"/);
+    expect(service).toContain("!build.scanner?.trim()");
+    expect(service).toContain("!build.scannedAt");
     expect(service).toContain('"BUILD_SCAN_NOT_CLEAN"');
     expect(service).toContain('"BUILD_STATE_CHANGED"');
   });
@@ -164,7 +164,8 @@ describe("integrated J4 build upload safety contract", () => {
     expect(route).toContain(
       "notes: z.string().trim().min(3).max(2000)",
     );
-    expect(route).toContain('if (targetType !== "build")');
+    expect(route).toContain('targetType === "build"');
+    expect(route).toContain("await productService.reviewBuild({");
     expect(repository).toContain(
       "await tx.insert(auditEvents).values",
     );

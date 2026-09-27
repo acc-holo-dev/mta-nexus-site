@@ -10,7 +10,7 @@ describe("community content API", () => {
     );
 
     expect(route).toContain("contentRepository.listPublished(limit)");
-    expect(route).toContain('consumeRateLimit("contentCreation", user.id)');
+    expect(route).toMatch(/consumeRateLimit\(\s*"contentCreation",\s*user\.id/);
     expect(route).toContain(': "draft";');
     expect(route).toContain('can(user, "admin.moderation")');
     expect(route).toContain("Linked server");

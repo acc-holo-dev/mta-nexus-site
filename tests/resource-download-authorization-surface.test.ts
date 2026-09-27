@@ -47,7 +47,7 @@ describe("resource download route policy surface", () => {
     );
 
     expect(route).toContain('access.reason === "resource_not_published"');
-    expect(route).toContain('{ status: 404 }');
-    expect(route).toContain('{ status: 403 }');
+    expect(route).toContain("{ status: 404, headers: privateHeaders }");
+    expect(route).toContain("{ status: 403, headers: privateHeaders }");
   });
 });
