@@ -9,7 +9,8 @@ describe("public search hardening", () => {
       "utf8"
     );
 
-    expect(route).toContain('consumeRateLimit("search", getClientIp(request.headers))');
+    expect(route).toContain('consumeRateLimit("search", getTrustedRequestIp(request))');
+    expect(route).not.toContain("getClientIp(request.headers)");
     expect(route).toContain("MAX_QUERY_LENGTH");
     expect(route).toContain("SEARCH_TYPES");
     expect(route).toContain("Unknown search type");

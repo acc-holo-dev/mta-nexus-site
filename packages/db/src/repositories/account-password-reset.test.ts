@@ -110,7 +110,7 @@ describe("D4a password reset service", () => {
     });
 
     const result = await authService.confirmPasswordReset({
-      challengeId: proof.id, token: proof.token, newPassword,
+      challengeId: proof.id, token: proof.token, newPassword, ip: "203.0.113.10",
     });
     expect(result.revokedSessionCount).toBe(2);
     expect(await authService.getSession(a.firstToken)).toBeNull();
@@ -129,7 +129,7 @@ describe("D4a password reset service", () => {
       eq(notifications.recipientId, a.userId), eq(notifications.category, "security"),
     ))).toHaveLength(1);
     await expect(authService.confirmPasswordReset({
-      challengeId: proof.id, token: proof.token, newPassword: "Synthetic-D4-replay-password!",
+      challengeId: proof.id, token: proof.token, newPassword: "Synthetic-D4-replay-password!", ip: "203.0.113.10",
     })).rejects.toThrow("Invalid or expired");
   });
 
@@ -145,7 +145,7 @@ describe("D4a password reset service", () => {
     const storedBefore = await userRepository.findByEmail(a.email);
     if (!storedBefore?.passwordHash) throw new Error("password hash missing");
     await expect(authService.confirmPasswordReset({
-      challengeId: proof.id, token: proof.token, newPassword,
+      challengeId: proof.id, token: proof.token, newPassword, ip: "203.0.113.10",
       consumeAuditId: usedAudit,
     })).rejects.toThrow();
     const storedAfter = await userRepository.findByEmail(a.email);

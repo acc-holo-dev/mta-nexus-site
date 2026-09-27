@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { consumeRateLimit, getClientIp } from "@nexus/security";
+import { consumeRateLimit } from "@nexus/security";
+import { getTrustedRequestIp } from "../../../lib/request-client-ip";
 import {
   discoveryService,
   type SearchResultType,
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const rateLimit = await consumeRateLimit("search", getClientIp(request.headers));
+  const rateLimit = await consumeRateLimit("search", getTrustedRequestIp(request));
   if (!rateLimit.success) {
     return NextResponse.json(
       { error: "Search rate limit exceeded. Please try again shortly." },

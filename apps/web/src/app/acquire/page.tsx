@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   CheckCircle2,
-  LibraryPlus,
+  Library,
   ShieldCheck,
 } from "lucide-react";
 import { Button } from "@nexus/ui";
@@ -182,7 +182,7 @@ function AcquireContent() {
     <div className="mx-auto max-w-2xl space-y-6 py-8">
       <header className="border-b border-base pb-5">
         <h1 className="flex items-center gap-2.5 font-display text-primary">
-          <LibraryPlus className="h-6 w-6 text-accent" aria-hidden="true" />
+          <Library className="h-6 w-6 text-accent" aria-hidden="true" />
           <span>{copy.title}</span>
         </h1>
         <p className="mt-1 max-w-xl text-sm leading-relaxed text-muted">
