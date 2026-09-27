@@ -1,10 +1,28 @@
-import { and, eq, desc, ne, sql } from "drizzle-orm";
+import { and, asc, count, eq, desc, ne, sql } from "drizzle-orm";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
 
 export class BuildRepository {
+  async countPendingReview(): Promise<number> {
+    const [row] = await db.select({ total: count() }).from(builds)
+      .where(eq(builds.status, "pending_review"));
+    return row?.total ?? 0;
+  }
+
+  async listPendingReviewPage(page: number, pageSize = 30): Promise<{ builds: Build[]; hasMore: boolean }> {
+    if (!Number.isSafeInteger(page) || page < 1 || page > 99_999 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+      throw new RangeError("Invalid build review page");
+    }
+    const rows = await db.select().from(builds)
+      .where(eq(builds.status, "pending_review"))
+      .orderBy(asc(builds.createdAt), asc(builds.id))
+      .limit(pageSize + 1)
+      .offset((page - 1) * pageSize);
+    return { builds: rows.slice(0, pageSize) as unknown as Build[], hasMore: rows.length > pageSize };
+  }
+
   async listByProduct(productId: string): Promise<Build[]> {
         const rows = await db
       .select()

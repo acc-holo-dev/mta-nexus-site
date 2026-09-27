@@ -16,7 +16,8 @@ describe("moderation queues", () => {
     expect(repository).toContain(
       'eq(builds.status, "pending_review")',
     );
-    expect(page).toContain("buildRepository.listPendingReview()");
+    expect(page).toContain("buildRepository.listPendingReviewPage(buildPage)");
+    expect(page).toContain("buildRepository.countPendingReview()");
     expect(page).toContain("copy.resourceBuildQueue");
     expect(page).toContain("copy.buildsAwaitingReview");
     expect(page).toContain('can(currentUser, "admin.access")');

@@ -34,7 +34,7 @@ describe("content moderation workflow", () => {
     expect(repository).toContain("expectedStatus");
     expect(service).toContain("CONTENT_STATE_CHANGED");
     expect(page).toContain(
-      'contentRepository.listByStatus("draft", 100)',
+      "contentRepository.listDraftPage(contentPage)",
     );
     expect(page).toContain("copy.communityQueue");
     expect(page).toContain("copy.draftsAwaitingModeration");

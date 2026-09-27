@@ -50,6 +50,10 @@ The **Verification queue** on `/admin` follows the same 30 item paging model, ol
 
 Очередь верификации в `/admin` показывает все ожидающие заявки постранично, от старых к новым; решения вынесены в историю. Счётчик учитывает все ожидающие заявки. Ссылка на доказательство доступна модератору. Одновременные заявки на один объект сериализуются в транзакции, повторная заявка получает 409. После сохранения заявки сбой уведомлений не превращает успешную подачу в ошибку. Быстрая проверка: `pnpm test:verification`.
 
+Resource builds awaiting review and community drafts on `/admin` also show the oldest work first in 30 item pages. Their totals come from dedicated count queries, so the moderator can tell when additional pages exist. Navigating one queue preserves the selected pages and views of the other queues. A draft card exposes its full text in an expandable section before a moderator publishes it. `pnpm test:moderation-queues` checks these read paths and the existing moderation controls. A draft is visible to moderators as soon as it is created; do not use the draft state to store private, unfinished work.
+
+Сборки на проверке и черновики сообщества в `/admin` тоже идут от старых к новым, по 30 на страницу. Счётчики показывают общее количество, переход между страницами сохраняет положение в остальных очередях. Перед публикацией модератор может раскрыть полный текст черновика. Проверка: `pnpm test:moderation-queues`. Черновик сразу доступен модераторам; это состояние не подходит для личных незаконченных материалов.
+
 When a functioning execution environment is available, the expected project verification path is:
 
 ```bash

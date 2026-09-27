@@ -44,6 +44,8 @@ export default async function AdminPage({
     reportPage?: string;
     verificationView?: string;
     verificationPage?: string;
+    buildPage?: string;
+    contentPage?: string;
   }>;
 }) {
   const locale = await getRequestLocale();
@@ -51,20 +53,27 @@ export default async function AdminPage({
   const copy = dictionary.admin;
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
   const query = await searchParams;
+  const parsePage = (value: string | undefined) =>
+    typeof value === "string" && /^[1-9]\d{0,4}$/.test(value) ? Number(value) : 1;
   const reportView = query.reportView === "history" ? "history" : "pending";
-  const reportPage =
-    typeof query.reportPage === "string" && /^[1-9]\d{0,4}$/.test(query.reportPage)
-      ? Number(query.reportPage)
-      : 1;
+  const reportPage = parsePage(query.reportPage);
   const verificationView = query.verificationView === "history" ? "history" : "pending";
-  const verificationPage =
-    typeof query.verificationPage === "string" && /^[1-9]\d{0,4}$/.test(query.verificationPage)
-      ? Number(query.verificationPage)
-      : 1;
+  const verificationPage = parsePage(query.verificationPage);
+  const buildPage = parsePage(query.buildPage);
+  const contentPage = parsePage(query.contentPage);
+  const adminHref = (changes: Record<string, string | number>) => {
+    const params = new URLSearchParams({
+      reportView, reportPage: String(reportPage),
+      verificationView, verificationPage: String(verificationPage),
+      buildPage: String(buildPage), contentPage: String(contentPage),
+    });
+    for (const [key, value] of Object.entries(changes)) params.set(key, String(value));
+    return `/admin?${params}`;
+  };
   const reportHref = (view: "pending" | "history", page: number) =>
-    `/admin?reportView=${view}&reportPage=${page}&verificationView=${verificationView}&verificationPage=${verificationPage}`;
+    adminHref({ reportView: view, reportPage: page });
   const verificationHref = (view: "pending" | "history", page: number) =>
-    `/admin?reportView=${reportView}&reportPage=${reportPage}&verificationView=${view}&verificationPage=${page}`;
+    adminHref({ verificationView: view, verificationPage: page });
 
   const cookieStore = await cookies();
   const token = cookieStore.get("nexus_session")?.value;
@@ -97,21 +106,27 @@ export default async function AdminPage({
     reportPageResult,
     verificationPageResult,
     pendingVerificationCount,
-    pendingBuilds,
-    pendingContent,
+    buildPageResult,
+    pendingBuildCount,
+    contentPageResult,
+    pendingContentCount,
     auditLogs,
   ] = await Promise.all([
     adminService.getSystemHealthMetrics(adminUser),
     adminService.listReports(adminUser, reportView, reportPage),
     verificationRepository.listPage(verificationView, verificationPage),
     verificationRepository.countPending(),
-    buildRepository.listPendingReview(),
-    contentRepository.listByStatus("draft", 100),
+    buildRepository.listPendingReviewPage(buildPage),
+    buildRepository.countPendingReview(),
+    contentRepository.listDraftPage(contentPage),
+    contentRepository.countDrafts(),
     canViewAudit ? adminService.listAuditLogs(adminUser) : Promise.resolve([]),
   ]);
 
   const { requests: verificationRequests, hasMore: moreVerifications } = verificationPageResult;
   const { reports, hasMore: moreReports } = reportPageResult;
+  const { builds: pendingBuilds, hasMore: moreBuilds } = buildPageResult;
+  const { items: pendingContent, hasMore: moreContent } = contentPageResult;
 
   return (
     <div className="space-y-8">
@@ -273,7 +288,7 @@ export default async function AdminPage({
       <section>
         <SectionHeader
           title={copy.resourceBuildQueue}
-          description={`${pendingBuilds.length} ${copy.buildsAwaitingReview}`}
+          description={`${pendingBuildCount} ${copy.buildsAwaitingReview}`}
           action={<PackageCheck className="h-4 w-4 text-warning" />}
         />
         <div className="space-y-2.5">
@@ -333,12 +348,19 @@ export default async function AdminPage({
             </div>
           )}
         </div>
+        {(buildPage > 1 || moreBuilds) && (
+          <nav aria-label={copy.buildPages} className="mt-3 flex items-center gap-3 text-xs">
+            {buildPage > 1 && <Link className="text-accent underline" href={adminHref({ buildPage: buildPage - 1 })}>{copy.previous}</Link>}
+            <span className="text-muted">{copy.reportPage} {buildPage}</span>
+            {moreBuilds && buildPage < 99_999 && <Link className="text-accent underline" href={adminHref({ buildPage: buildPage + 1 })}>{copy.next}</Link>}
+          </nav>
+        )}
       </section>
 
       <section>
         <SectionHeader
           title={copy.communityQueue}
-          description={`${pendingContent.length} ${copy.draftsAwaitingModeration}`}
+          description={`${pendingContentCount} ${copy.draftsAwaitingModeration}`}
         />
         <div className="space-y-2.5">
           {pendingContent.length > 0 ? (
@@ -365,6 +387,12 @@ export default async function AdminPage({
                       {item.excerpt}
                     </p>
                   )}
+                  <details className="max-w-prose font-caption text-muted">
+                    <summary className="cursor-pointer text-accent">{copy.readDraft}</summary>
+                    <div className="mt-2 max-h-96 overflow-y-auto whitespace-pre-wrap break-words rounded-md border border-base bg-inset p-3 text-xs text-secondary">
+                      {item.body}
+                    </div>
+                  </details>
                 </div>
                 <ContentModerationControls contentId={item.id} />
               </div>
@@ -375,6 +403,13 @@ export default async function AdminPage({
             </div>
           )}
         </div>
+        {(contentPage > 1 || moreContent) && (
+          <nav aria-label={copy.contentPages} className="mt-3 flex items-center gap-3 text-xs">
+            {contentPage > 1 && <Link className="text-accent underline" href={adminHref({ contentPage: contentPage - 1 })}>{copy.previous}</Link>}
+            <span className="text-muted">{copy.reportPage} {contentPage}</span>
+            {moreContent && contentPage < 99_999 && <Link className="text-accent underline" href={adminHref({ contentPage: contentPage + 1 })}>{copy.next}</Link>}
+          </nav>
+        )}
       </section>
 
       <section>

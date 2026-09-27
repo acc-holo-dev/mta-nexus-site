@@ -1,10 +1,28 @@
-import { eq, desc, and, count, sql, inArray, ilike, or } from "drizzle-orm";
+import { eq, asc, desc, and, count, sql, inArray, ilike, or } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, content, comments, products } from "../schema";
 import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
 export class ContentRepository {
+  async countDrafts(): Promise<number> {
+    const [row] = await db.select({ total: count() }).from(content)
+      .where(eq(content.status, "draft"));
+    return row?.total ?? 0;
+  }
+
+  async listDraftPage(page: number, pageSize = 30): Promise<{ items: Content[]; hasMore: boolean }> {
+    if (!Number.isSafeInteger(page) || page < 1 || page > 99_999 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+      throw new RangeError("Invalid content review page");
+    }
+    const rows = await db.select().from(content)
+      .where(eq(content.status, "draft"))
+      .orderBy(asc(content.createdAt), asc(content.id))
+      .limit(pageSize + 1)
+      .offset((page - 1) * pageSize);
+    return { items: rows.slice(0, pageSize) as unknown as Content[], hasMore: rows.length > pageSize };
+  }
+
   async countPublished(): Promise<number> {
     const [row] = await db.select({ total: count() }).from(content).where(
       eq(content.status, "published"),

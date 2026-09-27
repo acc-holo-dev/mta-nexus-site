@@ -249,6 +249,7 @@ export const builds = pgTable("builds", {
 }, (table) => [
   uniqueIndex("builds_product_version_idx").on(table.productId, table.version),
   index("builds_product_status_idx").on(table.productId, table.status),
+  index("builds_status_created_id_idx").on(table.status, table.createdAt, table.id),
   check(
     "builds_clean_scan_provenance_check",
     sql`${table.scanStatus} <> 'clean' OR (
@@ -411,6 +412,7 @@ export const content = pgTable(
     uniqueIndex("content_slug_idx").on(table.slug),
     index("content_author_idx").on(table.authorId),
     index("content_type_idx").on(table.type),
+    index("content_status_created_id_idx").on(table.status, table.createdAt, table.id),
   ]
 );
 
