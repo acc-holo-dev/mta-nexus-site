@@ -1,8 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   matchesMtaEndpoint,
+  mtaMasterDirectoryService,
   normalizeMtaAddress,
   parseMtaMasterList,
+  readBoundedMasterPayload,
 } from "./mta-master-directory-service";
 
 const FLAGS = 0x0004 | 0x0008 | 0x0020 | 0x0040 | 0x0080 | 0x0100 | 0x0200 | 0x1000 | 0x080000;
@@ -121,5 +123,86 @@ describe("editorial/live endpoint matching", () => {
       { ipAddress: "127.0.0.1", port: 22003 },
       { address: "127.0.0.1", port: 22004 }
     )).toBe(false);
+  });
+});
+
+describe("bounded MTA master-list transport", () => {
+  it("reassembles a chunked response without using unbounded arrayBuffer()", async () => {
+    const response = new Response(new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array([0, 1]));
+        controller.enqueue(new Uint8Array([2, 3]));
+        controller.close();
+      },
+    }));
+    response.arrayBuffer = () => {
+      throw new Error("Unbounded reader must not be used");
+    };
+
+    expect(new Uint8Array(await readBoundedMasterPayload(response, 4)))
+      .toEqual(new Uint8Array([0, 1, 2, 3]));
+  });
+
+  it("rejects an oversized advertised length and cancels its body", async () => {
+    let cancelled = false;
+    const response = new Response(new ReadableStream<Uint8Array>({
+      cancel() { cancelled = true; },
+    }), { headers: { "content-length": "17" } });
+
+    await expect(readBoundedMasterPayload(response, 16))
+      .rejects.toThrow("payload exceeds safety limit");
+    expect(cancelled).toBe(true);
+  });
+
+  it("stops reading and cancels when chunks exceed the limit without a length header", async () => {
+    let cancelled = false;
+    const response = new Response(new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(8));
+        controller.enqueue(new Uint8Array(9));
+      },
+      cancel() { cancelled = true; },
+    }));
+
+    await expect(readBoundedMasterPayload(response, 16))
+      .rejects.toThrow("payload exceeds safety limit");
+    expect(cancelled).toBe(true);
+  });
+});
+
+describe("MTA directory outage cache", () => {
+  it("throttles failed refreshes without extending the stale snapshot deadline", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-09-27T00:00:00Z"));
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response(fixture()))
+      .mockRejectedValue(new Error("upstream unavailable"));
+    vi.stubGlobal("fetch", fetchMock);
+    try {
+      const fresh = await mtaMasterDirectoryService.getDirectory();
+      expect(fresh.isStale).toBe(false);
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+
+      vi.setSystemTime(new Date("2026-09-27T00:01:01Z"));
+      const stale = await mtaMasterDirectoryService.getDirectory();
+      expect(stale.isStale).toBe(true);
+      expect(stale.fetchedAt).toBe(fresh.fetchedAt);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+
+      expect((await mtaMasterDirectoryService.getDirectory()).isStale).toBe(true);
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+
+      vi.setSystemTime(new Date("2026-09-27T00:01:12Z"));
+      expect((await mtaMasterDirectoryService.getDirectory()).isStale).toBe(true);
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+
+      vi.setSystemTime(new Date("2026-09-27T00:15:01Z"));
+      await expect(mtaMasterDirectoryService.getDirectory())
+        .rejects.toThrow("upstream unavailable");
+      expect(fetchMock).toHaveBeenCalledTimes(4);
+    } finally {
+      vi.unstubAllGlobals();
+      vi.useRealTimers();
+    }
   });
 });

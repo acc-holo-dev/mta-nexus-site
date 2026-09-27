@@ -71,6 +71,12 @@ A free claim:
 
 Expired entitlements are not accepted by authorization checks. License fallback requires an active, non-expired license.
 
+### External MTA directory
+
+The public MTA master list is read as a bounded stream (8 MiB maximum) and parsed with a 10,000-server limit. An oversized response is cancelled before further chunks are read. A failed refresh may serve the last successful snapshot for at most 15 minutes, marked stale. Retries are spaced by 10 seconds during an outage without extending that deadline.
+
+Публичный список MTA читается потоком с ограничением 8 МиБ и максимумом 10 000 серверов. При ошибке обновления прежний снимок доступен не более 15 минут и помечается устаревшим.
+
 ### Authorization
 
 Authorization is evaluated from current actor context, resource ownership and organization membership. Historical `authorId`/owner attribution is not a permanent bypass after ownership changes.

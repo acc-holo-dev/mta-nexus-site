@@ -187,6 +187,46 @@ export function parseMtaMasterList(data: ArrayBuffer): MtaMasterServer[] {
   return servers;
 }
 
+export async function readBoundedMasterPayload(
+  response: Response,
+  maxBytes = MAX_MASTER_PAYLOAD_BYTES,
+): Promise<ArrayBuffer> {
+  const declaredLength = response.headers.get("content-length");
+  if (declaredLength && Number(declaredLength) > maxBytes) {
+    await response.body?.cancel();
+    throw new Error("MTA master-list payload exceeds safety limit");
+  }
+  if (!response.body) throw new Error("MTA master-list response has no body");
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        throw new Error("MTA master-list payload exceeds safety limit");
+      }
+      chunks.push(value);
+    }
+  } catch (error) {
+    await reader.cancel().catch(() => {});
+    throw error;
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes.buffer;
+}
+
 async function requestDirectory(): Promise<MtaMasterDirectory> {
   const response = await fetch(MTA_MASTER_URL, {
     cache: "no-store",
@@ -198,10 +238,7 @@ async function requestDirectory(): Promise<MtaMasterDirectory> {
     throw new Error(`MTA master-list request failed with ${response.status}`);
   }
 
-  const payload = await response.arrayBuffer();
-  if (payload.byteLength > MAX_MASTER_PAYLOAD_BYTES) {
-    throw new Error("MTA master-list payload exceeds safety limit");
-  }
+  const payload = await readBoundedMasterPayload(response);
 
   const servers = parseMtaMasterList(payload)
     .filter((server) => server.responding !== false)
@@ -224,7 +261,11 @@ export const mtaMasterDirectoryService = {
         })
         .catch((error) => {
           if (cachedDirectory && Date.now() < staleCacheExpiresAt) {
-            return { ...cachedDirectory, isStale: true };
+            cachedDirectory = { ...cachedDirectory, isStale: true };
+            // Avoid one upstream request per visitor during an outage, without
+            // extending the original 15-minute stale-data deadline.
+            cacheExpiresAt = Math.min(Date.now() + 10_000, staleCacheExpiresAt);
+            return cachedDirectory;
           }
           throw error;
         })
