@@ -16,13 +16,13 @@ export class AdminService {
       throw new ForbiddenError("Admin access required");
     }
 
-    const [users, servers, products, content, reports] =
+    const [users, servers, products, publishedContent, reportsOpen] =
       await Promise.all([
-        userRepository.listAll(),
-        serverRepository.listActivePublic(),
-        productRepository.list(),
-        contentRepository.listPublished(),
-        reportRepository.listAll(),
+        userRepository.countAll(),
+        serverRepository.countActivePublic(),
+        productRepository.countPublishedFree(),
+        contentRepository.countPublished(),
+        reportRepository.countOpen(),
       ]);
 
     return {
@@ -31,13 +31,11 @@ export class AdminService {
       uptimeSeconds: process.uptime(),
       memoryUsage: process.memoryUsage(),
       counts: {
-        users: users.length,
-        servers: servers.length,
-        products: products.length,
-        publishedContent: content.length,
-        reportsOpen: reports.filter(
-          (report) => report.status === "open",
-        ).length,
+        users,
+        servers,
+        products,
+        publishedContent,
+        reportsOpen,
       },
     };
   }

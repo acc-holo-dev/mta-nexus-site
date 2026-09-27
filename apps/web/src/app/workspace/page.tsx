@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import {
   entitlementRepository,
+  licenseRepository,
   productRepository,
   serverRepository,
 } from "@nexus/db";
@@ -9,12 +10,13 @@ import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
 import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
 import { authService } from "../../lib/services/auth-service";
 import {
-  matchesMtaEndpoint,
+  indexMtaObservations,
   mtaLiveStatus,
   mtaMasterDirectoryService,
 } from "../../lib/services/mta-master-directory-service";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
+import { collectLibraryEntries } from "../../lib/user-library";
 
 export const dynamic = "force-dynamic";
 
@@ -43,25 +45,28 @@ export default async function WorkspacePage() {
     );
   }
 
-  const [entitlements, ownedServers, products, directory] = await Promise.all([
+  const [entitlements, legacyLicenses, ownedServers] = await Promise.all([
     entitlementRepository.listBySubject({ type: "user", id: user.id }),
+    licenseRepository.listActiveDownloadableByUser(user.id),
     serverRepository.listByOwner(user.id),
-    productRepository.list(),
-    mtaMasterDirectoryService.getDirectory().catch(() => null),
   ]);
 
+  const downloadable = collectLibraryEntries(entitlements, legacyLicenses);
+  const [products, directory] = await Promise.all([
+    productRepository.listPublishedFreeByIds(
+      downloadable.map((entitlement) => entitlement.resourceId),
+    ),
+    ownedServers.length > 0
+      ? mtaMasterDirectoryService.getDirectory().catch(() => null)
+      : Promise.resolve(null),
+  ]);
   const productMap = new Map(products.map((product) => [product.id, product]));
-  const downloadable = entitlements.filter(
-    (entitlement) => entitlement.permission === "product.download",
-  );
-  const observations = directory?.servers ?? [];
+  const observationFor = indexMtaObservations(directory?.servers ?? []);
   const directoryIsFresh = Boolean(directory && !directory.isStale);
   const liveByServerId = new Map(
     ownedServers.map((server) => [
       server.id,
-      observations.find((observation) =>
-        matchesMtaEndpoint(server, observation),
-      ) ?? null,
+      observationFor(server) ?? null,
     ]),
   );
   const onlineServers = ownedServers.filter((server) => {
@@ -154,7 +159,7 @@ export default async function WorkspacePage() {
               const product = productMap.get(entitlement.resourceId);
               return (
                 <article
-                  key={entitlement.id}
+                  key={entitlement.resourceId}
                   className="nexus-panel flex items-center justify-between gap-3 p-4"
                 >
                   <div className="min-w-0">

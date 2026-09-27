@@ -70,6 +70,12 @@ pnpm dev:host
 # project verification
 pnpm check
 pnpm nexus:doctor
+
+# focused public catalog, saved/library and admin-count checks (no local database)
+pnpm test:catalog
+
+# report privacy, audit transaction and moderator notification checks
+pnpm test:reports
 ```
 
 ## Development rules / Правила разработки
@@ -96,6 +102,8 @@ packages/validation/ request schemas
 scripts/           operational and verification tooling
 tests/             unit, integration and contract tests
 ```
+
+The free resource library at `/market` supports category and text search, three sort modes and bounded pages. `/api/products` accepts `type`, `sort`, `q`, `page` and `limit` and returns `products`, `limit`, `page` and `hasMore`. Published resources must still have a trusted clean build. Saved items, personal libraries and public profiles query their own IDs or owners, so older resources are not lost behind the catalog's first page. The personal library also shows active, unexpired legacy licenses without exposing their keys or repeating resources already claimed through newer access records.
 
 ## Documentation
 

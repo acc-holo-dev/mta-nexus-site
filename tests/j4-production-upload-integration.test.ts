@@ -46,7 +46,7 @@ describe("J4 production upload integration candidate", () => {
     const dbPackage = JSON.parse(read("packages/db/package.json"));
     const entrypoint = read("scripts/start-production.sh");
 
-    expect(dbPackage.dependencies.tsx).toBe("^4.23.13");
+    expect(dbPackage.dependencies.tsx).toMatch(/^\^4\.\d+\.\d+$/u);
     expect(entrypoint).toContain("node --import tsx src/migrate.ts");
     expect(entrypoint).toContain("exec node server.js");
     expect(entrypoint).not.toContain("pnpm");

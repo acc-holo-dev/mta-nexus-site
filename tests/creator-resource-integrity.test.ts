@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -9,8 +10,9 @@ describe("creator resource integrity", () => {
     const repository = read("packages/db/src/repositories/products.ts");
     expect(repository).toContain('eq(products.status, "published")');
     expect(repository).toContain("ilike(products.title, pattern)");
-    expect(repository).toContain(".orderBy(order)");
+    expect(repository).toContain(".orderBy(order, desc(products.id))");
     expect(repository).toContain(".limit(limit)");
+    expect(repository).toContain(".offset(offset)");
     expect(repository).not.toContain("items.sort");
   });
 
@@ -26,8 +28,11 @@ describe("creator resource integrity", () => {
 
   it("does not claim that an unreviewed upload is published", () => {
     const page = read("apps/web/src/app/workspace/resources/new/page.tsx");
-    expect(page).toContain("Resource submitted for review");
-    expect(page).toContain("moderator approval");
+    expect(page).toContain("copy.submittedTitle");
+    expect(page).toContain("copy.submittedDescription");
+    expect(getDictionary("en").publishing.submittedTitle).toBe("Resource submitted for review");
+    expect(getDictionary("en").publishing.submittedDescription).toContain("moderator approval");
+    expect(getDictionary("ru").publishing.submittedDescription).toContain("одобрения модератора");
     expect(page).not.toContain(">Resource published<");
   });
 

@@ -16,7 +16,9 @@ describe("abuse report workflow", () => {
     expect(route).toContain("Report target was not found");
     expect(route).toContain("You already have an open report for this target");
     expect(route).toContain("notificationRepository.create");
-    expect(route).toContain("candidate.role === \"moderator\" || candidate.role === \"admin\"");
+    expect(route).toContain("userRepository.listModeratorIds()");
+    expect(route).toContain("reportRepository.createWithAudit(");
+    expect(route).toContain("moderation.report_notification_failed");
     expect(repository).toContain("findOpenByReporterAndTarget");
   });
 });

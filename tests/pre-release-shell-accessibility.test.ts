@@ -58,9 +58,9 @@ describe("pre-release shell accessibility", () => {
     const page = read("apps/web/src/app/notifications/page.tsx");
 
     expect(page).toContain("data?.success !== true");
-    expect(page.indexOf("data?.success !== true")).toBeLessThan(
-      page.indexOf("setNotifications((previous)"),
-    );
+    const markAllRead = page.slice(page.indexOf("async function markAllRead()"), page.indexOf("const filtered ="));
+    expect(markAllRead).toContain("await loadNotifications()");
+    expect(markAllRead).not.toContain("setNotifications((previous)");
     expect(page).toContain('role="tablist"');
     expect(page).toContain("aria-label={copy.title}");
   });

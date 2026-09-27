@@ -3,6 +3,7 @@ import { productService } from "../../../lib/services/product-service";
 import { authService } from "../../../lib/services/auth-service";
 import { createProductSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
+import { parseMarketQuery } from "../../../lib/market-query";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -17,18 +18,31 @@ function privateJson(body: unknown, status = 200) {
 }
 
 export async function GET(request: NextRequest) {
-  const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "50");
+  const params = request.nextUrl.searchParams;
+  const single = (name: string) => {
+    const values = params.getAll(name);
+    return values.length === 1 ? values[0] : undefined;
+  };
+  const { type, sort, query, page } = parseMarketQuery({
+    type: single("type"),
+    sort: single("sort"),
+    q: single("q"),
+    page: single("page"),
+  });
+  const requestedLimit = Number(single("limit") || "50");
   const limit = Number.isFinite(requestedLimit)
     ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
     : 50;
-  const products = await productService.listProducts({
-    maxPrice: 0,
-    sort: "popular",
-    limit,
+  const { products, hasMore } = await productService.listPublicPage({
+    type: type === "all" ? undefined : type,
+    sort,
+    query,
+    page,
+    pageSize: limit,
   });
 
   return NextResponse.json(
-    { products, limit },
+    { products, limit, page, hasMore },
     { headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=120" } }
   );
 }

@@ -15,9 +15,12 @@ describe("article comments API", () => {
     expect(route).toContain('consumeRateLimit("commentCreation", user.id)');
     expect(route).toContain("createContentCommentSchema.safeParse");
     expect(route).toContain("incrementView: false");
-    expect(route).toContain("notificationRepository.create");
+    expect(route).toContain("notificationRepository");
+    expect(route).toContain(".create({");
+    expect(route).toContain(".catch(() => undefined)");
     expect(route).toContain('category: "content"');
-    expect(route).toContain('Cache-Control": "no-store"');
+    expect(route).toContain('"Cache-Control": "private, no-store"');
+    expect(route).toContain('Vary: "Cookie"');
   });
 
   it("keeps comment writes and article counters in one transaction", () => {

@@ -1,10 +1,17 @@
-import { eq, desc, and, sql, inArray, ilike, or } from "drizzle-orm";
+import { eq, desc, and, count, sql, inArray, ilike, or } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, content, comments, products } from "../schema";
 import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
 export class ContentRepository {
+  async countPublished(): Promise<number> {
+    const [row] = await db.select({ total: count() }).from(content).where(
+      eq(content.status, "published"),
+    );
+    return row?.total ?? 0;
+  }
+
   async searchPublished(term: string, limit = 50): Promise<Content[]> {
     const pattern = containsPattern(term);
     const boundedLimit = Number.isFinite(limit)

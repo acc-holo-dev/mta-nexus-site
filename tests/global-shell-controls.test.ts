@@ -63,9 +63,9 @@ describe("global shell controls", () => {
     expect(source).toContain('credentials: "same-origin"');
     expect(source).toContain('cache: "no-store"');
     expect(source).toContain("data?.success !== true");
-    expect(source.indexOf("data?.success !== true")).toBeLessThan(
-      source.indexOf("setUnreadCount(0)"),
-    );
+    const markAllRead = source.slice(source.indexOf("async function markAllRead()"), source.indexOf("const bellLabel"));
+    expect(markAllRead).toContain("setAttempt((value) => value + 1)");
+    expect(markAllRead).not.toContain("setUnreadCount(0)");
     expect(source).toContain('role="dialog"');
 
     const en = getDictionary("en").notificationBell;

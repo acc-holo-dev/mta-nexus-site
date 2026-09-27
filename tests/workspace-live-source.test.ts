@@ -12,7 +12,11 @@ describe("workspace live telemetry source", () => {
     expect(page).toContain(
       "mtaMasterDirectoryService.getDirectory().catch(() => null)",
     );
-    expect(page).toContain("matchesMtaEndpoint(server, observation)");
+    expect(page).toContain("indexMtaObservations(directory?.servers ?? [])");
+    expect(page).toContain("productRepository.listPublishedFreeByIds(");
+    expect(page).toContain("licenseRepository.listActiveDownloadableByUser(user.id)");
+    expect(page).toContain("collectLibraryEntries(entitlements, legacyLicenses)");
+    expect(page).toContain("ownedServers.length > 0");
     expect(page).toContain("dictionary.servers.online");
     expect(page).toContain("dictionary.servers.offline");
     expect(page).toContain("dictionary.servers.unknown");

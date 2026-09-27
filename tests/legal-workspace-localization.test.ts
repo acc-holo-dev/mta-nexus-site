@@ -47,7 +47,8 @@ describe("localized legal and workspace shell", () => {
     expect(workspace).toContain(
       "mtaMasterDirectoryService.getDirectory().catch(() => null)",
     );
-    expect(workspace).toContain("matchesMtaEndpoint(server, observation)");
+    expect(workspace).toContain("indexMtaObservations(directory?.servers ?? [])");
+    expect(workspace).toContain("observationFor(server)");
     expect(workspace).toContain("dictionary.servers.online");
     expect(workspace).toContain("dictionary.servers.offline");
     expect(workspace).toContain("dictionary.servers.unknown");

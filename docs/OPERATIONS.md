@@ -59,6 +59,10 @@ For changes to the official MTA directory and search, run `pnpm test:directory` 
 
 For review and build-moderation changes, `pnpm test:resource` checks resource review HTTP boundaries, safe published-build selection and the moderation contract without PostgreSQL. It checks neither database transaction execution nor scanner integration; those remain in the full CI suite.
 
+For changes to the free resource catalog and personal library, run `pnpm test:catalog`. It exercises RU/EN rendered navigation, HTTP parameters, safe-public SQL predicates, pagination bounds, saved ID batching, legacy-license access selection, scoped library reads and scalar admin counters with a controlled query layer. These tests do not execute PostgreSQL; use the full `pnpm check` and browser journeys against the exact `main` SHA before accepting a release. At the 1000-page navigation limit, deeper catalog browsing needs a later cursor-based path backed by live query plans and representative data.
+
+For report and moderation intake, run `pnpm test:reports`. It calls the real route for private caching on allowed and denied reads, verifies that a report and its audit share a transaction, checks the duplicate lock and conflict response with a controlled query layer, and ensures notification failure after commit still returns the committed result. Complaint target IDs and evidence URL lists are bounded; notification recipient selection fetches moderator IDs only. Follow with database-backed concurrency and browser checks before release acceptance.
+
 ## 3. Production boundary
 
 Production must use explicit production Compose/configuration, not the local development stack.

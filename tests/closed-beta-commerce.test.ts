@@ -47,7 +47,7 @@ describe("closed beta commerce guard", () => {
       "utf8",
     );
 
-    expect(service).toContain("publishedContent: content.length");
+    expect(service).toContain("contentRepository.countPublished()");
     expect(service).not.toContain("licenseRepository");
     expect(service).not.toContain("orderRepository");
     expect(page).toContain("health.counts.publishedContent");

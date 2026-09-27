@@ -31,8 +31,10 @@ describe("resource build scanner contract", () => {
     );
     const compose = readFileSync(resolve(process.cwd(), "compose.production.yaml"), "utf8");
     const config = readFileSync(resolve(process.cwd(), "packages/config/src/index.ts"), "utf8");
-    expect(scanner).toContain('socket.write("zINSTREAM');
-    expect(scanner).toContain("writeUInt32BE");
+    const transport = readFileSync(resolve(process.cwd(), "apps/web/src/lib/services/clamav-instream.ts"), "utf8");
+    expect(scanner).toContain("writeClamAvInstream(socket, bytes)");
+    expect(transport).toContain('writeChunk(socket, "zINSTREAM\\0")');
+    expect(transport).toContain("writeUInt32BE");
     expect(scanner).toContain('status: "clean", scanner: "clamav"');
     expect(compose).toContain("clamav/clamav:1.5");
     expect(config).toContain("Production resource publishing requires ClamAV");

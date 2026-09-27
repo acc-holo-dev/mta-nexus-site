@@ -14,6 +14,7 @@ export interface ProductFilters {
   sort?: "popular" | "newest" | "price_asc" | "price_desc" | "rating" | "relevance";
   featuredOnly?: boolean;
   limit?: number;
+  offset?: number;
 }
 
 export class ProductService {
@@ -46,7 +47,26 @@ export class ProductService {
       sort: filters.sort,
       query: filters.query,
       limit: filters.limit,
+      offset: filters.offset,
     });
+  }
+
+  async listPublicPage(filters: Omit<ProductFilters, "limit" | "offset"> & {
+    page: number;
+    pageSize: number;
+  }): Promise<{ products: Product[]; hasMore: boolean }> {
+    const pageSize = Number.isFinite(filters.pageSize)
+      ? Math.min(Math.max(Math.floor(filters.pageSize), 1), 100)
+      : 24;
+    const page = Number.isFinite(filters.page)
+      ? Math.min(Math.max(Math.floor(filters.page), 1), 1000)
+      : 1;
+    const rows = await this.listProducts({
+      ...filters,
+      limit: pageSize + 1,
+      offset: (page - 1) * pageSize,
+    });
+    return { products: rows.slice(0, pageSize), hasMore: rows.length > pageSize };
   }
 
   async getProductBySlug(slug: string): Promise<Product | null> {

@@ -1,4 +1,4 @@
-import { eq, desc, asc, and, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
+import { eq, desc, asc, and, count, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
 import { safePublishedBuildCondition } from "./build-safety";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
@@ -26,9 +26,19 @@ export interface ProductQueryOptions {
   sort?: "popular" | "newest" | "price_asc" | "price_desc" | "rating" | "relevance";
   query?: string;
   limit?: number;
+  offset?: number;
 }
 
 export class ProductRepository {
+  async countPublishedFree(): Promise<number> {
+    const [row] = await db.select({ total: count() }).from(products).where(and(
+      eq(products.status, "published"),
+      eq(products.price, 0),
+      hasSafePublishedBuild(),
+    ));
+    return row?.total ?? 0;
+  }
+
   async list(options: ProductQueryOptions = {}): Promise<Product[]> {
     const conditions = [
       eq(products.status, "published"),
@@ -59,14 +69,18 @@ export class ProductRepository {
             : desc(products.createdAt);
     const limit = options.limit === undefined || !Number.isFinite(options.limit)
       ? 100
-      : Math.min(Math.max(Math.floor(options.limit), 1), 100);
+      : Math.min(Math.max(Math.floor(options.limit), 1), 101);
+    const offset = options.offset === undefined || !Number.isFinite(options.offset)
+      ? 0
+      : Math.min(Math.max(Math.floor(options.offset), 0), 100_000);
 
     const rows = await db
       .select()
       .from(products)
       .where(and(...conditions))
-      .orderBy(order)
-      .limit(limit);
+      .orderBy(order, desc(products.id))
+      .limit(limit)
+      .offset(offset);
     return rows as unknown as Product[];
   }
 

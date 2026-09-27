@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, or } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { users } from "../schema";
@@ -12,6 +12,18 @@ function toPublicUser(row: UserRow): User {
 }
 
 export class UserRepository {
+  async listModeratorIds(): Promise<string[]> {
+    const rows = await db.select({ id: users.id }).from(users).where(
+      inArray(users.role, ["moderator", "admin"]),
+    );
+    return rows.map((row) => row.id);
+  }
+
+  async countAll(): Promise<number> {
+    const [row] = await db.select({ total: count() }).from(users);
+    return row?.total ?? 0;
+  }
+
   async searchDevelopers(term: string, limit = 50): Promise<User[]> {
     const pattern = containsPattern(term);
     const boundedLimit = Number.isFinite(limit)

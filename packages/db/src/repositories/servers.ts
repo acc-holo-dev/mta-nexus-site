@@ -1,10 +1,18 @@
-import { and, desc, eq, ilike, inArray, ne, or } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, ne, or } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, servers } from "../schema";
 import type { AuditEvent, Server } from "@nexus/domain";
 
 export class ServerRepository {
+  async countActivePublic(): Promise<number> {
+    const [row] = await db.select({ total: count() }).from(servers).where(and(
+      eq(servers.visibility, "public"),
+      eq(servers.status, "active"),
+    ));
+    return row?.total ?? 0;
+  }
+
   async searchActivePublic(term: string, limit = 50): Promise<Server[]> {
     const pattern = containsPattern(term);
     const boundedLimit = Number.isFinite(limit)

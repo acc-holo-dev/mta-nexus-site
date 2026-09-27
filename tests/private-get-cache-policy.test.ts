@@ -47,11 +47,12 @@ describe("private GET cache policy", () => {
     );
 
     expect(reports).toContain(
-      '{ status: 403, headers: privateHeaders }',
+      'privateJson(context, { error: "Unauthorized" }, { status: 403 })',
     );
     expect(reports).toContain(
-      'NextResponse.json({ reports }, { headers: privateHeaders })',
+      'return privateJson(context, { reports });',
     );
+    expect(reports).toContain('headers.set("Cache-Control", privateHeaders["Cache-Control"]);');
     expect(verification).toContain(
       'return json({ error: "Unauthorized" }, 401);',
     );
@@ -84,7 +85,7 @@ describe("private GET cache policy", () => {
       "apps/web/src/app/api/servers/directory/route.ts",
     ]) {
       const source = read(path);
-      expect(source).toContain('"Cache-Control": "public');
+      expect(source).toMatch(/"Cache-Control"\s*:\s*"public/u);
     }
   });
 

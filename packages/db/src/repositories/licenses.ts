@@ -1,9 +1,21 @@
-import { eq } from "drizzle-orm";
+import { and, eq, gt, isNull, or } from "drizzle-orm";
 import { db } from "../client";
 import { licenses } from "../schema";
 import type { License } from "@nexus/domain";
 
 export class LicenseRepository {
+  async listActiveDownloadableByUser(userId: string): Promise<Array<Pick<License, "productId" | "createdAt">>> {
+    const rows = await db.select({
+      productId: licenses.productId,
+      createdAt: licenses.createdAt,
+    }).from(licenses).where(and(
+      eq(licenses.userId, userId),
+      eq(licenses.status, "active"),
+      or(isNull(licenses.expiresAt), gt(licenses.expiresAt, new Date())),
+    ));
+    return rows;
+  }
+
   async findByKey(key: string): Promise<License | null> {
         const rows = await db.select().from(licenses).where(eq(licenses.key, key)).limit(1);
     return (rows[0] as unknown as License) || null;

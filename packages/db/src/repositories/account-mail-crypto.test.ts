@@ -1,7 +1,7 @@
 import { describe, it } from "vitest";
 import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
-import { AccountMailCipher } from "./account-mail-crypto";
+import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import type { MailContext, MailPayload } from "./account-mail-crypto";
 const fixture = () => {
   const key = randomBytes(32);
@@ -48,7 +48,10 @@ describe("D2a authenticated account mail envelopes", () => {
     const next = new AccountMailCipher("key_b", { key_a: f.key, key_b: nextKey });
     assert.equal(next.open(f.context, old).token === f.payload.token, true);
     assert.equal(next.seal(f.context, f.payload).keyId, "key_b");
-    fails(() => new AccountMailCipher("key_b", { key_b: nextKey }).open(f.context, old));
+    assert.throws(
+      () => new AccountMailCipher("key_b", { key_b: nextKey }).open(f.context, old),
+      AccountMailKeyUnavailableError,
+    );
     fails(() => new AccountMailCipher("key_a", { key_a: nextKey }).open(f.context, old));
   });
   it("authenticates key ID even when two IDs accidentally contain identical keys", () => {

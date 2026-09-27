@@ -231,7 +231,7 @@ export const createContentCommentSchema = z
 // --- Moderation & Reports ---
 export const createReportSchema = z.object({
   targetType: z.enum(["product", "server", "content", "comment", "user"]),
-  targetId: z.string().min(1),
+  targetId: z.string().min(1).max(128),
   type: z.enum([
     "scam",
     "copyright",
@@ -243,7 +243,7 @@ export const createReportSchema = z.object({
     "other",
   ]),
   reason: z.string().min(10).max(1000),
-  evidenceUrls: z.array(z.string().url()).default([]),
+  evidenceUrls: z.array(z.string().url().max(2048)).max(5).default([]),
 });
 
 // --- Search & Discovery ---
