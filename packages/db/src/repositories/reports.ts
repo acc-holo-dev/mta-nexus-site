@@ -1,4 +1,4 @@
-import { and, count, eq, desc, inArray, sql } from "drizzle-orm";
+import { and, asc, count, eq, desc, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, reports } from "../schema";
 import type { AuditEvent, Report } from "@nexus/domain";
@@ -6,14 +6,25 @@ import type { AuditEvent, Report } from "@nexus/domain";
 export class ReportRepository {
   async countOpen(): Promise<number> {
     const [row] = await db.select({ total: count() }).from(reports).where(
-      eq(reports.status, "open"),
+      inArray(reports.status, ["open", "under_review"]),
     );
     return row?.total ?? 0;
   }
 
-  async listAll(): Promise<Report[]> {
-        const rows = await db.select().from(reports).orderBy(desc(reports.createdAt));
-    return rows as unknown as Report[];
+  async listPage(view: "pending" | "history", page: number, pageSize = 30): Promise<{ reports: Report[]; hasMore: boolean }> {
+    if (!Number.isSafeInteger(page) || page < 1 || page > 99_999 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+      throw new RangeError("Invalid report page");
+    }
+    const filter = view === "pending" ? ["open", "under_review"] : ["resolved", "dismissed"];
+    const ordering = view === "pending"
+      ? [asc(reports.createdAt), asc(reports.id)]
+      : [desc(reports.resolvedAt), desc(reports.id)];
+    const rows = await db.select().from(reports)
+      .where(inArray(reports.status, filter))
+      .orderBy(...ordering)
+      .limit(pageSize + 1)
+      .offset((page - 1) * pageSize);
+    return { reports: rows.slice(0, pageSize) as unknown as Report[], hasMore: rows.length > pageSize };
   }
 
   async findById(id: string): Promise<Report | null> {
@@ -81,7 +92,7 @@ export class ReportRepository {
     id: string,
     status: "resolved" | "dismissed",
     moderatorNotes: string,
-    audit?: Omit<AuditEvent, "createdAt">,
+    audit: Omit<AuditEvent, "createdAt">,
   ): Promise<Report | null> {
     return db.transaction(async (tx) => {
       const now = new Date();
@@ -98,12 +109,10 @@ export class ReportRepository {
       const resolved = rows[0];
       if (!resolved) return null;
 
-      if (audit) {
-        await tx.insert(auditEvents).values({
-          ...audit,
-          createdAt: now,
-        });
-      }
+      await tx.insert(auditEvents).values({
+        ...audit,
+        createdAt: now,
+      });
 
       return resolved as unknown as Report;
     });

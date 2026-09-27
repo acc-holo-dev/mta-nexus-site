@@ -42,6 +42,10 @@ The check requires HTTP health, database reachability and writable private stora
 
 ## 2. Verification
 
+Moderators review complaints in `/admin`, under **Reports & moderation**. The default queue shows unresolved cases oldest first; **Decision history** shows completed cases newest first. Both views are paged (30 items). A decision requires at least three characters of review context. The report status and audit event commit together; a stale second decision returns HTTP 409. The private `GET /api/reports?view=pending&page=1` endpoint uses the same bounded queue, with `view=history` for completed cases. Run `pnpm test:reports` for focused checks. Do not interpret a notification delivery failure as a failed report submission: a stored complaint remains in the queue.
+
+Модератор обрабатывает жалобы в `/admin` → **Жалобы и модерация**. По умолчанию открытые жалобы идут от старых к новым; история решений показывает последние закрытые случаи. В каждой странице 30 записей. Для решения необходим комментарий от трёх символов; статус и аудит сохраняются одной транзакцией. При повторном решении уже закрытой жалобы API возвращает 409. Быстрая проверка: `pnpm test:reports`.
+
 When a functioning execution environment is available, the expected project verification path is:
 
 ```bash

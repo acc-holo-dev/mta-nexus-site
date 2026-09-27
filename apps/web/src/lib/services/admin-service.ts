@@ -48,12 +48,12 @@ export class AdminService {
     return auditRepository.listRecent(50);
   }
 
-  async listReports(actor: User): Promise<Report[]> {
+  async listReports(actor: User, view: "pending" | "history" = "pending", page = 1): Promise<{ reports: Report[]; hasMore: boolean }> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError("Moderator access required");
     }
 
-    return reportRepository.listAll();
+    return reportRepository.listPage(view, page);
   }
 
   async resolveReport(
@@ -72,21 +72,17 @@ export class AdminService {
       reportId,
       input.status,
       input.moderatorNotes,
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: "admin",
+        action: input.status === "resolved" ? "admin.resolve" : "admin.dismiss",
+        targetId: reportId,
+        targetType: "report",
+        details: { notes: input.moderatorNotes },
+      },
     );
     if (!report) throw new NotFoundError("Report", reportId);
-
-    await auditRepository.record({
-      id: generateId("aud"),
-      actorId: actor.id,
-      actorType: "admin",
-      action: "report.resolved",
-      targetId: reportId,
-      targetType: "report",
-      details: {
-        resolution: input.status,
-        notes: input.moderatorNotes,
-      },
-    });
 
     return report;
   }

@@ -11,9 +11,9 @@ describe("verification moderation controls surface", () => {
     expect(page).toContain(
       'import { VerificationModerationControls } from "../../components/verification-moderation-controls"',
     );
-    expect(page).toContain('vr.status === "pending"');
+    expect(page).toContain('request.status === "pending"');
     expect(page).toContain(
-      "<VerificationModerationControls requestId={vr.id} />",
+      "<VerificationModerationControls requestId={request.id} />",
     );
   });
 

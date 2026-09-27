@@ -179,7 +179,15 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     expect(report.status).toBe("open");
 
     // Resolve report
-    const resolved = await reportRepository.resolve(report.id, "resolved", "Case verified and closed");
+    const resolved = await reportRepository.resolve(report.id, "resolved", "Case verified and closed", {
+      id: `aud_${Date.now()}`,
+      actorId: playerUser.id,
+      actorType: "admin",
+      action: "admin.resolve",
+      targetId: report.id,
+      targetType: "report",
+      details: { notes: "Case verified and closed" },
+    });
     expect(resolved?.status).toBe("resolved");
   });
 });

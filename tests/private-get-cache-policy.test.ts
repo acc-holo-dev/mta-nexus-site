@@ -50,7 +50,7 @@ describe("private GET cache policy", () => {
       'privateJson(context, { error: "Unauthorized" }, { status: 403 })',
     );
     expect(reports).toContain(
-      'return privateJson(context, { reports });',
+      'return privateJson(context, { ...result, page, view });',
     );
     expect(reports).toContain('headers.set("Cache-Control", privateHeaders["Cache-Control"]);');
     expect(verification).toContain(

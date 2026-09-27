@@ -32,8 +32,14 @@ export async function GET(request: NextRequest) {
       return privateJson(context, { error: "Unauthorized" }, { status: 403 });
     }
 
-    const reports = await reportRepository.listAll();
-    return privateJson(context, { reports });
+    const rawPage = request.nextUrl.searchParams.get("page") ?? "1";
+    const view = request.nextUrl.searchParams.get("view") ?? "pending";
+    if (!/^[1-9]\d{0,4}$/.test(rawPage) || !["pending", "history"].includes(view)) {
+      return privateJson(context, { error: "Invalid report page or view" }, { status: 400 });
+    }
+    const page = Number(rawPage);
+    const result = await reportRepository.listPage(view as "pending" | "history", page);
+    return privateJson(context, { ...result, page, view });
   } catch (error: unknown) {
     logRequestEvent({
       level: "error",

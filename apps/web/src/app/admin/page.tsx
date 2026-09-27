@@ -32,14 +32,27 @@ import { getRequestLocale } from "../../lib/i18n-server";
 import { BuildModerationControls } from "../../components/build-moderation-controls";
 import { ContentModerationControls } from "../../components/content-moderation-controls";
 import { VerificationModerationControls } from "../../components/verification-moderation-controls";
+import { ReportModerationControls } from "../../components/report-moderation-controls";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ reportView?: string; reportPage?: string }>;
+}) {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const copy = dictionary.admin;
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
+  const query = await searchParams;
+  const reportView = query.reportView === "history" ? "history" : "pending";
+  const reportPage =
+    typeof query.reportPage === "string" && /^[1-9]\d{0,4}$/.test(query.reportPage)
+      ? Number(query.reportPage)
+      : 1;
+  const reportHref = (view: "pending" | "history", page: number) =>
+    `/admin?reportView=${view}&reportPage=${page}`;
 
   const cookieStore = await cookies();
   const token = cookieStore.get("nexus_session")?.value;
@@ -69,14 +82,14 @@ export default async function AdminPage() {
   const canViewAudit = can(adminUser, "admin.audit");
   const [
     health,
-    reports,
+    reportPageResult,
     verificationRequests,
     pendingBuilds,
     pendingContent,
     auditLogs,
   ] = await Promise.all([
     adminService.getSystemHealthMetrics(adminUser),
-    adminService.listReports(adminUser),
+    adminService.listReports(adminUser, reportView, reportPage),
     verificationRepository.listAll(),
     buildRepository.listPendingReview(),
     contentRepository.listByStatus("draft", 100),
@@ -86,6 +99,7 @@ export default async function AdminPage() {
   const pendingVerifications = verificationRequests.filter(
     (request) => request.status === "pending",
   );
+  const { reports, hasMore: moreReports } = reportPageResult;
 
   return (
     <div className="space-y-8">
@@ -305,10 +319,23 @@ export default async function AdminPage() {
       </section>
 
       <section>
-        <SectionHeader
-          title={copy.reports}
-          description={copy.caseHistory}
-        />
+        <SectionHeader title={copy.reports} description={copy.caseHistory} />
+        <nav aria-label={copy.reports} className="mb-3 flex gap-2">
+          <Link
+            href={reportHref("pending", 1)}
+            aria-current={reportView === "pending" ? "page" : undefined}
+            className={`rounded-md border border-base px-3 py-2 text-xs ${reportView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
+          >
+            {copy.reportQueue} ({health.counts.reportsOpen})
+          </Link>
+          <Link
+            href={reportHref("history", 1)}
+            aria-current={reportView === "history" ? "page" : undefined}
+            className={`rounded-md border border-base px-3 py-2 text-xs ${reportView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
+          >
+            {copy.reportHistory}
+          </Link>
+        </nav>
         <div className="space-y-2.5">
           {reports.length > 0 ? (
             reports.map((report) => (
@@ -326,30 +353,59 @@ export default async function AdminPage() {
                     </span>
                   </div>
                   <p className="font-caption text-secondary">{report.reason}</p>
+                  <p className="font-caption text-faint">
+                    {copy.reporter}: {report.reporterId} · {report.targetType} ·{" "}
+                    {new Date(report.createdAt).toLocaleDateString(dateLocale)}
+                  </p>
+                  {report.evidenceUrls.length > 0 && (
+                    <div className="flex flex-wrap gap-2 font-caption text-faint">
+                      <span>{copy.reportEvidence}:</span>
+                      {report.evidenceUrls
+                        .filter((url) => /^https?:\/\//i.test(url))
+                        .map((url, index) => (
+                          <a key={`${index}-${url}`} href={url} target="_blank" rel="noopener noreferrer" className="break-all text-accent underline">
+                            {index + 1}
+                          </a>
+                        ))}
+                    </div>
+                  )}
                   {report.moderatorNotes && (
                     <p className="font-code font-caption text-faint">
                       {copy.notes}: {report.moderatorNotes}
                     </p>
                   )}
+                  {report.resolvedAt && (
+                    <p className="font-caption text-faint">
+                      {copy.reportDecidedAt}: {new Date(report.resolvedAt).toLocaleString(dateLocale)}
+                    </p>
+                  )}
                 </div>
-                <StatusBadge
-                  status={report.status}
-                  tone={
-                    report.status === "resolved"
-                      ? "success"
-                      : report.status === "dismissed"
-                        ? "neutral"
-                        : "warning"
-                  }
-                />
+                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
+                  <StatusBadge
+                    status={report.status}
+                    tone={report.status === "resolved" ? "success" : report.status === "dismissed" ? "neutral" : "warning"}
+                  />
+                  {(report.status === "open" || report.status === "under_review") && (
+                    <ReportModerationControls reportId={report.id} />
+                  )}
+                </div>
               </div>
             ))
           ) : (
             <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">{copy.noReports}</p>
+              <p className="font-caption text-muted">
+                {reportView === "pending" ? copy.noReports : copy.noReportHistory}
+              </p>
             </div>
           )}
         </div>
+        {(reportPage > 1 || moreReports) && (
+          <nav aria-label={copy.reportPages} className="mt-3 flex items-center gap-3 text-xs">
+            {reportPage > 1 && <Link className="text-accent underline" href={reportHref(reportView, reportPage - 1)}>{copy.previous}</Link>}
+            <span className="text-muted">{copy.reportPage} {reportPage}</span>
+            {moreReports && <Link className="text-accent underline" href={reportHref(reportView, reportPage + 1)}>{copy.next}</Link>}
+          </nav>
+        )}
       </section>
 
       {canViewAudit && (

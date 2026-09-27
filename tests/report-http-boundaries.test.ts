@@ -5,7 +5,7 @@ const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   can: vi.fn(),
   rate: vi.fn(),
-  listAll: vi.fn(),
+  listPage: vi.fn(),
   findProduct: vi.fn(),
   createWithAudit: vi.fn(),
   listModeratorIds: vi.fn(),
@@ -22,7 +22,7 @@ vi.mock("@nexus/security", () => ({
 }));
 vi.mock("@nexus/db", () => ({
   reportRepository: {
-    listAll: mocks.listAll,
+    listPage: mocks.listPage,
     createWithAudit: mocks.createWithAudit,
   },
   productRepository: { findById: mocks.findProduct },
@@ -45,7 +45,7 @@ beforeEach(() => {
   mocks.session.mockResolvedValue(null);
   mocks.can.mockReturnValue(false);
   mocks.rate.mockResolvedValue({ success: true });
-  mocks.listAll.mockResolvedValue([]);
+  mocks.listPage.mockResolvedValue({ reports: [], hasMore: false });
   mocks.findProduct.mockResolvedValue({ id: "prd_test" });
   mocks.listModeratorIds.mockResolvedValue(["mod_1"]);
   mocks.notify.mockResolvedValue({});
@@ -61,11 +61,24 @@ describe("report privacy and durable success", () => {
 
     mocks.session.mockResolvedValue({ id: "mod_1" });
     mocks.can.mockReturnValue(true);
-    mocks.listAll.mockResolvedValue([{ id: "rpt_test" }]);
+    mocks.listPage.mockResolvedValue({ reports: [{ id: "rpt_test" }], hasMore: true });
     const allowed = await GET(request);
     expect(allowed.status).toBe(200);
     privateResponse(allowed);
-    expect(await allowed.json()).toEqual({ reports: [{ id: "rpt_test" }] });
+    expect(await allowed.json()).toEqual({ reports: [{ id: "rpt_test" }], hasMore: true, page: 1, view: "pending" });
+    expect(mocks.listPage).toHaveBeenCalledWith("pending", 1);
+  });
+
+  it("rejects invalid pages and scopes authorized history reads", async () => {
+    mocks.session.mockResolvedValue({ id: "mod_1" });
+    mocks.can.mockReturnValue(true);
+    const invalid = await GET(new NextRequest("https://nexus.test/api/reports?page=0"));
+    expect(invalid.status).toBe(400);
+    privateResponse(invalid);
+    expect(mocks.listPage).not.toHaveBeenCalled();
+    const history = await GET(new NextRequest("https://nexus.test/api/reports?view=history&page=2"));
+    expect(history.status).toBe(200);
+    expect(mocks.listPage).toHaveBeenCalledWith("history", 2);
   });
 
   it("does not report a committed complaint as failed when moderator notification fails", async () => {

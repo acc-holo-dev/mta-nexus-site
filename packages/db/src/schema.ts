@@ -529,7 +529,10 @@ export const reports = pgTable("reports", {
   moderatorNotes: text("moderator_notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
-});
+}, (table) => [
+  index("reports_status_created_id_idx").on(table.status, table.createdAt, table.id),
+  index("reports_status_resolved_id_idx").on(table.status, table.resolvedAt, table.id),
+]);
 
 // 25. Moderation Cases
 export const moderationCases = pgTable("moderation_cases", {
