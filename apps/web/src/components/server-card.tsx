@@ -4,28 +4,30 @@ import { Gamepad2, Users } from "lucide-react";
 import { TrustBadge } from "@nexus/ui";
 import type { Server } from "@nexus/domain";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { mtaLiveStatus, type MtaMasterServer } from "../lib/services/mta-master-directory-service";
 
 export function ServerCard({
   server,
   locale = "en",
+  observation,
+  isStale = false,
 }: {
   server: Server;
   locale?: Locale;
+  observation?: MtaMasterServer | null;
+  isStale?: boolean;
 }) {
   const copy = getDictionary(locale).servers;
-  const hasLiveData =
-    server.currentPlayers != null && server.maxPlayers != null;
-  const occupancyPercent = hasLiveData
+  const liveStatus = mtaLiveStatus(observation, isStale);
+  const hasLiveData = liveStatus === "online" && observation?.players != null;
+  const maxPlayers = observation?.maxPlayers ?? server.maxPlayers;
+  const occupancyPercent = hasLiveData && maxPlayers != null && maxPlayers > 0
     ? Math.round(
-        (server.currentPlayers! / Math.max(1, server.maxPlayers!)) * 100,
+        (observation.players! / maxPlayers) * 100,
       )
     : null;
-  const isOnline = hasLiveData && server.status === "active";
-  const liveLabel = hasLiveData
-    ? isOnline
-      ? copy.online
-      : copy.offline
-    : copy.unknown;
+  const isOnline = liveStatus === "online";
+  const liveLabel = liveStatus === "online" ? copy.online : liveStatus === "offline" ? copy.offline : copy.unknown;
 
   return (
     <Link
@@ -89,7 +91,7 @@ export function ServerCard({
               <Users className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="font-numeric">
                 {hasLiveData
-                  ? `${server.currentPlayers} / ${server.maxPlayers}`
+                  ? `${observation.players} / ${maxPlayers ?? "?"}`
                   : copy.unknown}
               </span>
             </span>

@@ -39,6 +39,14 @@ export type MtaMasterServer = {
   responding?: boolean;
 };
 
+export function mtaLiveStatus(
+  observation: Pick<MtaMasterServer, "responding"> | null | undefined,
+  isStale = false,
+): "online" | "offline" | "unknown" {
+  if (isStale || !observation) return "unknown";
+  return observation.responding === false ? "offline" : "online";
+}
+
 export function normalizeMtaAddress(address: string): string {
   return address.trim().toLowerCase().replace(/\.$/, "");
 }

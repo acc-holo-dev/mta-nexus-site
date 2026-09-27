@@ -10,6 +10,7 @@ import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
 import { authService } from "../../lib/services/auth-service";
 import {
   matchesMtaEndpoint,
+  mtaLiveStatus,
   mtaMasterDirectoryService,
 } from "../../lib/services/mta-master-directory-service";
 import { getDictionary } from "../../lib/i18n";
@@ -54,6 +55,7 @@ export default async function WorkspacePage() {
     (entitlement) => entitlement.permission === "product.download",
   );
   const observations = directory?.servers ?? [];
+  const directoryIsFresh = Boolean(directory && !directory.isStale);
   const liveByServerId = new Map(
     ownedServers.map((server) => [
       server.id,
@@ -64,7 +66,7 @@ export default async function WorkspacePage() {
   );
   const onlineServers = ownedServers.filter((server) => {
     const observation = liveByServerId.get(server.id);
-    return Boolean(observation && observation.responding !== false);
+    return mtaLiveStatus(observation, !directoryIsFresh) === "online";
   });
   const onlinePlayers = onlineServers.reduce(
     (total, server) =>
@@ -119,11 +121,13 @@ export default async function WorkspacePage() {
           value={ownedServers.length}
           tone="accent"
           icon={<ServerIcon className="h-4 w-4" />}
-          context={`${onlineServers.length} ${dictionary.workspace.online}`}
+          context={directoryIsFresh
+            ? `${onlineServers.length} ${dictionary.workspace.online}`
+            : dictionary.workspace.liveUnavailable}
         />
         <StatCard
           label={dictionary.workspace.playersOnline}
-          value={onlinePlayers}
+          value={directoryIsFresh ? onlinePlayers : "—"}
           tone="success"
           icon={<Users className="h-4 w-4" />}
           context={dictionary.workspace.onServers}
@@ -202,12 +206,9 @@ export default async function WorkspacePage() {
           <div className="space-y-3">
             {ownedServers.map((server) => {
               const observation = liveByServerId.get(server.id);
-              const isOnline = Boolean(
-                observation && observation.responding !== false,
-              );
-              const isOffline = Boolean(
-                observation && observation.responding === false,
-              );
+              const liveStatus = mtaLiveStatus(observation, !directoryIsFresh);
+              const isOnline = liveStatus === "online";
+              const isOffline = liveStatus === "offline";
               const status = isOnline
                 ? dictionary.servers.online
                 : isOffline

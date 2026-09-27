@@ -8,6 +8,7 @@ import { ServerCard } from "../../components/server-card";
 import { ArticleCard } from "../../components/article-card";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
+import { matchesMtaEndpoint, mtaMasterDirectoryService } from "../../lib/services/mta-master-directory-service";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +17,11 @@ export default async function ExplorePage() {
   const dictionary = getDictionary(locale);
   const copy = dictionary.explore;
 
-  const [products, servers, articles] = await Promise.all([
+  const [products, servers, articles, directory] = await Promise.all([
     productService.listProducts({ limit: 8 }),
-    serverService.listServers(),
+    serverService.listServers(3),
     contentService.listArticles(6),
+    mtaMasterDirectoryService.getDirectory().catch(() => null),
   ]);
 
   return (
@@ -61,11 +63,13 @@ export default async function ExplorePage() {
         <SectionHeader title={copy.activeServers} />
         {servers.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {servers.slice(0, 3).map((server) => (
+            {servers.map((server) => (
               <ServerCard
                 key={server.id}
                 server={server}
                 locale={locale}
+                observation={directory?.servers.find((item) => matchesMtaEndpoint(server, item))}
+                isStale={directory?.isStale}
               />
             ))}
           </div>

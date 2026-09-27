@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   matchesMtaEndpoint,
+  mtaLiveStatus,
   mtaMasterDirectoryService,
   normalizeMtaAddress,
   parseMtaMasterList,
@@ -138,6 +139,16 @@ describe("editorial/live endpoint matching", () => {
       { ipAddress: "127.0.0.1", port: 22003 },
       { address: "127.0.0.1", port: 22004 }
     )).toBe(false);
+  });
+});
+
+describe("MTA live-status authority", () => {
+  it("treats missing and stale observations as unknown", () => {
+    expect(mtaLiveStatus(null)).toBe("unknown");
+    expect(mtaLiveStatus({ responding: true }, true)).toBe("unknown");
+    expect(mtaLiveStatus({ responding: false }, true)).toBe("unknown");
+    expect(mtaLiveStatus({ responding: true })).toBe("online");
+    expect(mtaLiveStatus({ responding: false })).toBe("offline");
   });
 });
 

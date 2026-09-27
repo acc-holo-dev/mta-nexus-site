@@ -4,7 +4,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { createServerSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
 import { getTrustedRequestIp } from "../../../lib/request-client-ip";
-import { matchesMtaEndpoint, mtaMasterDirectoryService, type MtaMasterServer } from "../../../lib/services/mta-master-directory-service";
+import { matchesMtaEndpoint, mtaLiveStatus, mtaMasterDirectoryService, type MtaMasterServer } from "../../../lib/services/mta-master-directory-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -43,11 +43,7 @@ export async function GET(request: NextRequest) {
     return {
       ...server,
       liveObservation: liveObservation ?? null,
-      liveStatus: liveObservation
-        ? liveObservation.responding === false
-          ? "offline"
-          : "online"
-        : "unknown",
+      liveStatus: mtaLiveStatus(liveObservation, directoryIsStale),
     };
   });
 

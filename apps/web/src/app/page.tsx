@@ -60,13 +60,15 @@ export default async function HomePage() {
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           label={dictionary.home.playersOnline}
-          value={playersOnline.toLocaleString(numberLocale)}
+          value={directory && !directory.isStale ? playersOnline.toLocaleString(numberLocale) : "—"}
           tone="success"
           icon={<Users className="h-4 w-4" />}
           context={
-            directory
-              ? dictionary.home.officialDirectory
-              : dictionary.home.directoryUnavailable
+            directory?.isStale
+              ? dictionary.home.latestSnapshot
+              : directory
+                ? dictionary.home.officialDirectory
+                : dictionary.home.directoryUnavailable
           }
         />
         <StatCard

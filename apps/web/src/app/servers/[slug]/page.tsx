@@ -6,6 +6,7 @@ import { TrustBadge } from "@nexus/ui";
 import { serverService } from "../../../lib/services/server-service";
 import {
   matchesMtaEndpoint,
+  mtaLiveStatus,
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
 import { ServerFollowButton } from "../../../components/server-follow-button";
@@ -77,9 +78,9 @@ export default async function ServerDetailPage({
   );
   const directoryIsStale = directory?.isStale ?? false;
 
-  const isOnline =
-    observedServer != null && observedServer.responding !== false;
-  const currentPlayers = observedServer?.players;
+  const liveStatus = mtaLiveStatus(observedServer, directoryIsStale);
+  const isOnline = liveStatus === "online";
+  const currentPlayers = directoryIsStale ? undefined : observedServer?.players;
   const maxPlayers = observedServer?.maxPlayers ?? server.maxPlayers;
   const occupancyPercent =
     currentPlayers == null || maxPlayers == null || maxPlayers === 0
@@ -133,11 +134,11 @@ export default async function ServerDetailPage({
                   aria-hidden="true"
                 />
                 <span>
-                  {observedServer
-                    ? isOnline
-                      ? serverCopy.online
-                      : serverCopy.offline
-                    : serverCopy.unknown}
+                  {liveStatus === "online"
+                    ? serverCopy.online
+                    : liveStatus === "offline"
+                      ? serverCopy.offline
+                      : serverCopy.unknown}
                 </span>
               </span>
               {server.isVerified && (
