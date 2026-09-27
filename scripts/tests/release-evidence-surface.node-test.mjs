@@ -46,6 +46,6 @@ test("evidence command does not serialize environment values or command output",
   assert.doesNotMatch(script, /environment:\s*process\.env/u);
   assert.doesNotMatch(script, /stdout\s*:/u);
   assert.doesNotMatch(script, /stderr\s*:/u);
-  assert.match(script, /"DATABASE_URL"/u);
+  assert.match(script, /process\.env\.DATABASE_URL/u);
   assert.match(script, /evidenceSha256/u);
 });
