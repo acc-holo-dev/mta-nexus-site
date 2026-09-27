@@ -46,17 +46,48 @@ describe("discovery search", () => {
     expect(sources.organizations).not.toHaveBeenCalled();
   });
 
-  it("bounds later sources by remaining capacity and avoids directory calls for empty matches", async () => {
-    sources.products.mockResolvedValue([{ id: "p", title: "Match", slug: "match", description: "Body", price: 0 }]);
-    sources.articles.mockResolvedValue([{ id: "a", title: "Match", slug: "match", body: "Body", type: "article" }]);
+  it("does not let a full product page hide other matching categories", async () => {
+    sources.products.mockResolvedValue(Array.from({ length: 5 }, (_, index) => ({
+      id: `p${index}`, title: "Match", slug: `product-${index}`, description: "Body", price: 0,
+    })));
+    sources.servers.mockResolvedValue([{ id: "s", name: "Match", slug: "server", ipAddress: "203.0.113.1", port: 22003 }]);
+    sources.articles.mockResolvedValue([{ id: "a", title: "Match", slug: "article", body: "Body", type: "article" }]);
+    sources.developers.mockResolvedValue([{ id: "d", displayName: "Match", username: "developer" }]);
+    sources.organizations.mockResolvedValue([{ id: "o", name: "Match", slug: "studio" }]);
+    sources.directory.mockRejectedValue(new Error("upstream unavailable"));
+
+    const results = await discoveryService.search("Match", 5);
+
+    expect(results.map((result) => result.type)).toEqual([
+      "product", "server", "article", "developer", "organization",
+    ]);
+    expect(sources.products).toHaveBeenCalledWith({ query: "Match", limit: 5 });
+    expect(sources.servers).toHaveBeenCalledWith("Match", 5);
+    expect(sources.articles).toHaveBeenCalledWith("Match", 5);
+    expect(results[1].badge).toBe("MTA server");
+  });
+
+  it("fills the result limit from one category and avoids directory calls without servers", async () => {
+    sources.products.mockResolvedValue(Array.from({ length: 3 }, (_, index) => ({
+      id: `p${index}`, title: "Match", slug: `product-${index}`, description: "Body", price: 0,
+    })));
 
     const results = await discoveryService.search("Match", 2);
 
-    expect(results.map((result) => result.type)).toEqual(["product", "article"]);
-    expect(sources.servers).toHaveBeenCalledWith("Match", 1);
-    expect(sources.articles).toHaveBeenCalledWith("Match", 1);
+    expect(results.map((result) => result.type)).toEqual(["product", "product"]);
     expect(sources.directory).not.toHaveBeenCalled();
-    expect(sources.developers).not.toHaveBeenCalled();
-    expect(sources.organizations).not.toHaveBeenCalled();
+    expect(sources.servers).toHaveBeenCalledWith("Match", 2);
+  });
+
+  it("does not advertise a stale or incomplete player observation as current", async () => {
+    sources.servers.mockResolvedValue([{ id: "s", name: "Match", slug: "server", ipAddress: "203.0.113.1", port: 22003 }]);
+    sources.directory.mockResolvedValueOnce({
+      isStale: true, servers: [{ address: "203.0.113.1", port: 22003, players: 99 }],
+    }).mockResolvedValueOnce({
+      isStale: false, servers: [{ address: "203.0.113.1", port: 22003 }],
+    });
+
+    expect((await discoveryService.search("Match", 1, "server"))[0].badge).toBe("MTA server");
+    expect((await discoveryService.search("Match", 1, "server"))[0].badge).toBe("MTA server");
   });
 });

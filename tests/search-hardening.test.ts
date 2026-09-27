@@ -25,12 +25,13 @@ describe("public search hardening", () => {
     );
 
     expect(service).toContain("productRepository.list({ query: normalizedQuery, limit: boundedLimit })");
-    expect(service).toContain("serverRepository.searchActivePublic(normalizedQuery, boundedLimit - results.length)");
-    expect(service).toContain("contentRepository.searchPublished(normalizedQuery, boundedLimit - results.length)");
-    expect(service).toContain("userRepository.searchDevelopers(normalizedQuery, boundedLimit - results.length)");
-    expect(service).toContain("organizationRepository.searchPublic(normalizedQuery, boundedLimit - results.length)");
+    expect(service).toContain("serverRepository.searchActivePublic(normalizedQuery, boundedLimit)");
+    expect(service).toContain("contentRepository.searchPublished(normalizedQuery, boundedLimit)");
+    expect(service).toContain("userRepository.searchDevelopers(normalizedQuery, boundedLimit)");
+    expect(service).toContain("organizationRepository.searchPublic(normalizedQuery, boundedLimit)");
     expect(service).toContain("mtaMasterDirectoryService.getDirectory()");
-    expect(service).toContain("badge: observation");
+    expect(service).toContain("if (!directory.isStale)");
+    expect(service).toContain("if (results.length === boundedLimit) break;");
     expect(service).not.toContain("currentPlayers");
     expect(service).toContain("return results");
   });
