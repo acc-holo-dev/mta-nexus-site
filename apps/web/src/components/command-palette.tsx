@@ -40,6 +40,8 @@ export function CommandPalette({
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchError, setSearchError] = useState(false);
+  const [searchRevision, setSearchRevision] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
 
   const commands: Command[] = [
@@ -106,6 +108,7 @@ export function CommandPalette({
     setQuery("");
     setResults([]);
     setLoading(false);
+    setSearchError(false);
     setActiveIndex(0);
   }, [isOpen]);
 
@@ -124,10 +127,14 @@ export function CommandPalette({
     if (!isOpen || !query.trim()) {
       setResults([]);
       setLoading(false);
+      setSearchError(false);
       return;
     }
 
+    setResults([]);
+    setSearchError(false);
     const controller = new AbortController();
+    let active = true;
     let requestTimeout: number | undefined;
 
     const timer = window.setTimeout(async () => {
@@ -150,25 +157,29 @@ export function CommandPalette({
         if (!response.ok || !Array.isArray(data?.results)) {
           throw new Error("Search unavailable");
         }
-        setResults(data.results);
+        if (active) setResults(data.results);
       } catch {
-        if (!controller.signal.aborted) setResults([]);
+        if (active) {
+          setResults([]);
+          setSearchError(true);
+        }
       } finally {
         if (requestTimeout !== undefined) {
           window.clearTimeout(requestTimeout);
         }
-        if (!controller.signal.aborted) setLoading(false);
+        if (active) setLoading(false);
       }
     }, 200);
 
     return () => {
+      active = false;
       window.clearTimeout(timer);
       if (requestTimeout !== undefined) {
         window.clearTimeout(requestTimeout);
       }
       controller.abort();
     };
-  }, [isOpen, query]);
+  }, [isOpen, query, searchRevision]);
 
   if (!isOpen) return null;
 
@@ -343,8 +354,22 @@ export function CommandPalette({
             </div>
           )}
 
+          {showResults && searchError && (
+            <div role="alert" className="flex items-center justify-between gap-3 px-3 py-4 text-xs text-danger">
+              <span>{copy.searchUnavailable}</span>
+              <button
+                type="button"
+                onClick={() => setSearchRevision((value) => value + 1)}
+                className="shrink-0 rounded-md border border-base px-3 py-1.5 font-semibold text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+              >
+                {copy.retry}
+              </button>
+            </div>
+          )}
+
           {showResults &&
             !loading &&
+            !searchError &&
             results.length === 0 &&
             filteredCommands.length === 0 && (
               <div className="py-8 text-center font-caption text-muted">

@@ -28,13 +28,15 @@ function AcquireContent() {
   const copy = dictionary.checkout;
   const [product, setProduct] = useState<ProductInfo | null>(null);
   const [productError, setProductError] = useState<string | null>(null);
+  const [loadRevision, setLoadRevision] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [completed, setCompleted] = useState(false);
+  const [claimedProductId, setClaimedProductId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!productId) return;
 
+    let active = true;
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 15_000);
 
@@ -48,27 +50,30 @@ function AcquireContent() {
     })
       .then(async (response) => {
         const data = await response.json().catch(() => null);
-        if (!response.ok || !data || typeof data.id !== "string") {
-          throw new Error(copy.productNotFound);
+        if (!response.ok || !data || data.id !== productId) {
+          throw new Error(response.status === 404 ? copy.productNotFound : copy.loadFailed);
         }
         return data as ProductInfo;
       })
-      .then(setProduct)
+      .then((data) => {
+        if (active) setProduct(data);
+      })
       .catch((caught: unknown) => {
-        if (controller.signal.aborted) return;
+        if (!active) return;
         setProductError(
-          caught instanceof Error && caught.message
-            ? caught.message
-            : copy.productNotFound,
+          caught instanceof Error && caught.message === copy.productNotFound
+            ? copy.productNotFound
+            : copy.loadFailed,
         );
       })
       .finally(() => window.clearTimeout(timeout));
 
     return () => {
+      active = false;
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [productId, copy.productNotFound]);
+  }, [productId, loadRevision, copy.productNotFound, copy.loadFailed]);
 
   async function handleClaim() {
     if (!product || loading) return;
@@ -95,7 +100,7 @@ function AcquireContent() {
         throw new Error(data?.error || copy.claimFailed);
       }
 
-      setCompleted(true);
+      setClaimedProductId(product.id);
     } catch (caught: unknown) {
       setError(
         caught instanceof Error && caught.message
@@ -107,7 +112,7 @@ function AcquireContent() {
     }
   }
 
-  if (completed) {
+  if (productId && claimedProductId === productId) {
     return (
       <div className="mx-auto max-w-xl py-12">
         <section className="nexus-panel space-y-5 p-8 text-center shadow-nexus">
@@ -146,20 +151,31 @@ function AcquireContent() {
     return (
       <div className="mx-auto max-w-xl space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">
-          {productError || copy.noProduct}
+          {productId ? productError : copy.noProduct}
         </h1>
-        <p className="text-sm text-muted">{copy.chooseResource}</p>
+        {(!productId || productError === copy.productNotFound) && (
+          <p className="text-sm text-muted">{copy.chooseResource}</p>
+        )}
         <Link
           href="/market"
           className="inline-block rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
         >
           {copy.browse}
         </Link>
+        {productId && productError && productError !== copy.productNotFound && (
+          <button
+            type="button"
+            onClick={() => setLoadRevision((value) => value + 1)}
+            className="ml-3 rounded-lg border border-base px-4 py-2 text-xs font-semibold text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--nexus-accent)]"
+          >
+            {copy.retry}
+          </button>
+        )}
       </div>
     );
   }
 
-  if (!product) {
+  if (!product || product.id !== productId) {
     return (
       <div
         role="status"
