@@ -1,9 +1,23 @@
-import { and, desc, eq, ne } from "drizzle-orm";
+import { and, desc, eq, ilike, ne, or } from "drizzle-orm";
+import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, servers } from "../schema";
 import type { AuditEvent, Server } from "@nexus/domain";
 
 export class ServerRepository {
+  async searchActivePublic(term: string, limit = 50): Promise<Server[]> {
+    const pattern = containsPattern(term);
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 50)
+      : 50;
+    const rows = await db.select().from(servers).where(and(
+      eq(servers.visibility, "public"),
+      eq(servers.status, "active"),
+      or(ilike(servers.name, pattern), ilike(servers.description, pattern), ilike(servers.gameMode, pattern)),
+    )).orderBy(desc(servers.updatedAt), desc(servers.id)).limit(boundedLimit);
+    return rows as unknown as Server[];
+  }
+
   async listActivePublic(limit?: number): Promise<Server[]> {
     const query = db
       .select()

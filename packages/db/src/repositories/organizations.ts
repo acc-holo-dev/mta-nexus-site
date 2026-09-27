@@ -1,9 +1,23 @@
-import { eq } from "drizzle-orm";
+import { desc, eq, ilike, or } from "drizzle-orm";
+import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { organizations, organizationMembers } from "../schema";
 import type { Organization, OrganizationMember } from "@nexus/domain";
 
 export class OrganizationRepository {
+  async searchPublic(term: string, limit = 50): Promise<Organization[]> {
+    const pattern = containsPattern(term);
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 50)
+      : 50;
+    const rows = await db.select().from(organizations).where(or(
+      ilike(organizations.name, pattern),
+      ilike(organizations.slug, pattern),
+      ilike(organizations.description, pattern),
+    )).orderBy(desc(organizations.updatedAt), desc(organizations.id)).limit(boundedLimit);
+    return rows as unknown as Organization[];
+  }
+
   async listAll(limit?: number): Promise<Organization[]> {
     const query = db.select().from(organizations);
     const boundedLimit =

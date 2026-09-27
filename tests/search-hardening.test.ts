@@ -25,13 +25,12 @@ describe("public search hardening", () => {
     );
 
     expect(service).toContain("productRepository.list({ query: normalizedQuery, limit: boundedLimit })");
-    expect(service).toContain("serverRepository.listActivePublic(boundedLimit)");
-    expect(service).toContain("contentRepository.listPublished(boundedLimit)");
-    expect(service).toContain("userRepository.listAll(boundedLimit)");
-    expect(service).toContain("organizationRepository.listAll(boundedLimit)");
+    expect(service).toContain("serverRepository.searchActivePublic(normalizedQuery, boundedLimit - results.length)");
+    expect(service).toContain("contentRepository.searchPublished(normalizedQuery, boundedLimit - results.length)");
+    expect(service).toContain("userRepository.searchDevelopers(normalizedQuery, boundedLimit - results.length)");
+    expect(service).toContain("organizationRepository.searchPublic(normalizedQuery, boundedLimit - results.length)");
     expect(service).toContain("mtaMasterDirectoryService.getDirectory()");
     expect(service).toContain("badge: observation");
-    expect(service).toContain(".filter((item) => !type || item.type === type)");
     expect(service).not.toContain("currentPlayers");
     expect(service).toContain("return results");
   });

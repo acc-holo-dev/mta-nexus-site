@@ -1,5 +1,6 @@
 import { eq, desc, asc, and, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
 import { safePublishedBuildCondition } from "./build-safety";
+import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, builds, products } from "../schema";
 import type { AuditEvent, Product, ProductType } from "@nexus/domain";
@@ -39,7 +40,7 @@ export class ProductRepository {
     if (options.minPrice !== undefined) conditions.push(gte(products.price, options.minPrice));
     if (options.maxPrice !== undefined) conditions.push(lte(products.price, options.maxPrice));
     if (options.query?.trim()) {
-      const pattern = `%${options.query.trim()}%`;
+      const pattern = containsPattern(options.query.trim());
       conditions.push(or(
         ilike(products.title, pattern),
         ilike(products.description, pattern),

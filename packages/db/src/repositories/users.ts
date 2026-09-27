@@ -1,4 +1,5 @@
-import { eq, or } from "drizzle-orm";
+import { and, desc, eq, ilike, or } from "drizzle-orm";
+import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { users } from "../schema";
 import type { User } from "@nexus/domain";
@@ -11,6 +12,18 @@ function toPublicUser(row: UserRow): User {
 }
 
 export class UserRepository {
+  async searchDevelopers(term: string, limit = 50): Promise<User[]> {
+    const pattern = containsPattern(term);
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 50)
+      : 50;
+    const rows = await db.select().from(users).where(and(
+      eq(users.role, "developer"),
+      or(ilike(users.username, pattern), ilike(users.displayName, pattern), ilike(users.bio, pattern)),
+    )).orderBy(desc(users.updatedAt), desc(users.id)).limit(boundedLimit);
+    return rows.map(toPublicUser);
+  }
+
   async findById(id: string): Promise<User | null> {
     const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return rows[0] ? toPublicUser(rows[0]) : null;

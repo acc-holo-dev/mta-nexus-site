@@ -1,9 +1,26 @@
-import { eq, desc, and, sql, inArray } from "drizzle-orm";
+import { eq, desc, and, sql, inArray, ilike, or } from "drizzle-orm";
+import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, content, comments, products } from "../schema";
 import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
 export class ContentRepository {
+  async searchPublished(term: string, limit = 50): Promise<Content[]> {
+    const pattern = containsPattern(term);
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 50)
+      : 50;
+    const rows = await db.select().from(content).where(and(
+      eq(content.status, "published"),
+      or(
+        ilike(content.title, pattern),
+        ilike(content.body, pattern),
+        sql`exists (select 1 from jsonb_array_elements_text(${content.tags}) as tag(value) where tag.value ilike ${pattern})`,
+      ),
+    )).orderBy(desc(content.createdAt), desc(content.id)).limit(boundedLimit);
+    return rows as unknown as Content[];
+  }
+
   async listPublished(limit = 50): Promise<Content[]> {
         const rows = await db
       .select()
