@@ -44,7 +44,7 @@ describe("mainline repository policy", () => {
 
   it("documents main as the only maintained development branch", () => {
     const readme = read("README.md");
-    expect(readme).toContain("Active development branch: `main` only.");
+    expect(readme).toMatch(/\*\*Active development branch:\*\* `main` only\./);
     expect(readme).not.toContain("--branch dev");
   });
 });
