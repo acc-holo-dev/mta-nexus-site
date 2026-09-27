@@ -39,7 +39,12 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage({
   searchParams,
 }: {
-  searchParams: Promise<{ reportView?: string; reportPage?: string }>;
+  searchParams: Promise<{
+    reportView?: string;
+    reportPage?: string;
+    verificationView?: string;
+    verificationPage?: string;
+  }>;
 }) {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
@@ -51,8 +56,15 @@ export default async function AdminPage({
     typeof query.reportPage === "string" && /^[1-9]\d{0,4}$/.test(query.reportPage)
       ? Number(query.reportPage)
       : 1;
+  const verificationView = query.verificationView === "history" ? "history" : "pending";
+  const verificationPage =
+    typeof query.verificationPage === "string" && /^[1-9]\d{0,4}$/.test(query.verificationPage)
+      ? Number(query.verificationPage)
+      : 1;
   const reportHref = (view: "pending" | "history", page: number) =>
-    `/admin?reportView=${view}&reportPage=${page}`;
+    `/admin?reportView=${view}&reportPage=${page}&verificationView=${verificationView}&verificationPage=${verificationPage}`;
+  const verificationHref = (view: "pending" | "history", page: number) =>
+    `/admin?reportView=${reportView}&reportPage=${reportPage}&verificationView=${view}&verificationPage=${page}`;
 
   const cookieStore = await cookies();
   const token = cookieStore.get("nexus_session")?.value;
@@ -83,22 +95,22 @@ export default async function AdminPage({
   const [
     health,
     reportPageResult,
-    verificationRequests,
+    verificationPageResult,
+    pendingVerificationCount,
     pendingBuilds,
     pendingContent,
     auditLogs,
   ] = await Promise.all([
     adminService.getSystemHealthMetrics(adminUser),
     adminService.listReports(adminUser, reportView, reportPage),
-    verificationRepository.listAll(),
+    verificationRepository.listPage(verificationView, verificationPage),
+    verificationRepository.countPending(),
     buildRepository.listPendingReview(),
     contentRepository.listByStatus("draft", 100),
     canViewAudit ? adminService.listAuditLogs(adminUser) : Promise.resolve([]),
   ]);
 
-  const pendingVerifications = verificationRequests.filter(
-    (request) => request.status === "pending",
-  );
+  const { requests: verificationRequests, hasMore: moreVerifications } = verificationPageResult;
   const { reports, hasMore: moreReports } = reportPageResult;
 
   return (
@@ -151,9 +163,25 @@ export default async function AdminPage({
       <section>
         <SectionHeader
           title={copy.verificationQueue}
-          description={`${pendingVerifications.length} ${copy.pendingRequests}`}
+          description={`${pendingVerificationCount} ${copy.pendingRequests}`}
           action={<BadgeCheck className="h-4 w-4 text-accent" />}
         />
+        <nav aria-label={copy.verificationQueue} className="mb-3 flex gap-2">
+          <Link
+            href={verificationHref("pending", 1)}
+            aria-current={verificationView === "pending" ? "page" : undefined}
+            className={`rounded-md border border-base px-3 py-2 text-xs ${verificationView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
+          >
+            {copy.verificationPending} ({pendingVerificationCount})
+          </Link>
+          <Link
+            href={verificationHref("history", 1)}
+            aria-current={verificationView === "history" ? "page" : undefined}
+            className={`rounded-md border border-base px-3 py-2 text-xs ${verificationView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
+          >
+            {copy.verificationHistory}
+          </Link>
+        </nav>
         <div className="space-y-2.5">
           {verificationRequests.length > 0 ? (
             verificationRequests.map((request) => (
@@ -177,9 +205,24 @@ export default async function AdminPage({
                   {request.notes && (
                     <p className="font-caption text-faint">{request.notes}</p>
                   )}
+                  {request.proofUrl && /^https?:\/\//i.test(request.proofUrl) && (
+                    <a
+                      href={request.proofUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block break-all font-caption text-accent underline"
+                    >
+                      {copy.verificationProof}
+                    </a>
+                  )}
                   {request.reviewNotes && (
                     <p className="font-code font-caption text-faint">
                       {copy.review}: {request.reviewNotes}
+                    </p>
+                  )}
+                  {request.resolvedAt && (
+                    <p className="font-caption text-faint">
+                      {copy.reportDecidedAt}: {new Date(request.resolvedAt).toLocaleString(dateLocale)}
                     </p>
                   )}
                 </div>
@@ -204,11 +247,27 @@ export default async function AdminPage({
           ) : (
             <div className="nexus-panel py-6 text-center">
               <p className="font-caption text-muted">
-                {copy.noVerificationRequests}
+                {verificationView === "pending"
+                  ? copy.noVerificationRequests
+                  : copy.noVerificationHistory}
               </p>
             </div>
           )}
         </div>
+        {(verificationPage > 1 || moreVerifications) && (
+          <nav
+            aria-label={copy.verificationPages}
+            className="mt-3 flex items-center gap-3 text-xs"
+          >
+            {verificationPage > 1 && (
+              <Link className="text-accent underline" href={verificationHref(verificationView, verificationPage - 1)}>{copy.previous}</Link>
+            )}
+            <span className="text-muted">{copy.reportPage} {verificationPage}</span>
+            {moreVerifications && verificationPage < 99_999 && (
+              <Link className="text-accent underline" href={verificationHref(verificationView, verificationPage + 1)}>{copy.next}</Link>
+            )}
+          </nav>
+        )}
       </section>
 
       <section>
@@ -403,7 +462,7 @@ export default async function AdminPage({
           <nav aria-label={copy.reportPages} className="mt-3 flex items-center gap-3 text-xs">
             {reportPage > 1 && <Link className="text-accent underline" href={reportHref(reportView, reportPage - 1)}>{copy.previous}</Link>}
             <span className="text-muted">{copy.reportPage} {reportPage}</span>
-            {moreReports && <Link className="text-accent underline" href={reportHref(reportView, reportPage + 1)}>{copy.next}</Link>}
+            {moreReports && reportPage < 99_999 && <Link className="text-accent underline" href={reportHref(reportView, reportPage + 1)}>{copy.next}</Link>}
           </nav>
         )}
       </section>

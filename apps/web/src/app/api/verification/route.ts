@@ -32,8 +32,8 @@ const verificationRequestSchema = z.object({
     "organization",
     "server",
   ]),
-  targetId: z.string().min(1),
-  proofUrl: z.string().url().optional().or(z.literal("")),
+  targetId: z.string().min(1).max(128),
+  proofUrl: z.string().url().regex(/^https?:\/\//i).max(2048).optional().or(z.literal("")),
   notes: z.string().max(1000).optional(),
 });
 
@@ -194,27 +194,26 @@ export async function POST(request: NextRequest) {
         },
       );
 
-    const moderators = (
-      await userRepository.listAll()
-    ).filter(
-      (candidate) =>
-        candidate.role === "moderator" ||
-        candidate.role === "admin",
-    );
-
-    await Promise.allSettled(
-      moderators.map((moderator) =>
-        notificationRepository.create({
-          id: generateId("not"),
-          recipientId: moderator.id,
-          title: "New verification request",
-          message:
-            `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
-          link: "/admin",
-          type: "security",
-        }),
-      ),
-    );
+    // Notification delivery is best effort; the committed request must remain successful.
+    try {
+      const moderatorIds = await userRepository.listModeratorIds();
+      const deliveries = await Promise.allSettled(
+        moderatorIds.map((moderatorId) =>
+          notificationRepository.create({
+            id: generateId("not"),
+            recipientId: moderatorId,
+            title: "New verification request",
+            message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
+            link: "/admin?verificationView=pending&verificationPage=1",
+            type: "security",
+          }),
+        ),
+      );
+      const failures = deliveries.filter((delivery) => delivery.status === "rejected").length;
+      if (failures) console.warn("Verification notification delivery failures:", failures);
+    } catch (error) {
+      console.warn("Verification moderator lookup failed:", error);
+    }
 
     return json(
       {

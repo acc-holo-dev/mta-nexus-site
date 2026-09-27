@@ -46,6 +46,10 @@ Moderators review complaints in `/admin`, under **Reports & moderation**. The de
 
 Модератор обрабатывает жалобы в `/admin` → **Жалобы и модерация**. По умолчанию открытые жалобы идут от старых к новым; история решений показывает последние закрытые случаи. В каждой странице 30 записей. Для решения необходим комментарий от трёх символов; статус и аудит сохраняются одной транзакцией. При повторном решении уже закрытой жалобы API возвращает 409. Быстрая проверка: `pnpm test:reports`.
 
+The **Verification queue** on `/admin` follows the same 30 item paging model, oldest pending requests first and completed decisions in a separate history. Its count covers every pending request, including those beyond the current page. Moderators can open a submitted HTTP(S) proof link before deciding. Concurrent applications for the same target are serialized in the creation transaction; a second pending application receives 409. Submission queries moderator IDs directly for notifications; notification failure after a successful insert does not turn a saved application into a failed response. Run `pnpm test:verification` for focused checks.
+
+Очередь верификации в `/admin` показывает все ожидающие заявки постранично, от старых к новым; решения вынесены в историю. Счётчик учитывает все ожидающие заявки. Ссылка на доказательство доступна модератору. Одновременные заявки на один объект сериализуются в транзакции, повторная заявка получает 409. После сохранения заявки сбой уведомлений не превращает успешную подачу в ошибку. Быстрая проверка: `pnpm test:verification`.
+
 When a functioning execution environment is available, the expected project verification path is:
 
 ```bash

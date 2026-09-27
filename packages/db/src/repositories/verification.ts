@@ -1,4 +1,4 @@
-import { and, eq, desc, isNotNull, sql } from "drizzle-orm";
+import { and, asc, count, eq, desc, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, verificationRequests, users, organizations, servers, serverClaimChallenges } from "../schema";
 import { generateId } from "@nexus/security";
@@ -39,6 +39,19 @@ export class VerificationRepository {
     };
 
     return db.transaction(async (tx) => {
+      // Serialize applications for the same target, including applications by different organization managers.
+      const lockKey = `verification:${input.targetType}:${input.targetId}`;
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`);
+      const [pending] = await tx.select({ id: verificationRequests.id })
+        .from(verificationRequests)
+        .where(and(
+          eq(verificationRequests.targetType, input.targetType),
+          eq(verificationRequests.targetId, input.targetId),
+          eq(verificationRequests.status, "pending"),
+        ))
+        .limit(1);
+      if (pending) throw new ConflictError("A verification request is already pending");
+
       const rows = await tx
         .insert(verificationRequests)
         .values(values)
@@ -117,12 +130,28 @@ export class VerificationRepository {
     return rows[0] || null;
   }
 
-  async listAll() {
-    return db
-      .select()
-      .from(verificationRequests)
-      .orderBy(desc(verificationRequests.createdAt))
-      .limit(100);
+  async countPending(): Promise<number> {
+    const [row] = await db.select({ total: count() }).from(verificationRequests)
+      .where(eq(verificationRequests.status, "pending"));
+    return row?.total ?? 0;
+  }
+
+  async listPage(view: "pending" | "history", page: number, pageSize = 30) {
+    if (!Number.isSafeInteger(page) || page < 1 || page > 99_999 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+      throw new RangeError("Invalid verification page");
+    }
+    const filter = view === "pending"
+      ? eq(verificationRequests.status, "pending")
+      : inArray(verificationRequests.status, ["approved", "rejected"]);
+    const ordering = view === "pending"
+      ? [asc(verificationRequests.createdAt), asc(verificationRequests.id)]
+      : [desc(verificationRequests.resolvedAt), desc(verificationRequests.id)];
+    const rows = await db.select().from(verificationRequests)
+      .where(filter)
+      .orderBy(...ordering)
+      .limit(pageSize + 1)
+      .offset((page - 1) * pageSize);
+    return { requests: rows.slice(0, pageSize), hasMore: rows.length > pageSize };
   }
 
   async listByRequester(requesterId: string) {

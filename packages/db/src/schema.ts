@@ -563,7 +563,10 @@ export const verificationRequests = pgTable("verification_requests", {
   reviewNotes: text("review_notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
-});
+}, (table) => [
+  index("verification_status_created_id_idx").on(table.status, table.createdAt, table.id),
+  index("verification_status_resolved_id_idx").on(table.status, table.resolvedAt, table.id),
+]);
 
 
 export const serverClaimChallenges = pgTable(
