@@ -9,7 +9,14 @@ describe("build review continuity", () => {
       "utf8"
     );
 
-    expect(repository).toContain('eq(builds.status, "published")');
+    const safety = readFileSync(
+      resolve(process.cwd(), "packages/db/src/repositories/build-safety.ts"),
+      "utf8"
+    );
+
+    expect(repository).toContain("safePublishedBuildCondition(data.productId)");
+    expect(safety).toContain('eq(builds.status, "published")');
+    expect(safety).toContain("trustedCleanScanCondition()");
     expect(repository).toContain("if (!published[0])");
     expect(repository).toContain('status: "pending_review"');
     expect(repository).toContain("db.transaction");

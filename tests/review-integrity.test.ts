@@ -2,31 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-describe("product review integrity", () => {
-  it("requires a published resource and a real entitlement", () => {
-    const route = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/api/products/[id]/reviews/route.ts"),
-      "utf8"
-    );
-
-    expect(route).toContain('product.status !== "published"');
-    expect(route).toContain('hasReviewFromUser(productId, user.id)');
-    expect(route).toContain('"product.download"');
-    expect(route).toContain("Add this resource to your library before reviewing it");
-    expect(route).toContain("isVerifiedPurchase: hasAcquired");
-  });
-
-  it("handles duplicate submissions both before and during insertion", () => {
-    const route = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/api/products/[id]/reviews/route.ts"),
-      "utf8"
-    );
-
-    expect(route).toContain("status: 409");
-    expect(route).toContain('databaseError.code === "23505"');
-    expect(route).toContain("You have already reviewed this product");
-  });
-
+describe("product review database integrity", () => {
   it("serializes rating aggregation with the review insert", () => {
     const route = readFileSync(
       resolve(process.cwd(), "apps/web/src/app/api/products/[id]/reviews/route.ts"),

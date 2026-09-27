@@ -43,7 +43,7 @@ describe("moderation atomicity surface", () => {
 
     expect(repository).toContain("restoreSuspendedWithPublishedBuild");
     expect(repository).toContain('eq(products.status, "suspended")');
-    expect(repository).toContain('eq(builds.status, "published")');
+    expect(repository).toContain(".where(safePublishedBuildCondition(id))");
     expect(repository).toContain('"no_published_build"');
     expect(repository).toContain("suspendPublished");
     expect(repository).toContain('eq(products.status, "published")');

@@ -57,6 +57,8 @@ A workflow object with zero executed steps is infrastructure evidence, not an ap
 
 For changes to the official MTA directory and search, run `pnpm test:directory` first. It checks parser boundaries, stale data, API filtering and pagination, RU/EN surfaces, and search without a local database. The API checks call the real route handler with a controlled directory response; the full `pnpm check` still requires PostgreSQL and is the release gate. A focused pass is not a release acceptance result.
 
+For review and build-moderation changes, `pnpm test:resource` checks resource review HTTP boundaries, safe published-build selection and the moderation contract without PostgreSQL. It checks neither database transaction execution nor scanner integration; those remain in the full CI suite.
+
 ## 3. Production boundary
 
 Production must use explicit production Compose/configuration, not the local development stack.

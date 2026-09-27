@@ -24,9 +24,8 @@ describe("resource build visibility", () => {
     );
     expect(service).toContain('product.status === "published"');
     expect(service).toContain("getProductPreviewBySlug");
-    expect(service).toContain(
-      'can(actor, "product.update", product',
-    );
+    expect(service).toContain("this.canManageProduct(product, actor");
+    expect(service).toContain("if (can(actor, action, product)) return true;");
 
     expect(page).toContain(
       "await productService.canManageProduct(product, user)",

@@ -11,8 +11,10 @@ describe("build moderation control surface", () => {
 
     expect(route).toContain('import { AppError } from "@nexus/domain"');
     expect(route).toContain("error instanceof AppError");
-    expect(route).toContain("status: error.statusCode");
-    expect(route).toContain('if (targetType !== "build")');
+    expect(route).toContain("error.statusCode");
+    expect(route).toContain('else if (targetType === "build")');
+    expect(route).toContain("productService.reviewBuild({");
+    expect(route).not.toContain("auditRepository.record(");
     expect(route).toContain(
       'targetType: z.literal("build")',
     );
@@ -50,7 +52,7 @@ describe("build moderation control surface", () => {
     expect(component).toContain('scanStatus === "clean"');
     expect(component).toContain("hasScanProvenance");
     expect(component).toContain("hasTrustedCleanScan");
-    expect(component).toContain("Artifact download requires a trusted clean scan");
+    expect(component).toContain("copy.artifactRequiresCleanScan");
     expect(component).toContain('moderate("approve")');
     expect(component).toContain('moderate("reject")');
     expect(page).toContain("<BuildModerationControls");
