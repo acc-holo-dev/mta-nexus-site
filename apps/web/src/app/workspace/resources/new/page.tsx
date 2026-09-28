@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@nexus/ui";
 import { MtaMetaInspectorPanel } from "../../../../components/mta-meta-inspector-panel";
 import { useNexusLocale } from "../../../../components/locale-context";
-import { getBuildSubmissionErrorMessage } from "../../../../lib/publishing-error-message";
+import { getResourceSubmissionErrorMessage } from "../../../../lib/publishing-error-message";
 import {
   exceedsBuildFileSizeLimit,
   MAX_BUILD_FILE_SIZE_BYTES,
@@ -34,6 +34,27 @@ export default function NewResourcePage() {
     "{maxFileSize}",
     maxFileSizeMb,
   );
+  const publishingErrorMessages = {
+    fileTooLarge: buildFileTooLarge,
+    malwareDetected: copy.scannerMalwareDetected,
+    scanLimitExceeded: copy.scannerLimitExceeded,
+    scannerUnavailable: copy.scannerUnavailable,
+    authenticationRequired: copy.authenticationRequired,
+    uploadRateLimited: copy.uploadRateLimited,
+    resourceNotFound: copy.resourceNotFound,
+    buildForbidden: copy.buildForbidden,
+    paidPublishingUnavailable: copy.paidPublishingUnavailable,
+    versionAlreadyExists: copy.versionAlreadyExists,
+    multipartRequired: copy.multipartRequired,
+    multipartInvalid: copy.multipartInvalid,
+    metadataInvalid: copy.metadataInvalid,
+    buildFileTypeNotAllowed: copy.buildFileTypeNotAllowed,
+    buildContentMismatch: copy.buildContentMismatch,
+    buildFileNameInvalid: copy.buildFileNameInvalid,
+    resourceMetadataInvalid: copy.resourceMetadataInvalid,
+    resourceSlugAlreadyExists: copy.resourceSlugAlreadyExists,
+    resourceCreationFailed: copy.resourceCreationFailed,
+  };
   const [loading, setLoading] = useState(false);
   const [resultSlug, setResultSlug] = useState<string | null>(null);
   const [createdProduct, setCreatedProduct] = useState<{
@@ -121,12 +142,18 @@ export default function NewResourcePage() {
           signal: AbortSignal.timeout(15_000),
         });
         const productData = await productResponse.json().catch(() => null);
+        const productErrorMessage = getResourceSubmissionErrorMessage(
+          productData?.code,
+          publishingErrorMessages,
+        );
         if (
           !productResponse.ok ||
           !productData?.product?.id ||
           !productData?.product?.slug
         ) {
-          throw new Error(productData?.error || copy.createError);
+          throw new Error(
+            productErrorMessage || productData?.error || copy.createError,
+          );
         }
         product = {
           id: productData.product.id,
@@ -165,24 +192,10 @@ export default function NewResourcePage() {
       );
       const buildData = await buildResponse.json().catch(() => null);
       if (!buildResponse.ok) {
-        const publishingMessage = getBuildSubmissionErrorMessage(buildData?.code, {
-          fileTooLarge: buildFileTooLarge,
-          malwareDetected: copy.scannerMalwareDetected,
-          scanLimitExceeded: copy.scannerLimitExceeded,
-          scannerUnavailable: copy.scannerUnavailable,
-          authenticationRequired: copy.authenticationRequired,
-          uploadRateLimited: copy.uploadRateLimited,
-          resourceNotFound: copy.resourceNotFound,
-          buildForbidden: copy.buildForbidden,
-          paidPublishingUnavailable: copy.paidPublishingUnavailable,
-          versionAlreadyExists: copy.versionAlreadyExists,
-          multipartRequired: copy.multipartRequired,
-          multipartInvalid: copy.multipartInvalid,
-          metadataInvalid: copy.metadataInvalid,
-          buildFileTypeNotAllowed: copy.buildFileTypeNotAllowed,
-          buildContentMismatch: copy.buildContentMismatch,
-          buildFileNameInvalid: copy.buildFileNameInvalid,
-        });
+        const publishingMessage = getResourceSubmissionErrorMessage(
+          buildData?.code,
+          publishingErrorMessages,
+        );
         throw new Error(publishingMessage || buildData?.error || copy.buildError);
       }
 

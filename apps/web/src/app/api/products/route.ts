@@ -4,6 +4,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { createProductSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
 import { parseMarketQuery } from "../../../lib/market-query";
+import { AppError } from "@nexus/domain";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -52,25 +53,41 @@ export async function POST(request: NextRequest) {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
-      return privateJson({ error: "Authentication required" }, 401 );
+      return privateJson(
+        { error: "Authentication required", code: "UNAUTHORIZED" },
+        401,
+      );
     }
 
     const rateLimit = await consumeRateLimit("contentCreation", user.id);
     if (!rateLimit.success) {
-      return privateJson({ error: "Resource creation limit exceeded" }, 429 );
+      return privateJson(
+        {
+          error: "Resource creation limit exceeded",
+          code: "RATE_LIMIT_EXCEEDED",
+        },
+        429,
+      );
     }
 
     const parsed = createProductSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
       return privateJson(
-        { error: "Invalid resource details", details: parsed.error.format() },
-        400 
+        {
+          error: "Invalid resource details",
+          code: "PRODUCT_METADATA_INVALID",
+          details: parsed.error.format(),
+        },
+        400,
       );
     }
     if (parsed.data.price !== 0) {
       return privateJson(
-        { error: "Paid resources are disabled until a payment provider is configured" },
-        422 
+        {
+          error: "Paid resources are disabled until a payment provider is configured",
+          code: "PAID_RESOURCES_DISABLED",
+        },
+        422,
       );
     }
 
@@ -88,14 +105,33 @@ export async function POST(request: NextRequest) {
 
     return privateJson({ product }, 201 );
   } catch (error: unknown) {
-    const appError =
-      error instanceof Error && "statusCode" in error
-        ? (error as Error & { statusCode: number })
-        : null;
+    const databaseCode =
+      typeof error === "object" && error !== null && "code" in error
+        ? error.code
+        : undefined;
+    if (databaseCode === "23505") {
+      return privateJson(
+        {
+          error: "A resource with this slug already exists",
+          code: "PRODUCT_SLUG_EXISTS",
+        },
+        409,
+      );
+    }
+    if (error instanceof AppError) {
+      return privateJson(
+        { error: error.message, code: error.code },
+        error.statusCode,
+      );
+    }
+
     console.error("Resource creation error:", error);
     return privateJson(
-      { error: appError?.message || "Could not create resource" },
-      appError?.statusCode || 500 
+      {
+        error: "Could not create resource",
+        code: "RESOURCE_CREATION_FAILED",
+      },
+      500,
     );
   }
 }

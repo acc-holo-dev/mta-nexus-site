@@ -1,4 +1,4 @@
-export interface BuildSubmissionErrorMessages {
+export interface ResourceSubmissionErrorMessages {
   fileTooLarge: string;
   malwareDetected: string;
   scanLimitExceeded: string;
@@ -15,11 +15,14 @@ export interface BuildSubmissionErrorMessages {
   buildFileTypeNotAllowed?: string;
   buildContentMismatch?: string;
   buildFileNameInvalid?: string;
+  resourceMetadataInvalid?: string;
+  resourceSlugAlreadyExists?: string;
+  resourceCreationFailed?: string;
 }
 
-export function getBuildSubmissionErrorMessage(
+export function getResourceSubmissionErrorMessage(
   code: unknown,
-  messages: BuildSubmissionErrorMessages,
+  messages: ResourceSubmissionErrorMessages,
 ): string | undefined {
   switch (code) {
     case "BUILD_UPLOAD_TOO_LARGE":
@@ -54,6 +57,12 @@ export function getBuildSubmissionErrorMessage(
       return messages.buildContentMismatch;
     case "BUILD_FILE_NAME_INVALID":
       return messages.buildFileNameInvalid;
+    case "PRODUCT_METADATA_INVALID":
+      return messages.resourceMetadataInvalid;
+    case "PRODUCT_SLUG_EXISTS":
+      return messages.resourceSlugAlreadyExists;
+    case "RESOURCE_CREATION_FAILED":
+      return messages.resourceCreationFailed;
     default:
       return undefined;
   }

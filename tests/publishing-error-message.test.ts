@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { getBuildSubmissionErrorMessage } from "../apps/web/src/lib/publishing-error-message";
+import { getResourceSubmissionErrorMessage } from "../apps/web/src/lib/publishing-error-message";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
-describe("localized resource scan failures", () => {
+describe("localized resource submission failures", () => {
   it.each([
     ["BUILD_UPLOAD_TOO_LARGE", "buildFileTooLarge"],
     ["BUILD_MALWARE_DETECTED", "scannerMalwareDetected"],
@@ -13,7 +13,7 @@ describe("localized resource scan failures", () => {
     const russian = getDictionary("ru").publishing;
 
     expect(
-      getBuildSubmissionErrorMessage(code, {
+      getResourceSubmissionErrorMessage(code, {
         fileTooLarge: english.buildFileTooLarge,
         malwareDetected: english.scannerMalwareDetected,
         scanLimitExceeded: english.scannerLimitExceeded,
@@ -21,7 +21,7 @@ describe("localized resource scan failures", () => {
       }),
     ).toBe(english[key]);
     expect(
-      getBuildSubmissionErrorMessage(code, {
+      getResourceSubmissionErrorMessage(code, {
         fileTooLarge: russian.buildFileTooLarge,
         malwareDetected: russian.scannerMalwareDetected,
         scanLimitExceeded: russian.scannerLimitExceeded,
@@ -32,7 +32,7 @@ describe("localized resource scan failures", () => {
 
   it("keeps unknown server errors available for fallback handling", () => {
     expect(
-      getBuildSubmissionErrorMessage("SOME_NEW_SERVER_ERROR", {
+      getResourceSubmissionErrorMessage("SOME_NEW_SERVER_ERROR", {
         fileTooLarge: "too large",
         malwareDetected: "malware",
         scanLimitExceeded: "limits",
@@ -54,6 +54,9 @@ describe("localized resource scan failures", () => {
     ["BUILD_FILE_TYPE_NOT_ALLOWED", "buildFileTypeNotAllowed"],
     ["BUILD_CONTENT_MISMATCH", "buildContentMismatch"],
     ["BUILD_FILE_NAME_INVALID", "buildFileNameInvalid"],
+    ["PRODUCT_METADATA_INVALID", "resourceMetadataInvalid"],
+    ["PRODUCT_SLUG_EXISTS", "resourceSlugAlreadyExists"],
+    ["RESOURCE_CREATION_FAILED", "resourceCreationFailed"],
   ] as const)("localizes %s for both interface languages", (code, key) => {
     const english = getDictionary("en").publishing;
     const russian = getDictionary("ru").publishing;
@@ -65,10 +68,10 @@ describe("localized resource scan failures", () => {
       [key]: copy[key],
     });
 
-    expect(getBuildSubmissionErrorMessage(code, messages(english))).toBe(
+    expect(getResourceSubmissionErrorMessage(code, messages(english))).toBe(
       english[key],
     );
-    expect(getBuildSubmissionErrorMessage(code, messages(russian))).toBe(
+    expect(getResourceSubmissionErrorMessage(code, messages(russian))).toBe(
       russian[key],
     );
   });
