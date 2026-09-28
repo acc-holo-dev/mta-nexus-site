@@ -48,6 +48,15 @@ describe("author-facing MTA meta inspector", () => {
     expect(panel).toContain("onApplyMinimumVersion(versionSuggestion)");
   });
 
+  it("shows declared ACL rights in a bounded preview without a trust verdict", () => {
+    const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
+
+    expect(panel).toContain("MAX_ACL_RIGHTS_PREVIEW = 20");
+    expect(panel).toContain(".slice(0, MAX_ACL_RIGHTS_PREVIEW)");
+    expect(panel).toContain("right.access ?? copy.notDeclared");
+    expect(panel).toContain("copy.aclRightsNote");
+  });
+
   it("keeps client size and authenticated uncached request guards", () => {
     const panel = read(
       "apps/web/src/components/mta-meta-inspector-panel.tsx",

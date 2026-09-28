@@ -11,6 +11,7 @@ type InspectionResponse = {
     byteLength: number;
     info: Record<string, string> | null;
     dependencyResources: string[];
+    aclRights: Array<Record<string, string>>;
     minMtaVersion: {
       client: string | null;
       server: string | null;
@@ -42,6 +43,7 @@ type InspectionResponse = {
 };
 
 const MAX_META_BYTES = 256 * 1024;
+const MAX_ACL_RIGHTS_PREVIEW = 20;
 
 export function MtaMetaInspectorPanel({
   onApplyMinimumVersion,
@@ -291,6 +293,45 @@ export function MtaMetaInspectorPanel({
                 ))}
               </div>
             </div>
+          )}
+
+          {inspection.aclRights.length > 0 && (
+            <section aria-labelledby="meta-inspector-acl-heading" className="space-y-2">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3
+                  id="meta-inspector-acl-heading"
+                  className="font-label uppercase text-faint"
+                >
+                  {copy.aclRights}
+                </h3>
+                <span className="text-[10px] text-faint">
+                  {copy.aclRightsCount.replace(
+                    "{shown}",
+                    String(Math.min(inspection.aclRights.length, MAX_ACL_RIGHTS_PREVIEW)),
+                  ).replace("{total}", String(inspection.aclRights.length))}
+                </span>
+              </div>
+              <ul className="grid gap-1.5 sm:grid-cols-2">
+                {inspection.aclRights
+                  .slice(0, MAX_ACL_RIGHTS_PREVIEW)
+                  .map((right, index) => (
+                    <li
+                      key={`${right.name ?? "unnamed"}-${index}`}
+                      className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                    >
+                      <code className="break-all text-secondary">
+                        {right.name || copy.aclRightNameMissing}
+                      </code>
+                      <span className="shrink-0 text-faint">
+                        {copy.aclAccess}: {right.access ?? copy.notDeclared}
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+              <p className="text-[10px] leading-relaxed text-faint">
+                {copy.aclRightsNote}
+              </p>
+            </section>
           )}
 
           {inspection.issues.length > 0 && (
