@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { productService } from "../../../lib/services/product-service";
 import { authService } from "../../../lib/services/auth-service";
 import { createProductSchema } from "@nexus/validation";
@@ -16,6 +17,32 @@ function privateJson(body: unknown, status = 200) {
     status,
     headers: privateHeaders,
   });
+}
+
+function matchesCreateRequest(
+  product: Product,
+  input: z.infer<typeof createProductSchema>,
+): boolean {
+  const sameList = (
+    left: readonly string[] = [],
+    right: readonly string[] = [],
+  ) =>
+    left.length === right.length &&
+    left.every((value, index) => value === right[index]);
+  const compatibility = product.compatibility ?? {};
+  const requestedCompatibility = input.compatibility ?? {};
+
+  return (
+    product.title === input.title &&
+    product.slug === input.slug &&
+    product.description === input.description &&
+    (product.shortDescription ?? undefined) === input.shortDescription &&
+    product.type === input.type &&
+    (product.organizationId ?? undefined) === input.organizationId &&
+    sameList(product.tags, input.tags) &&
+    compatibility.mtaMinVersion === requestedCompatibility.mtaMinVersion &&
+    sameList(compatibility.dependencies, requestedCompatibility.dependencies)
+  );
 }
 
 export async function GET(request: NextRequest) {
@@ -118,7 +145,8 @@ export async function POST(request: NextRequest) {
         );
         if (
           existingDraft?.authorId === user.id &&
-          existingDraft.status === "draft"
+          existingDraft.status === "draft" &&
+          matchesCreateRequest(existingDraft, parsed.data)
         ) {
           return privateJson(
             { product: existingDraft, reusedDraft: true },

@@ -25,6 +25,19 @@ vi.mock("@nexus/security", () => ({
 
 import { POST } from "../apps/web/src/app/api/products/route";
 
+const validResourceInput = {
+  title: "Resource title",
+  slug: "resource-title",
+  shortDescription: "A short description",
+  description: "A longer description for this resource.",
+  type: "script",
+  price: 0,
+  currency: "USD",
+  licenseModel: "unlimited",
+  tags: [],
+  compatibility: { dependencies: [] },
+};
+
 function request(body: unknown) {
   return new NextRequest("http://nexus.test/api/products", {
     method: "POST",
@@ -65,18 +78,7 @@ describe("resource creation HTTP errors", () => {
       status: "draft",
     });
 
-    const response = await POST(
-      request({
-        title: "Resource title",
-        slug: "resource-title",
-        shortDescription: "A short description",
-        description: "A longer description for this resource.",
-        type: "script",
-        price: 0,
-        currency: "USD",
-        licenseModel: "unlimited",
-      }),
-    );
+    const response = await POST(request(validResourceInput));
 
     expect(response.status).toBe(409);
     expect(await response.json()).toEqual({
@@ -89,23 +91,21 @@ describe("resource creation HTTP errors", () => {
     const existingDraft = {
       id: "prd_existing_draft",
       slug: "resource-title",
+      title: "Resource title",
+      shortDescription: "A short description",
+      description: "A longer description for this resource.",
+      type: "script",
       authorId: "usr_creator",
       status: "draft",
+      price: 0,
+      tags: [],
+      compatibility: { dependencies: [] },
     };
     mocks.createProduct.mockRejectedValueOnce({ code: "23505" });
     mocks.getProductPreviewBySlug.mockResolvedValueOnce(existingDraft);
 
     const response = await POST(
-      request({
-        title: "Resource title",
-        slug: "resource-title",
-        shortDescription: "A short description",
-        description: "A longer description for this resource.",
-        type: "script",
-        price: 0,
-        currency: "USD",
-        licenseModel: "unlimited",
-      }),
+      request(validResourceInput),
     );
 
     expect(response.status).toBe(200);
@@ -119,6 +119,28 @@ describe("resource creation HTTP errors", () => {
     );
   });
 
+  it("does not reuse the creator's draft when submitted metadata has changed", async () => {
+    mocks.createProduct.mockRejectedValueOnce({ code: "23505" });
+    mocks.getProductPreviewBySlug.mockResolvedValueOnce({
+      id: "prd_existing_draft",
+      ...validResourceInput,
+      authorId: "usr_creator",
+      status: "draft",
+    });
+
+    const response = await POST(
+      request({
+        ...validResourceInput,
+        description: "Changed description content.",
+      }),
+    );
+
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({
+      code: "PRODUCT_SLUG_EXISTS",
+    });
+  });
+
   it("does not send internal error details back to the creator", async () => {
     mocks.createProduct.mockRejectedValueOnce(
       new Error("database connection string contains a secret"),
@@ -128,18 +150,7 @@ describe("resource creation HTTP errors", () => {
       .mockImplementation(() => undefined);
 
     try {
-      const response = await POST(
-        request({
-          title: "Resource title",
-          slug: "resource-title",
-          shortDescription: "A short description",
-          description: "A longer description for this resource.",
-          type: "script",
-          price: 0,
-          currency: "USD",
-          licenseModel: "unlimited",
-        }),
-      );
+      const response = await POST(request(validResourceInput));
 
       expect(response.status).toBe(500);
       expect(await response.json()).toEqual({
