@@ -56,6 +56,9 @@ describe("MTA meta.xml inspector", () => {
       },
     ]);
     expect(result.dependencyResources).toEqual(["scoreboard"]);
+    expect(result.exports).toEqual([
+      { function: "getRaceState", type: "shared", http: "true" },
+    ]);
     expect(result.minMtaVersion).toEqual({
       client: null,
       server: null,

@@ -11,6 +11,7 @@ type InspectionResponse = {
     byteLength: number;
     info: Record<string, string> | null;
     dependencyResources: string[];
+    exports: Array<Record<string, string>>;
     aclRights: Array<Record<string, string>>;
     minMtaVersion: {
       client: string | null;
@@ -43,7 +44,7 @@ type InspectionResponse = {
 };
 
 const MAX_META_BYTES = 256 * 1024;
-const MAX_ACL_RIGHTS_PREVIEW = 20;
+const MAX_META_ENTRY_PREVIEW = 20;
 
 export function MtaMetaInspectorPanel({
   onApplyMinimumVersion,
@@ -296,7 +297,10 @@ export function MtaMetaInspectorPanel({
           )}
 
           {inspection.aclRights.length > 0 && (
-            <section aria-labelledby="meta-inspector-acl-heading" className="space-y-2">
+            <section
+              aria-labelledby="meta-inspector-acl-heading"
+              className="space-y-2"
+            >
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <h3
                   id="meta-inspector-acl-heading"
@@ -307,13 +311,18 @@ export function MtaMetaInspectorPanel({
                 <span className="text-[10px] text-faint">
                   {copy.aclRightsCount.replace(
                     "{shown}",
-                    String(Math.min(inspection.aclRights.length, MAX_ACL_RIGHTS_PREVIEW)),
+                    String(
+                      Math.min(
+                        inspection.aclRights.length,
+                        MAX_META_ENTRY_PREVIEW,
+                      ),
+                    ),
                   ).replace("{total}", String(inspection.aclRights.length))}
                 </span>
               </div>
               <ul className="grid gap-1.5 sm:grid-cols-2">
                 {inspection.aclRights
-                  .slice(0, MAX_ACL_RIGHTS_PREVIEW)
+                  .slice(0, MAX_META_ENTRY_PREVIEW)
                   .map((right, index) => (
                     <li
                       key={`${right.name ?? "unnamed"}-${index}`}
@@ -330,6 +339,54 @@ export function MtaMetaInspectorPanel({
               </ul>
               <p className="text-[10px] leading-relaxed text-faint">
                 {copy.aclRightsNote}
+              </p>
+            </section>
+          )}
+
+          {inspection.exports.length > 0 && (
+            <section
+              aria-labelledby="meta-inspector-exports-heading"
+              className="space-y-2"
+            >
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h3
+                  id="meta-inspector-exports-heading"
+                  className="font-label uppercase text-faint"
+                >
+                  {copy.exportsDetails}
+                </h3>
+                <span className="text-[10px] text-faint">
+                  {copy.manifestEntriesCount
+                    .replace(
+                      "{shown}",
+                      String(
+                        Math.min(inspection.exports.length, MAX_META_ENTRY_PREVIEW),
+                      ),
+                    )
+                    .replace("{total}", String(inspection.exports.length))}
+                </span>
+              </div>
+              <ul className="grid gap-1.5 sm:grid-cols-2">
+                {inspection.exports
+                  .slice(0, MAX_META_ENTRY_PREVIEW)
+                  .map((entry, index) => (
+                    <li
+                      key={`${entry.function ?? "unnamed"}-${index}`}
+                      className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
+                    >
+                      <code className="break-all text-secondary">
+                        {entry.function || copy.exportFunctionNameMissing}
+                      </code>
+                      <span className="text-faint">
+                        {copy.exportTypeLabel}: {entry.type ?? copy.notDeclared}
+                        {" · "}
+                        {copy.httpAttribute}: {entry.http ?? copy.notDeclared}
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+              <p className="text-[10px] leading-relaxed text-faint">
+                {copy.exportsNote}
               </p>
             </section>
           )}
