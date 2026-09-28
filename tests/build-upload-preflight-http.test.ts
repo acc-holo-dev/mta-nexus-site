@@ -62,6 +62,20 @@ function invalidBodyRequest() {
   );
 }
 
+function oversizedDeclaredRequest() {
+  return new NextRequest(
+    "http://nexus.test/api/products/prd_target/builds",
+    {
+      method: "POST",
+      headers: {
+        "content-type": "multipart/form-data; boundary=nexus-boundary",
+        "content-length": String(65 * 1024 * 1024 + 1),
+      },
+      body: "small test body",
+    },
+  );
+}
+
 const context = {
   params: Promise.resolve({ id: "prd_target" }),
 };
@@ -134,6 +148,23 @@ describe("build upload authorization HTTP preflight", () => {
     expect(scan).not.toHaveBeenCalled();
     expect(uploadAsset).not.toHaveBeenCalled();
     expect(deleteAsset).not.toHaveBeenCalled();
+    expect(releaseBuild).not.toHaveBeenCalled();
+  });
+
+  it("returns a stable localized error code when the declared upload exceeds the limit", async () => {
+    preflight.mockResolvedValueOnce({
+      id: "prd_target",
+      price: 0,
+    });
+
+    const response = await POST(oversizedDeclaredRequest(), context);
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toMatchObject({
+      code: "BUILD_UPLOAD_TOO_LARGE",
+    });
+    expect(scan).not.toHaveBeenCalled();
+    expect(uploadAsset).not.toHaveBeenCalled();
     expect(releaseBuild).not.toHaveBeenCalled();
   });
 });

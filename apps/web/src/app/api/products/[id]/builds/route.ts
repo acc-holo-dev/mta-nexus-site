@@ -81,7 +81,10 @@ export async function POST(
       declaredLength > MAX_FILE_SIZE_BYTES + MULTIPART_OVERHEAD_BYTES
     ) {
       return privateJson(context, 
-        { error: "Build archive exceeds the 64MB closed-beta limit" },
+        {
+          error: "Build archive exceeds the 64MB closed-beta limit",
+          code: "BUILD_UPLOAD_TOO_LARGE",
+        },
         { status: 413 }
       );
     }
@@ -106,7 +109,10 @@ export async function POST(
       if (error instanceof MultipartBodyTooLargeError) {
         return privateJson(
           context,
-          { error: "Build archive exceeds the 64MB closed-beta limit" },
+          {
+            error: "Build archive exceeds the 64MB closed-beta limit",
+            code: "BUILD_UPLOAD_TOO_LARGE",
+          },
           { status: 413 },
         );
       }
@@ -137,7 +143,10 @@ export async function POST(
     }
     if (file.size > MAX_FILE_SIZE_BYTES) {
       return privateJson(context, 
-        { error: "Build archive exceeds the 64MB closed-beta limit" },
+        {
+          error: "Build archive exceeds the 64MB closed-beta limit",
+          code: "BUILD_UPLOAD_TOO_LARGE",
+        },
         { status: 413 }
       );
     }

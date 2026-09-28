@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@nexus/ui";
 import { MtaMetaInspectorPanel } from "../../../../components/mta-meta-inspector-panel";
 import { useNexusLocale } from "../../../../components/locale-context";
-import { getBuildScanErrorMessage } from "../../../../lib/publishing-error-message";
+import { getBuildSubmissionErrorMessage } from "../../../../lib/publishing-error-message";
 import { exceedsBuildFileSizeLimit } from "../../../../lib/build-file-validation";
 import {
   parsePendingResourceDraft,
@@ -151,12 +151,13 @@ export default function NewResourcePage() {
       );
       const buildData = await buildResponse.json().catch(() => null);
       if (!buildResponse.ok) {
-        const scannerMessage = getBuildScanErrorMessage(buildData?.code, {
+        const publishingMessage = getBuildSubmissionErrorMessage(buildData?.code, {
+          fileTooLarge: copy.buildFileTooLarge,
           malwareDetected: copy.scannerMalwareDetected,
           scanLimitExceeded: copy.scannerLimitExceeded,
           scannerUnavailable: copy.scannerUnavailable,
         });
-        throw new Error(scannerMessage || buildData?.error || copy.buildError);
+        throw new Error(publishingMessage || buildData?.error || copy.buildError);
       }
 
       try {
