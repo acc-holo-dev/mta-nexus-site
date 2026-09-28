@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
   createProduct: vi.fn(),
+  getProductPreviewBySlug: vi.fn(),
   consumeRateLimit: vi.fn(),
 }));
 
@@ -12,7 +13,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 }));
 
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
-  productService: { createProduct: mocks.createProduct },
+  productService: {
+    createProduct: mocks.createProduct,
+    getProductPreviewBySlug: mocks.getProductPreviewBySlug,
+  },
 }));
 
 vi.mock("@nexus/security", () => ({
@@ -54,6 +58,12 @@ describe("resource creation HTTP errors", () => {
       code: "23505",
       detail: "private database constraint detail",
     });
+    mocks.getProductPreviewBySlug.mockResolvedValueOnce({
+      id: "prd_other_author",
+      slug: "resource-title",
+      authorId: "usr_other",
+      status: "draft",
+    });
 
     const response = await POST(
       request({
@@ -73,6 +83,40 @@ describe("resource creation HTTP errors", () => {
       error: "A resource with this slug already exists",
       code: "PRODUCT_SLUG_EXISTS",
     });
+  });
+
+  it("recovers the creator's draft when a previous create response was lost", async () => {
+    const existingDraft = {
+      id: "prd_existing_draft",
+      slug: "resource-title",
+      authorId: "usr_creator",
+      status: "draft",
+    };
+    mocks.createProduct.mockRejectedValueOnce({ code: "23505" });
+    mocks.getProductPreviewBySlug.mockResolvedValueOnce(existingDraft);
+
+    const response = await POST(
+      request({
+        title: "Resource title",
+        slug: "resource-title",
+        shortDescription: "A short description",
+        description: "A longer description for this resource.",
+        type: "script",
+        price: 0,
+        currency: "USD",
+        licenseModel: "unlimited",
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      product: existingDraft,
+      reusedDraft: true,
+    });
+    expect(mocks.getProductPreviewBySlug).toHaveBeenCalledWith(
+      "resource-title",
+      expect.objectContaining({ id: "usr_creator" }),
+    );
   });
 
   it("does not send internal error details back to the creator", async () => {

@@ -4,7 +4,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { createProductSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
 import { parseMarketQuery } from "../../../lib/market-query";
-import { AppError } from "@nexus/domain";
+import { AppError, type Product } from "@nexus/domain";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -91,17 +91,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const product = await productService.createProduct(
-      {
-        ...parsed.data,
-        authorId: user.id,
-        status: "draft",
-        currentVersion: "0.1.0",
-        isFeatured: false,
-        screenshots: [],
-      },
-      user
-    );
+    let product: Product;
+    try {
+      product = await productService.createProduct(
+        {
+          ...parsed.data,
+          authorId: user.id,
+          status: "draft",
+          currentVersion: "0.1.0",
+          isFeatured: false,
+          screenshots: [],
+        },
+        user,
+      );
+    } catch (error: unknown) {
+      const isDuplicate =
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        error.code === "23505";
+
+      if (isDuplicate) {
+        const existingDraft = await productService.getProductPreviewBySlug(
+          parsed.data.slug,
+          user,
+        );
+        if (
+          existingDraft?.authorId === user.id &&
+          existingDraft.status === "draft"
+        ) {
+          return privateJson(
+            { product: existingDraft, reusedDraft: true },
+            200,
+          );
+        }
+      }
+      throw error;
+    }
 
     return privateJson({ product }, 201 );
   } catch (error: unknown) {
