@@ -183,7 +183,7 @@ Codex must not mark the project release-ready until these blockers are closed.
 
 #### A. Remote branch cleanup
 
-GitHub currently exposes 60 branches: `main` plus 59 historical development/release/audit branches.
+GitHub currently exposes 61 branches: `main` plus 60 historical development/release/audit branches. The safety inventory must be refreshed before any deletion.
 
 Required action:
 
