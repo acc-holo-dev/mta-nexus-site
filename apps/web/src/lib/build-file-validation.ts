@@ -11,14 +11,29 @@ const RAR_SIGNATURES = [
 
 const SEVEN_ZIP_SIGNATURE = [0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c] as const;
 
-function startsWithSignature(bytes: Uint8Array, signature: readonly number[]): boolean {
-  return bytes.length >= signature.length && signature.every((byte, index) => bytes[index] === byte);
+export const MAX_BUILD_FILE_SIZE_BYTES = 64 * 1024 * 1024;
+
+export function exceedsBuildFileSizeLimit(sizeBytes: number): boolean {
+  return sizeBytes > MAX_BUILD_FILE_SIZE_BYTES;
 }
 
-/** Checks file type markers only; archive structure and extractability need a real archive parser. */
+function startsWithSignature(bytes: Uint8Array, signature: readonly number[]): boolean {
+  return (
+    bytes.length >= signature.length &&
+    signature.every((byte, index) => bytes[index] === byte)
+  );
+}
+
+/**
+ * Checks file type markers only; archive structure and extractability need a real archive parser.
+ */
 export function hasExpectedBuildFileFormat(extension: string, bytes: Uint8Array): boolean {
-  if (extension === "zip") return ZIP_SIGNATURES.some((signature) => startsWithSignature(bytes, signature));
-  if (extension === "rar") return RAR_SIGNATURES.some((signature) => startsWithSignature(bytes, signature));
+  if (extension === "zip") {
+    return ZIP_SIGNATURES.some((signature) => startsWithSignature(bytes, signature));
+  }
+  if (extension === "rar") {
+    return RAR_SIGNATURES.some((signature) => startsWithSignature(bytes, signature));
+  }
   if (extension === "7z") return startsWithSignature(bytes, SEVEN_ZIP_SIGNATURE);
   if (extension === "lua") {
     if (bytes.includes(0)) return false;

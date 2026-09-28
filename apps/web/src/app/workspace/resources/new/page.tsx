@@ -6,6 +6,7 @@ import { Button } from "@nexus/ui";
 import { MtaMetaInspectorPanel } from "../../../../components/mta-meta-inspector-panel";
 import { useNexusLocale } from "../../../../components/locale-context";
 import { getBuildScanErrorMessage } from "../../../../lib/publishing-error-message";
+import { exceedsBuildFileSizeLimit } from "../../../../lib/build-file-validation";
 import {
   parsePendingResourceDraft,
   PENDING_RESOURCE_DRAFT_KEY,
@@ -69,6 +70,9 @@ export default function NewResourcePage() {
       const file = form.get("file");
       if (!(file instanceof File) || file.size === 0) {
         throw new Error(copy.chooseArchive);
+      }
+      if (exceedsBuildFileSizeLimit(file.size)) {
+        throw new Error(copy.buildFileTooLarge);
       }
 
       let product = createdProduct;
@@ -359,6 +363,7 @@ export default function NewResourcePage() {
             required
             className="w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent"
           />
+          <span className="text-xs text-muted">{copy.buildFileRequirements}</span>
         </label>
 
         <label className={`${labelClass} sm:col-span-2`}>

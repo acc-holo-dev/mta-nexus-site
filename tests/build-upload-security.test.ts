@@ -1,11 +1,25 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { hasExpectedBuildFileFormat } from "../apps/web/src/lib/build-file-validation";
+import {
+  exceedsBuildFileSizeLimit,
+  hasExpectedBuildFileFormat,
+  MAX_BUILD_FILE_SIZE_BYTES,
+} from "../apps/web/src/lib/build-file-validation";
 
 const bytes = (...values: number[]) => new Uint8Array(values);
 
 describe("build file format detection", () => {
+  it("matches the storage limit and rejects oversized uploads", () => {
+    const storage = readFileSync(
+      resolve(process.cwd(), "packages/storage/src/storage-service.ts"),
+      "utf8",
+    );
+    expect(storage).toContain("MAX_FILE_SIZE_BYTES = 64 * 1024 * 1024");
+    expect(exceedsBuildFileSizeLimit(MAX_BUILD_FILE_SIZE_BYTES)).toBe(false);
+    expect(exceedsBuildFileSizeLimit(MAX_BUILD_FILE_SIZE_BYTES + 1)).toBe(true);
+  });
+
   it.each([
     ["zip", bytes(0x50, 0x4b, 0x03, 0x04, 0x00)],
     ["zip", bytes(0x50, 0x4b, 0x05, 0x06)],

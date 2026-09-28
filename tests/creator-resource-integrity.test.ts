@@ -70,4 +70,16 @@ describe("creator resource integrity", () => {
     expect(service).toContain("buildRepository.submitForReview(");
     expect(service).not.toContain('action: "build.submitted_for_review"\n    });');
   });
+
+  it("shows localized build limits and checks file size before creating the resource", () => {
+    const page = read("apps/web/src/app/workspace/resources/new/page.tsx");
+    const createProduct = page.indexOf('fetch("/api/products"');
+    const fileLimit = page.indexOf("exceedsBuildFileSizeLimit(file.size)");
+
+    expect(fileLimit).toBeGreaterThan(-1);
+    expect(fileLimit).toBeLessThan(createProduct);
+    expect(page).toContain("copy.buildFileRequirements");
+    expect(getDictionary("en").publishing.buildFileTooLarge).toContain("64 MB");
+    expect(getDictionary("ru").publishing.buildFileTooLarge).toContain("64 МБ");
+  });
 });
