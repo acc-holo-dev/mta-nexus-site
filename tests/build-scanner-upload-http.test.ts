@@ -48,7 +48,7 @@ vi.mock("@nexus/security", () => ({
 
 import { POST } from "../apps/web/src/app/api/products/[id]/builds/route";
 
-function uploadRequest() {
+function uploadRequest(mtaVersionTarget?: string) {
   const form = new FormData();
   form.set(
     "file",
@@ -59,6 +59,7 @@ function uploadRequest() {
     ),
   );
   form.set("version", "1.0.0");
+  if (mtaVersionTarget) form.set("mtaVersionTarget", mtaVersionTarget);
 
   return new NextRequest(
     "http://nexus.test/api/products/prd_scanner/builds",
@@ -183,6 +184,27 @@ describe("build upload scanner HTTP behavior", () => {
         scanStatus: "clean",
         scanner: "clamav",
         scannedAt,
+      }),
+      expect.objectContaining({ id: "usr_scanner_author" }),
+    );
+  });
+
+  it("stores the exact sortable MTA target on a clean uploaded build", async () => {
+    const sortableTarget = "1.6.0-9.22279.0";
+    scan.mockResolvedValueOnce({
+      status: "clean",
+      scanner: "clamav",
+      scannedAt: new Date(),
+    });
+
+    const response = await POST(uploadRequest(sortableTarget), context);
+
+    expect(response.status).toBe(201);
+    expect(uploadAsset).toHaveBeenCalledTimes(1);
+    expect(releaseBuild).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mtaVersionTarget: sortableTarget,
+        scanStatus: "clean",
       }),
       expect.objectContaining({ id: "usr_scanner_author" }),
     );
