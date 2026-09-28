@@ -8,6 +8,7 @@ import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
 import { consumeRateLimit } from "@nexus/security";
 import { AppError } from "@nexus/domain";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../../../lib/observability";
+import { hasExpectedBuildFileFormat } from "../../../../../lib/build-file-validation";
 
 const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
 const ALLOWED_BUILD_EXTENSIONS = new Set(["zip", "rar", "7z", "lua"]);
@@ -36,16 +37,6 @@ function privateJson(
     ...init,
     headers,
   });
-}
-
-function hasExpectedSignature(extension: string, bytes: Uint8Array): boolean {
-  if (extension === "lua") return true;
-  const signature = Array.from(bytes.slice(0, 6));
-  if (extension === "zip") return signature[0] === 0x50 && signature[1] === 0x4b;
-  if (extension === "rar") {
-    return signature[0] === 0x52 && signature[1] === 0x61 && signature[2] === 0x72 && signature[3] === 0x21;
-  }
-  return signature.join(",") === "55,122,188,175,39,28";
 }
 
 const buildMetadataSchema = z.object({
@@ -134,7 +125,7 @@ export async function POST(
     }
 
     const fileBytes = new Uint8Array(await file.arrayBuffer());
-    if (!hasExpectedSignature(extension, fileBytes)) {
+    if (!hasExpectedBuildFileFormat(extension, fileBytes)) {
       return privateJson(context, 
         { error: "Build content does not match its file extension" },
         { status: 415 }
