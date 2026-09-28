@@ -52,6 +52,8 @@ describe("creator resource integrity", () => {
     expect(page).toContain("setFormEpoch((current) => current + 1)");
     expect(page).toContain("copy.startNewResource");
     expect(page).toContain("key={formEpoch}");
+    expect(page).toContain("if (!draftReady || loading) return;");
+    expect(page).toContain("disabled={loading}");
     expect(page).toContain("encodeURIComponent(product.id)}/builds");
     expect(page).toContain("disabled={Boolean(createdProduct)}");
     expect(page).toContain("copy.retryBuild");

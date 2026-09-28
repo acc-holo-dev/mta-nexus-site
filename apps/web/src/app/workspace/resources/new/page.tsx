@@ -59,7 +59,7 @@ export default function NewResourcePage() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (loading) return;
+    if (!draftReady || loading) return;
 
     setLoading(true);
     setError(null);
@@ -216,6 +216,7 @@ export default function NewResourcePage() {
             variant="outline"
             size="sm"
             onClick={startNewSubmission}
+            disabled={loading}
             className="shrink-0"
           >
             {copy.startNewResource}
