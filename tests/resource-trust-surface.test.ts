@@ -31,7 +31,7 @@ describe("resource trust surface", () => {
     expect(form).toContain(
       'buildForm.set("mtaVersionTarget"',
     );
-    expect(route).toContain("mtaVersionTarget: z");
+    expect(route).toContain("mtaVersionTarget: mtaVersionSchema");
     expect(route).toContain(
       "mtaVersionTarget: parsed.data.mtaVersionTarget",
     );

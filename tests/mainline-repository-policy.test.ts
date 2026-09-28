@@ -23,7 +23,8 @@ describe("mainline repository policy", () => {
 
     const dependabot = read(".github/dependabot.yml");
     expect(dependabot).not.toContain('target-branch: "dev"');
-    expect(dependabot.match(/target-branch: "main"/g)?.length).toBe(3);
+    expect(dependabot).not.toMatch(/^\s+target-branch:/m);
+    expect(dependabot.match(/package-ecosystem:/g)?.length).toBe(3);
   });
 
   it("keeps only the two maintained long-form documents", () => {
