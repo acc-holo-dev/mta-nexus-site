@@ -99,6 +99,33 @@ function oversizedChunkedRequest() {
   );
 }
 
+function validChunkedRequest() {
+  const body = new TextEncoder().encode(
+    '--nexus-boundary\r\nContent-Disposition: form-data; name="version"\r\n\r\n1.2.3\r\n' +
+      '--nexus-boundary\r\nContent-Disposition: form-data; name="file"; filename="resource.zip"\r\n' +
+      'Content-Type: application/zip\r\n\r\nPK\u0003\u0004\u0001\u0002\u0003\u0004\r\n' +
+      '--nexus-boundary--\r\n',
+  );
+  const chunks = [body.slice(0, 23), body.slice(23, 71), body.slice(71)];
+
+  return new NextRequest(
+    "http://nexus.test/api/products/prd_target/builds",
+    {
+      method: "POST",
+      headers: {
+        "content-type": "multipart/form-data; boundary=nexus-boundary",
+      },
+      body: new ReadableStream<Uint8Array>({
+        start(controller) {
+          for (const chunk of chunks) controller.enqueue(chunk);
+          controller.close();
+        },
+      }),
+      duplex: "half",
+    } as unknown as ConstructorParameters<typeof NextRequest>[1],
+  );
+}
+
 const context = {
   params: Promise.resolve({ id: "prd_target" }),
 };
@@ -208,5 +235,42 @@ describe("build upload authorization HTTP preflight", () => {
     expect(scan).not.toHaveBeenCalled();
     expect(uploadAsset).not.toHaveBeenCalled();
     expect(releaseBuild).not.toHaveBeenCalled();
+  });
+
+  it("accepts a valid chunked multipart upload without Content-Length", async () => {
+    preflight.mockResolvedValueOnce({
+      id: "prd_target",
+      price: 0,
+    });
+    scan.mockResolvedValueOnce({
+      status: "clean",
+      scanner: "clamav",
+      scannedAt: new Date("2026-09-28T00:00:00.000Z"),
+    });
+    uploadAsset.mockResolvedValueOnce({
+      key: "assets/usr_attacker/resource.zip",
+      sha256Hash: "a".repeat(64),
+      sizeBytes: 8,
+    });
+    releaseBuild.mockResolvedValueOnce({
+      id: "bld_target",
+      productId: "prd_target",
+      version: "1.2.3",
+      status: "pending_review",
+    });
+    const request = validChunkedRequest();
+
+    expect(request.headers.has("content-length")).toBe(false);
+    const response = await POST(request, context);
+
+    expect(response.status).toBe(201);
+    expect(scan).toHaveBeenCalledWith(
+      expect.objectContaining({ fileName: "resource.zip" }),
+    );
+    expect(uploadAsset).toHaveBeenCalledTimes(1);
+    expect(releaseBuild).toHaveBeenCalledWith(
+      expect.objectContaining({ productId: "prd_target", version: "1.2.3" }),
+      expect.objectContaining({ id: "usr_attacker" }),
+    );
   });
 });
