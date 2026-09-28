@@ -55,6 +55,9 @@ describe("build moderation control surface", () => {
     expect(component).toContain("copy.artifactRequiresCleanScan");
     expect(component).toContain('moderate("approve")');
     expect(component).toContain('moderate("reject")');
+    expect(page).toContain("{build.sha256Hash}");
+    expect(page).toContain("copy.scanProvenance");
+    expect(page).toContain("build.scanner");
     expect(page).toContain("<BuildModerationControls");
     expect(page).toContain("hasScanProvenance={Boolean(");
   });

@@ -312,9 +312,17 @@ export default async function AdminPage({
                     {(build.fileSizeBytes / 1024 / 1024).toFixed(1)} MB
                   </p>
                   <p className="font-caption text-faint">
-                    {copy.scan}: {build.scanStatus.replace(/_/g, " ")} · SHA-256{" "}
-                    {build.sha256Hash.slice(0, 16)}…
+                    {copy.scan}: {build.scanStatus.replace(/_/g, " ")} · SHA-256
                   </p>
+                  <code className="block break-all font-code text-[10px] text-faint">
+                    {build.sha256Hash}
+                  </code>
+                  {build.scanner && build.scannedAt && (
+                    <p className="font-caption text-faint">
+                      {copy.scanProvenance}: {build.scanner} ·{" "}
+                      {new Date(build.scannedAt).toLocaleString(dateLocale)}
+                    </p>
+                  )}
                   {build.releaseNotes && (
                     <p className="font-caption text-faint">
                       {build.releaseNotes}
