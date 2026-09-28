@@ -1,3 +1,5 @@
+import { MTA_VERSION_PATTERN } from "@nexus/validation";
+
 const MAX_META_XML_BYTES = 256 * 1024;
 const MAX_TAG_ENTRIES_PER_KIND = 500;
 const MAX_INSPECTION_ISSUES = 200;
@@ -403,7 +405,56 @@ export function inspectMtaMetaXml(xml: string): MtaMetaInspection {
     "setting",
     issues,
   );
-  const minVersionTag = tagItems(source, "min_mta_version", issues)[0] ?? null;
+  const minVersionTags = tagItems(source, "min_mta_version", issues);
+  const minVersionTag = minVersionTags[0] ?? null;
+  if (minVersionTags.length > 1) {
+    issue(
+      issues,
+      "MTA_VERSION_MULTIPLE",
+      "warning",
+      "Multiple <min_mta_version> tags were found; only the first is summarized.",
+    );
+  }
+  if (minVersionTag) {
+    const scopes = ["both", "server", "client"] as const;
+    const declaredScopes = scopes.filter((scope) => Object.hasOwn(minVersionTag, scope));
+    if (declaredScopes.length === 0) {
+      issue(
+        issues,
+        "MTA_VERSION_MISSING",
+        "warning",
+        "The <min_mta_version> tag does not declare a client, server, or both version.",
+      );
+    }
+    for (const scope of declaredScopes) {
+      const version = minVersionTag[scope];
+      if (!version || !MTA_VERSION_PATTERN.test(version)) {
+        issue(
+          issues,
+          "MTA_VERSION_INVALID",
+          "warning",
+          `The ${scope} minimum MTA version does not use a supported release format.`,
+        );
+      }
+    }
+    const clientVersion = minVersionTag.client;
+    const serverVersion = minVersionTag.server;
+    if (
+      !minVersionTag.both &&
+      clientVersion &&
+      serverVersion &&
+      MTA_VERSION_PATTERN.test(clientVersion) &&
+      MTA_VERSION_PATTERN.test(serverVersion) &&
+      clientVersion !== serverVersion
+    ) {
+      issue(
+        issues,
+        "MTA_VERSION_TARGET_CONFLICT",
+        "warning",
+        "Client and server minimums differ; the single resource compatibility field cannot represent both values.",
+      );
+    }
+  }
   const aclRights = containedTagItems(
     source,
     "aclrequest",

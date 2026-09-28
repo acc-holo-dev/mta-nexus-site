@@ -105,6 +105,12 @@ export function MtaMetaInspectorPanel({
   const versionSuggestion = getMtaVersionTargetSuggestion(
     inspection?.minMtaVersion ?? null,
   );
+  const localizedVersionIssues: Record<string, string> = {
+    MTA_VERSION_MULTIPLE: copy.multipleMinimumVersions,
+    MTA_VERSION_MISSING: copy.minimumVersionMissing,
+    MTA_VERSION_INVALID: copy.minimumVersionInvalid,
+    MTA_VERSION_TARGET_CONFLICT: copy.minimumVersionConflict,
+  };
 
   return (
     <section
@@ -307,7 +313,7 @@ export function MtaMetaInspectorPanel({
                         : "text-xs text-warning"
                     }
                   >
-                    {issue.message}
+                    {localizedVersionIssues[issue.code] ?? issue.message}
                   </li>
                 ))}
               </ul>

@@ -208,4 +208,32 @@ describe("MTA meta.xml inspector", () => {
       }),
     );
   });
+
+  it("warns about malformed, missing, conflicting, and repeated minimum versions", () => {
+    const invalid = inspectMtaMetaXml(
+      '<meta><min_mta_version both="1.6.0-preview" /></meta>',
+    );
+    expect(invalid.issues).toContainEqual(
+      expect.objectContaining({ code: "MTA_VERSION_INVALID", severity: "warning" }),
+    );
+
+    const missing = inspectMtaMetaXml("<meta><min_mta_version /></meta>");
+    expect(missing.issues).toContainEqual(
+      expect.objectContaining({ code: "MTA_VERSION_MISSING", severity: "warning" }),
+    );
+
+    const conflict = inspectMtaMetaXml(
+      '<meta><min_mta_version client="1.5.9" server="1.6.0" /></meta>',
+    );
+    expect(conflict.issues).toContainEqual(
+      expect.objectContaining({ code: "MTA_VERSION_TARGET_CONFLICT", severity: "warning" }),
+    );
+
+    const repeated = inspectMtaMetaXml(
+      '<meta><min_mta_version both="1.6.0" /><min_mta_version both="1.6.0" /></meta>',
+    );
+    expect(repeated.issues).toContainEqual(
+      expect.objectContaining({ code: "MTA_VERSION_MULTIPLE", severity: "warning" }),
+    );
+  });
 });
