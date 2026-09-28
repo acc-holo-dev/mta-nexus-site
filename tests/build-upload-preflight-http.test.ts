@@ -34,7 +34,7 @@ vi.mock("../apps/web/src/lib/services/build-scanner-service", () => ({
 }));
 
 vi.mock("@nexus/storage", () => ({
-  MAX_FILE_SIZE_BYTES: 64 * 1024 * 1024,
+  MAX_FILE_SIZE_BYTES: 1024,
   storageService: {
     uploadAsset,
     deleteAsset,
@@ -73,6 +73,29 @@ function oversizedDeclaredRequest() {
       },
       body: "small test body",
     },
+  );
+}
+
+function oversizedChunkedRequest() {
+  const body = new ReadableStream<Uint8Array>({
+    start(controller) {
+      for (let index = 0; index < 5; index += 1) {
+        controller.enqueue(new Uint8Array(256 * 1024));
+      }
+      controller.close();
+    },
+  });
+
+  return new NextRequest(
+    "http://nexus.test/api/products/prd_target/builds",
+    {
+      method: "POST",
+      headers: {
+        "content-type": "multipart/form-data; boundary=nexus-boundary",
+      },
+      body,
+      duplex: "half",
+    } as unknown as ConstructorParameters<typeof NextRequest>[1],
   );
 }
 
@@ -158,6 +181,25 @@ describe("build upload authorization HTTP preflight", () => {
     });
 
     const response = await POST(oversizedDeclaredRequest(), context);
+
+    expect(response.status).toBe(413);
+    expect(await response.json()).toMatchObject({
+      code: "BUILD_UPLOAD_TOO_LARGE",
+    });
+    expect(scan).not.toHaveBeenCalled();
+    expect(uploadAsset).not.toHaveBeenCalled();
+    expect(releaseBuild).not.toHaveBeenCalled();
+  });
+
+  it("rejects an oversized chunked body without Content-Length before scanner or storage", async () => {
+    preflight.mockResolvedValueOnce({
+      id: "prd_target",
+      price: 0,
+    });
+    const request = oversizedChunkedRequest();
+
+    expect(request.headers.has("content-length")).toBe(false);
+    const response = await POST(request, context);
 
     expect(response.status).toBe(413);
     expect(await response.json()).toMatchObject({
