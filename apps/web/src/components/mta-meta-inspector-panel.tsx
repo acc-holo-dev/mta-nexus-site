@@ -4,6 +4,7 @@ import { FileSearch, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { useNexusLocale } from "./locale-context";
 import { getMtaVersionTargetSuggestion } from "../lib/mta-version-target";
+import { getMtaMetaInspectorIssueMessage } from "../lib/mta-meta-inspector-messages";
 
 type InspectionResponse = {
   inspection?: {
@@ -105,12 +106,6 @@ export function MtaMetaInspectorPanel({
   const versionSuggestion = getMtaVersionTargetSuggestion(
     inspection?.minMtaVersion ?? null,
   );
-  const localizedVersionIssues: Record<string, string> = {
-    MTA_VERSION_MULTIPLE: copy.multipleMinimumVersions,
-    MTA_VERSION_MISSING: copy.minimumVersionMissing,
-    MTA_VERSION_INVALID: copy.minimumVersionInvalid,
-    MTA_VERSION_TARGET_CONFLICT: copy.minimumVersionConflict,
-  };
 
   return (
     <section
@@ -313,7 +308,10 @@ export function MtaMetaInspectorPanel({
                         : "text-xs text-warning"
                     }
                   >
-                    {localizedVersionIssues[issue.code] ?? issue.message}
+                    {getMtaMetaInspectorIssueMessage(
+                      issue,
+                      copy.structuralIssues,
+                    )}
                   </li>
                 ))}
               </ul>
