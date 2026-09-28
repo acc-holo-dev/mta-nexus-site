@@ -75,9 +75,14 @@ describe("creator resource integrity", () => {
     const page = read("apps/web/src/app/workspace/resources/new/page.tsx");
     const createProduct = page.indexOf('fetch("/api/products"');
     const fileLimit = page.indexOf("exceedsBuildFileSizeLimit(file.size)");
+    const fileType = page.indexOf("getSupportedBuildExtension(file.name)");
 
     expect(fileLimit).toBeGreaterThan(-1);
     expect(fileLimit).toBeLessThan(createProduct);
+    expect(fileType).toBeGreaterThan(-1);
+    expect(fileType).toBeLessThan(createProduct);
+    expect(page).toContain('pattern="v?[0-9]+\\.[0-9]+(\\.[0-9]+)?(-[a-zA-Z0-9.]+)?"');
+    expect(page).toContain('pattern="1\\.[0-9]+(\\.[0-9]+)?"');
     expect(page).toContain("copy.buildFileRequirements");
     expect(getDictionary("en").publishing.buildFileTooLarge).toContain(
       "{maxFileSize} MB",

@@ -8,6 +8,7 @@ import { useNexusLocale } from "../../../../components/locale-context";
 import { getResourceSubmissionErrorMessage } from "../../../../lib/publishing-error-message";
 import {
   exceedsBuildFileSizeLimit,
+  getSupportedBuildExtension,
   MAX_BUILD_FILE_SIZE_BYTES,
 } from "../../../../lib/build-file-validation";
 import {
@@ -111,6 +112,9 @@ export default function NewResourcePage() {
       }
       if (exceedsBuildFileSizeLimit(file.size)) {
         throw new Error(buildFileTooLarge);
+      }
+      if (!getSupportedBuildExtension(file.name)) {
+        throw new Error(copy.buildFileTypeNotAllowed);
       }
 
       let product = createdProduct;
@@ -374,6 +378,7 @@ export default function NewResourcePage() {
             defaultValue="1.0.0"
             required
             maxLength={64}
+            pattern="v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?"
             className={fieldClass}
           />
         </label>
@@ -384,6 +389,7 @@ export default function NewResourcePage() {
             name="mtaMinVersion"
             value={mtaVersionTarget}
             onChange={(event) => setMtaVersionTarget(event.target.value)}
+            pattern="1\.[0-9]+(\.[0-9]+)?"
             maxLength={64}
             className={fieldClass}
             disabled={Boolean(createdProduct)}

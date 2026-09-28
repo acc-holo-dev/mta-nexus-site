@@ -8,14 +8,16 @@ import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
 import { consumeRateLimit } from "@nexus/security";
 import { AppError, MAX_BUILD_MULTIPART_OVERHEAD_BYTES } from "@nexus/domain";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../../../lib/observability";
-import { hasExpectedBuildFileFormat } from "../../../../../lib/build-file-validation";
+import {
+  getSupportedBuildExtension,
+  hasExpectedBuildFileFormat,
+} from "../../../../../lib/build-file-validation";
 import { mtaVersionSchema } from "@nexus/validation";
 import {
   MultipartBodyTooLargeError,
   parseMultipartFormDataWithLimit,
 } from "../../../../../lib/bounded-multipart";
 
-const ALLOWED_BUILD_EXTENSIONS = new Set(["zip", "rar", "7z", "lua"]);
 const BUILD_FILE_SIZE_LIMIT_MB = MAX_FILE_SIZE_BYTES / (1024 * 1024);
 const BUILD_MIME_TYPES: Record<string, string> = {
   zip: "application/zip",
@@ -148,8 +150,8 @@ export async function POST(
         { status: 400 }
       );
     }
-    const extension = file.name.split(".").pop()?.toLowerCase();
-    if (!extension || !ALLOWED_BUILD_EXTENSIONS.has(extension)) {
+    const extension = getSupportedBuildExtension(file.name);
+    if (!extension) {
       return privateJson(context, 
         {
           error: "Only .zip, .rar, .7z, and .lua resource builds are allowed",

@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   exceedsBuildFileSizeLimit,
+  getSupportedBuildExtension,
   hasExpectedBuildFileFormat,
   MAX_BUILD_FILE_SIZE_BYTES,
 } from "../apps/web/src/lib/build-file-validation";
@@ -14,6 +15,20 @@ import {
 const bytes = (...values: number[]) => new Uint8Array(values);
 
 describe("build file format detection", () => {
+  it.each([
+    ["resource.zip", "zip"],
+    ["resource.RAR", "rar"],
+    ["resource.7z", "7z"],
+    ["resource.lua", "lua"],
+  ])("recognizes supported build extension %s", (fileName, expected) => {
+    expect(getSupportedBuildExtension(fileName)).toBe(expected);
+  });
+
+  it.each(["resource.tar.gz", "resource.zip.exe", "resource.exe"])(
+    "rejects unsupported build extension %s",
+    (fileName) => expect(getSupportedBuildExtension(fileName)).toBeNull(),
+  );
+
   it("matches the storage limit and rejects oversized uploads", () => {
     const storage = readFileSync(
       resolve(process.cwd(), "packages/storage/src/storage-service.ts"),
