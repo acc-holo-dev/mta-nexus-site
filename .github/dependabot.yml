@@ -3,12 +3,11 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
-    target-branch: "main"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "06:00"
-      timezone: "Etc/UTC"
+      timezone: "Europe/Moscow"
     open-pull-requests-limit: 5
     groups:
       production-minor-patch:
@@ -30,20 +29,18 @@ updates:
 
   - package-ecosystem: "github-actions"
     directory: "/"
-    target-branch: "main"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "06:30"
-      timezone: "Etc/UTC"
+      timezone: "Europe/Moscow"
     open-pull-requests-limit: 3
 
   - package-ecosystem: "docker"
     directory: "/"
-    target-branch: "main"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "07:00"
-      timezone: "Etc/UTC"
+      timezone: "Europe/Moscow"
     open-pull-requests-limit: 3
