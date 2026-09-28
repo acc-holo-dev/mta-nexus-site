@@ -1,11 +1,15 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@nexus/ui";
 import { MtaMetaInspectorPanel } from "../../../../components/mta-meta-inspector-panel";
 import { useNexusLocale } from "../../../../components/locale-context";
 import { getBuildScanErrorMessage } from "../../../../lib/publishing-error-message";
+import {
+  parsePendingResourceDraft,
+  PENDING_RESOURCE_DRAFT_KEY,
+} from "../../../../lib/pending-resource-draft";
 
 const fieldClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
@@ -22,7 +26,24 @@ export default function NewResourcePage() {
     slug: string;
     mtaVersionTarget: string;
   } | null>(null);
+  const [draftReady, setDraftReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(PENDING_RESOURCE_DRAFT_KEY);
+      const pendingDraft = parsePendingResourceDraft(stored);
+      if (pendingDraft) {
+        setCreatedProduct(pendingDraft);
+      } else if (stored) {
+        sessionStorage.removeItem(PENDING_RESOURCE_DRAFT_KEY);
+      }
+    } catch {
+      // Storage can be unavailable in restricted browser contexts.
+    } finally {
+      setDraftReady(true);
+    }
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -83,6 +104,14 @@ export default function NewResourcePage() {
           mtaVersionTarget,
         };
         setCreatedProduct(product);
+        try {
+          sessionStorage.setItem(
+            PENDING_RESOURCE_DRAFT_KEY,
+            JSON.stringify(product),
+          );
+        } catch {
+          // Keep the in-memory retry path if session storage is unavailable.
+        }
       }
 
       const buildForm = new FormData();
@@ -114,6 +143,12 @@ export default function NewResourcePage() {
         throw new Error(scannerMessage || buildData?.error || copy.buildError);
       }
 
+      try {
+        sessionStorage.removeItem(PENDING_RESOURCE_DRAFT_KEY);
+      } catch {
+        // A completed submission must still show success if storage is blocked.
+      }
+      setCreatedProduct(null);
       setResultSlug(product.slug);
     } catch (caught) {
       setError(
@@ -164,7 +199,7 @@ export default function NewResourcePage() {
           role="status"
           className="rounded-lg border border-base bg-inset p-4 text-sm text-secondary"
         >
-          {copy.buildRetryReady}
+          {copy.buildRetryReady} {copy.pendingDraftLabel} {createdProduct.slug}
         </p>
       )}
 
@@ -317,9 +352,12 @@ export default function NewResourcePage() {
         <Button
           type="submit"
           isLoading={loading}
+          disabled={!draftReady}
           className="sm:col-span-2"
         >
-          {loading
+          {!draftReady
+            ? copy.checkingDraft
+            : loading
             ? copy.submitting
             : createdProduct
               ? copy.retryBuild

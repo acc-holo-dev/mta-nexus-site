@@ -590,6 +590,8 @@ const en = {
     buildError: "Resource was created, but the build could not be submitted",
     buildRetryReady:
       "The resource draft is saved. Replace the archive or wait for the scanner, then retry; this will not create another resource.",
+    pendingDraftLabel: "Draft slug:",
+    checkingDraft: "Checking for a saved draft...",
     retryBuild: "Retry build submission",
     scannerMalwareDetected: "The scanner detected malware. This build was not stored.",
     scannerLimitExceeded:
@@ -1665,6 +1667,8 @@ const ru: typeof en = {
     buildError: "Ресурс создан, но сборку не удалось отправить",
     buildRetryReady:
       "Черновик ресурса сохранён. Замените архив или дождитесь восстановления сканера и отправьте сборку повторно — новый ресурс создан не будет.",
+    pendingDraftLabel: "Slug черновика:",
+    checkingDraft: "Проверяю сохранённый черновик...",
     retryBuild: "Повторить отправку сборки",
     scannerMalwareDetected: "Сканер обнаружил вредоносный код. Сборка не сохранена.",
     scannerLimitExceeded:

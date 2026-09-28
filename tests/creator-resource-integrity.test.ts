@@ -45,6 +45,9 @@ describe("creator resource integrity", () => {
     expect(page).toContain("let product = createdProduct");
     expect(page).toContain("if (!product)");
     expect(page).toContain("setCreatedProduct(product)");
+    expect(page).toContain("sessionStorage.setItem(");
+    expect(page).toContain("sessionStorage.removeItem(PENDING_RESOURCE_DRAFT_KEY)");
+    expect(page).toContain("parsePendingResourceDraft(stored)");
     expect(page).toContain("encodeURIComponent(product.id)}/builds");
     expect(page).toContain("disabled={Boolean(createdProduct)}");
     expect(page).toContain("copy.retryBuild");
