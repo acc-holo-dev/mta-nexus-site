@@ -63,6 +63,7 @@ export default function NewResourcePage() {
     mtaVersionTarget: string;
   } | null>(null);
   const [formEpoch, setFormEpoch] = useState(0);
+  const [mtaVersionTarget, setMtaVersionTarget] = useState("1.6.0");
   const [draftReady, setDraftReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -73,6 +74,7 @@ export default function NewResourcePage() {
       // The in-memory state still resets if storage is unavailable.
     }
     setCreatedProduct(null);
+    setMtaVersionTarget("1.6.0");
     setError(null);
     setFormEpoch((current) => current + 1);
   }
@@ -83,6 +85,7 @@ export default function NewResourcePage() {
       const pendingDraft = parsePendingResourceDraft(stored);
       if (pendingDraft) {
         setCreatedProduct(pendingDraft);
+        setMtaVersionTarget(pendingDraft.mtaVersionTarget);
       } else if (stored) {
         sessionStorage.removeItem(PENDING_RESOURCE_DRAFT_KEY);
       }
@@ -277,7 +280,10 @@ export default function NewResourcePage() {
         </div>
       )}
 
-      <MtaMetaInspectorPanel />
+      <MtaMetaInspectorPanel
+        onApplyMinimumVersion={setMtaVersionTarget}
+        minimumVersionLocked={Boolean(createdProduct)}
+      />
 
       <form
         key={formEpoch}
@@ -376,7 +382,8 @@ export default function NewResourcePage() {
           <span className={labelTextClass}>{copy.minMtaVersion}</span>
           <input
             name="mtaMinVersion"
-            defaultValue="1.6.0"
+            value={mtaVersionTarget}
+            onChange={(event) => setMtaVersionTarget(event.target.value)}
             maxLength={64}
             className={fieldClass}
             disabled={Boolean(createdProduct)}

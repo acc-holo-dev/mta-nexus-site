@@ -14,8 +14,8 @@ describe("author-facing MTA meta inspector", () => {
       "apps/web/src/components/mta-meta-inspector-panel.tsx",
     );
 
-    expect(page).toContain("<MtaMetaInspectorPanel />");
-    expect(page.indexOf("<MtaMetaInspectorPanel />")).toBeLessThan(
+    expect(page).toContain("<MtaMetaInspectorPanel");
+    expect(page.indexOf("<MtaMetaInspectorPanel")).toBeLessThan(
       page.indexOf("<form"),
     );
     expect(panel).toContain('type="button"');
@@ -33,8 +33,19 @@ describe("author-facing MTA meta inspector", () => {
     expect(panel).toContain("copy.description");
     expect(panel).toContain("copy.structuralNotes");
     expect(panel).toContain("copy.note");
+    expect(panel).toContain("getMtaVersionTargetSuggestion");
+    expect(panel).toContain("copy.applyMinimumVersion");
     expect(panel).not.toContain("Resource is safe");
     expect(panel).not.toContain("Verified resource");
+  });
+
+  it("connects the inspector suggestion to the controlled MTA target field", () => {
+    const page = read("apps/web/src/app/workspace/resources/new/page.tsx");
+    const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
+
+    expect(page).toContain("onApplyMinimumVersion={setMtaVersionTarget}");
+    expect(page).toContain("value={mtaVersionTarget}");
+    expect(panel).toContain("onApplyMinimumVersion(versionSuggestion)");
   });
 
   it("keeps client size and authenticated uncached request guards", () => {

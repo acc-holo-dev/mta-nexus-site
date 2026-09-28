@@ -3,6 +3,7 @@
 import { FileSearch, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { useNexusLocale } from "./locale-context";
+import { getMtaVersionTargetSuggestion } from "../lib/mta-version-target";
 
 type InspectionResponse = {
   inspection?: {
@@ -41,7 +42,13 @@ type InspectionResponse = {
 
 const MAX_META_BYTES = 256 * 1024;
 
-export function MtaMetaInspectorPanel() {
+export function MtaMetaInspectorPanel({
+  onApplyMinimumVersion,
+  minimumVersionLocked = false,
+}: {
+  onApplyMinimumVersion: (version: string) => void;
+  minimumVersionLocked?: boolean;
+}) {
   const { dictionary } = useNexusLocale();
   const copy = dictionary.metaInspector;
   const [file, setFile] = useState<File | null>(null);
@@ -95,6 +102,9 @@ export function MtaMetaInspectorPanel() {
   }
 
   const inspection = result?.inspection;
+  const versionSuggestion = getMtaVersionTargetSuggestion(
+    inspection?.minMtaVersion ?? null,
+  );
 
   return (
     <section
@@ -242,6 +252,22 @@ export function MtaMetaInspectorPanel() {
                         .filter(Boolean)
                         .join(" · ") ||
                       copy.notDeclared}
+                  </dd>
+                </>
+              )}
+              {versionSuggestion && (
+                <>
+                  <dt className="text-faint">{copy.formTarget}</dt>
+                  <dd className="flex flex-wrap items-center gap-2 text-secondary">
+                    <code>{versionSuggestion}</code>
+                    <button
+                      type="button"
+                      disabled={minimumVersionLocked}
+                      onClick={() => onApplyMinimumVersion(versionSuggestion)}
+                      className="min-h-8 rounded-md border border-base px-2.5 py-1 text-[11px] font-semibold text-accent transition-colors hover:bg-accent-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {copy.applyMinimumVersion}
+                    </button>
                   </dd>
                 </>
               )}

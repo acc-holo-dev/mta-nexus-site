@@ -9,6 +9,7 @@ import { consumeRateLimit } from "@nexus/security";
 import { AppError, MAX_BUILD_MULTIPART_OVERHEAD_BYTES } from "@nexus/domain";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../../../lib/observability";
 import { hasExpectedBuildFileFormat } from "../../../../../lib/build-file-validation";
+import { mtaVersionSchema } from "@nexus/validation";
 import {
   MultipartBodyTooLargeError,
   parseMultipartFormDataWithLimit,
@@ -48,11 +49,7 @@ const buildMetadataSchema = z.object({
     .string()
     .regex(/^v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?$/, "Semantic version expected"),
   releaseNotes: z.string().max(5000).optional(),
-  mtaVersionTarget: z
-    .string()
-    .regex(/^1\.\d+(\.\d+)?$/, "Use an MTA version such as 1.6 or 1.6.0")
-    .optional()
-    .or(z.literal("")),
+  mtaVersionTarget: mtaVersionSchema.optional().or(z.literal("")),
 });
 
 export async function POST(

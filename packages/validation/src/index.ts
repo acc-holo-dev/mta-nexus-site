@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+// MTA's sortable release form, for example 1.6.0-9.22279.0.
+export const MTA_VERSION_PATTERN = /^1\.\d+(?:\.\d+)?(?:-\d+(?:\.\d+){1,2})?$/;
+export const mtaVersionSchema = z
+  .string()
+  .max(64)
+  .regex(MTA_VERSION_PATTERN, "Use an MTA version such as 1.6.0 or 1.6.0-9.22279.0");
+
 // --- Auth & User Schemas ---
 export const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -135,10 +142,7 @@ export const createProductSchema = z.object({
   organizationId: z.string().optional(),
   compatibility: z
     .object({
-      mtaMinVersion: z
-        .string()
-        .regex(/^1\.\d+(\.\d+)?$/, "Use an MTA version such as 1.6 or 1.6.0")
-        .optional(),
+      mtaMinVersion: mtaVersionSchema.optional(),
       dependencies: z
         .array(z.string().min(3).max(120).regex(/^[a-z0-9][a-z0-9._-]*$/, "Use a resource slug"))
         .max(25)
@@ -170,7 +174,7 @@ export const createBuildSchema = z.object({
   storageKey: z.string().min(1),
   sha256Hash: z.string().length(64, "SHA-256 hash must be 64 characters"),
   fileSizeBytes: z.number().int().positive(),
-  mtaVersionTarget: z.string().optional(),
+  mtaVersionTarget: mtaVersionSchema.optional(),
 });
 
 // --- Resource acquisition ---

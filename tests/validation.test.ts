@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   createServerSchema,
   createProductSchema,
+  createBuildSchema,
   checkoutSchema,
   changePasswordSchema,
   notificationPreferencesSchema,
@@ -53,12 +54,53 @@ describe("Validation Schemas", () => {
 
     expect(createProductSchema.safeParse({
       ...base,
+      compatibility: { mtaMinVersion: "1.6.0-9.22279.0", dependencies: [] },
+    }).success).toBe(true);
+
+    expect(createProductSchema.safeParse({
+      ...base,
       compatibility: { mtaMinVersion: "latest", dependencies: ["core-ui"] },
     }).success).toBe(false);
 
     expect(createProductSchema.safeParse({
       ...base,
+      compatibility: { mtaMinVersion: "1.6.0-preview", dependencies: [] },
+    }).success).toBe(false);
+
+    expect(createProductSchema.safeParse({
+      ...base,
       compatibility: { dependencies: ["core-ui", "core-ui"] },
+    }).success).toBe(false);
+  });
+
+  it("accepts sortable MTA release targets for resource and build metadata", () => {
+    const target = "1.6.0-9.22279.0";
+    expect(createProductSchema.safeParse({
+      title: "Sortable MTA Resource",
+      slug: "sortable-mta-resource",
+      description: "A resource using an exact MTA sortable release target",
+      type: "script",
+      price: 0,
+      licenseModel: "unlimited",
+      compatibility: { mtaMinVersion: target },
+    }).success).toBe(true);
+
+    expect(createBuildSchema.safeParse({
+      productId: "prd_sortable",
+      version: "1.0.0",
+      storageKey: "builds/sortable.zip",
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 1,
+      mtaVersionTarget: target,
+    }).success).toBe(true);
+
+    expect(createBuildSchema.safeParse({
+      productId: "prd_sortable",
+      version: "1.0.0",
+      storageKey: "builds/sortable.zip",
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 1,
+      mtaVersionTarget: "1.6.0-preview",
     }).success).toBe(false);
   });
 
