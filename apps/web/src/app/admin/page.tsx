@@ -311,6 +311,20 @@ export default async function AdminPage({
                     {copy.resource} {build.productId} •{" "}
                     {(build.fileSizeBytes / 1024 / 1024).toFixed(1)} MB
                   </p>
+                  <p className="font-caption text-secondary">
+                    {build.productStatus === "published" ? (
+                      <Link className="text-accent underline" href={`/market/${encodeURIComponent(build.productSlug)}`}>
+                        {build.productTitle}
+                      </Link>
+                    ) : (
+                      <>{build.productTitle} · {copy.resourceNotPublished}</>
+                    )}
+                  </p>
+                  <p className="font-caption text-muted">
+                    {copy.resourcePublisher}: <Link className="text-accent underline" href={`/users/${encodeURIComponent(build.publisherUsername)}`}>
+                      @{build.publisherUsername}
+                    </Link>
+                  </p>
                   <p className="font-caption text-faint">
                     {copy.scan}: {build.scanStatus.replace(/_/g, " ")} · SHA-256
                   </p>

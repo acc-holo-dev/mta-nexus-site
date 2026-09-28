@@ -1,8 +1,16 @@
 import { and, asc, count, eq, desc, ne, sql } from "drizzle-orm";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { db } from "../client";
-import { auditEvents, builds, products } from "../schema";
+import { auditEvents, builds, products, users } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
+
+export type PendingReviewBuild = Build & {
+  productTitle: string;
+  productSlug: string;
+  productStatus: string;
+  publisherId: string;
+  publisherUsername: string;
+};
 
 export class BuildRepository {
   async countPendingReview(): Promise<number> {
@@ -11,16 +19,35 @@ export class BuildRepository {
     return row?.total ?? 0;
   }
 
-  async listPendingReviewPage(page: number, pageSize = 30): Promise<{ builds: Build[]; hasMore: boolean }> {
+  async listPendingReviewPage(page: number, pageSize = 30): Promise<{ builds: PendingReviewBuild[]; hasMore: boolean }> {
     if (!Number.isSafeInteger(page) || page < 1 || page > 99_999 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
       throw new RangeError("Invalid build review page");
     }
-    const rows = await db.select().from(builds)
+    const rows = await db.select({
+      build: builds,
+      productTitle: products.title,
+      productSlug: products.slug,
+      productStatus: products.status,
+      publisherId: users.id,
+      publisherUsername: users.username,
+    }).from(builds)
+      .innerJoin(products, eq(builds.productId, products.id))
+      .innerJoin(users, eq(products.authorId, users.id))
       .where(eq(builds.status, "pending_review"))
       .orderBy(asc(builds.createdAt), asc(builds.id))
       .limit(pageSize + 1)
       .offset((page - 1) * pageSize);
-    return { builds: rows.slice(0, pageSize) as unknown as Build[], hasMore: rows.length > pageSize };
+    return {
+      builds: rows.slice(0, pageSize).map((row) => ({
+        ...(row.build as unknown as Build),
+        productTitle: row.productTitle,
+        productSlug: row.productSlug,
+        productStatus: row.productStatus,
+        publisherId: row.publisherId,
+        publisherUsername: row.publisherUsername,
+      })),
+      hasMore: rows.length > pageSize,
+    };
   }
 
   async listByProduct(productId: string): Promise<Build[]> {

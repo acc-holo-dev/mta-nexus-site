@@ -52,7 +52,11 @@ The **Verification queue** on `/admin` follows the same 30 item paging model, ol
 
 Resource builds awaiting review and community drafts on `/admin` also show the oldest work first in 30 item pages. Their totals come from dedicated count queries, so the moderator can tell when additional pages exist. Navigating one queue preserves the selected pages and views of the other queues. A draft card exposes its full text in an expandable section before a moderator publishes it. `pnpm test:moderation-queues` checks these read paths and the existing moderation controls. A draft is visible to moderators as soon as it is created; do not use the draft state to store private, unfinished work.
 
+Build cards include the product title and publisher account from the same joined query as the review queue. Published products link to their public resource page; pending products remain labeled as unpublished. The reviewer can compare the full stored SHA-256 with the downloaded artifact response.
+
 Сборки на проверке и черновики сообщества в `/admin` тоже идут от старых к новым, по 30 на страницу. Счётчики показывают общее количество, переход между страницами сохраняет положение в остальных очередях. Перед публикацией модератор может раскрыть полный текст черновика. Проверка: `pnpm test:moderation-queues`. Черновик сразу доступен модераторам; это состояние не подходит для личных незаконченных материалов.
+
+Карточка сборки показывает название ресурса и аккаунт издателя из того же запроса очереди. Опубликованный ресурс открывается по ссылке; неопубликованный явно помечается. Полный SHA-256 можно сверить с заголовком скачанного файла.
 
 When a functioning execution environment is available, the expected project verification path is:
 
