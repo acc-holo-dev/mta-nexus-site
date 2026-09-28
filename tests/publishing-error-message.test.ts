@@ -41,6 +41,38 @@ describe("localized resource scan failures", () => {
     ).toBeUndefined();
   });
 
+  it.each([
+    ["BUILD_VERSION_EXISTS", "versionAlreadyExists"],
+    ["UNAUTHORIZED", "authenticationRequired"],
+    ["RATE_LIMIT_EXCEEDED", "uploadRateLimited"],
+    ["NOT_FOUND", "resourceNotFound"],
+    ["FORBIDDEN", "buildForbidden"],
+    ["PAID_RESOURCES_DISABLED", "paidPublishingUnavailable"],
+    ["BUILD_MULTIPART_REQUIRED", "multipartRequired"],
+    ["BUILD_MULTIPART_INVALID", "multipartInvalid"],
+    ["BUILD_METADATA_INVALID", "metadataInvalid"],
+    ["BUILD_FILE_TYPE_NOT_ALLOWED", "buildFileTypeNotAllowed"],
+    ["BUILD_CONTENT_MISMATCH", "buildContentMismatch"],
+    ["BUILD_FILE_NAME_INVALID", "buildFileNameInvalid"],
+  ] as const)("localizes %s for both interface languages", (code, key) => {
+    const english = getDictionary("en").publishing;
+    const russian = getDictionary("ru").publishing;
+    const messages = (copy: typeof english) => ({
+      fileTooLarge: copy.buildFileTooLarge,
+      malwareDetected: copy.scannerMalwareDetected,
+      scanLimitExceeded: copy.scannerLimitExceeded,
+      scannerUnavailable: copy.scannerUnavailable,
+      [key]: copy[key],
+    });
+
+    expect(getBuildSubmissionErrorMessage(code, messages(english))).toBe(
+      english[key],
+    );
+    expect(getBuildSubmissionErrorMessage(code, messages(russian))).toBe(
+      russian[key],
+    );
+  });
+
   it("describes resumable and reset actions in both languages", () => {
     expect(getDictionary("en").publishing.startNewResource).toBe(
       "Start a new resource",

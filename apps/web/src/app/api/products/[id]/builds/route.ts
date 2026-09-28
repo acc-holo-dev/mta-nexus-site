@@ -64,12 +64,20 @@ export async function POST(
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
-      return privateJson(context, { error: "Authentication required" }, { status: 401 });
+      return privateJson(
+        context,
+        { error: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
     }
 
     const rateLimit = await consumeRateLimit("buildUpload", user.id);
     if (!rateLimit.success) {
-      return privateJson(context, { error: "Build upload limit exceeded" }, { status: 429 });
+      return privateJson(
+        context,
+        { error: "Build upload limit exceeded", code: "RATE_LIMIT_EXCEEDED" },
+        { status: 429 },
+      );
     }
 
     const { id: productId } = await params;
@@ -94,7 +102,10 @@ export async function POST(
     if (!contentType.startsWith("multipart/form-data")) {
       return privateJson(
         context,
-        { error: "Build upload requires multipart/form-data" },
+        {
+          error: "Build upload requires multipart/form-data",
+          code: "BUILD_MULTIPART_REQUIRED",
+        },
         { status: 415 },
       );
     }
@@ -118,7 +129,10 @@ export async function POST(
       }
       return privateJson(
         context,
-        { error: "Invalid multipart build upload" },
+        {
+          error: "Invalid multipart build upload",
+          code: "BUILD_MULTIPART_INVALID",
+        },
         { status: 400 },
       );
     }
@@ -130,14 +144,20 @@ export async function POST(
     });
     if (!parsed.success || !(file instanceof File) || file.size === 0) {
       return privateJson(context, 
-        { error: "A valid build archive and semantic version are required" },
+        {
+          error: "A valid build archive and semantic version are required",
+          code: "BUILD_METADATA_INVALID",
+        },
         { status: 400 }
       );
     }
     const extension = file.name.split(".").pop()?.toLowerCase();
     if (!extension || !ALLOWED_BUILD_EXTENSIONS.has(extension)) {
       return privateJson(context, 
-        { error: "Only .zip, .rar, .7z, and .lua resource builds are allowed" },
+        {
+          error: "Only .zip, .rar, .7z, and .lua resource builds are allowed",
+          code: "BUILD_FILE_TYPE_NOT_ALLOWED",
+        },
         { status: 415 }
       );
     }
@@ -153,13 +173,20 @@ export async function POST(
 
     const safeFileName = path.basename(file.name).replace(/[^a-zA-Z0-9._-]/g, "_");
     if (!safeFileName) {
-      return privateJson(context, { error: "A valid build file name is required" }, { status: 400 });
+      return privateJson(
+        context,
+        { error: "A valid build file name is required", code: "BUILD_FILE_NAME_INVALID" },
+        { status: 400 },
+      );
     }
 
     const fileBytes = new Uint8Array(await file.arrayBuffer());
     if (!hasExpectedBuildFileFormat(extension, fileBytes)) {
       return privateJson(context, 
-        { error: "Build content does not match its file extension" },
+        {
+          error: "Build content does not match its file extension",
+          code: "BUILD_CONTENT_MISMATCH",
+        },
         { status: 415 }
       );
     }

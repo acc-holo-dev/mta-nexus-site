@@ -191,13 +191,41 @@ describe("build upload authorization HTTP preflight", () => {
     const response = await POST(invalidBodyRequest(), context);
 
     expect(response.status).toBe(415);
-    expect(await response.json()).toEqual({
+    expect(await response.json()).toMatchObject({
       error: "Build upload requires multipart/form-data",
+      code: "BUILD_MULTIPART_REQUIRED",
     });
     expect(preflight).toHaveBeenCalledTimes(1);
     expect(scan).not.toHaveBeenCalled();
     expect(uploadAsset).not.toHaveBeenCalled();
     expect(deleteAsset).not.toHaveBeenCalled();
+    expect(releaseBuild).not.toHaveBeenCalled();
+  });
+
+  it("returns a stable error code for malformed multipart input", async () => {
+    preflight.mockResolvedValueOnce({
+      id: "prd_target",
+      price: 0,
+    });
+    const request = new NextRequest(
+      "http://nexus.test/api/products/prd_target/builds",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "multipart/form-data; boundary=nexus-boundary",
+        },
+        body: "not a multipart body",
+      },
+    );
+
+    const response = await POST(request, context);
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({
+      code: "BUILD_MULTIPART_INVALID",
+    });
+    expect(scan).not.toHaveBeenCalled();
+    expect(uploadAsset).not.toHaveBeenCalled();
     expect(releaseBuild).not.toHaveBeenCalled();
   });
 

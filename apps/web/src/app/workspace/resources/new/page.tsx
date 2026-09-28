@@ -170,6 +170,18 @@ export default function NewResourcePage() {
           malwareDetected: copy.scannerMalwareDetected,
           scanLimitExceeded: copy.scannerLimitExceeded,
           scannerUnavailable: copy.scannerUnavailable,
+          authenticationRequired: copy.authenticationRequired,
+          uploadRateLimited: copy.uploadRateLimited,
+          resourceNotFound: copy.resourceNotFound,
+          buildForbidden: copy.buildForbidden,
+          paidPublishingUnavailable: copy.paidPublishingUnavailable,
+          versionAlreadyExists: copy.versionAlreadyExists,
+          multipartRequired: copy.multipartRequired,
+          multipartInvalid: copy.multipartInvalid,
+          metadataInvalid: copy.metadataInvalid,
+          buildFileTypeNotAllowed: copy.buildFileTypeNotAllowed,
+          buildContentMismatch: copy.buildContentMismatch,
+          buildFileNameInvalid: copy.buildFileNameInvalid,
         });
         throw new Error(publishingMessage || buildData?.error || copy.buildError);
       }
