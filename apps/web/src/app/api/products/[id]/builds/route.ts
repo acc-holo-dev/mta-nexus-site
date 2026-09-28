@@ -9,6 +9,10 @@ import { consumeRateLimit } from "@nexus/security";
 import { AppError } from "@nexus/domain";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../../../lib/observability";
 import { hasExpectedBuildFileFormat } from "../../../../../lib/build-file-validation";
+import {
+  MultipartBodyTooLargeError,
+  parseMultipartFormDataWithLimit,
+} from "../../../../../lib/bounded-multipart";
 
 const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
 const ALLOWED_BUILD_EXTENSIONS = new Set(["zip", "rar", "7z", "lua"]);
@@ -92,7 +96,26 @@ export async function POST(
       );
     }
 
-    const form = await request.formData();
+    let form: FormData;
+    try {
+      form = await parseMultipartFormDataWithLimit(
+        request,
+        MAX_FILE_SIZE_BYTES + MULTIPART_OVERHEAD_BYTES,
+      );
+    } catch (error) {
+      if (error instanceof MultipartBodyTooLargeError) {
+        return privateJson(
+          context,
+          { error: "Build archive exceeds the 64MB closed-beta limit" },
+          { status: 413 },
+        );
+      }
+      return privateJson(
+        context,
+        { error: "Invalid multipart build upload" },
+        { status: 400 },
+      );
+    }
     const file = form.get("file");
     const parsed = buildMetadataSchema.safeParse({
       version: form.get("version"),

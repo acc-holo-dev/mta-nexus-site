@@ -24,7 +24,7 @@ describe("integrated J4 build upload safety contract", () => {
     const contentType = route.indexOf(
       'request.headers.get("content-type")',
     );
-    const formData = route.indexOf("await request.formData()");
+    const formData = route.indexOf("parseMultipartFormDataWithLimit(");
     const arrayBuffer = route.indexOf("await file.arrayBuffer()");
     const scan = route.indexOf("buildScannerService.scan(");
     const storage = route.indexOf("storageService.uploadAsset(");
