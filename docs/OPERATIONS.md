@@ -200,6 +200,8 @@ This cleanup was not executable through the previous GitHub connector because it
 
 Recent exact-SHA workflow runs create jobs but execute zero steps: the jobs report `steps: []`. Checkout, lint, typecheck, tests and builds therefore never begin.
 
+The latest observed CI run is [run 36398395028](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/36398395028) for commit `1f766c6ec295cf97e1150e92d7a4860ca9cde2b8`. Its retry (attempt 2) created five jobs, all failed before a step started with `runner_id: 0` and an empty runner name. Retrying did not restore execution. The available GitHub connector cannot read the protected Actions settings endpoint, so a repository or organization maintainer must inspect runner availability, Actions policy, and usage/quota in GitHub settings.
+
 Required action:
 
 1. inspect repository and organization Actions settings;
