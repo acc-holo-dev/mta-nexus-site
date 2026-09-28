@@ -111,6 +111,7 @@ describe("build upload scanner HTTP behavior", () => {
     expect(response.status).toBe(422);
     expect(await response.json()).toMatchObject({
       error: "Build was rejected by the malware scanner",
+      code: "BUILD_MALWARE_DETECTED",
       scanner: "clamav",
     });
     expect(uploadAsset).not.toHaveBeenCalled();
@@ -134,6 +135,7 @@ describe("build upload scanner HTTP behavior", () => {
     expect(await response.json()).toEqual({
       error:
         "Malware scanning is temporarily unavailable. No build was stored; retry the upload later.",
+      code: "BUILD_SCANNER_UNAVAILABLE",
     });
     expect(uploadAsset).not.toHaveBeenCalled();
     expect(releaseBuild).not.toHaveBeenCalled();
@@ -153,6 +155,7 @@ describe("build upload scanner HTTP behavior", () => {
     expect(response.status).toBe(422);
     expect(await response.json()).toMatchObject({
       error: expect.stringContaining("could not be fully checked"),
+      code: "BUILD_SCAN_LIMIT_EXCEEDED",
       scanner: "clamav",
     });
     expect(uploadAsset).not.toHaveBeenCalled();

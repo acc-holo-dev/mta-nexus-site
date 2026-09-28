@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@nexus/ui";
 import { MtaMetaInspectorPanel } from "../../../../components/mta-meta-inspector-panel";
 import { useNexusLocale } from "../../../../components/locale-context";
+import { getBuildScanErrorMessage } from "../../../../lib/publishing-error-message";
 
 const fieldClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
@@ -16,6 +17,11 @@ export default function NewResourcePage() {
   const copy = dictionary.publishing;
   const [loading, setLoading] = useState(false);
   const [resultSlug, setResultSlug] = useState<string | null>(null);
+  const [createdProduct, setCreatedProduct] = useState<{
+    id: string;
+    slug: string;
+    mtaVersionTarget: string;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -27,38 +33,56 @@ export default function NewResourcePage() {
     const form = new FormData(event.currentTarget);
 
     try {
-      const productResponse = await fetch("/api/products", {
-        method: "POST",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: String(form.get("title") || "").trim(),
-          slug: String(form.get("slug") || "").trim().toLowerCase(),
-          shortDescription: String(form.get("shortDescription") || "").trim(),
-          description: String(form.get("description") || "").trim(),
-          type: String(form.get("type") || "script"),
-          price: 0,
-          currency: "USD",
-          licenseModel: "unlimited",
-          tags: String(form.get("tags") || "")
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter(Boolean),
-          compatibility: {
-            mtaMinVersion:
-              String(form.get("mtaMinVersion") || "").trim() || undefined,
-            dependencies: String(form.get("dependencies") || "")
+      const file = form.get("file");
+      if (!(file instanceof File) || file.size === 0) {
+        throw new Error(copy.chooseArchive);
+      }
+
+      let product = createdProduct;
+      if (!product) {
+        const mtaVersionTarget = String(form.get("mtaMinVersion") || "").trim();
+        const productResponse = await fetch("/api/products", {
+          method: "POST",
+          cache: "no-store",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: String(form.get("title") || "").trim(),
+            slug: String(form.get("slug") || "").trim().toLowerCase(),
+            shortDescription: String(form.get("shortDescription") || "").trim(),
+            description: String(form.get("description") || "").trim(),
+            type: String(form.get("type") || "script"),
+            price: 0,
+            currency: "USD",
+            licenseModel: "unlimited",
+            tags: String(form.get("tags") || "")
               .split(",")
-              .map((dependency) => dependency.trim().toLowerCase())
+              .map((tag) => tag.trim())
               .filter(Boolean),
-          },
-        }),
-        signal: AbortSignal.timeout(15_000),
-      });
-      const productData = await productResponse.json().catch(() => null);
-      if (!productResponse.ok || !productData?.product?.id) {
-        throw new Error(productData?.error || copy.createError);
+            compatibility: {
+              mtaMinVersion: mtaVersionTarget || undefined,
+              dependencies: String(form.get("dependencies") || "")
+                .split(",")
+                .map((dependency) => dependency.trim().toLowerCase())
+                .filter(Boolean),
+            },
+          }),
+          signal: AbortSignal.timeout(15_000),
+        });
+        const productData = await productResponse.json().catch(() => null);
+        if (
+          !productResponse.ok ||
+          !productData?.product?.id ||
+          !productData?.product?.slug
+        ) {
+          throw new Error(productData?.error || copy.createError);
+        }
+        product = {
+          id: productData.product.id,
+          slug: productData.product.slug,
+          mtaVersionTarget,
+        };
+        setCreatedProduct(product);
       }
 
       const buildForm = new FormData();
@@ -67,19 +91,11 @@ export default function NewResourcePage() {
         "releaseNotes",
         String(form.get("releaseNotes") || "").trim(),
       );
-      buildForm.set(
-        "mtaVersionTarget",
-        String(form.get("mtaMinVersion") || "").trim(),
-      );
-
-      const file = form.get("file");
-      if (!(file instanceof File) || file.size === 0) {
-        throw new Error(copy.chooseArchive);
-      }
+      buildForm.set("mtaVersionTarget", product.mtaVersionTarget);
       buildForm.set("file", file);
 
       const buildResponse = await fetch(
-        `/api/products/${encodeURIComponent(productData.product.id)}/builds`,
+        `/api/products/${encodeURIComponent(product.id)}/builds`,
         {
           method: "POST",
           cache: "no-store",
@@ -90,10 +106,15 @@ export default function NewResourcePage() {
       );
       const buildData = await buildResponse.json().catch(() => null);
       if (!buildResponse.ok) {
-        throw new Error(buildData?.error || copy.buildError);
+        const scannerMessage = getBuildScanErrorMessage(buildData?.code, {
+          malwareDetected: copy.scannerMalwareDetected,
+          scanLimitExceeded: copy.scannerLimitExceeded,
+          scannerUnavailable: copy.scannerUnavailable,
+        });
+        throw new Error(scannerMessage || buildData?.error || copy.buildError);
       }
 
-      setResultSlug(productData.product.slug);
+      setResultSlug(product.slug);
     } catch (caught) {
       setError(
         caught instanceof Error && caught.message
@@ -138,6 +159,15 @@ export default function NewResourcePage() {
         </p>
       </div>
 
+      {createdProduct && (
+        <p
+          role="status"
+          className="rounded-lg border border-base bg-inset p-4 text-sm text-secondary"
+        >
+          {copy.buildRetryReady}
+        </p>
+      )}
+
       {error && (
         <div
           role="alert"
@@ -162,6 +192,7 @@ export default function NewResourcePage() {
             minLength={3}
             maxLength={120}
             className={fieldClass}
+            disabled={Boolean(createdProduct)}
           />
         </label>
 
@@ -176,6 +207,7 @@ export default function NewResourcePage() {
             autoCapitalize="none"
             spellCheck={false}
             className={fieldClass}
+            disabled={Boolean(createdProduct)}
           />
         </label>
 
@@ -185,6 +217,7 @@ export default function NewResourcePage() {
             name="shortDescription"
             maxLength={240}
             className={fieldClass}
+            disabled={Boolean(createdProduct)}
           />
         </label>
 
@@ -197,12 +230,17 @@ export default function NewResourcePage() {
             maxLength={20_000}
             rows={6}
             className={fieldClass}
+            disabled={Boolean(createdProduct)}
           />
         </label>
 
         <label className={labelClass}>
           <span className={labelTextClass}>{copy.type}</span>
-          <select name="type" className={fieldClass}>
+          <select
+            name="type"
+            className={fieldClass}
+            disabled={Boolean(createdProduct)}
+          >
             <option value="script">{copy.typeScript}</option>
             <option value="map">{copy.typeMap}</option>
             <option value="vehicle">{copy.typeVehicle}</option>
@@ -214,7 +252,12 @@ export default function NewResourcePage() {
 
         <label className={labelClass}>
           <span className={labelTextClass}>{copy.tags}</span>
-          <input name="tags" maxLength={500} className={fieldClass} />
+          <input
+            name="tags"
+            maxLength={500}
+            className={fieldClass}
+            disabled={Boolean(createdProduct)}
+          />
         </label>
 
         <label className={labelClass}>
@@ -235,6 +278,7 @@ export default function NewResourcePage() {
             defaultValue="1.6.0"
             maxLength={64}
             className={fieldClass}
+            disabled={Boolean(createdProduct)}
           />
         </label>
 
@@ -245,6 +289,7 @@ export default function NewResourcePage() {
             maxLength={1000}
             placeholder="core-ui, vehicle-pack"
             className={fieldClass}
+            disabled={Boolean(createdProduct)}
           />
         </label>
 
@@ -274,7 +319,11 @@ export default function NewResourcePage() {
           isLoading={loading}
           className="sm:col-span-2"
         >
-          {loading ? copy.submitting : copy.submit}
+          {loading
+            ? copy.submitting
+            : createdProduct
+              ? copy.retryBuild
+              : copy.submit}
         </Button>
       </form>
     </div>

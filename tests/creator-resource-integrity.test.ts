@@ -36,6 +36,20 @@ describe("creator resource integrity", () => {
     expect(page).not.toContain(">Resource published<");
   });
 
+  it("retries a failed build against its saved draft instead of creating another resource", () => {
+    const page = read("apps/web/src/app/workspace/resources/new/page.tsx");
+    expect(page.indexOf('if (!(file instanceof File)')).toBeLessThan(
+      page.indexOf('fetch("/api/products"'),
+    );
+    expect(page).toContain("const [createdProduct, setCreatedProduct]");
+    expect(page).toContain("let product = createdProduct");
+    expect(page).toContain("if (!product)");
+    expect(page).toContain("setCreatedProduct(product)");
+    expect(page).toContain("encodeURIComponent(product.id)}/builds");
+    expect(page).toContain("disabled={Boolean(createdProduct)}");
+    expect(page).toContain("copy.retryBuild");
+  });
+
   it("commits build state, product state and audit evidence atomically", () => {
     const repository = read("packages/db/src/repositories/builds.ts");
     const service = read("apps/web/src/lib/services/product-service.ts");

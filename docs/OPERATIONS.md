@@ -30,7 +30,7 @@ The stack contains:
 
 Only the application port is published to the host and it is bound to loopback. PostgreSQL and ClamAV stay on the Compose network.
 
-Both supported Compose stacks set `CLAMD_CONF_AlertExceedsMax=yes`. ClamAV otherwise treats some files skipped because of archive scan limits as clean. With this setting, NEXUS rejects incomplete scans before storage; deployments that provide their own ClamAV daemon must enable the same `AlertExceedsMax` directive. Run `pnpm test:scanner` to exercise INSTREAM framing, real TCP request/response handling, timeout and response limits, scan-limit rejection, and the upload route without a running ClamAV database or PostgreSQL.
+Both supported Compose stacks set `CLAMD_CONF_AlertExceedsMax=yes`. ClamAV otherwise treats some files skipped because of archive scan limits as clean. With this setting, NEXUS rejects incomplete scans before storage; deployments that provide their own ClamAV daemon must enable the same `AlertExceedsMax` directive. If the initial build is rejected, the publishing form keeps the saved draft and retries the build against it instead of creating duplicate resources. Run `pnpm test:scanner` to exercise INSTREAM framing, real TCP request/response handling, timeout and response limits, RU/EN scan feedback, draft retry, scan-limit rejection, and the upload route without a running ClamAV database or PostgreSQL.
 
 Source directories are bind-mounted read-only. Next.js uses polling in Docker so edits under `apps/web/src` and workspace `src` directories hot-reload. Package/dependency and image changes still require a rebuild.
 

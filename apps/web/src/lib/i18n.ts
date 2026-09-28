@@ -588,6 +588,14 @@ const en = {
     submit: "Submit free resource for review",
     createError: "Could not create resource",
     buildError: "Resource was created, but the build could not be submitted",
+    buildRetryReady:
+      "The resource draft is saved. Replace the archive or wait for the scanner, then retry; this will not create another resource.",
+    retryBuild: "Retry build submission",
+    scannerMalwareDetected: "The scanner detected malware. This build was not stored.",
+    scannerLimitExceeded:
+      "The archive could not be fully scanned because it exceeds scan limits. Reduce its size or complexity and try again.",
+    scannerUnavailable:
+      "The malware scanner is temporarily unavailable. No build was stored; try again later.",
     chooseArchive: "Choose a build archive",
     unexpectedError: "Unexpected publishing error",
     typeScript: "Script",
@@ -1655,6 +1663,14 @@ const ru: typeof en = {
     submit: "Отправить ресурс на проверку",
     createError: "Не удалось создать ресурс",
     buildError: "Ресурс создан, но сборку не удалось отправить",
+    buildRetryReady:
+      "Черновик ресурса сохранён. Замените архив или дождитесь восстановления сканера и отправьте сборку повторно — новый ресурс создан не будет.",
+    retryBuild: "Повторить отправку сборки",
+    scannerMalwareDetected: "Сканер обнаружил вредоносный код. Сборка не сохранена.",
+    scannerLimitExceeded:
+      "Архив не удалось проверить полностью из-за лимитов сканирования. Уменьшите его размер или сложность и попробуйте снова.",
+    scannerUnavailable:
+      "Сканер временно недоступен. Сборка не сохранена; попробуйте позже.",
     chooseArchive: "Выберите архив сборки",
     unexpectedError: "Непредвиденная ошибка публикации",
     typeScript: "Скрипт",

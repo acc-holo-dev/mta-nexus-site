@@ -152,7 +152,11 @@ export async function POST(
       });
       return privateJson(
         context,
-        { error: "Build was rejected by the malware scanner", scanner: scan.scanner },
+        {
+          error: "Build was rejected by the malware scanner",
+          code: "BUILD_MALWARE_DETECTED",
+          scanner: scan.scanner,
+        },
         { status: 422 }
       );
     }
@@ -169,6 +173,7 @@ export async function POST(
         {
           error:
             "The build exceeds malware scanner limits and could not be fully checked. Reduce its size or archive complexity and try again.",
+          code: "BUILD_SCAN_LIMIT_EXCEEDED",
           scanner: scan.scanner,
         },
         { status: 422 },
@@ -187,6 +192,7 @@ export async function POST(
         {
           error:
             "Malware scanning is temporarily unavailable. No build was stored; retry the upload later.",
+          code: "BUILD_SCANNER_UNAVAILABLE",
         },
         { status: 503, headers: { "Retry-After": "30" } },
       );
