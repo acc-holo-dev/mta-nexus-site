@@ -48,6 +48,10 @@ describe("creator resource integrity", () => {
     expect(page).toContain("sessionStorage.setItem(");
     expect(page).toContain("sessionStorage.removeItem(PENDING_RESOURCE_DRAFT_KEY)");
     expect(page).toContain("parsePendingResourceDraft(stored)");
+    expect(page).toContain("sessionStorage.removeItem(PENDING_RESOURCE_DRAFT_KEY)");
+    expect(page).toContain("setFormEpoch((current) => current + 1)");
+    expect(page).toContain("copy.startNewResource");
+    expect(page).toContain("key={formEpoch}");
     expect(page).toContain("encodeURIComponent(product.id)}/builds");
     expect(page).toContain("disabled={Boolean(createdProduct)}");
     expect(page).toContain("copy.retryBuild");

@@ -26,8 +26,20 @@ export default function NewResourcePage() {
     slug: string;
     mtaVersionTarget: string;
   } | null>(null);
+  const [formEpoch, setFormEpoch] = useState(0);
   const [draftReady, setDraftReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function startNewSubmission() {
+    try {
+      sessionStorage.removeItem(PENDING_RESOURCE_DRAFT_KEY);
+    } catch {
+      // The in-memory state still resets if storage is unavailable.
+    }
+    setCreatedProduct(null);
+    setError(null);
+    setFormEpoch((current) => current + 1);
+  }
 
   useEffect(() => {
     try {
@@ -195,12 +207,20 @@ export default function NewResourcePage() {
       </div>
 
       {createdProduct && (
-        <p
-          role="status"
-          className="rounded-lg border border-base bg-inset p-4 text-sm text-secondary"
-        >
-          {copy.buildRetryReady} {copy.pendingDraftLabel} {createdProduct.slug}
-        </p>
+        <div className="flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p role="status" className="text-sm text-secondary">
+            {copy.buildRetryReady} {copy.pendingDraftLabel} {createdProduct.slug}
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={startNewSubmission}
+            className="shrink-0"
+          >
+            {copy.startNewResource}
+          </Button>
+        </div>
       )}
 
       {error && (
@@ -215,6 +235,7 @@ export default function NewResourcePage() {
       <MtaMetaInspectorPanel />
 
       <form
+        key={formEpoch}
         onSubmit={submit}
         aria-busy={loading}
         className="nexus-panel grid grid-cols-1 gap-4 p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"

@@ -36,4 +36,13 @@ describe("localized resource scan failures", () => {
       }),
     ).toBeUndefined();
   });
+
+  it("describes resumable and reset actions in both languages", () => {
+    expect(getDictionary("en").publishing.startNewResource).toBe(
+      "Start a new resource",
+    );
+    expect(getDictionary("ru").publishing.startNewResource).toBe(
+      "Начать новый ресурс",
+    );
+  });
 });

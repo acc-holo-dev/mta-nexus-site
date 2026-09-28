@@ -592,6 +592,7 @@ const en = {
       "The resource draft is saved. Replace the archive or wait for the scanner, then retry; this will not create another resource.",
     pendingDraftLabel: "Draft slug:",
     checkingDraft: "Checking for a saved draft...",
+    startNewResource: "Start a new resource",
     retryBuild: "Retry build submission",
     scannerMalwareDetected: "The scanner detected malware. This build was not stored.",
     scannerLimitExceeded:
@@ -1669,6 +1670,7 @@ const ru: typeof en = {
       "Черновик ресурса сохранён. Замените архив или дождитесь восстановления сканера и отправьте сборку повторно — новый ресурс создан не будет.",
     pendingDraftLabel: "Slug черновика:",
     checkingDraft: "Проверяю сохранённый черновик...",
+    startNewResource: "Начать новый ресурс",
     retryBuild: "Повторить отправку сборки",
     scannerMalwareDetected: "Сканер обнаружил вредоносный код. Сборка не сохранена.",
     scannerLimitExceeded:
