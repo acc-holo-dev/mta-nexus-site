@@ -6,7 +6,10 @@ import { Button } from "@nexus/ui";
 import { MtaMetaInspectorPanel } from "../../../../components/mta-meta-inspector-panel";
 import { useNexusLocale } from "../../../../components/locale-context";
 import { getBuildSubmissionErrorMessage } from "../../../../lib/publishing-error-message";
-import { exceedsBuildFileSizeLimit } from "../../../../lib/build-file-validation";
+import {
+  exceedsBuildFileSizeLimit,
+  MAX_BUILD_FILE_SIZE_BYTES,
+} from "../../../../lib/build-file-validation";
 import {
   parsePendingResourceDraft,
   PENDING_RESOURCE_DRAFT_KEY,
@@ -20,6 +23,17 @@ const labelTextClass = "font-label text-secondary";
 export default function NewResourcePage() {
   const { dictionary } = useNexusLocale();
   const copy = dictionary.publishing;
+  const maxFileSizeMb = String(
+    MAX_BUILD_FILE_SIZE_BYTES / (1024 * 1024),
+  );
+  const buildFileTooLarge = copy.buildFileTooLarge.replace(
+    "{maxFileSize}",
+    maxFileSizeMb,
+  );
+  const buildFileRequirements = copy.buildFileRequirements.replace(
+    "{maxFileSize}",
+    maxFileSizeMb,
+  );
   const [loading, setLoading] = useState(false);
   const [resultSlug, setResultSlug] = useState<string | null>(null);
   const [createdProduct, setCreatedProduct] = useState<{
@@ -72,7 +86,7 @@ export default function NewResourcePage() {
         throw new Error(copy.chooseArchive);
       }
       if (exceedsBuildFileSizeLimit(file.size)) {
-        throw new Error(copy.buildFileTooLarge);
+        throw new Error(buildFileTooLarge);
       }
 
       let product = createdProduct;
@@ -152,7 +166,7 @@ export default function NewResourcePage() {
       const buildData = await buildResponse.json().catch(() => null);
       if (!buildResponse.ok) {
         const publishingMessage = getBuildSubmissionErrorMessage(buildData?.code, {
-          fileTooLarge: copy.buildFileTooLarge,
+          fileTooLarge: buildFileTooLarge,
           malwareDetected: copy.scannerMalwareDetected,
           scanLimitExceeded: copy.scannerLimitExceeded,
           scannerUnavailable: copy.scannerUnavailable,
@@ -364,7 +378,7 @@ export default function NewResourcePage() {
             required
             className="w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-secondary file:mr-3 file:rounded-md file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-accent"
           />
-          <span className="text-xs text-muted">{copy.buildFileRequirements}</span>
+          <span className="text-xs text-muted">{buildFileRequirements}</span>
         </label>
 
         <label className={`${labelClass} sm:col-span-2`}>

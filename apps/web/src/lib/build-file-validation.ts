@@ -1,3 +1,5 @@
+import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
+
 const ZIP_SIGNATURES = [
   [0x50, 0x4b, 0x03, 0x04], // Local file header
   [0x50, 0x4b, 0x05, 0x06], // Empty archive end record
@@ -11,7 +13,7 @@ const RAR_SIGNATURES = [
 
 const SEVEN_ZIP_SIGNATURE = [0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c] as const;
 
-export const MAX_BUILD_FILE_SIZE_BYTES = 64 * 1024 * 1024;
+export const MAX_BUILD_FILE_SIZE_BYTES = MAX_UPLOAD_FILE_SIZE_BYTES;
 
 export function exceedsBuildFileSizeLimit(sizeBytes: number): boolean {
   return sizeBytes > MAX_BUILD_FILE_SIZE_BYTES;

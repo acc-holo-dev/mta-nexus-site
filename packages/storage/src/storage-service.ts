@@ -2,10 +2,10 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { getStorageProvider } from "./index";
 import { generateId } from "@nexus/security";
-import { ValidationError } from "@nexus/domain";
+import { MAX_UPLOAD_FILE_SIZE_BYTES, ValidationError } from "@nexus/domain";
 import type { StorageObjectMeta } from "./types";
 
-export const MAX_FILE_SIZE_BYTES = 64 * 1024 * 1024;
+export const MAX_FILE_SIZE_BYTES = MAX_UPLOAD_FILE_SIZE_BYTES;
 
 const ALLOWED_EXTENSIONS = new Set([
   ".zip",

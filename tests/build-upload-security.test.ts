@@ -6,6 +6,10 @@ import {
   hasExpectedBuildFileFormat,
   MAX_BUILD_FILE_SIZE_BYTES,
 } from "../apps/web/src/lib/build-file-validation";
+import {
+  MAX_BUILD_MULTIPART_OVERHEAD_BYTES,
+  MAX_UPLOAD_FILE_SIZE_BYTES,
+} from "@nexus/domain";
 
 const bytes = (...values: number[]) => new Uint8Array(values);
 
@@ -15,7 +19,7 @@ describe("build file format detection", () => {
       resolve(process.cwd(), "packages/storage/src/storage-service.ts"),
       "utf8",
     );
-    expect(storage).toContain("MAX_FILE_SIZE_BYTES = 64 * 1024 * 1024");
+    expect(storage).toContain("MAX_FILE_SIZE_BYTES = MAX_UPLOAD_FILE_SIZE_BYTES");
     expect(exceedsBuildFileSizeLimit(MAX_BUILD_FILE_SIZE_BYTES)).toBe(false);
     expect(exceedsBuildFileSizeLimit(MAX_BUILD_FILE_SIZE_BYTES + 1)).toBe(true);
   });
@@ -28,10 +32,10 @@ describe("build file format detection", () => {
     const caddy = readFileSync(resolve(process.cwd(), "deploy/Caddyfile"), "utf8");
     const proxyLimit = caddy.match(/request_body\s*\{[^}]*max_size\s+(\d+)/u);
 
-    expect(route).toContain("const MULTIPART_OVERHEAD_BYTES = 1024 * 1024");
+    expect(route).toContain("MAX_BUILD_MULTIPART_OVERHEAD_BYTES");
     expect(proxyLimit).not.toBeNull();
     expect(Number(proxyLimit?.[1])).toBe(
-      MAX_BUILD_FILE_SIZE_BYTES + 1024 * 1024,
+      MAX_UPLOAD_FILE_SIZE_BYTES + MAX_BUILD_MULTIPART_OVERHEAD_BYTES,
     );
   });
 
@@ -72,6 +76,7 @@ describe("build upload hardening", () => {
     expect(route).toContain("Build content does not match its file extension");
     expect(route).toContain("const fileBytes = new Uint8Array(await file.arrayBuffer())");
     expect(route).toContain("BUILD_MIME_TYPES");
+    expect(route).toContain("BUILD_FILE_SIZE_LIMIT_MB");
     expect(route).toContain("path.basename(file.name)");
     expect(route).toContain("fileName: safeFileName");
   });

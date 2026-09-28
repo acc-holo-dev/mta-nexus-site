@@ -6,7 +6,7 @@ import { buildScannerService } from "../../../../../lib/services/build-scanner-s
 import { authService } from "../../../../../lib/services/auth-service";
 import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
 import { consumeRateLimit } from "@nexus/security";
-import { AppError } from "@nexus/domain";
+import { AppError, MAX_BUILD_MULTIPART_OVERHEAD_BYTES } from "@nexus/domain";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../../../lib/observability";
 import { hasExpectedBuildFileFormat } from "../../../../../lib/build-file-validation";
 import {
@@ -14,8 +14,8 @@ import {
   parseMultipartFormDataWithLimit,
 } from "../../../../../lib/bounded-multipart";
 
-const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
 const ALLOWED_BUILD_EXTENSIONS = new Set(["zip", "rar", "7z", "lua"]);
+const BUILD_FILE_SIZE_LIMIT_MB = MAX_FILE_SIZE_BYTES / (1024 * 1024);
 const BUILD_MIME_TYPES: Record<string, string> = {
   zip: "application/zip",
   rar: "application/vnd.rar",
@@ -78,11 +78,11 @@ export async function POST(
     const declaredLength = Number(request.headers.get("content-length"));
     if (
       Number.isFinite(declaredLength) &&
-      declaredLength > MAX_FILE_SIZE_BYTES + MULTIPART_OVERHEAD_BYTES
+      declaredLength > MAX_FILE_SIZE_BYTES + MAX_BUILD_MULTIPART_OVERHEAD_BYTES
     ) {
       return privateJson(context, 
         {
-          error: "Build archive exceeds the 64MB closed-beta limit",
+          error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB closed-beta limit`,
           code: "BUILD_UPLOAD_TOO_LARGE",
         },
         { status: 413 }
@@ -103,14 +103,14 @@ export async function POST(
     try {
       form = await parseMultipartFormDataWithLimit(
         request,
-        MAX_FILE_SIZE_BYTES + MULTIPART_OVERHEAD_BYTES,
+        MAX_FILE_SIZE_BYTES + MAX_BUILD_MULTIPART_OVERHEAD_BYTES,
       );
     } catch (error) {
       if (error instanceof MultipartBodyTooLargeError) {
         return privateJson(
           context,
           {
-            error: "Build archive exceeds the 64MB closed-beta limit",
+            error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB closed-beta limit`,
             code: "BUILD_UPLOAD_TOO_LARGE",
           },
           { status: 413 },
@@ -144,7 +144,7 @@ export async function POST(
     if (file.size > MAX_FILE_SIZE_BYTES) {
       return privateJson(context, 
         {
-          error: "Build archive exceeds the 64MB closed-beta limit",
+          error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB closed-beta limit`,
           code: "BUILD_UPLOAD_TOO_LARGE",
         },
         { status: 413 }

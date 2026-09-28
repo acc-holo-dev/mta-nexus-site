@@ -59,7 +59,7 @@ test('pins the production proxy body limit to the application build envelope', (
   const uploadRoute = readFileSync('apps/web/src/app/api/products/[id]/builds/route.ts', 'utf8');
   assert.equal(PRODUCTION_UPLOAD_ENVELOPE_BYTES, 65 * 1024 * 1024);
   assert.doesNotThrow(() => assertProductionUploadBodyLimit(caddy));
-  assert.match(storage, /MAX_FILE_SIZE_BYTES\s*=\s*64\s*\*\s*1024\s*\*\s*1024/u);
-  assert.match(uploadRoute, /MULTIPART_OVERHEAD_BYTES\s*=\s*1024\s*\*\s*1024/u);
+  assert.match(storage, /MAX_FILE_SIZE_BYTES\s*=\s*MAX_UPLOAD_FILE_SIZE_BYTES/u);
+  assert.match(uploadRoute, /MAX_BUILD_MULTIPART_OVERHEAD_BYTES/u);
   assert.throws(() => assertProductionUploadBodyLimit(caddy.replace('68157440', '65000000')), /65 MiB build-upload envelope/u);
 });

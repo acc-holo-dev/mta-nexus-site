@@ -79,7 +79,12 @@ describe("creator resource integrity", () => {
     expect(fileLimit).toBeGreaterThan(-1);
     expect(fileLimit).toBeLessThan(createProduct);
     expect(page).toContain("copy.buildFileRequirements");
-    expect(getDictionary("en").publishing.buildFileTooLarge).toContain("64 MB");
-    expect(getDictionary("ru").publishing.buildFileTooLarge).toContain("64 МБ");
+    expect(getDictionary("en").publishing.buildFileTooLarge).toContain(
+      "{maxFileSize} MB",
+    );
+    expect(getDictionary("ru").publishing.buildFileTooLarge).toContain(
+      "{maxFileSize} МБ",
+    );
+    expect(page).toContain("MAX_BUILD_FILE_SIZE_BYTES / (1024 * 1024)");
   });
 });
