@@ -20,6 +20,9 @@ services:
   clamav:
     image: clamav/clamav:1.5
     restart: unless-stopped
+    environment:
+      # ClamAV otherwise treats archives that exceed scan limits as clean.
+      CLAMD_CONF_AlertExceedsMax: "yes"
     volumes:
       - clamav_data:/var/lib/clamav
     healthcheck:

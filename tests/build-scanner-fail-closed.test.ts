@@ -6,20 +6,29 @@ const read = (path: string) =>
   readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("build scanner fail-closed upload flow", () => {
-  it("rejects malicious and scanner-error verdicts before private storage", () => {
+  it("rejects malicious, scan-limit, and scanner-error verdicts before private storage", () => {
     const route = read(
       "apps/web/src/app/api/products/[id]/builds/route.ts",
     );
 
     const malicious = route.indexOf('scan.status === "malicious"');
+    const scanLimits = route.indexOf('scan.status === "rejected"');
     const unavailable = route.indexOf('scan.status === "error"');
     const storage = route.indexOf("storageService.uploadAsset");
 
     expect(malicious).toBeGreaterThan(-1);
-    expect(unavailable).toBeGreaterThan(malicious);
+    expect(scanLimits).toBeGreaterThan(malicious);
+    expect(unavailable).toBeGreaterThan(scanLimits);
     expect(storage).toBeGreaterThan(unavailable);
     expect(route).toContain("No build was stored; retry the upload later.");
     expect(route).toContain('status: 503, headers: { "Retry-After": "30" }');
+  });
+
+  it("configures both ClamAV stacks to report files it could not fully scan", () => {
+    for (const path of ["compose.yaml", "compose.production.yaml"]) {
+      const compose = read(path);
+      expect(compose).toContain('CLAMD_CONF_AlertExceedsMax: "yes"');
+    }
   });
 
   it("keeps non-clean builds impossible to approve", () => {

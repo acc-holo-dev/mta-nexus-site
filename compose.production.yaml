@@ -2,6 +2,9 @@ services:
   clamav:
     image: clamav/clamav:1.5
     restart: unless-stopped
+    environment:
+      # Never report an incompletely scanned archive as clean.
+      CLAMD_CONF_AlertExceedsMax: "yes"
     volumes:
       - clamav_data:/var/lib/clamav
     healthcheck:

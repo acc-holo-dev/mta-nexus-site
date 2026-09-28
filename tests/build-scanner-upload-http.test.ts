@@ -140,6 +140,25 @@ describe("build upload scanner HTTP behavior", () => {
     expect(deleteAsset).not.toHaveBeenCalled();
   });
 
+  it("rejects archives that ClamAV could not fully inspect because of scan limits", async () => {
+    scan.mockResolvedValueOnce({
+      status: "rejected",
+      scanner: "clamav",
+      scannedAt: new Date(),
+      reason: "Heuristics.Limits.Exceeded.MaxRecursion FOUND",
+    });
+
+    const response = await POST(uploadRequest(), context);
+
+    expect(response.status).toBe(422);
+    expect(await response.json()).toMatchObject({
+      error: expect.stringContaining("could not be fully checked"),
+      scanner: "clamav",
+    });
+    expect(uploadAsset).not.toHaveBeenCalled();
+    expect(releaseBuild).not.toHaveBeenCalled();
+  });
+
   it("stores and submits only after a clean verdict", async () => {
     const scannedAt = new Date();
     scan.mockResolvedValueOnce({

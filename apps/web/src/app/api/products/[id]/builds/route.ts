@@ -156,6 +156,24 @@ export async function POST(
         { status: 422 }
       );
     }
+    if (scan.status === "rejected") {
+      logRequestEvent({
+        level: "warn",
+        event: "resource.build.rejected_scan_limits",
+        context,
+        status: 422,
+        fields: { scanner: scan.scanner },
+      });
+      return privateJson(
+        context,
+        {
+          error:
+            "The build exceeds malware scanner limits and could not be fully checked. Reduce its size or archive complexity and try again.",
+          scanner: scan.scanner,
+        },
+        { status: 422 },
+      );
+    }
     if (scan.status === "error") {
       logRequestEvent({
         level: "warn",

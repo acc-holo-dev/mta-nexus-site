@@ -21,6 +21,7 @@ describe("resource build scanner contract", () => {
     expect(scanner).toContain('scanner: "disabled"');
     expect(upload).toContain("buildScannerService.scan");
     expect(upload).toContain('scan.status === "malicious"');
+    expect(upload).toContain('scan.status === "rejected"');
     expect(service).toContain('build.scanStatus !== "clean"');
   });
 
@@ -37,6 +38,9 @@ describe("resource build scanner contract", () => {
     expect(transport).toContain("writeUInt32BE");
     expect(scanner).toContain('status: "clean", scanner: "clamav"');
     expect(compose).toContain("clamav/clamav:1.5");
+    expect(compose).toContain('CLAMD_CONF_AlertExceedsMax: "yes"');
+    expect(readFileSync(resolve(process.cwd(), "compose.yaml"), "utf8"))
+      .toContain('CLAMD_CONF_AlertExceedsMax: "yes"');
     expect(config).toContain("Production resource publishing requires ClamAV");
   });
 });
