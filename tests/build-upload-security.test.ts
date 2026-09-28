@@ -20,6 +20,21 @@ describe("build file format detection", () => {
     expect(exceedsBuildFileSizeLimit(MAX_BUILD_FILE_SIZE_BYTES + 1)).toBe(true);
   });
 
+  it("keeps the reverse proxy headroom aligned with the multipart upload envelope", () => {
+    const route = readFileSync(
+      resolve(process.cwd(), "apps/web/src/app/api/products/[id]/builds/route.ts"),
+      "utf8",
+    );
+    const caddy = readFileSync(resolve(process.cwd(), "deploy/Caddyfile"), "utf8");
+    const proxyLimit = caddy.match(/request_body\s*\{[^}]*max_size\s+(\d+)/u);
+
+    expect(route).toContain("const MULTIPART_OVERHEAD_BYTES = 1024 * 1024");
+    expect(proxyLimit).not.toBeNull();
+    expect(Number(proxyLimit?.[1])).toBe(
+      MAX_BUILD_FILE_SIZE_BYTES + 1024 * 1024,
+    );
+  });
+
   it.each([
     ["zip", bytes(0x50, 0x4b, 0x03, 0x04, 0x00)],
     ["zip", bytes(0x50, 0x4b, 0x05, 0x06)],
