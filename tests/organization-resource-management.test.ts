@@ -30,11 +30,11 @@ describe("canonical organization resource authorization surface", () => {
   it("authorizes linked content through the canonical server and product service contracts", () => {
     const route = read("apps/web/src/app/api/content/route.ts");
 
-    expect(route).toContain(
-      "serverService.canManageServer(linkedServer, user)",
+    expect(route).toMatch(
+      /serverService\.canManageServer\(\s*linkedServer,\s*user,?\s*\)/u,
     );
-    expect(route).toContain(
-      "productService.canManageProduct(linkedProduct, user)",
+    expect(route).toMatch(
+      /productService\.canManageProduct\(\s*linkedProduct,\s*user,?\s*\)/u,
     );
     expect(route).toContain("You do not manage the linked server");
     expect(route).toContain("You do not manage the linked resource");
