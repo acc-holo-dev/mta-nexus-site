@@ -19,6 +19,11 @@ docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-
 
 Open `http://localhost:3000`.
 
+Inside the Compose network, browser checks may use `http://nexus-local-app-1:3000`.
+This hostname is explicitly allowed by Next.js development origin checks. The
+published host port stays bound to loopback; use `localhost` from the host.
+Changes to `apps/web/next.config.mjs` require rebuilding the app image.
+
 If Node.js 26+ and the pinned pnpm are installed, `pnpm dev` now starts the same full Docker development stack after running the repository doctor:
 
 ```bash
