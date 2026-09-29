@@ -6,6 +6,7 @@ import { commerceService } from "../../../../../lib/services/commerce-service";
 import { productRepository, buildRepository, auditRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";
 import { consumeRateLimit, generateId } from "@nexus/security";
+import { ValidationError } from "@nexus/domain";
 import { decideResourceDownloadAccess } from "../../../../../lib/resource-download-policy";
 import { productService } from "../../../../../lib/services/product-service";
 
@@ -123,6 +124,14 @@ export async function GET(
       },
     });
   } catch (error: unknown) {
+    // A build whose bytes are missing from storage is a data-state problem,
+    // not a server fault: answer with an honest 404 instead of a 500.
+    if (error instanceof ValidationError) {
+      return NextResponse.json(
+        { error: "Resource build file is not available" },
+        { status: 404, headers: privateHeaders },
+      );
+    }
     console.error("Download error:", error);
     return NextResponse.json({ error: "Failed to deliver resource build" }, { status: 500, headers: privateHeaders });
   }

@@ -80,6 +80,10 @@ export type MtaMasterDirectory = {
 let cachedDirectory: MtaMasterDirectory | null = null;
 let cacheExpiresAt = 0;
 let staleCacheExpiresAt = 0;
+// When the upstream is down and no successful snapshot exists, remember the
+// failure for a short window so visitors do not each wait for the full request
+// timeout before seeing the graceful "directory unavailable" state.
+let failureBackoffUntil = 0;
 let pendingDirectory: Promise<MtaMasterDirectory> | null = null;
 
 class MasterListReader {
@@ -275,6 +279,9 @@ async function requestDirectory(): Promise<MtaMasterDirectory> {
 export const mtaMasterDirectoryService = {
   async getDirectory(): Promise<MtaMasterDirectory> {
     if (cachedDirectory && Date.now() < cacheExpiresAt) return cachedDirectory;
+    if (Date.now() < failureBackoffUntil) {
+      throw new Error("MTA master-list request is in failure backoff");
+    }
 
     if (!pendingDirectory) {
       pendingDirectory = requestDirectory()
@@ -292,6 +299,8 @@ export const mtaMasterDirectoryService = {
             cacheExpiresAt = Math.min(Date.now() + 10_000, staleCacheExpiresAt);
             return cachedDirectory;
           }
+          // No snapshot to serve: back off briefly so the page degrades fast.
+          failureBackoffUntil = Date.now() + 10_000;
           throw error;
         })
         .finally(() => {

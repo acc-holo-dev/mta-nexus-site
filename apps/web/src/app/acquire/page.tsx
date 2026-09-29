@@ -96,7 +96,10 @@ function AcquireContent() {
       });
 
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true) {
+      // The claim API answers 201 with { entitlement, alreadyClaimed } and does
+      // not include a success flag; a claim is successful when an entitlement
+      // object is present.
+      if (!response.ok || !data?.entitlement) {
         throw new Error(data?.error || copy.claimFailed);
       }
 
