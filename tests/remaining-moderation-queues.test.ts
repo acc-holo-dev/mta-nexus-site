@@ -20,6 +20,7 @@ vi.mock("../packages/db/src/client", () => ({
           where(filter: SQL) {
             captured.filter = filter;
             return {
+              // biome-ignore lint/suspicious/noThenProperty: The Drizzle count query mock must be awaitable.
               then(resolve: (rows: { total: number }[]) => void) { resolve([{ total: 307 }]); },
               orderBy(...order: SQL[]) {
                 captured.order = order;
