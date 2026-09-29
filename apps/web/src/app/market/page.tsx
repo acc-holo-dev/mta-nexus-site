@@ -65,24 +65,26 @@ export default async function MarketPage({
         </div>
       </div>
 
-      <form action="/market" method="get" role="search" className="flex flex-wrap gap-2">
-        <input type="hidden" name="type" value={type} />
-        <input type="hidden" name="sort" value={sort} />
-        <label htmlFor="market-query" className="sr-only">{dictionary.market.searchLabel}</label>
-        <input
-          id="market-query"
-          name="q"
-          type="search"
-          maxLength={100}
-          defaultValue={query}
-          placeholder={dictionary.market.searchPlaceholder}
-          className="min-h-11 min-w-0 flex-1 rounded-lg border border-base bg-surface px-3 text-sm text-primary placeholder:text-faint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-        />
-        <button type="submit" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
-          <Search className="h-4 w-4" aria-hidden="true" />
-          {dictionary.market.searchButton}
-        </button>
-      </form>
+      <search aria-label={dictionary.market.searchLabel}>
+        <form action="/market" method="get" className="flex flex-wrap gap-2">
+          <input type="hidden" name="type" value={type} />
+          <input type="hidden" name="sort" value={sort} />
+          <label htmlFor="market-query" className="sr-only">{dictionary.market.searchLabel}</label>
+          <input
+            id="market-query"
+            name="q"
+            type="search"
+            maxLength={100}
+            defaultValue={query}
+            placeholder={dictionary.market.searchPlaceholder}
+            className="min-h-11 min-w-0 flex-1 rounded-lg border border-base bg-surface px-3 text-sm text-primary placeholder:text-faint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          />
+          <button type="submit" className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent px-4 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+            <Search className="h-4 w-4" aria-hidden="true" />
+            {dictionary.market.searchButton}
+          </button>
+        </form>
+      </search>
 
       <nav aria-label={dictionary.market.sortLabel} className="flex items-center gap-1 overflow-x-auto border-b border-base">
         {SORTS.map((option) => {
