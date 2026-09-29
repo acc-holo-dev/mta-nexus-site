@@ -173,6 +173,10 @@ export default async function ProductDetailPage({
         <span className="text-secondary">{product.title}</span>
       </div>
 
+      <h1 className="text-3xl font-black tracking-tight text-primary sm:text-4xl">
+        {product.title}
+      </h1>
+
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-base bg-inset shadow-nexus-lg">
