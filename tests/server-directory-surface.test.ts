@@ -14,7 +14,9 @@ describe("public MTA directory surface", () => {
       "utf8"
     );
 
-    expect(component).toContain('fetch("/api/servers/directory?" + params');
+    expect(component).toMatch(
+      /fetch\(\s*(?:`\/api\/servers\/directory\?\$\{params\}`|"\/api\/servers\/directory\?"\s*\+\s*params)\s*,/,
+    );
     expect(component).toContain("const PAGE_SIZE = 50");
     expect(component).toContain("{copy.page} {page + 1} {copy.of} {totalPages}");
     expect(getDictionary("en").servers.page).not.toBe(getDictionary("ru").servers.page);

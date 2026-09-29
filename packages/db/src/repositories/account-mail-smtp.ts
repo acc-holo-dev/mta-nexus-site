@@ -79,11 +79,12 @@ function validateOptions(options: AccountMailSmtpOptions) {
     || !["auto", "plain", "login"].includes(options.authMode ?? "auto")) {
     throw new Error("Invalid SMTP transport configuration");
   }
-  const hasUsername = typeof options.username === "string" && options.username.length > 0;
-  const hasPassword = typeof options.password === "string" && options.password.length > 0;
+  const { username, password } = options;
+  const hasUsername = typeof username === "string" && username.length > 0;
+  const hasPassword = typeof password === "string" && password.length > 0;
   if (hasUsername !== hasPassword
-    || (hasUsername && (options.username!.length > 320 || /[\r\n\0]/.test(options.username!)))
-    || (hasPassword && (options.password!.length > 1024 || /[\r\n\0]/.test(options.password!)))) {
+    || (hasUsername && (username.length > 320 || /[\r\n\0]/.test(username)))
+    || (hasPassword && (password.length > 1024 || /[\r\n\0]/.test(password)))) {
     throw new Error("Invalid SMTP authentication configuration");
   }
   const timeout = options.timeoutMs ?? 5_000;

@@ -164,7 +164,7 @@ export function MtaMasterServerDirectory({
     setDirectory(null);
 
     const scheduled = window.setTimeout(() => {
-      fetch("/api/servers/directory?" + params, {
+      fetch(`/api/servers/directory?${params}`, {
         cache: "no-store",
         credentials: "same-origin",
         signal: controller.signal,

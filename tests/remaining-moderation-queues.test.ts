@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PgDialect } from "drizzle-orm/pg-core";
 import type { SQL } from "drizzle-orm";
 
@@ -44,7 +44,21 @@ import { ContentRepository } from "../packages/db/src/repositories/content";
 
 const dialect = new PgDialect();
 
+function filterParams() {
+  if (captured.filter === null) throw new Error("Expected a moderation status filter");
+  return dialect.sqlToQuery(captured.filter).params;
+}
+
 describe("remaining moderation queues", () => {
+  beforeEach(() => {
+    captured.filter = null;
+    captured.order = [];
+    captured.limit = 0;
+    captured.offset = 0;
+    captured.joins = 0;
+    captured.rows = [];
+  });
+
   it("keeps old resource builds accessible after the first 100 and counts the entire queue", async () => {
     captured.rows = Array.from({ length: 31 }, (_, index) => ({
       build: { id: `build-${index}` },
@@ -63,7 +77,7 @@ describe("remaining moderation queues", () => {
       id: "build-0", productTitle: "Resource 0", publisherUsername: "creator",
     });
     expect(result.hasMore).toBe(true);
-    expect(dialect.sqlToQuery(captured.filter!).params).toEqual(["pending_review"]);
+    expect(filterParams()).toEqual(["pending_review"]);
     expect(captured.order.map((part) => dialect.sqlToQuery(part).sql)).toEqual([
       '"builds"."created_at" asc', '"builds"."id" asc',
     ]);
@@ -79,7 +93,7 @@ describe("remaining moderation queues", () => {
     const result = await repo.listDraftPage(4);
     expect(result.items).toEqual([]);
     expect(result.hasMore).toBe(false);
-    expect(dialect.sqlToQuery(captured.filter!).params).toEqual(["draft"]);
+    expect(filterParams()).toEqual(["draft"]);
     expect(captured.order.map((part) => dialect.sqlToQuery(part).sql)).toEqual([
       '"content"."created_at" asc', '"content"."id" asc',
     ]);
