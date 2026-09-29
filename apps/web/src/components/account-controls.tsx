@@ -106,6 +106,7 @@ export function AccountControls() {
   return (
     <div
       aria-label={copy.groupLabel}
+      // biome-ignore lint/a11y/useSemanticElements: Mixed links and a button form a named group, not a form fieldset.
       role="group"
       className="relative flex min-w-0 items-center gap-1.5 sm:gap-2"
     >
