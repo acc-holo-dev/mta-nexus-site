@@ -207,6 +207,7 @@ function advertisesCapability(lines: string[], capability: string): boolean {
 }
 
 function containsNonAscii(value: string): boolean {
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: The ASCII boundary is intentional for SMTP data.
   return /[^\x00-\x7f]/.test(value);
 }
 
