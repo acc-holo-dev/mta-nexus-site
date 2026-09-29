@@ -18,6 +18,8 @@ import { Button, EmptyState, Skeleton } from "@nexus/ui";
 import type { Notification } from "@nexus/domain";
 import { useNexusLocale } from "../../components/locale-context";
 
+const LOADING_CARD_IDS = ["first", "second", "third", "fourth"] as const;
+
 export default function NotificationCenterPage() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.notifications;
@@ -201,8 +203,8 @@ export default function NotificationCenterPage() {
 
       <div className="space-y-3">
         {loading ? (
-          Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="nexus-panel space-y-3 p-4">
+          LOADING_CARD_IDS.map((id) => (
+            <div key={id} className="nexus-panel space-y-3 p-4">
               <Skeleton className="h-4 w-2/5" />
               <Skeleton className="h-3 w-4/5" />
               <Skeleton className="h-3 w-1/4" />
