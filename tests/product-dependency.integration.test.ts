@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import {
   productRepository,
   userRepository,
+  buildRepository,
 } from "@nexus/db";
 
 describe("published dependency repository integration", () => {
@@ -59,6 +60,24 @@ describe("published dependency repository integration", () => {
       slug: paidSlug,
       status: "published",
       price: 100,
+    });
+
+    // Published free dependency targets are public only with a trusted clean
+    // build (fail-closed visibility policy).
+    await buildRepository.create({
+      id: `bld_dep_pub_${suffix}`,
+      productId: `prd_dep_pub_${suffix}`,
+      version: "1.0.0",
+      status: "published",
+      storageKey: `builds/prd_dep_pub_${suffix}/v1.0.0.zip`,
+      sha256Hash: "e".repeat(64),
+      fileSizeBytes: 2048,
+      fileName: "dependency-target.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "test-scanner",
+      scannedAt: new Date(),
+      isSigned: false,
     });
   });
 

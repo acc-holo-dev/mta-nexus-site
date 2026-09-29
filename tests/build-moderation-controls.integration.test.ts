@@ -168,7 +168,8 @@ describe("build moderation route integration", () => {
       );
       expect(nonCleanDownload.status).toBe(422);
       expect(await nonCleanDownload.json()).toEqual({
-        error: "Reviewer download requires a clean malware scan",
+        error:
+          "Reviewer download requires a provenance-backed clean malware scan",
       });
 
       const reviewerDownload = await downloadReviewerArtifact(
@@ -357,8 +358,10 @@ describe("build moderation route integration", () => {
     ]);
 
     const loser = approve.status === 409 ? approve : reject;
+    // The loser is rejected either by the pending-review pre-check or by the
+    // moderated-row guard; both are 409 build state conflicts.
     expect(await loser.json()).toMatchObject({
-      code: "BUILD_STATE_CHANGED",
+      code: expect.stringMatching(/^BUILD_(NOT_PENDING_REVIEW|STATE_CHANGED)$/),
     });
 
     const build = await buildRepository.findById(buildId);

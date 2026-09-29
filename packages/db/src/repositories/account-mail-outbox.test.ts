@@ -83,6 +83,14 @@ afterEach(async () => {
   }
 });
 
+async function clearDisposableOutbox() {
+  // Capacity arithmetic is global: the queue gate is a singleton row. Other
+  // suites that share the disposable database may leave envelopes behind, so
+  // the capacity tests start from a provably empty queue instead of assuming
+  // file execution order.
+  await db.delete(accountMailOutbox);
+}
+
 describe("D2a atomic encrypted mail enqueue on disposable PostgreSQL", () => {
   it("applies the additive migration without creating mail for old proofs or changing users", async () => {
     const schema = `d2_${randomUUID().replaceAll("-", "")}`;
@@ -169,6 +177,7 @@ describe("D2a atomic encrypted mail enqueue on disposable PostgreSQL", () => {
   });
 
   it("enforces the last queue slot across two competing accounts", async () => {
+    await clearDisposableOutbox();
     assert.equal((await db.select().from(accountMailOutbox)).length, 0, "Capacity test requires an empty disposable queue");
     const a = await account(); const b = await account(); await capacity(1);
     const outcomes = await Promise.all([settled(queue.enqueue(verification(a), cipher)), settled(queue.enqueue(verification(b), cipher))]);
@@ -181,6 +190,7 @@ describe("D2a atomic encrypted mail enqueue on disposable PostgreSQL", () => {
   });
 
   it("a full queue preserves an earlier standalone proof rather than silently revoking it", async () => {
+    await clearDisposableOutbox();
     assert.equal((await db.select().from(accountMailOutbox)).length, 0);
     const a = await account(); const b = await account(); const previous = await proofs.issue(verification(a));
     await capacity(1); const occupant = await queue.enqueue(verification(b), cipher);

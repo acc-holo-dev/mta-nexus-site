@@ -7,6 +7,7 @@ import {
   reportRepository,
   licenseRepository,
   contentRepository,
+  buildRepository,
 } from "@nexus/db";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
 import type { User, Product } from "@nexus/domain";
@@ -53,6 +54,24 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
       isFeatured: false,
       screenshots: [],
       compatibility: {},
+    });
+
+    // Claimable published resources require a trusted clean build
+    // (builds_published_safe_check invariant).
+    await buildRepository.create({
+      id: `bld_jr_${ts}`,
+      productId: testProduct.id,
+      version: "1.0.0",
+      status: "published",
+      storageKey: `builds/${testProduct.id}/v1.0.0.zip`,
+      sha256Hash: "c".repeat(64),
+      fileSizeBytes: 2048,
+      fileName: "journey-test.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "test-scanner",
+      scannedAt: new Date(),
+      isSigned: false,
     });
   });
 

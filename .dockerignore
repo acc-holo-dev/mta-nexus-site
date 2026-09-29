@@ -1,5 +1,6 @@
 .git
-.github
+# .github stays in the image: repository-policy surface tests read workflow
+# definitions and dependabot.yml at runtime (see tests/mainline-repository-policy.test.ts).
 node_modules
 **/node_modules
 .next

@@ -9,6 +9,7 @@
     "start": "pnpm --filter @nexus/web start",
     "lint": "biome lint .",
     "test": "vitest run",
+    "test:isolated": "node scripts/run-isolated-tests.mjs",
     "test:directory": "vitest run apps/web/src/lib/services/mta-master-directory-service.test.ts apps/web/src/components/server-card.test.tsx tests/server-directory-api.test.ts tests/server-directory-surface.test.ts tests/server-editorial-api.test.ts tests/server-detail-live-link.test.ts tests/server-experience-ui.test.ts tests/server-control-challenge-migration.test.ts tests/discovery-search-behavior.test.ts tests/search-hardening.test.ts tests/search-pattern.test.ts tests/search-result-label.test.ts",
     "test:resource": "vitest run tests/resource-review-http.test.ts tests/review-integrity.test.ts tests/build-review-continuity.test.ts tests/moderation-atomicity.test.ts tests/build-visibility-policy.test.ts tests/build-moderation-controls.test.ts",
     "test:scanner": "vitest run tests/clamav-instream.test.ts tests/build-scanner-protocol.test.ts tests/build-scanner-upload-http.test.ts tests/build-scanner-fail-closed.test.ts tests/build-scanner-contract.test.ts tests/bounded-multipart.test.ts tests/build-upload-security.test.ts tests/build-upload-preflight-http.test.ts tests/product-creation-http.test.ts tests/publishing-error-message.test.ts tests/pending-resource-draft.test.ts tests/creator-resource-integrity.test.ts tests/mta-meta-inspector.test.ts tests/mta-meta-inspector-surface.test.ts tests/mta-meta-inspector-messages.test.ts tests/mta-version-target.test.ts tests/validation.test.ts",
@@ -45,7 +46,9 @@
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.1",
-    "@biomejs/biome": "2.5.14"
+    "@biomejs/biome": "2.5.14",
+    "drizzle-orm": "^0.45.3",
+    "next": "16.3.5"
   },
   "engines": {
     "node": ">=26.0.0",

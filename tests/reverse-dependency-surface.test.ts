@@ -24,8 +24,10 @@ describe("reverse dependency surface", () => {
     const page = read("apps/web/src/app/market/[slug]/page.tsx");
 
     expect(page).toContain("reverseDependencySummary");
-    expect(page).toContain(
-      "productService.getReverseDependencySummary(product.slug)",
+    // The call lives inside the product-detail Promise.all read group and
+    // degrades gracefully instead of failing the whole page.
+    expect(page).toMatch(
+      /productService\s*\n\s*\.getReverseDependencySummary\(product\.slug\)/,
     );
     expect(page).toContain("<ReverseDependencyList");
     expect(page).toContain("locale={locale}");

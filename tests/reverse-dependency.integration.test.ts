@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { productRepository, userRepository } from "@nexus/db";
+import { productRepository, userRepository, buildRepository } from "@nexus/db";
 
 describe("reverse dependency repository integration", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -68,6 +68,24 @@ describe("reverse dependency repository integration", () => {
       status: "published",
       price: 100,
       compatibility: { dependencies: [targetSlug] },
+    });
+
+    // Only published free resources with a trusted clean build are public
+    // (fail-closed visibility policy).
+    await buildRepository.create({
+      id: `bld_rev_public_${suffix}`,
+      productId: `prd_rev_public_${suffix}`,
+      version: "1.0.0",
+      status: "published",
+      storageKey: `builds/prd_rev_public_${suffix}/v1.0.0.zip`,
+      sha256Hash: "f".repeat(64),
+      fileSizeBytes: 2048,
+      fileName: "reverse-dependent.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "test-scanner",
+      scannedAt: new Date(),
+      isSigned: false,
     });
   });
 

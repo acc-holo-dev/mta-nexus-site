@@ -4,6 +4,7 @@ import {
   organizationRepository,
   productRepository,
   userRepository,
+  buildRepository,
 } from "@nexus/db";
 
 describe("organization public listing integration", () => {
@@ -83,6 +84,24 @@ describe("organization public listing integration", () => {
       slug: `b-published-resource-${suffix}`,
       organizationId: orgBId,
       status: "published",
+    });
+
+    // Public free listings only expose published resources with a trusted
+    // clean build (fail-closed visibility policy).
+    await buildRepository.create({
+      id: `bld_org_a_pub_${suffix}`,
+      productId: `prd_org_a_pub_${suffix}`,
+      version: "1.0.0",
+      status: "published",
+      storageKey: `builds/prd_org_a_pub_${suffix}/v1.0.0.zip`,
+      sha256Hash: "d".repeat(64),
+      fileSizeBytes: 2048,
+      fileName: "organization-listing.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "test-scanner",
+      scannedAt: new Date(),
+      isSigned: false,
     });
 
     const baseContent = {

@@ -22,6 +22,8 @@ function contentRequest(token: string, body: Record<string, unknown>) {
 describe("linked content target authorization integration", () => {
   it("rejects foreign server/resource links and accepts the real owner", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
+    // Slugs only allow [a-z0-9-], so derive a slug-safe variant for URL fields.
+    const slugSuffix = suffix.replace(/[^a-z0-9-]/g, "-");
     const ownerId = `usr_link_owner_${suffix}`;
     const attackerId = `usr_link_attacker_${suffix}`;
     const serverId = `srv_link_${suffix}`;
@@ -95,7 +97,7 @@ describe("linked content target authorization integration", () => {
     const foreignServer = await POST(
       contentRequest(attackerToken, {
         title: "Foreign server association",
-        slug: `foreign-server-association-${suffix}`,
+        slug: `foreign-server-association-${slugSuffix}`,
         body: "This body is long enough for content validation.",
         type: "post",
         serverId,
@@ -109,7 +111,7 @@ describe("linked content target authorization integration", () => {
     const foreignProduct = await POST(
       contentRequest(attackerToken, {
         title: "Foreign resource association",
-        slug: `foreign-resource-association-${suffix}`,
+        slug: `foreign-resource-association-${slugSuffix}`,
         body: "This body is long enough for content validation.",
         type: "post",
         productId,
@@ -123,7 +125,7 @@ describe("linked content target authorization integration", () => {
     const owned = await POST(
       contentRequest(ownerToken, {
         title: "Owned linked publication",
-        slug: `owned-linked-publication-${suffix}`,
+        slug: `owned-linked-publication-${slugSuffix}`,
         body: "This body is long enough for content validation.",
         type: "post",
         serverId,

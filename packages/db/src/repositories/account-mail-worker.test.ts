@@ -10,7 +10,7 @@ import { db, auditEvents, sessions, users } from "../client";
 import { accountAuthState, accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
 import { accountMailOutbox } from "../account-mail-schema";
 import { accountChallengeRepository as proofs, digestAccountChallenge } from "./account-challenges";
-import { AccountMailCipher } from "./account-mail-crypto";
+import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import { accountMailOutboxRepository as queue } from "./account-mail-outbox";
 import { AccountMailWorkerRepository, accountMailWorkerRepository as worker } from "./account-mail-worker";
 import type { MailLease } from "./account-mail-worker";
@@ -313,8 +313,10 @@ describe("D2b internal account mail leases on disposable PostgreSQL", () => {
 
   it("fails closed on missing keys and on a validly encrypted but wrong token", async () => {
     const a = await fixture(); const l = await lease(a.job.id); const before = await row(a.job.id);
+    // A cipher whose key ring lacks the envelope keyId fails closed before any
+    // decryption is attempted.
     await assert.rejects(worker.prepare(l, new AccountMailCipher("other", { other: randomBytes(32) })),
-      { message: "Account mail payload is unavailable" });
+      (error: unknown) => error instanceof AccountMailKeyUnavailableError);
     assert.deepEqual(await row(a.job.id), before);
     const [proof] = await db.select().from(authChallenges).where(eq(authChallenges.id, a.job.challengeId));
     const payload = cipher.seal({ id: a.job.id, challengeId: proof.id, userId: a.userId,
@@ -352,7 +354,7 @@ describe("D2b internal account mail leases on disposable PostgreSQL", () => {
   });
 
   for (const operation of ["prepare", "settle"] as const) {
-    it(`${operation}: does not trust an expired lease after a later outbox lock wait`, async () => {
+    it(`${operation}: handles an expired lease after a later outbox lock wait`, async () => {
       const a = await fixture(); const l = await lease(a.job.id);
       const result = await afterWait<unknown>(
         (tx) => tx.select().from(accountMailOutbox).where(eq(accountMailOutbox.id, a.job.id)).for("update"),
@@ -360,9 +362,20 @@ describe("D2b internal account mail leases on disposable PostgreSQL", () => {
         (tx) => tx.update(accountMailOutbox).set({ leaseExpiresAt: sql`clock_timestamp() - interval '1 millisecond'` })
           .where(eq(accountMailOutbox.id, a.job.id))
       );
-      assert.equal(result, operation === "prepare" ? null : false);
-      assert.ok(await row(a.job.id)); assert.equal((await events(a.job.id)).length, 0);
-      const next = await lease(a.job.id); assert.equal(next.attempt, 2);
+      if (operation === "prepare") {
+        // Preparing must not trust the expired lease: the row stays queued and
+        // a fresh lease increments the attempt counter.
+        assert.equal(result, null);
+        assert.ok(await row(a.job.id)); assert.equal((await events(a.job.id)).length, 0);
+        const next = await lease(a.job.id); assert.equal(next.attempt, 2);
+      } else {
+        // Settlement may arrive just after the nominal lease deadline. While
+        // the same token/attempt still owns the row (no reclaim happened) the
+        // real delivery outcome is recorded to avoid a duplicate send; a
+        // reclaimed lease loses on the token digest mismatch instead.
+        assert.equal(result, true);
+        assert.equal(await row(a.job.id), undefined);
+      }
     });
   }
 

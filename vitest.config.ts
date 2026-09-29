@@ -5,6 +5,12 @@ export default defineConfig({
   test: {
     globals: true,
     environment: "node",
+    // Several repository suites (account-mail queue/lease capacity) exercise a
+    // global singleton queue gate and assert exact row counts. Running test
+    // files in parallel lets one suite mutate another suite's queue state,
+    // which is a nondeterministic failure, not a product bug. File-level
+    // serialization keeps those suites deterministic at the cost of runtime.
+    fileParallelism: false,
   },
   resolve: {
     alias: {

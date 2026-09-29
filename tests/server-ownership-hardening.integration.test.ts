@@ -32,6 +32,8 @@ function jsonRequest(
 describe("server ownership hardening integration", () => {
   it("registers through the trusted request-IP wrapper in test runtime", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
+    // Server slugs only allow [a-z0-9-], so derive a slug-safe variant.
+    const slugSuffix = suffix.replace(/[^a-z0-9-]/g, "-");
     const userId = `usr_srv_register_${suffix}`;
     const token = `tok_srv_register_${suffix}`;
     const port = 12_000 + ((Date.now() + process.pid) % 40_000);
@@ -57,7 +59,7 @@ describe("server ownership hardening integration", () => {
         token,
         {
           name: "Trusted IP Registration",
-          slug: `trusted-ip-registration-${suffix}`,
+          slug: `trusted-ip-registration-${slugSuffix}`,
           description: "Server registration route integration coverage.",
           ipAddress: "198.51.100.201",
           port,

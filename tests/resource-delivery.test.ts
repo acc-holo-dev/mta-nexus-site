@@ -1,4 +1,4 @@
-import { Readable } from "node:stream";
+import type { Readable } from "node:stream";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildRepository, userRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";

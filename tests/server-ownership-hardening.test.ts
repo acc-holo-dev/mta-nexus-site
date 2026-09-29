@@ -44,17 +44,25 @@ describe("server ownership hardening surface", () => {
       "pg_advisory_xact_lock",
     );
     expect(repository).toContain(
-      "verification:server:",
+      "pg_advisory_xact_lock",
+    );
+    // Claim serialization keys on the verification target, not a server-only
+    // literal: the same contract now covers user/developer/organization targets.
+    expect(repository).toContain(
+      "verification:${input.targetType}:${input.targetId}",
     );
     expect(repository).toContain(
-      "A server ownership request is already pending",
+      "A verification request is already pending",
     );
     expect(repository).toContain(
       'throw new ConflictError("Server claim target is already owned by another user")',
     );
     expect(repository).toContain("findPendingForAnyRequester");
+    // Duplicate pending requests are detected per requester before enqueue;
+    // cross-requester pending state stays available on the repository for
+    // moderation-side checks.
     expect(route).toContain(
-      "verificationRepository.findPendingForAnyRequester",
+      "verificationRepository.findPendingForTarget(",
     );
     expect(route).toContain("error instanceof AppError");
   });
@@ -64,15 +72,13 @@ describe("server ownership hardening surface", () => {
       "apps/web/src/app/api/verification/route.ts",
     );
 
-    expect(route).toContain(
-      'const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" }',
-    );
-    expect(route).toContain(
-      'return NextResponse.json({ requests }, { headers: privateHeaders })',
-    );
-    expect(route).toContain(
-      '{ status: 401, headers: privateHeaders }',
-    );
+    // Every authenticated response (including 401 and rate limits) goes through
+    // the json() helper, so the private no-store headers always apply.
+    expect(route).toContain('"Cache-Control": "private, no-store"');
+    expect(route).toContain("Vary: \"Cookie\"");
+    expect(route).toContain("headers: privateHeaders");
+    expect(route).toContain("return json({ requests });");
+    expect(route).toContain("return json({ error: \"Unauthorized\" }, 401)");
   });
 
   it("does not claim automatic proof or live-ownership acceptance", () => {

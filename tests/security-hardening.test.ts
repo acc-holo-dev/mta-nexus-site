@@ -103,15 +103,56 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     );
     expect(hasBought).toBe(false);
 
+    // A claimable free resource needs its own dedicated product so the shared
+    // fixture product stays build-free for the download authorization test.
+    const reviewProduct = await productRepository.create({
+      id: `prd_sec_review_${ts}`,
+      title: "Security Review Product",
+      slug: `security-review-${ts}`,
+      description: "Product used for review integrity tests",
+      type: "script",
+      status: "published",
+      authorId: author.id,
+      price: 0,
+      currency: "USD",
+      licenseModel: "single_server",
+      tags: ["security"],
+      currentVersion: "1.0.0",
+      ratingAverage: 0,
+      ratingCount: 0,
+      salesCount: 0,
+      isFeatured: false,
+      screenshots: [],
+      compatibility: {},
+    });
+
+    // A published free resource must expose a trusted clean build before it can
+    // be claimed or downloaded (builds_published_safe_check invariant).
+    await buildRepository.create({
+      id: `bld_sec_review_${ts}`,
+      productId: reviewProduct.id,
+      version: "1.0.0",
+      status: "published",
+      storageKey: `builds/${reviewProduct.id}/v1.0.0.zip`,
+      sha256Hash: "b".repeat(64),
+      fileSizeBytes: 1024,
+      fileName: "security-test.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "test-scanner",
+      scannedAt: new Date(),
+      isSigned: false,
+    });
+
     // After purchase, user B can review
     await commerceService.claimFreeResource({
       user: userB,
-      productId: product.id,
+      productId: reviewProduct.id,
     });
 
     const review = await contentRepository.addComment({
       id: `cmt_sec_${ts}`,
-      productId: product.id,
+      productId: reviewProduct.id,
       authorId: userB.id,
       text: "Solid resource, works as advertised",
       rating: 4,
@@ -120,7 +161,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     expect(review.isVerifiedPurchase).toBe(true);
 
     // Duplicate review must be detectable
-    const duplicate = await contentRepository.hasReviewFromUser(product.id, userB.id);
+    const duplicate = await contentRepository.hasReviewFromUser(reviewProduct.id, userB.id);
     expect(duplicate).toBe(true);
   });
 
@@ -145,7 +186,8 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     const builds = await buildRepository.listByProduct(product.id);
     expect(builds.length).toBe(0);
 
-    // Publish a real build
+    // Publish a real build that satisfies the published-safe invariant
+    // (clean scan with scanner identity and scan timestamp).
     await buildRepository.create({
       id: `bld_sec_${ts}`,
       productId: product.id,
@@ -156,8 +198,8 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       fileSizeBytes: 1024,
       fileName: "security-test.zip",
       mimeType: "application/zip",
-      scanStatus: "not_scanned",
-      scanner: "disabled",
+      scanStatus: "clean",
+      scanner: "test-scanner",
       scannedAt: new Date(),
       isSigned: false,
     });

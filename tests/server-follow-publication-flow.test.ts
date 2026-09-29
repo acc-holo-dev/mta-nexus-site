@@ -17,8 +17,8 @@ describe("server follower publication notifications", () => {
     expect(service).toContain(
       'if (decision === "publish" && updated.serverId)',
     );
-    expect(service).toContain(
-      "notifyServerFollowersOfPublishedContent(updated).catch(() => undefined)",
+    expect(service).toMatch(
+      /notifyServerFollowersOfPublishedContent\(updated\)\.catch\(\s*\n\s*\(\) => undefined,\s*\n\s*\)/,
     );
     expect(service).toContain("CONTENT_ALREADY_IN_STATE");
     expect(createRoute).not.toContain(
@@ -50,8 +50,8 @@ describe("server follower publication notifications", () => {
       fanout.indexOf("follow.followerId !== content.authorId"),
     );
     expect(fanout).toContain("Promise.all(");
-    expect(fanout).toContain(
-      'socialRepository.listFollowersByTarget("server"',
+    expect(fanout).toMatch(
+      /socialRepository\.listFollowersByTarget\(\s*\n\s*"server",/,
     );
     expect(fanout).toContain("followerLimitReached");
     expect(notifications).toContain(

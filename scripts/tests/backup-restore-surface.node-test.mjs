@@ -84,7 +84,7 @@ test("temporary backup artifacts are forced to private file permissions", () => 
 test("workflow runs backup restore as a separate disposable job", () => {
   const workflow = read(".github/workflows/ci.yml");
 
-  assert.match(workflow, /^  backup-restore:/mu);
+  assert.match(workflow, /^ {2}backup-restore:/mu);
   assert.match(workflow, /name: Disposable backup restore/u);
   assert.match(
     workflow,
