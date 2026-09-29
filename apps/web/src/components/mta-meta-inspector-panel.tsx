@@ -1,5 +1,6 @@
 "use client";
 
+import { withOccurrenceKeys } from "@nexus/ui";
 import { FileSearch, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { useNexusLocale } from "./locale-context";
@@ -321,11 +322,12 @@ export function MtaMetaInspectorPanel({
                 </span>
               </div>
               <ul className="grid gap-1.5 sm:grid-cols-2">
-                {inspection.aclRights
-                  .slice(0, MAX_META_ENTRY_PREVIEW)
-                  .map((right, index) => (
+                {withOccurrenceKeys(
+                  inspection.aclRights.slice(0, MAX_META_ENTRY_PREVIEW),
+                  (right) => JSON.stringify([right.name, right.access]),
+                ).map(({ key, item: right }) => (
                     <li
-                      key={`${right.name ?? "unnamed"}-${index}`}
+                      key={key}
                       className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
                     >
                       <code className="break-all text-secondary">
@@ -367,11 +369,12 @@ export function MtaMetaInspectorPanel({
                 </span>
               </div>
               <ul className="grid gap-1.5 sm:grid-cols-2">
-                {inspection.exports
-                  .slice(0, MAX_META_ENTRY_PREVIEW)
-                  .map((entry, index) => (
+                {withOccurrenceKeys(
+                  inspection.exports.slice(0, MAX_META_ENTRY_PREVIEW),
+                  (entry) => JSON.stringify([entry.function, entry.type, entry.http]),
+                ).map(({ key, item: entry }) => (
                     <li
-                      key={`${entry.function ?? "unnamed"}-${index}`}
+                      key={key}
                       className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-md border border-base bg-inset px-2.5 py-2 text-xs"
                     >
                       <code className="break-all text-secondary">
@@ -397,9 +400,11 @@ export function MtaMetaInspectorPanel({
                 {copy.structuralNotes}
               </div>
               <ul className="space-y-1.5">
-                {inspection.issues.map((issue, index) => (
+                {withOccurrenceKeys(inspection.issues, (issue) =>
+                  JSON.stringify([issue.code, issue.severity, issue.message]),
+                ).map(({ key, item: issue }) => (
                   <li
-                    key={`${issue.code}-${index}`}
+                    key={key}
                     className={
                       issue.severity === "error"
                         ? "text-xs text-danger"
@@ -424,3 +429,4 @@ export function MtaMetaInspectorPanel({
     </section>
   );
 }
+

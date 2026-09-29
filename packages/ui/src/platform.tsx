@@ -1,5 +1,6 @@
-import * as React from "react";
+import type * as React from "react";
 import { cn } from "./utils";
+import { withOccurrenceKeys } from "./list-keys";
 import { ShieldCheck, BadgeCheck, CheckCircle2, Megaphone, Star } from "lucide-react";
 
 /* ============================================================
@@ -186,8 +187,8 @@ export function DataTableHeader({ columns }: { columns: string[] }) {
   return (
     <thead className="font-label text-faint uppercase border-b border-base">
       <tr>
-        {columns.map((col, i) => (
-          <th key={i} className={cn("py-2.5 pr-4", i === columns.length - 1 && "text-right pr-0")}>
+        {withOccurrenceKeys(columns, (column) => column).map(({ key, item: col }, i) => (
+          <th key={key} className={cn("py-2.5 pr-4", i === columns.length - 1 && "text-right pr-0")}>
             {col}
           </th>
         ))}
@@ -213,3 +214,4 @@ export function DataTableEmpty({ colSpan, message }: { colSpan: number; message:
     </tr>
   );
 }
+
