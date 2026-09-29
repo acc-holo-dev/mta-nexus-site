@@ -23,6 +23,8 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
+const REVIEW_STAR_IDS = [1, 2, 3, 4, 5] as const;
+
 function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) {
     return `${Math.max(1, Math.round(bytes / 1024))} KB`;
@@ -334,11 +336,9 @@ export default async function ProductDetailPage({
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex flex-wrap items-center gap-2">
                         <div className="flex text-warning">
-                          {Array.from({
-                            length: review.rating || 5,
-                          }).map((_, index) => (
+                          {REVIEW_STAR_IDS.slice(0, review.rating || 5).map((star) => (
                             <Star
-                              key={index}
+                              key={star}
                               className="h-3.5 w-3.5 fill-current"
                               aria-hidden="true"
                             />
