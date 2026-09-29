@@ -91,6 +91,7 @@ export const serverHistoryService = {
       absenceMeansOffline: false as const,
       summary: summarizeServerObservations(observations),
       observations: observations.map((observation) => ({
+        id: observation.id,
         observedAt: new Date(observation.observedAt).toISOString(),
         currentPlayers:
           typeof observation.currentPlayers === "number"
