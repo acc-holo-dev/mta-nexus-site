@@ -39,8 +39,8 @@
 
 ### P1-1. Lint-долг: 34 ошибки по последнему полному прогону
 
-biome 2.5.14, ошибки требуют ручных решений по группам. Четыре предупреждения в трёх файлах исправлены
-в `43a996f`, `60ccbd0` и `2cfb4b4`; текущий счёт не подтверждён новым полным прогоном.
+biome 2.5.14, ошибки требуют ручных решений по группам. Восемь отмеченных предупреждений исправлены в `43a996f`, `60ccbd0`,
+`2cfb4b4` и `0aa5bc8`; текущий счёт не подтверждён новым полным прогоном.
 `pnpm check` остаётся неподтверждённым, пока GitHub Actions не исполняет jobs.
 
 **correctness/useExhaustiveDependencies (10)** — ручная проверка массивов
@@ -64,13 +64,10 @@ biome 2.5.14, ошибки требуют ручных решений по гр�
 - `apps/web/src/components/server-history-panel.tsx:113`
 - `packages/ui/src/platform.tsx:190`
 
-**a11y (7 из исходных 8)** — семантические элементы/клавиатура/фокус:
+**a11y (3 из исходных 8)** — семантические элементы/клавиатура/фокус:
 
 - `apps/web/src/app/market/page.tsx:68` — useSemanticElements
 - `apps/web/src/components/account-controls.tsx:109` — useSemanticElements
-- `apps/web/src/components/command-palette.tsx:196` и `:203` — useKeyWithClickEvents
-- `apps/web/src/components/command-palette.tsx:203` — noStaticElementInteractions
-- `apps/web/src/components/command-palette.tsx:210` — noAutofocus
 - `packages/ui/src/dialog.tsx:22` — noStaticElementInteractions
 
 **прочее (оставшиеся записи из исходного списка):**
@@ -188,6 +185,9 @@ TS-валидация есть только на входе приложений
 ---
 
 ## Недавно исправлено (справочно, из истории)
+
+- `0aa5bc8` — командная панель закрывается кнопкой фона; фокус поиска
+  устанавливается при открытии и возвращается после закрытия.
 
 - `2cfb4b4` — фиксированные идентификаторы ключей для четырёх loading-карточек.
 
