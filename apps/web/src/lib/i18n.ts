@@ -656,6 +656,9 @@ const en = {
     typeModel: "Model",
     typeUi: "UI",
     typePlugin: "Plugin",
+    typeApi: "API",
+    typeBundle: "Bundle",
+    typeService: "Service",
   },
   serverRegistration: {
     title: "Add a server listing",
@@ -1783,6 +1786,9 @@ const ru: typeof en = {
     typeModel: "Модель",
     typeUi: "UI",
     typePlugin: "Плагин",
+    typeApi: "API",
+    typeBundle: "Набор",
+    typeService: "Сервис",
   },
   serverRegistration: {
     title: "Добавить сервер",

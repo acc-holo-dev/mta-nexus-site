@@ -1,5 +1,8 @@
 "use client";
 
+import { PRODUCT_TYPES } from "@nexus/domain";
+import { PRODUCT_PUBLISHING_KEYS } from "../../../../lib/product-type-labels";
+
 import { type FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@nexus/ui";
@@ -352,12 +355,9 @@ export default function NewResourcePage() {
             className={fieldClass}
             disabled={Boolean(createdProduct)}
           >
-            <option value="script">{copy.typeScript}</option>
-            <option value="map">{copy.typeMap}</option>
-            <option value="vehicle">{copy.typeVehicle}</option>
-            <option value="model">{copy.typeModel}</option>
-            <option value="ui">{copy.typeUi}</option>
-            <option value="plugin">{copy.typePlugin}</option>
+            {PRODUCT_TYPES.map((type) => (
+              <option key={type} value={type}>{copy[PRODUCT_PUBLISHING_KEYS[type]]}</option>
+            ))}
           </select>
         </label>
 

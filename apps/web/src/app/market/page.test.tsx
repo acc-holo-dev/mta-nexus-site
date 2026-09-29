@@ -32,7 +32,7 @@ describe("free resource catalog as rendered for visitors", () => {
     expect(mocks.listPublicPage).toHaveBeenCalledWith({
       type: "script", sort: "rating", query: "MTA & RPG", page: 1, pageSize: 24,
     });
-    expect(html).toContain('role="search"');
+    expect(html).toMatch(/<search\b[^>]*aria-label="Поиск ресурсов"/);
     expect(html).toContain("Искать бесплатные ресурсы MTA");
     expect(html).toContain("Скрипт");
     expect(html).toContain("page=2");

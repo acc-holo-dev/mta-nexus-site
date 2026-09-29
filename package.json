@@ -39,7 +39,10 @@
     "dev:docker:logs": "docker compose -p nexus-local -f compose.yaml logs --tail 100 --follow app postgres clamav",
     "dev:docker:check": "docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs",
     "dev:host": "pnpm --filter @nexus/web dev",
-    "dev:preflight": "pnpm nexus:doctor"
+    "dev:preflight": "pnpm nexus:doctor",
+    "db:seed:repair": "pnpm --filter @nexus/db seed --repair-demo-builds",
+    "test:resource-integrity": "vitest run tests/product-types.test.ts tests/seed-archive.test.ts tests/seed-storage.test.ts tests/seed-baseline.test.ts tests/build-download-metadata.test.ts tests/storage-open-file.test.ts tests/storage-provider.test.ts tests/resource-download-http.test.ts tests/build-moderation-controls.test.ts apps/web/src/app/workspace/resources/new/page.test.tsx",
+    "test:resource-integrity:integration": "vitest run tests/product-types.integration.test.ts tests/seed-baseline.integration.test.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",

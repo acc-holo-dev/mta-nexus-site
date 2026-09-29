@@ -1,5 +1,4 @@
 import fs from "node:fs/promises";
-import { createReadStream } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import type { StorageProvider, StorageObjectMeta } from "./types";
@@ -42,17 +41,19 @@ export class LocalStorageProvider implements StorageProvider {
     };
   }
 
-  async get(key: string): Promise<{ stream: NodeJS.ReadableStream; meta?: Partial<StorageObjectMeta> }> {
+  async get(
+    key: string,
+  ): Promise<{ stream: NodeJS.ReadableStream; meta?: Partial<StorageObjectMeta> }> {
     const filePath = this.resolvePath(key);
-    const stat = await fs.stat(filePath);
-    const stream = createReadStream(filePath);
-    return {
-      stream,
-      meta: {
-        key,
-        sizeBytes: stat.size,
-      },
-    };
+    const handle = await fs.open(filePath, "r");
+    try {
+      const stat = await handle.stat();
+      if (!stat.isFile()) throw new Error("Storage object is not a regular file");
+      return { stream: handle.createReadStream(), meta: { key, sizeBytes: stat.size } };
+    } catch (error) {
+      await handle.close();
+      throw error;
+    }
   }
 
   async delete(key: string): Promise<void> {
@@ -61,7 +62,11 @@ export class LocalStorageProvider implements StorageProvider {
       await fs.unlink(filePath);
     } catch (error: unknown) {
       if (
-        !(error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "ENOENT")
+        !(
+          error instanceof Error &&
+          "code" in error &&
+          (error as NodeJS.ErrnoException).code === "ENOENT"
+        )
       ) {
         throw error;
       }

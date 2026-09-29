@@ -1,3 +1,5 @@
+import type { ProductType } from "./product-types";
+
 // Domain State Enums & Types
 
 export type UserRole = "user" | "developer" | "server_owner" | "moderator" | "admin";
@@ -8,16 +10,7 @@ export type ServerStatus = "active" | "inactive" | "maintenance" | "suspended";
 
 export type ServerVisibility = "public" | "unlisted" | "private";
 
-export type ProductType =
-  | "script"
-  | "model"
-  | "vehicle"
-  | "map"
-  | "ui"
-  | "plugin"
-  | "api"
-  | "service"
-  | "bundle";
+export type { ProductType } from "./product-types";
 
 export type ProductStatus = "draft" | "pending_review" | "published" | "suspended" | "archived";
 

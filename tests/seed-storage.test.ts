@@ -6,25 +6,14 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 const fixture = vi.hoisted(() => ({
   config: { NODE_ENV: "test", STORAGE_PROVIDER: "local", STORAGE_LOCAL_PATH: "" },
-  create: vi.fn(async (value: Record<string, unknown>) => value),
-  record: vi.fn(),
+  persist: vi.fn(async (_data: unknown, _options: unknown) => ({
+    inserted: 13,
+    repairedBuilds: 0,
+  })),
 }));
 vi.mock("@nexus/config", () => ({ config: fixture.config }));
 vi.mock("@nexus/security", () => ({ hashPassword: async () => "test-only-hash" }));
-vi.mock("../packages/db/src/repositories/index", () => ({
-  ...Object.fromEntries(
-    [
-      "userRepository",
-      "organizationRepository",
-      "serverRepository",
-      "productRepository",
-      "buildRepository",
-      "licenseRepository",
-      "contentRepository",
-    ].map((name) => [name, { create: fixture.create }]),
-  ),
-  auditRepository: { record: fixture.record },
-}));
+vi.mock("../packages/db/src/seed-baseline", () => ({ seedBaseline: fixture.persist }));
 import { runSeed } from "../packages/db/src/seed";
 
 let root: string;
@@ -40,20 +29,26 @@ afterEach(async () => {
 
 it("creates a build whose metadata matches the actual downloadable archive", async () => {
   await runSeed();
-  const build = fixture.create.mock.calls
-    .map(([value]) => value)
-    .find((value) => value.id === "bld_inv_320");
-  if (!build) throw new Error("Seed did not create its inventory build");
-  const bytes = await readFile(join(root, String(build.storageKey)));
-  expect(build.fileSizeBytes).toBe(bytes.length);
-  expect(build.sha256Hash).toBe(createHash("sha256").update(bytes).digest("hex"));
-  expect(build.releaseNotes).toContain("demo archive");
-  expect(fixture.record).toHaveBeenCalledOnce();
+  const data = fixture.persist.mock.calls[0][0] as {
+    builds: {
+      storageKey: string;
+      fileSizeBytes: number;
+      sha256Hash: string;
+      releaseNotes: string;
+    }[];
+  };
+  expect(data.builds).toHaveLength(2);
+  for (const build of data.builds) {
+    const bytes = await readFile(join(root, build.storageKey));
+    expect(build.fileSizeBytes).toBe(bytes.length);
+    expect(build.sha256Hash).toBe(createHash("sha256").update(bytes).digest("hex"));
+    expect(build.releaseNotes).toContain("demo archive");
+  }
+  expect(fixture.persist).toHaveBeenCalledOnce();
 });
 
 it("rejects production before any repository mutation", async () => {
   fixture.config.NODE_ENV = "production";
   await expect(runSeed()).rejects.toThrow("disabled in production");
-  expect(fixture.create).not.toHaveBeenCalled();
-  expect(fixture.record).not.toHaveBeenCalled();
+  expect(fixture.persist).not.toHaveBeenCalled();
 });

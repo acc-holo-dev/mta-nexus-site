@@ -1,3 +1,8 @@
+import { ValidationError } from "@nexus/domain";
+import {
+  assertBuildDownloadMetadata,
+  BuildArtifactMismatchError,
+} from "../../../../../../lib/build-download-metadata";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { NextRequest, NextResponse } from "next/server";
@@ -69,11 +74,7 @@ export async function GET(
         { status: 409, headers: privateHeaders },
       );
     }
-    if (
-      build.scanStatus !== "clean" ||
-      !build.scanner?.trim() ||
-      !build.scannedAt
-    ) {
+    if (build.scanStatus !== "clean" || !build.scanner?.trim() || !build.scannedAt) {
       return NextResponse.json(
         { error: "Reviewer download requires a provenance-backed clean malware scan" },
         { status: 422, headers: privateHeaders },
@@ -81,6 +82,7 @@ export async function GET(
     }
 
     const stored = await storageService.getDownloadStream(build.storageKey);
+    const contentLength = assertBuildDownloadMetadata(stored, build);
     try {
       await auditRepository.record({
         id: generateId("aud"),
@@ -108,12 +110,27 @@ export async function GET(
           build.id,
           build.fileName,
         )}"`,
-        "Content-Length": String(stored.meta?.sizeBytes || build.fileSizeBytes),
+        "Content-Length": String(contentLength),
         "X-Content-SHA256": build.sha256Hash,
         "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error: unknown) {
+    if (error instanceof BuildArtifactMismatchError) {
+      return NextResponse.json(
+        {
+          error: "Build file does not match its recorded metadata",
+          code: "BUILD_ARTIFACT_MISMATCH",
+        },
+        { status: 409, headers: privateHeaders },
+      );
+    }
+    if (error instanceof ValidationError) {
+      return NextResponse.json(
+        { error: "Resource build file is not available" },
+        { status: 404, headers: privateHeaders },
+      );
+    }
     console.error("Reviewer build download error:", error);
     return NextResponse.json(
       { error: "Could not deliver reviewer artifact" },

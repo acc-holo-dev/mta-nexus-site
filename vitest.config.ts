@@ -1,9 +1,11 @@
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 import path from "node:path";
 
 export default defineConfig({
   test: {
     globals: true,
+    // Standalone builds copy source tests; never execute those generated copies.
+    exclude: [...configDefaults.exclude, "**/.next/**"],
     environment: "node",
     // Several repository suites (account-mail queue/lease capacity) exercise a
     // global singleton queue gate and assert exact row counts. Running test

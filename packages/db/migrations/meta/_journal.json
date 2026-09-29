@@ -169,6 +169,13 @@
       "when": 1790507200000,
       "tag": "0023_remaining_moderation_queue_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1790668800000,
+      "tag": "0024_product_type_invariant",
+      "breakpoints": true
     }
   ]
 }

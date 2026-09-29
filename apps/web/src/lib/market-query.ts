@@ -1,10 +1,8 @@
-import type { ProductType } from "@nexus/domain";
+import { PRODUCT_TYPES, isProductType, type ProductType } from "@nexus/domain";
 
 export const MARKET_PAGE_SIZE = 24;
 export const MAX_MARKET_PAGE = 1000;
-export const MARKET_TYPES = [
-  "script", "vehicle", "model", "map", "ui", "plugin", "api", "bundle", "service",
-] as const satisfies readonly ProductType[];
+export const MARKET_TYPES = PRODUCT_TYPES;
 export const MARKET_SORTS = ["popular", "newest", "rating"] as const;
 
 export type MarketSort = (typeof MARKET_SORTS)[number];
@@ -17,18 +15,12 @@ export function parseMarketPage(value: Param): number {
   return page <= MAX_MARKET_PAGE ? page : 1;
 }
 
-export function parseMarketQuery(params: {
-  type?: Param;
-  sort?: Param;
-  q?: Param;
-  page?: Param;
-}) {
-  const type: MarketType = typeof params.type === "string" &&
-    MARKET_TYPES.some((candidate) => candidate === params.type)
-    ? params.type as ProductType : "all";
-  const sort: MarketSort = typeof params.sort === "string" &&
-    MARKET_SORTS.some((candidate) => candidate === params.sort)
-    ? params.sort as MarketSort : "popular";
+export function parseMarketQuery(params: { type?: Param; sort?: Param; q?: Param; page?: Param }) {
+  const type: MarketType = isProductType(params.type) ? params.type : "all";
+  const sort: MarketSort =
+    typeof params.sort === "string" && MARKET_SORTS.some((candidate) => candidate === params.sort)
+      ? (params.sort as MarketSort)
+      : "popular";
   const query = typeof params.q === "string" ? params.q.trim().slice(0, 100) : "";
   return { type, sort, query, page: parseMarketPage(params.page) };
 }

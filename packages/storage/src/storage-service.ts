@@ -37,7 +37,7 @@ export class StorageService {
     }
     if (input.data.byteLength > MAX_FILE_SIZE_BYTES) {
       throw new ValidationError(
-        `File exceeds maximum permitted size of ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB`
+        `File exceeds maximum permitted size of ${MAX_FILE_SIZE_BYTES / (1024 * 1024)}MB`,
       );
     }
 
@@ -46,7 +46,7 @@ export class StorageService {
       throw new ValidationError(
         ext
           ? `File type '${ext}' is not permitted in MTA Nexus storage`
-          : "A permitted file extension is required"
+          : "A permitted file extension is required",
       );
     }
 
@@ -77,7 +77,14 @@ export class StorageService {
     if (!exists) {
       throw new ValidationError("Asset does not exist in storage");
     }
-    return provider.get(key);
+    try {
+      return await provider.get(key);
+    } catch (error) {
+      if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+        throw new ValidationError("Asset does not exist in storage");
+      }
+      throw error;
+    }
   }
 
   async getSignedUrl(key: string, expiresInSeconds = 3600): Promise<string> {

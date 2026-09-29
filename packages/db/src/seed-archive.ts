@@ -9,11 +9,13 @@ const archive = Buffer.from(
   "base64",
 );
 
-export async function ensureSeedArchive(options: {
+type SeedStorageOptions = {
   NODE_ENV: string;
   STORAGE_PROVIDER: string;
   STORAGE_LOCAL_PATH: string;
-}) {
+};
+
+function validateSeedStorage(options: SeedStorageOptions) {
   if (options.NODE_ENV === "production") {
     throw new Error("Demonstration seed is disabled in production");
   }
@@ -22,8 +24,10 @@ export async function ensureSeedArchive(options: {
       "Seed requires local storage with an absolute STORAGE_LOCAL_PATH shared with the app",
     );
   }
+}
 
-  const storageKey = "builds/prd_inv_pro/v3.2.0.zip";
+async function ensureArchive(options: SeedStorageOptions, storageKey: string, archive: Buffer) {
+  validateSeedStorage(options);
   const target = join(options.STORAGE_LOCAL_PATH, storageKey);
   await mkdir(dirname(target), { recursive: true });
   const temporary = `${target}.${randomUUID()}.tmp`;
@@ -47,4 +51,19 @@ export async function ensureSeedArchive(options: {
     sha256Hash: createHash("sha256").update(archive).digest("hex"),
     fileSizeBytes: archive.length,
   };
+}
+
+const driftArchive = Buffer.from(
+  "UEsDBBQAAAAAAAAAIVzbjvAjkAAAAJAAAAAKAAAAUkVBRE1FLnR4dE1UQSBORVhVUyBkZXZlbG9wbWVudCBmaXh0dXJlCkRvd25sb2FkIGRlbW8gb25seSwgbm90IGEgZnVuY3Rpb25pbmcgZHJpZnQgaGFuZGxpbmcgc3lzdGVtLgpEbyBub3QgZGVwbG95IHRoaXMgZml4dHVyZSBhcyBhIHByb2R1Y3Rpb24gcmVzb3VyY2UuClBLAwQUAAAAAAAAACFcU77Os2oAAABqAAAACAAAAG1ldGEueG1sPG1ldGE+CiAgPGluZm8gbmFtZT0iTmV4dXMgZHJpZnQgZG93bmxvYWQgZGVtbyIgYXV0aG9yPSJNVEEgTkVYVVMiIHZlcnNpb249IjEuMC4wIiB0eXBlPSJtaXNjIiAvPgo8L21ldGE+ClBLAQIUAxQAAAAAAAAAIVzbjvAjkAAAAJAAAAAKAAAAAAAAAAAAAACAAQAAAABSRUFETUUudHh0UEsBAhQDFAAAAAAAAAAhXFO+zrNqAAAAagAAAAgAAAAAAAAAAAAAAIABuAAAAG1ldGEueG1sUEsFBgAAAAACAAIAbgAAAEgBAAAAAA==",
+  "base64",
+);
+
+export function ensureSeedArchive(options: SeedStorageOptions) {
+  return ensureArchive(options, "builds/prd_inv_pro/v3.2.0.zip", archive);
+}
+
+export async function ensureSeedArchives(options: SeedStorageOptions) {
+  const inventory = await ensureSeedArchive(options);
+  const drift = await ensureArchive(options, "builds/prd_drift_physics/v2.1.4.zip", driftArchive);
+  return { inventory, drift };
 }

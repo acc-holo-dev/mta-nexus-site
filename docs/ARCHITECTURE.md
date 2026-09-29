@@ -121,3 +121,31 @@ Never attach an existing PostgreSQL data directory to a different PostgreSQL maj
 ## 7. Repository policy
 
 `main` is the only maintained development line. CI, browser workflows and Dependabot target `main`. Short-lived external automation branches may exist while a tool is operating, but product development must not depend on a permanent `dev` branch.
+
+## Resource integrity and development fixtures
+
+`packages/domain/src/product-types.ts` owns `PRODUCT_TYPES` and `ProductType`.
+Input validation, catalog filters, publishing options and database typing use
+that registry. Exhaustive translation mappings cover all nine types in English
+and Russian. Migration `0024_product_type_invariant` maps only the historical
+`tool` alias to `plugin`, then adds a CHECK constraint; unknown values fail the
+migration instead of receiving an arbitrary classification.
+
+Development seeding separates deterministic archive preparation (`seed-archive`),
+declarative records (`seed-data`) and transactional persistence (`seed-baseline`).
+A transaction-scoped advisory lock serializes seed writers; existing fixture rows
+are locked and checked for identity before missing IDs are inserted. Unique-key
+collisions abort the transaction. Existing user edits are preserved. The explicit
+repair mode changes only size/hash for matching demo builds. Audit writes belong
+to the same transaction, and no-op reruns do not create audit noise. Filesystem
+preparation is outside the transaction and never overwrites conflicting bytes.
+A rollback can leave reusable fixture files but cannot publish partial DB rows.
+
+Public and reviewer delivery share a metadata guard before download-started audit
+writes. A known storage size/hash mismatch produces private HTTP 409 with
+`BUILD_ARTIFACT_MISMATCH`, and closes the stream. Missing bytes produce 404.
+Local storage obtains metadata and the stream from the same open file handle, so
+pathname replacement cannot switch the streamed file after stat. This does not
+protect against writes into that same inode. Local reads do not recompute SHA-256:
+same-size corruption is not detected unless a provider supplies a conflicting hash.
+Providers without metadata retain the recorded positive content-length fallback.

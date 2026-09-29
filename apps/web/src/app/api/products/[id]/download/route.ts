@@ -1,3 +1,7 @@
+import {
+  assertBuildDownloadMetadata,
+  BuildArtifactMismatchError,
+} from "../../../../../lib/build-download-metadata";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { NextRequest, NextResponse } from "next/server";
@@ -25,10 +29,7 @@ function destroyOpenedStream(stream: NodeJS.ReadableStream): void {
   destroyable.destroy?.();
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id: productId } = await params;
     const token = request.cookies.get("nexus_session")?.value;
@@ -36,35 +37,36 @@ export async function GET(
     if (!user) {
       return NextResponse.json(
         { error: "Authentication required to download resource builds" },
-        { status: 401, headers: privateHeaders }
+        { status: 401, headers: privateHeaders },
       );
     }
 
     const rateLimit = await consumeRateLimit("download", user.id);
     if (!rateLimit.success) {
-      return NextResponse.json({ error: "Too many download requests" }, { status: 429, headers: privateHeaders });
+      return NextResponse.json(
+        { error: "Too many download requests" },
+        { status: 429, headers: privateHeaders },
+      );
     }
 
     const product = await productRepository.findById(productId);
     if (!product) {
-      return NextResponse.json({ error: "Resource not found" }, { status: 404, headers: privateHeaders });
+      return NextResponse.json(
+        { error: "Resource not found" },
+        { status: 404, headers: privateHeaders },
+      );
     }
 
     const isPrivileged =
-      user.role === "admin" ||
-      (await productService.canManageProduct(product, user));
+      user.role === "admin" || (await productService.canManageProduct(product, user));
     const hasEntitlement = isPrivileged
       ? false
       : await commerceService.checkEntitlement(
           { type: "user", id: user.id },
           productId,
-          "product.download"
+          "product.download",
         );
-    const access = decideResourceDownloadAccess(
-      product,
-      isPrivileged,
-      hasEntitlement,
-    );
+    const access = decideResourceDownloadAccess(product, isPrivileged, hasEntitlement);
 
     if (!access.allowed) {
       if (access.reason === "resource_not_published") {
@@ -75,14 +77,16 @@ export async function GET(
       }
       return NextResponse.json(
         { error: "Add this resource to your library before downloading it" },
-        { status: 403, headers: privateHeaders }
+        { status: 403, headers: privateHeaders },
       );
     }
 
-    const latestBuild =
-      await buildRepository.findLatestPublishedByProduct(productId);
+    const latestBuild = await buildRepository.findLatestPublishedByProduct(productId);
     if (!latestBuild) {
-      return NextResponse.json({ error: "No published build is available" }, { status: 404, headers: privateHeaders });
+      return NextResponse.json(
+        { error: "No published build is available" },
+        { status: 404, headers: privateHeaders },
+      );
     }
     if (
       latestBuild.scanStatus !== "clean" ||
@@ -96,6 +100,7 @@ export async function GET(
     }
 
     const stored = await storageService.getDownloadStream(latestBuild.storageKey);
+    const contentLength = assertBuildDownloadMetadata(stored, latestBuild);
     try {
       await auditRepository.record({
         id: generateId("aud"),
@@ -117,13 +122,22 @@ export async function GET(
       headers: {
         "Content-Type": latestBuild.mimeType || stored.meta?.mimeType || "application/octet-stream",
         "Content-Disposition": `attachment; filename="${fileName}"`,
-        "Content-Length": String(stored.meta?.sizeBytes || latestBuild.fileSizeBytes),
+        "Content-Length": String(contentLength),
         "X-Content-SHA256": latestBuild.sha256Hash,
         ...privateHeaders,
         "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error: unknown) {
+    if (error instanceof BuildArtifactMismatchError) {
+      return NextResponse.json(
+        {
+          error: "Build file does not match its recorded metadata",
+          code: "BUILD_ARTIFACT_MISMATCH",
+        },
+        { status: 409, headers: privateHeaders },
+      );
+    }
     // A build whose bytes are missing from storage is a data-state problem,
     // not a server fault: answer with an honest 404 instead of a 500.
     if (error instanceof ValidationError) {
@@ -133,6 +147,9 @@ export async function GET(
       );
     }
     console.error("Download error:", error);
-    return NextResponse.json({ error: "Failed to deliver resource build" }, { status: 500, headers: privateHeaders });
+    return NextResponse.json(
+      { error: "Failed to deliver resource build" },
+      { status: 500, headers: privateHeaders },
+    );
   }
 }

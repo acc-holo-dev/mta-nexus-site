@@ -1,3 +1,4 @@
+import { PRODUCT_TYPES } from "@nexus/domain";
 import { z } from "zod";
 
 // MTA's sortable release form, for example 1.6.0-9.22279.0.
@@ -118,17 +119,7 @@ export const createProductSchema = z.object({
   slug: z.string().min(3).max(120).regex(/^[a-z0-9-]+$/),
   shortDescription: z.string().max(250).optional(),
   description: z.string().min(10).max(10000),
-  type: z.enum([
-    "script",
-    "model",
-    "vehicle",
-    "map",
-    "ui",
-    "plugin",
-    "api",
-    "service",
-    "bundle",
-  ]),
+  type: z.enum(PRODUCT_TYPES),
   price: z.coerce.number().int().min(0, "Price must be non-negative in cents"),
   currency: z.string().length(3).default("USD"),
   licenseModel: z.enum([

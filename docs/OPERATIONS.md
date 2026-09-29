@@ -506,3 +506,43 @@ Next: restore executed CI jobs (the zero-step runner blocker), run the focused H
 Session revocation now accepts exactly one command: `{ "sessionId": "..." }` for a single owned non-current session, or `{ "allOther": true }` for every other session. Mixed, malformed and extra-key requests return 400 without a revocation. Responses identify the completed scope, and the Settings page verifies that scope and the exact session ID before showing success. The current session remains protected by the server-side check; use logout for it.
 
 The focused HTTP tests cover the request matrix, ownership, current-session protection, anonymous and rate-limited calls, and private response headers. Execute them with the full account/browser and database verification on an exact `main` SHA before release acceptance.
+
+## Resource integrity rollout and seed recovery
+
+Before applying migration `0024_product_type_invariant`, inspect the type inventory
+on the target database and follow the backup/restore procedure above:
+
+```sql
+SELECT type, count(*) FROM products GROUP BY type ORDER BY type;
+```
+
+The migration normalizes only `tool` to `plugin`. Unknown values must be reviewed
+and explicitly corrected by an operator; the constraint intentionally blocks an
+unreviewed migration. Run `pnpm db:migrate` before the updated application.
+
+Development baseline commands (shared absolute local storage required):
+
+```bash
+docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed
+docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed
+# Only after inspecting a reported legacy demo metadata mismatch:
+docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed:repair
+```
+
+The second normal run should report zero insertions and zero repairs. Changed
+passwords, roles, product descriptions and build moderation states stay intact.
+Repair touches only known demo size/hash fields and can insert missing baseline
+records. A conflicting on-disk file is never overwritten; inspect it separately.
+Do not use these commands for production data provisioning.
+
+Run the fast regression group with `pnpm test:resource-integrity`. Against an
+isolated, migrated PostgreSQL development database, run
+`pnpm test:resource-integrity:integration` with its `DATABASE_URL`. The new database
+tests use temporary tables; the seed test copies checks/indexes, not foreign keys,
+and is not a substitute for the full `pnpm test:isolated` acceptance run.
+
+Finally verify both demo resource claim/download flows through the browser,
+compare response length/hash to disk, rerun seed, and confirm account edits remain.
+A 409 `BUILD_ARTIFACT_MISMATCH` means storage metadata disagrees with the build;
+inspect storage and the build record before retrying. Current acceptance gaps
+remain in [PROBLEMS.md](PROBLEMS.md).

@@ -85,26 +85,35 @@ pnpm test:reports
 
 ## Demo data / Демонстрационные данные
 
-After migrations, populate a **fresh development database**:
+After migrations, populate or safely repeat the development baseline:
 
 ```bash
 docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed
 ```
 
-Seed creates a small ZIP for the inventory demo in the shared local storage,
-with its actual byte length and SHA-256 recorded in the build. The archive
-contains README.txt and meta.xml only; it is a download fixture, not the
-advertised inventory implementation. Production seed is rejected.
+Seed creates real ZIP fixtures for both inventory and drift resources, recording
+actual byte lengths and SHA-256 hashes. Each archive contains README.txt and
+meta.xml only; neither implements the advertised game system. New demo resource
+descriptions explicitly say so. Production seed is rejected.
 
-For host execution, set `STORAGE_PROVIDER=local` and an **absolute**
-`STORAGE_LOCAL_PATH` shared by the app and seed. Relative paths are rejected
-because workspace commands run from different directories.
+The database baseline is transactional and serialized between seed processes.
+Reruns insert missing records and preserve existing passwords, roles, content
+edits and moderation states. Reserved IDs or unique slugs belonging to other
+records cause an error, not an overwrite. A missing demo build is not recreated
+for a product whose current version or publication state has changed.
 
-File creation is repeatable and never replaces a different existing file.
-The database seed itself still inserts fixed IDs: do not rerun it over an
-already populated database. Existing databases and manually created placeholder
-files are not automatically repaired. Verify the full claim/download flow in
-your development stack after seeding.
+Legacy demo metadata is detected rather than silently repaired. After inspecting
+the conflict, repair only the known demo builds with:
+
+```bash
+docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed:repair
+```
+
+This updates only size/hash metadata after fixture identity checks. It never
+replaces a different existing file or resets moderation status. For host
+execution, use `STORAGE_PROVIDER=local` and an **absolute** `STORAGE_LOCAL_PATH`
+shared by the app and seed. Prepared ZIPs may remain after a database rollback;
+reruns reuse identical files. Verify claim/download in your development stack.
 
 ## Development rules / Правила разработки
 

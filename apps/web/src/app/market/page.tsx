@@ -1,3 +1,5 @@
+import { PRODUCT_TYPES } from "@nexus/domain";
+import { PRODUCT_CATEGORY_KEYS } from "../../lib/product-type-labels";
 import Link from "next/link";
 import { productService } from "../../lib/services/product-service";
 import { ProductCard } from "../../components/product-card";
@@ -10,15 +12,7 @@ export const dynamic = "force-dynamic";
 
 const CATEGORIES = [
   { id: "all", key: "all" },
-  { id: "script", key: "scripts" },
-  { id: "vehicle", key: "vehicles" },
-  { id: "model", key: "models" },
-  { id: "map", key: "maps" },
-  { id: "ui", key: "ui" },
-  { id: "plugin", key: "plugins" },
-  { id: "api", key: "apis" },
-  { id: "bundle", key: "bundles" },
-  { id: "service", key: "services" },
+  ...PRODUCT_TYPES.map((id) => ({ id, key: PRODUCT_CATEGORY_KEYS[id] })),
 ] as const;
 
 const SORTS = [

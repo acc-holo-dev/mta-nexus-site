@@ -1,3 +1,4 @@
+import { PRODUCT_TYPES, type ProductType } from "@nexus/domain";
 import { sql } from "drizzle-orm";
 import {
   pgTable,
@@ -191,7 +192,7 @@ export const products = pgTable(
     slug: text("slug").notNull().unique(),
     description: text("description").notNull(),
     shortDescription: text("short_description"),
-    type: text("type").notNull(), // script, model, vehicle, map, ui, plugin, api, service, bundle
+    type: text("type").$type<ProductType>().notNull(),
     status: text("status").notNull().default("draft"), // draft, pending_review, published, suspended, archived
     authorId: text("author_id")
       .notNull()
@@ -219,6 +220,7 @@ export const products = pgTable(
   },
   (table) => [
     uniqueIndex("products_slug_idx").on(table.slug),
+    check("products_type_check", sql`${table.type} IN (${sql.raw(PRODUCT_TYPES.map((type) => `'${type}'`).join(", "))})`),
     index("products_type_idx").on(table.type),
     index("products_status_idx").on(table.status),
     index("products_author_idx").on(table.authorId),

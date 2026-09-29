@@ -85,10 +85,7 @@ vi.mock("@nexus/security", () => ({
 import { GET } from "../apps/web/src/app/api/products/[id]/download/route";
 
 function request() {
-  return new NextRequest(
-    "http://nexus.test/api/products/prd_http/download",
-    { method: "GET" },
-  );
+  return new NextRequest("http://nexus.test/api/products/prd_http/download", { method: "GET" });
 }
 
 const context = {
@@ -98,6 +95,8 @@ const context = {
 describe("resource download HTTP contract", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    auditRecord.mockReset();
+    downloadStream.mockReset();
     state.user = {
       id: "usr_player",
       email: "player@nexus.test",
@@ -244,18 +243,16 @@ describe("resource download HTTP contract", () => {
   });
 
   it("destroys an opened storage stream when the required audit write fails", async () => {
-    const openedStream = Readable.from(Buffer.from("audit-failure"));
+    const openedStream = Readable.from(Buffer.from("nexus-build"));
     downloadStream.mockResolvedValueOnce({
       stream: openedStream,
       meta: {
-        sizeBytes: Buffer.byteLength("audit-failure"),
+        sizeBytes: Buffer.byteLength("nexus-build"),
         mimeType: "application/zip",
       },
     });
     auditRecord.mockRejectedValueOnce(new Error("audit unavailable"));
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => undefined);
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     try {
       const response = await GET(request(), context);
@@ -280,12 +277,8 @@ describe("resource download HTTP contract", () => {
     expect(response.headers.get("Content-Disposition")).toContain(
       'filename="http-resource-1.2.3.zip"',
     );
-    expect(Buffer.from(await response.arrayBuffer()).toString("utf8")).toBe(
-      "nexus-build",
-    );
-    expect(downloadStream).toHaveBeenCalledWith(
-      "assets/http-resource.zip",
-    );
+    expect(Buffer.from(await response.arrayBuffer()).toString("utf8")).toBe("nexus-build");
+    expect(downloadStream).toHaveBeenCalledWith("assets/http-resource.zip");
     expect(auditRecord).toHaveBeenCalledTimes(1);
     expect(auditRecord).toHaveBeenCalledWith(
       expect.objectContaining({

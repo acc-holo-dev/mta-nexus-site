@@ -1,0 +1,98 @@
+import { Readable } from "node:stream";
+import { NextRequest } from "next/server";
+import { ValidationError } from "@nexus/domain";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const mocks = vi.hoisted(() => ({ download: vi.fn(), audit: vi.fn() }));
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+  authService: { getSession: async () => ({ id: "admin", role: "admin" }) },
+}));
+vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
+  commerceService: { checkEntitlement: async () => true },
+}));
+vi.mock("../apps/web/src/lib/services/product-service", () => ({
+  productService: { canManageProduct: async () => true },
+}));
+vi.mock("@nexus/security", () => ({
+  can: () => true,
+  consumeRateLimit: async () => ({ success: true }),
+  generateId: () => "audit",
+}));
+vi.mock("@nexus/storage", () => ({ storageService: { getDownloadStream: mocks.download } }));
+vi.mock("@nexus/db", () => {
+  const build = {
+    id: "build",
+    productId: "product",
+    version: "1.0.0",
+    status: "pending_review",
+    scanStatus: "clean",
+    scanner: "test",
+    scannedAt: new Date(),
+    storageKey: "build.zip",
+    fileName: "build.zip",
+    fileSizeBytes: 4,
+    sha256Hash: "a".repeat(64),
+  };
+  return {
+    productRepository: {
+      findById: async () => ({ id: "product", slug: "product", status: "published" }),
+    },
+    buildRepository: {
+      findById: async () => build,
+      findLatestPublishedByProduct: async () => ({ ...build, status: "published" }),
+    },
+    auditRepository: { record: mocks.audit },
+  };
+});
+import { GET as publicDownload } from "../apps/web/src/app/api/products/[id]/download/route";
+import { GET as reviewDownload } from "../apps/web/src/app/api/admin/builds/[buildId]/download/route";
+
+describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
+  const request = () => {
+    const req = new NextRequest("http://nexus.test/download");
+    return reviewer
+      ? reviewDownload(req, { params: Promise.resolve({ buildId: "build" }) })
+      : publicDownload(req, { params: Promise.resolve({ id: "product" }) });
+  };
+  beforeEach(() => {
+    mocks.download.mockReset();
+    mocks.audit.mockReset();
+  });
+  it.each([0, 3, 5])("rejects size %s before auditing or delivering bytes", async (sizeBytes) => {
+    const stream = Readable.from(Buffer.from("data"));
+    mocks.download.mockResolvedValue({ stream, meta: { sizeBytes } });
+    const response = await request();
+    expect(response.status).toBe(409);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(await response.json()).toMatchObject({ code: "BUILD_ARTIFACT_MISMATCH" });
+    expect(stream.destroyed).toBe(true);
+    expect(mocks.audit).not.toHaveBeenCalled();
+  });
+  it("rejects a conflicting provider hash even when the size matches", async () => {
+    const stream = Readable.from(Buffer.from("data"));
+    mocks.download.mockResolvedValue({
+      stream,
+      meta: { sizeBytes: 4, sha256Hash: "b".repeat(64) },
+    });
+    expect((await request()).status).toBe(409);
+    expect(stream.destroyed).toBe(true);
+    expect(mocks.audit).not.toHaveBeenCalled();
+  });
+  it("reports missing storage bytes as 404", async () => {
+    mocks.download.mockRejectedValue(new ValidationError("missing"));
+    expect((await request()).status).toBe(404);
+    expect(mocks.audit).not.toHaveBeenCalled();
+  });
+  it("delivers matching bytes with the recorded content length", async () => {
+    mocks.download.mockResolvedValue({
+      stream: Readable.from(Buffer.from("data")),
+      meta: { sizeBytes: 4 },
+    });
+    const response = await request();
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Content-Length")).toBe("4");
+    expect(await response.text()).toBe("data");
+    expect(mocks.audit).toHaveBeenCalledOnce();
+  });
+});
