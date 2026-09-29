@@ -1,4 +1,5 @@
 export type ServerHistoryPoint = Readonly<{
+  id?: string;
   observedAt: string;
   currentPlayers: number | null;
   maxPlayers: number | null;
