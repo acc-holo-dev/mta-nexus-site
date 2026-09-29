@@ -224,7 +224,7 @@ Codex should execute the stages below in order. Each stage must leave `main` bet
 
 - ~~delete all non-`main` remote branches after the safety check above~~ — deleted 2026-09-29 (see 7.3.A);
 - workspace metadata verified: no temporary planning or abandoned artifact files remain (`packages/db/src/seed-extra.ts` is an intentionally untracked local demo seed, kept out of git);
-- only `README.md`, `docs/ARCHITECTURE.md` and `docs/OPERATIONS.md` remain maintained prose documentation; the dated audit `docs/AUDIT-2026-09-29.md` is point-in-time evidence, not a maintained document;
+- only `README.md`, `docs/ARCHITECTURE.md` and `docs/OPERATIONS.md` remain maintained prose documentation; the dated audit evidence lives outside the maintained docs in gitignored `artifacts/audit/` (enforced by `tests/mainline-repository-policy.test.ts`);
 - package manifests and workspace metadata consistent with the current beta version.
 
 Acceptance: GitHub shows exactly one branch, `main`, and the repository documentation policy remains satisfied. ✅ Verified 2026-09-29.
@@ -251,7 +251,7 @@ Progress 2026-09-29 (verified inside the local Docker development stack, Node 26
 - `pnpm test` — green: 198 files / 767 tests, including the previously broken root-level `tests/` suite (root `package.json` now declares `next` and `drizzle-orm` devDependencies so isolated pnpm layouts resolve them) and the account-mail capacity suites (they now reset the disposable queue before capacity assertions; `vitest.config.ts` serializes test files to remove cross-file queue races);
 - `pnpm build` — green with production env vars (fail-closed config validation intentionally rejects `http://`/localhost production URLs);
 - `pnpm test:isolated` (new) — green: full suite against a freshly recreated disposable `mta_nexus_test` database inside the local stack;
-- `pnpm lint` — still red: 34 errors / ~149 warnings are documented with locations and remediation guidance in `docs/AUDIT-2026-09-29.md`;
+- `pnpm lint` — still red: 34 errors / ~149 warnings are documented with locations and remediation guidance in `artifacts/audit/2026-09-29-audit.md`;
 - remaining blocker: GitHub Actions still cannot execute jobs (see 7.3.B) — `pnpm release:verify` must be re-run on restored CI runners.
 
 Acceptance: all host-side verification passes on a named exact SHA. ⚠️ Blocked only by lint debt (documented) and the CI runner outage.
