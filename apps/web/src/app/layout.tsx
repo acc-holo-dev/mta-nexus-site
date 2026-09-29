@@ -51,6 +51,7 @@ export default async function RootLayout({
         <Script
           id="nexus-theme-init"
           strategy="beforeInteractive"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: This script is a static local constant with no user input.
           dangerouslySetInnerHTML={{ __html: themeInitScript }}
         />
         <NexusShell locale={locale}>{children}</NexusShell>
