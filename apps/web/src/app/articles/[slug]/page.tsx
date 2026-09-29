@@ -152,7 +152,6 @@ export default async function ArticleDetailPage({
 
         <div
           className="inline-flex items-center gap-1.5 rounded-lg border border-base bg-inset px-3 py-1.5 text-xs font-semibold text-secondary"
-          aria-label={`${article.likeCount} ${copy.upvotes}`}
         >
           <ThumbsUp className="h-3.5 w-3.5 text-warning" aria-hidden="true" />
           <span>
