@@ -83,6 +83,29 @@ pnpm test:catalog
 pnpm test:reports
 ```
 
+## Demo data / Демонстрационные данные
+
+After migrations, populate a **fresh development database**:
+
+```bash
+docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed
+```
+
+Seed creates a small ZIP for the inventory demo in the shared local storage,
+with its actual byte length and SHA-256 recorded in the build. The archive
+contains README.txt and meta.xml only; it is a download fixture, not the
+advertised inventory implementation. Production seed is rejected.
+
+For host execution, set `STORAGE_PROVIDER=local` and an **absolute**
+`STORAGE_LOCAL_PATH` shared by the app and seed. Relative paths are rejected
+because workspace commands run from different directories.
+
+File creation is repeatable and never replaces a different existing file.
+The database seed itself still inserts fixed IDs: do not rerun it over an
+already populated database. Existing databases and manually created placeholder
+files are not automatically repaired. Verify the full claim/download flow in
+your development stack after seeding.
+
 ## Development rules / Правила разработки
 
 - `main` is the only maintained development branch.
@@ -127,3 +150,4 @@ Everything else should be represented by executable code, migrations, tests, com
 This repository is a closed-beta codebase. Production deployment is a separate operational decision and requires successful verification of the exact `main` SHA, backup/restore readiness, configured production secrets, TLS, storage, malware scanning and recovery delivery.
 
 MTA NEXUS is not affiliated with Rockstar Games, Take-Two Interactive, or the Multi Theft Auto project.
+

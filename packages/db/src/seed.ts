@@ -1,3 +1,6 @@
+import { pathToFileURL } from "node:url";
+import { config } from "@nexus/config";
+import { ensureSeedArchive } from "./seed-archive";
 import { hashPassword } from "@nexus/security";
 import {
   userRepository,
@@ -11,6 +14,8 @@ import {
 } from "./repositories/index";
 
 export async function runSeed() {
+  const seedArchive = await ensureSeedArchive(config);
+
   console.log("Seeding MTA Nexus database with baseline records...");
 
   const defaultPasswordHash = await hashPassword("password123");
@@ -55,7 +60,7 @@ export async function runSeed() {
     emailVerified: true,
   });
 
-  const player = await userRepository.create({
+  await userRepository.create({
     id: "usr_player_001",
     email: "player@example.com",
     username: "speedy_cj",
@@ -185,11 +190,9 @@ export async function runSeed() {
     id: "bld_inv_320",
     productId: prodInv.id,
     version: "3.2.0",
-    releaseNotes: "Optimized item synchronization payload size by 40% and added audio feedback.",
+    releaseNotes: "Development demo archive for claim/download testing; no inventory implementation included.",
     status: "published",
-    storageKey: "builds/prd_inv_pro/v3.2.0.zip",
-    sha256Hash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    fileSizeBytes: 4829104,
+    ...seedArchive,
     mtaVersionTarget: "1.6.0",
     fileName: "resource.zip",
     mimeType: "application/zip",
@@ -244,10 +247,12 @@ export async function runSeed() {
   console.log("Database seeded successfully.");
 }
 
-// Execute if called directly
-runSeed()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error("Seed error:", err);
-    process.exit(1);
-  });
+// Importing the seed must not mutate the database or terminate the caller.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  runSeed()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error("Seed error:", err);
+      process.exit(1);
+    });
+}
