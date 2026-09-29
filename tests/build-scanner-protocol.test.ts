@@ -1,26 +1,23 @@
-import net, { type AddressInfo } from "node:net";
+import { createServer, type Socket } from "node:net";
 import { afterEach, describe, expect, it } from "vitest";
 import { createClamAvScanner } from "../apps/web/src/lib/services/build-scanner-service";
 
-const servers: net.Server[] = [];
-const connections = new Set<net.Socket>();
+const servers: ReturnType<typeof createServer>[] = [];
+const sockets = new Set<Socket>();
 
-async function scannerFor(
+async function scanWithMockClamAv(
   reply: string | null,
-  options: { timeoutMs?: number; maxResponseBytes?: number } = {},
+  options: { timeoutMs?: number } = {}
 ) {
-  let request = Buffer.alloc(0);
-  const server = net.createServer({ allowHalfOpen: true }, (connection) => {
-    connections.add(connection);
-    connection.once("close", () => connections.delete(connection));
-    connection.on("data", (chunk) => {
-      request = Buffer.concat([
-        request,
-        Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk),
-      ]);
+  let received = Buffer.alloc(0);
+  const server = createServer({ allowHalfOpen: true }, (socket: Socket) => {
+    sockets.add(socket);
+    socket.once("close", () => sockets.delete(socket));
+    socket.on("data", (chunk) => {
+      received = Buffer.concat([received, Buffer.from(chunk)]);
     });
-    connection.on("end", () => {
-      if (reply !== null) connection.end(reply);
+    socket.on("end", () => {
+      if (reply !== null) socket.end(Buffer.from(`${reply}\0`));
     });
   });
   servers.push(server);
@@ -29,60 +26,70 @@ async function scannerFor(
     server.once("error", reject);
     server.listen(0, "127.0.0.1", resolve);
   });
-  const { port } = server.address() as AddressInfo;
+  const address = server.address();
+  if (!address || typeof address === "string") throw new Error("Mock ClamAV did not bind a TCP port");
 
-  return {
-    scanner: createClamAvScanner({ host: "127.0.0.1", port, ...options }),
-    getRequest: () => request,
-  };
+  const result = await createClamAvScanner({
+    host: "127.0.0.1",
+    port: address.port,
+    timeoutMs: options.timeoutMs ?? 1_000,
+  }).scan({ bytes: Uint8Array.from([0x50, 0x4b, 0x03, 0x04, 0x01]), fileName: "build.zip" });
+
+  return { result, request: received };
 }
 
 afterEach(async () => {
-  for (const connection of connections) connection.destroy();
-  await Promise.all(
-    servers.splice(0).map(
-      (server) =>
-        new Promise<void>((resolve) => {
-          server.close(() => resolve());
-        }),
-    ),
-  );
+  for (const socket of sockets) socket.destroy();
+  await Promise.all(servers.splice(0).map((server) => new Promise<void>((resolve) => {
+    server.close(() => resolve());
+  })));
 });
 
-describe("ClamAV scanner TCP protocol", () => {
-  it("streams a build and accepts an explicit clean verdict", async () => {
-    const { scanner, getRequest } = await scannerFor("stream: OK\0");
-    const result = await scanner.scan({ bytes: new Uint8Array([1, 2, 3]), fileName: "build.zip" });
+describe("ClamAV INSTREAM protocol", () => {
+  it("sends framed bytes and trusts only the exact clean verdict", async () => {
+    const { result, request } = await scanWithMockClamAv("stream: OK");
+    const fileBytes = Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x01]);
+    const length = Buffer.alloc(4);
+    length.writeUInt32BE(fileBytes.length);
+    const expectedRequest = Buffer.concat([
+      Buffer.from("zINSTREAM\0"),
+      length,
+      fileBytes,
+      Buffer.alloc(4),
+    ]);
 
+    expect(request).toEqual(expectedRequest);
     expect(result.status).toBe("clean");
-    const request = getRequest();
-    expect(request.subarray(0, 10).toString()).toBe("zINSTREAM\0");
-    expect(request.readUInt32BE(10)).toBe(3);
-    expect(request.subarray(14, 17)).toEqual(Buffer.from([1, 2, 3]));
-    expect(request.readUInt32BE(17)).toBe(0);
+    expect(result.scanner).toBe("clamav");
+    expect(result.scannedAt).toBeInstanceOf(Date);
   });
 
-  it("distinguishes malware from archives ClamAV could not fully inspect", async () => {
-    const { scanner: malwareScanner } = await scannerFor("stream: Eicar-Test-Signature FOUND\0");
-    const { scanner: limitedScanner } = await scannerFor("stream: Heuristics.Limits.Exceeded.MaxRecursion FOUND\0");
+  it.each([
+    "stream: Eicar-Test-Signature FOUND",
+    "stream: Heuristics.Limits.Exceeded.MaxFileSize FOUND",
+  ])("classifies a ClamAV FOUND reply as malicious: %s", async (reply) => {
+    const { result } = await scanWithMockClamAv(reply);
 
-    expect((await malwareScanner.scan({ bytes: new Uint8Array([1]), fileName: "malware.zip" })).status)
-      .toBe("malicious");
-    expect((await limitedScanner.scan({ bytes: new Uint8Array([1]), fileName: "complex.zip" })).status)
-      .toBe("rejected");
+    expect(result).toMatchObject({
+      status: "malicious",
+      scanner: "clamav",
+      reason: reply,
+    });
   });
 
-  it("fails closed on malformed, oversized, or stalled daemon responses", async () => {
-    const { scanner: malformedScanner } = await scannerFor("unexpected response\0");
-    const { scanner: oversizedScanner } = await scannerFor("x".repeat(32), { maxResponseBytes: 16 });
-    const { scanner: stalledScanner } = await scannerFor(null, { timeoutMs: 40 });
+  it.each([
+    ["a daemon error", "stream: Access denied ERROR"],
+    ["a malformed clean-looking reply", "unrecognized response OK"],
+    ["an empty reply", ""],
+  ])("fails closed for %s", async (_description, reply) => {
+    const { result } = await scanWithMockClamAv(reply);
 
-    const malformed = await malformedScanner.scan({ bytes: new Uint8Array([1]), fileName: "build.zip" });
-    const oversized = await oversizedScanner.scan({ bytes: new Uint8Array([1]), fileName: "build.zip" });
-    const stalled = await stalledScanner.scan({ bytes: new Uint8Array([1]), fileName: "build.zip" });
+    expect(result.status).toBe("error");
+  });
 
-    expect(malformed).toMatchObject({ status: "error", reason: "unexpected response" });
-    expect(oversized).toMatchObject({ status: "error", reason: "Scanner response exceeded limit" });
-    expect(stalled).toMatchObject({ status: "error", reason: "Scanner timeout" });
+  it("fails closed when the scanner does not finish before the timeout", async () => {
+    const { result } = await scanWithMockClamAv(null, { timeoutMs: 25 });
+
+    expect(result).toMatchObject({ status: "error", reason: "Scanner timeout" });
   });
 });

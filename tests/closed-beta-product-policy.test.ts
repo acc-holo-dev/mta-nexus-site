@@ -13,7 +13,7 @@ describe("closed beta product policy", () => {
     expect(service).toContain("input.price !== 0");
     expect(service).toContain("minPrice: 0");
     expect(service).toContain("maxPrice: 0");
-    expect(service).toContain('product.price !== 0 || product.status !== "published"');
+    expect(service).toContain('product?.price === 0 && product.status === "published"');
     expect(service).toContain("product.price !== 0");
   });
 
@@ -23,6 +23,6 @@ describe("closed beta product policy", () => {
 
     expect(market).not.toContain('id: "price_asc"');
     expect(market).not.toContain('id: "price_desc"');
-    expect(card).toContain("dictionary.market.free");
+    expect(card).toContain('const formattedPrice = "Free"');
   });
 });

@@ -1,87 +1,16 @@
-# Local development only. Production uses compose.production.yaml explicitly.
 services:
   postgres:
     image: postgres:18-alpine
+    container_name: nexus-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: nexus
       POSTGRES_PASSWORD: nexus_secret
       POSTGRES_DB: mta_nexus
-    volumes:
-      # Existing data layouts still require inventory before an upgrade.
-      - pgdata:/var/lib/postgresql
-    healthcheck:
-      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "nexus", "-d", "mta_nexus"]
-      interval: 5s
-      timeout: 5s
-      retries: 12
-      start_period: 10s
-
-  clamav:
-    image: clamav/clamav:1.5
-    restart: unless-stopped
-    environment:
-      # ClamAV otherwise treats archives that exceed scan limits as clean.
-      CLAMD_CONF_AlertExceedsMax: "yes"
-    volumes:
-      - clamav_data:/var/lib/clamav
-    healthcheck:
-      test: ["CMD", "clamdcheck.sh"]
-      interval: 10s
-      timeout: 5s
-      retries: 48
-      start_period: 60s
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: development
-    init: true
-    # Leave a failed migration visible instead of restarting it indefinitely.
-    restart: "no"
-    environment:
-      NODE_ENV: development
-      PORT: 3000
-      NEXT_PUBLIC_APP_URL: http://localhost:${NEXUS_DEV_PORT:-3000}
-      DATABASE_URL: postgres://nexus:nexus_secret@postgres:5432/mta_nexus
-      AUTH_SECRET: development-only-secret-change-before-production
-      STORAGE_PROVIDER: local
-      STORAGE_LOCAL_PATH: /data/uploads
-      EMAIL_PROVIDER: disabled
-      BUILD_SCANNER: clamav
-      CLAMAV_HOST: clamav
-      CLAMAV_PORT: 3310
-      NEXT_TELEMETRY_DISABLED: "1"
-      WATCHPACK_POLLING: "true"
     ports:
-      - "127.0.0.1:${NEXUS_DEV_PORT:-3000}:3000"
+      - "5432:5432"
     volumes:
-      - uploads:/data/uploads
-      # Keep dependency installation inside the image, but hot-reload application
-      # and workspace source files from the host.
-      - ./apps/web/src:/app/apps/web/src:ro
-      - ./packages/config/src:/app/packages/config/src:ro
-      - ./packages/db/src:/app/packages/db/src:ro
-      - ./packages/db/migrations:/app/packages/db/migrations:ro
-      - ./packages/domain/src:/app/packages/domain/src:ro
-      - ./packages/security/src:/app/packages/security/src:ro
-      - ./packages/storage/src:/app/packages/storage/src:ro
-      - ./packages/ui/src:/app/packages/ui/src:ro
-      - ./packages/validation/src:/app/packages/validation/src:ro
-    depends_on:
-      postgres:
-        condition: service_healthy
-      clamav:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "node", "scripts/check-local-readiness.mjs"]
-      interval: 15s
-      timeout: 15s
-      retries: 12
-      start_period: 60s
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
   pgdata:
-  uploads:
-  clamav_data:

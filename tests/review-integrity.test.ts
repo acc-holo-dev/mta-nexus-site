@@ -2,26 +2,29 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-describe("product review database integrity", () => {
-  it("serializes rating aggregation with the review insert", () => {
+describe("product review integrity", () => {
+  it("requires a published resource and a real entitlement", () => {
     const route = readFileSync(
       resolve(process.cwd(), "apps/web/src/app/api/products/[id]/reviews/route.ts"),
       "utf8"
     );
-    const repository = readFileSync(
-      resolve(process.cwd(), "packages/db/src/repositories/content.ts"),
+
+    expect(route).toContain('product.status !== "published"');
+    expect(route).toContain('hasReviewFromUser(productId, user.id)');
+    expect(route).toContain('"product.download"');
+    expect(route).toContain("Add this resource to your library before reviewing it");
+    expect(route).toContain("isVerifiedPurchase: hasAcquired");
+  });
+
+  it("handles duplicate submissions both before and during insertion", () => {
+    const route = readFileSync(
+      resolve(process.cwd(), "apps/web/src/app/api/products/[id]/reviews/route.ts"),
       "utf8"
     );
 
-    expect(route).toContain("contentRepository.addProductReview");
-    expect(route).not.toContain("Recalculate true rating average");
-    expect(repository).toContain("async addProductReview(");
-    expect(repository).toContain('eq(products.status, "published")');
-    expect(repository).toContain('set({ updatedAt: sql`${products.updatedAt}` })');
-    expect(repository).toContain("count(${comments.rating})::int");
-    expect(repository).toContain("avg(${comments.rating}) * 10");
-    expect(repository).toContain("ratingCount,");
-    expect(repository).toContain("ratingAverage,");
+    expect(route).toContain("status: 409");
+    expect(route).toContain('databaseError.code === "23505"');
+    expect(route).toContain("You have already reviewed this product");
   });
 
   it("enforces one product review per author at the database boundary", () => {
@@ -43,5 +46,32 @@ describe("product review database integrity", () => {
     expect(migration).toContain('CREATE UNIQUE INDEX IF NOT EXISTS "comments_product_author_idx"');
     expect(migration).toContain("duplicate reviews exist");
     expect(repository).toContain("hasReviewFromUser");
+  });
+
+  it("serializes review insertion and aggregate updates per product", () => {
+    const route = readFileSync(
+      resolve(process.cwd(), "apps/web/src/app/api/products/[id]/reviews/route.ts"),
+      "utf8"
+    );
+    const repository = readFileSync(
+      resolve(process.cwd(), "packages/db/src/repositories/content.ts"),
+      "utf8"
+    );
+
+    expect(route).toContain("contentRepository.addProductReview");
+    expect(route).not.toContain("const allReviews =");
+    expect(repository).toContain('.for("update")');
+    expect(repository).toContain("count(${comments.rating})::int");
+    expect(repository).toContain("round(avg(${comments.rating}) * 10)");
+  });
+
+  it("does not allow generic content comments to bypass review verification", () => {
+    const service = readFileSync(
+      resolve(process.cwd(), "apps/web/src/lib/services/content-service.ts"),
+      "utf8"
+    );
+
+    expect(service).toContain("PRODUCT_REVIEW_FLOW_REQUIRED");
+    expect(service).not.toContain("prod.ratingCount + 1");
   });
 });

@@ -11,12 +11,6 @@ import {
 import { consumeRateLimit, generateId } from "@nexus/security";
 
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;
-const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
-
-function privateJson(body: unknown, init?: ResponseInit) {
-  return NextResponse.json(body, { ...init, headers: privateHeaders });
-}
-
 type TargetType = (typeof ALLOWED_TARGET_TYPES)[number];
 
 function isTargetType(value: unknown): value is TargetType {
@@ -29,7 +23,7 @@ async function targetExists(targetType: TargetType, targetId: string): Promise<b
       return (await userRepository.findById(targetId)) !== null;
     case "server":
       const server = await serverRepository.findById(targetId);
-      return server !== null && server.visibility !== "private" && server.status !== "suspended";
+      return server !== null && server.visibility !== "private" && server.status === "active";
     case "product": {
       const product = await productRepository.findById(targetId);
       return product !== null && product.status === "published" && product.price === 0;
@@ -42,41 +36,22 @@ async function targetExists(targetType: TargetType, targetId: string): Promise<b
 }
 
 export async function GET(request: NextRequest) {
-  const targetType = request.nextUrl.searchParams.get("targetType") || "";
-  const targetId = request.nextUrl.searchParams.get("targetId") || "";
-
-  if (!isTargetType(targetType)) {
-    return privateJson(
-      { error: "Invalid target type" },
-      { status: 400, headers: privateHeaders },
-    );
-  }
-  if (!targetId || targetId.length > 128) {
-    return privateJson(
-      { error: "Target ID required" },
-      { status: 400, headers: privateHeaders },
-    );
-  }
-
   const token = request.cookies.get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
   if (!user) {
-    return privateJson(
-      { authenticated: false, following: false },
-      { headers: privateHeaders },
-    );
+    return NextResponse.json({ following: false });
   }
 
-  const following = await socialRepository.isFollowing(
-    user.id,
-    targetType,
-    targetId,
-  );
-  return privateJson(
-    { authenticated: true, following },
-    { headers: privateHeaders },
-  );
+  const targetType = request.nextUrl.searchParams.get("targetType") || "";
+  const targetId = request.nextUrl.searchParams.get("targetId") || "";
+
+  if (!ALLOWED_TARGET_TYPES.includes(targetType as TargetType)) {
+    return NextResponse.json({ error: "Invalid target type" }, { status: 400 });
+  }
+
+  const following = await socialRepository.isFollowing(user.id, targetType, targetId);
+  return NextResponse.json({ following });
 }
 
 export async function POST(request: NextRequest) {
@@ -85,17 +60,17 @@ export async function POST(request: NextRequest) {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return privateJson({ error: "Authentication required" }, { status: 401 });
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const rateLimit = await consumeRateLimit("follow", user.id);
     if (!rateLimit.success) {
-      return privateJson({ error: "Too many follow requests. Please try again shortly." }, { status: 429 });
+      return NextResponse.json({ error: "Too many follow requests. Please try again shortly." }, { status: 429 });
     }
 
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== "object" || Array.isArray(body)) {
-      return privateJson({ error: "Request body must be an object" }, { status: 400 });
+      return NextResponse.json({ error: "Request body must be an object" }, { status: 400 });
     }
     const { targetType, targetId } = body as {
       targetType?: unknown;
@@ -103,22 +78,22 @@ export async function POST(request: NextRequest) {
     };
 
     if (!isTargetType(targetType)) {
-      return privateJson(
+      return NextResponse.json(
         { error: `Invalid target type. Allowed: ${ALLOWED_TARGET_TYPES.join(", ")}` },
         { status: 400 }
       );
     }
 
-    if (typeof targetId !== "string" || targetId.length === 0 || targetId.length > 128) {
-      return privateJson({ error: "Target ID required" }, { status: 400 });
+    if (!targetId || typeof targetId !== "string") {
+      return NextResponse.json({ error: "Target ID required" }, { status: 400 });
     }
 
     if (!(await targetExists(targetType, targetId))) {
-      return privateJson({ error: "Target does not exist" }, { status: 404 });
+      return NextResponse.json({ error: "Target does not exist" }, { status: 404 });
     }
 
     if (targetType === "user" && targetId === user.id) {
-      return privateJson({ error: "Cannot follow yourself" }, { status: 400 });
+      return NextResponse.json({ error: "Cannot follow yourself" }, { status: 400 });
     }
 
     const follow = await socialRepository.follow({
@@ -128,16 +103,11 @@ export async function POST(request: NextRequest) {
       targetId,
     });
     if (!follow) {
-      const following = await socialRepository.isFollowing(user.id, targetType, targetId);
-      return privateJson(
-        { error: following ? "Already following this target" : "Could not confirm follow", targetType, targetId, following },
-        { status: following ? 409 : 503 },
-      );
+      return NextResponse.json({ error: "Already following this target" }, { status: 409 });
     }
 
     if (targetType === "user" && targetId !== user.id) {
-      try {
-        await notificationRepository.create({
+      await notificationRepository.create({
         id: generateId("not"),
         recipientId: targetId,
         title: "New Follower",
@@ -145,17 +115,13 @@ export async function POST(request: NextRequest) {
         type: "system",
         category: "follow",
         link: `/users/${user.username}`,
-        });
-      } catch (error) {
-        // The follow already committed. Notification delivery must not turn it into a failed mutation.
-        console.error("Follow notification delivery failed:", error);
-      }
+      });
     }
 
-    return privateJson({ success: true, targetType, targetId, following: true, follow });
+    return NextResponse.json({ success: true, follow });
   } catch (error: unknown) {
     console.error("Follow API error:", error);
-    return privateJson({ error: "Follow request failed" }, { status: 500 });
+    return NextResponse.json({ error: "Follow request failed" }, { status: 500 });
   }
 }
 
@@ -165,17 +131,17 @@ export async function DELETE(request: NextRequest) {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return privateJson({ error: "Authentication required" }, { status: 401 });
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const rateLimit = await consumeRateLimit("follow", user.id);
     if (!rateLimit.success) {
-      return privateJson({ error: "Too many follow requests. Please try again shortly." }, { status: 429 });
+      return NextResponse.json({ error: "Too many follow requests. Please try again shortly." }, { status: 429 });
     }
 
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== "object" || Array.isArray(body)) {
-      return privateJson({ error: "Request body must be an object" }, { status: 400 });
+      return NextResponse.json({ error: "Request body must be an object" }, { status: 400 });
     }
     const { targetType, targetId } = body as {
       targetType?: unknown;
@@ -183,17 +149,17 @@ export async function DELETE(request: NextRequest) {
     };
 
     if (!isTargetType(targetType)) {
-      return privateJson({ error: "Invalid target type" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid target type" }, { status: 400 });
     }
-    if (typeof targetId !== "string" || targetId.length === 0 || targetId.length > 128) {
-      return privateJson({ error: "Target ID required" }, { status: 400 });
+    if (typeof targetId !== "string" || targetId.length === 0) {
+      return NextResponse.json({ error: "Target ID required" }, { status: 400 });
     }
 
     await socialRepository.unfollow(user.id, targetType, targetId);
 
-    return privateJson({ success: true, targetType, targetId, following: false });
+    return NextResponse.json({ success: true });
   } catch (error: unknown) {
     console.error("Follow API error:", error);
-    return privateJson({ error: "Follow request failed" }, { status: 500 });
+    return NextResponse.json({ error: "Follow request failed" }, { status: 500 });
   }
 }

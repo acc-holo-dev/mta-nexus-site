@@ -1,17 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import {
-  ArrowLeft,
-  MessageSquare,
-  ThumbsUp,
-} from "lucide-react";
-import { Avatar } from "@nexus/ui";
 import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
+import { Calendar, Eye, MessageSquare, ArrowLeft } from "lucide-react";
 import { ContentCommentForm } from "../../../components/content-comment-form";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
@@ -21,14 +14,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const locale = await getRequestLocale();
-  const dictionary = getDictionary(locale);
-  const article = await contentService.getArticleBySlug(slug, {
-    incrementView: false,
-  });
+  // Metadata generation must not count as a second article view.
+  const article = await contentService.getArticleBySlug(slug, { incrementView: false });
 
   if (!article) {
-    return { title: dictionary.articles.notFound };
+    return { title: "Article not found" };
   }
 
   return {
@@ -39,9 +29,7 @@ export async function generateMetadata({
       title: article.title,
       description: article.excerpt || article.body.slice(0, 155),
       type: "article",
-      images: article.coverImageUrl
-        ? [{ url: article.coverImageUrl }]
-        : undefined,
+      images: article.coverImageUrl ? [{ url: article.coverImageUrl }] : undefined,
     },
   };
 }
@@ -52,155 +40,125 @@ export default async function ArticleDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const locale = await getRequestLocale();
-  const dictionary = getDictionary(locale);
-  const copy = dictionary.articles;
   const article = await contentService.getArticleBySlug(slug);
 
   if (!article) {
     notFound();
   }
 
-  const [author, comments] = await Promise.all([
-    authService.getUserById(article.authorId),
-    contentService.getComments({ contentId: article.id }, 100),
-  ]);
-  const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
-  const formattedDate = new Date(article.createdAt).toLocaleDateString(
-    dateLocale,
-    {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    },
-  );
+  const author = await authService.getUserById(article.authorId);
+  const comments = await contentService.getComments({ contentId: article.id }, 100);
+
+  const formattedDate = new Date(article.createdAt).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
-    <article className="mx-auto max-w-4xl space-y-8">
+    <article className="max-w-4xl mx-auto space-y-8">
+      {/* Back button */}
       <Link
         href="/articles"
-        className="inline-flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-primary"
+        className="inline-flex items-center gap-1.5 text-xs text-neutral-400 hover:text-white"
       >
-        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-        <span>{copy.back}</span>
+        <ArrowLeft className="w-3.5 h-3.5" />
+        <span>Back to Articles</span>
       </Link>
 
-      <header className="space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded bg-warning-soft px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-warning">
+      {/* Header */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-amber-500 text-black">
             {article.type}
           </span>
-          <span className="font-numeric text-xs text-muted">
-            • {formattedDate}
-          </span>
-          <span className="font-numeric text-xs text-muted">
-            • {article.viewCount} {copy.reads}
-          </span>
+          <span className="text-xs text-neutral-400 font-mono">• {formattedDate}</span>
+          <span className="text-xs text-neutral-400 font-mono">• {article.viewCount} reads</span>
         </div>
 
-        <h1 className="text-3xl font-black leading-tight text-primary sm:text-4xl">
+        <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
           {article.title}
         </h1>
 
+        {/* Author info */}
         {author && (
           <div className="flex items-center gap-3 pt-2">
-            <Avatar
-              src={author.avatarUrl || undefined}
-              alt={author.displayName}
-              fallback={author.displayName || author.username}
-            />
-            <div className="min-w-0">
-              <div className="truncate text-sm font-bold text-primary">
-                {author.displayName}
-              </div>
-              <div className="truncate text-xs text-faint">
-                @{author.username}
-              </div>
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-neutral-800 border border-neutral-700">
+              <img
+                src={author.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${author.username}`}
+                alt={author.displayName}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-white">{author.displayName}</div>
+              <div className="text-xs text-neutral-500">@{author.username}</div>
             </div>
           </div>
         )}
-      </header>
+      </div>
 
+      {/* Cover Image */}
       {article.coverImageUrl && (
-        <div className="aspect-[21/9] w-full overflow-hidden rounded-xl border border-base bg-inset shadow-nexus-sm">
+        <div className="aspect-[21/9] w-full rounded-xl overflow-hidden border border-base">
           <img
             src={article.coverImageUrl}
             alt={article.title}
-            width={1120}
-            height={480}
-            decoding="async"
-            className="h-full w-full object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
       )}
 
-      <div className="nexus-panel whitespace-pre-line p-6 text-sm leading-7 text-secondary shadow-nexus-sm sm:p-8">
+      {/* Body Content */}
+      <div className="p-8 rounded-xl border border-base bg-surface prose prose-invert max-w-none text-neutral-200 text-sm leading-relaxed whitespace-pre-line space-y-4 font-sans">
         {article.body}
       </div>
 
-      <div className="nexus-panel flex flex-wrap items-center justify-between gap-4 p-4">
+      {/* Tags */}
+      <div className="flex flex-wrap items-center gap-4 p-4 rounded-xl border border-base bg-surface">
         <div className="flex flex-wrap items-center gap-2">
-          {article.tags.map((tag) => (
+          {article.tags.map((t) => (
             <span
-              key={tag}
-              className="rounded border border-base bg-inset px-2.5 py-1 text-xs text-muted"
+              key={t}
+              className="px-2.5 py-1 rounded bg-neutral-900 border border-base text-xs text-neutral-400"
             >
-              #{tag}
+              #{t}
             </span>
           ))}
         </div>
 
-        <div
-          className="inline-flex items-center gap-1.5 rounded-lg border border-base bg-inset px-3 py-1.5 text-xs font-semibold text-secondary"
-          aria-label={`${article.likeCount} ${copy.upvotes}`}
-        >
-          <ThumbsUp className="h-3.5 w-3.5 text-warning" aria-hidden="true" />
-          <span>
-            {article.likeCount} {copy.upvotes}
-          </span>
-        </div>
       </div>
 
-      <section className="nexus-panel space-y-6 p-5 shadow-nexus-sm sm:p-6">
-        <h2 className="flex items-center gap-2 font-heading text-primary">
-          <MessageSquare className="h-4 w-4 text-warning" aria-hidden="true" />
-          <span>
-            {copy.discussion} ({comments.length})
-          </span>
-        </h2>
+      {/* Comments Section */}
+      <div className="p-6 rounded-xl border border-base bg-surface space-y-6">
+        <h3 className="text-base font-bold text-white flex items-center gap-2">
+          <MessageSquare className="w-4 h-4 text-amber-400" />
+          <span>Discussion & Comments ({comments.length})</span>
+        </h3>
 
         <ContentCommentForm slug={article.slug} />
 
         {comments.length > 0 ? (
-          <div className="space-y-3">
-            {comments.map((comment) => (
+          <div className="space-y-4">
+            {comments.map((c) => (
               <div
-                key={comment.id}
-                className="space-y-1.5 rounded-lg border border-base bg-inset p-4"
+                key={c.id}
+                className="p-4 rounded-lg bg-neutral-900 border border-base space-y-1.5"
               >
-                <div className="flex items-center justify-between gap-3 text-xs text-muted">
-                  <span className="font-semibold text-secondary">
-                    {copy.communityMember}
+                <div className="flex items-center justify-between text-xs text-neutral-400">
+                  <span className="font-semibold text-neutral-200">Community Member</span>
+                  <span className="font-mono text-[11px]">
+                    {new Date(c.createdAt).toLocaleDateString()}
                   </span>
-                  <time
-                    dateTime={new Date(comment.createdAt).toISOString()}
-                    className="font-numeric text-[11px]"
-                  >
-                    {new Date(comment.createdAt).toLocaleDateString(
-                      dateLocale,
-                    )}
-                  </time>
                 </div>
-                <p className="text-xs leading-relaxed text-secondary">
-                  {comment.text}
-                </p>
+                <p className="text-xs text-neutral-300 leading-relaxed">{c.text}</p>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-xs text-faint">{copy.firstComment}</p>
+          <p className="text-xs text-neutral-500">Be the first to leave a comment on this article.</p>
         )}
-      </section>
+      </div>
     </article>
   );
 }

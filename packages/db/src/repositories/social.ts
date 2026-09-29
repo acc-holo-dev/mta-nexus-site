@@ -49,30 +49,15 @@ export class SocialRepository {
       );
   }
 
-  async listFollowersByTarget(
-    targetType: Follow["targetType"],
-    targetId: string,
-    limit = 100,
+  async listFollows(
+    followerId: string,
+    targetType?: string,
+    limit = 100
   ): Promise<Follow[]> {
     const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 500)
+      ? Math.min(Math.max(Math.floor(limit), 1), 100)
       : 100;
-    const rows = await db
-      .select()
-      .from(follows)
-      .where(
-        and(
-          eq(follows.targetType, targetType),
-          eq(follows.targetId, targetId),
-        ),
-      )
-      .orderBy(desc(follows.createdAt))
-      .limit(boundedLimit);
-    return rows as unknown as Follow[];
-  }
-
-  async listFollows(followerId: string, targetType?: string): Promise<Follow[]> {
-        if (targetType) {
+    if (targetType) {
       const rows = await db
         .select()
         .from(follows)
@@ -81,14 +66,17 @@ export class SocialRepository {
             eq(follows.followerId, followerId),
             eq(follows.targetType, targetType)
           )
-        ).orderBy(desc(follows.createdAt));
+        )
+        .orderBy(desc(follows.createdAt))
+        .limit(boundedLimit);
       return rows as unknown as Follow[];
     }
     const rows = await db
       .select()
       .from(follows)
       .where(eq(follows.followerId, followerId))
-      .orderBy(desc(follows.createdAt));
+      .orderBy(desc(follows.createdAt))
+      .limit(boundedLimit);
     return rows as unknown as Follow[];
   }
 }

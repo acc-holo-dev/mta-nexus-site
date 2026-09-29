@@ -1,53 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
+  auditRepository,
   notificationRepository,
   organizationRepository,
+  serverRepository,
   userRepository,
   verificationRepository,
 } from "@nexus/db";
-import {
-  consumeRateLimit,
-  generateId,
-} from "@nexus/security";
+import { consumeRateLimit, generateId } from "@nexus/security";
 import { z } from "zod";
-import { AppError } from "@nexus/domain";
 
-const privateHeaders = {
-  "Cache-Control": "private, no-store",
-  Vary: "Cookie",
-};
-
-function json(body: unknown, status = 200) {
-  return NextResponse.json(body, {
-    status,
-    headers: privateHeaders,
+const verificationRequestSchema = z
+  .object({
+    targetType: z.enum(["user", "developer", "organization", "server"]),
+    targetId: z.string().min(1),
+    proofUrl: z
+      .string()
+      .url()
+      .refine((value) => /^https?:\/\//i.test(value), "Evidence URL must use HTTP or HTTPS")
+      .optional()
+      .or(z.literal("")),
+    notes: z.string().trim().max(1000).optional(),
+  })
+  .superRefine((value, context) => {
+    if (value.targetType === "server" && !value.proofUrl && (value.notes?.length ?? 0) < 20) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["notes"],
+        message: "Server ownership requests require an evidence URL or detailed verification notes",
+      });
+    }
   });
-}
-
-const verificationRequestSchema = z.object({
-  targetType: z.enum([
-    "user",
-    "developer",
-    "organization",
-    "server",
-  ]),
-  targetId: z.string().min(1).max(128),
-  proofUrl: z.string().url().regex(/^https?:\/\//i).max(2048).optional().or(z.literal("")),
-  notes: z.string().max(1000).optional(),
-});
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
   if (!user) {
-    return json({ error: "Unauthorized" }, 401);
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const requests =
-    await verificationRepository.listByRequester(user.id);
-  return json({ requests });
+  const requests = await verificationRepository.listByRequester(user.id);
+  return NextResponse.json({ requests });
 }
 
 export async function POST(request: NextRequest) {
@@ -56,20 +51,15 @@ export async function POST(request: NextRequest) {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return json({ error: "Authentication required" }, 401);
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const rateLimit = await consumeRateLimit(
-      "verification",
-      user.id,
-    );
-    if (!rateLimit.success) {
-      return json(
-        {
-          error:
-            "Too many verification requests. Please try again tomorrow.",
-        },
-        429,
+    // Limit verification request spam
+    const rl = await consumeRateLimit("verification", user.id);
+    if (!rl.success) {
+      return NextResponse.json(
+        { error: "Too many verification requests. Please try again tomorrow." },
+        { status: 429 }
       );
     }
 
@@ -77,163 +67,96 @@ export async function POST(request: NextRequest) {
     const parsed = verificationRequestSchema.safeParse(body);
 
     if (!parsed.success) {
-      return json(
-        {
-          error: "Invalid verification request",
-          details: parsed.error.format(),
-        },
-        400,
-      );
-    }
-
-    if (parsed.data.targetType === "server") {
-      return json(
-        {
-          error:
-            "Server ownership verification requires the MTA control challenge flow.",
-          code: "SERVER_CONTROL_CHALLENGE_REQUIRED",
-        },
-        422,
+      return NextResponse.json(
+        { error: "Invalid verification request", details: parsed.error.format() },
+        { status: 400 }
       );
     }
 
     let targetIsVerified = false;
-
-    if (
-      parsed.data.targetType === "user" ||
-      parsed.data.targetType === "developer"
-    ) {
+    if (parsed.data.targetType === "user" || parsed.data.targetType === "developer") {
       if (parsed.data.targetId !== user.id) {
-        return json(
-          { error: "You can only verify your own profile" },
-          403,
-        );
+        return NextResponse.json({ error: "You can only verify your own profile" }, { status: 403 });
       }
       targetIsVerified = user.isVerified;
-    } else {
-      const organization =
-        await organizationRepository.findById(
-          parsed.data.targetId,
-        );
-      if (!organization) {
-        return json(
-          { error: "Organization was not found" },
-          404,
-        );
+    } else if (parsed.data.targetType === "server") {
+      const server = await serverRepository.findById(parsed.data.targetId);
+      if (!server) {
+        return NextResponse.json({ error: "Server was not found" }, { status: 404 });
       }
-
-      const memberships =
-        await organizationRepository.listUserMemberships(
-          user.id,
-        );
-      const membership = memberships.find(
-        (candidate) =>
-          candidate.organizationId === organization.id,
-      );
-
+      if (server.ownerId && server.ownerId !== user.id) {
+        return NextResponse.json({ error: "This server is already claimed" }, { status: 409 });
+      }
+      targetIsVerified = server.isVerified;
+    } else {
+      const organization = await organizationRepository.findById(parsed.data.targetId);
+      if (!organization) {
+        return NextResponse.json({ error: "Organization was not found" }, { status: 404 });
+      }
+      const memberships = await organizationRepository.listUserMemberships(user.id);
+      const membership = memberships.find((candidate) => candidate.organizationId === organization.id);
       if (
         organization.ownerId !== user.id &&
-        (!membership ||
-          (membership.role !== "owner" &&
-            membership.role !== "admin"))
+        (!membership || (membership.role !== "owner" && membership.role !== "admin"))
       ) {
-        return json(
-          {
-            error:
-              "You do not manage this organization",
-          },
-          403,
-        );
+        return NextResponse.json({ error: "You do not manage this organization" }, { status: 403 });
       }
-
       targetIsVerified = organization.isVerified;
     }
 
     if (targetIsVerified) {
-      return json(
-        { error: "This target is already verified" },
-        409,
-      );
+      return NextResponse.json({ error: "This target is already verified" }, { status: 409 });
     }
 
-    const duplicate =
-      await verificationRepository.findPendingForTarget(
-        user.id,
-        parsed.data.targetType,
-        parsed.data.targetId,
-      );
+    const duplicate = await verificationRepository.findPendingForTarget(
+      user.id,
+      parsed.data.targetType,
+      parsed.data.targetId
+    );
     if (duplicate) {
-      return json(
-        {
-          error:
-            "A verification request is already pending",
-          requestId: duplicate.id,
-        },
-        409,
+      return NextResponse.json(
+        { error: "A verification request is already pending", requestId: duplicate.id },
+        { status: 409 }
       );
     }
 
-    const verificationRequest =
-      await verificationRepository.createRequest(
-        {
-          requesterId: user.id,
-          targetType: parsed.data.targetType,
-          targetId: parsed.data.targetId,
-          proofUrl: parsed.data.proofUrl || undefined,
-          notes: parsed.data.notes,
-        },
-        {
-          id: generateId("aud"),
-          actorId: user.id,
-          actorType: "user",
-          action: "verification.requested",
-          details: {
-            targetType: parsed.data.targetType,
-            targetId: parsed.data.targetId,
-          },
-        },
-      );
+    const verificationRequest = await verificationRepository.createRequest({
+      requesterId: user.id,
+      targetType: parsed.data.targetType,
+      targetId: parsed.data.targetId,
+      proofUrl: parsed.data.proofUrl || undefined,
+      notes: parsed.data.notes,
+    });
 
-    // Notification delivery is best effort; the committed request must remain successful.
-    try {
-      const moderatorIds = await userRepository.listModeratorIds();
-      const deliveries = await Promise.allSettled(
-        moderatorIds.map((moderatorId) =>
-          notificationRepository.create({
-            id: generateId("not"),
-            recipientId: moderatorId,
-            title: "New verification request",
-            message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
-            link: "/admin?verificationView=pending&verificationPage=1",
-            type: "security",
-          }),
-        ),
-      );
-      const failures = deliveries.filter((delivery) => delivery.status === "rejected").length;
-      if (failures) console.warn("Verification notification delivery failures:", failures);
-    } catch (error) {
-      console.warn("Verification moderator lookup failed:", error);
-    }
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: user.id,
+      actorType: "user",
+      action: "verification.requested",
+      targetId: verificationRequest.id,
+      targetType: "verification",
+      details: { targetType: parsed.data.targetType, targetId: parsed.data.targetId },
+    });
 
-    return json(
-      {
-        success: true,
-        request: verificationRequest,
-      },
-      201,
+    const moderators = (await userRepository.listAll()).filter(
+      (candidate) => candidate.role === "moderator" || candidate.role === "admin"
     );
+    await Promise.all(
+      moderators.map((moderator) =>
+        notificationRepository.create({
+          id: generateId("not"),
+          recipientId: moderator.id,
+          title: "New verification request",
+          message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
+          link: "/admin",
+          type: "security",
+        })
+      )
+    );
+
+    return NextResponse.json({ success: true, request: verificationRequest }, { status: 201 });
   } catch (error: unknown) {
-    if (error instanceof AppError) {
-      return json(
-        { error: error.message, code: error.code },
-        error.statusCode,
-      );
-    }
-
     console.error("Verification request error:", error);
-    return json(
-      { error: "Failed to submit verification request" },
-      500,
-    );
+    return NextResponse.json({ error: "Failed to submit verification request" }, { status: 500 });
   }
 }

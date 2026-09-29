@@ -1,24 +1,18 @@
 import path from "node:path";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { productService } from "../../../../../lib/services/product-service";
 import { buildScannerService } from "../../../../../lib/services/build-scanner-service";
 import { authService } from "../../../../../lib/services/auth-service";
-import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
+import { storageService } from "@nexus/storage";
 import { consumeRateLimit } from "@nexus/security";
-import { AppError, MAX_BUILD_MULTIPART_OVERHEAD_BYTES } from "@nexus/domain";
-import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../../../lib/observability";
+import { AppError } from "@nexus/domain";
 import {
   getSupportedBuildExtension,
-  hasExpectedBuildFileFormat,
-} from "../../../../../lib/build-file-validation";
-import { mtaVersionSchema } from "@nexus/validation";
-import {
-  MultipartBodyTooLargeError,
-  parseMultipartFormDataWithLimit,
-} from "../../../../../lib/bounded-multipart";
+  MAX_BUILD_FILE_SIZE_BYTES,
+} from "../../../../../lib/build-file-policy";
 
-const BUILD_FILE_SIZE_LIMIT_MB = MAX_FILE_SIZE_BYTES / (1024 * 1024);
+const MULTIPART_OVERHEAD_BYTES = 1024 * 1024;
 const BUILD_MIME_TYPES: Record<string, string> = {
   zip: "application/zip",
   rar: "application/vnd.rar",
@@ -26,24 +20,14 @@ const BUILD_MIME_TYPES: Record<string, string> = {
   lua: "text/plain; charset=utf-8",
 };
 
-const privateHeaders = {
-  "Cache-Control": "private, no-store",
-  Vary: "Cookie",
-};
-
-function privateJson(
-  context: ReturnType<typeof createRequestLogContext>,
-  body: unknown,
-  init: ResponseInit = {},
-) {
-  const headers = new Headers(privateHeaders);
-  new Headers(init.headers).forEach((value, key) => {
-    headers.set(key, value);
-  });
-  return jsonWithRequestId(context, body, {
-    ...init,
-    headers,
-  });
+function hasExpectedSignature(extension: string, bytes: Uint8Array): boolean {
+  if (extension === "lua") return true;
+  const signature = Array.from(bytes.slice(0, 6));
+  if (extension === "zip") return signature[0] === 0x50 && signature[1] === 0x4b;
+  if (extension === "rar") {
+    return signature[0] === 0x52 && signature[1] === 0x61 && signature[2] === 0x72 && signature[3] === 0x21;
+  }
+  return signature.join(",") === "55,122,188,175,39,28";
 }
 
 const buildMetadataSchema = z.object({
@@ -51,90 +35,46 @@ const buildMetadataSchema = z.object({
     .string()
     .regex(/^v?[0-9]+\.[0-9]+(\.[0-9]+)?(-[a-zA-Z0-9.]+)?$/, "Semantic version expected"),
   releaseNotes: z.string().max(5000).optional(),
-  mtaVersionTarget: mtaVersionSchema.optional().or(z.literal("")),
+  mtaVersionTarget: z
+    .string()
+    .regex(/^1\.\d+(\.\d+)?$/, "Use an MTA version such as 1.6 or 1.6.0")
+    .optional()
+    .or(z.literal("")),
 });
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
-      return privateJson(
-        context,
-        { error: "Authentication required", code: "UNAUTHORIZED" },
-        { status: 401 },
-      );
-    }
-
-    const rateLimit = await consumeRateLimit("buildUpload", user.id);
-    if (!rateLimit.success) {
-      return privateJson(
-        context,
-        { error: "Build upload limit exceeded", code: "RATE_LIMIT_EXCEEDED" },
-        { status: 429 },
-      );
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const { id: productId } = await params;
-    await productService.assertCanReleaseBuild(productId, user);
+    // Reject unauthorized callers before reading an archive into memory or
+    // spending malware-scanner capacity.
+    await productService.authorizeBuildRelease(productId, user);
+
+    const rateLimit = await consumeRateLimit("buildUpload", user.id);
+    if (!rateLimit.success) {
+      return NextResponse.json({ error: "Build upload limit exceeded" }, { status: 429 });
+    }
 
     const declaredLength = Number(request.headers.get("content-length"));
     if (
       Number.isFinite(declaredLength) &&
-      declaredLength > MAX_FILE_SIZE_BYTES + MAX_BUILD_MULTIPART_OVERHEAD_BYTES
+      declaredLength > MAX_BUILD_FILE_SIZE_BYTES + MULTIPART_OVERHEAD_BYTES
     ) {
-      return privateJson(context, 
-        {
-          error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB closed-beta limit`,
-          code: "BUILD_UPLOAD_TOO_LARGE",
-        },
+      return NextResponse.json(
+        { error: "Build archive exceeds the 64MB closed-beta limit" },
         { status: 413 }
       );
     }
 
-    const contentType =
-      request.headers.get("content-type")?.toLowerCase() ?? "";
-    if (!contentType.startsWith("multipart/form-data")) {
-      return privateJson(
-        context,
-        {
-          error: "Build upload requires multipart/form-data",
-          code: "BUILD_MULTIPART_REQUIRED",
-        },
-        { status: 415 },
-      );
-    }
-
-    let form: FormData;
-    try {
-      form = await parseMultipartFormDataWithLimit(
-        request,
-        MAX_FILE_SIZE_BYTES + MAX_BUILD_MULTIPART_OVERHEAD_BYTES,
-      );
-    } catch (error) {
-      if (error instanceof MultipartBodyTooLargeError) {
-        return privateJson(
-          context,
-          {
-            error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB closed-beta limit`,
-            code: "BUILD_UPLOAD_TOO_LARGE",
-          },
-          { status: 413 },
-        );
-      }
-      return privateJson(
-        context,
-        {
-          error: "Invalid multipart build upload",
-          code: "BUILD_MULTIPART_INVALID",
-        },
-        { status: 400 },
-      );
-    }
+    const form = await request.formData();
     const file = form.get("file");
     const parsed = buildMetadataSchema.safeParse({
       version: form.get("version"),
@@ -142,108 +82,43 @@ export async function POST(
       mtaVersionTarget: form.get("mtaVersionTarget") || undefined,
     });
     if (!parsed.success || !(file instanceof File) || file.size === 0) {
-      return privateJson(context, 
-        {
-          error: "A valid build archive and semantic version are required",
-          code: "BUILD_METADATA_INVALID",
-        },
+      return NextResponse.json(
+        { error: "A valid build archive and semantic version are required" },
         { status: 400 }
       );
     }
     const extension = getSupportedBuildExtension(file.name);
     if (!extension) {
-      return privateJson(context, 
-        {
-          error: "Only .zip, .rar, .7z, and .lua resource builds are allowed",
-          code: "BUILD_FILE_TYPE_NOT_ALLOWED",
-        },
+      return NextResponse.json(
+        { error: "Only .zip, .rar, .7z, and .lua resource builds are allowed" },
         { status: 415 }
       );
     }
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      return privateJson(context, 
-        {
-          error: `Build archive exceeds the ${BUILD_FILE_SIZE_LIMIT_MB}MB closed-beta limit`,
-          code: "BUILD_UPLOAD_TOO_LARGE",
-        },
+    if (file.size > MAX_BUILD_FILE_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: "Build archive exceeds the 64MB closed-beta limit" },
         { status: 413 }
       );
     }
 
     const safeFileName = path.basename(file.name).replace(/[^a-zA-Z0-9._-]/g, "_");
     if (!safeFileName) {
-      return privateJson(
-        context,
-        { error: "A valid build file name is required", code: "BUILD_FILE_NAME_INVALID" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "A valid build file name is required" }, { status: 400 });
     }
 
     const fileBytes = new Uint8Array(await file.arrayBuffer());
-    if (!hasExpectedBuildFileFormat(extension, fileBytes)) {
-      return privateJson(context, 
-        {
-          error: "Build content does not match its file extension",
-          code: "BUILD_CONTENT_MISMATCH",
-        },
+    if (!hasExpectedSignature(extension, fileBytes)) {
+      return NextResponse.json(
+        { error: "Build content does not match its file extension" },
         { status: 415 }
       );
     }
 
     const scan = await buildScannerService.scan({ bytes: fileBytes, fileName: safeFileName });
     if (scan.status === "malicious") {
-      logRequestEvent({
-        level: "warn",
-        event: "resource.build.rejected_malware",
-        context,
-        status: 422,
-        fields: { scanner: scan.scanner },
-      });
-      return privateJson(
-        context,
-        {
-          error: "Build was rejected by the malware scanner",
-          code: "BUILD_MALWARE_DETECTED",
-          scanner: scan.scanner,
-        },
+      return NextResponse.json(
+        { error: "Build was rejected by the malware scanner", scanner: scan.scanner },
         { status: 422 }
-      );
-    }
-    if (scan.status === "rejected") {
-      logRequestEvent({
-        level: "warn",
-        event: "resource.build.rejected_scan_limits",
-        context,
-        status: 422,
-        fields: { scanner: scan.scanner },
-      });
-      return privateJson(
-        context,
-        {
-          error:
-            "The build exceeds malware scanner limits and could not be fully checked. Reduce its size or archive complexity and try again.",
-          code: "BUILD_SCAN_LIMIT_EXCEEDED",
-          scanner: scan.scanner,
-        },
-        { status: 422 },
-      );
-    }
-    if (scan.status === "error") {
-      logRequestEvent({
-        level: "warn",
-        event: "resource.build.scanner_unavailable",
-        context,
-        status: 503,
-        fields: { scanner: scan.scanner },
-      });
-      return privateJson(
-        context,
-        {
-          error:
-            "Malware scanning is temporarily unavailable. No build was stored; retry the upload later.",
-          code: "BUILD_SCANNER_UNAVAILABLE",
-        },
-        { status: 503, headers: { "Retry-After": "30" } },
       );
     }
 
@@ -273,27 +148,19 @@ export async function POST(
         },
         user
       );
-      return privateJson(context, { build }, { status: 201 });
+      return NextResponse.json({ build }, { status: 201 });
     } catch (error) {
       await storageService.deleteAsset(asset.key);
       throw error;
     }
   } catch (error: unknown) {
-    if (!(error instanceof AppError)) {
-      logRequestEvent({
-        level: "error",
-        event: "resource.build.upload_failed",
-        context,
-        status: 500,
-        error,
-      });
-    }
+    console.error("Build upload error:", error);
     if (error instanceof AppError) {
-      return privateJson(context, 
+      return NextResponse.json(
         { error: error.message, code: error.code },
         { status: error.statusCode }
       );
     }
-    return privateJson(context, { error: "Could not publish build" }, { status: 500 });
+    return NextResponse.json({ error: "Could not publish build" }, { status: 500 });
   }
 }

@@ -2,10 +2,10 @@ import { describe, it, expect } from "vitest";
 import {
   createServerSchema,
   createProductSchema,
-  createBuildSchema,
   checkoutSchema,
   changePasswordSchema,
   notificationPreferencesSchema,
+  createReportSchema,
 } from "@nexus/validation";
 
 describe("Validation Schemas", () => {
@@ -54,53 +54,12 @@ describe("Validation Schemas", () => {
 
     expect(createProductSchema.safeParse({
       ...base,
-      compatibility: { mtaMinVersion: "1.6.0-9.22279.0", dependencies: [] },
-    }).success).toBe(true);
-
-    expect(createProductSchema.safeParse({
-      ...base,
       compatibility: { mtaMinVersion: "latest", dependencies: ["core-ui"] },
     }).success).toBe(false);
 
     expect(createProductSchema.safeParse({
       ...base,
-      compatibility: { mtaMinVersion: "1.6.0-preview", dependencies: [] },
-    }).success).toBe(false);
-
-    expect(createProductSchema.safeParse({
-      ...base,
       compatibility: { dependencies: ["core-ui", "core-ui"] },
-    }).success).toBe(false);
-  });
-
-  it("accepts sortable MTA release targets for resource and build metadata", () => {
-    const target = "1.6.0-9.22279.0";
-    expect(createProductSchema.safeParse({
-      title: "Sortable MTA Resource",
-      slug: "sortable-mta-resource",
-      description: "A resource using an exact MTA sortable release target",
-      type: "script",
-      price: 0,
-      licenseModel: "unlimited",
-      compatibility: { mtaMinVersion: target },
-    }).success).toBe(true);
-
-    expect(createBuildSchema.safeParse({
-      productId: "prd_sortable",
-      version: "1.0.0",
-      storageKey: "builds/sortable.zip",
-      sha256Hash: "a".repeat(64),
-      fileSizeBytes: 1,
-      mtaVersionTarget: target,
-    }).success).toBe(true);
-
-    expect(createBuildSchema.safeParse({
-      productId: "prd_sortable",
-      version: "1.0.0",
-      storageKey: "builds/sortable.zip",
-      sha256Hash: "a".repeat(64),
-      fileSizeBytes: 1,
-      mtaVersionTarget: "1.6.0-preview",
     }).success).toBe(false);
   });
 
@@ -120,6 +79,23 @@ describe("Validation Schemas", () => {
     expect(notificationPreferencesSchema.safeParse({ followsEnabled: false }).success).toBe(true);
     expect(notificationPreferencesSchema.safeParse({ followsEnabled: "false" }).success).toBe(false);
     expect(notificationPreferencesSchema.safeParse({}).success).toBe(false);
+  });
+
+  it("bounds report text and evidence while normalizing the reason", () => {
+    const valid = {
+      targetType: "server",
+      targetId: "srv_valid_target",
+      type: "fake_server",
+      reason: "  The listing links to an unrelated server.  ",
+      evidenceUrls: ["https://example.test/evidence"],
+    };
+
+    expect(createReportSchema.parse(valid).reason).toBe("The listing links to an unrelated server.");
+    expect(createReportSchema.safeParse({ ...valid, reason: "          " }).success).toBe(false);
+    expect(createReportSchema.safeParse({
+      ...valid,
+      evidenceUrls: Array.from({ length: 6 }, () => "https://example.test/evidence"),
+    }).success).toBe(false);
   });
 
   it("should require at least one item for checkout", () => {

@@ -34,11 +34,6 @@ export type ProductUpdatedEvent = DomainEvent<
   { productId: string; updatedFields: string[] }
 >;
 
-export type BuildSubmittedForReviewEvent = DomainEvent<
-  "build.submitted_for_review",
-  { buildId: string; productId: string; version: string; hash: string }
->;
-
 export type BuildReleasedEvent = DomainEvent<
   "build.released",
   { buildId: string; productId: string; version: string; hash: string }
@@ -46,14 +41,7 @@ export type BuildReleasedEvent = DomainEvent<
 
 export type ServerCreatedEvent = DomainEvent<
   "server.created",
-  {
-    serverId: string;
-    name: string;
-    ownerId?: string;
-    organizationId?: string;
-    ip: string;
-    port: number;
-  }
+  { serverId: string; name: string; ownerId: string; ip: string; port: number }
 >;
 
 export type ServerUpdatedEvent = DomainEvent<
@@ -100,7 +88,6 @@ export type NexusDomainEvent =
   | ProductCreatedEvent
   | ProductPublishedEvent
   | ProductUpdatedEvent
-  | BuildSubmittedForReviewEvent
   | BuildReleasedEvent
   | ServerCreatedEvent
   | ServerUpdatedEvent

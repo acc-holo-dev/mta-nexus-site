@@ -1,51 +1,9 @@
-import { eq, asc, desc, and, count, sql, inArray, ilike, or } from "drizzle-orm";
-import { containsPattern } from "./search-pattern";
+import { eq, desc, and, sql, inArray } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, content, comments, products } from "../schema";
-import type { AuditEvent, Content, Comment } from "@nexus/domain";
+import { content, comments, products } from "../schema";
+import type { Content, Comment } from "@nexus/domain";
 
 export class ContentRepository {
-  async countDrafts(): Promise<number> {
-    const [row] = await db.select({ total: count() }).from(content)
-      .where(eq(content.status, "draft"));
-    return row?.total ?? 0;
-  }
-
-  async listDraftPage(page: number, pageSize = 30): Promise<{ items: Content[]; hasMore: boolean }> {
-    if (!Number.isSafeInteger(page) || page < 1 || page > 99_999 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
-      throw new RangeError("Invalid content review page");
-    }
-    const rows = await db.select().from(content)
-      .where(eq(content.status, "draft"))
-      .orderBy(asc(content.createdAt), asc(content.id))
-      .limit(pageSize + 1)
-      .offset((page - 1) * pageSize);
-    return { items: rows.slice(0, pageSize) as unknown as Content[], hasMore: rows.length > pageSize };
-  }
-
-  async countPublished(): Promise<number> {
-    const [row] = await db.select({ total: count() }).from(content).where(
-      eq(content.status, "published"),
-    );
-    return row?.total ?? 0;
-  }
-
-  async searchPublished(term: string, limit = 50): Promise<Content[]> {
-    const pattern = containsPattern(term);
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 50)
-      : 50;
-    const rows = await db.select().from(content).where(and(
-      eq(content.status, "published"),
-      or(
-        ilike(content.title, pattern),
-        ilike(content.body, pattern),
-        sql`exists (select 1 from jsonb_array_elements_text(${content.tags}) as tag(value) where tag.value ilike ${pattern})`,
-      ),
-    )).orderBy(desc(content.createdAt), desc(content.id)).limit(boundedLimit);
-    return rows as unknown as Content[];
-  }
-
   async listPublished(limit = 50): Promise<Content[]> {
         const rows = await db
       .select()
@@ -53,31 +11,6 @@ export class ContentRepository {
       .where(eq(content.status, "published"))
       .orderBy(desc(content.createdAt))
       .limit(Math.min(Math.max(limit, 1), 100));
-    return rows as unknown as Content[];
-  }
-
-  async listPublishedByOrganization(
-    organizationId: string,
-    limit = 100,
-  ): Promise<Content[]> {
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 100)
-      : 100;
-
-    const rows = await db
-      .select()
-      .from(content)
-      .where(
-        and(
-          eq(content.organizationId, organizationId),
-          eq(content.status, "published"),
-        ),
-      )
-      .orderBy(
-        desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`),
-        desc(content.id),
-      )
-      .limit(boundedLimit);
     return rows as unknown as Content[];
   }
 
@@ -89,38 +22,6 @@ export class ContentRepository {
       .where(and(eq(content.status, "published"), inArray(content.type, types)))
       .orderBy(desc(content.updatedAt))
       .limit(Math.min(Math.max(Math.floor(limit), 1), 100));
-    return rows as unknown as Content[];
-  }
-
-  async listPublishedByServer(
-    serverId: string,
-    limit = 6,
-  ): Promise<Content[]> {
-    const publicServerUpdateTypes: Content["type"][] = [
-      "article",
-      "news",
-      "devlog",
-      "update",
-      "announcement",
-    ];
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 12)
-      : 6;
-
-    const rows = await db
-      .select()
-      .from(content)
-      .where(
-        and(
-          eq(content.serverId, serverId),
-          eq(content.status, "published"),
-          inArray(content.type, publicServerUpdateTypes),
-        ),
-      )
-      .orderBy(
-        desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`),
-      )
-      .limit(boundedLimit);
     return rows as unknown as Content[];
   }
 
@@ -200,39 +101,6 @@ export class ContentRepository {
     return (rows[0] as unknown as Content) || null;
   }
 
-  async moderateStatusWithAudit(
-    id: string,
-    status: Content["status"],
-    expectedStatus: Content["status"],
-    audit: Omit<AuditEvent, "createdAt">,
-  ): Promise<Content | null> {
-    return db.transaction(async (tx) => {
-      const now = new Date();
-      const rows = await tx
-        .update(content)
-        .set({
-          status,
-          publishedAt: status === "published" ? now : null,
-          updatedAt: now,
-        })
-        .where(
-          and(
-            eq(content.id, id),
-            eq(content.status, expectedStatus),
-          ),
-        )
-        .returning();
-      const updated = rows[0];
-      if (!updated) return null;
-
-      await tx.insert(auditEvents).values({
-        ...audit,
-        createdAt: now,
-      });
-      return updated as unknown as Content;
-    });
-  }
-
   async create(data: Omit<Content, "createdAt" | "updatedAt">): Promise<Content> {
     const values = {
       ...data,
@@ -242,24 +110,6 @@ export class ContentRepository {
 
         const rows = await db.insert(content).values(values).returning();
     return rows[0] as unknown as Content;
-  }
-
-  async createWithAudit(
-    data: Omit<Content, "createdAt" | "updatedAt">,
-    audit: Omit<AuditEvent, "createdAt">,
-  ): Promise<Content> {
-    return db.transaction(async (tx) => {
-      const now = new Date();
-      const rows = await tx
-        .insert(content)
-        .values({ ...data, createdAt: now, updatedAt: now })
-        .returning();
-      const created = rows[0];
-      if (!created) throw new Error("Content insert did not return a row");
-
-      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
-      return created as unknown as Content;
-    });
   }
 
   async findCommentById(id: string): Promise<Comment | null> {
@@ -300,10 +150,7 @@ export class ContentRepository {
     return [];
   }
 
-  async addComment(
-    data: Omit<Comment, "createdAt">,
-    audit?: Omit<AuditEvent, "createdAt">,
-  ): Promise<Comment> {
+  async addComment(data: Omit<Comment, "createdAt">): Promise<Comment> {
     const values = {
       ...data,
       createdAt: new Date(),
@@ -320,44 +167,33 @@ export class ContentRepository {
           })
           .where(eq(content.id, data.contentId));
       }
-      if (audit) {
-        await tx.insert(auditEvents).values({
-          ...audit,
-          createdAt: values.createdAt,
-        });
-      }
-
       return rows[0] as unknown as Comment;
     });
   }
 
   async addProductReview(
-    data: Omit<Comment, "createdAt"> & { productId: string; rating: number },
-    audit?: Omit<AuditEvent, "createdAt">,
-  ): Promise<{ review: Comment; ratingCount: number; ratingAverage: number }> {
+    data: Omit<Comment, "createdAt"> & { productId: string; rating: number }
+  ): Promise<{
+    review: Comment;
+    ratingAverage: number;
+    ratingCount: number;
+  }> {
     const values = {
       ...data,
       createdAt: new Date(),
     };
 
     return db.transaction(async (tx) => {
-      // Serialize review aggregation per product. Without a product-row lock,
-      // two concurrent reviewers can both calculate aggregates from incomplete
-      // snapshots and the last writer can overwrite the correct counters.
-      const lockedProduct = await tx
-        .update(products)
-        .set({ updatedAt: sql`${products.updatedAt}` })
-        .where(and(eq(products.id, data.productId), eq(products.status, "published")))
-        .returning({ id: products.id });
-
-      if (!lockedProduct.length) {
-        throw new Error("PRODUCT_NOT_PUBLISHED");
-      }
+      // Serialize reviews for the same product. Without this lock, concurrent
+      // inserts can each calculate an aggregate that omits the other review.
+      await tx
+        .select({ id: products.id })
+        .from(products)
+        .where(eq(products.id, data.productId))
+        .for("update");
 
       const rows = await tx.insert(comments).values(values).returning();
-      const review = rows[0] as unknown as Comment;
-
-      const aggregateRows = await tx
+      const aggregates = await tx
         .select({
           ratingCount: sql<number>`count(${comments.rating})::int`,
           ratingAverage: sql<number>`coalesce(round(avg(${comments.rating}) * 10), 0)::int`,
@@ -365,31 +201,24 @@ export class ContentRepository {
         .from(comments)
         .where(eq(comments.productId, data.productId));
 
-      const ratingCount = aggregateRows[0]?.ratingCount ?? 0;
-      const ratingAverage = aggregateRows[0]?.ratingAverage ?? 0;
+      const ratingCount = aggregates[0]?.ratingCount ?? 0;
+      const ratingAverage = aggregates[0]?.ratingAverage ?? 0;
 
       await tx
         .update(products)
-        .set({
-          ratingCount,
-          ratingAverage,
-          updatedAt: new Date(),
-        })
+        .set({ ratingCount, ratingAverage, updatedAt: new Date() })
         .where(eq(products.id, data.productId));
 
-      if (audit) {
-        await tx.insert(auditEvents).values({
-          ...audit,
-          createdAt: values.createdAt,
-        });
-      }
-
-      return { review, ratingCount, ratingAverage };
+      return {
+        review: rows[0] as unknown as Comment,
+        ratingAverage,
+        ratingCount,
+      };
     });
   }
 
   async hasReviewFromUser(productId: string, authorId: string): Promise<boolean> {
-    const rows = await db
+        const rows = await db
       .select()
       .from(comments)
       .where(and(eq(comments.productId, productId), eq(comments.authorId, authorId)))

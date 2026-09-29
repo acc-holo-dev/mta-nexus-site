@@ -116,7 +116,6 @@
   .bg-elevated { background-color: var(--nexus-elevated); }
   .bg-inset { background-color: var(--nexus-inset); }
   .bg-hover { background-color: var(--nexus-hover); }
-
   .border-base { border-color: var(--nexus-border); }
   .border-strong { border-color: var(--nexus-border-strong); }
 

@@ -2,30 +2,19 @@ import {
   contentRepository,
   productRepository,
   serverRepository,
+  auditRepository,
 } from "@nexus/db";
 import { can, generateId } from "@nexus/security";
-import { ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
+import { eventBus, ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
 import type { Content, Comment, User, Product, Server } from "@nexus/domain";
-import { notifyServerFollowersOfPublishedContent } from "./server-follow-notification-service";
 
 export class ContentService {
   async listArticles(limit = 50): Promise<Content[]> {
-    const editorialTypes: Content["type"][] = [
-      "article",
-      "news",
-      "devlog",
-      "update",
-      "announcement",
-    ];
-    return contentRepository.listPublishedByTypes(editorialTypes, limit);
+    return contentRepository.listPublished(limit);
   }
 
   async listCommunityTopics(limit = 50): Promise<Content[]> {
     return contentRepository.listPublishedByTypes(["post", "question"], limit);
-  }
-
-  async listServerUpdates(serverId: string, limit = 6): Promise<Content[]> {
-    return contentRepository.listPublishedByServer(serverId, limit);
   }
 
   async getArticleBySlug(
@@ -52,6 +41,14 @@ export class ContentService {
     },
     actor: User
   ): Promise<Comment> {
+    if (input.productId || input.rating !== undefined) {
+      throw new AppError(
+        "Product reviews must use the verified review submission flow",
+        400,
+        "PRODUCT_REVIEW_FLOW_REQUIRED"
+      );
+    }
+
     if (input.contentId) {
       const target = await contentRepository.findById(input.contentId);
       if (!target || target.status !== "published") {
@@ -77,30 +74,29 @@ export class ContentService {
       }
     }
 
-    const comment = await contentRepository.addComment(
-      {
-        id: generateId("cmt"),
-        contentId: input.contentId,
-        productId: input.productId,
-        parentId: input.parentId,
-        authorId: actor.id,
-        text: input.text,
-        rating: input.rating,
-        // Article comments are not product acquisitions. Product review routes
-        // set this flag only after an entitlement check.
-        isVerifiedPurchase: false,
-      },
-      input.contentId
-        ? {
-            id: generateId("aud"),
-            actorId: actor.id,
-            actorType: "user",
-            action: "content.comment_added",
-            targetId: input.contentId,
-            targetType: "content",
-          }
-        : undefined,
-    );
+    const comment = await contentRepository.addComment({
+      id: generateId("cmt"),
+      contentId: input.contentId,
+      productId: input.productId,
+      parentId: input.parentId,
+      authorId: actor.id,
+      text: input.text,
+      rating: input.rating,
+      // Article comments are not product acquisitions. Product review routes
+      // set this flag only after an entitlement check.
+      isVerifiedPurchase: false,
+    });
+
+    if (input.contentId) {
+      await auditRepository.record({
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: "user",
+        action: "content.comment_added",
+        targetId: input.contentId,
+        targetType: "content",
+      });
+    }
 
     return comment;
   }
@@ -128,19 +124,10 @@ export class ContentService {
       );
     }
 
-    const updated = await contentRepository.moderateStatusWithAudit(
+    const updated = await contentRepository.updateStatus(
       contentId,
       targetStatus,
-      current.status,
-      {
-        id: generateId("aud"),
-        actorId: actor.id,
-        actorType: "admin",
-        action: decision === "publish" ? "content.published" : "content.archived",
-        targetId: contentId,
-        targetType: "content",
-        details: { from: current.status, to: targetStatus, notes },
-      },
+      current.status
     );
     if (!updated) {
       throw new AppError(
@@ -150,11 +137,15 @@ export class ContentService {
       );
     }
 
-    if (decision === "publish" && updated.serverId) {
-      await notifyServerFollowersOfPublishedContent(updated).catch(
-        () => undefined,
-      );
-    }
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "admin",
+      action: decision === "publish" ? "content.published" : "content.archived",
+      targetId: contentId,
+      targetType: "content",
+      details: { from: current.status, to: targetStatus, notes },
+    });
 
     return updated;
   }
@@ -170,7 +161,7 @@ export class ContentService {
       limit: 4,
     });
     const trendingServers = await serverRepository.listActivePublic(3);
-    const recentArticles = await this.listArticles(3);
+    const recentArticles = await contentRepository.listPublished(3);
 
     return {
       featuredProducts,

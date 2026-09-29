@@ -2,42 +2,33 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
-
 describe("resource build visibility", () => {
-  it("shows only published builds publicly and keeps lifecycle details to managers/admins", () => {
-    const repository = read(
-      "packages/db/src/repositories/builds.ts",
+  it("shows only published builds publicly and keeps lifecycle details to owners/admins", () => {
+    const repository = readFileSync(
+      resolve(process.cwd(), "packages/db/src/repositories/builds.ts"),
+      "utf8"
     );
-    const service = read(
-      "apps/web/src/lib/services/product-service.ts",
+    const service = readFileSync(
+      resolve(process.cwd(), "apps/web/src/lib/services/product-service.ts"),
+      "utf8"
     );
-    const page = read(
-      "apps/web/src/app/market/[slug]/page.tsx",
+    const page = readFileSync(
+      resolve(process.cwd(), "apps/web/src/app/market/[slug]/page.tsx"),
+      "utf8"
     );
 
     expect(repository).toContain("listPublishedByProduct");
     expect(service).toContain("includeNonPublic = false");
-    expect(service).toContain(
-      "buildRepository.listPublishedByProduct",
-    );
+    expect(service).toContain("buildRepository.listPublishedByProduct");
     expect(service).toContain('product.status === "published"');
     expect(service).toContain("getProductPreviewBySlug");
-    expect(service).toContain("this.canManageProduct(product, actor");
-    expect(service).toContain("if (can(actor, action, product)) return true;");
-
+    expect(service).toContain('can(actor, "product.update", product');
+    expect(page).toContain("const canInspectBuilds = isAuthor || isAdmin");
+    expect(page).toContain("Private creator preview");
+    expect(page).toContain("const hasLibraryAccess = isPublished &&");
     expect(page).toContain(
-      "await productService.canManageProduct(product, user)",
+      "const hasDownloadableAccess = hasLibraryAccess && latestDownloadableBuild != null;"
     );
-    expect(page).toContain(
-      "const canInspectBuilds = canManageProduct || isAdmin;",
-    );
-    expect(page).toContain(
-      "productService.getProductBuilds(product.id, canInspectBuilds)",
-    );
-    expect(page).toContain("copy.privatePreview");
-    expect(page).toContain("const hasAccess =");
-    expect(page).toContain("isPublished &&");
+    expect(page).toContain("b.status === \"published\"");
   });
 });

@@ -1,12 +1,5 @@
 import { z } from "zod";
 
-// MTA's sortable release form, for example 1.6.0-9.22279.0.
-export const MTA_VERSION_PATTERN = /^1\.\d+(?:\.\d+)?(?:-\d+(?:\.\d+){1,2})?$/;
-export const mtaVersionSchema = z
-  .string()
-  .max(64)
-  .regex(MTA_VERSION_PATTERN, "Use an MTA version such as 1.6.0 or 1.6.0-9.22279.0");
-
 // --- Auth & User Schemas ---
 export const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -41,25 +34,6 @@ export const changePasswordSchema = z
       });
     }
   });
-
-export const requestRecoveryEmailVerificationSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required").max(128),
-}).strict();
-
-export const confirmRecoveryEmailVerificationSchema = z.object({
-  challengeId: z.string().min(1).max(100).regex(/^ach_[A-Za-z0-9_-]+$/, "Invalid confirmation identifier"),
-  token: z.string().length(43).regex(/^[A-Za-z0-9_-]+$/, "Invalid confirmation token"),
-}).strict();
-
-export const requestPasswordResetSchema = z.object({
-  email: z.string().trim().email("Invalid email address").max(320).transform((value) => value.toLowerCase()),
-}).strict();
-
-export const confirmPasswordResetSchema = z.object({
-  challengeId: z.string().min(1).max(100).regex(/^ach_[A-Za-z0-9_-]+$/, "Invalid reset identifier"),
-  token: z.string().length(43).regex(/^[A-Za-z0-9_-]+$/, "Invalid reset token"),
-  newPassword: z.string().min(8, "Password must be at least 8 characters").max(128),
-}).strict();
 
 export const notificationPreferencesSchema = z
   .object({
@@ -142,7 +116,10 @@ export const createProductSchema = z.object({
   organizationId: z.string().optional(),
   compatibility: z
     .object({
-      mtaMinVersion: mtaVersionSchema.optional(),
+      mtaMinVersion: z
+        .string()
+        .regex(/^1\.\d+(\.\d+)?$/, "Use an MTA version such as 1.6 or 1.6.0")
+        .optional(),
       dependencies: z
         .array(z.string().min(3).max(120).regex(/^[a-z0-9][a-z0-9._-]*$/, "Use a resource slug"))
         .max(25)
@@ -174,7 +151,7 @@ export const createBuildSchema = z.object({
   storageKey: z.string().min(1),
   sha256Hash: z.string().length(64, "SHA-256 hash must be 64 characters"),
   fileSizeBytes: z.number().int().positive(),
-  mtaVersionTarget: mtaVersionSchema.optional(),
+  mtaVersionTarget: z.string().optional(),
 });
 
 // --- Resource acquisition ---
@@ -214,7 +191,7 @@ export const createContentSchema = z.object({
   serverId: z.string().optional(),
   productId: z.string().optional(),
   organizationId: z.string().optional(),
-  status: z.enum(["draft", "published"]).default("draft"),
+  status: z.enum(["draft", "published"]).default("published"),
 });
 
 export const addCommentSchema = z.object({
@@ -246,8 +223,8 @@ export const createReportSchema = z.object({
     "spam",
     "other",
   ]),
-  reason: z.string().min(10).max(1000),
-  evidenceUrls: z.array(z.string().url().max(2048)).max(5).default([]),
+  reason: z.string().trim().min(10).max(1000),
+  evidenceUrls: z.array(z.string().url().max(2000)).max(5).default([]),
 });
 
 // --- Search & Discovery ---

@@ -21,8 +21,8 @@ describe("resource build scanner contract", () => {
     expect(scanner).toContain('scanner: "disabled"');
     expect(upload).toContain("buildScannerService.scan");
     expect(upload).toContain('scan.status === "malicious"');
-    expect(upload).toContain('scan.status === "rejected"');
-    expect(service).toContain('build.scanStatus !== "clean"');
+    expect(service).toContain("hasTrustedCleanBuildScanEvidence");
+    expect(service).toContain('"BUILD_SCAN_EVIDENCE_INVALID"');
   });
 
   it("streams builds to ClamAV and fails closed in production", () => {
@@ -32,15 +32,11 @@ describe("resource build scanner contract", () => {
     );
     const compose = readFileSync(resolve(process.cwd(), "compose.production.yaml"), "utf8");
     const config = readFileSync(resolve(process.cwd(), "packages/config/src/index.ts"), "utf8");
-    const transport = readFileSync(resolve(process.cwd(), "apps/web/src/lib/services/clamav-instream.ts"), "utf8");
-    expect(scanner).toContain("writeClamAvInstream(socket, bytes)");
-    expect(transport).toContain('writeChunk(socket, "zINSTREAM\\0")');
-    expect(transport).toContain("writeUInt32BE");
+    expect(scanner).toContain('socket.write("zINSTREAM');
+    expect(scanner).toContain("writeUInt32BE");
     expect(scanner).toContain('status: "clean", scanner: "clamav"');
     expect(compose).toContain("clamav/clamav:1.5");
     expect(compose).toContain('CLAMD_CONF_AlertExceedsMax: "yes"');
-    expect(readFileSync(resolve(process.cwd(), "compose.yaml"), "utf8"))
-      .toContain('CLAMD_CONF_AlertExceedsMax: "yes"');
     expect(config).toContain("Production resource publishing requires ClamAV");
   });
 });

@@ -1,9 +1,7 @@
-import { productRepository, buildRepository, organizationRepository } from "@nexus/db";
+import { productRepository, buildRepository, auditRepository, organizationRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
-import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
+import { AppError, NotFoundError, ForbiddenError, eventBus, hasTrustedCleanBuildScanEvidence } from "@nexus/domain";
 import type { Product, Build, User, ProductType } from "@nexus/domain";
-import { buildProductDependencyResolution } from "../product-dependency-resolution";
-import { buildReverseDependencySummary, reverseDependencyLimits } from "../reverse-dependency-summary";
 
 export interface ProductFilters {
   query?: string;
@@ -14,30 +12,9 @@ export interface ProductFilters {
   sort?: "popular" | "newest" | "price_asc" | "price_desc" | "rating" | "relevance";
   featuredOnly?: boolean;
   limit?: number;
-  offset?: number;
 }
 
 export class ProductService {
-  async canManageProduct(
-    product: Product,
-    actor: User,
-    action: "product.update" | "build.release" | "build.retire" = "product.update",
-  ): Promise<boolean> {
-    if (can(actor, action, product)) return true;
-    if (!product.organizationId) return false;
-
-    const [organization, organizationMemberships] = await Promise.all([
-      organizationRepository.findById(product.organizationId),
-      organizationRepository.listUserMemberships(actor.id),
-    ]);
-
-    if (organization?.ownerId === actor.id) return true;
-
-    return can(actor, action, product, {
-      organizationMemberships,
-    });
-  }
-
   async listProducts(filters: ProductFilters = {}): Promise<Product[]> {
     return productRepository.list({
       type: filters.type,
@@ -47,35 +24,12 @@ export class ProductService {
       sort: filters.sort,
       query: filters.query,
       limit: filters.limit,
-      offset: filters.offset,
     });
-  }
-
-  async listPublicPage(filters: Omit<ProductFilters, "limit" | "offset"> & {
-    page: number;
-    pageSize: number;
-  }): Promise<{ products: Product[]; hasMore: boolean }> {
-    const pageSize = Number.isFinite(filters.pageSize)
-      ? Math.min(Math.max(Math.floor(filters.pageSize), 1), 100)
-      : 24;
-    const page = Number.isFinite(filters.page)
-      ? Math.min(Math.max(Math.floor(filters.page), 1), 1000)
-      : 1;
-    const rows = await this.listProducts({
-      ...filters,
-      limit: pageSize + 1,
-      offset: (page - 1) * pageSize,
-    });
-    return { products: rows.slice(0, pageSize), hasMore: rows.length > pageSize };
   }
 
   async getProductBySlug(slug: string): Promise<Product | null> {
     const product = await productRepository.findBySlug(slug);
-    if (!product || product.price !== 0 || product.status !== "published") {
-      return null;
-    }
-    const build = await buildRepository.findLatestPublishedByProduct(product.id);
-    return build ? product : null;
+    return product?.price === 0 && product.status === "published" ? product : null;
   }
 
   async getProductPreviewBySlug(slug: string, actor: User | null): Promise<Product | null> {
@@ -84,49 +38,23 @@ export class ProductService {
     if (product.status === "published") return product;
     if (!actor) return null;
 
-    return (await this.canManageProduct(product, actor))
+    const organizationMemberships = product.organizationId
+      ? await organizationRepository.listUserMemberships(actor.id)
+      : [];
+    return can(actor, "product.update", product, { organizationMemberships })
       ? product
       : null;
   }
 
   async getProductById(id: string): Promise<Product | null> {
     const product = await productRepository.findById(id);
-    if (!product || product.price !== 0 || product.status !== "published") {
-      return null;
-    }
-    const build = await buildRepository.findLatestPublishedByProduct(product.id);
-    return build ? product : null;
+    return product?.price === 0 && product.status === "published" ? product : null;
   }
 
   async getProductBuilds(productId: string, includeNonPublic = false): Promise<Build[]> {
     return includeNonPublic
       ? buildRepository.listByProduct(productId)
       : buildRepository.listPublishedByProduct(productId);
-  }
-
-  async getDependencyResolution(
-    product: Pick<Product, "slug" | "compatibility">,
-  ) {
-    const declared = product.compatibility.dependencies ?? [];
-    if (declared.length === 0) {
-      return buildProductDependencyResolution(product, []);
-    }
-
-    const publishedDependencies =
-      await productRepository.findPublishedFreeBySlugs(declared);
-    return buildProductDependencyResolution(
-      product,
-      publishedDependencies,
-    );
-  }
-
-  async getReverseDependencySummary(productSlug: string) {
-    const dependents =
-      await productRepository.listPublishedFreeDependingOnSlug(
-        productSlug,
-        reverseDependencyLimits.query,
-      );
-    return buildReverseDependencySummary(productSlug, dependents);
   }
 
   async createProduct(
@@ -151,41 +79,38 @@ export class ProductService {
 
       const memberships = await organizationRepository.listUserMemberships(actor.id);
       const membership = memberships.find((item) => item.organizationId === input.organizationId);
-      const canManageProducts =
+      const canManageOrganization =
         organization.ownerId === actor.id ||
         membership?.role === "owner" ||
         membership?.role === "admin" ||
-        membership?.permissions.includes("manage_products");
+        membership?.role === "developer";
 
-      if (!canManageProducts) {
-        throw new ForbiddenError(
-          "You do not have permission to create resources for this organization",
-        );
+      if (!canManageOrganization) {
+        throw new ForbiddenError("You do not manage this organization");
       }
     }
 
     const id = generateId("prd");
-    const product = await productRepository.createWithAudit(
-      {
-        ...input,
-        id,
-        price: 0,
-        currency: "USD",
-        licenseModel: "unlimited",
-        ratingAverage: 0,
-        ratingCount: 0,
-        salesCount: 0,
-      },
-      {
-        id: generateId("aud"),
-        actorId: actor.id,
-        actorType: "user",
-        action: "product.created",
-        targetId: id,
-        targetType: "product",
-        details: { title: input.title, price: 0 },
-      },
-    );
+    const product = await productRepository.create({
+      ...input,
+      id,
+      price: 0,
+      currency: "USD",
+      licenseModel: "unlimited",
+      ratingAverage: 0,
+      ratingCount: 0,
+      salesCount: 0,
+    });
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "user",
+      action: "product.created",
+      targetId: id,
+      targetType: "product",
+      details: { title: product.title, price: product.price },
+    });
 
     await eventBus.publish({
       id: generateId("evt"),
@@ -207,10 +132,49 @@ export class ProductService {
     return product;
   }
 
-  async assertCanReleaseBuild(
+  async updateProductDetails(
     productId: string,
-    actor: User,
+    updates: Partial<Pick<
+      Product,
+      "title" | "slug" | "shortDescription" | "description" | "type" | "tags" | "compatibility"
+    >>,
+    actor: User
   ): Promise<Product> {
+    const product = await productRepository.findById(productId);
+    if (!product) throw new NotFoundError("Product", productId);
+
+    const organizationMemberships = product.organizationId
+      ? await organizationRepository.listUserMemberships(actor.id)
+      : [];
+    if (!can(actor, "product.update", product, { organizationMemberships })) {
+      throw new ForbiddenError("Not authorized to update this resource");
+    }
+
+    let updated: Product | null;
+    try {
+      updated = await productRepository.update(product.id, updates);
+    } catch (error: unknown) {
+      if ((error as { code?: string }).code === "23505") {
+        throw new AppError("This resource slug is already in use", 409, "PRODUCT_SLUG_EXISTS");
+      }
+      throw error;
+    }
+    if (!updated) throw new NotFoundError("Product", productId);
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: actor.role === "admin" ? "admin" : "user",
+      action: "product.updated",
+      targetId: product.id,
+      targetType: "product",
+      details: { fields: Object.keys(updates) },
+    });
+
+    return updated;
+  }
+
+  async authorizeBuildRelease(productId: string, actor: User): Promise<Product> {
     const product = await productRepository.findById(productId);
     if (!product) throw new NotFoundError("Product", productId);
     if (product.price !== 0) {
@@ -220,9 +184,14 @@ export class ProductService {
         "PAID_RESOURCES_DISABLED"
       );
     }
-    if (!(await this.canManageProduct(product, actor, "build.release"))) {
+
+    const organizationMemberships = product.organizationId
+      ? await organizationRepository.listUserMemberships(actor.id)
+      : [];
+    if (!can(actor, "build.release", product, { organizationMemberships })) {
       throw new ForbiddenError("Not authorized to publish builds for this product");
     }
+
     return product;
   }
 
@@ -243,10 +212,15 @@ export class ProductService {
     },
     actor: User
   ): Promise<Build> {
-    const product = await this.assertCanReleaseBuild(
-      input.productId,
-      actor,
-    );
+    const product = await this.authorizeBuildRelease(input.productId, actor);
+
+    if (input.scanStatus === "clean" && !hasTrustedCleanBuildScanEvidence(input)) {
+      throw new AppError(
+        "A clean build requires a valid ClamAV scan result",
+        422,
+        "BUILD_SCAN_EVIDENCE_INVALID"
+      );
+    }
 
     const buildId = generateId("bld");
     const auditId = generateId("aud");
@@ -294,7 +268,7 @@ export class ProductService {
 
     await eventBus.publish({
       id: generateId("evt"),
-      type: "build.submitted_for_review",
+      type: "build.released",
       version: 1,
       timestamp: new Date().toISOString(),
       actor: { id: actor.id, type: "user" },
@@ -326,16 +300,9 @@ export class ProductService {
 
     const product = await productRepository.findById(build.productId);
     if (!product) throw new NotFoundError("Product", build.productId);
-    if (
-      input.decision === "approve" &&
-      (
-        build.scanStatus !== "clean" ||
-        !build.scanner?.trim() ||
-        !build.scannedAt
-      )
-    ) {
+    if (input.decision === "approve" && !hasTrustedCleanBuildScanEvidence(build)) {
       throw new AppError(
-        "Only a provenance-backed clean malware scan can be approved",
+        "Only a build with valid clean ClamAV evidence can be approved",
         422,
         "BUILD_SCAN_NOT_CLEAN"
       );
@@ -358,24 +325,6 @@ export class ProductService {
       );
     }
 
-    if (input.decision === "approve") {
-      await eventBus.publish({
-        id: generateId("evt"),
-        type: "build.released",
-        version: 1,
-        timestamp: new Date().toISOString(),
-        actor: { id: actor.id, type: "user" },
-        aggregateId: reviewed.id,
-        aggregateType: "build",
-        payload: {
-          buildId: reviewed.id,
-          productId: reviewed.productId,
-          version: reviewed.version,
-          hash: reviewed.sha256Hash,
-        },
-      });
-    }
-
     return reviewed;
   }
 
@@ -385,7 +334,10 @@ export class ProductService {
   ): Promise<Build> {
     const product = await productRepository.findById(input.productId);
     if (!product) throw new NotFoundError("Product", input.productId);
-    if (!(await this.canManageProduct(product, actor, "build.retire"))) {
+    const organizationMemberships = product.organizationId
+      ? await organizationRepository.listUserMemberships(actor.id)
+      : [];
+    if (!can(actor, "build.retire", product, { organizationMemberships })) {
       throw new ForbiddenError("Not authorized to retire builds for this product");
     }
 

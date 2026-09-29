@@ -21,13 +21,14 @@ export class ServerObservationRepository {
         .returning();
 
       if (inserted[0]) {
-        // Keep public/editorial metadata separate from observed runtime state.
-        // A master-list snapshot must not rename an owner-managed profile.
         await tx
           .update(servers)
           .set({
-            currentPlayers: input.currentPlayers ?? null,
-            maxPlayers: input.maxPlayers ?? null,
+            name: input.name,
+            gameMode: input.gameMode,
+            mapName: input.mapName,
+            currentPlayers: input.currentPlayers,
+            maxPlayers: input.maxPlayers,
             lastObservedAt: input.observedAt,
             observationSource: input.source,
           })
@@ -47,29 +48,6 @@ export class ServerObservationRepository {
       .orderBy(desc(serverObservations.observedAt))
       .limit(boundedLimit);
     return rows as ServerObservation[];
-  }
-
-  async listWindow(
-    serverId: string,
-    hours = 24,
-    limit = 500,
-  ): Promise<ServerObservation[]> {
-    const boundedHours = Math.min(Math.max(Math.floor(hours), 1), 24 * 31);
-    const boundedLimit = Math.min(Math.max(Math.floor(limit), 1), 500);
-    const since = new Date(Date.now() - boundedHours * 3_600_000);
-    const rows = await db
-      .select()
-      .from(serverObservations)
-      .where(
-        and(
-          eq(serverObservations.serverId, serverId),
-          gte(serverObservations.observedAt, since),
-        ),
-      )
-      .orderBy(desc(serverObservations.observedAt))
-      .limit(boundedLimit);
-
-    return (rows as ServerObservation[]).reverse();
   }
 
   async getPeakPlayers(serverId: string, hours = 24): Promise<number | null> {

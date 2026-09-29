@@ -1,24 +1,21 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import type { Metadata } from "next";
-import { Cpu, Users } from "lucide-react";
-import { TrustBadge } from "@nexus/ui";
+import { socialRepository, verificationRepository } from "@nexus/db";
 import { serverService } from "../../../lib/services/server-service";
+import { authService } from "../../../lib/services/auth-service";
+import { ServerClaimForm } from "../../../components/server-claim-form";
+import { ServerReportForm } from "../../../components/server-report-form";
+import { SavedTargetButton } from "../../../components/saved-target-button";
 import {
   matchesMtaEndpoint,
-  mtaLiveStatus,
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
-import { ServerFollowButton } from "../../../components/server-follow-button";
-import { serverHistoryService } from "../../../lib/services/server-history-service";
-import { ServerHistoryPanel } from "../../../components/server-history-panel";
-import { contentService } from "../../../lib/services/content-service";
-import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
-import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
-import { getDictionary } from "../../../lib/i18n";
-import { getRequestLocale } from "../../../lib/i18n-server";
+import { Cpu, ShieldCheck, Users } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
 
 export async function generateMetadata({
   params,
@@ -26,20 +23,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const locale = await getRequestLocale();
-  const copy = getDictionary(locale).serverDetail;
   const server = await serverService.getServerBySlug(slug);
 
-  if (!server || server.visibility === "private") {
-    return { title: copy.notFound };
-  }
+  if (!server) return { title: "Server not found" };
 
-  const description =
-    server.description?.slice(0, 155) ||
-    (server.gameMode
-      ? `${server.gameMode} ${copy.serverFallback}`
-      : copy.serverFallback);
-
+  const description = server.description?.slice(0, 155) || (server.gameMode || "MTA") + " server";
   return {
     title: server.name,
     description,
@@ -59,202 +47,119 @@ export default async function ServerDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const locale = await getRequestLocale();
-  const dictionary = getDictionary(locale);
-  const copy = dictionary.serverDetail;
-  const serverCopy = dictionary.servers;
   const server = await serverService.getServerBySlug(slug);
 
-  if (!server || server.visibility === "private") notFound();
+  if (!server) notFound();
 
-  const [directory, history, serverUpdates] = await Promise.all([
-    mtaMasterDirectoryService.getDirectory().catch(() => null),
-    serverHistoryService.getHistory(server.id, "24h").catch(() => null),
-    contentService.listServerUpdates(server.id, 6).catch(() => null),
-  ]);
-
-  const observedServer = directory?.servers.find((item) =>
-    matchesMtaEndpoint(server, item),
+  const cookieStore = await cookies();
+  const currentUser = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  const canRequestOwnership = !server.isVerified && (
+    !server.ownerId || server.ownerId === currentUser?.id
   );
-  const directoryIsStale = directory?.isStale ?? false;
+  const pendingClaim = currentUser && canRequestOwnership
+    ? await verificationRepository.findPendingForTarget(currentUser.id, "server", server.id)
+    : null;
+  const isFollowingServer = currentUser
+    ? await socialRepository.isFollowing(currentUser.id, "server", server.id)
+    : false;
 
-  const liveStatus = mtaLiveStatus(observedServer, directoryIsStale);
-  const isOnline = liveStatus === "online";
-  const currentPlayers = directoryIsStale ? undefined : observedServer?.players;
+  let observedServer: Awaited<ReturnType<typeof mtaMasterDirectoryService.getDirectory>>["servers"][number] | undefined;
+  let directoryIsStale = false;
+  try {
+    const directory = await mtaMasterDirectoryService.getDirectory();
+    observedServer = directory.servers.find(
+      (item) => matchesMtaEndpoint(server, item)
+    );
+    directoryIsStale = directory.isStale;
+  } catch {
+    // The editorial server profile remains available when the public directory is unavailable.
+  }
+
+  const isOnline = observedServer != null && observedServer.responding !== false;
+  const currentPlayers = observedServer?.players;
   const maxPlayers = observedServer?.maxPlayers ?? server.maxPlayers;
-  const occupancyPercent =
-    currentPlayers == null || maxPlayers == null || maxPlayers === 0
-      ? 0
-      : Math.min(100, Math.round((currentPlayers / maxPlayers) * 100));
+  const occupancyPercent = currentPlayers == null || maxPlayers == null || maxPlayers === 0
+    ? 0
+    : Math.min(100, Math.round((currentPlayers / maxPlayers) * 100));
   const connectUri = "mtasa://" + server.ipAddress + ":" + server.port;
   const statusClass = isOnline
-    ? "border-[color:var(--nexus-success)]/30 bg-success-soft text-success"
-    : "border-base bg-inset text-secondary";
-  const dotClass = isOnline
-    ? "animate-pulse bg-[var(--nexus-success)]"
-    : "bg-[var(--nexus-text-faint)]";
+    ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+    : "bg-neutral-700/50 text-neutral-300 border-neutral-600";
+  const dotClass = isOnline ? "bg-emerald-500 animate-pulse" : "bg-neutral-400";
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center gap-2 text-xs text-muted">
-        <Link
-          href="/servers"
-          className="transition-colors hover:text-primary"
-        >
-          {copy.breadcrumb}
-        </Link>
-        <span aria-hidden="true">/</span>
-        <span className="text-secondary">{server.name}</span>
+      <div className="flex items-center gap-2 text-xs text-neutral-400">
+        <Link href="/servers" className="hover:text-white">Servers</Link>
+        <span>/</span>
+        <span className="text-neutral-200">{server.name}</span>
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl border border-base bg-surface shadow-nexus-lg">
-        <div className="relative h-64 w-full bg-inset">
+      <div className="relative rounded-2xl border border-base overflow-hidden bg-neutral-900 shadow-2xl">
+        <div className="h-64 w-full relative">
           {server.bannerUrl && (
-            <img
-              src={server.bannerUrl}
-              alt={server.name}
-              width={1600}
-              height={640}
-              fetchPriority="high"
-              decoding="async"
-              className="h-full w-full object-cover"
-            />
+            <img src={server.bannerUrl} alt={server.name} className="w-full h-full object-cover" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--nexus-page)] via-[color:var(--nexus-page)]/60 to-transparent" />
         </div>
 
-        <div className="relative -mt-20 flex flex-col justify-between gap-6 p-6 md:flex-row md:items-end md:p-8">
+        <div className="p-6 md:p-8 -mt-20 relative flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-numeric text-xs font-bold ${statusClass}`}
-              >
-                <span
-                  className={`h-2 w-2 rounded-full ${dotClass}`}
-                  aria-hidden="true"
-                />
-                <span>
-                  {liveStatus === "online"
-                    ? serverCopy.online
-                    : liveStatus === "offline"
-                      ? serverCopy.offline
-                      : serverCopy.unknown}
-                </span>
+            <div className="flex items-center gap-2">
+              <span className={"px-2.5 py-1 rounded-full text-xs font-mono font-bold border flex items-center gap-1.5 " + statusClass}>
+                <span className={"w-2 h-2 rounded-full " + dotClass} />
+                <span>{observedServer ? (isOnline ? "ONLINE" : "OFFLINE") : "UNKNOWN"}</span>
               </span>
               {server.isVerified && (
-                <TrustBadge
-                  variant="verifiedServer"
-                  label={copy.verifiedIdentity}
-                />
+                <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Verified Identity
+                </span>
               )}
             </div>
-            <h1 className="text-2xl font-black text-primary md:text-4xl">
-              {server.name}
-            </h1>
-            {server.description && (
-              <p className="max-w-2xl text-xs leading-relaxed text-muted">
-                {server.description}
-              </p>
-            )}
+            <h1 className="text-2xl md:text-4xl font-black text-white">{server.name}</h1>
+            <p className="text-xs text-neutral-400 max-w-2xl">{server.description}</p>
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <ServerFollowButton
-              serverId={server.id}
-              serverName={server.name}
+          <div className="flex flex-wrap items-center gap-3">
+            <SavedTargetButton
+              targetType="server"
+              targetId={server.id}
+              label="server"
+              isAuthenticated={Boolean(currentUser)}
+              initialSaved={isFollowingServer}
             />
             <a
               href={connectUri}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--nexus-success)] px-6 py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90"
+              className="px-6 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-500/20 transition-all"
             >
-              {copy.connect}
+              Connect to Server
             </a>
           </div>
         </div>
       </div>
 
-      {!server.ownerId && !server.isVerified && (
-        <ServerClaimControlPanel
-          serverId={server.id}
-          serverName={server.name}
-        />
-      )}
-
-      {(server.language ||
-        server.region ||
-        server.websiteUrl ||
-        server.discordUrl ||
-        server.rulesUrl ||
-        server.gameplayTags?.length ||
-        server.mediaUrls?.length) && (
-        <section className="nexus-panel space-y-4 p-5">
-          <div className="flex flex-wrap items-center gap-2 text-xs text-secondary">
-            {server.language && (
-              <span className="rounded border border-base bg-inset px-2 py-1">
-                {copy.language}: {server.language}
-              </span>
-            )}
-            {server.region && (
-              <span className="rounded border border-base bg-inset px-2 py-1">
-                {copy.region}: {server.region}
-              </span>
-            )}
+      {(server.language || server.region || server.websiteUrl || server.discordUrl || server.rulesUrl || server.gameplayTags?.length || server.mediaUrls?.length) && (
+        <section className="nexus-panel p-5 space-y-4">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-neutral-300">
+            {server.language && <span className="px-2 py-1 rounded bg-neutral-800 border border-base">Language: {server.language}</span>}
+            {server.region && <span className="px-2 py-1 rounded bg-neutral-800 border border-base">Region: {server.region}</span>}
             {server.gameplayTags?.map((tag) => (
-              <span
-                key={tag}
-                className="rounded border border-[color:var(--nexus-accent)]/20 bg-accent-soft px-2 py-1 text-accent"
-              >
-                #{tag}
-              </span>
+              <span key={tag} className="px-2 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/20">#{tag}</span>
             ))}
           </div>
-
           {(server.websiteUrl || server.discordUrl || server.rulesUrl) && (
             <div className="flex flex-wrap gap-3 text-xs font-semibold">
-              {server.websiteUrl && (
-                <a
-                  href={server.websiteUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  {copy.website} ↗
-                </a>
-              )}
-              {server.discordUrl && (
-                <a
-                  href={server.discordUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  Discord ↗
-                </a>
-              )}
-              {server.rulesUrl && (
-                <a
-                  href={server.rulesUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-accent hover:underline"
-                >
-                  {copy.rules} ↗
-                </a>
-              )}
+              {server.websiteUrl && <a href={server.websiteUrl} target="_blank" rel="noreferrer" className="text-accent hover:underline">Website ↗</a>}
+              {server.discordUrl && <a href={server.discordUrl} target="_blank" rel="noreferrer" className="text-accent hover:underline">Discord ↗</a>}
+              {server.rulesUrl && <a href={server.rulesUrl} target="_blank" rel="noreferrer" className="text-accent hover:underline">Rules ↗</a>}
             </div>
           )}
-
           {server.mediaUrls && server.mediaUrls.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {server.mediaUrls.slice(0, 8).map((mediaUrl) => (
-                <a
-                  key={mediaUrl}
-                  href={mediaUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block rounded-lg border border-base bg-inset px-3 py-4 text-center text-[11px] text-muted transition-colors hover:border-strong hover:bg-hover hover:text-primary"
-                >
-                  {copy.openMedia} ↗
+                <a key={mediaUrl} href={mediaUrl} target="_blank" rel="noreferrer" className="block rounded-lg border border-base bg-neutral-900 px-3 py-4 text-center text-[11px] text-neutral-400 hover:text-white hover:border-strong">
+                  Open media ↗
                 </a>
               ))}
             </div>
@@ -262,65 +167,58 @@ export default async function ServerDetailPage({
         </section>
       )}
 
-      <ServerHistoryPanel history={history} locale={locale} />
-
-      <ServerUpdatesPanel updates={serverUpdates} locale={locale} />
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="nexus-panel space-y-4 p-6">
-          <div className="flex items-center justify-between text-xs text-muted">
-            <span className="font-semibold uppercase tracking-wider">
-              {copy.livePlayerLoad}
-            </span>
-            <Users className="h-4 w-4 text-success" aria-hidden="true" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-6 rounded-xl border border-base bg-surface space-y-4">
+          <div className="flex items-center justify-between text-xs text-neutral-400">
+            <span className="font-semibold uppercase tracking-wider">Live Player Load</span>
+            <Users className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="text-3xl font-black text-primary">
-            {currentPlayers ?? "—"}{" "}
-            <span className="text-base font-normal text-faint">
-              / {maxPlayers ?? "—"}
-            </span>
+          <div className="text-3xl font-black text-white">
+            {currentPlayers ?? "—"} <span className="text-base font-normal text-neutral-500">/ {maxPlayers}</span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-inset">
-            <div
-              className="h-full rounded-full bg-[var(--nexus-success)]"
-              style={{ width: occupancyPercent + "%" }}
-            />
+          <div className="w-full h-2 bg-neutral-800 rounded-full overflow-hidden">
+            <div className="h-full bg-emerald-500 rounded-full" style={{ width: occupancyPercent + "%" }} />
           </div>
           {!observedServer && (
-            <div className="text-[11px] text-faint">{copy.noObservation}</div>
+            <div className="text-[11px] text-neutral-500">No current observation in the official MTA directory.</div>
           )}
           {directoryIsStale && (
-            <div className="text-[11px] text-warning">
-              {copy.staleSnapshot}
-            </div>
+            <div className="text-[11px] text-amber-400">Showing the latest available directory snapshot.</div>
           )}
         </div>
 
-        <div className="nexus-panel space-y-3 p-6">
-          <div className="text-xs font-semibold uppercase tracking-wider text-muted">
-            {copy.connectionIp}
-          </div>
-          <div className="select-all rounded border border-base bg-inset p-2.5 font-mono text-base text-primary">
+        <div className="p-6 rounded-xl border border-base bg-surface space-y-3">
+          <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Connection IP</div>
+          <div className="font-mono text-base text-white select-all bg-neutral-900 p-2.5 rounded border border-base">
             {server.ipAddress}:{server.port}
           </div>
-          <div className="text-[11px] text-faint">{copy.selectHint}</div>
+          <div className="text-[11px] text-neutral-500">Click to select and paste into MTA Quick Connect</div>
         </div>
 
-        <div className="nexus-panel space-y-3 p-6">
-          <div className="text-xs font-semibold uppercase tracking-wider text-muted">
-            {copy.runtime}
-          </div>
+        <div className="p-6 rounded-xl border border-base bg-surface space-y-3">
+          <div className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Runtime & Module</div>
           <div className="flex items-center gap-2">
-            <Cpu className="h-4 w-4 text-accent" aria-hidden="true" />
-            <span className="text-sm font-semibold text-primary">
-              {copy.officialDirectory}
-            </span>
+            <Cpu className="w-4 h-4 text-blue-400" />
+            <span className="text-sm font-semibold text-white">Official MTA directory</span>
           </div>
-          <div className="text-[11px] leading-relaxed text-muted">
-            {copy.runtimeDescription}
+          <div className="text-[11px] text-neutral-400">
+            Live status is based on the latest public MTA directory observation. Editorial server details are managed separately.
           </div>
         </div>
       </div>
+
+      {canRequestOwnership && (
+        <ServerClaimForm
+          serverId={server.id}
+          isAuthenticated={Boolean(currentUser)}
+          isPending={Boolean(pendingClaim)}
+        />
+      )}
+
+      <ServerReportForm
+        serverId={server.id}
+        isAuthenticated={Boolean(currentUser)}
+      />
     </div>
   );
 }

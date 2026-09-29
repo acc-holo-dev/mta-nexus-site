@@ -1,4 +1,3 @@
-import { sql } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -9,7 +8,9 @@ import {
   index,
   uniqueIndex,
   check,
+  foreignKey,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 // 1. Users
 export const users = pgTable(
@@ -34,6 +35,10 @@ export const users = pgTable(
     uniqueIndex("users_email_idx").on(table.email),
     uniqueIndex("users_username_idx").on(table.username),
     index("users_role_idx").on(table.role),
+    check(
+      "users_role_check",
+      sql`${table.role} in ('user', 'developer', 'server_owner', 'moderator', 'admin')`
+    ),
   ]
 );
 
@@ -95,6 +100,10 @@ export const organizationMembers = pgTable(
   (table) => [
     uniqueIndex("org_user_idx").on(table.organizationId, table.userId),
     index("org_members_user_idx").on(table.userId),
+    check(
+      "organization_members_role_check",
+      sql`${table.role} in ('owner', 'admin', 'developer', 'member')`
+    ),
   ]
 );
 
@@ -156,6 +165,25 @@ export const servers = pgTable(
     index("servers_owner_idx").on(table.ownerId),
     uniqueIndex("servers_endpoint_idx").on(table.ipAddress, table.port),
     index("servers_last_observed_idx").on(table.lastObservedAt),
+    check(
+      "servers_status_check",
+      sql`${table.status} in ('active', 'inactive', 'maintenance', 'suspended')`
+    ),
+    check(
+      "servers_visibility_check",
+      sql`${table.visibility} in ('public', 'unlisted', 'private')`
+    ),
+    check("servers_port_check", sql`${table.port} between 1 and 65535`),
+    check(
+      "servers_http_port_check",
+      sql`${table.httpPort} is null or ${table.httpPort} between 1 and 65535`
+    ),
+    check(
+      "servers_player_counts_check",
+      sql`(${table.currentPlayers} is null or ${table.currentPlayers} >= 0)
+        and (${table.maxPlayers} is null or ${table.maxPlayers} >= 0)
+        and (${table.currentPlayers} is null or ${table.maxPlayers} is null or ${table.currentPlayers} <= ${table.maxPlayers})`
+    ),
   ]
 );
 
@@ -180,6 +208,16 @@ export const serverObservations = pgTable("server_observations", {
 }, (table) => [
   index("server_observations_server_time_idx").on(table.serverId, table.observedAt),
   uniqueIndex("server_observations_source_sequence_idx").on(table.source, table.sourceSequence, table.serverId),
+  check(
+    "server_observations_source_check",
+    sql`${table.source} in ('mta_master', 'mta_query')`
+  ),
+  check(
+    "server_observations_player_counts_check",
+    sql`(${table.currentPlayers} is null or ${table.currentPlayers} >= 0)
+      and (${table.maxPlayers} is null or ${table.maxPlayers} >= 0)
+      and (${table.currentPlayers} is null or ${table.maxPlayers} is null or ${table.currentPlayers} <= ${table.maxPlayers})`
+  ),
 ]);
 
 // 8. Products
@@ -223,6 +261,20 @@ export const products = pgTable(
     index("products_status_idx").on(table.status),
     index("products_author_idx").on(table.authorId),
     index("products_featured_idx").on(table.isFeatured),
+    check(
+      "products_type_check",
+      sql`${table.type} in ('script', 'model', 'vehicle', 'map', 'ui', 'plugin', 'api', 'service', 'bundle')`
+    ),
+    check(
+      "products_status_check",
+      sql`${table.status} in ('draft', 'pending_review', 'published', 'suspended', 'archived')`
+    ),
+    check("products_price_check", sql`${table.price} >= 0`),
+    check(
+      "products_rating_check",
+      sql`${table.ratingAverage} between 0 and 50 and ${table.ratingCount} >= 0`
+    ),
+    check("products_sales_count_check", sql`${table.salesCount} >= 0`),
   ]
 );
 
@@ -234,7 +286,7 @@ export const builds = pgTable("builds", {
     .references(() => products.id, { onDelete: "cascade" }),
   version: text("version").notNull(),
   releaseNotes: text("release_notes"),
-  status: text("status").notNull().default("draft"), // draft, testing, pending_review, published, rejected, deprecated, retired
+  status: text("status").notNull().default("draft"), // draft, testing, published, deprecated, retired
   storageKey: text("storage_key").notNull(),
   sha256Hash: text("sha256_hash").notNull(),
   fileSizeBytes: integer("file_size_bytes").notNull(),
@@ -249,24 +301,16 @@ export const builds = pgTable("builds", {
 }, (table) => [
   uniqueIndex("builds_product_version_idx").on(table.productId, table.version),
   index("builds_product_status_idx").on(table.productId, table.status),
-  index("builds_status_created_id_idx").on(table.status, table.createdAt, table.id),
   check(
-    "builds_clean_scan_provenance_check",
-    sql`${table.scanStatus} <> 'clean' OR (
-      ${table.scanner} IS NOT NULL
-      AND btrim(${table.scanner}) <> ''
-      AND ${table.scannedAt} IS NOT NULL
-    )`,
+    "builds_status_check",
+    sql`${table.status} in ('draft', 'testing', 'pending_review', 'published', 'rejected', 'deprecated', 'retired')`
   ),
   check(
-    "builds_published_safe_check",
-    sql`${table.status} <> 'published' OR (
-      ${table.scanStatus} = 'clean'
-      AND ${table.scanner} IS NOT NULL
-      AND btrim(${table.scanner}) <> ''
-      AND ${table.scannedAt} IS NOT NULL
-    )`,
+    "builds_scan_status_check",
+    sql`${table.scanStatus} in ('not_scanned', 'clean', 'malicious', 'error')`
   ),
+  check("builds_file_size_check", sql`${table.fileSizeBytes} > 0`),
+  check("builds_sha256_check", sql`length(${table.sha256Hash}) = 64`),
 ]);
 
 // 10. Assets
@@ -313,16 +357,28 @@ export const licenses = pgTable(
 );
 
 // 12. Entitlements
-export const entitlements = pgTable("entitlements", {
-  id: text("id").primaryKey(),
-  subjectType: text("subject_type").notNull(), // user, server, organization
-  subjectId: text("subject_id").notNull(),
-  permission: text("permission").notNull(),
-  resourceId: text("resource_id").notNull(),
-  expiresAt: timestamp("expires_at", { withTimezone: true }),
-  metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+export const entitlements = pgTable(
+  "entitlements",
+  {
+    id: text("id").primaryKey(),
+    subjectType: text("subject_type").notNull(), // user, server, organization
+    subjectId: text("subject_id").notNull(),
+    permission: text("permission").notNull(),
+    resourceId: text("resource_id").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check(
+      "entitlements_subject_type_check",
+      sql`${table.subjectType} in ('user', 'server', 'organization')`
+    ),
+    uniqueIndex("entitlements_perpetual_grant_idx")
+      .on(table.subjectType, table.subjectId, table.permission, table.resourceId)
+      .where(sql`${table.expiresAt} is null`),
+  ]
+);
 
 // 13. Orders
 export const orders = pgTable("orders", {
@@ -412,7 +468,18 @@ export const content = pgTable(
     uniqueIndex("content_slug_idx").on(table.slug),
     index("content_author_idx").on(table.authorId),
     index("content_type_idx").on(table.type),
-    index("content_status_created_id_idx").on(table.status, table.createdAt, table.id),
+    check(
+      "content_type_check",
+      sql`${table.type} in ('article', 'post', 'news', 'devlog', 'update', 'announcement', 'question', 'review')`
+    ),
+    check(
+      "content_status_check",
+      sql`${table.status} in ('draft', 'published', 'archived')`
+    ),
+    check(
+      "content_counters_check",
+      sql`${table.viewCount} >= 0 and ${table.likeCount} >= 0 and ${table.commentCount} >= 0`
+    ),
   ]
 );
 
@@ -436,6 +503,25 @@ export const comments = pgTable(
     // Nullable product_id keeps article comments independent while enforcing
     // one product review per author for non-null product_id rows.
     uniqueIndex("comments_product_author_idx").on(table.productId, table.authorId),
+    uniqueIndex("comments_id_content_idx").on(table.id, table.contentId),
+    foreignKey({
+      columns: [table.parentId, table.contentId],
+      foreignColumns: [table.id, table.contentId],
+      name: "comments_parent_content_fk",
+    }).onDelete("cascade"),
+    check(
+      "comments_single_target_check",
+      sql`num_nonnulls(${table.contentId}, ${table.productId}) = 1`
+    ),
+    check(
+      "comments_rating_target_check",
+      sql`(${table.contentId} is not null and ${table.rating} is null)
+        or (${table.productId} is not null and ${table.rating} between 1 and 5)`
+    ),
+    check(
+      "comments_parent_target_check",
+      sql`${table.parentId} is null or ${table.contentId} is not null`
+    ),
   ]
 );
 
@@ -531,10 +617,7 @@ export const reports = pgTable("reports", {
   moderatorNotes: text("moderator_notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
-}, (table) => [
-  index("reports_status_created_id_idx").on(table.status, table.createdAt, table.id),
-  index("reports_status_resolved_id_idx").on(table.status, table.resolvedAt, table.id),
-]);
+});
 
 // 25. Moderation Cases
 export const moderationCases = pgTable("moderation_cases", {
@@ -565,72 +648,4 @@ export const verificationRequests = pgTable("verification_requests", {
   reviewNotes: text("review_notes"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
-}, (table) => [
-  index("verification_status_created_id_idx").on(table.status, table.createdAt, table.id),
-  index("verification_status_resolved_id_idx").on(table.status, table.resolvedAt, table.id),
-]);
-
-
-export const serverClaimChallenges = pgTable(
-  "server_claim_challenges",
-  {
-    id: text("id").primaryKey(),
-    serverId: text("server_id")
-      .notNull()
-      .references(() => servers.id, { onDelete: "cascade" }),
-    requesterId: text("requester_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    tokenDigest: text("token_digest").notNull(),
-    proofVersion: integer("proof_version").notNull().default(1),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-    consumedAt: timestamp("consumed_at", { withTimezone: true }),
-    revokedAt: timestamp("revoked_at", { withTimezone: true }),
-    sourceFetchedAt: timestamp("source_fetched_at", { withTimezone: true }),
-    verificationRequestId: text("verification_request_id"),
-  },
-  (table) => [
-    uniqueIndex("server_claim_challenge_digest_unique").on(table.tokenDigest),
-    uniqueIndex("server_claim_challenge_active_requester_unique")
-      .on(table.serverId, table.requesterId)
-      .where(sql`${table.consumedAt} is null and ${table.revokedAt} is null`),
-    uniqueIndex("server_claim_challenge_verification_unique").on(
-      table.verificationRequestId,
-    ),
-    index("server_claim_challenge_server_idx").on(table.serverId, table.createdAt),
-    index("server_claim_challenge_expiry_idx").on(table.expiresAt),
-    check(
-      "server_claim_challenge_id_check",
-      sql`${table.id} ~ '^scc_[0-9a-f-]{36}$'`,
-    ),
-    check(
-      "server_claim_challenge_digest_check",
-      sql`${table.tokenDigest} ~ '^[0-9a-f]{64}$'`,
-    ),
-    check(
-      "server_claim_challenge_version_check",
-      sql`${table.proofVersion} = 1`,
-    ),
-    check(
-      "server_claim_challenge_expiry_check",
-      sql`${table.expiresAt} > ${table.createdAt}`,
-    ),
-    check(
-      "server_claim_challenge_terminal_check",
-      sql`not (${table.consumedAt} is not null and ${table.revokedAt} is not null)`,
-    ),
-    check(
-      "server_claim_challenge_evidence_check",
-      sql`(
-        ${table.consumedAt} is null
-        and ${table.sourceFetchedAt} is null
-        and ${table.verificationRequestId} is null
-      ) or (
-        ${table.consumedAt} is not null
-        and ${table.sourceFetchedAt} is not null
-        and ${table.verificationRequestId} is not null
-      )`,
-    ),
-  ],
-);
+});

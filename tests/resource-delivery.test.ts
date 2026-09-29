@@ -76,6 +76,22 @@ describe("free resource delivery lifecycle", () => {
     });
     storageKey = asset.key;
 
+    await expect(productService.releaseBuild(
+      {
+        productId: product.id,
+        version: "0.9.9",
+        storageKey: asset.key,
+        sha256Hash: asset.sha256Hash,
+        fileSizeBytes: asset.sizeBytes,
+        fileName: "delivery-test.zip",
+        mimeType: "application/zip",
+        scanStatus: "clean",
+        scanner: "integration-fixture",
+        scannedAt: new Date(),
+      },
+      author
+    )).rejects.toMatchObject({ code: "BUILD_SCAN_EVIDENCE_INVALID" });
+
     const build = await productService.releaseBuild(
       {
         productId: product.id,
@@ -87,7 +103,8 @@ describe("free resource delivery lifecycle", () => {
         fileName: "delivery-test.zip",
         mimeType: "application/zip",
         scanStatus: "clean",
-        scanner: "integration-fixture",
+        // This integration path supplies the explicit clean scanner verdict required by moderation.
+        scanner: "clamav",
         scannedAt: new Date(),
       },
       author
@@ -101,8 +118,28 @@ describe("free resource delivery lifecycle", () => {
     );
     expect(approved.status).toBe("published");
 
+    const legacyBuild = await buildRepository.create({
+      id: `bld_legacy_${suffix}`,
+      productId: product.id,
+      version: "0.9.8",
+      status: "published",
+      storageKey: asset.key,
+      sha256Hash: asset.sha256Hash,
+      fileSizeBytes: asset.sizeBytes,
+      fileName: "legacy-delivery-test.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "manual-review",
+      scannedAt: new Date(),
+      isSigned: false,
+    });
+
     const publishedBuilds = await buildRepository.listByProduct(product.id);
     expect(publishedBuilds.some((candidate) => candidate.id === build.id)).toBe(true);
+
+    const deliverableBuilds = await buildRepository.listPublishedByProduct(product.id);
+    expect(deliverableBuilds.some((candidate) => candidate.id === build.id)).toBe(true);
+    expect(deliverableBuilds.some((candidate) => candidate.id === legacyBuild.id)).toBe(false);
 
     const claim = await commerceService.claimFreeResource({
       user: player,

@@ -2,32 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../../lib/services/auth-service";
 import {
   contentRepository,
+  productRepository,
   entitlementRepository,
+  auditRepository,
 } from "@nexus/db";
-import { productService } from "../../../../../lib/services/product-service";
 import { addCommentSchema } from "@nexus/validation";
 import { generateId, consumeRateLimit } from "@nexus/security";
-
-const privateHeaders = {
-  "Cache-Control": "private, no-store",
-  Vary: "Cookie",
-};
-
-function privateJson(body: unknown, status = 200) {
-  return NextResponse.json(body, {
-    status,
-    headers: privateHeaders,
-  });
-}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: productId } = await params;
-  const product = await productService.getProductById(productId);
+  const product = await productRepository.findById(productId);
 
-  if (!product) {
+  if (!product || product.status !== "published") {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
@@ -45,15 +34,15 @@ export async function POST(
     const user = await authService.getSession(token);
 
     if (!user) {
-      return privateJson({ error: "Authentication required to review" }, 401 );
+      return NextResponse.json({ error: "Authentication required to review" }, { status: 401 });
     }
 
     // Rate limit reviews per user
     const rl = await consumeRateLimit("reviewSubmission", user.id);
     if (!rl.success) {
-      return privateJson(
+      return NextResponse.json(
         { error: "Too many review submissions. Please try again later." },
-        429 
+        { status: 429 }
       );
     }
 
@@ -61,32 +50,31 @@ export async function POST(
     const parsed = addCommentSchema.safeParse(body);
 
     if (!parsed.success) {
-      return privateJson(
+      return NextResponse.json(
         { error: "Invalid review content", details: parsed.error.format() },
-        400 
+        { status: 400 }
       );
     }
 
-    const product = await productService.getProductById(productId);
-    if (!product) {
-      return privateJson({ error: "Product not found" }, 404 );
+    const product = await productRepository.findById(productId);
+    if (!product || product.status !== "published") {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Review integrity rule 1: current product managers cannot review
-    // resources they control. Historical author attribution is not authority.
-    if (await productService.canManageProduct(product, user)) {
-      return privateJson(
-        { error: "You cannot review a product you manage" },
-        403 ,
+    // Review integrity rule 1: no self-reviews
+    if (product.authorId === user.id) {
+      return NextResponse.json(
+        { error: "You cannot review your own product" },
+        { status: 403 }
       );
     }
 
     // Review integrity rule 2: one review per user per product
     const hasExisting = await contentRepository.hasReviewFromUser(productId, user.id);
     if (hasExisting) {
-      return privateJson(
+      return NextResponse.json(
         { error: "You have already reviewed this product" },
-        409 
+        { status: 409 }
       );
     }
 
@@ -98,56 +86,47 @@ export async function POST(
     );
 
     if (!hasAcquired) {
-      return privateJson(
+      return NextResponse.json(
         { error: "Add this resource to your library before reviewing it" },
-        403 
+        { status: 403 }
       );
     }
 
     const rating = Math.min(5, Math.max(1, parsed.data.rating || 5));
 
-    const {
-      review: comment,
-      ratingCount,
-      ratingAverage,
-    } = await contentRepository.addProductReview(
-      {
-        id: generateId("cmt"),
-        productId,
-        authorId: user.id,
-        text: parsed.data.text,
-        rating,
-        isVerifiedPurchase: hasAcquired,
-      },
-      {
-        id: generateId("aud"),
-        actorId: user.id,
-        actorType: "user",
-        action: "product.review_submitted",
-        targetId: productId,
-        targetType: "product",
-        details: { rating, verifiedAcquisition: hasAcquired },
-      },
-    );
+    const { review, ratingAverage, ratingCount } = await contentRepository.addProductReview({
+      id: generateId("cmt"),
+      productId,
+      authorId: user.id,
+      text: parsed.data.text,
+      rating,
+      isVerifiedPurchase: hasAcquired,
+    });
 
-    return privateJson(
-      { success: true, review: comment, newRating: { ratingAverage, ratingCount } },
-      201 
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: user.id,
+      actorType: "user",
+      action: "product.review_submitted",
+      targetId: productId,
+      targetType: "product",
+      details: { rating, verifiedAcquisition: hasAcquired },
+    });
+
+    return NextResponse.json(
+      { success: true, review, newRating: { ratingAverage, ratingCount } },
+      { status: 201 }
     );
   } catch (error: unknown) {
-    if (error instanceof Error && error.message === "PRODUCT_NOT_PUBLISHED") {
-      return privateJson({ error: "Product not found" }, 404 );
-    }
-
     const databaseError = error as { code?: unknown };
     if (databaseError.code === "23505") {
-      return privateJson(
+      return NextResponse.json(
         { error: "You have already reviewed this product" },
-        409 
+        { status: 409 }
       );
     }
 
     console.error("Review submission error:", error);
-    return privateJson({ error: "Failed to submit review" }, 500 );
+    return NextResponse.json({ error: "Failed to submit review" }, { status: 500 });
   }
 }

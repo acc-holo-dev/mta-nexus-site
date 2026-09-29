@@ -1,114 +1,74 @@
 import React from "react";
 import Link from "next/link";
-import { Gamepad2, Users } from "lucide-react";
+import { Users, Gamepad2 } from "lucide-react";
 import { TrustBadge } from "@nexus/ui";
 import type { Server } from "@nexus/domain";
-import { getDictionary, type Locale } from "../lib/i18n";
-import { mtaLiveStatus, type MtaMasterServer } from "../lib/services/mta-master-directory-service";
 
-export function ServerCard({
-  server,
-  locale = "en",
-  observation,
-  isStale = false,
-}: {
-  server: Server;
-  locale?: Locale;
-  observation?: MtaMasterServer | null;
-  isStale?: boolean;
-}) {
-  const copy = getDictionary(locale).servers;
-  const liveStatus = mtaLiveStatus(observation, isStale);
-  const hasLiveData = liveStatus === "online" && observation?.players != null;
-  const maxPlayers = observation?.maxPlayers ?? server.maxPlayers;
-  const occupancyPercent = hasLiveData && maxPlayers != null && maxPlayers > 0
-    ? Math.round(
-        (observation.players! / maxPlayers) * 100,
-      )
+export function ServerCard({ server }: { server: Server }) {
+  const hasLiveData = server.currentPlayers != null && server.maxPlayers != null;
+  const occupancyPercent = hasLiveData
+    ? Math.round((server.currentPlayers! / Math.max(1, server.maxPlayers!)) * 100)
     : null;
-  const isOnline = liveStatus === "online";
-  const liveLabel = liveStatus === "online" ? copy.online : liveStatus === "offline" ? copy.offline : copy.unknown;
+  const isOnline = hasLiveData && server.status === "active";
 
   return (
     <Link
       href={`/servers/${server.slug}`}
-      className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus"
+      className="group flex flex-col nexus-panel overflow-hidden hover:border-strong hover:shadow-nexus transition-all"
     >
-      <div className="relative h-28 w-full overflow-hidden bg-inset">
+      {/* Banner */}
+      <div className="relative h-28 w-full bg-inset overflow-hidden">
         {server.bannerUrl ? (
           <img
             src={server.bannerUrl}
             alt={server.name}
-            width={640}
-            height={224}
             loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-[color:var(--nexus-inset)] to-[color:var(--nexus-surface)]" />
+          <div className="w-full h-full bg-gradient-to-br from-[color:var(--nexus-inset)] to-[color:var(--nexus-surface)]" />
         )}
-
-        <div className="absolute right-2 top-2 flex items-center gap-1.5 rounded-full bg-black/60 px-2 py-0.5 font-numeric text-[11px] font-bold text-white backdrop-blur-sm">
+        <div className="absolute top-2 right-2 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm font-numeric text-[11px] font-bold text-white">
           <span
-            className={`h-2 w-2 rounded-full ${
-              isOnline
-                ? "animate-pulse bg-[var(--nexus-success)]"
-                : "bg-[var(--nexus-text-faint)]"
-            }`}
-            aria-hidden="true"
+            className={`w-2 h-2 rounded-full ${isOnline ? "bg-emerald-400 animate-pulse" : "bg-neutral-400"}`}
           />
-          <span>{liveLabel}</span>
+          <span>{hasLiveData ? (isOnline ? "ONLINE" : "OFFLINE") : "UNKNOWN"}</span>
         </div>
-
         {server.isVerified && (
           <div className="absolute bottom-2 left-2">
-            <TrustBadge
-              variant="verifiedServer"
-              label={copy.verifiedServer}
-            />
+            <TrustBadge variant="verifiedServer" />
           </div>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-3.5">
-        <h3 className="line-clamp-1 text-xs font-heading text-primary transition-colors group-hover:text-accent">
+      {/* Body */}
+      <div className="p-3.5 flex flex-col flex-1 gap-2">
+        <h3 className="text-xs font-heading text-primary group-hover:text-accent transition-colors line-clamp-1">
           {server.name}
         </h3>
 
         <div className="flex items-center gap-2 font-caption text-muted">
-          <Gamepad2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-          <span className="truncate">{server.gameMode || copy.freeroam}</span>
+          <Gamepad2 className="w-3.5 h-3.5 shrink-0" />
+          <span className="truncate">{server.gameMode || "Freeroam"}</span>
         </div>
 
-        <p className="line-clamp-2 flex-1 font-caption text-muted">
-          {server.description}
-        </p>
+        <p className="font-caption text-muted line-clamp-2 flex-1">{server.description}</p>
 
-        <div className="space-y-1.5 border-t border-base pt-2.5">
+        {/* Player load */}
+        <div className="space-y-1.5 pt-2.5 border-t border-base">
           <div className="flex items-center justify-between font-caption">
-            <span className="flex items-center gap-1 font-medium text-secondary">
-              <Users className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="flex items-center gap-1 text-secondary font-medium">
+              <Users className="w-3.5 h-3.5" />
               <span className="font-numeric">
-                {hasLiveData
-                  ? `${observation.players} / ${maxPlayers ?? "?"}`
-                  : copy.unknown}
+                {hasLiveData ? `${server.currentPlayers} / ${server.maxPlayers}` : "Unknown"}
               </span>
             </span>
-            <span className="font-numeric text-faint">
-              {occupancyPercent == null ? "—" : `${occupancyPercent}%`}
-            </span>
+            <span className="font-numeric text-faint">{occupancyPercent == null ? "—" : `${occupancyPercent}%`}</span>
           </div>
-          <div className="h-1 w-full overflow-hidden rounded-full bg-inset">
+          <div className="w-full h-1 bg-inset rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full bg-[var(--nexus-success)] transition-all duration-500"
-              style={{
-                width: `${
-                  occupancyPercent == null
-                    ? 0
-                    : Math.min(100, occupancyPercent)
-                }%`,
-              }}
+              className="h-full bg-success rounded-full transition-all duration-500"
+              style={{ width: `${occupancyPercent == null ? 0 : Math.min(100, occupancyPercent)}%` }}
             />
           </div>
         </div>

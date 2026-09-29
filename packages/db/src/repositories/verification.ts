@@ -1,32 +1,19 @@
-import { and, asc, count, eq, desc, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, eq, desc, ne, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, verificationRequests, users, organizations, servers, serverClaimChallenges } from "../schema";
+import { verificationRequests, users, organizations, servers, notifications } from "../schema";
 import { generateId } from "@nexus/security";
-import { AppError, ConflictError } from "@nexus/domain";
-import type { AuditEvent } from "@nexus/domain";
 
 const VALID_TARGET_TYPES = ["user", "developer", "organization", "server"] as const;
 export type VerificationTargetType = (typeof VALID_TARGET_TYPES)[number];
 
 export class VerificationRepository {
-  async createRequest(
-    input: {
-      requesterId: string;
-      targetType: VerificationTargetType;
-      targetId: string;
-      proofUrl?: string;
-      notes?: string;
-    },
-    audit?: Omit<AuditEvent, "createdAt" | "targetId" | "targetType">,
-  ) {
-    if (input.targetType === "server") {
-      throw new AppError(
-        "Server ownership verification requires a verified MTA control challenge.",
-        422,
-        "SERVER_CONTROL_CHALLENGE_REQUIRED",
-      );
-    }
-
+  async createRequest(input: {
+    requesterId: string;
+    targetType: VerificationTargetType;
+    targetId: string;
+    proofUrl?: string;
+    notes?: string;
+  }) {
     const values = {
       id: generateId("ver"),
       requesterId: input.requesterId,
@@ -38,40 +25,8 @@ export class VerificationRepository {
       createdAt: new Date(),
     };
 
-    return db.transaction(async (tx) => {
-      // Serialize applications for the same target, including applications by different organization managers.
-      const lockKey = `verification:${input.targetType}:${input.targetId}`;
-      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`);
-      const [pending] = await tx.select({ id: verificationRequests.id })
-        .from(verificationRequests)
-        .where(and(
-          eq(verificationRequests.targetType, input.targetType),
-          eq(verificationRequests.targetId, input.targetId),
-          eq(verificationRequests.status, "pending"),
-        ))
-        .limit(1);
-      if (pending) throw new ConflictError("A verification request is already pending");
-
-      const rows = await tx
-        .insert(verificationRequests)
-        .values(values)
-        .returning();
-      const request = rows[0];
-      if (!request) {
-        throw new Error("Verification request insert did not return a row");
-      }
-
-      if (audit) {
-        await tx.insert(auditEvents).values({
-          ...audit,
-          targetId: request.id,
-          targetType: "verification",
-          createdAt: values.createdAt,
-        });
-      }
-
-      return request;
-    });
+    const rows = await db.insert(verificationRequests).values(values).returning();
+    return rows[0];
   }
 
   async findPendingForTarget(
@@ -94,24 +49,6 @@ export class VerificationRepository {
     return rows[0] || null;
   }
 
-  async findPendingForAnyRequester(
-    targetType: VerificationTargetType,
-    targetId: string,
-  ) {
-    const rows = await db
-      .select()
-      .from(verificationRequests)
-      .where(
-        and(
-          eq(verificationRequests.targetType, targetType),
-          eq(verificationRequests.targetId, targetId),
-          eq(verificationRequests.status, "pending"),
-        ),
-      )
-      .limit(1);
-    return rows[0] || null;
-  }
-
   async findPendingById(id: string) {
     const rows = await db
       .select()
@@ -121,37 +58,12 @@ export class VerificationRepository {
     return rows[0] || null;
   }
 
-  async findById(id: string) {
-    const rows = await db
+  async listAll() {
+    return db
       .select()
       .from(verificationRequests)
-      .where(eq(verificationRequests.id, id))
-      .limit(1);
-    return rows[0] || null;
-  }
-
-  async countPending(): Promise<number> {
-    const [row] = await db.select({ total: count() }).from(verificationRequests)
-      .where(eq(verificationRequests.status, "pending"));
-    return row?.total ?? 0;
-  }
-
-  async listPage(view: "pending" | "history", page: number, pageSize = 30) {
-    if (!Number.isSafeInteger(page) || page < 1 || page > 99_999 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
-      throw new RangeError("Invalid verification page");
-    }
-    const filter = view === "pending"
-      ? eq(verificationRequests.status, "pending")
-      : inArray(verificationRequests.status, ["approved", "rejected"]);
-    const ordering = view === "pending"
-      ? [asc(verificationRequests.createdAt), asc(verificationRequests.id)]
-      : [desc(verificationRequests.resolvedAt), desc(verificationRequests.id)];
-    const rows = await db.select().from(verificationRequests)
-      .where(filter)
-      .orderBy(...ordering)
-      .limit(pageSize + 1)
-      .offset((page - 1) * pageSize);
-    return { requests: rows.slice(0, pageSize), hasMore: rows.length > pageSize };
+      .orderBy(desc(verificationRequests.createdAt))
+      .limit(100);
   }
 
   async listByRequester(requesterId: string) {
@@ -167,15 +79,12 @@ export class VerificationRepository {
    * Atomically resolve a pending request and apply verification to its target.
    * The conditional update prevents two moderators from resolving the same request.
    */
-  async resolveRequest(
-    input: {
-      id: string;
-      reviewerId: string;
-      decision: "approved" | "rejected";
-      reviewNotes?: string;
-    },
-    audit?: Omit<AuditEvent, "createdAt">,
-  ) {
+  async resolveRequest(input: {
+    id: string;
+    reviewerId: string;
+    decision: "approved" | "rejected";
+    reviewNotes?: string;
+  }) {
     return db.transaction(async (tx) => {
       const rows = await tx
         .update(verificationRequests)
@@ -198,55 +107,20 @@ export class VerificationRepository {
 
       if (input.decision === "approved") {
         if (request.targetType === "user" || request.targetType === "developer") {
-          const verifiedUsers = await tx
+          const verified = await tx
             .update(users)
-            .set({ isVerified: true })
+            .set({ isVerified: true, updatedAt: new Date() })
             .where(eq(users.id, request.targetId))
             .returning({ id: users.id });
-          if (!verifiedUsers[0]) {
-            throw new ConflictError(
-              "Verification target no longer exists",
-            );
-          }
+          if (!verified[0]) throw new Error("Verification target no longer exists");
         } else if (request.targetType === "organization") {
-          const verifiedOrganizations = await tx
+          const verified = await tx
             .update(organizations)
-            .set({ isVerified: true })
+            .set({ isVerified: true, updatedAt: new Date() })
             .where(eq(organizations.id, request.targetId))
             .returning({ id: organizations.id });
-          if (!verifiedOrganizations[0]) {
-            throw new ConflictError(
-              "Verification target no longer exists",
-            );
-          }
+          if (!verified[0]) throw new Error("Verification target no longer exists");
         } else if (request.targetType === "server") {
-          const [proof] = await tx
-            .select({ id: serverClaimChallenges.id })
-            .from(serverClaimChallenges)
-            .where(
-              and(
-                eq(
-                  serverClaimChallenges.verificationRequestId,
-                  request.id,
-                ),
-                eq(serverClaimChallenges.serverId, request.targetId),
-                eq(
-                  serverClaimChallenges.requesterId,
-                  request.requesterId,
-                ),
-                eq(serverClaimChallenges.proofVersion, 1),
-                isNotNull(serverClaimChallenges.consumedAt),
-                isNotNull(serverClaimChallenges.sourceFetchedAt),
-              ),
-            )
-            .limit(1);
-
-          if (!proof) {
-            throw new ConflictError(
-              "Verified MTA server control proof is required before approval",
-            );
-          }
-
           // A server claim is finalized only by moderation. The conditional
           // ownership update prevents approving a stale request after another
           // claimant has already become the owner.
@@ -266,17 +140,42 @@ export class VerificationRepository {
             .returning({ id: servers.id });
 
           if (!claimed[0]) {
-            throw new ConflictError("Server claim target is already owned by another user");
+            throw new Error("Server claim target is already owned by another user");
           }
+
+          // Once ownership is proven, competing pending claims become stale and
+          // must not remain actionable in the moderation queue.
+          await tx
+            .update(verificationRequests)
+            .set({
+              status: "rejected",
+              reviewerId: input.reviewerId,
+              reviewNotes: "Another ownership claim was approved",
+              resolvedAt: new Date(),
+            })
+            .where(
+              and(
+                ne(verificationRequests.id, request.id),
+                eq(verificationRequests.targetType, "server"),
+                eq(verificationRequests.targetId, request.targetId),
+                eq(verificationRequests.status, "pending")
+              )
+            );
         }
       }
 
-      if (audit) {
-        await tx.insert(auditEvents).values({
-          ...audit,
-          createdAt: new Date(),
-        });
-      }
+      await tx.insert(notifications).values({
+        id: generateId("not"),
+        recipientId: request.requesterId,
+        title: input.decision === "approved"
+          ? "Verification approved"
+          : "Verification request rejected",
+        message: `${request.targetType} verification for ${request.targetId} was ${input.decision}`,
+        link: request.targetType === "server" ? "/workspace" : "/settings",
+        type: "security",
+        category: "security",
+        createdAt: new Date(),
+      });
 
       return request;
     });

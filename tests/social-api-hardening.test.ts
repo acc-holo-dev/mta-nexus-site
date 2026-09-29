@@ -14,6 +14,7 @@ describe("social API hardening", () => {
     expect(route).toContain("Target does not exist");
     expect(route).toContain('product.status === "published"');
     expect(route).toContain('server.visibility !== "private"');
+    expect(route).toContain('server.status === "active"');
 
     const repository = readFileSync(
       resolve(process.cwd(), "packages/db/src/repositories/social.ts"),

@@ -1,4 +1,4 @@
-import { serverRepository, organizationRepository } from "@nexus/db";
+import { serverRepository, auditRepository, organizationRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Server, User } from "@nexus/domain";
@@ -16,7 +16,7 @@ export class ServerService {
   }
 
   async getServerBySlug(slug: string): Promise<Server | null> {
-    return serverRepository.findBySlug(slug);
+    return serverRepository.findPublicBySlug(slug);
   }
 
   async getServerById(id: string): Promise<Server | null> {
@@ -34,41 +34,36 @@ export class ServerService {
       if (!organization) throw new NotFoundError("Organization", input.organizationId);
 
       const memberships = await organizationRepository.listUserMemberships(actor.id);
-      const membership = memberships.find(
-        (item) => item.organizationId === input.organizationId,
-      );
-      const canManageServers =
+      const membership = memberships.find((item) => item.organizationId === input.organizationId);
+      const canManageOrganization =
         organization.ownerId === actor.id ||
         membership?.role === "owner" ||
         membership?.role === "admin" ||
-        membership?.permissions.includes("manage_servers");
+        membership?.role === "developer";
 
-      if (!canManageServers) {
-        throw new ForbiddenError(
-          "You do not have permission to create servers for this organization",
-        );
+      if (!canManageOrganization) {
+        throw new ForbiddenError("You do not manage this organization");
       }
     }
 
     const id = generateId("srv");
-    const server = await serverRepository.createWithAudit(
-      {
-        ...input,
-        id,
-        // A listing is editorially active immediately; live availability is sourced separately from the official MTA directory.
-        status: "active",
-        isVerified: false,
-      },
-      {
-        id: generateId("aud"),
-        actorId: actor.id,
-        actorType: "user",
-        action: "server.created",
-        targetId: id,
-        targetType: "server",
-        details: { name: input.name, ip: input.ipAddress, port: input.port },
-      },
-    );
+    const server = await serverRepository.create({
+      ...input,
+      id,
+      // A listing is editorially active immediately; live availability is sourced separately from the official MTA directory.
+      status: "active",
+      isVerified: false,
+    });
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "user",
+      action: "server.created",
+      targetId: id,
+      targetType: "server",
+      details: { name: server.name, ip: server.ipAddress, port: server.port },
+    });
 
     await eventBus.publish({
       id: generateId("evt"),
@@ -78,56 +73,31 @@ export class ServerService {
       actor: { id: actor.id, type: "user" },
       aggregateId: id,
       aggregateType: "server",
-      payload: {
-        serverId: id,
-        name: server.name,
-        ownerId: server.ownerId,
-        organizationId: server.organizationId,
-        ip: server.ipAddress,
-        port: server.port,
-      },
+      payload: { serverId: id, name: server.name, ownerId: actor.id, ip: server.ipAddress, port: server.port },
     });
 
     return server;
   }
 
-  async canManageServer(server: Server, actor: User): Promise<boolean> {
-    if (can(actor, "server.manage", server)) return true;
-    if (!server.organizationId) return false;
-
-    const [organization, organizationMemberships] = await Promise.all([
-      organizationRepository.findById(server.organizationId),
-      organizationRepository.listUserMemberships(actor.id),
-    ]);
-
-    if (organization?.ownerId === actor.id) return true;
-
-    return can(actor, "server.manage", server, {
-      organizationMemberships,
-    });
-  }
-
   async updateServer(serverId: string, updates: ServerDetailsUpdate, actor: User): Promise<Server> {
     const server = await serverRepository.findById(serverId);
     if (!server) throw new NotFoundError("Server", serverId);
-    if (!(await this.canManageServer(server, actor))) {
-      throw new ForbiddenError("You do not manage this server");
+    if (!can(actor, "server.manage", server)) {
+      throw new ForbiddenError("Only the server owner can update its details");
     }
 
-    const updated = await serverRepository.updateWithAudit(
-      serverId,
-      updates,
-      {
-        id: generateId("aud"),
-        actorId: actor.id,
-        actorType: "user",
-        action: "server.updated",
-        targetId: serverId,
-        targetType: "server",
-        details: { fields: Object.keys(updates) },
-      },
-    );
+    const updated = await serverRepository.update(serverId, updates);
     if (!updated) throw new NotFoundError("Server", serverId);
+
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "user",
+      action: "server.updated",
+      targetId: serverId,
+      targetType: "server",
+      details: { fields: Object.keys(updates) },
+    });
 
     return updated;
   }

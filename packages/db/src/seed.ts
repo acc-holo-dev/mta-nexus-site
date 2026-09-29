@@ -1,4 +1,5 @@
 import { hashPassword } from "@nexus/security";
+import { getDevelopmentSeedPassword } from "./seed-guard";
 import {
   userRepository,
   organizationRepository,
@@ -11,9 +12,10 @@ import {
 } from "./repositories/index";
 
 export async function runSeed() {
+  const seedPassword = getDevelopmentSeedPassword();
   console.log("Seeding MTA Nexus database with baseline records...");
 
-  const defaultPasswordHash = await hashPassword("password123");
+  const defaultPasswordHash = await hashPassword(seedPassword);
 
   // 1. Users
   const admin = await userRepository.create({
@@ -193,9 +195,9 @@ export async function runSeed() {
     mtaVersionTarget: "1.6.0",
     fileName: "resource.zip",
     mimeType: "application/zip",
-    scanStatus: "clean",
-    scanner: "seed-manual-review",
-    scannedAt: new Date(),
+    // Seed artifacts have no real scanner verdict and must never look trusted.
+    scanStatus: "not_scanned",
+    scanner: "disabled",
     isSigned: false,
   });
 

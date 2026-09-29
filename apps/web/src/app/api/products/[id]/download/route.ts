@@ -6,22 +6,12 @@ import { commerceService } from "../../../../../lib/services/commerce-service";
 import { productRepository, buildRepository, auditRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";
 import { consumeRateLimit, generateId } from "@nexus/security";
-import { decideResourceDownloadAccess } from "../../../../../lib/resource-download-policy";
-import { productService } from "../../../../../lib/services/product-service";
 
 const DOWNLOAD_EXTENSIONS = new Set([".zip", ".rar", ".7z", ".lua"]);
-const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
 function getDownloadExtension(storageKey: string): string {
   const extension = path.extname(storageKey).toLowerCase();
   return DOWNLOAD_EXTENSIONS.has(extension) ? extension : ".zip";
-}
-
-function destroyOpenedStream(stream: NodeJS.ReadableStream): void {
-  const destroyable = stream as NodeJS.ReadableStream & {
-    destroy?: (error?: Error) => void;
-  };
-  destroyable.destroy?.();
 }
 
 export async function GET(
@@ -35,80 +25,57 @@ export async function GET(
     if (!user) {
       return NextResponse.json(
         { error: "Authentication required to download resource builds" },
-        { status: 401, headers: privateHeaders }
+        { status: 401 }
       );
     }
 
     const rateLimit = await consumeRateLimit("download", user.id);
     if (!rateLimit.success) {
-      return NextResponse.json({ error: "Too many download requests" }, { status: 429, headers: privateHeaders });
+      return NextResponse.json({ error: "Too many download requests" }, { status: 429 });
     }
 
     const product = await productRepository.findById(productId);
-    if (!product) {
-      return NextResponse.json({ error: "Resource not found" }, { status: 404, headers: privateHeaders });
+    if (!product || product.status !== "published") {
+      return NextResponse.json({ error: "Resource not found" }, { status: 404 });
     }
 
-    const isPrivileged =
+    const hasAccess =
+      product.authorId === user.id ||
       user.role === "admin" ||
-      (await productService.canManageProduct(product, user));
-    const hasEntitlement = isPrivileged
-      ? false
-      : await commerceService.checkEntitlement(
-          { type: "user", id: user.id },
-          productId,
-          "product.download"
-        );
-    const access = decideResourceDownloadAccess(
-      product,
-      isPrivileged,
-      hasEntitlement,
-    );
-
-    if (!access.allowed) {
-      if (access.reason === "resource_not_published") {
-        return NextResponse.json(
-          { error: "Resource not found" },
-          { status: 404, headers: privateHeaders },
-        );
-      }
+      (await commerceService.checkEntitlement(
+        { type: "user", id: user.id },
+        productId,
+        "product.download"
+      ));
+    if (!hasAccess) {
       return NextResponse.json(
         { error: "Add this resource to your library before downloading it" },
-        { status: 403, headers: privateHeaders }
+        { status: 403 }
       );
     }
 
-    const latestBuild =
-      await buildRepository.findLatestPublishedByProduct(productId);
+    const requestedBuildId = request.nextUrl.searchParams.get("buildId");
+    const builds = await buildRepository.listPublishedByProduct(productId);
+    const latestBuild = requestedBuildId
+      ? builds.find((build) => build.id === requestedBuildId)
+      : builds[0];
     if (!latestBuild) {
-      return NextResponse.json({ error: "No published build is available" }, { status: 404, headers: privateHeaders });
-    }
-    if (
-      latestBuild.scanStatus !== "clean" ||
-      !latestBuild.scanner?.trim() ||
-      !latestBuild.scannedAt
-    ) {
       return NextResponse.json(
-        { error: "Published build is not cleared for delivery" },
-        { status: 409, headers: privateHeaders },
+        { error: requestedBuildId ? "Requested build is not available" : "No published build is available" },
+        { status: 404 }
       );
     }
 
     const stored = await storageService.getDownloadStream(latestBuild.storageKey);
-    try {
-      await auditRepository.record({
-        id: generateId("aud"),
-        actorId: user.id,
-        actorType: "user",
-        action: "product.download_started",
-        targetId: productId,
-        targetType: "product",
-        details: { buildId: latestBuild.id, version: latestBuild.version },
-      });
-    } catch (error) {
-      destroyOpenedStream(stored.stream);
-      throw error;
-    }
+    await auditRepository.record({
+      id: generateId("aud"),
+      actorId: user.id,
+      actorType: "user",
+      action: "product.downloaded",
+      targetId: productId,
+      targetType: "product",
+      details: { buildId: latestBuild.id, version: latestBuild.version },
+    });
 
     const stream = Readable.toWeb(stored.stream as Readable) as ReadableStream;
     const fileName = `${product.slug}-${latestBuild.version}${getDownloadExtension(latestBuild.fileName)}`;
@@ -118,12 +85,12 @@ export async function GET(
         "Content-Disposition": `attachment; filename="${fileName}"`,
         "Content-Length": String(stored.meta?.sizeBytes || latestBuild.fileSizeBytes),
         "X-Content-SHA256": latestBuild.sha256Hash,
-        ...privateHeaders,
+        "Cache-Control": "private, no-store",
         "X-Content-Type-Options": "nosniff",
       },
     });
   } catch (error: unknown) {
     console.error("Download error:", error);
-    return NextResponse.json({ error: "Failed to deliver resource build" }, { status: 500, headers: privateHeaders });
+    return NextResponse.json({ error: "Failed to deliver resource build" }, { status: 500 });
   }
 }

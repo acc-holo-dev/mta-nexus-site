@@ -1,546 +1,272 @@
-import { cookies } from "next/headers";
+﻿import { cookies } from "next/headers";
 import Link from "next/link";
-import {
-  buildRepository,
-  contentRepository,
-  verificationRepository,
-} from "@nexus/db";
+import { buildRepository, contentRepository, verificationRepository } from "@nexus/db";
+import { authService } from "../../lib/services/auth-service";
+import { adminService } from "../../lib/services/admin-service";
 import { can } from "@nexus/security";
+import { VerificationReviewForm } from "../../components/verification-review-form";
 import {
-  AlertTriangle,
-  BadgeCheck,
-  BookOpen,
-  Box,
-  PackageCheck,
-  Server,
-  ShieldAlert,
-  Users,
-} from "lucide-react";
-import {
+  StatCard,
+  SectionHeader,
   DataTable,
+  DataTableHeader,
   DataTableBody,
   DataTableEmpty,
-  DataTableHeader,
-  SectionHeader,
-  StatCard,
   StatusBadge,
 } from "@nexus/ui";
-import { adminService } from "../../lib/services/admin-service";
-import { authService } from "../../lib/services/auth-service";
-import { getDictionary } from "../../lib/i18n";
-import { getRequestLocale } from "../../lib/i18n-server";
-import { BuildModerationControls } from "../../components/build-moderation-controls";
-import { ContentModerationControls } from "../../components/content-moderation-controls";
-import { VerificationModerationControls } from "../../components/verification-moderation-controls";
-import { ReportModerationControls } from "../../components/report-moderation-controls";
+import {
+  ShieldAlert,
+  Users,
+  Box,
+  Server,
+  KeyRound,
+  ShoppingBag,
+  AlertTriangle,
+  BadgeCheck,
+  PackageCheck,
+} from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    reportView?: string;
-    reportPage?: string;
-    verificationView?: string;
-    verificationPage?: string;
-    buildPage?: string;
-    contentPage?: string;
-  }>;
-}) {
-  const locale = await getRequestLocale();
-  const dictionary = getDictionary(locale);
-  const copy = dictionary.admin;
-  const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
-  const query = await searchParams;
-  const parsePage = (value: string | undefined) =>
-    typeof value === "string" && /^[1-9]\d{0,4}$/.test(value) ? Number(value) : 1;
-  const reportView = query.reportView === "history" ? "history" : "pending";
-  const reportPage = parsePage(query.reportPage);
-  const verificationView = query.verificationView === "history" ? "history" : "pending";
-  const verificationPage = parsePage(query.verificationPage);
-  const buildPage = parsePage(query.buildPage);
-  const contentPage = parsePage(query.contentPage);
-  const adminHref = (changes: Record<string, string | number>) => {
-    const params = new URLSearchParams({
-      reportView, reportPage: String(reportPage),
-      verificationView, verificationPage: String(verificationPage),
-      buildPage: String(buildPage), contentPage: String(contentPage),
-    });
-    for (const [key, value] of Object.entries(changes)) params.set(key, String(value));
-    return `/admin?${params}`;
-  };
-  const reportHref = (view: "pending" | "history", page: number) =>
-    adminHref({ reportView: view, reportPage: page });
-  const verificationHref = (view: "pending" | "history", page: number) =>
-    adminHref({ verificationView: view, verificationPage: page });
-
+export default async function AdminPage() {
+  // Authorization: the page renders only for real admin/moderator sessions
   const cookieStore = await cookies();
   const token = cookieStore.get("nexus_session")?.value;
   const currentUser = await authService.getSession(token);
 
   if (!currentUser || !can(currentUser, "admin.access")) {
     return (
-      <div className="mx-auto max-w-md space-y-4 py-20 text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-danger-soft text-danger">
-          <ShieldAlert className="h-7 w-7" aria-hidden="true" />
+      <div className="max-w-md mx-auto py-20 text-center space-y-4">
+        <div className="w-14 h-14 rounded-xl bg-danger-soft text-danger flex items-center justify-center mx-auto">
+          <ShieldAlert className="w-7 h-7" />
         </div>
-        <h1 className="font-display text-primary">{copy.accessDenied}</h1>
+        <h1 className="font-display text-primary">Access denied</h1>
         <p className="font-caption text-muted">
-          {copy.accessDeniedDescription}
+          Administration requires an admin or moderator account.
         </p>
         <Link
           href="/auth/login"
-          className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
+          className="inline-block px-4 py-2 rounded-md bg-accent hover:bg-[var(--nexus-accent-hover)] text-white text-xs font-semibold transition-colors"
         >
-          {copy.signIn}
+          Sign In
         </Link>
       </div>
     );
   }
 
   const adminUser = currentUser;
+  const health = await adminService.getSystemHealthMetrics(adminUser);
+  const reports = await adminService.listReports(adminUser);
   const canViewAudit = can(adminUser, "admin.audit");
-  const [
-    health,
-    reportPageResult,
-    verificationPageResult,
-    pendingVerificationCount,
-    buildPageResult,
-    pendingBuildCount,
-    contentPageResult,
-    pendingContentCount,
-    auditLogs,
-  ] = await Promise.all([
-    adminService.getSystemHealthMetrics(adminUser),
-    adminService.listReports(adminUser, reportView, reportPage),
-    verificationRepository.listPage(verificationView, verificationPage),
-    verificationRepository.countPending(),
-    buildRepository.listPendingReviewPage(buildPage),
-    buildRepository.countPendingReview(),
-    contentRepository.listDraftPage(contentPage),
-    contentRepository.countDrafts(),
-    canViewAudit ? adminService.listAuditLogs(adminUser) : Promise.resolve([]),
-  ]);
-
-  const { requests: verificationRequests, hasMore: moreVerifications } = verificationPageResult;
-  const { reports, hasMore: moreReports } = reportPageResult;
-  const { builds: pendingBuilds, hasMore: moreBuilds } = buildPageResult;
-  const { items: pendingContent, hasMore: moreContent } = contentPageResult;
+  const auditLogs = canViewAudit ? await adminService.listAuditLogs(adminUser) : [];
+  const verificationRequests = await verificationRepository.listAll();
+  const pendingVerifications = verificationRequests.filter((v) => v.status === "pending");
+  const pendingBuilds = await buildRepository.listPendingReview();
+  const pendingContent = await contentRepository.listByStatus("draft", 100);
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="flex items-center gap-2.5 font-display text-primary">
-            <ShieldAlert className="h-6 w-6 text-danger" aria-hidden="true" />
-            <span>{copy.title}</span>
+          <h1 className="font-display text-primary flex items-center gap-2.5">
+            <ShieldAlert className="w-6 h-6 text-danger" />
+            <span>Administration</span>
           </h1>
-          <p className="mt-0.5 font-caption text-muted">{copy.description}</p>
+          <p className="font-caption text-muted mt-0.5">
+            Platform moderation, verification queue and audit trail.
+          </p>
         </div>
-        <span className="self-start rounded-full border border-base bg-inset px-3 py-1 font-label uppercase text-muted sm:self-auto">
-          {copy.authorizedSession}
-        </span>
-      </header>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
-        <StatCard
-          label={copy.users}
-          value={health.counts.users}
-          icon={<Users className="h-4 w-4" />}
-        />
-        <StatCard
-          label={copy.servers}
-          value={health.counts.servers}
-          tone="success"
-          icon={<Server className="h-4 w-4" />}
-        />
-        <StatCard
-          label={copy.products}
-          value={health.counts.products}
-          tone="accent"
-          icon={<Box className="h-4 w-4" />}
-        />
-        <StatCard
-          label={copy.publishedContent}
-          value={health.counts.publishedContent}
-          tone="purple"
-          icon={<BookOpen className="h-4 w-4" />}
-        />
-        <StatCard
-          label={copy.openReports}
-          value={health.counts.reportsOpen}
-          tone="warning"
-          icon={<AlertTriangle className="h-4 w-4" />}
-        />
+        <div className="flex items-center gap-2">
+          <span className="font-label text-muted uppercase">Authorized admin session</span>
+        </div>
       </div>
 
+      {/* Metrics (unified StatCard) */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <StatCard label="Users" value={health.counts.users} icon={<Users className="w-4 h-4" />} />
+        <StatCard label="Servers" value={health.counts.servers} tone="success" icon={<Server className="w-4 h-4" />} />
+        <StatCard label="Products" value={health.counts.products} tone="accent" icon={<Box className="w-4 h-4" />} />
+        <StatCard label="Licenses" value={health.counts.licenses} tone="purple" icon={<KeyRound className="w-4 h-4" />} />
+        <StatCard label="Orders" value={health.counts.orders} icon={<ShoppingBag className="w-4 h-4" />} />
+        <StatCard label="Open Reports" value={health.counts.reportsOpen} tone="warning" icon={<AlertTriangle className="w-4 h-4" />} />
+      </div>
+
+      {/* Verification Queue */}
       <section>
         <SectionHeader
-          title={copy.verificationQueue}
-          description={`${pendingVerificationCount} ${copy.pendingRequests}`}
-          action={<BadgeCheck className="h-4 w-4 text-accent" />}
+          title="Verification Queue"
+          description={`${pendingVerifications.length} pending request${pendingVerifications.length === 1 ? "" : "s"}`}
+          action={<BadgeCheck className="w-4 h-4 text-accent" />}
         />
-        <nav aria-label={copy.verificationQueue} className="mb-3 flex gap-2">
-          <Link
-            href={verificationHref("pending", 1)}
-            aria-current={verificationView === "pending" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs ${verificationView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
-          >
-            {copy.verificationPending} ({pendingVerificationCount})
-          </Link>
-          <Link
-            href={verificationHref("history", 1)}
-            aria-current={verificationView === "history" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs ${verificationView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
-          >
-            {copy.verificationHistory}
-          </Link>
-        </nav>
         <div className="space-y-2.5">
           {verificationRequests.length > 0 ? (
-            verificationRequests.map((request) => (
-              <div
-                key={request.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
-                <div className="min-w-0 space-y-1">
+            verificationRequests.map((vr) => (
+              <div key={vr.id} className="nexus-panel p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-accent-soft px-2 py-0.5 text-[10px] font-bold uppercase text-accent">
-                      {request.targetType}
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-accent-soft text-accent">
+                      {vr.targetType}
                     </span>
-                    <span className="truncate font-code text-xs font-heading text-primary">
-                      {request.targetId}
-                    </span>
+                    <span className="text-xs font-heading text-primary font-code truncate">{vr.targetId}</span>
                   </div>
                   <p className="font-caption text-muted">
-                    {copy.requester} {request.requesterId} •{" "}
-                    {new Date(request.createdAt).toLocaleDateString(dateLocale)}
+                    Requester {vr.requesterId} • {new Date(vr.createdAt).toLocaleDateString()}
                   </p>
-                  {request.notes && (
-                    <p className="font-caption text-faint">{request.notes}</p>
-                  )}
-                  {request.proofUrl && /^https?:\/\//i.test(request.proofUrl) && (
+                  {vr.notes && <p className="font-caption text-faint">{vr.notes}</p>}
+                  {vr.proofUrl && (
                     <a
-                      href={request.proofUrl}
+                      href={vr.proofUrl}
                       target="_blank"
-                      rel="noopener noreferrer"
-                      className="block break-all font-caption text-accent underline"
+                      rel="noreferrer"
+                      className="font-caption text-accent hover:underline"
                     >
-                      {copy.verificationProof}
+                      Review ownership evidence ↗
                     </a>
                   )}
-                  {request.reviewNotes && (
-                    <p className="font-code font-caption text-faint">
-                      {copy.review}: {request.reviewNotes}
-                    </p>
-                  )}
-                  {request.resolvedAt && (
-                    <p className="font-caption text-faint">
-                      {copy.reportDecidedAt}: {new Date(request.resolvedAt).toLocaleString(dateLocale)}
-                    </p>
-                  )}
+                  {vr.reviewNotes && <p className="font-caption text-faint font-code">Review: {vr.reviewNotes}</p>}
                 </div>
 
-                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
+                {vr.status === "pending" ? (
+                  <VerificationReviewForm requestId={vr.id} />
+                ) : (
                   <StatusBadge
-                    status={request.status}
-                    tone={
-                      request.status === "approved"
-                        ? "success"
-                        : request.status === "rejected"
-                          ? "danger"
-                          : "warning"
-                    }
+                    status={vr.status}
+                    tone={vr.status === "approved" ? "success" : "danger"}
                   />
-                  {request.status === "pending" && (
-                    <VerificationModerationControls requestId={request.id} />
-                  )}
-                </div>
+                )}
               </div>
             ))
           ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">
-                {verificationView === "pending"
-                  ? copy.noVerificationRequests
-                  : copy.noVerificationHistory}
-              </p>
+            <div className="py-6 text-center nexus-panel">
+              <p className="font-caption text-muted">No verification requests submitted.</p>
             </div>
           )}
         </div>
-        {(verificationPage > 1 || moreVerifications) && (
-          <nav
-            aria-label={copy.verificationPages}
-            className="mt-3 flex items-center gap-3 text-xs"
-          >
-            {verificationPage > 1 && (
-              <Link className="text-accent underline" href={verificationHref(verificationView, verificationPage - 1)}>{copy.previous}</Link>
-            )}
-            <span className="text-muted">{copy.reportPage} {verificationPage}</span>
-            {moreVerifications && verificationPage < 99_999 && (
-              <Link className="text-accent underline" href={verificationHref(verificationView, verificationPage + 1)}>{copy.next}</Link>
-            )}
-          </nav>
-        )}
       </section>
 
+      {/* Resource Build Queue */}
       <section>
         <SectionHeader
-          title={copy.resourceBuildQueue}
-          description={`${pendingBuildCount} ${copy.buildsAwaitingReview}`}
-          action={<PackageCheck className="h-4 w-4 text-warning" />}
+          title="Resource Build Queue"
+          description={`${pendingBuilds.length} build${pendingBuilds.length === 1 ? "" : "s"} awaiting review`}
+          action={<PackageCheck className="w-4 h-4 text-amber-400" />}
         />
         <div className="space-y-2.5">
           {pendingBuilds.length > 0 ? (
             pendingBuilds.map((build) => (
-              <div
-                key={build.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
-                <div className="min-w-0 space-y-1">
+              <div key={build.id} className="nexus-panel p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
-                      {copy.pendingReview}
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-warning-soft text-warning">
+                      pending review
                     </span>
-                    <span className="truncate font-code text-xs font-heading text-primary">
+                    <span className="text-xs font-heading text-primary font-code truncate">
                       {build.fileName} · v{build.version}
                     </span>
                   </div>
                   <p className="font-caption text-muted">
-                    {copy.resource} {build.productId} •{" "}
-                    {(build.fileSizeBytes / 1024 / 1024).toFixed(1)} MB
-                  </p>
-                  <p className="font-caption text-secondary">
-                    {build.productStatus === "published" ? (
-                      <Link className="text-accent underline" href={`/market/${encodeURIComponent(build.productSlug)}`}>
-                        {build.productTitle}
-                      </Link>
-                    ) : (
-                      <>{build.productTitle} · {copy.resourceNotPublished}</>
-                    )}
-                  </p>
-                  <p className="font-caption text-muted">
-                    {copy.resourcePublisher}: <Link className="text-accent underline" href={`/users/${encodeURIComponent(build.publisherUsername)}`}>
-                      @{build.publisherUsername}
-                    </Link>
+                    Resource {build.productId} • {(build.fileSizeBytes / 1024 / 1024).toFixed(1)} MB
                   </p>
                   <p className="font-caption text-faint">
-                    {copy.scan}: {build.scanStatus.replace(/_/g, " ")} · SHA-256
+                    Scan: {build.scanStatus.replace(/_/g, " ")} · {build.scanner || "unknown scanner"}
+                    {build.scannedAt ? ` · ${new Date(build.scannedAt).toISOString()}` : " · no scan timestamp"}
+                    {` · SHA-256 ${build.sha256Hash.slice(0, 16)}…`}
                   </p>
-                  <code className="block break-all font-code text-[10px] text-faint">
-                    {build.sha256Hash}
-                  </code>
-                  {build.scanner && build.scannedAt && (
-                    <p className="font-caption text-faint">
-                      {copy.scanProvenance}: {build.scanner} ·{" "}
-                      {new Date(build.scannedAt).toLocaleString(dateLocale)}
-                    </p>
-                  )}
-                  {build.releaseNotes && (
-                    <p className="font-caption text-faint">
-                      {build.releaseNotes}
-                    </p>
-                  )}
+                  {build.releaseNotes && <p className="font-caption text-faint">{build.releaseNotes}</p>}
                 </div>
-                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
-                  <StatusBadge
-                    status={build.scanStatus}
-                    tone={
-                      build.scanStatus === "clean"
-                        ? "success"
-                        : build.scanStatus === "malicious"
-                          ? "danger"
-                          : "warning"
-                    }
-                  />
-                  <BuildModerationControls
-                    buildId={build.id}
-                    scanStatus={build.scanStatus}
-                    hasScanProvenance={Boolean(
-                      build.scanner?.trim() && build.scannedAt,
-                    )}
-                  />
-                </div>
+                <StatusBadge status={build.scanStatus} tone={build.scanStatus === "malicious" ? "danger" : "warning"} />
               </div>
             ))
           ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">{copy.noBuilds}</p>
+            <div className="py-6 text-center nexus-panel">
+              <p className="font-caption text-muted">No resource builds are waiting for review.</p>
             </div>
           )}
         </div>
-        {(buildPage > 1 || moreBuilds) && (
-          <nav aria-label={copy.buildPages} className="mt-3 flex items-center gap-3 text-xs">
-            {buildPage > 1 && <Link className="text-accent underline" href={adminHref({ buildPage: buildPage - 1 })}>{copy.previous}</Link>}
-            <span className="text-muted">{copy.reportPage} {buildPage}</span>
-            {moreBuilds && buildPage < 99_999 && <Link className="text-accent underline" href={adminHref({ buildPage: buildPage + 1 })}>{copy.next}</Link>}
-          </nav>
-        )}
       </section>
 
+      {/* Community Content Queue */}
       <section>
         <SectionHeader
-          title={copy.communityQueue}
-          description={`${pendingContentCount} ${copy.draftsAwaitingModeration}`}
+          title="Community Content Queue"
+          description={`${pendingContent.length} draft${pendingContent.length === 1 ? "" : "s"} awaiting moderation`}
         />
         <div className="space-y-2.5">
           {pendingContent.length > 0 ? (
             pendingContent.map((item) => (
-              <div
-                key={item.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
-                <div className="min-w-0 space-y-1">
+              <div key={item.id} className="nexus-panel p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-warning-soft text-warning">
                       {item.type}
                     </span>
-                    <span className="truncate text-xs font-heading text-primary">
-                      {item.title}
-                    </span>
+                    <span className="text-xs font-heading text-primary truncate">{item.title}</span>
                   </div>
                   <p className="font-caption text-muted">
-                    {copy.author} {item.authorId} •{" "}
-                    {new Date(item.createdAt).toLocaleDateString(dateLocale)}
+                    Author {item.authorId} • {new Date(item.createdAt).toLocaleDateString()}
                   </p>
-                  {item.excerpt && (
-                    <p className="truncate font-caption text-faint">
-                      {item.excerpt}
-                    </p>
-                  )}
-                  <details className="max-w-prose font-caption text-muted">
-                    <summary className="cursor-pointer text-accent">{copy.readDraft}</summary>
-                    <div className="mt-2 max-h-96 overflow-y-auto whitespace-pre-wrap break-words rounded-md border border-base bg-inset p-3 text-xs text-secondary">
-                      {item.body}
-                    </div>
-                  </details>
+                  {item.excerpt && <p className="font-caption text-faint truncate">{item.excerpt}</p>}
                 </div>
-                <ContentModerationControls contentId={item.id} />
+                <span className="font-caption text-warning">Use content moderation action</span>
               </div>
             ))
           ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">{copy.noDrafts}</p>
+            <div className="py-6 text-center nexus-panel">
+              <p className="font-caption text-muted">No community drafts are waiting for review.</p>
             </div>
           )}
         </div>
-        {(contentPage > 1 || moreContent) && (
-          <nav aria-label={copy.contentPages} className="mt-3 flex items-center gap-3 text-xs">
-            {contentPage > 1 && <Link className="text-accent underline" href={adminHref({ contentPage: contentPage - 1 })}>{copy.previous}</Link>}
-            <span className="text-muted">{copy.reportPage} {contentPage}</span>
-            {moreContent && contentPage < 99_999 && <Link className="text-accent underline" href={adminHref({ contentPage: contentPage + 1 })}>{copy.next}</Link>}
-          </nav>
-        )}
       </section>
 
+      {/* Reports */}
       <section>
-        <SectionHeader title={copy.reports} description={copy.caseHistory} />
-        <nav aria-label={copy.reports} className="mb-3 flex gap-2">
-          <Link
-            href={reportHref("pending", 1)}
-            aria-current={reportView === "pending" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs ${reportView === "pending" ? "bg-accent-soft text-accent" : "text-muted"}`}
-          >
-            {copy.reportQueue} ({health.counts.reportsOpen})
-          </Link>
-          <Link
-            href={reportHref("history", 1)}
-            aria-current={reportView === "history" ? "page" : undefined}
-            className={`rounded-md border border-base px-3 py-2 text-xs ${reportView === "history" ? "bg-accent-soft text-accent" : "text-muted"}`}
-          >
-            {copy.reportHistory}
-          </Link>
-        </nav>
+        <SectionHeader
+          title="Reports & Moderation"
+          description="Immutable case history"
+        />
         <div className="space-y-2.5">
           {reports.length > 0 ? (
-            reports.map((report) => (
-              <div
-                key={report.id}
-                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
-              >
-                <div className="min-w-0 space-y-1">
+            reports.map((r) => (
+              <div key={r.id} className="nexus-panel p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="space-y-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
-                      {report.type}
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-warning-soft text-warning">
+                      {r.type}
                     </span>
-                    <span className="font-code text-xs font-heading text-primary">
-                      {report.targetId}
-                    </span>
+                    <span className="text-xs font-heading text-primary font-code">{r.targetId}</span>
                   </div>
-                  <p className="font-caption text-secondary">{report.reason}</p>
-                  <p className="font-caption text-faint">
-                    {copy.reporter}: {report.reporterId} · {report.targetType} ·{" "}
-                    {new Date(report.createdAt).toLocaleDateString(dateLocale)}
-                  </p>
-                  {report.evidenceUrls.length > 0 && (
-                    <div className="flex flex-wrap gap-2 font-caption text-faint">
-                      <span>{copy.reportEvidence}:</span>
-                      {report.evidenceUrls
-                        .filter((url) => /^https?:\/\//i.test(url))
-                        .map((url, index) => (
-                          <a key={`${index}-${url}`} href={url} target="_blank" rel="noopener noreferrer" className="break-all text-accent underline">
-                            {index + 1}
-                          </a>
-                        ))}
-                    </div>
-                  )}
-                  {report.moderatorNotes && (
-                    <p className="font-code font-caption text-faint">
-                      {copy.notes}: {report.moderatorNotes}
-                    </p>
-                  )}
-                  {report.resolvedAt && (
-                    <p className="font-caption text-faint">
-                      {copy.reportDecidedAt}: {new Date(report.resolvedAt).toLocaleString(dateLocale)}
-                    </p>
+                  <p className="font-caption text-secondary">{r.reason}</p>
+                  {r.moderatorNotes && (
+                    <p className="font-caption text-faint font-code">Notes: {r.moderatorNotes}</p>
                   )}
                 </div>
-                <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
-                  <StatusBadge
-                    status={report.status}
-                    tone={report.status === "resolved" ? "success" : report.status === "dismissed" ? "neutral" : "warning"}
-                  />
-                  {(report.status === "open" || report.status === "under_review") && (
-                    <ReportModerationControls reportId={report.id} />
-                  )}
-                </div>
+
+                <StatusBadge
+                  status={r.status}
+                  tone={r.status === "resolved" ? "success" : r.status === "dismissed" ? "neutral" : "warning"}
+                />
               </div>
             ))
           ) : (
-            <div className="nexus-panel py-6 text-center">
-              <p className="font-caption text-muted">
-                {reportView === "pending" ? copy.noReports : copy.noReportHistory}
-              </p>
+            <div className="py-6 text-center nexus-panel">
+              <p className="font-caption text-muted">No reports in the moderation queue.</p>
             </div>
           )}
         </div>
-        {(reportPage > 1 || moreReports) && (
-          <nav aria-label={copy.reportPages} className="mt-3 flex items-center gap-3 text-xs">
-            {reportPage > 1 && <Link className="text-accent underline" href={reportHref(reportView, reportPage - 1)}>{copy.previous}</Link>}
-            <span className="text-muted">{copy.reportPage} {reportPage}</span>
-            {moreReports && reportPage < 99_999 && <Link className="text-accent underline" href={reportHref(reportView, reportPage + 1)}>{copy.next}</Link>}
-          </nav>
-        )}
       </section>
 
+      {/* Audit Trail — reserved for administrators because it can contain sensitive security context */}
       {canViewAudit && (
         <section>
           <SectionHeader
-            title={copy.auditLog}
-            description={copy.auditDescription}
+            title="Security Audit Log"
+            description="Most recent platform events"
           />
           <div className="nexus-panel p-4">
             <DataTable>
-              <DataTableHeader
-                columns={[
-                  copy.timestamp,
-                  copy.actor,
-                  copy.action,
-                  copy.target,
-                  copy.ip,
-                ]}
-              />
+              <DataTableHeader columns={["Timestamp", "Actor", "Action", "Target", "IP"]} />
               <DataTableBody>
                 {auditLogs.length > 0 ? (
                   auditLogs.map((log) => (
@@ -549,19 +275,13 @@ export default async function AdminPage({
                         {new Date(log.createdAt).toISOString()}
                       </td>
                       <td className="pr-4 text-purple">{log.actorId}</td>
-                      <td className="pr-4 font-semibold text-primary">
-                        {log.action}
-                      </td>
-                      <td className="pr-4 text-muted">
-                        {log.targetType}:{log.targetId}
-                      </td>
-                      <td className="text-right text-faint">
-                        {log.ipAddress || copy.internal}
-                      </td>
+                      <td className="pr-4 text-primary font-semibold">{log.action}</td>
+                      <td className="pr-4 text-muted">{log.targetType}:{log.targetId}</td>
+                      <td className="text-right text-faint">{log.ipAddress || "internal"}</td>
                     </tr>
                   ))
                 ) : (
-                  <DataTableEmpty colSpan={5} message={copy.auditDescription} />
+                  <DataTableEmpty colSpan={5} message="No audit events recorded." />
                 )}
               </DataTableBody>
             </DataTable>

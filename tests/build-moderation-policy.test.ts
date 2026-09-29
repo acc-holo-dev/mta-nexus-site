@@ -14,7 +14,8 @@ describe("resource build moderation", () => {
     );
 
     expect(service).toContain('status: "pending_review"');
-    expect(service).toContain('build.scanStatus !== "clean"');
+    expect(service).toContain("hasTrustedCleanBuildScanEvidence(build)");
+    expect(service).toContain("BUILD_SCAN_EVIDENCE_INVALID");
     expect(service).toContain('moderatePending(build.id, input.decision, {');
     expect(service).toContain("BUILD_STATE_CHANGED");
     expect(service).toContain("async reviewBuild(");

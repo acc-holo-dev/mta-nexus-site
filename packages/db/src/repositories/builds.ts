@@ -1,61 +1,24 @@
-import { and, asc, count, eq, desc, ne, sql } from "drizzle-orm";
-import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
+import { and, eq, desc, ne, isNotNull, lte } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, builds, products, users } from "../schema";
+import { auditEvents, builds, products } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
 
-export type PendingReviewBuild = Build & {
-  productTitle: string;
-  productSlug: string;
-  productStatus: string;
-  publisherId: string;
-  publisherUsername: string;
-};
+function trustedCleanScanConditions(now = new Date()) {
+  return [
+    eq(builds.scanStatus, "clean"),
+    eq(builds.scanner, "clamav"),
+    isNotNull(builds.scannedAt),
+    lte(builds.scannedAt, now),
+  ];
+}
 
 export class BuildRepository {
-  async countPendingReview(): Promise<number> {
-    const [row] = await db.select({ total: count() }).from(builds)
-      .where(eq(builds.status, "pending_review"));
-    return row?.total ?? 0;
-  }
-
-  async listPendingReviewPage(page: number, pageSize = 30): Promise<{ builds: PendingReviewBuild[]; hasMore: boolean }> {
-    if (!Number.isSafeInteger(page) || page < 1 || page > 99_999 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
-      throw new RangeError("Invalid build review page");
-    }
-    const rows = await db.select({
-      build: builds,
-      productTitle: products.title,
-      productSlug: products.slug,
-      productStatus: products.status,
-      publisherId: users.id,
-      publisherUsername: users.username,
-    }).from(builds)
-      .innerJoin(products, eq(builds.productId, products.id))
-      .innerJoin(users, eq(products.authorId, users.id))
-      .where(eq(builds.status, "pending_review"))
-      .orderBy(asc(builds.createdAt), asc(builds.id))
-      .limit(pageSize + 1)
-      .offset((page - 1) * pageSize);
-    return {
-      builds: rows.slice(0, pageSize).map((row) => ({
-        ...(row.build as unknown as Build),
-        productTitle: row.productTitle,
-        productSlug: row.productSlug,
-        productStatus: row.productStatus,
-        publisherId: row.publisherId,
-        publisherUsername: row.publisherUsername,
-      })),
-      hasMore: rows.length > pageSize,
-    };
-  }
-
   async listByProduct(productId: string): Promise<Build[]> {
         const rows = await db
       .select()
       .from(builds)
       .where(eq(builds.productId, productId))
-      .orderBy(desc(builds.createdAt), desc(builds.id));
+      .orderBy(desc(builds.createdAt));
     return rows as unknown as Build[];
   }
 
@@ -73,23 +36,17 @@ export class BuildRepository {
     const rows = await db
       .select()
       .from(builds)
-      .where(safePublishedBuildCondition(productId))
-      .orderBy(desc(builds.createdAt), desc(builds.id));
+      .where(and(
+        eq(builds.productId, productId),
+        eq(builds.status, "published"),
+        ...trustedCleanScanConditions()
+      ))
+      .orderBy(desc(builds.createdAt));
     return rows as unknown as Build[];
   }
 
   async findById(id: string): Promise<Build | null> {
     const rows = await db.select().from(builds).where(eq(builds.id, id)).limit(1);
-    return (rows[0] as unknown as Build) || null;
-  }
-
-  async findLatestPublishedByProduct(productId: string): Promise<Build | null> {
-    const rows = await db
-      .select()
-      .from(builds)
-      .where(safePublishedBuildCondition(productId))
-      .orderBy(desc(builds.createdAt), desc(builds.id))
-      .limit(1);
     return (rows[0] as unknown as Build) || null;
   }
 
@@ -120,7 +77,11 @@ export class BuildRepository {
       const published = await tx
         .select({ id: builds.id })
         .from(builds)
-        .where(safePublishedBuildCondition(data.productId))
+        .where(and(
+          eq(builds.productId, data.productId),
+          eq(builds.status, "published"),
+          ...trustedCleanScanConditions(createdAt)
+        ))
         .limit(1);
       if (!published[0]) {
         await tx
@@ -145,50 +106,22 @@ export class BuildRepository {
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
       const targetStatus = decision === "approve" ? "published" : "rejected";
-      const reviewCondition =
-        decision === "approve"
-          ? and(
-              eq(builds.id, id),
-              eq(builds.status, "pending_review"),
-              trustedCleanScanCondition(),
-            )
-          : and(eq(builds.id, id), eq(builds.status, "pending_review"));
+      const conditions = [eq(builds.id, id), eq(builds.status, "pending_review")];
+      if (decision === "approve") conditions.push(...trustedCleanScanConditions());
 
       const rows = await tx
         .update(builds)
         .set({ status: targetStatus })
-        .where(reviewCondition)
+        .where(and(...conditions))
         .returning();
       const reviewed = rows[0];
       if (!reviewed) return null;
 
-      const lockedProduct = await tx
-        .update(products)
-        .set({ updatedAt: sql`${products.updatedAt}` })
-        .where(eq(products.id, reviewed.productId))
-        .returning({ id: products.id });
-      if (!lockedProduct[0]) {
-        throw new Error("Build product disappeared during moderation");
-      }
-
       if (decision === "approve") {
-        const latestPublished = await tx
-          .select({
-            id: builds.id,
-            version: builds.version,
-          })
-          .from(builds)
-          .where(safePublishedBuildCondition(reviewed.productId))
-          .orderBy(desc(builds.createdAt), desc(builds.id))
-          .limit(1);
-        if (!latestPublished[0]) {
-          throw new Error("Published build disappeared during moderation");
-        }
-
         await tx
           .update(products)
           .set({
-            currentVersion: latestPublished[0].version,
+            currentVersion: reviewed.version,
             status: "published",
             updatedAt: new Date(),
           })
@@ -197,13 +130,13 @@ export class BuildRepository {
         const fallback = await tx
           .select({ version: builds.version })
           .from(builds)
-          .where(
-            and(
-              safePublishedBuildCondition(reviewed.productId),
-              ne(builds.id, reviewed.id),
-            ),
-          )
-          .orderBy(desc(builds.createdAt), desc(builds.id))
+          .where(and(
+            eq(builds.productId, reviewed.productId),
+            ne(builds.id, reviewed.id),
+            eq(builds.status, "published"),
+            ...trustedCleanScanConditions()
+          ))
+          .orderBy(desc(builds.createdAt))
           .limit(1);
         await tx
           .update(products)
@@ -233,25 +166,16 @@ export class BuildRepository {
       const retired = rows[0];
       if (!retired) return null;
 
-      const lockedProduct = await tx
-        .update(products)
-        .set({ updatedAt: sql`${products.updatedAt}` })
-        .where(eq(products.id, retired.productId))
-        .returning({ id: products.id });
-      if (!lockedProduct[0]) {
-        throw new Error("Build product disappeared during retirement");
-      }
-
       const fallback = await tx
         .select({ version: builds.version })
         .from(builds)
-        .where(
-          and(
-            safePublishedBuildCondition(retired.productId),
-            ne(builds.id, retired.id),
-          ),
-        )
-        .orderBy(desc(builds.createdAt), desc(builds.id))
+        .where(and(
+          eq(builds.productId, retired.productId),
+          ne(builds.id, retired.id),
+          eq(builds.status, "published"),
+          ...trustedCleanScanConditions()
+        ))
+        .orderBy(desc(builds.createdAt))
         .limit(1);
       await tx
         .update(products)
