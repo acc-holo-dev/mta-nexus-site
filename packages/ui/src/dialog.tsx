@@ -16,16 +16,34 @@ export function Dialog({
   description,
   children,
 }: DialogProps) {
+  const closeButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+
+    const previousFocus = document.activeElement;
+    closeButtonRef.current?.focus();
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      if (previousFocus instanceof HTMLElement) previousFocus.focus();
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-      role="presentation"
-      onMouseDown={(event) => {
-        if (event.currentTarget === event.target) onClose();
-      }}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="Close dialog"
+        onClick={onClose}
+        className="absolute inset-0 cursor-default bg-black/60 backdrop-blur-sm"
+      />
       <div
         role="dialog"
         aria-modal="true"
@@ -34,6 +52,7 @@ export function Dialog({
         className="relative w-full max-w-lg rounded-xl border border-base bg-elevated p-6 text-primary shadow-nexus-lg"
       >
         <button
+          ref={closeButtonRef}
           type="button"
           onClick={onClose}
           className="absolute right-4 top-4 rounded-md p-1 text-muted transition-colors hover:bg-hover hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
