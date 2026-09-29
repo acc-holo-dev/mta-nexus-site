@@ -39,8 +39,8 @@
 
 ### P1-1. Lint-долг: 34 ошибки по последнему полному прогону
 
-biome 2.5.14, ошибки требуют ручных решений по группам. Два места исправлены
-в `43a996f` и `60ccbd0`; текущий счёт не подтверждён новым полным прогоном.
+biome 2.5.14, ошибки требуют ручных решений по группам. Четыре предупреждения в трёх файлах исправлены
+в `43a996f`, `60ccbd0` и `2cfb4b4`; текущий счёт не подтверждён новым полным прогоном.
 `pnpm check` остаётся неподтверждённым, пока GitHub Actions не исполняет jobs.
 
 **correctness/useExhaustiveDependencies (10)** — ручная проверка массивов
@@ -55,10 +55,9 @@ biome 2.5.14, ошибки требуют ручных решений по гр�
 - `apps/web/src/components/notification-bell.tsx:26`
 - `apps/web/src/components/server-follow-button.tsx:29`
 
-**suspicious/noArrayIndexKey (10)** — заменить ключи по индексу на стабильные id:
+**suspicious/noArrayIndexKey (8 из исходных 10)** — заменить ключи по индексу на стабильные id:
 
 - `apps/web/src/app/admin/page.tsx:482`
-- `apps/web/src/app/loading.tsx:17` и `:25`
 - `apps/web/src/app/market/[slug]/page.tsx:337`
 - `apps/web/src/app/notifications/page.tsx:205`
 - `apps/web/src/components/mta-meta-inspector-panel.tsx:328`, `:374`, `:402`
@@ -189,6 +188,8 @@ TS-валидация есть только на входе приложений
 ---
 
 ## Недавно исправлено (справочно, из истории)
+
+- `2cfb4b4` — фиксированные идентификаторы ключей для четырёх loading-карточек.
 
 - `43a996f` — объявление в `switch` маршрута follow заключено в блок.
 - `60ccbd0` — счётчик оценок статьи доступен через видимый текст без
