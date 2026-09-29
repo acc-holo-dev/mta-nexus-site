@@ -102,7 +102,7 @@ export function ServerHistoryPanel({
             className="flex h-32 items-end gap-1 rounded-lg border border-base bg-inset px-3 pb-2 pt-4"
             aria-label={copy.chartLabel}
           >
-            {points.map((point, index) => {
+            {points.map((point) => {
               const percent = serverHistoryBarPercent(
                 point.currentPlayers,
                 peak,
@@ -110,7 +110,7 @@ export function ServerHistoryPanel({
               const label = formatObservationTimeUtc(point.observedAt);
               return (
                 <li
-                  key={`${point.observedAt}-${index}`}
+                  key={point.id ?? point.observedAt}
                   className="flex h-full min-w-0 flex-1 items-end"
                 >
                   <div className="flex h-full w-full items-end">
