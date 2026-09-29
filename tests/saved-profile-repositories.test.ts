@@ -12,6 +12,7 @@ vi.mock("../packages/db/src/client", () => ({
           captured.conditions.push(condition);
           const query = {
             orderBy: () => query,
+            // biome-ignore lint/suspicious/noThenProperty: The Drizzle selection mock must be awaitable.
             then: (resolve: (rows: unknown[]) => void) => resolve([]),
           };
           return query;
