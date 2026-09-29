@@ -27,12 +27,17 @@ describe("mainline repository policy", () => {
     expect(dependabot.match(/package-ecosystem:/g)?.length).toBe(3);
   });
 
-  it("keeps only the two maintained long-form documents", () => {
+  it("keeps only the three maintained long-form documents", () => {
     const documents = readdirSync(resolve(process.cwd(), "docs"))
       .filter((name) => name.endsWith(".md"))
       .sort();
 
-    expect(documents).toEqual(["ARCHITECTURE.md", "OPERATIONS.md"]);
+    // PROBLEMS.md is the single maintained problem registry (owner-requested).
+    expect(documents).toEqual([
+      "ARCHITECTURE.md",
+      "OPERATIONS.md",
+      "PROBLEMS.md",
+    ]);
   });
 
   it("keeps Docker DEV source mounts and polling enabled", () => {

@@ -1,6 +1,10 @@
 packages:
   - "apps/*"
   - "packages/*"
+# The repository develops through the Docker path (no host node_modules).
+# Host-side orchestration scripts (pnpm dev:docker:*, pnpm test:isolated) must
+# not trigger pnpm's automatic dependency installation before running.
+verifyDepsBeforeRun: warn
 allowBuilds:
   esbuild: true
 overrides:

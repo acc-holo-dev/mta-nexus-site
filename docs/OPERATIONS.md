@@ -224,7 +224,7 @@ Codex should execute the stages below in order. Each stage must leave `main` bet
 
 - ~~delete all non-`main` remote branches after the safety check above~~ — deleted 2026-09-29 (see 7.3.A);
 - workspace metadata verified: no temporary planning or abandoned artifact files remain (`packages/db/src/seed-extra.ts` is an intentionally untracked local demo seed, kept out of git);
-- only `README.md`, `docs/ARCHITECTURE.md` and `docs/OPERATIONS.md` remain maintained prose documentation; the dated audit evidence lives outside the maintained docs in gitignored `artifacts/audit/` (enforced by `tests/mainline-repository-policy.test.ts`);
+- `README.md`, `docs/ARCHITECTURE.md`, `docs/OPERATIONS.md` and `docs/PROBLEMS.md` remain the maintained prose documentation; dated audit evidence does not live in the repository (enforced by `tests/mainline-repository-policy.test.ts`);
 - package manifests and workspace metadata consistent with the current beta version.
 
 Acceptance: GitHub shows exactly one branch, `main`, and the repository documentation policy remains satisfied. ✅ Verified 2026-09-29.
@@ -251,7 +251,7 @@ Progress 2026-09-29 (verified inside the local Docker development stack, Node 26
 - `pnpm test` — green: 198 files / 767 tests, including the previously broken root-level `tests/` suite (root `package.json` now declares `next` and `drizzle-orm` devDependencies so isolated pnpm layouts resolve them) and the account-mail capacity suites (they now reset the disposable queue before capacity assertions; `vitest.config.ts` serializes test files to remove cross-file queue races);
 - `pnpm build` — green with production env vars (fail-closed config validation intentionally rejects `http://`/localhost production URLs);
 - `pnpm test:isolated` (new) — green: full suite against a freshly recreated disposable `mta_nexus_test` database inside the local stack;
-- `pnpm lint` — still red: 34 errors / ~149 warnings are documented with locations and remediation guidance in `artifacts/audit/2026-09-29-audit.md`;
+- `pnpm lint` — still red: 34 errors / ~149 warnings are documented with locations and remediation guidance in `docs/PROBLEMS.md` (P1-1);
 - remaining blocker: GitHub Actions still cannot execute jobs (see 7.3.B) — `pnpm release:verify` must be re-run on restored CI runners.
 
 Acceptance: all host-side verification passes on a named exact SHA. ⚠️ Blocked only by lint debt (documented) and the CI runner outage.
@@ -277,9 +277,16 @@ Verify:
 
 Acceptance: full local stack is healthy and reproducible from a clean environment.
 
-#### Stage 4 — Browser acceptance in RU/EN and light/dark themes
+#### Stage 4 — Browser acceptance in RU/EN and light/dark themes — DONE 2026-09-29
 
 Use an actual browser against the running application. Test desktop and narrow mobile viewports.
+
+Executed 2026-09-29 with a real (containerized Chromium + Firefox) browser:
+guest → registration → claim → download → publish → ClamAV scan → admin
+moderation → download of the newly approved resource, plus RU/EN, light/dark,
+command palette, mobile 390px and 404. Found issues are tracked in
+`docs/PROBLEMS.md` (P1-2 no-h1, P2-1 external resources, P2-2 dev hostname,
+P2-3 seed files); three UX defects were fixed in commit `b33371a`.
 
 Minimum journeys:
 

@@ -107,10 +107,11 @@ The free resource library at `/market` supports category and text search, three 
 
 ## Documentation
 
-Only two long-form documents are maintained:
+Only three long-form documents are maintained:
 
 - [Architecture / Архитектура](docs/ARCHITECTURE.md)
 - [Operations / Эксплуатация](docs/OPERATIONS.md)
+- [Problems / Реестр проблем](docs/PROBLEMS.md) — the single open-problem registry
 
 Everything else should be represented by executable code, migrations, tests, commit history, or issues instead of additional standalone planning documents.
 
