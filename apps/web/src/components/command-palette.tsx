@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import { useRouter } from "next/navigation";
 import {
   Bell,
@@ -44,6 +44,7 @@ export function CommandPalette({
   const [searchError, setSearchError] = useState(false);
   const [searchRevision, setSearchRevision] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const commands: Command[] = [
     {
@@ -111,6 +112,11 @@ export function CommandPalette({
     setLoading(false);
     setSearchError(false);
     setActiveIndex(0);
+    const previousFocus = document.activeElement;
+    searchInputRef.current?.focus();
+    return () => {
+      if (previousFocus instanceof HTMLElement) previousFocus.focus();
+    };
   }, [isOpen]);
 
   useEffect(() => {
@@ -193,21 +199,24 @@ export function CommandPalette({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 px-4 pt-[12vh] backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label={copy.dialogLabel}
-    >
+    <div className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[12vh]">
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label={copy.close}
+        onClick={onClose}
+        className="absolute inset-0 cursor-default bg-black/60 backdrop-blur-sm"
+      />
       <div
-        className="flex w-full max-w-xl flex-col overflow-hidden rounded-xl border border-strong bg-elevated shadow-nexus-lg"
-        onClick={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={copy.dialogLabel}
+        className="relative flex w-full max-w-xl flex-col overflow-hidden rounded-xl border border-strong bg-elevated shadow-nexus-lg"
       >
         <div className="flex items-center border-b border-base px-4 py-3">
           <Search className="mr-3 h-4 w-4 text-muted" aria-hidden="true" />
           <input
-            autoFocus
+            ref={searchInputRef}
             type="search"
             placeholder={copy.searchPlaceholder}
             value={query}
