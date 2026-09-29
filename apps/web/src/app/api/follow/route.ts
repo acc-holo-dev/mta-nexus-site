@@ -27,9 +27,10 @@ async function targetExists(targetType: TargetType, targetId: string): Promise<b
   switch (targetType) {
     case "user":
       return (await userRepository.findById(targetId)) !== null;
-    case "server":
+    case "server": {
       const server = await serverRepository.findById(targetId);
       return server !== null && server.visibility !== "private" && server.status !== "suspended";
+    }
     case "product": {
       const product = await productRepository.findById(targetId);
       return product !== null && product.status === "published" && product.price === 0;
