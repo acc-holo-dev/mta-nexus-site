@@ -26,6 +26,7 @@ export function ServerFollowButton({
   const [pending, setPending] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
     let active = true;
     const controller = new AbortController();
@@ -183,3 +184,4 @@ export function ServerFollowButton({
     </button>
   );
 }
+

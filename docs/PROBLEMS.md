@@ -37,31 +37,30 @@
 
 ## P1 — существенные проблемы
 
-### P1-1. Lint-долг: 34 ошибки по последнему полному прогону
+### P1-1. Lint-долг: полный повторный прогон ещё требуется
 
-biome 2.5.14, ошибки требуют ручных решений по группам. Двадцать отмеченных предупреждений исправлены в последних коммитах;
-текущий счёт не подтверждён новым полным прогоном.
-`pnpm check` остаётся неподтверждённым, пока GitHub Actions не исполняет jobs.
+Исторический полный прогон Biome 2.5.14 находил 34 ошибки. 2026-09-29
+повторно проверена выборка из 21 файла актуального main с корневым
+biome.json и package.json корня, web и ui (манифесты необходимы для
+определения React-правил). Команда:
+`biome lint --vcs-enabled=false --max-diagnostics=100 .`.
 
-**correctness/useExhaustiveDependencies (10)** — ручная проверка массивов
-зависимостей (авто-фикс может изменить поведение):
+После правок в выборке осталось **4 ошибки, 7 предупреждений и 1 info**.
+Это не полный `pnpm check`, не typecheck и не проверка поведения в браузере.
+Прежняя оценка «20 исправлено» не была подтверждена измерением.
 
-- `apps/web/src/app/acquire/page.tsx:36`
-- `apps/web/src/app/settings/page.tsx:167`
-- `apps/web/src/components/account-controls.tsx:21`
-- `apps/web/src/components/command-palette.tsx:127`
-- `apps/web/src/components/context-switcher.tsx:26`
-- `apps/web/src/components/mta-master-server-directory.tsx:146` (и ещё 2 в файле)
-- `apps/web/src/components/notification-bell.tsx:26`
-- `apps/web/src/components/server-follow-button.tsx:29`
+**suspicious/noArrayIndexKey (4)**:
 
-**suspicious/noArrayIndexKey (4 из исходных 10)** — заменить ключи по индексу на стабильные id:
+- `apps/web/src/components/mta-meta-inspector-panel.tsx`: ACL, exports, issues;
+- `packages/ui/src/platform.tsx`: DataTableHeader.
 
-- `apps/web/src/components/mta-meta-inspector-panel.tsx:328`, `:374`, `:402`
-- `packages/ui/src/platform.tsx:190`
+Предупреждения выборки: четыре non-null assertions в SMTP, два в тестах
+moderation queues, один type-only import в platform.tsx.
+Info: конкатенация URL каталога вместо template literal.
 
-Порядок работы: отдельная задача «lint: zero errors», по группам; после каждой
-группы — `pnpm check` + ручной smoke соответствующих страниц.
+**Следующий шаг:** выбрать стабильную идентичность элементов без потери
+дубликатов, затем выполнить полный lint/check и smoke повторной загрузки,
+смены языка и проверки сессии. CI остаётся заблокирован проблемой P0-1.
 
 ### P1-2. Заголовки детальных страниц (a11y/SEO)
 

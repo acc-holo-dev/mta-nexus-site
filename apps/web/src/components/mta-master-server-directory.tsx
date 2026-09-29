@@ -143,6 +143,7 @@ export function MtaMasterServerDirectory({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
@@ -202,7 +203,7 @@ export function MtaMasterServerDirectory({
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [minimumPlayers, page, query, attempt, locale]);
+  }, [minimumPlayers, page, query, attempt, copy.directoryFetchError, copy.directoryTimeout]);
 
   const totalPages = Math.max(
     1,
@@ -400,3 +401,4 @@ export function MtaMasterServerDirectory({
     </section>
   );
 }
+

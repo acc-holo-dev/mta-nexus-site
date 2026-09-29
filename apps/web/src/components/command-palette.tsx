@@ -130,6 +130,7 @@ export function CommandPalette({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(searchRevision): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
     if (!isOpen || !query.trim()) {
       setResults([]);
@@ -389,3 +390,4 @@ export function CommandPalette({
     </div>
   );
 }
+

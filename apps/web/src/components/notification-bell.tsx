@@ -23,6 +23,7 @@ export function NotificationBell() {
   const mutationGeneration = useRef(0);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
     let active = true;
 
@@ -249,3 +250,4 @@ export function NotificationBell() {
     </div>
   );
 }
+

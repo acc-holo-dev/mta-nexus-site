@@ -23,6 +23,7 @@ export function ContextSwitcher() {
   const [error, setError] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(reload): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -142,3 +143,4 @@ export function ContextSwitcher() {
     </section>
   );
 }
+

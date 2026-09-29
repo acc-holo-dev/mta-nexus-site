@@ -18,6 +18,8 @@ export function AccountControls() {
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(pathname): Recheck the session after navigation, including sign-in and sign-out.
+  // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
     let active = true;
     const controller = new AbortController();
@@ -104,9 +106,9 @@ export function AccountControls() {
     "inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-base bg-elevated px-2 text-xs font-semibold text-primary transition-colors hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] sm:px-2.5";
 
   return (
+    // biome-ignore lint/a11y/useSemanticElements: Mixed links and a button form a named group, not a form fieldset.
     <div
       aria-label={copy.groupLabel}
-      // biome-ignore lint/a11y/useSemanticElements: Mixed links and a button form a named group, not a form fieldset.
       role="group"
       className="relative flex min-w-0 items-center gap-1.5 sm:gap-2"
     >
@@ -172,3 +174,4 @@ export function AccountControls() {
     </div>
   );
 }
+

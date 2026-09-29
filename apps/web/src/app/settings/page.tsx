@@ -164,6 +164,7 @@ export default function SettingsPage() {
     );
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(revision): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
     let active = true;
     setLoading(true);
@@ -798,3 +799,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

@@ -33,6 +33,7 @@ function AcquireContent() {
   const [claimedProductId, setClaimedProductId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies(loadRevision): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
     if (!productId) return;
 
@@ -294,3 +295,4 @@ export default function AcquirePage() {
     </Suspense>
   );
 }
+
