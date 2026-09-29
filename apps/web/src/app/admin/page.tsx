@@ -478,8 +478,9 @@ export default async function AdminPage({
                       <span>{copy.reportEvidence}:</span>
                       {report.evidenceUrls
                         .filter((url) => /^https?:\/\//i.test(url))
+                        .filter((url, index, urls) => urls.indexOf(url) === index)
                         .map((url, index) => (
-                          <a key={`${index}-${url}`} href={url} target="_blank" rel="noopener noreferrer" className="break-all text-accent underline">
+                          <a key={url} href={url} target="_blank" rel="noopener noreferrer" aria-label={`${copy.reportEvidence} ${index + 1}: ${url}`} className="break-all text-accent underline">
                             {index + 1}
                           </a>
                         ))}
