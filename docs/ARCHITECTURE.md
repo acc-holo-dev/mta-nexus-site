@@ -145,7 +145,18 @@ Public and reviewer delivery share a metadata guard before download-started audi
 writes. A known storage size/hash mismatch produces private HTTP 409 with
 `BUILD_ARTIFACT_MISMATCH`, and closes the stream. Missing bytes produce 404.
 Local storage obtains metadata and the stream from the same open file handle, so
-pathname replacement cannot switch the streamed file after stat. This does not
-protect against writes into that same inode. Local reads do not recompute SHA-256:
-same-size corruption is not detected unless a provider supplies a conflicting hash.
-Providers without metadata retain the recorded positive content-length fallback.
+pathname replacement cannot switch the streamed file after stat. Local reads
+compute SHA-256 with a 64 KiB buffer before delivery and verify size/timestamps
+again after hashing. Both download routes reject same-size corruption against the
+recorded hash before auditing a download. This adds a full disk read before the
+response, without buffering the entire archive. A privileged external writer can
+still modify the same inode after verification; storage is not a tamper-proof
+snapshot. Providers without metadata retain the recorded content-length fallback.
+
+Local uploads snapshot caller-owned bytes, write a private temporary file, flush
+and close it, then atomically publish it using a hard link. Existing keys always
+raise a conflict, even for identical content. Concurrent writers cannot overwrite
+the winner; failed writes/publications remove their temporary file. New releases
+must use new keys, as `StorageService.uploadAsset` already does. This is an atomic
+publication guarantee, not a cross-filesystem/database transaction or a complete
+power-loss durability guarantee.

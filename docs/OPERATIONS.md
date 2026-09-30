@@ -546,3 +546,22 @@ compare response length/hash to disk, rerun seed, and confirm account edits rema
 A 409 `BUILD_ARTIFACT_MISMATCH` means storage metadata disagrees with the build;
 inspect storage and the build record before retrying. Current acceptance gaps
 remain in [PROBLEMS.md](PROBLEMS.md).
+
+### Local archive integrity and immutable keys
+
+Local downloads hash the opened file before responding. Same-size corruption now
+returns the same private 409 `BUILD_ARTIFACT_MISMATCH` as a size mismatch, for both
+public and reviewer downloads. Hashing uses a 64 KiB buffer but adds a full disk
+read per download; include this cost in latency/load acceptance tests.
+
+Uploads atomically publish complete files and refuse an existing storage key.
+Do not retry with a reused key or edit published files in place. Publish a new
+build/key through the normal upload workflow. Filesystem administrators can still
+change an inode after verification; keep application storage private and treat
+manual file changes as maintenance requiring verification.
+
+A process crash may leave a UUID-suffixed `.tmp` file. Automatic cleanup covers
+handled failures, not process termination. Inspect orphan files before cleanup;
+never remove files belonging to an active upload. Filesystems must support hard
+links within the storage directory; unsupported publication fails without a
+partially published destination.

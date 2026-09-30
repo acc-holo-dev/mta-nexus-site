@@ -4,7 +4,7 @@ export class BuildArtifactMismatchError extends Error {
   }
 }
 
-/** Compare metadata supplied by storage; this does not rehash a local file. */
+/** Compare provider metadata before delivery; local storage hashes the opened file. */
 export function assertBuildDownloadMetadata(
   stored: { stream: NodeJS.ReadableStream; meta?: { sizeBytes?: number; sha256Hash?: string } },
   build: { fileSizeBytes: number; sha256Hash: string },

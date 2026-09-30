@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
+import { ConflictError } from "@nexus/domain";
 import type { StorageProvider, StorageObjectMeta } from "./types";
 
 export class LocalStorageProvider implements StorageProvider {
@@ -26,14 +27,35 @@ export class LocalStorageProvider implements StorageProvider {
 
   async put(key: string, data: Buffer | Uint8Array, mimeType: string): Promise<StorageObjectMeta> {
     const filePath = this.resolvePath(key);
+    // Snapshot caller-owned memory before yielding, then publish complete bytes only.
+    const bytes = Buffer.from(data);
+    const hash = crypto.createHash("sha256").update(bytes).digest("hex");
     await fs.mkdir(path.dirname(filePath), { recursive: true });
-    await fs.writeFile(filePath, data);
-
-    const hash = crypto.createHash("sha256").update(data).digest("hex");
+    const temporary = `${filePath}.${crypto.randomUUID()}.tmp`;
+    const handle = await fs.open(temporary, "wx", 0o600);
+    try {
+      try {
+        await handle.writeFile(bytes);
+        await handle.sync();
+      } finally {
+        await handle.close();
+      }
+      try {
+        // A hard link is atomic and cannot replace a previously published key.
+        await fs.link(temporary, filePath);
+      } catch (error) {
+        if (error instanceof Error && "code" in error && error.code === "EEXIST") {
+          throw new ConflictError("Storage key already exists; upload under a new key");
+        }
+        throw error;
+      }
+    } finally {
+      await fs.unlink(temporary);
+    }
 
     return {
       key,
-      sizeBytes: data.byteLength,
+      sizeBytes: bytes.byteLength,
       mimeType,
       sha256Hash: hash,
       isPrivate: false,
@@ -49,7 +71,34 @@ export class LocalStorageProvider implements StorageProvider {
     try {
       const stat = await handle.stat();
       if (!stat.isFile()) throw new Error("Storage object is not a regular file");
-      return { stream: handle.createReadStream(), meta: { key, sizeBytes: stat.size } };
+      // Bounded memory: hash the opened file before any response/audit is produced.
+      // Positional reads leave the stream offset at zero and keep pathname races out.
+      const hash = crypto.createHash("sha256");
+      const buffer = Buffer.allocUnsafe(64 * 1024);
+      let position = 0;
+      while (position < stat.size) {
+        const { bytesRead } = await handle.read(
+          buffer,
+          0,
+          Math.min(buffer.length, stat.size - position),
+          position,
+        );
+        if (bytesRead === 0) throw new Error("Storage object changed while reading");
+        hash.update(buffer.subarray(0, bytesRead));
+        position += bytesRead;
+      }
+      const after = await handle.stat();
+      if (
+        after.size !== stat.size ||
+        after.mtimeMs !== stat.mtimeMs ||
+        after.ctimeMs !== stat.ctimeMs
+      ) {
+        throw new Error("Storage object changed while reading");
+      }
+      return {
+        stream: handle.createReadStream({ start: 0 }),
+        meta: { key, sizeBytes: stat.size, sha256Hash: hash.digest("hex") },
+      };
     } catch (error) {
       await handle.close();
       throw error;

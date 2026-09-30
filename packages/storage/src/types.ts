@@ -10,6 +10,7 @@ export interface StorageObjectMeta {
 }
 
 export interface StorageProvider {
+  /** Publish a new immutable key. Existing keys must never be overwritten. */
   put(key: string, data: Buffer | Uint8Array, mimeType: string): Promise<StorageObjectMeta>;
   get(key: string): Promise<{ stream: NodeJS.ReadableStream; meta?: Partial<StorageObjectMeta> }>;
   delete(key: string): Promise<void>;

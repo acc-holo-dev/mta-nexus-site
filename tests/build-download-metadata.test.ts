@@ -1,9 +1,13 @@
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { LocalStorageProvider } from "../packages/storage/src/local-provider";
 import { Readable } from "node:stream";
 import { NextRequest } from "next/server";
 import { ValidationError } from "@nexus/domain";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ download: vi.fn(), audit: vi.fn() }));
+const mocks = vi.hoisted(() => ({ download: vi.fn(), audit: vi.fn(), hash: "a".repeat(64) }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => ({ id: "admin", role: "admin" }) },
 }));
@@ -38,8 +42,12 @@ vi.mock("@nexus/db", () => {
       findById: async () => ({ id: "product", slug: "product", status: "published" }),
     },
     buildRepository: {
-      findById: async () => build,
-      findLatestPublishedByProduct: async () => ({ ...build, status: "published" }),
+      findById: async () => ({ ...build, sha256Hash: mocks.hash }),
+      findLatestPublishedByProduct: async () => ({
+        ...build,
+        status: "published",
+        sha256Hash: mocks.hash,
+      }),
     },
     auditRepository: { record: mocks.audit },
   };
@@ -55,6 +63,7 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
       : publicDownload(req, { params: Promise.resolve({ id: "product" }) });
   };
   beforeEach(() => {
+    mocks.hash = "a".repeat(64);
     mocks.download.mockReset();
     mocks.audit.mockReset();
   });
@@ -95,4 +104,30 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
     expect(await response.text()).toBe("data");
     expect(mocks.audit).toHaveBeenCalledOnce();
   });
+  it.each([false, true])(
+    "checks actual local bytes before delivery (corrupted=%s)",
+    async (corrupted) => {
+      const root = await mkdtemp(join(tmpdir(), "nexus-http-integrity-"));
+      try {
+        const provider = new LocalStorageProvider(root);
+        const meta = await provider.put("build.zip", Buffer.from("data"), "application/zip");
+        mocks.hash = meta.sha256Hash;
+        if (corrupted) await writeFile(join(root, "build.zip"), "oops");
+        mocks.download.mockImplementation((key: string) => provider.get(key));
+        const response = await request();
+        if (corrupted) {
+          expect(response.status).toBe(409);
+          expect(await response.json()).toMatchObject({ code: "BUILD_ARTIFACT_MISMATCH" });
+          expect(mocks.audit).not.toHaveBeenCalled();
+        } else {
+          expect(response.status).toBe(200);
+          expect(await response.text()).toBe("data");
+          expect(response.headers.get("X-Content-SHA256")).toBe(meta.sha256Hash);
+          expect(mocks.audit).toHaveBeenCalledOnce();
+        }
+      } finally {
+        await rm(root, { recursive: true, force: true });
+      }
+    },
+  );
 });
