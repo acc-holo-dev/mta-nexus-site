@@ -1,3 +1,5 @@
+import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
+import { parseProfilePage } from "../../../lib/profile-pagination";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Calendar, ShieldCheck } from "lucide-react";
@@ -40,8 +42,10 @@ export async function generateMetadata({
 
 export default async function UserProfilePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ username: string }>;
+  searchParams?: Promise<{ page?: string | string[] }>;
 }) {
   const { username } = await params;
   const locale = await getRequestLocale();
@@ -53,10 +57,12 @@ export default async function UserProfilePage({
     notFound();
   }
 
-  const [userProducts, userServers] = await Promise.all([
-    productRepository.listPublishedFreeByAuthor(user.id),
+  const query = await searchParams;
+  const [resourcePage, userServers] = await Promise.all([
+    productRepository.pagePublishedFreeByAuthor(user.id, parseProfilePage(query?.page), 24),
     serverRepository.listActivePublicByOwner(user.id),
   ]);
+  const userProducts = resourcePage.products;
   const directory = userServers.length > 0
     ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
     : null;
@@ -115,7 +121,7 @@ export default async function UserProfilePage({
         <div className="grid min-w-52 grid-cols-2 gap-3">
           <StatCard
             label={copy.resources}
-            value={userProducts.length}
+            value={resourcePage.total}
             tone="accent"
           />
           <StatCard
@@ -126,10 +132,10 @@ export default async function UserProfilePage({
         </div>
       </section>
 
-      {userProducts.length > 0 && (
-        <section className="space-y-4">
+      {resourcePage.total > 0 && (
+        <section id="resources" className="space-y-4">
           <h2 className="font-heading text-primary">
-            {copy.authoredResources} ({userProducts.length})
+            {copy.authoredResources} ({resourcePage.total})
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {userProducts.map((product) => (
@@ -140,6 +146,7 @@ export default async function UserProfilePage({
               />
             ))}
           </div>
+          <ProfileResourcePagination basePath={`/users/${encodeURIComponent(user.username)}`} page={resourcePage.page} totalPages={resourcePage.totalPages} locale={locale} />
         </section>
       )}
 

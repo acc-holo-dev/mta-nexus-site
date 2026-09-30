@@ -201,3 +201,10 @@ clamps requested pages to the counted final page. Counts and rows use separate
 statements, so concurrent publication/moderation can change the result between
 them; no snapshot-consistency guarantee is made. Other callers of the existing
 full author-list method retain their current behavior.
+
+Public user profiles also use the bounded author-resource page query. Both user
+and developer profiles share parameter parsing and a server-rendered pagination
+component with localized labels and a resources-section anchor. Resource totals
+remain independent of page size. User-owned public servers retain their existing
+selection and live-directory degradation behavior; server-list pagination is not
+part of this change.

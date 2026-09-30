@@ -118,8 +118,8 @@ it("renders the total and navigation for the requested author page", async () =>
     await Page({ ...params(), searchParams: Promise.resolve({ page: "2" }) }),
   );
   expect(state.products).toHaveBeenCalledWith("author", 2, 24);
-  expect(html).toContain('href="/developers/creator?page=1"');
-  expect(html).toContain('href="/developers/creator?page=3"');
+  expect(html).toContain('href="/developers/creator?page=1#resources"');
+  expect(html).toContain('href="/developers/creator?page=3#resources"');
   expect(html).toContain("49");
   expect(html).toContain("Second page resource");
 });

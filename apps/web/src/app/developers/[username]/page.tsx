@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
+import { parseProfilePage } from "../../../lib/profile-pagination";
 import { notFound } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { Avatar, EmptyState, StatCard } from "@nexus/ui";
@@ -48,8 +49,7 @@ export default async function DeveloperProfilePage({
   }
 
   const query = await searchParams;
-  const requestedPage =
-    typeof query?.page === "string" && /^[1-9]\d{0,8}$/.test(query.page) ? Number(query.page) : 1;
+  const requestedPage = parseProfilePage(query?.page);
   const result = await productRepository.pagePublishedFreeByAuthor(user.id, requestedPage, 24);
   const authorProducts = result.products;
   const profilePath = `/developers/${encodeURIComponent(user.username)}`;
@@ -91,7 +91,7 @@ export default async function DeveloperProfilePage({
         </div>
       </section>
 
-      <section className="space-y-6">
+      <section id="resources" className="space-y-6">
         <h2 className="font-heading text-primary">
           {copy.releasesBy} {user.displayName}
         </h2>
@@ -104,38 +104,7 @@ export default async function DeveloperProfilePage({
         ) : (
           <EmptyState title={copy.noReleases} description={copy.bioFallback} />
         )}
-        {result.totalPages > 1 && (
-          <nav
-            aria-label={dictionary.market.paginationLabel}
-            className="flex items-center justify-between gap-3"
-          >
-            {result.page > 1 ? (
-              <Link
-                href={`${profilePath}?page=${result.page - 1}`}
-                rel="prev"
-                className="text-sm text-accent underline"
-              >
-                {dictionary.market.previousPage}
-              </Link>
-            ) : (
-              <span />
-            )}
-            <span className="text-sm text-secondary">
-              {dictionary.market.pageLabel} {result.page} / {result.totalPages}
-            </span>
-            {result.page < result.totalPages ? (
-              <Link
-                href={`${profilePath}?page=${result.page + 1}`}
-                rel="next"
-                className="text-sm text-accent underline"
-              >
-                {dictionary.market.nextPage}
-              </Link>
-            ) : (
-              <span />
-            )}
-          </nav>
-        )}
+        <ProfileResourcePagination basePath={profilePath} page={result.page} totalPages={result.totalPages} locale={locale} />
       </section>
     </div>
   );
