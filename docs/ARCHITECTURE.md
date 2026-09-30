@@ -170,3 +170,10 @@ audit and return private 499 `DOWNLOAD_CANCELLED` if no response has started.
 An audit already written during cancellation remains a download-started event,
 not evidence of completed delivery. This does not interrupt an in-flight OS read
 or database operation; it stops subsequent work at the next cancellation check.
+
+Asset keys use `assets/<validated-owner-id>/<generated-asset-id>.<extension>`.
+The original filename is kept in build metadata, never in filesystem components.
+This bounds key components even for long or non-ASCII names and leaves room for
+atomic-upload temporary suffixes. Owner IDs are restricted to 1–128 ASCII letters,
+digits, underscores or hyphens. Existing stored keys remain readable; no migration
+or file rename is needed.

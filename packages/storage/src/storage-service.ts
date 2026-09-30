@@ -50,10 +50,15 @@ export class StorageService {
       );
     }
 
+    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(input.userId)) {
+      throw new ValidationError("Invalid storage owner identifier");
+    }
+
     const sha256Hash = crypto.createHash("sha256").update(input.data).digest("hex");
     const id = generateId("ast");
-    const sanitizedName = path.basename(input.fileName).replace(/[^a-zA-Z0-9._-]/g, "_");
-    const key = `assets/${input.userId}/${id}_${sanitizedName}`;
+    // Original names belong in build metadata, not filesystem components.
+    // A generated key leaves room for the atomic writer's temporary suffix.
+    const key = `assets/${input.userId}/${id}${ext}`;
 
     const provider = getStorageProvider();
     const meta = await provider.put(key, input.data, input.mimeType);
