@@ -99,9 +99,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
-    const stored = await storageService.getDownloadStream(latestBuild.storageKey);
+    const stored = await storageService.getDownloadStream(latestBuild.storageKey, request.signal);
     const contentLength = assertBuildDownloadMetadata(stored, latestBuild);
     try {
+      request.signal.throwIfAborted();
       await auditRepository.record({
         id: generateId("aud"),
         actorId: user.id,
@@ -111,6 +112,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         targetType: "product",
         details: { buildId: latestBuild.id, version: latestBuild.version },
       });
+      request.signal.throwIfAborted();
     } catch (error) {
       destroyOpenedStream(stored.stream);
       throw error;
@@ -129,6 +131,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       },
     });
   } catch (error: unknown) {
+    if (request.signal.aborted) {
+      return NextResponse.json(
+        { error: "Download cancelled", code: "DOWNLOAD_CANCELLED" },
+        { status: 499, headers: privateHeaders },
+      );
+    }
     if (error instanceof BuildArtifactMismatchError) {
       return NextResponse.json(
         {

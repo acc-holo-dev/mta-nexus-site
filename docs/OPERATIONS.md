@@ -565,3 +565,11 @@ handled failures, not process termination. Inspect orphan files before cleanup;
 never remove files belonging to an active upload. Filesystems must support hard
 links within the storage directory; unsupported publication fails without a
 partially published destination.
+
+Cancelled downloads propagate the request signal to storage. Preparation stops
+between disk reads; streams and abort listeners are released. A cancellation
+before response delivery maps to private 499 `DOWNLOAD_CANCELLED`, without a
+server-error log. The disconnected client may never receive this response.
+If cancellation races with an audit write, the started event can remain; it must
+not be interpreted as a completed download. Include a real network disconnect
+during hashing and during response streaming in deployment acceptance checks.

@@ -56,8 +56,8 @@ import { GET as publicDownload } from "../apps/web/src/app/api/products/[id]/dow
 import { GET as reviewDownload } from "../apps/web/src/app/api/admin/builds/[buildId]/download/route";
 
 describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
-  const request = () => {
-    const req = new NextRequest("http://nexus.test/download");
+  const request = (signal?: AbortSignal) => {
+    const req = new NextRequest("http://nexus.test/download", { signal });
     return reviewer
       ? reviewDownload(req, { params: Promise.resolve({ buildId: "build" }) })
       : publicDownload(req, { params: Promise.resolve({ id: "product" }) });
@@ -130,4 +130,31 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
       }
     },
   );
+  it("does not audit when cancellation arrives during storage preparation", async () => {
+    const controller = new AbortController();
+    const stream = Readable.from(Buffer.from("data"));
+    mocks.download.mockImplementation(async (_key: string, signal: AbortSignal) => {
+      expect(signal.aborted).toBe(false);
+      controller.abort();
+      return { stream, meta: { sizeBytes: 4 } };
+    });
+    const response = await request(controller.signal);
+    expect(response.status).toBe(499);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(await response.json()).toMatchObject({ code: "DOWNLOAD_CANCELLED" });
+    expect(stream.destroyed).toBe(true);
+    expect(mocks.audit).not.toHaveBeenCalled();
+  });
+
+  it("closes a prepared stream if cancellation arrives during audit", async () => {
+    const controller = new AbortController();
+    const stream = Readable.from(Buffer.from("data"));
+    mocks.download.mockResolvedValue({ stream, meta: { sizeBytes: 4 } });
+    mocks.audit.mockImplementation(async () => { controller.abort(); });
+    const response = await request(controller.signal);
+    expect(response.status).toBe(499);
+    expect(stream.destroyed).toBe(true);
+    expect(mocks.audit).toHaveBeenCalledOnce();
+  });
+
 });

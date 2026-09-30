@@ -278,7 +278,7 @@ describe("resource download HTTP contract", () => {
       'filename="http-resource-1.2.3.zip"',
     );
     expect(Buffer.from(await response.arrayBuffer()).toString("utf8")).toBe("nexus-build");
-    expect(downloadStream).toHaveBeenCalledWith("assets/http-resource.zip");
+    expect(downloadStream).toHaveBeenCalledWith("assets/http-resource.zip", expect.any(AbortSignal));
     expect(auditRecord).toHaveBeenCalledTimes(1);
     expect(auditRecord).toHaveBeenCalledWith(
       expect.objectContaining({

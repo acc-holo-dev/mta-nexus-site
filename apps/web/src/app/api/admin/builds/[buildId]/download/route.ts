@@ -81,9 +81,10 @@ export async function GET(
       );
     }
 
-    const stored = await storageService.getDownloadStream(build.storageKey);
+    const stored = await storageService.getDownloadStream(build.storageKey, request.signal);
     const contentLength = assertBuildDownloadMetadata(stored, build);
     try {
+      request.signal.throwIfAborted();
       await auditRepository.record({
         id: generateId("aud"),
         actorId: actor.id,
@@ -96,6 +97,7 @@ export async function GET(
           version: build.version,
         },
       });
+      request.signal.throwIfAborted();
     } catch (error) {
       destroyOpenedStream(stored.stream);
       throw error;
@@ -116,6 +118,12 @@ export async function GET(
       },
     });
   } catch (error: unknown) {
+    if (request.signal.aborted) {
+      return NextResponse.json(
+        { error: "Download cancelled", code: "DOWNLOAD_CANCELLED" },
+        { status: 499, headers: privateHeaders },
+      );
+    }
     if (error instanceof BuildArtifactMismatchError) {
       return NextResponse.json(
         {

@@ -160,3 +160,13 @@ the winner; failed writes/publications remove their temporary file. New releases
 must use new keys, as `StorageService.uploadAsset` already does. This is an atomic
 publication guarantee, not a cross-filesystem/database transaction or a complete
 power-loss durability guarantee.
+
+Download cancellation propagates from the HTTP request through StorageService to
+local storage. Hash preparation checks the signal before opening and between
+64 KiB reads, closing the descriptor on failure. A prepared stream listens for
+abort and closes without emitting an unhandled error while audit is pending; its
+listener is removed on stream close. Routes check cancellation before and after
+audit and return private 499 `DOWNLOAD_CANCELLED` if no response has started.
+An audit already written during cancellation remains a download-started event,
+not evidence of completed delivery. This does not interrupt an in-flight OS read
+or database operation; it stops subsequent work at the next cancellation check.

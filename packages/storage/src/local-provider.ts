@@ -65,10 +65,13 @@ export class LocalStorageProvider implements StorageProvider {
 
   async get(
     key: string,
+    signal?: AbortSignal,
   ): Promise<{ stream: NodeJS.ReadableStream; meta?: Partial<StorageObjectMeta> }> {
+    signal?.throwIfAborted();
     const filePath = this.resolvePath(key);
     const handle = await fs.open(filePath, "r");
     try {
+      signal?.throwIfAborted();
       const stat = await handle.stat();
       if (!stat.isFile()) throw new Error("Storage object is not a regular file");
       // Bounded memory: hash the opened file before any response/audit is produced.
@@ -77,12 +80,14 @@ export class LocalStorageProvider implements StorageProvider {
       const buffer = Buffer.allocUnsafe(64 * 1024);
       let position = 0;
       while (position < stat.size) {
+        signal?.throwIfAborted();
         const { bytesRead } = await handle.read(
           buffer,
           0,
           Math.min(buffer.length, stat.size - position),
           position,
         );
+        signal?.throwIfAborted();
         if (bytesRead === 0) throw new Error("Storage object changed while reading");
         hash.update(buffer.subarray(0, bytesRead));
         position += bytesRead;
@@ -95,8 +100,17 @@ export class LocalStorageProvider implements StorageProvider {
       ) {
         throw new Error("Storage object changed while reading");
       }
+      signal?.throwIfAborted();
+      const stream = handle.createReadStream({ start: 0 });
+      // Cancellation during the audit await must not emit an unhandled error.
+      // The route rechecks the signal before auditing/returning a response.
+      if (signal) {
+        const abort = () => stream.destroy();
+        signal.addEventListener("abort", abort, { once: true });
+        stream.once("close", () => signal.removeEventListener("abort", abort));
+      }
       return {
-        stream: handle.createReadStream({ start: 0 }),
+        stream,
         meta: { key, sizeBytes: stat.size, sha256Hash: hash.digest("hex") },
       };
     } catch (error) {

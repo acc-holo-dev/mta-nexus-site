@@ -71,14 +71,16 @@ export class StorageService {
     await provider.delete(key);
   }
 
-  async getDownloadStream(key: string) {
+  async getDownloadStream(key: string, signal?: AbortSignal) {
+    signal?.throwIfAborted();
     const provider = getStorageProvider();
     const exists = await provider.exists(key);
+    signal?.throwIfAborted();
     if (!exists) {
       throw new ValidationError("Asset does not exist in storage");
     }
     try {
-      return await provider.get(key);
+      return await provider.get(key, signal);
     } catch (error) {
       if (error instanceof Error && "code" in error && error.code === "ENOENT") {
         throw new ValidationError("Asset does not exist in storage");
