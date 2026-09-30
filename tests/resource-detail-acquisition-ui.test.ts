@@ -17,10 +17,8 @@ describe("resource detail acquisition and delivery UI", () => {
 
   it("shows one latest-build download action instead of one per history row", () => {
     const page = read("apps/web/src/app/market/[slug]/page.tsx");
-    const downloadLinks =
-      page.match(/\/api\/products\/\$\{product\.id\}\/download/g) ?? [];
-
-    expect(downloadLinks).toHaveLength(1);
+    expect(page.match(/<ResourceDownloadButton\b/g)).toHaveLength(1);
+    expect(page).toContain("productId={product.id}");
     expect(page).toContain("copy.latestBuildNotice");
     expect(page).not.toContain("buildRepository");
   });

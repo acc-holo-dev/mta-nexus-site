@@ -27,7 +27,7 @@ describe("J5 resource browser acceptance contract", () => {
     expect(harness).toContain("'clean'");
   });
 
-  it("claims through the real checkout UI and downloads through the product UI", () => {
+  it("claims through the real acquisition UI and downloads through the product UI", () => {
     const browser = read("scripts/tests/resource-claim-download.playwright.mjs");
 
     expect(browser).toContain("page.goto(`/market/${productSlug}`)");
@@ -36,6 +36,9 @@ describe("J5 resource browser acceptance contract", () => {
     expect(browser).toContain('page.goto("/workspace")');
     expect(browser).toContain('"Download Build v1.0.0"');
     expect(browser).toContain('page.waitForEvent("download")');
+    expect(browser).toContain('getByRole("alert")');
+    expect(browser).toContain("BUILD_ARTIFACT_MISMATCH");
+    expect(browser).toContain("/acquire");
     expect(browser).toContain('createHash("sha256")');
     expect(browser).toContain("assert.equal(actualSha256, expectedSha256)");
   });

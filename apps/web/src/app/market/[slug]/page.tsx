@@ -1,10 +1,10 @@
+import { ResourceDownloadButton } from "../../../components/resource-download-button";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import type { Metadata } from "next";
 import {
   CheckCircle2,
-  Download,
   Key,
   Layers,
   MessageSquare,
@@ -409,15 +409,7 @@ export default async function ProductDetailPage({
                     </p>
                   </div>
 
-                  <a
-                    href={`/api/products/${product.id}/download`}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--nexus-success)] py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90"
-                  >
-                    <Download className="h-4 w-4" aria-hidden="true" />
-                    <span>
-                      {copy.downloadBuild} v{product.currentVersion}
-                    </span>
-                  </a>
+                  <ResourceDownloadButton productId={product.id} version={product.currentVersion} />
 
                   <Link
                     href="/workspace"

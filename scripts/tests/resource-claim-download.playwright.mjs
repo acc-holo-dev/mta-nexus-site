@@ -107,17 +107,17 @@ test("J5 claim -> workspace -> download exact published build", async ({
       page.getByRole("link", { name: "Add to library", exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: /Download Build/u }),
+      page.getByRole("button", { name: /Download Build/u }),
     ).toHaveCount(0);
 
     await page
       .getByRole("link", { name: "Add to library", exact: true })
       .click();
     await expect(page).toHaveURL(
-      new RegExp(`/checkout\\?productId=${productId}$`, "u"),
+      new RegExp(`/acquire\\?productId=${productId}$`, "u"),
     );
     await expect(
-      page.getByRole("heading", { name: "Secure Checkout", exact: true }),
+      page.getByRole("heading", { name: "Add resource to library", exact: true }),
     ).toBeVisible();
     await expect(page.getByText(productTitle, { exact: true })).toBeVisible();
 
@@ -140,7 +140,7 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await expect(page).toHaveURL(new RegExp(`/market/${productSlug}$`, "u"));
     await expect(page.getByText("In your library", { exact: true })).toBeVisible();
     await expect(
-      page.getByRole("link", {
+      page.getByRole("button", {
         name: "Download Build v1.0.0",
         exact: true,
       }),
@@ -156,9 +156,20 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await expect(page.getByText(productTitle, { exact: true })).toBeVisible();
 
     await page.goto(`/market/${productSlug}`);
+    const downloadPattern = "**/api/products/*/download";
+    await page.route(downloadPattern, (route) => route.fulfill({
+      status: 409,
+      contentType: "application/json",
+      body: JSON.stringify({ code: "BUILD_ARTIFACT_MISMATCH" }),
+    }));
+    await page.getByRole("button", { name: "Download Build v1.0.0", exact: true }).click();
+    await expect(page.getByRole("alert")).toContainText("This build cannot be downloaded right now");
+    await expect(page).toHaveURL(new RegExp(`/market/${productSlug}$`, "u"));
+    await page.unroute(downloadPattern);
+
     const downloadPromise = page.waitForEvent("download");
     await page
-      .getByRole("link", {
+      .getByRole("button", {
         name: "Download Build v1.0.0",
         exact: true,
       })

@@ -177,3 +177,13 @@ This bounds key components even for long or non-ASCII names and leaves room for
 atomic-upload temporary suffixes. Owner IDs are restricted to 1–128 ASCII letters,
 digits, underscores or hyphens. Existing stored keys remain readable; no migration
 or file rename is needed.
+
+The resource detail download control uses a same-origin authenticated fetch so
+HTTP failures stay on the product page with RU/EN messages. The client bounds
+received bytes to the upload limit, checks declared length, and saves only a
+complete response. It rejects HTML/JSON error pages and partial status responses.
+An AbortController cancels on user request or unmount. Browser download handoff
+uses a temporary object URL, revoked after handoff, replacement or unmount.
+The UI reports handoff rather than claiming that the browser saved a file.
+This bounded Blob approach buffers up to 64 MiB of payload, with additional
+browser allocation overhead; it is not intended for unbounded large downloads.
