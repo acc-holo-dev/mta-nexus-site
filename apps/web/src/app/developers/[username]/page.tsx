@@ -2,12 +2,30 @@ import { notFound } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { Avatar, EmptyState, StatCard } from "@nexus/ui";
 import { authService } from "../../../lib/services/auth-service";
-import { productService } from "../../../lib/services/product-service";
+import { productRepository } from "@nexus/db";
+import type { Metadata } from "next";
 import { ProductCard } from "../../../components/product-card";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: { params: Promise<{ username: string }> }): Promise<Metadata> {
+  const { username } = await params;
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const user = await authService.getUserByUsername(username);
+  if (!user || (user.role !== "developer" && user.role !== "admin")) {
+    return { title: dictionary.profiles.userNotFound, robots: { index: false, follow: false } };
+  }
+  return {
+    title: `${user.displayName} (@${user.username})`,
+    description: user.bio?.slice(0, 155) || dictionary.developers.bioFallback,
+    alternates: { canonical: `/developers/${encodeURIComponent(user.username)}` },
+  };
+}
 
 export default async function DeveloperProfilePage({
   params,
@@ -24,10 +42,7 @@ export default async function DeveloperProfilePage({
     notFound();
   }
 
-  const allProducts = await productService.listProducts({ limit: 100 });
-  const authorProducts = allProducts.filter(
-    (product) => product.authorId === user.id,
-  );
+  const authorProducts = await productRepository.listPublishedFreeByAuthor(user.id);
 
   return (
     <div className="space-y-10">
