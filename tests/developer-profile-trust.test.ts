@@ -25,7 +25,7 @@ describe("creator profile trust signals", () => {
     expect(page).toContain("authService.getUserByUsername(username)");
     expect(page).toContain('user.role !== "developer"');
     expect(page).toContain('user.role !== "admin"');
-    expect(page).toContain("productRepository.listPublishedFreeByAuthor(user.id)");
+    expect(page).toContain("productRepository.pagePublishedFreeByAuthor(user.id");
     expect(page).not.toContain("allProducts.filter");
     expect(page).not.toContain("100%");
     expect(page).not.toContain("Reputation");

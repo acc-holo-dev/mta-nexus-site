@@ -193,3 +193,11 @@ can release a pending read on wrapped streams. Reader cancellation is best-effor
 a stalled/rejected cleanup promise must not keep the UI busy or replace the
 original HTTP failure. The reader lock and abort listener are released on exit.
 Already-aborted requests do not start a fetch.
+
+Developer profile releases use a bounded author-scoped page query (24 per page),
+with a separate total under identical public/free/safe-build conditions. Stable
+ordering is created_at DESC, id DESC. The repository bounds page size to 100 and
+clamps requested pages to the counted final page. Counts and rows use separate
+statements, so concurrent publication/moderation can change the result between
+them; no snapshot-consistency guarantee is made. Other callers of the existing
+full author-list method retain their current behavior.

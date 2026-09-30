@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { Avatar, EmptyState, StatCard } from "@nexus/ui";
@@ -12,7 +13,9 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
-}: { params: Promise<{ username: string }> }): Promise<Metadata> {
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
   const { username } = await params;
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
@@ -29,8 +32,10 @@ export async function generateMetadata({
 
 export default async function DeveloperProfilePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ username: string }>;
+  searchParams?: Promise<{ page?: string | string[] }>;
 }) {
   const { username } = await params;
   const locale = await getRequestLocale();
@@ -42,7 +47,12 @@ export default async function DeveloperProfilePage({
     notFound();
   }
 
-  const authorProducts = await productRepository.listPublishedFreeByAuthor(user.id);
+  const query = await searchParams;
+  const requestedPage =
+    typeof query?.page === "string" && /^[1-9]\d{0,8}$/.test(query.page) ? Number(query.page) : 1;
+  const result = await productRepository.pagePublishedFreeByAuthor(user.id, requestedPage, 24);
+  const authorProducts = result.products;
+  const profilePath = `/developers/${encodeURIComponent(user.username)}`;
 
   return (
     <div className="space-y-10">
@@ -57,21 +67,14 @@ export default async function DeveloperProfilePage({
           />
           <div className="min-w-0 space-y-1.5">
             <div className="flex items-center gap-2">
-              <h1 className="truncate text-2xl font-black text-primary">
-                {user.displayName}
-              </h1>
+              <h1 className="truncate text-2xl font-black text-primary">{user.displayName}</h1>
               {user.isVerified && (
                 <span title={copy.verifiedIdentity}>
-                  <ShieldCheck
-                    className="h-5 w-5 text-success"
-                    aria-hidden="true"
-                  />
+                  <ShieldCheck className="h-5 w-5 text-success" aria-hidden="true" />
                 </span>
               )}
             </div>
-            <div className="truncate text-xs text-faint">
-              @{user.username}
-            </div>
+            <div className="truncate text-xs text-faint">@{user.username}</div>
             <p className="max-w-xl text-sm leading-relaxed text-muted">
               {user.bio || copy.bioFallback}
             </p>
@@ -79,11 +82,7 @@ export default async function DeveloperProfilePage({
         </div>
 
         <div className="grid min-w-48 grid-cols-2 gap-3">
-          <StatCard
-            label={copy.resources}
-            value={authorProducts.length}
-            tone="accent"
-          />
+          <StatCard label={copy.resources} value={result.total} tone="accent" />
           <StatCard
             label={copy.profileStatus}
             value={user.isVerified ? copy.verified : copy.public}
@@ -99,18 +98,43 @@ export default async function DeveloperProfilePage({
         {authorProducts.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {authorProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                locale={locale}
-              />
+              <ProductCard key={product.id} product={product} locale={locale} />
             ))}
           </div>
         ) : (
-          <EmptyState
-            title={copy.noReleases}
-            description={copy.bioFallback}
-          />
+          <EmptyState title={copy.noReleases} description={copy.bioFallback} />
+        )}
+        {result.totalPages > 1 && (
+          <nav
+            aria-label={dictionary.market.paginationLabel}
+            className="flex items-center justify-between gap-3"
+          >
+            {result.page > 1 ? (
+              <Link
+                href={`${profilePath}?page=${result.page - 1}`}
+                rel="prev"
+                className="text-sm text-accent underline"
+              >
+                {dictionary.market.previousPage}
+              </Link>
+            ) : (
+              <span />
+            )}
+            <span className="text-sm text-secondary">
+              {dictionary.market.pageLabel} {result.page} / {result.totalPages}
+            </span>
+            {result.page < result.totalPages ? (
+              <Link
+                href={`${profilePath}?page=${result.page + 1}`}
+                rel="next"
+                className="text-sm text-accent underline"
+              >
+                {dictionary.market.nextPage}
+              </Link>
+            ) : (
+              <span />
+            )}
+          </nav>
         )}
       </section>
     </div>

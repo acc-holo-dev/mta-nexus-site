@@ -30,6 +30,27 @@ export interface ProductQueryOptions {
 }
 
 export class ProductRepository {
+  async pagePublishedFreeByAuthor(authorId: string, requestedPage = 1, requestedSize = 24) {
+    const pageSize = Number.isFinite(requestedSize)
+      ? Math.min(Math.max(Math.floor(requestedSize), 1), 100) : 24;
+    const requested = Number.isFinite(requestedPage)
+      ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER) : 1;
+    const condition = and(
+      eq(products.authorId, authorId),
+      eq(products.status, "published"),
+      eq(products.price, 0),
+      hasSafePublishedBuild(),
+    );
+    const [summary] = await db.select({ total: count() }).from(products).where(condition);
+    const total = summary?.total ?? 0;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const page = Math.min(requested, totalPages);
+    const rows = await db.select().from(products).where(condition)
+      .orderBy(desc(products.createdAt), desc(products.id))
+      .limit(pageSize).offset((page - 1) * pageSize);
+    return { products: rows as unknown as Product[], total, page, pageSize, totalPages };
+  }
+
   async countPublishedFree(): Promise<number> {
     const [row] = await db.select({ total: count() }).from(products).where(and(
       eq(products.status, "published"),
