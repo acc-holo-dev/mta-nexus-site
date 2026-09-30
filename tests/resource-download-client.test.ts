@@ -123,3 +123,83 @@ it("does not compare decoded bytes with a proxy's compressed content length", as
   expect(await result.blob.text()).toBe("archive");
   expect(progress).toHaveBeenCalledWith(7, null);
 });
+
+it("does not fetch for an already cancelled request", async () => {
+  const active = controller();
+  active.abort();
+  const fetcher = vi.fn<typeof fetch>();
+  await expect(fetchResourceDownload("id", active.signal, vi.fn(), fetcher)).rejects.toMatchObject({
+    name: "AbortError",
+  });
+  expect(fetcher).not.toHaveBeenCalled();
+});
+
+it("cancels a pending read even when no next chunk arrives", async () => {
+  const active = controller();
+  const cancelled = vi.fn();
+  let started = () => {};
+  const reading = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  const body = new ReadableStream<Uint8Array>(
+    {
+      pull() {
+        started();
+      },
+      cancel: cancelled,
+    },
+    { highWaterMark: 0 },
+  );
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body));
+  const download = fetchResourceDownload("id", active.signal, vi.fn(), fetcher);
+  await reading;
+  active.abort();
+  await expect(download).rejects.toMatchObject({ name: "AbortError" });
+  expect(cancelled).toHaveBeenCalledOnce();
+  expect(body.locked).toBe(false);
+});
+
+it("does not await a stalled underlying cancel operation", async () => {
+  const active = controller();
+  let started = () => {};
+  const reading = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  const body = new ReadableStream<Uint8Array>(
+    {
+      pull() {
+        started();
+      },
+      cancel() {
+        return new Promise<void>(() => {});
+      },
+    },
+    { highWaterMark: 0 },
+  );
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body));
+  const download = fetchResourceDownload("id", active.signal, vi.fn(), fetcher);
+  await reading;
+  active.abort();
+  await expect(download).rejects.toMatchObject({ name: "AbortError" });
+  expect(body.locked).toBe(false);
+});
+
+it("preserves the HTTP error when response cleanup fails", async () => {
+  const body = new ReadableStream<Uint8Array>({
+    cancel() {
+      throw new Error("cleanup failed");
+    },
+  });
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, { status: 401 }));
+  await expect(
+    fetchResourceDownload("id", controller().signal, vi.fn(), fetcher),
+  ).rejects.toMatchObject({ reason: "signIn" });
+});
+
+it("removes the abort listener after successful reading", async () => {
+  const active = controller();
+  const remove = vi.spyOn(active.signal, "removeEventListener");
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response());
+  await fetchResourceDownload("id", active.signal, vi.fn(), fetcher);
+  expect(remove).toHaveBeenCalledWith("abort", expect.any(Function));
+});

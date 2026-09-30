@@ -50,7 +50,7 @@
 - зависимости установлены через `pnpm install --frozen-lockfile`;
 - полный `pnpm typecheck` прошёл;
 - production `pnpm build` прошёл с тестовой конфигурацией;
-- `test:resource-integrity`: 122 теста в 15 файлах;
+- `test:resource-integrity`: 127 тестов в 15 файлах;
 - `test:scanner`: 119 тестов в 17 файлах;
 - `test:catalog`: 20 тестов в 11 файлах;
 - `test:resource`: 16 тестов в 6 файлах;

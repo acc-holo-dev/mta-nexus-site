@@ -187,3 +187,9 @@ uses a temporary object URL, revoked after handoff, replacement or unmount.
 The UI reports handoff rather than claiming that the browser saved a file.
 This bounded Blob approach buffers up to 64 MiB of payload, with additional
 browser allocation overhead; it is not intended for unbounded large downloads.
+
+The download client also binds abort directly to its body reader so cancellation
+can release a pending read on wrapped streams. Reader cancellation is best-effort:
+a stalled/rejected cleanup promise must not keep the UI busy or replace the
+original HTTP failure. The reader lock and abort listener are released on exit.
+Already-aborted requests do not start a fetch.

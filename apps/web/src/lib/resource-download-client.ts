@@ -21,13 +21,14 @@ export async function fetchResourceDownload(
   onProgress: (received: number, total: number | null) => void,
   request: typeof fetch = fetch,
 ): Promise<{ blob: Blob; fileName: string }> {
+  signal.throwIfAborted();
   const response = await request(`/api/products/${encodeURIComponent(productId)}/download`, {
     credentials: "same-origin",
     cache: "no-store",
     signal,
   });
   if (!response.ok) {
-    await response.body?.cancel();
+    void response.body?.cancel().catch(() => undefined);
     const reasons: Record<number, DownloadFailure> = {
       401: "signIn",
       403: "access",
@@ -39,7 +40,7 @@ export async function fetchResourceDownload(
   }
   const mime = response.headers.get("Content-Type")?.split(";")[0].trim().toLowerCase();
   if (response.status !== 200 || mime === "text/html" || mime === "application/json") {
-    await response.body?.cancel();
+    void response.body?.cancel().catch(() => undefined);
     throw new ResourceDownloadError("failed");
   }
   // Fetch exposes decoded bytes; a proxy may report the compressed wire length.
@@ -47,7 +48,7 @@ export async function fetchResourceDownload(
   const header =
     !encoding || encoding === "identity" ? response.headers.get("Content-Length") : null;
   if (header !== null && !/^\d+$/.test(header)) {
-    await response.body?.cancel();
+    void response.body?.cancel().catch(() => undefined);
     throw new ResourceDownloadError("failed");
   }
   const total = header !== null && /^\d+$/.test(header) ? Number(header) : null;
@@ -55,11 +56,18 @@ export async function fetchResourceDownload(
     total !== null &&
     (!Number.isSafeInteger(total) || total <= 0 || total > MAX_UPLOAD_FILE_SIZE_BYTES)
   ) {
-    await response.body?.cancel();
+    void response.body?.cancel().catch(() => undefined);
     throw new ResourceDownloadError("failed");
   }
   if (!response.body) throw new ResourceDownloadError("failed");
   const reader = response.body.getReader();
+  // A wrapped response stream need not inherit fetch's AbortSignal. Cancel the
+  // reader directly so a pending read can finish even without another chunk.
+  const cancel = () => {
+    void reader.cancel().catch(() => undefined);
+  };
+  signal.addEventListener("abort", cancel, { once: true });
+  if (signal.aborted) cancel();
   const chunks: ArrayBuffer[] = [];
   let received = 0;
   try {
@@ -79,9 +87,10 @@ export async function fetchResourceDownload(
       throw new ResourceDownloadError("failed");
     }
   } catch (error) {
-    await reader.cancel().catch(() => undefined);
+    cancel();
     throw error;
   } finally {
+    signal.removeEventListener("abort", cancel);
     reader.releaseLock();
   }
   const name = response.headers.get("Content-Disposition")?.match(/filename="([^"]+)"/)?.[1];
