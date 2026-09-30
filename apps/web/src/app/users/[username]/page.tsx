@@ -45,7 +45,7 @@ export default async function UserProfilePage({
   searchParams,
 }: {
   params: Promise<{ username: string }>;
-  searchParams?: Promise<{ page?: string | string[] }>;
+  searchParams?: Promise<{ page?: string | string[]; serverPage?: string | string[] }>;
 }) {
   const { username } = await params;
   const locale = await getRequestLocale();
@@ -58,11 +58,12 @@ export default async function UserProfilePage({
   }
 
   const query = await searchParams;
-  const [resourcePage, userServers] = await Promise.all([
+  const [resourcePage, serverPage] = await Promise.all([
     productRepository.pagePublishedFreeByAuthor(user.id, parseProfilePage(query?.page), 24),
-    serverRepository.listActivePublicByOwner(user.id),
+    serverRepository.pageActivePublicByOwner(user.id, parseProfilePage(query?.serverPage), 12),
   ]);
   const userProducts = resourcePage.products;
+  const userServers = serverPage.servers;
   const directory = userServers.length > 0
     ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
     : null;
@@ -126,7 +127,7 @@ export default async function UserProfilePage({
           />
           <StatCard
             label={copy.servers}
-            value={userServers.length}
+            value={serverPage.total}
             tone="success"
           />
         </div>
@@ -146,14 +147,14 @@ export default async function UserProfilePage({
               />
             ))}
           </div>
-          <ProfileResourcePagination basePath={`/users/${encodeURIComponent(user.username)}`} page={resourcePage.page} totalPages={resourcePage.totalPages} locale={locale} />
+          <ProfileResourcePagination basePath={`/users/${encodeURIComponent(user.username)}`} page={resourcePage.page} totalPages={resourcePage.totalPages} locale={locale} otherPage={serverPage.page} />
         </section>
       )}
 
-      {userServers.length > 0 && (
-        <section className="space-y-4">
+      {serverPage.total > 0 && (
+        <section id="servers" className="space-y-4">
           <h2 className="font-heading text-primary">
-            {copy.operatedServers} ({userServers.length})
+            {copy.operatedServers} ({serverPage.total})
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {userServers.map((server) => (
@@ -166,6 +167,7 @@ export default async function UserProfilePage({
               />
             ))}
           </div>
+          <ProfileResourcePagination basePath={`/users/${encodeURIComponent(user.username)}`} page={serverPage.page} totalPages={serverPage.totalPages} locale={locale} section="servers" otherPage={resourcePage.page} />
         </section>
       )}
     </div>

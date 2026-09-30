@@ -205,6 +205,10 @@ full author-list method retain their current behavior.
 Public user profiles also use the bounded author-resource page query. Both user
 and developer profiles share parameter parsing and a server-rendered pagination
 component with localized labels and a resources-section anchor. Resource totals
-remain independent of page size. User-owned public servers retain their existing
-selection and live-directory degradation behavior; server-list pagination is not
-part of this change.
+remain independent of page size. User-owned servers use a separate owner-scoped
+active/public page query (12 per page), ordered by updated_at DESC, id DESC.
+Count and page share the same visibility conditions. The `page` and `serverPage`
+parameters are preserved independently by navigation, with links targeting the
+corresponding section. Live-directory enrichment only runs when the selected
+server page contains rows, and directory failures leave the known public servers
+visible. Count and row queries do not promise snapshot consistency.

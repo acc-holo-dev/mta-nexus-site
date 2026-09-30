@@ -5,6 +5,27 @@ import { auditEvents, servers } from "../schema";
 import type { AuditEvent, Server } from "@nexus/domain";
 
 export class ServerRepository {
+  async pageActivePublicByOwner(ownerId: string, requestedPage = 1, requestedSize = 12) {
+    const pageSize = Number.isFinite(requestedSize)
+      ? Math.min(Math.max(Math.floor(requestedSize), 1), 100) : 12;
+    const requested = Number.isFinite(requestedPage)
+      ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER) : 1;
+    const condition = and(
+      eq(servers.ownerId, ownerId),
+      eq(servers.visibility, "public"),
+      eq(servers.status, "active"),
+    );
+    const [summary] = await db.select({ total: count() }).from(servers).where(condition);
+    const total = summary?.total ?? 0;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const page = Math.min(requested, totalPages);
+    const rows = await db.select().from(servers).where(condition)
+      .orderBy(desc(servers.updatedAt), desc(servers.id))
+      .limit(pageSize).offset((page - 1) * pageSize);
+    return { servers: rows as unknown as Server[], total, page, pageSize, totalPages };
+  }
+
+
   async countActivePublic(): Promise<number> {
     const [row] = await db.select({ total: count() }).from(servers).where(and(
       eq(servers.visibility, "public"),
