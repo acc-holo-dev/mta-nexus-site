@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "pnpm dev:docker",
     "build": "pnpm --filter @nexus/web build",
+    "build:webpack": "pnpm --filter @nexus/web build:webpack",
     "start": "pnpm --filter @nexus/web start",
     "lint": "biome lint .",
     "test": "vitest run",

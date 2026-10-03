@@ -573,3 +573,18 @@ server-error log. The disconnected client may never receive this response.
 If cancellation races with an audit write, the started event can remain; it must
 not be interpreted as a completed download. Include a real network disconnect
 during hashing and during response streaming in deployment acceptance checks.
+
+## Production compilation in restricted build environments
+
+The default `pnpm build` uses Next.js Turbopack. Some sandbox environments deny
+its internal local port binding while processing CSS (`Operation not permitted`).
+When that environment limitation is confirmed, run `pnpm build:webpack` explicitly
+with the same production build environment variables. This selects Next.js's
+Webpack compiler and produces the configured standalone output. It does not start
+a web server or disable application configuration validation.
+
+There is no automatic fallback: a failed default build remains a failed gate.
+CI/release verification continues to execute the default build. Record which
+compiler was used; a successful Webpack build does not establish Turbopack parity,
+service connectivity or runtime/browser acceptance. On 2026-10-03 the explicit
+Webpack build passed locally using test-only configuration and no live database.
