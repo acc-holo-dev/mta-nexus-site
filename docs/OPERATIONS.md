@@ -601,3 +601,12 @@ again. A changed commit, dirty final tree or failed Git read blocks the candidat
 both initial and final identity are recorded without serializing changed paths.
 This detects final-state drift, not transient edits that were reverted during the
 run. Use an isolated checkout in CI and avoid editing it during verification.
+
+Local container readiness probes the mounted storage directory using the same
+hard-link publication primitive as local archive uploads. It verifies that a new
+published name is readable, replacement fails with EEXIST, and removing the
+staging name preserves the published bytes. Success includes
+`publication: "atomic-no-replace"`. Filesystems without hard-link support fail
+readiness instead of reporting that uploads are ready based on read/write alone.
+Each probe uses and removes only its own unique temporary directory. This does
+not prove scanner availability, crash durability or end-to-end HTTP uploads.

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { link, mkdtemp, readFile, rm, unlink, writeFile } from 'node:fs/promises';
 import { isAbsolute, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 export async function checkLocalReadiness({
   storagePath = process.env.STORAGE_LOCAL_PATH,
   fetchFn = globalThis.fetch,
+  linkFn = link,
 } = {}) {
   assert(storagePath && isAbsolute(storagePath), 'An absolute storage path is required');
   const response = await fetchFn('http://127.0.0.1:3000/api/health', {
@@ -26,10 +27,19 @@ export async function checkLocalReadiness({
     const file = join(directory, 'probe');
     await writeFile(file, value, { flag: 'wx', mode: 0o600 });
     assert.equal(await readFile(file, 'utf8'), value, 'Storage read/write failed');
+    // LocalStorageProvider publishes using link(), so read/write alone is not
+    // enough to establish that this mounted filesystem supports uploads.
+    const published = join(directory, 'published');
+    await linkFn(file, published);
+    await assert.rejects(linkFn(file, published), { code: 'EEXIST' },
+      'Storage must reject replacement of an already published key');
+    await unlink(file);
+    assert.equal(await readFile(published, 'utf8'), value,
+      'Published storage bytes must survive staging-file removal');
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
-  return { status: 'ok', database: 'reachable', storage: 'read-write' };
+  return { status: 'ok', database: 'reachable', storage: 'read-write', publication: 'atomic-no-replace' };
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -13,6 +13,7 @@ test('checks real storage and cleans only its own probe', async (t) => {
   await writeFile(join(storagePath, 'existing-file'), 'keep');
   const result = await checkLocalReadiness({ storagePath, fetchFn: healthy });
   assert.equal(result.storage, 'read-write');
+  assert.equal(result.publication, 'atomic-no-replace');
   assert.deepEqual(await readdir(storagePath), ['existing-file']);
   assert.equal(await readFile(join(storagePath, 'existing-file'), 'utf8'), 'keep');
 });
@@ -36,4 +37,26 @@ test('does not create a missing storage mount', async (t) => {
 
 test('rejects relative storage paths', async () => {
   await assert.rejects(checkLocalReadiness({ storagePath: './uploads', fetchFn: healthy }), /absolute storage path/);
+});
+
+test('fails and cleans its probe when the mount cannot publish with hard links', async (t) => {
+  const storagePath = await mkdtemp(join(tmpdir(), 'nexus-readiness-links-'));
+  t.after(() => rm(storagePath, { recursive: true, force: true }));
+  await writeFile(join(storagePath, 'existing-file'), 'keep');
+  await assert.rejects(checkLocalReadiness({ storagePath, fetchFn: healthy,
+    linkFn: async () => { throw Object.assign(new Error('hard links unsupported'), { code: 'ENOTSUP' }); },
+  }), { code: 'ENOTSUP' });
+  assert.deepEqual(await readdir(storagePath), ['existing-file']);
+  assert.equal(await readFile(join(storagePath, 'existing-file'), 'utf8'), 'keep');
+});
+
+test('concurrent probes do not overwrite or remove each other or existing data', async (t) => {
+  const storagePath = await mkdtemp(join(tmpdir(), 'nexus-readiness-concurrent-'));
+  t.after(() => rm(storagePath, { recursive: true, force: true }));
+  await writeFile(join(storagePath, 'existing-file'), 'keep');
+  const results = await Promise.all(Array.from({ length: 4 }, () =>
+    checkLocalReadiness({ storagePath, fetchFn: healthy })));
+  assert.ok(results.every((result) => result.publication === 'atomic-no-replace'));
+  assert.deepEqual(await readdir(storagePath), ['existing-file']);
+  assert.equal(await readFile(join(storagePath, 'existing-file'), 'utf8'), 'keep');
 });
