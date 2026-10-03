@@ -14,6 +14,11 @@
     -Server
   }
 
+  # Reject declared oversized bodies even if the upstream never reads them.
+  @oversized_body expression `{header.Content-Length} != "" && int({header.Content-Length}) > 68157440`
+  respond @oversized_body "Request body too large" 413
+
+  # Keep the streaming limit for chunked requests without Content-Length.
   request_body {
     max_size 68157440
   }

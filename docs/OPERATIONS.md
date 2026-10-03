@@ -633,3 +633,9 @@ report exists, upload fails explicitly. Earlier setup failures that skip
 verification do not attempt an upload. Runner termination or job cancellation can
 still prevent artifact preservation; a downloadable report does not imply passed
 gates. Check its repository SHA and summary before using it as release evidence.
+
+The production proxy rejects declared Content-Length above 65 MiB before
+upstream handling, including routes that never read request bodies. The existing
+request_body limit remains in place for streaming/chunked reads. Production smoke
+reports safe phase names and line numbers on failure without shell xtrace or
+command text; all browser rehearsals share this production prerequisite.

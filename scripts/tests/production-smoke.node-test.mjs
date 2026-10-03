@@ -63,3 +63,10 @@ test('pins the production proxy body limit to the application build envelope', (
   assert.match(uploadRoute, /MAX_BUILD_MULTIPART_OVERHEAD_BYTES/u);
   assert.throws(() => assertProductionUploadBodyLimit(caddy.replace('68157440', '65000000')), /65 MiB build-upload envelope/u);
 });
+
+test('requires matching declared-length and streaming limits', () => {
+  const source = readFileSync('deploy/Caddyfile', 'utf8');
+  assert.doesNotThrow(() => assertProductionUploadBodyLimit(source));
+  assert.throws(() => assertProductionUploadBodyLimit(source.replace('> 68157440', '> 68157441')));
+  assert.throws(() => assertProductionUploadBodyLimit(source.replace('respond @oversized_body "Request body too large" 413', '')));
+});

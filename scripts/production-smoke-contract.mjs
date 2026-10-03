@@ -10,6 +10,11 @@ export function assertProductionUploadBodyLimit(source) {
     PRODUCTION_UPLOAD_ENVELOPE_BYTES,
     'Production proxy body limit must equal the 65 MiB build-upload envelope',
   );
+  const declared = source.match(/int\(\{header\.Content-Length\}\) > (\d+)/u);
+  assert(declared, 'Production proxy must reject declared oversized bodies before upstream handling');
+  assert.equal(Number(declared[1]), PRODUCTION_UPLOAD_ENVELOPE_BYTES, "Declared length limit must equal the 65 MiB build-upload envelope");
+  assert.match(source, /respond @oversized_body "Request body too large" 413/u);
+
 }
 
 // Preserve every production proxy directive; change only the test CA policy.
