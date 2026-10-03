@@ -625,3 +625,11 @@ current run's temporary directory. Readers see a complete old or new report.
 Always verify the report SHA and command exit status: a failed run can leave the
 older report in place. Abrupt termination may leave a temporary directory, and
 this does not guarantee directory-entry durability after power loss.
+
+The Verify CI job uploads only `artifacts/release-evidence.json` immediately after
+release verification, including failed verification runs. Artifact names include
+the workflow SHA and attempt; retention is 14 days. If verification ran but no
+report exists, upload fails explicitly. Earlier setup failures that skip
+verification do not attempt an upload. Runner termination or job cancellation can
+still prevent artifact preservation; a downloadable report does not imply passed
+gates. Check its repository SHA and summary before using it as release evidence.

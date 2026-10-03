@@ -164,7 +164,17 @@ jobs:
         run: node --test packages/db/scripts/scenario-lab-contract.node-test.mjs
 
       - name: Verify project and write core release evidence
+        id: release_verification
         run: pnpm release:verify
+
+      - name: Preserve core release evidence
+        if: ${{ always() && steps.release_verification.outcome != 'skipped' }}
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: core-release-evidence-${{ github.sha }}-${{ github.run_attempt }}
+          path: artifacts/release-evidence.json
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Build production image
         run: docker build --tag mta-nexus:ci .

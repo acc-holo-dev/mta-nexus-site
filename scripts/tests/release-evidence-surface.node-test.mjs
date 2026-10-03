@@ -56,3 +56,15 @@ test("repository stability is checked after command execution and feeds the summ
   assert.match(script, /gates\.push\(runGate\("repository_stability"/u);
   assert.match(script, /dirty: dirty \|\| finalDirty/u);
 });
+
+test("CI preserves only the evidence JSON after successful or failed verification", () => {
+  const workflow = read(".github/workflows/ci.yml");
+  const section = workflow.slice(workflow.indexOf("      - name: Preserve core release evidence"), workflow.indexOf("      - name: Build production image"));
+  assert.match(workflow, /id: release_verification/u);
+  assert.match(section, /always\(\) && steps\.release_verification\.outcome != 'skipped'/u);
+  assert.match(section, /uses: actions\/upload-artifact@v7\.0\.1/u);
+  assert.match(section, /path: artifacts\/release-evidence\.json/u);
+  assert.match(section, /if-no-files-found: error/u);
+  assert.match(section, /retention-days: 14/u);
+  assert.doesNotMatch(section, /continue-on-error|include-hidden-files|path: artifacts\s*$/mu);
+});
