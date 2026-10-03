@@ -71,7 +71,13 @@ test("J5 claim -> workspace -> download exact published build", async ({
 
   page.on("pageerror", (error) => browserErrors.push(error.message));
   page.on("console", (message) => {
-    if (message.type() === "error") browserErrors.push(message.text());
+    if (message.type() !== "error") return;
+    // Only the deliberately intercepted download may report the expected 409.
+    const expectedConflict = message.text() ===
+      "Failed to load resource: the server responded with a status of 409 (Conflict)" &&
+      message.location().url ===
+        `${process.env.NEXUS_BROWSER_BASE_URL}/api/products/${productId}/download`;
+    if (!expectedConflict) browserErrors.push(message.text());
   });
 
   try {

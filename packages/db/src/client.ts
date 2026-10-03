@@ -1,10 +1,10 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { config } from "@nexus/config";
+import { readDatabaseUrl } from "./database-config";
 import * as schema from "./schema";
 
 // Connection pool singleton
-const queryClient = postgres(config.DATABASE_URL, {
+const queryClient = postgres(readDatabaseUrl(), {
   max: 10,
   idle_timeout: 20,
   connect_timeout: 10,

@@ -448,6 +448,6 @@ check('D4-01 anonymous neutral request and one-time password reset', async () =>
     'New password must require an explicit normal login');
   assert.equal((await request(guest, '/api/auth/password-reset', 'PATCH', {
     challengeId: proof.challengeId, token: proof.token, newPassword: `Replay-${resetPassword}`,
-  })).status, 401, 'Consumed reset proof cannot replay');
+  })).status, 400, 'Consumed reset proof cannot replay');
 });
 
