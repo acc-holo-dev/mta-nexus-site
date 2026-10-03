@@ -99,6 +99,7 @@ const queueHealth = (): Promise<void> => {
 };
 
 let failed = false;
+let failurePhase = "configuration";
 try {
   const config = readAccountMailRuntimeConfig();
   fingerprint = runtimeFingerprint(config);
@@ -176,12 +177,18 @@ try {
     }
   };
 
+  failurePhase = "health-file";
   await queueHealth();
+  failurePhase = "database-connect";
   if (!controller.signal.aborted) await checkDatabaseConnection();
 
+  failurePhase = "queue-key-coverage";
   await assertQueueKeyCoverage();
+  failurePhase = "provider-gate";
   await refreshProviderGate();
+  failurePhase = "queue-stats";
   await refreshQueueStats();
+  failurePhase = "delivery-stats";
   await refreshDeliveryStats();
 
   if (!controller.signal.aborted) {
@@ -202,6 +209,7 @@ try {
     heartbeatTimer.unref();
   }
 
+  failurePhase = "dispatch-loop";
   const summary = await runAccountMailLoop({
     dispatcher: guardedDispatcher,
     signal: controller.signal,
@@ -265,6 +273,7 @@ try {
   process.stderr.write(JSON.stringify({
     status: "failed",
     config: fingerprint || undefined,
+    phase: fingerprint ? failurePhase : undefined,
   }) + "\n");
   process.exitCode = 1;
 } finally {
