@@ -389,6 +389,9 @@ function run() {
     );
 
     const uploadsBackup = join(temp, "uploads.tar.gz");
+    // Create on the host first: container tar truncates this inode without
+    // transferring ownership to root, so the runner can verify private mode.
+    writeFileSync(uploadsBackup, Buffer.alloc(0), { flag: "wx", mode: 0o600 });
     docker([
       "run",
       "--rm",

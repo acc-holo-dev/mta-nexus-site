@@ -75,6 +75,7 @@ function run() {
     COMPOSE_DISABLE_ENV_FILE: 'true', DOMAIN: 'persistence.invalid',
     ACME_EMAIL: 'ci@persistence.invalid',
     AUTH_SECRET: 'disposable-persistence-test-not-a-production-secret',
+    TRUSTED_PROXY_SECRET: 'disposable-persistence-proxy-config-only',
     POSTGRES_USER: 'nexus_probe', POSTGRES_DB: 'nexus_probe',
     POSTGRES_PASSWORD: 'disposable-config-render-only',
   });

@@ -112,3 +112,11 @@ test("destructive cleanup ownership requires the exact label and volume name", (
     ),
   );
 });
+
+test("uploads archive is host-owned before container tar opens it", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const script = await readFile(new URL("../check-backup-restore.mjs", import.meta.url), "utf8");
+  const create = script.indexOf('writeFileSync(uploadsBackup, Buffer.alloc(0), { flag: "wx", mode: 0o600 })');
+  assert.ok(create > 0);
+  assert.ok(create < script.indexOf('tar -C /data -czf /backup/uploads.tar.gz'));
+});

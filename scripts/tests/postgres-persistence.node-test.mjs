@@ -47,3 +47,9 @@ test('accepts only the intended writable named volume covering actual PGDATA', (
     ...intended, Name: 'shadow-volume', Destination: '/var/lib/postgresql/18',
   }], data, 'unique_pgdata'));
 });
+
+test('Compose render supplies an isolated proxy secret required by the full config', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const script = await readFile(new URL('../check-postgres-persistence.mjs', import.meta.url), 'utf8');
+  assert.match(script, /TRUSTED_PROXY_SECRET: 'disposable-persistence-proxy-config-only'/u);
+});

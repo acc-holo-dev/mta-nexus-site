@@ -189,7 +189,7 @@ docker run --rm --add-host host.docker.internal:host-gateway \
 code=$?
 set -e
 test "$code" -ne 0
-grep -Fxq 'Account mail dispatcher failed' /tmp/nexus-d5-missing.err
+grep -Fxq '{"status":"failed"}' /tmp/nexus-d5-missing.err
 ! grep -F "$mail_key" /tmp/nexus-d5-missing.err
 ! grep -F nexus_test_secret /tmp/nexus-d5-missing.err
 

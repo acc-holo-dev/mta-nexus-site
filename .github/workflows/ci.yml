@@ -122,7 +122,7 @@ jobs:
           export ACCOUNT_MAIL_POLL_INTERVAL_MS=60000
 
           node --import tsx packages/db/scripts/run-account-mail-dispatcher.ts --once > /tmp/account-mail-once.json
-          grep -q '"status":"ok"' /tmp/account-mail-once.json
+          grep -q '"status":"stopped"' /tmp/account-mail-once.json
           ! grep -F "$mail_key" /tmp/account-mail-once.json
           ! grep -F "$abuse_key" /tmp/account-mail-once.json
 
@@ -147,7 +147,7 @@ jobs:
           ! kill -0 "$worker" 2>/dev/null
           wait "$worker"
           grep -q '"status":"ready"' /tmp/account-mail-loop.json
-          grep -q '"status":"ok"' /tmp/account-mail-loop.json
+          grep -q '"status":"stopped"' /tmp/account-mail-loop.json
           test ! -s /tmp/account-mail-loop.err
           ! grep -F "$mail_key" /tmp/account-mail-loop.json
           ! grep -F "$abuse_key" /tmp/account-mail-loop.json
@@ -156,7 +156,7 @@ jobs:
             echo "worker unexpectedly accepted missing mail key"
             exit 1
           fi
-          grep -Fxq "Account mail dispatcher failed" /tmp/account-mail-missing.err
+          grep -Fxq '{"status":"failed"}' /tmp/account-mail-missing.err
           ! grep -F "$AUTH_SECRET" /tmp/account-mail-missing.err
           echo "PASS: dedicated keys, one-shot worker, SIGTERM shutdown and secret-safe failure"
 
