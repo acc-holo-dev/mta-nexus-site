@@ -173,7 +173,8 @@ check('P5 old password fails and new password signs in on another browser', asyn
 
 check('P6 selected session is ended in UI and its cookie no longer authorizes', async () => {
   const target = (await list(guest)).data.sessions.find((s) => s.isCurrent).id;
-  assert.equal((await request(bob, '/api/auth/sessions', 'DELETE', { sessionId: target, userId: aliceId })).status, 404);
+  assert.equal((await request(bob, '/api/auth/sessions', 'DELETE', { sessionId: target, userId: aliceId })).status, 400);
+  assert.equal((await request(bob, '/api/auth/sessions', 'DELETE', { sessionId: target })).status, 404);
   assert.equal((await session(guest)).data.user.id, aliceId);
   await settings(alice);
   const response = alice.page.waitForResponse((r) => r.url().endsWith('/api/auth/sessions') && r.request().method() === 'DELETE');
@@ -203,7 +204,8 @@ check('P7 end-other-sessions keeps this browser and invalidates both other cooki
 check('P8 current and foreign sessions are protected and a body userId cannot target another password', async () => {
   const current = (await list(alice)).data.sessions.find((s) => s.isCurrent).id;
   assert.equal((await request(alice, '/api/auth/sessions', 'DELETE', { sessionId: current })).status, 409);
-  assert.equal((await request(bob, '/api/auth/sessions', 'DELETE', { sessionId: current, userId: aliceId })).status, 404);
+  assert.equal((await request(bob, '/api/auth/sessions', 'DELETE', { sessionId: current, userId: aliceId })).status, 400);
+  assert.equal((await request(bob, '/api/auth/sessions', 'DELETE', { sessionId: current })).status, 404);
   assert.equal((await request(bob, '/api/auth/password', 'POST', { userId: aliceId, currentPassword: newPassword, newPassword: secret() })).status, 401);
   assert.equal((await request(guest, '/api/auth/sessions', 'DELETE', { allOther: true })).status, 401);
   for (const [a, id] of [[alice, aliceId], [bob, bobId]]) assert.equal((await session(a)).data.user.id, id);

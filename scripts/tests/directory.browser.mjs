@@ -96,8 +96,8 @@ check('J1-01 honest player counts, stale data and connection actions', async ({ 
   await expect(page.getByRole('article', { name: 'Empty But Known' })).toContainText('0 players / 32 slots');
   await expect(region(page)).toContainText('Updates are delayed');
   await expect(region(page).locator('time')).toHaveAttribute('datetime', fetchedAt);
-  await expect(page.getByRole('link', { name: 'Connect to Nexus Drift', exact: true })).toHaveAttribute('href', 'mtasa://192.0.2.1:22003');
-  await expect(page.getByRole('textbox', { name: 'Server address for Nexus Drift', exact: true })).toHaveValue('192.0.2.1:22003');
+  await expect(page.getByRole('link', { name: 'Connect: Nexus Drift', exact: true })).toHaveAttribute('href', 'mtasa://192.0.2.1:22003');
+  await expect(page.getByRole('textbox', { name: 'Server address: Nexus Drift', exact: true })).toHaveValue('192.0.2.1:22003');
 }, { route: (route) => respond(route, data(servers, { isStale: true })), capture: true });
 
 check('J1-02 search, pagination and filter reset use the correct request', async ({ page }) => {
@@ -185,12 +185,12 @@ check('J1-06 superseded search requests cannot overwrite the latest results', as
 check('J1-07 keyboard connection and actual clipboard copy', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: baseURL });
   await open(page);
-  const address = page.getByRole('textbox', { name: 'Server address for Nexus Drift', exact: true });
+  const address = page.getByRole('textbox', { name: 'Server address: Nexus Drift', exact: true });
   await address.focus();
   await page.keyboard.press('Tab');
-  await expect(page.getByRole('link', { name: 'Connect to Nexus Drift', exact: true })).toBeFocused();
+  await expect(page.getByRole('link', { name: 'Connect: Nexus Drift', exact: true })).toBeFocused();
   await page.keyboard.press('Tab');
-  await expect(page.getByRole('button', { name: 'Copy address for Nexus Drift', exact: true })).toBeFocused();
+  await expect(page.getByRole('button', { name: 'Copy address: Nexus Drift', exact: true })).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('article', { name: 'Nexus Drift' })).toContainText('Address copied');
   assert.equal(await page.evaluate(() => navigator.clipboard.readText()), '192.0.2.1:22003');
@@ -202,8 +202,8 @@ check('J1-08 denied clipboard selects a manual-copy fallback', async ({ page }) 
     Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: () => Promise.reject(new DOMException('Denied', 'NotAllowedError')) } });
   });
   await open(page);
-  await page.getByRole('button', { name: 'Copy address for Nexus Drift', exact: true }).click();
-  const address = page.getByRole('textbox', { name: 'Server address for Nexus Drift', exact: true });
+  await page.getByRole('button', { name: 'Copy address: Nexus Drift', exact: true }).click();
+  const address = page.getByRole('textbox', { name: 'Server address: Nexus Drift', exact: true });
   await expect(address).toBeFocused();
   await expect(page.getByRole('article', { name: 'Nexus Drift' })).toContainText('copy it manually');
   assert.deepEqual(await address.evaluate((input) => [input.selectionStart, input.selectionEnd]), [0, '192.0.2.1:22003'.length]);
@@ -252,7 +252,7 @@ check('J1-11 agent-browser navigation, snapshot and screenshot', async ({ page }
     await expect(page.getByRole('article', { name: 'Nexus Drift' })).toBeVisible();
     const { stdout } = await agent('snapshot', '-i');
     assert.match(stdout, /Search servers/);
-    assert.match(stdout, /Copy address for Nexus Drift/);
+    assert.match(stdout, /Copy address: Nexus Drift/);
     await writeFile(join(output, 'agent-browser-snapshot.txt'), stdout);
     await agent('screenshot', join(output, 'agent-browser-directory.png'));
     console.log(`Agent-browser snapshot:\n${stdout}`);

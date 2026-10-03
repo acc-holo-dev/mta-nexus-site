@@ -38,6 +38,8 @@ export ACME_EMAIL=ci@nexus-ci.test
 export POSTGRES_USER=nexus
 export POSTGRES_PASSWORD=nexus_test_secret
 export POSTGRES_DB=mta_nexus_test
+# Used only when rendering the full Compose config; never passed to the worker.
+export TRUSTED_PROXY_SECRET=disposable-mail-worker-proxy-config-only
 export ACCOUNT_MAIL_KEY_ID=ci
 export ACCOUNT_MAIL_KEY="$mail_key"
 export ACCOUNT_RECOVERY_ABUSE_KEY="$abuse_key"

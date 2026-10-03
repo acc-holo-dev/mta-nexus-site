@@ -163,7 +163,7 @@ test("J5 claim -> workspace -> download exact published build", async ({
       body: JSON.stringify({ code: "BUILD_ARTIFACT_MISMATCH" }),
     }));
     await page.getByRole("button", { name: "Download Build v1.0.0", exact: true }).click();
-    await expect(page.getByRole("alert")).toContainText("This build cannot be downloaded right now");
+    await expect(page.getByRole("alert").filter({ hasText: "This build cannot be downloaded right now" })).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/market/${productSlug}$`, "u"));
     await page.unroute(downloadPattern);
 

@@ -72,6 +72,7 @@ test("CI preserves only the evidence JSON after successful or failed verificatio
 test("mail worker CI expects current structured terminal events", () => {
   const workflow = read(".github/workflows/ci.yml");
   const production = read("scripts/check-production-mail-worker.sh");
+  assert.ok(production.includes("export TRUSTED_PROXY_SECRET=disposable-mail-worker-proxy-config-only"));
   assert.match(workflow, /'"status":"stopped"' \/tmp\/account-mail-once\.json/u);
   assert.match(workflow, /'"status":"stopped"' \/tmp\/account-mail-loop\.json/u);
   for (const text of [workflow, production]) {

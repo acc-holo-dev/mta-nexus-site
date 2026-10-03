@@ -70,3 +70,11 @@ test('requires matching declared-length and streaming limits', () => {
   assert.throws(() => assertProductionUploadBodyLimit(source.replace('> 68157440', '> 68157441')));
   assert.throws(() => assertProductionUploadBodyLimit(source.replace('respond @oversized_body "Request body too large" 413', '')));
 });
+
+test('live smoke checks both sides of the declared upload boundary', () => {
+  const source = readFileSync('scripts/check-production-startup.sh', 'utf8');
+  assert.match(source, /truncate -s \$\(\(proxy_upload_limit \+ 1\)\)/u);
+  assert.match(source, /truncate -s "\$proxy_upload_limit"/u);
+  assert.match(source, /\[\[ \$at_limit_code == 405 \]\]/u);
+  assert.match(source, /\[\[ \$oversized_code == 413 \]\]/u);
+});

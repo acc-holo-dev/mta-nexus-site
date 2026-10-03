@@ -96,13 +96,13 @@ test("J1 native-runner smoke: honest counts, freshness and connection actions", 
   await expect(directory.locator("time")).toHaveAttribute("datetime", fetchedAt);
   await expect(
     page.getByRole("link", {
-      name: "Connect to Nexus Drift",
+      name: "Connect: Nexus Drift",
       exact: true,
     }),
   ).toHaveAttribute("href", "mtasa://192.0.2.1:22003");
   await expect(
     page.getByRole("textbox", {
-      name: "Server address for Nexus Drift",
+      name: "Server address: Nexus Drift",
       exact: true,
     }),
   ).toHaveValue("192.0.2.1:22003");

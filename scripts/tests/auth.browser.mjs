@@ -122,12 +122,13 @@ async function request(actor, path, method = 'GET', body) {
 async function readSyntheticProof(email, purpose = 'email_verify') {
   const { stdout, stderr } = await execute('docker', [
     'exec',
+    '--workdir', '/app/packages/db',
     '-e', 'GITHUB_ACTIONS=true',
     '-e', 'RUNNER_ENVIRONMENT=github-hosted',
     '-e', 'NEXUS_ACCOUNT_MAIL_TEST_READ=true',
     process.env.NEXUS_BROWSER_APP_CONTAINER,
     'node', '--import', 'tsx',
-    'packages/db/scripts/read-account-email-verification-ci.ts',
+    'scripts/read-account-email-verification-ci.ts',
     email,
     purpose,
   ], { timeout: 30_000, maxBuffer: 16 * 1024 });
@@ -259,7 +260,8 @@ check('J2-04 nonempty session lists are private and another account cannot revok
   assert(!a.text.includes(bobCookie.value) && !a.text.includes(aliceCookie.value) && !b.text.includes(bobCookie.value), 'Raw tokens must not be returned');
   assert(/private/.test(a.cacheControl) && /no-store/.test(a.cacheControl));
   const foreignId = b.data.sessions.find((session) => session.isCurrent).id;
-  assert.equal((await request(alice, '/api/auth/sessions', 'DELETE', { sessionId: foreignId, userId: bobUser.id })).status, 404);
+  assert.equal((await request(alice, '/api/auth/sessions', 'DELETE', { sessionId: foreignId, userId: bobUser.id })).status, 400);
+  assert.equal((await request(alice, '/api/auth/sessions', 'DELETE', { sessionId: foreignId })).status, 404);
   assert((await request(bob, '/api/auth/session')).data.user.id === bobUser.id, 'Other account remains signed in');
 });
 
