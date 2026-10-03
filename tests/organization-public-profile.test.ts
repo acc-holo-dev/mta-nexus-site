@@ -13,7 +13,7 @@ describe("organization public profile queries", () => {
       "productRepository.pagePublishedFreeByOrganization(organization.id, parseProfilePage(query?.page), 24)",
     );
     expect(page).toContain(
-      "contentRepository.listPublishedByOrganization(organization.id, 100)",
+      "contentRepository.pagePublishedEditorialByOrganization(organization.id, parseProfilePage(query?.articlePage), 12)",
     );
     expect(page).not.toContain("productRepository.list()");
     expect(page).not.toContain("contentRepository.listPublished()");

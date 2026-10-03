@@ -20,20 +20,12 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
-const EDITORIAL_TYPES = new Set([
-  "article",
-  "news",
-  "devlog",
-  "update",
-  "announcement",
-]);
-
 export default async function OrganizationProfilePage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ page?: string | string[] }>;
+  searchParams?: Promise<{ page?: string | string[]; articlePage?: string | string[] }>;
 }) {
   const { slug } = await params;
   const locale = await getRequestLocale();
@@ -46,14 +38,12 @@ export default async function OrganizationProfilePage({
   }
 
   const query = await searchParams;
-  const [resourcePage, publishedContent] = await Promise.all([
+  const [resourcePage, articlePage] = await Promise.all([
     productRepository.pagePublishedFreeByOrganization(organization.id, parseProfilePage(query?.page), 24),
-    contentRepository.listPublishedByOrganization(organization.id, 100),
+    contentRepository.pagePublishedEditorialByOrganization(organization.id, parseProfilePage(query?.articlePage), 12),
   ]);
   const products = resourcePage.products;
-  const articles = publishedContent.filter((item) =>
-    EDITORIAL_TYPES.has(item.type),
-  );
+  const articles = articlePage.items;
 
   return (
     <div className="space-y-10">
@@ -138,14 +128,14 @@ export default async function OrganizationProfilePage({
               />
             ))}
           </div>
-          <ProfileResourcePagination basePath={`/organizations/${encodeURIComponent(organization.slug)}`} page={resourcePage.page} totalPages={resourcePage.totalPages} locale={locale} />
+          <ProfileResourcePagination basePath={`/organizations/${encodeURIComponent(organization.slug)}`} page={resourcePage.page} totalPages={resourcePage.totalPages} locale={locale} otherSection="articles" otherPage={articlePage.page} />
         </section>
       )}
 
-      {articles.length > 0 && (
-        <section className="space-y-4">
+      {articlePage.total > 0 && (
+        <section id="articles" className="space-y-4">
           <h2 className="font-heading text-primary">
-            {copy.articles} ({articles.length})
+            {copy.articles} ({articlePage.total})
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {articles.map((article) => (
@@ -156,6 +146,7 @@ export default async function OrganizationProfilePage({
               />
             ))}
           </div>
+          <ProfileResourcePagination basePath={`/organizations/${encodeURIComponent(organization.slug)}`} page={articlePage.page} totalPages={articlePage.totalPages} locale={locale} section="articles" otherPage={resourcePage.page} />
         </section>
       )}
     </div>

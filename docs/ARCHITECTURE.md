@@ -218,3 +218,10 @@ pagination implementation as author portfolios, scoped by organization ID before
 counting and limiting. Pages contain 24 resources; the displayed total comes from
 the matching count query. The shared profile navigation uses `page` and anchors
 the resource section. Count and rows are separate queries, not a snapshot.
+
+Organization editorial content is paged separately in batches of 12 via
+`articlePage`. Organization, published status and the five editorial types
+(article, news, devlog, update, announcement) are applied in SQL to both count
+and rows. Ordering uses publication time (falling back to update time), then ID.
+Shared navigation preserves the clamped page of the other section; empty sections
+have no navigation. This removes the former first-100 in-memory article filter.

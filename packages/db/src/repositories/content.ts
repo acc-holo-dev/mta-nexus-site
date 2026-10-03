@@ -56,6 +56,27 @@ export class ContentRepository {
     return rows as unknown as Content[];
   }
 
+  async pagePublishedEditorialByOrganization(organizationId: string, requestedPage = 1, requestedSize = 12) {
+    const pageSize = Number.isFinite(requestedSize)
+      ? Math.min(Math.max(Math.floor(requestedSize), 1), 100) : 12;
+    const requested = Number.isFinite(requestedPage)
+      ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER) : 1;
+    const editorialTypes: Content["type"][] = ["article", "news", "devlog", "update", "announcement"];
+    const condition = and(
+      eq(content.organizationId, organizationId),
+      eq(content.status, "published"),
+      inArray(content.type, editorialTypes),
+    );
+    const [summary] = await db.select({ total: count() }).from(content).where(condition);
+    const total = summary?.total ?? 0;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const page = Math.min(requested, totalPages);
+    const rows = await db.select().from(content).where(condition)
+      .orderBy(desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`), desc(content.id))
+      .limit(pageSize).offset((page - 1) * pageSize);
+    return { items: rows as unknown as Content[], total, page, pageSize, totalPages };
+  }
+
   async listPublishedByOrganization(
     organizationId: string,
     limit = 100,

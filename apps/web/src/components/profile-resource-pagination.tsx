@@ -8,33 +8,40 @@ export function ProfileResourcePagination({
   locale,
   section = "resources",
   otherPage = 1,
+  otherSection = "servers",
 }: {
   basePath: string;
   page: number;
   totalPages: number;
   locale: Locale;
-  section?: "resources" | "servers";
+  section?: "resources" | "servers" | "articles";
+  otherSection?: "servers" | "articles";
   otherPage?: number;
 }) {
   if (totalPages <= 1) return null;
   const dictionary = getDictionary(locale);
   const copy = dictionary.market;
+  const labels = {
+    resources: copy.paginationLabel,
+    articles: dictionary.organizations.articles,
+    servers: dictionary.profiles.operatedServers,
+  };
+  const secondaryParameter = (section === "resources" ? otherSection : section) === "articles"
+    ? "articlePage" : "serverPage";
   const href = (target: number) => {
     const query = new URLSearchParams();
     if (section === "resources") {
       query.set("page", String(target));
-      if (otherPage > 1) query.set("serverPage", String(otherPage));
+      if (otherPage > 1) query.set(secondaryParameter, String(otherPage));
     } else {
       if (otherPage > 1) query.set("page", String(otherPage));
-      query.set("serverPage", String(target));
+      query.set(secondaryParameter, String(target));
     }
     return `${basePath}?${query}#${section}`;
   };
   return (
     <nav
-      aria-label={
-        section === "resources" ? copy.paginationLabel : dictionary.profiles.operatedServers
-      }
+      aria-label={labels[section]}
       className="flex items-center justify-between gap-3"
     >
       {page > 1 ? (
