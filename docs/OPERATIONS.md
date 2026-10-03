@@ -588,3 +588,10 @@ CI/release verification continues to execute the default build. Record which
 compiler was used; a successful Webpack build does not establish Turbopack parity,
 service connectivity or runtime/browser acceptance. On 2026-10-03 the explicit
 Webpack build passed locally using test-only configuration and no live database.
+
+Release evidence explicitly records its required gate names. The summary requires
+repository identity, evidence harness, database migrations, lint, typecheck, tests
+and the default Next.js build exactly once each. Missing or duplicate gate records
+block release-candidate status even if every recorded command passed. Additional
+checks may extend the report; failed or incomplete checks still prevent success.
+Repository cleanliness must be explicitly confirmed as false for `dirty`.

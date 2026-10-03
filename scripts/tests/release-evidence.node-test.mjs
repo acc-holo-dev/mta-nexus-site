@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import {
+  REQUIRED_RELEASE_GATES,
   buildEvidenceChecksum,
   listMigrationEvidence,
   summarizeReleaseEvidence,
@@ -12,10 +13,7 @@ import {
 test("release summary passes only a clean tree with all gates passed", () => {
   const summary = summarizeReleaseEvidence({
     dirty: false,
-    gates: [
-      { name: "typecheck", status: "passed" },
-      { name: "tests", status: "passed" },
-    ],
+    gates: REQUIRED_RELEASE_GATES.map((name) => ({ name, status: "passed" })),
   });
 
   assert.equal(summary.status, "passed");
@@ -86,4 +84,37 @@ test("evidence checksum changes with evidence content", () => {
     buildEvidenceChecksum({ status: "passed" }),
     buildEvidenceChecksum({ status: "failed" }),
   );
+});
+
+for (const missing of REQUIRED_RELEASE_GATES) {
+  test(`release summary blocks missing required gate: ${missing}`, () => {
+    const summary = summarizeReleaseEvidence({ dirty: false,
+      gates: REQUIRED_RELEASE_GATES.filter((name) => name !== missing)
+        .map((name) => ({ name, status: "passed" })),
+    });
+    assert.equal(summary.releaseCandidate, false);
+    assert.equal(summary.status, "blocked");
+    assert.deepEqual(summary.missingGates, [missing]);
+  });
+}
+test("duplicate successes cannot replace required evidence", () => {
+  const summary = summarizeReleaseEvidence({ dirty: false, gates: [
+    ...REQUIRED_RELEASE_GATES.map((name) => ({ name, status: "passed" })),
+    { name: "tests", status: "passed" },
+  ] });
+  assert.equal(summary.status, "blocked");
+  assert.deepEqual(summary.duplicateGates, ["tests"]);
+});
+test("repository cleanliness must be explicitly confirmed", () => {
+  const summary = summarizeReleaseEvidence({
+    gates: REQUIRED_RELEASE_GATES.map((name) => ({ name, status: "passed" })),
+  });
+  assert.equal(summary.releaseCandidate, false);
+});
+test("additional successful gates do not invalidate complete evidence", () => {
+  const summary = summarizeReleaseEvidence({ dirty: false, gates: [
+    ...REQUIRED_RELEASE_GATES.map((name) => ({ name, status: "passed" })),
+    { name: "extra_check", status: "passed" },
+  ] });
+  assert.equal(summary.releaseCandidate, true);
 });

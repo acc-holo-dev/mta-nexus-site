@@ -18,6 +18,16 @@ export function listMigrationEvidence(migrationsDir) {
     );
 }
 
+export const REQUIRED_RELEASE_GATES = Object.freeze([
+  "repository_identity",
+  "release_evidence_harness",
+  "database_migrations",
+  "lint",
+  "typecheck",
+  "tests",
+  "next_build",
+]);
+
 export function summarizeReleaseEvidence({ dirty, gates }) {
   const failedGates = gates
     .filter((gate) => gate.status === "failed")
@@ -37,11 +47,17 @@ export function summarizeReleaseEvidence({ dirty, gates }) {
     )
     .map((gate) => gate.name);
   const noGatesRecorded = gates.length === 0;
+  const counts = new Map();
+  for (const gate of gates) counts.set(gate.name, (counts.get(gate.name) ?? 0) + 1);
+  const missingGates = REQUIRED_RELEASE_GATES.filter((name) => !counts.has(name));
+  const duplicateGates = [...counts].filter(([, count]) => count > 1).map(([name]) => name);
 
   const status =
     failedGates.length > 0
       ? "failed"
-      : dirty ||
+      : dirty !== false ||
+          missingGates.length > 0 ||
+          duplicateGates.length > 0 ||
           blockedGates.length > 0 ||
           incompleteGates.length > 0 ||
           noGatesRecorded
@@ -51,8 +67,10 @@ export function summarizeReleaseEvidence({ dirty, gates }) {
   return Object.freeze({
     status,
     releaseCandidate: status === "passed",
-    dirtyWorkingTree: dirty,
+    dirtyWorkingTree: dirty !== false,
     noGatesRecorded,
+    missingGates,
+    duplicateGates,
     passedGates,
     failedGates,
     blockedGates,

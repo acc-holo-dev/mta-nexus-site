@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { performance } from "node:perf_hooks";
 import process from "node:process";
 import {
+  REQUIRED_RELEASE_GATES,
   buildEvidenceChecksum,
   listMigrationEvidence,
   sha256File,
@@ -182,6 +183,7 @@ const evidenceCore = {
     count: migrationFiles.length,
     files: migrationFiles,
   },
+  requiredGates: REQUIRED_RELEASE_GATES,
   gates,
   limitations: [
     "This bundle proves only the core application gates listed here.",
