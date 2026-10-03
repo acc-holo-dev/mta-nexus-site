@@ -231,3 +231,11 @@ and description without loading resource/article portfolios. Descriptions are
 trimmed and bounded to 155 characters; blank descriptions use localized copy.
 Missing organization and user metadata explicitly opts out of indexing. Canonical
 profile paths encode the stored slug/username and omit pagination parameters.
+
+Public organization websites and server website/Discord/rules/media URLs share an
+HTTP(S)-only policy in `@nexus/validation`. Input schemas reject credentials,
+control characters, whitespace, backslashes and oversized URLs. Public pages also
+apply the policy to stored values, hiding invalid legacy links without mutating
+the database. Optional link fields still accept empty strings for clearing.
+The helper is a browser-link policy, not an SSRF defense or a remote-host trust
+check; MTA connection URIs are separate and unchanged.

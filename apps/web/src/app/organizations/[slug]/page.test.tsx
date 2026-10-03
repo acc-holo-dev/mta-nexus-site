@@ -1,8 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru", exists: true, description: "", slug: "team", products: vi.fn(), content: vi.fn() }));
+const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru", exists: true, websiteUrl: "", description: "", slug: "team", products: vi.fn(), content: vi.fn() }));
 vi.mock("@nexus/db", () => ({
-  organizationRepository: { findBySlug: async () => state.exists ? { id: "org", slug: state.slug, name: "Team", description: state.description } : null },
+  organizationRepository: { findBySlug: async () => state.exists ? { id: "org", slug: state.slug, name: "Team", description: state.description, websiteUrl: state.websiteUrl } : null },
   productRepository: { pagePublishedFreeByOrganization: state.products },
   contentRepository: { pagePublishedEditorialByOrganization: state.content },
 }));
@@ -15,7 +15,7 @@ import Page, { generateMetadata } from "./page";
 import { getDictionary } from "../../../lib/i18n";
 const input = (page?: string | string[], articlePage?: string | string[]) => ({ params: Promise.resolve({ slug: "team" }), searchParams: Promise.resolve({ page, articlePage }) });
 beforeEach(() => {
-  state.locale = "en"; state.exists = true; state.description = ""; state.slug = "team"; state.products.mockReset(); state.content.mockReset();
+  state.locale = "en"; state.exists = true; state.websiteUrl = ""; state.description = ""; state.slug = "team"; state.products.mockReset(); state.content.mockReset();
   state.products.mockResolvedValue({ products: [{ id: "release", title: "Later release" }], total: 120, page: 2, totalPages: 5 });
   state.content.mockResolvedValue({ items: [{ id: "article", type: "article", title: "Team article" }], total: 137, page: 3, totalPages: 12 });
 });
@@ -74,4 +74,15 @@ it.each(["en", "ru"] as const)("localizes empty descriptions and missing metadat
     title: getDictionary(locale).errors.notFoundTitle,
     robots: { index: false, follow: false },
   });
+});
+
+it.each(["javascript:alert(1)", "data:text/html,unsafe", "https://user:password@example.com"])("hides unsafe stored website %s", async (websiteUrl) => {
+  state.websiteUrl = websiteUrl;
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(html).not.toContain(websiteUrl);
+  expect(html).not.toContain('target="_blank"');
+});
+it("renders a safe stored website", async () => {
+  state.websiteUrl = "https://example.com/team";
+  expect(renderToStaticMarkup(await Page(input()))).toContain('href="https://example.com/team"');
 });

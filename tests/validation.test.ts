@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import {
   createServerSchema,
+  createOrganizationSchema,
+  updateServerSchema,
+  safeExternalWebUrl,
   createProductSchema,
   createBuildSchema,
   checkoutSchema,
@@ -130,5 +133,26 @@ describe("Validation Schemas", () => {
 
     const result = checkoutSchema.safeParse(emptyCheckout);
     expect(result.success).toBe(false);
+  });
+});
+
+describe("public external website links", () => {
+  it.each(["javascript:alert(1)", "data:text/html,hello", "file:///tmp/a", "ftp://example.com", "//example.com", "https://user:pass@example.com", "https://example.com/\nfoo", " https://example.com", `https://example.com/${"x".repeat(2048)}`])("rejects unsafe URL %s at create/update boundaries", (url) => {
+    expect(safeExternalWebUrl(url)).toBeUndefined();
+    expect(createOrganizationSchema.safeParse({ name: "Team", slug: "team", websiteUrl: url }).success).toBe(false);
+    for (const field of ["websiteUrl", "discordUrl", "rulesUrl"]) {
+      expect(updateServerSchema.safeParse({ [field]: url }).success).toBe(false);
+    }
+    expect(updateServerSchema.safeParse({ mediaUrls: [url] }).success).toBe(false);
+  });
+  it.each(["https://example.com/path?q=a%20b#section", "http://localhost:3000", "https://пример.рф", "HTTPS://EXAMPLE.COM"])("accepts HTTP(S) URL %s", (url) => {
+    expect(safeExternalWebUrl(url)).toBe(new URL(url).href);
+    expect(createOrganizationSchema.safeParse({ name: "Team", slug: "team", websiteUrl: url }).success).toBe(true);
+    expect(updateServerSchema.safeParse({ websiteUrl: url, discordUrl: url, rulesUrl: url, mediaUrls: [url] }).success).toBe(true);
+  });
+  it("keeps optional links clearable and rejects blank media items", () => {
+    expect(updateServerSchema.safeParse({ websiteUrl: "", discordUrl: "", rulesUrl: "", mediaUrls: [] }).success).toBe(true);
+    expect(updateServerSchema.safeParse({ mediaUrls: [""] }).success).toBe(false);
+    expect(safeExternalWebUrl(null)).toBeUndefined();
   });
 });

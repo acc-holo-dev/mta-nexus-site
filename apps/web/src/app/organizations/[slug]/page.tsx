@@ -1,3 +1,4 @@
+import { safeExternalWebUrl } from "@nexus/validation";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { parseProfilePage } from "../../../lib/profile-pagination";
 import type { Metadata } from "next";
@@ -62,6 +63,7 @@ export default async function OrganizationProfilePage({
     notFound();
   }
 
+  const websiteUrl = safeExternalWebUrl(organization.websiteUrl);
   const query = await searchParams;
   const [resourcePage, articlePage] = await Promise.all([
     productRepository.pagePublishedFreeByOrganization(organization.id, parseProfilePage(query?.page), 24),
@@ -115,15 +117,15 @@ export default async function OrganizationProfilePage({
               {organization.description || copy.fallback}
             </p>
 
-            {organization.websiteUrl && (
+            {websiteUrl && (
               <a
-                href={organization.websiteUrl}
+                href={websiteUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex max-w-full items-center gap-1.5 pt-1 text-xs font-semibold text-accent hover:underline"
               >
                 <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                <span className="truncate">{organization.websiteUrl}</span>
+                <span className="truncate">{websiteUrl}</span>
                 <ExternalLink className="h-2.5 w-2.5 shrink-0" aria-hidden="true" />
               </a>
             )}

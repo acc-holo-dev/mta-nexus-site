@@ -1,6 +1,25 @@
 import { PRODUCT_TYPES } from "@nexus/domain";
 import { z } from "zod";
 
+// Shared by input validation and rendering of legacy public links.
+export function safeExternalWebUrl(value: unknown): string | undefined {
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: Reject URL parser normalization of literal control characters.
+  if (typeof value !== "string" || value.length > 2048 || /[\u0000-\u0020\u007f]/.test(value)) return undefined;
+  if (!/^https?:\/\//i.test(value)) return undefined;
+  try {
+    const url = new URL(value);
+    if (!url.hostname || url.username || url.password || value.includes("\\")) return undefined;
+    return url.href;
+  } catch {
+    return undefined;
+  }
+}
+
+export const externalWebUrlSchema = z.string().max(2048).refine(
+  (value) => safeExternalWebUrl(value) !== undefined,
+  "Use an HTTP or HTTPS URL without credentials or whitespace",
+);
+
 // MTA's sortable release form, for example 1.6.0-9.22279.0.
 export const MTA_VERSION_PATTERN = /^1\.\d+(?:\.\d+)?(?:-\d+(?:\.\d+){1,2})?$/;
 export const mtaVersionSchema = z
@@ -86,7 +105,7 @@ export const createOrganizationSchema = z.object({
   name: z.string().min(2).max(64),
   slug: z.string().min(2).max(64).regex(/^[a-z0-9-]+$/),
   description: z.string().max(1000).optional(),
-  websiteUrl: z.string().url().optional().or(z.literal("")),
+  websiteUrl: externalWebUrlSchema.optional().or(z.literal("")),
 });
 
 // --- Server Schemas ---
@@ -94,10 +113,10 @@ export const createServerSchema = z.object({
   name: z.string().min(3).max(100),
   slug: z.string().min(3).max(100).regex(/^[a-z0-9-]+$/),
   description: z.string().max(5000).optional(),
-  websiteUrl: z.string().url().max(500).optional().or(z.literal("")),
-  discordUrl: z.string().url().max(500).optional().or(z.literal("")),
-  rulesUrl: z.string().url().max(500).optional().or(z.literal("")),
-  mediaUrls: z.array(z.string().url().max(500)).max(8).default([]),
+  websiteUrl: externalWebUrlSchema.max(500).optional().or(z.literal("")),
+  discordUrl: externalWebUrlSchema.max(500).optional().or(z.literal("")),
+  rulesUrl: externalWebUrlSchema.max(500).optional().or(z.literal("")),
+  mediaUrls: z.array(externalWebUrlSchema.max(500)).max(8).default([]),
   language: z.string().trim().max(64).optional(),
   region: z.string().trim().max(64).optional(),
   gameplayTags: z.array(z.string().trim().min(1).max(32)).max(12).default([]),

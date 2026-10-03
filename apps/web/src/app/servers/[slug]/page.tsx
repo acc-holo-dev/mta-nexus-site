@@ -1,3 +1,4 @@
+import { safeExternalWebUrl } from "@nexus/validation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -66,6 +67,12 @@ export default async function ServerDetailPage({
   const server = await serverService.getServerBySlug(slug);
 
   if (!server || server.visibility === "private") notFound();
+
+  const websiteUrl = safeExternalWebUrl(server.websiteUrl);
+  const discordUrl = safeExternalWebUrl(server.discordUrl);
+  const rulesUrl = safeExternalWebUrl(server.rulesUrl);
+  const mediaUrls = (server.mediaUrls ?? []).slice(0, 8)
+    .map(safeExternalWebUrl).filter((url): url is string => url !== undefined);
 
   const [directory, history, serverUpdates] = await Promise.all([
     mtaMasterDirectoryService.getDirectory().catch(() => null),
@@ -182,11 +189,11 @@ export default async function ServerDetailPage({
 
       {(server.language ||
         server.region ||
-        server.websiteUrl ||
-        server.discordUrl ||
-        server.rulesUrl ||
+        websiteUrl ||
+        discordUrl ||
+        rulesUrl ||
         server.gameplayTags?.length ||
-        server.mediaUrls?.length) && (
+        mediaUrls?.length) && (
         <section className="nexus-panel space-y-4 p-5">
           <div className="flex flex-wrap items-center gap-2 text-xs text-secondary">
             {server.language && (
@@ -209,11 +216,11 @@ export default async function ServerDetailPage({
             ))}
           </div>
 
-          {(server.websiteUrl || server.discordUrl || server.rulesUrl) && (
+          {(websiteUrl || discordUrl || rulesUrl) && (
             <div className="flex flex-wrap gap-3 text-xs font-semibold">
-              {server.websiteUrl && (
+              {websiteUrl && (
                 <a
-                  href={server.websiteUrl}
+                  href={websiteUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="text-accent hover:underline"
@@ -221,9 +228,9 @@ export default async function ServerDetailPage({
                   {copy.website} ↗
                 </a>
               )}
-              {server.discordUrl && (
+              {discordUrl && (
                 <a
-                  href={server.discordUrl}
+                  href={discordUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="text-accent hover:underline"
@@ -231,9 +238,9 @@ export default async function ServerDetailPage({
                   Discord ↗
                 </a>
               )}
-              {server.rulesUrl && (
+              {rulesUrl && (
                 <a
-                  href={server.rulesUrl}
+                  href={rulesUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="text-accent hover:underline"
@@ -244,9 +251,9 @@ export default async function ServerDetailPage({
             </div>
           )}
 
-          {server.mediaUrls && server.mediaUrls.length > 0 && (
+          {mediaUrls && mediaUrls.length > 0 && (
             <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-              {server.mediaUrls.slice(0, 8).map((mediaUrl) => (
+              {mediaUrls.slice(0, 8).map((mediaUrl) => (
                 <a
                   key={mediaUrl}
                   href={mediaUrl}
