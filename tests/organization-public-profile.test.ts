@@ -10,7 +10,7 @@ describe("organization public profile queries", () => {
     const page = read("apps/web/src/app/organizations/[slug]/page.tsx");
 
     expect(page).toContain(
-      "productRepository.listPublishedByOrganization(organization.id, 100)",
+      "productRepository.pagePublishedFreeByOrganization(organization.id, parseProfilePage(query?.page), 24)",
     );
     expect(page).toContain(
       "contentRepository.listPublishedByOrganization(organization.id, 100)",

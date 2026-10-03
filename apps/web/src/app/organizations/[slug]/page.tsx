@@ -1,3 +1,5 @@
+import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
+import { parseProfilePage } from "../../../lib/profile-pagination";
 import { notFound } from "next/navigation";
 import {
   Building2,
@@ -28,8 +30,10 @@ const EDITORIAL_TYPES = new Set([
 
 export default async function OrganizationProfilePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ page?: string | string[] }>;
 }) {
   const { slug } = await params;
   const locale = await getRequestLocale();
@@ -41,10 +45,12 @@ export default async function OrganizationProfilePage({
     notFound();
   }
 
-  const [products, publishedContent] = await Promise.all([
-    productRepository.listPublishedByOrganization(organization.id, 100),
+  const query = await searchParams;
+  const [resourcePage, publishedContent] = await Promise.all([
+    productRepository.pagePublishedFreeByOrganization(organization.id, parseProfilePage(query?.page), 24),
     contentRepository.listPublishedByOrganization(organization.id, 100),
   ]);
+  const products = resourcePage.products;
   const articles = publishedContent.filter((item) =>
     EDITORIAL_TYPES.has(item.type),
   );
@@ -112,16 +118,16 @@ export default async function OrganizationProfilePage({
         <div className="min-w-28">
           <StatCard
             label={copy.releases}
-            value={products.length}
+            value={resourcePage.total}
             tone="accent"
           />
         </div>
       </section>
 
-      {products.length > 0 && (
-        <section className="space-y-4">
+      {resourcePage.total > 0 && (
+        <section id="resources" className="space-y-4">
           <h2 className="font-heading text-primary">
-            {copy.marketplaceReleases} ({products.length})
+            {copy.marketplaceReleases} ({resourcePage.total})
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
@@ -132,6 +138,7 @@ export default async function OrganizationProfilePage({
               />
             ))}
           </div>
+          <ProfileResourcePagination basePath={`/organizations/${encodeURIComponent(organization.slug)}`} page={resourcePage.page} totalPages={resourcePage.totalPages} locale={locale} />
         </section>
       )}
 

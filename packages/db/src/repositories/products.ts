@@ -1,3 +1,4 @@
+import type { SQL } from "drizzle-orm";
 import { eq, desc, asc, and, count, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
 import { safePublishedBuildCondition } from "./build-safety";
 import { containsPattern } from "./search-pattern";
@@ -31,12 +32,20 @@ export interface ProductQueryOptions {
 
 export class ProductRepository {
   async pagePublishedFreeByAuthor(authorId: string, requestedPage = 1, requestedSize = 24) {
+    return this.pagePublishedFree(eq(products.authorId, authorId), requestedPage, requestedSize);
+  }
+
+  async pagePublishedFreeByOrganization(organizationId: string, requestedPage = 1, requestedSize = 24) {
+    return this.pagePublishedFree(eq(products.organizationId, organizationId), requestedPage, requestedSize);
+  }
+
+  private async pagePublishedFree(scope: SQL, requestedPage: number, requestedSize: number) {
     const pageSize = Number.isFinite(requestedSize)
       ? Math.min(Math.max(Math.floor(requestedSize), 1), 100) : 24;
     const requested = Number.isFinite(requestedPage)
       ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER) : 1;
     const condition = and(
-      eq(products.authorId, authorId),
+      scope,
       eq(products.status, "published"),
       eq(products.price, 0),
       hasSafePublishedBuild(),

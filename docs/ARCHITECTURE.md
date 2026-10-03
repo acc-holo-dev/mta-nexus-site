@@ -212,3 +212,9 @@ parameters are preserved independently by navigation, with links targeting the
 corresponding section. Live-directory enrichment only runs when the selected
 server page contains rows, and directory failures leave the known public servers
 visible. Count and row queries do not promise snapshot consistency.
+
+Organization resource portfolios use the same bounded free/published/safe-build
+pagination implementation as author portfolios, scoped by organization ID before
+counting and limiting. Pages contain 24 resources; the displayed total comes from
+the matching count query. The shared profile navigation uses `page` and anchors
+the resource section. Count and rows are separate queries, not a snapshot.

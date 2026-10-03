@@ -93,3 +93,15 @@ it.each([
   });
   expect(state.offset).toBe(0);
 });
+
+it("scopes organization pages before counting and limiting", async () => {
+  await repository.pagePublishedFreeByOrganization("organization", 2, 24);
+  const queries = state.conditions.map((condition) => dialect.sqlToQuery(condition));
+  expect(queries[0]).toEqual(queries[1]);
+  expect(queries[0].sql).toContain('"products"."organization_id"');
+  expect(queries[0].sql).not.toContain('"products"."author_id"');
+  expect(queries[0].params).toEqual(expect.arrayContaining(["organization", "published", 0]));
+  expect(queries[0].sql).toContain("exists (");
+  expect(state.limit).toBe(24);
+  expect(state.offset).toBe(24);
+});
