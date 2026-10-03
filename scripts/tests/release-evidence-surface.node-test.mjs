@@ -49,3 +49,10 @@ test("evidence command does not serialize environment values or command output",
   assert.match(script, /process\.env\.DATABASE_URL/u);
   assert.match(script, /evidenceSha256/u);
 });
+
+test("repository stability is checked after command execution and feeds the summary", () => {
+  const script = read("scripts/release-evidence.mjs");
+  assert.ok(script.indexOf("const finalShaResult") > script.indexOf('runGate("next_build"'));
+  assert.match(script, /gates\.push\(runGate\("repository_stability"/u);
+  assert.match(script, /dirty: dirty \|\| finalDirty/u);
+});

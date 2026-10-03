@@ -5,6 +5,7 @@ import { join } from "node:path";
 import test from "node:test";
 import {
   REQUIRED_RELEASE_GATES,
+  repositoryStayedStable,
   buildEvidenceChecksum,
   listMigrationEvidence,
   summarizeReleaseEvidence,
@@ -117,4 +118,17 @@ test("additional successful gates do not invalidate complete evidence", () => {
     { name: "extra_check", status: "passed" },
   ] });
   assert.equal(summary.releaseCandidate, true);
+});
+
+test("repository stability requires the same readable clean checkout", () => {
+  const initialSha = "a".repeat(40);
+  const baseline = { initialSha, finalSha: initialSha, statusAvailable: true, dirty: false };
+  assert.equal(repositoryStayedStable(baseline), true);
+  for (const change of [
+    { finalSha: "b".repeat(40) }, { finalSha: null }, { initialSha: null },
+    { initialSha: "", finalSha: "" }, { statusAvailable: false },
+    { dirty: true }, { dirty: undefined },
+  ]) {
+    assert.equal(repositoryStayedStable({ ...baseline, ...change }), false);
+  }
 });

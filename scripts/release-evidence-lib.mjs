@@ -26,7 +26,13 @@ export const REQUIRED_RELEASE_GATES = Object.freeze([
   "typecheck",
   "tests",
   "next_build",
+  "repository_stability",
 ]);
+
+export function repositoryStayedStable({ initialSha, finalSha, statusAvailable, dirty }) {
+  return typeof initialSha === "string" && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(initialSha)
+    && finalSha === initialSha && statusAvailable === true && dirty === false;
+}
 
 export function summarizeReleaseEvidence({ dirty, gates }) {
   const failedGates = gates

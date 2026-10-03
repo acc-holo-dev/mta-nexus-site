@@ -7,6 +7,7 @@ import { performance } from "node:perf_hooks";
 import process from "node:process";
 import {
   REQUIRED_RELEASE_GATES,
+  repositoryStayedStable,
   buildEvidenceChecksum,
   listMigrationEvidence,
   sha256File,
@@ -152,6 +153,21 @@ const gates = [
 ];
 
 const migrationFiles = listMigrationEvidence(migrationsDir);
+// Re-read after all commands and migration hashing: successful gates must not
+// be attributed to a checkout that changed while they were running.
+const finalShaResult = runCaptured("git", ["rev-parse", "HEAD"]);
+const finalStatusResult = runCaptured("git", ["status", "--porcelain"]);
+const finalSha = finalShaResult.ok ? finalShaResult.output : null;
+const finalDirty = finalStatusResult.ok ? Boolean(finalStatusResult.output) : true;
+const repositoryStable = repositoryStayedStable({
+  initialSha: gitSha,
+  finalSha,
+  statusAvailable: finalStatusResult.ok,
+  dirty: finalDirty,
+});
+gates.push(runGate("repository_stability", "internal", [], repositoryStable ? {} : {
+  blockedReason: "Repository HEAD changed, the working tree became dirty, or final Git identity is unavailable.",
+}));
 const evidenceCore = {
   schemaVersion: 1,
   scope: "core_application",
@@ -164,6 +180,9 @@ const evidenceCore = {
     githubRunId: process.env.GITHUB_RUN_ID || null,
     githubRunAttempt: process.env.GITHUB_RUN_ATTEMPT || null,
     githubShaMatches,
+    finalSha,
+    finalDirty,
+    stableAtCompletion: repositoryStable,
   },
   runtime: {
     node: process.version,
@@ -190,7 +209,7 @@ const evidenceCore = {
     "Docker startup, browser acceptance, external provider delivery, backup restore and production rollout require separate evidence.",
     "The bundle contains no environment variable values or command stdout/stderr.",
   ],
-  summary: summarizeReleaseEvidence({ dirty, gates }),
+  summary: summarizeReleaseEvidence({ dirty: dirty || finalDirty, gates }),
 };
 
 const evidence = {

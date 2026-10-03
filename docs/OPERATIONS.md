@@ -591,7 +591,13 @@ Webpack build passed locally using test-only configuration and no live database.
 
 Release evidence explicitly records its required gate names. The summary requires
 repository identity, evidence harness, database migrations, lint, typecheck, tests
-and the default Next.js build exactly once each. Missing or duplicate gate records
+the default Next.js build and final repository stability exactly once each. Missing or duplicate gate records
 block release-candidate status even if every recorded command passed. Additional
 checks may extend the report; failed or incomplete checks still prevent success.
 Repository cleanliness must be explicitly confirmed as false for `dirty`.
+
+After the commands finish, release verification reads HEAD and working-tree status
+again. A changed commit, dirty final tree or failed Git read blocks the candidate;
+both initial and final identity are recorded without serializing changed paths.
+This detects final-state drift, not transient edits that were reverted during the
+run. Use an isolated checkout in CI and avoid editing it during verification.
