@@ -245,3 +245,8 @@ moderator rendering boundary. Rejected evidence fails before report/audit writes
 or notifications. The evidence component hides invalid legacy URLs, normalizes
 and deduplicates links, limits legacy arrays to five entries and omits empty
 labels. New-tab links retain noopener/noreferrer and localized accessible labels.
+
+Article cover URLs use the shared HTTP(S) policy at content submission and when
+rendering cards, article detail pages and Open Graph metadata. Invalid legacy
+covers are omitted consistently; an empty or omitted cover remains valid. This
+validates the URL syntax and scheme, not the remote image content or availability.

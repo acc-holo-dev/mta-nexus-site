@@ -1,3 +1,4 @@
+import { safeExternalWebUrl } from "@nexus/validation";
 import React from "react";
 import Link from "next/link";
 import { Calendar, MessageSquare, ThumbsUp } from "lucide-react";
@@ -11,6 +12,7 @@ export function ArticleCard({
   article: Content;
   locale?: Locale;
 }) {
+  const coverImageUrl = safeExternalWebUrl(article.coverImageUrl);
   const dictionary = getDictionary(locale);
   const copy = dictionary.articles;
   const formattedDate = new Date(article.createdAt).toLocaleDateString(
@@ -27,10 +29,10 @@ export function ArticleCard({
       href={`/articles/${article.slug}`}
       className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus"
     >
-      {article.coverImageUrl && (
+      {coverImageUrl && (
         <div className="relative aspect-[16/9] w-full overflow-hidden bg-inset">
           <img
-            src={article.coverImageUrl}
+            src={coverImageUrl}
             alt={article.title}
             width={640}
             height={360}

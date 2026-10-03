@@ -220,7 +220,7 @@ export const createContentSchema = z.object({
     "review",
   ]),
   tags: z.array(z.string().min(1).max(30)).default([]),
-  coverImageUrl: z.string().url().optional().or(z.literal("")),
+  coverImageUrl: externalWebUrlSchema.optional().or(z.literal("")),
   serverId: z.string().optional(),
   productId: z.string().optional(),
   organizationId: z.string().optional(),

@@ -1,3 +1,4 @@
+import { safeExternalWebUrl } from "@nexus/validation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -31,6 +32,7 @@ export async function generateMetadata({
     return { title: dictionary.articles.notFound };
   }
 
+  const coverImageUrl = safeExternalWebUrl(article.coverImageUrl);
   return {
     title: article.title,
     description: article.excerpt || article.body.slice(0, 155),
@@ -39,8 +41,8 @@ export async function generateMetadata({
       title: article.title,
       description: article.excerpt || article.body.slice(0, 155),
       type: "article",
-      images: article.coverImageUrl
-        ? [{ url: article.coverImageUrl }]
+      images: coverImageUrl
+        ? [{ url: coverImageUrl }]
         : undefined,
     },
   };
@@ -61,6 +63,7 @@ export default async function ArticleDetailPage({
     notFound();
   }
 
+  const coverImageUrl = safeExternalWebUrl(article.coverImageUrl);
   const [author, comments] = await Promise.all([
     authService.getUserById(article.authorId),
     contentService.getComments({ contentId: article.id }, 100),
@@ -121,10 +124,10 @@ export default async function ArticleDetailPage({
         )}
       </header>
 
-      {article.coverImageUrl && (
+      {coverImageUrl && (
         <div className="aspect-[21/9] w-full overflow-hidden rounded-xl border border-base bg-inset shadow-nexus-sm">
           <img
-            src={article.coverImageUrl}
+            src={coverImageUrl}
             alt={article.title}
             width={1120}
             height={480}
