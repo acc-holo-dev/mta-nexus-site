@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { updateServerSchema } from "@nexus/validation";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -7,22 +8,21 @@ const read = (path: string) =>
 
 describe("editorial server metadata", () => {
   it("validates bounded profile links, media, taxonomy and locale fields", () => {
-    const validation = read(
-      "packages/validation/src/index.ts",
-    );
     const migration = read(
       "packages/db/migrations/0008_server_editorial_metadata.sql",
     );
 
-    expect(validation).toContain(
-      "mediaUrls: z.array(z.string().url().max(500)).max(8).default([])",
-    );
-    expect(validation).toContain(
-      "gameplayTags: z.array(z.string().trim().min(1).max(32)).max(12).default([])",
-    );
-    expect(validation).toContain(
-      "websiteUrl: z.string().url().max(500)",
-    );
+    const url = "https://example.com/image.png";
+    expect(updateServerSchema.safeParse({ websiteUrl: url, mediaUrls: Array(8).fill(url), gameplayTags: ["  racing  "], language: "ru", region: "EU" })).toMatchObject({ success: true, data: { gameplayTags: ["racing"] } });
+    for (const invalid of [
+      { mediaUrls: Array(9).fill(url) },
+      { mediaUrls: ["javascript:alert(1)"] },
+      { websiteUrl: `https://example.com/${"x".repeat(500)}` },
+      { gameplayTags: Array(13).fill("racing") },
+      { gameplayTags: ["x".repeat(33)] },
+      { language: "x".repeat(65) },
+      { region: "x".repeat(65) },
+    ]) expect(updateServerSchema.safeParse(invalid).success).toBe(false);
     expect(migration).toContain(
       'ADD COLUMN IF NOT EXISTS "media_urls" jsonb',
     );

@@ -63,6 +63,9 @@ cleanup() {
   exit "$status"
 }
 trap cleanup EXIT
+phase=compose-validation
+# Never print BASH_COMMAND or enable xtrace: commands can contain disposable credentials.
+trap 'printf "FAIL: production smoke phase=%s line=%s\n" "$phase" "$LINENO" >&2' ERR
 "${pc[@]}" config --format json > "$work/compose.json"
 node --input-type=module - "$work/compose.json" "$project" "$NEXUS_CI_CADDYFILE" <<'NODE'
 import { readFileSync } from 'node:fs';
@@ -80,8 +83,11 @@ import { readFileSync } from 'node:fs';
 import { assertInternalIssuer } from './scripts/production-smoke-contract.mjs';
 assertInternalIssuer(JSON.parse(readFileSync(process.argv[2], 'utf8')));
 NODE
+phase=image-build
 "${pc[@]}" build app
+phase=stack-start
 "${pc[@]}" up --detach --wait --wait-timeout 600 --no-build
+phase=runtime-layout
 app=$("${pc[@]}" ps -q app)
 caddy=$("${pc[@]}" ps -q caddy)
 [[ $("${pc[@]}" exec -T app id -u) != 0 ]]
@@ -96,12 +102,14 @@ if "${pc[@]}" exec -T app sh -c 'command -v pnpm >/dev/null 2>&1'; then
   exit 1
 fi
 "${pc[@]}" exec -T app node scripts/check-local-readiness.mjs
+phase=private-ports
 for service in app postgres clamav; do
   id=$("${pc[@]}" ps -q "$service")
   [[ -n $id && -z $(docker port "$id") ]]
 done
 [[ $(docker port "$caddy" 443/tcp) == 127.0.0.1:8443 ]]
 [[ $(docker port "$caddy" 80/tcp) == 127.0.0.1:8080 ]]
+phase=test-ca
 for attempt in $(seq 1 30); do
   if docker cp "$caddy:/data/caddy/pki/authorities/local/root.crt" "$work/root.crt" 2>/dev/null; then break; fi
   sleep 1
@@ -109,17 +117,20 @@ done
 test -s "$work/root.crt"
 https=(curl --silent --show-error --noproxy '*' --max-time 30
   --cacert "$work/root.crt" --resolve "$domain:8443:127.0.0.1")
+phase=https-health
 "${https[@]}" --fail "https://$domain:8443/api/health" > "$work/health.json"
 node --input-type=module - "$work/health.json" <<'NODE'
 import assert from 'node:assert/strict'; import { readFileSync } from 'node:fs';
 const value = JSON.parse(readFileSync(process.argv[2], 'utf8'));
 assert.equal(value.status, 'ok'); assert.equal(value.database, 'reachable');
 NODE
+phase=https-home
 "${https[@]}" --fail "https://$domain:8443/" > "$work/home.html"
 grep -qi '<html' "$work/home.html"
 
 # The proxy must reject a request one byte above the 65 MiB upload envelope
 # before the application can parse or buffer it.
+phase=proxy-body-limit
 proxy_upload_limit=$((65 * 1024 * 1024))
 truncate -s $((proxy_upload_limit + 1)) "$work/oversized-request.bin"
 oversized_code=$("${https[@]}" \
@@ -129,13 +140,15 @@ oversized_code=$("${https[@]}" \
   -o /dev/null \
   -w '%{http_code}' \
   "https://$domain:8443/api/health")
-[[ $oversized_code == 413 ]]
+[[ $oversized_code == 413 ]] || { echo "FAIL: oversized request expected HTTP 413, got $oversized_code" >&2; exit 1; }
 rm -f -- "$work/oversized-request.bin"
 
+phase=http-redirect
 redirect=$(curl --silent --show-error --noproxy '*' --max-time 10 --resolve "$domain:8080:127.0.0.1" -o /dev/null -w '%{http_code} %{redirect_url}' "http://$domain:8080/")
 [[ $redirect == "308 https://$domain"* ]]
 echo 'PASS: production image, trusted test TLS, HTTP redirect, 65 MiB proxy body limit, database, writable uploads and private ports'
 
+phase=persistence
 sql() { "${pc[@]}" exec -T postgres psql -X -v ON_ERROR_STOP=1 -U nexus -d mta_nexus -Atc "$1"; }
 [[ $(sql 'SELECT count(*) FROM drizzle.__drizzle_migrations') -gt 0 ]]
 sql "CREATE TABLE beta003_probe (id integer PRIMARY KEY, value text); INSERT INTO beta003_probe VALUES (1, 'retained');"
@@ -151,6 +164,7 @@ after=$("${pc[@]}" ps -q app)
 echo 'PASS: production app replaced using the same image; database and uploaded file retained'
 
 # These one-off containers use the real production startup command, not a mock.
+phase=startup-refusals
 expect_refusal() {
   label=$1; value=$2
   set +e
@@ -169,6 +183,7 @@ expect_refusal 'disabled scanner' 'BUILD_SCANNER=disabled'
 expect_refusal 'unavailable migration database' "DATABASE_URL=postgres://nexus:$password@postgres:5432/nonexistent_beta003"
 
 # Failures of dependencies must be visible, and recovery must use existing data.
+phase=database-recovery
 "${pc[@]}" stop postgres
 code=$("${https[@]}" -o "$work/unavailable.json" -w '%{http_code}' "https://$domain:8443/api/health")
 [[ $code == 503 ]]
@@ -187,3 +202,4 @@ echo 'PASS: database outage returns 503 through HTTPS proxy; service recovers wi
   echo 'PASS: rejected invalid secret, HTTP URL, disabled scanner and failing migration; database 503 and recovery.'
   echo 'Not covered: public ACME/DNS, browser journeys, malware verdicts, existing databases or backup restore.'
 } | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}"
+phase=browser-acceptance
