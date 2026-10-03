@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, writeFileSync, readFileSync, readdirSync, mkdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import {
   REQUIRED_RELEASE_GATES,
+  writeReleaseEvidence,
   executeReleaseCommand,
   repositoryStayedStable,
   buildEvidenceChecksum,
@@ -155,4 +156,34 @@ test("spawn errors and invalid timeout values cannot pass", () => {
   assert.equal(result.status, "failed");
   assert.equal(result.errorCode, "ENOENT");
   assert.throws(() => executeReleaseCommand(process.execPath, [], { timeoutMs: 0 }), RangeError);
+});
+
+test("evidence publication replaces a complete file and cleans staging", (t) => {
+  const directory = mkdtempSync(join(tmpdir(), "nexus-evidence-write-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const path = join(directory, "release-evidence.json");
+  writeFileSync(path, '{"old":true}');
+  writeReleaseEvidence(path, { status: "blocked", sha: "example" });
+  assert.deepEqual(JSON.parse(readFileSync(path, "utf8")), { status: "blocked", sha: "example" });
+  assert.deepEqual(readdirSync(directory), ["release-evidence.json"]);
+});
+test("serialization failure preserves the previous evidence", (t) => {
+  const directory = mkdtempSync(join(tmpdir(), "nexus-evidence-invalid-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const path = join(directory, "release-evidence.json");
+  writeFileSync(path, '{"old":true}');
+  const circular = {}; circular.self = circular;
+  assert.throws(() => writeReleaseEvidence(path, circular), TypeError);
+  assert.equal(readFileSync(path, "utf8"), '{"old":true}');
+  assert.deepEqual(readdirSync(directory), ["release-evidence.json"]);
+});
+test("failed publication cleans only its own temporary directory", (t) => {
+  const directory = mkdtempSync(join(tmpdir(), "nexus-evidence-failure-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const destination = join(directory, "release-evidence.json");
+  mkdirSync(destination);
+  writeFileSync(join(destination, "existing"), "keep");
+  assert.throws(() => writeReleaseEvidence(destination, { status: "failed" }));
+  assert.equal(readFileSync(join(destination, "existing"), "utf8"), "keep");
+  assert.deepEqual(readdirSync(directory), ["release-evidence.json"]);
 });

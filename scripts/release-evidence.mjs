@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import process from "node:process";
 import {
   REQUIRED_RELEASE_GATES,
+  writeReleaseEvidence,
   executeReleaseCommand,
   repositoryStayedStable,
   buildEvidenceChecksum,
@@ -203,7 +204,7 @@ const evidence = {
 };
 
 mkdirSync(join(root, "artifacts"), { recursive: true });
-writeFileSync(outputPath, JSON.stringify(evidence, null, 2) + "\n", "utf8");
+writeReleaseEvidence(outputPath, evidence);
 
 process.stdout.write(
   "\nRelease evidence: " + outputPath + "\n" +

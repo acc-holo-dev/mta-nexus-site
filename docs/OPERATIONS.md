@@ -617,3 +617,11 @@ lookups to 15 seconds. A gate timeout is recorded as failed with `timedOut`,
 continues to collect remaining gate results. The timeout forcibly terminates the
 direct child process; it is not a process-tree cleanup guarantee, so CI should
 retain its job-level timeout and isolated runner cleanup.
+
+Evidence JSON is serialized before writing, flushed to a private temporary file
+on the same filesystem, then published by rename. A serialization or pre-rename
+write failure preserves the previous report; normal failures clean only the
+current run's temporary directory. Readers see a complete old or new report.
+Always verify the report SHA and command exit status: a failed run can leave the
+older report in place. Abrupt termination may leave a temporary directory, and
+this does not guarantee directory-entry durability after power loss.

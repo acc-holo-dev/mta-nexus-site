@@ -1,8 +1,8 @@
 import { spawnSync } from "node:child_process";
 import { performance } from "node:perf_hooks";
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync } from "node:fs";
-import { basename, join } from "node:path";
+import { readFileSync, readdirSync, mkdtempSync, writeFileSync, renameSync, rmSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 
 export function sha256File(path) {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
@@ -109,4 +109,18 @@ export function executeReleaseCommand(command, args, { cwd, env, timeoutMs = 30 
     timedOut,
     ...(result.error ? { errorCode: result.error.code ?? "SPAWN_ERROR" } : {}),
   });
+}
+
+export function writeReleaseEvidence(outputPath, evidence) {
+  // Serialize before touching the filesystem; the temporary directory is on the
+  // same volume as the destination so publication can use atomic rename.
+  const serialized = `${JSON.stringify(evidence, null, 2)}\n`;
+  const temporaryDirectory = mkdtempSync(join(dirname(outputPath), ".release-evidence-"));
+  try {
+    const temporaryPath = join(temporaryDirectory, "evidence.json");
+    writeFileSync(temporaryPath, serialized, { encoding: "utf8", mode: 0o600, flag: "wx", flush: true });
+    renameSync(temporaryPath, outputPath);
+  } finally {
+    rmSync(temporaryDirectory, { recursive: true, force: true });
+  }
 }
