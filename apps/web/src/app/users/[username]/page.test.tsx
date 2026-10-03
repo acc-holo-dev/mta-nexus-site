@@ -48,7 +48,8 @@ vi.mock("next/navigation", () => ({
     throw new Error("NOT_FOUND");
   },
 }));
-import Page from "./page";
+import Page, { generateMetadata } from "./page";
+import { getDictionary } from "../../../lib/i18n";
 const input = (page?: string | string[]) => ({
   params: Promise.resolve({ username: "member" }),
   searchParams: Promise.resolve({ page }),
@@ -141,4 +142,21 @@ it("preserves resource and server pages independently", async () => {
   expect(html).toContain('href="/users/member?page=2&amp;serverPage=3#servers"');
   expect(html).toContain("25");
   expect(html).toContain("Second-page server");
+});
+
+it.each(["en", "ru"] as const)("excludes missing user profiles from indexing in %s", async (locale) => {
+  state.locale = locale;
+  state.exists = false;
+  expect(await generateMetadata(input())).toEqual({
+    title: getDictionary(locale).profiles.userNotFound,
+    robots: { index: false, follow: false },
+  });
+  expect(state.products).not.toHaveBeenCalled();
+  expect(state.servers).not.toHaveBeenCalled();
+});
+it("uses the stored user identity for canonical metadata", async () => {
+  expect(await generateMetadata(input())).toMatchObject({
+    title: "Member (@member)",
+    alternates: { canonical: "/users/member" },
+  });
 });

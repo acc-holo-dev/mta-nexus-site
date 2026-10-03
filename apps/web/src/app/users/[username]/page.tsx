@@ -28,7 +28,7 @@ export async function generateMetadata({
   const user = await userRepository.findByUsername(username);
 
   if (!user) {
-    return { title: copy.userNotFound };
+    return { title: copy.userNotFound, robots: { index: false, follow: false } };
   }
 
   return {
@@ -36,7 +36,7 @@ export async function generateMetadata({
     description:
       user.bio?.slice(0, 155) ||
       `${copy.profileDescription} ${user.displayName}`,
-    alternates: { canonical: `/users/${user.username}` },
+    alternates: { canonical: `/users/${encodeURIComponent(user.username)}` },
   };
 }
 

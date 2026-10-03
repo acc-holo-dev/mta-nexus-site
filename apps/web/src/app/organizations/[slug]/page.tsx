@@ -1,5 +1,6 @@
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { parseProfilePage } from "../../../lib/profile-pagination";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   Building2,
@@ -19,6 +20,30 @@ import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const [locale, organization] = await Promise.all([
+    getRequestLocale(),
+    organizationRepository.findBySlug(slug),
+  ]);
+  const dictionary = getDictionary(locale);
+  if (!organization) {
+    return {
+      title: dictionary.errors.notFoundTitle,
+      robots: { index: false, follow: false },
+    };
+  }
+  return {
+    title: organization.name,
+    description: organization.description?.trim().slice(0, 155) || dictionary.organizations.fallback,
+    alternates: { canonical: `/organizations/${encodeURIComponent(organization.slug)}` },
+  };
+}
 
 export default async function OrganizationProfilePage({
   params,

@@ -1,8 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru", exists: true, products: vi.fn(), content: vi.fn() }));
+const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru", exists: true, description: "", slug: "team", products: vi.fn(), content: vi.fn() }));
 vi.mock("@nexus/db", () => ({
-  organizationRepository: { findBySlug: async () => state.exists ? { id: "org", slug: "team", name: "Team" } : null },
+  organizationRepository: { findBySlug: async () => state.exists ? { id: "org", slug: state.slug, name: "Team", description: state.description } : null },
   productRepository: { pagePublishedFreeByOrganization: state.products },
   contentRepository: { pagePublishedEditorialByOrganization: state.content },
 }));
@@ -11,10 +11,11 @@ vi.mock("../../../components/product-card", () => ({ ProductCard: ({ product }: 
 vi.mock("../../../components/article-card", () => ({ ArticleCard: ({ article }: { article: { title: string } }) => <article>{article.title}</article> }));
 vi.mock("@nexus/ui", () => ({ StatCard: ({ value }: { value: number }) => <p>{value}</p> }));
 vi.mock("next/navigation", () => ({ notFound: () => { throw new Error("NOT_FOUND"); } }));
-import Page from "./page";
+import Page, { generateMetadata } from "./page";
+import { getDictionary } from "../../../lib/i18n";
 const input = (page?: string | string[], articlePage?: string | string[]) => ({ params: Promise.resolve({ slug: "team" }), searchParams: Promise.resolve({ page, articlePage }) });
 beforeEach(() => {
-  state.locale = "en"; state.exists = true; state.products.mockReset(); state.content.mockReset();
+  state.locale = "en"; state.exists = true; state.description = ""; state.slug = "team"; state.products.mockReset(); state.content.mockReset();
   state.products.mockResolvedValue({ products: [{ id: "release", title: "Later release" }], total: 120, page: 2, totalPages: 5 });
   state.content.mockResolvedValue({ items: [{ id: "article", type: "article", title: "Team article" }], total: 137, page: 3, totalPages: 12 });
 });
@@ -49,4 +50,28 @@ it("omits empty article sections and navigation", async () => {
   const html = renderToStaticMarkup(await Page(input()));
   expect(html).not.toContain('id="articles"');
   expect(html).not.toContain("articlePage=");
+});
+
+it("uses stored organization identity and bounds its description", async () => {
+  state.description = `  ${"x".repeat(200)}  `;
+  state.slug = "team/name";
+  expect(await generateMetadata(input())).toEqual({
+    title: "Team",
+    description: "x".repeat(155),
+    alternates: { canonical: "/organizations/team%2Fname" },
+  });
+  expect(state.products).not.toHaveBeenCalled();
+  expect(state.content).not.toHaveBeenCalled();
+});
+it.each(["en", "ru"] as const)("localizes empty descriptions and missing metadata in %s", async (locale) => {
+  state.locale = locale;
+  state.description = "   ";
+  expect(await generateMetadata(input())).toMatchObject({
+    description: getDictionary(locale).organizations.fallback,
+  });
+  state.exists = false;
+  expect(await generateMetadata(input())).toEqual({
+    title: getDictionary(locale).errors.notFoundTitle,
+    robots: { index: false, follow: false },
+  });
 });

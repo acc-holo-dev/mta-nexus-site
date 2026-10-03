@@ -225,3 +225,9 @@ Organization editorial content is paged separately in batches of 12 via
 and rows. Ordering uses publication time (falling back to update time), then ID.
 Shared navigation preserves the clamped page of the other section; empty sections
 have no navigation. This removes the former first-100 in-memory article filter.
+
+Organization profiles generate localized metadata from their stored name, slug
+and description without loading resource/article portfolios. Descriptions are
+trimmed and bounded to 155 characters; blank descriptions use localized copy.
+Missing organization and user metadata explicitly opts out of indexing. Canonical
+profile paths encode the stored slug/username and omit pagination parameters.
