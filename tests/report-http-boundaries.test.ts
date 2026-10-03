@@ -137,6 +137,7 @@ describe("report privacy and durable success", () => {
     mocks.session.mockResolvedValue({ id: "member_1" });
     for (const input of [
       { targetId: "x".repeat(129) },
+      ...["javascript:alert(1)", "data:text/html,bad", "https://user:pass@example.com", "https://example.com/\npath", "https://"].map((url) => ({ evidenceUrls: [url] })),
       { evidenceUrls: Array.from({ length: 6 }, (_, i) => `https://example.test/${i}`) },
     ]) {
       const response = await POST(new NextRequest("https://nexus.test/api/reports", {
@@ -152,5 +153,6 @@ describe("report privacy and durable success", () => {
     }
     expect(mocks.findProduct).not.toHaveBeenCalled();
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
+    expect(mocks.notify).not.toHaveBeenCalled();
   });
 });

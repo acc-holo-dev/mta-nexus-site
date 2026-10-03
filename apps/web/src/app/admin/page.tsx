@@ -1,3 +1,4 @@
+import { ReportEvidenceLinks } from "../../components/report-evidence-links";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import {
@@ -473,19 +474,7 @@ export default async function AdminPage({
                     {copy.reporter}: {report.reporterId} · {report.targetType} ·{" "}
                     {new Date(report.createdAt).toLocaleDateString(dateLocale)}
                   </p>
-                  {report.evidenceUrls.length > 0 && (
-                    <div className="flex flex-wrap gap-2 font-caption text-faint">
-                      <span>{copy.reportEvidence}:</span>
-                      {report.evidenceUrls
-                        .filter((url) => /^https?:\/\//i.test(url))
-                        .filter((url, index, urls) => urls.indexOf(url) === index)
-                        .map((url, index) => (
-                          <a key={url} href={url} target="_blank" rel="noopener noreferrer" aria-label={`${copy.reportEvidence} ${index + 1}: ${url}`} className="break-all text-accent underline">
-                            {index + 1}
-                          </a>
-                        ))}
-                    </div>
-                  )}
+                  <ReportEvidenceLinks urls={report.evidenceUrls} label={copy.reportEvidence} />
                   {report.moderatorNotes && (
                     <p className="font-code font-caption text-faint">
                       {copy.notes}: {report.moderatorNotes}

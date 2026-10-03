@@ -239,3 +239,9 @@ apply the policy to stored values, hiding invalid legacy links without mutating
 the database. Optional link fields still accept empty strings for clearing.
 The helper is a browser-link policy, not an SSRF defense or a remote-host trust
 check; MTA connection URIs are separate and unchanged.
+
+Report evidence uses the same external HTTP(S) URL policy at the API schema and
+moderator rendering boundary. Rejected evidence fails before report/audit writes
+or notifications. The evidence component hides invalid legacy URLs, normalizes
+and deduplicates links, limits legacy arrays to five entries and omits empty
+labels. New-tab links retain noopener/noreferrer and localized accessible labels.

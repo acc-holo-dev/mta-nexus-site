@@ -257,7 +257,7 @@ export const createReportSchema = z.object({
     "other",
   ]),
   reason: z.string().min(10).max(1000),
-  evidenceUrls: z.array(z.string().url().max(2048)).max(5).default([]),
+  evidenceUrls: z.array(externalWebUrlSchema).max(5).default([]),
 });
 
 // --- Search & Discovery ---
