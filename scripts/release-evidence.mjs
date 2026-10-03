@@ -3,10 +3,10 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
-import { performance } from "node:perf_hooks";
 import process from "node:process";
 import {
   REQUIRED_RELEASE_GATES,
+  executeReleaseCommand,
   repositoryStayedStable,
   buildEvidenceChecksum,
   listMigrationEvidence,
@@ -28,6 +28,8 @@ function runCaptured(command, args) {
     cwd: root,
     encoding: "utf8",
     shell: false,
+    timeout: 15_000,
+    killSignal: "SIGKILL",
   });
   return Object.freeze({
     ok: result.status === 0 && !result.error,
@@ -65,27 +67,10 @@ function runGate(name, command, args, options = {}) {
   }
 
   process.stdout.write("\n==> " + name + ": " + commandText + "\n");
-  const startedAt = performance.now();
-  const result = spawnSync(command, args, {
-    cwd: root,
-    stdio: "inherit",
-    shell: false,
-    env: process.env,
-  });
-  const durationMs = Math.round(performance.now() - startedAt);
-  const exitCode = typeof result.status === "number" ? result.status : null;
-  const passed = exitCode === 0 && !result.signal && !result.error;
-
   return Object.freeze({
     name,
     command: commandText,
-    status: passed ? "passed" : "failed",
-    exitCode,
-    signal: result.signal ?? null,
-    durationMs,
-    ...(result.error
-      ? { errorCode: result.error.code ?? "SPAWN_ERROR" }
-      : {}),
+    ...executeReleaseCommand(command, args, { cwd: root, env: process.env }),
   });
 }
 

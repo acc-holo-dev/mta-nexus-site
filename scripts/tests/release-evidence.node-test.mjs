@@ -5,6 +5,7 @@ import { join } from "node:path";
 import test from "node:test";
 import {
   REQUIRED_RELEASE_GATES,
+  executeReleaseCommand,
   repositoryStayedStable,
   buildEvidenceChecksum,
   listMigrationEvidence,
@@ -131,4 +132,27 @@ test("repository stability requires the same readable clean checkout", () => {
   ]) {
     assert.equal(repositoryStayedStable({ ...baseline, ...change }), false);
   }
+});
+
+test("release commands record success and nonzero exit without command output", () => {
+  const success = executeReleaseCommand(process.execPath, ["-e", "console.log('private output')"], { stdio: "pipe", timeoutMs: 5000 });
+  assert.equal(success.status, "passed");
+  assert.equal(success.timedOut, false);
+  assert.equal(JSON.stringify(success).includes("private output"), false);
+  const failure = executeReleaseCommand(process.execPath, ["-e", "process.exit(7)"], { stdio: "pipe", timeoutMs: 5000 });
+  assert.equal(failure.status, "failed");
+  assert.equal(failure.exitCode, 7);
+});
+test("a stuck release command times out and cannot pass", () => {
+  const result = executeReleaseCommand(process.execPath, ["-e", "setInterval(() => {}, 1000)"], { stdio: "pipe", timeoutMs: 200 });
+  assert.equal(result.status, "failed");
+  assert.equal(result.timedOut, true);
+  assert.equal(result.errorCode, "ETIMEDOUT");
+  assert.equal(result.timeoutMs, 200);
+});
+test("spawn errors and invalid timeout values cannot pass", () => {
+  const result = executeReleaseCommand("nexus-missing-executable-for-test", [], { stdio: "pipe" });
+  assert.equal(result.status, "failed");
+  assert.equal(result.errorCode, "ENOENT");
+  assert.throws(() => executeReleaseCommand(process.execPath, [], { timeoutMs: 0 }), RangeError);
 });

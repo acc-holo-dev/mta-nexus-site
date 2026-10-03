@@ -610,3 +610,10 @@ staging name preserves the published bytes. Success includes
 readiness instead of reporting that uploads are ready based on read/write alone.
 Each probe uses and removes only its own unique temporary directory. This does
 not prove scanner availability, crash durability or end-to-end HTTP uploads.
+
+Release verification bounds each external gate command to 30 minutes and identity
+lookups to 15 seconds. A gate timeout is recorded as failed with `timedOut`,
+`timeoutMs` and `ETIMEDOUT`; it cannot produce a release candidate. Verification
+continues to collect remaining gate results. The timeout forcibly terminates the
+direct child process; it is not a process-tree cleanup guarantee, so CI should
+retain its job-level timeout and isolated runner cleanup.

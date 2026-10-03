@@ -1,3 +1,5 @@
+import { spawnSync } from "node:child_process";
+import { performance } from "node:perf_hooks";
 import { createHash } from "node:crypto";
 import { readFileSync, readdirSync } from "node:fs";
 import { basename, join } from "node:path";
@@ -86,4 +88,25 @@ export function summarizeReleaseEvidence({ dirty, gates }) {
 
 export function buildEvidenceChecksum(evidence) {
   return createHash("sha256").update(JSON.stringify(evidence)).digest("hex");
+}
+
+export function executeReleaseCommand(command, args, { cwd, env, timeoutMs = 30 * 60_000, stdio = "inherit" } = {}) {
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1) {
+    throw new RangeError("Release command timeout must be a positive integer");
+  }
+  const startedAt = performance.now();
+  const result = spawnSync(command, args, {
+    cwd, env, stdio, shell: false, timeout: timeoutMs, killSignal: "SIGKILL",
+  });
+  const exitCode = typeof result.status === "number" ? result.status : null;
+  const timedOut = result.error?.code === "ETIMEDOUT";
+  return Object.freeze({
+    status: exitCode === 0 && !result.signal && !result.error ? "passed" : "failed",
+    exitCode,
+    signal: result.signal ?? null,
+    durationMs: Math.round(performance.now() - startedAt),
+    timeoutMs,
+    timedOut,
+    ...(result.error ? { errorCode: result.error.code ?? "SPAWN_ERROR" } : {}),
+  });
 }
