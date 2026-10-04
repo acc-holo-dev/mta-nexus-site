@@ -58,9 +58,16 @@ jobs:
             test -s "$report/shell-summary.md"
             test -s "$report/portfolio-results.json"
             test -s "$report/portfolio-summary.md"
+            test -s "$report/download-browser-memory.json"
+            test -s "$report/download-hash-results.json"
             test -s "$report/download-network-results.json"
             test -s "$report/download-network-summary.md"
           fi
+          for result in download-browser-memory download-hash-results; do
+            if [ -f "$report/$result.json" ]; then
+              { echo; echo '```json'; cat "$report/$result.json"; echo; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
           if [ -f "$report/shell-summary.md" ]; then
             tee -a "$GITHUB_STEP_SUMMARY" < "$report/shell-summary.md"
           fi

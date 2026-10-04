@@ -286,3 +286,21 @@ it("does not let empty chunks keep a stalled download alive", async () => {
   expect(cancel).toHaveBeenCalledOnce();
   expect(vi.getTimerCount()).toBe(0);
 });
+
+
+it("snapshots reused stream buffers before subsequent reads mutate them", async () => {
+  const buffer = new Uint8Array(4);
+  let block = 0;
+  const body = new ReadableStream<Uint8Array>({
+    pull(stream) {
+      if (block === 3) { stream.close(); return; }
+      buffer.fill(++block);
+      stream.enqueue(buffer);
+    },
+  }, { highWaterMark: 0 });
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body));
+  const result = await fetchResourceDownload("id", controller().signal, vi.fn(), fetcher);
+  expect(new Uint8Array(await result.blob.arrayBuffer())).toEqual(
+    new Uint8Array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]),
+  );
+});

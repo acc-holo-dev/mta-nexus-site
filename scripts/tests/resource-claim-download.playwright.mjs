@@ -4,6 +4,7 @@ import { createReadStream } from "node:fs";
 import { mkdir, rm, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { createRequire } from "node:module";
+import { startBrowserMemoryProbe } from "../browser-memory.mjs";
 
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
@@ -75,7 +76,7 @@ test.afterAll(async () => {
 });
 
 test("J5 claim -> workspace -> download exact published build", async ({
-  page,
+  page, browser,
 }) => {
   const name = "claim published free resource and download exact bytes";
   let status = "FAIL";
@@ -236,23 +237,38 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await expect(page.getByRole("alert").filter({ hasText: "The download stopped responding" })).toHaveCount(0);
     assert.equal(downloads.length, 0, "Cancelled requests must not save a file");
 
-    const downloadPromise = page.waitForEvent("download");
-    await page
-      .getByRole("button", {
-        name: "Download Build v1.0.0",
-        exact: true,
-      })
-      .click();
-    const download = await downloadPromise;
-
-    assert.equal(
-      download.suggestedFilename(),
-      `${productSlug}-1.0.0.zip`,
-    );
-
-    const savedPath = join(output, "j5-browser-download.zip");
-    await download.saveAs(savedPath);
-    await verifyDownloadedFile(savedPath);
+    const stopMemoryProbe = await startBrowserMemoryProbe(browser);
+    let memory;
+    try {
+      const downloadPromise = page.waitForEvent("download");
+      await page
+        .getByRole("button", {
+          name: "Download Build v1.0.0",
+          exact: true,
+        })
+        .click();
+      const download = await downloadPromise;
+  
+      assert.equal(
+        download.suggestedFilename(),
+        `${productSlug}-1.0.0.zip`,
+      );
+  
+      const savedPath = join(output, "j5-browser-download.zip");
+      await download.saveAs(savedPath);
+      await verifyDownloadedFile(savedPath);
+      // Release the handoff URL and record the post-release state as well.
+      await page.clock.fastForward(60_001);
+    } finally {
+      memory = await stopMemoryProbe();
+      await writeFile(join(output, "download-browser-memory.json"), JSON.stringify({
+        commit: process.env.GITHUB_SHA, archiveBytes: expectedSize, ...memory,
+        growthBudgetKiB: 384 * 1024,
+      }, null, 2));
+    }
+    assert(memory.samples.length >= 3, "Sample the actual 64 MiB browser transfer");
+    assert(memory.growthKiB < 384 * 1024, "Chromium RSS growth exceeded the regression budget");
+    results.push({ name: `64 MiB Chromium RSS growth: ${memory.growthKiB} KiB`, status: "PASS" });
 
     // Exercise the actual language control, including the server-rendered reload.
     await page.getByRole("button", { name: "Language", exact: true }).click();

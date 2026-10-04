@@ -168,3 +168,23 @@ echo "PASS: author approval/rejection notifications persisted once and were mark
 export NEXUS_DOWNLOAD_PROBE_APP="$("${pc[@]}" ps -q app)"
 export NEXUS_DOWNLOAD_PROBE_CA="$work/root.crt"
 node scripts/check-download-network.mjs
+
+# Exercise the actual standalone Next.js route in a secondary loopback process.
+# The preload is copied explicitly; the production application has no test hook.
+"${pc[@]}" cp scripts/tests/hash-cancellation-preload.mjs app:/tmp/nexus-hash-preload.mjs
+"${pc[@]}" cp scripts/check-download-hash-cancellation.mjs app:/tmp/nexus-hash-probe.mjs
+hash_player_count=$(sql "SELECT count(*) FROM audit_events WHERE action = 'product.download_started' AND target_id = '$product_id';")
+if "${pc[@]}" exec -T -w /app/apps/web \
+  -e NEXUS_HASH_PROBE=disposable-ci \
+  -e NEXUS_HASH_PROBE_FILE="/data/uploads/$storage_key" \
+  -e NEXUS_RESOURCE_BROWSER_PRODUCT_ID="$product_id" \
+  -e NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256="$expected_sha" \
+  -e GITHUB_SHA="$GITHUB_SHA" app node /tmp/nexus-hash-probe.mjs; then
+  hash_probe_status=0
+else
+  hash_probe_status=$?
+fi
+"${pc[@]}" cp app:/tmp/nexus-hash-results.json "$NEXUS_BROWSER_REPORT_DIR/download-hash-results.json"
+[[ "$hash_probe_status" == 0 ]]
+[[ $(sql "SELECT count(*) FROM audit_events WHERE action = 'product.download_started' AND target_id = '$product_id';") == $((hash_player_count + 1)) ]]
+echo "PASS: pre-response TCP disconnect stops hashing, closes the file, creates no download audit and permits an exact-byte retry"

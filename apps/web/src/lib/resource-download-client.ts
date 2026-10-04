@@ -107,7 +107,7 @@ async function readResourceDownload(
   };
   signal.addEventListener("abort", cancel, { once: true });
   if (signal.aborted) cancel();
-  const chunks: ArrayBuffer[] = [];
+  const chunks: Blob[] = [];
   let received = 0;
   try {
     while (true) {
@@ -121,7 +121,9 @@ async function readResourceDownload(
       if (received > MAX_UPLOAD_FILE_SIZE_BYTES || (total !== null && received > total)) {
         throw new ResourceDownloadError("failed");
       }
-      chunks.push(Uint8Array.from(value).buffer);
+      // Snapshot each block without retaining a separate archive-sized array of
+      // ArrayBuffers. The browser controls Blob storage and its reclamation.
+      chunks.push(new Blob([value as Uint8Array<ArrayBuffer>]));
       onProgress(received, total);
     }
     if (received === 0 || (total !== null && received !== total)) {
