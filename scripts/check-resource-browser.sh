@@ -20,7 +20,7 @@ build_id="bld_resource_browser_$short"
 product_slug="j5-browser-resource-$short"
 storage_key="ci-resource-browser/$short.zip"
 payload_file="$work/j5-browser-resource.zip"
-node --import tsx --input-type=module - "$payload_file" <<'NODE'
+node --input-type=module - "$payload_file" <<'NODE'
 import { randomBytes } from 'node:crypto';
 import { openSync, closeSync, writeFileSync } from 'node:fs';
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from './packages/domain/src/upload-limits.ts';

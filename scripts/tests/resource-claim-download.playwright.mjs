@@ -38,7 +38,8 @@ async function verifyDownloadedFile(path) {
   assert.equal((await stat(path)).size, expectedSize);
   const hash = createHash("sha256");
   for await (const chunk of createReadStream(path)) hash.update(chunk);
-  assert.equal(hash.digest("hex"), expectedSha256);
+  const actualSha256 = hash.digest("hex");
+  assert.equal(actualSha256, expectedSha256);
   await rm(path);
 }
 const results = [];
