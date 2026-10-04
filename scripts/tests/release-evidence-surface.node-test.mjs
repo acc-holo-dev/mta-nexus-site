@@ -80,3 +80,31 @@ test("mail worker CI expects current structured terminal events", () => {
     assert.ok(!text.includes("Account mail dispatcher failed"));
   }
 });
+
+test("production mail acceptance isolates its queue before seeding and dispatching", () => {
+  const script = read("scripts/check-production-mail-worker.sh");
+  const create = script.indexOf("CREATE DATABASE nexus_mail_acceptance");
+  const migrate = script.indexOf("pnpm --filter @nexus/db migrate");
+  const seed = script.indexOf("phase=seed-synthetic-mail");
+  assert.ok(create > script.indexOf("phase=runner-guard"));
+  assert.ok(migrate > create && seed > migrate);
+  assert.match(script, /export DATABASE_URL=postgres:\/\/[^\n]+@localhost:5432\/nexus_mail_acceptance/u);
+  const workerUrls = [...script.matchAll(/--env DATABASE_URL=([^\s]+)/gu)];
+  assert.equal(workerUrls.length, 2);
+  for (const [, url] of workerUrls) {
+    assert.ok(url.endsWith("@host.docker.internal:5432/nexus_mail_acceptance"));
+  }
+  assert.doesNotMatch(script, /TRUNCATE|DELETE FROM|DROP DATABASE/iu);
+});
+
+test("mail worker crash probe signals only the inspected container process", () => {
+  const script = read("scripts/check-production-mail-worker.sh");
+  const crash = script.slice(script.indexOf("phase=supervised-crash-restart"), script.indexOf("phase=graceful-recreate"));
+  assert.ok(crash.includes("sleep 10"));
+  assert.ok(crash.includes("docker inspect --format '{{.State.Pid}}' \"$worker\""));
+  assert.ok(crash.includes('"$worker_pid" -gt 1'));
+  assert.ok(crash.includes('sudo kill -KILL "$worker_pid"'));
+  assert.doesNotMatch(crash, /^docker (?:kill|stop|restart|start) /mu);
+  assert.ok(crash.includes('"$restart_now" -gt "$restart_before"'));
+  assert.ok(crash.includes('"$ready_now" -gt "$ready_before"'));
+});

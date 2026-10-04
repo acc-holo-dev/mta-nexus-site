@@ -158,7 +158,13 @@ phase=supervised-crash-restart
 echo 'D5 phase: supervised crash restart'
 restart_before=$(docker inspect --format '{{.RestartCount}}' "$worker")
 ready_before=$(docker logs "$worker" 2>&1 | grep -c '"status":"ready"' || true)
-docker kill --signal KILL "$worker" >/dev/null
+# Let Docker observe a successful start before exercising its restart policy.
+sleep 10
+# docker kill marks a manual stop and suppresses unless-stopped restart.
+# Signal only this disposable container's host PID to simulate a process crash.
+worker_pid=$(docker inspect --format '{{.State.Pid}}' "$worker")
+[[ "$worker_pid" =~ ^[0-9]+$ && "$worker_pid" -gt 1 ]]
+sudo kill -KILL "$worker_pid"
 restarted=0
 for attempt in $(seq 1 100); do
   running=$(docker inspect --format '{{.State.Running}}' "$worker" 2>/dev/null || true)
