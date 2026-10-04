@@ -41,7 +41,7 @@ test.afterAll(async () => {
     expectedSha256,
     results,
     limitations:
-      "Disposable production stack, real auth/database/entitlement/local-storage/download route. Product/build are seeded fixtures; author publishing and moderator approval are covered separately.",
+      "Disposable production stack, real auth/database/entitlement/local-storage/download route. Timeout/cancellation use a synthetic stalled fetch and browser clock; they do not simulate a real TCP interruption. Product/build are seeded fixtures; author publishing and moderator approval are covered separately.",
   };
   await writeFile(
     join(output, "resource-results.json"),
@@ -68,6 +68,9 @@ test("J5 claim -> workspace -> download exact published build", async ({
   const name = "claim published free resource and download exact bytes";
   let status = "FAIL";
   const browserErrors = [];
+  const downloads = [];
+  page.on("download", (download) => downloads.push(download));
+  await page.clock.install();
 
   page.on("pageerror", (error) => browserErrors.push(error.message));
   page.on("console", (message) => {
@@ -172,6 +175,47 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await expect(page.getByRole("alert").filter({ hasText: "This build cannot be downloaded right now" })).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/market/${productSlug}$`, "u"));
     await page.unroute(downloadPattern);
+
+    // Stall exactly one download in the browser. Restore fetch immediately so
+    // subsequent retries and unrelated requests use the real production stack.
+    const stallNextDownload = () => page.evaluate((id) => {
+      const originalFetch = window.fetch;
+      window.fetch = (input, init) => {
+        if (input !== `/api/products/${encodeURIComponent(id)}/download`) {
+          return originalFetch(input, init);
+        }
+        window.fetch = originalFetch;
+        return new Promise((_resolve, reject) => {
+          const signal = init?.signal;
+          if (!signal) {
+            reject(new Error("Download must provide an AbortSignal"));
+            return;
+          }
+          if (signal.aborted) reject(signal.reason);
+          else signal.addEventListener("abort", () => reject(signal.reason), { once: true });
+        });
+      };
+    }, productId);
+    const downloadButton = page.getByRole("button", { name: "Download Build v1.0.0", exact: true });
+    const preparingButton = page.getByRole("button", { name: "Preparing download…", exact: true });
+
+    await stallNextDownload();
+    await downloadButton.click();
+    await expect(preparingButton).toBeDisabled();
+    await page.clock.fastForward(60_001);
+    await expect(page.getByRole("alert").filter({ hasText: "The download stopped responding" })).toBeVisible();
+    await expect(downloadButton).toBeEnabled();
+    assert.equal(downloads.length, 0, "Timed-out requests must not save a file");
+
+    await stallNextDownload();
+    await downloadButton.click();
+    await expect(preparingButton).toBeDisabled();
+    await page.getByRole("button", { name: "Cancel download", exact: true }).click();
+    await expect(page.getByRole("status").filter({ hasText: "Download cancelled. You can try again." })).toBeVisible();
+    await expect(downloadButton).toBeEnabled();
+    await page.clock.fastForward(60_001);
+    await expect(page.getByRole("alert").filter({ hasText: "The download stopped responding" })).toHaveCount(0);
+    assert.equal(downloads.length, 0, "Cancelled requests must not save a file");
 
     const downloadPromise = page.waitForEvent("download");
     await page
