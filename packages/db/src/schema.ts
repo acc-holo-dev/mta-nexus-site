@@ -1,4 +1,4 @@
-import { PRODUCT_TYPES, type ProductType } from "@nexus/domain";
+import { PRODUCT_TYPES, type ProductType, type BuildReviewNotificationData } from "@nexus/domain";
 import { sql } from "drizzle-orm";
 import {
   pgTable,
@@ -472,6 +472,7 @@ export const follows = pgTable(
 
 // 21. Notifications
 export const notifications = pgTable("notifications", {
+  data: jsonb("data").$type<BuildReviewNotificationData>(),
   id: text("id").primaryKey(),
   recipientId: text("recipient_id")
     .notNull()

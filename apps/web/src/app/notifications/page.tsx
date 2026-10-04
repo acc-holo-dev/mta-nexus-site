@@ -15,6 +15,7 @@ import {
   Settings,
 } from "lucide-react";
 import { Button, EmptyState, Skeleton } from "@nexus/ui";
+import { formatNotification } from "../../lib/notification-copy";
 import type { Notification } from "@nexus/domain";
 import { useNexusLocale } from "../../components/locale-context";
 
@@ -223,15 +224,15 @@ export default function NotificationCenterPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-sm font-bold text-primary">
-                      {notification.title}
+                    <h2 className="break-words text-sm font-bold text-primary">
+                      {formatNotification(notification, dictionary.buildReviewNotifications).title}
                     </h2>
                     <span className="rounded border border-base bg-inset px-2 py-0.5 font-numeric text-[10px] uppercase text-muted">
                       {notification.type}
                     </span>
                   </div>
-                  <p className="text-xs leading-relaxed text-secondary">
-                    {notification.message}
+                  <p className="whitespace-pre-wrap break-words text-xs leading-relaxed text-secondary">
+                    {formatNotification(notification, dictionary.buildReviewNotifications).message}
                   </p>
                 </div>
 

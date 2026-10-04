@@ -849,6 +849,12 @@ const en = {
     switchToLight: "Switch to light theme",
     switchToDark: "Switch to dark theme",
   },
+  buildReviewNotifications: {
+  "approved": "Resource version approved",
+  "rejected": "Resource version rejected",
+  "version": "Version",
+  "notes": "Moderator comment"
+},
   notifications: {
     workspace: "Workspace",
     title: "Notification center",
@@ -2053,6 +2059,12 @@ const ru: typeof en = {
     switchToLight: "Включить светлую тему",
     switchToDark: "Включить тёмную тему",
   },
+  buildReviewNotifications: {
+  "approved": "Версия ресурса одобрена",
+  "rejected": "Версия ресурса отклонена",
+  "version": "Версия",
+  "notes": "Комментарий модератора"
+},
   notifications: {
     workspace: "Рабочая зона",
     title: "Центр уведомлений",

@@ -148,3 +148,7 @@ for decision in submitted_for_review approved rejected retired; do
 done
 [[ $(sql "SELECT count(*) FROM entitlements WHERE resource_id = '$created_product' AND permission = 'product.download';") == 1 ]]
 echo "PASS: real author lifecycle, clean scans, decisions, audit trail, entitlement and final-public-build retirement persisted"
+
+[[ $(sql "SELECT count(*) FROM notifications WHERE recipient_id = (SELECT id FROM users WHERE email = '$NEXUS_AUTHOR_BROWSER_EMAIL') AND data->>'kind' = 'build_review';") == 2 ]]
+[[ $(sql "SELECT count(*) FROM notifications WHERE recipient_id = (SELECT id FROM users WHERE email = '$NEXUS_AUTHOR_BROWSER_EMAIL') AND data->>'kind' = 'build_review' AND is_read = false;") == 0 ]]
+echo "PASS: author approval/rejection notifications persisted once and were marked read"

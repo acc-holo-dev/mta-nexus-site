@@ -1,7 +1,7 @@
 import { and, asc, count, eq, desc, ne, sql, inArray } from "drizzle-orm";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { db } from "../client";
-import { auditEvents, builds, products, users } from "../schema";
+import { auditEvents, builds, products, users, organizations, organizationMembers, notificationPreferences, notifications } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
 
 export type PendingReviewBuild = Build & {
@@ -182,7 +182,7 @@ export class BuildRepository {
         .update(products)
         .set({ updatedAt: sql`${products.updatedAt}` })
         .where(eq(products.id, reviewed.productId))
-        .returning({ id: products.id });
+        .returning({ id: products.id, title: products.title, authorId: products.authorId, organizationId: products.organizationId });
       if (!lockedProduct[0]) {
         throw new Error("Build product disappeared during moderation");
       }
@@ -231,6 +231,31 @@ export class BuildRepository {
       }
 
       await tx.insert(auditEvents).values({ ...audit, createdAt: new Date() });
+      const product = lockedProduct[0];
+      const notes = typeof audit.details?.notes === "string" ? audit.details.notes : "";
+      const title = decision === "approve" ? "Resource version approved" : "Resource version rejected";
+      const data = { kind: "build_review", decision, resourceTitle: product.title, version: reviewed.version, notes };
+      // Resolve current recipients in SQL, without exposing notes to former owners.
+      // The pending-state compare-and-set above makes a replay a no-op, including delivery.
+      await tx.execute(sql`
+        insert into ${notifications} (id, recipient_id, title, message, link, type, category, is_read, data, created_at)
+        select 'ntf_build_review_' || ${reviewed.id} || '_' || ${users.id}, ${users.id},
+          ${title}, ${`${product.title} · ${reviewed.version}${notes ? `\n${notes}` : ""}`},
+          ${`/workspace/resources/${product.id}`}, 'system', 'system', false, ${JSON.stringify(data)}::jsonb, now()
+        from ${users}
+        where (
+          (${product.organizationId}::text is null and ${users.id} = ${product.authorId})
+          or exists (select 1 from ${organizations}
+            where ${organizations.id} = ${product.organizationId} and ${organizations.ownerId} = ${users.id})
+          or exists (select 1 from ${organizationMembers}
+            where ${organizationMembers.organizationId} = ${product.organizationId}
+              and ${organizationMembers.userId} = ${users.id}
+              and (${organizationMembers.role} in ('owner', 'admin')
+                or ${organizationMembers.permissions} @> '["manage_products"]'::jsonb))
+        ) and not exists (select 1 from ${notificationPreferences}
+          where ${notificationPreferences.userId} = ${users.id}
+            and ${notificationPreferences.systemEnabled} = false)
+      `);
       return reviewed as unknown as Build;
     });
   }

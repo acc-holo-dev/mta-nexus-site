@@ -93,7 +93,20 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   assert.equal(forbidden, 404);
   evidence.push("Unauthenticated and unrelated moderator access denied.");
   await moderate(outsider, build.id, "approve", "Approved author acceptance version one.");
-  await page.reload();
+  const repeated = await outsider.evaluate(async (buildId) => (await fetch("/api/admin/actions", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ targetType: "build", targetId: buildId, action: "approve", notes: "Repeat approval" }),
+  })).status, build.id);
+  assert.equal(repeated, 409);
+  await page.goto("/notifications");
+  const approvalCard = page.locator("article").filter({ has: page.getByRole("heading", { name: "Resource version approved", exact: true }) });
+  await expect(approvalCard).toBeVisible();
+  await expect(approvalCard.getByText(/Moderator comment: Approved author acceptance version one\./u)).toBeVisible();
+  const approvalNotices = await page.evaluate(async () => (await (await fetch("/api/notifications")).json()).notifications);
+  assert.equal(approvalNotices.filter((notice) => notice.data?.kind === "build_review").length, 1);
+  await approvalCard.getByRole("link", { name: "View", exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/workspace/resources/${product.id}$`, "u"));
+  evidence.push("Approval delivered one localized author notification with notes and a working resource link; replay returned 409.");
   await expect(page.getByText("Approved author acceptance version one.", { exact: true })).toBeVisible();
   await expect(page.getByText("Published · 1.0.0", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Open resource preview", exact: true }).click();
@@ -124,8 +137,21 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   const second = (await submittedResponse.json()).build;
   await expect(page.getByText("Version submitted for scanning and moderator review.", { exact: true })).toBeVisible();
   await moderate(outsider, second.id, "reject", "Rejected second version: update the manifest.");
+  await page.goto("/notifications");
+  await expect(page.getByRole("heading", { name: "Resource version rejected", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Mark all as read", exact: true }).click();
+  await expect.poll(async () => page.evaluate(async () => (await (await fetch("/api/notifications")).json()).unreadCount)).toBe(0);
   await page.getByRole("button", { name: "Language", exact: true }).click();
   await page.reload();
+  await expect(page.getByRole("heading", { name: "Версия ресурса одобрена", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Версия ресурса отклонена", exact: true })).toBeVisible();
+  const rejectionCard = page.locator("article").filter({ has: page.getByRole("heading", { name: "Версия ресурса отклонена", exact: true }) });
+  await expect(rejectionCard.getByText(/Комментарий модератора: Rejected second version/u)).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth));
+  await rejectionCard.getByRole("link", { name: "Открыть", exact: true }).click();
+  await expect(page).toHaveURL(new RegExp(`/workspace/resources/${product.id}$`, "u"));
+  evidence.push("Approval/rejection notifications localized to RU, fit mobile width and marked as read without losing history.");
   await expect(page.getByText("Rejected second version: update the manifest.", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "История версий", exact: true })).toBeVisible();
   await expect(page.getByText("Опубликован · 1.0.0", { exact: true })).toBeVisible();

@@ -8,6 +8,7 @@ import {
   CheckCheck,
   ExternalLink,
 } from "lucide-react";
+import { formatNotification } from "../lib/notification-copy";
 import type { Notification } from "@nexus/domain";
 import { useNexusLocale } from "./locale-context";
 
@@ -199,7 +200,7 @@ export function NotificationBell() {
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="truncate text-xs font-semibold text-primary">
-                        {notification.title}
+                        {formatNotification(notification, dictionary.buildReviewNotifications).title}
                       </span>
                       <time
                         dateTime={new Date(notification.createdAt).toISOString()}
@@ -210,8 +211,8 @@ export function NotificationBell() {
                         )}
                       </time>
                     </div>
-                    <p className="line-clamp-2 font-caption text-muted">
-                      {notification.message}
+                    <p className="line-clamp-2 whitespace-pre-wrap break-words font-caption text-muted">
+                      {formatNotification(notification, dictionary.buildReviewNotifications).message}
                     </p>
                     {notification.link && (
                       <Link

@@ -390,7 +390,16 @@ export interface NotificationPreferences {
   updatedAt: Date;
 }
 
+export interface BuildReviewNotificationData {
+  kind: "build_review";
+  decision: "approve" | "reject";
+  resourceTitle: string;
+  version: string;
+  notes: string;
+}
+
 export interface Notification {
+  data?: BuildReviewNotificationData | null;
   id: string;
   recipientId: string;
   title: string;

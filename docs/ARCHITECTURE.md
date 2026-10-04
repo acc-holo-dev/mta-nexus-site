@@ -271,3 +271,25 @@ The disposable Resource browser workflow includes real author creation, metadata
 clean-scanned version submissions, API approval/rejection by a moderator, author-visible
 review notes, RU/mobile layout and final-public-version retirement. Existing claim and
 64 MiB download acceptance remains in the same run. It does not test external mail delivery.
+
+## Build review notifications
+
+Build approval/rejection now inserts system notifications in the same PostgreSQL
+transaction as the build transition, product synchronization and audit. A failed
+notification insert rolls back that decision; a replay cannot deliver another notice.
+Recipients are resolved from current personal ownership or organization ownership /
+owner-admin membership / `manage_products`, without relying on historical authorship.
+Users with system notifications disabled are excluded. Organization recipients are
+selected in one set-based INSERT, so membership lists are not silently truncated.
+
+Migration `0025_build_review_notifications` adds nullable JSON data to notifications.
+Existing plain-text rows keep their display fallback. Structured review notices carry
+the decision, resource title, version and moderator notes; the center and bell render
+RU/EN labels at display time. Links lead to the private author workspace. Comments
+remain plain text, with line breaks and wrapping. This feature sends in-app notices;
+it does not enqueue or send external email.
+
+PostgreSQL integration acceptance covers concurrent replay, delivery opt-out, revoked
+organization permissions and notification-write rollback/retry. The production browser
+journey checks review notices, resource links, RU/mobile presentation, read state and
+database delivery counts alongside the complete author publication flow.
