@@ -113,8 +113,10 @@ try {
   evidence.rerunIdempotent = true;
   evidence.phase = "structured-notification";
   const data = { kind: "build_review", decision: "approve", resourceTitle: "Existing resource", version: "1.0.0", notes: "Reviewed" };
+  // Drizzle changes this client's JSON serializers. Bind serialized JSON as
+  // text and cast explicitly instead of using postgres.js's original json helper.
   await client`INSERT INTO notifications (id, recipient_id, title, message, data)
-    VALUES ('upgrade-new-notification', 'upgrade-user', 'Review', 'Approved', ${client.json(data)})`;
+    VALUES ('upgrade-new-notification', 'upgrade-user', 'Review', 'Approved', ${JSON.stringify(data)}::jsonb)`;
   const added = await client`SELECT data FROM notifications WHERE id = 'upgrade-new-notification'`;
   assert.deepEqual(added[0].data, data);
   evidence.structuredNotificationAccepted = true;
