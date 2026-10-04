@@ -110,9 +110,22 @@ export NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE="J5 Browser Resource"
 export NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256="$expected_sha"
 export NEXUS_RESOURCE_BROWSER_EXPECTED_SIZE="$file_size"
 
+# Create real password accounts, then grant disposable CI roles directly in the fixture DB.
+export NEXUS_AUTHOR_BROWSER_EMAIL="author-cabinet-$short@example.invalid"
+export NEXUS_MODERATOR_BROWSER_EMAIL="moderator-cabinet-$short@example.invalid"
+export NEXUS_AUTHOR_BROWSER_PASSWORD="Ci-$(openssl rand -hex 24)"
+echo "::add-mask::$NEXUS_AUTHOR_BROWSER_PASSWORD"
+for role in developer moderator; do
+  if [[ "$role" == developer ]]; then account_email="$NEXUS_AUTHOR_BROWSER_EMAIL"; else account_email="$NEXUS_MODERATOR_BROWSER_EMAIL"; fi
+  account_json=$(ACCOUNT_EMAIL="$account_email" ACCOUNT_USERNAME="cabinet_${role}_$short" node -e 'process.stdout.write(JSON.stringify({email:process.env.ACCOUNT_EMAIL,username:process.env.ACCOUNT_USERNAME,password:process.env.NEXUS_AUTHOR_BROWSER_PASSWORD}))')
+  "${https[@]}" --fail -H 'Content-Type: application/json' --data "$account_json" "https://$domain:8443/api/auth/register" > "$work/cabinet-$role.json"
+  sql "UPDATE users SET role = '$role' WHERE email = '$account_email';" > /dev/null
+done
+
 "$NEXUS_BROWSER_TOOLS/node_modules/.bin/playwright" test \
   --config=playwright.ci.config.mjs \
-  scripts/tests/resource-claim-download.playwright.mjs
+  scripts/tests/resource-claim-download.playwright.mjs \
+  scripts/tests/author-workspace.playwright.mjs
 
 claims=$(sql "SELECT count(*) FROM entitlements WHERE resource_id = '$product_id' AND permission = 'product.download';")
 [[ "$claims" == 1 ]]

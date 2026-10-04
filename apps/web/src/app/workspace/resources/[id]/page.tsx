@@ -1,0 +1,145 @@
+import Link from "next/link";
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { authService } from "../../../../lib/services/auth-service";
+import { productService } from "../../../../lib/services/product-service";
+import { getDictionary } from "../../../../lib/i18n";
+import { getRequestLocale } from "../../../../lib/i18n-server";
+import { AuthorResourceForms, RetireBuildForm } from "../../../../components/author-resource-forms";
+
+export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "Manage resource | MTA NEXUS",
+  robots: { index: false, follow: false },
+};
+
+export default async function ManageResourcePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.authorResources;
+  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  if (!actor)
+    return (
+      <section className="space-y-4 py-16 text-center">
+        <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
+        <Link href="/auth/login" className="text-accent underline">
+          {dictionary.workspace.signIn}
+        </Link>
+      </section>
+    );
+  const { id } = await params;
+  const product = await productService.getManagedProduct(id, actor);
+  if (!product) notFound();
+  const history = await productService.getManagedHistory(
+    id,
+    actor,
+    Number((await searchParams).page ?? 1),
+  );
+  return (
+    <div className="space-y-8">
+      <Link href="/workspace/resources" className="text-sm text-accent underline">
+        {copy.back}
+      </Link>
+      <header className="space-y-2">
+        <h1 className="break-words font-display text-primary">{product.title}</h1>
+        <p className="text-secondary">
+          {copy.statusLabels[product.status]} · {product.currentVersion}
+        </p>
+        <Link href={`/market/${product.slug}`} className="text-sm text-accent underline">
+          {copy.preview}
+        </Link>
+      </header>
+      <AuthorResourceForms
+        product={{
+          id: product.id,
+          title: product.title,
+          shortDescription: product.shortDescription ?? "",
+          description: product.description,
+          tags: product.tags,
+        }}
+      />
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-primary">{copy.history}</h2>
+        {history.builds.length === 0 && <p className="text-secondary">{copy.noBuilds}</p>}
+        <ul className="space-y-4">
+          {history.builds.map((build) => (
+            <li key={build.id} className="space-y-3 rounded-lg border border-base bg-surface p-5">
+              <div className="flex flex-wrap justify-between gap-2">
+                <h3 className="font-semibold text-primary">{build.version}</h3>
+                <time
+                  dateTime={new Date(build.createdAt).toISOString()}
+                  className="text-sm text-muted"
+                >
+                  {new Date(build.createdAt).toLocaleDateString(
+                    locale === "ru" ? "ru-RU" : "en-GB",
+                  )}
+                </time>
+              </div>
+              <p className="text-sm text-secondary">
+                {copy.buildLabels[build.status]} · {copy.scan}:{" "}
+                {copy.scanLabels[build.scanStatus as keyof typeof copy.scanLabels] ??
+                  copy.scanLabels.unknown}
+              </p>
+              {build.releaseNotes && (
+                <p className="whitespace-pre-wrap break-words text-sm text-secondary">
+                  {build.releaseNotes}
+                </p>
+              )}
+              {history.decisions
+                .filter((decision) => decision.buildId === build.id)
+                .map((decision) => (
+                  <div
+                    key={decision.id}
+                    className="border-l-2 border-base pl-3 text-sm text-secondary"
+                  >
+                    <p>
+                      {copy.notes} ·{" "}
+                      {decision.action === "build.approved"
+                        ? copy.buildLabels.published
+                        : decision.action === "build.rejected"
+                          ? copy.buildLabels.rejected
+                          : copy.buildLabels.retired}
+                    </p>
+                    <p className="whitespace-pre-wrap break-words">
+                      {typeof decision.details?.notes === "string"
+                        ? decision.details.notes
+                        : typeof decision.details?.reason === "string"
+                          ? decision.details.reason
+                          : ""}
+                    </p>
+                  </div>
+                ))}
+              {build.status !== "retired" && (
+                <RetireBuildForm productId={id} buildId={build.id} version={build.version} />
+              )}
+            </li>
+          ))}
+        </ul>
+        {history.totalPages > 1 && (
+          <nav aria-label={copy.page} className="flex gap-4 text-sm">
+            {history.page > 1 && (
+              <Link href={`?page=${history.page - 1}`} className="text-accent underline">
+                {copy.previous}
+              </Link>
+            )}
+            <span>
+              {copy.page} {history.page} {copy.of} {history.totalPages}
+            </span>
+            {history.page < history.totalPages && (
+              <Link href={`?page=${history.page + 1}`} className="text-accent underline">
+                {copy.next}
+              </Link>
+            )}
+          </nav>
+        )}
+      </section>
+    </div>
+  );
+}

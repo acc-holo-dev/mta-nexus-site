@@ -250,3 +250,24 @@ Article cover URLs use the shared HTTP(S) policy at content submission and when
 rendering cards, article detail pages and Open Graph metadata. Invalid legacy
 covers are omitted consistently; an empty or omitted cover remains valid. This
 validates the URL syntax and scheme, not the remote image content or availability.
+
+## Author resource workspace
+
+`/workspace/resources` lists manageable free resources, including unpublished drafts,
+with status filters and 24-item pages. `/workspace/resources/[id]` edits only title,
+short description, description and tags, submits another build through the existing
+bounded upload / ClamAV / private-storage pipeline, and shows 20-item version pages
+with moderation and retirement notes. The workspace and submission result link to it.
+Both pages are private, dynamic and excluded from indexing; client props omit storage keys.
+
+List, private reads and metadata writes share one SQL authorization scope: personal
+ownership, organization ownership, an organization owner/admin membership or the
+`manage_products` permission. Organization resources do not grant access through
+historical authorship. Administrator maintenance access follows the existing policy.
+Metadata writes recheck scope in the UPDATE and insert their audit record in the same
+transaction. PATCH rejects unknown fields, including ownership, status, price and slug.
+
+The disposable Resource browser workflow includes real author creation, metadata edits,
+clean-scanned version submissions, API approval/rejection by a moderator, author-visible
+review notes, RU/mobile layout and final-public-version retirement. Existing claim and
+64 MiB download acceptance remains in the same run. It does not test external mail delivery.

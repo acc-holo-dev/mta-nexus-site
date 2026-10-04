@@ -1,4 +1,4 @@
-import { and, asc, count, eq, desc, ne, sql } from "drizzle-orm";
+import { and, asc, count, eq, desc, ne, sql, inArray } from "drizzle-orm";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { db } from "../client";
 import { auditEvents, builds, products, users } from "../schema";
@@ -13,6 +13,22 @@ export type PendingReviewBuild = Build & {
 };
 
 export class BuildRepository {
+  async pageHistory(productId: string, requestedPage = 1) {
+    const condition = eq(builds.productId, productId);
+    const [summary] = await db.select({ total: count() }).from(builds).where(condition);
+    const totalPages = Math.max(1, Math.ceil((summary?.total ?? 0) / 20));
+    const page = Math.min(Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1, totalPages);
+    const rows = await db.select().from(builds).where(condition)
+      .orderBy(desc(builds.createdAt), desc(builds.id)).limit(20).offset((page - 1) * 20);
+    const decisions = rows.length ? await db.select({ id: auditEvents.id, buildId: auditEvents.targetId,
+      action: auditEvents.action, details: auditEvents.details, createdAt: auditEvents.createdAt })
+      .from(auditEvents).where(and(eq(auditEvents.targetType, "build"),
+        inArray(auditEvents.targetId, rows.map((row) => row.id)),
+        inArray(auditEvents.action, ["build.approved", "build.rejected", "build.retired"])))
+      .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id)) : [];
+    return { builds: rows as unknown as Build[], decisions, page, totalPages };
+  }
+
   async countPendingReview(): Promise<number> {
     const [row] = await db.select({ total: count() }).from(builds)
       .where(eq(builds.status, "pending_review"));

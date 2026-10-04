@@ -271,3 +271,11 @@ export const searchFilterSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
 });
+
+// Author editing cannot change ownership, slug, pricing or publication state.
+export const editProductDetailsSchema = z.object({
+  title: z.string().trim().min(3).max(120),
+  shortDescription: z.string().trim().max(250),
+  description: z.string().trim().min(10).max(10_000),
+  tags: z.array(z.string().trim().min(1).max(30)).max(20),
+}).strict();

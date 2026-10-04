@@ -3,8 +3,8 @@ import { eq, desc, asc, and, count, gte, lte, ilike, or, sql, inArray, ne } from
 import { safePublishedBuildCondition } from "./build-safety";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
-import { auditEvents, builds, products } from "../schema";
-import type { AuditEvent, Product, ProductType } from "@nexus/domain";
+import { auditEvents, builds, products, organizations, organizationMembers } from "../schema";
+import type { AuditEvent, Product, ProductType, User } from "@nexus/domain";
 
 function hasSafePublishedBuild() {
   return sql`exists (
@@ -16,6 +16,21 @@ function hasSafePublishedBuild() {
       and ${builds.scanner} is not null
       and btrim(${builds.scanner}) <> ''
       and ${builds.scannedAt} is not null
+  )`;
+}
+
+/** Same scope for listing, private reads and audited metadata writes. */
+export function managedProductCondition(actor: Pick<User, "id" | "role">): SQL {
+  if (actor.role === "admin") return sql`true`;
+  return sql`(
+    (${products.organizationId} is null and ${products.authorId} = ${actor.id})
+    or exists (select 1 from ${organizations}
+      where ${organizations.id} = ${products.organizationId} and ${organizations.ownerId} = ${actor.id})
+    or exists (select 1 from ${organizationMembers}
+      where ${organizationMembers.organizationId} = ${products.organizationId}
+        and ${organizationMembers.userId} = ${actor.id}
+        and (${organizationMembers.role} in ('owner', 'admin')
+          or ${organizationMembers.permissions} @> '["manage_products"]'::jsonb))
   )`;
 }
 
@@ -31,6 +46,39 @@ export interface ProductQueryOptions {
 }
 
 export class ProductRepository {
+  async pageManaged(actor: Pick<User, "id" | "role">, status?: Product["status"], requestedPage = 1) {
+    const condition = and(managedProductCondition(actor), eq(products.price, 0),
+      status ? eq(products.status, status) : undefined);
+    const [summary] = await db.select({ total: count() }).from(products).where(condition);
+    const total = summary?.total ?? 0;
+    const totalPages = Math.max(1, Math.ceil(total / 24));
+    const page = Math.min(Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1, totalPages);
+    const rows = await db.select().from(products).where(condition)
+      .orderBy(desc(products.updatedAt), desc(products.id)).limit(24).offset((page - 1) * 24);
+    return { products: rows as unknown as Product[], total, page, totalPages };
+  }
+
+  async findManaged(id: string, actor: Pick<User, "id" | "role">): Promise<Product | null> {
+    const rows = await db.select().from(products).where(and(eq(products.id, id),
+      eq(products.price, 0), managedProductCondition(actor))).limit(1);
+    return (rows[0] as unknown as Product) ?? null;
+  }
+
+  async updateManagedDetails(id: string, actor: Pick<User, "id" | "role">,
+    details: Pick<Product, "title" | "shortDescription" | "description" | "tags">,
+    audit: Omit<AuditEvent, "createdAt">): Promise<Product | null> {
+    return db.transaction(async (tx) => {
+      // Recheck the scope in the mutation, including organization membership.
+      const rows = await tx.update(products).set({ title: details.title,
+        shortDescription: details.shortDescription, description: details.description,
+        tags: details.tags, updatedAt: new Date() })
+        .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor))).returning();
+      if (!rows[0]) return null;
+      await tx.insert(auditEvents).values(audit);
+      return rows[0] as unknown as Product;
+    });
+  }
+
   async pagePublishedFreeByAuthor(authorId: string, requestedPage = 1, requestedSize = 24) {
     return this.pagePublishedFree(eq(products.authorId, authorId), requestedPage, requestedSize);
   }

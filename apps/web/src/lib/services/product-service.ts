@@ -18,6 +18,31 @@ export interface ProductFilters {
 }
 
 export class ProductService {
+  async listManagedProducts(actor: User, status?: Product["status"], page = 1) {
+    return productRepository.pageManaged(actor, status, page);
+  }
+
+  async getManagedProduct(id: string, actor: User) {
+    return productRepository.findManaged(id, actor);
+  }
+
+  async getManagedHistory(id: string, actor: User, page = 1) {
+    const product = await this.getManagedProduct(id, actor);
+    if (!product) throw new NotFoundError("Product", id);
+    return buildRepository.pageHistory(product.id, page);
+  }
+
+  async updateProductDetails(id: string,
+    details: Pick<Product, "title" | "shortDescription" | "description" | "tags">, actor: User) {
+    const product = await productRepository.updateManagedDetails(id, actor, details, {
+      id: generateId("aud"), actorId: actor.id, actorType: actor.role === "admin" ? "admin" : "user",
+      action: "product.details_updated", targetId: id, targetType: "product",
+      details: { fields: ["title", "shortDescription", "description", "tags"] },
+    });
+    if (!product) throw new NotFoundError("Product", id);
+    return product;
+  }
+
   async canManageProduct(
     product: Product,
     actor: User,

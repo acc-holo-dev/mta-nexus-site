@@ -246,6 +246,7 @@ export default function NewResourcePage() {
           >
             {copy.openStatus}
           </Link>
+        <Link href="/workspace/resources" className="block text-accent underline">{dictionary.authorResources.title}</Link>
         </div>
       </div>
     );

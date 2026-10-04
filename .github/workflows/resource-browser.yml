@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   resource-browser:
-    name: Free claim and download
+    name: Author publishing, claim and download
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -38,7 +38,7 @@ jobs:
           echo "NEXUS_BROWSER_TOOLS=$tools" >> "$GITHUB_ENV"
           echo "PLAYWRIGHT_BROWSERS_PATH=$PLAYWRIGHT_BROWSERS_PATH" >> "$GITHUB_ENV"
           echo "NEXUS_BROWSER_REPORT_DIR=$RUNNER_TEMP/nexus-resource-report" >> "$GITHUB_ENV"
-      - name: Verify free resource claim and download journey
+      - name: Verify author workspace and free resource journey
         id: acceptance
         run: bash scripts/check-resource-browser.sh
       - name: Publish textual evidence
@@ -52,6 +52,11 @@ jobs:
             test -s "$report/resource-results.json"
             test -s "$report/resource-summary.md"
             test -s "$report/playwright-report.json"
+            test -s "$report/author-results.json"
+            test -s "$report/author-summary.md"
+          fi
+          if [ -f "$report/author-summary.md" ]; then
+            tee -a "$GITHUB_STEP_SUMMARY" < "$report/author-summary.md"
           fi
           if [ -f "$report/resource-summary.md" ]; then
             tee -a "$GITHUB_STEP_SUMMARY" < "$report/resource-summary.md"
