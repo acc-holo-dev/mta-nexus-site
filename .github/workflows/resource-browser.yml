@@ -56,9 +56,19 @@ jobs:
             test -s "$report/author-summary.md"
             test -s "$report/shell-results.json"
             test -s "$report/shell-summary.md"
+            test -s "$report/portfolio-results.json"
+            test -s "$report/portfolio-summary.md"
+            test -s "$report/download-network-results.json"
+            test -s "$report/download-network-summary.md"
           fi
           if [ -f "$report/shell-summary.md" ]; then
             tee -a "$GITHUB_STEP_SUMMARY" < "$report/shell-summary.md"
+          fi
+          if [ -f "$report/portfolio-summary.md" ]; then
+            tee -a "$GITHUB_STEP_SUMMARY" < "$report/portfolio-summary.md"
+          fi
+          if [ -f "$report/download-network-summary.md" ]; then
+            tee -a "$GITHUB_STEP_SUMMARY" < "$report/download-network-summary.md"
           fi
           if [ -f "$report/author-summary.md" ]; then
             tee -a "$GITHUB_STEP_SUMMARY" < "$report/author-summary.md"

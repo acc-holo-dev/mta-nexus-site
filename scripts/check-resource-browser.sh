@@ -110,6 +110,16 @@ export NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE="J5 Browser Resource"
 export NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256="$expected_sha"
 export NEXUS_RESOURCE_BROWSER_EXPECTED_SIZE="$file_size"
 
+portfolio_sql=$(PORTFOLIO_STORAGE_KEY="$storage_key" PORTFOLIO_SHA256="$expected_sha" node --input-type=module <<'NODE'
+import { readFileSync } from 'node:fs';
+const key = process.env.PORTFOLIO_STORAGE_KEY;
+const hash = process.env.PORTFOLIO_SHA256;
+if (!/^ci-resource-browser\/[a-f0-9]+\.zip$/.test(key) || !/^[a-f0-9]{64}$/.test(hash)) throw new Error('Invalid disposable portfolio fixture');
+process.stdout.write(readFileSync('scripts/fixtures/public-portfolio.sql', 'utf8').replaceAll('__STORAGE_KEY__', key).replaceAll('__SHA256__', hash));
+NODE
+)
+sql "$portfolio_sql" > /dev/null
+
 # Create real password accounts, then grant disposable CI roles directly in the fixture DB.
 export NEXUS_AUTHOR_BROWSER_EMAIL="author-cabinet-$short@example.invalid"
 export NEXUS_MODERATOR_BROWSER_EMAIL="moderator-cabinet-$short@example.invalid"
@@ -126,7 +136,8 @@ done
   --config=playwright.ci.config.mjs \
   scripts/tests/resource-claim-download.playwright.mjs \
   scripts/tests/author-workspace.playwright.mjs \
-  scripts/tests/shell-accessibility.playwright.mjs
+  scripts/tests/shell-accessibility.playwright.mjs \
+  scripts/tests/public-portfolio.playwright.mjs
 
 claims=$(sql "SELECT count(*) FROM entitlements WHERE resource_id = '$product_id' AND permission = 'product.download';")
 [[ "$claims" == 1 ]]
@@ -153,3 +164,7 @@ echo "PASS: real author lifecycle, clean scans, decisions, audit trail, entitlem
 [[ $(sql "SELECT count(*) FROM notifications WHERE recipient_id = (SELECT id FROM users WHERE email = '$NEXUS_AUTHOR_BROWSER_EMAIL') AND data->>'kind' = 'build_review';") == 2 ]]
 [[ $(sql "SELECT count(*) FROM notifications WHERE recipient_id = (SELECT id FROM users WHERE email = '$NEXUS_AUTHOR_BROWSER_EMAIL') AND data->>'kind' = 'build_review' AND is_read = false;") == 0 ]]
 echo "PASS: author approval/rejection notifications persisted once and were marked read"
+
+export NEXUS_DOWNLOAD_PROBE_APP="$("${pc[@]}" ps -q app)"
+export NEXUS_DOWNLOAD_PROBE_CA="$work/root.crt"
+node scripts/check-download-network.mjs

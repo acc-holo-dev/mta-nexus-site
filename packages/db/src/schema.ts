@@ -224,6 +224,12 @@ export const products = pgTable(
     index("products_type_idx").on(table.type),
     index("products_status_idx").on(table.status),
     index("products_author_idx").on(table.authorId),
+    index("products_public_author_created_id_idx")
+      .on(table.authorId, table.createdAt.desc(), table.id.desc())
+      .where(sql`${table.status} = 'published' AND ${table.price} = 0`),
+    index("products_public_org_created_id_idx")
+      .on(table.organizationId, table.createdAt.desc(), table.id.desc())
+      .where(sql`${table.status} = 'published' AND ${table.price} = 0`),
     index("products_featured_idx").on(table.isFeatured),
   ]
 );
@@ -413,6 +419,9 @@ export const content = pgTable(
   (table) => [
     uniqueIndex("content_slug_idx").on(table.slug),
     index("content_author_idx").on(table.authorId),
+    index("content_public_org_published_id_idx")
+      .on(table.organizationId, sql`coalesce(${table.publishedAt}, ${table.updatedAt}) DESC`, table.id.desc())
+      .where(sql`${table.status} = 'published'`),
     index("content_type_idx").on(table.type),
     index("content_status_created_id_idx").on(table.status, table.createdAt, table.id),
   ]

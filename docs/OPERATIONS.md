@@ -658,7 +658,7 @@ Keep these CI artifacts outside the runner before their 14-day retention expires
 | Evidence | What it proves |
 | --- | --- |
 | `core-release-evidence-<sha>-<attempt>` | Repository identity, migrations, lint, types, tests, default production build |
-| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0025; failed DDL and ledger rollback; retry; idempotency; legacy rows and new structured notifications |
+| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0026; failed DDL and ledger rollback; retry; idempotency; legacy rows and new structured notifications |
 | `backup-restore-<sha>-<attempt>` | Destroyed synthetic source restored into new owned volumes; schema, migration ledger, author, resource, trusted build, entitlement, notification and uploads preserved |
 
 Require `status: "PASS"`, the intended `sha`, and all verification/cleanup flags
@@ -666,10 +666,10 @@ to be true in the upgrade and restore reports. A downloaded report alone is not
 success. These reports extend the core release evidence; they are separate required
 workflow steps, not additional gates silently inferred by the core JSON summary.
 
-The upgrade fixture intentionally pins 0024 → 0025 and fails when a new migration
+The upgrade fixture intentionally pins 0024 → 0026 and fails when another migration
 is added. Review and extend it with the next release's old-schema fixtures and
 data-changing effects. Its injected failure is synthetic and occurs after the
-real 0025 SQL, within Drizzle's transaction. It proves database rollback/retry,
+real 0026 SQL, within Drizzle's transaction. It proves database rollback/retry,
 not recovery from host failure or compatibility of an older application image.
 Backup acceptance uses synthetic data and the production PostgreSQL/storage
 topology; rehearse separately against a protected copy of the target dataset.
@@ -790,3 +790,38 @@ Keep the failed installation stopped and retain its volumes for investigation.
 
 Do not copy a raw PostgreSQL volume between major versions. Preserve both the
 failed volumes and the backup until the recovered installation is confirmed stable.
+
+
+## Large portfolios and streaming download acceptance
+
+Migration `0026_public_portfolio_indexes` adds partial author/organization resource
+indexes and a published organization-content index with the same ordering as the
+public pages. It changes no rows. Index creation runs in the migration transaction
+and can block writers; include it in the maintenance window and rehearse on a
+restored target dataset before deployment. The upgrade rehearsal still starts
+from 0024 and now verifies transaction rollback/retry across both 0025 and 0026.
+
+The Verify job executes the real portfolio repositories against temporary tables
+with 10,128 resources, 10,127 builds and 10,025 articles. It captures representative
+EXPLAIN ANALYZE/BUFFERS plans before and after the new indexes. Retrieve
+`portfolio-query-plans-<sha>-<attempt>` within 14 days; timings are synthetic,
+warm-cache observations, not a production latency guarantee. The test does not
+force planner settings. Public filtering, deterministic equal-date ordering and
+deep/stale pages are verified independently through the repository methods.
+
+Resource browser acceptance covers guest RU/EN developer, user and organization
+portfolios with 125 safe resources and 25 articles at 390 and 1280 pixels, including
+resource/article page preservation and excluded draft/paid/unsafe/foreign rows.
+Its report includes screenshots and portfolio JSON. After the browser journeys,
+a Node HTTPS client creates a real account and claim, breaks three actual TLS/TCP
+connections during delivery, retries with exact byte/hash verification, and runs
+four throttled 64 MiB downloads concurrently. The report records HTTP-process
+RSS baseline/peak and enforces a 128 MiB growth regression budget. It does not
+measure browser memory, total container page cache, interruption during hashing,
+or production capacity. Browser evidence is retained for three days.
+
+Both public and reviewer downloads now count the Web Stream queue in bytes with
+a 64 KiB high-water mark. This preserves backpressure for slow clients rather
+than allowing thousands of binary chunks to accumulate. Source cancellation
+still closes the underlying stream. Full pre-response hashing remains required;
+measure its disk/latency cost on the deployment host.

@@ -191,6 +191,15 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Preserve portfolio query plans
+        if: ${{ always() && steps.release_verification.outcome != 'skipped' }}
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: portfolio-query-plans-${{ github.sha }}-${{ github.run_attempt }}
+          path: artifacts/portfolio-query-plans.json
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Build production image
         run: docker build --tag mta-nexus:ci .
 

@@ -3,7 +3,7 @@ import {
   BuildArtifactMismatchError,
 } from "../../../../../lib/build-download-metadata";
 import path from "node:path";
-import { Readable } from "node:stream";
+import { toDownloadWebStream } from "../../../../../lib/download-web-stream";
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../../lib/services/auth-service";
 import { commerceService } from "../../../../../lib/services/commerce-service";
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       throw error;
     }
 
-    const stream = Readable.toWeb(stored.stream as Readable) as ReadableStream;
+    const stream = toDownloadWebStream(stored.stream);
     const fileName = `${product.slug}-${latestBuild.version}${getDownloadExtension(latestBuild.fileName)}`;
     return new NextResponse(stream, {
       headers: {

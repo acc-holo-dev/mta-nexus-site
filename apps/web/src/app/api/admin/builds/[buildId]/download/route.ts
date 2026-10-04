@@ -4,7 +4,7 @@ import {
   BuildArtifactMismatchError,
 } from "../../../../../../lib/build-download-metadata";
 import path from "node:path";
-import { Readable } from "node:stream";
+import { toDownloadWebStream } from "../../../../../../lib/download-web-stream";
 import { NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { auditRepository, buildRepository } from "@nexus/db";
@@ -103,7 +103,7 @@ export async function GET(
       throw error;
     }
 
-    const stream = Readable.toWeb(stored.stream as Readable) as ReadableStream;
+    const stream = toDownloadWebStream(stored.stream);
     return new NextResponse(stream, {
       headers: {
         ...privateHeaders,

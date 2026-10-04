@@ -21,7 +21,7 @@ const root = fileURLToPath(new URL("../../../", import.meta.url));
 const migrationsFolder = join(root, "packages/db/migrations");
 const journal = JSON.parse(readFileSync(join(migrationsFolder, "meta/_journal.json"), "utf8"));
 // Freeze the baseline: when migrations advance, review and extend this fixture.
-assert.equal(journal.entries.at(-1).tag, "0025_build_review_notifications");
+assert.equal(journal.entries.at(-1).tag, "0026_public_portfolio_indexes");
 const temp = mkdtempSync(join(tmpdir(), "nexus-upgrade-"));
 const baselineFolder = join(temp, "baseline");
 const failureFolder = join(temp, "failure");
@@ -33,7 +33,7 @@ const evidence = {
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: "0024_product_type_invariant",
-  target: "0025_build_review_notifications",
+  target: "0026_public_portfolio_indexes",
   phase: "baseline",
   failedMigrationRolledBack: false,
   legacyRowsPreserved: false,
@@ -46,10 +46,10 @@ const evidence = {
 try {
   cpSync(migrationsFolder, baselineFolder, { recursive: true });
   writeFileSync(join(baselineFolder, "meta/_journal.json"), JSON.stringify({
-    ...journal, entries: journal.entries.slice(0, -1),
+    ...journal, entries: journal.entries.filter((entry) => entry.idx <= 24),
   }));
   cpSync(migrationsFolder, failureFolder, { recursive: true });
-  const targetPath = join(failureFolder, "0025_build_review_notifications.sql");
+  const targetPath = join(failureFolder, "0026_public_portfolio_indexes.sql");
   writeFileSync(targetPath, readFileSync(targetPath, "utf8") +
     "\n--> statement-breakpoint\nDO $$ BEGIN RAISE EXCEPTION 'nexus_upgrade_injected_failure'; END $$;\n");
 
@@ -92,6 +92,9 @@ try {
   const columns = await client`SELECT column_name FROM information_schema.columns
     WHERE table_schema = 'public' AND table_name = 'notifications' AND column_name = 'data'`;
   assert.equal(columns.length, 0, "Failed migration must roll back its DDL");
+  const failedIndexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public'
+    AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx')`;
+  assert.equal(failedIndexes.length, 0, "Failed migration must roll back its indexes");
   evidence.failedMigrationRolledBack = true;
 
   evidence.phase = "upgrade";
@@ -99,6 +102,9 @@ try {
   const afterLedger = await ledger();
   const count = await client`SELECT count(*)::int AS count FROM drizzle.__drizzle_migrations`;
   assert.equal(count[0].count, journal.entries.length);
+  const indexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public'
+    AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx')`;
+  assert.equal(indexes.length, 3);
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);
