@@ -46,6 +46,7 @@ for (const locale of ["en", "ru"]) {
     const dialog = page.getByRole("dialog", { name: copy.dialogLabel, exact: true });
     const input = dialog.getByRole("combobox", { name: copy.searchLabel, exact: true });
     await expect(input).toBeFocused();
+    await expect(dialog).toHaveJSProperty("open", true);
     await containedTabbing(page, dialog);
     await page.keyboard.press("Escape");
     await expect(dialog).toHaveCount(0);
@@ -88,14 +89,17 @@ for (const locale of ["en", "ru"]) {
     await expect(bell).toBeFocused();
     evidence.push(`${locale}: notification modal contains focus and restores its trigger on Escape`);
 
-    const routes = ["/market", "/workspace", "/workspace/resources", "/notifications", "/settings", "/auth/login"];
+    const headings = { "/market": dictionary.market.title, "/workspace": dictionary.workspace.signInRequired,
+      "/workspace/resources": dictionary.workspace.signInRequired, "/notifications": dictionary.notifications.title,
+      "/settings": dictionary.settings.signInRequired, "/auth/login": dictionary.auth.loginTitle };
+    const routes = Object.keys(headings);
     for (const width of [320, 390, 1280]) {
       await page.setViewportSize({ width, height: 844 });
       for (const route of routes) {
         const response = await page.goto(route);
         assert.equal(response.status(), 200, `${locale} ${width} ${route}`);
         await expect(page.locator("html")).toHaveAttribute("lang", locale);
-        await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
+        await expect(page.getByRole("main").getByRole("heading", { level: 1, name: headings[route], exact: true })).toBeVisible();
         assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `Horizontal overflow: ${locale} ${width} ${route}`);
         // Every visible form field needs an accessible label.
         const unlabeled = await page.locator('main input:not([type="hidden"]), main select, main textarea').evaluateAll((elements) => elements.filter((element) => element.getClientRects().length && !element.getAttribute("aria-label") && !element.getAttribute("aria-labelledby") && !element.labels?.length).map((element) => element.name || element.id));

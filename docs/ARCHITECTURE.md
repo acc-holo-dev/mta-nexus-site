@@ -298,7 +298,8 @@ database delivery counts alongside the complete author publication flow.
 
 The command palette and notification menu use native modal `dialog` elements.
 Shared lifecycle handling restores the previous connected focus target on close;
-the browser contains focus and makes the underlying page inert. Escape, explicit
+the browser makes the underlying page inert, and explicit Tab/Shift+Tab wrapping
+keeps keyboard focus inside at the first/last control. Escape, explicit
 close controls and backdrop dismissal close the same modal state. Opening the
 notification menu triggers an uncached refresh rather than waiting for its poll.
 
