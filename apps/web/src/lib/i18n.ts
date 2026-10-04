@@ -468,6 +468,7 @@ const en = {
       missing: "The build file is unavailable. Try again later.",
       unavailable: "This build cannot be downloaded right now. Try again after it has been checked.",
       rateLimit: "Too many download attempts. Wait a moment and try again.",
+      timeout: "The download stopped responding. Check your connection and try again.",
       failed: "The download could not be completed. Check your connection and try again.",
     },
 
@@ -1613,6 +1614,7 @@ const ru: typeof en = {
       missing: "Файл сборки недоступен. Попробуйте позже.",
       unavailable: "Сейчас эту сборку скачать нельзя. Повторите попытку после её проверки.",
       rateLimit: "Слишком много попыток скачивания. Подождите и попробуйте снова.",
+      timeout: "Скачивание не отвечает. Проверьте соединение и попробуйте снова.",
       failed: "Не удалось завершить скачивание. Проверьте соединение и попробуйте снова.",
     },
 

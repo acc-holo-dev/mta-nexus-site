@@ -1,6 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
-import { fetchResourceDownload } from "../apps/web/src/lib/resource-download-client";
+import { DOWNLOAD_IDLE_TIMEOUT_MS, fetchResourceDownload } from "../apps/web/src/lib/resource-download-client";
+
+afterEach(() => vi.useRealTimers());
 
 const controller = () => new AbortController();
 const response = (body = "archive", headers: Record<string, string> = {}) =>
@@ -19,7 +21,7 @@ describe("browser resource download preparation", () => {
     expect(fetcher).toHaveBeenCalledWith("/api/products/product%2Fid/download", {
       credentials: "same-origin",
       cache: "no-store",
-      signal,
+      signal: expect.any(AbortSignal),
     });
     expect(result.fileName).toBe("resource-1.0.zip");
     expect(await result.blob.text()).toBe("archive");
@@ -202,4 +204,67 @@ it("removes the abort listener after successful reading", async () => {
   const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response());
   await fetchResourceDownload("id", active.signal, vi.fn(), fetcher);
   expect(remove).toHaveBeenCalledWith("abort", expect.any(Function));
+});
+
+it("times out while waiting for response headers and clears its timer", async () => {
+  vi.useFakeTimers();
+  const fetcher = vi.fn<typeof fetch>().mockImplementation((_url, init) =>
+    new Promise((_resolve, reject) => {
+      init?.signal?.addEventListener("abort", () => reject(init.signal?.reason), { once: true });
+    }),
+  );
+  const download = fetchResourceDownload("id", controller().signal, vi.fn(), fetcher);
+  const rejected = expect(download).rejects.toMatchObject({ reason: "timeout" });
+  await vi.advanceTimersByTimeAsync(DOWNLOAD_IDLE_TIMEOUT_MS);
+  await rejected;
+  expect(vi.getTimerCount()).toBe(0);
+});
+
+it("cancels a stalled response body without saving partial bytes", async () => {
+  vi.useFakeTimers();
+  const cancel = vi.fn();
+  const body = new ReadableStream<Uint8Array>({
+    start(stream) { stream.enqueue(new Uint8Array([1])); },
+    cancel,
+  });
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body));
+  const download = fetchResourceDownload("id", controller().signal, vi.fn(), fetcher);
+  const rejected = expect(download).rejects.toMatchObject({ reason: "timeout" });
+  await vi.advanceTimersByTimeAsync(DOWNLOAD_IDLE_TIMEOUT_MS);
+  await rejected;
+  expect(cancel).toHaveBeenCalledOnce();
+  expect(body.locked).toBe(false);
+  expect(vi.getTimerCount()).toBe(0);
+});
+
+it("allows a slow download to exceed the timeout while bytes keep arriving", async () => {
+  vi.useFakeTimers();
+  let stream!: ReadableStreamDefaultController<Uint8Array>;
+  const body = new ReadableStream<Uint8Array>({ start(value) { stream = value; } });
+  const progress = vi.fn();
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body));
+  const download = fetchResourceDownload("id", controller().signal, progress, fetcher);
+  for (let i = 0; i < 3; i++) {
+    await vi.advanceTimersByTimeAsync(DOWNLOAD_IDLE_TIMEOUT_MS - 1);
+    stream.enqueue(new Uint8Array([i]));
+    await vi.advanceTimersByTimeAsync(0);
+  }
+  stream.close();
+  expect((await download).blob.size).toBe(3);
+  expect(progress).toHaveBeenCalledTimes(3);
+  expect(vi.getTimerCount()).toBe(0);
+});
+
+it("preserves manual cancellation and releases the idle timer", async () => {
+  vi.useFakeTimers();
+  const active = controller();
+  const body = new ReadableStream<Uint8Array>();
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body));
+  const download = fetchResourceDownload("id", active.signal, vi.fn(), fetcher);
+  const rejected = expect(download).rejects.toMatchObject({ name: "AbortError" });
+  await vi.advanceTimersByTimeAsync(1);
+  active.abort();
+  await rejected;
+  expect(body.locked).toBe(false);
+  expect(vi.getTimerCount()).toBe(0);
 });

@@ -6,6 +6,7 @@ export type DownloadFailure =
   | "missing"
   | "unavailable"
   | "rateLimit"
+  | "timeout"
   | "failed";
 
 export class ResourceDownloadError extends Error {
@@ -14,12 +15,50 @@ export class ResourceDownloadError extends Error {
   }
 }
 
+export const DOWNLOAD_IDLE_TIMEOUT_MS = 60_000;
+
 /** Read at most the supported archive size; never save partial/error responses. */
 export async function fetchResourceDownload(
   productId: string,
   signal: AbortSignal,
   onProgress: (received: number, total: number | null) => void,
   request: typeof fetch = fetch,
+): Promise<{ blob: Blob; fileName: string }> {
+  signal.throwIfAborted();
+  const active = new AbortController();
+  const cancel = () => active.abort(signal.reason);
+  signal.addEventListener("abort", cancel, { once: true });
+  let timedOut = false;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const resetTimeout = () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      timedOut = true;
+      active.abort();
+    }, DOWNLOAD_IDLE_TIMEOUT_MS);
+  };
+  resetTimeout();
+  try {
+    return await readResourceDownload(productId, active.signal, (received, total) => {
+      resetTimeout();
+      onProgress(received, total);
+    }, request);
+  } catch (error) {
+    // Explicit cancellation takes precedence over a concurrent idle timeout.
+    signal.throwIfAborted();
+    if (timedOut) throw new ResourceDownloadError("timeout");
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    signal.removeEventListener("abort", cancel);
+  }
+}
+
+async function readResourceDownload(
+  productId: string,
+  signal: AbortSignal,
+  onProgress: (received: number, total: number | null) => void,
+  request: typeof fetch,
 ): Promise<{ blob: Blob; fileName: string }> {
   signal.throwIfAborted();
   const response = await request(`/api/products/${encodeURIComponent(productId)}/download`, {
