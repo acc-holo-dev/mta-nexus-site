@@ -37,7 +37,7 @@ export DOMAIN=nexus-ci.test
 export ACME_EMAIL=ci@nexus-ci.test
 export POSTGRES_USER=nexus
 export POSTGRES_PASSWORD=nexus_test_secret
-export POSTGRES_DB=mta_nexus_test
+export POSTGRES_DB=nexus_mail_acceptance
 # Used only when rendering the full Compose config; never passed to the worker.
 export TRUSTED_PROXY_SECRET=disposable-mail-worker-proxy-config-only
 export ACCOUNT_MAIL_KEY_ID=ci
@@ -62,6 +62,19 @@ docker compose --env-file /dev/null \
 node scripts/tests/mail-worker-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json
 node scripts/tests/recovery-compose.node-test.mjs /tmp/nexus-d5-worker-compose.json
 
+# A fresh database prevents unrelated test ciphertext/key IDs from contaminating
+# the fail-closed key-coverage check. Never delete rows from the shared test DB.
+phase=isolated-database
+echo 'D5 phase: create isolated acceptance database'
+pnpm --filter @nexus/db exec node --input-type=module -e '
+  import postgres from "postgres";
+  const sql = postgres(process.env.DATABASE_URL, { max: 1 });
+  try { await sql.unsafe("CREATE DATABASE nexus_mail_acceptance"); }
+  finally { await sql.end(); }
+'
+export DATABASE_URL=postgres://nexus:nexus_test_secret@localhost:5432/nexus_mail_acceptance
+pnpm --filter @nexus/db migrate
+
 phase=seed-synthetic-mail
 echo 'D5 phase: seed synthetic mail'
 seed=$(NEXUS_D5_MAIL_SEED=true NEXUS_D5_TEST_PASSWORD="$test_password" \
@@ -82,7 +95,7 @@ start_worker() {
     --restart unless-stopped \
     --add-host host.docker.internal:host-gateway \
     --env NODE_ENV=production \
-    --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/mta_nexus_test \
+    --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/nexus_mail_acceptance \
     --env ACCOUNT_MAIL_KEY_ID=ci \
     --env ACCOUNT_MAIL_KEY="$mail_key" \
     --env ACCOUNT_MAIL_PREVIOUS_KEY_ID=ci-previous \
@@ -181,7 +194,7 @@ phase=missing-key-fail-closed
 echo 'D5 phase: missing-key fail-closed'
 set +e
 docker run --rm --add-host host.docker.internal:host-gateway \
-  --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/mta_nexus_test \
+  --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/nexus_mail_acceptance \
   --env ACCOUNT_MAIL_KEY_ID=ci --env ACCOUNT_MAIL_KEY= \
   --env ACCOUNT_MAIL_APP_URL=https://nexus-mta.test \
   --env ACCOUNT_MAIL_SMTP_HOST="$smtp_host" --env ACCOUNT_MAIL_SMTP_PORT=2465 \
