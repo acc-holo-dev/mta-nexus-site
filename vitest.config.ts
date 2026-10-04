@@ -1,5 +1,8 @@
 import { configDefaults, defineConfig } from "vitest/config";
 import path from "node:path";
+import { classifyTests } from "./scripts/test-projects.mjs";
+
+const testFiles = classifyTests(__dirname);
 
 export default defineConfig({
   test: {
@@ -7,12 +10,29 @@ export default defineConfig({
     // Standalone builds copy source tests; never execute those generated copies.
     exclude: [...configDefaults.exclude, "**/.next/**"],
     environment: "node",
-    // Several repository suites (account-mail queue/lease capacity) exercise a
-    // global singleton queue gate and assert exact row counts. Running test
-    // files in parallel lets one suite mutate another suite's queue state,
-    // which is a nondeterministic failure, not a product bug. File-level
-    // serialization keeps those suites deterministic at the cost of runtime.
-    fileParallelism: false,
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: "unit",
+          include: testFiles.unit,
+          fileParallelism: true,
+          // Avoid dozens of workers competing for memory on developer hosts.
+          maxWorkers: 4,
+          isolate: true,
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "database",
+          include: testFiles.database,
+          // Queue capacity, leases and exact counts share one disposable DB.
+          fileParallelism: false,
+          isolate: true,
+        },
+      },
+    ],
   },
   resolve: {
     alias: {

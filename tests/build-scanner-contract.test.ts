@@ -1,46 +1,32 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { describe, expect, it, vi } from "vitest";
 
-describe("resource build scanner contract", () => {
-  it("keeps disabled scanning explicit and blocks malicious scanner verdicts", () => {
-    const scanner = readFileSync(
-      resolve(process.cwd(), "apps/web/src/lib/services/build-scanner-service.ts"),
-      "utf8"
-    );
-    const upload = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/api/products/[id]/builds/route.ts"),
-      "utf8"
-    );
-    const service = readFileSync(
-      resolve(process.cwd(), "apps/web/src/lib/services/product-service.ts"),
-      "utf8"
-    );
+vi.mock("@nexus/config", () => ({
+  config: {
+    BUILD_SCANNER: "disabled",
+    CLAMAV_HOST: "127.0.0.1",
+    CLAMAV_PORT: 3310,
+  },
+}));
 
-    expect(scanner).toContain('status: "not_scanned"');
-    expect(scanner).toContain('scanner: "disabled"');
-    expect(upload).toContain("buildScannerService.scan");
-    expect(upload).toContain('scan.status === "malicious"');
-    expect(upload).toContain('scan.status === "rejected"');
-    expect(service).toContain('build.scanStatus !== "clean"');
-  });
+import { buildScannerService } from "../apps/web/src/lib/services/build-scanner-service";
 
-  it("streams builds to ClamAV and fails closed in production", () => {
-    const scanner = readFileSync(
-      resolve(process.cwd(), "apps/web/src/lib/services/build-scanner-service.ts"),
-      "utf8"
-    );
-    const compose = readFileSync(resolve(process.cwd(), "compose.production.yaml"), "utf8");
-    const config = readFileSync(resolve(process.cwd(), "packages/config/src/index.ts"), "utf8");
-    const transport = readFileSync(resolve(process.cwd(), "apps/web/src/lib/services/clamav-instream.ts"), "utf8");
-    expect(scanner).toContain("writeClamAvInstream(socket, bytes)");
-    expect(transport).toContain('writeChunk(socket, "zINSTREAM\\0")');
-    expect(transport).toContain("writeUInt32BE");
-    expect(scanner).toContain('status: "clean", scanner: "clamav"');
-    expect(compose).toContain("clamav/clamav:1.5");
-    expect(compose).toContain('CLAMD_CONF_AlertExceedsMax: "yes"');
-    expect(readFileSync(resolve(process.cwd(), "compose.yaml"), "utf8"))
-      .toContain('CLAMD_CONF_AlertExceedsMax: "yes"');
-    expect(config).toContain("Production resource publishing requires ClamAV");
+describe("disabled resource build scanner", () => {
+  // TCP framing/verdicts, upload rejection, production configuration and
+  // approval authorization have their own behavioral suites. This distinct
+  // case prevents a disabled scanner from silently reporting a clean build.
+  it("returns an explicit unscanned verdict with a timestamp", async () => {
+    const startedAt = Date.now();
+    const result = await buildScannerService.scan({
+      bytes: new Uint8Array([1, 2, 3]),
+      fileName: "build.zip",
+    });
+
+    expect(result).toMatchObject({
+      status: "not_scanned",
+      scanner: "disabled",
+      scannedAt: expect.any(Date),
+    });
+    expect(result.scannedAt.getTime()).toBeGreaterThanOrEqual(startedAt);
+    expect(result.scannedAt.getTime()).toBeLessThanOrEqual(Date.now());
   });
 });

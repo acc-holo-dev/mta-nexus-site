@@ -31,17 +31,6 @@ describe("J4 production upload integration candidate", () => {
     expect(startup).toContain("[[ $oversized_code == 413 ]]");
   });
 
-  it("keeps both standalone and proxy evidence in the production summary", () => {
-    const startup = read("scripts/check-production-startup.sh");
-
-    expect(startup).toContain(
-      "production Caddy rejects request bodies above the 65 MiB build-upload envelope with HTTP 413",
-    );
-    expect(startup).toContain(
-      "standalone HTTP runtime, deployed migration runtime, no runtime pnpm",
-    );
-  });
-
   it("keeps the database deploy payload executable without a runtime package manager", () => {
     const dbPackage = JSON.parse(read("packages/db/package.json"));
     const entrypoint = read("scripts/start-production.sh");

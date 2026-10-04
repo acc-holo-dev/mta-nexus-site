@@ -1,29 +1,37 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { renderToStaticMarkup } from "react-dom/server";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../lib/i18n";
+
+import { LocaleProvider } from "./locale-context";
+import { CommandPalette } from "./command-palette";
+import { ThemeToggle } from "./theme-toggle";
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 const read = (path: string) =>
   readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("global shell controls", () => {
-  it("opens the command palette from Ctrl/Cmd+K and keeps closed-beta navigation clean", () => {
-    const navbar = read("apps/web/src/components/navbar.tsx");
-    const palette = read("apps/web/src/components/command-palette.tsx");
-
-    expect(navbar).toContain("event.metaKey || event.ctrlKey");
-    expect(navbar).toContain('event.key.toLowerCase() === "k"');
-    expect(navbar).toContain("setIsSearchOpen((open) => !open)");
-    expect(navbar).toContain('aria-haspopup="dialog"');
-
-    expect(palette).toContain('router.push("/market")');
-    expect(palette).toContain('router.push("/servers")');
-    expect(palette).toContain('router.push("/workspace/saved")');
-    expect(palette).toContain('router.push("/settings")');
-    expect(palette).not.toContain("/workspace/purchases");
-    expect(palette).not.toContain("/workspace/licenses");
-    expect(palette).not.toContain("CreditCard");
-    expect(palette).not.toContain("Key,");
+  // Shortcut, focus containment and keyboard activation are exercised by
+  // shell-accessibility.playwright.mjs rather than JavaScript spelling checks.
+  it.each(["en", "ru"] as const)("renders accessible localized palette commands in %s", (locale) => {
+    const copy = getDictionary(locale).commandPalette;
+    const renderPalette = (isOpen: boolean) => renderToStaticMarkup(
+      <LocaleProvider locale={locale}>
+        <CommandPalette isOpen={isOpen} onClose={() => undefined} />
+      </LocaleProvider>,
+    );
+    expect(renderPalette(false)).toBe("");
+    const html = renderPalette(true);
+    expect(html).toContain(`aria-label="${copy.dialogLabel}"`);
+    expect(html).toContain('role="combobox"');
+    expect(html).toContain('role="listbox"');
+    expect(html).toContain('aria-modal="true"');
+    for (const label of [copy.goMarket, copy.goServers, copy.openSaved, copy.openSettings]) {
+      expect(html).toContain(label);
+    }
   });
 
   it("uses localized command copy and abortable uncached search requests", () => {
@@ -74,16 +82,14 @@ describe("global shell controls", () => {
     expect(en.loadError).not.toBe(ru.loadError);
   });
 
-  it("localizes theme control accessibility labels", () => {
-    const source = read("apps/web/src/components/theme-toggle.tsx");
-
-    expect(source).toContain("dictionary.theme");
-    expect(source).toContain("copy.switchToLight");
-    expect(source).toContain("copy.switchToDark");
-
-    const en = getDictionary("en").theme;
-    const ru = getDictionary("ru").theme;
-    expect(en.switchToLight).not.toBe(ru.switchToLight);
-    expect(en.switchToDark).not.toBe(ru.switchToDark);
+  it.each(["en", "ru"] as const)("renders the theme control with an accessible localized name in %s", (locale) => {
+    const html = renderToStaticMarkup(
+      <LocaleProvider locale={locale}>
+        <ThemeToggle />
+      </LocaleProvider>,
+    );
+    expect(html).toContain('type="button"');
+    expect(html).toContain(`aria-label="${getDictionary(locale).theme.switchToLight}"`);
+    expect(html).toContain('aria-hidden="true"');
   });
 });

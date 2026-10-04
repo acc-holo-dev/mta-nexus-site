@@ -5,6 +5,7 @@ suite="${NEXUS_ACCOUNT_SUITE:-account}"
 case "$suite" in account|password) ;; *) echo 'Unknown account test suite' >&2; exit 2 ;; esac
 # Every matrix job receives its own fresh hosted runner, UUID project and volumes.
 # The production harness retains its cleanup trap throughout the browser checks.
+export NEXUS_CI_BROWSER_ONLY=true
 source "$(dirname "$0")/check-production-startup.sh"
 : "${NEXUS_BROWSER_TOOLS:?Browser-only tools are required}"
 : "${NEXUS_BROWSER_REPORT_DIR:?A report directory is required}"

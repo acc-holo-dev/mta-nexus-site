@@ -69,7 +69,32 @@ pnpm check
 pnpm release:verify
 ```
 
-CI also owns disposable PostgreSQL persistence, backup/restore, local Compose, production Compose and browser journeys.
+### Test and CI scopes
+
+- `pnpm test:unit`: isolated unit/mock suites, at most four parallel workers; no database required.
+- `pnpm test:database`: real DB/integration suites, sequential files against a disposable PostgreSQL database.
+- `pnpm test:tooling`: standalone Node suites. Compose validators that require rendered JSON remain owned by their infrastructure harnesses.
+- `pnpm test`: both Vitest projects; `pnpm check` and `pnpm release:verify` retain the full local release path.
+
+Only `CI` starts on push/PR. Ordinary code changes run lint, types, both test projects,
+one cached production-image build and a short registration/logout/directory browser smoke.
+Browser and infrastructure consumers load the exact same SHA-labelled image; a missing
+or mismatched artifact fails instead of rebuilding or pulling an unverified image.
+Production image transfer uses a one-day artifact without a registry publication.
+
+Full acceptance runs on `v*` tags, the manual **Run workflow → full=true** input, and
+infrastructure/migration/tooling/dependency changes. It additionally runs SMTP/worker,
+upgrade, persistence, backup/restore, DEV/production Compose and complete reusable
+account/directory/resource browser suites. Each browser job retains its own fresh DB
+and volumes. Browser startup skips repeated infrastructure-failure rehearsals; the
+production infrastructure job owns those checks. Markdown-only changes to README/docs
+run scope selection and the final status without Docker. `CI result` is the single
+aggregate status: missing, failed, cancelled or skipped required jobs cannot pass.
+
+Fast success is **not** full release acceptance. Evidence records `fast_ci`,
+`full_acceptance` or `documentation` and the exact SHA; unit/database JSON reports
+retain execution timings. A release needs a successful full run for its exact SHA.
+
 
 A workflow object with zero executed steps is infrastructure evidence, not an application test result. Release acceptance must name the exact tested `main` SHA.
 

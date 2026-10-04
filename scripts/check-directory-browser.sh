@@ -3,6 +3,7 @@ set -euo pipefail
 
 # Reuse the exact production rehearsal and its UUID resources in this shell.
 # Its EXIT trap stays active until all browser checks finish, even on failure.
+export NEXUS_CI_BROWSER_ONLY=true
 source "$(dirname "$0")/check-production-startup.sh"
 : "${NEXUS_BROWSER_TOOLS:?Browser-only tools must be installed by the CI job}"
 : "${NEXUS_BROWSER_REPORT_DIR:?A CI report directory is required}"
@@ -13,12 +14,6 @@ mkdir -p "$NEXUS_BROWSER_HOME/.pki/nssdb"
 certutil -d "sql:$NEXUS_BROWSER_HOME/.pki/nssdb" -N --empty-password
 certutil -d "sql:$NEXUS_BROWSER_HOME/.pki/nssdb" -A -n nexus-directory-ci -t 'C,,' -i "$work/root.crt"
 node --test scripts/tests/directory.browser.mjs
-
-# DEVX-002 foundation: run one duplicate smoke through Playwright Test itself.
-# The legacy node:test suite remains authoritative while scenarios migrate incrementally.
-"$NEXUS_BROWSER_TOOLS/node_modules/.bin/playwright" test \
-  --config=playwright.ci.config.mjs \
-  scripts/tests/directory-smoke.playwright.mjs
 
 # This is deliberately separate from fixture-driven browser assertions.
 # Upstream downtime is reported rather than hidden by, or made to fail, UI fixtures.

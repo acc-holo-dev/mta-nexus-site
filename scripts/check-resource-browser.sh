@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # Reuse the exact disposable production rehearsal and keep its cleanup trap.
+export NEXUS_CI_BROWSER_ONLY=true
 source "$(dirname "$0")/check-production-startup.sh"
 : "${NEXUS_BROWSER_TOOLS:?Browser-only tools are required}"
 : "${NEXUS_BROWSER_REPORT_DIR:?A browser report directory is required}"

@@ -9,11 +9,18 @@ set -euo pipefail
   echo 'Refusing a non-default or remote Docker daemon.' >&2; exit 1;
 }
 cd "$(dirname "$0")/.."
-node --test scripts/tests/production-entrypoint.node-test.mjs
 umask 077
-work=$(mktemp -d)
 project="nexus-prod-ci-$(node -p 'require("node:crypto").randomUUID()')"
+browser_only="${NEXUS_CI_BROWSER_ONLY:-false}"
+case "$browser_only" in true|false) ;; *) echo 'NEXUS_CI_BROWSER_ONLY must be true or false' >&2; exit 1 ;; esac
 image="${project}:candidate"
+if [[ -n ${NEXUS_CI_PREBUILT_IMAGE:-} ]]; then
+  image=$(bash scripts/validate-ci-image.sh)
+elif [[ $browser_only == true ]]; then
+  echo 'Browser jobs require NEXUS_CI_PREBUILT_IMAGE to avoid rebuilding the production image.' >&2
+  exit 1
+fi
+work=$(mktemp -d)
 domain=nexus-ci.test
 password=$(openssl rand -hex 24)
 secret=$(openssl rand -hex 32)
@@ -84,7 +91,9 @@ import { assertInternalIssuer } from './scripts/production-smoke-contract.mjs';
 assertInternalIssuer(JSON.parse(readFileSync(process.argv[2], 'utf8')));
 NODE
 phase=image-build
-"${pc[@]}" build app
+if [[ -z ${NEXUS_CI_PREBUILT_IMAGE:-} ]]; then
+  "${pc[@]}" build app
+fi
 phase=stack-start
 "${pc[@]}" up --detach --wait --wait-timeout 600 --no-build
 phase=runtime-layout
@@ -128,6 +137,12 @@ phase=https-home
 "${https[@]}" --fail "https://$domain:8443/" > "$work/home.html"
 grep -qi '<html' "$work/home.html"
 
+# The shared SQL helper remains available to browser fixtures in light mode.
+sql() { "${pc[@]}" exec -T postgres psql -X -v ON_ERROR_STOP=1 -U nexus -d mta_nexus -Atc "$1"; }
+[[ $(sql 'SELECT count(*) FROM drizzle.__drizzle_migrations') -gt 0 ]]
+image_before=$(docker inspect --format '{{.Image}}' "$app")
+
+if [[ $browser_only == false ]]; then
 # The proxy must reject a request one byte above the 65 MiB upload envelope
 # before the application can parse or buffer it.
 phase=proxy-body-limit
@@ -150,15 +165,15 @@ at_limit_code=$("${https[@]}" \
   -o /dev/null -w '%{http_code}' "https://$domain:8443/api/health")
 [[ $at_limit_code == 405 ]] || { echo "FAIL: exact-limit health POST expected HTTP 405, got $at_limit_code" >&2; exit 1; }
 rm -f -- "$work/oversized-request.bin"
+fi
 
 phase=http-redirect
 redirect=$(curl --silent --show-error --noproxy '*' --max-time 10 --resolve "$domain:8080:127.0.0.1" -o /dev/null -w '%{http_code} %{redirect_url}' "http://$domain:8080/")
 [[ $redirect == "308 https://$domain"* ]]
-echo 'PASS: production image, trusted test TLS, HTTP redirect, 65 MiB proxy body limit, database, writable uploads and private ports'
+echo 'PASS: production image, trusted test TLS, HTTP redirect, database, writable uploads and private ports'
 
+if [[ $browser_only == false ]]; then
 phase=persistence
-sql() { "${pc[@]}" exec -T postgres psql -X -v ON_ERROR_STOP=1 -U nexus -d mta_nexus -Atc "$1"; }
-[[ $(sql 'SELECT count(*) FROM drizzle.__drizzle_migrations') -gt 0 ]]
 sql "CREATE TABLE beta003_probe (id integer PRIMARY KEY, value text); INSERT INTO beta003_probe VALUES (1, 'retained');"
 "${pc[@]}" exec -T app node --input-type=module -e "import {writeFileSync} from 'node:fs'; writeFileSync('/data/uploads/beta003-probe', 'retained', {flag:'wx'});"
 image_before=$(docker inspect --format '{{.Image}}' "$app")
@@ -200,14 +215,19 @@ code=$("${https[@]}" -o "$work/unavailable.json" -w '%{http_code}' "https://$dom
 "${https[@]}" --fail "https://$domain:8443/api/health" > /dev/null
 [[ $(sql 'SELECT value FROM beta003_probe WHERE id=1') == retained ]]
 echo 'PASS: database outage returns 503 through HTTPS proxy; service recovers without losing the probe'
+fi
 {
   echo '## BETA-003 production startup'
   echo "Commit: ${GITHUB_SHA:-unknown}"
   echo "Application image: $image_before"
   echo 'PASS: HTTPS with an explicitly trusted disposable internal CA; production proxy directives retained.'
-  echo 'PASS: production Caddy rejects request bodies above the 65 MiB build-upload envelope with HTTP 413.'
-  echo 'PASS: standalone HTTP runtime, deployed migration runtime, no runtime pnpm, non-root app, private ports, read/write storage, replacement and retained probes.'
-  echo 'PASS: rejected invalid secret, HTTP URL, disabled scanner and failing migration; database 503 and recovery.'
+  echo 'PASS: standalone HTTP runtime, deployed migration runtime, no runtime pnpm, non-root app, private ports and writable storage.'
+  if [[ $browser_only == false ]]; then
+    echo 'PASS: production Caddy body boundary, replacement and retained probes.'
+    echo 'PASS: rejected invalid secret, HTTP URL, disabled scanner and failing migration; database 503 and recovery.'
+  else
+    echo 'Browser-only startup: infrastructure failure rehearsals are delegated to the production infrastructure job.'
+  fi
   echo 'Not covered: public ACME/DNS, browser journeys, malware verdicts, existing databases or backup restore.'
 } | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}"
 phase=browser-acceptance

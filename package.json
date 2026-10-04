@@ -43,7 +43,10 @@
     "dev:preflight": "pnpm nexus:doctor",
     "db:seed:repair": "pnpm --filter @nexus/db seed --repair-demo-builds",
     "test:resource-integrity": "vitest run tests/resource-download-client.test.ts tests/resource-detail-acquisition-ui.test.ts apps/web/src/components/resource-download-button.test.tsx tests/product-types.test.ts tests/seed-archive.test.ts tests/seed-storage.test.ts tests/seed-baseline.test.ts tests/build-download-metadata.test.ts tests/storage-open-file.test.ts tests/storage-atomic-upload.test.ts tests/storage-upload-key.test.ts tests/storage-provider.test.ts tests/resource-download-http.test.ts tests/build-moderation-controls.test.ts apps/web/src/app/workspace/resources/new/page.test.tsx",
-    "test:resource-integrity:integration": "vitest run tests/product-types.integration.test.ts tests/seed-baseline.integration.test.ts"
+    "test:resource-integrity:integration": "vitest run tests/product-types.integration.test.ts tests/seed-baseline.integration.test.ts",
+    "test:unit": "vitest run --project unit",
+    "test:database": "vitest run --project database",
+    "test:tooling": "node scripts/run-tooling-tests.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",

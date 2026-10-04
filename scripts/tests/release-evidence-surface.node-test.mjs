@@ -11,11 +11,13 @@ test("root exposes release:verify without adding runtime dependencies", () => {
   assert.equal(pkg.scripts["release:verify"], "node scripts/release-evidence.mjs");
 });
 
-test("CI uses the evidence-producing core verification command", () => {
+test("CI runs separate test projects and reports the selected verification scope", () => {
   const workflow = read(".github/workflows/ci.yml");
-  assert.match(workflow, /Verify project and write core release evidence/u);
-  assert.match(workflow, /run: pnpm release:verify/u);
-  assert.doesNotMatch(workflow, /name: Verify project\n\s+run: pnpm check/u);
+  assert.match(workflow, /pnpm test:unit/u);
+  assert.match(workflow, /pnpm test:database/u);
+  assert.match(workflow, /node scripts\/ci-summary\.mjs/u);
+  assert.match(workflow, /toJSON\(needs\)/u);
+  assert.doesNotMatch(workflow, /run: pnpm release:verify/u);
 });
 
 test("core release evidence records lint as its own gate", () => {
@@ -58,16 +60,14 @@ test("repository stability is checked after command execution and feeds the summ
   assert.match(script, /dirty: dirty \|\| finalDirty/u);
 });
 
-test("CI preserves only the evidence JSON after successful or failed verification", () => {
+test("CI preserves the selected-scope evidence independently of test success", () => {
   const workflow = read(".github/workflows/ci.yml");
-  const section = workflow.slice(workflow.indexOf("      - name: Preserve core release evidence"), workflow.indexOf("      - name: Build production image"));
-  assert.match(workflow, /id: release_verification/u);
-  assert.match(section, /always\(\) && steps\.release_verification\.outcome != 'skipped'/u);
-  assert.match(section, /uses: actions\/upload-artifact@v7\.0\.1/u);
-  assert.match(section, /path: artifacts\/release-evidence\.json/u);
+  const section = workflow.slice(workflow.indexOf("  summary:"));
+  assert.match(section, /always\(\)/u);
+  assert.match(section, /path: artifacts\/ci-evidence\.json/u);
   assert.match(section, /if-no-files-found: error/u);
   assert.match(section, /retention-days: 14/u);
-  assert.doesNotMatch(section, /continue-on-error|include-hidden-files|path: artifacts\s*$/mu);
+  assert.doesNotMatch(section, /continue-on-error|include-hidden-files/u);
 });
 
 test("mail worker CI expects current structured terminal events", () => {
