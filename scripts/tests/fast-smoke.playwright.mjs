@@ -19,6 +19,7 @@ test("registration, authenticated workspace and logout on the production image",
   await expect(page.getByRole("heading", { name: "Workspace", exact: true })).toBeVisible();
   await expect(page.getByRole("group", { name: "Account", exact: true })).toContainText(`@smoke_${nonce}`);
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await page.waitForURL("**/auth/login");
   await page.goto("/workspace");
   await expect(page.getByRole("heading", { name: "Sign in required", exact: true })).toBeVisible();
   assert.deepEqual(errors, []);

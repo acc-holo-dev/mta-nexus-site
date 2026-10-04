@@ -48,6 +48,44 @@ describe("isolated and shared-database test projects", () => {
     assert.deepEqual(classifyTests(root).unit, ["mock.test.ts"]);
   });
 
+  it("finds multiple imports and barrel exports on the same line", () => {
+    const root = project({
+      ...databaseFiles,
+      "inline.test.ts": 'import { it } from "vitest"; import { db } from "@nexus/db";',
+      "barrel.ts": 'export { value } from "./logic"; export { db } from "@nexus/db";',
+      "logic.ts": 'export const value = "pure";',
+      "barrel.test.ts": 'import { db } from "./barrel";',
+    });
+    assert.deepEqual(classifyTests(root).database, ["barrel.test.ts", "inline.test.ts"]);
+  });
+
+  it("does not let commented, quoted or regex mock examples suppress database imports", () => {
+    const root = project({
+      ...databaseFiles,
+      "line.test.ts": '// vi.mock("@nexus/db", () => ({ db: {} }));\nimport { db } from "@nexus/db";',
+      "block.test.ts": '/* vi.mock("@nexus/db", () => ({ db: {} })); */\nimport { db } from "@nexus/db";',
+      "quoted.test.ts": 'const example = \'vi.mock("@nexus/db", () => ({ db: {} }));\';\nimport { db } from "@nexus/db";',
+      "regex.test.ts": 'const example = /vi.mock("@nexus\\/db", () => ({}))/;\nimport { db } from "@nexus/db";',
+    });
+    assert.deepEqual(classifyTests(root).database, ["block.test.ts", "line.test.ts", "quoted.test.ts", "regex.test.ts"]);
+  });
+
+  it("restores the live edge when a full mock is subsequently removed", () => {
+    const root = project({
+      ...databaseFiles,
+      "unmock.test.ts": 'vi.mock("@nexus/db", () => ({ db: {} })); vi.unmock("@nexus/db"); import { db } from "@nexus/db";',
+    });
+    assert.deepEqual(classifyTests(root).database, ["unmock.test.ts"]);
+  });
+
+  it("serializes opaque dynamic imports inside template interpolations", () => {
+    const root = project({
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: literal source fixture, evaluated only by the classifier.
+      "template.test.ts": 'const value = `value: ${await import(moduleName)}`;',
+    });
+    assert.deepEqual(classifyTests(root).database, ["template.test.ts"]);
+  });
+
   it("keeps partial mocks and importActual in the database project", () => {
     const root = project({
       ...databaseFiles,

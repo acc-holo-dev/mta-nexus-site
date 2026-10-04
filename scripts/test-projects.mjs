@@ -33,32 +33,124 @@ export function classifyTests(root, files = discoverTests(root)) {
     return [base, ...[".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", "/index.ts", "/index.tsx", "/index.js"].map((extension) => base + extension)]
       .find((candidate) => existsSync(candidate) && /\.[cm]?[jt]sx?$/.test(candidate)) ?? null;
   }
+  // Tokenize enough JavaScript/TypeScript syntax to distinguish executable
+  // imports and mocks from comments, assertion strings and regex literals.
+  function tokenize(source) {
+    const tokens = [];
+    let unknownTemplateImport = false;
+    let index = 0;
+    while (index < source.length) {
+      const character = source[index];
+      if (/\s/.test(character)) { index++; continue; }
+      if (source.startsWith("//", index)) {
+        const end = source.indexOf("\n", index + 2);
+        index = end === -1 ? source.length : end + 1;
+        continue;
+      }
+      if (source.startsWith("/*", index)) {
+        const end = source.indexOf("*/", index + 2);
+        index = end === -1 ? source.length : end + 2;
+        continue;
+      }
+      if (character === '"' || character === "'" || character === "`") {
+        const quote = character;
+        const start = ++index;
+        let content = "";
+        while (index < source.length && source[index] !== quote) {
+          if (source[index] === "\\") { content += source.slice(index, index + 2); index += 2; }
+          else content += source[index++];
+        }
+        index++;
+        if (quote === "`") {
+          // Interpolations need a full parser. Never assume their imports are
+          // isolated just because template text is opaque to this scanner.
+          if (content.includes("${") && /\b(?:import|require)\s*\(|\bvi\.importActual/.test(content)) unknownTemplateImport = true;
+          tokens.push({ text: "template", value: content, start });
+        } else tokens.push({ text: "string", value: content, start });
+        continue;
+      }
+      const previous = tokens.at(-1)?.text;
+      if (character === "/" && (!previous || ["=", "(", ",", ":", "[", "!", "return", "=>", "|", "&", "?"].includes(previous))) {
+        // A regex is opaque too; its quotes and comment-like text are data.
+        index++;
+        let bracket = false;
+        while (index < source.length) {
+          if (source[index] === "\\") { index += 2; continue; }
+          if (source[index] === "[") bracket = true;
+          if (source[index] === "]") bracket = false;
+          if (source[index] === "/" && !bracket) { index++; break; }
+          index++;
+        }
+        while (/[a-z]/i.test(source[index] ?? "")) index++;
+        tokens.push({ text: "regex" });
+        continue;
+      }
+      const identifier = /^[A-Za-z_$][\w$]*/.exec(source.slice(index));
+      if (identifier) {
+        tokens.push({ text: identifier[0] });
+        index += identifier[0].length;
+      } else if (source.startsWith("=>", index)) {
+        tokens.push({ text: "=>" }); index += 2;
+      } else { tokens.push({ text: character }); index++; }
+    }
+    return { tokens, unknownTemplateImport };
+  }
   function inspect(file) {
     if (parsed.has(file)) return parsed.get(file);
-    const source = readFileSync(file, "utf8");
+    const { tokens, unknownTemplateImport } = tokenize(readFileSync(file, "utf8"));
     const imports = [];
     const mocks = new Set();
-    // Static module statements only: quoted paths in source-contract assertions
-    // and readFileSync calls are not executable dependencies.
-    const statements = /(?:^|\n)\s*(?:import|export)\s+(?!type\b)(?:(?:[\s\S]*?)\s+from\s+)?["']([^"']+)["']/g;
-    for (const match of source.matchAll(statements)) {
-      if (/\{\s*type\s+[^}]+\}/.test(match[0]) && !/\{[^}]*,\s*(?!type\b)[A-Za-z_$]/.test(match[0])) continue;
-      imports.push(match[1]);
+    const actual = new Set();
+    let unknownImport = unknownTemplateImport;
+    for (let index = 0; index < tokens.length; index++) {
+      const token = tokens[index].text;
+      const next = tokens[index + 1];
+      if ((token === "import" || token === "export") && next?.text !== "type" && next?.text !== "(") {
+        if (token === "import" && next?.text === "string") imports.push(next.value);
+        else {
+          for (let cursor = index + 1; cursor < tokens.length && tokens[cursor].text !== ";"; cursor++) {
+            if (tokens[cursor].text === "from" && tokens[cursor + 1]?.text === "string") {
+              imports.push(tokens[cursor + 1].value);
+              break;
+            }
+          }
+        }
+      }
+      if ((token === "import" || token === "require") && next?.text === "(") {
+        const argument = tokens[index + 2];
+        if (argument?.text === "string") imports.push(argument.value);
+        else unknownImport = true;
+      }
+      if (token !== "vi" || next?.text !== ".") continue;
+      const method = tokens[index + 2]?.text;
+      let cursor = index + 3;
+      if (tokens[cursor]?.text === "<") {
+        let depth = 0;
+        do {
+          if (tokens[cursor]?.text === "<") depth++;
+          if (tokens[cursor]?.text === ">") depth--;
+          cursor++;
+        } while (cursor < tokens.length && depth > 0);
+      }
+      if (tokens[cursor]?.text !== "(") continue;
+      const argument = tokens[cursor + 1];
+      if (argument?.text !== "string") {
+        if (["mock", "importActual", "unmock", "doUnmock"].includes(method)) unknownImport = true;
+        continue;
+      }
+      const target = resolveModule(file, argument.value);
+      if (method === "importActual") {
+        imports.push(argument.value);
+        if (target) actual.add(target);
+      } else if (method === "unmock" || method === "doUnmock") {
+        if (target) actual.add(target);
+      } else if (method === "mock" && tokens[cursor + 2]?.text === ",") {
+        let factory = cursor + 3;
+        if (tokens[factory]?.text === "async") factory++;
+        if (tokens[factory]?.text === "(" && tokens[factory + 1]?.text === ")" && tokens[factory + 2]?.text === "=>" && target) mocks.add(target);
+      }
     }
-    const dynamicImports = /\b(?:import|require|vi\.importActual)\s*\(\s*(["'])([^"']+)\1\s*\)/g;
-    for (const match of source.matchAll(dynamicImports)) imports.push(match[2]);
-    const unknownImport = /\b(?:import|require)\s*\(\s*(?!["'\s])/.test(source);
-    const fullMocks = /\bvi\.mock\s*\(\s*(["'])([^"']+)\1\s*,\s*(?:async\s+)?\(\s*\)\s*=>/g;
-    for (const match of source.matchAll(fullMocks)) {
-      const target = resolveModule(file, match[2]);
-      if (target) mocks.add(target);
-    }
-    // importActual is an escape from the mock barrier, including generic calls.
-    for (const match of source.matchAll(/\bvi\.importActual(?:<[^;]+?>)?\s*\(\s*(["'])([^"']+)\1/g)) {
-      imports.push(match[2]);
-      const target = resolveModule(file, match[2]);
-      if (target) mocks.delete(target);
-    }
+    for (const target of actual) mocks.delete(target);
     const result = { imports, mocks, unknownImport };
     parsed.set(file, result);
     return result;
