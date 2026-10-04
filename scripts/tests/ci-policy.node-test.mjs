@@ -13,7 +13,7 @@ test("application changes retain all mandatory fast gates", () => {
   assert.deepEqual(requiredJobs(policy), ["plan", "unit", "verify", "image", "smoke"]);
 });
 test("migration, workflow and explicit release changes run full acceptance", () => {
-  for (const files of [["packages/db/migrations/0027.sql"], [".github/workflows/ci.yml"], ["Dockerfile"]]) {
+  for (const files of [["packages/db/migrations/0027.sql"], [".github/workflows/ci.yml"], ["Dockerfile"], ["tests/mainline-repository-policy.test.ts"]]) {
     assert.equal(classifyChanges(files).full, true);
   }
   for (const option of [{ explicitFull: true }, { release: true }]) {

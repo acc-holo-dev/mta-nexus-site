@@ -7,18 +7,18 @@ const read = (path: string) =>
 
 describe("mainline repository policy", () => {
   it("keeps maintained automation on main", () => {
-    const workflows = [
-      ".github/workflows/ci.yml",
+    const coordinator = read(".github/workflows/ci.yml");
+    expect(coordinator).toContain("main");
+    expect(coordinator).not.toMatch(/branches:\s*\[[^\]]*\bdev\b/);
+    expect(coordinator).not.toMatch(/^\s*- dev\s*$/m);
+    for (const path of [
       ".github/workflows/auth-browser.yml",
       ".github/workflows/directory-browser.yml",
       ".github/workflows/resource-browser.yml",
-    ];
-
-    for (const path of workflows) {
+    ]) {
       const content = read(path);
-      expect(content, path).toContain("main");
-      expect(content, path).not.toMatch(/branches:\s*\[[^\]]*\bdev\b/);
-      expect(content, path).not.toMatch(/^\s*- dev\s*$/m);
+      expect(content, path).toContain("workflow_call:");
+      expect(content, path).not.toMatch(/^\s+(?:push|pull_request|schedule):/m);
     }
 
     const dependabot = read(".github/dependabot.yml");
