@@ -125,7 +125,8 @@ done
 "$NEXUS_BROWSER_TOOLS/node_modules/.bin/playwright" test \
   --config=playwright.ci.config.mjs \
   scripts/tests/resource-claim-download.playwright.mjs \
-  scripts/tests/author-workspace.playwright.mjs
+  scripts/tests/author-workspace.playwright.mjs \
+  scripts/tests/shell-accessibility.playwright.mjs
 
 claims=$(sql "SELECT count(*) FROM entitlements WHERE resource_id = '$product_id' AND permission = 'product.download';")
 [[ "$claims" == 1 ]]

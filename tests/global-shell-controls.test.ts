@@ -66,7 +66,7 @@ describe("global shell controls", () => {
     const markAllRead = source.slice(source.indexOf("async function markAllRead()"), source.indexOf("const bellLabel"));
     expect(markAllRead).toContain("setAttempt((value) => value + 1)");
     expect(markAllRead).not.toContain("setUnreadCount(0)");
-    expect(source).toContain('role="dialog"');
+    expect(source).toContain("<dialog");
 
     const en = getDictionary("en").notificationBell;
     const ru = getDictionary("ru").notificationBell;

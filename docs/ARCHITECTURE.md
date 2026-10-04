@@ -293,3 +293,25 @@ PostgreSQL integration acceptance covers concurrent replay, delivery opt-out, re
 organization permissions and notification-write rollback/retry. The production browser
 journey checks review notices, resource links, RU/mobile presentation, read state and
 database delivery counts alongside the complete author publication flow.
+
+## Keyboard and responsive shell acceptance
+
+The command palette and notification menu use native modal `dialog` elements.
+Shared lifecycle handling restores the previous connected focus target on close;
+the browser contains focus and makes the underlying page inert. Escape, explicit
+close controls and backdrop dismissal close the same modal state. Opening the
+notification menu triggers an uncached refresh rather than waiting for its poll.
+
+Search exposes a labeled combobox, a connected listbox and selected options through
+`aria-activedescendant`. Arrow navigation clamps against the current result count,
+Enter activates the selected command or real search result, and the active row
+scrolls into view without moving focus out of the input. Closed dialogs leave no
+hidden focus targets. Mobile navigation uses short RU/EN resource/workspace labels.
+
+The disposable Resource browser workflow also checks keyboard and responsive shell
+behavior: skip-to-content, Ctrl+K, Tab/Shift+Tab containment, Escape/backdrop focus
+return, arrow selection and real public resource search. Six guest routes (market,
+workspace, author resources, notifications, settings and login) are checked in RU/EN
+at 320, 390 and 1280 px for horizontal overflow, localized headings, field labels
+and active mobile navigation. A short mobile viewport and reduced-motion setting
+are included. This is scoped Chromium acceptance, not a full WCAG/screen-reader audit.

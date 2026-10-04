@@ -29,6 +29,8 @@ const en = {
     admin: "Admin",
     devTools: "Dev status",
     home: "Home",
+    mobileResources: "Resources",
+    mobileWorkspace: "Workspace",
     skipToContent: "Skip to main content",
     collapse: "Collapse sidebar",
     expand: "Expand sidebar",
@@ -812,6 +814,7 @@ const en = {
       "Could not confirm sign out. Your session may still be active. Try again.",
   },
   notificationBell: {
+    close: "Close notifications",
     title: "Notifications",
     unreadSuffix: "unread notifications",
     markAllRead: "Mark all read",
@@ -1240,6 +1243,8 @@ const ru: typeof en = {
     admin: "Админ",
     devTools: "DEV-статус",
     home: "Главная",
+    mobileResources: "Ресурсы",
+    mobileWorkspace: "Кабинет",
     skipToContent: "Перейти к основному содержимому",
     collapse: "Свернуть боковую панель",
     expand: "Развернуть боковую панель",
@@ -2022,6 +2027,7 @@ const ru: typeof en = {
       "Не удалось подтвердить выход. Сессия может оставаться активной. Попробуйте ещё раз.",
   },
   notificationBell: {
+    close: "Закрыть уведомления",
     title: "Уведомления",
     unreadSuffix: "непрочитанных уведомлений",
     markAllRead: "Прочитать всё",

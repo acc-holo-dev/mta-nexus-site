@@ -17,7 +17,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
   const items = [
     { href: "/", label: dictionary.nav.home, icon: Home },
     { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
-    { href: "/market", label: dictionary.nav.freeResources, icon: Library },
+    { href: "/market", label: dictionary.nav.mobileResources, icon: Library },
     {
       href: "/community",
       label: dictionary.nav.community,
@@ -25,7 +25,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
     },
     {
       href: "/workspace",
-      label: dictionary.nav.workspace,
+      label: dictionary.nav.mobileWorkspace,
       icon: LayoutDashboard,
     },
   ];
