@@ -80,7 +80,7 @@ Only `CI` starts on push/PR. Ordinary code changes run lint, types, both test pr
 one cached production-image build and a short registration/logout/directory browser smoke.
 Browser and infrastructure consumers load the exact same SHA-labelled image; a missing
 or mismatched artifact fails instead of rebuilding or pulling an unverified image.
-Production image transfer uses a one-day artifact without a registry publication.
+Production image transfer uses a one-day artifact without a registry publication. Ordinary code commits use six jobs, including scope selection and the aggregate result. Full acceptance remains broader and is intentionally reserved for infrastructure/release verification.
 
 Full acceptance runs on `v*` tags, the manual **Run workflow → full=true** input, and
 infrastructure/migration/tooling/dependency changes. It additionally runs SMTP/worker,

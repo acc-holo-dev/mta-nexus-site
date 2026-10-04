@@ -57,12 +57,15 @@ export default async function ManageResourcePage({
         </Link>
       </header>
       <AuthorResourceForms
+        key={`${actor.id}:${product.id}`}
+        actorId={actor.id}
         product={{
           id: product.id,
           title: product.title,
           shortDescription: product.shortDescription ?? "",
           description: product.description,
           tags: product.tags,
+          updatedAt: new Date(product.updatedAt).toISOString(),
         }}
       />
       <section className="space-y-4">
