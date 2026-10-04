@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { randomBytes, createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
@@ -48,7 +48,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await page.goto("/workspace/resources/new");
   await page.locator('[name="title"]').fill(title);
   await page.locator('[name="slug"]').fill(slug);
-  await page.locator('[name="description"]').fill("A complete author workspace acceptance resource description.");
+  await page.getByLabel("Description", { exact: true }).fill("A complete author workspace acceptance resource description.");
   await page.locator('[name="version"]').fill("1.0.0");
   await page.locator('[name="file"]').setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
   const created = page.waitForResponse((response) => response.url().endsWith("/api/products") && response.request().method() === "POST");
@@ -93,6 +93,19 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await expect(page.getByText("Published · 1.0.0", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Open resource preview", exact: true }).click();
   await expect(page.getByRole("heading", { name: updated, exact: true })).toBeVisible();
+  await outsider.goto(`/market/${slug}`);
+  await outsider.getByRole("link", { name: "Add to library", exact: true }).click();
+  await outsider.getByRole("button", { name: "Add to library", exact: true }).click();
+  await expect(outsider.getByRole("heading", { name: "Resource added", exact: true })).toBeVisible();
+  await outsider.getByRole("link", { name: "Open resource", exact: true }).click();
+  const downloadPromise = outsider.waitForEvent("download");
+  await outsider.getByRole("button", { name: "Download Build v1.0.0", exact: true }).click();
+  const download = await downloadPromise;
+  assert.equal(await download.failure(), null);
+  const downloadedPath = await download.path();
+  assert.deepEqual(await readFile(downloadedPath), file);
+  await rm(downloadedPath);
+  evidence.push("The newly published author resource was claimed and downloaded with exact uploaded bytes.");
   evidence.push("Moderator approval notes appeared in the author workspace and the public resource opened.");
   await page.goto(`/workspace/resources/${product.id}`);
   const upload = page.getByRole("form", { name: "Submit a new version", exact: true });
