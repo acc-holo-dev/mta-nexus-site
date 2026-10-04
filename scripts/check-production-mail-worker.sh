@@ -144,10 +144,11 @@ phase=tls-settlement
 echo 'D5 phase: wait for TLS acceptance and DB settlement'
 accepted=0
 for attempt in $(seq 1 40); do
-  set +e
-  NEXUS_D5_MAIL_CHECK=true node --import tsx packages/db/scripts/check-account-mail-delivery-ci.ts "$challenge" "$mail" > /tmp/nexus-d5-check.out 2> /tmp/nexus-d5-check.err
-  code=$?
-  set -e
+  if NEXUS_D5_MAIL_CHECK=true node --import tsx packages/db/scripts/check-account-mail-delivery-ci.ts "$challenge" "$mail" > /tmp/nexus-d5-check.out 2> /tmp/nexus-d5-check.err; then
+    code=0
+  else
+    code=$?
+  fi
   if [[ $code == 0 ]] && grep -q '^PASS$' /tmp/nexus-d5-check.out; then accepted=1; break; fi
   sleep 0.25
 done
@@ -198,17 +199,18 @@ docker rm "$worker" >/dev/null
 
 phase=missing-key-fail-closed
 echo 'D5 phase: missing-key fail-closed'
-set +e
-docker run --rm --add-host host.docker.internal:host-gateway \
+if docker run --rm --add-host host.docker.internal:host-gateway \
   --env DATABASE_URL=postgres://nexus:nexus_test_secret@host.docker.internal:5432/nexus_mail_acceptance \
   --env ACCOUNT_MAIL_KEY_ID=ci --env ACCOUNT_MAIL_KEY= \
   --env ACCOUNT_MAIL_APP_URL=https://nexus-mta.test \
   --env ACCOUNT_MAIL_SMTP_HOST="$smtp_host" --env ACCOUNT_MAIL_SMTP_PORT=2465 \
   --env ACCOUNT_MAIL_SMTP_SERVERNAME=localhost --env ACCOUNT_MAIL_SMTP_FROM=no-reply@nexus-mta.test \
   "$image" sh -c 'cd /app/packages/db && exec node --import tsx scripts/run-account-mail-dispatcher.ts --once' \
-  > /tmp/nexus-d5-missing.out 2> /tmp/nexus-d5-missing.err
-code=$?
-set -e
+  > /tmp/nexus-d5-missing.out 2> /tmp/nexus-d5-missing.err; then
+  code=0
+else
+  code=$?
+fi
 test "$code" -ne 0
 grep -Fxq '{"status":"failed"}' /tmp/nexus-d5-missing.err
 ! grep -F "$mail_key" /tmp/nexus-d5-missing.err

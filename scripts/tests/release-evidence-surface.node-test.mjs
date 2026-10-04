@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
@@ -107,4 +108,22 @@ test("mail worker crash probe signals only the inspected container process", () 
   assert.doesNotMatch(crash, /^docker (?:kill|stop|restart|start) /mu);
   assert.ok(crash.includes('"$restart_now" -gt "$restart_before"'));
   assert.ok(crash.includes('"$ready_now" -gt "$ready_before"'));
+});
+
+test("expected missing-key failures are captured without triggering the ERR trap", () => {
+  const script = read("scripts/check-production-mail-worker.sh");
+  const section = script.slice(script.indexOf("phase=missing-key-fail-closed"));
+  const command = section.slice(section.indexOf("if docker run"), section.indexOf('test "$code" -ne 0'))
+    .replaceAll("/tmp/nexus-d5-missing.out", "/dev/null")
+    .replaceAll("/tmp/nexus-d5-missing.err", "/dev/null");
+  assert.ok(command.startsWith("if docker run"));
+  for (const exitCode of [0, 1, 125]) {
+    const result = spawnSync("bash", ["-c", `set -Ee
+trap 'exit 99' ERR
+docker() { return ${exitCode}; }
+${command}
+printf '%s' "$code"`], { encoding: "utf8" });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, String(exitCode));
+  }
 });
