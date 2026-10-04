@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash, randomBytes } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createReadStream } from "node:fs";
+import { mkdir, rm, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { createRequire } from "node:module";
 
@@ -31,6 +32,15 @@ const productId = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_ID;
 const productSlug = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG;
 const productTitle = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE;
 const expectedSha256 = process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256;
+const expectedSize = Number(process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SIZE);
+assert.equal(expectedSize, 64 * 1024 * 1024, "Exercise the maximum supported download size");
+async function verifyDownloadedFile(path) {
+  assert.equal((await stat(path)).size, expectedSize);
+  const hash = createHash("sha256");
+  for await (const chunk of createReadStream(path)) hash.update(chunk);
+  assert.equal(hash.digest("hex"), expectedSha256);
+  await rm(path);
+}
 const results = [];
 
 test.afterAll(async () => {
@@ -39,6 +49,7 @@ test.afterAll(async () => {
     commit: process.env.GITHUB_SHA ?? null,
     productSlug,
     expectedSha256,
+    expectedSize,
     results,
     limitations:
       "Disposable production stack, real auth/database/entitlement/local-storage/download route. Timeout/cancellation use a synthetic stalled fetch and browser clock; they do not simulate a real TCP interruption. Product/build are seeded fixtures; author publishing and moderator approval are covered separately.",
@@ -233,9 +244,7 @@ test("J5 claim -> workspace -> download exact published build", async ({
 
     const savedPath = join(output, "j5-browser-download.zip");
     await download.saveAs(savedPath);
-    const bytes = await readFile(savedPath);
-    const actualSha256 = createHash("sha256").update(bytes).digest("hex");
-    assert.equal(actualSha256, expectedSha256);
+    await verifyDownloadedFile(savedPath);
 
     // Exercise the actual language control, including the server-rendered reload.
     await page.getByRole("button", { name: "Language", exact: true }).click();
@@ -285,8 +294,34 @@ test("J5 claim -> workspace -> download exact published build", async ({
     assert.equal(russianFile.suggestedFilename(), `${productSlug}-1.0.0.zip`);
     const russianPath = join(output, "j5-browser-download-ru.zip");
     await russianFile.saveAs(russianPath);
-    assert.equal(createHash("sha256").update(await readFile(russianPath)).digest("hex"), expectedSha256);
+    await verifyDownloadedFile(russianPath);
     results.push({ name: "RU/EN timeout, cancellation, partial-stream cleanup and exact-byte retries", status: "PASS" });
+
+    for (const failure of ["truncated", "stream-error"]) {
+      await page.evaluate(({ id, failure }) => {
+        const originalFetch = window.fetch;
+        window.fetch = (input, init) => {
+          if (input !== `/api/products/${encodeURIComponent(id)}/download`) return originalFetch(input, init);
+          window.fetch = originalFetch;
+          const body = new ReadableStream({
+            start(stream) {
+              stream.enqueue(new Uint8Array([80, 75, 3, 4]));
+              if (failure === "truncated") stream.close();
+              else setTimeout(() => stream.error(new TypeError("Synthetic interrupted stream")), 10);
+            },
+          });
+          return Promise.resolve(new Response(body, {
+            headers: { "Content-Length": "8", "Content-Type": "application/zip" },
+          }));
+        };
+      }, { id: productId, failure });
+      await russianDownload.click();
+      await page.clock.fastForward(20);
+      await expect(page.getByRole("alert").filter({ hasText: "Не удалось завершить скачивание" })).toBeVisible();
+      await expect(russianDownload).toBeEnabled();
+      assert.equal(downloads.length, 2, "Incomplete/error responses must not save a file");
+    }
+    results.push({ name: "64 MiB exact-byte downloads and rejection of truncated/error responses", status: "PASS" });
 
     assert.deepEqual(
       browserErrors,

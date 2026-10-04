@@ -20,7 +20,20 @@ build_id="bld_resource_browser_$short"
 product_slug="j5-browser-resource-$short"
 storage_key="ci-resource-browser/$short.zip"
 payload_file="$work/j5-browser-resource.zip"
-printf 'MTA NEXUS J5 browser delivery fixture %s' "$fixture" > "$payload_file"
+node --import tsx --input-type=module - "$payload_file" <<'NODE'
+import { randomBytes } from 'node:crypto';
+import { openSync, closeSync, writeFileSync } from 'node:fs';
+import { MAX_UPLOAD_FILE_SIZE_BYTES } from './packages/domain/src/upload-limits.ts';
+const block = randomBytes(1024 * 1024);
+const file = openSync(process.argv[2], 'wx');
+try {
+  for (let written = 0; written < MAX_UPLOAD_FILE_SIZE_BYTES; written += block.length) {
+    writeFileSync(file, block.subarray(0, Math.min(block.length, MAX_UPLOAD_FILE_SIZE_BYTES - written)));
+  }
+} finally {
+  closeSync(file);
+}
+NODE
 expected_sha=$(sha256sum "$payload_file" | awk '{print $1}')
 file_size=$(wc -c < "$payload_file" | tr -d ' ')
 
@@ -94,6 +107,7 @@ export NEXUS_RESOURCE_BROWSER_PRODUCT_ID="$product_id"
 export NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG="$product_slug"
 export NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE="J5 Browser Resource"
 export NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256="$expected_sha"
+export NEXUS_RESOURCE_BROWSER_EXPECTED_SIZE="$file_size"
 
 "$NEXUS_BROWSER_TOOLS/node_modules/.bin/playwright" test \
   --config=playwright.ci.config.mjs \
