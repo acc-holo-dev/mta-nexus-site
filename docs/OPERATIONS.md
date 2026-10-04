@@ -639,3 +639,16 @@ upstream handling, including routes that never read request bodies. The existing
 request_body limit remains in place for streaming/chunked reads. Production smoke
 reports safe phase names and line numbers on failure without shell xtrace or
 command text; all browser rehearsals share this production prerequisite.
+
+
+## Existing-installation release acceptance
+
+Use [RELEASE-UPGRADE.md](RELEASE-UPGRADE.md) for the exact-SHA evidence checklist,
+maintenance backup commands, migration review, candidate activation and recovery
+decision. CI now separately rehearses the real Drizzle 0024 → 0025 upgrade,
+injected migration failure/rollback/retry, preserved legacy records and idempotency.
+The disposable restore rehearsal verifies application records and the migration
+ledger in addition to schema and uploads. Both reports are retained for 14 days
+under artifact names containing the workflow SHA and attempt. This closes the
+synthetic upgrade/restore acceptance gap; target-data rehearsal and an explicit
+production deployment decision remain separate.

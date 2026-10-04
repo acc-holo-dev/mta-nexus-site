@@ -69,6 +69,21 @@ jobs:
       - name: Apply database migrations
         run: pnpm db:migrate
 
+      - name: Verify existing installation upgrade and failed migration retry
+        id: upgrade_rehearsal
+        run: |
+          node --test scripts/tests/release-upgrade.node-test.mjs
+          node packages/db/scripts/check-release-upgrade.mjs
+
+      - name: Preserve upgrade rehearsal evidence
+        if: ${{ always() && steps.upgrade_rehearsal.outcome != 'skipped' }}
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: release-upgrade-${{ github.sha }}-${{ github.run_attempt }}
+          path: artifacts/release-upgrade.json
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Verify Scenario Lab database idempotency
         run: pnpm --filter @nexus/db exec tsx scripts/scenario-lab-db.integration.ts
 
@@ -278,7 +293,16 @@ jobs:
       - name: Verify backup restore isolation contract
         run: node --test scripts/tests/backup-restore.node-test.mjs scripts/tests/backup-restore-surface.node-test.mjs
       - name: Rehearse database and uploads backup restore
+        id: backup_rehearsal
         run: node scripts/check-backup-restore.mjs
+      - name: Preserve backup restore evidence
+        if: ${{ always() && steps.backup_rehearsal.outcome != 'skipped' }}
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: backup-restore-${{ github.sha }}-${{ github.run_attempt }}
+          path: artifacts/backup-restore-evidence.json
+          if-no-files-found: error
+          retention-days: 14
 
   production-compose:
     name: Production Docker startup

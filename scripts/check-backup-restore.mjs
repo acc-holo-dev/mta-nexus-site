@@ -5,6 +5,7 @@ import {
   appendFileSync,
   chmodSync,
   mkdtempSync,
+  mkdirSync,
   readFileSync,
   readdirSync,
   rmSync,
@@ -132,6 +133,8 @@ function run() {
     backupChecksumsVerified: false,
     databaseRowsRestored: false,
     applicationSchemaRestored: false,
+    applicationRowsRestored: false,
+    migrationLedgerRestored: false,
     uploadFilesRestored: false,
     cleanupComplete: false,
   };
@@ -307,6 +310,43 @@ function run() {
 
     result.migrationsApplied = migrationFiles.length;
     result.latestMigration = migrationFiles.at(-1);
+
+    // Model a deployed database's real migration ledger, not only its public
+    // schema. The separate upgrade rehearsal executes the Drizzle migrator.
+    const journal = JSON.parse(readFileSync(join(migrationsDir, "meta/_journal.json"), "utf8"));
+    assert.equal(journal.entries.length, migrationFiles.length);
+    sql(sourceContainer, "CREATE SCHEMA drizzle; CREATE TABLE drizzle.__drizzle_migrations " +
+      "(id serial PRIMARY KEY, hash text NOT NULL, created_at bigint);");
+    for (const entry of journal.entries) {
+      const hash = sha256(join(migrationsDir, entry.tag + ".sql"));
+      assert(Number.isSafeInteger(entry.when));
+      sql(sourceContainer, "INSERT INTO drizzle.__drizzle_migrations (hash, created_at) " +
+        "VALUES ('" + hash + "', " + entry.when + ");");
+    }
+    const ledger = (container) => sql(container,
+      "SELECT json_agg(t ORDER BY id)::text FROM drizzle.__drizzle_migrations t;");
+    const sourceLedger = ledger(sourceContainer);
+
+    const archiveHash = createHash("sha256").update("archive-probe").digest("hex");
+    sql(sourceContainer,
+      "INSERT INTO users (id, email, username, display_name) VALUES " +
+      "('backup-user', 'backup@example.invalid', 'backup-user', 'Backup author'); " +
+      "INSERT INTO products (id, title, slug, description, type, author_id, status) VALUES " +
+      "('backup-resource', 'Backup resource', 'backup-resource', 'Preserved', 'script', 'backup-user', 'published'); " +
+      "INSERT INTO builds (id, product_id, version, storage_key, sha256_hash, file_size_bytes, " +
+      "status, scan_status, scanner, scanned_at) VALUES " +
+      "('backup-build', 'backup-resource', '1.0.0', 'resources/build.zip', '" + archiveHash +
+      "', 13, 'published', 'clean', 'clamav', now()); " +
+      "INSERT INTO entitlements (id, subject_type, subject_id, permission, resource_id) VALUES " +
+      "('backup-entitlement', 'user', 'backup-user', 'download', 'backup-resource'); " +
+      "INSERT INTO notifications (id, recipient_id, title, message, is_read, data) VALUES " +
+      "('backup-notification', 'backup-user', 'Reviewed', 'Approved', true, " +
+      "'{\"kind\":\"build_review\",\"decision\":\"approve\",\"resourceTitle\":\"Backup resource\",\"version\":\"1.0.0\",\"notes\":\"Reviewed\"}'::jsonb);");
+    const applicationRows = (container) => Object.fromEntries(
+      ["users", "products", "builds", "entitlements", "notifications"].map((table) =>
+        [table, sql(container, "SELECT json_agg(t ORDER BY id)::text FROM " + table + " t;")]),
+    );
+    const sourceApplicationRows = applicationRows(sourceContainer);
 
     const schemaFingerprint = (container) => ({
       columns: sql(
@@ -524,6 +564,11 @@ function run() {
     );
     result.applicationSchemaRestored = true;
     result.restoredSchemaFingerprint = restoredSchemaFingerprint;
+    assert.deepEqual(applicationRows(restoreContainer), sourceApplicationRows,
+      "Restored author, resource, trusted build, entitlement and notification must match exactly");
+    result.applicationRowsRestored = true;
+    assert.equal(ledger(restoreContainer), sourceLedger, "Migration ledger must survive restore");
+    result.migrationLedgerRestored = true;
 
     const restoredFiles = String(
       helper(imageId, restoreUploads, restoreToken, [
@@ -594,6 +639,10 @@ function run() {
     if (!result.cleanupComplete) result.status = "FAIL";
 
     console.log(JSON.stringify(result, null, 2));
+    result.sha = process.env.GITHUB_SHA ?? null;
+    mkdirSync(join(root, "artifacts"), { recursive: true });
+    writeFileSync(join(root, "artifacts/backup-restore-evidence.json"),
+      JSON.stringify(result, null, 2) + "\n", { mode: 0o600 });
     if (process.env.GITHUB_STEP_SUMMARY) {
       appendFileSync(
         process.env.GITHUB_STEP_SUMMARY,
