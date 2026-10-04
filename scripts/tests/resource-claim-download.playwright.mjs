@@ -237,6 +237,57 @@ test("J5 claim -> workspace -> download exact published build", async ({
     const actualSha256 = createHash("sha256").update(bytes).digest("hex");
     assert.equal(actualSha256, expectedSha256);
 
+    // Exercise the actual language control, including the server-rendered reload.
+    await page.getByRole("button", { name: "Language", exact: true }).click();
+    const russianDownload = page.getByRole("button", { name: "Скачать сборку v1.0.0", exact: true });
+    await expect(russianDownload).toBeVisible();
+    const stallMidStream = () => page.evaluate((id) => {
+      const originalFetch = window.fetch;
+      window.fetch = (input, init) => {
+        if (input !== `/api/products/${encodeURIComponent(id)}/download`) {
+          return originalFetch(input, init);
+        }
+        window.fetch = originalFetch;
+        window.nexusDownloadCancelled = false;
+        const body = new ReadableStream({
+          start(stream) { stream.enqueue(new Uint8Array([80, 75, 3, 4])); },
+          cancel() { window.nexusDownloadCancelled = true; },
+        });
+        return Promise.resolve(new Response(body, {
+          headers: { "Content-Length": "8", "Content-Type": "application/zip" },
+        }));
+      };
+    }, productId);
+
+    for (const reason of ["timeout", "cancel"]) {
+      await stallMidStream();
+      await russianDownload.click();
+      await expect(page.getByRole("progressbar", { name: "Прогресс скачивания" })).toHaveAttribute("value", "50");
+      await expect(page.getByRole("button", { name: "Подготовка скачивания…", exact: true })).toBeDisabled();
+      if (reason === "timeout") {
+        await page.clock.fastForward(60_001);
+        await expect(page.getByRole("alert").filter({ hasText: "Скачивание не отвечает" })).toBeVisible();
+      } else {
+        await page.getByRole("button", { name: "Отменить скачивание", exact: true }).click();
+        await expect(page.getByRole("status").filter({ hasText: "Скачивание отменено. Можно попробовать снова." })).toBeVisible();
+        await page.clock.fastForward(60_001);
+        await expect(page.getByRole("alert").filter({ hasText: "Скачивание не отвечает" })).toHaveCount(0);
+      }
+      await expect(russianDownload).toBeEnabled();
+      await expect(page.getByRole("progressbar", { name: "Прогресс скачивания" })).toHaveCount(0);
+      assert.equal(await page.evaluate(() => window.nexusDownloadCancelled), true, "Partial response reader must be cancelled");
+      assert.equal(downloads.length, 1, "A partial response must not create another download");
+    }
+
+    const russianDownloadPromise = page.waitForEvent("download");
+    await russianDownload.click();
+    const russianFile = await russianDownloadPromise;
+    assert.equal(russianFile.suggestedFilename(), `${productSlug}-1.0.0.zip`);
+    const russianPath = join(output, "j5-browser-download-ru.zip");
+    await russianFile.saveAs(russianPath);
+    assert.equal(createHash("sha256").update(await readFile(russianPath)).digest("hex"), expectedSha256);
+    results.push({ name: "RU/EN timeout, cancellation, partial-stream cleanup and exact-byte retries", status: "PASS" });
+
     assert.deepEqual(
       browserErrors,
       [],

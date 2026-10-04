@@ -115,6 +115,8 @@ async function readResourceDownload(
       const { done, value } = await reader.read();
       signal.throwIfAborted();
       if (done) break;
+      // Empty chunks are not progress and must not extend the idle deadline.
+      if (value.byteLength === 0) continue;
       received += value.byteLength;
       if (received > MAX_UPLOAD_FILE_SIZE_BYTES || (total !== null && received > total)) {
         throw new ResourceDownloadError("failed");

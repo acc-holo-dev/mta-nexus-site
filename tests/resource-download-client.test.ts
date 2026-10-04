@@ -268,3 +268,21 @@ it("preserves manual cancellation and releases the idle timer", async () => {
   expect(body.locked).toBe(false);
   expect(vi.getTimerCount()).toBe(0);
 });
+
+it("does not let empty chunks keep a stalled download alive", async () => {
+  vi.useFakeTimers();
+  let stream!: ReadableStreamDefaultController<Uint8Array>;
+  const cancel = vi.fn();
+  const body = new ReadableStream<Uint8Array>({ start(value) { stream = value; }, cancel });
+  const progress = vi.fn();
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body));
+  const download = fetchResourceDownload("id", controller().signal, progress, fetcher);
+  const rejected = expect(download).rejects.toMatchObject({ reason: "timeout" });
+  await vi.advanceTimersByTimeAsync(DOWNLOAD_IDLE_TIMEOUT_MS - 1);
+  stream.enqueue(new Uint8Array(0));
+  await vi.advanceTimersByTimeAsync(1);
+  await rejected;
+  expect(progress).not.toHaveBeenCalled();
+  expect(cancel).toHaveBeenCalledOnce();
+  expect(vi.getTimerCount()).toBe(0);
+});
