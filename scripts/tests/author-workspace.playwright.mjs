@@ -83,7 +83,12 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   assert.equal(denied, 401);
   await login(outsider, process.env.NEXUS_MODERATOR_BROWSER_EMAIL);
   const outsiderResponse = await outsider.goto(`${process.env.NEXUS_BROWSER_BASE_URL}/workspace/resources/${product.id}`);
-  assert.equal(outsiderResponse.status(), 404);
+  // Next streams the loading shell before notFound(), so the document can be 200.
+  assert([200, 404].includes(outsiderResponse.status()));
+  await expect(outsider.getByRole("heading", { name: "Page not found", exact: true })).toBeVisible();
+  await expect(outsider.getByRole("heading", { name: updated, exact: true })).toHaveCount(0);
+  await expect(outsider.getByRole("form", { name: "Resource details", exact: true })).toHaveCount(0);
+  await expect(outsider.getByRole("form", { name: "Submit a new version", exact: true })).toHaveCount(0);
   const forbidden = await outsider.evaluate(async (id) => (await fetch(`/api/products/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: "{}" })).status, product.id);
   assert.equal(forbidden, 404);
   evidence.push("Unauthenticated and unrelated moderator access denied.");
