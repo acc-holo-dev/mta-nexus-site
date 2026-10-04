@@ -56,7 +56,7 @@ INSERT INTO products (
   id, title, slug, description, type, status, author_id,
   price, currency, license_model, tags, current_version,
   rating_average, rating_count, sales_count, is_featured,
-  screenshots, compatibility, created_at, updated_at
+  screenshots, compatibility, thumbnail_url, created_at, updated_at
 ) VALUES (
   '$product_id',
   'J5 Browser Resource',
@@ -76,6 +76,7 @@ INSERT INTO products (
   false,
   '[]'::jsonb,
   '{}'::jsonb,
+  'https://nexus-ci.test:8443/ci-preview.png',
   now(),
   now()
 );

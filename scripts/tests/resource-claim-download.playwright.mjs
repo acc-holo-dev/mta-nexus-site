@@ -83,6 +83,11 @@ test("J5 claim -> workspace -> download exact published build", async ({
   const downloads = [];
   page.on("download", (download) => downloads.push(download));
   await page.clock.install();
+  // A successful HTTP response with undecodable image bytes exercises the
+  // preview error event without treating an intentional 404 as a console fault.
+  await page.route("**/ci-preview.png", (route) => route.fulfill({
+    status: 200, contentType: "image/png", body: "Synthetic broken preview",
+  }));
 
   page.on("pageerror", (error) => browserErrors.push(error.message));
   page.on("console", (message) => {
@@ -124,6 +129,8 @@ test("J5 claim -> workspace -> download exact published build", async ({
     assert(!("passwordHash" in registration.data.user));
 
     await page.goto(`/market/${productSlug}`);
+    await expect(page.getByText("Preview unavailable", { exact: true })).toBeVisible();
+    await expect(page.getByRole("img", { name: productTitle, exact: true })).toHaveCount(0);
     await expect(
       page.getByRole("link", { name: "Add to library", exact: true }),
     ).toBeVisible();
@@ -251,6 +258,8 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await page.getByRole("button", { name: "Language", exact: true }).click();
     const russianDownload = page.getByRole("button", { name: "Скачать сборку v1.0.0", exact: true });
     await expect(russianDownload).toBeVisible();
+    await expect(page.getByText("Превью недоступно", { exact: true })).toBeVisible();
+    await expect(page.getByRole("img", { name: productTitle, exact: true })).toHaveCount(0);
     const stallMidStream = () => page.evaluate((id) => {
       const originalFetch = window.fetch;
       window.fetch = (input, init) => {

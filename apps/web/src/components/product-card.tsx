@@ -1,8 +1,9 @@
-import React from "react";
 import Link from "next/link";
 import { Library, Star, Tag } from "lucide-react";
 import type { Product } from "@nexus/domain";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
+import { ResourcePreview } from "./resource-preview";
 
 export function ProductCard({
   product,
@@ -23,21 +24,10 @@ export function ProductCard({
       className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus"
     >
       <div className="relative aspect-video w-full overflow-hidden bg-inset">
-        {product.thumbnailUrl ? (
-          <img
-            src={product.thumbnailUrl}
-            alt={product.title}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center font-caption text-faint">
-            {dictionary.market.noPreview}
-          </div>
-        )}
+        <ResourcePreview src={product.thumbnailUrl} title={product.title} fallback={dictionary.market.noPreview} />
         <div className="absolute left-2 top-2 flex gap-1.5">
           <span className="rounded bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-            {product.type}
+            {dictionary.publishing[PRODUCT_PUBLISHING_KEYS[product.type]]}
           </span>
         </div>
         <div className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-0.5 font-numeric text-xs font-bold text-white">

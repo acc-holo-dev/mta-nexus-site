@@ -1,4 +1,7 @@
 import { ResourceDownloadButton } from "../../../components/resource-download-button";
+import { ResourcePreview } from "../../../components/resource-preview";
+import { safeExternalWebUrl } from "@nexus/validation";
+import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -79,11 +82,12 @@ export async function generateMetadata({
   const product = await productService.getProductBySlug(slug);
 
   if (!product) {
-    return { title: dictionary.product.notFound };
+    return { title: dictionary.product.notFound, robots: { index: false, follow: false } };
   }
 
   const description =
     product.shortDescription || product.description.slice(0, 155);
+  const thumbnailUrl = safeExternalWebUrl(product.thumbnailUrl);
 
   return {
     title: product.title,
@@ -93,8 +97,8 @@ export async function generateMetadata({
       title: product.title,
       description,
       type: "website",
-      images: product.thumbnailUrl
-        ? [{ url: product.thumbnailUrl }]
+      images: thumbnailUrl
+        ? [{ url: thumbnailUrl }]
         : undefined,
     },
   };
@@ -170,7 +174,7 @@ export default async function ProductDetailPage({
           {copy.market}
         </Link>
         <span aria-hidden="true">/</span>
-        <span className="capitalize">{product.type}</span>
+        <span>{dictionary.publishing[PRODUCT_PUBLISHING_KEYS[product.type]]}</span>
         <span aria-hidden="true">/</span>
         <span className="text-secondary">{product.title}</span>
       </div>
@@ -182,24 +186,10 @@ export default async function ProductDetailPage({
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-base bg-inset shadow-nexus-lg">
-            {product.thumbnailUrl ? (
-              <img
-                src={product.thumbnailUrl}
-                alt={product.title}
-                width={1280}
-                height={720}
-                fetchPriority="high"
-                decoding="async"
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-sm text-faint">
-                {copy.previewUnavailable}
-              </div>
-            )}
+            <ResourcePreview src={product.thumbnailUrl} title={product.title} fallback={copy.previewUnavailable} priority />
             <div className="absolute left-4 top-4 flex gap-2">
               <span className="rounded bg-accent px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-white shadow-nexus-sm">
-                {product.type}
+                {dictionary.publishing[PRODUCT_PUBLISHING_KEYS[product.type]]}
               </span>
               <span className="rounded border border-white/15 bg-black/70 px-2.5 py-1 font-numeric text-xs font-bold text-white backdrop-blur">
                 v{product.currentVersion}
