@@ -69,6 +69,7 @@ describe("resource creation HTTP errors", () => {
   it("turns a duplicate slug into a safe actionable conflict", async () => {
     mocks.createProduct.mockRejectedValueOnce({
       code: "23505",
+      constraint_name: "products_slug_unique",
       detail: "private database constraint detail",
     });
     mocks.getProductPreviewBySlug.mockResolvedValueOnce({
@@ -87,7 +88,11 @@ describe("resource creation HTTP errors", () => {
     });
   });
 
-  it("recovers the creator's draft when a previous create response was lost", async () => {
+  it.each([
+    { code: "23505", constraint_name: "products_slug_unique" },
+    { cause: { code: "23505", constraint_name: "products_slug_unique" } },
+    { cause: { cause: { code: "23505", constraint_name: "products_slug_idx" } } },
+  ])("recovers the creator's draft from a direct or wrapped slug conflict %#", async (error) => {
     const existingDraft = {
       id: "prd_existing_draft",
       slug: "resource-title",
@@ -101,7 +106,7 @@ describe("resource creation HTTP errors", () => {
       tags: [],
       compatibility: { dependencies: [] },
     };
-    mocks.createProduct.mockRejectedValueOnce({ code: "23505" });
+    mocks.createProduct.mockRejectedValueOnce(error);
     mocks.getProductPreviewBySlug.mockResolvedValueOnce(existingDraft);
 
     const response = await POST(
@@ -120,7 +125,7 @@ describe("resource creation HTTP errors", () => {
   });
 
   it("does not reuse the creator's draft when submitted metadata has changed", async () => {
-    mocks.createProduct.mockRejectedValueOnce({ code: "23505" });
+    mocks.createProduct.mockRejectedValueOnce({ cause: { code: "23505", constraint_name: "products_slug_unique" } });
     mocks.getProductPreviewBySlug.mockResolvedValueOnce({
       id: "prd_existing_draft",
       ...validResourceInput,
@@ -139,6 +144,17 @@ describe("resource creation HTTP errors", () => {
     expect(await response.json()).toMatchObject({
       code: "PRODUCT_SLUG_EXISTS",
     });
+  });
+
+  it("does not reinterpret unrelated unique constraints as a slug conflict", async () => {
+    mocks.createProduct.mockRejectedValueOnce({ cause: { code: "23505", constraint_name: "audit_events_pkey" } });
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    try {
+      const response = await POST(request(validResourceInput));
+      expect(response.status).toBe(500);
+      expect(await response.json()).toMatchObject({ code: "RESOURCE_CREATION_FAILED" });
+      expect(mocks.getProductPreviewBySlug).not.toHaveBeenCalled();
+    } finally { consoleError.mockRestore(); }
   });
 
   it("does not send internal error details back to the creator", async () => {

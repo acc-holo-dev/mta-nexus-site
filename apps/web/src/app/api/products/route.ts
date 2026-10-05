@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { type NextRequest, NextResponse } from "next/server";
+import type { z } from "zod";
 import { productService } from "../../../lib/services/product-service";
 import { authService } from "../../../lib/services/auth-service";
 import { createProductSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
 import { parseMarketQuery } from "../../../lib/market-query";
+import { isUniqueConstraintViolation } from "../../../lib/postgres-error";
 import { AppError, type Product } from "@nexus/domain";
 
 const privateHeaders = {
@@ -132,11 +133,7 @@ export async function POST(request: NextRequest) {
         user,
       );
     } catch (error: unknown) {
-      const isDuplicate =
-        typeof error === "object" &&
-        error !== null &&
-        "code" in error &&
-        error.code === "23505";
+      const isDuplicate = isUniqueConstraintViolation(error, ["products_slug_unique", "products_slug_idx"]);
 
       if (isDuplicate) {
         const existingDraft = await productService.getProductPreviewBySlug(
@@ -159,11 +156,7 @@ export async function POST(request: NextRequest) {
 
     return privateJson({ product }, 201 );
   } catch (error: unknown) {
-    const databaseCode =
-      typeof error === "object" && error !== null && "code" in error
-        ? error.code
-        : undefined;
-    if (databaseCode === "23505") {
+    if (isUniqueConstraintViolation(error, ["products_slug_unique", "products_slug_idx"])) {
       return privateJson(
         {
           error: "A resource with this slug already exists",

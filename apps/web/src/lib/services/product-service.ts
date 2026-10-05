@@ -4,6 +4,7 @@ import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain
 import type { Product, Build, User, ProductType } from "@nexus/domain";
 import { buildProductDependencyResolution } from "../product-dependency-resolution";
 import { buildReverseDependencySummary, reverseDependencyLimits } from "../reverse-dependency-summary";
+import { isUniqueConstraintViolation } from "../postgres-error";
 
 export interface ProductFilters {
   query?: string;
@@ -322,7 +323,7 @@ export class ProductService {
         }
       );
     } catch (error: unknown) {
-      if ((error as { code?: string }).code === "23505") {
+      if (isUniqueConstraintViolation(error, ["builds_product_version_idx"])) {
         throw new AppError(
           "This resource version already exists",
           409,

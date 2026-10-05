@@ -22,7 +22,6 @@ describe("creator resource integrity", () => {
     const service = read("apps/web/src/lib/services/product-service.ts");
     expect(schema).toContain('uniqueIndex("builds_product_version_idx")');
     expect(migration).toContain("duplicate versions exist");
-    expect(service).toContain('code === "23505"');
     expect(service).toContain("BUILD_VERSION_EXISTS");
   });
 

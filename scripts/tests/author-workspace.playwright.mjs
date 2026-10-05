@@ -76,21 +76,52 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   };
   await page.route(pendingBuildUrl, invalidFirstBuild);
   await page.locator('[name="file"]').setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
+  const productsUrl = `${process.env.NEXUS_BROWSER_BASE_URL}/api/products`;
+  let committedProduct;
+  const loseCommittedProductReply = async route => {
+    assert.equal(route.request().method(), "POST");
+    const committedResponse = await route.fetch();
+    assert.equal(committedResponse.status(), 201);
+    committedProduct = (await committedResponse.json()).product;
+    assert.equal(committedProduct.slug, slug);
+    await route.fulfill({ status: 503, contentType: "application/json", body: "{}" });
+  };
+  await page.route(productsUrl, loseCommittedProductReply);
+  try {
+    const lostProductReply = page.waitForResponse(response => response.url() === productsUrl && response.request().method() === "POST");
+    await page.getByRole("button", { name: "Submit free resource for review", exact: true }).click();
+    assert.equal((await lostProductReply).status(), 503);
+    await expect(page.getByRole("alert").filter({ hasText: "Could not create resource" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Submit free resource for review", exact: true })).toBeEnabled();
+    await expect(page.locator('[name="title"]')).toHaveValue(title);
+    await expect(page.locator('[name="slug"]')).toHaveValue(slug);
+    await expect(page.locator('[name="version"]')).toHaveValue("1.0.0");
+    await expect(page.locator('[name="releaseNotes"]')).toHaveValue(firstNotes);
+    assert.equal(await page.locator('[name="file"]').evaluate(input => input.files?.[0]?.name), "author.lua");
+    assert.equal(await page.evaluate(key => sessionStorage.getItem(key), pendingCreationKey), null);
+    await expect(page.getByRole("button", { name: "Retry build submission", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Resource submitted for review", exact: true })).toHaveCount(0);
+    assert.equal(productCreates, 1);
+  } finally { await page.unroute(productsUrl, loseCommittedProductReply); }
   const created = page.waitForResponse((response) => response.url().endsWith("/api/products") && response.request().method() === "POST");
   const failedFirstBuild = page.waitForResponse((response) => pendingBuildUrl.test(new URL(response.url()).pathname) && response.request().method() === "POST");
   await page.getByRole("button", { name: "Submit free resource for review", exact: true }).click();
   const createResponse = await created;
-  assert.equal(createResponse.status(), 201);
-  const { product } = await createResponse.json();
+  assert.equal(createResponse.status(), 200);
+  const { product, reusedDraft } = await createResponse.json();
+  assert.equal(reusedDraft, true);
+  assert.equal(product.id, committedProduct.id);
+  assert.equal(product.slug, committedProduct.slug);
   assert.equal((await failedFirstBuild).status(), 201);
   await expect(page.getByRole("alert").filter({ hasText: "Resource was created, but the build could not be submitted" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Resource submitted for review", exact: true })).toHaveCount(0);
   await expect(page.locator('[name="version"]')).toHaveValue("1.0.0");
   await expect(page.locator('[name="releaseNotes"]')).toHaveValue(firstNotes);
   assert.equal(await page.locator('[name="file"]').evaluate(input => input.files?.[0]?.name), "author.lua");
-  assert.equal(productCreates, 1);
+  assert.equal(productCreates, 2);
   await expect.poll(() => page.evaluate(key => JSON.parse(sessionStorage.getItem(key) ?? "null")?.id, pendingCreationKey)).toBe(product.id);
   await page.unroute(pendingBuildUrl, invalidFirstBuild);
+  evidence.push("A committed resource creation followed by a lost response preserved the entire creation form; retry returned 200 with reusedDraft and the same product ID before submitting its first build.");
 
   // Account switching keeps the owner's recoverable identity private in the same tab.
   await logout(page);
@@ -128,7 +159,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
     await expect(page.locator('[name="releaseNotes"]')).toHaveValue(firstNotes);
     assert.equal(await page.locator('[name="file"]').evaluate(input => input.files?.[0]?.name), "author.lua");
     await expect(page.getByRole("heading", { name: "Resource submitted for review", exact: true })).toHaveCount(0);
-    assert.equal(productCreates, 1);
+    assert.equal(productCreates, 2);
   } finally { await page.unroute(initialBuildUrl, wrongProductBuild); }
   await page.reload();
   await expect(retry).toBeEnabled();
@@ -160,7 +191,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
     assert.equal(await page.locator('[name="file"]').evaluate(input => input.files?.[0]?.name), "author.lua");
     assert.equal(await page.evaluate(key => JSON.parse(sessionStorage.getItem(key)).id, pendingCreationKey), product.id);
     await expect(page.getByRole("heading", { name: "Resource submitted for review", exact: true })).toHaveCount(0);
-    assert.equal(productCreates, 1);
+    assert.equal(productCreates, 2);
   } finally { await page.unroute(initialBuildUrl, loseCommittedBuildReply); }
   const firstBuild = page.waitForResponse(response => response.url() === initialBuildUrl && response.request().method() === "POST");
   await retry.click();
@@ -173,7 +204,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   assert.equal(recoveredBuild.version, committedFirstBuild.version);
   assert.equal(recoveredBuild.status, committedFirstBuild.status);
   const build = committedFirstBuild;
-  assert.equal(productCreates, 1);
+  assert.equal(productCreates, 2);
   const resourceStatus = page.getByRole("link", { name: "Open resource status", exact: true });
   await expect(resourceStatus).toHaveAttribute("href", `/workspace/resources/${product.id}`);
   assert.equal(await page.evaluate(key => sessionStorage.getItem(key), pendingCreationKey), null);

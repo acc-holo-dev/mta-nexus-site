@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { buildRepository, productRepository, userRepository } from "@nexus/db";
 import type { Build } from "@nexus/domain";
+import { ProductService } from "../apps/web/src/lib/services/product-service";
 
 describe("exact pending build retry lookup", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -23,6 +24,18 @@ describe("exact pending build retry lookup", () => {
 
   it("finds the original clean pending build including identical raw multiline notes", async () => {
     expect(await buildRepository.findExactPendingRetry(input)).toMatchObject({ id: base.id, storageKey: "assets/original.zip" });
+  });
+
+  it("translates a real wrapped duplicate insert and recovers its original build without creating a second row", async () => {
+    const actor = await userRepository.findById(authorId);
+    if (!actor) throw new Error("Retry test author missing");
+    const service = new ProductService();
+    await expect(service.releaseBuild({ ...base, storageKey: "assets/redundant-retry.zip" }, actor))
+      .rejects.toMatchObject({ statusCode: 409, code: "BUILD_VERSION_EXISTS" });
+    expect(await service.recoverPendingBuildUpload(input, actor)).toMatchObject({ id: base.id });
+    const matching = (await buildRepository.listByProduct(productId)).filter((build) => build.version === input.version);
+    expect(matching).toHaveLength(1);
+    expect(matching[0]?.storageKey).toBe("assets/original.zip");
   });
 
   it.each([

@@ -880,8 +880,10 @@ MTA target version. Recovery requires a clean scan with scanner identity and tim
 reviewed versions and different uploads still return `409 BUILD_VERSION_EXISTS`.
 The new upload asset is removed before the recovery lookup. Recovery adds no build,
 audit event or notification and returns only build identity, version and status.
-The browser acceptance test hides a real committed response and verifies this
-retry against the real database and storage.
+The browser acceptance test hides real committed creation and upload responses
+and verifies both retries against the real database and storage. Slug and build
+version conflicts recognize PostgreSQL errors wrapped by Drizzle and only the
+corresponding named unique constraints; unrelated persistence errors remain failures.
 
 Pending resource identity uses actor-scoped session storage with a 24-hour TTL.
 Legacy records without an actor are discarded. Switching accounts in the same tab
