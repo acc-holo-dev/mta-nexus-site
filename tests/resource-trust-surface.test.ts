@@ -1,15 +1,12 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("resource trust surface", () => {
   it("presents build metadata without claiming an unchecked upload is verified", () => {
-    const page = read(
-      "apps/web/src/app/market/[slug]/page.tsx",
-    );
+    const page = read("apps/web/src/app/market/[slug]/page.tsx");
 
     expect(page).toContain("copy.shaRecorded");
     expect(page).toContain("build.mtaVersionTarget");
@@ -20,20 +17,12 @@ describe("resource trust surface", () => {
   });
 
   it("collects and validates compatibility for both the product and release", () => {
-    const form = read(
-      "apps/web/src/app/workspace/resources/new/page.tsx",
-    );
-    const route = read(
-      "apps/web/src/app/api/products/[id]/builds/route.ts",
-    );
+    const form = read("apps/web/src/components/new-resource-form.tsx");
+    const route = read("apps/web/src/app/api/products/[id]/builds/route.ts");
 
     expect(form).toContain('form.get("dependencies")');
-    expect(form).toContain(
-      'buildForm.set("mtaVersionTarget"',
-    );
+    expect(form).toContain('buildForm.set("mtaVersionTarget"');
     expect(route).toContain("mtaVersionTarget: mtaVersionSchema");
-    expect(route).toContain(
-      "mtaVersionTarget: parsed.data.mtaVersionTarget",
-    );
+    expect(route).toContain("mtaVersionTarget: parsed.data.mtaVersionTarget");
   });
 });

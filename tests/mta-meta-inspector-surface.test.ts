@@ -1,23 +1,16 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("author-facing MTA meta inspector", () => {
   it("is optional and separate from the build submission form", () => {
-    const page = read(
-      "apps/web/src/app/workspace/resources/new/page.tsx",
-    );
-    const panel = read(
-      "apps/web/src/components/mta-meta-inspector-panel.tsx",
-    );
+    const page = read("apps/web/src/components/new-resource-form.tsx");
+    const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
 
     expect(page).toContain("<MtaMetaInspectorPanel");
-    expect(page.indexOf("<MtaMetaInspectorPanel")).toBeLessThan(
-      page.indexOf("<form"),
-    );
+    expect(page.indexOf("<MtaMetaInspectorPanel")).toBeLessThan(page.indexOf("<form"));
     expect(panel).toContain('type="button"');
     expect(panel).toContain('fetch("/api/resources/inspect-meta"');
     expect(panel).not.toContain("/api/products/");
@@ -25,9 +18,7 @@ describe("author-facing MTA meta inspector", () => {
   });
 
   it("states through localized copy that inspection is structural rather than a security scan", () => {
-    const panel = read(
-      "apps/web/src/components/mta-meta-inspector-panel.tsx",
-    );
+    const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
 
     expect(panel).toContain("dictionary.metaInspector");
     expect(panel).toContain("copy.description");
@@ -40,7 +31,7 @@ describe("author-facing MTA meta inspector", () => {
   });
 
   it("connects the inspector suggestion to the controlled MTA target field", () => {
-    const page = read("apps/web/src/app/workspace/resources/new/page.tsx");
+    const page = read("apps/web/src/components/new-resource-form.tsx");
     const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
 
     expect(page).toContain("onApplyMinimumVersion={setMtaVersionTarget}");
@@ -60,9 +51,7 @@ describe("author-facing MTA meta inspector", () => {
   });
 
   it("keeps client size and authenticated uncached request guards", () => {
-    const panel = read(
-      "apps/web/src/components/mta-meta-inspector-panel.tsx",
-    );
+    const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
 
     expect(panel).toContain("const MAX_META_BYTES = 256 * 1024");
     expect(panel).toContain("file.size > MAX_META_BYTES");

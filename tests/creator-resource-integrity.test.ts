@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
@@ -27,36 +27,13 @@ describe("creator resource integrity", () => {
   });
 
   it("does not claim that an unreviewed upload is published", () => {
-    const page = read("apps/web/src/app/workspace/resources/new/page.tsx");
+    const page = read("apps/web/src/components/new-resource-form.tsx");
     expect(page).toContain("copy.submittedTitle");
     expect(page).toContain("copy.submittedDescription");
     expect(getDictionary("en").publishing.submittedTitle).toBe("Resource submitted for review");
     expect(getDictionary("en").publishing.submittedDescription).toContain("moderator approval");
     expect(getDictionary("ru").publishing.submittedDescription).toContain("одобрения модератора");
     expect(page).not.toContain(">Resource published<");
-  });
-
-  it("retries a failed build against its saved draft instead of creating another resource", () => {
-    const page = read("apps/web/src/app/workspace/resources/new/page.tsx");
-    expect(page.indexOf('if (!(file instanceof File)')).toBeLessThan(
-      page.indexOf('fetch("/api/products"'),
-    );
-    expect(page).toContain("const [createdProduct, setCreatedProduct]");
-    expect(page).toContain("let product = createdProduct");
-    expect(page).toContain("if (!product)");
-    expect(page).toContain("setCreatedProduct(product)");
-    expect(page).toContain("sessionStorage.setItem(");
-    expect(page).toContain("sessionStorage.removeItem(PENDING_RESOURCE_DRAFT_KEY)");
-    expect(page).toContain("parsePendingResourceDraft(stored)");
-    expect(page).toContain("sessionStorage.removeItem(PENDING_RESOURCE_DRAFT_KEY)");
-    expect(page).toContain("setFormEpoch((current) => current + 1)");
-    expect(page).toContain("copy.startNewResource");
-    expect(page).toContain("key={formEpoch}");
-    expect(page).toContain("if (!draftReady || loading) return;");
-    expect(page).toContain("disabled={loading}");
-    expect(page).toContain("encodeURIComponent(product.id)}/builds");
-    expect(page).toContain("disabled={Boolean(createdProduct)}");
-    expect(page).toContain("copy.retryBuild");
   });
 
   it("commits build state, product state and audit evidence atomically", () => {
@@ -72,7 +49,7 @@ describe("creator resource integrity", () => {
   });
 
   it("shows localized build limits and checks file size before creating the resource", () => {
-    const page = read("apps/web/src/app/workspace/resources/new/page.tsx");
+    const page = read("apps/web/src/components/new-resource-form.tsx");
     const createProduct = page.indexOf('fetch("/api/products"');
     const fileLimit = page.indexOf("exceedsBuildFileSizeLimit(file.size)");
     const fileType = page.indexOf("getSupportedBuildExtension(file.name)");
@@ -84,12 +61,8 @@ describe("creator resource integrity", () => {
     expect(page).toContain('pattern="v?[0-9]+\\.[0-9]+(\\.[0-9]+)?(-[a-zA-Z0-9.]+)?"');
     expect(page).toContain('pattern="1\\.[0-9]+(\\.[0-9]+)?"');
     expect(page).toContain("copy.buildFileRequirements");
-    expect(getDictionary("en").publishing.buildFileTooLarge).toContain(
-      "{maxFileSize} MB",
-    );
-    expect(getDictionary("ru").publishing.buildFileTooLarge).toContain(
-      "{maxFileSize} МБ",
-    );
+    expect(getDictionary("en").publishing.buildFileTooLarge).toContain("{maxFileSize} MB");
+    expect(getDictionary("ru").publishing.buildFileTooLarge).toContain("{maxFileSize} МБ");
     expect(page).toContain("MAX_BUILD_FILE_SIZE_BYTES / (1024 * 1024)");
   });
 });

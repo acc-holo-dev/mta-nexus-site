@@ -28,6 +28,10 @@ async function login(page, email) {
   }, { email, password: process.env.NEXUS_AUTHOR_BROWSER_PASSWORD });
   assert.equal(status, 200);
 }
+async function logout(page) {
+  const status = await page.evaluate(async () => (await fetch("/api/auth/session", { method: "DELETE" })).status);
+  assert.equal(status, 200);
+}
 async function moderate(page, buildId, action, notes) {
   const result = await page.evaluate(async (body) => {
     const response = await fetch("/api/admin/actions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -52,26 +56,104 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
     }
   });
   await login(page, process.env.NEXUS_AUTHOR_BROWSER_EMAIL);
+  const creatingActorId = await page.evaluate(async () => (await (await fetch("/api/auth/session")).json()).user.id);
+  const pendingCreationKey = `nexus:pending-resource-draft:v2:${encodeURIComponent(creatingActorId)}`;
   await page.goto("/workspace/resources/new");
   await page.locator('[name="title"]').fill(title);
   await page.locator('[name="slug"]').fill(slug);
   await page.getByLabel("Description", { exact: true }).fill("A complete author workspace acceptance resource description.");
   await page.locator('[name="version"]').fill("1.0.0");
+  const firstNotes = "First acceptance version, retained after an invalid response.";
+  await page.locator('[name="releaseNotes"]').fill(firstNotes);
+  let productCreates = 0;
+  page.on("request", request => {
+    if (new URL(request.url()).pathname === "/api/products" && request.method() === "POST") productCreates += 1;
+  });
+  const pendingBuildUrl = /\/api\/products\/[^/]+\/builds$/u;
+  const invalidFirstBuild = async route => {
+    assert.equal(route.request().method(), "POST");
+    await route.fulfill({ status: 201, contentType: "application/json", body: "{}" });
+  };
+  await page.route(pendingBuildUrl, invalidFirstBuild);
   await page.locator('[name="file"]').setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
   const created = page.waitForResponse((response) => response.url().endsWith("/api/products") && response.request().method() === "POST");
-  const firstBuild = page.waitForResponse((response) => /\/api\/products\/[^/]+\/builds$/u.test(new URL(response.url()).pathname) && response.request().method() === "POST");
+  const failedFirstBuild = page.waitForResponse((response) => pendingBuildUrl.test(new URL(response.url()).pathname) && response.request().method() === "POST");
   await page.getByRole("button", { name: "Submit free resource for review", exact: true }).click();
   const createResponse = await created;
   assert.equal(createResponse.status(), 201);
   const { product } = await createResponse.json();
+  assert.equal((await failedFirstBuild).status(), 201);
+  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Resource submitted for review", exact: true })).toHaveCount(0);
+  await expect(page.locator('[name="version"]')).toHaveValue("1.0.0");
+  await expect(page.locator('[name="releaseNotes"]')).toHaveValue(firstNotes);
+  assert.equal(await page.locator('[name="file"]').evaluate(input => input.files?.[0]?.name), "author.lua");
+  assert.equal(productCreates, 1);
+  await expect.poll(() => page.evaluate(key => JSON.parse(sessionStorage.getItem(key) ?? "null")?.id, pendingCreationKey)).toBe(product.id);
+  await page.unroute(pendingBuildUrl, invalidFirstBuild);
+
+  // Account switching keeps the owner's recoverable identity private in the same tab.
+  await logout(page);
+  await login(page, process.env.NEXUS_MODERATOR_BROWSER_EMAIL);
+  await page.goto("/workspace/resources/new");
+  await expect(page.getByRole("button", { name: "Submit free resource for review", exact: true })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Retry build submission", exact: true })).toHaveCount(0);
+  await expect(page.getByText(new RegExp(slug, "u"))).toHaveCount(0);
+  assert.equal(await page.evaluate(key => JSON.parse(sessionStorage.getItem(key)).actorId, pendingCreationKey), creatingActorId);
+  await logout(page);
+  await login(page, process.env.NEXUS_AUTHOR_BROWSER_EMAIL);
+  await page.goto("/workspace/resources/new");
+  const retry = page.getByRole("button", { name: "Retry build submission", exact: true });
+  await expect(retry).toBeEnabled();
+  await expect(page.getByRole("status").filter({ hasText: slug })).toBeVisible();
+  assert.equal(await page.locator('[name="file"]').evaluate(input => input.files?.length), 0);
+  // Browsers cannot restore a selected archive after navigation; reselect explicitly.
+  await page.locator('[name="version"]').fill("1.0.0");
+  await page.locator('[name="releaseNotes"]').fill(firstNotes);
+  await page.locator('[name="file"]').setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
+  const initialBuildUrl = `${process.env.NEXUS_BROWSER_BASE_URL}/api/products/${product.id}/builds`;
+  const wrongProductBuild = async route => {
+    await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify({
+      build: { id: "bld_foreign", productId: "prd_foreign", version: "1.0.0", status: "pending_review" },
+    }) });
+  };
+  await page.route(initialBuildUrl, wrongProductBuild);
+  try {
+    const failed = page.waitForResponse(response => response.url() === initialBuildUrl && response.request().method() === "POST");
+    await retry.click();
+    assert.equal((await failed).status(), 201);
+    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(retry).toBeEnabled();
+    await expect(page.locator('[name="version"]')).toHaveValue("1.0.0");
+    await expect(page.locator('[name="releaseNotes"]')).toHaveValue(firstNotes);
+    assert.equal(await page.locator('[name="file"]').evaluate(input => input.files?.[0]?.name), "author.lua");
+    await expect(page.getByRole("heading", { name: "Resource submitted for review", exact: true })).toHaveCount(0);
+    assert.equal(productCreates, 1);
+  } finally { await page.unroute(initialBuildUrl, wrongProductBuild); }
+  await page.reload();
+  await expect(retry).toBeEnabled();
+  await expect(page.getByRole("status").filter({ hasText: slug })).toBeVisible();
+  assert.equal(await page.locator('[name="file"]').evaluate(input => input.files?.length), 0);
+  await page.locator('[name="version"]').fill("1.0.0");
+  await page.locator('[name="releaseNotes"]').fill(firstNotes);
+  await page.locator('[name="file"]').setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
+  const firstBuild = page.waitForResponse(response => response.url() === initialBuildUrl && response.request().method() === "POST");
+  await retry.click();
   const buildResponse = await firstBuild;
   assert.equal(buildResponse.status(), 201);
   const { build } = await buildResponse.json();
+  assert.equal(productCreates, 1);
+  const resourceStatus = page.getByRole("link", { name: "Open resource status", exact: true });
+  await expect(resourceStatus).toHaveAttribute("href", `/workspace/resources/${product.id}`);
+  assert.equal(await page.evaluate(key => sessionStorage.getItem(key), pendingCreationKey), null);
+  await resourceStatus.click();
+  await expect(page.getByRole("heading", { name: title, exact: true })).toBeVisible();
+  await expect(page.getByRole("form", { name: "Resource details", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Page not found", exact: true })).toHaveCount(0);
+  evidence.push("Initial submission rejected empty and foreign-product 201 replies without losing the selected archive or creating duplicate resources; reload restored the owner's pending identity and another account could not recover it in the same tab.");
   assert.equal(build.scanStatus, "clean"); assert(build.scanner); assert(build.scannedAt);
   assert.equal(build.status, "pending_review");
   evidence.push("Author created a resource and submitted a real clean-scanned private build.");
-  await page.getByRole("link", { name: "My resources", exact: true }).click();
-  await page.getByRole("link", { name: title, exact: true }).click();
   const details = page.getByRole("form", { name: "Resource details", exact: true });
   const updated = `${title} edited`;
   const uploadDraft = page.getByRole("form", { name: "Submit a new version", exact: true });

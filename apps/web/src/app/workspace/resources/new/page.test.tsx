@@ -1,23 +1,40 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { expect, it, vi } from "vitest";
-import { PRODUCT_TYPES } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
 import { getDictionary } from "../../../../lib/i18n";
-import { PRODUCT_PUBLISHING_KEYS } from "../../../../lib/product-type-labels";
 
-const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru" }));
-vi.mock("../../../../components/locale-context", () => ({
-  useNexusLocale: () => ({ locale: state.locale, dictionary: getDictionary(state.locale) }),
+const mocks = vi.hoisted(() => ({
+  locale: "en" as "en" | "ru",
+  actor: { id: "author" } as { id: string } | null,
+  forms: vi.fn(),
 }));
-import NewResourcePage from "./page";
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
+vi.mock("../../../../lib/services/auth-service", () => ({
+  authService: { getSession: async () => mocks.actor },
+}));
+vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
+vi.mock("../../../../components/new-resource-form", () => ({
+  NewResourceForm: (props: unknown) => {
+    mocks.forms(props);
+    return null;
+  },
+}));
 
-it.each(["en", "ru"] as const)("offers every supported resource type in %s", (locale) => {
-  state.locale = locale;
-  const html = renderToStaticMarkup(<NewResourcePage />);
-  const select = html.match(/<select[^>]*name="type"[^>]*>(.*?)<\/select>/s)?.[1];
-  expect(select).toBeDefined();
-  expect(select?.match(/<option\b/g)).toHaveLength(PRODUCT_TYPES.length);
-  for (const type of PRODUCT_TYPES) {
-    expect(select).toContain(`value="${type}"`);
-    expect(select).toContain(getDictionary(locale).publishing[PRODUCT_PUBLISHING_KEYS[type]]);
-  }
+import Page, { metadata } from "./page";
+
+beforeEach(() => {
+  mocks.actor = { id: "author" };
+  mocks.forms.mockClear();
+});
+it("passes authenticated actor identity to the publishing form and disables indexing", async () => {
+  renderToStaticMarkup(await Page());
+  expect(mocks.forms).toHaveBeenCalledWith({ actorId: "author" });
+  expect(metadata.robots).toMatchObject({ index: false, follow: false });
+});
+it.each(["en", "ru"] as const)("requires sign-in before showing the form in %s", async (locale) => {
+  mocks.actor = null;
+  mocks.locale = locale;
+  const html = renderToStaticMarkup(await Page());
+  expect(html).toContain(getDictionary(locale).workspace.signInRequired);
+  expect(html).toContain('href="/auth/login"');
+  expect(mocks.forms).not.toHaveBeenCalled();
 });

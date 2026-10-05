@@ -862,3 +862,20 @@ a 64 KiB high-water mark. This preserves backpressure for slow clients rather
 than allowing thousands of binary chunks to accumulate. Source cancellation
 still closes the underlying stream. Full pre-response hashing remains required;
 measure its disk/latency cost on the deployment host.
+
+### Author creation recovery and response confirmation
+
+The new resource page authenticates on the server and scopes the client form to
+the current actor. It confirms a draft creation response against the submitted
+metadata and actor; recovery of an identical existing draft requires the explicit
+`200`/`reusedDraft: true` contract. A build is successful only on a confirmed `201`
+for the same resource, version and `pending_review` status. Ambiguous responses
+retain the selected file, version and notes for a retry.
+
+Pending resource identity uses actor-scoped session storage with a 24-hour TTL.
+Legacy records without an actor are discarded. Switching accounts in the same tab
+does not restore another author's record; returning to the original account can
+resume its unexpired attempt. Reloads require selecting the archive again.
+Only the already-created resource identity and MTA target version are persisted,
+not the archive or the complete form. Successful submission opens the private
+workspace resource page, where pending review resources remain accessible.
