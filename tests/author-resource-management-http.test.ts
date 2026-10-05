@@ -20,11 +20,11 @@ const input = {
   tags: ["lua"],
 };
 const actor = { id: "author", role: "developer" };
-function request(body: unknown) {
+function request(body: unknown, revision?: string) {
   return new NextRequest("http://nexus.test/api/products/resource", {
     method: "PATCH",
     body: JSON.stringify(body),
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(revision !== undefined ? { "If-Match": revision } : {}) },
   });
 }
 const params = { params: Promise.resolve({ id: "resource" }) };
@@ -39,6 +39,7 @@ beforeEach(() => {
     storageKey: "private",
     authorId: "author",
     status: "published",
+    updatedAt: new Date("2026-10-05T00:00:00.000Z"),
   });
 });
 it("requires authentication before reading or editing", async () => {
@@ -73,7 +74,7 @@ it("persists only validated details and returns a narrow response", async () => 
   const response = await PATCH(request({ ...input, title: " My resource " }), params);
   expect(response.status).toBe(200);
   expect(mocks.updateProductDetails).toHaveBeenCalledWith("resource", input, actor);
-  expect(await response.json()).toEqual({ product: { id: "resource", ...input } });
+  expect(await response.json()).toEqual({ product: { id: "resource", ...input, updatedAt: "2026-10-05T00:00:00.000Z" } });
 });
 it("respects throttling", async () => {
   mocks.consumeRateLimit.mockResolvedValue({ success: false });
@@ -93,4 +94,35 @@ it("rejects excessive tags and whitespace metadata", async () => {
     { ...input, tags: ["  "] },
   ])
     expect((await PATCH(request(body), params)).status).toBe(400);
+});
+
+it("passes the quoted ISO revision into the atomic metadata write", async () => {
+  const timestamp = "2026-10-04T20:00:00.123Z";
+  const response = await PATCH(request(input, `"${timestamp}"`), params);
+  expect(response.status).toBe(200);
+  expect(mocks.updateProductDetails).toHaveBeenCalledWith("resource", input, actor, new Date(timestamp));
+});
+it.each([
+  "*", 'W/"2026-10-04T20:00:00.123Z"', "2026-10-04T20:00:00.123Z",
+  '"2026-10-04T20:00:00Z"', '"2026-02-30T20:00:00.123Z"',
+  '"2026-10-04T25:00:00.123Z"', '"2026-10-04T20:00:00.123Z", "2026-10-05T20:00:00.123Z"',
+  `"${"x".repeat(1000)}"`,
+])("rejects invalid revision %s without writing", async (revision) => {
+  const response = await PATCH(request(input, revision), params);
+  expect(response.status).toBe(400);
+  expect(await response.json()).toEqual({ code: "PRODUCT_METADATA_INVALID" });
+  expect(mocks.updateProductDetails).not.toHaveBeenCalled();
+});
+it("returns only the conflict code and keeps the response private", async () => {
+  mocks.updateProductDetails.mockRejectedValue(new AppError("changed", 409, "PRODUCT_METADATA_CONFLICT"));
+  const response = await PATCH(request(input, '"2026-10-04T20:00:00.123Z"'), params);
+  expect(response.status).toBe(409);
+  expect(await response.json()).toEqual({ code: "PRODUCT_METADATA_CONFLICT" });
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+});
+it("hides scope-denied resources even when a revision is malformed", async () => {
+  mocks.getManagedProduct.mockResolvedValue(null);
+  const response = await PATCH(request(input, "*"), params);
+  expect(response.status).toBe(404);
+  expect(mocks.updateProductDetails).not.toHaveBeenCalled();
 });

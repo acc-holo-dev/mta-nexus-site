@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   AUTHOR_RESOURCE_DRAFT_TTL_MS, authorResourceDraftKey, emptyAuthorVersion,
-  hasAuthorVersionDraft, parseAuthorResourceDraft, sameAuthorDetails,
+  hasAuthorVersionDraft, parseAuthorResourceDraft, sameAuthorDetails, reconcileAuthorDetails,
 } from "../apps/web/src/lib/author-resource-draft";
 
 const now = Date.parse("2026-10-05T00:00:00Z");
@@ -46,5 +46,48 @@ describe("author resource text recovery", () => {
     expect(sameAuthorDetails(draft.details, { ...draft.details, title: "changed" })).toBe(false);
     expect(hasAuthorVersionDraft(emptyAuthorVersion)).toBe(false);
     expect(hasAuthorVersionDraft({ ...emptyAuthorVersion, releaseNotes: "unfinished" })).toBe(true);
+  });
+});
+
+
+describe("refreshed author metadata", () => {
+  const oldDetails = { title: "Previous title", shortDescription: "Old summary", description: "Old description", tagsText: "lua" };
+  const newDetails = { ...oldDetails, title: "Other author's new title" };
+  const previousTimestamp = "2026-10-04T00:00:00.000Z";
+  const newTimestamp = "2026-10-05T00:00:00.000Z";
+  it("updates a clean editor to the externally changed metadata", () => {
+    const result = reconcileAuthorDetails({ baseline: oldDetails, details: oldDetails, baseUpdatedAt: previousTimestamp },
+      { details: newDetails, updatedAt: newTimestamp });
+    expect(result.details).toEqual(newDetails);
+    expect(result.baseline).toEqual(newDetails);
+    expect(result.baseUpdatedAt).toBe(newTimestamp);
+    expect(result.needsChoice).toBe(false);
+    expect(sameAuthorDetails(result.details, result.baseline)).toBe(true);
+  });
+  it("retains pending user text while requiring an explicit conflict choice", () => {
+    const pending = { ...oldDetails, description: "My unsaved description" };
+    const result = reconcileAuthorDetails({ baseline: oldDetails, details: pending, baseUpdatedAt: previousTimestamp },
+      { details: newDetails, updatedAt: newTimestamp });
+    expect(result.details).toEqual(pending);
+    expect(result.baseline).toEqual(newDetails);
+    expect(result.needsChoice).toBe(true);
+    expect(sameAuthorDetails(result.details, result.baseline)).toBe(false);
+  });
+  it("advances after an upload without disturbing pending metadata", () => {
+    const pending = { ...oldDetails, description: "My unsaved description" };
+    const result = reconcileAuthorDetails({ baseline: oldDetails, details: pending, baseUpdatedAt: previousTimestamp },
+      { details: oldDetails, updatedAt: newTimestamp });
+    expect(result.details).toEqual(pending);
+    expect(result.baseline).toEqual(oldDetails);
+    expect(result.baseUpdatedAt).toBe(newTimestamp);
+    expect(result.needsChoice).toBe(false);
+  });
+  it("does not regress a confirmed save when old props are still rendering", () => {
+    const result = reconcileAuthorDetails({ baseline: newDetails, details: newDetails, baseUpdatedAt: newTimestamp },
+      { details: oldDetails, updatedAt: previousTimestamp });
+    expect(result.details).toEqual(newDetails);
+    expect(result.baseline).toEqual(newDetails);
+    expect(result.baseUpdatedAt).toBe(newTimestamp);
+    expect(result.changed).toBe(false);
   });
 });

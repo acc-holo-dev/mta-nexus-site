@@ -43,9 +43,24 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (!await productService.getManagedProduct(id, actor)) return privateJson({ code: "NOT_FOUND" }, 404);
     const limit = await consumeRateLimit("contentCreation", actor.id);
     if (!limit.success) return privateJson({ code: "RATE_LIMIT_EXCEEDED" }, 429);
+    const revision = request.headers.get("if-match");
+    let expectedUpdatedAt: Date | undefined;
+    if (revision !== null) {
+      // One quoted, canonical millisecond ISO revision; reject wildcard/list/weak tags.
+      if (!/^"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z"$/.test(revision)) {
+        return privateJson({ code: "PRODUCT_METADATA_INVALID" }, 400);
+      }
+      const timestamp = revision.slice(1, -1);
+      expectedUpdatedAt = new Date(timestamp);
+      if (!Number.isFinite(expectedUpdatedAt.getTime()) || expectedUpdatedAt.toISOString() !== timestamp) {
+        return privateJson({ code: "PRODUCT_METADATA_INVALID" }, 400);
+      }
+    }
     const parsed = editProductDetailsSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) return privateJson({ code: "PRODUCT_METADATA_INVALID" }, 400);
-    const product = await productService.updateProductDetails(id, parsed.data, actor);
+    const product = expectedUpdatedAt
+      ? await productService.updateProductDetails(id, parsed.data, actor, expectedUpdatedAt)
+      : await productService.updateProductDetails(id, parsed.data, actor);
     return privateJson({ product: { id: product.id, title: product.title, shortDescription: product.shortDescription,
       description: product.description, tags: product.tags, updatedAt: product.updatedAt } });
   } catch (error) {

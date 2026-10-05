@@ -11,7 +11,7 @@ import {
 import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
 
 import {
-  authorResourceDraftKey, parseAuthorResourceDraft, sameAuthorDetails,
+  authorResourceDraftKey, parseAuthorResourceDraft, sameAuthorDetails, reconcileAuthorDetails,
   emptyAuthorVersion, hasAuthorVersionDraft,
   type AuthorDetailsDraft, type AuthorResourceDraft,
 } from "../lib/author-resource-draft";
@@ -62,6 +62,7 @@ export function AuthorResourceForms({
   const detailsDirty = !sameAuthorDetails(details, baseline);
   const dirty = detailsDirty || hasAuthorVersionDraft(versionDraft) || fileSelected;
   const storageKey = authorResourceDraftKey(actorId, product.id);
+  const refreshPending = Date.parse(product.updatedAt) > Date.parse(baseUpdatedAt);
 
   // The page keys this component by actor/resource. A refresh after our own
   // mutation must not reload storage or replace the other form's pending text.
@@ -108,17 +109,33 @@ export function AuthorResourceForms({
   }, [dirty]);
 
   useEffect(() => {
+    if (!ready) return;
     const currentServer = { title: product.title, shortDescription: product.shortDescription,
       description: product.description, tagsText: product.tags.join(", ") };
-    // A successful upload/retirement changes updatedAt but not metadata. Keep
-    // the other form's draft anchored to that refresh without hiding a real
-    // change to the metadata from another session.
-    if (sameAuthorDetails(currentServer, baseline) &&
-      Date.parse(product.updatedAt) > Date.parse(baseUpdatedAt)) {
-      setBaseUpdatedAt(product.updatedAt);
+    const reconciled = reconcileAuthorDetails({ baseline, details, baseUpdatedAt },
+      { details: currentServer, updatedAt: product.updatedAt });
+    if (!reconciled.changed) return;
+    if (reconciled.needsChoice && !conflict) {
+      // Keep the user's complete draft, including the other form, until they
+      // explicitly choose how to resolve the changed server metadata.
+      const pendingDraft: AuthorResourceDraft = {
+        schemaVersion: 1, actorId, productId: product.id, savedAt: Date.now(),
+        baseUpdatedAt, details, version: versionDraft,
+      };
+      setConflict(pendingDraft);
+      try { sessionStorage.setItem(storageKey, JSON.stringify(pendingDraft)); }
+      catch { setStorageFailed(true); }
     }
-  }, [product.title, product.shortDescription, product.description, product.tags,
-    product.updatedAt, baseline, baseUpdatedAt]);
+    if (!sameAuthorDetails(currentServer, baseline)) {
+      setSaved(false);
+      setRecovered(false);
+    }
+    setBaseline(reconciled.baseline);
+    setDetails(reconciled.details);
+    setBaseUpdatedAt(reconciled.baseUpdatedAt);
+  }, [ready, product.title, product.shortDescription, product.description, product.tags,
+    product.updatedAt, baseline, details, baseUpdatedAt, conflict, actorId, product.id,
+    versionDraft, storageKey]);
 
   function changeDetails(field: keyof AuthorDetailsDraft, value: string) {
     setDetails((current) => ({ ...current, [field]: value }));
@@ -138,7 +155,7 @@ export function AuthorResourceForms({
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (saving) return;
+    if (saving || !ready || conflict || refreshPending) return;
     const form = new FormData(event.currentTarget);
     const parsed = editProductDetailsSchema.safeParse({
       title: form.get("title"),
@@ -159,12 +176,17 @@ export function AuthorResourceForms({
     try {
       const response = await fetch(`/api/products/${product.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "If-Match": `"${new Date(baseUpdatedAt).toISOString()}"` },
         body: JSON.stringify(parsed.data),
         signal: AbortSignal.timeout(15_000),
       });
       const body = await response.json().catch(() => null);
       if (!response.ok) {
+        if (body?.code === "PRODUCT_METADATA_CONFLICT") {
+          setError(copy.metadataConflict);
+          router.refresh();
+          return;
+        }
         setError(
           body?.code === "PRODUCT_METADATA_INVALID"
             ? copy.invalid
@@ -200,7 +222,7 @@ export function AuthorResourceForms({
 
   async function upload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (uploading) return;
+    if (uploading || !ready || conflict || refreshPending) return;
     const element = event.currentTarget;
     const data = new FormData(element);
     const file = data.get("file");
@@ -268,7 +290,12 @@ export function AuthorResourceForms({
             <p>{copy.draftConflict}</p>
             <div className="flex flex-wrap gap-3">
               <button type="button" onClick={recoverDraft} className={buttonClass}>{copy.restoreDraft}</button>
-              <button type="button" onClick={() => { setConflict(null); setRecovered(false); }}
+              <button type="button" onClick={() => {
+                setDetails(baseline);
+                setConflict(null);
+                setRecovered(false);
+                setSaved(false);
+              }}
                 className="rounded-md border border-base px-4 py-2">{copy.discardDraft}</button>
             </div>
           </div>
@@ -286,7 +313,7 @@ export function AuthorResourceForms({
         className="space-y-4 rounded-lg border border-base bg-surface p-5"
       >
         <h2 className="text-xl font-semibold text-primary">{copy.edit}</h2>
-        <fieldset disabled={saving || !ready || Boolean(conflict)} className="space-y-4">
+        <fieldset disabled={saving || !ready || Boolean(conflict) || refreshPending} className="space-y-4">
           <label className="block space-y-1 text-sm text-secondary">
             <span>{publishing.title}</span>
             <input
@@ -333,12 +360,12 @@ export function AuthorResourceForms({
             {error}
           </p>
         )}
-        {saved && (
+        {saved && !refreshPending && !conflict && (
           <p role="status" className="text-sm text-success">
             {copy.saved}
           </p>
         )}
-        <button type="submit" disabled={saving || !ready || Boolean(conflict)} className={buttonClass}>
+        <button type="submit" disabled={saving || !ready || Boolean(conflict) || refreshPending} className={buttonClass}>
           {saving ? copy.saving : copy.save}
         </button>
       </form>
@@ -349,7 +376,7 @@ export function AuthorResourceForms({
       >
         <h2 className="text-xl font-semibold text-primary">{copy.newVersion}</h2>
         <p className="text-sm text-secondary">{publishing.submittedDescription}</p>
-        <fieldset disabled={uploading || !ready || Boolean(conflict)} className="space-y-4">
+        <fieldset disabled={uploading || !ready || Boolean(conflict) || refreshPending} className="space-y-4">
           <label className="block space-y-1 text-sm text-secondary">
             <span>{publishing.version}</span>
             <input
@@ -404,7 +431,7 @@ export function AuthorResourceForms({
             {copy.versionSubmitted}
           </p>
         )}
-        <button type="submit" disabled={uploading || !ready || Boolean(conflict)} className={buttonClass}>
+        <button type="submit" disabled={uploading || !ready || Boolean(conflict) || refreshPending} className={buttonClass}>
           {uploading ? publishing.submitting : copy.newVersion}
         </button>
       </form>

@@ -75,3 +75,22 @@ export function sameAuthorDetails(a: AuthorDetailsDraft, b: AuthorDetailsDraft) 
 export function hasAuthorVersionDraft(value: AuthorVersionDraft) {
   return Object.values(value).some((text) => text.length > 0);
 }
+
+/** Reconcile a refreshed server snapshot without silently overwriting either editor. */
+export function reconcileAuthorDetails(
+  current: { baseline: AuthorDetailsDraft; details: AuthorDetailsDraft; baseUpdatedAt: string },
+  server: { details: AuthorDetailsDraft; updatedAt: string },
+) {
+  if (!(Date.parse(server.updatedAt) > Date.parse(current.baseUpdatedAt))) {
+    return { ...current, changed: false, needsChoice: false };
+  }
+  const metadataChanged = !sameAuthorDetails(server.details, current.baseline);
+  const pendingDetails = !sameAuthorDetails(current.details, current.baseline);
+  return {
+    baseline: server.details,
+    details: metadataChanged && !pendingDetails ? server.details : current.details,
+    baseUpdatedAt: server.updatedAt,
+    changed: true,
+    needsChoice: metadataChanged && pendingDetails,
+  };
+}

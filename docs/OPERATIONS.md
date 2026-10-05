@@ -106,6 +106,18 @@ For changes to the free resource catalog and personal library, run `pnpm test:ca
 
 For report and moderation intake, run `pnpm test:reports`. It calls the real route for private caching on allowed and denied reads, verifies that a report and its audit share a transaction, checks the duplicate lock and conflict response with a controlled query layer, and ensures notification failure after commit still returns the committed result. Complaint target IDs and evidence URL lists are bounded; notification recipient selection fetches moderator IDs only. Follow with database-backed concurrency and browser checks before release acceptance.
 
+### Author editing recovery
+
+The author resource editor preserves text in sessionStorage for the current actor and
+resource, for up to 24 hours in the same tab. Archives are never persisted; a reload
+requires selecting the file again. Malformed or mismatched mutation responses keep
+the pending text and selected file. Metadata PATCH sends a quoted millisecond ISO
+`If-Match` revision: the database checks management scope and revision atomically,
+and stale writes return `409 PRODUCT_METADATA_CONFLICT` without an audit entry.
+Refreshed metadata is adopted by a clean form; pending changes require an explicit
+Restore/Discard choice. Successful metadata and build submissions clear only their
+corresponding pending text. Full resource browser acceptance exercises this behavior.
+
 ## 3. Production boundary
 
 Production must use explicit production Compose/configuration, not the local development stack.

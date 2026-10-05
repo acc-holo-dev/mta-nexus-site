@@ -37,13 +37,20 @@ async function moderate(page, buildId, action, notes) {
 }
 
 test("author creates, edits, submits versions, reads moderation and retires a publication", async ({ page, browser }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   const nonce = randomBytes(6).toString("hex");
   const slug = `author-cabinet-${nonce}`;
   const title = `Author resource ${nonce}`;
   const file = Buffer.from('-- Real clean Lua author acceptance fixture\noutputDebugString("NEXUS author workspace")\n');
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  page.on("dialog", async (dialog) => {
+    if (dialog.type() === "beforeunload") await dialog.accept();
+    else {
+      errors.push(`Unexpected ${dialog.type()} dialog: ${dialog.message()}`);
+      await dialog.dismiss();
+    }
+  });
   await login(page, process.env.NEXUS_AUTHOR_BROWSER_EMAIL);
   await page.goto("/workspace/resources/new");
   await page.locator('[name="title"]').fill(title);
@@ -67,13 +74,104 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await page.getByRole("link", { name: title, exact: true }).click();
   const details = page.getByRole("form", { name: "Resource details", exact: true });
   const updated = `${title} edited`;
+  const uploadDraft = page.getByRole("form", { name: "Submit a new version", exact: true });
+  const notes = "Second acceptance version.";
+  const dirtyNotice = page.getByText("There are changes you have not submitted yet.", { exact: true });
+  const restoredNotice = page.getByText("Your unfinished text has been restored in this tab.", { exact: true });
+  const actorId = await page.evaluate(async () => (await (await fetch("/api/auth/session")).json()).user.id);
+  const draftKey = `nexus:author-resource-draft:v1:${encodeURIComponent(actorId)}:${encodeURIComponent(product.id)}`;
   await details.getByLabel("Title", { exact: true }).fill(updated);
+  await uploadDraft.getByLabel("Version", { exact: true }).fill("1.1.0");
+  await uploadDraft.getByLabel("Release notes", { exact: true }).fill(notes);
+  await expect(dirtyNotice).toBeVisible();
+  await expect.poll(() => page.evaluate(key => JSON.parse(sessionStorage.getItem(key) ?? "null")?.version.version, draftKey)).toBe("1.1.0");
+  const foreignKeys = await page.evaluate(({ key, actorId, productId }) => {
+    const current = JSON.parse(sessionStorage.getItem(key));
+    const foreign = [
+      { ...current, actorId: `${actorId}-foreign`, details: { ...current.details, title: "Foreign actor sentinel" } },
+      { ...current, productId: `${productId}-foreign`, details: { ...current.details, title: "Foreign product sentinel" } },
+    ];
+    return foreign.map(value => {
+      const foreignKey = `nexus:author-resource-draft:v1:${encodeURIComponent(value.actorId)}:${encodeURIComponent(value.productId)}`;
+      sessionStorage.setItem(foreignKey, JSON.stringify(value));
+      return foreignKey;
+    });
+  }, { key: draftKey, actorId, productId: product.id });
+
+  const metadataUrl = `${process.env.NEXUS_BROWSER_BASE_URL}/api/products/${product.id}`;
+  for (const injected of [
+    { status: 500, body: JSON.stringify({ code: "INTERNAL_ERROR" }) },
+    { status: 200, body: "null" },
+    { status: 200, body: "" },
+    { status: 200, body: JSON.stringify({ product: { ...product, id: "prd_foreign", title: updated } }) },
+  ]) {
+    const handler = async route => {
+      assert.equal(route.request().method(), "PATCH");
+      await route.fulfill({ ...injected, contentType: "application/json" });
+    };
+    await page.route(metadataUrl, handler);
+    try {
+      const completed = page.waitForResponse(response => response.url() === metadataUrl && response.request().method() === "PATCH");
+      await details.getByRole("button", { name: "Save details", exact: true }).click();
+      await completed;
+      await expect(details.getByRole("button", { name: "Save details", exact: true })).toBeEnabled();
+      await expect(details.getByRole("alert")).toBeVisible();
+      await expect(details.getByLabel("Title", { exact: true })).toHaveValue(updated);
+      await expect(dirtyNotice).toBeVisible();
+      await expect(details.getByRole("status")).toHaveCount(0);
+      await expect(uploadDraft.getByLabel("Version", { exact: true })).toHaveValue("1.1.0");
+    } finally { await page.unroute(metadataUrl, handler); }
+  }
+  await page.reload();
+  await expect(restoredNotice).toBeVisible();
+  await expect(details.getByLabel("Title", { exact: true })).toHaveValue(updated);
+  await expect(uploadDraft.getByLabel("Release notes", { exact: true })).toHaveValue(notes);
+  await expect(page.getByText("Foreign actor sentinel", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Foreign product sentinel", { exact: true })).toHaveCount(0);
+
+  // Another authenticated client changes this same resource after our draft.
+  const draftRevision = await page.evaluate(key => JSON.parse(sessionStorage.getItem(key)).baseUpdatedAt, draftKey);
+  const concurrentTitle = `${title} changed elsewhere`;
+  const concurrent = await page.evaluate(async ({ id, title, original }) => {
+    const response = await fetch(`/api/products/${id}`, {
+      method: "PATCH", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, shortDescription: original.shortDescription ?? "",
+        description: original.description, tags: original.tags ?? [] }),
+    });
+    return { status: response.status, body: await response.json() };
+  }, { id: product.id, title: concurrentTitle, original: product });
+  assert.equal(concurrent.status, 200, JSON.stringify(concurrent.body));
+  assert.equal(concurrent.body.product.title, concurrentTitle);
+  const staleResponse = page.waitForResponse(response => response.url() === metadataUrl && response.request().method() === "PATCH");
   await details.getByRole("button", { name: "Save details", exact: true }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Details saved." })).toBeVisible();
+  const stale = await staleResponse;
+  assert.equal(stale.status(), 409);
+  assert.equal((await stale.json()).code, "PRODUCT_METADATA_CONFLICT");
+  assert.equal(stale.request().headers()["if-match"], JSON.stringify(new Date(draftRevision).toISOString()));
+  await expect(page.getByRole("heading", { name: concurrentTitle, exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Restore draft", exact: true })).toBeVisible();
+  await expect(details.getByLabel("Title", { exact: true })).toBeDisabled();
+  await expect(uploadDraft.getByLabel("Version", { exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "Restore draft", exact: true }).click();
+  await expect(details.getByLabel("Title", { exact: true })).toHaveValue(updated);
+  await expect(uploadDraft.getByLabel("Version", { exact: true })).toHaveValue("1.1.0");
+  await details.getByRole("button", { name: "Save details", exact: true }).click();
+  await expect(details.getByRole("status").filter({ hasText: "Details saved." })).toBeVisible();
   await page.reload();
   await expect(page.getByRole("heading", { name: updated, exact: true })).toBeVisible();
+  await expect(restoredNotice).toBeVisible();
+  await expect(uploadDraft.getByLabel("Version", { exact: true })).toHaveValue("1.1.0");
+  await expect(uploadDraft.getByLabel("Release notes", { exact: true })).toHaveValue(notes);
+  assert(await page.evaluate(keys => keys.every(key => sessionStorage.getItem(key) !== null), foreignKeys));
+  evidence.push("Failed or malformed metadata responses preserved both forms; scoped text restored after reload and a real stale-revision save returned 409 without overwriting the concurrent edit, requiring an explicit restore decision.");
+  evidence.push("Metadata edits survived reload without clearing the pending version or foreign actor/resource drafts.");
 
-  evidence.push("Metadata edits survived reload.");
+  async function restorePendingDraft() {
+    const restore = page.getByRole("button", { name: "Restore draft", exact: true });
+    const titleInput = details.getByLabel("Title", { exact: true });
+    await expect.poll(async () => await restore.isVisible() || await titleInput.isEnabled()).toBe(true);
+    if (await restore.isVisible()) await restore.click();
+  }
 
   // An unrelated author has neither a private page nor mutation access.
   const outsiderContext = await browser.newContext({ baseURL: process.env.NEXUS_BROWSER_BASE_URL });
@@ -106,6 +204,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   assert.equal(approvalNotices.filter((notice) => notice.data?.kind === "build_review").length, 1);
   await approvalCard.getByRole("link", { name: "View", exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`/workspace/resources/${product.id}$`, "u"));
+  await restorePendingDraft();
   evidence.push("Approval delivered one localized author notification with notes and a working resource link; replay returned 409.");
   await expect(page.getByText("Approved author acceptance version one.", { exact: true })).toBeVisible();
   await expect(page.getByText("Published · 1.0.0", { exact: true })).toBeVisible();
@@ -126,16 +225,54 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   evidence.push("The newly published author resource was claimed and downloaded with exact uploaded bytes.");
   evidence.push("Moderator approval notes appeared in the author workspace and the public resource opened.");
   await page.goto(`/workspace/resources/${product.id}`);
+  await restorePendingDraft();
   const upload = page.getByRole("form", { name: "Submit a new version", exact: true });
-  await upload.getByLabel("Version", { exact: true }).fill("1.1.0");
-  await upload.getByLabel("Release notes", { exact: true }).fill("Second acceptance version.");
+  await expect(upload.getByLabel("Version", { exact: true })).toHaveValue("1.1.0");
+  await expect(upload.getByLabel("Release notes", { exact: true })).toHaveValue(notes);
   await upload.locator('[name="file"]').setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
+  const buildsUrl = `${metadataUrl}/builds`;
+  for (const body of [
+    {},
+    { build: { id: "bld_foreign", productId: "prd_foreign", version: "1.1.0", status: "pending_review" } },
+  ]) {
+    const handler = async route => {
+      assert.equal(route.request().method(), "POST");
+      await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify(body) });
+    };
+    await page.route(buildsUrl, handler);
+    try {
+      const completed = page.waitForResponse(response => response.url() === buildsUrl && response.request().method() === "POST");
+      await upload.getByRole("button", { name: "Submit a new version", exact: true }).click();
+      await completed;
+      await expect(upload.getByRole("button", { name: "Submit a new version", exact: true })).toBeEnabled();
+      await expect(upload.getByRole("alert")).toBeVisible();
+      await expect(upload.getByLabel("Version", { exact: true })).toHaveValue("1.1.0");
+      await expect(upload.getByLabel("Release notes", { exact: true })).toHaveValue(notes);
+      assert.deepEqual(await upload.locator('[name="file"]').evaluate(input => Array.from(input.files, item => ({ name: item.name, size: item.size }))), [{ name: "author.lua", size: file.length }]);
+      await expect(upload.getByRole("status")).toHaveCount(0);
+      await expect(dirtyNotice).toBeVisible();
+    } finally { await page.unroute(buildsUrl, handler); }
+  }
+  await page.reload();
+  await restorePendingDraft();
+  await expect(upload.getByLabel("Version", { exact: true })).toHaveValue("1.1.0");
+  await expect(upload.getByLabel("Release notes", { exact: true })).toHaveValue(notes);
+  assert.equal(await upload.locator('[name="file"]').evaluate(input => input.files.length), 0);
+  await expect(page.getByText("Only text is restored. After reopening this page, select the archive again. Text remains in this tab for up to 24 hours.", { exact: true })).toBeVisible();
+  await upload.locator('[name="file"]').setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
+  evidence.push("Malformed or mismatched upload confirmations preserved the selected file and version text; reload restored only text and required archive reselection.");
   const secondResponse = page.waitForResponse((response) => response.url().endsWith(`/api/products/${product.id}/builds`) && response.request().method() === "POST");
   await upload.getByRole("button", { name: "Submit a new version", exact: true }).click();
   const submittedResponse = await secondResponse;
   assert.equal(submittedResponse.status(), 201);
   const second = (await submittedResponse.json()).build;
   await expect(page.getByText("Version submitted for scanning and moderator review.", { exact: true })).toBeVisible();
+  await expect(upload.getByLabel("Version", { exact: true })).toHaveValue("");
+  await expect(upload.getByLabel("Release notes", { exact: true })).toHaveValue("");
+  assert.equal(await upload.locator('[name="file"]').evaluate(input => input.files.length), 0);
+  await expect.poll(() => page.evaluate(key => sessionStorage.getItem(key), draftKey)).toBe(null);
+  assert(await page.evaluate(keys => keys.every(key => sessionStorage.getItem(key) !== null), foreignKeys));
+  evidence.push("A genuine upload cleared its own submitted draft and file while preserving unrelated scoped drafts.");
   await moderate(outsider, second.id, "reject", "Rejected second version: update the manifest.");
   await page.goto("/notifications");
   await expect(page.getByRole("heading", { name: "Resource version rejected", exact: true })).toBeVisible();

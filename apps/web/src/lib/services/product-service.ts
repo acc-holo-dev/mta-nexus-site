@@ -33,13 +33,19 @@ export class ProductService {
   }
 
   async updateProductDetails(id: string,
-    details: Pick<Product, "title" | "shortDescription" | "description" | "tags">, actor: User) {
+    details: Pick<Product, "title" | "shortDescription" | "description" | "tags">, actor: User, expectedUpdatedAt?: Date) {
     const product = await productRepository.updateManagedDetails(id, actor, details, {
       id: generateId("aud"), actorId: actor.id, actorType: actor.role === "admin" ? "admin" : "user",
       action: "product.details_updated", targetId: id, targetType: "product",
       details: { fields: ["title", "shortDescription", "description", "tags"] },
-    });
-    if (!product) throw new NotFoundError("Product", id);
+    }, expectedUpdatedAt);
+    if (!product) {
+      // Reveal a revision conflict only while the actor still has management access.
+      if (expectedUpdatedAt && await productRepository.findManaged(id, actor)) {
+        throw new AppError("Resource details changed; reload before saving", 409, "PRODUCT_METADATA_CONFLICT");
+      }
+      throw new NotFoundError("Product", id);
+    }
     return product;
   }
 

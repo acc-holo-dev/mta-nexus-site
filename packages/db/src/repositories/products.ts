@@ -66,13 +66,17 @@ export class ProductRepository {
 
   async updateManagedDetails(id: string, actor: Pick<User, "id" | "role">,
     details: Pick<Product, "title" | "shortDescription" | "description" | "tags">,
-    audit: Omit<AuditEvent, "createdAt">): Promise<Product | null> {
+    audit: Omit<AuditEvent, "createdAt">, expectedUpdatedAt?: Date): Promise<Product | null> {
     return db.transaction(async (tx) => {
       // Recheck the scope in the mutation, including organization membership.
       const rows = await tx.update(products).set({ title: details.title,
         shortDescription: details.shortDescription, description: details.description,
-        tags: details.tags, updatedAt: new Date() })
-        .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor))).returning();
+        tags: details.tags,
+        // Millisecond revisions match JS Dates and advance even within one clock tick.
+        updatedAt: sql`greatest(date_trunc('milliseconds', clock_timestamp()),
+          date_trunc('milliseconds', ${products.updatedAt}) + interval '1 millisecond')` })
+        .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor),
+          expectedUpdatedAt ? sql`date_trunc('milliseconds', ${products.updatedAt}) = ${expectedUpdatedAt.toISOString()}::timestamptz` : undefined)).returning();
       if (!rows[0]) return null;
       await tx.insert(auditEvents).values(audit);
       return rows[0] as unknown as Product;
