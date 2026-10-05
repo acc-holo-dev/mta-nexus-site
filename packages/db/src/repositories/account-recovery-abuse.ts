@@ -34,6 +34,11 @@ export class AccountRecoveryAbuseLimitRepository {
     return db.transaction(async (tx) => {
       await tx.execute(sql`set local lock_timeout = '5s'`);
       await tx.execute(sql`set local statement_timeout = '10s'`);
+      // A row lock cannot serialize the first request: there is no row yet.
+      // Lock the keyed identity before reading the clock or the current window.
+      // Only the HMAC digest reaches PostgreSQL, never the raw subject or key.
+      const lockKey = `nexus:account-recovery-limit:v1:${input.scope}:${subjectDigest}`;
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`);
       const [clock] = await tx.execute(sql`select clock_timestamp()::text as now`);
       const now = new Date(String(clock.now));
       const rows = await tx.execute(sql`
