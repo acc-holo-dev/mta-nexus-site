@@ -125,6 +125,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await page.reload();
   await expect(restoredNotice).toBeVisible();
   await expect(details.getByLabel("Title", { exact: true })).toHaveValue(updated);
+  await expect(details.getByLabel("Description", { exact: true })).toHaveValue(product.description);
   await expect(uploadDraft.getByLabel("Release notes", { exact: true })).toHaveValue(notes);
   await expect(page.getByText("Foreign actor sentinel", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Foreign product sentinel", { exact: true })).toHaveCount(0);

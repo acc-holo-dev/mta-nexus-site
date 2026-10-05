@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { editProductDetailsSchema } from "@nexus/validation";
 import { useNexusLocale } from "./locale-context";
@@ -41,6 +41,7 @@ export function AuthorResourceForms({
   const copy = dictionary.authorResources;
   const publishing = dictionary.publishing;
   const router = useRouter();
+  const fieldId = useId();
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -336,9 +337,10 @@ export function AuthorResourceForms({
               className={inputClass}
             />
           </label>
-          <label className="block space-y-1 text-sm text-secondary">
-            <span>{publishing.description}</span>
+          <div className="block space-y-1 text-sm text-secondary">
+            <label htmlFor={`${fieldId}-description`}>{publishing.description}</label>
             <textarea
+              id={`${fieldId}-description`}
               name="description"
               required
               minLength={10}
@@ -348,7 +350,7 @@ export function AuthorResourceForms({
               onChange={(event) => changeDetails("description", event.target.value)}
               className={inputClass}
             />
-          </label>
+          </div>
           <label className="block space-y-1 text-sm text-secondary">
             <span>{publishing.tags}</span>
             <input name="tags" value={details.tagsText} maxLength={4096}
@@ -401,11 +403,11 @@ export function AuthorResourceForms({
               className={inputClass}
             />
           </label>
-          <label className="block space-y-1 text-sm text-secondary">
-            <span>{publishing.releaseNotes}</span>
-            <textarea name="releaseNotes" value={versionDraft.releaseNotes}
+          <div className="block space-y-1 text-sm text-secondary">
+            <label htmlFor={`${fieldId}-release-notes`}>{publishing.releaseNotes}</label>
+            <textarea id={`${fieldId}-release-notes`} name="releaseNotes" value={versionDraft.releaseNotes}
               onChange={(event) => { setVersionDraft((draft) => ({ ...draft, releaseNotes: event.target.value })); setSubmitted(false); }} maxLength={5000} rows={4} className={inputClass} />
-          </label>
+          </div>
           <label className="block space-y-1 text-sm text-secondary">
             <span>{publishing.buildArchive}</span>
             <input
@@ -451,6 +453,7 @@ export function RetireBuildForm({
   const { dictionary } = useNexusLocale();
   const copy = dictionary.authorResources;
   const router = useRouter();
+  const reasonId = useId();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   async function retire(event: FormEvent<HTMLFormElement>) {
@@ -485,9 +488,10 @@ export function RetireBuildForm({
       </summary>
       <form onSubmit={retire} className="mt-3 space-y-3">
         <p>{copy.retireHint}</p>
-        <label className="block space-y-1">
-          <span>{copy.retireReason}</span>
+        <div className="block space-y-1">
+          <label htmlFor={reasonId}>{copy.retireReason}</label>
           <textarea
+            id={reasonId}
             name="reason"
             required
             minLength={3}
@@ -495,7 +499,7 @@ export function RetireBuildForm({
             disabled={pending}
             className={inputClass}
           />
-        </label>
+        </div>
         {error && <p role="alert">{error}</p>}
         <button type="submit" disabled={pending} className={buttonClass}>
           {pending ? copy.retiring : copy.retire}
