@@ -83,7 +83,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   assert.equal(createResponse.status(), 201);
   const { product } = await createResponse.json();
   assert.equal((await failedFirstBuild).status(), 201);
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.getByRole("alert").filter({ hasText: "Resource was created, but the build could not be submitted" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Resource submitted for review", exact: true })).toHaveCount(0);
   await expect(page.locator('[name="version"]')).toHaveValue("1.0.0");
   await expect(page.locator('[name="releaseNotes"]')).toHaveValue(firstNotes);
@@ -122,7 +122,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
     const failed = page.waitForResponse(response => response.url() === initialBuildUrl && response.request().method() === "POST");
     await retry.click();
     assert.equal((await failed).status(), 201);
-    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(page.getByRole("alert").filter({ hasText: "Resource was created, but the build could not be submitted" })).toBeVisible();
     await expect(retry).toBeEnabled();
     await expect(page.locator('[name="version"]')).toHaveValue("1.0.0");
     await expect(page.locator('[name="releaseNotes"]')).toHaveValue(firstNotes);
