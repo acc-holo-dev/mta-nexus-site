@@ -257,6 +257,15 @@ export class ProductService {
     return product;
   }
 
+  async recoverPendingBuildUpload(
+    input: Pick<Build, "productId" | "version" | "sha256Hash" | "fileSizeBytes" | "fileName" | "mimeType" | "releaseNotes" | "mtaVersionTarget">,
+    actor: User,
+  ): Promise<Build | null> {
+    // Permissions can change while scanning or uploading; do not reuse preflight access.
+    await this.assertCanReleaseBuild(input.productId, actor);
+    return buildRepository.findExactPendingRetry(input);
+  }
+
   async releaseBuild(
     input: {
       productId: string;

@@ -25,7 +25,8 @@ export function confirmedAuthorDetails(
 export function confirmedAuthorBuild(
   status: number, body: unknown, productId: string, version: string,
 ): boolean {
-  if (status !== 201 || !record(body) || !record(body.build)) return false;
+  if (!record(body) || !record(body.build) ||
+    (status !== 201 && !(status === 200 && body.reusedBuild === true))) return false;
   const build = body.build;
   return typeof build.id === "string" && build.id.trim().length > 0 && build.id.length <= 128 &&
     build.productId === productId && build.version === version.trim().replace(/^v/, "") &&

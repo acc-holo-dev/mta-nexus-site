@@ -13,6 +13,24 @@ export type PendingReviewBuild = Build & {
 };
 
 export class BuildRepository {
+  async findExactPendingRetry(
+    input: Pick<Build, "productId" | "version" | "sha256Hash" | "fileSizeBytes" | "fileName" | "mimeType" | "releaseNotes" | "mtaVersionTarget">,
+  ): Promise<Build | null> {
+    const rows = await db.select().from(builds).where(and(
+      eq(builds.productId, input.productId),
+      eq(builds.version, input.version),
+      eq(builds.status, "pending_review"),
+      trustedCleanScanCondition(),
+      eq(builds.sha256Hash, input.sha256Hash),
+      eq(builds.fileSizeBytes, input.fileSizeBytes),
+      eq(builds.fileName, input.fileName),
+      eq(builds.mimeType, input.mimeType),
+      sql`coalesce(${builds.releaseNotes}, '') = ${input.releaseNotes ?? ""}`,
+      sql`coalesce(${builds.mtaVersionTarget}, '') = ${input.mtaVersionTarget ?? ""}`,
+    )).limit(1);
+    return (rows[0] as unknown as Build) || null;
+  }
+
   async pageHistory(productId: string, requestedPage = 1) {
     const condition = eq(builds.productId, productId);
     const [summary] = await db.select({ total: count() }).from(builds).where(condition);

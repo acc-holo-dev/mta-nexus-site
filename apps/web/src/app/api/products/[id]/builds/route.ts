@@ -276,6 +276,24 @@ export async function POST(
       return privateJson(context, { build }, { status: 201 });
     } catch (error) {
       await storageService.deleteAsset(asset.key);
+      if (error instanceof AppError && error.code === "BUILD_VERSION_EXISTS") {
+        const build = await productService.recoverPendingBuildUpload({
+          productId,
+          version: parsed.data.version.replace(/^v/, ""),
+          releaseNotes: parsed.data.releaseNotes,
+          mtaVersionTarget: parsed.data.mtaVersionTarget || undefined,
+          sha256Hash: asset.sha256Hash,
+          fileSizeBytes: asset.sizeBytes,
+          fileName: safeFileName,
+          mimeType: BUILD_MIME_TYPES[extension],
+        }, user);
+        if (build) {
+          return privateJson(context, {
+            build: { id: build.id, productId: build.productId, version: build.version, status: build.status },
+            reusedBuild: true,
+          }, { status: 200 });
+        }
+      }
       throw error;
     }
   } catch (error: unknown) {

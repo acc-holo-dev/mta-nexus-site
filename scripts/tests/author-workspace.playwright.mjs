@@ -137,11 +137,42 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await page.locator('[name="version"]').fill("1.0.0");
   await page.locator('[name="releaseNotes"]').fill(firstNotes);
   await page.locator('[name="file"]').setInputFiles({ name: "author.lua", mimeType: "text/plain", buffer: file });
+  let committedFirstBuild;
+  const loseCommittedBuildReply = async route => {
+    assert.equal(route.request().method(), "POST");
+    const committedResponse = await route.fetch();
+    assert.equal(committedResponse.status(), 201);
+    committedFirstBuild = (await committedResponse.json()).build;
+    assert.equal(committedFirstBuild.productId, product.id);
+    assert.equal(committedFirstBuild.version, "1.0.0");
+    assert.equal(committedFirstBuild.sha256Hash, createHash("sha256").update(file).digest("hex"));
+    await route.fulfill({ status: 503, contentType: "application/json", body: "{}" });
+  };
+  await page.route(initialBuildUrl, loseCommittedBuildReply);
+  try {
+    const lostReply = page.waitForResponse(response => response.url() === initialBuildUrl && response.request().method() === "POST");
+    await retry.click();
+    assert.equal((await lostReply).status(), 503);
+    await expect(page.getByRole("alert").filter({ hasText: "Resource was created, but the build could not be submitted" })).toBeVisible();
+    await expect(retry).toBeEnabled();
+    await expect(page.locator('[name="version"]')).toHaveValue("1.0.0");
+    await expect(page.locator('[name="releaseNotes"]')).toHaveValue(firstNotes);
+    assert.equal(await page.locator('[name="file"]').evaluate(input => input.files?.[0]?.name), "author.lua");
+    assert.equal(await page.evaluate(key => JSON.parse(sessionStorage.getItem(key)).id, pendingCreationKey), product.id);
+    await expect(page.getByRole("heading", { name: "Resource submitted for review", exact: true })).toHaveCount(0);
+    assert.equal(productCreates, 1);
+  } finally { await page.unroute(initialBuildUrl, loseCommittedBuildReply); }
   const firstBuild = page.waitForResponse(response => response.url() === initialBuildUrl && response.request().method() === "POST");
   await retry.click();
   const buildResponse = await firstBuild;
-  assert.equal(buildResponse.status(), 201);
-  const { build } = await buildResponse.json();
+  assert.equal(buildResponse.status(), 200);
+  const { build: recoveredBuild, reusedBuild } = await buildResponse.json();
+  assert.equal(reusedBuild, true);
+  assert.equal(recoveredBuild.id, committedFirstBuild.id);
+  assert.equal(recoveredBuild.productId, committedFirstBuild.productId);
+  assert.equal(recoveredBuild.version, committedFirstBuild.version);
+  assert.equal(recoveredBuild.status, committedFirstBuild.status);
+  const build = committedFirstBuild;
   assert.equal(productCreates, 1);
   const resourceStatus = page.getByRole("link", { name: "Open resource status", exact: true });
   await expect(resourceStatus).toHaveAttribute("href", `/workspace/resources/${product.id}`);
@@ -154,6 +185,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   assert.equal(build.scanStatus, "clean"); assert(build.scanner); assert(build.scannedAt);
   assert.equal(build.status, "pending_review");
   evidence.push("Author created a resource and submitted a real clean-scanned private build.");
+  evidence.push("A real build committed with the archive's exact SHA-256 before a lost response was recovered by retrying the same bytes: the API returned 200 with reusedBuild and the original build identity, without another resource or build submission.");
   const details = page.getByRole("form", { name: "Resource details", exact: true });
   const updated = `${title} edited`;
   const uploadDraft = page.getByRole("form", { name: "Submit a new version", exact: true });

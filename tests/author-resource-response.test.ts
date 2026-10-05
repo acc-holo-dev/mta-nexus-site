@@ -37,6 +37,21 @@ describe("author mutation confirmation", () => {
   ])("does not confirm a missing or unrelated build result %#", (body) => {
     expect(confirmedAuthorBuild(201, body, product.id, "1.2.3")).toBe(false);
   });
+  it("confirms an explicitly recovered pending build with matching identity", () => {
+    expect(confirmedAuthorBuild(200, { build, reusedBuild: true }, product.id, " v1.2.3 ")).toBe(true);
+  });
+  it.each([
+    { build }, { build, reusedBuild: false }, { build, reusedBuild: "true" },
+    { build: { ...build, id: "" }, reusedBuild: true },
+    { build: { ...build, productId: "prd_other" }, reusedBuild: true },
+    { build: { ...build, version: "1.2.4" }, reusedBuild: true },
+    { build: { ...build, status: "published" }, reusedBuild: true },
+  ])("rejects an ambiguous or unrelated recovery response %#", (body) => {
+    expect(confirmedAuthorBuild(200, body, product.id, "1.2.3")).toBe(false);
+  });
+  it.each([202, 204, 409, 503])("does not recover on status %s", (status) => {
+    expect(confirmedAuthorBuild(status, { build, reusedBuild: true }, product.id, "1.2.3")).toBe(false);
+  });
   it("rejects false HTTP 200 success and validates retirement identity/status", () => {
     expect(confirmedAuthorBuild(200, { build }, product.id, "1.2.3")).toBe(false);
     expect(confirmedRetiredBuild(200, { build: { ...build, status: "retired" } }, product.id, build.id)).toBe(true);

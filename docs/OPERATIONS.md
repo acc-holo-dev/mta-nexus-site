@@ -868,9 +868,20 @@ measure its disk/latency cost on the deployment host.
 The new resource page authenticates on the server and scopes the client form to
 the current actor. It confirms a draft creation response against the submitted
 metadata and actor; recovery of an identical existing draft requires the explicit
-`200`/`reusedDraft: true` contract. A build is successful only on a confirmed `201`
-for the same resource, version and `pending_review` status. Ambiguous responses
-retain the selected file, version and notes for a retry.
+`200`/`reusedDraft: true` contract. A build is successful only on a confirmed `201`,
+or an explicit `200`/`reusedBuild: true` recovery response, for the same resource,
+version and `pending_review` status. Ambiguous responses retain the selected file,
+version and notes for a retry.
+
+If an upload committed but its response was lost, repeating the same upload can
+recover the original pending build. The server rechecks release permission and
+compares the stored SHA-256, size, safe filename, canonical MIME type, notes and
+MTA target version. Recovery requires a clean scan with scanner identity and time;
+reviewed versions and different uploads still return `409 BUILD_VERSION_EXISTS`.
+The new upload asset is removed before the recovery lookup. Recovery adds no build,
+audit event or notification and returns only build identity, version and status.
+The browser acceptance test hides a real committed response and verifies this
+retry against the real database and storage.
 
 Pending resource identity uses actor-scoped session storage with a 24-hour TTL.
 Legacy records without an actor are discarded. Switching accounts in the same tab

@@ -150,6 +150,12 @@ echo "PASS: J5 browser claimed one entitlement, incremented library additions on
 created_product=$(sql "SELECT id FROM products WHERE author_id = (SELECT id FROM users WHERE email = '$NEXUS_AUTHOR_BROWSER_EMAIL');")
 [[ "$created_product" =~ ^prd_[a-zA-Z0-9_-]+$ ]]
 [[ $(sql "SELECT status FROM products WHERE id = '$created_product';") == draft ]]
+[[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product';") == 2 ]]
+# Retrying a committed upload must not leave duplicate assets or temporary files.
+created_author_id=$(sql "SELECT author_id FROM products WHERE id = '$created_product';")
+[[ "$created_author_id" =~ ^usr_[a-zA-Z0-9_-]+$ ]]
+author_assets=$("${pc[@]}" exec -T app sh -c 'find "/data/uploads/assets/$1" -type f | wc -l' sh "$created_author_id" | tr -d '[:space:]')
+[[ "$author_assets" == 2 ]]
 [[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product' AND scan_status = 'clean' AND scanner IS NOT NULL AND scanned_at IS NOT NULL;") == 2 ]]
 [[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product' AND status = 'retired';") == 1 ]]
 [[ $(sql "SELECT count(*) FROM builds WHERE product_id = '$created_product' AND status = 'rejected';") == 1 ]]
