@@ -1,0 +1,103 @@
+# 30. Server Ownership, Status и Join Flow
+
+## 1. Discovery before ownership
+
+Public MTA server существует в NEXUS независимо от регистрации владельца. Observed data остаётся фактической основой directory.
+
+## 2. Claim method
+
+Основной target claim proof — текущий MTA challenge/control proof.
+
+Не добавлять DNS/file/site proof просто ради количества методов. Альтернатива появляется только при доказанной проблеме coverage/usability.
+
+## 3. Co-owners
+
+Server может иметь нескольких co-owners. Ownership membership хранится как relation с состояниями и audit, а не массив usernames.
+
+Минимальные поля conceptually:
+
+- server_id;
+- principal user/org;
+- ownership role;
+- accepted_at;
+- added_by;
+- status;
+- permissions overlay where needed.
+
+## 4. Ownership transfer
+
+Flow:
+
+```text
+Current owner initiates
+  -> target accepts
+  -> re-auth / step-up checks
+  -> policy validation
+  -> transactional ownership change
+  -> audit + notifications
+```
+
+Для risky transfer может потребоваться дополнительный control challenge.
+
+## 5. Operational posts
+
+Server page поддерживает structured status posts:
+
+- maintenance;
+- incident;
+- scheduled restart;
+- event;
+- resolved/update.
+
+Каждый post имеет timestamps, author/team context и visible status.
+
+## 6. Observed truth vs owner message
+
+Owner может написать «maintenance», но NEXUS всё равно показывает observed server state отдельно. Нельзя выдавать editorial status за network observation.
+
+## 7. Join Server
+
+Primary CTA:
+
+- safe deep-link where supported;
+- copy endpoint fallback;
+- visible connection info according to privacy/public policy.
+
+Click analytics считается intent signal, не confirmed player join.
+
+## 8. No player identity by default
+
+Directory/server page не публикует список player names по умолчанию. Используются aggregate online/slots. Любое расширение этой политики требует отдельного privacy decision.
+
+## 13. Round 7 — server presentation, recruitment и analytics
+
+### 13.1 Safe customization
+
+Claimed server owner получает широкую свободу оформления через безопасные primitives:
+
+- block reordering;
+- banner/colors;
+- media;
+- custom text/sections;
+- predefined widgets.
+
+Arbitrary HTML/CSS/JS не допускается как обычная customization feature из-за XSS, impersonation, accessibility и long-term compatibility risks.
+
+### 13.2 Recruitment forms
+
+Server/Organization может строить recruitment/application forms из approved field types и custom questions. Ответы private by default, имеют retention/delete policy и role-scoped access.
+
+### 13.3 History visibility
+
+OWNER DECISION: история page edits и ownership changes видна **только owners/staff**, а не является публичным changelog по умолчанию. Публичные события/announcements существуют отдельно.
+
+### 13.4 Join analytics
+
+Owner analytics может учитывать:
+
+- clicks;
+- approximate unique users/sessions;
+- source/referrer/campaign;
+- first-party technical telemetry, в том числе не показываемую самому посетителю как отдельный UI signal.
+
+Однако hidden telemetry не означает undisclosed surveillance: сбор должен быть описан в Privacy/Cookie/analytics policy, минимизирован, защищён retention rules и consent/legal requirements там, где они применимы. Third-party/cross-site identifiers не являются автоматическим default только потому, что аналитика невидима в UI.

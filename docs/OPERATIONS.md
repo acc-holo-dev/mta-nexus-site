@@ -181,15 +181,20 @@ The version `1.2.0-beta.3` represents the consolidated mainline hardening, RU/EN
 
 From this point forward, Codex is the implementation owner for subsequent MTA NEXUS development.
 
-Baseline before the documentation-only handoff commit:
+Baseline for the owner-confirmed handbook integration:
 
 - branch: `main`;
-- implementation SHA: `b864076582a8f3b3dfad77798a97580d2b2500bf`;
+- implementation parent SHA: `b46905faae2385fb7dd3c58a6f8f9943fb84b554`;
 - repository version: `1.2.0-beta.3`;
 - development policy: work directly on `main`; do not create new long-lived development branches;
-- production deployment remains a separate explicit decision.
+- production deployment remains a separate explicit human decision.
 
-Codex must treat this section as the canonical continuation plan. Do not restart architecture from scratch and do not reintroduce features intentionally removed or disabled by the closed-beta policy.
+Product intent is now governed by `docs/handbook/13-DECISION-REGISTER.md` and
+`docs/handbook/58-SOURCE-OF-TRUTH-AND-REPO-HANDOFF.md`. This Operations section
+remains the canonical operational continuation/release plan. When approved target
+product behavior differs from current closed-beta code, design a safe migration;
+do not pretend the target is already implemented and do not silently discard the
+owner-confirmed decision.
 
 ### 7.2 Current implemented state
 
@@ -212,7 +217,7 @@ The current mainline already includes the following consolidated work:
 - admin build/content/verification moderation with explicit server-confirmed mutations;
 - notification center/preferences and authenticated mutation responses hardened with private/no-store semantics where applicable;
 - mutation UI generally requires confirmed response payloads rather than treating an arbitrary HTTP 2xx as success;
-- only two long-form project documents remain: `docs/ARCHITECTURE.md` and this `docs/OPERATIONS.md`.
+- the root `docs/` keeps Architecture, Operations and Problems as operational documents, while the owner-confirmed target specification is versioned under `docs/handbook/`.
 
 ### 7.3 Known release blockers at handoff
 
@@ -261,7 +266,7 @@ Codex should execute the stages below in order. Each stage must leave `main` bet
 
 - ~~delete all non-`main` remote branches after the safety check above~~ — deleted 2026-09-29 (see 7.3.A);
 - workspace metadata verified: no temporary planning or abandoned artifact files remain (`packages/db/src/seed-extra.ts` is an intentionally untracked local demo seed, kept out of git);
-- `README.md`, `docs/ARCHITECTURE.md`, `docs/OPERATIONS.md` and `docs/PROBLEMS.md` remain the maintained prose documentation; dated audit evidence does not live in the repository (enforced by `tests/mainline-repository-policy.test.ts`);
+- `README.md`, the three operational root documents and `docs/handbook/` are the maintained prose surfaces; dated ad-hoc audit evidence still does not live in the repository (enforced by `tests/mainline-repository-policy.test.ts`);
 - package manifests and workspace metadata consistent with the current beta version.
 
 Acceptance: GitHub shows exactly one branch, `main`, and the repository documentation policy remains satisfied. ✅ Verified 2026-09-29.
@@ -514,20 +519,21 @@ For every substantial stage:
 5. execute the relevant verification when execution infrastructure exists;
 6. commit directly to `main` with a descriptive message;
 7. re-read the resulting exact SHA rather than assuming the ref moved correctly;
-8. keep this document updated only when operational truth or the handoff plan materially changes.
+8. keep this document updated when operational truth or the release plan materially changes; update the handbook Decision Register/source-of-truth chapters when owner-confirmed product truth changes.
 
 Prefer one coherent finished update over dozens of cosmetic commits. Do not report a check as passed unless it actually executed.
 
 ### 7.7 Handoff completion definition
 
-The handoff is complete when this documentation is committed to `main`.
+The handoff is complete when the owner-confirmed handbook and this operational
+documentation are committed to `main`.
 
 At that point:
 
-- the previous agent should make no further implementation decisions unless explicitly asked again by the human owner;
-- Codex should begin at Stage 1 above;
-- Codex owns continuation, debugging, verification and release preparation;
-- the human owner retains the final decision for destructive data operations and production deployment.
+- AI implementation work starts by reading the handbook Decision Register and source-of-truth rules, then inspecting current `main`;
+- the operational stages in this document remain the release/verification sequence;
+- AI agents may make reversible `PROVISIONAL` technical choices within the handbook boundaries;
+- the human owner retains final control over destructive data operations, real payment activation and production deployment.
 
 
 ### 7.8 Social-state verification slice

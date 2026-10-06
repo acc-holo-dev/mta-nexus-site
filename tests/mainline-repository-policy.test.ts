@@ -27,7 +27,7 @@ describe("mainline repository policy", () => {
     expect(dependabot.match(/package-ecosystem:/g)?.length).toBe(3);
   });
 
-  it("keeps only the three maintained long-form documents", () => {
+  it("keeps operational docs focused and the owner handbook controlled", () => {
     const documents = readdirSync(resolve(process.cwd(), "docs"))
       .filter((name) => name.endsWith(".md"))
       .sort();
@@ -38,6 +38,21 @@ describe("mainline repository policy", () => {
       "OPERATIONS.md",
       "PROBLEMS.md",
     ]);
+
+    const handbook = readdirSync(resolve(process.cwd(), "docs/handbook")).sort();
+    expect(handbook.length).toBeGreaterThanOrEqual(4);
+    expect(handbook.every((name) => name.endsWith(".md"))).toBe(true);
+    expect(handbook).toEqual(expect.arrayContaining([
+      "00-README.md",
+      "11-AI-AGENT-HANDOFF.md",
+      "13-DECISION-REGISTER.md",
+      "58-SOURCE-OF-TRUTH-AND-REPO-HANDOFF.md",
+      "MANIFEST-SHA256.md",
+    ]));
+
+    const readme = read("README.md");
+    expect(readme).toContain("docs/handbook/00-README.md");
+    expect(readme).toContain("docs/handbook/13-DECISION-REGISTER.md");
   });
 
   it("keeps Docker DEV source mounts and polling enabled", () => {

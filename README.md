@@ -144,15 +144,27 @@ The free resource library at `/market` supports category and text search, three 
 
 ## Documentation
 
-Only three long-form documents are maintained:
+The repository keeps three operational long-form documents at the root of `docs/`:
 
 - [Architecture / Архитектура](docs/ARCHITECTURE.md)
 - [Operations / Эксплуатация](docs/OPERATIONS.md)
 - [Problems / Реестр проблем](docs/PROBLEMS.md) — the single open-problem registry
 
-Everything else should be represented by executable code, migrations, tests, commit history, or issues instead of additional standalone planning documents.
+The owner-confirmed product specification and AI development handbook lives in
+[docs/handbook/](docs/handbook/00-README.md). Start with the
+[Decision Register](docs/handbook/13-DECISION-REGISTER.md), then read
+[Source of Truth and Repository Handoff](docs/handbook/58-SOURCE-OF-TRUTH-AND-REPO-HANDOFF.md)
+and the relevant domain chapters.
 
-**Development handoff:** subsequent implementation ownership and the ordered Codex continuation plan are recorded in [Operations / Эксплуатация](docs/OPERATIONS.md#7-codex-handoff--передача-разработки-codex).
+The handbook describes the approved target product. It does **not** imply that
+future commerce, DRM, subscriptions or other target features are already active
+in the current closed-beta runtime. Current operational truth, release gates and
+verified implementation state remain in Architecture, Operations, Problems,
+executable code, migrations and tests.
+
+**Development handoff:** product intent and precedence are defined by the handbook;
+the ordered operational continuation and release procedure remain in
+[Operations / Эксплуатация](docs/OPERATIONS.md#7-codex-handoff--передача-разработки-codex).
 
 ## Release state
 
