@@ -36,9 +36,12 @@ describe("verification application serialization", () => {
       requesterId: "manager_2", targetType: "organization", targetId: "org_1",
     })).rejects.toMatchObject({ statusCode: 409 });
     const dialect = new PgDialect();
-    expect(dialect.sqlToQuery(captured.lock!).sql).toContain("pg_advisory_xact_lock");
-    expect(dialect.sqlToQuery(captured.lock!).params).toEqual(["verification:organization:org_1"]);
-    expect(dialect.sqlToQuery(captured.filter!).params).toEqual(["organization", "org_1", "pending"]);
+    if (!captured.lock || !captured.filter) {
+      throw new Error("Expected advisory lock and pending-request filter to be captured");
+    }
+    expect(dialect.sqlToQuery(captured.lock).sql).toContain("pg_advisory_xact_lock");
+    expect(dialect.sqlToQuery(captured.lock).params).toEqual(["verification:organization:org_1"]);
+    expect(dialect.sqlToQuery(captured.filter).params).toEqual(["organization", "org_1", "pending"]);
     expect(captured.inserts).toEqual([]);
   });
 

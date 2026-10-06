@@ -20,7 +20,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 }));
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
-  generateId: vi.fn((prefix: string) => prefix + "_new"),
+  generateId: vi.fn((prefix: string) => `${prefix}_new`),
 }));
 vi.mock("@nexus/db", () => ({
   userRepository: { findById: vi.fn(async () => ({ id: "usr_2" })) },
@@ -33,7 +33,7 @@ vi.mock("@nexus/db", () => ({
     unfollow: vi.fn(async () => undefined),
   },
   notificationRepository: {
-    listByUser: vi.fn(async () => Array.from({ length: 100 }, (_, index) => ({ id: "not_" + index, isRead: true }))),
+    listByUser: vi.fn(async () => Array.from({ length: 100 }, (_, index) => ({ id: `not_${index}`, isRead: true }))),
     countUnread: vi.fn(async () => 137),
     create: createNotification,
     markAsRead: markSingle,
@@ -46,7 +46,7 @@ import { POST as markRead } from "../apps/web/src/app/api/notifications/mark-rea
 import { GET as listNotifications } from "../apps/web/src/app/api/notifications/route";
 
 const makeRequest = (path: string, method: string, body?: string) =>
-  new NextRequest("http://nexus.test" + path, {
+  new NextRequest(`http://nexus.test${path}`, {
     method,
     headers: { "content-type": "application/json" },
     ...(body === undefined ? {} : { body }),

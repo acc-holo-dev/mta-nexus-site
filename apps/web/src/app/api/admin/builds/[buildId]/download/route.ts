@@ -5,7 +5,7 @@ import {
 } from "../../../../../../lib/build-download-metadata";
 import path from "node:path";
 import { toDownloadWebStream } from "../../../../../../lib/download-web-stream";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { auditRepository, buildRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";

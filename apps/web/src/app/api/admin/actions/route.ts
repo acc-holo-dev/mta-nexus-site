@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { AppError } from "@nexus/domain";
 import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";

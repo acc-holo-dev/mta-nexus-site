@@ -1,7 +1,6 @@
 import { describe, it, expect, afterAll } from "vitest";
 import { LocalStorageProvider } from "@nexus/storage";
 import fs from "node:fs/promises";
-import path from "node:path";
 
 describe("Storage Abstraction & Integrity", () => {
   const testDir = "./tmp-test-storage";

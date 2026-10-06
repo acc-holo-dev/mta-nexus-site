@@ -38,7 +38,8 @@ describe("verification queue query", () => {
     const result = await new VerificationRepository().listPage("pending", 4);
     expect(result.requests).toHaveLength(30);
     expect(result.hasMore).toBe(true);
-    expect(dialect.sqlToQuery(captured.where!).params).toEqual(["pending"]);
+    if (!captured.where) throw new Error("Expected pending queue filter to be captured");
+    expect(dialect.sqlToQuery(captured.where).params).toEqual(["pending"]);
     expect(captured.order.map((column) => dialect.sqlToQuery(column).sql)).toEqual([
       '"verification_requests"."created_at" asc',
       '"verification_requests"."id" asc',
@@ -51,7 +52,8 @@ describe("verification queue query", () => {
     captured.rows = [];
     const result = await new VerificationRepository().listPage("history", 1);
     expect(result.hasMore).toBe(false);
-    expect(dialect.sqlToQuery(captured.where!).params).toEqual(["approved", "rejected"]);
+    if (!captured.where) throw new Error("Expected history queue filter to be captured");
+    expect(dialect.sqlToQuery(captured.where).params).toEqual(["approved", "rejected"]);
     expect(captured.order.map((column) => dialect.sqlToQuery(column).sql)).toEqual([
       '"verification_requests"."resolved_at" desc',
       '"verification_requests"."id" desc',

@@ -1,5 +1,5 @@
 import { randomInt } from "node:crypto";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { confirmPasswordResetSchema, requestPasswordResetSchema } from "@nexus/validation";
 import { AppError } from "@nexus/domain";
