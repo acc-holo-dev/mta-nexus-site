@@ -38,7 +38,8 @@ describe("report moderation queue", () => {
     const result = await new ReportRepository().listPage("pending", 2);
     expect(result.reports).toHaveLength(30);
     expect(result.hasMore).toBe(true);
-    expect(dialect.sqlToQuery(captured.where!).params).toEqual(["open", "under_review"]);
+    if (!captured.where) throw new Error("Expected pending report filter to be captured");
+    expect(dialect.sqlToQuery(captured.where).params).toEqual(["open", "under_review"]);
     expect(captured.order.map((column) => dialect.sqlToQuery(column).sql)).toEqual([
       '"reports"."created_at" asc', '"reports"."id" asc',
     ]);
@@ -50,7 +51,8 @@ describe("report moderation queue", () => {
     captured.rows = [];
     const result = await new ReportRepository().listPage("history", 1);
     expect(result.hasMore).toBe(false);
-    expect(dialect.sqlToQuery(captured.where!).params).toEqual(["resolved", "dismissed"]);
+    if (!captured.where) throw new Error("Expected report history filter to be captured");
+    expect(dialect.sqlToQuery(captured.where).params).toEqual(["resolved", "dismissed"]);
     expect(captured.order.map((column) => dialect.sqlToQuery(column).sql)).toEqual([
       '"reports"."resolved_at" desc', '"reports"."id" desc',
     ]);

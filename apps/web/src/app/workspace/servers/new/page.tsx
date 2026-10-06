@@ -60,7 +60,7 @@ export default function RegisterServerPage() {
         throw new Error(data?.error || copy.createError);
       }
       window.location.assign(
-        "/workspace/servers/" + encodeURIComponent(data.server.id),
+        `/workspace/servers/${encodeURIComponent(data.server.id)}`,
       );
     } catch (caught) {
       setError(

@@ -1,5 +1,4 @@
 import { safeExternalWebUrl } from "@nexus/validation";
-import React from "react";
 import Link from "next/link";
 import { Calendar, MessageSquare, ThumbsUp } from "lucide-react";
 import type { Content } from "@nexus/domain";
@@ -31,6 +30,7 @@ export function ArticleCard({
     >
       {coverImageUrl && (
         <div className="relative aspect-[16/9] w-full overflow-hidden bg-inset">
+          {/* biome-ignore lint/performance/noImgElement: article-controlled remote media intentionally bypasses Next image optimization trust. */}
           <img
             src={coverImageUrl}
             alt={article.title}

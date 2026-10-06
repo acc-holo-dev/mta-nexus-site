@@ -44,7 +44,7 @@ export async function generateMetadata({
   return {
     title: server.name,
     description,
-    alternates: { canonical: "/servers/" + server.slug },
+    alternates: { canonical: `/servers/${server.slug}` },
     openGraph: {
       title: server.name,
       description,
@@ -93,7 +93,7 @@ export default async function ServerDetailPage({
     currentPlayers == null || maxPlayers == null || maxPlayers === 0
       ? 0
       : Math.min(100, Math.round((currentPlayers / maxPlayers) * 100));
-  const connectUri = "mtasa://" + server.ipAddress + ":" + server.port;
+  const connectUri = `mtasa://${server.ipAddress}:${server.port}`;
   const statusClass = isOnline
     ? "border-[color:var(--nexus-success)]/30 bg-success-soft text-success"
     : "border-base bg-inset text-secondary";
@@ -117,15 +117,18 @@ export default async function ServerDetailPage({
       <div className="relative overflow-hidden rounded-2xl border border-base bg-surface shadow-nexus-lg">
         <div className="relative h-64 w-full bg-inset">
           {server.bannerUrl && (
-            <img
+            <>
+              {/* biome-ignore lint/performance/noImgElement: server-controlled remote banner stays outside the trusted image-optimizer allowlist. */}
+              <img
               src={server.bannerUrl}
               alt={server.name}
               width={1600}
               height={640}
               fetchPriority="high"
               decoding="async"
-              className="h-full w-full object-cover"
-            />
+                className="h-full w-full object-cover"
+              />
+            </>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--nexus-page)] via-[color:var(--nexus-page)]/60 to-transparent" />
         </div>
@@ -290,7 +293,7 @@ export default async function ServerDetailPage({
           <div className="h-2 w-full overflow-hidden rounded-full bg-inset">
             <div
               className="h-full rounded-full bg-[var(--nexus-success)]"
-              style={{ width: occupancyPercent + "%" }}
+              style={{ width: `${occupancyPercent}%` }}
             />
           </div>
           {!observedServer && (

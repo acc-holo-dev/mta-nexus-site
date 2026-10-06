@@ -30,7 +30,8 @@ describe("J5 resource browser acceptance contract", () => {
   it("claims through the real acquisition UI and downloads through the product UI", () => {
     const browser = read("scripts/tests/resource-claim-download.playwright.mjs");
 
-    expect(browser).toContain("page.goto(`/market/${productSlug}`)");
+    const dollar = "$";
+    expect(browser).toContain(`page.goto(\`/market/${dollar}{productSlug}\`)`);
     expect(browser).toContain('getByRole("link", { name: "Add to library", exact: true })');
     expect(browser).toContain('response.url().endsWith("/api/resources/claim")');
     expect(browser).toContain('page.goto("/workspace")');

@@ -57,7 +57,8 @@ describe("report write and notification lookup", () => {
     const result = await new ReportRepository().createWithAudit(data, audit);
     expect(result).toMatchObject({ report: { id: "rpt_1" }, created: true });
     expect(captured.inserts).toEqual([reports, auditEvents]);
-    expect(new PgDialect().sqlToQuery(captured.lock!).sql).toContain("pg_advisory_xact_lock");
+    if (!captured.lock) throw new Error("Expected report advisory lock to be captured");
+    expect(new PgDialect().sqlToQuery(captured.lock).sql).toContain("pg_advisory_xact_lock");
 
     const duplicate = await new ReportRepository().createWithAudit(data, audit);
     expect(duplicate).toMatchObject({ report: { id: "rpt_1" }, created: false });
@@ -67,7 +68,9 @@ describe("report write and notification lookup", () => {
   it("fetches only moderator IDs and does not hydrate account data", async () => {
     expect(await new UserRepository().listModeratorIds()).toEqual(["mod_1"]);
     expect(Object.keys(captured.selected ?? {})).toEqual(["id"]);
-    expect(new PgDialect().sqlToQuery(captured.filter!).params).toContain("moderator");
-    expect(new PgDialect().sqlToQuery(captured.filter!).params).toContain("admin");
+    if (!captured.filter) throw new Error("Expected moderator filter to be captured");
+    const filterParams = new PgDialect().sqlToQuery(captured.filter).params;
+    expect(filterParams).toContain("moderator");
+    expect(filterParams).toContain("admin");
   });
 });
