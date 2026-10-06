@@ -124,6 +124,13 @@ for attempt in $(seq 1 30); do
   sleep 1
 done
 test -s "$work/root.crt"
+if [[ $browser_only == true ]]; then
+  if ! getent ahostsv4 "$domain" 2>/dev/null | awk '{print $1}' | grep -Fxq '127.0.0.1'; then
+    printf '127.0.0.1\t%s\n' "$domain" | sudo tee -a /etc/hosts > /dev/null
+  fi
+  getent ahostsv4 "$domain" | awk '{print $1}' | grep -Fxq '127.0.0.1'
+  export NODE_EXTRA_CA_CERTS="$work/root.crt"
+fi
 https=(curl --silent --show-error --noproxy '*' --max-time 30
   --cacert "$work/root.crt" --resolve "$domain:8443:127.0.0.1")
 phase=https-health

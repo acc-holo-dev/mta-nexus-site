@@ -78,3 +78,13 @@ test('live smoke checks both sides of the declared upload boundary', () => {
   assert.match(source, /\[\[ \$at_limit_code == 405 \]\]/u);
   assert.match(source, /\[\[ \$oversized_code == 413 \]\]/u);
 });
+
+test('browser-only acceptance resolves the disposable origin for Node without disabling TLS verification', () => {
+  const startup = readFileSync('scripts/check-production-startup.sh', 'utf8');
+  const playwright = readFileSync('playwright.ci.config.mjs', 'utf8');
+  assert.match(startup, /getent ahostsv4 "\$domain"/u);
+  assert.match(startup, /127\.0\.0\.1\\t%s\\n/u);
+  assert.match(startup, /NODE_EXTRA_CA_CERTS="\$work\/root\.crt"/u);
+  assert.match(playwright, /ignoreHTTPSErrors:\s*false/u);
+  assert.doesNotMatch(playwright, /ignoreHTTPSErrors:\s*true/u);
+});
