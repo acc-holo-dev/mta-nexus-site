@@ -71,6 +71,7 @@ jobs:
       run: pnpm test:tooling
     - name: Preserve unit test timings
       if: ${{ always() }}
+      continue-on-error: ${{ github.ref_type != 'tag' }}
       uses: actions/upload-artifact@v7.0.1
       with:
         name: unit-tests-${{ github.sha }}
@@ -127,6 +128,7 @@ jobs:
       if: ${{ needs.plan.outputs.full == 'true' }}
     - name: Preserve upgrade rehearsal evidence
       if: ${{ always() && needs.plan.outputs.full == 'true' }}
+      continue-on-error: ${{ github.ref_type != 'tag' }}
       uses: actions/upload-artifact@v7.0.1
       with:
         name: release-upgrade-${{ github.sha }}-${{ github.run_attempt }}
@@ -232,6 +234,7 @@ jobs:
       run: pnpm test:database --reporter=default --reporter=json --outputFile=artifacts/database-tests.json
     - name: Preserve portfolio query plans
       if: ${{ always() && steps.database_tests.outcome != 'skipped' }}
+      continue-on-error: ${{ github.ref_type != 'tag' }}
       uses: actions/upload-artifact@v7.0.1
       with:
         name: portfolio-query-plans-${{ github.sha }}-${{ github.run_attempt }}
@@ -243,6 +246,7 @@ jobs:
       run: docker rm --force "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}" >/dev/null 2>&1 || true
     - name: Preserve database test timings
       if: ${{ always() }}
+      continue-on-error: ${{ github.ref_type != 'tag' }}
       uses: actions/upload-artifact@v7.0.1
       with:
         name: database-tests-${{ github.sha }}
@@ -275,14 +279,11 @@ jobs:
         cache-from: type=gha,scope=nexus-production
         cache-to: type=gha,mode=max,scope=nexus-production
         provenance: false
-    - name: Share image without a registry push
-      uses: actions/upload-artifact@v7.0.1
+    - name: Cache shared production image by exact commit
+      uses: actions/cache/save@v4
       with:
-        name: production-image-${{ github.sha }}
         path: ${{ runner.temp }}/production.tar
-        compression-level: 0
-        if-no-files-found: error
-        retention-days: 1
+        key: nexus-production-image-${{ runner.os }}-${{ github.sha }}
   smoke:
     name: Production browser smoke
     needs:
@@ -304,14 +305,15 @@ jobs:
       uses: actions/setup-node@v7
       with:
         node-version: 26.0.0
-    - name: Download shared production image
-      uses: actions/download-artifact@v8.0.1
+    - name: Restore shared production image by exact commit
+      uses: actions/cache/restore@v4
       with:
-        name: production-image-${{ github.sha }}
-        path: ${{ runner.temp }}/nexus-image
+        path: ${{ runner.temp }}/production.tar
+        key: nexus-production-image-${{ runner.os }}-${{ github.sha }}
+        fail-on-cache-miss: true
     - name: Load the exact commit image
       run: |-
-        docker load --input "$RUNNER_TEMP/nexus-image/production.tar"
+        docker load --input "$RUNNER_TEMP/production.tar"
         bash scripts/validate-ci-image.sh
     - name: Install browser tools
       shell: bash
@@ -328,6 +330,7 @@ jobs:
       run: bash scripts/check-browser-smoke.sh
     - name: Preserve smoke failure evidence
       if: ${{ always() }}
+      continue-on-error: ${{ github.ref_type != 'tag' }}
       uses: actions/upload-artifact@v7.0.1
       with:
         name: smoke-${{ github.sha }}
@@ -430,6 +433,7 @@ jobs:
       run: node scripts/check-backup-restore.mjs
     - name: Preserve backup restore evidence
       if: ${{ always() && steps.backup_rehearsal.outcome != 'skipped' }}
+      continue-on-error: ${{ github.ref_type != 'tag' }}
       uses: actions/upload-artifact@v7.0.1
       with:
         name: backup-restore-${{ github.sha }}-${{ github.run_attempt }}
@@ -450,14 +454,15 @@ jobs:
       uses: actions/setup-node@v7
       with:
         node-version: 26.0.0
-    - name: Download shared production image
-      uses: actions/download-artifact@v8.0.1
+    - name: Restore shared production image by exact commit
+      uses: actions/cache/restore@v4
       with:
-        name: production-image-${{ github.sha }}
-        path: ${{ runner.temp }}/nexus-image
+        path: ${{ runner.temp }}/production.tar
+        key: nexus-production-image-${{ runner.os }}-${{ github.sha }}
+        fail-on-cache-miss: true
     - name: Load the exact commit image
       run: |-
-        docker load --input "$RUNNER_TEMP/nexus-image/production.tar"
+        docker load --input "$RUNNER_TEMP/production.tar"
         bash scripts/validate-ci-image.sh
     - name: Verify production smoke isolation
       run: node --test scripts/tests/production-smoke.node-test.mjs
@@ -514,14 +519,15 @@ jobs:
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
-    - name: Download shared production image
-      uses: actions/download-artifact@v8.0.1
+    - name: Restore shared production image by exact commit
+      uses: actions/cache/restore@v4
       with:
-        name: production-image-${{ github.sha }}
-        path: ${{ runner.temp }}/nexus-image
+        path: ${{ runner.temp }}/production.tar
+        key: nexus-production-image-${{ runner.os }}-${{ github.sha }}
+        fail-on-cache-miss: true
     - name: Load the exact commit image
       run: |-
-        docker load --input "$RUNNER_TEMP/nexus-image/production.tar"
+        docker load --input "$RUNNER_TEMP/production.tar"
         bash scripts/validate-ci-image.sh
     - name: Start isolated TLS SMTP receiver
       run: |
@@ -612,6 +618,7 @@ jobs:
       run: node scripts/ci-summary.mjs
     - name: Preserve scope and exact commit result
       if: ${{ always() }}
+      continue-on-error: ${{ github.ref_type != 'tag' }}
       uses: actions/upload-artifact@v7.0.1
       with:
         name: ci-evidence-${{ github.sha }}

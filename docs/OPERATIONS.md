@@ -79,8 +79,13 @@ pnpm release:verify
 Only `CI` starts on push/PR. Ordinary code changes run lint, types, both test projects,
 one cached production-image build and a short registration/logout/directory browser smoke.
 Browser and infrastructure consumers load the exact same SHA-labelled image; a missing
-or mismatched artifact fails instead of rebuilding or pulling an unverified image.
-Production image transfer uses a one-day artifact without a registry publication. Ordinary code commits use six jobs, including scope selection and the aggregate result. Full acceptance remains broader and is intentionally reserved for infrastructure/release verification.
+or mismatched transfer fails instead of rebuilding or pulling an unverified image.
+The producer stores the one-run production tar in GitHub Actions Cache under an immutable
+exact-SHA key, and every consumer restores that exact key before validating the image
+revision label. This keeps build-once semantics without depending on GitHub Artifact
+Storage quota or publishing a registry image. Ordinary code commits use six jobs,
+including scope selection and the aggregate result. Full acceptance remains broader
+and is intentionally reserved for infrastructure/release verification.
 
 Full acceptance runs on `v*` tags, the manual **Run workflow → full=true** input, and
 infrastructure/migration/tooling/dependency changes. It additionally runs SMTP/worker,
@@ -93,7 +98,11 @@ aggregate status: missing, failed, cancelled or skipped required jobs cannot pas
 
 Fast success is **not** full release acceptance. Evidence records `fast_ci`,
 `full_acceptance` or `documentation` and the exact SHA; unit/database JSON reports
-retain execution timings. A release needs a successful full run for its exact SHA.
+retain execution timings. Artifact uploads for diagnostics are best-effort on normal
+branch/PR runs because external artifact-storage quota is not application correctness;
+the same upload steps remain strict on release tags. Mandatory assertions and the
+GitHub step summary remain authoritative even when optional artifact persistence is
+unavailable. A release needs a successful full run for its exact SHA.
 
 
 A workflow object with zero executed steps is infrastructure evidence, not an application test result. Release acceptance must name the exact tested `main` SHA.
