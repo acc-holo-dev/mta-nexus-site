@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { contentService } from "../../../../lib/services/content-service";
 
 export async function GET(

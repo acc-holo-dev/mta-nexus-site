@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../../lib/services/auth-service";
 import {
   contentRepository,
@@ -21,7 +21,7 @@ function privateJson(body: unknown, status = 200) {
 }
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id: productId } = await params;

@@ -15,11 +15,12 @@ describe("product review database integrity", () => {
 
     expect(route).toContain("contentRepository.addProductReview");
     expect(route).not.toContain("Recalculate true rating average");
+    const dollar = "$";
     expect(repository).toContain("async addProductReview(");
     expect(repository).toContain('eq(products.status, "published")');
-    expect(repository).toContain('set({ updatedAt: sql`${products.updatedAt}` })');
-    expect(repository).toContain("count(${comments.rating})::int");
-    expect(repository).toContain("avg(${comments.rating}) * 10");
+    expect(repository).toContain(`set({ updatedAt: sql\`${dollar}{products.updatedAt}\` })`);
+    expect(repository).toContain(`count(${dollar}{comments.rating})::int`);
+    expect(repository).toContain(`avg(${dollar}{comments.rating}) * 10`);
     expect(repository).toContain("ratingCount,");
     expect(repository).toContain("ratingAverage,");
   });

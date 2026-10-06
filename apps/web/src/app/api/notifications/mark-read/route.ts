@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
 import { consumeRateLimit } from "@nexus/security";

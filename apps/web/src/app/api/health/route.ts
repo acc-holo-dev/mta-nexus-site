@@ -1,4 +1,4 @@
-import { type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { checkDatabaseConnection } from "@nexus/db";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../lib/observability";
 

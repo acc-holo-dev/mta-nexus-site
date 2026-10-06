@@ -48,8 +48,9 @@ describe("server ownership hardening surface", () => {
     );
     // Claim serialization keys on the verification target, not a server-only
     // literal: the same contract now covers user/developer/organization targets.
+    const dollar = "$";
     expect(repository).toContain(
-      "verification:${input.targetType}:${input.targetId}",
+      `verification:${dollar}{input.targetType}:${dollar}{input.targetId}`,
     );
     expect(repository).toContain(
       "A verification request is already pending",

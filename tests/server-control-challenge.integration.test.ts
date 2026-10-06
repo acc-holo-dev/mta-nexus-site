@@ -219,7 +219,8 @@ describe("MTA server control challenge integration", () => {
       code: "MTA_DIRECTORY_STALE",
     });
 
-    const createdAt = storedChallenge!.createdAt;
+    if (!storedChallenge) throw new Error("Expected issued challenge to be persisted");
+    const createdAt = storedChallenge.createdAt;
     directoryState.current = {
       fetchedAt: new Date(createdAt.getTime() - 1_000).toISOString(),
       isStale: false,

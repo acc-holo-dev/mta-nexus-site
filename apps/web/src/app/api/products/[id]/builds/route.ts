@@ -1,5 +1,5 @@
 import path from "node:path";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { productService } from "../../../../../lib/services/product-service";
 import { buildScannerService } from "../../../../../lib/services/build-scanner-service";
