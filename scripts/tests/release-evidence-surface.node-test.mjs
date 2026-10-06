@@ -60,14 +60,18 @@ test("repository stability is checked after command execution and feeds the summ
   assert.match(script, /dirty: dirty \|\| finalDirty/u);
 });
 
-test("CI preserves the selected-scope evidence independently of test success", () => {
+test("CI keeps selected-scope evidence strict for releases without coupling branch correctness to artifact quota", () => {
   const workflow = read(".github/workflows/ci.yml");
   const section = workflow.slice(workflow.indexOf("  summary:"));
+  const summaryStep = section.indexOf("Require every gate for the selected scope");
+  const artifactStep = section.indexOf("Preserve scope and exact commit result");
   assert.match(section, /always\(\)/u);
+  assert.ok(summaryStep >= 0 && artifactStep > summaryStep);
   assert.match(section, /path: artifacts\/ci-evidence\.json/u);
   assert.match(section, /if-no-files-found: error/u);
   assert.match(section, /retention-days: 14/u);
-  assert.doesNotMatch(section, /continue-on-error|include-hidden-files/u);
+  assert.match(section, /continue-on-error: \$\{\{ github\.ref_type != 'tag' \}\}/u);
+  assert.doesNotMatch(section, /include-hidden-files/u);
 });
 
 test("mail worker CI expects current structured terminal events", () => {
