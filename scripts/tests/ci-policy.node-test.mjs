@@ -18,6 +18,9 @@ test("migration, database tooling, workflow and explicit release changes run ful
   for (const files of [
     ["packages/db/migrations/0027.sql"],
     ["packages/db/scripts/check-release-upgrade.mjs"],
+    ["packages/db/src/schema.ts"],
+    ["packages/db/src/account-mail-schema.ts"],
+    ["packages/db/src/migrate.ts"],
     [".github/workflows/ci.yml"],
     ["Dockerfile"],
     ["tests/mainline-repository-policy.test.ts"],

@@ -28,7 +28,7 @@ function getRequest(token: string, buildId: string) {
 function moderationRequest(
   token: string,
   buildId: string,
-  action: "approve" | "reject",
+  action: "approve" | "reject" | "quarantine" | "restore",
   notes?: string,
 ) {
   return new NextRequest("http://nexus.test/api/admin/actions", {
@@ -259,8 +259,54 @@ describe("build moderation route integration", () => {
       );
       expect(afterReview.status).toBe(409);
       expect(await afterReview.json()).toEqual({
-        error: "Build is no longer pending review",
+        error: "Build is not available for moderator evidence review",
       });
+
+      const quarantined = await moderate(
+        moderationRequest(
+          moderatorToken,
+          cleanBuildId,
+          "quarantine",
+          "Contain the published artifact while the reviewer rechecks evidence.",
+        ),
+      );
+      expect(quarantined.status).toBe(200);
+      expect(await quarantined.json()).toMatchObject({
+        success: true,
+        action: "quarantine",
+        targetId: cleanBuildId,
+      });
+      expect((await buildRepository.findById(cleanBuildId))?.status).toBe(
+        "quarantined",
+      );
+
+      const quarantineEvidence = await downloadReviewerArtifact(
+        getRequest(moderatorToken, cleanBuildId),
+        { params: Promise.resolve({ buildId: cleanBuildId }) },
+      );
+      expect(quarantineEvidence.status).toBe(200);
+      expect(quarantineEvidence.headers.get("Cache-Control")).toBe(
+        "private, no-store",
+      );
+      expect(Buffer.from(await quarantineEvidence.arrayBuffer())).toEqual(bytes);
+
+      const restored = await moderate(
+        moderationRequest(
+          moderatorToken,
+          cleanBuildId,
+          "restore",
+          "Evidence review confirms the trusted clean artifact can return.",
+        ),
+      );
+      expect(restored.status).toBe(200);
+      expect(await restored.json()).toMatchObject({
+        success: true,
+        action: "restore",
+        targetId: cleanBuildId,
+      });
+      expect((await buildRepository.findById(cleanBuildId))?.status).toBe(
+        "published",
+      );
     } finally {
       await storageService.deleteAsset(asset.key);
     }
