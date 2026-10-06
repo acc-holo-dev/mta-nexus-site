@@ -46,6 +46,28 @@ export class ContentRepository {
     return rows as unknown as Content[];
   }
 
+  async searchPublishedByTypes(
+    types: Content["type"][],
+    term: string,
+    limit = 50,
+  ): Promise<Content[]> {
+    if (types.length === 0) return [];
+    const pattern = containsPattern(term);
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 50)
+      : 50;
+    const rows = await db.select().from(content).where(and(
+      eq(content.status, "published"),
+      inArray(content.type, types),
+      or(
+        ilike(content.title, pattern),
+        ilike(content.body, pattern),
+        sql`exists (select 1 from jsonb_array_elements_text(${content.tags}) as tag(value) where tag.value ilike ${pattern})`,
+      ),
+    )).orderBy(desc(content.updatedAt), desc(content.id)).limit(boundedLimit);
+    return rows as unknown as Content[];
+  }
+
   async listPublished(limit = 50): Promise<Content[]> {
         const rows = await db
       .select()

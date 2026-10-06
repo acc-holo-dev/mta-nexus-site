@@ -335,7 +335,7 @@ Use an actual browser against the running application. Test desktop and narrow m
 Executed 2026-09-29 with a real (containerized Chromium + Firefox) browser:
 guest → registration → claim → download → publish → ClamAV scan → admin
 moderation → download of the newly approved resource, plus RU/EN, light/dark,
-command palette, mobile 390px and 404. Found issues are tracked in
+global search/discovery, mobile 390px and 404. Found issues are tracked in
 `docs/PROBLEMS.md` (P1-2 no-h1, P2-1 external resources, P2-2 dev hostname,
 P2-3 seed files); three UX defects were fixed in commit `b33371a`.
 
@@ -344,7 +344,7 @@ Minimum journeys:
 1. landing/home and global navigation;
 2. locale switch RU ↔ EN;
 3. light ↔ dark theme;
-4. command palette with Ctrl/Cmd+K;
+4. ordinary global search and `/discover` section navigation;
 5. register/login/logout/session refresh;
 6. forgot-password/reset-password/recovery-email flows using test delivery infrastructure;
 7. settings preferences, password change and session revocation;

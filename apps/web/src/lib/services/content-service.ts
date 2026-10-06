@@ -20,6 +20,17 @@ export class ContentService {
     return contentRepository.listPublishedByTypes(editorialTypes, limit);
   }
 
+  async searchArticles(query: string, limit = 24): Promise<Content[]> {
+    const editorialTypes: Content["type"][] = [
+      "article",
+      "news",
+      "devlog",
+      "update",
+      "announcement",
+    ];
+    return contentRepository.searchPublishedByTypes(editorialTypes, query, limit);
+  }
+
   async listCommunityTopics(limit = 50): Promise<Content[]> {
     return contentRepository.listPublishedByTypes(["post", "question"], limit);
   }

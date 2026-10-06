@@ -35,7 +35,7 @@ export function Sidebar({
 
   const primaryNav = [
     { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
-    { href: "/explore", label: dictionary.nav.explore, icon: Compass },
+    { href: "/discover", label: dictionary.nav.explore, icon: Compass },
     { href: "/market", label: dictionary.nav.freeResources, icon: Library },
     { href: "/community", label: dictionary.nav.community, icon: MessageSquare },
     { href: "/articles", label: dictionary.nav.updates, icon: BookOpen },

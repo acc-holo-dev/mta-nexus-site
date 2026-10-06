@@ -386,6 +386,11 @@ export class AuthService {
     return users.map((user) => toPublicUser(user));
   }
 
+  async searchDevelopers(query: string, limit = 24): Promise<User[]> {
+    const users = await userRepository.searchDevelopers(query, limit);
+    return users.map((user) => toPublicUser(user));
+  }
+
   async listUsers(): Promise<User[]> {
     const users = await userRepository.listAll();
     return users.map((user) => toPublicUser(user));

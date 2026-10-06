@@ -15,6 +15,10 @@ export class ServerService {
     return serverRepository.listActivePublic(limit);
   }
 
+  async searchServers(query: string, limit = 24): Promise<Server[]> {
+    return serverRepository.searchActivePublic(query, limit);
+  }
+
   async getServerBySlug(slug: string): Promise<Server | null> {
     return serverRepository.findBySlug(slug);
   }
