@@ -24,7 +24,8 @@ describe("free resource acquisition surface", () => {
   it("returns users directly to the resource or library after a successful claim", () => {
     const page = read("apps/web/src/app/acquire/page.tsx");
 
-    expect(page).toContain('href={`/market/${product?.slug ?? ""}`}');
+    const dollar = "$";
+    expect(page).toContain(`href={\`/market/${dollar}{product?.slug ?? ""}\`}`);
     expect(page).toContain('href="/workspace"');
     expect(page).toContain("copy.openLibrary");
     expect(page).not.toContain("Go to My Licenses");
@@ -40,8 +41,9 @@ describe("free resource acquisition surface", () => {
     expect(repository).toContain(
       'eq(entitlements.permission, "product.download")',
     );
+    const dollar = "$";
     expect(repository).toContain(
-      "salesCount: sql`${products.salesCount} + 1`",
+      `salesCount: sql\`${dollar}{products.salesCount} + 1\``,
     );
   });
 });

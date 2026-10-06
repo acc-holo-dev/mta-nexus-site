@@ -8,7 +8,7 @@
     "build": "pnpm --filter @nexus/web build",
     "build:webpack": "pnpm --filter @nexus/web build:webpack",
     "start": "pnpm --filter @nexus/web start",
-    "lint": "biome lint .",
+    "lint": "biome lint --max-diagnostics=200 .",
     "test": "vitest run",
     "test:isolated": "node scripts/run-isolated-tests.mjs",
     "test:directory": "vitest run apps/web/src/lib/services/mta-master-directory-service.test.ts apps/web/src/components/server-card.test.tsx tests/server-directory-api.test.ts tests/server-directory-surface.test.ts tests/server-editorial-api.test.ts tests/server-detail-live-link.test.ts tests/server-experience-ui.test.ts tests/server-control-challenge-migration.test.ts tests/discovery-search-behavior.test.ts tests/search-hardening.test.ts tests/search-pattern.test.ts tests/search-result-label.test.ts",

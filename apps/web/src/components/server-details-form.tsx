@@ -48,7 +48,7 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
 
     try {
       const response = await fetch(
-        "/api/servers/" + encodeURIComponent(server.id),
+        `/api/servers/${encodeURIComponent(server.id)}`,
         {
           method: "PATCH",
           cache: "no-store",

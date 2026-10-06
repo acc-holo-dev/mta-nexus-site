@@ -31,8 +31,9 @@ describe("community vertical", () => {
     expect(form).toContain('fetch("/api/content"');
     expect(form).not.toContain('status: "published"');
     expect(form).toContain("payload?.success !== true");
+    const dollar = "$";
     expect(form).toContain(
-      "/articles/${encodeURIComponent(payload.content.slug)}",
+      `/articles/${dollar}{encodeURIComponent(payload.content.slug)}`,
     );
     expect(sidebar).toContain('href: "/community"');
     expect(sidebar).toContain(

@@ -14,7 +14,8 @@ describe("content discussion form", () => {
     );
 
     expect(page).toContain("<ContentCommentForm slug={article.slug} />");
-    expect(form).toContain("/api/content/${encodeURIComponent(slug)}/comments");
+    const dollar = "$";
+    expect(form).toContain(`/api/content/${dollar}{encodeURIComponent(slug)}/comments`);
     expect(form).toContain('method: "POST"');
     expect(form).toContain("payload?.comment?.id");
     expect(form).toContain("router.refresh()");

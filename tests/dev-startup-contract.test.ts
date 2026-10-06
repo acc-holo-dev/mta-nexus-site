@@ -25,8 +25,9 @@ describe("deterministic development startup contract", () => {
   it("keeps the local stack private except for the loopback application port", () => {
     const compose = read("compose.yaml");
 
+    const dollar = "$";
     expect(compose).toContain(
-      '"127.0.0.1:${NEXUS_DEV_PORT:-3000}:3000"',
+      `"127.0.0.1:${dollar}{NEXUS_DEV_PORT:-3000}:3000"`,
     );
     expect(compose).not.toMatch(/5432:5432/u);
     expect(compose).not.toMatch(/3310:3310/u);

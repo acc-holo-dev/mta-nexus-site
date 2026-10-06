@@ -54,7 +54,7 @@ export class ContentService {
   ): Promise<Comment> {
     if (input.contentId) {
       const target = await contentRepository.findById(input.contentId);
-      if (!target || target.status !== "published") {
+      if (target?.status !== "published") {
         throw new NotFoundError("Content", input.contentId);
       }
     }

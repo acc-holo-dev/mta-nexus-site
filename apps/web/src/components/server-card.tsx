@@ -92,7 +92,7 @@ export function ServerCard({
               <Users className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="font-numeric">
                 {hasLiveData
-                  ? `${observation.players} / ${maxPlayers ?? "?"}`
+                  ? `${livePlayers} / ${maxPlayers ?? "?"}`
                   : copy.unknown}
               </span>
             </span>

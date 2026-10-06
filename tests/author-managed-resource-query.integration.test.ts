@@ -64,7 +64,8 @@ it("atomically rejects concurrent and stale metadata revisions without extra aud
       updatedAt: sql`'2099-01-01T00:00:00.123456Z'::timestamptz` });
     const before = await productRepository.findManaged(productId, actor);
     expect(before).not.toBeNull();
-    const base = before!.updatedAt;
+    if (!before) throw new Error("Expected managed product fixture");
+    const base = before.updatedAt;
     expect(base.toISOString()).toBe("2099-01-01T00:00:00.123Z");
     const outcomes = await Promise.allSettled([
       service.updateProductDetails(productId, first, actor, base),

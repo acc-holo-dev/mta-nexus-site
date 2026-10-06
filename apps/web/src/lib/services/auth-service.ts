@@ -1,9 +1,7 @@
 import {
   userRepository,
   sessionRepository,
-  organizationRepository,
   authRepository,
-  auditRepository,
   accountEmailEnrollmentRepository,
   accountRecoveryAbuseLimitRepository,
   getPinnedAccountMailProducerCipher,
@@ -101,7 +99,7 @@ export class AuthService {
     password: string;
   }): Promise<{ user: User; token: string }> {
     const userWithHash = await userRepository.findByEmail(input.email);
-    if (!userWithHash || !userWithHash.passwordHash) {
+    if (!userWithHash?.passwordHash) {
       throw new UnauthorizedError("Invalid email or password");
     }
 

@@ -120,8 +120,9 @@ describe("integrated J4 build upload safety contract", () => {
       "apps/web/src/lib/services/product-service.ts",
     );
 
+    const dollar = "$";
     expect(repository).toContain(
-      '.set({ updatedAt: sql`${products.updatedAt}` })',
+      `.set({ updatedAt: sql\`${dollar}{products.updatedAt}\` })`,
     );
     expect(repository).toContain(
       ".orderBy(desc(builds.createdAt), desc(builds.id))",

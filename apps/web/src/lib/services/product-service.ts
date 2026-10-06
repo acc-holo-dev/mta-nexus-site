@@ -103,7 +103,7 @@ export class ProductService {
 
   async getProductBySlug(slug: string): Promise<Product | null> {
     const product = await productRepository.findBySlug(slug);
-    if (!product || product.price !== 0 || product.status !== "published") {
+    if (product?.price !== 0 || product.status !== "published") {
       return null;
     }
     const build = await buildRepository.findLatestPublishedByProduct(product.id);
@@ -112,7 +112,7 @@ export class ProductService {
 
   async getProductPreviewBySlug(slug: string, actor: User | null): Promise<Product | null> {
     const product = await productRepository.findBySlug(slug);
-    if (!product || product.price !== 0) return null;
+    if (product?.price !== 0) return null;
     if (product.status === "published") return product;
     if (!actor) return null;
 

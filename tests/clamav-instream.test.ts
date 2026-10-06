@@ -45,6 +45,12 @@ function uint32(chunk: string | Uint8Array): number {
   return Buffer.from(chunk as Uint8Array).readUInt32BE(0);
 }
 
+function writeAt(socket: FakeSocket, index: number): string | Uint8Array {
+  const value = socket.writes[index];
+  if (value === undefined) throw new Error(`Expected socket write at index ${index}`);
+  return value;
+}
+
 describe("ClamAV INSTREAM writer", () => {
   it("writes protocol command, bounded chunks, lengths and zero terminator", async () => {
     const bytes = new Uint8Array(clamAvInstreamLimits.chunkBytes + 3);
@@ -56,15 +62,15 @@ describe("ClamAV INSTREAM writer", () => {
     expect(socket.ended).toBe(true);
     expect(socket.writes).toHaveLength(6);
     expect(socket.writes[0]).toBe("zINSTREAM\0");
-    expect(uint32(socket.writes[1]!)).toBe(
+    expect(uint32(writeAt(socket, 1))).toBe(
       clamAvInstreamLimits.chunkBytes,
     );
     expect((socket.writes[2] as Uint8Array).byteLength).toBe(
       clamAvInstreamLimits.chunkBytes,
     );
-    expect(uint32(socket.writes[3]!)).toBe(3);
+    expect(uint32(writeAt(socket, 3))).toBe(3);
     expect((socket.writes[4] as Uint8Array).byteLength).toBe(3);
-    expect(uint32(socket.writes[5]!)).toBe(0);
+    expect(uint32(writeAt(socket, 5))).toBe(0);
   });
 
   it("waits for drain before continuing after socket backpressure", async () => {
@@ -75,8 +81,8 @@ describe("ClamAV INSTREAM writer", () => {
 
     expect(socket.ended).toBe(true);
     expect(socket.writes).toHaveLength(4);
-    expect(uint32(socket.writes[1]!)).toBe(3);
-    expect(uint32(socket.writes[3]!)).toBe(0);
+    expect(uint32(writeAt(socket, 1))).toBe(3);
+    expect(uint32(writeAt(socket, 3))).toBe(0);
   });
 
   it("rejects when a backpressured socket closes before drain", async () => {
