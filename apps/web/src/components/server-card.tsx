@@ -1,4 +1,3 @@
-import React from "react";
 import Link from "next/link";
 import { Gamepad2, Users } from "lucide-react";
 import { TrustBadge } from "@nexus/ui";
@@ -19,12 +18,11 @@ export function ServerCard({
 }) {
   const copy = getDictionary(locale).servers;
   const liveStatus = mtaLiveStatus(observation, isStale);
-  const hasLiveData = liveStatus === "online" && observation?.players != null;
+  const livePlayers = liveStatus === "online" ? observation?.players : undefined;
+  const hasLiveData = livePlayers != null;
   const maxPlayers = observation?.maxPlayers ?? server.maxPlayers;
   const occupancyPercent = hasLiveData && maxPlayers != null && maxPlayers > 0
-    ? Math.round(
-        (observation.players! / maxPlayers) * 100,
-      )
+    ? Math.round((livePlayers / maxPlayers) * 100)
     : null;
   const isOnline = liveStatus === "online";
   const liveLabel = liveStatus === "online" ? copy.online : liveStatus === "offline" ? copy.offline : copy.unknown;
@@ -36,15 +34,18 @@ export function ServerCard({
     >
       <div className="relative h-28 w-full overflow-hidden bg-inset">
         {server.bannerUrl ? (
-          <img
+          <>
+            {/* biome-ignore lint/performance/noImgElement: server-controlled remote banner stays outside the trusted image-optimizer allowlist. */}
+            <img
             src={server.bannerUrl}
             alt={server.name}
             width={640}
             height={224}
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </>
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-[color:var(--nexus-inset)] to-[color:var(--nexus-surface)]" />
         )}

@@ -69,7 +69,7 @@ describe("private GET cache policy", () => {
 
     for (const status of [401, 403, 404, 429, 500]) {
       expect(download).toContain(
-        'status: ' + status + ', headers: privateHeaders',
+        `status: ${status}, headers: privateHeaders`,
       );
     }
     expect(download).toContain("...privateHeaders");

@@ -23,13 +23,15 @@ beforeEach(() => { state.rows = []; state.condition = undefined; state.values = 
 it("compares millisecond revision atomically alongside the resource and management scope", async () => {
   const revision = new Date("2026-10-04T20:00:00.123Z");
   expect(await repository.updateManagedDetails("resource", actor, details, audit, revision)).toBeNull();
-  const query = dialect.sqlToQuery(state.condition!);
+  if (!state.condition) throw new Error("Expected guarded product update condition");
+  const query = dialect.sqlToQuery(state.condition);
   expect(query.sql).toContain('date_trunc(\'milliseconds\', "products"."updated_at")');
   expect(query.sql).toContain("::timestamptz");
   expect(query.sql).toContain("manage_products");
   expect(query.params).toEqual(expect.arrayContaining(["resource", 0, "author", revision.toISOString()]));
   expect(state.audit).not.toHaveBeenCalled();
-  const update = dialect.sqlToQuery(state.values!.updatedAt).sql;
+  if (!state.values) throw new Error("Expected product update values");
+  const update = dialect.sqlToQuery(state.values.updatedAt).sql;
   expect(update).toContain("greatest");
   expect(update).toContain("clock_timestamp()");
   expect(update).toContain("interval '1 millisecond'");
@@ -38,5 +40,6 @@ it("writes one audit only when the guarded update returns a row", async () => {
   state.rows = [{ id: "resource" }];
   expect(await repository.updateManagedDetails("resource", actor, details, audit)).toEqual({ id: "resource" });
   expect(state.audit).toHaveBeenCalledExactlyOnceWith(audit);
-  expect(dialect.sqlToQuery(state.condition!).sql).not.toContain("date_trunc");
+  if (!state.condition) throw new Error("Expected unversioned product update condition");
+  expect(dialect.sqlToQuery(state.condition).sql).not.toContain("date_trunc");
 });

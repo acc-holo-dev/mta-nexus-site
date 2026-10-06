@@ -33,11 +33,12 @@ describe("password change transaction", () => {
   it("rotates this token without extending expiry and invalidates every old token", async () => {
     const a = await account();
     const before = await sessionRepository.findValidSession(a.token);
+    if (!before) throw new Error("Expected current session fixture");
     const result = await authService.changePassword({ userId: a.user.id, currentToken: a.token,
       currentPassword: oldPassword, newPassword: nextPassword });
     expect(result.revokedSessionCount).toBe(1);
     expect(result.token !== a.token).toBe(true);
-    expect(result.expiresAt.getTime()).toBe(new Date(before!.session.expiresAt).getTime());
+    expect(result.expiresAt.getTime()).toBe(new Date(before.session.expiresAt).getTime());
     expect(await authService.getSession(a.token)).toBeNull();
     expect(await authService.getSession(a.otherToken)).toBeNull();
     expect((await authService.getSession(result.token))?.id).toBe(a.user.id);
@@ -82,7 +83,8 @@ describe("password change transaction", () => {
     expect(results.filter((r) => r.status === "rejected")).toHaveLength(1);
     const winner = results.findIndex((r) => r.status === "fulfilled");
     const stored = await userRepository.findByEmail(a.input.email);
-    expect(await verifyPassword(passwords[winner], stored!.passwordHash!)).toBe(true);
+    if (!stored?.passwordHash || winner < 0) throw new Error("Expected one password-change winner");
+    expect(await verifyPassword(passwords[winner], stored.passwordHash)).toBe(true);
     expect((await authService.getSession(tokens[winner]))?.id).toBe(a.user.id);
     expect(await authService.getSession(tokens[1 - winner])).toBeNull();
     expect(await authService.getSession(a.token)).toBeNull();

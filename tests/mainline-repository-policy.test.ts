@@ -11,15 +11,18 @@ describe("mainline repository policy", () => {
     expect(coordinator).toContain("main");
     expect(coordinator).not.toMatch(/branches:\s*\[[^\]]*\bdev\b/);
     expect(coordinator).not.toMatch(/^\s*- dev\s*$/m);
+    const dollar = "$";
+    const imageCacheKey = `nexus-production-image-${dollar}{{ runner.os }}-${dollar}{{ github.sha }}`;
+    const bestEffortArtifact = `continue-on-error: ${dollar}{{ github.ref_type != 'tag' }}`;
     expect(coordinator).toContain("actions/cache/save@v4");
-    expect(coordinator).toContain("nexus-production-image-${{ runner.os }}-${{ github.sha }}");
+    expect(coordinator).toContain(imageCacheKey);
     expect(coordinator).not.toContain("actions/download-artifact");
     const coordinatorArtifactUploads = coordinator
-      .split(/^    - name: /m)
+      .split(/^\s{4}- name: /m)
       .filter((step) => step.includes("actions/upload-artifact@"));
     expect(coordinatorArtifactUploads.length).toBeGreaterThan(0);
     expect(coordinatorArtifactUploads.every((step) =>
-      step.includes("continue-on-error: ${{ github.ref_type != 'tag' }}")
+      step.includes(bestEffortArtifact)
     )).toBe(true);
 
     for (const path of [
@@ -31,7 +34,7 @@ describe("mainline repository policy", () => {
       expect(content, path).toContain("workflow_call:");
       expect(content, path).not.toMatch(/^\s+(?:push|pull_request|schedule):/m);
       expect(content, path).toContain("actions/cache/restore@v4");
-      expect(content, path).toContain("nexus-production-image-${{ runner.os }}-${{ github.sha }}");
+      expect(content, path).toContain(imageCacheKey);
       expect(content, path).not.toContain("actions/download-artifact");
     }
 

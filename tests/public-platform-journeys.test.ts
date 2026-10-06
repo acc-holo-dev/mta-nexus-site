@@ -5,7 +5,6 @@ import {
   socialRepository,
   notificationRepository,
   reportRepository,
-  licenseRepository,
   contentRepository,
   buildRepository,
 } from "@nexus/db";

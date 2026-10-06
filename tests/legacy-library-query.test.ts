@@ -21,7 +21,8 @@ describe("private legacy library lookup", () => {
   it("selects only product/date for the current user's active unexpired licenses", async () => {
     await new LicenseRepository().listActiveDownloadableByUser("member-1");
     expect(Object.keys(captured.selection ?? {})).toEqual(["productId", "createdAt"]);
-    const query = new PgDialect().sqlToQuery(captured.filter!);
+    if (!captured.filter) throw new Error("Expected legacy library filter to be captured");
+    const query = new PgDialect().sqlToQuery(captured.filter);
     expect(query.params).toContain("member-1");
     expect(query.params).toContain("active");
     expect(query.sql).toContain('"licenses"."expires_at" is null');

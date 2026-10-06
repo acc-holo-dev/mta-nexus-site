@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Footer } from "./footer";
 import { MobileNav } from "./mobile-nav";
 import { Navbar } from "./navbar";
@@ -12,7 +12,7 @@ export function NexusShell({
   children,
   locale,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   locale: Locale;
 }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);

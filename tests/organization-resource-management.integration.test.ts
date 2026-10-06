@@ -307,6 +307,8 @@ describe("organization resource management integration", () => {
       ownerId: orgOwnerId,
     });
 
+    const organizationOwner = await userRepository.findById(orgOwnerId);
+    if (!organizationOwner) throw new Error("Expected organization owner fixture");
     const legacy = await serverService.createServer(
       {
         name: "Legacy Organization Server",
@@ -318,7 +320,7 @@ describe("organization resource management integration", () => {
         gameplayTags: [],
         mediaUrls: [],
       },
-      (await userRepository.findById(orgOwnerId))!,
+      organizationOwner,
     );
 
     // Simulate a historical ownerId directly; production update deliberately

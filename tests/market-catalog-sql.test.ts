@@ -36,7 +36,8 @@ describe("catalog database pagination", () => {
     await new ProductRepository().list({
       type: "script", sort: "rating", query: "100%_ MTA", limit: 25, offset: 24,
     });
-    const where = dialect.sqlToQuery(captured.where!);
+    if (!captured.where) throw new Error("Expected catalog filter to be captured");
+    const where = dialect.sqlToQuery(captured.where);
     expect(where.sql).toContain('"products"."status"');
     expect(where.sql).toContain('"products"."price"');
     expect(where.sql).toContain("exists (");
