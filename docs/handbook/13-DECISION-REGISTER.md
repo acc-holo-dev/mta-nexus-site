@@ -1,6 +1,6 @@
 # MTA NEXUS — Decision Register
 
-> Статус: v0.10, 2026-10-06 — owner interview rounds 1–9 incorporated.
+> Статус: v0.11, 2026-10-06 — owner interview rounds 1–10 incorporated and handbook integrated into `main`.
 > Этот файл нужен людям и AI-агентам: он отделяет решения от current implementation, legacy и ещё открытых деталей.
 
 ## Статусы
@@ -43,8 +43,8 @@
 | E-008 | CONFIRMED | Production deploy — human decision | Green CI alone not authorization |
 | E-009 | OPEN | Final production hosting/provider | Нужно определить |
 | E-010 | CONFIRMED | Production marketplace artifacts use private object storage + signed CDN delivery | Local filesystem remains dev/test fallback |
-| E-011 | OPEN | Exact production observability vendor/delegation policy | Required capabilities are understood; owner has not approved who chooses vendors |
-| E-012 | OPEN | Финальная repo docs policy для handbook | Current policy допускает только 3 long-form docs |
+| E-011 | CONFIRMED | AI may choose the production observability stack as a reversible `PROVISIONAL` technical decision | Required capabilities remain mandatory; vendor is replaceable |
+| E-012 | CONFIRMED | Official handbook lives under `docs/handbook/`; root operational docs remain focused | Repository policy test and README were updated with the integration |
 
 ## C. Resource safety
 

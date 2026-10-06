@@ -1,7 +1,7 @@
 # MTA NEXUS — план интеграции handbook в GitHub
 
-> Статус: OPEN до ревью владельца.  
-> Не выполнять автоматически: текущий `mta-nexus-site` намеренно ограничивает long-form documentation и имеет policy test на её состав.
+> Статус: **COMPLETED 2026-10-06**.  
+> Handbook интегрирован в `mta-nexus-site/docs/handbook/`; README, Operations и repository policy test обновлены в том же coherent migration.
 
 ## 1. Проблема
 
@@ -99,7 +99,7 @@ docs/
 
 ---
 
-## 5. Migration sequence после ревью владельца
+## 5. Выполненная migration sequence
 
 ### Step 1 — закрыть критические вопросы
 
@@ -177,21 +177,20 @@ docs/
 
 ## 6. Документационная иерархия после интеграции
 
-Предлагаемый порядок истины:
+Для **целевого продукта** утверждён порядок:
 
 ```text
-Code / migrations / tests
+Owner-confirmed Decision Register / handbook
         ↓
-ARCHITECTURE / OPERATIONS / PROBLEMS
+Security and data-integrity invariants
         ↓
-Handbook Decision Register
+Current implementation + ARCHITECTURE / OPERATIONS / PROBLEMS
         ↓
-Handbook product chapters
-        ↓
-Roadmap candidates
-        ↓
-Source Map / legacy references
+Legacy MTA Market material
 ```
+
+Для вопроса «что работает прямо сейчас» executable runtime/code/tests и current operational docs
+остаются фактическим источником CURRENT-состояния. Target нельзя выдавать за уже реализованный runtime.
 
 ---
 

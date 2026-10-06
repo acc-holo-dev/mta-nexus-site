@@ -1,6 +1,6 @@
 # MTA NEXUS — Project Handbook
 
-**Статус:** product/engineering specification / owner review rounds 1–9 incorporated  
+**Статус:** product/engineering specification / owner review rounds 1–10 incorporated; integrated into `main`  
 **Срез:** 2026-10-06  
 **Текущий репозиторий:** `acc-holo-dev/mta-nexus-site`  
 **Наследуемый источник идей:** `acc-holo-dev/mta-market-platform`  

@@ -2,15 +2,18 @@
 
 Status: **OWNER-CONFIRMED / Round 10**
 
-## 1. Target repository location
+## 1. Repository location — completed
 
-After the owner's final handbook review, the approved handbook is intended to become an official part of:
+The owner-approved handbook is now an official part of:
 
 ```text
 mta-nexus-site/docs/handbook/
 ```
 
-The current repository policy that permits only three long-form documents must be intentionally changed together with its policy test and README links. Do not simply copy files and leave CI red.
+The root `docs/` policy still keeps Architecture, Operations and Problems focused, while
+`tests/mainline-repository-policy.test.ts` explicitly permits and checks the handbook.
+README and Operations link the new source-of-truth model. This integration was performed
+as one coherent mainline migration rather than leaving CI in an intentionally inconsistent state.
 
 ## 2. Product target precedence
 
