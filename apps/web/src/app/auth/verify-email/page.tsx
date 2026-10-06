@@ -148,7 +148,9 @@ export default function VerifyEmailPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => void confirm(state.proof!)}
+                onClick={() => {
+                  if (state.kind === "error" && state.proof) void confirm(state.proof);
+                }}
               >
                 {copy.retry}
               </Button>

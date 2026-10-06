@@ -78,6 +78,7 @@ export default async function OrganizationProfilePage({
         <div className="flex min-w-0 items-center gap-5 sm:gap-6">
           <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-base bg-inset text-muted shadow-nexus-sm">
             {organization.logoUrl ? (
+              {/* biome-ignore lint/performance/noImgElement: organization-controlled remote logo stays outside the trusted image-optimizer allowlist. */}
               <img
                 src={organization.logoUrl}
                 alt={organization.name}

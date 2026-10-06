@@ -126,6 +126,7 @@ export default async function ArticleDetailPage({
 
       {coverImageUrl && (
         <div className="aspect-[21/9] w-full overflow-hidden rounded-xl border border-base bg-inset shadow-nexus-sm">
+          {/* biome-ignore lint/performance/noImgElement: user-controlled remote media intentionally bypasses Next image optimization trust. */}
           <img
             src={coverImageUrl}
             alt={article.title}

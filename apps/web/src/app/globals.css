@@ -180,7 +180,9 @@
   *,
   *::before,
   *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced-motion accessibility override must beat component animation rules. */
     animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced-motion accessibility override must beat component transition rules. */
     transition-duration: 0.01ms !important;
   }
 }

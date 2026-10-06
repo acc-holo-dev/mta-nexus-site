@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { consumeRateLimit } from "@nexus/security";
 import { getTrustedRequestIp } from "../../../lib/request-client-ip";
 import {

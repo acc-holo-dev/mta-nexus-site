@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { mtaMasterDirectoryService } from "../../../../lib/services/mta-master-directory-service";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../../lib/observability";

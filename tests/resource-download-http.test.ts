@@ -150,8 +150,9 @@ describe("resource download HTTP contract", () => {
   });
 
   it("returns 404 for an unpublished resource even with entitlement", async () => {
+    if (!state.product) throw new Error("Expected default product fixture");
     state.product = {
-      ...state.product!,
+      ...state.product,
       status: "draft",
     };
 
@@ -188,8 +189,9 @@ describe("resource download HTTP contract", () => {
       displayName: "Former Manager",
       role: "developer",
     };
+    if (!state.product) throw new Error("Expected default product fixture");
     state.product = {
-      ...state.product!,
+      ...state.product,
       authorId: "usr_author",
     };
     state.managementAccess = false;
@@ -226,8 +228,9 @@ describe("resource download HTTP contract", () => {
   });
 
   it("fails closed when a published build has no trusted scan provenance", async () => {
+    if (!state.build) throw new Error("Expected default published build fixture");
     state.build = {
-      ...state.build!,
+      ...state.build,
       scanner: undefined,
       scannedAt: undefined,
     };

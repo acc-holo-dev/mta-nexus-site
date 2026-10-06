@@ -9,7 +9,8 @@ describe("resource detail acquisition and delivery UI", () => {
   it("routes free resources through acquisition and disables paid legacy resources", () => {
     const page = read("apps/web/src/app/market/[slug]/page.tsx");
 
-    expect(page).toContain('href={`/acquire?productId=${product.id}`}');
+    const dollar = "$";
+    expect(page).toContain(`href={\`/acquire?productId=${dollar}{product.id}\`}`);
     expect(page).not.toContain('/checkout?productId=');
     expect(page).toContain("product.price === 0");
     expect(page).toContain("dictionary.checkout.paidDisabled");

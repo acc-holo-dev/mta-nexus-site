@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { commerceService } from "../../../../lib/services/commerce-service";
 import { authService } from "../../../../lib/services/auth-service";
 import { claimResourceSchema } from "@nexus/validation";

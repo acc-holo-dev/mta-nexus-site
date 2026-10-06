@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
   contentRepository,
