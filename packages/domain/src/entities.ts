@@ -30,6 +30,7 @@ export type BuildStatus =
   | "published"
   | "rejected"
   | "deprecated"
+  | "quarantined"
   | "retired";
 
 export type BuildScanStatus = "not_scanned" | "clean" | "malicious" | "error";
@@ -234,6 +235,10 @@ export interface Build {
   scannedAt?: Date;
   mtaVersionTarget?: string;
   isSigned: boolean;
+  quarantinePreviousStatus?: BuildStatus;
+  quarantineReason?: string;
+  quarantinedAt?: Date;
+  quarantinedBy?: string;
   createdAt: Date;
 }
 

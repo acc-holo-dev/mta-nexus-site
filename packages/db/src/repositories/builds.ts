@@ -12,6 +12,8 @@ export type PendingReviewBuild = Build & {
   publisherUsername: string;
 };
 
+export type RiskReviewBuild = PendingReviewBuild;
+
 export class BuildRepository {
   async findExactPendingRetry(
     input: Pick<Build, "productId" | "version" | "sha256Hash" | "fileSizeBytes" | "fileName" | "mimeType" | "releaseNotes" | "mtaVersionTarget">,
@@ -42,7 +44,13 @@ export class BuildRepository {
       action: auditEvents.action, details: auditEvents.details, createdAt: auditEvents.createdAt })
       .from(auditEvents).where(and(eq(auditEvents.targetType, "build"),
         inArray(auditEvents.targetId, rows.map((row) => row.id)),
-        inArray(auditEvents.action, ["build.approved", "build.rejected", "build.retired"])))
+        inArray(auditEvents.action, [
+          "build.approved",
+          "build.rejected",
+          "build.retired",
+          "build.quarantined",
+          "build.quarantine_restored",
+        ])))
       .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id)) : [];
     return { builds: rows as unknown as Build[], decisions, page, totalPages };
   }
@@ -82,6 +90,59 @@ export class BuildRepository {
       })),
       hasMore: rows.length > pageSize,
     };
+  }
+
+  async listRiskReviewPage(
+    page: number,
+    pageSize = 30,
+  ): Promise<{ builds: RiskReviewBuild[]; hasMore: boolean }> {
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      page > 99_999 ||
+      !Number.isSafeInteger(pageSize) ||
+      pageSize < 1 ||
+      pageSize > 100
+    ) {
+      throw new RangeError("Invalid build risk-review page");
+    }
+
+    const rows = await db
+      .select({
+        build: builds,
+        productTitle: products.title,
+        productSlug: products.slug,
+        productStatus: products.status,
+        publisherId: users.id,
+        publisherUsername: users.username,
+      })
+      .from(builds)
+      .innerJoin(products, eq(builds.productId, products.id))
+      .innerJoin(users, eq(products.authorId, users.id))
+      .where(inArray(builds.status, ["published", "quarantined"]))
+      .orderBy(desc(builds.createdAt), desc(builds.id))
+      .limit(pageSize + 1)
+      .offset((page - 1) * pageSize);
+
+    return {
+      builds: rows.slice(0, pageSize).map((row) => ({
+        ...(row.build as unknown as Build),
+        productTitle: row.productTitle,
+        productSlug: row.productSlug,
+        productStatus: row.productStatus,
+        publisherId: row.publisherId,
+        publisherUsername: row.publisherUsername,
+      })),
+      hasMore: rows.length > pageSize,
+    };
+  }
+
+  async countQuarantined(): Promise<number> {
+    const [row] = await db
+      .select({ total: count() })
+      .from(builds)
+      .where(eq(builds.status, "quarantined"));
+    return row?.total ?? 0;
   }
 
   async listByProduct(productId: string): Promise<Build[]> {
@@ -322,6 +383,138 @@ export class BuildRepository {
 
       await tx.insert(auditEvents).values({ ...audit, createdAt: new Date() });
       return retired as unknown as Build;
+    });
+  }
+
+  async quarantinePublishedAndRefreshProduct(
+    id: string,
+    actorId: string,
+    reason: string,
+    audit: Omit<AuditEvent, "createdAt">,
+  ): Promise<Build | null> {
+    return db.transaction(async (tx) => {
+      const now = new Date();
+      const rows = await tx
+        .update(builds)
+        .set({
+          status: "quarantined",
+          quarantinePreviousStatus: "published",
+          quarantineReason: reason,
+          quarantinedAt: now,
+          quarantinedBy: actorId,
+        })
+        .where(and(eq(builds.id, id), eq(builds.status, "published")))
+        .returning();
+      const quarantined = rows[0];
+      if (!quarantined) return null;
+
+      const productRows = await tx
+        .update(products)
+        .set({ updatedAt: sql`${products.updatedAt}` })
+        .where(eq(products.id, quarantined.productId))
+        .returning({ id: products.id, status: products.status });
+      const product = productRows[0];
+      if (!product) {
+        throw new Error("Build product disappeared during quarantine");
+      }
+
+      const fallback = await tx
+        .select({ version: builds.version })
+        .from(builds)
+        .where(safePublishedBuildCondition(quarantined.productId))
+        .orderBy(desc(builds.createdAt), desc(builds.id))
+        .limit(1);
+
+      if (product.status === "published") {
+        await tx
+          .update(products)
+          .set(
+            fallback[0]
+              ? {
+                  currentVersion: fallback[0].version,
+                  status: "published",
+                  updatedAt: now,
+                }
+              : { status: "draft", updatedAt: now },
+          )
+          .where(eq(products.id, quarantined.productId));
+      } else if (fallback[0]) {
+        await tx
+          .update(products)
+          .set({ currentVersion: fallback[0].version, updatedAt: now })
+          .where(eq(products.id, quarantined.productId));
+      }
+
+      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      return quarantined as unknown as Build;
+    });
+  }
+
+  async restoreQuarantinedAndRefreshProduct(
+    id: string,
+    audit: Omit<AuditEvent, "createdAt">,
+  ): Promise<Build | null> {
+    return db.transaction(async (tx) => {
+      const now = new Date();
+      const rows = await tx
+        .update(builds)
+        .set({
+          status: "published",
+          quarantinePreviousStatus: null,
+          quarantineReason: null,
+          quarantinedAt: null,
+          quarantinedBy: null,
+        })
+        .where(
+          and(
+            eq(builds.id, id),
+            eq(builds.status, "quarantined"),
+            eq(builds.quarantinePreviousStatus, "published"),
+            trustedCleanScanCondition(),
+          ),
+        )
+        .returning();
+      const restored = rows[0];
+      if (!restored) return null;
+
+      const productRows = await tx
+        .update(products)
+        .set({ updatedAt: sql`${products.updatedAt}` })
+        .where(eq(products.id, restored.productId))
+        .returning({ id: products.id, status: products.status });
+      const product = productRows[0];
+      if (!product) {
+        throw new Error("Build product disappeared during quarantine restore");
+      }
+
+      const latestPublished = await tx
+        .select({ version: builds.version })
+        .from(builds)
+        .where(safePublishedBuildCondition(restored.productId))
+        .orderBy(desc(builds.createdAt), desc(builds.id))
+        .limit(1);
+      if (!latestPublished[0]) {
+        throw new Error("Restored build disappeared from safe publication scope");
+      }
+
+      await tx
+        .update(products)
+        .set(
+          product.status === "draft" || product.status === "published"
+            ? {
+                currentVersion: latestPublished[0].version,
+                status: "published",
+                updatedAt: now,
+              }
+            : {
+                currentVersion: latestPublished[0].version,
+                updatedAt: now,
+              },
+        )
+        .where(eq(products.id, restored.productId));
+
+      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      return restored as unknown as Build;
     });
   }
 

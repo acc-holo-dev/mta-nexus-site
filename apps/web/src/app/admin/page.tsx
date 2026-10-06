@@ -31,6 +31,7 @@ import { authService } from "../../lib/services/auth-service";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { BuildModerationControls } from "../../components/build-moderation-controls";
+import { BuildQuarantineControls } from "../../components/build-quarantine-controls";
 import { ContentModerationControls } from "../../components/content-moderation-controls";
 import { VerificationModerationControls } from "../../components/verification-moderation-controls";
 import { ReportModerationControls } from "../../components/report-moderation-controls";
@@ -46,6 +47,7 @@ export default async function AdminPage({
     verificationView?: string;
     verificationPage?: string;
     buildPage?: string;
+    riskBuildPage?: string;
     contentPage?: string;
   }>;
 }) {
@@ -61,12 +63,14 @@ export default async function AdminPage({
   const verificationView = query.verificationView === "history" ? "history" : "pending";
   const verificationPage = parsePage(query.verificationPage);
   const buildPage = parsePage(query.buildPage);
+  const riskBuildPage = parsePage(query.riskBuildPage);
   const contentPage = parsePage(query.contentPage);
   const adminHref = (changes: Record<string, string | number>) => {
     const params = new URLSearchParams({
       reportView, reportPage: String(reportPage),
       verificationView, verificationPage: String(verificationPage),
-      buildPage: String(buildPage), contentPage: String(contentPage),
+      buildPage: String(buildPage), riskBuildPage: String(riskBuildPage),
+      contentPage: String(contentPage),
     });
     for (const [key, value] of Object.entries(changes)) params.set(key, String(value));
     return `/admin?${params}`;
@@ -109,6 +113,8 @@ export default async function AdminPage({
     pendingVerificationCount,
     buildPageResult,
     pendingBuildCount,
+    riskBuildPageResult,
+    quarantinedBuildCount,
     contentPageResult,
     pendingContentCount,
     auditLogs,
@@ -119,6 +125,8 @@ export default async function AdminPage({
     verificationRepository.countPending(),
     buildRepository.listPendingReviewPage(buildPage),
     buildRepository.countPendingReview(),
+    buildRepository.listRiskReviewPage(riskBuildPage),
+    buildRepository.countQuarantined(),
     contentRepository.listDraftPage(contentPage),
     contentRepository.countDrafts(),
     canViewAudit ? adminService.listAuditLogs(adminUser) : Promise.resolve([]),
@@ -127,6 +135,7 @@ export default async function AdminPage({
   const { requests: verificationRequests, hasMore: moreVerifications } = verificationPageResult;
   const { reports, hasMore: moreReports } = reportPageResult;
   const { builds: pendingBuilds, hasMore: moreBuilds } = buildPageResult;
+  const { builds: riskBuilds, hasMore: moreRiskBuilds } = riskBuildPageResult;
   const { items: pendingContent, hasMore: moreContent } = contentPageResult;
 
   return (
@@ -376,6 +385,123 @@ export default async function AdminPage({
             {buildPage > 1 && <Link className="text-accent underline" href={adminHref({ buildPage: buildPage - 1 })}>{copy.previous}</Link>}
             <span className="text-muted">{copy.reportPage} {buildPage}</span>
             {moreBuilds && buildPage < 99_999 && <Link className="text-accent underline" href={adminHref({ buildPage: buildPage + 1 })}>{copy.next}</Link>}
+          </nav>
+        )}
+      </section>
+
+      <section>
+        <SectionHeader
+          title={copy.quarantineQueue}
+          description={`${quarantinedBuildCount} ${copy.buildsQuarantined}`}
+          action={<ShieldAlert className="h-4 w-4 text-danger" />}
+        />
+        <p className="mb-3 max-w-3xl font-caption text-muted">
+          {copy.quarantineQueueDescription}
+        </p>
+        <div className="space-y-2.5">
+          {riskBuilds.length > 0 ? (
+            riskBuilds.map((build) => (
+              <div
+                key={build.id}
+                className="nexus-panel flex flex-col justify-between gap-3 p-4 md:flex-row md:items-center"
+              >
+                <div className="min-w-0 space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge
+                      status={build.status}
+                      tone={build.status === "quarantined" ? "danger" : "success"}
+                    />
+                    <span className="truncate font-code text-xs font-heading text-primary">
+                      {build.fileName} · v{build.version}
+                    </span>
+                  </div>
+                  <p className="font-caption text-secondary">
+                    {build.productStatus === "published" ? (
+                      <Link
+                        className="text-accent underline"
+                        href={`/market/${encodeURIComponent(build.productSlug)}`}
+                      >
+                        {build.productTitle}
+                      </Link>
+                    ) : (
+                      <>{build.productTitle} · {copy.resourceNotPublished}</>
+                    )}
+                  </p>
+                  <p className="font-caption text-muted">
+                    {copy.resourcePublisher}:{" "}
+                    <Link
+                      className="text-accent underline"
+                      href={`/users/${encodeURIComponent(build.publisherUsername)}`}
+                    >
+                      @{build.publisherUsername}
+                    </Link>
+                  </p>
+                  <p className="font-caption text-faint">
+                    {copy.scan}: {build.scanStatus.replace(/_/g, " ")} · SHA-256
+                  </p>
+                  <code className="block break-all font-code text-[10px] text-faint">
+                    {build.sha256Hash}
+                  </code>
+                  {build.status === "quarantined" && (
+                    <>
+                      <p className="whitespace-pre-wrap font-caption text-danger">
+                        {copy.quarantineReason}: {build.quarantineReason}
+                      </p>
+                      {build.quarantinedAt && (
+                        <p className="font-caption text-faint">
+                          {copy.quarantinedAt}:{" "}
+                          {new Date(build.quarantinedAt).toLocaleString(dateLocale)}
+                        </p>
+                      )}
+                    </>
+                  )}
+                  {build.scanStatus === "clean" &&
+                    build.scanner?.trim() &&
+                    build.scannedAt && (
+                      <a
+                        href={`/api/admin/builds/${encodeURIComponent(build.id)}/download`}
+                        className="inline-block text-xs font-semibold text-accent underline"
+                      >
+                        {copy.reviewArtifact}
+                      </a>
+                    )}
+                </div>
+                <BuildQuarantineControls
+                  buildId={build.id}
+                  status={build.status as "published" | "quarantined"}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="nexus-panel py-6 text-center">
+              <p className="font-caption text-muted">{copy.noRiskBuilds}</p>
+            </div>
+          )}
+        </div>
+        {(riskBuildPage > 1 || moreRiskBuilds) && (
+          <nav
+            aria-label={copy.quarantinePages}
+            className="mt-3 flex items-center gap-3 text-xs"
+          >
+            {riskBuildPage > 1 && (
+              <Link
+                className="text-accent underline"
+                href={adminHref({ riskBuildPage: riskBuildPage - 1 })}
+              >
+                {copy.previous}
+              </Link>
+            )}
+            <span className="text-muted">
+              {copy.reportPage} {riskBuildPage}
+            </span>
+            {moreRiskBuilds && riskBuildPage < 99_999 && (
+              <Link
+                className="text-accent underline"
+                href={adminHref({ riskBuildPage: riskBuildPage + 1 })}
+              >
+                {copy.next}
+              </Link>
+            )}
           </nav>
         )}
       </section>

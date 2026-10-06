@@ -420,6 +420,114 @@ export class ProductService {
     return reviewed;
   }
 
+  async quarantineBuild(
+    input: { buildId: string; reason: string },
+    actor: User,
+  ): Promise<Build> {
+    if (!can(actor, "admin.moderation")) {
+      throw new ForbiddenError(
+        "Moderator privilege is required to quarantine builds",
+      );
+    }
+
+    const build = await buildRepository.findById(input.buildId);
+    if (!build) throw new NotFoundError("Build", input.buildId);
+    if (build.status !== "published") {
+      throw new AppError(
+        "Only a published build can enter quarantine",
+        409,
+        "BUILD_QUARANTINE_INVALID_STATE",
+      );
+    }
+
+    const quarantined = await buildRepository.quarantinePublishedAndRefreshProduct(
+      build.id,
+      actor.id,
+      input.reason,
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: actor.role === "admin" ? "admin" : "user",
+        action: "build.quarantined",
+        targetId: build.id,
+        targetType: "build",
+        details: {
+          productId: build.productId,
+          version: build.version,
+          reason: input.reason,
+          previousStatus: build.status,
+        },
+      },
+    );
+    if (!quarantined) {
+      throw new AppError(
+        "Build state changed before quarantine completed",
+        409,
+        "BUILD_STATE_CHANGED",
+      );
+    }
+    return quarantined;
+  }
+
+  async restoreQuarantinedBuild(
+    input: { buildId: string; reason: string },
+    actor: User,
+  ): Promise<Build> {
+    if (!can(actor, "admin.moderation")) {
+      throw new ForbiddenError(
+        "Moderator privilege is required to restore quarantined builds",
+      );
+    }
+
+    const build = await buildRepository.findById(input.buildId);
+    if (!build) throw new NotFoundError("Build", input.buildId);
+    if (build.status !== "quarantined") {
+      throw new AppError(
+        "Only a quarantined build can be restored",
+        409,
+        "BUILD_QUARANTINE_INVALID_STATE",
+      );
+    }
+    if (
+      build.quarantinePreviousStatus !== "published" ||
+      build.scanStatus !== "clean" ||
+      !build.scanner?.trim() ||
+      !build.scannedAt
+    ) {
+      throw new AppError(
+        "Quarantined build is not eligible for safe publication restore",
+        422,
+        "BUILD_QUARANTINE_RESTORE_UNSAFE",
+      );
+    }
+
+    const restored = await buildRepository.restoreQuarantinedAndRefreshProduct(
+      build.id,
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: actor.role === "admin" ? "admin" : "user",
+        action: "build.quarantine_restored",
+        targetId: build.id,
+        targetType: "build",
+        details: {
+          productId: build.productId,
+          version: build.version,
+          reason: input.reason,
+          quarantineReason: build.quarantineReason,
+        },
+      },
+    );
+    if (!restored) {
+      throw new AppError(
+        "Build state or safety evidence changed before restore completed",
+        409,
+        "BUILD_STATE_CHANGED",
+      );
+    }
+    return restored;
+  }
+
   async retireBuild(
     input: { productId: string; buildId: string; reason?: string },
     actor: User

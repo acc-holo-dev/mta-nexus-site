@@ -95,6 +95,11 @@ export default async function ManageResourcePage({
                   {build.releaseNotes}
                 </p>
               )}
+              {build.status === "quarantined" && build.quarantineReason && (
+                <p className="whitespace-pre-wrap break-words text-sm text-danger">
+                  {copy.quarantine}: {build.quarantineReason}
+                </p>
+              )}
               {history.decisions
                 .filter((decision) => decision.buildId === build.id)
                 .map((decision) => (
@@ -108,7 +113,11 @@ export default async function ManageResourcePage({
                         ? copy.buildLabels.published
                         : decision.action === "build.rejected"
                           ? copy.buildLabels.rejected
-                          : copy.buildLabels.retired}
+                          : decision.action === "build.quarantined"
+                            ? copy.buildLabels.quarantined
+                            : decision.action === "build.quarantine_restored"
+                              ? copy.quarantineRestored
+                              : copy.buildLabels.retired}
                     </p>
                     <p className="whitespace-pre-wrap break-words">
                       {typeof decision.details?.notes === "string"
@@ -119,7 +128,7 @@ export default async function ManageResourcePage({
                     </p>
                   </div>
                 ))}
-              {build.status !== "retired" && (
+              {build.status !== "retired" && build.status !== "quarantined" && (
                 <RetireBuildForm productId={id} buildId={build.id} version={build.version} />
               )}
             </li>

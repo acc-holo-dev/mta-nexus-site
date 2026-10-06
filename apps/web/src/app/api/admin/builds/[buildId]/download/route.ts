@@ -68,9 +68,12 @@ export async function GET(
         { status: 404, headers: privateHeaders },
       );
     }
-    if (build.status !== "pending_review") {
+    if (
+      build.status !== "pending_review" &&
+      build.status !== "quarantined"
+    ) {
       return NextResponse.json(
-        { error: "Build is no longer pending review" },
+        { error: "Build is not available for moderator evidence review" },
         { status: 409, headers: privateHeaders },
       );
     }

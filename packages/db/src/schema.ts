@@ -242,7 +242,7 @@ export const builds = pgTable("builds", {
     .references(() => products.id, { onDelete: "cascade" }),
   version: text("version").notNull(),
   releaseNotes: text("release_notes"),
-  status: text("status").notNull().default("draft"), // draft, testing, pending_review, published, rejected, deprecated, retired
+  status: text("status").notNull().default("draft"), // draft, testing, pending_review, published, rejected, deprecated, quarantined, retired
   storageKey: text("storage_key").notNull(),
   sha256Hash: text("sha256_hash").notNull(),
   fileSizeBytes: integer("file_size_bytes").notNull(),
@@ -253,6 +253,10 @@ export const builds = pgTable("builds", {
   scannedAt: timestamp("scanned_at", { withTimezone: true }),
   mtaVersionTarget: text("mta_version_target"),
   isSigned: boolean("is_signed").notNull().default(false),
+  quarantinePreviousStatus: text("quarantine_previous_status"),
+  quarantineReason: text("quarantine_reason"),
+  quarantinedAt: timestamp("quarantined_at", { withTimezone: true }),
+  quarantinedBy: text("quarantined_by").references(() => users.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [
   uniqueIndex("builds_product_version_idx").on(table.productId, table.version),
@@ -273,6 +277,15 @@ export const builds = pgTable("builds", {
       AND ${table.scanner} IS NOT NULL
       AND btrim(${table.scanner}) <> ''
       AND ${table.scannedAt} IS NOT NULL
+    )`,
+  ),
+  check(
+    "builds_quarantine_metadata_check",
+    sql`${table.status} <> 'quarantined' OR (
+      ${table.quarantinePreviousStatus} IN ('published', 'pending_review')
+      AND ${table.quarantineReason} IS NOT NULL
+      AND btrim(${table.quarantineReason}) <> ''
+      AND ${table.quarantinedAt} IS NOT NULL
     )`,
   ),
 ]);
