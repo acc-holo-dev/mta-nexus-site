@@ -21,7 +21,7 @@ const root = fileURLToPath(new URL("../../../", import.meta.url));
 const migrationsFolder = join(root, "packages/db/migrations");
 const journal = JSON.parse(readFileSync(join(migrationsFolder, "meta/_journal.json"), "utf8"));
 // Freeze the baseline: when migrations advance, review and extend this fixture.
-assert.equal(journal.entries.at(-1).tag, "0026_public_portfolio_indexes");
+assert.equal(journal.entries.at(-1).tag, "0027_build_quarantine");
 const temp = mkdtempSync(join(tmpdir(), "nexus-upgrade-"));
 const baselineFolder = join(temp, "baseline");
 const failureFolder = join(temp, "failure");
@@ -33,7 +33,7 @@ const evidence = {
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: "0024_product_type_invariant",
-  target: "0026_public_portfolio_indexes",
+  target: "0027_build_quarantine",
   phase: "baseline",
   failedMigrationRolledBack: false,
   legacyRowsPreserved: false,
@@ -49,7 +49,7 @@ try {
     ...journal, entries: journal.entries.filter((entry) => entry.idx <= 24),
   }));
   cpSync(migrationsFolder, failureFolder, { recursive: true });
-  const targetPath = join(failureFolder, "0026_public_portfolio_indexes.sql");
+  const targetPath = join(failureFolder, "0027_build_quarantine.sql");
   writeFileSync(targetPath, readFileSync(targetPath, "utf8") +
     "\n--> statement-breakpoint\nDO $$ BEGIN RAISE EXCEPTION 'nexus_upgrade_injected_failure'; END $$;\n");
 
@@ -75,8 +75,16 @@ try {
   const rows = async () => {
     const result = {};
     for (const table of ["users", "products", "builds", "entitlements", "notifications"]) {
-      // Removing the new nullable field makes the legacy-row comparison exact.
-      result[table] = await client.unsafe(`SELECT to_jsonb(t) - 'data' AS row FROM "${table}" t ORDER BY id`);
+      // Remove only fields introduced after the frozen baseline so existing
+      // legacy-row values remain byte-for-byte comparable across the upgrade.
+      const rowJson = table === "notifications"
+        ? "to_jsonb(t) - 'data'"
+        : table === "builds"
+          ? "to_jsonb(t) - 'quarantine_previous_status' - 'quarantine_reason' - 'quarantined_at' - 'quarantined_by'"
+          : "to_jsonb(t)";
+      result[table] = await client.unsafe(
+        `SELECT ${rowJson} AS row FROM "${table}" t ORDER BY id`,
+      );
     }
     return JSON.stringify(result);
   };
@@ -95,6 +103,10 @@ try {
   const failedIndexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public'
     AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx')`;
   assert.equal(failedIndexes.length, 0, "Failed migration must roll back its indexes");
+  const failedQuarantineColumns = await client`SELECT column_name FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'builds'
+      AND column_name IN ('quarantine_previous_status', 'quarantine_reason', 'quarantined_at', 'quarantined_by')`;
+  assert.equal(failedQuarantineColumns.length, 0, "Failed migration must roll back quarantine columns");
   evidence.failedMigrationRolledBack = true;
 
   evidence.phase = "upgrade";
@@ -105,6 +117,10 @@ try {
   const indexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public'
     AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx')`;
   assert.equal(indexes.length, 3);
+  const quarantineColumns = await client`SELECT column_name FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'builds'
+      AND column_name IN ('quarantine_previous_status', 'quarantine_reason', 'quarantined_at', 'quarantined_by')`;
+  assert.equal(quarantineColumns.length, 4);
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);

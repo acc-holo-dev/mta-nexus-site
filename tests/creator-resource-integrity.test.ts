@@ -38,11 +38,21 @@ describe("creator resource integrity", () => {
   it("commits build state, product state and audit evidence atomically", () => {
     const repository = read("packages/db/src/repositories/builds.ts");
     const service = read("apps/web/src/lib/services/product-service.ts");
-    expect(repository).toContain("async submitForReview(");
-    expect(repository).toContain("async moderatePending(");
-    expect(repository).toContain("async retireAndRefreshProduct(");
-    expect(repository.match(/db\.transaction/g)).toHaveLength(3);
-    expect(repository.match(/tx\.insert\(auditEvents\)/g)).toHaveLength(3);
+    const transactionalLifecycleMethods = [
+      "submitForReview",
+      "moderatePending",
+      "retireAndRefreshProduct",
+      "quarantinePublishedAndRefreshProduct",
+      "restoreQuarantinedAndRefreshProduct",
+    ];
+    for (const method of transactionalLifecycleMethods) {
+      const start = repository.indexOf(`  async ${method}(`);
+      expect(start, method).toBeGreaterThanOrEqual(0);
+      const next = repository.indexOf("\n  async ", start + 4);
+      const body = repository.slice(start, next === -1 ? undefined : next);
+      expect(body, method).toContain("return db.transaction");
+      expect(body, method).toContain("tx.insert(auditEvents)");
+    }
     expect(service).toContain("buildRepository.submitForReview(");
     expect(service).not.toContain('action: "build.submitted_for_review"\n    });');
   });
