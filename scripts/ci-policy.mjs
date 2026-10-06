@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 
 export function classifyChanges(files, { explicitFull = false, release = false } = {}) {
   const code = files.some(file => !/^(?:README\.md|docs\/[^\n]+\.md)$/.test(file));
-  const infrastructure = files.some(file => /^(?:\.github\/workflows\/|Dockerfile$|compose[^/]*\.ya?ml$|deploy\/|packages\/db\/migrations\/|scripts\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|tests\/(?:mainline-repository-policy|j4-production-upload-integration)\.test\.ts$)/.test(file));
+  const infrastructure = files.some(file => /^(?:\.github\/workflows\/|Dockerfile$|compose[^/]*\.ya?ml$|deploy\/|packages\/db\/(?:migrations|scripts)\/|scripts\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|tests\/(?:mainline-repository-policy|j4-production-upload-integration)\.test\.ts$)/.test(file));
   return { code: code || explicitFull || release, full: explicitFull || release || infrastructure };
 }
 

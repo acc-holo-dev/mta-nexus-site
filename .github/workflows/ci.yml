@@ -470,6 +470,8 @@ jobs:
       run: bash scripts/check-production-startup.sh
     needs:
     - plan
+    - unit
+    - verify
     - image
     if: ${{ needs.plan.outputs.full == 'true' }}
     env: *id001

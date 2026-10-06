@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { classifyChanges, requiredJobs, summarizeJobs } from "../ci-policy.mjs";
 
 test("documentation does not trigger builds; executable docs/configuration do", () => {
@@ -12,8 +14,14 @@ test("application changes retain all mandatory fast gates", () => {
   assert.deepEqual(policy, { code: true, full: false });
   assert.deepEqual(requiredJobs(policy), ["plan", "unit", "verify", "image", "smoke"]);
 });
-test("migration, workflow and explicit release changes run full acceptance", () => {
-  for (const files of [["packages/db/migrations/0027.sql"], [".github/workflows/ci.yml"], ["Dockerfile"], ["tests/mainline-repository-policy.test.ts"]]) {
+test("migration, database tooling, workflow and explicit release changes run full acceptance", () => {
+  for (const files of [
+    ["packages/db/migrations/0027.sql"],
+    ["packages/db/scripts/check-release-upgrade.mjs"],
+    [".github/workflows/ci.yml"],
+    ["Dockerfile"],
+    ["tests/mainline-repository-policy.test.ts"],
+  ]) {
     assert.equal(classifyChanges(files).full, true);
   }
   for (const option of [{ explicitFull: true }, { release: true }]) {
@@ -31,4 +39,17 @@ test("skipped or missing required gates never report successful acceptance", () 
     const invalid = { ...needs, "resource-browser": { result } };
     assert.deepEqual(summarizeJobs(policy, invalid).failedOrMissing, ["resource-browser"]);
   }
+});
+
+
+test("expensive production startup waits for core verification", () => {
+  const workflow = readFileSync(resolve(process.cwd(), ".github/workflows/ci.yml"), "utf8");
+  const start = workflow.indexOf("  production-compose:");
+  const end = workflow.indexOf("  mail-worker:", start);
+  assert.ok(start >= 0 && end > start);
+  const section = workflow.slice(start, end);
+  for (const gate of ["plan", "unit", "verify", "image"]) {
+    assert.match(section, new RegExp(`^    - ${gate}$`, "m"));
+  }
+  assert.match(section, /needs\.plan\.outputs\.full == 'true'/u);
 });

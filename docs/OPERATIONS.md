@@ -88,11 +88,15 @@ including scope selection and the aggregate result. Full acceptance remains broa
 and is intentionally reserved for infrastructure/release verification.
 
 Full acceptance runs on `v*` tags, the manual **Run workflow → full=true** input, and
-infrastructure/migration/tooling/dependency changes. It additionally runs SMTP/worker,
+infrastructure/migration/database-tooling/dependency changes. Database migration helpers
+under `packages/db/scripts/` are infrastructure because they can change upgrade or
+recovery evidence even when no SQL file changes. It additionally runs SMTP/worker,
 upgrade, persistence, backup/restore, DEV/production Compose and complete reusable
 account/directory/resource browser suites. Each browser job retains its own fresh DB
 and volumes. Browser startup skips repeated infrastructure-failure rehearsals; the
-production infrastructure job owns those checks. Markdown-only changes to README/docs
+production infrastructure job owns those checks. Expensive production Compose waits for
+the core unit/database/image gates so a known core failure does not consume another
+production-shaped runner. Markdown-only changes to README/docs
 run scope selection and the final status without Docker. `CI result` is the single
 aggregate status: missing, failed, cancelled or skipped required jobs cannot pass.
 
