@@ -29,54 +29,70 @@ for (const locale of ["en", "ru"]) {
   test(`shell keyboard and responsive routes in ${locale}`, async ({ page, context }) => {
     test.setTimeout(120_000);
     const dictionary = getDictionary(locale);
-    const copy = dictionary.commandPalette;
+    const discoverCopy = dictionary.discover;
     await page.emulateMedia({ reducedMotion: "reduce" });
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     await context.addCookies([{ name: "nexus_locale", value: locale, url: process.env.NEXUS_BROWSER_BASE_URL, secure: true, sameSite: "Lax" }]);
     await page.goto("/market");
-    const searchTrigger = page.getByRole("banner").getByRole("button", { name: new RegExp(dictionary.nav.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "u") });
+    const searchTrigger = page
+      .getByRole("banner")
+      .getByRole("link", { name: dictionary.nav.search, exact: true });
     // Test the skip link from the first actual Tab, rather than programmatic focus.
     await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: dictionary.nav.skipToContent, exact: true })).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page.getByRole("main")).toBeFocused();
+    await expect(searchTrigger).toBeVisible();
+    await expect(searchTrigger).toHaveAttribute("href", "/discover");
     await searchTrigger.focus();
-    await page.keyboard.press("Enter");
-    const dialog = page.getByRole("dialog", { name: copy.dialogLabel, exact: true });
-    const input = dialog.getByRole("combobox", { name: copy.searchLabel, exact: true });
-    await expect(input).toBeFocused();
-    await expect(dialog).toHaveJSProperty("open", true);
-    await containedTabbing(page, dialog);
-    await page.keyboard.press("Escape");
-    await expect(dialog).toHaveCount(0);
     await expect(searchTrigger).toBeFocused();
     await page.keyboard.press("Enter");
-    await expect(dialog).toBeVisible();
-    await page.mouse.click(5, 5);
-    await expect(dialog).toHaveCount(0);
-    await expect(searchTrigger).toBeFocused();
-    await page.keyboard.press("Control+k");
-    await expect(input).toBeFocused();
-    await page.keyboard.press("ArrowDown");
-    await expect(dialog.getByRole("option", { name: copy.goServers, exact: true })).toHaveAttribute("aria-selected", "true");
-    const activeId = await input.getAttribute("aria-activedescendant");
-    assert.equal(await dialog.getByRole("option", { name: copy.goServers, exact: true }).getAttribute("id"), activeId);
-    await page.keyboard.press("ArrowUp");
-    await expect(dialog.getByRole("option", { name: copy.goMarket, exact: true })).toHaveAttribute("aria-selected", "true");
+    await expect(page).toHaveURL(/\/discover(?:\?.*)?$/u);
+
+    const discoverTabs = page.getByRole("navigation", {
+      name: discoverCopy.tabsLabel,
+      exact: true,
+    });
+    const resourcesTab = discoverTabs.getByRole("link", {
+      name: discoverCopy.resources,
+      exact: true,
+    });
+    await resourcesTab.focus();
     await page.keyboard.press("Enter");
-    await expect(dialog).toHaveCount(0);
-    await expect(page).toHaveURL(/\/market$/u);
-    await page.keyboard.press("Control+k");
+    await expect(page).toHaveURL(/\/discover\?type=resources(?:&.*)?$/u);
+
+    const discoverSearch = page.getByRole("search", {
+      name: discoverCopy.searchLabel,
+      exact: true,
+    });
+    const input = discoverSearch.getByRole("searchbox", {
+      name: discoverCopy.searchLabel,
+      exact: true,
+    });
+    await input.focus();
     await expect(input).toBeFocused();
-    // Use a real seeded public resource search, then activate its result by keyboard.
     await input.fill(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE);
-    const result = dialog.getByRole("option", { name: new RegExp(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE, "u") });
-    await expect(result).toBeVisible();
-    await expect(result).toHaveAttribute("aria-selected", "true");
     await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(new RegExp(`/market/${process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG}$`, "u"));
-    evidence.push(`${locale}: skip link, modal focus containment/return, shortcut, arrows and real search result activation`);
+    await expect(page).toHaveURL(/\/discover\?type=resources&q=/u);
+
+    const escapedTitle = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      "\\$&",
+    );
+    const result = page
+      .getByRole("main")
+      .getByRole("link", { name: new RegExp(escapedTitle, "u") })
+      .first();
+    await expect(result).toBeVisible();
+    await result.focus();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(
+      new RegExp(`/market/${process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG}$`, "u"),
+    );
+    evidence.push(
+      `${locale}: skip link and ordinary keyboard search navigation through Discover to a real resource`,
+    );
 
     const bell = page.getByRole("banner").getByRole("button", { name: dictionary.notificationBell.title, exact: true });
     await bell.focus();
@@ -89,9 +105,10 @@ for (const locale of ["en", "ru"]) {
     await expect(bell).toBeFocused();
     evidence.push(`${locale}: notification modal contains focus and restores its trigger on Escape`);
 
-    const headings = { "/market": dictionary.market.title, "/workspace": dictionary.workspace.signInRequired,
-      "/workspace/resources": dictionary.workspace.signInRequired, "/notifications": dictionary.notifications.title,
-      "/settings": dictionary.settings.signInRequired, "/auth/login": dictionary.auth.loginTitle };
+    const headings = { "/market": dictionary.market.title, "/discover": dictionary.discover.title,
+      "/workspace": dictionary.workspace.signInRequired, "/workspace/resources": dictionary.workspace.signInRequired,
+      "/notifications": dictionary.notifications.title, "/settings": dictionary.settings.signInRequired,
+      "/auth/login": dictionary.auth.loginTitle };
     const routes = Object.keys(headings);
     for (const width of [320, 390, 1280]) {
       await page.setViewportSize({ width, height: 844 });
@@ -111,16 +128,32 @@ for (const locale of ["en", "ru"]) {
           if (route.startsWith("/workspace")) await expect(navigation.getByRole("link", { name: dictionary.nav.mobileWorkspace, exact: true })).toHaveAttribute("aria-current", "page");
         }
       }
-      evidence.push(`${locale}: six core routes at ${width}px, localized headings, labeled fields and mobile current-route state`);
+      evidence.push(`${locale}: seven core routes at ${width}px, localized headings, labeled fields and mobile current-route state`);
     }
     await page.setViewportSize({ width: 390, height: 480 });
-    await searchTrigger.focus();
+    await page.goto("/market");
+    const mobileSearchTrigger = page
+      .getByRole("banner")
+      .getByRole("link", { name: dictionary.nav.search, exact: true });
+    await expect(mobileSearchTrigger).toHaveAttribute("href", "/discover");
+    await mobileSearchTrigger.focus();
     await page.keyboard.press("Enter");
-    await expect(dialog).toBeVisible();
-    const box = await dialog.boundingBox();
-    assert(box.x >= 0 && box.y >= 0 && box.x + box.width <= 390 && box.y + box.height <= 480);
-    await page.keyboard.press("Escape");
+    await expect(page).toHaveURL(/\/discover(?:\?.*)?$/u);
+    await expect(
+      page.getByRole("searchbox", {
+        name: discoverCopy.searchLabel,
+        exact: true,
+      }),
+    ).toBeVisible();
+    assert(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+      `Horizontal overflow: ${locale} short mobile Discover`,
+    );
     assert.deepEqual(errors, []);
-    evidence.push(`${locale}: command dialog stays within a short mobile viewport; no uncaught browser errors`);
+    evidence.push(
+      `${locale}: ordinary Discover search remains keyboard reachable and fits a short mobile viewport; no uncaught browser errors`,
+    );
   });
 }
