@@ -110,7 +110,7 @@ export function NotificationBell() {
         aria-label={bellLabel}
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        aria-controls="notification-popover"
+        aria-controls={isOpen ? "notification-popover" : undefined}
       >
         <Bell className="h-4 w-4" aria-hidden="true" />
         {unreadCount > 0 && (

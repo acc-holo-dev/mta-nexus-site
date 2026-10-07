@@ -126,13 +126,20 @@ for (const locale of ["en", "ru"]) {
     );
 
     const bell = page.getByRole("banner").getByRole("button", { name: dictionary.notificationBell.title, exact: true });
+    await expect(bell).toHaveAttribute("aria-expanded", "false");
+    await expect(bell).not.toHaveAttribute("aria-controls", /.+/u);
     await bell.focus();
     await page.keyboard.press("Enter");
+    await expect(bell).toHaveAttribute("aria-expanded", "true");
+    await expect(bell).toHaveAttribute("aria-controls", "notification-popover");
     const notices = page.getByRole("dialog", { name: dictionary.notificationBell.title, exact: true });
+    await expect(notices).toHaveAttribute("id", "notification-popover");
     await expect(notices.getByRole("button", { name: dictionary.notificationBell.close, exact: true })).toBeFocused();
     await containedTabbing(page, notices);
     await page.keyboard.press("Escape");
     await expect(notices).toHaveCount(0);
+    await expect(bell).toHaveAttribute("aria-expanded", "false");
+    await expect(bell).not.toHaveAttribute("aria-controls", /.+/u);
     await expect(bell).toBeFocused();
     evidence.push(`${locale}: notification modal contains focus and restores its trigger on Escape`);
 
@@ -171,12 +178,17 @@ for (const locale of ["en", "ru"]) {
       name: dictionary.nav.more,
       exact: true,
     });
+    await expect(moreButton).toHaveAttribute("aria-expanded", "false");
+    await expect(moreButton).not.toHaveAttribute("aria-controls", /.+/u);
     await moreButton.focus();
     await page.keyboard.press("Enter");
+    await expect(moreButton).toHaveAttribute("aria-expanded", "true");
+    await expect(moreButton).toHaveAttribute("aria-controls", "mobile-more-menu");
     const moreDialog = page.getByRole("dialog", {
       name: dictionary.nav.more,
       exact: true,
     });
+    await expect(moreDialog).toHaveAttribute("id", "mobile-more-menu");
     await expect(
       moreDialog.getByRole("link", {
         name: dictionary.nav.explore,
@@ -209,6 +221,8 @@ for (const locale of ["en", "ru"]) {
     ).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(moreDialog).toHaveCount(0);
+    await expect(moreButton).toHaveAttribute("aria-expanded", "false");
+    await expect(moreButton).not.toHaveAttribute("aria-controls", /.+/u);
     await expect(moreButton).toBeFocused();
 
     await page.keyboard.press("Enter");

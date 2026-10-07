@@ -97,7 +97,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
         aria-current={moreActive ? "page" : undefined}
         aria-expanded={isMoreOpen}
         aria-haspopup="dialog"
-        aria-controls="mobile-more-menu"
+        aria-controls={isMoreOpen ? "mobile-more-menu" : undefined}
         className={`flex min-h-12 min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-[10px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
           moreActive
             ? "bg-accent-soft text-accent"
