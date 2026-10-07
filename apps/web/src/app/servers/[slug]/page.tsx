@@ -175,7 +175,7 @@ export default async function ServerDetailPage({
             />
             <a
               href={connectUri}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--nexus-success)] px-6 py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-success-solid px-6 py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90"
             >
               {copy.connect}
             </a>

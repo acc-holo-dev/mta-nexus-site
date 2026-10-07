@@ -201,7 +201,7 @@ export function ServerClaimControlPanel({
               type="button"
               onClick={() => void verify()}
               disabled={state === "verifying"}
-              className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-[var(--nexus-success)] px-4 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-success)] disabled:opacity-50"
+              className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-success-solid px-4 py-2 text-xs font-bold text-white transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-success)] disabled:opacity-50"
             >
               {state === "verifying" && (
                 <LoaderCircle className="h-4 w-4 animate-spin" aria-hidden="true" />

@@ -31,11 +31,14 @@
   --nexus-accent-text: #1d47b8;
 
   /* Status */
-  --nexus-success: #0e8a54;
+  --nexus-success: #087647;
+  --nexus-success-solid: #087647;
   --nexus-success-soft: #e3f5ec;
-  --nexus-warning: #b47407;
+  --nexus-warning: #8a5500;
+  --nexus-warning-solid: #8a5500;
   --nexus-warning-soft: #fcf2df;
-  --nexus-danger: #cf3030;
+  --nexus-danger: #b51f1f;
+  --nexus-danger-solid: #b51f1f;
   --nexus-danger-soft: #fdeaea;
   --nexus-purple: #7239d3;
   --nexus-purple-soft: #f0eafc;
@@ -81,13 +84,16 @@
   --nexus-accent-text: #6aa5f8;
 
   --nexus-success: #34d399;
-  --nexus-success-soft: rgba(52, 211, 153, 0.12);
+  --nexus-success-solid: #087647;
+  --nexus-success-soft: #152a29;
   --nexus-warning: #fbbf24;
-  --nexus-warning-soft: rgba(251, 191, 36, 0.12);
+  --nexus-warning-solid: #8a5500;
+  --nexus-warning-soft: #2d281b;
   --nexus-danger: #f87171;
-  --nexus-danger-soft: rgba(248, 113, 113, 0.12);
+  --nexus-danger-solid: #b51f1f;
+  --nexus-danger-soft: #2d1e24;
   --nexus-purple: #a78bfa;
-  --nexus-purple-soft: rgba(167, 139, 250, 0.12);
+  --nexus-purple-soft: #232135;
 
   --nexus-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --nexus-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
@@ -133,8 +139,11 @@
 
   .bg-accent { background-color: var(--nexus-accent); }
   .bg-accent-soft { background-color: var(--nexus-accent-soft); }
+  .bg-success-solid { background-color: var(--nexus-success-solid); }
   .bg-success-soft { background-color: var(--nexus-success-soft); }
+  .bg-warning-solid { background-color: var(--nexus-warning-solid); }
   .bg-warning-soft { background-color: var(--nexus-warning-soft); }
+  .bg-danger-solid { background-color: var(--nexus-danger-solid); }
   .bg-danger-soft { background-color: var(--nexus-danger-soft); }
   .bg-purple-soft { background-color: var(--nexus-purple-soft); }
 

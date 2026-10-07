@@ -93,7 +93,7 @@ export function ResourceDownloadButton({
         onClick={download}
         disabled={busy}
         aria-busy={busy}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--nexus-success)] py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90 disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-success-solid py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90 disabled:opacity-60"
       >
         <Download className="h-4 w-4" aria-hidden="true" />
         {busy ? copy.downloadPreparing : `${copy.downloadBuild} v${version}`}

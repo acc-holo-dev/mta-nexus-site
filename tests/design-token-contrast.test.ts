@@ -60,6 +60,17 @@ const surfaceTokens = [
   "--nexus-inset",
   "--nexus-hover",
 ] as const;
+const statusPairs = [
+  ["--nexus-success", "--nexus-success-soft"],
+  ["--nexus-warning", "--nexus-warning-soft"],
+  ["--nexus-danger", "--nexus-danger-soft"],
+  ["--nexus-purple", "--nexus-purple-soft"],
+] as const;
+const solidStatusTokens = [
+  "--nexus-success-solid",
+  "--nexus-warning-solid",
+  "--nexus-danger-solid",
+] as const;
 
 describe("design token contrast", () => {
   for (const [theme, source] of [
@@ -89,6 +100,31 @@ describe("design token contrast", () => {
           contrast(accent, token(source, surfaceToken)),
           `accent focus against ${surfaceToken}`,
         ).toBeGreaterThanOrEqual(3);
+      }
+    });
+
+    it(`${theme} status foregrounds remain AA-readable`, () => {
+      for (const [foregroundToken, softToken] of statusPairs) {
+        const foreground = token(source, foregroundToken);
+        for (const surfaceToken of surfaceTokens) {
+          expect(
+            contrast(foreground, token(source, surfaceToken)),
+            `${foregroundToken} on ${surfaceToken}`,
+          ).toBeGreaterThanOrEqual(4.5);
+        }
+        expect(
+          contrast(foreground, token(source, softToken)),
+          `${foregroundToken} on ${softToken}`,
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+
+    it(`${theme} solid status actions support white labels`, () => {
+      for (const solidToken of solidStatusTokens) {
+        expect(
+          contrast("#ffffff", token(source, solidToken)),
+          `white on ${solidToken}`,
+        ).toBeGreaterThanOrEqual(4.5);
       }
     });
   }
