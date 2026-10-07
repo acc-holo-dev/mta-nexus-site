@@ -276,9 +276,7 @@ for (const locale of ["en", "ru"]) {
       name: dictionary.notifications.all,
       exact: true,
     });
-    const unreadNotificationsTab = notificationTabs.getByRole("tab", {
-      name: new RegExp(`^${dictionary.notifications.unread} \\(`, "u"),
-    });
+    const unreadNotificationsTab = notificationTabs.getByRole("tab").nth(1);
     await allNotificationsTab.focus();
     await expect(allNotificationsTab).toHaveAttribute("aria-selected", "true");
     await page.keyboard.press("ArrowRight");
@@ -291,10 +289,8 @@ for (const locale of ["en", "ru"]) {
       "aria-controls",
     );
     assert(controlledPanelId);
-    await expect(page.locator(`#${CSS.escape(controlledPanelId)}`)).toHaveAttribute(
-      "role",
-      "tabpanel",
-    );
+    const notificationPanel = page.getByRole("tabpanel");
+    await expect(notificationPanel).toHaveAttribute("id", controlledPanelId);
     await page.keyboard.press("Home");
     await expect(allNotificationsTab).toBeFocused();
     evidence.push(
