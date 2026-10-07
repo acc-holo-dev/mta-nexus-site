@@ -1,7 +1,10 @@
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { Dialog } from "../packages/ui/src/dialog";
+import {
+  Dialog,
+  nextDialogFocusIndex,
+} from "../packages/ui/src/dialog";
 
 function attributeValues(markup: string, attribute: string) {
   return [
@@ -61,5 +64,30 @@ describe("Dialog accessibility identity", () => {
 
     expect(attributeValues(markup, "aria-labelledby")).toHaveLength(1);
     expect(attributeValues(markup, "aria-describedby")).toHaveLength(0);
+  });
+});
+
+
+describe("Dialog keyboard focus containment", () => {
+  it("wraps forward focus from the last control to the first", () => {
+    expect(nextDialogFocusIndex(4, 3, false)).toBe(0);
+  });
+
+  it("wraps backward focus from the first control to the last", () => {
+    expect(nextDialogFocusIndex(4, 0, true)).toBe(3);
+  });
+
+  it("recovers focus entering from outside the dialog", () => {
+    expect(nextDialogFocusIndex(4, -1, false)).toBe(0);
+    expect(nextDialogFocusIndex(4, -1, true)).toBe(3);
+  });
+
+  it("leaves normal in-dialog tab movement to the browser", () => {
+    expect(nextDialogFocusIndex(4, 1, false)).toBeNull();
+    expect(nextDialogFocusIndex(4, 2, true)).toBeNull();
+  });
+
+  it("handles a dialog with no focusable controls defensively", () => {
+    expect(nextDialogFocusIndex(0, -1, false)).toBeNull();
   });
 });
