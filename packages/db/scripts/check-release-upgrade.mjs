@@ -21,7 +21,7 @@ const root = fileURLToPath(new URL("../../../", import.meta.url));
 const migrationsFolder = join(root, "packages/db/migrations");
 const journal = JSON.parse(readFileSync(join(migrationsFolder, "meta/_journal.json"), "utf8"));
 // Freeze the baseline: when migrations advance, review and extend this fixture.
-assert.equal(journal.entries.at(-1).tag, "0027_build_quarantine");
+assert.equal(journal.entries.at(-1).tag, "0028_support_cases");
 const temp = mkdtempSync(join(tmpdir(), "nexus-upgrade-"));
 const baselineFolder = join(temp, "baseline");
 const failureFolder = join(temp, "failure");
@@ -33,7 +33,7 @@ const evidence = {
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: "0024_product_type_invariant",
-  target: "0027_build_quarantine",
+  target: "0028_support_cases",
   phase: "baseline",
   failedMigrationRolledBack: false,
   legacyRowsPreserved: false,
@@ -121,6 +121,14 @@ try {
     WHERE table_schema = 'public' AND table_name = 'builds'
       AND column_name IN ('quarantine_previous_status', 'quarantine_reason', 'quarantined_at', 'quarantined_by')`;
   assert.equal(quarantineColumns.length, 4);
+  const supportTables = await client`SELECT table_name FROM information_schema.tables
+    WHERE table_schema = 'public'
+      AND table_name IN ('support_cases', 'support_case_messages')
+    ORDER BY table_name`;
+  assert.deepEqual(
+    supportTables.map((row) => row.table_name),
+    ["support_case_messages", "support_cases"],
+  );
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);
