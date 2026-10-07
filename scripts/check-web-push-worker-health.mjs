@@ -33,7 +33,8 @@ try {
     queueCapacity >= 1 &&
     queueCapacity <= 50_000 &&
     queueDue <= queuePending &&
-    queueLeased <= queuePending;
+    queueLeased <= queuePending &&
+    queuePending < queueCapacity;
 
   if (
     data?.status !== "ready" ||

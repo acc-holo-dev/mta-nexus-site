@@ -104,3 +104,40 @@ test("rejects impossible queue counters and invalid capacity", () => {
     0,
   );
 });
+
+
+test("fails health when the durable queue reaches configured capacity", async () => {
+  const healthFile = join(
+    tmpdir(),
+    `nexus-web-push-health-saturated-${process.pid}.json`,
+  );
+  await writeFile(
+    healthFile,
+    JSON.stringify({
+      status: "ready",
+      configured: true,
+      pid: process.pid,
+      batch: 1,
+      heartbeatAt: new Date().toISOString(),
+      staleAfterMs: 60000,
+      queuePending: 100,
+      queueDue: 100,
+      queueLeased: 0,
+      queueCapacity: 100,
+      queueOldestAgeSeconds: 10,
+    }),
+  );
+  const result = spawnSync(
+    process.execPath,
+    [checkerPath],
+    {
+      env: {
+        ...process.env,
+        NEXUS_WEB_PUSH_HEALTH_FILE: healthFile,
+      },
+      encoding: "utf8",
+    },
+  );
+  await rm(healthFile, { force: true });
+  assert.notEqual(result.status, 0);
+});

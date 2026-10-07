@@ -78,6 +78,7 @@ describe("durable Web Push outbox", () => {
       recipientId: userId,
     });
     expect(created.pushJobs).toBe(2);
+    expect(created.pushQueueState).toBe("queued");
 
     const jobs = await db
       .select()
@@ -137,6 +138,7 @@ describe("durable Web Push outbox", () => {
     ).resolves.toEqual({
       notification: null,
       pushJobs: 0,
+      pushQueueState: "no_subscriptions",
     });
 
     const [notificationRows, jobs] = await Promise.all([

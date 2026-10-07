@@ -23,10 +23,12 @@ describe("notification dispatch service", () => {
       .mockResolvedValueOnce({
         notification: { id: "not_1", recipientId: "u1" },
         pushJobs: 2,
+        pushQueueState: "queued",
       })
       .mockResolvedValueOnce({
         notification: null,
         pushJobs: 0,
+        pushQueueState: "no_subscriptions",
       })
       .mockRejectedValueOnce(new Error("db unavailable"));
 
@@ -59,6 +61,31 @@ describe("notification dispatch service", () => {
       stored: 1,
       storageFailed: 1,
       pushQueued: 2,
+      pushQueueDegraded: 0,
+    });
+  });
+
+  it("reports a stored inbox row whose push queue degraded", async () => {
+    create.mockResolvedValueOnce({
+      notification: { id: "not_1", recipientId: "u1" },
+      pushJobs: 0,
+      pushQueueState: "saturated",
+    });
+
+    await expect(
+      dispatchNotificationsBestEffort([
+        {
+          recipientId: "u1",
+          title: "Saturated",
+          message: "Inbox remains authoritative",
+          type: "system",
+          category: "system",
+        },
+      ]),
+    ).resolves.toMatchObject({
+      stored: 1,
+      pushQueued: 0,
+      pushQueueDegraded: 1,
     });
   });
 
@@ -66,6 +93,7 @@ describe("notification dispatch service", () => {
     create.mockImplementation(async (value) => ({
       notification: value,
       pushJobs: 0,
+      pushQueueState: "no_subscriptions",
     }));
     await dispatchNotificationsBestEffort([
       {
