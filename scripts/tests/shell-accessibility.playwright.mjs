@@ -19,7 +19,7 @@ test.afterAll(async () => {
   const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
   await mkdir(output, { recursive: true });
   await writeFile(join(output, "shell-results.json"), JSON.stringify({ commit: process.env.GITHUB_SHA, results: evidence,
-    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button names and image alt attributes. This is scoped acceptance, not a full WCAG or screen-reader audit." }, null, 2));
+    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/image names, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification." }, null, 2));
   await writeFile(join(output, "shell-summary.md"), ["# Keyboard, mobile and locale acceptance", "", ...evidence.map((value) => `- PASS: ${value}`), ""].join("\n"));
 });
 
@@ -111,6 +111,57 @@ async function assertBasicAccessibleNames(page, label) {
     result.imagesWithoutAlt,
     [],
     `${label}: visible images without alt attributes`,
+  );
+}
+
+async function assertDocumentStructure(page, label) {
+  const result = await page.evaluate(() => {
+    const visible = (element) =>
+      element.getClientRects().length > 0 &&
+      getComputedStyle(element).visibility !== "hidden";
+
+    const mains = [...document.querySelectorAll("main")].filter(visible);
+    const visibleHeadings = [
+      ...document.querySelectorAll("h1, h2, h3, h4, h5, h6"),
+    ].filter(visible);
+    const h1s = mains.flatMap((main) =>
+      [...main.querySelectorAll("h1")].filter(visible),
+    );
+    const emptyHeadings = visibleHeadings
+      .filter((heading) => !heading.textContent?.trim())
+      .map((heading) => heading.outerHTML.slice(0, 180));
+
+    const navs = [...document.querySelectorAll("nav")].filter(visible);
+    const unnamedNavs =
+      navs.length <= 1
+        ? []
+        : navs
+            .filter(
+              (nav) =>
+                !nav.getAttribute("aria-label")?.trim() &&
+                !nav.getAttribute("aria-labelledby")?.trim(),
+            )
+            .map((nav) => nav.outerHTML.slice(0, 180));
+
+    return {
+      mainCount: mains.length,
+      h1Count: h1s.length,
+      emptyHeadings,
+      unnamedNavs,
+    };
+  });
+
+  assert.equal(result.mainCount, 1, `${label}: exactly one visible main`);
+  assert.equal(result.h1Count, 1, `${label}: exactly one visible main h1`);
+  assert.deepEqual(
+    result.emptyHeadings,
+    [],
+    `${label}: visible headings require text`,
+  );
+  assert.deepEqual(
+    result.unnamedNavs,
+    [],
+    `${label}: multiple visible nav landmarks require names`,
   );
 }
 
@@ -255,6 +306,10 @@ for (const locale of ["en", "ru"]) {
           `${locale} ${width} ${route}`,
         );
         await assertBasicAccessibleNames(
+          page,
+          `${locale} ${width} ${route}`,
+        );
+        await assertDocumentStructure(
           page,
           `${locale} ${width} ${route}`,
         );
@@ -649,6 +704,10 @@ for (const locale of ["en", "ru"]) {
           page,
           `${locale} ${width} ${spec.route}`,
         );
+        await assertDocumentStructure(
+          page,
+          `${locale} ${width} ${spec.route}`,
+        );
         await assertNoHorizontalOverflow(
           page,
           `${locale} ${spec.route} at ${width}px`,
@@ -711,7 +770,7 @@ for (const locale of ["en", "ru"]) {
     assert.deepEqual(errors, []);
     await logoutFixture(page);
     evidence.push(
-      `${locale}: authenticated Settings, Security Center, Support, Publish and unowned Server Claim pass labeled-field, ARIA-IDREF, focus, reduced-motion and 320/390/1280 reflow acceptance`,
+      `${locale}: authenticated Settings, Security Center, Support, Publish and unowned Server Claim pass labeled-field, ARIA-IDREF, landmark/heading structure, focus, reduced-motion and 320/390/1280 reflow acceptance`,
     );
   });
 }
