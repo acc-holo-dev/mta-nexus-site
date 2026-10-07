@@ -59,6 +59,13 @@ function healthy(overrides = {}) {
     queueLeased: 1,
     queueCapacity: 10_000,
     queueOldestAgeSeconds: 12,
+    queueAlert: "ok",
+    queueAlertReasons: [],
+    queueAlertThresholds: {
+      pendingPercent: 80,
+      dueJobs: 100,
+      oldestAgeSeconds: 900,
+    },
     ...overrides,
   };
 }
@@ -66,7 +73,34 @@ function healthy(overrides = {}) {
 test("accepts a fresh, internally consistent worker heartbeat", () => {
   assert.equal(run(healthy()), 0);
   assert.equal(
-    run(healthy({ configured: false, queuePending: 0 })),
+    run(
+      healthy({
+        configured: false,
+        queuePending: 0,
+        queueDue: 0,
+        queueLeased: 0,
+        queueOldestAgeSeconds: 0,
+      }),
+    ),
+    0,
+  );
+});
+
+test("accepts queue alerts without converting backlog pressure into liveness failure", () => {
+  assert.equal(
+    run(
+      healthy({
+        queuePending: 8_000,
+        queueDue: 100,
+        queueOldestAgeSeconds: 900,
+        queueAlert: "alert",
+        queueAlertReasons: [
+          "capacity_pressure",
+          "due_backlog",
+          "oldest_job_age",
+        ],
+      }),
+    ),
     0,
   );
 });
@@ -107,6 +141,19 @@ test("rejects impossible queue counters and invalid capacity", () => {
 
 
 
+test("rejects inconsistent queue alert metadata", () => {
+  assert.notEqual(run(healthy({ queuePending: 8_000 })), 0);
+  assert.notEqual(
+    run(
+      healthy({
+        queueAlert: "alert",
+        queueAlertReasons: ["due_backlog"],
+      }),
+    ),
+    0,
+  );
+});
+
 test("fails health when the durable queue reaches configured capacity", () => {
   assert.notEqual(
     run(
@@ -116,6 +163,11 @@ test("fails health when the durable queue reaches configured capacity", () => {
         queueLeased: 0,
         queueCapacity: 100,
         queueOldestAgeSeconds: 10,
+        queueAlert: "alert",
+        queueAlertReasons: [
+          "capacity_pressure",
+          "due_backlog",
+        ],
       }),
     ),
     0,

@@ -473,18 +473,29 @@ Validate production configuration without deploying publicly:
 - optional Web Push VAPID configuration is either fully absent or contains a valid public P-256 key, private P-256 scalar and `mailto:`/HTTPS subject together; production Compose passes the triplet to both web and `push-worker` without exposing the private key in logs or client payloads;
 - migration `0030_web_push_outbox.sql` is applied before `push-worker` starts; inbox notifications enqueue one job per active subscription, with a global queue gate/capacity;
 - `push-worker` is a separate production process with lease ownership, max 5 attempts, deterministic backoff, terminal 404/410 subscription cleanup, 24-hour job TTL and graceful shutdown;
-- worker health is checked through `scripts/check-web-push-worker-health.mjs`; a stale/malformed heartbeat or impossible queue counters fail closed, while a fully unconfigured VAPID setup remains healthy-idle and continues expired-job maintenance;
+- worker liveness is checked through `scripts/check-web-push-worker-health.mjs`; a stale/malformed heartbeat, impossible queue counters or hard saturation fail closed, while a fully unconfigured VAPID setup remains healthy-idle and continues expired-job maintenance;
+- operational backlog alerting is separate from liveness: the heartbeat contains only aggregate `queueAlert`, reasons and thresholds, and `scripts/check-web-push-worker-queue.mjs` returns exit 0 for OK, 2 for an alert and 1 for an invalid/stale heartbeat;
+- default alert thresholds are 80% queue capacity, 100 due jobs and 900 seconds oldest active job; production can override them with `WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT`, `WEB_PUSH_QUEUE_ALERT_DUE_JOBS` and `WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS`;
 - queue operations never expose endpoint capability URLs or notification bodies in worker health/log events.
 
 Acceptance: production startup/restart test passes in an isolated production-shaped environment.
 
 Web Push operational checks for a production-shaped host:
 
-1. Confirm `push-worker` is healthy separately from the HTTP app.
-2. Inspect only aggregate heartbeat fields: `configured`, `queuePending`, `queueDue`, `queueLeased`, `queueCapacity`, `queueOldestAgeSeconds`.
-3. If VAPID is intentionally disabled, `configured=false` is valid; no provider delivery occurs, but expired/exhausted queue rows are still maintained.
-4. If VAPID is enabled and `queueDue`/oldest age grows continuously, treat it as provider/DNS/network/configuration degradation rather than restarting the web app blindly.
-5. A 404/410 from a push provider removes the stale subscription and cascades its queued jobs. Transient transport failures and 408/425/429/5xx are retried; other 4xx are discarded without deleting the subscription.
+Run the aggregate queue probe from the worker container and wire any non-zero exit into the external monitor:
+
+```bash
+docker compose -f compose.production.yaml exec -T push-worker \
+  node /app/scripts/check-web-push-worker-queue.mjs
+```
+
+Exit 0 means the queue is within policy, exit 2 is an operational alert, and exit 1 means the heartbeat/configuration itself is invalid or stale. The worker emits one `queue-alert` event when the reason set changes and one `queue-recovered` event after recovery, so log-based alerting does not spam every poll.
+
+1. Confirm `push-worker` liveness separately from the HTTP app; do not use backlog pressure as a reason to restart the HTTP service.
+2. Inspect only aggregate heartbeat fields: `configured`, `queuePending`, `queueDue`, `queueLeased`, `queueCapacity`, `queueOldestAgeSeconds`, `queueAlert` and reasons.
+3. If VAPID is intentionally disabled, `configured=false` is valid only while no active jobs remain; pending durable jobs produce `delivery_disabled_with_pending_jobs`.
+4. `capacity_pressure`, `due_backlog` or `oldest_job_age` means the provider/DNS/network/configuration path needs investigation. Thresholds are explicit configuration, not automatic restart triggers.
+5. A 404/410 from a push provider removes the stale subscription and cascades its queued job. Transient transport failures and 408/425/429/5xx are retried; other 4xx are discarded without deleting the subscription.
 6. Do not manually replay accepted jobs: successful settlement deletes the endpoint-specific row. One notification with multiple browser subscriptions intentionally creates independent jobs.
 
 #### Stage 11 — Exact-SHA release candidate verification

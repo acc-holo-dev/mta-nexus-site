@@ -52,7 +52,9 @@ COPY --from=build /runtime/db /app/packages/db
 COPY --from=build /app/scripts/start-production.sh /app/scripts/start-production.sh
 COPY --from=build /app/scripts/check-local-readiness.mjs /app/scripts/check-local-readiness.mjs
 COPY --from=build /app/scripts/check-account-mail-worker-health.mjs /app/scripts/check-account-mail-worker-health.mjs
+COPY --from=build /app/scripts/web-push-worker-health-state.mjs /app/scripts/web-push-worker-health-state.mjs
 COPY --from=build /app/scripts/check-web-push-worker-health.mjs /app/scripts/check-web-push-worker-health.mjs
+COPY --from=build /app/scripts/check-web-push-worker-queue.mjs /app/scripts/check-web-push-worker-queue.mjs
 RUN mkdir -p /data/uploads && chown -R node:node /data/uploads
 USER node
 EXPOSE 3000

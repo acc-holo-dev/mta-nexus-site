@@ -16,6 +16,40 @@ const STALE_AFTER_MS = 60_000;
 const POLL_INTERVAL_MS = 2_000;
 const BATCH_SIZE = 20;
 
+function readQueueAlertThreshold(
+  name: string,
+  fallback: number,
+  min: number,
+  max: number,
+): number {
+  const raw = process.env[name]?.trim();
+  if (!raw) return fallback;
+  if (!/^[0-9]+$/u.test(raw)) {
+    throw new Error("Invalid Web Push queue alert configuration");
+  }
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value) || value < min || value > max) {
+    throw new Error("Invalid Web Push queue alert configuration");
+  }
+  return value;
+}
+
+const QUEUE_ALERT_PENDING_PERCENT = readQueueAlertThreshold(
+  "WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT", 80, 1, 99,
+);
+const QUEUE_ALERT_DUE_JOBS = readQueueAlertThreshold(
+  "WEB_PUSH_QUEUE_ALERT_DUE_JOBS", 100, 1, 50_000,
+);
+const QUEUE_ALERT_OLDEST_AGE_SECONDS = readQueueAlertThreshold(
+  "WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS", 900, 1, 86_400,
+);
+
+type QueueAlertReason =
+  | "delivery_disabled_with_pending_jobs"
+  | "capacity_pressure"
+  | "due_backlog"
+  | "oldest_job_age";
+
 const controller = new AbortController();
 let stopping = false;
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
@@ -29,9 +63,45 @@ let healthQueueDue = 0;
 let healthQueueLeased = 0;
 let healthQueueCapacity = 0;
 let healthQueueOldestAgeSeconds = 0;
+let healthQueueAlertReasons: QueueAlertReason[] = [];
+let lastQueueAlertSignature = "";
 
 function emit(event: Record<string, unknown>) {
   process.stdout.write(`${JSON.stringify(event)}\n`);
+}
+
+function queueAlertThresholds() {
+  return {
+    pendingPercent: QUEUE_ALERT_PENDING_PERCENT,
+    dueJobs: QUEUE_ALERT_DUE_JOBS,
+    oldestAgeSeconds: QUEUE_ALERT_OLDEST_AGE_SECONDS,
+  };
+}
+
+function updateQueueAlertState() {
+  const reasons: QueueAlertReason[] = [];
+  if (!configured && healthQueuePending > 0) reasons.push("delivery_disabled_with_pending_jobs");
+  if (healthQueuePending * 100 >= healthQueueCapacity * QUEUE_ALERT_PENDING_PERCENT) reasons.push("capacity_pressure");
+  if (healthQueueDue >= QUEUE_ALERT_DUE_JOBS) reasons.push("due_backlog");
+  if (healthQueuePending > 0 && healthQueueOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS) reasons.push("oldest_job_age");
+
+  const previousSignature = lastQueueAlertSignature;
+  const nextSignature = reasons.join(",");
+  healthQueueAlertReasons = reasons;
+  lastQueueAlertSignature = nextSignature;
+  if (nextSignature === previousSignature) return;
+
+  const queue = {
+    configured,
+    queuePending: healthQueuePending,
+    queueDue: healthQueueDue,
+    queueLeased: healthQueueLeased,
+    queueCapacity: healthQueueCapacity,
+    queueOldestAgeSeconds: healthQueueOldestAgeSeconds,
+    thresholds: queueAlertThresholds(),
+  };
+  if (reasons.length > 0) emit({ status: "queue-alert", reasons, ...queue });
+  else if (previousSignature) emit({ status: "queue-recovered", ...queue });
 }
 
 function stop(signal: "SIGTERM" | "SIGINT") {
@@ -58,6 +128,9 @@ async function writeHealthSnapshot() {
     queueLeased: healthQueueLeased,
     queueCapacity: healthQueueCapacity,
     queueOldestAgeSeconds: healthQueueOldestAgeSeconds,
+    queueAlert: healthQueueAlertReasons.length > 0 ? "alert" : "ok",
+    queueAlertReasons: healthQueueAlertReasons,
+    queueAlertThresholds: queueAlertThresholds(),
   });
   await writeFile(HEALTH_TMP, payload, {
     encoding: "utf8",
@@ -83,6 +156,7 @@ async function refreshQueueStats() {
   healthQueueLeased = stats.leased;
   healthQueueCapacity = stats.capacity;
   healthQueueOldestAgeSeconds = stats.oldestAgeSeconds;
+  updateQueueAlertState();
 }
 
 async function delay(ms: number, signal: AbortSignal) {
