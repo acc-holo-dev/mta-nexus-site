@@ -6,6 +6,9 @@ import {
   productRepository,
   userRepository,
   notificationRepository,
+  sessionRepository,
+  webPushOutbox,
+  webPushSubscriptionRepository,
 } from "@nexus/db";
 import { db } from "../packages/db/src/client";
 import { auditEvents, builds, organizationMembers, organizations } from "../packages/db/src/schema";
@@ -15,12 +18,29 @@ async function fixture() {
   const authorId = `usr_review_${suffix}`;
   const productId = `prd_review_${suffix}`;
   const buildId = `bld_review_${suffix}`;
+  const sessionId = `ses_review_${suffix}`;
+  const subscriptionId = `wps_review_${suffix}`;
   await userRepository.create({
     id: authorId,
     email: `${suffix}@example.invalid`,
     username: `review_${suffix}`,
     displayName: "Review Author",
     role: "developer",
+  });
+  await sessionRepository.create({
+    id: sessionId,
+    userId: authorId,
+    token: `review-session-${suffix}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
+  await webPushSubscriptionRepository.upsert({
+    id: subscriptionId,
+    userId: authorId,
+    sessionId,
+    endpoint: `https://push.example.invalid/review-${suffix}`,
+    p256dh: "review-key",
+    auth: "review-auth",
+    expirationAt: null,
   });
   await productRepository.create({
     id: productId,
@@ -67,7 +87,13 @@ async function fixture() {
     targetType: "build",
     details: { notes: "Review comment <script>literal</script>" },
   });
-  return { authorId, productId, buildId, audit };
+  return {
+    authorId,
+    productId,
+    buildId,
+    subscriptionId,
+    audit,
+  };
 }
 
 it("commits approval and one author notification atomically, even with simultaneous replay", async () => {
@@ -100,6 +126,22 @@ it("commits approval and one author notification atomically, even with simultane
     },
   });
   expect(await notificationRepository.countUnread(f.authorId)).toBe(1);
+  await expect(
+    db
+      .select()
+      .from(webPushOutbox)
+      .where(
+        eq(
+          webPushOutbox.notificationId,
+          notices[0]!.id,
+        ),
+      ),
+  ).resolves.toEqual([
+    expect.objectContaining({
+      subscriptionId: f.subscriptionId,
+      attempts: 0,
+    }),
+  ]);
   expect(
     await db.select().from(auditEvents).where(eq(auditEvents.targetId, f.buildId)),
   ).toHaveLength(1);
