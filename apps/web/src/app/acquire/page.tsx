@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useId, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -26,6 +26,9 @@ function AcquireContent() {
   const productId = searchParams.get("productId");
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.checkout;
+  const summaryHeadingId = useId();
+  const accessHeadingId = useId();
+  const accessDescriptionId = useId();
   const [product, setProduct] = useState<ProductInfo | null>(null);
   const [productError, setProductError] = useState<string | null>(null);
   const [loadRevision, setLoadRevision] = useState(0);
@@ -119,7 +122,12 @@ function AcquireContent() {
   if (productId && claimedProductId === productId) {
     return (
       <div className="mx-auto max-w-xl py-12">
-        <section className="nexus-panel space-y-5 p-8 text-center shadow-nexus">
+        <section
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="nexus-panel space-y-5 p-8 text-center shadow-nexus"
+        >
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success-soft text-success">
             <CheckCircle2 className="h-9 w-9" aria-hidden="true" />
           </div>
@@ -153,7 +161,11 @@ function AcquireContent() {
 
   if (!productId || productError) {
     return (
-      <div className="mx-auto max-w-xl space-y-4 py-16 text-center">
+      <div
+        role={productError ? "alert" : undefined}
+        aria-live={productError ? "assertive" : undefined}
+        className="mx-auto max-w-xl space-y-4 py-16 text-center"
+      >
         <h1 className="font-display text-primary">
           {productId ? productError : copy.noProduct}
         </h1>
@@ -219,38 +231,68 @@ function AcquireContent() {
         </div>
       )}
 
-      <section className="nexus-panel space-y-4 p-6 shadow-nexus-sm">
-        <h2 className="font-label uppercase text-muted">
+      <section
+        aria-labelledby={summaryHeadingId}
+        className="nexus-panel space-y-4 p-6 shadow-nexus-sm"
+      >
+        <h2
+          id={summaryHeadingId}
+          className="font-label uppercase text-muted"
+        >
           {copy.orderSummary}
         </h2>
-        <div className="flex items-center justify-between gap-4 border-b border-base py-2 text-sm">
-          <span className="font-semibold text-primary">{product.title}</span>
-          <span className="font-numeric font-bold text-primary">
-            {formattedPrice}
-          </span>
-        </div>
-        <div className="flex items-center justify-between gap-4 text-xs text-muted">
-          <span>
-            {copy.licenseModel}:{" "}
-            <span className="capitalize">
+        <dl className="divide-y divide-[color:var(--nexus-border)] text-sm">
+          <div className="flex items-center justify-between gap-4 py-2">
+            <dt className="text-muted">{copy.resource}</dt>
+            <dd className="text-right font-semibold text-primary">
+              {product.title}
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-4 py-2">
+            <dt className="text-muted">{copy.price}</dt>
+            <dd className="font-numeric font-bold text-primary">
+              {formattedPrice}
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-4 py-2">
+            <dt className="text-muted">{copy.licenseModel}</dt>
+            <dd className="text-right capitalize text-primary">
               {product.licenseModel.replace(/_/g, " ")}
-            </span>
-          </span>
-          <span className="font-numeric">v{product.currentVersion}</span>
-        </div>
-        <div className="flex items-center justify-between gap-4 border-t border-base pt-3 font-bold text-primary">
-          <span>{copy.totalDue}</span>
-          <span className="font-numeric text-success">
-            {formattedPrice}
-          </span>
-        </div>
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-4 py-2">
+            <dt className="text-muted">{copy.version}</dt>
+            <dd className="font-numeric text-primary">
+              v{product.currentVersion}
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-4 py-3 font-bold">
+            <dt className="text-primary">{copy.totalDue}</dt>
+            <dd className="font-numeric text-success">
+              {formattedPrice}
+            </dd>
+          </div>
+        </dl>
       </section>
 
-      <section className="nexus-panel space-y-2 p-6">
-        <h2 className="text-sm font-bold text-primary">
+      <section
+        role={product.price > 0 ? "status" : undefined}
+        aria-live={product.price > 0 ? "polite" : undefined}
+        aria-atomic={product.price > 0 ? "true" : undefined}
+        aria-labelledby={accessHeadingId}
+        aria-describedby={accessDescriptionId}
+        className="nexus-panel space-y-2 p-6"
+      >
+        <h2
+          id={accessHeadingId}
+          className="text-sm font-bold text-primary"
+        >
           {product.price === 0 ? copy.freeResource : copy.paidCheckout}
         </h2>
-        <p className="text-sm leading-relaxed text-muted">
+        <p
+          id={accessDescriptionId}
+          className="text-sm leading-relaxed text-muted"
+        >
           {product.price === 0 ? copy.noPaymentRequired : copy.paidDisabled}
         </p>
       </section>
@@ -259,6 +301,7 @@ function AcquireContent() {
         type="button"
         onClick={() => void handleClaim()}
         disabled={product.price > 0}
+        aria-describedby={accessDescriptionId}
         isLoading={loading}
         className="w-full"
       >
@@ -269,7 +312,10 @@ function AcquireContent() {
             : copy.paidUnavailable}
       </Button>
 
-      <div className="flex items-center justify-center gap-2 text-xs text-muted">
+      <div
+        role="note"
+        className="flex items-center justify-center gap-2 text-xs text-muted"
+      >
         <ShieldCheck className="h-4 w-4 text-success" aria-hidden="true" />
         <span>{copy.noSimulatedPayments}</span>
       </div>

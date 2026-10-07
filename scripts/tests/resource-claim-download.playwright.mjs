@@ -19,6 +19,9 @@ assert.equal(
 assert(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_ID);
 assert(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG);
 assert(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE);
+assert(process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_ID);
+assert(process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_SLUG);
+assert(process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_TITLE);
 assert.match(
   process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256 ?? "",
   /^[a-f0-9]{64}$/u,
@@ -32,6 +35,9 @@ const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
 const productId = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_ID;
 const productSlug = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG;
 const productTitle = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE;
+const paidProductId = process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_ID;
+const paidProductSlug = process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_SLUG;
+const paidProductTitle = process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_TITLE;
 const expectedSha256 = process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256;
 const expectedSize = Number(process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SIZE);
 assert.equal(expectedSize, 64 * 1024 * 1024, "Exercise the maximum supported download size");
@@ -411,6 +417,120 @@ test("J5 claim -> workspace -> download exact published build", async ({
       "Unexpected JavaScript, hydration or console errors",
     );
 
+    status = "PASS";
+  } finally {
+    results.push({ name, status });
+  }
+});
+
+
+test("J5 paid resource stays fail-closed and accessibly explained", async ({
+  page,
+}) => {
+  const name = "paid resource closed-beta accessibility without payment mutation";
+  let status = "FAIL";
+  const mutationRequests = [];
+
+  page.on("request", (request) => {
+    if (
+      request.method() !== "GET" &&
+      (
+        request.url().includes("/api/checkout") ||
+        request.url().includes("/api/resources/claim")
+      )
+    ) {
+      mutationRequests.push({
+        method: request.method(),
+        url: request.url(),
+      });
+    }
+  });
+
+  try {
+    await page.goto(
+      `/acquire?productId=${encodeURIComponent(paidProductId)}`,
+    );
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: "Add resource to library",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(paidProductTitle, { exact: true }),
+    ).toBeVisible();
+
+    const paidStatus = page.getByRole("status").filter({
+      hasText: "Paid resources disabled",
+    });
+    await expect(paidStatus).toBeVisible();
+    const paidDescription = page.getByText(
+      "Paid resources are disabled during the closed beta. No payment attempt will be created.",
+      { exact: true },
+    );
+    await expect(paidDescription).toBeVisible();
+
+    const paidButton = page.getByRole("button", {
+      name: "Paid resources unavailable",
+      exact: true,
+    });
+    await expect(paidButton).toBeDisabled();
+    const describedBy = await paidButton.getAttribute("aria-describedby");
+    assert(describedBy);
+    await expect(paidDescription).toHaveAttribute("id", describedBy);
+
+    const summary = page.locator("dl");
+    await expect(summary.getByText("Resource", { exact: true })).toBeVisible();
+    await expect(summary.getByText("Price", { exact: true })).toBeVisible();
+    await expect(summary.getByText("Version", { exact: true })).toBeVisible();
+    await expect(summary.getByText("$25.00", { exact: true })).toBeVisible();
+
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      await assertNoHorizontalOverflow(
+        page,
+        `paid acquire page at ${width}px`,
+      );
+    }
+
+    await page.getByRole("button", { name: "Language", exact: true }).click();
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: "Добавить ресурс в библиотеку",
+        exact: true,
+      }),
+    ).toBeVisible();
+    const russianPaidDescription = page.getByText(
+      "Платные ресурсы отключены на время закрытой беты. Попытка оплаты не создаётся.",
+      { exact: true },
+    );
+    await expect(russianPaidDescription).toBeVisible();
+    const russianPaidButton = page.getByRole("button", {
+      name: "Платные ресурсы недоступны",
+      exact: true,
+    });
+    await expect(russianPaidButton).toBeDisabled();
+    const russianDescribedBy =
+      await russianPaidButton.getAttribute("aria-describedby");
+    assert(russianDescribedBy);
+    await expect(russianPaidDescription).toHaveAttribute(
+      "id",
+      russianDescribedBy,
+    );
+
+    assert.deepEqual(
+      mutationRequests,
+      [],
+      "Paid closed-beta screen must not create checkout or free-claim mutations",
+    );
+
+    results.push({
+      name:
+        "RU/EN paid-disabled summary, explanation, disabled action and 320/390px reflow",
+      status: "PASS",
+    });
     status = "PASS";
   } finally {
     results.push({ name, status });

@@ -19,6 +19,9 @@ author_id="usr_resource_browser_$short"
 product_id="prd_resource_browser_$short"
 build_id="bld_resource_browser_$short"
 product_slug="j5-browser-resource-$short"
+paid_product_id="prd_paid_resource_browser_$short"
+paid_product_slug="j5-paid-browser-resource-$short"
+paid_product_title="J5 Paid Browser Resource"
 claim_server_id="srv_claim_browser_$short"
 claim_server_slug="claim-browser-$short"
 claim_server_name="Claim Browser Fixture $short"
@@ -85,6 +88,35 @@ INSERT INTO products (
   now()
 );
 
+INSERT INTO products (
+  id, title, slug, description, type, status, author_id,
+  price, currency, license_model, tags, current_version,
+  rating_average, rating_count, sales_count, is_featured,
+  screenshots, compatibility, thumbnail_url, created_at, updated_at
+) VALUES (
+  '$paid_product_id',
+  '$paid_product_title',
+  '$paid_product_slug',
+  'Disposable paid resource used only to verify closed-beta fail-closed acquisition UI.',
+  'script',
+  'published',
+  '$author_id',
+  2500,
+  'USD',
+  'unlimited',
+  '[]'::jsonb,
+  '1.0.0',
+  0,
+  0,
+  0,
+  false,
+  '[]'::jsonb,
+  '{}'::jsonb,
+  NULL,
+  now(),
+  now()
+);
+
 INSERT INTO builds (
   id, product_id, version, release_notes, status, storage_key,
   sha256_hash, file_size_bytes, file_name, mime_type,
@@ -130,6 +162,9 @@ export NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG="$product_slug"
 export NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE="J5 Browser Resource"
 export NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256="$expected_sha"
 export NEXUS_RESOURCE_BROWSER_EXPECTED_SIZE="$file_size"
+export NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_ID="$paid_product_id"
+export NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_SLUG="$paid_product_slug"
+export NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_TITLE="$paid_product_title"
 export NEXUS_CLAIM_BROWSER_SERVER_SLUG="$claim_server_slug"
 export NEXUS_CLAIM_BROWSER_SERVER_NAME="$claim_server_name"
 

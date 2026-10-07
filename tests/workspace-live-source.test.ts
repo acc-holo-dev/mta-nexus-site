@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
@@ -33,13 +34,11 @@ vi.mock("next/link", async () => {
   return {
     default: ({
       href,
-      children,
-      ...props
+      children
     }: {
       href: string;
-      children: React.ReactNode;
-      [key: string]: unknown;
-    }) => React.createElement("a", { href, ...props }, children),
+      children: ReactNode;
+    }) => React.createElement("a", { href }, children),
   };
 });
 
