@@ -129,7 +129,7 @@ describe("build quarantine service behavior", () => {
     { quarantinePreviousStatus: "draft" as const },
     { quarantinePreviousStatus: "published" as const, scanStatus: "infected" as const },
     { quarantinePreviousStatus: "published" as const, scanner: "" },
-    { quarantinePreviousStatus: "published" as const, scannedAt: undefined },
+    { quarantinePreviousStatus: "published" as const, scannedAt: null },
   ])("rejects unsafe quarantine restore evidence %#", async (override) => {
     mocks.findBuild.mockResolvedValue(
       build({

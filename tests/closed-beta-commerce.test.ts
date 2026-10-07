@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { User } from "@nexus/domain";
 
 const mocks = vi.hoisted(() => ({
   claimFreeResource: vi.fn(),
@@ -51,7 +52,7 @@ describe("closed-beta commerce behavior", () => {
       username: "user",
       displayName: "User",
       role: "user",
-    } as never;
+    } as User;
 
     await expect(
       service.claimFreeResource({ user, productId: "prd_1" }),

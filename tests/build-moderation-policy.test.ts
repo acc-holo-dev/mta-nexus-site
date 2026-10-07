@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Build, Product, User } from "@nexus/domain";
 import { eventBus } from "@nexus/domain";
 
@@ -87,6 +87,10 @@ describe("build moderation service behavior", () => {
   const service = new ProductService();
   let publishSpy: ReturnType<typeof vi.spyOn>;
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.can.mockReturnValue(true);
@@ -126,7 +130,7 @@ describe("build moderation service behavior", () => {
   it.each([
     { scanStatus: "infected" as const },
     { scanStatus: "clean" as const, scanner: "" },
-    { scanStatus: "clean" as const, scannedAt: undefined },
+    { scanStatus: "clean" as const, scannedAt: null },
   ])("rejects approval without trusted clean scan provenance %#", async (override) => {
     mocks.findBuild.mockResolvedValue(build(override as Partial<Build>));
 
