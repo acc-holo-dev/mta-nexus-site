@@ -19,9 +19,11 @@ const mocks = vi.hoisted(() => ({
   rate: vi.fn(),
   findPending: vi.fn(),
   create: vi.fn(),
+  listByRequester: vi.fn(),
   moderators: vi.fn(),
-  notify: vi.fn(),
-  push: vi.fn(),
+  dispatch: vi.fn(),
+  findOrganization: vi.fn(),
+  memberships: vi.fn(),
 }));
 
 vi.mock("next/server", async () => {
@@ -37,33 +39,62 @@ vi.mock("next/server", async () => {
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
+
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: mocks.rate,
   generateId: (prefix: string) => `${prefix}_test`,
 }));
+
 vi.mock("@nexus/db", () => ({
   verificationRepository: {
     findPendingForTarget: mocks.findPending,
     createRequest: mocks.create,
+    listByRequester: mocks.listByRequester,
   },
   userRepository: { listModeratorIds: mocks.moderators },
-  notificationRepository: { create: mocks.notify },
-  organizationRepository: {},
+  organizationRepository: {
+    findById: mocks.findOrganization,
+    listUserMemberships: mocks.memberships,
+  },
 }));
+
 vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
-  dispatchNotificationsBestEffort: mocks.push,
+  dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 
-import { POST } from "../apps/web/src/app/api/verification/route";
+import {
+  GET,
+  POST,
+} from "../apps/web/src/app/api/verification/route";
 
-function request(body: unknown = { targetType: "user", targetId: "u_1" }) {
-  const req = new NextRequest("https://nexus.test/api/verification", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  req.cookies.set("nexus_session", "session");
-  return req;
+function postRequest(
+  body: unknown = { targetType: "user", targetId: "u_1" },
+) {
+  const request = new NextRequest(
+    "https://nexus.test/api/verification",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+  );
+  request.cookies.set("nexus_session", "session");
+  return request;
+}
+
+function getRequest() {
+  const request = new NextRequest(
+    "https://nexus.test/api/verification",
+  );
+  request.cookies.set("nexus_session", "session");
+  return request;
+}
+
+function expectPrivate(response: Response) {
+  expect(response.headers.get("Cache-Control")).toBe(
+    "private, no-store",
+  );
+  expect(response.headers.get("Vary")).toBe("Cookie");
 }
 
 beforeEach(() => {
@@ -72,54 +103,93 @@ beforeEach(() => {
   state.user = { id: "u_1", isVerified: false };
   mocks.rate.mockResolvedValue({ success: true });
   mocks.findPending.mockResolvedValue(null);
-  mocks.create.mockResolvedValue({ id: "ver_test", status: "pending" });
-  mocks.moderators.mockResolvedValue(["mod_1", "mod_2"]);
-  mocks.notify.mockImplementation(async (input) => ({
-    ...input,
-    createdAt: new Date(),
-    isRead: false,
-  }));
-  mocks.push.mockResolvedValue({
-    notifications: 2,
-    attempted: 0,
-    delivered: 0,
-    failed: 0,
-    stale: 0,
-    deliveryErrors: 0,
+  mocks.create.mockResolvedValue({
+    id: "ver_test",
+    status: "pending",
   });
+  mocks.listByRequester.mockResolvedValue([]);
+  mocks.moderators.mockResolvedValue(["mod_1", "mod_2"]);
+  mocks.dispatch.mockResolvedValue({
+    requested: 2,
+    stored: 2,
+    storageFailed: 0,
+    push: {
+      notifications: 2,
+      attempted: 0,
+      delivered: 0,
+      failed: 0,
+      stale: 0,
+      deliveryErrors: 0,
+    },
+  });
+  mocks.findOrganization.mockResolvedValue(null);
+  mocks.memberships.mockResolvedValue([]);
 });
 
-describe("verification notification delivery", () => {
-  it("commits the application before scheduling moderator inbox and push delivery", async () => {
-    const response = await POST(request());
+describe("verification HTTP behavior", () => {
+  it("keeps unauthenticated and authenticated history reads private", async () => {
+    state.user = null;
+    const denied = await GET(getRequest());
+    expect(denied.status).toBe(401);
+    expectPrivate(denied);
+
+    state.user = { id: "u_1", isVerified: false };
+    mocks.listByRequester.mockResolvedValue([
+      { id: "ver_history", status: "approved" },
+    ]);
+    const allowed = await GET(getRequest());
+    expect(allowed.status).toBe(200);
+    expectPrivate(allowed);
+    expect(await allowed.json()).toEqual({
+      requests: [{ id: "ver_history", status: "approved" }],
+    });
+    expect(mocks.listByRequester).toHaveBeenCalledWith("u_1");
+  });
+
+  it("commits the application before moderator notification dispatch", async () => {
+    const response = await POST(postRequest());
+
     expect(response.status).toBe(201);
+    expectPrivate(response);
     expect(mocks.create).toHaveBeenCalledWith(
-      expect.objectContaining({ requesterId: "u_1", targetId: "u_1" }),
-      expect.objectContaining({ action: "verification.requested" }),
+      expect.objectContaining({
+        requesterId: "u_1",
+        targetType: "user",
+        targetId: "u_1",
+      }),
+      expect.objectContaining({
+        action: "verification.requested",
+      }),
     );
     expect(afterMock).toHaveBeenCalledOnce();
     expect(mocks.moderators).not.toHaveBeenCalled();
-    expect(mocks.notify).not.toHaveBeenCalled();
-    expect(mocks.push).not.toHaveBeenCalled();
+    expect(mocks.dispatch).not.toHaveBeenCalled();
 
     await state.afterCallbacks[0]?.();
 
     expect(mocks.moderators).toHaveBeenCalledOnce();
-    expect(mocks.notify).toHaveBeenCalledTimes(2);
-    expect(mocks.notify).toHaveBeenCalledWith(
-      expect.objectContaining({ recipientId: "mod_2" }),
-    );
-    expect(mocks.push).toHaveBeenCalledOnce();
-    expect(mocks.push.mock.calls[0]?.[0]).toHaveLength(2);
+    expect(mocks.dispatch).toHaveBeenCalledWith([
+      expect.objectContaining({
+        recipientId: "mod_1",
+        type: "security",
+      }),
+      expect.objectContaining({
+        recipientId: "mod_2",
+        type: "security",
+      }),
+    ]);
   });
 
-  it("reports a saved application as successful even when notification lookup fails", async () => {
+  it("keeps a committed application successful when moderator lookup fails", async () => {
     mocks.moderators.mockRejectedValueOnce(
-      new Error("Delivery database unavailable"),
+      new Error("moderator lookup unavailable"),
     );
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const warning = vi
+      .spyOn(console, "warn")
+      .mockImplementation(() => undefined);
+
     try {
-      const response = await POST(request());
+      const response = await POST(postRequest());
       expect(response.status).toBe(201);
       expect(await response.json()).toMatchObject({
         success: true,
@@ -129,84 +199,146 @@ describe("verification notification delivery", () => {
       await state.afterCallbacks[0]?.();
 
       expect(mocks.create).toHaveBeenCalledOnce();
-      expect(warn).toHaveBeenCalledOnce();
-      expect(mocks.push).not.toHaveBeenCalled();
+      expect(mocks.dispatch).not.toHaveBeenCalled();
+      expect(warning).toHaveBeenCalledOnce();
     } finally {
-      warn.mockRestore();
+      warning.mockRestore();
     }
   });
 
-  it("pushes only successfully stored moderator notifications", async () => {
-    mocks.notify
-      .mockResolvedValueOnce({
-        id: "not_1",
-        recipientId: "mod_1",
-        title: "New verification request",
-        message: "user verification requested for u_1",
-        link: "/admin?verificationView=pending&verificationPage=1",
-        type: "security",
-        createdAt: new Date(),
-        isRead: false,
-      })
-      .mockRejectedValueOnce(new Error("Recipient storage unavailable"));
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    try {
-      const response = await POST(request());
-      expect(response.status).toBe(201);
+  it("reports partial moderator inbox storage without changing the committed request", async () => {
+    mocks.dispatch.mockResolvedValueOnce({
+      requested: 2,
+      stored: 1,
+      storageFailed: 1,
+      push: {
+        notifications: 1,
+        attempted: 0,
+        delivered: 0,
+        failed: 0,
+        stale: 0,
+        deliveryErrors: 0,
+      },
+    });
+    const warning = vi
+      .spyOn(console, "warn")
+      .mockImplementation(() => undefined);
 
+    try {
+      const response = await POST(postRequest());
+      expect(response.status).toBe(201);
       await state.afterCallbacks[0]?.();
 
-      expect(mocks.notify).toHaveBeenCalledTimes(2);
-      expect(warn).toHaveBeenCalledWith(
+      expect(warning).toHaveBeenCalledWith(
         "Verification notification delivery failures:",
         1,
       );
-      expect(mocks.push).toHaveBeenCalledWith([
-        expect.objectContaining({
-          id: "not_1",
-          recipientId: "mod_1",
-        }),
-      ]);
     } finally {
-      warn.mockRestore();
+      warning.mockRestore();
     }
   });
 
-  it("does not schedule notifications if the application was not saved", async () => {
-    mocks.create.mockRejectedValueOnce(new Error("Insert failed"));
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+  it("rejects verification of another user profile before duplicate or write checks", async () => {
+    const response = await POST(
+      postRequest({
+        targetType: "user",
+        targetId: "u_other",
+      }),
+    );
+
+    expect(response.status).toBe(403);
+    expectPrivate(response);
+    expect(await response.json()).toEqual({
+      error: "You can only verify your own profile",
+    });
+    expect(mocks.findPending).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("forces server ownership through the dedicated MTA control challenge", async () => {
+    const response = await POST(
+      postRequest({
+        targetType: "server",
+        targetId: "srv_1",
+      }),
+    );
+
+    expect(response.status).toBe(422);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({
+      code: "SERVER_CONTROL_CHALLENGE_REQUIRED",
+    });
+    expect(mocks.findPending).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("returns the canonical pending request for a duplicate target", async () => {
+    mocks.findPending.mockResolvedValueOnce({
+      id: "ver_existing",
+      status: "pending",
+    });
+
+    const response = await POST(postRequest());
+
+    expect(response.status).toBe(409);
+    expectPrivate(response);
+    expect(await response.json()).toEqual({
+      error: "A verification request is already pending",
+      requestId: "ver_existing",
+    });
+    expect(mocks.create).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects already-verified targets before creating another request", async () => {
+    state.user = { id: "u_1", isVerified: true };
+
+    const response = await POST(postRequest());
+
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({
+      error: "This target is already verified",
+    });
+    expect(mocks.findPending).not.toHaveBeenCalled();
+    expect(mocks.create).not.toHaveBeenCalled();
+  });
+
+  it("rejects unsafe proof schemes and oversized target IDs before writes", async () => {
+    for (const body of [
+      {
+        targetType: "user",
+        targetId: "u_1",
+        proofUrl: "javascript:alert(1)",
+      },
+      {
+        targetType: "user",
+        targetId: "x".repeat(129),
+      },
+    ]) {
+      const response = await POST(postRequest(body));
+      expect(response.status).toBe(400);
+      expectPrivate(response);
+    }
+    expect(mocks.create).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("does not schedule moderator delivery when the application transaction fails", async () => {
+    mocks.create.mockRejectedValueOnce(new Error("insert failed"));
+    const error = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
     try {
-      expect((await POST(request())).status).toBe(500);
+      const response = await POST(postRequest());
+      expect(response.status).toBe(500);
+      expectPrivate(response);
       expect(afterMock).not.toHaveBeenCalled();
       expect(mocks.moderators).not.toHaveBeenCalled();
     } finally {
       error.mockRestore();
     }
-  });
-
-  it("rejects unsafe proof schemes and excessive target IDs before creating a request", async () => {
-    expect(
-      (
-        await POST(
-          request({
-            targetType: "user",
-            targetId: "u_1",
-            proofUrl: "javascript:alert(1)",
-          }),
-        )
-      ).status,
-    ).toBe(400);
-    expect(
-      (
-        await POST(
-          request({
-            targetType: "user",
-            targetId: "x".repeat(129),
-          }),
-        )
-      ).status,
-    ).toBe(400);
-    expect(mocks.create).not.toHaveBeenCalled();
-    expect(afterMock).not.toHaveBeenCalled();
   });
 });
