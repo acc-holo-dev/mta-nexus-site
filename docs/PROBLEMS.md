@@ -217,6 +217,10 @@ CHECK, известный алиас tool → plugin и отказ на неиз
 - root `tests/` импортируют `next/server`, `drizzle-orm` — работает через
   root devDependencies (`ea5235c`); долгосрочно тесты стоит перенести в
   соответствующие пакеты воркспейса;
+- private GET cache source policy заменён прямыми HTTP response assertions:
+  auth context, notification preferences/inbox, reports, verification, follow
+  и downloads подтверждают `private, no-store` + `Vary: Cookie`, а
+  products/servers/content/search/MTA directory — явный public cache contract;
 - surface-тесты сверяют точные строки исходников — ломаются при
   переформатировании; при правках предпочитать regex/поведенческие проверки.
   Discover query parsing/href contract уже переведён на прямую поведенческую
