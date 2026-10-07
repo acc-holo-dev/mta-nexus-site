@@ -112,8 +112,6 @@ export async function POST(request: NextRequest) {
         category: parsed.data.category,
         subject: parsed.data.subject,
         status: "open",
-        relatedType: parsed.data.relatedType,
-        relatedId: parsed.data.relatedId,
       },
       {
         id: generateId("spm"),
@@ -131,7 +129,6 @@ export async function POST(request: NextRequest) {
         targetType: "support_case",
         details: {
           category: parsed.data.category,
-          relatedType: parsed.data.relatedType ?? null,
         },
       },
     );

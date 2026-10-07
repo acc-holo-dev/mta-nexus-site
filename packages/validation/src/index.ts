@@ -2,7 +2,6 @@ import {
   PRODUCT_TYPES,
   SUPPORT_CASE_CATEGORIES,
   SUPPORT_CASE_STATUSES,
-  SUPPORT_RELATED_TYPES,
 } from "@nexus/domain";
 import { z } from "zod";
 
@@ -271,17 +270,8 @@ export const createSupportCaseSchema = z
     category: z.enum(SUPPORT_CASE_CATEGORIES),
     subject: z.string().trim().min(5).max(120),
     message: z.string().trim().min(10).max(4_000),
-    relatedType: z.enum(SUPPORT_RELATED_TYPES).optional(),
-    relatedId: z.string().trim().min(1).max(128).optional(),
   })
-  .strict()
-  .refine(
-    (value) => Boolean(value.relatedType) === Boolean(value.relatedId),
-    {
-      message: "relatedType and relatedId must be provided together",
-      path: ["relatedId"],
-    },
-  );
+  .strict();
 
 export const createSupportMessageSchema = z
   .object({

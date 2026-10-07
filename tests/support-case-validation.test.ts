@@ -6,7 +6,7 @@ import {
 } from "@nexus/validation";
 
 describe("support validation", () => {
-  it("accepts bounded cases and requires related entity pairs", () => {
+  it("accepts bounded cases and rejects unverified related entity context", () => {
     expect(
       createSupportCaseSchema.safeParse({
         category: "account",
@@ -17,10 +17,11 @@ describe("support validation", () => {
 
     expect(
       createSupportCaseSchema.safeParse({
-        category: "resource",
-        subject: "Resource install problem",
-        message: "The resource fails during installation after download.",
-        relatedType: "product",
+        category: "purchase",
+        subject: "Order context must be verified",
+        message: "A client must not attach an arbitrary purchase to a support case.",
+        relatedType: "purchase",
+        relatedId: "ord_someone_else",
       }).success,
     ).toBe(false);
 

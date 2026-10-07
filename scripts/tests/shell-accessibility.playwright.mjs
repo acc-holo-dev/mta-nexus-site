@@ -108,7 +108,7 @@ for (const locale of ["en", "ru"]) {
     const headings = { "/market": dictionary.market.title, "/discover": dictionary.discover.title,
       "/workspace": dictionary.workspace.signInRequired, "/workspace/resources": dictionary.workspace.signInRequired,
       "/notifications": dictionary.notifications.title, "/settings": dictionary.settings.signInRequired,
-      "/auth/login": dictionary.auth.loginTitle };
+      "/support": dictionary.support.title, "/auth/login": dictionary.auth.loginTitle };
     const routes = Object.keys(headings);
     for (const width of [320, 390, 1280]) {
       await page.setViewportSize({ width, height: 844 });
@@ -128,7 +128,7 @@ for (const locale of ["en", "ru"]) {
           if (route.startsWith("/workspace")) await expect(navigation.getByRole("button", { name: dictionary.nav.more, exact: true })).toHaveAttribute("aria-current", "page");
         }
       }
-      evidence.push(`${locale}: seven core routes at ${width}px, localized headings, labeled fields and mobile current-route state`);
+      evidence.push(`${locale}: eight core routes at ${width}px, localized headings, labeled fields and mobile current-route state`);
     }
     await page.setViewportSize({ width: 390, height: 480 });
     await page.goto("/market");
@@ -179,10 +179,37 @@ for (const locale of ["en", "ru"]) {
     await page.keyboard.press("Escape");
     await expect(moreDialog).toHaveCount(0);
     await expect(moreButton).toBeFocused();
+
+    await page.keyboard.press("Enter");
+    const reopenedMoreDialog = page.getByRole("dialog", {
+      name: dictionary.nav.more,
+      exact: true,
+    });
+    await reopenedMoreDialog
+      .getByRole("link", {
+        name: dictionary.nav.support,
+        exact: true,
+      })
+      .click();
+    await expect(page).toHaveURL(/\/support$/u);
+    await expect(
+      page.getByRole("main").getByRole("heading", {
+        level: 1,
+        name: dictionary.support.title,
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("main").getByRole("link", {
+        name: dictionary.support.signIn,
+        exact: true,
+      }),
+    ).toHaveAttribute("href", "/auth/login");
     evidence.push(
-      `${locale}: mobile More menu exposes implemented secondary destinations and restores focus`,
+      `${locale}: mobile More menu restores focus and routes guests to the real Support sign-in state`,
     );
 
+    await page.goto("/market");
     const mobileSearchTrigger = page
       .getByRole("banner")
       .getByRole("link", { name: dictionary.nav.search, exact: true });

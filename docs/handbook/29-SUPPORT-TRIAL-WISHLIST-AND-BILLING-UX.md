@@ -11,6 +11,7 @@
 - audit events for case creation, replies and status changes;
 - dedicated rate limits for case/message spam;
 - RU/EN user UI and mobile `More -> Support` access;
+- public case creation intentionally does **not** accept arbitrary related purchase/license/product IDs until server-side ownership/context verification exists;
 - no hard response-time promise during closed beta.
 
 Пока **не** реализованы evidence attachments, seller/team routing, purchase/license auto-context, assignment/priority/SLA automation и отдельная Support staff capability. Current staff access временно использует `admin.moderation`, пока не внедрена broader many-to-many staff model.
