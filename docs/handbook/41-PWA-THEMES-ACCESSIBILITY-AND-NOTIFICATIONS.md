@@ -19,7 +19,9 @@ Chromium release acceptance теперь также покрывает RU/EN log
 
 Free-resource acquisition acceptance теперь дополнительно проходит keyboard-only Add-to-library → claim → return → download error/cancel и reflow 320/390 px поверх реального entitlement/download flow. Это закрывает бесплатную acquisition/download часть accessibility; paid cart/checkout/license/payment UI остаётся отдельным будущим commerce gate и не симулируется.
 
-Ещё не закрыты target requirements этой главы: **Web Push delivery/dispatcher и production VAPID wiring**, policy для кеширования ранее просмотренного публичного read-only content, paid commerce accessibility acceptance и полный WCAG 2.2 AA screen-reader audit.
+Web Push delivery coordinator теперь готовит bounded payload, отправляет только по active repository subscriptions, считает delivered/failed/stale и удаляет terminal 404/410 endpoints. Sender передаётся адаптером, поэтому orchestration тестируется без сетевого push provider.
+
+Ещё не закрыты target requirements этой главы: **реальный Web Push encryption/VAPID HTTP sender и event/worker wiring**, policy для кеширования ранее просмотренного публичного read-only content, paid commerce accessibility acceptance и полный WCAG 2.2 AA screen-reader audit.
 
 ## 1. Public release quality bar
 
