@@ -69,6 +69,17 @@ vi.mock(
   }),
 );
 
+vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
+  deliverStoredNotificationsWebPush: vi.fn(async () => ({
+    notifications: 0,
+    attempted: 0,
+    delivered: 0,
+    failed: 0,
+    stale: 0,
+    deliveryErrors: 0,
+  })),
+}));
+
 vi.mock("@nexus/db", () => ({
   productRepository: {
     updateWithAudit: vi.fn(),
