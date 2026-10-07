@@ -1,6 +1,4 @@
-import {
-  notificationRepository,
-  serverClaimChallengeRepository,
+import {  serverClaimChallengeRepository,
   serverRepository,
   userRepository,
 } from "@nexus/db";
@@ -18,7 +16,7 @@ import {
   mtaMasterDirectoryService,
 } from "./mta-master-directory-service";
 import { serverService } from "./server-service";
-import { deliverStoredNotificationsWebPush } from "./notification-web-push-service";
+import { dispatchNotificationsBestEffort } from "./notification-dispatch-service";
 
 async function assertRequesterCanChallenge(
   server: Server,
@@ -47,25 +45,16 @@ export async function notifyModeratorsOfServerClaim(
 ): Promise<void> {
   try {
     const moderatorIds = await userRepository.listModeratorIds();
-    const deliveries = await Promise.allSettled(
-      moderatorIds.map((moderatorId) =>
-        notificationRepository.create({
-          id: generateId("not"),
-          recipientId: moderatorId,
-          title: "Server ownership proof requires review",
-          message: `MTA control proof verified for ${serverName}`,
-          link: "/admin",
-          type: "security",
-          category: "security",
-        }),
-      ),
+    await dispatchNotificationsBestEffort(
+      moderatorIds.map((moderatorId) => ({
+        recipientId: moderatorId,
+        title: "Server ownership proof requires review",
+        message: "MTA control proof verified for " + serverName,
+        link: "/admin",
+        type: "security" as const,
+        category: "security" as const,
+      })),
     );
-    const storedNotifications = deliveries.flatMap((delivery) =>
-      delivery.status === "fulfilled" && delivery.value
-        ? [delivery.value]
-        : [],
-    );
-    await deliverStoredNotificationsWebPush(storedNotifications);
   } catch {
     // The durable verification request is the source of truth. Moderator
     // inbox/push delivery is secondary and must not affect proof success.

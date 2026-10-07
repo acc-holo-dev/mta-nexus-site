@@ -5,11 +5,9 @@ import {
   userRepository,
   serverRepository,
   productRepository,
-  organizationRepository,
-  notificationRepository,
-} from "@nexus/db";
+  organizationRepository,} from "@nexus/db";
 import { consumeRateLimit, generateId } from "@nexus/security";
-import { deliverStoredNotificationsWebPush } from "../../../lib/services/notification-web-push-service";
+import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -140,7 +138,8 @@ export async function POST(request: NextRequest) {
     if (targetType === "user" && targetId !== user.id) {
       after(async () => {
         try {
-          const created = await notificationRepository.create({
+          await dispatchNotificationsBestEffort([
+            {
             id: generateId("not"),
             recipientId: targetId,
             title: "New Follower",
@@ -148,10 +147,8 @@ export async function POST(request: NextRequest) {
             type: "system",
             category: "follow",
             link: `/users/${user.username}`,
-          });
-          if (created) {
-            await deliverStoredNotificationsWebPush([created]);
-          }
+          },
+          ]);
         } catch (error) {
           // The follow already committed. Notification/push delivery remains best effort.
           console.error("Follow notification delivery failed:", error);

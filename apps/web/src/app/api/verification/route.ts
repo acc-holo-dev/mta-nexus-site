@@ -1,8 +1,6 @@
 import { after, type NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
-import {
-  notificationRepository,
-  organizationRepository,
+import {  organizationRepository,
   userRepository,
   verificationRepository,
 } from "@nexus/db";
@@ -12,7 +10,7 @@ import {
 } from "@nexus/security";
 import { z } from "zod";
 import { AppError } from "@nexus/domain";
-import { deliverStoredNotificationsWebPush } from "../../../lib/services/notification-web-push-service";
+import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -200,34 +198,24 @@ export async function POST(request: NextRequest) {
     after(async () => {
       try {
         const moderatorIds = await userRepository.listModeratorIds();
-        const deliveries = await Promise.allSettled(
-          moderatorIds.map((moderatorId) =>
-            notificationRepository.create({
-              id: generateId("not"),
-              recipientId: moderatorId,
-              title: "New verification request",
-              message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
-              link: "/admin?verificationView=pending&verificationPage=1",
-              type: "security",
-            }),
-          ),
+        const dispatch = await dispatchNotificationsBestEffort(
+          moderatorIds.map((moderatorId) => ({
+            recipientId: moderatorId,
+            title: "New verification request",
+            message:
+              parsed.data.targetType +
+              " verification requested for " +
+              parsed.data.targetId,
+            link: "/admin?verificationView=pending&verificationPage=1",
+            type: "security" as const,
+          })),
         );
-        const failures = deliveries.filter(
-          (delivery) => delivery.status === "rejected",
-        ).length;
-        if (failures) {
+        if (dispatch.storageFailed) {
           console.warn(
             "Verification notification delivery failures:",
-            failures,
+            dispatch.storageFailed,
           );
         }
-
-        const storedNotifications = deliveries.flatMap((delivery) =>
-          delivery.status === "fulfilled" && delivery.value
-            ? [delivery.value]
-            : [],
-        );
-        await deliverStoredNotificationsWebPush(storedNotifications);
       } catch (error) {
         console.warn("Verification moderator lookup failed:", error);
       }

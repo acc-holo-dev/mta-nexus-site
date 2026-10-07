@@ -1,11 +1,10 @@
 import { after, type NextRequest, NextResponse } from "next/server";
 import { contentService } from "../../../../../lib/services/content-service";
 import { authService } from "../../../../../lib/services/auth-service";
-import { notificationRepository } from "@nexus/db";
 import { createContentCommentSchema } from "@nexus/validation";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
-import { deliverStoredNotificationsWebPush } from "../../../../../lib/services/notification-web-push-service";
+import { dispatchNotificationsBestEffort } from "../../../../../lib/services/notification-dispatch-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -75,7 +74,8 @@ export async function POST(
     if (article.authorId !== user.id) {
       after(async () => {
         try {
-          const created = await notificationRepository.create({
+          await dispatchNotificationsBestEffort([
+            {
             id: generateId("not"),
             recipientId: article.authorId,
             title: "New article comment",
@@ -83,10 +83,8 @@ export async function POST(
             type: "content",
             category: "content",
             link: `/articles/${article.slug}`,
-          });
-          if (created) {
-            await deliverStoredNotificationsWebPush([created]);
-          }
+          },
+          ]);
         } catch {
           // The comment commit is authoritative; notification/push is best effort.
         }

@@ -1,9 +1,7 @@
 import { after, type NextRequest } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
-  contentRepository,
-  notificationRepository,
-  productRepository,
+  contentRepository,  productRepository,
   reportRepository,
   serverRepository,
   userRepository,
@@ -12,7 +10,7 @@ import { createReportSchema } from "@nexus/validation";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
 
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../lib/observability";
-import { deliverStoredNotificationsWebPush } from "../../../lib/services/notification-web-push-service";
+import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
@@ -129,39 +127,32 @@ export async function POST(request: NextRequest) {
     after(async () => {
       try {
         const moderators = await userRepository.listModeratorIds();
-        const deliveries = await Promise.allSettled(
-          moderators.map((moderatorId) =>
-            notificationRepository.create({
-              id: generateId("not"),
-              recipientId: moderatorId,
-              title: "New report requires review",
-              message: `${parsed.data.type} report for ${parsed.data.targetType}:${parsed.data.targetId}`,
-              link: "/admin",
-              type: "security",
-            }),
-          ),
+        const dispatch = await dispatchNotificationsBestEffort(
+          moderators.map((moderatorId) => ({
+            recipientId: moderatorId,
+            title: "New report requires review",
+            message:
+              parsed.data.type +
+              " report for " +
+              parsed.data.targetType +
+              ":" +
+              parsed.data.targetId,
+            link: "/admin",
+            type: "security" as const,
+          })),
         );
-        const failures = deliveries.filter(
-          (delivery) => delivery.status === "rejected",
-        ).length;
-        if (failures) {
+        if (dispatch.storageFailed) {
           logRequestEvent({
             level: "warn",
             event: "moderation.report_notification_failed",
             context,
             status: 201,
             error: new Error(
-              `${failures} moderator notification deliveries failed`,
+              dispatch.storageFailed +
+                " moderator notification deliveries failed",
             ),
           });
         }
-
-        const storedNotifications = deliveries.flatMap((delivery) =>
-          delivery.status === "fulfilled" && delivery.value
-            ? [delivery.value]
-            : [],
-        );
-        await deliverStoredNotificationsWebPush(storedNotifications);
       } catch (error) {
         logRequestEvent({
           level: "warn",
