@@ -1,5 +1,74 @@
 import { z } from "zod";
 
+const BASE64URL_PATTERN = /^[A-Za-z0-9_-]+$/u;
+const P256_ORDER =
+  0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551n;
+
+function decodeBase64Url(value: string): Uint8Array | null {
+  if (!BASE64URL_PATTERN.test(value)) return null;
+  const padding = "=".repeat((4 - (value.length % 4)) % 4);
+  const base64 = (value + padding).replace(/-/gu, "+").replace(/_/gu, "/");
+  try {
+    const raw = atob(base64);
+    return Uint8Array.from(raw, (character) => character.charCodeAt(0));
+  } catch {
+    return null;
+  }
+}
+
+export function isValidWebPushP256PublicKey(value: string): boolean {
+  const decoded = decodeBase64Url(value);
+  return decoded?.length === 65 && decoded[0] === 0x04;
+}
+
+export function isValidWebPushAuthSecret(value: string): boolean {
+  return decodeBase64Url(value)?.length === 16;
+}
+
+export function isValidWebPushP256PrivateKey(value: string): boolean {
+  const decoded = decodeBase64Url(value);
+  if (decoded?.length !== 32) return false;
+  let scalar = 0n;
+  for (const byte of decoded) scalar = (scalar << 8n) | BigInt(byte);
+  return scalar > 0n && scalar < P256_ORDER;
+}
+
+export function isValidVapidSubject(value: string): boolean {
+  try {
+    const subject = new URL(value);
+    if (subject.protocol === "https:") return Boolean(subject.hostname);
+    return subject.protocol === "mailto:" && subject.pathname.includes("@");
+  } catch {
+    return false;
+  }
+}
+
+export type WebPushVapidConfig = {
+  publicKey: string;
+  privateKey: string;
+  subject: string;
+};
+
+export function readWebPushVapidConfig(
+  env: Record<string, string | undefined> = process.env,
+): WebPushVapidConfig | null {
+  const publicKey = env.WEB_PUSH_VAPID_PUBLIC_KEY?.trim() ?? "";
+  const privateKey = env.WEB_PUSH_VAPID_PRIVATE_KEY?.trim() ?? "";
+  const subject = env.WEB_PUSH_VAPID_SUBJECT?.trim() ?? "";
+  if (!publicKey && !privateKey && !subject) return null;
+  if (
+    !publicKey ||
+    !privateKey ||
+    !subject ||
+    !isValidWebPushP256PublicKey(publicKey) ||
+    !isValidWebPushP256PrivateKey(privateKey) ||
+    !isValidVapidSubject(subject)
+  ) {
+    throw new Error("Invalid Web Push VAPID configuration");
+  }
+  return { publicKey, privateKey, subject };
+}
+
 const developmentDefaults = {
   NODE_ENV: "development",
   PORT: "3000",
@@ -24,6 +93,9 @@ const developmentDefaults = {
   SMTP_USER: "",
   SMTP_PASS: "",
   SMTP_FROM: "no-reply@mta-nexus.test",
+  WEB_PUSH_VAPID_PUBLIC_KEY: "",
+  WEB_PUSH_VAPID_PRIVATE_KEY: "",
+  WEB_PUSH_VAPID_SUBJECT: "",
 } as const;
 
 export const envSchema = z
@@ -51,6 +123,9 @@ export const envSchema = z
     SMTP_USER: z.string(),
     SMTP_PASS: z.string(),
     SMTP_FROM: z.string().email(),
+    WEB_PUSH_VAPID_PUBLIC_KEY: z.string(),
+    WEB_PUSH_VAPID_PRIVATE_KEY: z.string(),
+    WEB_PUSH_VAPID_SUBJECT: z.string(),
   })
   .superRefine((value, ctx) => {
     const addIssue = (path: keyof typeof value, message: string) =>
@@ -58,6 +133,45 @@ export const envSchema = z
 
     if (Boolean(value.DISCORD_CLIENT_ID) !== Boolean(value.DISCORD_CLIENT_SECRET)) {
       addIssue("DISCORD_CLIENT_SECRET", "Discord client ID and secret must be configured together");
+    }
+
+    const webPushConfigured = [
+      value.WEB_PUSH_VAPID_PUBLIC_KEY,
+      value.WEB_PUSH_VAPID_PRIVATE_KEY,
+      value.WEB_PUSH_VAPID_SUBJECT,
+    ].filter(Boolean).length;
+    if (webPushConfigured !== 0 && webPushConfigured !== 3) {
+      addIssue(
+        "WEB_PUSH_VAPID_PUBLIC_KEY",
+        "Web Push VAPID public key, private key and subject must be configured together",
+      );
+    }
+    if (
+      value.WEB_PUSH_VAPID_PUBLIC_KEY &&
+      !isValidWebPushP256PublicKey(value.WEB_PUSH_VAPID_PUBLIC_KEY)
+    ) {
+      addIssue(
+        "WEB_PUSH_VAPID_PUBLIC_KEY",
+        "Web Push public key must be an uncompressed P-256 public key",
+      );
+    }
+    if (
+      value.WEB_PUSH_VAPID_PRIVATE_KEY &&
+      !isValidWebPushP256PrivateKey(value.WEB_PUSH_VAPID_PRIVATE_KEY)
+    ) {
+      addIssue(
+        "WEB_PUSH_VAPID_PRIVATE_KEY",
+        "Web Push private key must be a valid P-256 scalar",
+      );
+    }
+    if (
+      value.WEB_PUSH_VAPID_SUBJECT &&
+      !isValidVapidSubject(value.WEB_PUSH_VAPID_SUBJECT)
+    ) {
+      addIssue(
+        "WEB_PUSH_VAPID_SUBJECT",
+        "Web Push VAPID subject must use mailto: or HTTPS",
+      );
     }
 
     if (value.STORAGE_PROVIDER === "local" && !value.STORAGE_LOCAL_PATH) {
@@ -128,6 +242,9 @@ export function getEnvConfig(env: Record<string, string | undefined> = process.e
         SMTP_USER: "",
         SMTP_PASS: "",
         SMTP_FROM: "no-reply@nexus-mta.invalid",
+        WEB_PUSH_VAPID_PUBLIC_KEY: "",
+        WEB_PUSH_VAPID_PRIVATE_KEY: "",
+        WEB_PUSH_VAPID_SUBJECT: "",
         ...env,
       }
     : { ...developmentDefaults, ...env };

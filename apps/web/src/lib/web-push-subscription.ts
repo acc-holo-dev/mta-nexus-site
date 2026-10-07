@@ -1,3 +1,8 @@
+import {
+  isValidWebPushAuthSecret,
+  isValidWebPushP256PublicKey,
+} from "@nexus/config";
+
 export type ParsedWebPushSubscription = {
   endpoint: string;
   expirationAt: Date | null;
@@ -12,32 +17,9 @@ function boundedString(value: unknown, maxLength: number): string | null {
   return trimmed;
 }
 
-function decodeBase64Url(value: string): Uint8Array | null {
-  if (!/^[A-Za-z0-9_-]+$/u.test(value)) return null;
-
-  const padding = "=".repeat((4 - (value.length % 4)) % 4);
-  const base64 = (value + padding).replace(/-/gu, "+").replace(/_/gu, "/");
-
-  try {
-    const raw = atob(base64);
-    return Uint8Array.from(raw, (character) => character.charCodeAt(0));
-  } catch {
-    return null;
-  }
-}
-
-function isUncompressedP256Key(value: string): boolean {
-  const decoded = decodeBase64Url(value);
-  return decoded?.length === 65 && decoded[0] === 0x04;
-}
-
-function isAuthSecret(value: string): boolean {
-  return decodeBase64Url(value)?.length === 16;
-}
-
 export function parseWebPushVapidPublicKey(value: unknown): string | null {
   const key = boundedString(value, 128);
-  return key && isUncompressedP256Key(key) ? key : null;
+  return key && isValidWebPushP256PublicKey(key) ? key : null;
 }
 
 export function parseWebPushSubscription(
@@ -58,8 +40,8 @@ export function parseWebPushSubscription(
     !endpoint ||
     !p256dh ||
     !auth ||
-    !isUncompressedP256Key(p256dh) ||
-    !isAuthSecret(auth)
+    !isValidWebPushP256PublicKey(p256dh) ||
+    !isValidWebPushAuthSecret(auth)
   ) {
     return null;
   }

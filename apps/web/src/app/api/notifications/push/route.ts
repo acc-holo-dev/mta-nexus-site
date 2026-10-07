@@ -1,18 +1,18 @@
+import { readWebPushVapidConfig } from "@nexus/config";
 import { NextResponse, type NextRequest } from "next/server";
 import { webPushSubscriptionRepository } from "@nexus/db";
 import { consumeRateLimit, generateId } from "@nexus/security";
-import {
-  parseWebPushSubscription,
-  parseWebPushVapidPublicKey,
-} from "../../../../lib/web-push-subscription";
+import { parseWebPushSubscription } from "../../../../lib/web-push-subscription";
 import { authService } from "../../../../lib/services/auth-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
 function publicKey() {
-  return parseWebPushVapidPublicKey(
-    process.env.WEB_PUSH_VAPID_PUBLIC_KEY,
-  );
+  try {
+    return readWebPushVapidConfig()?.publicKey ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function requireSession(request: NextRequest) {

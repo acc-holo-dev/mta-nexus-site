@@ -1,5 +1,19 @@
+import { Buffer } from "node:buffer";
 import { describe, expect, it } from "vitest";
-import { getEnvConfig } from "@nexus/config";
+import {
+  getEnvConfig,
+  readWebPushVapidConfig,
+} from "@nexus/config";
+
+function vapidPublicKey(fill = 1) {
+  const bytes = new Uint8Array(65).fill(fill);
+  bytes[0] = 0x04;
+  return Buffer.from(bytes).toString("base64url");
+}
+
+function vapidPrivateKey(fill = 2) {
+  return Buffer.from(new Uint8Array(32).fill(fill)).toString("base64url");
+}
 
 describe("production configuration", () => {
   it("fails closed when production secrets and providers are missing", () => {
@@ -73,5 +87,67 @@ describe("production configuration", () => {
       EMAIL_PROVIDER: "disabled",
       BUILD_SCANNER: "disabled",
     })).toThrow("Invalid configuration parameters");
+  });
+});
+
+
+describe("Web Push VAPID configuration", () => {
+  const valid = {
+    WEB_PUSH_VAPID_PUBLIC_KEY: vapidPublicKey(),
+    WEB_PUSH_VAPID_PRIVATE_KEY: vapidPrivateKey(),
+    WEB_PUSH_VAPID_SUBJECT: "mailto:ops@nexus.example.com",
+  };
+
+  it("accepts a complete VAPID triplet", () => {
+    expect(readWebPushVapidConfig(valid)).toEqual({
+      publicKey: valid.WEB_PUSH_VAPID_PUBLIC_KEY,
+      privateKey: valid.WEB_PUSH_VAPID_PRIVATE_KEY,
+      subject: valid.WEB_PUSH_VAPID_SUBJECT,
+    });
+  });
+
+  it("treats an entirely absent VAPID configuration as disabled", () => {
+    expect(readWebPushVapidConfig({})).toBeNull();
+  });
+
+  it("rejects partial and malformed VAPID configuration", () => {
+    expect(() =>
+      readWebPushVapidConfig({
+        WEB_PUSH_VAPID_PUBLIC_KEY: valid.WEB_PUSH_VAPID_PUBLIC_KEY,
+      }),
+    ).toThrow("Invalid Web Push VAPID configuration");
+
+    expect(() =>
+      readWebPushVapidConfig({
+        ...valid,
+        WEB_PUSH_VAPID_PRIVATE_KEY: Buffer.from(
+          new Uint8Array(32),
+        ).toString("base64url"),
+      }),
+    ).toThrow("Invalid Web Push VAPID configuration");
+
+    expect(() =>
+      readWebPushVapidConfig({
+        ...valid,
+        WEB_PUSH_VAPID_SUBJECT: "http://nexus.example.com",
+      }),
+    ).toThrow("Invalid Web Push VAPID configuration");
+  });
+
+  it("makes the production schema reject partial VAPID configuration", () => {
+    expect(() =>
+      getEnvConfig({
+        NODE_ENV: "production",
+        NEXT_PUBLIC_APP_URL: "https://nexus-mta.com",
+        DATABASE_URL: "postgres://nexus:secret@db.example.com:5432/nexus",
+        AUTH_SECRET: "a-production-secret-with-at-least-32-characters",
+        STORAGE_PROVIDER: "local",
+        STORAGE_LOCAL_PATH: "/data/uploads",
+        EMAIL_PROVIDER: "disabled",
+        BUILD_SCANNER: "clamav",
+        CLAMAV_HOST: "clamav",
+        WEB_PUSH_VAPID_PUBLIC_KEY: valid.WEB_PUSH_VAPID_PUBLIC_KEY,
+      }),
+    ).toThrow("Invalid configuration parameters");
   });
 });
