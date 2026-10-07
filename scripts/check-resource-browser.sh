@@ -19,6 +19,9 @@ author_id="usr_resource_browser_$short"
 product_id="prd_resource_browser_$short"
 build_id="bld_resource_browser_$short"
 product_slug="j5-browser-resource-$short"
+claim_server_id="srv_claim_browser_$short"
+claim_server_slug="claim-browser-$short"
+claim_server_name="Claim Browser Fixture $short"
 storage_key="ci-resource-browser/$short.zip"
 payload_file="$work/j5-browser-resource.zip"
 node --input-type=module - "$payload_file" <<'NODE'
@@ -103,6 +106,23 @@ INSERT INTO builds (
   false,
   now()
 );
+
+INSERT INTO servers (
+  id, name, slug, description, ip_address, port,
+  status, visibility, is_verified, created_at, updated_at
+) VALUES (
+  '$claim_server_id',
+  '$claim_server_name',
+  '$claim_server_slug',
+  'Disposable unowned server used only for server-claim accessibility acceptance.',
+  '203.0.113.254',
+  22003,
+  'active',
+  'public',
+  false,
+  now(),
+  now()
+);
 "
 
 export NEXUS_RESOURCE_BROWSER_PRODUCT_ID="$product_id"
@@ -110,6 +130,8 @@ export NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG="$product_slug"
 export NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE="J5 Browser Resource"
 export NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256="$expected_sha"
 export NEXUS_RESOURCE_BROWSER_EXPECTED_SIZE="$file_size"
+export NEXUS_CLAIM_BROWSER_SERVER_SLUG="$claim_server_slug"
+export NEXUS_CLAIM_BROWSER_SERVER_NAME="$claim_server_name"
 
 portfolio_sql=$(PORTFOLIO_STORAGE_KEY="$storage_key" PORTFOLIO_SHA256="$expected_sha" node --input-type=module <<'NODE'
 import { readFileSync } from 'node:fs';

@@ -10,6 +10,8 @@ assert(process.env.NEXUS_BROWSER_TOOLS);
 assert(process.env.NEXUS_BROWSER_REPORT_DIR);
 assert(process.env.NEXUS_AUTHOR_BROWSER_EMAIL);
 assert(process.env.NEXUS_AUTHOR_BROWSER_PASSWORD);
+assert(process.env.NEXUS_CLAIM_BROWSER_SERVER_SLUG);
+assert(process.env.NEXUS_CLAIM_BROWSER_SERVER_NAME);
 const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { test, expect } = require("@playwright/test");
 const evidence = [];
@@ -440,6 +442,18 @@ for (const locale of ["en", "ru"]) {
             }),
           ).toBeVisible(),
       },
+      {
+        route: `/servers/${process.env.NEXUS_CLAIM_BROWSER_SERVER_SLUG}`,
+        heading: process.env.NEXUS_CLAIM_BROWSER_SERVER_NAME,
+        ready: async () =>
+          expect(
+            page.getByRole("heading", {
+              level: 2,
+              name: dictionary.serverClaim.title,
+              exact: true,
+            }),
+          ).toBeVisible(),
+      },
     ];
 
     for (const width of [320, 390, 1280]) {
@@ -495,10 +509,23 @@ for (const locale of ["en", "ru"]) {
     await resourceTitle.focus();
     await expect(resourceTitle).toBeFocused();
 
+    await page.goto(
+      `/servers/${process.env.NEXUS_CLAIM_BROWSER_SERVER_SLUG}`,
+    );
+    const claimButton = page.getByRole("button", {
+      name: dictionary.serverClaim.create,
+      exact: true,
+    });
+    await claimButton.focus();
+    await expect(claimButton).toBeFocused();
+    await expect(
+      page.getByText(dictionary.serverClaim.exactEndpoint, { exact: true }),
+    ).toBeVisible();
+
     assert.deepEqual(errors, []);
     await logoutFixture(page);
     evidence.push(
-      `${locale}: authenticated Settings, Security Center, Support and Publish pass labeled-field, focus, reduced-motion and 320/390/1280 reflow acceptance`,
+      `${locale}: authenticated Settings, Security Center, Support, Publish and unowned Server Claim pass labeled-field, focus, reduced-motion and 320/390/1280 reflow acceptance`,
     );
   });
 }
