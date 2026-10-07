@@ -4,7 +4,7 @@ import { db } from "../client";
 import { auditEvents, sessions, users } from "../schema";
 import { accountAuthState, accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
 import { accountMailDeliveryEvents, accountMailOutbox, accountMailQueueGate } from "../account-mail-schema";
-import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
+import { type AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import type { MailContext, MailPayload } from "./account-mail-crypto";
 import { digestAccountChallenge } from "./account-challenges";
 import type { AccountMailTransportStage } from "./account-mail-smtp";
@@ -220,7 +220,9 @@ export class AccountMailWorkerRepository {
         // Keep the lease for explicit retry/discard or bounded expiry recovery.
         throw new Error("Account mail payload is unavailable");
       }
-      const sendBefore = new Date(Math.min(item.mail.leaseExpiresAt!.getTime(), item.validUntil.getTime()));
+      const leaseExpiresAt = item.mail.leaseExpiresAt;
+      if (!leaseExpiresAt) return null;
+      const sendBefore = new Date(Math.min(leaseExpiresAt.getTime(), item.validUntil.getTime()));
       if (sendBefore <= await clock(tx)) return null;
       return Object.freeze({ ...context, ...decoded, sendBefore });
     });
@@ -532,8 +534,10 @@ export class AccountMailWorkerRepository {
 
   private owns(item: NonNullable<Awaited<ReturnType<AccountMailWorkerRepository["lockLiveMail"]>>>,
     lease: MailLease, digest: string): boolean {
+    const leaseExpiresAt = item.mail.leaseExpiresAt;
     return this.matchesLease(item, lease, digest)
-      && item.mail.leaseExpiresAt! > item.now;
+      && leaseExpiresAt !== null
+      && leaseExpiresAt > item.now;
   }
 
   private async lockLiveMail(tx: Tx, id: string) {

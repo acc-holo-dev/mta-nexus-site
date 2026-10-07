@@ -133,11 +133,12 @@ export class ProductRepository {
     if (options.maxPrice !== undefined) conditions.push(lte(products.price, options.maxPrice));
     if (options.query?.trim()) {
       const pattern = containsPattern(options.query.trim());
-      conditions.push(or(
+      const searchCondition = or(
         ilike(products.title, pattern),
         ilike(products.description, pattern),
-        sql`${products.tags}::text ILIKE ${pattern}`
-      )!);
+        sql`${products.tags}::text ILIKE ${pattern}`,
+      );
+      if (searchCondition) conditions.push(searchCondition);
     }
 
     const order = options.sort === "popular"

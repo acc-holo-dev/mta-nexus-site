@@ -12,7 +12,7 @@ if (process.env.GITHUB_ACTIONS !== "true"
 }
 const email = process.argv[2]?.toLowerCase();
 const purpose = process.argv[3] ?? "email_verify";
-if (!email || !email.endsWith("@example.invalid")) {
+if (!email?.endsWith("@example.invalid")) {
   throw new Error("Synthetic CI recipient required");
 }
 if (purpose !== "email_verify" && purpose !== "password_reset") {

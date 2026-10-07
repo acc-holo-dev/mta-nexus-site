@@ -25,7 +25,7 @@ assert.equal(journal.entries.at(-1).tag, "0027_build_quarantine");
 const temp = mkdtempSync(join(tmpdir(), "nexus-upgrade-"));
 const baselineFolder = join(temp, "baseline");
 const failureFolder = join(temp, "failure");
-const database = "nexus_upgrade_" + randomUUID().replaceAll("-", "");
+const database = `nexus_upgrade_${randomUUID().replaceAll("-", "")}`;
 const admin = postgres(url.toString(), { max: 1, onnotice: () => {} });
 let client;
 let created = false;
@@ -55,7 +55,7 @@ try {
 
   await admin.unsafe(`CREATE DATABASE "${database}"`);
   created = true;
-  url.pathname = "/" + database;
+  url.pathname = `/${database}`;
   client = postgres(url.toString(), { max: 1, onnotice: () => {} });
   const db = drizzle(client);
   await migrate(db, { migrationsFolder: baselineFolder });
@@ -158,7 +158,7 @@ try {
   await admin.end({ timeout: 5 });
   rmSync(temp, { recursive: true, force: true });
   mkdirSync(join(root, "artifacts"), { recursive: true });
-  writeFileSync(join(root, "artifacts/release-upgrade.json"), JSON.stringify(evidence, null, 2) + "\n", { mode: 0o600 });
+  writeFileSync(join(root, "artifacts/release-upgrade.json"), `${JSON.stringify(evidence, null, 2)}\n`, { mode: 0o600 });
   console.log(JSON.stringify(evidence, null, 2));
 }
 assert.equal(evidence.status, "PASS", "Existing-installation upgrade rehearsal failed");

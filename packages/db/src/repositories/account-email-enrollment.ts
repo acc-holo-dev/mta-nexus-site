@@ -36,7 +36,7 @@ export class AccountEmailEnrollmentRepository {
     return {
       email: user.email,
       verified,
-      verifiedAt: verified ? binding!.verifiedAt : null,
+      verifiedAt: verified && binding ? binding.verifiedAt : null,
       eligible: Boolean(user.passwordHash) && !user.twoFactorEnabled
         && !["admin", "moderator"].includes(user.role),
     };

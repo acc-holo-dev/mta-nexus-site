@@ -41,7 +41,7 @@ let healthDeliveryUncertain = 0;
 let nextAbuseCleanupAt = 0;
 
 function emit(event: Record<string, unknown>) {
-  process.stdout.write(JSON.stringify(event) + "\n");
+  process.stdout.write(`${JSON.stringify(event)}\n`);
 }
 
 function stop(signal: "SIGTERM" | "SIGINT") {
@@ -270,11 +270,11 @@ try {
   });
 } catch {
   failed = true;
-  process.stderr.write(JSON.stringify({
+  process.stderr.write(`${JSON.stringify({
     status: "failed",
     config: fingerprint || undefined,
     phase: fingerprint ? failurePhase : undefined,
-  }) + "\n");
+  })}\n`);
   process.exitCode = 1;
 } finally {
   if (heartbeatTimer) clearInterval(heartbeatTimer);
@@ -292,7 +292,7 @@ try {
     await rm(HEALTH_FILE, { force: true });
   } catch {
     if (!failed) {
-      process.stderr.write(JSON.stringify({ status: "failed", config: fingerprint || undefined }) + "\n");
+      process.stderr.write(`${JSON.stringify({ status: "failed", config: fingerprint || undefined })}\n`);
       process.exitCode = 1;
       failed = true;
     }
@@ -302,7 +302,7 @@ try {
     await closeDatabaseConnection();
   } catch {
     if (!failed) {
-      process.stderr.write(JSON.stringify({ status: "failed", config: fingerprint || undefined }) + "\n");
+      process.stderr.write(`${JSON.stringify({ status: "failed", config: fingerprint || undefined })}\n`);
       process.exitCode = 1;
     }
   }

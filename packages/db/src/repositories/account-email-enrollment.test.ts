@@ -1,10 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { and, eq } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
-import { auditEvents, db, users } from "../client";
+import { auditEvents, db } from "../client";
 import { accountMailOutbox } from "../account-mail-schema";
 import { accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
-import { accountEmailEnrollmentRepository } from "./account-email-enrollment";
 import { AccountMailCipher } from "./account-mail-crypto";
 import { authService } from "../../../../apps/web/src/lib/services/auth-service";
 import { userRepository } from "./users";

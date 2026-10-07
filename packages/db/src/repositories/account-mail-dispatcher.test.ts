@@ -60,8 +60,10 @@ describe("D2c account mail dispatcher", () => {
     await f.dispatcher.runBatch();
     const sent = f.sent();
     expect(sent).toBeTruthy();
-    expect(sent!.text).toContain("https://nexus-mta.test/auth/reset-password?challenge=ach_test#token=");
-    const link = sent!.text.split("\n").find((line) => line.startsWith("https://"))!;
+    if (!sent) throw new Error("Expected one outbound account mail");
+    expect(sent.text).toContain("https://nexus-mta.test/auth/reset-password?challenge=ach_test#token=");
+    const link = sent.text.split("\n").find((line) => line.startsWith("https://"));
+    if (!link) throw new Error("Expected reset link in outbound account mail");
     const url = new URL(link);
     expect(url.searchParams.get("challenge")).toBe("ach_test");
     expect(url.search).not.toContain(prepared.token);

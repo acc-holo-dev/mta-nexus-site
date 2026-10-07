@@ -376,8 +376,11 @@ describe("D1 account proof primitives", () => {
     const pending = await db.select().from(authChallenges).where(and(eq(authChallenges.userId, a.userId),
       isNull(authChallenges.consumedAt), isNull(authChallenges.revokedAt)));
     expect(pending).toHaveLength(1);
-    const winner = issued.find((c) => c.id === pending[0].id)!;
-    const loser = issued.find((c) => c.id !== pending[0].id)!;
+    const pendingId = pending[0]?.id;
+    if (!pendingId) throw new Error("Expected one pending proof");
+    const winner = issued.find((c) => c.id === pendingId);
+    const loser = issued.find((c) => c.id !== pendingId);
+    if (!winner || !loser) throw new Error("Expected serialized winner and loser proofs");
     expect(await repo.consume({ ...verification(a), ...winner }, noMutation)).toBe(true);
     await expect(repo.consume({ ...verification(a), ...loser }, noMutation)).rejects.toBeInstanceOf(UnauthorizedError);
   });

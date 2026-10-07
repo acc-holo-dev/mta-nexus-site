@@ -5,7 +5,7 @@ import { fork } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { db, auditEvents, sessions, users } from "../client";
 import { accountAuthState, accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
 import { accountMailOutbox } from "../account-mail-schema";
@@ -145,7 +145,7 @@ describe("D2b internal account mail leases on disposable PostgreSQL", () => {
     assert.ok((await worker.candidates(100)).includes(a.job.id));
     const attempts = await Promise.all([worker.claim(a.job.id), worker.claim(a.job.id)]);
     assert.equal(attempts.filter(Boolean).length, 1);
-    const l = attempts.find((x) => x !== null)!;
+    const l = attempts.find((x) => x !== null); assert.ok(l);
     const stored = await row(a.job.id);
     assert.equal(stored.attempts, 1); assert.equal(stored.leaseTokenDigest === l.token, false);
     assert.ok(l.expiresAt <= stored.expiresAt);
@@ -200,7 +200,7 @@ describe("D2b internal account mail leases on disposable PostgreSQL", () => {
     });
     child.stdout?.resume(); child.stderr?.resume(); // Drain without recording sensitive IPC/child output.
     const exited = new Promise<void>((resolveExit) => child.once("exit", () => resolveExit()));
-    let first: MailLease;
+    let first: MailLease | undefined;
     try {
       first = await new Promise<MailLease>((resolveLease, reject) => {
         const timer = setTimeout(() => reject(new Error("Claim fixture timed out")), 8000);
@@ -214,14 +214,15 @@ describe("D2b internal account mail leases on disposable PostgreSQL", () => {
         });
       });
     } finally { child.kill("SIGKILL"); await exited; }
+    if (!first) throw new Error("Claim fixture did not return a lease");
     assert.equal((await row(a.job.id)).attempts, 1);
     await expireLease(a.job.id); // Accelerated expiry; the process stop above is real.
     const replacement = new AccountMailWorkerRepository();
     const second = await replacement.claim(a.job.id); assert.ok(second); assert.equal(second.attempt, 2);
-    assert.equal(second.token === first!.token, false);
-    assert.equal(await replacement.prepare(first!, cipher), null);
-    assert.equal(await replacement.settle(first!, "accepted"), false);
-    assert.equal(await replacement.settle(first!, "retry"), false);
+    assert.equal(second.token === first.token, false);
+    assert.equal(await replacement.prepare(first, cipher), null);
+    assert.equal(await replacement.settle(first, "accepted"), false);
+    assert.equal(await replacement.settle(first, "retry"), false);
     assert.ok(await replacement.prepare(second, new AccountMailCipher("d2b_test", { d2b_test: key })));
   }, 15_000);
 

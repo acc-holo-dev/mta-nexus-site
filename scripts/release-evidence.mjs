@@ -67,7 +67,7 @@ function runGate(name, command, args, options = {}) {
     });
   }
 
-  process.stdout.write("\n==> " + name + ": " + commandText + "\n");
+  process.stdout.write(`\n==> ${name}: ${commandText}\n`);
   return Object.freeze({
     name,
     command: commandText,

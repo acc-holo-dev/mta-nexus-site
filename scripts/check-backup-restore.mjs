@@ -101,7 +101,7 @@ function run() {
         ? error.stderr.toString("utf8")
         : String(error.stderr || error.message);
       throw new Error(
-        "docker " + args[0] + " failed: " + stderr.slice(-5000),
+        `docker ${args[0]} failed: ${stderr.slice(-5000)}`,
         { cause: error },
       );
     }
@@ -141,7 +141,7 @@ function run() {
 
   function createOwnedVolume(name, token) {
     const existing = String(
-      docker(["volume", "ls", "--quiet", "--filter", "name=^" + name + "$"]),
+      docker(["volume", "ls", "--quiet", "--filter", `name=^${name}$`]),
     ).trim();
     assert.equal(existing, "", "Refusing to adopt an existing Docker volume");
     const created = String(
@@ -149,7 +149,7 @@ function run() {
         "volume",
         "create",
         "--label",
-        BACKUP_RESTORE_LABEL + "=" + token,
+        `${BACKUP_RESTORE_LABEL}=${token}`,
         name,
       ]),
     ).trim();
@@ -172,7 +172,7 @@ function run() {
     assertOwnedVolume(inspected, name, token);
     docker(["volume", "rm", name]);
     const remaining = String(
-      docker(["volume", "ls", "--quiet", "--filter", "name=^" + name + "$"]),
+      docker(["volume", "ls", "--quiet", "--filter", `name=^${name}$`]),
     ).trim();
     assert.equal(remaining, "");
   }
@@ -190,7 +190,7 @@ function run() {
       "--entrypoint",
       "sh",
       "--mount",
-      "type=volume,src=" + volumeName + ",dst=/data",
+      `type=volume,src=${volumeName},dst=/data`,
       imageId,
       ...args,
     ]);
@@ -225,9 +225,9 @@ function run() {
     result.postgresRepoDigests = imageInfo.RepoDigests ?? [];
 
     const sourceToken = randomUUID();
-    const sourceProject = "nexus-backup-source-" + sourceToken;
-    const sourcePg = sourceProject + "-pgdata";
-    const sourceUploads = sourceProject + "-uploads";
+    const sourceProject = `nexus-backup-source-${sourceToken}`;
+    const sourcePg = `${sourceProject}-pgdata`;
+    const sourceUploads = `${sourceProject}-uploads`;
     const sourceFixture = join(temp, "source-compose.json");
     projects.push({ name: sourceProject, fixture: sourceFixture });
 
@@ -318,7 +318,7 @@ function run() {
     sql(sourceContainer, "CREATE SCHEMA drizzle; CREATE TABLE drizzle.__drizzle_migrations " +
       "(id serial PRIMARY KEY, hash text NOT NULL, created_at bigint);");
     for (const entry of journal.entries) {
-      const hash = sha256(join(migrationsDir, entry.tag + ".sql"));
+      const hash = sha256(join(migrationsDir, `${entry.tag}.sql`));
       assert(Number.isSafeInteger(entry.when));
       sql(sourceContainer, "INSERT INTO drizzle.__drizzle_migrations (hash, created_at) " +
         "VALUES ('" + hash + "', " + entry.when + ");");
@@ -344,7 +344,7 @@ function run() {
       "'{\"kind\":\"build_review\",\"decision\":\"approve\",\"resourceTitle\":\"Backup resource\",\"version\":\"1.0.0\",\"notes\":\"Reviewed\"}'::jsonb);");
     const applicationRows = (container) => Object.fromEntries(
       ["users", "products", "builds", "entitlements", "notifications"].map((table) =>
-        [table, sql(container, "SELECT json_agg(t ORDER BY id)::text FROM " + table + " t;")]),
+        [table, sql(container, `SELECT json_agg(t ORDER BY id)::text FROM ${table} t;`)]),
     );
     const sourceApplicationRows = applicationRows(sourceContainer);
 
@@ -440,9 +440,9 @@ function run() {
       "--entrypoint",
       "sh",
       "--mount",
-      "type=volume,src=" + sourceUploads + ",dst=/data,readonly",
+      `type=volume,src=${sourceUploads},dst=/data,readonly`,
       "--mount",
-      "type=bind,src=" + temp + ",dst=/backup",
+      `type=bind,src=${temp},dst=/backup`,
       imageId,
       "-eu",
       "-c",
@@ -477,9 +477,9 @@ function run() {
     result.backupChecksumsVerified = true;
 
     const restoreToken = randomUUID();
-    const restoreProject = "nexus-backup-restore-" + restoreToken;
-    const restorePg = restoreProject + "-pgdata";
-    const restoreUploads = restoreProject + "-uploads";
+    const restoreProject = `nexus-backup-restore-${restoreToken}`;
+    const restorePg = `${restoreProject}-pgdata`;
+    const restoreUploads = `${restoreProject}-uploads`;
     const restoreFixture = join(temp, "restore-compose.json");
     projects.push({ name: restoreProject, fixture: restoreFixture });
 
@@ -540,9 +540,9 @@ function run() {
       "--entrypoint",
       "sh",
       "--mount",
-      "type=volume,src=" + restoreUploads + ",dst=/data",
+      `type=volume,src=${restoreUploads},dst=/data`,
       "--mount",
-      "type=bind,src=" + temp + ",dst=/backup,readonly",
+      `type=bind,src=${temp},dst=/backup,readonly`,
       imageId,
       "-eu",
       "-c",
@@ -592,7 +592,7 @@ function run() {
       } catch (error) {
         result.status = "FAIL";
         result.cleanupError =
-          (result.cleanupError ? result.cleanupError + "; " : "") +
+          (result.cleanupError ? `${result.cleanupError}; ` : "") +
           error.message;
       }
     }
@@ -605,14 +605,14 @@ function run() {
             "ls",
             "--quiet",
             "--filter",
-            "name=^" + volume.name + "$",
+            `name=^${volume.name}$`,
           ]),
         ).trim();
         if (exists) removeOwnedVolume(volume.name, volume.token);
       } catch (error) {
         result.status = "FAIL";
         result.cleanupError =
-          (result.cleanupError ? result.cleanupError + "; " : "") +
+          (result.cleanupError ? `${result.cleanupError}; ` : "") +
           error.message;
       }
     }
@@ -627,7 +627,7 @@ function run() {
                 "ls",
                 "--quiet",
                 "--filter",
-                "name=^" + volume.name + "$",
+                `name=^${volume.name}$`,
               ]),
             ).trim() === ""
           );
@@ -642,7 +642,7 @@ function run() {
     result.sha = process.env.GITHUB_SHA ?? null;
     mkdirSync(join(root, "artifacts"), { recursive: true });
     writeFileSync(join(root, "artifacts/backup-restore-evidence.json"),
-      JSON.stringify(result, null, 2) + "\n", { mode: 0o600 });
+      `${JSON.stringify(result, null, 2)}\n`, { mode: 0o600 });
     if (process.env.GITHUB_STEP_SUMMARY) {
       appendFileSync(
         process.env.GITHUB_STEP_SUMMARY,

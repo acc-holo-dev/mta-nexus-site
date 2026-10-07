@@ -75,8 +75,10 @@ it("atomically rejects concurrent and stale metadata revisions without extra aud
     const failed = outcomes.find((result) => result.status === "rejected");
     expect(failed?.status === "rejected" && failed.reason).toMatchObject({ statusCode: 409, code: "PRODUCT_METADATA_CONFLICT" });
     const saved = await productRepository.findManaged(productId, actor);
-    expect(saved!.updatedAt.getTime()).toBe(base.getTime() + 1);
-    const expected = saved!.title === first.title ? first : second;
+    expect(saved).not.toBeNull();
+    if (!saved) throw new Error("Expected updated managed product");
+    expect(saved.updatedAt.getTime()).toBe(base.getTime() + 1);
+    const expected = saved.title === first.title ? first : second;
     expect(saved).toMatchObject(expected);
     const events = async () => db.select().from(auditEvents).where(eq(auditEvents.targetId, productId));
     expect(await events()).toHaveLength(1);
@@ -85,7 +87,7 @@ it("atomically rejects concurrent and stale metadata revisions without extra aud
     });
     // Both a valid and a stale revision remain indistinguishable from missing data outside scope.
     const stranger = { id: "unrelated-revision-actor", role: "developer" } as User;
-    for (const revision of [base, saved!.updatedAt]) {
+    for (const revision of [base, saved.updatedAt]) {
       await expect(service.updateProductDetails(productId, initial, stranger, revision)).rejects.toMatchObject({
         statusCode: 404, code: "NOT_FOUND",
       });
@@ -93,8 +95,8 @@ it("atomically rejects concurrent and stale metadata revisions without extra aud
     expect(await productRepository.findManaged(productId, actor)).toEqual(saved);
     expect(await events()).toHaveLength(1);
     // The new revision permits another write and advances even while ahead of wall time.
-    const next = await service.updateProductDetails(productId, initial, actor, saved!.updatedAt);
-    expect(next.updatedAt.getTime()).toBe(saved!.updatedAt.getTime() + 1);
+    const next = await service.updateProductDetails(productId, initial, actor, saved.updatedAt);
+    expect(next.updatedAt.getTime()).toBe(saved.updatedAt.getTime() + 1);
     expect(await events()).toHaveLength(2);
   } finally {
     await db.delete(auditEvents).where(eq(auditEvents.targetId, productId));

@@ -120,8 +120,10 @@ export interface EventBus {
   ): () => void;
 }
 
+type EventHandler = (event: NexusDomainEvent) => Promise<void>;
+
 export class InMemoryEventBus implements EventBus {
-  private handlers = new Map<string, Array<(event: any) => Promise<void>>>();
+  private handlers = new Map<string, EventHandler[]>();
 
   async publish<E extends NexusDomainEvent>(event: E): Promise<void> {
     const list = this.handlers.get(event.type) || [];
@@ -133,14 +135,16 @@ export class InMemoryEventBus implements EventBus {
     type: TType,
     handler: (event: Extract<NexusDomainEvent, { type: TType }>) => Promise<void>
   ): () => void {
+    const wrapped: EventHandler = (event) =>
+      handler(event as Extract<NexusDomainEvent, { type: TType }>);
     const existing = this.handlers.get(type) || [];
-    this.handlers.set(type, [...existing, handler]);
+    this.handlers.set(type, [...existing, wrapped]);
 
     return () => {
       const current = this.handlers.get(type) || [];
       this.handlers.set(
         type,
-        current.filter((h) => h !== handler)
+        current.filter((h) => h !== wrapped),
       );
     };
   }

@@ -123,7 +123,7 @@ export class ProductService {
 
   async getProductById(id: string): Promise<Product | null> {
     const product = await productRepository.findById(id);
-    if (!product || product.price !== 0 || product.status !== "published") {
+    if (product?.price !== 0 || product.status !== "published") {
       return null;
     }
     const build = await buildRepository.findLatestPublishedByProduct(product.id);

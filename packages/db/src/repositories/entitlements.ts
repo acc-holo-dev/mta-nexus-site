@@ -97,7 +97,7 @@ export class EntitlementRepository {
         .limit(1);
       const product = productRows[0];
 
-      if (!product || product.status !== "published") {
+      if (product?.status !== "published") {
         throw new NotFoundError("Resource", input.productId);
       }
       if (product.price !== 0) {

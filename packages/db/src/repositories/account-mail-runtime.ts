@@ -113,7 +113,8 @@ function readActiveMailKeyMaterial(
     "ACCOUNT_MAIL_KEY_FILE",
     "account mail encryption key",
     { required: true },
-  )!;
+  );
+  if (!rawKey) throw new Error("Account mail encryption key is required");
   if (env.AUTH_SECRET && rawKey === env.AUTH_SECRET) {
     throw new Error("Account mail encryption key must not reuse AUTH_SECRET");
   }
@@ -133,7 +134,8 @@ function readRecoveryAbuseKeyMaterial(
     "ACCOUNT_RECOVERY_ABUSE_KEY_FILE",
     "account recovery abuse key",
     { required: true },
-  )!;
+  );
+  if (!raw) throw new Error("Account recovery abuse key is required");
   if (env.AUTH_SECRET && raw === env.AUTH_SECRET) {
     throw new Error("Account recovery abuse key must not reuse AUTH_SECRET");
   }

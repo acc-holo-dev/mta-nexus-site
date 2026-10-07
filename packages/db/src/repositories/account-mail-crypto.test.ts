@@ -62,7 +62,7 @@ describe("D2a authenticated account mail envelopes", () => {
   it("rejects malformed envelopes, truncated tags and oversized ciphertext", () => {
     const f = fixture(); const sealed = f.cipher.seal(f.context, f.payload);
     for (const value of [null, [], {}, { ...sealed, version: 2 }, { ...sealed, extra: true },
-      { ...sealed, tag: "AA" }, { ...sealed, nonce: sealed.nonce + "=" },
+      { ...sealed, tag: "AA" }, { ...sealed, nonce: `${sealed.nonce}=` },
       { ...sealed, ciphertext: "A".repeat(2049) }]) fails(() => f.cipher.open(f.context, value));
   });
   it("requires an explicit well-formed key ring without fallback", () => {
@@ -74,8 +74,8 @@ describe("D2a authenticated account mail envelopes", () => {
   it("rejects invalid or oversized recipients and noncanonical proof tokens", () => {
     const f = fixture();
     for (const value of [{ ...f.payload, recipient: "line\nbreak@example.invalid" },
-      { ...f.payload, recipient: "x".repeat(321) + "@example.invalid" },
-      { ...f.payload, token: "short" }, { ...f.payload, token: f.payload.token + "=" },
+      { ...f.payload, recipient: `${"x".repeat(321)}@example.invalid` },
+      { ...f.payload, token: "short" }, { ...f.payload, token: `${f.payload.token}=` },
       { ...f.payload, password: "not-an-allowed-field" }]) {
       fails(() => f.cipher.seal(f.context, value as MailPayload));
     }

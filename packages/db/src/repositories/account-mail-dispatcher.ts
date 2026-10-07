@@ -1,4 +1,4 @@
-import { AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
+import { type AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import { accountMailWorkerRepository } from "./account-mail-worker";
 import type { MailLease, PreparedAccountMail } from "./account-mail-worker";
 import type {

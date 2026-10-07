@@ -151,7 +151,13 @@ export function can(
 
     case "organization.manage": {
       if (!resource) return false;
-      const orgId = typeof resource === "string" ? resource : (resource as any).id;
+      const orgId = typeof resource === "string"
+        ? resource
+        : typeof resource === "object" && resource !== null
+          && "id" in resource && typeof resource.id === "string"
+          ? resource.id
+          : undefined;
+      if (!orgId) return false;
       if (context?.organizationMemberships) {
         const mem = context.organizationMemberships.find((m) => m.organizationId === orgId);
         return mem?.role === "owner" || mem?.role === "admin";

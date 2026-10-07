@@ -70,7 +70,9 @@ export class AccountMailCipher {
     const nonce = randomBytes(12);
     const plain = Buffer.from(JSON.stringify(payload(input)), "utf8");
     try {
-      const cipher = createCipheriv("aes-256-gcm", this.#keys.get(keyId)!, nonce, { authTagLength: 16 });
+      const key = this.#keys.get(keyId);
+      if (!key) throw invalid();
+      const cipher = createCipheriv("aes-256-gcm", key, nonce, { authTagLength: 16 });
       cipher.setAAD(aad(context, keyId));
       const ciphertext = Buffer.concat([cipher.update(plain), cipher.final()]);
       return Object.freeze({ version: 1, keyId, nonce: nonce.toString("base64url"),

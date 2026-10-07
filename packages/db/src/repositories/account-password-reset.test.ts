@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { and, eq } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
-import { auditEvents, db, notifications, sessions } from "../client";
+import { auditEvents, db, notifications } from "../client";
 import { accountMailOutbox } from "../account-mail-schema";
 import { authChallenges } from "../account-recovery-schema";
 import { AccountMailCipher } from "./account-mail-crypto";
@@ -13,6 +13,12 @@ import { generateId } from "@nexus/security";
 const oldPassword = "Synthetic-D4-old-password!";
 const newPassword = "Synthetic-D4-new-password!";
 const envBackup = { ...process.env };
+
+function accountMailKey(): string {
+  const value = process.env.ACCOUNT_MAIL_KEY;
+  if (!value) throw new Error("ACCOUNT_MAIL_KEY is required by this fixture");
+  return value;
+}
 
 async function account() {
   const username = `d4_${generateId("usr").slice(-18)}`;
@@ -29,7 +35,7 @@ async function enroll(a: Awaited<ReturnType<typeof account>>) {
   if (!queued.challengeId) throw new Error("verification challenge missing");
   const [mail] = await db.select().from(accountMailOutbox)
     .where(eq(accountMailOutbox.challengeId, queued.challengeId));
-  const cipher = new AccountMailCipher("d4", { d4: Buffer.from(process.env.ACCOUNT_MAIL_KEY!, "base64url") });
+  const cipher = new AccountMailCipher("d4", { d4: Buffer.from(accountMailKey(), "base64url") });
   const payload = cipher.open({
     id: mail.id, challengeId: mail.challengeId, userId: a.userId,
     purpose: "email_verify", expiresAt: mail.expiresAt,
@@ -50,7 +56,7 @@ async function resetProof(email: string) {
   if (!challenge) throw new Error("reset challenge missing");
   const [mail] = await db.select().from(accountMailOutbox)
     .where(eq(accountMailOutbox.challengeId, challenge.id));
-  const cipher = new AccountMailCipher("d4", { d4: Buffer.from(process.env.ACCOUNT_MAIL_KEY!, "base64url") });
+  const cipher = new AccountMailCipher("d4", { d4: Buffer.from(accountMailKey(), "base64url") });
   const payload = cipher.open({
     id: mail.id, challengeId: mail.challengeId, userId: user.id,
     purpose: "password_reset", expiresAt: mail.expiresAt,

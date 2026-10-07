@@ -5,7 +5,7 @@ import { authChallenges } from "../account-recovery-schema";
 import { accountMailOutbox, accountMailQueueGate } from "../account-mail-schema";
 import { accountChallengeRepository } from "./account-challenges";
 import type { ChallengeIntent } from "./account-challenges";
-import { AccountMailCipher } from "./account-mail-crypto";
+import type { AccountMailCipher } from "./account-mail-crypto";
 
 export class AccountMailQueueFullError extends Error {
   constructor() { super("Account mail queue is full"); this.name = "AccountMailQueueFullError"; }
