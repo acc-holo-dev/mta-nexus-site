@@ -1,45 +1,61 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
-describe("public content publication integrity", () => {
-  it("filters slug reads to published content", () => {
-    const repository = readFileSync(
-      resolve(process.cwd(), "packages/db/src/repositories/content.ts"),
-      "utf8"
-    );
+const mocks = vi.hoisted(() => ({
+  article: vi.fn(),
+  comments: vi.fn(),
+}));
 
-    expect(repository).toContain("findPublishedBySlug");
-    expect(repository).toContain('eq(content.status, "published")');
-    expect(repository).toContain("return this.findPublishedBySlug(slug, options)");
+vi.mock("../apps/web/src/lib/services/content-service", () => ({
+  contentService: {
+    getArticleBySlug: mocks.article,
+    getComments: mocks.comments,
+  },
+}));
+
+import { GET } from "../apps/web/src/app/api/content/[slug]/route";
+
+describe("published content detail HTTP behavior", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.comments.mockResolvedValue([]);
   });
 
-  it("does not count metadata generation as an article view", () => {
-    const page = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/articles/[slug]/page.tsx"),
-      "utf8"
-    );
+  it.each(["", "Uppercase", "a".repeat(201), "bad/slash"])(
+    "rejects invalid public slug %j before service lookup",
+    async (slug) => {
+      const response = await GET(
+        new NextRequest("http://nexus.test/api/content/" + encodeURIComponent(slug)),
+        { params: Promise.resolve({ slug }) },
+      );
+      expect(response.status).toBe(404);
+      expect(mocks.article).not.toHaveBeenCalled();
+    },
+  );
 
-    expect(page).toContain("contentService.getArticleBySlug(slug");
-    expect(page).toContain("incrementView: false");
-    expect(page).toContain(
-      'contentService.getComments({ contentId: article.id }, 100)'
+  it("returns 404 when published lookup cannot find the article", async () => {
+    mocks.article.mockResolvedValue(null);
+    const response = await GET(
+      new NextRequest("http://nexus.test/api/content/missing"),
+      { params: Promise.resolve({ slug: "missing" }) },
     );
+    expect(response.status).toBe(404);
+    expect(mocks.article).toHaveBeenCalledWith("missing");
+    expect(mocks.comments).not.toHaveBeenCalled();
   });
 
-  it("bounds comments and exposes a cacheable published detail read", () => {
-    const repository = readFileSync(
-      resolve(process.cwd(), "packages/db/src/repositories/content.ts"),
-      "utf8"
-    );
-    const route = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/api/content/[slug]/route.ts"),
-      "utf8"
+  it("returns bounded comments and public cache headers for a published article", async () => {
+    mocks.article.mockResolvedValue({ id: "cnt_1", slug: "published" });
+    mocks.comments.mockResolvedValue([{ id: "cmt_1" }]);
+    const response = await GET(
+      new NextRequest("http://nexus.test/api/content/published"),
+      { params: Promise.resolve({ slug: "published" }) },
     );
 
-    expect(repository).toContain(".limit(boundedLimit)");
-    expect(route).toContain('contentService.getArticleBySlug(slug)');
-    expect(route).toContain("Article not found");
-    expect(route).toContain("stale-while-revalidate=120");
+    expect(response.status).toBe(200);
+    expect(mocks.comments).toHaveBeenCalledWith({ contentId: "cnt_1" }, 100);
+    expect(response.headers.get("Cache-Control")).toBe(
+      "public, max-age=30, stale-while-revalidate=120",
+    );
   });
 });

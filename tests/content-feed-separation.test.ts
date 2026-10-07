@@ -1,34 +1,43 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-describe("content feed separation", () => {
-  it("keeps editorial feeds separate from community topics", () => {
-    const service = readFileSync(
-      resolve(process.cwd(), "apps/web/src/lib/services/content-service.ts"),
-      "utf8",
-    );
+const mocks = vi.hoisted(() => ({
+  listByTypes: vi.fn(),
+}));
 
-    const articles = service.slice(
-      service.indexOf("async listArticles("),
-      service.indexOf("async listCommunityTopics("),
-    );
-    const community = service.slice(
-      service.indexOf("async listCommunityTopics("),
-      service.indexOf("async listServerUpdates("),
-    );
+vi.mock("@nexus/db", () => ({
+  contentRepository: {
+    listPublishedByTypes: mocks.listByTypes,
+  },
+  productRepository: {},
+  serverRepository: {},
+}));
+vi.mock("@nexus/security", () => ({
+  can: vi.fn(),
+  generateId: vi.fn(),
+}));
 
-    for (const type of [
-      "article",
-      "news",
-      "devlog",
-      "update",
-      "announcement",
-    ]) {
-      expect(articles).toContain(`"${type}"`);
-    }
-    expect(articles).not.toContain('"post"');
-    expect(articles).not.toContain('"question"');
-    expect(community).toContain('["post", "question"]');
+import { ContentService } from "../apps/web/src/lib/services/content-service";
+
+describe("content feed separation behavior", () => {
+  const service = new ContentService();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.listByTypes.mockResolvedValue([]);
+  });
+
+  it("queries only editorial types for article feeds", async () => {
+    await service.listArticles(12);
+    expect(mocks.listByTypes).toHaveBeenCalledWith(
+      ["article", "news", "devlog", "update", "announcement"],
+      12,
+    );
+  });
+
+  it("queries only post/question for community topics", async () => {
+    await service.listCommunityTopics(18);
+    expect(mocks.listByTypes).toHaveBeenCalledWith(
+      ["post", "question"],
+      18,
+    );
   });
 });

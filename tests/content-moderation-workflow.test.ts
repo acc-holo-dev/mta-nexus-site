@@ -1,42 +1,128 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Content, User } from "@nexus/domain";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const mocks = vi.hoisted(() => ({
+  findById: vi.fn(),
+  moderate: vi.fn(),
+  can: vi.fn(),
+}));
 
-describe("content moderation workflow", () => {
-  it("lets moderators publish or archive drafts through an audited service path", () => {
-    const route = read(
-      "apps/web/src/app/api/admin/actions/route.ts",
-    );
-    const service = read(
-      "apps/web/src/lib/services/content-service.ts",
-    );
-    const repository = read(
-      "packages/db/src/repositories/content.ts",
-    );
-    const page = read("apps/web/src/app/admin/page.tsx");
+vi.mock("@nexus/db", () => ({
+  contentRepository: {
+    findById: mocks.findById,
+    moderateStatusWithAudit: mocks.moderate,
+    listPublishedByTypes: vi.fn(),
+    searchPublishedByTypes: vi.fn(),
+    listPublishedByServer: vi.fn(),
+    findPublishedBySlug: vi.fn(),
+    listComments: vi.fn(),
+  },
+  productRepository: { list: vi.fn() },
+  serverRepository: { listActivePublic: vi.fn() },
+}));
 
-    expect(route).toContain('z.literal("content")');
-    expect(route).toContain(
-      'z.enum(["publish", "archive"])',
+vi.mock("@nexus/security", () => ({
+  can: mocks.can,
+  generateId: vi.fn((prefix: string) => `${prefix}_test`),
+}));
+
+import { ContentService } from "../apps/web/src/lib/services/content-service";
+
+const moderator = {
+  id: "usr_mod",
+  username: "moderator",
+  displayName: "Moderator",
+  role: "moderator",
+} as User;
+
+function content(status: Content["status"]): Content {
+  return {
+    id: "cnt_1",
+    authorId: "usr_author",
+    title: "Article",
+    slug: "article",
+    body: "Article body",
+    type: "article",
+    tags: [],
+    status,
+    viewCount: 0,
+    likeCount: 0,
+    commentCount: 0,
+    createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+  } as Content;
+}
+
+describe("content moderation behavior", () => {
+  const service = new ContentService();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.can.mockReturnValue(true);
+    mocks.findById.mockResolvedValue(content("draft"));
+    mocks.moderate.mockResolvedValue(content("published"));
+  });
+
+  it("requires moderator permission before content lookup", async () => {
+    mocks.can.mockReturnValue(false);
+    await expect(
+      service.moderateContent("cnt_1", "publish", moderator, "Reviewed"),
+    ).rejects.toMatchObject({ statusCode: 403 });
+    expect(mocks.findById).not.toHaveBeenCalled();
+  });
+
+  it("rejects a repeated transition to the same state", async () => {
+    mocks.findById.mockResolvedValue(content("published"));
+    await expect(
+      service.moderateContent("cnt_1", "publish", moderator, "Replay"),
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      code: "CONTENT_ALREADY_IN_STATE",
+    });
+    expect(mocks.moderate).not.toHaveBeenCalled();
+  });
+
+  it("publishes with expected-state compare-and-set and an audit decision", async () => {
+    const updated = content("published");
+    mocks.moderate.mockResolvedValue(updated);
+
+    await expect(
+      service.moderateContent("cnt_1", "publish", moderator, "Reviewed"),
+    ).resolves.toBe(updated);
+    expect(mocks.moderate).toHaveBeenCalledWith(
+      "cnt_1",
+      "published",
+      "draft",
+      expect.objectContaining({
+        action: "content.published",
+        details: { from: "draft", to: "published", notes: "Reviewed" },
+      }),
     );
-    expect(route).toContain("contentService.moderateContent");
-    expect(service).toContain(
-      'can(actor, "admin.moderation")',
+  });
+
+  it("archives from the current state with the archive audit action", async () => {
+    mocks.findById.mockResolvedValue(content("published"));
+    const updated = content("archived");
+    mocks.moderate.mockResolvedValue(updated);
+
+    await expect(
+      service.moderateContent("cnt_1", "archive", moderator, "Retired"),
+    ).resolves.toBe(updated);
+    expect(mocks.moderate).toHaveBeenCalledWith(
+      "cnt_1",
+      "archived",
+      "published",
+      expect.objectContaining({ action: "content.archived" }),
     );
-    expect(service).toContain(
-      'action: decision === "publish" ? "content.published" : "content.archived"',
-    );
-    expect(repository).toContain("listByStatus");
-    expect(repository).toContain("updateStatus");
-    expect(repository).toContain("expectedStatus");
-    expect(service).toContain("CONTENT_STATE_CHANGED");
-    expect(page).toContain(
-      "contentRepository.listDraftPage(contentPage)",
-    );
-    expect(page).toContain("copy.communityQueue");
-    expect(page).toContain("copy.draftsAwaitingModeration");
+  });
+
+  it("maps a lost compare-and-set to CONTENT_STATE_CHANGED", async () => {
+    mocks.moderate.mockResolvedValue(null);
+    await expect(
+      service.moderateContent("cnt_1", "publish", moderator, "Reviewed"),
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      code: "CONTENT_STATE_CHANGED",
+    });
   });
 });
