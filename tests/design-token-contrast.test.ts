@@ -15,7 +15,7 @@ function block(pattern: RegExp): string {
 
 function token(source: string, name: string): string {
   const match = source.match(
-    new RegExp(`\${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`),
+    new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`),
   );
   expect(match?.[1], name).toBeTruthy();
   return match?.[1] ?? "#000000";
@@ -44,8 +44,8 @@ function contrast(foreground: string, background: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-const light = block(/:root\\s*\\{([\\s\\S]*?)\\n\\}/u);
-const dark = block(/\\.dark\\s*\\{([\\s\\S]*?)\\n\\}/u);
+const light = block(/:root\s*\{([\s\S]*?)\n\}/u);
+const dark = block(/\.dark\s*\{([\s\S]*?)\n\}/u);
 const textTokens = [
   "--nexus-text",
   "--nexus-text-secondary",
@@ -66,18 +66,18 @@ describe("design token contrast", () => {
     ["light", light],
     ["dark", dark],
   ] as const) {
-    it(`\${theme} semantic text stays AA-readable on semantic surfaces`, () => {
+    it(`${theme} semantic text stays AA-readable on semantic surfaces`, () => {
       for (const textToken of textTokens) {
         for (const surfaceToken of surfaceTokens) {
           expect(
             contrast(token(source, textToken), token(source, surfaceToken)),
-            `\${textToken} on \${surfaceToken}`,
+            `${textToken} on ${surfaceToken}`,
           ).toBeGreaterThanOrEqual(4.5);
         }
       }
     });
 
-    it(`\${theme} solid accent supports white labels and visible focus`, () => {
+    it(`${theme} solid accent supports white labels and visible focus`, () => {
       const accent = token(source, "--nexus-accent");
       expect(
         contrast("#ffffff", accent),
@@ -87,7 +87,7 @@ describe("design token contrast", () => {
       for (const surfaceToken of surfaceTokens) {
         expect(
           contrast(accent, token(source, surfaceToken)),
-          `accent focus against \${surfaceToken}`,
+          `accent focus against ${surfaceToken}`,
         ).toBeGreaterThanOrEqual(3);
       }
     });
