@@ -5,12 +5,10 @@ const state = vi.hoisted(() => ({
     id: "ver_1",
     requesterId: "usr_requester",
     status: "approved",
-  } as Record<string, unknown> | null
+  } as Record<string, unknown> | null,
 }));
 
 const afterMock = vi.hoisted(() => vi.fn());
-  }),
-);
 const resolveRequest = vi.hoisted(() =>
   vi.fn(async () => state.resolution),
 );
@@ -22,10 +20,7 @@ vi.mock("next/server", async () => {
   const actual = await vi.importActual<typeof import("next/server")>(
     "next/server",
   );
-  return {
-    ...actual,
-    after: afterMock,
-  };
+  return { ...actual, after: afterMock };
 });
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -47,9 +42,7 @@ vi.mock("../apps/web/src/lib/services/product-service", () => ({
 }));
 
 vi.mock("../apps/web/src/lib/services/content-service", () => ({
-  contentService: {
-    moderateContent: vi.fn(),
-  },
+  contentService: { moderateContent: vi.fn() },
 }));
 
 vi.mock(
@@ -74,7 +67,6 @@ vi.mock("@nexus/db", () => ({
     resolveRequest,
     findById: findVerification,
   },
-
 }));
 
 vi.mock("@nexus/security", () => ({
@@ -113,7 +105,7 @@ describe("verification resolution durable push scheduling", () => {
   });
 
   it.each(["approve", "reject"] as const)(
-    "leaves requester notification and push scheduling inside the committed resolution for %s",
+    "keeps requester notification/outbox inside the committed %s resolution",
     async (action) => {
       state.resolution = {
         ...state.resolution,
@@ -139,7 +131,7 @@ describe("verification resolution durable push scheduling", () => {
     },
   );
 
-  it("does not schedule push when the verification state transition lost its compare-and-set", async () => {
+  it("does not schedule HTTP-side work when compare-and-set loses", async () => {
     state.resolution = null;
 
     const response = await POST(request("approve"));
