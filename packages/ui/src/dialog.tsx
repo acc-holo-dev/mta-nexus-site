@@ -16,6 +16,8 @@ export function Dialog({
   description,
   children,
 }: DialogProps) {
+  const titleId = React.useId();
+  const descriptionId = React.useId();
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
@@ -47,8 +49,8 @@ export function Dialog({
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="nexus-dialog-title"
-        aria-describedby={description ? "nexus-dialog-description" : undefined}
+        aria-labelledby={titleId}
+        aria-describedby={description ? descriptionId : undefined}
         className="relative w-full max-w-lg rounded-xl border border-base bg-elevated p-6 text-primary shadow-nexus-lg"
       >
         <button
@@ -61,12 +63,12 @@ export function Dialog({
           <X className="h-5 w-5" />
         </button>
         <div className="mb-4 pr-8">
-          <h3 id="nexus-dialog-title" className="text-lg font-bold text-primary">
+          <h3 id={titleId} className="text-lg font-bold text-primary">
             {title}
           </h3>
           {description && (
             <p
-              id="nexus-dialog-description"
+              id={descriptionId}
               className="mt-1 text-sm text-muted"
             >
               {description}
