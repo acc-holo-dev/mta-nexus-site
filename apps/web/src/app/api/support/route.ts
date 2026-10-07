@@ -1,13 +1,14 @@
-import { supportCaseRepository } from "@nexus/db";
+import { notificationRepository, supportCaseRepository, userRepository } from "@nexus/db";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
 import { createSupportCaseSchema } from "@nexus/validation";
-import type { NextRequest } from "next/server";
+import { after, type NextRequest } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
+import { deliverStoredNotificationsWebPush } from "../../../lib/services/notification-web-push-service";
 
 function privateJson(
   context: Parameters<typeof jsonWithRequestId>[0],
@@ -132,6 +133,39 @@ export async function POST(request: NextRequest) {
         },
       },
     );
+
+    after(async () => {
+      try {
+        const moderatorIds = await userRepository.listModeratorIds();
+        const deliveries = await Promise.allSettled(
+          moderatorIds.map((moderatorId) =>
+            notificationRepository.create({
+              id: generateId("not"),
+              recipientId: moderatorId,
+              title: "New support case",
+              message: supportCase.subject,
+              link: "/admin/support/" + supportCase.id,
+              type: "system",
+              category: "system",
+            }),
+          ),
+        );
+        const stored = deliveries.flatMap((delivery) =>
+          delivery.status === "fulfilled" && delivery.value
+            ? [delivery.value]
+            : [],
+        );
+        await deliverStoredNotificationsWebPush(stored);
+      } catch (error) {
+        logRequestEvent({
+          level: "warn",
+          event: "support.case_notification_failed",
+          context,
+          status: 201,
+          error,
+        });
+      }
+    });
 
     return privateJson(
       context,

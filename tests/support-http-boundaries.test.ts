@@ -1,6 +1,10 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const state = vi.hoisted(() => ({
+  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
+}));
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   can: vi.fn(),
@@ -12,7 +16,21 @@ const mocks = vi.hoisted(() => ({
   createWithInitialMessage: vi.fn(),
   addMessage: vi.fn(),
   updateStatus: vi.fn(),
+  moderatorIds: vi.fn(),
+  notify: vi.fn(),
+  push: vi.fn(),
 }));
+
+const afterMock = vi.hoisted(() =>
+  vi.fn((callback: () => unknown | Promise<unknown>) => {
+    state.afterCallbacks.push(callback);
+  }),
+);
+
+vi.mock("next/server", async () => {
+  const actual = await vi.importActual<typeof import("next/server")>("next/server");
+  return { ...actual, after: afterMock };
+});
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
@@ -34,6 +52,12 @@ vi.mock("@nexus/db", () => ({
     addMessage: mocks.addMessage,
     updateStatus: mocks.updateStatus,
   },
+  userRepository: { listModeratorIds: mocks.moderatorIds },
+  notificationRepository: { create: mocks.notify },
+}));
+
+vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
+  deliverStoredNotificationsWebPush: mocks.push,
 }));
 
 import {
@@ -57,6 +81,7 @@ function expectPrivate(response: Response) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  state.afterCallbacks.length = 0;
   mocks.session.mockResolvedValue(null);
   mocks.can.mockReturnValue(false);
   mocks.rate.mockResolvedValue({ success: true });
@@ -75,7 +100,10 @@ beforeEach(() => {
     supportCase: { id: caseId, status: "open" },
     message: { id: `spm_${"a".repeat(24)}`, authorRole: "requester" },
   });
-  mocks.updateStatus.mockResolvedValue({ id: caseId, status: "resolved" });
+  mocks.updateStatus.mockResolvedValue({ id: caseId, requesterId: "usr_member", subject: "Account help", status: "resolved" });
+  mocks.moderatorIds.mockResolvedValue(["usr_mod"]);
+  mocks.notify.mockImplementation(async (input) => ({ ...input, createdAt: new Date(), isRead: false }));
+  mocks.push.mockResolvedValue({ notifications: 1, attempted: 0, delivered: 0, failed: 0, stale: 0, deliveryErrors: 0 });
 });
 
 describe("support HTTP authorization and privacy", () => {
@@ -190,6 +218,95 @@ describe("support HTTP authorization and privacy", () => {
         actorId: "usr_member",
         action: "support.case.created",
         targetId: caseId,
+      }),
+    );
+  });
+
+  it("delivers support notifications only after committed mutations", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    const createResponse = await createCase(
+      new NextRequest("https://nexus.test/api/support", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          category: "account",
+          subject: "Account access problem",
+          message: "Recovery completed, but access is still unavailable.",
+        }),
+      }),
+    );
+    expect(createResponse.status).toBe(201);
+    expect(afterMock).toHaveBeenCalledOnce();
+    expect(mocks.notify).not.toHaveBeenCalled();
+    await state.afterCallbacks.shift()?.();
+    expect(mocks.notify).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipientId: "usr_mod",
+        link: "/admin/support/" + caseId,
+      }),
+    );
+    expect(mocks.push).toHaveBeenCalledOnce();
+
+    vi.clearAllMocks();
+    state.afterCallbacks.length = 0;
+    mocks.session.mockResolvedValue({ id: "usr_staff", role: "moderator" });
+    mocks.can.mockReturnValue(true);
+    mocks.findById.mockResolvedValue({
+      id: caseId,
+      requesterId: "usr_member",
+      subject: "Account help",
+      status: "open",
+    });
+    const reply = await addMessage(
+      new NextRequest("https://nexus.test/api/support/" + caseId, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: "We restored the account." }),
+      }),
+      params,
+    );
+    expect(reply.status).toBe(201);
+    expect(mocks.notify).not.toHaveBeenCalled();
+    await state.afterCallbacks.shift()?.();
+    expect(mocks.notify).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipientId: "usr_member",
+        link: "/support/" + caseId,
+      }),
+    );
+    expect(mocks.push).toHaveBeenCalledOnce();
+
+    vi.clearAllMocks();
+    state.afterCallbacks.length = 0;
+    mocks.session.mockResolvedValue({ id: "usr_staff", role: "moderator" });
+    mocks.can.mockReturnValue(true);
+    mocks.findById.mockResolvedValue({
+      id: caseId,
+      requesterId: "usr_member",
+      subject: "Account help",
+      status: "open",
+    });
+    mocks.updateStatus.mockResolvedValue({
+      id: caseId,
+      requesterId: "usr_member",
+      subject: "Account help",
+      status: "resolved",
+    });
+    const statusResponse = await updateCase(
+      new NextRequest("https://nexus.test/api/support/" + caseId, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ status: "resolved" }),
+      }),
+      params,
+    );
+    expect(statusResponse.status).toBe(200);
+    expect(mocks.notify).not.toHaveBeenCalled();
+    await state.afterCallbacks.shift()?.();
+    expect(mocks.notify).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipientId: "usr_member",
+        title: "Support case status changed",
       }),
     );
   });
