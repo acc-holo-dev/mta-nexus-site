@@ -1,6 +1,16 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+const state = vi.hoisted(() => ({
+  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
+}));
+
+const afterMock = vi.hoisted(() =>
+  vi.fn((callback: () => unknown | Promise<unknown>) => {
+    state.afterCallbacks.push(callback);
+  }),
+);
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   can: vi.fn(),
@@ -10,11 +20,26 @@ const mocks = vi.hoisted(() => ({
   createWithAudit: vi.fn(),
   listModeratorIds: vi.fn(),
   notify: vi.fn(),
+  push: vi.fn(),
 }));
+
+vi.mock("next/server", async () => {
+  const actual = await vi.importActual<typeof import("next/server")>(
+    "next/server",
+  );
+  return {
+    ...actual,
+    after: afterMock,
+  };
+});
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
+vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
+  deliverStoredNotificationsWebPush: mocks.push,
+}));
+
 vi.mock("@nexus/security", () => ({
   can: mocks.can,
   consumeRateLimit: mocks.rate,
@@ -42,13 +67,27 @@ const privateResponse = (response: Response) => {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  state.afterCallbacks.length = 0;
   mocks.session.mockResolvedValue(null);
   mocks.can.mockReturnValue(false);
   mocks.rate.mockResolvedValue({ success: true });
   mocks.listPage.mockResolvedValue({ reports: [], hasMore: false });
   mocks.findProduct.mockResolvedValue({ id: "prd_test" });
   mocks.listModeratorIds.mockResolvedValue(["mod_1"]);
-  mocks.notify.mockResolvedValue({});
+  mocks.notify.mockImplementation(async (input) => ({
+    ...input,
+    id: "not_report",
+    createdAt: new Date(),
+    isRead: false,
+  }));
+  mocks.push.mockResolvedValue({
+    notifications: 1,
+    attempted: 0,
+    delivered: 0,
+    failed: 0,
+    stale: 0,
+    deliveryErrors: 0,
+  });
   mocks.createWithAudit.mockResolvedValue({ report: { id: "rpt_test", status: "open" }, created: true });
 });
 
@@ -83,7 +122,7 @@ describe("report privacy and durable success", () => {
 
   it("does not report a committed complaint as failed when moderator notification fails", async () => {
     mocks.session.mockResolvedValue({ id: "member_1" });
-    mocks.notify.mockRejectedValue(new Error("Mail unavailable"));
+    mocks.notify.mockRejectedValue(new Error("Notification unavailable"));
     const response = await POST(new NextRequest("https://nexus.test/api/reports", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -100,8 +139,43 @@ describe("report privacy and durable success", () => {
       expect.objectContaining({ reporterId: "member_1", targetId: "prd_test" }),
       expect.objectContaining({ actorId: "member_1", action: "report.created" }),
     );
+    expect(afterMock).toHaveBeenCalledOnce();
+    expect(mocks.listModeratorIds).not.toHaveBeenCalled();
+    expect(mocks.notify).not.toHaveBeenCalled();
+
+    await state.afterCallbacks[0]?.();
+
     expect(mocks.listModeratorIds).toHaveBeenCalledOnce();
-    expect(mocks.notify).toHaveBeenCalledWith(expect.objectContaining({ recipientId: "mod_1" }));
+    expect(mocks.notify).toHaveBeenCalledWith(
+      expect.objectContaining({ recipientId: "mod_1" }),
+    );
+    expect(mocks.push).toHaveBeenCalledWith([]);
+  });
+
+  it("pushes only successfully stored report notifications after response", async () => {
+    mocks.session.mockResolvedValue({ id: "member_1" });
+    const response = await POST(new NextRequest("https://nexus.test/api/reports", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        targetType: "product", targetId: "prd_test", type: "scam",
+        reason: "The resource requires moderator review",
+      }),
+    }));
+
+    expect(response.status).toBe(201);
+    expect(mocks.notify).not.toHaveBeenCalled();
+    expect(mocks.push).not.toHaveBeenCalled();
+
+    await state.afterCallbacks[0]?.();
+
+    expect(mocks.notify).toHaveBeenCalledOnce();
+    expect(mocks.push).toHaveBeenCalledWith([
+      expect.objectContaining({
+        id: "not_report",
+        recipientId: "mod_1",
+      }),
+    ]);
   });
 
   it("does not notify anyone if the report and audit transaction fails", async () => {
@@ -115,6 +189,7 @@ describe("report privacy and durable success", () => {
     expect(response.status).toBe(500);
     privateResponse(response);
     expect(mocks.listModeratorIds).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
   });
 
   it("returns a conflict for a concurrent duplicate without sending another notification", async () => {
@@ -131,6 +206,7 @@ describe("report privacy and durable success", () => {
     privateResponse(response);
     expect((await response.json()).reportId).toBe("rpt_existing");
     expect(mocks.listModeratorIds).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
   });
 
   it("rejects oversized target IDs and evidence lists before reading the target", async () => {

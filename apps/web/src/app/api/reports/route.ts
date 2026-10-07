@@ -1,4 +1,4 @@
-import type { NextRequest } from "next/server";
+import { after, type NextRequest } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
   contentRepository,
@@ -12,6 +12,7 @@ import { createReportSchema } from "@nexus/validation";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
 
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../lib/observability";
+import { deliverStoredNotificationsWebPush } from "../../../lib/services/notification-web-push-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
@@ -125,29 +126,52 @@ export async function POST(request: NextRequest) {
     }
     const report = result.report;
 
-    try {
-      const moderators = await userRepository.listModeratorIds();
-      await Promise.all(
-        moderators.map((moderatorId) =>
-          notificationRepository.create({
-            id: generateId("not"),
-            recipientId: moderatorId,
-            title: "New report requires review",
-            message: `${parsed.data.type} report for ${parsed.data.targetType}:${parsed.data.targetId}`,
-            link: "/admin",
-            type: "security",
-          })
-        )
-      );
-    } catch (error) {
-      logRequestEvent({
-        level: "warn",
-        event: "moderation.report_notification_failed",
-        context,
-        status: 201,
-        error,
-      });
-    }
+    after(async () => {
+      try {
+        const moderators = await userRepository.listModeratorIds();
+        const deliveries = await Promise.allSettled(
+          moderators.map((moderatorId) =>
+            notificationRepository.create({
+              id: generateId("not"),
+              recipientId: moderatorId,
+              title: "New report requires review",
+              message: `${parsed.data.type} report for ${parsed.data.targetType}:${parsed.data.targetId}`,
+              link: "/admin",
+              type: "security",
+            }),
+          ),
+        );
+        const failures = deliveries.filter(
+          (delivery) => delivery.status === "rejected",
+        ).length;
+        if (failures) {
+          logRequestEvent({
+            level: "warn",
+            event: "moderation.report_notification_failed",
+            context,
+            status: 201,
+            error: new Error(
+              `${failures} moderator notification deliveries failed`,
+            ),
+          });
+        }
+
+        const storedNotifications = deliveries.flatMap((delivery) =>
+          delivery.status === "fulfilled" && delivery.value
+            ? [delivery.value]
+            : [],
+        );
+        await deliverStoredNotificationsWebPush(storedNotifications);
+      } catch (error) {
+        logRequestEvent({
+          level: "warn",
+          event: "moderation.report_notification_failed",
+          context,
+          status: 201,
+          error,
+        });
+      }
+    });
 
     return privateJson(context, { success: true, report }, { status: 201 });
   } catch (error: unknown) {

@@ -1,0 +1,170 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const state = vi.hoisted(() => ({
+  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
+  articleAuthorId: "usr_author",
+  storedNotification: true,
+}));
+
+const afterMock = vi.hoisted(() =>
+  vi.fn((callback: () => unknown | Promise<unknown>) => {
+    state.afterCallbacks.push(callback);
+  }),
+);
+const createNotification = vi.hoisted(() =>
+  vi.fn(async (input) =>
+    state.storedNotification
+      ? {
+          ...input,
+          id: "not_comment",
+          createdAt: new Date(),
+          isRead: false,
+        }
+      : null,
+  ),
+);
+const pushNotifications = vi.hoisted(() =>
+  vi.fn(async () => ({
+    notifications: 1,
+    attempted: 0,
+    delivered: 0,
+    failed: 0,
+    stale: 0,
+    deliveryErrors: 0,
+  })),
+);
+const getArticle = vi.hoisted(() =>
+  vi.fn(async () => ({
+    id: "cnt_1",
+    slug: "article-one",
+    title: "Article One",
+    authorId: state.articleAuthorId,
+  })),
+);
+const addComment = vi.hoisted(() =>
+  vi.fn(async () => ({
+    id: "cmt_1",
+    contentId: "cnt_1",
+    authorId: "usr_commenter",
+    text: "Useful comment",
+  })),
+);
+
+vi.mock("next/server", async () => {
+  const actual = await vi.importActual<typeof import("next/server")>(
+    "next/server",
+  );
+  return {
+    ...actual,
+    after: afterMock,
+  };
+});
+
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+  authService: {
+    getSession: vi.fn(async () => ({
+      id: "usr_commenter",
+      username: "commenter",
+    })),
+  },
+}));
+
+vi.mock("../apps/web/src/lib/services/content-service", () => ({
+  contentService: {
+    getArticleBySlug: getArticle,
+    addComment,
+  },
+}));
+
+vi.mock("@nexus/db", () => ({
+  notificationRepository: {
+    create: createNotification,
+  },
+}));
+
+vi.mock("@nexus/security", () => ({
+  consumeRateLimit: vi.fn(async () => ({ success: true })),
+  generateId: vi.fn((prefix: string) => `${prefix}_test`),
+}));
+
+vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
+  deliverStoredNotificationsWebPush: pushNotifications,
+}));
+
+import { NextRequest } from "next/server";
+import { POST } from "../apps/web/src/app/api/content/[slug]/comments/route";
+
+function request() {
+  return new NextRequest(
+    "https://nexus.test/api/content/article-one/comments",
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        cookie: "nexus_session=test-session",
+      },
+      body: JSON.stringify({ text: "Useful comment" }),
+    },
+  );
+}
+
+describe("article comment notification side effects", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    state.afterCallbacks.length = 0;
+    state.articleAuthorId = "usr_author";
+    state.storedNotification = true;
+  });
+
+  it("returns the committed comment before author inbox and push delivery", async () => {
+    const response = await POST(request(), {
+      params: Promise.resolve({ slug: "article-one" }),
+    });
+
+    expect(response.status).toBe(201);
+    expect(addComment).toHaveBeenCalledOnce();
+    expect(afterMock).toHaveBeenCalledOnce();
+    expect(createNotification).not.toHaveBeenCalled();
+    expect(pushNotifications).not.toHaveBeenCalled();
+
+    await state.afterCallbacks[0]?.();
+
+    expect(createNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipientId: "usr_author",
+        category: "content",
+        link: "/articles/article-one",
+      }),
+    );
+    expect(pushNotifications).toHaveBeenCalledWith([
+      expect.objectContaining({
+        id: "not_comment",
+        recipientId: "usr_author",
+      }),
+    ]);
+  });
+
+  it("does not push when preferences suppress the stored inbox row", async () => {
+    state.storedNotification = false;
+    const response = await POST(request(), {
+      params: Promise.resolve({ slug: "article-one" }),
+    });
+    expect(response.status).toBe(201);
+
+    await state.afterCallbacks[0]?.();
+
+    expect(createNotification).toHaveBeenCalledOnce();
+    expect(pushNotifications).not.toHaveBeenCalled();
+  });
+
+  it("does not schedule a self-notification for the article author", async () => {
+    state.articleAuthorId = "usr_commenter";
+    const response = await POST(request(), {
+      params: Promise.resolve({ slug: "article-one" }),
+    });
+
+    expect(response.status).toBe(201);
+    expect(afterMock).not.toHaveBeenCalled();
+    expect(createNotification).not.toHaveBeenCalled();
+  });
+});

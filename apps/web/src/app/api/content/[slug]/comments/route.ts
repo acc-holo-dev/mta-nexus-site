@@ -1,10 +1,11 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { after, type NextRequest, NextResponse } from "next/server";
 import { contentService } from "../../../../../lib/services/content-service";
 import { authService } from "../../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
 import { createContentCommentSchema } from "@nexus/validation";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
+import { deliverStoredNotificationsWebPush } from "../../../../../lib/services/notification-web-push-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -72,17 +73,24 @@ export async function POST(
     );
 
     if (article.authorId !== user.id) {
-      await notificationRepository
-        .create({
-          id: generateId("not"),
-          recipientId: article.authorId,
-          title: "New article comment",
-          message: `@${user.username} commented on “${article.title}”.`,
-          type: "content",
-          category: "content",
-          link: `/articles/${article.slug}`,
-        })
-        .catch(() => undefined);
+      after(async () => {
+        try {
+          const created = await notificationRepository.create({
+            id: generateId("not"),
+            recipientId: article.authorId,
+            title: "New article comment",
+            message: `@${user.username} commented on “${article.title}”.`,
+            type: "content",
+            category: "content",
+            link: `/articles/${article.slug}`,
+          });
+          if (created) {
+            await deliverStoredNotificationsWebPush([created]);
+          }
+        } catch {
+          // The comment commit is authoritative; notification/push is best effort.
+        }
+      });
     }
 
     return json(
