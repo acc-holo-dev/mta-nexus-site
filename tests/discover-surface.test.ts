@@ -20,23 +20,37 @@ vi.mock("next/link", async () => {
   };
 });
 
-for (const modulePath of [
-  "../apps/web/src/components/account-controls",
-  "../apps/web/src/components/locale-switcher",
-  "../apps/web/src/components/notification-bell",
-  "../apps/web/src/components/theme-toggle",
-]) {
-  vi.mock(modulePath, async () => {
-    const ReactModule = await import("react");
-    return new Proxy(
-      {},
-      {
-        get: (_target, property) =>
-          () => ReactModule.createElement("span", { "data-mock": String(property) }),
-      },
-    );
-  });
-}
+vi.mock("../apps/web/src/components/account-controls", async () => {
+  const ReactModule = await import("react");
+  return {
+    AccountControls: () =>
+      ReactModule.createElement("span", { "data-mock": "AccountControls" }),
+  };
+});
+
+vi.mock("../apps/web/src/components/locale-switcher", async () => {
+  const ReactModule = await import("react");
+  return {
+    LocaleSwitcher: () =>
+      ReactModule.createElement("span", { "data-mock": "LocaleSwitcher" }),
+  };
+});
+
+vi.mock("../apps/web/src/components/notification-bell", async () => {
+  const ReactModule = await import("react");
+  return {
+    NotificationBell: () =>
+      ReactModule.createElement("span", { "data-mock": "NotificationBell" }),
+  };
+});
+
+vi.mock("../apps/web/src/components/theme-toggle", async () => {
+  const ReactModule = await import("react");
+  return {
+    ThemeToggle: () =>
+      ReactModule.createElement("span", { "data-mock": "ThemeToggle" }),
+  };
+});
 
 import { Sidebar } from "../apps/web/src/components/sidebar";
 import { Navbar } from "../apps/web/src/components/navbar";
