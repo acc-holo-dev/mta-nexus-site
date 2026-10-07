@@ -28,7 +28,11 @@ export function StatCard({ label, value, context, tone = "default", icon, action
     <div className="nexus-panel p-4 flex flex-col gap-1">
       <div className="flex items-center justify-between">
         <span className="font-label text-muted uppercase">{label}</span>
-        {icon && <span className="text-muted">{icon}</span>}
+        {icon && (
+          <span className="text-muted" aria-hidden="true">
+            {icon}
+          </span>
+        )}
       </div>
       <div className={cn("font-numeric text-2xl font-bold", tones[tone])}>{value}</div>
       <div className="flex items-center justify-between gap-2">
@@ -133,7 +137,7 @@ export function TrustBadge({ variant, label, className }: TrustBadgeProps) {
         className
       )}
     >
-      <Icon className="w-3 h-3" />
+      <Icon className="w-3 h-3" aria-hidden="true" />
       <span>{label ?? config.label}</span>
     </span>
   );
