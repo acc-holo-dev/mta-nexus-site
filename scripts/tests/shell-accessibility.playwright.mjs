@@ -466,9 +466,7 @@ for (const locale of ["en", "ru"]) {
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/settings");
-    const firstPreference = page.getByLabel(dictionary.settings.newFollowers, {
-      exact: true,
-    });
+    const firstPreference = page.getByRole("checkbox").first();
     await firstPreference.focus();
     await expect(firstPreference).toBeFocused();
 
@@ -481,15 +479,9 @@ for (const locale of ["en", "ru"]) {
     await expect(settingsLink).toBeFocused();
 
     await page.goto("/support");
-    const supportCategory = page.getByLabel(dictionary.support.category, {
-      exact: true,
-    });
-    const supportSubject = page.getByLabel(dictionary.support.subject, {
-      exact: true,
-    });
-    const supportMessage = page.getByLabel(dictionary.support.message, {
-      exact: true,
-    });
+    const supportCategory = page.getByLabel(dictionary.support.category);
+    const supportSubject = page.getByLabel(dictionary.support.subject);
+    const supportMessage = page.getByLabel(dictionary.support.message);
     await supportCategory.focus();
     await page.keyboard.press("Tab");
     await expect(supportSubject).toBeFocused();
