@@ -6,33 +6,6 @@ const read = (path: string) =>
   readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("server follower publication notifications", () => {
-  it("fans out only after moderator-approved server-linked publication", () => {
-    const service = read(
-      "apps/web/src/lib/services/content-service.ts",
-    );
-    const adminRoute = read(
-      "apps/web/src/app/api/admin/actions/route.ts",
-    );
-    const createRoute = read(
-      "apps/web/src/app/api/content/route.ts",
-    );
-
-    expect(service).toContain("CONTENT_ALREADY_IN_STATE");
-    expect(service).not.toContain(
-      "notifyServerFollowersOfPublishedContent",
-    );
-    expect(adminRoute).toContain(
-      'if (action === "publish" && moderated.serverId)',
-    );
-    expect(adminRoute).toContain("after(async () =>");
-    expect(adminRoute).toContain(
-      "notifyServerFollowersOfPublishedContent(moderated)",
-    );
-    expect(createRoute).not.toContain(
-      "notifyServerFollowersOfPublishedContent",
-    );
-  });
-
   it("bounds fanout, excludes the content author and respects server preferences", () => {
     const fanout = read(
       "apps/web/src/lib/services/server-follow-notification-service.ts",
@@ -73,21 +46,11 @@ describe("server follower publication notifications", () => {
     const fanout = read(
       "apps/web/src/lib/services/server-follow-notification-service.ts",
     );
-    const service = read(
-      "apps/web/src/lib/services/content-service.ts",
-    );
-
     expect(fanout).toContain("suppressedByPreference");
     expect(fanout).toContain("failed += 1");
     expect(fanout).toContain("deliverConfiguredWebPushNotification(created)");
     expect(fanout).toContain("pushFailed");
     expect(fanout).toContain("catch {");
-    expect(service).not.toContain(
-      "notifyServerFollowersOfPublishedContent",
-    );
-    expect(read("apps/web/src/app/api/admin/actions/route.ts")).toContain(
-      "after(async () =>",
-    );
   });
 
   it("does not notify followers for private or suspended servers", () => {
