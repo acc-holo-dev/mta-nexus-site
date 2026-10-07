@@ -32,6 +32,23 @@ describe("PWA release surface", () => {
     expect(source).toContain('request.mode === "navigate"');
     expect(source).toContain("fetch(request).catch(() => offlineDocument(request))");
     expect(source).toContain("never confirms purchases");
-    expect(source).not.toContain("caches.put(");
+  });
+
+  it("runtime-caches only same-origin immutable Next.js static assets", async () => {
+    const source = await getServiceWorker().text();
+
+    expect(source).toContain('url.origin !== self.location.origin');
+    expect(source).toContain('url.pathname.startsWith("/_next/static/")');
+    expect(source).toContain("immutableStaticResponse(request)");
+    expect(source).toContain('response.type === "basic"');
+    expect(source).toContain("response.clone()");
+    expect(source).toContain("cache.put(request, response.clone())");
+
+    expect(source).not.toContain('url.pathname.startsWith("/api/")');
+    expect(source).not.toContain('url.pathname.startsWith("/auth/")');
+    expect(source).not.toContain('url.pathname.startsWith("/workspace/")');
+    expect(source.indexOf('url.pathname.startsWith("/_next/static/")')).toBeLessThan(
+      source.indexOf('request.mode === "navigate"'),
+    );
   });
 });

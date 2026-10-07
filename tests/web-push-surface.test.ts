@@ -11,9 +11,13 @@ describe("Web Push service worker surface", () => {
     expect(source).toContain('return "/notifications"');
   });
 
-  it("keeps offline mutation safety unchanged", async () => {
+  it("keeps offline mutation and private-route cache safety unchanged", async () => {
     const source = await getServiceWorker().text();
+
     expect(source).toContain('request.method !== "GET"');
-    expect(source).not.toContain("caches.put(");
+    expect(source).toContain('url.pathname.startsWith("/_next/static/")');
+    expect(source).not.toContain('url.pathname.startsWith("/api/")');
+    expect(source).not.toContain('url.pathname.startsWith("/settings")');
+    expect(source).not.toContain('url.pathname.startsWith("/security")');
   });
 });
