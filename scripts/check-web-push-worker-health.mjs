@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 
 const HEALTH_FILE =
+  process.env.NEXUS_WEB_PUSH_HEALTH_FILE ||
   "/tmp/nexus-web-push-worker-health.json";
 
 try {

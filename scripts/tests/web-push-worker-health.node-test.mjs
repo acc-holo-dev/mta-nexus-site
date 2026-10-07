@@ -1,0 +1,106 @@
+import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import {
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { test } from "node:test";
+
+const checker = new URL(
+  "../check-web-push-worker-health.mjs",
+  import.meta.url,
+);
+
+function run(payload) {
+  const root = mkdtempSync(
+    join(tmpdir(), "nexus-web-push-health-"),
+  );
+  const file = join(root, "health.json");
+  try {
+    if (payload !== undefined) {
+      writeFileSync(
+        file,
+        typeof payload === "string"
+          ? payload
+          : JSON.stringify(payload),
+      );
+    }
+    const result = spawnSync(
+      process.execPath,
+      [checker.pathname],
+      {
+        encoding: "utf8",
+        env: {
+          ...process.env,
+          NEXUS_WEB_PUSH_HEALTH_FILE: file,
+        },
+      },
+    );
+    assert.ifError(result.error);
+    return result.status;
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+function healthy(overrides = {}) {
+  return {
+    status: "ready",
+    configured: true,
+    pid: 123,
+    batch: 2,
+    heartbeatAt: new Date().toISOString(),
+    staleAfterMs: 60_000,
+    queuePending: 4,
+    queueDue: 2,
+    queueLeased: 1,
+    queueCapacity: 10_000,
+    queueOldestAgeSeconds: 12,
+    ...overrides,
+  };
+}
+
+test("accepts a fresh, internally consistent worker heartbeat", () => {
+  assert.equal(run(healthy()), 0);
+  assert.equal(
+    run(healthy({ configured: false, queuePending: 0 })),
+    0,
+  );
+});
+
+test("fails closed for missing, malformed and stale heartbeat state", () => {
+  assert.notEqual(run(undefined), 0);
+  assert.notEqual(run("{broken"), 0);
+  assert.notEqual(
+    run(
+      healthy({
+        heartbeatAt: new Date(
+          Date.now() - 120_000,
+        ).toISOString(),
+      }),
+    ),
+    0,
+  );
+});
+
+test("rejects impossible queue counters and invalid capacity", () => {
+  assert.notEqual(
+    run(healthy({ queueDue: 5, queuePending: 4 })),
+    0,
+  );
+  assert.notEqual(
+    run(healthy({ queueLeased: 5, queuePending: 4 })),
+    0,
+  );
+  assert.notEqual(
+    run(healthy({ queueCapacity: 50_001 })),
+    0,
+  );
+  assert.notEqual(
+    run(healthy({ configured: "true" })),
+    0,
+  );
+});
