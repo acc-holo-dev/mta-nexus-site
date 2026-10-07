@@ -311,11 +311,18 @@ export class VerificationRepository {
       if (!resolutionNotification) {
         throw new Error("Verification notification insert failed");
       }
-      await enqueueWebPushOutboxForNotification(
-        tx,
-        resolutionNotification.id,
-        resolutionNotification.recipientId,
-      );
+      try {
+        await tx.transaction((pushTx) =>
+          enqueueWebPushOutboxForNotification(
+            pushTx,
+            resolutionNotification.id,
+            resolutionNotification.recipientId,
+          ),
+        );
+      } catch {
+        // Resolution/audit/inbox are authoritative. Push queue failure is
+        // isolated to this savepoint.
+      }
 
       return request;
     });

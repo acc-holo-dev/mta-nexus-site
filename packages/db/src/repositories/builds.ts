@@ -337,12 +337,19 @@ export class BuildRepository {
             and ${notificationPreferences.systemEnabled} = false)
         returning id, recipient_id
       `);
-      for (const row of notificationRows) {
-        await enqueueWebPushOutboxForNotification(
-          tx,
-          String(row.id),
-          String(row.recipient_id),
-        );
+      try {
+        await tx.transaction(async (pushTx) => {
+          for (const row of notificationRows) {
+            await enqueueWebPushOutboxForNotification(
+              pushTx,
+              String(row.id),
+              String(row.recipient_id),
+            );
+          }
+        });
+      } catch {
+        // Build review + inbox notification are authoritative. A push queue
+        // failure rolls back only its savepoint and never the moderation.
       }
       return reviewed as unknown as Build;
     });

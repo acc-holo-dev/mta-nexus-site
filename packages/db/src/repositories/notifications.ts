@@ -180,11 +180,19 @@ export class NotificationRepository {
         throw new Error("Notification insert did not return a row");
       }
 
-      const pushJobs = await enqueueWebPushOutboxForNotification(
-        tx,
-        row.id,
-        row.recipientId,
-      );
+      let pushJobs = 0;
+      try {
+        pushJobs = await tx.transaction((pushTx) =>
+          enqueueWebPushOutboxForNotification(
+            pushTx,
+            row.id,
+            row.recipientId,
+          ),
+        );
+      } catch {
+        // Inbox is authoritative. A queue-local failure rolls back only
+        // the savepoint and must not erase a successfully stored notification.
+      }
 
       return {
         notification: row as unknown as Notification,
