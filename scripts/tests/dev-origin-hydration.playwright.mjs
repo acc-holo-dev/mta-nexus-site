@@ -66,7 +66,7 @@ try {
       [400, 401, 403].includes(loginResponse.status()),
       `${origin.name}: invalid login should be rejected by the API`,
     );
-    await page.getByRole("alert").waitFor({ state: "visible" });
+    await page.locator("#auth-error").waitFor({ state: "visible" });
     assert.equal(
       new URL(page.url()).pathname,
       "/auth/login",
