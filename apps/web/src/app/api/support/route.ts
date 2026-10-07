@@ -1,4 +1,4 @@
-import { notificationRepository, supportCaseRepository, userRepository } from "@nexus/db";
+import { supportCaseRepository, userRepository } from "@nexus/db";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
 import { createSupportCaseSchema } from "@nexus/validation";
 import { after, type NextRequest } from "next/server";
@@ -8,7 +8,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
-import { deliverStoredNotificationsWebPush } from "../../../lib/services/notification-web-push-service";
+import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
 function privateJson(
   context: Parameters<typeof jsonWithRequestId>[0],
@@ -137,25 +137,16 @@ export async function POST(request: NextRequest) {
     after(async () => {
       try {
         const moderatorIds = await userRepository.listModeratorIds();
-        const deliveries = await Promise.allSettled(
-          moderatorIds.map((moderatorId) =>
-            notificationRepository.create({
-              id: generateId("not"),
-              recipientId: moderatorId,
-              title: "New support case",
-              message: supportCase.subject,
-              link: "/admin/support/" + supportCase.id,
-              type: "system",
-              category: "system",
-            }),
-          ),
+        await dispatchNotificationsBestEffort(
+          moderatorIds.map((moderatorId) => ({
+            recipientId: moderatorId,
+            title: "New support case",
+            message: supportCase.subject,
+            link: "/admin/support/" + supportCase.id,
+            type: "system" as const,
+            category: "system" as const,
+          })),
         );
-        const stored = deliveries.flatMap((delivery) =>
-          delivery.status === "fulfilled" && delivery.value
-            ? [delivery.value]
-            : [],
-        );
-        await deliverStoredNotificationsWebPush(stored);
       } catch (error) {
         logRequestEvent({
           level: "warn",

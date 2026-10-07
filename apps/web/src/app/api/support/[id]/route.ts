@@ -1,4 +1,4 @@
-import { notificationRepository, supportCaseRepository, userRepository } from "@nexus/db";
+import { supportCaseRepository, userRepository } from "@nexus/db";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
 import {
   createSupportMessageSchema,
@@ -11,7 +11,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../lib/observability";
-import { deliverStoredNotificationsWebPush } from "../../../../lib/services/notification-web-push-service";
+import { dispatchNotificationsBestEffort } from "../../../../lib/services/notification-dispatch-service";
 
 function privateJson(
   context: Parameters<typeof jsonWithRequestId>[0],
@@ -175,33 +175,24 @@ export async function POST(
           authorRole === "staff"
             ? [access.supportCase.requesterId]
             : await userRepository.listModeratorIds();
-        const deliveries = await Promise.allSettled(
+        await dispatchNotificationsBestEffort(
           recipientIds
             .filter((recipientId) => recipientId !== access.user!.id)
-            .map((recipientId) =>
-              notificationRepository.create({
-                id: generateId("not"),
-                recipientId,
-                title:
-                  authorRole === "staff"
-                    ? "Support replied"
-                    : "Support case updated",
-                message: access.supportCase.subject,
-                link:
-                  authorRole === "staff"
-                    ? "/support/" + id
-                    : "/admin/support/" + id,
-                type: "system",
-                category: "system",
-              }),
-            ),
+            .map((recipientId) => ({
+              recipientId,
+              title:
+                authorRole === "staff"
+                  ? "Support replied"
+                  : "Support case updated",
+              message: access.supportCase.subject,
+              link:
+                authorRole === "staff"
+                  ? "/support/" + id
+                  : "/admin/support/" + id,
+              type: "system" as const,
+              category: "system" as const,
+            })),
         );
-        const stored = deliveries.flatMap((delivery) =>
-          delivery.status === "fulfilled" && delivery.value
-            ? [delivery.value]
-            : [],
-        );
-        await deliverStoredNotificationsWebPush(stored);
       } catch (error) {
         logRequestEvent({
           level: "warn",
@@ -299,18 +290,17 @@ export async function PATCH(
     if (supportCase.status !== access.supportCase.status) {
       after(async () => {
         try {
-          const created = await notificationRepository.create({
-            id: generateId("not"),
-            recipientId: access.supportCase!.requesterId,
-            title: "Support case status changed",
-            message: access.supportCase!.subject + ": " + supportCase.status,
-            link: "/support/" + id,
-            type: "system",
-            category: "system",
-          });
-          if (created) {
-            await deliverStoredNotificationsWebPush([created]);
-          }
+          await dispatchNotificationsBestEffort([
+            {
+              recipientId: access.supportCase!.requesterId,
+              title: "Support case status changed",
+              message:
+                access.supportCase!.subject + ": " + supportCase.status,
+              link: "/support/" + id,
+              type: "system",
+              category: "system",
+            },
+          ]);
         } catch (error) {
           logRequestEvent({
             level: "warn",
