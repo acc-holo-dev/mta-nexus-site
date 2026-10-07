@@ -166,6 +166,12 @@ for (const locale of ["en", "ru"]) {
     ).toBeVisible();
     await expect(
       moreDialog.getByRole("link", {
+        name: dictionary.nav.support,
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      moreDialog.getByRole("link", {
         name: dictionary.nav.settings,
         exact: true,
       }),

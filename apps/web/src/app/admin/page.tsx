@@ -148,9 +148,17 @@ export default async function AdminPage({
           </h1>
           <p className="mt-0.5 font-caption text-muted">{copy.description}</p>
         </div>
-        <span className="self-start rounded-full border border-base bg-inset px-3 py-1 font-label uppercase text-muted sm:self-auto">
-          {copy.authorizedSession}
-        </span>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <Link
+            href="/admin/support"
+            className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+          >
+            {copy.supportQueue}
+          </Link>
+          <span className="rounded-full border border-base bg-inset px-3 py-1 font-label uppercase text-muted">
+            {copy.authorizedSession}
+          </span>
+        </div>
       </header>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">

@@ -1,5 +1,20 @@
 # 29. Support, Trial, Wishlist и Billing UX
 
+## CURRENT support implementation — 2026-10-07
+
+В `main` реализован первый end-to-end unified support slice:
+
+- durable `support_cases` + participant message history;
+- authenticated user create/list/thread/reply flow;
+- staff queue under `/admin/support` for current moderator/admin capability model;
+- staff reply, resolve, close and reopen;
+- audit events for case creation, replies and status changes;
+- dedicated rate limits for case/message spam;
+- RU/EN user UI and mobile `More -> Support` access;
+- no hard response-time promise during closed beta.
+
+Пока **не** реализованы evidence attachments, seller/team routing, purchase/license auto-context, assignment/priority/SLA automation и отдельная Support staff capability. Current staff access временно использует `admin.moderation`, пока не внедрена broader many-to-many staff model.
+
 ## 1. Trial/demo
 
 Paid seller может включить demo/trial.

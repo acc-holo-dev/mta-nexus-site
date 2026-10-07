@@ -1,0 +1,300 @@
+"use client";
+
+import { ArrowLeft, Send } from "lucide-react";
+import Link from "next/link";
+import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { useNexusLocale } from "./locale-context";
+
+type CaseData = {
+  id: string;
+  category: string;
+  subject: string;
+  status: "open" | "resolved" | "closed";
+};
+
+type MessageData = {
+  id: string;
+  authorRole: "requester" | "staff";
+  body: string;
+  createdAt: string;
+};
+
+export function SupportCaseThread({
+  caseId,
+  staffMode = false,
+}: {
+  caseId: string;
+  staffMode?: boolean;
+}) {
+  const { locale, dictionary } = useNexusLocale();
+  const copy = dictionary.support;
+  const [supportCase, setSupportCase] = useState<CaseData | null>(null);
+  const [messages, setMessages] = useState<MessageData[]>([]);
+  const [reply, setReply] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
+
+  const categories: Record<string, string> = {
+    account: copy.categoryAccount,
+    resource: copy.categoryResource,
+    server: copy.categoryServer,
+    purchase: copy.categoryPurchase,
+    license: copy.categoryLicense,
+    payment: copy.categoryPayment,
+    seller: copy.categorySeller,
+    integration: copy.categoryIntegration,
+    other: copy.categoryOther,
+  };
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `/api/support/${encodeURIComponent(caseId)}`,
+        {
+          cache: "no-store",
+          credentials: "same-origin",
+          signal: AbortSignal.timeout(15_000),
+        },
+      );
+      const data = await response.json().catch(() => null);
+      if (
+        !response.ok ||
+        !data?.supportCase?.id ||
+        !Array.isArray(data?.messages)
+      ) {
+        throw new Error(copy.loadError);
+      }
+
+      setSupportCase(data.supportCase);
+      setMessages(data.messages);
+    } catch {
+      setSupportCase(null);
+      setMessages([]);
+      setError(copy.loadError);
+    } finally {
+      setLoading(false);
+    }
+  }, [caseId, copy.loadError]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  async function sendReply(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (sending || !reply.trim()) return;
+
+    setSending(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `/api/support/${encodeURIComponent(caseId)}`,
+        {
+          method: "POST",
+          cache: "no-store",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: reply }),
+          signal: AbortSignal.timeout(15_000),
+        },
+      );
+      const data = await response.json().catch(() => null);
+      if (!response.ok || data?.success !== true) {
+        throw new Error(copy.replyError);
+      }
+
+      setReply("");
+      await load();
+    } catch {
+      setError(copy.replyError);
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function updateStatus(status: CaseData["status"]) {
+    setError(null);
+    try {
+      const response = await fetch(
+        `/api/support/${encodeURIComponent(caseId)}`,
+        {
+          method: "PATCH",
+          cache: "no-store",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+          signal: AbortSignal.timeout(15_000),
+        },
+      );
+      const data = await response.json().catch(() => null);
+      if (!response.ok || data?.success !== true) {
+        throw new Error(copy.statusError);
+      }
+
+      await load();
+    } catch {
+      setError(copy.statusError);
+    }
+  }
+
+  const backHref = staffMode ? "/admin/support" : "/support";
+
+  if (loading) {
+    return (
+      <p className="mx-auto max-w-4xl text-sm text-muted">{copy.loading}</p>
+    );
+  }
+
+  if (!supportCase) {
+    return (
+      <div className="mx-auto max-w-4xl space-y-4">
+        <Link href={backHref} className="text-sm text-accent hover:underline">
+          {copy.back}
+        </Link>
+        <div role="alert" className="nexus-panel p-5 text-sm text-danger">
+          {error ?? copy.loadError}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-4xl space-y-6">
+      <Link
+        href={backHref}
+        className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+        {copy.back}
+      </Link>
+
+      <header className="space-y-2 border-b border-base pb-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="font-label uppercase text-muted">
+              {categories[supportCase.category] ?? supportCase.category}
+            </p>
+            <h1 className="mt-1 font-display text-primary">
+              {supportCase.subject}
+            </h1>
+          </div>
+          <span className="rounded-full border border-base bg-inset px-3 py-1 font-label text-muted">
+            {supportCase.status === "open"
+              ? copy.open
+              : supportCase.status === "resolved"
+                ? copy.resolved
+                : copy.closed}
+          </span>
+        </div>
+
+        {staffMode && (
+          <div className="flex flex-wrap gap-2">
+            {supportCase.status !== "open" && (
+              <button
+                type="button"
+                onClick={() => void updateStatus("open")}
+                className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.reopen}
+              </button>
+            )}
+            {supportCase.status !== "resolved" && (
+              <button
+                type="button"
+                onClick={() => void updateStatus("resolved")}
+                className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+              >
+                {copy.resolve}
+              </button>
+            )}
+            {supportCase.status !== "closed" && (
+              <button
+                type="button"
+                onClick={() => void updateStatus("closed")}
+                className="rounded-md border border-[color:var(--nexus-danger)]/30 bg-danger-soft px-3 py-1.5 text-xs font-semibold text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-danger)]"
+              >
+                {copy.close}
+              </button>
+            )}
+          </div>
+        )}
+      </header>
+
+      {error && (
+        <div
+          role="alert"
+          className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
+        >
+          {error}
+        </div>
+      )}
+
+      <section className="space-y-3" aria-label={copy.messages}>
+        {messages.map((message) => (
+          <article
+            key={message.id}
+            className={`rounded-xl border p-4 ${
+              message.authorRole === "staff"
+                ? "border-[color:var(--nexus-accent)]/25 bg-accent-soft"
+                : "border-base bg-surface"
+            }`}
+          >
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs font-bold text-primary">
+                {message.authorRole === "staff"
+                  ? copy.staff
+                  : staffMode
+                    ? copy.requester
+                    : copy.you}
+              </span>
+              <time
+                dateTime={new Date(message.createdAt).toISOString()}
+                className="font-numeric text-[11px] text-faint"
+              >
+                {new Date(message.createdAt).toLocaleString(dateLocale)}
+              </time>
+            </div>
+            <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
+              {message.body}
+            </p>
+          </article>
+        ))}
+      </section>
+
+      {supportCase.status !== "closed" ? (
+        <form
+          onSubmit={(event) => void sendReply(event)}
+          className="nexus-panel space-y-3 p-4"
+        >
+          <label className="block space-y-1.5">
+            <span className="font-label text-secondary">{copy.reply}</span>
+            <textarea
+              value={reply}
+              onChange={(event) => setReply(event.target.value)}
+              maxLength={4000}
+              required
+              rows={4}
+              className="w-full resize-y rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+            />
+          </label>
+          <button
+            type="submit"
+            disabled={sending}
+            className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            <Send className="h-4 w-4" aria-hidden="true" />
+            {sending ? copy.sending : copy.sendReply}
+          </button>
+        </form>
+      ) : (
+        <p className="rounded-lg border border-base bg-inset p-4 text-sm text-muted">
+          {copy.closedReply}
+        </p>
+      )}
+    </div>
+  );
+}

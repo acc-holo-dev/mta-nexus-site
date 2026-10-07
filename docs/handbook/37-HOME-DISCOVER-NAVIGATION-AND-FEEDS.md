@@ -12,7 +12,7 @@
 - Community;
 - More.
 
-`More` открывает доступный modal bottom sheet с существующими secondary surfaces: Discover, Notifications, Workspace, Settings и Security Center. Escape/фон закрывают sheet, а focus возвращается на trigger. Messages и Support не подменяются мёртвыми ссылками: отдельных runtime routes для них пока нет, поэтому они остаются target gap.
+`More` открывает доступный modal bottom sheet с существующими secondary surfaces: Discover, Notifications, Workspace, Support, Settings и Security Center. Escape/фон закрывают sheet, а focus возвращается на trigger. Support теперь доступен через `More` и работает как отдельная unified case system. Messages остаётся target gap: отдельного runtime route для личных сообщений пока нет.
 
 ## 1. Home после login
 

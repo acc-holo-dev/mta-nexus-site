@@ -6,6 +6,7 @@ import {
   Home,
   LayoutDashboard,
   Library,
+  LifeBuoy,
   Menu,
   MessageSquare,
   Server,
@@ -48,6 +49,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
       label: dictionary.nav.mobileWorkspace,
       icon: LayoutDashboard,
     },
+    { href: "/support", label: dictionary.nav.support, icon: LifeBuoy },
     { href: "/settings", label: dictionary.nav.settings, icon: Settings },
     {
       href: "/security",
