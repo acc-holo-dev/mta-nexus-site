@@ -158,7 +158,7 @@ async function register(actor, person, displayName) {
   assert(!('passwordHash' in value.data.user) && !('token' in value.data), 'Do not expose auth secrets in JSON');
   assert(value.data.user.role !== 'admin', 'Public registration must not grant admin');
   const cookie = (await actor.context.cookies()).find((item) => item.name === 'nexus_session');
-  assert(cookie && cookie.httpOnly && cookie.secure && cookie.sameSite === 'Lax' && cookie.path === '/', 'Session cookie security contract');
+  assert(cookie?.httpOnly && cookie.secure && cookie.sameSite === 'Lax' && cookie.path === '/', 'Session cookie security contract');
   assert(cookie.expires > Date.now() / 1000);
   assert(!(await actor.page.evaluate(() => document.cookie)).includes('nexus_session='), 'JavaScript cannot read the session cookie');
   assert(/private/.test(value.cacheControl) && /no-store/.test(value.cacheControl));

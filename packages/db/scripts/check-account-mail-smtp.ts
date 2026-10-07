@@ -6,7 +6,6 @@ import { db, auditEvents, users } from "../src/client";
 import { accountMailOutbox } from "../src/account-mail-schema";
 import { AccountMailCipher } from "../src/repositories/account-mail-crypto";
 import { accountMailOutboxRepository } from "../src/repositories/account-mail-outbox";
-import { accountMailWorkerRepository } from "../src/repositories/account-mail-worker";
 import { AccountMailDispatcher } from "../src/repositories/account-mail-dispatcher";
 import { AccountMailSmtpTransport } from "../src/repositories/account-mail-smtp";
 import { authService } from "../../../apps/web/src/lib/services/auth-service";
