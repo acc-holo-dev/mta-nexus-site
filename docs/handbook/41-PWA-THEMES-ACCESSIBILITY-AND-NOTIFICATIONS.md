@@ -17,7 +17,9 @@
 
 Chromium release acceptance теперь также покрывает RU/EN login и password-recovery UI, а после реального входа — Settings, Security Center, Support, Publish и disposable unowned Server Claim: keyboard focus, accessible labels, live error/status semantics, reduced-motion и reflow на 320/390/1280 px. Reduced-motion contract останавливает повторяющиеся animations, сокращает transitions и принудительно отключает smooth scrolling. Claim acceptance не запускает внешний master-list challenge и проверяет только безопасный UI до state-changing действия. Semantic text/faint/accent tokens теперь защищены математическим regression-тестом: normal-size text >= 4.5:1 на semantic surfaces, solid accent >= 4.5:1 с белым label и >= 3:1 как focus indicator. Status palette разделена на foreground и solid-action tokens: success/warning/danger/purple foreground >= 4.5:1 на semantic/soft surfaces, а solid success/warning/danger >= 4.5:1 с белым label. Это scoped browser acceptance, не полная screen-reader/WCAG-сертификация.
 
-Ещё не закрыты target requirements этой главы: **Web Push delivery/dispatcher и production VAPID wiring**, policy для кеширования ранее просмотренного публичного read-only content, commerce accessibility acceptance и полный WCAG 2.2 AA screen-reader/contrast audit.
+Free-resource acquisition acceptance теперь дополнительно проходит keyboard-only Add-to-library → claim → return → download error/cancel и reflow 320/390 px поверх реального entitlement/download flow. Это закрывает бесплатную acquisition/download часть accessibility; paid cart/checkout/license/payment UI остаётся отдельным будущим commerce gate и не симулируется.
+
+Ещё не закрыты target requirements этой главы: **Web Push delivery/dispatcher и production VAPID wiring**, policy для кеширования ранее просмотренного публичного read-only content, paid commerce accessibility acceptance и полный WCAG 2.2 AA screen-reader audit.
 
 ## 1. Public release quality bar
 

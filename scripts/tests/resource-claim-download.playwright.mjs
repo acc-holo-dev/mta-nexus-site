@@ -35,6 +35,15 @@ const productTitle = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE;
 const expectedSha256 = process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256;
 const expectedSize = Number(process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SIZE);
 assert.equal(expectedSize, 64 * 1024 * 1024, "Exercise the maximum supported download size");
+async function assertNoHorizontalOverflow(page, label) {
+  assert(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+    `Horizontal overflow: ${label}`,
+  );
+}
+
 async function verifyDownloadedFile(path) {
   assert.equal((await stat(path)).size, expectedSize);
   const hash = createHash("sha256");
@@ -130,6 +139,17 @@ test("J5 claim -> workspace -> download exact published build", async ({
     assert(!("passwordHash" in registration.data.user));
 
     await page.goto(`/market/${productSlug}`);
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      await expect(
+        page.getByRole("heading", { level: 1, name: productTitle, exact: true }),
+      ).toBeVisible();
+      await assertNoHorizontalOverflow(
+        page,
+        `resource detail at ${width}px before acquisition`,
+      );
+    }
+    await page.setViewportSize({ width: 1280, height: 844 });
     await expect(page.getByText("Preview unavailable", { exact: true })).toBeVisible();
     await expect(page.getByRole("img", { name: productTitle, exact: true })).toHaveCount(0);
     await expect(
@@ -139,9 +159,13 @@ test("J5 claim -> workspace -> download exact published build", async ({
       page.getByRole("button", { name: /Download Build/u }),
     ).toHaveCount(0);
 
-    await page
-      .getByRole("link", { name: "Add to library", exact: true })
-      .click();
+    const addToLibraryLink = page.getByRole("link", {
+      name: "Add to library",
+      exact: true,
+    });
+    await addToLibraryLink.focus();
+    await expect(addToLibraryLink).toBeFocused();
+    await page.keyboard.press("Enter");
     await expect(page).toHaveURL(
       new RegExp(`/acquire\\?productId=${productId}$`, "u"),
     );
@@ -150,14 +174,24 @@ test("J5 claim -> workspace -> download exact published build", async ({
     ).toBeVisible();
     await expect(page.getByText(productTitle, { exact: true })).toBeVisible();
 
+    for (const width of [320, 390]) {
+      await page.setViewportSize({ width, height: 844 });
+      await assertNoHorizontalOverflow(page, `acquire page at ${width}px`);
+    }
+    await page.setViewportSize({ width: 1280, height: 844 });
+
     const claimResponsePromise = page.waitForResponse(
       (response) =>
         response.url().endsWith("/api/resources/claim") &&
         response.request().method() === "POST",
     );
-    await page
-      .getByRole("button", { name: "Add to library", exact: true })
-      .click();
+    const claimButton = page.getByRole("button", {
+      name: "Add to library",
+      exact: true,
+    });
+    await claimButton.focus();
+    await expect(claimButton).toBeFocused();
+    await page.keyboard.press("Enter");
     const claimResponse = await claimResponsePromise;
     assert.equal(claimResponse.status(), 201);
 
@@ -165,7 +199,13 @@ test("J5 claim -> workspace -> download exact published build", async ({
       page.getByRole("heading", { name: "Resource added", exact: true }),
     ).toBeVisible();
 
-    await page.getByRole("link", { name: "Open resource", exact: true }).click();
+    const openResourceLink = page.getByRole("link", {
+      name: "Open resource",
+      exact: true,
+    });
+    await openResourceLink.focus();
+    await expect(openResourceLink).toBeFocused();
+    await page.keyboard.press("Enter");
     await expect(page).toHaveURL(new RegExp(`/market/${productSlug}$`, "u"));
     await expect(page.getByText("In your library", { exact: true })).toBeVisible();
     await expect(
@@ -191,7 +231,13 @@ test("J5 claim -> workspace -> download exact published build", async ({
       contentType: "application/json",
       body: JSON.stringify({ code: "BUILD_ARTIFACT_MISMATCH" }),
     }));
-    await page.getByRole("button", { name: "Download Build v1.0.0", exact: true }).click();
+    const keyboardDownload = page.getByRole("button", {
+      name: "Download Build v1.0.0",
+      exact: true,
+    });
+    await keyboardDownload.focus();
+    await expect(keyboardDownload).toBeFocused();
+    await page.keyboard.press("Enter");
     await expect(page.getByRole("alert").filter({ hasText: "This build cannot be downloaded right now" })).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/market/${productSlug}$`, "u"));
     await page.unroute(downloadPattern);
@@ -230,7 +276,13 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await stallNextDownload();
     await downloadButton.click();
     await expect(preparingButton).toBeDisabled();
-    await page.getByRole("button", { name: "Cancel download", exact: true }).click();
+    const cancelDownload = page.getByRole("button", {
+      name: "Cancel download",
+      exact: true,
+    });
+    await cancelDownload.focus();
+    await expect(cancelDownload).toBeFocused();
+    await page.keyboard.press("Enter");
     await expect(page.getByRole("status").filter({ hasText: "Download cancelled. You can try again." })).toBeVisible();
     await expect(downloadButton).toBeEnabled();
     await page.clock.fastForward(60_001);
@@ -322,6 +374,10 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await russianFile.saveAs(russianPath);
     await verifyDownloadedFile(russianPath);
     results.push({ name: "RU/EN timeout, cancellation, partial-stream cleanup and exact-byte retries", status: "PASS" });
+    results.push({
+      name: "Keyboard-only free acquisition/download actions and 320/390px reflow",
+      status: "PASS",
+    });
 
     for (const failure of ["truncated", "stream-error"]) {
       await page.evaluate(({ id, failure }) => {
