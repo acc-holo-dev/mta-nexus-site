@@ -109,16 +109,37 @@ export function WebPushSettings() {
           applicationServerKey: applicationServerKey(publicKey),
         });
       }
-      const response = await fetch("/api/notifications/push", {
-        method: "POST",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(subscription.toJSON()),
-        signal: AbortSignal.timeout(15_000),
-      });
-      const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true) throw new Error("push-enable");
+      const persistSubscription = async (value: PushSubscription) => {
+        const response = await fetch("/api/notifications/push", {
+          method: "POST",
+          cache: "no-store",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(value.toJSON()),
+          signal: AbortSignal.timeout(15_000),
+        });
+        return {
+          response,
+          data: await response.json().catch(() => null),
+        };
+      };
+
+      let persisted = await persistSubscription(subscription);
+      if (
+        persisted.response.status === 409 &&
+        persisted.data?.code === "WEB_PUSH_ENDPOINT_CONFLICT"
+      ) {
+        await subscription.unsubscribe();
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: applicationServerKey(publicKey),
+        });
+        persisted = await persistSubscription(subscription);
+      }
+
+      if (!persisted.response.ok || persisted.data?.success !== true) {
+        throw new Error("push-enable");
+      }
       setStatus("enabled");
     } catch {
       setStatus("error");

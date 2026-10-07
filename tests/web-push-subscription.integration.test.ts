@@ -95,3 +95,92 @@ describe("Web Push active subscription repository", () => {
     );
   });
 });
+
+
+it("never rebinds an existing push endpoint to another session", async () => {
+  const suffix = randomBytes(6).toString("hex");
+  const firstUserId = `usr_push_owner_${suffix}`;
+  const secondUserId = `usr_push_other_${suffix}`;
+  const firstSessionId = `ses_push_owner_${suffix}`;
+  const secondSessionId = `ses_push_other_${suffix}`;
+  const endpoint = `https://push.example.invalid/shared-${suffix}`;
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+  for (const [userId, username] of [
+    [firstUserId, `push_owner_${suffix}`],
+    [secondUserId, `push_other_${suffix}`],
+  ] as const) {
+    await userRepository.create({
+      id: userId,
+      email: `${username}@example.invalid`,
+      username,
+      displayName: username,
+      role: "user",
+    });
+  }
+
+  await sessionRepository.create({
+    id: firstSessionId,
+    userId: firstUserId,
+    token: `owner-token-${suffix}`,
+    expiresAt,
+  });
+  await sessionRepository.create({
+    id: secondSessionId,
+    userId: secondUserId,
+    token: `other-token-${suffix}`,
+    expiresAt,
+  });
+
+  const created = await webPushSubscriptionRepository.upsert({
+    id: `wps_owner_${suffix}`,
+    userId: firstUserId,
+    sessionId: firstSessionId,
+    endpoint,
+    p256dh: "first-key",
+    auth: "first-auth",
+    expirationAt: null,
+  });
+  expect(created).not.toBeNull();
+
+  const refreshed = await webPushSubscriptionRepository.upsert({
+    id: `wps_ignored_${suffix}`,
+    userId: firstUserId,
+    sessionId: firstSessionId,
+    endpoint,
+    p256dh: "refreshed-key",
+    auth: "refreshed-auth",
+    expirationAt: null,
+  });
+  expect(refreshed).toMatchObject({
+    userId: firstUserId,
+    sessionId: firstSessionId,
+    p256dh: "refreshed-key",
+  });
+
+  await expect(
+    webPushSubscriptionRepository.upsert({
+      id: `wps_other_${suffix}`,
+      userId: secondUserId,
+      sessionId: secondSessionId,
+      endpoint,
+      p256dh: "other-key",
+      auth: "other-auth",
+      expirationAt: null,
+    }),
+  ).resolves.toBeNull();
+
+  expect(
+    await webPushSubscriptionRepository.listByUser(firstUserId),
+  ).toEqual([
+    expect.objectContaining({
+      endpoint,
+      userId: firstUserId,
+      sessionId: firstSessionId,
+      p256dh: "refreshed-key",
+    }),
+  ]);
+  expect(
+    await webPushSubscriptionRepository.listByUser(secondUserId),
+  ).toEqual([]);
+});

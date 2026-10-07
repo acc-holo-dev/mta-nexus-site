@@ -25,26 +25,39 @@ export class WebPushSubscriptionRepository {
     auth: string;
     expirationAt: Date | null;
     userAgent?: string | null;
-  }): Promise<WebPushSubscriptionRecord> {
+  }): Promise<WebPushSubscriptionRecord | null> {
     const now = new Date();
-    const [row] = await db.insert(webPushSubscriptions).values({
+    const values = {
       ...input,
       userAgent: input.userAgent ?? null,
       createdAt: now,
       updatedAt: now,
-    }).onConflictDoUpdate({
-      target: webPushSubscriptions.endpoint,
-      set: {
-        userId: input.userId,
-        sessionId: input.sessionId,
+    };
+    const [inserted] = await db
+      .insert(webPushSubscriptions)
+      .values(values)
+      .onConflictDoNothing({ target: webPushSubscriptions.endpoint })
+      .returning();
+    if (inserted) return inserted as WebPushSubscriptionRecord;
+
+    const [updated] = await db
+      .update(webPushSubscriptions)
+      .set({
         p256dh: input.p256dh,
         auth: input.auth,
         expirationAt: input.expirationAt,
         userAgent: input.userAgent ?? null,
         updatedAt: now,
-      },
-    }).returning();
-    return row as WebPushSubscriptionRecord;
+      })
+      .where(
+        and(
+          eq(webPushSubscriptions.endpoint, input.endpoint),
+          eq(webPushSubscriptions.userId, input.userId),
+          eq(webPushSubscriptions.sessionId, input.sessionId),
+        ),
+      )
+      .returning();
+    return (updated as WebPushSubscriptionRecord | undefined) ?? null;
   }
 
   async countForSession(userId: string, sessionId: string): Promise<number> {
