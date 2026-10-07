@@ -19,7 +19,7 @@ test.afterAll(async () => {
   const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
   await mkdir(output, { recursive: true });
   await writeFile(join(output, "shell-results.json"), JSON.stringify({ commit: process.env.GITHUB_SHA, results: evidence,
-    scope: "Chromium keyboard behavior, responsive widths, localization and visible form labels. This is scoped acceptance, not a full WCAG or screen-reader audit." }, null, 2));
+    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button names and image alt attributes. This is scoped acceptance, not a full WCAG or screen-reader audit." }, null, 2));
   await writeFile(join(output, "shell-summary.md"), ["# Keyboard, mobile and locale acceptance", "", ...evidence.map((value) => `- PASS: ${value}`), ""].join("\n"));
 });
 
@@ -67,6 +67,50 @@ async function assertValidAccessibilityReferences(page, label) {
     result.missingReferences,
     [],
     `${label}: dangling ARIA ID references`,
+  );
+}
+
+async function assertBasicAccessibleNames(page, label) {
+  const result = await page.evaluate(() => {
+    const visible = (element) =>
+      element.getClientRects().length > 0 &&
+      getComputedStyle(element).visibility !== "hidden";
+
+    const unnamedButtons = [...document.querySelectorAll("button")]
+      .filter(visible)
+      .filter((button) => {
+        if (button.getAttribute("aria-label")?.trim()) return false;
+        if (button.getAttribute("aria-labelledby")?.trim()) return false;
+        if (button.getAttribute("title")?.trim()) return false;
+        if (button.textContent?.trim()) return false;
+        if (
+          [...button.querySelectorAll("img[alt]")].some((image) =>
+            image.getAttribute("alt")?.trim(),
+          )
+        ) {
+          return false;
+        }
+        return !button.querySelector("[aria-label]");
+      })
+      .map((button) => button.outerHTML.slice(0, 180));
+
+    const imagesWithoutAlt = [...document.querySelectorAll("img")]
+      .filter(visible)
+      .filter((image) => !image.hasAttribute("alt"))
+      .map((image) => image.outerHTML.slice(0, 180));
+
+    return { unnamedButtons, imagesWithoutAlt };
+  });
+
+  assert.deepEqual(
+    result.unnamedButtons,
+    [],
+    `${label}: visible buttons without accessible names`,
+  );
+  assert.deepEqual(
+    result.imagesWithoutAlt,
+    [],
+    `${label}: visible images without alt attributes`,
   );
 }
 
@@ -207,6 +251,10 @@ for (const locale of ["en", "ru"]) {
         const unlabeled = await page.locator('main input:not([type="hidden"]), main select, main textarea').evaluateAll((elements) => elements.filter((element) => element.getClientRects().length && !element.getAttribute("aria-label") && !element.getAttribute("aria-labelledby") && !element.labels?.length).map((element) => element.name || element.id));
         assert.deepEqual(unlabeled, [], `${route} unlabeled fields`);
         await assertValidAccessibilityReferences(
+          page,
+          `${locale} ${width} ${route}`,
+        );
+        await assertBasicAccessibleNames(
           page,
           `${locale} ${width} ${route}`,
         );
@@ -564,6 +612,10 @@ for (const locale of ["en", "ru"]) {
         await spec.ready();
         await assertNoVisibleUnlabeledFields(page, spec.route);
         await assertValidAccessibilityReferences(
+          page,
+          `${locale} ${width} ${spec.route}`,
+        );
+        await assertBasicAccessibleNames(
           page,
           `${locale} ${width} ${spec.route}`,
         );
