@@ -64,16 +64,23 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 
 ### P1-2. GitHub-hosted runner не начинает `plan` job
 
-После исправлений Web Push commit `0221f85` и последующие SHA
-`ce2a0e9`, `d7e9c56`, `ad7ca08`, `e654c6a` получают один и тот же
-внешний симптом: job **Choose verification scope** завершается `failure`
-до первого шага. GitHub API возвращает пустой `steps: []`; job logs отсутствуют.
-У run `37565630603` тот же zero-step failure воспроизведён в трёх attempts,
-включая отдельный rerun конкретного failed job. Новые push-runs
-`37565951604`, `37566015924`, `37566128990`, `37566190556` повторили
-симптом. При этом последний полностью исполнившийся HEAD `7567191` прошёл
-полный CI, а run `37565299572` на `3a1f818` ещё запускал реальные jobs и
-дал обычные диагностируемые ошибки typecheck/upgrade rehearsal.
+После исправлений Web Push commit `0221f85` и все проверенные последующие
+SHA получают один и тот же внешний симптом: job **Choose verification scope**
+завершается `failure` до первого шага. GitHub Actions Jobs API возвращает
+`steps: []`, `runner_id: 0`, пустые `runner_name` / `runner_group_name`;
+job logs отсутствуют. Check Run при этом создаётся и содержит системные
+annotations, то есть workflow зарегистрирован, но runner не назначается.
+
+У run `37565630603` zero-step failure воспроизведён в трёх attempts, включая
+отдельный rerun конкретного failed job. Симптом далее повторился на новых
+push-runs, включая `37565951604`, `37566015924`, `37566128990`,
+`37566190556`, `37566679395`, `37566968237`, `37567047445`,
+`37567168541` и `37567282718`. На последнем run (`3c85ea7`) plan job
+`112617774537` и synthetic `CI result` job также имеют `runner_id: 0`
+и ноль шагов. При этом последний полностью исполнившийся HEAD `7567191`
+прошёл полный CI, а run `37565299572` на `3a1f818` ещё назначал runners,
+запускал реальные jobs и дал обычные диагностируемые ошибки
+typecheck/upgrade rehearsal.
 
 Репозиторий private. Доступный GitHub connector не раскрывает account billing /
 Actions minutes / repository Actions policy, поэтому причина (quota/billing,
