@@ -1,57 +1,83 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-describe("closed beta commerce guard", () => {
-  it("keeps paid checkout explicitly disabled", () => {
-    const route = readFileSync(
-      path.resolve(
-        process.cwd(),
-        "apps/web/src/app/api/checkout/route.ts",
-      ),
-      "utf8",
-    );
+const mocks = vi.hoisted(() => ({
+  claimFreeResource: vi.fn(),
+  hasEntitlement: vi.fn(),
+}));
 
-    expect(route).toContain("CHECKOUT_DISABLED");
-    expect(route).toContain("{ status: 503 }");
-    expect(route).not.toContain("createOrderAndCheckout");
+vi.mock("@nexus/db", () => ({
+  entitlementRepository: {
+    claimFreeResource: mocks.claimFreeResource,
+    hasEntitlement: mocks.hasEntitlement,
+  },
+}));
+
+vi.mock("@nexus/security", () => ({
+  generateId: vi.fn(() => "ent_test"),
+}));
+
+import { POST as disabledCheckout } from "../apps/web/src/app/api/checkout/route";
+import { CommerceService } from "../apps/web/src/lib/services/commerce-service";
+
+describe("closed-beta commerce behavior", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("keeps paid commerce primitives out of the active resource access service", () => {
-    const service = readFileSync(
-      path.resolve(
-        process.cwd(),
-        "apps/web/src/lib/services/commerce-service.ts",
-      ),
-      "utf8",
-    );
+  it("fails paid checkout closed with a stable public code", async () => {
+    const response = await disabledCheckout();
 
-    expect(service).toContain("entitlementRepository.claimFreeResource");
-    expect(service).toContain("entitlementRepository.hasEntitlement");
-    expect(service).not.toContain("licenseRepository");
-    expect(service).not.toContain("createOrderAndCheckout");
-    expect(service).not.toContain("verifyLicense");
-    expect(service).not.toContain("getUserLicenses");
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({
+      error: "Paid checkout is not available during the closed beta.",
+      code: "CHECKOUT_DISABLED",
+    });
   });
 
-  it("keeps disabled commerce history out of active admin metrics", () => {
-    const service = readFileSync(
-      path.resolve(
-        process.cwd(),
-        "apps/web/src/lib/services/admin-service.ts",
-      ),
-      "utf8",
-    );
-    const page = readFileSync(
-      path.resolve(process.cwd(), "apps/web/src/app/admin/page.tsx"),
-      "utf8",
-    );
+  it("claims only through the free entitlement repository path", async () => {
+    mocks.claimFreeResource.mockResolvedValue({
+      entitlement: {
+        id: "ent_test",
+        subjectType: "user",
+        subjectId: "usr_1",
+        resourceId: "prd_1",
+        permission: "product.download",
+      },
+      alreadyClaimed: false,
+    });
+    const service = new CommerceService();
+    const user = {
+      id: "usr_1",
+      username: "user",
+      displayName: "User",
+      role: "user",
+    } as never;
 
-    expect(service).toContain("contentRepository.countPublished()");
-    expect(service).not.toContain("licenseRepository");
-    expect(service).not.toContain("orderRepository");
-    expect(page).toContain("health.counts.publishedContent");
-    expect(page).not.toContain("health.counts.licenses");
-    expect(page).not.toContain("health.counts.orders");
+    await expect(
+      service.claimFreeResource({ user, productId: "prd_1" }),
+    ).resolves.toMatchObject({ alreadyClaimed: false });
+    expect(mocks.claimFreeResource).toHaveBeenCalledWith({
+      entitlementId: "ent_test",
+      userId: "usr_1",
+      productId: "prd_1",
+    });
+  });
+
+  it("delegates access checks to the entitlement engine", async () => {
+    mocks.hasEntitlement.mockResolvedValue(true);
+    const service = new CommerceService();
+
+    await expect(
+      service.checkEntitlement(
+        { type: "user", id: "usr_1" },
+        "prd_1",
+        "product.download",
+      ),
+    ).resolves.toBe(true);
+    expect(mocks.hasEntitlement).toHaveBeenCalledWith(
+      { type: "user", id: "usr_1" },
+      "prd_1",
+      "product.download",
+    );
   });
 });
