@@ -23,23 +23,24 @@ const EMPTY_SUMMARY: WebPushDeliverySummary = {
   removedStale: 0,
 };
 
-let cachedPublicKey: string | null = null;
+let cachedVapidIdentity: string | null = null;
 let cachedSender: WebPushSender | null = null;
 
 function configuredSender(): WebPushSender | null {
   const config = readWebPushVapidConfig();
   if (!config) {
-    cachedPublicKey = null;
+    cachedVapidIdentity = null;
     cachedSender = null;
     return null;
   }
 
-  if (!cachedSender || cachedPublicKey !== config.publicKey) {
+  const vapidIdentity = `${config.publicKey}\n${config.subject}`;
+  if (!cachedSender || cachedVapidIdentity !== vapidIdentity) {
     cachedSender = createWebPushHttpSender(config, {
       timeoutMs: 5_000,
       ttlSeconds: 300,
     });
-    cachedPublicKey = config.publicKey;
+    cachedVapidIdentity = vapidIdentity;
   }
   return cachedSender;
 }

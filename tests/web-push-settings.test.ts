@@ -1,5 +1,9 @@
+import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { parsePushServerState } from "../apps/web/src/components/web-push-settings";
+import {
+  endpointFingerprint,
+  parsePushServerState,
+} from "../apps/web/src/components/web-push-settings";
 
 describe("Web Push settings state parser", () => {
   it("accepts the exact server state contract", () => {
@@ -51,5 +55,16 @@ describe("Web Push settings state parser", () => {
         subscribed: 1,
       }),
     ).toBeNull();
+  });
+});
+
+
+describe("Web Push endpoint fingerprint", () => {
+  it("uses the canonical lowercase SHA-256 hex digest without exposing the endpoint", async () => {
+    const endpoint =
+      "https://push.example.net/subscriptions/high-entropy-capability";
+    await expect(endpointFingerprint(endpoint)).resolves.toBe(
+      createHash("sha256").update(endpoint, "utf8").digest("hex"),
+    );
   });
 });

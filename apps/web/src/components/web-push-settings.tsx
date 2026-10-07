@@ -47,8 +47,10 @@ function applicationServerKey(value: string): Uint8Array<ArrayBuffer> {
   return Uint8Array.from(raw, (character) => character.charCodeAt(0));
 }
 
-async function endpointFingerprint(endpoint: string): Promise<string> {
-  const digest = await crypto.subtle.digest(
+export async function endpointFingerprint(
+  endpoint: string,
+): Promise<string> {
+  const digest = await globalThis.crypto.subtle.digest(
     "SHA-256",
     new TextEncoder().encode(endpoint),
   );
