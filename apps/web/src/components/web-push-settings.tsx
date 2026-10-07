@@ -40,11 +40,24 @@ export function parsePushServerState(value: unknown): PushServerState | null {
   };
 }
 
-function applicationServerKey(value: string): Uint8Array<ArrayBuffer> {
+export function applicationServerKey(
+  value: string,
+): Uint8Array<ArrayBuffer> {
   const padding = "=".repeat((4 - (value.length % 4)) % 4);
   const base64 = (value + padding).replace(/-/g, "+").replace(/_/g, "/");
   const raw = atob(base64);
   return Uint8Array.from(raw, (character) => character.charCodeAt(0));
+}
+
+export function matchesApplicationServerKey(
+  current: ArrayBuffer | null | undefined,
+  publicKey: string,
+): boolean {
+  if (!current) return false;
+  const expected = applicationServerKey(publicKey);
+  const actual = new Uint8Array(current);
+  if (actual.length !== expected.length) return false;
+  return actual.every((byte, index) => byte === expected[index]);
 }
 
 export async function endpointFingerprint(
@@ -57,6 +70,19 @@ export async function endpointFingerprint(
   return Array.from(new Uint8Array(digest), (byte) =>
     byte.toString(16).padStart(2, "0"),
   ).join("");
+}
+
+async function deleteStoredEndpoint(endpoint: string): Promise<boolean> {
+  const response = await fetch("/api/notifications/push", {
+    method: "DELETE",
+    cache: "no-store",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ endpoint }),
+    signal: AbortSignal.timeout(15_000),
+  });
+  const data = await response.json().catch(() => null);
+  return response.ok && data?.success === true;
 }
 
 async function readPushState(endpoint?: string) {
@@ -109,6 +135,20 @@ export function WebPushSettings() {
           setStatus("denied");
           return;
         }
+        if (
+          localSubscription &&
+          !matchesApplicationServerKey(
+            localSubscription.options.applicationServerKey,
+            state.publicKey,
+          )
+        ) {
+          await deleteStoredEndpoint(localSubscription.endpoint).catch(
+            () => false,
+          );
+          await localSubscription.unsubscribe().catch(() => false);
+          if (active) setStatus("disabled");
+          return;
+        }
         setStatus(
           state.subscribed && localSubscription
             ? "enabled"
@@ -133,6 +173,19 @@ export function WebPushSettings() {
       }
       const registration = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
       let subscription = await registration.pushManager.getSubscription();
+      if (
+        subscription &&
+        !matchesApplicationServerKey(
+          subscription.options.applicationServerKey,
+          publicKey,
+        )
+      ) {
+        await deleteStoredEndpoint(subscription.endpoint).catch(
+          () => false,
+        );
+        await subscription.unsubscribe().catch(() => false);
+        subscription = null;
+      }
       if (!subscription) {
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
@@ -188,16 +241,9 @@ export function WebPushSettings() {
       const registration = await navigator.serviceWorker.getRegistration("/");
       const subscription = await registration?.pushManager.getSubscription();
       if (subscription) {
-        const response = await fetch("/api/notifications/push", {
-          method: "DELETE",
-          cache: "no-store",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ endpoint: subscription.endpoint }),
-          signal: AbortSignal.timeout(15_000),
-        });
-        const data = await response.json().catch(() => null);
-        if (!response.ok || data?.success !== true) throw new Error("push-disable");
+        if (!(await deleteStoredEndpoint(subscription.endpoint))) {
+          throw new Error("push-disable");
+        }
         await subscription.unsubscribe();
       }
       setStatus("disabled");

@@ -1,7 +1,9 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import {
+  applicationServerKey,
   endpointFingerprint,
+  matchesApplicationServerKey,
   parsePushServerState,
 } from "../apps/web/src/components/web-push-settings";
 
@@ -66,5 +68,25 @@ describe("Web Push endpoint fingerprint", () => {
     await expect(endpointFingerprint(endpoint)).resolves.toBe(
       createHash("sha256").update(endpoint, "utf8").digest("hex"),
     );
+  });
+});
+
+
+describe("Web Push VAPID rotation detection", () => {
+  it("matches the browser applicationServerKey bytes exactly", () => {
+    const first =
+      "BOD-Q0l2s6Fc4px7XK1T64eYh1t0DlmeMqksBXtxIYKi-gJ07CN8X8c7n8pE3aTsToHu41vWY1Fs9YVdG8MAB2Q";
+    const second =
+      "BHZ_wYx4LYtN1nlw0VQ5BfIgD7b7DUfC_4Z-22Ogw0SG9MvT7DzKluOVfsWD0aNcz7xEJ9EM3qd1CqcyukmBE24";
+
+    const firstBytes = applicationServerKey(first);
+    const firstBuffer = firstBytes.buffer.slice(
+      firstBytes.byteOffset,
+      firstBytes.byteOffset + firstBytes.byteLength,
+    );
+
+    expect(matchesApplicationServerKey(firstBuffer, first)).toBe(true);
+    expect(matchesApplicationServerKey(firstBuffer, second)).toBe(false);
+    expect(matchesApplicationServerKey(null, first)).toBe(false);
   });
 });
