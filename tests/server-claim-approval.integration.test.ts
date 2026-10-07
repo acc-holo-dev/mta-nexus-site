@@ -9,6 +9,10 @@ import {
   verificationRequests,
 } from "@nexus/db";
 
+function disposablePort(offset: number) {
+  return 20_000 + ((Date.now() + process.pid + offset) % 30_000);
+}
+
 async function dbFutureTimestamp() {
   const [row] = await db.execute(
     sql`select (clock_timestamp() + interval '1 second')::text as now`,
@@ -43,7 +47,7 @@ describe("server claim moderation ownership CAS", () => {
       name: "Claim Approval Server",
       slug: `claim-approval-${suffix}`,
       ipAddress: "198.51.100.70",
-      port: 22003,
+      port: disposablePort(1),
       status: "active",
       visibility: "public",
       isVerified: false,
@@ -122,7 +126,7 @@ describe("server claim moderation ownership CAS", () => {
       name: "Missing Proof Server",
       slug: `missing-proof-${suffix}`,
       ipAddress: "198.51.100.71",
-      port: 22003,
+      port: disposablePort(2),
       status: "active",
       visibility: "public",
       isVerified: false,
@@ -191,7 +195,7 @@ describe("server claim moderation ownership CAS", () => {
       name: "Claim Race Server",
       slug: `claim-race-${suffix}`,
       ipAddress: "198.51.100.72",
-      port: 22003,
+      port: disposablePort(3),
       status: "active",
       visibility: "public",
       isVerified: false,
