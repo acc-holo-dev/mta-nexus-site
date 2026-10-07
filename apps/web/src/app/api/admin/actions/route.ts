@@ -5,10 +5,12 @@ import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
 import { contentService } from "../../../../lib/services/content-service";
 import { notifyServerFollowersOfPublishedContent } from "../../../../lib/services/server-follow-notification-service";
+import { deliverStoredNotificationsWebPush } from "../../../../lib/services/notification-web-push-service";
 import {
   productRepository,
   reportRepository,
   verificationRepository,
+  notificationRepository,
 } from "@nexus/db";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 
@@ -177,11 +179,22 @@ export async function POST(request: NextRequest) {
       }
     } else if (targetType === "build") {
       if (action === "approve" || action === "reject") {
-        await productService.reviewBuild({
+        const reviewed = await productService.reviewBuild({
           buildId: targetId,
           decision: action,
           notes,
         }, user);
+        after(async () => {
+          try {
+            const storedNotifications =
+              await notificationRepository.listBuildReviewByBuildId(
+                reviewed.id,
+              );
+            await deliverStoredNotificationsWebPush(storedNotifications);
+          } catch {
+            // Inbox notification commit is authoritative; push is best-effort.
+          }
+        });
       } else if (action === "quarantine") {
         await productService.quarantineBuild({
           buildId: targetId,

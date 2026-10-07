@@ -79,6 +79,14 @@ it("commits approval and one author notification atomically, even with simultane
   expect(results.filter(Boolean)).toHaveLength(1);
   const notices = await notificationRepository.listByUser(f.authorId);
   expect(notices).toHaveLength(1);
+  await expect(
+    notificationRepository.listBuildReviewByBuildId(f.buildId),
+  ).resolves.toEqual([
+    expect.objectContaining({
+      id: notices[0]?.id,
+      recipientId: f.authorId,
+    }),
+  ]);
   expect(notices[0]).toMatchObject({
     link: `/workspace/resources/${f.productId}`,
     category: "system",

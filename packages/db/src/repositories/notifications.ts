@@ -1,4 +1,4 @@
-import { eq, desc, and, count } from "drizzle-orm";
+import { eq, desc, and, count, sql } from "drizzle-orm";
 import { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
 import type {
@@ -83,6 +83,25 @@ export class NotificationRepository {
       )
       .orderBy(desc(notifications.createdAt))
       .limit(Math.min(Math.max(limit, 1), 100));
+    return rows as unknown as Notification[];
+  }
+
+  async listBuildReviewByBuildId(
+    buildId: string,
+    limit = 32,
+  ): Promise<Notification[]> {
+    const prefix = `ntf_build_review_${buildId}_`;
+    const rows = await db
+      .select()
+      .from(notifications)
+      .where(
+        and(
+          sql`left(${notifications.id}, ${prefix.length}) = ${prefix}`,
+          sql`${notifications.data}->>'kind' = 'build_review'`,
+        ),
+      )
+      .orderBy(desc(notifications.createdAt))
+      .limit(Math.min(Math.max(limit, 1), 64));
     return rows as unknown as Notification[];
   }
 

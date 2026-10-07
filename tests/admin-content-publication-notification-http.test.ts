@@ -84,6 +84,9 @@ vi.mock("@nexus/db", () => ({
     resolveRequest: vi.fn(),
     findById: vi.fn(),
   },
+  notificationRepository: {
+    listBuildReviewByBuildId: vi.fn(async () => []),
+  },
 }));
 
 vi.mock("@nexus/security", () => ({
