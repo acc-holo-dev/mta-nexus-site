@@ -1,36 +1,180 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Build, User } from "@nexus/domain";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const mocks = vi.hoisted(() => ({
+  findBuild: vi.fn(),
+  quarantine: vi.fn(),
+  restore: vi.fn(),
+  can: vi.fn(),
+}));
 
-describe("build quarantine policy", () => {
-  it("models quarantine as a first-class build state with evidence metadata", () => {
-    const domain = read("packages/domain/src/entities.ts");
-    const schema = read("packages/db/src/schema.ts");
-    expect(domain).toContain('| "quarantined"');
-    expect(domain).toContain("quarantinePreviousStatus");
-    expect(schema).toContain("builds_quarantine_metadata_check");
-    expect(schema).toContain('quarantineReason: text("quarantine_reason")');
+vi.mock("@nexus/db", () => ({
+  buildRepository: {
+    findById: mocks.findBuild,
+    quarantinePublishedAndRefreshProduct: mocks.quarantine,
+    restoreQuarantinedAndRefreshProduct: mocks.restore,
+  },
+  productRepository: {},
+  organizationRepository: {},
+}));
+
+vi.mock("@nexus/security", () => ({
+  can: mocks.can,
+  generateId: vi.fn((prefix: string) => `${prefix}_test`),
+}));
+
+import { ProductService } from "../apps/web/src/lib/services/product-service";
+
+const moderator = {
+  id: "usr_mod",
+  username: "moderator",
+  displayName: "Moderator",
+  role: "moderator",
+} as User;
+
+function build(overrides: Partial<Build> = {}): Build {
+  return {
+    id: "bld_1",
+    productId: "prd_1",
+    version: "1.0.0",
+    status: "published",
+    storageKey: "test/bld_1.zip",
+    sha256Hash: "a".repeat(64),
+    fileSizeBytes: 42,
+    fileName: "resource.zip",
+    mimeType: "application/zip",
+    scanStatus: "clean",
+    scanner: "test-scanner",
+    scannedAt: new Date("2026-01-01T00:00:00.000Z"),
+    isSigned: false,
+    createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    ...overrides,
+  } as Build;
+}
+
+describe("build quarantine service behavior", () => {
+  const service = new ProductService();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.can.mockReturnValue(true);
+    mocks.findBuild.mockResolvedValue(build());
+    mocks.quarantine.mockResolvedValue(
+      build({
+        status: "quarantined",
+        quarantinePreviousStatus: "published",
+        quarantineReason: "Investigation",
+      }),
+    );
+    mocks.restore.mockResolvedValue(build({ status: "published" }));
   });
 
-  it("uses transactional compare-and-set containment and safe restore", () => {
-    const repository = read("packages/db/src/repositories/builds.ts");
-    expect(repository).toContain("quarantinePublishedAndRefreshProduct");
-    expect(repository).toContain('eq(builds.status, "published")');
-    expect(repository).toContain("restoreQuarantinedAndRefreshProduct");
-    expect(repository).toContain('eq(builds.status, "quarantined")');
-    expect(repository).toContain("trustedCleanScanCondition()");
-    expect(repository).toContain("safePublishedBuildCondition(quarantined.productId)");
+  it("requires moderator permission before quarantine lookup", async () => {
+    mocks.can.mockReturnValue(false);
+
+    await expect(
+      service.quarantineBuild(
+        { buildId: "bld_1", reason: "Investigation" },
+        moderator,
+      ),
+    ).rejects.toMatchObject({ statusCode: 403 });
+    expect(mocks.findBuild).not.toHaveBeenCalled();
   });
 
-  it("requires moderator actions and prevents seller retirement from bypassing quarantine", () => {
-    const route = read("apps/web/src/app/api/admin/actions/route.ts");
-    const page = read("apps/web/src/app/workspace/resources/[id]/page.tsx");
-    expect(route).toContain('"quarantine", "restore"');
-    expect(route).toContain("productService.quarantineBuild");
-    expect(route).toContain("productService.restoreQuarantinedBuild");
-    expect(page).toContain('build.status !== "quarantined"');
+  it("allows quarantine only from published state", async () => {
+    mocks.findBuild.mockResolvedValue(build({ status: "pending_review" }));
+
+    await expect(
+      service.quarantineBuild(
+        { buildId: "bld_1", reason: "Investigation" },
+        moderator,
+      ),
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      code: "BUILD_QUARANTINE_INVALID_STATE",
+    });
+    expect(mocks.quarantine).not.toHaveBeenCalled();
+  });
+
+  it("maps quarantine compare-and-set loss to BUILD_STATE_CHANGED", async () => {
+    mocks.quarantine.mockResolvedValue(null);
+
+    await expect(
+      service.quarantineBuild(
+        { buildId: "bld_1", reason: "Investigation" },
+        moderator,
+      ),
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      code: "BUILD_STATE_CHANGED",
+    });
+  });
+
+  it("requires quarantined state before restore", async () => {
+    mocks.findBuild.mockResolvedValue(build({ status: "published" }));
+
+    await expect(
+      service.restoreQuarantinedBuild(
+        { buildId: "bld_1", reason: "Cleared" },
+        moderator,
+      ),
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      code: "BUILD_QUARANTINE_INVALID_STATE",
+    });
+    expect(mocks.restore).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { quarantinePreviousStatus: "draft" as const },
+    { quarantinePreviousStatus: "published" as const, scanStatus: "infected" as const },
+    { quarantinePreviousStatus: "published" as const, scanner: "" },
+    { quarantinePreviousStatus: "published" as const, scannedAt: undefined },
+  ])("rejects unsafe quarantine restore evidence %#", async (override) => {
+    mocks.findBuild.mockResolvedValue(
+      build({
+        status: "quarantined",
+        quarantinePreviousStatus: "published",
+        ...override,
+      } as Partial<Build>),
+    );
+
+    await expect(
+      service.restoreQuarantinedBuild(
+        { buildId: "bld_1", reason: "Cleared" },
+        moderator,
+      ),
+    ).rejects.toMatchObject({
+      statusCode: 422,
+      code: "BUILD_QUARANTINE_RESTORE_UNSAFE",
+    });
+    expect(mocks.restore).not.toHaveBeenCalled();
+  });
+
+  it("restores only after trusted clean quarantine evidence", async () => {
+    const quarantined = build({
+      status: "quarantined",
+      quarantinePreviousStatus: "published",
+      quarantineReason: "Investigation",
+    });
+    const restored = build({ status: "published" });
+    mocks.findBuild.mockResolvedValue(quarantined);
+    mocks.restore.mockResolvedValue(restored);
+
+    await expect(
+      service.restoreQuarantinedBuild(
+        { buildId: "bld_1", reason: "Cleared" },
+        moderator,
+      ),
+    ).resolves.toBe(restored);
+    expect(mocks.restore).toHaveBeenCalledWith(
+      "bld_1",
+      expect.objectContaining({
+        action: "build.quarantine_restored",
+        details: expect.objectContaining({
+          quarantineReason: "Investigation",
+        }),
+      }),
+    );
   });
 });

@@ -238,8 +238,10 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   integration (last published → draft, fallback published version). Closed-beta
   paid/product source policies теперь проверяются поведением: checkout 503 code,
   paid create/release rejection до write, free-only listing/public visibility и
-  entitlement claim/check. Оставшиеся source-surface тесты сокращать по мере
-  изменения функций;
+  entitlement claim/check. Build moderation/quarantine source policies заменены
+  service behavior guards поверх уже существующих PostgreSQL/HTTP integrations:
+  pending/CAS/scan provenance/release event и published/quarantined trusted-restore
+  state machine. Оставшиеся source-surface тесты сокращать по мере изменения функций;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере
