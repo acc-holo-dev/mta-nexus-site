@@ -15,12 +15,15 @@ export function ThemeToggle() {
   const { dictionary } = useNexusLocale();
   const copy = dictionary.theme;
   const [theme, setTheme] = useState<ThemePreference>("system");
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
       setTheme(parseThemePreference(localStorage.getItem("nexus-theme")));
     } catch {
       setTheme("system");
+    } finally {
+      setHydrated(true);
     }
   }, []);
 
@@ -63,7 +66,10 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-base bg-elevated p-0 text-muted transition-colors hover:bg-hover hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+      disabled={!hydrated}
+      data-theme-toggle=""
+      data-hydrated={hydrated ? "true" : "false"}
+      className="inline-flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-base bg-elevated p-0 text-muted transition-colors hover:bg-hover hover:text-primary disabled:cursor-wait disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
       aria-label={label}
       title={label}
     >

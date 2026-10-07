@@ -35,6 +35,12 @@ try {
     });
     assert.equal(response?.status(), 200, `${origin.name}: login route status`);
 
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector("[data-theme-toggle]")
+          ?.getAttribute("data-hydrated") === "true",
+    );
     await page
       .getByRole("button", {
         name: dictionary.theme.switchToLight,
