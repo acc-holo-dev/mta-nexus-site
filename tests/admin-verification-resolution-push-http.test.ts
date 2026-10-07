@@ -1,27 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
-  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
   resolution: {
     id: "ver_1",
     requesterId: "usr_requester",
     status: "approved",
-  } as Record<string, unknown> | null,
-  stored: {
-    id: "ntf_verification_resolution_ver_1",
-    recipientId: "usr_requester",
-    title: "Verification approved",
-    message: "user verification for usr_requester was approved.",
-    type: "security",
-    category: "security",
-    isRead: false,
-    createdAt: new Date("2026-01-01T00:00:00.000Z"),
-  } as Record<string, unknown> | null,
+  } as Record<string, unknown> | null
 }));
 
-const afterMock = vi.hoisted(() =>
-  vi.fn((callback: () => unknown | Promise<unknown>) => {
-    state.afterCallbacks.push(callback);
+const afterMock = vi.hoisted(() => vi.fn());
   }),
 );
 const resolveRequest = vi.hoisted(() =>
@@ -29,19 +16,6 @@ const resolveRequest = vi.hoisted(() =>
 );
 const findVerification = vi.hoisted(() =>
   vi.fn(async () => ({ id: "ver_1", status: "pending" })),
-);
-const findNotification = vi.hoisted(() =>
-  vi.fn(async () => state.stored),
-);
-const deliverStored = vi.hoisted(() =>
-  vi.fn(async () => ({
-    notifications: state.stored ? 1 : 0,
-    attempted: 0,
-    delivered: 0,
-    failed: 0,
-    stale: 0,
-    deliveryErrors: 0,
-  })),
 );
 
 vi.mock("next/server", async () => {
@@ -85,10 +59,6 @@ vi.mock(
   }),
 );
 
-vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
-  deliverStoredNotificationsWebPush: deliverStored,
-}));
-
 vi.mock("@nexus/db", () => ({
   productRepository: {
     updateWithAudit: vi.fn(),
@@ -104,10 +74,7 @@ vi.mock("@nexus/db", () => ({
     resolveRequest,
     findById: findVerification,
   },
-  notificationRepository: {
-    findById: findNotification,
-    listBuildReviewByBuildId: vi.fn(async () => []),
-  },
+
 }));
 
 vi.mock("@nexus/security", () => ({
@@ -135,29 +102,18 @@ function request(action: "approve" | "reject") {
   });
 }
 
-describe("verification resolution push side effects", () => {
+describe("verification resolution durable push scheduling", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    state.afterCallbacks.length = 0;
     state.resolution = {
       id: "ver_1",
       requesterId: "usr_requester",
       status: "approved",
     };
-    state.stored = {
-      id: "ntf_verification_resolution_ver_1",
-      recipientId: "usr_requester",
-      title: "Verification approved",
-      message: "user verification for usr_requester was approved.",
-      type: "security",
-      category: "security",
-      isRead: false,
-      createdAt: new Date("2026-01-01T00:00:00.000Z"),
-    };
   });
 
   it.each(["approve", "reject"] as const)(
-    "schedules the committed requester notification after %s",
+    "leaves requester notification and push scheduling inside the committed resolution for %s",
     async (action) => {
       state.resolution = {
         ...state.resolution,
@@ -179,30 +135,9 @@ describe("verification resolution push side effects", () => {
           targetType: "verification",
         }),
       );
-      expect(afterMock).toHaveBeenCalledTimes(1);
-      expect(findNotification).not.toHaveBeenCalled();
-      expect(deliverStored).not.toHaveBeenCalled();
-
-      await state.afterCallbacks[0]?.();
-
-      expect(findNotification).toHaveBeenCalledWith(
-        "ntf_verification_resolution_ver_1",
-      );
-      expect(deliverStored).toHaveBeenCalledWith([state.stored]);
+      expect(afterMock).not.toHaveBeenCalled();
     },
   );
-
-  it("keeps a missing post-commit row from becoming a push error", async () => {
-    state.stored = null;
-
-    const response = await POST(request("approve"));
-    expect(response.status).toBe(200);
-
-    await state.afterCallbacks[0]?.();
-
-    expect(findNotification).toHaveBeenCalledOnce();
-    expect(deliverStored).not.toHaveBeenCalled();
-  });
 
   it("does not schedule push when the verification state transition lost its compare-and-set", async () => {
     state.resolution = null;
@@ -214,7 +149,5 @@ describe("verification resolution push side effects", () => {
       code: "VERIFICATION_STATE_CHANGED",
     });
     expect(afterMock).not.toHaveBeenCalled();
-    expect(findNotification).not.toHaveBeenCalled();
-    expect(deliverStored).not.toHaveBeenCalled();
   });
 });

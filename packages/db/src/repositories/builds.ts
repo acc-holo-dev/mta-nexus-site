@@ -1,5 +1,6 @@
 import { and, asc, count, eq, desc, ne, sql, inArray } from "drizzle-orm";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
+import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
 import { db } from "../client";
 import { auditEvents, builds, products, users, organizations, organizationMembers, notificationPreferences, notifications } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
@@ -316,7 +317,7 @@ export class BuildRepository {
       const data = { kind: "build_review", decision, resourceTitle: product.title, version: reviewed.version, notes };
       // Resolve current recipients in SQL, without exposing notes to former owners.
       // The pending-state compare-and-set above makes a replay a no-op, including delivery.
-      await tx.execute(sql`
+      const notificationRows = await tx.execute(sql`
         insert into ${notifications} (id, recipient_id, title, message, link, type, category, is_read, data, created_at)
         select 'ntf_build_review_' || ${reviewed.id} || '_' || ${users.id}, ${users.id},
           ${title}, ${`${product.title} · ${reviewed.version}${notes ? `\n${notes}` : ""}`},
@@ -334,7 +335,15 @@ export class BuildRepository {
         ) and not exists (select 1 from ${notificationPreferences}
           where ${notificationPreferences.userId} = ${users.id}
             and ${notificationPreferences.systemEnabled} = false)
+        returning id, recipient_id
       `);
+      for (const row of notificationRows) {
+        await enqueueWebPushOutboxForNotification(
+          tx,
+          String(row.id),
+          String(row.recipient_id),
+        );
+      }
       return reviewed as unknown as Build;
     });
   }

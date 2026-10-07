@@ -91,10 +91,7 @@ describe("server follower publication notification integration", () => {
       delivered: 1,
       suppressedByPreference: 1,
       failed: 0,
-      pushAttempted: 0,
-      pushDelivered: 0,
-      pushFailed: 0,
-      pushStale: 0,
+      pushQueued: 0,
       followerLimitReached: false,
       skipped: false,
     });

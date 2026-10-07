@@ -1,7 +1,6 @@
 import { notificationRepository } from "@nexus/db";
 import type { Notification } from "@nexus/domain";
 import { generateId } from "@nexus/security";
-import { deliverStoredNotificationsWebPush } from "./notification-web-push-service";
 
 export type NotificationDispatchInput = Omit<
   Notification,
@@ -14,7 +13,7 @@ export type NotificationDispatchSummary = {
   requested: number;
   stored: number;
   storageFailed: number;
-  push: Awaited<ReturnType<typeof deliverStoredNotificationsWebPush>>;
+  pushQueued: number;
 };
 
 export async function dispatchNotificationsBestEffort(
@@ -22,25 +21,27 @@ export async function dispatchNotificationsBestEffort(
 ): Promise<NotificationDispatchSummary> {
   const deliveries = await Promise.allSettled(
     inputs.map((input) =>
-      notificationRepository.create({
+      notificationRepository.createWithPushOutbox({
         ...input,
         id: input.id ?? generateId("not"),
       }),
     ),
   );
 
-  const stored = deliveries.flatMap((delivery) =>
-    delivery.status === "fulfilled" && delivery.value
-      ? [delivery.value]
-      : [],
-  );
+  let stored = 0;
+  let pushQueued = 0;
+  for (const delivery of deliveries) {
+    if (delivery.status !== "fulfilled") continue;
+    if (delivery.value.notification) stored += 1;
+    pushQueued += delivery.value.pushJobs;
+  }
 
   return {
     requested: inputs.length,
-    stored: stored.length,
+    stored,
     storageFailed: deliveries.filter(
       (delivery) => delivery.status === "rejected",
     ).length,
-    push: await deliverStoredNotificationsWebPush(stored),
+    pushQueued,
   };
 }

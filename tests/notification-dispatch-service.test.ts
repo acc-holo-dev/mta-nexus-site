@@ -1,17 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const create = vi.hoisted(() => vi.fn());
-const push = vi.hoisted(() => vi.fn());
 let id = 0;
 
 vi.mock("@nexus/db", () => ({
-  notificationRepository: { create },
+  notificationRepository: { createWithPushOutbox: create },
 }));
 vi.mock("@nexus/security", () => ({
   generateId: vi.fn(() => `not_generated_${++id}`),
-}));
-vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
-  deliverStoredNotificationsWebPush: push,
 }));
 
 import { dispatchNotificationsBestEffort } from "../apps/web/src/lib/services/notification-dispatch-service";
@@ -20,29 +16,19 @@ describe("notification dispatch service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     id = 0;
-    push.mockResolvedValue({
-      notifications: 0,
-      attempted: 0,
-      delivered: 0,
-      failed: 0,
-      stale: 0,
-      deliveryErrors: 0,
-    });
   });
 
-  it("pushes only notifications that survived preferences/storage", async () => {
+  it("stores notifications and reports durable push jobs without network delivery", async () => {
     create
-      .mockResolvedValueOnce({ id: "not_1", recipientId: "u1" })
-      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({
+        notification: { id: "not_1", recipientId: "u1" },
+        pushJobs: 2,
+      })
+      .mockResolvedValueOnce({
+        notification: null,
+        pushJobs: 0,
+      })
       .mockRejectedValueOnce(new Error("db unavailable"));
-    push.mockResolvedValueOnce({
-      notifications: 1,
-      attempted: 1,
-      delivered: 1,
-      failed: 0,
-      stale: 0,
-      deliveryErrors: 0,
-    });
 
     await expect(
       dispatchNotificationsBestEffort([
@@ -72,22 +58,15 @@ describe("notification dispatch service", () => {
       requested: 3,
       stored: 1,
       storageFailed: 1,
-      push: {
-        notifications: 1,
-        attempted: 1,
-        delivered: 1,
-        failed: 0,
-        stale: 0,
-        deliveryErrors: 0,
-      },
+      pushQueued: 2,
     });
-    expect(push).toHaveBeenCalledWith([
-      expect.objectContaining({ id: "not_1" }),
-    ]);
   });
 
   it("preserves explicit deterministic notification IDs", async () => {
-    create.mockImplementation(async (value) => value);
+    create.mockImplementation(async (value) => ({
+      notification: value,
+      pushJobs: 0,
+    }));
     await dispatchNotificationsBestEffort([
       {
         id: "ntf_deterministic",

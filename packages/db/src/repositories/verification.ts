@@ -1,5 +1,6 @@
 import { and, asc, count, eq, desc, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "../client";
+import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
 import {
   auditEvents,
   notifications,
@@ -288,19 +289,33 @@ export class VerificationRepository {
 
       const decisionLabel =
         input.decision === "approved" ? "approved" : "rejected";
-      await tx.insert(notifications).values({
-        id: `ntf_verification_resolution_${request.id}`,
-        recipientId: request.requesterId,
-        title:
-          input.decision === "approved"
-            ? "Verification approved"
-            : "Verification rejected",
-        message: `${request.targetType} verification for ${request.targetId} was ${decisionLabel}.`,
-        type: "security",
-        category: "security",
-        isRead: false,
-        createdAt: new Date(),
-      });
+      const [resolutionNotification] = await tx
+        .insert(notifications)
+        .values({
+          id: `ntf_verification_resolution_${request.id}`,
+          recipientId: request.requesterId,
+          title:
+            input.decision === "approved"
+              ? "Verification approved"
+              : "Verification rejected",
+          message: `${request.targetType} verification for ${request.targetId} was ${decisionLabel}.`,
+          type: "security",
+          category: "security",
+          isRead: false,
+          createdAt: new Date(),
+        })
+        .returning({
+          id: notifications.id,
+          recipientId: notifications.recipientId,
+        });
+      if (!resolutionNotification) {
+        throw new Error("Verification notification insert failed");
+      }
+      await enqueueWebPushOutboxForNotification(
+        tx,
+        resolutionNotification.id,
+        resolutionNotification.recipientId,
+      );
 
       return request;
     });

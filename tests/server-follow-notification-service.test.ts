@@ -38,38 +38,25 @@ const createNotification = vi.hoisted(() =>
       await new Promise<void>((resolve) => {
         setTimeout(resolve, 1);
       });
-      if (input.recipientId === "usr_suppressed") return null;
+      if (input.recipientId === "usr_suppressed") {
+        return { notification: null, pushJobs: 0 };
+      }
       return {
-        ...input,
-        createdAt: new Date(),
-        isRead: false,
+        notification: {
+          ...input,
+          createdAt: new Date(),
+          isRead: false,
+        },
+        pushJobs: input.recipientId === "usr_push_error" ? 0 : 1,
       };
     } finally {
       state.activeCreates -= 1;
     }
   }),
 );
-const deliverPush = vi.hoisted(() =>
-  vi.fn(async (notification: { recipientId: string }) => {
-    if (notification.recipientId === "usr_push_error") {
-      throw new Error("provider unavailable");
-    }
-    return {
-      configured: true,
-      summary: {
-        attempted: 1,
-        delivered: 1,
-        failed: 0,
-        stale: 0,
-        removedStale: 0,
-      },
-    };
-  }),
-);
-
 vi.mock("@nexus/db", () => ({
   notificationRepository: {
-    create: createNotification,
+    createWithPushOutbox: createNotification,
   },
   serverRepository: {
     findById: findServer,
@@ -82,13 +69,6 @@ vi.mock("@nexus/db", () => ({
 vi.mock("@nexus/security", () => ({
   generateId: vi.fn((prefix: string) => `${prefix}_test`),
 }));
-
-vi.mock(
-  "../apps/web/src/lib/services/configured-web-push-delivery",
-  () => ({
-    deliverConfiguredWebPushNotification: deliverPush,
-  }),
-);
 
 import { notifyServerFollowersOfPublishedContent } from "../apps/web/src/lib/services/server-follow-notification-service";
 
@@ -153,7 +133,7 @@ describe("server follower notification service", () => {
     },
   );
 
-  it("bounds fanout, excludes the author and keeps storage/push failures best-effort", async () => {
+  it("bounds fanout, excludes the author and queues push jobs without network delivery", async () => {
     state.followers = [
       {
         followerId: "usr_author",
@@ -191,15 +171,11 @@ describe("server follower notification service", () => {
       delivered: 99,
       suppressedByPreference: 1,
       failed: 0,
-      pushAttempted: 98,
-      pushDelivered: 98,
-      pushFailed: 1,
-      pushStale: 0,
+      pushQueued: 98,
       followerLimitReached: true,
       skipped: false,
     });
     expect(createNotification).toHaveBeenCalledTimes(100);
-    expect(deliverPush).toHaveBeenCalledTimes(99);
     expect(state.maxActiveCreates).toBeLessThanOrEqual(10);
     expect(state.maxActiveCreates).toBeGreaterThan(1);
     expect(

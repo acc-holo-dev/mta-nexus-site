@@ -1,23 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const state = vi.hoisted(() => ({
-  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
-  storedNotifications: [
-    {
-      id: "ntf_build_review_bld_1_usr_1",
-      recipientId: "usr_1",
-      title: "Resource version approved",
-      message: "Resource · 1.0.0",
-      link: "/workspace/resources/prd_1",
-    },
-  ],
-}));
-
-const afterMock = vi.hoisted(() =>
-  vi.fn((callback: () => unknown | Promise<unknown>) => {
-    state.afterCallbacks.push(callback);
-  }),
-);
+const afterMock = vi.hoisted(() => vi.fn());
 const reviewBuild = vi.hoisted(() =>
   vi.fn(async () => ({
     id: "bld_1",
@@ -25,30 +8,13 @@ const reviewBuild = vi.hoisted(() =>
     status: "published",
   })),
 );
-const listBuildReviewByBuildId = vi.hoisted(() =>
-  vi.fn(async () => state.storedNotifications),
-);
-const deliverStored = vi.hoisted(() =>
-  vi.fn(async () => ({
-    notifications: state.storedNotifications.length,
-    attempted: 0,
-    delivered: 0,
-    failed: 0,
-    stale: 0,
-    deliveryErrors: 0,
-  })),
-);
 
 vi.mock("next/server", async () => {
   const actual = await vi.importActual<typeof import("next/server")>(
     "next/server",
   );
-  return {
-    ...actual,
-    after: afterMock,
-  };
+  return { ...actual, after: afterMock };
 });
-
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
@@ -58,7 +24,6 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
     })),
   },
 }));
-
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
   productService: {
     reviewBuild,
@@ -66,24 +31,13 @@ vi.mock("../apps/web/src/lib/services/product-service", () => ({
     restoreQuarantinedBuild: vi.fn(async () => ({ id: "bld_1" })),
   },
 }));
-
 vi.mock("../apps/web/src/lib/services/content-service", () => ({
-  contentService: {
-    moderateContent: vi.fn(),
-  },
+  contentService: { moderateContent: vi.fn() },
 }));
-
 vi.mock(
   "../apps/web/src/lib/services/server-follow-notification-service",
-  () => ({
-    notifyServerFollowersOfPublishedContent: vi.fn(),
-  }),
+  () => ({ notifyServerFollowersOfPublishedContent: vi.fn() }),
 );
-
-vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
-  deliverStoredNotificationsWebPush: deliverStored,
-}));
-
 vi.mock("@nexus/db", () => ({
   productRepository: {
     updateWithAudit: vi.fn(),
@@ -91,19 +45,12 @@ vi.mock("@nexus/db", () => ({
     restoreSuspendedWithPublishedBuild: vi.fn(),
     findById: vi.fn(),
   },
-  reportRepository: {
-    resolve: vi.fn(),
-    findById: vi.fn(),
-  },
+  reportRepository: { resolve: vi.fn(), findById: vi.fn() },
   verificationRepository: {
     resolveRequest: vi.fn(),
     findById: vi.fn(),
   },
-  notificationRepository: {
-    listBuildReviewByBuildId,
-  },
 }));
-
 vi.mock("@nexus/security", () => ({
   can: vi.fn(() => true),
   consumeRateLimit: vi.fn(async () => ({ success: true })),
@@ -129,17 +76,15 @@ function request(action: "approve" | "reject" | "quarantine") {
   });
 }
 
-describe("build review push side effects", () => {
+describe("build review durable push scheduling", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    state.afterCallbacks.length = 0;
   });
 
   it.each(["approve", "reject"] as const)(
-    "schedules stored build-review notifications after %s commit",
+    "leaves push scheduling inside the committed review transaction for %s",
     async (action) => {
       const response = await POST(request(action));
-
       expect(response.status).toBe(200);
       expect(reviewBuild).toHaveBeenCalledWith(
         {
@@ -149,25 +94,13 @@ describe("build review push side effects", () => {
         },
         expect.objectContaining({ id: "usr_mod" }),
       );
-      expect(afterMock).toHaveBeenCalledTimes(1);
-      expect(listBuildReviewByBuildId).not.toHaveBeenCalled();
-      expect(deliverStored).not.toHaveBeenCalled();
-
-      await state.afterCallbacks[0]?.();
-
-      expect(listBuildReviewByBuildId).toHaveBeenCalledWith("bld_1");
-      expect(deliverStored).toHaveBeenCalledWith(
-        state.storedNotifications,
-      );
+      expect(afterMock).not.toHaveBeenCalled();
     },
   );
 
-  it("does not schedule build-review push for quarantine", async () => {
+  it("does not add an HTTP-side push task for quarantine", async () => {
     const response = await POST(request("quarantine"));
-
     expect(response.status).toBe(200);
     expect(afterMock).not.toHaveBeenCalled();
-    expect(listBuildReviewByBuildId).not.toHaveBeenCalled();
-    expect(deliverStored).not.toHaveBeenCalled();
   });
 });
