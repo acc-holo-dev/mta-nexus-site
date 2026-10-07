@@ -1,5 +1,6 @@
 import { eq, desc, and, count, sql } from "drizzle-orm";
 import { db } from "../client";
+import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
 import { notificationPreferences, notifications } from "../schema";
 import type {
   Notification,
@@ -127,9 +128,12 @@ export class NotificationRepository {
     return result.total;
   }
 
-  async create(
-    data: Omit<Notification, "createdAt" | "isRead">
-  ): Promise<Notification | null> {
+  async createWithPushOutbox(
+    data: Omit<Notification, "createdAt" | "isRead">,
+  ): Promise<{
+    notification: Notification | null;
+    pushJobs: number;
+  }> {
     const preferences = await this.getPreferences(data.recipientId);
     const category = data.category ?? (
       data.type === "order" || data.type === "license"
@@ -156,18 +160,43 @@ export class NotificationRepository {
                 : null;
 
     if (preferenceKey && !preferences[preferenceKey]) {
-      return null;
+      return { notification: null, pushJobs: 0 };
     }
 
-    const values = {
-      ...data,
-      category,
-      isRead: false,
-      createdAt: new Date(),
-    };
+    return await db.transaction(async (tx) => {
+      const now = new Date();
+      const values = {
+        ...data,
+        category,
+        isRead: false,
+        createdAt: now,
+      };
 
-    const rows = await db.insert(notifications).values(values).returning();
-    return rows[0] as unknown as Notification;
+      const [row] = await tx
+        .insert(notifications)
+        .values(values)
+        .returning();
+      if (!row) {
+        throw new Error("Notification insert did not return a row");
+      }
+
+      const pushJobs = await enqueueWebPushOutboxForNotification(
+        tx,
+        row.id,
+        row.recipientId,
+      );
+
+      return {
+        notification: row as unknown as Notification,
+        pushJobs,
+      };
+    });
+  }
+
+  async create(
+    data: Omit<Notification, "createdAt" | "isRead">,
+  ): Promise<Notification | null> {
+    return (await this.createWithPushOutbox(data)).notification;
   }
 
   async markAsRead(id: string, recipientId: string): Promise<boolean> {

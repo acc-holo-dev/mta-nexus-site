@@ -564,6 +564,70 @@ export const webPushSubscriptions = pgTable(
   ],
 );
 
+// 23b. Durable Web Push Outbox
+export const webPushQueueGate = pgTable(
+  "web_push_queue_gate",
+  {
+    singleton: boolean("singleton").primaryKey().default(true),
+    capacity: integer("capacity").notNull().default(10_000),
+  },
+  (table) => [
+    check("web_push_queue_gate_singleton", sql`${table.singleton} = true`),
+    check(
+      "web_push_queue_capacity_bounds",
+      sql`${table.capacity} between 1 and 50000`,
+    ),
+  ],
+);
+
+export const webPushOutbox = pgTable(
+  "web_push_outbox",
+  {
+    id: text("id").primaryKey(),
+    notificationId: text("notification_id")
+      .notNull()
+      .references(() => notifications.id, { onDelete: "cascade" }),
+    subscriptionId: text("subscription_id")
+      .notNull()
+      .references(() => webPushSubscriptions.id, { onDelete: "cascade" }),
+    attempts: integer("attempts").notNull().default(0),
+    availableAt: timestamp("available_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    leaseTokenDigest: text("lease_token_digest"),
+    leaseExpiresAt: timestamp("lease_expires_at", { withTimezone: true }),
+    lastStatusCode: integer("last_status_code"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true })
+      .notNull()
+      .default(sql`now() + interval '24 hours'`),
+  },
+  (table) => [
+    uniqueIndex("web_push_outbox_notification_subscription_idx").on(
+      table.notificationId,
+      table.subscriptionId,
+    ),
+    index("web_push_outbox_due_idx").on(table.availableAt, table.id),
+    index("web_push_outbox_lease_idx").on(table.leaseExpiresAt),
+    index("web_push_outbox_expiry_idx").on(table.expiresAt),
+    check(
+      "web_push_outbox_attempts_bounds",
+      sql`${table.attempts} between 0 and 5`,
+    ),
+    check(
+      "web_push_outbox_expiry_check",
+      sql`${table.expiresAt} > ${table.createdAt}`,
+    ),
+    check(
+      "web_push_outbox_status_bounds",
+      sql`${table.lastStatusCode} is null or (${table.lastStatusCode} between 100 and 599)`,
+    ),
+  ],
+);
+
+
 // 24. Audit Events
 export const auditEvents = pgTable("audit_events", {
   id: text("id").primaryKey(),
