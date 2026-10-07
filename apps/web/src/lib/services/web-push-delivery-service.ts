@@ -45,10 +45,26 @@ function boundedText(
   return trimmed ? trimmed.slice(0, maxLength) : undefined;
 }
 
+function safeNotificationTarget(value: unknown): string | undefined {
+  const bounded = boundedText(value, 2048);
+  if (!bounded || !bounded.startsWith("/") || bounded.startsWith("//")) {
+    return undefined;
+  }
+
+  try {
+    const base = new URL("https://nexus.invalid/");
+    const target = new URL(bounded, base);
+    if (target.origin !== base.origin) return undefined;
+    return `${target.pathname}${target.search}${target.hash}`;
+  } catch {
+    return undefined;
+  }
+}
+
 export function normalizeWebPushPayload(
   value: WebPushNotificationPayload,
 ): WebPushNotificationPayload {
-  const url = boundedText(value.url, 2048);
+  const url = safeNotificationTarget(value.url);
   const tag = boundedText(value.tag, 120);
   return {
     title: boundedText(value.title, 120) ?? "MTA NEXUS",

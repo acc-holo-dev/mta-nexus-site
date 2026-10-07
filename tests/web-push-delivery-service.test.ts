@@ -53,6 +53,36 @@ describe("Web Push delivery coordinator", () => {
     });
   });
 
+  it("drops external and protocol-relative notification targets", () => {
+    for (const url of [
+      "https://evil.example/account",
+      "//evil.example/account",
+      "javascript:alert(1)",
+      "settings",
+    ]) {
+      expect(
+        normalizeWebPushPayload({
+          title: "NEXUS",
+          body: "Update",
+          url,
+        }),
+      ).toEqual({
+        title: "NEXUS",
+        body: "Update",
+      });
+    }
+
+    expect(
+      normalizeWebPushPayload({
+        title: "NEXUS",
+        body: "Update",
+        url: "/security?tab=sessions#active",
+      }),
+    ).toMatchObject({
+      url: "/security?tab=sessions#active",
+    });
+  });
+
   it("delivers active subscriptions and removes terminal stale endpoints", async () => {
     const records = [
       subscription("ok"),
