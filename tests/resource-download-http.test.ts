@@ -269,6 +269,43 @@ describe("resource download HTTP contract", () => {
     }
   });
 
+  it("falls back to a safe zip extension for an untrusted build filename", async () => {
+    if (!state.build) throw new Error("Expected default published build fixture");
+    state.build = {
+      ...state.build,
+      fileName: "resource.payload.exe",
+    };
+
+    const response = await GET(request(), context);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Content-Disposition")).toContain(
+      'filename="http-resource-1.2.3.zip"',
+    );
+    expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
+    expect(Buffer.from(await response.arrayBuffer()).toString("utf8")).toBe(
+      "nexus-build",
+    );
+  });
+
+  it("preserves an allowlisted build extension", async () => {
+    if (!state.build) throw new Error("Expected default published build fixture");
+    state.build = {
+      ...state.build,
+      fileName: "resource.lua",
+      mimeType: "text/plain",
+    };
+
+    const response = await GET(request(), context);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Content-Disposition")).toContain(
+      'filename="http-resource-1.2.3.lua"',
+    );
+    expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
+    await response.arrayBuffer();
+  });
+
   it("streams the published build with integrity and private-cache headers", async () => {
     const response = await GET(request(), context);
 
