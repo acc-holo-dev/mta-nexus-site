@@ -2,6 +2,18 @@
 
 > Статус: OWNER DECISION / TARGET SPEC, Round 6.
 
+## CURRENT mobile navigation status — 2026-10-07
+
+В `main` bottom navigation приведена к owner-approved структуре:
+
+- Home;
+- Servers;
+- Market;
+- Community;
+- More.
+
+`More` открывает доступный modal bottom sheet с существующими secondary surfaces: Discover, Notifications, Workspace, Settings и Security Center. Escape/фон закрывают sheet, а focus возвращается на trigger. Messages и Support не подменяются мёртвыми ссылками: отдельных runtime routes для них пока нет, поэтому они остаются target gap.
+
 ## 1. Home после login
 
 После входа пользователь остаётся на обычной Home. Home не превращается в dashboard.

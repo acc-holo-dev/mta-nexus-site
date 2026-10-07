@@ -123,15 +123,60 @@ for (const locale of ["en", "ru"]) {
         assert.deepEqual(unlabeled, [], `${route} unlabeled fields`);
         if (width < 1024) {
           const navigation = page.getByRole("navigation", { name: dictionary.nav.ecosystem, exact: true });
-          await expect(navigation.getByRole("link", { name: dictionary.nav.mobileResources, exact: true })).toBeVisible();
-          await expect(navigation.getByRole("link", { name: dictionary.nav.mobileWorkspace, exact: true })).toBeVisible();
-          if (route.startsWith("/workspace")) await expect(navigation.getByRole("link", { name: dictionary.nav.mobileWorkspace, exact: true })).toHaveAttribute("aria-current", "page");
+          await expect(navigation.getByRole("link", { name: dictionary.nav.mobileMarket, exact: true })).toBeVisible();
+          await expect(navigation.getByRole("button", { name: dictionary.nav.more, exact: true })).toBeVisible();
+          if (route.startsWith("/workspace")) await expect(navigation.getByRole("button", { name: dictionary.nav.more, exact: true })).toHaveAttribute("aria-current", "page");
         }
       }
       evidence.push(`${locale}: seven core routes at ${width}px, localized headings, labeled fields and mobile current-route state`);
     }
     await page.setViewportSize({ width: 390, height: 480 });
     await page.goto("/market");
+    const mobileNavigation = page.getByRole("navigation", {
+      name: dictionary.nav.ecosystem,
+      exact: true,
+    });
+    const moreButton = mobileNavigation.getByRole("button", {
+      name: dictionary.nav.more,
+      exact: true,
+    });
+    await moreButton.focus();
+    await page.keyboard.press("Enter");
+    const moreDialog = page.getByRole("dialog", {
+      name: dictionary.nav.more,
+      exact: true,
+    });
+    await expect(
+      moreDialog.getByRole("link", {
+        name: dictionary.nav.explore,
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      moreDialog.getByRole("link", {
+        name: dictionary.nav.notifications,
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      moreDialog.getByRole("link", {
+        name: dictionary.nav.mobileWorkspace,
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      moreDialog.getByRole("link", {
+        name: dictionary.nav.settings,
+        exact: true,
+      }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(moreDialog).toHaveCount(0);
+    await expect(moreButton).toBeFocused();
+    evidence.push(
+      `${locale}: mobile More menu exposes implemented secondary destinations and restores focus`,
+    );
+
     const mobileSearchTrigger = page
       .getByRole("banner")
       .getByRole("link", { name: dictionary.nav.search, exact: true });
