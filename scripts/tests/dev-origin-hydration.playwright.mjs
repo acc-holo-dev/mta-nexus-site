@@ -35,33 +35,6 @@ try {
     });
     assert.equal(response?.status(), 200, `${origin.name}: login route status`);
 
-    await page.getByLabel(dictionary.auth.email, { exact: true }).fill(
-      "dev-origin-check@example.invalid",
-    );
-    await page.getByLabel(dictionary.auth.password, { exact: true }).fill(
-      "not-the-right-password",
-    );
-
-    const loginResponsePromise = page.waitForResponse(
-      (candidate) =>
-        candidate.url() === `${origin.url}/api/auth/login` &&
-        candidate.request().method() === "POST",
-    );
-    await page
-      .getByRole("button", { name: dictionary.auth.signIn, exact: true })
-      .click();
-    const loginResponse = await loginResponsePromise;
-    assert(
-      [400, 401, 403].includes(loginResponse.status()),
-      `${origin.name}: invalid login should be rejected by the API`,
-    );
-    await page.locator("#auth-error").waitFor({ state: "visible" });
-    assert.equal(
-      new URL(page.url()).pathname,
-      "/auth/login",
-      `${origin.name}: hydrated form must not degrade to native GET navigation`,
-    );
-
     await page
       .getByRole("button", {
         name: dictionary.theme.switchToLight,
@@ -103,6 +76,33 @@ try {
     await page.emulateMedia({ colorScheme: "light" });
     await page.waitForFunction(
       () => !document.documentElement.classList.contains("dark"),
+    );
+
+    await page.getByLabel(dictionary.auth.email, { exact: true }).fill(
+      "dev-origin-check@example.invalid",
+    );
+    await page.getByLabel(dictionary.auth.password, { exact: true }).fill(
+      "not-the-right-password",
+    );
+
+    const loginResponsePromise = page.waitForResponse(
+      (candidate) =>
+        candidate.url() === `${origin.url}/api/auth/login` &&
+        candidate.request().method() === "POST",
+    );
+    await page
+      .getByRole("button", { name: dictionary.auth.signIn, exact: true })
+      .click();
+    const loginResponse = await loginResponsePromise;
+    assert(
+      [400, 401, 403].includes(loginResponse.status()),
+      `${origin.name}: invalid login should be rejected by the API`,
+    );
+    await page.locator("#auth-error").waitFor({ state: "visible" });
+    assert.equal(
+      new URL(page.url()).pathname,
+      "/auth/login",
+      `${origin.name}: hydrated form must not degrade to native GET navigation`,
     );
     assert.deepEqual(
       pageErrors,

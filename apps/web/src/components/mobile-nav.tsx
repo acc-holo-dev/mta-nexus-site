@@ -112,6 +112,12 @@ export function MobileNav({ locale }: { locale: Locale }) {
           id="mobile-more-menu"
           aria-modal="true"
           aria-label={dictionary.nav.more}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              setIsMoreOpen(false);
+            }
+          }}
           onCancel={(event) => {
             event.preventDefault();
             setIsMoreOpen(false);
