@@ -21,8 +21,8 @@
   /* Text */
   --nexus-text: #10151c;
   --nexus-text-secondary: #3f4a57;
-  --nexus-text-muted: #6b7684;
-  --nexus-text-faint: #98a1ad;
+  --nexus-text-muted: #596572;
+  --nexus-text-faint: #5f6b79;
 
   /* Accent */
   --nexus-accent: #2456d9;
@@ -73,10 +73,10 @@
   --nexus-text: #f1f5f9;
   --nexus-text-secondary: #c3ccd8;
   --nexus-text-muted: #8a94a4;
-  --nexus-text-faint: #5c6675;
+  --nexus-text-faint: #7c8797;
 
-  --nexus-accent: #3b82f6;
-  --nexus-accent-hover: #2f6fe0;
+  --nexus-accent: #2f6fe0;
+  --nexus-accent-hover: #285fc7;
   --nexus-accent-soft: rgba(59, 130, 246, 0.12);
   --nexus-accent-text: #6aa5f8;
 
