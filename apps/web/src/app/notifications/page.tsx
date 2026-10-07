@@ -29,6 +29,7 @@ export default function NotificationCenterPage() {
   const [loading, setLoading] = useState(true);
   const [marking, setMarking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [announcement, setAnnouncement] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const requestGeneration = useRef(0);
 
@@ -82,6 +83,7 @@ export default function NotificationCenterPage() {
     requestGeneration.current += 1;
     setMarking(true);
     setError(null);
+    setAnnouncement(null);
     try {
       const response = await fetch("/api/notifications/mark-read", {
         method: "POST",
@@ -95,6 +97,7 @@ export default function NotificationCenterPage() {
       }
       // Confirm the state from the server, including notifications added concurrently.
       await loadNotifications();
+      setAnnouncement(copy.markedAllRead);
     } catch (caught) {
       // The write might have succeeded even if its response was lost.
       await loadNotifications();
@@ -185,6 +188,12 @@ export default function NotificationCenterPage() {
           );
         })}
       </div>
+
+      {announcement && (
+        <p role="status" aria-live="polite" className="sr-only">
+          {announcement}
+        </p>
+      )}
 
       {error && (
         <div

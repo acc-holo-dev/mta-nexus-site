@@ -15,6 +15,7 @@ export function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [announcement, setAnnouncement] = useState<string | null>(null);
   const [marking, setMarking] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const dialogRef = useModalDialog(isOpen);
@@ -73,6 +74,7 @@ export function NotificationBell() {
     mutationGeneration.current += 1;
     setMarking(true);
     setError(null);
+    setAnnouncement(null);
     try {
       const response = await fetch("/api/notifications/mark-read", {
         method: "POST",
@@ -86,6 +88,7 @@ export function NotificationBell() {
       }
 
       // Read the server state again; a notification may arrive during this request.
+      setAnnouncement(copy.markedAllRead);
       setAttempt((value) => value + 1);
     } catch {
       // Recheck the server after an ambiguous response or timeout.
@@ -125,6 +128,12 @@ export function NotificationBell() {
           />
         )}
       </button>
+
+      {announcement && (
+        <span role="status" aria-live="polite" className="sr-only">
+          {announcement}
+        </span>
+      )}
 
       {isOpen && (
         <dialog
