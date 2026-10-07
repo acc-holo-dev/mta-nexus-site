@@ -99,6 +99,7 @@ describe("Web Push worker repository", () => {
         url: "/notifications",
         tag: f.notificationId,
       },
+      sendWithinMs: expect.any(Number),
     });
 
     expect(

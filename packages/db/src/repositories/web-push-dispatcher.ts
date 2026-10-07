@@ -115,8 +115,7 @@ export class WebPushDispatcher {
       }
 
       const sendWindowMs =
-        prepared.sendBefore.getTime() -
-        Date.now() -
+        prepared.sendWithinMs -
         SEND_SETTLE_MARGIN_MS;
       if (sendWindowMs <= 0) {
         const settled = await this.#worker.settle(

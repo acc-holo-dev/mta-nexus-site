@@ -42,6 +42,7 @@ export type PreparedWebPushJob = Readonly<{
   auth: string;
   payload: WebPushNotificationPayload;
   sendBefore: Date;
+  sendWithinMs: number;
 }>;
 
 const availableLease = () =>
@@ -313,6 +314,10 @@ export class WebPushWorkerRepository {
           tag: row.notification.id,
         }),
         sendBefore: validUntil,
+        sendWithinMs: Math.max(
+          0,
+          validUntil.getTime() - now.getTime(),
+        ),
       });
     });
   }
@@ -376,13 +381,6 @@ export class WebPushWorkerRepository {
           )
           .returning({ id: webPushOutbox.id });
         return deleted.length === 1;
-      }
-
-      if (row.expiresAt <= now) {
-        await tx
-          .delete(webPushOutbox)
-          .where(eq(webPushOutbox.id, lease.id));
-        return true;
       }
 
       const retryAt = new Date(

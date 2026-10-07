@@ -35,6 +35,7 @@ function prepared(
       tag: `not_${id}`,
     },
     sendBefore: new Date(Date.now() + 60_000),
+    sendWithinMs: 60_000,
   };
 }
 
@@ -134,7 +135,8 @@ describe("Web Push dispatcher", () => {
     const w = worker([id]);
     w.prepare.mockResolvedValueOnce({
       ...prepared(id),
-      sendBefore: new Date(Date.now() + 500),
+      sendBefore: new Date(Date.now() + 60_000),
+      sendWithinMs: 500,
     });
     const sender = vi.fn(async () => ({ statusCode: 201 }));
 
