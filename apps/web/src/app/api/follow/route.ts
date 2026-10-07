@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { after, type NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
   socialRepository,
@@ -9,6 +9,7 @@ import {
   notificationRepository,
 } from "@nexus/db";
 import { consumeRateLimit, generateId } from "@nexus/security";
+import { deliverStoredNotificationsWebPush } from "../../../lib/services/notification-web-push-service";
 
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -137,20 +138,25 @@ export async function POST(request: NextRequest) {
     }
 
     if (targetType === "user" && targetId !== user.id) {
-      try {
-        await notificationRepository.create({
-        id: generateId("not"),
-        recipientId: targetId,
-        title: "New Follower",
-        message: `@${user.username} started following your activity.`,
-        type: "system",
-        category: "follow",
-        link: `/users/${user.username}`,
-        });
-      } catch (error) {
-        // The follow already committed. Notification delivery must not turn it into a failed mutation.
-        console.error("Follow notification delivery failed:", error);
-      }
+      after(async () => {
+        try {
+          const created = await notificationRepository.create({
+            id: generateId("not"),
+            recipientId: targetId,
+            title: "New Follower",
+            message: `@${user.username} started following your activity.`,
+            type: "system",
+            category: "follow",
+            link: `/users/${user.username}`,
+          });
+          if (created) {
+            await deliverStoredNotificationsWebPush([created]);
+          }
+        } catch (error) {
+          // The follow already committed. Notification/push delivery remains best effort.
+          console.error("Follow notification delivery failed:", error);
+        }
+      });
     }
 
     return privateJson({ success: true, targetType, targetId, following: true, follow });

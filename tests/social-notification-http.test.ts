@@ -2,22 +2,57 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
 const state = vi.hoisted(() => ({
+  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
   user: { id: "usr_1", username: "tester" } as { id: string; username: string } | null,
   follow: { id: "fol_1", followerId: "usr_1", targetType: "user", targetId: "usr_2" } as Record<string, string> | null,
   following: true,
   notificationFails: false,
 }));
 
-const createNotification = vi.hoisted(() => vi.fn(async () => {
+const afterMock = vi.hoisted(() =>
+  vi.fn((callback: () => unknown | Promise<unknown>) => {
+    state.afterCallbacks.push(callback);
+  }),
+);
+const createNotification = vi.hoisted(() => vi.fn(async (input) => {
   if (state.notificationFails) throw new Error("delivery unavailable");
-  return { id: "not_1" };
+  return {
+    ...input,
+    id: "not_1",
+    createdAt: new Date(),
+    isRead: false,
+  };
 }));
+const pushNotifications = vi.hoisted(() =>
+  vi.fn(async () => ({
+    notifications: 1,
+    attempted: 0,
+    delivered: 0,
+    failed: 0,
+    stale: 0,
+    deliveryErrors: 0,
+  })),
+);
 const markSingle = vi.hoisted(() => vi.fn(async () => false));
 const markAll = vi.hoisted(() => vi.fn(async () => undefined));
+
+vi.mock("next/server", async () => {
+  const actual = await vi.importActual<typeof import("next/server")>(
+    "next/server",
+  );
+  return {
+    ...actual,
+    after: afterMock,
+  };
+});
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
 }));
+vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
+  deliverStoredNotificationsWebPush: pushNotifications,
+}));
+
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: vi.fn((prefix: string) => `${prefix}_new`),
@@ -55,26 +90,74 @@ const makeRequest = (path: string, method: string, body?: string) =>
 describe("social and notification HTTP state contract", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    state.afterCallbacks.length = 0;
     state.user = { id: "usr_1", username: "tester" };
     state.follow = { id: "fol_1", followerId: "usr_1", targetType: "user", targetId: "usr_2" };
     state.following = true;
     state.notificationFails = false;
   });
 
-  it("confirms a committed follow even when best-effort notification fails", async () => {
+  it("confirms a committed follow before best-effort notification delivery", async () => {
     state.notificationFails = true;
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     try {
-      const response = await follow(makeRequest("/api/follow", "POST", '{"targetType":"user","targetId":"usr_2"}'));
+      const response = await follow(
+        makeRequest(
+          "/api/follow",
+          "POST",
+          '{"targetType":"user","targetId":"usr_2"}',
+        ),
+      );
       expect(response.status).toBe(200);
       expect(response.headers.get("Cache-Control")).toBe("private, no-store");
       expect(await response.json()).toMatchObject({
-        success: true, targetType: "user", targetId: "usr_2", following: true,
+        success: true,
+        targetType: "user",
+        targetId: "usr_2",
+        following: true,
       });
+      expect(afterMock).toHaveBeenCalledOnce();
+      expect(createNotification).not.toHaveBeenCalled();
+      expect(pushNotifications).not.toHaveBeenCalled();
+
+      await state.afterCallbacks[0]?.();
+
       expect(createNotification).toHaveBeenCalledTimes(1);
+      expect(pushNotifications).not.toHaveBeenCalled();
+      expect(log).toHaveBeenCalledOnce();
     } finally {
       log.mockRestore();
     }
+  });
+
+  it("pushes only the successfully stored follower notification after response", async () => {
+    const response = await follow(
+      makeRequest(
+        "/api/follow",
+        "POST",
+        '{"targetType":"user","targetId":"usr_2"}',
+      ),
+    );
+
+    expect(response.status).toBe(200);
+    expect(createNotification).not.toHaveBeenCalled();
+    expect(pushNotifications).not.toHaveBeenCalled();
+
+    await state.afterCallbacks[0]?.();
+
+    expect(createNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recipientId: "usr_2",
+        category: "follow",
+        link: "/users/tester",
+      }),
+    );
+    expect(pushNotifications).toHaveBeenCalledWith([
+      expect.objectContaining({
+        id: "not_1",
+        recipientId: "usr_2",
+      }),
+    ]);
   });
 
   it("checks the exact follow key before confirming a conflict", async () => {
