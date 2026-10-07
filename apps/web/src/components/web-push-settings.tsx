@@ -1,11 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { BellRing } from "lucide-react";
 import { Button } from "@nexus/ui";
 import { useNexusLocale } from "./locale-context";
 
-type PushStatus = "loading" | "unsupported" | "unconfigured" | "denied" | "disabled" | "enabled" | "error";
+type PushStatus =
+  | "loading"
+  | "unsupported"
+  | "unconfigured"
+  | "denied"
+  | "disabled"
+  | "enabled"
+  | "error";
+
+export type PushServerState = {
+  configured: boolean;
+  publicKey: string | null;
+  subscribed: boolean;
+};
+
+export function parsePushServerState(value: unknown): PushServerState | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const record = value as Record<string, unknown>;
+  if (
+    typeof record.configured !== "boolean" ||
+    typeof record.subscribed !== "boolean" ||
+    !(
+      record.publicKey === null ||
+      typeof record.publicKey === "string"
+    )
+  ) {
+    return null;
+  }
+  return {
+    configured: record.configured,
+    publicKey: record.publicKey,
+    subscribed: record.subscribed,
+  };
+}
 
 function applicationServerKey(value: string): Uint8Array<ArrayBuffer> {
   const padding = "=".repeat((4 - (value.length % 4)) % 4);
@@ -21,13 +54,16 @@ async function readPushState() {
     signal: AbortSignal.timeout(15_000),
   });
   const data = await response.json().catch(() => null);
-  if (!response.ok || !data) throw new Error("push-state");
-  return data as { configured: boolean; publicKey: string | null; subscribed: boolean };
+  const state = parsePushServerState(data);
+  if (!response.ok || !state) throw new Error("push-state");
+  return state;
 }
 
 export function WebPushSettings() {
   const { dictionary } = useNexusLocale();
   const copy = dictionary.settings;
+  const titleId = useId();
+  const descriptionId = useId();
   const [status, setStatus] = useState<PushStatus>("loading");
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -127,25 +163,57 @@ export function WebPushSettings() {
     copy.webPushDescription;
 
   return (
-    <div className="mt-4 flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between">
+    <section
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+      className="mt-4 flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between"
+    >
       <div className="min-w-0">
-        <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+        <h3
+          id={titleId}
+          className="flex items-center gap-2 text-sm font-semibold text-primary"
+        >
           <BellRing className="h-4 w-4 text-accent" aria-hidden="true" />
           <span>{copy.webPush}</span>
-        </div>
-        <p className="mt-1 text-xs text-muted">{description}</p>
+        </h3>
+        <p id={descriptionId} className="mt-1 text-xs text-muted">
+          {description}
+        </p>
+        <span
+          role={status === "error" ? "alert" : "status"}
+          aria-live={status === "error" ? "assertive" : "polite"}
+          aria-atomic="true"
+          className="sr-only"
+        >
+          {description}
+        </span>
       </div>
       {status === "enabled" ? (
-        <Button type="button" size="sm" variant="outline" isLoading={pending} onClick={() => void disable()}>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          isLoading={pending}
+          aria-describedby={descriptionId}
+          onClick={() => void disable()}
+        >
           {copy.webPushDisable}
         </Button>
       ) : status === "disabled" ? (
-        <Button type="button" size="sm" isLoading={pending} onClick={() => void enable()}>
+        <Button
+          type="button"
+          size="sm"
+          isLoading={pending}
+          aria-describedby={descriptionId}
+          onClick={() => void enable()}
+        >
           {copy.webPushEnable}
         </Button>
       ) : status === "loading" ? (
-        <span role="status" className="text-xs text-muted">{copy.webPushLoading}</span>
+        <span aria-hidden="true" className="text-xs text-muted">
+          {copy.webPushLoading}
+        </span>
       ) : null}
-    </div>
+    </section>
   );
 }

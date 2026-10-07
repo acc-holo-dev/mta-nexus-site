@@ -510,6 +510,14 @@ for (const locale of ["en", "ru"]) {
     const firstPreference = page.getByRole("checkbox").first();
     await firstPreference.focus();
     await expect(firstPreference).toBeFocused();
+    const webPushRegion = page.getByRole("region", {
+      name: dictionary.settings.webPush,
+      exact: true,
+    });
+    await expect(webPushRegion).toBeVisible();
+    await expect(
+      webPushRegion.locator('[role="status"], [role="alert"]'),
+    ).toHaveCount(1);
 
     await page.goto("/security");
     const settingsLink = page.getByRole("link", {
