@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { NexusShell } from "../components/nexus-shell";
+import { PwaServiceWorker } from "../components/pwa-service-worker";
 import { getDictionary } from "../lib/i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 
@@ -54,6 +55,7 @@ export default async function RootLayout({
           // biome-ignore lint/security/noDangerouslySetInnerHtml: This script is a static local constant with no user input.
           dangerouslySetInnerHTML={{ __html: themeInitScript }}
         />
+        <PwaServiceWorker />
         <NexusShell locale={locale}>{children}</NexusShell>
       </body>
     </html>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="MTA NEXUS">
+  <rect width="512" height="512" rx="112" fill="#09090b"/>
+  <path d="M118 354V158h62l76 108 76-108h62v196h-62V252l-76 104-76-104v102z" fill="#fafafa"/>
+  <circle cx="256" cy="256" r="190" fill="none" stroke="#3f3f46" stroke-width="18"/>
+</svg>

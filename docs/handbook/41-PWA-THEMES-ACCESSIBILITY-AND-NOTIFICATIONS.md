@@ -2,6 +2,18 @@
 
 > Статус: OWNER DECISION / TARGET SPEC, Round 7.
 
+## CURRENT implementation status — 2026-10-07
+
+В `main` реализован первый безопасный PWA slice:
+
+- installable Web App Manifest и maskable-capable SVG icon;
+- production-only registration service worker;
+- network-first navigation: при отсутствии сети показывается self-contained offline shell;
+- service worker не кеширует HTML пользовательских страниц и не перехватывает non-GET mutations;
+- offline shell явно сообщает, что покупки, публикация, модерация и другие state-changing actions не подтверждаются без authoritative server response.
+
+Ещё не закрыты target requirements этой главы: **Web Push**, **System theme**, расширенная стратегия read-only public cache и полный WCAG 2.2 AA acceptance pass.
+
 ## 1. Public release quality bar
 
 Public release target включает:
