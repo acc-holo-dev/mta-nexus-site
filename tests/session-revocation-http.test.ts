@@ -11,6 +11,22 @@ const state = vi.hoisted(() => ({
 }));
 const revokeSession = vi.hoisted(() => vi.fn(async () => state.owned));
 const revokeOthers = vi.hoisted(() => vi.fn(async () => state.revokedCount));
+const listSessions = vi.hoisted(() => vi.fn(async () => [
+  {
+    id: "ses_current",
+    expiresAt: new Date("2030-01-01T00:00:00.000Z"),
+    ipAddress: "203.0.113.10",
+    userAgent: "Current browser",
+    createdAt: new Date("2029-01-01T00:00:00.000Z"),
+  },
+  {
+    id: "ses_other",
+    expiresAt: new Date("2030-01-02T00:00:00.000Z"),
+    ipAddress: undefined,
+    userAgent: "Other browser",
+    createdAt: new Date("2029-01-02T00:00:00.000Z"),
+  },
+]));
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
@@ -18,6 +34,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
     getCurrentSessionId: vi.fn(async () => state.currentSessionId),
     revokeSession,
     revokeOtherSessions: revokeOthers,
+    listSessions,
   },
 }));
 vi.mock("@nexus/security", () => ({
@@ -27,7 +44,13 @@ vi.mock("@nexus/domain", () => ({
   AppError: class AppError extends Error {},
 }));
 
-import { DELETE } from "../apps/web/src/app/api/auth/sessions/route";
+import { DELETE, GET } from "../apps/web/src/app/api/auth/sessions/route";
+
+function listRequest() {
+  return new NextRequest("http://nexus.test/api/auth/sessions", {
+    headers: { cookie: "nexus_session=token_owner" },
+  });
+}
 
 function request(body: unknown) {
   return new NextRequest("http://nexus.test/api/auth/sessions", {
@@ -36,6 +59,53 @@ function request(body: unknown) {
     body: JSON.stringify(body),
   });
 }
+
+describe("session listing HTTP contract", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    state.user = { id: "usr_owner" };
+    state.currentSessionId = "ses_current";
+  });
+
+  it("returns private active-session metadata with the current session marked", async () => {
+    const response = await GET(listRequest());
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("Vary")).toBe("Cookie");
+
+    const body = await response.json();
+    expect(body.sessions).toEqual([
+      {
+        id: "ses_current",
+        expiresAt: "2030-01-01T00:00:00.000Z",
+        ipAddress: "203.0.113.10",
+        userAgent: "Current browser",
+        createdAt: "2029-01-01T00:00:00.000Z",
+        isCurrent: true,
+      },
+      {
+        id: "ses_other",
+        expiresAt: "2030-01-02T00:00:00.000Z",
+        userAgent: "Other browser",
+        createdAt: "2029-01-02T00:00:00.000Z",
+        isCurrent: false,
+      },
+    ]);
+    for (const session of body.sessions) {
+      expect(session).not.toHaveProperty("token");
+      expect(session).not.toHaveProperty("userId");
+    }
+    expect(listSessions).toHaveBeenCalledWith("usr_owner");
+  });
+
+  it("does not expose session metadata without authentication", async () => {
+    state.user = null;
+    const response = await GET(listRequest());
+    expect(response.status).toBe(401);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(listSessions).not.toHaveBeenCalled();
+  });
+});
 
 describe("session revocation command matrix", () => {
   beforeEach(() => {

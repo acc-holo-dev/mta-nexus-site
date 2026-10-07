@@ -172,9 +172,11 @@ CHECK, известный алиас tool → plugin и отказ на неиз
 - surface-тесты сверяют точные строки исходников — ломаются при
   переформатировании; при правках предпочитать regex/поведенческие проверки.
   Discover query parsing/href contract уже переведён на прямую поведенческую
-  проверку; active/expired session listing также проверяется через реальный
-  PostgreSQL repository contract без чтения исходника. Оставшиеся source-surface
-  тесты сокращать по мере изменения функций;
+  проверку; active/expired session listing проверяется через реальный PostgreSQL
+  repository contract, GET/DELETE session-management и password-change route —
+  через HTTP behavior tests без чтения route source. Устаревший
+  `account-security-surface.test.ts` удалён; оставшиеся source-surface тесты
+  сокращать по мере изменения функций;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере
