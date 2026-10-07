@@ -20,6 +20,8 @@ export const RATE_LIMIT_POLICIES = {
   commentCreation: { limit: 20, windowSeconds: 300 },
   reviewSubmission: { limit: 5, windowSeconds: 300 },
   search: { limit: 60, windowSeconds: 60 },
+  supportCase: { limit: 5, windowSeconds: 3600 },
+  supportMessage: { limit: 30, windowSeconds: 3600 },
 } as const;
 
 export type RateLimitPolicy = keyof typeof RATE_LIMIT_POLICIES;

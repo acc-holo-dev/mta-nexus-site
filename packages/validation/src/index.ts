@@ -1,4 +1,9 @@
-import { PRODUCT_TYPES } from "@nexus/domain";
+import {
+  PRODUCT_TYPES,
+  SUPPORT_CASE_CATEGORIES,
+  SUPPORT_CASE_STATUSES,
+  SUPPORT_RELATED_TYPES,
+} from "@nexus/domain";
 import { z } from "zod";
 
 // Shared by input validation and rendering of legacy public links.
@@ -259,6 +264,36 @@ export const createReportSchema = z.object({
   reason: z.string().min(10).max(1000),
   evidenceUrls: z.array(externalWebUrlSchema).max(5).default([]),
 });
+
+// --- Unified Support ---
+export const createSupportCaseSchema = z
+  .object({
+    category: z.enum(SUPPORT_CASE_CATEGORIES),
+    subject: z.string().trim().min(5).max(120),
+    message: z.string().trim().min(10).max(4_000),
+    relatedType: z.enum(SUPPORT_RELATED_TYPES).optional(),
+    relatedId: z.string().trim().min(1).max(128).optional(),
+  })
+  .strict()
+  .refine(
+    (value) => Boolean(value.relatedType) === Boolean(value.relatedId),
+    {
+      message: "relatedType and relatedId must be provided together",
+      path: ["relatedId"],
+    },
+  );
+
+export const createSupportMessageSchema = z
+  .object({
+    message: z.string().trim().min(1).max(4_000),
+  })
+  .strict();
+
+export const updateSupportCaseStatusSchema = z
+  .object({
+    status: z.enum(SUPPORT_CASE_STATUSES),
+  })
+  .strict();
 
 // --- Search & Discovery ---
 export const searchFilterSchema = z.object({

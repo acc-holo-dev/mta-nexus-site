@@ -89,6 +89,33 @@ export type ReportType =
 
 export type ReportStatus = "open" | "under_review" | "resolved" | "dismissed";
 
+export const SUPPORT_CASE_CATEGORIES = [
+  "account",
+  "resource",
+  "server",
+  "purchase",
+  "license",
+  "payment",
+  "seller",
+  "integration",
+  "other",
+] as const;
+export type SupportCaseCategory = (typeof SUPPORT_CASE_CATEGORIES)[number];
+
+export const SUPPORT_CASE_STATUSES = ["open", "resolved", "closed"] as const;
+export type SupportCaseStatus = (typeof SUPPORT_CASE_STATUSES)[number];
+
+export const SUPPORT_RELATED_TYPES = [
+  "product",
+  "server",
+  "purchase",
+  "license",
+  "seller",
+] as const;
+export type SupportRelatedType = (typeof SUPPORT_RELATED_TYPES)[number];
+
+export type SupportMessageAuthorRole = "requester" | "staff";
+
 // Domain Interfaces
 
 export interface User {
@@ -441,6 +468,27 @@ export interface Report {
   moderatorNotes?: string;
   createdAt: Date;
   resolvedAt?: Date;
+}
+
+export interface SupportCase {
+  id: string;
+  requesterId: string;
+  category: SupportCaseCategory;
+  subject: string;
+  status: SupportCaseStatus;
+  relatedType?: SupportRelatedType;
+  relatedId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SupportCaseMessage {
+  id: string;
+  caseId: string;
+  authorId?: string;
+  authorRole: SupportMessageAuthorRole;
+  body: string;
+  createdAt: Date;
 }
 
 export interface ModerationCase {

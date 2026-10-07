@@ -27,7 +27,9 @@ export type EntityPrefix =
   | "mod"
   | "ses"
   | "evt"
-  | "ver";
+  | "ver"
+  | "sup"
+  | "spm";
 
 /**
  * Generates secure, collision-resistant, URL-safe opaque IDs with entity prefix.

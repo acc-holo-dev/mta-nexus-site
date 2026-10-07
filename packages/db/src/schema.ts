@@ -1,4 +1,15 @@
-import { PRODUCT_TYPES, type ProductType, type BuildReviewNotificationData } from "@nexus/domain";
+import {
+  PRODUCT_TYPES,
+  SUPPORT_CASE_CATEGORIES,
+  SUPPORT_CASE_STATUSES,
+  SUPPORT_RELATED_TYPES,
+  type ProductType,
+  type BuildReviewNotificationData,
+  type SupportCaseCategory,
+  type SupportCaseStatus,
+  type SupportMessageAuthorRole,
+  type SupportRelatedType,
+} from "@nexus/domain";
 import { sql } from "drizzle-orm";
 import {
   pgTable,
@@ -561,7 +572,88 @@ export const reports = pgTable("reports", {
   index("reports_status_resolved_id_idx").on(table.status, table.resolvedAt, table.id),
 ]);
 
-// 25. Moderation Cases
+// 25. Unified Support
+export const supportCases = pgTable(
+  "support_cases",
+  {
+    id: text("id").primaryKey(),
+    requesterId: text("requester_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    category: text("category").$type<SupportCaseCategory>().notNull(),
+    subject: text("subject").notNull(),
+    status: text("status").$type<SupportCaseStatus>().notNull().default("open"),
+    relatedType: text("related_type").$type<SupportRelatedType>(),
+    relatedId: text("related_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check(
+      "support_cases_category_check",
+      sql`${table.category} IN (${sql.raw(
+        SUPPORT_CASE_CATEGORIES.map((value) => `'${value}'`).join(", "),
+      )})`,
+    ),
+    check(
+      "support_cases_status_check",
+      sql`${table.status} IN (${sql.raw(
+        SUPPORT_CASE_STATUSES.map((value) => `'${value}'`).join(", "),
+      )})`,
+    ),
+    check(
+      "support_cases_related_type_check",
+      sql`${table.relatedType} IS NULL OR ${table.relatedType} IN (${sql.raw(
+        SUPPORT_RELATED_TYPES.map((value) => `'${value}'`).join(", "),
+      )})`,
+    ),
+    check(
+      "support_cases_related_pair_check",
+      sql`(${table.relatedType} IS NULL AND ${table.relatedId} IS NULL) OR (${table.relatedType} IS NOT NULL AND ${table.relatedId} IS NOT NULL)`,
+    ),
+    index("support_cases_requester_updated_id_idx").on(
+      table.requesterId,
+      table.updatedAt,
+      table.id,
+    ),
+    index("support_cases_status_updated_id_idx").on(
+      table.status,
+      table.updatedAt,
+      table.id,
+    ),
+  ],
+);
+
+export const supportCaseMessages = pgTable(
+  "support_case_messages",
+  {
+    id: text("id").primaryKey(),
+    caseId: text("case_id")
+      .notNull()
+      .references(() => supportCases.id, { onDelete: "cascade" }),
+    authorId: text("author_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    authorRole: text("author_role")
+      .$type<SupportMessageAuthorRole>()
+      .notNull(),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    check(
+      "support_case_messages_author_role_check",
+      sql`${table.authorRole} IN ('requester', 'staff')`,
+    ),
+    index("support_case_messages_case_created_id_idx").on(
+      table.caseId,
+      table.createdAt,
+      table.id,
+    ),
+  ],
+);
+
+// 26. Moderation Cases
 export const moderationCases = pgTable("moderation_cases", {
   id: text("id").primaryKey(),
   reportId: text("report_id").references(() => reports.id, { onDelete: "set null" }),
