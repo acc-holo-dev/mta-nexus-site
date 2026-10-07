@@ -267,6 +267,40 @@ for (const locale of ["en", "ru"]) {
       }
       evidence.push(`${locale}: eight core routes at ${width}px, localized headings, labeled fields and mobile current-route state`);
     }
+    await page.goto("/notifications");
+    const notificationTabs = page.getByRole("tablist", {
+      name: dictionary.notifications.title,
+      exact: true,
+    });
+    const allNotificationsTab = notificationTabs.getByRole("tab", {
+      name: dictionary.notifications.all,
+      exact: true,
+    });
+    const unreadNotificationsTab = notificationTabs.getByRole("tab", {
+      name: new RegExp(`^${dictionary.notifications.unread} \\(`, "u"),
+    });
+    await allNotificationsTab.focus();
+    await expect(allNotificationsTab).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("ArrowRight");
+    await expect(unreadNotificationsTab).toBeFocused();
+    await expect(unreadNotificationsTab).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    const controlledPanelId = await unreadNotificationsTab.getAttribute(
+      "aria-controls",
+    );
+    assert(controlledPanelId);
+    await expect(page.locator(`#${CSS.escape(controlledPanelId)}`)).toHaveAttribute(
+      "role",
+      "tabpanel",
+    );
+    await page.keyboard.press("Home");
+    await expect(allNotificationsTab).toBeFocused();
+    evidence.push(
+      `${locale}: notification filters implement roving tab focus, arrow/Home navigation and a real ARIA tabpanel relation`,
+    );
+
     await page.setViewportSize({ width: 390, height: 480 });
     await page.goto("/market");
     const mobileNavigation = page.getByRole("navigation", {

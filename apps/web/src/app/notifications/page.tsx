@@ -14,7 +14,12 @@ import {
   ExternalLink,
   Settings,
 } from "lucide-react";
-import { Button, EmptyState, Skeleton } from "@nexus/ui";
+import {
+  Button,
+  EmptyState,
+  Skeleton,
+  nextTabIndex,
+} from "@nexus/ui";
 import { formatNotification } from "../../lib/notification-copy";
 import type { Notification } from "@nexus/domain";
 import { useNexusLocale } from "../../components/locale-context";
@@ -24,6 +29,8 @@ const LOADING_CARD_IDS = ["first", "second", "third", "fourth"] as const;
 export default function NotificationCenterPage() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.notifications;
+  const tabIdPrefix = useId();
+  const resultsPanelId = useId();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -167,16 +174,31 @@ export default function NotificationCenterPage() {
         role="tablist"
         aria-label={copy.title}
       >
-        {(["all", "unread"] as const).map((item) => {
+        {(["all", "unread"] as const).map((item, index, items) => {
           const active = filter === item;
+          const tabId = `${tabIdPrefix}-${item}`;
 
           return (
             <button
               key={item}
+              id={tabId}
               type="button"
               role="tab"
               aria-selected={active}
+              aria-controls={resultsPanelId}
+              tabIndex={active ? 0 : -1}
               onClick={() => setFilter(item)}
+              onKeyDown={(event) => {
+                const nextIndex = nextTabIndex(items.length, index, event.key);
+                if (nextIndex === null) return;
+                const next = items[nextIndex];
+                if (!next) return;
+                event.preventDefault();
+                setFilter(next);
+                event.currentTarget.parentElement
+                  ?.querySelectorAll<HTMLElement>('[role="tab"]')
+                  [nextIndex]?.focus();
+              }}
               className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${
                 active
                   ? "border-[color:var(--nexus-accent)] bg-accent text-white"
@@ -211,7 +233,13 @@ export default function NotificationCenterPage() {
         </div>
       )}
 
-      <div className="space-y-3">
+      <div
+        id={resultsPanelId}
+        role="tabpanel"
+        aria-labelledby={`${tabIdPrefix}-${filter}`}
+        tabIndex={0}
+        className="space-y-3"
+      >
         {loading ? (
           LOADING_CARD_IDS.map((id) => (
             <div key={id} className="nexus-panel space-y-3 p-4">
@@ -271,7 +299,7 @@ export default function NotificationCenterPage() {
           <EmptyState
             title={copy.empty}
             description={copy.description}
-            icon={<Bell className="h-6 w-6" />}
+            icon={<Bell className="h-6 w-6" aria-hidden="true" />}
           />
         )}
       </div>
