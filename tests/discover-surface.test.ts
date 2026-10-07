@@ -1,19 +1,57 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import {
+  DISCOVER_TYPES,
+  discoverHref,
+  parseDiscoverQuery,
+} from "../apps/web/src/lib/discover-query";
 
 const read = (path: string) =>
   readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("discover surface", () => {
-  it("uses a dedicated entity-scoped discover route", () => {
-    const page = read("apps/web/src/app/discover/page.tsx");
-    expect(page).toContain('form action="/discover"');
-    expect(page).toContain("DISCOVER_TYPES.map");
-    expect(page).toContain('type === "servers"');
-    expect(page).toContain('type === "resources"');
-    expect(page).toContain('type === "creators"');
-    expect(page).toContain('type === "organizations"');
+  it("keeps discovery entity-scoped and normalizes query state behaviorally", () => {
+    expect(DISCOVER_TYPES).toEqual([
+      "servers",
+      "resources",
+      "creators",
+      "organizations",
+      "content",
+    ]);
+
+    expect(parseDiscoverQuery({})).toEqual({
+      type: "servers",
+      query: "",
+    });
+    expect(
+      parseDiscoverQuery({
+        type: ["resources", "servers"],
+        q: ["  vehicle pack  ", "ignored"],
+      }),
+    ).toEqual({
+      type: "resources",
+      query: "vehicle pack",
+    });
+    expect(
+      parseDiscoverQuery({
+        type: "all",
+        q: "x".repeat(140),
+      }),
+    ).toEqual({
+      type: "servers",
+      query: "x".repeat(100),
+    });
+
+    expect(
+      discoverHref({
+        type: "organizations",
+        query: "  nexus studio  ",
+      }),
+    ).toBe("/discover?type=organizations&q=nexus+studio");
+    expect(discoverHref({ type: "content" })).toBe(
+      "/discover?type=content",
+    );
   });
 
   it("routes primary navigation and navbar search to discover", () => {
