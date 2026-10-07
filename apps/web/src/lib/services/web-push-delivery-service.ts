@@ -1,7 +1,4 @@
-import {
-  webPushSubscriptionRepository,
-  type WebPushSubscriptionRecord,
-} from "@nexus/db";
+import type { WebPushSubscriptionRecord } from "@nexus/db";
 
 export type WebPushNotificationPayload = {
   title: string;
@@ -51,17 +48,15 @@ function boundedText(
 export function normalizeWebPushPayload(
   value: WebPushNotificationPayload,
 ): WebPushNotificationPayload {
+  const url = boundedText(value.url, 2048);
+  const tag = boundedText(value.tag, 120);
   return {
     title: boundedText(value.title, 120) ?? "MTA NEXUS",
     body:
       boundedText(value.body, 280) ??
       "You have a new notification.",
-    ...(boundedText(value.url, 2048)
-      ? { url: boundedText(value.url, 2048) }
-      : {}),
-    ...(boundedText(value.tag, 120)
-      ? { tag: boundedText(value.tag, 120) }
-      : {}),
+    ...(url ? { url } : {}),
+    ...(tag ? { tag } : {}),
   };
 }
 
@@ -69,7 +64,7 @@ export async function deliverWebPushToUser(
   userId: string,
   payload: WebPushNotificationPayload,
   sender: WebPushSender,
-  store: WebPushSubscriptionStore = webPushSubscriptionRepository,
+  store: WebPushSubscriptionStore,
 ): Promise<WebPushDeliverySummary> {
   const subscriptions = await store.listByUser(userId);
   const normalizedPayload = normalizeWebPushPayload(payload);

@@ -3,7 +3,6 @@ import type { WebPushSubscriptionRecord } from "@nexus/db";
 import {
   deliverWebPushToUser,
   normalizeWebPushPayload,
-  type WebPushSubscriptionStore,
 } from "../apps/web/src/lib/services/web-push-delivery-service";
 
 function subscription(
@@ -24,14 +23,16 @@ function subscription(
   };
 }
 
-function store(
-  records: WebPushSubscriptionRecord[],
-): WebPushSubscriptionStore & {
-  removeForSession: ReturnType<typeof vi.fn>;
-} {
+function store(records: WebPushSubscriptionRecord[]) {
   return {
-    listByUser: vi.fn(async () => records),
-    removeForSession: vi.fn(async () => true),
+    listByUser: vi.fn(async (_userId: string) => records),
+    removeForSession: vi.fn(
+      async (
+        _userId: string,
+        _sessionId: string,
+        _endpoint: string,
+      ) => true,
+    ),
   };
 }
 
