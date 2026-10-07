@@ -6,6 +6,7 @@ import {
   createWebPushHttpSender,
   WebPushDispatcher,
   webPushOutboxRepository,
+  webPushWorkerRepository,
 } from "../src/index";
 
 const HEALTH_FILE = "/tmp/nexus-web-push-worker-health.json";
@@ -150,6 +151,20 @@ try {
           status: "batch",
           batch: healthBatch,
           ...result,
+        });
+      }
+    } else {
+      const cleaned =
+        await webPushWorkerRepository.discardUnavailable(
+          BATCH_SIZE,
+        );
+      activity = cleaned;
+      if (cleaned > 0) {
+        emit({
+          status: "maintenance",
+          batch: healthBatch,
+          cleaned,
+          configured: false,
         });
       }
     }
