@@ -1,8 +1,10 @@
+import { createHash } from "node:crypto";
 import { readWebPushVapidConfig } from "@nexus/config";
 import { NextResponse, type NextRequest } from "next/server";
 import { webPushSubscriptionRepository } from "@nexus/db";
 import { consumeRateLimit, generateId } from "@nexus/security";
 import { parseWebPushSubscription } from "../../../../lib/web-push-subscription";
+import { parseWebPushEndpoint } from "../../../../lib/services/web-push-endpoint-policy";
 import { authService } from "../../../../lib/services/auth-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -26,11 +28,46 @@ async function requireSession(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const authenticated = await requireSession(request);
-  if (!authenticated) return NextResponse.json({ error: "Authentication required" }, { status: 401, headers: privateHeaders });
+  if (!authenticated) {
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401, headers: privateHeaders },
+    );
+  }
+
+  const endpointHash =
+    request.nextUrl.searchParams.get("endpointHash")?.trim() ?? "";
+  if (endpointHash && !/^[a-f0-9]{64}$/u.test(endpointHash)) {
+    return NextResponse.json(
+      { error: "Invalid Web Push endpoint fingerprint" },
+      { status: 400, headers: privateHeaders },
+    );
+  }
 
   const key = publicKey();
-  const subscriptionCount = await webPushSubscriptionRepository.countForSession(authenticated.user.id, authenticated.sessionId);
-  return NextResponse.json({ configured: key !== null, publicKey: key, subscribed: subscriptionCount > 0 }, { headers: privateHeaders });
+  let subscribed = false;
+  if (endpointHash) {
+    const active =
+      await webPushSubscriptionRepository.listForSession(
+        authenticated.user.id,
+        authenticated.sessionId,
+      );
+    subscribed = active.some(
+      (subscription) =>
+        createHash("sha256")
+          .update(subscription.endpoint, "utf8")
+          .digest("hex") === endpointHash,
+    );
+  }
+
+  return NextResponse.json(
+    {
+      configured: key !== null,
+      publicKey: key,
+      subscribed,
+    },
+    { headers: privateHeaders },
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -89,9 +126,7 @@ export async function DELETE(request: NextRequest) {
 
   let normalizedEndpoint: string;
   try {
-    const url = new URL(endpoint);
-    if (url.protocol !== "https:") throw new Error("invalid protocol");
-    normalizedEndpoint = url.toString();
+    normalizedEndpoint = parseWebPushEndpoint(endpoint).toString();
   } catch {
     return NextResponse.json({ error: "Invalid Web Push endpoint" }, { status: 400, headers: privateHeaders });
   }

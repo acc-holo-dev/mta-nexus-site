@@ -89,6 +89,15 @@ describe("Web Push active subscription repository", () => {
       ),
     ).toBe(0);
 
+    const sessionActive =
+      await webPushSubscriptionRepository.listForSession(
+        userId,
+        activeSessionId,
+      );
+    expect(sessionActive.map((item) => item.id).sort()).toEqual(
+      [`wps_active_${suffix}`, `wps_future_${suffix}`].sort(),
+    );
+
     const active = await webPushSubscriptionRepository.listByUser(userId);
     expect(active.map((item) => item.id).sort()).toEqual(
       [`wps_active_${suffix}`, `wps_future_${suffix}`].sort(),

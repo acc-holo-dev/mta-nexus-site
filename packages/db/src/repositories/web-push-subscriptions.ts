@@ -149,6 +149,41 @@ export class WebPushSubscriptionRepository {
     return result.status === "stored" ? result.subscription : null;
   }
 
+  async listForSession(
+    userId: string,
+    sessionId: string,
+  ): Promise<WebPushSubscriptionRecord[]> {
+    const now = new Date();
+    const rows = await db
+      .select({
+        id: webPushSubscriptions.id,
+        userId: webPushSubscriptions.userId,
+        sessionId: webPushSubscriptions.sessionId,
+        endpoint: webPushSubscriptions.endpoint,
+        p256dh: webPushSubscriptions.p256dh,
+        auth: webPushSubscriptions.auth,
+        expirationAt: webPushSubscriptions.expirationAt,
+        userAgent: webPushSubscriptions.userAgent,
+        createdAt: webPushSubscriptions.createdAt,
+        updatedAt: webPushSubscriptions.updatedAt,
+      })
+      .from(webPushSubscriptions)
+      .innerJoin(sessions, eq(sessions.id, webPushSubscriptions.sessionId))
+      .where(
+        and(
+          eq(webPushSubscriptions.userId, userId),
+          eq(webPushSubscriptions.sessionId, sessionId),
+          gt(sessions.expiresAt, now),
+          or(
+            isNull(webPushSubscriptions.expirationAt),
+            gt(webPushSubscriptions.expirationAt, now),
+          ),
+        ),
+      )
+      .limit(32);
+    return rows as WebPushSubscriptionRecord[];
+  }
+
   async countForSession(userId: string, sessionId: string): Promise<number> {
     const now = new Date();
     const [row] = await db

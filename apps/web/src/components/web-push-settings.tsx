@@ -47,8 +47,24 @@ function applicationServerKey(value: string): Uint8Array<ArrayBuffer> {
   return Uint8Array.from(raw, (character) => character.charCodeAt(0));
 }
 
-async function readPushState() {
-  const response = await fetch("/api/notifications/push", {
+async function endpointFingerprint(endpoint: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(endpoint),
+  );
+  return Array.from(new Uint8Array(digest), (byte) =>
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
+}
+
+async function readPushState(endpoint?: string) {
+  const endpointHash = endpoint
+    ? await endpointFingerprint(endpoint)
+    : null;
+  const url = endpointHash
+    ? `/api/notifications/push?endpointHash=${endpointHash}`
+    : "/api/notifications/push";
+  const response = await fetch(url, {
     cache: "no-store",
     credentials: "same-origin",
     signal: AbortSignal.timeout(15_000),
@@ -76,14 +92,26 @@ export function WebPushSettings() {
         return;
       }
       try {
-        const state = await readPushState();
+        const registration =
+          await navigator.serviceWorker.getRegistration("/");
+        const localSubscription =
+          await registration?.pushManager.getSubscription();
+        const state = await readPushState(localSubscription?.endpoint);
         if (!active) return;
         setPublicKey(state.publicKey);
-        if (!state.configured || !state.publicKey) { setStatus("unconfigured"); return; }
-        if (Notification.permission === "denied") { setStatus("denied"); return; }
-        const registration = await navigator.serviceWorker.getRegistration("/");
-        const localSubscription = await registration?.pushManager.getSubscription();
-        setStatus(state.subscribed && localSubscription ? "enabled" : "disabled");
+        if (!state.configured || !state.publicKey) {
+          setStatus("unconfigured");
+          return;
+        }
+        if (Notification.permission === "denied") {
+          setStatus("denied");
+          return;
+        }
+        setStatus(
+          state.subscribed && localSubscription
+            ? "enabled"
+            : "disabled",
+        );
       } catch {
         if (active) setStatus("error");
       }
@@ -138,6 +166,9 @@ export function WebPushSettings() {
       }
 
       if (!persisted.response.ok || persisted.data?.success !== true) {
+        if (persisted.response.status === 409) {
+          await subscription.unsubscribe().catch(() => false);
+        }
         throw new Error("push-enable");
       }
       setStatus("enabled");
