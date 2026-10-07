@@ -7,6 +7,7 @@ import {
   normalizeMtaAddress,
   parseMtaMasterList,
   readBoundedMasterPayload,
+  requestMtaMasterDirectoryFromEndpoints,
 } from "./mta-master-directory-service";
 
 const FLAGS = 0x0004 | 0x0008 | 0x0020 | 0x0040 | 0x0080 | 0x0100 | 0x0200 | 0x1000 | 0x080000;
@@ -200,6 +201,104 @@ describe("bounded MTA master-list transport", () => {
     await expect(readBoundedMasterPayload(response, 16))
       .rejects.toThrow("payload exceeds safety limit");
     expect(cancelled).toBe(true);
+  });
+});
+
+describe("MTA master endpoint fallback", () => {
+  it("falls back from an unavailable official endpoint to a valid mirror", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response("upstream unavailable", { status: 503 }),
+      )
+      .mockResolvedValueOnce(new Response(fixture()));
+
+    const directory =
+      await requestMtaMasterDirectoryFromEndpoints(
+        [
+          "https://master.multitheftauto.com/ase/mta/",
+          "https://mirror.example.com/ase/mta/",
+        ],
+        fetchMock,
+      );
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "https://master.multitheftauto.com/ase/mta/",
+      "https://mirror.example.com/ase/mta/",
+    ]);
+    expect(directory.isStale).toBe(false);
+    expect(directory.servers).toHaveLength(1);
+    expect(directory.servers[0]).toMatchObject({
+      address: "127.0.0.1",
+      port: 22003,
+      players: 42,
+    });
+  });
+
+  it("rejects a malformed mirror payload and continues to the next endpoint", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(new Uint8Array([0, 0, 0, 2])),
+      )
+      .mockResolvedValueOnce(new Response(fixture()));
+
+    const directory =
+      await requestMtaMasterDirectoryFromEndpoints(
+        [
+          "https://broken.example.com/ase/mta/",
+          "https://healthy.example.net/ase/mta/",
+        ],
+        fetchMock,
+      );
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(directory.servers[0]?.name).toBe(
+      "Nexus test server",
+    );
+  });
+
+  it("reports a generic failure after every endpoint fails", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockRejectedValue(new Error("private endpoint detail"));
+
+    await expect(
+      requestMtaMasterDirectoryFromEndpoints(
+        [
+          "https://master.multitheftauto.com/ase/mta/",
+          "https://secret-mirror.example.com/ase/mta/",
+        ],
+        fetchMock,
+      ),
+    ).rejects.toThrow(
+      "MTA master-list endpoints are unavailable",
+    );
+  });
+
+  it("passes bounded timeout signals and no-store semantics to every attempt", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(new Response(null, { status: 502 }))
+      .mockResolvedValueOnce(new Response(fixture()));
+
+    await requestMtaMasterDirectoryFromEndpoints(
+      [
+        "https://one.example.com/master",
+        "https://two.example.com/master",
+      ],
+      fetchMock,
+    );
+
+    for (const [, init] of fetchMock.mock.calls) {
+      expect(init?.cache).toBe("no-store");
+      expect(init?.signal).toBeInstanceOf(AbortSignal);
+      expect(init?.headers).toEqual({
+        "user-agent":
+          "MTA-Nexus/1.0 (+https://nexus-mta.com)",
+      });
+    }
   });
 });
 

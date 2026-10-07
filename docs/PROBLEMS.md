@@ -73,11 +73,11 @@ annotations, то есть workflow зарегистрирован, но runner 
 
 У run `37565630603` zero-step failure воспроизведён в трёх attempts, включая
 отдельный rerun конкретного failed job. Симптом далее стабильно повторяется на
-новых push-runs. Свежий run `37605994153` на `d700448` завершился тем же
-образом: plan job `112741481690` имеет пустой runner identity и `steps: []`;
-до checkout/user code выполнение не дошло. Это подтверждает, что blocker
-пережил крупный durable Web Push outbox/worker refactor и не привязан к
-конкретному workflow step. При этом последний полностью исполнившийся HEAD `7567191`
+новых push-runs. Свежий run `37666844264` на `601b2bf` завершился тем же
+образом: plan job `112948144949` имеет `steps: null`; все executable jobs
+были пропущены до checkout/user code. Это подтверждает, что blocker пережил
+durable Web Push queue alerting и safe public offline-cache refactor и не
+привязан к конкретному workflow step. При этом последний полностью исполнившийся HEAD `7567191`
 прошёл полный CI, а run `37565299572` на `3a1f818` ещё назначал runners,
 запускал реальные jobs и дал обычные диагностируемые ошибки
 typecheck/upgrade rehearsal.
@@ -105,10 +105,20 @@ repository policy или runner-side allocation failure) **не подтверж
 Приложение деградирует честно («directory temporarily unavailable», «Нет
 превью»), но каталог выглядит пустым, а live-серверы не отображаются.
 
-- **Следующий шаг:** подтвердить причину (региональная блокировка vs downtime);
-  рассмотреть self-hosted превью (загрузка скриншотов в приватное storage) и
-  прокси/зеркало для master-list в production-инфраструктуре; для dev —
-  документировать ожидаемую деградацию.
+- **Изменение:** master-list runtime теперь поддерживает до трёх явно заданных
+  оператором HTTPS fallback endpoints через `MTA_MASTER_MIRROR_URLS`.
+  Официальный `master.multitheftauto.com` всегда идёт первым; все попытки
+  делят единый 10-секундный budget. Mirror обязан пройти тот же 8 MiB bound,
+  ASE parser, server-count limit и EOF validation. Конфигурация отклоняет HTTP,
+  credentials, IP literals, localhost/mDNS, single-label hostnames, нестандартный
+  порт, дубли и больше трёх endpoints. Ошибка всех источников остаётся generic
+  и не раскрывает operator endpoint клиенту.
+- **Следующий шаг:** поднять/выбрать реально контролируемый mirror в целевой
+  production-сети, настроить его через environment и подтвердить live refresh
+  + stale fallback при недоступном official endpoint. Это изменение даёт
+  безопасный механизм переключения, но само по себе не доказывает доступность
+  какого-либо mirror. Для превью по-прежнему предпочтителен self-hosted upload
+  в приватное storage вместо зависимости от Unsplash.
 - **Изменение:** превью ресурсов теперь скрывает недопустимые HTTP/HTTPS-адреса
   и показывает RU/EN-заглушку при ошибке декодирования или загрузки, включая
   кешированную ошибку до гидрации. Open Graph применяет ту же проверку URL.

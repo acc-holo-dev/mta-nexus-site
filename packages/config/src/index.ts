@@ -1,5 +1,6 @@
 import { ECDH, createECDH, timingSafeEqual } from "node:crypto";
 import { Buffer } from "node:buffer";
+import { isIP } from "node:net";
 import { z } from "zod";
 
 const BASE64URL_PATTERN = /^[A-Za-z0-9_-]+$/u;
@@ -113,6 +114,71 @@ export function readWebPushVapidConfig(
   return { publicKey, privateKey, subject };
 }
 
+const MAX_MTA_MASTER_MIRRORS = 3;
+const MTA_MASTER_MIRROR_CONFIG_MAX_LENGTH = 6_144;
+
+function parseMtaMasterMirrorUrls(raw: string): string[] {
+  const value = raw.trim();
+  if (!value) return [];
+  if (value.length > MTA_MASTER_MIRROR_CONFIG_MAX_LENGTH) {
+    throw new Error("MTA master mirror configuration is too long");
+  }
+
+  const entries = value
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  if (entries.length > MAX_MTA_MASTER_MIRRORS) {
+    throw new Error("At most three MTA master mirrors are supported");
+  }
+
+  const urls: string[] = [];
+  const seen = new Set<string>();
+  for (const entry of entries) {
+    let url: URL;
+    try {
+      url = new URL(entry);
+    } catch {
+      throw new Error("Invalid MTA master mirror URL");
+    }
+
+    const hostname = url.hostname.toLowerCase().replace(/\.$/u, "");
+    if (
+      url.protocol !== "https:" ||
+      !hostname ||
+      url.username ||
+      url.password ||
+      url.hash ||
+      (url.port && url.port !== "443") ||
+      isIP(hostname) !== 0 ||
+      hostname.startsWith("[") ||
+      !hostname.includes(".") ||
+      hostname === "localhost" ||
+      hostname.endsWith(".localhost") ||
+      hostname.endsWith(".local")
+    ) {
+      throw new Error("MTA master mirrors must be public HTTPS hostnames");
+    }
+
+    const normalized = url.href;
+    if (seen.has(normalized)) {
+      throw new Error("MTA master mirror URLs must be unique");
+    }
+    seen.add(normalized);
+    urls.push(normalized);
+  }
+
+  return urls;
+}
+
+export function readMtaMasterMirrorUrls(
+  env: Record<string, string | undefined> = process.env,
+): string[] {
+  return parseMtaMasterMirrorUrls(
+    env.MTA_MASTER_MIRROR_URLS ?? "",
+  );
+}
+
 const developmentDefaults = {
   NODE_ENV: "development",
   PORT: "3000",
@@ -140,6 +206,7 @@ const developmentDefaults = {
   WEB_PUSH_VAPID_PUBLIC_KEY: "",
   WEB_PUSH_VAPID_PRIVATE_KEY: "",
   WEB_PUSH_VAPID_SUBJECT: "",
+  MTA_MASTER_MIRROR_URLS: "",
 } as const;
 
 export const envSchema = z
@@ -170,6 +237,7 @@ export const envSchema = z
     WEB_PUSH_VAPID_PUBLIC_KEY: z.string(),
     WEB_PUSH_VAPID_PRIVATE_KEY: z.string(),
     WEB_PUSH_VAPID_SUBJECT: z.string(),
+    MTA_MASTER_MIRROR_URLS: z.string(),
   })
   .superRefine((value, ctx) => {
     const addIssue = (path: keyof typeof value, message: string) =>
@@ -230,6 +298,17 @@ export const envSchema = z
       addIssue(
         "WEB_PUSH_VAPID_SUBJECT",
         "Web Push VAPID subject must use mailto: or HTTPS",
+      );
+    }
+
+    try {
+      parseMtaMasterMirrorUrls(value.MTA_MASTER_MIRROR_URLS);
+    } catch (error) {
+      addIssue(
+        "MTA_MASTER_MIRROR_URLS",
+        error instanceof Error
+          ? error.message
+          : "Invalid MTA master mirror configuration",
       );
     }
 
@@ -304,6 +383,7 @@ export function getEnvConfig(env: Record<string, string | undefined> = process.e
         WEB_PUSH_VAPID_PUBLIC_KEY: "",
         WEB_PUSH_VAPID_PRIVATE_KEY: "",
         WEB_PUSH_VAPID_SUBJECT: "",
+        MTA_MASTER_MIRROR_URLS: "",
         ...env,
       }
     : { ...developmentDefaults, ...env };

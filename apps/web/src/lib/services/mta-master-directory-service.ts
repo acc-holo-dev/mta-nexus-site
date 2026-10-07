@@ -1,4 +1,8 @@
+import { readMtaMasterMirrorUrls } from "@nexus/config";
+
 const MTA_MASTER_URL = "https://master.multitheftauto.com/ase/mta/";
+const MASTER_TOTAL_TIMEOUT_MS = 10_000;
+const MASTER_ENDPOINT_TIMEOUT_MS = 4_000;
 const CACHE_TTL_MS = 60_000;
 const STALE_CACHE_TTL_MS = 15 * 60_000;
 const MAX_MASTER_PAYLOAD_BYTES = 8 * 1024 * 1024;
@@ -256,24 +260,74 @@ export async function readBoundedMasterPayload(
   return bytes.buffer;
 }
 
-async function requestDirectory(): Promise<MtaMasterDirectory> {
-  const response = await fetch(MTA_MASTER_URL, {
-    cache: "no-store",
-    signal: AbortSignal.timeout(10_000),
-    headers: { "user-agent": "MTA-Nexus/1.0 (+https://nexus-mta.com)" },
-  });
+type MasterFetch = (
+  input: string | URL | Request,
+  init?: RequestInit,
+) => Promise<Response>;
 
-  if (!response.ok) {
-    throw new Error(`MTA master-list request failed with ${response.status}`);
+export async function requestMtaMasterDirectoryFromEndpoints(
+  endpoints: readonly string[],
+  fetcher: MasterFetch = fetch,
+): Promise<MtaMasterDirectory> {
+  if (endpoints.length === 0) {
+    throw new Error("No MTA master-list endpoints configured");
   }
 
-  const payload = await readBoundedMasterPayload(response);
+  const deadline = Date.now() + MASTER_TOTAL_TIMEOUT_MS;
+  for (const endpoint of endpoints) {
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) break;
 
-  const servers = parseMtaMasterList(payload)
-    .filter((server) => server.responding !== false)
-    .sort((a, b) => (b.players ?? 0) - (a.players ?? 0));
+    try {
+      const response = await fetcher(endpoint, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(
+          Math.min(MASTER_ENDPOINT_TIMEOUT_MS, remainingMs),
+        ),
+        headers: {
+          "user-agent": "MTA-Nexus/1.0 (+https://nexus-mta.com)",
+        },
+      });
 
-  return { servers, fetchedAt: new Date().toISOString(), isStale: false };
+      if (!response.ok) {
+        void response.body?.cancel().catch(() => {});
+        continue;
+      }
+
+      const payload = await readBoundedMasterPayload(response);
+      const servers = parseMtaMasterList(payload)
+        .filter((server) => server.responding !== false)
+        .sort((a, b) => (b.players ?? 0) - (a.players ?? 0));
+
+      return {
+        servers,
+        fetchedAt: new Date().toISOString(),
+        isStale: false,
+      };
+    } catch {
+      // A mirror must satisfy the same transport, size and binary-format
+      // contract as the official endpoint. Try only the next operator-defined
+      // endpoint while the shared deadline remains.
+    }
+  }
+
+  throw new Error("MTA master-list endpoints are unavailable");
+}
+
+function configuredMasterEndpoints(): string[] {
+  const endpoints = [
+    MTA_MASTER_URL,
+    ...readMtaMasterMirrorUrls(),
+  ];
+  return endpoints.filter(
+    (endpoint, index) => endpoints.indexOf(endpoint) === index,
+  );
+}
+
+async function requestDirectory(): Promise<MtaMasterDirectory> {
+  return requestMtaMasterDirectoryFromEndpoints(
+    configuredMasterEndpoints(),
+  );
 }
 
 export const mtaMasterDirectoryService = {

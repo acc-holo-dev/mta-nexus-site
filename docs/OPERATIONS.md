@@ -470,6 +470,7 @@ Validate production configuration without deploying publicly:
 - Caddy/TLS edge headers remain fail-closed;
 - backup and restore tooling works against production-shaped configuration;
 - recovery/email configuration is explicit before claiming delivery is operational;
+- optional `MTA_MASTER_MIRROR_URLS` contains at most three comma-separated public HTTPS FQDN endpoints; the official MTA master remains first, mirrors are fallback-only, and the full cascade shares one 10-second budget while retaining the same 8 MiB/parser/EOF safety contract;
 - optional Web Push VAPID configuration is either fully absent or contains a valid public P-256 key, private P-256 scalar and `mailto:`/HTTPS subject together; production Compose passes the triplet to both web and `push-worker` without exposing the private key in logs or client payloads;
 - migration `0030_web_push_outbox.sql` is applied before `push-worker` starts; inbox notifications enqueue one job per active subscription, with a global queue gate/capacity;
 - `push-worker` is a separate production process with lease ownership, max 5 attempts, deterministic backoff, terminal 404/410 subscription cleanup, 24-hour job TTL and graceful shutdown;
