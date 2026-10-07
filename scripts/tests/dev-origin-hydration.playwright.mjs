@@ -35,17 +35,6 @@ try {
     });
     assert.equal(response?.status(), 200, `${origin.name}: login route status`);
 
-    const themeToggle = page.getByRole("button", {
-      name: dictionary.theme.switchToLight,
-      exact: true,
-    });
-    await themeToggle.click();
-    await page.waitForFunction(
-      () =>
-        localStorage.getItem("nexus-theme") === "light" &&
-        !document.documentElement.classList.contains("dark"),
-    );
-
     await page.getByLabel(dictionary.auth.email, { exact: true }).fill(
       "dev-origin-check@example.invalid",
     );
@@ -71,6 +60,17 @@ try {
       new URL(page.url()).pathname,
       "/auth/login",
       `${origin.name}: hydrated form must not degrade to native GET navigation`,
+    );
+
+    const themeToggle = page.getByRole("button", {
+      name: dictionary.theme.switchToLight,
+      exact: true,
+    });
+    await themeToggle.click();
+    await page.waitForFunction(
+      () =>
+        localStorage.getItem("nexus-theme") === "light" &&
+        !document.documentElement.classList.contains("dark"),
     );
     assert.deepEqual(
       pageErrors,
