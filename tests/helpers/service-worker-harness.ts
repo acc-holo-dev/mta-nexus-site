@@ -13,6 +13,7 @@ export type ServiceWorkerRequest = {
 
 type HarnessOptions = {
   cachedResponse?: unknown;
+  cacheKeys?: unknown[];
   fetch?: (request: unknown) => Promise<unknown>;
 };
 
@@ -45,6 +46,9 @@ export function createServiceWorkerHarness(
   const listeners = new Map<string, ServiceWorkerListener>();
   const fetchCalls: unknown[] = [];
   const cachePuts: Array<{ request: unknown; response: unknown }> = [];
+  const cacheDeletes: unknown[] = [];
+  const cacheEntries = new Map<unknown, unknown>();
+  for (const key of options.cacheKeys ?? []) cacheEntries.set(key, { cached: true });
   const notifications: Array<{
     title: string;
     options: Record<string, unknown>;
@@ -69,8 +73,19 @@ export function createServiceWorkerHarness(
         async addAll() {
           return undefined;
         },
+        async match(request: unknown) {
+          return options.cachedResponse ?? cacheEntries.get(request) ?? null;
+        },
         async put(request: unknown, response: unknown) {
           cachePuts.push({ request, response });
+          cacheEntries.set(request, response);
+        },
+        async keys() {
+          return [...cacheEntries.keys()];
+        },
+        async delete(request: unknown) {
+          cacheDeletes.push(request);
+          return cacheEntries.delete(request);
         },
       };
     },
@@ -185,6 +200,7 @@ export function createServiceWorkerHarness(
   }
 
   return {
+    cacheDeletes,
     cachePuts,
     deletedCaches,
     dispatchFetch,

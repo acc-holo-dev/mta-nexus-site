@@ -11,7 +11,7 @@
 - Light / Dark / System theme modes; System реагирует на изменение OS color scheme без перезагрузки;
 - network-first navigation: при отсутствии сети показывается self-contained offline shell;
 - service worker не кеширует HTML пользовательских страниц и не перехватывает non-GET mutations;
-- runtime cache разрешён только для same-origin immutable `/_next/static/` assets; API, auth, settings, security, workspace и navigation HTML не попадают в runtime cache;
+- runtime cache разрешён только для same-origin immutable `/_next/static/` assets; API, auth, settings, security, workspace и navigation HTML не попадают в runtime cache; static namespace ограничен 96 entries и читает только текущий cache namespace, чтобы hashed assets не росли бесконечно между долгими сессиями;
 - добавлены session-bound browser Web Push subscriptions: authenticated subscribe/unsubscribe API, VAPID public-key gate и safe same-origin notification click handling; завершение серверной session каскадно удаляет её push subscription; VAPID/p256dh принимаются только как 65-byte uncompressed P-256 (`0x04`), auth secret — ровно 16 bytes; production config принимает VAPID public/private/subject только полным согласованным набором и передаёт его через production Compose без обязательного включения до готовности delivery worker;
 - offline shell явно сообщает, что покупки, публикация, модерация и другие state-changing actions не подтверждаются без authoritative server response.
 

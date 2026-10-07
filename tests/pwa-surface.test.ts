@@ -89,6 +89,32 @@ describe("PWA release surface", () => {
     expect(harness.cachePuts).toEqual([{ request, response: clone }]);
   });
 
+  it("bounds the immutable static cache and evicts oldest entries", async () => {
+    const oldKeys = Array.from({ length: 97 }, (_, index) => ({
+      url: `https://nexus.test/_next/static/chunks/old-${index}.js`,
+    }));
+    const clone = { kind: "cached-clone" };
+    const harness = createServiceWorkerHarness(await serviceWorkerSource(), {
+      cacheKeys: oldKeys,
+      async fetch() {
+        return {
+          ok: true,
+          type: "basic",
+          clone() {
+            return clone;
+          },
+        };
+      },
+    });
+    const request = makeServiceWorkerRequest(
+      "https://nexus.test/_next/static/chunks/new.js",
+    );
+
+    await harness.dispatchFetch(request);
+
+    expect(harness.cacheDeletes).toEqual(oldKeys.slice(0, 2));
+  });
+
   it("serves an immutable static cache hit without network access", async () => {
     const cachedResponse = { kind: "cached" };
     const harness = createServiceWorkerHarness(await serviceWorkerSource(), {
