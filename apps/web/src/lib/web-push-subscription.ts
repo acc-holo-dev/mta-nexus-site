@@ -65,7 +65,12 @@ export function parseWebPushSubscription(
       return null;
     }
     expirationAt = new Date(expirationTime);
-    if (Number.isNaN(expirationAt.getTime())) return null;
+    if (
+      Number.isNaN(expirationAt.getTime()) ||
+      expirationAt.getTime() <= Date.now()
+    ) {
+      return null;
+    }
   }
 
   return {

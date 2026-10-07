@@ -101,6 +101,15 @@ describe("Web Push subscription validation", () => {
     ).toBeNull();
   });
 
+  it("rejects an already expired subscription", () => {
+    expect(
+      parseWebPushSubscription({
+        ...valid,
+        expirationTime: Date.now() - 60_000,
+      }),
+    ).toBeNull();
+  });
+
   it("normalizes an expiration timestamp when supplied", () => {
     const expirationTime = Date.UTC(2030, 0, 1);
     expect(

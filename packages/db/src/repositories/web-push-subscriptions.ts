@@ -1,6 +1,6 @@
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, gt, isNull, or } from "drizzle-orm";
 import { db } from "../client";
-import { webPushSubscriptions } from "../schema";
+import { sessions, webPushSubscriptions } from "../schema";
 
 export type WebPushSubscriptionRecord = {
   id: string;
@@ -48,12 +48,22 @@ export class WebPushSubscriptionRepository {
   }
 
   async countForSession(userId: string, sessionId: string): Promise<number> {
-    const [row] = await db.select({ total: count() }).from(webPushSubscriptions).where(
-      and(
-        eq(webPushSubscriptions.userId, userId),
-        eq(webPushSubscriptions.sessionId, sessionId),
-      ),
-    );
+    const now = new Date();
+    const [row] = await db
+      .select({ total: count() })
+      .from(webPushSubscriptions)
+      .innerJoin(sessions, eq(sessions.id, webPushSubscriptions.sessionId))
+      .where(
+        and(
+          eq(webPushSubscriptions.userId, userId),
+          eq(webPushSubscriptions.sessionId, sessionId),
+          gt(sessions.expiresAt, now),
+          or(
+            isNull(webPushSubscriptions.expirationAt),
+            gt(webPushSubscriptions.expirationAt, now),
+          ),
+        ),
+      );
     return row.total;
   }
 
@@ -69,9 +79,33 @@ export class WebPushSubscriptionRepository {
   }
 
   async listByUser(userId: string): Promise<WebPushSubscriptionRecord[]> {
-    return await db.select().from(webPushSubscriptions).where(
-      eq(webPushSubscriptions.userId, userId),
-    ) as WebPushSubscriptionRecord[];
+    const now = new Date();
+    const rows = await db
+      .select({
+        id: webPushSubscriptions.id,
+        userId: webPushSubscriptions.userId,
+        sessionId: webPushSubscriptions.sessionId,
+        endpoint: webPushSubscriptions.endpoint,
+        p256dh: webPushSubscriptions.p256dh,
+        auth: webPushSubscriptions.auth,
+        expirationAt: webPushSubscriptions.expirationAt,
+        userAgent: webPushSubscriptions.userAgent,
+        createdAt: webPushSubscriptions.createdAt,
+        updatedAt: webPushSubscriptions.updatedAt,
+      })
+      .from(webPushSubscriptions)
+      .innerJoin(sessions, eq(sessions.id, webPushSubscriptions.sessionId))
+      .where(
+        and(
+          eq(webPushSubscriptions.userId, userId),
+          gt(sessions.expiresAt, now),
+          or(
+            isNull(webPushSubscriptions.expirationAt),
+            gt(webPushSubscriptions.expirationAt, now),
+          ),
+        ),
+      );
+    return rows as WebPushSubscriptionRecord[];
   }
 }
 
