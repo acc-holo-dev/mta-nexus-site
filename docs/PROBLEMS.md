@@ -34,7 +34,7 @@ CI переработан: один workflow-координатор, отдел�
 Пропущенный обязательный шаг не считается успешной приёмкой. Полный новый
 контур успешно прошёл на `fde2721`: 930 unit и 203 database проверки, 109
 Node-проверок, production/local Compose, SMTP worker и все браузерные сценарии.
-Все 239 Vitest-файлов распределены без пропусков и пересечений. Быстрый контур
+На том SHA все 239 существовавших Vitest-файлов были распределены без пропусков и пересечений; текущий классификатор проверяет полный автоматически обнаруженный набор. Быстрый контур
 подтверждён на `7a9539e`: оба тестовых проекта, tooling и production browser smoke
 зелёные; тяжёлые инфраструктурные и полные браузерные задания пропущены.
 В этом прогоне обнаружена и исправлена first-use гонка recovery rate-limit:
@@ -211,8 +211,14 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   через HTTP behavior tests без чтения route source. Устаревший
   `account-security-surface.test.ts` удалён; PWA/Web Push surface tests теперь
   исполняют реальный service-worker source в изолированном VM и проверяют
-  cache/offline/push/click поведение вместо совпадения строк. Оставшиеся
-  source-surface тесты сокращать по мере изменения функций;
+  cache/offline/push/click поведение вместо совпадения строк. Report workflow
+  больше не имеет дублирующего source-only теста: HTTP boundary + repository
+  transaction/advisory-lock tests покрывают его поведением. Server-follow
+  fanout переведён с чтения исходника на unit behavior (limit, author exclusion,
+  concurrency, preference suppression и push failure), а comment notification
+  path — на HTTP behavior; source-check оставлен только для внутреннего comment
+  transaction/counter invariant без дешёвого unit seam. Оставшиеся source-surface
+  тесты сокращать по мере изменения функций;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере

@@ -2,28 +2,10 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-describe("article comments API", () => {
-  it("requires authentication, validates parent ownership and notifies authors", () => {
-    const route = readFileSync(
-      resolve(
-        process.cwd(),
-        "apps/web/src/app/api/content/[slug]/comments/route.ts"
-      ),
-      "utf8"
-    );
-
-    expect(route).toContain('consumeRateLimit("commentCreation", user.id)');
-    expect(route).toContain("createContentCommentSchema.safeParse");
-    expect(route).toContain("incrementView: false");
-    expect(route).toContain("notificationRepository");
-    expect(route).toContain(".create({");
-    expect(route).toContain("after(async () =>");
-    expect(route).toContain("deliverStoredNotificationsWebPush([created])");
-    expect(route).toContain('category: "content"');
-    expect(route).toContain('"Cache-Control": "private, no-store"');
-    expect(route).toContain('Vary: "Cookie"');
-  });
-
+describe("article comment persistence", () => {
+  // HTTP auth/validation/post-response notification behavior is covered by
+  // content-comment-notification-http.test.ts. This remaining source contract
+  // is limited to the transaction implementation that has no cheap unit seam.
   it("keeps comment writes and article counters in one transaction", () => {
     const repository = readFileSync(
       resolve(process.cwd(), "packages/db/src/repositories/content.ts"),
