@@ -88,12 +88,17 @@ describe("Web Push HTTP sender", () => {
     });
     const current = subscription();
 
+    const controller = new AbortController();
     await expect(
-      sender(current, {
-        title: "MTA NEXUS",
-        body: "New notification",
-        url: "/notifications",
-      }),
+      sender(
+        current,
+        {
+          title: "MTA NEXUS",
+          body: "New notification",
+          url: "/notifications",
+        },
+        { signal: controller.signal },
+      ),
     ).resolves.toEqual({ statusCode: 201 });
 
     expect(transport).toHaveBeenCalledTimes(1);
@@ -105,6 +110,7 @@ describe("Web Push HTTP sender", () => {
       port: 443,
       path: "/subscriptions/abc?token=1",
       timeoutMs: 5_000,
+      signal: controller.signal,
     });
     expect(request?.headers.Host).toBe("push.example.net");
     expect(request?.headers.TTL).toBe("60");

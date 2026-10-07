@@ -4,7 +4,6 @@ import type {
 } from "./web-push-worker";
 import { webPushWorkerRepository } from "./web-push-worker";
 import type {
-  WebPushNotificationPayload,
   WebPushSendResult,
   WebPushSender,
 } from "../web-push-runtime";
@@ -27,14 +26,9 @@ type Worker = Readonly<{
   discardUnavailable(limit?: number): Promise<number>;
 }>;
 
-type Sender = (
-  subscription: {
-    endpoint: string;
-    p256dh: string;
-    auth: string;
-  },
-  payload: WebPushNotificationPayload,
-) => Promise<WebPushSendResult>;
+type Sender = WebPushSender;
+
+const SEND_SETTLE_MARGIN_MS = 1_000;
 
 export type WebPushDispatchSummary = Readonly<{
   accepted: number;
@@ -120,6 +114,25 @@ export class WebPushDispatcher {
         continue;
       }
 
+      const sendWindowMs =
+        prepared.sendBefore.getTime() -
+        Date.now() -
+        SEND_SETTLE_MARGIN_MS;
+      if (sendWindowMs <= 0) {
+        const settled = await this.#worker.settle(
+          lease,
+          "retry",
+        );
+        if (settled) summary.retried += 1;
+        else summary.unsettled += 1;
+        continue;
+      }
+
+      const deadlineSignal = AbortSignal.timeout(sendWindowMs);
+      const sendSignal = signal
+        ? AbortSignal.any([signal, deadlineSignal])
+        : deadlineSignal;
+
       let result: WebPushSendResult;
       try {
         result = await this.#sender(
@@ -129,6 +142,7 @@ export class WebPushDispatcher {
             auth: prepared.auth,
           },
           prepared.payload,
+          { signal: sendSignal },
         );
       } catch {
         const settled = await this.#worker.settle(

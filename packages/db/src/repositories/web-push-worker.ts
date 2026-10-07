@@ -265,7 +265,9 @@ export class WebPushWorkerRepository {
       const owns =
         row.outbox.attempts === lease.attempt &&
         row.outbox.leaseTokenDigest === digest &&
-        row.outbox.leaseExpiresAt !== null;
+        row.outbox.leaseExpiresAt !== null &&
+        row.outbox.leaseExpiresAt.getTime() ===
+          lease.expiresAt.getTime();
       const valid =
         row.outbox.expiresAt > now &&
         row.sessionExpiresAt > now &&
@@ -338,10 +340,16 @@ export class WebPushWorkerRepository {
         .from(webPushOutbox)
         .where(eq(webPushOutbox.id, lease.id))
         .for("update");
+      const now = await clock(tx);
       if (
         !row ||
         row.attempts !== lease.attempt ||
-        row.leaseTokenDigest !== digest
+        row.leaseTokenDigest !== digest ||
+        row.leaseExpiresAt === null ||
+        row.leaseExpiresAt.getTime() !==
+          lease.expiresAt.getTime() ||
+        row.leaseExpiresAt <= now ||
+        row.expiresAt <= now
       ) {
         return false;
       }
@@ -370,7 +378,6 @@ export class WebPushWorkerRepository {
         return deleted.length === 1;
       }
 
-      const now = await clock(tx);
       if (row.expiresAt <= now) {
         await tx
           .delete(webPushOutbox)
@@ -434,11 +441,16 @@ export class WebPushWorkerRepository {
         .from(webPushOutbox)
         .where(eq(webPushOutbox.id, lease.id))
         .for("update");
+      const now = await clock(tx);
       if (
         !row ||
         row.subscriptionId !== subscriptionId ||
         row.attempts !== lease.attempt ||
-        row.leaseTokenDigest !== digest
+        row.leaseTokenDigest !== digest ||
+        row.leaseExpiresAt === null ||
+        row.leaseExpiresAt.getTime() !==
+          lease.expiresAt.getTime() ||
+        row.leaseExpiresAt <= now
       ) {
         return false;
       }

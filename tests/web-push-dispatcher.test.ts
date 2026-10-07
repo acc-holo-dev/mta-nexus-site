@@ -128,6 +128,34 @@ describe("Web Push dispatcher", () => {
     ).not.toHaveBeenCalled();
   });
 
+  it("never sends a job whose lease window is already too close to expiry", async () => {
+    const id =
+      "wpo_00000000-0000-0000-0000-000000000008";
+    const w = worker([id]);
+    w.prepare.mockResolvedValueOnce({
+      ...prepared(id),
+      sendBefore: new Date(Date.now() + 500),
+    });
+    const sender = vi.fn(async () => ({ statusCode: 201 }));
+
+    await expect(
+      new WebPushDispatcher({
+        worker: w,
+        sender,
+      }).runBatch(),
+    ).resolves.toMatchObject({
+      accepted: 0,
+      retried: 1,
+      unsettled: 0,
+    });
+
+    expect(sender).not.toHaveBeenCalled();
+    expect(w.settle).toHaveBeenCalledWith(
+      expect.objectContaining({ id }),
+      "retry",
+    );
+  });
+
   it("stops claiming new jobs after shutdown is requested", async () => {
     const controller = new AbortController();
     const ids = [

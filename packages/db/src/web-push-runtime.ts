@@ -73,11 +73,16 @@ export type WebPushHttpsRequest = {
   port: number;
   servername: string;
   timeoutMs: number;
+  signal?: AbortSignal;
 };
 
 export type WebPushHttpsTransport = (
   request: WebPushHttpsRequest,
 ) => Promise<WebPushSendResult>;
+
+export type WebPushSendOptions = {
+  signal?: AbortSignal;
+};
 
 export type WebPushSender = (
   subscription: {
@@ -86,6 +91,7 @@ export type WebPushSender = (
     auth: string;
   },
   payload: WebPushNotificationPayload,
+  options?: WebPushSendOptions,
 ) => Promise<WebPushSendResult>;
 
 const RESERVED_ADDRESSES = new BlockList();
@@ -575,7 +581,12 @@ export const sendWebPushHttpsRequest: WebPushHttpsTransport =
             method: "POST",
             headers: prepared.headers,
             rejectUnauthorized: true,
-            signal: AbortSignal.timeout(prepared.timeoutMs),
+            signal: prepared.signal
+              ? AbortSignal.any([
+                  prepared.signal,
+                  AbortSignal.timeout(prepared.timeoutMs),
+                ])
+              : AbortSignal.timeout(prepared.timeoutMs),
           },
           (response) => {
             const statusCode = response.statusCode ?? 0;
@@ -613,7 +624,7 @@ export function createWebPushHttpSender(
     throw new RangeError("Invalid Web Push timeout");
   }
 
-  return async (subscription, payload) => {
+  return async (subscription, payload, sendOptions) => {
     const target = await resolveWebPushTarget(
       subscription.endpoint,
       resolver,
@@ -641,6 +652,7 @@ export function createWebPushHttpSender(
       port: 443,
       servername: target.hostname,
       timeoutMs,
+      signal: sendOptions?.signal,
     });
   };
 }

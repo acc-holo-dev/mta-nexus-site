@@ -167,6 +167,41 @@ describe("Web Push worker repository", () => {
     ).toEqual([]);
   });
 
+  it("refuses settlement after lease expiry even before another worker reclaims the job", async () => {
+    const f = await fixture("expired_owner");
+    const current =
+      await webPushWorkerRepository.claim(f.jobId);
+    if (!current) throw new Error("Lease missing");
+
+    await db
+      .update(webPushOutbox)
+      .set({
+        leaseExpiresAt:
+          sql`clock_timestamp() - interval '1 second'`,
+      })
+      .where(eq(webPushOutbox.id, f.jobId));
+
+    await expect(
+      webPushWorkerRepository.settle(
+        current,
+        "accepted",
+        201,
+      ),
+    ).resolves.toBe(false);
+    await expect(
+      webPushWorkerRepository.discardStaleSubscription(
+        current,
+        f.subscriptionId,
+      ),
+    ).resolves.toBe(false);
+    expect(
+      await db
+        .select()
+        .from(webPushOutbox)
+        .where(eq(webPushOutbox.id, f.jobId)),
+    ).toHaveLength(1);
+  });
+
   it("refuses settlement from a stale lease owner after reclaim", async () => {
     const f = await fixture("reclaim");
     const first =
