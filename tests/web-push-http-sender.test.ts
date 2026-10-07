@@ -5,6 +5,7 @@ import type { WebPushVapidConfig } from "@nexus/config";
 import {
   createWebPushHttpSender,
   prepareWebPushRequest,
+  type WebPushHttpsRequest,
 } from "../apps/web/src/lib/services/web-push-http-sender";
 
 function vapidConfig(): WebPushVapidConfig {
@@ -63,8 +64,21 @@ describe("Web Push HTTP sender", () => {
     expect(prepared.body.length).toBeGreaterThan(86);
   });
 
+  it("rejects unsafe endpoints even when only preparing a request", () => {
+    expect(() =>
+      prepareWebPushRequest(
+        "https://127.0.0.1/subscriptions/abc",
+        subscription(),
+        { title: "NEXUS", body: "Update" },
+        vapidConfig(),
+      ),
+    ).toThrow("Unsafe Web Push endpoint");
+  });
+
   it("connects to the pinned public IP while preserving Host and TLS SNI", async () => {
-    const transport = vi.fn(async () => ({ statusCode: 201 }));
+    const transport = vi.fn(async (_request: WebPushHttpsRequest) => ({
+      statusCode: 201,
+    }));
     const sender = createWebPushHttpSender(vapidConfig(), {
       resolver: async () => [{ address: "1.1.1.1", family: 4 }],
       transport,
@@ -97,7 +111,9 @@ describe("Web Push HTTP sender", () => {
   });
 
   it("never reaches transport for a private DNS resolution", async () => {
-    const transport = vi.fn(async () => ({ statusCode: 201 }));
+    const transport = vi.fn(async (_request: WebPushHttpsRequest) => ({
+      statusCode: 201,
+    }));
     const sender = createWebPushHttpSender(vapidConfig(), {
       resolver: async () => [{ address: "127.0.0.1", family: 4 }],
       transport,

@@ -143,8 +143,17 @@ export async function resolveWebPushTarget(
   const hostname = normalizedHostname(url);
   const records = await resolver(hostname);
 
-  if (!records.length || records.some((record) => !isPublicWebPushAddress(record.address))) {
-    throw new Error("Web Push endpoint did not resolve exclusively to public addresses");
+  if (
+    !records.length ||
+    records.some(
+      (record) =>
+        isIP(record.address) !== record.family ||
+        !isPublicWebPushAddress(record.address),
+    )
+  ) {
+    throw new Error(
+      "Web Push endpoint did not resolve exclusively to public addresses",
+    );
   }
 
   const [selected] = records;

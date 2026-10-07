@@ -11,6 +11,7 @@ import {
   encryptWebPushMessage,
 } from "./web-push-crypto";
 import {
+  parseWebPushEndpoint,
   resolveWebPushTarget,
   systemWebPushHostResolver,
   type WebPushHostResolver,
@@ -62,7 +63,7 @@ export function prepareWebPushRequest(
     throw new RangeError("Invalid Web Push TTL");
   }
 
-  const url = new URL(endpoint);
+  const url = parseWebPushEndpoint(endpoint);
   const body = encryptWebPushMessage(
     subscription,
     Buffer.from(JSON.stringify(payload), "utf8"),
