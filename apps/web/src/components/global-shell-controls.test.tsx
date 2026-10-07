@@ -1,52 +1,27 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { getDictionary } from "../lib/i18n";
 
 import { LocaleProvider } from "./locale-context";
-import { CommandPalette } from "./command-palette";
 import { ThemeToggle } from "./theme-toggle";
 
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 const read = (path: string) =>
   readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("global shell controls", () => {
-  // Shortcut, focus containment and keyboard activation are exercised by
-  // shell-accessibility.playwright.mjs rather than JavaScript spelling checks.
-  it.each(["en", "ru"] as const)("renders accessible localized palette commands in %s", (locale) => {
-    const copy = getDictionary(locale).commandPalette;
-    const renderPalette = (isOpen: boolean) => renderToStaticMarkup(
-      <LocaleProvider locale={locale}>
-        <CommandPalette isOpen={isOpen} onClose={() => undefined} />
-      </LocaleProvider>,
-    );
-    expect(renderPalette(false)).toBe("");
-    const html = renderPalette(true);
-    expect(html).toContain(`aria-label="${copy.dialogLabel}"`);
-    expect(html).toContain('role="combobox"');
-    expect(html).toContain('role="listbox"');
-    expect(html).toContain('aria-modal="true"');
-    for (const label of [copy.goMarket, copy.goServers, copy.openSaved, copy.openSettings]) {
-      expect(html).toContain(label);
-    }
-  });
+  it("uses ordinary Discover navigation instead of command-driven shell search", () => {
+    const navbar = read("apps/web/src/components/navbar.tsx");
+    const shell = read("apps/web/src/components/nexus-shell.tsx");
+    const trigger = navbar.slice(navbar.indexOf("function NavbarSearchTrigger"));
 
-  it("uses localized command copy and abortable uncached search requests", () => {
-    const palette = read("apps/web/src/components/command-palette.tsx");
-
-    expect(palette).toContain("dictionary.commandPalette");
-    expect(palette).toContain('cache: "no-store"');
-    expect(palette).toContain('credentials: "same-origin"');
-    expect(palette).toContain("controller.abort()");
-    expect(palette).toContain('aria-modal="true"');
-
-    const en = getDictionary("en").commandPalette;
-    const ru = getDictionary("ru").commandPalette;
-    expect(en.goMarket).not.toBe(ru.goMarket);
-    expect(en.searchPlaceholder).not.toBe(ru.searchPlaceholder);
+    expect(trigger).toContain('href="/discover"');
+    expect(trigger).toContain("aria-label={placeholder}");
+    expect(trigger).not.toContain("onClick=");
+    expect(shell).not.toContain("CommandPalette");
+    expect(shell).not.toContain("Control+k");
   });
 
   it("localizes account controls and protects session mutations", () => {
