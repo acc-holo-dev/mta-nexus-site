@@ -1,6 +1,7 @@
 import { and, asc, count, eq, desc, ne, sql, inArray } from "drizzle-orm";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { db } from "../client";
 import { auditEvents, builds, products, users, organizations, organizationMembers, notificationPreferences, notifications } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
@@ -316,6 +317,28 @@ export class BuildRepository {
       const title = decision === "approve" ? "Resource version approved" : "Resource version rejected";
       const data = { kind: "build_review", decision, resourceTitle: product.title, version: reviewed.version, notes };
       // Resolve current recipients in SQL, without exposing notes to former owners.
+      // Lock preference scopes first so a concurrent settings PATCH linearizes
+      // before or after this moderation notification, never through a stale read.
+      const preferenceRecipients = await tx.execute(sql`
+        select ${users.id} as id
+        from ${users}
+        where (
+          (${product.organizationId}::text is null and ${users.id} = ${product.authorId})
+          or exists (select 1 from ${organizations}
+            where ${organizations.id} = ${product.organizationId} and ${organizations.ownerId} = ${users.id})
+          or exists (select 1 from ${organizationMembers}
+            where ${organizationMembers.organizationId} = ${product.organizationId}
+              and ${organizationMembers.userId} = ${users.id}
+              and (${organizationMembers.role} in ('owner', 'admin')
+                or ${organizationMembers.permissions} @> '["manage_products"]'::jsonb))
+        )
+        order by ${users.id}
+      `);
+      await lockNotificationPreferencesForUsers(
+        tx,
+        preferenceRecipients.map((row) => String(row.id)),
+      );
+
       // The pending-state compare-and-set above makes a replay a no-op, including delivery.
       const notificationRows = await tx.execute(sql`
         insert into ${notifications} (id, recipient_id, title, message, link, type, category, is_read, data, created_at)

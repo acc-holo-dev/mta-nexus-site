@@ -1,6 +1,7 @@
 import { eq, desc, and, count, sql } from "drizzle-orm";
 import { db } from "../client";
 import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { notificationPreferences, notifications } from "../schema";
 import type {
   Notification,
@@ -40,32 +41,44 @@ export class NotificationRepository {
       >
     >
   ): Promise<NotificationPreferences> {
-    const current = await this.getPreferences(userId);
-    const values = {
-      ...current,
-      ...updates,
-      id: current.id || `npr_${userId}`,
-      userId,
-      updatedAt: new Date(),
-    };
-    const rows = await db
-      .insert(notificationPreferences)
-      .values(values)
-      .onConflictDoUpdate({
-        target: notificationPreferences.userId,
-        set: {
-          followsEnabled: values.followsEnabled,
-          contentEnabled: values.contentEnabled,
-          serverEnabled: values.serverEnabled,
-          commerceEnabled: values.commerceEnabled,
-          systemEnabled: values.systemEnabled,
-          updatedAt: values.updatedAt,
-        },
-      })
-      .returning();
-    return rows[0] as unknown as NotificationPreferences;
+    return db.transaction(async (tx) => {
+      await lockNotificationPreferencesForUsers(tx, [userId]);
+      const rows = await tx
+        .select()
+        .from(notificationPreferences)
+        .where(eq(notificationPreferences.userId, userId))
+        .limit(1);
+      const current =
+        (rows[0] as unknown as NotificationPreferences | undefined) ??
+        this.defaultPreferences(userId);
+      const values = {
+        ...current,
+        ...updates,
+        id: current.id || `npr_${userId}`,
+        userId,
+        updatedAt: new Date(),
+      };
+      const [stored] = await tx
+        .insert(notificationPreferences)
+        .values(values)
+        .onConflictDoUpdate({
+          target: notificationPreferences.userId,
+          set: {
+            followsEnabled: values.followsEnabled,
+            contentEnabled: values.contentEnabled,
+            serverEnabled: values.serverEnabled,
+            commerceEnabled: values.commerceEnabled,
+            systemEnabled: values.systemEnabled,
+            updatedAt: values.updatedAt,
+          },
+        })
+        .returning();
+      if (!stored) {
+        throw new Error("Notification preferences update returned no row");
+      }
+      return stored as unknown as NotificationPreferences;
+    });
   }
-
   async findById(id: string): Promise<Notification | null> {
     const rows = await db
       .select()
@@ -135,7 +148,6 @@ export class NotificationRepository {
     pushJobs: number;
     pushQueueState: "queued" | "no_subscriptions" | "saturated" | "error";
   }> {
-    const preferences = await this.getPreferences(data.recipientId);
     const category = data.category ?? (
       data.type === "order" || data.type === "license"
         ? "commerce"
@@ -160,15 +172,25 @@ export class NotificationRepository {
                 ? "systemEnabled"
                 : null;
 
-    if (preferenceKey && !preferences[preferenceKey]) {
-      return {
-        notification: null,
-        pushJobs: 0,
-        pushQueueState: "no_subscriptions",
-      };
-    }
-
     return await db.transaction(async (tx) => {
+      await lockNotificationPreferencesForUsers(tx, [data.recipientId]);
+      const preferenceRows = await tx
+        .select()
+        .from(notificationPreferences)
+        .where(eq(notificationPreferences.userId, data.recipientId))
+        .limit(1);
+      const preferences =
+        (preferenceRows[0] as unknown as NotificationPreferences | undefined) ??
+        this.defaultPreferences(data.recipientId);
+
+      if (preferenceKey && !preferences[preferenceKey]) {
+        return {
+          notification: null,
+          pushJobs: 0,
+          pushQueueState: "no_subscriptions" as const,
+        };
+      }
+
       const now = new Date();
       const values = {
         ...data,
