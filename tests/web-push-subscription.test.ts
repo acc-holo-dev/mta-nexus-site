@@ -20,7 +20,7 @@ describe("Web Push subscription validation", () => {
   it("rejects insecure, incomplete and oversized subscriptions", () => {
     expect(parseWebPushSubscription({ ...valid, endpoint: "http://push.example.test/subscriptions/abc" })).toBeNull();
     expect(parseWebPushSubscription({ ...valid, keys: { p256dh: valid.keys.p256dh } })).toBeNull();
-    expect(parseWebPushSubscription({ ...valid, endpoint: "https://push.example.test/" + "x".repeat(2100) })).toBeNull();
+    expect(parseWebPushSubscription({ ...valid, endpoint: `https://push.example.test/${"x".repeat(2100)}` })).toBeNull();
   });
 
   it("normalizes an expiration timestamp when supplied", () => {
