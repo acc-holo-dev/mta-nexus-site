@@ -1179,6 +1179,21 @@ const en = {
     systemNotifications: "System notifications",
     systemNotificationsDescription:
       "Important non-security account messages.",
+    webPush: "Browser push",
+    webPushDescription:
+      "Receive browser notifications using the same NEXUS notification preferences.",
+    webPushEnable: "Enable push",
+    webPushDisable: "Disable push",
+    webPushEnabled:
+      "Enabled for this signed-in browser. Ending this session also removes its server-side push subscription.",
+    webPushUnsupported: "This browser does not support Web Push.",
+    webPushUnconfigured:
+      "Web Push is not configured on this deployment yet.",
+    webPushDenied:
+      "Browser notification permission is blocked. Change the site permission in your browser to enable push.",
+    webPushError:
+      "Web Push state could not be confirmed. Reload settings before retrying.",
+    webPushLoading: "Checking browser push...",
     recoveryEmail: "Recovery email",
     recoveryNotVerified: "Not verified for recovery yet.",
     recoveryUnavailable:
@@ -2513,6 +2528,21 @@ const ru: typeof en = {
     systemNotifications: "Системные уведомления",
     systemNotificationsDescription:
       "Важные сообщения аккаунта, не связанные напрямую с безопасностью.",
+    webPush: "Push-уведомления браузера",
+    webPushDescription:
+      "Получайте уведомления браузера с учётом тех же настроек уведомлений NEXUS.",
+    webPushEnable: "Включить push",
+    webPushDisable: "Отключить push",
+    webPushEnabled:
+      "Включено для этого авторизованного браузера. Завершение этой сессии также удалит её серверную push-подписку.",
+    webPushUnsupported: "Этот браузер не поддерживает Web Push.",
+    webPushUnconfigured:
+      "Web Push пока не настроен на этом окружении.",
+    webPushDenied:
+      "Разрешение на уведомления заблокировано. Измените разрешение сайта в браузере, чтобы включить push.",
+    webPushError:
+      "Не удалось подтвердить состояние Web Push. Обновите настройки перед повторной попыткой.",
+    webPushLoading: "Проверка push-уведомлений...",
     recoveryEmail: "Email для восстановления",
     recoveryNotVerified: "Email для восстановления ещё не подтверждён.",
     recoveryUnavailable:

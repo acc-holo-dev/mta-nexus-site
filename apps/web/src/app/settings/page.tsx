@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Bell, KeyRound, MailCheck, Monitor, ShieldCheck } from "lucide-react";
 import { Button } from "@nexus/ui";
 import { ContextSwitcher } from "../../components/context-switcher";
+import { WebPushSettings } from "../../components/web-push-settings";
 import { useNexusLocale } from "../../components/locale-context";
 
 type Preferences = {
@@ -533,6 +534,7 @@ export default function SettingsPage() {
               </label>
             ))}
         </div>
+        <WebPushSettings />
       </section>
 
       <section

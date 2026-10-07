@@ -538,7 +538,33 @@ export const notificationPreferences = pgTable(
   (table) => [uniqueIndex("notification_preferences_user_idx").on(table.userId)]
 );
 
-// 23. Audit Events
+// 23. Web Push Subscriptions
+export const webPushSubscriptions = pgTable(
+  "web_push_subscriptions",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    expirationAt: timestamp("expiration_at", { withTimezone: true }),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("web_push_subscriptions_endpoint_idx").on(table.endpoint),
+    index("web_push_subscriptions_user_idx").on(table.userId),
+    index("web_push_subscriptions_session_idx").on(table.sessionId),
+  ],
+);
+
+// 24. Audit Events
 export const auditEvents = pgTable("audit_events", {
   id: text("id").primaryKey(),
   actorId: text("actor_id").notNull(),

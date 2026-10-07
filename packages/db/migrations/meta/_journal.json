@@ -204,6 +204,13 @@
       "when": 1791330000000,
       "tag": "0028_support_cases",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1791333600000,
+      "tag": "0029_web_push_subscriptions",
+      "breakpoints": true
     }
   ]
 }

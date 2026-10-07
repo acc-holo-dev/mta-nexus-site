@@ -17,6 +17,7 @@ export * from "./audit";
 export * from "./reports";
 export * from "./support";
 export * from "./notifications";
+export * from "./web-push-subscriptions";
 export * from "./social";
 export * from "./verification";
 export * from "./account-email-enrollment";
