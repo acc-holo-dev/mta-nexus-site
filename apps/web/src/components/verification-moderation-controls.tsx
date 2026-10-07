@@ -4,6 +4,10 @@ import { BadgeCheck, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
+import {
+  buildVerificationDecisionPayload,
+  normalizeVerificationReviewNotes,
+} from "../lib/verification-moderation";
 import { useNexusLocale } from "./locale-context";
 
 export function VerificationModerationControls({
@@ -18,10 +22,16 @@ export function VerificationModerationControls({
   const [pending, setPending] = useState<"approve" | "reject" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const hasNotes = notes.trim().length >= 3;
+  const normalizedNotes = normalizeVerificationReviewNotes(notes);
+  const hasNotes = normalizedNotes !== null;
 
   async function decide(action: "approve" | "reject") {
-    if (!hasNotes || pending) return;
+    const payload = buildVerificationDecisionPayload(
+      requestId,
+      action,
+      notes,
+    );
+    if (!payload || pending) return;
 
     const confirmed = window.confirm(
       action === "approve"
@@ -38,12 +48,7 @@ export function VerificationModerationControls({
         cache: "no-store",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          targetType: "verification",
-          targetId: requestId,
-          action,
-          notes: notes.trim(),
-        }),
+        body: JSON.stringify(payload),
         signal: AbortSignal.timeout(10_000),
       });
       const data = await response.json().catch(() => null);
