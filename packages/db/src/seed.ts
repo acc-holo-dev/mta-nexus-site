@@ -15,11 +15,20 @@ export async function runSeed(options: SeedOptions = {}) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const args = process.argv.slice(2);
-  if (args.some((arg) => arg !== "--repair-demo-builds")) {
-    console.error("Usage: seed [--repair-demo-builds]");
+  const allowed = new Set([
+    "--repair-demo-builds",
+    "--repair-demo-media",
+  ]);
+  if (args.some((arg) => !allowed.has(arg))) {
+    console.error(
+      "Usage: seed [--repair-demo-builds] [--repair-demo-media]",
+    );
     process.exit(1);
   }
-  runSeed({ repairDemoBuilds: args.includes("--repair-demo-builds") })
+  runSeed({
+    repairDemoBuilds: args.includes("--repair-demo-builds"),
+    repairDemoMedia: args.includes("--repair-demo-media"),
+  })
     .then(() => process.exit(0))
     .catch((error) => {
       console.error("Seed error:", error);

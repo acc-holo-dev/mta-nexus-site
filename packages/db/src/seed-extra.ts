@@ -34,7 +34,6 @@ async function runSeedExtra() {
     await userRepository.create({
       ...u,
       passwordHash,
-      avatarUrl: `https://api.dicebear.com/7.x/bottts/svg?seed=${u.username}`,
       isVerified: true,
       emailVerified: true,
     });
@@ -56,8 +55,6 @@ async function runSeedExtra() {
       status: "active",
       visibility: "public",
       isVerified: true,
-      bannerUrl: `https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80&lock=${s.id.length}`,
-      logoUrl: `https://api.dicebear.com/7.x/identicon/svg?seed=${s.slug}`,
     });
   }
 
@@ -107,10 +104,7 @@ async function runSeedExtra() {
       ratingCount: p.ratingCount,
       salesCount: p.salesCount,
       isFeatured: p.featured,
-      thumbnailUrl: `https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80&lock=${p.id.length}`,
-      screenshots: [
-        `https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80&lock=${p.id.length}`,
-      ],
+      screenshots: [],
       compatibility: { mtaMinVersion: "1.6.0", dependencies: [] },
     });
     await buildRepository.create({
@@ -165,7 +159,6 @@ async function runSeedExtra() {
     slug: "clamav-scan-gates-safe-builds",
     excerpt: "Every downloadable build passes a trusted clean scan with scanner identity and timestamp before it becomes public.",
     body: "Safety is not a checkbox at MTA NEXUS. Each uploaded build is scanned, signed with scanner identity and only published when the result is trusted clean. Here is how the pipeline works and why fail-closed matters.",
-    coverImageUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80",
     type: "article",
     authorId: "usr_admin_001",
     status: "published",
@@ -180,7 +173,6 @@ async function runSeedExtra() {
     slug: "season-12-racing-cup-registration",
     excerpt: "Ranked circuit racing returns with weekly cups, ghost replays and a new anti-cheat verified leaderboard.",
     body: "Race Arena opens Season 12 registration. Verify your account, pick your class and qualify on the new San Fierro circuit. Weekly cups, prize pool and full replay telemetry for every race.",
-    coverImageUrl: "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80",
     type: "article",
     authorId: "usr_owner_003",
     serverId: "srv_race_arena",

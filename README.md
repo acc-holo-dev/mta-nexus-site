@@ -94,7 +94,9 @@ docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed
 Seed creates real ZIP fixtures for both inventory and drift resources, recording
 actual byte lengths and SHA-256 hashes. Each archive contains README.txt and
 meta.xml only; neither implements the advertised game system. New demo resource
-descriptions explicitly say so. Production seed is rejected.
+descriptions explicitly say so. Fresh baseline data contains no remote avatar,
+banner, thumbnail or article-cover URLs; the UI exercises its built-in fallbacks
+instead of depending on Unsplash/DiceBear. Production seed is rejected.
 
 The database baseline is transactional and serialized between seed processes.
 Reruns insert missing records and preserve existing passwords, roles, content
@@ -110,9 +112,18 @@ docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed:repair
 ```
 
 This updates only size/hash metadata after fixture identity checks. It never
-replaces a different existing file or resets moderation status. For host
-execution, use `STORAGE_PROVIDER=local` and an **absolute** `STORAGE_LOCAL_PATH`
-shared by the app and seed. Prepared ZIPs may remain after a database rollback;
+replaces a different existing file or resets moderation status. Older development
+volumes that still contain the exact legacy CDN media values can be cleaned
+separately:
+
+```bash
+docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed:repair-media
+```
+
+Media repair clears only exact URLs previously written by the NEXUS demo seed;
+custom replacements are preserved. For host execution, use
+`STORAGE_PROVIDER=local` and an **absolute** `STORAGE_LOCAL_PATH` shared by
+the app and seed. Prepared ZIPs may remain after a database rollback;
 reruns reuse identical files. Verify claim/download in your development stack.
 
 ## Development rules / Правила разработки

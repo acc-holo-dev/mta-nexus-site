@@ -1,7 +1,12 @@
 import { eq, sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 import type { db as Database } from "../packages/db/src/client";
-import { users, builds, auditEvents } from "../packages/db/src/schema";
+import {
+  users,
+  products,
+  builds,
+  auditEvents,
+} from "../packages/db/src/schema";
 import { createSeedData } from "../packages/db/src/seed-data";
 
 type Transaction = Parameters<Parameters<typeof Database.transaction>[0]>[0];
@@ -50,12 +55,63 @@ it("repeats and repairs the seed within isolated PostgreSQL tables", async () =>
           sha256Hash: "b".repeat(64),
         },
       });
-      expect(await seedBaseline(data)).toEqual({ inserted: 13, repairedBuilds: 0 });
+      expect(await seedBaseline(data)).toEqual({ inserted: 13, repairedBuilds: 0, repairedMedia: 0 });
       await tx
         .update(users)
         .set({ passwordHash: "changed", role: "user" })
         .where(eq(users.id, "usr_admin_001"));
-      expect(await seedBaseline(data)).toEqual({ inserted: 0, repairedBuilds: 0 });
+      expect(await seedBaseline(data)).toEqual({ inserted: 0, repairedBuilds: 0, repairedMedia: 0 });
+
+      await tx
+        .update(users)
+        .set({
+          avatarUrl:
+            "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_admin",
+        })
+        .where(eq(users.id, "usr_admin_001"));
+      await tx
+        .update(users)
+        .set({ avatarUrl: "https://media.example/custom.svg" })
+        .where(eq(users.id, "usr_dev_001"));
+      await tx
+        .update(products)
+        .set({
+          thumbnailUrl:
+            "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80",
+          screenshots: [
+            "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80",
+          ],
+        })
+        .where(eq(products.id, "prd_inv_pro"));
+
+      expect(
+        await seedBaseline(data, { repairDemoMedia: true }),
+      ).toEqual({
+        inserted: 0,
+        repairedBuilds: 0,
+        repairedMedia: 2,
+      });
+      const [repairedAdmin] = await tx
+        .select()
+        .from(users)
+        .where(eq(users.id, "usr_admin_001"));
+      const [customDev] = await tx
+        .select()
+        .from(users)
+        .where(eq(users.id, "usr_dev_001"));
+      const [repairedProduct] = await tx
+        .select()
+        .from(products)
+        .where(eq(products.id, "prd_inv_pro"));
+      expect(repairedAdmin.avatarUrl).toBeNull();
+      expect(customDev.avatarUrl).toBe(
+        "https://media.example/custom.svg",
+      );
+      expect(repairedProduct).toMatchObject({
+        thumbnailUrl: null,
+        screenshots: [],
+      });
+
       await tx
         .update(builds)
         .set({ fileSizeBytes: 999, status: "retired" })
@@ -64,12 +120,13 @@ it("repeats and repairs the seed within isolated PostgreSQL tables", async () =>
       expect(await seedBaseline(data, { repairDemoBuilds: true })).toEqual({
         inserted: 0,
         repairedBuilds: 1,
+        repairedMedia: 0,
       });
       const [build] = await tx.select().from(builds).where(eq(builds.id, "bld_inv_320"));
       expect(build).toMatchObject({ fileSizeBytes: 512, status: "retired" });
       const [user] = await tx.select().from(users).where(eq(users.id, "usr_admin_001"));
       expect(user).toMatchObject({ passwordHash: "changed", role: "user" });
-      expect(await tx.select().from(auditEvents)).toHaveLength(2);
+      expect(await tx.select().from(auditEvents)).toHaveLength(3);
     } finally {
       scope.tx = null;
     }

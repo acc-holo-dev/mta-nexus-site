@@ -609,12 +609,15 @@ docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed
 docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed
 # Only after inspecting a reported legacy demo metadata mismatch:
 docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed:repair
+# Optional cleanup for exact old Unsplash/DiceBear values written by the seed:
+docker compose -p nexus-local -f compose.yaml exec app pnpm db:seed:repair-media
 ```
 
 The second normal run should report zero insertions and zero repairs. Changed
 passwords, roles, product descriptions and build moderation states stay intact.
-Repair touches only known demo size/hash fields and can insert missing baseline
-records. A conflicting on-disk file is never overwritten; inspect it separately.
+Build repair touches only known demo size/hash fields. Media repair clears only
+exact legacy demo CDN values; a custom avatar/banner/thumbnail/cover survives.
+A conflicting on-disk file is never overwritten; inspect it separately.
 Do not use these commands for production data provisioning.
 
 Run the fast regression group with `pnpm test:resource-integrity`. Against an

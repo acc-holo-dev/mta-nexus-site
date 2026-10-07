@@ -12,7 +12,6 @@ export function createSeedData(
     displayName: "Nexus Master Admin",
     passwordHash: defaultPasswordHash,
     role: "admin",
-    avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_admin",
     bio: "Official System Administrator & Core Architect of MTA Nexus.",
     isVerified: true,
     emailVerified: true,
@@ -25,7 +24,6 @@ export function createSeedData(
     displayName: "Horizon Studio Lead",
     passwordHash: defaultPasswordHash,
     role: "developer",
-    avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=horizon_dev",
     bio: "Fullstack Lua & C++ MTA developer. Creating high-performance networked resources since 2014.",
     isVerified: true,
     emailVerified: true,
@@ -38,7 +36,6 @@ export function createSeedData(
     displayName: "SA Drift King",
     passwordHash: defaultPasswordHash,
     role: "server_owner",
-    avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=drift_king",
     bio: "Founder of SA Drift Paradise & MTA competitive organizer.",
     isVerified: true,
     emailVerified: true,
@@ -51,7 +48,6 @@ export function createSeedData(
     displayName: "Speedy Carl",
     passwordHash: defaultPasswordHash,
     role: "user",
-    avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=speedy_cj",
     bio: "Passionate MTA racer and asset collector.",
     isVerified: false,
     emailVerified: true,
@@ -63,8 +59,6 @@ export function createSeedData(
     slug: "horizon-interactive",
     description:
       "Premium engineering group specialized in custom MTA:SA systems and synchronization modules.",
-    logoUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=horizon-interactive",
-    websiteUrl: "https://horizon-mta.com",
     ownerId: dev.id,
   } satisfies typeof organizations.$inferInsert;
 
@@ -85,9 +79,6 @@ export function createSeedData(
     status: "active",
     visibility: "public",
     isVerified: true,
-    bannerUrl:
-      "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80",
-    logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=sa-drift-paradise",
   } satisfies typeof servers.$inferInsert;
 
   const rpServer = {
@@ -108,9 +99,6 @@ export function createSeedData(
     status: "active",
     visibility: "public",
     isVerified: true,
-    bannerUrl:
-      "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=80",
-    logoUrl: "https://api.dicebear.com/7.x/identicon/svg?seed=horizon-roleplay",
   } satisfies typeof servers.$inferInsert;
 
   const prodInv = {
@@ -134,11 +122,7 @@ export function createSeedData(
     ratingCount: 52,
     salesCount: 148,
     isFeatured: true,
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80",
-    screenshots: [
-      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80",
-    ],
+    screenshots: [],
     compatibility: {
       mtaMinVersion: "1.6.0",
       dependencies: [],
@@ -166,11 +150,7 @@ export function createSeedData(
     ratingCount: 38,
     salesCount: 215,
     isFeatured: true,
-    thumbnailUrl:
-      "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80",
-    screenshots: [
-      "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80",
-    ],
+    screenshots: [],
     compatibility: {
       mtaMinVersion: "1.5.9",
       dependencies: [],
@@ -212,8 +192,6 @@ export function createSeedData(
     excerpt:
       "How we reduced tick latency and packet loss by 68% on 1000 player servers through binary serialization and selective synchronization.",
     body: "Running a 1,000 player concurrent server in MTA:SA is no longer science fiction. In this deep dive we explore spatial grid broadcast and binary payload packing.",
-    coverImageUrl:
-      "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80",
     type: "article",
     authorId: dev.id,
     serverId: "srv_horizon_rp",

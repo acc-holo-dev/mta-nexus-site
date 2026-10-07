@@ -46,7 +46,8 @@
     "test:resource-integrity:integration": "vitest run tests/product-types.integration.test.ts tests/seed-baseline.integration.test.ts",
     "test:unit": "vitest run --project unit",
     "test:database": "vitest run --project database",
-    "test:tooling": "node scripts/run-tooling-tests.mjs"
+    "test:tooling": "node scripts/run-tooling-tests.mjs",
+    "db:seed:repair-media": "pnpm --filter @nexus/db seed --repair-demo-media"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",

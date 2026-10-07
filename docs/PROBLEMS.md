@@ -100,10 +100,13 @@ repository policy или runner-side allocation failure) **не подтверж
 
 ### P2-1. Внешние ресурсы недоступны из сети владельца
 
-`master.multitheftauto.com` (master-list) и `images.unsplash.com` (превью seed-
-данных) не отвечают даже с хоста — похоже на региональную блокировку сети.
-Приложение деградирует честно («directory temporarily unavailable», «Нет
-превью»), но каталог выглядит пустым, а live-серверы не отображаются.
+`master.multitheftauto.com` (master-list) не отвечает даже с хоста —
+похоже на региональную блокировку сети. Историческая зависимость fresh demo
+seed от `images.unsplash.com`/DiceBear устранена: новый baseline не записывает
+remote media URL и использует UI-fallbacks. Старые dev-тома могут адресно
+очистить только точные legacy seed URL через `pnpm db:seed:repair-media`;
+пользовательские replacements сохраняются. Live-серверы при недоступности
+official master без настроенного mirror по-прежнему не отображаются.
 
 - **Изменение:** master-list runtime теперь поддерживает до трёх явно заданных
   оператором HTTPS fallback endpoints через `MTA_MASTER_MIRROR_URLS`.
@@ -117,8 +120,9 @@ repository policy или runner-side allocation failure) **не подтверж
   production-сети, настроить его через environment и подтвердить live refresh
   + stale fallback при недоступном official endpoint. Это изменение даёт
   безопасный механизм переключения, но само по себе не доказывает доступность
-  какого-либо mirror. Для превью по-прежнему предпочтителен self-hosted upload
-  в приватное storage вместо зависимости от Unsplash.
+  какого-либо mirror. Для реальных пользовательских превью по-прежнему
+  предпочтителен upload в контролируемое storage; fresh demo-data от внешнего
+  image CDN больше не зависит.
 - **Изменение:** превью ресурсов теперь скрывает недопустимые HTTP/HTTPS-адреса
   и показывает RU/EN-заглушку при ошибке декодирования или загрузки, включая
   кешированную ошибку до гидрации. Open Graph применяет ту же проверку URL.

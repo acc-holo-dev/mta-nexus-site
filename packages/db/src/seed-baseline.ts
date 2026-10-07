@@ -15,6 +15,75 @@ import type { SeedData } from "./seed-data";
 
 export interface SeedOptions {
   repairDemoBuilds?: boolean;
+  repairDemoMedia?: boolean;
+}
+
+const LEGACY_USER_AVATARS: Record<string, string> = {
+  usr_admin_001:
+    "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_admin",
+  usr_dev_001:
+    "https://api.dicebear.com/7.x/bottts/svg?seed=horizon_dev",
+  usr_server_001:
+    "https://api.dicebear.com/7.x/bottts/svg?seed=drift_king",
+  usr_player_001:
+    "https://api.dicebear.com/7.x/bottts/svg?seed=speedy_cj",
+};
+
+const LEGACY_ORGANIZATION_LOGOS: Record<string, string> = {
+  org_horizon:
+    "https://api.dicebear.com/7.x/shapes/svg?seed=horizon-interactive",
+};
+
+const LEGACY_SERVER_MEDIA: Record<
+  string,
+  { bannerUrl: string; logoUrl: string }
+> = {
+  srv_drift_01: {
+    bannerUrl:
+      "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80",
+    logoUrl:
+      "https://api.dicebear.com/7.x/identicon/svg?seed=sa-drift-paradise",
+  },
+  srv_horizon_rp: {
+    bannerUrl:
+      "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=80",
+    logoUrl:
+      "https://api.dicebear.com/7.x/identicon/svg?seed=horizon-roleplay",
+  },
+};
+
+const LEGACY_PRODUCT_MEDIA: Record<
+  string,
+  { thumbnailUrl: string; screenshot: string }
+> = {
+  prd_inv_pro: {
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80",
+    screenshot:
+      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1200&q=80",
+  },
+  prd_drift_physics: {
+    thumbnailUrl:
+      "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80",
+    screenshot:
+      "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80",
+  },
+};
+
+const LEGACY_CONTENT_COVERS: Record<string, string> = {
+  cnt_art_001:
+    "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80",
+};
+
+function isLegacySingleScreenshot(
+  value: unknown,
+  expected: string,
+): boolean {
+  return (
+    Array.isArray(value) &&
+    value.length === 1 &&
+    value[0] === expected
+  );
 }
 
 function assertIdentity(existing: { id: string }[], expected: { id: string }[], keys: string[]) {
@@ -40,6 +109,7 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
     );
     let inserted = 0;
     let repairedBuilds = 0;
+    let repairedMedia = 0;
 
     const existingUsers = await tx
       .select()
@@ -52,6 +122,18 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
       )
       .for("update");
     assertIdentity(existingUsers, data.users, ["email", "username"]);
+    if (options.repairDemoMedia) {
+      for (const row of existingUsers) {
+        const legacy = LEGACY_USER_AVATARS[row.id];
+        if (legacy && row.avatarUrl === legacy) {
+          await tx
+            .update(users)
+            .set({ avatarUrl: null })
+            .where(eq(users.id, row.id));
+          repairedMedia++;
+        }
+      }
+    }
     inserted += (
       await tx
         .insert(users)
@@ -71,6 +153,18 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
       )
       .for("update");
     assertIdentity(existingOrganizations, data.organizations, ["slug", "ownerId"]);
+    if (options.repairDemoMedia) {
+      for (const row of existingOrganizations) {
+        const legacy = LEGACY_ORGANIZATION_LOGOS[row.id];
+        if (legacy && row.logoUrl === legacy) {
+          await tx
+            .update(organizations)
+            .set({ logoUrl: null })
+            .where(eq(organizations.id, row.id));
+          repairedMedia++;
+        }
+      }
+    }
     inserted += (
       await tx
         .insert(organizations)
@@ -90,6 +184,29 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
       )
       .for("update");
     assertIdentity(existingServers, data.servers, ["slug", "ownerId", "organizationId"]);
+    if (options.repairDemoMedia) {
+      for (const row of existingServers) {
+        const legacy = LEGACY_SERVER_MEDIA[row.id];
+        if (!legacy) continue;
+        const values: {
+          bannerUrl?: null;
+          logoUrl?: null;
+        } = {};
+        if (row.bannerUrl === legacy.bannerUrl) {
+          values.bannerUrl = null;
+        }
+        if (row.logoUrl === legacy.logoUrl) {
+          values.logoUrl = null;
+        }
+        if (Object.keys(values).length > 0) {
+          await tx
+            .update(servers)
+            .set(values)
+            .where(eq(servers.id, row.id));
+          repairedMedia++;
+        }
+      }
+    }
     inserted += (
       await tx
         .insert(servers)
@@ -109,6 +226,34 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
       )
       .for("update");
     assertIdentity(existingProducts, data.products, ["slug", "authorId", "organizationId"]);
+    if (options.repairDemoMedia) {
+      for (const row of existingProducts) {
+        const legacy = LEGACY_PRODUCT_MEDIA[row.id];
+        if (!legacy) continue;
+        const values: {
+          thumbnailUrl?: null;
+          screenshots?: string[];
+        } = {};
+        if (row.thumbnailUrl === legacy.thumbnailUrl) {
+          values.thumbnailUrl = null;
+        }
+        if (
+          isLegacySingleScreenshot(
+            row.screenshots,
+            legacy.screenshot,
+          )
+        ) {
+          values.screenshots = [];
+        }
+        if (Object.keys(values).length > 0) {
+          await tx
+            .update(products)
+            .set(values)
+            .where(eq(products.id, row.id));
+          repairedMedia++;
+        }
+      }
+    }
     inserted += (
       await tx
         .insert(products)
@@ -192,6 +337,18 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
       )
       .for("update");
     assertIdentity(existingContent, data.content, ["slug", "authorId"]);
+    if (options.repairDemoMedia) {
+      for (const row of existingContent) {
+        const legacy = LEGACY_CONTENT_COVERS[row.id];
+        if (legacy && row.coverImageUrl === legacy) {
+          await tx
+            .update(content)
+            .set({ coverImageUrl: null })
+            .where(eq(content.id, row.id));
+          repairedMedia++;
+        }
+      }
+    }
     inserted += (
       await tx
         .insert(content)
@@ -200,7 +357,7 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
         .returning({ id: content.id })
     ).length;
 
-    if (inserted || repairedBuilds) {
+    if (inserted || repairedBuilds || repairedMedia) {
       await tx.insert(auditEvents).values({
         id: `aud_${randomUUID()}`,
         actorId: "usr_admin_001",
@@ -208,9 +365,9 @@ export async function seedBaseline(data: SeedData, options: SeedOptions = {}) {
         action: "database.seeded",
         targetId: "baseline:v1",
         targetType: "database",
-        details: { inserted, repairedBuilds },
+        details: { inserted, repairedBuilds, repairedMedia },
       });
     }
-    return { inserted, repairedBuilds };
+    return { inserted, repairedBuilds, repairedMedia };
   });
 }
