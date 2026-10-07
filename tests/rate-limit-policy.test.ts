@@ -23,6 +23,8 @@ describe("risk-based rate limit policy", () => {
       "commentCreation",
       "reviewSubmission",
       "search",
+      "supportCase",
+      "supportMessage",
     ]);
 
     for (const policy of Object.values(RATE_LIMIT_POLICIES)) {
@@ -48,5 +50,7 @@ describe("risk-based rate limit policy", () => {
     expect(getRateLimitPolicy("commentCreation")).toEqual({ limit: 20, windowSeconds: 300 });
     expect(getRateLimitPolicy("reviewSubmission")).toEqual({ limit: 5, windowSeconds: 300 });
     expect(getRateLimitPolicy("search")).toEqual({ limit: 60, windowSeconds: 60 });
+    expect(getRateLimitPolicy("supportCase")).toEqual({ limit: 5, windowSeconds: 3600 });
+    expect(getRateLimitPolicy("supportMessage")).toEqual({ limit: 30, windowSeconds: 3600 });
   });
 });
