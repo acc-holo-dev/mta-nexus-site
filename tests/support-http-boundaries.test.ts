@@ -17,8 +17,7 @@ const mocks = vi.hoisted(() => ({
   addMessage: vi.fn(),
   updateStatus: vi.fn(),
   moderatorIds: vi.fn(),
-  notify: vi.fn(),
-  push: vi.fn(),
+  dispatch: vi.fn(),
 }));
 
 const afterMock = vi.hoisted(() =>
@@ -53,11 +52,10 @@ vi.mock("@nexus/db", () => ({
     updateStatus: mocks.updateStatus,
   },
   userRepository: { listModeratorIds: mocks.moderatorIds },
-  notificationRepository: { create: mocks.notify },
 }));
 
-vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
-  deliverStoredNotificationsWebPush: mocks.push,
+vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+  dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 
 import {
@@ -102,8 +100,12 @@ beforeEach(() => {
   });
   mocks.updateStatus.mockResolvedValue({ id: caseId, requesterId: "usr_member", subject: "Account help", status: "resolved" });
   mocks.moderatorIds.mockResolvedValue(["usr_mod"]);
-  mocks.notify.mockImplementation(async (input) => ({ ...input, createdAt: new Date(), isRead: false }));
-  mocks.push.mockResolvedValue({ notifications: 1, attempted: 0, delivered: 0, failed: 0, stale: 0, deliveryErrors: 0 });
+  mocks.dispatch.mockResolvedValue({
+    requested: 1,
+    stored: 1,
+    storageFailed: 0,
+    pushQueued: 1,
+  });
 });
 
 describe("support HTTP authorization and privacy", () => {
@@ -237,15 +239,14 @@ describe("support HTTP authorization and privacy", () => {
     );
     expect(createResponse.status).toBe(201);
     expect(afterMock).toHaveBeenCalledOnce();
-    expect(mocks.notify).not.toHaveBeenCalled();
+    expect(mocks.dispatch).not.toHaveBeenCalled();
     await state.afterCallbacks.shift()?.();
-    expect(mocks.notify).toHaveBeenCalledWith(
+    expect(mocks.dispatch).toHaveBeenCalledWith([
       expect.objectContaining({
         recipientId: "usr_mod",
         link: "/admin/support/" + caseId,
       }),
-    );
-    expect(mocks.push).toHaveBeenCalledOnce();
+    ]);
 
     vi.clearAllMocks();
     state.afterCallbacks.length = 0;
@@ -266,15 +267,14 @@ describe("support HTTP authorization and privacy", () => {
       params,
     );
     expect(reply.status).toBe(201);
-    expect(mocks.notify).not.toHaveBeenCalled();
+    expect(mocks.dispatch).not.toHaveBeenCalled();
     await state.afterCallbacks.shift()?.();
-    expect(mocks.notify).toHaveBeenCalledWith(
+    expect(mocks.dispatch).toHaveBeenCalledWith([
       expect.objectContaining({
         recipientId: "usr_member",
         link: "/support/" + caseId,
       }),
-    );
-    expect(mocks.push).toHaveBeenCalledOnce();
+    ]);
 
     vi.clearAllMocks();
     state.afterCallbacks.length = 0;
@@ -301,14 +301,14 @@ describe("support HTTP authorization and privacy", () => {
       params,
     );
     expect(statusResponse.status).toBe(200);
-    expect(mocks.notify).not.toHaveBeenCalled();
+    expect(mocks.dispatch).not.toHaveBeenCalled();
     await state.afterCallbacks.shift()?.();
-    expect(mocks.notify).toHaveBeenCalledWith(
+    expect(mocks.dispatch).toHaveBeenCalledWith([
       expect.objectContaining({
         recipientId: "usr_member",
         title: "Support case status changed",
       }),
-    );
+    ]);
   });
 
   it("keeps status changes staff-only and closed threads immutable to replies", async () => {
