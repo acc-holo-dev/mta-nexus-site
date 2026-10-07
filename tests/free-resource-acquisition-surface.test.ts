@@ -1,49 +1,43 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const redirect = vi.hoisted(() => vi.fn());
 
-describe("free resource acquisition surface", () => {
-  it("uses a dedicated acquisition route and the free claim endpoint", () => {
-    const page = read("apps/web/src/app/acquire/page.tsx");
-    const legacy = read("apps/web/src/app/checkout/page.tsx");
+vi.mock("next/navigation", () => ({ redirect }));
 
-    expect(page).toContain('fetch("/api/resources/claim"');
-    expect(page).not.toContain('fetch("/api/checkout"');
-    expect(page).toContain("copy.addToLibrary");
-    expect(page).toContain('credentials: "same-origin"');
-    expect(page).toContain('cache: "no-store"');
+import CheckoutCompatibilityRedirect from "../apps/web/src/app/checkout/page";
 
-    expect(legacy).toContain('redirect(');
-    expect(legacy).toContain('/acquire?productId=');
-    expect(legacy).not.toContain("/api/resources/claim");
+describe("free resource acquisition compatibility redirect", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("returns users directly to the resource or library after a successful claim", () => {
-    const page = read("apps/web/src/app/acquire/page.tsx");
+  it("preserves a single product id when redirecting legacy checkout", async () => {
+    await CheckoutCompatibilityRedirect({
+      searchParams: Promise.resolve({ productId: "prd free/1" }),
+    });
 
-    const dollar = "$";
-    expect(page).toContain(`href={\`/market/${dollar}{product?.slug ?? ""}\`}`);
-    expect(page).toContain('href="/workspace"');
-    expect(page).toContain("copy.openLibrary");
-    expect(page).not.toContain("Go to My Licenses");
+    expect(redirect).toHaveBeenCalledWith(
+      "/acquire?productId=prd%20free%2F1",
+    );
   });
 
-  it("keeps claim transaction serialized and increments the library count once", () => {
-    const repository = read(
-      "packages/db/src/repositories/entitlements.ts",
-    );
+  it("uses only the first product id from a repeated query parameter", async () => {
+    await CheckoutCompatibilityRedirect({
+      searchParams: Promise.resolve({
+        productId: ["prd_first", "prd_second"],
+      }),
+    });
 
-    expect(repository).toContain("pg_advisory_xact_lock");
-    expect(repository).toContain("free-resource:");
-    expect(repository).toContain(
-      'eq(entitlements.permission, "product.download")',
+    expect(redirect).toHaveBeenCalledWith(
+      "/acquire?productId=prd_first",
     );
-    const dollar = "$";
-    expect(repository).toContain(
-      `salesCount: sql\`${dollar}{products.salesCount} + 1\``,
-    );
+  });
+
+  it("redirects an empty legacy checkout to the acquisition landing page", async () => {
+    await CheckoutCompatibilityRedirect({
+      searchParams: Promise.resolve({}),
+    });
+
+    expect(redirect).toHaveBeenCalledWith("/acquire");
   });
 });

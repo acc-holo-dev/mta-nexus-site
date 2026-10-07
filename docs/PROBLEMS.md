@@ -231,8 +231,12 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   fanout переведён с чтения исходника на unit behavior (limit, author exclusion,
   concurrency, preference suppression и push failure), а comment notification
   path — на HTTP behavior; source-check оставлен только для внутреннего comment
-  transaction/counter invariant без дешёвого unit seam. Оставшиеся source-surface
-  тесты сокращать по мере изменения функций;
+  transaction/counter invariant без дешёвого unit seam. Free-resource acquisition
+  больше не читает UI/repository source: claim/download/idempotency покрыты HTTP,
+  PostgreSQL и browser journeys, а legacy checkout redirect — прямым behavior test.
+  Build retirement source-policy заменён HTTP contract + PostgreSQL lifecycle
+  integration (last published → draft, fallback published version). Оставшиеся
+  source-surface тесты сокращать по мере изменения функций;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере
