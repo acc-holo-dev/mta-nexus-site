@@ -359,7 +359,17 @@ check('J2-09 malformed and duplicate registration does not authenticate the gues
 check('J2-10 keyboard and narrow login form plus agent-browser snapshot', async () => {
   await guest.page.setViewportSize({ width: 390, height: 844 });
   await guest.page.goto('/auth/login');
-  await guest.page.getByLabel('Email address', { exact: true }).focus();
+  // AccountControls resolves /api/auth/session after hydration and rerenders the
+  // header. Wait for its stable guest control before asserting native tab order,
+  // otherwise that unrelated rerender can steal focus between focus() and Tab.
+  await expect(
+    guest.page
+      .getByRole('banner')
+      .getByRole('link', { name: 'Sign in', exact: true }),
+  ).toBeVisible();
+  const emailField = guest.page.getByLabel('Email address', { exact: true });
+  await emailField.focus();
+  await expect(emailField).toBeFocused();
   await guest.page.keyboard.press('Tab');
   await expect(guest.page.getByLabel('Password', { exact: true })).toBeFocused();
   await guest.page.keyboard.press('Tab');
