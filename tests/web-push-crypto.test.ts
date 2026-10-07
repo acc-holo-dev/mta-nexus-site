@@ -42,6 +42,30 @@ describe("RFC 8291 Web Push encryption", () => {
     expect(encrypted.toString("base64url")).toBe(expected);
   });
 
+  it("accepts the 3993-byte interoperable maximum and rejects 3994 bytes", () => {
+    const receiver = createECDH("prime256v1");
+    receiver.generateKeys();
+    const subscription = {
+      p256dh: receiver
+        .getPublicKey(undefined, "uncompressed")
+        .toString("base64url"),
+      auth: Buffer.alloc(16, 7).toString("base64url"),
+    };
+
+    expect(
+      encryptWebPushMessage(
+        subscription,
+        Buffer.alloc(3993),
+      ),
+    ).toHaveLength(4096);
+    expect(() =>
+      encryptWebPushMessage(
+        subscription,
+        Buffer.alloc(3994),
+      ),
+    ).toThrow("encrypted body exceeds 4096 bytes");
+  });
+
   it("rejects a message that cannot fit the mandatory single record", () => {
     const receiver = createECDH("prime256v1");
     receiver.generateKeys();

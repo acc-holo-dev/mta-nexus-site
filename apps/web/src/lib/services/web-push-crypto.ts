@@ -14,6 +14,9 @@ import {
 } from "@nexus/config";
 
 const DEFAULT_RECORD_SIZE = 4096;
+const MAX_WEB_PUSH_BODY_BYTES = 4096;
+const AES128GCM_HEADER_FIXED_BYTES = 21;
+const AES_GCM_TAG_BYTES = 16;
 const WEB_PUSH_INFO = Buffer.from("WebPush: info", "ascii");
 const CEK_INFO = Buffer.from("Content-Encoding: aes128gcm\0", "ascii");
 const NONCE_INFO = Buffer.from("Content-Encoding: nonce\0", "ascii");
@@ -86,7 +89,7 @@ export function encryptWebPushMessage(
   }
 
   const payload = Buffer.from(plaintext);
-  if (payload.length + 1 + 16 >= recordSize) {
+  if (payload.length + 1 + AES_GCM_TAG_BYTES >= recordSize) {
     throw new RangeError("Web Push payload does not fit one encrypted record");
   }
 
@@ -111,6 +114,18 @@ export function encryptWebPushMessage(
   }
 
   const senderPublic = sender.getPublicKey(undefined, "uncompressed");
+  const encryptedBodySize =
+    AES128GCM_HEADER_FIXED_BYTES +
+    senderPublic.length +
+    payload.length +
+    1 +
+    AES_GCM_TAG_BYTES;
+  if (encryptedBodySize > MAX_WEB_PUSH_BODY_BYTES) {
+    throw new RangeError(
+      "Web Push encrypted body exceeds 4096 bytes",
+    );
+  }
+
   const sharedSecret = sender.computeSecret(receiverPublic);
 
   const authenticationPrk = hmacSha256(authSecret, sharedSecret);
@@ -141,7 +156,7 @@ export function encryptWebPushMessage(
   ]);
   const tag = cipher.getAuthTag();
 
-  const header = Buffer.allocUnsafe(21);
+  const header = Buffer.allocUnsafe(AES128GCM_HEADER_FIXED_BYTES);
   salt.copy(header, 0);
   header.writeUInt32BE(recordSize, 16);
   header[20] = senderPublic.length;
