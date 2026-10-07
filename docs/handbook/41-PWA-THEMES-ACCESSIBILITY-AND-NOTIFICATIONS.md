@@ -21,7 +21,9 @@ Free-resource acquisition acceptance теперь дополнительно п�
 
 Web Push crypto core теперь реализует RFC 8291 single-record `aes128gcm` encryption на стандартном Node crypto и проверяется точным опубликованным RFC test vector; VAPID builder создаёт origin-bound ES256 JWT с 12-hour expiry и `vapid t=..., k=...`, причём подпись проверяется в unit test. Web Push delivery coordinator готовит bounded payload, отправляет только по active repository subscriptions, считает delivered/failed/stale и удаляет terminal 404/410 endpoints. Sender и subscription store передаются адаптерами, поэтому orchestration остаётся чистым unit-контрактом без импорта PostgreSQL client или сетевого push provider.
 
-Ещё не закрыты target requirements этой главы: **anti-SSRF push-endpoint policy, HTTP sender и event/worker wiring**, policy для кеширования ранее просмотренного публичного read-only content, paid commerce accessibility acceptance и полный WCAG 2.2 AA screen-reader audit.
+HTTP sender теперь использует обязательные `TTL`, `Content-Encoding: aes128gcm` и VAPID Authorization headers. Push endpoint проходит anti-SSRF policy: только HTTPS/443 hostname без credentials/fragment/IP literal; DNS проверяется целиком на public-only addresses, затем TLS соединение pinned к проверенному IP с исходным Host/SNI, поэтому повторное DNS-разрешение при connect не используется. Redirects sender не следует.
+
+Ещё не закрыты target requirements этой главы: **notification event/worker wiring и live provider acceptance**, policy для кеширования ранее просмотренного публичного read-only content, paid commerce accessibility acceptance и полный WCAG 2.2 AA screen-reader audit.
 
 ## 1. Public release quality bar
 
