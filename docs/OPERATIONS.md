@@ -470,9 +470,22 @@ Validate production configuration without deploying publicly:
 - Caddy/TLS edge headers remain fail-closed;
 - backup and restore tooling works against production-shaped configuration;
 - recovery/email configuration is explicit before claiming delivery is operational;
-- optional Web Push VAPID configuration is either fully absent or contains a valid public P-256 key, private P-256 scalar and `mailto:`/HTTPS subject together; production Compose must pass the triplet without exposing the private key in logs or client payloads.
+- optional Web Push VAPID configuration is either fully absent or contains a valid public P-256 key, private P-256 scalar and `mailto:`/HTTPS subject together; production Compose passes the triplet to both web and `push-worker` without exposing the private key in logs or client payloads;
+- migration `0030_web_push_outbox.sql` is applied before `push-worker` starts; inbox notifications enqueue one job per active subscription, with a global queue gate/capacity;
+- `push-worker` is a separate production process with lease ownership, max 5 attempts, deterministic backoff, terminal 404/410 subscription cleanup, 24-hour job TTL and graceful shutdown;
+- worker health is checked through `scripts/check-web-push-worker-health.mjs`; a stale/malformed heartbeat or impossible queue counters fail closed, while a fully unconfigured VAPID setup remains healthy-idle and continues expired-job maintenance;
+- queue operations never expose endpoint capability URLs or notification bodies in worker health/log events.
 
 Acceptance: production startup/restart test passes in an isolated production-shaped environment.
+
+Web Push operational checks for a production-shaped host:
+
+1. Confirm `push-worker` is healthy separately from the HTTP app.
+2. Inspect only aggregate heartbeat fields: `configured`, `queuePending`, `queueDue`, `queueLeased`, `queueCapacity`, `queueOldestAgeSeconds`.
+3. If VAPID is intentionally disabled, `configured=false` is valid; no provider delivery occurs, but expired/exhausted queue rows are still maintained.
+4. If VAPID is enabled and `queueDue`/oldest age grows continuously, treat it as provider/DNS/network/configuration degradation rather than restarting the web app blindly.
+5. A 404/410 from a push provider removes the stale subscription and cascades its queued jobs. Transient transport failures and 408/425/429/5xx are retried; other 4xx are discarded without deleting the subscription.
+6. Do not manually replay accepted jobs: successful settlement deletes the endpoint-specific row. One notification with multiple browser subscriptions intentionally creates independent jobs.
 
 #### Stage 11 — Exact-SHA release candidate verification
 
