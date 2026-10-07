@@ -1,7 +1,6 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
-Единственный реестр проблем проекта. Обновлён: 2026-10-07 (после lint cleanup,
-исправления IPC worker fixture и успешного fast CI на `c06da2e`).
+Единственный реестр проблем проекта. Обновлён: 2026-10-07 (после PWA/Web Push и accessibility release-slices; текущий hosted-runner blocker зафиксирован ниже).
 
 Правила реестра:
 
@@ -61,6 +60,33 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 **Следующий шаг:** проверить планы запросов, память/диск и критические сценарии
 на восстановленной копии целевой БД. Синтетический CI-набор и Chromium не
 подтверждают production-нагрузку или совместимость остальных браузеров.
+
+
+### P1-2. GitHub-hosted runner не начинает `plan` job
+
+После исправлений Web Push commit `0221f85` и последующие SHA
+`ce2a0e9`, `d7e9c56`, `ad7ca08`, `e654c6a` получают один и тот же
+внешний симптом: job **Choose verification scope** завершается `failure`
+до первого шага. GitHub API возвращает пустой `steps: []`; job logs отсутствуют.
+У run `37565630603` тот же zero-step failure воспроизведён в трёх attempts,
+включая отдельный rerun конкретного failed job. Новые push-runs
+`37565951604`, `37566015924`, `37566128990`, `37566190556` повторили
+симптом. При этом последний полностью исполнившийся HEAD `7567191` прошёл
+полный CI, а run `37565299572` на `3a1f818` ещё запускал реальные jobs и
+дал обычные диагностируемые ошибки typecheck/upgrade rehearsal.
+
+Репозиторий private. Доступный GitHub connector не раскрывает account billing /
+Actions minutes / repository Actions policy, поэтому причина (quota/billing,
+repository policy или runner-side allocation failure) **не подтверждена**.
+Публичный GitHub Status на момент диагностики показывал Actions operational,
+так что глобальный outage также не подтверждён.
+
+- **Влияние:** commits после `7567191` пока не получили executable exact-SHA
+  CI, даже когда их ошибки проверены статически/математически.
+- **Следующий шаг:** проверить GitHub Settings → Actions и Billing/usage для
+  private repo/account; после восстановления hosted runner запустить полный CI
+  на актуальном HEAD и закрыть этот пункт только после реального выполнения
+  `plan`, unit/typecheck, migrations, Docker и browser acceptance.
 
 
 ## P2 — известные ограничения
