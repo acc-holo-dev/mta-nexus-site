@@ -1,4 +1,5 @@
 import { Buffer } from "node:buffer";
+import { createECDH } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import {
   parseWebPushSubscription,
@@ -9,10 +10,10 @@ function base64Url(bytes: Uint8Array) {
   return Buffer.from(bytes).toString("base64url");
 }
 
-function p256Key(fill = 1) {
-  const bytes = new Uint8Array(65).fill(fill);
-  bytes[0] = 0x04;
-  return base64Url(bytes);
+function p256Key() {
+  const ecdh = createECDH("prime256v1");
+  ecdh.generateKeys();
+  return ecdh.getPublicKey(undefined, "uncompressed").toString("base64url");
 }
 
 function authSecret(fill = 2) {
@@ -120,7 +121,7 @@ describe("Web Push subscription validation", () => {
 
 describe("Web Push VAPID public key validation", () => {
   it("accepts an uncompressed P-256 public key", () => {
-    const key = p256Key(3);
+    const key = p256Key();
     expect(parseWebPushVapidPublicKey(key)).toBe(key);
   });
 

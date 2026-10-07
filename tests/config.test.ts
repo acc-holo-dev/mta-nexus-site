@@ -1,18 +1,18 @@
 import { Buffer } from "node:buffer";
+import { createECDH } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import {
   getEnvConfig,
   readWebPushVapidConfig,
 } from "@nexus/config";
 
-function vapidPublicKey(fill = 1) {
-  const bytes = new Uint8Array(65).fill(fill);
-  bytes[0] = 0x04;
-  return Buffer.from(bytes).toString("base64url");
-}
-
-function vapidPrivateKey(fill = 2) {
-  return Buffer.from(new Uint8Array(32).fill(fill)).toString("base64url");
+function vapidKeyPair() {
+  const ecdh = createECDH("prime256v1");
+  ecdh.generateKeys();
+  return {
+    publicKey: ecdh.getPublicKey(undefined, "uncompressed").toString("base64url"),
+    privateKey: ecdh.getPrivateKey().toString("base64url"),
+  };
 }
 
 describe("production configuration", () => {
@@ -92,9 +92,10 @@ describe("production configuration", () => {
 
 
 describe("Web Push VAPID configuration", () => {
+  const pair = vapidKeyPair();
   const valid = {
-    WEB_PUSH_VAPID_PUBLIC_KEY: vapidPublicKey(),
-    WEB_PUSH_VAPID_PRIVATE_KEY: vapidPrivateKey(),
+    WEB_PUSH_VAPID_PUBLIC_KEY: pair.publicKey,
+    WEB_PUSH_VAPID_PRIVATE_KEY: pair.privateKey,
     WEB_PUSH_VAPID_SUBJECT: "mailto:ops@nexus.example.com",
   };
 
@@ -108,6 +109,16 @@ describe("Web Push VAPID configuration", () => {
 
   it("treats an entirely absent VAPID configuration as disabled", () => {
     expect(readWebPushVapidConfig({})).toBeNull();
+  });
+
+  it("rejects a public key that does not match the private key", () => {
+    const otherPair = vapidKeyPair();
+    expect(() =>
+      readWebPushVapidConfig({
+        ...valid,
+        WEB_PUSH_VAPID_PUBLIC_KEY: otherPair.publicKey,
+      }),
+    ).toThrow("Invalid Web Push VAPID configuration");
   });
 
   it("rejects partial and malformed VAPID configuration", () => {

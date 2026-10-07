@@ -1,9 +1,8 @@
+import { ECDH, createECDH, timingSafeEqual } from "node:crypto";
+import { Buffer } from "node:buffer";
 import { z } from "zod";
 
 const BASE64URL_PATTERN = /^[A-Za-z0-9_-]+$/u;
-const P256_ORDER =
-  0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551n;
-
 function decodeBase64Url(value: string): Uint8Array | null {
   if (!BASE64URL_PATTERN.test(value)) return null;
   const padding = "=".repeat((4 - (value.length % 4)) % 4);
@@ -18,7 +17,19 @@ function decodeBase64Url(value: string): Uint8Array | null {
 
 export function isValidWebPushP256PublicKey(value: string): boolean {
   const decoded = decodeBase64Url(value);
-  return decoded?.length === 65 && decoded[0] === 0x04;
+  if (decoded?.length !== 65 || decoded[0] !== 0x04) return false;
+  try {
+    const normalized = ECDH.convertKey(
+      Buffer.from(decoded),
+      "prime256v1",
+      undefined,
+      undefined,
+      "uncompressed",
+    );
+    return normalized.length === 65 && normalized[0] === 0x04;
+  } catch {
+    return false;
+  }
 }
 
 export function isValidWebPushAuthSecret(value: string): boolean {
@@ -28,9 +39,41 @@ export function isValidWebPushAuthSecret(value: string): boolean {
 export function isValidWebPushP256PrivateKey(value: string): boolean {
   const decoded = decodeBase64Url(value);
   if (decoded?.length !== 32) return false;
-  let scalar = 0n;
-  for (const byte of decoded) scalar = (scalar << 8n) | BigInt(byte);
-  return scalar > 0n && scalar < P256_ORDER;
+  try {
+    const ecdh = createECDH("prime256v1");
+    ecdh.setPrivateKey(Buffer.from(decoded));
+    return ecdh.getPublicKey(undefined, "uncompressed").length === 65;
+  } catch {
+    return false;
+  }
+}
+
+export function isMatchingWebPushVapidKeyPair(
+  publicKey: string,
+  privateKey: string,
+): boolean {
+  const decodedPublic = decodeBase64Url(publicKey);
+  const decodedPrivate = decodeBase64Url(privateKey);
+  if (
+    decodedPublic?.length !== 65 ||
+    decodedPublic[0] !== 0x04 ||
+    decodedPrivate?.length !== 32
+  ) {
+    return false;
+  }
+
+  try {
+    const ecdh = createECDH("prime256v1");
+    ecdh.setPrivateKey(Buffer.from(decodedPrivate));
+    const derived = ecdh.getPublicKey(undefined, "uncompressed");
+    const supplied = Buffer.from(decodedPublic);
+    return (
+      derived.length === supplied.length &&
+      timingSafeEqual(derived, supplied)
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function isValidVapidSubject(value: string): boolean {
@@ -62,6 +105,7 @@ export function readWebPushVapidConfig(
     !subject ||
     !isValidWebPushP256PublicKey(publicKey) ||
     !isValidWebPushP256PrivateKey(privateKey) ||
+    !isMatchingWebPushVapidKeyPair(publicKey, privateKey) ||
     !isValidVapidSubject(subject)
   ) {
     throw new Error("Invalid Web Push VAPID configuration");
@@ -162,6 +206,21 @@ export const envSchema = z
       addIssue(
         "WEB_PUSH_VAPID_PRIVATE_KEY",
         "Web Push private key must be a valid P-256 scalar",
+      );
+    }
+    if (
+      value.WEB_PUSH_VAPID_PUBLIC_KEY &&
+      value.WEB_PUSH_VAPID_PRIVATE_KEY &&
+      isValidWebPushP256PublicKey(value.WEB_PUSH_VAPID_PUBLIC_KEY) &&
+      isValidWebPushP256PrivateKey(value.WEB_PUSH_VAPID_PRIVATE_KEY) &&
+      !isMatchingWebPushVapidKeyPair(
+        value.WEB_PUSH_VAPID_PUBLIC_KEY,
+        value.WEB_PUSH_VAPID_PRIVATE_KEY,
+      )
+    ) {
+      addIssue(
+        "WEB_PUSH_VAPID_PRIVATE_KEY",
+        "Web Push VAPID public and private keys must form the same P-256 key pair",
       );
     }
     if (
