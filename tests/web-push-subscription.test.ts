@@ -40,12 +40,19 @@ describe("Web Push subscription validation", () => {
   });
 
   it("rejects insecure, incomplete and oversized subscriptions", () => {
-    expect(
-      parseWebPushSubscription({
-        ...valid,
-        endpoint: "http://push.example.test/subscriptions/abc",
-      }),
-    ).toBeNull();
+    for (const endpoint of [
+      "http://push.example.test/subscriptions/abc",
+      "https://127.0.0.1/subscriptions/abc",
+      "https://push.example.test:8443/subscriptions/abc",
+      "https://push.example.test/subscriptions/abc#fragment",
+    ]) {
+      expect(
+        parseWebPushSubscription({
+          ...valid,
+          endpoint,
+        }),
+      ).toBeNull();
+    }
     expect(
       parseWebPushSubscription({
         ...valid,

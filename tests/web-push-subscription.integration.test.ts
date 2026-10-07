@@ -159,7 +159,7 @@ it("never rebinds an existing push endpoint to another session", async () => {
   });
 
   await expect(
-    webPushSubscriptionRepository.upsert({
+    webPushSubscriptionRepository.upsertWithResult({
       id: `wps_other_${suffix}`,
       userId: secondUserId,
       sessionId: secondSessionId,
@@ -168,7 +168,7 @@ it("never rebinds an existing push endpoint to another session", async () => {
       auth: "other-auth",
       expirationAt: null,
     }),
-  ).resolves.toBeNull();
+  ).resolves.toEqual({ status: "endpoint_conflict" });
 
   expect(
     await webPushSubscriptionRepository.listByUser(firstUserId),
@@ -183,4 +183,65 @@ it("never rebinds an existing push endpoint to another session", async () => {
   expect(
     await webPushSubscriptionRepository.listByUser(secondUserId),
   ).toEqual([]);
+});
+
+
+it("prunes expired rows and enforces a serialized per-session subscription cap", async () => {
+  const suffix = randomBytes(6).toString("hex");
+  const userId = `usr_push_limit_${suffix}`;
+  const sessionId = `ses_push_limit_${suffix}`;
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+  await userRepository.create({
+    id: userId,
+    email: `push_limit_${suffix}@example.invalid`,
+    username: `push_limit_${suffix}`,
+    displayName: "Push Limit",
+    role: "user",
+  });
+  await sessionRepository.create({
+    id: sessionId,
+    userId,
+    token: `push-limit-token-${suffix}`,
+    expiresAt,
+  });
+
+  const add = (
+    id: string,
+    expirationAt: Date | null,
+  ) =>
+    webPushSubscriptionRepository.upsertWithResult(
+      {
+        id,
+        userId,
+        sessionId,
+        endpoint: `https://push.example.invalid/${id}`,
+        p256dh: `key-${id}`,
+        auth: `auth-${id}`,
+        expirationAt,
+      },
+      2,
+    );
+
+  await expect(add(`wps_limit_active_${suffix}`, null)).resolves.toMatchObject({
+    status: "stored",
+  });
+  await expect(
+    add(
+      `wps_limit_expired_${suffix}`,
+      new Date(Date.now() - 60_000),
+    ),
+  ).resolves.toMatchObject({ status: "stored" });
+
+  await expect(
+    add(`wps_limit_replacement_${suffix}`, null),
+  ).resolves.toMatchObject({ status: "stored" });
+
+  await expect(
+    add(`wps_limit_blocked_${suffix}`, null),
+  ).resolves.toEqual({ status: "session_limit" });
+
+  expect(
+    await webPushSubscriptionRepository.countForSession(userId, sessionId),
+  ).toBe(2);
 });

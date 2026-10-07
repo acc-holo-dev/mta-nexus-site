@@ -2,6 +2,7 @@ import {
   isValidWebPushAuthSecret,
   isValidWebPushP256PublicKey,
 } from "@nexus/config";
+import { parseWebPushEndpoint } from "./services/web-push-endpoint-policy";
 
 export type ParsedWebPushSubscription = {
   endpoint: string;
@@ -48,11 +49,10 @@ export function parseWebPushSubscription(
 
   let endpointUrl: URL;
   try {
-    endpointUrl = new URL(endpoint);
+    endpointUrl = parseWebPushEndpoint(endpoint);
   } catch {
     return null;
   }
-  if (endpointUrl.protocol !== "https:") return null;
 
   const expirationTime = record.expirationTime;
   let expirationAt: Date | null = null;

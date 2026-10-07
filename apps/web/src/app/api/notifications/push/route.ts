@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
   const parsed = parseWebPushSubscription(await request.json().catch(() => null));
   if (!parsed) return NextResponse.json({ error: "Invalid Web Push subscription" }, { status: 400, headers: privateHeaders });
 
-  const stored = await webPushSubscriptionRepository.upsert({
+  const stored = await webPushSubscriptionRepository.upsertWithResult({
     id: generateId("wps"),
     userId: authenticated.user.id,
     sessionId: authenticated.sessionId,
@@ -54,11 +54,16 @@ export async function POST(request: NextRequest) {
     expirationAt: parsed.expirationAt,
     userAgent: request.headers.get("user-agent"),
   });
-  if (!stored) {
+  if (stored.status !== "stored") {
+    const endpointConflict = stored.status === "endpoint_conflict";
     return NextResponse.json(
       {
-        error: "Web Push endpoint is already bound to another session",
-        code: "WEB_PUSH_ENDPOINT_CONFLICT",
+        error: endpointConflict
+          ? "Web Push endpoint is already bound to another session"
+          : "Too many Web Push subscriptions for this session",
+        code: endpointConflict
+          ? "WEB_PUSH_ENDPOINT_CONFLICT"
+          : "WEB_PUSH_SESSION_LIMIT",
       },
       { status: 409, headers: privateHeaders },
     );
