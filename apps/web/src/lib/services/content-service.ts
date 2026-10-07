@@ -6,7 +6,6 @@ import {
 import { can, generateId } from "@nexus/security";
 import { ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
 import type { Content, Comment, User, Product, Server } from "@nexus/domain";
-import { notifyServerFollowersOfPublishedContent } from "./server-follow-notification-service";
 
 export class ContentService {
   async listArticles(limit = 50): Promise<Content[]> {
@@ -158,12 +157,6 @@ export class ContentService {
         "Content changed before moderation completed",
         409,
         "CONTENT_STATE_CHANGED"
-      );
-    }
-
-    if (decision === "publish" && updated.serverId) {
-      await notifyServerFollowersOfPublishedContent(updated).catch(
-        () => undefined,
       );
     }
 

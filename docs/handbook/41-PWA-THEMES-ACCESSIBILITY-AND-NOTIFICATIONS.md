@@ -23,7 +23,9 @@ Web Push crypto core теперь реализует RFC 8291 single-record `aes
 
 HTTP sender теперь использует обязательные `TTL`, `Content-Encoding: aes128gcm` и VAPID Authorization headers. Push endpoint проходит anti-SSRF policy: только HTTPS/443 hostname без credentials/fragment/IP literal; DNS проверяется целиком на public-only addresses, затем TLS соединение pinned к проверенному IP с исходным Host/SNI, поэтому повторное DNS-разрешение при connect не используется. Redirects sender не следует.
 
-Ещё не закрыты target requirements этой главы: **notification event/worker wiring и live provider acceptance**, policy для кеширования ранее просмотренного публичного read-only content, paid commerce accessibility acceptance и полный WCAG 2.2 AA screen-reader audit.
+Moderator-approved server publication теперь schedule-ит follower fanout через Next.js `after()` уже после response; inbox notification создаётся первой, затем configured Web Push отправляется best-effort, и push failure не откатывает публикацию/notification. Это поддерживается текущим Docker/Node deployment path Next.js 16.3.5.
+
+Ещё не закрыты target requirements этой главы: **durable generic push outbox для остальных notification types и live provider acceptance**, policy для кеширования ранее просмотренного публичного read-only content, paid commerce accessibility acceptance и полный WCAG 2.2 AA screen-reader audit.
 
 ## 1. Public release quality bar
 

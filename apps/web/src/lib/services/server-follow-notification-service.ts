@@ -6,6 +6,7 @@ import {
 import type { Content } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { buildServerPublicationNotification } from "../server-follow-notifications";
+import { deliverConfiguredWebPushNotification } from "./configured-web-push-delivery";
 
 const MAX_SERVER_FOLLOWERS_PER_PUBLICATION = 100;
 const SERVER_FOLLOW_NOTIFICATION_CONCURRENCY = 10;
@@ -16,6 +17,10 @@ export type ServerFollowerNotificationResult = Readonly<{
   delivered: number;
   suppressedByPreference: number;
   failed: number;
+  pushAttempted: number;
+  pushDelivered: number;
+  pushFailed: number;
+  pushStale: number;
   followerLimitReached: boolean;
   skipped: boolean;
 }>;
@@ -27,6 +32,10 @@ function skippedResult(): ServerFollowerNotificationResult {
     delivered: 0,
     suppressedByPreference: 0,
     failed: 0,
+    pushAttempted: 0,
+    pushDelivered: 0,
+    pushFailed: 0,
+    pushStale: 0,
     followerLimitReached: false,
     skipped: true,
   });
@@ -71,6 +80,10 @@ export async function notifyServerFollowersOfPublishedContent(
     let delivered = 0;
     let suppressedByPreference = 0;
     let failed = 0;
+    let pushAttempted = 0;
+    let pushDelivered = 0;
+    let pushFailed = 0;
+    let pushStale = 0;
 
     for (
       let offset = 0;
@@ -89,17 +102,52 @@ export async function notifyServerFollowersOfPublishedContent(
               recipientId: follow.followerId,
               ...notification,
             });
-            return created ? "delivered" : "suppressed";
+            if (!created) {
+              return {
+                inbox: "suppressed" as const,
+                push: null,
+              };
+            }
+
+            let push = null;
+            try {
+              push = await deliverConfiguredWebPushNotification(created);
+            } catch {
+              push = {
+                configured: true,
+                summary: {
+                  attempted: 0,
+                  delivered: 0,
+                  failed: 1,
+                  stale: 0,
+                  removedStale: 0,
+                },
+              };
+            }
+            return {
+              inbox: "delivered" as const,
+              push,
+            };
           } catch {
-            return "failed";
+            return {
+              inbox: "failed" as const,
+              push: null,
+            };
           }
         }),
       );
 
       for (const result of results) {
-        if (result === "delivered") delivered += 1;
-        else if (result === "suppressed") suppressedByPreference += 1;
+        if (result.inbox === "delivered") delivered += 1;
+        else if (result.inbox === "suppressed") suppressedByPreference += 1;
         else failed += 1;
+
+        if (result.push?.configured) {
+          pushAttempted += result.push.summary.attempted;
+          pushDelivered += result.push.summary.delivered;
+          pushFailed += result.push.summary.failed;
+          pushStale += result.push.summary.stale;
+        }
       }
     }
 
@@ -109,6 +157,10 @@ export async function notifyServerFollowersOfPublishedContent(
       delivered,
       suppressedByPreference,
       failed,
+      pushAttempted,
+      pushDelivered,
+      pushFailed,
+      pushStale,
       followerLimitReached,
       skipped: false,
     });
@@ -119,6 +171,10 @@ export async function notifyServerFollowersOfPublishedContent(
       delivered: 0,
       suppressedByPreference: 0,
       failed: 1,
+      pushAttempted: 0,
+      pushDelivered: 0,
+      pushFailed: 0,
+      pushStale: 0,
       followerLimitReached: false,
       skipped: false,
     });

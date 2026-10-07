@@ -10,17 +10,24 @@ describe("server follower publication notifications", () => {
     const service = read(
       "apps/web/src/lib/services/content-service.ts",
     );
+    const adminRoute = read(
+      "apps/web/src/app/api/admin/actions/route.ts",
+    );
     const createRoute = read(
       "apps/web/src/app/api/content/route.ts",
     );
 
-    expect(service).toContain(
-      'if (decision === "publish" && updated.serverId)',
-    );
-    expect(service).toMatch(
-      /notifyServerFollowersOfPublishedContent\(updated\)\.catch\(\s*\n\s*\(\) => undefined,\s*\n\s*\)/,
-    );
     expect(service).toContain("CONTENT_ALREADY_IN_STATE");
+    expect(service).not.toContain(
+      "notifyServerFollowersOfPublishedContent",
+    );
+    expect(adminRoute).toContain(
+      'if (action === "publish" && moderated.serverId)',
+    );
+    expect(adminRoute).toContain("after(async () =>");
+    expect(adminRoute).toContain(
+      "notifyServerFollowersOfPublishedContent(moderated)",
+    );
     expect(createRoute).not.toContain(
       "notifyServerFollowersOfPublishedContent",
     );
@@ -72,9 +79,14 @@ describe("server follower publication notifications", () => {
 
     expect(fanout).toContain("suppressedByPreference");
     expect(fanout).toContain("failed += 1");
+    expect(fanout).toContain("deliverConfiguredWebPushNotification(created)");
+    expect(fanout).toContain("pushFailed");
     expect(fanout).toContain("catch {");
-    expect(service.indexOf("contentRepository.updateStatus")).toBeLessThan(
-      service.indexOf("notifyServerFollowersOfPublishedContent"),
+    expect(service).not.toContain(
+      "notifyServerFollowersOfPublishedContent",
+    );
+    expect(read("apps/web/src/app/api/admin/actions/route.ts")).toContain(
+      "after(async () =>",
     );
   });
 
