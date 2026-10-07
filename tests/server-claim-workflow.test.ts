@@ -26,6 +26,19 @@ describe("server ownership claim workflow", () => {
     expect(proofService).toContain(
       "observed.name.includes(input.token)",
     );
+    expect(proofService).toContain(
+      "userRepository.listModeratorIds()",
+    );
+    expect(proofService).toContain(
+      "deliverStoredNotificationsWebPush(storedNotifications)",
+    );
+    const verifyRoute = read(
+      "apps/web/src/app/api/servers/[id]/claim-challenge/verify/route.ts",
+    );
+    expect(verifyRoute).toContain("after(async () =>");
+    expect(verifyRoute).toContain(
+      "notifyModeratorsOfServerClaim",
+    );
   });
 
   it("assigns ownership only inside an approved moderation transaction", () => {

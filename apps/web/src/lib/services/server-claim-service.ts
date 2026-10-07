@@ -18,6 +18,7 @@ import {
   mtaMasterDirectoryService,
 } from "./mta-master-directory-service";
 import { serverService } from "./server-service";
+import { deliverStoredNotificationsWebPush } from "./notification-web-push-service";
 
 async function assertRequesterCanChallenge(
   server: Server,
@@ -41,17 +42,16 @@ async function assertRequesterCanChallenge(
   }
 }
 
-async function notifyModerators(serverName: string) {
+export async function notifyModeratorsOfServerClaim(
+  serverName: string,
+): Promise<void> {
   try {
-    const moderators = (await userRepository.listAll()).filter(
-      (candidate) =>
-        candidate.role === "moderator" || candidate.role === "admin",
-    );
-    await Promise.allSettled(
-      moderators.map((moderator) =>
+    const moderatorIds = await userRepository.listModeratorIds();
+    const deliveries = await Promise.allSettled(
+      moderatorIds.map((moderatorId) =>
         notificationRepository.create({
           id: generateId("not"),
-          recipientId: moderator.id,
+          recipientId: moderatorId,
           title: "Server ownership proof requires review",
           message: `MTA control proof verified for ${serverName}`,
           link: "/admin",
@@ -60,9 +60,15 @@ async function notifyModerators(serverName: string) {
         }),
       ),
     );
+    const storedNotifications = deliveries.flatMap((delivery) =>
+      delivery.status === "fulfilled" && delivery.value
+        ? [delivery.value]
+        : [],
+    );
+    await deliverStoredNotificationsWebPush(storedNotifications);
   } catch {
     // The durable verification request is the source of truth. Moderator
-    // notification is secondary and must not turn a verified proof into 500.
+    // inbox/push delivery is secondary and must not affect proof success.
   }
 }
 
@@ -161,10 +167,11 @@ export const serverClaimService = {
         auditId: generateId("aud"),
       });
 
-    await notifyModerators(server.name);
-
     return Object.freeze({
       success: true as const,
+      moderatorNotification: Object.freeze({
+        serverName: server.name,
+      }),
       verificationRequest: completed.verificationRequest,
       proof: Object.freeze({
         method: "mta_master_name_challenge" as const,

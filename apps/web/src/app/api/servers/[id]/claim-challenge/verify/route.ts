@@ -1,9 +1,12 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { after, type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { authService } from "../../../../../../lib/services/auth-service";
-import { serverClaimService } from "../../../../../../lib/services/server-claim-service";
+import {
+  notifyModeratorsOfServerClaim,
+  serverClaimService,
+} from "../../../../../../lib/services/server-claim-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -63,7 +66,10 @@ export async function POST(
       );
     }
 
-    const result = await serverClaimService.verifyChallenge(
+    const {
+      moderatorNotification,
+      ...result
+    } = await serverClaimService.verifyChallenge(
       {
         serverId,
         challengeId: parsed.data.challengeId,
@@ -71,6 +77,12 @@ export async function POST(
       },
       user,
     );
+
+    after(async () => {
+      await notifyModeratorsOfServerClaim(
+        moderatorNotification.serverName,
+      );
+    });
 
     return NextResponse.json(result, {
       status: 201,
