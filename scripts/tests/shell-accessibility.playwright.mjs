@@ -23,6 +23,53 @@ test.afterAll(async () => {
   await writeFile(join(output, "shell-summary.md"), ["# Keyboard, mobile and locale acceptance", "", ...evidence.map((value) => `- PASS: ${value}`), ""].join("\n"));
 });
 
+async function assertValidAccessibilityReferences(page, label) {
+  const result = await page.evaluate(() => {
+    const counts = new Map();
+    for (const element of document.querySelectorAll("[id]")) {
+      const id = element.id;
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    const duplicateIds = [...counts.entries()]
+      .filter(([, count]) => count > 1)
+      .map(([id]) => id);
+
+    const missingReferences = [];
+    const attributes = [
+      "aria-labelledby",
+      "aria-describedby",
+      "aria-errormessage",
+      "aria-controls",
+    ];
+    for (const element of document.querySelectorAll(
+      attributes.map((attribute) => `[${attribute}]`).join(","),
+    )) {
+      for (const attribute of attributes) {
+        const value = element.getAttribute(attribute);
+        if (!value) continue;
+        for (const id of value.split(/\s+/u).filter(Boolean)) {
+          if (!counts.has(id)) {
+            missingReferences.push({
+              attribute,
+              id,
+              element: element.tagName.toLowerCase(),
+            });
+          }
+        }
+      }
+    }
+
+    return { duplicateIds, missingReferences };
+  });
+
+  assert.deepEqual(result.duplicateIds, [], `${label}: duplicate DOM ids`);
+  assert.deepEqual(
+    result.missingReferences,
+    [],
+    `${label}: dangling ARIA ID references`,
+  );
+}
+
 async function containedTabbing(page, dialog) {
   for (const key of ["Tab", "Tab", "Tab", "Shift+Tab", "Shift+Tab", "Shift+Tab"]) {
     await page.keyboard.press(key);
@@ -159,6 +206,10 @@ for (const locale of ["en", "ru"]) {
         // Every visible form field needs an accessible label.
         const unlabeled = await page.locator('main input:not([type="hidden"]), main select, main textarea').evaluateAll((elements) => elements.filter((element) => element.getClientRects().length && !element.getAttribute("aria-label") && !element.getAttribute("aria-labelledby") && !element.labels?.length).map((element) => element.name || element.id));
         assert.deepEqual(unlabeled, [], `${route} unlabeled fields`);
+        await assertValidAccessibilityReferences(
+          page,
+          `${locale} ${width} ${route}`,
+        );
         if (width < 1024) {
           const navigation = page.getByRole("navigation", { name: dictionary.nav.ecosystem, exact: true });
           await expect(navigation.getByRole("link", { name: dictionary.nav.mobileMarket, exact: true })).toBeVisible();
@@ -512,6 +563,10 @@ for (const locale of ["en", "ru"]) {
         ).toBeVisible();
         await spec.ready();
         await assertNoVisibleUnlabeledFields(page, spec.route);
+        await assertValidAccessibilityReferences(
+          page,
+          `${locale} ${width} ${spec.route}`,
+        );
         await assertNoHorizontalOverflow(
           page,
           `${locale} ${spec.route} at ${width}px`,
@@ -574,7 +629,7 @@ for (const locale of ["en", "ru"]) {
     assert.deepEqual(errors, []);
     await logoutFixture(page);
     evidence.push(
-      `${locale}: authenticated Settings, Security Center, Support, Publish and unowned Server Claim pass labeled-field, focus, reduced-motion and 320/390/1280 reflow acceptance`,
+      `${locale}: authenticated Settings, Security Center, Support, Publish and unowned Server Claim pass labeled-field, ARIA-IDREF, focus, reduced-motion and 320/390/1280 reflow acceptance`,
     );
   });
 }
