@@ -12,6 +12,12 @@ import { generateId } from "@nexus/security";
 const password = "Synthetic-D3-current-password!";
 const envBackup = { ...process.env };
 
+function accountMailKey(): string {
+  const value = process.env.ACCOUNT_MAIL_KEY;
+  if (!value) throw new Error("ACCOUNT_MAIL_KEY is required by this fixture");
+  return value;
+}
+
 async function account() {
   const username = `d3_${generateId("usr").slice(-18)}`;
   const email = `${username}@example.invalid`;
@@ -57,7 +63,7 @@ describe("D3a verified recovery email enrollment", () => {
 
   it("atomically creates a provenance-backed binding on one valid confirmation and rejects replay", async () => {
     const a = await account();
-    const cipher = new AccountMailCipher("d3", { d3: Buffer.from(process.env.ACCOUNT_MAIL_KEY!, "base64url") });
+    const cipher = new AccountMailCipher("d3", { d3: Buffer.from(accountMailKey(), "base64url") });
     const queued = await authService.requestRecoveryEmailVerification({
       userId: a.userId, currentToken: a.token, currentPassword: password,
     });
