@@ -1,6 +1,7 @@
 import { after, type NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
-import {  organizationRepository,
+import {
+  organizationRepository,
   userRepository,
   verificationRepository,
 } from "@nexus/db";

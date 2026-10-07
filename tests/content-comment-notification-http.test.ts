@@ -87,8 +87,8 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn((prefix: string) => `${prefix}_test`),
 }));
 
-vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
-  deliverStoredNotificationsWebPush: pushNotifications,
+vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+  dispatchNotificationsBestEffort: pushNotifications,
 }));
 
 import { NextRequest } from "next/server";
@@ -138,8 +138,8 @@ describe("article comment notification side effects", () => {
     );
     expect(pushNotifications).toHaveBeenCalledWith([
       expect.objectContaining({
-        id: "not_comment",
         recipientId: "usr_author",
+        category: "content",
       }),
     ]);
   });

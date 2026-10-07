@@ -1,7 +1,8 @@
 import { after, type NextRequest } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
-  contentRepository,  productRepository,
+  contentRepository,
+  productRepository,
   reportRepository,
   serverRepository,
   userRepository,

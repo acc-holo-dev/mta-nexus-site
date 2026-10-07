@@ -49,8 +49,8 @@ vi.mock("next/server", async () => {
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
 }));
-vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
-  deliverStoredNotificationsWebPush: pushNotifications,
+vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+  dispatchNotificationsBestEffort: pushNotifications,
 }));
 
 vi.mock("@nexus/security", () => ({
@@ -154,8 +154,8 @@ describe("social and notification HTTP state contract", () => {
     );
     expect(pushNotifications).toHaveBeenCalledWith([
       expect.objectContaining({
-        id: "not_1",
         recipientId: "usr_2",
+        category: "follow",
       }),
     ]);
   });

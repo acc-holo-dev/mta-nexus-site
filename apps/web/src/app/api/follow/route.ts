@@ -1,12 +1,13 @@
 import { after, type NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
+  organizationRepository,
+  productRepository,
+  serverRepository,
   socialRepository,
   userRepository,
-  serverRepository,
-  productRepository,
-  organizationRepository,} from "@nexus/db";
-import { consumeRateLimit, generateId } from "@nexus/security";
+} from "@nexus/db";
+import { consumeRateLimit } from "@nexus/security";
 import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;

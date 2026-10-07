@@ -3,7 +3,7 @@ import { contentService } from "../../../../../lib/services/content-service";
 import { authService } from "../../../../../lib/services/auth-service";
 import { createContentCommentSchema } from "@nexus/validation";
 import { AppError } from "@nexus/domain";
-import { consumeRateLimit, generateId } from "@nexus/security";
+import { consumeRateLimit } from "@nexus/security";
 import { dispatchNotificationsBestEffort } from "../../../../../lib/services/notification-dispatch-service";
 
 const privateHeaders = {

@@ -50,8 +50,8 @@ vi.mock("@nexus/db", () => ({
   notificationRepository: { create: mocks.notify },
   organizationRepository: {},
 }));
-vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
-  deliverStoredNotificationsWebPush: mocks.push,
+vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+  dispatchNotificationsBestEffort: mocks.push,
 }));
 
 import { POST } from "../apps/web/src/app/api/verification/route";

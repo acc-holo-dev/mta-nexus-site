@@ -1,4 +1,5 @@
-import {  serverClaimChallengeRepository,
+import {
+  serverClaimChallengeRepository,
   serverRepository,
   userRepository,
 } from "@nexus/db";
