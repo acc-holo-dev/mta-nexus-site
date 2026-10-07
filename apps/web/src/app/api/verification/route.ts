@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { after, type NextRequest, NextResponse } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
   notificationRepository,
@@ -12,6 +12,7 @@ import {
 } from "@nexus/security";
 import { z } from "zod";
 import { AppError } from "@nexus/domain";
+import { deliverStoredNotificationsWebPush } from "../../../lib/services/notification-web-push-service";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -194,26 +195,43 @@ export async function POST(request: NextRequest) {
         },
       );
 
-    // Notification delivery is best effort; the committed request must remain successful.
-    try {
-      const moderatorIds = await userRepository.listModeratorIds();
-      const deliveries = await Promise.allSettled(
-        moderatorIds.map((moderatorId) =>
-          notificationRepository.create({
-            id: generateId("not"),
-            recipientId: moderatorId,
-            title: "New verification request",
-            message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
-            link: "/admin?verificationView=pending&verificationPage=1",
-            type: "security",
-          }),
-        ),
-      );
-      const failures = deliveries.filter((delivery) => delivery.status === "rejected").length;
-      if (failures) console.warn("Verification notification delivery failures:", failures);
-    } catch (error) {
-      console.warn("Verification moderator lookup failed:", error);
-    }
+    // Moderator inbox + push delivery is best effort and starts only after
+    // the verification request and audit are committed and the 201 can return.
+    after(async () => {
+      try {
+        const moderatorIds = await userRepository.listModeratorIds();
+        const deliveries = await Promise.allSettled(
+          moderatorIds.map((moderatorId) =>
+            notificationRepository.create({
+              id: generateId("not"),
+              recipientId: moderatorId,
+              title: "New verification request",
+              message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
+              link: "/admin?verificationView=pending&verificationPage=1",
+              type: "security",
+            }),
+          ),
+        );
+        const failures = deliveries.filter(
+          (delivery) => delivery.status === "rejected",
+        ).length;
+        if (failures) {
+          console.warn(
+            "Verification notification delivery failures:",
+            failures,
+          );
+        }
+
+        const storedNotifications = deliveries.flatMap((delivery) =>
+          delivery.status === "fulfilled" && delivery.value
+            ? [delivery.value]
+            : [],
+        );
+        await deliverStoredNotificationsWebPush(storedNotifications);
+      } catch (error) {
+        console.warn("Verification moderator lookup failed:", error);
+      }
+    });
 
     return json(
       {
