@@ -1,30 +1,63 @@
 "use client";
 
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import {
+  nextThemePreference,
+  parseThemePreference,
+  resolveThemePreference,
+  SYSTEM_THEME_QUERY,
+  type ThemePreference,
+} from "../lib/theme-preference";
 import { useNexusLocale } from "./locale-context";
 
 export function ThemeToggle() {
   const { dictionary } = useNexusLocale();
   const copy = dictionary.theme;
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<ThemePreference>("system");
 
   useEffect(() => {
-    const stored = localStorage.getItem("nexus-theme");
-    const initial =
-      stored === "light" || stored === "dark" ? stored : "dark";
-    setTheme(initial);
+    try {
+      setTheme(parseThemePreference(localStorage.getItem("nexus-theme")));
+    } catch {
+      setTheme("system");
+    }
   }, []);
 
-  const toggle = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    localStorage.setItem("nexus-theme", next);
-    document.documentElement.classList.toggle("dark", next === "dark");
-  };
+  useEffect(() => {
+    const media = window.matchMedia(SYSTEM_THEME_QUERY);
+    const apply = () => {
+      const resolved = resolveThemePreference(theme, media.matches);
+      document.documentElement.classList.toggle("dark", resolved === "dark");
+    };
 
+    apply();
+
+    if (theme !== "system") {
+      return;
+    }
+
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
+  }, [theme]);
+
+  const nextTheme = nextThemePreference(theme);
   const label =
-    theme === "dark" ? copy.switchToLight : copy.switchToDark;
+    nextTheme === "light"
+      ? copy.switchToLight
+      : nextTheme === "dark"
+        ? copy.switchToDark
+        : copy.useSystem;
+
+  const toggle = () => {
+    setTheme(nextTheme);
+
+    try {
+      localStorage.setItem("nexus-theme", nextTheme);
+    } catch {
+      // Keep the preference for this page even if browser storage is unavailable.
+    }
+  };
 
   return (
     <button
@@ -34,10 +67,12 @@ export function ThemeToggle() {
       aria-label={label}
       title={label}
     >
-      {theme === "dark" ? (
+      {nextTheme === "light" ? (
         <Sun className="h-4 w-4" aria-hidden="true" />
-      ) : (
+      ) : nextTheme === "dark" ? (
         <Moon className="h-4 w-4" aria-hidden="true" />
+      ) : (
+        <Monitor className="h-4 w-4" aria-hidden="true" />
       )}
     </button>
   );

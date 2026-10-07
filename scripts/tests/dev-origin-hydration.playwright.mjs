@@ -62,15 +62,47 @@ try {
       `${origin.name}: hydrated form must not degrade to native GET navigation`,
     );
 
-    const themeToggle = page.getByRole("button", {
-      name: dictionary.theme.switchToLight,
-      exact: true,
-    });
-    await themeToggle.click();
+    await page
+      .getByRole("button", {
+        name: dictionary.theme.switchToLight,
+        exact: true,
+      })
+      .click();
     await page.waitForFunction(
       () =>
         localStorage.getItem("nexus-theme") === "light" &&
         !document.documentElement.classList.contains("dark"),
+    );
+
+    await page
+      .getByRole("button", {
+        name: dictionary.theme.switchToDark,
+        exact: true,
+      })
+      .click();
+    await page.waitForFunction(
+      () =>
+        localStorage.getItem("nexus-theme") === "dark" &&
+        document.documentElement.classList.contains("dark"),
+    );
+
+    await page
+      .getByRole("button", {
+        name: dictionary.theme.useSystem,
+        exact: true,
+      })
+      .click();
+    await page.waitForFunction(
+      () => localStorage.getItem("nexus-theme") === "system",
+    );
+
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.waitForFunction(() =>
+      document.documentElement.classList.contains("dark"),
+    );
+    await page.emulateMedia({ colorScheme: "light" });
+    await page.waitForFunction(
+      () => !document.documentElement.classList.contains("dark"),
     );
     assert.deepEqual(
       pageErrors,

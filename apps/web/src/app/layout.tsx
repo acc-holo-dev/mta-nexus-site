@@ -26,16 +26,25 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const themeInitScript = `
 (function() {
+  var preference = 'system';
+
   try {
-    var t = localStorage.getItem('nexus-theme');
-    if (t === 'light') {
-      document.documentElement.classList.remove('dark');
-    } else {
-      document.documentElement.classList.add('dark');
+    var stored = localStorage.getItem('nexus-theme');
+    if (stored === 'light' || stored === 'dark' || stored === 'system') {
+      preference = stored;
     }
   } catch (e) {
-    document.documentElement.classList.add('dark');
+    // Storage can be unavailable in hardened browser modes. System theme remains safe.
   }
+
+  var prefersDark =
+    typeof window.matchMedia === 'function'
+      ? window.matchMedia('(prefers-color-scheme: dark)').matches
+      : true;
+  var useDark =
+    preference === 'dark' || (preference === 'system' && prefersDark);
+
+  document.documentElement.classList.toggle('dark', useDark);
 })();
 `;
 

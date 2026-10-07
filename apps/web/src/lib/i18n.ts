@@ -840,6 +840,7 @@ const en = {
   theme: {
     switchToLight: "Switch to light theme",
     switchToDark: "Switch to dark theme",
+    useSystem: "Use system theme",
   },
   buildReviewNotifications: {
   "approved": "Resource version approved",
@@ -2116,6 +2117,7 @@ const ru: typeof en = {
   theme: {
     switchToLight: "Включить светлую тему",
     switchToDark: "Включить тёмную тему",
+    useSystem: "Использовать системную тему",
   },
   buildReviewNotifications: {
   "approved": "Версия ресурса одобрена",

@@ -8,11 +8,12 @@
 
 - installable Web App Manifest и maskable-capable SVG icon;
 - production-only registration service worker;
+- Light / Dark / System theme modes; System реагирует на изменение OS color scheme без перезагрузки;
 - network-first navigation: при отсутствии сети показывается self-contained offline shell;
 - service worker не кеширует HTML пользовательских страниц и не перехватывает non-GET mutations;
 - offline shell явно сообщает, что покупки, публикация, модерация и другие state-changing actions не подтверждаются без authoritative server response.
 
-Ещё не закрыты target requirements этой главы: **Web Push**, **System theme**, расширенная стратегия read-only public cache и полный WCAG 2.2 AA acceptance pass.
+Ещё не закрыты target requirements этой главы: **Web Push**, расширенная стратегия read-only public cache и полный WCAG 2.2 AA acceptance pass.
 
 ## 1. Public release quality bar
 
