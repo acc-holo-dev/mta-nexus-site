@@ -176,6 +176,19 @@ export async function POST(request: NextRequest) {
             "VERIFICATION_STATE_CHANGED",
           );
         }
+
+        after(async () => {
+          try {
+            const stored = await notificationRepository.findById(
+              `ntf_verification_resolution_${resolved.id}`,
+            );
+            if (stored) {
+              await deliverStoredNotificationsWebPush([stored]);
+            }
+          } catch {
+            // The committed resolution + inbox notification remain authoritative.
+          }
+        });
       }
     } else if (targetType === "build") {
       if (action === "approve" || action === "reject") {

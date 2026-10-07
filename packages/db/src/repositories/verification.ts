@@ -1,6 +1,14 @@
 import { and, asc, count, eq, desc, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, verificationRequests, users, organizations, servers, serverClaimChallenges } from "../schema";
+import {
+  auditEvents,
+  notifications,
+  verificationRequests,
+  users,
+  organizations,
+  servers,
+  serverClaimChallenges,
+} from "../schema";
 import { generateId } from "@nexus/security";
 import { AppError, ConflictError } from "@nexus/domain";
 import type { AuditEvent } from "@nexus/domain";
@@ -277,6 +285,22 @@ export class VerificationRepository {
           createdAt: new Date(),
         });
       }
+
+      const decisionLabel =
+        input.decision === "approved" ? "approved" : "rejected";
+      await tx.insert(notifications).values({
+        id: `ntf_verification_resolution_${request.id}`,
+        recipientId: request.requesterId,
+        title:
+          input.decision === "approved"
+            ? "Verification approved"
+            : "Verification rejected",
+        message: `${request.targetType} verification for ${request.targetId} was ${decisionLabel}.`,
+        type: "security",
+        category: "security",
+        isRead: false,
+        createdAt: new Date(),
+      });
 
       return request;
     });

@@ -5,6 +5,7 @@ import {
   organizations,
   organizationRepository,
   userRepository,
+  notificationRepository,
   verificationRepository,
   verificationRequests,
 } from "@nexus/db";
@@ -69,5 +70,10 @@ describe("verification stale target approval", () => {
     expect(persisted?.status).toBe("pending");
     expect(persisted?.reviewerId).toBeFalsy();
     expect(persisted?.resolvedAt).toBeFalsy();
+    expect(
+      await notificationRepository.findById(
+        `ntf_verification_resolution_${request.id}`,
+      ),
+    ).toBeNull();
   });
 });

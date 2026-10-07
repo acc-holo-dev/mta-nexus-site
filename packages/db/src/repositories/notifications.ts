@@ -65,6 +65,15 @@ export class NotificationRepository {
     return rows[0] as unknown as NotificationPreferences;
   }
 
+  async findById(id: string): Promise<Notification | null> {
+    const rows = await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.id, id))
+      .limit(1);
+    return (rows[0] as unknown as Notification | undefined) ?? null;
+  }
+
   async listByUser(
     recipientId: string,
     limit = 50,
