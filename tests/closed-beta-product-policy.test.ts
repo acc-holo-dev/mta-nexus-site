@@ -13,7 +13,7 @@ describe("closed beta product policy", () => {
     expect(service).toContain("input.price !== 0");
     expect(service).toContain("minPrice: 0");
     expect(service).toContain("maxPrice: 0");
-    expect(service).toContain('product.price !== 0 || product.status !== "published"');
+    expect(service).toMatch(/product\??\.price\s*!==\s*0\s*\|\|\s*product\.status\s*!==\s*"published"/u);
     expect(service).toContain("product.price !== 0");
   });
 
