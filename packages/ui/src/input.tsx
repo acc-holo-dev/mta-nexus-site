@@ -8,10 +8,23 @@ export interface InputProps
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type = "text", error, label, id, ...props }, ref) => {
+  (
+    {
+      className,
+      type = "text",
+      error,
+      label,
+      id,
+      "aria-describedby": ariaDescribedBy,
+      "aria-invalid": ariaInvalid,
+      ...props
+    },
+    ref,
+  ) => {
     const generatedId = React.useId();
     const inputId = id ?? generatedId;
     const errorId = error ? `${inputId}-error` : undefined;
+    const describedBy = [ariaDescribedBy, errorId].filter(Boolean).join(" ") || undefined;
 
     return (
       <div className="w-full space-y-1.5">
@@ -27,8 +40,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           id={inputId}
           type={type}
           ref={ref}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={errorId}
+          aria-invalid={error ? true : ariaInvalid}
+          aria-describedby={describedBy}
+          aria-errormessage={errorId}
           className={cn(
             "h-10 w-full rounded-lg border bg-inset px-3 py-2 text-sm text-primary transition-colors placeholder:text-[color:var(--nexus-text-faint)]",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--nexus-page)]",

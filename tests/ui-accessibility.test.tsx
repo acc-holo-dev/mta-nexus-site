@@ -21,6 +21,23 @@ describe("Input accessibility wiring", () => {
     expect(markup).toContain('role="alert"');
   });
 
+  it("merges caller descriptions with validation errors", () => {
+    const markup = renderToStaticMarkup(
+      <Input
+        id="password"
+        label="Password"
+        error="Password is too short"
+        aria-describedby="password-policy"
+      />,
+    );
+
+    expect(markup).toContain(
+      'aria-describedby="password-policy password-error"',
+    );
+    expect(markup).toContain('aria-errormessage="password-error"');
+    expect(markup).toContain('role="alert"');
+  });
+
   it("preserves an explicit caller-provided id", () => {
     const markup = renderToStaticMarkup(
       <Input id="account-email" label="Email" error="Invalid email" />,
