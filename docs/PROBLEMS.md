@@ -241,7 +241,10 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   entitlement claim/check. Build moderation/quarantine source policies заменены
   service behavior guards поверх уже существующих PostgreSQL/HTTP integrations:
   pending/CAS/scan provenance/release event и published/quarantined trusted-restore
-  state machine. Оставшиеся source-surface тесты сокращать по мере изменения функций;
+  state machine. Discover/workspace source checks теперь заменены rendered navigation,
+  compatibility redirect и SavedPage privacy/repository behavior; legacy commerce
+  workspace routes вызываются напрямую. Оставшиеся source-surface тесты сокращать
+  по мере изменения функций;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере

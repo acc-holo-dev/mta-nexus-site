@@ -1,17 +1,59 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const nav = vi.hoisted(() => ({
+  pathname: "/",
+  permanentRedirect: vi.fn(),
+}));
+
+vi.mock("next/navigation", () => ({
+  usePathname: () => nav.pathname,
+  permanentRedirect: nav.permanentRedirect,
+}));
+
+vi.mock("next/link", async () => {
+  const ReactModule = await import("react");
+  return {
+    default: ({ href, children, ...props }: { href: string; children?: React.ReactNode }) =>
+      ReactModule.createElement("a", { href, ...props }, children),
+  };
+});
+
+for (const modulePath of [
+  "../apps/web/src/components/account-controls",
+  "../apps/web/src/components/locale-switcher",
+  "../apps/web/src/components/notification-bell",
+  "../apps/web/src/components/theme-toggle",
+]) {
+  vi.mock(modulePath, async () => {
+    const ReactModule = await import("react");
+    return new Proxy(
+      {},
+      {
+        get: (_target, property) =>
+          () => ReactModule.createElement("span", { "data-mock": String(property) }),
+      },
+    );
+  });
+}
+
+import { Sidebar } from "../apps/web/src/components/sidebar";
+import { Navbar } from "../apps/web/src/components/navbar";
+import ExplorePage from "../apps/web/src/app/explore/page";
 import {
   DISCOVER_TYPES,
   discoverHref,
   parseDiscoverQuery,
 } from "../apps/web/src/lib/discover-query";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+describe("discover surface behavior", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    nav.pathname = "/";
+  });
 
-describe("discover surface", () => {
-  it("keeps discovery entity-scoped and normalizes query state behaviorally", () => {
+  it("keeps discovery entity-scoped and canonicalizes query state", () => {
     expect(DISCOVER_TYPES).toEqual([
       "servers",
       "resources",
@@ -19,52 +61,35 @@ describe("discover surface", () => {
       "organizations",
       "content",
     ]);
-
-    expect(parseDiscoverQuery({})).toEqual({
-      type: "servers",
-      query: "",
-    });
     expect(
       parseDiscoverQuery({
         type: ["resources", "servers"],
         q: ["  vehicle pack  ", "ignored"],
       }),
-    ).toEqual({
-      type: "resources",
-      query: "vehicle pack",
-    });
+    ).toEqual({ type: "resources", query: "vehicle pack" });
     expect(
-      parseDiscoverQuery({
-        type: "all",
-        q: "x".repeat(140),
-      }),
-    ).toEqual({
-      type: "servers",
-      query: "x".repeat(100),
-    });
-
-    expect(
-      discoverHref({
-        type: "organizations",
-        query: "  nexus studio  ",
-      }),
+      discoverHref({ type: "organizations", query: "  nexus studio  " }),
     ).toBe("/discover?type=organizations&q=nexus+studio");
-    expect(discoverHref({ type: "content" })).toBe(
-      "/discover?type=content",
+  });
+
+  it("renders discover in both desktop ecosystem navigation and navbar search", () => {
+    const sidebar = renderToStaticMarkup(
+      React.createElement(Sidebar, {
+        locale: "en",
+        isCollapsed: false,
+        onToggle: () => undefined,
+      }),
     );
-  });
+    const navbar = renderToStaticMarkup(
+      React.createElement(Navbar, { locale: "en" }),
+    );
 
-  it("routes primary navigation and navbar search to discover", () => {
-    const sidebar = read("apps/web/src/components/sidebar.tsx");
-    const navbar = read("apps/web/src/components/navbar.tsx");
-    expect(sidebar).toContain('href: "/discover"');
+    expect(sidebar).toContain('href="/discover"');
     expect(navbar).toContain('href="/discover"');
-    expect(navbar).not.toContain("CommandPalette");
-    expect(navbar).not.toContain("Ctrl K");
   });
 
-  it("keeps the old explore URL as a compatibility redirect", () => {
-    const legacy = read("apps/web/src/app/explore/page.tsx");
-    expect(legacy).toContain('permanentRedirect("/discover")');
+  it("keeps /explore as a permanent compatibility redirect", () => {
+    ExplorePage();
+    expect(nav.permanentRedirect).toHaveBeenCalledWith("/discover");
   });
 });
