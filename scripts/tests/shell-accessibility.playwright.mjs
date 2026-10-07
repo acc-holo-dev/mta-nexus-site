@@ -8,6 +8,8 @@ assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
 assert(process.env.NEXUS_BROWSER_TOOLS);
 assert(process.env.NEXUS_BROWSER_REPORT_DIR);
+assert(process.env.NEXUS_AUTHOR_BROWSER_EMAIL);
+assert(process.env.NEXUS_AUTHOR_BROWSER_PASSWORD);
 const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { test, expect } = require("@playwright/test");
 const evidence = [];
@@ -232,6 +234,279 @@ for (const locale of ["en", "ru"]) {
     assert.deepEqual(errors, []);
     evidence.push(
       `${locale}: ordinary Discover search remains keyboard reachable and fits a short mobile viewport; no uncaught browser errors`,
+    );
+  });
+}
+
+
+async function loginFixture(page) {
+  await page.goto("/auth/login");
+  const status = await page.evaluate(
+    async (account) => {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(account),
+      });
+      return response.status;
+    },
+    {
+      email: process.env.NEXUS_AUTHOR_BROWSER_EMAIL,
+      password: process.env.NEXUS_AUTHOR_BROWSER_PASSWORD,
+    },
+  );
+  assert.equal(status, 200);
+}
+
+async function logoutFixture(page) {
+  const status = await page.evaluate(
+    async () =>
+      (await fetch("/api/auth/session", { method: "DELETE" })).status,
+  );
+  assert.equal(status, 200);
+}
+
+async function assertNoVisibleUnlabeledFields(page, route) {
+  const unlabeled = await page
+    .locator(
+      'main input:not([type="hidden"]), main select, main textarea',
+    )
+    .evaluateAll((elements) =>
+      elements
+        .filter(
+          (element) =>
+            element.getClientRects().length > 0 &&
+            !element.getAttribute("aria-label") &&
+            !element.getAttribute("aria-labelledby") &&
+            !element.labels?.length,
+        )
+        .map((element) => element.getAttribute("name") || element.id || element.tagName),
+    );
+  assert.deepEqual(unlabeled, [], `${route}: visible form fields require accessible labels`);
+}
+
+async function assertNoHorizontalOverflow(page, label) {
+  assert(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+    `Horizontal overflow: ${label}`,
+  );
+}
+
+for (const locale of ["en", "ru"]) {
+  test(`critical account accessibility in ${locale}`, async ({ page, context }) => {
+    test.setTimeout(120_000);
+    const dictionary = getDictionary(locale);
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await context.addCookies([
+      {
+        name: "nexus_locale",
+        value: locale,
+        url: process.env.NEXUS_BROWSER_BASE_URL,
+        secure: true,
+        sameSite: "Lax",
+      },
+    ]);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 320, height: 844 });
+
+    await page.goto("/auth/login");
+    await expect(
+      page.getByRole("main").getByRole("heading", {
+        level: 1,
+        name: dictionary.auth.loginTitle,
+        exact: true,
+      }),
+    ).toBeVisible();
+    const loginEmail = page.getByLabel(dictionary.auth.email, { exact: true });
+    const loginPassword = page.getByLabel(dictionary.auth.password, {
+      exact: true,
+    });
+    const loginSubmit = page.getByRole("button", {
+      name: dictionary.auth.signIn,
+      exact: true,
+    });
+    await loginEmail.focus();
+    await expect(loginEmail).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(loginPassword).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(loginSubmit).toBeFocused();
+    await loginEmail.fill("a11y-unknown@example.invalid");
+    await loginPassword.fill("not-the-right-password");
+    await loginSubmit.click();
+    await expect(page.locator("#auth-error")).toHaveAttribute("role", "alert");
+    await assertNoVisibleUnlabeledFields(page, "/auth/login");
+    await assertNoHorizontalOverflow(page, `${locale} /auth/login at 320px`);
+    evidence.push(
+      `${locale}: login has logical keyboard order, labeled controls, live error semantics and 320px reflow`,
+    );
+
+    await page.route("**/api/auth/password-reset", async (route) => {
+      assert.equal(route.request().method(), "POST");
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true }),
+      });
+    });
+    try {
+      await page.goto("/auth/forgot-password");
+      await expect(
+        page.getByRole("main").getByRole("heading", {
+          level: 1,
+          name: dictionary.recovery.forgotTitle,
+          exact: true,
+        }),
+      ).toBeVisible();
+      const recoveryEmail = page.getByLabel(dictionary.recovery.email, {
+        exact: true,
+      });
+      const recoverySubmit = page.getByRole("button", {
+        name: dictionary.recovery.sendReset,
+        exact: true,
+      });
+      await recoveryEmail.focus();
+      await page.keyboard.press("Tab");
+      await expect(recoverySubmit).toBeFocused();
+      await recoveryEmail.fill("privacy-neutral@example.invalid");
+      await recoverySubmit.click();
+      await expect(
+        page.getByRole("status").filter({
+          hasText: dictionary.recovery.accepted,
+        }),
+      ).toBeVisible();
+      await assertNoVisibleUnlabeledFields(page, "/auth/forgot-password");
+      await assertNoHorizontalOverflow(
+        page,
+        `${locale} /auth/forgot-password at 320px`,
+      );
+      evidence.push(
+        `${locale}: password recovery is keyboard reachable, privacy-neutral in the UI, status-announced and mobile-safe`,
+      );
+    } finally {
+      await page.unroute("**/api/auth/password-reset");
+    }
+
+    await loginFixture(page);
+
+    const criticalRoutes = [
+      {
+        route: "/settings",
+        heading: dictionary.settings.title,
+        ready: async () =>
+          expect(
+            page.getByRole("heading", {
+              level: 2,
+              name: dictionary.settings.notificationPreferences,
+              exact: true,
+            }),
+          ).toBeVisible(),
+      },
+      {
+        route: "/security",
+        heading: dictionary.securityCenter.title,
+        ready: async () =>
+          expect(
+            page.getByRole("heading", {
+              level: 2,
+              name: dictionary.securityCenter.sessions,
+              exact: true,
+            }),
+          ).toBeVisible(),
+      },
+      {
+        route: "/support",
+        heading: dictionary.support.title,
+        ready: async () =>
+          expect(
+            page.getByRole("heading", {
+              level: 2,
+              name: dictionary.support.newCase,
+              exact: true,
+            }),
+          ).toBeVisible(),
+      },
+      {
+        route: "/workspace/resources/new",
+        heading: dictionary.publishing.resourceTitle,
+        ready: async () =>
+          expect(
+            page.getByRole("button", {
+              name: dictionary.publishing.submit,
+              exact: true,
+            }),
+          ).toBeVisible(),
+      },
+    ];
+
+    for (const width of [320, 390, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      for (const spec of criticalRoutes) {
+        const response = await page.goto(spec.route);
+        assert.equal(response?.status(), 200, `${locale} ${width} ${spec.route}`);
+        await expect(page.locator("html")).toHaveAttribute("lang", locale);
+        await expect(
+          page.getByRole("main").getByRole("heading", {
+            level: 1,
+            name: spec.heading,
+            exact: true,
+          }),
+        ).toBeVisible();
+        await spec.ready();
+        await assertNoVisibleUnlabeledFields(page, spec.route);
+        await assertNoHorizontalOverflow(
+          page,
+          `${locale} ${spec.route} at ${width}px`,
+        );
+      }
+    }
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/settings");
+    const firstPreference = page.getByLabel(dictionary.settings.newFollowers, {
+      exact: true,
+    });
+    await firstPreference.focus();
+    await expect(firstPreference).toBeFocused();
+
+    await page.goto("/security");
+    const settingsLink = page.getByRole("link", {
+      name: dictionary.securityCenter.manageSettings,
+      exact: true,
+    });
+    await settingsLink.focus();
+    await expect(settingsLink).toBeFocused();
+
+    await page.goto("/support");
+    const supportCategory = page.getByLabel(dictionary.support.category, {
+      exact: true,
+    });
+    const supportSubject = page.getByLabel(dictionary.support.subject, {
+      exact: true,
+    });
+    const supportMessage = page.getByLabel(dictionary.support.message, {
+      exact: true,
+    });
+    await supportCategory.focus();
+    await page.keyboard.press("Tab");
+    await expect(supportSubject).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(supportMessage).toBeFocused();
+
+    await page.goto("/workspace/resources/new");
+    const resourceTitle = page.getByLabel(dictionary.publishing.title, {
+      exact: true,
+    });
+    await resourceTitle.focus();
+    await expect(resourceTitle).toBeFocused();
+
+    assert.deepEqual(errors, []);
+    await logoutFixture(page);
+    evidence.push(
+      `${locale}: authenticated Settings, Security Center, Support and Publish pass labeled-field, focus, reduced-motion and 320/390/1280 reflow acceptance`,
     );
   });
 }

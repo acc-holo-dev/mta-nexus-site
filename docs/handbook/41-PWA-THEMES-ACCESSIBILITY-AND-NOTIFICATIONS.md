@@ -14,7 +14,9 @@
 - добавлены session-bound browser Web Push subscriptions: authenticated subscribe/unsubscribe API, VAPID public-key gate и safe same-origin notification click handling; завершение серверной session каскадно удаляет её push subscription;
 - offline shell явно сообщает, что покупки, публикация, модерация и другие state-changing actions не подтверждаются без authoritative server response.
 
-Ещё не закрыты target requirements этой главы: **Web Push delivery/dispatcher и production VAPID wiring**, расширенная стратегия read-only public cache и полный WCAG 2.2 AA acceptance pass.
+Chromium release acceptance теперь также покрывает RU/EN login и password-recovery UI, а после реального входа — Settings, Security Center, Support и Publish: keyboard focus, accessible labels, live error/status semantics, reduced-motion и reflow на 320/390/1280 px. Это scoped browser acceptance, не полная screen-reader/WCAG-сертификация.
+
+Ещё не закрыты target requirements этой главы: **Web Push delivery/dispatcher и production VAPID wiring**, расширенная стратегия read-only public cache, server-claim/commerce accessibility acceptance и полный WCAG 2.2 AA screen-reader/contrast audit.
 
 ## 1. Public release quality bar
 
