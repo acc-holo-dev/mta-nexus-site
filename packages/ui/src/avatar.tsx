@@ -28,6 +28,8 @@ export function Avatar({
 
   return (
     <div
+      role={!src || imageFailed ? "img" : undefined}
+      aria-label={!src || imageFailed ? alt || fallback : undefined}
       className={cn(
         "relative inline-flex select-none items-center justify-center overflow-hidden rounded-full border border-base bg-inset font-semibold text-secondary",
         sizes[size],

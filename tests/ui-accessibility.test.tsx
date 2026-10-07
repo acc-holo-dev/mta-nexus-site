@@ -1,6 +1,8 @@
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { Avatar } from "../packages/ui/src/avatar";
+import { EmptyState } from "../packages/ui/src/empty-state";
 import { Input } from "../packages/ui/src/input";
 import { Tabs, nextTabIndex } from "../packages/ui/src/tabs";
 
@@ -16,6 +18,7 @@ describe("Input accessibility wiring", () => {
     expect(markup).toContain(`aria-describedby="${id}-error"`);
     expect(markup).toContain(`id="${id}-error"`);
     expect(markup).toContain('aria-invalid="true"');
+    expect(markup).toContain('role="alert"');
   });
 
   it("preserves an explicit caller-provided id", () => {
@@ -72,5 +75,26 @@ describe("Tabs keyboard navigation", () => {
     );
 
     expect((markup.match(/tabindex="0"/gu) ?? []).length).toBe(1);
+  });
+});
+
+
+describe("Shared non-text accessibility", () => {
+  it("gives an avatar fallback an image role and accessible name", () => {
+    const markup = renderToStaticMarkup(
+      <Avatar fallback="HN" alt="Holo Nexus" />,
+    );
+
+    expect(markup).toContain('role="img"');
+    expect(markup).toContain('aria-label="Holo Nexus"');
+    expect(markup).toContain('aria-hidden="true"');
+  });
+
+  it("keeps the default empty-state icon decorative", () => {
+    const markup = renderToStaticMarkup(
+      <EmptyState title="Nothing here" description="No records found." />,
+    );
+
+    expect(markup).toContain('aria-hidden="true"');
   });
 });

@@ -25,7 +25,7 @@ export function EmptyState({
       )}
     >
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-base bg-surface text-muted shadow-nexus-sm">
-        {icon || <FolderOpen className="h-6 w-6" />}
+        {icon || <FolderOpen className="h-6 w-6" aria-hidden="true" />}
       </div>
       <h3 className="text-base font-semibold text-primary">{title}</h3>
       <p className="mb-6 mt-1 max-w-sm text-sm text-muted">
