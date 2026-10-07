@@ -1,13 +1,19 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { and, eq } from "drizzle-orm";
 import { randomBytes } from "node:crypto";
-import { auditEvents, db, notifications } from "../client";
+import {
+  auditEvents,
+  db,
+  notifications,
+  webPushSubscriptions,
+} from "../client";
 import { accountMailOutbox } from "../account-mail-schema";
 import { authChallenges } from "../account-recovery-schema";
 import { AccountMailCipher } from "./account-mail-crypto";
 import { accountChallengeRepository } from "./account-challenges";
 import { authService } from "../../../../apps/web/src/lib/services/auth-service";
 import { userRepository } from "./users";
+import { webPushSubscriptionRepository } from "./web-push-subscriptions";
 import { generateId } from "@nexus/security";
 
 const oldPassword = "Synthetic-D4-old-password!";
@@ -115,6 +121,33 @@ describe("D4a password reset service", () => {
       auditId: generateId("aud"),
     });
 
+    const firstSessionId =
+      await authService.getCurrentSessionId(a.firstToken);
+    const secondSessionId =
+      await authService.getCurrentSessionId(a.secondToken);
+    if (!firstSessionId || !secondSessionId) {
+      throw new Error("synthetic session IDs missing");
+    }
+
+    for (const [index, sessionId] of [
+      firstSessionId,
+      secondSessionId,
+    ].entries()) {
+      const storedPush = await webPushSubscriptionRepository.upsert({
+        id: `wps_reset_${index}_${a.userId}`,
+        userId: a.userId,
+        sessionId,
+        endpoint: `https://push.example.invalid/reset-${index}-${a.userId}`,
+        p256dh: `test-p256dh-${index}`,
+        auth: `test-auth-${index}`,
+        expirationAt: null,
+      });
+      expect(storedPush).not.toBeNull();
+    }
+    expect(
+      await webPushSubscriptionRepository.listByUser(a.userId),
+    ).toHaveLength(2);
+
     const result = await authService.confirmPasswordReset({
       challengeId: proof.id, token: proof.token, newPassword, ip: "203.0.113.10",
     });
@@ -134,6 +167,15 @@ describe("D4a password reset service", () => {
     expect(await db.select().from(notifications).where(and(
       eq(notifications.recipientId, a.userId), eq(notifications.category, "security"),
     ))).toHaveLength(1);
+    expect(
+      await db
+        .select()
+        .from(webPushSubscriptions)
+        .where(eq(webPushSubscriptions.userId, a.userId)),
+    ).toHaveLength(0);
+    expect(
+      await webPushSubscriptionRepository.listByUser(a.userId),
+    ).toHaveLength(0);
     await expect(authService.confirmPasswordReset({
       challengeId: proof.id, token: proof.token, newPassword: "Synthetic-D4-replay-password!", ip: "203.0.113.10",
     })).rejects.toThrow("Invalid or expired");

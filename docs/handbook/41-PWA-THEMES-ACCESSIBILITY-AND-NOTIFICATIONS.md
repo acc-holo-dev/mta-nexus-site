@@ -118,3 +118,5 @@ Bottom nav:
 - More.
 
 Messages, Notifications, Discover, Workspace/Profile и Support доступны через More/header/badges.
+
+Password-reset security invariant: Web Push remains strictly session-bound. A successful password reset changes the password, revokes every session, cascade-deletes their web_push_subscriptions, writes the audit event and a durable security inbox notification in the same transaction. Therefore reset intentionally does not send post-commit push to revoked endpoints; the notification is available on the next login and an old device keeps no delivery capability.
