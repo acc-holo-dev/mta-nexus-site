@@ -26,6 +26,7 @@ describe("verification moderation controls surface", () => {
     expect(controls).toContain('targetType: "verification"');
     expect(controls).toContain('action,');
     expect(controls).toContain("notes: notes.trim()");
+    expect(controls).toContain("confirmsAdminAction(");
   });
 
   it("keeps server proof enforcement on the backend, not in the client", () => {

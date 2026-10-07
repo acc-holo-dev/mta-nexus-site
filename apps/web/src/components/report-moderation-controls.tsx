@@ -3,6 +3,7 @@
 import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { confirmsAdminAction } from "../lib/admin-action-confirmation";
 import { useNexusLocale } from "./locale-context";
 
 export function ReportModerationControls({ reportId }: { reportId: string }) {
@@ -29,7 +30,7 @@ export function ReportModerationControls({ reportId }: { reportId: string }) {
         signal: AbortSignal.timeout(10_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true || data?.targetId !== reportId || data?.action !== action) {
+      if (!confirmsAdminAction(response.status, data, reportId, action)) {
         setError(data?.error || copy.reportDecisionFailed);
         return;
       }

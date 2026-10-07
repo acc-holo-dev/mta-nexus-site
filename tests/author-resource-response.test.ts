@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { confirmedAuthorBuild, confirmedAuthorDetails, confirmedRetiredBuild } from "../apps/web/src/lib/author-resource-response";
 
@@ -59,5 +61,26 @@ describe("author mutation confirmation", () => {
     expect(confirmedRetiredBuild(200, { build: { ...build, status: "retired" } }, "prd_other", build.id)).toBe(false);
     expect(confirmedRetiredBuild(200, { build: { ...build, status: "retired" } }, product.id, "bld_other")).toBe(false);
     expect(confirmedRetiredBuild(204, {}, product.id, build.id)).toBe(false);
+  });
+});
+
+
+describe("author resource client mutation policy", () => {
+  it("routes every author write through the enforced private request policy", () => {
+    const source = readFileSync(
+      resolve(
+        process.cwd(),
+        "apps/web/src/components/author-resource-forms.tsx",
+      ),
+      "utf8",
+    );
+
+    expect(source).toContain(
+      'import { privateRequest } from "../lib/private-request"',
+    );
+    expect(source.match(/privateRequest\(\{/gu)).toHaveLength(3);
+    expect(source).toContain("confirmedAuthorDetails(");
+    expect(source).toContain("confirmedAuthorBuild(");
+    expect(source).toContain("confirmedRetiredBuild(");
   });
 });

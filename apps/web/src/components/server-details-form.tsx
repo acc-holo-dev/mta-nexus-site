@@ -3,6 +3,7 @@
 import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nexus/ui";
+import { confirmedUpdatedServer } from "../lib/server-mutation-confirmation";
 import { useNexusLocale } from "./locale-context";
 
 type EditableServer = {
@@ -47,6 +48,28 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
     const form = new FormData(event.currentTarget);
 
     try {
+      const command = {
+        name: String(form.get("name") || "").trim(),
+        description: String(form.get("description") || "").trim(),
+        websiteUrl: String(form.get("websiteUrl") || "").trim(),
+        discordUrl: String(form.get("discordUrl") || "").trim(),
+        rulesUrl: String(form.get("rulesUrl") || "").trim(),
+        mediaUrls: String(form.get("mediaUrls") || "")
+          .split("\n")
+          .map((value) => value.trim())
+          .filter(Boolean),
+        language: String(form.get("language") || "").trim(),
+        region: String(form.get("region") || "").trim(),
+        gameplayTags: String(form.get("gameplayTags") || "")
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean),
+        ipAddress: String(form.get("ipAddress") || "").trim(),
+        port: Number(form.get("port")),
+        gameMode: String(form.get("gameMode") || "").trim(),
+        maxPlayers: Number(form.get("maxPlayers")),
+        visibility: String(form.get("visibility") || "private"),
+      };
       const response = await fetch(
         `/api/servers/${encodeURIComponent(server.id)}`,
         {
@@ -54,36 +77,19 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
           cache: "no-store",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: String(form.get("name") || "").trim(),
-            description: String(form.get("description") || "").trim(),
-            websiteUrl: String(form.get("websiteUrl") || "").trim(),
-            discordUrl: String(form.get("discordUrl") || "").trim(),
-            rulesUrl: String(form.get("rulesUrl") || "").trim(),
-            mediaUrls: String(form.get("mediaUrls") || "")
-              .split("\n")
-              .map((value) => value.trim())
-              .filter(Boolean),
-            language: String(form.get("language") || "").trim(),
-            region: String(form.get("region") || "").trim(),
-            gameplayTags: String(form.get("gameplayTags") || "")
-              .split(",")
-              .map((value) => value.trim())
-              .filter(Boolean),
-            ipAddress: String(form.get("ipAddress") || "").trim(),
-            port: Number(form.get("port")),
-            gameMode: String(form.get("gameMode") || "").trim(),
-            maxPlayers: Number(form.get("maxPlayers")),
-            visibility: String(form.get("visibility") || "private"),
-          }),
+          body: JSON.stringify(command),
           signal: AbortSignal.timeout(15_000),
         },
       );
       const data = await response.json().catch(() => null);
       if (
-        !response.ok ||
-        typeof data?.server?.id !== "string" ||
-        data.server.id !== server.id
+        !confirmedUpdatedServer(response.status, data, {
+          id: server.id,
+          name: command.name,
+          ipAddress: command.ipAddress,
+          port: command.port,
+          visibility: command.visibility,
+        })
       ) {
         throw new Error(data?.error || copy.saveError);
       }

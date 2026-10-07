@@ -9,6 +9,7 @@ import {
   getSupportedBuildExtension,
 } from "../lib/build-file-validation";
 import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
+import { privateRequest } from "../lib/private-request";
 
 import {
   authorResourceDraftKey, parseAuthorResourceDraft, sameAuthorDetails, reconcileAuthorDetails,
@@ -175,12 +176,18 @@ export function AuthorResourceForms({
     }
     setSaving(true);
     try {
-      const response = await fetch(`/api/products/${product.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", "If-Match": `"${new Date(baseUpdatedAt).toISOString()}"` },
-        body: JSON.stringify(parsed.data),
-        signal: AbortSignal.timeout(15_000),
-      });
+      const response = await fetch(
+        `/api/products/${product.id}`,
+        privateRequest({
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "If-Match": `"${new Date(baseUpdatedAt).toISOString()}"`,
+          },
+          body: JSON.stringify(parsed.data),
+          signal: AbortSignal.timeout(15_000),
+        }),
+      );
       const body = await response.json().catch(() => null);
       if (!response.ok) {
         if (body?.code === "PRODUCT_METADATA_CONFLICT") {
@@ -239,11 +246,14 @@ export function AuthorResourceForms({
     }
     setUploading(true);
     try {
-      const response = await fetch(`/api/products/${product.id}/builds`, {
-        method: "POST",
-        body: data,
-        signal: AbortSignal.timeout(120_000),
-      });
+      const response = await fetch(
+        `/api/products/${product.id}/builds`,
+        privateRequest({
+          method: "POST",
+          body: data,
+          signal: AbortSignal.timeout(120_000),
+        }),
+      );
       const body = await response.json().catch(() => null);
       if (!response.ok) {
         setUploadError(
@@ -463,12 +473,15 @@ export function RetireBuildForm({
     setPending(true);
     setError("");
     try {
-      const response = await fetch(`/api/products/${productId}/builds/${buildId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "retire", reason }),
-        signal: AbortSignal.timeout(15_000),
-      });
+      const response = await fetch(
+        `/api/products/${productId}/builds/${buildId}`,
+        privateRequest({
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "retire", reason }),
+          signal: AbortSignal.timeout(15_000),
+        }),
+      );
       const body = await response.json().catch(() => null);
       if (!confirmedRetiredBuild(response.status, body, productId, buildId)) {
         setError(copy.retireFailed);

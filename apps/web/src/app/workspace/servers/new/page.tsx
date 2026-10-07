@@ -3,6 +3,7 @@
 import { type FormEvent, useState } from "react";
 import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../../../components/locale-context";
+import { confirmedCreatedServer } from "../../../../lib/server-mutation-confirmation";
 
 const fieldClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
@@ -24,43 +25,49 @@ export default function RegisterServerPage() {
     const form = new FormData(event.currentTarget);
 
     try {
+      const command = {
+        name: String(form.get("name") || "").trim(),
+        slug: String(form.get("slug") || "").trim().toLowerCase(),
+        description: String(form.get("description") || "").trim(),
+        websiteUrl: String(form.get("websiteUrl") || "").trim(),
+        discordUrl: String(form.get("discordUrl") || "").trim(),
+        rulesUrl: String(form.get("rulesUrl") || "").trim(),
+        mediaUrls: String(form.get("mediaUrls") || "")
+          .split("\n")
+          .map((value) => value.trim())
+          .filter(Boolean),
+        language: String(form.get("language") || "").trim(),
+        region: String(form.get("region") || "").trim(),
+        gameplayTags: String(form.get("gameplayTags") || "")
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean),
+        ipAddress: String(form.get("ipAddress") || "").trim(),
+        port: Number(form.get("port") || 22003),
+        httpPort: Number(form.get("httpPort") || 22005),
+        maxPlayers: Number(form.get("maxPlayers") || 128),
+        gameMode: String(form.get("gameMode") || "").trim(),
+        visibility: String(form.get("visibility") || "public"),
+      };
       const response = await fetch("/api/servers", {
         method: "POST",
         cache: "no-store",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: String(form.get("name") || "").trim(),
-          slug: String(form.get("slug") || "").trim().toLowerCase(),
-          description: String(form.get("description") || "").trim(),
-          websiteUrl: String(form.get("websiteUrl") || "").trim(),
-          discordUrl: String(form.get("discordUrl") || "").trim(),
-          rulesUrl: String(form.get("rulesUrl") || "").trim(),
-          mediaUrls: String(form.get("mediaUrls") || "")
-            .split("\n")
-            .map((value) => value.trim())
-            .filter(Boolean),
-          language: String(form.get("language") || "").trim(),
-          region: String(form.get("region") || "").trim(),
-          gameplayTags: String(form.get("gameplayTags") || "")
-            .split(",")
-            .map((value) => value.trim())
-            .filter(Boolean),
-          ipAddress: String(form.get("ipAddress") || "").trim(),
-          port: Number(form.get("port") || 22003),
-          httpPort: Number(form.get("httpPort") || 22005),
-          maxPlayers: Number(form.get("maxPlayers") || 128),
-          gameMode: String(form.get("gameMode") || "").trim(),
-          visibility: String(form.get("visibility") || "public"),
-        }),
+        body: JSON.stringify(command),
         signal: AbortSignal.timeout(15_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok || !data?.server?.id) {
+      const serverId = confirmedCreatedServer(
+        response.status,
+        data,
+        command.slug,
+      );
+      if (!serverId) {
         throw new Error(data?.error || copy.createError);
       }
       window.location.assign(
-        `/workspace/servers/${encodeURIComponent(data.server.id)}`,
+        `/workspace/servers/${encodeURIComponent(serverId)}`,
       );
     } catch (caught) {
       setError(

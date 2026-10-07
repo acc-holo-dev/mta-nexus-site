@@ -52,8 +52,28 @@ describe("server experience UI", () => {
     }
 
     expect(details).toContain("dictionary.serverManagement");
+    expect(details).toContain("confirmedUpdatedServer(");
     expect(follow).toContain("dictionary.follow");
     expect(claim).toContain("dictionary.serverClaim");
+  });
+
+  it("confirms server registration against the requested slug before navigation", () => {
+    const registration = read(
+      "apps/web/src/app/workspace/servers/new/page.tsx",
+    );
+
+    expect(registration).toContain(
+      "confirmedCreatedServer(",
+    );
+    expect(registration).toContain(
+      'credentials: "same-origin"',
+    );
+    expect(registration).toContain(
+      'cache: "no-store"',
+    );
+    expect(registration).toContain(
+      "AbortSignal.timeout",
+    );
   });
 
   it("localizes history, update, follow, claim, and management surfaces", () => {

@@ -386,6 +386,8 @@ Pay special attention to settings, follows, comments, content publishing, admin 
 
 Acceptance: contract tests cover confirmation payloads and cache privacy for all sensitive mutation families.
 
+Progress 2026-10-07: the current audit slice makes author resource metadata/build/retire writes use one enforced `same-origin` + `no-store` request policy while retaining exact metadata/build/retirement response confirmation. Build, quarantine, content, verification and report moderation clients now confirm the returned `targetId` and `action` instead of accepting a generic `success: true`. Server registration confirms exact `201 + slug + id`, and server edits confirm the same server plus core returned name/IP/port/visibility before showing success. The reviewed mutation routes already return private/no-store responses. Stage 5 remains open for the remaining client families; do not interpret this slice as a complete mutation inventory.
+
 #### Stage 6 — Security and authorization audit
 
 Recheck all authority boundaries, especially:

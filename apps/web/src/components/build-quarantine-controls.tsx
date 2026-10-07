@@ -3,6 +3,7 @@
 import { LoaderCircle, RotateCcw, ShieldOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { confirmsAdminAction } from "../lib/admin-action-confirmation";
 import { useNexusLocale } from "./locale-context";
 
 export function BuildQuarantineControls({
@@ -46,7 +47,7 @@ export function BuildQuarantineControls({
         signal: AbortSignal.timeout(10_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true) {
+      if (!confirmsAdminAction(response.status, data, buildId, action)) {
         setError(data?.error || copy.quarantineBuildFailed);
         return;
       }

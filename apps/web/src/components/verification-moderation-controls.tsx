@@ -3,6 +3,7 @@
 import { BadgeCheck, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { confirmsAdminAction } from "../lib/admin-action-confirmation";
 import { useNexusLocale } from "./locale-context";
 
 export function VerificationModerationControls({
@@ -46,7 +47,7 @@ export function VerificationModerationControls({
         signal: AbortSignal.timeout(10_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true) {
+      if (!confirmsAdminAction(response.status, data, requestId, action)) {
         setError(data?.error || copy.verificationFailed);
         return;
       }
