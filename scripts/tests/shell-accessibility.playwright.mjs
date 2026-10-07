@@ -39,6 +39,33 @@ for (const locale of ["en", "ru"]) {
     page.on("pageerror", (error) => errors.push(error.message));
     await context.addCookies([{ name: "nexus_locale", value: locale, url: process.env.NEXUS_BROWSER_BASE_URL, secure: true, sameSite: "Lax" }]);
     await page.goto("/market");
+    const reducedMotion = await page.evaluate(() => {
+      const probe = document.createElement("div");
+      probe.style.animationDuration = "5s";
+      probe.style.animationIterationCount = "infinite";
+      probe.style.transitionDuration = "5s";
+      document.body.append(probe);
+      const probeStyle = getComputedStyle(probe);
+      const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = "smooth";
+      const htmlStyle = getComputedStyle(document.documentElement);
+      const result = {
+        animationDuration: probeStyle.animationDuration,
+        animationIterationCount: probeStyle.animationIterationCount,
+        transitionDuration: probeStyle.transitionDuration,
+        scrollBehavior: htmlStyle.scrollBehavior,
+      };
+      document.documentElement.style.scrollBehavior = previousScrollBehavior;
+      probe.remove();
+      return result;
+    });
+    assert.equal(reducedMotion.animationDuration, "0.01ms");
+    assert.equal(reducedMotion.animationIterationCount, "1");
+    assert.equal(reducedMotion.transitionDuration, "0.01ms");
+    assert.equal(reducedMotion.scrollBehavior, "auto");
+    evidence.push(
+      `${locale}: reduced-motion media query stops repeated animation, shortens transitions and disables smooth scrolling`,
+    );
     const searchTrigger = page
       .getByRole("banner")
       .getByRole("link", { name: dictionary.nav.search, exact: true });

@@ -177,11 +177,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced-motion accessibility override must beat component scrolling rules. */
+    scroll-behavior: auto !important;
+  }
+
   *,
   *::before,
   *::after {
     /* biome-ignore lint/complexity/noImportantStyles: reduced-motion accessibility override must beat component animation rules. */
     animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: infinite decorative animation must not keep cycling for reduced-motion users. */
+    animation-iteration-count: 1 !important;
     /* biome-ignore lint/complexity/noImportantStyles: reduced-motion accessibility override must beat component transition rules. */
     transition-duration: 0.01ms !important;
   }
