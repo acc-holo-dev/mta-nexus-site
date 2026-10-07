@@ -209,8 +209,10 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   проверку; active/expired session listing проверяется через реальный PostgreSQL
   repository contract, GET/DELETE session-management и password-change route —
   через HTTP behavior tests без чтения route source. Устаревший
-  `account-security-surface.test.ts` удалён; оставшиеся source-surface тесты
-  сокращать по мере изменения функций;
+  `account-security-surface.test.ts` удалён; PWA/Web Push surface tests теперь
+  исполняют реальный service-worker source в изолированном VM и проверяют
+  cache/offline/push/click поведение вместо совпадения строк. Оставшиеся
+  source-surface тесты сокращать по мере изменения функций;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере

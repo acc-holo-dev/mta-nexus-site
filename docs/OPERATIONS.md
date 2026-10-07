@@ -469,7 +469,8 @@ Validate production configuration without deploying publicly:
 - PostgreSQL and ClamAV are not publicly exposed;
 - Caddy/TLS edge headers remain fail-closed;
 - backup and restore tooling works against production-shaped configuration;
-- recovery/email configuration is explicit before claiming delivery is operational.
+- recovery/email configuration is explicit before claiming delivery is operational;
+- optional Web Push VAPID configuration is either fully absent or contains a valid public P-256 key, private P-256 scalar and `mailto:`/HTTPS subject together; production Compose must pass the triplet without exposing the private key in logs or client payloads.
 
 Acceptance: production startup/restart test passes in an isolated production-shaped environment.
 
