@@ -92,6 +92,43 @@ async function afterLockWait(a: Account, mode: Mode, invalidate: (tx: Tx) => Pro
   if (!result.ok) expect(result.error).toBeInstanceOf(UnauthorizedError);
 }
 
+describe("session listing behavior", () => {
+  it("returns active metadata only and never exposes session tokens", async () => {
+    const a = await account();
+    const third = await sessionRepository.findValidSession(a.thirdToken);
+    if (!third) throw new Error("Third synthetic session is unavailable");
+
+    const expiredId = generateId("ses");
+    await sessionRepository.create({
+      id: expiredId,
+      userId: a.userId,
+      token: generateSessionToken(),
+      expiresAt: new Date(Date.now() - 60_000),
+      ipAddress: "203.0.113.50",
+      userAgent: "expired-session-fixture",
+    });
+
+    const listed = await sessionRepository.listByUser(a.userId);
+    expect(listed.map((session) => session.id).sort()).toEqual(
+      [a.currentId, a.sessionId, third.session.id].sort(),
+    );
+    expect(listed.some((session) => session.id === expiredId)).toBe(false);
+
+    for (const session of listed) {
+      expect(session.expiresAt.getTime()).toBeGreaterThan(Date.now());
+      expect("token" in session).toBe(false);
+      expect("userId" in session).toBe(false);
+      expect(Object.keys(session).sort()).toEqual([
+        "createdAt",
+        "expiresAt",
+        "id",
+        "ipAddress",
+        "userAgent",
+      ]);
+    }
+  });
+});
+
 describe("manual session revocation transaction", () => {
   it("ends only the selected session, records one safe audit, and does not audit a replay", async () => {
     const a = await account();

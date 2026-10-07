@@ -12,10 +12,6 @@ describe("account security API", () => {
     expect(route).toContain("The current session cannot be revoked");
     expect(route).not.toContain("session.token");
   });
-  it("excludes expired sessions from the active-session list", () => {
-    const sessions = readFileSync(resolve(process.cwd(), "packages/db/src/repositories/sessions.ts"), "utf8");
-    expect(sessions).toContain("gt(sessions.expiresAt, new Date())");
-  });
   it("requires the current password and delegates the atomic credential change", () => {
     const route = readFileSync(resolve(process.cwd(), "apps/web/src/app/api/auth/password/route.ts"), "utf8");
     const service = readFileSync(resolve(process.cwd(), "apps/web/src/lib/services/auth-service.ts"), "utf8");
