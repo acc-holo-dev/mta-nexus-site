@@ -159,6 +159,19 @@ phase=https-home
 "${https[@]}" --fail "https://$domain:8443/" > "$work/home.html"
 grep -qi '<html' "$work/home.html"
 
+phase=offline-cache-policy
+"${https[@]}" --fail --dump-header "$work/offline-guest.headers" \
+  "https://$domain:8443/privacy" -o "$work/offline-guest.html"
+grep -qi '^x-nexus-offline-cache: public-readonly-v1' "$work/offline-guest.headers"
+grep -qi '^vary:.*cookie' "$work/offline-guest.headers"
+"${https[@]}" --fail --dump-header "$work/offline-session.headers" \
+  -H 'Cookie: nexus_session=invalid-smoke-token; nexus_locale=en' \
+  "https://$domain:8443/privacy" -o "$work/offline-session.html"
+if grep -qi '^x-nexus-offline-cache:' "$work/offline-session.headers"; then
+  echo 'FAIL: session-bearing public page was marked for offline document caching' >&2
+  exit 1
+fi
+
 # The shared SQL helper remains available to browser fixtures in light mode.
 sql() { "${pc[@]}" exec -T postgres psql -X -v ON_ERROR_STOP=1 -U nexus -d mta_nexus -Atc "$1"; }
 [[ $(sql 'SELECT count(*) FROM drizzle.__drizzle_migrations') -gt 0 ]]

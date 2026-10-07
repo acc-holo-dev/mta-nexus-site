@@ -79,6 +79,14 @@ test('live smoke checks both sides of the declared upload boundary', () => {
   assert.match(source, /\[\[ \$oversized_code == 413 \]\]/u);
 });
 
+test('production smoke proves offline-cache opt-in disappears when a session cookie is present', () => {
+  const source = readFileSync('scripts/check-production-startup.sh', 'utf8');
+  assert.match(source, /offline-cache-policy/u);
+  assert.match(source, /x-nexus-offline-cache: public-readonly-v1/ui);
+  assert.match(source, /Cookie: nexus_session=invalid-smoke-token/u);
+  assert.match(source, /session-bearing public page was marked for offline document caching/u);
+});
+
 test('browser-only acceptance resolves the disposable origin for Node without disabling TLS verification', () => {
   const startup = readFileSync('scripts/check-production-startup.sh', 'utf8');
   const playwright = readFileSync('playwright.ci.config.mjs', 'utf8');
