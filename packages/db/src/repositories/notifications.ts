@@ -133,6 +133,7 @@ export class NotificationRepository {
   ): Promise<{
     notification: Notification | null;
     pushJobs: number;
+    pushQueueState: "queued" | "no_subscriptions" | "saturated" | "error";
   }> {
     const preferences = await this.getPreferences(data.recipientId);
     const category = data.category ?? (
@@ -160,7 +161,11 @@ export class NotificationRepository {
                 : null;
 
     if (preferenceKey && !preferences[preferenceKey]) {
-      return { notification: null, pushJobs: 0 };
+      return {
+        notification: null,
+        pushJobs: 0,
+        pushQueueState: "no_subscriptions",
+      };
     }
 
     return await db.transaction(async (tx) => {
@@ -181,14 +186,21 @@ export class NotificationRepository {
       }
 
       let pushJobs = 0;
+      let pushQueueState:
+        | "queued"
+        | "no_subscriptions"
+        | "saturated"
+        | "error" = "error";
       try {
-        pushJobs = await tx.transaction((pushTx) =>
+        const queued = await tx.transaction((pushTx) =>
           enqueueWebPushOutboxForNotification(
             pushTx,
             row.id,
             row.recipientId,
           ),
         );
+        pushJobs = queued.queued;
+        pushQueueState = queued.reason;
       } catch {
         // Inbox is authoritative. A queue-local failure rolls back only
         // the savepoint and must not erase a successfully stored notification.
@@ -197,6 +209,7 @@ export class NotificationRepository {
       return {
         notification: row as unknown as Notification,
         pushJobs,
+        pushQueueState,
       };
     });
   }

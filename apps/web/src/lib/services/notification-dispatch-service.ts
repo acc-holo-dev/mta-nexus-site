@@ -14,6 +14,7 @@ export type NotificationDispatchSummary = {
   stored: number;
   storageFailed: number;
   pushQueued: number;
+  pushQueueDegraded: number;
 };
 
 export async function dispatchNotificationsBestEffort(
@@ -30,10 +31,18 @@ export async function dispatchNotificationsBestEffort(
 
   let stored = 0;
   let pushQueued = 0;
+  let pushQueueDegraded = 0;
   for (const delivery of deliveries) {
     if (delivery.status !== "fulfilled") continue;
     if (delivery.value.notification) stored += 1;
     pushQueued += delivery.value.pushJobs;
+    if (
+      delivery.value.notification &&
+      (delivery.value.pushQueueState === "saturated" ||
+        delivery.value.pushQueueState === "error")
+    ) {
+      pushQueueDegraded += 1;
+    }
   }
 
   return {
@@ -43,5 +52,6 @@ export async function dispatchNotificationsBestEffort(
       (delivery) => delivery.status === "rejected",
     ).length,
     pushQueued,
+    pushQueueDegraded,
   };
 }

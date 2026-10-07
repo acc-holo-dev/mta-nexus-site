@@ -13,6 +13,11 @@ type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export const WEB_PUSH_OUTBOX_TTL_HOURS = 24;
 export const WEB_PUSH_OUTBOX_MAX_ACTIVE_SUBSCRIPTIONS = 64;
 
+export type WebPushOutboxEnqueueResult = Readonly<{
+  queued: number;
+  reason: "queued" | "no_subscriptions" | "saturated";
+}>;
+
 export type WebPushOutboxQueueStats = Readonly<{
   pending: number;
   due: number;
@@ -25,7 +30,7 @@ export async function enqueueWebPushOutboxForNotification(
   tx: Tx,
   notificationId: string,
   recipientId: string,
-): Promise<number> {
+): Promise<WebPushOutboxEnqueueResult> {
   const subscriptions = await tx
     .select({ id: webPushSubscriptions.id })
     .from(webPushSubscriptions)
@@ -43,7 +48,12 @@ export async function enqueueWebPushOutboxForNotification(
     .orderBy(webPushSubscriptions.createdAt, webPushSubscriptions.id)
     .limit(WEB_PUSH_OUTBOX_MAX_ACTIVE_SUBSCRIPTIONS);
 
-  if (subscriptions.length === 0) return 0;
+  if (subscriptions.length === 0) {
+    return Object.freeze({
+      queued: 0,
+      reason: "no_subscriptions" as const,
+    });
+  }
 
   const [gate] = await tx
     .select()
@@ -58,7 +68,10 @@ export async function enqueueWebPushOutboxForNotification(
     .where(gt(webPushOutbox.expiresAt, sql`clock_timestamp()`));
 
   if (current.total + subscriptions.length > gate.capacity) {
-    return 0;
+    return Object.freeze({
+      queued: 0,
+      reason: "saturated" as const,
+    });
   }
 
   const rows = subscriptions.map((subscription) => ({
@@ -82,7 +95,10 @@ export async function enqueueWebPushOutboxForNotification(
     })
     .returning({ id: webPushOutbox.id });
 
-  return inserted.length;
+  return Object.freeze({
+    queued: inserted.length,
+    reason: "queued" as const,
+  });
 }
 
 export class WebPushOutboxRepository {
