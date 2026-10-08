@@ -329,7 +329,11 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   experience source checks также удалены: live authority/management проверяют
   SSR behavior suites, create/update/follow/claim — confirmation parsers, а
   server client requests используют единый tested private API policy
-  (`same-origin`, `no-store`, bounded timeout/caller abort);
+  (`same-origin`, `no-store`, bounded timeout/caller abort). Generic
+  client-mutation source inspection удалён: server/admin confirmations уже
+  имеют dedicated behavior tests, notification preferences теперь имеют
+  colocated canonical parser/confirmation suite, а private cache headers
+  проверяются прямыми HTTP assertions;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере
