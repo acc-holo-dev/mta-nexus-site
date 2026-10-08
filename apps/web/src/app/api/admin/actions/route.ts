@@ -1,4 +1,5 @@
 import { after, type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { AppError } from "@nexus/domain";
 import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";
@@ -33,6 +34,7 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
 ]);
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -221,7 +223,13 @@ export async function POST(request: NextRequest) {
         error.statusCode ,
       );
     }
-    console.error("Admin action error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "admin.action_failed",
+      context,
+      status: 500,
+      error,
+    });
     return json({ error: "Failed to execute administrative action" }, 500 );
   }
 }

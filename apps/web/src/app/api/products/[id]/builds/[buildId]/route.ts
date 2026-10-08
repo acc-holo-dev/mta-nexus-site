@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../../../lib/observability";
 import { z } from "zod";
 import { AppError } from "@nexus/domain";
 import { authService } from "../../../../../../lib/services/auth-service";
@@ -25,6 +26,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; buildId: string }> }
 ) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const actor = await authService.getSession(token);
@@ -53,7 +55,13 @@ export async function PATCH(
         error.statusCode 
       );
     }
-    console.error("Build lifecycle error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "product.build_lifecycle_failed",
+      context,
+      status: 500,
+      error,
+    });
     return json({ error: "Could not update build lifecycle" }, 500 );
   }
 }

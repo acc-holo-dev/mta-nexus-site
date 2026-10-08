@@ -22,46 +22,9 @@
   },
   "overrides": [
     {
-      "name": "obs-001-structured-api-logging",
+      "name": "structured-api-logging",
       "includes": [
-        "apps/web/src/app/api/auth/login/route.ts",
-        "apps/web/src/app/api/auth/password-reset/route.ts",
-        "apps/web/src/app/api/products/[id]/builds/route.ts",
-        "apps/web/src/app/api/reports/route.ts",
-        "apps/web/src/app/api/servers/directory/route.ts",
-        "apps/web/src/app/api/health/route.ts"
-      ],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noConsole": "error"
-          }
-        }
-      }
-    },
-    {
-      "name": "structured-auth-notification-api-logging",
-      "includes": [
-        "apps/web/src/app/api/auth/**",
-        "apps/web/src/app/api/notifications/**"
-      ],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noConsole": "error"
-          }
-        }
-      }
-    },
-    {
-      "name": "structured-content-social-server-api-logging",
-      "includes": [
-        "apps/web/src/app/api/content/**",
-        "apps/web/src/app/api/follow/route.ts",
-        "apps/web/src/app/api/mta/**",
-        "apps/web/src/app/api/resources/**",
-        "apps/web/src/app/api/servers/**",
-        "apps/web/src/app/api/verification/route.ts"
+        "apps/web/src/app/api/**"
       ],
       "linter": {
         "rules": {

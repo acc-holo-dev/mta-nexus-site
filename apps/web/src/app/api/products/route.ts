@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
 import type { z } from "zod";
 import { productService } from "../../../lib/services/product-service";
 import { authService } from "../../../lib/services/auth-service";
@@ -77,6 +78,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -172,7 +174,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Resource creation error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "product.create_failed",
+      context,
+      status: 500,
+      error,
+    });
     return privateJson(
       {
         error: "Could not create resource",

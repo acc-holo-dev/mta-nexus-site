@@ -1,4 +1,5 @@
 import { ValidationError } from "@nexus/domain";
+import { createRequestLogContext, logRequestEvent } from "../../../../../../lib/observability";
 import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
@@ -142,7 +143,13 @@ export async function GET(
         { status: 404, headers: privateHeaders },
       );
     }
-    console.error("Reviewer build download error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "admin.build_download_failed",
+      context,
+      status: 500,
+      error,
+    });
     return NextResponse.json(
       { error: "Could not deliver reviewer artifact" },
       { status: 500, headers: privateHeaders },

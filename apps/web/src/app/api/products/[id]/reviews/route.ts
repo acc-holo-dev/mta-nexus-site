@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../../lib/observability";
 import { authService } from "../../../../../lib/services/auth-service";
 import {
   contentRepository,
@@ -39,6 +40,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const context = createRequestLogContext(request);
   try {
     const { id: productId } = await params;
     const token = request.cookies.get("nexus_session")?.value;
@@ -147,7 +149,13 @@ export async function POST(
       );
     }
 
-    console.error("Review submission error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "product.review_submit_failed",
+      context,
+      status: 500,
+      error,
+    });
     return privateJson({ error: "Failed to submit review" }, 500 );
   }
 }

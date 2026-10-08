@@ -1,4 +1,5 @@
 import {
+import { createRequestLogContext, logRequestEvent } from "../../../../../lib/observability";
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
 } from "../../../../../lib/build-download-metadata";
@@ -154,7 +155,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         { status: 404, headers: privateHeaders },
       );
     }
-    console.error("Download error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "product.download_failed",
+      context,
+      status: 500,
+      error,
+    });
     return NextResponse.json(
       { error: "Failed to deliver resource build" },
       { status: 500, headers: privateHeaders },

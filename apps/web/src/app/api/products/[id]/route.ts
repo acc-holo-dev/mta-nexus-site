@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { editProductDetailsSchema } from "@nexus/validation";
@@ -35,6 +36,7 @@ function privateJson(body: unknown, status = 200) {
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const context = createRequestLogContext(request);
   try {
     const actor = await authService.getSession(request.cookies.get("nexus_session")?.value);
     if (!actor) return privateJson({ code: "UNAUTHORIZED" }, 401);
@@ -65,7 +67,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       description: product.description, tags: product.tags, updatedAt: product.updatedAt } });
   } catch (error) {
     if (error instanceof AppError) return privateJson({ code: error.code }, error.statusCode);
-    console.error("Product details update failed:", error);
+    logRequestEvent({
+      level: "error",
+      event: "product.update_failed",
+      context,
+      status: 500,
+      error,
+    });
     return privateJson({ code: "RESOURCE_UPDATE_FAILED" }, 500);
   }
 }
