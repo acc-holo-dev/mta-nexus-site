@@ -164,13 +164,14 @@ export class SupportCaseRepository {
     id: string,
     status: SupportCaseStatus,
     audit: Omit<AuditEvent, "createdAt">,
+    expectedStatus?: SupportCaseStatus,
   ): Promise<SupportCase | null> {
     return db.transaction(async (tx) => {
       const now = new Date();
       const [updated] = await tx
         .update(supportCases)
         .set({ status, updatedAt: now })
-        .where(eq(supportCases.id, id))
+        .where(expectedStatus === undefined ? eq(supportCases.id, id) : and(eq(supportCases.id, id), eq(supportCases.status, expectedStatus)))
         .returning();
       if (!updated) return null;
 
