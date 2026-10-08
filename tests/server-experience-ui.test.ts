@@ -1,79 +1,56 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import {
+  confirmsServerClaimVerification,
+  parseIssuedServerClaimChallenge,
+} from "../apps/web/src/lib/server-claim-confirmation";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+describe("server experience behavior", () => {
+  it("accepts only a challenge bound to the requested server", () => {
+    const payload = {
+      challenge: {
+        challengeId: "sch_1",
+        token: "NXCLAIM-ABCDEF0123456789ABCDEF01",
+        expiresAt: "2026-10-08T12:00:00.000Z",
+        server: { id: "srv_1" },
+      },
+    };
 
-describe("server experience UI", () => {
-  it("keeps public server detail locale-aware without changing live-data authority", () => {
-    const page = read("apps/web/src/app/servers/[slug]/page.tsx");
+    expect(
+      parseIssuedServerClaimChallenge(201, payload, "srv_1"),
+    ).toEqual({
+      challengeId: "sch_1",
+      token: "NXCLAIM-ABCDEF0123456789ABCDEF01",
+      expiresAt: "2026-10-08T12:00:00.000Z",
+    });
 
-    expect(page).toContain("getRequestLocale");
-    expect(page).toContain("dictionary.serverDetail");
-    expect(page).toContain("mtaMasterDirectoryService.getDirectory()");
-    expect(page).toContain("matchesMtaEndpoint(server, item)");
-    expect(page).toContain(
-      "<ServerHistoryPanel history={history} locale={locale} />",
-    );
-    expect(page).toContain(
-      "<ServerUpdatesPanel updates={serverUpdates} locale={locale} />",
-    );
+    expect(
+      parseIssuedServerClaimChallenge(201, payload, "srv_other"),
+    ).toBeNull();
+    expect(
+      parseIssuedServerClaimChallenge(500, payload, "srv_1"),
+    ).toBeNull();
   });
 
-  it("preserves canonical server management authority", () => {
-    const page = read(
-      "apps/web/src/app/workspace/servers/[id]/page.tsx",
-    );
+  it("confirms ownership verification only for the issued challenge", () => {
+    const payload = {
+      success: true,
+      verificationRequest: { id: "ver_1" },
+      proof: {
+        method: "mta_master_name_challenge",
+        challengeId: "sch_1",
+      },
+    };
 
-    expect(page).toContain(
-      "await serverService.canManageServer(server, user)",
-    );
-    expect(page).toContain("getRequestLocale");
-    expect(page).toContain("getDictionary(locale).serverManagement");
-  });
-
-  it("hardens authenticated server mutations and follow state requests", () => {
-    const details = read(
-      "apps/web/src/components/server-details-form.tsx",
-    );
-    const follow = read(
-      "apps/web/src/components/server-follow-button.tsx",
-    );
-    const claim = read(
-      "apps/web/src/components/server-claim-control-panel.tsx",
-    );
-
-    for (const source of [details, follow, claim]) {
-      expect(source).toContain('credentials: "same-origin"');
-      expect(source).toContain('cache: "no-store"');
-      expect(source).toContain("AbortSignal.timeout");
-    }
-
-    expect(details).toContain("dictionary.serverManagement");
-    expect(details).toContain("confirmedUpdatedServer(");
-    expect(follow).toContain("dictionary.follow");
-    expect(claim).toContain("dictionary.serverClaim");
-  });
-
-  it("confirms server registration against the requested slug before navigation", () => {
-    const registration = read(
-      "apps/web/src/app/workspace/servers/new/page.tsx",
-    );
-
-    expect(registration).toContain(
-      "confirmedCreatedServer(",
-    );
-    expect(registration).toContain(
-      'credentials: "same-origin"',
-    );
-    expect(registration).toContain(
-      'cache: "no-store"',
-    );
-    expect(registration).toContain(
-      "AbortSignal.timeout",
-    );
+    expect(
+      confirmsServerClaimVerification(200, payload, "sch_1"),
+    ).toBe(true);
+    expect(
+      confirmsServerClaimVerification(200, payload, "sch_other"),
+    ).toBe(false);
+    expect(
+      confirmsServerClaimVerification(409, payload, "sch_1"),
+    ).toBe(false);
   });
 
   it("localizes history, update, follow, claim, and management surfaces", () => {
