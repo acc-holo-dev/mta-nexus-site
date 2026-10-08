@@ -19,7 +19,7 @@ test.afterAll(async () => {
   const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
   await mkdir(output, { recursive: true });
   await writeFile(join(output, "shell-results.json"), JSON.stringify({ commit: process.env.GITHUB_SHA, results: evidence,
-    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/image names, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification." }, null, 2));
+    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, logical tabindex order, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification." }, null, 2));
   await writeFile(join(output, "shell-summary.md"), ["# Keyboard, mobile and locale acceptance", "", ...evidence.map((value) => `- PASS: ${value}`), ""].join("\n"));
 });
 
@@ -94,12 +94,42 @@ async function assertBasicAccessibleNames(page, label) {
       })
       .map((button) => button.outerHTML.slice(0, 180));
 
+    const unnamedLinks = [...document.querySelectorAll("a[href]")]
+      .filter(visible)
+      .filter((link) => {
+        if (link.getAttribute("aria-label")?.trim()) return false;
+        if (link.getAttribute("aria-labelledby")?.trim()) return false;
+        if (link.getAttribute("title")?.trim()) return false;
+        if (link.textContent?.trim()) return false;
+        if (
+          [...link.querySelectorAll("img[alt]")].some((image) =>
+            image.getAttribute("alt")?.trim(),
+          )
+        ) {
+          return false;
+        }
+        return !link.querySelector("[aria-label]");
+      })
+      .map((link) => link.outerHTML.slice(0, 180));
+
     const imagesWithoutAlt = [...document.querySelectorAll("img")]
       .filter(visible)
       .filter((image) => !image.hasAttribute("alt"))
       .map((image) => image.outerHTML.slice(0, 180));
 
-    return { unnamedButtons, imagesWithoutAlt };
+    const positiveTabIndex = [
+      ...document.querySelectorAll("[tabindex]"),
+    ]
+      .filter(visible)
+      .filter((element) => element.tabIndex > 0)
+      .map((element) => element.outerHTML.slice(0, 180));
+
+    return {
+      unnamedButtons,
+      unnamedLinks,
+      imagesWithoutAlt,
+      positiveTabIndex,
+    };
   });
 
   assert.deepEqual(
@@ -108,9 +138,19 @@ async function assertBasicAccessibleNames(page, label) {
     `${label}: visible buttons without accessible names`,
   );
   assert.deepEqual(
+    result.unnamedLinks,
+    [],
+    `${label}: visible links without accessible names`,
+  );
+  assert.deepEqual(
     result.imagesWithoutAlt,
     [],
     `${label}: visible images without alt attributes`,
+  );
+  assert.deepEqual(
+    result.positiveTabIndex,
+    [],
+    `${label}: positive tabindex must not override logical focus order`,
   );
 }
 
