@@ -23,6 +23,16 @@ export type SupportMessageData = {
 export type SupportThreadData = {
   supportCase: SupportCaseData;
   messages: SupportMessageData[];
+  messagePage: number;
+  messageTotalPages: number;
+  messageTotal: number;
+};
+
+export type SupportCasePage = {
+  cases: SupportCaseSummary[];
+  page: number;
+  totalPages: number;
+  total: number;
 };
 
 const caseIdPattern = /^sup_[a-f0-9]{24}$/;
@@ -83,6 +93,45 @@ function parseMessage(value: unknown, caseId: string): SupportMessageData | null
   };
 }
 
+function parsePositiveInteger(value: unknown): number | null {
+  return typeof value === "number" &&
+    Number.isSafeInteger(value) &&
+    value >= 0
+    ? value
+    : null;
+}
+
+export function parseSupportCasePage(payload: unknown): SupportCasePage | null {
+  if (
+    !isRecord(payload) ||
+    !Array.isArray(payload.cases) ||
+    payload.cases.length > 100
+  ) {
+    return null;
+  }
+  const page = parsePositiveInteger(payload.page);
+  const totalPages = parsePositiveInteger(payload.totalPages);
+  const total = parsePositiveInteger(payload.total);
+  if (
+    page === null ||
+    page < 1 ||
+    totalPages === null ||
+    totalPages < 1 ||
+    total === null ||
+    page > totalPages
+  ) {
+    return null;
+  }
+
+  const cases: SupportCaseSummary[] = [];
+  for (const row of payload.cases) {
+    const supportCase = parseSummary(row);
+    if (!supportCase) return null;
+    cases.push(supportCase);
+  }
+  return { cases, page, totalPages, total };
+}
+
 export function parseSupportCaseList(payload: unknown): SupportCaseSummary[] | null {
   if (!isRecord(payload) || !Array.isArray(payload.cases) || payload.cases.length > 100) return null;
   const cases: SupportCaseSummary[] = [];
@@ -95,16 +144,42 @@ export function parseSupportCaseList(payload: unknown): SupportCaseSummary[] | n
 }
 
 export function parseSupportThread(payload: unknown, caseId: string): SupportThreadData | null {
-  if (!caseIdPattern.test(caseId) || !isRecord(payload) || !Array.isArray(payload.messages)) return null;
+  if (
+    !caseIdPattern.test(caseId) ||
+    !isRecord(payload) ||
+    !Array.isArray(payload.messages) ||
+    payload.messages.length > 100
+  ) {
+    return null;
+  }
   const supportCase = parseCase(payload.supportCase);
   if (!supportCase || supportCase.id !== caseId) return null;
+  const messagePage = parsePositiveInteger(payload.messagePage);
+  const messageTotalPages = parsePositiveInteger(payload.messageTotalPages);
+  const messageTotal = parsePositiveInteger(payload.messageTotal);
+  if (
+    messagePage === null ||
+    messagePage < 1 ||
+    messageTotalPages === null ||
+    messageTotalPages < 1 ||
+    messageTotal === null ||
+    messagePage > messageTotalPages
+  ) {
+    return null;
+  }
   const messages: SupportMessageData[] = [];
   for (const row of payload.messages) {
     const message = parseMessage(row, caseId);
     if (!message) return null;
     messages.push(message);
   }
-  return { supportCase, messages };
+  return {
+    supportCase,
+    messages,
+    messagePage,
+    messageTotalPages,
+    messageTotal,
+  };
 }
 
 export function confirmSupportCaseCreated(

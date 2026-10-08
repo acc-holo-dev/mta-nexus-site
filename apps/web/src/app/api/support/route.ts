@@ -10,6 +10,12 @@ import {
 } from "../../../lib/observability";
 import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
+function parsePage(value: string | null): number {
+  return value && /^[1-9]\d{0,6}$/u.test(value)
+    ? Number(value)
+    : 1;
+}
+
 function privateJson(
   context: Parameters<typeof jsonWithRequestId>[0],
   body: unknown,
@@ -41,18 +47,30 @@ export async function GET(request: NextRequest) {
         return privateJson(context, { error: "Forbidden" }, { status: 403 });
       }
 
-      const rows = await supportCaseRepository.listStaff();
+      const result = await supportCaseRepository.pageStaff(
+        parsePage(request.nextUrl.searchParams.get("page")),
+      );
       return privateJson(context, {
-        cases: rows.map((row) => ({
+        cases: result.items.map((row) => ({
           ...row.supportCase,
           requesterUsername: row.requesterUsername,
           requesterDisplayName: row.requesterDisplayName,
         })),
+        page: result.page,
+        totalPages: result.totalPages,
+        total: result.total,
       });
     }
 
+    const result = await supportCaseRepository.pageByRequester(
+      user.id,
+      parsePage(request.nextUrl.searchParams.get("page")),
+    );
     return privateJson(context, {
-      cases: await supportCaseRepository.listByRequester(user.id),
+      cases: result.items,
+      page: result.page,
+      totalPages: result.totalPages,
+      total: result.total,
     });
   } catch (error) {
     logRequestEvent({

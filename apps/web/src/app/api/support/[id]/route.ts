@@ -13,6 +13,12 @@ import {
 } from "../../../../lib/observability";
 import { dispatchNotificationsBestEffort } from "../../../../lib/services/notification-dispatch-service";
 
+function parsePage(value: string | null): number {
+  return value && /^[1-9]\d{0,6}$/u.test(value)
+    ? Number(value)
+    : 1;
+}
+
 function privateJson(
   context: Parameters<typeof jsonWithRequestId>[0],
   body: unknown,
@@ -73,9 +79,16 @@ export async function GET(
       );
     }
 
+    const messages = await supportCaseRepository.pageMessages(
+      id,
+      parsePage(request.nextUrl.searchParams.get("messagePage")),
+    );
     return privateJson(context, {
       supportCase: access.supportCase,
-      messages: await supportCaseRepository.listMessages(id),
+      messages: messages.items,
+      messagePage: messages.page,
+      messageTotalPages: messages.totalPages,
+      messageTotal: messages.total,
       staff: access.staff,
     });
   } catch (error) {

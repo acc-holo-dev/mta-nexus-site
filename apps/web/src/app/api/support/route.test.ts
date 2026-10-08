@@ -9,10 +9,10 @@ const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   can: vi.fn(),
   rate: vi.fn(),
-  listByRequester: vi.fn(),
-  listStaff: vi.fn(),
+  pageByRequester: vi.fn(),
+  pageStaff: vi.fn(),
   findById: vi.fn(),
-  listMessages: vi.fn(),
+  pageMessages: vi.fn(),
   createWithInitialMessage: vi.fn(),
   addMessage: vi.fn(),
   updateStatus: vi.fn(),
@@ -43,10 +43,10 @@ vi.mock("@nexus/security", () => ({
 
 vi.mock("@nexus/db", () => ({
   supportCaseRepository: {
-    listByRequester: mocks.listByRequester,
-    listStaff: mocks.listStaff,
+    pageByRequester: mocks.pageByRequester,
+    pageStaff: mocks.pageStaff,
     findById: mocks.findById,
-    listMessages: mocks.listMessages,
+    pageMessages: mocks.pageMessages,
     createWithInitialMessage: mocks.createWithInitialMessage,
     addMessage: mocks.addMessage,
     updateStatus: mocks.updateStatus,
@@ -83,10 +83,28 @@ beforeEach(() => {
   mocks.session.mockResolvedValue(null);
   mocks.can.mockReturnValue(false);
   mocks.rate.mockResolvedValue({ success: true });
-  mocks.listByRequester.mockResolvedValue([]);
-  mocks.listStaff.mockResolvedValue([]);
+  mocks.pageByRequester.mockResolvedValue({
+    items: [],
+    page: 1,
+    pageSize: 25,
+    total: 0,
+    totalPages: 1,
+  });
+  mocks.pageStaff.mockResolvedValue({
+    items: [],
+    page: 1,
+    pageSize: 25,
+    total: 0,
+    totalPages: 1,
+  });
   mocks.findById.mockResolvedValue(null);
-  mocks.listMessages.mockResolvedValue([]);
+  mocks.pageMessages.mockResolvedValue({
+    items: [],
+    page: 1,
+    pageSize: 100,
+    total: 0,
+    totalPages: 1,
+  });
   mocks.createWithInitialMessage.mockResolvedValue({
     id: caseId,
     requesterId: "usr_member",
@@ -116,11 +134,11 @@ describe("support HTTP authorization and privacy", () => {
     expectPrivate(denied);
 
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
-    mocks.listByRequester.mockResolvedValue([{ id: caseId }]);
+    mocks.pageByRequester.mockResolvedValue([{ id: caseId }]);
     const allowed = await listCases(request);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
-    expect(mocks.listByRequester).toHaveBeenCalledWith("usr_member");
+    expect(mocks.pageByRequester).toHaveBeenCalledWith("usr_member", 1);
   });
 
   it("requires moderation capability for the staff queue", async () => {
@@ -130,10 +148,10 @@ describe("support HTTP authorization and privacy", () => {
     const denied = await listCases(request);
     expect(denied.status).toBe(403);
     expectPrivate(denied);
-    expect(mocks.listStaff).not.toHaveBeenCalled();
+    expect(mocks.pageStaff).not.toHaveBeenCalled();
 
     mocks.can.mockReturnValue(true);
-    mocks.listStaff.mockResolvedValue([
+    mocks.pageStaff.mockResolvedValue([
       {
         supportCase: { id: caseId, requesterId: "usr_other" },
         requesterUsername: "other",
@@ -143,7 +161,7 @@ describe("support HTTP authorization and privacy", () => {
     const allowed = await listCases(request);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
-    expect(mocks.listStaff).toHaveBeenCalledOnce();
+    expect(mocks.pageStaff).toHaveBeenCalledWith(1);
   });
 
   it("does not expose another user's thread unless the viewer is staff", async () => {
@@ -158,14 +176,14 @@ describe("support HTTP authorization and privacy", () => {
     const hidden = await getCase(request, params);
     expect(hidden.status).toBe(404);
     expectPrivate(hidden);
-    expect(mocks.listMessages).not.toHaveBeenCalled();
+    expect(mocks.pageMessages).not.toHaveBeenCalled();
 
     mocks.can.mockReturnValue(true);
-    mocks.listMessages.mockResolvedValue([{ id: "spm_1", body: "private" }]);
+    mocks.pageMessages.mockResolvedValue([{ id: "spm_1", body: "private" }]);
     const allowed = await getCase(request, params);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
-    expect(mocks.listMessages).toHaveBeenCalledWith(caseId);
+    expect(mocks.pageMessages).toHaveBeenCalledWith(caseId, 1);
   });
 
   it("rejects client-forged related entity context before persistence", async () => {

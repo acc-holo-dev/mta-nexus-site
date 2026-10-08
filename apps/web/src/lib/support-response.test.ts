@@ -5,6 +5,7 @@ import {
   confirmSupportReply,
   confirmSupportStatusChanged,
   parseSupportCaseList,
+  parseSupportCasePage,
   parseSupportThread,
 } from "./support-response";
 
@@ -12,6 +13,12 @@ const caseId = "sup_" + "a".repeat(24);
 const anotherId = "sup_" + "b".repeat(24);
 const messageId = "spm_" + "c".repeat(24);
 const timestamp = "2026-10-08T05:00:00.000Z";
+const pageMeta = { page: 1, totalPages: 1, total: 1 };
+const messageMeta = {
+  messagePage: 1,
+  messageTotalPages: 1,
+  messageTotal: 1,
+};
 const supportCase = {
   id: caseId,
   category: "account",
@@ -32,10 +39,26 @@ describe("support API client confirmations", () => {
     assert.deepEqual(parseSupportCaseList({ cases: [{ ...supportCase, requesterUsername: "alice", requesterId: "hidden" }] }), [
       { ...supportCase, requesterUsername: "alice" },
     ]);
-    assert.deepEqual(parseSupportThread({ supportCase, messages: [{ ...message, authorId: "hidden" }] }, caseId), {
-      supportCase: { id: caseId, category: "account", subject: "Account access", status: "open" },
-      messages: [message],
-    });
+    assert.deepEqual(
+      parseSupportThread(
+        {
+          supportCase,
+          messages: [{ ...message, authorId: "hidden" }],
+          ...messageMeta,
+        },
+        caseId,
+      ),
+      {
+        supportCase: {
+          id: caseId,
+          category: "account",
+          subject: "Account access",
+          status: "open",
+        },
+        messages: [message],
+        ...messageMeta,
+      },
+    );
   });
 
   it("rejects invalid dates, malformed identifiers and incomplete payloads before UI rendering", () => {
@@ -43,10 +66,10 @@ describe("support API client confirmations", () => {
     assert.equal(parseSupportCaseList({ cases: [{ ...supportCase, updatedAt: "2026-02-31T05:00:00.000Z" }] }), null);
     assert.equal(parseSupportCaseList({ cases: Array.from({ length: 101 }, () => supportCase) }), null);
     assert.equal(parseSupportCaseList({ cases: [{ ...supportCase, id: "../other" }] }), null);
-    assert.equal(parseSupportThread({ supportCase: { ...supportCase, id: anotherId }, messages: [] }, caseId), null);
-    assert.equal(parseSupportThread({ supportCase, messages: [{ ...message, caseId: anotherId }] }, caseId), null);
-    assert.equal(parseSupportThread({ supportCase, messages: [{ ...message, createdAt: "not-a-date" }] }, caseId), null);
-    assert.equal(parseSupportThread({ supportCase, messages: [{ ...message, body: "X".repeat(4001) }] }, caseId), null);
+    assert.equal(parseSupportThread({ supportCase: { ...supportCase, id: anotherId }, messages: [], ...messageMeta }, caseId), null);
+    assert.equal(parseSupportThread({ supportCase, messages: [{ ...message, caseId: anotherId }], ...messageMeta }, caseId), null);
+    assert.equal(parseSupportThread({ supportCase, messages: [{ ...message, createdAt: "not-a-date" }], ...messageMeta }, caseId), null);
+    assert.equal(parseSupportThread({ supportCase, messages: [{ ...message, body: "X".repeat(4001) }], ...messageMeta }, caseId), null);
   });
 
   it("only confirms a created ticket after HTTP 201 and exact category, subject and id", () => {
@@ -82,5 +105,57 @@ describe("support API client confirmations", () => {
     assert.equal(confirmSupportStatusChanged(200, payload, caseId, "closed"), null);
     assert.equal(confirmSupportStatusChanged(200, payload, anotherId, "resolved"), null);
     assert.equal(confirmSupportStatusChanged(200, { ...payload, success: false }, caseId, "resolved"), null);
+  });
+});
+
+
+describe("support pagination payloads", () => {
+  it("parses bounded case-page metadata", () => {
+    assert.deepEqual(
+      parseSupportCasePage({
+        cases: [supportCase],
+        page: 2,
+        totalPages: 4,
+        total: 77,
+      }),
+      {
+        cases: [supportCase],
+        page: 2,
+        totalPages: 4,
+        total: 77,
+      },
+    );
+    assert.equal(
+      parseSupportCasePage({
+        cases: [supportCase],
+        page: 5,
+        totalPages: 4,
+        total: 77,
+      }),
+      null,
+    );
+  });
+
+  it("rejects missing or impossible message-page metadata", () => {
+    assert.equal(
+      parseSupportThread(
+        { supportCase, messages: [message] },
+        caseId,
+      ),
+      null,
+    );
+    assert.equal(
+      parseSupportThread(
+        {
+          supportCase,
+          messages: [message],
+          messagePage: 2,
+          messageTotalPages: 1,
+          messageTotal: 1,
+        },
+        caseId,
+      ),
+      null,
+    );
   });
 });

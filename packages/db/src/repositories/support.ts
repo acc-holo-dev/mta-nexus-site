@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, ne } from "drizzle-orm";
+import { and, asc, count, desc, eq, ne } from "drizzle-orm";
 import type {
   AuditEvent,
   SupportCase,
@@ -14,21 +14,109 @@ import {
   users,
 } from "../schema";
 
-export class SupportCaseRepository {
-  async listByRequester(
-    requesterId: string,
-    limit = 100,
-  ): Promise<SupportCase[]> {
-    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
-      throw new RangeError("Invalid support case limit");
-    }
+export type SupportPage<T> = {
+  items: T[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+};
 
-    return (await db
+function normalizePage(page: number, total: number, pageSize: number) {
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const requested =
+    Number.isSafeInteger(page) && page > 0 ? page : 1;
+  return {
+    page: Math.min(requested, totalPages),
+    totalPages,
+  };
+}
+
+function normalizePageSize(pageSize: number, fallback: number, max: number) {
+  return Number.isSafeInteger(pageSize) && pageSize > 0
+    ? Math.min(pageSize, max)
+    : fallback;
+}
+
+export class SupportCaseRepository {
+  async pageByRequester(
+    requesterId: string,
+    page = 1,
+    pageSize = 25,
+  ): Promise<SupportPage<SupportCase>> {
+    const boundedSize = normalizePageSize(pageSize, 25, 100);
+    const [countRow] = await db
+      .select({ total: count() })
+      .from(supportCases)
+      .where(eq(supportCases.requesterId, requesterId));
+    const total = countRow?.total ?? 0;
+    const normalized = normalizePage(page, total, boundedSize);
+
+    const items = (await db
       .select()
       .from(supportCases)
       .where(eq(supportCases.requesterId, requesterId))
       .orderBy(desc(supportCases.updatedAt), desc(supportCases.id))
-      .limit(limit)) as unknown as SupportCase[];
+      .limit(boundedSize)
+      .offset((normalized.page - 1) * boundedSize)) as unknown as SupportCase[];
+
+    return {
+      items,
+      page: normalized.page,
+      pageSize: boundedSize,
+      total,
+      totalPages: normalized.totalPages,
+    };
+  }
+
+  async listByRequester(
+    requesterId: string,
+    limit = 100,
+  ): Promise<SupportCase[]> {
+    const page = await this.pageByRequester(requesterId, 1, limit);
+    return page.items;
+  }
+
+  async pageStaff(
+    page = 1,
+    pageSize = 25,
+  ): Promise<
+    SupportPage<{
+      supportCase: SupportCase;
+      requesterUsername: string;
+      requesterDisplayName: string;
+    }>
+  > {
+    const boundedSize = normalizePageSize(pageSize, 25, 100);
+    const [countRow] = await db
+      .select({ total: count() })
+      .from(supportCases);
+    const total = countRow?.total ?? 0;
+    const normalized = normalizePage(page, total, boundedSize);
+
+    const items = await db
+      .select({
+        supportCase: supportCases,
+        requesterUsername: users.username,
+        requesterDisplayName: users.displayName,
+      })
+      .from(supportCases)
+      .innerJoin(users, eq(users.id, supportCases.requesterId))
+      .orderBy(desc(supportCases.updatedAt), desc(supportCases.id))
+      .limit(boundedSize)
+      .offset((normalized.page - 1) * boundedSize);
+
+    return {
+      items: items as unknown as Array<{
+        supportCase: SupportCase;
+        requesterUsername: string;
+        requesterDisplayName: string;
+      }>,
+      page: normalized.page,
+      pageSize: boundedSize,
+      total,
+      totalPages: normalized.totalPages,
+    };
   }
 
   async listStaff(limit = 100): Promise<
@@ -38,26 +126,8 @@ export class SupportCaseRepository {
       requesterDisplayName: string;
     }>
   > {
-    if (!Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
-      throw new RangeError("Invalid support case limit");
-    }
-
-    const rows = await db
-      .select({
-        supportCase: supportCases,
-        requesterUsername: users.username,
-        requesterDisplayName: users.displayName,
-      })
-      .from(supportCases)
-      .innerJoin(users, eq(users.id, supportCases.requesterId))
-      .orderBy(desc(supportCases.updatedAt), desc(supportCases.id))
-      .limit(limit);
-
-    return rows as unknown as Array<{
-      supportCase: SupportCase;
-      requesterUsername: string;
-      requesterDisplayName: string;
-    }>;
+    const page = await this.pageStaff(1, limit);
+    return page.items;
   }
 
   async findById(id: string): Promise<SupportCase | null> {
@@ -69,15 +139,42 @@ export class SupportCaseRepository {
     return (row as unknown as SupportCase | undefined) ?? null;
   }
 
-  async listMessages(caseId: string): Promise<SupportCaseMessage[]> {
-    return (await db
+  async pageMessages(
+    caseId: string,
+    page = 1,
+    pageSize = 100,
+  ): Promise<SupportPage<SupportCaseMessage>> {
+    const boundedSize = normalizePageSize(pageSize, 100, 100);
+    const [countRow] = await db
+      .select({ total: count() })
+      .from(supportCaseMessages)
+      .where(eq(supportCaseMessages.caseId, caseId));
+    const total = countRow?.total ?? 0;
+    const normalized = normalizePage(page, total, boundedSize);
+
+    const newestFirst = (await db
       .select()
       .from(supportCaseMessages)
       .where(eq(supportCaseMessages.caseId, caseId))
       .orderBy(
-        asc(supportCaseMessages.createdAt),
-        asc(supportCaseMessages.id),
-      )) as unknown as SupportCaseMessage[];
+        desc(supportCaseMessages.createdAt),
+        desc(supportCaseMessages.id),
+      )
+      .limit(boundedSize)
+      .offset((normalized.page - 1) * boundedSize)) as unknown as SupportCaseMessage[];
+
+    return {
+      items: newestFirst.reverse(),
+      page: normalized.page,
+      pageSize: boundedSize,
+      total,
+      totalPages: normalized.totalPages,
+    };
+  }
+
+  async listMessages(caseId: string): Promise<SupportCaseMessage[]> {
+    const page = await this.pageMessages(caseId, 1, 100);
+    return page.items;
   }
 
   async createWithInitialMessage(

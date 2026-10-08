@@ -4,12 +4,18 @@ import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { useNexusLocale } from "./locale-context";
-import { confirmSupportCaseCreated, parseSupportCaseList, type SupportCaseSummary } from "../lib/support-response";
+import {
+  confirmSupportCaseCreated,
+  parseSupportCasePage,
+  type SupportCaseSummary,
+} from "../lib/support-response";
 
 export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support;
   const [cases, setCases] = useState<SupportCaseSummary[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
@@ -39,7 +45,9 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
     setError(null);
     try {
       const response = await fetch(
-        staffMode ? "/api/support?scope=staff" : "/api/support",
+        staffMode
+          ? `/api/support?scope=staff&page=${page}`
+          : `/api/support?page=${page}`,
         {
           cache: "no-store",
           credentials: "same-origin",
@@ -53,20 +61,22 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
       }
 
       const data = await response.json().catch(() => null);
-      const validatedCases = parseSupportCaseList(data);
-      if (!response.ok || !validatedCases) {
+      const validated = parseSupportCasePage(data);
+      if (!response.ok || !validated) {
         throw new Error(copy.loadError);
       }
 
       setAuthRequired(false);
-      setCases(validatedCases);
+      setCases(validated.cases);
+      setPage(validated.page);
+      setTotalPages(validated.totalPages);
     } catch {
       setCases([]);
       setError(copy.loadError);
     } finally {
       setLoading(false);
     }
-  }, [copy.loadError, staffMode]);
+  }, [copy.loadError, page, staffMode]);
 
   useEffect(() => {
     void loadCases();
@@ -97,7 +107,14 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
       setSubject("");
       setMessage("");
       setCreatedCaseId(created.id);
-      setCases((previous) => [created, ...previous.filter((item) => item.id !== created.id)]);
+      if (page === 1) {
+        setCases((previous) => [
+          created,
+          ...previous.filter((item) => item.id !== created.id),
+        ]);
+      } else {
+        setPage(1);
+      }
     } catch {
       setError(copy.createError);
     } finally {
@@ -263,6 +280,35 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
               ))
             )}
           </section>
+
+          {totalPages > 1 && (
+            <nav
+              aria-label={dictionary.market.paginationLabel}
+              className="flex items-center justify-between gap-3"
+            >
+              <button
+                type="button"
+                disabled={page <= 1 || loading}
+                onClick={() => setPage((value) => Math.max(1, value - 1))}
+                className="text-sm text-accent underline disabled:opacity-40"
+              >
+                {dictionary.market.previousPage}
+              </button>
+              <span className="text-sm text-secondary">
+                {dictionary.market.pageLabel} {page} / {totalPages}
+              </span>
+              <button
+                type="button"
+                disabled={page >= totalPages || loading}
+                onClick={() =>
+                  setPage((value) => Math.min(totalPages, value + 1))
+                }
+                className="text-sm text-accent underline disabled:opacity-40"
+              >
+                {dictionary.market.nextPage}
+              </button>
+            </nav>
+          )}
         </>
       )}
     </div>

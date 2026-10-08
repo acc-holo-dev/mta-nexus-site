@@ -17,6 +17,8 @@ export function SupportCaseThread({
   const copy = dictionary.support;
   const [supportCase, setSupportCase] = useState<SupportCaseData | null>(null);
   const [messages, setMessages] = useState<SupportMessageData[]>([]);
+  const [messagePage, setMessagePage] = useState(1);
+  const [messageTotalPages, setMessageTotalPages] = useState(1);
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -41,7 +43,7 @@ export function SupportCaseThread({
     setError(null);
     try {
       const response = await fetch(
-        `/api/support/${encodeURIComponent(caseId)}`,
+        `/api/support/${encodeURIComponent(caseId)}?messagePage=${messagePage}`,
         {
           cache: "no-store",
           credentials: "same-origin",
@@ -56,6 +58,8 @@ export function SupportCaseThread({
 
       setSupportCase(validated.supportCase);
       setMessages(validated.messages);
+      setMessagePage(validated.messagePage);
+      setMessageTotalPages(validated.messageTotalPages);
     } catch {
       setSupportCase(null);
       setMessages([]);
@@ -63,7 +67,7 @@ export function SupportCaseThread({
     } finally {
       setLoading(false);
     }
-  }, [caseId, copy.loadError]);
+  }, [caseId, copy.loadError, messagePage]);
 
   useEffect(() => {
     void load();
@@ -104,7 +108,15 @@ export function SupportCaseThread({
       }
 
       setSupportCase(confirmed.supportCase);
-      setMessages((previous) => previous.some((item) => item.id === confirmed.message.id) ? previous : [...previous, confirmed.message]);
+      if (messagePage === 1) {
+        setMessages((previous) =>
+          previous.some((item) => item.id === confirmed.message.id)
+            ? previous
+            : [...previous, confirmed.message],
+        );
+      } else {
+        setMessagePage(1);
+      }
       setReply("");
     } catch {
       setError(copy.replyError);
@@ -274,6 +286,39 @@ export function SupportCaseThread({
           </article>
         ))}
       </section>
+
+      {messageTotalPages > 1 && (
+        <nav
+          aria-label={dictionary.market.paginationLabel}
+          className="flex items-center justify-between gap-3"
+        >
+          <button
+            type="button"
+            disabled={messagePage <= 1 || loading}
+            onClick={() =>
+              setMessagePage((value) => Math.max(1, value - 1))
+            }
+            className="text-sm text-accent underline disabled:opacity-40"
+          >
+            {dictionary.market.previousPage}
+          </button>
+          <span className="text-sm text-secondary">
+            {dictionary.market.pageLabel} {messagePage} / {messageTotalPages}
+          </span>
+          <button
+            type="button"
+            disabled={messagePage >= messageTotalPages || loading}
+            onClick={() =>
+              setMessagePage((value) =>
+                Math.min(messageTotalPages, value + 1),
+              )
+            }
+            className="text-sm text-accent underline disabled:opacity-40"
+          >
+            {dictionary.market.nextPage}
+          </button>
+        </nav>
+      )}
 
       {supportCase.status !== "closed" ? (
         <form
