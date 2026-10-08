@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useId,
   useRef,
   useState,
 } from "react";
@@ -199,7 +200,7 @@ export default function NotificationCenterPage() {
                   ?.querySelectorAll<HTMLElement>('[role="tab"]')
                   [nextIndex]?.focus();
               }}
-              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${
+              className={`min-h-8 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)] ${
                 active
                   ? "border-[color:var(--nexus-accent)] bg-accent text-white"
                   : "border-base bg-surface text-muted hover:bg-hover hover:text-primary"
@@ -226,7 +227,7 @@ export default function NotificationCenterPage() {
           <button
             type="button"
             onClick={() => void loadNotifications()}
-            className="shrink-0 rounded-sm font-semibold underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-danger)]"
+            className="min-h-6 shrink-0 rounded-sm px-1 font-semibold underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-danger)]"
           >
             {dictionary.errors.retry}
           </button>

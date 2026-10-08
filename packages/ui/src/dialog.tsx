@@ -108,7 +108,7 @@ export function Dialog({
           className="absolute right-4 top-4 rounded-md p-1 text-muted transition-colors hover:bg-hover hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]"
           aria-label="Close dialog"
         >
-          <X className="h-5 w-5" />
+          <X className="h-5 w-5" aria-hidden="true" />
         </button>
         <div className="mb-4 pr-8">
           <h3 id={titleId} className="text-lg font-bold text-primary">

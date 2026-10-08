@@ -162,7 +162,7 @@ export function NotificationBell() {
               type="button"
               aria-label={copy.close}
               onClick={() => setIsOpen(false)}
-              className="rounded-md p-1 text-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-accent"
+              className="min-h-6 min-w-6 rounded-md p-1 text-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-accent"
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -171,7 +171,7 @@ export function NotificationBell() {
                 type="button"
                 disabled={marking}
                 onClick={() => void markAllRead()}
-                className="flex items-center gap-1 text-[11px] font-semibold text-accent hover:underline disabled:opacity-50"
+                className="flex min-h-6 items-center gap-1 px-1 text-[11px] font-semibold text-accent hover:underline disabled:opacity-50"
               >
                 <CheckCheck className="h-3 w-3" aria-hidden="true" />
                 <span>{copy.markAllRead}</span>
@@ -191,7 +191,7 @@ export function NotificationBell() {
               <button
                 type="button"
                 onClick={() => setAttempt((value) => value + 1)}
-                className="font-semibold underline"
+                className="min-h-6 px-1 font-semibold underline"
               >
                 {copy.retry}
               </button>

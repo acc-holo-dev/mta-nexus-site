@@ -19,7 +19,7 @@ test.afterAll(async () => {
   const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
   await mkdir(output, { recursive: true });
   await writeFile(join(output, "shell-results.json"), JSON.stringify({ commit: process.env.GITHUB_SHA, results: evidence,
-    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, logical tabindex order, hidden-focus safety, dialog naming, tab/tabpanel relations, aria-current validity, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification." }, null, 2));
+    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, WCAG 2.5.8 control target size, logical tabindex order, hidden-focus safety, dialog naming, tab/tabpanel relations, aria-current validity, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification." }, null, 2));
   await writeFile(join(output, "shell-summary.md"), ["# Keyboard, mobile and locale acceptance", "", ...evidence.map((value) => `- PASS: ${value}`), ""].join("\n"));
 });
 
@@ -267,6 +267,57 @@ async function assertAdvancedAriaSemantics(page, label) {
   );
 }
 
+async function assertMinimumControlTargetSize(page, label) {
+  const failures = await page.evaluate(() => {
+    const visible = (element) =>
+      element.getClientRects().length > 0 &&
+      getComputedStyle(element).visibility !== "hidden";
+
+    const controls = [
+      ...document.querySelectorAll(
+        [
+          "button:not(:disabled)",
+          "input:not([type=\"hidden\"]):not(:disabled)",
+          "select:not(:disabled)",
+          "textarea:not(:disabled)",
+          "summary",
+          '[role="tab"]',
+          '[role="switch"]',
+          '[role="checkbox"]',
+          '[role="radio"]',
+        ].join(","),
+      ),
+    ].filter(visible);
+
+    return controls.flatMap((control) => {
+      let target = control;
+      if (
+        control instanceof HTMLInputElement &&
+        (control.type === "checkbox" || control.type === "radio")
+      ) {
+        const labelElement = [...control.labels].find(visible);
+        if (labelElement) target = labelElement;
+      }
+
+      const rect = target.getBoundingClientRect();
+      if (rect.width >= 24 && rect.height >= 24) return [];
+      return [
+        {
+          element: control.outerHTML.slice(0, 180),
+          width: Math.round(rect.width * 10) / 10,
+          height: Math.round(rect.height * 10) / 10,
+        },
+      ];
+    });
+  });
+
+  assert.deepEqual(
+    failures,
+    [],
+    `${label}: visible controls require a minimum 24x24 CSS-pixel target`,
+  );
+}
+
 async function assertDocumentStructure(page, label) {
   const result = await page.evaluate(() => {
     const visible = (element) =>
@@ -430,6 +481,10 @@ for (const locale of ["en", "ru"]) {
     const notices = page.getByRole("dialog", { name: dictionary.notificationBell.title, exact: true });
     await expect(notices).toHaveAttribute("id", "notification-popover");
     await expect(notices.getByRole("button", { name: dictionary.notificationBell.close, exact: true })).toBeFocused();
+    await assertMinimumControlTargetSize(
+      page,
+      `${locale} notification dialog`,
+    );
     await containedTabbing(page, notices);
     await page.keyboard.press("Escape");
     await expect(notices).toHaveCount(0);
@@ -467,6 +522,10 @@ for (const locale of ["en", "ru"]) {
           `${locale} ${width} ${route}`,
         );
         await assertDocumentStructure(
+          page,
+          `${locale} ${width} ${route}`,
+        );
+        await assertMinimumControlTargetSize(
           page,
           `${locale} ${width} ${route}`,
         );
@@ -530,6 +589,10 @@ for (const locale of ["en", "ru"]) {
       exact: true,
     });
     await expect(moreDialog).toHaveAttribute("id", "mobile-more-menu");
+    await assertMinimumControlTargetSize(
+      page,
+      `${locale} mobile More dialog`,
+    );
     await expect(
       moreDialog.getByRole("link", {
         name: dictionary.nav.explore,
@@ -931,7 +994,7 @@ for (const locale of ["en", "ru"]) {
     assert.deepEqual(errors, []);
     await logoutFixture(page);
     evidence.push(
-      `${locale}: authenticated Settings, Security Center, Support, Publish and unowned Server Claim pass labeled-field, ARIA-IDREF, landmark/heading structure, focus, reduced-motion and 320/390/1280 reflow acceptance`,
+      `${locale}: authenticated Settings, Security Center, Support, Publish and unowned Server Claim pass labeled-field, ARIA-IDREF, 24x24 target-size, landmark/heading structure, focus, reduced-motion and 320/390/1280 reflow acceptance`,
     );
   });
 }
