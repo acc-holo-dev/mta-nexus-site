@@ -19,7 +19,7 @@ test.afterAll(async () => {
   const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
   await mkdir(output, { recursive: true });
   await writeFile(join(output, "shell-results.json"), JSON.stringify({ commit: process.env.GITHUB_SHA, results: evidence,
-    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, WCAG 2.5.8 control target size, logical tabindex order, hidden-focus safety, dialog naming, tab/tabpanel relations, aria-current validity, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification." }, null, 2));
+    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, WCAG 2.5.8 control target size, WCAG 2.4.7 visible keyboard focus, logical tabindex order, hidden-focus safety, dialog naming, tab/tabpanel relations, aria-current validity, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification." }, null, 2));
   await writeFile(join(output, "shell-summary.md"), ["# Keyboard, mobile and locale acceptance", "", ...evidence.map((value) => `- PASS: ${value}`), ""].join("\n"));
 });
 
@@ -369,10 +369,58 @@ async function assertDocumentStructure(page, label) {
   );
 }
 
+async function assertVisibleFocusIndicator(locator, label) {
+  const result = await locator.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const outlineWidth = Number.parseFloat(style.outlineWidth) || 0;
+    const transparent = new Set([
+      "transparent",
+      "rgba(0, 0, 0, 0)",
+      "rgba(0,0,0,0)",
+    ]);
+    const hasOutline =
+      style.outlineStyle !== "none" &&
+      outlineWidth >= 2 &&
+      !transparent.has(style.outlineColor);
+    const hasBoxShadow =
+      Boolean(style.boxShadow) &&
+      style.boxShadow !== "none" &&
+      !style.boxShadow.includes("0px 0px 0px 0px");
+
+    return {
+      focused: document.activeElement === element,
+      hasOutline,
+      hasBoxShadow,
+      outlineStyle: style.outlineStyle,
+      outlineWidth,
+      outlineColor: style.outlineColor,
+      boxShadow: style.boxShadow,
+    };
+  });
+
+  assert.equal(result.focused, true, `${label}: element must be focused`);
+  assert(
+    result.hasOutline || result.hasBoxShadow,
+    `${label}: keyboard focus requires a visible outline or focus ring; got ${JSON.stringify(
+      result,
+    )}`,
+  );
+}
+
 async function containedTabbing(page, dialog) {
   for (const key of ["Tab", "Tab", "Tab", "Shift+Tab", "Shift+Tab", "Shift+Tab"]) {
     await page.keyboard.press(key);
-    assert(await dialog.evaluate((element) => element.contains(document.activeElement)), `Focus escaped after ${key}`);
+    assert(
+      await dialog.evaluate((element) =>
+        element.contains(document.activeElement),
+      ),
+      `Focus escaped after ${key}`,
+    );
+    const active = page.locator(":focus");
+    await assertVisibleFocusIndicator(
+      active,
+      `dialog focus after ${key}`,
+    );
   }
 }
 for (const locale of ["en", "ru"]) {
@@ -417,7 +465,15 @@ for (const locale of ["en", "ru"]) {
       .getByRole("link", { name: dictionary.nav.search, exact: true });
     // Test the skip link from the first actual Tab, rather than programmatic focus.
     await page.keyboard.press("Tab");
-    await expect(page.getByRole("link", { name: dictionary.nav.skipToContent, exact: true })).toBeFocused();
+    const skipLink = page.getByRole("link", {
+      name: dictionary.nav.skipToContent,
+      exact: true,
+    });
+    await expect(skipLink).toBeFocused();
+    await assertVisibleFocusIndicator(
+      skipLink,
+      `${locale} skip link`,
+    );
     await page.keyboard.press("Enter");
     await expect(page.getByRole("main")).toBeFocused();
     await expect(searchTrigger).toBeVisible();
@@ -480,7 +536,15 @@ for (const locale of ["en", "ru"]) {
     await expect(bell).toHaveAttribute("aria-controls", "notification-popover");
     const notices = page.getByRole("dialog", { name: dictionary.notificationBell.title, exact: true });
     await expect(notices).toHaveAttribute("id", "notification-popover");
-    await expect(notices.getByRole("button", { name: dictionary.notificationBell.close, exact: true })).toBeFocused();
+    const noticeClose = notices.getByRole("button", {
+      name: dictionary.notificationBell.close,
+      exact: true,
+    });
+    await expect(noticeClose).toBeFocused();
+    await assertVisibleFocusIndicator(
+      noticeClose,
+      `${locale} notification dialog close`,
+    );
     await assertMinimumControlTargetSize(
       page,
       `${locale} notification dialog`,
@@ -552,6 +616,10 @@ for (const locale of ["en", "ru"]) {
     await expect(allNotificationsTab).toHaveAttribute("aria-selected", "true");
     await page.keyboard.press("ArrowRight");
     await expect(unreadNotificationsTab).toBeFocused();
+    await assertVisibleFocusIndicator(
+      unreadNotificationsTab,
+      `${locale} unread notification tab`,
+    );
     await expect(unreadNotificationsTab).toHaveAttribute(
       "aria-selected",
       "true",
@@ -628,6 +696,10 @@ for (const locale of ["en", "ru"]) {
     await expect(moreButton).toHaveAttribute("aria-expanded", "false");
     await expect(moreButton).not.toHaveAttribute("aria-controls", /.+/u);
     await expect(moreButton).toBeFocused();
+    await assertVisibleFocusIndicator(
+      moreButton,
+      `${locale} mobile More trigger after Escape`,
+    );
 
     await page.keyboard.press("Enter");
     const reopenedMoreDialog = page.getByRole("dialog", {
@@ -779,8 +851,16 @@ for (const locale of ["en", "ru"]) {
     await expect(loginEmail).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(loginPassword).toBeFocused();
+    await assertVisibleFocusIndicator(
+      loginPassword,
+      `${locale} login password`,
+    );
     await page.keyboard.press("Tab");
     await expect(loginSubmit).toBeFocused();
+    await assertVisibleFocusIndicator(
+      loginSubmit,
+      `${locale} login submit`,
+    );
     await loginEmail.fill("a11y-unknown@example.invalid");
     await loginPassword.fill("not-the-right-password");
     await loginSubmit.click();
@@ -818,6 +898,10 @@ for (const locale of ["en", "ru"]) {
       await recoveryEmail.focus();
       await page.keyboard.press("Tab");
       await expect(recoverySubmit).toBeFocused();
+      await assertVisibleFocusIndicator(
+        recoverySubmit,
+        `${locale} password recovery submit`,
+      );
       await recoveryEmail.fill("privacy-neutral@example.invalid");
       await recoverySubmit.click();
       await expect(
