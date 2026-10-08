@@ -8,9 +8,9 @@ import { ContextSwitcher } from "../../components/context-switcher";
 import { WebPushSettings } from "../../components/web-push-settings";
 import { useNexusLocale } from "../../components/locale-context";
 import {
-  confirmedNotificationNotificationPreferences,
-  parseNotificationNotificationPreferences,
-  type NotificationNotificationPreferences,
+  confirmedNotificationPreferences,
+  parseNotificationPreferences,
+  type NotificationPreferences,
 } from "../../lib/notification-preferences-confirmation";
 
 type Session = {
@@ -79,7 +79,7 @@ async function request<T>(
 export default function SettingsPage() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.settings;
-  const [preferences, setNotificationPreferences] = useState<NotificationPreferences | null>(null);
+  const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [sessions, setSessions] = useState<Session[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [signedOut, setSignedOut] = useState(false);
@@ -175,8 +175,11 @@ export default function SettingsPage() {
     ])
       .then(([preferenceData, sessionData, recovery]) => {
         if (!active) return;
+        const confirmedPreferences = parseNotificationPreferences(
+          preferenceData.preferences,
+        );
         if (
-          !isNotificationPreferences(preferenceData.preferences) ||
+          !confirmedPreferences ||
           !Array.isArray(sessionData.sessions) ||
           typeof recovery.email !== "string" ||
           typeof recovery.verified !== "boolean" ||
@@ -185,7 +188,7 @@ export default function SettingsPage() {
           throw new Error(copy.invalidResponse);
         }
 
-        setNotificationPreferences(preferenceData.preferences);
+        setPreferences(confirmedPreferences);
         setSessions(sessionData.sessions);
         setRecoveryEmail(recovery);
         setSignedOut(false);
@@ -193,7 +196,7 @@ export default function SettingsPage() {
       .catch((error: unknown) => {
         if (!active) return;
 
-        setNotificationPreferences(null);
+        setPreferences(null);
         setSessions(null);
         setRecoveryEmail(null);
         setPassword({ currentPassword: "", newPassword: "" });
@@ -237,7 +240,7 @@ export default function SettingsPage() {
       ) {
         setSignedOut(true);
         setSessions(null);
-        setNotificationPreferences(null);
+        setPreferences(null);
         setRecoveryEmail(null);
         setPassword({ currentPassword: "", newPassword: "" });
         setRecoveryPassword("");
@@ -376,14 +379,13 @@ export default function SettingsPage() {
         [key]: value,
       });
 
-      if (
-        data.success !== true ||
-        !isNotificationPreferences(data.preferences)
-      ) {
+      const confirmedPreferences =
+        confirmedNotificationPreferences(data);
+      if (!confirmedPreferences) {
         throw new SettingsError(copy.requestUnconfirmed, 502);
       }
 
-      setNotificationPreferences(data.preferences);
+      setPreferences(confirmedPreferences);
       setNotice({
         text: copy.preferenceSaved,
         error: false,
@@ -479,7 +481,7 @@ export default function SettingsPage() {
             id="notification-heading"
             className="text-sm font-semibold text-primary"
           >
-            {copy.notificationNotificationPreferences}
+            {copy.notificationPreferences}
           </h2>
         </div>
         <p className="text-xs text-muted">
