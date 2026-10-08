@@ -34,7 +34,7 @@ const pushRepository = vi.hoisted(() => ({
   removeForSession: vi.fn(async () => true),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
     getCurrentSessionId: vi.fn(async () => state.sessionId),
@@ -61,7 +61,7 @@ vi.mock("@nexus/config", () => ({
   })),
 }));
 
-vi.mock("../apps/web/src/lib/web-push-subscription", () => ({
+vi.mock("../../../lib/web-push-subscription", () => ({
   parseWebPushSubscription: vi.fn(() => ({
     endpoint: "https://push.example.test/subscription",
     p256dh: "p256dh",
@@ -70,17 +70,17 @@ vi.mock("../apps/web/src/lib/web-push-subscription", () => ({
   })),
 }));
 
-import { GET as inboxGET } from "../apps/web/src/app/api/notifications/route";
-import { POST as markReadPOST } from "../apps/web/src/app/api/notifications/mark-read/route";
+import { GET as inboxGET } from "./route";
+import { POST as markReadPOST } from "./mark-read/route";
 import {
   GET as preferencesGET,
   PATCH as preferencesPATCH,
-} from "../apps/web/src/app/api/notifications/preferences/route";
+} from "./preferences/route";
 import {
   DELETE as pushDELETE,
   GET as pushGET,
   POST as pushPOST,
-} from "../apps/web/src/app/api/notifications/push/route";
+} from "./push/route";
 
 function request(
   path: string,

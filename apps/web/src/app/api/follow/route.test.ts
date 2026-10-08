@@ -76,7 +76,7 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-import { POST as follow, DELETE as unfollow } from "./route";
+import { DELETE as unfollow, GET as followState, POST as follow } from "./route";
 import { POST as markRead } from "../notifications/mark-read/route";
 import { GET as listNotifications } from "../notifications/route";
 
@@ -100,6 +100,48 @@ describe("social and notification HTTP state contract", () => {
     state.follow = { id: "fol_1", followerId: "usr_1", targetType: "user", targetId: "usr_2" };
     state.following = true;
     state.notificationFails = false;
+  });
+
+  it("keeps anonymous and authenticated follow-state reads private", async () => {
+    state.user = null;
+    const anonymous = await followState(
+      makeRequest(
+        "/api/follow?targetType=server&targetId=srv_1",
+        "GET",
+      ),
+    );
+    expect(anonymous.status).toBe(200);
+    expectPrivate(anonymous);
+    expect(await anonymous.json()).toEqual({
+      authenticated: false,
+      following: false,
+    });
+
+    state.user = { id: "usr_1", username: "tester" };
+    state.following = true;
+    const authenticated = await followState(
+      makeRequest(
+        "/api/follow?targetType=user&targetId=usr_2",
+        "GET",
+      ),
+    );
+    expect(authenticated.status).toBe(200);
+    expectPrivate(authenticated);
+    expect(await authenticated.json()).toEqual({
+      authenticated: true,
+      following: true,
+    });
+  });
+
+  it("keeps follow-state validation errors private", async () => {
+    const response = await followState(
+      makeRequest(
+        "/api/follow?targetType=invalid&targetId=x",
+        "GET",
+      ),
+    );
+    expect(response.status).toBe(400);
+    expectPrivate(response);
   });
 
   it("confirms a committed follow before best-effort notification delivery", async () => {
