@@ -1,8 +1,13 @@
-import { after, type NextRequest, NextResponse } from "next/server";
-import { createRequestLogContext, logRequestEvent } from "../../../../../../lib/observability";
-import { z } from "zod";
+import { after, type NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
+import { z } from "zod";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../../../lib/observability";
 import { authService } from "../../../../../../lib/services/auth-service";
 import {
   notifyModeratorsOfServerClaim,
@@ -14,15 +19,28 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-const verifySchema = z.object({
-  challengeId: z
-    .string()
-    .regex(/^scc_[0-9a-f-]{36}$/u)
-    .max(64),
-  token: z
-    .string()
-    .regex(/^NXCLAIM-[A-F0-9]{24}$/u),
-});
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
+    status,
+    headers: privateHeaders,
+  });
+}
+
+const verifySchema = z
+  .object({
+    challengeId: z
+      .string()
+      .regex(/^scc_[0-9a-f-]{36}$/u)
+      .max(64),
+    token: z
+      .string()
+      .regex(/^NXCLAIM-[A-F0-9]{24}$/u),
+  })
+  .strict();
 
 export async function POST(
   request: NextRequest,
@@ -30,12 +48,15 @@ export async function POST(
 ) {
   const context = createRequestLogContext(request);
   try {
-    const sessionToken = request.cookies.get("nexus_session")?.value;
-    const user = await authService.getSession(sessionToken);
+    const sessionToken =
+      request.cookies.get("nexus_session")?.value;
+    const user =
+      await authService.getSession(sessionToken);
     if (!user) {
-      return NextResponse.json(
+      return json(
+        context,
         { error: "Authentication required" },
-        { status: 401, headers: privateHeaders },
+        401,
       );
     }
 
@@ -44,9 +65,13 @@ export async function POST(
       user.id,
     );
     if (!rateLimit.success) {
-      return NextResponse.json(
-        { error: "Too many server control proof attempts" },
-        { status: 429, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error:
+            "Too many server control proof attempts",
+        },
+        429,
       );
     }
 
@@ -54,17 +79,22 @@ export async function POST(
       await request.json().catch(() => null),
     );
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid server control proof" },
-        { status: 400, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error:
+            "Invalid server control proof",
+        },
+        400,
       );
     }
 
     const { id: serverId } = await params;
     if (!serverId || serverId.length > 128) {
-      return NextResponse.json(
+      return json(
+        context,
         { error: "Server not found" },
-        { status: 404, headers: privateHeaders },
+        404,
       );
     }
 
@@ -81,32 +111,49 @@ export async function POST(
     );
 
     after(async () => {
-      await notifyModeratorsOfServerClaim(
-        moderatorNotification.serverName,
-      );
+      try {
+        await notifyModeratorsOfServerClaim(
+          moderatorNotification.serverName,
+        );
+      } catch (error) {
+        logRequestEvent({
+          level: "warn",
+          event:
+            "server.claim_challenge.notification_failed",
+          context,
+          status: 201,
+          error,
+        });
+      }
     });
 
-    return NextResponse.json(result, {
-      status: 201,
-      headers: privateHeaders,
-    });
+    return json(context, result, 201);
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return NextResponse.json(
-        { error: error.message, code: error.code },
-        { status: error.statusCode, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error: error.message,
+          code: error.code,
+        },
+        error.statusCode,
       );
     }
     logRequestEvent({
       level: "error",
-      event: "server.claim_challenge.verify_failed",
+      event:
+        "server.claim_challenge.verify_failed",
       context,
       status: 500,
       error,
     });
-    return NextResponse.json(
-      { error: "Could not verify server control" },
-      { status: 500, headers: privateHeaders },
+    return json(
+      context,
+      {
+        error:
+          "Could not verify server control",
+      },
+      500,
     );
   }
 }

@@ -102,6 +102,9 @@ describe("server claim moderator notification side effects", () => {
     });
 
     expect(response.status).toBe(201);
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     const data = await response.json();
     expect(data).toMatchObject({
       success: true,
@@ -124,6 +127,9 @@ describe("server claim moderator notification side effects", () => {
         params: Promise.resolve({ id: "srv_1" }),
       });
       expect(response.status).toBe(500);
+      expect(response.headers.get("X-Request-Id")).toMatch(
+        /^[0-9a-f-]{20,}$/u,
+      );
       expect(afterMock).not.toHaveBeenCalled();
       expect(notifyModerators).not.toHaveBeenCalled();
     } finally {

@@ -1,18 +1,149 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
 
-describe("server owner updates", () => {
-  it("only accepts public-card fields and enforces owner authorization in the service", () => {
-    const route = readFileSync(path.resolve(process.cwd(), "apps/web/src/app/api/servers/[id]/route.ts"), "utf8");
-    const service = readFileSync(path.resolve(process.cwd(), "apps/web/src/lib/services/server-service.ts"), "utf8");
+const state = vi.hoisted(() => ({
+  user: {
+    id: "usr_server_owner",
+    role: "developer",
+  } as Record<string, unknown> | null,
+  allowed: true,
+}));
 
-    expect(route).toContain("serverUpdateSchema");
-    expect(route).toContain('visibility: z.enum(["public", "unlisted", "private"]).optional()');
-    expect(route).not.toContain("ownerId:");
-    expect(route).not.toContain("status: z.");
-    expect(service).toContain('can(actor, "server.manage", server)');
-    expect(service).toContain("organizationRepository.listUserMemberships(actor.id)");
-    expect(service).toContain('action: "server.updated"');
+const updateServer = vi.hoisted(() =>
+  vi.fn(async (_id, input) => ({
+    id: "srv_1",
+    ...input,
+  })),
+);
+
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+  authService: {
+    getSession: vi.fn(async () => state.user),
+  },
+}));
+
+vi.mock("../apps/web/src/lib/services/server-service", () => ({
+  serverService: {
+    updateServer,
+  },
+}));
+
+vi.mock("@nexus/security", () => ({
+  consumeRateLimit: vi.fn(async () => ({
+    success: state.allowed,
+  })),
+}));
+
+import { PATCH } from "../apps/web/src/app/api/servers/[id]/route";
+
+function request(body: unknown) {
+  return new NextRequest(
+    "https://nexus.test/api/servers/srv_1",
+    {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+        cookie:
+          "nexus_session=server-owner-token",
+      },
+      body: JSON.stringify(body),
+    },
+  );
+}
+
+const routeContext = {
+  params: Promise.resolve({ id: "srv_1" }),
+};
+
+function expectPrivateCorrelation(
+  response: Response,
+) {
+  expect(
+    response.headers.get("cache-control"),
+  ).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe(
+    "Cookie",
+  );
+  expect(
+    response.headers.get("x-request-id"),
+  ).toMatch(/^[0-9a-f-]{20,}$/u);
+}
+
+describe("server owner update HTTP contract", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    state.user = {
+      id: "usr_server_owner",
+      role: "developer",
+    };
+    state.allowed = true;
+  });
+
+  it("updates only the strict public-card schema", async () => {
+    const response = await PATCH(
+      request({
+        name: "Nexus Racing",
+        description: "Public description",
+        visibility: "unlisted",
+      }),
+      routeContext,
+    );
+
+    expect(response.status).toBe(200);
+    expectPrivateCorrelation(response);
+    expect(updateServer).toHaveBeenCalledWith(
+      "srv_1",
+      {
+        name: "Nexus Racing",
+        description: "Public description",
+        visibility: "unlisted",
+      },
+      state.user,
+    );
+  });
+
+  it.each([
+    { ownerId: "usr_attacker" },
+    { status: "suspended" },
+    {
+      name: "Nexus Racing",
+      ownerId: "usr_attacker",
+    },
+  ])(
+    "rejects authority/state field injection before the service: %j",
+    async (body) => {
+      const response = await PATCH(
+        request(body),
+        routeContext,
+      );
+
+      expect(response.status).toBe(400);
+      expectPrivateCorrelation(response);
+      expect(updateServer).not.toHaveBeenCalled();
+    },
+  );
+
+  it("requires authentication and rate-limit budget before mutation", async () => {
+    state.user = null;
+    const anonymous = await PATCH(
+      request({ name: "Nexus Racing" }),
+      routeContext,
+    );
+    expect(anonymous.status).toBe(401);
+    expectPrivateCorrelation(anonymous);
+    expect(updateServer).not.toHaveBeenCalled();
+
+    state.user = {
+      id: "usr_server_owner",
+      role: "developer",
+    };
+    state.allowed = false;
+    const limited = await PATCH(
+      request({ name: "Nexus Racing" }),
+      routeContext,
+    );
+    expect(limited.status).toBe(429);
+    expectPrivateCorrelation(limited);
+    expect(updateServer).not.toHaveBeenCalled();
   });
 });

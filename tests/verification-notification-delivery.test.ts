@@ -95,6 +95,9 @@ function expectPrivate(response: Response) {
     "private, no-store",
   );
   expect(response.headers.get("Vary")).toBe("Cookie");
+  expect(response.headers.get("X-Request-Id")).toMatch(
+    /^[0-9a-f-]{20,}$/u,
+  );
 }
 
 beforeEach(() => {
@@ -229,10 +232,12 @@ describe("verification HTTP behavior", () => {
       expect(response.status).toBe(201);
       await state.afterCallbacks[0]?.();
 
-      expect(warning).toHaveBeenCalledWith(
-        "Verification notification delivery failures:",
-        1,
+      expect(warning).toHaveBeenCalledOnce();
+      const line = String(warning.mock.calls[0]?.[0] ?? "");
+      expect(line).toContain(
+        "verification.moderator_notification_partial_failure",
       );
+      expect(line).toContain('"storageFailed":1');
     } finally {
       warning.mockRestore();
     }

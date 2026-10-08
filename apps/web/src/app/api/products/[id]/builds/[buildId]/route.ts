@@ -1,7 +1,12 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { createRequestLogContext, logRequestEvent } from "../../../../../../lib/observability";
-import { z } from "zod";
+import type { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { z } from "zod";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../../../lib/observability";
 import { authService } from "../../../../../../lib/services/auth-service";
 import { productService } from "../../../../../../lib/services/product-service";
 
@@ -10,58 +15,108 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(body: unknown, status = 200) {
-  return NextResponse.json(body, {
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
   });
 }
 
-const retireBuildSchema = z.object({
-  action: z.literal("retire"),
-  reason: z.string().trim().min(3).max(2_000).optional(),
-});
+const retireBuildSchema = z
+  .object({
+    action: z.literal("retire"),
+    reason: z
+      .string()
+      .trim()
+      .min(3)
+      .max(2_000)
+      .optional(),
+  })
+  .strict();
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string; buildId: string }> }
+  {
+    params,
+  }: {
+    params: Promise<{
+      id: string;
+      buildId: string;
+    }>;
+  },
 ) {
   const context = createRequestLogContext(request);
   try {
-    const token = request.cookies.get("nexus_session")?.value;
-    const actor = await authService.getSession(token);
+    const token =
+      request.cookies.get("nexus_session")?.value;
+    const actor =
+      await authService.getSession(token);
     if (!actor) {
-      return json({ error: "Authentication required" }, 401 );
-    }
-
-    const parsed = retireBuildSchema.safeParse(await request.json());
-    if (!parsed.success) {
       return json(
-        { error: "Invalid build lifecycle action", details: parsed.error.flatten() },
-        400 
+        context,
+        { error: "Authentication required" },
+        401,
       );
     }
 
-    const { id: productId, buildId } = await params;
-    const build = await productService.retireBuild(
-      { productId, buildId, reason: parsed.data.reason },
-      actor
+    const parsed = retireBuildSchema.safeParse(
+      await request.json(),
     );
-    return json({ build });
+    if (!parsed.success) {
+      return json(
+        context,
+        {
+          error:
+            "Invalid build lifecycle action",
+          details: parsed.error.flatten(),
+        },
+        400,
+      );
+    }
+
+    const { id: productId, buildId } =
+      await params;
+    const build =
+      await productService.retireBuild(
+        {
+          productId,
+          buildId,
+          reason: parsed.data.reason,
+        },
+        actor,
+      );
+    return json(context, { build });
   } catch (error: unknown) {
     if (error instanceof AppError) {
       return json(
-        { error: error.message, code: error.code },
-        error.statusCode 
+        context,
+        {
+          error: error.message,
+          code: error.code,
+        },
+        error.statusCode,
       );
     }
+
     logRequestEvent({
       level: "error",
-      event: "product.build_lifecycle_failed",
+      event:
+        "product.build_lifecycle_failed",
       context,
       status: 500,
       error,
     });
-    return json({ error: "Could not update build lifecycle" }, 500 );
+    return json(
+      context,
+      {
+        error:
+          "Could not update build lifecycle",
+      },
+      500,
+    );
   }
 }

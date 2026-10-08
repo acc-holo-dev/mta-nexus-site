@@ -11,7 +11,15 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
 }));
 vi.mock("../apps/web/src/lib/observability", () => ({
   createRequestLogContext: () => ({ requestId: "test-request" }),
-  jsonWithRequestId: (_context: unknown, body: unknown, init: ResponseInit) => NextResponse.json(body, init),
+  jsonWithRequestId: (
+    context: { requestId: string },
+    body: unknown,
+    init: ResponseInit,
+  ) => {
+    const headers = new Headers(init.headers);
+    headers.set("X-Request-Id", context.requestId);
+    return NextResponse.json(body, { ...init, headers });
+  },
   logRequestEvent: logEvent,
 }));
 
@@ -41,12 +49,15 @@ describe("official MTA directory API", () => {
       fetchedAt: "2026-09-27T00:00:00.000Z", isStale: true,
     });
     expect(response.headers.get("Cache-Control")).toContain("max-age=30");
+    expect(response.headers.get("X-Request-Id")).toBeNull();
     expect(getDirectory).toHaveBeenCalledOnce();
   });
 
   it("rejects invalid pagination without reading the master list", async () => {
     const response = await GET(new NextRequest("https://nexus.test/api/servers/directory?limit=101"));
     expect(response.status).toBe(400);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(response.headers.get("X-Request-Id")).toBe("test-request");
     expect(getDirectory).not.toHaveBeenCalled();
   });
 
@@ -55,6 +66,8 @@ describe("official MTA directory API", () => {
     const response = await GET(new NextRequest("https://nexus.test/api/servers/directory"));
     expect(response.status).toBe(503);
     expect(response.headers.get("Retry-After")).toBe("30");
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(response.headers.get("X-Request-Id")).toBe("test-request");
     expect((await response.json()).error).toMatch(/temporarily unavailable/);
     expect(logEvent).toHaveBeenCalledOnce();
   });

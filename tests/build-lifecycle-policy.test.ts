@@ -77,6 +77,9 @@ describe("build retirement HTTP behavior", () => {
     expect(response.headers.get("Cache-Control")).toBe(
       "private, no-store",
     );
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(retireBuild).not.toHaveBeenCalled();
   });
 
@@ -100,6 +103,9 @@ describe("build retirement HTTP behavior", () => {
     );
 
     expect(response.status).toBe(200);
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.json()).toEqual({
       build: {
         id: "bld_1",

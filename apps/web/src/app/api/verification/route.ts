@@ -1,17 +1,22 @@
-import { after, type NextRequest, NextResponse } from "next/server";
-import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
-import { authService } from "../../../lib/services/auth-service";
+import { after, type NextRequest } from "next/server";
 import {
   organizationRepository,
   userRepository,
   verificationRepository,
 } from "@nexus/db";
+import { AppError } from "@nexus/domain";
 import {
   consumeRateLimit,
   generateId,
 } from "@nexus/security";
 import { z } from "zod";
-import { AppError } from "@nexus/domain";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../lib/observability";
+import { authService } from "../../../lib/services/auth-service";
 import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
 const privateHeaders = {
@@ -19,46 +24,91 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(body: unknown, status = 200) {
-  return NextResponse.json(body, {
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
   });
 }
 
-const verificationRequestSchema = z.object({
-  targetType: z.enum([
-    "user",
-    "developer",
-    "organization",
-    "server",
-  ]),
-  targetId: z.string().min(1).max(128),
-  proofUrl: z.string().url().regex(/^https?:\/\//i).max(2048).optional().or(z.literal("")),
-  notes: z.string().max(1000).optional(),
-});
+const verificationRequestSchema = z
+  .object({
+    targetType: z.enum([
+      "user",
+      "developer",
+      "organization",
+      "server",
+    ]),
+    targetId: z.string().min(1).max(128),
+    proofUrl: z
+      .string()
+      .url()
+      .regex(/^https?:///iu)
+      .max(2048)
+      .optional()
+      .or(z.literal("")),
+    notes: z.string().max(1000).optional(),
+  })
+  .strict();
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get("nexus_session")?.value;
-  const user = await authService.getSession(token);
+  const context = createRequestLogContext(request);
 
-  if (!user) {
-    return json({ error: "Unauthorized" }, 401);
+  try {
+    const token =
+      request.cookies.get("nexus_session")?.value;
+    const user = await authService.getSession(token);
+
+    if (!user) {
+      return json(
+        context,
+        { error: "Unauthorized" },
+        401,
+      );
+    }
+
+    const requests =
+      await verificationRepository.listByRequester(
+        user.id,
+      );
+    return json(context, { requests });
+  } catch (error) {
+    logRequestEvent({
+      level: "error",
+      event:
+        "verification.history_fetch_failed",
+      context,
+      status: 500,
+      error,
+    });
+    return json(
+      context,
+      {
+        error:
+          "Failed to load verification requests",
+      },
+      500,
+    );
   }
-
-  const requests =
-    await verificationRepository.listByRequester(user.id);
-  return json({ requests });
 }
 
 export async function POST(request: NextRequest) {
   const context = createRequestLogContext(request);
   try {
-    const token = request.cookies.get("nexus_session")?.value;
+    const token =
+      request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user) {
-      return json({ error: "Authentication required" }, 401);
+      return json(
+        context,
+        { error: "Authentication required" },
+        401,
+      );
     }
 
     const rateLimit = await consumeRateLimit(
@@ -67,6 +117,7 @@ export async function POST(request: NextRequest) {
     );
     if (!rateLimit.success) {
       return json(
+        context,
         {
           error:
             "Too many verification requests. Please try again tomorrow.",
@@ -75,25 +126,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json().catch(() => null);
-    const parsed = verificationRequestSchema.safeParse(body);
+    const body = await request
+      .json()
+      .catch(() => null);
+    const parsed =
+      verificationRequestSchema.safeParse(body);
 
     if (!parsed.success) {
       return json(
+        context,
         {
-          error: "Invalid verification request",
+          error:
+            "Invalid verification request",
           details: parsed.error.format(),
         },
         400,
       );
     }
 
-    if (parsed.data.targetType === "server") {
+    if (
+      parsed.data.targetType === "server"
+    ) {
       return json(
+        context,
         {
           error:
             "Server ownership verification requires the MTA control challenge flow.",
-          code: "SERVER_CONTROL_CHALLENGE_REQUIRED",
+          code:
+            "SERVER_CONTROL_CHALLENGE_REQUIRED",
         },
         422,
       );
@@ -105,9 +165,15 @@ export async function POST(request: NextRequest) {
       parsed.data.targetType === "user" ||
       parsed.data.targetType === "developer"
     ) {
-      if (parsed.data.targetId !== user.id) {
+      if (
+        parsed.data.targetId !== user.id
+      ) {
         return json(
-          { error: "You can only verify your own profile" },
+          context,
+          {
+            error:
+              "You can only verify your own profile",
+          },
           403,
         );
       }
@@ -119,7 +185,11 @@ export async function POST(request: NextRequest) {
         );
       if (!organization) {
         return json(
-          { error: "Organization was not found" },
+          context,
+          {
+            error:
+              "Organization was not found",
+          },
           404,
         );
       }
@@ -130,7 +200,8 @@ export async function POST(request: NextRequest) {
         );
       const membership = memberships.find(
         (candidate) =>
-          candidate.organizationId === organization.id,
+          candidate.organizationId ===
+          organization.id,
       );
 
       if (
@@ -140,6 +211,7 @@ export async function POST(request: NextRequest) {
             membership.role !== "admin"))
       ) {
         return json(
+          context,
           {
             error:
               "You do not manage this organization",
@@ -148,12 +220,17 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      targetIsVerified = organization.isVerified;
+      targetIsVerified =
+        organization.isVerified;
     }
 
     if (targetIsVerified) {
       return json(
-        { error: "This target is already verified" },
+        context,
+        {
+          error:
+            "This target is already verified",
+        },
         409,
       );
     }
@@ -166,6 +243,7 @@ export async function POST(request: NextRequest) {
       );
     if (duplicate) {
       return json(
+        context,
         {
           error:
             "A verification request is already pending",
@@ -181,7 +259,8 @@ export async function POST(request: NextRequest) {
           requesterId: user.id,
           targetType: parsed.data.targetType,
           targetId: parsed.data.targetId,
-          proofUrl: parsed.data.proofUrl || undefined,
+          proofUrl:
+            parsed.data.proofUrl || undefined,
           notes: parsed.data.notes,
         },
         {
@@ -190,42 +269,53 @@ export async function POST(request: NextRequest) {
           actorType: "user",
           action: "verification.requested",
           details: {
-            targetType: parsed.data.targetType,
+            targetType:
+              parsed.data.targetType,
             targetId: parsed.data.targetId,
           },
         },
       );
 
-    // Moderator inbox + push delivery is best effort and starts only after
-    // the verification request and audit are committed and the 201 can return.
     after(async () => {
       try {
-        const moderatorIds = await userRepository.listModeratorIds();
-        const dispatch = await dispatchNotificationsBestEffort(
-          moderatorIds.map((moderatorId) => ({
-            recipientId: moderatorId,
-            title: "New verification request",
-            message:
-              parsed.data.targetType +
-              " verification requested for " +
-              parsed.data.targetId,
-            link: "/admin?verificationView=pending&verificationPage=1",
-            type: "security" as const,
-          })),
-        );
+        const moderatorIds =
+          await userRepository.listModeratorIds();
+        const dispatch =
+          await dispatchNotificationsBestEffort(
+            moderatorIds.map(
+              (moderatorId) => ({
+                recipientId: moderatorId,
+                title:
+                  "New verification request",
+                message:
+                  parsed.data.targetType +
+                  " verification requested for " +
+                  parsed.data.targetId,
+                link:
+                  "/admin?verificationView=pending&verificationPage=1",
+                type: "security" as const,
+              }),
+            ),
+          );
+
         if (dispatch.storageFailed) {
           logRequestEvent({
             level: "warn",
-            event: "verification.moderator_notification_partial_failure",
+            event:
+              "verification.moderator_notification_partial_failure",
             context,
             status: 201,
-            fields: { storageFailed: dispatch.storageFailed },
+            fields: {
+              storageFailed:
+                dispatch.storageFailed,
+            },
           });
         }
       } catch (error) {
         logRequestEvent({
           level: "warn",
-          event: "verification.moderator_notification_failed",
+          event:
+            "verification.moderator_notification_failed",
           context,
           status: 201,
           error,
@@ -234,6 +324,7 @@ export async function POST(request: NextRequest) {
     });
 
     return json(
+      context,
       {
         success: true,
         request: verificationRequest,
@@ -243,7 +334,11 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     if (error instanceof AppError) {
       return json(
-        { error: error.message, code: error.code },
+        context,
+        {
+          error: error.message,
+          code: error.code,
+        },
         error.statusCode,
       );
     }
@@ -256,7 +351,11 @@ export async function POST(request: NextRequest) {
       error,
     });
     return json(
-      { error: "Failed to submit verification request" },
+      context,
+      {
+        error:
+          "Failed to submit verification request",
+      },
       500,
     );
   }
