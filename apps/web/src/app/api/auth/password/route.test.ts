@@ -16,7 +16,7 @@ const consumeRateLimit = vi.hoisted(() =>
   vi.fn(async () => ({ success: state.allowed })),
 );
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
     changePassword,
@@ -27,7 +27,7 @@ vi.mock("@nexus/security", async (importOriginal) => {
   return { ...actual, consumeRateLimit };
 });
 
-import { POST } from "../apps/web/src/app/api/auth/password/route";
+import { POST } from "./route";
 
 function request(body: unknown, cookie = "nexus_session=ses_current") {
   return new NextRequest("http://nexus.test/api/auth/password", {

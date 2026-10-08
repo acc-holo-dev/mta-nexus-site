@@ -26,7 +26,7 @@ const logout = vi.hoisted(() =>
   }),
 );
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/auth-service", () => ({
   authService: {
     getSession,
     logout,
@@ -36,7 +36,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 import {
   DELETE,
   GET,
-} from "../apps/web/src/app/api/auth/session/route";
+} from "./route";
 
 function request(method = "GET") {
   return new NextRequest(

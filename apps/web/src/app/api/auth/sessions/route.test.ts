@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
-import { parseSessionRevocation } from "../apps/web/src/lib/session-revocation";
+import { parseSessionRevocation } from "../../../../lib/session-revocation";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_owner" } as { id: string } | null,
@@ -28,7 +28,7 @@ const listSessions = vi.hoisted(() => vi.fn(async () => [
   },
 ]));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
     getCurrentSessionId: vi.fn(async () => state.currentSessionId),
@@ -44,7 +44,7 @@ vi.mock("@nexus/domain", () => ({
   AppError: class AppError extends Error {},
 }));
 
-import { DELETE, GET } from "../apps/web/src/app/api/auth/sessions/route";
+import { DELETE, GET } from "./route";
 
 function listRequest() {
   return new NextRequest("http://nexus.test/api/auth/sessions", {

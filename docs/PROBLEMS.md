@@ -264,10 +264,11 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   в `apps/web/src/components/`; reports, verification, follow, article-comment
   и support HTTP suites перенесены непосредственно к своим Route Handlers.
   Focused `test:reports` и `test:verification` обновлены на новые пути.
-  Follow GET cache contract объединён с colocated follow suite, а inbox /
-  preferences / Web Push correlation suite перенесён к `/api/notifications`.
-  Root devDependencies остаются только для оставшихся cross-workspace suites;
-  перенос продолжать по мере правок;
+  Follow GET cache contract объединён с colocated follow suite, inbox /
+  preferences / Web Push correlation suite перенесён к `/api/notifications`,
+  а current-session, password-change и session-revocation HTTP contracts —
+  непосредственно к auth Route Handlers. Root devDependencies остаются только
+  для оставшихся cross-workspace suites; перенос продолжать по мере правок;
 - private GET cache source policy заменён прямыми HTTP response assertions:
   auth context, notification preferences/inbox, reports, verification, follow
   и downloads подтверждают `private, no-store` + `Vary: Cookie`, а
