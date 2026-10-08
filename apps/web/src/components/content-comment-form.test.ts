@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../lib/i18n";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
@@ -9,15 +9,15 @@ const state = vi.hoisted(() => ({
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn() }),
 }));
-vi.mock("../apps/web/src/components/locale-context", () => ({
+vi.mock("./locale-context", () => ({
   useNexusLocale: () => ({
     locale: state.locale,
     dictionary: getDictionary(state.locale),
   }),
 }));
 
-import { ContentCommentForm } from "../apps/web/src/components/content-comment-form";
-import { submitContentCommentRequest } from "../apps/web/src/lib/content-comment-client";
+import { ContentCommentForm } from "./content-comment-form";
+import { submitContentCommentRequest } from "../lib/content-comment-client";
 
 describe("content discussion form", () => {
   beforeEach(() => {

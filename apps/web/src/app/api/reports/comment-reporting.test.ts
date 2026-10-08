@@ -22,10 +22,10 @@ vi.mock("next/server", async () => {
   const actual = await vi.importActual<typeof import("next/server")>("next/server");
   return { ...actual, after: afterMock };
 });
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../../../lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 vi.mock("@nexus/security", () => ({
@@ -50,7 +50,7 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-import { POST } from "../apps/web/src/app/api/reports/route";
+import { POST } from "./route";
 
 function request(targetId = "cmt_1") {
   return new NextRequest("https://nexus.test/api/reports", {

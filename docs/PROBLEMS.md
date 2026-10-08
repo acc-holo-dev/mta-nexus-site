@@ -258,9 +258,12 @@ CHECK, известный алиас tool → plugin и отказ на неиз
 
 ### P2-5. Тестовая инфраструктура: хрупкости и производительность
 
-- root `tests/` импортируют `next/server`, `drizzle-orm` — работает через
-  root devDependencies (`ea5235c`); долгосрочно тесты стоит перенести в
-  соответствующие пакеты воркспейса;
+- root `tests/` всё ещё содержит часть cross-workspace HTTP/integration
+  сценариев, но новые comment contracts перенесены к владельцам кода:
+  repository transaction contract — в `packages/db/src/repositories/`,
+  form/client contract — в `apps/web/src/components/`, report-comment HTTP
+  contract — рядом с route. Root devDependencies всё ещё поддерживают
+  оставшиеся cross-workspace suites; перенос продолжать по мере правок;
 - private GET cache source policy заменён прямыми HTTP response assertions:
   auth context, notification preferences/inbox, reports, verification, follow
   и downloads подтверждают `private, no-store` + `Vary: Cookie`, а

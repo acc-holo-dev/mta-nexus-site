@@ -1,7 +1,7 @@
 import { PgDialect } from "drizzle-orm/pg-core";
 import type { SQL } from "drizzle-orm";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { auditEvents, comments, content } from "../packages/db/src/schema";
+import { auditEvents, comments, content } from "../schema";
 
 const captured = vi.hoisted(() => ({
   transactionCalls: 0,
@@ -11,7 +11,7 @@ const captured = vi.hoisted(() => ({
   updateWhere: null as SQL | null,
 }));
 
-vi.mock("../packages/db/src/client", () => ({
+vi.mock("../client", () => ({
   db: {
     transaction: async (run: (tx: unknown) => Promise<unknown>) => {
       captured.transactionCalls += 1;
@@ -50,7 +50,7 @@ vi.mock("../packages/db/src/client", () => ({
   },
 }));
 
-import { ContentRepository } from "../packages/db/src/repositories/content";
+import { ContentRepository } from "./content";
 
 describe("article comment persistence", () => {
   beforeEach(() => {
