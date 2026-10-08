@@ -4,6 +4,7 @@ import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useNexusLocale } from "./locale-context";
+import { clearSupportRetry, reserveSupportReplyRetry } from "../lib/support-retry";
 import { confirmSupportReply, confirmSupportStatusChanged, parseSupportThread, type SupportCaseData, type SupportMessageData } from "../lib/support-response";
 
 export function SupportCaseThread({
@@ -95,15 +96,12 @@ export function SupportCaseThread({
     if (mutationInFlight.current || !reply.trim() || !supportCase) return;
     mutationInFlight.current = true;
     const expectedStatus = supportCase.status;
-    const payload = JSON.stringify({ message: reply.trim(), expectedStatus });
-    if (pendingReply.current?.payload !== payload) {
-      pendingReply.current = { payload, key: crypto.randomUUID() };
-    }
-    const requestKey = pendingReply.current.key;
-
     setSending(true);
     setError(null);
     try {
+      const attempt = await reserveSupportReplyRetry(caseId, reply.trim(), expectedStatus);
+      const { key: requestKey, payload } = attempt;
+      pendingReply.current = { payload, key: requestKey };
       const response = await fetch(
         `/api/support/${encodeURIComponent(caseId)}`,
         {
@@ -121,6 +119,7 @@ export function SupportCaseThread({
       const data = await response.json().catch(() => null);
       if (response.status === 409) {
         // A definitive conflict means this request was not committed.
+        clearSupportRetry("reply:" + caseId, requestKey);
         pendingReply.current = null;
         if (await load()) setError(copy.replyConflict);
         return;
@@ -135,6 +134,7 @@ export function SupportCaseThread({
         throw new Error(copy.replyError);
       }
 
+      clearSupportRetry("reply:" + caseId, requestKey);
       pendingReply.current = null;
       setSupportCase(confirmed.supportCase);
       if (data?.replayed === true) {

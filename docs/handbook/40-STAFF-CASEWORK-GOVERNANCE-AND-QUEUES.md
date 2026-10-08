@@ -134,3 +134,10 @@ Risk/provider policy может добавить dual-control позже без 
 - The browser keeps the same UUID only while retrying unchanged normalized content in the mounted form. It resets the key on a confirmed response or a changed payload; a full reload does **not** persist it. A lost-response reload remains an explicitly tracked P2 limitation.
 - Neither replay result lookup nor the idempotency row authorizes access by itself. The HTTP route first verifies the session and the user's ownership or moderation capability. The key does not bypass ACLs or allow another actor to fetch an unrelated reply.
 - Migration and repo integration tests cover concurrent requests, payload/key conflicts, status changes, audit cardinality and actor isolation. They still require actual PostgreSQL/executable CI validation before release acceptance.
+
+## 13. Reload-safe retry keys (implemented in code)
+
+- Same-tab reload retains only UUIDv4, SHA-256 normalized payload digest, reply status and expiration in sessionStorage; no subject/message content persists.
+- Reusing a matching form payload preserves the original request key and, for replies, its original expected status even if staff has since changed status. The server recognizes already-committed replies before its CAS check.
+- Entries expire after 24 hours. A changed payload gets a fresh key; a successful response or definitive conflict clears the matching key. Inaccessible browser storage falls back to volatile memory.
+- A full cross-tab or logout/account-switch guarantee is **not yet verified**. The stored key is authenticated and actor-scoped on the server, but another user of the same browser session should not inherit a pending form attempt. See PROBLEMS.md.

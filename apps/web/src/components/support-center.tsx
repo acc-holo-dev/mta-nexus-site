@@ -4,6 +4,7 @@ import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useNexusLocale } from "./locale-context";
+import { clearSupportRetry, reserveSupportCaseRetry } from "../lib/support-retry";
 import {
   confirmSupportCaseCreated,
   parseSupportCasePage,
@@ -110,11 +111,10 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
       subject: subject.trim(),
       message: message.trim(),
     });
-    if (pendingCreate.current?.payload !== payload) {
-      pendingCreate.current = { payload, key: crypto.randomUUID() };
-    }
-    const requestKey = pendingCreate.current.key;
     try {
+      const attempt = await reserveSupportCaseRetry(payload);
+      const requestKey = attempt.key;
+      pendingCreate.current = { payload, key: requestKey };
       const response = await fetch("/api/support", {
         method: "POST",
         cache: "no-store",
@@ -132,6 +132,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
         throw new Error(copy.createError);
       }
 
+      clearSupportRetry("case", requestKey);
       pendingCreate.current = null;
       setSubject("");
       setMessage("");
