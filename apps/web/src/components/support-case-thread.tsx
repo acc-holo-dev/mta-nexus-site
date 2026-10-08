@@ -71,7 +71,7 @@ export function SupportCaseThread({
 
   async function sendReply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (sending || !reply.trim()) return;
+    if (sending || updatingStatus || !reply.trim()) return;
 
     setSending(true);
     setError(null);
@@ -120,6 +120,11 @@ export function SupportCaseThread({
         },
       );
       const data = await response.json().catch(() => null);
+      if (response.status === 409) {
+        await load();
+        setError(copy.statusError);
+        return;
+      }
       const confirmed = confirmSupportStatusChanged(response.status, data, caseId, status);
       if (!response.ok || !confirmed) {
         throw new Error(copy.statusError);
@@ -278,7 +283,7 @@ export function SupportCaseThread({
           </label>
           <button
             type="submit"
-            disabled={sending}
+            disabled={sending || updatingStatus}
             className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
           >
             <Send className="h-4 w-4" aria-hidden="true" />
