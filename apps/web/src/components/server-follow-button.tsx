@@ -5,6 +5,7 @@ import { Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNexusLocale } from "./locale-context";
 import { confirmsFollowMutation } from "../lib/follow-confirmation";
+import { privateApiRequest } from "../lib/private-api-request";
 
 type FollowState =
   | "checking"
@@ -30,16 +31,14 @@ export function ServerFollowButton({
   useEffect(() => {
     let active = true;
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 10_000);
 
     setState("checking");
     fetch(
       `/api/follow?targetType=server&targetId=${encodeURIComponent(serverId)}`,
-      {
-        cache: "no-store",
-        credentials: "same-origin",
+      privateApiRequest({
         signal: controller.signal,
-      },
+        timeoutMs: 10_000,
+      }),
     )
       .then(async (response) => {
         if (!response.ok) throw new Error("Follow status unavailable");
@@ -60,13 +59,10 @@ export function ServerFollowButton({
       .catch(() => {
         if (active) setState("error");
       })
-      .finally(() => {
-        window.clearTimeout(timeout);
-      });
+      .finally(() => undefined);
 
     return () => {
       active = false;
-      window.clearTimeout(timeout);
       controller.abort();
     };
   }, [serverId, attempt]);
@@ -81,17 +77,17 @@ export function ServerFollowButton({
 
     setPending(true);
     try {
-      const response = await fetch("/api/follow", {
-        method: state === "following" ? "DELETE" : "POST",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          targetType: "server",
-          targetId: serverId,
+      const response = await fetch(
+        "/api/follow",
+        privateApiRequest({
+          method: state === "following" ? "DELETE" : "POST",
+          json: {
+            targetType: "server",
+            targetId: serverId,
+          },
+          timeoutMs: 10_000,
         }),
-        signal: AbortSignal.timeout(10_000),
-      });
+      );
 
       if (response.status === 401) {
         setState("anonymous");

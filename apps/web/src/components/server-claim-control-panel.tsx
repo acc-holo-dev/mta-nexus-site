@@ -8,6 +8,7 @@ import {
   parseIssuedServerClaimChallenge,
   type IssuedServerClaimChallenge,
 } from "../lib/server-claim-confirmation";
+import { privateApiRequest } from "../lib/private-api-request";
 import { useNexusLocale } from "./locale-context";
 
 export function ServerClaimControlPanel({
@@ -36,12 +37,10 @@ export function ServerClaimControlPanel({
     try {
       const response = await fetch(
         `/api/servers/${encodeURIComponent(serverId)}/claim-challenge`,
-        {
+        privateApiRequest({
           method: "POST",
-          cache: "no-store",
-          credentials: "same-origin",
-          signal: AbortSignal.timeout(10_000),
-        },
+          timeoutMs: 10_000,
+        }),
       );
       const data = await response.json().catch(() => null);
       if (response.status === 401) {
@@ -78,17 +77,14 @@ export function ServerClaimControlPanel({
         `/api/servers/${encodeURIComponent(
           serverId,
         )}/claim-challenge/verify`,
-        {
+        privateApiRequest({
           method: "POST",
-          cache: "no-store",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+          json: {
             challengeId: challenge.challengeId,
             token: challenge.token,
-          }),
-          signal: AbortSignal.timeout(15_000),
-        },
+          },
+          timeoutMs: 15_000,
+        }),
       );
       const data = await response.json().catch(() => null);
       if (response.status === 401) {
