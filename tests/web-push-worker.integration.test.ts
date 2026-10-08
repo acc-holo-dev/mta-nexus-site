@@ -110,6 +110,14 @@ describe("Web Push worker repository", () => {
       ),
     ).toBe(true);
 
+    const [deferred] = await db
+      .select({ availableAt: webPushOutbox.availableAt })
+      .from(webPushOutbox)
+      .where(eq(webPushOutbox.id, f.jobId));
+    expect(deferred?.availableAt.getTime()).toBeGreaterThan(
+      Date.now() + 45_000,
+    );
+
     await db
       .update(webPushOutbox)
       .set({

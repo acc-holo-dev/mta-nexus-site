@@ -326,6 +326,7 @@ export class WebPushWorkerRepository {
     lease: WebPushLease,
     outcome: "accepted" | "retry" | "discard",
     statusCode?: number,
+    retryAfterMs?: number,
   ): Promise<boolean> {
     const digest = leaseDigest(lease);
     if (
@@ -337,6 +338,16 @@ export class WebPushWorkerRepository {
       )
     ) {
       throw new RangeError("Invalid Web Push status code");
+    }
+    if (
+      retryAfterMs !== undefined &&
+      (
+        !Number.isSafeInteger(retryAfterMs) ||
+        retryAfterMs < 0 ||
+        retryAfterMs > 24 * 60 * 60 * 1_000
+      )
+    ) {
+      throw new RangeError("Invalid Web Push Retry-After");
     }
 
     return transaction(async (tx) => {
@@ -383,10 +394,13 @@ export class WebPushWorkerRepository {
         return deleted.length === 1;
       }
 
+      const retryDelay = Math.max(
+        retryDelayMs(lease.id, lease.attempt),
+        retryAfterMs ?? 0,
+      );
       const retryAt = new Date(
         Math.min(
-          now.getTime() +
-            retryDelayMs(lease.id, lease.attempt),
+          now.getTime() + retryDelay,
           row.expiresAt.getTime(),
         ),
       );

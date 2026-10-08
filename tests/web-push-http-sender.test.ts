@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { WebPushVapidConfig } from "@nexus/config";
 import {
   createWebPushHttpSender,
+  parseWebPushRetryAfter,
   prepareWebPushRequest,
   type WebPushHttpsRequest,
 } from "../apps/web/src/lib/services/web-push-http-sender";
@@ -31,6 +32,23 @@ function subscription() {
     auth: Buffer.alloc(16, 7).toString("base64url"),
   };
 }
+
+describe("Web Push Retry-After parsing", () => {
+  it("supports delta-seconds, HTTP-date and bounded delays", () => {
+    const now = Date.UTC(2030, 0, 1, 0, 0, 0);
+    expect(parseWebPushRetryAfter("30", now)).toBe(30_000);
+    expect(
+      parseWebPushRetryAfter(
+        new Date(now + 45_000).toUTCString(),
+        now,
+      ),
+    ).toBe(45_000);
+    expect(parseWebPushRetryAfter("999999999", now)).toBe(
+      24 * 60 * 60 * 1_000,
+    );
+    expect(parseWebPushRetryAfter("not-a-date", now)).toBeUndefined();
+  });
+});
 
 describe("Web Push HTTP sender", () => {
   it("builds the mandatory RFC push headers", () => {

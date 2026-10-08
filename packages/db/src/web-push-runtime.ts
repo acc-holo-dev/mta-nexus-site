@@ -35,6 +35,7 @@ export type WebPushNotificationPayload = {
 
 export type WebPushSendResult = {
   statusCode: number;
+  retryAfterMs?: number;
 };
 
 export class WebPushPermanentSubscriptionError extends Error {
@@ -87,6 +88,29 @@ export type WebPushHttpsRequest = {
 export type WebPushHttpsTransport = (
   request: WebPushHttpsRequest,
 ) => Promise<WebPushSendResult>;
+
+export function parseWebPushRetryAfter(
+  value: string | string[] | undefined,
+  nowMs = Date.now(),
+): number | undefined {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw) return undefined;
+  const trimmed = raw.trim();
+  if (!trimmed) return undefined;
+
+  if (/^[0-9]+$/u.test(trimmed)) {
+    const seconds = Number(trimmed);
+    if (!Number.isSafeInteger(seconds)) return undefined;
+    return Math.min(seconds * 1_000, 24 * 60 * 60 * 1_000);
+  }
+
+  const timestamp = Date.parse(trimmed);
+  if (!Number.isFinite(timestamp)) return undefined;
+  return Math.min(
+    Math.max(0, timestamp - nowMs),
+    24 * 60 * 60 * 1_000,
+  );
+}
 
 export type WebPushSendOptions = {
   signal?: AbortSignal;
@@ -610,8 +634,16 @@ export const sendWebPushHttpsRequest: WebPushHttpsTransport =
           },
           (response) => {
             const statusCode = response.statusCode ?? 0;
+            const retryAfterMs = parseWebPushRetryAfter(
+              response.headers["retry-after"],
+            );
             response.destroy();
-            resolve({ statusCode });
+            resolve({
+              statusCode,
+              ...(retryAfterMs !== undefined
+                ? { retryAfterMs }
+                : {}),
+            });
           },
         );
 

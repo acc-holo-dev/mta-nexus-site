@@ -67,7 +67,10 @@ describe("Web Push dispatcher", () => {
     const sender = vi
       .fn()
       .mockResolvedValueOnce({ statusCode: 201 })
-      .mockResolvedValueOnce({ statusCode: 503 })
+      .mockResolvedValueOnce({
+        statusCode: 503,
+        retryAfterMs: 45_000,
+      })
       .mockResolvedValueOnce({ statusCode: 400 })
       .mockResolvedValueOnce({ statusCode: 410 });
 
@@ -96,6 +99,7 @@ describe("Web Push dispatcher", () => {
       expect.anything(),
       "retry",
       503,
+      45_000,
     );
     expect(w.settle).toHaveBeenNthCalledWith(
       3,

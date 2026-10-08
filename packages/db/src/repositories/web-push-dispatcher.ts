@@ -22,6 +22,7 @@ type Worker = Readonly<{
     lease: WebPushLease,
     outcome: "accepted" | "retry" | "discard",
     statusCode?: number,
+    retryAfterMs?: number,
   ): Promise<boolean>;
   discardStaleSubscription(
     lease: WebPushLease,
@@ -225,6 +226,9 @@ export class WebPushDispatcher {
         lease,
         outcome,
         result.statusCode,
+        outcome === "retry"
+          ? result.retryAfterMs
+          : undefined,
       );
       if (!settled) {
         summary.unsettled += 1;
