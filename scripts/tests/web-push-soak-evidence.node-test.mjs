@@ -41,6 +41,10 @@ function evidence(overrides = {}) {
       passed: true,
       failures: [],
     },
+    cleanup: {
+      attempted: true,
+      succeeded: true,
+    },
     runtime: {
       node: process.version,
       platform: process.platform,
@@ -86,6 +90,18 @@ test("rejects tampered evidence", () => {
   const result = run(value);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /checksum mismatch/u);
+});
+
+test("rejects evidence without proven fixture cleanup", () => {
+  const value = evidence({
+    cleanup: {
+      attempted: true,
+      succeeded: false,
+    },
+  });
+  const result = run(value);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /cleanup was not proven/u);
 });
 
 test("rejects a failed or undrained soak", () => {

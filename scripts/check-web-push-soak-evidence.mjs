@@ -59,6 +59,13 @@ if (
 }
 
 if (
+  evidence?.cleanup?.attempted !== true ||
+  evidence?.cleanup?.succeeded !== true
+) {
+  fail("fixture cleanup was not proven");
+}
+
+if (
   !Number.isSafeInteger(evidence?.timing?.durationActualMs) ||
   evidence.timing.durationActualMs <
     evidence?.timing?.durationTargetMs

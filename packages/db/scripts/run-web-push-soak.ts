@@ -194,6 +194,7 @@ let stoppedEnqueueAt = 0;
 let completedAt = 0;
 let fixtureCreated = false;
 let cleanupSucceeded = true;
+let evidenceCore: Record<string, unknown> | null = null;
 
 async function snapshot() {
   const [fixture, global] = await Promise.all([
@@ -358,7 +359,7 @@ try {
     queueCapacity: finalGlobal.capacity,
   });
 
-  const evidenceCore = {
+  evidenceCore = {
     schemaVersion: 1,
     kind: "web_push_production_duration_soak",
     generatedAt: new Date().toISOString(),
@@ -399,18 +400,6 @@ try {
       arch: process.arch,
     },
   };
-  const evidenceSha256 = createHash("sha256")
-    .update(JSON.stringify(evidenceCore))
-    .digest("hex");
-  await writeEvidence({
-    ...evidenceCore,
-    evidenceSha256,
-  });
-
-  process.stdout.write(
-    `web-push-soak status=${verdict.passed ? "passed" : "failed"} jobs=${enqueuedJobs} accepted=${acceptedKeys.size} retries=${summary.retried} evidence=${evidencePath}\n`,
-  );
-  if (!verdict.passed) process.exitCode = 1;
 } finally {
   if (fixtureCreated) {
     try {
@@ -422,13 +411,50 @@ try {
     } catch {
       cleanupSucceeded = false;
     }
-    if (!cleanupSucceeded) {
-      process.stderr.write(
-        "web-push-soak cleanup failed for fixture namespace " +
-          suffix +
-          "\n",
-      );
-      process.exitCode = 1;
-    }
+  }
+
+  if (evidenceCore) {
+    const currentVerdict = evidenceCore.verdict as {
+      passed: boolean;
+      failures: readonly string[];
+    };
+    const finalVerdict = cleanupSucceeded
+      ? currentVerdict
+      : {
+          passed: false,
+          failures: [
+            ...currentVerdict.failures,
+            "fixture_cleanup_failed",
+          ],
+        };
+    const finalCore = {
+      ...evidenceCore,
+      cleanup: {
+        attempted: fixtureCreated,
+        succeeded: cleanupSucceeded,
+      },
+      verdict: finalVerdict,
+    };
+    const evidenceSha256 = createHash("sha256")
+      .update(JSON.stringify(finalCore))
+      .digest("hex");
+    await writeEvidence({
+      ...finalCore,
+      evidenceSha256,
+    });
+
+    process.stdout.write(
+      `web-push-soak status=${finalVerdict.passed ? "passed" : "failed"} jobs=${enqueuedJobs} accepted=${acceptedKeys.size} retries=${summary.retried} evidence=${evidencePath}\n`,
+    );
+    if (!finalVerdict.passed) process.exitCode = 1;
+  }
+
+  if (!cleanupSucceeded) {
+    process.stderr.write(
+      "web-push-soak cleanup failed for fixture namespace " +
+        suffix +
+        "\n",
+    );
+    process.exitCode = 1;
   }
 }
