@@ -111,11 +111,33 @@ export class WebPushDispatcher {
         continue;
       }
 
+      if (signal?.aborted) {
+        const settled = await this.#worker.settle(
+          lease,
+          "retry",
+        );
+        if (settled) summary.retried += 1;
+        else summary.unsettled += 1;
+        onProgress?.();
+        break;
+      }
+
       const prepared = await this.#worker.prepare(lease);
       if (!prepared) {
         summary.skipped += 1;
         onProgress?.();
         continue;
+      }
+
+      if (signal?.aborted) {
+        const settled = await this.#worker.settle(
+          lease,
+          "retry",
+        );
+        if (settled) summary.retried += 1;
+        else summary.unsettled += 1;
+        onProgress?.();
+        break;
       }
 
       const sendWindowMs =
