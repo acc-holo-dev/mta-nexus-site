@@ -143,6 +143,9 @@ describe("resource download HTTP contract", () => {
     expect(response.status).toBe(401);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.json()).toEqual({
       error: "Authentication required to download resource builds",
     });
@@ -161,6 +164,9 @@ describe("resource download HTTP contract", () => {
     expect(response.status).toBe(404);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.json()).toEqual({
       error: "Resource not found",
     });
@@ -175,6 +181,9 @@ describe("resource download HTTP contract", () => {
     expect(response.status).toBe(403);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.json()).toEqual({
       error: "Add this resource to your library before downloading it",
     });
@@ -221,6 +230,9 @@ describe("resource download HTTP contract", () => {
     expect(response.status).toBe(404);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.json()).toEqual({
       error: "No published build is available",
     });
@@ -263,6 +275,9 @@ describe("resource download HTTP contract", () => {
       expect(response.status).toBe(500);
       expect(response.headers.get("Cache-Control")).toBe("private, no-store");
       expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
       expect(openedStream.destroyed).toBe(true);
     } finally {
       consoleError.mockRestore();
@@ -313,7 +328,13 @@ describe("resource download HTTP contract", () => {
     expect(response.headers.get("X-Content-SHA256")).toBe("a".repeat(64));
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(response.headers.get("Content-Disposition")).toContain(
       'filename="http-resource-1.2.3.zip"',
     );

@@ -1,65 +1,125 @@
+import path from "node:path";
+import { ValidationError } from "@nexus/domain";
 import {
-import { createRequestLogContext, logRequestEvent } from "../../../../../lib/observability";
+  auditRepository,
+  buildRepository,
+  productRepository,
+} from "@nexus/db";
+import { consumeRateLimit, generateId } from "@nexus/security";
+import { storageService } from "@nexus/storage";
+import { type NextRequest, NextResponse } from "next/server";
+import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
 } from "../../../../../lib/build-download-metadata";
-import path from "node:path";
 import { toDownloadWebStream } from "../../../../../lib/download-web-stream";
-import { type NextRequest, NextResponse } from "next/server";
+import {
+  REQUEST_ID_HEADER,
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../../lib/observability";
+import { decideResourceDownloadAccess } from "../../../../../lib/resource-download-policy";
 import { authService } from "../../../../../lib/services/auth-service";
 import { commerceService } from "../../../../../lib/services/commerce-service";
-import { productRepository, buildRepository, auditRepository } from "@nexus/db";
-import { storageService } from "@nexus/storage";
-import { consumeRateLimit, generateId } from "@nexus/security";
-import { ValidationError } from "@nexus/domain";
-import { decideResourceDownloadAccess } from "../../../../../lib/resource-download-policy";
 import { productService } from "../../../../../lib/services/product-service";
 
-const DOWNLOAD_EXTENSIONS = new Set([".zip", ".rar", ".7z", ".lua"]);
-const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+const DOWNLOAD_EXTENSIONS = new Set([
+  ".zip",
+  ".rar",
+  ".7z",
+  ".lua",
+]);
 
-function getDownloadExtension(storageKey: string): string {
-  const extension = path.extname(storageKey).toLowerCase();
-  return DOWNLOAD_EXTENSIONS.has(extension) ? extension : ".zip";
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
+    status,
+    headers: privateHeaders,
+  });
 }
 
-function destroyOpenedStream(stream: NodeJS.ReadableStream): void {
-  const destroyable = stream as NodeJS.ReadableStream & {
-    destroy?: (error?: Error) => void;
-  };
+function getDownloadExtension(
+  storageKey: string,
+): string {
+  const extension = path
+    .extname(storageKey)
+    .toLowerCase();
+  return DOWNLOAD_EXTENSIONS.has(extension)
+    ? extension
+    : ".zip";
+}
+
+function destroyOpenedStream(
+  stream: NodeJS.ReadableStream,
+): void {
+  const destroyable =
+    stream as NodeJS.ReadableStream & {
+      destroy?: (error?: Error) => void;
+    };
   destroyable.destroy?.();
 }
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const context = createRequestLogContext(request);
+
   try {
     const { id: productId } = await params;
-    const token = request.cookies.get("nexus_session")?.value;
+    const token =
+      request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
+
     if (!user) {
-      return NextResponse.json(
-        { error: "Authentication required to download resource builds" },
-        { status: 401, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error:
+            "Authentication required to download resource builds",
+        },
+        401,
       );
     }
 
-    const rateLimit = await consumeRateLimit("download", user.id);
+    const rateLimit = await consumeRateLimit(
+      "download",
+      user.id,
+    );
     if (!rateLimit.success) {
-      return NextResponse.json(
+      return json(
+        context,
         { error: "Too many download requests" },
-        { status: 429, headers: privateHeaders },
+        429,
       );
     }
 
-    const product = await productRepository.findById(productId);
+    const product =
+      await productRepository.findById(productId);
     if (!product) {
-      return NextResponse.json(
+      return json(
+        context,
         { error: "Resource not found" },
-        { status: 404, headers: privateHeaders },
+        404,
       );
     }
 
     const isPrivileged =
-      user.role === "admin" || (await productService.canManageProduct(product, user));
+      user.role === "admin" ||
+      (await productService.canManageProduct(
+        product,
+        user,
+      ));
     const hasEntitlement = isPrivileged
       ? false
       : await commerceService.checkEntitlement(
@@ -67,41 +127,74 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           productId,
           "product.download",
         );
-    const access = decideResourceDownloadAccess(product, isPrivileged, hasEntitlement);
+    const access = decideResourceDownloadAccess(
+      product,
+      isPrivileged,
+      hasEntitlement,
+    );
 
     if (!access.allowed) {
-      if (access.reason === "resource_not_published") {
-        return NextResponse.json(
+      if (
+        access.reason ===
+        "resource_not_published"
+      ) {
+        return json(
+          context,
           { error: "Resource not found" },
-          { status: 404, headers: privateHeaders },
+          404,
         );
       }
-      return NextResponse.json(
-        { error: "Add this resource to your library before downloading it" },
-        { status: 403, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error:
+            "Add this resource to your library before downloading it",
+        },
+        403,
       );
     }
 
-    const latestBuild = await buildRepository.findLatestPublishedByProduct(productId);
+    const latestBuild =
+      await buildRepository.findLatestPublishedByProduct(
+        productId,
+      );
     if (!latestBuild) {
-      return NextResponse.json(
-        { error: "No published build is available" },
-        { status: 404, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error:
+            "No published build is available",
+        },
+        404,
       );
     }
+
     if (
       latestBuild.scanStatus !== "clean" ||
       !latestBuild.scanner?.trim() ||
       !latestBuild.scannedAt
     ) {
-      return NextResponse.json(
-        { error: "Published build is not cleared for delivery" },
-        { status: 409, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error:
+            "Published build is not cleared for delivery",
+        },
+        409,
       );
     }
 
-    const stored = await storageService.getDownloadStream(latestBuild.storageKey, request.signal);
-    const contentLength = assertBuildDownloadMetadata(stored, latestBuild);
+    const stored =
+      await storageService.getDownloadStream(
+        latestBuild.storageKey,
+        request.signal,
+      );
+    const contentLength =
+      assertBuildDownloadMetadata(
+        stored,
+        latestBuild,
+      );
+
     try {
       request.signal.throwIfAborted();
       await auditRepository.record({
@@ -111,7 +204,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         action: "product.download_started",
         targetId: productId,
         targetType: "product",
-        details: { buildId: latestBuild.id, version: latestBuild.version },
+        details: {
+          buildId: latestBuild.id,
+          version: latestBuild.version,
+        },
       });
       request.signal.throwIfAborted();
     } catch (error) {
@@ -119,42 +215,66 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       throw error;
     }
 
-    const stream = toDownloadWebStream(stored.stream);
-    const fileName = `${product.slug}-${latestBuild.version}${getDownloadExtension(latestBuild.fileName)}`;
+    const stream =
+      toDownloadWebStream(stored.stream);
+    const fileName =
+      `${product.slug}-${latestBuild.version}${getDownloadExtension(
+        latestBuild.fileName,
+      )}`;
+
     return new NextResponse(stream, {
       headers: {
-        "Content-Type": latestBuild.mimeType || stored.meta?.mimeType || "application/octet-stream",
-        "Content-Disposition": `attachment; filename="${fileName}"`,
+        "Content-Type":
+          latestBuild.mimeType ||
+          stored.meta?.mimeType ||
+          "application/octet-stream",
+        "Content-Disposition":
+          `attachment; filename="${fileName}"`,
         "Content-Length": String(contentLength),
-        "X-Content-SHA256": latestBuild.sha256Hash,
+        "X-Content-SHA256":
+          latestBuild.sha256Hash,
         ...privateHeaders,
         "X-Content-Type-Options": "nosniff",
+        [REQUEST_ID_HEADER]: context.requestId,
       },
     });
   } catch (error: unknown) {
     if (request.signal.aborted) {
-      return NextResponse.json(
-        { error: "Download cancelled", code: "DOWNLOAD_CANCELLED" },
-        { status: 499, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error: "Download cancelled",
+          code: "DOWNLOAD_CANCELLED",
+        },
+        499,
       );
     }
-    if (error instanceof BuildArtifactMismatchError) {
-      return NextResponse.json(
+
+    if (
+      error instanceof BuildArtifactMismatchError
+    ) {
+      return json(
+        context,
         {
-          error: "Build file does not match its recorded metadata",
+          error:
+            "Build file does not match its recorded metadata",
           code: "BUILD_ARTIFACT_MISMATCH",
         },
-        { status: 409, headers: privateHeaders },
+        409,
       );
     }
-    // A build whose bytes are missing from storage is a data-state problem,
-    // not a server fault: answer with an honest 404 instead of a 500.
+
     if (error instanceof ValidationError) {
-      return NextResponse.json(
-        { error: "Resource build file is not available" },
-        { status: 404, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error:
+            "Resource build file is not available",
+        },
+        404,
       );
     }
+
     logRequestEvent({
       level: "error",
       event: "product.download_failed",
@@ -162,9 +282,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       status: 500,
       error,
     });
-    return NextResponse.json(
-      { error: "Failed to deliver resource build" },
-      { status: 500, headers: privateHeaders },
+    return json(
+      context,
+      {
+        error:
+          "Failed to deliver resource build",
+      },
+      500,
     );
   }
 }

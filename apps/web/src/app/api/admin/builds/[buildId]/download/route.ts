@@ -1,99 +1,177 @@
+import path from "node:path";
 import { ValidationError } from "@nexus/domain";
-import { createRequestLogContext, logRequestEvent } from "../../../../../../lib/observability";
+import {
+  auditRepository,
+  buildRepository,
+} from "@nexus/db";
+import {
+  can,
+  consumeRateLimit,
+  generateId,
+} from "@nexus/security";
+import { storageService } from "@nexus/storage";
+import { type NextRequest, NextResponse } from "next/server";
 import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
 } from "../../../../../../lib/build-download-metadata";
-import path from "node:path";
 import { toDownloadWebStream } from "../../../../../../lib/download-web-stream";
-import { type NextRequest, NextResponse } from "next/server";
+import {
+  REQUEST_ID_HEADER,
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../../../lib/observability";
 import { authService } from "../../../../../../lib/services/auth-service";
-import { auditRepository, buildRepository } from "@nexus/db";
-import { storageService } from "@nexus/storage";
-import { can, consumeRateLimit, generateId } from "@nexus/security";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
   Vary: "Cookie",
 };
 
-function destroyOpenedStream(stream: NodeJS.ReadableStream): void {
-  const destroyable = stream as NodeJS.ReadableStream & {
-    destroy?: (error?: Error) => void;
-  };
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
+    status,
+    headers: privateHeaders,
+  });
+}
+
+function destroyOpenedStream(
+  stream: NodeJS.ReadableStream,
+): void {
+  const destroyable =
+    stream as NodeJS.ReadableStream & {
+      destroy?: (error?: Error) => void;
+    };
   destroyable.destroy?.();
 }
 
-function safeReviewerFileName(buildId: string, fileName: string): string {
+function safeReviewerFileName(
+  buildId: string,
+  fileName: string,
+): string {
   const safeBase = path
     .basename(fileName)
-    .replace(/[^a-zA-Z0-9._-]/g, "_")
+    .replace(/[^a-zA-Z0-9._-]/gu, "_")
     .slice(0, 180);
   return `review-${buildId}-${safeBase || "artifact.bin"}`;
 }
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ buildId: string }> },
+  {
+    params,
+  }: {
+    params: Promise<{ buildId: string }>;
+  },
 ) {
+  const context = createRequestLogContext(request);
+
   try {
-    const token = request.cookies.get("nexus_session")?.value;
+    const token =
+      request.cookies.get("nexus_session")?.value;
     const actor = await authService.getSession(token);
-    if (!actor || !can(actor, "admin.moderation")) {
-      return NextResponse.json(
-        { error: "Moderator access required" },
-        { status: 403, headers: privateHeaders },
+    if (
+      !actor ||
+      !can(actor, "admin.moderation")
+    ) {
+      return json(
+        context,
+        {
+          error:
+            "Moderator access required",
+        },
+        403,
       );
     }
 
-    const rateLimit = await consumeRateLimit("download", `moderator:${actor.id}`);
+    const rateLimit = await consumeRateLimit(
+      "download",
+      `moderator:${actor.id}`,
+    );
     if (!rateLimit.success) {
-      return NextResponse.json(
-        { error: "Too many reviewer downloads" },
-        { status: 429, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error:
+            "Too many reviewer downloads",
+        },
+        429,
       );
     }
 
     const { buildId } = await params;
     if (!buildId || buildId.length > 128) {
-      return NextResponse.json(
+      return json(
+        context,
         { error: "Build not found" },
-        { status: 404, headers: privateHeaders },
+        404,
       );
     }
 
-    const build = await buildRepository.findById(buildId);
+    const build =
+      await buildRepository.findById(buildId);
     if (!build) {
-      return NextResponse.json(
+      return json(
+        context,
         { error: "Build not found" },
-        { status: 404, headers: privateHeaders },
+        404,
       );
     }
+
     if (
       build.status !== "pending_review" &&
       build.status !== "quarantined"
     ) {
-      return NextResponse.json(
-        { error: "Build is not available for moderator evidence review" },
-        { status: 409, headers: privateHeaders },
-      );
-    }
-    if (build.scanStatus !== "clean" || !build.scanner?.trim() || !build.scannedAt) {
-      return NextResponse.json(
-        { error: "Reviewer download requires a provenance-backed clean malware scan" },
-        { status: 422, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error:
+            "Build is not available for moderator evidence review",
+        },
+        409,
       );
     }
 
-    const stored = await storageService.getDownloadStream(build.storageKey, request.signal);
-    const contentLength = assertBuildDownloadMetadata(stored, build);
+    if (
+      build.scanStatus !== "clean" ||
+      !build.scanner?.trim() ||
+      !build.scannedAt
+    ) {
+      return json(
+        context,
+        {
+          error:
+            "Reviewer download requires a provenance-backed clean malware scan",
+        },
+        422,
+      );
+    }
+
+    const stored =
+      await storageService.getDownloadStream(
+        build.storageKey,
+        request.signal,
+      );
+    const contentLength =
+      assertBuildDownloadMetadata(stored, build);
+
     try {
       request.signal.throwIfAborted();
       await auditRepository.record({
         id: generateId("aud"),
         actorId: actor.id,
-        actorType: actor.role === "admin" ? "admin" : "user",
-        action: "build.review_artifact_download_started",
+        actorType:
+          actor.role === "admin"
+            ? "admin"
+            : "user",
+        action:
+          "build.review_artifact_download_started",
         targetId: build.id,
         targetType: "build",
         details: {
@@ -107,42 +185,63 @@ export async function GET(
       throw error;
     }
 
-    const stream = toDownloadWebStream(stored.stream);
+    const stream =
+      toDownloadWebStream(stored.stream);
+
     return new NextResponse(stream, {
       headers: {
         ...privateHeaders,
-        "Content-Type": "application/octet-stream",
-        "Content-Disposition": `attachment; filename="${safeReviewerFileName(
-          build.id,
-          build.fileName,
-        )}"`,
+        "Content-Type":
+          "application/octet-stream",
+        "Content-Disposition":
+          `attachment; filename="${safeReviewerFileName(
+            build.id,
+            build.fileName,
+          )}"`,
         "Content-Length": String(contentLength),
-        "X-Content-SHA256": build.sha256Hash,
+        "X-Content-SHA256":
+          build.sha256Hash,
         "X-Content-Type-Options": "nosniff",
+        [REQUEST_ID_HEADER]: context.requestId,
       },
     });
   } catch (error: unknown) {
     if (request.signal.aborted) {
-      return NextResponse.json(
-        { error: "Download cancelled", code: "DOWNLOAD_CANCELLED" },
-        { status: 499, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error: "Download cancelled",
+          code: "DOWNLOAD_CANCELLED",
+        },
+        499,
       );
     }
-    if (error instanceof BuildArtifactMismatchError) {
-      return NextResponse.json(
+
+    if (
+      error instanceof BuildArtifactMismatchError
+    ) {
+      return json(
+        context,
         {
-          error: "Build file does not match its recorded metadata",
+          error:
+            "Build file does not match its recorded metadata",
           code: "BUILD_ARTIFACT_MISMATCH",
         },
-        { status: 409, headers: privateHeaders },
+        409,
       );
     }
+
     if (error instanceof ValidationError) {
-      return NextResponse.json(
-        { error: "Resource build file is not available" },
-        { status: 404, headers: privateHeaders },
+      return json(
+        context,
+        {
+          error:
+            "Resource build file is not available",
+        },
+        404,
       );
     }
+
     logRequestEvent({
       level: "error",
       event: "admin.build_download_failed",
@@ -150,9 +249,13 @@ export async function GET(
       status: 500,
       error,
     });
-    return NextResponse.json(
-      { error: "Could not deliver reviewer artifact" },
-      { status: 500, headers: privateHeaders },
+    return json(
+      context,
+      {
+        error:
+          "Could not deliver reviewer artifact",
+      },
+      500,
     );
   }
 }

@@ -74,6 +74,9 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
     expect(response.status).toBe(409);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.json()).toMatchObject({ code: "BUILD_ARTIFACT_MISMATCH" });
     expect(stream.destroyed).toBe(true);
     expect(mocks.audit).not.toHaveBeenCalled();
@@ -101,6 +104,9 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
     const response = await request();
     expect(response.status).toBe(200);
     expect(response.headers.get("Content-Length")).toBe("4");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.text()).toBe("data");
     expect(mocks.audit).toHaveBeenCalledOnce();
   });
@@ -141,6 +147,9 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
     const response = await request(controller.signal);
     expect(response.status).toBe(499);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.json()).toMatchObject({ code: "DOWNLOAD_CANCELLED" });
     expect(stream.destroyed).toBe(true);
     expect(mocks.audit).not.toHaveBeenCalled();
