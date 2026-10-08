@@ -6,6 +6,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import process from "node:process";
 import {
   and,
@@ -21,7 +22,6 @@ import {
 } from "drizzle-orm";
 import {
   db,
-  notifications,
   notificationRepository,
   sessionRepository,
   userRepository,
@@ -55,8 +55,10 @@ const suffix = randomBytes(8).toString("hex");
 const userId = `usr_push_soak_long_${suffix}`;
 const sessionId = `ses_push_soak_long_${suffix}`;
 const notificationPrefix = `not_push_soak_long_${suffix}_`;
+const here = dirname(fileURLToPath(import.meta.url));
+const repositoryRoot = resolve(here, "../../..");
 const evidencePath = resolve(
-  process.cwd(),
+  repositoryRoot,
   process.env.NEXUS_WEB_PUSH_SOAK_EVIDENCE_PATH?.trim() ||
     "artifacts/web-push-soak-evidence.json",
 );
@@ -66,7 +68,7 @@ const sleep = (ms: number) =>
     setTimeout(resolveSleep, ms);
   });
 
-const summary: WebPushDispatchSummary = {
+const summary = {
   accepted: 0,
   retried: 0,
   discarded: 0,
@@ -190,6 +192,8 @@ let waves = 0;
 let startedAt = 0;
 let stoppedEnqueueAt = 0;
 let completedAt = 0;
+let fixtureCreated = false;
+let cleanupSucceeded = true;
 
 async function snapshot() {
   const [fixture, global] = await Promise.all([
@@ -285,6 +289,7 @@ try {
     displayName: "Web Push Duration Soak",
     role: "user",
   });
+  fixtureCreated = true;
   await sessionRepository.create({
     id: sessionId,
     userId,
@@ -407,8 +412,23 @@ try {
   );
   if (!verdict.passed) process.exitCode = 1;
 } finally {
-  await db
-    .delete(users)
-    .where(eq(users.id, userId))
-    .catch(() => undefined);
+  if (fixtureCreated) {
+    try {
+      const removed = await db
+        .delete(users)
+        .where(eq(users.id, userId))
+        .returning({ id: users.id });
+      cleanupSucceeded = removed.length === 1;
+    } catch {
+      cleanupSucceeded = false;
+    }
+    if (!cleanupSucceeded) {
+      process.stderr.write(
+        "web-push-soak cleanup failed for fixture namespace " +
+          suffix +
+          "\n",
+      );
+      process.exitCode = 1;
+    }
+  }
 }
