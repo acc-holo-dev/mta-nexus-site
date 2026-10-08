@@ -7,7 +7,7 @@ import {
   socialRepository,
   userRepository,
 } from "@nexus/db";
-import { consumeRateLimit } from "@nexus/security";
+import { consumeRateLimit, generateId } from "@nexus/security";
 import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
 const ALLOWED_TARGET_TYPES = ["user", "server", "product", "organization"] as const;
@@ -141,7 +141,6 @@ export async function POST(request: NextRequest) {
         try {
           await dispatchNotificationsBestEffort([
             {
-            id: generateId("not"),
             recipientId: targetId,
             title: "New Follower",
             message: `@${user.username} started following your activity.`,

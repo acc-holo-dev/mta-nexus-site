@@ -23,14 +23,19 @@ const createNotification = vi.hoisted(() =>
       : null,
   ),
 );
-const pushNotifications = vi.hoisted(() =>
+const dispatchNotifications = vi.hoisted(() =>
   vi.fn(async () => ({
-    notifications: 1,
-    attempted: 0,
-    delivered: 0,
-    failed: 0,
-    stale: 0,
-    deliveryErrors: 0,
+    requested: 1,
+    stored: 1,
+    storageFailed: 0,
+    push: {
+      notifications: 1,
+      attempted: 0,
+      delivered: 0,
+      failed: 0,
+      stale: 0,
+      deliveryErrors: 0,
+    },
   })),
 );
 const getArticle = vi.hoisted(() =>
@@ -88,7 +93,7 @@ vi.mock("@nexus/security", () => ({
 }));
 
 vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
-  dispatchNotificationsBestEffort: pushNotifications,
+  dispatchNotificationsBestEffort: dispatchNotifications,
 }));
 
 import { NextRequest } from "next/server";
@@ -125,7 +130,7 @@ describe("article comment notification side effects", () => {
     expect(addComment).toHaveBeenCalledOnce();
     expect(afterMock).toHaveBeenCalledOnce();
     expect(createNotification).not.toHaveBeenCalled();
-    expect(pushNotifications).not.toHaveBeenCalled();
+    expect(dispatchNotifications).not.toHaveBeenCalled();
 
     await state.afterCallbacks[0]?.();
 
@@ -136,7 +141,7 @@ describe("article comment notification side effects", () => {
         link: "/articles/article-one",
       }),
     );
-    expect(pushNotifications).toHaveBeenCalledWith([
+    expect(dispatchNotifications).toHaveBeenCalledWith([
       expect.objectContaining({
         recipientId: "usr_author",
         category: "content",
@@ -154,7 +159,7 @@ describe("article comment notification side effects", () => {
     await state.afterCallbacks[0]?.();
 
     expect(createNotification).toHaveBeenCalledOnce();
-    expect(pushNotifications).not.toHaveBeenCalled();
+    expect(dispatchNotifications).not.toHaveBeenCalled();
   });
 
   it("does not schedule a self-notification for the article author", async () => {

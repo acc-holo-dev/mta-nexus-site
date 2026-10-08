@@ -14,24 +14,25 @@ const afterMock = vi.hoisted(() =>
     state.afterCallbacks.push(callback);
   }),
 );
-const createNotification = vi.hoisted(() => vi.fn(async (input) => {
-  if (state.notificationFails) throw new Error("delivery unavailable");
-  return {
-    ...input,
-    id: "not_1",
-    createdAt: new Date(),
-    isRead: false,
-  };
-}));
-const pushNotifications = vi.hoisted(() =>
-  vi.fn(async () => ({
-    notifications: 1,
-    attempted: 0,
-    delivered: 0,
-    failed: 0,
-    stale: 0,
-    deliveryErrors: 0,
-  })),
+const dispatchNotifications = vi.hoisted(() =>
+  vi.fn(async () => {
+    if (state.notificationFails) {
+      throw new Error("delivery unavailable");
+    }
+    return {
+      requested: 1,
+      stored: 1,
+      storageFailed: 0,
+      push: {
+        notifications: 1,
+        attempted: 0,
+        delivered: 0,
+        failed: 0,
+        stale: 0,
+        deliveryErrors: 0,
+      },
+    };
+  }),
 );
 const markSingle = vi.hoisted(() => vi.fn(async () => false));
 const markAll = vi.hoisted(() => vi.fn(async () => undefined));
@@ -50,7 +51,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
 }));
 vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
-  dispatchNotificationsBestEffort: pushNotifications,
+  dispatchNotificationsBestEffort: dispatchNotifications,
 }));
 
 vi.mock("@nexus/security", () => ({
@@ -70,7 +71,6 @@ vi.mock("@nexus/db", () => ({
   notificationRepository: {
     listByUser: vi.fn(async () => Array.from({ length: 100 }, (_, index) => ({ id: `not_${index}`, isRead: true }))),
     countUnread: vi.fn(async () => 137),
-    create: createNotification,
     markAsRead: markSingle,
     markAllAsRead: markAll,
   },
@@ -117,13 +117,11 @@ describe("social and notification HTTP state contract", () => {
         following: true,
       });
       expect(afterMock).toHaveBeenCalledOnce();
-      expect(createNotification).not.toHaveBeenCalled();
-      expect(pushNotifications).not.toHaveBeenCalled();
+      expect(dispatchNotifications).not.toHaveBeenCalled();
 
       await state.afterCallbacks[0]?.();
 
-      expect(createNotification).toHaveBeenCalledTimes(1);
-      expect(pushNotifications).not.toHaveBeenCalled();
+      expect(dispatchNotifications).toHaveBeenCalledTimes(1);
       expect(log).toHaveBeenCalledOnce();
     } finally {
       log.mockRestore();
@@ -140,19 +138,11 @@ describe("social and notification HTTP state contract", () => {
     );
 
     expect(response.status).toBe(200);
-    expect(createNotification).not.toHaveBeenCalled();
-    expect(pushNotifications).not.toHaveBeenCalled();
+    expect(dispatchNotifications).not.toHaveBeenCalled();
 
     await state.afterCallbacks[0]?.();
 
-    expect(createNotification).toHaveBeenCalledWith(
-      expect.objectContaining({
-        recipientId: "usr_2",
-        category: "follow",
-        link: "/users/tester",
-      }),
-    );
-    expect(pushNotifications).toHaveBeenCalledWith([
+    expect(dispatchNotifications).toHaveBeenCalledWith([
       expect.objectContaining({
         recipientId: "usr_2",
         category: "follow",

@@ -76,7 +76,6 @@ export async function POST(
         try {
           await dispatchNotificationsBestEffort([
             {
-            id: generateId("not"),
             recipientId: article.authorId,
             title: "New article comment",
             message: `@${user.username} commented on “${article.title}”.`,
