@@ -76,6 +76,9 @@ describe("free resource claim HTTP contract", () => {
     expect(response.status).toBe(201);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.json()).toMatchObject({
       alreadyClaimed: false,
       entitlement: {
@@ -93,6 +96,9 @@ describe("free resource claim HTTP contract", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.json()).toMatchObject({
       alreadyClaimed: true,
       entitlement: {
@@ -109,6 +115,9 @@ describe("free resource claim HTTP contract", () => {
     expect(response.status).toBe(401);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(await response.json()).toEqual({
       error: "Authentication required",
     });

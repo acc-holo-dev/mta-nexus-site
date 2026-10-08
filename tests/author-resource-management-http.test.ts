@@ -50,6 +50,9 @@ it("requires authentication before reading or editing", async () => {
   expect(mocks.updateProductDetails).not.toHaveBeenCalled();
   expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
+  expect(response.headers.get("x-request-id")).toMatch(
+    /^[0-9a-f-]{20,}$/u,
+  );
 });
 it("hides resources outside the management scope", async () => {
   mocks.getManagedProduct.mockResolvedValue(null);

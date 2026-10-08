@@ -27,6 +27,8 @@ describe("public search rate-limit identity", () => {
       headers: { "x-forwarded-for": "203.0.113.10" },
     }));
     expect(untrusted.status).toBe(200);
+    expect(untrusted.headers.get("cache-control")).toContain("public");
+    expect(untrusted.headers.get("x-request-id")).toBeNull();
     expect(consumeRateLimit).toHaveBeenCalledWith("search", "unknown");
 
     vi.mocked(consumeRateLimit).mockClear();
@@ -37,6 +39,7 @@ describe("public search rate-limit identity", () => {
       },
     }));
     expect(trusted.status).toBe(200);
+    expect(trusted.headers.get("x-request-id")).toBeNull();
     expect(consumeRateLimit).toHaveBeenCalledWith("search", "198.51.100.25");
   });
 });

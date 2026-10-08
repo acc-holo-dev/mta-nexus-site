@@ -17,6 +17,7 @@ describe("public resource catalog HTTP", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toContain("public, max-age=30");
+    expect(response.headers.get("x-request-id")).toBeNull();
     expect(await response.json()).toEqual({
       products: [{ id: "p2" }], limit: 24, page: 2, hasMore: true,
     });
