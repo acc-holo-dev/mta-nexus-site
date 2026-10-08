@@ -42,10 +42,16 @@ describe("support validation", () => {
       createSupportMessageSchema.safeParse({ message: "" }).success,
     ).toBe(false);
     expect(
-      updateSupportCaseStatusSchema.safeParse({ status: "resolved" }).success,
+      updateSupportCaseStatusSchema.safeParse({ status: "resolved", expectedStatus: "open" }).success,
     ).toBe(true);
     expect(
-      updateSupportCaseStatusSchema.safeParse({ status: "pending" }).success,
+      updateSupportCaseStatusSchema.safeParse({ status: "resolved" }).success,
+    ).toBe(false);
+    expect(
+      updateSupportCaseStatusSchema.safeParse({ status: "pending", expectedStatus: "open" }).success,
+    ).toBe(false);
+    expect(
+      updateSupportCaseStatusSchema.safeParse({ status: "closed", expectedStatus: "pending" }).success,
     ).toBe(false);
   });
 });

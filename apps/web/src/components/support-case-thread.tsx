@@ -134,7 +134,9 @@ export function SupportCaseThread({
   }
 
   async function updateStatus(status: SupportCaseData["status"]) {
-    if (updatingStatus || sending) return;
+    if (updatingStatus || sending || !supportCase) return;
+    // Snapshot the status visible when the moderator initiated the action.
+    const expectedStatus = supportCase.status;
     setUpdatingStatus(true);
     setError(null);
     try {
@@ -145,7 +147,7 @@ export function SupportCaseThread({
           cache: "no-store",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status }),
+          body: JSON.stringify({ status, expectedStatus }),
           signal: AbortSignal.timeout(15_000),
         },
       );

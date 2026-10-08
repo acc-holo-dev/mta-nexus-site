@@ -282,6 +282,8 @@ export const createSupportMessageSchema = z
 export const updateSupportCaseStatusSchema = z
   .object({
     status: z.enum(SUPPORT_CASE_STATUSES),
+    // Require the client-observed status as an optimistic concurrency precondition.
+    expectedStatus: z.enum(SUPPORT_CASE_STATUSES),
   })
   .strict();
 

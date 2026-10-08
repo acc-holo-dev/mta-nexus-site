@@ -286,6 +286,16 @@ export async function PATCH(
       );
     }
 
+    // Reject a stale staff view before the no-op shortcut. The DB conditional
+    // update below also protects a race occurring after this read.
+    if (access.supportCase.status !== parsed.data.expectedStatus) {
+      return privateJson(
+        context,
+        { error: "Support case changed concurrently", code: "SUPPORT_STATUS_CONFLICT" },
+        { status: 409 },
+      );
+    }
+
     if (access.supportCase.status === parsed.data.status) {
       return privateJson(context, { success: true, supportCase: access.supportCase });
     }
@@ -305,7 +315,7 @@ export async function PATCH(
           to: parsed.data.status,
         },
       },
-      access.supportCase.status,
+      parsed.data.expectedStatus,
     );
     if (!supportCase) {
       return privateJson(

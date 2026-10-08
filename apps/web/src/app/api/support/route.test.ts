@@ -384,7 +384,7 @@ describe("support HTTP authorization and privacy", () => {
       new NextRequest("https://nexus.test/api/support/" + caseId, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ status: "resolved" }),
+        body: JSON.stringify({ status: "resolved", expectedStatus: "open" }),
       }),
       params,
     );
@@ -412,7 +412,7 @@ describe("support HTTP authorization and privacy", () => {
       {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ status: "resolved" }),
+        body: JSON.stringify({ status: "resolved", expectedStatus: "open" }),
       },
     );
     const denied = await updateCase(patchRequest, params);
@@ -487,13 +487,51 @@ describe("support HTTP authorization and privacy", () => {
 });
 
 describe("concurrent support moderation", () => {
+
+  it("requires the last observed status before a staff mutation", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_staff", role: "moderator" });
+    mocks.can.mockReturnValue(true);
+    mocks.findById.mockResolvedValue({ id: caseId, requesterId: "usr_member", status: "open" });
+
+    const response = await updateCase(new NextRequest("https://nexus.test/api/support/" + caseId, {
+      method: "PATCH", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ status: "closed" }),
+    }), params);
+
+    expect(response.status).toBe(400);
+    expectPrivate(response);
+    expect(mocks.updateStatus).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it.each(["closed", "resolved"] as const)(
+    "rejects a stale staff view even when requested status is %s",
+    async (status) => {
+      mocks.session.mockResolvedValue({ id: "usr_staff", role: "moderator" });
+      mocks.can.mockReturnValue(true);
+      // Staff viewed open; another moderator has since resolved the ticket.
+      mocks.findById.mockResolvedValue({ id: caseId, requesterId: "usr_member", status: "resolved" });
+
+      const response = await updateCase(new NextRequest("https://nexus.test/api/support/" + caseId, {
+        method: "PATCH", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ status, expectedStatus: "open" }),
+      }), params);
+
+      expect(response.status).toBe(409);
+      expectPrivate(response);
+      expect(await response.json()).toMatchObject({ code: "SUPPORT_STATUS_CONFLICT" });
+      expect(mocks.updateStatus).not.toHaveBeenCalled();
+      expect(afterMock).not.toHaveBeenCalled();
+      expect(mocks.dispatch).not.toHaveBeenCalled();
+    },
+  );
   it("does not write or notify when the requested status is already current", async () => {
     mocks.session.mockResolvedValue({ id: "usr_staff", role: "moderator" });
     mocks.can.mockReturnValue(true);
     mocks.findById.mockResolvedValue({ id: caseId, requesterId: "usr_member", status: "resolved" });
     const response = await updateCase(new NextRequest("https://nexus.test/api/support/" + caseId, {
       method: "PATCH", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ status: "resolved" }),
+      body: JSON.stringify({ status: "resolved", expectedStatus: "resolved" }),
     }), params);
     expect(response.status).toBe(200);
     expect(mocks.updateStatus).not.toHaveBeenCalled();
@@ -507,7 +545,7 @@ describe("concurrent support moderation", () => {
     mocks.updateStatus.mockResolvedValueOnce(null);
     const response = await updateCase(new NextRequest("https://nexus.test/api/support/" + caseId, {
       method: "PATCH", headers: { "content-type": "application/json" },
-      body: JSON.stringify({ status: "closed" }),
+      body: JSON.stringify({ status: "closed", expectedStatus: "open" }),
     }), params);
     expect(response.status).toBe(409);
     expectPrivate(response);

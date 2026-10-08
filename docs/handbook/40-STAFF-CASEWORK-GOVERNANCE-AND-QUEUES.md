@@ -91,3 +91,9 @@ Second staff approval не является обязательным universal p
 - reason and exact references.
 
 Risk/provider policy может добавить dual-control позже без изменения базовой business philosophy.
+## 7. Support status concurrency (implemented)
+
+- Staff `PATCH /api/support/:id` requires both `status` (requested) and `expectedStatus` (last status shown to staff).
+- If stored status differs from `expectedStatus`, return private `409 SUPPORT_STATUS_CONFLICT` and reload the case in the client. Do not record status audit or notify the requester.
+- Matching no-op is idempotent, without duplicate audit/notification. Real changes use a PostgreSQL compare-and-set inside the audit transaction, protecting a race after the read.
+- The precondition compares status values, not an immutable revision. A full `open -> resolved -> open` ABA cycle is not detected; add a revision token if stronger ordering is needed.
