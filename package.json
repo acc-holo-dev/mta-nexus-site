@@ -49,7 +49,9 @@
     "test:tooling": "node scripts/run-tooling-tests.mjs",
     "db:seed:repair-media": "pnpm --filter @nexus/db seed --repair-demo-media",
     "push:soak": "pnpm --filter @nexus/db push:soak",
-    "push:soak:verify": "node scripts/check-web-push-soak-evidence.mjs"
+    "push:soak:verify": "node scripts/check-web-push-soak-evidence.mjs",
+    "push:provider:probe": "pnpm --filter @nexus/db push:provider:probe",
+    "push:provider:verify": "node scripts/check-web-push-provider-evidence.mjs"
   },
   "devDependencies": {
     "@types/node": "^26.6.2",

@@ -14,7 +14,8 @@
     "scenario:create": "tsx scripts/run-scenario-lab.ts apply",
     "scenario:cleanup": "tsx scripts/run-scenario-lab.ts cleanup",
     "push:dispatch": "tsx scripts/run-web-push-dispatcher.ts",
-    "push:soak": "tsx scripts/run-web-push-soak.ts"
+    "push:soak": "tsx scripts/run-web-push-soak.ts",
+    "push:provider:probe": "tsx scripts/run-web-push-provider-probe.ts"
   },
   "dependencies": {
     "@nexus/config": "workspace:*",
