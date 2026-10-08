@@ -45,7 +45,7 @@ vi.mock("next/server", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_claimant",
@@ -55,7 +55,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 }));
 
 vi.mock(
-  "../apps/web/src/lib/services/server-claim-service",
+  "../../../../../../lib/services/server-claim-service",
   () => ({
     serverClaimService: {
       verifyChallenge,
@@ -69,7 +69,7 @@ vi.mock("@nexus/security", () => ({
 }));
 
 import { NextRequest } from "next/server";
-import { POST } from "../apps/web/src/app/api/servers/[id]/claim-challenge/verify/route";
+import { POST } from "./route";
 
 function request() {
   return new NextRequest(

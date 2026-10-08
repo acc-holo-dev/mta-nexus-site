@@ -36,26 +36,26 @@ vi.mock("@nexus/security", () => ({
   generateId: vi.fn((prefix: string) => `${prefix}_test`),
 }));
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({ id: "usr_1" })),
     getCurrentSessionId: vi.fn(async () => "ses_1"),
   },
 }));
 
-vi.mock("../apps/web/src/lib/web-push-subscription", () => ({
+vi.mock("../../../../lib/web-push-subscription", () => ({
   parseWebPushSubscription: vi.fn(),
 }));
 
 vi.mock(
-  "../apps/web/src/lib/services/web-push-endpoint-policy",
+  "../../../../lib/services/web-push-endpoint-policy",
   () => ({
     parseWebPushEndpoint: vi.fn((value: string) => new URL(value)),
   }),
 );
 
 import { NextRequest } from "next/server";
-import { GET } from "../apps/web/src/app/api/notifications/push/route";
+import { GET } from "./route";
 
 function fingerprint(endpoint: string) {
   return createHash("sha256").update(endpoint, "utf8").digest("hex");
