@@ -18,7 +18,6 @@ const auth = vi.hoisted(() => ({
   getRecoveryEmailStatus: vi.fn(),
 }));
 
-const activity = vi.hoisted(() => vi.fn());
 const auditList = vi.hoisted(() => vi.fn());
 
 vi.mock("next/headers", () => ({
@@ -53,12 +52,6 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: auth,
 }));
 
-vi.mock("../apps/web/src/lib/services/security-center-service", () => ({
-  securityCenterService: {
-    listActivity: activity,
-  },
-}));
-
 vi.mock("@nexus/db", () => ({
   auditRepository: {
     listByActor: auditList,
@@ -77,7 +70,6 @@ describe("Security Center behavior", () => {
     auth.listSessions.mockResolvedValue([]);
     auth.getCurrentSessionId.mockResolvedValue(null);
     auth.getRecoveryEmailStatus.mockResolvedValue(null);
-    activity.mockResolvedValue([]);
     auditList.mockResolvedValue([]);
   });
 
@@ -87,7 +79,6 @@ describe("Security Center behavior", () => {
     expect(html).toContain('href="/auth/login"');
     expect(auth.listSessions).not.toHaveBeenCalled();
     expect(auth.getRecoveryEmailStatus).not.toHaveBeenCalled();
-    expect(activity).not.toHaveBeenCalled();
   });
 
   it("loads sessions, recovery state and actor-scoped activity for the authenticated user", async () => {
@@ -111,9 +102,10 @@ describe("Security Center behavior", () => {
       email: "recovery@example.test",
       verified: true,
     });
-    activity.mockResolvedValue([
+    auditList.mockResolvedValue([
       {
         id: "aud_1",
+        actorId: "usr_security",
         action: "user.logged_in",
         targetType: "user",
         ipAddress: "203.0.113.10",
@@ -127,7 +119,11 @@ describe("Security Center behavior", () => {
     expect(auth.listSessions).toHaveBeenCalledWith("usr_security");
     expect(auth.getCurrentSessionId).toHaveBeenCalledWith("session-token");
     expect(auth.getRecoveryEmailStatus).toHaveBeenCalledWith("usr_security");
-    expect(activity).toHaveBeenCalledWith("usr_security", 30);
+    expect(auditList).toHaveBeenCalledWith(
+      "usr_security",
+      [...SECURITY_ACTIVITY_ACTIONS],
+      30,
+    );
     expect(html).toContain("recovery@example.test");
     expect(html).toContain("Test Browser");
     expect(html).toContain("203.0.113.10");
