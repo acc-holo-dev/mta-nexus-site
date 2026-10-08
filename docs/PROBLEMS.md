@@ -267,7 +267,10 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   separation. Product review authority/integrity source checks также удалены:
   HTTP behavior покрывает auth/manager/entitlement/conflict boundaries, а
   PostgreSQL integration теперь проверяет concurrent aggregate serialization,
-  DB uniqueness и fail-closed unpublished state;
+  DB uniqueness и fail-closed unpublished state. Server updates/reverse
+  dependencies source suites тоже удалены: реальные PostgreSQL filters,
+  server-detail parallel behavior, reverse summary bounds и rendered RU/EN
+  unavailable/empty/list states покрывают контракт без чтения исходников;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере
