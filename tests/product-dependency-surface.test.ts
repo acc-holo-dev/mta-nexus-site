@@ -1,44 +1,169 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import * as React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getDictionary } from "../apps/web/src/lib/i18n";
+import { buildProductDependencyResolution } from "../apps/web/src/lib/product-dependency-resolution";
+import { ProductDependencyList } from "../apps/web/src/components/product-dependency-list";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const mocks = vi.hoisted(() => ({
+  findPublishedFreeBySlugs: vi.fn(),
+}));
 
-describe("resource dependency resolution surface", () => {
-  it("resolves dependencies in one bounded public-free repository query", () => {
-    const repository = read(
-      "packages/db/src/repositories/products.ts",
-    );
+vi.mock("@nexus/db", () => ({
+  productRepository: {
+    findPublishedFreeBySlugs: mocks.findPublishedFreeBySlugs,
+    listPublishedFreeDependingOnSlug: vi.fn(async () => []),
+  },
+  buildRepository: {},
+  organizationRepository: {},
+}));
 
-    expect(repository).toContain("findPublishedFreeBySlugs");
-    expect(repository).toContain("inArray(products.slug, normalized)");
-    expect(repository).toContain('eq(products.status, "published")');
-    expect(repository).toContain("eq(products.price, 0)");
-    expect(repository).toContain(".slice(0, 25)");
-    expect(repository).toContain(".limit(25)");
+vi.mock("@nexus/security", () => ({
+  generateId: vi.fn((prefix: string) => `${prefix}_test`),
+  can: vi.fn(() => false),
+}));
+
+import { ProductService } from "../apps/web/src/lib/services/product-service";
+
+describe("resource dependency resolution behavior", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  it("loads builds, reviews and dependency reads in one parallel group", () => {
-    const page = read("apps/web/src/app/market/[slug]/page.tsx");
+  it("resolves declared dependencies through one normalized repository lookup", async () => {
+    mocks.findPublishedFreeBySlugs.mockResolvedValue([
+      {
+        id: "prd_core",
+        slug: "core-ui",
+        title: "Core UI",
+        type: "ui",
+        currentVersion: "2.1.0",
+      },
+    ]);
+    const service = new ProductService();
 
-    expect(page).toContain("await Promise.all([");
-    expect(page).toContain(
-      "productService.getDependencyResolution(product).catch(() => null)",
-    );
-    expect(page).toContain("<ProductDependencyList");
-    expect(page).toContain("locale={locale}");
+    const result = await service.getDependencyResolution({
+      slug: "vehicle-pack",
+      compatibility: {
+        dependencies: [
+          " Core-UI ",
+          "core-ui",
+          "missing-pack",
+        ],
+      },
+    });
+
+    expect(mocks.findPublishedFreeBySlugs).toHaveBeenCalledOnce();
+    expect(mocks.findPublishedFreeBySlugs).toHaveBeenCalledWith([
+      " Core-UI ",
+      "core-ui",
+      "missing-pack",
+    ]);
+    expect(result).toMatchObject({
+      declaredCount: 2,
+      availableCount: 1,
+      unresolvedCount: 1,
+      dependencies: [
+        {
+          slug: "core-ui",
+          status: "available",
+        },
+        {
+          slug: "missing-pack",
+          status: "unresolved",
+        },
+      ],
+    });
   });
 
-  it("labels unresolved dependencies without claiming incompatibility", () => {
-    const component = read(
-      "apps/web/src/components/product-dependency-list.tsx",
-    );
+  it("skips the repository entirely when nothing was declared", async () => {
+    const service = new ProductService();
 
-    expect(component).toContain("getDictionary(locale).dependencyUi");
-    expect(component).toContain("copy.notFound");
-    expect(component).toContain("copy.selfReference");
-    expect(component).toContain("copy.resolutionNotice");
-    expect(component).not.toContain("incompatible");
+    await expect(
+      service.getDependencyResolution({
+        slug: "empty-pack",
+        compatibility: { dependencies: [] },
+      }),
+    ).resolves.toEqual({
+      declaredCount: 0,
+      availableCount: 0,
+      unresolvedCount: 0,
+      selfReferenceCount: 0,
+      dependencies: [],
+    });
+    expect(mocks.findPublishedFreeBySlugs).not.toHaveBeenCalled();
+  });
+
+  it.each(["en", "ru"] as const)(
+    "renders resolved, missing and self-reference states in %s without compatibility claims",
+    (locale) => {
+      const resolution = buildProductDependencyResolution(
+        {
+          slug: "vehicle-pack",
+          compatibility: {
+            dependencies: [
+              "core-ui",
+              "missing-pack",
+              "vehicle-pack",
+            ],
+          },
+        },
+        [
+          {
+            id: "prd_core",
+            slug: "core-ui",
+            title: "Core UI",
+            type: "ui",
+            currentVersion: "2.1.0",
+          },
+        ],
+      );
+      const copy = getDictionary(locale).dependencyUi;
+
+      const markup = renderToStaticMarkup(
+        <ProductDependencyList
+          declared={[
+            "core-ui",
+            "missing-pack",
+            "vehicle-pack",
+          ]}
+          resolution={resolution}
+          locale={locale}
+        />,
+      );
+
+      expect(markup).toContain('href="/market/core-ui"');
+      expect(markup).toContain("v2.1.0");
+      expect(markup).toContain("missing-pack");
+      expect(markup).toContain(copy.notFound);
+      expect(markup).toContain("vehicle-pack");
+      expect(markup).toContain(copy.selfReference);
+      expect(markup).toContain(copy.resolutionNotice);
+      expect(markup).not.toMatch(
+        /compatible|incompatible|guaranteed|verified/iu,
+      );
+    },
+  );
+
+  it("renders explicit unavailable and empty states instead of inventing dependency status", () => {
+    const copy = getDictionary("en").dependencyUi;
+    const unavailable = renderToStaticMarkup(
+      <ProductDependencyList
+        declared={["core-ui", "missing-pack"]}
+        resolution={null}
+        locale="en"
+      />,
+    );
+    expect(unavailable).toContain("core-ui, missing-pack");
+    expect(unavailable).toContain(copy.resolutionUnavailable);
+
+    const empty = renderToStaticMarkup(
+      <ProductDependencyList
+        declared={[]}
+        resolution={null}
+        locale="en"
+      />,
+    );
+    expect(empty).toContain(copy.noneDeclared);
   });
 });
