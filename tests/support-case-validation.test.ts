@@ -3,6 +3,7 @@ import {
   createSupportCaseSchema,
   createSupportMessageSchema,
   updateSupportCaseStatusSchema,
+  supportStaffQueueFiltersSchema,
 } from "@nexus/validation";
 
 describe("support validation", () => {
@@ -53,5 +54,15 @@ describe("support validation", () => {
     expect(
       updateSupportCaseStatusSchema.safeParse({ status: "closed", expectedStatus: "pending" }).success,
     ).toBe(false);
+  });
+});
+
+describe("support staff queue filters", () => {
+  it("only accepts recognized filters without extra fields", () => {
+    expect(supportStaffQueueFiltersSchema.safeParse({}).success).toBe(true);
+    expect(supportStaffQueueFiltersSchema.safeParse({ status: "open", category: "payment" }).success).toBe(true);
+    expect(supportStaffQueueFiltersSchema.safeParse({ status: "pending" }).success).toBe(false);
+    expect(supportStaffQueueFiltersSchema.safeParse({ category: "" }).success).toBe(false);
+    expect(supportStaffQueueFiltersSchema.safeParse({ category: "payment", requesterId: "usr_victim" }).success).toBe(false);
   });
 });

@@ -234,6 +234,57 @@ it("serializes reply-vs-status races without losing the moderation decision", as
   expect(raced).toHaveLength(replyResult ? 1 : 0);
 });
 
+
+it("filters staff queue totals, categories and pages in PostgreSQL", async () => {
+  const suffix = `${Date.now().toString(36)}_${process.pid}`;
+  const requesterId = `usr_filter_${suffix}`;
+  const openId = `sup_filter_open_${suffix}`;
+  const closedId = `sup_filter_closed_${suffix}`;
+  const otherId = `sup_filter_other_${suffix}`;
+  await userRepository.create({
+    id: requesterId,
+    email: `support-filter-${suffix}@nexus.test`,
+    username: `sf_${suffix}`,
+    displayName: "Filtered queue requester",
+    role: "user",
+  });
+  const beforeOpen = await supportCaseRepository.pageStaff(1, 25, { category: "integration", status: "open" });
+  const beforeClosed = await supportCaseRepository.pageStaff(1, 25, { category: "integration", status: "closed" });
+  const beforeCategory = await supportCaseRepository.pageStaff(1, 25, { category: "integration" });
+  for (const [id, category] of [
+    [openId, "integration"], [closedId, "integration"], [otherId, "account"],
+  ] as const) {
+    await supportCaseRepository.createWithInitialMessage(
+      { id, requesterId, category, subject: "Queue filter integration check", status: "open" },
+      { id: `spm_${id}`, caseId: id, authorId: requesterId, authorRole: "requester", body: "Initial support queue filter test message." },
+      { id: `aud_${id}`, actorId: requesterId, actorType: "user", action: "support.case.created", targetId: id, targetType: "support_case" },
+    );
+  }
+  const transitioned = await supportCaseRepository.updateStatus(
+    closedId, "closed",
+    { id: `aud_closed_${suffix}`, actorId: requesterId, actorType: "admin", action: "support.case.status_changed", targetId: closedId, targetType: "support_case" },
+    "open",
+  );
+  expect(transitioned?.status).toBe("closed");
+  const open = await supportCaseRepository.pageStaff(1, 25, { category: "integration", status: "open" });
+  const closed = await supportCaseRepository.pageStaff(1, 25, { category: "integration", status: "closed" });
+  const category = await supportCaseRepository.pageStaff(1, 25, { category: "integration" });
+  expect(open.total).toBe(beforeOpen.total + 1);
+  expect(closed.total).toBe(beforeClosed.total + 1);
+  expect(category.total).toBe(beforeCategory.total + 2);
+  expect(open.items.every((row) => row.supportCase.category === "integration" && row.supportCase.status === "open")).toBe(true);
+  expect(closed.items.every((row) => row.supportCase.category === "integration" && row.supportCase.status === "closed")).toBe(true);
+  expect(open.items.some((row) => row.supportCase.id === openId)).toBe(true);
+  expect(closed.items.some((row) => row.supportCase.id === closedId)).toBe(true);
+  expect(category.items.every((row) => row.supportCase.category === "integration")).toBe(true);
+  expect((await supportCaseRepository.pageByRequester(requesterId)).total).toBe(3);
+  const one = await supportCaseRepository.pageStaff(1, 1, { category: "integration", status: "open" });
+  expect(one.pageSize).toBe(1);
+  expect(one.items).toHaveLength(1);
+  expect(one.total).toBe(open.total);
+  expect(one.totalPages).toBe(Math.max(1, open.total));
+});
+
 it("paginates support cases and keeps message pages bounded newest-first", async () => {
   const suffix = `support_page_${Date.now().toString(36)}_${process.pid}`;
   const requesterId = `usr_${suffix}`;

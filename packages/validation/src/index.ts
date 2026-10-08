@@ -265,6 +265,13 @@ export const createReportSchema = z.object({
 });
 
 // --- Unified Support ---
+export const supportStaffQueueFiltersSchema = z
+  .object({
+    status: z.enum(SUPPORT_CASE_STATUSES).optional(),
+    category: z.enum(SUPPORT_CASE_CATEGORIES).optional(),
+  })
+  .strict();
+
 export const createSupportCaseSchema = z
   .object({
     category: z.enum(SUPPORT_CASE_CATEGORIES),

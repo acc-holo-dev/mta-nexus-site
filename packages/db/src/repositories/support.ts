@@ -2,6 +2,7 @@ import { and, count, desc, eq, ne } from "drizzle-orm";
 import type {
   AuditEvent,
   SupportCase,
+  SupportCaseCategory,
   SupportCaseMessage,
   SupportCaseStatus,
   SupportMessageAuthorRole,
@@ -13,6 +14,11 @@ import {
   supportCases,
   users,
 } from "../schema";
+
+export type StaffSupportFilters = {
+  status?: SupportCaseStatus;
+  category?: SupportCaseCategory;
+};
 
 export type SupportPage<T> = {
   items: T[];
@@ -80,6 +86,7 @@ export class SupportCaseRepository {
   async pageStaff(
     page = 1,
     pageSize = 25,
+    filters: StaffSupportFilters = {},
   ): Promise<
     SupportPage<{
       supportCase: SupportCase;
@@ -88,9 +95,14 @@ export class SupportCaseRepository {
     }>
   > {
     const boundedSize = normalizePageSize(pageSize, 25, 100);
+    const where = and(
+      filters.status ? eq(supportCases.status, filters.status) : undefined,
+      filters.category ? eq(supportCases.category, filters.category) : undefined,
+    );
     const [countRow] = await db
       .select({ total: count() })
-      .from(supportCases);
+      .from(supportCases)
+      .where(where);
     const total = countRow?.total ?? 0;
     const normalized = normalizePage(page, total, boundedSize);
 
@@ -102,6 +114,7 @@ export class SupportCaseRepository {
       })
       .from(supportCases)
       .innerJoin(users, eq(users.id, supportCases.requesterId))
+      .where(where)
       .orderBy(desc(supportCases.updatedAt), desc(supportCases.id))
       .limit(boundedSize)
       .offset((normalized.page - 1) * boundedSize);

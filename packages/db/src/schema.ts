@@ -711,6 +711,12 @@ export const supportCases = pgTable(
       table.updatedAt,
       table.id,
     ),
+    index("support_cases_category_status_updated_id_idx").on(
+      table.category,
+      table.status,
+      table.updatedAt,
+      table.id,
+    ),
     index("support_cases_updated_id_idx").on(
       table.updatedAt,
       table.id,

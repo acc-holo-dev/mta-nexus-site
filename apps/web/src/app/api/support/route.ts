@@ -1,6 +1,6 @@
 import { supportCaseRepository, userRepository } from "@nexus/db";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
-import { createSupportCaseSchema } from "@nexus/validation";
+import { createSupportCaseSchema, supportStaffQueueFiltersSchema } from "@nexus/validation";
 import { after, type NextRequest } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
@@ -47,8 +47,29 @@ export async function GET(request: NextRequest) {
         return privateJson(context, { error: "Forbidden" }, { status: 403 });
       }
 
+      const params = request.nextUrl.searchParams;
+      if (params.getAll("status").length > 1 || params.getAll("category").length > 1) {
+        return privateJson(
+          context,
+          { error: "Invalid support queue filters" },
+          { status: 400 },
+        );
+      }
+      const parsed = supportStaffQueueFiltersSchema.safeParse({
+        ...(params.has("status") ? { status: params.get("status") } : {}),
+        ...(params.has("category") ? { category: params.get("category") } : {}),
+      });
+      if (!parsed.success) {
+        return privateJson(
+          context,
+          { error: "Invalid support queue filters" },
+          { status: 400 },
+        );
+      }
       const result = await supportCaseRepository.pageStaff(
-        parsePage(request.nextUrl.searchParams.get("page")),
+        parsePage(params.get("page")),
+        25,
+        parsed.data,
       );
       return privateJson(context, {
         cases: result.items.map((row) => ({

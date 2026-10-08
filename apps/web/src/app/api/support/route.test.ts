@@ -173,7 +173,43 @@ describe("support HTTP authorization and privacy", () => {
     const allowed = await listCases(request);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
-    expect(mocks.pageStaff).toHaveBeenCalledWith(1);
+    expect(mocks.pageStaff).toHaveBeenCalledWith(1, 25, {});
+  });
+
+  it("filters authorized staff queues with the same bounded page metadata", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_staff", role: "moderator" });
+    mocks.can.mockReturnValue(true);
+    mocks.pageStaff.mockResolvedValue({ items: [], page: 3, pageSize: 25, total: 53, totalPages: 3 });
+
+    const response = await listCases(new NextRequest(
+      "https://nexus.test/api/support?scope=staff&page=3&status=open&category=payment",
+    ));
+    expect(response.status).toBe(200);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({ page: 3, total: 53, totalPages: 3 });
+    expect(mocks.pageStaff).toHaveBeenCalledWith(3, 25, {
+      status: "open",
+      category: "payment",
+    });
+    expect(mocks.pageByRequester).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    "status=under_review",
+    "category=invalid",
+    "status=",
+    "status=open&status=closed",
+    "category=account&category=payment",
+  ])("rejects invalid staff queue filters: %s", async (query) => {
+    mocks.session.mockResolvedValue({ id: "usr_staff", role: "moderator" });
+    mocks.can.mockReturnValue(true);
+    const response = await listCases(new NextRequest(
+      `https://nexus.test/api/support?scope=staff&${query}`,
+    ));
+    expect(response.status).toBe(400);
+    expectPrivate(response);
+    expect(mocks.pageStaff).not.toHaveBeenCalled();
+    expect(mocks.pageByRequester).not.toHaveBeenCalled();
   });
 
   it("does not expose another user's thread unless the viewer is staff", async () => {

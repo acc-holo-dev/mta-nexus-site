@@ -225,6 +225,13 @@
       "when": 1791423600000,
       "tag": "0031_support_staff_queue_index",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1791453600000,
+      "tag": "0032_support_staff_filter_index",
+      "breakpoints": true
     }
   ]
 }
