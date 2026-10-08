@@ -47,7 +47,7 @@ const verificationRequestSchema = z
     proofUrl: z
       .string()
       .url()
-      .regex(/^https?:///iu)
+      .regex(/^https?:\/\//iu)
       .max(2048)
       .optional()
       .or(z.literal("")),
