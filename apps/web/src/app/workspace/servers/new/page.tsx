@@ -4,6 +4,7 @@ import { type FormEvent, useState } from "react";
 import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../../../components/locale-context";
 import { confirmedCreatedServer } from "../../../../lib/server-mutation-confirmation";
+import { privateApiRequest } from "../../../../lib/private-api-request";
 
 const fieldClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
@@ -49,14 +50,14 @@ export default function RegisterServerPage() {
         gameMode: String(form.get("gameMode") || "").trim(),
         visibility: String(form.get("visibility") || "public"),
       };
-      const response = await fetch("/api/servers", {
-        method: "POST",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(command),
-        signal: AbortSignal.timeout(15_000),
-      });
+      const response = await fetch(
+        "/api/servers",
+        privateApiRequest({
+          method: "POST",
+          json: command,
+          timeoutMs: 15_000,
+        }),
+      );
       const data = await response.json().catch(() => null);
       const serverId = confirmedCreatedServer(
         response.status,

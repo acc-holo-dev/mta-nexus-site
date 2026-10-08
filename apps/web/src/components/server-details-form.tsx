@@ -4,6 +4,7 @@ import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nexus/ui";
 import { confirmedUpdatedServer } from "../lib/server-mutation-confirmation";
+import { privateApiRequest } from "../lib/private-api-request";
 import { useNexusLocale } from "./locale-context";
 
 type EditableServer = {
@@ -72,14 +73,11 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
       };
       const response = await fetch(
         `/api/servers/${encodeURIComponent(server.id)}`,
-        {
+        privateApiRequest({
           method: "PATCH",
-          cache: "no-store",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(command),
-          signal: AbortSignal.timeout(15_000),
-        },
+          json: command,
+          timeoutMs: 15_000,
+        }),
       );
       const data = await response.json().catch(() => null);
       if (
