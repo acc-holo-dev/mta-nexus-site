@@ -179,3 +179,23 @@ describe("Web Push dispatcher", () => {
     expect(w.claim).toHaveBeenCalledTimes(1);
   });
 });
+
+
+it("reports progress throughout a multi-job batch", async () => {
+  const ids = [
+    "wpo_00000000-0000-0000-0000-000000000011",
+    "wpo_00000000-0000-0000-0000-000000000012",
+    "wpo_00000000-0000-0000-0000-000000000013",
+  ];
+  const w = worker(ids);
+  const progress = vi.fn();
+
+  await new WebPushDispatcher({
+    worker: w,
+    sender: vi.fn(async () => ({ statusCode: 201 })),
+  }).runBatch(20, undefined, progress);
+
+  // Candidate discovery, every handled job and terminal cleanup all advance
+  // the worker liveness clock.
+  expect(progress).toHaveBeenCalledTimes(ids.length + 2);
+});

@@ -253,6 +253,7 @@ try {
       const result = await dispatcher.runBatch(
         BATCH_SIZE,
         controller.signal,
+        markProgress,
       );
       activity =
         result.accepted +

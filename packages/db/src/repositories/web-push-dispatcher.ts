@@ -78,6 +78,7 @@ export class WebPushDispatcher {
   async runBatch(
     limit = 20,
     signal?: AbortSignal,
+    onProgress?: () => void,
   ): Promise<WebPushDispatchSummary> {
     if (
       !Number.isSafeInteger(limit) ||
@@ -99,18 +100,21 @@ export class WebPushDispatcher {
 
     if (signal?.aborted) return Object.freeze(summary);
     const ids = await this.#worker.candidates(limit);
+    onProgress?.();
 
     for (const id of ids) {
       if (signal?.aborted) break;
       const lease = await this.#worker.claim(id);
       if (!lease) {
         summary.skipped += 1;
+        onProgress?.();
         continue;
       }
 
       const prepared = await this.#worker.prepare(lease);
       if (!prepared) {
         summary.skipped += 1;
+        onProgress?.();
         continue;
       }
 
@@ -124,6 +128,7 @@ export class WebPushDispatcher {
         );
         if (settled) summary.retried += 1;
         else summary.unsettled += 1;
+        onProgress?.();
         continue;
       }
 
@@ -150,6 +155,7 @@ export class WebPushDispatcher {
         );
         if (settled) summary.retried += 1;
         else summary.unsettled += 1;
+        onProgress?.();
         continue;
       }
 
@@ -162,6 +168,7 @@ export class WebPushDispatcher {
           );
         if (removed) summary.stale += 1;
         else summary.unsettled += 1;
+        onProgress?.();
         continue;
       }
 
@@ -179,6 +186,7 @@ export class WebPushDispatcher {
       } else {
         summary.discarded += 1;
       }
+      onProgress?.();
     }
 
     if (!signal?.aborted) {
@@ -186,6 +194,7 @@ export class WebPushDispatcher {
         await this.#worker.discardUnavailable(
           Math.min(limit, 100),
         );
+      onProgress?.();
     }
 
     return Object.freeze(summary);
