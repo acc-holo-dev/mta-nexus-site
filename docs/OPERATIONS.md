@@ -757,8 +757,9 @@ The upgrade fixture intentionally pins 0024 → 0030 and fails when another migr
 is added. It verifies the Support tables, Web Push subscriptions, durable outbox
 tables/indexes, queue-gate seed, legacy-row preservation, rollback/retry and
 idempotent rerun. Review and extend it with the next release's old-schema fixtures
-and data-changing effects. Its injected failure is synthetic and occurs after the
-real 0026 SQL, within Drizzle's transaction. It proves database rollback/retry,
+and data-changing effects. Its injected failure is synthetic and is appended to
+migration 0027 after that migration's real SQL, within Drizzle's transaction.
+It proves database rollback/retry,
 not recovery from host failure or compatibility of an older application image.
 Backup acceptance uses synthetic data and the production PostgreSQL/storage
 topology; rehearse separately against a protected copy of the target dataset.
@@ -812,9 +813,10 @@ test -n "$postgres_id"
 old_image=$(docker inspect --format '{{.Image}}' "$app_id")
 postgres_image=$(docker inspect --format '{{.Image}}' "$postgres_id")
 mkdir -m 700 "$BACKUP_DIR"
-dc stop caddy app
-# Stop enabled writer services/jobs using their actual configured names too.
-# Proceed only after all writers are stopped.
+dc stop caddy push-worker app
+# Stop any additional enabled writer services/jobs (for example the optional
+# account-mail worker override) using their actual configured names too.
+# Proceed only after every writer is stopped.
 docker exec "$postgres_id" sh -eu -c \
   'exec pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --format=custom --no-owner --no-privileges' \
   > "$BACKUP_DIR/database.dump"
@@ -842,8 +844,19 @@ investigating. Do not use `down --volumes`, `volume prune` or `db:seed` on this 
 After app readiness succeeds, check `node scripts/check-local-readiness.mjs`
 inside the app, compare the migration ledger to the candidate journal, and verify
 the expected resource/build/entitlement/notification counts and upload checksums.
-Start any enabled worker with the same candidate and retained mail keys. Restore
-ingress only after these checks, then verify through HTTPS:
+Start the production push worker with the same candidate and retained VAPID
+configuration, then require its liveness probe to pass. If Web Push is configured,
+also run the queue probe and resolve any alert before restoring ingress:
+
+```bash
+dc up --detach --no-build --pull never --wait --wait-timeout 300 push-worker
+dc exec -T push-worker node /app/scripts/check-web-push-worker-health.mjs
+dc exec -T push-worker node /app/scripts/check-web-push-worker-queue.mjs
+```
+
+Start any additional enabled workers (for example account mail) with the same
+candidate and retained secrets. Restore ingress only after these checks, then
+verify through HTTPS:
 
 - login, session revocation and the configured recovery-mail path;
 - catalog, existing free acquisition and a downloaded file's length/SHA-256;
@@ -889,8 +902,10 @@ Migration `0026_public_portfolio_indexes` adds partial author/organization resou
 indexes and a published organization-content index with the same ordering as the
 public pages. It changes no rows. Index creation runs in the migration transaction
 and can block writers; include it in the maintenance window and rehearse on a
-restored target dataset before deployment. The upgrade rehearsal still starts
-from 0024 and now verifies transaction rollback/retry across both 0025 and 0026.
+restored target dataset before deployment. The upgrade rehearsal still starts from 0024, injects a rollback failure in
+0027, and then verifies a clean retry through the current 0030 target, including
+the 0025-0026 portfolio/notification changes and the 0028-0030 Support/Web Push
+schema additions.
 
 The Verify job executes the real portfolio repositories against temporary tables
 with 10,128 resources, 10,127 builds and 10,025 articles. It captures representative
