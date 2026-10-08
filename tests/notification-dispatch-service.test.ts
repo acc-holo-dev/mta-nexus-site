@@ -32,15 +32,6 @@ describe("notification dispatch service", () => {
       })
       .mockRejectedValueOnce(new Error("db unavailable"));
 
-    const sensitive = {
-      recipientId: "u1",
-      title: "Sensitive title",
-      message: "Sensitive message",
-      type: "system" as const,
-      category: "system" as const,
-      link: "/private/sensitive-link",
-    };
-
     await expect(
       dispatchNotificationsBestEffort([
         {
@@ -76,6 +67,14 @@ describe("notification dispatch service", () => {
 
   it("reports a stored inbox row whose push queue degraded without logging notification content", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const sensitive = {
+      recipientId: "u1",
+      title: "Sensitive title",
+      message: "Sensitive message",
+      type: "system" as const,
+      category: "system" as const,
+      link: "/private/sensitive-link",
+    };
     create.mockResolvedValueOnce({
       notification: { id: "not_1", recipientId: "u1" },
       pushJobs: 0,
