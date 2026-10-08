@@ -745,7 +745,7 @@ Keep these CI artifacts outside the runner before their 14-day retention expires
 | Evidence | What it proves |
 | --- | --- |
 | `core-release-evidence-<sha>-<attempt>` | Repository identity, migrations, lint, types, tests, default production build |
-| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0026; failed DDL and ledger rollback; retry; idempotency; legacy rows and new structured notifications |
+| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0030; failed DDL and ledger rollback; retry; idempotency; legacy rows and new structured notifications |
 | `backup-restore-<sha>-<attempt>` | Destroyed synthetic source restored into new owned volumes; schema, migration ledger, author, resource, trusted build, entitlement, notification and uploads preserved |
 
 Require `status: "PASS"`, the intended `sha`, and all verification/cleanup flags
@@ -753,9 +753,11 @@ to be true in the upgrade and restore reports. A downloaded report alone is not
 success. These reports extend the core release evidence; they are separate required
 workflow steps, not additional gates silently inferred by the core JSON summary.
 
-The upgrade fixture intentionally pins 0024 → 0026 and fails when another migration
-is added. Review and extend it with the next release's old-schema fixtures and
-data-changing effects. Its injected failure is synthetic and occurs after the
+The upgrade fixture intentionally pins 0024 → 0030 and fails when another migration
+is added. It verifies the Support tables, Web Push subscriptions, durable outbox
+tables/indexes, queue-gate seed, legacy-row preservation, rollback/retry and
+idempotent rerun. Review and extend it with the next release's old-schema fixtures
+and data-changing effects. Its injected failure is synthetic and occurs after the
 real 0026 SQL, within Drizzle's transaction. It proves database rollback/retry,
 not recovery from host failure or compatibility of an older application image.
 Backup acceptance uses synthetic data and the production PostgreSQL/storage
@@ -769,8 +771,10 @@ topology; rehearse separately against a protected copy of the target dataset.
    Save the image with `docker image save` if it is not available from a registry.
 2. Record `SELECT id, hash, created_at FROM drizzle.__drizzle_migrations ORDER BY id`
    from the target database. Review pending SQL against this inventory. Do not edit
-   applied SQL or its journal. Migration 0025 only adds nullable notification JSON;
-   existing notification title/message/read state remain the fallback.
+   applied SQL or its journal. Migration 0025 adds nullable structured notification JSON; migrations 0028-0030
+   then add Support storage, session-bound Web Push subscriptions and the durable
+   Web Push outbox/queue gate. Existing notification title/message/read state
+   remain the fallback.
 3. Review older pending migrations too: 0020 retires unsafe legacy builds and can
    return products to draft; 0024 normalizes `tool` and rejects unknown types.
    This runbook does not cover a PostgreSQL major-version or storage-layout change.

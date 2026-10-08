@@ -21,7 +21,7 @@ const root = fileURLToPath(new URL("../../../", import.meta.url));
 const migrationsFolder = join(root, "packages/db/migrations");
 const journal = JSON.parse(readFileSync(join(migrationsFolder, "meta/_journal.json"), "utf8"));
 // Freeze the baseline: when migrations advance, review and extend this fixture.
-assert.equal(journal.entries.at(-1).tag, "0029_web_push_subscriptions");
+assert.equal(journal.entries.at(-1).tag, "0030_web_push_outbox");
 const temp = mkdtempSync(join(tmpdir(), "nexus-upgrade-"));
 const baselineFolder = join(temp, "baseline");
 const failureFolder = join(temp, "failure");
@@ -33,13 +33,16 @@ const evidence = {
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: "0024_product_type_invariant",
-  target: "0029_web_push_subscriptions",
+  target: "0030_web_push_outbox",
   phase: "baseline",
   failedMigrationRolledBack: false,
   legacyRowsPreserved: false,
   retrySucceeded: false,
   rerunIdempotent: false,
   structuredNotificationAccepted: false,
+  supportSchemaPresent: false,
+  webPushSubscriptionSchemaPresent: false,
+  webPushOutboxSchemaPresent: false,
   cleanupComplete: false,
 };
 
@@ -129,13 +132,57 @@ try {
     supportTables.map((row) => row.table_name),
     ["support_case_messages", "support_cases"],
   );
+  evidence.supportSchemaPresent = true;
+
   const pushTables = await client`SELECT table_name FROM information_schema.tables
     WHERE table_schema = 'public'
-      AND table_name = 'web_push_subscriptions'`;
+      AND table_name IN (
+        'web_push_subscriptions',
+        'web_push_queue_gate',
+        'web_push_outbox'
+      )
+    ORDER BY table_name`;
   assert.deepEqual(
     pushTables.map((row) => row.table_name),
-    ["web_push_subscriptions"],
+    [
+      "web_push_outbox",
+      "web_push_queue_gate",
+      "web_push_subscriptions",
+    ],
   );
+  evidence.webPushSubscriptionSchemaPresent = true;
+
+  const pushIndexes = await client`SELECT indexname FROM pg_indexes
+    WHERE schemaname = 'public'
+      AND indexname IN (
+        'web_push_outbox_notification_subscription_idx',
+        'web_push_outbox_due_idx',
+        'web_push_outbox_lease_idx',
+        'web_push_outbox_expiry_idx'
+      )
+    ORDER BY indexname`;
+  assert.deepEqual(
+    pushIndexes.map((row) => row.indexname),
+    [
+      "web_push_outbox_due_idx",
+      "web_push_outbox_expiry_idx",
+      "web_push_outbox_lease_idx",
+      "web_push_outbox_notification_subscription_idx",
+    ],
+  );
+  const queueGate = await client`
+    SELECT singleton, capacity
+    FROM web_push_queue_gate
+  `;
+  assert.equal(queueGate.length, 1);
+  assert.equal(queueGate[0].singleton, true);
+  assert.equal(queueGate[0].capacity, 10_000);
+  const outboxCount = await client`
+    SELECT count(*)::int AS count
+    FROM web_push_outbox
+  `;
+  assert.equal(outboxCount[0].count, 0);
+  evidence.webPushOutboxSchemaPresent = true;
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);

@@ -11,6 +11,7 @@ function snapshot(overrides = {}) {
   return {
     status: "ready", configured: true, pid: 123, batch: 8,
     heartbeatAt: new Date().toISOString(), staleAfterMs: 60_000,
+    progressAt: new Date().toISOString(), progressStaleAfterMs: 180_000,
     queuePending: 4, queueDue: 2, queueLeased: 1,
     queueCapacity: 10_000, queueOldestAgeSeconds: 12,
     queueAlert: "ok", queueAlertReasons: [],

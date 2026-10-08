@@ -1,6 +1,6 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
-Единственный реестр проблем проекта. Обновлён: 2026-10-07 (после PWA/Web Push и accessibility release-slices; текущий hosted-runner blocker зафиксирован ниже).
+Единственный реестр проблем проекта. Обновлён: 2026-10-08 (после PWA/Web Push и accessibility release-slices; текущий hosted-runner blocker зафиксирован ниже).
 
 Правила реестра:
 
@@ -95,6 +95,19 @@ repository policy или runner-side allocation failure) **не подтверж
   на актуальном HEAD и закрыть этот пункт только после реального выполнения
   `plan`, unit/typecheck, migrations, Docker и browser acceptance.
 
+
+### P1-3. Release upgrade fixture отставал от Web Push outbox
+
+Upgrade rehearsal был жёстко зафиксирован на последней миграции `0029`, хотя
+актуальный journal уже содержит `0030_web_push_outbox`. Это означало
+детерминированный отказ full acceptance сразу после восстановления GitHub runner.
+Fixture обновлён до baseline `0024` → target `0030` и теперь проверяет Support,
+Web Push subscriptions, outbox/gate/indexes, rollback/retry, legacy rows и
+idempotency. Queue-health tooling fixture также синхронизирован с обязательным
+progress watchdog metadata.
+
+- **Статус:** исправлено в коде, но exact-SHA hosted CI всё ещё нужен после
+  восстановления runner allocation.
 
 ## P2 — известные ограничения
 
