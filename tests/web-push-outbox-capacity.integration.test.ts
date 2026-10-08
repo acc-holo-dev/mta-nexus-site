@@ -60,9 +60,14 @@ describe("Web Push outbox capacity gate", () => {
         delete from web_push_outbox
         where expires_at <= clock_timestamp()
       `);
+      const baseline = await webPushOutboxRepository.stats();
+      if (baseline.pending > 49_998) {
+        throw new Error("Web Push queue is too full for the capacity fixture");
+      }
+      const fixtureCapacity = baseline.pending + 2;
       await db.execute(sql`
         update web_push_queue_gate
-        set capacity = 2
+        set capacity = ${fixtureCapacity}
         where singleton = true
       `);
 
@@ -107,8 +112,8 @@ describe("Web Push outbox capacity gate", () => {
       expect(jobs).toHaveLength(2);
 
       await expect(webPushOutboxRepository.stats()).resolves.toMatchObject({
-        capacity: 2,
-        pending: 2,
+        capacity: baseline.pending + 2,
+        pending: baseline.pending + 2,
       });
     } finally {
       await db
