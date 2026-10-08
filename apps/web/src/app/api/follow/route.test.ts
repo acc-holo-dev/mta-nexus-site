@@ -77,8 +77,8 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import { POST as follow, DELETE as unfollow } from "./route";
-import { POST as markRead } from "../apps/web/src/app/api/notifications/mark-read/route";
-import { GET as listNotifications } from "../apps/web/src/app/api/notifications/route";
+import { POST as markRead } from "../notifications/mark-read/route";
+import { GET as listNotifications } from "../notifications/route";
 
 function expectPrivate(response: Response) {
   expect(response.headers.get("Cache-Control")).toBe("private, no-store");
