@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { SUPPORT_JSON_MAX_BYTES } from "../../../lib/bounded-json";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
@@ -127,6 +128,67 @@ beforeEach(() => {
 });
 
 describe("support HTTP authorization and privacy", () => {
+
+  it("rejects oversized support creation before persistence or notifications", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    const response = await createCase(new NextRequest("https://nexus.test/api/support", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        category: "account",
+        subject: "Large request",
+        message: "a".repeat(SUPPORT_JSON_MAX_BYTES),
+      }),
+    }));
+    expect(response.status).toBe(413);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({ code: "SUPPORT_BODY_TOO_LARGE" });
+    expect(mocks.createWithInitialMessage).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects oversized replies before touching the durable case", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.findById.mockResolvedValue({
+      id: caseId, requesterId: "usr_member", subject: "Account help", status: "open",
+    });
+    const response = await addMessage(new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        message: "a".repeat(SUPPORT_JSON_MAX_BYTES),
+        expectedStatus: "open",
+      }),
+    }), params);
+    expect(response.status).toBe(413);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({ code: "SUPPORT_BODY_TOO_LARGE" });
+    expect(mocks.addMessage).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects oversized moderator status changes without a database write", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_staff", role: "moderator" });
+    mocks.can.mockReturnValue(true);
+    mocks.findById.mockResolvedValue({
+      id: caseId, requesterId: "usr_member", subject: "Account help", status: "open",
+    });
+    const response = await updateCase(new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        status: "closed",
+        expectedStatus: "open",
+        padding: "a".repeat(SUPPORT_JSON_MAX_BYTES),
+      }),
+    }), params);
+    expect(response.status).toBe(413);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({ code: "SUPPORT_BODY_TOO_LARGE" });
+    expect(mocks.updateStatus).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
   it("keeps unauthenticated and authenticated case lists private", async () => {
     const request = new NextRequest("https://nexus.test/api/support");
     const denied = await listCases(request);

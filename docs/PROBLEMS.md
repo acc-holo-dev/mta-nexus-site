@@ -414,3 +414,16 @@ contract-test не даёт version files разойтись.
   Docker очищен от ресурсов других проектов (~2.8 GB).
 - `a93ed14` — датированные аудиты убраны из `docs/` (policy-тест), реестр
   проблем консолидирован в этот файл.
+
+### P2. Support mutations without durable idempotency keys
+
+The support forms have a same-tab single-flight guard and bounded JSON input, but a
+client may lose the HTTP response after a committed case/reply and retry. Status
+compare-and-set protects concurrent moderation decisions, not retry identity.
+
+- **Impact:** a retry following an ambiguous timeout may create a duplicate case
+  or message and corresponding audit/notification. This is not a payment issue.
+- **Next step:** add a server-enforced request idempotency key stored in a unique
+  durable database constraint, scoped to requester and mutation intent. Replay
+  must confirm the original committed result without duplicating side effects.
+  Add concurrent PostgreSQL and lost-response browser acceptance before release.

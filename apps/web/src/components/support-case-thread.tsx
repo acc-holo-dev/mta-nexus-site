@@ -26,6 +26,7 @@ export function SupportCaseThread({
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const loadSequence = useRef(0);
+  const mutationInFlight = useRef(false);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   const categories: Record<string, string> = {
@@ -90,7 +91,8 @@ export function SupportCaseThread({
 
   async function sendReply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (sending || updatingStatus || !reply.trim() || !supportCase) return;
+    if (mutationInFlight.current || !reply.trim() || !supportCase) return;
+    mutationInFlight.current = true;
     const expectedStatus = supportCase.status;
 
     setSending(true);
@@ -142,12 +144,14 @@ export function SupportCaseThread({
     } catch {
       setError(copy.replyError);
     } finally {
+      mutationInFlight.current = false;
       setSending(false);
     }
   }
 
   async function updateStatus(status: SupportCaseData["status"]) {
-    if (updatingStatus || sending || !supportCase) return;
+    if (mutationInFlight.current || !supportCase) return;
+    mutationInFlight.current = true;
     // Snapshot the status visible when the moderator initiated the action.
     const expectedStatus = supportCase.status;
     setUpdatingStatus(true);
@@ -178,6 +182,7 @@ export function SupportCaseThread({
     } catch {
       setError(copy.statusError);
     } finally {
+      mutationInFlight.current = false;
       setUpdatingStatus(false);
     }
   }
@@ -345,12 +350,14 @@ export function SupportCaseThread({
       {supportCase.status !== "closed" ? (
         <form
           onSubmit={(event) => void sendReply(event)}
+          aria-busy={sending}
           className="nexus-panel space-y-3 p-4"
         >
           <label className="block space-y-1.5">
             <span className="font-label text-secondary">{copy.reply}</span>
             <textarea
               value={reply}
+              disabled={sending || updatingStatus}
               onChange={(event) => setReply(event.target.value)}
               maxLength={4000}
               required

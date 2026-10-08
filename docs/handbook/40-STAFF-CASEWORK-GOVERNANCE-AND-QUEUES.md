@@ -118,3 +118,10 @@ Risk/provider policy может добавить dual-control позже без 
 - `SupportCaseRepository.updateStatus` requires `expectedStatus`; there is no unconditional status update fallback. HTTP guards and DB conditions must both remain present.
 - Support thread pagination cancels obsolete GET requests and ignores responses from superseded loads. A conflict refresh only displays the conflict-specific message if the updated thread actually loaded; otherwise the load error remains visible.
 - Switching message pages is disabled while a reply or staff status mutation is pending. These controls do not replace server-side compare-and-set.
+
+## 11. Bounded support input and single-flight forms (implemented)
+
+- Every support JSON mutation (case creation, reply and staff status change) reads at most 32 KiB of actual streamed bytes. An excessive declared Content-Length also fails early; a forged small length cannot bypass the streamed limit. An oversized body returns private HTTP 413 with `SUPPORT_BODY_TOO_LARGE`, without writing cases/messages or notifications.
+- Invalid JSON and malformed UTF-8 are rejected as invalid input; the existing strict Zod schemas still validate individual field limits. The cap supports 4,000 four-byte Unicode characters plus message metadata.
+- Client forms apply a synchronous single-flight guard and disable inputs during submission, so rapid clicks cannot trigger two concurrent actions from the same component instance or erase edits typed during a pending write.
+- **Remaining limit:** an ambiguous network timeout after a committed response is not yet protected by a durable server idempotency token; users should check the case list/thread before retrying, and durable retry keys require a separate design and migration.

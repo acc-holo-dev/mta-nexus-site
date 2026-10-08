@@ -3,6 +3,7 @@ import { generateId, can, consumeRateLimit } from "@nexus/security";
 import { createSupportCaseSchema, supportStaffQueueFiltersSchema } from "@nexus/validation";
 import { after, type NextRequest } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
+import { parseBoundedJson } from "../../../lib/bounded-json";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -133,8 +134,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const body = await parseBoundedJson(request);
+    if (!body.ok && body.reason === "too_large") {
+      return privateJson(
+        context,
+        { error: "Support request body too large", code: "SUPPORT_BODY_TOO_LARGE" },
+        { status: 413 },
+      );
+    }
+
     const parsed = createSupportCaseSchema.safeParse(
-      await request.json().catch(() => null),
+      body.ok ? body.value : null,
     );
     if (!parsed.success) {
       return privateJson(

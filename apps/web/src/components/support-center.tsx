@@ -19,6 +19,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const creatingRef = useRef(false);
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +97,8 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
 
   async function createCase(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (creating) return;
+    if (creatingRef.current) return;
+    creatingRef.current = true;
 
     setCreating(true);
     setError(null);
@@ -127,6 +129,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
     } catch {
       setError(copy.createError);
     } finally {
+      creatingRef.current = false;
       setCreating(false);
     }
   }
@@ -170,6 +173,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
           {!staffMode && (
             <form
               onSubmit={(event) => void createCase(event)}
+              aria-busy={creating}
               className="nexus-panel space-y-4 p-5"
             >
               <div className="flex items-center gap-2">
@@ -181,6 +185,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
                 <span className="font-label text-secondary">{copy.category}</span>
                 <select
                   value={category}
+                  disabled={creating}
                   onChange={(event) => setCategory(event.target.value)}
                   className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
                 >
@@ -196,6 +201,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
                 <span className="font-label text-secondary">{copy.subject}</span>
                 <input
                   value={subject}
+                  disabled={creating}
                   onChange={(event) => setSubject(event.target.value)}
                   minLength={5}
                   maxLength={120}
@@ -209,6 +215,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
                 <span className="font-label text-secondary">{copy.message}</span>
                 <textarea
                   value={message}
+                  disabled={creating}
                   onChange={(event) => setMessage(event.target.value)}
                   minLength={10}
                   maxLength={4000}

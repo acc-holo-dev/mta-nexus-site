@@ -6,6 +6,7 @@ import {
 } from "@nexus/validation";
 import { after, type NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
+import { parseBoundedJson } from "../../../../lib/bounded-json";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -140,8 +141,17 @@ export async function POST(
       );
     }
 
+    const body = await parseBoundedJson(request);
+    if (!body.ok && body.reason === "too_large") {
+      return privateJson(
+        context,
+        { error: "Support request body too large", code: "SUPPORT_BODY_TOO_LARGE" },
+        { status: 413 },
+      );
+    }
+
     const parsed = createSupportMessageSchema.safeParse(
-      await request.json().catch(() => null),
+      body.ok ? body.value : null,
     );
     if (!parsed.success) {
       return privateJson(
@@ -294,8 +304,17 @@ export async function PATCH(
       return privateJson(context, { error: "Forbidden" }, { status: 403 });
     }
 
+    const body = await parseBoundedJson(request);
+    if (!body.ok && body.reason === "too_large") {
+      return privateJson(
+        context,
+        { error: "Support request body too large", code: "SUPPORT_BODY_TOO_LARGE" },
+        { status: 413 },
+      );
+    }
+
     const parsed = updateSupportCaseStatusSchema.safeParse(
-      await request.json().catch(() => null),
+      body.ok ? body.value : null,
     );
     if (!parsed.success) {
       return privateJson(
