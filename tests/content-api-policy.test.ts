@@ -98,6 +98,7 @@ describe("community content API behavior", () => {
     expect(response.headers.get("Cache-Control")).toBe(
       "public, max-age=30, stale-while-revalidate=120",
     );
+    expect(response.headers.get("X-Request-Id")).toBeNull();
   });
 
   it("keeps authenticated creation private and rejects anonymous callers", async () => {
@@ -107,6 +108,9 @@ describe("community content API behavior", () => {
     expect(response.status).toBe(401);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
   });
 

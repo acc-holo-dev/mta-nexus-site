@@ -1,5 +1,10 @@
-import { after, type NextRequest, NextResponse } from "next/server";
-import { createRequestLogContext, logRequestEvent } from "../../../../../lib/observability";
+import { after, type NextRequest } from "next/server";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../../lib/observability";
 import { contentService } from "../../../../../lib/services/content-service";
 import { authService } from "../../../../../lib/services/auth-service";
 import { createContentCommentSchema } from "@nexus/validation";
@@ -12,8 +17,12 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(body: unknown, status = 200) {
-  return NextResponse.json(body, {
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
   });
@@ -21,47 +30,77 @@ function json(body: unknown, status = 200) {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   const context = createRequestLogContext(request);
   try {
     const { slug } = await params;
-    if (!slug || slug.length > 200 || !/^[a-z0-9-]+$/.test(slug)) {
-      return json({ error: "Article not found" }, 404 );
+    if (
+      !slug ||
+      slug.length > 200 ||
+      !/^[a-z0-9-]+$/u.test(slug)
+    ) {
+      return json(
+        context,
+        { error: "Article not found" },
+        404,
+      );
     }
 
-    const token = request.cookies.get("nexus_session")?.value;
+    const token =
+      request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
       return json(
-        { error: "Authentication required to comment" },
-        401 
+        context,
+        {
+          error:
+            "Authentication required to comment",
+        },
+        401,
       );
     }
 
-    const rateLimit = await consumeRateLimit("commentCreation", user.id);
+    const rateLimit = await consumeRateLimit(
+      "commentCreation",
+      user.id,
+    );
     if (!rateLimit.success) {
       return json(
-        { error: "Too many comments. Please try again later." },
-        429 
+        context,
+        {
+          error:
+            "Too many comments. Please try again later.",
+        },
+        429,
       );
     }
 
-    const parsed = createContentCommentSchema.safeParse(
-      await request.json().catch(() => null)
-    );
+    const parsed =
+      createContentCommentSchema.safeParse(
+        await request.json().catch(() => null),
+      );
     if (!parsed.success) {
       return json(
-        { error: "Invalid comment", details: parsed.error.format() },
-        400 
+        context,
+        {
+          error: "Invalid comment",
+          details: parsed.error.format(),
+        },
+        400,
       );
     }
 
-    const article = await contentService.getArticleBySlug(slug, {
-      incrementView: false,
-    });
+    const article =
+      await contentService.getArticleBySlug(slug, {
+        incrementView: false,
+      });
     if (!article) {
-      return json({ error: "Article not found" }, 404 );
+      return json(
+        context,
+        { error: "Article not found" },
+        404,
+      );
     }
 
     const comment = await contentService.addComment(
@@ -70,7 +109,7 @@ export async function POST(
         parentId: parsed.data.parentId,
         text: parsed.data.text,
       },
-      user
+      user,
     );
 
     if (article.authorId !== user.id) {
@@ -78,29 +117,42 @@ export async function POST(
         try {
           await dispatchNotificationsBestEffort([
             {
-            recipientId: article.authorId,
-            title: "New article comment",
-            message: `@${user.username} commented on “${article.title}”.`,
-            type: "content",
-            category: "content",
-            link: `/articles/${article.slug}`,
-          },
+              recipientId: article.authorId,
+              title: "New article comment",
+              message:
+                `@${user.username} commented on “${article.title}”.`,
+              type: "content",
+              category: "content",
+              link: `/articles/${article.slug}`,
+            },
           ]);
-        } catch {
-          // The comment commit is authoritative; notification/push is best effort.
+        } catch (error) {
+          logRequestEvent({
+            level: "warn",
+            event:
+              "content.comment.notification_failed",
+            context,
+            status: 201,
+            error,
+          });
         }
       });
     }
 
     return json(
+      context,
       { comment },
       201,
     );
   } catch (error: unknown) {
     if (error instanceof AppError) {
       return json(
-        { error: error.message, code: error.code },
-        error.statusCode 
+        context,
+        {
+          error: error.message,
+          code: error.code,
+        },
+        error.statusCode,
       );
     }
 
@@ -112,8 +164,9 @@ export async function POST(
       error,
     });
     return json(
+      context,
       { error: "Failed to add comment" },
-      500 
+      500,
     );
   }
 }

@@ -83,6 +83,9 @@ import { POST } from "../apps/web/src/app/api/content/[slug]/comments/route";
 function expectPrivate(response: Response) {
   expect(response.headers.get("Cache-Control")).toBe("private, no-store");
   expect(response.headers.get("Vary")).toBe("Cookie");
+  expect(response.headers.get("X-Request-Id")).toMatch(
+    /^[0-9a-f-]{20,}$/u,
+  );
 }
 
 function request() {

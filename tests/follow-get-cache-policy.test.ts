@@ -51,6 +51,9 @@ describe("follow GET cache privacy", () => {
       "private, no-store",
     );
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
   });
 
   it("marks authenticated follow-state responses private", async () => {
@@ -84,6 +87,9 @@ describe("follow GET cache privacy", () => {
       "private, no-store",
     );
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
   });
 
   it("keeps validation errors private after authentication", async () => {
@@ -104,5 +110,8 @@ describe("follow GET cache privacy", () => {
       "private, no-store",
     );
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
   });
 });

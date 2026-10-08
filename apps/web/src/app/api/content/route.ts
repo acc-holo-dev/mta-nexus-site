@@ -1,5 +1,10 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
+import type { NextRequest } from "next/server";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../lib/observability";
 import { authService } from "../../../lib/services/auth-service";
 import {
   contentRepository,
@@ -20,41 +25,78 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function privateJson(body: unknown, status = 200) {
-  return NextResponse.json(body, {
+const publicHeaders = {
+  "Cache-Control":
+    "public, max-age=30, stale-while-revalidate=120",
+};
+
+const errorHeaders = {
+  "Cache-Control": "no-store",
+};
+
+function privateJson(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
   });
 }
 
 export async function GET(request: NextRequest) {
-  const requestedLimit = Number(
-    request.nextUrl.searchParams.get("limit") || "50",
-  );
-  const limit = Number.isFinite(requestedLimit)
-    ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
-    : 50;
-  const content = await contentRepository.listPublished(limit);
+  const context = createRequestLogContext(request);
 
-  return NextResponse.json(
-    { content, limit },
-    {
-      headers: {
-        "Cache-Control":
-          "public, max-age=30, stale-while-revalidate=120",
+  try {
+    const requestedLimit = Number(
+      request.nextUrl.searchParams.get("limit") ||
+        "50",
+    );
+    const limit = Number.isFinite(requestedLimit)
+      ? Math.min(
+          Math.max(Math.floor(requestedLimit), 1),
+          100,
+        )
+      : 50;
+    const content =
+      await contentRepository.listPublished(limit);
+
+    // Keep the cacheable public representation free of a unique
+    // correlation header; a CDN may replay cached response headers.
+    return Response.json(
+      { content, limit },
+      { headers: publicHeaders },
+    );
+  } catch (error) {
+    logRequestEvent({
+      level: "error",
+      event: "content.list_failed",
+      context,
+      status: 503,
+      error,
+    });
+    return jsonWithRequestId(
+      context,
+      {
+        error:
+          "Published content is temporarily unavailable",
       },
-    },
-  );
+      { status: 503, headers: errorHeaders },
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
   const context = createRequestLogContext(request);
   try {
-    const token = request.cookies.get("nexus_session")?.value;
+    const token =
+      request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user) {
       return privateJson(
+        context,
         { error: "Authentication required" },
         401,
       );
@@ -66,7 +108,11 @@ export async function POST(request: NextRequest) {
     );
     if (!rateLimit.success) {
       return privateJson(
-        { error: "Content creation limit exceeded" },
+        context,
+        {
+          error:
+            "Content creation limit exceeded",
+        },
         429,
       );
     }
@@ -76,6 +122,7 @@ export async function POST(request: NextRequest) {
     );
     if (!parsed.success) {
       return privateJson(
+        context,
         {
           error: "Invalid content details",
           details: parsed.error.format(),
@@ -85,33 +132,47 @@ export async function POST(request: NextRequest) {
     }
 
     if (parsed.data.serverId) {
-      const linkedServer = await serverService.getServerById(
-        parsed.data.serverId,
-      );
+      const linkedServer =
+        await serverService.getServerById(
+          parsed.data.serverId,
+        );
       if (!linkedServer) {
         return privateJson(
+          context,
           { error: "Linked server was not found" },
           404,
         );
       }
 
       if (
-        !(await serverService.canManageServer(linkedServer, user))
+        !(await serverService.canManageServer(
+          linkedServer,
+          user,
+        ))
       ) {
         return privateJson(
-          { error: "You do not manage the linked server" },
+          context,
+          {
+            error:
+              "You do not manage the linked server",
+          },
           403,
         );
       }
     }
 
     if (parsed.data.productId) {
-      const linkedProduct = await productRepository.findById(
-        parsed.data.productId,
-      );
+      const linkedProduct =
+        await productRepository.findById(
+          parsed.data.productId,
+        );
       if (!linkedProduct) {
         return privateJson(
-          { error: "Linked resource was not found" },
+          context,
+          {
+            error:
+              "Linked resource was not found",
+          },
           404,
         );
       }
@@ -123,7 +184,11 @@ export async function POST(request: NextRequest) {
         ))
       ) {
         return privateJson(
-          { error: "You do not manage the linked resource" },
+          context,
+          {
+            error:
+              "You do not manage the linked resource",
+          },
           403,
         );
       }
@@ -136,7 +201,11 @@ export async function POST(request: NextRequest) {
         );
       if (!organization) {
         return privateJson(
-          { error: "Linked organization was not found" },
+          context,
+          {
+            error:
+              "Linked organization was not found",
+          },
           404,
         );
       }
@@ -147,7 +216,8 @@ export async function POST(request: NextRequest) {
         );
       const membership = memberships.find(
         (item) =>
-          item.organizationId === parsed.data.organizationId,
+          item.organizationId ===
+          parsed.data.organizationId,
       );
       const canManageOrganization =
         organization.ownerId === user.id ||
@@ -157,7 +227,11 @@ export async function POST(request: NextRequest) {
 
       if (!canManageOrganization) {
         return privateJson(
-          { error: "You do not manage this organization" },
+          context,
+          {
+            error:
+              "You do not manage this organization",
+          },
           403,
         );
       }
@@ -203,7 +277,11 @@ export async function POST(request: NextRequest) {
       );
 
     return privateJson(
-      { success: true, content: contentItem },
+      context,
+      {
+        success: true,
+        content: contentItem,
+      },
       201,
     );
   } catch (error: unknown) {
@@ -215,6 +293,7 @@ export async function POST(request: NextRequest) {
       error,
     });
     return privateJson(
+      context,
       { error: "Failed to create content" },
       500,
     );
