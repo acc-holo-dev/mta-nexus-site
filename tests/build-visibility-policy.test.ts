@@ -1,43 +1,167 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Product, User } from "@nexus/domain";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const mocks = vi.hoisted(() => ({
+  findBySlug: vi.fn(),
+  listPublishedByProduct: vi.fn(),
+  listByProduct: vi.fn(),
+  can: vi.fn(),
+  findOrganizationById: vi.fn(),
+  listUserMemberships: vi.fn(),
+}));
 
-describe("resource build visibility", () => {
-  it("shows only published builds publicly and keeps lifecycle details to managers/admins", () => {
-    const repository = read(
-      "packages/db/src/repositories/builds.ts",
-    );
-    const service = read(
-      "apps/web/src/lib/services/product-service.ts",
-    );
-    const page = read(
-      "apps/web/src/app/market/[slug]/page.tsx",
-    );
+vi.mock("@nexus/db", () => ({
+  productRepository: {
+    findBySlug: mocks.findBySlug,
+    findPublishedFreeBySlugs: vi.fn(async () => []),
+    listPublishedFreeDependingOnSlug: vi.fn(async () => []),
+  },
+  buildRepository: {
+    listPublishedByProduct: mocks.listPublishedByProduct,
+    listByProduct: mocks.listByProduct,
+  },
+  organizationRepository: {
+    findById: mocks.findOrganizationById,
+    listUserMemberships: mocks.listUserMemberships,
+  },
+}));
 
-    expect(repository).toContain("listPublishedByProduct");
-    expect(service).toContain("includeNonPublic = false");
-    expect(service).toContain(
-      "buildRepository.listPublishedByProduct",
-    );
-    expect(service).toContain('product.status === "published"');
-    expect(service).toContain("getProductPreviewBySlug");
-    expect(service).toContain("this.canManageProduct(product, actor");
-    expect(service).toContain("if (can(actor, action, product)) return true;");
+vi.mock("@nexus/security", () => ({
+  generateId: vi.fn((prefix: string) => `${prefix}_test`),
+  can: mocks.can,
+}));
 
-    expect(page).toContain(
-      "await productService.canManageProduct(product, user)",
+import { ProductService } from "../apps/web/src/lib/services/product-service";
+
+const outsider = {
+  id: "usr_outsider",
+  username: "outsider",
+  displayName: "Outsider",
+  role: "user",
+} as User;
+
+function product(overrides: Partial<Product> = {}): Product {
+  return {
+    id: "prd_visibility",
+    authorId: "usr_owner",
+    title: "Visibility fixture",
+    slug: "visibility-fixture",
+    description: "Visibility fixture",
+    type: "script",
+    status: "draft",
+    price: 0,
+    currency: "USD",
+    licenseModel: "unlimited",
+    tags: [],
+    currentVersion: "1.0.0",
+    ratingAverage: 0,
+    ratingCount: 0,
+    salesCount: 0,
+    isFeatured: false,
+    screenshots: [],
+    compatibility: { dependencies: [] },
+    createdAt: new Date("2026-01-01T00:00:00.000Z"),
+    updatedAt: new Date("2026-01-01T00:00:00.000Z"),
+    ...overrides,
+  } as Product;
+}
+
+describe("resource build visibility behavior", () => {
+  const service = new ProductService();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.listPublishedByProduct.mockResolvedValue([
+      { id: "bld_public", status: "published" },
+    ]);
+    mocks.listByProduct.mockResolvedValue([
+      { id: "bld_public", status: "published" },
+      { id: "bld_pending", status: "pending_review" },
+    ]);
+    mocks.listUserMemberships.mockResolvedValue([]);
+    mocks.findOrganizationById.mockResolvedValue(null);
+    mocks.can.mockReturnValue(false);
+  });
+
+  it("uses the published-only repository path for public build history", async () => {
+    await expect(
+      service.getProductBuilds("prd_visibility"),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        id: "bld_public",
+        status: "published",
+      }),
+    ]);
+
+    expect(mocks.listPublishedByProduct).toHaveBeenCalledWith(
+      "prd_visibility",
     );
-    expect(page).toContain(
-      "const canInspectBuilds = canManageProduct || isAdmin;",
+    expect(mocks.listByProduct).not.toHaveBeenCalled();
+  });
+
+  it("uses full lifecycle history only when caller explicitly has inspection access", async () => {
+    await expect(
+      service.getProductBuilds("prd_visibility", true),
+    ).resolves.toEqual([
+      expect.objectContaining({ id: "bld_public" }),
+      expect.objectContaining({
+        id: "bld_pending",
+        status: "pending_review",
+      }),
+    ]);
+
+    expect(mocks.listByProduct).toHaveBeenCalledWith(
+      "prd_visibility",
     );
-    expect(page).toContain(
-      "productService.getProductBuilds(product.id, canInspectBuilds)",
+    expect(mocks.listPublishedByProduct).not.toHaveBeenCalled();
+  });
+
+  it("hides non-published previews from guests and unauthorized users", async () => {
+    const draft = product();
+    mocks.findBySlug.mockResolvedValue(draft);
+
+    await expect(
+      service.getProductPreviewBySlug(draft.slug, null),
+    ).resolves.toBeNull();
+
+    await expect(
+      service.getProductPreviewBySlug(
+        draft.slug,
+        outsider,
+      ),
+    ).resolves.toBeNull();
+
+    expect(mocks.can).toHaveBeenCalledWith(
+      outsider,
+      "product.update",
+      draft,
     );
-    expect(page).toContain("copy.privatePreview");
-    expect(page).toContain("const hasAccess =");
-    expect(page).toContain("isPublished &&");
+  });
+
+  it("allows an authorized manager to preview a non-published resource", async () => {
+    const draft = product();
+    mocks.findBySlug.mockResolvedValue(draft);
+    mocks.can.mockReturnValue(true);
+
+    await expect(
+      service.getProductPreviewBySlug(
+        draft.slug,
+        outsider,
+      ),
+    ).resolves.toBe(draft);
+  });
+
+  it("never exposes a legacy paid resource through preview access", async () => {
+    const paid = product({ price: 1000 });
+    mocks.findBySlug.mockResolvedValue(paid);
+    mocks.can.mockReturnValue(true);
+
+    await expect(
+      service.getProductPreviewBySlug(
+        paid.slug,
+        outsider,
+      ),
+    ).resolves.toBeNull();
+    expect(mocks.can).not.toHaveBeenCalled();
   });
 });
