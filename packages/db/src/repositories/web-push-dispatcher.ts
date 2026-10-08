@@ -222,14 +222,19 @@ export class WebPushDispatcher {
         continue;
       }
 
-      const settled = await this.#worker.settle(
-        lease,
-        outcome,
-        result.statusCode,
+      const settled =
         outcome === "retry"
-          ? result.retryAfterMs
-          : undefined,
-      );
+          ? await this.#worker.settle(
+              lease,
+              outcome,
+              result.statusCode,
+              result.retryAfterMs,
+            )
+          : await this.#worker.settle(
+              lease,
+              outcome,
+              result.statusCode,
+            );
       if (!settled) {
         summary.unsettled += 1;
       } else if (outcome === "accepted") {

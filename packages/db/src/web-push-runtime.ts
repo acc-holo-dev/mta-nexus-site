@@ -101,7 +101,7 @@ export function parseWebPushRetryAfter(
   if (/^[0-9]+$/u.test(trimmed)) {
     const seconds = Number(trimmed);
     if (!Number.isSafeInteger(seconds)) return undefined;
-    return Math.min(seconds * 1_000, 24 * 60 * 60 * 1_000);
+    return Math.min(seconds, 24 * 60 * 60) * 1_000;
   }
 
   const timestamp = Date.parse(trimmed);
