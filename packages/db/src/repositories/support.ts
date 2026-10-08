@@ -117,6 +117,7 @@ export class SupportCaseRepository {
       authorId: string;
       authorRole: SupportMessageAuthorRole;
       body: string;
+      expectedStatus: SupportCaseStatus;
     },
     audit: Omit<AuditEvent, "createdAt">,
   ): Promise<{
@@ -131,6 +132,7 @@ export class SupportCaseRepository {
         .where(
           and(
             eq(supportCases.id, input.caseId),
+            eq(supportCases.status, input.expectedStatus),
             ne(supportCases.status, "closed"),
           ),
         )

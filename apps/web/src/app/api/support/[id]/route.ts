@@ -149,6 +149,7 @@ export async function POST(
         authorId: access.user.id,
         authorRole,
         body: parsed.data.message,
+        expectedStatus: access.supportCase.status,
       },
       {
         id: generateId("aud"),
@@ -162,9 +163,18 @@ export async function POST(
     );
 
     if (!result) {
+      const current = await supportCaseRepository.findById(id);
+      const closed = current?.status === "closed";
       return privateJson(
         context,
-        { error: "Closed support cases cannot receive new messages" },
+        {
+          error: closed
+            ? "Closed support cases cannot receive new messages"
+            : "Support case changed concurrently",
+          code: closed
+            ? "SUPPORT_CASE_CLOSED"
+            : "SUPPORT_MESSAGE_CONFLICT",
+        },
         { status: 409 },
       );
     }

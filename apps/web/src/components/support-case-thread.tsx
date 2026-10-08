@@ -88,7 +88,17 @@ export function SupportCaseThread({
         },
       );
       const data = await response.json().catch(() => null);
-      const confirmed = confirmSupportReply(response.status, data, caseId, reply);
+      if (response.status === 409) {
+        await load();
+        setError(copy.replyError);
+        return;
+      }
+      const confirmed = confirmSupportReply(
+        response.status,
+        data,
+        caseId,
+        reply,
+      );
       if (!response.ok || !confirmed) {
         throw new Error(copy.replyError);
       }

@@ -70,6 +70,7 @@ describe("support case repository", () => {
         authorId: staffId,
         authorRole: "staff",
         body: "Staff reply stored in the same durable case.",
+        expectedStatus: "open",
       },
       {
         id: `aud_support_reply_${suffix}`,
@@ -125,6 +126,7 @@ describe("support case repository", () => {
           authorId: requesterId,
           authorRole: "requester",
           body: "This message must not be accepted after final close.",
+          expectedStatus: "closed",
         },
         {
           id: `aud_support_after_close_${suffix}`,
@@ -137,4 +139,97 @@ describe("support case repository", () => {
       ),
     ).resolves.toBeNull();
   });
+});
+
+
+it("serializes reply-vs-status races without losing the moderation decision", async () => {
+  const suffix = `support_race_${Date.now().toString(36)}_${process.pid}`;
+  const requesterId = `usr_${suffix}`;
+  const staffId = `usr_staff_${suffix}`;
+  const caseId = `sup_${suffix}`;
+
+  await userRepository.create({
+    id: requesterId,
+    email: `${suffix}@nexus.test`,
+    username: suffix,
+    displayName: "Support Race Requester",
+    role: "user",
+  });
+  await userRepository.create({
+    id: staffId,
+    email: `staff_${suffix}@nexus.test`,
+    username: `staff_${suffix}`,
+    displayName: "Support Race Moderator",
+    role: "moderator",
+  });
+
+  await supportCaseRepository.createWithInitialMessage(
+    {
+      id: caseId,
+      requesterId,
+      category: "account",
+      subject: "Concurrent support moderation",
+      status: "open",
+    },
+    {
+      id: `spm_initial_${suffix}`,
+      caseId,
+      authorId: requesterId,
+      authorRole: "requester",
+      body: "Initial message for the concurrency fixture.",
+    },
+    {
+      id: `aud_initial_${suffix}`,
+      actorId: requesterId,
+      actorType: "user",
+      action: "support.case.created",
+      targetId: caseId,
+      targetType: "support_case",
+    },
+  );
+
+  const [replyResult, statusResult] = await Promise.all([
+    supportCaseRepository.addMessage(
+      {
+        id: `spm_race_${suffix}`,
+        caseId,
+        authorId: requesterId,
+        authorRole: "requester",
+        body: "Reply racing with a moderator resolution.",
+        expectedStatus: "open",
+      },
+      {
+        id: `aud_reply_race_${suffix}`,
+        actorId: requesterId,
+        actorType: "user",
+        action: "support.message.created",
+        targetId: caseId,
+        targetType: "support_case",
+      },
+    ),
+    supportCaseRepository.updateStatus(
+      caseId,
+      "resolved",
+      {
+        id: `aud_resolve_race_${suffix}`,
+        actorId: staffId,
+        actorType: "admin",
+        action: "support.case.status_changed",
+        targetId: caseId,
+        targetType: "support_case",
+      },
+      "open",
+    ),
+  ]);
+
+  expect((await supportCaseRepository.findById(caseId))?.status).toBe(
+    "resolved",
+  );
+  expect(statusResult?.status).toBe("resolved");
+
+  const messages = await supportCaseRepository.listMessages(caseId);
+  const raced = messages.filter(
+    (message) => message.id === `spm_race_${suffix}`,
+  );
+  expect(raced).toHaveLength(replyResult ? 1 : 0);
 });

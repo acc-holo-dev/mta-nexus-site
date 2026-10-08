@@ -333,6 +333,11 @@ describe("support HTTP authorization and privacy", () => {
     expect(mocks.updateStatus).not.toHaveBeenCalled();
 
     mocks.addMessage.mockResolvedValueOnce(null);
+    mocks.findById.mockResolvedValueOnce({
+      id: caseId,
+      requesterId: "usr_member",
+      status: "closed",
+    });
     const reply = await addMessage(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "POST",
@@ -343,6 +348,53 @@ describe("support HTTP authorization and privacy", () => {
     );
     expect(reply.status).toBe(409);
     expectPrivate(reply);
+    expect(await reply.json()).toMatchObject({
+      code: "SUPPORT_CASE_CLOSED",
+    });
+  });
+
+  it("rejects a stale reply when moderation changed the case after authorization", async () => {
+    mocks.session.mockResolvedValue({
+      id: "usr_member",
+      role: "user",
+    });
+    mocks.findById
+      .mockResolvedValueOnce({
+        id: caseId,
+        requesterId: "usr_member",
+        status: "open",
+      })
+      .mockResolvedValueOnce({
+        id: caseId,
+        requesterId: "usr_member",
+        status: "resolved",
+      });
+    mocks.addMessage.mockResolvedValueOnce(null);
+
+    const response = await addMessage(
+      new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          message: "This reply raced with moderation.",
+        }),
+      }),
+      params,
+    );
+
+    expect(response.status).toBe(409);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({
+      code: "SUPPORT_MESSAGE_CONFLICT",
+    });
+    expect(mocks.addMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        caseId,
+        expectedStatus: "open",
+      }),
+      expect.any(Object),
+    );
+    expect(afterMock).not.toHaveBeenCalled();
   });
 });
 

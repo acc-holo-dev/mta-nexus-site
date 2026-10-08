@@ -259,7 +259,11 @@ CHECK, известный алиас tool → plugin и отказ на неиз
 ### P2-5. Тестовая инфраструктура: хрупкости и производительность
 
 - root `tests/` всё ещё содержит cross-workspace integration и часть
-  legacy HTTP suites, но ownership постепенно выровнен: comment repository
+  legacy HTTP suites; Support status-vs-status и reply-vs-status mutations
+  теперь используют PostgreSQL compare-and-swap contracts, поэтому stale
+  moderation/reply не может silently вернуть thread в `open`. HTTP 409
+  различает final closed case и concurrent message conflict, а client
+  перечитывает authoritative thread перед показом ошибки; но ownership постепенно выровнен: comment repository
   contract живёт в `packages/db/src/repositories/`; comment form/client —
   в `apps/web/src/components/`; reports, verification, follow, article-comment
   и support HTTP suites перенесены непосредственно к своим Route Handlers.
