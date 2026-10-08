@@ -1,7 +1,14 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { confirmedAuthorBuild, confirmedAuthorDetails, confirmedRetiredBuild } from "../apps/web/src/lib/author-resource-response";
+import {
+  confirmedAuthorBuild,
+  confirmedAuthorDetails,
+  confirmedRetiredBuild,
+} from "../apps/web/src/lib/author-resource-response";
+import {
+  authorBuildRetireRequest,
+  authorBuildUploadRequest,
+  authorDetailsMutationRequest,
+} from "../apps/web/src/lib/author-resource-requests";
 
 const details = { title: "A resource", shortDescription: "Brief", description: "A resource description", tags: ["lua"] };
 const product = { id: "prd_owned", ...details, updatedAt: "2026-10-05T00:00:00.000Z" };
@@ -66,21 +73,67 @@ describe("author mutation confirmation", () => {
 
 
 describe("author resource client mutation policy", () => {
-  it("routes every author write through the enforced private request policy", () => {
-    const source = readFileSync(
-      resolve(
-        process.cwd(),
-        "apps/web/src/components/author-resource-forms.tsx",
-      ),
-      "utf8",
+  it("builds a private optimistic-concurrency metadata mutation", () => {
+    const signal = new AbortController().signal;
+    const request = authorDetailsMutationRequest(
+      {
+        title: details.title,
+        shortDescription: details.shortDescription,
+        description: details.description,
+        tags: details.tags,
+      },
+      product.updatedAt,
+      signal,
     );
 
-    expect(source).toContain(
-      'import { privateRequest } from "../lib/private-request"',
+    expect(request).toMatchObject({
+      method: "PATCH",
+      cache: "no-store",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+        "If-Match": '"2026-10-05T00:00:00.000Z"',
+      },
+      body: JSON.stringify(details),
+      signal,
+    });
+  });
+
+  it("keeps build upload private without forcing a multipart content-type", () => {
+    const body = new FormData();
+    body.set("version", "1.2.3");
+    body.set("file", new Blob(["build"]), "resource.zip");
+    const signal = new AbortController().signal;
+
+    const request = authorBuildUploadRequest(body, signal);
+
+    expect(request.method).toBe("POST");
+    expect(request.cache).toBe("no-store");
+    expect(request.credentials).toBe("same-origin");
+    expect(request.body).toBe(body);
+    expect(request.headers).toBeUndefined();
+    expect(request.signal).toBe(signal);
+  });
+
+  it("builds a private retirement mutation with an exact JSON action", () => {
+    const signal = new AbortController().signal;
+    const request = authorBuildRetireRequest(
+      "No longer supported",
+      signal,
     );
-    expect(source.match(/privateRequest\(\{/gu)).toHaveLength(3);
-    expect(source).toContain("confirmedAuthorDetails(");
-    expect(source).toContain("confirmedAuthorBuild(");
-    expect(source).toContain("confirmedRetiredBuild(");
+
+    expect(request).toMatchObject({
+      method: "PATCH",
+      cache: "no-store",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "retire",
+        reason: "No longer supported",
+      }),
+      signal,
+    });
   });
 });

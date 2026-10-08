@@ -9,7 +9,11 @@ import {
   getSupportedBuildExtension,
 } from "../lib/build-file-validation";
 import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
-import { privateRequest } from "../lib/private-request";
+import {
+  authorBuildRetireRequest,
+  authorBuildUploadRequest,
+  authorDetailsMutationRequest,
+} from "../lib/author-resource-requests";
 
 import {
   authorResourceDraftKey, parseAuthorResourceDraft, sameAuthorDetails, reconcileAuthorDetails,
@@ -178,15 +182,11 @@ export function AuthorResourceForms({
     try {
       const response = await fetch(
         `/api/products/${product.id}`,
-        privateRequest({
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            "If-Match": `"${new Date(baseUpdatedAt).toISOString()}"`,
-          },
-          body: JSON.stringify(parsed.data),
-          signal: AbortSignal.timeout(15_000),
-        }),
+        authorDetailsMutationRequest(
+          parsed.data,
+          baseUpdatedAt,
+          AbortSignal.timeout(15_000),
+        ),
       );
       const body = await response.json().catch(() => null);
       if (!response.ok) {
@@ -248,11 +248,10 @@ export function AuthorResourceForms({
     try {
       const response = await fetch(
         `/api/products/${product.id}/builds`,
-        privateRequest({
-          method: "POST",
-          body: data,
-          signal: AbortSignal.timeout(120_000),
-        }),
+        authorBuildUploadRequest(
+          data,
+          AbortSignal.timeout(120_000),
+        ),
       );
       const body = await response.json().catch(() => null);
       if (!response.ok) {
@@ -475,12 +474,10 @@ export function RetireBuildForm({
     try {
       const response = await fetch(
         `/api/products/${productId}/builds/${buildId}`,
-        privateRequest({
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "retire", reason }),
-          signal: AbortSignal.timeout(15_000),
-        }),
+        authorBuildRetireRequest(
+          reason,
+          AbortSignal.timeout(15_000),
+        ),
       );
       const body = await response.json().catch(() => null);
       if (!confirmedRetiredBuild(response.status, body, productId, buildId)) {
