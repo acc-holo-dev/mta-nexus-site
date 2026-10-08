@@ -8,6 +8,10 @@ import { after, type NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { parseBoundedJson } from "../../../../lib/bounded-json";
 import {
+  parseSupportIdempotencyKey,
+  supportMutationFingerprint,
+} from "../../../../lib/support-idempotency";
+import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
@@ -132,15 +136,6 @@ export async function POST(
       );
     }
 
-    const limit = await consumeRateLimit("supportMessage", access.user.id);
-    if (!limit.success) {
-      return privateJson(
-        context,
-        { error: "Too many support messages" },
-        { status: 429 },
-      );
-    }
-
     const body = await parseBoundedJson(request);
     if (!body.ok && body.reason === "too_large") {
       return privateJson(
@@ -158,6 +153,49 @@ export async function POST(
         context,
         { error: "Invalid support message" },
         { status: 400 },
+      );
+    }
+
+    const requestKey = parseSupportIdempotencyKey(request.headers.get("Idempotency-Key"));
+    if (!requestKey) {
+      return privateJson(
+        context,
+        { error: "A valid idempotency key is required", code: "SUPPORT_IDEMPOTENCY_KEY_INVALID" },
+        { status: 400 },
+      );
+    }
+
+    const fingerprint = supportMutationFingerprint({
+      operation: "reply",
+      caseId: id,
+      message: parsed.data.message,
+      expectedStatus: parsed.data.expectedStatus,
+    });
+    const scope = {
+      actorId: access.user.id,
+      requestKey,
+      operation: "reply" as const,
+      fingerprint,
+    };
+    const previous = await supportCaseRepository.findMutationReplay(scope);
+    if (previous.kind === "key_conflict") {
+      return privateJson(
+        context,
+        { error: "Idempotency key was already used for a different request", code: "SUPPORT_IDEMPOTENCY_CONFLICT" },
+        { status: 409 },
+      );
+    }
+    if (previous.kind === "replayed") {
+      if (!previous.message) throw new Error("Support reply replay is missing its message");
+      return privateJson(
+        context,
+        {
+          success: true,
+          supportCase: previous.supportCase,
+          message: previous.message,
+          replayed: true,
+        },
+        { status: 201 },
       );
     }
 
@@ -180,13 +218,23 @@ export async function POST(
       );
     }
 
+    const limit = await consumeRateLimit("supportMessage", access.user.id);
+    if (!limit.success) {
+      return privateJson(
+        context,
+        { error: "Too many support messages" },
+        { status: 429 },
+      );
+    }
+
     const authorRole =
       access.supportCase.requesterId === access.user.id
         ? "requester"
         : "staff";
-    const result = await supportCaseRepository.addMessage(
+    const messageId = generateId("spm");
+    const result = await supportCaseRepository.addIdempotentMessage(
       {
-        id: generateId("spm"),
+        id: messageId,
         caseId: id,
         authorId: access.user.id,
         authorRole,
@@ -202,9 +250,18 @@ export async function POST(
         targetType: "support_case",
         details: { authorRole },
       },
+      { ...scope, caseId: id, messageId },
     );
 
-    if (!result) {
+    if (result.kind === "key_conflict") {
+      return privateJson(
+        context,
+        { error: "Idempotency key was already used for a different request", code: "SUPPORT_IDEMPOTENCY_CONFLICT" },
+        { status: 409 },
+      );
+    }
+
+    if (result.kind === "stale") {
       const current = await supportCaseRepository.findById(id);
       const closed = current?.status === "closed";
       return privateJson(
@@ -221,7 +278,7 @@ export async function POST(
       );
     }
 
-    after(async () => {
+    if (result.kind === "created") after(async () => {
       try {
         const recipientIds =
           authorRole === "staff"
@@ -258,7 +315,12 @@ export async function POST(
 
     return privateJson(
       context,
-      { success: true, ...result },
+      {
+        success: true,
+        supportCase: result.supportCase,
+        message: result.message,
+        replayed: result.kind === "replayed",
+      },
       { status: 201 },
     );
   } catch (error) {

@@ -190,7 +190,7 @@ export function confirmSupportCaseCreated(
   if (status !== 201 || !isRecord(payload) || payload.success !== true) return null;
   const supportCase = parseSummary(payload.supportCase);
   if (
-    !supportCase || supportCase.status !== "open" ||
+    !supportCase || (supportCase.status !== "open" && payload.replayed !== true) ||
     supportCase.category !== input.category ||
     supportCase.subject !== input.subject.trim()
   ) return null;
@@ -207,7 +207,8 @@ export function confirmSupportReply(
   const supportCase = parseCase(payload.supportCase);
   const message = parseMessage(payload.message, caseId);
   if (
-    !supportCase || supportCase.id !== caseId || supportCase.status !== "open" ||
+    !supportCase || supportCase.id !== caseId ||
+    (supportCase.status !== "open" && payload.replayed !== true) ||
     !message || message.body !== body.trim()
   ) return null;
   return { supportCase, message };

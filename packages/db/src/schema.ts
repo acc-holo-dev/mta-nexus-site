@@ -20,6 +20,7 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  primaryKey,
   check,
 } from "drizzle-orm/pg-core";
 
@@ -749,6 +750,39 @@ export const supportCaseMessages = pgTable(
       table.caseId,
       table.createdAt,
       table.id,
+    ),
+  ],
+);
+
+export const supportMutationRequests = pgTable(
+  "support_mutation_requests",
+  {
+    actorId: text("actor_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    requestKey: text("request_key").notNull(),
+    operation: text("operation").$type<"case" | "reply">().notNull(),
+    fingerprint: text("fingerprint").notNull(),
+    caseId: text("case_id").notNull(),
+    messageId: text("message_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({
+      name: "support_mutation_requests_actor_request_pk",
+      columns: [table.actorId, table.requestKey],
+    }),
+    check(
+      "support_mutation_requests_operation_check",
+      sql`${table.operation} IN ('case', 'reply')`,
+    ),
+    check(
+      "support_mutation_requests_key_check",
+      sql`length(${table.requestKey}) = 36`,
+    ),
+    check(
+      "support_mutation_requests_fingerprint_check",
+      sql`length(${table.fingerprint}) = 64`,
     ),
   ],
 );

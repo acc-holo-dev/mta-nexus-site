@@ -48,6 +48,7 @@ const evidence = {
   supportSchemaPresent: false,
   supportStaffQueueIndexPresent: false,
   supportStaffFilterIndexPresent: false,
+  supportMutationIdempotencyPresent: false,
   webPushSubscriptionSchemaPresent: false,
   webPushOutboxSchemaPresent: false,
   cleanupComplete: false,
@@ -170,6 +171,20 @@ try {
   );
   evidence.supportStaffQueueIndexPresent = true;
   evidence.supportStaffFilterIndexPresent = true;
+
+  const supportMutationColumns = await client`SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'support_mutation_requests'
+    ORDER BY column_name`;
+  assert.deepEqual(
+    supportMutationColumns.map((row) => row.column_name),
+    ["actor_id", "case_id", "created_at", "fingerprint", "message_id", "operation", "request_key"],
+  );
+  const supportKeyIndexes = await client`SELECT indexname FROM pg_indexes
+    WHERE schemaname = 'public' AND tablename = 'support_mutation_requests'
+      AND indexname = 'support_mutation_requests_actor_request_pk'`;
+  assert.equal(supportKeyIndexes.length, 1, "Support idempotency uniqueness must exist");
+  evidence.supportMutationIdempotencyPresent = true;
 
   const pushTables = await client`SELECT table_name FROM information_schema.tables
     WHERE table_schema = 'public'

@@ -5,6 +5,10 @@ import { after, type NextRequest } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import { parseBoundedJson } from "../../../lib/bounded-json";
 import {
+  parseSupportIdempotencyKey,
+  supportMutationFingerprint,
+} from "../../../lib/support-idempotency";
+import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
@@ -125,15 +129,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const limit = await consumeRateLimit("supportCase", user.id);
-    if (!limit.success) {
-      return privateJson(
-        context,
-        { error: "Too many support cases" },
-        { status: 429 },
-      );
-    }
-
     const body = await parseBoundedJson(request);
     if (!body.ok && body.reason === "too_large") {
       return privateJson(
@@ -154,8 +149,57 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const requestKey = parseSupportIdempotencyKey(
+      request.headers.get("Idempotency-Key"),
+    );
+    if (!requestKey) {
+      return privateJson(
+        context,
+        { error: "A valid idempotency key is required", code: "SUPPORT_IDEMPOTENCY_KEY_INVALID" },
+        { status: 400 },
+      );
+    }
+
+    const fingerprint = supportMutationFingerprint({
+      operation: "case",
+      category: parsed.data.category,
+      subject: parsed.data.subject,
+      message: parsed.data.message,
+    });
+    const scope = {
+      actorId: user.id,
+      requestKey,
+      operation: "case" as const,
+      fingerprint,
+    };
+    const existing = await supportCaseRepository.findMutationReplay(scope);
+    if (existing.kind === "key_conflict") {
+      return privateJson(
+        context,
+        { error: "Idempotency key was already used for a different request", code: "SUPPORT_IDEMPOTENCY_CONFLICT" },
+        { status: 409 },
+      );
+    }
+    if (existing.kind === "replayed") {
+      return privateJson(
+        context,
+        { success: true, supportCase: existing.supportCase, replayed: true },
+        { status: 201 },
+      );
+    }
+
+    const limit = await consumeRateLimit("supportCase", user.id);
+    if (!limit.success) {
+      return privateJson(
+        context,
+        { error: "Too many support cases" },
+        { status: 429 },
+      );
+    }
+
     const caseId = generateId("sup");
-    const supportCase = await supportCaseRepository.createWithInitialMessage(
+    const messageId = generateId("spm");
+    const result = await supportCaseRepository.createIdempotentCase(
       {
         id: caseId,
         requesterId: user.id,
@@ -164,7 +208,7 @@ export async function POST(request: NextRequest) {
         status: "open",
       },
       {
-        id: generateId("spm"),
+        id: messageId,
         caseId,
         authorId: user.id,
         authorRole: "requester",
@@ -181,9 +225,17 @@ export async function POST(request: NextRequest) {
           category: parsed.data.category,
         },
       },
+      { ...scope, caseId, messageId },
     );
-
-    after(async () => {
+    if (result.kind === "key_conflict") {
+      return privateJson(
+        context,
+        { error: "Idempotency key was already used for a different request", code: "SUPPORT_IDEMPOTENCY_CONFLICT" },
+        { status: 409 },
+      );
+    }
+    const supportCase = result.supportCase;
+    if (result.kind === "created") after(async () => {
       try {
         const moderatorIds = await userRepository.listModeratorIds();
         await dispatchNotificationsBestEffort(
@@ -209,7 +261,7 @@ export async function POST(request: NextRequest) {
 
     return privateJson(
       context,
-      { success: true, supportCase },
+      { success: true, supportCase, replayed: result.kind === "replayed" },
       { status: 201 },
     );
   } catch (error) {

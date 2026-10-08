@@ -27,6 +27,7 @@ export function SupportCaseThread({
   const [error, setError] = useState<string | null>(null);
   const loadSequence = useRef(0);
   const mutationInFlight = useRef(false);
+  const pendingReply = useRef<{ payload: string; key: string } | null>(null);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   const categories: Record<string, string> = {
@@ -94,6 +95,11 @@ export function SupportCaseThread({
     if (mutationInFlight.current || !reply.trim() || !supportCase) return;
     mutationInFlight.current = true;
     const expectedStatus = supportCase.status;
+    const payload = JSON.stringify({ message: reply.trim(), expectedStatus });
+    if (pendingReply.current?.payload !== payload) {
+      pendingReply.current = { payload, key: crypto.randomUUID() };
+    }
+    const requestKey = pendingReply.current.key;
 
     setSending(true);
     setError(null);
@@ -104,13 +110,18 @@ export function SupportCaseThread({
           method: "POST",
           cache: "no-store",
           credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: reply, expectedStatus }),
+          headers: {
+            "Content-Type": "application/json",
+            "Idempotency-Key": requestKey,
+          },
+          body: payload,
           signal: AbortSignal.timeout(15_000),
         },
       );
       const data = await response.json().catch(() => null);
       if (response.status === 409) {
+        // A definitive conflict means this request was not committed.
+        pendingReply.current = null;
         if (await load()) setError(copy.replyConflict);
         return;
       }
@@ -124,7 +135,18 @@ export function SupportCaseThread({
         throw new Error(copy.replyError);
       }
 
+      pendingReply.current = null;
       setSupportCase(confirmed.supportCase);
+      if (data?.replayed === true) {
+        // Replays may refer to an earlier write after the thread changed.
+        setReply("");
+        if (messagePage === 1) {
+          await load();
+        } else {
+          setMessagePage(1);
+        }
+        return;
+      }
       const nextTotal = messageTotal + 1;
       setMessageTotal(nextTotal);
       setMessageTotalPages(

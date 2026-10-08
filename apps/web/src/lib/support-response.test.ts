@@ -80,6 +80,15 @@ describe("support API client confirmations", () => {
     assert.equal(confirmSupportCaseCreated(201, { success: true, supportCase: { ...supportCase, subject: "Other ticket" } }, input), null);
     assert.equal(confirmSupportCaseCreated(201, { success: true, supportCase: { ...supportCase, category: "other" } }, input), null);
     assert.equal(confirmSupportCaseCreated(201, { success: true }, input), null);
+    assert.deepEqual(
+      confirmSupportCaseCreated(201, {
+        success: true, replayed: true, supportCase: { ...supportCase, status: "closed" },
+      }, input),
+      { ...supportCase, status: "closed" },
+    );
+    assert.equal(confirmSupportCaseCreated(201, {
+      success: true, supportCase: { ...supportCase, status: "closed" },
+    }, input), null);
   });
 
   it("only confirms a reply with the committed message identity, case and text", () => {
@@ -93,6 +102,15 @@ describe("support API client confirmations", () => {
     assert.equal(confirmSupportReply(201, { ...payload, message: { ...message, body: "Other reply" } }, caseId, message.body), null);
     assert.equal(confirmSupportReply(201, { ...payload, message: { ...message, caseId: anotherId } }, caseId, message.body), null);
     assert.equal(confirmSupportReply(201, { ...payload, supportCase: { ...supportCase, status: "closed" } }, caseId, message.body), null);
+    assert.deepEqual(
+      confirmSupportReply(201, {
+        ...payload, replayed: true, supportCase: { ...supportCase, status: "closed" },
+      }, caseId, message.body),
+      {
+        supportCase: { id: caseId, category: "account", subject: "Account access", status: "closed" },
+        message,
+      },
+    );
   });
 
   it("rejects mismatched or unconfirmed moderation transitions", () => {

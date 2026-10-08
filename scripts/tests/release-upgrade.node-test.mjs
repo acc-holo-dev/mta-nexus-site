@@ -97,7 +97,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0032_support_staff_filter_index");
+  assert.equal(plan.targetTag, "0033_support_mutation_idempotency");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -110,6 +110,17 @@ test("upgrade contract requires the filtered staff queue migration", () => {
   assert.match(rehearsal, /'support_cases_status_updated_id_idx'/u);
   assert.match(rehearsal, /'support_cases_category_status_updated_id_idx'/u);
   assert.match(rehearsal, /supportStaffFilterIndexPresent = true/u);
+});
+
+test("upgrade fixture checks durable support mutation idempotency", () => {
+  const migration = readFileSync(
+    new URL("0033_support_mutation_idempotency.sql", migrationsUrl),
+    "utf8",
+  );
+  assert.match(migration, /CREATE TABLE "support_mutation_requests"/u);
+  assert.match(migration, /PRIMARY KEY \("actor_id", "request_key"\)/u);
+  const rehearsal = readFileSync(script, "utf8");
+  assert.match(rehearsal, /supportMutationIdempotencyPresent = true/u);
 });
 
 test("upgrade contract fails fast when a new migration advances the journal", () => {

@@ -14,8 +14,9 @@ const mocks = vi.hoisted(() => ({
   pageStaff: vi.fn(),
   findById: vi.fn(),
   pageMessages: vi.fn(),
-  createWithInitialMessage: vi.fn(),
-  addMessage: vi.fn(),
+  createIdempotentCase: vi.fn(),
+  addIdempotentMessage: vi.fn(),
+  findMutationReplay: vi.fn(),
   updateStatus: vi.fn(),
   moderatorIds: vi.fn(),
   dispatch: vi.fn(),
@@ -48,8 +49,9 @@ vi.mock("@nexus/db", () => ({
     pageStaff: mocks.pageStaff,
     findById: mocks.findById,
     pageMessages: mocks.pageMessages,
-    createWithInitialMessage: mocks.createWithInitialMessage,
-    addMessage: mocks.addMessage,
+    createIdempotentCase: mocks.createIdempotentCase,
+    addIdempotentMessage: mocks.addIdempotentMessage,
+    findMutationReplay: mocks.findMutationReplay,
     updateStatus: mocks.updateStatus,
   },
   userRepository: { listModeratorIds: mocks.moderatorIds },
@@ -71,6 +73,10 @@ import {
 
 const caseId = `sup_${"a".repeat(24)}`;
 const params = { params: Promise.resolve({ id: caseId }) };
+const supportHeaders = {
+  "content-type": "application/json",
+  "Idempotency-Key": "12345678-1234-4234-8234-123456789abc",
+};
 
 function expectPrivate(response: Response) {
   expect(response.headers.get("cache-control")).toBe("private, no-store");
@@ -106,14 +112,19 @@ beforeEach(() => {
     total: 0,
     totalPages: 1,
   });
-  mocks.createWithInitialMessage.mockResolvedValue({
-    id: caseId,
-    requesterId: "usr_member",
-    category: "account",
-    subject: "Account help",
-    status: "open",
+  mocks.findMutationReplay.mockResolvedValue({ kind: "missing" });
+  mocks.createIdempotentCase.mockResolvedValue({
+    kind: "created",
+    supportCase: {
+      id: caseId,
+      requesterId: "usr_member",
+      category: "account",
+      subject: "Account help",
+      status: "open",
+    },
   });
-  mocks.addMessage.mockResolvedValue({
+  mocks.addIdempotentMessage.mockResolvedValue({
+    kind: "created",
     supportCase: { id: caseId, status: "open" },
     message: { id: `spm_${"a".repeat(24)}`, authorRole: "requester" },
   });
@@ -133,7 +144,7 @@ describe("support HTTP authorization and privacy", () => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
     const response = await createCase(new NextRequest("https://nexus.test/api/support", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: supportHeaders,
       body: JSON.stringify({
         category: "account",
         subject: "Large request",
@@ -143,7 +154,7 @@ describe("support HTTP authorization and privacy", () => {
     expect(response.status).toBe(413);
     expectPrivate(response);
     expect(await response.json()).toMatchObject({ code: "SUPPORT_BODY_TOO_LARGE" });
-    expect(mocks.createWithInitialMessage).not.toHaveBeenCalled();
+    expect(mocks.createIdempotentCase).not.toHaveBeenCalled();
     expect(afterMock).not.toHaveBeenCalled();
   });
 
@@ -154,7 +165,7 @@ describe("support HTTP authorization and privacy", () => {
     });
     const response = await addMessage(new NextRequest(`https://nexus.test/api/support/${caseId}`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: supportHeaders,
       body: JSON.stringify({
         message: "a".repeat(SUPPORT_JSON_MAX_BYTES),
         expectedStatus: "open",
@@ -163,7 +174,7 @@ describe("support HTTP authorization and privacy", () => {
     expect(response.status).toBe(413);
     expectPrivate(response);
     expect(await response.json()).toMatchObject({ code: "SUPPORT_BODY_TOO_LARGE" });
-    expect(mocks.addMessage).not.toHaveBeenCalled();
+    expect(mocks.addIdempotentMessage).not.toHaveBeenCalled();
     expect(afterMock).not.toHaveBeenCalled();
   });
 
@@ -175,7 +186,7 @@ describe("support HTTP authorization and privacy", () => {
     });
     const response = await updateCase(new NextRequest(`https://nexus.test/api/support/${caseId}`, {
       method: "PATCH",
-      headers: { "content-type": "application/json" },
+      headers: supportHeaders,
       body: JSON.stringify({
         status: "closed",
         expectedStatus: "open",
@@ -359,7 +370,7 @@ describe("support HTTP authorization and privacy", () => {
     const response = await createCase(
       new NextRequest("https://nexus.test/api/support", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({
           category: "purchase",
           subject: "Please check this purchase",
@@ -372,7 +383,7 @@ describe("support HTTP authorization and privacy", () => {
 
     expect(response.status).toBe(400);
     expectPrivate(response);
-    expect(mocks.createWithInitialMessage).not.toHaveBeenCalled();
+    expect(mocks.createIdempotentCase).not.toHaveBeenCalled();
   });
 
   it("persists a valid new case with an audit event", async () => {
@@ -380,7 +391,7 @@ describe("support HTTP authorization and privacy", () => {
     const response = await createCase(
       new NextRequest("https://nexus.test/api/support", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({
           category: "account",
           subject: "Account access problem",
@@ -391,7 +402,7 @@ describe("support HTTP authorization and privacy", () => {
 
     expect(response.status).toBe(201);
     expectPrivate(response);
-    expect(mocks.createWithInitialMessage).toHaveBeenCalledWith(
+    expect(mocks.createIdempotentCase).toHaveBeenCalledWith(
       expect.objectContaining({
         id: caseId,
         requesterId: "usr_member",
@@ -407,6 +418,7 @@ describe("support HTTP authorization and privacy", () => {
         action: "support.case.created",
         targetId: caseId,
       }),
+      expect.objectContaining({ actorId: "usr_member", operation: "case", caseId }),
     );
   });
 
@@ -415,7 +427,7 @@ describe("support HTTP authorization and privacy", () => {
     const createResponse = await createCase(
       new NextRequest("https://nexus.test/api/support", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({
           category: "account",
           subject: "Account access problem",
@@ -447,7 +459,7 @@ describe("support HTTP authorization and privacy", () => {
     const reply = await addMessage(
       new NextRequest("https://nexus.test/api/support/" + caseId, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({ message: "We restored the account.", expectedStatus: "open" }),
       }),
       params,
@@ -481,7 +493,7 @@ describe("support HTTP authorization and privacy", () => {
     const statusResponse = await updateCase(
       new NextRequest("https://nexus.test/api/support/" + caseId, {
         method: "PATCH",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({ status: "resolved", expectedStatus: "open" }),
       }),
       params,
@@ -509,7 +521,7 @@ describe("support HTTP authorization and privacy", () => {
       `https://nexus.test/api/support/${caseId}`,
       {
         method: "PATCH",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({ status: "resolved", expectedStatus: "open" }),
       },
     );
@@ -518,7 +530,7 @@ describe("support HTTP authorization and privacy", () => {
     expectPrivate(denied);
     expect(mocks.updateStatus).not.toHaveBeenCalled();
 
-    mocks.addMessage.mockResolvedValueOnce(null);
+    mocks.addIdempotentMessage.mockResolvedValueOnce({ kind: "stale" });
     mocks.findById.mockResolvedValueOnce({
       id: caseId,
       requesterId: "usr_member",
@@ -527,7 +539,7 @@ describe("support HTTP authorization and privacy", () => {
     const reply = await addMessage(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({ message: "Please reopen this issue.", expectedStatus: "open" }),
       }),
       params,
@@ -555,12 +567,12 @@ describe("support HTTP authorization and privacy", () => {
         requesterId: "usr_member",
         status: "resolved",
       });
-    mocks.addMessage.mockResolvedValueOnce(null);
+    mocks.addIdempotentMessage.mockResolvedValueOnce({ kind: "stale" });
 
     const response = await addMessage(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({
           message: "This reply raced with moderation.",
           expectedStatus: "open",
@@ -574,12 +586,13 @@ describe("support HTTP authorization and privacy", () => {
     expect(await response.json()).toMatchObject({
       code: "SUPPORT_MESSAGE_CONFLICT",
     });
-    expect(mocks.addMessage).toHaveBeenCalledWith(
+    expect(mocks.addIdempotentMessage).toHaveBeenCalledWith(
       expect.objectContaining({
         caseId,
         expectedStatus: "open",
       }),
       expect.any(Object),
+      expect.objectContaining({ actorId: "usr_member", operation: "reply", caseId }),
     );
     expect(afterMock).not.toHaveBeenCalled();
   });
@@ -593,14 +606,14 @@ describe("support HTTP authorization and privacy", () => {
     const response = await addMessage(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({ message: "This request has no state precondition." }),
       }),
       params,
     );
     expect(response.status).toBe(400);
     expectPrivate(response);
-    expect(mocks.addMessage).not.toHaveBeenCalled();
+    expect(mocks.addIdempotentMessage).not.toHaveBeenCalled();
     expect(afterMock).not.toHaveBeenCalled();
   });
 
@@ -612,7 +625,7 @@ describe("support HTTP authorization and privacy", () => {
     const response = await addMessage(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({ message: "I was reading an open thread.", expectedStatus: "open" }),
       }),
       params,
@@ -620,7 +633,7 @@ describe("support HTTP authorization and privacy", () => {
     expect(response.status).toBe(409);
     expectPrivate(response);
     expect(await response.json()).toMatchObject({ code: "SUPPORT_MESSAGE_CONFLICT" });
-    expect(mocks.addMessage).not.toHaveBeenCalled();
+    expect(mocks.addIdempotentMessage).not.toHaveBeenCalled();
     expect(afterMock).not.toHaveBeenCalled();
   });
 
@@ -632,16 +645,17 @@ describe("support HTTP authorization and privacy", () => {
     const response = await addMessage(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({ message: "I still need assistance.", expectedStatus: "resolved" }),
       }),
       params,
     );
     expect(response.status).toBe(201);
     expectPrivate(response);
-    expect(mocks.addMessage).toHaveBeenCalledWith(
+    expect(mocks.addIdempotentMessage).toHaveBeenCalledWith(
       expect.objectContaining({ caseId, expectedStatus: "resolved" }),
       expect.any(Object),
+      expect.objectContaining({ actorId: "usr_member", operation: "reply", caseId }),
     );
     expect(afterMock).toHaveBeenCalledOnce();
   });
@@ -654,7 +668,7 @@ describe("support HTTP authorization and privacy", () => {
     const response = await addMessage(
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: supportHeaders,
         body: JSON.stringify({ message: "The ticket is already closed.", expectedStatus: "closed" }),
       }),
       params,
@@ -662,7 +676,7 @@ describe("support HTTP authorization and privacy", () => {
     expect(response.status).toBe(409);
     expectPrivate(response);
     expect(await response.json()).toMatchObject({ code: "SUPPORT_CASE_CLOSED" });
-    expect(mocks.addMessage).not.toHaveBeenCalled();
+    expect(mocks.addIdempotentMessage).not.toHaveBeenCalled();
     expect(afterMock).not.toHaveBeenCalled();
   });
 });
@@ -675,7 +689,7 @@ describe("concurrent support moderation", () => {
     mocks.findById.mockResolvedValue({ id: caseId, requesterId: "usr_member", status: "open" });
 
     const response = await updateCase(new NextRequest("https://nexus.test/api/support/" + caseId, {
-      method: "PATCH", headers: { "content-type": "application/json" },
+      method: "PATCH", headers: supportHeaders,
       body: JSON.stringify({ status: "closed" }),
     }), params);
 
@@ -694,7 +708,7 @@ describe("concurrent support moderation", () => {
       mocks.findById.mockResolvedValue({ id: caseId, requesterId: "usr_member", status: "resolved" });
 
       const response = await updateCase(new NextRequest("https://nexus.test/api/support/" + caseId, {
-        method: "PATCH", headers: { "content-type": "application/json" },
+        method: "PATCH", headers: supportHeaders,
         body: JSON.stringify({ status, expectedStatus: "open" }),
       }), params);
 
@@ -711,7 +725,7 @@ describe("concurrent support moderation", () => {
     mocks.can.mockReturnValue(true);
     mocks.findById.mockResolvedValue({ id: caseId, requesterId: "usr_member", status: "resolved" });
     const response = await updateCase(new NextRequest("https://nexus.test/api/support/" + caseId, {
-      method: "PATCH", headers: { "content-type": "application/json" },
+      method: "PATCH", headers: supportHeaders,
       body: JSON.stringify({ status: "resolved", expectedStatus: "resolved" }),
     }), params);
     expect(response.status).toBe(200);
@@ -725,7 +739,7 @@ describe("concurrent support moderation", () => {
     mocks.findById.mockResolvedValue({ id: caseId, requesterId: "usr_member", status: "open" });
     mocks.updateStatus.mockResolvedValueOnce(null);
     const response = await updateCase(new NextRequest("https://nexus.test/api/support/" + caseId, {
-      method: "PATCH", headers: { "content-type": "application/json" },
+      method: "PATCH", headers: supportHeaders,
       body: JSON.stringify({ status: "closed", expectedStatus: "open" }),
     }), params);
     expect(response.status).toBe(409);
@@ -733,5 +747,84 @@ describe("concurrent support moderation", () => {
     expect((await response.json()).code).toBe("SUPPORT_STATUS_CONFLICT");
     expect(mocks.updateStatus).toHaveBeenCalledWith(caseId, "closed", expect.any(Object), "open");
     expect(afterMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("durable support request replays", () => {
+  it("returns an earlier creation without consuming another limit or notifying twice", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.findMutationReplay.mockResolvedValueOnce({
+      kind: "replayed",
+      supportCase: { id: caseId, category: "account", subject: "Account access problem", status: "closed" },
+    });
+    const response = await createCase(new NextRequest("https://nexus.test/api/support", {
+      method: "POST", headers: supportHeaders,
+      body: JSON.stringify({ category: "account", subject: "Account access problem", message: "Recovery completed, but access is still unavailable." }),
+    }));
+    expect(response.status).toBe(201);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({ replayed: true, supportCase: { id: caseId, status: "closed" } });
+    expect(mocks.rate).not.toHaveBeenCalled();
+    expect(mocks.createIdempotentCase).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("replays a committed reply even after staff closes the case", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.findById.mockResolvedValue({ id: caseId, requesterId: "usr_member", subject: "Account help", status: "closed" });
+    mocks.findMutationReplay.mockResolvedValueOnce({
+      kind: "replayed",
+      supportCase: { id: caseId, category: "account", subject: "Account help", status: "closed" },
+      message: { id: `spm_${"a".repeat(24)}`, caseId, body: "Already committed.", authorRole: "requester" },
+    });
+    const response = await addMessage(new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+      method: "POST", headers: supportHeaders,
+      body: JSON.stringify({ message: "Already committed.", expectedStatus: "open" }),
+    }), params);
+    expect(response.status).toBe(201);
+    expect(await response.json()).toMatchObject({ replayed: true, supportCase: { status: "closed" } });
+    expect(mocks.addIdempotentMessage).not.toHaveBeenCalled();
+    expect(mocks.rate).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects reused keys for different payloads without writes", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.findMutationReplay.mockResolvedValueOnce({ kind: "key_conflict" });
+    const response = await createCase(new NextRequest("https://nexus.test/api/support", {
+      method: "POST", headers: supportHeaders,
+      body: JSON.stringify({ category: "account", subject: "Different", message: "A different request with the same key." }),
+    }));
+    expect(response.status).toBe(409);
+    expect((await response.json()).code).toBe("SUPPORT_IDEMPOTENCY_CONFLICT");
+    expect(mocks.createIdempotentCase).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("handles a concurrent creation winner without a second notification", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.createIdempotentCase.mockResolvedValueOnce({
+      kind: "replayed",
+      supportCase: { id: caseId, category: "account", subject: "New case", status: "open" },
+    });
+    const response = await createCase(new NextRequest("https://nexus.test/api/support", {
+      method: "POST", headers: supportHeaders,
+      body: JSON.stringify({ category: "account", subject: "New case", message: "Two identical concurrent requests." }),
+    }));
+    expect(response.status).toBe(201);
+    expect((await response.json()).replayed).toBe(true);
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects missing request keys before any write", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    const response = await createCase(new NextRequest("https://nexus.test/api/support", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ category: "account", subject: "Missing key", message: "A key is mandatory to avoid duplicate cases." }),
+    }));
+    expect(response.status).toBe(400);
+    expect((await response.json()).code).toBe("SUPPORT_IDEMPOTENCY_KEY_INVALID");
+    expect(mocks.createIdempotentCase).not.toHaveBeenCalled();
+    expect(mocks.findMutationReplay).not.toHaveBeenCalled();
   });
 });

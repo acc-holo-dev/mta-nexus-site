@@ -20,6 +20,8 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const creatingRef = useRef(false);
+  // Keep a retry key after an ambiguous timeout; change it for a new payload.
+  const pendingCreate = useRef<{ payload: string; key: string } | null>(null);
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -103,13 +105,25 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
     setCreating(true);
     setError(null);
     setCreatedCaseId(null);
+    const payload = JSON.stringify({
+      category,
+      subject: subject.trim(),
+      message: message.trim(),
+    });
+    if (pendingCreate.current?.payload !== payload) {
+      pendingCreate.current = { payload, key: crypto.randomUUID() };
+    }
+    const requestKey = pendingCreate.current.key;
     try {
       const response = await fetch("/api/support", {
         method: "POST",
         cache: "no-store",
         credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category, subject, message }),
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": requestKey,
+        },
+        body: payload,
         signal: AbortSignal.timeout(15_000),
       });
       const data = await response.json().catch(() => null);
@@ -118,6 +132,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
         throw new Error(copy.createError);
       }
 
+      pendingCreate.current = null;
       setSubject("");
       setMessage("");
       setCreatedCaseId(created.id);

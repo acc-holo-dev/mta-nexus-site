@@ -415,15 +415,18 @@ contract-test не даёт version files разойтись.
 - `a93ed14` — датированные аудиты убраны из `docs/` (policy-тест), реестр
   проблем консолидирован в этот файл.
 
-### P2. Support mutations without durable idempotency keys
+### P2. Support retry keys after a page reload
 
-The support forms have a same-tab single-flight guard and bounded JSON input, but a
-client may lose the HTTP response after a committed case/reply and retry. Status
-compare-and-set protects concurrent moderation decisions, not retry identity.
+A new durable actor-scoped mutation key protects support case/reply retries in
+the current mounted browser form, including an ambiguous HTTP timeout. A full
+reload or navigation currently loses the in-memory retry key and can turn
+a deliberate retry into a fresh mutation. This limitation is separate from
+status CAS; stale status decisions continue to fail closed.
 
-- **Impact:** a retry following an ambiguous timeout may create a duplicate case
-  or message and corresponding audit/notification. This is not a payment issue.
-- **Next step:** add a server-enforced request idempotency key stored in a unique
-  durable database constraint, scoped to requester and mutation intent. Replay
-  must confirm the original committed result without duplicating side effects.
-  Add concurrent PostgreSQL and lost-response browser acceptance before release.
+- **Impact:** after refreshing an unconfirmed form submission, a user may
+  create a second case or reply using a new key. The server cannot infer a
+  retry merely from matching text without also blocking legitimate new posts.
+- **Next step:** design a non-sensitive session-scoped retry token lifecycle
+  (never persist support message contents), add a lost-response+reload browser
+  acceptance test, and verify deduplication and audit on a real PostgreSQL
+  deployment. Hosted CI allocation must recover for exact-SHA acceptance.
