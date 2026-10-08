@@ -3,7 +3,7 @@
 import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nexus/ui";
-import { confirmedCommentId } from "../lib/content-comment-confirmation";
+import { submitContentCommentRequest } from "../lib/content-comment-client";
 import { useNexusLocale } from "./locale-context";
 
 export function ContentCommentForm({ slug }: { slug: string }) {
@@ -22,21 +22,11 @@ export function ContentCommentForm({ slug }: { slug: string }) {
     setSubmitting(true);
     setError(null);
     try {
-      const response = await fetch(
-        `/api/content/${encodeURIComponent(slug)}/comments`,
-        {
-          method: "POST",
-          cache: "no-store",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: normalized }),
-          signal: AbortSignal.timeout(15_000),
-        },
-      );
-      const payload = await response.json().catch(() => null);
-      if (!confirmedCommentId(response.status, payload)) {
-        throw new Error(payload?.error || copy.commentError);
-      }
+      await submitContentCommentRequest({
+        slug,
+        text: normalized,
+        fallbackError: copy.commentError,
+      });
 
       setText("");
       router.refresh();
