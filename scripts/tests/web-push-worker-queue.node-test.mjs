@@ -41,6 +41,15 @@ test("returns zero and aggregate diagnostics for a healthy queue", () => {
   const value = JSON.parse(result.stdout);
   assert.equal(value.status, "ok");
   assert.deepEqual(value.reasons, []);
+  assert.equal(
+    value.heartbeatAt,
+    snapshot().heartbeatAt,
+  );
+  assert.equal(
+    value.progressStaleAfterMs,
+    180_000,
+  );
+  assert.equal(typeof value.progressAt, "string");
   assert.equal("endpoint" in value, false);
   assert.equal("payload" in value, false);
 });

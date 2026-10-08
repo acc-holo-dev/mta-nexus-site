@@ -74,9 +74,11 @@ describe("Web Push concurrent worker soak", () => {
           throw new Error("Expected durable notification tag");
         }
         sentTags.push(payload.tag);
-      // Yield so candidate/claim overlap is exercised rather than letting one
-      // dispatcher synchronously drain every row before peers start.
-      await new Promise((resolve) => setTimeout(resolve, 1));
+        // Yield so candidate/claim overlap is exercised rather than letting one
+        // dispatcher synchronously drain every row before peers start.
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1),
+        );
         return { statusCode: 201 };
       },
     );
