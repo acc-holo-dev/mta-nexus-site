@@ -301,7 +301,12 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   DB uniqueness и fail-closed unpublished state. Server updates/reverse
   dependencies source suites тоже удалены: реальные PostgreSQL filters,
   server-detail parallel behavior, reverse summary bounds и rendered RU/EN
-  unavailable/empty/list states покрывают контракт без чтения исходников;
+  unavailable/empty/list states покрывают контракт без чтения исходников.
+  Public server-directory composition, resource trust/provenance chain и
+  resource-detail acquisition UI также переведены с чтения JSX/source на
+  HTTP/SSR behavior: localized directory shell, full recorded SHA/scanner/signature
+  facts, free/paid/entitled/manager acquisition states и ровно один latest-build
+  download action при длинной build history;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере
