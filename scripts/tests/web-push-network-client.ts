@@ -51,10 +51,9 @@ const sender = createWebPushHttpSender(config, {
 });
 
 const statuses = [];
+let retryAfterMs;
 for (const status of [201, 410, 503]) {
-  statuses.push(
-    (
-      await sender(
+  const result = await sender(
         {
           ...subscription,
           endpoint:
@@ -67,9 +66,11 @@ for (const status of [201, 410, 503]) {
           url: "/notifications",
           tag: "network-acceptance",
         },
-      )
-    ).statusCode,
-  );
+      );
+  statuses.push(result.statusCode);
+  if (status === 503) {
+    retryAfterMs = result.retryAfterMs;
+  }
 }
 
 let timeoutRejected = false;

@@ -81,6 +81,9 @@ test(
           const status = Number(
             request.url?.split("/").pop(),
           );
+          if (status === 503) {
+            response.setHeader("Retry-After", "7");
+          }
           response.writeHead(status);
           response.end();
         },
@@ -133,6 +136,7 @@ test(
       assert.equal(code, 0, stderr);
       const result = JSON.parse(stdout);
       assert.deepEqual(result.statuses, [201, 410, 503]);
+      assert.equal(result.retryAfterMs, 7_000);
       assert.equal(result.timeoutRejected, true);
       assert.equal(received.length, 4);
 
