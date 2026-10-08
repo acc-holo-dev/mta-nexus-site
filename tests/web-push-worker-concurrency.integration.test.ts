@@ -10,6 +10,10 @@ import {
   webPushSubscriptionRepository,
 } from "@nexus/db";
 import { WebPushDispatcher } from "../packages/db/src/repositories/web-push-dispatcher";
+import type {
+  WebPushNotificationPayload,
+  WebPushSender,
+} from "../packages/db/src/web-push-runtime";
 
 describe("Web Push concurrent worker soak", () => {
   it("delivers every overlapping candidate exactly once across four workers", async () => {
@@ -60,14 +64,22 @@ describe("Web Push concurrent worker soak", () => {
       expect(created.pushJobs).toBe(1);
     }
 
-    const sentTags = [];
-    const sender = vi.fn(async (_subscription, payload) => {
-      sentTags.push(payload.tag);
+    const sentTags: string[] = [];
+    const sender = vi.fn(
+      async (
+        _subscription: Parameters<WebPushSender>[0],
+        payload: WebPushNotificationPayload,
+      ) => {
+        if (!payload.tag) {
+          throw new Error("Expected durable notification tag");
+        }
+        sentTags.push(payload.tag);
       // Yield so candidate/claim overlap is exercised rather than letting one
       // dispatcher synchronously drain every row before peers start.
       await new Promise((resolve) => setTimeout(resolve, 1));
-      return { statusCode: 201 };
-    });
+        return { statusCode: 201 };
+      },
+    );
 
     const workers = Array.from(
       { length: 4 },
