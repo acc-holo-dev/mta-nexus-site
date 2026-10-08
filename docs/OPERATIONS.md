@@ -942,3 +942,14 @@ resume its unexpired attempt. Reloads require selecting the archive again.
 Only the already-created resource identity and MTA target version are persisted,
 not the archive or the complete form. Successful submission opens the private
 workspace resource page, where pending review resources remain accessible.
+
+
+### Worker liveness vs progress
+
+Production delivery workers distinguish process heartbeat from dispatcher progress.
+A fresh health-file heartbeat is not sufficient if the main dispatch loop has
+stopped completing batches. Web Push uses a 180-second progress watchdog.
+Account mail uses a minimum 180-second watchdog that scales with configured
+batch size and SMTP timeout. If progress exceeds that budget, the worker exits
+non-zero so the container restart policy can recover it; durable leases/outbox
+rows remain authoritative and are reclaimed after expiry.

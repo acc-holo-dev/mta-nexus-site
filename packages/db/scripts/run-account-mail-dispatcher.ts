@@ -14,15 +14,19 @@ const HEALTH_FILE = "/tmp/nexus-account-mail-worker-health.json";
 const HEALTH_TMP = `${HEALTH_FILE}.${process.pid}.tmp`;
 const HEARTBEAT_INTERVAL_MS = 15_000;
 const STALE_AFTER_MS = 60_000;
+const MIN_LOOP_STALL_AFTER_MS = 180_000;
 
 const controller = new AbortController();
 let stopping = false;
 let fingerprint = "";
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+let watchdogTimer: ReturnType<typeof setInterval> | null = null;
 let healthWrite: Promise<void> = Promise.resolve();
 let healthFailure: unknown = null;
 let healthStatus: "starting" | "ready" | "stopping" = "starting";
 let healthBatch = 0;
+let lastProgressAt = Date.now();
+let loopStallAfterMs = MIN_LOOP_STALL_AFTER_MS;
 let healthProviderBlocked = false;
 let healthProviderBlockedUntil: string | null = null;
 let healthProviderFailureStreak = 0;
@@ -42,6 +46,29 @@ let nextAbuseCleanupAt = 0;
 
 function emit(event: Record<string, unknown>) {
   process.stdout.write(`${JSON.stringify(event)}\n`);
+}
+
+function markProgress() {
+  lastProgressAt = Date.now();
+}
+
+function failIfLoopStalled() {
+  if (
+    stopping ||
+    Date.now() - lastProgressAt <= loopStallAfterMs
+  ) {
+    return;
+  }
+
+  process.stderr.write(
+    `${JSON.stringify({
+      status: "failed",
+      config: fingerprint || undefined,
+      phase: "dispatch-loop-stalled",
+      batch: healthBatch,
+    })}\n`,
+  );
+  process.exit(1);
 }
 
 function stop(signal: "SIGTERM" | "SIGINT") {
@@ -68,6 +95,8 @@ const writeHealthSnapshot = async () => {
     batch: healthBatch,
     heartbeatAt: new Date().toISOString(),
     staleAfterMs: STALE_AFTER_MS,
+    progressAt: new Date(lastProgressAt).toISOString(),
+    progressStaleAfterMs: loopStallAfterMs,
     providerBlocked: healthProviderBlocked,
     providerBlockedUntil: healthProviderBlockedUntil,
     providerFailureStreak: healthProviderFailureStreak,
@@ -100,8 +129,18 @@ const queueHealth = (): Promise<void> => {
 
 let failed = false;
 let failurePhase = "configuration";
+watchdogTimer = setInterval(
+  failIfLoopStalled,
+  HEARTBEAT_INTERVAL_MS,
+);
+watchdogTimer.unref();
+
 try {
   const config = readAccountMailRuntimeConfig();
+  loopStallAfterMs = Math.max(
+    MIN_LOOP_STALL_AFTER_MS,
+    config.batchSize * (config.smtpTimeoutMs + 35_000) + 60_000,
+  );
   fingerprint = runtimeFingerprint(config);
   const dispatcher = createAccountMailDispatcher(config);
 
@@ -190,6 +229,7 @@ try {
   await refreshQueueStats();
   failurePhase = "delivery-stats";
   await refreshDeliveryStats();
+  markProgress();
 
   if (!controller.signal.aborted) {
     healthStatus = "ready";
@@ -221,6 +261,7 @@ try {
       await refreshProviderGate(true);
       await refreshQueueStats(true);
       await refreshDeliveryStats();
+      markProgress();
       if (!controller.signal.aborted) await queueHealth();
 
       if (!controller.signal.aborted && Date.now() >= nextAbuseCleanupAt) {
@@ -280,6 +321,8 @@ try {
   if (heartbeatTimer) clearInterval(heartbeatTimer);
   // A late signal must not enqueue a snapshot after health-file cleanup begins.
   heartbeatTimer = null;
+  if (watchdogTimer) clearInterval(watchdogTimer);
+  watchdogTimer = null;
 
   try {
     await healthWrite;
