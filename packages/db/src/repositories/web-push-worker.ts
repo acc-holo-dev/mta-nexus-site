@@ -449,6 +449,7 @@ export class WebPushWorkerRepository {
           subscriptionId: webPushOutbox.subscriptionId,
           attempts: webPushOutbox.attempts,
           leaseTokenDigest: webPushOutbox.leaseTokenDigest,
+          leaseExpiresAt: webPushOutbox.leaseExpiresAt,
         })
         .from(webPushOutbox)
         .where(eq(webPushOutbox.id, lease.id))

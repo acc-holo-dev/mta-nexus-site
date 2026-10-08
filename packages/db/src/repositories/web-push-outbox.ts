@@ -81,7 +81,7 @@ export async function enqueueWebPushOutboxForNotification(
     attempts: 0,
     availableAt: sql`clock_timestamp()`,
     createdAt: sql`clock_timestamp()`,
-    expiresAt: sql`clock_timestamp() + interval '24 hours'`,
+    expiresAt: sql`clock_timestamp() + ${WEB_PUSH_OUTBOX_TTL_HOURS} * interval '1 hour'`,
   }));
 
   const inserted = await tx
