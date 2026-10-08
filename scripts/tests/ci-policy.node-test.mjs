@@ -6,6 +6,8 @@ import { classifyChanges, requiredJobs, summarizeJobs } from "../ci-policy.mjs";
 
 test("documentation does not trigger builds; executable docs/configuration do", () => {
   assert.deepEqual(classifyChanges(["README.md", "docs/OPERATIONS.md"]), { code: false, full: false });
+  assert.deepEqual(classifyChanges(["docs/handbook/13-DECISION-REGISTER.md", "docs/handbook/deep/note.md"]), { code: false, full: false });
+  assert.deepEqual(classifyChanges(["docs/handbook/schema.sql", "docs/handbook/.config.yml"]), { code: true, full: false });
   assert.deepEqual(classifyChanges(["docs/migration.sql"]), { code: true, full: false });
   assert.deepEqual(classifyChanges(["compose.production.yaml"]), { code: true, full: true });
 });
