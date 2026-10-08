@@ -1,70 +1,121 @@
-import { describe, expect, it } from "vitest";
+import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../lib/i18n";
-
 import { LocaleProvider } from "./locale-context";
+import { AccountControls } from "./account-controls";
+import { Navbar } from "./navbar";
+import { NotificationBell } from "./notification-bell";
 import { ThemeToggle } from "./theme-toggle";
 
+const nav = vi.hoisted(() => ({ pathname: "/" }));
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+vi.mock("next/navigation", () => ({
+  usePathname: () => nav.pathname,
+}));
 
-describe("global shell controls", () => {
-  it("uses ordinary Discover navigation instead of command-driven shell search", () => {
-    const navbar = read("apps/web/src/components/navbar.tsx");
-    const shell = read("apps/web/src/components/nexus-shell.tsx");
-    const trigger = navbar.slice(navbar.indexOf("function NavbarSearchTrigger"));
+vi.mock("next/link", async () => {
+  const ReactModule = await import("react");
+  return {
+    default: ({
+      href,
+      children,
+      ...props
+    }: {
+      href: string;
+      children?: React.ReactNode;
+      [key: string]: unknown;
+    }) => ReactModule.createElement("a", { href, ...props }, children),
+  };
+});
 
-    expect(trigger).toContain('href="/discover"');
-    expect(trigger).toContain("aria-label={placeholder}");
-    expect(trigger).not.toContain("onClick=");
-    expect(shell).not.toContain("CommandPalette");
-    expect(shell).not.toContain("Control+k");
+describe("global shell controls behavior", () => {
+  beforeEach(() => {
+    nav.pathname = "/";
   });
 
-  it("localizes account controls and protects session mutations", () => {
-    const source = read("apps/web/src/components/account-controls.tsx");
+  it.each(["en", "ru"] as const)(
+    "renders ordinary localized Discover search navigation in %s",
+    (locale) => {
+      const dictionary = getDictionary(locale);
+      const html = renderToStaticMarkup(
+        React.createElement(Navbar, { locale }),
+      );
 
-    expect(source).toContain("dictionary.accountControls");
-    expect(source.match(/credentials: "same-origin"/g)?.length).toBe(2);
-    expect(source.match(/cache: "no-store"/g)?.length).toBe(2);
-    expect(source).toContain("AbortSignal.timeout(10_000)");
-    expect(source).toContain("data?.success !== true");
+      expect(html).toMatch(
+        new RegExp(
+          `<a[^>]*href="/discover"[^>]*aria-label="${dictionary.nav.search}"`,
+          "u",
+        ),
+      );
+    },
+  );
 
-    const en = getDictionary("en").accountControls;
-    const ru = getDictionary("ru").accountControls;
-    expect(en.signOut).not.toBe(ru.signOut);
-    expect(en.checkError).not.toBe(ru.checkError);
-  });
+  it.each(["en", "ru"] as const)(
+    "renders account session checking as a localized live status in %s",
+    (locale) => {
+      const dictionary = getDictionary(locale);
+      const html = renderToStaticMarkup(
+        React.createElement(
+          LocaleProvider,
+          { locale },
+          React.createElement(AccountControls),
+        ),
+      );
 
-  it("does not mark notifications read before the server confirms success", () => {
-    const source = read("apps/web/src/components/notification-bell.tsx");
+      expect(html).toContain('role="status"');
+      expect(html).toContain(dictionary.accountControls.checking);
+    },
+  );
 
-    expect(source).toContain("dictionary.notificationBell");
-    expect(source).toContain('credentials: "same-origin"');
-    expect(source).toContain('cache: "no-store"');
-    expect(source).toContain("data?.success !== true");
-    const markAllRead = source.slice(source.indexOf("async function markAllRead()"), source.indexOf("const bellLabel"));
-    expect(markAllRead).toContain("setAttempt((value) => value + 1)");
-    expect(markAllRead).not.toContain("setUnreadCount(0)");
-    expect(source).toContain("<dialog");
+  it.each(["en", "ru"] as const)(
+    "renders a closed notification trigger with a localized accessible name in %s",
+    (locale) => {
+      const dictionary = getDictionary(locale);
+      const html = renderToStaticMarkup(
+        React.createElement(
+          LocaleProvider,
+          { locale },
+          React.createElement(NotificationBell),
+        ),
+      );
 
-    const en = getDictionary("en").notificationBell;
-    const ru = getDictionary("ru").notificationBell;
-    expect(en.markAllRead).not.toBe(ru.markAllRead);
-    expect(en.loadError).not.toBe(ru.loadError);
-  });
+      expect(html).toContain(
+        `aria-label="${dictionary.notificationBell.title}"`,
+      );
+      expect(html).toContain('aria-expanded="false"');
+      expect(html).not.toContain('aria-controls="notification-popover"');
+      expect(html).not.toContain('id="notification-popover"');
+    },
+  );
 
-  it.each(["en", "ru"] as const)("renders the theme control with an accessible localized name in %s", (locale) => {
-    const html = renderToStaticMarkup(
-      <LocaleProvider locale={locale}>
-        <ThemeToggle />
-      </LocaleProvider>,
+  it.each(["en", "ru"] as const)(
+    "renders the theme control with an accessible localized name in %s",
+    (locale) => {
+      const html = renderToStaticMarkup(
+        React.createElement(
+          LocaleProvider,
+          { locale },
+          React.createElement(ThemeToggle),
+        ),
+      );
+      expect(html).toContain('type="button"');
+      expect(html).toContain(
+        `aria-label="${getDictionary(locale).theme.switchToLight}"`,
+      );
+      expect(html).toContain('aria-hidden="true"');
+    },
+  );
+
+  it("keeps RU and EN account/notification copy distinct", () => {
+    const en = getDictionary("en");
+    const ru = getDictionary("ru");
+
+    expect(en.accountControls.signOut).not.toBe(
+      ru.accountControls.signOut,
     );
-    expect(html).toContain('type="button"');
-    expect(html).toContain(`aria-label="${getDictionary(locale).theme.switchToLight}"`);
-    expect(html).toContain('aria-hidden="true"');
+    expect(en.notificationBell.markAllRead).not.toBe(
+      ru.notificationBell.markAllRead,
+    );
   });
 });

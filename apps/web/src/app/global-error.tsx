@@ -21,15 +21,18 @@ const copy = {
   },
 } as const;
 
-function detectLocale(): Locale {
-  if (typeof document === "undefined") return "en";
-
-  return document.cookie
+export function detectGlobalErrorLocale(cookie: string): Locale {
+  return cookie
     .split(";")
     .map((part) => part.trim())
     .some((part) => part === "nexus_locale=ru")
     ? "ru"
     : "en";
+}
+
+function detectLocale(): Locale {
+  if (typeof document === "undefined") return "en";
+  return detectGlobalErrorLocale(document.cookie);
 }
 
 export default function GlobalError({

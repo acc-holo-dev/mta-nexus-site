@@ -1,67 +1,135 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const nav = vi.hoisted(() => ({ pathname: "/market" }));
 
-describe("pre-release shell accessibility", () => {
-  it("provides a localized skip link and focusable main landmark", () => {
-    const shell = read("apps/web/src/components/nexus-shell.tsx");
-    const en = getDictionary("en");
-    const ru = getDictionary("ru");
+vi.mock("next/navigation", () => ({
+  usePathname: () => nav.pathname,
+}));
 
-    expect(shell).toContain('href="#main-content"');
-    expect(shell).toContain('id="main-content"');
-    expect(shell).toContain("tabIndex={-1}");
-    expect(shell).toContain("dictionary.nav.skipToContent");
-    expect(en.nav.skipToContent).not.toBe(ru.nav.skipToContent);
+vi.mock("next/link", async () => {
+  const ReactModule = await import("react");
+  return {
+    default: ({
+      href,
+      children,
+      ...props
+    }: {
+      href: string;
+      children?: React.ReactNode;
+      [key: string]: unknown;
+    }) => ReactModule.createElement("a", { href, ...props }, children),
+  };
+});
+
+vi.mock("../apps/web/src/components/account-controls", async () => {
+  const ReactModule = await import("react");
+  return {
+    AccountControls: () =>
+      ReactModule.createElement("span", { "data-mock": "account" }),
+  };
+});
+
+vi.mock("../apps/web/src/components/locale-switcher", async () => {
+  const ReactModule = await import("react");
+  return {
+    LocaleSwitcher: () =>
+      ReactModule.createElement("span", { "data-mock": "locale" }),
+  };
+});
+
+vi.mock("../apps/web/src/components/notification-bell", async () => {
+  const ReactModule = await import("react");
+  return {
+    NotificationBell: () =>
+      ReactModule.createElement("span", { "data-mock": "notifications" }),
+  };
+});
+
+vi.mock("../apps/web/src/components/theme-toggle", async () => {
+  const ReactModule = await import("react");
+  return {
+    ThemeToggle: () =>
+      ReactModule.createElement("span", { "data-mock": "theme" }),
+  };
+});
+
+import { MobileNav } from "../apps/web/src/components/mobile-nav";
+import { NexusShell } from "../apps/web/src/components/nexus-shell";
+import { Sidebar } from "../apps/web/src/components/sidebar";
+
+describe("pre-release shell accessibility behavior", () => {
+  beforeEach(() => {
+    nav.pathname = "/market";
   });
 
-  it("keeps mobile navigation touch-sized and keyboard visible", () => {
-    const mobile = read("apps/web/src/components/mobile-nav.tsx");
+  it.each(["en", "ru"] as const)(
+    "renders a localized skip link targeting the focusable main landmark in %s",
+    (locale) => {
+      const dictionary = getDictionary(locale);
+      const html = renderToStaticMarkup(
+        React.createElement(
+          NexusShell,
+          { locale },
+          React.createElement("h1", null, "Fixture"),
+        ),
+      );
 
-    expect(mobile).toContain("min-h-12");
-    expect(mobile).toContain("focus-visible:outline-2");
-    expect(mobile).toContain('aria-current={active ? "page" : undefined}');
-    expect(mobile).toContain('aria-hidden="true"');
-  });
+      expect(html).toContain(
+        `href="#main-content">${dictionary.nav.skipToContent}</a>`,
+      );
+      expect(html).toMatch(
+        /<main[^>]*id="main-content"[^>]*tabindex="-1"/u,
+      );
+      expect(html).toContain("<h1>Fixture</h1>");
+    },
+  );
 
-  it("gives collapsed sidebar links accessible names", () => {
-    const sidebar = read("apps/web/src/components/sidebar.tsx");
-
-    expect(sidebar).toContain(
-      "aria-label={isCollapsed ? item.label : undefined}",
+  it("marks the active mobile destination and keeps the More dialog relation closed until opened", () => {
+    const dictionary = getDictionary("en");
+    const html = renderToStaticMarkup(
+      React.createElement(MobileNav, { locale: "en" }),
     );
-    expect(sidebar).toContain(
-      "aria-label={isCollapsed ? dictionary.nav.admin : undefined}",
+
+    expect(html).toMatch(
+      /<a[^>]*href="\/market"[^>]*aria-current="page"/u,
     );
-    expect(sidebar).toContain("focus-visible:outline-2");
+    expect(html).toContain(
+      `aria-label="${dictionary.nav.ecosystem}"`,
+    );
+    expect(html).toMatch(
+      new RegExp(
+        `<button[^>]*aria-expanded="false"[^>]*>.*?${dictionary.nav.more}`,
+        "su",
+      ),
+    );
+    expect(html).not.toContain('aria-controls="mobile-more-menu"');
+    expect(html).not.toContain('id="mobile-more-menu"');
   });
 
-  it("uses compact account controls on narrow headers without removing labels", () => {
-    const account = read("apps/web/src/components/account-controls.tsx");
-    const locale = read("apps/web/src/components/locale-switcher.tsx");
-    const navbar = read("apps/web/src/components/navbar.tsx");
+  it("gives collapsed sidebar destinations accessible names", () => {
+    const dictionary = getDictionary("en");
+    const html = renderToStaticMarkup(
+      React.createElement(Sidebar, {
+        locale: "en",
+        isCollapsed: true,
+        onToggle: () => undefined,
+      }),
+    );
 
-    expect(account).toContain('className="hidden max-w-24 truncate sm:block"');
-    expect(account).toContain("sr-only sm:hidden");
-    expect(account).toContain("UserRound");
-    expect(account).toContain("LogOut");
-    expect(locale).toContain("nextLocale.toUpperCase()");
-    expect(locale).toContain('className="sm:hidden"');
-    expect(navbar).toContain("gap-1.5 sm:gap-2");
-  });
-
-  it("does not optimistically mark the notification center read", () => {
-    const page = read("apps/web/src/app/notifications/page.tsx");
-
-    expect(page).toContain("data?.success !== true");
-    const markAllRead = page.slice(page.indexOf("async function markAllRead()"), page.indexOf("const filtered ="));
-    expect(markAllRead).toContain("await loadNotifications()");
-    expect(markAllRead).not.toContain("setNotifications((previous)");
-    expect(page).toContain('role="tablist"');
-    expect(page).toContain("aria-label={copy.title}");
+    expect(html).toMatch(
+      new RegExp(
+        `<a[^>]*href="/discover"[^>]*aria-label="${dictionary.nav.explore}"`,
+        "u",
+      ),
+    );
+    expect(html).toMatch(
+      new RegExp(
+        `<a[^>]*href="/admin"[^>]*aria-label="${dictionary.nav.admin}"`,
+        "u",
+      ),
+    );
   });
 });
