@@ -31,6 +31,17 @@ export const REQUIRED_RELEASE_GATES = Object.freeze([
   "repository_stability",
 ]);
 
+export const EXTERNAL_RELEASE_EVIDENCE_SPECS = Object.freeze({
+  webPushDurationSoak: Object.freeze({
+    relativePath: "artifacts/web-push-soak-evidence.json",
+    checker: "scripts/check-web-push-soak-evidence.mjs",
+  }),
+  webPushLiveProvider: Object.freeze({
+    relativePath: "artifacts/web-push-provider-evidence.json",
+    checker: "scripts/check-web-push-provider-evidence.mjs",
+  }),
+});
+
 export function repositoryStayedStable({ initialSha, finalSha, statusAvailable, dirty }) {
   return typeof initialSha === "string" && /^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(initialSha)
     && finalSha === initialSha && statusAvailable === true && dirty === false;

@@ -3,6 +3,14 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
+import {
+  EXTERNAL_RELEASE_EVIDENCE_SPECS,
+  REQUIRED_RELEASE_GATES,
+  executeReleaseCommand,
+  repositoryStayedStable,
+  summarizeExternalEvidence,
+  summarizeReleaseEvidence,
+} from "../release-evidence-lib.mjs";
 
 const read = (path) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -20,22 +28,43 @@ test("CI runs separate test projects and reports the selected verification scope
   assert.doesNotMatch(workflow, /run: pnpm release:verify/u);
 });
 
-test("core release evidence records lint as its own gate", () => {
-  const script = read("scripts/release-evidence.mjs");
+test("core release evidence requires every named gate including lint and typecheck", () => {
   const pkg = JSON.parse(read("package.json"));
-
   assert.equal(
     pkg.scripts.check,
     "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
   );
-  assert.match(
-    script,
-    /runGate\("lint", pnpmCommand, \["lint"\]\)/u,
+
+  assert.deepEqual(REQUIRED_RELEASE_GATES, [
+    "repository_identity",
+    "release_evidence_harness",
+    "database_migrations",
+    "lint",
+    "typecheck",
+    "tests",
+    "next_build",
+    "repository_stability",
+  ]);
+
+  const passed = REQUIRED_RELEASE_GATES.map((name) => ({
+    name,
+    status: "passed",
+  }));
+  assert.equal(
+    summarizeReleaseEvidence({
+      dirty: false,
+      gates: passed,
+    }).releaseCandidate,
+    true,
   );
-  assert.match(
-    script,
-    /runGate\("typecheck", pnpmCommand, \["typecheck"\]\)/u,
-  );
+
+  const withoutLint = passed.filter((gate) => gate.name !== "lint");
+  const incomplete = summarizeReleaseEvidence({
+    dirty: false,
+    gates: withoutLint,
+  });
+  assert.equal(incomplete.releaseCandidate, false);
+  assert.deepEqual(incomplete.missingGates, ["lint"]);
 });
 
 test("generated release evidence is not tracked by default", () => {
@@ -43,21 +72,68 @@ test("generated release evidence is not tracked by default", () => {
   assert.match(gitignore, /^artifacts\/$/mu);
 });
 
-test("evidence command does not serialize environment values or command output", () => {
-  const script = read("scripts/release-evidence.mjs");
-  assert.doesNotMatch(script, /JSON\.stringify\(process\.env\)/u);
-  assert.doesNotMatch(script, /environment:\s*process\.env/u);
-  assert.doesNotMatch(script, /stdout\s*:/u);
-  assert.doesNotMatch(script, /stderr\s*:/u);
-  assert.match(script, /process\.env\.DATABASE_URL/u);
-  assert.match(script, /evidenceSha256/u);
+test("release command results never serialize stdout or stderr payloads", () => {
+  const result = executeReleaseCommand(
+    process.execPath,
+    [
+      "-e",
+      "process.stdout.write('secret-out'); process.stderr.write('secret-err')",
+    ],
+    {
+      cwd: process.cwd(),
+      env: process.env,
+      stdio: "pipe",
+      timeoutMs: 5_000,
+    },
+  );
+
+  assert.equal(result.status, "passed");
+  assert.equal("stdout" in result, false);
+  assert.equal("stderr" in result, false);
+  assert.equal("output" in result, false);
+  assert.equal(result.timeoutMs, 5_000);
 });
 
-test("repository stability is checked after command execution and feeds the summary", () => {
-  const script = read("scripts/release-evidence.mjs");
-  assert.ok(script.indexOf("const finalShaResult") > script.indexOf('runGate("next_build"'));
-  assert.match(script, /gates\.push\(runGate\("repository_stability"/u);
-  assert.match(script, /dirty: dirty \|\| finalDirty/u);
+test("repository stability is a fail-closed exact-SHA contract", () => {
+  const sha = "a".repeat(40);
+  assert.equal(
+    repositoryStayedStable({
+      initialSha: sha,
+      finalSha: sha,
+      statusAvailable: true,
+      dirty: false,
+    }),
+    true,
+  );
+
+  for (const candidate of [
+    {
+      initialSha: sha,
+      finalSha: "b".repeat(40),
+      statusAvailable: true,
+      dirty: false,
+    },
+    {
+      initialSha: sha,
+      finalSha: sha,
+      statusAvailable: false,
+      dirty: false,
+    },
+    {
+      initialSha: sha,
+      finalSha: sha,
+      statusAvailable: true,
+      dirty: true,
+    },
+    {
+      initialSha: "not-a-sha",
+      finalSha: "not-a-sha",
+      statusAvailable: true,
+      dirty: false,
+    },
+  ]) {
+    assert.equal(repositoryStayedStable(candidate), false);
+  }
 });
 
 test("CI keeps selected-scope evidence strict for releases without coupling branch correctness to artifact quota", () => {
@@ -132,13 +208,49 @@ printf '%s' "$code"`], { encoding: "utf8" });
   }
 });
 
+test("Web Push external release evidence is referenced by sanitized manifest and checksum status only", () => {
+  assert.deepEqual(EXTERNAL_RELEASE_EVIDENCE_SPECS, {
+    webPushDurationSoak: {
+      relativePath: "artifacts/web-push-soak-evidence.json",
+      checker: "scripts/check-web-push-soak-evidence.mjs",
+    },
+    webPushLiveProvider: {
+      relativePath: "artifacts/web-push-provider-evidence.json",
+      checker: "scripts/check-web-push-provider-evidence.mjs",
+    },
+  });
 
-test("core release evidence references sanitized Web Push external artifacts by checksum only", () => {
-  const script = read("scripts/release-evidence.mjs");
-  assert.match(script, /web-push-soak-evidence\.json/u);
-  assert.match(script, /web-push-provider-evidence\.json/u);
-  assert.match(script, /summarizeExternalEvidence/u);
-  assert.match(script, /sha256File\(specification\.path\)/u);
-  assert.doesNotMatch(script, /NEXUS_WEB_PUSH_PROBE_(?:ENDPOINT|P256DH|AUTH)/u);
-  assert.doesNotMatch(script, /readFileSync\(specification\.path/u);
+  const validSha = "a".repeat(64);
+  assert.deepEqual(
+    summarizeExternalEvidence({
+      webPushDurationSoak: {
+        present: true,
+        valid: true,
+        sha256: validSha,
+      },
+      webPushLiveProvider: {
+        present: true,
+        valid: true,
+        sha256: validSha,
+      },
+    }),
+    {
+      complete: true,
+      missingOrInvalid: [],
+    },
+  );
+
+  assert.deepEqual(
+    summarizeExternalEvidence({
+      webPushDurationSoak: {
+        present: false,
+        valid: false,
+        sha256: null,
+      },
+    }),
+    {
+      complete: false,
+      missingOrInvalid: ["webPushDurationSoak"],
+    },
+  );
 });

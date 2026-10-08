@@ -9,6 +9,7 @@ import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import process from "node:process";
 import {
+  EXTERNAL_RELEASE_EVIDENCE_SPECS,
   REQUIRED_RELEASE_GATES,
   writeReleaseEvidence,
   executeReleaseCommand,
@@ -143,16 +144,17 @@ const gates = [
   runGate("next_build", pnpmCommand, ["build"]),
 ];
 
-const externalEvidenceSpecs = {
-  webPushDurationSoak: {
-    path: join(root, "artifacts", "web-push-soak-evidence.json"),
-    checker: "scripts/check-web-push-soak-evidence.mjs",
-  },
-  webPushLiveProvider: {
-    path: join(root, "artifacts", "web-push-provider-evidence.json"),
-    checker: "scripts/check-web-push-provider-evidence.mjs",
-  },
-};
+const externalEvidenceSpecs = Object.fromEntries(
+  Object.entries(EXTERNAL_RELEASE_EVIDENCE_SPECS).map(
+    ([name, specification]) => [
+      name,
+      {
+        path: join(root, specification.relativePath),
+        checker: specification.checker,
+      },
+    ],
+  ),
+);
 
 const externalEvidence = Object.fromEntries(
   Object.entries(externalEvidenceSpecs).map(
