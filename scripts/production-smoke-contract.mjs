@@ -2,6 +2,13 @@ import assert from 'node:assert/strict';
 
 export const PRODUCTION_UPLOAD_ENVELOPE_BYTES = 65 * 1024 * 1024;
 
+function durationSeconds(value) {
+  if (typeof value !== "string") return Number.NaN;
+  const match = value.match(/^(?:(\d+)m)?(?:(\d+)s)?$/u);
+  if (!match || (!match[1] && !match[2])) return Number.NaN;
+  return Number(match[1] ?? 0) * 60 + Number(match[2] ?? 0);
+}
+
 export function assertProductionUploadBodyLimit(source) {
   const match = source.match(/request_body\s*\{[\s\S]*?max_size\s+(\d+)[\s\S]*?\}/u);
   assert(match, 'Production Caddyfile must declare a request_body max_size');
@@ -45,7 +52,11 @@ export function assertIsolatedProduction(config, project, caddyFile) {
   assert.deepEqual(pushWorker.security_opt, ['no-new-privileges:true']);
   assert.equal(pushWorker.pids_limit, 128);
   assert.equal(pushWorker.stop_signal, 'SIGTERM');
-  assert.equal(pushWorker.stop_grace_period, '75s');
+  assert.equal(
+    durationSeconds(pushWorker.stop_grace_period),
+    75,
+    'push-worker must keep a 75-second graceful stop budget',
+  );
   assert(pushWorker.tmpfs?.some((entry) => String(entry).startsWith('/tmp:')));
   for (const [name, service] of Object.entries(config.services)) {
     assert(!service.privileged && !service.container_name && !service.network_mode);
