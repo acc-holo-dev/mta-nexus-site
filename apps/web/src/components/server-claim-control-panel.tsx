@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { KeyRound, LoaderCircle, ShieldCheck } from "lucide-react";
 import { useState } from "react";
+import {
+  confirmsServerClaimVerification,
+  parseIssuedServerClaimChallenge,
+  type IssuedServerClaimChallenge,
+} from "../lib/server-claim-confirmation";
 import { useNexusLocale } from "./locale-context";
-
-type IssuedChallenge = Readonly<{
-  challengeId: string;
-  token: string;
-  expiresAt: string;
-}>;
 
 export function ServerClaimControlPanel({
   serverId,
@@ -20,7 +19,8 @@ export function ServerClaimControlPanel({
 }) {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.serverClaim;
-  const [challenge, setChallenge] = useState<IssuedChallenge | null>(null);
+  const [challenge, setChallenge] =
+    useState<IssuedServerClaimChallenge | null>(null);
   const [state, setState] = useState<
     "idle" | "issuing" | "issued" | "verifying" | "verified"
   >("idle");
@@ -49,23 +49,18 @@ export function ServerClaimControlPanel({
         setState("idle");
         return;
       }
-      if (
-        !response.ok ||
-        typeof data?.challenge?.challengeId !== "string" ||
-        typeof data.challenge.token !== "string" ||
-        typeof data.challenge.expiresAt !== "string" ||
-        data.challenge.server?.id !== serverId
-      ) {
+      const issued = parseIssuedServerClaimChallenge(
+        response.status,
+        data,
+        serverId,
+      );
+      if (!issued) {
         setError(data?.error || copy.createError);
         setState("idle");
         return;
       }
 
-      setChallenge({
-        challengeId: data.challenge.challengeId,
-        token: data.challenge.token,
-        expiresAt: data.challenge.expiresAt,
-      });
+      setChallenge(issued);
       setState("issued");
     } catch {
       setError(copy.createUnavailable);
@@ -102,10 +97,11 @@ export function ServerClaimControlPanel({
         return;
       }
       if (
-        !response.ok ||
-        data?.success !== true ||
-        typeof data?.verificationRequest?.id !== "string" ||
-        data?.proof?.challengeId !== challenge.challengeId
+        !confirmsServerClaimVerification(
+          response.status,
+          data,
+          challenge.challengeId,
+        )
       ) {
         setError(data?.error || copy.proofRejected);
         setState("issued");

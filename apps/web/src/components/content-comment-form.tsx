@@ -3,6 +3,7 @@
 import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nexus/ui";
+import { confirmedCommentId } from "../lib/content-comment-confirmation";
 import { useNexusLocale } from "./locale-context";
 
 export function ContentCommentForm({ slug }: { slug: string }) {
@@ -33,10 +34,7 @@ export function ContentCommentForm({ slug }: { slug: string }) {
         },
       );
       const payload = await response.json().catch(() => null);
-      if (
-        !response.ok ||
-        typeof payload?.comment?.id !== "string"
-      ) {
+      if (!confirmedCommentId(response.status, payload)) {
         throw new Error(payload?.error || copy.commentError);
       }
 

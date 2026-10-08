@@ -7,33 +7,11 @@ import { Button } from "@nexus/ui";
 import { ContextSwitcher } from "../../components/context-switcher";
 import { WebPushSettings } from "../../components/web-push-settings";
 import { useNexusLocale } from "../../components/locale-context";
-
-type Preferences = {
-  followsEnabled: boolean;
-  contentEnabled: boolean;
-  serverEnabled: boolean;
-  commerceEnabled: boolean;
-  systemEnabled: boolean;
-};
-
-const preferenceKeys = [
-  "followsEnabled",
-  "contentEnabled",
-  "serverEnabled",
-  "commerceEnabled",
-  "systemEnabled",
-] as const;
-
-function isPreferences(value: unknown): value is Preferences {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return false;
-  }
-
-  const record = value as Record<string, unknown>;
-  return preferenceKeys.every(
-    (key) => typeof record[key] === "boolean",
-  );
-}
+import {
+  confirmedNotificationNotificationPreferences,
+  parseNotificationNotificationPreferences,
+  type NotificationNotificationPreferences,
+} from "../../lib/notification-preferences-confirmation";
 
 type Session = {
   id: string;
@@ -101,7 +79,7 @@ async function request<T>(
 export default function SettingsPage() {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.settings;
-  const [preferences, setPreferences] = useState<Preferences | null>(null);
+  const [preferences, setNotificationPreferences] = useState<NotificationPreferences | null>(null);
   const [sessions, setSessions] = useState<Session[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [signedOut, setSignedOut] = useState(false);
@@ -120,7 +98,7 @@ export default function SettingsPage() {
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   const preferenceLabels: Array<{
-    key: keyof Preferences;
+    key: keyof NotificationPreferences;
     label: string;
     description: string;
   }> = [
@@ -173,7 +151,7 @@ export default function SettingsPage() {
     setNotice(null);
 
     Promise.all([
-      request<{ preferences: Preferences }>(
+      request<{ preferences: NotificationPreferences }>(
         "/api/notifications/preferences",
         "GET",
         undefined,
@@ -198,7 +176,7 @@ export default function SettingsPage() {
       .then(([preferenceData, sessionData, recovery]) => {
         if (!active) return;
         if (
-          !isPreferences(preferenceData.preferences) ||
+          !isNotificationPreferences(preferenceData.preferences) ||
           !Array.isArray(sessionData.sessions) ||
           typeof recovery.email !== "string" ||
           typeof recovery.verified !== "boolean" ||
@@ -207,7 +185,7 @@ export default function SettingsPage() {
           throw new Error(copy.invalidResponse);
         }
 
-        setPreferences(preferenceData.preferences);
+        setNotificationPreferences(preferenceData.preferences);
         setSessions(sessionData.sessions);
         setRecoveryEmail(recovery);
         setSignedOut(false);
@@ -215,7 +193,7 @@ export default function SettingsPage() {
       .catch((error: unknown) => {
         if (!active) return;
 
-        setPreferences(null);
+        setNotificationPreferences(null);
         setSessions(null);
         setRecoveryEmail(null);
         setPassword({ currentPassword: "", newPassword: "" });
@@ -259,7 +237,7 @@ export default function SettingsPage() {
       ) {
         setSignedOut(true);
         setSessions(null);
-        setPreferences(null);
+        setNotificationPreferences(null);
         setRecoveryEmail(null);
         setPassword({ currentPassword: "", newPassword: "" });
         setRecoveryPassword("");
@@ -389,23 +367,23 @@ export default function SettingsPage() {
     });
   }
 
-  function updatePreference(key: keyof Preferences, value: boolean) {
+  function updatePreference(key: keyof NotificationPreferences, value: boolean) {
     void perform(async () => {
       const data = await requestSettings<{
         success: boolean;
-        preferences: Preferences;
+        preferences: NotificationPreferences;
       }>("/api/notifications/preferences", "PATCH", {
         [key]: value,
       });
 
       if (
         data.success !== true ||
-        !isPreferences(data.preferences)
+        !isNotificationPreferences(data.preferences)
       ) {
         throw new SettingsError(copy.requestUnconfirmed, 502);
       }
 
-      setPreferences(data.preferences);
+      setNotificationPreferences(data.preferences);
       setNotice({
         text: copy.preferenceSaved,
         error: false,
@@ -501,7 +479,7 @@ export default function SettingsPage() {
             id="notification-heading"
             className="text-sm font-semibold text-primary"
           >
-            {copy.notificationPreferences}
+            {copy.notificationNotificationPreferences}
           </h2>
         </div>
         <p className="text-xs text-muted">
