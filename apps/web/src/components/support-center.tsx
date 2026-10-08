@@ -108,10 +108,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
       setMessage("");
       setCreatedCaseId(created.id);
       if (page === 1) {
-        setCases((previous) => [
-          created,
-          ...previous.filter((item) => item.id !== created.id),
-        ]);
+        await loadCases();
       } else {
         setPage(1);
       }

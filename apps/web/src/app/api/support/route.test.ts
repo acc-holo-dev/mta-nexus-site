@@ -134,7 +134,13 @@ describe("support HTTP authorization and privacy", () => {
     expectPrivate(denied);
 
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
-    mocks.pageByRequester.mockResolvedValue([{ id: caseId }]);
+    mocks.pageByRequester.mockResolvedValue({
+      items: [{ id: caseId }],
+      page: 1,
+      pageSize: 25,
+      total: 1,
+      totalPages: 1,
+    });
     const allowed = await listCases(request);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
@@ -151,13 +157,19 @@ describe("support HTTP authorization and privacy", () => {
     expect(mocks.pageStaff).not.toHaveBeenCalled();
 
     mocks.can.mockReturnValue(true);
-    mocks.pageStaff.mockResolvedValue([
-      {
-        supportCase: { id: caseId, requesterId: "usr_other" },
-        requesterUsername: "other",
-        requesterDisplayName: "Other",
-      },
-    ]);
+    mocks.pageStaff.mockResolvedValue({
+      items: [
+        {
+          supportCase: { id: caseId, requesterId: "usr_other" },
+          requesterUsername: "other",
+          requesterDisplayName: "Other",
+        },
+      ],
+      page: 1,
+      pageSize: 25,
+      total: 1,
+      totalPages: 1,
+    });
     const allowed = await listCases(request);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
@@ -179,11 +191,69 @@ describe("support HTTP authorization and privacy", () => {
     expect(mocks.pageMessages).not.toHaveBeenCalled();
 
     mocks.can.mockReturnValue(true);
-    mocks.pageMessages.mockResolvedValue([{ id: "spm_1", body: "private" }]);
+    mocks.pageMessages.mockResolvedValue({
+      items: [{ id: "spm_1", body: "private" }],
+      page: 1,
+      pageSize: 100,
+      total: 1,
+      totalPages: 1,
+    });
     const allowed = await getCase(request, params);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
     expect(mocks.pageMessages).toHaveBeenCalledWith(caseId, 1);
+  });
+
+  it("normalizes invalid page query and exposes bounded page metadata", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.pageByRequester.mockResolvedValue({
+      items: [{ id: caseId }],
+      page: 1,
+      pageSize: 25,
+      total: 51,
+      totalPages: 3,
+    });
+
+    const response = await listCases(
+      new NextRequest("https://nexus.test/api/support?page=0"),
+    );
+    expect(response.status).toBe(200);
+    expect(mocks.pageByRequester).toHaveBeenCalledWith("usr_member", 1);
+    expect(await response.json()).toMatchObject({
+      page: 1,
+      totalPages: 3,
+      total: 51,
+    });
+  });
+
+  it("passes a bounded message page into the repository", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.findById.mockResolvedValue({
+      id: caseId,
+      requesterId: "usr_member",
+      status: "open",
+    });
+    mocks.pageMessages.mockResolvedValue({
+      items: [],
+      page: 7,
+      pageSize: 100,
+      total: 601,
+      totalPages: 7,
+    });
+
+    const response = await getCase(
+      new NextRequest(
+        `https://nexus.test/api/support/${caseId}?messagePage=7`,
+      ),
+      params,
+    );
+    expect(response.status).toBe(200);
+    expect(mocks.pageMessages).toHaveBeenCalledWith(caseId, 7);
+    expect(await response.json()).toMatchObject({
+      messagePage: 7,
+      messageTotalPages: 7,
+      messageTotal: 601,
+    });
   });
 
   it("rejects client-forged related entity context before persistence", async () => {

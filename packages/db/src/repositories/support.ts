@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, ne } from "drizzle-orm";
+import { and, count, desc, eq, ne } from "drizzle-orm";
 import type {
   AuditEvent,
   SupportCase,
@@ -270,7 +270,14 @@ export class SupportCaseRepository {
       const [updated] = await tx
         .update(supportCases)
         .set({ status, updatedAt: now })
-        .where(expectedStatus === undefined ? eq(supportCases.id, id) : and(eq(supportCases.id, id), eq(supportCases.status, expectedStatus)))
+        .where(
+          expectedStatus === undefined
+            ? eq(supportCases.id, id)
+            : and(
+                eq(supportCases.id, id),
+                eq(supportCases.status, expectedStatus),
+              ),
+        )
         .returning();
       if (!updated) return null;
 

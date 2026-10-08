@@ -19,6 +19,7 @@ export function SupportCaseThread({
   const [messages, setMessages] = useState<SupportMessageData[]>([]);
   const [messagePage, setMessagePage] = useState(1);
   const [messageTotalPages, setMessageTotalPages] = useState(1);
+  const [messageTotal, setMessageTotal] = useState(0);
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -60,6 +61,7 @@ export function SupportCaseThread({
       setMessages(validated.messages);
       setMessagePage(validated.messagePage);
       setMessageTotalPages(validated.messageTotalPages);
+      setMessageTotal(validated.messageTotal);
     } catch {
       setSupportCase(null);
       setMessages([]);
@@ -108,12 +110,18 @@ export function SupportCaseThread({
       }
 
       setSupportCase(confirmed.supportCase);
+      const nextTotal = messageTotal + 1;
+      setMessageTotal(nextTotal);
+      setMessageTotalPages(
+        Math.max(1, Math.ceil(nextTotal / 100)),
+      );
       if (messagePage === 1) {
-        setMessages((previous) =>
-          previous.some((item) => item.id === confirmed.message.id)
-            ? previous
-            : [...previous, confirmed.message],
-        );
+        setMessages((previous) => {
+          if (previous.some((item) => item.id === confirmed.message.id)) {
+            return previous;
+          }
+          return [...previous, confirmed.message].slice(-100);
+        });
       } else {
         setMessagePage(1);
       }
