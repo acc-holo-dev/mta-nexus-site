@@ -190,11 +190,15 @@ async function refreshQueueStats() {
 async function delay(ms: number, signal: AbortSignal) {
   if (signal.aborted) return;
   await new Promise<void>((resolve) => {
-    const timer = setTimeout(resolve, ms);
-    const abort = () => {
+    const timer = setTimeout(done, ms);
+    const abort = () => done();
+
+    function done() {
       clearTimeout(timer);
+      signal.removeEventListener("abort", abort);
       resolve();
-    };
+    }
+
     signal.addEventListener("abort", abort, { once: true });
   });
 }
@@ -232,7 +236,11 @@ try {
   }
 
   heartbeatTimer = setInterval(() => {
-    void queueHealth();
+    void queueHealth().catch(() => {
+      // queueHealth records the failure and aborts the main loop. Consume the
+      // timer promise so a health-file write failure cannot become an
+      // unhandled rejection before the structured shutdown path runs.
+    });
   }, HEARTBEAT_INTERVAL_MS);
   heartbeatTimer.unref();
 
