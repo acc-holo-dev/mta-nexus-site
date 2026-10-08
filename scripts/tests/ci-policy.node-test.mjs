@@ -22,6 +22,8 @@ test("migration, database tooling, workflow and explicit release changes run ful
     ["packages/db/scripts/check-release-upgrade.mjs"],
     ["packages/db/src/schema.ts"],
     ["packages/db/src/account-mail-schema.ts"],
+    ["packages/db/src/repositories/security-schema.ts"],
+    ["packages/db/src/nested/migrate.ts"],
     ["packages/db/src/migrate.ts"],
     [".github/workflows/ci.yml"],
     ["Dockerfile"],
