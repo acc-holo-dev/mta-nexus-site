@@ -117,6 +117,7 @@ export async function collectDoctor(options = {}) {
   const checks = [];
   const facts = {
     node: nodeVersion,
+    nodePin: null,
     pnpm: null,
     docker: null,
     compose: null,
@@ -156,13 +157,53 @@ export async function collectDoctor(options = {}) {
     );
   }
 
+  let pinnedNode = "";
+  try {
+    const [nvmrc, nodeVersionFile] = await Promise.all([
+      readFile(resolve(root, ".nvmrc"), "utf8"),
+      readFile(resolve(root, ".node-version"), "utf8"),
+    ]);
+    const nvmPin = nvmrc.trim();
+    const nodeVersionPin = nodeVersionFile.trim();
+    if (!nvmPin || nvmPin !== nodeVersionPin || !parseVersion(nvmPin)) {
+      addCheck(
+        checks,
+        "node-pin",
+        "fail",
+        "Repository Node version files are missing, invalid, or disagree.",
+        "Keep .nvmrc and .node-version on the same valid Node release.",
+      );
+    } else {
+      pinnedNode = nvmPin;
+      facts.nodePin = pinnedNode;
+      addCheck(
+        checks,
+        "node-pin",
+        "pass",
+        `Repository host Node pin: ${pinnedNode}.`,
+      );
+    }
+  } catch {
+    addCheck(
+      checks,
+      "node-pin",
+      "fail",
+      "Repository Node version files could not be read.",
+      "Restore .nvmrc and .node-version before using host-side tooling.",
+    );
+  }
+
   const nodeMajor = parseVersion(nodeVersion)?.[0] ?? 0;
   addCheck(
     checks,
     "node",
     nodeMajor >= 26 ? "pass" : "fail",
     `Node.js ${nodeVersion}; project requires Node.js 26 or newer for host-side tooling.`,
-    nodeMajor >= 26 ? undefined : "Use Node.js 26+ or the documented Docker-only startup.",
+    nodeMajor >= 26
+      ? undefined
+      : pinnedNode
+        ? `Use the repository Node ${pinnedNode} (for nvm: run \`nvm use\`) or the documented Docker-only startup.`
+        : "Use Node.js 26+ or the documented Docker-only startup.",
   );
 
   const pnpmResult = await runCommand("pnpm", ["--version"], { cwd: root });
@@ -189,7 +230,7 @@ export async function collectDoctor(options = {}) {
       matchesPin
         ? undefined
         : pinned
-          ? `Use pnpm ${pinnedPnpm} for reproducible host-side commands.`
+          ? `Use pnpm ${pinnedPnpm} for reproducible host-side commands; package.json#packageManager is authoritative.`
           : "Restore package.json before relying on host-side pnpm commands.",
     );
   }
