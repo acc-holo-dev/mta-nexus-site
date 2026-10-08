@@ -50,6 +50,19 @@ describe("deterministic development startup contract", () => {
   });
 });
 
+describe("host toolchain version contract", () => {
+  it("pins the same Node release for common version managers", () => {
+    const nvm = read(".nvmrc").trim();
+    const nodeVersion = read(".node-version").trim();
+    const pkg = JSON.parse(read("package.json"));
+
+    expect(nvm).toBe("26.10.0");
+    expect(nodeVersion).toBe(nvm);
+    expect(pkg.engines.node).toBe(">=26.0.0");
+    expect(pkg.packageManager).toBe("pnpm@12.4.2");
+  });
+});
+
 describe("beta version consistency", () => {
   it("pins the complete workspace to 1.2.0-beta.3", () => {
     const manifests = [

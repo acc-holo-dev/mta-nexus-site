@@ -24,7 +24,7 @@ This hostname is explicitly allowed by Next.js development origin checks. The
 published host port stays bound to loopback; use `localhost` from the host.
 Changes to `apps/web/next.config.mjs` require rebuilding the app image.
 
-If Node.js 26+ and the pinned pnpm are installed, `pnpm dev` now starts the same full Docker development stack after running the repository doctor:
+If Node.js 26+ and the pinned pnpm are installed, `pnpm dev` now starts the same full Docker development stack after running the repository doctor. The repository pins the verified host Node release in both `.nvmrc` and `.node-version` (26.10.0), while `package.json#packageManager` pins pnpm 12.4.2. Version managers should use those files instead of a machine-global Node installation:
 
 ```bash
 pnpm dev

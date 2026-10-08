@@ -11,7 +11,7 @@ Use the root `compose.yaml` directly when you want a Docker-only startup:
 docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-timeout 600
 ```
 
-When Node.js 26+ and the pinned pnpm are installed, the supported convenience entrypoint is:
+When Node.js 26+ and the pinned pnpm are installed, the supported convenience entrypoint is shown below. Host tooling is explicit: `.nvmrc` and `.node-version` pin Node 26.10.0, and `package.json#packageManager` pins pnpm 12.4.2. Use the repository version files before running host-side commands:
 
 ```bash
 pnpm dev
