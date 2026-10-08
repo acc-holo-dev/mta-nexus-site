@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
-import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useNexusLocale } from "./locale-context";
 import { confirmSupportReply, confirmSupportStatusChanged, parseSupportThread, type SupportCaseData, type SupportMessageData } from "../lib/support-response";
 
@@ -25,6 +25,7 @@ export function SupportCaseThread({
   const [sending, setSending] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const loadSequence = useRef(0);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   const categories: Record<string, string> = {
@@ -39,7 +40,9 @@ export function SupportCaseThread({
     other: copy.categoryOther,
   };
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (signal?: AbortSignal): Promise<boolean> => {
+    const sequence = ++loadSequence.current;
+    const isCurrent = () => sequence === loadSequence.current && !signal?.aborted;
     setLoading(true);
     setError(null);
     try {
@@ -48,31 +51,41 @@ export function SupportCaseThread({
         {
           cache: "no-store",
           credentials: "same-origin",
-          signal: AbortSignal.timeout(15_000),
+          signal: signal
+            ? AbortSignal.any([signal, AbortSignal.timeout(15_000)])
+            : AbortSignal.timeout(15_000),
         },
       );
+      if (!isCurrent()) return false;
       const data = await response.json().catch(() => null);
+      if (!isCurrent()) return false;
       const validated = parseSupportThread(data, caseId);
-      if (!response.ok || !validated) {
-        throw new Error(copy.loadError);
-      }
+      if (!response.ok || !validated) throw new Error(copy.loadError);
 
       setSupportCase(validated.supportCase);
       setMessages(validated.messages);
       setMessagePage(validated.messagePage);
       setMessageTotalPages(validated.messageTotalPages);
       setMessageTotal(validated.messageTotal);
+      return true;
     } catch {
+      if (!isCurrent()) return false;
       setSupportCase(null);
       setMessages([]);
       setError(copy.loadError);
+      return false;
     } finally {
-      setLoading(false);
+      if (isCurrent()) setLoading(false);
     }
   }, [caseId, copy.loadError, messagePage]);
 
   useEffect(() => {
-    void load();
+    const controller = new AbortController();
+    void load(controller.signal);
+    return () => {
+      controller.abort();
+      loadSequence.current += 1;
+    };
   }, [load]);
 
   async function sendReply(event: FormEvent<HTMLFormElement>) {
@@ -96,8 +109,7 @@ export function SupportCaseThread({
       );
       const data = await response.json().catch(() => null);
       if (response.status === 409) {
-        await load();
-        setError(copy.replyConflict);
+        if (await load()) setError(copy.replyConflict);
         return;
       }
       const confirmed = confirmSupportReply(
@@ -154,8 +166,7 @@ export function SupportCaseThread({
       );
       const data = await response.json().catch(() => null);
       if (response.status === 409) {
-        await load();
-        setError(copy.statusConflict);
+        if (await load()) setError(copy.statusConflict);
         return;
       }
       const confirmed = confirmSupportStatusChanged(response.status, data, caseId, status);
@@ -305,7 +316,7 @@ export function SupportCaseThread({
         >
           <button
             type="button"
-            disabled={messagePage <= 1 || loading}
+            disabled={messagePage <= 1 || loading || sending || updatingStatus}
             onClick={() =>
               setMessagePage((value) => Math.max(1, value - 1))
             }
@@ -318,7 +329,7 @@ export function SupportCaseThread({
           </span>
           <button
             type="button"
-            disabled={messagePage >= messageTotalPages || loading}
+            disabled={messagePage >= messageTotalPages || loading || sending || updatingStatus}
             onClick={() =>
               setMessagePage((value) =>
                 Math.min(messageTotalPages, value + 1),

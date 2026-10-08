@@ -98,7 +98,7 @@ describe("support case repository", () => {
           action: "support.case.status_changed",
           targetId: caseId,
           targetType: "support_case",
-        })
+        }, "open")
       )?.status,
     ).toBe("closed");
 

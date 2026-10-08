@@ -112,3 +112,9 @@ Risk/provider policy может добавить dual-control позже без 
 - A user who consciously replies to a currently resolved case may reopen it; the repository atomically compares the status and writes the message and audit event in one transaction. This avoids silently reopening a case after a separate staff decision.
 - The browser refreshes the thread on conflict, preserves unsent text, and renders localized RU/EN conflict guidance; retries must be explicitly submitted.
 - This is status-based compare-and-set. The documented ABA/revision limitation remains.
+
+## 10. Repository CAS and thread freshness (implemented)
+
+- `SupportCaseRepository.updateStatus` requires `expectedStatus`; there is no unconditional status update fallback. HTTP guards and DB conditions must both remain present.
+- Support thread pagination cancels obsolete GET requests and ignores responses from superseded loads. A conflict refresh only displays the conflict-specific message if the updated thread actually loaded; otherwise the load error remains visible.
+- Switching message pages is disabled while a reply or staff status mutation is pending. These controls do not replace server-side compare-and-set.
