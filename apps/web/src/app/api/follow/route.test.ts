@@ -47,10 +47,10 @@ vi.mock("next/server", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/auth-service", () => ({
   authService: { getSession: vi.fn(async () => state.user) },
 }));
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../../../lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: dispatchNotifications,
 }));
 
@@ -76,7 +76,7 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-import { POST as follow, DELETE as unfollow } from "../apps/web/src/app/api/follow/route";
+import { POST as follow, DELETE as unfollow } from "./route";
 import { POST as markRead } from "../apps/web/src/app/api/notifications/mark-read/route";
 import { GET as listNotifications } from "../apps/web/src/app/api/notifications/route";
 

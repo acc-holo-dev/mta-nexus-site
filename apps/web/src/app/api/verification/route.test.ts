@@ -36,7 +36,7 @@ vi.mock("next/server", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 
@@ -58,14 +58,14 @@ vi.mock("@nexus/db", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../../../lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 
 import {
   GET,
   POST,
-} from "../apps/web/src/app/api/verification/route";
+} from "./route";
 
 function postRequest(
   body: unknown = { targetType: "user", targetId: "u_1" },

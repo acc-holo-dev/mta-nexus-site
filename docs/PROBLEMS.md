@@ -258,12 +258,14 @@ CHECK, известный алиас tool → plugin и отказ на неиз
 
 ### P2-5. Тестовая инфраструктура: хрупкости и производительность
 
-- root `tests/` всё ещё содержит часть cross-workspace HTTP/integration
-  сценариев, но новые comment contracts перенесены к владельцам кода:
-  repository transaction contract — в `packages/db/src/repositories/`,
-  form/client contract — в `apps/web/src/components/`, report-comment HTTP
-  contract — рядом с route. Root devDependencies всё ещё поддерживают
-  оставшиеся cross-workspace suites; перенос продолжать по мере правок;
+- root `tests/` всё ещё содержит cross-workspace integration и часть
+  legacy HTTP suites, но ownership постепенно выровнен: comment repository
+  contract живёт в `packages/db/src/repositories/`; comment form/client —
+  в `apps/web/src/components/`; reports, verification, follow, article-comment
+  и support HTTP suites перенесены непосредственно к своим Route Handlers.
+  Focused `test:reports` и `test:verification` обновлены на новые пути.
+  Root devDependencies остаются только для оставшихся cross-workspace suites;
+  перенос продолжать по мере правок;
 - private GET cache source policy заменён прямыми HTTP response assertions:
   auth context, notification preferences/inbox, reports, verification, follow
   и downloads подтверждают `private, no-store` + `Vary: Cookie`, а

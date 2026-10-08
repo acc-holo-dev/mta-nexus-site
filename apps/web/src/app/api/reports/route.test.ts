@@ -32,10 +32,10 @@ vi.mock("next/server", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../../../lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 
@@ -55,7 +55,7 @@ vi.mock("@nexus/db", () => ({
   userRepository: { findById: vi.fn(), listModeratorIds: mocks.listModeratorIds },
 }));
 
-import { GET, POST } from "../apps/web/src/app/api/reports/route";
+import { GET, POST } from "./route";
 
 const privateResponse = (response: Response) => {
   expect(response.headers.get("cache-control")).toBe("private, no-store");

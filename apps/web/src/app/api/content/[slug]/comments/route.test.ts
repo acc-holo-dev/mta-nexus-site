@@ -52,7 +52,7 @@ vi.mock("next/server", async () => {
   };
 });
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({
       id: "usr_commenter",
@@ -61,7 +61,7 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
+vi.mock("../../../../../lib/services/content-service", () => ({
   contentService: {
     getArticleBySlug: getArticle,
     addComment,
@@ -73,12 +73,12 @@ vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
 
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../../../../../lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: dispatchNotifications,
 }));
 
 import { NextRequest } from "next/server";
-import { POST } from "../apps/web/src/app/api/content/[slug]/comments/route";
+import { POST } from "./route";
 
 function expectPrivate(response: Response) {
   expect(response.headers.get("Cache-Control")).toBe("private, no-store");

@@ -31,7 +31,7 @@ vi.mock("next/server", async () => {
   return { ...actual, after: afterMock };
 });
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+vi.mock("../../../lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 
@@ -54,19 +54,19 @@ vi.mock("@nexus/db", () => ({
   userRepository: { listModeratorIds: mocks.moderatorIds },
 }));
 
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+vi.mock("../../../lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 
 import {
   GET as listCases,
   POST as createCase,
-} from "../apps/web/src/app/api/support/route";
+} from "./route";
 import {
   GET as getCase,
   PATCH as updateCase,
   POST as addMessage,
-} from "../apps/web/src/app/api/support/[id]/route";
+} from "./[id]/route";
 
 const caseId = `sup_${"a".repeat(24)}`;
 const params = { params: Promise.resolve({ id: caseId }) };
