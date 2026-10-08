@@ -1,19 +1,194 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const product = vi.hoisted(() => ({
+  updateWithAudit: vi.fn(),
+  suspendPublished: vi.fn(),
+  restoreSuspendedWithPublishedBuild: vi.fn(),
+  findById: vi.fn(),
+}));
+
+const report = vi.hoisted(() => ({
+  resolve: vi.fn(),
+  findById: vi.fn(),
+}));
+
+vi.mock("next/server", async () => {
+  const actual = await vi.importActual<typeof import("next/server")>(
+    "next/server",
+  );
+  return {
+    ...actual,
+    after: vi.fn(),
+  };
+});
+
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+  authService: {
+    getSession: vi.fn(async () => ({
+      id: "usr_mod",
+      username: "moderator",
+      role: "moderator",
+    })),
+  },
+}));
+
+vi.mock("../apps/web/src/lib/services/product-service", () => ({
+  productService: {
+    reviewBuild: vi.fn(),
+    quarantineBuild: vi.fn(),
+    restoreQuarantinedBuild: vi.fn(),
+  },
+}));
+
+vi.mock("../apps/web/src/lib/services/content-service", () => ({
+  contentService: {
+    moderateContent: vi.fn(),
+  },
+}));
+
+vi.mock(
+  "../apps/web/src/lib/services/server-follow-notification-service",
+  () => ({
+    notifyServerFollowersOfPublishedContent: vi.fn(),
+  }),
+);
+
+vi.mock("@nexus/db", () => ({
+  productRepository: product,
+  reportRepository: report,
+  verificationRepository: {
+    resolveRequest: vi.fn(),
+    findById: vi.fn(),
+  },
+}));
+
+vi.mock("@nexus/security", () => ({
+  can: vi.fn(() => true),
+  consumeRateLimit: vi.fn(async () => ({ success: true })),
+  generateId: vi.fn((prefix: string) => `${prefix}_test`),
+}));
+
+import { NextRequest } from "next/server";
+import { POST } from "../apps/web/src/app/api/admin/actions/route";
+
+function request(
+  targetType: "product" | "report",
+  targetId: string,
+  action: string,
+) {
+  return new NextRequest("http://nexus.test/api/admin/actions", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      cookie: "nexus_session=test-session",
+    },
+    body: JSON.stringify({
+      targetType,
+      targetId,
+      action,
+      notes: "Moderation evidence.",
+    }),
+  });
+}
 
 describe("moderation action integrity", () => {
-  it("does not audit a successful moderation action when its target is missing", () => {
-    const route = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/api/admin/actions/route.ts"),
-      "utf8"
+  beforeEach(() => {
+    vi.clearAllMocks();
+    product.updateWithAudit.mockResolvedValue(null);
+    product.suspendPublished.mockResolvedValue(null);
+    product.restoreSuspendedWithPublishedBuild.mockResolvedValue(
+      "not_found",
+    );
+    product.findById.mockResolvedValue(null);
+    report.resolve.mockResolvedValue(false);
+    report.findById.mockResolvedValue(null);
+  });
+
+  it.each(["feature", "unfeature"] as const)(
+    "returns 404 when product %s cannot atomically update the target",
+    async (action) => {
+      const response = await POST(
+        request("product", "prd_missing", action),
+      );
+
+      expect(response.status).toBe(404);
+      expect(await response.json()).toEqual({
+        error: "Product not found",
+      });
+      expect(product.updateWithAudit).toHaveBeenCalledWith(
+        "prd_missing",
+        { isFeatured: action === "feature" },
+        expect.objectContaining({
+          actorId: "usr_mod",
+          action: `admin.${action}`,
+          targetId: "prd_missing",
+          targetType: "product",
+        }),
+      );
+    },
+  );
+
+  it("distinguishes a missing product from a suspend compare-and-set loss", async () => {
+    const missing = await POST(
+      request("product", "prd_missing", "suspend"),
+    );
+    expect(missing.status).toBe(404);
+    expect(await missing.json()).toEqual({
+      error: "Product not found",
+    });
+
+    product.findById.mockResolvedValueOnce({
+      id: "prd_existing",
+      status: "draft",
+    });
+    const stale = await POST(
+      request("product", "prd_existing", "suspend"),
+    );
+    expect(stale.status).toBe(409);
+    expect(await stale.json()).toMatchObject({
+      code: "PRODUCT_STATE_CHANGED",
+    });
+  });
+
+  it("returns 404 when restore reports that the product does not exist", async () => {
+    const response = await POST(
+      request("product", "prd_missing", "restore"),
     );
 
-    expect(route).toContain('{ error: "Product not found" }');
-    expect(route).toContain('{ error: "Report not found" }');
-    expect(route).toContain("productRepository.updateWithAudit(");
-    expect(route).toContain("productRepository.suspendPublished(");
-    expect(route).toContain("productRepository.restoreSuspendedWithPublishedBuild(");
-    expect(route).toContain("const resolved = await reportRepository.resolve");
+    expect(response.status).toBe(404);
+    expect(await response.json()).toEqual({
+      error: "Product not found",
+    });
+    expect(
+      product.restoreSuspendedWithPublishedBuild,
+    ).toHaveBeenCalledWith(
+      "prd_missing",
+      expect.objectContaining({
+        action: "admin.restore",
+        targetId: "prd_missing",
+      }),
+    );
+  });
+
+  it("distinguishes a missing report from a moderation race", async () => {
+    const missing = await POST(
+      request("report", "rpt_missing", "resolve"),
+    );
+    expect(missing.status).toBe(404);
+    expect(await missing.json()).toEqual({
+      error: "Report not found",
+    });
+
+    report.findById.mockResolvedValueOnce({
+      id: "rpt_existing",
+      status: "open",
+    });
+    const stale = await POST(
+      request("report", "rpt_existing", "dismiss"),
+    );
+    expect(stale.status).toBe(409);
+    expect(await stale.json()).toMatchObject({
+      code: "REPORT_STATE_CHANGED",
+    });
   });
 });
