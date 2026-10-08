@@ -5,6 +5,7 @@ import { type FormEvent, useState } from "react";
 import { KeyRound } from "lucide-react";
 import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../../components/locale-context";
+import { recoveryJsonRequest } from "../../../lib/account-recovery-browser";
 
 export default function ForgotPasswordPage() {
   const { dictionary } = useNexusLocale();
@@ -23,14 +24,10 @@ export default function ForgotPasswordPage() {
     setPending(true);
     setNotice(null);
     try {
-      const response = await fetch("/api/auth/password-reset", {
-        method: "POST",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
-        signal: AbortSignal.timeout(15_000),
-      });
+      const response = await fetch(
+        "/api/auth/password-reset",
+        recoveryJsonRequest("POST", { email: email.trim() }),
+      );
       const data = await response.json().catch(() => null);
       if (!response.ok || data?.accepted !== true) {
         throw new Error(data?.error || copy.unavailable);

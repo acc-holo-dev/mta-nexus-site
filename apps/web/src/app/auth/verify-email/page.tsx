@@ -5,8 +5,13 @@ import { useEffect, useState } from "react";
 import { MailCheck } from "lucide-react";
 import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../../components/locale-context";
+import {
+  readAccountRecoveryProofFromWindow,
+  recoveryJsonRequest,
+  type AccountRecoveryProof,
+} from "../../../lib/account-recovery-browser";
 
-type Proof = { challengeId: string; token: string };
+type Proof = AccountRecoveryProof;
 type State =
   | { kind: "loading" }
   | { kind: "ready"; proof: Proof }
@@ -15,32 +20,13 @@ type State =
   | { kind: "success"; email: string }
   | { kind: "error"; proof?: Proof; message: string };
 
-function readProof(): Proof | null {
-  const url = new URL(window.location.href);
-  const challengeId = url.searchParams.get("challenge") ?? "";
-  const fragment = new URLSearchParams(
-    url.hash.startsWith("#") ? url.hash.slice(1) : url.hash,
-  );
-  const token = fragment.get("token") ?? "";
-
-  window.history.replaceState(null, "", url.pathname);
-
-  if (
-    !/^ach_[A-Za-z0-9_-]{1,96}$/.test(challengeId) ||
-    !/^[A-Za-z0-9_-]{43}$/.test(token)
-  ) {
-    return null;
-  }
-  return { challengeId, token };
-}
-
 export default function VerifyEmailPage() {
   const { dictionary } = useNexusLocale();
   const copy = dictionary.recovery;
   const [state, setState] = useState<State>({ kind: "loading" });
 
   useEffect(() => {
-    const proof = readProof();
+    const proof = readAccountRecoveryProofFromWindow();
     setState(proof ? { kind: "ready", proof } : { kind: "invalid" });
   }, []);
 
@@ -48,14 +34,10 @@ export default function VerifyEmailPage() {
     setState({ kind: "submitting", proof });
 
     try {
-      const response = await fetch("/api/auth/email-verification", {
-        method: "PATCH",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(proof),
-        signal: AbortSignal.timeout(15_000),
-      });
+      const response = await fetch(
+        "/api/auth/email-verification",
+        recoveryJsonRequest("PATCH", proof),
+      );
       const data = await response.json().catch(() => null);
 
       if (

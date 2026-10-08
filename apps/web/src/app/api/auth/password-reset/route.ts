@@ -5,37 +5,28 @@ import { confirmPasswordResetSchema, requestPasswordResetSchema } from "@nexus/v
 import { AppError } from "@nexus/domain";
 import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent, type RequestLogContext } from "../../../../lib/observability";
-
-const neutral = {
-  accepted: true,
-  message: "If an eligible account uses that email, a password reset link will be sent.",
-} as const;
+import {
+  PASSWORD_RESET_NEUTRAL_RESPONSE,
+  PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS,
+  passwordResetTargetMs,
+  waitForPasswordResetFloor,
+} from "../../../../lib/account-recovery-request-policy";
 const headers = {
   "Cache-Control": "private, no-store",
   Pragma: "no-cache",
   "X-Content-Type-Options": "nosniff",
 };
-const requestFloorMinMs = 900;
-const requestFloorJitterMs = 300;
-
 function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, { status, headers });
-}
-
-function requestTargetMs(): number {
-  return requestFloorMinMs + randomInt(0, requestFloorJitterMs + 1);
-}
-
-async function floor(startedAt: number, targetMs: number) {
-  const remaining = targetMs - (performance.now() - startedAt);
-  if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
 }
 
 
 export async function POST(request: NextRequest) {
   const context = createRequestLogContext(request);
   const startedAt = performance.now();
-  const targetMs = requestTargetMs();
+  const targetMs = passwordResetTargetMs(
+    randomInt(0, PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS + 1),
+  );
   const parsed = requestPasswordResetSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return json(context, { error: "Enter a valid email address." }, 400);
@@ -46,8 +37,8 @@ export async function POST(request: NextRequest) {
       email: parsed.data.email,
       ip: getTrustedRequestIp(request),
     });
-    await floor(startedAt, targetMs);
-    return json(context, neutral, 202);
+    await waitForPasswordResetFloor(startedAt, targetMs);
+    return json(context, PASSWORD_RESET_NEUTRAL_RESPONSE, 202);
   } catch {
     // Missing dedicated keys or shared persistence failure makes recovery
     // unavailable for every address; do not expose account-specific detail.
@@ -57,7 +48,7 @@ export async function POST(request: NextRequest) {
       context,
       status: 503,
     });
-    await floor(startedAt, targetMs);
+    await waitForPasswordResetFloor(startedAt, targetMs);
     return json(context, { error: "Password reset is temporarily unavailable. Please try again later." }, 503);
   }
 }
