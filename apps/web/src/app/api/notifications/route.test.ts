@@ -17,10 +17,10 @@ const notificationRepository = vi.hoisted(() => ({
   markAsRead: vi.fn(async () => true),
   markAllAsRead: vi.fn(async () => undefined),
   getPreferences: vi.fn(async () => ({
-    follow: true,
-    content: true,
-    security: true,
-    system: true,
+    followsEnabled: true,
+    contentEnabled: true,
+    serverEnabled: true,
+    systemEnabled: true,
   })),
   updatePreferences: vi.fn(async (_userId, value) => value),
 }));
@@ -41,10 +41,15 @@ vi.mock("../../../lib/services/auth-service", () => ({
   },
 }));
 
-vi.mock("@nexus/db", () => ({
-  notificationRepository,
-  webPushSubscriptionRepository: pushRepository,
-}));
+vi.mock("@nexus/db", async () => {
+  // Keep the pure endpoint validator real without importing the database client.
+  const { parseWebPushEndpoint } = await import("../../../../../../packages/db/src/web-push-runtime");
+  return {
+    notificationRepository,
+    webPushSubscriptionRepository: pushRepository,
+    parseWebPushEndpoint,
+  };
+});
 
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({
@@ -63,7 +68,7 @@ vi.mock("@nexus/config", () => ({
 
 vi.mock("../../../lib/web-push-subscription", () => ({
   parseWebPushSubscription: vi.fn(() => ({
-    endpoint: "https://push.example.test/subscription",
+    endpoint: "https://push.example.net/subscription",
     p256dh: "p256dh",
     auth: "auth",
     expirationAt: null,
@@ -198,10 +203,10 @@ describe("notification API request correlation", () => {
         "/api/notifications/preferences",
         "PATCH",
         {
-          follow: true,
-          content: true,
-          security: true,
-          system: true,
+          followsEnabled: true,
+          contentEnabled: true,
+          serverEnabled: true,
+          systemEnabled: true,
         },
       ),
     );
@@ -232,7 +237,7 @@ describe("notification API request correlation", () => {
         "DELETE",
         {
           endpoint:
-            "https://push.example.test/subscription",
+            "https://push.example.net/subscription",
         },
       ),
     );

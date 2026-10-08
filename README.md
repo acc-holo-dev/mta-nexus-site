@@ -78,6 +78,11 @@ pnpm dev:host
 pnpm check
 pnpm nexus:doctor
 
+# dependency boundaries, unused-code report and production bundle report
+pnpm analyze:architecture
+pnpm analyze:unused
+pnpm analyze:bundle
+
 # focused public catalog, saved/library and admin-count checks (no local database)
 pnpm test:catalog
 

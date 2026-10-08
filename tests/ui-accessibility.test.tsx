@@ -12,7 +12,7 @@ describe("Input accessibility wiring", () => {
       <Input label="Email" error="Email is required" />,
     );
 
-    const id = markup.match(/<input[^>]*id="([^"]+)"/u)?.[1];
+    const id = markup.match(/<input[^>]*\sid="([^"]+)"/u)?.[1];
     expect(id).toBeTruthy();
     expect(markup).toContain(`for="${id}"`);
     expect(markup).toContain(`aria-describedby="${id}-error"`);

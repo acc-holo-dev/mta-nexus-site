@@ -27,6 +27,7 @@ export function Avatar({
   };
 
   return (
+    // biome-ignore lint/a11y/useAriaPropsSupportedByRole: The label and img role are both set only for the text fallback; the image supplies its own alt.
     <div
       role={!src || imageFailed ? "img" : undefined}
       aria-label={!src || imageFailed ? alt || fallback : undefined}

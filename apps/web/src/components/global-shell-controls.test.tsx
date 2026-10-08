@@ -39,7 +39,7 @@ describe("global shell controls behavior", () => {
     (locale) => {
       const dictionary = getDictionary(locale);
       const html = renderToStaticMarkup(
-        React.createElement(Navbar, { locale }),
+        <LocaleProvider locale={locale}><Navbar locale={locale} /></LocaleProvider>,
       );
 
       expect(html).toMatch(
@@ -56,11 +56,7 @@ describe("global shell controls behavior", () => {
     (locale) => {
       const dictionary = getDictionary(locale);
       const html = renderToStaticMarkup(
-        React.createElement(
-          LocaleProvider,
-          { locale },
-          React.createElement(AccountControls),
-        ),
+        <LocaleProvider locale={locale}><AccountControls /></LocaleProvider>,
       );
 
       expect(html).toContain('role="status"');
@@ -73,11 +69,7 @@ describe("global shell controls behavior", () => {
     (locale) => {
       const dictionary = getDictionary(locale);
       const html = renderToStaticMarkup(
-        React.createElement(
-          LocaleProvider,
-          { locale },
-          React.createElement(NotificationBell),
-        ),
+        <LocaleProvider locale={locale}><NotificationBell /></LocaleProvider>,
       );
 
       expect(html).toContain(
@@ -93,11 +85,7 @@ describe("global shell controls behavior", () => {
     "renders the theme control with an accessible localized name in %s",
     (locale) => {
       const html = renderToStaticMarkup(
-        React.createElement(
-          LocaleProvider,
-          { locale },
-          React.createElement(ThemeToggle),
-        ),
+        <LocaleProvider locale={locale}><ThemeToggle /></LocaleProvider>,
       );
       expect(html).toContain('type="button"');
       expect(html).toContain(

@@ -134,7 +134,6 @@ describe("build quarantine service behavior", () => {
     mocks.findBuild.mockResolvedValue(
       build({
         status: "quarantined",
-        quarantinePreviousStatus: "published",
         ...override,
       } as Partial<Build>),
     );

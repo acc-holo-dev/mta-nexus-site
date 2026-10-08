@@ -7,7 +7,7 @@ import {
   parseWebPushRetryAfter,
   prepareWebPushRequest,
   type WebPushHttpsRequest,
-} from "../apps/web/src/lib/services/web-push-http-sender";
+} from "../packages/db/src/web-push-runtime";
 
 function vapidConfig(): WebPushVapidConfig {
   const ecdh = createECDH("prime256v1");

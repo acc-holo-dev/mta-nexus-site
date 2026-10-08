@@ -19,9 +19,7 @@ vi.mock("next/link", async () => {
 describe("staff support queue UI", () => {
   it.each(["en", "ru"] as const)("localizes staff-only filters in %s", (locale) => {
     const copy = getDictionary(locale).support;
-    const staff = renderToStaticMarkup(React.createElement(
-      LocaleProvider, { locale }, React.createElement(SupportCenter, { staffMode: true }),
-    ));
+    const staff = renderToStaticMarkup(<LocaleProvider locale={locale}><SupportCenter staffMode /></LocaleProvider>);
     expect(staff).toContain(copy.staffFilters);
     expect(staff).toContain(copy.filterStatus);
     expect(staff).toContain(copy.allStatuses);
@@ -29,9 +27,7 @@ describe("staff support queue UI", () => {
     expect(staff).toContain('value="resolved"');
     expect(staff).toContain('value="payment"');
 
-    const customer = renderToStaticMarkup(React.createElement(
-      LocaleProvider, { locale }, React.createElement(SupportCenter),
-    ));
+    const customer = renderToStaticMarkup(<LocaleProvider locale={locale}><SupportCenter /></LocaleProvider>);
     expect(customer).not.toContain(copy.allStatuses);
     expect(customer).not.toContain(copy.allCategories);
   });

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
+  "workspaces": {
+    ".": {
+      // Operational scripts and browser/Node fixtures are invoked by CI and shell.
+      "entry": ["scripts/**/*.{mjs,ts}", "tests/**/*.test.{ts,tsx}", "playwright.ci.config.mjs"],
+      "project": ["scripts/**/*.{mjs,ts}", "tests/**/*.{ts,tsx}", "*.{mjs,cjs,ts}"],
+      // Browser checks install Playwright into an isolated prefix in the shell runners.
+      // dependency-cruiser loads its optional SWC parser dynamically.
+      "ignoreDependencies": ["@playwright/test", "@swc/core"],
+      // OpenSSL is an OS dependency of the closed TLS provider test.
+      "ignoreBinaries": ["openssl"]
+    },
+    "apps/web": {
+      "entry": ["scripts/**/*.ts"],
+      "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.ts"],
+      "next": true
+    },
+    "packages/*": {
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "packages/db": {
+      // The worker integration test starts this fixture through a computed fork path.
+      "entry": ["scripts/**/*.{ts,mjs}", "src/repositories/account-mail-worker.fixture.ts"],
+      "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mjs}"],
+      "drizzle": true
+    }
+  }
+}

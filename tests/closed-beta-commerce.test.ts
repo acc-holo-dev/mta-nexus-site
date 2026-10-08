@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
 
@@ -26,7 +27,7 @@ describe("closed-beta commerce behavior", () => {
   });
 
   it("fails paid checkout closed with a stable public code", async () => {
-    const response = await disabledCheckout();
+    const response = await disabledCheckout(new NextRequest("https://nexus.test/api/checkout", { method: "POST" }));
 
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({

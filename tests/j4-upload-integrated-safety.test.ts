@@ -147,7 +147,7 @@ describe("integrated J4 build upload safety contract", () => {
     expect(route).toContain('build.scanStatus !== "clean"');
     expect(route).toContain('"Cache-Control": "private, no-store"');
     expect(route).toContain('Vary: "Cookie"');
-    expect(route).toContain('"X-Content-SHA256": build.sha256Hash');
+    expect(route).toMatch(/"X-Content-SHA256":\s*build\.sha256Hash/u);
     expect(route).toContain("destroyOpenedStream(stored.stream)");
   });
 
@@ -166,7 +166,7 @@ describe("integrated J4 build upload safety contract", () => {
       "notes: z.string().trim().min(3).max(2000)",
     );
     expect(route).toContain('targetType === "build"');
-    expect(route).toContain("await productService.reviewBuild({");
+    expect(route).toMatch(/await productService\.reviewBuild\(\s*\{/u);
     expect(repository).toContain(
       "await tx.insert(auditEvents).values",
     );

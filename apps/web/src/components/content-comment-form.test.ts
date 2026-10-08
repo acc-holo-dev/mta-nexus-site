@@ -33,8 +33,8 @@ describe("content discussion form", () => {
       );
       const copy = getDictionary(locale).articles;
       expect(html).toContain(copy.joinDiscussion);
-      expect(html).toContain('minlength="2"');
-      expect(html).toContain('maxlength="5000"');
+      expect(html).toMatch(/minlength="2"/iu);
+      expect(html).toMatch(/maxlength="5000"/iu);
       expect(html).toContain('required=""');
       expect(html).toContain(copy.publishComment);
     },

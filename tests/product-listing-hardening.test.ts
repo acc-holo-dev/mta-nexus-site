@@ -13,9 +13,9 @@ describe("public product listing hardening", () => {
       "utf8"
     );
 
-    expect(route).toContain("Math.min(Math.max(Math.floor(requestedLimit), 1), 100)");
+    expect(route).toMatch(/Math\.min\(\s*Math\.max\(\s*Math\.floor\(requestedLimit\),\s*1,?\s*\),\s*100,?\s*\)/u);
     expect(route).toContain("stale-while-revalidate=120");
-    expect(route).toContain("limit,");
+    expect(route).toContain("pageSize: limit,");
     expect(service).toContain("limit?: number");
     expect(service).toContain("limit: filters.limit");
   });

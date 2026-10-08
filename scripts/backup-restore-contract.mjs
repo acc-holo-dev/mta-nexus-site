@@ -1,7 +1,16 @@
 import assert from "node:assert/strict";
+import { writeFileSync } from "node:fs";
 
 export const BACKUP_RESTORE_LABEL = "io.nexus.backup-restore-test";
 export const PRIVATE_BACKUP_FILE_MODE = 0o600;
+
+/** Reserve a private host-owned inode before a container writes the archive. */
+export function createPrivateBackupFile(path) {
+  writeFileSync(path, Buffer.alloc(0), {
+    flag: "wx",
+    mode: PRIVATE_BACKUP_FILE_MODE,
+  });
+}
 
 const PASSTHROUGH_ENV_KEYS = Object.freeze([
   "PATH",

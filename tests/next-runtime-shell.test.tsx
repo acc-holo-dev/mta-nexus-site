@@ -172,14 +172,9 @@ describe("Next.js root runtime shell behavior", () => {
     (locale) => {
       const dictionary = getDictionary(locale);
       const html = renderToStaticMarkup(
-        React.createElement(
-          LocaleProvider,
-          { locale },
-          React.createElement(ErrorPage, {
-            error: new Error("route"),
-            reset: () => undefined,
-          }),
-        ),
+        <LocaleProvider locale={locale}>
+          <ErrorPage error={new Error("route")} reset={() => undefined} />
+        </LocaleProvider>,
       );
 
       expect(html).toContain(`>${dictionary.errors.retry}</span>`);

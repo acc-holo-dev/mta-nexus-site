@@ -22,7 +22,6 @@
   },
   "overrides": [
     {
-      "name": "structured-api-logging",
       "includes": [
         "apps/web/src/app/api/**"
       ],

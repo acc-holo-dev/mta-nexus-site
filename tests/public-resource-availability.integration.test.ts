@@ -93,8 +93,8 @@ describe("public resource safe-build catalog scope", () => {
     await expectHidden();
   });
 
-  it("still hides a published product whose published build lacks scan provenance", async () => {
-    await buildRepository.create({
+  it("rejects a published clean build without scan provenance at the database boundary", async () => {
+    await expect(buildRepository.create({
       id: `bld_public_unsafe_${suffix}`,
       productId,
       version: "1.0.0",
@@ -105,8 +105,31 @@ describe("public resource safe-build catalog scope", () => {
       fileName: "public-unsafe.zip",
       mimeType: "application/zip",
       scanStatus: "clean",
-      scanner: null,
-      scannedAt: null,
+      isSigned: false,
+    })).rejects.toMatchObject({
+      cause: {
+        code: "23514",
+        constraint_name: "builds_clean_scan_provenance_check",
+      },
+    });
+
+    await expectHidden();
+  });
+
+  it("hides a product whose clean build is still awaiting review", async () => {
+    await buildRepository.create({
+      id: `bld_public_pending_${suffix}`,
+      productId,
+      version: "1.0.1",
+      status: "pending_review",
+      storageKey: `assets/test/public-pending-${suffix}.zip`,
+      sha256Hash: "c".repeat(64),
+      fileSizeBytes: 16,
+      fileName: "public-pending.zip",
+      mimeType: "application/zip",
+      scanStatus: "clean",
+      scanner: "integration-test",
+      scannedAt: new Date(),
       isSigned: false,
     });
 

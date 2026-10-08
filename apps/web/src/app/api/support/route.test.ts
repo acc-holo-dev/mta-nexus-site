@@ -86,6 +86,7 @@ function expectPrivate(response: Response) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  for (const mock of Object.values(mocks)) mock.mockReset();
   state.afterCallbacks.length = 0;
   mocks.session.mockResolvedValue(null);
   mocks.can.mockReturnValue(false);

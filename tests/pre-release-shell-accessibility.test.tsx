@@ -70,15 +70,11 @@ describe("pre-release shell accessibility behavior", () => {
     (locale) => {
       const dictionary = getDictionary(locale);
       const html = renderToStaticMarkup(
-        React.createElement(
-          NexusShell,
-          { locale },
-          React.createElement("h1", null, "Fixture"),
-        ),
+        <NexusShell locale={locale}><h1>Fixture</h1></NexusShell>,
       );
 
-      expect(html).toContain(
-        `href="#main-content">${dictionary.nav.skipToContent}</a>`,
+      expect(html).toMatch(
+        new RegExp(`<a[^>]*href="#main-content"[^>]*>${dictionary.nav.skipToContent}</a>`, "u"),
       );
       expect(html).toMatch(
         /<main[^>]*id="main-content"[^>]*tabindex="-1"/u,

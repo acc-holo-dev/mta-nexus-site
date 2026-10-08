@@ -267,7 +267,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
           )}
 
           {staffMode && (
-            <div className="nexus-panel grid gap-4 p-4 sm:grid-cols-2" role="group" aria-label={copy.staffFilters}>
+            <fieldset className="nexus-panel grid gap-4 p-4 sm:grid-cols-2" aria-label={copy.staffFilters}>
               <label className="block space-y-1.5">
                 <span className="font-label text-secondary">{copy.filterStatus}</span>
                 <select
@@ -300,7 +300,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
                   ))}
                 </select>
               </label>
-            </div>
+            </fieldset>
           )}
 
           <section className="space-y-3">

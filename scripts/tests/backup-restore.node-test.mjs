@@ -1,8 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   BACKUP_RESTORE_LABEL,
   assertOwnedVolume,
+  createPrivateBackupFile,
   extractBackupRestoreSpec,
   makePostgresFixture,
 } from "../backup-restore-contract.mjs";
@@ -113,10 +117,21 @@ test("destructive cleanup ownership requires the exact label and volume name", (
   );
 });
 
-test("uploads archive is host-owned before container tar opens it", async () => {
-  const { readFile } = await import("node:fs/promises");
-  const script = await readFile(new URL("../check-backup-restore.mjs", import.meta.url), "utf8");
-  const create = script.indexOf('writeFileSync(uploadsBackup, Buffer.alloc(0), { flag: "wx", mode: 0o600 })');
-  assert.ok(create > 0);
-  assert.ok(create < script.indexOf('tar -C /data -czf /backup/uploads.tar.gz'));
+test("reserves a private host-owned archive without overwriting existing data", () => {
+  const root = mkdtempSync(join(tmpdir(), "nexus-backup-contract-"));
+  const archive = join(root, "uploads.tar.gz");
+  try {
+    createPrivateBackupFile(archive);
+    const info = statSync(archive);
+    assert.equal(info.size, 0);
+    if (process.platform !== "win32") {
+      assert.equal(info.mode & 0o777, 0o600);
+      assert.equal(info.uid, process.getuid());
+    }
+    writeFileSync(archive, "existing backup");
+    assert.throws(() => createPrivateBackupFile(archive), { code: "EEXIST" });
+    assert.equal(readFileSync(archive, "utf8"), "existing backup");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

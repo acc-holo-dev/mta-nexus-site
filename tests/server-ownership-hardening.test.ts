@@ -78,8 +78,8 @@ describe("server ownership hardening surface", () => {
     expect(route).toContain('"Cache-Control": "private, no-store"');
     expect(route).toContain("Vary: \"Cookie\"");
     expect(route).toContain("headers: privateHeaders");
-    expect(route).toContain("return json({ requests });");
-    expect(route).toContain("return json({ error: \"Unauthorized\" }, 401)");
+    expect(route).toContain("return json(context, { requests });");
+    expect(route).toMatch(/return json\(\s*context,\s*\{ error: "Unauthorized" \},\s*401,?\s*\)/u);
   });
 
   it("does not claim automatic proof or live-ownership acceptance", () => {

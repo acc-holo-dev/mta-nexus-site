@@ -142,7 +142,7 @@ export function createServiceWorkerHarness(
     clearTimeout,
   });
 
-  async function dispatchFetch(request: ServiceWorkerRequest) {
+  async function dispatchFetch(request: ServiceWorkerRequest): Promise<{ intercepted: boolean; response: unknown }> {
     const listener = listeners.get("fetch");
     if (!listener) throw new Error("Service worker did not register fetch");
 

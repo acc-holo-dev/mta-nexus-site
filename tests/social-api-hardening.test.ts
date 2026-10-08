@@ -9,7 +9,7 @@ describe("social API hardening", () => {
       "utf8"
     );
 
-    expect((route.match(/consumeRateLimit\("follow", user\.id\)/g) || []).length).toBe(2);
+    expect((route.match(/consumeRateLimit\(\s*"follow",\s*user\.id,?\s*\)/gu) || []).length).toBe(2);
     expect(route).toContain("Cannot follow yourself");
     expect(route).toContain("Target does not exist");
     expect(route).toContain('product.status === "published"');
@@ -20,7 +20,7 @@ describe("social API hardening", () => {
       "utf8"
     );
     expect(repository).toContain(".onConflictDoNothing()");
-    expect(route).toContain("if (!follow)");
+    expect(route).toContain("if (!created)");
   });
 
   it("turns malformed abuse-report bodies into a validation response", () => {

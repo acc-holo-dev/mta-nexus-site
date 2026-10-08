@@ -59,6 +59,7 @@ describe("product review repository integration", () => {
       currency: "USD",
       licenseModel: "unlimited",
       tags: [],
+      compatibility: {},
       currentVersion: "1.0.0",
       ratingAverage: 0,
       ratingCount: 0,

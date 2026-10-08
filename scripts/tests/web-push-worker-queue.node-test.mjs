@@ -37,14 +37,15 @@ function run(payload) {
 }
 
 test("returns zero and aggregate diagnostics for a healthy queue", () => {
-  const result = run(snapshot());
+  const payload = snapshot();
+  const result = run(payload);
   assert.equal(result.status, 0);
   const value = JSON.parse(result.stdout);
   assert.equal(value.status, "ok");
   assert.deepEqual(value.reasons, []);
   assert.equal(
     value.heartbeatAt,
-    snapshot().heartbeatAt,
+    payload.heartbeatAt,
   );
   assert.equal(
     value.progressStaleAfterMs,

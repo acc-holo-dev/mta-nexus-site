@@ -44,7 +44,7 @@ vi.mock("@nexus/ui", () => ({
   }: {
     alt: string;
     fallback: string;
-  }) => <span aria-label={alt}>{fallback}</span>,
+  }) => <span role="img" aria-label={alt}>{fallback}</span>,
   EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
 }));
 

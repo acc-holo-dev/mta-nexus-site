@@ -51,7 +51,7 @@ const sender = createWebPushHttpSender(config, {
 });
 
 const statuses = [];
-let retryAfterMs;
+let retryAfterMs: number | undefined;
 for (const status of [201, 410, 503]) {
   const result = await sender(
         {
@@ -92,5 +92,5 @@ try {
 }
 
 process.stdout.write(
-  JSON.stringify({ statuses, timeoutRejected }) + "\n",
+  JSON.stringify({ statuses, timeoutRejected, retryAfterMs }) + "\n",
 );

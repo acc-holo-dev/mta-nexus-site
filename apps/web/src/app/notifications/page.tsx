@@ -234,11 +234,11 @@ export default function NotificationCenterPage() {
         </div>
       )}
 
-      <div
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: A tabpanel must be keyboard-focusable when its content has no focusable target. */}
+      <div tabIndex={0}
         id={resultsPanelId}
         role="tabpanel"
         aria-labelledby={`${tabIdPrefix}-${filter}`}
-        tabIndex={0}
         className="space-y-3"
       >
         {loading ? (

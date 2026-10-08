@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import path from "node:path";
-import { getStorageProvider } from "./index";
+import { getStorageProvider } from "./provider-factory";
 import { generateId } from "@nexus/security";
 import { MAX_UPLOAD_FILE_SIZE_BYTES, ValidationError } from "@nexus/domain";
 import type { StorageObjectMeta } from "./types";

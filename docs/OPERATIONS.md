@@ -81,7 +81,51 @@ pnpm release:verify
 - `pnpm test:tooling`: standalone Node suites. Compose validators that require rendered JSON remain owned by their infrastructure harnesses.
 - `pnpm test`: both Vitest projects; `pnpm check` and `pnpm release:verify` retain the full local release path.
 
-Only `CI` starts on push/PR. Ordinary code changes run lint, types, both test projects,
+### Code analysis
+
+| Command | Purpose | Result |
+| --- | --- | --- |
+| `pnpm analyze:architecture` | Check package boundaries, cycles and unresolved imports with dependency-cruiser | Required in the CI unit job; violations fail the command. |
+| `pnpm analyze:unused` | Find unused files, dependencies and exports with Knip | Review report; findings return exit code 1. The remaining review is tracked in PROBLEMS. |
+| `pnpm analyze:bundle` | Analyze the production bundle with the pinned Next.js Turbopack analyzer | Writes `apps/web/.next/diagnostics/analyze/`; generated output stays out of git. |
+
+Run these from the repository root after `pnpm install --frozen-lockfile`, or use
+`docker compose -p nexus-local -f compose.yaml exec app pnpm <command>` in DEV.
+To explore the bundle interactively, run
+`pnpm --filter @nexus/web exec next experimental-analyze` without `--output`.
+The experimental CLI is verified against the pinned Next.js 16.3.5; this does
+not add a separate bundler plugin or runtime dependency.
+
+The architecture check covers application/package source and operational package
+scripts, excluding tests, dependencies and generated output. Package `src/`
+cannot import the application; `domain` cannot depend on other workspace layers;
+`ui` cannot import server packages. CI fixture scripts may orchestrate the app.
+Type-only imports remain part of the graph. SWC is explicitly installed and
+selected because dependency-cruiser 18.5 does not support the TypeScript 7 compiler
+API. Its generic `missing-typescript-transpiler` warning still appears with SWC;
+do not downgrade the project compiler to silence it. The initial JSON report
+was checked against all 313 matching source files: none were missing (336 graph
+modules, 1001 dependencies). Recheck coverage when changing parser options.
+
+Knip entries include shell-invoked scripts and the forked mail-worker fixture.
+The externally installed Playwright runner, OS OpenSSL binary and dynamically
+loaded SWC parser are documented exceptions. Findings are not auto-deleted and
+Knip is not a blocking CI gate until the remaining public-export review is done.
+The web workspace no longer declares unused `clsx`/`tailwind-merge`; `@nexus/ui`
+still owns the dependencies it actually imports.
+
+Local verification for this tooling slice used Node 26.10.0 and pnpm 12.4.2:
+1261 unit tests in 218 files and 159 tooling checks passed; typecheck passed;
+lint had no errors (36 warnings and 28 informational diagnostics remain).
+The analyzer produced a report, and the architecture check passed. PostgreSQL,
+Docker and browser acceptance were unavailable in this environment, so database
+fixture corrections still require the full exact-SHA CI run. See PROBLEMS for
+hosted-runner and release acceptance blockers.
+
+References: [Knip configuration](https://knip.dev/reference/configuration),
+[dependency-cruiser options](https://github.com/sverweij/dependency-cruiser/blob/main/doc/options-reference.md).
+
+Only `CI` starts on push/PR. Ordinary code changes run lint, types, architecture checks, both test projects,
 one cached production-image build and a short registration/logout/directory browser smoke.
 Browser and infrastructure consumers load the exact same SHA-labelled image; a missing
 or mismatched transfer fails instead of rebuilding or pulling an unverified image.
@@ -283,7 +327,7 @@ Codex should execute the stages below in order. Each stage must leave `main` bet
 #### Stage 1 — Repository hygiene and single-main enforcement — DONE 2026-09-29
 
 - ~~delete all non-`main` remote branches after the safety check above~~ — deleted 2026-09-29 (see 7.3.A);
-- workspace metadata verified: no temporary planning or abandoned artifact files remain (`packages/db/src/seed-extra.ts` is an intentionally untracked local demo seed, kept out of git);
+- workspace metadata was reviewed during the original hygiene pass; the later Knip review flags the tracked `packages/db/src/seed-extra.ts` for an explicit keep/remove decision (see PROBLEMS);
 - `README.md`, the three operational root documents and `docs/handbook/` are the maintained prose surfaces; dated ad-hoc audit evidence still does not live in the repository (enforced by `tests/mainline-repository-policy.test.ts`);
 - package manifests and workspace metadata consistent with the current beta version.
 

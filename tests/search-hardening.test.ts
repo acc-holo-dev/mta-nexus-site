@@ -9,12 +9,12 @@ describe("public search hardening", () => {
       "utf8"
     );
 
-    expect(route).toContain('consumeRateLimit("search", getTrustedRequestIp(request))');
+    expect(route).toMatch(/consumeRateLimit\(\s*"search",\s*getTrustedRequestIp\(request\),?\s*\)/u);
     expect(route).not.toContain("getClientIp(request.headers)");
     expect(route).toContain("MAX_QUERY_LENGTH");
     expect(route).toContain("SEARCH_TYPES");
     expect(route).toContain("Unknown search type");
-    expect(route).toContain("Math.min(Math.max(Math.floor(requestedLimit), 1), DEFAULT_LIMIT)");
+    expect(route).toMatch(/Math\.min\(\s*Math\.max\(\s*Math\.floor\(requestedLimit\),\s*1,?\s*\),\s*DEFAULT_LIMIT,?\s*\)/u);
     expect(route).toContain("stale-while-revalidate=60");
   });
 

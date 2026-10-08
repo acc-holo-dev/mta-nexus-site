@@ -5,6 +5,8 @@ import { classifyTests } from "./scripts/test-projects.mjs";
 const testFiles = classifyTests(__dirname);
 
 export default defineConfig({
+  // Match Next.js: JSX uses the automatic React runtime, including shared packages.
+  esbuild: { jsx: "automatic" },
   test: {
     globals: true,
     // Standalone builds copy source tests; never execute those generated copies.

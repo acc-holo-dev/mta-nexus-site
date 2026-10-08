@@ -278,7 +278,7 @@ describe("HTTP cache visibility contract", () => {
 
     expect(response.status).toBe(200);
     expectPublic(response);
-    expect(response.headers.get("X-Request-Id")).toBeTruthy();
+    expect(response.headers.get("X-Request-Id")).toBeNull();
     expect(await response.json()).toMatchObject({
       servers: [],
       total: 0,

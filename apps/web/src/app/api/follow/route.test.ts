@@ -146,7 +146,7 @@ describe("social and notification HTTP state contract", () => {
 
   it("confirms a committed follow before best-effort notification delivery", async () => {
     state.notificationFails = true;
-    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const log = vi.spyOn(console, "warn").mockImplementation(() => {});
     try {
       const response = await follow(
         makeRequest(

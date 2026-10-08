@@ -330,7 +330,7 @@ describe("MTA directory outage cache", () => {
 
       vi.setSystemTime(new Date("2026-09-27T00:15:01Z"));
       await expect(mtaMasterDirectoryService.getDirectory())
-        .rejects.toThrow("upstream unavailable");
+        .rejects.toThrow("MTA master-list endpoints are unavailable");
       expect(fetchMock).toHaveBeenCalledTimes(4);
     } finally {
       vi.unstubAllGlobals();

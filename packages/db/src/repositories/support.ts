@@ -26,7 +26,8 @@ export type SupportMutationKey = {
 };
 
 export type SupportMutationReplay =
-  | { kind: "missing" | "key_conflict" }
+  | { kind: "missing" }
+  | { kind: "key_conflict" }
   | { kind: "replayed"; supportCase: SupportCase; message?: SupportCaseMessage };
 
 class StaleSupportMutation extends Error {
@@ -41,7 +42,8 @@ export type SupportCaseMutationResult =
 
 export type SupportReplyMutationResult =
   | { kind: "created" | "replayed"; supportCase: SupportCase; message: SupportCaseMessage }
-  | { kind: "key_conflict" | "stale" };
+  | { kind: "key_conflict" }
+  | { kind: "stale" };
 
 export type StaffSupportFilters = {
   status?: SupportCaseStatus;

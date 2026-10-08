@@ -6,6 +6,7 @@ packages:
 # not trigger pnpm's automatic dependency installation before running.
 verifyDepsBeforeRun: warn
 allowBuilds:
+  '@swc/core': true
   esbuild: true
 overrides:
   "@esbuild-kit/core-utils>esbuild": "0.28.2"

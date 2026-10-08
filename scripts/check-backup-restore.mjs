@@ -23,6 +23,7 @@ import {
   assertOwnedVolume,
   createBackupRestoreEnvironment,
   createBackupRestoreResult,
+  createPrivateBackupFile,
   extractBackupRestoreSpec,
   makePostgresFixture,
   registerCreatedVolume,
@@ -385,10 +386,7 @@ function run() {
     const uploadsBackup = join(temp, "uploads.tar.gz");
     // Create on the host first: container tar truncates this inode without
     // transferring ownership to root, so the runner can verify private mode.
-    writeFileSync(uploadsBackup, Buffer.alloc(0), {
-      flag: "wx",
-      mode: PRIVATE_BACKUP_FILE_MODE,
-    });
+    createPrivateBackupFile(uploadsBackup);
     docker([
       "run",
       "--rm",

@@ -6,7 +6,7 @@ import { beforeEach, afterEach, expect, it, vi } from "vitest";
 import { LocalStorageProvider } from "../packages/storage/src/local-provider";
 
 const state = vi.hoisted(() => ({ provider: null as LocalStorageProvider | null, next: 0 }));
-vi.mock("../packages/storage/src/index", () => ({
+vi.mock("../packages/storage/src/provider-factory", () => ({
   getStorageProvider: () => {
     if (!state.provider) throw new Error("Test storage not initialized");
     return state.provider;

@@ -145,7 +145,7 @@ export async function PATCH(
     let expectedUpdatedAt: Date | undefined;
     if (revision !== null) {
       if (
-        !/^"d{4}-d{2}-d{2}Td{2}:d{2}:d{2}.d{3}Z"$/u.test(
+        !/^"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z"$/u.test(
           revision,
         )
       ) {

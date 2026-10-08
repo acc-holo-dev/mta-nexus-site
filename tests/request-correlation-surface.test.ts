@@ -8,7 +8,6 @@ describe("request correlation lint policy", () => {
       readFileSync(resolve(process.cwd(), "biome.json"), "utf8"),
     ) as {
       overrides?: Array<{
-        name?: string;
         includes?: string[];
         linter?: {
           rules?: {
@@ -21,7 +20,7 @@ describe("request correlation lint policy", () => {
     };
 
     const policy = config.overrides?.find(
-      (override) => override.name === "structured-api-logging",
+      (override) => override.includes?.includes("apps/web/src/app/api/**"),
     );
 
     expect(policy).toBeTruthy();
