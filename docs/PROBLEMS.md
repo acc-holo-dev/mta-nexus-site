@@ -264,7 +264,10 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   по мере изменения функций. Content API/publication/moderation/feed source policies
   теперь заменены HTTP/service/schema behaviors: cache/auth/rate-limit, server-derived
   status authority, organization access, moderation CAS/audit и published detail/feed
-  separation;
+  separation. Product review authority/integrity source checks также удалены:
+  HTTP behavior покрывает auth/manager/entitlement/conflict boundaries, а
+  PostgreSQL integration теперь проверяет concurrent aggregate serialization,
+  DB uniqueness и fail-closed unpublished state;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере
