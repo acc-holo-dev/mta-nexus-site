@@ -1,6 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { getDictionary, resolveLocale } from "../apps/web/src/lib/i18n";
 
 describe("RU/EN shell foundation", () => {
@@ -50,18 +48,4 @@ describe("RU/EN shell foundation", () => {
     expect(getDictionary("en").workspaceContext.retry).toBe("Try again");
   });
 
-  it("keeps mobile navigation and locale switching in the global shell", () => {
-    const shell = readFileSync(
-      resolve(process.cwd(), "apps/web/src/components/nexus-shell.tsx"),
-      "utf8",
-    );
-    const layout = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/layout.tsx"),
-      "utf8",
-    );
-
-    expect(shell).toContain("<MobileNav locale={locale} />");
-    expect(layout).toContain("<NexusShell locale={locale}>");
-    expect(layout).toContain("<html lang={locale}");
-  });
 });

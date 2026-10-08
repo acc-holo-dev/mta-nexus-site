@@ -110,6 +110,21 @@ describe("Next.js root runtime shell behavior", () => {
     runtime.locale = "en";
   });
 
+  it.each(["en", "ru"] as const)(
+    "propagates %s locale through the root document and shell",
+    async (locale) => {
+      runtime.locale = locale;
+      const element = await RootLayout({
+        children: React.createElement("p", null, "Child"),
+      });
+      const html = renderToStaticMarkup(element);
+
+      expect(html).toMatch(new RegExp(`^<html lang="${locale}"`, "u"));
+      expect(html).toContain(`data-shell-locale="${locale}"`);
+      expect(html).toContain('data-pwa="registered"');
+    },
+  );
+
   it("renders a beforeInteractive theme bootstrap that applies stored/system preference", async () => {
     const element = await RootLayout({
       children: React.createElement("p", null, "Child"),
