@@ -38,6 +38,11 @@ const validResourceInput = {
   compatibility: { dependencies: [] },
 };
 
+function expectPrivate(response: Response) {
+  expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+  expect(response.headers.get("Vary")).toBe("Cookie");
+}
+
 function request(body: unknown) {
   return new NextRequest("http://nexus.test/api/products", {
     method: "POST",
@@ -60,6 +65,7 @@ describe("resource creation HTTP errors", () => {
     const response = await POST(request({}));
 
     expect(response.status).toBe(400);
+    expectPrivate(response);
     expect(await response.json()).toMatchObject({
       code: "PRODUCT_METADATA_INVALID",
     });
@@ -82,6 +88,7 @@ describe("resource creation HTTP errors", () => {
     const response = await POST(request(validResourceInput));
 
     expect(response.status).toBe(409);
+    expectPrivate(response);
     expect(await response.json()).toEqual({
       error: "A resource with this slug already exists",
       code: "PRODUCT_SLUG_EXISTS",

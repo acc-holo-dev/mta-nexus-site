@@ -80,6 +80,11 @@ import { POST as follow, DELETE as unfollow } from "../apps/web/src/app/api/foll
 import { POST as markRead } from "../apps/web/src/app/api/notifications/mark-read/route";
 import { GET as listNotifications } from "../apps/web/src/app/api/notifications/route";
 
+function expectPrivate(response: Response) {
+  expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+  expect(response.headers.get("Vary")).toBe("Cookie");
+}
+
 const makeRequest = (path: string, method: string, body?: string) =>
   new NextRequest(`http://nexus.test${path}`, {
     method,
@@ -109,7 +114,7 @@ describe("social and notification HTTP state contract", () => {
         ),
       );
       expect(response.status).toBe(200);
-      expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+      expectPrivate(response);
       expect(await response.json()).toMatchObject({
         success: true,
         targetType: "user",
@@ -169,7 +174,7 @@ describe("social and notification HTTP state contract", () => {
     for (const body of ["not-json", "null", '{"id":null}', '{"unexpected":true}']) {
       const response = await markRead(makeRequest("/api/notifications/mark-read", "POST", body));
       expect(response.status).toBe(400);
-      expect(response.headers.get("Vary")).toBe("Cookie");
+      expectPrivate(response);
     }
     expect(markAll).not.toHaveBeenCalled();
     expect(markSingle).not.toHaveBeenCalled();
@@ -191,6 +196,7 @@ describe("social and notification HTTP state contract", () => {
 
     const bulk = await markRead(makeRequest("/api/notifications/mark-read", "POST"));
     expect(bulk.status).toBe(200);
+    expectPrivate(bulk);
     expect(await bulk.json()).toEqual({ success: true, scope: "all" });
     expect(markAll).toHaveBeenCalledWith("usr_1");
   });

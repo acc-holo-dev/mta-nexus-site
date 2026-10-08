@@ -71,6 +71,11 @@ vi.mock("@nexus/security", () => ({
 import { NextRequest } from "next/server";
 import { POST } from "../apps/web/src/app/api/admin/actions/route";
 
+function expectPrivate(response: Response) {
+  expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+  expect(response.headers.get("Vary")).toBe("Cookie");
+}
+
 function request(
   targetType: "product" | "report",
   targetId: string,
@@ -112,6 +117,7 @@ describe("moderation action integrity", () => {
       );
 
       expect(response.status).toBe(404);
+      expectPrivate(response);
       expect(await response.json()).toEqual({
         error: "Product not found",
       });
@@ -133,6 +139,7 @@ describe("moderation action integrity", () => {
       request("product", "prd_missing", "suspend"),
     );
     expect(missing.status).toBe(404);
+    expectPrivate(missing);
     expect(await missing.json()).toEqual({
       error: "Product not found",
     });
@@ -145,6 +152,7 @@ describe("moderation action integrity", () => {
       request("product", "prd_existing", "suspend"),
     );
     expect(stale.status).toBe(409);
+    expectPrivate(stale);
     expect(await stale.json()).toMatchObject({
       code: "PRODUCT_STATE_CHANGED",
     });

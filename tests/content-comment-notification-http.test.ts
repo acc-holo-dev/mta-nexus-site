@@ -80,6 +80,11 @@ vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
 import { NextRequest } from "next/server";
 import { POST } from "../apps/web/src/app/api/content/[slug]/comments/route";
 
+function expectPrivate(response: Response) {
+  expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+  expect(response.headers.get("Vary")).toBe("Cookie");
+}
+
 function request() {
   return new NextRequest(
     "https://nexus.test/api/content/article-one/comments",
@@ -107,6 +112,7 @@ describe("article comment notification side effects", () => {
     });
 
     expect(response.status).toBe(201);
+    expectPrivate(response);
     expect(addComment).toHaveBeenCalledOnce();
     expect(afterMock).toHaveBeenCalledOnce();
     expect(dispatchNotifications).not.toHaveBeenCalled();
@@ -127,6 +133,7 @@ describe("article comment notification side effects", () => {
     });
 
     expect(response.status).toBe(201);
+    expectPrivate(response);
     expect(afterMock).not.toHaveBeenCalled();
   });
 });
