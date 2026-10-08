@@ -54,11 +54,11 @@
     "push:provider:verify": "node scripts/check-web-push-provider-evidence.mjs"
   },
   "devDependencies": {
-    "@types/node": "^26.6.2",
+    "@types/node": "^26.6.4",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.1",
-    "@biomejs/biome": "2.5.14",
+    "vitest": "^5.0.3",
+    "@biomejs/biome": "2.5.15",
     "drizzle-orm": "^0.45.3",
     "next": "16.3.5"
   },
