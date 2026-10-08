@@ -1,3 +1,4 @@
+import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
@@ -28,7 +29,7 @@ describe("content discussion form", () => {
     (locale) => {
       state.locale = locale;
       const html = renderToStaticMarkup(
-        <ContentCommentForm slug="hello world/one" />,
+        createElement(ContentCommentForm, { slug: "hello world/one" }),
       );
       const copy = getDictionary(locale).articles;
       expect(html).toContain(copy.joinDiscussion);
