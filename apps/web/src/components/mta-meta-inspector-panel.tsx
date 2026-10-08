@@ -7,7 +7,7 @@ import { useNexusLocale } from "./locale-context";
 import { getMtaVersionTargetSuggestion } from "../lib/mta-version-target";
 import { getMtaMetaInspectorIssueMessage } from "../lib/mta-meta-inspector-messages";
 
-type InspectionResponse = {
+export type InspectionResponse = {
   inspection?: {
     byteLength: number;
     info: Record<string, string> | null;
@@ -44,8 +44,43 @@ type InspectionResponse = {
   code?: string;
 };
 
-const MAX_META_BYTES = 256 * 1024;
-const MAX_META_ENTRY_PREVIEW = 20;
+export const metaInspectorClientPolicy = Object.freeze({
+  maxBytes: 256 * 1024,
+  previewEntries: 20,
+  requestTimeoutMs: 10_000,
+  fileAccept: ".xml,text/xml,text/plain",
+});
+
+export function metaInspectorPreview<T>(
+  entries: readonly T[],
+): readonly T[] {
+  return entries.slice(0, metaInspectorClientPolicy.previewEntries);
+}
+
+export async function requestMtaMetaInspection(
+  source: string,
+  fetcher: typeof fetch = fetch,
+): Promise<{
+  response: Response;
+  data: InspectionResponse | null;
+}> {
+  const response = await fetcher("/api/resources/inspect-meta", {
+    method: "POST",
+    cache: "no-store",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+    },
+    body: source,
+    signal: AbortSignal.timeout(
+      metaInspectorClientPolicy.requestTimeoutMs,
+    ),
+  });
+  const data = (await response.json().catch(() => null)) as
+    | InspectionResponse
+    | null;
+  return { response, data };
+}
 
 export function MtaMetaInspectorPanel({
   onApplyMinimumVersion,
@@ -75,23 +110,14 @@ export function MtaMetaInspectorPanel({
     setResult(null);
 
     try {
-      if (file.size > MAX_META_BYTES) {
+      if (file.size > metaInspectorClientPolicy.maxBytes) {
         setResult({ error: copy.tooLarge });
         return;
       }
 
       const source = await file.text();
-      const response = await fetch("/api/resources/inspect-meta", {
-        method: "POST",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { "Content-Type": "text/plain; charset=utf-8" },
-        body: source,
-        signal: AbortSignal.timeout(10_000),
-      });
-      const data = (await response.json().catch(() => null)) as
-        | InspectionResponse
-        | null;
+      const { response, data } =
+        await requestMtaMetaInspection(source);
 
       if (!response.ok || !data) {
         setResult({ error: responseError(data) });
@@ -139,7 +165,7 @@ export function MtaMetaInspectorPanel({
           <span className="text-xs text-secondary">{copy.fileLabel}</span>
           <input
             type="file"
-            accept=".xml,text/xml,text/plain"
+            accept={metaInspectorClientPolicy.fileAccept}
             onChange={(event) => {
               setFile(event.target.files?.[0] ?? null);
               setResult(null);
@@ -315,7 +341,7 @@ export function MtaMetaInspectorPanel({
                     String(
                       Math.min(
                         inspection.aclRights.length,
-                        MAX_META_ENTRY_PREVIEW,
+                        metaInspectorClientPolicy.previewEntries,
                       ),
                     ),
                   ).replace("{total}", String(inspection.aclRights.length))}
@@ -323,7 +349,7 @@ export function MtaMetaInspectorPanel({
               </div>
               <ul className="grid gap-1.5 sm:grid-cols-2">
                 {withOccurrenceKeys(
-                  inspection.aclRights.slice(0, MAX_META_ENTRY_PREVIEW),
+                  metaInspectorPreview(inspection.aclRights),
                   (right) => JSON.stringify([right.name, right.access]),
                 ).map(({ key, item: right }) => (
                     <li
@@ -362,7 +388,7 @@ export function MtaMetaInspectorPanel({
                     .replace(
                       "{shown}",
                       String(
-                        Math.min(inspection.exports.length, MAX_META_ENTRY_PREVIEW),
+                        Math.min(inspection.exports.length, metaInspectorClientPolicy.previewEntries),
                       ),
                     )
                     .replace("{total}", String(inspection.exports.length))}
@@ -370,7 +396,7 @@ export function MtaMetaInspectorPanel({
               </div>
               <ul className="grid gap-1.5 sm:grid-cols-2">
                 {withOccurrenceKeys(
-                  inspection.exports.slice(0, MAX_META_ENTRY_PREVIEW),
+                  metaInspectorPreview(inspection.exports),
                   (entry) => JSON.stringify([entry.function, entry.type, entry.http]),
                 ).map(({ key, item: entry }) => (
                     <li

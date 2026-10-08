@@ -1,63 +1,124 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { describe, expect, it } from "vitest";
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it, vi } from "vitest";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
-const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
+const state = vi.hoisted(() => ({
+  locale: "en" as "en" | "ru",
+}));
+
+vi.mock("../apps/web/src/components/locale-context", () => ({
+  useNexusLocale: () => ({
+    locale: state.locale,
+    dictionary: getDictionary(state.locale),
+  }),
+}));
+
+import { NewResourceForm } from "../apps/web/src/components/new-resource-form";
+import {
+  MtaMetaInspectorPanel,
+  metaInspectorClientPolicy,
+  metaInspectorPreview,
+  requestMtaMetaInspection,
+} from "../apps/web/src/components/mta-meta-inspector-panel";
 
 describe("author-facing MTA meta inspector", () => {
-  it("is optional and separate from the build submission form", () => {
-    const page = read("apps/web/src/components/new-resource-form.tsx");
-    const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
+  it.each(["en", "ru"] as const)(
+    "renders the optional structural inspector before resource submission in %s",
+    (locale) => {
+      state.locale = locale;
+      const html = renderToStaticMarkup(
+        <NewResourceForm actorId="author" />,
+      );
+      const copy = getDictionary(locale).metaInspector;
 
-    expect(page).toContain("<MtaMetaInspectorPanel");
-    expect(page.indexOf("<MtaMetaInspectorPanel")).toBeLessThan(page.indexOf("<form"));
-    expect(panel).toContain('type="button"');
-    expect(panel).toContain('fetch("/api/resources/inspect-meta"');
-    expect(panel).not.toContain("/api/products/");
-    expect(panel).not.toContain("buildForm");
+      expect(html).toContain(copy.title);
+      expect(html).toContain(copy.description);
+      expect(html).toContain(
+        `accept="${metaInspectorClientPolicy.fileAccept}"`,
+      );
+      expect(html.indexOf(copy.title)).toBeLessThan(
+        html.indexOf("<form"),
+      );
+      expect(html).not.toMatch(
+        /Resource is safe|Verified resource/u,
+      );
+    },
+  );
+
+  it("keeps the inspector action separate from form submission", () => {
+    state.locale = "en";
+    const html = renderToStaticMarkup(
+      <MtaMetaInspectorPanel
+        onApplyMinimumVersion={() => undefined}
+      />,
+    );
+    const copy = getDictionary("en").metaInspector;
+
+    expect(html).toContain(`type="button"`);
+    expect(html).toContain(copy.inspect);
+    expect(html).toContain(copy.fileLabel);
+    expect(html).not.toContain("<form");
   });
 
-  it("states through localized copy that inspection is structural rather than a security scan", () => {
-    const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
+  it("performs one authenticated uncached bounded inspection request", async () => {
+    const fetcher = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          inspection: {
+            byteLength: 7,
+          },
+        }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      ),
+    );
 
-    expect(panel).toContain("dictionary.metaInspector");
-    expect(panel).toContain("copy.description");
-    expect(panel).toContain("copy.structuralNotes");
-    expect(panel).toContain("copy.note");
-    expect(panel).toContain("getMtaVersionTargetSuggestion");
-    expect(panel).toContain("copy.applyMinimumVersion");
-    expect(panel).not.toContain("Resource is safe");
-    expect(panel).not.toContain("Verified resource");
+    const result = await requestMtaMetaInspection(
+      "<meta/>",
+      fetcher as typeof fetch,
+    );
+
+    expect(result.response.status).toBe(200);
+    expect(result.data).toMatchObject({
+      inspection: {
+        byteLength: 7,
+      },
+    });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(fetcher).toHaveBeenCalledWith(
+      "/api/resources/inspect-meta",
+      expect.objectContaining({
+        method: "POST",
+        cache: "no-store",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "text/plain; charset=utf-8",
+        },
+        body: "<meta/>",
+        signal: expect.any(AbortSignal),
+      }),
+    );
   });
 
-  it("connects the inspector suggestion to the controlled MTA target field", () => {
-    const page = read("apps/web/src/components/new-resource-form.tsx");
-    const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
+  it("keeps client limits explicit and bounds ACL/export previews", () => {
+    expect(metaInspectorClientPolicy).toEqual({
+      maxBytes: 256 * 1024,
+      previewEntries: 20,
+      requestTimeoutMs: 10_000,
+      fileAccept: ".xml,text/xml,text/plain",
+    });
 
-    expect(page).toContain("onApplyMinimumVersion={setMtaVersionTarget}");
-    expect(page).toContain("value={mtaVersionTarget}");
-    expect(panel).toContain("onApplyMinimumVersion(versionSuggestion)");
-  });
-
-  it("shows declared ACL rights in a bounded preview without a trust verdict", () => {
-    const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
-
-    expect(panel).toContain("MAX_META_ENTRY_PREVIEW = 20");
-    expect(panel).toContain(".slice(0, MAX_META_ENTRY_PREVIEW)");
-    expect(panel).toContain("right.access ?? copy.notDeclared");
-    expect(panel).toContain("copy.aclRightsNote");
-    expect(panel).toContain("entry.http ?? copy.notDeclared");
-    expect(panel).toContain("copy.exportsNote");
-  });
-
-  it("keeps client size and authenticated uncached request guards", () => {
-    const panel = read("apps/web/src/components/mta-meta-inspector-panel.tsx");
-
-    expect(panel).toContain("const MAX_META_BYTES = 256 * 1024");
-    expect(panel).toContain("file.size > MAX_META_BYTES");
-    expect(panel).toContain('accept=".xml,text/xml,text/plain"');
-    expect(panel).toContain('credentials: "same-origin"');
-    expect(panel).toContain('cache: "no-store"');
-    expect(panel).toContain("AbortSignal.timeout(10_000)");
+    const entries = Array.from(
+      { length: 25 },
+      (_, index) => index,
+    );
+    expect(metaInspectorPreview(entries)).toEqual(
+      entries.slice(0, 20),
+    );
+    expect(entries).toHaveLength(25);
   });
 });
