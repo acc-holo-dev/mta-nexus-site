@@ -128,6 +128,21 @@ test("rejects impossible queue counters and invalid capacity", () => {
     0,
   );
   assert.notEqual(
+    run(
+      healthy({
+        queuePending: 101,
+        queueDue: 100,
+        queueCapacity: 100,
+        queueAlert: "alert",
+        queueAlertReasons: [
+          "capacity_pressure",
+          "due_backlog",
+        ],
+      }),
+    ),
+    0,
+  );
+  assert.notEqual(
     run(healthy({ queueLeased: 5, queuePending: 4 })),
     0,
   );

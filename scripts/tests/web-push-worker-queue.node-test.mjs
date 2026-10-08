@@ -93,3 +93,45 @@ test("fails queue probe when worker heartbeat is fresh but loop progress is stal
     1,
   );
 });
+
+
+test("reports an alert, not invalid state, at exactly full queue capacity", () => {
+  const result = run(
+    snapshot({
+      queuePending: 100,
+      queueDue: 100,
+      queueLeased: 0,
+      queueCapacity: 100,
+      queueAlert: "alert",
+      queueAlertReasons: [
+        "capacity_pressure",
+        "due_backlog",
+      ],
+    }),
+  );
+  assert.equal(result.status, 2);
+  const value = JSON.parse(result.stdout);
+  assert.equal(value.status, "alert");
+  assert.deepEqual(value.reasons, [
+    "capacity_pressure",
+    "due_backlog",
+  ]);
+});
+
+test("fails closed when queue counters exceed configured capacity", () => {
+  assert.equal(
+    run(
+      snapshot({
+        queuePending: 101,
+        queueDue: 100,
+        queueCapacity: 100,
+        queueAlert: "alert",
+        queueAlertReasons: [
+          "capacity_pressure",
+          "due_backlog",
+        ],
+      }),
+    ).status,
+    1,
+  );
+});
