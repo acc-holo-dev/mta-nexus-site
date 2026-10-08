@@ -35,7 +35,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v7
       with:
-        node-version: 26.0.0
+        node-version-file: .nvmrc
     - name: Classify changes
       id: scope
       run: node scripts/ci-policy.mjs
@@ -57,7 +57,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v7
       with:
-        node-version: 26.0.0
+        node-version-file: .nvmrc
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
@@ -111,7 +111,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v7
       with:
-        node-version: 26.0.0
+        node-version-file: .nvmrc
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
@@ -304,7 +304,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v7
       with:
-        node-version: 26.0.0
+        node-version-file: .nvmrc
     - name: Restore shared production image by exact commit
       uses: actions/cache/restore@v4
       with:
@@ -347,7 +347,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v7
       with:
-        node-version: 26.0.0
+        node-version-file: .nvmrc
     - name: Check persistence test isolation
       run: node --test scripts/tests/postgres-persistence.node-test.mjs
     - name: Recreate PostgreSQL with its named volume
@@ -435,7 +435,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v7
       with:
-        node-version: 26.0.0
+        node-version-file: .nvmrc
     - name: Verify backup restore isolation contract
       run: node --test scripts/tests/backup-restore.node-test.mjs scripts/tests/backup-restore-surface.node-test.mjs
     - name: Rehearse database and uploads backup restore
@@ -463,7 +463,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v7
       with:
-        node-version: 26.0.0
+        node-version-file: .nvmrc
     - name: Restore shared production image by exact commit
       uses: actions/cache/restore@v4
       with:
@@ -527,7 +527,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v7
       with:
-        node-version: 26.0.0
+        node-version-file: .nvmrc
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
@@ -621,7 +621,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v7
       with:
-        node-version: 26.0.0
+        node-version-file: .nvmrc
     - name: Require every gate for the selected scope
       env:
         CI_CODE: ${{ needs.plan.outputs.code }}
