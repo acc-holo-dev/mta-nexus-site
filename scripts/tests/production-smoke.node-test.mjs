@@ -12,10 +12,31 @@ const project = 'nexus-prod-ci-11111111-1111-1111-1111-111111111111';
 const fixture = () => ({
   name: project,
   services: {
-    app: { restart: 'no', build: { target: 'runtime' }, environment: {
-      NODE_ENV: 'production', NEXT_PUBLIC_APP_URL: 'https://nexus-ci.test',
-      BUILD_SCANNER: 'clamav', EMAIL_PROVIDER: 'disabled',
-    }, volumes: [{ type: 'volume', source: 'uploads' }] },
+    app: {
+      image: 'nexus-ci:test',
+      restart: 'no',
+      build: { target: 'runtime' },
+      environment: {
+        NODE_ENV: 'production',
+        NEXT_PUBLIC_APP_URL: 'https://nexus-ci.test',
+        BUILD_SCANNER: 'clamav',
+        EMAIL_PROVIDER: 'disabled',
+      },
+      volumes: [{ type: 'volume', source: 'uploads' }],
+    },
+    'push-worker': {
+      image: 'nexus-ci:test',
+      restart: 'no',
+      user: 'node',
+      read_only: true,
+      init: true,
+      cap_drop: ['ALL'],
+      security_opt: ['no-new-privileges:true'],
+      pids_limit: 128,
+      stop_signal: 'SIGTERM',
+      stop_grace_period: '1m15s',
+      tmpfs: ['/tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777'],
+    },
     postgres: { restart: 'no' }, clamav: { restart: 'no' },
     caddy: { restart: 'no', ports: [
       { host_ip: '127.0.0.1', published: '8080', target: 80 },
@@ -41,6 +62,13 @@ test('rejects public ports, external volumes and development mode', () => {
     c => { c.services.app.environment.NODE_ENV = 'development'; },
     c => { c.services.postgres.ports = [{ target: 5432 }]; },
     c => { c.services.app.network_mode = 'host'; },
+    c => { c.services['push-worker'].image = 'different-image:test'; },
+    c => { c.services['push-worker'].read_only = false; },
+    c => { c.services['push-worker'].cap_drop = []; },
+    c => { c.services['push-worker'].security_opt = []; },
+    c => { c.services['push-worker'].pids_limit = 512; },
+    c => { c.services['push-worker'].stop_grace_period = '10s'; },
+    c => { c.services['push-worker'].tmpfs = []; },
   ]) {
     const c = fixture(); mutate(c);
     assert.throws(() => assertIsolatedProduction(c, project, '/tmp/test/Caddyfile'));
