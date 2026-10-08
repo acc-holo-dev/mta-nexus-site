@@ -131,6 +131,46 @@ assert.equal(value.status, 'ok');
 assert.equal(value.configured, false);
 assert.equal(value.queuePending, 0);
 NODE
+if [[ $browser_only == false ]]; then
+phase=push-worker-supervisor-recovery
+app_before=$("${pc[@]}" ps -q app)
+postgres_before=$("${pc[@]}" ps -q postgres)
+worker_before=$("${pc[@]}" ps -q push-worker)
+restart_before=$(docker inspect --format '{{.RestartCount}}' "$worker_before")
+health_pid_before=$("${pc[@]}" exec -T push-worker node --input-type=module -e "import {readFileSync} from 'node:fs'; const h=JSON.parse(readFileSync('/tmp/nexus-web-push-worker-health.json','utf8')); process.stdout.write(String(h.pid));")
+worker_child=$(docker top "$worker_before" -eo pid,args | awk '/run-web-push-dispatcher\.ts/ {print $1; exit}')
+[[ $worker_child =~ ^[0-9]+$ && $worker_child -gt 1 ]]
+sudo kill -KILL "$worker_child"
+
+recovered=0
+for attempt in $(seq 1 120); do
+  sleep 0.25
+  worker_now=$("${pc[@]}" ps -q push-worker 2>/dev/null || true)
+  [[ -n $worker_now ]] || continue
+  restart_now=$(docker inspect --format '{{.RestartCount}}' "$worker_now" 2>/dev/null || echo 0)
+  if [[ $restart_now -le $restart_before ]]; then continue; fi
+  if "${pc[@]}" exec -T push-worker node /app/scripts/check-web-push-worker-health.mjs >/dev/null 2>&1; then
+    health_pid_after=$("${pc[@]}" exec -T push-worker node --input-type=module -e "import {readFileSync} from 'node:fs'; const h=JSON.parse(readFileSync('/tmp/nexus-web-push-worker-health.json','utf8')); process.stdout.write(String(h.pid));")
+    if [[ $health_pid_after != "$health_pid_before" ]]; then
+      recovered=1
+      break
+    fi
+  fi
+done
+[[ $recovered == 1 ]]
+[[ $("${pc[@]}" ps -q app) == "$app_before" ]]
+[[ $("${pc[@]}" ps -q postgres) == "$postgres_before" ]]
+"${pc[@]}" exec -T push-worker node /app/scripts/check-web-push-worker-queue.mjs > "$work/push-queue-after-restart.json"
+node --input-type=module - "$work/push-queue-after-restart.json" <<'NODE'
+import assert from 'node:assert/strict'; import { readFileSync } from 'node:fs';
+const value = JSON.parse(readFileSync(process.argv[2], 'utf8'));
+assert.equal(value.status, 'ok');
+assert.equal(value.queuePending, 0);
+assert.equal(value.queueDue, 0);
+assert.equal(value.queueLeased, 0);
+NODE
+echo 'PASS: push-worker process crash is supervised, restarted and healthy without restarting app/postgres'
+fi
 phase=private-ports
 for service in app push-worker postgres clamav; do
   id=$("${pc[@]}" ps -q "$service")
@@ -264,6 +304,7 @@ fi
   echo 'PASS: standalone HTTP runtime, deployed migration runtime, no runtime pnpm, non-root app, private ports and writable storage.'
   if [[ $browser_only == false ]]; then
     echo 'PASS: production Caddy body boundary, replacement and retained probes.'
+    echo 'PASS: push-worker process crash is supervised and recovers health without restarting app/postgres.'
     echo 'PASS: rejected invalid secret, HTTP URL, disabled scanner and failing migration; database 503 and recovery.'
   else
     echo 'Browser-only startup: infrastructure failure rehearsals are delegated to the production infrastructure job.'

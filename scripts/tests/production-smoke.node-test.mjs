@@ -26,7 +26,7 @@ const fixture = () => ({
     },
     'push-worker': {
       image: 'nexus-ci:test',
-      restart: 'no',
+      restart: 'unless-stopped',
       user: 'node',
       environment: { HOME: '/tmp', TMPDIR: '/tmp' },
       read_only: true,
@@ -71,6 +71,7 @@ test('rejects public ports, external volumes and development mode', () => {
     c => { c.services['push-worker'].pids_limit = 512; },
     c => { c.services['push-worker'].stop_grace_period = '10s'; },
     c => { c.services['push-worker'].tmpfs = []; },
+    c => { c.services['push-worker'].restart = 'no'; },
   ]) {
     const c = fixture(); mutate(c);
     assert.throws(() => assertIsolatedProduction(c, project, '/tmp/test/Caddyfile'));

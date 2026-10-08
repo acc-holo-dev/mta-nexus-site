@@ -62,7 +62,15 @@ export function assertIsolatedProduction(config, project, caddyFile) {
   assert(pushWorker.tmpfs?.some((entry) => String(entry).startsWith('/tmp:')));
   for (const [name, service] of Object.entries(config.services)) {
     assert(!service.privileged && !service.container_name && !service.network_mode);
-    assert.equal(service.restart, 'no');
+    if (name === 'push-worker') {
+      assert.equal(
+        service.restart,
+        'unless-stopped',
+        'CI must preserve the production push-worker supervisor policy',
+      );
+    } else {
+      assert.equal(service.restart, 'no');
+    }
     if (name !== 'caddy') assert.equal(service.ports?.length || 0, 0);
     for (const mount of service.volumes || []) {
       if (mount.type === 'volume') assert(config.volumes[mount.source]);
