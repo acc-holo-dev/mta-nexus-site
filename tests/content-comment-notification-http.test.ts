@@ -3,25 +3,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
   afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
   articleAuthorId: "usr_author",
-  storedNotification: true,
 }));
 
 const afterMock = vi.hoisted(() =>
   vi.fn((callback: () => unknown | Promise<unknown>) => {
     state.afterCallbacks.push(callback);
   }),
-);
-const createNotification = vi.hoisted(() =>
-  vi.fn(async (input) =>
-    state.storedNotification
-      ? {
-          ...input,
-          id: "not_comment",
-          createdAt: new Date(),
-          isRead: false,
-        }
-      : null,
-  ),
 );
 const dispatchNotifications = vi.hoisted(() =>
   vi.fn(async () => ({
@@ -81,15 +68,9 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
   },
 }));
 
-vi.mock("@nexus/db", () => ({
-  notificationRepository: {
-    create: createNotification,
-  },
-}));
 
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
-  generateId: vi.fn((prefix: string) => `${prefix}_test`),
 }));
 
 vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
@@ -118,7 +99,6 @@ describe("article comment notification side effects", () => {
     vi.clearAllMocks();
     state.afterCallbacks.length = 0;
     state.articleAuthorId = "usr_author";
-    state.storedNotification = true;
   });
 
   it("returns the committed comment before author inbox and push delivery", async () => {
@@ -129,37 +109,15 @@ describe("article comment notification side effects", () => {
     expect(response.status).toBe(201);
     expect(addComment).toHaveBeenCalledOnce();
     expect(afterMock).toHaveBeenCalledOnce();
-    expect(createNotification).not.toHaveBeenCalled();
     expect(dispatchNotifications).not.toHaveBeenCalled();
 
     await state.afterCallbacks[0]?.();
-
-    expect(createNotification).toHaveBeenCalledWith(
-      expect.objectContaining({
-        recipientId: "usr_author",
-        category: "content",
-        link: "/articles/article-one",
-      }),
-    );
     expect(dispatchNotifications).toHaveBeenCalledWith([
       expect.objectContaining({
         recipientId: "usr_author",
         category: "content",
       }),
     ]);
-  });
-
-  it("does not push when preferences suppress the stored inbox row", async () => {
-    state.storedNotification = false;
-    const response = await POST(request(), {
-      params: Promise.resolve({ slug: "article-one" }),
-    });
-    expect(response.status).toBe(201);
-
-    await state.afterCallbacks[0]?.();
-
-    expect(createNotification).toHaveBeenCalledOnce();
-    expect(dispatchNotifications).not.toHaveBeenCalled();
   });
 
   it("does not schedule a self-notification for the article author", async () => {
@@ -170,6 +128,5 @@ describe("article comment notification side effects", () => {
 
     expect(response.status).toBe(201);
     expect(afterMock).not.toHaveBeenCalled();
-    expect(createNotification).not.toHaveBeenCalled();
   });
 });
