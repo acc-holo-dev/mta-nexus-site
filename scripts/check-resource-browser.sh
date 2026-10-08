@@ -9,6 +9,17 @@ source "$(dirname "$0")/check-production-startup.sh"
 
 export NEXUS_BROWSER_BASE_URL="https://$domain:8443"
 export NEXUS_BROWSER_HOME="$work/resource-browser-home"
+
+contract_json=$(node scripts/resource-browser-acceptance.mjs)
+seed_initial_entitlements=$(CONTRACT_JSON="$contract_json" node -e 'const c=JSON.parse(process.env.CONTRACT_JSON); process.stdout.write(String(c.fixture.initialEntitlements))')
+seed_product_status=$(CONTRACT_JSON="$contract_json" node -e 'const c=JSON.parse(process.env.CONTRACT_JSON); process.stdout.write(c.fixture.productStatus)')
+seed_build_status=$(CONTRACT_JSON="$contract_json" node -e 'const c=JSON.parse(process.env.CONTRACT_JSON); process.stdout.write(c.fixture.buildStatus)')
+seed_scan_status=$(CONTRACT_JSON="$contract_json" node -e 'const c=JSON.parse(process.env.CONTRACT_JSON); process.stdout.write(c.fixture.scanStatus)')
+expected_claims=$(CONTRACT_JSON="$contract_json" node -e 'const c=JSON.parse(process.env.CONTRACT_JSON); process.stdout.write(String(c.postconditions.entitlements))')
+expected_sales=$(CONTRACT_JSON="$contract_json" node -e 'const c=JSON.parse(process.env.CONTRACT_JSON); process.stdout.write(String(c.postconditions.salesCount))')
+mapfile -t browser_specs < <(
+  CONTRACT_JSON="$contract_json" node -e 'const c=JSON.parse(process.env.CONTRACT_JSON); for (const spec of c.playwrightSpecs) console.log(spec)'
+)
 mkdir -p "$NEXUS_BROWSER_HOME/.pki/nssdb" "$NEXUS_BROWSER_REPORT_DIR"
 certutil -d "sql:$NEXUS_BROWSER_HOME/.pki/nssdb" -N --empty-password
 certutil -d "sql:$NEXUS_BROWSER_HOME/.pki/nssdb" -A -n nexus-resource-ci -t 'C,,' -i "$work/root.crt"
@@ -70,7 +81,7 @@ INSERT INTO products (
   '$product_slug',
   'Disposable resource for the real claim-to-download browser journey.',
   'script',
-  'published',
+  '$seed_product_status',
   '$author_id',
   0,
   'USD',
@@ -126,13 +137,13 @@ INSERT INTO builds (
   '$product_id',
   '1.0.0',
   'Disposable J5 browser fixture.',
-  'published',
+  '$seed_build_status',
   '$storage_key',
   '$expected_sha',
   $file_size,
   'j5-browser-resource.zip',
   'application/zip',
-  'clean',
+  '$seed_scan_status',
   'browser-fixture',
   now(),
   false,
@@ -190,17 +201,17 @@ for role in developer moderator; do
   sql "UPDATE users SET role = '$role' WHERE email = '$account_email';" > /dev/null
 done
 
+initial_claims=$(sql "SELECT count(*) FROM entitlements WHERE resource_id = '$product_id' AND permission = 'product.download';")
+[[ "$initial_claims" == "$seed_initial_entitlements" ]]
+
 "$NEXUS_BROWSER_TOOLS/node_modules/.bin/playwright" test \
   --config=playwright.ci.config.mjs \
-  scripts/tests/resource-claim-download.playwright.mjs \
-  scripts/tests/author-workspace.playwright.mjs \
-  scripts/tests/shell-accessibility.playwright.mjs \
-  scripts/tests/public-portfolio.playwright.mjs
+  "${browser_specs[@]}"
 
 claims=$(sql "SELECT count(*) FROM entitlements WHERE resource_id = '$product_id' AND permission = 'product.download';")
-[[ "$claims" == 1 ]]
+[[ "$claims" == "$expected_claims" ]]
 sales=$(sql "SELECT sales_count FROM products WHERE id = '$product_id';")
-[[ "$sales" == 1 ]]
+[[ "$sales" == "$expected_sales" ]]
 
 echo "PASS: J5 browser claimed one entitlement, incremented library additions once and downloaded the seeded build"
 
