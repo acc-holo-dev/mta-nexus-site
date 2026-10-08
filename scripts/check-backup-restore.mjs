@@ -17,9 +17,15 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   BACKUP_RESTORE_LABEL,
+  PRIVATE_BACKUP_FILE_MODE,
+  assertBackupRestoreEvidence,
+  assertDisposableRunnerPolicy,
   assertOwnedVolume,
+  createBackupRestoreEnvironment,
+  createBackupRestoreResult,
   extractBackupRestoreSpec,
   makePostgresFixture,
+  registerCreatedVolume,
 } from "./backup-restore-contract.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -29,28 +35,10 @@ function sha256(path) {
 }
 
 function requireDisposableRunner() {
-  assert.equal(
-    process.env.GITHUB_ACTIONS,
-    "true",
-    "Backup/restore rehearsal requires GitHub Actions",
-  );
-  assert.equal(
-    process.env.RUNNER_ENVIRONMENT,
-    "github-hosted",
-    "Backup/restore rehearsal requires a disposable GitHub-hosted runner",
-  );
-  assert(
-    !process.env.DOCKER_HOST,
-    "Remote Docker hosts are not allowed",
-  );
-  assert(
-    !process.env.DOCKER_CONTEXT,
-    "Alternate Docker contexts are not allowed",
-  );
   const context = execFileSync("docker", ["context", "show"], {
     encoding: "utf8",
   }).trim();
-  assert.equal(context, "default", "Only the default local Docker context is allowed");
+  assertDisposableRunnerPolicy(process.env, context);
 }
 
 function run() {
@@ -58,32 +46,9 @@ function run() {
 
   const temp = mkdtempSync(join(tmpdir(), "nexus-backup-restore-"));
   const emptyEnv = join(temp, "empty.env");
-  writeFileSync(emptyEnv, "", { mode: 0o600 });
+  writeFileSync(emptyEnv, "", { mode: PRIVATE_BACKUP_FILE_MODE });
 
-  const env = Object.fromEntries(
-    [
-      "PATH",
-      "HOME",
-      "USER",
-      "TMPDIR",
-      "DOCKER_CONFIG",
-      "XDG_RUNTIME_DIR",
-      "SSL_CERT_FILE",
-      "SSL_CERT_DIR",
-    ]
-      .filter((key) => process.env[key] !== undefined)
-      .map((key) => [key, process.env[key]]),
-  );
-  Object.assign(env, {
-    COMPOSE_DISABLE_ENV_FILE: "true",
-    DOMAIN: "backup-restore.invalid",
-    ACME_EMAIL: "ci@backup-restore.invalid",
-    AUTH_SECRET: "disposable-backup-restore-auth-secret",
-    TRUSTED_PROXY_SECRET: "disposable-backup-restore-proxy-secret",
-    POSTGRES_USER: "nexus",
-    POSTGRES_DB: "mta_nexus",
-    POSTGRES_PASSWORD: "disposable-config-render-only",
-  });
+  const env = createBackupRestoreEnvironment(process.env);
 
   function docker(args, options = {}) {
     try {
@@ -127,17 +92,7 @@ function run() {
 
   const createdVolumes = [];
   const projects = [];
-  const result = {
-    status: "FAIL",
-    sourceDestroyedBeforeRestore: false,
-    backupChecksumsVerified: false,
-    databaseRowsRestored: false,
-    applicationSchemaRestored: false,
-    applicationRowsRestored: false,
-    migrationLedgerRestored: false,
-    uploadFilesRestored: false,
-    cleanupComplete: false,
-  };
+  const result = createBackupRestoreResult();
 
   function createOwnedVolume(name, token) {
     const existing = String(
@@ -156,8 +111,7 @@ function run() {
 
     // Register cleanup immediately after Docker reports success. Any later
     // assertion must still leave finally() able to remove this exact volume.
-    createdVolumes.push({ name, token });
-    assert.equal(created, name);
+    registerCreatedVolume(createdVolumes, name, token, created);
 
     const inspected = JSON.parse(
       String(docker(["volume", "inspect", name])),
@@ -420,7 +374,7 @@ function run() {
       ],
       { encoding: null },
     );
-    writeFileSync(dbBackup, dump, { mode: 0o600 });
+    writeFileSync(dbBackup, dump, { mode: PRIVATE_BACKUP_FILE_MODE });
     assert(statSync(dbBackup).size > 0, "Database dump is empty");
     assert.equal(
       statSync(dbBackup).mode & 0o777,
@@ -431,7 +385,10 @@ function run() {
     const uploadsBackup = join(temp, "uploads.tar.gz");
     // Create on the host first: container tar truncates this inode without
     // transferring ownership to root, so the runner can verify private mode.
-    writeFileSync(uploadsBackup, Buffer.alloc(0), { flag: "wx", mode: 0o600 });
+    writeFileSync(uploadsBackup, Buffer.alloc(0), {
+      flag: "wx",
+      mode: PRIVATE_BACKUP_FILE_MODE,
+    });
     docker([
       "run",
       "--rm",
@@ -449,7 +406,7 @@ function run() {
       "tar -C /data -czf /backup/uploads.tar.gz .",
     ]);
     assert(statSync(uploadsBackup).size > 0, "Uploads archive is empty");
-    chmodSync(uploadsBackup, 0o600);
+    chmodSync(uploadsBackup, PRIVATE_BACKUP_FILE_MODE);
     assert.equal(
       statSync(uploadsBackup).mode & 0o777,
       0o600,
@@ -637,6 +594,15 @@ function run() {
       });
 
     if (!result.cleanupComplete) result.status = "FAIL";
+
+    if (result.status === "PASS") {
+      try {
+        assertBackupRestoreEvidence(result);
+      } catch (error) {
+        result.status = "FAIL";
+        result.error = error.message;
+      }
+    }
 
     console.log(JSON.stringify(result, null, 2));
     result.sha = process.env.GITHUB_SHA ?? null;

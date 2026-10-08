@@ -1,6 +1,98 @@
 import assert from "node:assert/strict";
 
 export const BACKUP_RESTORE_LABEL = "io.nexus.backup-restore-test";
+export const PRIVATE_BACKUP_FILE_MODE = 0o600;
+
+const PASSTHROUGH_ENV_KEYS = Object.freeze([
+  "PATH",
+  "HOME",
+  "USER",
+  "TMPDIR",
+  "DOCKER_CONFIG",
+  "XDG_RUNTIME_DIR",
+  "SSL_CERT_FILE",
+  "SSL_CERT_DIR",
+]);
+
+export const BACKUP_RESTORE_EVIDENCE_FLAGS = Object.freeze([
+  "sourceDestroyedBeforeRestore",
+  "backupChecksumsVerified",
+  "databaseRowsRestored",
+  "applicationSchemaRestored",
+  "applicationRowsRestored",
+  "migrationLedgerRestored",
+  "uploadFilesRestored",
+  "cleanupComplete",
+]);
+
+export function assertDisposableRunnerPolicy(env, dockerContext) {
+  assert.equal(
+    env.GITHUB_ACTIONS,
+    "true",
+    "Backup/restore rehearsal requires GitHub Actions",
+  );
+  assert.equal(
+    env.RUNNER_ENVIRONMENT,
+    "github-hosted",
+    "Backup/restore rehearsal requires a disposable GitHub-hosted runner",
+  );
+  assert(!env.DOCKER_HOST, "Remote Docker hosts are not allowed");
+  assert(!env.DOCKER_CONTEXT, "Alternate Docker contexts are not allowed");
+  assert.equal(
+    dockerContext,
+    "default",
+    "Only the default local Docker context is allowed",
+  );
+}
+
+export function createBackupRestoreEnvironment(sourceEnv = process.env) {
+  const env = Object.fromEntries(
+    PASSTHROUGH_ENV_KEYS
+      .filter((key) => sourceEnv[key] !== undefined)
+      .map((key) => [key, sourceEnv[key]]),
+  );
+
+  return {
+    ...env,
+    COMPOSE_DISABLE_ENV_FILE: "true",
+    DOMAIN: "backup-restore.invalid",
+    ACME_EMAIL: "ci@backup-restore.invalid",
+    AUTH_SECRET: "disposable-backup-restore-auth-secret",
+    TRUSTED_PROXY_SECRET: "disposable-backup-restore-proxy-secret",
+    POSTGRES_USER: "nexus",
+    POSTGRES_DB: "mta_nexus",
+    POSTGRES_PASSWORD: "disposable-config-render-only",
+  };
+}
+
+export function registerCreatedVolume(
+  registry,
+  name,
+  token,
+  createdName,
+) {
+  registry.push({ name, token });
+  assert.equal(createdName, name, "Docker returned an unexpected volume name");
+}
+
+export function createBackupRestoreResult() {
+  return {
+    status: "FAIL",
+    ...Object.fromEntries(
+      BACKUP_RESTORE_EVIDENCE_FLAGS.map((flag) => [flag, false]),
+    ),
+  };
+}
+
+export function assertBackupRestoreEvidence(result) {
+  for (const flag of BACKUP_RESTORE_EVIDENCE_FLAGS) {
+    assert.equal(
+      result[flag],
+      true,
+      `Backup/restore evidence is incomplete: ${flag}`,
+    );
+  }
+}
 
 export function extractBackupRestoreSpec(config) {
   const postgres = config.services?.postgres;

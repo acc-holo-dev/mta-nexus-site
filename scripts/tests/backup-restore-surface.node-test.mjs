@@ -1,88 +1,204 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import {
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 import test from "node:test";
+import {
+  BACKUP_RESTORE_EVIDENCE_FLAGS,
+  BACKUP_RESTORE_LABEL,
+  PRIVATE_BACKUP_FILE_MODE,
+  assertBackupRestoreEvidence,
+  assertDisposableRunnerPolicy,
+  assertOwnedVolume,
+  createBackupRestoreEnvironment,
+  createBackupRestoreResult,
+  extractBackupRestoreSpec,
+  makePostgresFixture,
+  registerCreatedVolume,
+} from "../backup-restore-contract.mjs";
 
-const read = (path) => readFileSync(resolve(process.cwd(), path), "utf8");
+test("backup restore policy accepts only a disposable local GitHub-hosted runner", () => {
+  assert.doesNotThrow(() =>
+    assertDisposableRunnerPolicy(
+      {
+        GITHUB_ACTIONS: "true",
+        RUNNER_ENVIRONMENT: "github-hosted",
+      },
+      "default",
+    ),
+  );
 
-function expectSourceOrder(source, needles) {
-  let previous = -1;
-  for (const needle of needles) {
-    const index = source.indexOf(needle);
-    assert(index > previous, `Expected source order for: ${needle}`);
-    previous = index;
+  for (const [env, context] of [
+    [{ GITHUB_ACTIONS: "false", RUNNER_ENVIRONMENT: "github-hosted" }, "default"],
+    [{ GITHUB_ACTIONS: "true", RUNNER_ENVIRONMENT: "self-hosted" }, "default"],
+    [
+      {
+        GITHUB_ACTIONS: "true",
+        RUNNER_ENVIRONMENT: "github-hosted",
+        DOCKER_HOST: "tcp://remote.example:2376",
+      },
+      "default",
+    ],
+    [
+      {
+        GITHUB_ACTIONS: "true",
+        RUNNER_ENVIRONMENT: "github-hosted",
+        DOCKER_CONTEXT: "remote",
+      },
+      "default",
+    ],
+    [{ GITHUB_ACTIONS: "true", RUNNER_ENVIRONMENT: "github-hosted" }, "desktop-linux"],
+  ]) {
+    assert.throws(() => assertDisposableRunnerPolicy(env, context));
   }
-}
-
-test("backup restore rehearsal refuses non-disposable Docker environments", () => {
-  const script = read("scripts/check-backup-restore.mjs");
-
-  assert.match(script, /process\.env\.GITHUB_ACTIONS/u);
-  assert.match(script, /process\.env\.RUNNER_ENVIRONMENT/u);
-  assert.match(script, /process\.env\.DOCKER_HOST/u);
-  assert.match(script, /process\.env\.DOCKER_CONTEXT/u);
-  assert.match(script, /docker", \["context", "show"\]/u);
-  assert.match(script, /Only the default local Docker context is allowed/u);
 });
 
-test("backup restore rehearsal never targets repository or production volume names directly", () => {
-  const script = read("scripts/check-backup-restore.mjs");
+test("backup restore environment is explicit and does not inherit repository/application secrets", () => {
+  const env = createBackupRestoreEnvironment({
+    PATH: "/usr/bin",
+    HOME: "/home/runner",
+    DATABASE_URL: "postgres://must-not-leak",
+    WEB_PUSH_VAPID_PRIVATE_KEY: "must-not-leak",
+    SMTP_PASSWORD: "must-not-leak",
+  });
 
-  assert.match(script, /randomUUID\(\)/u);
-  assert.match(script, /BACKUP_RESTORE_LABEL/u);
-  assert.match(script, /assertOwnedVolume/u);
-  assert.match(script, /"volume", "rm", name/u);
-  assert.doesNotMatch(script, /docker\s+volume\s+prune/u);
-  assert.doesNotMatch(script, /down", "--volumes/u);
+  assert.equal(env.PATH, "/usr/bin");
+  assert.equal(env.HOME, "/home/runner");
+  assert.equal(env.COMPOSE_DISABLE_ENV_FILE, "true");
+  assert.equal(env.DOMAIN, "backup-restore.invalid");
+  assert.equal(env.POSTGRES_USER, "nexus");
+  assert.equal(env.POSTGRES_DB, "mta_nexus");
+  assert.equal("DATABASE_URL" in env, false);
+  assert.equal("WEB_PUSH_VAPID_PRIVATE_KEY" in env, false);
+  assert.equal("SMTP_PASSWORD" in env, false);
 });
 
-test("new volumes enter the cleanup registry before post-create validation", () => {
-  const script = read("scripts/check-backup-restore.mjs");
-  const createStart = script.indexOf("function createOwnedVolume");
-  const createEnd = script.indexOf("function removeOwnedVolume", createStart);
-  const section = script.slice(createStart, createEnd);
+test("created volumes enter cleanup ownership before later validation can fail", () => {
+  const registry = [];
 
-  expectSourceOrder(section, [
-    "docker([",
-    '"volume",',
-    '"create",',
-    "createdVolumes.push({ name, token })",
-    "assert.equal(created, name)",
-    'docker(["volume", "inspect", name])',
-    "assertOwnedVolume(inspected, name, token)",
+  assert.throws(() =>
+    registerCreatedVolume(
+      registry,
+      "expected-volume",
+      "token-1",
+      "unexpected-volume",
+    ),
+  );
+  assert.deepEqual(registry, [
+    { name: "expected-volume", token: "token-1" },
   ]);
 });
 
-test("rehearsal covers migrated application database and private uploads transfer", () => {
-  const script = read("scripts/check-backup-restore.mjs");
+test("volume ownership labels prevent deleting unrelated Docker volumes", () => {
+  assert.doesNotThrow(() =>
+    assertOwnedVolume(
+      {
+        Name: "owned-volume",
+        Labels: { [BACKUP_RESTORE_LABEL]: "token-1" },
+      },
+      "owned-volume",
+      "token-1",
+    ),
+  );
 
-  assert.match(script, /packages", "db", "migrations/u);
-  assert.match(script, /readdirSync\(migrationsDir\)/u);
-  assert.match(script, /ON_ERROR_STOP=1/u);
-  assert.match(script, /sourceSchemaFingerprint/u);
-  assert.match(script, /restoredSchemaFingerprint/u);
-  assert.match(script, /assert\.deepEqual\(/u);
-  assert.match(script, /"pg_dump"/u);
-  assert.match(script, /"pg_restore"/u);
-  assert.match(script, /uploads\.tar\.gz/u);
-  assert.match(script, /sourceDestroyedBeforeRestore/u);
-  assert.match(script, /backupChecksumsVerified/u);
-  assert.match(script, /databaseRowsRestored/u);
-  assert.match(script, /applicationSchemaRestored/u);
-  assert.match(script, /uploadFilesRestored/u);
+  assert.throws(() =>
+    assertOwnedVolume(
+      {
+        Name: "owned-volume",
+        Labels: { [BACKUP_RESTORE_LABEL]: "someone-else" },
+      },
+      "owned-volume",
+      "token-1",
+    ),
+  );
 });
 
-test("temporary backup artifacts are forced to private file permissions", () => {
-  const script = read("scripts/check-backup-restore.mjs");
+test("production storage topology is converted into an isolated PostgreSQL fixture", () => {
+  const spec = extractBackupRestoreSpec({
+    services: {
+      postgres: {
+        image: "postgres:18-alpine",
+        volumes: [
+          {
+            type: "volume",
+            source: "pgdata",
+            target: "/var/lib/postgresql/data",
+          },
+        ],
+      },
+      app: {
+        volumes: [
+          {
+            type: "volume",
+            source: "uploads",
+            target: "/data/uploads",
+          },
+        ],
+      },
+    },
+  });
 
-  assert.match(script, /writeFileSync\(dbBackup, dump, \{ mode: 0o600 \}\)/u);
-  assert.match(script, /chmodSync\(uploadsBackup, 0o600\)/u);
-  assert.match(script, /Database backup must remain private/u);
-  assert.match(script, /Uploads backup must remain private/u);
+  assert.deepEqual(spec, {
+    postgresImage: "postgres:18-alpine",
+    postgresTarget: "/var/lib/postgresql/data",
+    uploadsTarget: "/data/uploads",
+  });
+
+  const fixture = makePostgresFixture(
+    spec,
+    "sha256:fixture-image",
+    "owned-pgdata",
+    "secret-token",
+  );
+  assert.equal(fixture.services.postgres.network_mode, "none");
+  assert.equal(fixture.services.postgres.restart, "no");
+  assert.equal(
+    fixture.volumes.pgdata.name,
+    "owned-pgdata",
+  );
+  assert.equal(
+    fixture.services.postgres.volumes[0].target,
+    "/var/lib/postgresql/data",
+  );
 });
 
-test("workflow runs backup restore as a separate disposable job", () => {
-  const workflow = read(".github/workflows/ci.yml");
+test("backup artifacts use a private filesystem mode", () => {
+  const directory = mkdtempSync(join(tmpdir(), "nexus-backup-mode-"));
+  const path = join(directory, "artifact");
+  try {
+    writeFileSync(path, "fixture", { mode: PRIVATE_BACKUP_FILE_MODE });
+    assert.equal(statSync(path).mode & 0o777, PRIVATE_BACKUP_FILE_MODE);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
+
+test("PASS evidence is impossible while any restore proof is missing", () => {
+  const result = createBackupRestoreResult();
+  for (const flag of BACKUP_RESTORE_EVIDENCE_FLAGS) result[flag] = true;
+
+  assert.doesNotThrow(() => assertBackupRestoreEvidence(result));
+
+  for (const flag of BACKUP_RESTORE_EVIDENCE_FLAGS) {
+    const incomplete = { ...result, [flag]: false };
+    assert.throws(
+      () => assertBackupRestoreEvidence(incomplete),
+      new RegExp(flag, "u"),
+    );
+  }
+});
+
+test("workflow keeps backup restore as a separate disposable job", () => {
+  const workflow = readFileSync(
+    resolve(process.cwd(), ".github/workflows/ci.yml"),
+    "utf8",
+  );
 
   assert.match(workflow, /^ {2}backup-restore:/mu);
   assert.match(workflow, /name: Disposable backup restore/u);
@@ -91,13 +207,4 @@ test("workflow runs backup restore as a separate disposable job", () => {
     /backup-restore:[\s\S]*?uses: actions\/checkout@v7[\s\S]*?persist-credentials: false/u,
   );
   assert.match(workflow, /node scripts\/check-backup-restore\.mjs/u);
-});
-
-test("production Compose is inspected without loading repository .env", () => {
-  const script = read("scripts/check-backup-restore.mjs");
-
-  assert.match(script, /COMPOSE_DISABLE_ENV_FILE: "true"/u);
-  assert.match(script, /"--env-file",\s*emptyEnv/u);
-  assert.match(script, /compose\.production\.yaml/u);
-  assert.doesNotMatch(script, /readFileSync\([^\n]*\.env/u);
 });
