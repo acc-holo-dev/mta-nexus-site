@@ -103,6 +103,10 @@ push_worker=$("${pc[@]}" ps -q push-worker)
 [[ -n $push_worker ]]
 [[ $("${pc[@]}" exec -T app id -u) != 0 ]]
 [[ $("${pc[@]}" exec -T push-worker id -u) != 0 ]]
+[[ "$(docker inspect --format '{{.HostConfig.ReadonlyRootfs}}' "$push_worker")" == true ]]
+[[ "$(docker inspect --format '{{.HostConfig.PidsLimit}}' "$push_worker")" == 128 ]]
+[[ "$(docker inspect --format '{{json .HostConfig.CapDrop}}' "$push_worker")" == '["ALL"]' ]]
+[[ "$(docker inspect --format '{{json .HostConfig.SecurityOpt}}' "$push_worker")" == '["no-new-privileges:true"]' ]]
 "${pc[@]}" exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; assert.equal(process.env.NODE_ENV, 'production'); assert.equal(process.env.HOSTNAME, '0.0.0.0'); assert.equal(process.env.BUILD_SCANNER, 'clamav');"
 "${pc[@]}" exec -T app test -f /app/apps/web/server.js
 "${pc[@]}" exec -T app test -f /app/packages/db/src/migrate.ts
@@ -112,6 +116,7 @@ push_worker=$("${pc[@]}" ps -q push-worker)
 "${pc[@]}" exec -T push-worker test -f /app/scripts/web-push-worker-health-state.mjs
 "${pc[@]}" exec -T push-worker test -f /app/scripts/check-web-push-worker-health.mjs
 "${pc[@]}" exec -T push-worker test -f /app/scripts/check-web-push-worker-queue.mjs
+"${pc[@]}" exec -T push-worker sh -c 'test -w /tmp && test ! -w /app'
 if "${pc[@]}" exec -T app sh -c 'command -v pnpm >/dev/null 2>&1'; then
   echo 'FAIL: production runtime unexpectedly contains pnpm' >&2
   exit 1

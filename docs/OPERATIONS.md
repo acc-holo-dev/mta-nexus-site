@@ -953,3 +953,15 @@ Account mail uses a minimum 180-second watchdog that scales with configured
 batch size and SMTP timeout. If progress exceeds that budget, the worker exits
 non-zero so the container restart policy can recover it; durable leases/outbox
 rows remain authoritative and are reclaimed after expiry.
+
+
+### Push worker container hardening
+
+The production Web Push worker uses the same approved runtime image as the web
+application but runs as an isolated non-root service with a read-only root
+filesystem, a small noexec/nosuid/nodev tmpfs for health state, all Linux
+capabilities dropped, no-new-privileges, a bounded PID limit, SIGTERM and a
+75-second graceful-stop window. CI production smoke renders the real Compose
+configuration, pins the push worker to the exact prebuilt commit image, disables
+restart only for the disposable test project, and asserts these runtime
+isolation properties before acceptance continues.

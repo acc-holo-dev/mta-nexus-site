@@ -10,6 +10,9 @@ services:
       ACCOUNT_MAIL_KEY_ID: ci
       ACCOUNT_MAIL_KEY: ${NEXUS_CI_ACCOUNT_MAIL_KEY:?use scripts/check-production-startup.sh}
       ACCOUNT_RECOVERY_ABUSE_KEY: ${NEXUS_CI_ACCOUNT_RECOVERY_ABUSE_KEY:?use scripts/check-production-startup.sh}
+  push-worker:
+    image: ${NEXUS_CI_IMAGE:?use scripts/check-production-startup.sh}
+    restart: "no"
   postgres:
     restart: "no"
   clamav:

@@ -27,12 +27,26 @@ export function localCertificateConfig(source) {
 export function assertIsolatedProduction(config, project, caddyFile) {
   assert.match(project, /^nexus-prod-ci-[a-f0-9-]{36}$/);
   assert.equal(config.name, project);
-  assert.deepEqual(Object.keys(config.services).sort(), ['app', 'caddy', 'clamav', 'postgres']);
+  assert.deepEqual(
+    Object.keys(config.services).sort(),
+    ['app', 'caddy', 'clamav', 'postgres', 'push-worker'],
+  );
   assert.equal(config.services.app.environment.NODE_ENV, 'production');
   assert.equal(config.services.app.environment.NEXT_PUBLIC_APP_URL, 'https://nexus-ci.test');
   assert.equal(config.services.app.environment.BUILD_SCANNER, 'clamav');
   assert.equal(config.services.app.environment.EMAIL_PROVIDER, 'disabled');
   assert.equal(config.services.app.build.target, 'runtime');
+  const pushWorker = config.services['push-worker'];
+  assert.equal(pushWorker.image, config.services.app.image);
+  assert.equal(pushWorker.user, 'node');
+  assert.equal(pushWorker.read_only, true);
+  assert.equal(pushWorker.init, true);
+  assert.deepEqual(pushWorker.cap_drop, ['ALL']);
+  assert.deepEqual(pushWorker.security_opt, ['no-new-privileges:true']);
+  assert.equal(pushWorker.pids_limit, 128);
+  assert.equal(pushWorker.stop_signal, 'SIGTERM');
+  assert.equal(pushWorker.stop_grace_period, '75s');
+  assert(pushWorker.tmpfs?.some((entry) => String(entry).startsWith('/tmp:')));
   for (const [name, service] of Object.entries(config.services)) {
     assert(!service.privileged && !service.container_name && !service.network_mode);
     assert.equal(service.restart, 'no');

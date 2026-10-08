@@ -75,7 +75,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    user: node
+    init: true
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    stop_signal: SIGTERM
+    stop_grace_period: 75s
     working_dir: /app/packages/db
     command:
       [
