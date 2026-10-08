@@ -263,6 +263,10 @@ export async function PATCH(
       );
     }
 
+    if (access.supportCase.status === parsed.data.status) {
+      return privateJson(context, { success: true, supportCase: access.supportCase });
+    }
+
     const supportCase = await supportCaseRepository.updateStatus(
       id,
       parsed.data.status,
@@ -278,12 +282,13 @@ export async function PATCH(
           to: parsed.data.status,
         },
       },
+      access.supportCase.status,
     );
     if (!supportCase) {
       return privateJson(
         context,
-        { error: "Support case not found" },
-        { status: 404 },
+        { error: "Support case changed concurrently", code: "SUPPORT_STATUS_CONFLICT" },
+        { status: 409 },
       );
     }
 
