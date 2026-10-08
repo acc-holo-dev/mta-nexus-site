@@ -7,6 +7,10 @@ import {
 import { describe, expect, it } from "vitest";
 import type { WebPushVapidConfig } from "@nexus/config";
 import {
+  WebPushPermanentPayloadError,
+  WebPushPermanentSubscriptionError,
+} from "@nexus/db";
+import {
   createVapidAuthorization,
   encryptWebPushMessage,
 } from "../apps/web/src/lib/services/web-push-crypto";
@@ -63,7 +67,7 @@ describe("RFC 8291 Web Push encryption", () => {
         subscription,
         Buffer.alloc(3994),
       ),
-    ).toThrow("encrypted body exceeds 4096 bytes");
+    ).toThrow(WebPushPermanentPayloadError);
   });
 
   it("rejects a message that cannot fit the mandatory single record", () => {
@@ -81,7 +85,21 @@ describe("RFC 8291 Web Push encryption", () => {
         Buffer.alloc(100),
         { recordSize: 64 },
       ),
-    ).toThrow("does not fit one encrypted record");
+    ).toThrow(WebPushPermanentPayloadError);
+  });
+});
+
+describe("Web Push subscription crypto validation", () => {
+  it("classifies malformed receiver key material as permanent subscription failure", () => {
+    expect(() =>
+      encryptWebPushMessage(
+        {
+          p256dh: "invalid",
+          auth: Buffer.alloc(16, 7).toString("base64url"),
+        },
+        Buffer.from("payload"),
+      ),
+    ).toThrow(WebPushPermanentSubscriptionError);
   });
 });
 

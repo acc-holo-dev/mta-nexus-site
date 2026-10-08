@@ -3,6 +3,10 @@ import type {
   WebPushLease,
 } from "./web-push-worker";
 import { webPushWorkerRepository } from "./web-push-worker";
+import {
+  WebPushPermanentPayloadError,
+  WebPushPermanentSubscriptionError,
+} from "../web-push-runtime";
 import type {
   WebPushSendResult,
   WebPushSender,
@@ -170,7 +174,30 @@ export class WebPushDispatcher {
           prepared.payload,
           { signal: sendSignal },
         );
-      } catch {
+      } catch (error) {
+        if (error instanceof WebPushPermanentSubscriptionError) {
+          const removed =
+            await this.#worker.discardStaleSubscription(
+              lease,
+              prepared.subscriptionId,
+            );
+          if (removed) summary.stale += 1;
+          else summary.unsettled += 1;
+          onProgress?.();
+          continue;
+        }
+
+        if (error instanceof WebPushPermanentPayloadError) {
+          const settled = await this.#worker.settle(
+            lease,
+            "discard",
+          );
+          if (settled) summary.discarded += 1;
+          else summary.unsettled += 1;
+          onProgress?.();
+          continue;
+        }
+
         const settled = await this.#worker.settle(
           lease,
           "retry",

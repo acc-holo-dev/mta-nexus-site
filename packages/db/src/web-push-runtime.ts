@@ -37,6 +37,14 @@ export type WebPushSendResult = {
   statusCode: number;
 };
 
+export class WebPushPermanentSubscriptionError extends Error {
+  override name = "WebPushPermanentSubscriptionError";
+}
+
+export class WebPushPermanentPayloadError extends Error {
+  override name = "WebPushPermanentPayloadError";
+}
+
 export type WebPushEncryptionSubscription = {
   p256dh: string;
   auth: string;
@@ -227,10 +235,14 @@ export function encryptWebPushMessage(
   options: WebPushEncryptionOptions = {},
 ): Buffer {
   if (!isValidWebPushP256PublicKey(subscription.p256dh)) {
-    throw new Error("Invalid Web Push receiver public key");
+    throw new WebPushPermanentSubscriptionError(
+      "Invalid Web Push receiver public key",
+    );
   }
   if (!isValidWebPushAuthSecret(subscription.auth)) {
-    throw new Error("Invalid Web Push authentication secret");
+    throw new WebPushPermanentSubscriptionError(
+      "Invalid Web Push authentication secret",
+    );
   }
 
   const recordSize = options.recordSize ?? DEFAULT_RECORD_SIZE;
@@ -244,7 +256,7 @@ export function encryptWebPushMessage(
 
   const payload = Buffer.from(plaintext);
   if (payload.length + 1 + AES_GCM_TAG_BYTES >= recordSize) {
-    throw new RangeError(
+    throw new WebPushPermanentPayloadError(
       "Web Push payload does not fit one encrypted record",
     );
   }
@@ -284,7 +296,7 @@ export function encryptWebPushMessage(
     1 +
     AES_GCM_TAG_BYTES;
   if (encryptedBodySize > MAX_WEB_PUSH_BODY_BYTES) {
-    throw new RangeError(
+    throw new WebPushPermanentPayloadError(
       "Web Push encrypted body exceeds 4096 bytes",
     );
   }
@@ -400,14 +412,18 @@ export function createVapidAuthorization(
 export function parseWebPushEndpoint(value: string): URL {
   const endpoint = value.trim();
   if (!endpoint || endpoint.length > 2048) {
-    throw new Error("Invalid Web Push endpoint");
+    throw new WebPushPermanentSubscriptionError(
+      "Invalid Web Push endpoint",
+    );
   }
 
   let url: URL;
   try {
     url = new URL(endpoint);
   } catch {
-    throw new Error("Invalid Web Push endpoint");
+    throw new WebPushPermanentSubscriptionError(
+      "Invalid Web Push endpoint",
+    );
   }
 
   if (
@@ -417,7 +433,9 @@ export function parseWebPushEndpoint(value: string): URL {
     url.hash ||
     (url.port && url.port !== "443")
   ) {
-    throw new Error("Unsafe Web Push endpoint");
+    throw new WebPushPermanentSubscriptionError(
+      "Unsafe Web Push endpoint",
+    );
   }
 
   const hostname = normalizedHostname(url);
@@ -485,15 +503,17 @@ export async function resolveWebPushTarget(
   const hostname = normalizedHostname(url);
   const records = await resolver(hostname);
 
+  if (!records.length) {
+    throw new Error("Web Push endpoint DNS resolution returned no addresses");
+  }
   if (
-    !records.length ||
     records.some(
       (record) =>
         isIP(record.address) !== record.family ||
         !isPublicWebPushAddress(record.address),
     )
   ) {
-    throw new Error(
+    throw new WebPushPermanentSubscriptionError(
       "Web Push endpoint did not resolve exclusively to public addresses",
     );
   }

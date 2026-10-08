@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  WebPushPermanentSubscriptionError,
+} from "@nexus/db";
+import {
   isPublicWebPushAddress,
   parseWebPushEndpoint,
   resolveWebPushTarget,
@@ -63,7 +66,9 @@ describe("Web Push endpoint policy", () => {
           { address: "10.0.0.10", family: 4 },
         ],
       ),
-    ).rejects.toThrow("exclusively to public addresses");
+    ).rejects.toBeInstanceOf(
+      WebPushPermanentSubscriptionError,
+    );
   });
 
   it("pins the connection target to the resolved public address", async () => {

@@ -7,6 +7,10 @@ import type {
   PreparedWebPushJob,
   WebPushLease,
 } from "../packages/db/src/repositories/web-push-worker";
+import {
+  WebPushPermanentPayloadError,
+  WebPushPermanentSubscriptionError,
+} from "../packages/db/src/web-push-runtime";
 
 function lease(id: string): WebPushLease {
   return {
@@ -123,6 +127,66 @@ describe("Web Push dispatcher", () => {
     expect(w.settle).toHaveBeenCalledWith(
       expect.objectContaining({ id }),
       "retry",
+    );
+    expect(
+      w.discardStaleSubscription,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("removes a permanently invalid subscription without retrying it", async () => {
+    const id =
+      "wpo_00000000-0000-0000-0000-000000000009";
+    const w = worker([id]);
+    const sender = vi.fn(async () => {
+      throw new WebPushPermanentSubscriptionError(
+        "unsafe endpoint",
+      );
+    });
+
+    await expect(
+      new WebPushDispatcher({
+        worker: w,
+        sender,
+      }).runBatch(),
+    ).resolves.toMatchObject({
+      retried: 0,
+      stale: 1,
+      discarded: 0,
+    });
+
+    expect(
+      w.discardStaleSubscription,
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({ id }),
+      `wps_${id}`,
+    );
+    expect(w.settle).not.toHaveBeenCalled();
+  });
+
+  it("discards a permanently invalid payload without deleting the subscription", async () => {
+    const id =
+      "wpo_00000000-0000-0000-0000-000000000010";
+    const w = worker([id]);
+    const sender = vi.fn(async () => {
+      throw new WebPushPermanentPayloadError(
+        "payload too large",
+      );
+    });
+
+    await expect(
+      new WebPushDispatcher({
+        worker: w,
+        sender,
+      }).runBatch(),
+    ).resolves.toMatchObject({
+      retried: 0,
+      stale: 0,
+      discarded: 1,
+    });
+
+    expect(w.settle).toHaveBeenCalledWith(
+      expect.objectContaining({ id }),
+      "discard",
     );
     expect(
       w.discardStaleSubscription,
