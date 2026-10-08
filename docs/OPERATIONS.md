@@ -26,6 +26,7 @@ The stack contains:
 - PostgreSQL 18;
 - ClamAV;
 - the Next.js development container;
+- the durable Web Push worker, healthy-idle when the VAPID triplet is absent;
 - persistent database, ClamAV and upload volumes.
 
 Only the application port is published to the host and it is bound to loopback. PostgreSQL and ClamAV stay on the Compose network.
@@ -40,7 +41,11 @@ Readiness:
 docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs
 ```
 
-The check requires HTTP health, database reachability and writable private storage.
+The app check requires HTTP health, database reachability and writable private storage.
+The same DEV stack also runs `push-worker`; its healthcheck validates worker
+heartbeat/progress and queue counters. With no VAPID triplet it remains
+healthy-idle and performs queue maintenance; with all three VAPID values set it
+dispatches durable Web Push jobs.
 
 ## 2. Verification
 

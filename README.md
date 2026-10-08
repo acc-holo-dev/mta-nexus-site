@@ -30,6 +30,8 @@ If Node.js 26+ and the pinned pnpm are installed, `pnpm dev` now starts the same
 pnpm dev
 ```
 
+Web Push is optional in DEV. Leave the three `WEB_PUSH_VAPID_*` values unset for a healthy-idle worker, or set the public/private/subject triplet together to exercise real durable push dispatch. Never commit the private key.
+
 Use `pnpm dev:host` only when PostgreSQL, storage, scanner settings and the rest of the development environment are already configured outside Compose. It starts only the Next.js app and intentionally does not provision dependencies.
 
 In development, `/dev` shows a sanitized runtime status panel for the application, database, storage, scanner and email mode. The route is intentionally unavailable when `NODE_ENV=production`.
@@ -47,9 +49,10 @@ Useful commands:
 ```bash
 # health/readiness
 docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs
+docker compose -p nexus-local -f compose.yaml exec push-worker node /app/scripts/check-web-push-worker-health.mjs
 
 # logs
-docker compose -p nexus-local -f compose.yaml logs --tail 100 --follow app postgres clamav
+docker compose -p nexus-local -f compose.yaml logs --tail 100 --follow app push-worker postgres clamav
 
 # stop, preserving data volumes
 docker compose -p nexus-local -f compose.yaml down
