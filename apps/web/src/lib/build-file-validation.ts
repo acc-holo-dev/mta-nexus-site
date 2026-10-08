@@ -26,6 +26,26 @@ export function exceedsBuildFileSizeLimit(sizeBytes: number): boolean {
   return sizeBytes > MAX_BUILD_FILE_SIZE_BYTES;
 }
 
+export type BuildFileSelectionIssue =
+  | "missing"
+  | "too_large"
+  | "unsupported_type";
+
+export function validateBuildFileSelection(
+  file: Readonly<{ name: string; size: number }> | null,
+): BuildFileSelectionIssue | null {
+  if (!file || !Number.isFinite(file.size) || file.size <= 0) {
+    return "missing";
+  }
+  if (exceedsBuildFileSizeLimit(file.size)) {
+    return "too_large";
+  }
+  if (!getSupportedBuildExtension(file.name)) {
+    return "unsupported_type";
+  }
+  return null;
+}
+
 function startsWithSignature(bytes: Uint8Array, signature: readonly number[]): boolean {
   return (
     bytes.length >= signature.length &&

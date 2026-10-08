@@ -22,3 +22,26 @@ it.each(["en", "ru"] as const)("offers every supported resource type in %s", (lo
     expect(select).toContain(getDictionary(locale).publishing[PRODUCT_PUBLISHING_KEYS[type]]);
   }
 });
+
+
+it.each(["en", "ru"] as const)(
+  "renders localized build constraints in %s",
+  (locale) => {
+    state.locale = locale;
+    const html = renderToStaticMarkup(
+      <NewResourceForm actorId="author" />,
+    );
+    const copy = getDictionary(locale).publishing;
+
+    expect(html).toContain(
+      'pattern="v?[0-9]+\\.[0-9]+(\\.[0-9]+)?(-[a-zA-Z0-9.]+)?"',
+    );
+    expect(html).toContain(
+      'pattern="1\\.[0-9]+(\\.[0-9]+)?"',
+    );
+    expect(html).toContain('accept=".zip,.rar,.7z,.lua"');
+    expect(html).toContain(
+      copy.buildFileRequirements.replace("{maxFileSize}", "64"),
+    );
+  },
+);

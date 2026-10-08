@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import {
   exceedsBuildFileSizeLimit,
   getSupportedBuildExtension,
+  validateBuildFileSelection,
   hasExpectedBuildFileFormat,
   MAX_BUILD_FILE_SIZE_BYTES,
 } from "../apps/web/src/lib/build-file-validation";
@@ -28,6 +29,34 @@ describe("build file format detection", () => {
     "rejects unsupported build extension %s",
     (fileName) => expect(getSupportedBuildExtension(fileName)).toBeNull(),
   );
+
+  it("rejects invalid file selections before any upload orchestration", () => {
+    expect(validateBuildFileSelection(null)).toBe("missing");
+    expect(
+      validateBuildFileSelection({
+        name: "empty.zip",
+        size: 0,
+      }),
+    ).toBe("missing");
+    expect(
+      validateBuildFileSelection({
+        name: "oversized.exe",
+        size: MAX_BUILD_FILE_SIZE_BYTES + 1,
+      }),
+    ).toBe("too_large");
+    expect(
+      validateBuildFileSelection({
+        name: "resource.exe",
+        size: 1024,
+      }),
+    ).toBe("unsupported_type");
+    expect(
+      validateBuildFileSelection({
+        name: "resource.zip",
+        size: MAX_BUILD_FILE_SIZE_BYTES,
+      }),
+    ).toBeNull();
+  });
 
   it("matches the storage limit and rejects oversized uploads", () => {
     const storage = readFileSync(

@@ -2,13 +2,11 @@
 
 import { PRODUCT_TYPES } from "@nexus/domain";
 import { Button } from "@nexus/ui";
-import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { confirmedAuthorBuild } from "../lib/author-resource-response";
 import {
-  exceedsBuildFileSizeLimit,
-  getSupportedBuildExtension,
   MAX_BUILD_FILE_SIZE_BYTES,
+  validateBuildFileSelection,
 } from "../lib/build-file-validation";
 import { confirmedCreatedResource } from "../lib/new-resource-response";
 import {
@@ -20,6 +18,7 @@ import {
 import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
 import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
 import { useNexusLocale } from "./locale-context";
+import { ResourceSubmissionSuccess } from "./resource-submission-success";
 import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
 
 const fieldClass =
@@ -29,7 +28,7 @@ const labelTextClass = "font-label text-secondary";
 
 export function NewResourceForm({ actorId }: { actorId: string }) {
   const storageKey = pendingResourceDraftKey(actorId);
-  const { dictionary } = useNexusLocale();
+  const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.publishing;
   const maxFileSizeMb = String(MAX_BUILD_FILE_SIZE_BYTES / (1024 * 1024));
   const buildFileTooLarge = copy.buildFileTooLarge.replace("{maxFileSize}", maxFileSizeMb);
@@ -106,15 +105,20 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
     const form = new FormData(event.currentTarget);
 
     try {
-      const file = form.get("file");
-      if (!(file instanceof File) || file.size === 0) {
+      const fileEntry = form.get("file");
+      const file = fileEntry instanceof File ? fileEntry : null;
+      const fileIssue = validateBuildFileSelection(file);
+      if (fileIssue === "missing") {
         throw new Error(copy.chooseArchive);
       }
-      if (exceedsBuildFileSizeLimit(file.size)) {
+      if (fileIssue === "too_large") {
         throw new Error(buildFileTooLarge);
       }
-      if (!getSupportedBuildExtension(file.name)) {
+      if (fileIssue === "unsupported_type") {
         throw new Error(copy.buildFileTypeNotAllowed);
+      }
+      if (!file) {
+        throw new Error(copy.chooseArchive);
       }
 
       let product = createdProduct;
@@ -226,24 +230,10 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
 
   if (resultId) {
     return (
-      <div className="mx-auto max-w-xl space-y-4 py-12">
-        <div className="nexus-panel space-y-4 p-6 shadow-nexus-sm">
-          <div className="inline-flex rounded-full bg-success-soft px-2.5 py-1 font-label text-success">
-            {dictionary.nav.closedBeta}
-          </div>
-          <h1 className="text-2xl font-black text-primary">{copy.submittedTitle}</h1>
-          <p className="text-sm leading-relaxed text-muted">{copy.submittedDescription}</p>
-          <Link
-            href={`/workspace/resources/${encodeURIComponent(resultId)}`}
-            className="inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
-          >
-            {copy.openStatus}
-          </Link>
-          <Link href="/workspace/resources" className="block text-accent underline">
-            {dictionary.authorResources.title}
-          </Link>
-        </div>
-      </div>
+      <ResourceSubmissionSuccess
+        resultId={resultId}
+        locale={locale}
+      />
     );
   }
 
