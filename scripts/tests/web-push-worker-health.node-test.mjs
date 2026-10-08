@@ -54,6 +54,8 @@ function healthy(overrides = {}) {
     batch: 2,
     heartbeatAt: new Date().toISOString(),
     staleAfterMs: 60_000,
+    progressAt: new Date().toISOString(),
+    progressStaleAfterMs: 180_000,
     queuePending: 4,
     queueDue: 2,
     queueLeased: 1,
@@ -168,6 +170,42 @@ test("fails health when the durable queue reaches configured capacity", () => {
           "capacity_pressure",
           "due_backlog",
         ],
+      }),
+    ),
+    0,
+  );
+});
+
+
+test("fails closed when heartbeat is fresh but dispatcher progress is stale", () => {
+  assert.notEqual(
+    run(
+      healthy({
+        heartbeatAt: new Date().toISOString(),
+        progressAt: new Date(
+          Date.now() - 240_000,
+        ).toISOString(),
+      }),
+    ),
+    0,
+  );
+});
+
+test("rejects impossible progress metadata", () => {
+  assert.notEqual(
+    run(
+      healthy({
+        progressStaleAfterMs: 60_000,
+      }),
+    ),
+    0,
+  );
+  assert.notEqual(
+    run(
+      healthy({
+        progressAt: new Date(
+          Date.now() + 60_000,
+        ).toISOString(),
       }),
     ),
     0,

@@ -69,3 +69,17 @@ test("fails closed for stale or inconsistent snapshot", () => {
   })).status, 1);
   assert.equal(run(snapshot({ queuePending: 8_000 })).status, 1);
 });
+
+
+test("fails queue probe when worker heartbeat is fresh but loop progress is stale", () => {
+  assert.equal(
+    run(
+      snapshot({
+        progressAt: new Date(
+          Date.now() - 240_000,
+        ).toISOString(),
+      }),
+    ).status,
+    1,
+  );
+});

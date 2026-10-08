@@ -30,6 +30,8 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
 
   const heartbeatAt = Date.parse(data?.heartbeatAt);
   const staleAfterMs = Number(data?.staleAfterMs);
+  const progressAt = Date.parse(data?.progressAt);
+  const progressStaleAfterMs = Number(data?.progressStaleAfterMs);
   const pid = Number(data?.pid);
   const batch = Number(data?.batch);
   const configured = data?.configured;
@@ -61,10 +63,14 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     typeof configured !== "boolean" ||
     !Number.isFinite(heartbeatAt) ||
     !inRange(staleAfterMs, 30_000, 120_000) ||
+    !Number.isFinite(progressAt) ||
+    !inRange(progressStaleAfterMs, 120_000, 600_000) ||
+    progressAt > heartbeatAt + 5_000 ||
     !Number.isSafeInteger(pid) || pid < 1 ||
     !Number.isSafeInteger(batch) || batch < 0 ||
     !queueStateValid || !thresholdsValid ||
-    now - heartbeatAt > staleAfterMs
+    now - heartbeatAt > staleAfterMs ||
+    now - progressAt > progressStaleAfterMs
   ) {
     throw new Error("Invalid Web Push worker health snapshot");
   }
@@ -91,7 +97,10 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   return Object.freeze({
     configured, pid, batch,
     heartbeatAt: new Date(heartbeatAt).toISOString(),
-    staleAfterMs, queuePending, queueDue, queueLeased,
+    staleAfterMs,
+    progressAt: new Date(progressAt).toISOString(),
+    progressStaleAfterMs,
+    queuePending, queueDue, queueLeased,
     queueCapacity, queueOldestAgeSeconds,
     queueAlert: expectedStatus,
     queueAlertReasons: Object.freeze([...reasons]),

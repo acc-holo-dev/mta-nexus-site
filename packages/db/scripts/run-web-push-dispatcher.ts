@@ -13,6 +13,7 @@ const HEALTH_FILE = "/tmp/nexus-web-push-worker-health.json";
 const HEALTH_TMP = `${HEALTH_FILE}.${process.pid}.tmp`;
 const HEARTBEAT_INTERVAL_MS = 15_000;
 const STALE_AFTER_MS = 60_000;
+const LOOP_STALL_AFTER_MS = 180_000;
 const POLL_INTERVAL_MS = 2_000;
 const BATCH_SIZE = 20;
 
@@ -53,11 +54,13 @@ type QueueAlertReason =
 const controller = new AbortController();
 let stopping = false;
 let heartbeatTimer: ReturnType<typeof setInterval> | null = null;
+let watchdogTimer: ReturnType<typeof setInterval> | null = null;
 let healthWrite: Promise<void> = Promise.resolve();
 let healthFailure: unknown = null;
 let healthStatus: "starting" | "ready" | "stopping" = "starting";
 let configured = false;
 let healthBatch = 0;
+let lastProgressAt = Date.now();
 let healthQueuePending = 0;
 let healthQueueDue = 0;
 let healthQueueLeased = 0;
@@ -68,6 +71,29 @@ let lastQueueAlertSignature = "";
 
 function emit(event: Record<string, unknown>) {
   process.stdout.write(`${JSON.stringify(event)}\n`);
+}
+
+function markProgress() {
+  lastProgressAt = Date.now();
+}
+
+function failIfLoopStalled() {
+  if (
+    stopping ||
+    Date.now() - lastProgressAt <= LOOP_STALL_AFTER_MS
+  ) {
+    return;
+  }
+
+  process.stderr.write(
+    `${JSON.stringify({
+      status: "failed",
+      reason: "loop-stalled",
+      configured,
+      batch: healthBatch,
+    })}\n`,
+  );
+  process.exit(1);
 }
 
 function queueAlertThresholds() {
@@ -123,6 +149,8 @@ async function writeHealthSnapshot() {
     batch: healthBatch,
     heartbeatAt: new Date().toISOString(),
     staleAfterMs: STALE_AFTER_MS,
+    progressAt: new Date(lastProgressAt).toISOString(),
+    progressStaleAfterMs: LOOP_STALL_AFTER_MS,
     queuePending: healthQueuePending,
     queueDue: healthQueueDue,
     queueLeased: healthQueueLeased,
@@ -172,6 +200,12 @@ async function delay(ms: number, signal: AbortSignal) {
 }
 
 let failed = false;
+watchdogTimer = setInterval(
+  failIfLoopStalled,
+  HEARTBEAT_INTERVAL_MS,
+);
+watchdogTimer.unref();
+
 try {
   const vapid = readWebPushVapidConfig();
   configured = vapid !== null;
@@ -179,6 +213,7 @@ try {
   await queueHealth();
   await checkDatabaseConnection();
   await refreshQueueStats();
+  markProgress();
 
   const dispatcher = vapid
     ? new WebPushDispatcher({
@@ -244,6 +279,7 @@ try {
     }
 
     await refreshQueueStats();
+    markProgress();
     await queueHealth();
 
     if (once) break;
@@ -272,6 +308,8 @@ try {
 } finally {
   if (heartbeatTimer) clearInterval(heartbeatTimer);
   heartbeatTimer = null;
+  if (watchdogTimer) clearInterval(watchdogTimer);
+  watchdogTimer = null;
 
   try {
     await healthWrite;
