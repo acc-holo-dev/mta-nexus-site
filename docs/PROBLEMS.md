@@ -311,7 +311,10 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   resource-detail acquisition UI также переведены с чтения JSX/source на
   HTTP/SSR behavior: localized directory shell, full recorded SHA/scanner/signature
   facts, free/paid/entitled/manager acquisition states и ровно один latest-build
-  download action при длинной build history;
+  download action при длинной build history. Account recovery source checks
+  заменены чистыми proof/history/request/timing contracts; admin content
+  moderation — SSR behavior controls + HTTP/service tests; RU/EN root shell
+  wiring — реальным RootLayout render вместо чтения JSX-файлов;
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере
