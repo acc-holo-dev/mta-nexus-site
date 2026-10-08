@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
 import { authService } from "../../../lib/services/auth-service";
 import {
   contentRepository,
@@ -47,6 +48,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -205,7 +207,13 @@ export async function POST(request: NextRequest) {
       201,
     );
   } catch (error: unknown) {
-    console.error("Content API error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "content.create_failed",
+      context,
+      status: 500,
+      error,
+    });
     return privateJson(
       { error: "Failed to create content" },
       500,

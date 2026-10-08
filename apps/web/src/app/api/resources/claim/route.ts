@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { commerceService } from "../../../../lib/services/commerce-service";
 import { authService } from "../../../../lib/services/auth-service";
 import { claimResourceSchema } from "@nexus/validation";
@@ -8,6 +9,7 @@ import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
     const rateLimit = await consumeRateLimit("resourceClaim", ip);
@@ -51,7 +53,13 @@ export async function POST(request: NextRequest) {
       error instanceof Error && "statusCode" in error
         ? (error as Error & { statusCode: number })
         : null;
-    console.error("Resource claim API error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "resource.claim_failed",
+      context,
+      status: appError?.statusCode || 500,
+      error,
+    });
     return NextResponse.json(
       { error: appError?.message || "Resource claim failed" },
       { status: appError?.statusCode || 500, headers: privateHeaders }

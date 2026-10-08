@@ -52,6 +52,24 @@
           }
         }
       }
+    },
+    {
+      "name": "structured-content-social-server-api-logging",
+      "includes": [
+        "apps/web/src/app/api/content/**",
+        "apps/web/src/app/api/follow/route.ts",
+        "apps/web/src/app/api/mta/**",
+        "apps/web/src/app/api/resources/**",
+        "apps/web/src/app/api/servers/**",
+        "apps/web/src/app/api/verification/route.ts"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "error"
+          }
+        }
+      }
     }
   ]
 }

@@ -1,4 +1,5 @@
 import { after, type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
 import { authService } from "../../../lib/services/auth-service";
 import {
   organizationRepository,
@@ -81,6 +82,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -151,19 +153,32 @@ export async function POST(request: NextRequest) {
           ]);
         } catch (error) {
           // The follow already committed. Notification/push delivery remains best effort.
-          console.error("Follow notification delivery failed:", error);
+          logRequestEvent({
+            level: "warn",
+            event: "follow.notification_delivery_failed",
+            context,
+            status: 200,
+            error,
+          });
         }
       });
     }
 
     return privateJson({ success: true, targetType, targetId, following: true, follow });
   } catch (error: unknown) {
-    console.error("Follow API error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "follow.create_failed",
+      context,
+      status: 500,
+      error,
+    });
     return privateJson({ error: "Follow request failed" }, { status: 500 });
   }
 }
 
 export async function DELETE(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -197,7 +212,13 @@ export async function DELETE(request: NextRequest) {
 
     return privateJson({ success: true, targetType, targetId, following: false });
   } catch (error: unknown) {
-    console.error("Follow API error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "follow.delete_failed",
+      context,
+      status: 500,
+      error,
+    });
     return privateJson({ error: "Follow request failed" }, { status: 500 });
   }
 }

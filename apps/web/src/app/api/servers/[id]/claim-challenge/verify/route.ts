@@ -1,4 +1,5 @@
 import { after, type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../../../lib/observability";
 import { z } from "zod";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
@@ -27,6 +28,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const context = createRequestLogContext(request);
   try {
     const sessionToken = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(sessionToken);
@@ -95,7 +97,13 @@ export async function POST(
         { status: error.statusCode, headers: privateHeaders },
       );
     }
-    console.error("Server control proof verification error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "server.claim_challenge.verify_failed",
+      context,
+      status: 500,
+      error,
+    });
     return NextResponse.json(
       { error: "Could not verify server control" },
       { status: 500, headers: privateHeaders },

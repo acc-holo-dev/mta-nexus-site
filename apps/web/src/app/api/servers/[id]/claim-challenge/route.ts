@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../../lib/observability";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { authService } from "../../../../../lib/services/auth-service";
@@ -13,6 +14,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -62,7 +64,13 @@ export async function POST(
         { status: error.statusCode, headers: privateHeaders },
       );
     }
-    console.error("Server claim challenge issue error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "server.claim_challenge.create_failed",
+      context,
+      status: 500,
+      error,
+    });
     return NextResponse.json(
       { error: "Could not create server control challenge" },
       { status: 500, headers: privateHeaders },

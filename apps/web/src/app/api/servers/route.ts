@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
 import { serverService } from "../../../lib/services/server-service";
 import { authService } from "../../../lib/services/auth-service";
 import { createServerSchema } from "@nexus/validation";
@@ -54,6 +55,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
     const rateLimit = await consumeRateLimit("serverMutation", ip);
@@ -88,7 +90,13 @@ export async function POST(request: NextRequest) {
       error instanceof Error && "statusCode" in error
         ? (error as Error & { statusCode: number })
         : null;
-    console.error("Server registration error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "server.registration_failed",
+      context,
+      status: appError?.statusCode || 500,
+      error,
+    });
     return privateJson(
       { error: appError?.message || "Could not register server" },
       appError?.statusCode || 500 

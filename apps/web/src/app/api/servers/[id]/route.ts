@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";
 import { serverService } from "../../../../lib/services/server-service";
@@ -41,6 +42,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -66,7 +68,13 @@ export async function PATCH(
     const appError = error instanceof Error && "statusCode" in error
       ? (error as Error & { statusCode: number })
       : null;
-    console.error("Server update error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "server.update_failed",
+      context,
+      status: appError?.statusCode || 500,
+      error,
+    });
     return json(
       { error: appError?.message || "Could not update server" },
       appError?.statusCode || 500 

@@ -1,4 +1,5 @@
 import { after, type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../../lib/observability";
 import { contentService } from "../../../../../lib/services/content-service";
 import { authService } from "../../../../../lib/services/auth-service";
 import { createContentCommentSchema } from "@nexus/validation";
@@ -22,6 +23,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const context = createRequestLogContext(request);
   try {
     const { slug } = await params;
     if (!slug || slug.length > 200 || !/^[a-z0-9-]+$/.test(slug)) {
@@ -102,7 +104,13 @@ export async function POST(
       );
     }
 
-    console.error("Content comment error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "content.comment.create_failed",
+      context,
+      status: 500,
+      error,
+    });
     return json(
       { error: "Failed to add comment" },
       500 
