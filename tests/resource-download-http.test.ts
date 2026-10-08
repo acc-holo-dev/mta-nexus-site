@@ -36,6 +36,7 @@ const state = vi.hoisted(() => ({
 
 const auditRecord = vi.hoisted(() => vi.fn(async () => undefined));
 const downloadStream = vi.hoisted(() => vi.fn());
+const findLatestPublishedBuild = vi.hoisted(() => vi.fn());
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
@@ -60,7 +61,7 @@ vi.mock("@nexus/db", () => ({
     findById: vi.fn(async () => state.product),
   },
   buildRepository: {
-    findLatestPublishedByProduct: vi.fn(async () => state.build),
+    findLatestPublishedByProduct: findLatestPublishedBuild,
   },
   auditRepository: {
     record: auditRecord,
@@ -126,6 +127,9 @@ describe("resource download HTTP contract", () => {
       fileSizeBytes: Buffer.byteLength("nexus-build"),
       mimeType: "application/zip",
     };
+    findLatestPublishedBuild.mockImplementation(
+      async () => state.build,
+    );
     downloadStream.mockResolvedValue({
       stream: Readable.from(Buffer.from("nexus-build")),
       meta: {
@@ -220,6 +224,15 @@ describe("resource download HTTP contract", () => {
 
     expect(response.status).toBe(200);
     expect(downloadStream).toHaveBeenCalledTimes(1);
+  });
+
+  it("resolves delivery through the repository's deterministic latest-published selector", async () => {
+    const response = await GET(request(), context);
+
+    expect(response.status).toBe(200);
+    expect(findLatestPublishedBuild).toHaveBeenCalledOnce();
+    expect(findLatestPublishedBuild).toHaveBeenCalledWith("prd_http");
+    await response.arrayBuffer();
   });
 
   it("returns 404 when access exists but no published build is available", async () => {

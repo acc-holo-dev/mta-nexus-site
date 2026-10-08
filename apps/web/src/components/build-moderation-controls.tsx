@@ -4,6 +4,7 @@ import { Download, LoaderCircle, ShieldCheck, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
+import { buildModerationUiState } from "../lib/build-moderation-ui";
 import { useNexusLocale } from "./locale-context";
 
 export function BuildModerationControls({
@@ -22,10 +23,17 @@ export function BuildModerationControls({
   const [pending, setPending] = useState<"approve" | "reject" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const hasNotes = notes.trim().length >= 3;
-  const hasTrustedCleanScan = scanStatus === "clean" && hasScanProvenance;
-  const canApprove = hasTrustedCleanScan && hasNotes && pending === null;
-  const canReject = hasNotes && pending === null;
+  const {
+    hasNotes,
+    hasTrustedCleanScan,
+    canApprove,
+    canReject,
+  } = buildModerationUiState({
+    scanStatus,
+    hasScanProvenance,
+    notes,
+    pending,
+  });
 
   async function moderate(action: "approve" | "reject") {
     if (pending || !hasNotes || (action === "approve" && !hasTrustedCleanScan)) {

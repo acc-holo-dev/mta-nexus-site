@@ -298,8 +298,12 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   integration (last published → draft, fallback published version). Closed-beta
   paid/product source policies теперь проверяются поведением: checkout 503 code,
   paid create/release rejection до write, free-only listing/public visibility и
-  entitlement claim/check. Build moderation/quarantine source policies заменены
-  service behavior guards поверх уже существующих PostgreSQL/HTTP integrations:
+  entitlement claim/check. Build moderation UI source-policy заменён pure UI-state contract + SSR
+  reviewer-artifact behavior; reviewer bytes/moderation остаются под PostgreSQL/HTTP
+  integration. Download route теперь прямо доказывает использование deterministic
+  latest-published selector, поэтому отдельный source-only publication test удалён.
+  Build moderation/quarantine policies используют service behavior guards поверх
+  PostgreSQL/HTTP integrations:
   pending/CAS/scan provenance/release event и published/quarantined trusted-restore
   state machine. Discover/workspace source checks теперь заменены rendered navigation,
   compatibility redirect и SavedPage privacy/repository behavior; legacy commerce
