@@ -360,19 +360,37 @@ export class BuildRepository {
             and ${notificationPreferences.systemEnabled} = false)
         returning id, recipient_id
       `);
-      try {
-        await tx.transaction(async (pushTx) => {
-          for (const row of notificationRows) {
-            await enqueueWebPushOutboxForNotification(
+      let pushQueued = 0;
+      let pushQueueDegraded = 0;
+      for (const row of notificationRows) {
+        try {
+          const queued = await tx.transaction((pushTx) =>
+            enqueueWebPushOutboxForNotification(
               pushTx,
               String(row.id),
               String(row.recipient_id),
-            );
+            ),
+          );
+          pushQueued += queued.queued;
+          if (queued.reason === "saturated") {
+            pushQueueDegraded += 1;
           }
-        });
-      } catch {
-        // Build review + inbox notification are authoritative. A push queue
-        // failure rolls back only its savepoint and never the moderation.
+        } catch {
+          // Isolate each recipient in its own savepoint: one queue-local
+          // failure must not roll back another recipient's durable job.
+          pushQueueDegraded += 1;
+        }
+      }
+      if (pushQueueDegraded > 0) {
+        console.warn(
+          JSON.stringify({
+            event: "notification.push_outbox_degraded",
+            producer: "build_review",
+            notifications: notificationRows.length,
+            pushQueued,
+            pushQueueDegraded,
+          }),
+        );
       }
       return reviewed as unknown as Build;
     });

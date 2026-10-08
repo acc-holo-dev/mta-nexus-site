@@ -311,17 +311,35 @@ export class VerificationRepository {
       if (!resolutionNotification) {
         throw new Error("Verification notification insert failed");
       }
+      let pushQueued = 0;
+      let pushQueueDegraded = 0;
       try {
-        await tx.transaction((pushTx) =>
+        const queued = await tx.transaction((pushTx) =>
           enqueueWebPushOutboxForNotification(
             pushTx,
             resolutionNotification.id,
             resolutionNotification.recipientId,
           ),
         );
+        pushQueued = queued.queued;
+        if (queued.reason === "saturated") {
+          pushQueueDegraded = 1;
+        }
       } catch {
         // Resolution/audit/inbox are authoritative. Push queue failure is
         // isolated to this savepoint.
+        pushQueueDegraded = 1;
+      }
+      if (pushQueueDegraded > 0) {
+        console.warn(
+          JSON.stringify({
+            event: "notification.push_outbox_degraded",
+            producer: "verification_resolution",
+            notifications: 1,
+            pushQueued,
+            pushQueueDegraded,
+          }),
+        );
       }
 
       return request;
