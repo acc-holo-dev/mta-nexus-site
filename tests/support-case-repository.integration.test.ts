@@ -101,6 +101,22 @@ describe("support case repository", () => {
       )?.status,
     ).toBe("closed");
 
+    const staleUpdate = await supportCaseRepository.updateStatus(
+      caseId,
+      "resolved",
+      {
+        id: `aud_support_stale_${suffix}`,
+        actorId: staffId,
+        actorType: "admin",
+        action: "support.case.status_changed",
+        targetId: caseId,
+        targetType: "support_case",
+      },
+      "open",
+    );
+    expect(staleUpdate).toBeNull();
+    expect((await supportCaseRepository.findById(caseId))?.status).toBe("closed");
+
     await expect(
       supportCaseRepository.addMessage(
         {
