@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   findBuild: vi.fn(),
   findProduct: vi.fn(),
   moderatePending: vi.fn(),
+  submitForReview: vi.fn(),
   can: vi.fn(),
 }));
 
@@ -13,6 +14,7 @@ vi.mock("@nexus/db", () => ({
   buildRepository: {
     findById: mocks.findBuild,
     moderatePending: mocks.moderatePending,
+    submitForReview: mocks.submitForReview,
   },
   productRepository: {
     findById: mocks.findProduct,
@@ -159,6 +161,49 @@ describe("build moderation service behavior", () => {
       code: "BUILD_STATE_CHANGED",
     });
     expect(publishSpy).not.toHaveBeenCalled();
+  });
+
+  it("publishes submitted_for_review, never released, when an author submits a build", async () => {
+    const pending = build({
+      id: "bld_test",
+      status: "pending_review",
+    });
+    mocks.submitForReview.mockResolvedValue(pending);
+    vi.spyOn(service, "assertCanReleaseBuild").mockResolvedValue(product());
+
+    await expect(
+      service.releaseBuild(
+        {
+          productId: "prd_1",
+          version: "1.0.0",
+          releaseNotes: "Submission",
+          storageKey: "test/bld_test.zip",
+          sha256Hash: "a".repeat(64),
+          fileSizeBytes: 42,
+          fileName: "resource.zip",
+          mimeType: "application/zip",
+          scanStatus: "clean",
+          scanner: "test-scanner",
+          scannedAt: new Date("2026-01-01T00:00:00.000Z"),
+        },
+        moderator,
+      ),
+    ).resolves.toBe(pending);
+
+    expect(publishSpy).toHaveBeenCalledTimes(1);
+    expect(publishSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "build.submitted_for_review",
+        aggregateType: "build",
+        payload: expect.objectContaining({
+          productId: "prd_1",
+          version: "1.0.0",
+        }),
+      }),
+    );
+    expect(publishSpy).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: "build.released" }),
+    );
   });
 
   it("publishes build.released only after a successful approval", async () => {

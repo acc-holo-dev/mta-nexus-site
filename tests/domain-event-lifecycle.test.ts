@@ -1,44 +1,61 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+import {
+  InMemoryEventBus,
+  type BuildSubmittedForReviewEvent,
+  type ServerCreatedEvent,
+} from "@nexus/domain";
 
 describe("domain event lifecycle contracts", () => {
-  it("does not call a pending-review build released", () => {
-    const service = read("apps/web/src/lib/services/product-service.ts");
-    const releaseStart = service.indexOf("async releaseBuild(");
-    const reviewStart = service.indexOf("async reviewBuild(");
-    const releaseSection = service.slice(releaseStart, reviewStart);
+  it("dispatches a submitted-for-review event as its own event type", async () => {
+    const bus = new InMemoryEventBus();
+    const received: string[] = [];
+    bus.subscribe("build.submitted_for_review", async (event) => {
+      received.push(event.type);
+      expect(event.payload.buildId).toBe("bld_1");
+    });
+    bus.subscribe("build.released", async () => {
+      received.push("build.released");
+    });
 
-    expect(releaseSection).toContain(
-      'type: "build.submitted_for_review"',
-    );
-    expect(releaseSection).not.toContain('type: "build.released"');
+    const event: BuildSubmittedForReviewEvent = {
+      id: "evt_1",
+      type: "build.submitted_for_review",
+      version: 1,
+      timestamp: "2026-10-08T00:00:00.000Z",
+      actor: { id: "usr_1", type: "user" },
+      aggregateId: "bld_1",
+      aggregateType: "build",
+      payload: {
+        buildId: "bld_1",
+        productId: "prd_1",
+        version: "1.0.0",
+        hash: "a".repeat(64),
+      },
+    };
+
+    await bus.publish(event);
+    expect(received).toEqual(["build.submitted_for_review"]);
   });
 
-  it("publishes build.released only after a successful approval result", () => {
-    const service = read("apps/web/src/lib/services/product-service.ts");
-    const reviewStart = service.indexOf("async reviewBuild(");
-    const retireStart = service.indexOf("async retireBuild(");
-    const reviewSection = service.slice(reviewStart, retireStart);
+  it("supports organization-owned server.created events without a personal owner", async () => {
+    const event = {
+      id: "evt_server",
+      type: "server.created",
+      version: 1,
+      timestamp: "2026-10-08T00:00:00.000Z",
+      actor: { id: "org_1", type: "organization" },
+      aggregateId: "srv_1",
+      aggregateType: "server",
+      payload: {
+        serverId: "srv_1",
+        name: "Organization Server",
+        organizationId: "org_1",
+        ip: "203.0.113.10",
+        port: 22003,
+      },
+    } satisfies ServerCreatedEvent;
 
-    const reviewedGuard = reviewSection.indexOf("if (!reviewed)");
-    const releasedEvent = reviewSection.indexOf('type: "build.released"');
-
-    expect(reviewedGuard).toBeGreaterThan(-1);
-    expect(releasedEvent).toBeGreaterThan(reviewedGuard);
-    expect(reviewSection).toContain(
-      'if (input.decision === "approve")',
-    );
-  });
-
-  it("allows server.created to represent organization-owned servers without a personal owner", () => {
-    const events = read("packages/domain/src/events.ts");
-
-    expect(events).toContain("ownerId?: string");
-    expect(events).toContain("organizationId?: string");
-    expect(events).toContain('"build.submitted_for_review"');
+    expect(event.payload.organizationId).toBe("org_1");
+    expect("ownerId" in event.payload).toBe(false);
   });
 });
