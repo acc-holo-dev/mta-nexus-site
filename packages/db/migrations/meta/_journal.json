@@ -218,6 +218,13 @@
       "when": 1791337200000,
       "tag": "0030_web_push_outbox",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1791423600000,
+      "tag": "0031_support_staff_queue_index",
+      "breakpoints": true
     }
   ]
 }

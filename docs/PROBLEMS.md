@@ -98,13 +98,13 @@ repository policy или runner-side allocation failure) **не подтверж
 
 ### P1-3. Release upgrade fixture отставал от Web Push outbox
 
-Upgrade rehearsal был жёстко зафиксирован на последней миграции `0029`, хотя
-актуальный journal уже содержит `0030_web_push_outbox`. Это означало
-детерминированный отказ full acceptance сразу после восстановления GitHub runner.
-Fixture обновлён до baseline `0024` → target `0030` и теперь проверяет Support,
+Upgrade rehearsal раньше отставал от Web Push outbox. Сейчас release contract
+намеренно требует, чтобы target совпадал с последней migration journal entry.
+После добавления bounded Support pagination target обновлён до
+`0031_support_staff_queue_index`: rehearsal проверяет Support tables и оба
+read-path индекса (requester + global staff order), message-history index,
 Web Push subscriptions, outbox/gate/indexes, rollback/retry, legacy rows и
-idempotency. Queue-health tooling fixture также синхронизирован с обязательным
-progress watchdog metadata.
+idempotency. Любая новая migration снова заставит fixture fail-fast до review.
 
 - **Статус:** исправлено в коде, но exact-SHA hosted CI всё ещё нужен после
   восстановления runner allocation.

@@ -46,6 +46,7 @@ const evidence = {
   rerunIdempotent: false,
   structuredNotificationAccepted: false,
   supportSchemaPresent: false,
+  supportStaffQueueIndexPresent: false,
   webPushSubscriptionSchemaPresent: false,
   webPushOutboxSchemaPresent: false,
   cleanupComplete: false,
@@ -145,6 +146,24 @@ try {
     ["support_case_messages", "support_cases"],
   );
   evidence.supportSchemaPresent = true;
+
+  const supportQueueIndexes = await client`SELECT indexname FROM pg_indexes
+    WHERE schemaname = 'public'
+      AND indexname IN (
+        'support_cases_requester_updated_id_idx',
+        'support_cases_updated_id_idx',
+        'support_case_messages_case_created_id_idx'
+      )
+    ORDER BY indexname`;
+  assert.deepEqual(
+    supportQueueIndexes.map((row) => row.indexname),
+    [
+      "support_case_messages_case_created_id_idx",
+      "support_cases_requester_updated_id_idx",
+      "support_cases_updated_id_idx",
+    ],
+  );
+  evidence.supportStaffQueueIndexPresent = true;
 
   const pushTables = await client`SELECT table_name FROM information_schema.tables
     WHERE table_schema = 'public'

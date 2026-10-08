@@ -3,7 +3,7 @@ export const RELEASE_UPGRADE_BASELINE_TAG =
 export const RELEASE_UPGRADE_FAILURE_TAG =
   "0027_build_quarantine";
 export const RELEASE_UPGRADE_TARGET_TAG =
-  "0030_web_push_outbox";
+  "0031_support_staff_queue_index";
 
 function journalEntries(journal) {
   if (!journal || !Array.isArray(journal.entries)) {
