@@ -104,3 +104,11 @@ Risk/provider policy может добавить dual-control позже без 
 - Server filtering uses validated query values, consistent count/page predicates and a composite index.
 - Status and category controls have English and Russian copy. Changing a filter resets pagination. Stale list fetches are aborted and ignored.
 - This is a queue browsing feature, not an assignment or adjudication mechanism.
+
+## 9. Support reply concurrency (implemented)
+
+- `POST /api/support/:id` requires `expectedStatus` in addition to the message body. The client captures the status visible when the reply is submitted.
+- A reply composed against a stale status returns private HTTP 409 `SUPPORT_MESSAGE_CONFLICT`. Already closed cases return `SUPPORT_CASE_CLOSED` without attempting a write.
+- A user who consciously replies to a currently resolved case may reopen it; the repository atomically compares the status and writes the message and audit event in one transaction. This avoids silently reopening a case after a separate staff decision.
+- The browser refreshes the thread on conflict, preserves unsent text, and renders localized RU/EN conflict guidance; retries must be explicitly submitted.
+- This is status-based compare-and-set. The documented ABA/revision limitation remains.

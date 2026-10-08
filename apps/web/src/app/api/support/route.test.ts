@@ -386,7 +386,7 @@ describe("support HTTP authorization and privacy", () => {
       new NextRequest("https://nexus.test/api/support/" + caseId, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message: "We restored the account." }),
+        body: JSON.stringify({ message: "We restored the account.", expectedStatus: "open" }),
       }),
       params,
     );
@@ -466,7 +466,7 @@ describe("support HTTP authorization and privacy", () => {
       new NextRequest(`https://nexus.test/api/support/${caseId}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ message: "Please reopen this issue." }),
+        body: JSON.stringify({ message: "Please reopen this issue.", expectedStatus: "open" }),
       }),
       params,
     );
@@ -501,6 +501,7 @@ describe("support HTTP authorization and privacy", () => {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           message: "This reply raced with moderation.",
+          expectedStatus: "open",
         }),
       }),
       params,
@@ -518,6 +519,88 @@ describe("support HTTP authorization and privacy", () => {
       }),
       expect.any(Object),
     );
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("requires a client-observed status before accepting replies", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.findById.mockResolvedValue({
+      id: caseId, requesterId: "usr_member", subject: "Account help", status: "open",
+    });
+
+    const response = await addMessage(
+      new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: "This request has no state precondition." }),
+      }),
+      params,
+    );
+    expect(response.status).toBe(400);
+    expectPrivate(response);
+    expect(mocks.addMessage).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects a reply composed before another moderator resolved the ticket", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.findById.mockResolvedValue({
+      id: caseId, requesterId: "usr_member", subject: "Account help", status: "resolved",
+    });
+    const response = await addMessage(
+      new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: "I was reading an open thread.", expectedStatus: "open" }),
+      }),
+      params,
+    );
+    expect(response.status).toBe(409);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({ code: "SUPPORT_MESSAGE_CONFLICT" });
+    expect(mocks.addMessage).not.toHaveBeenCalled();
+    expect(afterMock).not.toHaveBeenCalled();
+  });
+
+  it("allows a deliberate reply to a resolved ticket, reopening it atomically", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.findById.mockResolvedValue({
+      id: caseId, requesterId: "usr_member", subject: "Account help", status: "resolved",
+    });
+    const response = await addMessage(
+      new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: "I still need assistance.", expectedStatus: "resolved" }),
+      }),
+      params,
+    );
+    expect(response.status).toBe(201);
+    expectPrivate(response);
+    expect(mocks.addMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ caseId, expectedStatus: "resolved" }),
+      expect.any(Object),
+    );
+    expect(afterMock).toHaveBeenCalledOnce();
+  });
+
+  it("rejects replies to already closed tickets before repository mutation", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.findById.mockResolvedValue({
+      id: caseId, requesterId: "usr_member", subject: "Account help", status: "closed",
+    });
+    const response = await addMessage(
+      new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: "The ticket is already closed.", expectedStatus: "closed" }),
+      }),
+      params,
+    );
+    expect(response.status).toBe(409);
+    expectPrivate(response);
+    expect(await response.json()).toMatchObject({ code: "SUPPORT_CASE_CLOSED" });
+    expect(mocks.addMessage).not.toHaveBeenCalled();
     expect(afterMock).not.toHaveBeenCalled();
   });
 });

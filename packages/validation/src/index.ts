@@ -283,6 +283,8 @@ export const createSupportCaseSchema = z
 export const createSupportMessageSchema = z
   .object({
     message: z.string().trim().min(1).max(4_000),
+    // The state seen by the author when composing this reply.
+    expectedStatus: z.enum(SUPPORT_CASE_STATUSES),
   })
   .strict();
 

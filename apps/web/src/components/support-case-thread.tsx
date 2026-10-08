@@ -77,7 +77,8 @@ export function SupportCaseThread({
 
   async function sendReply(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (sending || updatingStatus || !reply.trim()) return;
+    if (sending || updatingStatus || !reply.trim() || !supportCase) return;
+    const expectedStatus = supportCase.status;
 
     setSending(true);
     setError(null);
@@ -89,14 +90,14 @@ export function SupportCaseThread({
           cache: "no-store",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: reply }),
+          body: JSON.stringify({ message: reply, expectedStatus }),
           signal: AbortSignal.timeout(15_000),
         },
       );
       const data = await response.json().catch(() => null);
       if (response.status === 409) {
         await load();
-        setError(copy.replyError);
+        setError(copy.replyConflict);
         return;
       }
       const confirmed = confirmSupportReply(
@@ -154,7 +155,7 @@ export function SupportCaseThread({
       const data = await response.json().catch(() => null);
       if (response.status === 409) {
         await load();
-        setError(copy.statusError);
+        setError(copy.statusConflict);
         return;
       }
       const confirmed = confirmSupportStatusChanged(response.status, data, caseId, status);

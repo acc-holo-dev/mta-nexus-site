@@ -37,10 +37,19 @@ describe("support validation", () => {
 
   it("bounds replies and staff status mutations", () => {
     expect(
-      createSupportMessageSchema.safeParse({ message: "Thanks" }).success,
+      createSupportMessageSchema.safeParse({ message: "Thanks", expectedStatus: "open" }).success,
     ).toBe(true);
     expect(
-      createSupportMessageSchema.safeParse({ message: "" }).success,
+      createSupportMessageSchema.safeParse({ message: "Follow up", expectedStatus: "resolved" }).success,
+    ).toBe(true);
+    expect(
+      createSupportMessageSchema.safeParse({ message: "Thanks" }).success,
+    ).toBe(false);
+    expect(
+      createSupportMessageSchema.safeParse({ message: "", expectedStatus: "open" }).success,
+    ).toBe(false);
+    expect(
+      createSupportMessageSchema.safeParse({ message: "Thanks", expectedStatus: "unknown" }).success,
     ).toBe(false);
     expect(
       updateSupportCaseStatusSchema.safeParse({ status: "resolved", expectedStatus: "open" }).success,

@@ -151,6 +151,25 @@ export async function POST(
       );
     }
 
+    // The requester's or moderator's view may be stale even before the
+    // transaction starts. Never implicitly reopen a newly resolved ticket.
+    if (
+      access.supportCase.status === "closed" ||
+      access.supportCase.status !== parsed.data.expectedStatus
+    ) {
+      const closed = access.supportCase.status === "closed";
+      return privateJson(
+        context,
+        {
+          error: closed
+            ? "Closed support cases cannot receive new messages"
+            : "Support case changed concurrently",
+          code: closed ? "SUPPORT_CASE_CLOSED" : "SUPPORT_MESSAGE_CONFLICT",
+        },
+        { status: 409 },
+      );
+    }
+
     const authorRole =
       access.supportCase.requesterId === access.user.id
         ? "requester"
@@ -162,7 +181,7 @@ export async function POST(
         authorId: access.user.id,
         authorRole,
         body: parsed.data.message,
-        expectedStatus: access.supportCase.status,
+        expectedStatus: parsed.data.expectedStatus,
       },
       {
         id: generateId("aud"),
