@@ -26,9 +26,9 @@ describe("Web Push endpoint policy", () => {
     "https://service.local/subscriptions/abc",
     "https://127.0.0.1/subscriptions/abc",
     "https://[::1]/subscriptions/abc",
-  ])("rejects an unsafe endpoint: %s", (endpoint) => {
+  ])("rejects an unsafe endpoint permanently: %s", (endpoint) => {
     expect(() => parseWebPushEndpoint(endpoint)).toThrow(
-      "Unsafe Web Push endpoint",
+      WebPushPermanentSubscriptionError,
     );
   });
 

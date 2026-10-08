@@ -10,6 +10,7 @@ import type {
 import {
   WebPushPermanentPayloadError,
   WebPushPermanentSubscriptionError,
+  parseWebPushEndpoint,
 } from "../packages/db/src/web-push-runtime";
 
 function lease(id: string): WebPushLease {
@@ -135,6 +136,30 @@ describe("Web Push dispatcher", () => {
     expect(
       w.discardStaleSubscription,
     ).not.toHaveBeenCalled();
+  });
+
+  it("removes unsafe endpoint failures without retrying them", async () => {
+    const id =
+      "wpo_00000000-0000-0000-0000-000000000014";
+    const w = worker([id]);
+    const sender = vi.fn(async () => {
+      parseWebPushEndpoint("https://127.0.0.1/push");
+      return { statusCode: 201 };
+    });
+
+    await expect(
+      new WebPushDispatcher({
+        worker: w,
+        sender,
+      }).runBatch(),
+    ).resolves.toMatchObject({
+      retried: 0,
+      stale: 1,
+      discarded: 0,
+    });
+
+    expect(w.discardStaleSubscription).toHaveBeenCalledOnce();
+    expect(w.settle).not.toHaveBeenCalled();
   });
 
   it("removes a permanently invalid subscription without retrying it", async () => {

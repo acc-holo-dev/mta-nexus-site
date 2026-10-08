@@ -472,7 +472,9 @@ export function parseWebPushEndpoint(value: string): URL {
     hostname.endsWith(".local") ||
     isIP(hostname) !== 0
   ) {
-    throw new Error("Unsafe Web Push endpoint");
+    throw new WebPushPermanentSubscriptionError(
+      "Unsafe Web Push endpoint",
+    );
   }
 
   return url;
