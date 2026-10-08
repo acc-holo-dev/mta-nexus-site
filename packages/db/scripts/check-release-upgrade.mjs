@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
+import { releaseUpgradePlan } from "./release-upgrade-contract.mjs";
 
 // Never connect to an operator's database. This rehearsal owns one new database
 // on the hosted runner's loopback PostgreSQL service, with no production secrets.
@@ -19,9 +20,13 @@ assert.equal(url.pathname, "/mta_nexus_test", "Only the disposable CI service is
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const migrationsFolder = join(root, "packages/db/migrations");
-const journal = JSON.parse(readFileSync(join(migrationsFolder, "meta/_journal.json"), "utf8"));
-// Freeze the baseline: when migrations advance, review and extend this fixture.
-assert.equal(journal.entries.at(-1).tag, "0030_web_push_outbox");
+const journal = JSON.parse(
+  readFileSync(
+    join(migrationsFolder, "meta/_journal.json"),
+    "utf8",
+  ),
+);
+const upgradePlan = releaseUpgradePlan(journal);
 const temp = mkdtempSync(join(tmpdir(), "nexus-upgrade-"));
 const baselineFolder = join(temp, "baseline");
 const failureFolder = join(temp, "failure");
@@ -32,8 +37,8 @@ let created = false;
 const evidence = {
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
-  baseline: "0024_product_type_invariant",
-  target: "0030_web_push_outbox",
+  baseline: upgradePlan.baselineTag,
+  target: upgradePlan.targetTag,
   phase: "baseline",
   failedMigrationRolledBack: false,
   legacyRowsPreserved: false,
@@ -48,11 +53,18 @@ const evidence = {
 
 try {
   cpSync(migrationsFolder, baselineFolder, { recursive: true });
-  writeFileSync(join(baselineFolder, "meta/_journal.json"), JSON.stringify({
-    ...journal, entries: journal.entries.filter((entry) => entry.idx <= 24),
-  }));
+  writeFileSync(
+    join(baselineFolder, "meta/_journal.json"),
+    JSON.stringify({
+      ...journal,
+      entries: upgradePlan.baselineEntries,
+    }),
+  );
   cpSync(migrationsFolder, failureFolder, { recursive: true });
-  const targetPath = join(failureFolder, "0027_build_quarantine.sql");
+  const targetPath = join(
+    failureFolder,
+    `${upgradePlan.failureTag}.sql`,
+  );
   writeFileSync(targetPath, readFileSync(targetPath, "utf8") +
     "\n--> statement-breakpoint\nDO $$ BEGIN RAISE EXCEPTION 'nexus_upgrade_injected_failure'; END $$;\n");
 
