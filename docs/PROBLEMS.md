@@ -100,11 +100,12 @@ repository policy или runner-side allocation failure) **не подтверж
 
 Upgrade rehearsal раньше отставал от Web Push outbox. Сейчас release contract
 намеренно требует, чтобы target совпадал с последней migration journal entry.
-После добавления bounded Support pagination target обновлён до
-`0031_support_staff_queue_index`: rehearsal проверяет Support tables и оба
-read-path индекса (requester + global staff order), message-history index,
-Web Push subscriptions, outbox/gate/indexes, rollback/retry, legacy rows и
-idempotency. Любая новая migration снова заставит fixture fail-fast до review.
+После добавления фильтров staff Support target обновлён до
+`0032_support_staff_filter_index`: rehearsal проверяет Support tables,
+все read-path индексы (requester, status, category+status, global staff order),
+message-history index, Web Push subscriptions, outbox/gate/indexes,
+rollback/retry, legacy rows и idempotency. Любая новая migration снова
+заставит fixture fail-fast до review.
 
 - **Статус:** исправлено в коде, но exact-SHA hosted CI всё ещё нужен после
   восстановления runner allocation.

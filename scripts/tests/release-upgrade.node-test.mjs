@@ -94,6 +94,24 @@ test("upgrade contract tracks the latest real migration journal", () => {
   );
 });
 
+test("upgrade contract requires the filtered staff queue migration", () => {
+  const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
+  const plan = releaseUpgradePlan(journal);
+  assert.equal(plan.targetTag, "0032_support_staff_filter_index");
+
+  const indexMigration = readFileSync(
+    new URL("0032_support_staff_filter_index.sql", migrationsUrl),
+    "utf8",
+  );
+  assert.match(indexMigration, /CREATE INDEX "support_cases_category_status_updated_id_idx"/u);
+  assert.match(indexMigration, /"category","status","updated_at","id"/u);
+
+  const rehearsal = readFileSync(script, "utf8");
+  assert.match(rehearsal, /'support_cases_status_updated_id_idx'/u);
+  assert.match(rehearsal, /'support_cases_category_status_updated_id_idx'/u);
+  assert.match(rehearsal, /supportStaffFilterIndexPresent = true/u);
+});
+
 test("upgrade contract fails fast when a new migration advances the journal", () => {
   const journal = JSON.parse(
     readFileSync(journalUrl, "utf8"),
@@ -106,7 +124,7 @@ test("upgrade contract fails fast when a new migration advances the journal", ()
         idx: journal.entries.length,
         version: "7",
         when: Date.now(),
-        tag: "0031_requires_fixture_review",
+        tag: "0033_requires_fixture_review",
         breakpoints: true,
       },
     ],
