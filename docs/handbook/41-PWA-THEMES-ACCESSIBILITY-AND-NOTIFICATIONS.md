@@ -28,7 +28,9 @@ Notification delivery теперь имеет единый durable contract. Pre
 
 Closed-provider evidence теперь включает настоящий local TLS/SNI network round-trip через production Web Push runtime, включая propagation `Retry-After` из реального 503 response: VAPID Authorization, `aes128gcm`, encrypted <=4096-byte body, 201/410/503 и timeout проверяются без внешней сети. PostgreSQL soak одновременно запускает четыре dispatcher-а на перекрывающихся candidate lists и требует exactly-once lease/send/settlement для 32 durable jobs. Это protocol/concurrency evidence, но не подменяет внешний provider.
 
-Ещё не закрыты target requirements этой главы: **live external provider acceptance и production-duration soak evidence для Web Push**, live paid-commerce accessibility после включения checkout/provider и полный WCAG 2.2 AA screen-reader audit. Public read-only offline cache policy теперь реализована fail-closed и намеренно остаётся узким allowlist, а не общим кешированием всех публичных страниц.
+Для оставшихся внешних Web Push доказательств теперь есть операторские fail-closed harnesses: fixture-only production-duration soak с exactly-once/retry/drain/cleanup evidence и sanitized live-provider probe через настоящий production sender. Core release artifact включает только их presence/validator/SHA-256 и не считает отсутствие внешнего evidence успешной public acceptance.
+
+Ещё не закрыты target requirements этой главы: **фактический запуск live external provider acceptance и production-duration soak на staging/целевой сети**, live paid-commerce accessibility после включения checkout/provider и полный WCAG 2.2 AA screen-reader audit. Public read-only offline cache policy теперь реализована fail-closed и намеренно остаётся узким allowlist, а не общим кешированием всех публичных страниц.
 
 ## 1. Public release quality bar
 

@@ -73,9 +73,9 @@ annotations, то есть workflow зарегистрирован, но runner 
 
 У run `37565630603` zero-step failure воспроизведён в трёх attempts, включая
 отдельный rerun конкретного failed job. Симптом далее стабильно повторяется на
-новых push-runs. Свежий run `37666844264` на `601b2bf` завершился тем же
-образом: plan job `112948144949` имеет `steps: null`; все executable jobs
-были пропущены до checkout/user code. Это подтверждает, что blocker пережил
+новых push-runs. Свежий run `37719493537` на `cab1c78` завершился тем же
+образом: plan job `113123622340` имеет `runner_id: null` и `steps: 0`;
+все executable jobs были пропущены до checkout/user code. Это подтверждает, что blocker пережил
 durable Web Push queue alerting и safe public offline-cache refactor и не
 привязан к конкретному workflow step. При этом последний полностью исполнившийся HEAD `7567191`
 прошёл полный CI, а run `37565299572` на `3a1f818` ещё назначал runners,
@@ -108,6 +108,37 @@ progress watchdog metadata.
 
 - **Статус:** исправлено в коде, но exact-SHA hosted CI всё ещё нужен после
   восстановления runner allocation.
+
+### P1-4. Web Push external acceptance ещё не выполнена
+
+Durable Web Push runtime, worker recovery, local TLS/SNI provider harness,
+`Retry-After`, anti-SSRF, queue health/watchdog и concurrent PostgreSQL
+lease/settlement уже реализованы. Для двух оставшихся внешних доказательств
+добавлены отдельные fail-closed инструменты:
+
+- `pnpm push:soak` — fixture-only production-duration soak. Synthetic sender
+  видит только собственный namespace, принудительно проходит 503→retry→201,
+  проверяет exactly-once acceptance, drain, queue pressure и cleanup; artifact
+  `artifacts/web-push-soak-evidence.json` имеет checksum и отдельный validator
+  `pnpm push:soak:verify`;
+- `pnpm push:provider:probe` — одноразовая отправка через настоящий production
+  sender/VAPID/anti-SSRF к реальной browser subscription. Artifact
+  `artifacts/web-push-provider-evidence.json` сохраняет только provider origin,
+  SHA-256 endpoint/public-key fingerprints, HTTP status и timing; endpoint,
+  p256dh/auth и private VAPID key в evidence не сериализуются. Validator:
+  `pnpm push:provider:verify`.
+
+Core `release:verify` теперь только ссылается на эти artifacts по
+`present/valid/sha256` в отдельном `externalEvidence`; core
+`releaseCandidate` намеренно не выдаёт их отсутствие за пройденную public
+production acceptance.
+
+- **Статус:** tooling готов, но evidence ещё не получена на staging/целевой сети.
+- **Следующий шаг:** на изолированной staging-БД выполнить минимум 15-минутный
+  soak с `NEXUS_WEB_PUSH_SOAK_ACK=YES`, затем live provider probe с реальной
+  browser subscription и полным VAPID набором. Оба validators должны пройти;
+  artifacts привязать к тому же release SHA. Не использовать production
+  пользовательскую subscription/queue для synthetic soak.
 
 ## P2 — известные ограничения
 
