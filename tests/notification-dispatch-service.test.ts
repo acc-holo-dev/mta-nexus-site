@@ -32,6 +32,15 @@ describe("notification dispatch service", () => {
       })
       .mockRejectedValueOnce(new Error("db unavailable"));
 
+    const sensitive = {
+      recipientId: "u1",
+      title: "Sensitive title",
+      message: "Sensitive message",
+      type: "system" as const,
+      category: "system" as const,
+      link: "/private/sensitive-link",
+    };
+
     await expect(
       dispatchNotificationsBestEffort([
         {
@@ -65,7 +74,8 @@ describe("notification dispatch service", () => {
     });
   });
 
-  it("reports a stored inbox row whose push queue degraded", async () => {
+  it("reports a stored inbox row whose push queue degraded without logging notification content", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     create.mockResolvedValueOnce({
       notification: { id: "not_1", recipientId: "u1" },
       pushJobs: 0,
@@ -74,19 +84,31 @@ describe("notification dispatch service", () => {
 
     await expect(
       dispatchNotificationsBestEffort([
-        {
-          recipientId: "u1",
-          title: "Saturated",
-          message: "Inbox remains authoritative",
-          type: "system",
-          category: "system",
-        },
+        sensitive,
       ]),
     ).resolves.toMatchObject({
       stored: 1,
       pushQueued: 0,
       pushQueueDegraded: 1,
     });
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    const logged = warn.mock.calls[0]?.[0];
+    expect(typeof logged).toBe("string");
+    const parsed = JSON.parse(String(logged));
+    expect(parsed).toEqual({
+      event: "notification.push_outbox_degraded",
+      requested: 1,
+      stored: 1,
+      storageFailed: 0,
+      pushQueued: 0,
+      pushQueueDegraded: 1,
+    });
+    expect(String(logged)).not.toContain(sensitive.recipientId);
+    expect(String(logged)).not.toContain(sensitive.title);
+    expect(String(logged)).not.toContain(sensitive.message);
+    expect(String(logged)).not.toContain(sensitive.link);
+    warn.mockRestore();
   });
 
   it("preserves explicit deterministic notification IDs", async () => {

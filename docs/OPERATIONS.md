@@ -478,6 +478,7 @@ Validate production configuration without deploying publicly:
 - `push-worker` is a separate production process with lease ownership, max 5 attempts, deterministic backoff, terminal 404/410 subscription cleanup, 24-hour job TTL and graceful shutdown;
 - worker liveness is checked through `scripts/check-web-push-worker-health.mjs`; a stale/malformed heartbeat, impossible queue counters or hard saturation fail closed, while a fully unconfigured VAPID setup remains healthy-idle and continues expired-job maintenance;
 - operational backlog alerting is separate from liveness: the heartbeat contains only aggregate `queueAlert`, reasons and thresholds, and `scripts/check-web-push-worker-queue.mjs` returns exit 0 for OK, 2 for an alert and 1 for an invalid/stale heartbeat;
+- if an inbox notification commits but its outbox savepoint is saturated or fails, the server emits one aggregate `notification.push_outbox_degraded` warning containing counts only; it never logs recipient IDs, notification text, links, subscription endpoints or VAPID material;
 - default alert thresholds are 80% queue capacity, 100 due jobs and 900 seconds oldest active job; production can override them with `WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT`, `WEB_PUSH_QUEUE_ALERT_DUE_JOBS` and `WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS`;
 - queue operations never expose endpoint capability URLs or notification bodies in worker health/log events.
 

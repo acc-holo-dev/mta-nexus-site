@@ -45,12 +45,27 @@ export async function dispatchNotificationsBestEffort(
     }
   }
 
+  const storageFailed = deliveries.filter(
+    (delivery) => delivery.status === "rejected",
+  ).length;
+
+  if (pushQueueDegraded > 0) {
+    console.warn(
+      JSON.stringify({
+        event: "notification.push_outbox_degraded",
+        requested: inputs.length,
+        stored,
+        storageFailed,
+        pushQueued,
+        pushQueueDegraded,
+      }),
+    );
+  }
+
   return {
     requested: inputs.length,
     stored,
-    storageFailed: deliveries.filter(
-      (delivery) => delivery.status === "rejected",
-    ).length,
+    storageFailed,
     pushQueued,
     pushQueueDegraded,
   };
