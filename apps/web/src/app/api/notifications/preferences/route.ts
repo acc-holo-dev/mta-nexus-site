@@ -1,25 +1,69 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
+import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
 import { notificationPreferencesSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../lib/observability";
 
-const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
+    status,
+    headers: privateHeaders,
+  });
+}
 
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get("nexus_session")?.value;
-  const user = await authService.getSession(token);
+  const context = createRequestLogContext(request);
 
-  if (!user) {
-    return NextResponse.json({ error: "Authentication required" }, { status: 401, headers: privateHeaders });
+  try {
+    const token = request.cookies.get("nexus_session")?.value;
+    const user = await authService.getSession(token);
+
+    if (!user) {
+      return json(
+        context,
+        { error: "Authentication required" },
+        401,
+      );
+    }
+
+    const preferences =
+      await notificationRepository.getPreferences(
+        user.id,
+      );
+    return json(context, { preferences });
+  } catch (error) {
+    logRequestEvent({
+      level: "error",
+      event:
+        "notifications.preferences_fetch_failed",
+      context,
+      status: 500,
+      error,
+    });
+    return json(
+      context,
+      {
+        error:
+          "Failed to fetch notification preferences",
+      },
+      500,
+    );
   }
-
-  const preferences = await notificationRepository.getPreferences(user.id);
-  return NextResponse.json(
-    { preferences },
-    { headers: privateHeaders }
-  );
 }
 
 export async function PATCH(request: NextRequest) {
@@ -29,45 +73,70 @@ export async function PATCH(request: NextRequest) {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return NextResponse.json(
+      return json(
+        context,
         { error: "Authentication required" },
-        { status: 401, headers: privateHeaders },
+        401,
       );
     }
 
-    const rateLimit = await consumeRateLimit("notificationMutation", user.id);
-    if (!rateLimit.success) {
-      return NextResponse.json(
-        { error: "Too many preference updates. Please try again shortly." },
-        { status: 429, headers: privateHeaders },
-      );
-    }
-
-    const body = await request.json().catch(() => ({}));
-    const parsed = notificationPreferencesSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid notification preferences", details: parsed.error.format() },
-        { status: 400, headers: privateHeaders },
-      );
-    }
-
-    const preferences = await notificationRepository.updatePreferences(user.id, parsed.data);
-    return NextResponse.json(
-      { success: true, preferences },
-      { headers: privateHeaders },
+    const rateLimit = await consumeRateLimit(
+      "notificationMutation",
+      user.id,
     );
+    if (!rateLimit.success) {
+      return json(
+        context,
+        {
+          error:
+            "Too many preference updates. Please try again shortly.",
+        },
+        429,
+      );
+    }
+
+    const body = await request
+      .json()
+      .catch(() => ({}));
+    const parsed =
+      notificationPreferencesSchema.safeParse(body);
+    if (!parsed.success) {
+      return json(
+        context,
+        {
+          error:
+            "Invalid notification preferences",
+          details: parsed.error.format(),
+        },
+        400,
+      );
+    }
+
+    const preferences =
+      await notificationRepository.updatePreferences(
+        user.id,
+        parsed.data,
+      );
+    return json(context, {
+      success: true,
+      preferences,
+    });
   } catch (error: unknown) {
     logRequestEvent({
       level: "error",
-      event: "notifications.preferences_update_failed",
+      event:
+        "notifications.preferences_update_failed",
       context,
       status: 500,
       error,
     });
-    return NextResponse.json(
-      { error: "Failed to update notification preferences" },
-      { status: 500, headers: privateHeaders },
+    return json(
+      context,
+      {
+        error:
+          "Failed to update notification preferences",
+      },
+      500,
     );
   }
 }

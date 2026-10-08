@@ -1,17 +1,26 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
+import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
 import { consumeRateLimit } from "@nexus/security";
 import { parseNotificationReadTarget } from "../../../../lib/notification-read";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../lib/observability";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
   Vary: "Cookie",
 };
 
-function json(body: unknown, status = 200) {
-  return NextResponse.json(body, {
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
   });
@@ -24,32 +33,69 @@ export async function POST(request: NextRequest) {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return json({ error: "Unauthorized" }, 401 );
-    }
-
-    const rateLimit = await consumeRateLimit("notificationMutation", user.id);
-    if (!rateLimit.success) {
       return json(
-        { error: "Too many notification updates. Please try again shortly." },
-        429 
+        context,
+        { error: "Unauthorized" },
+        401,
       );
     }
 
-    const target = parseNotificationReadTarget(await request.text());
-    if (!target) {
-      return json({ error: "Invalid notification target" }, 400);
-    }
-    if (target.scope === "single") {
-      // IDOR protection: only mark notifications owned by the current user.
-      const updated = await notificationRepository.markAsRead(target.id, user.id);
-      if (!updated) {
-        return json({ error: "Notification not found or not owned by you" }, 404);
-      }
-      return json({ success: true, scope: "single", id: target.id });
+    const rateLimit = await consumeRateLimit(
+      "notificationMutation",
+      user.id,
+    );
+    if (!rateLimit.success) {
+      return json(
+        context,
+        {
+          error:
+            "Too many notification updates. Please try again shortly.",
+        },
+        429,
+      );
     }
 
-    await notificationRepository.markAllAsRead(user.id);
-    return json({ success: true, scope: "all" });
+    const target = parseNotificationReadTarget(
+      await request.text(),
+    );
+    if (!target) {
+      return json(
+        context,
+        { error: "Invalid notification target" },
+        400,
+      );
+    }
+
+    if (target.scope === "single") {
+      const updated =
+        await notificationRepository.markAsRead(
+          target.id,
+          user.id,
+        );
+      if (!updated) {
+        return json(
+          context,
+          {
+            error:
+              "Notification not found or not owned by you",
+          },
+          404,
+        );
+      }
+      return json(context, {
+        success: true,
+        scope: "single",
+        id: target.id,
+      });
+    }
+
+    await notificationRepository.markAllAsRead(
+      user.id,
+    );
+    return json(context, {
+      success: true,
+      scope: "all",
+    });
   } catch (error: unknown) {
     logRequestEvent({
       level: "error",
@@ -58,6 +104,13 @@ export async function POST(request: NextRequest) {
       status: 500,
       error,
     });
-    return json({ error: "Failed to mark notifications read" }, 500 );
+    return json(
+      context,
+      {
+        error:
+          "Failed to mark notifications read",
+      },
+      500,
+    );
   }
 }
