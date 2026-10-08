@@ -19,8 +19,7 @@ const mocks = vi.hoisted(() => ({
   findProduct: vi.fn(),
   createWithAudit: vi.fn(),
   listModeratorIds: vi.fn(),
-  notify: vi.fn(),
-  push: vi.fn(),
+  dispatch: vi.fn(),
 }));
 
 vi.mock("next/server", async () => {
@@ -36,8 +35,8 @@ vi.mock("next/server", async () => {
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
-vi.mock("../apps/web/src/lib/services/notification-web-push-service", () => ({
-  deliverStoredNotificationsWebPush: mocks.push,
+vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
+  dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 
 vi.mock("@nexus/security", () => ({
@@ -54,7 +53,6 @@ vi.mock("@nexus/db", () => ({
   serverRepository: { findById: vi.fn() },
   contentRepository: { findById: vi.fn(), findCommentById: vi.fn() },
   userRepository: { findById: vi.fn(), listModeratorIds: mocks.listModeratorIds },
-  notificationRepository: { create: mocks.notify },
 }));
 
 import { GET, POST } from "../apps/web/src/app/api/reports/route";
@@ -74,19 +72,18 @@ beforeEach(() => {
   mocks.listPage.mockResolvedValue({ reports: [], hasMore: false });
   mocks.findProduct.mockResolvedValue({ id: "prd_test" });
   mocks.listModeratorIds.mockResolvedValue(["mod_1"]);
-  mocks.notify.mockImplementation(async (input) => ({
-    ...input,
-    id: "not_report",
-    createdAt: new Date(),
-    isRead: false,
-  }));
-  mocks.push.mockResolvedValue({
-    notifications: 1,
-    attempted: 0,
-    delivered: 0,
-    failed: 0,
-    stale: 0,
-    deliveryErrors: 0,
+  mocks.dispatch.mockResolvedValue({
+    requested: 1,
+    stored: 1,
+    storageFailed: 0,
+    push: {
+      notifications: 1,
+      attempted: 0,
+      delivered: 0,
+      failed: 0,
+      stale: 0,
+      deliveryErrors: 0,
+    },
   });
   mocks.createWithAudit.mockResolvedValue({ report: { id: "rpt_test", status: "open" }, created: true });
 });
@@ -122,7 +119,7 @@ describe("report privacy and durable success", () => {
 
   it("does not report a committed complaint as failed when moderator notification fails", async () => {
     mocks.session.mockResolvedValue({ id: "member_1" });
-    mocks.notify.mockRejectedValue(new Error("Notification unavailable"));
+    mocks.dispatch.mockRejectedValue(new Error("Notification unavailable"));
     const response = await POST(new NextRequest("https://nexus.test/api/reports", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -141,15 +138,14 @@ describe("report privacy and durable success", () => {
     );
     expect(afterMock).toHaveBeenCalledOnce();
     expect(mocks.listModeratorIds).not.toHaveBeenCalled();
-    expect(mocks.notify).not.toHaveBeenCalled();
+    expect(mocks.dispatch).not.toHaveBeenCalled();
 
     await state.afterCallbacks[0]?.();
 
     expect(mocks.listModeratorIds).toHaveBeenCalledOnce();
-    expect(mocks.notify).toHaveBeenCalledWith(
+    expect(mocks.dispatch).toHaveBeenCalledWith([
       expect.objectContaining({ recipientId: "mod_1" }),
-    );
-    expect(mocks.push).toHaveBeenCalledWith([]);
+    ]);
   });
 
   it("pushes only successfully stored report notifications after response", async () => {
@@ -164,16 +160,14 @@ describe("report privacy and durable success", () => {
     }));
 
     expect(response.status).toBe(201);
-    expect(mocks.notify).not.toHaveBeenCalled();
-    expect(mocks.push).not.toHaveBeenCalled();
+    expect(mocks.dispatch).not.toHaveBeenCalled();
 
     await state.afterCallbacks[0]?.();
 
-    expect(mocks.notify).toHaveBeenCalledOnce();
-    expect(mocks.push).toHaveBeenCalledWith([
+    expect(mocks.dispatch).toHaveBeenCalledWith([
       expect.objectContaining({
-        id: "not_report",
         recipientId: "mod_1",
+        type: "security",
       }),
     ]);
   });
@@ -229,6 +223,6 @@ describe("report privacy and durable success", () => {
     }
     expect(mocks.findProduct).not.toHaveBeenCalled();
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
-    expect(mocks.notify).not.toHaveBeenCalled();
+    expect(mocks.dispatch).not.toHaveBeenCalled();
   });
 });
