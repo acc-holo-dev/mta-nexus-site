@@ -101,27 +101,49 @@ describe("D2c account mail dispatcher", () => {
 
 
 it("reports progress throughout a multi-message dispatch batch", async () => {
-  const first = lease("ame_progress_1");
-  const second = lease("ame_progress_2");
-  const w = worker({
-    ids: [first.id, second.id],
-    leases: new Map([
-      [first.id, first],
-      [second.id, second],
+  const ids = ["ame_progress_1", "ame_progress_2"];
+  const leases = new Map(
+    ids.map((id) => [
+      id,
+      Object.freeze({
+        ...lease,
+        id,
+      }) satisfies MailLease,
     ]),
-  });
-  const progress = vi.fn();
+  );
+  let progress = 0;
+
   const dispatcher = new AccountMailDispatcher({
-    worker: w,
-    cipher: cipher(),
-    transport: transport([
-      accepted(),
-      accepted(),
-    ]),
+    worker: {
+      candidates: async () => ids,
+      claim: async (id: string) => leases.get(id) ?? null,
+      prepare: async (current: MailLease) =>
+        Object.freeze({
+          ...prepared,
+          id: current.id,
+          challengeId: `ach_${current.id}`,
+        }),
+      settle: async () => true,
+      discardUnavailable: async () => 0,
+    },
+    cipher,
+    transport: {
+      send: async () => ({
+        outcome: "accepted" as const,
+        uncertain: false,
+        stage: "final_reply" as const,
+      }),
+    },
     appUrl: "https://nexus.test",
   });
 
-  await dispatcher.runBatch(10, undefined, progress);
+  await dispatcher.runBatch(
+    10,
+    undefined,
+    () => {
+      progress += 1;
+    },
+  );
 
-  expect(progress).toHaveBeenCalledTimes(4);
+  expect(progress).toBe(ids.length + 2);
 });
