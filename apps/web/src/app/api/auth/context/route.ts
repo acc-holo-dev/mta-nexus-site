@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";
 import { organizationRepository } from "@nexus/db";
@@ -114,6 +115,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -167,7 +169,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Context switch error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "auth.context.switch_failed",
+      context,
+      status: 500,
+      error,
+    });
     return json({ error: "Failed to switch context" }, 500);
   }
 }

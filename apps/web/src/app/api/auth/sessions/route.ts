@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
 import { consumeRateLimit } from "@nexus/security";
 import { AppError } from "@nexus/domain";
@@ -11,6 +12,7 @@ function json(body: unknown, status = 200) {
 }
 
 export async function GET(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -21,13 +23,20 @@ export async function GET(request: NextRequest) {
     return json({ sessions: sessions.map((session) => ({
       ...session, isCurrent: session.id === currentSessionId,
     })) });
-  } catch {
-    console.error("Session list could not be loaded");
+  } catch (error: unknown) {
+    logRequestEvent({
+      level: "error",
+      event: "auth.sessions.list_failed",
+      context,
+      status: 503,
+      error,
+    });
     return json({ error: "Account settings are temporarily unavailable." }, 503);
   }
 }
 
 export async function DELETE(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -55,7 +64,13 @@ export async function DELETE(request: NextRequest) {
     if (error instanceof AppError) {
       return json({ error: error.message, code: error.code }, error.statusCode);
     }
-    console.error("Session update could not be confirmed");
+    logRequestEvent({
+      level: "error",
+      event: "auth.sessions.revoke_failed",
+      context,
+      status: 503,
+      error,
+    });
     return json({ error: "Could not confirm the session update. Reload settings before retrying." }, 503);
   }
 }

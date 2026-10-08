@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
 import { changePasswordSchema } from "@nexus/validation";
 import { AppError } from "@nexus/domain";
@@ -11,6 +12,7 @@ function json(body: unknown, status = 200) {
 }
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -44,7 +46,13 @@ export async function POST(request: NextRequest) {
       return json({ error: error.message, code: error.code }, error.statusCode);
     }
     // SQL errors may include bound values: never log passwords, hashes or tokens.
-    console.error("Password change could not be confirmed");
+    logRequestEvent({
+      level: "error",
+      event: "auth.password.change_failed",
+      context,
+      status: 503,
+      error,
+    });
     return json({ error: "Could not confirm the password change. Sign in again before retrying." }, 503);
   }
 }

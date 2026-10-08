@@ -38,6 +38,20 @@
           }
         }
       }
+    },
+    {
+      "name": "structured-auth-notification-api-logging",
+      "includes": [
+        "apps/web/src/app/api/auth/**",
+        "apps/web/src/app/api/notifications/**"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "error"
+          }
+        }
+      }
     }
   ]
 }

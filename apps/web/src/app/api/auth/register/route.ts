@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
 import { registerSchema } from "@nexus/validation";
 import { consumeRateLimit } from "@nexus/security";
@@ -18,6 +19,7 @@ function json(body: unknown, status = 200) {
 }
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
     const rl = await consumeRateLimit("authRegistration", ip);
@@ -64,7 +66,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error("Registration failed", error);
+    logRequestEvent({
+      level: "error",
+      event: "auth.register.failed",
+      context,
+      status: 500,
+      error,
+    });
     return json({ error: "Failed to register" }, 500);
   }
 }

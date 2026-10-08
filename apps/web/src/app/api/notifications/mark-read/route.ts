@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
 import { consumeRateLimit } from "@nexus/security";
@@ -17,6 +18,7 @@ function json(body: unknown, status = 200) {
 }
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -49,7 +51,13 @@ export async function POST(request: NextRequest) {
     await notificationRepository.markAllAsRead(user.id);
     return json({ success: true, scope: "all" });
   } catch (error: unknown) {
-    console.error("Notification update error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "notifications.mark_read_failed",
+      context,
+      status: 500,
+      error,
+    });
     return json({ error: "Failed to mark notifications read" }, 500 );
   }
 }

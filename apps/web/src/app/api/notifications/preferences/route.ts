@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
 import { notificationRepository } from "@nexus/db";
 import { notificationPreferencesSchema } from "@nexus/validation";
@@ -22,6 +23,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
@@ -56,7 +58,13 @@ export async function PATCH(request: NextRequest) {
       { headers: privateHeaders },
     );
   } catch (error: unknown) {
-    console.error("Notification preferences error:", error);
+    logRequestEvent({
+      level: "error",
+      event: "notifications.preferences_update_failed",
+      context,
+      status: 500,
+      error,
+    });
     return NextResponse.json(
       { error: "Failed to update notification preferences" },
       { status: 500, headers: privateHeaders },

@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
 import {
   confirmRecoveryEmailVerificationSchema,
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const current = await actor(request);
     if (!current) return json({ error: "Authentication required" }, 401);
@@ -60,12 +62,19 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     if (error instanceof AppError) return json({ error: error.message, code: error.code }, error.statusCode);
     // Configuration/DB/queue failures may contain secret-bearing context.
-    console.error("Recovery email verification request could not be confirmed");
+    logRequestEvent({
+      level: "error",
+      event: "auth.recovery_email.request_failed",
+      context,
+      status: 503,
+      error,
+    });
     return json({ error: "Could not start email verification. Please try again later." }, 503);
   }
 }
 
 export async function PATCH(request: NextRequest) {
+  const context = createRequestLogContext(request);
   try {
     const current = await actor(request);
     if (!current) return json({ error: "Authentication required" }, 401);
@@ -82,7 +91,13 @@ export async function PATCH(request: NextRequest) {
     return json({ success: true, email: result.email, verifiedAt: result.verifiedAt });
   } catch (error: unknown) {
     if (error instanceof AppError) return json({ error: error.message, code: error.code }, error.statusCode);
-    console.error("Recovery email confirmation could not be confirmed");
+    logRequestEvent({
+      level: "error",
+      event: "auth.recovery_email.confirm_failed",
+      context,
+      status: 503,
+      error,
+    });
     return json({ error: "Could not confirm this email. Please try again later." }, 503);
   }
 }
