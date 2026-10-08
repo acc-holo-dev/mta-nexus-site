@@ -72,6 +72,9 @@ describe("session listing HTTP contract", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
 
     const body = await response.json();
     expect(body.sessions).toEqual([
@@ -103,6 +106,9 @@ describe("session listing HTTP contract", () => {
     const response = await GET(listRequest());
     expect(response.status).toBe(401);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(listSessions).not.toHaveBeenCalled();
   });
 });
@@ -127,6 +133,9 @@ describe("session revocation command matrix", () => {
     const response = await DELETE(request(body));
     expect(response.status).toBe(400);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("X-Request-Id")).toMatch(
+      /^[0-9a-f-]{20,}$/u,
+    );
     expect(revokeSession).not.toHaveBeenCalled();
     expect(revokeOthers).not.toHaveBeenCalled();
   });

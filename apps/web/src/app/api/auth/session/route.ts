@@ -1,25 +1,63 @@
-import { type NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../lib/observability";
 
-const headers = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
+    status,
+    headers: privateHeaders,
+  });
+}
 
 export async function GET(request: NextRequest) {
+  const context = createRequestLogContext(request);
+
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
-    return NextResponse.json({ authenticated: Boolean(user), user: user ?? null }, { headers });
-  } catch {
-    // A database failure is not proof that the visitor is signed out.
-    return NextResponse.json({ error: "Could not check session" }, { status: 503, headers });
+
+    return json(context, {
+      authenticated: Boolean(user),
+      user: user ?? null,
+    });
+  } catch (error) {
+    logRequestEvent({
+      level: "error",
+      event: "auth.session.read_failed",
+      context,
+      status: 503,
+      error,
+    });
+    return json(
+      context,
+      { error: "Could not check session" },
+      503,
+    );
   }
 }
 
 export async function DELETE(request: NextRequest) {
+  const context = createRequestLogContext(request);
+
   try {
     const token = request.cookies.get("nexus_session")?.value;
     if (token) await authService.logout(token);
 
-    const response = NextResponse.json({ success: true }, { headers });
+    const response = json(context, { success: true });
     response.cookies.set("nexus_session", "", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -29,8 +67,21 @@ export async function DELETE(request: NextRequest) {
       expires: new Date(0),
     });
     return response;
-  } catch {
-    // Do not report successful revocation or clear the cookie when it is unconfirmed.
-    return NextResponse.json({ error: "Could not confirm sign out. Please try again." }, { status: 503, headers });
+  } catch (error) {
+    logRequestEvent({
+      level: "error",
+      event: "auth.session.logout_failed",
+      context,
+      status: 503,
+      error,
+    });
+    return json(
+      context,
+      {
+        error:
+          "Could not confirm sign out. Please try again.",
+      },
+      503,
+    );
   }
 }

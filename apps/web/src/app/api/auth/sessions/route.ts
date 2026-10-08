@@ -1,13 +1,28 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
+import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { consumeRateLimit } from "@nexus/security";
 import { AppError } from "@nexus/domain";
 import { parseSessionRevocation } from "../../../../lib/session-revocation";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+  type RequestLogContext,
+} from "../../../../lib/observability";
 
-function json(body: unknown, status = 200) {
-  return NextResponse.json(body, {
-    status, headers: { "Cache-Control": "private, no-store", Vary: "Cookie" },
+const privateHeaders = {
+  "Cache-Control": "private, no-store",
+  Vary: "Cookie",
+};
+
+function json(
+  context: RequestLogContext,
+  body: unknown,
+  status = 200,
+) {
+  return jsonWithRequestId(context, body, {
+    status,
+    headers: privateHeaders,
   });
 }
 
@@ -16,13 +31,25 @@ export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
-    if (!user) return json({ error: "Authentication required" }, 401);
+    if (!user) {
+      return json(
+        context,
+        { error: "Authentication required" },
+        401,
+      );
+    }
+
     const [sessions, currentSessionId] = await Promise.all([
-      authService.listSessions(user.id), authService.getCurrentSessionId(token),
+      authService.listSessions(user.id),
+      authService.getCurrentSessionId(token),
     ]);
-    return json({ sessions: sessions.map((session) => ({
-      ...session, isCurrent: session.id === currentSessionId,
-    })) });
+
+    return json(context, {
+      sessions: sessions.map((session) => ({
+        ...session,
+        isCurrent: session.id === currentSessionId,
+      })),
+    });
   } catch (error: unknown) {
     logRequestEvent({
       level: "error",
@@ -31,7 +58,14 @@ export async function GET(request: NextRequest) {
       status: 503,
       error,
     });
-    return json({ error: "Account settings are temporarily unavailable." }, 503);
+    return json(
+      context,
+      {
+        error:
+          "Account settings are temporarily unavailable.",
+      },
+      503,
+    );
   }
 }
 
@@ -40,30 +74,99 @@ export async function DELETE(request: NextRequest) {
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
-    if (!user || !token) return json({ error: "Authentication required" }, 401);
-    const rateLimit = await consumeRateLimit("sessionManagement", user.id);
+    if (!user || !token) {
+      return json(
+        context,
+        { error: "Authentication required" },
+        401,
+      );
+    }
+
+    const rateLimit = await consumeRateLimit(
+      "sessionManagement",
+      user.id,
+    );
     if (!rateLimit.success) {
-      return json({ error: "Too many session security requests. Please try again shortly." }, 429);
+      return json(
+        context,
+        {
+          error:
+            "Too many session security requests. Please try again shortly.",
+        },
+        429,
+      );
     }
-    const command = parseSessionRevocation(await request.json().catch(() => null));
+
+    const command = parseSessionRevocation(
+      await request.json().catch(() => null),
+    );
     if (!command) {
-      return json({ error: "Provide exactly one session revocation action" }, 400);
+      return json(
+        context,
+        {
+          error:
+            "Provide exactly one session revocation action",
+        },
+        400,
+      );
     }
+
     if (command.scope === "others") {
-      const revokedCount = await authService.revokeOtherSessions(user.id, token);
-      return json({ success: true, scope: "others", revokedCount });
+      const revokedCount =
+        await authService.revokeOtherSessions(
+          user.id,
+          token,
+        );
+      return json(context, {
+        success: true,
+        scope: "others",
+        revokedCount,
+      });
     }
-    const currentSessionId = await authService.getCurrentSessionId(token);
+
+    const currentSessionId =
+      await authService.getCurrentSessionId(token);
     if (command.sessionId === currentSessionId) {
-      return json({ error: "The current session cannot be revoked here; use logout instead" }, 409);
+      return json(
+        context,
+        {
+          error:
+            "The current session cannot be revoked here; use logout instead",
+        },
+        409,
+      );
     }
-    const revoked = await authService.revokeSession(user.id, command.sessionId, token);
-    if (!revoked) return json({ error: "Session not found or not owned by you" }, 404);
-    return json({ success: true, scope: "single", sessionId: command.sessionId });
+
+    const revoked = await authService.revokeSession(
+      user.id,
+      command.sessionId,
+      token,
+    );
+    if (!revoked) {
+      return json(
+        context,
+        {
+          error:
+            "Session not found or not owned by you",
+        },
+        404,
+      );
+    }
+
+    return json(context, {
+      success: true,
+      scope: "single",
+      sessionId: command.sessionId,
+    });
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json({ error: error.message, code: error.code }, error.statusCode);
+      return json(
+        context,
+        { error: error.message, code: error.code },
+        error.statusCode,
+      );
     }
+
     logRequestEvent({
       level: "error",
       event: "auth.sessions.revoke_failed",
@@ -71,6 +174,13 @@ export async function DELETE(request: NextRequest) {
       status: 503,
       error,
     });
-    return json({ error: "Could not confirm the session update. Reload settings before retrying." }, 503);
+    return json(
+      context,
+      {
+        error:
+          "Could not confirm the session update. Reload settings before retrying.",
+      },
+      503,
+    );
   }
 }
