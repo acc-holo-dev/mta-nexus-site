@@ -1,43 +1,181 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import * as React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getDictionary } from "../apps/web/src/lib/i18n";
+import {
+  buildCommunityTopicSubmission,
+  communityTopicRequest,
+  confirmedCommunityTopicPath,
+} from "../apps/web/src/lib/community-topic-submission";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const state = vi.hoisted(() => ({
+  pathname: "/community",
+  topics: [] as Array<Record<string, unknown>>,
+}));
 
-describe("community vertical", () => {
-  it("publishes bounded user topics while keeping editorial content moderated", () => {
-    const route = read("apps/web/src/app/api/content/route.ts");
-    const repository = read(
-      "packages/db/src/repositories/content.ts",
-    );
+const router = vi.hoisted(() => ({
+  push: vi.fn(),
+  refresh: vi.fn(),
+}));
 
-    expect(route).toContain("const isCommunityTopic =");
-    expect(route).toContain('parsed.data.type === "post"');
-    expect(route).toContain('parsed.data.type === "question"');
-    expect(route).toContain('can(user, "admin.moderation")');
-    expect(repository).toContain("listPublishedByTypes");
-    expect(repository).toContain("inArray(content.type, types)");
+const listCommunityTopics = vi.hoisted(() => vi.fn());
+
+vi.mock("next/navigation", () => ({
+  usePathname: () => state.pathname,
+  useRouter: () => router,
+}));
+
+vi.mock("next/link", async () => {
+  const ReactModule = await import("react");
+  return {
+    default: ({
+      href,
+      children,
+      ...props
+    }: {
+      href: string;
+      children?: React.ReactNode;
+    }) => ReactModule.createElement("a", { href, ...props }, children),
+  };
+});
+
+vi.mock("../apps/web/src/components/locale-context", () => ({
+  useNexusLocale: () => ({
+    locale: "en",
+    dictionary: getDictionary("en"),
+  }),
+}));
+
+vi.mock("../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: vi.fn(async () => "en"),
+}));
+
+vi.mock("../apps/web/src/lib/services/content-service", () => ({
+  contentService: {
+    listCommunityTopics,
+  },
+}));
+
+import CommunityPage from "../apps/web/src/app/community/page";
+import { CommunityTopicForm } from "../apps/web/src/components/community-topic-form";
+import { Sidebar } from "../apps/web/src/components/sidebar";
+
+describe("community topic submission behavior", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    state.pathname = "/community";
+    listCommunityTopics.mockResolvedValue(state.topics);
   });
 
-  it("exposes topic discovery, creation and the existing discussion path", () => {
-    const page = read("apps/web/src/app/community/page.tsx");
-    const form = read(
-      "apps/web/src/components/community-topic-form.tsx",
+  it("builds only post/question payloads without a client-controlled publication status", () => {
+    const submission = buildCommunityTopicSubmission(
+      {
+        title: "  Vehicle Help: Ä Edition  ",
+        body: "  How should this resource be configured?  ",
+        type: "question",
+        tags: " help, lua, help ",
+      },
+      123456,
     );
-    const sidebar = read("apps/web/src/components/sidebar.tsx");
 
-    expect(page).toContain("listCommunityTopics");
-    expect(form).toContain('fetch("/api/content"');
-    expect(form).not.toContain('status: "published"');
-    expect(form).toContain("payload?.success !== true");
-    const dollar = "$";
-    expect(form).toContain(
-      `/articles/${dollar}{encodeURIComponent(payload.content.slug)}`,
+    expect(submission).toEqual({
+      title: "Vehicle Help: Ä Edition",
+      slug: "vehicle-help-a-edition-2n9c",
+      body: "How should this resource be configured?",
+      type: "question",
+      tags: ["help", "lua", "help"],
+    });
+    expect(submission).not.toHaveProperty("status");
+    expect(
+      buildCommunityTopicSubmission({
+        title: "Editorial",
+        body: "This should not become an article from the community form.",
+        type: "article",
+        tags: "",
+      }),
+    ).toBeNull();
+  });
+
+  it("builds a private same-origin JSON request and confirms only a canonical success", () => {
+    const submission = buildCommunityTopicSubmission(
+      {
+        title: "Question",
+        body: "A sufficiently long community question.",
+        type: "post",
+        tags: "",
+      },
+      42,
     );
-    expect(sidebar).toContain('href: "/community"');
-    expect(sidebar).toContain(
-      "label: dictionary.nav.community",
+    expect(submission).not.toBeNull();
+    if (!submission) return;
+
+    const signal = new AbortController().signal;
+    expect(communityTopicRequest(submission, signal)).toMatchObject({
+      method: "POST",
+      cache: "no-store",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(submission),
+      signal,
+    });
+
+    expect(
+      confirmedCommunityTopicPath(201, {
+        success: true,
+        content: { slug: "topic/with/slash" },
+      }),
+    ).toBe("/articles/topic%2Fwith%2Fslash");
+    expect(
+      confirmedCommunityTopicPath(200, {
+        success: false,
+        content: { slug: "topic" },
+      }),
+    ).toBeNull();
+    expect(
+      confirmedCommunityTopicPath(500, {
+        success: true,
+        content: { slug: "topic" },
+      }),
+    ).toBeNull();
+  });
+
+  it("renders the bounded community feed and existing article discussion path", async () => {
+    state.topics = [
+      {
+        id: "cnt_1",
+        slug: "vehicle-help",
+        type: "question",
+        title: "Vehicle Help",
+        excerpt: "Need configuration help",
+        body: "Fallback body",
+        commentCount: 4,
+      },
+    ];
+    listCommunityTopics.mockResolvedValue(state.topics);
+
+    const html = renderToStaticMarkup(await CommunityPage());
+
+    expect(listCommunityTopics).toHaveBeenCalledWith(50);
+    expect(html).toContain('href="/community/new"');
+    expect(html).toContain('href="/articles/vehicle-help"');
+    expect(html).toContain("Vehicle Help");
+    expect(html).toContain(">4 ");
+  });
+
+  it("renders community navigation and a creation form without publication controls", async () => {
+    const sidebar = renderToStaticMarkup(
+      <Sidebar
+        locale="en"
+        isCollapsed={false}
+        onToggle={() => undefined}
+      />,
     );
+    const form = renderToStaticMarkup(<CommunityTopicForm />);
+
+    expect(sidebar).toContain('href="/community"');
+    expect(sidebar).toContain(getDictionary("en").nav.community);
+    expect(form).toContain('option value="question"');
+    expect(form).toContain('option value="post"');
+    expect(form).not.toContain('name="status"');
   });
 });

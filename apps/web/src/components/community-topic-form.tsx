@@ -4,6 +4,11 @@ import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nexus/ui";
 import { useNexusLocale } from "./locale-context";
+import {
+  buildCommunityTopicSubmission,
+  communityTopicRequest,
+  confirmedCommunityTopicPath,
+} from "../lib/community-topic-submission";
 
 const fieldClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
@@ -20,47 +25,36 @@ export function CommunityTopicForm() {
     if (busy) return;
 
     const form = new FormData(event.currentTarget);
-    const title = String(form.get("title") || "").trim();
-    const base = title
-      .normalize("NFKD")
-      .toLowerCase()
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "")
-      .slice(0, 120);
-    const slug = `${base || "topic"}-${Date.now().toString(36)}`;
+    const submission = buildCommunityTopicSubmission({
+      title: String(form.get("title") || ""),
+      body: String(form.get("body") || ""),
+      type: String(form.get("type") || "question"),
+      tags: String(form.get("tags") || ""),
+    });
+    if (!submission) {
+      setError(copy.createError);
+      return;
+    }
 
     setBusy(true);
     setError(null);
     try {
-      const response = await fetch("/api/content", {
-        method: "POST",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          slug,
-          body: String(form.get("body") || "").trim(),
-          type: String(form.get("type") || "question"),
-          tags: String(form.get("tags") || "")
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter(Boolean),
-        }),
-        signal: AbortSignal.timeout(15_000),
-      });
+      const response = await fetch(
+        "/api/content",
+        communityTopicRequest(
+          submission,
+          AbortSignal.timeout(15_000),
+        ),
+      );
       const payload = await response.json().catch(() => null);
-      if (
-        !response.ok ||
-        payload?.success !== true ||
-        typeof payload?.content?.slug !== "string"
-      ) {
+      const path = confirmedCommunityTopicPath(
+        response.status,
+        payload,
+      );
+      if (!response.ok || !path) {
         throw new Error(payload?.error || copy.createError);
       }
-      router.push(
-        `/articles/${encodeURIComponent(payload.content.slug)}`,
-      );
+      router.push(path);
       router.refresh();
     } catch (caught) {
       setError(
