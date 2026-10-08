@@ -2,12 +2,13 @@
 
 import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
-import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useNexusLocale } from "./locale-context";
 import {
   confirmSupportCaseCreated,
   parseSupportCasePage,
   type SupportCaseSummary,
+  type SupportCaseStatus,
 } from "../lib/support-response";
 
 export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
@@ -24,6 +25,9 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
   const [category, setCategory] = useState("account");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [staffStatus, setStaffStatus] = useState<SupportCaseStatus | "all">("all");
+  const [staffCategory, setStaffCategory] = useState("all");
+  const loadSequence = useRef(0);
 
   const categories = [
     ["account", copy.categoryAccount],
@@ -40,46 +44,54 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
   const categoryLabel = (value: string) =>
     categories.find(([candidate]) => candidate === value)?.[1] ?? value;
 
-  const loadCases = useCallback(async () => {
+  const loadCases = useCallback(async (signal?: AbortSignal) => {
+    const sequence = ++loadSequence.current;
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        staffMode
-          ? `/api/support?scope=staff&page=${page}`
-          : `/api/support?page=${page}`,
-        {
-          cache: "no-store",
-          credentials: "same-origin",
-          signal: AbortSignal.timeout(15_000),
-        },
-      );
+      const params = new URLSearchParams({ page: String(page) });
+      if (staffMode) {
+        params.set("scope", "staff");
+        if (staffStatus !== "all") params.set("status", staffStatus);
+        if (staffCategory !== "all") params.set("category", staffCategory);
+      }
+      const response = await fetch(`/api/support?${params.toString()}`, {
+        cache: "no-store",
+        credentials: "same-origin",
+        signal: signal
+          ? AbortSignal.any([signal, AbortSignal.timeout(15_000)])
+          : AbortSignal.timeout(15_000),
+      });
+      if (sequence !== loadSequence.current || signal?.aborted) return;
       if (response.status === 401) {
         setAuthRequired(true);
         setCases([]);
         return;
       }
-
       const data = await response.json().catch(() => null);
+      if (sequence !== loadSequence.current || signal?.aborted) return;
       const validated = parseSupportCasePage(data);
-      if (!response.ok || !validated) {
-        throw new Error(copy.loadError);
-      }
-
+      if (!response.ok || !validated) throw new Error(copy.loadError);
       setAuthRequired(false);
       setCases(validated.cases);
       setPage(validated.page);
       setTotalPages(validated.totalPages);
     } catch {
+      if (sequence !== loadSequence.current || signal?.aborted) return;
       setCases([]);
       setError(copy.loadError);
     } finally {
-      setLoading(false);
+      if (sequence === loadSequence.current && !signal?.aborted) setLoading(false);
     }
-  }, [copy.loadError, page, staffMode]);
+  }, [copy.loadError, page, staffMode, staffStatus, staffCategory]);
 
   useEffect(() => {
-    void loadCases();
+    const controller = new AbortController();
+    void loadCases(controller.signal);
+    return () => {
+      controller.abort();
+      loadSequence.current += 1;
+    };
   }, [loadCases]);
 
   async function createCase(event: FormEvent<HTMLFormElement>) {
@@ -228,6 +240,43 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
               className="rounded-lg border border-[color:var(--nexus-danger)]/25 bg-danger-soft p-4 text-sm text-danger"
             >
               {error}
+            </div>
+          )}
+
+          {staffMode && (
+            <div className="nexus-panel grid gap-4 p-4 sm:grid-cols-2" role="group" aria-label={copy.staffFilters}>
+              <label className="block space-y-1.5">
+                <span className="font-label text-secondary">{copy.filterStatus}</span>
+                <select
+                  value={staffStatus}
+                  onChange={(event) => {
+                    setPage(1);
+                    setStaffStatus(event.target.value as SupportCaseStatus | "all");
+                  }}
+                  className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
+                >
+                  <option value="all">{copy.allStatuses}</option>
+                  <option value="open">{copy.open}</option>
+                  <option value="resolved">{copy.resolved}</option>
+                  <option value="closed">{copy.closed}</option>
+                </select>
+              </label>
+              <label className="block space-y-1.5">
+                <span className="font-label text-secondary">{copy.category}</span>
+                <select
+                  value={staffCategory}
+                  onChange={(event) => {
+                    setPage(1);
+                    setStaffCategory(event.target.value);
+                  }}
+                  className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
+                >
+                  <option value="all">{copy.allCategories}</option>
+                  {categories.map(([value, label]) => (
+                    <option key={value} value={value}>{label}</option>
+                  ))}
+                </select>
+              </label>
             </div>
           )}
 

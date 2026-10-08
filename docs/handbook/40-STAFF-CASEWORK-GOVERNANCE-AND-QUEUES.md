@@ -97,3 +97,10 @@ Risk/provider policy может добавить dual-control позже без 
 - If stored status differs from `expectedStatus`, return private `409 SUPPORT_STATUS_CONFLICT` and reload the case in the client. Do not record status audit or notify the requester.
 - Matching no-op is idempotent, without duplicate audit/notification. Real changes use a PostgreSQL compare-and-set inside the audit transaction, protecting a race after the read.
 - The precondition compares status values, not an immutable revision. A full `open -> resolved -> open` ABA cycle is not detected; add a revision token if stronger ordering is needed.
+
+## 8. Staff support filtering (implemented)
+
+- Authorized staff can filter the queue by case status and category. The customer view remains requester-scoped.
+- Server filtering uses validated query values, consistent count/page predicates and a composite index.
+- Status and category controls have English and Russian copy. Changing a filter resets pagination. Stale list fetches are aborted and ignored.
+- This is a queue browsing feature, not an assignment or adjudication mechanism.

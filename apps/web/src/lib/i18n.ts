@@ -951,6 +951,10 @@ const en = {
     noGuaranteedSla:
       "Closed beta: response times are not guaranteed yet. Critical security incidents are prioritized.",
     staffQueue: "Support queue",
+    staffFilters: "Filter support cases",
+    filterStatus: "Status",
+    allStatuses: "All statuses",
+    allCategories: "All categories",
     staffDescription:
       "Review user support cases, reply in context, and resolve or close completed cases.",
     newCase: "New support case",
@@ -2305,6 +2309,10 @@ const ru: typeof en = {
     noGuaranteedSla:
       "Закрытая бета: время ответа пока не гарантируется. Критические инциденты безопасности имеют приоритет.",
     staffQueue: "Очередь поддержки",
+    staffFilters: "Фильтры обращений",
+    filterStatus: "Статус",
+    allStatuses: "Все статусы",
+    allCategories: "Все категории",
     staffDescription:
       "Просматривайте обращения пользователей, отвечайте в контексте и завершайте обработанные кейсы.",
     newCase: "Новое обращение",
