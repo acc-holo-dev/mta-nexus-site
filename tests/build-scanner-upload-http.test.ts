@@ -181,6 +181,7 @@ describe("build upload scanner HTTP behavior", () => {
       expect.objectContaining({
         productId: "prd_scanner",
         version: "1.0.0",
+        sha256Hash: "a".repeat(64),
         scanStatus: "clean",
         scanner: "clamav",
         scannedAt,

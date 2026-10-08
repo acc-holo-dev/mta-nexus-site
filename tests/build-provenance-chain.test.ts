@@ -1,50 +1,54 @@
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { BuildProvenanceDetails } from "../apps/web/src/components/build-provenance-details";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
-
-describe("build provenance chain", () => {
-  it("uses the storage-computed SHA-256 as the recorded build hash", () => {
-    const upload = read(
-      "apps/web/src/app/api/products/[id]/builds/route.ts",
+describe("build provenance chain behavior", () => {
+  it("renders the full recorded hash as selectable provenance", () => {
+    const hash = "12".repeat(32);
+    const html = renderToStaticMarkup(
+      <BuildProvenanceDetails
+        build={{
+          status: "published",
+          sha256Hash: hash,
+          fileName: "trusted.zip",
+          mimeType: "application/zip",
+          scanStatus: "clean",
+          scanner: "clamav",
+          scannedAt: new Date("2026-10-08T00:00:00.000Z"),
+          mtaVersionTarget: "1.6.0",
+          isSigned: true,
+        }}
+      />,
     );
-    const service = read(
-      "apps/web/src/lib/services/product-service.ts",
-    );
 
-    expect(upload).toContain("sha256Hash: asset.sha256Hash");
-    expect(service).toContain("sha256Hash: input.sha256Hash");
-    expect(service).toContain("hash: input.sha256Hash");
+    expect(html).toContain(hash);
+    expect(html).toContain("select-all");
   });
 
-  it("shows the full recorded hash and exposes it on downloads", () => {
-    const provenance = read(
-      "apps/web/src/components/build-provenance-details.tsx",
-    );
-    const download = read(
-      "apps/web/src/app/api/products/[id]/download/route.ts",
-    );
-
-    expect(provenance).toContain("{build.sha256Hash}");
-    expect(provenance).toContain("select-all");
-    expect(download).toContain(
-      '"X-Content-SHA256": latestBuild.sha256Hash',
-    );
-  });
-
-  it("keeps malware verdict and cryptographic signature as separate facts", () => {
-    const provenance = read(
-      "apps/web/src/components/build-provenance-details.tsx",
+  it("keeps malware verdict, recorded hash and signature record as separate facts", () => {
+    const copy = getDictionary("en").provenance;
+    const html = renderToStaticMarkup(
+      <BuildProvenanceDetails
+        build={{
+          status: "quarantined",
+          sha256Hash: "34".repeat(32),
+          fileName: "blocked.zip",
+          mimeType: "application/zip",
+          scanStatus: "malicious",
+          scanner: "clamav",
+          scannedAt: new Date("2026-10-08T00:00:00.000Z"),
+          mtaVersionTarget: "1.6.0",
+          isSigned: true,
+        }}
+      />,
     );
 
-    expect(provenance).toContain("copy.explanation");
-    expect(provenance).toContain(
-      "build.isSigned ? copy.recordedAsSigned : copy.notAvailable",
+    expect(html).toContain(copy.blockedMalicious);
+    expect(html).toContain(copy.recordedAsSigned);
+    expect(html).toContain(copy.explanation);
+    expect(html).not.toMatch(
+      /SHA-256 verified|cryptographically verified/iu,
     );
-    expect(provenance).toContain("getDictionary(locale).provenance");
-    expect(provenance).not.toContain("SHA-256 verified");
-    expect(provenance).not.toContain("Cryptographically verified");
   });
 });

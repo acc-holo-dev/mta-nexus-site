@@ -1,26 +1,66 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
-describe("public MTA directory surface", () => {
-  it("loads only paginated live data instead of embedding the full master-list", () => {
-    const component = readFileSync(
-      resolve(process.cwd(), "apps/web/src/components/mta-master-server-directory.tsx"),
-      "utf8"
-    );
-    const page = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/servers/page.tsx"),
-      "utf8"
-    );
+const state = vi.hoisted(() => ({
+  locale: "en" as "en" | "ru",
+}));
 
-    expect(component).toMatch(
-      /fetch\(\s*(?:`\/api\/servers\/directory\?\$\{params\}`|"\/api\/servers\/directory\?"\s*\+\s*params)\s*,/,
-    );
-    expect(component).toContain("const PAGE_SIZE = 50");
-    expect(component).toContain("{copy.page} {page + 1} {copy.of} {totalPages}");
-    expect(getDictionary("en").servers.page).not.toBe(getDictionary("ru").servers.page);
-    expect(page).toContain("<MtaMasterServerDirectory locale={locale} />");
-    expect(page).not.toContain("mtaMasterDirectoryService");
+vi.mock("next/link", async () => {
+  const ReactModule = await import("react");
+  return {
+    default: ({
+      href,
+      children,
+      ...props
+    }: {
+      href: string;
+      children: React.ReactNode;
+      [key: string]: unknown;
+    }) => ReactModule.createElement("a", { href, ...props }, children),
+  };
+});
+
+vi.mock("../apps/web/src/lib/i18n-server", () => ({
+  getRequestLocale: vi.fn(async () => state.locale),
+}));
+
+vi.mock("../apps/web/src/components/mta-master-server-directory", async () => {
+  const ReactModule = await import("react");
+  return {
+    MtaMasterServerDirectory: ({ locale }: { locale: string }) =>
+      ReactModule.createElement("section", {
+        "data-testid": "mta-directory",
+        "data-locale": locale,
+      }),
+  };
+});
+
+import ServersPage from "../apps/web/src/app/servers/page";
+
+describe("public MTA directory page behavior", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    state.locale = "en";
   });
+
+  it.each(["en", "ru"] as const)(
+    "renders localized directory shell and one paginated client directory in %s",
+    async (locale) => {
+      state.locale = locale;
+      const copy = getDictionary(locale).servers;
+      const html = renderToStaticMarkup(await ServersPage());
+
+      expect(html).toContain(copy.title);
+      expect(html).toContain(copy.description);
+      expect(html).toContain(copy.addListing);
+      expect(html).toContain('href="/workspace/servers/new"');
+      expect(html).toContain('data-testid="mta-directory"');
+      expect(html).toContain(`data-locale="${locale}"`);
+      expect(
+        (html.match(/data-testid="mta-directory"/gu) ?? []).length,
+      ).toBe(1);
+    },
+  );
 });
