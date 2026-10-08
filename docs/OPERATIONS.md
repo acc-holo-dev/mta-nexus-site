@@ -41,9 +41,9 @@ Readiness:
 docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs
 ```
 
-The app check requires HTTP health, database reachability and writable private storage.
-The same DEV stack also runs `push-worker`; its healthcheck validates worker
-heartbeat/progress and queue counters. With no VAPID triplet it remains
+`pnpm dev:docker:check` requires both app readiness and push-worker liveness.
+The app half checks HTTP health, database reachability and writable private storage;
+the worker half validates heartbeat/progress and queue counters. With no VAPID triplet it remains
 healthy-idle and performs queue maintenance; with all three VAPID values set it
 dispatches durable Web Push jobs.
 

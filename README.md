@@ -48,8 +48,7 @@ Useful commands:
 
 ```bash
 # health/readiness
-docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs
-docker compose -p nexus-local -f compose.yaml exec push-worker node /app/scripts/check-web-push-worker-health.mjs
+pnpm dev:docker:check
 
 # logs
 docker compose -p nexus-local -f compose.yaml logs --tail 100 --follow app push-worker postgres clamav

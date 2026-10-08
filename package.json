@@ -38,7 +38,7 @@
     "dev:docker:up": "pnpm dev:preflight && docker compose -p nexus-local -f compose.yaml up --build --detach --wait --wait-timeout 600",
     "dev:docker:down": "docker compose -p nexus-local -f compose.yaml down",
     "dev:docker:logs": "docker compose -p nexus-local -f compose.yaml logs --tail 100 --follow app push-worker postgres clamav",
-    "dev:docker:check": "docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs",
+    "dev:docker:check": "docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-readiness.mjs && docker compose -p nexus-local -f compose.yaml exec push-worker node /app/scripts/check-web-push-worker-health.mjs",
     "dev:host": "pnpm --filter @nexus/web dev",
     "dev:preflight": "pnpm nexus:doctor",
     "db:seed:repair": "pnpm --filter @nexus/db seed --repair-demo-builds",
