@@ -156,8 +156,8 @@ test("rejects inconsistent queue alert metadata", () => {
   );
 });
 
-test("fails health when the durable queue reaches configured capacity", () => {
-  assert.notEqual(
+test("reports capacity pressure without invalidating a full durable queue", () => {
+  assert.equal(
     run(
       healthy({
         queuePending: 100,

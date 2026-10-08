@@ -112,7 +112,7 @@ idempotency. Любая новая migration снова заставит fixture
 ### P1-4. Web Push external acceptance ещё не выполнена
 
 Durable Web Push runtime, worker recovery, stale-subscription lease ownership, local TLS/SNI provider harness,
-`Retry-After`, anti-SSRF, queue health/watchdog и concurrent PostgreSQL
+`Retry-After`, anti-SSRF, queue health/watchdog (включая корректный alert при ровно 100% capacity) и concurrent PostgreSQL
 lease/settlement уже реализованы. Для двух оставшихся внешних доказательств
 добавлены отдельные fail-closed инструменты:
 

@@ -51,7 +51,7 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
       .every((value) => Number.isInteger(value) && value >= 0) &&
     queueCapacity >= 1 && queueCapacity <= 50_000 &&
     queueDue <= queuePending && queueLeased <= queuePending &&
-    queuePending < queueCapacity;
+    queuePending <= queueCapacity;
 
   const thresholdsValid =
     inRange(queueAlertThresholds.pendingPercent, 1, 99) &&
