@@ -4,20 +4,7 @@ import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { useNexusLocale } from "./locale-context";
-
-type CaseData = {
-  id: string;
-  category: string;
-  subject: string;
-  status: "open" | "resolved" | "closed";
-};
-
-type MessageData = {
-  id: string;
-  authorRole: "requester" | "staff";
-  body: string;
-  createdAt: string;
-};
+import { confirmSupportReply, confirmSupportStatusChanged, parseSupportThread, type SupportCaseData, type SupportMessageData } from "../lib/support-response";
 
 export function SupportCaseThread({
   caseId,
@@ -28,11 +15,12 @@ export function SupportCaseThread({
 }) {
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.support;
-  const [supportCase, setSupportCase] = useState<CaseData | null>(null);
-  const [messages, setMessages] = useState<MessageData[]>([]);
+  const [supportCase, setSupportCase] = useState<SupportCaseData | null>(null);
+  const [messages, setMessages] = useState<SupportMessageData[]>([]);
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
@@ -61,16 +49,13 @@ export function SupportCaseThread({
         },
       );
       const data = await response.json().catch(() => null);
-      if (
-        !response.ok ||
-        !data?.supportCase?.id ||
-        !Array.isArray(data?.messages)
-      ) {
+      const validated = parseSupportThread(data, caseId);
+      if (!response.ok || !validated) {
         throw new Error(copy.loadError);
       }
 
-      setSupportCase(data.supportCase);
-      setMessages(data.messages);
+      setSupportCase(validated.supportCase);
+      setMessages(validated.messages);
     } catch {
       setSupportCase(null);
       setMessages([]);
@@ -103,12 +88,14 @@ export function SupportCaseThread({
         },
       );
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true) {
+      const confirmed = confirmSupportReply(response.status, data, caseId, reply);
+      if (!response.ok || !confirmed) {
         throw new Error(copy.replyError);
       }
 
+      setSupportCase(confirmed.supportCase);
+      setMessages((previous) => previous.some((item) => item.id === confirmed.message.id) ? previous : [...previous, confirmed.message]);
       setReply("");
-      await load();
     } catch {
       setError(copy.replyError);
     } finally {
@@ -116,7 +103,9 @@ export function SupportCaseThread({
     }
   }
 
-  async function updateStatus(status: CaseData["status"]) {
+  async function updateStatus(status: SupportCaseData["status"]) {
+    if (updatingStatus || sending) return;
+    setUpdatingStatus(true);
     setError(null);
     try {
       const response = await fetch(
@@ -131,13 +120,16 @@ export function SupportCaseThread({
         },
       );
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true) {
+      const confirmed = confirmSupportStatusChanged(response.status, data, caseId, status);
+      if (!response.ok || !confirmed) {
         throw new Error(copy.statusError);
       }
 
-      await load();
+      setSupportCase(confirmed);
     } catch {
       setError(copy.statusError);
+    } finally {
+      setUpdatingStatus(false);
     }
   }
 
@@ -196,6 +188,7 @@ export function SupportCaseThread({
             {supportCase.status !== "open" && (
               <button
                 type="button"
+                disabled={updatingStatus || sending}
                 onClick={() => void updateStatus("open")}
                 className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
@@ -205,6 +198,7 @@ export function SupportCaseThread({
             {supportCase.status !== "resolved" && (
               <button
                 type="button"
+                disabled={updatingStatus || sending}
                 onClick={() => void updateStatus("resolved")}
                 className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
               >
@@ -214,6 +208,7 @@ export function SupportCaseThread({
             {supportCase.status !== "closed" && (
               <button
                 type="button"
+                disabled={updatingStatus || sending}
                 onClick={() => void updateStatus("closed")}
                 className="rounded-md border border-[color:var(--nexus-danger)]/30 bg-danger-soft px-3 py-1.5 text-xs font-semibold text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-danger)]"
               >

@@ -4,15 +4,7 @@ import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { useNexusLocale } from "./locale-context";
-
-type SupportCaseSummary = {
-  id: string;
-  category: string;
-  subject: string;
-  status: "open" | "resolved" | "closed";
-  updatedAt: string;
-  requesterUsername?: string;
-};
+import { confirmSupportCaseCreated, parseSupportCaseList, type SupportCaseSummary } from "../lib/support-response";
 
 export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
   const { locale, dictionary } = useNexusLocale();
@@ -20,6 +12,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
   const [cases, setCases] = useState<SupportCaseSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [category, setCategory] = useState("account");
@@ -60,12 +53,13 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
       }
 
       const data = await response.json().catch(() => null);
-      if (!response.ok || !Array.isArray(data?.cases)) {
+      const validatedCases = parseSupportCaseList(data);
+      if (!response.ok || !validatedCases) {
         throw new Error(copy.loadError);
       }
 
       setAuthRequired(false);
-      setCases(data.cases);
+      setCases(validatedCases);
     } catch {
       setCases([]);
       setError(copy.loadError);
@@ -84,6 +78,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
 
     setCreating(true);
     setError(null);
+    setCreatedCaseId(null);
     try {
       const response = await fetch("/api/support", {
         method: "POST",
@@ -94,13 +89,15 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
         signal: AbortSignal.timeout(15_000),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok || data?.success !== true || !data?.supportCase?.id) {
+      const created = confirmSupportCaseCreated(response.status, data, { category, subject });
+      if (!response.ok || !created) {
         throw new Error(copy.createError);
       }
 
       setSubject("");
       setMessage("");
-      await loadCases();
+      setCreatedCaseId(created.id);
+      setCases((previous) => [created, ...previous.filter((item) => item.id !== created.id)]);
     } catch {
       setError(copy.createError);
     } finally {
@@ -205,6 +202,10 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
                 {creating ? copy.creating : copy.create}
               </button>
             </form>
+          )}
+
+          {createdCaseId && !staffMode && (
+            <Link href={`${basePath}/${encodeURIComponent(createdCaseId)}`} className="block text-sm font-semibold text-accent underline">{copy.yourCases}: {createdCaseId}</Link>
           )}
 
           {error && (
