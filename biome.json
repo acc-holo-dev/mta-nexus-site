@@ -19,5 +19,25 @@
   },
   "assist": {
     "enabled": true
-  }
+  },
+  "overrides": [
+    {
+      "name": "obs-001-structured-api-logging",
+      "includes": [
+        "apps/web/src/app/api/auth/login/route.ts",
+        "apps/web/src/app/api/auth/password-reset/route.ts",
+        "apps/web/src/app/api/products/[id]/builds/route.ts",
+        "apps/web/src/app/api/reports/route.ts",
+        "apps/web/src/app/api/servers/directory/route.ts",
+        "apps/web/src/app/api/health/route.ts"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "error"
+          }
+        }
+      }
+    }
+  ]
 }
