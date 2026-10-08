@@ -19,7 +19,7 @@ test.afterAll(async () => {
   const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
   await mkdir(output, { recursive: true });
   await writeFile(join(output, "shell-results.json"), JSON.stringify({ commit: process.env.GITHUB_SHA, results: evidence,
-    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, logical tabindex order, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification." }, null, 2));
+    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, logical tabindex order, hidden-focus safety, dialog naming, tab/tabpanel relations, aria-current validity, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification." }, null, 2));
   await writeFile(join(output, "shell-summary.md"), ["# Keyboard, mobile and locale acceptance", "", ...evidence.map((value) => `- PASS: ${value}`), ""].join("\n"));
 });
 
@@ -151,6 +151,119 @@ async function assertBasicAccessibleNames(page, label) {
     result.positiveTabIndex,
     [],
     `${label}: positive tabindex must not override logical focus order`,
+  );
+}
+
+async function assertAdvancedAriaSemantics(page, label) {
+  const result = await page.evaluate(() => {
+    const visible = (element) =>
+      element.getClientRects().length > 0 &&
+      getComputedStyle(element).visibility !== "hidden";
+
+    const focusableSelector = [
+      "a[href]",
+      "button:not(:disabled)",
+      "input:not(:disabled)",
+      "select:not(:disabled)",
+      "textarea:not(:disabled)",
+      "[tabindex]:not([tabindex=\"-1\"])",
+    ].join(",");
+
+    const focusableInsideHidden = [
+      ...document.querySelectorAll('[aria-hidden="true"]'),
+    ]
+      .flatMap((hidden) => {
+        const candidates = [];
+        if (hidden.matches(focusableSelector)) candidates.push(hidden);
+        candidates.push(...hidden.querySelectorAll(focusableSelector));
+        return candidates;
+      })
+      .filter(visible)
+      .map((element) => element.outerHTML.slice(0, 180));
+
+    const unnamedDialogs = [
+      ...document.querySelectorAll(
+        'dialog, [role="dialog"], [role="alertdialog"]',
+      ),
+    ]
+      .filter(visible)
+      .filter((dialog) => {
+        if (dialog.getAttribute("aria-label")?.trim()) return false;
+        const labelledBy = dialog.getAttribute("aria-labelledby");
+        if (!labelledBy) return true;
+        return !labelledBy
+          .split(/\s+/u)
+          .filter(Boolean)
+          .some((id) => document.getElementById(id)?.textContent?.trim());
+      })
+      .map((dialog) => dialog.outerHTML.slice(0, 180));
+
+    const invalidTabs = [...document.querySelectorAll('[role="tab"]')]
+      .filter(visible)
+      .flatMap((tab) => {
+        const problems = [];
+        const controls = tab.getAttribute("aria-controls");
+        const selected = tab.getAttribute("aria-selected");
+        if (!controls) {
+          problems.push("missing aria-controls");
+        } else {
+          const panel = document.getElementById(controls);
+          if (!panel || panel.getAttribute("role") !== "tabpanel") {
+            problems.push("aria-controls does not reference a tabpanel");
+          }
+        }
+        if (selected !== "true" && selected !== "false") {
+          problems.push("aria-selected must be true or false");
+        }
+        return problems.map(
+          (problem) =>
+            `${problem}: ${tab.outerHTML.slice(0, 150)}`,
+        );
+      });
+
+    const invalidAriaCurrent = [...document.querySelectorAll("[aria-current]")]
+      .filter(visible)
+      .filter((element) => {
+        const value = element.getAttribute("aria-current");
+        return ![
+          "page",
+          "step",
+          "location",
+          "date",
+          "time",
+          "true",
+          "false",
+        ].includes(value ?? "");
+      })
+      .map((element) => element.outerHTML.slice(0, 180));
+
+    return {
+      focusableInsideHidden,
+      unnamedDialogs,
+      invalidTabs,
+      invalidAriaCurrent,
+    };
+  });
+
+  assert.deepEqual(
+    result.focusableInsideHidden,
+    [],
+    `${label}: aria-hidden content must not expose focusable controls`,
+  );
+  assert.deepEqual(
+    result.unnamedDialogs,
+    [],
+    `${label}: visible dialogs must have accessible names`,
+  );
+  assert.deepEqual(
+    result.invalidTabs,
+    [],
+    `${label}: tabs must reference real tabpanels and expose selection state`,
+  );
+  assert.deepEqual(
+    result.invalidAriaCurrent,
+    [],
+    `${label}: aria-current values must use valid tokens`,
   );
 }
 
@@ -346,6 +459,10 @@ for (const locale of ["en", "ru"]) {
           `${locale} ${width} ${route}`,
         );
         await assertBasicAccessibleNames(
+          page,
+          `${locale} ${width} ${route}`,
+        );
+        await assertAdvancedAriaSemantics(
           page,
           `${locale} ${width} ${route}`,
         );
@@ -741,6 +858,10 @@ for (const locale of ["en", "ru"]) {
           `${locale} ${width} ${spec.route}`,
         );
         await assertBasicAccessibleNames(
+          page,
+          `${locale} ${width} ${spec.route}`,
+        );
+        await assertAdvancedAriaSemantics(
           page,
           `${locale} ${width} ${spec.route}`,
         );
