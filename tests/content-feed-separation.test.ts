@@ -2,14 +2,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   listByTypes: vi.fn(),
+  listProducts: vi.fn(),
+  listServers: vi.fn(),
 }));
 
 vi.mock("@nexus/db", () => ({
   contentRepository: {
     listPublishedByTypes: mocks.listByTypes,
   },
-  productRepository: {},
-  serverRepository: {},
+  productRepository: {
+    list: mocks.listProducts,
+  },
+  serverRepository: {
+    listActivePublic: mocks.listServers,
+  },
 }));
 vi.mock("@nexus/security", () => ({
   can: vi.fn(),
@@ -23,6 +29,8 @@ describe("content feed separation behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.listByTypes.mockResolvedValue([]);
+    mocks.listProducts.mockResolvedValue([]);
+    mocks.listServers.mockResolvedValue([]);
   });
 
   it("queries only editorial types for article feeds", async () => {
@@ -30,6 +38,21 @@ describe("content feed separation behavior", () => {
     expect(mocks.listByTypes).toHaveBeenCalledWith(
       ["article", "news", "devlog", "update", "announcement"],
       12,
+    );
+  });
+
+  it("keeps the aggregated feed bounded and free-only", async () => {
+    await service.getFeed();
+
+    expect(mocks.listProducts).toHaveBeenCalledWith({
+      featuredOnly: true,
+      maxPrice: 0,
+      limit: 4,
+    });
+    expect(mocks.listServers).toHaveBeenCalledWith(3);
+    expect(mocks.listByTypes).toHaveBeenCalledWith(
+      ["article", "news", "devlog", "update", "announcement"],
+      3,
     );
   });
 
