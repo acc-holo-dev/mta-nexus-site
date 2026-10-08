@@ -12,7 +12,7 @@ import type { AccountMailTransportStage } from "./account-mail-smtp";
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export type MailLease = Readonly<{ id: string; token: string; attempt: number; expiresAt: Date }>;
 export type PreparedAccountMail = Readonly<MailContext & MailPayload & { sendBefore: Date }>;
-export const ACCOUNT_MAIL_MAX_ATTEMPTS = 5;
+const ACCOUNT_MAIL_MAX_ATTEMPTS = 5;
 const leaseMs = 60_000;
 const backoffMs = [5_000, 30_000, 120_000, 300_000] as const;
 const providerBackoffMs = [30_000, 60_000, 120_000, 300_000, 600_000] as const;

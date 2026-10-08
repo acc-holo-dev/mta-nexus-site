@@ -33,7 +33,7 @@ export function digestAccountChallenge(purpose: ChallengePurpose, token: string)
 // handler. Callers must verify the current password before email_verify and
 // perform the protected action INSIDE consume's callback using the supplied tx.
 // No SMTP/network/side effects or detached promises inside transaction callbacks.
-export class AccountChallengeRepository {
+class AccountChallengeRepository {
   async issue(input: Intent): Promise<{ id: string; token: string; expiresAt: Date }> {
     return this.issueAtomic(input, async (_tx, proof) => ({
       id: proof.id, token: proof.token, expiresAt: proof.expiresAt,

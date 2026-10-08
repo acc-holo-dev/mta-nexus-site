@@ -1,6 +1,6 @@
 import type { Product } from "@nexus/domain";
 
-export type ProductDependencyResolutionItem = Readonly<{
+type ProductDependencyResolutionItem = Readonly<{
   slug: string;
   status: "available" | "unresolved" | "self_reference";
   product: Readonly<{

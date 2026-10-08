@@ -1,7 +1,7 @@
 import { organizationRepository } from "@nexus/db";
 import type { Organization } from "@nexus/domain";
 
-export class OrganizationService {
+class OrganizationService {
   async listOrganizations(limit = 24): Promise<Organization[]> {
     return organizationRepository.listAll(Math.min(Math.max(Math.floor(limit), 1), 100));
   }

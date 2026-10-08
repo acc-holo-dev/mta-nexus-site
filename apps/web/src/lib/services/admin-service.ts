@@ -10,7 +10,7 @@ import { can, generateId } from "@nexus/security";
 import { ForbiddenError, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Report, User } from "@nexus/domain";
 
-export class AdminService {
+class AdminService {
   async getSystemHealthMetrics(actor: User) {
     if (!can(actor, "admin.access")) {
       throw new ForbiddenError("Admin access required");

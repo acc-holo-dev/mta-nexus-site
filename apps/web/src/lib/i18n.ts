@@ -1,4 +1,4 @@
-export const supportedLocales = ["en", "ru"] as const;
+const supportedLocales = ["en", "ru"] as const;
 export type Locale = (typeof supportedLocales)[number];
 
 export function resolveLocale(value: string | null | undefined): Locale {
@@ -2725,7 +2725,7 @@ const ru: typeof en = {
   },
 };
 
-export const dictionaries: Record<Locale, typeof en> = { en, ru };
+const dictionaries: Record<Locale, typeof en> = { en, ru };
 
 export function getDictionary(locale: Locale) {
   return dictionaries[locale];

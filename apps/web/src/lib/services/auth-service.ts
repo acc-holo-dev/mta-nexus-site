@@ -38,7 +38,7 @@ function isUniqueConstraintError(error: unknown): boolean {
   );
 }
 
-export class AuthService {
+class AuthService {
   async register(input: {
     email: string;
     username: string;

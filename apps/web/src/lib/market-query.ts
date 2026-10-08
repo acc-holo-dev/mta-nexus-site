@@ -1,9 +1,8 @@
-import { PRODUCT_TYPES, isProductType, type ProductType } from "@nexus/domain";
+import { isProductType, type ProductType } from "@nexus/domain";
 
 export const MARKET_PAGE_SIZE = 24;
 export const MAX_MARKET_PAGE = 1000;
-export const MARKET_TYPES = PRODUCT_TYPES;
-export const MARKET_SORTS = ["popular", "newest", "rating"] as const;
+const MARKET_SORTS = ["popular", "newest", "rating"] as const;
 
 export type MarketSort = (typeof MARKET_SORTS)[number];
 export type MarketType = "all" | ProductType;

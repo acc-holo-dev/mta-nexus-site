@@ -418,18 +418,3 @@ contract-test не даёт version files разойтись.
 ### P2. Browser retry restoration after a fresh login
 
 Same-tab support form reloads now retain the opaque UUID and a SHA-256 digest of the normalized payload, plus the original reply status for at most 24 hours in sessionStorage. No subject or message plaintext is stored. Browser storage may be unavailable; the fallback is process-local only. A fresh login under a different user in the same tab can reuse a pending retry key, which the server scopes to the authenticated actor; it cannot expose another actor's result but may create a new support mutation. Before release, bind retry restoration to a non-sensitive identity/session discriminator and verify logout/account-switch behavior.
-
-
-### P3-1. Результаты Knip требуют ручного разбора
-
-Первый проверенный запуск `pnpm analyze:unused` на 2026-10-08 отмечает 2 файла
-(`web-push-http-sender.ts` facade и `seed-extra.ts`), 1 devDependency
-(`@types/react-dom` в UI), 16 экспортов значений и 10 экспортов типов.
-Это кандидаты на упрощение, а не разрешение автоматически удалить публичный API.
-Неиспользуемые прямые зависимости `clsx` и `tailwind-merge` из web уже убраны;
-используемые зависимости UI сохранены.
-
-**Следующий шаг:** проверить назначение оставшихся facade/seed и публичных
-экспортов, затем удалить лишнее небольшими проверяемыми изменениями. После
-очистки отчёта включить Knip как обязательную CI-проверку. До этого команда
-намеренно возвращает ненулевой код при находках; `--no-exit-code` не используется.

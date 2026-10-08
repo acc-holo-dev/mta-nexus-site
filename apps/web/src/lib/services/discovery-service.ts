@@ -10,7 +10,7 @@ import {
   mtaMasterDirectoryService,
 } from "./mta-master-directory-service";
 
-export interface SearchResultItem {
+interface SearchResultItem {
   id: string;
   type: "product" | "server" | "developer" | "organization" | "article";
   title: string;
@@ -23,7 +23,7 @@ export interface SearchResultItem {
 
 export type SearchResultType = SearchResultItem["type"];
 
-export class DiscoveryService {
+class DiscoveryService {
   async search(
     query: string,
     limit = 50,

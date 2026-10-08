@@ -86,7 +86,7 @@ pnpm release:verify
 | Command | Purpose | Result |
 | --- | --- | --- |
 | `pnpm analyze:architecture` | Check package boundaries, cycles and unresolved imports with dependency-cruiser | Required in the CI unit job; violations fail the command. |
-| `pnpm analyze:unused` | Find unused files, dependencies and exports with Knip | Review report; findings return exit code 1. The remaining review is tracked in PROBLEMS. |
+| `pnpm analyze:unused` | Find unused files, dependencies and exports with Knip | Required in the CI unit job; findings return exit code 1. |
 | `pnpm analyze:bundle` | Analyze the production bundle with the pinned Next.js Turbopack analyzer | Writes `apps/web/.next/diagnostics/analyze/`; generated output stays out of git. |
 
 Run these from the repository root after `pnpm install --frozen-lockfile`, or use
@@ -104,28 +104,30 @@ Type-only imports remain part of the graph. SWC is explicitly installed and
 selected because dependency-cruiser 18.5 does not support the TypeScript 7 compiler
 API. Its generic `missing-typescript-transpiler` warning still appears with SWC;
 do not downgrade the project compiler to silence it. The initial JSON report
-was checked against all 313 matching source files: none were missing (336 graph
-modules, 1001 dependencies). Recheck coverage when changing parser options.
+on `b86063a` was checked against all 313 matching source files: none were missing
+(336 graph modules, 1001 dependencies). Recheck coverage when changing parser options.
 
 Knip entries include shell-invoked scripts and the forked mail-worker fixture.
 The externally installed Playwright runner, OS OpenSSL binary and dynamically
-loaded SWC parser are documented exceptions. Findings are not auto-deleted and
-Knip is not a blocking CI gate until the remaining public-export review is done.
+loaded SWC parser are documented exceptions. Findings are not auto-deleted. Knip now runs as a blocking CI gate after the
+architecture check; review intentional entry points before adding exceptions.
 The web workspace no longer declares unused `clsx`/`tailwind-merge`; `@nexus/ui`
 still owns the dependencies it actually imports.
 
-Local verification for this tooling slice used Node 26.10.0 and pnpm 12.4.2:
-1261 unit tests in 218 files and 159 tooling checks passed; typecheck passed;
-lint had no errors (36 warnings and 28 informational diagnostics remain).
-The analyzer produced a report, and the architecture check passed. PostgreSQL,
-Docker and browser acceptance were unavailable in this environment, so database
-fixture corrections still require the full exact-SHA CI run. See PROBLEMS for
+The unused-code baseline is clean after reviewing all initial findings. Internal
+service/repository classes and helper types stay module-local; consumed singleton
+services and package entry points are preserved. The orphaned Web Push sender
+facade and unreferenced `seed-extra.ts` script were removed. Use `pnpm db:seed`
+for the maintained development seed; removing the script does not delete any
+existing database rows. The UI package retains its React/ReactDOM peer contract.
+
+Local analysis is not PostgreSQL, Docker or browser acceptance. See PROBLEMS for
 hosted-runner and release acceptance blockers.
 
 References: [Knip configuration](https://knip.dev/reference/configuration),
 [dependency-cruiser options](https://github.com/sverweij/dependency-cruiser/blob/main/doc/options-reference.md).
 
-Only `CI` starts on push/PR. Ordinary code changes run lint, types, architecture checks, both test projects,
+Only `CI` starts on push/PR. Ordinary code changes run lint, types, architecture/unused-code checks, both test projects,
 one cached production-image build and a short registration/logout/directory browser smoke.
 Browser and infrastructure consumers load the exact same SHA-labelled image; a missing
 or mismatched transfer fails instead of rebuilding or pulling an unverified image.
@@ -327,7 +329,7 @@ Codex should execute the stages below in order. Each stage must leave `main` bet
 #### Stage 1 — Repository hygiene and single-main enforcement — DONE 2026-09-29
 
 - ~~delete all non-`main` remote branches after the safety check above~~ — deleted 2026-09-29 (see 7.3.A);
-- workspace metadata was reviewed during the original hygiene pass; the later Knip review flags the tracked `packages/db/src/seed-extra.ts` for an explicit keep/remove decision (see PROBLEMS);
+- the unused-code review removed the orphaned extra seed; `pnpm db:seed` remains the maintained development entry point;
 - `README.md`, the three operational root documents and `docs/handbook/` are the maintained prose surfaces; dated ad-hoc audit evidence still does not live in the repository (enforced by `tests/mainline-repository-policy.test.ts`);
 - package manifests and workspace metadata consistent with the current beta version.
 

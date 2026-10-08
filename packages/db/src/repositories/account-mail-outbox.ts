@@ -14,7 +14,7 @@ export class AccountMailQueueFullError extends Error {
 // Queue acceptance is not SMTP acceptance or delivery. This producer is internal
 // and returns no token/recipient. All producers must use the same persisted gate.
 // No network calls or runtime configuration changes are made by this module.
-export type AccountMailQueueStats = Readonly<{
+type AccountMailQueueStats = Readonly<{
   pending: number;
   due: number;
   leased: number;
@@ -22,7 +22,7 @@ export type AccountMailQueueStats = Readonly<{
   oldestAgeSeconds: number;
 }>;
 
-export class AccountMailOutboxRepository {
+class AccountMailOutboxRepository {
   async stats(): Promise<AccountMailQueueStats> {
     const rows = await db.execute(sql`
       select

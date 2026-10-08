@@ -1,4 +1,4 @@
-export type CommunityTopicType = "question" | "post";
+type CommunityTopicType = "question" | "post";
 
 export type CommunityTopicSubmission = {
   title: string;

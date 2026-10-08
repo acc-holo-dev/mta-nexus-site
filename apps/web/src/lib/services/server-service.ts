@@ -10,7 +10,7 @@ type ServerDetailsUpdate = Partial<
   >
 >;
 
-export class ServerService {
+class ServerService {
   async listServers(limit = 100): Promise<Server[]> {
     return serverRepository.listActivePublic(limit);
   }

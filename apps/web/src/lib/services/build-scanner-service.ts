@@ -2,7 +2,7 @@ import net from "node:net";
 import { config } from "@nexus/config";
 import { writeClamAvInstream } from "./clamav-instream";
 
-export type BuildScanResult =
+type BuildScanResult =
   | { status: "not_scanned"; scanner: "disabled"; scannedAt: Date }
   | { status: "clean"; scanner: string; scannedAt: Date }
   | { status: "malicious"; scanner: string; scannedAt: Date; reason?: string }
@@ -136,7 +136,7 @@ export function createClamAvScanner(options: {
   };
 }
 
-export const clamAvScanner: BuildScanner = createClamAvScanner({
+const clamAvScanner: BuildScanner = createClamAvScanner({
   host: config.CLAMAV_HOST,
   port: config.CLAMAV_PORT,
 });

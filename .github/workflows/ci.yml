@@ -67,6 +67,8 @@ jobs:
         pnpm typecheck
     - name: Package boundaries and dependency cycles
       run: pnpm analyze:architecture
+    - name: Unused code and dependency declarations
+      run: pnpm analyze:unused
     - name: Unit tests
       run: pnpm test:unit --reporter=default --reporter=json --outputFile=artifacts/unit-tests.json
     - name: Tooling behavior and isolation checks
