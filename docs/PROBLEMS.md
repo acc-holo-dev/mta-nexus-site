@@ -307,7 +307,7 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   pending/CAS/scan provenance/release event и published/quarantined trusted-restore
   state machine. Discover/workspace source checks теперь заменены rendered navigation,
   compatibility redirect и SavedPage privacy/repository behavior; legacy commerce
-  workspace routes вызываются напрямую. Оставшиеся source-surface тесты сокращать
+  workspace routes вызываются напрямую. Public-resource availability source inspection также заменён: service detail fail-closed проверяется unit behavior, а catalog safe-build scope — реальным PostgreSQL переходом `no build → unsafe build → provenance-backed clean build`. Оставшиеся source-surface тесты сокращать
   по мере изменения функций. Content API/publication/moderation/feed source policies
   теперь заменены HTTP/service/schema behaviors: cache/auth/rate-limit, server-derived
   status authority, organization access, moderation CAS/audit и published detail/feed
