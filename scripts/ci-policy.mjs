@@ -2,14 +2,33 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, appendFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
+// Changes to deployment, dependencies and trust boundaries require full acceptance.
+const fullAcceptancePaths = [
+  /^\.github\/workflows\//,
+  /^Dockerfile$/,
+  /^compose[^/]*\.ya?ml$/,
+  /^deploy\//,
+  /^packages\/db\/(?:migrations\/|scripts\/|src\/(?:[^/]+\/)*(?:[^/]*schema|migrate)\.ts$)/,
+  /^scripts\//,
+  /^vitest\.config\.ts$/,
+  /^(?:[^/]+\/)*package\.json$/,
+  /^pnpm-(?:lock|workspace)\.yaml$/,
+  /^\.(?:nvmrc|node-version)$/,
+  /^apps\/web\/next\.config\.(?:mjs|ts)$/,
+  /^packages\/(?:config|security|storage)\//,
+  /^apps\/web\/src\/app\/api\/auth\//,
+  /^tests\/(?:mainline-repository-policy|j4-production-upload-integration)\.test\.ts$/,
+];
+
 export function classifyChanges(files, { explicitFull = false, release = false } = {}) {
   const code = files.some(file => !/^(?:README\.md|docs\/(?:[^/\n]+\/)*[^/\n]+\.md)$/.test(file));
-  const infrastructure = files.some(file => /^(?:\.github\/workflows\/|Dockerfile$|compose[^/]*\.ya?ml$|deploy\/|packages\/db\/(?:migrations\/|scripts\/|src\/(?:[^/]+\/)*(?:[^/]*schema|migrate)\.ts$)|scripts\/|vitest\.config\.ts$|package\.json$|pnpm-lock\.yaml$|pnpm-workspace\.yaml$|tests\/(?:mainline-repository-policy|j4-production-upload-integration)\.test\.ts$)/.test(file));
+  const infrastructure = files.some(file => fullAcceptancePaths.some(pattern => pattern.test(file)));
   return { code: code || explicitFull || release, full: explicitFull || release || infrastructure };
 }
 
 export function requiredJobs({ code, full }) {
-  if (!code) return ["plan"];
+  // Full acceptance may not degrade into a documentation-only pass.
+  if (!code && !full) return ["plan"];
   const jobs = ["plan", "unit", "verify", "image", "smoke"];
   if (full) jobs.push("postgres-persistence", "local-compose", "backup-restore", "production-compose", "auth-browser", "directory-browser", "resource-browser", "mail-worker");
   return jobs;
