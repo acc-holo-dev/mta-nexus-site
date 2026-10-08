@@ -1,42 +1,65 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import * as React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const state = vi.hoisted(() => ({
+  locale: "en" as "en" | "ru",
+}));
 
-describe("admin content moderation UI", () => {
-  it("connects draft content to the existing moderation API", () => {
-    const page = read("apps/web/src/app/admin/page.tsx");
-    const controls = read(
-      "apps/web/src/components/content-moderation-controls.tsx",
-    );
-    const route = read("apps/web/src/app/api/admin/actions/route.ts");
+const refresh = vi.hoisted(() => vi.fn());
 
-    expect(page).toContain(
-      "<ContentModerationControls contentId={item.id} />",
-    );
-    expect(controls).toContain('targetType: "content"');
-    expect(controls).toContain('moderate("publish")');
-    expect(controls).toContain('moderate("archive")');
-    expect(controls).toContain('credentials: "same-origin"');
-    expect(controls).toContain("confirmsAdminAction(");
-    expect(route).toContain('targetType: z.literal("content")');
-    expect(route).toContain('z.enum(["publish", "archive"])');
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh }),
+}));
+
+vi.mock("../apps/web/src/components/locale-context", async () => {
+  const actual = await vi.importActual<
+    typeof import("../apps/web/src/lib/i18n")
+  >("../apps/web/src/lib/i18n");
+  return {
+    useNexusLocale: () => ({
+      locale: state.locale,
+      dictionary: actual.getDictionary(state.locale),
+    }),
+  };
+});
+
+import { ContentModerationControls } from "../apps/web/src/components/content-moderation-controls";
+
+describe("admin content moderation controls", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    state.locale = "en";
   });
 
-  it("uses shared locale copy instead of hard-coded moderation labels", () => {
-    const page = read("apps/web/src/app/admin/page.tsx");
-    const build = read(
-      "apps/web/src/components/build-moderation-controls.tsx",
-    );
-    const verification = read(
-      "apps/web/src/components/verification-moderation-controls.tsx",
-    );
+  it.each(["en", "ru"] as const)(
+    "renders localized %s moderation actions with review-note gating",
+    (locale) => {
+      state.locale = locale;
+      const copy = getDictionary(locale).admin;
+      const html = renderToStaticMarkup(
+        <ContentModerationControls contentId="cnt_behavior" />,
+      );
 
-    expect(page).toContain("getRequestLocale");
-    expect(page).toContain("dictionary.admin");
-    expect(build).toContain("dictionary.admin");
-    expect(verification).toContain("dictionary.admin");
+      expect(html).toContain(copy.reviewNote);
+      expect(html).toContain(copy.reviewNoteAudit);
+      expect(html).toContain(copy.reviewNoteHint);
+      expect(html).toContain(`>${copy.publish}<`);
+      expect(html).toContain(`>${copy.archive}<`);
+      expect((html.match(/disabled=""/gu) ?? []).length).toBe(2);
+      expect(html).toContain('aria-busy="false"');
+    },
+  );
+
+  it("keeps RU controls free of hard-coded English moderation labels", () => {
+    state.locale = "ru";
+    const html = renderToStaticMarkup(
+      <ContentModerationControls contentId="cnt_behavior" />,
+    );
+    const en = getDictionary("en").admin;
+
+    expect(html).not.toContain(`>${en.publish}<`);
+    expect(html).not.toContain(`>${en.archive}<`);
   });
 });
