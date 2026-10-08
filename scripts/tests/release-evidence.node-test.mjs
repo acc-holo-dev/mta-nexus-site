@@ -11,6 +11,7 @@ import {
   buildEvidenceChecksum,
   listMigrationEvidence,
   summarizeReleaseEvidence,
+  summarizeExternalEvidence,
 } from "../release-evidence-lib.mjs";
 
 test("release summary passes only a clean tree with all gates passed", () => {
@@ -186,4 +187,45 @@ test("failed publication cleans only its own temporary directory", (t) => {
   assert.throws(() => writeReleaseEvidence(destination, { status: "failed" }));
   assert.equal(readFileSync(join(destination, "existing"), "utf8"), "keep");
   assert.deepEqual(readdirSync(directory), ["release-evidence.json"]);
+});
+
+
+test("external evidence summary requires every declared artifact to be present valid and hashed", () => {
+  const valid = {
+    present: true,
+    valid: true,
+    sha256: "a".repeat(64),
+  };
+  assert.deepEqual(
+    summarizeExternalEvidence({
+      provider: valid,
+      soak: { ...valid, sha256: "b".repeat(64) },
+    }),
+    {
+      complete: true,
+      missingOrInvalid: [],
+    },
+  );
+
+  assert.deepEqual(
+    summarizeExternalEvidence({
+      provider: valid,
+      soak: {
+        present: false,
+        valid: false,
+        sha256: null,
+      },
+    }),
+    {
+      complete: false,
+      missingOrInvalid: ["soak"],
+    },
+  );
+});
+
+test("external evidence summary does not treat an empty declaration as complete", () => {
+  assert.deepEqual(summarizeExternalEvidence({}), {
+    complete: false,
+    missingOrInvalid: [],
+  });
 });

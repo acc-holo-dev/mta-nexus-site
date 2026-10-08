@@ -86,6 +86,24 @@ export function summarizeReleaseEvidence({ dirty, gates }) {
   });
 }
 
+export function summarizeExternalEvidence(items) {
+  const entries = Object.entries(items ?? {});
+  const missingOrInvalid = entries
+    .filter(
+      ([, value]) =>
+        value?.present !== true ||
+        value?.valid !== true ||
+        typeof value?.sha256 !== "string" ||
+        !/^[a-f0-9]{64}$/u.test(value.sha256),
+    )
+    .map(([name]) => name);
+  return Object.freeze({
+    complete:
+      entries.length > 0 && missingOrInvalid.length === 0,
+    missingOrInvalid,
+  });
+}
+
 export function buildEvidenceChecksum(evidence) {
   return createHash("sha256").update(JSON.stringify(evidence)).digest("hex");
 }

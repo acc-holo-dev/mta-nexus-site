@@ -131,3 +131,14 @@ printf '%s' "$code"`], { encoding: "utf8" });
     assert.equal(result.stdout, String(exitCode));
   }
 });
+
+
+test("core release evidence references sanitized Web Push external artifacts by checksum only", () => {
+  const script = read("scripts/release-evidence.mjs");
+  assert.match(script, /web-push-soak-evidence\.json/u);
+  assert.match(script, /web-push-provider-evidence\.json/u);
+  assert.match(script, /summarizeExternalEvidence/u);
+  assert.match(script, /sha256File\(specification\.path\)/u);
+  assert.doesNotMatch(script, /NEXUS_WEB_PUSH_PROBE_(?:ENDPOINT|P256DH|AUTH)/u);
+  assert.doesNotMatch(script, /readFileSync\(specification\.path/u);
+});

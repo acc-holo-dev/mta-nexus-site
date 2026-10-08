@@ -1,5 +1,9 @@
 #!/usr/bin/env node
-import { mkdirSync, readFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+} from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -13,6 +17,7 @@ import {
   listMigrationEvidence,
   sha256File,
   summarizeReleaseEvidence,
+  summarizeExternalEvidence,
 } from "./release-evidence-lib.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -138,6 +143,49 @@ const gates = [
   runGate("next_build", pnpmCommand, ["build"]),
 ];
 
+const externalEvidenceSpecs = {
+  webPushDurationSoak: {
+    path: join(root, "artifacts", "web-push-soak-evidence.json"),
+    checker: "scripts/check-web-push-soak-evidence.mjs",
+  },
+  webPushLiveProvider: {
+    path: join(root, "artifacts", "web-push-provider-evidence.json"),
+    checker: "scripts/check-web-push-provider-evidence.mjs",
+  },
+};
+
+const externalEvidence = Object.fromEntries(
+  Object.entries(externalEvidenceSpecs).map(
+    ([name, specification]) => {
+      if (!existsSync(specification.path)) {
+        return [
+          name,
+          Object.freeze({
+            present: false,
+            valid: false,
+            sha256: null,
+          }),
+        ];
+      }
+
+      const verification = runCaptured(
+        process.execPath,
+        [specification.checker, specification.path],
+      );
+      return [
+        name,
+        Object.freeze({
+          present: true,
+          valid: verification.ok,
+          sha256: sha256File(specification.path),
+        }),
+      ];
+    },
+  ),
+);
+const externalEvidenceSummary =
+  summarizeExternalEvidence(externalEvidence);
+
 const migrationFiles = listMigrationEvidence(migrationsDir);
 // Re-read after all commands and migration hashing: successful gates must not
 // be attributed to a checkout that changed while they were running.
@@ -190,9 +238,14 @@ const evidenceCore = {
   },
   requiredGates: REQUIRED_RELEASE_GATES,
   gates,
+  externalEvidence: {
+    items: externalEvidence,
+    summary: externalEvidenceSummary,
+  },
   limitations: [
     "This bundle proves only the core application gates listed here.",
-    "Docker startup, browser acceptance, external provider delivery, backup restore and production rollout require separate evidence.",
+    "Docker startup, browser acceptance, backup restore and production rollout require separate evidence.",
+    "Core releaseCandidate status does not imply public production readiness; externalEvidence summarizes optional Web Push provider/soak artifacts separately.",
     "The bundle contains no environment variable values or command stdout/stderr.",
   ],
   summary: summarizeReleaseEvidence({ dirty: dirty || finalDirty, gates }),
