@@ -46,6 +46,8 @@ export function assertIsolatedProduction(config, project, caddyFile) {
   const pushWorker = config.services['push-worker'];
   assert.equal(pushWorker.image, config.services.app.image);
   assert.equal(pushWorker.user, 'node');
+  assert.equal(pushWorker.environment.HOME, '/tmp');
+  assert.equal(pushWorker.environment.TMPDIR, '/tmp');
   assert.equal(pushWorker.read_only, true);
   assert.equal(pushWorker.init, true);
   assert.deepEqual(pushWorker.cap_drop, ['ALL']);

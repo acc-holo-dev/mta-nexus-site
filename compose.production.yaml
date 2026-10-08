@@ -99,6 +99,8 @@ services:
       ]
     environment:
       NODE_ENV: production
+      HOME: /tmp
+      TMPDIR: /tmp
       NEXT_PUBLIC_APP_URL: https://${DOMAIN:?set DOMAIN in .env}
       DATABASE_URL: postgres://${POSTGRES_USER:-nexus}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mta_nexus}
       AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET in .env}
