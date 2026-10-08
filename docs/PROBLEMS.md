@@ -317,7 +317,11 @@ CHECK, известный алиас tool → plugin и отказ на неиз
   download action при длинной build history. Account recovery source checks
   заменены чистыми proof/history/request/timing contracts; admin content
   moderation — SSR behavior controls + HTTP/service tests; RU/EN root shell
-  wiring — реальным RootLayout render вместо чтения JSX-файлов;
+  wiring — реальным RootLayout render вместо чтения JSX-файлов. Server
+  experience source checks также удалены: live authority/management проверяют
+  SSR behavior suites, create/update/follow/claim — confirmation parsers, а
+  server client requests используют единый tested private API policy
+  (`same-origin`, `no-store`, bounded timeout/caller abort);
 - unit-проект уже выполняется параллельно четырьмя workers; только database
   проект последовательный из-за общих очередей и точных счётчиков. Следующий
   шаг — заменять оставшиеся проверки строк исходников поведением по мере
