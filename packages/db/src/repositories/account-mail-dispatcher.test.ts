@@ -98,3 +98,30 @@ describe("D2c account mail dispatcher", () => {
     })).toThrow("Invalid account mail application URL");
   });
 });
+
+
+it("reports progress throughout a multi-message dispatch batch", async () => {
+  const first = lease("ame_progress_1");
+  const second = lease("ame_progress_2");
+  const w = worker({
+    ids: [first.id, second.id],
+    leases: new Map([
+      [first.id, first],
+      [second.id, second],
+    ]),
+  });
+  const progress = vi.fn();
+  const dispatcher = new AccountMailDispatcher({
+    worker: w,
+    cipher: cipher(),
+    transport: transport([
+      accepted(),
+      accepted(),
+    ]),
+    appUrl: "https://nexus.test",
+  });
+
+  await dispatcher.runBatch(10, undefined, progress);
+
+  expect(progress).toHaveBeenCalledTimes(4);
+});

@@ -326,7 +326,11 @@ export type AccountMailBatchResult = Readonly<{
 }>;
 
 type BatchRunner = Readonly<{
-  runBatch(limit?: number, signal?: AbortSignal): Promise<AccountMailBatchResult>;
+  runBatch(
+    limit?: number,
+    signal?: AbortSignal,
+    onProgress?: () => void,
+  ): Promise<AccountMailBatchResult>;
 }>;
 
 function sleep(ms: number, signal: AbortSignal): Promise<void> {
@@ -349,6 +353,7 @@ export async function runAccountMailLoop(input: {
   batchSize: number;
   pollIntervalMs: number;
   once?: boolean;
+  onProgress?: () => void;
   onBatch?: (input: Readonly<{
     batch: number;
     result: AccountMailBatchResult;
@@ -363,7 +368,11 @@ export async function runAccountMailLoop(input: {
   const total = { batches: 0, accepted: 0, retried: 0, discarded: 0, skipped: 0, unsettled: 0, cleaned: 0 };
   do {
     if (input.signal.aborted) break;
-    const result = await input.dispatcher.runBatch(input.batchSize, input.signal);
+    const result = await input.dispatcher.runBatch(
+      input.batchSize,
+      input.signal,
+      input.onProgress,
+    );
     total.batches++;
     total.accepted += result.accepted;
     total.retried += result.retried;

@@ -95,19 +95,28 @@ export class AccountMailDispatcher {
     this.#baseUrl = checkedBaseUrl(input.appUrl);
   }
 
-  async runBatch(limit = 10, signal?: AbortSignal): Promise<AccountMailDispatchSummary> {
+  async runBatch(
+    limit = 10,
+    signal?: AbortSignal,
+    onProgress?: () => void,
+  ): Promise<AccountMailDispatchSummary> {
     if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new Error("Invalid dispatch batch limit");
     const summary = { accepted: 0, retried: 0, discarded: 0, skipped: 0, unsettled: 0, cleaned: 0 };
     // Shutdown may have arrived while the caller was checking queue key coverage.
     if (signal?.aborted) return Object.freeze(summary);
     let providerDeferred = false;
     const ids = await this.#worker.candidates(limit);
+    onProgress?.();
     for (const id of ids) {
       // Shutdown is a drain boundary, not cancellation of an already-claimed
       // delivery. Stop taking new work, but settle the one already in flight.
       if (signal?.aborted) break;
       const lease = await this.#worker.claim(id);
-      if (!lease) { summary.skipped++; continue; }
+      if (!lease) {
+        summary.skipped++;
+        onProgress?.();
+        continue;
+      }
       let prepared: PreparedAccountMail | null;
       try {
         prepared = await this.#worker.prepare(lease, this.#cipher);
@@ -116,13 +125,19 @@ export class AccountMailDispatcher {
           if (this.#worker.releaseForMissingKey) {
             await this.#worker.releaseForMissingKey(lease);
           }
+          onProgress?.();
           throw new Error("Account mail worker key ring is unavailable");
         }
         const settled = await this.#worker.settle(lease, "retry");
         if (settled) summary.retried++; else summary.unsettled++;
+        onProgress?.();
         continue;
       }
-      if (!prepared) { summary.skipped++; continue; }
+      if (!prepared) {
+        summary.skipped++;
+        onProgress?.();
+        continue;
+      }
       const result = await this.#transport.send(messageFor(prepared, this.#baseUrl));
 
       if (isProviderWideRetry(result) && this.#worker.deferProviderFailure) {
@@ -136,6 +151,7 @@ export class AccountMailDispatcher {
         } else {
           summary.unsettled++;
         }
+        onProgress?.();
         break;
       }
 
@@ -157,6 +173,7 @@ export class AccountMailDispatcher {
 
       // Workers without the provider-defer extension still stop the batch after
       // a provider-wide retry so subsequent rows keep their attempts.
+      onProgress?.();
       if (settled && isProviderWideRetry(result)) {
         providerDeferred = true;
         break;
@@ -166,6 +183,7 @@ export class AccountMailDispatcher {
     // so exit latency is bounded by the single in-flight delivery.
     if (!signal?.aborted) {
       summary.cleaned = await this.#worker.discardUnavailable(Math.min(limit, 100));
+      onProgress?.();
     }
     return Object.freeze({
       ...summary,

@@ -153,9 +153,14 @@ try {
   };
 
   const guardedDispatcher = {
-    runBatch: async (limit?: number, signal?: AbortSignal) => {
+    runBatch: async (
+      limit?: number,
+      signal?: AbortSignal,
+      onProgress?: () => void,
+    ) => {
       await assertQueueKeyCoverage();
-      return dispatcher.runBatch(limit, signal);
+      onProgress?.();
+      return dispatcher.runBatch(limit, signal, onProgress);
     },
   };
 
@@ -256,6 +261,7 @@ try {
     batchSize: config.batchSize,
     pollIntervalMs: config.pollIntervalMs,
     once: process.argv.includes("--once"),
+    onProgress: markProgress,
     onBatch: async ({ batch, result }) => {
       healthBatch = batch;
       await refreshProviderGate(true);
