@@ -39,6 +39,7 @@ vi.mock("@nexus/security", () => ({
 vi.mock("../../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => ({ id: "usr_1" })),
+    getSessionIdentity: vi.fn(async () => ({ user: { id: "usr_1" }, sessionId: "ses_1" })),
     getCurrentSessionId: vi.fn(async () => "ses_1"),
   },
 }));

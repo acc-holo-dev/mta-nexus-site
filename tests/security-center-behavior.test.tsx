@@ -12,6 +12,7 @@ const state = vi.hoisted(() => ({
 }));
 
 const auth = vi.hoisted(() => ({
+  getSessionIdentity: vi.fn(),
   getSession: vi.fn(),
   listSessions: vi.fn(),
   getCurrentSessionId: vi.fn(),
@@ -67,6 +68,8 @@ describe("Security Center behavior", () => {
     vi.clearAllMocks();
     state.user = null;
     auth.getSession.mockImplementation(async () => state.user);
+    auth.getSessionIdentity.mockImplementation(async () => state.user
+      ? { user: state.user, sessionId: "ses_current" } : null);
     auth.listSessions.mockResolvedValue([]);
     auth.getCurrentSessionId.mockResolvedValue(null);
     auth.getRecoveryEmailStatus.mockResolvedValue(null);
@@ -117,7 +120,10 @@ describe("Security Center behavior", () => {
     const html = renderToStaticMarkup(await SecurityPage());
 
     expect(auth.listSessions).toHaveBeenCalledWith("usr_security");
-    expect(auth.getCurrentSessionId).toHaveBeenCalledWith("session-token");
+    expect(auth.getSessionIdentity).toHaveBeenCalledOnce();
+    expect(auth.getSessionIdentity).toHaveBeenCalledWith("session-token");
+    expect(auth.getSession).not.toHaveBeenCalled();
+    expect(auth.getCurrentSessionId).not.toHaveBeenCalled();
     expect(auth.getRecoveryEmailStatus).toHaveBeenCalledWith("usr_security");
     expect(auditList).toHaveBeenCalledWith(
       "usr_security",

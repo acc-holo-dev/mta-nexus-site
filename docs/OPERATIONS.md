@@ -259,6 +259,26 @@ and [Check Run annotations API](https://docs.github.com/en/rest/checks/runs).
 
 #### Application query optimizations
 
+The Security page, session listing API and Web Push GET/POST/DELETE obtain the
+public user and current session ID through one `getSessionIdentity` lookup,
+instead of reading the same joined session/user record twice. Single-session
+revocation also uses that ID for its early current-session guard. The existing
+session repository still validates expiration and hashes the supplied token;
+the service exposes only the sanitized user and session ID, not the stored
+token, password hash, IP or user agent from the session record. There is no
+cross-request cache: each identity request validates the current database row.
+Legacy `getSession` and `getCurrentSessionId` APIs remain available.
+
+Session revocation repositories still lock and revalidate the current actor
+inside their transaction; those checks are essential and were not removed.
+Private no-store headers, current-session protection, endpoint/session ownership
+and Web Push mutation rate limits remain enforced. Nine new identity tests use
+the real session repository and Drizzle builder with a synthetic pg-proxy driver
+to verify one query, missing/expired/revoked sessions, lookup errors, sanitization
+and independent lookups. HTTP/SSR tests assert one identity request per surface;
+three Web Push cases reject absent identities before subscription reads/writes.
+These checks are not real PostgreSQL concurrency or browser acceptance.
+
 The saved page starts MTA directory loading as soon as its public-server query
 finishes, independently of the saved-resource query. It still waits for server
 filtering before deciding whether telemetry is needed: anonymous users, empty

@@ -20,9 +20,9 @@ export default async function SecurityPage() {
   const dictionary = getDictionary(locale);
   const copy = dictionary.securityCenter;
   const token = (await cookies()).get("nexus_session")?.value;
-  const user = await authService.getSession(token);
+  const authenticated = await authService.getSessionIdentity(token);
 
-  if (!user) {
+  if (!authenticated) {
     return (
       <div className="mx-auto max-w-md space-y-4 py-20 text-center">
         <ShieldCheck className="mx-auto h-10 w-10 text-accent" aria-hidden="true" />
@@ -37,10 +37,10 @@ export default async function SecurityPage() {
     );
   }
 
-  const [sessions, currentSessionId, recoveryEmail, activity] =
+  const { user, sessionId: currentSessionId } = authenticated;
+  const [sessions, recoveryEmail, activity] =
     await Promise.all([
       authService.listSessions(user.id),
-      authService.getCurrentSessionId(token),
       authService.getRecoveryEmailStatus(user.id),
       securityCenterService.listActivity(user.id, 30),
     ]);

@@ -139,6 +139,15 @@ class AuthService {
     return result ? toPublicUser(result.user) : null;
   }
 
+  async getSessionIdentity(
+    token?: string | null,
+  ): Promise<{ user: User; sessionId: string } | null> {
+    if (!token) return null;
+    const result = await sessionRepository.findValidSession(token);
+    // Return only the public user and ID, never the stored token or session metadata.
+    return result ? { user: toPublicUser(result.user), sessionId: result.session.id } : null;
+  }
+
   async logout(token: string): Promise<void> {
     const session = await sessionRepository.findValidSession(token);
     if (!session) {

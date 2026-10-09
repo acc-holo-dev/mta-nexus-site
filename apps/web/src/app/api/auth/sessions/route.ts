@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
-    const user = await authService.getSession(token);
-    if (!user) {
+    const authenticated = await authService.getSessionIdentity(token);
+    if (!authenticated) {
       return json(
         context,
         { error: "Authentication required" },
@@ -39,10 +39,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const [sessions, currentSessionId] = await Promise.all([
-      authService.listSessions(user.id),
-      authService.getCurrentSessionId(token),
-    ]);
+    const { user, sessionId: currentSessionId } = authenticated;
+    const sessions = await authService.listSessions(user.id);
 
     return json(context, {
       sessions: sessions.map((session) => ({
@@ -73,8 +71,8 @@ export async function DELETE(request: NextRequest) {
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
-    const user = await authService.getSession(token);
-    if (!user || !token) {
+    const authenticated = await authService.getSessionIdentity(token);
+    if (!authenticated || !token) {
       return json(
         context,
         { error: "Authentication required" },
@@ -82,6 +80,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    const { user, sessionId: currentSessionId } = authenticated;
     const rateLimit = await consumeRateLimit(
       "sessionManagement",
       user.id,
@@ -124,8 +123,6 @@ export async function DELETE(request: NextRequest) {
       });
     }
 
-    const currentSessionId =
-      await authService.getCurrentSessionId(token);
     if (command.sessionId === currentSessionId) {
       return json(
         context,

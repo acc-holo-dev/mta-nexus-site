@@ -64,6 +64,15 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 
 ### P1-2. GitHub-hosted runner не начинает `plan` job
 
+Страница Security и HTTP API сессий/Web Push больше не читают одну
+session/user запись дважды для пользователя и ID текущей сессии.
+`getSessionIdentity` возвращает их из одного validated lookup без кеша между
+запросами. Проверки текущего actor под блокировкой при отзыве сессий сохранены.
+Drizzle/pg-proxy, HTTP и SSR проверки покрывают expiry, missing/revoked rows,
+приватность и ранний отказ Web Push; настоящая DB/browser приёмка остаётся открытой.
+Локальный `pnpm check:code` на этом срезе прошёл 1452 unit и 200 tooling
+проверок, typecheck, Knip и архитектурный анализ; lint сохранил 40 предупреждений.
+
 На saved-странице чтение ресурсов больше не задерживает MTA lookup после
 получения публичных серверов. Проверки подписки и отметки уведомления возвращают
 только ID вместо полной строки. SSR virtual-clock и Drizzle/pg-proxy тесты

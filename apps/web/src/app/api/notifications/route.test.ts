@@ -37,6 +37,8 @@ const pushRepository = vi.hoisted(() => ({
 vi.mock("../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
+    getSessionIdentity: vi.fn(async () => state.user && state.sessionId
+      ? { user: state.user, sessionId: state.sessionId } : null),
     getCurrentSessionId: vi.fn(async () => state.sessionId),
   },
 }));
@@ -76,6 +78,7 @@ vi.mock("../../../lib/web-push-subscription", () => ({
 }));
 
 import { GET as inboxGET } from "./route";
+import { authService } from "../../../lib/services/auth-service";
 import { POST as markReadPOST } from "./mark-read/route";
 import {
   GET as preferencesGET,
@@ -243,6 +246,24 @@ describe("notification API request correlation", () => {
     );
     expect(removed.status).toBe(200);
     expectPrivateCorrelation(removed);
+    expect(authService.getSessionIdentity).toHaveBeenCalledTimes(3);
+    expect(authService.getSession).not.toHaveBeenCalled();
+    expect(authService.getCurrentSessionId).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["GET", pushGET],
+    ["POST", pushPOST],
+    ["DELETE", pushDELETE],
+  ] as const)("refuses Web Push %s without a valid session identity", async (method, handler) => {
+    state.sessionId = null;
+    const response = await handler(request("/api/notifications/push", method));
+    expect(response.status).toBe(401);
+    expectPrivateCorrelation(response);
+    expect(authService.getSessionIdentity).toHaveBeenCalledOnce();
+    expect(pushRepository.listForSession).not.toHaveBeenCalled();
+    expect(pushRepository.upsertWithResult).not.toHaveBeenCalled();
+    expect(pushRepository.removeForSession).not.toHaveBeenCalled();
   });
 
   it("returns correlated private failures without exposing raw errors", async () => {

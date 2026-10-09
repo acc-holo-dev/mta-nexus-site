@@ -31,6 +31,8 @@ const listSessions = vi.hoisted(() => vi.fn(async () => [
 vi.mock("../../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
+    getSessionIdentity: vi.fn(async () => state.user
+      ? { user: state.user, sessionId: state.currentSessionId } : null),
     getCurrentSessionId: vi.fn(async () => state.currentSessionId),
     revokeSession,
     revokeOtherSessions: revokeOthers,
@@ -45,6 +47,7 @@ vi.mock("@nexus/domain", () => ({
 }));
 
 import { DELETE, GET } from "./route";
+import { authService } from "../../../../lib/services/auth-service";
 
 function listRequest() {
   return new NextRequest("http://nexus.test/api/auth/sessions", {
@@ -99,6 +102,10 @@ describe("session listing HTTP contract", () => {
       expect(session).not.toHaveProperty("userId");
     }
     expect(listSessions).toHaveBeenCalledWith("usr_owner");
+    expect(authService.getSessionIdentity).toHaveBeenCalledOnce();
+    expect(authService.getSessionIdentity).toHaveBeenCalledWith("token_owner");
+    expect(authService.getSession).not.toHaveBeenCalled();
+    expect(authService.getCurrentSessionId).not.toHaveBeenCalled();
   });
 
   it("does not expose session metadata without authentication", async () => {
@@ -154,6 +161,8 @@ describe("session revocation command matrix", () => {
     const current = await DELETE(request({ sessionId: "ses_current" }));
     expect(current.status).toBe(409);
     expect(revokeSession).not.toHaveBeenCalled();
+    expect(authService.getSessionIdentity).toHaveBeenCalledOnce();
+    expect(authService.getCurrentSessionId).not.toHaveBeenCalled();
 
     state.owned = false;
     const unowned = await DELETE(request({ sessionId: "ses_foreign" }));

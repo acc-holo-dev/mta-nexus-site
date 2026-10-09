@@ -42,13 +42,7 @@ function publicKey() {
 
 async function requireSession(request: NextRequest) {
   const token = request.cookies.get("nexus_session")?.value;
-  const [user, sessionId] = await Promise.all([
-    authService.getSession(token),
-    authService.getCurrentSessionId(token),
-  ]);
-  return user && sessionId
-    ? { user, sessionId }
-    : null;
+  return authService.getSessionIdentity(token);
 }
 
 export async function GET(request: NextRequest) {
