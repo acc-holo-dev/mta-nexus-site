@@ -1,11 +1,9 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import {
-  serverRepository,
-  userLibraryRepository,
-} from "@nexus/db";
+import { serverRepository, userLibraryRepository } from "@nexus/db";
 import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
-import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
+import { SectionHeader, StatCard } from "@nexus/ui";
 import { authService } from "../../lib/services/auth-service";
 import {
   indexMtaObservations,
@@ -16,26 +14,29 @@ import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";
 import { getLibraryCopy } from "../../lib/library-view";
+import { getManagedServerCopy } from "../../lib/managed-server-view";
+import { ManagedServerCard } from "../../components/managed-server-card";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "Workspace | MTA NEXUS",
+  robots: { index: false, follow: false },
+};
 
 export default async function WorkspacePage() {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const historyCopy = getCommerceHistoryCopy(locale);
   const libraryCopy = getLibraryCopy(locale);
+  const serverCopy = getManagedServerCopy(locale);
   const token = (await cookies()).get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
   if (!user) {
     return (
       <div className="mx-auto max-w-md space-y-4 py-20 text-center">
-        <h1 className="font-display text-primary">
-          {dictionary.workspace.signInRequired}
-        </h1>
-        <p className="font-caption text-muted">
-          {dictionary.workspace.signInMessage}
-        </p>
+        <h1 className="font-display text-primary">{dictionary.workspace.signInRequired}</h1>
+        <p className="font-caption text-muted">{dictionary.workspace.signInMessage}</p>
         <Link
           href="/auth/login"
           className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
@@ -46,50 +47,55 @@ export default async function WorkspacePage() {
     );
   }
 
-  const [library, ownedServers] = await Promise.all([
+  const [library, { serverPage, directory }] = await Promise.all([
     userLibraryRepository.pageByUser(user.id, 1, "all", 4),
-    serverRepository.listByOwner(user.id),
+    serverRepository.pageManagedByUser(user.id, 1, {}, 4).then(async (serverPage) => ({
+      serverPage,
+      directory:
+        serverPage.servers.length > 0
+          ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
+          : null,
+    })),
   ]);
+  const managedServers = serverPage.servers;
   const downloadable = library.items;
-  const directory = ownedServers.length > 0
-    ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
-    : null;
   const observationFor = indexMtaObservations(directory?.servers ?? []);
   const directoryIsFresh = Boolean(directory && !directory.isStale);
   const liveByServerId = new Map(
-    ownedServers.map((server) => [
-      server.id,
-      observationFor(server) ?? null,
-    ]),
+    managedServers.map((server) => [server.id, observationFor(server) ?? null]),
   );
-  const onlineServers = ownedServers.filter((server) => {
+  const onlineServers = managedServers.filter((server) => {
     const observation = liveByServerId.get(server.id);
     return mtaLiveStatus(observation, !directoryIsFresh) === "online";
   });
   const onlinePlayers = onlineServers.reduce(
-    (total, server) =>
-      total + (liveByServerId.get(server.id)?.players ?? 0),
+    (total, server) => total + (liveByServerId.get(server.id)?.players ?? 0),
     0,
   );
+  const playerCountsKnown =
+    directoryIsFresh &&
+    managedServers.every((server) => {
+      const observation = liveByServerId.get(server.id);
+      return mtaLiveStatus(observation, false) === "offline" || observation?.players != null;
+    });
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   return (
     <div className="space-y-8">
       <header className="flex flex-col justify-between gap-4 border-b border-base pb-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-display text-primary">
-            {dictionary.workspace.title}
-          </h1>
+          <h1 className="font-display text-primary">{dictionary.workspace.title}</h1>
           <p className="mt-0.5 font-caption text-muted">
             @{user.username} · {dictionary.workspace.subtitle}
           </p>
-          <p className="mt-1 max-w-2xl font-caption text-faint">
-            {dictionary.workspace.liveNote}
-          </p>
+          <p className="mt-1 max-w-2xl font-caption text-faint">{dictionary.workspace.liveNote}</p>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Link href="/workspace/resources" className="rounded-md border border-base px-4 py-2 text-xs font-semibold text-secondary hover:text-primary">
+          <Link
+            href="/workspace/resources"
+            className="rounded-md border border-base px-4 py-2 text-xs font-semibold text-secondary hover:text-primary"
+          >
             {dictionary.authorResources.title}
           </Link>
           <Link
@@ -118,20 +124,22 @@ export default async function WorkspacePage() {
           context={dictionary.workspace.inLibrary}
         />
         <StatCard
-          label={dictionary.workspace.yourServers}
-          value={ownedServers.length}
+          label={serverCopy.title}
+          value={serverPage.total}
           tone="accent"
           icon={<ServerIcon className="h-4 w-4" />}
-          context={directoryIsFresh
-            ? `${onlineServers.length} ${dictionary.workspace.online}`
-            : dictionary.workspace.liveUnavailable}
+          context={
+            directoryIsFresh
+              ? `${onlineServers.length} ${serverCopy.previewOnline}`
+              : dictionary.workspace.liveUnavailable
+          }
         />
         <StatCard
           label={dictionary.workspace.playersOnline}
-          value={directoryIsFresh ? onlinePlayers : "—"}
+          value={playerCountsKnown ? onlinePlayers : "—"}
           tone="success"
           icon={<Users className="h-4 w-4" />}
-          context={dictionary.workspace.onServers}
+          context={serverCopy.previewPlayers}
         />
       </div>
 
@@ -185,9 +193,7 @@ export default async function WorkspacePage() {
                     </div>
                     <div className="text-xs text-faint">
                       {dictionary.workspace.added}{" "}
-                      {entitlement.addedAt.toLocaleDateString(
-                        dateLocale,
-                      )}
+                      {entitlement.addedAt.toLocaleDateString(dateLocale)}
                     </div>
                   </div>
                   {entitlement.downloadable && entitlement.slug && (
@@ -211,67 +217,38 @@ export default async function WorkspacePage() {
 
       <section>
         <SectionHeader
-          title={dictionary.workspace.yourServers}
-          description={dictionary.workspace.serversDescription}
+          title={serverCopy.title}
+          description={serverCopy.preview}
           action={
-            <Link
-              href="/workspace/servers/new"
-              className="text-xs font-semibold text-accent hover:underline"
-            >
-              {dictionary.workspace.registerServer}
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/workspace/servers"
+                className="text-xs font-semibold text-accent hover:underline"
+              >
+                {serverCopy.openAll}
+              </Link>
+              <Link
+                href="/workspace/servers/new"
+                className="text-xs font-semibold text-accent hover:underline"
+              >
+                {dictionary.workspace.registerServer}
+              </Link>
+            </div>
           }
         />
 
-        {ownedServers.length > 0 ? (
+        {managedServers.length > 0 ? (
           <div className="space-y-3">
-            {ownedServers.map((server) => {
+            {managedServers.map((server) => {
               const observation = liveByServerId.get(server.id);
-              const liveStatus = mtaLiveStatus(observation, !directoryIsFresh);
-              const isOnline = liveStatus === "online";
-              const isOffline = liveStatus === "offline";
-              const status = isOnline
-                ? dictionary.servers.online
-                : isOffline
-                  ? dictionary.servers.offline
-                  : dictionary.servers.unknown;
-
               return (
-                <article
+                <ManagedServerCard
                   key={server.id}
-                  className="nexus-panel flex flex-wrap items-center justify-between gap-3 p-4"
-                >
-                  <div className="min-w-0">
-                    <Link
-                      href={`/servers/${server.slug}`}
-                      className="text-sm font-semibold text-primary transition-colors hover:text-accent"
-                    >
-                      {server.name}
-                    </Link>
-                    <div className="font-mono text-xs text-faint">
-                      {server.ipAddress}:{server.port}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Link
-                      href={`/workspace/servers/${server.id}`}
-                      className="text-xs font-semibold text-accent hover:underline"
-                    >
-                      {dictionary.workspace.manage}
-                    </Link>
-                    <StatusBadge
-                      status={status}
-                      tone={
-                        isOnline
-                          ? "success"
-                          : isOffline
-                            ? "danger"
-                            : "neutral"
-                      }
-                    />
-                  </div>
-                </article>
+                  server={server}
+                  observation={observation}
+                  isStale={!directoryIsFresh}
+                  locale={locale}
+                />
               );
             })}
           </div>

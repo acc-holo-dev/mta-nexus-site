@@ -1,8 +1,25 @@
-import { and, asc, count, desc, eq, gt, ilike, inArray, ne, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, exists, gt, ilike, inArray, isNull, ne, or, sql } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
-import { auditEvents, servers } from "../schema";
-import type { AuditEvent, Server } from "@nexus/domain";
+import { auditEvents, organizationMembers, organizations, servers } from "../schema";
+import type { AuditEvent, Server, ServerStatus, ServerVisibility } from "@nexus/domain";
+
+export type ManagedServerFilters = {
+  query?: string;
+  status?: ServerStatus;
+  visibility?: ServerVisibility;
+  verification?: "verified" | "unverified";
+};
+
+const managedServerFields = {
+  id: servers.id, name: servers.name, slug: servers.slug,
+  ipAddress: servers.ipAddress, port: servers.port,
+  organizationId: servers.organizationId, status: servers.status,
+  visibility: servers.visibility, isVerified: servers.isVerified,
+  updatedAt: servers.updatedAt,
+};
+
+export type ManagedServerItem = Pick<typeof servers.$inferSelect, keyof typeof managedServerFields>;
 
 // Full database reads include the durable revision introduced in migration 0034.
 type PersistedServer = Server & { endpointRevision: number };
@@ -42,6 +59,51 @@ function resetLiveStateForEndpointEdit(updates: ServerEditableFields) {
 }
 
 export class ServerRepository {
+  /** A private workspace includes personal ownership and existing organization management rights. */
+  async pageManagedByUser(userId: string, requestedPage = 1, filters: ManagedServerFilters = {}, requestedSize = 12) {
+    if (!userId) throw new RangeError("A user ID is required for managed servers");
+    const pageSize = Number.isFinite(requestedSize)
+      ? Math.min(Math.max(Math.floor(requestedSize), 1), 50) : 12;
+    const requested = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+    const query = typeof filters.query === "string" ? filters.query.trim().slice(0, 120) : "";
+    const pattern = query ? containsPattern(query) : undefined;
+    const condition = and(
+      or(
+        // A creator listed as owner on an organization's server still needs its organization rights.
+        and(isNull(servers.organizationId), eq(servers.ownerId, userId)),
+        exists(db.select({ id: organizations.id }).from(organizations).where(and(
+          eq(organizations.id, servers.organizationId), eq(organizations.ownerId, userId),
+        ))),
+        exists(db.select({ id: organizationMembers.id }).from(organizationMembers).where(and(
+          eq(organizationMembers.organizationId, servers.organizationId),
+          eq(organizationMembers.userId, userId),
+          or(inArray(organizationMembers.role, ["owner", "admin"]),
+            sql`${organizationMembers.permissions} @> ${JSON.stringify(["manage_servers"])}::jsonb`),
+        ))),
+      ),
+      filters.status && ["active", "inactive", "maintenance", "suspended"].includes(filters.status)
+        ? eq(servers.status, filters.status) : undefined,
+      filters.visibility && ["public", "unlisted", "private"].includes(filters.visibility)
+        ? eq(servers.visibility, filters.visibility) : undefined,
+      filters.verification === "verified" || filters.verification === "unverified"
+        ? eq(servers.isVerified, filters.verification === "verified") : undefined,
+      pattern ? or(ilike(servers.name, pattern), ilike(servers.ipAddress, pattern)) : undefined,
+    );
+
+    return db.transaction(async tx => {
+      const [summary] = await tx.select({ total: count() }).from(servers).where(condition);
+      const total = summary?.total;
+      if (total === undefined || !Number.isSafeInteger(total) || total < 0) {
+        throw new RangeError("Invalid managed server total");
+      }
+      const totalPages = Math.max(1, Math.ceil(total / pageSize));
+      const page = Math.min(requested, totalPages);
+      const rows = total === 0 ? [] : await tx.select(managedServerFields).from(servers).where(condition)
+        .orderBy(desc(servers.updatedAt), desc(servers.id)).limit(pageSize).offset((page - 1) * pageSize);
+      return { servers: rows, total, page, pageSize, totalPages };
+    }, { isolationLevel: "repeatable read", accessMode: "read only" });
+  }
+
   async pageActivePublicByOwner(ownerId: string, requestedPage = 1, requestedSize = 12) {
     const pageSize = Number.isFinite(requestedSize)
       ? Math.min(Math.max(Math.floor(requestedSize), 1), 100) : 12;

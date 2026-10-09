@@ -101,3 +101,20 @@ Owner analytics может учитывать:
 - first-party technical telemetry, в том числе не показываемую самому посетителю как отдельный UI signal.
 
 Однако hidden telemetry не означает undisclosed surveillance: сбор должен быть описан в Privacy/Cookie/analytics policy, минимизирован, защищён retention rules и consent/legal requirements там, где они применимы. Third-party/cross-site identifiers не являются автоматическим default только потому, что аналитика невидима в UI.
+
+## 14. Implemented managed-server workspace
+
+`/workspace/servers` provides the authenticated account's personal and
+organization-managed listings in bounded pages with RU/EN search, visibility,
+listing-status and ownership-verification filters. Organization owners and
+members with owner/admin roles or `manage_servers` see their organization
+servers. A creator named in `owner_id` on an organization server still needs
+that organization grant. Listing and editing use the existing ownership model;
+co-owner membership and ownership transfer described above remain future work.
+
+The overview shows four recently updated cards and an exact total. Its live
+metrics describe those displayed cards, while the complete list supports all
+pages. Private cards lead to authorized management. Listing maintenance and
+observed network availability are displayed separately; unavailable observations
+remain unknown. Page reads do not issue claims or modify ownership. Management
+routes recheck current access whenever an edit is requested.

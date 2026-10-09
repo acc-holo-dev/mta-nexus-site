@@ -21,6 +21,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { getManagedServerCopy } from "../lib/managed-server-view";
 
 export function Sidebar({
   locale,
@@ -33,6 +34,7 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const dictionary = getDictionary(locale);
+  const serverCopy = getManagedServerCopy(locale);
 
   const primaryNav = [
     { href: "/servers", label: dictionary.nav.liveServers, icon: Server },
@@ -46,6 +48,7 @@ export function Sidebar({
   const workspaceNav = [
     { href: "/workspace", label: dictionary.nav.overview, icon: LayoutDashboard },
     { href: "/workspace/resources/new", label: dictionary.nav.publishResource, icon: Plus },
+    { href: "/workspace/servers", label: serverCopy.title, icon: Server },
     { href: "/workspace/servers/new", label: dictionary.nav.registerServer, icon: Server },
     { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
     { href: "/notifications", label: dictionary.nav.notifications, icon: Bell },
@@ -59,7 +62,9 @@ export function Sidebar({
   const isActive = (href: string) =>
     href === "/workspace"
       ? pathname === "/workspace"
-      : pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+      : href === "/workspace/servers"
+        ? pathname === href || (pathname.startsWith(`${href}/`) && pathname !== `${href}/new`)
+        : pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 
   const renderItems = (
     items: Array<{
@@ -138,7 +143,10 @@ export function Sidebar({
         )}
       </div>
 
-      <nav className="flex-1 space-y-5 overflow-y-auto px-2 py-3" aria-label={dictionary.nav.ecosystem}>
+      <nav
+        className="flex-1 space-y-5 overflow-y-auto px-2 py-3"
+        aria-label={dictionary.nav.ecosystem}
+      >
         <div className="space-y-0.5">
           {!isCollapsed && (
             <div className="px-2.5 pb-1.5 font-label uppercase text-faint">

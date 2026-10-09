@@ -511,6 +511,56 @@ have NULL revision and fail closed; reject their pending verification requests
 before re-issuing fresh proof. Run migration 0034 and the PostgreSQL suite
 before deploying this change.
 
+### Bounded managed-server workspace
+
+`/workspace/servers` lists the authenticated account's personal servers and
+organization grants. The page offers name/IP search and independent listing
+status, visibility and ownership-verification filters. GET forms reset pagination
+when filters change; previous/next links preserve them. Search is capped at 120
+characters and LIKE wildcards are escaped. Repeated or malformed URL values use
+safe defaults. Twelve cards are displayed per page; stale page links clamp to
+the final available page. The repository caps internal page sizes at 50.
+
+The SQL scope includes personal `owner_id` only when `organization_id` is NULL,
+organization owners, and members with role owner/admin or an explicit
+`manage_servers` permission. An organization server's creator needs the existing
+organization management grant. Correlated EXISTS checks preserve one server row
+when both ownership and membership match. Administrators retain their existing
+maintenance access on individual management routes; this workspace index follows
+grants attached to their account. Editing still rechecks authorization through
+the existing management service. No grant or role is created by listing a server.
+
+Count and page use one read-only repeatable-read transaction, identical scope and
+filters, and stable `updated_at DESC, id DESC` ordering. Only ten card fields are
+selected, excluding editorial text/media and saved telemetry. An empty count
+skips the row query. This bounds transfer and rendered cards but adds a count
+and transaction compared with the previous unbounded owner read; query plans and
+production latency remain unmeasured. Existing owner and membership indexes are
+available; no schema migration or dependency is added. PostgreSQL documents
+[EXISTS](https://www.postgresql.org/docs/current/functions-subquery.html) and
+[JSONB containment](https://www.postgresql.org/docs/current/functions-json.html).
+
+The overview requests four managed-server cards plus the exact total, alongside
+the existing four-row resource-library preview. MTA directory loading begins
+as soon as the server page arrives, without waiting for the independent library
+read. Online/player metrics explicitly describe the displayed preview. A missing
+player count keeps the combined player total unknown. The directory is not
+contacted for an empty page. One endpoint lookup is reused for all selected
+cards; stale/failed/missing observations remain neutral and expose no stale
+player counts. Editorial maintenance/suspension remains separate from live
+availability. Private cards link to authorized management, while public and
+unlisted cards also offer their public detail view.
+
+RU/EN copy, the workspace/sidebar links, and management breadcrumbs expose the
+new list. Overview and server management pages are noindex. SQL-builder tests
+check scope, projections, limits and snapshot configuration; SSR tests cover
+anonymous access, private links, independent reads, filters, both locales and
+live fallback. The PostgreSQL fixture
+`tests/managed-servers-access.integration.test.ts` owns temporary tables and
+checks 135 accessible servers, excluded organization grants, stable pagination,
+literal search and revoked membership. It still needs a real database run.
+Server-rendered test output does not establish browser or production acceptance.
+
 ### Complete server history windows
 
 Server detail pages offer 24-hour, 7-day and 30-day history periods through

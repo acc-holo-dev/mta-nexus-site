@@ -1,6 +1,4 @@
 /** Bounded, public release-history query parameters and bilingual copy. */
-export { releaseHistoryPageBounds, RELEASE_HISTORY_PAGE_SIZE } from "@nexus/domain";
-
 export function parseReleaseHistoryPage(input: string | string[] | undefined): number {
   if (typeof input !== "string" || !/^[1-9][0-9]{0,4}$/u.test(input)) {
     return 1;

@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { renderToStaticMarkup } from "react-dom/server";
+import { ManagedServerCard } from "../apps/web/src/components/managed-server-card";
+import { getManagedServerCopy } from "../apps/web/src/lib/managed-server-view";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("localized legal and workspace shell", () => {
   it("serves legal pages from one RU/EN document system", () => {
@@ -42,18 +44,42 @@ describe("localized legal and workspace shell", () => {
   });
 
   it("keeps workspace live status authoritative and localized", () => {
-    const workspace = read("apps/web/src/app/workspace/page.tsx");
-
-    expect(workspace).toContain(
-      "mtaMasterDirectoryService.getDirectory().catch(() => null)",
-    );
-    expect(workspace).toContain("indexMtaObservations(directory?.servers ?? [])");
-    expect(workspace).toContain("observationFor(server)");
-    expect(workspace).toContain("dictionary.servers.online");
-    expect(workspace).toContain("dictionary.servers.offline");
-    expect(workspace).toContain("dictionary.servers.unknown");
-    expect(workspace).not.toContain("bg-blue-600");
-    expect(workspace).not.toContain("bg-emerald-600");
-    expect(workspace).not.toContain("text-neutral-");
+    const server = {
+      id: "server",
+      name: "Server",
+      slug: "server",
+      ipAddress: "203.0.113.7",
+      port: 22003,
+      organizationId: null,
+      visibility: "public",
+      status: "maintenance",
+      isVerified: true,
+      updatedAt: new Date("2026-10-09T12:00:00Z"),
+    };
+    const observation = {
+      address: server.ipAddress,
+      port: server.port,
+      responding: true,
+      players: 99,
+    };
+    for (const locale of ["en", "ru"] as const) {
+      const copy = getManagedServerCopy(locale);
+      for (const [observed, stale, status] of [
+        [observation, false, "online"],
+        [{ ...observation, responding: false, players: 0 }, false, "offline"],
+        [undefined, false, "unknown"],
+        [observation, true, "unknown"],
+      ] as const) {
+        const html = renderToStaticMarkup(
+          ManagedServerCard({ server, observation: observed, isStale: stale, locale }),
+        );
+        expect(html).toContain(copy[status]);
+        expect(html).toContain(copy.maintenance);
+        if (stale) expect(html).not.toContain("99");
+        expect(html).not.toContain("bg-blue-600");
+        expect(html).not.toContain("bg-emerald-600");
+        expect(html).not.toContain("text-neutral-");
+      }
+    }
   });
 });
