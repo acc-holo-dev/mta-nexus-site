@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 import { DOWNLOAD_IDLE_TIMEOUT_MS, fetchResourceDownload } from "../apps/web/src/lib/resource-download-client";
@@ -5,8 +6,14 @@ import { DOWNLOAD_IDLE_TIMEOUT_MS, fetchResourceDownload } from "../apps/web/src
 afterEach(() => vi.useRealTimers());
 
 const controller = () => new AbortController();
+const sha256 = (body: string | Uint8Array) =>
+  createHash("sha256").update(body).digest("hex");
 const response = (body = "archive", headers: Record<string, string> = {}) =>
-  new Response(body, { headers: { "Content-Length": String(body.length), ...headers } });
+  new Response(body, { headers: {
+    "Content-Length": String(new TextEncoder().encode(body).byteLength),
+    "X-Content-SHA256": sha256(body),
+    ...headers,
+  } });
 
 describe("browser resource download preparation", () => {
   it("fetches privately and returns complete bytes with the server filename", async () => {
@@ -70,7 +77,9 @@ describe("browser resource download preparation", () => {
   );
 
   it("supports a bounded response without a declared length", async () => {
-    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response("archive"));
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response("archive", {
+      headers: { "X-Content-SHA256": sha256("archive") },
+    }));
     const progress = vi.fn();
     const result = await fetchResourceDownload("id", controller().signal, progress, fetcher);
     expect(await result.blob.text()).toBe("archive");
@@ -242,7 +251,9 @@ it("allows a slow download to exceed the timeout while bytes keep arriving", asy
   let stream!: ReadableStreamDefaultController<Uint8Array>;
   const body = new ReadableStream<Uint8Array>({ start(value) { stream = value; } });
   const progress = vi.fn();
-  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body));
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, {
+    headers: { "X-Content-SHA256": sha256(new Uint8Array([0, 1, 2])) },
+  }));
   const download = fetchResourceDownload("id", controller().signal, progress, fetcher);
   for (let i = 0; i < 3; i++) {
     await vi.advanceTimersByTimeAsync(DOWNLOAD_IDLE_TIMEOUT_MS - 1);
@@ -298,7 +309,10 @@ it("snapshots reused stream buffers before subsequent reads mutate them", async 
       stream.enqueue(buffer);
     },
   }, { highWaterMark: 0 });
-  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body));
+  const expectedBytes = new Uint8Array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]);
+  const fetcher = vi.fn<typeof fetch>().mockResolvedValue(new Response(body, {
+    headers: { "X-Content-SHA256": sha256(expectedBytes) },
+  }));
   const result = await fetchResourceDownload("id", controller().signal, vi.fn(), fetcher);
   expect(new Uint8Array(await result.blob.arrayBuffer())).toEqual(
     new Uint8Array([1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3]),
@@ -346,5 +360,40 @@ describe("explicit version download URL", () => {
       "prd_resource", controller().signal, vi.fn(), fetcher, "../private-file",
     )).rejects.toThrow("Invalid resource build identifier");
     expect(fetcher).not.toHaveBeenCalled();
+  });
+});
+
+
+describe("SHA-256 verification before saving", () => {
+  it("refuses a successful response without a digest", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response("archive", { headers: { "Content-Length": "7" } }),
+    );
+    await expect(fetchResourceDownload("id", controller().signal, vi.fn(), fetcher))
+      .rejects.toMatchObject({ reason: "failed" });
+  });
+
+  it.each(["bad", "0".repeat(64)])("rejects invalid or mismatched digest %s", async digest => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      response("archive", { "X-Content-SHA256": digest }),
+    );
+    await expect(fetchResourceDownload("id", controller().signal, vi.fn(), fetcher))
+      .rejects.toMatchObject({ reason: "failed" });
+  });
+
+  it("refuses altered bytes that retain the expected Content-Length", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      response("corrupt", { "X-Content-SHA256": sha256("archive") }),
+    );
+    await expect(fetchResourceDownload("id", controller().signal, vi.fn(), fetcher))
+      .rejects.toMatchObject({ reason: "failed" });
+  });
+
+  it("accepts uppercase canonical SHA-256", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(
+      response("archive", { "X-Content-SHA256": sha256("archive").toUpperCase() }),
+    );
+    expect((await fetchResourceDownload("id", controller().signal, vi.fn(), fetcher)).blob.size)
+      .toBe(7);
   });
 });

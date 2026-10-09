@@ -1,5 +1,6 @@
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 import { resourceDownloadUrl } from "./build-download-selection";
+import { matchesDownloadedSha256 } from "./resource-download-sha256";
 
 export type DownloadFailure =
   | "signIn"
@@ -148,10 +149,17 @@ async function readResourceDownload(
   const name = response.headers.get("Content-Disposition")?.match(/filename="([^"]+)"/)?.[1];
   const fileName =
     name && /^[a-zA-Z0-9._-]{1,200}$/.test(name) && !name.startsWith(".") ? name : "resource.zip";
-  return {
-    blob: new Blob(chunks, {
-      type: response.headers.get("Content-Type") ?? "application/octet-stream",
-    }),
-    fileName,
-  };
+  const blob = new Blob(chunks, {
+    type: response.headers.get("Content-Type") ?? "application/octet-stream",
+  });
+  // The HTTP length protects against truncation, not same-length corruption.
+  // Do not hand an unverified artifact to the browser's save dialog.
+  const validHash = await matchesDownloadedSha256(
+    blob,
+    response.headers.get("X-Content-SHA256"),
+    signal,
+  );
+  signal.throwIfAborted();
+  if (!validHash) throw new ResourceDownloadError("failed");
+  return { blob, fileName };
 }
