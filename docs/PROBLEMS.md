@@ -810,3 +810,13 @@ from the actual archive descriptor, and `.` is explicitly an invalid key.
   filesystem the provider must fail closed, never silently fall back to path
   traversal or non-atomic overwrites.
 
+
+#### Cancellation at stream creation
+
+A pre-existing race allowed `AbortSignal` to fire inside the creation of a
+local file stream before its abort handler was registered. The provider could
+then return a live, readable stream for an already cancelled request. The local
+provider now registers the listener, rechecks `signal.aborted`, destroys the
+stream and rejects the operation. The regression test cancels synchronously
+inside `FileHandle.createReadStream`. Isolated Linux Node.js 22 tests passed;
+full Node.js 26 repository and CI acceptance remain pending.

@@ -176,6 +176,13 @@ export class LocalStorageProvider implements StorageProvider {
           const abort = () => stream.destroy();
           signal.addEventListener("abort", abort, { once: true });
           stream.once("close", () => signal.removeEventListener("abort", abort));
+          // An abort may have fired synchronously in createReadStream()
+          // before the listener existed. Subscribing and then checking
+          // closes that gap; never return a readable cancelled stream.
+          if (signal.aborted) {
+            abort();
+            signal.throwIfAborted();
+          }
         }
         return {
           stream,

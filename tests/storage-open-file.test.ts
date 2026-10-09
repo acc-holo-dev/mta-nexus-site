@@ -103,6 +103,32 @@ it("closes a prepared stream when its request is cancelled", async () => {
   expect((opened.stream as Readable).destroyed).toBe(true);
 });
 
+it("rejects and destroys a download cancelled inside createReadStream", async () => {
+  await storage.put("build.zip", Buffer.from("cancelled bytes"), "application/zip");
+  const controller = new AbortController();
+  const open = fs.open.bind(fs);
+  let openedStream: Readable | undefined;
+  vi.spyOn(fs, "open").mockImplementation(async (...args) => {
+    const handle = await open(...args);
+    if (!String(args[0]).endsWith("/build.zip")) return handle;
+    const createStream = handle.createReadStream.bind(handle);
+    vi.spyOn(handle, "createReadStream").mockImplementation((options) => {
+      const stream = createStream(options);
+      openedStream = stream;
+      // Exercise the exact gap between stream creation and registering
+      // the provider's AbortSignal handler.
+      controller.abort();
+      return stream;
+    });
+    return handle;
+  });
+
+  await expect(storage.get("build.zip", controller.signal))
+    .rejects.toMatchObject({ name: "AbortError" });
+  expect(openedStream).toBeDefined();
+  expect(openedStream?.destroyed).toBe(true);
+});
+
 it("removes the request abort listener after a completed download", async () => {
   await storage.put("build.zip", Buffer.from("original"), "application/zip");
   const controller = new AbortController();
