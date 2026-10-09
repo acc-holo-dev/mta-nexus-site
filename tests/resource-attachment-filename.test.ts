@@ -8,6 +8,11 @@ describe("safe download response filenames", () => {
   it("keeps ordinary release filenames and allowlisted extensions", () => {
     expect(resourceAttachmentFileName("script", "1.2.3", "asset.zip")).toBe("script-1.2.3.zip");
     expect(resourceAttachmentFileName("script", "1.2.3", "asset.lua")).toBe("script-1.2.3.lua");
+    for (const ext of [".luac", ".dff", ".txd", ".col", ".png", ".jpg", ".jpeg", ".webp", ".json", ".map"]) {
+      expect(resourceAttachmentFileName("script", "1.2.3", "asset" + ext))
+        .toBe("script-1.2.3" + ext);
+    }
+    expect(resourceAttachmentFileName("script", "1.2.3", "IMAGE.PNG")).toBe("script-1.2.3.png");
   });
   it("does not allow header delimiters, Unicode, quotes, or traversal text", () => {
     for (const value of ['unsafe"\r\nX-Injected: yes', "../escape", "привет", "a\\b"]) {

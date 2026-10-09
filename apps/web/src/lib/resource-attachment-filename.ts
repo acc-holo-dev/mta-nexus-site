@@ -1,8 +1,8 @@
 import path from "node:path";
+import { isAllowedResourceUploadExtension } from "@nexus/domain";
 
 /** Keep download header values ASCII and inert even for legacy database rows. */
 const SAFE_PART = /^[a-zA-Z0-9][a-zA-Z0-9._-]*$/u;
-const SAFE_EXTENSIONS = new Set([".zip", ".rar", ".7z", ".lua"]);
 
 function safePart(value: string, fallback: string, maximum: number): string {
   if (value.length <= maximum && SAFE_PART.test(value) && !value.includes("..")) return value;
@@ -20,7 +20,7 @@ export function resourceAttachmentFileName(
   originalFileName: string,
 ): string {
   const extension = path.extname(originalFileName).toLowerCase();
-  const ext = SAFE_EXTENSIONS.has(extension) ? extension : ".zip";
+  const ext = isAllowedResourceUploadExtension(extension) ? extension : ".zip";
   // Leave sufficient room for separators and the extension under 200 chars.
   const safeSlug = safePart(slug, "resource", 95);
   const safeVersion = safePart(version, "release", 90);

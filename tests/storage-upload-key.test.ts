@@ -111,3 +111,21 @@ it("maps missing bytes directly from open to a missing asset error", async () =>
   await expect(service.getDownloadStream("assets/usr_owner/missing.zip"))
     .rejects.toMatchObject({ code: "VALIDATION_FAILED" });
 });
+
+it.each([".luac", ".dff", ".txd", ".col", ".png", ".jpg", ".jpeg", ".webp", ".json", ".map"])(
+  "uploads supported %s artifacts with their original extension",
+  async (ext) => {
+    const bytes = Buffer.from("asset bytes");
+    const asset = await service.uploadAsset({
+      data: bytes,
+      fileName: "payload" + ext,
+      mimeType: "application/octet-stream",
+      userId: "usr_owner",
+    });
+    expect(asset.key.endsWith(ext)).toBe(true);
+    const download = await service.getDownloadStream(asset.key);
+    const received: Buffer[] = [];
+    for await (const chunk of download.stream as Readable) received.push(Buffer.from(chunk));
+    expect(Buffer.concat(received)).toEqual(bytes);
+  },
+);

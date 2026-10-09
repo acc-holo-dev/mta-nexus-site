@@ -48,7 +48,13 @@ export async function fetchResourceDownload(
     return await readResourceDownload(productId, active.signal, (received, total) => {
       resetTimeout();
       onProgress(received, total);
-    }, request, buildId);
+    }, request, () => {
+      // Idle means *network* inactivity. The full Blob is already received;
+      // large SHA-256 calculations on slower devices must not trigger a
+      // spurious transfer timeout. Manual AbortSignal cancellation still works.
+      clearTimeout(timer);
+      timer = undefined;
+    }, buildId);
   } catch (error) {
     // Explicit cancellation takes precedence over a concurrent idle timeout.
     signal.throwIfAborted();
@@ -65,6 +71,7 @@ async function readResourceDownload(
   signal: AbortSignal,
   onProgress: (received: number, total: number | null) => void,
   request: typeof fetch,
+  onTransferComplete: () => void,
   buildId?: string,
 ): Promise<{ blob: Blob; fileName: string }> {
   signal.throwIfAborted();
@@ -156,6 +163,7 @@ async function readResourceDownload(
     signal.removeEventListener("abort", cancel);
     reader.releaseLock();
   }
+  onTransferComplete();
   const name = response.headers.get("Content-Disposition")?.match(/filename="([^"]+)"/)?.[1];
   const fileName =
     name && /^[a-zA-Z0-9._-]{1,200}$/.test(name) && !name.startsWith(".") ? name : "resource.zip";

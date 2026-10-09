@@ -2,27 +2,14 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { getStorageProvider } from "./provider-factory";
 import { generateId } from "@nexus/security";
-import { MAX_UPLOAD_FILE_SIZE_BYTES, ValidationError } from "@nexus/domain";
+import {
+  MAX_UPLOAD_FILE_SIZE_BYTES,
+  ValidationError,
+  isAllowedResourceUploadExtension,
+} from "@nexus/domain";
 import type { StorageObjectMeta } from "./types";
 
 export const MAX_FILE_SIZE_BYTES = MAX_UPLOAD_FILE_SIZE_BYTES;
-
-const ALLOWED_EXTENSIONS = new Set([
-  ".zip",
-  ".rar",
-  ".7z",
-  ".lua",
-  ".luac",
-  ".dff",
-  ".txd",
-  ".col",
-  ".png",
-  ".jpg",
-  ".jpeg",
-  ".webp",
-  ".json",
-  ".map",
-]);
 
 export class StorageService {
   async uploadAsset(input: {
@@ -42,7 +29,7 @@ export class StorageService {
     }
 
     const ext = path.extname(input.fileName).toLowerCase();
-    if (!ext || !ALLOWED_EXTENSIONS.has(ext)) {
+    if (!ext || !isAllowedResourceUploadExtension(ext)) {
       throw new ValidationError(
         ext
           ? `File type '${ext}' is not permitted in MTA Nexus storage`
