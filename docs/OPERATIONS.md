@@ -230,6 +230,35 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 ### Code analysis
 
+#### Read-only GitHub CI diagnostics
+
+When a workflow fails before its first step and has no job logs, inspect the
+Check Run's system annotations instead of inferring a billing or runner cause
+from `steps: []`. Run diagnostics on one explicit workflow run:
+
+```bash
+pnpm ci:diagnose --run-id 37910773256
+```
+
+For a private repository, provide `GH_TOKEN` or `GITHUB_TOKEN` in the process
+environment with repository **Actions: read** and **Checks: read** permissions;
+the linked ChatGPT connector's credentials are not reused by this local command.
+The command performs GET requests only and never reruns a workflow or changes
+settings. It prints JSON with the SHA, attempt, job/runner state, failed steps
+and annotations. It pins the run attempt, reads collections in pages of 100
+up to 20 pages, refuses incomplete job collections, times out individual reads
+after ten seconds and rejects redirects. Annotations that cannot be read are
+explicitly marked unavailable. Configured tokens are redacted from reported
+text, and raw HTTP error bodies are not printed. It does not read billing data.
+
+Exit codes: `0` for a successful completed run, `1` for an unsuccessful completed
+run, and `2` for pending runs or collection errors. These codes describe the
+selected workflow, not full release acceptance. See the official
+[workflow jobs API](https://docs.github.com/en/rest/actions/workflow-jobs)
+and [Check Run annotations API](https://docs.github.com/en/rest/checks/runs).
+
+#### Application query optimizations
+
 The saved page starts MTA directory loading as soon as its public-server query
 finishes, independently of the saved-resource query. It still waits for server
 filtering before deciding whether telemetry is needed: anonymous users, empty

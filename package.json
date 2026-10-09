@@ -29,6 +29,7 @@
     "format:check": "biome format .",
     "nexus:doctor": "node scripts/nexus-doctor.mjs",
     "nexus:doctor:test": "node --test scripts/tests/nexus-doctor.node-test.mjs",
+    "ci:diagnose": "node scripts/ci-diagnose.mjs",
     "scenario:list": "pnpm --filter @nexus/db scenario:list",
     "scenario:create": "pnpm --filter @nexus/db scenario:create",
     "scenario:cleanup": "pnpm --filter @nexus/db scenario:cleanup",

@@ -319,9 +319,19 @@ repository policy или runner-side allocation failure) **не подтверж
 Публичный GitHub Status на момент диагностики показывал Actions operational,
 так что глобальный outage также не подтверждён.
 
+На `93604f1` run `37910773256` и plan job `113755107097` повторили failure
+с пустыми steps. Check Run зарегистрировал две annotations, но текущий
+connector отклоняет endpoint их чтения; job logs вернули BlobNotFound.
+Точное системное сообщение поэтому ещё не прочитано. Добавлена read-only
+команда `pnpm ci:diagnose --run-id 37910773256`: при локальном токене с
+Actions/Checks read она собирает attempt-specific jobs и системные annotations,
+не меняя settings и не перезапуская CI. Команда покрыта synthetic API tests;
+live authenticated REST-запуск в этой среде не выполнен.
+
 - **Влияние:** commits после `7567191` пока не получили executable exact-SHA
   CI, даже когда их ошибки проверены статически/математически.
-- **Следующий шаг:** проверить GitHub Settings → Actions и Billing/usage для
+- **Следующий шаг:** прочитать системные annotations через `pnpm ci:diagnose`,
+  затем проверить GitHub Settings → Actions и Billing/usage для
   private repo/account; после восстановления hosted runner запустить полный CI
   на актуальном HEAD и закрыть этот пункт только после реального выполнения
   `plan`, unit/typecheck, migrations, Docker и browser acceptance.
