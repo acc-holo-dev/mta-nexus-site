@@ -230,6 +230,29 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 ### Code analysis
 
+Resource detail loading starts locale and session resolution together. Public
+metadata likewise starts its public product read alongside locale resolution;
+it still uses the public reader separately from the authenticated preview path.
+After a successful preview, management, entitlement, comments and dependency
+reads start together. The build-history read remains chained to the current
+management decision and selects full history only for management/admin access.
+It can start while entitlement is still pending. A missing/denied preview starts
+none of these detail reads, and a failed management read cannot start history.
+
+The existing acquisition behavior suite now has 11 tests. Deferred promises
+verify metadata/session overlap with locale resolution, independent detail reads,
+both management decisions, and build gating while entitlement is pending. Failure
+coverage checks a management rejection followed by a late entitlement rejection.
+The first metadata/detail scheduling checks failed against the previous source.
+These are actual page calls and SSR output with synthetic service adapters;
+they verify dependency ordering and output, not production SQL/browser timings.
+The query count, authorization rules and download route checks are unchanged;
+the improvement removes unnecessary sequential waits without new dependencies
+or a private-data cache. Run `pnpm test:resource-integrity` for the page/acquisition
+checks alongside the existing download and resource integrity suites.
+See [Next parallel data fetching](https://nextjs.org/docs/app/getting-started/fetching-data#parallel-data-fetching)
+and [server-side data access authorization](https://nextjs.org/docs/app/guides/data-security#data-access-layer).
+
 Global discovery search reuses `indexMtaObservations` when more than one server
 result is displayed. It builds one temporary endpoint index for the current
 fresh directory instead of scanning the entire snapshot for every server.

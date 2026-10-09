@@ -77,9 +77,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const locale = await getRequestLocale();
+  const [locale, product] = await Promise.all([
+    getRequestLocale(),
+    productService.getProductBySlug(slug),
+  ]);
   const dictionary = getDictionary(locale);
-  const product = await productService.getProductBySlug(slug);
 
   if (!product) {
     return { title: dictionary.product.notFound, robots: { index: false, follow: false } };
@@ -110,46 +112,52 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const locale = await getRequestLocale();
+  const [locale, user] = await Promise.all([
+    getRequestLocale(),
+    cookies().then(cookieStore => authService.getSession(cookieStore.get("nexus_session")?.value)),
+  ]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.product;
-  const token = (await cookies()).get("nexus_session")?.value;
-  const user = await authService.getSession(token);
   const product = await productService.getProductPreviewBySlug(slug, user);
 
   if (!product) {
     notFound();
   }
 
-  const canManageProduct = user
-    ? await productService.canManageProduct(product, user)
-    : false;
+  const managementAccess = user
+    ? productService.canManageProduct(product, user)
+    : Promise.resolve(false);
   const isPublished = product.status === "published";
-  const isLicensed = user
-    ? await commerceService.checkEntitlement(
-        { type: "user", id: user.id },
-        product.id,
-        "product.download",
-      )
-    : false;
   const isAdmin = user?.role === "admin";
-  const hasAccess =
-    isPublished && (canManageProduct || isLicensed || isAdmin);
-  const canInspectBuilds = canManageProduct || isAdmin;
 
   const [
+    canManageProduct,
+    isLicensed,
     builds,
     reviews,
     dependencyResolution,
     reverseDependencySummary,
   ] = await Promise.all([
-    productService.getProductBuilds(product.id, canInspectBuilds),
+    managementAccess,
+    user
+      ? commerceService.checkEntitlement(
+          { type: "user", id: user.id },
+          product.id,
+          "product.download",
+        )
+      : false,
+    managementAccess.then(canManageProduct => {
+      const canInspectBuilds = canManageProduct || isAdmin;
+      return productService.getProductBuilds(product.id, canInspectBuilds);
+    }),
     contentService.getComments({ productId: product.id }),
     productService.getDependencyResolution(product).catch(() => null),
     productService
       .getReverseDependencySummary(product.slug)
       .catch(() => null),
   ]);
+  const hasAccess =
+    isPublished && (canManageProduct || isLicensed || isAdmin);
 
   const formattedPrice =
     product.price === 0
