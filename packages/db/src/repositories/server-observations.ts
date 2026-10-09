@@ -9,6 +9,12 @@ export type RecordServerObservationInput = Omit<
   "id" | "createdAt"
 >;
 
+function boundedObservationInt(value: number, fallback: number, max: number): number {
+  return Number.isFinite(value)
+    ? Math.min(Math.max(Math.floor(value), 1), max)
+    : fallback;
+}
+
 export class ServerObservationRepository {
   async record(input: RecordServerObservationInput): Promise<ServerObservation> {
     const values = { id: generateId("obs"), ...input, createdAt: new Date() };
@@ -49,7 +55,7 @@ export class ServerObservationRepository {
   }
 
   async listRecent(serverId: string, limit = 96): Promise<ServerObservation[]> {
-    const boundedLimit = Math.min(Math.max(Math.floor(limit), 1), 500);
+    const boundedLimit = boundedObservationInt(limit, 96, 500);
     const rows = await db
       .select()
       .from(serverObservations)
@@ -64,8 +70,8 @@ export class ServerObservationRepository {
     hours = 24,
     limit = 500,
   ): Promise<ServerObservation[]> {
-    const boundedHours = Math.min(Math.max(Math.floor(hours), 1), 24 * 31);
-    const boundedLimit = Math.min(Math.max(Math.floor(limit), 1), 500);
+    const boundedHours = boundedObservationInt(hours, 24, 24 * 31);
+    const boundedLimit = boundedObservationInt(limit, 500, 500);
     const since = new Date(Date.now() - boundedHours * 3_600_000);
     const rows = await db
       .select()
@@ -83,7 +89,7 @@ export class ServerObservationRepository {
   }
 
   async getPeakPlayers(serverId: string, hours = 24): Promise<number | null> {
-    const boundedHours = Math.min(Math.max(Math.floor(hours), 1), 24 * 31);
+    const boundedHours = boundedObservationInt(hours, 24, 24 * 31);
     const since = new Date(Date.now() - boundedHours * 3_600_000);
     const rows = await db
       .select({ peak: sql<number | null>`max(${serverObservations.currentPlayers})` })

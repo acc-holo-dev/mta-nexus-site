@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
   order: [] as SQL[],
+  where: null as SQL | null,
   limit: 0,
   rows: [] as { id: string; observedAt: Date }[],
 }));
@@ -13,7 +14,7 @@ vi.mock("../packages/db/src/client", () => ({
     select: () => {
       const query = {
         from: () => query,
-        where: () => query,
+        where(condition: SQL) { state.where = condition; return query; },
         orderBy(...fields: SQL[]) { state.order = fields; return query; },
         limit(value: number) {
           state.limit = value;
@@ -36,6 +37,7 @@ const ORDER = [
 
 beforeEach(() => {
   state.order = [];
+  state.where = null;
   state.limit = 0;
   state.rows = [];
 });
@@ -60,4 +62,51 @@ describe("bounded deterministic observation history queries", () => {
     await repository.listWindow("srv_test", 24 * 30, 50_000);
     expect(state.limit).toBe(500);
   });
+
+  it.each([
+    [Number.NaN, 96],
+    [Number.POSITIVE_INFINITY, 96],
+    [-9, 1],
+    [1.9, 1],
+    [5_000, 500],
+  ])("bounds recent history limit %s", async (input, expected) => {
+    await repository.listRecent("srv_test", input);
+    expect(state.limit).toBe(expected);
+  });
+
+  it.each([
+    [Number.NaN, 500],
+    [Number.NEGATIVE_INFINITY, 500],
+    [-9, 1],
+    [1.9, 1],
+    [9_999, 500],
+  ])("bounds history window limit %s", async (input, expected) => {
+    await repository.listWindow("srv_test", 24, input);
+    expect(state.limit).toBe(expected);
+  });
+
+  it.each([
+    Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY,
+  ])("uses a valid 24h history window for invalid hours %s", async (hours) => {
+    await repository.listWindow("srv_test", hours, 20);
+    if (!state.where) throw new Error("Missing SQL predicate");
+    const params = dialect.sqlToQuery(state.where).params;
+    const since = params.find(value => value instanceof Date);
+    expect(since).toBeInstanceOf(Date);
+    const elapsed = Date.now() - (since as Date).getTime();
+    expect(elapsed).toBeGreaterThanOrEqual(24 * 3_600_000 - 1_000);
+    expect(elapsed).toBeLessThanOrEqual(24 * 3_600_000 + 1_000);
+  });
+
+  it.each([Number.NaN, Number.POSITIVE_INFINITY])(
+    "uses valid peak-player window hours for %s",
+    async (hours) => {
+      // Verify the constructed SQL without a live PostgreSQL dependency.
+      await repository.getPeakPlayers("srv_test", hours);
+      if (!state.where) throw new Error("Missing SQL predicate");
+      const since = dialect.sqlToQuery(state.where).params.find(value => value instanceof Date);
+      expect(since).toBeInstanceOf(Date);
+      expect(Number.isFinite((since as Date).getTime())).toBe(true);
+    },
+  );
 });

@@ -64,6 +64,12 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 
 ### P1-2. GitHub-hosted runner не начинает `plan` job
 
+Доступные методы истории наблюдений `listRecent`, `listWindow` и
+`getPeakPlayers` теперь устойчивы к NaN/Infinity: лимиты и интервалы
+получают безопасные значения по умолчанию до построения SQL. Прежние
+числовые ограничения сохраняются; добавлены контрактные проверки граничных
+значений и дат. Их выполнение в текущем CI ещё не подтверждено.
+
 MTA master-list fetch отказывается от редиректов (`redirect: "error"`) и
 отсекает `response.redirected` даже при injected HTTP adapter. Так mirror
 не может перенаправить доверенный HTTPS endpoint на иной адрес или протокол
