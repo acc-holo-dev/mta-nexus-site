@@ -1,7 +1,10 @@
 import { assertServerObservationCaptureEnvironment } from "../../../scripts/server-observation-capture-contract.mjs";
+import { readServerObservationCaptureOptions } from "../../../scripts/server-observation-capture-options.mjs";
 
 async function main() {
   assertServerObservationCaptureEnvironment(process.env);
+
+  const options = readServerObservationCaptureOptions(process.env);
 
   // Import application/database code only after the explicit mutation guard.
   const [{ captureKnownServerObservations }, { closeDatabaseConnection }] =
@@ -11,7 +14,7 @@ async function main() {
     ]);
 
   try {
-    const result = await captureKnownServerObservations();
+    const result = await captureKnownServerObservations(options);
     process.stdout.write(`${JSON.stringify(result)}\n`);
   } finally {
     await closeDatabaseConnection();

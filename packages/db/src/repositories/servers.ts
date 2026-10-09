@@ -1,4 +1,4 @@
-import { and, count, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, servers } from "../schema";
@@ -125,6 +125,30 @@ export class ServerRepository {
       // sentinel when many listings share the same updated timestamp.
       .orderBy(desc(servers.updatedAt), desc(servers.id))
       .limit(boundedLimit);
+    return rows;
+  }
+
+  /**
+   * Keyset pagination for large observation captures. Unlike a permanent
+   * "newest 500" cap, a cursor can cover every eligible server in bounded
+   * pages. The id ordering is stable when profile timestamps change.
+   */
+  async listObservableAfter(
+    limit = 501,
+    afterId?: string,
+  ): Promise<Pick<Server, "id" | "ipAddress" | "port">[]> {
+    const boundedLimit = Number.isFinite(limit)
+      ? Math.min(Math.max(Math.floor(limit), 1), 501)
+      : 501;
+    const rows = await db.select({
+      id: servers.id,
+      ipAddress: servers.ipAddress,
+      port: servers.port,
+    }).from(servers).where(and(
+      eq(servers.status, "active"),
+      ne(servers.visibility, "private"),
+      afterId ? gt(servers.id, afterId) : undefined,
+    )).orderBy(asc(servers.id)).limit(boundedLimit);
     return rows;
   }
 

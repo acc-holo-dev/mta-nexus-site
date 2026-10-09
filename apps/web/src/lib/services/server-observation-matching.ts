@@ -8,8 +8,8 @@ import type { RecordServerObservationInput } from "@nexus/db";
 export function buildMasterObservationCandidates(
   knownServers: readonly Pick<Server, "id" | "ipAddress" | "port">[],
   directory: MtaMasterDirectory,
+  observationFor = indexMtaObservations(directory.servers),
 ): RecordServerObservationInput[] {
-  const observationFor = indexMtaObservations(directory.servers);
 
   const observedAt = new Date(directory.fetchedAt);
   if (!Number.isFinite(observedAt.getTime())) {

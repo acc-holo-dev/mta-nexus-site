@@ -2,62 +2,115 @@ import {
   serverObservationRepository,
   serverRepository,
 } from "@nexus/db";
-import { mtaMasterDirectoryService } from "./mta-master-directory-service";
+import {
+  indexMtaObservations,
+  mtaMasterDirectoryService,
+} from "./mta-master-directory-service";
 import { buildMasterObservationCandidates } from "./server-observation-matching";
 
 const RECORD_CONCURRENCY = 5;
+const MAX_PAGES = 20;
 
 export async function captureKnownServerObservations(options?: {
   limit?: number;
+  maxPages?: number;
+  afterId?: string;
 }) {
   const requestedLimit = options?.limit ?? 500;
   const limit = Number.isFinite(requestedLimit)
     ? Math.min(Math.max(Math.floor(requestedLimit), 1), 500)
     : 500;
-  // The CLI closes its database connection after this function settles.
-  const [directoryRead, serverRead] = await Promise.allSettled([
+  const requestedPages = options?.maxPages ?? 1;
+  const maxPages = Number.isFinite(requestedPages)
+    ? Math.min(Math.max(Math.floor(requestedPages), 1), MAX_PAGES)
+    : 1;
+  const firstCursor = options?.afterId;
+  if (
+    firstCursor !== undefined &&
+    (typeof firstCursor !== "string" || !firstCursor || firstCursor.length > 128)
+  ) {
+    throw new RangeError("Invalid observation capture cursor");
+  }
+
+  // Start the master read and first DB page concurrently. The CLI closes its
+  // DB connection after the entire bounded capture settles.
+  const [directoryRead, initialPageRead] = await Promise.allSettled([
     mtaMasterDirectoryService.getDirectory(),
-    serverRepository.listObservable(limit + 1),
+    serverRepository.listObservableAfter(limit + 1, firstCursor),
   ]);
   if (directoryRead.status === "rejected") throw directoryRead.reason;
-  if (serverRead.status === "rejected") throw serverRead.reason;
-  const directory = directoryRead.value;
-  const fetchedServers = serverRead.value;
-  const knownServerLimitReached = fetchedServers.length > limit;
-  const knownServers = fetchedServers.slice(0, limit);
-  const candidates = buildMasterObservationCandidates(
-    knownServers,
-    directory,
-  );
-  // Stale fallback is the same captured master snapshot being replayed
-  // during an outage. Preserve matching diagnostics, but avoid unnecessary
-  // conflict transactions (and never treat replay as a new observation).
-  const recordable = directory.isStale ? [] : candidates;
-  const endpointById = new Map(knownServers.map(server => [server.id, server] as const));
+  if (initialPageRead.status === "rejected") throw initialPageRead.reason;
 
-  for (let offset = 0; offset < recordable.length; offset += RECORD_CONCURRENCY) {
-    const results = await Promise.allSettled(
-      recordable.slice(offset, offset + RECORD_CONCURRENCY)
-        .map(async candidate => serverObservationRepository.record(
-          candidate,
-          endpointById.get(candidate.serverId),
-        )),
+  const directory = directoryRead.value;
+  // Construct once, not once per PostgreSQL page.
+  const observationFor = indexMtaObservations(directory.servers);
+  let pageRows = initialPageRead.value;
+  let cursor = firstCursor;
+  let nextCursor: string | null = null;
+  let pagesProcessed = 0;
+  let knownServersCount = 0;
+  let matchedServers = 0;
+  let recordAttempts = 0;
+
+  for (let page = 0; page < maxPages; page++) {
+    const knownServers = pageRows.slice(0, limit);
+    if (knownServers.length === 0) {
+      nextCursor = null;
+      break;
+    }
+    // A broken adapter must not return duplicate/reversed pages; this also
+    // prevents an infinite loop if a cursor is ever used by a worker.
+    for (const [index, server] of knownServers.entries()) {
+      const previous = index === 0 ? cursor : knownServers[index - 1]?.id;
+      if (previous && server.id <= previous) {
+        throw new Error("Observation page is not strictly ordered by server ID");
+      }
+    }
+
+    const candidates = buildMasterObservationCandidates(
+      knownServers,
+      directory,
+      observationFor,
     );
-    // Drain the batch before failing; later batches must not start on error.
-    const failure = results.find(result => result.status === "rejected");
-    if (failure) throw failure.reason;
+    const recordable = directory.isStale ? [] : candidates;
+    const endpointById = new Map(
+      knownServers.map(server => [server.id, server] as const),
+    );
+    for (let offset = 0; offset < recordable.length; offset += RECORD_CONCURRENCY) {
+      const results = await Promise.allSettled(
+        recordable.slice(offset, offset + RECORD_CONCURRENCY)
+          .map(async candidate => serverObservationRepository.record(
+            candidate,
+            endpointById.get(candidate.serverId),
+          )),
+      );
+      // Drain the batch before failing; never begin later pages on failure.
+      const failure = results.find(result => result.status === "rejected");
+      if (failure) throw failure.reason;
+    }
+
+    pagesProcessed++;
+    knownServersCount += knownServers.length;
+    matchedServers += candidates.length;
+    recordAttempts += recordable.length;
+    cursor = knownServers[knownServers.length - 1]!.id;
+    nextCursor = pageRows.length > limit ? cursor : null;
+    if (!nextCursor || page + 1 >= maxPages) break;
+    pageRows = await serverRepository.listObservableAfter(limit + 1, nextCursor);
   }
 
   return Object.freeze({
     source: "mta_master" as const,
     sourceFetchedAt: directory.fetchedAt,
     sourceWasStale: directory.isStale,
-    knownServers: knownServers.length,
+    knownServers: knownServersCount,
     knownServerLimit: limit,
-    knownServerLimitReached,
-    matchedServers: candidates.length,
-    notListedServers: knownServers.length - candidates.length,
+    knownServerLimitReached: nextCursor !== null,
+    matchedServers,
+    notListedServers: knownServersCount - matchedServers,
     absenceMeansOffline: false as const,
-    recordAttempts: recordable.length,
+    recordAttempts,
+    pagesProcessed,
+    nextCursor,
   });
 }

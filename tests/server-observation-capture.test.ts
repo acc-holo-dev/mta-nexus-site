@@ -3,7 +3,7 @@ import type { RecordServerObservationInput } from "@nexus/db";
 
 const sources = vi.hoisted(() => ({ directory: vi.fn(), known: vi.fn(), record: vi.fn() }));
 vi.mock("@nexus/db", () => ({
-  serverRepository: { listObservable: sources.known },
+  serverRepository: { listObservableAfter: sources.known },
   serverObservationRepository: { record: sources.record },
 }));
 vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async importOriginal => ({
@@ -20,7 +20,7 @@ function deferred<T>() {
 }
 function fixture(count: number) {
   const known = Array.from({ length: count }, (_, index) => ({
-    id: `srv_${index}`, ipAddress: `server-${index}.test`, port: 22003,
+    id: `srv_${String(index).padStart(5, "0")}`, ipAddress: `server-${index}.test`, port: 22003,
   }));
   const directory = {
     fetchedAt: "2026-10-09T00:00:00.000Z", isStale: false,
@@ -47,7 +47,7 @@ describe("bounded observation capture", () => {
     const capture = captureKnownServerObservations();
     try {
       expect(sources.directory).toHaveBeenCalledOnce();
-      expect(sources.known).toHaveBeenCalledExactlyOnceWith(501);
+      expect(sources.known).toHaveBeenCalledExactlyOnceWith(501, undefined);
       expect(sources.record).not.toHaveBeenCalled();
       directory.resolve(data.directory);
       await Promise.resolve();
@@ -168,8 +168,81 @@ describe("bounded observation capture", () => {
   it.each([[NaN, 500], [Infinity, 500], [-3, 1], [1.8, 1], [1000, 500]])("bounds requested limit %s to %s", async (limit, expected) => {
     fixture(501);
     const result = await captureKnownServerObservations({ limit });
-    expect(sources.known).toHaveBeenCalledWith(expected + 1);
+    expect(sources.known).toHaveBeenCalledWith(expected + 1, undefined);
     expect(result).toMatchObject({ knownServers: expected, knownServerLimit: expected, knownServerLimitReached: true, recordAttempts: expected });
     expect(sources.record).toHaveBeenCalledTimes(expected);
+  });
+  it("covers a large listing in bounded ID-keyset pages with one master snapshot", async () => {
+    const { known } = fixture(23);
+    sources.known.mockImplementation(async (limit: number, afterId?: string) => {
+      return known.filter(server => !afterId || server.id > afterId).slice(0, limit);
+    });
+    const result = await captureKnownServerObservations({ limit: 10, maxPages: 3 });
+    expect(result).toMatchObject({
+      pagesProcessed: 3,
+      knownServers: 23,
+      knownServerLimit: 10,
+      knownServerLimitReached: false,
+      nextCursor: null,
+      matchedServers: 23,
+      recordAttempts: 23,
+    });
+    expect(sources.directory).toHaveBeenCalledTimes(1);
+    expect(sources.known.mock.calls).toEqual([
+      [11, undefined], [11, "srv_00009"], [11, "srv_00019"],
+    ]);
+    expect(new Set(sources.record.mock.calls.map(([input]) => input.serverId)).size).toBe(23);
+  });
+
+  it("exposes a resumable cursor when bounded after one page", async () => {
+    const { known } = fixture(23);
+    sources.known.mockImplementation(async (limit: number, afterId?: string) =>
+      known.filter(server => !afterId || server.id > afterId).slice(0, limit),
+    );
+    const first = await captureKnownServerObservations({ limit: 10 });
+    expect(first).toMatchObject({
+      pagesProcessed: 1, knownServers: 10,
+      knownServerLimitReached: true, nextCursor: "srv_00009",
+    });
+    sources.record.mockClear();
+    const second = await captureKnownServerObservations({
+      limit: 10, maxPages: 2, afterId: first.nextCursor ?? undefined,
+    });
+    expect(second).toMatchObject({
+      pagesProcessed: 2, knownServers: 13,
+      knownServerLimitReached: false, nextCursor: null,
+    });
+    expect([...new Set(sources.record.mock.calls.map(([input]) => input.serverId))])
+      .not.toContain("srv_00000");
+  });
+
+  it("stops safely if the repository returns a repeated or unordered page", async () => {
+    const { known } = fixture(15);
+    sources.known.mockResolvedValueOnce(known.slice(0, 11))
+      .mockResolvedValueOnce(known.slice(0, 11));
+    await expect(captureKnownServerObservations({
+      limit: 10, maxPages: 2,
+    })).rejects.toThrow("Observation page is not strictly ordered");
+    expect(sources.known).toHaveBeenCalledTimes(2);
+    expect(sources.record).toHaveBeenCalledTimes(10);
+  });
+
+  it("limits pages to 20 and fails before reads on invalid cursors", async () => {
+    const { known } = fixture(4);
+    sources.known.mockImplementation(async (limit: number, afterId?: string) =>
+      known.filter(server => !afterId || server.id > afterId).slice(0, limit),
+    );
+    const capture = await captureKnownServerObservations({ limit: 2, maxPages: Infinity });
+    expect(capture.pagesProcessed).toBe(1);
+    expect(capture.nextCursor).toBe("srv_00001");
+    for (const invalid of ["", "x".repeat(129)]) {
+      sources.directory.mockClear();
+      sources.known.mockClear();
+      await expect(captureKnownServerObservations({
+        afterId: invalid,
+      })).rejects.toThrow("Invalid observation capture cursor");
+      expect(sources.directory).not.toHaveBeenCalled();
+      expect(sources.known).not.toHaveBeenCalled();
+    }
   });
 });

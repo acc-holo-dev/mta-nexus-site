@@ -306,10 +306,34 @@ have NULL revision and fail closed; reject their pending verification requests
 before re-issuing fresh proof. Run migration 0034 and the PostgreSQL suite
 before deploying this change.
 
-The opt-in MTA observation collector starts the directory and known-server reads
-together, then records matches in batches of at most five concurrent writes per
-capture. The known-server limit remains 500, with one extra row detecting a
-truncated selection. Each write still uses the existing repository transaction
+The development-only MTA observation collector now supports bounded
+ID-keyset pagination. Each SQL page projects only id/ipAddress/port,
+ordered by id ASC; one extra row detects the presence of the next page.
+A capture reuses one MTA Master snapshot and endpoint index across all pages,
+so 500 is a **per-page** limit rather than a permanent "newest 500" ceiling.
+A run defaults to one page and can explicitly process up to 20 pages
+(maximum 10,000 server rows). The result contains `pagesProcessed`,
+`nextCursor` (or null when finished), and accumulated match/write totals.
+A bad/out-of-order database page fails closed instead of repeating entries.
+The CLI can resume at the next server ID in another bounded run:
+
+```sh
+NEXUS_SERVER_OBSERVATION_CAPTURE=true NODE_ENV=development \
+NEXUS_SERVER_OBSERVATION_PAGE_LIMIT=500 \
+NEXUS_SERVER_OBSERVATION_MAX_PAGES=10 \
+DATABASE_URL=postgres://nexus:nexus_secret@postgres:5432/mta_nexus \
+pnpm server:observations:capture
+```
+
+To resume after a truncated run, repeat with
+`NEXUS_SERVER_OBSERVATION_AFTER_ID=<nextCursor>` from the JSON result.
+Only the canonical local Docker database is permitted by the existing
+environment guard. Captures still use at most five concurrent writes per
+batch and do not interpret missing master endpoints as offline. The
+master snapshot is fetched once per capture; concurrent deployments or
+changes to the eligible server set between independent captures can still
+shift cursor boundaries. This is resumable bounded collection, not
+snapshot-isolated global scanning. Each write still uses the existing repository transaction
 and duplicate suppression; missing directory endpoints are not recorded as offline.
 For duplicate `source/sourceSequence/serverId` observations, `record()` returns
 the original persisted row and ID (one additional indexed SELECT only on a
@@ -326,10 +350,12 @@ and does not start later batches. The CLI can then close its database connection
 without leaving capture writes running. A failed capture can contain committed
 records from earlier or active batches; capture is not one global transaction.
 Retrying the same snapshot retains the repository's existing duplicate behavior.
-The development-only environment guard and successful summary are unchanged.
+The development-only environment guard remains enforced. Additional
+summary fields expose page count and cursor; no production scheduler is
+enabled by this change.
 
-Eleven collector tests use synthetic repositories and actual endpoint matching
-helpers. They cover concurrent inputs, the five-write bound, draining asynchronous
+Collector tests use synthetic repositories and actual endpoint matching
+helpers, including multi-page scans, resumable cursors and out-of-order guards. They cover concurrent inputs, the five-write bound, draining asynchronous
 and synchronous failures, no later batches after failure, limits, and missing/stale
 directory diagnostics. With each synthetic write taking one virtual time unit,
 500 writes take 100 units instead of the previous 500. This checks scheduling,
