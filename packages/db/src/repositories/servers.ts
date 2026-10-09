@@ -68,12 +68,18 @@ export class ServerRepository {
     return rows as unknown as Server[];
   }
 
-  async listObservable(limit = 501): Promise<Server[]> {
+  async listObservable(limit = 501): Promise<Pick<Server, "id" | "ipAddress" | "port">[]> {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 501)
       : 501;
+    // Observation matching needs only endpoints and stable IDs, not the
+    // potentially large editorial descriptions, images or JSON metadata.
     const rows = await db
-      .select()
+      .select({
+        id: servers.id,
+        ipAddress: servers.ipAddress,
+        port: servers.port,
+      })
       .from(servers)
       .where(
         and(
@@ -81,9 +87,11 @@ export class ServerRepository {
           ne(servers.visibility, "private"),
         ),
       )
-      .orderBy(desc(servers.updatedAt))
+      // Stable tie-breaking avoids arbitrarily shifting the 501-row
+      // sentinel when many listings share the same updated timestamp.
+      .orderBy(desc(servers.updatedAt), desc(servers.id))
       .limit(boundedLimit);
-    return rows as unknown as Server[];
+    return rows;
   }
 
   async listByOwner(ownerId: string): Promise<Server[]> {
