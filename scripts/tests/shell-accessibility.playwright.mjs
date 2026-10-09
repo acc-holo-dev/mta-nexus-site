@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { getDictionary } from "../../apps/web/src/lib/i18n.ts";
+import { assertAxeAccessibility } from "../axe-accessibility.mjs";
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
@@ -424,7 +425,7 @@ async function containedTabbing(page, dialog) {
   }
 }
 for (const locale of ["en", "ru"]) {
-  test(`shell keyboard and responsive routes in ${locale}`, async ({ page, context }) => {
+  test(`shell keyboard and responsive routes in ${locale}`, async ({ page, context }, testInfo) => {
     test.setTimeout(120_000);
     const dictionary = getDictionary(locale);
     const discoverCopy = dictionary.discover;
@@ -536,6 +537,7 @@ for (const locale of ["en", "ru"]) {
     await expect(bell).toHaveAttribute("aria-controls", "notification-popover");
     const notices = page.getByRole("dialog", { name: dictionary.notificationBell.title, exact: true });
     await expect(notices).toHaveAttribute("id", "notification-popover");
+    await assertAxeAccessibility(page, testInfo, `${locale}-notification-dialog`);
     const noticeClose = notices.getByRole("button", {
       name: dictionary.notificationBell.close,
       exact: true,
@@ -657,6 +659,7 @@ for (const locale of ["en", "ru"]) {
       exact: true,
     });
     await expect(moreDialog).toHaveAttribute("id", "mobile-more-menu");
+    await assertAxeAccessibility(page, testInfo, `${locale}-mobile-menu-dialog`);
     await assertMinimumControlTargetSize(
       page,
       `${locale} mobile More dialog`,
@@ -814,7 +817,7 @@ async function assertNoHorizontalOverflow(page, label) {
 }
 
 for (const locale of ["en", "ru"]) {
-  test(`critical account accessibility in ${locale}`, async ({ page, context }) => {
+  test(`critical account accessibility in ${locale}`, async ({ page, context }, testInfo) => {
     test.setTimeout(120_000);
     const dictionary = getDictionary(locale);
     const errors = [];
@@ -865,6 +868,7 @@ for (const locale of ["en", "ru"]) {
     await loginPassword.fill("not-the-right-password");
     await loginSubmit.click();
     await expect(page.locator("#auth-error")).toHaveAttribute("role", "alert");
+    await assertAxeAccessibility(page, testInfo, `${locale}-login-error`);
     await assertNoVisibleUnlabeledFields(page, "/auth/login");
     await assertNoHorizontalOverflow(page, `${locale} /auth/login at 320px`);
     evidence.push(
@@ -910,6 +914,7 @@ for (const locale of ["en", "ru"]) {
         }),
       ).toBeVisible();
       await assertNoVisibleUnlabeledFields(page, "/auth/forgot-password");
+      await assertAxeAccessibility(page, testInfo, `${locale}-recovery-accepted`);
       await assertNoHorizontalOverflow(
         page,
         `${locale} /auth/forgot-password at 320px`,
@@ -999,6 +1004,8 @@ for (const locale of ["en", "ru"]) {
           }),
         ).toBeVisible();
         await spec.ready();
+        // Scan mobile and desktop once each; the 390px pass retains behavioral checks.
+        if (width !== 390) await assertAxeAccessibility(page, testInfo, `${locale}-${width}-${spec.route}`);
         await assertNoVisibleUnlabeledFields(page, spec.route);
         await assertValidAccessibilityReferences(
           page,

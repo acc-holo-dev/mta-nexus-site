@@ -9,4 +9,4 @@ certutil -d "sql:$NEXUS_BROWSER_HOME/.pki/nssdb" -N --empty-password
 certutil -d "sql:$NEXUS_BROWSER_HOME/.pki/nssdb" -A -n nexus-smoke-ci -t 'C,,' -i "$work/root.crt"
 "$NEXUS_BROWSER_TOOLS/node_modules/.bin/playwright" test \
   --config=playwright.ci.config.mjs scripts/tests/fast-smoke.playwright.mjs \
-  scripts/tests/directory-smoke.playwright.mjs
+  scripts/tests/directory-smoke.playwright.mjs scripts/tests/accessibility-smoke.playwright.mjs

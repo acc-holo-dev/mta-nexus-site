@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { randomBytes } from "node:crypto";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
+import { assertAxeAccessibility } from "../axe-accessibility.mjs";
 const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { test, expect } = require("@playwright/test");
 
-test("registration, authenticated workspace and logout on the production image", async ({ page }) => {
+test("registration, authenticated workspace and logout on the production image", async ({ page }, testInfo) => {
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
   const nonce = randomBytes(6).toString("hex");
@@ -18,6 +19,7 @@ test("registration, authenticated workspace and logout on the production image",
   assert.equal((await registered).status(), 201);
   await expect(page.getByRole("heading", { name: "Workspace", exact: true })).toBeVisible();
   await expect(page.getByRole("group", { name: "Account", exact: true })).toContainText(`@smoke_${nonce}`);
+  await assertAxeAccessibility(page, testInfo, "authenticated-workspace");
   await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await page.waitForURL("**/auth/login");
   await page.goto("/workspace");

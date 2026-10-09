@@ -132,6 +132,38 @@ pnpm release:verify
 - `pnpm test:tooling`: standalone Node suites. Compose validators that require rendered JSON remain owned by their infrastructure harnesses.
 - `pnpm test`: both Vitest projects; `pnpm check` and `pnpm release:verify` retain the full local release path.
 
+### Automated browser accessibility
+
+The existing Chromium acceptance now also uses `@axe-core/playwright` 4.13.0 and
+`axe-core` 4.13.0. Both are pinned in the isolated browser-tools installations for
+the smoke and resource-browser jobs; they are not application dependencies.
+
+| Contour | Scanned states |
+| --- | --- |
+| Production browser smoke | Login, registration and password recovery in RU/EN, light desktop and dark mobile themes; authenticated workspace after registration. |
+| Resource browser | Open notification and mobile More dialogs in RU/EN; login error, recovery success and authenticated Settings, Security, Support, resource publishing and server claim at 320px and 1280px. |
+
+`scripts/axe-accessibility.mjs` scans the full rendered state after each test's
+readiness assertions. It selects WCAG 2 A/AA, 2.1 A/AA and 2.2 AA rule tags and
+fails on every returned violation, including contrast. There are no rule disables
+or excluded page regions. Existing keyboard, focus, reflow and ARIA-reference
+checks remain in the same scenarios.
+
+Every completed scan writes a JSON diagnostic under the job report's `axe/`
+directory and attaches it to Playwright. Reports retain rule IDs, impacts, help
+links and element selectors, without raw HTML or form values. Incomplete checks
+are recorded for review separately from confirmed violations. Passing scans are
+retained even though general Playwright output is preserved only for failures.
+These checks cover automatically detectable issues in the tested states; keyboard
+and assistive-technology assessments remain necessary.
+
+The standalone gate tests verify that a violation blocks acceptance after its
+report is saved, incomplete findings stay visible, and engine errors propagate.
+They use a browser-adapter fixture and do not claim a real DOM scan. Current
+browser execution/hosted-runner limitations are tracked in [PROBLEMS](PROBLEMS.md).
+Integration follows the [official Playwright accessibility guide](https://playwright.dev/docs/accessibility-testing)
+and [axe Playwright API](https://github.com/dequelabs/axe-core-npm/tree/v4.13.0/packages/playwright).
+
 ### Code analysis
 
 | Command | Purpose | Result |
@@ -179,7 +211,7 @@ References: [Knip configuration](https://knip.dev/reference/configuration),
 [dependency-cruiser options](https://github.com/sverweij/dependency-cruiser/blob/main/doc/options-reference.md).
 
 Only `CI` starts on push/PR. Ordinary code changes run lint, types, architecture/unused-code checks, both test projects,
-one cached production-image build and a short registration/logout/directory browser smoke.
+one cached production-image build and a short registration/logout/directory/accessibility browser smoke.
 Browser and infrastructure consumers load the exact same SHA-labelled image; a missing
 or mismatched transfer fails instead of rebuilding or pulling an unverified image.
 The producer stores the one-run production tar in GitHub Actions Cache under an immutable

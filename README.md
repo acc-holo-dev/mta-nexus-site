@@ -109,6 +109,11 @@ pnpm test:catalog
 pnpm test:reports
 ```
 
+Browser acceptance also runs axe-core WCAG checks for account forms in RU/EN,
+light and dark themes, plus open dialogs and authenticated screens. Rule and
+element diagnostics are retained with the CI browser reports. See
+[Operations](docs/OPERATIONS.md#automated-browser-accessibility) for coverage and limitations.
+
 ## Demo data / Демонстрационные данные
 
 After migrations, populate or safely repeat the development baseline:

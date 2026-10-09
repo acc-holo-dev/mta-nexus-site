@@ -1,6 +1,6 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
-Единственный реестр проблем проекта. Обновлён: 2026-10-09 (после DEV Mailpit slice; текущий hosted-runner blocker зафиксирован ниже).
+Единственный реестр проблем проекта. Обновлён: 2026-10-09 (после DEV Mailpit и axe browser-gate slices; текущий hosted-runner blocker зафиксирован ниже).
 
 Правила реестра:
 
@@ -63,6 +63,14 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 
 
 ### P1-2. GitHub-hosted runner не начинает `plan` job
+
+В browser smoke и resource-browser добавлены axe-проверки WCAG для форм,
+диалогов и авторизованных состояний RU/EN. Само падение gate при нарушениях и
+сохранение диагностик проверяются отдельными Node-тестами с browser-adapter
+fixture. Настоящий browser scan в текущей локальной среде не выполнен:
+обычный Chromium не установился, альтернативный локальный binary не запускается.
+До executable CI нет подтверждения axe baseline на production-образе;
+найденные там нарушения нужно исправить, а не скрывать правилами/исключениями.
 
 DEV Mailpit overlay добавлен в `Local Docker startup`: приёмка проверяет
 worker health, непубликуемый SMTP, loopback UI и фактический TLS SMTP/API capture.

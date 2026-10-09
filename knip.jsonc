@@ -7,7 +7,7 @@
       "project": ["scripts/**/*.{mjs,ts}", "tests/**/*.{ts,tsx}", "*.{mjs,cjs,ts}"],
       // Browser checks install Playwright into an isolated prefix in the shell runners.
       // dependency-cruiser loads its optional SWC parser dynamically.
-      "ignoreDependencies": ["@playwright/test", "@swc/core"],
+      "ignoreDependencies": ["@playwright/test", "@axe-core/playwright", "@swc/core"],
       // OpenSSL is an OS dependency of the closed TLS provider test.
       "ignoreBinaries": ["openssl"]
     },
