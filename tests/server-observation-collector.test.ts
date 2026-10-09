@@ -56,6 +56,31 @@ describe("server observation collector", () => {
     },
   );
 
+  it("creates distinct snapshot identities for endpoint A -> B -> A revisions", () => {
+    const fetchedAt = "2026-10-09T07:30:00.000Z";
+    const directory = {
+      fetchedAt,
+      isStale: false,
+      servers: [{ address: "host.test", port: 22003, players: 12 }],
+    };
+    const collect = (endpointRevision: number) => {
+      const rows = buildMasterObservationCandidates(
+        [{ id: "srv_one", ipAddress: "host.test", port: 22003, endpointRevision }],
+        directory,
+      );
+      expect(rows).toHaveLength(1);
+      return rows[0]!;
+    };
+    expect(collect(0).sourceSequence).toBe(fetchedAt);
+    expect(collect(1).sourceSequence).toBe(fetchedAt + "#endpoint-revision=1");
+    expect(collect(2).sourceSequence).toBe(fetchedAt + "#endpoint-revision=2");
+    expect(collect(2).observedAt.toISOString()).toBe(fetchedAt);
+    expect(collect(1).currentPlayers).toBe(12);
+    expect(collect(1).sourceSequence).not.toBe(collect(2).sourceSequence);
+    expect(() => collect(-1)).toThrow("Invalid server endpoint revision");
+    expect(() => collect(2_147_483_648)).toThrow("Invalid server endpoint revision");
+  });
+
   it("does not synthesize offline observations for missing servers", () => {
     const candidates = buildMasterObservationCandidates(
       [{ id: "srv_missing", ipAddress: "missing.example", port: 22003 }],

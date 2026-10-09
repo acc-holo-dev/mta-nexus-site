@@ -221,6 +221,23 @@ describe("bounded observation capture", () => {
       .not.toContain("srv_00000");
   });
 
+  it("keeps snapshot identity distinct for servers with different endpoint revisions", async () => {
+    const { known } = fixture(3);
+    sources.known.mockResolvedValue(known.map((row, index) => ({
+      ...row,
+      endpointRevision: index,
+    })));
+    const result = await captureKnownServerObservations();
+    expect(result).toMatchObject({ recordAttempts: 3, matchedServers: 3 });
+    expect(sources.record.mock.calls.map(([observation]) => observation.sourceSequence)).toEqual([
+      "2026-10-09T00:00:00.000Z",
+      "2026-10-09T00:00:00.000Z#endpoint-revision=1",
+      "2026-10-09T00:00:00.000Z#endpoint-revision=2",
+    ]);
+    expect(sources.record.mock.calls.map(([, endpoint]) => endpoint?.endpointRevision))
+      .toEqual([0, 1, 2]);
+  });
+
   it("counts skipped old-endpoint captures without treating them as persisted rows", async () => {
     fixture(3);
     sources.record.mockResolvedValueOnce(null);

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
+import { buildMasterObservationCandidates } from "../apps/web/src/lib/services/server-observation-matching";
 import {
   db,
   servers,
@@ -207,6 +208,63 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
       expect((await liveState(serverId))?.currentPlayers).toBeNull();
       expect(await db.select().from(serverObservations)
         .where(eq(serverObservations.serverId, serverId))).toHaveLength(0);
+    });
+  });
+
+  it("stores all endpoint revisions within one cached MTA snapshot without identity collisions", async () => {
+    await withServer(async serverId => {
+      const original = await serverRepository.findById(serverId);
+      if (!original) throw new Error("Missing server");
+      const fetchedAt = "2026-10-09T16:00:00.000Z";
+      const alternateHost = "backup." + original.ipAddress;
+      const directory = {
+        fetchedAt,
+        isStale: false,
+        servers: [
+          { address: original.ipAddress, port: original.port, players: 11 },
+          { address: alternateHost, port: original.port, players: 22 },
+        ],
+      };
+      function observationFor(endpoint: typeof original) {
+        const [candidate] = buildMasterObservationCandidates([endpoint], directory);
+        if (!candidate) throw new Error("Expected source observation");
+        return candidate;
+      }
+
+      const first = await serverObservationRepository.record(observationFor(original), original);
+      expect(first?.sourceSequence).toBe(fetchedAt);
+      expect(first?.currentPlayers).toBe(11);
+      const identical = await serverObservationRepository.record(observationFor(original), original);
+      expect(identical?.id).toBe(first?.id);
+
+      await serverRepository.update(serverId, { ipAddress: alternateHost });
+      const secondEndpoint = await serverRepository.findById(serverId);
+      if (!secondEndpoint) throw new Error("Missing changed endpoint");
+      expect(secondEndpoint.endpointRevision).toBe(original.endpointRevision + 1);
+      const second = await serverObservationRepository.record(
+        observationFor(secondEndpoint), secondEndpoint,
+      );
+      expect(second?.sourceSequence).toBe(fetchedAt + "#endpoint-revision=1");
+      expect(second?.currentPlayers).toBe(22);
+      expect((await liveState(serverId))?.currentPlayers).toBe(22);
+
+      await serverRepository.update(serverId, { ipAddress: original.ipAddress });
+      const thirdEndpoint = await serverRepository.findById(serverId);
+      if (!thirdEndpoint) throw new Error("Missing restored endpoint");
+      expect(thirdEndpoint.endpointRevision).toBe(original.endpointRevision + 2);
+      const third = await serverObservationRepository.record(
+        observationFor(thirdEndpoint), thirdEndpoint,
+      );
+      expect(third?.sourceSequence).toBe(fetchedAt + "#endpoint-revision=2");
+      expect(third?.currentPlayers).toBe(11);
+      expect((await liveState(serverId))?.currentPlayers).toBe(11);
+
+      const history = await db.select().from(serverObservations)
+        .where(eq(serverObservations.serverId, serverId));
+      expect(history).toHaveLength(3);
+      expect(new Set(history.map(row => row.sourceSequence)).size).toBe(3);
+      expect(new Set(history.map(row => row.id)).size).toBe(3);
+      expect(history.every(row => row.observedAt.toISOString() === fetchedAt)).toBe(true);
     });
   });
 

@@ -376,7 +376,17 @@ snapshot-isolated global scanning. Each write still uses the existing repository
 and duplicate suppression; missing directory endpoints are not recorded as offline.
 For duplicate `source/sourceSequence/serverId` observations, `record()` returns
 the original persisted row and ID (one additional indexed SELECT only on a
-conflict), never a fabricated ID from an ignored INSERT. The conflict target is
+conflict), never a fabricated ID from an ignored INSERT.
+For MTA master-list capture, `sourceSequence` now includes the server's
+`endpointRevision` when it is greater than zero: a reused cached master
+snapshot must not treat the new network endpoint as the previous endpoint's
+already-committed observation. Revision zero keeps the original timestamp
+sequence for backward-compatible deduplication of pre-change observations.
+Revisions 1, 2, etc. use an `#endpoint-revision=N` suffix. The actual
+`observedAt` remains the original snapshot timestamp. This makes A -> B -> A
+endpoint changes independently recordable even within the same cached
+snapshot; the repository still checks current endpoint identity and revision
+under a row lock before writing history. The conflict target is
 explicit, so unexpected generated-ID collisions fail instead of masquerading
 as duplicate upstream snapshots. Equal timestamps and older snapshots still
 cannot overwrite newer denormalized live state. PostgreSQL integration tests
