@@ -82,16 +82,13 @@ vi.mock("../apps/web/src/lib/services/server-service", () => ({
   },
 }));
 
-vi.mock(
-  "../apps/web/src/lib/services/mta-master-directory-service",
-  () => ({
-    mtaMasterDirectoryService: {
-      getDirectory: mocks.directory,
-    },
-    matchesMtaEndpoint: mocks.matches,
-    mtaLiveStatus: mocks.liveStatus,
-  }),
-);
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+  mtaMasterDirectoryService: {
+    getDirectory: mocks.directory,
+  },
+  matchesMtaEndpoint: mocks.matches,
+  mtaLiveStatus: mocks.liveStatus,
+}));
 
 vi.mock("../apps/web/src/lib/services/server-history-service", () => ({
   serverHistoryService: {
@@ -112,13 +109,7 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({
 vi.mock("../apps/web/src/components/server-follow-button", async () => {
   const React = await import("react");
   return {
-    ServerFollowButton: ({
-      serverId,
-      serverName,
-    }: {
-      serverId: string;
-      serverName: string;
-    }) =>
+    ServerFollowButton: ({ serverId, serverName }: { serverId: string; serverName: string }) =>
       React.createElement(
         "div",
         {
@@ -133,13 +124,7 @@ vi.mock("../apps/web/src/components/server-follow-button", async () => {
 vi.mock("../apps/web/src/components/server-history-panel", async () => {
   const React = await import("react");
   return {
-    ServerHistoryPanel: ({
-      history,
-      locale,
-    }: {
-      history: unknown;
-      locale: string;
-    }) =>
+    ServerHistoryPanel: ({ history, locale }: { history: unknown; locale: string }) =>
       React.createElement("div", {
         "data-testid": "server-history",
         "data-locale": locale,
@@ -159,19 +144,16 @@ vi.mock("../apps/web/src/components/server-updates-panel", async () => {
   };
 });
 
-vi.mock(
-  "../apps/web/src/components/server-claim-control-panel",
-  async () => {
-    const React = await import("react");
-    return {
-      ServerClaimControlPanel: ({ serverId }: { serverId: string }) =>
-        React.createElement("div", {
-          "data-testid": "server-claim",
-          "data-server-id": serverId,
-        }),
-    };
-  },
-);
+vi.mock("../apps/web/src/components/server-claim-control-panel", async () => {
+  const React = await import("react");
+  return {
+    ServerClaimControlPanel: ({ serverId }: { serverId: string }) =>
+      React.createElement("div", {
+        "data-testid": "server-claim",
+        "data-server-id": serverId,
+      }),
+  };
+});
 
 import ServerDetailPage from "../apps/web/src/app/servers/[slug]/page";
 
@@ -257,6 +239,29 @@ describe("server detail behavior", () => {
     expect(html).toContain('data-testid="server-history"');
     expect(html).not.toContain('data-testid="server-claim"');
   });
+
+  it.each([
+    ["7d", "7d"],
+    ["30d", "30d"],
+    ["invalid", "24h"],
+    [["7d", "30d"], "24h"],
+  ] as const)(
+    "uses the requested history period %s during server rendering",
+    async (history, expected) => {
+      mocks.directory.mockResolvedValue({ isStale: false, servers: [] });
+      mocks.history.mockResolvedValue(null);
+      mocks.updates.mockResolvedValue([]);
+
+      await ServerDetailPage({
+        params: Promise.resolve({ slug: state.server.slug }),
+        searchParams: Promise.resolve({
+          history: typeof history === "string" ? history : [...history],
+        }),
+      });
+
+      expect(mocks.history).toHaveBeenCalledExactlyOnceWith(state.server, expected);
+    },
+  );
 
   it("fails closed for private listings", async () => {
     mocks.getServer.mockResolvedValue({

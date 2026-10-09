@@ -12,11 +12,14 @@ import {
 function vapidConfig(): WebPushVapidConfig {
   const ecdh = createECDH("prime256v1");
   ecdh.generateKeys();
+  const scalar = ecdh.getPrivateKey();
+  const privateKey = Buffer.alloc(32);
+  scalar.copy(privateKey, privateKey.length - scalar.length);
   return {
     publicKey: ecdh
       .getPublicKey(undefined, "uncompressed")
       .toString("base64url"),
-    privateKey: ecdh.getPrivateKey().toString("base64url"),
+    privateKey: privateKey.toString("base64url"),
     subject: "mailto:ops@nexus.example.com",
   };
 }

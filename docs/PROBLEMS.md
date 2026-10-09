@@ -64,6 +64,19 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 
 ### P1-2. GitHub-hosted runner не начинает `plan` job
 
+История серверов теперь агрегирует весь выбранный период 24h/7d/30d, а не
+только последние 500 записей. Сводка и UTC-интервалы графика читаются вместе с
+ограниченными подробными записями в read-only repeatable-read транзакции.
+Это исправляет пропущенные старые пики и неполные счётчики; три SELECT добавляют
+работу БД, production latency ещё не измерена. Пропуски не считаются offline.
+SQL-builder, HTTP, сервисные и SSR проверки дополнены PostgreSQL fixture с
+более чем 500 наблюдениями; её реальная DB приёмка остаётся открытой.
+После совмещения с библиотекой ресурсов и миграцией 0036 прошёл полный
+`pnpm check:code`: 1591 unit и 200 tooling проверок, typecheck, Knip и
+архитектурная проверка. Lint сохранил 40 предупреждений. Устранена случайная
+ошибка VAPID fixtures: тестовые scalar keys дополнены до 32 байт без изменения
+рабочей криптографии. Эти результаты не заменяют PostgreSQL/browser приёмку.
+
 Подготовлен единый credential-free SQL projection для пользователей и
 узкий session identity lookup: account/profile/context запросы не читают
 password_hash, identity не читает private session metadata. Legacy lookup и

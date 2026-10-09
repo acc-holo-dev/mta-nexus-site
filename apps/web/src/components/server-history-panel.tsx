@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { Activity, BarChart3, Clock3 } from "lucide-react";
 import {
-  formatObservationTimeUtc,
-  selectServerHistoryChartPoints,
+  formatHistoryIntervalUtc,
+  serverHistoryChartSlots,
   serverHistoryBarPercent,
 } from "../lib/server-history-presentation";
 import type { ServerHistoryResult } from "../lib/services/server-history-service";
@@ -22,15 +23,9 @@ export function ServerHistoryPanel({
 
   if (!history) {
     return (
-      <section
-        className="nexus-panel p-5 md:p-6"
-        aria-labelledby="server-history-title"
-      >
+      <section className="nexus-panel p-5 md:p-6" aria-labelledby="server-history-title">
         <div className="flex items-start gap-3">
-          <Clock3
-            className="mt-0.5 h-4 w-4 shrink-0 text-faint"
-            aria-hidden="true"
-          />
+          <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-faint" aria-hidden="true" />
           <div className="space-y-1">
             <h2
               id="server-history-title"
@@ -45,14 +40,16 @@ export function ServerHistoryPanel({
     );
   }
 
-  const points = selectServerHistoryChartPoints(history.observations, 24);
+  const points = serverHistoryChartSlots(
+    history.buckets,
+    history.windowStart,
+    history.windowEnd,
+    history.bucketSeconds,
+  );
   const peak = history.summary.peakPlayers;
 
   return (
-    <section
-      className="nexus-panel space-y-5 p-5 md:p-6"
-      aria-labelledby="server-history-title"
-    >
+    <section className="nexus-panel space-y-5 p-5 md:p-6" aria-labelledby="server-history-title">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -71,6 +68,26 @@ export function ServerHistoryPanel({
         </span>
       </div>
 
+      <nav aria-label={copy.chooseWindow} className="flex flex-wrap gap-2">
+        {(
+          [
+            ["24h", copy.period24h],
+            ["7d", copy.period7d],
+            ["30d", copy.period30d],
+          ] as const
+        ).map(([window, label]) => (
+          <Link
+            key={window}
+            href={`/servers/${encodeURIComponent(history.server.slug)}?history=${window}#server-history-title`}
+            aria-current={history.window === window ? "true" : undefined}
+            className={`rounded-lg border border-base px-3 py-2 text-xs font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${history.window === window ? "bg-accent-soft text-accent" : "bg-inset text-secondary"}`}
+          >
+            {label}
+          </Link>
+        ))}
+      </nav>
+      <p className="text-xs text-muted">{copy.summaryScope}</p>
+
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
           [copy.samples, history.summary.observationCount],
@@ -85,7 +102,7 @@ export function ServerHistoryPanel({
         ))}
       </div>
 
-      {points.length === 0 ? (
+      {history.summary.observationCount === 0 || points.length === 0 ? (
         <div className="rounded-lg border border-dashed border-base bg-inset p-5 text-xs text-muted">
           <div className="flex items-start gap-2">
             <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-faint" aria-hidden="true" />
@@ -95,7 +112,14 @@ export function ServerHistoryPanel({
       ) : (
         <div className="space-y-3">
           <div className="flex items-center justify-between text-[11px] text-faint">
-            <span>{copy.window}</span>
+            <span>
+              {copy.window}:{" "}
+              {history.bucketSeconds === 3600
+                ? copy.intervalHour
+                : history.bucketSeconds === 21600
+                  ? copy.intervalSixHours
+                  : copy.intervalDay}
+            </span>
             <span>UTC</span>
           </div>
           <ol
@@ -103,20 +127,14 @@ export function ServerHistoryPanel({
             aria-label={copy.chartLabel}
           >
             {points.map((point) => {
-              const percent = serverHistoryBarPercent(
-                point.currentPlayers,
-                peak,
-              );
-              const label = formatObservationTimeUtc(point.observedAt);
+              const percent = serverHistoryBarPercent(point.peakPlayers, peak);
+              const label = formatHistoryIntervalUtc(point.bucketAt);
               return (
-                <li
-                  key={point.id ?? point.observedAt}
-                  className="flex h-full min-w-0 flex-1 items-end"
-                >
+                <li key={point.bucketAt} className="flex h-full min-w-0 flex-1 items-end">
                   <div className="flex h-full w-full items-end">
                     <div
                       className={
-                        point.currentPlayers == null
+                        point.peakPlayers == null
                           ? "min-h-0.5 w-full rounded-t bg-[var(--nexus-text-faint)]/50"
                           : "min-h-0.5 w-full rounded-t bg-[var(--nexus-accent)]/80"
                       }
@@ -125,13 +143,11 @@ export function ServerHistoryPanel({
                     />
                   </div>
                   <span className="sr-only">
-                    {label}:{" "}
-                    {point.currentPlayers == null
+                    {label}: {point.observationCount} {copy.samples};{" "}
+                    {point.peakPlayers == null
                       ? copy.playerCountUnknown
-                      : `${point.currentPlayers} ${copy.players}`}
-                    {point.maxPlayers == null
-                      ? ""
-                      : ` ${point.maxPlayers} ${copy.slots}`}
+                      : `${point.peakPlayers} ${copy.players}`}
+                    {point.maxPlayers == null ? "" : ` ${point.maxPlayers} ${copy.slots}`}
                   </span>
                 </li>
               );
@@ -142,6 +158,12 @@ export function ServerHistoryPanel({
             <span>{copy.barsDescription}</span>
           </div>
         </div>
+      )}
+      {points.length > 0 && history.summary.observationCount > 0 && (
+        <p className="flex flex-wrap justify-between gap-2 text-[11px] text-faint">
+          <span>{formatHistoryIntervalUtc(history.windowStart)}</span>
+          <span>{formatHistoryIntervalUtc(history.windowEnd)}</span>
+        </p>
       )}
     </section>
   );

@@ -511,6 +511,49 @@ have NULL revision and fail closed; reject their pending verification requests
 before re-issuing fresh proof. Run migration 0034 and the PostgreSQL suite
 before deploying this change.
 
+### Complete server history windows
+
+Server detail pages offer 24-hour, 7-day and 30-day history periods through
+`?history=24h|7d|30d`; absent, invalid or ambiguous page values select 24 hours.
+The history API retains its strict `?window=` validation and `no-store` responses.
+Private listings remain hidden, and rendering a known server does not repeat
+the server lookup. Period controls and explanations are available in RU and EN.
+
+History statistics now aggregate **all** `mta_master` observations between a
+fixed window start and end, including both boundaries. Previously, the latest
+500 records could conceal older peaks and undercount a week or month. Detailed
+`observations` remain capped at 500 for compatibility; `sampleLimit` and
+`samplesTruncated` explicitly describe that cap. `summary.observationCount`,
+`knownPlayerCount`, peak, average and observed timestamps describe the complete
+window. NULL player counts are excluded from the average, and a NULL count in
+the latest observation remains unknown rather than falling back to an older
+measurement. This is an average of stored samples, not a time-weighted average
+or an uptime/SLA calculation.
+
+`buckets` cover the complete window in UTC intervals: one hour for 24h, six
+hours for 7d, and one day for 30d. The chart uses each interval's recorded peak,
+with at most 32 displayed intervals, including partially covered boundary
+intervals. Missing intervals and unknown counts have neutral marks; measured
+zero remains zero. Full UTC dates make month-long charts unambiguous. Missing
+observations never become fabricated downtime or zero-player samples.
+
+The repository performs three SELECTs (summary, bounded recent rows, interval
+aggregates) inside a read-only repeatable-read transaction. This adds database
+work compared with reading 500 rows, while keeping returned rows and chart size
+bounded; production latency has not been measured. The existing
+`(server_id, observed_at)` index supports the window predicate. No new package,
+migration, HTTP cache or collector scheduler is required. Transaction behavior
+is documented by [Drizzle](https://orm.drizzle.team/docs/transactions) and
+[PostgreSQL](https://www.postgresql.org/docs/current/transaction-iso.html).
+
+SQL-builder, service, HTTP and server-rendered UI tests cover complete-window
+counts, peaks outside the recent sample cap, private listings, unknown gaps,
+UTC widths, strict API validation and both locales. The PostgreSQL fixture in
+`tests/server-history-window.integration.test.ts` inserts over 500 samples plus
+an older peak, NULL values, another source/server, and excluded past/future
+rows. It belongs to the database project and still needs a real database run;
+mock SQL checks do not establish PostgreSQL execution or production performance.
+
 The development-only MTA observation collector now supports bounded
 ID-keyset pagination. Each SQL page projects id/ipAddress/port/endpointRevision,
 ordered by id ASC; one extra row detects the presence of the next page.

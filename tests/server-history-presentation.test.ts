@@ -1,48 +1,62 @@
 import { describe, expect, it } from "vitest";
 import {
-  formatObservationTimeUtc,
-  selectServerHistoryChartPoints,
+  formatHistoryIntervalUtc,
+  serverHistoryChartSlots,
   serverHistoryBarPercent,
 } from "../apps/web/src/lib/server-history-presentation";
 
-function points(count: number) {
-  return Array.from({ length: count }, (_, index) => ({
-    observedAt: new Date(
-      Date.UTC(2026, 8, 25, 0, index, 0),
-    ).toISOString(),
-    currentPlayers: index,
-    maxPlayers: 64,
-  }));
-}
-
-describe("server history presentation", () => {
-  it("keeps small histories intact", () => {
-    const source = points(4);
-    expect(selectServerHistoryChartPoints(source, 24)).toEqual(source);
+describe("complete-window history chart", () => {
+  it("keeps missing intervals unknown and preserves a measured zero", () => {
+    const buckets = [
+      { bucketAt: "2026-10-09T01:00:00Z", observationCount: 2, peakPlayers: 0, maxPlayers: 64 },
+    ];
+    const slots = serverHistoryChartSlots(
+      buckets,
+      "2026-10-09T00:30:00Z",
+      "2026-10-09T02:30:00Z",
+      3600,
+    );
+    expect(slots).toHaveLength(3);
+    expect(slots[0]).toMatchObject({ observationCount: 0, peakPlayers: null });
+    expect(slots[1]).toEqual(buckets[0]);
+    expect(slots[2]).toMatchObject({ observationCount: 0, peakPlayers: null });
   });
-
-  it("downsamples long histories while preserving both ends", () => {
-    const source = points(100);
-    const selected = selectServerHistoryChartPoints(source, 24);
-
-    expect(selected).toHaveLength(24);
-    expect(selected[0]).toEqual(source[0]);
-    expect(selected.at(-1)).toEqual(source.at(-1));
+  it("uses all daily bins for a thirty-day window and does not mutate buckets", () => {
+    const bucket = Object.freeze({
+      bucketAt: "2026-09-10T00:00:00Z",
+      observationCount: 3,
+      peakPlayers: 99,
+      maxPlayers: 100,
+    });
+    const slots = serverHistoryChartSlots(
+      [bucket],
+      "2026-09-09T12:00:00Z",
+      "2026-10-09T12:00:00Z",
+      86400,
+    );
+    expect(slots).toHaveLength(31);
+    expect(slots[1]).toBe(bucket);
+    expect(slots.at(-1)?.bucketAt).toBe("2026-10-09T00:00:00.000Z");
   });
-
-  it("bounds chart density and avoids invalid percentages", () => {
-    expect(selectServerHistoryChartPoints(points(100), 500)).toHaveLength(48);
-    expect(selectServerHistoryChartPoints(points(100), 1)).toHaveLength(2);
+  it.each([
+    ["bad", "2026-10-09", 3600],
+    ["2026-10-10", "2026-10-09", 3600],
+    ["2026-09-01", "2026-10-09", 1],
+    ["2026-10-09", "2026-10-09", NaN],
+    ["2026-10-09", "2026-10-09", Infinity],
+    ["2026-10-09", "2026-10-09", 0],
+  ] as const)("rejects invalid or excessive chart ranges %s %s %s", (start, end, width) => {
+    expect(serverHistoryChartSlots([], start, end, width)).toEqual([]);
+  });
+  it("scales peaks without invalid percentages", () => {
     expect(serverHistoryBarPercent(10, 20)).toBe(50);
     expect(serverHistoryBarPercent(30, 20)).toBe(100);
-    expect(serverHistoryBarPercent(null, 20)).toBe(0);
+    for (const value of [null, NaN, Infinity, -5])
+      expect(serverHistoryBarPercent(value, 20)).toBe(0);
     expect(serverHistoryBarPercent(5, null)).toBe(0);
   });
-
-  it("formats timestamps deterministically in UTC", () => {
-    expect(formatObservationTimeUtc("2026-09-25T07:05:00.000Z")).toBe(
-      "07:05 UTC",
-    );
-    expect(formatObservationTimeUtc("invalid")).toBe("Unknown time");
+  it("includes dates in interval labels for multi-day histories", () => {
+    expect(formatHistoryIntervalUtc("2026-09-25T07:05:00Z")).toBe("2026-09-25 07:05 UTC");
+    expect(formatHistoryIntervalUtc("invalid")).toBe("Unknown time");
   });
 });

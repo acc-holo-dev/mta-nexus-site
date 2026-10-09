@@ -12,6 +12,7 @@ import {
 } from "../../../lib/services/mta-master-directory-service";
 import { ServerFollowButton } from "../../../components/server-follow-button";
 import { serverHistoryService } from "../../../lib/services/server-history-service";
+import { parseServerHistoryWindow } from "../../../lib/server-history-window";
 import { ServerHistoryPanel } from "../../../components/server-history-panel";
 import { contentService } from "../../../lib/services/content-service";
 import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
@@ -58,11 +59,14 @@ export async function generateMetadata({
 
 export default async function ServerDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ history?: string | string[] }>;
 }) {
   const { slug } = await params;
-  const [locale, server] = await Promise.all([getRequestLocale(), getServer(slug)]);
+  const [locale, server, query] = await Promise.all([getRequestLocale(), getServer(slug), searchParams]);
+  const historyWindow = parseServerHistoryWindow(query?.history);
   const dictionary = getDictionary(locale);
   const copy = dictionary.serverDetail;
   const serverCopy = dictionary.servers;
@@ -77,7 +81,7 @@ export default async function ServerDetailPage({
 
   const [directory, history, serverUpdates] = await Promise.all([
     mtaMasterDirectoryService.getDirectory().catch(() => null),
-    serverHistoryService.getHistoryForServer(server, "24h").catch(() => null),
+    serverHistoryService.getHistoryForServer(server, historyWindow).catch(() => null),
     contentService.listServerUpdates(server.id, 6).catch(() => null),
   ]);
 

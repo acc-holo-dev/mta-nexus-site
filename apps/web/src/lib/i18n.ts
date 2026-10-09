@@ -383,6 +383,10 @@ const en = {
       "Master-list presence alone is not treated as proof. NEXUS requires the one-time token to appear on the exact server endpoint in a fresh directory snapshot.",
   },
   serverHistory: {
+    chooseWindow: "History period",
+    period24h: "24 hours", period7d: "7 days", period30d: "30 days",
+    intervalHour: "1 hour", intervalSixHours: "6 hours", intervalDay: "1 day",
+    summaryScope: "Statistics and chart cover all saved observations in the selected period.",
     title: "Observed player history",
     unavailable:
       "Stored history is temporarily unavailable. Live directory status remains separate from historical observations.",
@@ -394,14 +398,14 @@ const en = {
     averagePlayers: "Average players",
     latestStored: "Latest stored",
     empty:
-      "No stored observations are available for the last 24 hours. History appears after the NEXUS collector records confirmed master-list observations.",
-    window: "24-hour stored sample window",
-    chartLabel: "Stored player observations for the last 24 hours",
+      "No stored observations are available for the selected period. History appears after the NEXUS collector records confirmed master-list observations.",
+    window: "Recorded interval",
+    chartLabel: "Recorded peak players by interval",
     playerCountUnknown: "player count unknown",
     players: "players",
     slots: "slots",
     barsDescription:
-      "Bars are sampled evenly from stored observations and scaled to the peak stored player count, not to server capacity. Neutral bars mean the player count was unknown.",
+      "Each bar shows the recorded peak for its interval, scaled to the period peak. Neutral intervals have missing or unknown player counts; they do not mean the server was offline.",
   },
   serverUpdates: {
     title: "Server updates",
@@ -1743,6 +1747,10 @@ const ru: typeof en = {
       "Одного присутствия в master-list недостаточно. NEXUS требует увидеть одноразовый токен на точном endpoint сервера в свежем снимке каталога.",
   },
   serverHistory: {
+    chooseWindow: "Период истории",
+    period24h: "24 часа", period7d: "7 дней", period30d: "30 дней",
+    intervalHour: "1 час", intervalSixHours: "6 часов", intervalDay: "1 день",
+    summaryScope: "Статистика и график учитывают все сохранённые наблюдения за выбранный период.",
     title: "История игроков",
     unavailable:
       "Сохранённая история временно недоступна. Живой статус каталога остаётся отдельным источником.",
@@ -1754,14 +1762,14 @@ const ru: typeof en = {
     averagePlayers: "Средний онлайн",
     latestStored: "Последнее значение",
     empty:
-      "За последние 24 часа сохранённых наблюдений нет. История появится после того, как сборщик NEXUS запишет подтверждённые наблюдения master-list.",
-    window: "Окно сохранённых наблюдений за 24 часа",
-    chartLabel: "Сохранённые наблюдения игроков за последние 24 часа",
+      "За выбранный период сохранённых наблюдений нет. История появится после того, как сборщик NEXUS запишет подтверждённые наблюдения master-list.",
+    window: "Интервал наблюдений",
+    chartLabel: "Пиковый сохранённый онлайн по интервалам",
     playerCountUnknown: "число игроков неизвестно",
     players: "игроков",
     slots: "слотов",
     barsDescription:
-      "Столбцы равномерно выбираются из сохранённых наблюдений и масштабируются относительно пикового сохранённого онлайна, а не вместимости сервера. Нейтральный столбец означает неизвестное число игроков.",
+      "Каждый столбец показывает сохранённый пик за интервал относительно пика за весь период. Нейтральные интервалы означают пропущенные наблюдения или неизвестный онлайн, а не отключение сервера.",
   },
   serverUpdates: {
     title: "Обновления сервера",

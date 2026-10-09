@@ -10,9 +10,13 @@ import {
 function vapidKeyPair() {
   const ecdh = createECDH("prime256v1");
   ecdh.generateKeys();
+  // OpenSSL can omit leading zero bytes; VAPID requires a 32-byte scalar.
+  const scalar = ecdh.getPrivateKey();
+  const privateKey = Buffer.alloc(32);
+  scalar.copy(privateKey, privateKey.length - scalar.length);
   return {
     publicKey: ecdh.getPublicKey(undefined, "uncompressed").toString("base64url"),
-    privateKey: ecdh.getPrivateKey().toString("base64url"),
+    privateKey: privateKey.toString("base64url"),
   };
 }
 

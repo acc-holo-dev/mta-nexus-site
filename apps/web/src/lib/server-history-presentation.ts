@@ -1,46 +1,60 @@
-export type ServerHistoryPoint = Readonly<{
-  id?: string;
-  observedAt: string;
-  currentPlayers: number | null;
+export type ServerHistorySlot = Readonly<{
+  bucketAt: string;
+  observationCount: number;
+  peakPlayers: number | null;
   maxPlayers: number | null;
 }>;
 
-export function selectServerHistoryChartPoints(
-  observations: readonly ServerHistoryPoint[],
-  maxPoints = 24,
-): ServerHistoryPoint[] {
-  const boundedMaxPoints = Number.isFinite(maxPoints)
-    ? Math.min(Math.max(Math.floor(maxPoints), 2), 48)
-    : 24;
-
-  if (observations.length <= boundedMaxPoints) return [...observations];
-
-  const lastIndex = observations.length - 1;
-  const selected: ServerHistoryPoint[] = [];
-
-  for (let index = 0; index < boundedMaxPoints; index += 1) {
-    const sourceIndex = Math.round(
-      (index * lastIndex) / (boundedMaxPoints - 1),
+// Empty intervals are unknown placeholders, never fabricated zero-player observations.
+export function serverHistoryChartSlots(
+  buckets: readonly ServerHistorySlot[],
+  windowStart: string,
+  windowEnd: string,
+  bucketSeconds: number,
+): ServerHistorySlot[] {
+  const start = new Date(windowStart).getTime();
+  const end = new Date(windowEnd).getTime();
+  const width = bucketSeconds * 1000;
+  if (
+    !Number.isFinite(start) ||
+    !Number.isFinite(end) ||
+    end < start ||
+    !Number.isSafeInteger(width) ||
+    width < 1
+  )
+    return [];
+  const first = Math.floor(start / width) * width;
+  const last = Math.floor(end / width) * width;
+  const count = (last - first) / width + 1;
+  if (count > 48) return [];
+  const byTime = new Map(buckets.map((bucket) => [new Date(bucket.bucketAt).getTime(), bucket]));
+  return Array.from({ length: count }, (_, index) => {
+    const time = first + index * width;
+    return (
+      byTime.get(time) ?? {
+        bucketAt: new Date(time).toISOString(),
+        observationCount: 0,
+        peakPlayers: null,
+        maxPlayers: null,
+      }
     );
-    const point = observations[sourceIndex];
-    if (point && selected.at(-1) !== point) selected.push(point);
-  }
-
-  return selected;
+  });
 }
 
-export function serverHistoryBarPercent(
-  value: number | null,
-  peak: number | null,
-): number {
-  if (value == null || peak == null || peak <= 0) return 0;
+export function serverHistoryBarPercent(value: number | null, peak: number | null): number {
+  if (
+    value == null ||
+    peak == null ||
+    !Number.isFinite(value) ||
+    !Number.isFinite(peak) ||
+    peak <= 0
+  )
+    return 0;
   return Math.min(100, Math.max(0, Math.round((value / peak) * 100)));
 }
 
-export function formatObservationTimeUtc(value: string): string {
+export function formatHistoryIntervalUtc(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Unknown time";
-  return `${String(date.getUTCHours()).padStart(2, "0")}:${String(
-    date.getUTCMinutes(),
-  ).padStart(2, "0")} UTC`;
+  return `${date.toISOString().slice(0, 16).replace("T", " ")} UTC`;
 }

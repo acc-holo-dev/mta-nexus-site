@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, isNull, lt, lte, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { serverObservations, servers } from "../schema";
 import type { Server, ServerObservation } from "@nexus/domain";
@@ -18,6 +18,30 @@ function boundedObservationInt(value: number, fallback: number, max: number): nu
     ? Math.min(Math.max(Math.floor(value), 1), max)
     : fallback;
 }
+
+type ObservationWindow = {
+  windowStart: Date;
+  windowEnd: Date;
+  bucketSeconds: number;
+  sampleLimit: number;
+  summary: {
+    observationCount: number;
+    knownPlayerCount: number;
+    observedFrom: Date | null;
+    observedTo: Date | null;
+    peakPlayers: number | null;
+    averagePlayers: number | null;
+  };
+  observations: ServerObservation[];
+  buckets: {
+    bucketAt: Date;
+    observationCount: number;
+    knownPlayerCount: number;
+    peakPlayers: number | null;
+    averagePlayers: number | null;
+    maxPlayers: number | null;
+  }[];
+};
 
 export class ServerObservationRepository {
   async record(input: RecordServerObservationInput): Promise<ServerObservation>;
@@ -159,6 +183,60 @@ export class ServerObservationRepository {
       .limit(boundedLimit);
 
     return (rows as ServerObservation[]).reverse();
+  }
+
+  async readWindow(serverId: string, hours = 24, limit = 500): Promise<ObservationWindow> {
+    const boundedHours = boundedObservationInt(hours, 24, 24 * 31);
+    const sampleLimit = boundedObservationInt(limit, 500, 500);
+    const windowEnd = new Date();
+    const windowStart = new Date(windowEnd.getTime() - boundedHours * 3_600_000);
+    const bucketSeconds = boundedHours <= 24 ? 3600 : boundedHours <= 168 ? 21_600 : 86_400;
+    const filter = and(
+      eq(serverObservations.serverId, serverId),
+      eq(serverObservations.source, "mta_master"),
+      gte(serverObservations.observedAt, windowStart),
+      lte(serverObservations.observedAt, windowEnd),
+    );
+    const average = sql<number | null>`round(avg(${serverObservations.currentPlayers}), 1)`
+      .mapWith((value: unknown): number | null => value == null ? null : Number(value));
+    const peak = sql<number | null>`max(${serverObservations.currentPlayers})`
+      .mapWith((value: unknown): number | null => value == null ? null : Number(value));
+    const bucket = sql<Date>`to_timestamp(floor(extract(epoch from ${serverObservations.observedAt}) / ${bucketSeconds}) * ${bucketSeconds})`
+      .mapWith(serverObservations.observedAt).as("bucket_at");
+
+    // The summary, recent samples and chart buckets must describe the same committed rows.
+    return db.transaction(async (tx) => {
+      const [summary] = await tx.select({
+        observationCount: count(),
+        knownPlayerCount: count(serverObservations.currentPlayers),
+        observedFrom: sql<Date | null>`min(${serverObservations.observedAt})`.mapWith(serverObservations.observedAt),
+        observedTo: sql<Date | null>`max(${serverObservations.observedAt})`.mapWith(serverObservations.observedAt),
+        peakPlayers: peak,
+        averagePlayers: average,
+      }).from(serverObservations).where(filter);
+      if (!summary) throw new Error("Server history aggregate returned no row");
+
+      const observations = await tx.select().from(serverObservations).where(filter)
+        .orderBy(desc(serverObservations.observedAt), desc(serverObservations.id)).limit(sampleLimit);
+      const buckets = await tx.select({
+        bucketAt: bucket,
+        observationCount: count(),
+        knownPlayerCount: count(serverObservations.currentPlayers),
+        peakPlayers: peak,
+        averagePlayers: average,
+        maxPlayers: sql<number | null>`max(${serverObservations.maxPlayers})`
+          .mapWith((value: unknown): number | null => value == null ? null : Number(value)),
+      }).from(serverObservations).where(filter)
+        // Refer to the SELECT alias: repeated parameterized expressions use different
+        // placeholders and PostgreSQL does not consider them identical GROUP BY keys.
+        .groupBy(sql`"bucket_at"`).orderBy(sql`"bucket_at"`);
+
+      return {
+        windowStart, windowEnd, bucketSeconds, sampleLimit, summary,
+        observations: (observations as ServerObservation[]).reverse(),
+        buckets,
+      };
+    }, { isolationLevel: "repeatable read", accessMode: "read only" });
   }
 
   async getPeakPlayers(serverId: string, hours = 24): Promise<number | null> {
