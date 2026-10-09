@@ -1,0 +1,156 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { RecordServerObservationInput } from "@nexus/db";
+
+const sources = vi.hoisted(() => ({ directory: vi.fn(), known: vi.fn(), record: vi.fn() }));
+vi.mock("@nexus/db", () => ({
+  serverRepository: { listObservable: sources.known },
+  serverObservationRepository: { record: sources.record },
+}));
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async importOriginal => ({
+  ...await importOriginal<typeof import("../apps/web/src/lib/services/mta-master-directory-service")>(),
+  mtaMasterDirectoryService: { getDirectory: sources.directory },
+}));
+import { captureKnownServerObservations } from "../apps/web/src/lib/services/server-observation-collector";
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<T>((done, fail) => { resolve = done; reject = fail; });
+  return { promise, resolve, reject };
+}
+function fixture(count: number) {
+  const known = Array.from({ length: count }, (_, index) => ({
+    id: `srv_${index}`, ipAddress: `server-${index}.test`, port: 22003,
+  }));
+  const directory = {
+    fetchedAt: "2026-10-09T00:00:00.000Z", isStale: false,
+    servers: known.map(server => ({ address: server.ipAddress, port: server.port, players: 0 })),
+  };
+  sources.known.mockResolvedValue(known);
+  sources.directory.mockResolvedValue(directory);
+  return { known, directory };
+}
+beforeEach(() => {
+  for (const source of Object.values(sources)) source.mockReset();
+  sources.record.mockImplementation(async (input: RecordServerObservationInput) => input);
+  fixture(2);
+});
+afterEach(() => vi.useRealTimers());
+
+describe("bounded observation capture", () => {
+  it("starts both read-only inputs together and waits for them before recording", async () => {
+    const data = fixture(2);
+    const directory = deferred<typeof data.directory>();
+    const known = deferred<typeof data.known>();
+    sources.directory.mockReturnValueOnce(directory.promise);
+    sources.known.mockReturnValueOnce(known.promise);
+    const capture = captureKnownServerObservations();
+    try {
+      expect(sources.directory).toHaveBeenCalledOnce();
+      expect(sources.known).toHaveBeenCalledExactlyOnceWith(501);
+      expect(sources.record).not.toHaveBeenCalled();
+      directory.resolve(data.directory);
+      await Promise.resolve();
+      expect(sources.record).not.toHaveBeenCalled();
+    } finally {
+      directory.resolve(data.directory);
+      known.resolve(data.known);
+      expect(await capture).toMatchObject({ recordAttempts: 2, matchedServers: 2 });
+    }
+  });
+
+  it("records 500 matches with at most five concurrent writes in 100 virtual time units", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(0);
+    fixture(500);
+    let active = 0;
+    let peak = 0;
+    sources.record.mockImplementation(async (input: RecordServerObservationInput) => {
+      active++;
+      peak = Math.max(peak, active);
+      await new Promise(resolve => setTimeout(resolve, 1));
+      active--;
+      return input;
+    });
+    const capture = captureKnownServerObservations();
+    try {
+      await vi.advanceTimersByTimeAsync(0);
+      const initialWrites = sources.record.mock.calls.length;
+      await vi.runAllTimersAsync();
+      expect(await capture).toMatchObject({ knownServers: 500, matchedServers: 500, recordAttempts: 500 });
+      expect({ initialWrites, peak, active, elapsed: Date.now() }).toEqual({
+        initialWrites: 5, peak: 5, active: 0, elapsed: 100,
+      });
+      expect(new Set(sources.record.mock.calls.map(([input]) => input.serverId)).size).toBe(500);
+    } finally {
+      await vi.runAllTimersAsync();
+      await capture;
+    }
+  });
+
+  it.each(["rejection", "synchronous throw"])("drains the active batch after a %s and skips later batches", async failureMode => {
+    fixture(12);
+    const writes = Array.from({ length: 5 }, () => deferred<unknown>());
+    const failure = new Error("Observation write failed");
+    sources.record.mockImplementation((input: RecordServerObservationInput) => {
+      const index = sources.record.mock.calls.length - 1;
+      if (index === 0 && failureMode === "synchronous throw") throw failure;
+      return writes[index]?.promise ?? Promise.resolve(input);
+    });
+    let settled = false;
+    const outcome = captureKnownServerObservations().then(
+      () => { settled = true; return null; },
+      error => { settled = true; return error; },
+    );
+    try {
+      await vi.waitFor(() => expect(sources.record).toHaveBeenCalledTimes(5));
+      if (failureMode === "rejection") writes[0].reject(failure);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(settled).toBe(false);
+      for (const write of writes.slice(1)) write.resolve(undefined);
+      expect(await outcome).toBe(failure);
+      expect(sources.record).toHaveBeenCalledTimes(5);
+    } finally {
+      for (const write of writes) write.resolve(undefined);
+      await outcome;
+    }
+  });
+
+  it("drains a pending input read before reporting a directory failure", async () => {
+    const data = fixture(2);
+    const known = deferred<typeof data.known>();
+    const failure = new Error("Directory unavailable");
+    sources.known.mockReturnValueOnce(known.promise);
+    sources.directory.mockRejectedValueOnce(failure);
+    let settled = false;
+    const outcome = captureKnownServerObservations().catch(error => { settled = true; return error; });
+    try {
+      await vi.waitFor(() => expect(sources.known).toHaveBeenCalledOnce());
+      await Promise.resolve();
+      expect(settled).toBe(false);
+      expect(sources.record).not.toHaveBeenCalled();
+    } finally {
+      known.resolve(data.known);
+      expect(await outcome).toBe(failure);
+      expect(sources.record).not.toHaveBeenCalled();
+    }
+  });
+
+  it("keeps missing endpoints unrecorded and retains stale-source diagnostics", async () => {
+    sources.directory.mockResolvedValue({ fetchedAt: "2026-10-09T00:00:00.000Z", isStale: true, servers: [] });
+    expect(await captureKnownServerObservations()).toMatchObject({
+      sourceWasStale: true, matchedServers: 0, notListedServers: 2,
+      recordAttempts: 0, absenceMeansOffline: false,
+    });
+    expect(sources.record).not.toHaveBeenCalled();
+  });
+
+  it.each([[NaN, 500], [Infinity, 500], [-3, 1], [1.8, 1], [1000, 500]])("bounds requested limit %s to %s", async (limit, expected) => {
+    fixture(501);
+    const result = await captureKnownServerObservations({ limit });
+    expect(sources.known).toHaveBeenCalledWith(expected + 1);
+    expect(result).toMatchObject({ knownServers: expected, knownServerLimit: expected, knownServerLimitReached: true, recordAttempts: expected });
+    expect(sources.record).toHaveBeenCalledTimes(expected);
+  });
+});

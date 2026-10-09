@@ -230,6 +230,28 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 ### Code analysis
 
+The opt-in MTA observation collector starts the directory and known-server reads
+together, then records matches in batches of at most five concurrent writes per
+capture. The known-server limit remains 500, with one extra row detecting a
+truncated selection. Each write still uses the existing repository transaction
+and duplicate suppression; missing directory endpoints are not recorded as offline.
+
+Both input reads and every active write batch use `Promise.allSettled`. If an
+operation fails, capture waits for the other started operations before throwing
+and does not start later batches. The CLI can then close its database connection
+without leaving capture writes running. A failed capture can contain committed
+records from earlier or active batches; capture is not one global transaction.
+Retrying the same snapshot retains the repository's existing duplicate behavior.
+The development-only environment guard and successful summary are unchanged.
+
+Eleven collector tests use synthetic repositories and actual endpoint matching
+helpers. They cover concurrent inputs, the five-write bound, draining asynchronous
+and synchronous failures, no later batches after failure, limits, and missing/stale
+directory diagnostics. With each synthetic write taking one virtual time unit,
+500 writes take 100 units instead of the previous 500. This checks scheduling,
+not PostgreSQL throughput or transaction acceptance. No dependency was added.
+See [MDN Promise.allSettled](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled).
+
 Resource detail loading starts locale and session resolution together. Public
 metadata likewise starts its public product read alongside locale resolution;
 it still uses the public reader separately from the authenticated preview path.
