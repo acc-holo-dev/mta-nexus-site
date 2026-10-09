@@ -27,31 +27,30 @@ export class EntitlementRepository {
 
     if (rows.length > 0) return true;
 
-    if (subject.type === "user") {
-      const userLicenses = await db
-        .select({ entitlements: licenses.entitlements })
-        .from(licenses)
-        .where(
-          and(
-            eq(licenses.userId, subject.id),
-            eq(licenses.productId, resourceId),
-            eq(licenses.status, "active"),
-            or(isNull(licenses.expiresAt), gt(licenses.expiresAt, new Date()))
-          )
-        )
-        .limit(1);
+    if (subject.type !== "user") return false;
 
-      if (userLicenses.length > 0) {
-        const license = userLicenses[0];
-        return (
-          license.entitlements.includes(permission) ||
-          permission === "product.download" ||
-          permission === "product.update"
-        );
-      }
-    }
+    // Legacy active licenses implicitly grant download/update. Other
+    // permissions must match *some* active license, not whichever row
+    // PostgreSQL happens to return first with LIMIT 1.
+    const implicitLegacyPermission =
+      permission === "product.download" || permission === "product.update";
+    const matchingLicenses = await db
+      .select({ id: licenses.id })
+      .from(licenses)
+      .where(
+        and(
+          eq(licenses.userId, subject.id),
+          eq(licenses.productId, resourceId),
+          eq(licenses.status, "active"),
+          or(isNull(licenses.expiresAt), gt(licenses.expiresAt, new Date())),
+          implicitLegacyPermission
+            ? undefined
+            : sql`${licenses.entitlements} @> ${JSON.stringify([permission])}::jsonb`,
+        ),
+      )
+      .limit(1);
 
-    return false;
+    return matchingLicenses.length > 0;
   }
 
   async listBySubject(subject: {

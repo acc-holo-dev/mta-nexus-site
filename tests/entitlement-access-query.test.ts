@@ -46,17 +46,37 @@ it.each(["server", "organization"] as const)("denies an absent %s entitlement wi
 });
 
 it.each([
-  ["product.download", [], true], ["product.update", [], true],
-  ["module.runtime", ["module.runtime"], true], ["module.runtime", ["other.permission"], false],
-] as const)("maps a projected license permissions array for %s", async (permission, permissions, expected) => {
-  state.results = [[], [[JSON.stringify(permissions)]]];
-  expect(await repository.hasEntitlement({ type: "user", id: "user-1" }, "resource-1", permission)).toBe(expected);
+  ["product.download", true, true], ["product.update", true, true],
+  ["module.runtime", true, false], ["module.runtime", false, false],
+  ["custom.permission", true, false],
+] as const)("checks matching active license rights for %s (match=%s)", async (permission, matches, implicit) => {
+  state.results = [[], matches ? [["matching-license"]] : []];
+  expect(await repository.hasEntitlement({ type: "user", id: "user-1" }, "resource-1", permission)).toBe(matches);
   expect(state.queries).toHaveLength(2);
-  expect(state.queries[1].sql).toMatch(/^select "entitlements" from "licenses" /);
-  expect(state.queries[1].params).toEqual(["user-1", "resource-1", "active", now.toISOString(), 1]);
-  expect(state.queries[1].sql).toContain('"licenses"."expires_at" is null');
-  expect(state.queries[1].sql).toContain('"licenses"."expires_at" > $4');
-  expect(state.queries[1].sql).not.toContain('"key"');
+  const query = state.queries[1];
+  expect(query.sql).toMatch(/^select "id" from "licenses" /);
+  expect(query.sql).toContain('"licenses"."expires_at" is null');
+  expect(query.sql).toContain('"licenses"."expires_at" > $4');
+  expect(query.sql).not.toContain('"key"');
+  expect(query.sql).not.toContain("select \"entitlements\"");
+  if (implicit) {
+    expect(query.params).toEqual(["user-1", "resource-1", "active", now.toISOString(), 1]);
+    expect(query.sql).not.toContain(" @> ");
+  } else {
+    expect(query.params).toEqual(["user-1", "resource-1", "active", now.toISOString(), JSON.stringify([permission]), 1]);
+    expect(query.sql).toContain('"licenses"."entitlements" @> $5::jsonb');
+    expect(query.sql).toContain("limit $6");
+  }
+});
+
+it("binds an unusual license permission as JSON data rather than SQL source", async () => {
+  const permission = "module.runtime' OR TRUE --";
+  state.results = [[], []];
+  expect(await repository.hasEntitlement({ type: "user", id: "user-1" }, "resource-1", permission)).toBe(false);
+  const query = state.queries[1];
+  expect(query.params).toContain(JSON.stringify([permission]));
+  expect(query.sql).not.toContain(permission);
+  expect(query.sql).toContain('"licenses"."entitlements" @> $5::jsonb');
 });
 
 it("denies missing direct grants and licenses and safely binds unusual identifiers", async () => {
