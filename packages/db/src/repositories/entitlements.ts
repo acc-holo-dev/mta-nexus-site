@@ -12,7 +12,7 @@ export class EntitlementRepository {
     permission: string
   ): Promise<boolean> {
     const rows = await db
-      .select()
+      .select({ id: entitlements.id })
       .from(entitlements)
       .where(
         and(
@@ -29,7 +29,7 @@ export class EntitlementRepository {
 
     if (subject.type === "user") {
       const userLicenses = await db
-        .select()
+        .select({ entitlements: licenses.entitlements })
         .from(licenses)
         .where(
           and(
@@ -91,7 +91,7 @@ export class EntitlementRepository {
       await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`);
 
       const productRows = await tx
-        .select()
+        .select({ status: products.status, price: products.price })
         .from(products)
         .where(eq(products.id, input.productId))
         .limit(1);

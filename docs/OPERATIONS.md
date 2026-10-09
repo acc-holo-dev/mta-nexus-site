@@ -298,6 +298,24 @@ matching and absent rows, SQL projections and bound parameters. These tests do
 not run PostgreSQL. See [partial select](https://orm.drizzle.team/docs/select)
 and [partial UPDATE RETURNING](https://orm.drizzle.team/docs/update).
 
+Resource access checks now project only an entitlement ID (1 of 8 columns) and,
+when the user-license fallback is needed, its permissions array (1 of 11 columns).
+The free-resource claim preflight reads only product status and price (2 of 23
+columns). This avoids returning entitlement metadata, license keys and unrelated
+product payloads for these decisions. Subject/resource/permission, active-license
+and strict expiry predicates are unchanged. Server and organization subjects do
+not use the user-license fallback, and a matching direct grant still skips it.
+
+Claim serialization, the trusted published-build gate, complete returned grants,
+expired-grant filtering and the atomic acquisition counter remain in the existing
+transaction. Seventeen pg-proxy tests execute the installed Drizzle builder and
+row mapper, covering these decisions, JSON permissions, error propagation, bound
+identifiers, denied preflight, reuse and new acquisition SQL ordering. They do not
+validate actual PostgreSQL locking, expiry evaluation or concurrency; the existing
+database entitlement/claim suites remain required. The query count is unchanged:
+this change reduces selected columns, with no production latency percentage claim.
+See the [Drizzle partial-select API](https://orm.drizzle.team/docs/select#partial-select).
+
 Article views increment with PostgreSQL `view_count + 1` and return the database
 value through `RETURNING`, avoiding lost updates from stale application reads.
 Metadata reads (`incrementView: false`) remain read-only. The unit test compiles

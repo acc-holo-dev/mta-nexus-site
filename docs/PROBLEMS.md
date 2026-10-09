@@ -64,6 +64,16 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 
 ### P1-2. GitHub-hosted runner не начинает `plan` job
 
+Последний проверенный CI для `d4be469` (run `37914732835`) снова завершился
+до выполнения шагов: `plan` failure, steps=0, runner_id=0; DB job skipped.
+Причина отказа hosted runner по доступным данным не установлена.
+Проверка ресурсных прав теперь читает ID вместо полной entitlement-строки,
+permissions вместо полной лицензии, а claim preflight — только status/price.
+Drizzle/pg-proxy покрывает прежние фильтры доступа и последовательность claim;
+настоящая PostgreSQL-приёмка остаётся открытой до восстановления CI.
+Локальный срез прошёл 1488 unit и 200 tooling проверок, typecheck, Knip
+и архитектурный анализ; lint сохранил 40 предупреждений.
+
 Страница Security и HTTP API сессий/Web Push больше не читают одну
 session/user запись дважды для пользователя и ID текущей сессии.
 `getSessionIdentity` возвращает их из одного validated lookup без кеша между
