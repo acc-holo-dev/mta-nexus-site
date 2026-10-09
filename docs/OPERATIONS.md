@@ -230,6 +230,27 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 ### Code analysis
 
+Global discovery search reuses `indexMtaObservations` when more than one server
+result is displayed. It builds one temporary endpoint index for the current
+fresh directory instead of scanning the entire snapshot for every server.
+A single server result retains `Array.find`, avoiding a full index build for an
+early match. No server results skip the directory call; stale snapshots skip
+both scanning and indexing. The observation collector now uses the same helper,
+removing its duplicate key-normalization and endpoint-index implementation.
+
+The discovery behavior suite executes the actual endpoint helpers and checks a
+10,000-entry snapshot with 50 absent server results. Address reads were 500,000
+before the change and are 10,000 afterwards, plus indexed result lookups. This
+is an operation-count fixture, not production latency, memory or network timing.
+The temporary index trades memory for avoiding repeated scans and does not add
+a cross-request cache. The existing master-directory limit is 10,000 entries.
+Additional cases retain early-match behavior for one result, normalized DNS/IPv6
+addresses, distinct ports, first-duplicate precedence, zero/unknown player counts
+and stale-snapshot suppression. Existing collector and directory tests retain
+their sourced-observation and duplicate semantics.
+See [MDN Map lookup behavior](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#description)
+and [Array.find first-match behavior](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find#description).
+
 The notification bell uses sequential polling: the next 30-second delay starts
 after the previous read settles. Repeated visibility events do not duplicate an
 active read. A hidden tab has no polling timer; hiding the tab or cleaning up the

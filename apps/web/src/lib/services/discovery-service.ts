@@ -6,6 +6,7 @@ import {
   organizationRepository,
 } from "@nexus/db";
 import {
+  indexMtaObservations,
   matchesMtaEndpoint,
   mtaMasterDirectoryService,
 } from "./mta-master-directory-service";
@@ -111,17 +112,20 @@ class DiscoveryService {
 
     // Resolve only server results actually shown. An outdated observation must
     // never be displayed as a current player count in global search.
-    if (results.some((item) => item.type === "server")) {
+    const serverResults = results.filter((item) => item.type === "server");
+    if (serverResults.length) {
       try {
         const directory = await mtaMasterDirectoryService.getDirectory();
         if (!directory.isStale) {
           const byId = new Map(servers.map((server) => [server.id, server]));
-          for (const item of results) {
-            if (item.type !== "server") continue;
+          const observationFor = serverResults.length === 1
+            ? (server: { ipAddress: string; port: number }) => directory.servers.find(candidate =>
+                matchesMtaEndpoint(server, candidate),
+              )
+            : indexMtaObservations(directory.servers);
+          for (const item of serverResults) {
             const server = byId.get(item.id);
-            const observation = server && directory.servers.find((candidate) =>
-              matchesMtaEndpoint(server, candidate),
-            );
+            const observation = server && observationFor(server);
             if (observation?.players != null) {
               item.players = observation.players;
               item.maxPlayers = observation.maxPlayers;

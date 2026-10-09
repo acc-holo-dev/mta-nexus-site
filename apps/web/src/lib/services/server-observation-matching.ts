@@ -1,32 +1,20 @@
 import type { Server } from "@nexus/domain";
 import {
-  normalizeMtaAddress,
+  indexMtaObservations,
   type MtaMasterDirectory,
-  type MtaMasterServer,
 } from "./mta-master-directory-service";
 import type { RecordServerObservationInput } from "@nexus/db";
-
-function endpointKey(address: string, port: number): string {
-  return `${normalizeMtaAddress(address)}:${port}`;
-}
 
 export function buildMasterObservationCandidates(
   knownServers: readonly Pick<Server, "id" | "ipAddress" | "port">[],
   directory: MtaMasterDirectory,
 ): RecordServerObservationInput[] {
-  const observedByEndpoint = new Map<string, MtaMasterServer>();
-
-  for (const observed of directory.servers) {
-    const key = endpointKey(observed.address, observed.port);
-    if (!observedByEndpoint.has(key)) observedByEndpoint.set(key, observed);
-  }
+  const observationFor = indexMtaObservations(directory.servers);
 
   const observedAt = new Date(directory.fetchedAt);
 
   return knownServers.flatMap((server) => {
-    const observed = observedByEndpoint.get(
-      endpointKey(server.ipAddress, server.port),
-    );
+    const observed = observationFor(server);
     if (!observed) return [];
 
     return [
