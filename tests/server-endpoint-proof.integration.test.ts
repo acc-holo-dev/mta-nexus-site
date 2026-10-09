@@ -132,6 +132,41 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
     expect(row).toMatchObject({ revision: 1, verified: false });
   });
 
+  it("fails closed for challenges created before endpoint revision migration", async () => {
+    const target = await fixture();
+    const challenge = await issue(target);
+    // Simulate a pre-0034 row that has no endpoint binding.
+    await db.update(serverClaimChallenges).set({ endpointRevision: null })
+      .where(eq(serverClaimChallenges.id, challenge.id));
+    await expect(consume(target, challenge)).rejects.toMatchObject({
+      statusCode: 409,
+    });
+    const [stored] = await db.select().from(serverClaimChallenges)
+      .where(eq(serverClaimChallenges.id, challenge.id));
+    expect(stored?.consumedAt).toBeNull();
+  });
+
+  it("rejects legacy consumed proof during moderation without changing queue status", async () => {
+    const target = await fixture();
+    const challenge = await issue(target);
+    const completed = await consume(target, challenge);
+    // Existing consumed rows are NULL after schema upgrade; they cannot
+    // transfer ownership without a new endpoint-bound challenge.
+    await db.update(serverClaimChallenges).set({ endpointRevision: null })
+      .where(eq(serverClaimChallenges.id, challenge.id));
+    await expect(verificationRepository.resolveRequest({
+      id: completed.verificationRequest.id,
+      reviewerId: target.reviewerId,
+      decision: "approved",
+    })).rejects.toMatchObject({ statusCode: 409 });
+    const [request] = await db.select().from(verificationRequests)
+      .where(eq(verificationRequests.id, completed.verificationRequest.id));
+    expect(request?.status).toBe("pending");
+    const server = await serverRepository.findById(target.serverId);
+    expect(server?.isVerified).toBe(false);
+    expect(server?.ownerId).toBeFalsy();
+  });
+
   it("preserves a fresh control proof after editorial-only updates", async () => {
     const target = await fixture();
     const challenge = await issue(target);
