@@ -29,7 +29,7 @@ const NOW = new Date("2026-10-09T09:00:00Z");
 const token = "raw-session-token";
 const storedToken = createHash("sha256").update(token).digest("hex");
 
-function joinedRow(expiresAt: Date, id = "usr_1", sessionId = "ses_1") {
+function joinedRow(expiresAt: Date, id = "usr_1", sessionId = "ses_1", fullSession = false) {
   const session = {
     id: sessionId,
     userId: id,
@@ -53,10 +53,10 @@ function joinedRow(expiresAt: Date, id = "usr_1", sessionId = "ses_1") {
     updatedAt: NOW.toISOString(),
   };
   return [
-    ...Object.keys(getTableColumns(sessions)).map(
-      (key) => session[key as keyof typeof session] ?? null,
-    ),
-    ...Object.keys(getTableColumns(users)).map((key) => user[key as keyof typeof user] ?? null),
+    ...(fullSession
+      ? Object.keys(getTableColumns(sessions)).map(key => session[key as keyof typeof session] ?? null)
+      : [sessionId, expiresAt.toISOString()]),
+    ...Object.keys(getTableColumns(users)).filter(key => key !== "passwordHash").map((key) => user[key as keyof typeof user] ?? null),
   ];
 }
 
@@ -73,7 +73,7 @@ describe("authenticated session identity", () => {
   it("returns a sanitized user and session ID from one real Drizzle query", async () => {
     state.rows = [joinedRow(new Date(NOW.getTime() + 1))];
     const identity = await authService.getSessionIdentity(token);
-    expect(identity).toMatchObject({ user: { id: "usr_1" }, sessionId: "ses_1" });
+    expect(identity).toMatchObject({ user: { id: "usr_1", role: "user", isVerified: false, emailVerified: false, twoFactorEnabled: false }, sessionId: "ses_1" });
     expect(Object.keys(identity ?? {})).toEqual(["user", "sessionId"]);
     const serialized = JSON.stringify(identity);
     for (const secret of [
@@ -87,6 +87,13 @@ describe("authenticated session identity", () => {
     }
     expect(state.queries).toHaveLength(1);
     expect(state.queries[0]?.sql).toContain('inner join "users"');
+    expect(state.queries[0]?.sql).not.toContain('"password_hash"');
+    const selection = state.queries[0].sql.split(' from ')[0];
+    for (const column of ['"sessions"."token"', '"sessions"."ip_address"', '"sessions"."user_agent"', '"sessions"."user_id"', '"sessions"."created_at"']) {
+      expect(selection).not.toContain(column);
+    }
+    expect(selection).toContain('"sessions"."id"');
+    expect(selection).toContain('"sessions"."expires_at"');
     expect(state.queries[0]?.params).toEqual([storedToken, 1]);
   });
 
@@ -130,4 +137,38 @@ describe("authenticated session identity", () => {
       createHash("sha256").update("second-token").digest("hex"),
     );
   });
+});
+
+// Legacy callers still receive the full private session record when they need it.
+describe("legacy session lookup compatibility", () => {
+  it("keeps the full session while excluding the user's password hash in SQL", async () => {
+    const { sessionRepository } = await import("../packages/db/src/repositories/sessions");
+    state.rows = [joinedRow(new Date(NOW.getTime() + 1000), "usr_1", "ses_1", true)];
+    expect(await sessionRepository.findValidSession(token)).toMatchObject({
+      session: { id: "ses_1", token: storedToken, ipAddress: "203.0.113.10", userAgent: "Private Browser" },
+      user: { id: "usr_1", role: "user" },
+    });
+    expect(state.queries[0].sql).not.toContain('"password_hash"');
+    expect(state.queries[0].sql).toContain('"sessions"."user_agent"');
+    expect(state.queries[0].params).toEqual([storedToken, 1]);
+  });
+  it.each([-1, 0])("still denies expired legacy sessions (%s ms)", async offset => {
+    const { sessionRepository } = await import("../packages/db/src/repositories/sessions");
+    state.rows = [joinedRow(new Date(NOW.getTime() + offset), "usr_1", "ses_1", true)];
+    expect(await sessionRepository.findValidSession(token)).toBeNull();
+  });
+});
+
+it.each(["not-a-date", "infinity", "-infinity"])("fails closed for malformed or non-finite identity expiry %s", async value => {
+  const row = joinedRow(new Date(NOW.getTime() + 1000));
+  row[1] = value;
+  state.rows = [row];
+  expect(await authService.getSessionIdentity(token)).toBeNull();
+});
+it.each(["not-a-date", "infinity", "-infinity"])("fails closed for malformed or non-finite legacy expiry %s", async value => {
+  const { sessionRepository } = await import("../packages/db/src/repositories/sessions");
+  const row = joinedRow(new Date(NOW.getTime() + 1000), "usr_1", "ses_1", true);
+  row[Object.keys(getTableColumns(sessions)).indexOf("expiresAt")] = value;
+  state.rows = [row];
+  expect(await sessionRepository.findValidSession(token)).toBeNull();
 });

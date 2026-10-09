@@ -44,6 +44,7 @@ export function formatHistoryAmount(
       currency,
     });
     const fractionDigits = formatter.resolvedOptions().maximumFractionDigits;
+    if (fractionDigits === undefined) return "—";
     return formatter.format(minorUnits / 10 ** fractionDigits);
   } catch {
     return "—";
@@ -54,7 +55,7 @@ export function orderStatusLabel(
   status: string,
   labels: Readonly<Record<OrderStatus, string>>,
 ): string {
-  return Object.prototype.hasOwnProperty.call(labels, status)
+  return Object.hasOwn(labels, status)
     ? labels[status as OrderStatus]
     : status;
 }
@@ -63,7 +64,7 @@ export function licenseStatusLabel(
   status: string,
   labels: Readonly<Record<LicenseStatus, string>>,
 ): string {
-  return Object.prototype.hasOwnProperty.call(labels, status)
+  return Object.hasOwn(labels, status)
     ? labels[status as LicenseStatus]
     : status;
 }

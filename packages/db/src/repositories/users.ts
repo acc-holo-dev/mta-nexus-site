@@ -3,13 +3,7 @@ import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { users } from "../schema";
 import type { User } from "@nexus/domain";
-
-type UserRow = typeof users.$inferSelect;
-
-function toPublicUser(row: UserRow): User {
-  const { passwordHash: _, ...user } = row;
-  return user as unknown as User;
-}
+import { publicUserColumns, toUserWithoutPassword } from "./public-user-projection";
 
 export class UserRepository {
   async listModeratorIds(): Promise<string[]> {
@@ -29,16 +23,16 @@ export class UserRepository {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 50)
       : 50;
-    const rows = await db.select().from(users).where(and(
+    const rows = await db.select(publicUserColumns).from(users).where(and(
       eq(users.role, "developer"),
       or(ilike(users.username, pattern), ilike(users.displayName, pattern), ilike(users.bio, pattern)),
     )).orderBy(desc(users.updatedAt), desc(users.id)).limit(boundedLimit);
-    return rows.map(toPublicUser);
+    return rows.map(toUserWithoutPassword);
   }
 
   async findById(id: string): Promise<User | null> {
-    const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
-    return rows[0] ? toPublicUser(rows[0]) : null;
+    const rows = await db.select(publicUserColumns).from(users).where(eq(users.id, id)).limit(1);
+    return rows[0] ? toUserWithoutPassword(rows[0]) : null;
   }
 
   async findByEmail(email: string): Promise<(User & { passwordHash?: string | null }) | null> {
@@ -47,8 +41,8 @@ export class UserRepository {
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    const rows = await db.select().from(users).where(eq(users.username, username)).limit(1);
-    return rows[0] ? toPublicUser(rows[0]) : null;
+    const rows = await db.select(publicUserColumns).from(users).where(eq(users.username, username)).limit(1);
+    return rows[0] ? toUserWithoutPassword(rows[0]) : null;
   }
 
   async create(user: {
@@ -80,8 +74,8 @@ export class UserRepository {
       updatedAt: new Date(),
     };
 
-    const rows = await db.insert(users).values(values).returning();
-    return toPublicUser(rows[0]);
+    const rows = await db.insert(users).values(values).returning(publicUserColumns);
+    return toUserWithoutPassword(rows[0]);
   }
 
   async update(id: string, updates: Partial<User>): Promise<User | null> {
@@ -89,8 +83,8 @@ export class UserRepository {
       .update(users)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(users.id, id))
-      .returning();
-    return rows[0] ? toPublicUser(rows[0]) : null;
+      .returning(publicUserColumns);
+    return rows[0] ? toUserWithoutPassword(rows[0]) : null;
   }
 
   async updatePassword(id: string, passwordHash: string): Promise<boolean> {
@@ -103,7 +97,7 @@ export class UserRepository {
   }
 
   async listAll(limit?: number): Promise<User[]> {
-    const query = db.select().from(users);
+    const query = db.select(publicUserColumns).from(users);
     const boundedLimit =
       limit === undefined
         ? undefined
@@ -111,7 +105,7 @@ export class UserRepository {
           ? Math.min(Math.max(Math.floor(limit), 1), 100)
           : 100;
     const rows = boundedLimit === undefined ? await query : await query.limit(boundedLimit);
-    return rows.map(toPublicUser);
+    return rows.map(toUserWithoutPassword);
   }
 
   async listDevelopers(limit = 100): Promise<User[]> {
@@ -119,11 +113,11 @@ export class UserRepository {
       ? Math.min(Math.max(Math.floor(limit), 1), 100)
       : 100;
     const rows = await db
-      .select()
+      .select(publicUserColumns)
       .from(users)
       .where(or(eq(users.role, "developer"), eq(users.role, "admin")))
       .limit(boundedLimit);
-    return rows.map(toPublicUser);
+    return rows.map(toUserWithoutPassword);
   }
 }
 

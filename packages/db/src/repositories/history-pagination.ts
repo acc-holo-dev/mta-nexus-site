@@ -2,7 +2,7 @@
  * Shared bounded pagination for legacy, read-only financial history.
  * Never accept a client-supplied page size or an unbounded history query.
  */
-export const HISTORY_PAGE_SIZE = 20;
+const HISTORY_PAGE_SIZE = 20;
 
 export function historyPageBounds(total: number, requestedPage = 1) {
   if (!Number.isSafeInteger(total) || total < 0) {

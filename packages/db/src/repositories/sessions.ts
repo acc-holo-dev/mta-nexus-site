@@ -3,6 +3,7 @@ import { and, desc, eq, gt, ne } from "drizzle-orm";
 import { db } from "../client";
 import { sessions, users } from "../schema";
 import type { User } from "@nexus/domain";
+import { publicUserColumns, toUserWithoutPassword } from "./public-user-projection";
 
 export interface SessionRecord {
   id: string;
@@ -21,6 +22,11 @@ export type SessionSummary = Pick<
 
 export function digestSessionToken(token: string): string {
   return crypto.createHash("sha256").update(token, "utf8").digest("hex");
+}
+
+function hasLiveExpiry(expiresAt: Date): boolean {
+  const time = new Date(expiresAt).getTime();
+  return Number.isFinite(time) && time > Date.now();
 }
 
 export class SessionRepository {
@@ -46,11 +52,28 @@ export class SessionRepository {
     return rows[0] as SessionRecord;
   }
 
+  async findValidIdentity(token: string): Promise<{ sessionId: string; user: User } | null> {
+    const rows = await db
+      .select({
+        sessionId: sessions.id,
+        expiresAt: sessions.expiresAt,
+        user: publicUserColumns,
+      })
+      .from(sessions)
+      .innerJoin(users, eq(sessions.userId, users.id))
+      .where(eq(sessions.token, digestSessionToken(token)))
+      .limit(1);
+
+    const row = rows[0];
+    if (!row || !hasLiveExpiry(row.expiresAt)) return null;
+    return { sessionId: row.sessionId, user: toUserWithoutPassword(row.user) };
+  }
+
   async findValidSession(token: string): Promise<{ session: SessionRecord; user: User } | null> {
     const rows = await db
       .select({
         session: sessions,
-        user: users,
+        user: publicUserColumns,
       })
       .from(sessions)
       .innerJoin(users, eq(sessions.userId, users.id))
@@ -59,13 +82,12 @@ export class SessionRepository {
 
     if (!rows.length) return null;
     const session = rows[0].session as SessionRecord;
-    if (new Date(session.expiresAt).getTime() <= Date.now()) {
+    if (!hasLiveExpiry(session.expiresAt)) {
       return null;
     }
-    const { passwordHash: _, ...publicUser } = rows[0].user;
     return {
       session,
-      user: publicUser as unknown as User,
+      user: toUserWithoutPassword(rows[0].user),
     };
   }
 

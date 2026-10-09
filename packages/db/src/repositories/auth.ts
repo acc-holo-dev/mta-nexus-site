@@ -4,6 +4,7 @@ import { auditEvents, organizationMembers, organizations, sessions, users } from
 import { ConflictError, ForbiddenError, NotFoundError, UnauthorizedError } from "@nexus/domain";
 import type { AuditEvent, User } from "@nexus/domain";
 import { digestSessionToken } from "./sessions";
+import { publicUserColumns, toUserWithoutPassword } from "./public-user-projection";
 
 interface SessionWrite {
   id: string;
@@ -43,11 +44,11 @@ export class AuthRepository {
           createdAt: new Date(),
           updatedAt: new Date(),
         })
-        .returning();
+        .returning(publicUserColumns);
 
       await tx.insert(sessions).values(this.sessionValues(data.session));
       await tx.insert(auditEvents).values({ ...data.audit, createdAt: new Date() });
-      return rows[0] as unknown as User;
+      return toUserWithoutPassword(rows[0]);
     });
   }
 
@@ -120,7 +121,7 @@ export class AuthRepository {
     return db.transaction(async (tx) => {
       // Serialize changes to this user's active context. Authorization is checked
       // after the user lock, together with the context write and audit insertion.
-      const [user] = await tx.select().from(users)
+      const [user] = await tx.select(publicUserColumns).from(users)
         .where(eq(users.id, data.userId)).for("update");
       if (!user) throw new NotFoundError("User", data.userId);
 
@@ -146,11 +147,11 @@ export class AuthRepository {
       }
 
       const previousContextId = user.activeContextId ?? "personal";
-      if (previousContextId === data.contextId) return user as User;
+      if (previousContextId === data.contextId) return toUserWithoutPassword(user);
 
       const [updated] = await tx.update(users)
         .set({ activeContextId: data.contextId, updatedAt: new Date() })
-        .where(eq(users.id, data.userId)).returning();
+        .where(eq(users.id, data.userId)).returning(publicUserColumns);
       await tx.insert(auditEvents).values({
         id: data.auditId,
         actorId: data.userId,
@@ -161,7 +162,7 @@ export class AuthRepository {
         details: { from: previousContextId, to: data.contextId },
         createdAt: new Date(),
       });
-      return updated as User;
+      return toUserWithoutPassword(updated);
     });
   }
 

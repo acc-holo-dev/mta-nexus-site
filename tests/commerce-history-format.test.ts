@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { historyPageBounds } from "../packages/db/src/repositories/history-pagination";
 import {
   effectiveLicenseStatus,
@@ -40,6 +40,15 @@ describe("bounded private commerce history", () => {
     expect(formatHistoryAmount(NaN, "USD", "en")).toBe("—");
     expect(formatHistoryAmount(13.5, "USD", "en")).toBe("—");
     expect(formatHistoryAmount(3, "INVALID", "en")).toBe("—");
+  });
+
+  it("fails closed when the formatter does not report currency fraction digits", () => {
+    const options = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).resolvedOptions();
+    const spy = vi.spyOn(Intl.NumberFormat.prototype, "resolvedOptions")
+      .mockReturnValue({ ...options, maximumFractionDigits: undefined });
+    try {
+      expect(formatHistoryAmount(12345, "USD", "en")).toBe("—");
+    } finally { spy.mockRestore(); }
   });
 
   it("calculates effective expiry without changing the stored license status", () => {

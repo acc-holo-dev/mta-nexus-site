@@ -272,12 +272,48 @@ Legacy `getSession` and `getCurrentSessionId` APIs remain available.
 Session revocation repositories still lock and revalidate the current actor
 inside their transaction; those checks are essential and were not removed.
 Private no-store headers, current-session protection, endpoint/session ownership
-and Web Push mutation rate limits remain enforced. Nine new identity tests use
+and Web Push mutation rate limits remain enforced. Identity tests use
 the real session repository and Drizzle builder with a synthetic pg-proxy driver
 to verify one query, missing/expired/revoked sessions, lookup errors, sanitization
 and independent lookups. HTTP/SSR tests assert one identity request per surface;
 three Web Push cases reject absent identities before subscription reads/writes.
 These checks are not real PostgreSQL concurrency or browser acceptance.
+
+For simultaneous contributors, keep source edits in separate worktrees and record
+the main SHA used as the base. Before publication, re-read main; if it advanced,
+preserve the new commits, integrate overlapping changes and validate the combined
+tree. Publish with an expected-head check and no force update. A stale expected
+SHA is a reason to reconcile, never to overwrite another contributor's work.
+
+Credential-free user projections now apply at the database boundary: profile
+lookups, developer search/listing, user lists, user creation/update RETURNING,
+registration RETURNING and locked context-switch reads/RETURNING exclude
+`password_hash`. A shared typed projection follows the existing user schema and
+retains the other account fields; the mapper defensively strips an extra hash
+returned by an adapter. This is credential minimization, not an anonymous public
+profile serializer: email/account fields still follow their existing service policy.
+
+The session identity lookup selects only session ID, expiry and credential-free
+user columns. It no longer retrieves the stored session token, IP, user agent,
+its duplicated user ID or creation date; the token digest remains a bound WHERE value. Legacy
+full-session lookup stays available for workflows that need its metadata. Both
+lookups reject malformed/non-finite expiry as well as expiry at or before now.
+No identity is cached across requests. Credential lookup by email and password
+revalidation under the login/password-change user lock still read the required
+hash. Context locks, current ownership/membership checks and auditing remain.
+
+The public-user query suite and expanded identity suite execute the installed
+Drizzle builder/mapper through pg-proxy, covering field mapping, hash exclusion,
+registration, context owner/no-op/denied branches, password revalidation, session
+privacy, legacy compatibility and expiry guards. Real PostgreSQL transaction,
+login/recovery and browser acceptance remain separate required gates. No schema
+migration, new dependency or production latency percentage is claimed. See
+[Drizzle column exclusion](https://orm.drizzle.team/docs/guides/include-or-exclude-columns).
+The pinned Drizzle version exposes the typed helper as `getTableColumns`.
+The combined verification also covers the concurrent read-only commerce archive
+pages: their anonymous surfaces now expect a sign-in prompt, currency formatting
+fails closed when fraction-digit metadata is absent, and unused/type-only exports
+and imports follow the local checks. Checkout and license activation remain disabled.
 
 The saved page starts MTA directory loading as soon as its public-server query
 finishes, independently of the saved-resource query. It still waits for server

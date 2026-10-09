@@ -64,6 +64,17 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 
 ### P1-2. GitHub-hosted runner не начинает `plan` job
 
+Подготовлен единый credential-free SQL projection для пользователей и
+узкий session identity lookup: account/profile/context запросы не читают
+password_hash, identity не читает private session metadata. Legacy lookup и
+password revalidation под lock сохранены. Некорректный/non-finite expiry
+отклоняется. SQL-builder и row-mapper проверки не заменяют PostgreSQL/browser
+приёмку; она остаётся заблокирована hosted runner.
+Срез совмещён с параллельными изменениями read-only commerce history и правкой
+landmark accessibility. Восстановлены актуальный anonymous-page контракт,
+типобезопасный currency formatter и проверки неиспользуемого кода.
+Локально прошли 1534 unit и 200 tooling проверок; реальная DB приёмка остаётся открытой.
+
 Последний проверенный CI для `d4be469` (run `37914732835`) снова завершился
 до выполнения шагов: `plan` failure, steps=0, runner_id=0; DB job skipped.
 Причина отказа hosted runner по доступным данным не установлена.

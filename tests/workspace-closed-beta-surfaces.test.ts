@@ -1,3 +1,4 @@
+import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
@@ -116,15 +117,13 @@ describe("closed-beta workspace behavior", () => {
     expect(en.noServers).not.toBe(ru.noServers);
   });
 
-  it("redirects every legacy commerce workspace route to the closed-beta workspace", () => {
-    LicensesPage();
-    PurchasesPage();
-    SalesPage();
-
-    expect(state.redirects).toEqual([
-      "/workspace",
-      "/workspace",
-      "/workspace",
-    ]);
+  it("keeps read-only commerce archives behind sign-in for anonymous visitors", async () => {
+    const input = { searchParams: Promise.resolve({}) };
+    for (const page of [LicensesPage, PurchasesPage, SalesPage]) {
+      const html = renderToStaticMarkup(await page(input));
+      expect(html).toContain("Sign in to view your private history");
+      expect(html).toContain('href="/auth/login"');
+    }
+    expect(state.redirects).toEqual([]);
   });
 });
