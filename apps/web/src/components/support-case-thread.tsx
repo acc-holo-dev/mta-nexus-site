@@ -4,7 +4,7 @@ import { ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { useNexusLocale } from "./locale-context";
-import { clearSupportRetry, reserveSupportReplyRetry } from "../lib/support-retry";
+import { clearSupportRetry, reserveSupportReplyRetry, resolveSupportRetryActorScope } from "../lib/support-retry";
 import { confirmSupportReply, confirmSupportStatusChanged, parseSupportThread, type SupportCaseData, type SupportMessageData } from "../lib/support-response";
 
 export function SupportCaseThread({
@@ -99,7 +99,8 @@ export function SupportCaseThread({
     setSending(true);
     setError(null);
     try {
-      const attempt = await reserveSupportReplyRetry(caseId, reply.trim(), expectedStatus);
+      const actorScope = await resolveSupportRetryActorScope();
+      const attempt = await reserveSupportReplyRetry(caseId, reply.trim(), expectedStatus, { actorScope });
       const { key: requestKey, payload } = attempt;
       pendingReply.current = { payload, key: requestKey };
       const response = await fetch(
@@ -119,7 +120,7 @@ export function SupportCaseThread({
       const data = await response.json().catch(() => null);
       if (response.status === 409) {
         // A definitive conflict means this request was not committed.
-        clearSupportRetry("reply:" + caseId, requestKey);
+        clearSupportRetry("reply:" + caseId, requestKey, { actorScope });
         pendingReply.current = null;
         if (await load()) setError(copy.replyConflict);
         return;
@@ -134,7 +135,7 @@ export function SupportCaseThread({
         throw new Error(copy.replyError);
       }
 
-      clearSupportRetry("reply:" + caseId, requestKey);
+      clearSupportRetry("reply:" + caseId, requestKey, { actorScope });
       pendingReply.current = null;
       setSupportCase(confirmed.supportCase);
       if (data?.replayed === true) {

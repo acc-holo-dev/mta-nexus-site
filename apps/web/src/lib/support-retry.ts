@@ -1,8 +1,11 @@
 /**
  * Recover an ambiguous support mutation after a same-tab reload. Persist only
  * an opaque key, the SHA-256 of the normalized payload, and non-sensitive
- * status/timing metadata: never persist subject or message text.
+ * status/timing metadata: never persist subject or message text. Recovery is
+ * additionally scoped to the authenticated actor, never to a shared browser tab.
  */
+import { privateApiRequest } from "./private-api-request";
+
 export type SupportRetryStatus = "open" | "resolved" | "closed";
 export type SupportRetryStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
@@ -21,15 +24,18 @@ type StoredAttempt = {
 };
 
 type RetryOptions = {
+  /** Opaque SHA-256 actor discriminator; null disables persistent retry recovery. */
+  actorScope?: string | null;
   storage?: SupportRetryStorage | null;
   now?: number;
   newKey?: () => string;
 };
 
-const PREFIX = "nexus:support:retry:v1:";
+const PREFIX = "nexus:support:retry:v2:";
 const TTL_MS = 24 * 60 * 60 * 1000;
 const UUID_V4 = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/u;
 const DIGEST = /^[a-f0-9]{64}$/u;
+const USER_ID = /^usr_[a-f0-9]{24}$/u;
 const inMemory = new Map<string, string>();
 const fallbackStore: SupportRetryStorage = {
   getItem: (key) => inMemory.get(key) ?? null,
@@ -46,8 +52,8 @@ function getStorage(options: RetryOptions): SupportRetryStorage {
   }
 }
 
-function slotFor(scope: string): string {
-  return PREFIX + scope;
+function slotFor(actorScope: string, scope: string): string {
+  return PREFIX + actorScope + ":" + scope;
 }
 
 function isStatus(value: unknown): value is SupportRetryStatus {
@@ -89,16 +95,40 @@ async function digest(payload: string): Promise<string> {
   return Array.from(new Uint8Array(hash), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+/**
+ * Resolve identity immediately before submitting a support mutation. A failed
+ * or unauthenticated session check still permits the server to handle the
+ * request, but deliberately disables same-tab retry restoration. Never store
+ * or expose session tokens, account names, or raw user IDs as storage keys.
+ */
+export async function resolveSupportRetryActorScope(): Promise<string | null> {
+  try {
+    const response = await fetch("/api/auth/session", privateApiRequest());
+    if (!response.ok) return null;
+    const data = await response.json();
+    if (
+      data?.authenticated !== true ||
+      typeof data.user?.id !== "string" ||
+      !USER_ID.test(data.user.id)
+    ) return null;
+    return digest("support-retry:v2:" + data.user.id);
+  } catch {
+    return null;
+  }
+}
+
 async function reserve(
   scope: string,
   payloadAt: (status: SupportRetryStatus | null) => string,
   observedStatus: SupportRetryStatus | null,
   options: RetryOptions = {},
 ): Promise<SupportRetryAttempt> {
-  const store = getStorage(options);
-  const slot = slotFor(scope);
+  // Missing/invalid identity must not fall back to a cross-account slot.
+  const actorScope = options.actorScope;
+  const store = actorScope && DIGEST.test(actorScope) ? getStorage(options) : null;
+  const slot = store && actorScope ? slotFor(actorScope, scope) : null;
   const now = options.now ?? Date.now();
-  const old = readAttempt(store, slot, now);
+  const old = store && slot ? readAttempt(store, slot, now) : null;
   if (old) {
     const oldPayload = payloadAt(old.observedStatus);
     if (await digest(oldPayload) === old.digest) {
@@ -108,13 +138,15 @@ async function reserve(
   const payload = payloadAt(observedStatus);
   const key = (options.newKey ?? (() => crypto.randomUUID()))();
   if (!UUID_V4.test(key)) throw new Error("Invalid support retry key generator");
-  writeAttempt(store, slot, {
-    version: 1,
-    key,
-    digest: await digest(payload),
-    observedStatus,
-    expiresAt: now + TTL_MS,
-  });
+  if (store && slot) {
+    writeAttempt(store, slot, {
+      version: 1,
+      key,
+      digest: await digest(payload),
+      observedStatus,
+      expiresAt: now + TTL_MS,
+    });
+  }
   return { key, payload, recovered: false };
 }
 
@@ -146,8 +178,10 @@ export function clearSupportRetry(
   key: string,
   options: RetryOptions = {},
 ): void {
+  const actorScope = options.actorScope;
+  if (!actorScope || !DIGEST.test(actorScope)) return;
   const store = getStorage(options);
-  const slot = slotFor(scope);
+  const slot = slotFor(actorScope, scope);
   const current = readAttempt(store, slot, options.now ?? Date.now());
   if (current?.key !== key) return;
   try { store.removeItem(slot); } catch { /* Non-persistent storage is optional. */ }
