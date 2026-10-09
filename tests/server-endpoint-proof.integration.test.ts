@@ -78,6 +78,36 @@ async function consume(
 }
 
 describe("server control proof is bound to game endpoint revision (PostgreSQL)", () => {
+  it("returns the endpoint read within the issued-challenge transaction", async () => {
+    const target = await fixture();
+    const challenge = await issue(target);
+    expect(challenge.server).toEqual({
+      id: target.serverId,
+      name: "Endpoint Proof Server",
+      ...target.endpoint,
+    });
+  });
+
+  it("rejects a future-dated proof before writing a verification request", async () => {
+    const target = await fixture();
+    const challenge = await issue(target);
+    await expect(serverClaimChallengeRepository.consumeVerifiedProof({
+      id: challenge.id,
+      serverId: target.serverId,
+      requesterId: target.requesterId,
+      token: challenge.token,
+      expectedEndpoint: target.endpoint,
+      sourceFetchedAt: new Date(Date.now() + 5 * 60_000),
+      verificationRequestId: `ver_future_${target.suffix}`,
+      auditId: `aud_future_${target.suffix}`,
+    })).rejects.toMatchObject({
+      statusCode: 503, code: "MTA_DIRECTORY_TIMESTAMP_INVALID",
+    });
+    const [stored] = await db.select().from(serverClaimChallenges)
+      .where(eq(serverClaimChallenges.id, challenge.id));
+    expect(stored?.consumedAt).toBeNull();
+  });
+
   it("rejects a challenge after A -> B -> A address changes", async () => {
     const target = await fixture();
     const challenge = await issue(target);

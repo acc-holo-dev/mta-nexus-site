@@ -105,6 +105,12 @@ describe("server claim service behavior", () => {
       id: "scc_1",
       token,
       expiresAt: new Date("2026-10-08T00:10:00.000Z"),
+      server: {
+        id: "srv_1",
+        name: "Nexus Racing",
+        ipAddress: "203.0.113.20",
+        port: 22003,
+      },
     });
     mocks.assertLive.mockResolvedValue(undefined);
     mocks.matchesEndpoint.mockReturnValue(true);
@@ -149,6 +155,23 @@ describe("server claim service behavior", () => {
       serverId: "srv_1",
       requesterId: "usr_claimant",
       auditId: "aud_test",
+    });
+  });
+
+  it("uses the endpoint locked by the repository, not a stale pre-read", async () => {
+    mocks.issue.mockResolvedValueOnce({
+      id: "scc_new",
+      token,
+      expiresAt: new Date("2026-10-08T00:10:00.000Z"),
+      server: {
+        id: "srv_1", name: "Updated Network Endpoint",
+        ipAddress: "198.51.100.100", port: 22100,
+      },
+    });
+    const challenge = await serverClaimService.issueChallenge("srv_1", requester);
+    expect(challenge.server).toEqual({
+      id: "srv_1", name: "Updated Network Endpoint",
+      ipAddress: "198.51.100.100", port: 22100,
     });
   });
 

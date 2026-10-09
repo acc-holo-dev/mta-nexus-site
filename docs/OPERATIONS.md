@@ -296,6 +296,13 @@ snapshot from the previous address cannot re-populate a new endpoint.
 Same-address and editorial-only updates retain live data. PostgreSQL
 integration checks have been added but need an executable runner.
 
+The MTA challenge issuance response now uses the server endpoint read
+inside the issuance transaction, avoiding inconsistent UI instructions if
+the owner changed IP/port after an earlier service pre-read. Proof
+consumption rejects non-finite or more than 30s future timestamps against
+the database transaction clock before persisting a verification request.
+Repository/service and PostgreSQL regression cases cover both guards.
+
 Server ownership proof is now bound to a durable endpointRevision saved at
 challenge issue time. A real IP/port change atomically increments revision
 and clears the verified badge; editorial edits do neither. At proof

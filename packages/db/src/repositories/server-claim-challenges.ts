@@ -41,7 +41,12 @@ export class ServerClaimChallengeRepository {
     serverId: string;
     requesterId: string;
     auditId: string;
-  }): Promise<{ id: string; token: string; expiresAt: Date }> {
+  }): Promise<{
+    id: string;
+    token: string;
+    expiresAt: Date;
+    server: { id: string; name: string; ipAddress: string; port: number };
+  }> {
     const token = generateServerClaimToken();
     const tokenDigest = digestServerClaimToken(token);
 
@@ -125,7 +130,17 @@ export class ServerClaimChallengeRepository {
         createdAt,
       });
 
-      return Object.freeze({ id, token, expiresAt });
+      return Object.freeze({
+        id, token, expiresAt,
+        // The server returned to the caller must come from the same locked
+        // row as the challenge, not an earlier service-layer read.
+        server: Object.freeze({
+          id: server.id,
+          name: server.name,
+          ipAddress: server.ipAddress,
+          port: server.port,
+        }),
+      });
     });
   }
 
@@ -226,6 +241,18 @@ export class ServerClaimChallengeRepository {
       const consumedAt = new Date(String(clock.now));
       if (challenge.expiresAt <= consumedAt) {
         throw invalidChallenge();
+      }
+      // A bogus future timestamp could otherwise satisfy the issued-after
+      // challenge constraint and persist a forged proof date.
+      if (
+        !Number.isFinite(input.sourceFetchedAt.getTime()) ||
+        input.sourceFetchedAt.getTime() > consumedAt.getTime() + 30_000
+      ) {
+        throw new AppError(
+          "MTA directory observation timestamp is invalid or in the future.",
+          503,
+          "MTA_DIRECTORY_TIMESTAMP_INVALID",
+        );
       }
       if (input.sourceFetchedAt < challenge.createdAt) {
         throw new AppError(

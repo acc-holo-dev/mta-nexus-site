@@ -78,12 +78,8 @@ export const serverClaimService = {
       challengeId: challenge.id,
       token: challenge.token,
       expiresAt: challenge.expiresAt.toISOString(),
-      server: Object.freeze({
-        id: server.id,
-        name: server.name,
-        ipAddress: server.ipAddress,
-        port: server.port,
-      }),
+      // Repository returns the endpoint read under the challenge row lock.
+      server: challenge.server,
     });
   },
 
