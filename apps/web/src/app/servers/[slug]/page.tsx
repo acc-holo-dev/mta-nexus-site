@@ -77,7 +77,7 @@ export default async function ServerDetailPage({
 
   const [directory, history, serverUpdates] = await Promise.all([
     mtaMasterDirectoryService.getDirectory().catch(() => null),
-    serverHistoryService.getHistory(server.id, "24h").catch(() => null),
+    serverHistoryService.getHistoryForServer(server, "24h").catch(() => null),
     contentService.listServerUpdates(server.id, 6).catch(() => null),
   ]);
 

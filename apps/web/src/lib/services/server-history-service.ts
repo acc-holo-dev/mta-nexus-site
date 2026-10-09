@@ -2,7 +2,7 @@ import {
   serverObservationRepository,
   serverRepository,
 } from "@nexus/db";
-import type { ServerObservation } from "@nexus/domain";
+import type { Server, ServerObservation } from "@nexus/domain";
 
 export const serverHistoryWindows = {
   "24h": 24,
@@ -63,13 +63,25 @@ export function summarizeServerObservations(
   });
 }
 
+type ServerHistoryListing = Pick<Server, "id" | "slug" | "name" | "visibility">;
+
 export const serverHistoryService = {
   async getHistory(
     serverId: string,
     window: ServerHistoryWindow,
   ) {
     const server = await serverRepository.findById(serverId);
-    if (!server || server.visibility === "private") return null;
+    if (!server) return null;
+    return this.getHistoryForServer(server, window);
+  },
+
+  // SSR already fetched this server for its detail page. Avoid a redundant
+  // SELECT here; enforce the same visibility boundary as the public API.
+  async getHistoryForServer(
+    server: ServerHistoryListing,
+    window: ServerHistoryWindow,
+  ) {
+    if (server.visibility === "private") return null;
 
     const hours = serverHistoryWindows[window];
     const observations = await serverObservationRepository.listWindow(
