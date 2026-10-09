@@ -55,6 +55,11 @@ const findOrganization = vi.hoisted(() =>
       : null,
   ),
 );
+const findSummaries = vi.hoisted(() =>
+  vi.fn(async (ids: readonly string[]): Promise<Array<{ id: string; name: string; slug: string }>> => ids
+    .filter(id => id === "org_member")
+    .map(id => ({ id, name: "Member Org", slug: "member-org" }))),
+);
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
@@ -68,6 +73,7 @@ vi.mock("@nexus/db", () => ({
     listOwnedByUser: owned,
     listUserMemberships: memberships,
     findById: findOrganization,
+    findSummariesByIds: findSummaries,
   },
 }));
 
@@ -162,10 +168,70 @@ describe("account context switching HTTP contract", () => {
       "usr_context",
       50,
     );
-    expect(findOrganization).toHaveBeenCalledTimes(1);
-    expect(findOrganization).toHaveBeenCalledWith(
-      "org_member",
+    expect(findOrganization).not.toHaveBeenCalled();
+    expect(findSummaries).toHaveBeenCalledExactlyOnceWith(["org_member"]);
+  });
+
+  it.each([0, 1, 50])("reads at most the remaining context capacity with %s owned organizations", async ownerCount => {
+    owned.mockResolvedValueOnce(Array.from({ length: ownerCount }, (_, index) => ({
+      id: `org_owned_${index}`, name: `Owned ${index}`, slug: `owned-${index}`,
+    })));
+    const memberRows = Array.from({ length: 100 }, (_, index) => ({
+      organizationId: `org_member_${index}`, role: index % 2 ? "member" : "admin",
+    }));
+    memberships.mockResolvedValueOnce([
+      ...Array.from({ length: ownerCount }, (_, index) => ({
+        organizationId: `org_owned_${index}`, role: "member",
+      })),
+      ...memberRows,
+    ]);
+    const selected = memberRows.slice(0, 50 - ownerCount);
+    if (selected.length) findSummaries.mockResolvedValueOnce(selected.map(row => ({
+      id: row.organizationId, name: row.organizationId, slug: row.organizationId,
+    })).reverse());
+
+    const response = await GET(getRequest());
+    const body = await response.json();
+    expect(response.status).toBe(200);
+    expectPrivateCorrelation(response);
+    expect(body.contexts).toHaveLength(51);
+    expect(body.contexts.slice(1, ownerCount + 1)).toEqual(
+      Array.from({ length: ownerCount }, (_, index) => expect.objectContaining({
+        id: `org_owned_${index}`, role: "owner",
+      })),
     );
+    expect(body.contexts.slice(ownerCount + 1)).toEqual(selected.map(row => expect.objectContaining({
+      id: row.organizationId, role: row.role,
+    })));
+    expect(findOrganization).not.toHaveBeenCalled();
+    if (selected.length) {
+      expect(findSummaries).toHaveBeenCalledExactlyOnceWith(selected.map(row => row.organizationId));
+    } else {
+      expect(findSummaries).not.toHaveBeenCalled();
+    }
+  });
+
+  it("omits missing membership organizations and falls back from a removed context", async () => {
+    state.user = { id: "usr_context", displayName: "Context User", activeContextId: "org_missing" };
+    memberships.mockResolvedValueOnce([
+      { organizationId: "org_member", role: "admin" },
+      { organizationId: "org_missing", role: "member" },
+    ]);
+    const response = await GET(getRequest());
+    const body = await response.json();
+    expect(body.activeContextId).toBe("personal");
+    expect(body.contexts.map((context: { id: string }) => context.id)).toEqual([
+      "personal", "org_owned", "org_member",
+    ]);
+    expect(findSummaries).toHaveBeenCalledExactlyOnceWith(["org_member", "org_missing"]);
+  });
+
+  it("returns a correlated private 503 if the batch read fails", async () => {
+    findSummaries.mockRejectedValueOnce(new Error("Database unavailable"));
+    const response = await GET(getRequest());
+    expect(response.status).toBe(503);
+    expectPrivateCorrelation(response);
+    await expect(response.json()).resolves.toEqual({ error: "Account contexts are temporarily unavailable." });
   });
 
   it("falls back to personal if the saved context is no longer available", async () => {
@@ -190,6 +256,7 @@ describe("account context switching HTTP contract", () => {
     expectPrivateCorrelation(response);
     expect(owned).not.toHaveBeenCalled();
     expect(memberships).not.toHaveBeenCalled();
+    expect(findSummaries).not.toHaveBeenCalled();
   });
 
   it("validates and rate-limits context switches before mutation", async () => {

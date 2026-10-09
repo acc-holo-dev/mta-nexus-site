@@ -159,6 +159,22 @@ describe("organization owner context switching integration", () => {
     const switched = await authService.switchContext(memberId, organizationId);
     expect(switched.activeContextId).toBe(organizationId);
 
+    const available = await getContexts(
+      new NextRequest("http://nexus.test/api/auth/context", {
+        headers: { cookie: `nexus_session=${token}` },
+      }),
+    );
+    expect(available.status).toBe(200);
+    const availableBody = await available.json();
+    expect(availableBody.activeContextId).toBe(organizationId);
+    expect(availableBody.contexts).toContainEqual({
+      id: organizationId,
+      type: "organization",
+      name: "Context Revoke Organization",
+      slug: `context-revoke-org-${suffix}`,
+      role: "member",
+    });
+
     await db
       .delete(organizationMembers)
       .where(

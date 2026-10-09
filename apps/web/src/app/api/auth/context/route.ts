@@ -92,20 +92,18 @@ export async function GET(request: NextRequest) {
         Math.max(0, 50 - contextsById.size),
       );
 
-    const memberOrganizations = await Promise.all(
-      remainingMemberships.map(async (membership) => ({
-        membership,
-        organization:
-          await organizationRepository.findById(
-            membership.organizationId,
-          ),
-      })),
+    const memberOrganizations = remainingMemberships.length
+      ? await organizationRepository.findSummariesByIds(
+          remainingMemberships.map(membership => membership.organizationId),
+        )
+      : [];
+    const memberOrganizationsById = new Map(
+      memberOrganizations.map(organization => [organization.id, organization]),
     );
 
-    for (const {
-      membership,
-      organization,
-    } of memberOrganizations) {
+    // An IN query can return rows in a different order from the memberships.
+    for (const membership of remainingMemberships) {
+      const organization = memberOrganizationsById.get(membership.organizationId);
       if (!organization) continue;
       contextsById.set(organization.id, {
         id: organization.id,

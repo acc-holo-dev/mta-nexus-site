@@ -255,6 +255,30 @@ See [MDN polling with recursive timeouts](https://developer.mozilla.org/en-US/do
 [Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
 and [React effect cleanup](https://react.dev/reference/react/useEffect).
 
+`GET /api/auth/context` reads membership organization summaries in one parameterized
+`IN` query instead of one `findById` call per membership. The query selects only
+`id`, `name` and `slug` and skips an empty selection. The existing owner/member
+list reads still start together; only the first remaining capacity is selected,
+keeping the response at one personal plus at most 50 organization contexts.
+For `M` selected membership organizations, organization-directory queries change
+from `2 + M` to `2 + (M > 0 ? 1 : 0)`; session/authentication queries are separate.
+This is a query-count reduction, not a PostgreSQL latency benchmark.
+
+Owners keep priority and the owner role when a membership overlaps. The route
+iterates the original selected memberships after indexing the batch by ID, so
+unordered SQL rows do not reorder the response or misassign roles. Missing
+organizations remain omitted and unavailable active contexts fall back to
+personal. Anonymous requests do not read organization data, and private/no-store
+headers and server-side context-switch authorization remain in place.
+Ten HTTP contract tests include capacity boundaries, reversed batch results,
+missing rows and batch failures. Three repository tests use the installed Drizzle
+PostgreSQL proxy driver to verify generated SQL, parameter binding, projection,
+row mapping and the single-query budget for 50 IDs without a database. The
+existing owner/revocation integration test now also checks a membership context
+before revocation; it requires PostgreSQL and is not implied by these unit checks.
+See [Drizzle IN filters](https://orm.drizzle.team/docs/operators#inarray)
+and [partial selections](https://orm.drizzle.team/docs/select#partial-select).
+
 Public developer/user/organization profiles and server details share one
 module-level `React.cache` reader between `generateMetadata` and the page.
 For the same username/slug in one RSC request, the underlying record lookup

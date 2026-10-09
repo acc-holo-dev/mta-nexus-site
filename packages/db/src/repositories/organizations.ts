@@ -1,4 +1,4 @@
-import { desc, eq, ilike, or } from "drizzle-orm";
+import { desc, eq, ilike, inArray, or } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { organizations, organizationMembers } from "../schema";
@@ -48,6 +48,15 @@ export class OrganizationRepository {
   async findById(id: string): Promise<Organization | null> {
         const rows = await db.select().from(organizations).where(eq(organizations.id, id)).limit(1);
     return (rows[0] as unknown as Organization) || null;
+  }
+
+  async findSummariesByIds(ids: readonly string[]): Promise<Pick<Organization, "id" | "name" | "slug">[]> {
+    const uniqueIds = [...new Set(ids)];
+    if (!uniqueIds.length) return [];
+    return db
+      .select({ id: organizations.id, name: organizations.name, slug: organizations.slug })
+      .from(organizations)
+      .where(inArray(organizations.id, uniqueIds));
   }
 
   async findBySlug(slug: string): Promise<Organization | null> {
