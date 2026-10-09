@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
   user: null as null | {
@@ -132,6 +132,8 @@ vi.mock("../apps/web/src/components/server-card", async () => {
 import SavedPage from "../apps/web/src/app/workspace/saved/page";
 
 describe("saved follows page behavior", () => {
+  afterEach(() => vi.useRealTimers());
+
   beforeEach(() => {
     vi.clearAllMocks();
     state.user = null;
@@ -154,6 +156,52 @@ describe("saved follows page behavior", () => {
     expect(mocks.servers).not.toHaveBeenCalled();
     expect(mocks.directory).not.toHaveBeenCalled();
   });
+
+  it.each([false, true])(
+    "starts MTA loading when servers resolve while resources are pending (upstream failure: %s)",
+    async (upstreamFailure) => {
+      vi.useFakeTimers();
+      const startedAt = Date.now();
+      state.user = { id: "usr_saved", username: "saved", role: "user" };
+      mocks.follows.mockResolvedValue([
+        { targetType: "server", targetId: "srv_saved" },
+        { targetType: "product", targetId: "prd_saved" },
+      ]);
+      mocks.products.mockImplementation(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return [{ id: "prd_saved" }];
+      });
+      mocks.servers.mockImplementation(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        return [{ id: "srv_saved" }];
+      });
+      mocks.directory.mockImplementation(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        if (upstreamFailure) throw new Error("MTA unavailable");
+        return { servers: [{ players: 12 }], isStale: false };
+      });
+      const rendering = SavedPage();
+      try {
+        await vi.advanceTimersByTimeAsync(0);
+        expect(mocks.products).toHaveBeenCalledOnce();
+        expect(mocks.servers).toHaveBeenCalledOnce();
+        expect(mocks.directory).not.toHaveBeenCalled();
+        await vi.advanceTimersByTimeAsync(100);
+        expect(mocks.directory).toHaveBeenCalledOnce();
+        await vi.runAllTimersAsync();
+        const html = renderToStaticMarkup(await rendering);
+        expect(Date.now() - startedAt).toBe(500);
+        expect(html).toContain('data-id="prd_saved"');
+        expect(html).toContain('data-id="srv_saved"');
+        expect(mocks.indexObservations).toHaveBeenCalledWith(
+          upstreamFailure ? [] : [{ players: 12 }],
+        );
+      } finally {
+        await vi.runAllTimersAsync();
+        await rendering;
+      }
+    },
+  );
 
   it("loads saved public resources and servers from the authenticated follow set", async () => {
     state.user = {

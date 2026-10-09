@@ -10,7 +10,7 @@ export class SocialRepository {
     targetId: string
   ): Promise<boolean> {
         const rows = await db
-      .select()
+      .select({ id: follows.id })
       .from(follows)
       .where(
         and(

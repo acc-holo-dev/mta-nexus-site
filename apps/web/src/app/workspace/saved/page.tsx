@@ -53,9 +53,15 @@ export default async function SavedPage() {
       .map((follow) => follow.targetId),
   );
 
-  const [products, servers] = await Promise.all([
+  const [products, { servers, directory }] = await Promise.all([
     productRepository.listPublishedFreeByIds([...savedProductIds]),
-    serverRepository.listActivePublicByIds([...savedServerIds]),
+    serverRepository.listActivePublicByIds([...savedServerIds]).then(async (servers) => ({
+      servers,
+      // Only public saved servers need telemetry; resource reads need not delay it.
+      directory: servers.length > 0
+        ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
+        : null,
+    })),
   ]);
   const productOrder = new Map([...savedProductIds].map((id, index) => [id, index]));
   const serverOrder = new Map([...savedServerIds].map((id, index) => [id, index]));
@@ -63,9 +69,6 @@ export default async function SavedPage() {
     (productOrder.get(a.id) ?? 0) - (productOrder.get(b.id) ?? 0));
   const savedServers = servers.sort((a, b) =>
     (serverOrder.get(a.id) ?? 0) - (serverOrder.get(b.id) ?? 0));
-  const directory = savedServers.length > 0
-    ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
-    : null;
   const observationFor = indexMtaObservations(directory?.servers ?? []);
 
   return (

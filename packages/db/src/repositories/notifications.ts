@@ -253,7 +253,7 @@ export class NotificationRepository {
           eq(notifications.recipientId, recipientId)
         )
       )
-      .returning();
+      .returning({ id: notifications.id });
     return rows.length > 0;
   }
 

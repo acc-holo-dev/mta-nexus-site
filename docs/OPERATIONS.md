@@ -230,6 +230,25 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 ### Code analysis
 
+The saved page starts MTA directory loading as soon as its public-server query
+finishes, independently of the saved-resource query. It still waits for server
+filtering before deciding whether telemetry is needed: anonymous users, empty
+saved lists and lists with no remaining public servers do not fetch the directory.
+Directory failures still render saved cards without observations, and saved-item
+ordering follows the authenticated follow list. A virtual-clock SSR fixture with
+500 ms resource reads, 100 ms server reads and 250 ms upstream reads completes
+in 500 instead of 750 virtual ms. This verifies dependency scheduling, not actual
+production latency or database throughput.
+
+Boolean follow-state reads select only the follow ID (one column instead of
+five). Marking one notification read returns only its ID (one column instead of
+ten, including the structured payload). Follower/target predicates, recipient
+ownership, LIMIT 1 and boolean return behavior stay intact. Four tests execute
+the real Drizzle query builder against a synthetic pg-proxy driver, covering
+matching and absent rows, SQL projections and bound parameters. These tests do
+not run PostgreSQL. See [partial select](https://orm.drizzle.team/docs/select)
+and [partial UPDATE RETURNING](https://orm.drizzle.team/docs/update).
+
 Article views increment with PostgreSQL `view_count + 1` and return the database
 value through `RETURNING`, avoiding lost updates from stale application reads.
 Metadata reads (`incrementView: false`) remain read-only. The unit test compiles
