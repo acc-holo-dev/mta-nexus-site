@@ -235,6 +235,15 @@ jobs:
         path: artifacts/portfolio-query-plans.json
         if-no-files-found: warn
         retention-days: 14
+    - name: Preserve notification inbox query plans
+      if: ${{ always() && steps.database_tests.outcome != 'skipped' }}
+      continue-on-error: ${{ github.ref_type != 'tag' }}
+      uses: actions/upload-artifact@v7.0.1
+      with:
+        name: notification-inbox-query-plans-${{ github.sha }}-${{ github.run_attempt }}
+        path: artifacts/notification-inbox-query-plans.json
+        if-no-files-found: warn
+        retention-days: 14
     - name: Stop isolated TLS SMTP receiver
       if: ${{ always() && needs.plan.outputs.full == 'true' }}
       run: docker rm --force "nexus-smtp-${{ github.run_id }}-${{ github.run_attempt }}" >/dev/null 2>&1 || true

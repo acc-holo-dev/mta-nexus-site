@@ -246,6 +246,13 @@
       "when": 1791534000000,
       "tag": "0034_server_endpoint_revision",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1791537600000,
+      "tag": "0035_notification_inbox_indexes",
+      "breakpoints": true
     }
   ]
 }

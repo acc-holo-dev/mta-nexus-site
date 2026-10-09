@@ -9,6 +9,12 @@ import type {
   NotificationPreferences,
 } from "@nexus/domain";
 
+function boundedNotificationLimit(value: number, fallback: number, maximum: number): number {
+  return Number.isFinite(value)
+    ? Math.min(Math.max(Math.floor(value), 1), maximum)
+    : fallback;
+}
+
 export class NotificationRepository {
   private defaultPreferences(userId: string): NotificationPreferences {
     return {
@@ -100,12 +106,13 @@ export class NotificationRepository {
         unreadOnly
           ? and(
               eq(notifications.recipientId, recipientId),
-              eq(notifications.isRead, false)
+              // Keep the fixed predicate visible to generic plans using the partial index.
+              sql`${notifications.isRead} = false`
             )
           : eq(notifications.recipientId, recipientId)
       )
-      .orderBy(desc(notifications.createdAt))
-      .limit(Math.min(Math.max(limit, 1), 100));
+      .orderBy(desc(notifications.createdAt), desc(notifications.id))
+      .limit(boundedNotificationLimit(limit, 50, 100));
     return rows as unknown as Notification[];
   }
 
@@ -123,8 +130,8 @@ export class NotificationRepository {
           sql`${notifications.data}->>'kind' = 'build_review'`,
         ),
       )
-      .orderBy(desc(notifications.createdAt))
-      .limit(Math.min(Math.max(limit, 1), 64));
+      .orderBy(desc(notifications.createdAt), desc(notifications.id))
+      .limit(boundedNotificationLimit(limit, 32, 64));
     return rows as unknown as Notification[];
   }
 
@@ -135,7 +142,7 @@ export class NotificationRepository {
       .where(
         and(
           eq(notifications.recipientId, recipientId),
-          eq(notifications.isRead, false),
+          sql`${notifications.isRead} = false`,
         ),
       );
     return result.total;
@@ -264,7 +271,7 @@ export class NotificationRepository {
       .where(
         and(
           eq(notifications.recipientId, recipientId),
-          eq(notifications.isRead, false),
+          sql`${notifications.isRead} = false`,
         ),
       );
   }

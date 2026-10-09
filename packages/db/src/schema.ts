@@ -521,7 +521,13 @@ export const notifications = pgTable("notifications", {
   category: text("category").notNull().default("system"),
   isRead: boolean("is_read").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  index("notifications_recipient_created_id_idx")
+    .on(table.recipientId, table.createdAt.desc(), table.id.desc()),
+  index("notifications_unread_recipient_created_id_idx")
+    .on(table.recipientId, table.createdAt.desc(), table.id.desc())
+    .where(sql`${table.isRead} = false`),
+]);
 
 // 22. Notification Preferences
 export const notificationPreferences = pgTable(

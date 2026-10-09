@@ -97,7 +97,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0034_server_endpoint_revision");
+  assert.equal(plan.targetTag, "0035_notification_inbox_indexes");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -146,7 +146,7 @@ test("upgrade contract fails fast when a new migration advances the journal", ()
         idx: journal.entries.length,
         version: "7",
         when: Date.now(),
-        tag: "0035_requires_fixture_review",
+        tag: "0036_requires_fixture_review",
         breakpoints: true,
       },
     ],

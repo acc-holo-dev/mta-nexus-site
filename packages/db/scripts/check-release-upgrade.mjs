@@ -45,6 +45,7 @@ const evidence = {
   retrySucceeded: false,
   rerunIdempotent: false,
   structuredNotificationAccepted: false,
+  notificationInboxIndexesPresent: false,
   supportSchemaPresent: false,
   supportStaffQueueIndexPresent: false,
   supportStaffFilterIndexPresent: false,
@@ -129,7 +130,7 @@ try {
     WHERE table_schema = 'public' AND table_name = 'notifications' AND column_name = 'data'`;
   assert.equal(columns.length, 0, "Failed migration must roll back its DDL");
   const failedIndexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public'
-    AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx')`;
+    AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx', 'notifications_recipient_created_id_idx', 'notifications_unread_recipient_created_id_idx')`;
   assert.equal(failedIndexes.length, 0, "Failed migration must roll back its indexes");
   const failedQuarantineColumns = await client`SELECT column_name FROM information_schema.columns
     WHERE table_schema = 'public' AND table_name = 'builds'
@@ -145,6 +146,15 @@ try {
   const indexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public'
     AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx')`;
   assert.equal(indexes.length, 3);
+  const inboxIndexes = await client`SELECT indexname, indexdef FROM pg_indexes WHERE schemaname = 'public'
+    AND indexname IN ('notifications_recipient_created_id_idx', 'notifications_unread_recipient_created_id_idx')`;
+  assert.equal(inboxIndexes.length, 2, "Upgrade must create both notification indexes");
+  for (const index of inboxIndexes) {
+    assert.match(index.indexdef, /recipient_id, created_at DESC, id DESC/u);
+  }
+  assert.match(inboxIndexes.find(index => index.indexname === 'notifications_unread_recipient_created_id_idx').indexdef,
+    /WHERE \(is_read = false\)/u);
+  evidence.notificationInboxIndexesPresent = true;
   const quarantineColumns = await client`SELECT column_name FROM information_schema.columns
     WHERE table_schema = 'public' AND table_name = 'builds'
       AND column_name IN ('quarantine_previous_status', 'quarantine_reason', 'quarantined_at', 'quarantined_by')`;

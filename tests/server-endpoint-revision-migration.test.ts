@@ -11,8 +11,9 @@ describe("server endpoint revision migration", () => {
     const revisions = entries.filter(entry => entry.tag === "0034_server_endpoint_revision");
     expect(revisions).toHaveLength(1);
     expect(revisions[0]).toMatchObject({ idx: 34, tag: "0034_server_endpoint_revision" });
-    expect(entries.at(-1)?.idx).toBe(34);
-    expect(entries.at(-2)?.idx).toBe(33);
+    expect(entries[34]?.idx).toBe(34);
+    expect(entries[33]?.idx).toBe(33);
+    expect(entries.map(entry => entry.idx)).toEqual(entries.map((_, index) => index));
   });
 
   it("assigns revision zero to existing servers and null to legacy proofs", () => {

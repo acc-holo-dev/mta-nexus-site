@@ -324,7 +324,7 @@ The async callback makes synchronous exceptions into promise rejections before
 [MDN async function contract](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function).
 Live PostgreSQL load and browser acceptance remain separate checks.
 
-The upgrade rehearsal now targets migration `0034_server_endpoint_revision`.
+The upgrade rehearsal now targets migration `0035_notification_inbox_indexes`.
 Its frozen 0024 fixture includes an existing server and legacy control challenge;
 the rehearsal checks revision zero, a null legacy proof revision, both constraints,
 row preservation, rollback/retry and an idempotent rerun. These assertions require
@@ -333,6 +333,29 @@ and refusal guards only. Server-detail/RSC fixtures use the prefetched-history A
 HTTP cache fixtures use fresh snapshots, and mocked session fetches return a new
 Response for each read. Full repository reads expose the persisted endpoint
 revision in their TypeScript result instead of dropping it from the return type.
+
+Notification inbox migration 0035 adds `(recipient_id, created_at DESC, id DESC)`
+indexes for all notifications and, separately, unread notifications (`is_read = false`).
+Queries bind the recipient while keeping the fixed unread predicate literal so
+PostgreSQL can match the partial index even with generic prepared plans. Both
+inbox and build-review lists use ID as a tie-breaker for equal timestamps. Limits
+are integer-clamped to 1–100 (inbox) or 1–64 (reviews); non-finite values fall back
+to 50 or 32 respectively. The build-review query does not use these recipient indexes.
+
+The two indexes consume storage and add write maintenance, including updates when
+notifications become read. This is a normal transactional CREATE INDEX migration:
+plan a maintenance window because index creation can block writes. The upgrade
+rehearsal verifies both index definitions after upgrade and their absence after
+the earlier injected migration failure.
+`tests/notification-inbox-performance.integration.test.ts` creates transaction-owned
+temporary tables and 20,125 synthetic rows, records before/after EXPLAIN ANALYZE
+plans, and checks repository ordering, counts and recipient isolation. CI preserves
+`notification-inbox-query-plans-<sha>-<attempt>` when the database test runs. These
+are warm-cache fixture measurements, not a production timing SLA. Local SQL-builder
+tests validate bindings and limit handling; PostgreSQL acceptance remains pending
+until the hosted database suite runs successfully. PostgreSQL explains the relevant
+[ORDER BY/LIMIT optimization](https://www.postgresql.org/docs/current/indexes-ordering.html)
+and [partial-index predicate matching](https://www.postgresql.org/docs/current/indexes-partial.html).
 
 The public MTA directory API selects a page without retaining every matching
 server. With no search term and `minPlayers=0`, it slices the source snapshot
@@ -1345,7 +1368,7 @@ Keep these CI artifacts outside the runner before their 14-day retention expires
 | Evidence | What it proves |
 | --- | --- |
 | `core-release-evidence-<sha>-<attempt>` | Repository identity, migrations, lint, types, tests, default production build |
-| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0034; failed DDL and ledger rollback; retry; idempotency; legacy rows, endpoint revision defaults, invalidated legacy proofs and new structured notifications |
+| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0035; failed DDL and ledger rollback; retry; idempotency; legacy rows, endpoint revision defaults, invalidated legacy proofs, notification inbox indexes and new structured notifications |
 | `backup-restore-<sha>-<attempt>` | Destroyed synthetic source restored into new owned volumes; schema, migration ledger, author, resource, trusted build, entitlement, notification and uploads preserved |
 
 Require `status: "PASS"`, the intended `sha`, and all verification/cleanup flags
