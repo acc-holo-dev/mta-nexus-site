@@ -1,5 +1,22 @@
 import type { MtaMasterServer } from "./services/mta-master-directory-service";
 
+// A master-list array represents one immutable upstream snapshot. Reuse only
+// computed search strings for that snapshot; WeakMap lets replaced snapshots be
+// garbage-collected without introducing process-wide invalidation or timers.
+const normalizedSearchSnapshots = new WeakMap<
+  readonly MtaMasterServer[],
+  Array<string | undefined>
+>();
+
+function getSearchStrings(servers: readonly MtaMasterServer[]): Array<string | undefined> {
+  let searchStrings = normalizedSearchSnapshots.get(servers);
+  if (!searchStrings) {
+    searchStrings = new Array<string | undefined>(servers.length);
+    normalizedSearchSnapshots.set(servers, searchStrings);
+  }
+  return searchStrings;
+}
+
 // Pagination and player limits are validated by the directory API schema.
 export function selectMtaDirectoryPage(
   servers: readonly MtaMasterServer[],
@@ -21,19 +38,20 @@ export function selectMtaDirectoryPage(
     return { servers: servers.slice(offset, offset + limit), total: servers.length };
   }
 
+  // Do not allocate any search strings for a player-count-only filter.
+  const searchStrings = term ? getSearchStrings(servers) : null;
   const page: MtaMasterServer[] = [];
   let total = 0;
-  for (const server of servers) {
+  for (let index = 0; index < servers.length; index++) {
+    const server = servers[index];
     if ((server.players ?? 0) < minPlayers) continue;
-    if (
-      term &&
-      ![server.name, server.address, server.gameMode, server.mapName, server.version]
-        .filter(Boolean)
-        .join(" ")
-        .toLocaleLowerCase()
-        .includes(term)
-    )
-      continue;
+    if (term && searchStrings) {
+      const searchable = searchStrings[index] ?? [
+        server.name, server.address, server.gameMode, server.mapName, server.version,
+      ].filter(Boolean).join(" ").toLocaleLowerCase();
+      searchStrings[index] = searchable;
+      if (!searchable.includes(term)) continue;
+    }
 
     if (total >= offset && page.length < limit) page.push(server);
     total++;

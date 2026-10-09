@@ -70,6 +70,19 @@ describe("parseMtaMasterList", () => {
     ]);
   });
 
+  it("decodes several independent Unicode text fields within one entry", () => {
+    const flags = 0x0020 | 0x0040;
+    const entry = [203, 0, 113, 7, ...u16(22003), ...text("Русский сервер"), ...text("Гонки")];
+    const payload = new Uint8Array([
+      0, 0, 0, 2, ...u32(flags), ...u32(0), ...u32(1),
+      ...u16(entry.length + 2), ...entry, ...u32(0x12345679),
+    ]).buffer;
+    expect(parseMtaMasterList(payload)).toEqual([{
+      address: "203.0.113.7", port: 22003,
+      name: "Русский сервер", gameMode: "Гонки",
+    }]);
+  });
+
   it("accepts endpoint-only entries when optional flags are absent", () => {
     const payload = new Uint8Array([
       0, 0, 0, 2,

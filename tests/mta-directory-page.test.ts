@@ -118,4 +118,41 @@ describe("MTA directory page selection", () => {
     expect(page.servers).toHaveLength(50);
     expect(inspected).toBe(0);
   });
+
+  it("reuses normalized strings for repeated text queries on one snapshot", () => {
+    let nameReads = 0;
+    const servers: readonly MtaMasterServer[] = Object.freeze([
+      Object.freeze({
+        address: "one.test", port: 22003, players: 5,
+        get name() { nameReads++; return "Nexus Roleplay"; },
+      }),
+      Object.freeze({
+        address: "two.test", port: 22003, players: 2,
+        get name() { nameReads++; return "Nexus Racing"; },
+      }),
+    ]);
+    const options = { minPlayers: 0, limit: 50, offset: 0 };
+    expect(selectMtaDirectoryPage(servers, { ...options, query: "nexus" }).total).toBe(2);
+    expect(selectMtaDirectoryPage(servers, { ...options, query: "racing" }).total).toBe(1);
+    expect(selectMtaDirectoryPage(servers, { ...options, query: "roleplay" }).total).toBe(1);
+    expect(nameReads).toBe(2);
+
+    // A new master-list snapshot rebuilds only its own search cache.
+    const nextSnapshot = [...servers];
+    expect(selectMtaDirectoryPage(nextSnapshot, { ...options, query: "nexus" }).total).toBe(2);
+    expect(nameReads).toBe(4);
+  });
+
+  it("does not normalize searchable text during player-only filtering", () => {
+    let nameReads = 0;
+    const servers: MtaMasterServer[] = [{
+      address: "one.test", port: 22003, players: 7,
+      get name() { nameReads++; return "Nexus"; },
+    }];
+    const result = selectMtaDirectoryPage(servers, {
+      minPlayers: 5, limit: 10, offset: 0,
+    });
+    expect(result.total).toBe(1);
+    expect(nameReads).toBe(0);
+  });
 });

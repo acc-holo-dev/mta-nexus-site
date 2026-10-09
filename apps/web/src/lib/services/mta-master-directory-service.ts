@@ -102,6 +102,7 @@ let pendingDirectory: Promise<MtaMasterDirectory> | null = null;
 class MasterListReader {
   private offset = 0;
   private readonly view: DataView;
+  private readonly decoder = new TextDecoder("utf-8", { fatal: false });
 
   constructor(private readonly data: ArrayBuffer) {
     this.view = new DataView(data);
@@ -150,7 +151,7 @@ class MasterListReader {
     this.ensure(length);
     const bytes = new Uint8Array(this.data, this.offset, length);
     this.offset += length;
-    return new TextDecoder("utf-8", { fatal: false }).decode(bytes);
+    return this.decoder.decode(bytes);
   }
 
   private ensure(length: number) {

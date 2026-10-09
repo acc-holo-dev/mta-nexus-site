@@ -86,8 +86,11 @@ export async function GET(request: NextRequest) {
       },
       {
         headers: {
-          "Cache-Control":
-            "public, max-age=30, stale-while-revalidate=120",
+          // A stale directory is already operating on borrowed upstream time.
+          // Never extend its validity through a second layer of HTTP caching.
+          "Cache-Control": directory.isStale
+            ? "no-store"
+            : "public, max-age=30, stale-while-revalidate=120",
         },
       },
     );
