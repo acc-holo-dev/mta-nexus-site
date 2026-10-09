@@ -338,13 +338,21 @@ so 500 is a **per-page** limit rather than a permanent "newest 500" ceiling.
 A run defaults to one page and can explicitly process up to 20 pages
 (maximum 10,000 server rows). The result contains `pagesProcessed`,
 `nextCursor` (or null when finished), and accumulated match/write totals.
-For explicit multi-page CLI runs, every *fully completed* page also emits
+For explicit multi-page CLI runs, every *fully completed* page from a
+**fresh** MTA master snapshot also emits
 `NEXUS_OBSERVATION_CHECKPOINT { ... }` as JSON on stderr with a
 safe `afterId` for resuming after a later page failure. A page with an
-incomplete write batch never emits a checkpoint. stdout still contains
-only the final JSON summary on success. Replaying the last unfinished page
-is idempotent; checkpoints are not proof that every row in later failed
-batches was stored.
+incomplete write batch never emits a checkpoint. An upstream snapshot marked
+stale does not record observations, does not emit checkpoints and does not
+advance a resume cursor; the CLI exits nonzero with a stale-source error after
+printing the JSON diagnostic summary. It only inspects the first bounded
+page in this case, rather than burning through all requested pages.
+`knownServerLimitReached` still indicates that a sentinel existed for that
+first page; `nextCursor: null` means it is **not safe to resume**. Always
+retry from the start after the upstream recovers. stdout contains only the
+final JSON summary on success (and on this diagnosed stale-source failure).
+Replaying the last unfinished fresh-source page is idempotent; checkpoints
+are not proof that every row in later failed batches was stored.
 A bad/out-of-order database page fails closed instead of repeating entries.
 The CLI can resume at the next server ID in another bounded run:
 

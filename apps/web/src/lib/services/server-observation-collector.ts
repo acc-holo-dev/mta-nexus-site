@@ -60,6 +60,9 @@ export async function captureKnownServerObservations(options?: {
   let pageRows = initialPageRead.value;
   let cursor = firstCursor;
   let nextCursor: string | null = null;
+  // A stale source must never produce an actionable resume cursor, but the
+  // output still reports whether the first bounded page had a sentinel.
+  let listingHasMore = false;
   let pagesProcessed = 0;
   let knownServersCount = 0;
   let matchedServers = 0;
@@ -114,17 +117,25 @@ export async function captureKnownServerObservations(options?: {
     matchedServers += candidates.length;
     recordAttempts += recordable.length;
     cursor = knownServers[knownServers.length - 1]!.id;
-    nextCursor = pageRows.length > limit ? cursor : null;
-    options?.onPageCompleted?.(Object.freeze({
-      afterId: cursor,
-      pagesProcessed,
-      knownServers: knownServersCount,
-      matchedServers,
-      recordAttempts,
-      recordSkippedEndpointChanges,
-      hasMore: nextCursor !== null,
-    }));
-    if (!nextCursor || page + 1 >= maxPages) break;
+    listingHasMore = pageRows.length > limit;
+    // Stale snapshots cannot prove that any current observation was written.
+    // Reporting an afterId for them would let an operator skip untouched
+    // rows on the next fresh capture.
+    nextCursor = directory.isStale
+      ? null
+      : listingHasMore ? cursor : null;
+    if (!directory.isStale) {
+      options?.onPageCompleted?.(Object.freeze({
+        afterId: cursor,
+        pagesProcessed,
+        knownServers: knownServersCount,
+        matchedServers,
+        recordAttempts,
+        recordSkippedEndpointChanges,
+        hasMore: nextCursor !== null,
+      }));
+    }
+    if (directory.isStale || !nextCursor || page + 1 >= maxPages) break;
     pageRows = await serverRepository.listObservableAfter(limit + 1, nextCursor);
   }
 
@@ -134,7 +145,7 @@ export async function captureKnownServerObservations(options?: {
     sourceWasStale: directory.isStale,
     knownServers: knownServersCount,
     knownServerLimit: limit,
-    knownServerLimitReached: nextCursor !== null,
+    knownServerLimitReached: listingHasMore,
     matchedServers,
     notListedServers: knownServersCount - matchedServers,
     absenceMeansOffline: false as const,

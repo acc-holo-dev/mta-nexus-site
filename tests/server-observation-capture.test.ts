@@ -233,6 +233,32 @@ describe("bounded observation capture", () => {
     expect(sources.record).toHaveBeenCalledTimes(3);
   });
 
+  it("never checkpoints or paginates a stale master snapshot", async () => {
+    const { known, directory } = fixture(13);
+    sources.directory.mockResolvedValue({ ...directory, isStale: true });
+    sources.known.mockImplementation(async (limit: number, afterId?: string) =>
+      known.filter(server => !afterId || server.id > afterId).slice(0, limit),
+    );
+    const checkpoints: string[] = [];
+    const result = await captureKnownServerObservations({
+      limit: 5,
+      maxPages: 3,
+      onPageCompleted: ({ afterId }) => checkpoints.push(afterId),
+    });
+    expect(result).toMatchObject({
+      sourceWasStale: true,
+      knownServers: 5,
+      matchedServers: 5,
+      recordAttempts: 0,
+      pagesProcessed: 1,
+      knownServerLimitReached: true,
+      nextCursor: null,
+    });
+    expect(checkpoints).toEqual([]);
+    expect(sources.known).toHaveBeenCalledTimes(1);
+    expect(sources.record).not.toHaveBeenCalled();
+  });
+
   it("does not attempt to persist stale snapshot matches", async () => {
     const { directory } = fixture(5);
     sources.directory.mockResolvedValue({ ...directory, isStale: true });

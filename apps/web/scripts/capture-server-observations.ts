@@ -1,4 +1,7 @@
-import { assertServerObservationCaptureEnvironment } from "../../../scripts/server-observation-capture-contract.mjs";
+import {
+  assertServerObservationCaptureEnvironment,
+  assertServerObservationCaptureResult,
+} from "../../../scripts/server-observation-capture-contract.mjs";
 import { readServerObservationCaptureOptions } from "../../../scripts/server-observation-capture-options.mjs";
 
 async function main() {
@@ -29,6 +32,9 @@ async function main() {
         : undefined,
     });
     process.stdout.write(`${JSON.stringify(result)}\n`);
+    // Keep machine-readable diagnostics while failing the operator command;
+    // a stale snapshot cannot represent a successfully persisted capture.
+    assertServerObservationCaptureResult(result);
   } finally {
     await closeDatabaseConnection();
   }

@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { assertServerObservationCaptureEnvironment } from "../server-observation-capture-contract.mjs";
+import {
+  assertServerObservationCaptureEnvironment,
+  assertServerObservationCaptureResult,
+} from "../server-observation-capture-contract.mjs";
 
 const base = {
   NODE_ENV: "development",
@@ -70,4 +73,12 @@ test("capture refuses non-canonical databases", () => {
       /canonical local Docker database/u,
     );
   }
+});
+
+test("capture refuses stale master snapshots as successful CLI runs", () => {
+  assert.doesNotThrow(() => assertServerObservationCaptureResult({ sourceWasStale: false }));
+  assert.throws(
+    () => assertServerObservationCaptureResult({ sourceWasStale: true }),
+    /snapshot is stale; retry without a resume cursor/u,
+  );
 });

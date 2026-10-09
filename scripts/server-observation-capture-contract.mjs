@@ -48,3 +48,12 @@ export function assertServerObservationCaptureEnvironment(
     databaseName: database.pathname.slice(1),
   });
 }
+
+/** A stale source never advances the durable observation capture checkpoint. */
+export function assertServerObservationCaptureResult(result) {
+  if (result?.sourceWasStale === true) {
+    throw new Error(
+      "Server observation capture deferred: the MTA master snapshot is stale; retry without a resume cursor",
+    );
+  }
+}
