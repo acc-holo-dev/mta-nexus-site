@@ -1,8 +1,40 @@
-import { and, count, desc, eq, ilike, inArray, ne, or } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, servers } from "../schema";
 import type { AuditEvent, Server } from "@nexus/domain";
+
+type ServerEditableFields = Partial<
+  Pick<Server, "name" | "description" | "websiteUrl" | "discordUrl" |
+    "rulesUrl" | "mediaUrls" | "language" | "region" | "gameplayTags" |
+    "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" |
+    "maxPlayers" | "visibility">
+>;
+
+/**
+ * PostgreSQL evaluates SQL SET expressions against the original row.
+ * Clear telemetry only if the stored endpoint actually changes, without
+ * read-before-write races or additional SELECTs.
+ */
+function resetLiveStateForEndpointEdit(updates: ServerEditableFields) {
+  const changes = [];
+  if (updates.ipAddress !== undefined) {
+    changes.push(sql`${servers.ipAddress} IS DISTINCT FROM ${updates.ipAddress}`);
+  }
+  if (updates.port !== undefined) {
+    changes.push(sql`${servers.port} IS DISTINCT FROM ${updates.port}`);
+  }
+  if (changes.length === 0) return {};
+  const changed = sql.join(changes, sql` OR `);
+  return {
+    currentPlayers: sql<number | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.currentPlayers} END`,
+    lastObservedAt: sql<Date | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.lastObservedAt} END`,
+    observationSource: sql<string | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.observationSource} END`,
+    ...(updates.maxPlayers === undefined
+      ? { maxPlayers: sql<number | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.maxPlayers} END` }
+      : {}),
+  };
+}
 
 export class ServerRepository {
   async pageActivePublicByOwner(ownerId: string, requestedPage = 1, requestedSize = 12) {
@@ -57,7 +89,7 @@ export class ServerRepository {
           eq(servers.status, "active")
         )
       )
-      .orderBy(desc(servers.updatedAt));
+      .orderBy(desc(servers.updatedAt), desc(servers.id));
     const boundedLimit =
       limit === undefined
         ? undefined
@@ -99,7 +131,7 @@ export class ServerRepository {
       .select()
       .from(servers)
       .where(eq(servers.ownerId, ownerId))
-      .orderBy(desc(servers.updatedAt));
+      .orderBy(desc(servers.updatedAt), desc(servers.id));
     return rows as unknown as Server[];
   }
 
@@ -163,11 +195,11 @@ export class ServerRepository {
 
   async update(
     id: string,
-    updates: Partial<Pick<Server, "name" | "description" | "websiteUrl" | "discordUrl" | "rulesUrl" | "mediaUrls" | "language" | "region" | "gameplayTags" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility">>
+    updates: ServerEditableFields
   ): Promise<Server | null> {
     const rows = await db
       .update(servers)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({ ...updates, ...resetLiveStateForEndpointEdit(updates), updatedAt: new Date() })
       .where(eq(servers.id, id))
       .returning();
     return (rows[0] as unknown as Server) || null;
@@ -175,14 +207,14 @@ export class ServerRepository {
 
   async updateWithAudit(
     id: string,
-    updates: Partial<Pick<Server, "name" | "description" | "websiteUrl" | "discordUrl" | "rulesUrl" | "mediaUrls" | "language" | "region" | "gameplayTags" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility">>,
+    updates: ServerEditableFields,
     audit: Omit<AuditEvent, "createdAt">,
   ): Promise<Server | null> {
     return db.transaction(async (tx) => {
       const now = new Date();
       const rows = await tx
         .update(servers)
-        .set({ ...updates, updatedAt: now })
+        .set({ ...updates, ...resetLiveStateForEndpointEdit(updates), updatedAt: now })
         .where(eq(servers.id, id))
         .returning();
       const updated = rows[0];

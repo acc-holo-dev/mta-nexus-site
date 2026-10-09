@@ -1,7 +1,7 @@
 import { and, desc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { serverObservations, servers } from "../schema";
-import type { ServerObservation } from "@nexus/domain";
+import type { Server, ServerObservation } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 
 export type RecordServerObservationInput = Omit<
@@ -16,7 +16,10 @@ function boundedObservationInt(value: number, fallback: number, max: number): nu
 }
 
 export class ServerObservationRepository {
-  async record(input: RecordServerObservationInput): Promise<ServerObservation> {
+  async record(
+    input: RecordServerObservationInput,
+    expectedEndpoint?: Readonly<Pick<Server, "ipAddress" | "port">>,
+  ): Promise<ServerObservation> {
     const values = { id: generateId("obs"), ...input, createdAt: new Date() };
 
     return db.transaction(async (tx) => {
@@ -72,6 +75,11 @@ export class ServerObservationRepository {
         })
         .where(and(
           eq(servers.id, input.serverId),
+          // Reject delayed telemetry from the server's previous IP/port.
+          ...(expectedEndpoint ? [
+            eq(servers.ipAddress, expectedEndpoint.ipAddress),
+            eq(servers.port, expectedEndpoint.port),
+          ] : []),
           or(
             isNull(servers.lastObservedAt),
             lt(servers.lastObservedAt, input.observedAt),

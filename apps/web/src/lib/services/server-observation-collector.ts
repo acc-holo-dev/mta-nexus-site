@@ -33,11 +33,15 @@ export async function captureKnownServerObservations(options?: {
   // during an outage. Preserve matching diagnostics, but avoid unnecessary
   // conflict transactions (and never treat replay as a new observation).
   const recordable = directory.isStale ? [] : candidates;
+  const endpointById = new Map(knownServers.map(server => [server.id, server] as const));
 
   for (let offset = 0; offset < recordable.length; offset += RECORD_CONCURRENCY) {
     const results = await Promise.allSettled(
       recordable.slice(offset, offset + RECORD_CONCURRENCY)
-        .map(async candidate => serverObservationRepository.record(candidate)),
+        .map(async candidate => serverObservationRepository.record(
+          candidate,
+          endpointById.get(candidate.serverId),
+        )),
     );
     // Drain the batch before failing; later batches must not start on error.
     const failure = results.find(result => result.status === "rejected");

@@ -82,6 +82,10 @@ describe("bounded observation capture", () => {
         initialWrites: 5, peak: 5, active: 0, elapsed: 100,
       });
       expect(new Set(sources.record.mock.calls.map(([input]) => input.serverId)).size).toBe(500);
+      for (const [input, endpoint] of sources.record.mock.calls) {
+        const index = Number(input.serverId.split("_")[1]);
+        expect(endpoint).toMatchObject({ ipAddress: `server-${index}.test`, port: 22003 });
+      }
     } finally {
       await vi.runAllTimersAsync();
       await capture;

@@ -282,6 +282,14 @@ Editorial/public server views never expose the packet's player-name list.
 The retained player counts and core server metadata are unchanged; a parser
 fixture covers 1000 names and a truncated ignored field.
 
+Server endpoint edits now clear stale live counts, timestamps and provenance
+atomically only when the stored IP/port actually changes. The SQL rule
+is shared by audited and direct updates. The collector also passes the
+exact selected endpoint to the conditional observation UPDATE so a delayed
+snapshot from the previous address cannot re-populate a new endpoint.
+Same-address and editorial-only updates retain live data. PostgreSQL
+integration checks have been added but need an executable runner.
+
 The opt-in MTA observation collector starts the directory and known-server reads
 together, then records matches in batches of at most five concurrent writes per
 capture. The known-server limit remains 500, with one extra row detecting a

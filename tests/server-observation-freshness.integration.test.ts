@@ -5,6 +5,7 @@ import {
   servers,
   serverObservations,
   serverObservationRepository,
+  serverRepository,
   type RecordServerObservationInput,
 } from "@nexus/db";
 
@@ -128,6 +129,35 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
       expect((await liveState(serverId))?.currentPlayers).toBe(12);
       expect(await db.select().from(serverObservations)
         .where(eq(serverObservations.serverId, serverId))).toHaveLength(2);
+    });
+  });
+
+  it("clears live state on endpoint edits and rejects delayed old-endpoint telemetry", async () => {
+    await withServer(async serverId => {
+      const original = await serverRepository.findById(serverId);
+      if (!original) throw new Error("Test server missing");
+      const endpoint = { ipAddress: original.ipAddress, port: original.port };
+      await serverObservationRepository.record(sample(serverId, "2026-10-09T09:00:00.000Z", 45), endpoint);
+      expect((await liveState(serverId))?.currentPlayers).toBe(45);
+
+      await serverRepository.update(serverId, { name: "Renamed", ipAddress: original.ipAddress });
+      expect((await liveState(serverId))?.currentPlayers).toBe(45);
+
+      await serverRepository.update(serverId, { port: original.port + 1 });
+      expect(await liveState(serverId)).toMatchObject({
+        currentPlayers: null, maxPlayers: null,
+        lastObservedAt: null, observationSource: null,
+      });
+      await serverObservationRepository.record(sample(serverId, "2026-10-09T11:00:00.000Z", 90), endpoint);
+      expect((await liveState(serverId))?.currentPlayers).toBeNull();
+
+      await serverObservationRepository.record(
+        sample(serverId, "2026-10-09T12:00:00.000Z", 19),
+        { ipAddress: original.ipAddress, port: original.port + 1 },
+      );
+      expect((await liveState(serverId))?.currentPlayers).toBe(19);
+      await serverRepository.update(serverId, { description: "Profile only" });
+      expect((await liveState(serverId))?.currentPlayers).toBe(19);
     });
   });
 
