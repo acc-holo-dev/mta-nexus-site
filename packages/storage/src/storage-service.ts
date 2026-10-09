@@ -69,7 +69,19 @@ export class StorageService {
     // An exists()-then-get() pair doubles I/O and is vulnerable to a rename
     // between both calls. Opening the object is the authoritative check.
     try {
-      return await provider.get(key, signal);
+      const opened = await provider.get(key, signal);
+      // Storage providers can finish preparing a stream concurrently with
+      // request cancellation. Reject after the await and destroy a stream
+      // already returned by the adapter rather than leaking live handles.
+      try {
+        signal?.throwIfAborted();
+      } catch (error) {
+        (opened.stream as NodeJS.ReadableStream & {
+          destroy?: () => void;
+        }).destroy?.();
+        throw error;
+      }
+      return opened;
     } catch (error) {
       if (error instanceof Error && "code" in error && error.code === "ENOENT") {
         throw new ValidationError("Asset does not exist in storage");

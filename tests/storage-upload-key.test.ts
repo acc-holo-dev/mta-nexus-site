@@ -1,7 +1,7 @@
 import { mkdtemp, rm, readdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Readable } from "node:stream";
+import { Readable } from "node:stream";
 import { beforeEach, afterEach, expect, it, vi } from "vitest";
 import { LocalStorageProvider } from "../packages/storage/src/local-provider";
 
@@ -129,3 +129,23 @@ it.each([".luac", ".dff", ".txd", ".col", ".png", ".jpg", ".jpeg", ".webp", ".js
     expect(Buffer.concat(received)).toEqual(bytes);
   },
 );
+
+// Provider-level checks are not enough: cancellation may occur between
+// adapter completion and the caller resuming after its await.
+it("destroys an opened provider stream when cancellation wins the return race", async () => {
+  const controller = new AbortController();
+  const provider = state.provider!;
+  const stream = Readable.from([Buffer.from("pending content")]);
+  const key = "assets/usr_owner/stale.zip";
+  const get = vi.spyOn(provider, "get").mockImplementation(async () => {
+    controller.abort();
+    return {
+      stream,
+      meta: { key, sizeBytes: 15, sha256Hash: "a".repeat(64) },
+    };
+  });
+  await expect(service.getDownloadStream(key, controller.signal))
+    .rejects.toMatchObject({ name: "AbortError" });
+  expect(get).toHaveBeenCalledOnce();
+  expect(stream.destroyed).toBe(true);
+});

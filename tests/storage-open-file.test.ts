@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { mkdtemp, rm, writeFile, rename } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 import type { Readable } from "node:stream";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { LocalStorageProvider } from "../packages/storage/src/local-provider";
@@ -39,6 +40,13 @@ it("rejects directories as download objects and refuses a root-directory key", a
   await fs.mkdir(join(root, "directory"));
   await expect(storage.get("directory")).rejects.toThrow("regular file");
   await expect(storage.get(".")).rejects.toThrow("Invalid storage key");
+});
+
+it("rejects an oversized on-disk object before expensive hashing or streaming", async () => {
+  await storage.put("oversized.zip", Buffer.from("original"), "application/zip");
+  await fs.truncate(join(root, "oversized.zip"), MAX_UPLOAD_FILE_SIZE_BYTES + 1);
+  await expect(storage.get("oversized.zip"))
+    .rejects.toThrow("Storage object exceeds maximum supported size");
 });
 
 it("hashes multi-chunk files without consuming the returned download stream", async () => {

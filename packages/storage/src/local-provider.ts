@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { ConflictError } from "@nexus/domain";
+import { ConflictError, MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 import type { StorageProvider, StorageObjectMeta, VerifiedStorageReadMeta } from "./types";
 
 type DirectoryHandle = Awaited<ReturnType<typeof fs.open>>;
@@ -142,6 +142,11 @@ export class LocalStorageProvider implements StorageProvider {
         const stat = await handle.stat();
         if (!stat.isFile()) throw new Error("Storage object is not a regular file");
         if (stat.nlink !== 1) throw new Error("Hard-linked storage objects are forbidden");
+        // Uploaded assets are bounded at ingress. Reject oversized or
+        // externally modified files before hashing attacker-sized content.
+        if (stat.size > MAX_UPLOAD_FILE_SIZE_BYTES) {
+          throw new Error("Storage object exceeds maximum supported size");
+        }
         // Bounded memory: hash the opened file before any response/audit is produced.
         // Positional reads leave the stream offset at zero and keep pathname races out.
         const hash = crypto.createHash("sha256");
@@ -230,6 +235,11 @@ export class LocalStorageProvider implements StorageProvider {
 
   async getSignedDownloadUrl(key: string, _expiresInSeconds = 3600): Promise<string> {
     this.resolvePath(key);
-    return `/api/storage/download/${encodeURIComponent(key)}`;
+    // This provider has no signed-token backend, and the application does not
+    // expose an authenticated /api/storage/download handler. Never invent an
+    // address that could later be mistaken for a verified capability URL.
+    throw new Error(
+      "Local storage cannot issue signed URLs; use an authenticated resource download endpoint",
+    );
   }
 }
