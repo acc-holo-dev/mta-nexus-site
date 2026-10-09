@@ -171,16 +171,42 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
         currentPlayers: null, maxPlayers: null,
         lastObservedAt: null, observationSource: null,
       });
-      await serverObservationRepository.record(sample(serverId, "2026-10-09T11:00:00.000Z", 90), endpoint);
+      const rejected = await serverObservationRepository.record(
+        sample(serverId, "2026-10-09T11:00:00.000Z", 90), endpoint,
+      );
+      expect(rejected).toBeNull();
       expect((await liveState(serverId))?.currentPlayers).toBeNull();
+      const historyAfterEdit = await db.select().from(serverObservations)
+        .where(eq(serverObservations.serverId, serverId));
+      expect(historyAfterEdit).toHaveLength(1);
+      expect(historyAfterEdit[0]?.currentPlayers).toBe(45);
 
       await serverObservationRepository.record(
         sample(serverId, "2026-10-09T12:00:00.000Z", 19),
         { ipAddress: original.ipAddress, port: original.port + 1 },
       );
       expect((await liveState(serverId))?.currentPlayers).toBe(19);
+      expect(await db.select().from(serverObservations)
+        .where(eq(serverObservations.serverId, serverId))).toHaveLength(2);
       await serverRepository.update(serverId, { description: "Profile only" });
       expect((await liveState(serverId))?.currentPlayers).toBe(19);
+    });
+  });
+
+  it("rejects already-stale endpoint history before attempting INSERT", async () => {
+    await withServer(async serverId => {
+      const original = await serverRepository.findById(serverId);
+      if (!original) throw new Error("Missing server");
+      const outdated = { ipAddress: original.ipAddress, port: original.port };
+      await serverRepository.update(serverId, { ipAddress: "updated." + outdated.ipAddress });
+      const result = await serverObservationRepository.record(
+        sample(serverId, "2026-10-09T13:00:00.000Z", 97),
+        outdated,
+      );
+      expect(result).toBeNull();
+      expect((await liveState(serverId))?.currentPlayers).toBeNull();
+      expect(await db.select().from(serverObservations)
+        .where(eq(serverObservations.serverId, serverId))).toHaveLength(0);
     });
   });
 

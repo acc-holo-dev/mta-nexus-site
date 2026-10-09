@@ -51,6 +51,7 @@ export async function captureKnownServerObservations(options?: {
   let knownServersCount = 0;
   let matchedServers = 0;
   let recordAttempts = 0;
+  let recordSkippedEndpointChanges = 0;
 
   for (let page = 0; page < maxPages; page++) {
     const knownServers = pageRows.slice(0, limit);
@@ -87,6 +88,12 @@ export async function captureKnownServerObservations(options?: {
       // Drain the batch before failing; never begin later pages on failure.
       const failure = results.find(result => result.status === "rejected");
       if (failure) throw failure.reason;
+      // The repository returns null when an owner changes endpoint between
+      // page selection and the locked observation transaction. It inserts
+      // neither history nor live data for that stale endpoint.
+      recordSkippedEndpointChanges += results.filter(
+        result => result.status === "fulfilled" && result.value === null,
+      ).length;
     }
 
     pagesProcessed++;
@@ -110,6 +117,7 @@ export async function captureKnownServerObservations(options?: {
     notListedServers: knownServersCount - matchedServers,
     absenceMeansOffline: false as const,
     recordAttempts,
+    recordSkippedEndpointChanges,
     pagesProcessed,
     nextCursor,
   });

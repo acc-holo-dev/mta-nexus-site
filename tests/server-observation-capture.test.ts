@@ -216,6 +216,30 @@ describe("bounded observation capture", () => {
       .not.toContain("srv_00000");
   });
 
+  it("counts skipped old-endpoint captures without treating them as persisted rows", async () => {
+    fixture(3);
+    sources.record.mockResolvedValueOnce(null);
+    const result = await captureKnownServerObservations();
+    expect(result).toMatchObject({
+      matchedServers: 3,
+      recordAttempts: 3,
+      recordSkippedEndpointChanges: 1,
+    });
+    expect(sources.record).toHaveBeenCalledTimes(3);
+  });
+
+  it("does not attempt to persist stale snapshot matches", async () => {
+    const { directory } = fixture(5);
+    sources.directory.mockResolvedValue({ ...directory, isStale: true });
+    const result = await captureKnownServerObservations();
+    expect(result).toMatchObject({
+      matchedServers: 5,
+      recordAttempts: 0,
+      recordSkippedEndpointChanges: 0,
+    });
+    expect(sources.record).not.toHaveBeenCalled();
+  });
+
   it("stops safely if the repository returns a repeated or unordered page", async () => {
     const { known } = fixture(15);
     sources.known.mockResolvedValueOnce(known.slice(0, 11))

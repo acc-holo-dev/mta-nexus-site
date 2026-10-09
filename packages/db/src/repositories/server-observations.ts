@@ -16,13 +16,37 @@ function boundedObservationInt(value: number, fallback: number, max: number): nu
 }
 
 export class ServerObservationRepository {
+  async record(input: RecordServerObservationInput): Promise<ServerObservation>;
+  async record(
+    input: RecordServerObservationInput,
+    expectedEndpoint: Readonly<Pick<Server, "ipAddress" | "port">> | undefined,
+  ): Promise<ServerObservation | null>;
   async record(
     input: RecordServerObservationInput,
     expectedEndpoint?: Readonly<Pick<Server, "ipAddress" | "port">>,
-  ): Promise<ServerObservation> {
+  ): Promise<ServerObservation | null> {
     const values = { id: generateId("obs"), ...input, createdAt: new Date() };
 
     return db.transaction(async (tx) => {
+      if (expectedEndpoint) {
+        // Lock the listing BEFORE inserting historical data. Endpoint edits
+        // use UPDATE on this same row, so an in-flight old-endpoint capture
+        // cannot be attributed to a new endpoint in either live state or
+        // immutable history. This lock is intentionally absent for callers
+        // that do not supply endpoint identity.
+        const [current] = await tx
+          .select({ id: servers.id })
+          .from(servers)
+          .where(and(
+            eq(servers.id, input.serverId),
+            eq(servers.ipAddress, expectedEndpoint.ipAddress),
+            eq(servers.port, expectedEndpoint.port),
+          ))
+          .for("update")
+          .limit(1);
+        if (!current) return null;
+      }
+
       const inserted = await tx
         .insert(serverObservations)
         .values(values)

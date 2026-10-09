@@ -288,6 +288,21 @@ Editorial/public server views never expose the packet's player-name list.
 The retained player counts and core server metadata are unchanged; a parser
 fixture covers 1000 names and a truncated ignored field.
 
+Observation history is now protected from delayed captures during endpoint
+changes, not only the denormalized live fields. When the collector supplies
+the endpoint identity, `record()` first locks that server row with
+`SELECT ... FOR UPDATE`, comparing IP and port before inserting
+history. A mismatch returns `null` without an INSERT or a live-state
+UPDATE. With a matching endpoint, the transaction inserts the observation
+and updates live state under the same row lock; an endpoint edit must
+serialize before or after the entire transaction. Calls without an
+endpoint preserve their original contract. This adds an indexed
+locking read per matched capture and should be measured with PostgreSQL
+before increasing capture throughput. `recordAttempts` remains the
+number attempted, while `recordSkippedEndpointChanges` reports rows
+skipped due to a changed network endpoint. Integration and SQL mock
+tests cover mismatches and unchanged-endpoint compatibility.
+
 Server endpoint edits now clear stale live counts, timestamps and provenance
 atomically only when the stored IP/port actually changes. The SQL rule
 is shared by audited and direct updates. The collector also passes the

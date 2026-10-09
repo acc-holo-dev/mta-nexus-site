@@ -64,6 +64,16 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 
 ### P1-2. GitHub-hosted runner не начинает `plan` job
 
+2026-10-09: наблюдения старых endpoint больше не сохраняются в
+историю нового IP/порта. При записи collector проверяет исходный адрес
+под `SELECT FOR UPDATE` до INSERT и возвращает null при несоответствии;
+диагностика считает `recordSkippedEndpointChanges`. Механизм усиливает
+согласованность истории и live-данных, но добавляет один locking SELECT
+на наблюдение; реальный PostgreSQL throughput/latency и race acceptance
+нужно проверить после восстановления CI.
+
+
+
 2026-10-09: оптимизирован bounded collector: добавлен постраничный
 keyset-обход по id, CLI `NEXUS_SERVER_OBSERVATION_MAX_PAGES` и
 `NEXUS_SERVER_OBSERVATION_AFTER_ID`, выходной `nextCursor`.
