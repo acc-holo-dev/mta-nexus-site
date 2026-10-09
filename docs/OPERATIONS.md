@@ -270,7 +270,14 @@ See [MDN filter copying](https://developer.mozilla.org/en-US/docs/Web/JavaScript
 and [Map lookup behavior](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#description).
 
 The ASE master-list parser skips unused player-name bytes without UTF-8
-decoding, but continues validating each field length and entry boundary.
+decoding, and now applies a strict per-entry byte boundary to every field
+(including optional strings and player entries) before reading or decoding.
+Malformed entries cannot consume the next server record or EOF. The
+observation collector also reports stale-snapshot matches without replaying
+database writes; `recordAttempts` remains the actual number of attempted
+inserts, while `matchedServers` remains a diagnostic match count.
+Both changes have targeted regression tests.
+
 Editorial/public server views never expose the packet's player-name list.
 The retained player counts and core server metadata are unchanged; a parser
 fixture covers 1000 names and a truncated ignored field.

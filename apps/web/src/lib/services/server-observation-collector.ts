@@ -29,10 +29,14 @@ export async function captureKnownServerObservations(options?: {
     knownServers,
     directory,
   );
+  // Stale fallback is the same captured master snapshot being replayed
+  // during an outage. Preserve matching diagnostics, but avoid unnecessary
+  // conflict transactions (and never treat replay as a new observation).
+  const recordable = directory.isStale ? [] : candidates;
 
-  for (let offset = 0; offset < candidates.length; offset += RECORD_CONCURRENCY) {
+  for (let offset = 0; offset < recordable.length; offset += RECORD_CONCURRENCY) {
     const results = await Promise.allSettled(
-      candidates.slice(offset, offset + RECORD_CONCURRENCY)
+      recordable.slice(offset, offset + RECORD_CONCURRENCY)
         .map(async candidate => serverObservationRepository.record(candidate)),
     );
     // Drain the batch before failing; later batches must not start on error.
@@ -50,6 +54,6 @@ export async function captureKnownServerObservations(options?: {
     matchedServers: candidates.length,
     notListedServers: knownServers.length - candidates.length,
     absenceMeansOffline: false as const,
-    recordAttempts: candidates.length,
+    recordAttempts: recordable.length,
   });
 }

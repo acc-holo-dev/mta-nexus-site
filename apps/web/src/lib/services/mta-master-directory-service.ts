@@ -102,6 +102,7 @@ let pendingDirectory: Promise<MtaMasterDirectory> | null = null;
 
 class MasterListReader {
   private offset = 0;
+  private entryEnd: number | null = null;
   private readonly view: DataView;
   private readonly decoder = new TextDecoder("utf-8", { fatal: false });
 
@@ -117,11 +118,23 @@ class MasterListReader {
     return this.offset;
   }
 
+  startEntry(end: number) {
+    if (this.entryEnd !== null || end < this.offset || end > this.data.byteLength) {
+      throw new Error("Invalid MTA master-list entry boundary");
+    }
+    this.entryEnd = end;
+  }
+
   seek(position: number) {
-    if (position < this.offset || position > this.data.byteLength) {
+    if (
+      position < this.offset ||
+      position > this.data.byteLength ||
+      (this.entryEnd !== null && position > this.entryEnd)
+    ) {
       throw new Error("Invalid MTA master-list entry boundary");
     }
     this.offset = position;
+    if (this.entryEnd === position) this.entryEnd = null;
   }
 
   u8() {
@@ -165,6 +178,9 @@ class MasterListReader {
   }
 
   private ensure(length: number) {
+    if (this.entryEnd !== null && this.offset + length > this.entryEnd) {
+      throw new Error("Truncated MTA master-list entry");
+    }
     if (this.offset + length > this.data.byteLength) {
       throw new Error("Truncated MTA master-list payload");
     }
@@ -195,6 +211,9 @@ export function parseMtaMasterList(data: ArrayBuffer): MtaMasterServer[] {
     if (entryLength < 8 || entryEnd > data.byteLength) {
       throw new Error("Invalid MTA master-list entry length");
     }
+    // Validate each read against this entry, not merely the entire packet.
+    // Malformed strings must not decode bytes from the next server or EOF.
+    reader.startEntry(entryEnd);
 
     const server: MtaMasterServer = { address: reader.ipv4(), port: reader.u16() };
     if (flags & FLAG.players) server.players = reader.u16();

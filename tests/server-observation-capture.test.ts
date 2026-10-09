@@ -137,6 +137,21 @@ describe("bounded observation capture", () => {
     }
   });
 
+  it("does not replay matching observations from a stale snapshot", async () => {
+    const data = fixture(20);
+    sources.directory.mockResolvedValue({ ...data.directory, isStale: true });
+    const result = await captureKnownServerObservations();
+    expect(result).toMatchObject({
+      sourceWasStale: true,
+      knownServers: 20,
+      matchedServers: 20,
+      notListedServers: 0,
+      recordAttempts: 0,
+      absenceMeansOffline: false,
+    });
+    expect(sources.record).not.toHaveBeenCalled();
+  });
+
   it("keeps missing endpoints unrecorded and retains stale-source diagnostics", async () => {
     sources.directory.mockResolvedValue({ fetchedAt: "2026-10-09T00:00:00.000Z", isStale: true, servers: [] });
     expect(await captureKnownServerObservations()).toMatchObject({

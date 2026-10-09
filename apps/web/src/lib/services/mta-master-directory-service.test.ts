@@ -118,7 +118,36 @@ describe("parseMtaMasterList", () => {
       ...u32(0x12345679),
     ]);
     expect(() => parseMtaMasterList(packet.buffer))
-      .toThrow("Truncated MTA master-list payload");
+      .toThrow("Truncated MTA master-list entry");
+  });
+
+  it("rejects a string crossing into the next server before decoding it", () => {
+    const first = [203, 0, 113, 7, ...u16(22003), 8, 65];
+    const second = [203, 0, 113, 8, ...u16(22004), 1, 66];
+    const payload = new Uint8Array([
+      0, 0, 0, 2, ...u32(0x0020), ...u32(1), ...u32(2),
+      ...u16(first.length + 2), ...first,
+      ...u16(second.length + 2), ...second,
+      ...u32(0x12345679),
+    ]);
+    const decode = vi.spyOn(TextDecoder.prototype, "decode");
+    try {
+      expect(() => parseMtaMasterList(payload.buffer))
+        .toThrow("Truncated MTA master-list entry");
+      expect(decode).not.toHaveBeenCalled();
+    } finally {
+      decode.mockRestore();
+    }
+  });
+
+  it("rejects an optional field crossing into the EOF marker", () => {
+    const entry = [203, 0, 113, 7, ...u16(22003)];
+    const payload = new Uint8Array([
+      0, 0, 0, 2, ...u32(0x0004), ...u32(1), ...u32(1),
+      ...u16(entry.length + 2), ...entry, ...u32(0x12345679),
+    ]);
+    expect(() => parseMtaMasterList(payload.buffer))
+      .toThrow("Truncated MTA master-list entry");
   });
 
   it("accepts endpoint-only entries when optional flags are absent", () => {
