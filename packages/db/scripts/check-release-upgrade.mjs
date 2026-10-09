@@ -46,6 +46,7 @@ const evidence = {
   rerunIdempotent: false,
   structuredNotificationAccepted: false,
   notificationInboxIndexesPresent: false,
+  userLibraryIndexesPresent: false,
   supportSchemaPresent: false,
   supportStaffQueueIndexPresent: false,
   supportStaffFilterIndexPresent: false,
@@ -155,6 +156,22 @@ try {
   assert.match(inboxIndexes.find(index => index.indexname === 'notifications_unread_recipient_created_id_idx').indexdef,
     /WHERE \(is_read = false\)/u);
   evidence.notificationInboxIndexesPresent = true;
+
+  const libraryIndexes = await client`SELECT indexname, indexdef
+    FROM pg_indexes
+    WHERE schemaname = 'public'
+      AND indexname IN (
+        'entitlements_user_download_library_idx',
+        'licenses_user_active_library_idx'
+      )
+    ORDER BY indexname`;
+  assert.deepEqual(libraryIndexes.map((row) => row.indexname), [
+    "entitlements_user_download_library_idx",
+    "licenses_user_active_library_idx",
+  ], "Library access lookup indexes must survive migration");
+  assert.match(libraryIndexes[0].indexdef, /subject_type.*'user'.*permission.*'product.download'/u);
+  assert.match(libraryIndexes[1].indexdef, /status.*'active'/u);
+  evidence.userLibraryIndexesPresent = true;
   const quarantineColumns = await client`SELECT column_name FROM information_schema.columns
     WHERE table_schema = 'public' AND table_name = 'builds'
       AND column_name IN ('quarantine_previous_status', 'quarantine_reason', 'quarantined_at', 'quarantined_by')`;

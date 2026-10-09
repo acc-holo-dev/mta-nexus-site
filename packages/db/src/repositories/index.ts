@@ -9,6 +9,7 @@ export * from "./products";
 export * from "./builds";
 export * from "./licenses";
 export * from "./entitlements";
+export * from "./user-library";
 export * from "./orders";
 export * from "./payments";
 export * from "./ledger";

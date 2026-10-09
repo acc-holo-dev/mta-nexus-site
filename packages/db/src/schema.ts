@@ -345,6 +345,9 @@ export const licenses = pgTable(
     uniqueIndex("licenses_key_idx").on(table.key),
     index("licenses_user_idx").on(table.userId),
     index("licenses_product_idx").on(table.productId),
+    index("licenses_user_active_library_idx")
+      .on(table.userId, table.productId, table.expiresAt, table.createdAt)
+      .where(sql`${table.status} = 'active'`),
   ]
 );
 
@@ -358,7 +361,11 @@ export const entitlements = pgTable("entitlements", {
   expiresAt: timestamp("expires_at", { withTimezone: true }),
   metadata: jsonb("metadata").$type<Record<string, unknown>>().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  index("entitlements_user_download_library_idx")
+    .on(table.subjectId, table.resourceId, table.expiresAt, table.createdAt)
+    .where(sql`${table.subjectType} = 'user' AND ${table.permission} = 'product.download'`),
+]);
 
 // 13. Orders
 export const orders = pgTable("orders", {

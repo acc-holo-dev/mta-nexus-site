@@ -97,7 +97,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0035_notification_inbox_indexes");
+  assert.equal(plan.targetTag, "0036_user_library_lookup_indexes");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -110,6 +110,19 @@ test("upgrade contract requires the filtered staff queue migration", () => {
   assert.match(rehearsal, /'support_cases_status_updated_id_idx'/u);
   assert.match(rehearsal, /'support_cases_category_status_updated_id_idx'/u);
   assert.match(rehearsal, /supportStaffFilterIndexPresent = true/u);
+});
+
+test("upgrade fixture requires indexed effective download rights", () => {
+  const migration = readFileSync(
+    new URL("0036_user_library_lookup_indexes.sql", migrationsUrl),
+    "utf8",
+  );
+  assert.match(migration, /CREATE INDEX "entitlements_user_download_library_idx"/u);
+  assert.match(migration, /CREATE INDEX "licenses_user_active_library_idx"/u);
+  assert.match(migration, /"subject_type" = 'user'/u);
+  assert.match(migration, /"status" = 'active'/u);
+  const rehearsal = readFileSync(script, "utf8");
+  assert.match(rehearsal, /userLibraryIndexesPresent = true/u);
 });
 
 test("upgrade fixture checks durable support mutation idempotency", () => {

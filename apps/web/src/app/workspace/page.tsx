@@ -1,10 +1,8 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import {
-  entitlementRepository,
-  licenseRepository,
-  productRepository,
   serverRepository,
+  userLibraryRepository,
 } from "@nexus/db";
 import { Box, Plus, Server as ServerIcon, Users } from "lucide-react";
 import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
@@ -17,7 +15,7 @@ import {
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";
-import { collectLibraryEntries } from "../../lib/user-library";
+import { getLibraryCopy } from "../../lib/library-view";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +23,7 @@ export default async function WorkspacePage() {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const historyCopy = getCommerceHistoryCopy(locale);
+  const libraryCopy = getLibraryCopy(locale);
   const token = (await cookies()).get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
@@ -47,22 +46,14 @@ export default async function WorkspacePage() {
     );
   }
 
-  const [entitlements, legacyLicenses, ownedServers] = await Promise.all([
-    entitlementRepository.listBySubject({ type: "user", id: user.id }),
-    licenseRepository.listActiveDownloadableByUser(user.id),
+  const [library, ownedServers] = await Promise.all([
+    userLibraryRepository.pageByUser(user.id, 1, "all", 4),
     serverRepository.listByOwner(user.id),
   ]);
-
-  const downloadable = collectLibraryEntries(entitlements, legacyLicenses);
-  const [products, directory] = await Promise.all([
-    productRepository.listPublishedFreeByIds(
-      downloadable.map((entitlement) => entitlement.resourceId),
-    ),
-    ownedServers.length > 0
-      ? mtaMasterDirectoryService.getDirectory().catch(() => null)
-      : Promise.resolve(null),
-  ]);
-  const productMap = new Map(products.map((product) => [product.id, product]));
+  const downloadable = library.items;
+  const directory = ownedServers.length > 0
+    ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
+    : null;
   const observationFor = indexMtaObservations(directory?.servers ?? []);
   const directoryIsFresh = Boolean(directory && !directory.isStale);
   const liveByServerId = new Map(
@@ -121,7 +112,7 @@ export default async function WorkspacePage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           label={dictionary.workspace.resources}
-          value={downloadable.length}
+          value={library.counts.all}
           tone="purple"
           icon={<Box className="h-4 w-4" />}
           context={dictionary.workspace.inLibrary}
@@ -159,21 +150,28 @@ export default async function WorkspacePage() {
       <section>
         <SectionHeader
           title={dictionary.workspace.libraryTitle}
-          description={dictionary.workspace.libraryDescription}
+          description={libraryCopy.subtitle}
           action={
-            <Link
-              href="/market?maxPrice=0"
-              className="text-xs font-semibold text-accent hover:underline"
-            >
-              {dictionary.workspace.browseResources}
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/workspace/library"
+                className="text-xs font-semibold text-accent hover:underline"
+              >
+                {libraryCopy.title}
+              </Link>
+              <Link
+                href="/market?maxPrice=0"
+                className="text-xs font-semibold text-accent hover:underline"
+              >
+                {dictionary.workspace.browseResources}
+              </Link>
+            </div>
           }
         />
 
-        {downloadable.length > 0 ? (
+        {library.counts.all > 0 ? (
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {downloadable.map((entitlement) => {
-              const product = productMap.get(entitlement.resourceId);
               return (
                 <article
                   key={entitlement.resourceId}
@@ -181,19 +179,20 @@ export default async function WorkspacePage() {
                 >
                   <div className="min-w-0">
                     <div className="truncate text-sm font-semibold text-primary">
-                      {product?.title ||
-                        dictionary.workspace.unavailableResource}
+                      {entitlement.downloadable
+                        ? entitlement.title
+                        : libraryCopy.unavailableResource}
                     </div>
                     <div className="text-xs text-faint">
                       {dictionary.workspace.added}{" "}
-                      {new Date(entitlement.createdAt).toLocaleDateString(
+                      {entitlement.addedAt.toLocaleDateString(
                         dateLocale,
                       )}
                     </div>
                   </div>
-                  {product && (
+                  {entitlement.downloadable && entitlement.slug && (
                     <Link
-                      href={`/market/${product.slug}`}
+                      href={`/market/${entitlement.slug}`}
                       className="shrink-0 text-xs font-semibold text-accent hover:underline"
                     >
                       {dictionary.workspace.open}

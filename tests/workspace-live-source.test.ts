@@ -12,12 +12,9 @@ const state = vi.hoisted(() => ({
 }));
 
 const repos = vi.hoisted(() => ({
-  entitlements: vi.fn(),
-  licenses: vi.fn(),
-  products: vi.fn(),
+  library: vi.fn(),
   ownedServers: vi.fn(),
   directory: vi.fn(),
-  collectLibrary: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({
@@ -43,9 +40,7 @@ vi.mock("next/link", async () => {
 });
 
 vi.mock("@nexus/db", () => ({
-  entitlementRepository: { listBySubject: repos.entitlements },
-  licenseRepository: { listActiveDownloadableByUser: repos.licenses },
-  productRepository: { listPublishedFreeByIds: repos.products },
+  userLibraryRepository: { pageByUser: repos.library },
   serverRepository: { listByOwner: repos.ownedServers },
 }));
 
@@ -57,10 +52,6 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 
 vi.mock("../apps/web/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
-}));
-
-vi.mock("../apps/web/src/lib/user-library", () => ({
-  collectLibraryEntries: repos.collectLibrary,
 }));
 
 vi.mock(
@@ -97,15 +88,19 @@ describe("workspace live telemetry behavior", () => {
       username: "workspace-user",
       role: "user",
     };
-    repos.entitlements.mockResolvedValue([]);
-    repos.licenses.mockResolvedValue([]);
-    repos.products.mockResolvedValue([]);
+    repos.library.mockResolvedValue({
+      items: [],
+      counts: { all: 0, ready: 0, unavailable: 0 },
+      page: 1,
+      pageSize: 4,
+      total: 0,
+      totalPages: 1,
+    });
     repos.ownedServers.mockResolvedValue([]);
     repos.directory.mockResolvedValue({
       servers: [],
       isStale: false,
     });
-    repos.collectLibrary.mockReturnValue([]);
   });
 
   it("does not contact the MTA directory when the user owns no servers", async () => {
@@ -166,30 +161,45 @@ describe("workspace live telemetry behavior", () => {
     expect(html).toContain("—");
   });
 
-  it("loads library cards only from the collected entitlement compatibility set", async () => {
-    const entitlement = {
-      resourceId: "prd_free",
-      createdAt: new Date("2026-01-01T00:00:00.000Z"),
-    };
-    repos.entitlements.mockResolvedValue([{ id: "ent_1" }]);
-    repos.licenses.mockResolvedValue([{ id: "lic_legacy" }]);
-    repos.collectLibrary.mockReturnValue([entitlement]);
-    repos.products.mockResolvedValue([
-      {
-        id: "prd_free",
-        slug: "free-resource",
+  it("loads a bounded preview of already authorized library entries", async () => {
+    repos.library.mockResolvedValue({
+      items: [{
+        resourceId: "prd_free",
+        addedAt: new Date("2026-01-01T00:00:00.000Z"),
+        downloadable: true,
         title: "Free Resource",
-      },
-    ]);
+        slug: "free-resource",
+        version: "1.0.0",
+      }],
+      counts: { all: 36, ready: 35, unavailable: 1 },
+      page: 1, pageSize: 4, total: 36, totalPages: 9,
+    });
 
     const html = renderToStaticMarkup(await WorkspacePage());
 
-    expect(repos.collectLibrary).toHaveBeenCalledWith(
-      [{ id: "ent_1" }],
-      [{ id: "lic_legacy" }],
-    );
-    expect(repos.products).toHaveBeenCalledWith(["prd_free"]);
+    expect(repos.library).toHaveBeenCalledWith("usr_workspace", 1, "all", 4);
     expect(html).toContain("Free Resource");
     expect(html).toContain("/market/free-resource");
+    expect(html).toContain("/workspace/library");
+    expect(html).toContain(">36<");
+  });
+
+  it("never exposes unpublished resource details in a private library preview", async () => {
+    repos.library.mockResolvedValue({
+      items: [{
+        resourceId: "prd_private",
+        addedAt: new Date("2026-01-01T00:00:00.000Z"),
+        downloadable: false,
+        title: null,
+        slug: null,
+        version: null,
+      }],
+      counts: { all: 1, ready: 0, unavailable: 1 },
+      page: 1, pageSize: 4, total: 1, totalPages: 1,
+    });
+    const html = renderToStaticMarkup(await WorkspacePage());
+    expect(html).toContain("Resource temporarily unavailable");
+    expect(html).not.toContain("prd_private");
+    expect(html).not.toContain("/market/undefined");
   });
 });

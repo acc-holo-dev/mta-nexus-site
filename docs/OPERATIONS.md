@@ -1661,3 +1661,27 @@ capabilities dropped, no-new-privileges, a bounded PID limit, SIGTERM and a
 configuration, pins the push worker to the exact prebuilt commit image, disables
 restart only for the disposable test project, and asserts these runtime
 isolation properties before acceptance continues.
+
+### Effective resource library: bounded SQL and index acceptance
+
+The player workspace now obtains a four-row read-only preview from
+`userLibraryRepository.pageByUser(userId, 1, "all", 4)`.
+`/workspace/library` shows twelve records per page with mutually exclusive
+`all / ready / unavailable` filters and an exact deduplicated count. Queries
+are user-scoped on both entitlement and legacy license sources; they never
+enumerate other accounts or select license keys, buyer data, provider tokens
+or other privileged fields. Invalid page/filter URL inputs fall back to safe
+defaults and cannot control SQL fragments or limits.
+
+`ready` applies the same product-published and published-clean-build gate
+as download delivery. Hidden/unapproved builds and nonpublic product metadata
+must never be exposed through library cards; a resource can become unavailable
+between page render and a download, so the real download route stays
+authoritative. Legacy paid checkout remains disabled.
+
+Migration `0036_user_library_lookup_indexes` creates partial indexes for
+user `product.download` entitlements and active user licenses. Release
+rehearsal asserts both indexes and their partial predicates. Exact-SHA
+acceptance still needs PostgreSQL integration, a real migration upgrade and
+a frontend build on a working runner. Do not treat static checks as that
+acceptance evidence.

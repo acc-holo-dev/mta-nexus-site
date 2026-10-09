@@ -253,6 +253,13 @@
       "when": 1791537600000,
       "tag": "0035_notification_inbox_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1791541200000,
+      "tag": "0036_user_library_lookup_indexes",
+      "breakpoints": true
     }
   ]
 }

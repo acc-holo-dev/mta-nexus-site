@@ -716,3 +716,24 @@ contract-test не даёт version files разойтись.
 нормализация лимитов и PostgreSQL-тест на 20 125 строках с планами до/после.
 Upgrade rehearsal теперь проверяет оба индекса. Локальные SQL-builder проверки
 не подтверждают ускорение на PostgreSQL; acceptance и планы ожидают успешного CI.
+
+### P2. Validate effective library access on PostgreSQL after migration 0036
+
+An indexed, bounded SQL-based library replaces full in-memory entitlement
+enumeration in the player workspace and provides a noindex, RU/EN
+`/workspace/library` page. The view suppresses metadata for unavailable
+products and never serves downloads without server-side reauthorization.
+Remaining deployment acceptance:
+
+- Run PostgreSQL integration tests for duplicated direct grants, expired
+  grants, active/expired/revoked legacy licenses, unpublished or unsafe builds,
+  filters, stable page order and cross-account isolation.
+- Apply migration `0036` to a disposable clone and review the query plans
+  and partial index usage under realistic grant volume; rehearse rollback and
+  retry with the current journal head.
+- Exercise a real browser download after ownership or published-build changes
+  between rendering the library and requesting a file.
+- Do not mistake library `ready` or legacy paid records for a license issuer
+  or payment provider. Closed-beta checkout remains explicitly disabled.
+
+These are acceptance tasks, not claims that CI/PostgreSQL already passed.
