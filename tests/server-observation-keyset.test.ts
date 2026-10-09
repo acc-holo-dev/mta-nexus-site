@@ -18,7 +18,7 @@ vi.mock("../packages/db/src/client", () => ({
         orderBy(...ordering: SQL[]) { state.ordering = ordering; return chain; },
         limit(limit: number) {
           state.limit = limit;
-          return Promise.resolve([{ id: "srv_one", ipAddress: "play.example", port: 22003 }]);
+          return Promise.resolve([{ id: "srv_one", ipAddress: "play.example", port: 22003, endpointRevision: 0 }]);
         },
       };
       return chain;
@@ -38,9 +38,9 @@ beforeEach(() => {
 describe("bounded ID-keyset observation page", () => {
   it("selects the minimal endpoint projection and stable ascending id", async () => {
     expect(await repo.listObservableAfter(101)).toEqual([
-      { id: "srv_one", ipAddress: "play.example", port: 22003 },
+      { id: "srv_one", ipAddress: "play.example", port: 22003, endpointRevision: 0 },
     ]);
-    expect(Object.keys(state.selected ?? {}).sort()).toEqual(["id", "ipAddress", "port"]);
+    expect(Object.keys(state.selected ?? {}).sort()).toEqual(["endpointRevision", "id", "ipAddress", "port"]);
     expect(state.ordering.map(value => dialect.sqlToQuery(value).sql))
       .toEqual(['"servers"."id" asc']);
     expect(state.limit).toBe(101);

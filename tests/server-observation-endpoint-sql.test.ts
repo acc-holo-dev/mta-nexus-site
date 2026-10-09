@@ -80,6 +80,18 @@ describe("endpoint-bound observation UPDATE", () => {
     expect(statement.params).toContain(22003);
   });
 
+  it("checks endpoint revision to reject A -> B -> A reuse", async () => {
+    mock.lockedMatch = true;
+    mock.lockWhere = null;
+    await repository.record(input, {
+      ipAddress: "play.example.com", port: 22003, endpointRevision: 7,
+    });
+    if (!mock.lockWhere) throw new Error("Missing SQL lock predicate");
+    const query = dialect.sqlToQuery(mock.lockWhere);
+    expect(query.sql).toContain('"servers"."endpoint_revision"');
+    expect(query.params).toContain(7);
+  });
+
   it("keeps compatibility for existing callers that do not provide an endpoint", async () => {
     mock.where = null;
     mock.lockWhere = null;

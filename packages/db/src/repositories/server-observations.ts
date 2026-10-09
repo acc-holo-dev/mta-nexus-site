@@ -4,6 +4,10 @@ import { serverObservations, servers } from "../schema";
 import type { Server, ServerObservation } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 
+type ObservedEndpoint = Readonly<
+  Pick<Server, "ipAddress" | "port"> & { endpointRevision?: number }
+>;
+
 export type RecordServerObservationInput = Omit<
   ServerObservation,
   "id" | "createdAt"
@@ -19,11 +23,11 @@ export class ServerObservationRepository {
   async record(input: RecordServerObservationInput): Promise<ServerObservation>;
   async record(
     input: RecordServerObservationInput,
-    expectedEndpoint: Readonly<Pick<Server, "ipAddress" | "port">> | undefined,
+    expectedEndpoint: ObservedEndpoint | undefined,
   ): Promise<ServerObservation | null>;
   async record(
     input: RecordServerObservationInput,
-    expectedEndpoint?: Readonly<Pick<Server, "ipAddress" | "port">>,
+    expectedEndpoint?: ObservedEndpoint,
   ): Promise<ServerObservation | null> {
     const values = { id: generateId("obs"), ...input, createdAt: new Date() };
 
@@ -41,6 +45,12 @@ export class ServerObservationRepository {
             eq(servers.id, input.serverId),
             eq(servers.ipAddress, expectedEndpoint.ipAddress),
             eq(servers.port, expectedEndpoint.port),
+            // The same host:port can be reused after A -> B -> A.
+            // Capture the revision selected for this server, not just
+            // its network endpoint text.
+            expectedEndpoint.endpointRevision === undefined
+              ? undefined
+              : eq(servers.endpointRevision, expectedEndpoint.endpointRevision),
           ))
           .for("update")
           .limit(1);
@@ -103,6 +113,9 @@ export class ServerObservationRepository {
           ...(expectedEndpoint ? [
             eq(servers.ipAddress, expectedEndpoint.ipAddress),
             eq(servers.port, expectedEndpoint.port),
+            ...(expectedEndpoint.endpointRevision === undefined
+              ? []
+              : [eq(servers.endpointRevision, expectedEndpoint.endpointRevision)]),
           ] : []),
           or(
             isNull(servers.lastObservedAt),

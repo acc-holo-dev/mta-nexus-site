@@ -14,7 +14,20 @@ async function main() {
     ]);
 
   try {
-    const result = await captureKnownServerObservations(options);
+    const result = await captureKnownServerObservations({
+      ...options,
+      // Progress goes to stderr, leaving stdout as exactly one final JSON
+      // summary. Checkpoints are emitted only for explicit multi-page runs.
+      // If the next page fails, the most recent logged afterId is a safe
+      // resume point; replaying an incomplete page remains idempotent.
+      onPageCompleted: options.maxPages > 1
+        ? (checkpoint) => {
+            process.stderr.write(
+              `NEXUS_OBSERVATION_CHECKPOINT ${JSON.stringify(checkpoint)}\n`,
+            );
+          }
+        : undefined,
+    });
     process.stdout.write(`${JSON.stringify(result)}\n`);
   } finally {
     await closeDatabaseConnection();

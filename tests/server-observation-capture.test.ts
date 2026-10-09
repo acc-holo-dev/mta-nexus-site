@@ -21,6 +21,7 @@ function deferred<T>() {
 function fixture(count: number) {
   const known = Array.from({ length: count }, (_, index) => ({
     id: `srv_${String(index).padStart(5, "0")}`, ipAddress: `server-${index}.test`, port: 22003,
+    endpointRevision: 0,
   }));
   const directory = {
     fetchedAt: "2026-10-09T00:00:00.000Z", isStale: false,
@@ -84,7 +85,11 @@ describe("bounded observation capture", () => {
       expect(new Set(sources.record.mock.calls.map(([input]) => input.serverId)).size).toBe(500);
       for (const [input, endpoint] of sources.record.mock.calls) {
         const index = Number(input.serverId.split("_")[1]);
-        expect(endpoint).toMatchObject({ ipAddress: `server-${index}.test`, port: 22003 });
+        expect(endpoint).toMatchObject({
+          ipAddress: `server-${index}.test`,
+          port: 22003,
+          endpointRevision: 0,
+        });
       }
     } finally {
       await vi.runAllTimersAsync();
@@ -238,6 +243,67 @@ describe("bounded observation capture", () => {
       recordSkippedEndpointChanges: 0,
     });
     expect(sources.record).not.toHaveBeenCalled();
+  });
+
+  it("publishes a safe resume checkpoint after each fully committed page", async () => {
+    const { known } = fixture(12);
+    sources.known.mockImplementation(async (limit: number, afterId?: string) =>
+      known.filter(server => !afterId || server.id > afterId).slice(0, limit),
+    );
+    const checkpoints: Array<{
+      afterId: string; pagesProcessed: number; knownServers: number;
+      recordAttempts: number; hasMore: boolean;
+    }> = [];
+    const result = await captureKnownServerObservations({
+      limit: 5,
+      maxPages: 3,
+      onPageCompleted: checkpoint => checkpoints.push(checkpoint),
+    });
+    expect(result).toMatchObject({
+      knownServers: 12, pagesProcessed: 3,
+      recordAttempts: 12, nextCursor: null,
+    });
+    expect(checkpoints).toMatchObject([
+      { afterId: "srv_00004", pagesProcessed: 1, knownServers: 5, recordAttempts: 5, hasMore: true },
+      { afterId: "srv_00009", pagesProcessed: 2, knownServers: 10, recordAttempts: 10, hasMore: true },
+      { afterId: "srv_00011", pagesProcessed: 3, knownServers: 12, recordAttempts: 12, hasMore: false },
+    ]);
+  });
+
+  it("does not checkpoint an incomplete page when any write fails", async () => {
+    const { known } = fixture(12);
+    sources.known.mockImplementation(async (limit: number, afterId?: string) =>
+      known.filter(server => !afterId || server.id > afterId).slice(0, limit),
+    );
+    const checkpoints: string[] = [];
+    const failure = new Error("Database write rejected");
+    sources.record.mockImplementation(async (input: RecordServerObservationInput) => {
+      if (input.serverId === "srv_00006") throw failure;
+      return input;
+    });
+    await expect(captureKnownServerObservations({
+      limit: 5,
+      maxPages: 3,
+      onPageCompleted: checkpoint => checkpoints.push(checkpoint.afterId),
+    })).rejects.toBe(failure);
+    expect(checkpoints).toEqual(["srv_00004"]);
+    expect(sources.known).toHaveBeenCalledTimes(2);
+    expect(sources.record).toHaveBeenCalledTimes(10);
+  });
+
+  it("keeps the completed checkpoint when loading a later page fails", async () => {
+    const { known } = fixture(8);
+    const failure = new Error("Next page query failed");
+    sources.known.mockResolvedValueOnce(known.slice(0, 6))
+      .mockRejectedValueOnce(failure);
+    const checkpoints: string[] = [];
+    await expect(captureKnownServerObservations({
+      limit: 5,
+      maxPages: 3,
+      onPageCompleted: checkpoint => checkpoints.push(checkpoint.afterId),
+    })).rejects.toBe(failure);
+    expect(checkpoints).toEqual(["srv_00004"]);
+    expect(sources.record).toHaveBeenCalledTimes(5);
   });
 
   it("stops safely if the repository returns a repeated or unordered page", async () => {

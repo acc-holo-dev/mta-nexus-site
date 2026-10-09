@@ -291,8 +291,10 @@ fixture covers 1000 names and a truncated ignored field.
 Observation history is now protected from delayed captures during endpoint
 changes, not only the denormalized live fields. When the collector supplies
 the endpoint identity, `record()` first locks that server row with
-`SELECT ... FOR UPDATE`, comparing IP and port before inserting
-history. A mismatch returns `null` without an INSERT or a live-state
+`SELECT ... FOR UPDATE`, comparing IP, port and endpointRevision before
+inserting history. The revision prevents A -> B -> A endpoint reuse from
+accepting a stale snapshot. The DB collector projection includes the
+revision in addition to id/IP/port. A mismatch returns `null` without an INSERT or a live-state
 UPDATE. With a matching endpoint, the transaction inserts the observation
 and updates live state under the same row lock; an endpoint edit must
 serialize before or after the entire transaction. Calls without an
@@ -329,13 +331,20 @@ before re-issuing fresh proof. Run migration 0034 and the PostgreSQL suite
 before deploying this change.
 
 The development-only MTA observation collector now supports bounded
-ID-keyset pagination. Each SQL page projects only id/ipAddress/port,
+ID-keyset pagination. Each SQL page projects id/ipAddress/port/endpointRevision,
 ordered by id ASC; one extra row detects the presence of the next page.
 A capture reuses one MTA Master snapshot and endpoint index across all pages,
 so 500 is a **per-page** limit rather than a permanent "newest 500" ceiling.
 A run defaults to one page and can explicitly process up to 20 pages
 (maximum 10,000 server rows). The result contains `pagesProcessed`,
 `nextCursor` (or null when finished), and accumulated match/write totals.
+For explicit multi-page CLI runs, every *fully completed* page also emits
+`NEXUS_OBSERVATION_CHECKPOINT { ... }` as JSON on stderr with a
+safe `afterId` for resuming after a later page failure. A page with an
+incomplete write batch never emits a checkpoint. stdout still contains
+only the final JSON summary on success. Replaying the last unfinished page
+is idempotent; checkpoints are not proof that every row in later failed
+batches was stored.
 A bad/out-of-order database page fails closed instead of repeating entries.
 The CLI can resume at the next server ID in another bounded run:
 

@@ -102,7 +102,7 @@ export class ServerRepository {
     return rows as unknown as Server[];
   }
 
-  async listObservable(limit = 501): Promise<Pick<Server, "id" | "ipAddress" | "port">[]> {
+  async listObservable(limit = 501): Promise<Array<Pick<Server, "id" | "ipAddress" | "port"> & { endpointRevision: number }>> {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 501)
       : 501;
@@ -113,6 +113,7 @@ export class ServerRepository {
         id: servers.id,
         ipAddress: servers.ipAddress,
         port: servers.port,
+        endpointRevision: servers.endpointRevision,
       })
       .from(servers)
       .where(
@@ -136,7 +137,7 @@ export class ServerRepository {
   async listObservableAfter(
     limit = 501,
     afterId?: string,
-  ): Promise<Pick<Server, "id" | "ipAddress" | "port">[]> {
+  ): Promise<Array<Pick<Server, "id" | "ipAddress" | "port"> & { endpointRevision: number }>> {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 501)
       : 501;
@@ -144,6 +145,7 @@ export class ServerRepository {
       id: servers.id,
       ipAddress: servers.ipAddress,
       port: servers.port,
+      endpointRevision: servers.endpointRevision,
     }).from(servers).where(and(
       eq(servers.status, "active"),
       ne(servers.visibility, "private"),

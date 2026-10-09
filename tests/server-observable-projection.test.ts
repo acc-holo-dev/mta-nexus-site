@@ -18,7 +18,7 @@ vi.mock("../packages/db/src/client", () => ({
         where(condition: SQL) { state.condition = condition; return query; },
         orderBy(...fields: SQL[]) { state.ordering = fields; return query; },
         limit(limit: number) { state.limit = limit; return Promise.resolve([
-          { id: "srv_1", ipAddress: "203.0.113.7", port: 22003 },
+          { id: "srv_1", ipAddress: "203.0.113.7", port: 22003, endpointRevision: 0 },
         ]); },
       };
       return query;
@@ -41,8 +41,8 @@ beforeEach(() => {
 describe("observable server endpoint query", () => {
   it("selects only the three collector fields and preserves the eligible listing filter", async () => {
     const rows = await repository.listObservable(501);
-    expect(Object.keys(state.selection ?? {}).sort()).toEqual(["id", "ipAddress", "port"]);
-    expect(rows).toEqual([{ id: "srv_1", ipAddress: "203.0.113.7", port: 22003 }]);
+    expect(Object.keys(state.selection ?? {}).sort()).toEqual(["endpointRevision", "id", "ipAddress", "port"]);
+    expect(rows).toEqual([{ id: "srv_1", ipAddress: "203.0.113.7", port: 22003, endpointRevision: 0 }]);
     expect(state.condition).not.toBeNull();
     const where = dialect.sqlToQuery(state.condition as SQL);
     expect(where.sql).toContain('"servers"."status"');

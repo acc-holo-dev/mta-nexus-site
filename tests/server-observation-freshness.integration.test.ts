@@ -210,6 +210,37 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
     });
   });
 
+  it("ignores delayed A -> B -> A observations using the captured endpoint revision", async () => {
+    await withServer(async serverId => {
+      const original = await serverRepository.findById(serverId);
+      if (!original) throw new Error("Missing server");
+      const captured = {
+        ipAddress: original.ipAddress,
+        port: original.port,
+        endpointRevision: 0,
+      };
+      await serverRepository.update(serverId, { port: original.port + 1 });
+      await serverRepository.update(serverId, { port: original.port });
+      const [state] = await db.select({ revision: servers.endpointRevision })
+        .from(servers).where(eq(servers.id, serverId));
+      expect(state?.revision).toBe(2);
+      const replayed = await serverObservationRepository.record(
+        sample(serverId, "2026-10-09T14:00:00.000Z", 77), captured,
+      );
+      expect(replayed).toBeNull();
+      expect((await liveState(serverId))?.currentPlayers).toBeNull();
+      expect(await db.select().from(serverObservations)
+        .where(eq(serverObservations.serverId, serverId))).toHaveLength(0);
+
+      const current = await serverObservationRepository.record(
+        sample(serverId, "2026-10-09T14:01:00.000Z", 31),
+        { ...captured, endpointRevision: 2 },
+      );
+      expect(current?.currentPlayers).toBe(31);
+      expect((await liveState(serverId))?.currentPlayers).toBe(31);
+    });
+  });
+
   it("handles concurrent writers and a later genuine refresh", async () => {
     await withServer(async serverId => {
       const older = sample(serverId, "2026-10-09T09:00:00.000Z", 8);

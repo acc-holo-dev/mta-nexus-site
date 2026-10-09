@@ -11,10 +11,23 @@ import { buildMasterObservationCandidates } from "./server-observation-matching"
 const RECORD_CONCURRENCY = 5;
 const MAX_PAGES = 20;
 
+export type ObservationPageCheckpoint = Readonly<{
+  afterId: string;
+  pagesProcessed: number;
+  knownServers: number;
+  matchedServers: number;
+  recordAttempts: number;
+  recordSkippedEndpointChanges: number;
+  hasMore: boolean;
+}>;
+
 export async function captureKnownServerObservations(options?: {
   limit?: number;
   maxPages?: number;
   afterId?: string;
+  // Synchronous after-write hook. A checkpoint is safe to resume from even
+  // if the next page's DB read or a later write batch fails.
+  onPageCompleted?: (checkpoint: ObservationPageCheckpoint) => void;
 }) {
   const requestedLimit = options?.limit ?? 500;
   const limit = Number.isFinite(requestedLimit)
@@ -102,6 +115,15 @@ export async function captureKnownServerObservations(options?: {
     recordAttempts += recordable.length;
     cursor = knownServers[knownServers.length - 1]!.id;
     nextCursor = pageRows.length > limit ? cursor : null;
+    options?.onPageCompleted?.(Object.freeze({
+      afterId: cursor,
+      pagesProcessed,
+      knownServers: knownServersCount,
+      matchedServers,
+      recordAttempts,
+      recordSkippedEndpointChanges,
+      hasMore: nextCursor !== null,
+    }));
     if (!nextCursor || page + 1 >= maxPages) break;
     pageRows = await serverRepository.listObservableAfter(limit + 1, nextCursor);
   }
