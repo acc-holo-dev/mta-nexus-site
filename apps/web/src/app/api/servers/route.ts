@@ -63,6 +63,7 @@ export async function GET(request: NextRequest) {
       mtaMasterDirectoryService.getDirectory().catch(() => null),
     ]);
     const directoryIsStale = directory?.isStale ?? false;
+    const directoryAvailable = directory !== null;
     const observations = directory?.servers ?? [];
     // One server benefits from an early Array.find; for many listings,
     // reuse the incremental endpoint index instead of N full-array scans.
@@ -84,6 +85,10 @@ export async function GET(request: NextRequest) {
       {
         servers: enrichedServers,
         directoryIsStale,
+        // Unavailable and fresh-but-empty are different operational states.
+        // Make provenance explicit without changing existing client fields.
+        directoryAvailable,
+        directoryFetchedAt: directory?.fetchedAt ?? null,
         limit,
       },
       // Bound shared HTTP caching by the remaining master-list freshness.

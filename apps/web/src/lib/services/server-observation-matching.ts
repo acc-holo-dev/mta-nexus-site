@@ -12,6 +12,11 @@ export function buildMasterObservationCandidates(
   const observationFor = indexMtaObservations(directory.servers);
 
   const observedAt = new Date(directory.fetchedAt);
+  if (!Number.isFinite(observedAt.getTime())) {
+    // Do not propagate an invalid timestamp into a persisted SQL row.
+    // Malformed source metadata is a failed capture, never an observation.
+    throw new Error("Invalid MTA master-list observation timestamp");
+  }
 
   return knownServers.flatMap((server) => {
     const observed = observationFor(server);

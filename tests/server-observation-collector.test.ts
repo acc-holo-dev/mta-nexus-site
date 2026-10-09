@@ -43,6 +43,19 @@ describe("server observation collector", () => {
     );
   });
 
+  it.each(["", "invalid", "2026-99-01T00:00:00Z"])(
+    "fails before creating observations for an invalid snapshot time %s",
+    fetchedAt => {
+      expect(() => buildMasterObservationCandidates(
+        [{ id: "srv_one", ipAddress: "example.com", port: 22003 }],
+        {
+          fetchedAt, isStale: false,
+          servers: [{ address: "example.com", port: 22003, players: 20 }],
+        },
+      )).toThrow("Invalid MTA master-list observation timestamp");
+    },
+  );
+
   it("does not synthesize offline observations for missing servers", () => {
     const candidates = buildMasterObservationCandidates(
       [{ id: "srv_missing", ipAddress: "missing.example", port: 22003 }],

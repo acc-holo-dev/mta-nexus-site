@@ -269,6 +269,12 @@ See [MDN filter copying](https://developer.mozilla.org/en-US/docs/Web/JavaScript
 [slice selection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)
 and [Map lookup behavior](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#description).
 
+MTA observation candidate generation rejects malformed source timestamps
+before creating SQL inputs. Public editorial server listings also expose
+additive `directoryAvailable` and `directoryFetchedAt` fields so
+unavailable master data is distinguishable from an empty valid directory.
+Existing response fields are unchanged; no new tables or dependencies.
+
 The ASE master-list parser skips unused player-name bytes without UTF-8
 decoding, and now applies a strict per-entry byte boundary to every field
 (including optional strings and player entries) before reading or decoding.

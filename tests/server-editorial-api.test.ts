@@ -37,9 +37,16 @@ describe("editorial server API", () => {
 
     expect(listServers).toHaveBeenCalledWith(100);
     expect(stale.directoryIsStale).toBe(true);
+    expect(stale.directoryAvailable).toBe(true);
+    expect(stale.directoryFetchedAt).toBeNull();
     expect(stale.servers[0]).toMatchObject({ liveStatus: "unknown", liveObservation: { players: 12 } });
     expect(fresh.servers[0].liveStatus).toBe("online");
     expect(unavailable.servers[0]).toMatchObject({ liveStatus: "unknown", liveObservation: null });
+    expect(unavailable).toMatchObject({
+      directoryAvailable: false,
+      directoryFetchedAt: null,
+      directoryIsStale: false,
+    });
   });
 
   it("performs independent editorial and directory reads together", async () => {
@@ -90,5 +97,6 @@ describe("editorial server API", () => {
     expect(stale.headers.get("Cache-Control")).toBe("no-store");
     expect(missing.headers.get("Cache-Control")).toBe("no-store");
     expect(fresh.headers.get("Cache-Control")).toBe("public, max-age=30");
+    expect((await fresh.json()).directoryAvailable).toBe(true);
   });
 });
