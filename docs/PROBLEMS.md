@@ -1,6 +1,6 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
-Единственный реестр проблем проекта. Обновлён: 2026-10-08 (после PWA/Web Push и accessibility release-slices; текущий hosted-runner blocker зафиксирован ниже).
+Единственный реестр проблем проекта. Обновлён: 2026-10-09 (после DEV Mailpit slice; текущий hosted-runner blocker зафиксирован ниже).
 
 Правила реестра:
 
@@ -63,6 +63,14 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 
 
 ### P1-2. GitHub-hosted runner не начинает `plan` job
+
+DEV Mailpit overlay добавлен в `Local Docker startup`: приёмка проверяет
+worker health, непубликуемый SMTP, loopback UI и фактический TLS SMTP/API capture.
+Локально прошли typecheck, lint, Knip, архитектурная проверка, 1261 unit,
+163 tooling и 26 runtime/dispatcher тестов. Tooling включает настоящий TLS
+handshake с генерируемым сертификатом и отказ при неверном hostname.
+Docker в среде этой проверки недоступен; новая Compose-приёмка пока не выполнена.
+Это не закрывает существующий hosted-runner blocker или production rollout.
 
 После исправлений Web Push commit `0221f85` и все проверенные последующие
 SHA получают один и тот же внешний симптом: job **Choose verification scope**

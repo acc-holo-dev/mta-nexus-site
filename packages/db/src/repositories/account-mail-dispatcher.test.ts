@@ -97,6 +97,26 @@ describe("D2c account mail dispatcher", () => {
       appUrl: "http://localhost:3000",
     })).toThrow("Invalid account mail application URL");
   });
+
+  it("renders local recovery links with fragment-only tokens when explicitly enabled", async () => {
+    const w = workerFixture();
+    let sent: AccountMailTransportInput | undefined;
+    const dispatcher = new AccountMailDispatcher({
+      worker: w.worker, cipher, appUrl: "http://localhost:3001", allowLocalHttp: true,
+      transport: { send: async input => {
+        sent = input;
+        return { outcome: "accepted", uncertain: false, stage: "final_reply" };
+      } },
+    });
+    expect((await dispatcher.runBatch()).accepted).toBe(1);
+    const link = sent?.text.split("\n").find(line => line.startsWith("http://"));
+    if (!link) throw new Error("Expected local recovery link");
+    const url = new URL(link);
+    expect(url.origin).toBe("http://localhost:3001");
+    expect(url.searchParams.get("challenge")).toBe("ach_test");
+    expect(url.search).not.toContain(prepared.token);
+    expect(url.hash).toContain(prepared.token);
+  });
 });
 
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { randomBytes } from "node:crypto";
-import { createAccountMailProducerCipher, readAccountMailRuntimeConfig, readAccountRecoveryAbuseKey, runAccountMailLoop, runtimeFingerprint } from "./account-mail-runtime";
+import { createAccountMailDispatcher, createAccountMailProducerCipher, readAccountMailRuntimeConfig, readAccountRecoveryAbuseKey, runAccountMailLoop, runtimeFingerprint } from "./account-mail-runtime";
 
 const key = randomBytes(32).toString("base64url");
 const baseEnv = {
@@ -55,6 +55,24 @@ describe("D2d account mail runtime", () => {
     expect(first.smtpUsername).toBe("ci-user");
     expect(first.smtpPassword).toBe("ci-password-one");
     expect(runtimeFingerprint(first)).toBe(runtimeFingerprint(second));
+  });
+
+  it.each(["http://localhost:3001", "http://127.0.0.1:3001", "http://[::1]:3001"])(
+    "enables a local HTTP origin only in explicit development mode: %s", appUrl => {
+      const config = readAccountMailRuntimeConfig({ ...baseEnv, NODE_ENV: "development", ACCOUNT_MAIL_APP_URL: appUrl });
+      expect(config.appUrl).toBe(appUrl);
+      expect(() => createAccountMailDispatcher(config)).not.toThrow();
+      for (const NODE_ENV of [undefined, "test", "production"]) {
+        expect(() => readAccountMailRuntimeConfig({ ...baseEnv, NODE_ENV, ACCOUNT_MAIL_APP_URL: appUrl })).toThrow();
+      }
+    },
+  );
+
+  it.each([
+    "http://nexus-mta.test", "http://localhost.evil.test", "http://192.168.1.2",
+    "http://user:password@localhost:3000", "http://localhost:3000?token=x", "http://localhost:3000#token=x",
+  ])("rejects non-local or decorated HTTP origins even in development: %s", appUrl => {
+    expect(() => readAccountMailRuntimeConfig({ ...baseEnv, NODE_ENV: "development", ACCOUNT_MAIL_APP_URL: appUrl })).toThrow();
   });
 
   it("supports one previous mail key for bounded rotation while producers stay on the active key", () => {

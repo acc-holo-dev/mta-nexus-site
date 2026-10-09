@@ -47,6 +47,57 @@ the worker half validates heartbeat/progress and queue counters. With no VAPID t
 healthy-idle and performs queue maintenance; with all three VAPID values set it
 dispatches durable Web Push jobs.
 
+### Optional local mail capture
+
+`compose.mailpit.yaml` extends only the development `compose.yaml`. It adds
+Mailpit 1.31.4, the existing durable account-mail worker and a one-shot initializer:
+
+```bash
+docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml up --build --detach --wait --wait-timeout 600
+# Or, with host Node/pnpm:
+pnpm dev:mail
+pnpm dev:mail:check
+```
+
+The Mailpit UI is bound to `127.0.0.1:8025`; use `http://localhost:8025`.
+`NEXUS_MAILPIT_PORT=8026` changes this host port. `NEXUS_DEV_PORT` changes the app
+port and the origin used in recovery links together. Set these variables
+consistently for startup, checks and shutdown. SMTP port 1025 stays unpublished.
+Relay/forwarding are not configured; even a real recipient address stays in the
+local capture box. The app's generic `EMAIL_PROVIDER` remains `disabled`; account
+recovery uses its separate encrypted outbox and dedicated worker.
+
+The initializer creates two independent 32-byte keys and a self-signed certificate
+for the Docker hostname `mailpit`. Keys persist in `dev_mail` and are never silently
+rotated on restart; corrupted keys stop startup. The certificate is renewed near
+expiry. App and worker read their keys from files as UID 1000; the worker verifies
+the certificate and hostname when connecting with implicit TLS. HTTP recovery
+links are allowed only for an explicitly configured `NODE_ENV=development` and
+`localhost`, `127.0.0.1` or `::1`; production and other environments still require
+HTTPS. This exception changes the link origin, not SMTP TLS verification.
+
+`pnpm dev:mail:check` checks the app, push-worker and mail-worker, then sends a
+synthetic message through the actual SMTP transport, verifies its captured body
+through the Mailpit API and deletes only that probe. It does not verify the entire
+account recovery flow. For that, log into a regular password-based development account without 2FA,
+verify its existing email in security settings using the captured link, then
+request a password reset and follow the captured reset link.
+
+Mailpit keeps at most 200 messages for 24 hours in its temporary database;
+container replacement discards captures. Database outbox data and encryption keys
+remain in their named volumes. Do not remove `dev_mail` while keeping queued mail
+that you intend to dispatch. `pnpm dev:mail:down` preserves all volumes. Stop with
+that command before starting the basic stack again. Use `pnpm dev:mail:logs` for
+diagnostics. Production recovery rollout still uses the dedicated production
+overlays and operator-supplied secrets, not this initializer or capture server.
+
+The `Local Docker startup` CI job adds this overlay after checking the basic
+stack and validates non-root services, port isolation, worker health and SMTP/API
+capture. Standalone tooling tests exercise key persistence and a real verified
+TLS connection without Docker. These tests do not replace the Compose acceptance.
+Mailpit configuration follows the [official Docker](https://mailpit.axllent.org/docs/install/docker/)
+and [SMTP TLS documentation](https://mailpit.axllent.org/docs/configuration/smtp/).
+
 ## 2. Verification
 
 Moderators review complaints in `/admin`, under **Reports & moderation**. The default queue shows unresolved cases oldest first; **Decision history** shows completed cases newest first. Both views are paged (30 items). A decision requires at least three characters of review context. The report status and audit event commit together; a stale second decision returns HTTP 409. The private `GET /api/reports?view=pending&page=1` endpoint uses the same bounded queue, with `view=history` for completed cases. Run `pnpm test:reports` for focused checks. Do not interpret a notification delivery failure as a failed report submission: a stored complaint remains in the queue.

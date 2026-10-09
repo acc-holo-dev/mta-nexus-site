@@ -32,6 +32,25 @@ pnpm dev
 
 Web Push is optional in DEV. Leave the three `WEB_PUSH_VAPID_*` values unset for a healthy-idle worker, or set the public/private/subject triplet together to exercise real durable push dispatch. Never commit the private key.
 
+For local recovery-email testing, enable the optional Mailpit capture stack:
+
+```bash
+pnpm dev:mail
+pnpm dev:mail:check
+```
+
+Docker-only equivalent: add `-f compose.mailpit.yaml` after `-f compose.yaml`
+in the startup command above. Open `http://localhost:8025` to view captured
+messages. No SMTP account or manually generated keys are needed: the initializer
+persists independent recovery keys and a local TLS certificate in a named volume.
+`pnpm dev:mail:check` verifies worker health and sends/removes one synthetic TLS
+probe; it does not trigger a real account recovery. Use the account security
+settings to verify a recovery address before testing password reset.
+`pnpm dev:mail:logs` shows the app, mail-worker and capture logs;
+`pnpm dev:mail:down` stops this stack while preserving data. To return to basic
+development, run that stop command before `pnpm dev:docker:up`.
+Mailpit never relays captured mail externally. Details: [Operations](docs/OPERATIONS.md#optional-local-mail-capture).
+
 Use `pnpm dev:host` only when PostgreSQL, storage, scanner settings and the rest of the development environment are already configured outside Compose. It starts only the Next.js app and intentionally does not provision dependencies.
 
 In development, `/dev` shows a sanitized runtime status panel for the application, database, storage, scanner and email mode. The route is intentionally unavailable when `NODE_ENV=production`.

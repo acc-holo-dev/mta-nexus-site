@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { closeSync, constants, fstatSync, openSync, readSync } from "node:fs";
 import { isAbsolute } from "node:path";
+import { parseAccountMailAppUrl } from "./account-mail-app-url";
 import { AccountMailCipher } from "./account-mail-crypto";
 import { AccountMailDispatcher } from "./account-mail-dispatcher";
 import { AccountMailSmtpTransport } from "./account-mail-smtp";
@@ -9,6 +10,7 @@ export type AccountMailRuntimeConfig = Readonly<{
   activeKeyId: string;
   keys: Readonly<Record<string, Uint8Array>>;
   appUrl: string;
+  allowLocalHttp?: boolean;
   previousKeyId?: string;
   smtpHost: string;
   smtpMode: "implicit_tls" | "starttls";
@@ -235,10 +237,8 @@ export function readAccountMailRuntimeConfig(
     ? Object.freeze({ [activeKeyId]: activeKey, [previousKeyId]: previousKey })
     : Object.freeze({ [activeKeyId]: activeKey });
   const appUrl = required(env, "ACCOUNT_MAIL_APP_URL");
-  const parsedUrl = new URL(appUrl);
-  if (parsedUrl.protocol !== "https:" || parsedUrl.username || parsedUrl.password || parsedUrl.search || parsedUrl.hash) {
-    throw new Error("Invalid account mail application URL");
-  }
+  const allowLocalHttp = env.NODE_ENV === "development";
+  const parsedUrl = parseAccountMailAppUrl(appUrl, allowLocalHttp);
   const smtpHost = required(env, "ACCOUNT_MAIL_SMTP_HOST");
   const smtpModeRaw = env.ACCOUNT_MAIL_SMTP_MODE || "implicit_tls";
   if (smtpModeRaw !== "implicit_tls" && smtpModeRaw !== "starttls") {
@@ -276,6 +276,7 @@ export function readAccountMailRuntimeConfig(
     keys,
     previousKeyId,
     appUrl: parsedUrl.toString().replace(/\/$/, ""),
+    allowLocalHttp,
     smtpHost,
     smtpMode,
     smtpPort: integer(
@@ -307,7 +308,7 @@ export function createAccountMailDispatcher(config: AccountMailRuntimeConfig): A
     username: config.smtpUsername, password: config.smtpPassword,
     ca: config.smtpCa, timeoutMs: config.smtpTimeoutMs,
   });
-  return new AccountMailDispatcher({ cipher, transport, appUrl: config.appUrl });
+  return new AccountMailDispatcher({ cipher, transport, appUrl: config.appUrl, allowLocalHttp: config.allowLocalHttp });
 }
 
 export type AccountMailLoopSummary = Readonly<{
@@ -399,7 +400,7 @@ export async function runAccountMailLoop(input: {
 export function runtimeFingerprint(config: AccountMailRuntimeConfig): string {
   return createHash("sha256").update(JSON.stringify({
     keyId: config.activeKeyId, keyRingSize: Object.keys(config.keys).length,
-    appUrl: config.appUrl, smtpHost: config.smtpHost, smtpMode: config.smtpMode,
+    appUrl: config.appUrl, localHttp: Boolean(config.allowLocalHttp), smtpHost: config.smtpHost, smtpMode: config.smtpMode,
     smtpPort: config.smtpPort, smtpServername: config.smtpServername, smtpFrom: config.smtpFrom,
     smtpEnvelopeFrom: config.smtpEnvelopeFrom ?? config.smtpFrom,
     smtpAuth: Boolean(config.smtpUsername), smtpAuthMode: config.smtpAuthMode, smtpTimeoutMs: config.smtpTimeoutMs, batchSize: config.batchSize, pollIntervalMs: config.pollIntervalMs,

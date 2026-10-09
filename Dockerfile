@@ -2,6 +2,8 @@
 FROM node:26-alpine AS development
 WORKDIR /app
 ENV NODE_ENV=development NEXT_TELEMETRY_DISABLED=1
+# Used by the optional local Mailpit initializer, only in the development image.
+RUN apk add --no-cache openssl
 RUN npm install --global pnpm@12.4.2
 COPY . .
 RUN pnpm install --frozen-lockfile --prod=false \

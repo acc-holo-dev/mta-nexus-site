@@ -1,3 +1,4 @@
+import { parseAccountMailAppUrl } from "./account-mail-app-url";
 import { type AccountMailCipher, AccountMailKeyUnavailableError } from "./account-mail-crypto";
 import { accountMailWorkerRepository } from "./account-mail-worker";
 import type { MailLease, PreparedAccountMail } from "./account-mail-worker";
@@ -43,14 +44,6 @@ export type AccountMailDispatchSummary = Readonly<{
   providerDeferred?: boolean;
 }>;
 
-function checkedBaseUrl(value: string): URL {
-  const url = new URL(value);
-  if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash) {
-    throw new Error("Invalid account mail application URL");
-  }
-  return url;
-}
-
 function isProviderWideRetry(result: AccountMailTransportResult): boolean {
   return result.outcome === "retry"
     && ["connect", "greeting", "ehlo", "starttls", "auth", "mail_from"].includes(result.stage);
@@ -87,12 +80,12 @@ export class AccountMailDispatcher {
   #transport: Transport;
   #baseUrl: URL;
 
-  constructor(input: { worker?: Worker; cipher: AccountMailCipher; transport: Transport; appUrl: string }) {
+  constructor(input: { worker?: Worker; cipher: AccountMailCipher; transport: Transport; appUrl: string; allowLocalHttp?: boolean }) {
     if (!input?.cipher || !input?.transport) throw new Error("Invalid account mail dispatcher");
     this.#worker = input.worker ?? accountMailWorkerRepository;
     this.#cipher = input.cipher;
     this.#transport = input.transport;
-    this.#baseUrl = checkedBaseUrl(input.appUrl);
+    this.#baseUrl = parseAccountMailAppUrl(input.appUrl, input.allowLocalHttp);
   }
 
   async runBatch(

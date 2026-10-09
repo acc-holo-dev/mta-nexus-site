@@ -416,14 +416,26 @@ jobs:
         docker compose --env-file /dev/null -f compose.yaml exec -T app node --input-type=module -e "import assert from 'node:assert/strict'; import {readFileSync} from 'node:fs'; assert.equal(readFileSync('/data/uploads/beta002-ci-probe', 'utf8'), 'preserved');"
         test "$(docker compose --env-file /dev/null -f compose.yaml exec -T postgres psql -X -U nexus -d mta_nexus -Atc 'SELECT value FROM beta002_ci_probe WHERE id=1')" = "preserved"
         echo 'PASS: migrations applied, app replaced, database and uploads retained'
+    - name: Verify optional development mail capture
+      run: |
+        docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml config --quiet
+        docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml up --build --detach --wait --wait-timeout 600
+        for service in mail-worker mailpit; do
+          test "$(docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml exec -T "$service" id -u)" != "0"
+        done
+        mailpit=$(docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml ps --quiet mailpit)
+        test "$(docker port "$mailpit" 8025/tcp)" = "127.0.0.1:8025"
+        test -z "$(docker port "$mailpit" 1025/tcp)"
+        docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml exec -T mail-worker node /app/scripts/check-account-mail-worker-health.mjs
+        docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml exec -T mail-worker node --import tsx scripts/check-dev-mailpit.ts
     - name: Show local test diagnostics
       if: always()
       run: |
-        docker compose --env-file /dev/null -f compose.yaml ps --all
-        docker compose --env-file /dev/null -f compose.yaml logs --no-color --tail 80
+        docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml ps --all
+        docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml logs --no-color --tail 80
     - name: Remove only the disposable CI project
       if: always()
-      run: docker compose --env-file /dev/null -f compose.yaml down --volumes --timeout 15
+      run: docker compose --env-file /dev/null -f compose.yaml -f compose.mailpit.yaml down --volumes --timeout 15
     needs:
     - plan
     if: ${{ needs.plan.outputs.full == 'true' }}

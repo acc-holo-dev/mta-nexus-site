@@ -54,7 +54,11 @@
     "push:provider:verify": "node scripts/check-web-push-provider-evidence.mjs",
     "analyze:unused": "knip",
     "analyze:architecture": "depcruise --config .dependency-cruiser.cjs apps/web/src packages",
-    "analyze:bundle": "pnpm --filter @nexus/web exec next experimental-analyze --output"
+    "analyze:bundle": "pnpm --filter @nexus/web exec next experimental-analyze --output",
+    "dev:mail": "pnpm dev:preflight && docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml up --build --detach --wait --wait-timeout 600",
+    "dev:mail:logs": "docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml logs --tail 100 --follow app mail-worker mailpit",
+    "dev:mail:down": "docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml down",
+    "dev:mail:check": "pnpm dev:docker:check && docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml exec -T mail-worker node /app/scripts/check-account-mail-worker-health.mjs && docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml exec -T mail-worker node --import tsx scripts/check-dev-mailpit.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",

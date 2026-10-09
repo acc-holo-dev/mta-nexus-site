@@ -1,0 +1,97 @@
+# Optional local development mail capture. Use only with compose.yaml.
+services:
+  mailpit-init:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    user: "0:0"
+    restart: "no"
+    environment:
+      NODE_ENV: development
+    command: ["node", "scripts/prepare-dev-mailpit.mjs"]
+    volumes:
+      - dev_mail:/data/dev-mail
+
+  mailpit:
+    image: axllent/mailpit:v1.31.4
+    user: "1000:1000"
+    restart: unless-stopped
+    environment:
+      MP_SMTP_TLS_CERT: /data/dev-mail/smtp.crt
+      MP_SMTP_TLS_KEY: /data/dev-mail/smtp.key
+      MP_SMTP_REQUIRE_TLS: "true"
+      MP_SMTP_DISABLE_RDNS: "true"
+      MP_ALLOWED_HOSTS: localhost,127.0.0.1,mailpit
+      MP_DISABLE_VERSION_CHECK: "true"
+      MP_MAX_MESSAGES: "200"
+      MP_MAX_AGE: 24h
+    ports:
+      - "127.0.0.1:${NEXUS_MAILPIT_PORT:-8025}:8025"
+    volumes:
+      - dev_mail:/data/dev-mail:ro
+    depends_on:
+      mailpit-init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+  app:
+    environment:
+      ACCOUNT_MAIL_KEY_ID: dev-mailpit
+      ACCOUNT_MAIL_KEY_FILE: /data/dev-mail/mail.key
+      ACCOUNT_RECOVERY_ABUSE_KEY_FILE: /data/dev-mail/abuse.key
+    volumes:
+      - dev_mail:/data/dev-mail:ro
+    depends_on:
+      mailpit-init:
+        condition: service_completed_successfully
+
+  mail-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    init: true
+    restart: "no"
+    working_dir: /app/packages/db
+    command: ["node", "--import", "tsx", "scripts/run-account-mail-dispatcher.ts", "--ready"]
+    stop_grace_period: 75s
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://nexus:nexus_secret@postgres:5432/mta_nexus
+      ACCOUNT_MAIL_KEY_ID: dev-mailpit
+      ACCOUNT_MAIL_KEY_FILE: /data/dev-mail/mail.key
+      ACCOUNT_MAIL_APP_URL: http://localhost:${NEXUS_DEV_PORT:-3000}
+      ACCOUNT_MAIL_SMTP_HOST: mailpit
+      ACCOUNT_MAIL_SMTP_MODE: implicit_tls
+      ACCOUNT_MAIL_SMTP_PORT: 1025
+      ACCOUNT_MAIL_SMTP_SERVERNAME: mailpit
+      ACCOUNT_MAIL_SMTP_CA_FILE: /data/dev-mail/smtp.crt
+      ACCOUNT_MAIL_SMTP_FROM: no-reply@nexus-mta.test
+      ACCOUNT_MAIL_POLL_INTERVAL_MS: 1000
+    volumes:
+      - dev_mail:/data/dev-mail:ro
+      - ./packages/db/src:/app/packages/db/src:ro
+      - ./packages/db/scripts:/app/packages/db/scripts:ro
+      - ./packages/config/src:/app/packages/config/src:ro
+      - ./packages/domain/src:/app/packages/domain/src:ro
+      - ./packages/security/src:/app/packages/security/src:ro
+    depends_on:
+      app:
+        condition: service_healthy
+      mailpit:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "/app/scripts/check-account-mail-worker-health.mjs"]
+      interval: 15s
+      timeout: 10s
+      retries: 8
+      start_period: 20s
+
+volumes:
+  dev_mail:
