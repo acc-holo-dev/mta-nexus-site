@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import {
   db, builds, entitlements, licenses, products, users,
   buildRepository, entitlementRepository, licenseRepository,
@@ -93,6 +93,44 @@ describe("effective resource library and private visibility (PostgreSQL)", () =>
       }
 
       const now = new Date();
+      // The product's denormalized currentVersion can be stale. Only safe
+      // published builds may become the default download's displayed version.
+      const latestReadyId = `bld_lib_ready_released_${suffix}`;
+      const unsafeNewerId = `bld_lib_ready_unsafe_${suffix}`;
+      buildIds.push(latestReadyId, unsafeNewerId);
+      const buildBase = {
+        productId: productIds.ready,
+        fileSizeBytes: 16,
+        fileName: "library-fixture.zip",
+        mimeType: "application/zip",
+        sha256Hash: "a".repeat(64),
+        isSigned: false,
+      };
+      await db.insert(builds).values([
+        {
+          ...buildBase,
+          id: latestReadyId,
+          version: "1.4.0",
+          status: "published",
+          storageKey: `assets/test/library-safe-release-${suffix}.zip`,
+          scanStatus: "clean",
+          scanner: "integration-fixture",
+          scannedAt: now,
+          createdAt: new Date(now.getTime() + 60_000),
+        },
+        {
+          ...buildBase,
+          id: unsafeNewerId,
+          version: "9.9.0",
+          status: "published",
+          storageKey: `assets/test/library-unsafe-release-${suffix}.zip`,
+          scanStatus: "error",
+          createdAt: new Date(now.getTime() + 120_000),
+        },
+      ]);
+      await db.update(products)
+        .set({ currentVersion: "99.0.0" })
+        .where(eq(products.id, productIds.ready));
       await db.insert(entitlements).values([
         { id: entitlementIds[0], subjectType: "user", subjectId: ownerId,
           permission: "product.download", resourceId: productIds.ready, createdAt: new Date(now.getTime() - 50_000) },
@@ -129,7 +167,9 @@ describe("effective resource library and private visibility (PostgreSQL)", () =>
       expect(owner.items).toHaveLength(4);
       expect(new Set(owner.items.map(row => row.resourceId)).size).toBe(4);
       expect(owner.items.find(row => row.resourceId === productIds.ready))
-        .toMatchObject({ title: "Private title ready", downloadable: true });
+        .toMatchObject({ title: "Private title ready", downloadable: true, version: "1.4.0" });
+      expect((await buildRepository.findLatestPublishedByProduct(productIds.ready))?.id)
+        .toBe(latestReadyId);
       expect(owner.items.find(row => row.resourceId === productIds.paid))
         .toMatchObject({ title: "Private title paid", downloadable: true });
       for (const name of ["draft", "unsafe"] as const) {

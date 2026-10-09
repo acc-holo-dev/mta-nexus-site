@@ -1,4 +1,4 @@
-import path from "node:path";
+import { resourceAttachmentFileName } from "../../../../../lib/resource-attachment-filename";
 import { ValidationError } from "@nexus/domain";
 import {
   auditRepository,
@@ -26,13 +26,6 @@ import { authService } from "../../../../../lib/services/auth-service";
 import { commerceService } from "../../../../../lib/services/commerce-service";
 import { productService } from "../../../../../lib/services/product-service";
 
-const DOWNLOAD_EXTENSIONS = new Set([
-  ".zip",
-  ".rar",
-  ".7z",
-  ".lua",
-]);
-
 const privateHeaders = {
   "Cache-Control": "private, no-store",
   Vary: "Cookie",
@@ -47,17 +40,6 @@ function json(
     status,
     headers: privateHeaders,
   });
-}
-
-function getDownloadExtension(
-  storageKey: string,
-): string {
-  const extension = path
-    .extname(storageKey)
-    .toLowerCase();
-  return DOWNLOAD_EXTENSIONS.has(extension)
-    ? extension
-    : ".zip";
 }
 
 function destroyOpenedStream(
@@ -226,10 +208,11 @@ export async function GET(
 
     const stream =
       toDownloadWebStream(stored.stream);
-    const fileName =
-      `${product.slug}-${selectedBuild.version}${getDownloadExtension(
-        selectedBuild.fileName,
-      )}`;
+    const fileName = resourceAttachmentFileName(
+      product.slug,
+      selectedBuild.version,
+      selectedBuild.fileName,
+    );
 
     return new NextResponse(stream, {
       headers: {

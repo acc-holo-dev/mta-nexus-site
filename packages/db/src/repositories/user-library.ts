@@ -84,6 +84,19 @@ export class UserLibraryRepository {
           AND ${trustedCleanScanCondition()}
       )
     ), false)`;
+    // Downloading without a pinned build selects the newest *safe published*
+    // build. Product.currentVersion is editorial/cache state and can lag behind
+    // moderation, quarantine or a newer upload. Show exactly what the download
+    // route will select, using its same publication/scan predicate and order.
+    const latestPublishedVersion = sql<string | null>`(
+      SELECT ${builds.version}
+      FROM ${builds}
+      WHERE ${builds.productId} = ${products.id}
+        AND ${builds.status} = 'published'
+        AND ${trustedCleanScanCondition()}
+      ORDER BY ${builds.createdAt} DESC, ${builds.id} DESC
+      LIMIT 1
+    )`;
     const joined = sql`FROM owned LEFT JOIN ${products}
       ON ${products.id} = owned.resource_id`;
     const totals = await db.execute<CountRow>(sql`
@@ -116,7 +129,7 @@ export class UserLibraryRepository {
         owned.added_at AS "addedAt",
         CASE WHEN ${ready} THEN ${products.title} ELSE NULL END AS "title",
         CASE WHEN ${ready} THEN ${products.slug} ELSE NULL END AS "slug",
-        CASE WHEN ${ready} THEN ${products.currentVersion} ELSE NULL END AS "version",
+        CASE WHEN ${ready} THEN ${latestPublishedVersion} ELSE NULL END AS "version",
         ${ready} AS "downloadable"
       ${joined}
       ${filterClause}
