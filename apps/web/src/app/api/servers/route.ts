@@ -10,10 +10,10 @@ import {
 import { getTrustedRequestIp } from "../../../lib/request-client-ip";
 import { authService } from "../../../lib/services/auth-service";
 import {
+  indexMtaObservations,
   matchesMtaEndpoint,
   mtaLiveStatus,
   mtaMasterDirectoryService,
-  type MtaMasterServer,
 } from "../../../lib/services/mta-master-directory-service";
 import { serverService } from "../../../lib/services/server-service";
 
@@ -60,41 +60,29 @@ export async function GET(request: NextRequest) {
         )
       : 100;
 
-    const servers =
-      await serverService.listServers(limit);
-    let observations: MtaMasterServer[] = [];
-    let directoryIsStale = false;
+    // Editorial data and the official directory are independent reads.
+    // Directory failure must not take down owner-managed server listings.
+    const [servers, directory] = await Promise.all([
+      serverService.listServers(limit),
+      mtaMasterDirectoryService.getDirectory().catch(() => null),
+    ]);
+    const directoryIsStale = directory?.isStale ?? false;
+    const observations = directory?.servers ?? [];
+    // One server benefits from an early Array.find; for many listings,
+    // reuse the incremental endpoint index instead of N full-array scans.
+    const observationFor = servers.length > 1
+      ? indexMtaObservations(observations)
+      : (server: { ipAddress: string; port: number }) =>
+          observations.find((observation) => matchesMtaEndpoint(server, observation));
 
-    try {
-      const directory =
-        await mtaMasterDirectoryService.getDirectory();
-      observations = directory.servers;
-      directoryIsStale = directory.isStale;
-    } catch {
-      // Editorial listings remain available when the official directory is unavailable.
-    }
-
-    const enrichedServers = servers.map(
-      (server) => {
-        const liveObservation =
-          observations.find((observation) =>
-            matchesMtaEndpoint(
-              server,
-              observation,
-            ),
-          );
-
-        return {
-          ...server,
-          liveObservation:
-            liveObservation ?? null,
-          liveStatus: mtaLiveStatus(
-            liveObservation,
-            directoryIsStale,
-          ),
-        };
-      },
-    );
+    const enrichedServers = servers.map((server) => {
+      const liveObservation = observationFor(server);
+      return {
+        ...server,
+        liveObservation: liveObservation ?? null,
+        liveStatus: mtaLiveStatus(liveObservation, directoryIsStale),
+      };
+    });
 
     return Response.json(
       {
@@ -102,7 +90,9 @@ export async function GET(request: NextRequest) {
         directoryIsStale,
         limit,
       },
-      { headers: publicHeaders },
+      // Do not cache an unavailable or stale directory for an additional
+      // 30s + 120s SWR window at an HTTP intermediary.
+      { headers: directory && !directoryIsStale ? publicHeaders : errorHeaders },
     );
   } catch (error) {
     logRequestEvent({

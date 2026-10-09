@@ -105,6 +105,16 @@ history API сохранён, оба пути проверяют private visibil
 integration cases: older-after-newer, equal timestamp, duplicate и
 конкурентная запись; до исполняемого database CI они не считаются пройденными.
 
+Публичный `GET /api/servers` теперь читает редакционные данные и master-list
+одновременно (upstream failure не ломает выдачу), а для нескольких
+редакционных карточек использует инкрементальный endpoint index вместо
+повторного Array.find на весь master-list. При 60 отсутствующих совпадениях
+на synthetic 10k-снимке число индексных чтений сокращается с 600k до 10k
+(проверяется единичным proxy instrumentation). Ответ с unavailable или
+stale upstream больше не сохраняется в публичном HTTP/SWR-кеше; у
+достоверно свежего upstream прежний короткий кеш сохранён. Добавлены
+unit HTTP tests, а оценка production latency остаётся непроверенной.
+
 Выборка известных серверов для MTA observation collector теперь возвращает
 только id/ipAddress/port вместо полного редакционного профиля с JSON
 метаданными. Выборка сохраняет фильтры active/non-private, лимит 501
