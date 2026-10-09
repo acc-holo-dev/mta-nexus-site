@@ -230,6 +230,31 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 ### Code analysis
 
+The notification bell uses sequential polling: the next 30-second delay starts
+after the previous read settles. Repeated visibility events do not duplicate an
+active read. A hidden tab has no polling timer; hiding the tab or cleaning up the
+effect aborts its current read. Returning to a visible tab reads immediately.
+Cancelled readers that settle late cannot update the UI or replace the newer
+poller's timer. Mark-all-read pauses polling until the write settles and then
+reloads the server state; refresh and locale changes cannot restart polling
+while that write is pending. GET and POST use the existing `privateApiRequest`
+credentials/cache/timeout policy. No new runtime dependency is required.
+
+Eleven fake-timer helper tests cover serialization, hidden/visible transitions,
+late responses, failures, cleanup and interval validation. Four notification-bell
+effect tests execute the actual component's setup/cleanup through an SSR hook
+adapter, covering repeated visibility events, cancellation, setup-cleanup-setup
+and an initially hidden tab. These are not DOM/browser acceptance tests. Before
+the change, the original three component regressions failed: a synthetic pending
+GET was duplicated by visibility events/timer ticks, cleanup left its signal
+active, and a hidden initial tab retained a polling timer. This establishes
+request lifecycle behavior, not production latency or traffic measurements.
+The sidebar also keeps its current-page toggle working when browser storage is
+unavailable; reading or persisting its preference cannot break the shell.
+See [MDN polling with recursive timeouts](https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval#ensure_that_execution_duration_is_shorter_than_interval_frequency),
+[Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
+and [React effect cleanup](https://react.dev/reference/react/useEffect).
+
 Public developer/user/organization profiles and server details share one
 module-level `React.cache` reader between `generateMetadata` and the page.
 For the same username/slug in one RSC request, the underlying record lookup

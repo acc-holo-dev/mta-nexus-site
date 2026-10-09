@@ -19,16 +19,21 @@ export function NexusShell({
   const dictionary = getDictionary(locale);
 
   useEffect(() => {
-    const stored = localStorage.getItem("nexus-sidebar-collapsed");
-    if (stored === "true") setIsSidebarCollapsed(true);
+    try {
+      if (localStorage.getItem("nexus-sidebar-collapsed") === "true") setIsSidebarCollapsed(true);
+    } catch {
+      // The sidebar remains usable when browser storage is unavailable.
+    }
   }, []);
 
   const toggle = () => {
-    setIsSidebarCollapsed((previous) => {
-      const next = !previous;
+    const next = !isSidebarCollapsed;
+    setIsSidebarCollapsed(next);
+    try {
       localStorage.setItem("nexus-sidebar-collapsed", String(next));
-      return next;
-    });
+    } catch {
+      // Keep this page's choice even if persistence is blocked.
+    }
   };
 
   return (

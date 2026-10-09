@@ -7,6 +7,8 @@ import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 import { formatNotification } from "../lib/notification-copy";
 import type { Notification } from "@nexus/domain";
 import { useNexusLocale } from "./locale-context";
+import { privateApiRequest } from "../lib/private-api-request";
+import { startVisiblePolling } from "../lib/visible-polling";
 
 export function NotificationBell() {
   const { locale, dictionary } = useNexusLocale();
@@ -20,20 +22,16 @@ export function NotificationBell() {
   const [attempt, setAttempt] = useState(0);
   const dialogRef = useModalDialog(isOpen);
   const mutationGeneration = useRef(0);
+  const stopPolling = useRef<(() => void) | null>(null);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
-    let active = true;
-
-    async function fetchNotifications() {
-      const generation = mutationGeneration.current;
-      try {
-        const response = await fetch("/api/notifications?limit=6", {
-          cache: "no-store",
-          credentials: "same-origin",
-          signal: AbortSignal.timeout(10_000),
-        });
+    if (marking) return;
+    const generation = mutationGeneration.current;
+    const stop = startVisiblePolling({
+      async read(signal) {
+        const response = await fetch("/api/notifications?limit=6", privateApiRequest({ signal }));
         const data = await response.json().catch(() => null);
         if (
           !response.ok ||
@@ -44,44 +42,37 @@ export function NotificationBell() {
           throw new Error(copy.loadError);
         }
 
-        if (active && generation === mutationGeneration.current) {
+        return data;
+      },
+      onValue(data) {
+        if (generation === mutationGeneration.current) {
           setNotifications(data.notifications);
           setUnreadCount(data.unreadCount);
           setError(null);
         }
-      } catch {
-        if (active && generation === mutationGeneration.current) setError(copy.loadError);
-      }
-    }
-
-    const refreshIfVisible = () => {
-      if (document.visibilityState === "visible") void fetchNotifications();
-    };
-    refreshIfVisible();
-    document.addEventListener("visibilitychange", refreshIfVisible);
-    const interval = window.setInterval(refreshIfVisible, 30_000);
+      },
+      onError() {
+        if (generation === mutationGeneration.current) setError(copy.loadError);
+      },
+    });
+    stopPolling.current = stop;
 
     return () => {
-      active = false;
-      document.removeEventListener("visibilitychange", refreshIfVisible);
-      window.clearInterval(interval);
+      stop();
+      if (stopPolling.current === stop) stopPolling.current = null;
     };
-  }, [attempt, copy.loadError]);
+  }, [attempt, copy.loadError, marking]);
 
   async function markAllRead() {
     if (marking || unreadCount === 0) return;
 
     mutationGeneration.current += 1;
+    stopPolling.current?.();
     setMarking(true);
     setError(null);
     setAnnouncement(null);
     try {
-      const response = await fetch("/api/notifications/mark-read", {
-        method: "POST",
-        cache: "no-store",
-        credentials: "same-origin",
-        signal: AbortSignal.timeout(10_000),
-      });
+      const response = await fetch("/api/notifications/mark-read", privateApiRequest({ method: "POST" }));
       const data = await response.json().catch(() => null);
       if (!response.ok || data?.success !== true || data?.scope !== "all") {
         throw new Error(copy.markError);
