@@ -785,3 +785,27 @@ wrong-version selection and unauthorized cross-product selection, but does
   tests but still need an exact-SHA runnable CI acceptance pass.
 
 Do not enable unsafe historical statuses to improve availability.
+
+### P2. Local storage confinement: target-runtime verification and descriptor regressions
+
+The local storage provider now opens each directory component with
+`O_DIRECTORY | O_NOFOLLOW` through a pinned descriptor and opens asset files
+with `O_NOFOLLOW`. It also rejects cross-boundary hard-linked files.
+The security contract assumes a deployment-controlled storage root and
+its ancestors and requires POSIX descriptor paths (Linux `/proc/self/fd`).
+The safety suite includes rename/symlink substitution and descriptor cleanup
+checks. Earlier tests were updated to distinguish the new directory handles
+from the actual archive descriptor, and `.` is explicitly an invalid key.
+
+- **Remaining acceptance:** run the complete storage suite and build on the
+  project's Node.js 26/Linux container, then inspect error-path descriptor
+  counts under concurrent traffic. Node 22 smoke coverage is not equivalent.
+- **Boundary:** external writers with the same Unix UID can still mutate an
+  already-open inode in place between the hash pass and streaming. In a secure
+  deployment the storage volume must be writable only by the storage service.
+  Browser SHA-256 verification rejects corrupted delivery but is not an
+  authorization or revocation barrier.
+- **Operations:** on a host without a trusted root or a functioning descriptor
+  filesystem the provider must fail closed, never silently fall back to path
+  traversal or non-atomic overwrites.
+

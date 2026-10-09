@@ -74,6 +74,9 @@ it("closes and removes the temporary file after a write failure", async () => {
   const close = vi.fn();
   vi.spyOn(fs, "open").mockImplementation(async (...args) => {
     const handle = await open(...args);
+    // Only the temporary upload handle writes archive data. Pinned parent
+    // directories are separate descriptors and should not skew this test.
+    if (!String(args[0]).endsWith(".tmp")) return handle;
     const originalClose = handle.close.bind(handle);
     vi.spyOn(handle, "writeFile").mockRejectedValue(new Error("disk full"));
     vi.spyOn(handle, "close").mockImplementation(async () => {

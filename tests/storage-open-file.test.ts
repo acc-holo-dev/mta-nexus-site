@@ -35,8 +35,10 @@ it("rejects a missing file before returning a stream", async () => {
   await expect(storage.get("missing.zip")).rejects.toMatchObject({ code: "ENOENT" });
 });
 
-it("rejects directories as download objects", async () => {
-  await expect(storage.get(".")).rejects.toThrow("regular file");
+it("rejects directories as download objects and refuses a root-directory key", async () => {
+  await fs.mkdir(join(root, "directory"));
+  await expect(storage.get("directory")).rejects.toThrow("regular file");
+  await expect(storage.get(".")).rejects.toThrow("Invalid storage key");
 });
 
 it("hashes multi-chunk files without consuming the returned download stream", async () => {
@@ -74,6 +76,9 @@ it("stops hashing between chunks and closes the file on cancellation", async () 
   const read = vi.fn();
   vi.spyOn(fs, "open").mockImplementation(async (...args) => {
     const handle = await open(...args);
+    // The storage provider also opens pinned directory descriptors. Spy on
+    // the actual asset file handle, not those independently closed parents.
+    if (!String(args[0]).endsWith("/large.zip")) return handle;
     const originalRead = handle.read.bind(handle);
     const originalClose = handle.close.bind(handle);
     vi.spyOn(handle, "read").mockImplementation(async (...readArgs: Parameters<typeof handle.read>) => {

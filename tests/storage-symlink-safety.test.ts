@@ -113,4 +113,25 @@ describe("local storage symlink confinement", () => {
     await provider.delete(created.key);
     expect(await provider.exists(created.key)).toBe(false);
   });
+
+  it("releases all pinned directories after an upload and after a denied symlink", async () => {
+    const opened: Array<Awaited<ReturnType<typeof fs.open>>> = [];
+    const originalOpen = fs.open.bind(fs);
+    vi.spyOn(fs, "open").mockImplementation(async (...args) => {
+      const handle = await originalOpen(...args);
+      if ((await handle.stat()).isDirectory()) opened.push(handle);
+      return handle;
+    });
+
+    await provider.put("nested/inside/asset.zip", Buffer.from("safe"), "application/zip");
+    await fs.symlink(outside, path.join(root, "linked"));
+    await expect(provider.get("linked/secret.zip")).rejects.toThrow();
+
+    expect(opened.length).toBeGreaterThanOrEqual(4);
+    for (const handle of opened) {
+      expect(handle.fd).toBe(-1);
+      await expect(handle.stat()).rejects.toMatchObject({ code: "EBADF" });
+    }
+    expect(await fs.readdir(outside)).toEqual(["secret.zip"]);
+  });
 });
