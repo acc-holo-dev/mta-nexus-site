@@ -269,6 +269,12 @@ See [MDN filter copying](https://developer.mozilla.org/en-US/docs/Web/JavaScript
 [slice selection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)
 and [Map lookup behavior](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#description).
 
+The ASE master-list parser skips unused player-name bytes without UTF-8
+decoding, but continues validating each field length and entry boundary.
+Editorial/public server views never expose the packet's player-name list.
+The retained player counts and core server metadata are unchanged; a parser
+fixture covers 1000 names and a truncated ignored field.
+
 The opt-in MTA observation collector starts the directory and known-server reads
 together, then records matches in batches of at most five concurrent writes per
 capture. The known-server limit remains 500, with one extra row detecting a

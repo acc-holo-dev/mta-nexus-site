@@ -155,6 +155,15 @@ class MasterListReader {
     return this.decoder.decode(bytes);
   }
 
+  skipString() {
+    // The master packet may include thousands of player names, but NEXUS
+    // does not expose them. Validate the length without decoding or
+    // allocating a Uint8Array for every ignored field.
+    const length = this.u8();
+    this.ensure(length);
+    this.offset += length;
+  }
+
   private ensure(length: number) {
     if (this.offset + length > this.data.byteLength) {
       throw new Error("Truncated MTA master-list payload");
@@ -200,7 +209,7 @@ export function parseMtaMasterList(data: ArrayBuffer): MtaMasterServer[] {
 
     if (flags & FLAG.playerList) {
       const playerCount = reader.u16();
-      for (let player = 0; player < playerCount; player++) reader.string();
+      for (let player = 0; player < playerCount; player++) reader.skipString();
     }
 
     if (flags & FLAG.responding) server.responding = reader.u8() === 0;

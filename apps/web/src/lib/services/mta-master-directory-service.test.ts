@@ -83,6 +83,44 @@ describe("parseMtaMasterList", () => {
     }]);
   });
 
+  it("skips unneeded player names without decoding them", () => {
+    const count = 1000;
+    const playerNames = Array.from({ length: count }, (_, index) =>
+      text(`player-${index}`),
+    ).flat();
+    const entry = [
+      203, 0, 113, 7, ...u16(22003), ...u16(count), ...playerNames,
+    ];
+    const packet = new Uint8Array([
+      0, 0, 0, 2, ...u32(0x0800), ...u32(1), ...u32(1),
+      ...u16(entry.length + 2), ...entry,
+      ...u32(0x12345679),
+    ]);
+    const decode = vi.spyOn(TextDecoder.prototype, "decode");
+    try {
+      expect(parseMtaMasterList(packet.buffer)).toEqual([
+        { address: "203.0.113.7", port: 22003 },
+      ]);
+      expect(decode).not.toHaveBeenCalled();
+    } finally {
+      decode.mockRestore();
+    }
+  });
+
+  it("rejects truncated ignored player names instead of reading into the next entry", () => {
+    const entry = [
+      203, 0, 113, 7, ...u16(22003), ...u16(1),
+      20, 65, 66,
+    ];
+    const packet = new Uint8Array([
+      0, 0, 0, 2, ...u32(0x0800), ...u32(1), ...u32(1),
+      ...u16(entry.length + 2), ...entry,
+      ...u32(0x12345679),
+    ]);
+    expect(() => parseMtaMasterList(packet.buffer))
+      .toThrow("Invalid MTA master-list entry boundary");
+  });
+
   it("accepts endpoint-only entries when optional flags are absent", () => {
     const payload = new Uint8Array([
       0, 0, 0, 2,
