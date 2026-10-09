@@ -44,7 +44,7 @@ describe("server observation history API", () => {
     );
     const updateBlock = repository.slice(
       repository.indexOf(".update(servers)"),
-      repository.indexOf(".where(and("),
+      repository.indexOf(".where(and(", repository.indexOf(".update(servers)")),
     );
 
     expect(updateBlock).toContain("currentPlayers");

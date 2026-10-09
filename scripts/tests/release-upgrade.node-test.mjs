@@ -97,7 +97,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0033_support_mutation_idempotency");
+  assert.equal(plan.targetTag, "0034_server_endpoint_revision");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -123,6 +123,17 @@ test("upgrade fixture checks durable support mutation idempotency", () => {
   assert.match(rehearsal, /supportMutationIdempotencyPresent = true/u);
 });
 
+test("upgrade fixture checks endpoint revisions and legacy proofs", () => {
+  const rehearsal = readFileSync(script, "utf8");
+  assert.match(rehearsal, /INSERT INTO server_claim_challenges/u);
+  assert.match(rehearsal, /endpoint\[0\]\.endpoint_revision, 0/u);
+  assert.match(rehearsal, /legacyProof\[0\]\.endpoint_revision, null/u);
+  assert.match(rehearsal, /servers_endpoint_revision_nonnegative/u);
+  assert.match(rehearsal, /server_claim_endpoint_revision_nonnegative/u);
+  assert.match(rehearsal, /serverEndpointRevisionPresent = true/u);
+  assert.match(rehearsal, /legacyServerProofInvalidated = true/u);
+});
+
 test("upgrade contract fails fast when a new migration advances the journal", () => {
   const journal = JSON.parse(
     readFileSync(journalUrl, "utf8"),
@@ -135,7 +146,7 @@ test("upgrade contract fails fast when a new migration advances the journal", ()
         idx: journal.entries.length,
         version: "7",
         when: Date.now(),
-        tag: "0033_requires_fixture_review",
+        tag: "0035_requires_fixture_review",
         breakpoints: true,
       },
     ],

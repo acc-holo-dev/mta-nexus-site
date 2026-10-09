@@ -3,7 +3,7 @@ export const RELEASE_UPGRADE_BASELINE_TAG =
 export const RELEASE_UPGRADE_FAILURE_TAG =
   "0027_build_quarantine";
 export const RELEASE_UPGRADE_TARGET_TAG =
-  "0033_support_mutation_idempotency";
+  "0034_server_endpoint_revision";
 
 function journalEntries(journal) {
   if (!journal || !Array.isArray(journal.entries)) {

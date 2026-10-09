@@ -225,7 +225,7 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
           { address: alternateHost, port: original.port, players: 22 },
         ],
       };
-      function observationFor(endpoint: typeof original) {
+      function observationFor(endpoint: NonNullable<typeof original>) {
         const [candidate] = buildMasterObservationCandidates([endpoint], directory);
         if (!candidate) throw new Error("Expected source observation");
         return candidate;

@@ -138,7 +138,7 @@ describe("support retry recovery across same-tab reload", () => {
 
   it("resolves an opaque discriminator only for a valid authenticated session", async () => {
     const user = { authenticated: true, user: { id: "usr_" + "1".repeat(24) } };
-    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify(user), { status: 200 }));
+    const fetchMock = vi.fn().mockImplementation(async () => new Response(JSON.stringify(user), { status: 200 }));
     vi.stubGlobal("fetch", fetchMock);
     const a = await resolveSupportRetryActorScope();
     const b = await resolveSupportRetryActorScope();

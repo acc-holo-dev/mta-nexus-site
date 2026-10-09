@@ -49,6 +49,8 @@ const evidence = {
   supportStaffQueueIndexPresent: false,
   supportStaffFilterIndexPresent: false,
   supportMutationIdempotencyPresent: false,
+  serverEndpointRevisionPresent: false,
+  legacyServerProofInvalidated: false,
   webPushSubscriptionSchemaPresent: false,
   webPushOutboxSchemaPresent: false,
   cleanupComplete: false,
@@ -89,17 +91,25 @@ try {
     VALUES ('upgrade-entitlement', 'user', 'upgrade-user', 'download', 'upgrade-resource')`;
   await client`INSERT INTO notifications (id, recipient_id, title, message, link, is_read)
     VALUES ('upgrade-notification', 'upgrade-user', 'Legacy title', 'Legacy message', '/workspace', true)`;
+  await client`INSERT INTO servers (id, name, slug, ip_address, port, owner_id)
+    VALUES ('upgrade-server', 'Existing server', 'upgrade-server', '198.51.100.70', 22003, 'upgrade-user')`;
+  await client`INSERT INTO server_claim_challenges
+    (id, server_id, requester_id, token_digest, expires_at)
+    VALUES ('scc_11111111-1111-4111-8111-111111111111', 'upgrade-server', 'upgrade-user',
+      ${"b".repeat(64)}, now() + interval '1 hour')`;
 
   const rows = async () => {
     const result = {};
-    for (const table of ["users", "products", "builds", "entitlements", "notifications"]) {
+    for (const table of ["users", "products", "builds", "entitlements", "notifications", "servers", "server_claim_challenges"]) {
       // Remove only fields introduced after the frozen baseline so existing
       // legacy-row values remain byte-for-byte comparable across the upgrade.
       const rowJson = table === "notifications"
         ? "to_jsonb(t) - 'data'"
         : table === "builds"
           ? "to_jsonb(t) - 'quarantine_previous_status' - 'quarantine_reason' - 'quarantined_at' - 'quarantined_by'"
-          : "to_jsonb(t)";
+          : table === "servers" || table === "server_claim_challenges"
+            ? "to_jsonb(t) - 'endpoint_revision'"
+            : "to_jsonb(t)";
       result[table] = await client.unsafe(
         `SELECT ${rowJson} AS row FROM "${table}" t ORDER BY id`,
       );
@@ -185,6 +195,21 @@ try {
       AND indexname = 'support_mutation_requests_actor_request_pk'`;
   assert.equal(supportKeyIndexes.length, 1, "Support idempotency uniqueness must exist");
   evidence.supportMutationIdempotencyPresent = true;
+
+  const endpoint = await client`SELECT endpoint_revision FROM servers WHERE id = 'upgrade-server'`;
+  assert.equal(endpoint[0].endpoint_revision, 0, "Existing servers start at revision zero");
+  const legacyProof = await client`SELECT endpoint_revision FROM server_claim_challenges
+    WHERE id = 'scc_11111111-1111-4111-8111-111111111111'`;
+  assert.equal(legacyProof[0].endpoint_revision, null, "Legacy proof must not receive a current revision");
+  const revisionConstraints = await client`SELECT conname FROM pg_constraint
+    WHERE conrelid IN ('public.servers'::regclass, 'public.server_claim_challenges'::regclass)
+      AND conname IN ('servers_endpoint_revision_nonnegative', 'server_claim_endpoint_revision_nonnegative')
+    ORDER BY conname`;
+  assert.deepEqual(revisionConstraints.map(row => row.conname), [
+    "server_claim_endpoint_revision_nonnegative", "servers_endpoint_revision_nonnegative",
+  ]);
+  evidence.serverEndpointRevisionPresent = true;
+  evidence.legacyServerProofInvalidated = true;
 
   const pushTables = await client`SELECT table_name FROM information_schema.tables
     WHERE table_schema = 'public'

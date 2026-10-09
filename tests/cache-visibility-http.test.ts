@@ -130,7 +130,7 @@ describe("HTTP cache visibility contract", () => {
     mocks.servers.mockResolvedValue([]);
     mocks.directory.mockResolvedValue({
       servers: [],
-      fetchedAt: "2026-10-08T00:00:00.000Z",
+      fetchedAt: new Date().toISOString(),
       isStale: false,
     });
     mocks.search.mockResolvedValue([]);

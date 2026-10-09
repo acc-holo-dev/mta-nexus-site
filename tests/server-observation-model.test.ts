@@ -23,7 +23,8 @@ describe("public MTA observation model", () => {
 
     expect(schema).toContain('serverObservations = pgTable("server_observations"');
     expect(schema).toContain('lastObservedAt: timestamp("last_observed_at"');
-    expect(repository).toContain("onConflictDoNothing()");
+    expect(repository).toContain(".onConflictDoNothing({");
+    expect(repository).toContain("serverObservations.sourceSequence,");
     expect(repository).toContain("getPeakPlayers");
     expect(migration).toContain('ALTER COLUMN "owner_id" DROP NOT NULL');
     expect(migration).toContain('DROP TABLE IF EXISTS "server_installations"');

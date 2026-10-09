@@ -51,7 +51,7 @@ const mocks = {
     mtaMasterDirectoryService: { getDirectory: async () => null },
     indexMtaObservations: () => nothing, matchesMtaEndpoint: () => false, mtaLiveStatus: () => "unknown",
   },
-  "server-history-service": { serverHistoryService: { getHistory: async () => null } },
+  "server-history-service": { serverHistoryService: { getHistoryForServer: async () => null } },
   "content-service": { contentService: { listServerUpdates: async () => [] } },
   "@nexus/validation": { safeExternalWebUrl: value => value || undefined },
   "next/navigation": { notFound: () => { throw new Error("NOT_FOUND"); } },
@@ -130,7 +130,7 @@ async function render(route, key, request) {
   }
   return requests.run(request, async () => {
     const errors = [];
-    const stream = await renderer.renderToReadableStream(React.createElement(Tree), {}, { onError: error => errors.push(error) });
+    const stream = await renderer.renderToReadableStream(React.createElement(Tree), {}, { onError: error => { errors.push(error); } });
     const flight = await new Response(stream).text();
     assert.deepEqual(errors, []);
     if (!request.missing) assert.ok(flight.includes(request.name), `${name}: page should show its own request data`);

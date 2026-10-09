@@ -230,6 +230,42 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 ### Code analysis
 
+Article views increment with PostgreSQL `view_count + 1` and return the database
+value through `RETURNING`, avoiding lost updates from stale application reads.
+Metadata reads (`incrementView: false`) remain read-only. The unit test compiles
+the increment and ID predicate with the Drizzle PostgreSQL dialect against a
+mocked query chain; it does not execute concurrent transactions on PostgreSQL.
+See the [Drizzle increment guide](https://orm.drizzle.team/docs/guides/incrementing-a-value).
+
+Notification dispatch processes at most ten storage operations per batch and
+waits for all of them before starting the next batch. Counts are accumulated
+per batch instead of retaining results for the entire recipient list. Both
+synchronous preparation/storage exceptions and rejected promises count as
+storage failures without cancelling later recipients. This is a per-call limit,
+not a global limit across requests or a guarantee of faster database execution.
+Deterministic tests cover 25 recipients, failures in the first and last batches,
+suppression, degraded push queues, final counts and empty input. Aggregate logs
+still exclude notification contents. Run the focused checks with:
+
+```bash
+pnpm exec vitest run --project unit tests/notification-dispatch-service.test.ts packages/db/src/repositories/content-view-counter.test.ts
+```
+
+The async callback makes synchronous exceptions into promise rejections before
+`Promise.allSettled` observes them; see the
+[MDN async function contract](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function).
+Live PostgreSQL load and browser acceptance remain separate checks.
+
+The upgrade rehearsal now targets migration `0034_server_endpoint_revision`.
+Its frozen 0024 fixture includes an existing server and legacy control challenge;
+the rehearsal checks revision zero, a null legacy proof revision, both constraints,
+row preservation, rollback/retry and an idempotent rerun. These assertions require
+the hosted disposable PostgreSQL service; local tooling tests check the contract
+and refusal guards only. Server-detail/RSC fixtures use the prefetched-history API,
+HTTP cache fixtures use fresh snapshots, and mocked session fetches return a new
+Response for each read. Full repository reads expose the persisted endpoint
+revision in their TypeScript result instead of dropping it from the return type.
+
 The public MTA directory API selects a page without retaining every matching
 server. With no search term and `minPlayers=0`, it slices the source snapshot
 directly; master-list player counts are unsigned. Filtered requests scan all
@@ -1241,7 +1277,7 @@ Keep these CI artifacts outside the runner before their 14-day retention expires
 | Evidence | What it proves |
 | --- | --- |
 | `core-release-evidence-<sha>-<attempt>` | Repository identity, migrations, lint, types, tests, default production build |
-| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0030; failed DDL and ledger rollback; retry; idempotency; legacy rows and new structured notifications |
+| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0034; failed DDL and ledger rollback; retry; idempotency; legacy rows, endpoint revision defaults, invalidated legacy proofs and new structured notifications |
 | `backup-restore-<sha>-<attempt>` | Destroyed synthetic source restored into new owned volumes; schema, migration ledger, author, resource, trusted build, entitlement, notification and uploads preserved |
 
 Require `status: "PASS"`, the intended `sha`, and all verification/cleanup flags

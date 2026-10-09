@@ -56,7 +56,7 @@ describe("server ownership hardening surface", () => {
       "A verification request is already pending",
     );
     expect(repository).toContain(
-      'throw new ConflictError("Server claim target is already owned by another user")',
+      '"Server endpoint changed or is already owned; new MTA control proof required"',
     );
     expect(repository).toContain("findPendingForAnyRequester");
     // Duplicate pending requests are detected per requester before enqueue;

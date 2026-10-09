@@ -4,6 +4,9 @@ import { db } from "../client";
 import { auditEvents, servers } from "../schema";
 import type { AuditEvent, Server } from "@nexus/domain";
 
+// Full database reads include the durable revision introduced in migration 0034.
+type PersistedServer = Server & { endpointRevision: number };
+
 type ServerEditableFields = Partial<
   Pick<Server, "name" | "description" | "websiteUrl" | "discordUrl" |
     "rulesUrl" | "mediaUrls" | "language" | "region" | "gameplayTags" |
@@ -187,14 +190,14 @@ export class ServerRepository {
     return result;
   }
 
-  async findById(id: string): Promise<Server | null> {
+  async findById(id: string): Promise<PersistedServer | null> {
     const rows = await db.select().from(servers).where(eq(servers.id, id)).limit(1);
-    return (rows[0] as unknown as Server) || null;
+    return (rows[0] as unknown as PersistedServer) || null;
   }
 
-  async findBySlug(slug: string): Promise<Server | null> {
+  async findBySlug(slug: string): Promise<PersistedServer | null> {
     const rows = await db.select().from(servers).where(eq(servers.slug, slug)).limit(1);
-    return (rows[0] as unknown as Server) || null;
+    return (rows[0] as unknown as PersistedServer) || null;
   }
 
   async create(server: Omit<Server, "createdAt" | "updatedAt">): Promise<Server> {

@@ -95,7 +95,7 @@ vi.mock(
 
 vi.mock("../apps/web/src/lib/services/server-history-service", () => ({
   serverHistoryService: {
-    getHistory: mocks.history,
+    getHistoryForServer: mocks.history,
   },
 }));
 
@@ -215,7 +215,7 @@ describe("server detail behavior", () => {
 
     await vi.waitFor(() => {
       expect(mocks.directory).toHaveBeenCalledOnce();
-      expect(mocks.history).toHaveBeenCalledWith(state.server.id, "24h");
+      expect(mocks.history).toHaveBeenCalledWith(state.server, "24h");
       expect(mocks.updates).toHaveBeenCalledWith(state.server.id, 6);
     });
 

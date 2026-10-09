@@ -189,12 +189,14 @@ export class ContentRepository {
     const item = rows[0] as unknown as Content;
 
     if (options.incrementView !== false) {
-      await db
+      // Increment in PostgreSQL so concurrent article reads cannot overwrite
+      // one another with the same stale in-memory value.
+      const [updatedItem] = await db
         .update(content)
-        .set({ viewCount: item.viewCount + 1 })
-        .where(eq(content.id, item.id));
-
-      item.viewCount += 1;
+        .set({ viewCount: sql`${content.viewCount} + 1` })
+        .where(eq(content.id, item.id))
+        .returning({ viewCount: content.viewCount });
+      item.viewCount = updatedItem?.viewCount ?? item.viewCount + 1;
     }
 
     return item;

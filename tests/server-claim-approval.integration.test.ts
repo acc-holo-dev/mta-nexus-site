@@ -42,12 +42,13 @@ describe("server claim moderation ownership CAS", () => {
       displayName: "Claim Approval Reviewer",
       role: "moderator",
     });
+    const serverPort = disposablePort(1);
     await db.insert(servers).values({
       id: serverId,
       name: "Claim Approval Server",
       slug: `claim-approval-${suffix}`,
       ipAddress: "198.51.100.70",
-      port: disposablePort(1),
+      port: serverPort,
       status: "active",
       visibility: "public",
       isVerified: false,
@@ -66,6 +67,7 @@ describe("server claim moderation ownership CAS", () => {
         requesterId,
         token: challenge.token,
         sourceFetchedAt,
+        expectedEndpoint: { ipAddress: "198.51.100.70", port: serverPort },
         verificationRequestId: verificationId,
         auditId: `aud_claim_proof_${suffix}`,
       });
@@ -190,12 +192,13 @@ describe("server claim moderation ownership CAS", () => {
         role,
       });
     }
+    const serverPort = disposablePort(3);
     await db.insert(servers).values({
       id: serverId,
       name: "Claim Race Server",
       slug: `claim-race-${suffix}`,
       ipAddress: "198.51.100.72",
-      port: disposablePort(3),
+      port: serverPort,
       status: "active",
       visibility: "public",
       isVerified: false,
@@ -212,6 +215,7 @@ describe("server claim moderation ownership CAS", () => {
       requesterId,
       token: challenge.token,
       sourceFetchedAt: await dbFutureTimestamp(),
+      expectedEndpoint: { ipAddress: "198.51.100.72", port: serverPort },
       verificationRequestId: verificationId,
       auditId: `aud_claim_race_proof_${suffix}`,
     });
