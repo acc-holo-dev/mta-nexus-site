@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { mtaMasterDirectoryService } from "../../../../lib/services/mta-master-directory-service";
+import { selectMtaDirectoryPage } from "../../../../lib/mta-directory-page";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -68,38 +69,16 @@ export async function GET(request: NextRequest) {
       limit,
       offset,
     } = parsedQuery.data;
-    const term = query?.toLocaleLowerCase();
-
-    const matchingServers =
-      directory.servers.filter((server) => {
-        if (
-          (server.players ?? 0) < minPlayers
-        ) {
-          return false;
-        }
-        if (!term) return true;
-        return [
-          server.name,
-          server.address,
-          server.gameMode,
-          server.mapName,
-          server.version,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLocaleLowerCase()
-          .includes(term);
-      });
+    const page = selectMtaDirectoryPage(directory.servers, {
+      query, minPlayers, limit, offset,
+    });
 
     // Unique request IDs are intentionally omitted from cacheable public
     // representations because intermediaries may replay response headers.
     return Response.json(
       {
-        servers: matchingServers.slice(
-          offset,
-          offset + limit,
-        ),
-        total: matchingServers.length,
+        servers: page.servers,
+        total: page.total,
         offset,
         limit,
         fetchedAt: directory.fetchedAt,

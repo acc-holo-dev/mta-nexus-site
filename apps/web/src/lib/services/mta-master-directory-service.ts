@@ -67,12 +67,21 @@ export function matchesMtaEndpoint(
 
 export function indexMtaObservations(servers: readonly MtaMasterServer[]) {
   const byEndpoint = new Map<string, MtaMasterServer>();
-  for (const server of servers) {
-    const key = `${normalizeMtaAddress(server.address)}:${server.port}`;
-    if (!byEndpoint.has(key)) byEndpoint.set(key, server);
-  }
-  return (editorial: { ipAddress: string; port: number }) =>
-    byEndpoint.get(`${normalizeMtaAddress(editorial.ipAddress)}:${editorial.port}`);
+  let nextIndex = 0;
+  return (editorial: { ipAddress: string; port: number }) => {
+    const key = `${normalizeMtaAddress(editorial.ipAddress)}:${editorial.port}`;
+    const known = byEndpoint.get(key);
+    if (known) return known;
+
+    // Index only the visited prefix of this snapshot; never scan it twice.
+    while (nextIndex < servers.length) {
+      const server = servers[nextIndex++];
+      const observedKey = `${normalizeMtaAddress(server.address)}:${server.port}`;
+      if (!byEndpoint.has(observedKey)) byEndpoint.set(observedKey, server);
+      if (observedKey === key) return server;
+    }
+    return undefined;
+  };
 }
 
 export type MtaMasterDirectory = {

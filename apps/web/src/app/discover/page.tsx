@@ -15,7 +15,7 @@ import { ServerCard } from "../../components/server-card";
 import { ArticleCard } from "../../components/article-card";
 import { authService } from "../../lib/services/auth-service";
 import { contentService } from "../../lib/services/content-service";
-import { matchesMtaEndpoint, mtaMasterDirectoryService } from "../../lib/services/mta-master-directory-service";
+import { indexMtaObservations, matchesMtaEndpoint, mtaMasterDirectoryService } from "../../lib/services/mta-master-directory-service";
 import { organizationService } from "../../lib/services/organization-service";
 import { productService } from "../../lib/services/product-service";
 import { serverService } from "../../lib/services/server-service";
@@ -152,6 +152,9 @@ async function DiscoverResults({
       query ? serverService.searchServers(query, 12) : serverService.listServers(12),
       mtaMasterDirectoryService.getDirectory().catch(() => null),
     ]);
+    const indexedObservationFor = directory && servers.length > 1
+      ? indexMtaObservations(directory.servers)
+      : null;
     return servers.length > 0 ? (
       <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
         {servers.map((server) => (
@@ -159,9 +162,9 @@ async function DiscoverResults({
             key={server.id}
             server={server}
             locale={locale}
-            observation={directory?.servers.find((item) =>
-              matchesMtaEndpoint(server, item),
-            )}
+            observation={indexedObservationFor
+              ? indexedObservationFor(server)
+              : directory?.servers.find((item) => matchesMtaEndpoint(server, item))}
             isStale={directory?.isStale}
           />
         ))}

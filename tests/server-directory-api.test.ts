@@ -31,6 +31,26 @@ beforeEach(() => {
 });
 
 describe("official MTA directory API", () => {
+  it("reads only the requested fifty entries from an unfiltered 10,000-server snapshot", async () => {
+    let entryReads = 0;
+    const servers = new Proxy(Array.from({ length: 10_000 }, (_, index) => ({
+      address: `server-${index}.test`, port: 22003, players: index % 32,
+    })), {
+      get(target, key, receiver) {
+        if (typeof key === "string" && /^\d+$/.test(key)) entryReads++;
+        return Reflect.get(target, key, receiver);
+      },
+    });
+    getDirectory.mockResolvedValue({ servers, fetchedAt: "2026-10-09T00:00:00.000Z", isStale: false });
+    const response = await GET(new NextRequest("https://nexus.test/api/servers/directory?offset=500&limit=50"));
+    const body = await response.json();
+    expect(body).toMatchObject({ total: 10_000, offset: 500, limit: 50, isStale: false });
+    expect(body.servers).toHaveLength(50);
+    expect(body.servers[0].address).toBe("server-500.test");
+    expect(body.servers.at(-1).address).toBe("server-549.test");
+    expect(entryReads).toBe(50);
+  });
+
   it("filters a live snapshot before paginating and preserves its provenance", async () => {
     getDirectory.mockResolvedValue({
       servers: [

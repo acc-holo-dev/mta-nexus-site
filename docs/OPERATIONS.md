@@ -230,6 +230,45 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 ### Code analysis
 
+The public MTA directory API selects a page without retaining every matching
+server. With no search term and `minPlayers=0`, it slices the source snapshot
+directly; master-list player counts are unsigned. Filtered requests scan all
+entries for an exact total but retain only the requested page, at most 100 server
+references. Search still uses the same joined fields and locale-aware lowercase
+comparison; order, query validation, provenance and public cache headers remain
+unchanged. The helper does not mutate or cache the source snapshot.
+
+The `/discover` server tab reuses the existing endpoint index for multiple cards.
+The shared index now builds incrementally: it remembers the scanned prefix and
+resumes from that position only when a later lookup needs more of the snapshot.
+Early matches do not require indexing the entire snapshot; a missing endpoint
+finishes the scan once, after which all lookups use the map. Existing index
+callers in search, profiles, workspace, saved servers and collection gain this
+behavior without changing their API. A snapshot must remain unchanged while its
+lookup is used; production consumers do not mutate it. A single discover result
+keeps the early-match `Array.find` path; empty results do not scan the snapshot.
+Normalized DNS/IPv6 addresses, ports and first-duplicate precedence remain
+unchanged. Stale observations still reach the existing card
+renderer, which hides stale live counts. Directory fetching and failure fallback
+retain their existing behavior; no dependency or cross-request index was added.
+
+Operation-count fixtures show 10,000 to 50 source-entry reads for an unfiltered
+50-server API page, and 120,000 to 10,000 address reads for twelve unmatched
+discover cards in both list and search modes. Five page-selection tests include
+2,000 generated comparisons with the previous filter/slice algorithm on two
+seeds, plus exact totals after the page fills, Unicode/joined-field matches,
+record identity and non-mutation. Three shared-index tests include 1,000
+generated comparisons with first-match `Array.find`, duplicate precedence after
+later scans, and out-of-order/repeated/missing lookups. Twelve early discover
+matches visit only twelve entries from a 10,000-entry snapshot. Nine discover
+tests execute the page's async results component and render actual cards with
+synthetic service adapters in
+RU/EN. These checks measure work and behavior, not production latency or heap
+usage under load; browser acceptance remains separate.
+See [MDN filter copying](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter),
+[slice selection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)
+and [Map lookup behavior](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map#description).
+
 The opt-in MTA observation collector starts the directory and known-server reads
 together, then records matches in batches of at most five concurrent writes per
 capture. The known-server limit remains 500, with one extra row detecting a
@@ -276,8 +315,8 @@ See [Next parallel data fetching](https://nextjs.org/docs/app/getting-started/fe
 and [server-side data access authorization](https://nextjs.org/docs/app/guides/data-security#data-access-layer).
 
 Global discovery search reuses `indexMtaObservations` when more than one server
-result is displayed. It builds one temporary endpoint index for the current
-fresh directory instead of scanning the entire snapshot for every server.
+result is displayed. It builds one temporary endpoint index for the visited
+prefix of the current fresh directory instead of rescanning for every server.
 A single server result retains `Array.find`, avoiding a full index build for an
 early match. No server results skip the directory call; stale snapshots skip
 both scanning and indexing. The observation collector now uses the same helper,
