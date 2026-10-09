@@ -23,6 +23,7 @@ import { ProductDependencyList } from "../../../components/product-dependency-li
 import { ReverseDependencyList } from "../../../components/reverse-dependency-list";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../lib/public-release-history";
 
 export const dynamic = "force-dynamic";
 
@@ -239,6 +240,14 @@ export default async function ProductDetailPage({
             <p className="text-xs leading-relaxed text-muted">
               {copy.latestBuildNotice}
             </p>
+            {isPublished && (
+              <Link
+                href={releaseHistoryHref(product.slug)}
+                className="inline-flex text-xs font-semibold text-accent hover:underline"
+              >
+                {getReleaseHistoryCopy(locale).browse}
+              </Link>
+            )}
 
             {builds.length > 0 ? (
               <div className="space-y-4">

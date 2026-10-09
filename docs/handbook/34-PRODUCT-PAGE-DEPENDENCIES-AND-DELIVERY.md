@@ -150,3 +150,38 @@ Product page должен различать:
 - delist/archive status.
 
 Не сводить всё к одному badge вроде `Trusted`.
+
+## 11. Closed-beta historical releases and pinned downloads (implementation)
+
+A new public-safe, dynamic `/market/[slug]/versions` page lists only
+currently **published** and **trusted-clean-scanned** builds of a published,
+free resource. Its 12-row SQL pagination is deterministic by
+`created_at DESC, id DESC`; malformed page inputs reset to page one.
+The query projection excludes storage keys, quarantine reasons and other
+private moderation data. Page metadata uses `noindex, nofollow`. RU/EN
+messages distinguish recorded scan provenance from any guarantee of
+future access; a recorded signature flag is **not** signature verification.
+
+The download URL remains the same protected API:
+`GET /api/products/:id/download` selects the latest safe published build.
+`GET /api/products/:id/download?buildId=bld_...` selects a specific
+currently safe build of **that same product**, never a storage key or
+user-supplied file path. Authentication, current ownership/entitlement,
+resource publication, scan provenance, rate limits, storage size/hash
+metadata and required audit are preserved. Unknown, retired, quarantined,
+unscanned and other-product IDs cannot deliver content. Duplicate or
+malformed build IDs are rejected with 400. A 200 download declares its
+actual `X-Resource-Build-Id`; the client refuses to save a pinned download
+if this does not exactly match the requested build.
+
+The library and resource-detail pages link to the release archive. Buttons
+are convenience controls for currently entitled users and managers, *not*
+authoritative grants. A version may disappear or be blocked between
+render and click. Current download authorization takes precedence over
+the page's stale state. Legacy paid checkout stays disabled.
+
+Outstanding: a build may be moderated between DB selection and opening
+the object stream; remove this read/stream race through a delivery lease or
+immutable revocation gate before calling this path race-free. Binary SHA-256
+from remote storage without trusted provider digest metadata also requires
+end-to-end independent verification in a later hardening pass.

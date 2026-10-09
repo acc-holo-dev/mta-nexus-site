@@ -324,6 +324,7 @@ describe("resource detail acquisition behavior", () => {
       );
       expect(html).toContain(copy.addToLibrary);
       expect(html).toContain(copy.latestBuildNotice);
+      expect(html).toContain('href="/market/detail-resource/versions"');
       expect(
         (html.match(/data-testid="build-provenance"/gu) ?? []).length,
       ).toBe(2);

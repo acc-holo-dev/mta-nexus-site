@@ -37,6 +37,7 @@ const state = vi.hoisted(() => ({
 const auditRecord = vi.hoisted(() => vi.fn(async () => undefined));
 const downloadStream = vi.hoisted(() => vi.fn());
 const findLatestPublishedBuild = vi.hoisted(() => vi.fn());
+const findPinnedPublishedBuild = vi.hoisted(() => vi.fn());
 
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
@@ -62,6 +63,7 @@ vi.mock("@nexus/db", () => ({
   },
   buildRepository: {
     findLatestPublishedByProduct: findLatestPublishedBuild,
+    findPublishedByProductAndId: findPinnedPublishedBuild,
   },
   auditRepository: {
     record: auditRecord,
@@ -129,6 +131,12 @@ describe("resource download HTTP contract", () => {
     };
     findLatestPublishedBuild.mockImplementation(
       async () => state.build,
+    );
+    findPinnedPublishedBuild.mockImplementation(
+      async (productId: string, buildId: string) =>
+        productId === state.build?.productId && buildId === state.build?.id
+          ? state.build
+          : null,
     );
     downloadStream.mockResolvedValue({
       stream: Readable.from(Buffer.from("nexus-build")),
@@ -360,5 +368,116 @@ describe("resource download HTTP contract", () => {
         targetId: "prd_http",
       }),
     );
+  });
+});
+
+describe("pinned historical build downloads", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    auditRecord.mockReset();
+    downloadStream.mockReset();
+    state.user = {
+      id: "usr_player",
+      email: "player@nexus.test",
+      username: "player",
+      displayName: "Player",
+      role: "user",
+    };
+    state.product = {
+      id: "prd_http",
+      slug: "http-resource",
+      authorId: "usr_author",
+      status: "published",
+    };
+    state.entitled = true;
+    state.managementAccess = false;
+    state.build = {
+      id: "bld_historical_1",
+      productId: "prd_http",
+      version: "1.0.0",
+      status: "published",
+      scanStatus: "clean",
+      scanner: "test-scanner",
+      scannedAt: new Date(),
+      storageKey: "assets/old-resource.zip",
+      sha256Hash: "a".repeat(64),
+      fileName: "historical-resource.zip",
+      fileSizeBytes: Buffer.byteLength("historical"),
+      mimeType: "application/zip",
+    };
+    findLatestPublishedBuild.mockResolvedValue(null);
+    findPinnedPublishedBuild.mockImplementation(
+      async (productId: string, buildId: string) =>
+        productId === "prd_http" && buildId === "bld_historical_1"
+          ? state.build
+          : null,
+    );
+    downloadStream.mockResolvedValue({
+      stream: Readable.from(Buffer.from("historical")),
+      meta: { sizeBytes: Buffer.byteLength("historical"), mimeType: "application/zip" },
+    });
+  });
+
+  function pinned(query = "?buildId=bld_historical_1") {
+    return new NextRequest(`http://nexus.test/api/products/prd_http/download${query}`);
+  }
+
+  it("serves the exact approved historical build without selecting the latest", async () => {
+    const response = await GET(pinned(), context);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("X-Resource-Build-Id")).toBe("bld_historical_1");
+    expect(response.headers.get("X-Content-SHA256")).toBe("a".repeat(64));
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("Content-Disposition")).toContain("http-resource-1.0.0.zip");
+    expect(findPinnedPublishedBuild).toHaveBeenCalledWith("prd_http", "bld_historical_1");
+    expect(findLatestPublishedBuild).not.toHaveBeenCalled();
+    expect(downloadStream).toHaveBeenCalledWith("assets/old-resource.zip", expect.any(AbortSignal));
+    expect(await response.text()).toBe("historical");
+    expect(auditRecord).toHaveBeenCalledWith(expect.objectContaining({
+      action: "product.download_started",
+      details: expect.objectContaining({
+        buildId: "bld_historical_1",
+        version: "1.0.0",
+        pinned: true,
+      }),
+    }));
+  });
+
+  it.each([
+    "?buildId=bld_one&buildId=bld_two",
+    "?buildId=../secret",
+    "?buildId=",
+    "?buildId=lic_secret",
+    "?buildId=bld_bad%0Aheader",
+  ])("refuses malformed pinned selectors before storage access: %s", async query => {
+    const response = await GET(pinned(query), context);
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ code: "BUILD_ID_INVALID" });
+    expect(downloadStream).not.toHaveBeenCalled();
+    expect(findPinnedPublishedBuild).not.toHaveBeenCalled();
+  });
+
+  it("cannot select another product or a retired/quarantined build", async () => {
+    findPinnedPublishedBuild.mockResolvedValue(null);
+    const response = await GET(pinned(), context);
+    expect(response.status).toBe(404);
+    expect(downloadStream).not.toHaveBeenCalled();
+    expect(auditRecord).not.toHaveBeenCalled();
+  });
+
+  it("checks current authorization before resolving a historical build", async () => {
+    state.entitled = false;
+    const denied = await GET(pinned(), context);
+    expect(denied.status).toBe(403);
+    expect(findPinnedPublishedBuild).not.toHaveBeenCalled();
+    expect(downloadStream).not.toHaveBeenCalled();
+  });
+
+  it("enforces trusted scan provenance on a pinned build", async () => {
+    if (!state.build) throw new Error("Missing pinned build");
+    state.build.scanStatus = "error";
+    const response = await GET(pinned(), context);
+    expect(response.status).toBe(409);
+    expect(downloadStream).not.toHaveBeenCalled();
   });
 });

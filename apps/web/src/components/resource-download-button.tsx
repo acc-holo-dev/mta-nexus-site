@@ -13,9 +13,11 @@ import {
 export function ResourceDownloadButton({
   productId,
   version,
+  buildId,
 }: {
   productId: string;
   version: string;
+  buildId?: string;
 }) {
   const { dictionary } = useNexusLocale();
   const copy = dictionary.product;
@@ -51,6 +53,8 @@ export function ResourceDownloadButton({
           if (!controller.signal.aborted)
             setProgress(total ? Math.floor((received / total) * 100) : null);
         },
+        fetch,
+        buildId,
       );
       controller.signal.throwIfAborted();
       if (downloadUrl.current) URL.revokeObjectURL(downloadUrl.current);

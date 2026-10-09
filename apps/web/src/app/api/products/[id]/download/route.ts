@@ -8,6 +8,7 @@ import {
 import { consumeRateLimit, generateId } from "@nexus/security";
 import { storageService } from "@nexus/storage";
 import { type NextRequest, NextResponse } from "next/server";
+import { parseDownloadBuildSelection } from "../../../../../lib/build-download-selection";
 import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
@@ -154,11 +155,18 @@ export async function GET(
       );
     }
 
-    const latestBuild =
-      await buildRepository.findLatestPublishedByProduct(
-        productId,
+    const selection = parseDownloadBuildSelection(request.nextUrl.searchParams);
+    if (selection.kind === "invalid") {
+      return json(
+        context,
+        { error: "Invalid requested build", code: "BUILD_ID_INVALID" },
+        400,
       );
-    if (!latestBuild) {
+    }
+    const selectedBuild = selection.kind === "pinned"
+      ? await buildRepository.findPublishedByProductAndId(productId, selection.buildId)
+      : await buildRepository.findLatestPublishedByProduct(productId);
+    if (!selectedBuild) {
       return json(
         context,
         {
@@ -170,9 +178,9 @@ export async function GET(
     }
 
     if (
-      latestBuild.scanStatus !== "clean" ||
-      !latestBuild.scanner?.trim() ||
-      !latestBuild.scannedAt
+      selectedBuild.scanStatus !== "clean" ||
+      !selectedBuild.scanner?.trim() ||
+      !selectedBuild.scannedAt
     ) {
       return json(
         context,
@@ -186,13 +194,13 @@ export async function GET(
 
     const stored =
       await storageService.getDownloadStream(
-        latestBuild.storageKey,
+        selectedBuild.storageKey,
         request.signal,
       );
     const contentLength =
       assertBuildDownloadMetadata(
         stored,
-        latestBuild,
+        selectedBuild,
       );
 
     try {
@@ -205,8 +213,9 @@ export async function GET(
         targetId: productId,
         targetType: "product",
         details: {
-          buildId: latestBuild.id,
-          version: latestBuild.version,
+          buildId: selectedBuild.id,
+          version: selectedBuild.version,
+          pinned: selection.kind === "pinned",
         },
       });
       request.signal.throwIfAborted();
@@ -218,21 +227,22 @@ export async function GET(
     const stream =
       toDownloadWebStream(stored.stream);
     const fileName =
-      `${product.slug}-${latestBuild.version}${getDownloadExtension(
-        latestBuild.fileName,
+      `${product.slug}-${selectedBuild.version}${getDownloadExtension(
+        selectedBuild.fileName,
       )}`;
 
     return new NextResponse(stream, {
       headers: {
         "Content-Type":
-          latestBuild.mimeType ||
+          selectedBuild.mimeType ||
           stored.meta?.mimeType ||
           "application/octet-stream",
         "Content-Disposition":
           `attachment; filename="${fileName}"`,
         "Content-Length": String(contentLength),
         "X-Content-SHA256":
-          latestBuild.sha256Hash,
+          selectedBuild.sha256Hash,
+        "X-Resource-Build-Id": selectedBuild.id,
         ...privateHeaders,
         "X-Content-Type-Options": "nosniff",
         [REQUEST_ID_HEADER]: context.requestId,

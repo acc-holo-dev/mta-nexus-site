@@ -1728,3 +1728,30 @@ rehearsal asserts both indexes and their partial predicates. Exact-SHA
 acceptance still needs PostgreSQL integration, a real migration upgrade and
 a frontend build on a working runner. Do not treat static checks as that
 acceptance evidence.
+
+### Safe historical release delivery
+
+The resource detail page links to `/market/:slug/versions`, a dynamic,
+non-indexed, RU/EN list of current published/clean builds. It selects only
+public release metadata and paginates by `created_at, id`, 12 rows per page.
+The server refuses private, paid closed-beta or unpublished resources before
+loading their history.
+
+The existing authorized `/api/products/:id/download` remains the latest
+build route. Passing a single validated opaque `buildId` query parameter
+selects a specifically published, trusted-clean build for **that exact
+product ID**, without ever trusting a file path or the caller's access
+assumption. Invalid selectors return 400, absent or moderated-out builds
+return 404, and lack of download rights returns 403 before build lookup.
+The audit includes the selected build ID, version and pinned status. The
+response includes `X-Resource-Build-Id`, `X-Content-SHA256`, `nosniff`
+and private/no-store caching. A browser pinned-version request refuses a
+different/missing echoed build ID, preventing silent substitution of the
+wrong release.
+
+The publication query uses the existing `builds_product_status_idx`;
+no new migration is required for this feature. Unit, UI, HTTP and PostgreSQL
+acceptance tests are committed, but real-DB integration and the complete
+Next/TypeScript build are still blocked until hosted GitHub Actions can
+allocate a runner. Do not treat a build-list entry as a capability token or
+promise a long-term right to previous versions.

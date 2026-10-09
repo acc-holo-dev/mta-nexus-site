@@ -6,6 +6,7 @@ import { ResourceDownloadButton } from "../../../components/resource-download-bu
 import { authService } from "../../../lib/services/auth-service";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { formatHistoryDate } from "../../../lib/commerce-history-format";
+import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../lib/public-release-history";
 import {
   getLibraryCopy,
   libraryHref,
@@ -33,6 +34,7 @@ export default async function ResourceLibraryPage({
     searchParams,
   ]);
   const copy = getLibraryCopy(locale);
+  const releaseCopy = getReleaseHistoryCopy(locale);
   const user = await authService.getSession(cookieStore.get("nexus_session")?.value);
   if (!user) {
     return (
@@ -113,12 +115,20 @@ export default async function ResourceLibraryPage({
                     productId={item.resourceId}
                     version={item.version}
                   />
-                  <Link
-                    href={`/market/${item.slug}`}
-                    className="inline-block text-sm text-accent underline"
-                  >
-                    {copy.open}
-                  </Link>
+                  <div className="flex flex-wrap gap-4">
+                    <Link
+                      href={`/market/${item.slug}`}
+                      className="inline-block text-sm text-accent underline"
+                    >
+                      {copy.open}
+                    </Link>
+                    <Link
+                      href={releaseHistoryHref(item.slug)}
+                      className="inline-block text-sm text-accent underline"
+                    >
+                      {releaseCopy.browse}
+                    </Link>
+                  </div>
                 </div>
               ) : (
                 <p className="mt-auto text-sm text-muted">{copy.unavailableReason}</p>

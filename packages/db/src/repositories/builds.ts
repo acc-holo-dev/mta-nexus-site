@@ -5,6 +5,7 @@ import { lockNotificationPreferencesForUsers } from "./notification-preference-l
 import { db } from "../client";
 import { auditEvents, builds, products, users, organizations, organizationMembers, notificationPreferences, notifications } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
+import { releaseHistoryPageBounds } from "@nexus/domain";
 
 export type PendingReviewBuild = Build & {
   productTitle: string;
@@ -178,6 +179,46 @@ export class BuildRepository {
   async findById(id: string): Promise<Build | null> {
     const rows = await db.select().from(builds).where(eq(builds.id, id)).limit(1);
     return (rows[0] as unknown as Build) || null;
+  }
+
+  /**
+   * Public release archive: project only safe publication metadata. Never
+   * return storage keys, quarantine reasons or moderation/private audit data.
+   */
+  async pagePublishedReleases(productId: string, requestedPage = 1) {
+    const condition = safePublishedBuildCondition(productId);
+    const [summary] = await db.select({ total: count() }).from(builds).where(condition);
+    const bounds = releaseHistoryPageBounds(summary?.total ?? 0, requestedPage);
+    const releases = await db.select({
+      id: builds.id,
+      version: builds.version,
+      releaseNotes: builds.releaseNotes,
+      sha256Hash: builds.sha256Hash,
+      fileName: builds.fileName,
+      fileSizeBytes: builds.fileSizeBytes,
+      mimeType: builds.mimeType,
+      mtaVersionTarget: builds.mtaVersionTarget,
+      scanStatus: builds.scanStatus,
+      scanner: builds.scanner,
+      scannedAt: builds.scannedAt,
+      isSigned: builds.isSigned,
+      createdAt: builds.createdAt,
+    }).from(builds).where(condition)
+      .orderBy(desc(builds.createdAt), desc(builds.id))
+      .limit(bounds.pageSize).offset(bounds.offset);
+    return { releases, ...bounds };
+  }
+
+  /**
+   * Pinned download lookup is always scoped by product *and* current trusted
+   * publication. A build from another product or retired/quarantined version
+   * must be indistinguishable from an unknown version.
+   */
+  async findPublishedByProductAndId(productId: string, buildId: string): Promise<Build | null> {
+    const [build] = await db.select().from(builds)
+      .where(and(safePublishedBuildCondition(productId), eq(builds.id, buildId)))
+      .limit(1);
+    return (build as unknown as Build) ?? null;
   }
 
   async findLatestPublishedByProduct(productId: string): Promise<Build | null> {

@@ -1,4 +1,5 @@
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
+import { resourceDownloadUrl } from "./build-download-selection";
 
 export type DownloadFailure =
   | "signIn"
@@ -23,6 +24,7 @@ export async function fetchResourceDownload(
   signal: AbortSignal,
   onProgress: (received: number, total: number | null) => void,
   request: typeof fetch = fetch,
+  buildId?: string,
 ): Promise<{ blob: Blob; fileName: string }> {
   signal.throwIfAborted();
   const active = new AbortController();
@@ -42,7 +44,7 @@ export async function fetchResourceDownload(
     return await readResourceDownload(productId, active.signal, (received, total) => {
       resetTimeout();
       onProgress(received, total);
-    }, request);
+    }, request, buildId);
   } catch (error) {
     // Explicit cancellation takes precedence over a concurrent idle timeout.
     signal.throwIfAborted();
@@ -59,9 +61,10 @@ async function readResourceDownload(
   signal: AbortSignal,
   onProgress: (received: number, total: number | null) => void,
   request: typeof fetch,
+  buildId?: string,
 ): Promise<{ blob: Blob; fileName: string }> {
   signal.throwIfAborted();
-  const response = await request(`/api/products/${encodeURIComponent(productId)}/download`, {
+  const response = await request(resourceDownloadUrl(productId, buildId), {
     credentials: "same-origin",
     cache: "no-store",
     signal,
@@ -76,6 +79,12 @@ async function readResourceDownload(
       429: "rateLimit",
     };
     throw new ResourceDownloadError(reasons[response.status] ?? "failed");
+  }
+  // A selected older version must never be silently replaced by a different
+  // build (for example because of a stale proxy or a route regression).
+  if (buildId && response.headers.get("X-Resource-Build-Id") !== buildId) {
+    void response.body?.cancel().catch(() => undefined);
+    throw new ResourceDownloadError("failed");
   }
   const mime = response.headers.get("Content-Type")?.split(";")[0].trim().toLowerCase();
   if (response.status !== 200 || mime === "text/html" || mime === "application/json") {

@@ -750,3 +750,26 @@ Remaining deployment acceptance:
   or payment provider. Closed-beta checkout remains explicitly disabled.
 
 These are acceptance tasks, not claims that CI/PostgreSQL already passed.
+
+### P2. Historical build delivery race and remote artifact digest
+
+Pinned resource downloads now query a specific current safe, published build
+under the exact product ID and send a version identity response header which
+the browser verifies before handing off bytes. This closes accidental
+wrong-version selection and unauthorized cross-product selection, but does
+**not** fully serialize moderation with storage delivery.
+
+- Concurrent retirement/quarantine after the SQL read but before the object
+  stream opens can still race. Consider transactional delivery reservations
+  or an immutable, revocable artifact gate without holding DB transactions
+  across a slow stream. Include a live PostgreSQL quarantine-vs-download
+  test, and confirm no stale bytes are delivered after a completed revoke.
+- A trusted scan and recorded SHA-256 are provenance facts, not independently
+  proven file bytes on every storage backend. Local storage verifies file
+  metadata; remote implementations need a strict provider digest contract or
+  bounded streaming SHA-256 verification before the release is considered
+  cryptographically verified.
+- Browser/HTTP, scoped SQL pagination and empty/noindex archive behavior have
+  tests but still need an exact-SHA runnable CI acceptance pass.
+
+Do not enable unsafe historical statuses to improve availability.

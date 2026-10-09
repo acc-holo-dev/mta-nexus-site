@@ -85,6 +85,8 @@ describe("private resource library", () => {
     expect(html).not.toContain("href=\"/market/secret-url\"");
     expect(html).toContain(locale === "ru" ? "Библиотека ресурсов" : "Resource library");
     expect(html).toContain("/workspace/library?filter=ready");
+    expect(html).toContain("/market/resource-a/versions");
+    expect(html).not.toContain("/market/secret-url/versions");
   });
 
   it("preserves selected filter during pagination and clamps untrusted page input", async () => {
