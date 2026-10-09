@@ -134,6 +134,22 @@ pnpm release:verify
 
 ### Automated browser accessibility
 
+All five browser-tool installations in the workflows use
+`scripts/browser-toolchain.mjs`. This is the single place to update their
+pinned package versions:
+
+| Profile | Tools | Used by |
+| --- | --- | --- |
+| `basic` | Playwright | DEV origin/hydration verification |
+| `a11y` | Playwright, axe Playwright integration and axe-core | Production smoke and Resource browser |
+| `agent` | Playwright and agent-browser | Account and Directory browser |
+
+The installer receives an absolute tool directory, invokes npm directly, and
+preserves a failed installation's exit status. Each job still uses its own
+temporary tool directory and Chromium installation. The application dependency
+graph is unchanged by these profiles. Direct package versions are pinned;
+browser-tool transitive dependencies retain npm's normal resolution behavior.
+
 The existing Chromium acceptance now also uses `@axe-core/playwright` 4.13.0 and
 `axe-core` 4.13.0. Both are pinned in the isolated browser-tools installations for
 the smoke and resource-browser jobs; they are not application dependencies.
@@ -163,6 +179,30 @@ They use a browser-adapter fixture and do not claim a real DOM scan. Current
 browser execution/hosted-runner limitations are tracked in [PROBLEMS](PROBLEMS.md).
 Integration follows the [official Playwright accessibility guide](https://playwright.dev/docs/accessibility-testing)
 and [axe Playwright API](https://github.com/dequelabs/axe-core-npm/tree/v4.13.0/packages/playwright).
+
+### Property-based checks
+
+`fast-check` 4.10.2 is a root development dependency and runs through the existing
+Vitest unit project. `pnpm test:properties` executes four trusted-proxy/IP
+properties, each with 1000 generated cases: mismatched Unicode markers must not
+throw, missing/untrusted markers must ignore forwarded IPs, a trusted real IPv4/IPv6
+address takes precedence, and an invalid first forwarded hop must not be skipped.
+
+The default seed is `20261009`, keeping CI repeatable. Use another signed 32-bit
+seed to explore additional inputs:
+
+```bash
+FC_SEED=12345 pnpm test:properties
+```
+
+Fast-check reports its seed and shrinks a failure to a smaller counterexample.
+The first adoption caught a UTF-8 length error in proxy-marker comparison;
+the exact Latin-1 regression is also covered using real Fetch Headers. Invalid
+markers now return `unknown` before `timingSafeEqual` can throw, while correct
+markers still use timing-safe byte comparison. This is a bounded property suite,
+not an exhaustive proof of all request handling.
+See the [official fast-check building blocks](https://fast-check.dev/docs/core-blocks/)
+and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotimingsafeequala-b).
 
 ### Code analysis
 

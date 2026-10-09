@@ -1,6 +1,6 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
-Единственный реестр проблем проекта. Обновлён: 2026-10-09 (после DEV Mailpit и axe browser-gate slices; текущий hosted-runner blocker зафиксирован ниже).
+Единственный реестр проблем проекта. Обновлён: 2026-10-09 (после browser-toolchain и fast-check slice; текущий hosted-runner blocker зафиксирован ниже).
 
 Правила реестра:
 
@@ -63,6 +63,15 @@ EXPLAIN ANALYZE/BUFFERS до и после миграции 0026.
 
 
 ### P1-2. GitHub-hosted runner не начинает `plan` job
+
+Последующий browser-toolchain/fast-check slice объединил пять установок
+браузерных инструментов в один источник версий. Реальная npm-установка профиля
+`a11y` локально прошла. Также прошли 1266 unit, 169 tooling, frozen install,
+typecheck, lint, Knip и архитектурная проверка. Четыре proxy/IP свойства проверены
+по 1000 примеров на двух seed; найденный UTF-8 length exception воспроизведён
+до исправления и устранён с регрессионной проверкой настоящих Fetch Headers.
+Это самостоятельные проверки установки/защитного кода, а не выполнение
+production Docker или browser acceptance.
 
 В browser smoke и resource-browser добавлены axe-проверки WCAG для форм,
 диалогов и авторизованных состояний RU/EN. Само падение gate при нарушениях и

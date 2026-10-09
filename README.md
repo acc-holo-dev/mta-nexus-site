@@ -107,6 +107,9 @@ pnpm test:catalog
 
 # report privacy, audit transaction and moderator notification checks
 pnpm test:reports
+
+# generated trusted-proxy/IP cases, with a reproducible seed
+pnpm test:properties
 ```
 
 Browser acceptance also runs axe-core WCAG checks for account forms in RU/EN,

@@ -73,6 +73,19 @@ describe("trusted request IP security boundary", () => {
     ).toThrow(/Invalid trusted proxy secret/u);
   });
 
+  it("rejects a Latin-1 proxy marker with equal JS length but different UTF-8 byte length", () => {
+    const requestHeaders = headers({
+      "x-nexus-proxy-secret": "é".repeat(secret.length),
+      "x-real-ip": "198.51.100.50",
+    });
+    expect(getClientIp(requestHeaders, secret)).toBe("unknown");
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("TRUSTED_PROXY_SECRET", secret);
+    expect(getTrustedRequestIp(new NextRequest("https://nexus.test/", {
+      headers: requestHeaders,
+    }))).toBe("unknown");
+  });
+
   it("uses one stable local identity outside production when the proxy is absent", () => {
     vi.stubEnv("NODE_ENV", "test");
     vi.stubEnv("TRUSTED_PROXY_SECRET", "");

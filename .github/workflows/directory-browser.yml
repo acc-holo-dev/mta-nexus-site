@@ -30,7 +30,7 @@ jobs:
       run: |
         tools="$RUNNER_TEMP/nexus-browser-tools"
         export PLAYWRIGHT_BROWSERS_PATH="$RUNNER_TEMP/nexus-browsers"
-        npm install --prefix "$tools" --no-audit --no-fund --save-exact @playwright/test@1.62.1 agent-browser@0.33.2
+        node scripts/browser-toolchain.mjs agent "$tools"
         node "$tools/node_modules/@playwright/test/cli.js" install --with-deps chromium
         sudo apt-get install -y libnss3-tools
         echo "NEXUS_BROWSER_TOOLS=$tools" >> "$GITHUB_ENV"

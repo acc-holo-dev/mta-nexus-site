@@ -11,7 +11,11 @@ function trustedProxy(headers: HeaderReader, expectedSecret: string): boolean {
   }
   const provided = headers.get("x-nexus-proxy-secret");
   if (!provided || provided.length !== expectedSecret.length || provided.length > 512) return false;
-  return timingSafeEqual(Buffer.from(provided, "utf8"), Buffer.from(expectedSecret, "utf8"));
+  const providedBytes = Buffer.from(provided, "utf8");
+  const expectedBytes = Buffer.from(expectedSecret, "utf8");
+  // Equal JS string lengths do not guarantee equal UTF-8 byte lengths.
+  if (providedBytes.length !== expectedBytes.length) return false;
+  return timingSafeEqual(providedBytes, expectedBytes);
 }
 
 export function getClientIp(headers: HeaderReader, expectedProxySecret: string): string {

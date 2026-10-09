@@ -58,7 +58,8 @@
     "dev:mail": "pnpm dev:preflight && docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml up --build --detach --wait --wait-timeout 600",
     "dev:mail:logs": "docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml logs --tail 100 --follow app mail-worker mailpit",
     "dev:mail:down": "docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml down",
-    "dev:mail:check": "pnpm dev:docker:check && docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml exec -T mail-worker node /app/scripts/check-account-mail-worker-health.mjs && docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml exec -T mail-worker node --import tsx scripts/check-dev-mailpit.ts"
+    "dev:mail:check": "pnpm dev:docker:check && docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml exec -T mail-worker node /app/scripts/check-account-mail-worker-health.mjs && docker compose -p nexus-local -f compose.yaml -f compose.mailpit.yaml exec -T mail-worker node --import tsx scripts/check-dev-mailpit.ts",
+    "test:properties": "vitest run --project unit tests/request-ip-properties.test.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
@@ -68,6 +69,7 @@
     "@types/react-dom": "19.3.0",
     "dependency-cruiser": "18.5.0",
     "drizzle-orm": "^0.45.3",
+    "fast-check": "4.10.2",
     "knip": "6.40.0",
     "lucide-react": "1.47.0",
     "next": "16.3.5",
