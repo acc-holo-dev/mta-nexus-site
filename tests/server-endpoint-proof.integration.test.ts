@@ -8,6 +8,7 @@ import {
   userRepository,
   verificationRepository,
   verificationRequests,
+  servers,
 } from "@nexus/db";
 
 async function fixture() {
@@ -105,6 +106,30 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
     const server = await serverRepository.findById(target.serverId);
     expect(server?.ownerId).toBeFalsy();
     expect(server?.isVerified).toBe(false);
+  });
+
+  it("invalidates verification through audited endpoint edits", async () => {
+    const target = await fixture();
+    await db.update(servers).set({ isVerified: true })
+      .where(eq(servers.id, target.serverId));
+    await serverRepository.updateWithAudit(
+      target.serverId,
+      { port: target.endpoint.port + 1 },
+      {
+        id: `aud_audited_endpoint_${target.suffix}`,
+        actorId: target.requesterId,
+        actorType: "user",
+        action: "server.updated",
+        targetId: target.serverId,
+        targetType: "server",
+        details: { fields: ["port"] },
+      },
+    );
+    const [row] = await db.select({
+      revision: servers.endpointRevision,
+      verified: servers.isVerified,
+    }).from(servers).where(eq(servers.id, target.serverId));
+    expect(row).toMatchObject({ revision: 1, verified: false });
   });
 
   it("preserves a fresh control proof after editorial-only updates", async () => {
