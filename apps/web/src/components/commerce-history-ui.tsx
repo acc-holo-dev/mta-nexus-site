@@ -36,7 +36,7 @@ export function HistoryShell({
     sales: copy.salesDescription,
   };
   return (
-    <main className="mx-auto max-w-5xl space-y-7 py-8">
+    <div className="mx-auto max-w-5xl space-y-7 py-8">
       <header className="space-y-3 border-b border-base pb-6">
         <Link href="/workspace" className="text-sm text-accent hover:underline">
           {copy.back}
@@ -60,7 +60,7 @@ export function HistoryShell({
         {copy.betaNotice}
       </p>
       {children}
-    </main>
+    </div>
   );
 }
 
