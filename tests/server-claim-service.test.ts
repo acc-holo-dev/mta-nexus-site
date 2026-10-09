@@ -294,6 +294,7 @@ describe("server claim service behavior", () => {
       requesterId: "usr_claimant",
       token,
       sourceFetchedAt: new Date("2026-10-08T00:00:00.000Z"),
+      expectedEndpoint: { ipAddress: "203.0.113.20", port: 22003 },
       verificationRequestId: "ver_test",
       auditId: "aud_test",
     });

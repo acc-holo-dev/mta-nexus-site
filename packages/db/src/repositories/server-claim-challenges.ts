@@ -105,6 +105,7 @@ export class ServerClaimChallengeRepository {
         requesterId: input.requesterId,
         tokenDigest,
         proofVersion: 1,
+        endpointRevision: server.endpointRevision,
         createdAt,
         expiresAt,
       });
@@ -163,6 +164,7 @@ export class ServerClaimChallengeRepository {
     requesterId: string;
     token: string;
     sourceFetchedAt: Date;
+    expectedEndpoint: { ipAddress: string; port: number };
     verificationRequestId: string;
     auditId: string;
   }) {
@@ -203,6 +205,19 @@ export class ServerClaimChallengeRepository {
         challenge.revokedAt
       ) {
         throw invalidChallenge();
+      }
+
+      // The lock serializes proof verification with concurrent endpoint edits.
+      // Reject a changed revision even if IP/port were changed and reverted.
+      if (
+        challenge.endpointRevision == null ||
+        challenge.endpointRevision !== server.endpointRevision ||
+        server.ipAddress !== input.expectedEndpoint.ipAddress ||
+        server.port !== input.expectedEndpoint.port
+      ) {
+        throw new ConflictError(
+          "Server endpoint changed; issue a new MTA control challenge",
+        );
       }
 
       const [clock] = await tx.execute(

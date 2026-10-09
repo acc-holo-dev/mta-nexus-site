@@ -30,6 +30,8 @@ function resetLiveStateForEndpointEdit(updates: ServerEditableFields) {
     currentPlayers: sql<number | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.currentPlayers} END`,
     lastObservedAt: sql<Date | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.lastObservedAt} END`,
     observationSource: sql<string | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.observationSource} END`,
+    isVerified: sql<boolean>`CASE WHEN (${changed}) THEN false ELSE ${servers.isVerified} END`,
+    endpointRevision: sql<number>`CASE WHEN (${changed}) THEN ${servers.endpointRevision} + 1 ELSE ${servers.endpointRevision} END`,
     ...(updates.maxPlayers === undefined
       ? { maxPlayers: sql<number | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.maxPlayers} END` }
       : {}),

@@ -230,7 +230,10 @@ export class VerificationRepository {
           }
         } else if (request.targetType === "server") {
           const [proof] = await tx
-            .select({ id: serverClaimChallenges.id })
+            .select({
+              id: serverClaimChallenges.id,
+              endpointRevision: serverClaimChallenges.endpointRevision,
+            })
             .from(serverClaimChallenges)
             .where(
               and(
@@ -250,9 +253,9 @@ export class VerificationRepository {
             )
             .limit(1);
 
-          if (!proof) {
+          if (!proof || proof.endpointRevision == null) {
             throw new ConflictError(
-              "Verified MTA server control proof is required before approval",
+              "Current-endpoint MTA control proof is required before approval",
             );
           }
 
@@ -269,13 +272,16 @@ export class VerificationRepository {
             .where(
               and(
                 eq(servers.id, request.targetId),
+                eq(servers.endpointRevision, proof.endpointRevision),
                 sql`${servers.ownerId} IS NULL OR ${servers.ownerId} = ${request.requesterId}`
               )
             )
             .returning({ id: servers.id });
 
           if (!claimed[0]) {
-            throw new ConflictError("Server claim target is already owned by another user");
+            throw new ConflictError(
+              "Server endpoint changed or is already owned; new MTA control proof required",
+            );
           }
         }
       }

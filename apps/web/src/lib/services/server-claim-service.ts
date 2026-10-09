@@ -153,6 +153,7 @@ export const serverClaimService = {
         requesterId: requester.id,
         token: input.token,
         sourceFetchedAt,
+        expectedEndpoint: { ipAddress: server.ipAddress, port: server.port },
         verificationRequestId: generateId("ver"),
         auditId: generateId("aud"),
       });

@@ -296,6 +296,16 @@ snapshot from the previous address cannot re-populate a new endpoint.
 Same-address and editorial-only updates retain live data. PostgreSQL
 integration checks have been added but need an executable runner.
 
+Server ownership proof is now bound to a durable endpointRevision saved at
+challenge issue time. A real IP/port change atomically increments revision
+and clears the verified badge; editorial edits do neither. At proof
+consumption, the row lock protects a check of revision and the exact IP/port
+that the MTA directory confirmed. Moderator approval rechecks revision in
+its conditional ownership UPDATE. Challenges created before migration 0034
+have NULL revision and fail closed; reject their pending verification requests
+before re-issuing fresh proof. Run migration 0034 and the PostgreSQL suite
+before deploying this change.
+
 The opt-in MTA observation collector starts the directory and known-server reads
 together, then records matches in batches of at most five concurrent writes per
 capture. The known-server limit remains 500, with one extra row detecting a

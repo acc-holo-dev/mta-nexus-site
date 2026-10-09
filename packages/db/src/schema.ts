@@ -156,6 +156,8 @@ export const servers = pgTable(
     status: text("status").notNull().default("active"), // active, inactive, maintenance, suspended
     visibility: text("visibility").notNull().default("public"), // public, unlisted, private
     isVerified: boolean("is_verified").notNull().default(false),
+    // Only network endpoint edits increment this counter; editorial changes do not.
+    endpointRevision: integer("endpoint_revision").notNull().default(0),
     bannerUrl: text("banner_url"),
     logoUrl: text("logo_url"),
     lastObservedAt: timestamp("last_observed_at", { withTimezone: true }),
@@ -169,6 +171,7 @@ export const servers = pgTable(
     index("servers_owner_idx").on(table.ownerId),
     uniqueIndex("servers_endpoint_idx").on(table.ipAddress, table.port),
     index("servers_last_observed_idx").on(table.lastObservedAt),
+    check("servers_endpoint_revision_nonnegative", sql`${table.endpointRevision} >= 0`),
   ]
 );
 
@@ -834,6 +837,8 @@ export const serverClaimChallenges = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     tokenDigest: text("token_digest").notNull(),
     proofVersion: integer("proof_version").notNull().default(1),
+    // Legacy proof rows are NULL, and cannot be used after migration 0034.
+    endpointRevision: integer("endpoint_revision"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     consumedAt: timestamp("consumed_at", { withTimezone: true }),
@@ -858,6 +863,10 @@ export const serverClaimChallenges = pgTable(
     check(
       "server_claim_challenge_digest_check",
       sql`${table.tokenDigest} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "server_claim_endpoint_revision_nonnegative",
+      sql`${table.endpointRevision} is null or ${table.endpointRevision} >= 0`,
     ),
     check(
       "server_claim_challenge_version_check",

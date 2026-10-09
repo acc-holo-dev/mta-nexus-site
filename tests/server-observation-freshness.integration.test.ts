@@ -132,6 +132,29 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
     });
   });
 
+  it("increments endpoint revisions and resets verification only for network edits", async () => {
+    await withServer(async serverId => {
+      const initial = await serverRepository.findById(serverId);
+      if (!initial) throw new Error("Missing server");
+      await db.update(servers).set({ isVerified: true })
+        .where(eq(servers.id, serverId));
+      const revision = async () => {
+        const [row] = await db.select({ value: servers.endpointRevision })
+          .from(servers).where(eq(servers.id, serverId));
+        return row?.value;
+      };
+      expect(await revision()).toBe(0);
+      await serverRepository.update(serverId, { ipAddress: initial.ipAddress, name: "Same endpoint" });
+      expect(await revision()).toBe(0);
+      expect((await serverRepository.findById(serverId))?.isVerified).toBe(true);
+      await serverRepository.update(serverId, { port: initial.port + 1 });
+      expect(await revision()).toBe(1);
+      expect((await serverRepository.findById(serverId))?.isVerified).toBe(false);
+      await serverRepository.update(serverId, { port: initial.port });
+      expect(await revision()).toBe(2);
+    });
+  });
+
   it("clears live state on endpoint edits and rejects delayed old-endpoint telemetry", async () => {
     await withServer(async serverId => {
       const original = await serverRepository.findById(serverId);
