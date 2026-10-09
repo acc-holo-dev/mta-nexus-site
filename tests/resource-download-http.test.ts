@@ -142,6 +142,7 @@ describe("resource download HTTP contract", () => {
       stream: Readable.from(Buffer.from("nexus-build")),
       meta: {
         sizeBytes: Buffer.byteLength("nexus-build"),
+        sha256Hash: state.build!.sha256Hash,
         mimeType: "application/zip",
       },
     });
@@ -284,6 +285,7 @@ describe("resource download HTTP contract", () => {
       stream: openedStream,
       meta: {
         sizeBytes: Buffer.byteLength("nexus-build"),
+        sha256Hash: state.build!.sha256Hash,
         mimeType: "application/zip",
       },
     });
@@ -414,7 +416,7 @@ describe("pinned historical build downloads", () => {
     );
     downloadStream.mockResolvedValue({
       stream: Readable.from(Buffer.from("historical")),
-      meta: { sizeBytes: Buffer.byteLength("historical"), mimeType: "application/zip" },
+      meta: { sizeBytes: Buffer.byteLength("historical"), sha256Hash: state.build!.sha256Hash, mimeType: "application/zip" },
     });
   });
 

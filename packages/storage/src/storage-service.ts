@@ -79,11 +79,8 @@ export class StorageService {
   async getDownloadStream(key: string, signal?: AbortSignal) {
     signal?.throwIfAborted();
     const provider = getStorageProvider();
-    const exists = await provider.exists(key);
-    signal?.throwIfAborted();
-    if (!exists) {
-      throw new ValidationError("Asset does not exist in storage");
-    }
+    // An exists()-then-get() pair doubles I/O and is vulnerable to a rename
+    // between both calls. Opening the object is the authoritative check.
     try {
       return await provider.get(key, signal);
     } catch (error) {

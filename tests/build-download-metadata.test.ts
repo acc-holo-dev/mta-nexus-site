@@ -69,7 +69,7 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
   });
   it.each([0, 3, 5])("rejects size %s before auditing or delivering bytes", async (sizeBytes) => {
     const stream = Readable.from(Buffer.from("data"));
-    mocks.download.mockResolvedValue({ stream, meta: { sizeBytes } });
+    mocks.download.mockResolvedValue({ stream, meta: { sizeBytes, sha256Hash: mocks.hash } });
     const response = await request();
     expect(response.status).toBe(409);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
@@ -91,6 +91,35 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
     expect(stream.destroyed).toBe(true);
     expect(mocks.audit).not.toHaveBeenCalled();
   });
+  it.each([
+    ["missing metadata", undefined],
+    ["missing hash", { sizeBytes: 4 }],
+    ["missing size", { sha256Hash: "a".repeat(64) }],
+    ["invalid hash", { sizeBytes: 4, sha256Hash: "not-a-checksum" }],
+    ["missing hash with correct size", { sizeBytes: 4, sha256Hash: undefined }],
+  ])("rejects %s before auditing or streaming", async (_description, meta) => {
+    const stream = Readable.from(Buffer.from("data"));
+    mocks.download.mockResolvedValue({ stream, meta });
+    const response = await request();
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ code: "BUILD_ARTIFACT_MISMATCH" });
+    expect(stream.destroyed).toBe(true);
+    expect(mocks.audit).not.toHaveBeenCalled();
+  });
+
+  it("rejects invalid recorded checksum even if provider repeats it", async () => {
+    mocks.hash = "not-a-hash";
+    const stream = Readable.from(Buffer.from("data"));
+    mocks.download.mockResolvedValue({
+      stream,
+      meta: { sizeBytes: 4, sha256Hash: mocks.hash },
+    });
+    const response = await request();
+    expect(response.status).toBe(409);
+    expect(stream.destroyed).toBe(true);
+    expect(mocks.audit).not.toHaveBeenCalled();
+  });
+
   it("reports missing storage bytes as 404", async () => {
     mocks.download.mockRejectedValue(new ValidationError("missing"));
     expect((await request()).status).toBe(404);
@@ -99,7 +128,7 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
   it("delivers matching bytes with the recorded content length", async () => {
     mocks.download.mockResolvedValue({
       stream: Readable.from(Buffer.from("data")),
-      meta: { sizeBytes: 4 },
+      meta: { sizeBytes: 4, sha256Hash: mocks.hash },
     });
     const response = await request();
     expect(response.status).toBe(200);
@@ -142,7 +171,7 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
     mocks.download.mockImplementation(async (_key: string, signal: AbortSignal) => {
       expect(signal.aborted).toBe(false);
       controller.abort();
-      return { stream, meta: { sizeBytes: 4 } };
+      return { stream, meta: { sizeBytes: 4, sha256Hash: mocks.hash } };
     });
     const response = await request(controller.signal);
     expect(response.status).toBe(499);
@@ -158,7 +187,7 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
   it("closes a prepared stream if cancellation arrives during audit", async () => {
     const controller = new AbortController();
     const stream = Readable.from(Buffer.from("data"));
-    mocks.download.mockResolvedValue({ stream, meta: { sizeBytes: 4 } });
+    mocks.download.mockResolvedValue({ stream, meta: { sizeBytes: 4, sha256Hash: mocks.hash } });
     mocks.audit.mockImplementation(async () => { controller.abort(); });
     const response = await request(controller.signal);
     expect(response.status).toBe(499);

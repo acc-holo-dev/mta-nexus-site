@@ -23,6 +23,7 @@ beforeEach(async () => {
   state.next = 0;
 });
 afterEach(async () => {
+  vi.restoreAllMocks();
   await rm(root, { recursive: true, force: true });
 });
 
@@ -87,4 +88,26 @@ it("retains extension validation before creating a generated key", async () => {
     }),
   ).rejects.toMatchObject({ code: "VALIDATION_FAILED" });
   expect(await readdir(root)).toEqual([]);
+});
+
+it("opens a download once, without an existence preflight race", async () => {
+  const asset = await service.uploadAsset({
+    data: Buffer.from("verified archive"),
+    fileName: "archive.zip",
+    mimeType: "application/zip",
+    userId: "usr_owner",
+  });
+  const provider = state.provider!;
+  const preflight = vi.spyOn(provider, "exists").mockRejectedValue(new Error("exists must not be called"));
+  const opened = await service.getDownloadStream(asset.key);
+  expect(preflight).not.toHaveBeenCalled();
+  expect(opened.meta.sha256Hash).toBe(asset.sha256Hash);
+  const chunks: Buffer[] = [];
+  for await (const chunk of opened.stream as Readable) chunks.push(Buffer.from(chunk));
+  expect(Buffer.concat(chunks).toString()).toBe("verified archive");
+});
+
+it("maps missing bytes directly from open to a missing asset error", async () => {
+  await expect(service.getDownloadStream("assets/usr_owner/missing.zip"))
+    .rejects.toMatchObject({ code: "VALIDATION_FAILED" });
 });

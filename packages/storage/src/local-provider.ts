@@ -3,7 +3,7 @@ import { constants as fsConstants } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { ConflictError } from "@nexus/domain";
-import type { StorageProvider, StorageObjectMeta } from "./types";
+import type { StorageProvider, StorageObjectMeta, VerifiedStorageReadMeta } from "./types";
 
 type DirectoryHandle = Awaited<ReturnType<typeof fs.open>>;
 
@@ -128,7 +128,7 @@ export class LocalStorageProvider implements StorageProvider {
   async get(
     key: string,
     signal?: AbortSignal,
-  ): Promise<{ stream: NodeJS.ReadableStream; meta?: Partial<StorageObjectMeta> }> {
+  ): Promise<{ stream: NodeJS.ReadableStream; meta: VerifiedStorageReadMeta }> {
     signal?.throwIfAborted();
     return this.withParent(key, false, async filePath => {
       // NOFOLLOW rejects a leaf symlink, even if it is swapped just before open.

@@ -777,10 +777,11 @@ wrong-version selection and unauthorized cross-product selection, but does
   across a slow stream. Include a live PostgreSQL quarantine-vs-download
   test, and confirm no stale bytes are delivered after a completed revoke.
 - A trusted scan and recorded SHA-256 are provenance facts, not independently
-  proven file bytes on every storage backend. Local storage verifies file
-  metadata; remote implementations need a strict provider digest contract or
-  bounded streaming SHA-256 verification before the release is considered
-  cryptographically verified.
+  proven file bytes on every storage backend. Download routes now require
+  actual storage-provider size **and** SHA-256 metadata (or fail with 409),
+  and local storage hashes the opened descriptor before delivery. A future
+  remote implementation must still prove the bytes with its own trusted digest
+  or bounded streaming SHA-256, not merely echo metadata from the database.
 - Browser/HTTP, scoped SQL pagination and empty/noindex archive behavior have
   tests but still need an exact-SHA runnable CI acceptance pass.
 
