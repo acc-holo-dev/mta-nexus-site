@@ -274,6 +274,14 @@ together, then records matches in batches of at most five concurrent writes per
 capture. The known-server limit remains 500, with one extra row detecting a
 truncated selection. Each write still uses the existing repository transaction
 and duplicate suppression; missing directory endpoints are not recorded as offline.
+For duplicate `source/sourceSequence/serverId` observations, `record()` returns
+the original persisted row and ID (one additional indexed SELECT only on a
+conflict), never a fabricated ID from an ignored INSERT. The conflict target is
+explicit, so unexpected generated-ID collisions fail instead of masquerading
+as duplicate upstream snapshots. Equal timestamps and older snapshots still
+cannot overwrite newer denormalized live state. PostgreSQL integration tests
+cover sequential retries, concurrent duplicates and observations without a
+source sequence; these tests require an executing database verification run.
 
 Both input reads and every active write batch use `Promise.allSettled`. If an
 operation fails, capture waits for the other started operations before throwing

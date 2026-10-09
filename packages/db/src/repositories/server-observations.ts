@@ -23,34 +23,62 @@ export class ServerObservationRepository {
       const inserted = await tx
         .insert(serverObservations)
         .values(values)
-        .onConflictDoNothing()
+        // Ignore only a duplicate snapshot identity, never an unexpected
+        // collision of the generated observation primary key.
+        .onConflictDoNothing({
+          target: [
+            serverObservations.source,
+            serverObservations.sourceSequence,
+            serverObservations.serverId,
+          ],
+        })
         .returning();
 
-      if (inserted[0]) {
-        // Observations are immutable history, but the denormalized current
-        // values must be monotonic. A slow/stale collector can finish after
-        // a newer capture. PostgreSQL rechecks this UPDATE predicate while
-        // acquiring the row lock, so even concurrent writers cannot regress
-        // live values or their provenance. Equal timestamps retain the first.
-        // Never update editorial metadata from a remote master-list.
-        await tx
-          .update(servers)
-          .set({
-            currentPlayers: input.currentPlayers ?? null,
-            maxPlayers: input.maxPlayers ?? null,
-            lastObservedAt: input.observedAt,
-            observationSource: input.source,
-          })
+      if (!inserted[0]) {
+        // A conflict is not a new observation. Return the actual persisted
+        // row, including its original ID and immutable payload, rather than
+        // inventing an object from values that PostgreSQL did not insert.
+        if (input.sourceSequence == null) {
+          throw new Error("Conflicting observation has no source sequence");
+        }
+        const [existing] = await tx
+          .select()
+          .from(serverObservations)
           .where(and(
-            eq(servers.id, input.serverId),
-            or(
-              isNull(servers.lastObservedAt),
-              lt(servers.lastObservedAt, input.observedAt),
-            ),
-          ));
+            eq(serverObservations.source, input.source),
+            eq(serverObservations.sourceSequence, input.sourceSequence),
+            eq(serverObservations.serverId, input.serverId),
+          ))
+          .limit(1);
+        if (!existing) {
+          throw new Error("Conflicting server observation was not found");
+        }
+        return existing as ServerObservation;
       }
 
-      return (inserted[0] ?? values) as ServerObservation;
+      // Observations are immutable history, but the denormalized current
+      // values must be monotonic. A slow/stale collector can finish after
+      // a newer capture. PostgreSQL rechecks this UPDATE predicate while
+      // acquiring the row lock, so even concurrent writers cannot regress
+      // live values or their provenance. Equal timestamps retain the first.
+      // Never update editorial metadata from a remote master-list.
+      await tx
+        .update(servers)
+        .set({
+          currentPlayers: input.currentPlayers ?? null,
+          maxPlayers: input.maxPlayers ?? null,
+          lastObservedAt: input.observedAt,
+          observationSource: input.source,
+        })
+        .where(and(
+          eq(servers.id, input.serverId),
+          or(
+            isNull(servers.lastObservedAt),
+            lt(servers.lastObservedAt, input.observedAt),
+          ),
+        ));
+
+      return inserted[0] as ServerObservation;
     });
   }
 

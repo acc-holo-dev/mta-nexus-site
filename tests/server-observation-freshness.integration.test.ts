@@ -59,7 +59,7 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
     await withServer(async serverId => {
       const newer = sample(serverId, "2026-10-09T12:00:00.000Z", 51);
       const older = sample(serverId, "2026-10-09T11:00:00.000Z", 13);
-      await serverObservationRepository.record(newer);
+      const first = await serverObservationRepository.record(newer);
       await serverObservationRepository.record(older);
       // An equal timestamp from another source is preserved in history,
       // but must not overwrite the first accepted current snapshot.
@@ -69,7 +69,13 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
       });
       // Replaying the same source sequence should not update current state
       // or create an additional immutable observation.
-      await serverObservationRepository.record({ ...newer, currentPlayers: 999 });
+      const duplicate = await serverObservationRepository.record({
+        ...newer, currentPlayers: 999,
+      });
+      expect(duplicate.id).toBe(first.id);
+      expect(duplicate.currentPlayers).toBe(51);
+      expect(duplicate.createdAt).toEqual(first.createdAt);
+      expect(duplicate.observedAt).toEqual(first.observedAt);
 
       const live = await liveState(serverId);
       expect(live).toMatchObject({
@@ -85,6 +91,43 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
       expect(history).toHaveLength(3);
       expect(history.map(item => item.currentPlayers).sort((a, b) => (a ?? 0) - (b ?? 0)))
         .toEqual([13, 51, 70]);
+    });
+  });
+
+  it("returns the one persisted observation for concurrent identical snapshots", async () => {
+    await withServer(async serverId => {
+      const snapshot = sample(serverId, "2026-10-09T14:00:00.000Z", 27);
+      const [first, second] = await Promise.all([
+        serverObservationRepository.record(snapshot),
+        serverObservationRepository.record(snapshot),
+      ]);
+      expect(first.id).toBe(second.id);
+      expect(first.currentPlayers).toBe(27);
+      expect(second.currentPlayers).toBe(27);
+      expect(first.createdAt).toEqual(second.createdAt);
+      const history = await db.select().from(serverObservations)
+        .where(eq(serverObservations.serverId, serverId));
+      expect(history).toHaveLength(1);
+      expect(history[0]?.id).toBe(first.id);
+      expect((await liveState(serverId))?.currentPlayers).toBe(27);
+    });
+  });
+
+  it("accepts independent observations when source sequence is omitted", async () => {
+    await withServer(async serverId => {
+      const base = sample(serverId, "2026-10-09T15:00:00.000Z", 11);
+      const first = await serverObservationRepository.record({
+        ...base, sourceSequence: undefined,
+      });
+      const second = await serverObservationRepository.record({
+        ...base, sourceSequence: undefined,
+        observedAt: new Date("2026-10-09T15:01:00.000Z"),
+        currentPlayers: 12,
+      });
+      expect(first.id).not.toBe(second.id);
+      expect((await liveState(serverId))?.currentPlayers).toBe(12);
+      expect(await db.select().from(serverObservations)
+        .where(eq(serverObservations.serverId, serverId))).toHaveLength(2);
     });
   });
 
