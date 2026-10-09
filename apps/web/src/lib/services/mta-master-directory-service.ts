@@ -1,9 +1,10 @@
 import { readMtaMasterMirrorUrls } from "@nexus/config";
+import { MTA_MASTER_FRESH_TTL_MS } from "../mta-directory-cache";
 
 const MTA_MASTER_URL = "https://master.multitheftauto.com/ase/mta/";
 const MASTER_TOTAL_TIMEOUT_MS = 10_000;
 const MASTER_ENDPOINT_TIMEOUT_MS = 4_000;
-const CACHE_TTL_MS = 60_000;
+const CACHE_TTL_MS = MTA_MASTER_FRESH_TTL_MS;
 const STALE_CACHE_TTL_MS = 15 * 60_000;
 const MAX_MASTER_PAYLOAD_BYTES = 8 * 1024 * 1024;
 const MAX_MASTER_SERVERS = 10_000;

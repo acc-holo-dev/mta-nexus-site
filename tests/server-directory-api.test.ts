@@ -76,13 +76,13 @@ describe("official MTA directory API", () => {
   it("keeps bounded public caching for freshly fetched master data", async () => {
     getDirectory.mockResolvedValue({
       servers: [{ address: "203.0.113.9", port: 22003, players: 4 }],
-      fetchedAt: "2026-10-09T00:00:00.000Z",
+      fetchedAt: new Date().toISOString(),
       isStale: false,
     });
     const response = await GET(new NextRequest("https://nexus.test/api/servers/directory"));
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe(
-      "public, max-age=30, stale-while-revalidate=120",
+      "public, max-age=30",
     );
     expect((await response.json()).isStale).toBe(false);
   });

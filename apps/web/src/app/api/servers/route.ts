@@ -16,15 +16,11 @@ import {
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
 import { serverService } from "../../../lib/services/server-service";
+import { mtaDirectoryHttpCacheControl } from "../../../lib/mta-directory-cache";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
   Vary: "Cookie",
-};
-
-const publicHeaders = {
-  "Cache-Control":
-    "public, max-age=30, stale-while-revalidate=120",
 };
 
 const errorHeaders = {
@@ -90,9 +86,8 @@ export async function GET(request: NextRequest) {
         directoryIsStale,
         limit,
       },
-      // Do not cache an unavailable or stale directory for an additional
-      // 30s + 120s SWR window at an HTTP intermediary.
-      { headers: directory && !directoryIsStale ? publicHeaders : errorHeaders },
+      // Bound shared HTTP caching by the remaining master-list freshness.
+      { headers: { "Cache-Control": mtaDirectoryHttpCacheControl(directory) } },
     );
   } catch (error) {
     logRequestEvent({

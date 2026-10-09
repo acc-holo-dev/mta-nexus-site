@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { mtaMasterDirectoryService } from "../../../../lib/services/mta-master-directory-service";
 import { selectMtaDirectoryPage } from "../../../../lib/mta-directory-page";
+import { mtaDirectoryHttpCacheControl } from "../../../../lib/mta-directory-cache";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -86,11 +87,7 @@ export async function GET(request: NextRequest) {
       },
       {
         headers: {
-          // A stale directory is already operating on borrowed upstream time.
-          // Never extend its validity through a second layer of HTTP caching.
-          "Cache-Control": directory.isStale
-            ? "no-store"
-            : "public, max-age=30, stale-while-revalidate=120",
+          "Cache-Control": mtaDirectoryHttpCacheControl(directory),
         },
       },
     );

@@ -82,13 +82,13 @@ describe("editorial server API", () => {
     listServers.mockResolvedValue([{ id: "srv_1", name: "Nexus", ipAddress: "203.0.113.7", port: 22003 }]);
     getDirectory.mockResolvedValueOnce({ servers: [], isStale: true })
       .mockRejectedValueOnce(new Error("unavailable"))
-      .mockResolvedValueOnce({ servers: [], isStale: false });
+      .mockResolvedValueOnce({ servers: [], fetchedAt: new Date().toISOString(), isStale: false });
     const request = () => new NextRequest("https://nexus.test/api/servers");
     const stale = await GET(request());
     const missing = await GET(request());
     const fresh = await GET(request());
     expect(stale.headers.get("Cache-Control")).toBe("no-store");
     expect(missing.headers.get("Cache-Control")).toBe("no-store");
-    expect(fresh.headers.get("Cache-Control")).toContain("max-age=30");
+    expect(fresh.headers.get("Cache-Control")).toBe("public, max-age=30");
   });
 });
