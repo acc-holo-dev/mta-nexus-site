@@ -59,7 +59,7 @@ describe("editorial server API", () => {
       address: `other-${index}.test`, port: 22003, players: 5,
     })), {
       get(target, key, receiver) {
-        if (typeof key === "string" && /^\\d+$/u.test(key)) reads++;
+        if (typeof key === "string" && /^\d+$/u.test(key)) reads++;
         return Reflect.get(target, key, receiver);
       },
     });
