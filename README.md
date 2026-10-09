@@ -93,7 +93,10 @@ pnpm dev:docker:up
 # Next.js only; external dependencies must already be configured
 pnpm dev:host
 
-# project verification
+# code checks without Docker or PostgreSQL
+pnpm check:code
+
+# full project verification with configured dependencies
 pnpm check
 pnpm nexus:doctor
 

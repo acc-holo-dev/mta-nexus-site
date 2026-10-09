@@ -61,18 +61,8 @@ jobs:
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
-    - name: Lint and typecheck
-      run: |-
-        pnpm lint
-        pnpm typecheck
-    - name: Package boundaries and dependency cycles
-      run: pnpm analyze:architecture
-    - name: Unused code and dependency declarations
-      run: pnpm analyze:unused
-    - name: Unit tests
-      run: pnpm test:unit --reporter=default --reporter=json --outputFile=artifacts/unit-tests.json
-    - name: Tooling behavior and isolation checks
-      run: pnpm test:tooling
+    - name: Check code, dependencies and isolated tests
+      run: pnpm check:code
     - name: Preserve unit test timings
       if: ${{ always() }}
       continue-on-error: ${{ github.ref_type != 'tag' }}

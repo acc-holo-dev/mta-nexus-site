@@ -21,7 +21,17 @@ test("root exposes release:verify without adding runtime dependencies", () => {
 
 test("CI runs separate test projects and reports the selected verification scope", () => {
   const workflow = read(".github/workflows/ci.yml");
-  assert.match(workflow, /pnpm test:unit/u);
+  const pkg = JSON.parse(read("package.json"));
+  assert.match(workflow, /pnpm check:code/u);
+  const selector = pkg.scripts["check:code"].match(/"\/([^"]+)\/"$/u);
+  assert.ok(selector, "check:code must select explicit scripts");
+  const pattern = new RegExp(selector[1]);
+  assert.deepEqual(Object.keys(pkg.scripts).filter(name => pattern.test(name)).sort(), [
+    "analyze:architecture", "analyze:unused", "lint", "test:tooling", "test:unit", "typecheck",
+  ]);
+  assert.match(pkg.scripts["check:code"], /--sequential --no-bail/u);
+  assert.match(pkg.scripts["test:unit"], /--project unit\b/u);
+  assert.match(pkg.scripts["test:unit"], /--outputFile=artifacts\/unit-tests\.json/u);
   assert.match(workflow, /pnpm test:database/u);
   assert.match(workflow, /node scripts\/ci-summary\.mjs/u);
   assert.match(workflow, /toJSON\(needs\)/u);

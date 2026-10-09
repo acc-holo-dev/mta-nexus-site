@@ -127,10 +127,34 @@ pnpm release:verify
 
 ### Test and CI scopes
 
-- `pnpm test:unit`: isolated unit/mock suites, at most four parallel workers; no database required.
+- `pnpm check:code`: lint, types, package boundaries, unused code, unit and tooling checks; no Docker or PostgreSQL required.
+- `pnpm test:unit`: isolated unit/mock suites, at most four parallel workers; no database required. Prints the normal reporter and writes timings/results to ignored `artifacts/unit-tests.json`.
 - `pnpm test:database`: real DB/integration suites, sequential files against a disposable PostgreSQL database.
 - `pnpm test:tooling`: standalone Node suites. Compose validators that require rendered JSON remain owned by their infrastructure harnesses.
 - `pnpm test`: both Vitest projects; `pnpm check` and `pnpm release:verify` retain the full local release path.
+
+The CI unit job and host development use the same `check:code` command. It uses
+the pinned pnpm's [native script selection](https://pnpm.io/cli/run#running-multiple-scripts),
+with an anchored selector for exactly six scripts. `--sequential` bounds memory;
+`--no-bail` lets independent checks finish after an earlier failure and returns a
+nonzero result if any check failed. The selected checks are independent of order. Unit
+test files still run with four Vitest workers. CI preserves the unit JSON even
+when a different check fails; database/build/browser acceptance keep their own jobs.
+No additional task runner is installed.
+
+`scripts/test-projects.mjs` uses the existing pinned SWC parser to inspect source
+syntax without executing modules. It follows executable imports/re-exports,
+CommonJS and TypeScript import-equals edges, plus calls inside template expressions.
+Explicit type-only declarations and TypeScript import queries are erased; inline
+type specifiers remain conservative because their module can retain side effects.
+Zero-argument arrow factories in hoisted `vi.mock` calls cut a mocked import edge,
+including Vitest's typed `vi.mock(import("..."), factory)` syntax. Partial/automatic
+and runtime mocks, `importActual` and unmock calls retain live edges. Unknown
+dynamic targets and unresolved local/workspace imports remain in the DB project;
+syntax errors stop classification with the source path. This is a conservative
+repository policy, not a whole-program evaluator of arbitrary aliases or control flow.
+See [SWC parsing APIs](https://swc.rs/docs/usage/core#parse)
+and [Vitest mock semantics](https://vitest.dev/api/vi#vi-mock).
 
 ### Automated browser accessibility
 
@@ -231,9 +255,10 @@ on `b86063a` was checked against all 313 matching source files: none were missin
 (336 graph modules, 1001 dependencies). Recheck coverage when changing parser options.
 
 Knip entries include shell-invoked scripts and the forked mail-worker fixture.
-The externally installed Playwright runner, OS OpenSSL binary and dynamically
-loaded SWC parser are documented exceptions. Findings are not auto-deleted. Knip now runs as a blocking CI gate after the
-architecture check; review intentional entry points before adding exceptions.
+Externally installed browser packages and the OS OpenSSL binary are documented
+exceptions. SWC is now imported directly by the test classifier, so its dependency
+exception has been removed. Findings are not auto-deleted. Knip runs as a blocking
+gate in `check:code`; review intentional entry points before adding exceptions.
 The web workspace no longer declares unused `clsx`/`tailwind-merge`; `@nexus/ui`
 still owns the dependencies it actually imports.
 
