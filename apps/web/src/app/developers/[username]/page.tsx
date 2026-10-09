@@ -9,8 +9,11 @@ import type { Metadata } from "next";
 import { ProductCard } from "../../../components/product-card";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { cache } from "react";
 
 export const dynamic = "force-dynamic";
+
+const getProfile = cache((username: string) => authService.getUserByUsername(username));
 
 export async function generateMetadata({
   params,
@@ -18,9 +21,8 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-  const locale = await getRequestLocale();
+  const [locale, user] = await Promise.all([getRequestLocale(), getProfile(username)]);
   const dictionary = getDictionary(locale);
-  const user = await authService.getUserByUsername(username);
   if (!user || (user.role !== "developer" && user.role !== "admin")) {
     return { title: dictionary.profiles.userNotFound, robots: { index: false, follow: false } };
   }
@@ -39,10 +41,9 @@ export default async function DeveloperProfilePage({
   searchParams?: Promise<{ page?: string | string[] }>;
 }) {
   const { username } = await params;
-  const locale = await getRequestLocale();
+  const [locale, user] = await Promise.all([getRequestLocale(), getProfile(username)]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.developers;
-  const user = await authService.getUserByUsername(username);
 
   if (!user || (user.role !== "developer" && user.role !== "admin")) {
     notFound();

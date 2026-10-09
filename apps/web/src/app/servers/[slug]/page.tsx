@@ -18,8 +18,11 @@ import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
 import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { cache } from "react";
 
 export const dynamic = "force-dynamic";
+
+const getServer = cache((slug: string) => serverService.getServerBySlug(slug));
 
 export async function generateMetadata({
   params,
@@ -27,9 +30,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const locale = await getRequestLocale();
+  const [locale, server] = await Promise.all([getRequestLocale(), getServer(slug)]);
   const copy = getDictionary(locale).serverDetail;
-  const server = await serverService.getServerBySlug(slug);
 
   if (!server || server.visibility === "private") {
     return { title: copy.notFound };
@@ -60,11 +62,10 @@ export default async function ServerDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const locale = await getRequestLocale();
+  const [locale, server] = await Promise.all([getRequestLocale(), getServer(slug)]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.serverDetail;
   const serverCopy = dictionary.servers;
-  const server = await serverService.getServerBySlug(slug);
 
   if (!server || server.visibility === "private") notFound();
 

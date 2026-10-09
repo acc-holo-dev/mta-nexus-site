@@ -14,8 +14,11 @@ import { ServerCard } from "../../../components/server-card";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { indexMtaObservations, mtaMasterDirectoryService } from "../../../lib/services/mta-master-directory-service";
+import { cache } from "react";
 
 export const dynamic = "force-dynamic";
+
+const getProfile = cache((username: string) => userRepository.findByUsername(username));
 
 export async function generateMetadata({
   params,
@@ -23,9 +26,8 @@ export async function generateMetadata({
   params: Promise<{ username: string }>;
 }): Promise<Metadata> {
   const { username } = await params;
-  const locale = await getRequestLocale();
+  const [locale, user] = await Promise.all([getRequestLocale(), getProfile(username)]);
   const copy = getDictionary(locale).profiles;
-  const user = await userRepository.findByUsername(username);
 
   if (!user) {
     return { title: copy.userNotFound, robots: { index: false, follow: false } };
@@ -48,10 +50,9 @@ export default async function UserProfilePage({
   searchParams?: Promise<{ page?: string | string[]; serverPage?: string | string[] }>;
 }) {
   const { username } = await params;
-  const locale = await getRequestLocale();
+  const [locale, user] = await Promise.all([getRequestLocale(), getProfile(username)]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.profiles;
-  const user = await userRepository.findByUsername(username);
 
   if (!user) {
     notFound();

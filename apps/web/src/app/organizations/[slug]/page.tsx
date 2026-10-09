@@ -19,8 +19,11 @@ import { ProductCard } from "../../../components/product-card";
 import { ArticleCard } from "../../../components/article-card";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { cache } from "react";
 
 export const dynamic = "force-dynamic";
+
+const getProfile = cache((slug: string) => organizationRepository.findBySlug(slug));
 
 export async function generateMetadata({
   params,
@@ -30,7 +33,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const [locale, organization] = await Promise.all([
     getRequestLocale(),
-    organizationRepository.findBySlug(slug),
+    getProfile(slug),
   ]);
   const dictionary = getDictionary(locale);
   if (!organization) {
@@ -54,10 +57,9 @@ export default async function OrganizationProfilePage({
   searchParams?: Promise<{ page?: string | string[]; articlePage?: string | string[] }>;
 }) {
   const { slug } = await params;
-  const locale = await getRequestLocale();
+  const [locale, organization] = await Promise.all([getRequestLocale(), getProfile(slug)]);
   const dictionary = getDictionary(locale);
   const copy = dictionary.organizations;
-  const organization = await organizationRepository.findBySlug(slug);
 
   if (!organization) {
     notFound();

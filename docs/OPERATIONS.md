@@ -230,6 +230,28 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 ### Code analysis
 
+Public developer/user/organization profiles and server details share one
+module-level `React.cache` reader between `generateMetadata` and the page.
+For the same username/slug in one RSC request, the underlying record lookup
+executes once and shares the in-flight promise. Locale resolution also uses
+request memoization across metadata/layout/page. Independent locale and record
+reads start together. React discards this cache between requests; no TTL,
+cross-request data cache or invalidation service is introduced.
+
+`pnpm test:tooling` renders the actual four page sources and locale resolver with
+the pinned Next RSC renderer in both development and production modes. Synthetic
+repositories/cookies and lightweight UI adapters verify 20 renders per mode:
+concurrent RU/EN requests with the same key, a fresh request, a missing record and
+its subsequent creation. Each render performs one record lookup and one locale
+cookie read. Before the change the developer metadata/page fixture made two
+record lookups. Existing page suites retain pagination, role and visibility
+coverage. This measures duplicate read removal, not production SQL timings or
+browser latency. Article metadata and page reads remain distinct because only
+the page increments views; private resource previews and authorization are not
+part of these public readers.
+See [Next metadata request memoization](https://nextjs.org/docs/app/getting-started/metadata-and-og-images#memoizing-data-requests)
+and [React cache request lifetime](https://react.dev/reference/react/cache#caveats).
+
 | Command | Purpose | Result |
 | --- | --- | --- |
 | `pnpm analyze:architecture` | Check package boundaries, cycles and unresolved imports with dependency-cruiser | Required in the CI unit job; violations fail the command. |
