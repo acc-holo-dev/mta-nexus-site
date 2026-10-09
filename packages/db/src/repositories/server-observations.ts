@@ -54,7 +54,7 @@ export class ServerObservationRepository {
       .select()
       .from(serverObservations)
       .where(eq(serverObservations.serverId, serverId))
-      .orderBy(desc(serverObservations.observedAt))
+      .orderBy(desc(serverObservations.observedAt), desc(serverObservations.id))
       .limit(boundedLimit);
     return rows as ServerObservation[];
   }
@@ -76,7 +76,7 @@ export class ServerObservationRepository {
           gte(serverObservations.observedAt, since),
         ),
       )
-      .orderBy(desc(serverObservations.observedAt))
+      .orderBy(desc(serverObservations.observedAt), desc(serverObservations.id))
       .limit(boundedLimit);
 
     return (rows as ServerObservation[]).reverse();

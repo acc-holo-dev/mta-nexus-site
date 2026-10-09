@@ -291,6 +291,9 @@ export async function requestMtaMasterDirectoryFromEndpoints(
     try {
       const response = await fetcher(endpoint, {
         cache: "no-store",
+        // Do not redirect operator-approved HTTPS endpoints to another host
+        // or scheme, particularly to a private/local network address.
+        redirect: "error",
         signal: AbortSignal.timeout(
           Math.min(MASTER_ENDPOINT_TIMEOUT_MS, remainingMs),
         ),
@@ -299,7 +302,9 @@ export async function requestMtaMasterDirectoryFromEndpoints(
         },
       });
 
-      if (!response.ok) {
+      // An injected fetch adapter may ignore redirect: "error".
+      // Reject successful but already-redirected responses as well.
+      if (!response.ok || response.redirected) {
         void response.body?.cancel().catch(() => {});
         continue;
       }
