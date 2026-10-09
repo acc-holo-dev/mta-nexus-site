@@ -1,4 +1,4 @@
-import path from "node:path";
+import { reviewerAttachmentFileName } from "../../../../../../lib/resource-attachment-filename";
 import { ValidationError } from "@nexus/domain";
 import {
   auditRepository,
@@ -49,17 +49,6 @@ function destroyOpenedStream(
       destroy?: (error?: Error) => void;
     };
   destroyable.destroy?.();
-}
-
-function safeReviewerFileName(
-  buildId: string,
-  fileName: string,
-): string {
-  const safeBase = path
-    .basename(fileName)
-    .replace(/[^a-zA-Z0-9._-]/gu, "_")
-    .slice(0, 180);
-  return `review-${buildId}-${safeBase || "artifact.bin"}`;
 }
 
 export async function GET(
@@ -194,7 +183,7 @@ export async function GET(
         "Content-Type":
           "application/octet-stream",
         "Content-Disposition":
-          `attachment; filename="${safeReviewerFileName(
+          `attachment; filename="${reviewerAttachmentFileName(
             build.id,
             build.fileName,
           )}"`,

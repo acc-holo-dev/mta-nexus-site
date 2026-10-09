@@ -26,3 +26,18 @@ export function resourceAttachmentFileName(
   const safeVersion = safePart(version, "release", 90);
   return safeSlug + "-" + safeVersion + ext;
 }
+
+/**
+ * Reviewer filenames contain identifiers supplied by legacy rows. Neither
+ * the DB build ID nor the original filename may control HTTP header syntax.
+ * Handle Windows and POSIX separators regardless of the deployment OS.
+ */
+export function reviewerAttachmentFileName(
+  buildId: string,
+  originalFileName: string,
+): string {
+  const safeId = safePart(buildId, "build", 64);
+  const base = path.win32.basename(path.posix.basename(originalFileName));
+  const safeName = safePart(base, "artifact.bin", 100);
+  return `review-${safeId}-${safeName}`;
+}

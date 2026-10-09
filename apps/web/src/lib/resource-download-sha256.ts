@@ -8,13 +8,18 @@
  */
 const SHA256_HEX = /^[a-fA-F0-9]{64}$/u;
 
+/** Reject broken/missing digest headers *before* buffering the response body. */
+export function isValidDownloadSha256Header(header: string | null): boolean {
+  return header !== null && SHA256_HEX.test(header);
+}
+
 export async function matchesDownloadedSha256(
   blob: Blob,
   expectedHeader: string | null,
   signal: AbortSignal,
 ): Promise<boolean> {
   signal.throwIfAborted();
-  if (!expectedHeader || !SHA256_HEX.test(expectedHeader)) return false;
+  if (!isValidDownloadSha256Header(expectedHeader)) return false;
 
   try {
     const bytes = await blob.arrayBuffer();

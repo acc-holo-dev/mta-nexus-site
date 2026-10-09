@@ -1,6 +1,9 @@
 import { MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 import { resourceDownloadUrl } from "./build-download-selection";
-import { matchesDownloadedSha256 } from "./resource-download-sha256";
+import {
+  isValidDownloadSha256Header,
+  matchesDownloadedSha256,
+} from "./resource-download-sha256";
 
 export type DownloadFailure =
   | "signIn"
@@ -92,6 +95,13 @@ async function readResourceDownload(
     void response.body?.cancel().catch(() => undefined);
     throw new ResourceDownloadError("failed");
   }
+  // A response with no valid checksum can never become a downloadable file.
+  // Fail before allocating up to 64 MiB and before spending time hashing it.
+  const expectedSha256 = response.headers.get("X-Content-SHA256");
+  if (!isValidDownloadSha256Header(expectedSha256)) {
+    void response.body?.cancel().catch(() => undefined);
+    throw new ResourceDownloadError("failed");
+  }
   // Fetch exposes decoded bytes; a proxy may report the compressed wire length.
   const encoding = response.headers.get("Content-Encoding")?.toLowerCase();
   const header =
@@ -156,7 +166,7 @@ async function readResourceDownload(
   // Do not hand an unverified artifact to the browser's save dialog.
   const validHash = await matchesDownloadedSha256(
     blob,
-    response.headers.get("X-Content-SHA256"),
+    expectedSha256,
     signal,
   );
   signal.throwIfAborted();
