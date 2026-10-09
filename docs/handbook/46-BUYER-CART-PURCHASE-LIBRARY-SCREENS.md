@@ -112,3 +112,32 @@ Seller may offer trials. Trial binds to one server, is short-lived and may have 
 ## 8. Offline/PWA behavior
 
 Offline shell may display cached library metadata but must block payment, license activation/transfer and other state-changing commerce actions with a clear `Offline` state.
+
+## 9. Closed-beta historical archive (implemented, read-only)
+
+The closed-beta paid checkout remains disabled. These authenticated,
+non-indexable workspace routes make previously stored legacy records
+inspectable without inventing a payment, payout, invoice or DRM provider:
+
+- `/workspace/purchases`: account-scoped historical order numbers, statuses,
+  dates and totals. No payment tokens, buyer emails or private provider data.
+- `/workspace/licenses`: account-scoped product titles, effective expiration,
+  model and boolean server-binding status. SQL never selects secret license
+  keys, entitlement JSON or server IDs. Historical `Active` is not a download
+  access grant; actual permissions still use the entitlement engine.
+- `/workspace/sales`: completed historical line items for resources authored
+  by the signed-in account; no buyer identity. Monetary amounts are **gross
+  line prices**, not withdrawable balances, fees or payout authorizations.
+  Organization-wide financial roles remain future work.
+
+Every page authenticates before any private query. The count and list use
+identical SQL ownership predicates with a 20-row limit and stable
+`created_at, id` descending order. Invalid page values revert to page one;
+larger valid pages clamp to the available history. Routes are dynamic,
+`noindex/nofollow`, and localized RU/EN.
+
+This read-only archive is not the target cart/purchase workflow in sections
+2-8. Historical order values are not a new purchase contract. PostgreSQL
+integration tests cover owner isolation, deterministic pagination, safe
+projections, and completed-only seller history, but their execution must be
+confirmed once CI runner allocation works.

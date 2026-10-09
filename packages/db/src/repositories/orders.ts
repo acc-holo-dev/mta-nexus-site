@@ -1,7 +1,8 @@
-import { eq, desc } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "../client";
 import { orders, orderItems, products } from "../schema";
 import type { Order, OrderItem } from "@nexus/domain";
+import { historyPageBounds } from "./history-pagination";
 
 export class OrderRepository {
   async findById(id: string): Promise<Order | null> {
@@ -12,6 +13,59 @@ export class OrderRepository {
     const order = orderRows[0] as unknown as Order;
     order.items = items as unknown as OrderItem[];
     return order;
+  }
+
+  /**
+   * Read-only bounded order archive. Never select payment tokens, buyer email,
+   * or other users' orders. This does not activate paid checkout.
+   */
+  async pageBuyerHistory(buyerId: string, requestedPage = 1) {
+    const scope = eq(orders.buyerId, buyerId);
+    const [summary] = await db.select({ total: count() }).from(orders).where(scope);
+    const bounds = historyPageBounds(summary?.total ?? 0, requestedPage);
+    const rows = await db.select({
+      id: orders.id,
+      orderNumber: orders.orderNumber,
+      status: orders.status,
+      totalAmount: orders.totalAmount,
+      currency: orders.currency,
+      createdAt: orders.createdAt,
+    }).from(orders).where(scope)
+      .orderBy(desc(orders.createdAt), desc(orders.id))
+      .limit(bounds.pageSize).offset(bounds.offset);
+    return { orders: rows, ...bounds };
+  }
+
+  /**
+   * Seller's own historical completed order lines. No buyer identity, payment
+   * provider, payout data, or unrelated product appears in the projection.
+   * A line is gross sales history, NOT proof of funds available to withdraw.
+   */
+  async pageSellerHistory(sellerId: string, requestedPage = 1) {
+    const scope = and(
+      eq(products.authorId, sellerId),
+      eq(orders.status, "completed"),
+    );
+    const [summary] = await db.select({ total: count() })
+      .from(orderItems)
+      .innerJoin(orders, eq(orderItems.orderId, orders.id))
+      .innerJoin(products, eq(orderItems.productId, products.id))
+      .where(scope);
+    const bounds = historyPageBounds(summary?.total ?? 0, requestedPage);
+    const rows = await db.select({
+      id: orderItems.id,
+      orderNumber: orders.orderNumber,
+      productTitle: products.title,
+      unitPrice: orderItems.unitPrice,
+      currency: orderItems.currency,
+      createdAt: orders.createdAt,
+    }).from(orderItems)
+      .innerJoin(orders, eq(orderItems.orderId, orders.id))
+      .innerJoin(products, eq(orderItems.productId, products.id))
+      .where(scope)
+      .orderBy(desc(orders.createdAt), desc(orderItems.id))
+      .limit(bounds.pageSize).offset(bounds.offset);
+    return { sales: rows, ...bounds };
   }
 
   async listByUser(buyerId: string): Promise<Order[]> {

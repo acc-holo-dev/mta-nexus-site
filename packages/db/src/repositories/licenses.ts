@@ -1,6 +1,7 @@
-import { and, eq, gt, isNull, or } from "drizzle-orm";
+import { and, count, desc, eq, gt, isNull, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { licenses } from "../schema";
+import { licenses, products } from "../schema";
+import { historyPageBounds } from "./history-pagination";
 import type { License } from "@nexus/domain";
 
 export class LicenseRepository {
@@ -14,6 +15,30 @@ export class LicenseRepository {
       or(isNull(licenses.expiresAt), gt(licenses.expiresAt, new Date())),
     ));
     return rows;
+  }
+
+  /**
+   * Bounded, user-scoped legacy license archive. Deliberately exclude the
+   * secret license key, entitlement JSON, server ID and account metadata.
+   */
+  async pageUserHistory(userId: string, requestedPage = 1) {
+    const scope = eq(licenses.userId, userId);
+    const [summary] = await db.select({ total: count() }).from(licenses).where(scope);
+    const bounds = historyPageBounds(summary?.total ?? 0, requestedPage);
+    const rows = await db.select({
+      id: licenses.id,
+      productTitle: products.title,
+      status: licenses.status,
+      model: licenses.model,
+      expiresAt: licenses.expiresAt,
+      createdAt: licenses.createdAt,
+      serverBound: sql<boolean>`${licenses.serverId} IS NOT NULL`,
+    }).from(licenses)
+      .innerJoin(products, eq(licenses.productId, products.id))
+      .where(scope)
+      .orderBy(desc(licenses.createdAt), desc(licenses.id))
+      .limit(bounds.pageSize).offset(bounds.offset);
+    return { licenses: rows, ...bounds };
   }
 
   async findByKey(key: string): Promise<License | null> {

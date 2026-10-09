@@ -16,6 +16,7 @@ import {
 } from "../../lib/services/mta-master-directory-service";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
+import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";
 import { collectLibraryEntries } from "../../lib/user-library";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +24,7 @@ export const dynamic = "force-dynamic";
 export default async function WorkspacePage() {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
+  const historyCopy = getCommerceHistoryCopy(locale);
   const token = (await cookies()).get("nexus_session")?.value;
   const user = await authService.getSession(token);
 
@@ -141,6 +143,18 @@ export default async function WorkspacePage() {
           context={dictionary.workspace.onServers}
         />
       </div>
+
+      <nav aria-label={historyCopy.navigation} className="flex flex-wrap gap-2">
+        {(["purchases", "licenses", "sales"] as const).map((area) => (
+          <Link
+            key={area}
+            href={`/workspace/${area}`}
+            className="rounded-md border border-base bg-surface px-4 py-2 text-sm text-secondary transition-colors hover:bg-hover hover:text-primary"
+          >
+            {historyCopy.tabs[area]}
+          </Link>
+        ))}
+      </nav>
 
       <section>
         <SectionHeader
