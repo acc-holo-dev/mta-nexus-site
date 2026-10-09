@@ -85,15 +85,25 @@ describe("bounded deterministic observation history queries", () => {
     expect(state.limit).toBe(expected);
   });
 
+  // The PostgreSQL timestamp encoder maps Date to ISO text in SQL params.
+  function capturedSince(): number {
+    if (!state.where) throw new Error("Missing SQL predicate");
+    const params = dialect.sqlToQuery(state.where).params;
+    const stamp = params.find(value =>
+      typeof value === "string" && value.length >= 20 &&
+      value[4] === "-" && value[7] === "-" && value[10] === "T",
+    );
+    if (typeof stamp !== "string") throw new Error("Missing ISO timestamp SQL parameter");
+    const parsed = Date.parse(stamp);
+    expect(Number.isFinite(parsed)).toBe(true);
+    return parsed;
+  }
+
   it.each([
     Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY,
   ])("uses a valid 24h history window for invalid hours %s", async (hours) => {
     await repository.listWindow("srv_test", hours, 20);
-    if (!state.where) throw new Error("Missing SQL predicate");
-    const params = dialect.sqlToQuery(state.where).params;
-    const since = params.find(value => value instanceof Date);
-    expect(since).toBeInstanceOf(Date);
-    const elapsed = Date.now() - (since as Date).getTime();
+    const elapsed = Date.now() - capturedSince();
     expect(elapsed).toBeGreaterThanOrEqual(24 * 3_600_000 - 1_000);
     expect(elapsed).toBeLessThanOrEqual(24 * 3_600_000 + 1_000);
   });
@@ -103,10 +113,7 @@ describe("bounded deterministic observation history queries", () => {
     async (hours) => {
       // Verify the constructed SQL without a live PostgreSQL dependency.
       await repository.getPeakPlayers("srv_test", hours);
-      if (!state.where) throw new Error("Missing SQL predicate");
-      const since = dialect.sqlToQuery(state.where).params.find(value => value instanceof Date);
-      expect(since).toBeInstanceOf(Date);
-      expect(Number.isFinite((since as Date).getTime())).toBe(true);
+      expect(Number.isFinite(capturedSince())).toBe(true);
     },
   );
 });

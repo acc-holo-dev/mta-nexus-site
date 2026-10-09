@@ -190,6 +190,47 @@ describe("bounded MTA master-list transport", () => {
       .toEqual(new Uint8Array([0, 1, 2, 3]));
   });
 
+  it("streams 20,000 one-byte chunks without retaining an array of chunks", async () => {
+    const total = 20_000;
+    let next = 0;
+    const response = new Response(new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (next === total) { controller.close(); return; }
+        controller.enqueue(new Uint8Array([next++ % 251]));
+      },
+    }));
+    const actual = new Uint8Array(await readBoundedMasterPayload(response, total));
+    expect(actual.length).toBe(total);
+    expect(actual[250]).toBe(250);
+    expect(actual[251]).toBe(0);
+    expect(actual[total - 1]).toBe((total - 1) % 251);
+  });
+
+  it("grows past 64 KiB and returns an exact-length buffer", async () => {
+    const first = new Uint8Array(64 * 1024).fill(5);
+    const second = new Uint8Array(37).fill(9);
+    const response = new Response(new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(first);
+        controller.enqueue(second);
+        controller.close();
+      },
+    }));
+    const actual = new Uint8Array(await readBoundedMasterPayload(response, first.length + second.length));
+    expect(actual.length).toBe(first.length + second.length);
+    expect(actual[0]).toBe(5);
+    expect(actual[first.length]).toBe(9);
+    expect(actual.at(-1)).toBe(9);
+  });
+
+  it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY, 8 * 1024 * 1024 + 1])(
+    "rejects an invalid stream byte limit %s", async (limit) => {
+      const response = new Response(new Uint8Array([1]));
+      await expect(readBoundedMasterPayload(response, limit))
+        .rejects.toThrow("Invalid MTA master-list payload size limit");
+    },
+  );
+
   it("rejects an oversized advertised length and cancels its body", async () => {
     let cancelled = false;
     const response = new Response(new ReadableStream<Uint8Array>({

@@ -235,6 +235,9 @@ export async function readBoundedMasterPayload(
   response: Response,
   maxBytes = MAX_MASTER_PAYLOAD_BYTES,
 ): Promise<ArrayBuffer> {
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > MAX_MASTER_PAYLOAD_BYTES) {
+    throw new Error("Invalid MTA master-list payload size limit");
+  }
   const declaredLength = response.headers.get("content-length");
   if (declaredLength && Number(declaredLength) > maxBytes) {
     await response.body?.cancel();
@@ -243,17 +246,26 @@ export async function readBoundedMasterPayload(
   if (!response.body) throw new Error("MTA master-list response has no body");
 
   const reader = response.body.getReader();
-  const chunks: Uint8Array[] = [];
+  // Keep bounded byte storage rather than one retained object per HTTP chunk.
+  let bytes = new Uint8Array(Math.min(maxBytes, 64 * 1024));
   let total = 0;
   try {
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      total += value.byteLength;
-      if (total > maxBytes) {
+      if (value.byteLength > maxBytes - total) {
         throw new Error("MTA master-list payload exceeds safety limit");
       }
-      chunks.push(value);
+      const needed = total + value.byteLength;
+      if (needed > bytes.byteLength) {
+        const expanded = new Uint8Array(
+          Math.min(maxBytes, Math.max(needed, bytes.byteLength * 2)),
+        );
+        expanded.set(bytes.subarray(0, total));
+        bytes = expanded;
+      }
+      bytes.set(value, total);
+      total = needed;
     }
   } catch (error) {
     await reader.cancel().catch(() => {});
@@ -261,14 +273,8 @@ export async function readBoundedMasterPayload(
   } finally {
     reader.releaseLock();
   }
-
-  const bytes = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    bytes.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return bytes.buffer;
+  // The returned ArrayBuffer must exclude unused capacity.
+  return bytes.slice(0, total).buffer;
 }
 
 type MasterFetch = (
