@@ -118,7 +118,7 @@ describe("parseMtaMasterList", () => {
       ...u32(0x12345679),
     ]);
     expect(() => parseMtaMasterList(packet.buffer))
-      .toThrow("Invalid MTA master-list entry boundary");
+      .toThrow("Truncated MTA master-list payload");
   });
 
   it("accepts endpoint-only entries when optional flags are absent", () => {
