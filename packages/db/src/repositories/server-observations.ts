@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, sql } from "drizzle-orm";
+import { and, desc, eq, gte, isNull, lt, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { serverObservations, servers } from "../schema";
 import type { ServerObservation } from "@nexus/domain";
@@ -21,8 +21,12 @@ export class ServerObservationRepository {
         .returning();
 
       if (inserted[0]) {
-        // Keep public/editorial metadata separate from observed runtime state.
-        // A master-list snapshot must not rename an owner-managed profile.
+        // Observations are immutable history, but the denormalized current
+        // values must be monotonic. A slow/stale collector can finish after
+        // a newer capture. PostgreSQL rechecks this UPDATE predicate while
+        // acquiring the row lock, so even concurrent writers cannot regress
+        // live values or their provenance. Equal timestamps retain the first.
+        // Never update editorial metadata from a remote master-list.
         await tx
           .update(servers)
           .set({
@@ -31,7 +35,13 @@ export class ServerObservationRepository {
             lastObservedAt: input.observedAt,
             observationSource: input.source,
           })
-          .where(eq(servers.id, input.serverId));
+          .where(and(
+            eq(servers.id, input.serverId),
+            or(
+              isNull(servers.lastObservedAt),
+              lt(servers.lastObservedAt, input.observedAt),
+            ),
+          ));
       }
 
       return (inserted[0] ?? values) as ServerObservation;
