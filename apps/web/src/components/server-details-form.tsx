@@ -215,14 +215,14 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         min: 1,
         max: 65535,
       })}
-      {field("httpPort", "HTTP port", server.httpPort ?? 22005, {
+      {field("httpPort", copy.httpPort, server.httpPort ?? 22005, {
         type: "number",
         required: true,
         min: 1,
         max: 65535,
       })}
       {field("gameMode", copy.gameMode, server.gameMode || "")}
-      {field("mapName", "Map name", server.mapName || "")}
+      {field("mapName", copy.mapName, server.mapName || "")}
       {field("maxPlayers", copy.maxPlayers, server.maxPlayers ?? 128, {
         type: "number",
         required: true,
