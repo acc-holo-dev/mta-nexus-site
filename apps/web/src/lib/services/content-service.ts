@@ -1,13 +1,22 @@
 import {
   contentRepository,
+  authorContentRepository,
   productRepository,
   serverRepository,
 } from "@nexus/db";
 import { can, generateId } from "@nexus/security";
 import { ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
 import type { Content, Comment, User, Product, Server } from "@nexus/domain";
+import { editorialTypes, communityTypes, type parseContentPage } from "../user-platform-contract";
 
 export class ContentService {
+  async pageArticles(filters: ReturnType<typeof parseContentPage>) {
+    return authorContentRepository.pagePublic([...editorialTypes], filters);
+  }
+
+  async pageCommunity(filters: ReturnType<typeof parseContentPage>) {
+    return authorContentRepository.pagePublic([...communityTypes], filters);
+  }
   async listArticles(limit = 50): Promise<Content[]> {
     const editorialTypes: Content["type"][] = [
       "article",

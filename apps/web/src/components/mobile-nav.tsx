@@ -2,6 +2,7 @@
 
 import {
   Bell,
+  BookOpen,
   Compass,
   Home,
   LayoutDashboard,
@@ -18,6 +19,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 
 export function MobileNav({ locale }: { locale: Locale }) {
@@ -38,6 +40,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
   ];
 
   const moreItems = [
+    { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
     { href: "/discover", label: dictionary.nav.explore, icon: Compass },
     {
       href: "/notifications",

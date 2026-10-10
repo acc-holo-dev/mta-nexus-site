@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
@@ -52,7 +52,7 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({
 
 vi.mock("../apps/web/src/lib/services/content-service", () => ({
   contentService: {
-    listCommunityTopics,
+    pageCommunity: listCommunityTopics,
   },
 }));
 
@@ -64,7 +64,7 @@ describe("community topic submission behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     state.pathname = "/community";
-    listCommunityTopics.mockResolvedValue(state.topics);
+    listCommunityTopics.mockResolvedValue({ items: state.topics, page: 1, hasMore: false });
   });
 
   it("builds only post/question payloads without a client-controlled publication status", () => {
@@ -151,11 +151,11 @@ describe("community topic submission behavior", () => {
         commentCount: 4,
       },
     ];
-    listCommunityTopics.mockResolvedValue(state.topics);
+    listCommunityTopics.mockResolvedValue({ items: state.topics, page: 1, hasMore: false });
 
     const html = renderToStaticMarkup(await CommunityPage());
 
-    expect(listCommunityTopics).toHaveBeenCalledWith(50);
+    expect(listCommunityTopics).toHaveBeenCalledWith({ page: 1, query: "" });
     expect(html).toContain('href="/community/new"');
     expect(html).toContain('href="/articles/vehicle-help"');
     expect(html).toContain("Vehicle Help");

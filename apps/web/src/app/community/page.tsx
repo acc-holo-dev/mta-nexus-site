@@ -4,14 +4,25 @@ import { EmptyState } from "@nexus/ui";
 import { contentService } from "../../lib/services/content-service";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
+import { ContentCatalogControls, ContentPageNavigation } from "../../components/content-catalog-controls";
+import { communityTypes, parseContentPage } from "../../lib/user-platform-contract";
+import { getUserPlatformCopy } from "../../lib/user-platform-copy";
 
 export const dynamic = "force-dynamic";
 
-export default async function CommunityPage() {
+export async function generateMetadata() {
+  const copy = getDictionary(await getRequestLocale()).community;
+  return { title: copy.title, description: copy.description };
+}
+
+export default async function CommunityPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> } = {}) {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const copy = dictionary.community;
-  const topics = await contentService.listCommunityTopics(50);
+  const platformCopy = getUserPlatformCopy(locale);
+  const { status: _status, ...filters } = parseContentPage(await searchParams ?? {});
+  const result = await contentService.pageCommunity(filters).catch(() => null);
+  const topics = result?.items ?? [];
 
   return (
     <div className="space-y-6">
@@ -32,7 +43,10 @@ export default async function CommunityPage() {
         </Link>
       </header>
 
-      {topics.length > 0 ? (
+      <Link href="/workspace/content" className="inline-block text-sm text-accent underline">{platformCopy.studio}</Link>
+      <ContentCatalogControls path="/community" filters={filters} locale={locale} types={communityTypes} />
+
+      {!result ? <p role="alert" className="text-sm text-danger">{platformCopy.unavailable}</p> : topics.length > 0 ? (
         <section className="space-y-2">
           {topics.map((topic) => (
             <Link
@@ -76,6 +90,7 @@ export default async function CommunityPage() {
           }
         />
       )}
+      {result && <ContentPageNavigation path="/community" filters={filters} page={result.page} hasMore={result.hasMore} locale={locale} />}
     </div>
   );
 }

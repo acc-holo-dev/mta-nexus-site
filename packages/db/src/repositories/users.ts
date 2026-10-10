@@ -1,11 +1,40 @@
-import { and, count, desc, eq, ilike, inArray, or } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
-import { users } from "../schema";
+import { users, auditEvents } from "../schema";
 import type { User } from "@nexus/domain";
 import { publicUserColumns, toUserWithoutPassword } from "./public-user-projection";
 
 export class UserRepository {
+  async updatePublicProfile(
+    id: string,
+    expectedUpdatedAt: Date,
+    fields: { displayName: string; bio: string; avatarUrl: string },
+    auditId: string,
+  ): Promise<User | null> {
+    return db.transaction(async (tx) => {
+      const [row] = await tx
+        .update(users)
+        .set({
+          displayName: fields.displayName,
+          bio: fields.bio || null,
+          avatarUrl: fields.avatarUrl || null,
+          updatedAt: sql`greatest(clock_timestamp(), date_trunc('milliseconds', ${users.updatedAt}) + interval '1 millisecond')`,
+        })
+        .where(and(
+          eq(users.id, id),
+          sql`date_trunc('milliseconds', ${users.updatedAt}) = ${expectedUpdatedAt.toISOString()}::timestamptz`,
+        ))
+        .returning(publicUserColumns);
+      if (!row) return null;
+      await tx.insert(auditEvents).values({
+        id: auditId, actorId: id, actorType: "user",
+        action: "user.profile_updated", targetId: id, targetType: "user",
+        details: { fields: ["displayName", "bio", "avatarUrl"] }, createdAt: new Date(),
+      });
+      return toUserWithoutPassword(row);
+    });
+  }
   async listModeratorIds(): Promise<string[]> {
     const rows = await db.select({ id: users.id }).from(users).where(
       inArray(users.role, ["moderator", "admin"]),

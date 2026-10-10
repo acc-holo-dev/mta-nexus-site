@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
+import { getUserPlatformCopy } from "../lib/user-platform-copy";
 
 export function Sidebar({
   locale,
@@ -47,6 +48,7 @@ export function Sidebar({
 
   const workspaceNav = [
     { href: "/workspace", label: dictionary.nav.overview, icon: LayoutDashboard },
+    { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
     { href: "/workspace/resources/new", label: dictionary.nav.publishResource, icon: Plus },
     { href: "/workspace/servers", label: serverCopy.title, icon: Server },
     { href: "/workspace/servers/new", label: dictionary.nav.registerServer, icon: Server },

@@ -31,3 +31,5 @@ export * from "./web-push-worker";
 export * from "./web-push-dispatcher";
 
 export * from "./server-claim-status";
+export { authorContentRepository } from "./author-content";
+export type { ContentSummary } from "./author-content";

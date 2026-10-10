@@ -9,6 +9,12 @@ MTA NEXUS is a player-first Multi Theft Auto: San Andreas platform for live serv
 
 ## Local development / Локальная разработка
 
+Authors manage articles, news and discussions at `/workspace/content`: creation,
+version-checked edits, status/search/type filters and archival. Editorial edits
+return to moderator review; archived entries remain read-only. `/articles` and
+`/community` support URL-preserving search, type filters and bounded pagination.
+Public name, biography and avatar are editable in `/settings` in both RU/EN.
+
 Recommended zero-host-dependency path: Docker Compose. Host Node.js, pnpm and PostgreSQL are not required.
 
 ```bash

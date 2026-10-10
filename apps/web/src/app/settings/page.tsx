@@ -6,6 +6,7 @@ import { Bell, KeyRound, MailCheck, Monitor, ShieldCheck } from "lucide-react";
 import { Button } from "@nexus/ui";
 import { ContextSwitcher } from "../../components/context-switcher";
 import { WebPushSettings } from "../../components/web-push-settings";
+import { PublicProfileForm } from "../../components/public-profile-form";
 import { useNexusLocale } from "../../components/locale-context";
 import {
   confirmedNotificationPreferences,
@@ -470,6 +471,7 @@ export default function SettingsPage() {
       )}
 
       <ContextSwitcher />
+      <PublicProfileForm />
 
       <section
         aria-labelledby="notification-heading"
