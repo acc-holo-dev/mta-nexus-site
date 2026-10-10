@@ -1,11 +1,41 @@
 import { describe, expect, it } from "vitest";
-import { readBoundedJson, SERVER_MUTATION_MAX_BODY_BYTES } from "../apps/web/src/lib/bounded-json";
+import {
+  readBoundedJson,
+  requireServerJsonContentType,
+  SERVER_MUTATION_MAX_BODY_BYTES,
+} from "../apps/web/src/lib/bounded-json";
 
 const url = "https://nexus.test/api/servers";
 const request = (body: BodyInit, headers: HeadersInit = {}) =>
   new Request(url, { method: "POST", headers, body });
 
 describe("bounded JSON reader for server mutations", () => {
+  it.each([
+    "application/json",
+    "Application/JSON; charset=UTF-8",
+    " application/json ; charset=utf-8",
+  ])("accepts JSON media type %s", (type) => {
+    expect(() => requireServerJsonContentType(new Request(url, {
+      headers: { "Content-Type": type },
+    }))).not.toThrow();
+  });
+
+  it.each([
+    null,
+    "text/plain",
+    "application/x-www-form-urlencoded",
+    "multipart/form-data; boundary=x",
+    "application/jsonp",
+    "application/ld+json",
+    "application/json".padEnd(257, " "),
+  ])("rejects non-JSON browser mutation media type %s", (type) => {
+    const headers = type === null ? {} : { "Content-Type": type };
+    expect(() => requireServerJsonContentType(new Request(url, { headers })))
+      .toThrowError(expect.objectContaining({
+        statusCode: 415, code: "UNSUPPORTED_MEDIA_TYPE",
+      }));
+  });
+
   it("accepts small objects and handles missing or malformed JSON", async () => {
     expect(await readBoundedJson(request('{"name":"Nexus"}'))).toEqual({ name: "Nexus" });
     expect(await readBoundedJson(new Request(url, { method: "POST" }))).toBeNull();
@@ -16,7 +46,8 @@ describe("bounded JSON reader for server mutations", () => {
   it("enforces the actual UTF-8 byte size, not JavaScript string length", async () => {
     const unicode = JSON.stringify({ text: "Ж".repeat(100) });
     expect(unicode.length).toBeLessThan(256);
-    await expect(readBoundedJson(request(unicode), 256)).rejects.toMatchObject({
+    expect(Buffer.byteLength(unicode)).toBeGreaterThan(180);
+    await expect(readBoundedJson(request(unicode), 180)).rejects.toMatchObject({
       statusCode: 413, code: "REQUEST_BODY_TOO_LARGE",
     });
   });

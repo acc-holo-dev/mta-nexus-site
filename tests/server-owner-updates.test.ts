@@ -131,6 +131,18 @@ describe("server owner update HTTP contract", () => {
     }
   });
 
+  it("rejects unsupported PATCH media types before any server update", async () => {
+    const response = await PATCH(new NextRequest("https://nexus.test/api/servers/srv_1", {
+      method: "PATCH",
+      headers: { "content-type": "text/plain", cookie: "nexus_session=server-owner-token" },
+      body: JSON.stringify({ name: "Tampered server" }),
+    }), routeContext);
+    expect(response.status).toBe(415);
+    expectPrivateCorrelation(response);
+    expect(await response.json()).toMatchObject({ code: "UNSUPPORTED_MEDIA_TYPE" });
+    expect(updateServer).not.toHaveBeenCalled();
+  });
+
   it("rejects an oversized PATCH request before database mutation", async () => {
     const response = await PATCH(
       request({ description: "x".repeat(40_000) }),

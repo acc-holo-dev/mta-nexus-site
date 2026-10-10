@@ -1,5 +1,25 @@
 import { AppError } from "@nexus/domain";
 
+/**
+ * Server write endpoints accept only application/json. In addition to
+ * validation, this prevents browser form encodings from being interpreted
+ * as authenticated API commands.
+ */
+export function requireServerJsonContentType(request: Pick<Request, "headers">): void {
+  const value = request.headers.get("content-type");
+  if (
+    value === null ||
+    value.length > 256 ||
+    value.split(";", 1)[0]?.trim().toLowerCase() !== "application/json"
+  ) {
+    throw new AppError(
+      "Content-Type application/json is required",
+      415,
+      "UNSUPPORTED_MEDIA_TYPE",
+    );
+  }
+}
+
 /** Maximum accepted bytes for a server listing's JSON metadata mutation. */
 export const SERVER_MUTATION_MAX_BODY_BYTES = 32 * 1024;
 

@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { readBoundedJson } from "../../../lib/bounded-json";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { createServerSchema } from "@nexus/validation";
@@ -151,6 +151,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    requireServerJsonContentType(request);
     const parsed = serverRegistrationSchema.safeParse(
       await readBoundedJson(request),
     );
