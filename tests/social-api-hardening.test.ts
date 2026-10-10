@@ -3,26 +3,6 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 describe("social API hardening", () => {
-  it("rate-limits both follow and unfollow mutations", () => {
-    const route = readFileSync(
-      resolve(process.cwd(), "apps/web/src/app/api/follow/route.ts"),
-      "utf8"
-    );
-
-    expect((route.match(/consumeRateLimit\(\s*"follow",\s*user\.id,?\s*\)/gu) || []).length).toBe(2);
-    expect(route).toContain("Cannot follow yourself");
-    expect(route).toContain("Target does not exist");
-    expect(route).toContain('product.status === "published"');
-    expect(route).toContain('server.visibility !== "private"');
-
-    const repository = readFileSync(
-      resolve(process.cwd(), "packages/db/src/repositories/social.ts"),
-      "utf8"
-    );
-    expect(repository).toContain(".onConflictDoNothing()");
-    expect(route).toContain("if (!created)");
-  });
-
   it("turns malformed abuse-report bodies into a validation response", () => {
     const route = readFileSync(
       resolve(process.cwd(), "apps/web/src/app/api/reports/route.ts"),

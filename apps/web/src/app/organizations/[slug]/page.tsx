@@ -1,3 +1,4 @@
+import { FollowButton } from "../../../components/follow-button";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { parseProfilePage } from "../../../lib/profile-pagination";
@@ -123,6 +124,7 @@ export default async function OrganizationProfilePage({
               {organization.description || copy.fallback}
             </p>
 
+            <FollowButton targetType="organization" targetId={organization.id} targetName={organization.name} />
             {websiteUrl && (
               <a
                 href={websiteUrl}

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Bookmark,
   Bell,
   BookOpen,
   Compass,
@@ -42,6 +43,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
   ];
 
   const moreItems = [
+    { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },
     { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
     { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
     { href: "/discover", label: dictionary.nav.explore, icon: Compass },

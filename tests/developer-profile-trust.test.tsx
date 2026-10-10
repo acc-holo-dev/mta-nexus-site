@@ -1,4 +1,4 @@
-import * as React from "react";
+import type * as React from "react";
 import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -11,13 +11,15 @@ const state = vi.hoisted(() => ({
   queryLimit: 0,
 }));
 
-const listDevelopers = vi.hoisted(() =>
-  vi.fn(async () => state.developers),
-);
+const directoryPage = vi.hoisted(() => vi.fn());
 
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({
-  authService: { listDevelopers },
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService: { getSession: async () => null } }));
+vi.mock("../apps/web/src/components/follow-button", () => ({ FollowButton: () => null }));
+vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
+  discoveryService: { page: directoryPage },
 }));
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({ indexMtaObservations: () => () => null }));
 
 vi.mock("../apps/web/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
@@ -83,6 +85,10 @@ vi.mock("../packages/db/src/client", () => ({
   },
 }));
 
+vi.mock("../apps/web/src/components/product-card", () => ({ ProductCard: () => null }));
+vi.mock("../apps/web/src/components/server-card", () => ({ ServerCard: () => null }));
+vi.mock("../apps/web/src/components/article-card", () => ({ ArticleCard: () => null }));
+
 import DevelopersPage from "../apps/web/src/app/developers/page";
 import { UserRepository } from "../packages/db/src/repositories/users";
 
@@ -114,14 +120,14 @@ describe("creator directory trust behavior", () => {
   });
 
   it("renders a bounded directory with honest identity labels", async () => {
+    directoryPage.mockResolvedValue({ type: "creators", items: state.developers, page: 1, hasMore: false });
     const html = renderToStaticMarkup(await DevelopersPage());
-    const copy = getDictionary("en").developers;
+    const copy = getDictionary("en").discover;
 
-    expect(listDevelopers).toHaveBeenCalledWith(100);
+    expect(directoryPage).toHaveBeenCalledWith(expect.objectContaining({ type: "creators", page: 1 }));
     expect(html).toContain('href="/developers/developer"');
     expect(html).toContain('href="/developers/admin-builder"');
-    expect(html).toContain(copy.verifiedIdentity);
-    expect(html).toContain(copy.creatorProfile);
+    expect(html).toContain(copy.verified);
     expect(html).not.toMatch(/Verified Seller|Verified Developer/u);
   });
 

@@ -41,3 +41,5 @@ export { contentDiscussionRepository } from "./content-discussion";
 export * from "./resource-variants";
 export * from "./resource-compatibility";
 export * from "./build-review-download";
+export { publicDirectoryRepository } from "./public-directory";
+export { followWorkspaceRepository } from "./follow-workspace";

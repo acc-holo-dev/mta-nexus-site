@@ -241,3 +241,9 @@ leave a team. Owner/admin boundaries and the shared revision are checked under
 transaction locks; existing resource permissions are preserved. Article and
 community discussions support author identities, replies and 20-item keyset
 pages through `/api/content/[slug]/comments` (GET/POST), with RU/EN interfaces.
+
+`/discover`, `/developers` and `/organizations` support paginated search and
+public filters through `/api/discover`. `/workspace/saved` manages all four
+existing follow types with private 20-item pages, search and removal, including
+unavailable targets. Public user/creator/organization profiles expose working
+follow controls; `/api/follow` accepts idempotent desired-state POST/DELETE commands.

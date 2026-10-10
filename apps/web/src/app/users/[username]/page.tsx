@@ -1,3 +1,4 @@
+import { FollowButton } from "../../../components/follow-button";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { parseProfilePage } from "../../../lib/profile-pagination";
 import { notFound } from "next/navigation";
@@ -111,6 +112,7 @@ export default async function UserProfilePage({
             <p className="max-w-xl text-sm leading-relaxed text-muted">
               {user.bio || copy.memberFallback}
             </p>
+            <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
             <div className="flex items-center gap-1.5 pt-1 text-[11px] text-faint">
               <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
               <span>

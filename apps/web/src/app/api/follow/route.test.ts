@@ -58,7 +58,16 @@ vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
   generateId: vi.fn((prefix: string) => `${prefix}_new`),
 }));
-vi.mock("@nexus/db", () => ({
+vi.mock("@nexus/db", async () => ({
+  followWorkspaceRepository: {
+    setFollowing: vi.fn(async (_actor: string, _type: string, _id: string, following: boolean) => {
+      if (following && !state.follow && !state.following) {
+        const { AppError } = await import("@nexus/domain");
+        throw new AppError("Unconfirmed", 503, "UNCONFIRMED");
+      }
+      return { following, created: following && !!state.follow };
+    }),
+  },
   userRepository: { findById: vi.fn(async () => ({ id: "usr_2" })) },
   serverRepository: { findById: vi.fn(async () => null) },
   productRepository: { findById: vi.fn(async () => null) },
@@ -115,6 +124,7 @@ describe("social and notification HTTP state contract", () => {
     expect(await anonymous.json()).toEqual({
       authenticated: false,
       following: false,
+      targetType: "server", targetId: "srv_1",
     });
 
     state.user = { id: "usr_1", username: "tester" };
@@ -130,6 +140,7 @@ describe("social and notification HTTP state contract", () => {
     expect(await authenticated.json()).toEqual({
       authenticated: true,
       following: true,
+      targetType: "user", targetId: "usr_2",
     });
   });
 
@@ -202,7 +213,7 @@ describe("social and notification HTTP state contract", () => {
     state.following = false;
     const response = await follow(makeRequest("/api/follow", "POST", '{"targetType":"user","targetId":"usr_2"}'));
     expect(response.status).toBe(503);
-    expect(await response.json()).toMatchObject({ following: false, targetId: "usr_2" });
+    expect(await response.json()).toMatchObject({ code: "UNCONFIRMED" });
   });
 
   it("returns canonical unfollow state and rejects unbounded IDs", async () => {

@@ -14,8 +14,8 @@ describe("discover query contract", () => {
       "organizations",
       "content",
     ]);
-    expect(parseDiscoverQuery({})).toEqual({ type: "servers", query: "" });
-    expect(parseDiscoverQuery({ type: "unknown" })).toEqual({
+    expect(parseDiscoverQuery({})).toMatchObject({ type: "servers", query: "", page: 1 });
+    expect(parseDiscoverQuery({ type: "unknown" })).toMatchObject({
       type: "servers",
       query: "",
     });
@@ -23,7 +23,7 @@ describe("discover query contract", () => {
 
   it("normalizes query values and bounds user input", () => {
     expect(parseDiscoverQuery({ type: ["content", "servers"], q: ["  lua  ", "ignored"] }))
-      .toEqual({ type: "content", query: "lua" });
+      .toMatchObject({ type: "content", query: "lua" });
     expect(parseDiscoverQuery({ type: "resources", q: "x".repeat(150) }).query)
       .toHaveLength(100);
   });

@@ -1,3 +1,4 @@
+vi.mock("../../../components/follow-button", () => ({ FollowButton: () => <button type="button">Follow</button> }));
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({ locale: "en" as "en" | "ru", exists: true, websiteUrl: "", description: "", slug: "team", products: vi.fn(), content: vi.fn() }));

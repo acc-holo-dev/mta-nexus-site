@@ -1,7 +1,7 @@
-import * as React from "react";
+import type * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getDictionary, type Locale } from "../apps/web/src/lib/i18n";
+import { getDictionary } from "../apps/web/src/lib/i18n";
 
 const sources = vi.hoisted(() => ({
   servers: vi.fn(),
@@ -9,6 +9,7 @@ const sources = vi.hoisted(() => ({
   directory: vi.fn(),
   locale: "en" as "en" | "ru",
 }));
+vi.mock("@nexus/db", () => ({ followWorkspaceRepository: { states: vi.fn() } }));
 vi.mock("next/link", async () => {
   const ReactModule = await import("react");
   return {
@@ -19,15 +20,13 @@ vi.mock("next/link", async () => {
 vi.mock("../apps/web/src/lib/i18n-server", () => ({
   getRequestLocale: async () => sources.locale,
 }));
-vi.mock("../apps/web/src/lib/services/server-service", () => ({
-  serverService: {
-    listServers: sources.servers,
-    searchServers: sources.search,
-  },
+vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
+  discoveryService: { page: async (input: { query: string; page: number }) => ({ type: "servers", items: input.query ? await sources.search(input.query, 24) : await sources.servers(24), page: input.page, hasMore: false }) },
 }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService: {} }));
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService: { getSession: async () => null } }));
+vi.mock("../apps/web/src/components/follow-button", () => ({ FollowButton: () => null }));
 vi.mock("../apps/web/src/lib/services/content-service", () => ({ contentService: {} }));
-vi.mock("../apps/web/src/lib/services/organization-service", () => ({ organizationService: {} }));
 vi.mock("../apps/web/src/lib/services/product-service", () => ({ productService: {} }));
 vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async (importOriginal) => ({
   ...(await importOriginal<
@@ -36,22 +35,14 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async (impo
   mtaMasterDirectoryService: { getDirectory: sources.directory },
 }));
 
+import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
 import DiscoverPage from "../apps/web/src/app/discover/page";
 
 async function loadResults(query = "") {
   const shell = await DiscoverPage({
     searchParams: Promise.resolve({ type: "servers", q: query }),
   });
-  // Resolve the page's async results component, then render the actual ServerCards.
-  const results = shell.props.children.find(
-    (child: React.ReactNode) => React.isValidElement(child) && typeof child.type === "function",
-  );
-  const render = results.type as (props: {
-    type: "servers";
-    query: string;
-    locale: Locale;
-  }) => Promise<React.ReactElement<{ children?: React.ReactNode }>>;
-  return render(results.props);
+  return shell;
 }
 async function renderResults(query = "") {
   return renderToStaticMarkup(await loadResults(query));
@@ -119,7 +110,7 @@ describe("discover server observation lookup", () => {
       expect(addressReads).toBe(10_000);
       expect(sources.directory).toHaveBeenCalledOnce();
       expect(query ? sources.search : sources.servers).toHaveBeenCalledWith(
-        ...(query ? [query, 12] : [12]),
+        ...(query ? [query, 24] : [24]),
       );
     },
   );
@@ -184,16 +175,6 @@ describe("discover server observation lookup", () => {
       ],
     });
     const tree = await loadResults();
-    expect(
-      React.Children.toArray(tree.props.children).map((card) =>
-        React.isValidElement<{ observation: { maxPlayers: number }; isStale: boolean }>(card)
-          ? [card.props.observation.maxPlayers, card.props.isStale]
-          : null,
-      ),
-    ).toEqual([
-      [32, true],
-      [16, true],
-    ]);
     const html = renderToStaticMarkup(tree);
     expect(html).not.toContain("99 /");
     expect(html).not.toContain("77 /");
@@ -213,7 +194,7 @@ describe("discover server observation lookup", () => {
         },
       ],
     });
-    expect(await renderResults()).toContain(getDictionary("en").discover.noServers);
+    expect(await renderResults()).toContain(discoveryCopy("en").empty);
     expect(inspected).not.toHaveBeenCalled();
   });
 

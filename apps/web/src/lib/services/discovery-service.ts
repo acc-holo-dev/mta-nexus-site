@@ -4,7 +4,13 @@ import {
   contentRepository,
   userRepository,
   organizationRepository,
+  publicDirectoryRepository,
+  authorContentRepository,
 } from "@nexus/db";
+import { safeExternalWebUrl } from "@nexus/validation";
+import type { DiscoverQuery } from "../discover-query";
+import { DISCOVER_CONTENT_TYPES } from "../discover-query";
+import { productService } from "./product-service";
 import {
   indexMtaObservations,
   matchesMtaEndpoint,
@@ -25,6 +31,31 @@ interface SearchResultItem {
 export type SearchResultType = SearchResultItem["type"];
 
 class DiscoveryService {
+  async page(input: DiscoverQuery) {
+    if (input.type === "resources") {
+      const result = await productService.listPublicPage({ query: input.query || undefined,
+        sort: input.query ? "relevance" : "newest", page: input.page, pageSize: 24 });
+      return { type: "resources" as const, items: result.products, page: input.page, hasMore: result.hasMore && input.page < 1000 };
+    }
+    if (input.type === "content") {
+      const result = await authorContentRepository.pagePublic([...DISCOVER_CONTENT_TYPES], {
+        query: input.query, page: input.page, type: input.contentType || undefined,
+      });
+      return { ...result, hasMore: result.hasMore && input.page < 1000, type: "content" as const };
+    }
+    if (input.type === "creators") {
+      const result = await publicDirectoryRepository.pageCreators(input);
+      return { ...result, type: "creators" as const, items: result.items.map(item => ({ ...item, avatarUrl: safeExternalWebUrl(item.avatarUrl) ?? null })) };
+    }
+    if (input.type === "organizations") {
+      const result = await publicDirectoryRepository.pageOrganizations(input);
+      return { ...result, type: "organizations" as const, items: result.items.map(item => ({ ...item, logoUrl: safeExternalWebUrl(item.logoUrl) ?? null })) };
+    }
+    const result = await publicDirectoryRepository.pageServers(input);
+    return { ...result, type: "servers" as const, items: result.items.map(item => ({ ...item,
+      bannerUrl: safeExternalWebUrl(item.bannerUrl) ?? undefined, logoUrl: safeExternalWebUrl(item.logoUrl) ?? undefined,
+    })) };
+  }
   async search(
     query: string,
     limit = 50,

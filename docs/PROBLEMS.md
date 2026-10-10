@@ -1199,6 +1199,19 @@ Published discussions use 20-item timestamp/ID keysets with microsecond cursors,
 public author projections and same-content parent previews. Posting rechecks
 publication and parent scope inside the transaction; activity counters no longer
 invalidate author metadata versions. PostgreSQL persistence/concurrency and
-browser acceptance remain pending. Agent A should add
-`comments_content_created_id_idx` on `(content_id, created_at DESC, id DESC)`
-where `product_id IS NULL AND content_id IS NOT NULL`; no migration was created here.
+browser acceptance remain pending. Agent A added
+`comments_content_created_id_idx` through migration 0042; applying and verifying
+that migration on PostgreSQL remains pending. No migration was created by Agent B.
+
+### Discovery pages and follow workspaces
+
+Discovery and the creator/organization directories now filter before SQL LIMIT,
+with stable 24-item pages, verification/name filters, server language/region/mode
+and publication types. The existing official MTA index and resource/content
+services remain the sources. Private follow lists use 20-item microsecond keysets
+and masked unavailable targets; desired-state mutations serialize one follow key,
+lock fresh target availability and notify only the first actual creation.
+Five PostgreSQL fixtures, browser interaction and full production generation
+remain pending. Agent A should add `follows_follower_created_id_idx` on
+`follows (follower_id, created_at DESC, id DESC)` for large private lists;
+no schema or migration was changed by this block.

@@ -7,6 +7,12 @@ export function formatNotification(
   copy: { approved: string; rejected: string; version: string; notes: string },
   locale: Locale = "en",
 ) {
+  const follower = notification.title === "New Follower" &&
+    /^@([a-zA-Z0-9_-]{1,80}) started following your activity\.$/u.exec(notification.message);
+  if (follower) return {
+    title: locale === "ru" ? "Новый подписчик" : "New follower",
+    message: locale === "ru" ? `@${follower[1]} подписался на вашу активность.` : notification.message,
+  };
   // These notices predate structured review payloads; localize their bounded,
   // server-generated template without changing persisted notification contracts.
   const comment =

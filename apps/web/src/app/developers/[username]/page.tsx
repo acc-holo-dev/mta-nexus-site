@@ -1,3 +1,4 @@
+import { FollowButton } from "../../../components/follow-button";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { parseProfilePage } from "../../../lib/profile-pagination";
 import { notFound } from "next/navigation";
@@ -79,6 +80,7 @@ export default async function DeveloperProfilePage({
             <p className="max-w-xl text-sm leading-relaxed text-muted">
               {user.bio || copy.bioFallback}
             </p>
+            <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
           </div>
         </div>
 
