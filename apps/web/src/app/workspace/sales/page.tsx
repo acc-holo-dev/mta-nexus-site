@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { getFinancialCopy } from "../../../lib/financial-i18n";
 import { cookies } from "next/headers";
 import { orderRepository } from "@nexus/db";
 import { authService } from "../../../lib/services/auth-service";
@@ -40,6 +42,7 @@ export default async function SalesHistoryPage({
 
   return (
     <HistoryShell copy={copy} area="sales">
+      <Link href="/workspace/finance" className="text-sm text-accent underline">{getFinancialCopy(locale).title}</Link>
       <p role="note" className="text-sm text-muted">{copy.grossNotice}</p>
       {result.sales.length === 0 ? (
         <p className="py-12 text-sm text-secondary">{copy.emptySales}</p>

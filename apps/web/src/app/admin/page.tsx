@@ -1,4 +1,5 @@
 import { ReportEvidenceLinks } from "../../components/report-evidence-links";
+import { getFinancialCopy } from "../../lib/financial-i18n";
 import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -156,6 +157,7 @@ export default async function AdminPage({
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           {currentUser.role === "admin" ? <Link href="/admin/commerce/plans" className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary">{getCommercialCopy(locale).admin}</Link> : null}
           <Link href="/admin/resources" className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary">{getResourceReleaseControlCopy(locale).moderation}</Link>
+          {currentUser.role === "admin" ? <Link href="/admin/commerce/reconciliation" className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary">{getFinancialCopy(locale).review}</Link> : null}
           <Link
             href="/admin/support"
             className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"

@@ -38,7 +38,7 @@ export async function resourceCommerceRequest(
     }
     if (
       !mutation &&
-      /\/activity(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/operations$|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/releases(?:\/|$)|^\/api\/products\/[^/]+\/moderation$/u.test(
+      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/operations$|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/releases(?:\/|$)|^\/api\/products\/[^/]+\/moderation$/u.test(
         request.nextUrl.pathname,
       )
     ) {

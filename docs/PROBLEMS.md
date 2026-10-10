@@ -1,5 +1,20 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Financial statements and journal foundation — 2026-10-11
+
+Migration `0049_financial_journal` adds idempotent batches and immutable balanced
+journal entries with deferred per-currency validation. PostgreSQL calculates new
+balances and prevents extending a committed journal. Historical entries remain
+distinct and are not promoted into verified settlement. Personal/organization
+statements and live-admin reconciliation are read-only; held/available amounts
+remain explicitly unreconciled. Generic payment methods cannot create completed
+attempts or promote recorded attempts to financial final states without a provider.
+Local domain, repository SQL, HTTP, SSR, type and compile checks cover the paths;
+live PostgreSQL deferred-trigger/locking/rollback checks and browser acceptance
+remain pending. A rollback-only PostgreSQL fixture is prepared. Provider integration,
+automatic fee/hold allocation, payout eligibility and subscription activation are
+still required before enabling paid commerce.
+
 ### Resource restrictions and saved download versions — 2026-10-10
 
 Migration `0048_resource_release_controls` stores private buyer version preferences

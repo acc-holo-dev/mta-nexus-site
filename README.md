@@ -307,3 +307,18 @@ preferences with revision checks and idempotent replay. Main library downloads
 honor a fixed selection and fail closed when that release is withdrawn. Preferences
 never mint rights, confirm installation or change license/server bindings.
 Apply migration `0048_resource_release_controls` before using these RU/EN surfaces.
+
+`/workspace/finance` exposes private, currency-separated recorded balances and
+20-entry statements for personal accounts and organizations owned/administered
+by the current user. Legacy descriptions and payment secrets are excluded.
+Held and withdrawable sums remain unreconciled until a real payment provider
+and hold allocation exist; a recorded balance never enables a payout.
+
+`/admin/commerce/reconciliation` provides live administrators with a read-only
+queue of amount/currency mismatches, multiple or missing recorded captures,
+cancelled references and missing/unbalanced ledger evidence. It offers no manual
+payment confirmation, refund or order repair. Internal ledger posting now uses
+idempotent immutable batches, separate currency balancing, sorted order/account
+locks and PostgreSQL-computed balances. Apply migration `0049_financial_journal`.
+Paid checkout, automatic commissions, seven-day hold allocation and payouts remain
+disabled; a balanced journal is accounting evidence, not provider settlement.

@@ -591,8 +591,16 @@ export const payments = pgTable("payments", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, table => [index("payments_order_created_id_idx").on(table.orderId, table.createdAt.desc(), table.id.desc())]);
 
+// Idempotent balanced journal batches; legacy entries remain distinguishable.
+export const ledgerPostingBatches = pgTable("ledger_posting_batches", {
+  id: text("id").primaryKey(), fingerprint: text("fingerprint").notNull(),
+  createdTransaction: text("created_transaction").notNull().default(sql`txid_current()::text`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [check("ledger_batch_fingerprint_check", sql`${table.fingerprint} ~ '^[a-f0-9]{64}$'`)]);
+
 // 16. Append-Only Financial Ledger
 export const ledgerEntries = pgTable("ledger_entries", {
+  batchId: text("batch_id").references(() => ledgerPostingBatches.id, { onDelete: "restrict" }),
   id: text("id").primaryKey(),
   accountId: text("account_id").notNull(),
   amount: integer("amount").notNull(), // positive = credit, negative = debit
@@ -602,7 +610,10 @@ export const ledgerEntries = pgTable("ledger_entries", {
   balanceAfter: integer("balance_after").notNull(),
   description: text("description").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-}, table => [index("ledger_entries_reference_idx").on(table.referenceId, table.referenceType)]);
+}, table => [index("ledger_entries_reference_idx").on(table.referenceId, table.referenceType),
+  index("ledger_entries_account_currency_time_idx").on(table.accountId, table.currency, table.createdAt.desc(), table.id.desc()),
+  index("ledger_entries_batch_idx").on(table.batchId),
+]);
 
 // 17. Content Engine (Articles, devlogs, announcements, reviews)
 export const content = pgTable(
