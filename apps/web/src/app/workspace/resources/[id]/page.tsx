@@ -2,6 +2,7 @@ import { ResourceLifecycleControls } from "../../../../components/resource-lifec
 import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
 import { getResourceManagementCopy } from "../../../../lib/resource-management-i18n";
 import { getResourceActivityCopy } from "../../../../lib/resource-activity-i18n";
+import { getResourceReleaseControlCopy } from "../../../../lib/resource-release-control-i18n";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -68,6 +69,7 @@ export default async function ManageResourcePage({
         <Link href={`/workspace/resources/${product.id}/variants`} className="underline">{managementCopy.variants}</Link>
         <Link href={`/workspace/resources/${product.id}/compatibility`} className="underline">{managementCopy.compatibility}</Link>
         <Link href={`/workspace/resources/${product.id}/activity`} className="underline">{getResourceActivityCopy(locale).analytics}</Link>
+        <Link href={`/workspace/resources/${product.id}/moderation`} className="underline">{getResourceReleaseControlCopy(locale).moderationHistory}</Link>
       </nav>
       <ResourceLifecycleControls
         key={`lifecycle:${product.id}:${product.status}:${new Date(product.updatedAt).toISOString()}`}

@@ -337,6 +337,13 @@
       "when": 1791697200000,
       "tag": "0047_community_report_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1791704400000,
+      "tag": "0048_resource_release_controls",
+      "breakpoints": true
     }
   ]
 }

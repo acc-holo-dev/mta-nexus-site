@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { eq, inArray } from "drizzle-orm";
 import {
-  db, builds, entitlements, licenses, products, users,
+  db, builds, entitlements, licenses, products, users, auditEvents,
   buildRepository, entitlementRepository, licenseRepository,
-  productRepository, userLibraryRepository, userRepository,
+  productRepository, userLibraryRepository, userRepository, resourceLibrarySelectionsRepository,
 } from "@nexus/db";
 
 describe("effective resource library and private visibility (PostgreSQL)", () => {
@@ -204,7 +204,37 @@ describe("effective resource library and private visibility (PostgreSQL)", () =>
         { type: "user", id: ownerId }, productIds.paid, "product.download",
       )).toBe(true);
       expect((await licenseRepository.pageUserHistory(ownerId)).total).toBe(3);
+
+      const oldBuildId = `bld_lib_ready_${suffix}`;
+      const selectInput = { userId: ownerId, productId: productIds.ready, auditId: `aud_lib_select_${suffix}`,
+        command: { mode: "fixed" as const, buildId: oldBuildId, expectedRevision: 0 } };
+      const selected = await resourceLibrarySelectionsRepository.command(selectInput);
+      expect(selected.selection).toMatchObject({ revision: 1, mode: "fixed", buildId: oldBuildId });
+      expect((await userLibraryRepository.pageByUser(ownerId)).items.find(row => row.resourceId === productIds.ready))
+        .toMatchObject({ version: "1.0.0", buildId: oldBuildId, selectionMode: "fixed", downloadable: true });
+      expect((await resourceLibrarySelectionsRepository.page(ownerId, 1, "updates")).items.map(row => row.productId)).toContain(productIds.ready);
+      expect((await resourceLibrarySelectionsRepository.command(selectInput)).selection.revision).toBe(1);
+      const races = await Promise.allSettled([
+        resourceLibrarySelectionsRepository.command({ ...selectInput, auditId: `aud_lib_race_1_${suffix}`, command: { mode: "latest", expectedRevision: 1 } }),
+        resourceLibrarySelectionsRepository.command({ ...selectInput, auditId: `aud_lib_race_2_${suffix}`, command: { mode: "fixed", buildId: latestReadyId, expectedRevision: 1 } }),
+      ]);
+      expect(races.filter(result => result.status === "fulfilled")).toHaveLength(1);
+      expect(races.filter(result => result.status === "rejected")).toHaveLength(1);
+      const current = await resourceLibrarySelectionsRepository.detail(ownerId, productIds.ready);
+      const pin = await resourceLibrarySelectionsRepository.command({ ...selectInput, auditId: `aud_lib_pin_${suffix}`, command: { mode: "fixed", buildId: oldBuildId, expectedRevision: current.selection.revision } });
+      await db.update(builds).set({ status: "quarantined" }).where(eq(builds.id, oldBuildId));
+      expect((await userLibraryRepository.pageByUser(ownerId)).items.find(row => row.resourceId === productIds.ready))
+        .toMatchObject({ downloadable: false, buildId: null, version: null });
+      expect((await resourceLibrarySelectionsRepository.detail(ownerId, productIds.ready)).selected).toBeNull();
+      await expect(resourceLibrarySelectionsRepository.command({ ...selectInput, command: { ...selectInput.command, expectedRevision: pin.selection.revision } }))
+        .rejects.toMatchObject({ code: "LIBRARY_RELEASE_UNAVAILABLE" });
+      await db.delete(entitlements).where(inArray(entitlements.id, entitlementIds.slice(0, 2)));
+      await expect(resourceLibrarySelectionsRepository.detail(ownerId, productIds.ready)).rejects.toMatchObject({ statusCode: 404 });
+      // Saved preferences neither mint a license nor alter existing financial/access records.
+      expect((await licenseRepository.pageUserHistory(ownerId)).total).toBe(3);
+
     } finally {
+      await db.delete(auditEvents).where(eq(auditEvents.actorId, ownerId));
       await db.delete(licenses).where(inArray(licenses.id, licenseIds));
       await db.delete(entitlements).where(inArray(entitlements.id, entitlementIds));
       await db.delete(builds).where(inArray(builds.id, buildIds));

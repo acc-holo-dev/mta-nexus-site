@@ -1,4 +1,5 @@
 import { ReportEvidenceLinks } from "../../components/report-evidence-links";
+import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import {
@@ -152,6 +153,7 @@ export default async function AdminPage({
         </div>
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           {currentUser.role === "admin" ? <Link href="/admin/commerce/plans" className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary">{getCommercialCopy(locale).admin}</Link> : null}
+          <Link href="/admin/resources" className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary">{getResourceReleaseControlCopy(locale).moderation}</Link>
           <Link
             href="/admin/support"
             className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"

@@ -1,7 +1,8 @@
-import { and, eq, gt, isNull, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { AppError, ForbiddenError, NotFoundError, type Build } from "@nexus/domain";
 import { db } from "../client";
-import { auditEvents, builds, entitlements, licenses, products, users } from "../schema";
+import { auditEvents, builds, products, users } from "../schema";
+import { lockUserDownloadAccess } from "./entitlements";
 import { assertProductMutationAuthority } from "./product-mutation-authority";
 
 export class ResourceDownloadAuthorizationRepository {
@@ -40,42 +41,10 @@ export class ResourceDownloadAuthorizationRepository {
           .for("share");
         if (!actor) throw new ForbiddenError("Current download access is required");
         actorRole = actor.role;
-        const now = new Date();
-        const [grant] = await tx
-          .select({ id: entitlements.id, expiresAt: entitlements.expiresAt })
-          .from(entitlements)
-          .where(
-            and(
-              eq(entitlements.subjectType, "user"),
-              eq(entitlements.subjectId, input.actorId),
-              eq(entitlements.resourceId, product.id),
-              eq(entitlements.permission, "product.download"),
-              or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, now)),
-            ),
-          )
-          .limit(1)
-          .for("share");
-        if (grant) {
-          accessSource = "entitlement";
-          accessExpiresAt = grant.expiresAt;
-        } else {
-          const [license] = await tx
-            .select({ id: licenses.id, expiresAt: licenses.expiresAt })
-            .from(licenses)
-            .where(
-              and(
-                eq(licenses.userId, input.actorId),
-                eq(licenses.productId, product.id),
-                eq(licenses.status, "active"),
-                or(isNull(licenses.expiresAt), gt(licenses.expiresAt, new Date())),
-              ),
-            )
-            .limit(1)
-            .for("share");
-          if (!license) throw new ForbiddenError("Current download access is required");
-          accessSource = "license";
-          accessExpiresAt = license.expiresAt;
-        }
+        const access = await lockUserDownloadAccess(tx, input.actorId, product.id);
+        if (!access) throw new ForbiddenError("Current download access is required");
+        accessSource = access.source;
+        accessExpiresAt = access.expiresAt;
       }
       const [build] = await tx
         .select()

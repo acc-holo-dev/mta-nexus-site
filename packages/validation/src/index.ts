@@ -7,6 +7,7 @@ import {
 } from "@nexus/domain";
 import { z } from "zod";
 export * from "./commercial-plans";
+export * from "./resource-release-control";
 import { mtaVersionSchema } from "./mta-version";
 export * from "./mta-version";
 export * from "./resource-management";

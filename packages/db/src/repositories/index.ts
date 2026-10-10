@@ -50,3 +50,5 @@ export { discussionManagementRepository, discussionRevision } from "./discussion
 export { communityReportsRepository } from "./community-reports";
 export * from "./commercial-plans";
 export * from "./order-operations";
+export * from "./resource-library-selections";
+export * from "./resource-moderation";

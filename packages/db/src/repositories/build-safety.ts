@@ -1,4 +1,4 @@
-import { and, eq, isNotNull, sql } from "drizzle-orm";
+import { type SQL, and, eq, isNotNull, sql } from "drizzle-orm";
 import { builds } from "../schema";
 
 export function trustedCleanScanCondition() {
@@ -10,7 +10,7 @@ export function trustedCleanScanCondition() {
   );
 }
 
-export function safePublishedBuildCondition(productId: string) {
+export function safePublishedBuildCondition(productId: string | SQL) {
   return and(
     eq(builds.productId, productId),
     eq(builds.status, "published"),

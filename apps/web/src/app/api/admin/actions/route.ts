@@ -2,6 +2,9 @@ import { after, type NextRequest, NextResponse } from "next/server";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { AppError } from "@nexus/domain";
 import { z } from "zod";
+import { resourceModerationCommandSchema } from "@nexus/validation";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
+import { resourceModerationService } from "../../../../lib/services/resource-release-control-service";
 import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
 import { contentService } from "../../../../lib/services/content-service";
@@ -26,7 +29,7 @@ function json(body: unknown, status = 200) {
 }
 
 const adminActionSchema = z.discriminatedUnion("targetType", [
-  z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional(), expectedUpdatedAt: z.string().max(40).optional() }),
   z.object({ targetType: z.literal("report"), targetId: z.string().min(1), action: z.enum(["resolve", "dismiss"]), notes: z.string().trim().min(3).max(2000) }),
   z.object({ targetType: z.literal("verification"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().trim().min(3).max(2000) }),
   z.object({ targetType: z.literal("build"), targetId: z.string().min(1), action: z.enum(["approve", "reject", "quarantine", "restore"]), notes: z.string().trim().min(3).max(2000) }),
@@ -46,13 +49,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    requireServerJsonContentType(request);
+    if (request.headers.get("sec-fetch-site") === "cross-site") throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
+
     // Admin actions are rate limited
     const rl = await consumeRateLimit("moderationAction", user.id);
     if (!rl.success) {
       return json({ error: "Too many admin actions" }, 429 );
     }
 
-    const parsed = adminActionSchema.safeParse(await request.json().catch(() => null));
+    const parsed = adminActionSchema.safeParse(await readBoundedJson(request, 32768));
     if (!parsed.success) {
       return json({ error: "Invalid moderation action", details: parsed.error.format() }, 400 );
     }
@@ -81,50 +87,14 @@ export async function POST(request: NextRequest) {
             404 ,
           );
         }
-      } else if (action === "suspend") {
-        const suspended = await productRepository.suspendPublished(
-          targetId,
-          makeAudit(),
-        );
-        if (!suspended) {
-          const current = await productRepository.findById(targetId);
-          if (!current) {
-            return json(
-              { error: "Product not found" },
-              404 ,
-            );
-          }
-          throw new AppError(
-            "Only a published resource can be suspended",
-            409,
-            "PRODUCT_STATE_CHANGED",
-          );
-        }
       } else {
-        const restore = await productRepository.restoreSuspendedWithPublishedBuild(
-          targetId,
-          makeAudit(),
-        );
-        if (restore === "not_found") {
-          return json(
-            { error: "Product not found" },
-            404 ,
-          );
-        }
-        if (restore === "no_published_build") {
-          throw new AppError(
-            "A suspended resource cannot be restored without a published build",
-            409,
-            "PRODUCT_RESTORE_NO_PUBLISHED_BUILD",
-          );
-        }
-        if (restore === "invalid_state") {
-          throw new AppError(
-            "Only a suspended resource can be restored",
-            409,
-            "PRODUCT_STATE_CHANGED",
-          );
-        }
+        const command = resourceModerationCommandSchema.safeParse({
+          action: action === "suspend" ? "suspend" : "release",
+          expectedUpdatedAt: parsed.data.expectedUpdatedAt,
+          reason: notes,
+        });
+        if (!command.success) throw new AppError("A current resource revision and moderation reason are required", 400, "RESOURCE_MODERATION_INVALID");
+        await resourceModerationService.command(user, targetId, command.data);
       }
     } else if (targetType === "report") {
       if (action === "resolve" || action === "dismiss") {

@@ -282,3 +282,18 @@ or ledger reference of any type, compares the displayed order revision and store
 an idempotent receipt and audit atomically. It creates no refund or entitlement.
 Migrations 0045–0047 add these contracts and Agent B's publication/report indexes;
 apply them before using the new routes.
+
+`/admin/resources` provides current moderators with a searchable, paginated
+resource queue, suspension and release decisions with publisher-visible reasons.
+Release returns the resource and its published/pending releases to draft for a
+new review; quarantined releases remain quarantined. The publisher sees the
+decision history at `/workspace/resources/[id]/moderation`, without historical
+internal staff notes. All decisions hold live staff authority and compare the
+displayed resource revision through the atomic audit commit.
+
+`/workspace/library/updates` lists approved releases for effective buyer grants
+and legacy licenses. `/workspace/library/[id]/versions` saves latest/fixed download
+preferences with revision checks and idempotent replay. Main library downloads
+honor a fixed selection and fail closed when that release is withdrawn. Preferences
+never mint rights, confirm installation or change license/server bindings.
+Apply migration `0048_resource_release_controls` before using these RU/EN surfaces.

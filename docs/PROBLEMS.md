@@ -1,5 +1,18 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Resource restrictions and saved download versions — 2026-10-10
+
+Migration `0048_resource_release_controls` stores private buyer version preferences
+and indexes the resource moderation queue. Moderation release now returns to draft
+for review, including the legacy administrative route; it cannot directly restore
+publication. Staff decisions and publisher-visible history use live locked authority,
+revision checks and atomic audit. Fixed downloads fail closed on withdrawal, and
+preferences do not modify grants, licenses or financial records. Local contract,
+SQL, HTTP and SSR checks cover these paths. Live PostgreSQL migration/rollback/
+concurrency and browser acceptance remain pending; the corresponding PostgreSQL
+fixtures are updated. Paid provider confirmation and subscription activation remain
+unfinished separate work.
+
 ### Acquisition provenance and publisher activity — 2026-10-10
 
 Migration `0043_resource_acquisition_activity` records new direct/cart free

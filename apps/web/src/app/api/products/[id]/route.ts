@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 import { editProductDetailsSchema } from "@nexus/validation";
 import {
   createRequestLogContext,
@@ -112,6 +113,9 @@ export async function PATCH(
       );
     }
 
+    requireServerJsonContentType(request);
+    if (request.headers.get("sec-fetch-site") === "cross-site") throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
+
     const { id } = await params;
     if (
       !(await productService.getManagedProduct(
@@ -181,7 +185,7 @@ export async function PATCH(
 
     const parsed =
       editProductDetailsSchema.safeParse(
-        await request.json().catch(() => null),
+        await readBoundedJson(request, 32768),
       );
     if (!parsed.success) {
       return privateJson(

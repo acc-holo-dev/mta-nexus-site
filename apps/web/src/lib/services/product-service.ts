@@ -94,21 +94,9 @@ export class ProductService {
   async canManageProduct(
     product: Product,
     actor: User,
-    action: "product.update" | "build.release" | "build.retire" = "product.update",
+    _action: "product.update" | "build.release" | "build.retire" = "product.update",
   ): Promise<boolean> {
-    if (can(actor, action, product)) return true;
-    if (!product.organizationId) return false;
-
-    const [organization, organizationMemberships] = await Promise.all([
-      organizationRepository.findById(product.organizationId),
-      organizationRepository.listUserMemberships(actor.id),
-    ]);
-
-    if (organization?.ownerId === actor.id) return true;
-
-    return can(actor, action, product, {
-      organizationMemberships,
-    });
+    return productRepository.hasManagementAccess(product.id, actor);
   }
 
   async listProducts(filters: ProductFilters = {}): Promise<Product[]> {

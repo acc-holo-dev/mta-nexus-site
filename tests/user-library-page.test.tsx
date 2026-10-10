@@ -33,12 +33,13 @@ vi.mock("next/link", async () => {
 vi.mock("../apps/web/src/components/resource-download-button", async () => {
   const React = await import("react");
   return {
-    ResourceDownloadButton: ({ productId, version }: {
+    ResourceDownloadButton: ({ productId, version, buildId }: {
       productId: string;
       version: string;
+      buildId?: string;
     }) => React.createElement("button", {
       "data-testid": "safe-download", "data-product": productId,
-      "data-version": version,
+      "data-version": version, "data-build": buildId,
     }, "Download"),
   };
 });
@@ -87,6 +88,19 @@ describe("private resource library", () => {
     expect(html).toContain("/workspace/library?filter=ready");
     expect(html).toContain("/market/resource-a/versions");
     expect(html).not.toContain("/market/secret-url/versions");
+  });
+
+  it("honors fixed download selections and keeps withdrawn selections manageable", async () => {
+    state.page.mockResolvedValueOnce({
+      items: [{ resourceId: "prd_fixed", title: "Fixed release", slug: "fixed", version: "1.0.0", buildId: "bld_fixed", selectionMode: "fixed", addedAt: now, downloadable: true },
+        { resourceId: "prd_withdrawn", title: null, slug: null, version: null, buildId: null, selectionMode: "fixed", addedAt: now, downloadable: false }],
+      counts: { all: 2, ready: 1, unavailable: 1 }, total: 2, page: 1, totalPages: 1,
+    });
+    const html = renderToStaticMarkup(await LibraryPage(pageProps()));
+    expect(html).toContain('data-build="bld_fixed"');
+    expect(html).not.toContain('data-product="prd_withdrawn"');
+    expect(html).toContain("/workspace/library/prd_withdrawn/versions");
+    expect(html).toContain("/workspace/library/updates");
   });
 
   it("preserves selected filter during pagination and clamps untrusted page input", async () => {

@@ -241,6 +241,8 @@ export const products = pgTable(
     check("products_type_check", sql`${table.type} IN (${sql.raw(PRODUCT_TYPES.map((type) => `'${type}'`).join(", "))})`),
     index("products_type_idx").on(table.type),
     index("products_status_idx").on(table.status),
+    index("products_moderation_status_updated_id_idx").on(table.status, table.updatedAt.desc(), table.id.desc()),
+    index("products_moderation_updated_id_idx").on(table.updatedAt.desc(), table.id.desc()),
     index("products_author_idx").on(table.authorId),
     index("products_public_author_created_id_idx")
       .on(table.authorId, table.createdAt.desc(), table.id.desc())
@@ -556,6 +558,22 @@ export const orderItems = pgTable("order_items", {
   unitPrice: integer("unit_price").notNull(),
   currency: text("currency").notNull().default("USD"),
 }, table => [index("order_items_order_id_item_id_idx").on(table.orderId, table.id)]);
+
+// Library preferences carry no access grant and never represent installation.
+export const resourceLibrarySelections = pgTable("resource_library_selections", {
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  mode: text("mode").$type<"latest" | "fixed">().notNull(),
+  // Preserve a withdrawn/deleted build selection so it is reported unavailable.
+  buildId: text("build_id"),
+  revision: integer("revision").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  primaryKey({ columns: [table.userId, table.productId] }),
+  check("resource_library_selection_revision_check", sql`${table.revision} > 0`),
+  check("resource_library_selection_mode_check", sql`(${table.mode} = 'latest' AND ${table.buildId} IS NULL) OR
+    (${table.mode} = 'fixed' AND ${table.buildId} IS NOT NULL AND length(${table.buildId}) BETWEEN 1 AND 128 AND ${table.buildId} ~ '^[A-Za-z0-9_-]+$')`),
+]);
 
 // 15. Payments
 export const payments = pgTable("payments", {

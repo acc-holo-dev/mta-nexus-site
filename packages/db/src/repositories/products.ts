@@ -1,10 +1,11 @@
 import type { SQL } from "drizzle-orm";
 import { eq, desc, asc, and, count, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
-import { safePublishedBuildCondition } from "./build-safety";
-import { assertProductMutationAuthority } from "./product-mutation-authority";
+import { assertProductMutationAuthority, assertBuildModerationAuthority } from "./product-mutation-authority";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
-import { auditEvents, builds, products, organizations, organizationMembers } from "../schema";
+import { auditEvents, builds, products, organizations, organizationMembers, users } from "../schema";
+import { AppError } from "@nexus/domain";
+import { resourceModerationRepository } from "./resource-moderation";
 import type { AuditEvent, Product, ProductType, User } from "@nexus/domain";
 
 function hasSafePublishedBuild() {
@@ -22,9 +23,9 @@ function hasSafePublishedBuild() {
 
 /** Same scope for listing, private reads and audited metadata writes. */
 export function managedProductCondition(actor: Pick<User, "id" | "role">): SQL {
-  if (actor.role === "admin") return sql`true`;
   return sql`(
-    (${products.organizationId} is null and ${products.authorId} = ${actor.id})
+    exists (select 1 from ${users} where ${users.id} = ${actor.id} and ${users.role} = 'admin')
+    or (${products.organizationId} is null and ${products.authorId} = ${actor.id})
     or exists (select 1 from ${organizations}
       where ${organizations.id} = ${products.organizationId} and ${organizations.ownerId} = ${actor.id})
     or exists (select 1 from ${organizationMembers}
@@ -47,6 +48,11 @@ export interface ProductQueryOptions {
 }
 
 export class ProductRepository {
+  async hasManagementAccess(id: string, actor: Pick<User, "id" | "role">): Promise<boolean> {
+    const [row] = await db.select({ id: products.id }).from(products)
+      .where(and(eq(products.id, id), managedProductCondition(actor))).limit(1);
+    return !!row;
+  }
   async pageManaged(actor: Pick<User, "id" | "role">, status?: Product["status"], requestedPage = 1) {
     const condition = and(managedProductCondition(actor), eq(products.price, 0),
       status ? eq(products.status, status) : undefined);
@@ -332,10 +338,14 @@ export class ProductRepository {
     audit: Omit<AuditEvent, "createdAt">,
   ): Promise<Product | null> {
     return db.transaction(async (tx) => {
+      const [parent] = await tx.select({ id: products.id }).from(products)
+        .where(eq(products.id, id)).limit(1).for("no key update");
+      await assertBuildModerationAuthority(tx, audit.actorId);
+      if (!parent) return null;
       const now = new Date();
       const rows = await tx
         .update(products)
-        .set({ ...updates, updatedAt: now })
+        .set({ ...updates, updatedAt: sql`greatest(date_trunc('milliseconds', clock_timestamp()), date_trunc('milliseconds', ${products.updatedAt}) + interval '1 millisecond')` })
         .where(eq(products.id, id))
         .returning();
       const updated = rows[0];
@@ -349,88 +359,27 @@ export class ProductRepository {
     });
   }
 
-  async suspendPublished(
-    id: string,
-    audit?: Omit<AuditEvent, "createdAt">,
-  ): Promise<Product | null> {
-    return db.transaction(async (tx) => {
-      const now = new Date();
-      const rows = await tx
-        .update(products)
-        .set({ status: "suspended", updatedAt: now })
-        .where(
-          and(
-            eq(products.id, id),
-            eq(products.status, "published"),
-          ),
-        )
-        .returning();
-      const suspended = rows[0];
-      if (!suspended) return null;
-
-      if (audit) {
-        await tx.insert(auditEvents).values({
-          ...audit,
-          createdAt: now,
-        });
-      }
-      return suspended as unknown as Product;
-    });
+  /** Legacy entry point: suspension still uses the shared live moderation gate. */
+  async suspendPublished(id: string, audit?: Omit<AuditEvent, "createdAt">): Promise<Product | null> {
+    if (!audit) throw new AppError("An audited moderation reason is required", 400, "RESOURCE_MODERATION_INVALID");
+    const product = await this.findById(id);
+    if (product?.status !== "published") return null;
+    await resourceModerationRepository.command({ actorId: audit.actorId, productId: id, auditId: audit.id,
+      command: { action: "suspend", expectedUpdatedAt: product.updatedAt.toISOString(), reason: typeof audit.details?.notes === "string" ? audit.details.notes : "" } });
+    return this.findById(id);
   }
 
-  async restoreSuspendedWithPublishedBuild(
-    id: string,
-    audit?: Omit<AuditEvent, "createdAt">,
-  ): Promise<"restored" | "not_found" | "invalid_state" | "no_published_build"> {
-    return db.transaction(async (tx) => {
-      const existing = await tx
-        .select({ id: products.id, status: products.status })
-        .from(products)
-        .where(eq(products.id, id))
-        .limit(1);
-      if (!existing[0]) return "not_found" as const;
-      if (existing[0].status !== "suspended") {
-        return "invalid_state" as const;
-      }
-
-      const publishedBuild = await tx
-        .select({ id: builds.id, version: builds.version })
-        .from(builds)
-        .where(safePublishedBuildCondition(id))
-        .orderBy(desc(builds.createdAt), desc(builds.id))
-        .limit(1);
-      if (!publishedBuild[0]) {
-        return "no_published_build" as const;
-      }
-
-      const now = new Date();
-      const restored = await tx
-        .update(products)
-        .set({
-          status: "published",
-          currentVersion: publishedBuild[0].version,
-          updatedAt: now,
-        })
-        .where(
-          and(
-            eq(products.id, id),
-            eq(products.status, "suspended"),
-          ),
-        )
-        .returning({ id: products.id });
-
-      if (!restored[0]) return "invalid_state" as const;
-
-      if (audit) {
-        await tx.insert(auditEvents).values({
-          ...audit,
-          createdAt: now,
-        });
-      }
-
-      return "restored" as const;
-    });
+  /** Legacy name retained; restored resources now return to draft for review. */
+  async restoreSuspendedWithPublishedBuild(id: string, audit?: Omit<AuditEvent, "createdAt">): Promise<"restored" | "not_found" | "invalid_state" | "no_published_build"> {
+    if (!audit) throw new AppError("An audited moderation reason is required", 400, "RESOURCE_MODERATION_INVALID");
+    const product = await this.findById(id);
+    if (!product) return "not_found";
+    if (product.status !== "suspended") return "invalid_state";
+    await resourceModerationRepository.command({ actorId: audit.actorId, productId: id, auditId: audit.id,
+      command: { action: "release", expectedUpdatedAt: product.updatedAt.toISOString(), reason: typeof audit.details?.notes === "string" ? audit.details.notes : "" } });
+    return "restored";
   }
+
 }
 
 export const productRepository = new ProductRepository();

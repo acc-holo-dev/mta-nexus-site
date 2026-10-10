@@ -8,6 +8,7 @@ import {
   db,
   productRepository,
   reportRepository,
+  resourceModerationRepository,
   sessionRepository,
   userRepository,
 } from "@nexus/db";
@@ -28,7 +29,7 @@ function adminRequest(
 }
 
 describe("moderation atomicity integration", () => {
-  it("keeps product suspend/restore inside the published-build state machine", async () => {
+  it("releases moderation restrictions into a reviewable draft atomically", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
     const authorId = `usr_mod_author_${suffix}`;
     const adminId = `usr_mod_admin_${suffix}`;
@@ -118,25 +119,23 @@ describe("moderation atomicity integration", () => {
         targetId: draftId,
         action: "suspend",
         notes: "Must not publish by restore later.",
+        expectedUpdatedAt: (await productRepository.findById(draftId))?.updatedAt.toISOString(),
       }),
     );
-    expect(draftSuspend.status).toBe(409);
-    expect(await draftSuspend.json()).toMatchObject({
-      code: "PRODUCT_STATE_CHANGED",
-    });
+    expect(draftSuspend.status).toBe(200);
+    expect((await productRepository.findById(draftId))?.status).toBe("suspended");
 
     const noBuildRestore = await adminAction(
       adminRequest(token, {
         targetType: "product",
         targetId: suspendedNoBuildId,
         action: "restore",
-        notes: "Must have an approved build.",
+        notes: "Release into draft without publication.",
+        expectedUpdatedAt: (await productRepository.findById(suspendedNoBuildId))?.updatedAt.toISOString(),
       }),
     );
-    expect(noBuildRestore.status).toBe(409);
-    expect(await noBuildRestore.json()).toMatchObject({
-      code: "PRODUCT_RESTORE_NO_PUBLISHED_BUILD",
-    });
+    expect(noBuildRestore.status).toBe(200);
+    expect((await productRepository.findById(suspendedNoBuildId))?.status).toBe("draft");
 
     const suspend = await adminAction(
       adminRequest(token, {
@@ -144,6 +143,7 @@ describe("moderation atomicity integration", () => {
         targetId: publishedId,
         action: "suspend",
         notes: "Temporary moderation suspension.",
+        expectedUpdatedAt: (await productRepository.findById(publishedId))?.updatedAt.toISOString(),
       }),
     );
     expect(suspend.status).toBe(200);
@@ -151,18 +151,29 @@ describe("moderation atomicity integration", () => {
       "suspended",
     );
 
+    const [suspensionAudit] = await db.select().from(auditEvents).where(eq(auditEvents.targetId, publishedId));
+    expect(suspensionAudit).toBeDefined();
+    const suspendedProduct = await productRepository.findById(publishedId);
+    if (!suspendedProduct) throw new Error("Expected suspended resource fixture");
+    await expect(resourceModerationRepository.command({
+      actorId: adminId, productId: publishedId, auditId: suspensionAudit.id,
+      command: { action: "release", reason: "Must roll back every transition.", expectedUpdatedAt: suspendedProduct.updatedAt.toISOString() },
+    })).rejects.toBeTruthy();
+    expect((await productRepository.findById(publishedId))?.status).toBe("suspended");
+    expect((await buildRepository.findById(`bld_mod_published_${suffix}`))?.status).toBe("published");
+
     const restore = await adminAction(
       adminRequest(token, {
         targetType: "product",
         targetId: publishedId,
         action: "restore",
-        notes: "Published build still exists.",
+        notes: "Published builds must be reviewed again.",
+        expectedUpdatedAt: (await productRepository.findById(publishedId))?.updatedAt.toISOString(),
       }),
     );
     expect(restore.status).toBe(200);
-    expect((await productRepository.findById(publishedId))?.status).toBe(
-      "published",
-    );
+    expect((await productRepository.findById(publishedId))?.status).toBe("draft");
+    expect((await buildRepository.findById(`bld_mod_published_${suffix}`))?.status).toBe("draft");
 
     const audits = await db
       .select()
@@ -171,8 +182,8 @@ describe("moderation atomicity integration", () => {
     expect(
       audits.filter(
         (event) =>
-          event.action === "admin.suspend" ||
-          event.action === "admin.restore",
+          event.action === "product.moderation_suspended" ||
+          event.action === "product.moderation_released",
       ),
     ).toHaveLength(2);
   });

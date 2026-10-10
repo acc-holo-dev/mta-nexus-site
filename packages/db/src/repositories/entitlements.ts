@@ -7,6 +7,19 @@ import type { Entitlement, FreeResourceClaimResult, ResourceAcquisitionSource } 
 
 export type ResourceTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
+/** Existing effective download policy, held through a transactional command. */
+export async function lockUserDownloadAccess(tx: ResourceTransaction, userId: string, productId: string) {
+  const [grant] = await tx.select({ id: entitlements.id, expiresAt: entitlements.expiresAt }).from(entitlements)
+    .where(and(eq(entitlements.subjectType, "user"), eq(entitlements.subjectId, userId),
+      eq(entitlements.resourceId, productId), eq(entitlements.permission, "product.download"),
+      or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, new Date())))).limit(1).for("share");
+  if (grant) return { source: "entitlement" as const, expiresAt: grant.expiresAt };
+  const [license] = await tx.select({ id: licenses.id, expiresAt: licenses.expiresAt }).from(licenses)
+    .where(and(eq(licenses.userId, userId), eq(licenses.productId, productId), eq(licenses.status, "active"),
+      or(isNull(licenses.expiresAt), gt(licenses.expiresAt, new Date())))).limit(1).for("share");
+  return license ? { source: "license" as const, expiresAt: license.expiresAt } : null;
+}
+
 export async function assertFreeResourceAvailable(
   tx: ResourceTransaction,
   productId: string,

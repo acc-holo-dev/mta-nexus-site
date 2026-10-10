@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { db } from "../client";
-import { builds, entitlements, licenses, products } from "../schema";
-import { trustedCleanScanCondition } from "./build-safety";
+import { builds, entitlements, licenses, products, resourceLibrarySelections as selections } from "../schema";
+import { trustedCleanScanCondition, safePublishedBuildCondition } from "./build-safety";
 import { libraryPageBounds, USER_LIBRARY_PAGE_SIZE } from "./library-page-bounds";
 
 /** The library is a *projection of effective grants*, not a payment ledger. */
@@ -14,6 +14,8 @@ export type UserLibraryItem = Readonly<{
   slug: string | null;
   version: string | null;
   downloadable: boolean;
+  buildId: string | null;
+  selectionMode: "latest" | "fixed";
 }>;
 
 export type UserLibraryPage = Readonly<{
@@ -36,6 +38,8 @@ type ItemRow = {
   slug: string | null;
   version: string | null;
   downloadable: boolean;
+  buildId?: string | null;
+  selectionMode?: "latest" | "fixed";
 };
 
 /**
@@ -43,15 +47,8 @@ type ItemRow = {
  * license tables to paginate in memory. Both entitlement and legacy license
  * fallback match EntitlementRepository.hasEntitlement's expiry/status gates.
  */
-export class UserLibraryRepository {
-  async pageByUser(
-    userId: string,
-    requestedPage = 1,
-    filter: UserLibraryFilter = "all",
-    requestedPageSize = USER_LIBRARY_PAGE_SIZE,
-  ): Promise<UserLibraryPage> {
-    const now = new Date();
-    const sources = sql`
+export function effectiveUserDownloadSources(userId: string, now: Date) {
+  return sql`
       WITH owned AS (
         SELECT grant_rows.resource_id, MAX(grant_rows.added_at) AS added_at
         FROM (
@@ -73,6 +70,17 @@ export class UserLibraryRepository {
         GROUP BY grant_rows.resource_id
       )
     `;
+ }
+
+export class UserLibraryRepository {
+  async pageByUser(
+    userId: string,
+    requestedPage = 1,
+    filter: UserLibraryFilter = "all",
+    requestedPageSize = USER_LIBRARY_PAGE_SIZE,
+  ): Promise<UserLibraryPage> {
+    const now = new Date();
+    const sources = effectiveUserDownloadSources(userId, now);
     // Product moderation and trusted build provenance gate the UI in exactly
     // the same way as the download route. Missing products fail closed.
     const ready = sql<boolean>`COALESCE((
@@ -83,6 +91,9 @@ export class UserLibraryRepository {
           AND ${builds.status} = 'published'
           AND ${trustedCleanScanCondition()}
       )
+      AND (${selections.mode} IS NULL OR ${selections.mode} = 'latest' OR EXISTS (
+        SELECT 1 FROM ${builds} WHERE ${safePublishedBuildCondition(products.id.getSQL())} AND ${builds.id} = ${selections.buildId}
+      ))
     ), false)`;
     // Downloading without a pinned build selects the newest *safe published*
     // build. Product.currentVersion is editorial/cache state and can lag behind
@@ -97,8 +108,13 @@ export class UserLibraryRepository {
       ORDER BY ${builds.createdAt} DESC, ${builds.id} DESC
       LIMIT 1
     )`;
+    const chosenVersion = sql`CASE WHEN ${selections.mode} = 'fixed' THEN (
+      SELECT ${builds.version} FROM ${builds}
+      WHERE ${safePublishedBuildCondition(products.id.getSQL())} AND ${builds.id} = ${selections.buildId} LIMIT 1
+    ) ELSE ${latestPublishedVersion} END`;
     const joined = sql`FROM owned LEFT JOIN ${products}
-      ON ${products.id} = owned.resource_id`;
+      ON ${products.id} = owned.resource_id
+      LEFT JOIN ${selections} ON ${selections.productId} = owned.resource_id AND ${selections.userId} = ${userId}`;
     const totals = await db.execute<CountRow>(sql`
       ${sources}
       SELECT count(*)::integer AS "all",
@@ -129,7 +145,9 @@ export class UserLibraryRepository {
         owned.added_at AS "addedAt",
         CASE WHEN ${ready} THEN ${products.title} ELSE NULL END AS "title",
         CASE WHEN ${ready} THEN ${products.slug} ELSE NULL END AS "slug",
-        CASE WHEN ${ready} THEN ${latestPublishedVersion} ELSE NULL END AS "version",
+        CASE WHEN ${ready} THEN ${chosenVersion} ELSE NULL END AS "version",
+        CASE WHEN ${ready} AND ${selections.mode} = 'fixed' THEN ${selections.buildId} ELSE NULL END AS "buildId",
+        coalesce(${selections.mode}, 'latest') AS "selectionMode",
         ${ready} AS "downloadable"
       ${joined}
       ${filterClause}
@@ -144,6 +162,8 @@ export class UserLibraryRepository {
         slug: row.slug,
         version: row.version,
         downloadable: row.downloadable === true,
+        buildId: row.downloadable === true ? row.buildId ?? null : null,
+        selectionMode: row.selectionMode === "fixed" ? "fixed" : "latest",
       })),
       ...bounds,
       total,

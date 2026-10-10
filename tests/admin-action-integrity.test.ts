@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { AppError, NotFoundError } from "@nexus/domain";
 
 const product = vi.hoisted(() => ({
   updateWithAudit: vi.fn(),
@@ -6,6 +7,9 @@ const product = vi.hoisted(() => ({
   restoreSuspendedWithPublishedBuild: vi.fn(),
   findById: vi.fn(),
 }));
+
+const moderation = vi.hoisted(() => ({ command: vi.fn() }));
+vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({ resourceModerationService: moderation }));
 
 const report = vi.hoisted(() => ({
   resolve: vi.fn(),
@@ -92,6 +96,7 @@ function request(
       targetId,
       action,
       notes: "Moderation evidence.",
+      expectedUpdatedAt: "2026-10-10T12:00:00.000Z",
     }),
   });
 }
@@ -99,6 +104,7 @@ function request(
 describe("moderation action integrity", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    moderation.command.mockReset().mockRejectedValue(new NotFoundError("Product", "prd_missing"));
     product.updateWithAudit.mockResolvedValue(null);
     product.suspendPublished.mockResolvedValue(null);
     product.restoreSuspendedWithPublishedBuild.mockResolvedValue(
@@ -107,6 +113,21 @@ describe("moderation action integrity", () => {
     product.findById.mockResolvedValue(null);
     report.resolve.mockResolvedValue(false);
     report.findById.mockResolvedValue(null);
+  });
+
+  it("requires a revision and refuses a cross-site legacy restore", async () => {
+    for (const crossSite of [false, true]) {
+      const headers = new Headers({ "content-type": "application/json" });
+      if (crossSite) headers.set("sec-fetch-site", "cross-site");
+      const response = await POST(new NextRequest("http://nexus.test/api/admin/actions", {
+        method: "POST", headers,
+        body: JSON.stringify({ targetType: "product", targetId: "prd_a", action: "restore", notes: "Reviewed evidence" }),
+      }));
+      expect(response.status).toBe(crossSite ? 403 : 400);
+      expectPrivate(response);
+    }
+    expect(moderation.command).not.toHaveBeenCalled();
+    expect(product.restoreSuspendedWithPublishedBuild).not.toHaveBeenCalled();
   });
 
   it.each(["feature", "unfeature"] as const)(
@@ -140,14 +161,9 @@ describe("moderation action integrity", () => {
     );
     expect(missing.status).toBe(404);
     expectPrivate(missing);
-    expect(await missing.json()).toEqual({
-      error: "Product not found",
-    });
+    expect(await missing.json()).toMatchObject({ code: "NOT_FOUND" });
 
-    product.findById.mockResolvedValueOnce({
-      id: "prd_existing",
-      status: "draft",
-    });
+    moderation.command.mockRejectedValueOnce(new AppError("Resource state changed", 409, "PRODUCT_STATE_CHANGED"));
     const stale = await POST(
       request("product", "prd_existing", "suspend"),
     );
@@ -164,18 +180,12 @@ describe("moderation action integrity", () => {
     );
 
     expect(response.status).toBe(404);
-    expect(await response.json()).toEqual({
-      error: "Product not found",
-    });
-    expect(
-      product.restoreSuspendedWithPublishedBuild,
-    ).toHaveBeenCalledWith(
-      "prd_missing",
-      expect.objectContaining({
-        action: "admin.restore",
-        targetId: "prd_missing",
-      }),
+    expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
+    expect(moderation.command).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "usr_mod" }), "prd_missing",
+      { action: "release", reason: "Moderation evidence.", expectedUpdatedAt: "2026-10-10T12:00:00.000Z" },
     );
+    expect(product.restoreSuspendedWithPublishedBuild).not.toHaveBeenCalled();
   });
 
   it("distinguishes a missing report from a moderation race", async () => {
