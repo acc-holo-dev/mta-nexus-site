@@ -20,28 +20,35 @@ async function main(): Promise<void> {
 
   // Do not connect to PostgreSQL until the local CLI options are validated.
   const { db, servers, closeDatabaseConnection } = await import("../src/client");
-  const audit = new ServerEndpointAuditCollector();
-  let afterId: string | null = null;
+  // Summary mode deliberately never retains per-row IDs or addresses.
+  const audit = new ServerEndpointAuditCollector(details);
   try {
-    while (true) {
-      const rows = await db
-        .select({
-          id: servers.id,
-          ipAddress: servers.ipAddress,
-          port: servers.port,
-          ownerId: servers.ownerId,
-          organizationId: servers.organizationId,
-          isVerified: servers.isVerified,
-        })
-        .from(servers)
-        .where(afterId === null ? undefined : gt(servers.id, afterId))
-        .orderBy(asc(servers.id))
-        .limit(500);
+    await db.transaction(async (tx) => {
+      let afterId: string | null = null;
+      while (true) {
+        const rows = await tx
+          .select({
+            id: servers.id,
+            ipAddress: servers.ipAddress,
+            port: servers.port,
+            ownerId: servers.ownerId,
+            organizationId: servers.organizationId,
+            isVerified: servers.isVerified,
+          })
+          .from(servers)
+          .where(afterId === null ? undefined : gt(servers.id, afterId))
+          .orderBy(asc(servers.id))
+          .limit(500);
 
-      for (const row of rows) audit.add(row);
-      if (rows.length < 500) break;
-      afterId = rows[rows.length - 1]!.id;
-    }
+        for (const row of rows) audit.add(row);
+        if (rows.length < 500) break;
+        afterId = rows[rows.length - 1]!.id;
+      }
+    }, {
+      // Every page sees one consistent point-in-time snapshot.
+      isolationLevel: "repeatable read",
+      accessMode: "read only",
+    });
   } finally {
     await closeDatabaseConnection();
   }

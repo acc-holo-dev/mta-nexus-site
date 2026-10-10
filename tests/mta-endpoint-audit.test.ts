@@ -79,6 +79,64 @@ describe("read-only MTA endpoint audit", () => {
     });
   });
 
+  it("keeps exact counts without retaining private row details in summary mode", () => {
+    const detailed = new ServerEndpointAuditCollector();
+    const compact = new ServerEndpointAuditCollector(false);
+    const rows = [
+      { id: "first_private_id", ipAddress: "PLAY.Private.Example.", port: 22003, ownerId: "private_owner_a", isVerified: true },
+      { id: "second_private_id", ipAddress: "play.private.example", port: 22003, ownerId: "private_owner_b" },
+      { id: "invalid_private_id", ipAddress: "invalid host", port: 22003 },
+      { id: "orphan_private_id", ipAddress: "another.private.example", port: 22004 },
+    ];
+    for (const row of rows) {
+      detailed.add(row);
+      compact.add(row);
+    }
+    const detailedReport = detailed.result();
+    const compactReport = compact.result();
+    expect(compactReport.summary).toEqual(detailedReport.summary);
+    expect(compactReport.details).toEqual({
+      invalidRows: [],
+      nonCanonicalRows: [],
+      collisions: [],
+    });
+    const serialized = JSON.stringify(compactReport);
+    for (const secret of [
+      "first_private_id", "second_private_id", "private_owner_a",
+      "private_owner_b", "invalid host", "play.private.example",
+    ]) {
+      expect(serialized).not.toContain(secret);
+    }
+    expect(compactReport.summary).toMatchObject({
+      collisionGroups: 1,
+      collisionGroupsWithOwnershipConflict: 1,
+      collisionGroupsWithVerifiedServers: 1,
+    });
+  });
+
+  it("counts a large paginated-equivalent input without detailed allocations", () => {
+    const audit = new ServerEndpointAuditCollector(false);
+    for (let id = 0; id < 3_000; id += 1) {
+      audit.add({
+        id: `srv_${id}`,
+        ipAddress: `game-${id}.example.com`,
+        port: 22003,
+        ownerId: `user_${id}`,
+      });
+    }
+    audit.add({
+      id: "duplicate", ipAddress: "GAME-0.EXAMPLE.COM.", port: 22003,
+      ownerId: "different_owner",
+    });
+    expect(audit.result().summary).toMatchObject({
+      scanned: 3_001,
+      collisionGroups: 1,
+      collidingRows: 2,
+      collisionGroupsWithOwnershipConflict: 1,
+    });
+    expect(audit.result().details.collisions).toEqual([]);
+  });
+
   it("does not claim a malformed address is a duplicate of a valid endpoint", () => {
     const audit = new ServerEndpointAuditCollector();
     audit.add({ id: "bad", ipAddress: "play.example..", port: 22003 });

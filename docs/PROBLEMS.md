@@ -1008,3 +1008,24 @@ to license/server ownership.
 Remaining: operate on the actual database with a read-only PostgreSQL user,
 compare the report with server claims, then implement a reviewed and reversible
 migration. No DB records have been changed by this development block.
+
+### P1. Consistent endpoint audit snapshot and compact report mode
+
+The PostgreSQL endpoint census now executes all keyset pages in one
+`REPEATABLE READ, READ ONLY` transaction. This avoids mixing server rows from
+different points in time while users create or transfer listings. The
+operator must still re-run the audit just before any future constraint
+migration; the transaction snapshot does not freeze changes after it ends.
+
+Without `--details`, the collector retains aggregate counts, canonical
+endpoint keys, and only the first ownership scope needed to classify
+duplicates. It no longer retains lists of per-row IDs, invalid addresses
+or complete owner scopes in the default command. Exact collision detection
+still requires memory proportional to the number of distinct endpoints.
+Explicit `--details` keeps the full sensitive review report for operators.
+The summary schema and CLI exit codes are unchanged.
+
+Local isolated strict TypeScript compilation and Node.js 22 assertions passed
+for both reporting modes and a 3001-row synthetic dataset. Full Vitest,
+Node.js 26, browser and PostgreSQL integration remain unverified until CI-001
+runner allocation is repaired.
