@@ -105,6 +105,17 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
           httpPort: command.httpPort,
           mapName: command.mapName,
           visibility: command.visibility,
+          description: command.description,
+          websiteUrl: command.websiteUrl,
+          discordUrl: command.discordUrl,
+          rulesUrl: command.rulesUrl,
+          mediaUrls: command.mediaUrls,
+          language: command.language,
+          region: command.region,
+          gameplayTags: command.gameplayTags,
+          gameMode: command.gameMode,
+          maxPlayers: command.maxPlayers,
+          ...(lastSavedAt ? { expectedUpdatedAt: lastSavedAt } : {}),
         })
       ) {
         throw new Error(data?.error || copy.saveError);

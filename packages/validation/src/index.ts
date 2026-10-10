@@ -131,7 +131,7 @@ export const createServerSchema = z.object({
   gameMode: z.string().max(64).optional(),
   mapName: z.string().max(64).optional(),
   visibility: z.enum(["public", "unlisted", "private"]).default("public"),
-  organizationId: z.string().optional(),
+  organizationId: z.string().regex(/^[a-zA-Z0-9_-]{1,128}$/).optional(),
 });
 
 export const updateServerSchema = createServerSchema.partial();

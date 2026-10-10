@@ -898,3 +898,20 @@ owner-facing API returns application error codes only for typed `AppError`.
   PostgreSQL integration and race tests on Node 26, followed by RU/EN browser
   checks and exact-SHA GitHub Actions verification. CI-001 still blocks
   hosted execution; no successful test run should be inferred.
+
+### P1. Owner canonicalization and complete save acknowledgments
+
+The server service now derives the personal owner from the authenticated actor
+and never accepts a caller-supplied owner as authoritative. Organization
+registrations clear the personal owner. HTTP POST rejects unexpected fields
+with a strict creation schema and bounds organization IDs.
+
+The frontend confirmation checks the chosen organization and all submitted
+editable metadata, including ordered lists. A version-guarded update must
+return an incremented authoritative timestamp; otherwise the UI does not
+display success. Existing callers that do not supply an organization or
+revision continue to use their legacy checks.
+
+Validation and confirmation regressions were added. Exact-SHA Node 26,
+PostgreSQL, browser and full-workflow checks remain required because
+CI-001 still blocks GitHub-hosted runners.

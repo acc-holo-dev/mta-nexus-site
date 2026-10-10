@@ -19,6 +19,9 @@ import {
 import { serverService } from "../../../lib/services/server-service";
 import { mtaDirectoryHttpCacheControl } from "../../../lib/mta-directory-cache";
 
+// Reject unexpected authority fields instead of silently stripping them.
+const serverRegistrationSchema = createServerSchema.strict();
+
 const privateHeaders = {
   "Cache-Control": "private, no-store",
   Vary: "Cookie",
@@ -147,7 +150,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const parsed = createServerSchema.safeParse(
+    const parsed = serverRegistrationSchema.safeParse(
       await request.json().catch(() => null),
     );
     if (!parsed.success) {

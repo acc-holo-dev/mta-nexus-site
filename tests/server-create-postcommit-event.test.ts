@@ -93,6 +93,23 @@ describe("server creation after durable write", () => {
       .rejects.toMatchObject({ statusCode: 409, code: "SERVER_ENDPOINT_TAKEN" });
   });
 
+  it("canonicalizes personal and organizational ownership before persistence", async () => {
+    await serverService.createServer({ ...input, ownerId: "usr_forged" }, actor);
+    expect(mocks.insert).toHaveBeenLastCalledWith(
+      expect.objectContaining({ ownerId: "usr_1" }),
+      expect.anything(),
+      "user",
+    );
+    await serverService.createServer({
+      ...input, organizationId: "org_1", ownerId: "usr_forged",
+    }, actor);
+    expect(mocks.insert).toHaveBeenLastCalledWith(
+      expect.objectContaining({ ownerId: undefined, organizationId: "org_1" }),
+      expect.anything(),
+      "user",
+    );
+  });
+
   it("does not dispatch an event if the durable transaction fails", async () => {
     const publish = vi.spyOn(eventBus, "publish").mockResolvedValue();
     mocks.insert.mockRejectedValueOnce(new Error("database unavailable"));

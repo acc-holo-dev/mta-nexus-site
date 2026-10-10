@@ -42,8 +42,12 @@ describe("editorial server metadata", () => {
       "apps/web/src/app/servers/[slug]/page.tsx",
     );
 
-    expect(route).toContain("mediaUrls");
-    expect(route).toContain("gameplayTags");
+    // PATCH delegates field validation to the shared strict schema.
+    expect(route).toContain('import { updateServerSchema } from "@nexus/validation"');
+    expect(route).toContain('.strict()');
+    expect(updateServerSchema.safeParse({
+      mediaUrls: ["https://example.com/image.png"], gameplayTags: ["race"],
+    }).success).toBe(true);
     expect(repository).toContain("websiteUrl");
     expect(detail).toContain("server.mediaUrls");
     expect(detail).toContain("server.gameplayTags");

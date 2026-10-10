@@ -26,6 +26,48 @@ describe("server mutation confirmation", () => {
     }
   });
 
+  it("confirms the requested ownership scope after creating a server", () => {
+    const personal = { server: { id: "srv_personal", slug: "personal", ownerId: "usr_1", organizationId: null } };
+    expect(confirmedCreatedServer(201, personal, "personal", null)).toBe("srv_personal");
+    expect(confirmedCreatedServer(201, { server: { ...personal.server, organizationId: "org_1" } }, "personal", null)).toBeNull();
+    const organization = { server: { id: "srv_team", slug: "team", organizationId: "org_1" } };
+    expect(confirmedCreatedServer(201, organization, "team", "org_1")).toBe("srv_team");
+    expect(confirmedCreatedServer(201, organization, "team", "org_2")).toBeNull();
+    expect(confirmedCreatedServer(201, personal, "personal", "org_1")).toBeNull();
+  });
+
+  it("verifies every editable field, complete arrays and the new revision", () => {
+    const fields = {
+      id: "srv_1", name: "Nexus Server", ipAddress: "play.example.com",
+      port: 22003, httpPort: 22005, mapName: "Los Santos",
+      visibility: "public", description: "Description",
+      websiteUrl: "https://example.com", discordUrl: "", rulesUrl: "",
+      mediaUrls: ["https://example.com/1.png", "https://example.com/2.png"],
+      gameplayTags: ["racing", "rp"], language: "en",
+      region: "EU", gameMode: "race", maxPlayers: 64,
+      expectedUpdatedAt: "2026-10-10T01:00:00.000Z",
+    };
+    const { expectedUpdatedAt, ...stored } = fields;
+    expect(confirmedUpdatedServer(200, {
+      server: { ...stored, updatedAt: "2026-10-10T01:00:00.001Z" },
+    }, fields)).toBe(true);
+    for (const [field, value] of [
+      ["mediaUrls", ["https://example.com/1.png"]],
+      ["gameplayTags", ["rp", "racing"]],
+      ["description", "other"],
+      ["language", "ru"],
+      ["maxPlayers", 32],
+    ] as const) {
+      expect(confirmedUpdatedServer(200, {
+        server: { ...stored, [field]: value, updatedAt: "2026-10-10T01:00:00.001Z" },
+      }, fields)).toBe(false);
+    }
+    expect(confirmedUpdatedServer(200, {
+      server: { ...stored, updatedAt: expectedUpdatedAt },
+    }, fields)).toBe(false);
+    expect(confirmedUpdatedServer(200, { server: { ...stored } }, fields)).toBe(false);
+  });
+
   it("confirms an update only when the returned authoritative core matches", () => {
     const expected = {
       id: "srv_1",

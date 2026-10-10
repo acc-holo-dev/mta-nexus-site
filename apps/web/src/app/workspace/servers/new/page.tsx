@@ -99,6 +99,7 @@ export default function RegisterServerPage() {
         response.status,
         data,
         command.slug,
+        organizationId || null,
       );
       if (!serverId) {
         throw new Error(data?.error || copy.createError);

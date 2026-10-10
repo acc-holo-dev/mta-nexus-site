@@ -6,6 +6,14 @@ const read = (path: string) =>
   readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("server ownership hardening surface", () => {
+  it("hardens registration ownership and validates organization identifiers", () => {
+    const service = read("apps/web/src/lib/services/server-service.ts");
+    const route = read("apps/web/src/app/api/servers/route.ts");
+    expect(service).toContain("ownerId: input.organizationId ? undefined : actor.id");
+    expect(route).toContain("serverRegistrationSchema.safeParse");
+    expect(route).toContain("createServerSchema.strict()");
+  });
+
   it("uses trusted request IP for server registration", () => {
     const route = read("apps/web/src/app/api/servers/route.ts");
     expect(route).toContain(

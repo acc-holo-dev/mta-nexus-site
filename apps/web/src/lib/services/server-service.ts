@@ -58,6 +58,9 @@ class ServerService {
       server = await serverRepository.createWithAudit(
         {
           ...input,
+          // Ownership is derived from the authenticated actor, never a
+          // caller-supplied ownerId. Organization listings have no personal owner.
+          ownerId: input.organizationId ? undefined : actor.id,
           id,
           // Editorial status is independent from the official MTA network status.
           status: "active",
