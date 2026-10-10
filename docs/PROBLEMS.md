@@ -820,3 +820,17 @@ provider now registers the listener, rechecks `signal.aborted`, destroys the
 stream and rejects the operation. The regression test cancels synchronously
 inside `FileHandle.createReadStream`. Isolated Linux Node.js 22 tests passed;
 full Node.js 26 repository and CI acceptance remain pending.
+
+### P2. In-memory domain events are best-effort after a committed write
+
+Product/build mutations and audit rows commit independently of in-memory
+subscribers. EventBus now converts synchronous and asynchronous subscriber
+failures into settled results, and logs only event identifiers and failure
+counts. ProductService does not turn post-commit dispatch exceptions into
+an HTTP failure that would trigger deletion of a referenced archive.
+
+- **Remaining limitation:** the event bus is not a persistent outbox. An event
+  may be lost if the process terminates after database commit. Critical
+  external effects require a transactional outbox with durable retries.
+- **Acceptance:** run post-commit resilience tests on Node.js 26 and verify
+  database records and retained files with PostgreSQL in CI.

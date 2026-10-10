@@ -1,10 +1,29 @@
 import { productRepository, buildRepository, organizationRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
-import type { Product, Build, User, ProductType } from "@nexus/domain";
+import type { Product, Build, User, ProductType, NexusDomainEvent } from "@nexus/domain";
 import { buildProductDependencyResolution } from "../product-dependency-resolution";
 import { buildReverseDependencySummary, reverseDependencyLimits } from "../reverse-dependency-summary";
 import { isUniqueConstraintViolation } from "../postgres-error";
+
+/**
+ * The database mutation and audit are already durable before the event
+ * notification. A delivery failure must not cause callers to delete assets
+ * still referenced by the newly persisted build or retry the entire write.
+ */
+async function publishCommittedEvent(factory: () => NexusDomainEvent): Promise<void> {
+  let event: NexusDomainEvent | undefined;
+  try {
+    event = factory();
+    await eventBus.publish(event);
+  } catch {
+    console.error("Nexus committed write succeeded but event dispatch failed", {
+      eventType: event?.type ?? "unknown",
+      aggregateType: event?.aggregateType ?? "unknown",
+      aggregateId: event?.aggregateId ?? "unknown",
+    });
+  }
+}
 
 export interface ProductFilters {
   query?: string;
@@ -219,7 +238,7 @@ export class ProductService {
       },
     );
 
-    await eventBus.publish({
+    await publishCommittedEvent(() => ({
       id: generateId("evt"),
       type: "product.created",
       version: 1,
@@ -234,7 +253,7 @@ export class ProductService {
         type: product.type,
         price: product.price,
       },
-    });
+    }));
 
     return product;
   }
@@ -333,7 +352,7 @@ export class ProductService {
       throw error;
     }
 
-    await eventBus.publish({
+    await publishCommittedEvent(() => ({
       id: generateId("evt"),
       type: "build.submitted_for_review",
       version: 1,
@@ -347,7 +366,7 @@ export class ProductService {
         version: input.version,
         hash: input.sha256Hash,
       },
-    });
+    }));
 
     return build;
   }
@@ -400,7 +419,7 @@ export class ProductService {
     }
 
     if (input.decision === "approve") {
-      await eventBus.publish({
+      await publishCommittedEvent(() => ({
         id: generateId("evt"),
         type: "build.released",
         version: 1,
@@ -414,7 +433,7 @@ export class ProductService {
           version: reviewed.version,
           hash: reviewed.sha256Hash,
         },
-      });
+      }));
     }
 
     return reviewed;

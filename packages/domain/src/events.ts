@@ -128,7 +128,22 @@ export class InMemoryEventBus implements EventBus {
   async publish<E extends NexusDomainEvent>(event: E): Promise<void> {
     const list = this.handlers.get(event.type) || [];
     const wildcard = this.handlers.get("*") || [];
-    await Promise.allSettled([...list, ...wildcard].map((handler) => handler(event)));
+    // Capture synchronous throws as rejected promises as well. Persistence
+    // may already be committed when this best-effort bus is called.
+    const results = await Promise.allSettled(
+      [...list, ...wildcard].map((handler) =>
+        Promise.resolve().then(() => handler(event)),
+      ),
+    );
+    const failed = results.filter((result) => result.status === "rejected").length;
+    if (failed > 0) {
+      // Exception messages and event payloads may contain private information.
+      console.error("Nexus domain event handlers failed", {
+        eventType: event.type,
+        eventId: event.id,
+        failedHandlers: failed,
+      });
+    }
   }
 
   subscribe<TType extends NexusDomainEvent["type"]>(
