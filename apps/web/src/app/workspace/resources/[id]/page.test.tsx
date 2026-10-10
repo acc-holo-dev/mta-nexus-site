@@ -4,9 +4,10 @@ const mocks = vi.hoisted(() => ({ locale: "en" as "en" | "ru", product: vi.fn(),
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({ notFound: () => { throw new Error("NOT_FOUND"); } }));
 vi.mock("../../../../lib/services/auth-service", () => ({ authService: { getSession: async () => ({ id: "author" }) } }));
-vi.mock("../../../../lib/services/product-service", () => ({ productService: { getManagedProduct: mocks.product, getManagedHistory: mocks.history } }));
+vi.mock("../../../../lib/services/product-service", () => ({ productService: { getManagedProduct: mocks.product, getManagedHistory: mocks.history, getResourceLifecycleHistory: async () => [] } }));
 vi.mock("../../../../lib/i18n-server", () => ({ getRequestLocale: async () => mocks.locale }));
 vi.mock("../../../../components/author-resource-forms", () => ({ AuthorResourceForms: (props: unknown) => { mocks.forms(props); return null; }, RetireBuildForm: () => null }));
+vi.mock("../../../../components/resource-lifecycle-controls", () => ({ ResourceLifecycleControls: () => null }));
 import Page, { metadata } from "./page";
 const input = { params: Promise.resolve({ id: "resource" }), searchParams: Promise.resolve({ page: "2" }) };
 beforeEach(() => { mocks.locale = "en"; mocks.forms.mockClear(); mocks.product.mockReset().mockResolvedValue({ id: "resource", title: "Owned resource", slug: "owned", description: "Description", tags: [], status: "published", currentVersion: "1.0.0", authorId: "author", updatedAt: new Date("2026-10-04"), privateField: "secret" }); mocks.history.mockReset().mockResolvedValue({ builds: [{ id: "build", version: "1.0.0", status: "published", scanStatus: "clean", createdAt: new Date("2026-10-04"), storageKey: "private/storage/key", releaseNotes: "<script>unsafe()</script>" }], decisions: [{ id: "audit", buildId: "build", action: "build.approved", details: { notes: "<b>Approved safely</b>" } }], page: 2, totalPages: 3 }); });

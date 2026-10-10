@@ -6,6 +6,7 @@ import {
   isValidMtaAddress,
 } from "@nexus/domain";
 import { z } from "zod";
+export * from "./resource-commerce";
 
 // Shared by input validation and rendering of legacy public links.
 export function safeExternalWebUrl(value: unknown): string | undefined {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { cookies } from "next/headers";
 import { orderRepository } from "@nexus/db";
 import { authService } from "../../../lib/services/auth-service";
@@ -71,6 +72,7 @@ export default async function PurchasesHistoryPage({
                   </dd>
                 </div>
               </dl>
+              <Link href={`/workspace/purchases/${encodeURIComponent(order.id)}`} className="inline-block text-sm text-accent underline">{copy.details}</Link>
             </li>
           ))}
         </ol>

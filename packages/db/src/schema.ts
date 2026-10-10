@@ -9,6 +9,7 @@ import {
   type SupportCaseStatus,
   type SupportMessageAuthorRole,
   type SupportRelatedType,
+  type ResourceCartAcquisition,
 } from "@nexus/domain";
 import { sql } from "drizzle-orm";
 import {
@@ -381,6 +382,35 @@ export const orders = pgTable("orders", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+// Account-scoped acquisition basket. This contains no payments or balances.
+export const resourceCartItems = pgTable(
+  "resource_cart_items",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.productId] })],
+);
+
+export const resourceCartAcquisitions = pgTable(
+  "resource_cart_acquisitions",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    requestId: text("request_id").notNull(),
+    productIds: jsonb("product_ids").$type<string[]>().notNull(),
+    result: jsonb("result").$type<ResourceCartAcquisition>().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.requestId] })],
+);
+
 // 14. Order Items
 export const orderItems = pgTable("order_items", {
   id: text("id").primaryKey(),
@@ -392,7 +422,7 @@ export const orderItems = pgTable("order_items", {
     .references(() => products.id, { onDelete: "restrict" }),
   unitPrice: integer("unit_price").notNull(),
   currency: text("currency").notNull().default("USD"),
-});
+}, table => [index("order_items_order_id_item_id_idx").on(table.orderId, table.id)]);
 
 // 15. Payments
 export const payments = pgTable("payments", {

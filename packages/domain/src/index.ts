@@ -10,3 +10,4 @@ export * from "./organization-server-permissions";
 export * from "./server-activity";
 
 export * from "./server-claim-scope";
+export * from "./resource-commerce";

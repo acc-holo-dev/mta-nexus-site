@@ -1,10 +1,73 @@
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, asc, count, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
-import { orders, orderItems, products } from "../schema";
+import { orders, orderItems, products, builds, entitlements, licenses } from "../schema";
 import type { Order, OrderItem } from "@nexus/domain";
 import { historyPageBounds } from "./history-pagination";
+import { trustedCleanScanCondition } from "./build-safety";
 
 export class OrderRepository {
+  /** Buyer-scoped receipt: historical line prices and current access are separate. */
+  async buyerDetails(orderId: string, buyerId: string, requestedPage = 1) {
+    return db.transaction(
+      async (tx) => {
+        const [order] = await tx
+          .select({
+      id: orders.id,
+      orderNumber: orders.orderNumber,
+      status: orders.status,
+      totalAmount: orders.totalAmount,
+      currency: orders.currency,
+      createdAt: orders.createdAt,
+            updatedAt: orders.updatedAt,
+          })
+          .from(orders)
+          .where(and(eq(orders.id, orderId), eq(orders.buyerId, buyerId)))
+          .limit(1);
+        if (!order) return null;
+        const [summary] = await tx
+          .select({ total: count() })
+      .from(orderItems)
+      .where(eq(orderItems.orderId, order.id));
+    const bounds = historyPageBounds(summary?.total ?? 0, requestedPage);
+    const now = new Date();
+        const available = sql<boolean>`(${products.status} = 'published'
+        and exists (select 1 from ${builds} where ${builds.productId} = ${products.id}
+          and ${builds.status} = 'published' and ${trustedCleanScanCondition()}))`;
+        const currentAccess = sql<boolean>`(${available} and (
+        exists (select 1 from ${entitlements} where ${entitlements.subjectType} = 'user'
+          and ${entitlements.subjectId} = ${buyerId} and ${entitlements.resourceId} = ${products.id}
+          and ${entitlements.permission} = 'product.download'
+          and (${entitlements.expiresAt} is null or ${entitlements.expiresAt} > ${now}))
+        or exists (select 1 from ${licenses} where ${licenses.userId} = ${buyerId}
+          and ${licenses.productId} = ${products.id} and ${licenses.status} = 'active'
+          and (${licenses.expiresAt} is null or ${licenses.expiresAt} > ${now}))))`;
+        const items = await tx
+          .select({
+            id: orderItems.id,
+            productId: orderItems.productId,
+            unitPrice: orderItems.unitPrice,
+            currency: orderItems.currency,
+            productTitle: sql<
+              string | null
+            >`case when (${currentAccess} or (${available} and ${products.price} = 0)) then ${products.title} else null end`,
+            productSlug: sql<
+              string | null
+            >`case when (${available} and ${products.price} = 0) then ${products.slug} else null end`,
+            hasCurrentAccess: sql<boolean>`coalesce(${currentAccess}, false)`,
+          })
+          .from(orderItems)
+          .innerJoin(products, eq(products.id, orderItems.productId))
+          .where(eq(orderItems.orderId, order.id))
+          .orderBy(asc(orderItems.id))
+          .limit(bounds.pageSize)
+          .offset(bounds.offset);
+        return { order, items, ...bounds };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
+
   async findById(id: string): Promise<Order | null> {
     const orderRows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
     if (!orderRows.length) return null;

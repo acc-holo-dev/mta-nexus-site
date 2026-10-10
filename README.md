@@ -196,6 +196,10 @@ tests/             unit, integration and contract tests
 
 The free resource library at `/market` supports category and text search, three sort modes and bounded pages. `/api/products` accepts `type`, `sort`, `q`, `page` and `limit` and returns `products`, `limit`, `page` and `hasMore`. Published resources must still have a trusted clean build. Saved items, personal libraries and public profiles query their own IDs or owners, so older resources are not lost behind the catalog's first page. The personal library also shows active, unexpired legacy licenses without exposing their keys or repeating resources already claimed through newer access records.
 
+The account-scoped resource cart at `/workspace/cart` holds up to 20 free resources. `/api/resources/cart` supports GET/POST/DELETE; POST `/api/resources/cart/acquire` takes the reviewed `productIds` and a UUID `requestId`, grants access atomically and stores a replay receipt. It never creates a payment or paid order. Library and resource pages link to this flow.
+
+Authors can archive a resource, restore it as a draft and submit its latest clean draft version for moderation from the resource workspace. Restoring requires renewed moderation of formerly public versions; suspension cannot be bypassed. Existing grants, files and history are retained. Private historical order details are available at `/workspace/purchases/[id]` and `/api/orders/[id]`, scoped to their buyer and separately checking current download rights. Migration `0039_resource_cart` adds the cart, replay receipts and the order-item lookup index.
+
 ## Documentation
 
 The repository keeps three operational long-form documents at the root of `docs/`:

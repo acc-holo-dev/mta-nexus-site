@@ -1,3 +1,4 @@
+import { AddResourceToCart } from "../../../components/resource-cart-controls";
 import { ResourceDownloadButton } from "../../../components/resource-download-button";
 import { ResourcePreview } from "../../../components/resource-preview";
 import { safeExternalWebUrl } from "@nexus/validation";
@@ -426,7 +427,7 @@ export default async function ProductDetailPage({
                     <span>{copy.openLibrary}</span>
                   </Link>
                 </div>
-              ) : product.price === 0 ? (
+              ) : isPublished && product.price === 0 ? (
                 <div className="space-y-3">
                   <Link
                     href={`/acquire?productId=${product.id}`}
@@ -437,10 +438,11 @@ export default async function ProductDetailPage({
                   <p className="text-center text-[11px] text-faint">
                     {copy.claimRequired}
                   </p>
+                  {isPublished && <AddResourceToCart key={product.id} productId={product.id} signedIn={!!user} />}
                 </div>
               ) : (
                 <div className="rounded-lg border border-[color:var(--nexus-warning)]/20 bg-warning-soft p-4 text-xs text-warning">
-                  {dictionary.checkout.paidDisabled}
+                  {isPublished ? dictionary.checkout.paidDisabled : copy.notPublic}
                 </div>
               )}
             </div>

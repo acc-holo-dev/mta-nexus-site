@@ -5,11 +5,104 @@ import { safePublishedBuildCondition } from "./build-safety";
 import { NotFoundError, ValidationError } from "@nexus/domain";
 import type { Entitlement } from "@nexus/domain";
 
+export type ResourceTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+export async function assertFreeResourceAvailable(
+  tx: ResourceTransaction,
+  productId: string,
+): Promise<void> {
+  const productRows = await tx
+    .select({ status: products.status, price: products.price })
+    .from(products)
+    .where(eq(products.id, productId))
+    .limit(1)
+    .for("no key update");
+  const product = productRows[0];
+
+  if (product?.status !== "published") {
+    throw new NotFoundError("Resource", productId);
+  }
+  if (product.price !== 0) {
+    throw new ValidationError("Only free resources can be claimed without a payment provider");
+  }
+
+  const safeBuildRows = await tx
+    .select({ id: builds.id })
+    .from(builds)
+    .where(safePublishedBuildCondition(productId))
+    .limit(1)
+    .for("share");
+  if (!safeBuildRows[0]) {
+    throw new ValidationError("Resource is not currently available for download");
+  }
+}
+
+/** The cart and single-resource path use the same grants and replay lock. */
+export async function claimFreeResourceInTransaction(
+  tx: ResourceTransaction,
+  input: {
+    entitlementId: string;
+    userId: string;
+    productId: string;
+  },
+): Promise<{ entitlement: Entitlement; alreadyClaimed: boolean }> {
+  const lockKey = `free-resource:${input.userId}:${input.productId}`;
+  await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`);
+
+  await assertFreeResourceAvailable(tx, input.productId);
+
+  const now = new Date();
+  const existingRows = await tx
+    .select()
+    .from(entitlements)
+    .where(
+      and(
+        eq(entitlements.subjectType, "user"),
+        eq(entitlements.subjectId, input.userId),
+        eq(entitlements.resourceId, input.productId),
+        eq(entitlements.permission, "product.download"),
+        or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, now)),
+      ),
+    )
+    .limit(1);
+
+  if (existingRows[0]) {
+    return {
+      entitlement: existingRows[0] as unknown as Entitlement,
+      alreadyClaimed: true,
+    };
+  }
+
+  const rows = await tx
+    .insert(entitlements)
+    .values({
+      id: input.entitlementId,
+      subjectType: "user",
+      subjectId: input.userId,
+      permission: "product.download",
+      resourceId: input.productId,
+      createdAt: new Date(),
+    })
+    .returning();
+
+  await tx
+    .update(products)
+    .set({
+      salesCount: sql`${products.salesCount} + 1`,
+    })
+    .where(eq(products.id, input.productId));
+
+  return {
+    entitlement: rows[0] as unknown as Entitlement,
+    alreadyClaimed: false,
+  };
+}
+
 export class EntitlementRepository {
   async hasEntitlement(
     subject: { type: "user" | "server" | "organization"; id: string },
     resourceId: string,
-    permission: string
+    permission: string,
   ): Promise<boolean> {
     const rows = await db
       .select({ id: entitlements.id })
@@ -20,8 +113,8 @@ export class EntitlementRepository {
           eq(entitlements.subjectId, subject.id),
           eq(entitlements.resourceId, resourceId),
           eq(entitlements.permission, permission),
-          or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, new Date()))
-        )
+          or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, new Date())),
+        ),
       )
       .limit(1);
 
@@ -64,8 +157,8 @@ export class EntitlementRepository {
         and(
           eq(entitlements.subjectType, subject.type),
           eq(entitlements.subjectId, subject.id),
-          or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, new Date()))
-        )
+          or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, new Date())),
+        ),
       );
     return rows as unknown as Entitlement[];
   }
@@ -86,80 +179,7 @@ export class EntitlementRepository {
     productId: string;
   }): Promise<{ entitlement: Entitlement; alreadyClaimed: boolean }> {
     return db.transaction(async (tx) => {
-      const lockKey = `free-resource:${input.userId}:${input.productId}`;
-      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`);
-
-      const productRows = await tx
-        .select({ status: products.status, price: products.price })
-        .from(products)
-        .where(eq(products.id, input.productId))
-        .limit(1);
-      const product = productRows[0];
-
-      if (product?.status !== "published") {
-        throw new NotFoundError("Resource", input.productId);
-      }
-      if (product.price !== 0) {
-        throw new ValidationError("Only free resources can be claimed without a payment provider");
-      }
-
-      const safeBuildRows = await tx
-        .select({ id: builds.id })
-        .from(builds)
-        .where(safePublishedBuildCondition(input.productId))
-        .limit(1);
-      if (!safeBuildRows[0]) {
-        throw new ValidationError(
-          "Resource is not currently available for download",
-        );
-      }
-
-      const now = new Date();
-      const existingRows = await tx
-        .select()
-        .from(entitlements)
-        .where(
-          and(
-            eq(entitlements.subjectType, "user"),
-            eq(entitlements.subjectId, input.userId),
-            eq(entitlements.resourceId, input.productId),
-            eq(entitlements.permission, "product.download"),
-            or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, now)),
-          )
-        )
-        .limit(1);
-
-      if (existingRows[0]) {
-        return {
-          entitlement: existingRows[0] as unknown as Entitlement,
-          alreadyClaimed: true,
-        };
-      }
-
-      const rows = await tx
-        .insert(entitlements)
-        .values({
-          id: input.entitlementId,
-          subjectType: "user",
-          subjectId: input.userId,
-          permission: "product.download",
-          resourceId: input.productId,
-          createdAt: new Date(),
-        })
-        .returning();
-
-      await tx
-        .update(products)
-        .set({
-          salesCount: sql`${products.salesCount} + 1`,
-          updatedAt: new Date(),
-        })
-        .where(eq(products.id, input.productId));
-
-      return {
-        entitlement: rows[0] as unknown as Entitlement,
-        alreadyClaimed: false,
-      };
+      return claimFreeResourceInTransaction(tx, input);
     });
   }
 }

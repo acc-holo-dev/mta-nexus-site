@@ -1,3 +1,5 @@
+import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
+import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -37,11 +39,14 @@ export default async function ManageResourcePage({
   const { id } = await params;
   const product = await productService.getManagedProduct(id, actor);
   if (!product) notFound();
-  const history = await productService.getManagedHistory(
+  const [history, lifecycleHistory] = await Promise.all([
+    productService.getManagedHistory(
     id,
     actor,
-    Number((await searchParams).page ?? 1),
-  );
+    Number((await searchParams).page ?? 1)),
+    productService.getResourceLifecycleHistory(id, actor),
+  ]);
+  const commerceCopy = getResourceCommerceCopy(locale);
   return (
     <div className="space-y-8">
       <Link href="/workspace/resources" className="text-sm text-accent underline">
@@ -56,9 +61,45 @@ export default async function ManageResourcePage({
           {copy.preview}
         </Link>
       </header>
+      <ResourceLifecycleControls
+        key={`lifecycle:${product.id}:${product.status}:${new Date(product.updatedAt).toISOString()}`}
+        product={{
+          id: product.id,
+          status: product.status,
+          updatedAt: new Date(product.updatedAt).toISOString(),
+        }}
+      />
+      {lifecycleHistory.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-xl font-semibold text-primary">{commerceCopy.history}</h2>
+          <ol className="space-y-3">
+            {lifecycleHistory.map((event) => (
+              <li
+                key={event.id}
+                className="rounded-lg border border-base p-4 text-sm text-secondary"
+              >
+                <p>
+                  {event.action === "product.archive"
+                    ? commerceCopy.archive
+                    : event.action === "product.restore"
+                      ? commerceCopy.restore
+                      : commerceCopy.submit}
+                </p>
+                <p className="whitespace-pre-wrap break-words">
+                  {typeof event.details?.reason === "string" ? event.details.reason : ""}
+                </p>
+                <time dateTime={new Date(event.createdAt).toISOString()}>
+                  {new Date(event.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-GB")}
+                </time>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
       <AuthorResourceForms
         key={`${actor.id}:${product.id}`}
         actorId={actor.id}
+        uploadBlocked={product.status === "archived" || product.status === "suspended"}
         product={{
           id: product.id,
           title: product.title,

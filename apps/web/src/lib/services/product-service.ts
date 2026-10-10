@@ -1,7 +1,7 @@
-import { productRepository, buildRepository, organizationRepository } from "@nexus/db";
+import { productRepository, buildRepository, organizationRepository, productLifecycleRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
-import type { Product, Build, User, ProductType, NexusDomainEvent } from "@nexus/domain";
+import type { Product, Build, User, ProductType, NexusDomainEvent, ResourceLifecycleAction } from "@nexus/domain";
 import { buildProductDependencyResolution } from "../product-dependency-resolution";
 import { buildReverseDependencySummary, reverseDependencyLimits } from "../reverse-dependency-summary";
 import { isUniqueConstraintViolation } from "../postgres-error";
@@ -38,6 +38,28 @@ export interface ProductFilters {
 }
 
 export class ProductService {
+  async transitionResource(
+    productId: string,
+    input: { action: ResourceLifecycleAction; expectedUpdatedAt: string; reason: string },
+    actor: User,
+  ) {
+    return productLifecycleRepository.transition({
+      productId,
+      actorId: actor.id,
+      action: input.action,
+      expectedUpdatedAt: new Date(input.expectedUpdatedAt),
+      reason: input.reason,
+      auditId: generateId("aud"),
+    });
+  }
+
+  async getResourceLifecycleHistory(productId: string, actor: User) {
+    if (!(await this.getManagedProduct(productId, actor)))
+      throw new NotFoundError("Product", productId);
+    return productLifecycleRepository.history(productId, actor);
+  }
+
+
   async listManagedProducts(actor: User, status?: Product["status"], page = 1) {
     return productRepository.pageManaged(actor, status, page);
   }
@@ -273,6 +295,9 @@ export class ProductService {
     }
     if (!(await this.canManageProduct(product, actor, "build.release"))) {
       throw new ForbiddenError("Not authorized to publish builds for this product");
+    }
+    if (product.status === "archived" || product.status === "suspended") {
+      throw new AppError("Restore the resource before uploading a version", 409, "PRODUCT_STATE_CHANGED");
     }
     return product;
   }

@@ -9,6 +9,7 @@ import {
   getSupportedBuildExtension,
 } from "../lib/build-file-validation";
 import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
+import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
 import {
   authorBuildRetireRequest,
   authorBuildUploadRequest,
@@ -30,9 +31,10 @@ const buttonClass =
   "rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white disabled:opacity-50";
 
 export function AuthorResourceForms({
-  product, actorId,
+  product, actorId, uploadBlocked = false,
 }: {
   actorId: string;
+  uploadBlocked?: boolean;
   product: {
     id: string;
     title: string;
@@ -42,7 +44,7 @@ export function AuthorResourceForms({
     updatedAt: string;
   };
 }) {
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.authorResources;
   const publishing = dictionary.publishing;
   const router = useRouter();
@@ -230,7 +232,7 @@ export function AuthorResourceForms({
 
   async function upload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (uploading || !ready || conflict || refreshPending) return;
+    if (uploadBlocked || uploading || !ready || conflict || refreshPending) return;
     const element = event.currentTarget;
     const data = new FormData(element);
     const file = data.get("file");
@@ -256,7 +258,7 @@ export function AuthorResourceForms({
       const body = await response.json().catch(() => null);
       if (!response.ok) {
         setUploadError(
-          getResourceSubmissionErrorMessage(body?.code, {
+          body?.code === "PRODUCT_STATE_CHANGED" ? resourceCommerceError(locale, body.code) : getResourceSubmissionErrorMessage(body?.code, {
             fileTooLarge: publishing.buildFileTooLarge.replace("{maxFileSize}", "64"),
             malwareDetected: publishing.scannerMalwareDetected,
             scanLimitExceeded: publishing.scannerLimitExceeded,
@@ -386,8 +388,8 @@ export function AuthorResourceForms({
         className="space-y-4 rounded-lg border border-base bg-surface p-5"
       >
         <h2 className="text-xl font-semibold text-primary">{copy.newVersion}</h2>
-        <p className="text-sm text-secondary">{publishing.submittedDescription}</p>
-        <fieldset disabled={uploading || !ready || Boolean(conflict) || refreshPending} className="space-y-4">
+        <p className="text-sm text-secondary">{uploadBlocked ? getResourceCommerceCopy(locale).errors.PRODUCT_STATE_CHANGED : publishing.submittedDescription}</p>
+        <fieldset disabled={uploadBlocked || uploading || !ready || Boolean(conflict) || refreshPending} className="space-y-4">
           <label className="block space-y-1 text-sm text-secondary">
             <span>{publishing.version}</span>
             <input
@@ -442,7 +444,7 @@ export function AuthorResourceForms({
             {copy.versionSubmitted}
           </p>
         )}
-        <button type="submit" disabled={uploading || !ready || Boolean(conflict) || refreshPending} className={buttonClass}>
+        <button type="submit" disabled={uploadBlocked || uploading || !ready || Boolean(conflict) || refreshPending} className={buttonClass}>
           {uploading ? publishing.submitting : copy.newVersion}
         </button>
       </form>

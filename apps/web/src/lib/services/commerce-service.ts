@@ -1,4 +1,4 @@
-import { entitlementRepository } from "@nexus/db";
+import { entitlementRepository, resourceCartRepository, orderRepository } from "@nexus/db";
 import { generateId } from "@nexus/security";
 import type { Entitlement, User } from "@nexus/domain";
 
@@ -11,6 +11,32 @@ import type { Entitlement, User } from "@nexus/domain";
  * logic in the repository layer.
  */
 export class CommerceService {
+  async getBuyerOrderDetails(user: User, orderId: string, page = 1) {
+    return orderRepository.buyerDetails(orderId, user.id, page);
+  }
+
+  async getResourceCart(user: User) {
+    return resourceCartRepository.get(user.id);
+  }
+
+  async addResourceToCart(user: User, productId: string) {
+    await resourceCartRepository.add(user.id, productId);
+  }
+
+  async removeResourceFromCart(user: User, productId: string) {
+    await resourceCartRepository.remove(user.id, productId);
+  }
+
+  async acquireResourceCart(user: User, productIds: string[], requestId: string) {
+    return resourceCartRepository.acquire({
+      userId: user.id,
+      productIds,
+      requestId,
+      entitlementIds: productIds.map(() => generateId("ent")),
+      auditId: generateId("aud"),
+    });
+  }
+
   async claimFreeResource(input: {
     user: User;
     productId: string;
@@ -33,8 +59,7 @@ export class CommerceService {
     return entitlementRepository.hasEntitlement(
       subject,
       resourceId,
-      permission,
-    );
+      permission);
   }
 }
 

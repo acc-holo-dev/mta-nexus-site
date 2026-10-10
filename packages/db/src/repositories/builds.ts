@@ -3,9 +3,10 @@ import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-
 import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { db } from "../client";
+import { assertProductMutationAuthority, assertBuildModerationAuthority } from "./product-mutation-authority";
 import { auditEvents, builds, products, users, organizations, organizationMembers, notificationPreferences, notifications } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
-import { releaseHistoryPageBounds } from "@nexus/domain";
+import { AppError, releaseHistoryPageBounds } from "@nexus/domain";
 
 export type PendingReviewBuild = Build & {
   productTitle: string;
@@ -248,6 +249,23 @@ export class BuildRepository {
     audit: Omit<AuditEvent, "createdAt">
   ): Promise<Build> {
     return db.transaction(async (tx) => {
+      const [parent] = await tx
+        .select({
+          id: products.id,
+          status: products.status,
+          authorId: products.authorId,
+          organizationId: products.organizationId,
+        })
+        .from(products)
+        .where(eq(products.id, data.productId))
+        .limit(1)
+        .for("no key update");
+      if (!parent || parent.status === "archived" || parent.status === "suspended") {
+        throw new AppError("Resource is withdrawn from publication", 409, "PRODUCT_STATE_CHANGED");
+      }
+
+      await assertProductMutationAuthority(tx, parent, audit.actorId);
+
       const createdAt = new Date();
       const rows = await tx
         .insert(builds)
@@ -282,6 +300,30 @@ export class BuildRepository {
     audit: Omit<AuditEvent, "createdAt">
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
+      const [target] = await tx
+        .select({ productId: builds.productId })
+        .from(builds)
+        .where(eq(builds.id, id))
+        .limit(1);
+      if (!target) return null;
+      const [parent] = await tx
+        .select({
+          id: products.id,
+          status: products.status,
+          authorId: products.authorId,
+          organizationId: products.organizationId,
+        })
+        .from(products)
+        .where(eq(products.id, target.productId))
+        .limit(1)
+        .for("no key update");
+      if (!parent) return null;
+      await assertBuildModerationAuthority(tx, audit.actorId);
+      if (parent.status === "archived" || parent.status === "suspended") {
+        throw new AppError("Resource is withdrawn from publication", 409, "PRODUCT_STATE_CHANGED");
+      }
+
+
       const targetStatus = decision === "approve" ? "published" : "rejected";
       const reviewCondition =
         decision === "approve"
@@ -443,6 +485,27 @@ export class BuildRepository {
     audit: Omit<AuditEvent, "createdAt">
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
+      const [target] = await tx
+        .select({ productId: builds.productId })
+        .from(builds)
+        .where(eq(builds.id, id))
+        .limit(1);
+      if (!target) return null;
+      const [parent] = await tx
+        .select({
+          id: products.id,
+          status: products.status,
+          authorId: products.authorId,
+          organizationId: products.organizationId,
+        })
+        .from(products)
+        .where(eq(products.id, target.productId))
+        .limit(1)
+        .for("no key update");
+      if (!parent) return null;
+      await assertProductMutationAuthority(tx, parent, audit.actorId);
+
+
       const rows = await tx
         .update(builds)
         .set({ status: "retired" })
@@ -473,7 +536,9 @@ export class BuildRepository {
         .limit(1);
       await tx
         .update(products)
-        .set(fallback[0]
+        .set(parent.status === "archived" || parent.status === "suspended"
+          ? { updatedAt: new Date() }
+          : fallback[0]
           ? { currentVersion: fallback[0].version, status: "published", updatedAt: new Date() }
           : { status: "draft", updatedAt: new Date() }
         )
@@ -491,6 +556,27 @@ export class BuildRepository {
     audit: Omit<AuditEvent, "createdAt">,
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
+      const [target] = await tx
+        .select({ productId: builds.productId })
+        .from(builds)
+        .where(eq(builds.id, id))
+        .limit(1);
+      if (!target) return null;
+      const [parent] = await tx
+        .select({
+          id: products.id,
+          status: products.status,
+          authorId: products.authorId,
+          organizationId: products.organizationId,
+        })
+        .from(products)
+        .where(eq(products.id, target.productId))
+        .limit(1)
+        .for("no key update");
+      if (!parent) return null;
+      await assertBuildModerationAuthority(tx, audit.actorId);
+
+
       const now = new Date();
       const rows = await tx
         .update(builds)
@@ -553,6 +639,27 @@ export class BuildRepository {
     audit: Omit<AuditEvent, "createdAt">,
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
+      const [target] = await tx
+        .select({ productId: builds.productId })
+        .from(builds)
+        .where(eq(builds.id, id))
+        .limit(1);
+      if (!target) return null;
+      const [parent] = await tx
+        .select({
+          id: products.id,
+          status: products.status,
+          authorId: products.authorId,
+          organizationId: products.organizationId,
+        })
+        .from(products)
+        .where(eq(products.id, target.productId))
+        .limit(1)
+        .for("no key update");
+      if (!parent) return null;
+      await assertBuildModerationAuthority(tx, audit.actorId);
+
+
       const now = new Date();
       const rows = await tx
         .update(builds)
