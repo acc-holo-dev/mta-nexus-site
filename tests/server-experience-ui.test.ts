@@ -59,6 +59,9 @@ describe("server experience behavior", () => {
 
     expect(en.serverDetail.connect).not.toBe(ru.serverDetail.connect);
     expect(en.serverManagement.save).not.toBe(ru.serverManagement.save);
+    expect(en.serverManagement.mapName).not.toBe(ru.serverManagement.mapName);
+    expect(en.serverManagement.httpPort).not.toBe(ru.serverManagement.httpPort);
+    expect(en.serverRegistration.mapName).not.toBe(ru.serverRegistration.mapName);
     expect(en.serverClaim.verify).not.toBe(ru.serverClaim.verify);
     expect(en.serverHistory.title).not.toBe(ru.serverHistory.title);
     expect(en.serverUpdates.title).not.toBe(ru.serverUpdates.title);

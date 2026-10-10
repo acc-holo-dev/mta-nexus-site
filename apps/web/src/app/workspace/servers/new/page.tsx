@@ -48,6 +48,7 @@ export default function RegisterServerPage() {
         httpPort: Number(form.get("httpPort") || 22005),
         maxPlayers: Number(form.get("maxPlayers") || 128),
         gameMode: String(form.get("gameMode") || "").trim(),
+        mapName: String(form.get("mapName") || "").trim(),
         visibility: String(form.get("visibility") || "public"),
       };
       const response = await fetch(
@@ -109,7 +110,7 @@ export default function RegisterServerPage() {
             name="name"
             required
             minLength={3}
-            maxLength={120}
+            maxLength={100}
             className={fieldClass}
           />
         </label>
@@ -120,7 +121,7 @@ export default function RegisterServerPage() {
             name="slug"
             required
             minLength={3}
-            maxLength={120}
+            maxLength={100}
             pattern="[a-z0-9-]+"
             autoCapitalize="none"
             spellCheck={false}
@@ -223,7 +224,12 @@ export default function RegisterServerPage() {
 
         <label className={labelClass}>
           <span className={labelTextClass}>{copy.gameMode}</span>
-          <input name="gameMode" maxLength={120} className={fieldClass} />
+          <input name="gameMode" maxLength={64} className={fieldClass} />
+        </label>
+
+        <label className={labelClass}>
+          <span className={labelTextClass}>{copy.mapName}</span>
+          <input name="mapName" maxLength={64} className={fieldClass} />
         </label>
 
         <label className={labelClass}>

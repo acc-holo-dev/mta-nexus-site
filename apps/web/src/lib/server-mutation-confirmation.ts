@@ -36,6 +36,8 @@ export function confirmedUpdatedServer(
     name: string;
     ipAddress: string;
     port: number;
+    httpPort?: number;
+    mapName?: string;
     visibility: string;
   }>,
 ): boolean {
@@ -47,6 +49,8 @@ export function confirmedUpdatedServer(
       server.name === expected.name &&
       server.ipAddress === expected.ipAddress &&
       server.port === expected.port &&
+      (expected.httpPort === undefined || server.httpPort === expected.httpPort) &&
+      (expected.mapName === undefined || server.mapName === expected.mapName) &&
       server.visibility === expected.visibility,
   );
 }

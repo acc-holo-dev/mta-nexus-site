@@ -43,6 +43,16 @@ describe("server mutation confirmation", () => {
       ),
     ).toBe(true);
 
+    const extended = { ...expected, httpPort: 22006, mapName: "Los Santos" };
+    expect(confirmedUpdatedServer(200, { server: extended }, extended)).toBe(true);
+    expect(
+      confirmedUpdatedServer(200, { server: { ...extended, httpPort: 22005 } }, extended),
+    ).toBe(false);
+    expect(
+      confirmedUpdatedServer(200, { server: { ...extended, mapName: "Old map" } }, extended),
+    ).toBe(false);
+    expect(confirmedUpdatedServer(200, { server: expected }, extended)).toBe(false);
+
     for (const [status, body] of [
       [204, { server: expected }],
       [200, { server: { ...expected, id: "srv_2" } }],

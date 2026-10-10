@@ -90,6 +90,8 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
           name: command.name,
           ipAddress: command.ipAddress,
           port: command.port,
+          httpPort: command.httpPort,
+          mapName: command.mapName,
           visibility: command.visibility,
         })
       ) {
@@ -120,6 +122,8 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
       required?: boolean;
       min?: number;
       max?: number;
+      minLength?: number;
+      maxLength?: number;
       placeholder?: string;
     },
   ) => (
@@ -132,6 +136,8 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         required={options?.required}
         min={options?.min}
         max={options?.max}
+        minLength={options?.minLength}
+        maxLength={options?.maxLength}
         placeholder={options?.placeholder}
         className={fieldClass}
       />
@@ -144,7 +150,7 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
       aria-busy={loading}
       className="grid grid-cols-1 gap-4 sm:grid-cols-2"
     >
-      {field("name", copy.name, server.name, { required: true })}
+      {field("name", copy.name, server.name, { required: true, minLength: 3, maxLength: 100 })}
 
       <label className="space-y-1.5">
         <span className="font-label text-secondary">{copy.visibility}</span>
@@ -182,13 +188,14 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         type: "url",
         placeholder: "https://...",
       })}
-      {field("language", copy.language, server.language || "")}
-      {field("region", copy.region, server.region || "")}
+      {field("language", copy.language, server.language || "", { maxLength: 64 })}
+      {field("region", copy.region, server.region || "", { maxLength: 64 })}
 
       <label className="space-y-1.5 sm:col-span-2">
         <span className="font-label text-secondary">{copy.gameplayTags}</span>
         <input
           name="gameplayTags"
+          maxLength={500}
           defaultValue={(server.gameplayTags || []).join(", ")}
           placeholder="roleplay, economy, freeroam"
           className={fieldClass}
@@ -199,6 +206,7 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         <span className="font-label text-secondary">{copy.mediaUrls}</span>
         <textarea
           name="mediaUrls"
+          maxLength={4007}
           defaultValue={(server.mediaUrls || []).join("\n")}
           rows={3}
           placeholder="https://..."
@@ -221,8 +229,8 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         min: 1,
         max: 65535,
       })}
-      {field("gameMode", copy.gameMode, server.gameMode || "")}
-      {field("mapName", copy.mapName, server.mapName || "")}
+      {field("gameMode", copy.gameMode, server.gameMode || "", { maxLength: 64 })}
+      {field("mapName", copy.mapName, server.mapName || "", { maxLength: 64 })}
       {field("maxPlayers", copy.maxPlayers, server.maxPlayers ?? 128, {
         type: "number",
         required: true,
