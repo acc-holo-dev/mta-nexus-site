@@ -1805,3 +1805,44 @@ acceptance tests are committed, but real-DB integration and the complete
 Next/TypeScript build are still blocked until hosted GitHub Actions can
 allocate a runner. Do not treat a build-list entry as a capability token or
 promise a long-term right to previous versions.
+
+### Private server activity and target index acceptance
+
+`/workspace/servers/:id/activity` is a dynamic, non-indexed, RU/EN private
+history of `server.created`, `server.updated` and
+`server.claim_challenge_issued` audit events. The management page links to it
+after its existing access guard. The activity repository performs its own
+fresh authority check and bounded audit read in one `REPEATABLE READ, READ ONLY`
+transaction. The managed-server list and activity share one SQL scope for
+personal ownership and existing organization grants; membership cannot grant
+access to a missing organization. Only platform administrators receive the
+existing global management override.
+
+The repository fetches twenty records plus a sentinel, orders by
+`created_at DESC, id DESC`, and uses a server-scoped audit ID as its next cursor.
+The timestamp anchor stays in SQL, preserving PostgreSQL microseconds. There is
+no whole-history count or deep `OFFSET`. Newer events do not shift an earlier
+page; a deleted/foreign/excluded anchor yields no events and the page offers
+the latest view. Each request reauthorizes: a cursor is not an access grant.
+
+SQL projects author username/display name only, plus allowed submitted field
+names normalized from audit JSON. It does not return the entire details object,
+address/user-agent, passwords, proof data or field values. Legacy malformed
+`details.fields` values become an empty list. This is recorded listing activity,
+not a complete ownership/verification history or before/after diff.
+
+Migration `0037_server_activity_lookup_index` adds
+`audit_events_target_created_id_idx` on
+`target_type, target_id, created_at DESC, id DESC`. It is an ordinary transactional
+index creation; allow for its write-lock/build time on a populated production
+audit table. The release-upgrade fixture now targets 0037, preserves an existing
+server audit row through failure/retry/rerun, and verifies the exact index order.
+
+Unit SQL, URL-input and rendered RU/EN tests cover access boundaries, bounded
+pages, safe projection and escaping. The PostgreSQL fixture
+`tests/server-activity.integration.test.ts` covers 63 tied/microsecond events,
+insertion between page requests, invalid/deleted anchors, private organization
+access, orphaned membership and revocation. Run it with the database test project
+after applying migrations. Real PostgreSQL, migration upgrade, query plans and
+browser/production-build acceptance remain pending until a working target runner
+is available.

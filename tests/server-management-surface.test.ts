@@ -163,6 +163,8 @@ describe("server management page behavior", () => {
     expect(html).toContain(dictionary.ownerManaged);
     expect(html).toContain(dictionary.ownerManagedDescription);
     expect(html).toContain(dictionary.listingDetails);
+    expect(html).toContain('href="/workspace/servers/srv_managed/activity"');
+    expect(html).toContain("View activity");
     expect(html).toContain('data-testid="server-details-form"');
     expect(html).toContain('data-testid="server-claim-control-panel"');
     expect(html).not.toMatch(/installation key|heartbeat/iu);

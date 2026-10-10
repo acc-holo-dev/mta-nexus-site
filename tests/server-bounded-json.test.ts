@@ -27,9 +27,9 @@ describe("bounded JSON reader for server mutations", () => {
     "multipart/form-data; boundary=x",
     "application/jsonp",
     "application/ld+json",
-    "application/json".padEnd(257, " "),
+    `application/json; charset=${"x".repeat(257)}`,
   ])("rejects non-JSON browser mutation media type %s", (type) => {
-    const headers = type === null ? {} : { "Content-Type": type };
+    const headers: HeadersInit = type === null ? {} : { "Content-Type": type };
     expect(() => requireServerJsonContentType(new Request(url, { headers })))
       .toThrowError(expect.objectContaining({
         statusCode: 415, code: "UNSUPPORTED_MEDIA_TYPE",

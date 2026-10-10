@@ -97,7 +97,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0036_user_library_lookup_indexes");
+  assert.equal(plan.targetTag, "0037_server_activity_lookup_index");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -123,6 +123,14 @@ test("upgrade fixture requires indexed effective download rights", () => {
   assert.match(migration, /"status" = 'active'/u);
   const rehearsal = readFileSync(script, "utf8");
   assert.match(rehearsal, /userLibraryIndexesPresent = true/u);
+});
+
+test("upgrade fixture requires the server activity target index", () => {
+  const migration = readFileSync(new URL("0037_server_activity_lookup_index.sql", migrationsUrl), "utf8");
+  assert.match(migration, /CREATE INDEX "audit_events_target_created_id_idx"/u);
+  assert.match(migration, /"target_type", "target_id", "created_at" DESC, "id" DESC/u);
+  const rehearsal = readFileSync(script, "utf8");
+  assert.match(rehearsal, /serverActivityIndexPresent = true/u);
 });
 
 test("upgrade fixture checks durable support mutation idempotency", () => {

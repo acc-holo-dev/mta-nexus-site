@@ -1,6 +1,6 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
-Единственный реестр проблем проекта. Обновлён: 2026-10-09 (после атомарного счётчика просмотров и ограничения нагрузки рассылки; текущий hosted-runner blocker зафиксирован ниже).
+Единственный реестр проблем проекта. Обновлён: 2026-10-10 (после закрытой истории серверов и проверки объединённого main; текущий hosted-runner blocker зафиксирован ниже).
 
 Правила реестра:
 
@@ -1067,3 +1067,46 @@ membership scopes and the current owner override.
 Twelve pure, dependency-free permission cases passed on local Node.js 22 and
 the helper passed strict isolated TypeScript compilation. Full Node.js 26,
 Vitest, PostgreSQL and browser acceptance remain outstanding until CI-001.
+
+### P2. Private server activity: database and migration acceptance
+
+The RU/EN management history at `/workspace/servers/:id/activity` now reads
+twenty allowed server-target audit events per page with a SQL-resolved cursor.
+Fresh personal/organization management rights and activity share a read-only
+repeatable-read snapshot. The SQL scope requires a live organization before a
+delegated membership can grant access. Administrators retain the existing
+maintenance override; moderators have no additional private-history permission.
+Only public author fields and allowlisted submitted listing field names are
+selected. Raw details, IP/user-agent, proof tokens and field values are omitted.
+Verification-target decisions and ownership-transfer history remain future work.
+
+Migration 0037 adds the target/time/ID index and advances the upgrade fixture.
+The fixture checks index order and preservation of a pre-existing audit row.
+A PostgreSQL test covers tied/microsecond timestamps, 63-event pagination,
+newer inserts, missing/foreign/deleted anchors, orphaned memberships and revoked
+authority. Real PostgreSQL, production query plans, migration rehearsal, browser
+and complete build acceptance still require a working target runner (CI-001).
+
+### Fixed: compatibility regressions in concurrent main integration
+
+The combined code gate found missing support JSON-parser exports after the
+server parser replacement, a nullable digest-header narrowing error, a scoped
+membership return type mismatch, and a storage test outside its provider scope.
+The support parser's original tagged-result contract was restored while retaining
+the bounded/deadline server reader. Types and the storage test scope were fixed.
+The oversized media-header fixture now uses a long parameter instead of trailing
+spaces that the Fetch Headers implementation removes before validation.
+
+Behavior tests also exposed registration defaults leaking into partial server
+updates through Zod `partial()`: a description-only request could reset visibility,
+ports, capacity and arrays, and empty/token-only requests could pass validation.
+The update schema now removes defaults from those six fields before making them
+optional. Existing creation defaults, endpoint canonicalization and strict PATCH
+authorization remain in place. Missing fields stay absent and empty edits are
+rejected; HTTP and schema regressions exercise this behavior.
+
+The combined Node.js 26 `pnpm check:code` passed with 1,933 unit tests,
+247 tooling tests, TypeScript, Knip and dependency checks. Lint has 55 existing
+warnings; dependency-cruiser retains its TypeScript 7 compatibility warning
+while the configured SWC dependency analysis succeeds. These code results do
+not substitute for PostgreSQL, migration, browser or complete-build acceptance.

@@ -50,4 +50,13 @@ describe("localized server mutation errors", () => {
     expect(serverMutationErrorMessage({ error: "ordinary error" }, messages, "Fallback"))
       .toBe("ordinary error");
   });
+
+  it("rejects every C0 control character while permitting ordinary multilingual text", () => {
+    for (let code = 0; code < 32; code++) {
+      expect(serverMutationErrorMessage({ error: `error${String.fromCharCode(code)}message` }, {}, "Fallback"))
+        .toBe("Fallback");
+    }
+    expect(serverMutationErrorMessage({ error: "Сервер недоступен 🌍" }, {}, "Fallback"))
+      .toBe("Сервер недоступен 🌍");
+  });
 });

@@ -9,7 +9,7 @@
 const SHA256_HEX = /^[a-fA-F0-9]{64}$/u;
 
 /** Reject broken/missing digest headers *before* buffering the response body. */
-export function isValidDownloadSha256Header(header: string | null): boolean {
+export function isValidDownloadSha256Header(header: string | null): header is string {
   return header !== null && SHA256_HEX.test(header);
 }
 

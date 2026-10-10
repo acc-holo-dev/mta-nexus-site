@@ -47,6 +47,7 @@ const evidence = {
   structuredNotificationAccepted: false,
   notificationInboxIndexesPresent: false,
   userLibraryIndexesPresent: false,
+  serverActivityIndexPresent: false,
   supportSchemaPresent: false,
   supportStaffQueueIndexPresent: false,
   supportStaffFilterIndexPresent: false,
@@ -95,6 +96,8 @@ try {
     VALUES ('upgrade-notification', 'upgrade-user', 'Legacy title', 'Legacy message', '/workspace', true)`;
   await client`INSERT INTO servers (id, name, slug, ip_address, port, owner_id)
     VALUES ('upgrade-server', 'Existing server', 'upgrade-server', '198.51.100.70', 22003, 'upgrade-user')`;
+  await client`INSERT INTO audit_events (id, actor_id, action, target_id, target_type, details)
+    VALUES ('upgrade-server-audit', 'upgrade-user', 'server.created', 'upgrade-server', 'server', '{"name":"Existing server"}'::jsonb)`;
   await client`INSERT INTO server_claim_challenges
     (id, server_id, requester_id, token_digest, expires_at)
     VALUES ('scc_11111111-1111-4111-8111-111111111111', 'upgrade-server', 'upgrade-user',
@@ -102,7 +105,7 @@ try {
 
   const rows = async () => {
     const result = {};
-    for (const table of ["users", "products", "builds", "entitlements", "notifications", "servers", "server_claim_challenges"]) {
+    for (const table of ["users", "products", "builds", "entitlements", "notifications", "servers", "server_claim_challenges", "audit_events"]) {
       // Remove only fields introduced after the frozen baseline so existing
       // legacy-row values remain byte-for-byte comparable across the upgrade.
       const rowJson = table === "notifications"
@@ -131,7 +134,7 @@ try {
     WHERE table_schema = 'public' AND table_name = 'notifications' AND column_name = 'data'`;
   assert.equal(columns.length, 0, "Failed migration must roll back its DDL");
   const failedIndexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public'
-    AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx', 'notifications_recipient_created_id_idx', 'notifications_unread_recipient_created_id_idx')`;
+    AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx', 'notifications_recipient_created_id_idx', 'notifications_unread_recipient_created_id_idx', 'audit_events_target_created_id_idx')`;
   assert.equal(failedIndexes.length, 0, "Failed migration must roll back its indexes");
   const failedQuarantineColumns = await client`SELECT column_name FROM information_schema.columns
     WHERE table_schema = 'public' AND table_name = 'builds'
@@ -172,6 +175,11 @@ try {
   assert.match(libraryIndexes[0].indexdef, /subject_type.*'user'.*permission.*'product.download'/u);
   assert.match(libraryIndexes[1].indexdef, /status.*'active'/u);
   evidence.userLibraryIndexesPresent = true;
+  const activityIndexes = await client`SELECT indexname, indexdef FROM pg_indexes
+    WHERE schemaname = 'public' AND indexname = 'audit_events_target_created_id_idx'`;
+  assert.equal(activityIndexes.length, 1, "Upgrade must create the private server timeline index");
+  assert.match(activityIndexes[0].indexdef, /target_type, target_id, created_at DESC, id DESC/u);
+  evidence.serverActivityIndexPresent = true;
   const quarantineColumns = await client`SELECT column_name FROM information_schema.columns
     WHERE table_schema = 'public' AND table_name = 'builds'
       AND column_name IN ('quarantine_previous_status', 'quarantine_reason', 'quarantined_at', 'quarantined_by')`;

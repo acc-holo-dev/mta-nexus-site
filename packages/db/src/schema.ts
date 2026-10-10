@@ -657,7 +657,9 @@ export const auditEvents = pgTable("audit_events", {
   userAgent: text("user_agent"),
   details: jsonb("details").$type<Record<string, unknown>>().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [
+  index("audit_events_target_created_id_idx").on(table.targetType, table.targetId, table.createdAt.desc(), table.id.desc()),
+]);
 
 // 24. Reports
 export const reports = pgTable("reports", {

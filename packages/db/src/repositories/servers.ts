@@ -1,5 +1,6 @@
-import { and, asc, count, desc, eq, exists, gt, ilike, inArray, isNull, ne, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
+import { managedServerScope } from "./server-management-scope";
 import { db } from "../client";
 import { auditEvents, organizationMembers, organizations, servers } from "../schema";
 import { AppError, ForbiddenError, NotFoundError, grantsServerManagement, type AuditEvent, type Server, type ServerStatus, type ServerVisibility, type User } from "@nexus/domain";
@@ -68,19 +69,7 @@ export class ServerRepository {
     const query = typeof filters.query === "string" ? filters.query.trim().slice(0, 120) : "";
     const pattern = query ? containsPattern(query) : undefined;
     const condition = and(
-      or(
-        // A creator listed as owner on an organization's server still needs its organization rights.
-        and(isNull(servers.organizationId), eq(servers.ownerId, userId)),
-        exists(db.select({ id: organizations.id }).from(organizations).where(and(
-          eq(organizations.id, servers.organizationId), eq(organizations.ownerId, userId),
-        ))),
-        exists(db.select({ id: organizationMembers.id }).from(organizationMembers).where(and(
-          eq(organizationMembers.organizationId, servers.organizationId),
-          eq(organizationMembers.userId, userId),
-          or(inArray(organizationMembers.role, ["owner", "admin"]),
-            sql`${organizationMembers.permissions} @> ${JSON.stringify(["manage_servers"])}::jsonb`),
-        ))),
-      ),
+      managedServerScope(userId),
       filters.status && ["active", "inactive", "maintenance", "suspended"].includes(filters.status)
         ? eq(servers.status, filters.status) : undefined,
       filters.visibility && ["public", "unlisted", "private"].includes(filters.visibility)

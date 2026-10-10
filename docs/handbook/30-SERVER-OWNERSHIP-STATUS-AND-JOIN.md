@@ -118,3 +118,27 @@ pages. Private cards lead to authorized management. Listing maintenance and
 observed network availability are displayed separately; unavailable observations
 remain unknown. Page reads do not issue claims or modify ownership. Management
 routes recheck current access whenever an edit is requested.
+
+## 15. Implemented private listing activity
+
+Authorized management links to `/workspace/servers/:id/activity`. This RU/EN
+history shows existing server-target audit records for registration, listing
+updates and issued control challenges. Each entry includes a timestamp, public
+author identity when available, and an allowlist of submitted listing field names.
+The field list describes a saved edit request, not a reconstructed before/after
+diff. Raw details, previous/current values, IP/user-agent, credentials and challenge
+tokens are not selected or rendered.
+
+Current personal ownership or organization ownership/owner/admin/`manage_servers`
+rights are checked together with activity in a read-only repeatable-read snapshot.
+Platform administrators retain their management override; ordinary moderators
+need a server grant. Anonymous users cannot load activity, and missing/revoked
+access uses the same not-found result. There is no public history route.
+
+Pages show twenty entries and an earlier-activity link. The cursor names a
+server-scoped audit anchor; timestamp comparisons happen inside PostgreSQL so
+microsecond precision and equal-timestamp ID ordering survive pagination.
+A missing/deleted anchor returns an empty page with a latest-activity link.
+Only recorded server-target actions are shown. Verification-target moderator
+decisions, ownership transfers and historical before/after values are not part
+of this first listing-history surface.

@@ -15,7 +15,7 @@ export class OrganizationRepository {
   async findServerMembershipForUser(
     organizationId: string,
     userId: string,
-  ): Promise<Pick<OrganizationMember, "organizationId" | "role" | "permissions"> | null> {
+  ): Promise<Pick<typeof organizationMembers.$inferSelect, "organizationId" | "role" | "permissions"> | null> {
     if (!organizationId || !userId) return null;
     const [membership] = await db
       .select({

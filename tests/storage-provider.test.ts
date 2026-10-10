@@ -35,11 +35,10 @@ describe("Storage Abstraction & Integrity", () => {
     const stillExists = await provider.exists("resources/test-pkg.zip");
     expect(stillExists).toBe(false);
   });
-});
-
-it("fails closed instead of inventing an unauthenticated signed download URL", async () => {
+  it("fails closed instead of inventing an unauthenticated signed download URL", async () => {
   await expect(provider.getSignedDownloadUrl("resources/private.zip"))
     .rejects.toThrow("Local storage cannot issue signed URLs");
   await expect(provider.getSignedDownloadUrl("../escape.zip"))
     .rejects.toThrow("escapes the configured storage directory");
+  });
 });

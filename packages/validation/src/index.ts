@@ -140,7 +140,17 @@ export const createServerSchema = z.object({
   organizationId: z.string().regex(/^[a-zA-Z0-9_-]{1,128}$/).optional(),
 });
 
-export const updateServerSchema = createServerSchema.partial();
+// Zod applies inner defaults even through optional()/partial(). PATCH must
+// retain only supplied fields, or a description edit could reset private
+// visibility, custom ports, media and capacity to registration defaults.
+export const updateServerSchema = createServerSchema.extend({
+  mediaUrls: createServerSchema.shape.mediaUrls.unwrap(),
+  gameplayTags: createServerSchema.shape.gameplayTags.unwrap(),
+  port: createServerSchema.shape.port.unwrap(),
+  httpPort: createServerSchema.shape.httpPort.unwrap(),
+  maxPlayers: createServerSchema.shape.maxPlayers.unwrap(),
+  visibility: createServerSchema.shape.visibility.unwrap(),
+}).partial();
 
 // --- Product Schemas ---
 export const createProductSchema = z.object({
