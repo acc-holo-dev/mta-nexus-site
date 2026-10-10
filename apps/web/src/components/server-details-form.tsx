@@ -20,7 +20,9 @@ type EditableServer = {
   gameplayTags?: string[];
   ipAddress: string;
   port: number;
+  httpPort?: number | null;
   gameMode?: string;
+  mapName?: string | null;
   maxPlayers?: number;
   visibility: "public" | "unlisted" | "private";
 };
@@ -67,7 +69,9 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
           .filter(Boolean),
         ipAddress: String(form.get("ipAddress") || "").trim(),
         port: Number(form.get("port")),
+        httpPort: Number(form.get("httpPort")),
         gameMode: String(form.get("gameMode") || "").trim(),
+        mapName: String(form.get("mapName") || "").trim(),
         maxPlayers: Number(form.get("maxPlayers")),
         visibility: String(form.get("visibility") || "private"),
       };
@@ -211,7 +215,14 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         min: 1,
         max: 65535,
       })}
+      {field("httpPort", "HTTP port", server.httpPort ?? 22005, {
+        type: "number",
+        required: true,
+        min: 1,
+        max: 65535,
+      })}
       {field("gameMode", copy.gameMode, server.gameMode || "")}
+      {field("mapName", "Map name", server.mapName || "")}
       {field("maxPlayers", copy.maxPlayers, server.maxPlayers ?? 128, {
         type: "number",
         required: true,
