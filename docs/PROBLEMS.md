@@ -834,3 +834,14 @@ an HTTP failure that would trigger deletion of a referenced archive.
   external effects require a transactional outbox with durable retries.
 - **Acceptance:** run post-commit resilience tests on Node.js 26 and verify
   database records and retained files with PostgreSQL in CI.
+
+### P2. MTA master-list stream cancellation needs target-runtime acceptance
+
+The MTA directory reader now rejects invalid/oversized declared lengths before
+buffering, initiates cancellation without waiting on a potentially stalled
+upstream stream, and listens to the endpoint timeout during body reads. A
+malfunctioning mirror must not block fallback to another configured mirror.
+
+- **Remaining acceptance:** run bounded-reader tests on the required Node.js 26
+  runtime and verify fallback during real upstream stalls. The current hosted
+  GitHub runner blocker still prevents an exact-SHA CI/browser acceptance pass.

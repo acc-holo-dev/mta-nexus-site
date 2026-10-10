@@ -262,24 +262,43 @@ export function parseMtaMasterList(data: ArrayBuffer): MtaMasterServer[] {
 export async function readBoundedMasterPayload(
   response: Response,
   maxBytes = MAX_MASTER_PAYLOAD_BYTES,
+  signal?: AbortSignal,
 ): Promise<ArrayBuffer> {
   if (!Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > MAX_MASTER_PAYLOAD_BYTES) {
     throw new Error("Invalid MTA master-list payload size limit");
   }
+  if (signal?.aborted) {
+    void response.body?.cancel().catch(() => {});
+    signal.throwIfAborted();
+  }
   const declaredLength = response.headers.get("content-length");
-  if (declaredLength && Number(declaredLength) > maxBytes) {
-    await response.body?.cancel();
+  if (
+    declaredLength !== null &&
+    (!/^[0-9]+$/u.test(declaredLength) ||
+      !Number.isSafeInteger(Number(declaredLength)) ||
+      Number(declaredLength) > maxBytes)
+  ) {
+    // A faulty mirror may never settle its stream's cancel() promise.
+    // Reject immediately rather than blocking the next healthy mirror.
+    void response.body?.cancel().catch(() => {});
     throw new Error("MTA master-list payload exceeds safety limit");
   }
   if (!response.body) throw new Error("MTA master-list response has no body");
 
   const reader = response.body.getReader();
+  const cancel = () => {
+    void reader.cancel().catch(() => {});
+  };
+  signal?.addEventListener("abort", cancel, { once: true });
+  if (signal?.aborted) cancel();
   // Keep bounded byte storage rather than one retained object per HTTP chunk.
   let bytes = new Uint8Array(Math.min(maxBytes, 64 * 1024));
   let total = 0;
   try {
     while (true) {
+      signal?.throwIfAborted();
       const { done, value } = await reader.read();
+      signal?.throwIfAborted();
       if (done) break;
       if (value.byteLength > maxBytes - total) {
         throw new Error("MTA master-list payload exceeds safety limit");
@@ -295,10 +314,12 @@ export async function readBoundedMasterPayload(
       bytes.set(value, total);
       total = needed;
     }
+    signal?.throwIfAborted();
   } catch (error) {
-    await reader.cancel().catch(() => {});
+    cancel();
     throw error;
   } finally {
+    signal?.removeEventListener("abort", cancel);
     reader.releaseLock();
   }
   // The returned ArrayBuffer must exclude unused capacity.
@@ -324,14 +345,15 @@ export async function requestMtaMasterDirectoryFromEndpoints(
     if (remainingMs <= 0) break;
 
     try {
+      const endpointSignal = AbortSignal.timeout(
+        Math.min(MASTER_ENDPOINT_TIMEOUT_MS, remainingMs),
+      );
       const response = await fetcher(endpoint, {
         cache: "no-store",
         // Do not redirect operator-approved HTTPS endpoints to another host
         // or scheme, particularly to a private/local network address.
         redirect: "error",
-        signal: AbortSignal.timeout(
-          Math.min(MASTER_ENDPOINT_TIMEOUT_MS, remainingMs),
-        ),
+        signal: endpointSignal,
         headers: {
           "user-agent": "MTA-Nexus/1.0 (+https://nexus-mta.com)",
         },
@@ -344,7 +366,9 @@ export async function requestMtaMasterDirectoryFromEndpoints(
         continue;
       }
 
-      const payload = await readBoundedMasterPayload(response);
+      const payload = await readBoundedMasterPayload(
+        response, MAX_MASTER_PAYLOAD_BYTES, endpointSignal,
+      );
       const servers = parseMtaMasterList(payload)
         .filter((server) => server.responding !== false)
         .sort((a, b) => (b.players ?? 0) - (a.players ?? 0));

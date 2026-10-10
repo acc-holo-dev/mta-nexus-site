@@ -323,6 +323,76 @@ describe("bounded MTA master-list transport", () => {
       .rejects.toThrow("payload exceeds safety limit");
     expect(cancelled).toBe(true);
   });
+
+  it("rejects malformed advertised lengths before buffering a mirror response", async () => {
+    for (const length of ["NaN", "-1", "1e6", "9007199254740992"]) {
+      let cancelled = false;
+      const body = new ReadableStream<Uint8Array>({
+        cancel() { cancelled = true; },
+      });
+      await expect(readBoundedMasterPayload(
+        new Response(body, { headers: { "content-length": length } }), 16,
+      )).rejects.toThrow("payload exceeds safety limit");
+      expect(cancelled).toBe(true);
+    }
+  });
+
+  it("rejects oversized declared content without awaiting a stalled cancel", async () => {
+    let cancelled = false;
+    const response = new Response(new ReadableStream<Uint8Array>({
+      cancel() {
+        cancelled = true;
+        return new Promise<void>(() => {});
+      },
+    }), { headers: { "content-length": "17" } });
+
+    await expect(readBoundedMasterPayload(response, 16))
+      .rejects.toThrow("payload exceeds safety limit");
+    expect(cancelled).toBe(true);
+  });
+
+  it("rejects oversized stream chunks without awaiting a stalled cancel", async () => {
+    let cancelled = false;
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(8));
+        controller.enqueue(new Uint8Array(9));
+      },
+      cancel() {
+        cancelled = true;
+        return new Promise<void>(() => {});
+      },
+    });
+
+    await expect(readBoundedMasterPayload(new Response(body), 16))
+      .rejects.toThrow("payload exceeds safety limit");
+    expect(cancelled).toBe(true);
+    expect(body.locked).toBe(false);
+  });
+
+  it("aborts a stalled mirror stream even if its cancellation never settles", async () => {
+    const active = new AbortController();
+    let notifyPull!: () => void;
+    const pulling = new Promise<void>((resolve) => {
+      notifyPull = resolve;
+    });
+    let cancelled = false;
+    const body = new ReadableStream<Uint8Array>({
+      pull() { notifyPull(); },
+      cancel() {
+        cancelled = true;
+        return new Promise<void>(() => {});
+      },
+    }, { highWaterMark: 0 });
+
+    const reading = readBoundedMasterPayload(new Response(body), 16, active.signal);
+    await pulling;
+    active.abort();
+    await expect(reading).rejects.toMatchObject({ name: "AbortError" });
+    expect(cancelled).toBe(true);
+    expect(body.locked).toBe(false);
+  });
+
 });
 
 describe("MTA master endpoint fallback", () => {
