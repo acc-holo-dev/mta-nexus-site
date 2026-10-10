@@ -302,6 +302,20 @@
       "when": 1791664800000,
       "tag": "0042_content_discussion_lookup",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1791672000000,
+      "tag": "0043_resource_acquisition_activity",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1791675600000,
+      "tag": "0044_follow_workspace_lookup",
+      "breakpoints": true
     }
   ]
 }

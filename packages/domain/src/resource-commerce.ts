@@ -1,4 +1,19 @@
 import type { ProductStatus } from "./entities";
+import type { Entitlement } from "./entities";
+
+/** An existing license is access, never a newly issued permanent grant. */
+export type FreeResourceClaimResult =
+  | { entitlement: Entitlement; alreadyClaimed: boolean; accessSource: "entitlement" }
+  | {
+      entitlement: null;
+      alreadyClaimed: true;
+      accessSource: "license";
+      license: { productId: string; expiresAt: Date | null };
+    };
+
+export const RESOURCE_ACTIVITY_DAYS = [7, 30, 90, 365] as const;
+export type ResourceActivityDays = (typeof RESOURCE_ACTIVITY_DAYS)[number];
+export type ResourceAcquisitionSource = "direct" | "cart";
 
 export const RESOURCE_CART_LIMIT = 20;
 export const RESOURCE_LIFECYCLE_ACTIONS = ["archive", "restore", "submit"] as const;

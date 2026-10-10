@@ -103,14 +103,14 @@ describe("expired free resource claims", () => {
     expect(created).toHaveLength(1);
     expect(reused).toHaveLength(9);
 
-    const renewedEntitlementId = created[0]?.entitlement.id;
+    const renewedEntitlementId = created[0]?.entitlement?.id;
     expect(renewedEntitlementId).toBeTruthy();
     expect(
       attempts.every(
-        (attempt) => attempt.entitlement.id === renewedEntitlementId,
+        (attempt) => attempt.entitlement?.id === renewedEntitlementId,
       ),
     ).toBe(true);
-    expect(created[0]?.entitlement.expiresAt).toBeFalsy();
+    expect(created[0]?.entitlement?.expiresAt).toBeFalsy();
 
     expect(
       await entitlementRepository.hasEntitlement(
@@ -144,7 +144,7 @@ describe("expired free resource claims", () => {
       productId,
     });
     expect(retry.alreadyClaimed).toBe(true);
-    expect(retry.entitlement.id).toBe(renewedEntitlementId);
+    expect(retry.entitlement?.id).toBe(renewedEntitlementId);
 
     const afterRetry = await productRepository.findById(productId);
     expect(afterRetry?.salesCount).toBe(1);

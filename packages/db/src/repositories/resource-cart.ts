@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gt, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
 import {
   AppError,
   RESOURCE_CART_LIMIT,
@@ -17,7 +17,6 @@ import {
 } from "../schema";
 import { trustedCleanScanCondition } from "./build-safety";
 import {
-  assertFreeResourceAvailable,
   claimFreeResourceInTransaction,
   type ResourceTransaction,
 } from "./entitlements";
@@ -172,30 +171,12 @@ export class ResourceCartRepository {
         .for("no key update");
       const acquired: ResourceCartAcquisition["acquired"] = [];
       for (const [index, productId] of ids.entries()) {
-        // An active legacy grant is still owned: don't create a permanent
-        // entitlement that would outlive a paid license's expiry or revocation.
-        const [legacy] = await tx
-          .select({ id: licenses.id })
-          .from(licenses)
-          .where(
-            and(
-              eq(licenses.userId, input.userId),
-              eq(licenses.productId, productId),
-              eq(licenses.status, "active"),
-              or(isNull(licenses.expiresAt), gt(licenses.expiresAt, new Date())),
-            ),
-          )
-          .limit(1)
-          .for("share");
-        if (legacy) {
-          await assertFreeResourceAvailable(tx, productId);
-          acquired.push({ productId, alreadyClaimed: true });
-          continue;
-        }
         const result = await claimFreeResourceInTransaction(tx, {
           entitlementId: input.entitlementIds[index],
           userId: input.userId,
           productId,
+          source: "cart",
+          requestId: input.requestId,
         });
         acquired.push({ productId, alreadyClaimed: result.alreadyClaimed });
       }

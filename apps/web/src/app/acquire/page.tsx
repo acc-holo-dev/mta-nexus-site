@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../components/locale-context";
+import { confirmedResourceClaim } from "../../lib/resource-commerce-confirmation";
+import { getResourceActivityCopy } from "../../lib/resource-activity-i18n";
 
 interface ProductInfo {
   id: string;
@@ -26,6 +28,7 @@ function AcquireContent() {
   const productId = searchParams.get("productId");
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.checkout;
+  const activityCopy = getResourceActivityCopy(locale);
   const summaryHeadingId = useId();
   const accessHeadingId = useId();
   const accessDescriptionId = useId();
@@ -34,6 +37,7 @@ function AcquireContent() {
   const [loadRevision, setLoadRevision] = useState(0);
   const [loading, setLoading] = useState(false);
   const [claimedProductId, setClaimedProductId] = useState<string | null>(null);
+  const [claimedAccess, setClaimedAccess] = useState<ReturnType<typeof confirmedResourceClaim>>(null);
   const [error, setError] = useState<string | null>(null);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(loadRevision): Explicit refresh trigger; changing it must restart this request.
@@ -100,13 +104,12 @@ function AcquireContent() {
       });
 
       const data = await response.json().catch(() => null);
-      // The claim API answers 201 with { entitlement, alreadyClaimed } and does
-      // not include a success flag; a claim is successful when an entitlement
-      // object is present.
-      if (!response.ok || !data?.entitlement) {
+      const confirmed = confirmedResourceClaim(data, product.id);
+      if (!response.ok || !confirmed) {
         throw new Error(data?.error || copy.claimFailed);
       }
 
+      setClaimedAccess(confirmed);
       setClaimedProductId(product.id);
     } catch (caught: unknown) {
       setError(
@@ -133,11 +136,14 @@ function AcquireContent() {
           </div>
           <div>
             <h1 className="font-display text-primary">
-              {copy.resourceAdded}
+              {claimedAccess?.kind === "license" ? activityCopy.licenseTitle : copy.resourceAdded}
             </h1>
             <p className="mt-2 text-sm text-muted">
-              {copy.resourceAddedMessage}
+              {claimedAccess?.kind === "license" ? activityCopy.licenseNote : copy.resourceAddedMessage}
             </p>
+            {claimedAccess?.kind === "license" ? <p className="mt-3 text-sm text-secondary">{claimedAccess.expiresAt
+              ? <>{activityCopy.expires} <time dateTime={claimedAccess.expiresAt}>{new Date(claimedAccess.expiresAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}</time></>
+              : activityCopy.perpetual}</p> : null}
           </div>
 
           <div className="flex flex-col justify-center gap-3 pt-2 sm:flex-row">

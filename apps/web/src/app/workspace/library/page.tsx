@@ -1,4 +1,5 @@
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
+import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -64,6 +65,7 @@ export default async function ResourceLibraryPage({
       </header>
 
       <Link href="/workspace/cart" className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceCommerceCopy(locale).openCart}</Link>
+      <Link href="/workspace/acquisitions" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceActivityCopy(locale).history}</Link>
       <nav aria-label={copy.title} className="flex flex-wrap gap-2">
         {filters.map((value) => (
           <Link

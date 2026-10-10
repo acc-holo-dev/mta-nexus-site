@@ -136,12 +136,29 @@ it("returns an existing full grant after the projected product and safe build ch
 
 it("creates a full grant and increments the counter only after all preflight checks", async () => {
   const newRow = [...grantRow]; newRow[0] = "new-entitlement";
-  state.results = [[], [["published", 0]], [["safe-build"]], [], [newRow], []];
+  state.results = [[], [["published", 0]], [["safe-build"]], [], [], [newRow], [], []];
   expect(await repository.claimFreeResource({ entitlementId: "new-entitlement", userId: "user", productId: "resource" }))
     .toMatchObject({ alreadyClaimed: false, entitlement: { id: "new-entitlement", resourceId: "resource" } });
-  expect(state.queries).toHaveLength(6);
-  expect(state.queries[4].sql).toMatch(/^insert into "entitlements" /);
-  expect(state.queries[4].sql).toContain('returning "id", "subject_type"');
-  expect(state.queries[5].sql).toContain('"products"."sales_count" + 1');
-  expect(state.queries[5].params).toContain("resource");
+  expect(state.queries).toHaveLength(8);
+  expect(state.queries[5].sql).toMatch(/^insert into "entitlements" /);
+  expect(state.queries[5].sql).toContain('returning "id", "subject_type"');
+  expect(state.queries[6].sql).toMatch(/^insert into "resource_acquisition_events" /);
+  expect(state.queries[6].params).toContain("new-entitlement");
+  expect(state.queries[6].params).toContain("direct");
+  expect(state.queries[7].sql).toContain('"products"."sales_count" + 1');
+  expect(state.queries[7].params).toContain("resource");
+});
+
+it.each([new Date("2026-11-01T10:00:00Z"), null])("preserves existing license access without creating a permanent grant or acquisition", async expiresAt => {
+  state.results = [[], [["published", 0]], [["safe-build"]], [], [["resource", expiresAt?.toISOString() ?? null]]];
+  expect(await repository.claimFreeResource({ entitlementId: "unused", userId: "user", productId: "resource" }))
+    .toEqual({ entitlement: null, alreadyClaimed: true, accessSource: "license", license: { productId: "resource", expiresAt } });
+  expect(state.queries).toHaveLength(5);
+  const query = state.queries[4];
+  expect(query.sql).toMatch(/^select "product_id", "expires_at" from "licenses" /);
+  expect(query.sql).toContain("for share");
+  expect(query.sql).not.toContain('"key"');
+  expect(query.params).toContain("active");
+  expect(query.params).toContain(now.toISOString());
+  expect(state.queries.some(q => q.sql.startsWith("insert") || q.sql.startsWith("update"))).toBe(false);
 });

@@ -462,6 +462,28 @@ export const resourceCartAcquisitions = pgTable(
   (table) => [primaryKey({ columns: [table.userId, table.requestId] })],
 );
 
+/** Provenance of new free grants. Historical licenses/payments are not backfilled. */
+export const resourceAcquisitionEvents = pgTable("resource_acquisition_events", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  // Keep the event when a resource or its grant is removed. Private metadata is
+  // obtained from current authorization, never from a frozen public title.
+  productId: text("product_id").notNull(),
+  entitlementId: text("entitlement_id").references(() => entitlements.id, { onDelete: "set null" }),
+  source: text("source").$type<"direct" | "cart">().notNull(),
+  requestId: text("request_id"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  uniqueIndex("resource_acquisition_entitlement_idx").on(table.entitlementId),
+  index("resource_acquisition_user_created_idx").on(table.userId, table.createdAt.desc(), table.id.desc()),
+  index("resource_acquisition_product_created_idx").on(table.productId, table.createdAt.desc(), table.id.desc()),
+  check("resource_acquisition_source_check", sql`${table.source} IN ('direct', 'cart')`),
+  check("resource_acquisition_request_check", sql`(
+    (${table.source} = 'direct' AND ${table.requestId} IS NULL)
+    OR (${table.source} = 'cart' AND ${table.requestId} IS NOT NULL AND length(${table.requestId}) BETWEEN 1 AND 128)
+  )`),
+]);
+
 // 14. Order Items
 export const orderItems = pgTable("order_items", {
   id: text("id").primaryKey(),
@@ -595,6 +617,7 @@ export const follows = pgTable(
   },
   (table) => [
     uniqueIndex("unique_follow_idx").on(table.followerId, table.targetType, table.targetId),
+    index("follows_follower_created_id_idx").on(table.followerId, table.createdAt.desc(), table.id.desc()),
   ]
 );
 
@@ -743,6 +766,8 @@ export const auditEvents = pgTable("audit_events", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [
   index("audit_events_target_created_id_idx").on(table.targetType, table.targetId, table.createdAt.desc(), table.id.desc()),
+  index("audit_events_download_activity_idx").on(table.targetId, table.createdAt.desc(), table.id.desc())
+    .where(sql`${table.targetType} = 'product' AND ${table.action} = 'product.download_started'`),
 ]);
 
 // 24. Reports

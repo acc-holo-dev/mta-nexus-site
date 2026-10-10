@@ -34,7 +34,7 @@ const state = vi.hoisted(() => ({
   },
 }));
 
-const auditRecord = vi.hoisted(() => vi.fn(async () => undefined));
+const auditRecord = vi.hoisted(() => vi.fn(async (_input?: unknown) => undefined));
 const downloadStream = vi.hoisted(() => vi.fn());
 const findLatestPublishedBuild = vi.hoisted(() => vi.fn());
 const findPinnedPublishedBuild = vi.hoisted(() => vi.fn());
@@ -67,6 +67,9 @@ vi.mock("@nexus/db", () => ({
   },
   auditRepository: {
     record: auditRecord,
+  },
+  resourceDownloadAuthorizationRepository: {
+    authorize: async (input: unknown) => { await auditRecord(input); return { slug: state.product?.slug ?? "http-resource" }; },
   },
 }));
 
@@ -142,7 +145,7 @@ describe("resource download HTTP contract", () => {
       stream: Readable.from(Buffer.from("nexus-build")),
       meta: {
         sizeBytes: Buffer.byteLength("nexus-build"),
-        sha256Hash: state.build!.sha256Hash,
+        sha256Hash: state.build?.sha256Hash,
         mimeType: "application/zip",
       },
     });
@@ -285,7 +288,7 @@ describe("resource download HTTP contract", () => {
       stream: openedStream,
       meta: {
         sizeBytes: Buffer.byteLength("nexus-build"),
-        sha256Hash: state.build!.sha256Hash,
+        sha256Hash: state.build?.sha256Hash,
         mimeType: "application/zip",
       },
     });
@@ -366,8 +369,9 @@ describe("resource download HTTP contract", () => {
     expect(auditRecord).toHaveBeenCalledTimes(1);
     expect(auditRecord).toHaveBeenCalledWith(
       expect.objectContaining({
-        action: "product.download_started",
-        targetId: "prd_http",
+        actorId: "usr_player",
+        expected: expect.objectContaining({ productId: "prd_http", id: "bld_http" }),
+        pinned: false,
       }),
     );
   });
@@ -416,7 +420,7 @@ describe("pinned historical build downloads", () => {
     );
     downloadStream.mockResolvedValue({
       stream: Readable.from(Buffer.from("historical")),
-      meta: { sizeBytes: Buffer.byteLength("historical"), sha256Hash: state.build!.sha256Hash, mimeType: "application/zip" },
+      meta: { sizeBytes: Buffer.byteLength("historical"), sha256Hash: state.build?.sha256Hash, mimeType: "application/zip" },
     });
   });
 
@@ -436,12 +440,11 @@ describe("pinned historical build downloads", () => {
     expect(downloadStream).toHaveBeenCalledWith("assets/old-resource.zip", expect.any(AbortSignal));
     expect(await response.text()).toBe("historical");
     expect(auditRecord).toHaveBeenCalledWith(expect.objectContaining({
-      action: "product.download_started",
-      details: expect.objectContaining({
-        buildId: "bld_historical_1",
+      expected: expect.objectContaining({
+        id: "bld_historical_1",
         version: "1.0.0",
-        pinned: true,
       }),
+      pinned: true,
     }));
   });
 

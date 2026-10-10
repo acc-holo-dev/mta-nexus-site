@@ -92,7 +92,8 @@ describe("safe resource acquisition", () => {
 
     expect(first.alreadyClaimed).toBe(false);
     expect(second.alreadyClaimed).toBe(true);
-    expect(second.entitlement.id).toBe(first.entitlement.id);
+    expect(first.entitlement?.id).toBeTruthy();
+    expect(second.entitlement?.id).toBe(first.entitlement?.id);
     expect(
       await entitlementRepository.hasEntitlement(
         { type: "user", id: player.id },

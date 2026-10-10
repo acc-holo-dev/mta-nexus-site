@@ -10,6 +10,8 @@ import {
 import { getTrustedRequestIp } from "../../../../lib/request-client-ip";
 import { authService } from "../../../../lib/services/auth-service";
 import { commerceService } from "../../../../lib/services/commerce-service";
+import { AppError } from "@nexus/domain";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -58,9 +60,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const parsed = claimResourceSchema.safeParse(
-      await request.json().catch(() => null),
-    );
+    requireServerJsonContentType(request);
+    if (request.headers.get("sec-fetch-site") === "cross-site") throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
+    const parsed = claimResourceSchema.safeParse(await readBoundedJson(request, 2048));
     if (!parsed.success) {
       return json(
         context,

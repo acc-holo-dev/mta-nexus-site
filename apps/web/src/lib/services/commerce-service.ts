@@ -1,6 +1,6 @@
 import { entitlementRepository, resourceCartRepository, orderRepository } from "@nexus/db";
 import { generateId } from "@nexus/security";
-import type { Entitlement, User } from "@nexus/domain";
+import type { FreeResourceClaimResult, User } from "@nexus/domain";
 
 /**
  * Closed-beta resource access service.
@@ -40,7 +40,7 @@ export class CommerceService {
   async claimFreeResource(input: {
     user: User;
     productId: string;
-  }): Promise<{ entitlement: Entitlement; alreadyClaimed: boolean }> {
+  }): Promise<FreeResourceClaimResult> {
     return entitlementRepository.claimFreeResource({
       entitlementId: generateId("ent"),
       userId: input.user.id,

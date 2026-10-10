@@ -207,8 +207,8 @@ export const createBuildSchema = z.object({
 
 // --- Resource acquisition ---
 export const claimResourceSchema = z.object({
-  productId: z.string().min(1),
-});
+  productId: z.string().regex(/^[A-Za-z0-9_-]{1,128}$/u),
+}).strict();
 
 // --- Checkout & Orders ---
 export const checkoutSchema = z.object({

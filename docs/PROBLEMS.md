@@ -1,5 +1,18 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Acquisition provenance and publisher activity — 2026-10-10
+
+Migration `0043_resource_acquisition_activity` records new direct/cart free
+grants in the entitlement transaction. Buyer history masks withdrawn metadata;
+publisher activity and CSV expose only aggregate free grants and download
+starts, with live personal/organization authority and UTC periods. Existing
+licenses are preserved by the shared claim path rather than converted into
+permanent grants. Customer file delivery rechecks rights and exact artifact
+evidence after storage opens and closes the stream on denial. Personal sales
+history no longer includes organization resources merely authored by the user.
+Live PostgreSQL migration/concurrency and browser acceptance remain pending;
+paid checkout, financial balances and renewal are not enabled by this block.
+
 ### Resource variants and requirements — 2026-10-10
 
 Migration `0041_resource_variants` adds bounded catalog groups, unique resource
@@ -1212,6 +1225,7 @@ services remain the sources. Private follow lists use 20-item microsecond keyset
 and masked unavailable targets; desired-state mutations serialize one follow key,
 lock fresh target availability and notify only the first actual creation.
 Five PostgreSQL fixtures, browser interaction and full production generation
-remain pending. Agent A should add `follows_follower_created_id_idx` on
-`follows (follower_id, created_at DESC, id DESC)` for large private lists;
-no schema or migration was changed by this block.
+remain pending. Agent A added `follows_follower_created_id_idx` on
+`follows (follower_id, created_at DESC, id DESC)` through migration 0044 for
+large private lists. Applying it and checking PostgreSQL query plans remain
+pending; Agent B's discovery block did not change schema or migrations.

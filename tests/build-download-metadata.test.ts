@@ -39,6 +39,7 @@ vi.mock("@nexus/db", () => {
   };
   return {
     buildReviewDownloadRepository: { authorize: mocks.audit },
+    resourceDownloadAuthorizationRepository: { authorize: async (input: unknown) => { await mocks.audit(input); return { slug: "product" }; } },
     productRepository: {
       findById: async () => ({ id: "product", slug: "product", status: "published" }),
     },

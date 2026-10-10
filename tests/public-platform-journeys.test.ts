@@ -148,7 +148,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     });
 
     expect(claim.alreadyClaimed).toBe(false);
-    expect(claim.entitlement.permission).toBe("product.download");
+    expect(claim.entitlement?.permission).toBe("product.download");
 
     // 3. After acquisition: check entitlement -> true
     const hasEntitled = await commerceService.checkEntitlement(

@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import { orders, orderItems, products, builds, entitlements, licenses } from "../schema";
 import type { Order, OrderItem } from "@nexus/domain";
@@ -107,6 +107,7 @@ export class OrderRepository {
   async pageSellerHistory(sellerId: string, requestedPage = 1) {
     const scope = and(
       eq(products.authorId, sellerId),
+      isNull(products.organizationId),
       eq(orders.status, "completed"),
     );
     const [summary] = await db.select({ total: count() })
@@ -200,11 +201,11 @@ export class OrderRepository {
       .from(orderItems)
       .innerJoin(orders, eq(orderItems.orderId, orders.id))
       .innerJoin(products, eq(orderItems.productId, products.id))
-      .where(eq(products.authorId, sellerId))
-      .orderBy(desc(orders.createdAt))
-      .limit(limit);
+      .where(and(eq(products.authorId, sellerId), isNull(products.organizationId), eq(orders.status, "completed")))
+      .orderBy(desc(orders.createdAt), desc(orderItems.id))
+      .limit(Number.isSafeInteger(limit) ? Math.max(1, Math.min(100, limit)) : 100);
 
-    return rows.filter((r) => r.orderStatus === "completed");
+    return rows;
   }
 }
 

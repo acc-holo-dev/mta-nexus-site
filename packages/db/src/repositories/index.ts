@@ -43,3 +43,5 @@ export * from "./resource-compatibility";
 export * from "./build-review-download";
 export { publicDirectoryRepository } from "./public-directory";
 export { followWorkspaceRepository } from "./follow-workspace";
+export * from "./resource-activity";
+export * from "./resource-download-authorization";

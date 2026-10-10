@@ -1,7 +1,7 @@
 import { resourceAttachmentFileName } from "../../../../../lib/resource-attachment-filename";
-import { ValidationError } from "@nexus/domain";
+import { AppError, ValidationError } from "@nexus/domain";
 import {
-  auditRepository,
+  resourceDownloadAuthorizationRepository,
   buildRepository,
   productRepository,
 } from "@nexus/db";
@@ -185,20 +185,14 @@ export async function GET(
         selectedBuild,
       );
 
+    let authorized: { slug: string };
     try {
       request.signal.throwIfAborted();
-      await auditRepository.record({
-        id: generateId("aud"),
+      authorized = await resourceDownloadAuthorizationRepository.authorize({
+        auditId: generateId("aud"),
         actorId: user.id,
-        actorType: "user",
-        action: "product.download_started",
-        targetId: productId,
-        targetType: "product",
-        details: {
-          buildId: selectedBuild.id,
-          version: selectedBuild.version,
-          pinned: selection.kind === "pinned",
-        },
+        expected: selectedBuild,
+        pinned: selection.kind === "pinned",
       });
       request.signal.throwIfAborted();
     } catch (error) {
@@ -209,7 +203,7 @@ export async function GET(
     const stream =
       toDownloadWebStream(stored.stream);
     const fileName = resourceAttachmentFileName(
-      product.slug,
+      authorized.slug,
       selectedBuild.version,
       selectedBuild.fileName,
     );
@@ -267,6 +261,8 @@ export async function GET(
         404,
       );
     }
+
+    if (error instanceof AppError) return json(context, { error: error.message, code: error.code }, error.statusCode);
 
     logRequestEvent({
       level: "error",

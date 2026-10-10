@@ -1,9 +1,9 @@
-import { and, eq, gt, isNull, or, sql } from "drizzle-orm";
+import { and, desc, eq, gt, isNull, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { builds, entitlements, licenses, products } from "../schema";
+import { builds, entitlements, licenses, products, resourceAcquisitionEvents } from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
 import { NotFoundError, ValidationError } from "@nexus/domain";
-import type { Entitlement } from "@nexus/domain";
+import type { Entitlement, FreeResourceClaimResult, ResourceAcquisitionSource } from "@nexus/domain";
 
 export type ResourceTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -44,8 +44,10 @@ export async function claimFreeResourceInTransaction(
     entitlementId: string;
     userId: string;
     productId: string;
+    source?: ResourceAcquisitionSource;
+    requestId?: string;
   },
-): Promise<{ entitlement: Entitlement; alreadyClaimed: boolean }> {
+): Promise<FreeResourceClaimResult> {
   const lockKey = `free-resource:${input.userId}:${input.productId}`;
   await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`);
 
@@ -64,14 +66,31 @@ export async function claimFreeResourceInTransaction(
         or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, now)),
       ),
     )
-    .limit(1);
+    .limit(1)
+    .for("share");
 
   if (existingRows[0]) {
     return {
       entitlement: existingRows[0] as unknown as Entitlement,
       alreadyClaimed: true,
+      accessSource: "entitlement",
     };
   }
+
+  // Both paths preserve an active license's original expiry and revocation.
+  // Select only access facts; never serialize license keys or runtime secrets.
+  const [legacy] = await tx
+    .select({ productId: licenses.productId, expiresAt: licenses.expiresAt })
+    .from(licenses)
+    .where(and(
+      eq(licenses.userId, input.userId), eq(licenses.productId, input.productId),
+      eq(licenses.status, "active"),
+      or(isNull(licenses.expiresAt), gt(licenses.expiresAt, now)),
+    ))
+    .orderBy(desc(licenses.expiresAt), desc(licenses.createdAt), desc(licenses.id))
+    .limit(1)
+    .for("share");
+  if (legacy) return { entitlement: null, alreadyClaimed: true, accessSource: "license", license: legacy };
 
   const rows = await tx
     .insert(entitlements)
@@ -81,9 +100,19 @@ export async function claimFreeResourceInTransaction(
       subjectId: input.userId,
       permission: "product.download",
       resourceId: input.productId,
-      createdAt: new Date(),
+      createdAt: now,
     })
     .returning();
+
+  await tx.insert(resourceAcquisitionEvents).values({
+    id: input.entitlementId,
+    userId: input.userId,
+    productId: input.productId,
+    entitlementId: input.entitlementId,
+    source: input.source ?? "direct",
+    requestId: input.source === "cart" ? input.requestId : null,
+    createdAt: now,
+  });
 
   await tx
     .update(products)
@@ -95,6 +124,7 @@ export async function claimFreeResourceInTransaction(
   return {
     entitlement: rows[0] as unknown as Entitlement,
     alreadyClaimed: false,
+    accessSource: "entitlement",
   };
 }
 
@@ -177,7 +207,7 @@ export class EntitlementRepository {
     entitlementId: string;
     userId: string;
     productId: string;
-  }): Promise<{ entitlement: Entitlement; alreadyClaimed: boolean }> {
+  }): Promise<FreeResourceClaimResult> {
     return db.transaction(async (tx) => {
       return claimFreeResourceInTransaction(tx, input);
     });

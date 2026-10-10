@@ -3,6 +3,7 @@ import { canTransitionResource } from "@nexus/domain";
 import {
   confirmedCartAcquisition,
   confirmedResourceCart,
+  confirmedResourceClaim,
 } from "../apps/web/src/lib/resource-commerce-confirmation";
 import { resourceCommerceError } from "../apps/web/src/lib/resource-commerce-i18n";
 
@@ -25,6 +26,24 @@ it("accepts only a confirmed acquisition of the exact selected resources", () =>
   expect(
     confirmedCartAcquisition({ success: true, acquired: result.acquired }, ["a", "b"]),
   ).toBeNull();
+});
+
+it("confirms an existing license separately and rejects wrong-resource or fabricated success", () => {
+  const license = { entitlement: null, alreadyClaimed: true, accessSource: "license", license: { productId: "prd_a", expiresAt: "2026-11-01T00:00:00.000Z" } };
+  expect(confirmedResourceClaim(license, "prd_a")).toEqual({ kind: "license", expiresAt: license.license.expiresAt });
+  expect(confirmedResourceClaim(license, "prd_b")).toBeNull();
+  expect(confirmedResourceClaim({ ...license, alreadyClaimed: false }, "prd_a")).toBeNull();
+  expect(confirmedResourceClaim({ ...license, entitlement: { id: "invented" } }, "prd_a")).toBeNull();
+  expect(confirmedResourceClaim({ ...license, license: { ...license.license, expiresAt: "tomorrow" } }, "prd_a")).toBeNull();
+  expect(confirmedResourceClaim({ ...license, license: { ...license.license, expiresAt: null } }, "prd_a")).toEqual({ kind: "license", expiresAt: null });
+  expect(confirmedResourceClaim({ success: true }, "prd_a")).toBeNull();
+});
+
+it("confirms only a matching user download grant", () => {
+  const grant = { accessSource: "entitlement", alreadyClaimed: false, entitlement: { id: "ent_a", subjectType: "user", permission: "product.download", resourceId: "prd_a" } };
+  expect(confirmedResourceClaim(grant, "prd_a")).toEqual({ kind: "entitlement" });
+  expect(confirmedResourceClaim(grant, "prd_b")).toBeNull();
+  expect(confirmedResourceClaim({ ...grant, entitlement: { ...grant.entitlement, permission: "product.update" } }, "prd_a")).toBeNull();
 });
 it("rejects private metadata for unavailable cart resources", () => {
   const item = {

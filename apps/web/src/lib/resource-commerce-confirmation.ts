@@ -4,6 +4,21 @@ function record(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
+export function confirmedResourceClaim(value: unknown, productId: string):
+  { kind: "entitlement" } | { kind: "license"; expiresAt: string | null } | null {
+  if (!record(value) || typeof value.alreadyClaimed !== "boolean") return null;
+  if (value.accessSource === "license") {
+    if (value.alreadyClaimed !== true || value.entitlement !== null || !record(value.license) || value.license.productId !== productId) return null;
+    const expiry = value.license.expiresAt;
+    if (expiry !== null && (typeof expiry !== "string" || !Number.isFinite(Date.parse(expiry)) || new Date(expiry).toISOString() !== expiry)) return null;
+    return { kind: "license", expiresAt: expiry as string | null };
+  }
+  if (value.accessSource !== "entitlement" || !record(value.entitlement) ||
+    value.entitlement.resourceId !== productId || value.entitlement.subjectType !== "user" ||
+    value.entitlement.permission !== "product.download" || typeof value.entitlement.id !== "string" || !value.entitlement.id) return null;
+  return { kind: "entitlement" };
+}
+
 export function confirmedResourceCart(value: unknown): ResourceCart | null {
   if (
     !record(value) ||

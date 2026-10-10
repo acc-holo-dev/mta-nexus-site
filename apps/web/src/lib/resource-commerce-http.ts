@@ -33,7 +33,17 @@ export async function resourceCommerceRequest(
         : "resourceClaim";
       if (!(await consumeRateLimit(policy, actor.id)).success) throw new RateLimitExceededError();
     }
-    return respond(await operation(actor));
+    if (!mutation && /\/activity(?:\/|$)|^\/api\/acquisitions$/u.test(request.nextUrl.pathname)) {
+      if (!(await consumeRateLimit("resourceInspection", actor.id)).success) throw new RateLimitExceededError();
+    }
+    const result = await operation(actor);
+    if (result instanceof Response) {
+      result.headers.set("Cache-Control", "private, no-store");
+      result.headers.set("Vary", "Cookie");
+      result.headers.set("X-Request-Id", context.requestId);
+      return result;
+    }
+    return respond(result);
   } catch (error) {
     if (error instanceof AppError) return respond({ code: error.code }, error.statusCode);
     logRequestEvent({

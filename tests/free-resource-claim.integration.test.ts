@@ -131,7 +131,7 @@ describe("free resource claim idempotency", () => {
     const product = await productRepository.findById(productId);
 
     expect(first.alreadyClaimed).toBe(true);
-    expect(first.entitlement.resourceId).toBe(productId);
+    expect(first.entitlement?.resourceId).toBe(productId);
     expect(product?.salesCount).toBe(1);
   });
 });
