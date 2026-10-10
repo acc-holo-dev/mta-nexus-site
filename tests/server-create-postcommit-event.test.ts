@@ -93,6 +93,46 @@ describe("server creation after durable write", () => {
       .rejects.toMatchObject({ statusCode: 409, code: "SERVER_ENDPOINT_TAKEN" });
   });
 
+  it("canonicalizes MTA endpoints for both audited creation and managed edits", async () => {
+    const variant = "  PLAY.Example.COM.  ";
+    const created = await serverService.createServer(
+      { ...input, ipAddress: variant },
+      actor,
+    );
+    expect(created.ipAddress).toBe("play.example.com");
+    expect(mocks.insert).toHaveBeenLastCalledWith(
+      expect.objectContaining({ ipAddress: "play.example.com" }),
+      expect.objectContaining({
+        details: expect.objectContaining({ ip: "play.example.com" }),
+      }),
+      "user",
+    );
+
+    await serverService.updateServer("srv_1", { ipAddress: variant }, actor);
+    expect(mocks.managedUpdate).toHaveBeenLastCalledWith(
+      "srv_1",
+      { ipAddress: "play.example.com" },
+      expect.anything(),
+      actor,
+      undefined,
+    );
+  });
+
+  it.each(["", " ", ".", "example.com:22003", "bad..com"])(
+    "rejects invalid server address %j before writing",
+    async (invalid) => {
+      await expect(serverService.createServer(
+        { ...input, ipAddress: invalid },
+        actor,
+      )).rejects.toMatchObject({ statusCode: 400, code: "INVALID_SERVER_ADDRESS" });
+      expect(mocks.insert).not.toHaveBeenCalled();
+
+      await expect(serverService.updateServer("srv_1", { ipAddress: invalid }, actor))
+        .rejects.toMatchObject({ statusCode: 400, code: "INVALID_SERVER_ADDRESS" });
+      expect(mocks.managedUpdate).not.toHaveBeenCalled();
+    },
+  );
+
   it("canonicalizes personal and organizational ownership before persistence", async () => {
     await serverService.createServer({ ...input, ownerId: "usr_forged" }, actor);
     expect(mocks.insert).toHaveBeenLastCalledWith(

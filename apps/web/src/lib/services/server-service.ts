@@ -1,6 +1,12 @@
 import { serverRepository, organizationRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
-import { AppError, ForbiddenError, eventBus } from "@nexus/domain";
+import {
+  AppError,
+  ForbiddenError,
+  eventBus,
+  isValidMtaAddress,
+  normalizeMtaAddress,
+} from "@nexus/domain";
 import type { Server, User } from "@nexus/domain";
 import { isUniqueConstraintViolation } from "../postgres-error";
 
@@ -18,6 +24,14 @@ function throwServerMutationConflict(error: unknown): never {
   throw error;
 }
 
+
+function canonicalServerAddress(value: string): string {
+  const address = normalizeMtaAddress(value);
+  if (!isValidMtaAddress(address)) {
+    throw new AppError("Invalid MTA server address", 400, "INVALID_SERVER_ADDRESS");
+  }
+  return address;
+}
 
 type ServerDetailsUpdate = Partial<
   Pick<
@@ -52,12 +66,14 @@ class ServerService {
     // Organization authority is checked under row locks by createWithAudit.
     // Do not perform an authorization read outside its database transaction.
 
+    const ipAddress = canonicalServerAddress(input.ipAddress);
     const id = generateId("srv");
     let server: Server;
     try {
       server = await serverRepository.createWithAudit(
         {
           ...input,
+          ipAddress,
           // Ownership is derived from the authenticated actor, never a
           // caller-supplied ownerId. Organization listings have no personal owner.
           ownerId: input.organizationId ? undefined : actor.id,
@@ -73,7 +89,7 @@ class ServerService {
           action: "server.created",
           targetId: id,
           targetType: "server",
-          details: { name: input.name, ip: input.ipAddress, port: input.port },
+          details: { name: input.name, ip: ipAddress, port: input.port },
         },
         actor.role,
       );
@@ -135,10 +151,13 @@ class ServerService {
     actor: User,
     expectedUpdatedAt?: Date,
   ): Promise<Server> {
+    const canonicalUpdates = updates.ipAddress === undefined
+      ? updates
+      : { ...updates, ipAddress: canonicalServerAddress(updates.ipAddress) };
     try {
       return await serverRepository.updateManagedWithAudit(
         serverId,
-        updates,
+        canonicalUpdates,
         {
           id: generateId("aud"),
           actorId: actor.id,
@@ -146,7 +165,7 @@ class ServerService {
           action: "server.updated",
           targetId: serverId,
           targetType: "server",
-          details: { fields: Object.keys(updates) },
+          details: { fields: Object.keys(canonicalUpdates) },
         },
         actor,
         expectedUpdatedAt,

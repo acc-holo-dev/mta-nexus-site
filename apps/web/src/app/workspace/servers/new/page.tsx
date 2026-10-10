@@ -2,6 +2,7 @@
 
 import { type FormEvent, useEffect, useState } from "react";
 import { Button } from "@nexus/ui";
+import { normalizeMtaAddress } from "@nexus/domain";
 import { useNexusLocale } from "../../../../components/locale-context";
 import { confirmedCreatedServer } from "../../../../lib/server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../../../../lib/server-mutation-errors";
@@ -78,7 +79,7 @@ export default function RegisterServerPage() {
           .split(",")
           .map((value) => value.trim())
           .filter(Boolean),
-        ipAddress: String(form.get("ipAddress") || "").trim(),
+        ipAddress: normalizeMtaAddress(String(form.get("ipAddress") || "")),
         port: Number(form.get("port") || 22003),
         httpPort: Number(form.get("httpPort") || 22005),
         maxPlayers: Number(form.get("maxPlayers") || 128),

@@ -3,6 +3,7 @@
 import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nexus/ui";
+import { normalizeMtaAddress } from "@nexus/domain";
 import { confirmedUpdatedServer } from "../lib/server-mutation-confirmation";
 import { serverMutationErrorMessage } from "../lib/server-mutation-errors";
 import { privateApiRequest } from "../lib/private-api-request";
@@ -76,7 +77,7 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
           .split(",")
           .map((value) => value.trim())
           .filter(Boolean),
-        ipAddress: String(form.get("ipAddress") || "").trim(),
+        ipAddress: normalizeMtaAddress(String(form.get("ipAddress") || "")),
         port: Number(form.get("port")),
         httpPort: Number(form.get("httpPort")),
         gameMode: String(form.get("gameMode") || "").trim(),

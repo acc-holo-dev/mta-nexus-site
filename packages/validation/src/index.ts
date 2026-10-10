@@ -2,6 +2,8 @@ import {
   PRODUCT_TYPES,
   SUPPORT_CASE_CATEGORIES,
   SUPPORT_CASE_STATUSES,
+  normalizeMtaAddress,
+  isValidMtaAddress,
 } from "@nexus/domain";
 import { z } from "zod";
 
@@ -124,7 +126,11 @@ export const createServerSchema = z.object({
   language: z.string().trim().max(64).optional(),
   region: z.string().trim().max(64).optional(),
   gameplayTags: z.array(z.string().trim().min(1).max(32)).max(12).default([]),
-  ipAddress: z.string().min(1, "Server IP address or hostname is required"),
+  // Canonicalize before uniqueness checks and match the public MTA directory.
+  // The explicit game port is a separate field; do not accept host:port here.
+  ipAddress: z.string().max(255)
+    .transform(normalizeMtaAddress)
+    .refine(isValidMtaAddress, "Enter a valid MTA host or IP without a port"),
   port: z.coerce.number().int().min(1).max(65535).default(22003),
   httpPort: z.coerce.number().int().min(1).max(65535).default(22005),
   maxPlayers: z.coerce.number().int().min(1).max(4096).default(128),

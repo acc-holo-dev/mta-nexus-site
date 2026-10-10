@@ -949,3 +949,22 @@ timeouts. Both HTTP routes share the same bounded reader.
   passed seven focused scenarios (including a stalled stream). This is not
   project Vitest/typecheck or Node 26/PostgreSQL acceptance. Dedicated Vitest
   regressions were added and remain to be run after CI-001 is resolved.
+
+### P2. MTA server endpoint aliases and legacy normalization
+
+The official directory has always treated case and a terminal DNS dot as
+equivalent for endpoint matching, but editable server addresses previously
+retained the raw form in the PostgreSQL unique (address, game_port) index.
+Registration, owner updates, direct service entrypoints and their forms now
+share a domain-level canonicalizer. Both create/update Zod contracts reject
+empty, URL-shaped, credential-shaped, host:port and malformed address values
+while preserving IPv4, DNS and IPv6 spellings. Unit regressions cover equivalent
+hosts and invalid forms.
+
+**Remaining DB acceptance:** audit existing rows for canonically equivalent
+(address, game_port) tuples before adding any normalized database-level unique
+index. Do not automatically rewrite legacy addresses or add the expression
+constraint before resolving collisions and ownership claims. The raw unique
+index remains as a backstop for newly canonicalized writes, but legacy aliases
+and internal direct DB writers need a separate data migration. Exact-SHA Node
+26/PostgreSQL/browser CI is still blocked by CI-001.

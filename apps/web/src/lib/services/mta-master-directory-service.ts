@@ -1,4 +1,6 @@
 import { readMtaMasterMirrorUrls } from "@nexus/config";
+import { normalizeMtaAddress } from "@nexus/domain";
+export { normalizeMtaAddress } from "@nexus/domain";
 import { MTA_MASTER_FRESH_TTL_MS } from "../mta-directory-cache";
 
 const MTA_MASTER_URL = "https://master.multitheftauto.com/ase/mta/";
@@ -50,10 +52,6 @@ export function mtaLiveStatus(
 ): "online" | "offline" | "unknown" {
   if (isStale || !observation) return "unknown";
   return observation.responding === false ? "offline" : "online";
-}
-
-export function normalizeMtaAddress(address: string): string {
-  return address.trim().toLowerCase().replace(/\.$/, "");
 }
 
 export function matchesMtaEndpoint(
