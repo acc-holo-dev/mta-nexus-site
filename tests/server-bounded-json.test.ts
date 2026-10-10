@@ -1,0 +1,88 @@
+import { describe, expect, it } from "vitest";
+import { readBoundedJson, SERVER_MUTATION_MAX_BODY_BYTES } from "../apps/web/src/lib/bounded-json";
+
+const url = "https://nexus.test/api/servers";
+const request = (body: BodyInit, headers: HeadersInit = {}) =>
+  new Request(url, { method: "POST", headers, body });
+
+describe("bounded JSON reader for server mutations", () => {
+  it("accepts small objects and handles missing or malformed JSON", async () => {
+    expect(await readBoundedJson(request('{"name":"Nexus"}'))).toEqual({ name: "Nexus" });
+    expect(await readBoundedJson(new Request(url, { method: "POST" }))).toBeNull();
+    expect(await readBoundedJson(request('{"name":'))).toBeNull();
+    expect(await readBoundedJson(request(new Uint8Array([0xff])))).toBeNull();
+  });
+
+  it("enforces the actual UTF-8 byte size, not JavaScript string length", async () => {
+    const unicode = JSON.stringify({ text: "Ж".repeat(100) });
+    expect(unicode.length).toBeLessThan(256);
+    await expect(readBoundedJson(request(unicode), 256)).rejects.toMatchObject({
+      statusCode: 413, code: "REQUEST_BODY_TOO_LARGE",
+    });
+  });
+
+  it("accepts an exactly bounded body and rejects the next byte", async () => {
+    const exact = '{"a":"12345"}';
+    expect(await readBoundedJson(request(exact), Buffer.byteLength(exact))).toEqual({ a: "12345" });
+    await expect(readBoundedJson(request(exact), Buffer.byteLength(exact) - 1))
+      .rejects.toMatchObject({ statusCode: 413, code: "REQUEST_BODY_TOO_LARGE" });
+  });
+
+  it("does not trust an understated Content-Length", async () => {
+    await expect(readBoundedJson(request('{"a":"oversize"}', { "Content-Length": "2" }), 10))
+      .rejects.toMatchObject({ statusCode: 413, code: "REQUEST_BODY_TOO_LARGE" });
+  });
+
+  it.each(["-1", "1.5", "1000000000000000000000", "unknown"])(
+    "rejects invalid Content-Length %s", async (length) => {
+      await expect(readBoundedJson(request("{}", { "Content-Length": length })))
+        .rejects.toMatchObject({ statusCode: 400, code: "INVALID_BODY_LENGTH" });
+    },
+  );
+
+  it("rejects an oversized declared length without awaiting stalled cancel", async () => {
+    let cancelled = false;
+    const body = new ReadableStream<Uint8Array>({
+      cancel() {
+        cancelled = true;
+        return new Promise<void>(() => {});
+      },
+    }, { highWaterMark: 0 });
+    const pending = new Request(url, { method: "POST", headers: { "Content-Length": "200" }, body, duplex: "half" } as RequestInit);
+    await expect(readBoundedJson(pending, 100))
+      .rejects.toMatchObject({ statusCode: 413, code: "REQUEST_BODY_TOO_LARGE" });
+    expect(cancelled).toBe(true);
+  });
+
+  it("cancels an oversized streaming response even if cancel never settles", async () => {
+    let cancelled = false;
+    const body = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(9));
+        controller.enqueue(new Uint8Array(9));
+      },
+      cancel() {
+        cancelled = true;
+        return new Promise<void>(() => {});
+      },
+    });
+    const pending = new Request(url, { method: "POST", body, duplex: "half" } as RequestInit);
+    await expect(readBoundedJson(pending, 16))
+      .rejects.toMatchObject({ statusCode: 413, code: "REQUEST_BODY_TOO_LARGE" });
+    expect(cancelled).toBe(true);
+    expect(body.locked).toBe(false);
+  });
+
+  it("fails on a pre-aborted request instead of attempting to parse", async () => {
+    const controller = new AbortController();
+    controller.abort();
+    const aborted = new Request(url, { method: "POST", body: '{"a":1}', signal: controller.signal });
+    await expect(readBoundedJson(aborted)).rejects.toMatchObject({ name: "AbortError" });
+  });
+
+  it("rejects invalid configured limits and preserves the production ceiling", async () => {
+    expect(SERVER_MUTATION_MAX_BODY_BYTES).toBe(32768);
+    await expect(readBoundedJson(request("{}"), 0)).rejects.toThrow("Invalid JSON request byte limit");
+    await expect(readBoundedJson(request("{}"), Number.NaN)).rejects.toThrow("Invalid JSON request byte limit");
+  });
+});

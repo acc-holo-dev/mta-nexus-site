@@ -915,3 +915,18 @@ revision continue to use their legacy checks.
 Validation and confirmation regressions were added. Exact-SHA Node 26,
 PostgreSQL, browser and full-workflow checks remain required because
 CI-001 still blocks GitHub-hosted runners.
+
+### P1. Bounded server mutation request bodies
+
+Server creation and owner-edit routes use a shared 32 KiB JSON reader with
+an actual streaming byte ceiling; forged Content-Length cannot bypass the
+limit. Oversized requests return typed HTTP 413 before database mutation.
+Stream cancellation is best-effort and nonblocking. Invalid JSON retains the
+existing HTTP 400 schema behavior.
+
+The personal-registration test fixture no longer passes undefined to a
+defaulted organization parameter. A separate administrator-role test covers
+platform-admin organization creation.
+
+- Acceptance: run HTTP/streaming tests and typecheck on Node 26.
+  CI-001 blocks exact-SHA hosted acceptance (zero steps).

@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { readBoundedJson } from "../../../../lib/bounded-json";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { updateServerSchema } from "@nexus/validation";
@@ -69,7 +70,7 @@ export async function PATCH(
     }
 
     const parsed = serverUpdateSchema.safeParse(
-      await request.json().catch(() => null),
+      await readBoundedJson(request),
     );
     if (!parsed.success) {
       return json(

@@ -109,6 +109,13 @@ describe("atomic server create authority", () => {
     expect(state.inserted).toHaveLength(0);
   });
 
+  it("allows a platform administrator to create a server in an existing organization", async () => {
+    await expect(repository.createWithAudit(server(), audit("usr_admin"), "admin"))
+      .resolves.toMatchObject({ id: "srv_1" });
+    expect(state.locks).toEqual(["share"]);
+    expect(state.inserted).toHaveLength(2);
+  });
+
   it("rejects nonexistent organizations and does not persist an audit", async () => {
     state.organization = null;
     await expect(repository.createWithAudit(server(), audit("usr_manager")))
@@ -117,7 +124,7 @@ describe("atomic server create authority", () => {
   });
 
   it("keeps personal registrations independent from organization lookups", async () => {
-    await expect(repository.createWithAudit(server(undefined), audit("usr_owner")))
+    await expect(repository.createWithAudit({ ...server(), organizationId: undefined }, audit("usr_owner")))
       .resolves.toMatchObject({ id: "srv_1" });
     expect(state.locks).toEqual([]);
     expect(state.inserted).toHaveLength(2);
