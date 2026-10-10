@@ -4,6 +4,7 @@ import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@nexus/ui";
 import { confirmedUpdatedServer } from "../lib/server-mutation-confirmation";
+import { serverMutationErrorMessage } from "../lib/server-mutation-errors";
 import { privateApiRequest } from "../lib/private-api-request";
 import { useNexusLocale } from "./locale-context";
 
@@ -93,9 +94,6 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         }),
       );
       const data = await response.json().catch(() => null);
-      if (data?.code === "SERVER_METADATA_CONFLICT") {
-        throw new Error(copy.concurrentEdit);
-      }
       if (
         !confirmedUpdatedServer(response.status, data, {
           id: server.id,
@@ -118,7 +116,13 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
           ...(lastSavedAt ? { expectedUpdatedAt: lastSavedAt } : {}),
         })
       ) {
-        throw new Error(data?.error || copy.saveError);
+        throw new Error(serverMutationErrorMessage(data, {
+          SERVER_METADATA_CONFLICT: copy.concurrentEdit,
+          SERVER_ENDPOINT_TAKEN: copy.endpointTaken,
+          FORBIDDEN: copy.forbiddenEdit,
+          REQUEST_BODY_TOO_LARGE: copy.bodyTooLarge,
+          REQUEST_BODY_TIMEOUT: copy.bodyTimedOut,
+        }, copy.saveError));
       }
 
       setLastSavedAt(revisionToken(data?.server?.updatedAt));

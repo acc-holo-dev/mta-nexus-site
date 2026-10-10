@@ -73,6 +73,38 @@ describe("bounded JSON reader for server mutations", () => {
     expect(body.locked).toBe(false);
   });
 
+  it("rejects a stalled client body with 408 even when cancellation never settles", async () => {
+    let cancelled = false;
+    const body = new ReadableStream<Uint8Array>({
+      pull() { return new Promise<void>(() => {}); },
+      cancel() {
+        cancelled = true;
+        return new Promise<void>(() => {});
+      },
+    }, { highWaterMark: 0 });
+    const request = new Request(url, {
+      method: "POST", body, duplex: "half",
+    } as RequestInit);
+
+    // Keep an event-loop handle for the weak AbortSignal.timeout timer in Node.
+    const keepAlive = setTimeout(() => {}, 250);
+    try {
+      await expect(readBoundedJson(request, 16, 40))
+        .rejects.toMatchObject({ statusCode: 408, code: "REQUEST_BODY_TIMEOUT" });
+      expect(cancelled).toBe(true);
+      expect(body.locked).toBe(false);
+    } finally {
+      clearTimeout(keepAlive);
+    }
+  });
+
+  it("permits fast well-formed bodies with the same timeout contract", async () => {
+    await expect(readBoundedJson(request('{"ok":true}'), 1024, 200))
+      .resolves.toEqual({ ok: true });
+    await expect(readBoundedJson(request("{}"), 1024, 0))
+      .rejects.toThrow("Invalid JSON request timeout");
+  });
+
   it("fails on a pre-aborted request instead of attempting to parse", async () => {
     const controller = new AbortController();
     controller.abort();

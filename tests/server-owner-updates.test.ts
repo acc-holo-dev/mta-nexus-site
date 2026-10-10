@@ -131,6 +131,19 @@ describe("server owner update HTTP contract", () => {
     }
   });
 
+  it("rejects an oversized PATCH request before database mutation", async () => {
+    const response = await PATCH(
+      request({ description: "x".repeat(40_000) }),
+      routeContext,
+    );
+    expect(response.status).toBe(413);
+    expectPrivateCorrelation(response);
+    expect(await response.json()).toMatchObject({
+      code: "REQUEST_BODY_TOO_LARGE",
+    });
+    expect(updateServer).not.toHaveBeenCalled();
+  });
+
   it("passes an explicit version token to the authoritative update", async () => {
     const response = await PATCH(
       request({

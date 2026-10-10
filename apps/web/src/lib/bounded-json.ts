@@ -7,6 +7,10 @@ function tooLarge(): AppError {
   return new AppError("Server request body exceeds 32 KiB", 413, "REQUEST_BODY_TOO_LARGE");
 }
 
+function timedOut(): AppError {
+  return new AppError("Server request body timed out", 408, "REQUEST_BODY_TIMEOUT");
+}
+
 /**
  * Reads untrusted JSON with a real byte ceiling, independently of
  * Content-Length. Body cancellation is intentionally fire-and-forget:
@@ -15,15 +19,22 @@ function tooLarge(): AppError {
 export async function readBoundedJson(
   request: Request,
   maxBytes = SERVER_MUTATION_MAX_BODY_BYTES,
+  timeoutMs = 10_000,
 ): Promise<unknown> {
   if (!Number.isSafeInteger(maxBytes) || maxBytes <= 0) {
     throw new RangeError("Invalid JSON request byte limit");
   }
 
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 60_000) {
+    throw new RangeError("Invalid JSON request timeout");
+  }
+  request.signal.throwIfAborted();
+
   const declared = request.headers.get("content-length");
   if (declared !== null) {
     if (!/^(?:0|[1-9][0-9]*)$/u.test(declared) ||
       !Number.isSafeInteger(Number(declared))) {
+      void request.body?.cancel().catch(() => {});
       throw new AppError("Invalid Content-Length", 400, "INVALID_BODY_LENGTH");
     }
     if (Number(declared) > maxBytes) {
@@ -34,17 +45,25 @@ export async function readBoundedJson(
 
   if (!request.body) return null;
   const reader = request.body.getReader();
-  const cancel = () => { void reader.cancel().catch(() => {}); };
-  request.signal.addEventListener("abort", cancel, { once: true });
-  if (request.signal.aborted) cancel();
+  const timeoutSignal = AbortSignal.timeout(timeoutMs);
+  const signal = AbortSignal.any([request.signal, timeoutSignal]);
+  const cancel = () => {
+    void reader.cancel().catch(() => {});
+  };
+  const throwIfAborted = () => {
+    request.signal.throwIfAborted();
+    if (timeoutSignal.aborted) throw timedOut();
+  };
+  signal.addEventListener("abort", cancel, { once: true });
+  if (signal.aborted) cancel();
 
   const chunks: Uint8Array[] = [];
   let size = 0;
   try {
     while (true) {
-      request.signal.throwIfAborted();
+      throwIfAborted();
       const { done, value } = await reader.read();
-      request.signal.throwIfAborted();
+      throwIfAborted();
       if (done) break;
       size += value.byteLength;
       if (size > maxBytes) throw tooLarge();
@@ -52,9 +71,10 @@ export async function readBoundedJson(
     }
   } catch (error) {
     cancel();
+    throwIfAborted();
     throw error;
   } finally {
-    request.signal.removeEventListener("abort", cancel);
+    signal.removeEventListener("abort", cancel);
     reader.releaseLock();
   }
 

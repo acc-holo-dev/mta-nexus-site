@@ -4,6 +4,7 @@ import { type FormEvent, useEffect, useState } from "react";
 import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../../../components/locale-context";
 import { confirmedCreatedServer } from "../../../../lib/server-mutation-confirmation";
+import { serverMutationErrorMessage } from "../../../../lib/server-mutation-errors";
 import { privateApiRequest } from "../../../../lib/private-api-request";
 import {
   parseServerOrganizations,
@@ -102,7 +103,13 @@ export default function RegisterServerPage() {
         organizationId || null,
       );
       if (!serverId) {
-        throw new Error(data?.error || copy.createError);
+        throw new Error(serverMutationErrorMessage(data, {
+          SERVER_SLUG_TAKEN: copy.slugTaken,
+          SERVER_ENDPOINT_TAKEN: copy.endpointTaken,
+          FORBIDDEN: copy.organizationForbidden,
+          REQUEST_BODY_TOO_LARGE: copy.bodyTooLarge,
+          REQUEST_BODY_TIMEOUT: copy.bodyTimedOut,
+        }, copy.createError));
       }
       window.location.assign(
         `/workspace/servers/${encodeURIComponent(serverId)}`,

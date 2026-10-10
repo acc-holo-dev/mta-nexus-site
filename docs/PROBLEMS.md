@@ -930,3 +930,22 @@ platform-admin organization creation.
 
 - Acceptance: run HTTP/streaming tests and typecheck on Node 26.
   CI-001 blocks exact-SHA hosted acceptance (zero steps).
+
+### P1. Bounded mutation bodies: deadline and localized errors
+
+The 32 KiB server registration/edit request reader now also has a ten-second
+deadline against slow or indefinitely stalled client streams. The timeout
+cancels the stream without waiting on an uncooperative underlying cancel
+promise, returns typed HTTP 408 REQUEST_BODY_TIMEOUT, and removes its abort
+listener when finished. The caller's abort reason takes precedence when the
+client itself disconnects. A malformed Content-Length now cancels unread data.
+
+Registration and management forms use one compact error-code translation
+helper and new RU/EN messages for duplicate slugs, duplicate MTA endpoints,
+lost organization/editing permissions, stale edits, oversized bodies and body
+timeouts. Both HTTP routes share the same bounded reader.
+
+- Local isolated Node 22 smoke check of the copied bounded-json implementation
+  passed seven focused scenarios (including a stalled stream). This is not
+  project Vitest/typecheck or Node 26/PostgreSQL acceptance. Dedicated Vitest
+  regressions were added and remain to be run after CI-001 is resolved.
