@@ -45,7 +45,7 @@ export class ReportRepository {
           eq(reports.reporterId, reporterId),
           eq(reports.targetType, targetType),
           eq(reports.targetId, targetId),
-          eq(reports.status, "open")
+          inArray(reports.status, ["open", "under_review"])
         )
       )
       .limit(1);
@@ -74,7 +74,7 @@ export class ReportRepository {
         eq(reports.reporterId, data.reporterId),
         eq(reports.targetType, data.targetType),
         eq(reports.targetId, data.targetId),
-        eq(reports.status, "open"),
+        inArray(reports.status, ["open", "under_review"]),
       )).limit(1);
       if (existing) return { report: existing as unknown as Report, created: false };
 

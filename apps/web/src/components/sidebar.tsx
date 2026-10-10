@@ -26,6 +26,7 @@ import { getManagedServerCopy } from "../lib/managed-server-view";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { publicationCopy } from "../lib/publication-feed-copy";
+import { communityReportCopy } from "../lib/community-report-copy";
 
 export function Sidebar({
   locale,
@@ -50,6 +51,7 @@ export function Sidebar({
   ];
 
   const workspaceNav = [
+    { href: "/workspace/reports", label: communityReportCopy(locale).myReports, icon: ShieldAlert },
     { href: "/workspace/feed", label: publicationCopy(locale).title, icon: MessageSquare },
     { href: "/workspace", label: dictionary.nav.overview, icon: LayoutDashboard },
     { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },

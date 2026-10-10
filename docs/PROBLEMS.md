@@ -1267,3 +1267,43 @@ CREATE INDEX content_public_org_feed_time_id_idx
   ON content (organization_id, (coalesce(published_at, created_at)) DESC, id DESC)
   WHERE status = 'published';
 ```
+
+### Community report submission, private tracking and case moderation
+
+Publication/discussion reporting now includes working forms, private owner
+history/details, filtered community moderation queues and direct case links.
+The new workspace/admin APIs enforce session scope, private/no-store responses,
+JSON byte/deadline limits, rate limits and RU/EN errors. Staff-only notes and
+reporter IDs are excluded from owner DTOs; owner target previews require a
+currently published publication. Duplicate reports are serialized with the
+existing advisory key and include both open and under-review states, also in
+the legacy report repository.
+
+Staff decisions recheck current database roles, compare the displayed report
+state, and require the exact current text revision for comment removal. Removal,
+counter update, report resolution and both audits share a transaction. Replies
+remain and content metadata revisions are unchanged. Current commercial review
+comments are excluded; unavailable historical targets cannot be removed here.
+Stored notifications contain only status/direct case links, never staff notes.
+Submission/decision results must be confirmed before UI success, and uncertain
+writes direct users to reload their persisted reports.
+
+97 focused unit/HTTP/SQL-builder/SSR checks, TypeScript, touched-file Biome and
+Next webpack compile mode passed. Dependency analysis found no violations but
+retains its TypeScript 7 compatibility warning. Knip still reports Agent A's
+unused `ResourceActivityService` export; this block adds no unused exports.
+Seven new PostgreSQL fixtures cover deduplication, public scope, privacy,
+orphaned replies, decision races, live roles/audit rollback and product-review
+exclusion. They have not run locally: PostgreSQL, browser interaction and full
+production generation remain pending.
+
+Agent A owns the following index contract. No schema/migration is added by B;
+existing staff status/time queue indexes are reused:
+
+```sql
+CREATE INDEX reports_reporter_created_id_idx
+  ON reports (reporter_id, created_at DESC, id DESC);
+CREATE INDEX reports_reporter_pending_target_idx
+  ON reports (reporter_id, target_type, target_id)
+  WHERE status IN ('open', 'under_review');
+```

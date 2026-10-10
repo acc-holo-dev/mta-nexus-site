@@ -7,6 +7,15 @@ export function formatNotification(
   copy: { approved: string; rejected: string; version: string; notes: string },
   locale: Locale = "en",
 ) {
+  if (notification.title === "New community report" && notification.message === "A community report is awaiting review.")
+    return { title: locale === "ru" ? "Новая жалоба сообщества" : notification.title,
+      message: locale === "ru" ? "Жалоба сообщества ожидает рассмотрения." : notification.message };
+  const reportStatus = notification.title === "Community report status" && /^Report status: (under_review|resolved|dismissed)\.$/u.exec(notification.message);
+  if (reportStatus) {
+    const statuses: Record<string, string> = { under_review: "рассматривается", resolved: "решена", dismissed: "отклонена" };
+    return { title: locale === "ru" ? "Статус жалобы" : notification.title,
+      message: locale === "ru" ? `Жалоба ${statuses[reportStatus[1]]}.` : notification.message };
+  }
   const follower = notification.title === "New Follower" &&
     /^@([a-zA-Z0-9_-]{1,80}) started following your activity\.$/u.exec(notification.message);
   if (follower) return {

@@ -35,6 +35,7 @@ import { BuildQuarantineControls } from "../../components/build-quarantine-contr
 import { ContentModerationControls } from "../../components/content-moderation-controls";
 import { VerificationModerationControls } from "../../components/verification-moderation-controls";
 import { ReportModerationControls } from "../../components/report-moderation-controls";
+import { communityReportCopy } from "../../lib/community-report-copy";
 
 export const dynamic = "force-dynamic";
 
@@ -571,6 +572,7 @@ export default async function AdminPage({
 
       <section>
         <SectionHeader title={copy.reports} description={copy.caseHistory} />
+        <Link href="/admin/reports" className="mb-3 inline-block text-sm text-accent underline">{communityReportCopy(locale).queue}</Link>
         <nav aria-label={copy.reports} className="mb-3 flex gap-2">
           <Link
             href={reportHref("pending", 1)}

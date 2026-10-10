@@ -12,6 +12,7 @@ import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { cookies } from "next/headers";
+import { CommunityReportForm } from "../../../components/community-report-form";
 import { can } from "@nexus/security";
 
 export const dynamic = "force-dynamic";
@@ -132,6 +133,8 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
       <div className="nexus-panel whitespace-pre-line p-6 text-sm leading-7 text-secondary shadow-nexus-sm sm:p-8">
         {article.body}
       </div>
+
+      {viewer?.id !== article.authorId && <CommunityReportForm key={`${article.id}:${viewer?.id ?? "guest"}`} targetType="content" targetId={article.id} locale={locale} authenticated={!!viewer} />}
 
       <div className="nexus-panel flex flex-wrap items-center justify-between gap-4 p-4">
         <div className="flex flex-wrap items-center gap-2">

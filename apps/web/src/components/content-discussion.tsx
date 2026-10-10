@@ -9,6 +9,7 @@ import { submitContentCommentRequest } from "../lib/content-comment-client";
 import { privateApiRequest } from "../lib/private-api-request";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { DiscussionCommentActions } from "./discussion-comment-actions";
+import { CommunityReportForm } from "./community-report-form";
 
 export function ContentDiscussion({
   slug,
@@ -220,6 +221,7 @@ export function ContentDiscussion({
             <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
               {comment.text}
             </p>
+            {viewer?.id !== comment.author?.id && <CommunityReportForm targetType="comment" targetId={comment.id} locale={locale} authenticated={!!viewer} />}
             <button
               className="text-xs text-accent underline"
               type="button"

@@ -258,3 +258,13 @@ discussion comments; moderators can remove another comment with a reason through
 `/api/content/[slug]/comments/[id]` (PATCH/DELETE). Live authority, text revisions,
 comment counters and audit are checked transactionally. Replies remain after a
 parent is removed. These operations do not modify product reviews.
+
+Publication and discussion pages now expose working abuse-report forms.
+`/workspace/reports` and `/workspace/reports/[id]` provide private, filtered
+20-item report history and current public target previews. `/admin/reports`
+and `/admin/reports/[id]` provide a community moderation queue, staff evidence
+review and status decisions through `/api/admin/reports`. Removing a reported
+discussion comment, updating its counter, resolving the report and both audit
+entries share one transaction with live role, report-state and text-revision
+checks. Replies remain; product review comments are excluded. Reporter status
+notifications contain no staff notes. All new surfaces support RU/EN.
