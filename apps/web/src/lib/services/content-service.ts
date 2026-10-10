@@ -4,6 +4,8 @@ import {
   authorContentRepository,
   productRepository,
   serverRepository,
+  discussionRevision,
+  discussionManagementRepository,
 } from "@nexus/db";
 import { can, generateId } from "@nexus/security";
 import { ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
@@ -14,6 +16,9 @@ type DiscussionCursor = { createdAt: string; id: string };
 import { editorialTypes, communityTypes, type parseContentPage } from "../user-platform-contract";
 
 export class ContentService {
+  async manageComment(input: { slug: string; commentId: string; expectedRevision: string; text?: string; reason?: string }, actor: User) {
+    return discussionManagementRepository.mutate({ ...input, actorId: actor.id, auditId: generateId("aud") });
+  }
   async pageArticles(filters: ReturnType<typeof parseContentPage>) {
     return authorContentRepository.pagePublic([...editorialTypes], filters);
   }
@@ -68,6 +73,7 @@ export class ContentService {
     return {
       items: result.items.map((row) => ({
         id: row.id,
+        revision: discussionRevision(row.id, row.text),
         text: row.text,
         parentId: row.parentId,
         createdAt: row.createdAt.toISOString(),

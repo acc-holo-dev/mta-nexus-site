@@ -24,6 +24,7 @@ export const RATE_LIMIT_POLICIES = {
   organizationManagement: { limit: 60, windowSeconds: 3600 },
   profileEditing: { limit: 30, windowSeconds: 3600 },
   commentCreation: { limit: 20, windowSeconds: 300 },
+  commentEditing: { limit: 30, windowSeconds: 300 },
   reviewSubmission: { limit: 5, windowSeconds: 300 },
   search: { limit: 60, windowSeconds: 60 },
   supportCase: { limit: 5, windowSeconds: 3600 },

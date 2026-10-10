@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { publicationCopy } from "../../lib/publication-feed-copy";
 import { MessageSquare, Plus } from "lucide-react";
 import { EmptyState } from "@nexus/ui";
 import { contentService } from "../../lib/services/content-service";
@@ -43,7 +44,7 @@ export default async function CommunityPage({ searchParams }: { searchParams?: P
         </Link>
       </header>
 
-      <Link href="/workspace/content" className="inline-block text-sm text-accent underline">{platformCopy.studio}</Link>
+      <div className="flex flex-wrap gap-4"><Link href="/workspace/content" className="inline-block text-sm text-accent underline">{platformCopy.studio}</Link><Link href="/workspace/feed" className="inline-block text-sm text-accent underline">{publicationCopy(locale).title}</Link></div>
       <ContentCatalogControls path="/community" filters={filters} locale={locale} types={communityTypes} />
 
       {!result ? <p role="alert" className="text-sm text-danger">{platformCopy.unavailable}</p> : topics.length > 0 ? (

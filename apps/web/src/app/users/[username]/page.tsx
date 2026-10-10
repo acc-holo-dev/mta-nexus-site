@@ -1,4 +1,6 @@
 import { FollowButton } from "../../../components/follow-button";
+import Link from "next/link";
+import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { parseProfilePage } from "../../../lib/profile-pagination";
 import { notFound } from "next/navigation";
@@ -113,6 +115,7 @@ export default async function UserProfilePage({
               {user.bio || copy.memberFallback}
             </p>
             <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
+            <Link href={`/users/${encodeURIComponent(user.username)}/activity`} className="inline-flex min-h-11 items-center text-sm text-accent underline">{publicationCopy(locale).activity}</Link>
             <div className="flex items-center gap-1.5 pt-1 text-[11px] text-faint">
               <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
               <span>

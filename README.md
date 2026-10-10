@@ -249,3 +249,12 @@ public filters through `/api/discover`. `/workspace/saved` manages all four
 existing follow types with private 20-item pages, search and removal, including
 unavailable targets. Public user/creator/organization profiles expose working
 follow controls; `/api/follow` accepts idempotent desired-state POST/DELETE commands.
+
+`/workspace/feed` shows public publications from all four follow types with
+search, type/source filters and 20-item cursor pages. Public publication history
+is available at `/users/[username]/activity` and `/organizations/[slug]/activity`,
+backed by `/api/activity/[kind]/[handle]`. Authors can edit or remove their
+discussion comments; moderators can remove another comment with a reason through
+`/api/content/[slug]/comments/[id]` (PATCH/DELETE). Live authority, text revisions,
+comment counters and audit are checked transactionally. Replies remain after a
+parent is removed. These operations do not modify product reviews.

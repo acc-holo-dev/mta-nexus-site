@@ -1,4 +1,6 @@
 import { FollowButton } from "../../../components/follow-button";
+import Link from "next/link";
+import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { parseProfilePage } from "../../../lib/profile-pagination";
@@ -125,6 +127,7 @@ export default async function OrganizationProfilePage({
             </p>
 
             <FollowButton targetType="organization" targetId={organization.id} targetName={organization.name} />
+            <Link href={`/organizations/${encodeURIComponent(organization.slug)}/activity`} className="inline-flex min-h-11 items-center text-sm text-accent underline">{publicationCopy(locale).activity}</Link>
             {websiteUrl && (
               <a
                 href={websiteUrl}

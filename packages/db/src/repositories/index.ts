@@ -45,3 +45,5 @@ export { publicDirectoryRepository } from "./public-directory";
 export { followWorkspaceRepository } from "./follow-workspace";
 export * from "./resource-activity";
 export * from "./resource-download-authorization";
+export { publicationFeedRepository, type PublicationScope } from "./publication-feed";
+export { discussionManagementRepository, discussionRevision } from "./discussion-management";

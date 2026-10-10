@@ -8,6 +8,7 @@ import { discussionPageSchema, type DiscussionPage } from "../lib/content-discus
 import { submitContentCommentRequest } from "../lib/content-comment-client";
 import { privateApiRequest } from "../lib/private-api-request";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { DiscussionCommentActions } from "./discussion-comment-actions";
 
 export function ContentDiscussion({
   slug,
@@ -15,12 +16,14 @@ export function ContentDiscussion({
   locale,
   count,
   initial,
+  viewer = null,
 }: {
   slug: string;
   contentId: string;
   locale: Locale;
   count: number;
   initial: DiscussionPage | null;
+  viewer?: { id: string; canModerate: boolean } | null;
 }) {
   const copy = getDiscussionCopy(locale);
   const [page, setPage] = useState<DiscussionPage | null>(initial);
@@ -32,12 +35,14 @@ export function ContentDiscussion({
   const [text, setText] = useState("");
   const [reply, setReply] = useState<{ id: string; name: string } | null>(null);
   const [displayCount, setDisplayCount] = useState(count);
+  const [managingId, setManagingId] = useState<string | null>(null);
+  const [managementSuccess, setManagementSuccess] = useState("");
   const readGuard = useRef(false);
   const writeGuard = useRef(false);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const path = `/api/content/${encodeURIComponent(slug)}/comments`;
   async function load(older = false) {
-    if (readGuard.current || (older && !page?.nextCursor)) return;
+    if (readGuard.current || managingId || (older && !page?.nextCursor)) return;
     readGuard.current = true;
     setLoading(true);
     setReadError("");
@@ -147,19 +152,19 @@ export function ContentDiscussion({
             maxLength={5000}
             rows={4}
             placeholder={copy.placeholder}
-            disabled={submitting}
+            disabled={submitting || !!managingId}
             value={text}
             onChange={(event) => setText(event.target.value)}
           />
         </label>
         <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" isLoading={submitting} disabled={text.trim().length < 2 || loading}>
+          <Button type="submit" isLoading={submitting} disabled={text.trim().length < 2 || loading || !!managingId}>
             {submitting ? copy.publishing : copy.publish}
           </Button>
           <span className="text-xs text-muted">{text.length}/5000</span>
-          <Link className="text-xs text-accent underline" href="/auth/login">
+          {!viewer && <Link className="text-xs text-accent underline" href="/auth/login">
             {copy.signIn}
-          </Link>
+          </Link>}
         </div>
         {writeError && (
           <p role="alert" className="text-sm text-danger">
@@ -172,6 +177,7 @@ export function ContentDiscussion({
           </p>
         )}
       </form>
+      {managementSuccess && <p role="status" className="text-sm text-accent">{managementSuccess}</p>}
       <div className="space-y-3" aria-busy={loading}>
         {page?.items.map((comment) => (
           <article
@@ -217,7 +223,7 @@ export function ContentDiscussion({
             <button
               className="text-xs text-accent underline"
               type="button"
-              disabled={submitting}
+              disabled={submitting || !!managingId}
               onClick={() => {
                 setReply({
                   id: comment.id,
@@ -230,6 +236,19 @@ export function ContentDiscussion({
             >
               {copy.reply}
             </button>
+            {viewer && comment.revision && (viewer.id === comment.author?.id || viewer.canModerate) && <DiscussionCommentActions
+              comment={comment} own={viewer.id === comment.author?.id} slug={slug} contentId={contentId} locale={locale}
+              disabled={loading || submitting || (!!managingId && managingId !== comment.id)}
+              onPending={(pending) => { writeGuard.current = pending; setManagingId(pending ? comment.id : null); if (pending) setManagementSuccess(""); }}
+              onSaved={(value, revision) => {
+                setPage((current) => current ? { ...current, items: current.items
+                  .filter((item) => value !== undefined || item.id !== comment.id)
+                  .map((item) => item.id === comment.id ? { ...item, text: value as string, revision }
+                    : item.parentId === comment.id ? { ...item, parent: value === undefined ? null : { text: value.slice(0, 160), username: comment.author?.username ?? null } } : item) } : current);
+                if (value === undefined) { setDisplayCount((current) => Math.max(0, current - 1)); if (reply?.id === comment.id) setReply(null); }
+                setManagementSuccess(value === undefined ? copy.removed : copy.edited);
+              }}
+            />}
           </article>
         ))}
       </div>
@@ -245,7 +264,7 @@ export function ContentDiscussion({
             type="button"
             size="sm"
             isLoading={loading}
-            disabled={submitting}
+            disabled={submitting || !!managingId}
             onClick={() => void load(true)}
           >
             {loading ? copy.loading : copy.older}
@@ -253,7 +272,7 @@ export function ContentDiscussion({
         )}
         <button
           type="button"
-          disabled={loading || submitting}
+          disabled={loading || submitting || !!managingId}
           className="text-sm text-accent underline"
           onClick={() => void load()}
         >

@@ -36,6 +36,7 @@ export function encodeDiscussionCursor(cursor: z.infer<typeof discussionCursorSc
 }
 const discussionItemSchema = z.object({
   id: z.string().min(1),
+  revision: z.string().regex(/^[a-f0-9]{64}$/u).optional(),
   text: z.string(),
   parentId: z.string().nullable(),
   createdAt: z.iso.datetime(),
@@ -57,3 +58,7 @@ export const discussionPageSchema = z
   })
   .refine((value) => value.hasMore === (value.nextCursor !== null));
 export type DiscussionPage = z.infer<typeof discussionPageSchema>;
+export const discussionEditSchema = z.object({
+  text: z.string().trim().min(2).max(5000), expectedRevision: z.string().regex(/^[a-f0-9]{64}$/u),
+}).strict();
+export const discussionRemoveSchema = discussionEditSchema.omit({ text: true }).extend({ reason: z.string().trim().max(1000).optional() }).strict();

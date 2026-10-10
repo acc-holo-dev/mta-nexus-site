@@ -11,6 +11,8 @@ import { getDiscussionCopy } from "../../../lib/content-discussion-copy";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { cookies } from "next/headers";
+import { can } from "@nexus/security";
 
 export const dynamic = "force-dynamic";
 
@@ -57,9 +59,10 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
   const isCommunity = article.type === "post" || article.type === "question";
   const coverImageUrl = safeExternalWebUrl(article.coverImageUrl);
-  const [author, discussion] = await Promise.all([
+  const [author, discussion, viewer] = await Promise.all([
     authService.getUserById(article.authorId),
     contentService.pageDiscussion(article.id).catch(() => null),
+    authService.getSession((await cookies()).get("nexus_session")?.value).catch(() => null),
   ]);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
   const formattedDate = new Date(article.createdAt).toLocaleDateString(dateLocale, {
@@ -151,7 +154,8 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
       </div>
 
       <ContentDiscussion
-        key={article.id}
+        key={`${article.id}:${viewer?.id ?? "anonymous"}:${viewer?.role ?? ""}`}
+        viewer={viewer ? { id: viewer.id, canModerate: can(viewer, "admin.moderation") } : null}
         slug={article.slug}
         contentId={article.id}
         locale={locale}

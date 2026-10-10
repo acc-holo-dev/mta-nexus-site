@@ -25,6 +25,7 @@ import { getDictionary, type Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
+import { publicationCopy } from "../lib/publication-feed-copy";
 
 export function Sidebar({
   locale,
@@ -49,6 +50,7 @@ export function Sidebar({
   ];
 
   const workspaceNav = [
+    { href: "/workspace/feed", label: publicationCopy(locale).title, icon: MessageSquare },
     { href: "/workspace", label: dictionary.nav.overview, icon: LayoutDashboard },
     { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
     { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },

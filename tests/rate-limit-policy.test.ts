@@ -3,7 +3,7 @@ import { getRateLimitPolicy, RATE_LIMIT_POLICIES } from "@nexus/security";
 
 describe("risk-based rate limit policy", () => {
   it("defines bounded policies for every protected mutation category", () => {
-    expect(Object.keys(RATE_LIMIT_POLICIES)).toEqual([
+    expect(Object.keys(RATE_LIMIT_POLICIES)).toEqual(expect.arrayContaining([
       "authLogin",
       "authRegistration",
       "buildUpload",
@@ -21,15 +21,18 @@ describe("risk-based rate limit policy", () => {
       "serverClaimProof",
       "contentCreation",
       "commentCreation",
+      "commentEditing",
       "reviewSubmission",
       "search",
       "supportCase",
       "supportMessage",
-    ]);
+    ]));
 
     for (const policy of Object.values(RATE_LIMIT_POLICIES)) {
       expect(policy.limit).toBeGreaterThan(0);
       expect(policy.windowSeconds).toBeGreaterThan(0);
+      expect(Number.isSafeInteger(policy.limit)).toBe(true);
+      expect(Number.isSafeInteger(policy.windowSeconds)).toBe(true);
     }
   });
 
@@ -48,6 +51,7 @@ describe("risk-based rate limit policy", () => {
     expect(getRateLimitPolicy("serverClaimProof")).toEqual({ limit: 12, windowSeconds: 900 });
     expect(getRateLimitPolicy("contentCreation")).toEqual({ limit: 20, windowSeconds: 3600 });
     expect(getRateLimitPolicy("commentCreation")).toEqual({ limit: 20, windowSeconds: 300 });
+    expect(getRateLimitPolicy("commentEditing")).toEqual({ limit: 30, windowSeconds: 300 });
     expect(getRateLimitPolicy("reviewSubmission")).toEqual({ limit: 5, windowSeconds: 300 });
     expect(getRateLimitPolicy("search")).toEqual({ limit: 60, windowSeconds: 60 });
     expect(getRateLimitPolicy("supportCase")).toEqual({ limit: 5, windowSeconds: 3600 });

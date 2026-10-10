@@ -1229,3 +1229,41 @@ remain pending. Agent A added `follows_follower_created_id_idx` on
 `follows (follower_id, created_at DESC, id DESC)` through migration 0044 for
 large private lists. Applying it and checking PostgreSQL query plans remain
 pending; Agent B's discovery block did not change schema or migrations.
+
+### Publication feeds and discussion management
+
+Following feeds and public user/organization publication histories now use
+20-item microsecond keysets. Actor scope comes only from the session, and multiple
+matching follows cannot duplicate a publication. Server/resource affiliations
+require current public availability; public author DTOs exclude account data.
+Discussion edits and removals lock publication/comment/current actor, compare
+the displayed text revision and audit atomically. Moderators must give a reason
+to remove another author's comment. Removal retains replies and decrements the
+counter without changing the publication's metadata revision; deleted text is
+not copied into audit. Product reviews are outside this contract.
+
+After integration with Agent A's acquisition/activity block, 259 focused unit,
+HTTP, SQL-builder and SSR checks, TypeScript, touched-file Biome and Next compile
+passed. Dependency analysis reports no violations but retains the TypeScript 7
+compatibility warning. Combined Knip currently fails on Agent A's unused exported
+`ResourceActivityService` class in `resource-activity-service.ts`; Agent A should
+remove the unused class export or supply a real consumer. Commercial code was
+preserved rather than changed to silence this diagnostic.
+
+Six prepared PostgreSQL fixtures (deduplication, microsecond traversal, private
+affiliations, concurrent edits, parent removal, live role/rollback) have not run
+locally. Browser interaction, full production generation and production query
+plans remain pending. Agent A owns the following index contract; Agent B adds
+no schema or migration:
+
+```sql
+CREATE INDEX content_public_feed_time_id_idx
+  ON content ((coalesce(published_at, created_at)) DESC, id DESC)
+  WHERE status = 'published';
+CREATE INDEX content_public_author_feed_time_id_idx
+  ON content (author_id, (coalesce(published_at, created_at)) DESC, id DESC)
+  WHERE status = 'published';
+CREATE INDEX content_public_org_feed_time_id_idx
+  ON content (organization_id, (coalesce(published_at, created_at)) DESC, id DESC)
+  WHERE status = 'published';
+```
