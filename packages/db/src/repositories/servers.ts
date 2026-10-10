@@ -2,7 +2,7 @@ import { and, asc, count, desc, eq, exists, gt, ilike, inArray, isNull, ne, or, 
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, organizationMembers, organizations, servers } from "../schema";
-import { ForbiddenError, NotFoundError, type AuditEvent, type Server, type ServerStatus, type ServerVisibility } from "@nexus/domain";
+import { AppError, ForbiddenError, NotFoundError, type AuditEvent, type Server, type ServerStatus, type ServerVisibility, type User } from "@nexus/domain";
 
 export type ManagedServerFilters = {
   query?: string;
@@ -56,6 +56,18 @@ function resetLiveStateForEndpointEdit(updates: ServerEditableFields) {
       ? { maxPlayers: sql<number | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.maxPlayers} END` }
       : {}),
   };
+}
+
+function memberMayManageServers(
+  membership: { role: string; permissions: string[] } | null | undefined,
+): boolean {
+  return Boolean(
+    membership && (
+      membership.role === "owner" ||
+      membership.role === "admin" ||
+      membership.permissions.includes("manage_servers")
+    ),
+  );
 }
 
 export class ServerRepository {
@@ -271,6 +283,7 @@ export class ServerRepository {
   async createWithAudit(
     server: Omit<Server, "createdAt" | "updatedAt">,
     audit: Omit<AuditEvent, "createdAt">,
+    actorRole?: User["role"],
   ): Promise<Server> {
     return db.transaction(async (tx) => {
       if (server.organizationId) {
@@ -286,7 +299,7 @@ export class ServerRepository {
         if (!organization) {
           throw new NotFoundError("Organization", server.organizationId);
         }
-        if (organization.ownerId !== audit.actorId) {
+        if (actorRole !== "admin" && organization.ownerId !== audit.actorId) {
           const [membership] = await tx
             .select({
               role: organizationMembers.role,
@@ -299,11 +312,7 @@ export class ServerRepository {
             ))
             .for("share")
             .limit(1);
-          if (!membership || !(
-            membership.role === "owner" ||
-            membership.role === "admin" ||
-            membership.permissions.includes("manage_servers")
-          )) {
+          if (!memberMayManageServers(membership)) {
             throw new ForbiddenError(
               "You do not have permission to create servers for this organization",
             );
@@ -335,6 +344,93 @@ export class ServerRepository {
     return (rows[0] as unknown as Server) || null;
   }
 
+  /**
+   * Owner-facing edits must check fresh authority and a stale-form token
+   * under the same row locks as the edit and its audit record. Callers may
+   * never rely on a previous page GET for permission to mutate a server.
+   */
+  async updateManagedWithAudit(
+    id: string,
+    updates: ServerEditableFields,
+    audit: Omit<AuditEvent, "createdAt">,
+    actor: Pick<User, "id" | "role">,
+    expectedUpdatedAt?: Date,
+  ): Promise<Server> {
+    return db.transaction(async (tx) => {
+      const [stored] = await tx
+        .select({
+          id: servers.id,
+          ownerId: servers.ownerId,
+          organizationId: servers.organizationId,
+          updatedAt: servers.updatedAt,
+        })
+        .from(servers)
+        .where(eq(servers.id, id))
+        .for("update")
+        .limit(1);
+
+      if (!stored) throw new NotFoundError("Server", id);
+      if (actor.role !== "admin") {
+        if (!stored.organizationId) {
+          if (stored.ownerId !== actor.id) {
+            throw new ForbiddenError("You do not manage this server");
+          }
+        } else {
+          const [organization] = await tx
+            .select({ ownerId: organizations.ownerId })
+            .from(organizations)
+            .where(eq(organizations.id, stored.organizationId))
+            .for("share")
+            .limit(1);
+          if (!organization) {
+            throw new ForbiddenError("You do not manage this server");
+          }
+          if (organization.ownerId !== actor.id) {
+            const [membership] = await tx
+              .select({
+                role: organizationMembers.role,
+                permissions: organizationMembers.permissions,
+              })
+              .from(organizationMembers)
+              .where(and(
+                eq(organizationMembers.organizationId, stored.organizationId),
+                eq(organizationMembers.userId, actor.id),
+              ))
+              .for("share")
+              .limit(1);
+            if (!memberMayManageServers(membership)) {
+              throw new ForbiddenError("You do not manage this server");
+            }
+          }
+        }
+      }
+
+      if (
+        expectedUpdatedAt &&
+        stored.updatedAt.getTime() !== expectedUpdatedAt.getTime()
+      ) {
+        throw new AppError(
+          "Server details changed; reload before saving",
+          409,
+          "SERVER_METADATA_CONFLICT",
+        );
+      }
+
+      // Monotonic millisecond timestamps prevent consecutive rapid edits
+      // from accidentally reusing the same compare-and-set token.
+      const now = new Date(Math.max(Date.now(), stored.updatedAt.getTime() + 1));
+      const [updated] = await tx
+        .update(servers)
+        .set({ ...updates, ...resetLiveStateForEndpointEdit(updates), updatedAt: now })
+        .where(eq(servers.id, id))
+        .returning();
+      if (!updated) throw new NotFoundError("Server", id);
+      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      return updated as unknown as Server;
+    });
+  }
+
+  /** Internal maintenance/test write; user-facing endpoints use updateManagedWithAudit. */
   async updateWithAudit(
     id: string,
     updates: ServerEditableFields,

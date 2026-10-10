@@ -1,6 +1,8 @@
 import type { NextRequest } from "next/server";
+import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { updateServerSchema } from "@nexus/validation";
+import { z } from "zod";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -30,8 +32,12 @@ function json(
 // organization and slug changes are not permitted through this endpoint.
 const serverUpdateSchema = updateServerSchema
   .omit({ slug: true, organizationId: true })
+  .extend({ expectedUpdatedAt: z.string().datetime({ offset: true }).optional() })
   .strict()
-  .refine((value) => Object.keys(value).length > 0, "At least one field is required");
+  .refine(
+    (value) => Object.keys(value).some((field) => field !== "expectedUpdatedAt"),
+    "At least one editable field is required",
+  );
 
 export async function PATCH(
   request: NextRequest,
@@ -77,20 +83,13 @@ export async function PATCH(
     }
 
     const { id } = await params;
-    const server = await serverService.updateServer(
-      id,
-      parsed.data,
-      user,
-    );
+    const { expectedUpdatedAt, ...updates } = parsed.data;
+    const server = expectedUpdatedAt
+      ? await serverService.updateServer(id, updates, user, new Date(expectedUpdatedAt))
+      : await serverService.updateServer(id, updates, user);
     return json(context, { server });
   } catch (error: unknown) {
-    const appError =
-      error instanceof Error &&
-      "statusCode" in error
-        ? (error as Error & {
-            statusCode: number;
-          })
-        : null;
+    const appError = error instanceof AppError ? error : null;
     logRequestEvent({
       level: "error",
       event: "server.update_failed",
@@ -101,9 +100,8 @@ export async function PATCH(
     return json(
       context,
       {
-        error:
-          appError?.message ||
-          "Could not update server",
+        error: appError?.message || "Could not update server",
+        ...(appError ? { code: appError.code } : {}),
       },
       appError?.statusCode || 500,
     );

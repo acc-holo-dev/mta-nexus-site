@@ -10,6 +10,7 @@ import { useNexusLocale } from "./locale-context";
 type EditableServer = {
   id: string;
   name: string;
+  updatedAt?: Date | string;
   description?: string;
   websiteUrl?: string;
   discordUrl?: string;
@@ -32,6 +33,12 @@ type Notice = {
   error: boolean;
 };
 
+function revisionToken(value: Date | string | undefined): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isFinite(date.getTime()) ? date.toISOString() : null;
+}
+
 const fieldClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
 
@@ -41,6 +48,7 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
   const copy = dictionary.serverManagement;
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
+  const [lastSavedAt, setLastSavedAt] = useState(() => revisionToken(server.updatedAt));
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -74,6 +82,7 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         mapName: String(form.get("mapName") || "").trim(),
         maxPlayers: Number(form.get("maxPlayers")),
         visibility: String(form.get("visibility") || "private"),
+        ...(lastSavedAt ? { expectedUpdatedAt: lastSavedAt } : {}),
       };
       const response = await fetch(
         `/api/servers/${encodeURIComponent(server.id)}`,
@@ -84,6 +93,9 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         }),
       );
       const data = await response.json().catch(() => null);
+      if (data?.code === "SERVER_METADATA_CONFLICT") {
+        throw new Error(copy.concurrentEdit);
+      }
       if (
         !confirmedUpdatedServer(response.status, data, {
           id: server.id,
@@ -98,6 +110,7 @@ export function ServerDetailsForm({ server }: { server: EditableServer }) {
         throw new Error(data?.error || copy.saveError);
       }
 
+      setLastSavedAt(revisionToken(data?.server?.updatedAt));
       setNotice({ text: copy.saved, error: false });
       router.refresh();
     } catch (caught) {

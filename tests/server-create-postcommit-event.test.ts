@@ -3,9 +3,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   insert: vi.fn(),
+  managedUpdate: vi.fn(),
 }));
 vi.mock("@nexus/db", () => ({
-  serverRepository: { createWithAudit: mocks.insert },
+  serverRepository: {
+    createWithAudit: mocks.insert,
+    updateManagedWithAudit: mocks.managedUpdate,
+  },
   organizationRepository: { findById: vi.fn(), listUserMemberships: vi.fn() },
 }));
 vi.mock("@nexus/security", () => ({
@@ -31,6 +35,10 @@ beforeEach(() => {
   vi.restoreAllMocks();
   mocks.insert.mockReset();
   mocks.insert.mockImplementation(async (server) => server);
+  mocks.managedUpdate.mockReset();
+  mocks.managedUpdate.mockImplementation(async (_id, changes) => ({
+    id: "srv_1", ...changes,
+  }));
 });
 
 describe("server creation after durable write", () => {
@@ -48,6 +56,41 @@ describe("server creation after durable write", () => {
       expect.objectContaining({ eventType: "server.created", aggregateId: "srv_test" }),
     );
     expect(JSON.stringify(log.mock.calls)).not.toContain("private payload");
+  });
+
+  it.each([
+    ["servers_slug_unique", "SERVER_SLUG_TAKEN"],
+    ["servers_slug_idx", "SERVER_SLUG_TAKEN"],
+    ["servers_endpoint_idx", "SERVER_ENDPOINT_TAKEN"],
+  ])("returns a structured 409 on create constraint %s", async (constraint, code) => {
+    const publish = vi.spyOn(eventBus, "publish");
+    mocks.insert.mockRejectedValueOnce({
+      cause: { code: "23505", constraint },
+    });
+    await expect(serverService.createServer(input, actor))
+      .rejects.toMatchObject({ statusCode: 409, code });
+    expect(publish).not.toHaveBeenCalled();
+  });
+
+  it("handles edit conflicts and delegates authority to the database transaction", async () => {
+    const original = new Date("2026-10-10T01:00:00.000Z");
+    await expect(serverService.updateServer(
+      "srv_1", { description: "New" }, actor, original,
+    )).resolves.toMatchObject({ id: "srv_1", description: "New" });
+    expect(mocks.managedUpdate).toHaveBeenCalledWith(
+      "srv_1",
+      { description: "New" },
+      expect.objectContaining({
+        action: "server.updated", actorId: "usr_1", targetId: "srv_1",
+      }),
+      actor,
+      original,
+    );
+    mocks.managedUpdate.mockRejectedValueOnce({
+      code: "23505", constraint_name: "servers_endpoint_idx",
+    });
+    await expect(serverService.updateServer("srv_1", { port: 22004 }, actor))
+      .rejects.toMatchObject({ statusCode: 409, code: "SERVER_ENDPOINT_TAKEN" });
   });
 
   it("does not dispatch an event if the durable transaction fails", async () => {

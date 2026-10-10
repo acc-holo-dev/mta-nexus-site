@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { createServerSchema } from "@nexus/validation";
 import {
@@ -175,13 +176,7 @@ export async function POST(request: NextRequest) {
       201,
     );
   } catch (error: unknown) {
-    const appError =
-      error instanceof Error &&
-      "statusCode" in error
-        ? (error as Error & {
-            statusCode: number;
-          })
-        : null;
+    const appError = error instanceof AppError ? error : null;
     logRequestEvent({
       level: "error",
       event: "server.registration_failed",
@@ -192,9 +187,8 @@ export async function POST(request: NextRequest) {
     return privateJson(
       context,
       {
-        error:
-          appError?.message ||
-          "Could not register server",
+        error: appError?.message || "Could not register server",
+        ...(appError ? { code: appError.code } : {}),
       },
       appError?.statusCode || 500,
     );

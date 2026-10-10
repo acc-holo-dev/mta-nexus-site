@@ -25,7 +25,12 @@ describe("server ownership hardening surface", () => {
     expect(service).toContain("organization?.ownerId === actor.id");
     expect(service).toContain("organizationRepository.listUserMemberships(actor.id)");
     expect(service).toContain('can(actor, "server.manage", server, {');
-    expect(service).toContain("await this.canManageServer(server, actor)");
+    expect(service).toContain("serverRepository.updateManagedWithAudit(");
+    expect(service).not.toContain("await this.canManageServer(server, actor)");
+    const repo = read("packages/db/src/repositories/servers.ts");
+    expect(repo).toContain('for("update")');
+    expect(repo).toContain('for("share")');
+    expect(repo).toContain('"SERVER_METADATA_CONFLICT"');
     expect(page).toContain("await serverService.canManageServer(server, user)");
     expect(page).not.toContain(
       'server.ownerId !== user.id && user.role !== "admin"',

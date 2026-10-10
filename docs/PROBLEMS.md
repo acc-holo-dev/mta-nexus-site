@@ -875,3 +875,26 @@ a product requirement.
 - Remaining acceptance: PostgreSQL role-revocation and concurrent-write
   tests on the target DB, plus event-dispatch regression tests on Node 26.
   CI-001 currently prevents hosted exact-SHA execution.
+
+### P1. Owner edits: transactional authorization, stale forms and uniqueness
+
+Owner-facing PATCH now uses `updateManagedWithAudit`, which locks the server
+row and then locks the applicable organization/permission rows before
+updating metadata or writing its audit event. A revoked organization manager
+cannot reuse a previously rendered form to update a server. The older
+`updateWithAudit` helper remains for explicitly trusted internal migration
+and test paths; it is not used by HTTP mutations.
+
+An optional `expectedUpdatedAt` UTC/offset ISO timestamp rejects stale
+updates with `409 SERVER_METADATA_CONFLICT`. The UI sends this token and
+renders localized reload guidance. Editor timestamps increase monotonically
+at millisecond precision even for immediate successive saves.
+
+Known PostgreSQL slug and endpoint uniqueness constraints now return
+actionable 409 errors, without returning database exception details. The
+owner-facing API returns application error codes only for typed `AppError`.
+
+- Acceptance: run transaction role/revocation/stale-edit unit tests and
+  PostgreSQL integration and race tests on Node 26, followed by RU/EN browser
+  checks and exact-SHA GitHub Actions verification. CI-001 still blocks
+  hosted execution; no successful test run should be inferred.

@@ -131,6 +131,33 @@ describe("server owner update HTTP contract", () => {
     }
   });
 
+  it("passes an explicit version token to the authoritative update", async () => {
+    const response = await PATCH(
+      request({
+        description: "Updated once",
+        expectedUpdatedAt: "2026-10-10T02:15:00.000Z",
+      }),
+      routeContext,
+    );
+    expect(response.status).toBe(200);
+    expect(updateServer).toHaveBeenCalledWith(
+      "srv_1",
+      { description: "Updated once" },
+      state.user,
+      new Date("2026-10-10T02:15:00.000Z"),
+    );
+  });
+
+  it.each([
+    { expectedUpdatedAt: "2026-10-10T02:15:00.000Z" },
+    { name: "Nexus Server", expectedUpdatedAt: "not-a-date" },
+    { name: "Nexus Server", expectedUpdatedAt: "2026-10-10" },
+  ])("rejects token-only or invalid optimistic updates: %j", async (body) => {
+    const response = await PATCH(request(body), routeContext);
+    expect(response.status).toBe(400);
+    expect(updateServer).not.toHaveBeenCalled();
+  });
+
   it.each([{}, { slug: "hijacked" }, { organizationId: "org_other" }])(
     "rejects empty or protected update payload %j",
     async (body) => {

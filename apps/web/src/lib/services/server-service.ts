@@ -1,7 +1,23 @@
 import { serverRepository, organizationRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
-import { NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
+import { AppError, ForbiddenError, eventBus } from "@nexus/domain";
 import type { Server, User } from "@nexus/domain";
+import { isUniqueConstraintViolation } from "../postgres-error";
+
+function throwServerMutationConflict(error: unknown): never {
+  if (isUniqueConstraintViolation(error, ["servers_slug_idx", "servers_slug_unique"])) {
+    throw new AppError("Server slug is already in use", 409, "SERVER_SLUG_TAKEN");
+  }
+  if (isUniqueConstraintViolation(error, ["servers_endpoint_idx"])) {
+    throw new AppError(
+      "This server endpoint is already registered",
+      409,
+      "SERVER_ENDPOINT_TAKEN",
+    );
+  }
+  throw error;
+}
+
 
 type ServerDetailsUpdate = Partial<
   Pick<
@@ -37,24 +53,30 @@ class ServerService {
     // Do not perform an authorization read outside its database transaction.
 
     const id = generateId("srv");
-    const server = await serverRepository.createWithAudit(
-      {
-        ...input,
-        id,
-        // A listing is editorially active immediately; live availability is sourced separately from the official MTA directory.
-        status: "active",
-        isVerified: false,
-      },
-      {
-        id: generateId("aud"),
-        actorId: actor.id,
-        actorType: "user",
-        action: "server.created",
-        targetId: id,
-        targetType: "server",
-        details: { name: input.name, ip: input.ipAddress, port: input.port },
-      },
-    );
+    let server: Server;
+    try {
+      server = await serverRepository.createWithAudit(
+        {
+          ...input,
+          id,
+          // Editorial status is independent from the official MTA network status.
+          status: "active",
+          isVerified: false,
+        },
+        {
+          id: generateId("aud"),
+          actorId: actor.id,
+          actorType: "user",
+          action: "server.created",
+          targetId: id,
+          targetType: "server",
+          details: { name: input.name, ip: input.ipAddress, port: input.port },
+        },
+        actor.role,
+      );
+    } catch (error) {
+      throwServerMutationConflict(error);
+    }
 
     // The server and audit are committed. Best-effort event subscribers
     // cannot turn a successful creation into a client-visible 500/retry.
@@ -104,29 +126,31 @@ class ServerService {
     });
   }
 
-  async updateServer(serverId: string, updates: ServerDetailsUpdate, actor: User): Promise<Server> {
-    const server = await serverRepository.findById(serverId);
-    if (!server) throw new NotFoundError("Server", serverId);
-    if (!(await this.canManageServer(server, actor))) {
-      throw new ForbiddenError("You do not manage this server");
+  async updateServer(
+    serverId: string,
+    updates: ServerDetailsUpdate,
+    actor: User,
+    expectedUpdatedAt?: Date,
+  ): Promise<Server> {
+    try {
+      return await serverRepository.updateManagedWithAudit(
+        serverId,
+        updates,
+        {
+          id: generateId("aud"),
+          actorId: actor.id,
+          actorType: "user",
+          action: "server.updated",
+          targetId: serverId,
+          targetType: "server",
+          details: { fields: Object.keys(updates) },
+        },
+        actor,
+        expectedUpdatedAt,
+      );
+    } catch (error) {
+      throwServerMutationConflict(error);
     }
-
-    const updated = await serverRepository.updateWithAudit(
-      serverId,
-      updates,
-      {
-        id: generateId("aud"),
-        actorId: actor.id,
-        actorType: "user",
-        action: "server.updated",
-        targetId: serverId,
-        targetType: "server",
-        details: { fields: Object.keys(updates) },
-      },
-    );
-    if (!updated) throw new NotFoundError("Server", serverId);
-
-    return updated;
   }
 
 }
