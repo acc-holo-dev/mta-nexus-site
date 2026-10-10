@@ -845,3 +845,16 @@ malfunctioning mirror must not block fallback to another configured mirror.
 - **Remaining acceptance:** run bounded-reader tests on the required Node.js 26
   runtime and verify fallback during real upstream stalls. The current hosted
   GitHub runner blocker still prevents an exact-SHA CI/browser acceptance pass.
+
+### P2. Organization server registration scope needs live acceptance
+
+Server registration now offers an authenticated, bounded list of organizations
+owned or managed by the current user (owner/admin roles or explicit
+manage_servers permission). The chooser returns only ID, name and slug.
+This is not an authority grant: POST /api/servers rechecks rights. A failed
+lookup leaves personal registration usable and organization choice disabled.
+
+- Remaining acceptance: run the PostgreSQL role/permission/revocation tests,
+  browser registration for an owner and delegated manager, and a scenario
+  where organization rights are revoked between option loading and creation.
+  CI-001 still prevents exact-SHA hosted acceptance.

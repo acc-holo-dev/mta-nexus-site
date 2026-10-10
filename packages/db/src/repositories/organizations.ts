@@ -1,10 +1,43 @@
-import { desc, eq, ilike, inArray, or } from "drizzle-orm";
+import { and, asc, desc, eq, exists, ilike, inArray, or, sql } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { organizations, organizationMembers } from "../schema";
 import type { Organization, OrganizationMember } from "@nexus/domain";
 
+export type ServerManageableOrganization = Pick<Organization, "id" | "name" | "slug">;
+
 export class OrganizationRepository {
+  /** Return only manageable organizations and no membership or private profile data. */
+  async listServerManageableByUser(
+    userId: string,
+    requestedLimit = 100,
+  ): Promise<ServerManageableOrganization[]> {
+    if (!userId) throw new RangeError("A user ID is required");
+    const limit = Number.isFinite(requestedLimit)
+      ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
+      : 100;
+    return db
+      .select({
+        id: organizations.id,
+        name: organizations.name,
+        slug: organizations.slug,
+      })
+      .from(organizations)
+      .where(or(
+        eq(organizations.ownerId, userId),
+        exists(db.select({ id: organizationMembers.id }).from(organizationMembers).where(and(
+          eq(organizationMembers.organizationId, organizations.id),
+          eq(organizationMembers.userId, userId),
+          or(
+            inArray(organizationMembers.role, ["owner", "admin"]),
+            sql`${organizationMembers.permissions} @> ${JSON.stringify(["manage_servers"])}::jsonb`,
+          ),
+        ))),
+      ))
+      .orderBy(asc(organizations.name), asc(organizations.id))
+      .limit(limit);
+  }
+
   async searchPublic(term: string, limit = 50): Promise<Organization[]> {
     const pattern = containsPattern(term);
     const boundedLimit = Number.isFinite(limit)

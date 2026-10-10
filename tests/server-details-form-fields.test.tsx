@@ -61,5 +61,7 @@ describe("server forms use the same editable MTA metadata", () => {
     expect(html).toContain('name="mapName"');
     expect(html).toContain("Map name");
     expect(html).toContain('name="httpPort"');
+    expect(html).toContain('name="organizationId"');
+    expect(html).toContain("My personal account");
   });
 });

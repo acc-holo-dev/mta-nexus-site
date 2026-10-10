@@ -763,6 +763,11 @@ const en = {
   },
   serverRegistration: {
     title: "Add a server listing",
+    ownerScope: "Register for",
+    personalScope: "My personal account",
+    organizationsLoading: "Checking organizations you manage...",
+    organizationsUnavailable: "Organizations are temporarily unavailable. You can still register a personal server.",
+    organizationSelectionUnavailable: "The selected organization is no longer available. Refresh this page and try again.",
     description:
       "Create a listing you can manage. Live MTA network data comes from the official master-list.",
     name: "Name",
@@ -2130,6 +2135,11 @@ const ru: typeof en = {
   },
   serverRegistration: {
     title: "Добавить сервер",
+    ownerScope: "От чьего имени добавить сервер",
+    personalScope: "Личный аккаунт",
+    organizationsLoading: "Проверяем доступные организации...",
+    organizationsUnavailable: "Организации временно недоступны. Личный сервер всё ещё можно зарегистрировать.",
+    organizationSelectionUnavailable: "Выбранная организация больше недоступна. Обновите страницу и повторите попытку.",
     description:
       "Создайте управляемую карточку сервера. Живые данные сети MTA поступают из официального master-list.",
     name: "Название",

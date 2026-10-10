@@ -15,6 +15,7 @@ vi.mock("../packages/db/src/client", async (importOriginal) => {
   };
 });
 import { ServerRepository } from "../packages/db/src/repositories/servers";
+import { OrganizationRepository } from "../packages/db/src/repositories/organizations";
 it("checks personal and organization management scope with bounded pages on PostgreSQL", async () => {
   const { db } = await vi.importActual<typeof import("../packages/db/src/client")>(
     "../packages/db/src/client",
@@ -53,6 +54,20 @@ it("checks personal and organization management scope with bounded pages on Post
         ('unrelated-server', 'Other member', 'unrelated-server', '203.0.113.2', 6, 'actor', 'org-other', 'private', 'active', false, '2026-10-09T12:00:00Z'),
         ('literal-server', 'Name %_ literal', 'literal-server', '203.0.113.2', 7, 'actor', NULL, 'private', 'maintenance', false, '2026-10-09T12:00:00Z'),
         ('unowned-server', 'No owner', 'unowned-server', '203.0.113.2', 8, NULL, NULL, 'private', 'active', false, '2026-10-09T12:00:00Z')`);
+        const organizationRepository = new OrganizationRepository();
+        const choices = await organizationRepository.listServerManageableByUser("actor");
+        expect(choices.map((item) => item.id).sort()).toEqual([
+          "org-admin", "org-owned", "org-permission", "org-role-owner",
+        ]);
+        expect(choices[0]).toEqual({
+          id: expect.any(String), name: expect.any(String), slug: expect.any(String),
+        });
+        expect(await organizationRepository.listServerManageableByUser("outsider")).toEqual([]);
+        await expect(organizationRepository.listServerManageableByUser(""))
+          .rejects.toThrow("A user ID is required");
+        expect(await organizationRepository.listServerManageableByUser("actor", 2))
+          .toHaveLength(2);
+
         const repository = new ServerRepository();
         const first = await repository.pageManagedByUser("actor");
         expect(first).toMatchObject({ total: 135, page: 1, pageSize: 12, totalPages: 12 });
@@ -101,6 +116,8 @@ it("checks personal and organization management scope with bounded pages on Post
         // The following request reads fresh rights; earlier HTML cannot retain a revoked membership.
         await tx.execute(sql`DELETE FROM organization_members WHERE id = 'permission-member'`);
         expect((await repository.pageManagedByUser("actor")).total).toBe(134);
+        expect((await organizationRepository.listServerManageableByUser("actor"))
+          .map((item) => item.id)).not.toContain("org-permission");
       } finally {
         active.db = null;
       }

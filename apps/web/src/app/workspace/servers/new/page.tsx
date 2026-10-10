@@ -1,10 +1,14 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { Button } from "@nexus/ui";
 import { useNexusLocale } from "../../../../components/locale-context";
 import { confirmedCreatedServer } from "../../../../lib/server-mutation-confirmation";
 import { privateApiRequest } from "../../../../lib/private-api-request";
+import {
+  parseServerOrganizations,
+  type ServerOrganizationOption,
+} from "../../../../lib/server-organization-options";
 
 const fieldClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary outline-none transition-colors placeholder:text-[color:var(--nexus-text-faint)] hover:border-strong focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)]";
@@ -16,6 +20,32 @@ export default function RegisterServerPage() {
   const copy = dictionary.serverRegistration;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [organizations, setOrganizations] = useState<ServerOrganizationOption[]>([]);
+  const [organizationsLoading, setOrganizationsLoading] = useState(true);
+  const [organizationsFailed, setOrganizationsFailed] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function loadOrganizations() {
+      try {
+        const response = await fetch(
+          "/api/workspace/server-organizations",
+          privateApiRequest({ signal: controller.signal, timeoutMs: 10_000 }),
+        );
+        if (!response.ok) throw new Error("Organization lookup unavailable");
+        const options = parseServerOrganizations(await response.json());
+        if (!options) throw new Error("Invalid organization lookup response");
+        if (!controller.signal.aborted) setOrganizations(options);
+      } catch {
+        // A lookup outage must not grant access to an unlisted organization.
+        if (!controller.signal.aborted) setOrganizationsFailed(true);
+      } finally {
+        if (!controller.signal.aborted) setOrganizationsLoading(false);
+      }
+    }
+    void loadOrganizations();
+    return () => controller.abort();
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,6 +56,10 @@ export default function RegisterServerPage() {
     const form = new FormData(event.currentTarget);
 
     try {
+      const organizationId = String(form.get("organizationId") || "");
+      if (organizationId && !organizations.some((item) => item.id === organizationId)) {
+        throw new Error(copy.organizationSelectionUnavailable);
+      }
       const command = {
         name: String(form.get("name") || "").trim(),
         slug: String(form.get("slug") || "").trim().toLowerCase(),
@@ -50,6 +84,7 @@ export default function RegisterServerPage() {
         gameMode: String(form.get("gameMode") || "").trim(),
         mapName: String(form.get("mapName") || "").trim(),
         visibility: String(form.get("visibility") || "public"),
+        ...(organizationId ? { organizationId } : {}),
       };
       const response = await fetch(
         "/api/servers",
@@ -104,6 +139,31 @@ export default function RegisterServerPage() {
         aria-busy={loading}
         className="nexus-panel grid grid-cols-1 gap-4 p-5 shadow-nexus-sm sm:grid-cols-2 sm:p-6"
       >
+        <label className={`${labelClass} sm:col-span-2`}>
+          <span className={labelTextClass}>{copy.ownerScope}</span>
+          <select
+            name="organizationId"
+            defaultValue=""
+            disabled={organizationsLoading || organizationsFailed}
+            className={fieldClass}
+          >
+            <option value="">{copy.personalScope}</option>
+            {organizations.map((organization) => (
+              <option key={organization.id} value={organization.id}>
+                {organization.name}
+              </option>
+            ))}
+          </select>
+          {organizationsLoading && (
+            <span className="block text-xs text-muted">{copy.organizationsLoading}</span>
+          )}
+          {organizationsFailed && (
+            <span role="status" className="block text-xs text-muted">
+              {copy.organizationsUnavailable}
+            </span>
+          )}
+        </label>
+
         <label className={labelClass}>
           <span className={labelTextClass}>{copy.name}</span>
           <input
