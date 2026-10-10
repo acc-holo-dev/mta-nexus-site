@@ -102,6 +102,44 @@ describe("server owner update HTTP contract", () => {
     );
   });
 
+  it("accepts safe links and the full editable network metadata", async () => {
+    const fields = {
+      websiteUrl: "https://example.com",
+      mediaUrls: ["https://example.com/screenshot.png"],
+      httpPort: 22006,
+      mapName: "Los Santos",
+    };
+    const response = await PATCH(request(fields), routeContext);
+    expect(response.status).toBe(200);
+    expect(updateServer).toHaveBeenCalledWith("srv_1", fields, state.user);
+  });
+
+  it.each([
+    "javascript:alert(1)",
+    "data:text/html,hello",
+    "file:///etc/passwd",
+    "https://user:pass@example.com",
+    " https://example.com",
+  ])("rejects unsafe link %s in each owner-edit URL field", async (url) => {
+    for (const field of ["websiteUrl", "discordUrl", "rulesUrl", "mediaUrls"]) {
+      updateServer.mockClear();
+      const value = field === "mediaUrls" ? [url] : url;
+      const response = await PATCH(request({ [field]: value }), routeContext);
+      expect(response.status).toBe(400);
+      expectPrivateCorrelation(response);
+      expect(updateServer).not.toHaveBeenCalled();
+    }
+  });
+
+  it.each([{}, { slug: "hijacked" }, { organizationId: "org_other" }])(
+    "rejects empty or protected update payload %j",
+    async (body) => {
+      const response = await PATCH(request(body), routeContext);
+      expect(response.status).toBe(400);
+      expect(updateServer).not.toHaveBeenCalled();
+    },
+  );
+
   it.each([
     { ownerId: "usr_attacker" },
     { status: "suspended" },
