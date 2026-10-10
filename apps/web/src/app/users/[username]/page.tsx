@@ -1,3 +1,5 @@
+import { DeveloperExperience } from "../../../components/developer-experience";
+import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
 import { FollowButton } from "../../../components/follow-button";
 import Link from "next/link";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
@@ -62,9 +64,12 @@ export default async function UserProfilePage({
   }
 
   const query = await searchParams;
-  const [resourcePage, serverPage] = await Promise.all([
+  const [resourcePage, serverPage, professional] = await Promise.all([
     productRepository.pagePublishedFreeByAuthor(user.id, parseProfilePage(query?.page), 24),
     serverRepository.pageActivePublicByOwner(user.id, parseProfilePage(query?.serverPage), 12),
+    user.role === "developer" || user.role === "admin"
+      ? verificationWorkspaceService.publicProfile(user.id).catch(() => null)
+      : null,
   ]);
   const userProducts = resourcePage.products;
   const userServers = serverPage.servers;
@@ -139,6 +144,7 @@ export default async function UserProfilePage({
         </div>
       </section>
 
+      <DeveloperExperience profile={professional} locale={locale} />
       {resourcePage.total > 0 && (
         <section id="resources" className="space-y-4">
           <h2 className="font-heading text-primary">

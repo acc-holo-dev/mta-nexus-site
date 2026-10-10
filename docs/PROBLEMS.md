@@ -1304,7 +1304,7 @@ writes direct users to reload their persisted reports.
 Next webpack compile mode passed. Dependency analysis found no violations but
 retains its TypeScript 7 compatibility warning. The previously reported unused
 `ResourceActivityService` export is removed in Agent A's integrated commerce
-block; rerunning Knip in a provisioned environment remains pending.
+block; Knip passes after integration with the verification workspace.
 Seven new PostgreSQL fixtures cover deduplication, public scope, privacy,
 orphaned replies, decision races, live roles/audit rollback and product-review
 exclusion. They have not run locally: PostgreSQL, browser interaction and full
@@ -1348,3 +1348,42 @@ fixture could not connect to local PostgreSQL (ECONNREFUSED); four new persisten
 and concurrency fixtures are prepared but unrun. Migrations, query plans, browser
 interaction and full production generation remain unverified. Actions were not
 used.
+
+### Professional profiles and private verification workspace — 2026-10-11
+
+`/settings/developer` persists specialties, portfolio and Discord in existing
+`developer_profiles`. Writes check live roles and the shared account revision,
+retain commercial counters and audit the edit. Material specialties/portfolio
+changes remove `verified_developer`; identity verification remains separate.
+Public user/developer profiles expose only safe professional fields and the
+actual experience flag, never private evidence or default reputation scores.
+
+`/workspace/verification` supports required evidence, own pending/history pages,
+feedback, type filters and bounded current-owner/admin organization search.
+API responses are private/no-store, session-scoped, rate-limited and bounded;
+RU/EN includes metadata, navigation and uncertain-write recovery. Moderator
+cards include current professional context; decisions recheck live staff and
+organization authority, refuse self approval and compare the submitted profile
+fingerprint stored in the existing request audit. Resolution, audit and requester
+inbox remain transactional; MTA proof/scope checks remain intact. Existing pending
+developer applications without a profile fingerprint must be rejected and
+resubmitted rather than automatically approved.
+
+129 focused contract, service, HTTP, SQL-builder and SSR checks pass, including
+existing MTA control-proof and community-report regressions. After rebasing on
+Agent A's release-control block, 207 checks across 22 files pass, including the
+commercial release/library regressions. TypeScript,
+touched-file Biome, Knip and Next webpack compile mode pass. Dependency analysis
+reports no violations (579 modules / 2115 edges), with its TypeScript 7 warning.
+Five new PostgreSQL fixtures cover persisted experience, invalidation, duplicate
+applications, shared-version races, stale-profile rollback, self review, revoked
+roles and revoked organization grants. These fixtures are unrun; live PostgreSQL,
+browser interaction and full production generation remain pending. No schema,
+migration, npm dependency or workflow is changed by this block.
+
+Index contract for Agent A, needed for large requester histories:
+
+```sql
+CREATE INDEX verification_requests_requester_created_id_idx
+  ON verification_requests (requester_id, created_at DESC, id DESC);
+```

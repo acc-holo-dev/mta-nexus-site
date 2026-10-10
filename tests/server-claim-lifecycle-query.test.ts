@@ -10,6 +10,10 @@ vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
+    // Moderation now validates the independent reviewer's live role before and
+    // after the existing control-proof checks; keep target fixtures separate.
+    if (sql.startsWith('select "role" from "users"') && params[0] === "moderator")
+      return { rows: [["moderator"]] };
     return {
       rows:
         sql.startsWith("select") || sql.includes(" returning ") ? (state.rows.shift() ?? []) : [],

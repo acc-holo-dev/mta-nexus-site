@@ -15,6 +15,7 @@ import {
   Settings,
   ShieldCheck,
   ShieldAlert,
+  Code2,
   X,
   Users,
 } from "lucide-react";
@@ -26,6 +27,7 @@ import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { communityReportCopy } from "../lib/community-report-copy";
+import { verificationCopy } from "../lib/verification-workspace-copy";
 import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 
 export function MobileNav({ locale }: { locale: Locale }) {
@@ -46,6 +48,8 @@ export function MobileNav({ locale }: { locale: Locale }) {
   ];
 
   const moreItems = [
+    { href: "/workspace/verification", label: verificationCopy(locale).title, icon: ShieldCheck },
+    { href: "/settings/developer", label: verificationCopy(locale).profile, icon: Code2 },
     { href: "/workspace/reports", label: communityReportCopy(locale).myReports, icon: ShieldAlert },
     { href: "/workspace/feed", label: publicationCopy(locale).title, icon: MessageSquare },
     { href: "/workspace/saved", label: dictionary.nav.saved, icon: Bookmark },

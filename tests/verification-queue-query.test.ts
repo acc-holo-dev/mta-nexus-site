@@ -14,12 +14,24 @@ vi.mock("../packages/db/src/client", () => ({
   db: {
     select: () => ({
       from: () => ({
+        leftJoin() {
+          return this;
+        },
         where(condition: SQL) {
           captured.where = condition;
           const query = {
-            orderBy(...order: SQL[]) { captured.order = order; return query; },
-            limit(value: number) { captured.limit = value; return query; },
-            offset(value: number) { captured.offset = value; return Promise.resolve(captured.rows); },
+            orderBy(...order: SQL[]) {
+              captured.order = order;
+              return query;
+            },
+            limit(value: number) {
+              captured.limit = value;
+              return query;
+            },
+            offset(value: number) {
+              captured.offset = value;
+              return Promise.resolve(captured.rows);
+            },
           };
           return query;
         },
@@ -59,6 +71,8 @@ describe("verification queue query", () => {
       '"verification_requests"."id" desc',
     ]);
     await expect(new VerificationRepository().listPage("pending", 0)).rejects.toThrow(RangeError);
-    await expect(new VerificationRepository().listPage("pending", 1, 101)).rejects.toThrow(RangeError);
+    await expect(new VerificationRepository().listPage("pending", 1, 101)).rejects.toThrow(
+      RangeError,
+    );
   });
 });

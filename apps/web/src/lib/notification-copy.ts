@@ -7,21 +7,81 @@ export function formatNotification(
   copy: { approved: string; rejected: string; version: string; notes: string },
   locale: Locale = "en",
 ) {
-  if (notification.title === "New community report" && notification.message === "A community report is awaiting review.")
-    return { title: locale === "ru" ? "Новая жалоба сообщества" : notification.title,
-      message: locale === "ru" ? "Жалоба сообщества ожидает рассмотрения." : notification.message };
-  const reportStatus = notification.title === "Community report status" && /^Report status: (under_review|resolved|dismissed)\.$/u.exec(notification.message);
-  if (reportStatus) {
-    const statuses: Record<string, string> = { under_review: "рассматривается", resolved: "решена", dismissed: "отклонена" };
-    return { title: locale === "ru" ? "Статус жалобы" : notification.title,
-      message: locale === "ru" ? `Жалоба ${statuses[reportStatus[1]]}.` : notification.message };
+  const verification =
+    /^([a-z]+) verification for ([a-zA-Z0-9_-]{1,128}) was (approved|rejected)\.$/u.exec(
+      notification.message,
+    );
+  if (
+    verification &&
+    ["user", "developer", "organization", "server"].includes(verification[1]) &&
+    notification.title === `Verification ${verification[3]}`
+  ) {
+    const labels: Record<string, string> = {
+      user: "Подтверждение личности",
+      developer: "Подтверждение опыта разработчика",
+      organization: "Подтверждение организации",
+      server: "Подтверждение контроля сервера",
+    };
+    return {
+      title:
+        locale === "ru"
+          ? verification[3] === "approved"
+            ? "Верификация одобрена"
+            : "Верификация отклонена"
+          : notification.title,
+      message:
+        locale === "ru"
+          ? `${labels[verification[1]]} ${verification[3] === "approved" ? "одобрено" : "отклонено"}.`
+          : notification.message,
+    };
   }
-  const follower = notification.title === "New Follower" &&
+  const requested =
+    /^(user|developer|organization|server) verification requested for ([a-zA-Z0-9_-]{1,128})$/u.exec(
+      notification.message,
+    );
+  if (notification.title === "New verification request" && requested && locale === "ru") {
+    const labels: Record<string, string> = {
+      user: "личности",
+      developer: "опыта разработчика",
+      organization: "организации",
+      server: "контроля сервера",
+    };
+    return {
+      title: "Новая заявка на верификацию",
+      message: `Подтверждение ${labels[requested[1]]}: ${requested[2]}.`,
+    };
+  }
+  if (
+    notification.title === "New community report" &&
+    notification.message === "A community report is awaiting review."
+  )
+    return {
+      title: locale === "ru" ? "Новая жалоба сообщества" : notification.title,
+      message: locale === "ru" ? "Жалоба сообщества ожидает рассмотрения." : notification.message,
+    };
+  const reportStatus =
+    notification.title === "Community report status" &&
+    /^Report status: (under_review|resolved|dismissed)\.$/u.exec(notification.message);
+  if (reportStatus) {
+    const statuses: Record<string, string> = {
+      under_review: "рассматривается",
+      resolved: "решена",
+      dismissed: "отклонена",
+    };
+    return {
+      title: locale === "ru" ? "Статус жалобы" : notification.title,
+      message: locale === "ru" ? `Жалоба ${statuses[reportStatus[1]]}.` : notification.message,
+    };
+  }
+  const follower =
+    notification.title === "New Follower" &&
     /^@([a-zA-Z0-9_-]{1,80}) started following your activity\.$/u.exec(notification.message);
-  if (follower) return {
-    title: locale === "ru" ? "Новый подписчик" : "New follower",
-    message: locale === "ru" ? `@${follower[1]} подписался на вашу активность.` : notification.message,
-  };
+  if (follower)
+    return {
+      title: locale === "ru" ? "Новый подписчик" : "New follower",
+      message:
+        locale === "ru" ? `@${follower[1]} подписался на вашу активность.` : notification.message,
+    };
   // These notices predate structured review payloads; localize their bounded,
   // server-generated template without changing persisted notification contracts.
   const comment =

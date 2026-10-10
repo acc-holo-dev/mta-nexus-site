@@ -10,6 +10,7 @@ import {
   generateId,
 } from "@nexus/security";
 import { z } from "zod";
+import { externalWebUrlSchema } from "@nexus/validation";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -44,11 +45,7 @@ const verificationRequestSchema = z
       "server",
     ]),
     targetId: z.string().min(1).max(128),
-    proofUrl: z
-      .string()
-      .url()
-      .regex(/^https?:\/\//iu)
-      .max(2048)
+    proofUrl: externalWebUrlSchema
       .optional()
       .or(z.literal("")),
     notes: z.string().max(1000).optional(),
@@ -177,7 +174,8 @@ export async function POST(request: NextRequest) {
           403,
         );
       }
-      targetIsVerified = user.isVerified;
+      // Identity and experience use separate live flags in the repository.
+      targetIsVerified = parsed.data.targetType === "user" && user.isVerified;
     } else {
       const organization =
         await organizationRepository.findById(

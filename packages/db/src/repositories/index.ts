@@ -48,6 +48,8 @@ export * from "./resource-download-authorization";
 export { publicationFeedRepository, type PublicationScope } from "./publication-feed";
 export { discussionManagementRepository, discussionRevision } from "./discussion-management";
 export { communityReportsRepository } from "./community-reports";
+export { developerProfileRepository } from "./developer-profile";
+export { verificationWorkspaceRepository } from "./verification-workspace";
 export * from "./commercial-plans";
 export * from "./order-operations";
 export * from "./resource-library-selections";

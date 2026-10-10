@@ -37,6 +37,8 @@ import { ContentModerationControls } from "../../components/content-moderation-c
 import { VerificationModerationControls } from "../../components/verification-moderation-controls";
 import { ReportModerationControls } from "../../components/report-moderation-controls";
 import { communityReportCopy } from "../../lib/community-report-copy";
+import { verificationCopy } from "../../lib/verification-workspace-copy";
+import { safeExternalWebUrl } from "@nexus/validation";
 import { getCommercialCopy } from "../../lib/commercial-i18n";
 
 export const dynamic = "force-dynamic";
@@ -243,9 +245,40 @@ export default async function AdminPage({
                   {request.notes && (
                     <p className="font-caption text-faint">{request.notes}</p>
                   )}
-                  {request.proofUrl && /^https?:\/\//i.test(request.proofUrl) && (
+                  {request.targetUsername && (
+                    <Link
+                      href={`/users/${encodeURIComponent(request.targetUsername)}`}
+                      className="block text-xs text-accent underline"
+                    >
+                      {verificationCopy(locale).publicProfile} · @{request.targetUsername}
+                    </Link>
+                  )}
+                  {request.organizationSlug && (
+                    <Link
+                      href={`/organizations/${encodeURIComponent(request.organizationSlug)}`}
+                      className="block text-xs text-accent underline"
+                    >
+                      {verificationCopy(locale).organization}
+                    </Link>
+                  )}
+                  {request.currentSpecialties && request.currentSpecialties.length > 0 && (
+                    <p className="break-words text-xs text-secondary">
+                      {request.currentSpecialties.slice(0, 12).join(" · ")}
+                    </p>
+                  )}
+                  {safeExternalWebUrl(request.currentGithubUrl) && (
                     <a
-                      href={request.proofUrl}
+                      href={safeExternalWebUrl(request.currentGithubUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-xs text-accent underline"
+                    >
+                      {verificationCopy(locale).github}
+                    </a>
+                  )}
+                  {safeExternalWebUrl(request.proofUrl) && (
+                    <a
+                      href={safeExternalWebUrl(request.proofUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block break-all font-caption text-accent underline"

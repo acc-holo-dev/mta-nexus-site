@@ -2,65 +2,65 @@
 
 import { BadgeCheck, LoaderCircle, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { confirmsAdminAction } from "../lib/admin-action-confirmation";
+import { useEffect, useRef, useState } from "react";
+import { z } from "zod";
+import { platformRequest } from "../lib/user-platform-client";
+import { verificationCopy, verificationDecisionError } from "../lib/verification-workspace-copy";
 import {
   buildVerificationDecisionPayload,
   normalizeVerificationReviewNotes,
 } from "../lib/verification-moderation";
 import { useNexusLocale } from "./locale-context";
 
-export function VerificationModerationControls({
-  requestId,
-}: {
-  requestId: string;
-}) {
+export function VerificationModerationControls({ requestId }: { requestId: string }) {
   const router = useRouter();
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.admin;
   const [notes, setNotes] = useState("");
   const [pending, setPending] = useState<"approve" | "reject" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const guard = useRef(false),
+    controller = useRef<AbortController | null>(null);
+  useEffect(() => () => controller.current?.abort(), []);
 
   const normalizedNotes = normalizeVerificationReviewNotes(notes);
   const hasNotes = normalizedNotes !== null;
 
   async function decide(action: "approve" | "reject") {
-    const payload = buildVerificationDecisionPayload(
-      requestId,
-      action,
-      notes,
-    );
-    if (!payload || pending) return;
+    const payload = buildVerificationDecisionPayload(requestId, action, notes);
+    if (!payload || guard.current) return;
 
     const confirmed = window.confirm(
-      action === "approve"
-        ? copy.approveVerificationConfirm
-        : copy.rejectVerificationConfirm,
+      action === "approve" ? copy.approveVerificationConfirm : copy.rejectVerificationConfirm,
     );
     if (!confirmed) return;
 
+    guard.current = true;
+    controller.current = new AbortController();
     setPending(action);
     setError(null);
     try {
-      const response = await fetch("/api/admin/actions", {
-        method: "POST",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(10_000),
-      });
-      const data = await response.json().catch(() => null);
-      if (!confirmsAdminAction(response.status, data, requestId, action)) {
-        setError(data?.error || copy.verificationFailed);
-        return;
-      }
+      const decision = action === "approve" ? "approved" : "rejected";
+      const data = await platformRequest(
+        `/api/admin/verification/${encodeURIComponent(requestId)}`,
+        locale,
+        "PATCH",
+        { decision, reviewNotes: payload.notes },
+        controller.current.signal,
+        verificationDecisionError,
+      );
+      if (
+        !z.object({ id: z.literal(requestId), status: z.literal(decision) }).safeParse(data).success
+      )
+        throw new Error(verificationCopy(locale).decisionUnavailable);
       setNotes("");
       router.refresh();
-    } catch {
-      setError(copy.verificationUnavailable);
+    } catch (caught) {
+      setError(
+        caught instanceof Error ? caught.message : verificationCopy(locale).decisionUnavailable,
+      );
     } finally {
+      guard.current = false;
       setPending(null);
     }
   }
@@ -111,7 +111,11 @@ export function VerificationModerationControls({
       </div>
 
       {!hasNotes && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
-      {error && <p role="alert" className="text-[11px] text-danger">{error}</p>}
+      {error && (
+        <p role="alert" className="text-[11px] text-danger">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

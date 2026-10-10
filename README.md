@@ -15,6 +15,16 @@ return to moderator review; archived entries remain read-only. `/articles` and
 `/community` support URL-preserving search, type filters and bounded pagination.
 Public name, biography and avatar are editable in `/settings` in both RU/EN.
 
+Developers edit specialties, portfolio and Discord in `/settings/developer`.
+Public profiles show these contacts and the separate verified-experience flag.
+Changing specialties or portfolio removes that flag. `/workspace/verification`
+supports private evidence submissions, current status and paginated feedback for
+identity, developer experience and managed organizations. MTA ownership keeps its
+control-challenge flow. Moderators review current profile/authority context at
+`/admin`; profile revisions, live roles and independent approval are checked in
+the same transaction as the decision, audit and requester notification. Both
+languages include errors, metadata, saved-state recovery and navigation.
+
 Recommended zero-host-dependency path: Docker Compose. Host Node.js, pnpm and PostgreSQL are not required.
 
 ```bash
