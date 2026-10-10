@@ -149,3 +149,61 @@ it("destroys an opened provider stream when cancellation wins the return race", 
   expect(get).toHaveBeenCalledOnce();
   expect(stream.destroyed).toBe(true);
 });
+
+it.each(["key", "sizeBytes", "sha256Hash"] as const)(
+  "rejects incorrect %s returned by an upload provider and cleans up the new object",
+  async (field) => {
+    const provider = state.provider!;
+    const originalPut = provider.put.bind(provider);
+    vi.spyOn(provider, "put").mockImplementation(async (...args) => {
+      const meta = await originalPut(...args);
+      switch (field) {
+        case "key":
+          return { ...meta, key: "assets/someone_else/different.zip" };
+        case "sizeBytes":
+          return { ...meta, sizeBytes: meta.sizeBytes + 1 };
+        case "sha256Hash":
+          return { ...meta, sha256Hash: "0".repeat(64) };
+      }
+    });
+
+    await expect(service.uploadAsset({
+      data: Buffer.from("asset integrity check"),
+      fileName: "asset.zip",
+      mimeType: "application/zip",
+      userId: "usr_owner",
+    })).rejects.toMatchObject({ code: "VALIDATION_FAILED" });
+    expect(await readdir(join(root, "assets/usr_owner"))).toEqual([]);
+  },
+);
+
+it.each(["key", "sizeBytes", "sha256Hash"] as const)(
+  "closes a raw download if the provider supplies invalid %s metadata",
+  async (field) => {
+    const asset = await service.uploadAsset({
+      data: Buffer.from("verified archive"),
+      fileName: "asset.zip",
+      mimeType: "application/zip",
+      userId: "usr_owner",
+    });
+    const provider = state.provider!;
+    const originalGet = provider.get.bind(provider);
+    let openedStream: Readable | undefined;
+    vi.spyOn(provider, "get").mockImplementation(async (...args) => {
+      const result = await originalGet(...args);
+      openedStream = result.stream as Readable;
+      if (field === "key") {
+        return { ...result, meta: { ...result.meta, key: "assets/other/file.zip" } };
+      }
+      if (field === "sizeBytes") {
+        return { ...result, meta: { ...result.meta, sizeBytes: -1 } };
+      }
+      return { ...result, meta: { ...result.meta, sha256Hash: "not-a-digest" } };
+    });
+
+    await expect(service.getDownloadStream(asset.key))
+      .rejects.toMatchObject({ code: "VALIDATION_FAILED" });
+    expect(openedStream).toBeDefined();
+    expect(openedStream?.destroyed).toBe(true);
+  },
+);

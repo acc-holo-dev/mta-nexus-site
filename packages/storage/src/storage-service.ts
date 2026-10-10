@@ -49,6 +49,24 @@ export class StorageService {
 
     const provider = getStorageProvider();
     const meta = await provider.put(key, input.data, input.mimeType);
+    // A storage adapter must acknowledge the exact immutable object that
+    // was requested. A successful write with a different key, length or
+    // digest must not be published as a valid upload in database metadata.
+    if (
+      meta.key !== key ||
+      meta.sizeBytes !== input.data.byteLength ||
+      meta.sha256Hash !== sha256Hash
+    ) {
+      // Best effort: this key was freshly generated and put() is required to
+      // publish only new keys. Do not hide the integrity failure if cleanup
+      // is unavailable or the adapter itself is malfunctioning.
+      try {
+        await provider.delete(key);
+      } catch {
+        // The orphaned object needs a separate storage maintenance sweep.
+      }
+      throw new ValidationError("Storage provider did not confirm uploaded asset integrity");
+    }
 
     return {
       ...meta,
@@ -75,6 +93,19 @@ export class StorageService {
       // already returned by the adapter rather than leaking live handles.
       try {
         signal?.throwIfAborted();
+        // Raw download callers may not have a build row to compare against.
+        // The provider must at least return a metadata record for the exact
+        // requested object with bounded size and a canonical digest.
+        const meta = opened.meta;
+        if (
+          meta?.key !== key ||
+          !Number.isSafeInteger(meta?.sizeBytes) ||
+          meta.sizeBytes <= 0 ||
+          meta.sizeBytes > MAX_FILE_SIZE_BYTES ||
+          !/^[a-f0-9]{64}$/u.test(meta.sha256Hash)
+        ) {
+          throw new ValidationError("Storage provider returned invalid verified metadata");
+        }
       } catch (error) {
         (opened.stream as NodeJS.ReadableStream & {
           destroy?: () => void;

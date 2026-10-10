@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { ConflictError, MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
+import { ConflictError, MAX_UPLOAD_FILE_SIZE_BYTES, ValidationError } from "@nexus/domain";
 import type { StorageProvider, StorageObjectMeta, VerifiedStorageReadMeta } from "./types";
 
 type DirectoryHandle = Awaited<ReturnType<typeof fs.open>>;
@@ -85,6 +85,15 @@ export class LocalStorageProvider implements StorageProvider {
   }
 
   async put(key: string, data: Buffer | Uint8Array, mimeType: string): Promise<StorageObjectMeta> {
+    // Keep the size contract even when an adapter is invoked without the
+    // StorageService facade. Validate before cloning a potentially huge input.
+    if (
+      !Number.isSafeInteger(data.byteLength) ||
+      data.byteLength === 0 ||
+      data.byteLength > MAX_UPLOAD_FILE_SIZE_BYTES
+    ) {
+      throw new ValidationError("Storage object size is outside the allowed range");
+    }
     // Snapshot caller-owned memory before yielding, then publish complete bytes only.
     const bytes = Buffer.from(data);
     const hash = crypto.createHash("sha256").update(bytes).digest("hex");

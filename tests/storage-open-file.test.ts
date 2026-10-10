@@ -42,6 +42,16 @@ it("rejects directories as download objects and refuses a root-directory key", a
   await expect(storage.get(".")).rejects.toThrow("Invalid storage key");
 });
 
+it("rejects an oversized direct provider upload before touching the filesystem", async () => {
+  await expect(storage.put(
+    "oversized-direct.zip",
+    Buffer.alloc(MAX_UPLOAD_FILE_SIZE_BYTES + 1),
+    "application/zip",
+  )).rejects.toMatchObject({ code: "VALIDATION_FAILED" });
+  await expect(fs.stat(join(root, "oversized-direct.zip")))
+    .rejects.toMatchObject({ code: "ENOENT" });
+});
+
 it("rejects an oversized on-disk object before expensive hashing or streaming", async () => {
   await storage.put("oversized.zip", Buffer.from("original"), "application/zip");
   await fs.truncate(join(root, "oversized.zip"), MAX_UPLOAD_FILE_SIZE_BYTES + 1);
