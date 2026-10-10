@@ -133,15 +133,17 @@ class ServerService {
     if (can(actor, "server.manage", server)) return true;
     if (!server.organizationId) return false;
 
-    const [organization, organizationMemberships] = await Promise.all([
-      organizationRepository.findById(server.organizationId),
-      organizationRepository.listUserMemberships(actor.id),
-    ]);
+    const organization = await organizationRepository.findById(server.organizationId);
+    // Never grant access based on an orphaned listing or stale membership.
+    if (!organization) return false;
+    if (organization.ownerId === actor.id) return true;
 
-    if (organization?.ownerId === actor.id) return true;
-
+    const membership = await organizationRepository.findServerMembershipForUser(
+      server.organizationId,
+      actor.id,
+    );
     return can(actor, "server.manage", server, {
-      organizationMemberships,
+      organizationMemberships: membership ? [membership] : [],
     });
   }
 

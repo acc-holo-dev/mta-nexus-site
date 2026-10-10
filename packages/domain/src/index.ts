@@ -6,3 +6,4 @@ export * from "./product-types";
 export * from "./release-pagination";
 export * from "./mta-endpoint";
 export * from "./mta-endpoint-audit";
+export * from "./organization-server-permissions";

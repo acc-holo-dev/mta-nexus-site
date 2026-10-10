@@ -1,3 +1,4 @@
+import { grantsServerManagement } from "@nexus/domain";
 import type { User, Product, Server, License, Content } from "@nexus/domain";
 
 export type Action =
@@ -120,7 +121,7 @@ export function can(
         const mem = context.organizationMemberships.find(
           (m) => m.organizationId === server.organizationId
         );
-        if (mem && (mem.role === "owner" || mem.role === "admin" || mem.permissions.includes("manage_servers"))) {
+        if (grantsServerManagement(mem)) {
           return true;
         }
       }

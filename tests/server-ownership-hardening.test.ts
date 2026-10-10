@@ -30,9 +30,15 @@ describe("server ownership hardening surface", () => {
     );
 
     expect(service).toContain("async canManageServer(");
-    expect(service).toContain("organization?.ownerId === actor.id");
-    expect(service).toContain("organizationRepository.listUserMemberships(actor.id)");
+    expect(service).toContain("if (!organization) return false");
+    expect(service).toContain("organization.ownerId === actor.id");
+    expect(service).toContain("organizationRepository.findServerMembershipForUser(");
+    expect(service).not.toContain("organizationRepository.listUserMemberships(actor.id)");
     expect(service).toContain('can(actor, "server.manage", server, {');
+    const orgRepo = read("packages/db/src/repositories/organizations.ts");
+    expect(orgRepo).toContain('eq(organizationMembers.organizationId, organizationId)');
+    expect(orgRepo).toContain('eq(organizationMembers.userId, userId)');
+    expect(orgRepo).toContain('.limit(1)');
     expect(service).toContain("serverRepository.updateManagedWithAudit(");
     expect(service).not.toContain("await this.canManageServer(server, actor)");
     const repo = read("packages/db/src/repositories/servers.ts");

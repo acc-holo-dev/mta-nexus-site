@@ -2,7 +2,7 @@ import { and, asc, count, desc, eq, exists, gt, ilike, inArray, isNull, ne, or, 
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, organizationMembers, organizations, servers } from "../schema";
-import { AppError, ForbiddenError, NotFoundError, type AuditEvent, type Server, type ServerStatus, type ServerVisibility, type User } from "@nexus/domain";
+import { AppError, ForbiddenError, NotFoundError, grantsServerManagement, type AuditEvent, type Server, type ServerStatus, type ServerVisibility, type User } from "@nexus/domain";
 
 export type ManagedServerFilters = {
   query?: string;
@@ -56,18 +56,6 @@ function resetLiveStateForEndpointEdit(updates: ServerEditableFields) {
       ? { maxPlayers: sql<number | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.maxPlayers} END` }
       : {}),
   };
-}
-
-function memberMayManageServers(
-  membership: { role: string; permissions: string[] } | null | undefined,
-): boolean {
-  return Boolean(
-    membership && (
-      membership.role === "owner" ||
-      membership.role === "admin" ||
-      membership.permissions.includes("manage_servers")
-    ),
-  );
 }
 
 export class ServerRepository {
@@ -312,7 +300,7 @@ export class ServerRepository {
             ))
             .for("share")
             .limit(1);
-          if (!memberMayManageServers(membership)) {
+          if (!grantsServerManagement(membership)) {
             throw new ForbiddenError(
               "You do not have permission to create servers for this organization",
             );
@@ -398,7 +386,7 @@ export class ServerRepository {
               ))
               .for("share")
               .limit(1);
-            if (!memberMayManageServers(membership)) {
+            if (!grantsServerManagement(membership)) {
               throw new ForbiddenError("You do not manage this server");
             }
           }

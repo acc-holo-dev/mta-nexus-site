@@ -1046,3 +1046,24 @@ by the existing tooling test runner. The isolated Node.js 22 run with
 `--experimental-strip-types` and a strict TypeScript check passed;
 Node.js 26 and full Vitest/PostgreSQL acceptance remain outstanding.
 CI-001 is still a runner-allocation issue, not a test-result verdict.
+
+### P2. Scoped organization server permissions and fail-closed workspace access
+
+The read-only server management workspace no longer loads every membership
+of the signed-in user. It fetches the current organization first, denies an
+orphaned organization listing, then reads at most one organization/user
+membership with only organizationId, role and permissions. Direct organization
+owners and platform administrators retain their existing access. The mutation
+repository still rechecks permissions under PostgreSQL row locks; the workspace
+view is not a substitute for the write authorization.
+
+The delegated `manage_servers` rule is centralized in `@nexus/domain`
+and shared by both the security policy and the transactional server repository.
+The organization option picker and SQL workspace listing use the same owner,
+admin and explicit permission categories. Focused Vitest and integration tests
+cover missing organizations, scoped roles, revoked permissions, malformed
+membership scopes and the current owner override.
+
+Twelve pure, dependency-free permission cases passed on local Node.js 22 and
+the helper passed strict isolated TypeScript compilation. Full Node.js 26,
+Vitest, PostgreSQL and browser acceptance remain outstanding until CI-001.

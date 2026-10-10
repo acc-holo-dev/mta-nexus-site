@@ -7,6 +7,31 @@ import type { Organization, OrganizationMember } from "@nexus/domain";
 export type ServerManageableOrganization = Pick<Organization, "id" | "name" | "slug">;
 
 export class OrganizationRepository {
+  /**
+   * Access checks for one server should never load a user's entire
+   * organization membership history. The write path separately rechecks
+   * current rights inside its own database transaction.
+   */
+  async findServerMembershipForUser(
+    organizationId: string,
+    userId: string,
+  ): Promise<Pick<OrganizationMember, "organizationId" | "role" | "permissions"> | null> {
+    if (!organizationId || !userId) return null;
+    const [membership] = await db
+      .select({
+        organizationId: organizationMembers.organizationId,
+        role: organizationMembers.role,
+        permissions: organizationMembers.permissions,
+      })
+      .from(organizationMembers)
+      .where(and(
+        eq(organizationMembers.organizationId, organizationId),
+        eq(organizationMembers.userId, userId),
+      ))
+      .limit(1);
+    return membership ?? null;
+  }
+
   /** Return only manageable organizations and no membership or private profile data. */
   async listServerManageableByUser(
     userId: string,

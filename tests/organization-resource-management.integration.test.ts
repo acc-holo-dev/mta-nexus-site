@@ -198,6 +198,14 @@ describe("organization resource management integration", () => {
       eq(organizationMembers.organizationId, organizationId),
       eq(organizationMembers.userId, managerId),
     ));
+    // Display permissions must be revoked alongside the write permissions.
+    expect(await serverService.canManageServer(created, manager)).toBe(false);
+    await expect(serverService.updateServer(
+      created.id,
+      { description: "Attempted stale-manager edit" },
+      manager,
+    )).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
+
     await expect(serverService.createServer(
       {
         name: "Revoked Organization Server",

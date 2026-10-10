@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { can, getStaticCapabilities } from "@nexus/security";
-import type { User, Product } from "@nexus/domain";
+import type { User, Product, Server } from "@nexus/domain";
 
 describe("Security Policy Engine can()", () => {
   const adminUser: User = {
@@ -64,6 +64,37 @@ describe("Security Policy Engine can()", () => {
     id: "prd_2",
     authorId: "usr_other_author",
   };
+
+  it("matches delegated server access, but never infers personal ownership for organization listings", () => {
+    const personal = { id: "srv_personal", ownerId: regularUser.id } as Server;
+    const orgServer = {
+      id: "srv_org",
+      ownerId: regularUser.id, // Legacy mixed owner data must not bypass organization rights
+      organizationId: "org_1",
+    } as Server;
+    expect(can(regularUser, "server.manage", personal)).toBe(true);
+    expect(can(regularUser, "server.manage", orgServer)).toBe(false);
+    expect(can(regularUser, "server.delete", orgServer)).toBe(false);
+
+    for (const membership of [
+      { organizationId: "org_1", role: "owner", permissions: [] },
+      { organizationId: "org_1", role: "admin", permissions: [] },
+      { organizationId: "org_1", role: "member", permissions: ["manage_servers"] },
+    ]) {
+      expect(can(regularUser, "server.manage", orgServer, {
+        organizationMemberships: [membership],
+      })).toBe(true);
+    }
+    for (const membership of [
+      { organizationId: "org_1", role: "member", permissions: ["manage_products"] },
+      { organizationId: "org_else", role: "admin", permissions: [] },
+      { organizationId: "org_1", role: "member", permissions: [] },
+    ]) {
+      expect(can(regularUser, "server.manage", orgServer, {
+        organizationMemberships: [membership],
+      })).toBe(false);
+    }
+  });
 
   it("should permit admin access to all actions", () => {
     expect(can(adminUser, "admin.access")).toBe(true);
