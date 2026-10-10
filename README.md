@@ -254,6 +254,13 @@ transaction locks; existing resource permissions are preserved. Article and
 community discussions support author identities, replies and 20-item keyset
 pages through `/api/content/[slug]/comments` (GET/POST), with RU/EN interfaces.
 
+Actual organization owners can transfer ownership to a current team member with
+an exact organization confirmation and a chosen retained member/admin role.
+`/workspace/organizations/[id]/activity` exposes private, 20-item audit history
+to current owners/admins. Transfers and team access changes store inbox notices
+atomically; optional push delivery uses the existing outbox. These flows support
+RU/EN, stale-version checks and recovery after an uncertain response.
+
 `/discover`, `/developers` and `/organizations` support paginated search and
 public filters through `/api/discover`. `/workspace/saved` manages all four
 existing follow types with private 20-item pages, search and removal, including

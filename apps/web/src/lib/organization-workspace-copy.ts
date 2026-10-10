@@ -1,5 +1,6 @@
 import type { Locale } from "./i18n";
 import { userPlatformError } from "./user-platform-copy";
+
 const en = {
   leave: "Leave organization",
   leaveConfirm: "Leave this organization? Your team and delegated access will be revoked.",
@@ -44,7 +45,8 @@ const en = {
     "Owners and administrators already manage servers. This permission also lets other team roles manage the organization's servers.",
   roleHelp:
     "Administrators manage the public profile, resources, servers and regular team members. Only the owner can appoint or remove administrators. Commercial permissions already assigned to a member are preserved.",
-  ownerHelp: "Organization ownership cannot be changed from this workspace.",
+  ownerHelp:
+    "Only the owner can transfer ownership to a current team member, with explicit confirmation in the team workspace.",
   remove: "Remove member",
   removeConfirm:
     "Remove this member from the organization? Their organizational access will be revoked.",
@@ -106,7 +108,8 @@ const ru: Record<keyof typeof en, string> = {
     "Владельцы и администраторы уже управляют серверами. Это разрешение даёт доступ к управлению серверами и другим ролям команды.",
   roleHelp:
     "Администраторы управляют публичным профилем, ресурсами, серверами и обычными участниками команды. Только владелец назначает и удаляет администраторов. Ранее выданные коммерческие разрешения участника сохраняются.",
-  ownerHelp: "В этом кабинете нельзя изменить владельца организации.",
+  ownerHelp:
+    "Только владелец может передать владение действующему участнику с отдельным подтверждением в кабинете команды.",
   remove: "Удалить участника",
   removeConfirm: "Удалить участника из организации? Его организационный доступ будет отозван.",
   updateMember: "Сохранить участника",

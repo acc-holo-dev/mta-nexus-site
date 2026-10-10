@@ -1,6 +1,7 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
-import { organizations, organizationMembers } from "../packages/db/src/schema";
+import { organizationMembers, organizations } from "../packages/db/src/schema";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -26,7 +27,12 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+vi.mock("../packages/db/src/repositories/organization-access-notice", () => ({
+  storeOrganizationAccessNotice: vi.fn(),
+}));
+
 import { organizationWorkspaceRepository as repository } from "../packages/db/src/repositories/organization-workspace";
+
 const version = new Date("2026-10-10T12:00:00.000Z");
 const organization = {
   id: "org",

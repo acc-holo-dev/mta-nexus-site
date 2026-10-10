@@ -1,25 +1,27 @@
 "use client";
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Avatar, Button } from "@nexus/ui";
+import type { OrganizationTeamRole } from "@nexus/domain";
 import {
-  canManageOrganization,
   canChangeOrganizationMember,
+  canManageOrganization,
   organizationTeamRoles,
 } from "@nexus/domain";
-import type { OrganizationTeamRole } from "@nexus/domain";
+import { Avatar, Button } from "@nexus/ui";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
-import { getOrganizationCopy } from "../lib/organization-workspace-copy";
+import { organizationGovernanceCopy } from "../lib/organization-governance-copy";
+import { organizationRequest as platformRequest } from "../lib/organization-workspace-client";
 import {
   editableOrganizationSchema,
   memberAddSchema,
-  organizationWorkspaceSchema,
   type OrganizationWorkspace,
+  organizationWorkspaceSchema,
 } from "../lib/organization-workspace-contract";
-import { OrganizationProfileForm } from "./organization-profile-form";
-import { organizationRequest as platformRequest } from "../lib/organization-workspace-client";
+import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { OrganizationOwnershipTransfer } from "./organization-ownership-transfer";
+import { OrganizationProfileForm } from "./organization-profile-form";
 
 export function OrganizationWorkspacePanel({
   initial,
@@ -33,6 +35,7 @@ export function OrganizationWorkspacePanel({
   query: string;
 }) {
   const copy = getOrganizationCopy(locale);
+  const governanceCopy = organizationGovernanceCopy(locale);
   const router = useRouter();
   const [data, setData] = useState(initial);
   useEffect(() => {
@@ -45,6 +48,9 @@ export function OrganizationWorkspacePanel({
   const [username, setUsername] = useState("");
   const [role, setRole] = useState<OrganizationTeamRole>("member");
   const [servers, setServers] = useState(false);
+  const [ownershipTarget, setOwnershipTarget] = useState<
+    OrganizationWorkspace["members"][number] | null
+  >(null);
   const manageable = canManageOrganization(data.role);
   const path = `/api/workspace/organizations/${encodeURIComponent(data.organization.id)}`;
   async function mutate(
@@ -87,13 +93,18 @@ export function OrganizationWorkspacePanel({
         throw new Error(copy.unavailable);
       // Retain the committed revision even if refreshing the team subsequently fails.
       setData((current) => ({ ...current, organization: organization.data }));
-      const filters = new URLSearchParams({ page: String(data.page), q: query });
-      const refreshed = organizationWorkspaceSchema.safeParse(
-        await platformRequest(`${path}?${filters}`, locale),
-      );
-      if (!refreshed.success) throw new Error(copy.unavailable);
-      setData(refreshed.data);
       setMessage(success);
+      const filters = new URLSearchParams({ page: String(data.page), q: query });
+      try {
+        const refreshed = organizationWorkspaceSchema.safeParse(
+          await platformRequest(`${path}?${filters}`, locale),
+        );
+        if (!refreshed.success || refreshed.data.organization.id !== data.organization.id)
+          throw new Error(copy.unavailable);
+        setData(refreshed.data);
+      } catch {
+        setError(governanceCopy.refreshFailed);
+      }
       router.refresh();
       return true;
     } catch (caught) {
@@ -174,6 +185,43 @@ export function OrganizationWorkspacePanel({
           setMessage(copy.saved);
         }}
       />
+      {manageable && (
+        <Link
+          className="inline-flex min-h-9 items-center text-sm text-accent underline"
+          href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/activity`}
+        >
+          {governanceCopy.history}
+        </Link>
+      )}
+      {data.role === "owner" && data.organization.ownerId === actorId && (
+        <OrganizationOwnershipTransfer
+          key={`${ownershipTarget?.id ?? "none"}:${data.organization.updatedAt}`}
+          data={data}
+          target={ownershipTarget}
+          actorId={actorId}
+          locale={locale}
+          busy={busy}
+          onBusyChange={(value) => {
+            guard.current = value;
+            setBusy(value);
+          }}
+          onCancel={() => setOwnershipTarget(null)}
+          onReload={() => router.refresh()}
+          onSaved={(result) => {
+            setData((current) => ({
+              ...current,
+              organization: result.organization,
+              owner: result.owner,
+              role: result.role,
+              members: current.members.filter((member) => member.id !== result.owner.id),
+            }));
+            setOwnershipTarget(null);
+            setMessage(governanceCopy.transferred);
+            setError("");
+            router.refresh();
+          }}
+        />
+      )}
       <section className="nexus-panel space-y-5 p-5" aria-busy={busy}>
         <h2 className="font-heading text-primary">{copy.team}</h2>
         <p className="text-sm text-muted">{copy.roleHelp}</p>
@@ -292,6 +340,16 @@ export function OrganizationWorkspacePanel({
                       copy.removed,
                     );
                 }}
+                onSelectOwner={
+                  data.role === "owner" && ["admin", "developer", "member"].includes(member.role)
+                    ? () => {
+                        setOwnershipTarget(member);
+                        document
+                          .getElementById("organization-ownership-transfer")
+                          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }
+                    : undefined
+                }
               />
             ))}
           </div>
@@ -370,6 +428,7 @@ function MemberEditor({
   busy,
   onSave,
   onRemove,
+  onSelectOwner,
 }: {
   member: OrganizationWorkspace["members"][number];
   locale: Locale;
@@ -378,6 +437,7 @@ function MemberEditor({
   busy: boolean;
   onSave: (role: OrganizationTeamRole, servers: boolean) => Promise<boolean>;
   onRemove: () => void;
+  onSelectOwner?: () => void;
 }) {
   const copy = getOrganizationCopy(locale);
   const [role, setRole] = useState(member.role);
@@ -441,6 +501,16 @@ function MemberEditor({
             {copy.remove}
           </button>
         </fieldset>
+      )}
+      {onSelectOwner && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={onSelectOwner}
+          className="min-h-9 text-sm text-accent underline"
+        >
+          {organizationGovernanceCopy(locale).choose}
+        </button>
       )}
     </form>
   );

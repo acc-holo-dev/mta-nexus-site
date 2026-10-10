@@ -1,18 +1,19 @@
 import { organizationWorkspaceRepository } from "@nexus/db";
-import { AppError } from "@nexus/domain";
 import type { User } from "@nexus/domain";
+import { AppError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
+import type { z } from "zod";
 import {
+  memberAddSchema,
+  memberRemoveSchema,
+  memberUpdateSchema,
   organizationCreateSchema,
   organizationUpdateSchema,
-  memberAddSchema,
-  memberUpdateSchema,
-  memberRemoveSchema,
 } from "../organization-workspace-contract";
-import type { z } from "zod";
+
 type StoredOrganization = Awaited<ReturnType<typeof organizationWorkspaceRepository.create>>;
-function editableOrganization(value: StoredOrganization) {
+export function editableOrganization(value: StoredOrganization) {
   return {
     id: value.id,
     slug: value.slug,

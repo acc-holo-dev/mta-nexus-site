@@ -1,8 +1,8 @@
 import { z } from "zod";
 import type { Locale } from "./i18n";
-import { userPlatformError } from "./user-platform-copy";
-import { contentFieldsSchema, profileUpdateSchema } from "./user-platform-contract";
 import { privateApiRequest } from "./private-api-request";
+import { contentFieldsSchema, profileUpdateSchema } from "./user-platform-contract";
+import { userPlatformError } from "./user-platform-copy";
 export const platformFieldClass =
   "w-full rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current";
 
@@ -56,6 +56,6 @@ export async function platformRequest(
     const code = data && typeof data === "object" && "code" in data ? data.code : null;
     throw new Error(translateError(locale, code));
   }
-  if (!data || typeof data !== "object") throw new Error(userPlatformError(locale, "UNCONFIRMED"));
+  if (!data || typeof data !== "object") throw new Error(translateError(locale, "UNCONFIRMED"));
   return data as Record<string, unknown>;
 }

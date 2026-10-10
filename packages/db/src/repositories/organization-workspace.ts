@@ -1,14 +1,15 @@
-import { and, asc, desc, eq, exists, ilike, or, sql, getTableColumns } from "drizzle-orm";
+import type { AuditEvent, OrganizationTeamRole } from "@nexus/domain";
 import {
   AppError,
-  NotFoundError,
-  canManageOrganization,
   canChangeOrganizationMember,
+  canManageOrganization,
+  NotFoundError,
   withServerManagementPermission,
 } from "@nexus/domain";
-import type { AuditEvent, OrganizationTeamRole } from "@nexus/domain";
+import { and, asc, desc, eq, exists, getTableColumns, ilike, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { organizations, organizationMembers, users, auditEvents } from "../schema";
+import { auditEvents, organizationMembers, organizations, users } from "../schema";
+import { storeOrganizationAccessNotice } from "./organization-access-notice";
 import { containsPattern } from "./search-pattern";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
@@ -29,7 +30,12 @@ const publicIdentity = {
   avatarUrl: users.avatarUrl,
 };
 
-async function access(tx: Transaction, id: string, actorId: string, lock = false) {
+export async function organizationWorkspaceAccess(
+  tx: Transaction,
+  id: string,
+  actorId: string,
+  lock = false,
+) {
   const query = tx.select().from(organizations).where(eq(organizations.id, id)).limit(1);
   const [organization] = await (lock ? query.for("update") : query);
   if (!organization) throw new NotFoundError("Organization");
@@ -46,7 +52,7 @@ async function access(tx: Transaction, id: string, actorId: string, lock = false
   return { organization, role: membership.role };
 }
 async function writable(tx: Transaction, id: string, actorId: string, expected: Date) {
-  const current = await access(tx, id, actorId, true);
+  const current = await organizationWorkspaceAccess(tx, id, actorId, true);
   if (!canManageOrganization(current.role))
     throw new AppError("Manager required", 403, "FORBIDDEN");
   if (current.organization.updatedAt.getTime() !== expected.getTime())
@@ -104,7 +110,7 @@ class OrganizationWorkspaceRepository {
   async getWorkspace(id: string, actorId: string, requestedPage = 1, query = "") {
     return db.transaction(
       async (tx) => {
-        const { organization, role } = await access(tx, id, actorId);
+        const { organization, role } = await organizationWorkspaceAccess(tx, id, actorId);
         const [owner] = await tx
           .select(publicIdentity)
           .from(users)
@@ -246,13 +252,14 @@ class OrganizationWorkspaceRepository {
         .returning({ id: organizationMembers.id });
       if (!inserted.length) throw new AppError("Already a member", 409, "MEMBER_EXISTS");
       const organization = await record(tx, id, audit, { userId: target.id, role, managesServers });
+      await storeOrganizationAccessNotice(tx, organization, target.id, "added", audit.id);
       return { organization, member: { ...target, role, managesServers } };
     });
   }
 
   async leave(id: string, actorId: string, expected: Date, audit: Audit) {
     return db.transaction(async (tx) => {
-      const current = await access(tx, id, actorId, true);
+      const current = await organizationWorkspaceAccess(tx, id, actorId, true);
       if (current.organization.ownerId === actorId)
         throw new AppError("Owner is protected", 403, "MEMBER_PROTECTED");
       if (current.organization.updatedAt.getTime() !== expected.getTime())
@@ -265,6 +272,7 @@ class OrganizationWorkspaceRepository {
         .returning({ userId: organizationMembers.userId });
       if (!removed.length) throw new AppError("Member not found", 404, "MEMBER_NOT_FOUND");
       const organization = await record(tx, id, audit, { userId: actorId, from: current.role });
+      await storeOrganizationAccessNotice(tx, organization, actorId, "left", audit.id);
       return { organization, userId: actorId, removed: true };
     });
   }
@@ -317,6 +325,13 @@ class OrganizationWorkspaceRepository {
         to: fields?.role ?? null,
         ...(fields ? { managesServers: fields.managesServers } : {}),
       });
+      await storeOrganizationAccessNotice(
+        tx,
+        organization,
+        userId,
+        fields ? "updated" : "removed",
+        audit.id,
+      );
       return {
         organization,
         userId,

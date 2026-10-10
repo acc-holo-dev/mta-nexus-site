@@ -1,5 +1,5 @@
-import type { Locale } from "./i18n";
 import type { Notification } from "@nexus/domain";
+import type { Locale } from "./i18n";
 
 /** Localize structured review notices; older notifications keep their stored text. */
 export function formatNotification(
@@ -7,6 +7,35 @@ export function formatNotification(
   copy: { approved: string; rejected: string; version: string; notes: string },
   locale: Locale = "en",
 ) {
+  const organizationAccess =
+    notification.title === "Organization access changed" &&
+    /^Organization ([a-zA-Z0-9_-]{1,128}): (added|updated|removed|left|ownership_gained|ownership_transferred)\.$/u.exec(
+      notification.message,
+    );
+  if (organizationAccess) {
+    const messages: Record<string, string> =
+      locale === "ru"
+        ? {
+            added: "Вас добавили в команду.",
+            updated: "Ваша роль или делегированный доступ изменены.",
+            removed: "Ваш доступ к команде отозван.",
+            left: "Вы вышли из команды.",
+            ownership_gained: "Вам передано владение организацией.",
+            ownership_transferred: "Вы передали владение организацией.",
+          }
+        : {
+            added: "You were added to the team.",
+            updated: "Your role or delegated access changed.",
+            removed: "Your team access was revoked.",
+            left: "You left the team.",
+            ownership_gained: "Organization ownership was transferred to you.",
+            ownership_transferred: "You transferred organization ownership.",
+          };
+    return {
+      title: locale === "ru" ? "Доступ к организации изменён" : notification.title,
+      message: messages[organizationAccess[2]],
+    };
+  }
   const verification =
     /^([a-z]+) verification for ([a-zA-Z0-9_-]{1,128}) was (approved|rejected)\.$/u.exec(
       notification.message,

@@ -1402,3 +1402,54 @@ Index contract for Agent A, needed for large requester histories:
 CREATE INDEX verification_requests_requester_created_id_idx
   ON verification_requests (requester_id, created_at DESC, id DESC);
 ```
+
+### Organization ownership, private history and access notices — 2026-10-11
+
+The organization workspace now transfers ownership to a current team member
+through POST `/api/workspace/organizations/[id]/ownership`. Only the actual
+owner may transfer; platform staff and legacy owner memberships do not grant
+that authority. The write locks the organization and affected memberships,
+checks the shared revision, selected account and exact slug, and retains an
+explicit member/admin role for the former owner. Existing delegated permissions,
+verification and profile fields remain intact. Role changes, owner, audit and
+both inbox notices share one transaction. Push enqueue failures use a savepoint
+and cannot invalidate the saved state. Other team access changes now produce
+the same bounded, localized inbox notices.
+
+GET `/api/workspace/organizations/[id]/activity` and
+`/workspace/organizations/[id]/activity` provide current-owner/admin-only history
+using a read-only repeatable-read snapshot. Twenty-item pages resolve an opaque
+anchor inside the same organization and preserve PostgreSQL microseconds;
+foreign/expired anchors fail explicitly. Responses allowlist public identities,
+actions and field/role labels, excluding raw audit details, account contacts,
+proof, network metadata and permission arrays. Both languages include forms,
+metadata, errors and reload recovery. Confirmed writes remain confirmed when a
+subsequent refresh fails.
+
+271 focused checks across 22 files pass; after integration with Agent A's
+financial-journal block, 320 checks across 26 files pass, including organization,
+professional verification, community publication, resource-release and financial
+regressions.
+TypeScript, touched-file Biome, Knip and Next webpack compile mode pass.
+Dependency analysis reports no violations (600 modules / 2216 edges), with its
+TypeScript 7 compatibility warning. Eight PostgreSQL fixtures are prepared for
+persisted roles, grants, inbox/outbox, competing transfers, rollback, revoked
+history access and microsecond pagination; they remain unrun. Live PostgreSQL,
+browser interaction and full production generation still require verification.
+This block changes no schema, migrations, npm dependencies or workflows and
+does not use Actions.
+
+Pending profile-privacy schema contract for Agent A (privacy controls are not
+implemented until this shared model is integrated):
+
+```sql
+CREATE TABLE user_profile_preferences (
+  user_id text PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  show_activity boolean NOT NULL DEFAULT true,
+  show_professional_contacts boolean NOT NULL DEFAULT true
+);
+```
+
+Missing rows preserve the current public visibility. Preference writes must use
+the shared `users.updated_at` revision and update it in the same transaction;
+notification preferences must not be repurposed as profile privacy settings.
