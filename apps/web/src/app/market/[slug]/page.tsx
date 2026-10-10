@@ -15,9 +15,11 @@ import {
   Layers,
   MessageSquare,
   ShieldCheck,
-  Star,
 } from "lucide-react";
-import { contentService } from "../../../lib/services/content-service";
+import { resourceReviewService } from "../../../lib/services/resource-review-service";
+import { ResourceReviewList } from "../../../components/resource-review-list";
+import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
+import { AppError } from "@nexus/domain";
 import { productService } from "../../../lib/services/product-service";
 import { authService } from "../../../lib/services/auth-service";
 import { commerceService } from "../../../lib/services/commerce-service";
@@ -29,8 +31,6 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 import { getReleaseHistoryCopy, releaseHistoryHref } from "../../../lib/public-release-history";
 
 export const dynamic = "force-dynamic";
-
-const REVIEW_STAR_IDS = [1, 2, 3, 4, 5] as const;
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) {
@@ -138,7 +138,7 @@ export default async function ProductDetailPage({
     canManageProduct,
     isLicensed,
     builds,
-    reviews,
+    reviewPage,
     dependencyResolution,
     reverseDependencySummary,
     variantGroup,
@@ -155,7 +155,7 @@ export default async function ProductDetailPage({
       const canInspectBuilds = canManageProduct || isAdmin;
       return productService.getProductBuilds(product.id, canInspectBuilds);
     }),
-    contentService.getComments({ productId: product.id }),
+    isPublished ? resourceReviewService.publicPage(product.id).catch(error => { if (error instanceof AppError && error.statusCode === 404) return null; throw error; }) : null,
     productService.getDependencyResolution(product).catch(() => null),
     productService
       .getReverseDependencySummary(product.slug)
@@ -169,7 +169,6 @@ export default async function ProductDetailPage({
     product.price === 0
       ? copy.free
       : dictionary.checkout.paidUnavailable;
-  const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
 
   return (
     <div className="space-y-10">
@@ -340,52 +339,10 @@ export default async function ProductDetailPage({
               <span>{copy.reviews}</span>
             </h2>
 
-            {reviews.length > 0 ? (
-              <div className="space-y-4">
-                {reviews.map((review) => (
-                  <article
-                    key={review.id}
-                    className="space-y-2 rounded-lg border border-base bg-inset p-4"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <div className="flex text-warning">
-                          {REVIEW_STAR_IDS.slice(0, review.rating || 5).map((star) => (
-                            <Star
-                              key={star}
-                              className="h-3.5 w-3.5 fill-current"
-                              aria-hidden="true"
-                            />
-                          ))}
-                        </div>
-                        {review.isVerifiedPurchase && (
-                          <span className="flex items-center gap-1 text-[11px] font-medium text-success">
-                            <CheckCircle2
-                              className="h-3 w-3"
-                              aria-hidden="true"
-                            />
-                            {copy.verifiedAcquisition}
-                          </span>
-                        )}
-                      </div>
-                      <time
-                        dateTime={new Date(review.createdAt).toISOString()}
-                        className="font-numeric text-[11px] text-faint"
-                      >
-                        {new Date(review.createdAt).toLocaleDateString(
-                          dateLocale,
-                        )}
-                      </time>
-                    </div>
-                    <p className="text-xs leading-relaxed text-secondary">
-                      {review.text}
-                    </p>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-faint">{copy.noReviews}</p>
-            )}
+            {reviewPage ? <ResourceReviewList reviews={reviewPage.reviews} productId={product.id} authenticated={!!user} locale={locale} /> : <p className="text-xs text-faint">{resourceReviewCopy(locale).unavailable}</p>}
+            {reviewPage && <Link href={`/market/${encodeURIComponent(product.slug)}/reviews`} className="text-sm text-accent underline">{resourceReviewCopy(locale).all} ({reviewPage.total})</Link>}
+            {reviewPage && user && <Link href={`/workspace/library/review/${encodeURIComponent(product.id)}`} className="ml-4 text-sm text-accent underline">{resourceReviewCopy(locale).write}</Link>}
+
           </section>
         </div>
 

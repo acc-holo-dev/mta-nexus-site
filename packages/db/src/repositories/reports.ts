@@ -6,7 +6,7 @@ import type { AuditEvent, Report } from "@nexus/domain";
 export class ReportRepository {
   async countOpen(): Promise<number> {
     const [row] = await db.select({ total: count() }).from(reports).where(
-      inArray(reports.status, ["open", "under_review"]),
+      and(sql`${reports.targetType} <> 'review'`, inArray(reports.status, ["open", "under_review"])),
     );
     return row?.total ?? 0;
   }
@@ -20,7 +20,7 @@ export class ReportRepository {
       ? [asc(reports.createdAt), asc(reports.id)]
       : [desc(reports.resolvedAt), desc(reports.id)];
     const rows = await db.select().from(reports)
-      .where(inArray(reports.status, filter))
+      .where(and(sql`${reports.targetType} <> 'review'`, inArray(reports.status, filter)))
       .orderBy(...ordering)
       .limit(pageSize + 1)
       .offset((page - 1) * pageSize);
@@ -28,7 +28,7 @@ export class ReportRepository {
   }
 
   async findById(id: string): Promise<Report | null> {
-        const rows = await db.select().from(reports).where(eq(reports.id, id)).limit(1);
+        const rows = await db.select().from(reports).where(and(eq(reports.id, id), sql`${reports.targetType} <> 'review'`)).limit(1);
     return (rows[0] as unknown as Report) || null;
   }
 
@@ -102,6 +102,7 @@ export class ReportRepository {
         .where(
           and(
             eq(reports.id, id),
+            sql`${reports.targetType} <> 'review'`,
             inArray(reports.status, ["open", "under_review"]),
           ),
         )

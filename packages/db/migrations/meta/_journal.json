@@ -351,6 +351,13 @@
       "when": 1791711600000,
       "tag": "0049_financial_journal",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1791718800000,
+      "tag": "0050_resource_review_lifecycle",
+      "breakpoints": true
     }
   ]
 }

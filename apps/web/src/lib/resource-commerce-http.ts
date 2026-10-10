@@ -29,6 +29,8 @@ export async function resourceCommerceRequest(
         request.nextUrl.pathname.startsWith("/api/admin/commerce/") ||
         request.nextUrl.pathname.startsWith("/api/admin/licenses/")
           ? "moderationAction"
+          : /\/(reviews|review)(?:\/|$)/u.test(request.nextUrl.pathname)
+            ? "reviewSubmission"
           : request.nextUrl.pathname.includes("/licenses/")
             ? "licenseControl"
             : /\/(lifecycle|variants|compatibility)(?:\/|$)/u.test(request.nextUrl.pathname)
@@ -38,7 +40,7 @@ export async function resourceCommerceRequest(
     }
     if (
       !mutation &&
-      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/operations$|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/releases(?:\/|$)|^\/api\/products\/[^/]+\/moderation$/u.test(
+      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/operations$|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/moderation$/u.test(
         request.nextUrl.pathname,
       )
     ) {

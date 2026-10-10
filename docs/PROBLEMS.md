@@ -1,5 +1,25 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Resource review lifecycle and commercial report queue — 2026-10-11
+
+Reviews now publish/edit/withdraw with locked live publisher and acquired-access
+checks, finite-license expiry rechecks and optimistic revisions. Rating repair is
+transactional and preserves the publisher's metadata revision. Public projections
+exclude account IDs and old purchase flags; legacy acquisition is explicitly
+unreverified. Private author history remains available after access expiry.
+Commercial review reports have separate private/staff pages, replay deduplication,
+current-role checks and exact review evidence for removal; the generic resolver
+cannot bypass this contract. Removed reviews cannot be republished by their author.
+
+Migration `0050` preserves historical text/rating/source uncertainty and adds review
+state/revision/source fields, bounded-list indexes and Agent B's requester-history
+index. The migration journal and upgrade target include `0050`; local upgrade
+contract checks pass, while the PostgreSQL rehearsal itself is unrun. New lifecycle
+and updated aggregation fixtures cover concurrency, live role revocation, expiry,
+rollback and private scope, but require PostgreSQL. Browser interaction and complete
+production generation remain unverified. Paid-provider, refunds, payout eligibility
+and subscription activation remain separate unfinished work; paid checkout is disabled.
+
 ### Financial statements and journal foundation — 2026-10-11
 
 Migration `0049_financial_journal` adds idempotent batches and immutable balanced

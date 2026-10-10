@@ -676,6 +676,11 @@ export const comments = pgTable(
     parentId: text("parent_id"),
     text: text("text").notNull(),
     isVerifiedPurchase: boolean("is_verified_purchase").notNull().default(false),
+    reviewStatus: text("review_status").notNull().default("published"),
+    reviewRevision: integer("review_revision").notNull().default(1),
+    reviewUpdatedAt: timestamp("review_updated_at", { withTimezone: true }),
+    reviewAccessSource: text("review_access_source"),
+    reviewModerationReason: text("review_moderation_reason"),
     rating: integer("rating"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -683,6 +688,14 @@ export const comments = pgTable(
     // Nullable product_id keeps article comments independent while enforcing
     // one product review per author for non-null product_id rows.
     uniqueIndex("comments_product_author_idx").on(table.productId, table.authorId),
+    check("comments_review_status_check", sql`${table.reviewStatus} IN ('published', 'withdrawn', 'removed')`),
+    check("comments_review_revision_check", sql`${table.reviewRevision} > 0`),
+    check("comments_review_source_check", sql`${table.reviewAccessSource} IS NULL OR ${table.reviewAccessSource} IN ('entitlement', 'license')`),
+    check("comments_review_target_check", sql`${table.productId} IS NULL OR (${table.contentId} IS NULL AND ${table.parentId} IS NULL AND (${table.reviewStatus} <> 'published' OR (${table.rating} BETWEEN 1 AND 5 AND ${table.rating} IS NOT NULL)))`),
+    index("comments_product_public_time_id_idx").on(table.productId, table.createdAt.desc(), table.id.desc())
+      .where(sql`${table.productId} IS NOT NULL AND ${table.contentId} IS NULL AND ${table.reviewStatus} = 'published'`),
+    index("comments_review_author_time_id_idx").on(table.authorId, table.createdAt.desc(), table.id.desc())
+      .where(sql`${table.productId} IS NOT NULL AND ${table.contentId} IS NULL`),
     index("comments_content_created_id_idx")
       .on(table.contentId, table.createdAt.desc(), table.id.desc())
       .where(sql`${table.productId} IS NULL AND ${table.contentId} IS NOT NULL`),
@@ -885,6 +898,7 @@ export const reports = pgTable("reports", {
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
 }, (table) => [
   index("reports_status_created_id_idx").on(table.status, table.createdAt, table.id),
+  index("reports_review_queue_idx").on(table.status, table.createdAt, table.id).where(sql`${table.targetType} = 'review'`),
   index("reports_status_resolved_id_idx").on(table.status, table.resolvedAt, table.id),
   index("reports_reporter_created_id_idx").on(table.reporterId, table.createdAt.desc(), table.id.desc()),
   index("reports_reporter_pending_target_idx")
@@ -1047,6 +1061,7 @@ export const verificationRequests = pgTable("verification_requests", {
   resolvedAt: timestamp("resolved_at", { withTimezone: true }),
 }, (table) => [
   index("verification_status_created_id_idx").on(table.status, table.createdAt, table.id),
+  index("verification_requests_requester_created_id_idx").on(table.requesterId, table.createdAt.desc(), table.id.desc()),
   index("verification_status_resolved_id_idx").on(table.status, table.resolvedAt, table.id),
   index("verification_requests_target_created_id_idx").on(table.targetType, table.targetId, table.createdAt.desc(), table.id.desc()),
 ]);

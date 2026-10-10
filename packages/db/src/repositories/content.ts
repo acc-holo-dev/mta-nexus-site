@@ -1,7 +1,8 @@
 import { eq, asc, desc, and, count, sql, inArray, ilike, or, isNull } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
-import { auditEvents, content, comments, products } from "../schema";
+import { resourceReviewsRepository } from "./resource-reviews";
+import { auditEvents, content, comments } from "../schema";
 import { AppError, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
@@ -338,7 +339,7 @@ export class ContentRepository {
       const rows = await db
         .select()
         .from(comments)
-        .where(eq(comments.productId, target.productId))
+        .where(and(eq(comments.productId, target.productId), isNull(comments.contentId), eq(comments.reviewStatus, "published")))
         .orderBy(desc(comments.createdAt))
         .limit(boundedLimit);
       return rows as unknown as Comment[];
@@ -350,6 +351,10 @@ export class ContentRepository {
     data: Omit<Comment, "createdAt">,
     audit?: Omit<AuditEvent, "createdAt">,
   ): Promise<Comment> {
+    if (data.productId) {
+      if (data.contentId || data.parentId || data.rating === undefined) throw new AppError("Invalid review target", 400, "REVIEW_INVALID");
+      return (await this.addProductReview({ ...data, productId: data.productId, rating: data.rating }, audit)).review;
+    }
     const values = {
       ...data,
       createdAt: new Date(),
@@ -406,57 +411,18 @@ export class ContentRepository {
     data: Omit<Comment, "createdAt"> & { productId: string; rating: number },
     audit?: Omit<AuditEvent, "createdAt">,
   ): Promise<{ review: Comment; ratingCount: number; ratingAverage: number }> {
-    const values = {
-      ...data,
-      createdAt: new Date(),
-    };
-
-    return db.transaction(async (tx) => {
-      // Serialize review aggregation per product. Without a product-row lock,
-      // two concurrent reviewers can both calculate aggregates from incomplete
-      // snapshots and the last writer can overwrite the correct counters.
-      const lockedProduct = await tx
-        .update(products)
-        .set({ updatedAt: sql`${products.updatedAt}` })
-        .where(and(eq(products.id, data.productId), eq(products.status, "published")))
-        .returning({ id: products.id });
-
-      if (!lockedProduct.length) {
-        throw new Error("PRODUCT_NOT_PUBLISHED");
-      }
-
-      const rows = await tx.insert(comments).values(values).returning();
-      const review = rows[0] as unknown as Comment;
-
-      const aggregateRows = await tx
-        .select({
-          ratingCount: sql<number>`count(${comments.rating})::int`,
-          ratingAverage: sql<number>`coalesce(round(avg(${comments.rating}) * 10), 0)::int`,
-        })
-        .from(comments)
-        .where(eq(comments.productId, data.productId));
-
-      const ratingCount = aggregateRows[0]?.ratingCount ?? 0;
-      const ratingAverage = aggregateRows[0]?.ratingAverage ?? 0;
-
-      await tx
-        .update(products)
-        .set({
-          ratingCount,
-          ratingAverage,
-          updatedAt: new Date(),
-        })
-        .where(eq(products.id, data.productId));
-
-      if (audit) {
-        await tx.insert(auditEvents).values({
-          ...audit,
-          createdAt: values.createdAt,
-        });
-      }
-
-      return { review, ratingCount, ratingAverage };
+    if (data.contentId || data.parentId) throw new AppError("Invalid review target", 400, "REVIEW_INVALID");
+    const result = await resourceReviewsRepository.command({
+      actorId: data.authorId, productId: data.productId, reviewId: data.id,
+      auditId: audit?.id ?? `aud_${data.id}`,
+      command: { action: "save", expectedRevision: 0, text: data.text, rating: data.rating },
     });
+    const review: Comment = {
+      id: result.id, productId: data.productId, authorId: data.authorId,
+      text: data.text.trim(), rating: data.rating, isVerifiedPurchase: true,
+      createdAt: ("review" in result ? result.review?.createdAt : undefined) ?? new Date(),
+    };
+    return { review, ratingCount: result.ratingCount, ratingAverage: result.ratingAverage };
   }
 
   async hasReviewFromUser(productId: string, authorId: string): Promise<boolean> {

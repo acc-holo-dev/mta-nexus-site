@@ -218,6 +218,18 @@ Migration `0043_resource_acquisition_activity` records newly issued free grants 
 
 ## Documentation
 
+Resource reviews now have an acquired-access workflow at
+`/workspace/library/review/[id]`, a private archive at `/workspace/library/reviews`
+and 20-item public pages at `/market/[slug]/reviews`. Publishing or editing locks
+current publisher authority, entitlement/license expiry and a safe release; authors
+can withdraw a review after access expires. Ratings exclude withdrawn/removed
+reviews and do not change the resource's metadata revision. Historical acquisition
+flags are not presented as verified payment or newly checked access.
+Reports use `/workspace/review-reports` and `/admin/commerce/reviews`, independently
+of community discussion cases. Moderation checks live roles, report state and the
+exact review revision; removal and rating repair commit with the report and audit.
+Migration `0050_resource_review_lifecycle` must be applied before these routes.
+
 The repository keeps three operational long-form documents at the root of `docs/`:
 
 - [Architecture / Архитектура](docs/ARCHITECTURE.md)

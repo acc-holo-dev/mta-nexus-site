@@ -97,7 +97,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0038_server_claim_scope_and_status");
+  assert.equal(plan.targetTag, "0050_resource_review_lifecycle");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -218,4 +218,15 @@ test("upgrade keeps legacy claim scopes unbound and indexes private claim status
   assert.match(rehearsal, /legacyProof\[0\]\.claim_scope_recorded, false/u);
   assert.match(rehearsal, /legacyProof\[0\]\.claim_organization_id, null/u);
   assert.match(rehearsal, /serverClaimScopePresent = true/u);
+});
+
+
+test("review upgrade preserves legacy evidence and indexes separate commercial queues", () => {
+  const migration = readFileSync(new URL("0050_resource_review_lifecycle.sql", migrationsUrl), "utf8");
+  assert.match(migration, /review_access_source TEXT;/u);
+  assert.match(migration, /NOT VALID/u);
+  assert.doesNotMatch(migration, /UPDATE comments|DELETE FROM/u);
+  const rehearsal = readFileSync(script, "utf8");
+  assert.match(rehearsal, /legacyReview\[0\]\.review_access_source, null/u);
+  assert.match(rehearsal, /resourceReviewSchemaPresent = true/u);
 });

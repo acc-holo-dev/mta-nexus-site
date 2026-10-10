@@ -331,3 +331,4 @@ export const editProductDetailsSchema = z.object({
   description: z.string().trim().min(10).max(10_000),
   tags: z.array(z.string().trim().min(1).max(30)).max(20),
 }).strict();
+export * from "./resource-reviews";

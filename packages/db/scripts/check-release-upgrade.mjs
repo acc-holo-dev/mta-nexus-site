@@ -57,6 +57,7 @@ const evidence = {
   legacyServerProofInvalidated: false,
   webPushSubscriptionSchemaPresent: false,
   webPushOutboxSchemaPresent: false,
+  resourceReviewSchemaPresent: false,
   cleanupComplete: false,
 };
 
@@ -93,6 +94,8 @@ try {
     12, 'published', 'clean', 'clamav', now())`;
   await client`INSERT INTO entitlements (id, subject_type, subject_id, permission, resource_id)
     VALUES ('upgrade-entitlement', 'user', 'upgrade-user', 'download', 'upgrade-resource')`;
+  await client`INSERT INTO comments (id, product_id, author_id, text, is_verified_purchase, rating)
+    VALUES ('upgrade-review', 'upgrade-resource', 'upgrade-user', 'Preserved legacy review', true, NULL)`;
   await client`INSERT INTO notifications (id, recipient_id, title, message, link, is_read)
     VALUES ('upgrade-notification', 'upgrade-user', 'Legacy title', 'Legacy message', '/workspace', true)`;
   await client`INSERT INTO servers (id, name, slug, ip_address, port, owner_id)
@@ -106,7 +109,7 @@ try {
 
   const rows = async () => {
     const result = {};
-    for (const table of ["users", "products", "builds", "entitlements", "notifications", "servers", "server_claim_challenges", "audit_events"]) {
+    for (const table of ["users", "products", "builds", "entitlements", "notifications", "servers", "server_claim_challenges", "audit_events", "comments"]) {
       // Remove only fields introduced after the frozen baseline so existing
       // legacy-row values remain byte-for-byte comparable across the upgrade.
       const rowJson = table === "notifications"
@@ -117,6 +120,8 @@ try {
             ? "to_jsonb(t) - 'endpoint_revision' - 'claim_scope_recorded' - 'claim_organization_id'"
             : table === "servers"
             ? "to_jsonb(t) - 'endpoint_revision'"
+            : table === "comments"
+            ? "to_jsonb(t) - 'review_status' - 'review_revision' - 'review_updated_at' - 'review_access_source' - 'review_moderation_reason'"
             : "to_jsonb(t)";
       result[table] = await client.unsafe(
         `SELECT ${rowJson} AS row FROM "${table}" t ORDER BY id`,
@@ -312,6 +317,27 @@ try {
   `;
   assert.equal(outboxCount[0].count, 0);
   evidence.webPushOutboxSchemaPresent = true;
+  const reviewColumns = await client`SELECT column_name FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'comments'
+    AND column_name IN ('review_status', 'review_revision', 'review_updated_at', 'review_access_source', 'review_moderation_reason')`;
+  assert.equal(reviewColumns.length, 5);
+  const legacyReview = await client`SELECT text, rating, is_verified_purchase, review_status, review_revision,
+    review_updated_at, review_access_source FROM comments WHERE id = 'upgrade-review'`;
+  assert.equal(legacyReview[0].text, 'Preserved legacy review');
+  assert.equal(legacyReview[0].rating, null);
+  assert.equal(legacyReview[0].is_verified_purchase, true);
+  assert.equal(legacyReview[0].review_status, 'published');
+  assert.equal(legacyReview[0].review_revision, 1);
+  assert.equal(legacyReview[0].review_updated_at, null);
+  assert.equal(legacyReview[0].review_access_source, null);
+  const reviewIndexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public'
+    AND indexname IN ('comments_product_public_time_id_idx', 'comments_review_author_time_id_idx',
+      'reports_review_queue_idx', 'verification_requests_requester_created_id_idx')`;
+  assert.equal(reviewIndexes.length, 4);
+  const reviewConstraints = await client`SELECT conname FROM pg_constraint WHERE conrelid = 'public.comments'::regclass
+    AND conname IN ('comments_review_status_check', 'comments_review_revision_check', 'comments_review_source_check', 'comments_review_target_check')`;
+  assert.equal(reviewConstraints.length, 4);
+  evidence.resourceReviewSchemaPresent = true;
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);
@@ -328,6 +354,8 @@ try {
   const data = { kind: "build_review", decision: "approve", resourceTitle: "Existing resource", version: "1.0.0", notes: "Reviewed" };
   // Drizzle changes this client's JSON serializers. Bind serialized JSON as
   // text and cast explicitly instead of using postgres.js's original json helper.
+  await client`INSERT INTO comments (id, product_id, author_id, text, is_verified_purchase, rating)
+    VALUES ('upgrade-review', 'upgrade-resource', 'upgrade-user', 'Preserved legacy review', true, NULL)`;
   await client`INSERT INTO notifications (id, recipient_id, title, message, data)
     VALUES ('upgrade-new-notification', 'upgrade-user', 'Review', 'Approved', ${JSON.stringify(data)}::jsonb)`;
   const added = await client`SELECT data FROM notifications WHERE id = 'upgrade-new-notification'`;

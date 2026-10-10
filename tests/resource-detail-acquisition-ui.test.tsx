@@ -76,10 +76,8 @@ vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
   },
 }));
 
-vi.mock("../apps/web/src/lib/services/content-service", () => ({
-  contentService: {
-    getComments: vi.fn(async () => []),
-  },
+vi.mock("../apps/web/src/lib/services/resource-review-service", () => ({
+  resourceReviewService: { publicPage: vi.fn(async () => ({reviews: [], total: 0, page: 1, totalPages: 1})) },
 }));
 
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
@@ -148,7 +146,7 @@ vi.mock("../apps/web/src/components/reverse-dependency-list", async () => {
 
 import ProductDetailPage, { generateMetadata } from "../apps/web/src/app/market/[slug]/page";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
-import { contentService } from "../apps/web/src/lib/services/content-service";
+import { resourceReviewService } from "../apps/web/src/lib/services/resource-review-service";
 import { authService } from "../apps/web/src/lib/services/auth-service";
 import { getRequestLocale } from "../apps/web/src/lib/i18n-server";
 
@@ -260,7 +258,7 @@ describe("resource detail acquisition behavior", () => {
     try {
       await vi.waitFor(() => expect(productService.canManageProduct).toHaveBeenCalledOnce());
       expect(commerceService.checkEntitlement).toHaveBeenCalledOnce();
-      expect(contentService.getComments).toHaveBeenCalledOnce();
+      expect(resourceReviewService.publicPage).toHaveBeenCalledOnce();
       expect(productService.getDependencyResolution).toHaveBeenCalledOnce();
       expect(productService.getReverseDependencySummary).toHaveBeenCalledOnce();
       expect(productService.getProductBuilds).not.toHaveBeenCalled();
@@ -288,7 +286,7 @@ describe("resource detail acquisition behavior", () => {
     expect(productService.canManageProduct).not.toHaveBeenCalled();
     expect(commerceService.checkEntitlement).not.toHaveBeenCalled();
     expect(productService.getProductBuilds).not.toHaveBeenCalled();
-    expect(contentService.getComments).not.toHaveBeenCalled();
+    expect(resourceReviewService.publicPage).not.toHaveBeenCalled();
     expect(productService.getDependencyResolution).not.toHaveBeenCalled();
     expect(productService.getReverseDependencySummary).not.toHaveBeenCalled();
   });

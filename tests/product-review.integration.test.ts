@@ -2,6 +2,9 @@ import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import {
   contentRepository,
+  builds,
+  entitlements,
+  comments,
   db,
   productRepository,
   products,
@@ -68,6 +71,15 @@ describe("product review repository integration", () => {
       screenshots: [],
     });
 
+    await db.insert(builds).values({
+      id: `bld_review_${suffix}`, productId, version: "1.0.0", status: "published",
+      storageKey: "fixtures/review.zip", sha256Hash: "a".repeat(64), fileSizeBytes: 100,
+      scanStatus: "clean", scanner: "integration-fixture", scannedAt: new Date(),
+    });
+    await db.insert(entitlements).values([reviewerA, reviewerB, reviewerC].map((subjectId, i) => ({
+      id: `ent_review_${i}_${suffix}`, subjectType: "user", subjectId, permission: "product.download", resourceId: productId,
+    })));
+
     const [first, second] = await Promise.all([
       contentRepository.addProductReview({
         id: `cmt_review_a_${suffix}`,
@@ -129,7 +141,12 @@ describe("product review repository integration", () => {
     } catch (error) {
       duplicateError = error;
     }
-    expect(databaseErrorCode(duplicateError)).toBe("23505");
+    expect(duplicateError).toMatchObject({ code: "REVIEW_CHANGED", statusCode: 409 });
+    // The unique database constraint also protects callers outside the repository.
+    try {
+      await db.insert(comments).values({id: `cmt_raw_duplicate_${suffix}`, productId, authorId: reviewerA, text: "Raw duplicate", rating: 1});
+      throw new Error("Duplicate was accepted");
+    } catch (error) { expect(databaseErrorCode(error)).toBe("23505"); }
 
     const [afterDuplicate] = await db
       .select({
@@ -157,7 +174,7 @@ describe("product review repository integration", () => {
         rating: 4,
         isVerifiedPurchase: true,
       }),
-    ).rejects.toThrow("PRODUCT_NOT_PUBLISHED");
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
 
     await expect(
       contentRepository.hasReviewFromUser(
