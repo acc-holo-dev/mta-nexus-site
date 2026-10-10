@@ -352,6 +352,32 @@ export const licenses = pgTable(
   ]
 );
 
+// Durable identity snapshots intentionally survive server/organization deletion.
+// Deletion must invalidate a binding, never make the license bindable again.
+export const licenseRuntimeBindings = pgTable("license_runtime_bindings", {
+  licenseId: text("license_id").primaryKey().references(() => licenses.id, { onDelete: "cascade" }),
+  serverId: text("server_id").notNull(),
+  organizationId: text("organization_id"),
+  endpointRevision: integer("endpoint_revision").notNull(),
+  tokenDigest: text("token_digest"),
+  tokenIssuedAt: timestamp("token_issued_at", { withTimezone: true }),
+  tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  uniqueIndex("license_runtime_token_digest_idx").on(table.tokenDigest),
+  index("license_runtime_server_idx").on(table.serverId),
+  check("license_runtime_revision_check", sql`${table.endpointRevision} >= 0`),
+  check("license_runtime_digest_check", sql`${table.tokenDigest} IS NULL OR ${table.tokenDigest} ~ '^[a-f0-9]{64}$'`),
+  check("license_runtime_token_check", sql`(
+    ${table.tokenDigest} IS NULL AND ${table.tokenIssuedAt} IS NULL AND ${table.tokenExpiresAt} IS NULL
+  ) OR (
+    ${table.tokenDigest} IS NOT NULL AND ${table.tokenIssuedAt} IS NOT NULL AND ${table.tokenExpiresAt} IS NOT NULL
+    AND ${table.tokenExpiresAt} > ${table.tokenIssuedAt}
+    AND ${table.tokenExpiresAt} <= ${table.tokenIssuedAt} + interval '720 hours'
+  )`),
+]);
+
 // 12. Entitlements
 export const entitlements = pgTable("entitlements", {
   id: text("id").primaryKey(),

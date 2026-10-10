@@ -1,6 +1,6 @@
 import { and, count, desc, eq, gt, isNull, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { licenses, products } from "../schema";
+import { licenses, products, licenseRuntimeBindings } from "../schema";
 import { historyPageBounds } from "./history-pagination";
 import type { License } from "@nexus/domain";
 
@@ -32,7 +32,9 @@ export class LicenseRepository {
       model: licenses.model,
       expiresAt: licenses.expiresAt,
       createdAt: licenses.createdAt,
-      serverBound: sql<boolean>`${licenses.serverId} IS NOT NULL`,
+      serverBound: sql<boolean>`${licenses.serverId} IS NOT NULL OR EXISTS (
+        SELECT 1 FROM ${licenseRuntimeBindings} WHERE ${licenseRuntimeBindings.licenseId} = ${licenses.id}
+      )`,
     }).from(licenses)
       .innerJoin(products, eq(licenses.productId, products.id))
       .where(scope)

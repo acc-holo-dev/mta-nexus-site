@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import Link from "next/link";
+import { can } from "@nexus/security";
 import { licenseRepository } from "@nexus/db";
 import { authService } from "../../../lib/services/auth-service";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
@@ -43,6 +46,7 @@ export default async function LicensesHistoryPage({
   return (
     <HistoryShell copy={copy} area="licenses">
       <p role="note" className="text-sm text-muted">{copy.licenseNotice}</p>
+      {can(user, "admin.moderation") && <Link href="/admin/licenses" className="text-sm text-accent underline">{getLicenseControlCopy(locale).moderation}</Link>}
       {result.licenses.length === 0 ? (
         <p className="py-12 text-sm text-secondary">{copy.emptyLicenses}</p>
       ) : (
@@ -92,6 +96,7 @@ export default async function LicensesHistoryPage({
                   </dd>
                 </div>
               </dl>
+              <Link href={`/workspace/licenses/${license.id}`} className="text-sm text-accent underline">{getLicenseControlCopy(locale).manage}</Link>
             </li>
           ))}
         </ol>

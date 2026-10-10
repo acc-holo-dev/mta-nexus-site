@@ -7,6 +7,7 @@ import {
 } from "@nexus/domain";
 import { z } from "zod";
 export * from "./resource-commerce";
+export * from "./license-control";
 
 // Shared by input validation and rendering of legacy public links.
 export function safeExternalWebUrl(value: unknown): string | undefined {

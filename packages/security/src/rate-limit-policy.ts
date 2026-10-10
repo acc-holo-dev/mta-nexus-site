@@ -12,6 +12,8 @@ export const RATE_LIMIT_POLICIES = {
   notificationMutation: { limit: 30, windowSeconds: 60 },
   resourceClaim: { limit: 20, windowSeconds: 60 },
   resourceInspection: { limit: 30, windowSeconds: 60 },
+  licenseControl: { limit: 20, windowSeconds: 60 },
+  licenseCheck: { limit: 120, windowSeconds: 60 },
   verification: { limit: 3, windowSeconds: 86400 },
   moderationAction: { limit: 60, windowSeconds: 60 },
   serverMutation: { limit: 20, windowSeconds: 3600 },

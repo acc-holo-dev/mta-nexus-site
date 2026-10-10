@@ -35,3 +35,4 @@ export { authorContentRepository } from "./author-content";
 export type { ContentSummary } from "./author-content";
 export * from "./resource-cart";
 export * from "./product-lifecycle";
+export * from "./license-controls";

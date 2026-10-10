@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactNode } from "react";
 
 const state = vi.hoisted(() => ({
-  user: { id: "usr_current" } as { id: string } | null,
+  user: { id: "usr_current", role: "user" } as { id: string; role: "user" } | null,
   locale: "en" as "en" | "ru",
   buyer: vi.fn(),
   licenses: vi.fn(),
@@ -46,7 +46,7 @@ const input = (page = "2") => ({ searchParams: Promise.resolve({ page }) });
 
 describe("private legacy commerce pages", () => {
   beforeEach(() => {
-    state.user = { id: "usr_current" };
+    state.user = { id: "usr_current", role: "user" };
     state.locale = "en";
     state.buyer.mockReset().mockResolvedValue({
       orders: [{

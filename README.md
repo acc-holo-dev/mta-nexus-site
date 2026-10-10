@@ -200,6 +200,8 @@ The account-scoped resource cart at `/workspace/cart` holds up to 20 free resour
 
 Authors can archive a resource, restore it as a draft and submit its latest clean draft version for moderation from the resource workspace. Restoring requires renewed moderation of formerly public versions; suspension cannot be bypassed. Existing grants, files and history are retained. Private historical order details are available at `/workspace/purchases/[id]` and `/api/orders/[id]`, scoped to their buyer and separately checking current download rights. Migration `0039_resource_cart` adds the cart, replay receipts and the order-item lookup index.
 
+Existing finite single-server licenses can be managed at `/workspace/licenses/[id]`: bind an approved server-control proof, create/rotate a hash-only runtime bearer token (at most 30 days and never beyond the recorded license expiry), revoke the token or revoke the license. `/admin/licenses` provides scoped moderation, reasons and revision checks; restoration preserves the original term and clears old tokens. Migration `0040_license_runtime_controls` preserves bindings across server deletion and endpoint changes. HTTPS `POST /api/licenses/check` accepts `Authorization: Bearer <token>` and JSON `{ "serverId": "bound server ID" }`; checks current proof, permissions, endpoint, license expiry and clean published builds. This checks a credential and binding, not the physical caller or source-code DRM. Paid issuance and renewal remain disabled.
+
 ## Documentation
 
 The repository keeps three operational long-form documents at the root of `docs/`:

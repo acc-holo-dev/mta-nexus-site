@@ -11,3 +11,4 @@ export * from "./server-activity";
 
 export * from "./server-claim-scope";
 export * from "./resource-commerce";
+export * from "./license-control";

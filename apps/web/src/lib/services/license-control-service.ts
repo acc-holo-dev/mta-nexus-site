@@ -1,0 +1,45 @@
+import { licenseControlsRepository } from "@nexus/db";
+import { can, createLicenseRuntimeToken, generateId } from "@nexus/security";
+import { ForbiddenError, type User } from "@nexus/domain";
+import type { LicenseOwnerCommand, LicenseModerationCommand } from "@nexus/validation";
+
+export const licenseControlService = {
+  detail: (user: User, licenseId: string) => licenseControlsRepository.detail(licenseId, user.id),
+  servers: (user: User, licenseId: string, page = 1) =>
+    licenseControlsRepository.eligibleServers(licenseId, user.id, page),
+  async ownerCommand(user: User, licenseId: string, command: LicenseOwnerCommand) {
+    const token = command.action === "rotate_token" ? createLicenseRuntimeToken() : undefined;
+    const result = await licenseControlsRepository.ownerCommand({
+      licenseId,
+      actorId: user.id,
+      command,
+      auditId: generateId("aud"),
+      tokenDigest: token?.digest,
+    });
+    return {
+      license: result.license,
+      ...(token && result.tokenExpiresAt
+        ? {
+            token: { value: token.value, expiresAt: result.tokenExpiresAt.toISOString() },
+          }
+        : {}),
+    };
+  },
+  async moderationPage(user: User, page = 1, status?: string, query = "") {
+    if (!can(user, "admin.moderation")) throw new ForbiddenError();
+    return licenseControlsRepository.moderationPage(user.id, page, status, query);
+  },
+  async moderationDetail(user: User, licenseId: string) {
+    if (!can(user, "admin.moderation")) throw new ForbiddenError();
+    return licenseControlsRepository.detail(licenseId, user.id, true);
+  },
+  async moderate(user: User, licenseId: string, command: LicenseModerationCommand) {
+    if (!can(user, "admin.moderation")) throw new ForbiddenError();
+    return licenseControlsRepository.moderate({
+      licenseId,
+      actorId: user.id,
+      command,
+      auditId: generateId("aud"),
+    });
+  },
+};

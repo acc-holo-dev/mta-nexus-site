@@ -281,6 +281,13 @@
       "when": 1791630000000,
       "tag": "0039_resource_cart",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1791654000000,
+      "tag": "0040_license_runtime_controls",
+      "breakpoints": true
     }
   ]
 }

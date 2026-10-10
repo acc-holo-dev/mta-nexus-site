@@ -24,7 +24,11 @@ export async function resourceCommerceRequest(
       if (request.headers.get("sec-fetch-site") === "cross-site") {
         throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
       }
-      const policy = request.nextUrl.pathname.includes("/lifecycle")
+      const policy = request.nextUrl.pathname.startsWith("/api/admin/licenses/")
+        ? "moderationAction"
+        : request.nextUrl.pathname.includes("/licenses/")
+        ? "licenseControl"
+        : request.nextUrl.pathname.includes("/lifecycle")
         ? "contentCreation"
         : "resourceClaim";
       if (!(await consumeRateLimit(policy, actor.id)).success) throw new RateLimitExceededError();
