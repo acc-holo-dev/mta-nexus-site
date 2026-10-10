@@ -232,3 +232,10 @@ This repository is a closed-beta codebase. Production deployment is a separate o
 
 MTA NEXUS is not affiliated with Rockstar Games, Take-Two Interactive, or the Multi Theft Auto project.
 
+
+Organization workspaces are available at `/workspace/organizations`: create a
+profile, manage existing Nexus team accounts and delegated MTA server access, or
+leave a team. Owner/admin boundaries and the shared revision are checked under
+transaction locks; existing resource permissions are preserved. Article and
+community discussions support author identities, replies and 20-item keyset
+pages through `/api/content/[slug]/comments` (GET/POST), with RU/EN interfaces.

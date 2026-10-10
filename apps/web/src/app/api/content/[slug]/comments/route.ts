@@ -1,172 +1,133 @@
-import { after, type NextRequest } from "next/server";
+import { after, type NextRequest, NextResponse } from "next/server";
+import { AppError, NotFoundError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
+import { consumeRateLimit } from "@nexus/security";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
-  type RequestLogContext,
 } from "../../../../../lib/observability";
 import { contentService } from "../../../../../lib/services/content-service";
 import { authService } from "../../../../../lib/services/auth-service";
-import { createContentCommentSchema } from "@nexus/validation";
-import { AppError } from "@nexus/domain";
-import { consumeRateLimit } from "@nexus/security";
 import { dispatchNotificationsBestEffort } from "../../../../../lib/services/notification-dispatch-service";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
+import { resolveLocale } from "../../../../../lib/i18n";
+import { discussionError } from "../../../../../lib/content-discussion-copy";
+import {
+  discussionCommentSchema,
+  parseDiscussionCursor,
+} from "../../../../../lib/content-discussion-contract";
 
-const privateHeaders = {
-  "Cache-Control": "private, no-store",
-  Vary: "Cookie",
-};
-
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
-  return jsonWithRequestId(context, body, {
-    status,
-    headers: privateHeaders,
-  });
+const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
+const validSlug = (slug: string) => !!slug && slug.length <= 200 && /^[a-z0-9-]+$/u.test(slug);
+export async function GET(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+  const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
+  const context = createRequestLogContext(request);
+  try {
+    const { slug } = await params;
+    if (!validSlug(slug)) throw new NotFoundError("Content");
+    const cursor = parseDiscussionCursor(request.nextUrl.searchParams);
+    if (cursor === null) throw new AppError("Invalid cursor", 400, "INVALID_CURSOR");
+    const article = await contentService.getArticleBySlug(slug, { incrementView: false });
+    if (!article) throw new NotFoundError("Content");
+    return NextResponse.json(await contentService.pageDiscussion(article.id, cursor), {
+      headers: { "Cache-Control": "no-store" },
+    });
+  } catch (error) {
+    const known = error instanceof AppError;
+    if (!known)
+      logRequestEvent({
+        level: "error",
+        event: "content.discussion.read_failed",
+        context,
+        status: 503,
+        error,
+      });
+    return NextResponse.json(
+      {
+        error: discussionError(locale, known ? error.code : "INTERNAL_ERROR"),
+        code: known ? error.code : "INTERNAL_ERROR",
+      },
+      {
+        status: known ? error.statusCode : 503,
+        headers: { "Cache-Control": "no-store", Vary: "Cookie" },
+      },
+    );
+  }
 }
-
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const context = createRequestLogContext(request);
+  const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
   try {
     const { slug } = await params;
-    if (
-      !slug ||
-      slug.length > 200 ||
-      !/^[a-z0-9-]+$/u.test(slug)
-    ) {
-      return json(
-        context,
-        { error: "Article not found" },
-        404,
-      );
-    }
-
-    const token =
-      request.cookies.get("nexus_session")?.value;
-    const user = await authService.getSession(token);
-    if (!user) {
-      return json(
-        context,
-        {
-          error:
-            "Authentication required to comment",
-        },
-        401,
-      );
-    }
-
-    const rateLimit = await consumeRateLimit(
-      "commentCreation",
-      user.id,
-    );
-    if (!rateLimit.success) {
-      return json(
-        context,
-        {
-          error:
-            "Too many comments. Please try again later.",
-        },
-        429,
-      );
-    }
-
-    const parsed =
-      createContentCommentSchema.safeParse(
-        await request.json().catch(() => null),
-      );
-    if (!parsed.success) {
-      return json(
-        context,
-        {
-          error: "Invalid comment",
-          details: parsed.error.format(),
-        },
-        400,
-      );
-    }
-
-    const article =
-      await contentService.getArticleBySlug(slug, {
-        incrementView: false,
-      });
-    if (!article) {
-      return json(
-        context,
-        { error: "Article not found" },
-        404,
-      );
-    }
-
+    if (!validSlug(slug)) throw new NotFoundError("Content");
+    const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
+    if (!user) throw new UnauthorizedError();
+    if (request.headers.get("sec-fetch-site") === "cross-site")
+      throw new AppError("Cross-site mutation forbidden", 403, "FORBIDDEN");
+    if (!(await consumeRateLimit("commentCreation", user.id)).success)
+      throw new RateLimitExceededError();
+    requireServerJsonContentType(request);
+    const parsed = discussionCommentSchema.safeParse(await readBoundedJson(request, 32 * 1024));
+    if (!parsed.success) throw new AppError("Invalid comment", 400, "VALIDATION_ERROR");
+    const article = await contentService.getArticleBySlug(slug, { incrementView: false });
+    if (!article) throw new NotFoundError("Content");
     const comment = await contentService.addComment(
-      {
-        contentId: article.id,
-        parentId: parsed.data.parentId,
-        text: parsed.data.text,
-      },
+      { contentId: article.id, parentId: parsed.data.parentId, text: parsed.data.text },
       user,
     );
-
-    if (article.authorId !== user.id) {
+    // Delivery remains best effort after persistence; a delivery error never retries the write.
+    if (article.authorId !== user.id || parsed.data.parentId)
       after(async () => {
         try {
-          await dispatchNotificationsBestEffort([
-            {
-              recipientId: article.authorId,
+          const parentAuthorId = parsed.data.parentId
+            ? await contentService.commentAuthor(article.id, parsed.data.parentId)
+            : null;
+          const recipients = [
+            ...new Set(
+              [article.authorId, parentAuthorId].filter(
+                (id): id is string => !!id && id !== user.id,
+              ),
+            ),
+          ];
+          await dispatchNotificationsBestEffort(
+            recipients.map((recipientId) => ({
+              recipientId,
               title: "New article comment",
-              message:
-                `@${user.username} commented on “${article.title}”.`,
+              message: `@${user.username} commented on “${article.title}”.`,
               type: "content",
               category: "content",
-              link: `/articles/${article.slug}`,
-            },
-          ]);
+              link: `/articles/${encodeURIComponent(article.slug)}#comment-${encodeURIComponent(comment.id)}`,
+            })),
+          );
         } catch (error) {
           logRequestEvent({
             level: "warn",
-            event:
-              "content.comment.notification_failed",
+            event: "content.comment.notification_failed",
             context,
             status: 201,
             error,
           });
         }
       });
-    }
-
-    return json(
-      context,
-      { comment },
-      201,
-    );
-  } catch (error: unknown) {
-    if (error instanceof AppError) {
-      return json(
+    return jsonWithRequestId(context, { comment }, { status: 201, headers: privateHeaders });
+  } catch (error) {
+    const known = error instanceof AppError;
+    const code = known ? error.code : "INTERNAL_ERROR";
+    if (!known)
+      logRequestEvent({
+        level: "error",
+        event: "content.comment.create_failed",
         context,
-        {
-          error: error.message,
-          code: error.code,
-        },
-        error.statusCode,
-      );
-    }
-
-    logRequestEvent({
-      level: "error",
-      event: "content.comment.create_failed",
+        status: 503,
+        error,
+      });
+    return jsonWithRequestId(
       context,
-      status: 500,
-      error,
-    });
-    return json(
-      context,
-      { error: "Failed to add comment" },
-      500,
+      { error: discussionError(locale, code), code },
+      { status: known ? error.statusCode : 503, headers: privateHeaders },
     );
   }
 }

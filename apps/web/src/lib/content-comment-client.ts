@@ -1,3 +1,5 @@
+import type { Locale } from "./i18n";
+import { discussionError } from "./content-discussion-copy";
 import { confirmedCommentId } from "./content-comment-confirmation";
 
 export type ContentCommentFetch = (
@@ -10,6 +12,9 @@ export async function submitContentCommentRequest(
     slug: string;
     text: string;
     fallbackError: string;
+    parentId?: string;
+    contentId?: string;
+    locale?: Locale;
   },
   fetchImpl: ContentCommentFetch = fetch,
 ): Promise<string> {
@@ -18,20 +23,27 @@ export async function submitContentCommentRequest(
     throw new RangeError("Comment text must contain 2..5000 characters");
   }
 
-  const response = await fetchImpl(
-    `/api/content/${encodeURIComponent(input.slug)}/comments`,
-    {
-      method: "POST",
-      cache: "no-store",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: normalized }),
-      signal: AbortSignal.timeout(15_000),
-    },
-  );
+  const response = await fetchImpl(`/api/content/${encodeURIComponent(input.slug)}/comments`, {
+    method: "POST",
+    cache: "no-store",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      text: normalized,
+      ...(input.parentId ? { parentId: input.parentId } : {}),
+    }),
+    signal: AbortSignal.timeout(15_000),
+  }).catch(() => {
+    throw new Error(input.fallbackError);
+  });
   const payload = await response.json().catch(() => null);
   const id = confirmedCommentId(response.status, payload);
-  if (!id) {
+  const confirmed =
+    !input.contentId ||
+    (payload?.comment?.contentId === input.contentId &&
+      payload?.comment?.text === normalized &&
+      (payload?.comment?.parentId ?? undefined) === input.parentId);
+  if (!id || !confirmed) {
     const message =
       payload &&
       typeof payload === "object" &&
@@ -39,7 +51,9 @@ export async function submitContentCommentRequest(
       typeof (payload as Record<string, unknown>).error === "string"
         ? (payload as Record<string, string>).error
         : input.fallbackError;
-    throw new Error(message);
+    throw new Error(
+      input.locale ? discussionError(input.locale, payload?.code ?? "UNCONFIRMED") : message,
+    );
   }
   return id;
 }

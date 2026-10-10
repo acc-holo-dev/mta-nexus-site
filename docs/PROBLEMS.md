@@ -1171,3 +1171,17 @@ TypeScript, Knip and configured SWC architecture checks (376 modules / 1,141
 dependencies). Lint retains 55 existing warnings; dependency-cruiser retains
 its TypeScript 7 compatibility warning. These checks do not replace acceptance
 on PostgreSQL or the production runtime.
+
+### Organization workspaces and paginated discussions
+
+Private organization profile/team APIs and RU/EN workspaces now use existing
+organization/member tables, transaction-scoped owner/admin checks, shared
+optimistic revisions and atomic audits. Owners are protected, unrelated
+permission flags survive edits, and non-owners can leave their own team.
+Published discussions use 20-item timestamp/ID keysets with microsecond cursors,
+public author projections and same-content parent previews. Posting rechecks
+publication and parent scope inside the transaction; activity counters no longer
+invalidate author metadata versions. PostgreSQL persistence/concurrency and
+browser acceptance remain pending. Agent A should add
+`comments_content_created_id_idx` on `(content_id, created_at DESC, id DESC)`
+where `product_id IS NULL AND content_id IS NOT NULL`; no migration was created here.

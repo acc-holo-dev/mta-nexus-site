@@ -19,9 +19,11 @@ import {
   ShieldAlert,
   ShieldCheck,
   Wrench,
+  Users,
 } from "lucide-react";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
+import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 
 export function Sidebar({
@@ -48,6 +50,7 @@ export function Sidebar({
 
   const workspaceNav = [
     { href: "/workspace", label: dictionary.nav.overview, icon: LayoutDashboard },
+    { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
     { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
     { href: "/workspace/resources/new", label: dictionary.nav.publishResource, icon: Plus },
     { href: "/workspace/servers", label: serverCopy.title, icon: Server },

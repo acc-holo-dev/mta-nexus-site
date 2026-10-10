@@ -16,15 +16,28 @@ vi.mock("../client", () => ({
     transaction: async (run: (tx: unknown) => Promise<unknown>) => {
       captured.transactionCalls += 1;
       const tx = {
+        select() {
+          return {
+            from() {
+              return {
+                where() {
+                  return {
+                    limit() {
+                      return { for: async () => [{ status: "published" }] };
+                    },
+                  };
+                },
+              };
+            },
+          };
+        },
         insert(table: unknown) {
           captured.inserts.push(table);
           return {
             values(value: unknown) {
               if (table === comments) {
                 return {
-                  returning: async () => [
-                    { ...(value as Record<string, unknown>) },
-                  ],
+                  returning: async () => [{ ...(value as Record<string, unknown>) }],
                 };
               }
               return Promise.resolve();
@@ -89,9 +102,7 @@ describe("article comment persistence", () => {
     expect(captured.transactionCalls).toBe(1);
     expect(captured.inserts).toEqual([comments, auditEvents]);
     expect(captured.updateTable).toBe(content);
-    expect(captured.updateValues).toMatchObject({
-      updatedAt: expect.any(Date),
-    });
+    expect(captured.updateValues).not.toHaveProperty("updatedAt");
     const increment = captured.updateValues?.commentCount;
     expect(increment).toBeTruthy();
     expect(new PgDialect().sqlToQuery(increment as SQL).sql).toContain("+ 1");

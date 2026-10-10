@@ -200,7 +200,7 @@ export function NotificationBell() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="truncate text-xs font-semibold text-primary">
-                      {formatNotification(notification, dictionary.buildReviewNotifications).title}
+                      {formatNotification(notification, dictionary.buildReviewNotifications, locale).title}
                     </span>
                     <time
                       dateTime={new Date(notification.createdAt).toISOString()}
@@ -210,7 +210,7 @@ export function NotificationBell() {
                     </time>
                   </div>
                   <p className="line-clamp-2 whitespace-pre-wrap break-words font-caption text-muted">
-                    {formatNotification(notification, dictionary.buildReviewNotifications).message}
+                    {formatNotification(notification, dictionary.buildReviewNotifications, locale).message}
                   </p>
                   {notification.link && (
                     <Link

@@ -65,6 +65,7 @@ export default async function OrganizationProfilePage({
     notFound();
   }
 
+  const logoUrl = safeExternalWebUrl(organization.logoUrl);
   const websiteUrl = safeExternalWebUrl(organization.websiteUrl);
   const query = await searchParams;
   const [resourcePage, articlePage] = await Promise.all([
@@ -79,11 +80,11 @@ export default async function OrganizationProfilePage({
       <section className="nexus-panel flex flex-col justify-between gap-6 p-6 shadow-nexus-sm md:flex-row md:items-center md:p-8">
         <div className="flex min-w-0 items-center gap-5 sm:gap-6">
           <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-base bg-inset text-muted shadow-nexus-sm">
-            {organization.logoUrl ? (
+            {logoUrl ? (
               <>
                 {/* biome-ignore lint/performance/noImgElement: organization-controlled remote logo stays outside the trusted image-optimizer allowlist. */}
                 <img
-                  src={organization.logoUrl}
+                  src={logoUrl}
                   alt={organization.name}
                   width={80}
                   height={80}

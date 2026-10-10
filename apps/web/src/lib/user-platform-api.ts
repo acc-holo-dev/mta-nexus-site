@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { User } from "@nexus/domain";
 import { authService } from "./services/auth-service";
-import { resolveLocale } from "./i18n";
+import { resolveLocale, type Locale } from "./i18n";
 import { userPlatformError } from "./user-platform-copy";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "./observability";
 
@@ -10,6 +10,7 @@ export async function userPlatformApi(
   request: NextRequest,
   action: (user: User) => Promise<unknown>,
   status = 200,
+  translateError: (locale: Locale, code: unknown) => string = userPlatformError,
 ) {
   const context = createRequestLogContext(request);
   const headers = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -35,7 +36,7 @@ export async function userPlatformApi(
     return jsonWithRequestId(
       context,
       {
-        error: userPlatformError(resolveLocale(request.cookies.get("nexus_locale")?.value), code),
+        error: translateError(resolveLocale(request.cookies.get("nexus_locale")?.value), code),
         code,
       },
       { status: statusCode, headers },

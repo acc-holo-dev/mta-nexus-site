@@ -263,14 +263,14 @@ export default function NotificationCenterPage() {
                 <div className="min-w-0 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="break-words text-sm font-bold text-primary">
-                      {formatNotification(notification, dictionary.buildReviewNotifications).title}
+                      {formatNotification(notification, dictionary.buildReviewNotifications, locale).title}
                     </h2>
                     <span className="rounded border border-base bg-inset px-2 py-0.5 font-numeric text-[10px] uppercase text-muted">
                       {notification.type}
                     </span>
                   </div>
                   <p className="whitespace-pre-wrap break-words text-xs leading-relaxed text-secondary">
-                    {formatNotification(notification, dictionary.buildReviewNotifications).message}
+                    {formatNotification(notification, dictionary.buildReviewNotifications, locale).message}
                   </p>
                 </div>
 

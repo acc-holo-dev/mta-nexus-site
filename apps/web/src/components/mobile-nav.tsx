@@ -14,11 +14,13 @@ import {
   Settings,
   ShieldCheck,
   X,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 
@@ -40,6 +42,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
   ];
 
   const moreItems = [
+    { href: "/workspace/organizations", label: getOrganizationCopy(locale).title, icon: Users },
     { href: "/workspace/content", label: getUserPlatformCopy(locale).studio, icon: BookOpen },
     { href: "/discover", label: dictionary.nav.explore, icon: Compass },
     {
@@ -62,8 +65,8 @@ export function MobileNav({ locale }: { locale: Locale }) {
   ];
 
   const isActive = (href: string) =>
-    href === "/"
-      ? pathname === "/"
+    href === "/" || href === "/workspace"
+      ? pathname === href
       : pathname === href || pathname.startsWith(`${href}/`);
 
   const moreActive = moreItems.some((item) => isActive(item.href));
@@ -83,9 +86,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-[10px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
-              active
-                ? "bg-accent-soft text-accent"
-                : "text-muted hover:bg-hover hover:text-primary"
+              active ? "bg-accent-soft text-accent" : "text-muted hover:bg-hover hover:text-primary"
             }`}
           >
             <Icon className="h-4 w-4" aria-hidden="true" />
@@ -102,9 +103,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
         aria-haspopup="dialog"
         aria-controls={isMoreOpen ? "mobile-more-menu" : undefined}
         className={`flex min-h-12 min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-md px-1 py-2 text-[10px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--nexus-accent)] ${
-          moreActive
-            ? "bg-accent-soft text-accent"
-            : "text-muted hover:bg-hover hover:text-primary"
+          moreActive ? "bg-accent-soft text-accent" : "text-muted hover:bg-hover hover:text-primary"
         }`}
       >
         <Menu className="h-4 w-4" aria-hidden="true" />
@@ -133,9 +132,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
           className="fixed inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] top-auto m-0 ml-auto mr-auto open:flex w-auto max-w-lg flex-col overflow-hidden rounded-xl border border-strong bg-elevated p-0 text-primary shadow-nexus-lg backdrop:bg-black/30"
         >
           <div className="flex items-center justify-between gap-3 border-b border-base px-4 py-3">
-            <h2 className="font-heading text-sm text-primary">
-              {dictionary.nav.more}
-            </h2>
+            <h2 className="font-heading text-sm text-primary">{dictionary.nav.more}</h2>
             <button
               type="button"
               aria-label={dictionary.nav.closeMore}

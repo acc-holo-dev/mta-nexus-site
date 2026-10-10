@@ -20,6 +20,8 @@ export const RATE_LIMIT_POLICIES = {
   serverClaimProof: { limit: 12, windowSeconds: 900 },
   contentCreation: { limit: 20, windowSeconds: 3600 },
   contentEditing: { limit: 60, windowSeconds: 3600 },
+  organizationCreation: { limit: 5, windowSeconds: 86400 },
+  organizationManagement: { limit: 60, windowSeconds: 3600 },
   profileEditing: { limit: 30, windowSeconds: 3600 },
   commentCreation: { limit: 20, windowSeconds: 300 },
   reviewSubmission: { limit: 5, windowSeconds: 300 },

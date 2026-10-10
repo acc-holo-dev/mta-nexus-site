@@ -1,7 +1,8 @@
-import { eq, asc, desc, and, count, sql, inArray, ilike, or } from "drizzle-orm";
+import { eq, asc, desc, and, count, sql, inArray, ilike, or, isNull } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, content, comments, products } from "../schema";
+import { AppError, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
 export class ContentRepository {
@@ -355,13 +356,38 @@ export class ContentRepository {
     };
 
     return db.transaction(async (tx) => {
+      if (data.contentId) {
+        const [target] = await tx
+          .select({ status: content.status })
+          .from(content)
+          .where(eq(content.id, data.contentId))
+          .limit(1)
+          .for("update");
+        if (target?.status !== "published") throw new NotFoundError("Content");
+        if (data.productId)
+          throw new AppError("Mixed comment targets", 400, "COMMENT_PARENT_TARGET_INVALID");
+        if (data.parentId) {
+          const [parent] = await tx
+            .select({ id: comments.id })
+            .from(comments)
+            .where(
+              and(
+                eq(comments.id, data.parentId),
+                eq(comments.contentId, data.contentId),
+                isNull(comments.productId),
+              ),
+            )
+            .limit(1)
+            .for("share");
+          if (!parent) throw new AppError("Parent not found", 400, "COMMENT_PARENT_NOT_FOUND");
+        }
+      }
       const rows = await tx.insert(comments).values(values).returning();
       if (data.contentId) {
         await tx
           .update(content)
           .set({
             commentCount: sql`${content.commentCount} + 1`,
-            updatedAt: new Date(),
           })
           .where(eq(content.id, data.contentId));
       }

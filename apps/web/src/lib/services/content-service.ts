@@ -1,5 +1,6 @@
 import {
   contentRepository,
+  contentDiscussionRepository,
   authorContentRepository,
   productRepository,
   serverRepository,
@@ -7,6 +8,9 @@ import {
 import { can, generateId } from "@nexus/security";
 import { ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
 import type { Content, Comment, User, Product, Server } from "@nexus/domain";
+import { safeExternalWebUrl } from "@nexus/validation";
+import { encodeDiscussionCursor } from "../content-discussion-contract";
+type DiscussionCursor = { createdAt: string; id: string };
 import { editorialTypes, communityTypes, type parseContentPage } from "../user-platform-contract";
 
 export class ContentService {
@@ -49,14 +53,44 @@ export class ContentService {
 
   async getArticleBySlug(
     slug: string,
-    options: { incrementView?: boolean } = {}
+    options: { incrementView?: boolean } = {},
   ): Promise<Content | null> {
     return contentRepository.findPublishedBySlug(slug, options);
   }
 
+  async commentAuthor(contentId: string, id: string) {
+    const parent = await contentRepository.findCommentById(id);
+    return parent?.contentId === contentId && !parent.productId ? parent.authorId : null;
+  }
+
+  async pageDiscussion(contentId: string, cursor?: DiscussionCursor) {
+    const result = await contentDiscussionRepository.page(contentId, cursor);
+    return {
+      items: result.items.map((row) => ({
+        id: row.id,
+        text: row.text,
+        parentId: row.parentId,
+        createdAt: row.createdAt.toISOString(),
+        author:
+          row.authorId && row.username
+            ? {
+                id: row.authorId,
+                username: row.username,
+                displayName: row.displayName ?? row.username,
+                avatarUrl: safeExternalWebUrl(row.avatarUrl) ?? null,
+              }
+            : null,
+        parent:
+          row.parentText !== null ? { text: row.parentText, username: row.parentUsername } : null,
+      })),
+      hasMore: result.hasMore,
+      nextCursor: result.nextCursor ? encodeDiscussionCursor(result.nextCursor) : null,
+    };
+  }
+
   async getComments(
     target: { contentId?: string; productId?: string },
-    limit = 100
+    limit = 100,
   ): Promise<Comment[]> {
     return contentRepository.listComments(target, limit);
   }
@@ -69,7 +103,7 @@ export class ContentService {
       text: string;
       rating?: number;
     },
-    actor: User
+    actor: User,
   ): Promise<Comment> {
     if (input.contentId) {
       const target = await contentRepository.findById(input.contentId);
@@ -83,15 +117,15 @@ export class ContentService {
         throw new AppError(
           "Parent comments are only supported for article discussions",
           400,
-          "COMMENT_PARENT_TARGET_INVALID"
+          "COMMENT_PARENT_TARGET_INVALID",
         );
       }
       const parent = await contentRepository.findCommentById(input.parentId);
-      if (!parent || parent.contentId !== input.contentId) {
+      if (!parent || parent.contentId !== input.contentId || parent.productId) {
         throw new AppError(
           "Parent comment was not found for this article",
           400,
-          "COMMENT_PARENT_NOT_FOUND"
+          "COMMENT_PARENT_NOT_FOUND",
         );
       }
     }
@@ -128,7 +162,7 @@ export class ContentService {
     contentId: string,
     decision: "publish" | "archive",
     actor: User,
-    notes?: string
+    notes?: string,
   ): Promise<Content> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError("Moderator privilege is required to moderate content");
@@ -137,14 +171,9 @@ export class ContentService {
     const current = await contentRepository.findById(contentId);
     if (!current) throw new NotFoundError("Content", contentId);
 
-    const targetStatus: Content["status"] =
-      decision === "publish" ? "published" : "archived";
+    const targetStatus: Content["status"] = decision === "publish" ? "published" : "archived";
     if (current.status === targetStatus) {
-      throw new AppError(
-        `Content is already ${targetStatus}`,
-        409,
-        "CONTENT_ALREADY_IN_STATE"
-      );
+      throw new AppError(`Content is already ${targetStatus}`, 409, "CONTENT_ALREADY_IN_STATE");
     }
 
     const updated = await contentRepository.moderateStatusWithAudit(
@@ -165,7 +194,7 @@ export class ContentService {
       throw new AppError(
         "Content changed before moderation completed",
         409,
-        "CONTENT_STATE_CHANGED"
+        "CONTENT_STATE_CHANGED",
       );
     }
 

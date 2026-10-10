@@ -36,3 +36,5 @@ export type { ContentSummary } from "./author-content";
 export * from "./resource-cart";
 export * from "./product-lifecycle";
 export * from "./license-controls";
+export { organizationWorkspaceRepository } from "./organization-workspace";
+export { contentDiscussionRepository } from "./content-discussion";

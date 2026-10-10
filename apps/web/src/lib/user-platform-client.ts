@@ -43,15 +43,18 @@ export async function platformRequest(
   method = "GET",
   json?: unknown,
   signal?: AbortSignal,
+  translateError: (locale: Locale, code: unknown) => string = userPlatformError,
 ) {
   const response = await fetch(
     path,
     privateApiRequest({ method, json, signal, timeoutMs: 15_000 }),
-  );
+  ).catch(() => {
+    throw new Error(translateError(locale, "INTERNAL_ERROR"));
+  });
   const data: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const code = data && typeof data === "object" && "code" in data ? data.code : null;
-    throw new Error(userPlatformError(locale, code));
+    throw new Error(translateError(locale, code));
   }
   if (!data || typeof data !== "object") throw new Error(userPlatformError(locale, "UNCONFIRMED"));
   return data as Record<string, unknown>;
