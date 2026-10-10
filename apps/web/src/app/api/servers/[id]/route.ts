@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { consumeRateLimit } from "@nexus/security";
-import { z } from "zod";
+import { updateServerSchema } from "@nexus/validation";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -26,76 +26,12 @@ function json(
   });
 }
 
-const serverUpdateSchema = z
-  .object({
-    name: z.string().min(3).max(100).optional(),
-    description: z.string().max(5000).optional(),
-    websiteUrl: z
-      .string()
-      .url()
-      .max(500)
-      .optional()
-      .or(z.literal("")),
-    discordUrl: z
-      .string()
-      .url()
-      .max(500)
-      .optional()
-      .or(z.literal("")),
-    rulesUrl: z
-      .string()
-      .url()
-      .max(500)
-      .optional()
-      .or(z.literal("")),
-    mediaUrls: z
-      .array(z.string().url().max(500))
-      .max(8)
-      .optional(),
-    language: z
-      .string()
-      .trim()
-      .max(64)
-      .optional(),
-    region: z
-      .string()
-      .trim()
-      .max(64)
-      .optional(),
-    gameplayTags: z
-      .array(z.string().trim().min(1).max(32))
-      .max(12)
-      .optional(),
-    ipAddress: z.string().min(1).optional(),
-    port: z.coerce
-      .number()
-      .int()
-      .min(1)
-      .max(65535)
-      .optional(),
-    httpPort: z.coerce
-      .number()
-      .int()
-      .min(1)
-      .max(65535)
-      .optional(),
-    gameMode: z.string().max(64).optional(),
-    mapName: z.string().max(64).optional(),
-    maxPlayers: z.coerce
-      .number()
-      .int()
-      .min(1)
-      .max(4096)
-      .optional(),
-    visibility: z
-      .enum(["public", "unlisted", "private"])
-      .optional(),
-  })
+// Share the strict HTTP(S) URL policy with server creation. Ownership,
+// organization and slug changes are not permitted through this endpoint.
+const serverUpdateSchema = updateServerSchema
+  .omit({ slug: true, organizationId: true })
   .strict()
-  .refine(
-    (value) => Object.keys(value).length > 0,
-    "At least one field is required",
-  );
+  .refine((value) => Object.keys(value).length > 0, "At least one field is required");
 
 export async function PATCH(
   request: NextRequest,
