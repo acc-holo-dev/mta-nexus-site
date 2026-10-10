@@ -1,22 +1,61 @@
 /**
- * Match the canonical representation used by the official MTA directory.
- * The game port is stored separately and must never be embedded in this value.
+ * Resolve game-server hosts using the same browser/Node WHATWG URL parser.
+ * The game port is always stored separately from the canonical host.
  */
-export function normalizeMtaAddress(address: string): string {
-  return address.trim().toLowerCase().replace(/\.$/u, "");
+function canonicalMtaHost(input: string): string | null {
+  const trimmed = input.trim().toLowerCase();
+  // A single terminal DNS dot is allowed; repeated dots are malformed.
+  if (trimmed.endsWith("..")) return null;
+  const value = trimmed.replace(/\.$/u, "");
+  if (
+    value.length === 0 ||
+    value.length > 255 ||
+    !/^[\p{L}\p{N}.:\[\]-]+$/u.test(value)
+  ) {
+    return null;
+  }
+
+  if (value.includes(":") || value.includes("[") || value.includes("]")) {
+    const bracketed = value.startsWith("[") && value.endsWith("]")
+      ? value
+      : value.includes("[") || value.includes("]")
+        ? null
+        : "[" + value + "]";
+    if (!bracketed) return null;
+    try {
+      // URL verifies the entire IPv6 literal and compresses equivalent forms.
+      const url = new URL("http://" + bracketed + "/");
+      return url.port === "" && /^\[[0-9a-f:.]+\]$/u.test(url.hostname)
+        ? url.hostname
+        : null;
+    } catch {
+      return null;
+    }
+  }
+
+  try {
+    // IDN labels become stable ASCII punycode; IPv4 shorthand is expanded.
+    const host = new URL("http://" + value + "/").hostname.replace(/\.$/u, "");
+    if (host.length === 0 || host.length > 253) return null;
+    const labels = host.split(".");
+    if (labels.some(
+      (label) => label.length > 63 ||
+        !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/u.test(label),
+    )) {
+      return null;
+    }
+    return host;
+  } catch {
+    return null;
+  }
 }
 
-/** Reject malformed addresses while retaining valid IPv4, DNS and IPv6 literals. */
+export function normalizeMtaAddress(address: string): string {
+  // Preserve invalid text for the validator to reject; never turn a malformed
+  // double-dot host into a valid one by stripping just its final dot.
+  return canonicalMtaHost(address) ?? address.trim().toLowerCase();
+}
+
 export function isValidMtaAddress(address: string): boolean {
-  return (
-    address.length > 0 &&
-    address.length <= 255 &&
-    address !== "." &&
-    !address.startsWith(".") &&
-    !address.endsWith(".") &&
-    !address.includes("..") &&
-    // Ports are separate: reject host:port without rejecting IPv6 literals.
-    (address.match(/:/gu)?.length ?? 0) !== 1 &&
-    !/[\s/\\?#@\u0000-\u001f\u007f]/u.test(address)
-  );
+  return canonicalMtaHost(address) !== null;
 }

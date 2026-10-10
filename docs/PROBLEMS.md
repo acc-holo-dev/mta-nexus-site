@@ -968,3 +968,23 @@ constraint before resolving collisions and ownership claims. The raw unique
 index remains as a backstop for newly canonicalized writes, but legacy aliases
 and internal direct DB writers need a separate data migration. Exact-SHA Node
 26/PostgreSQL/browser CI is still blocked by CI-001.
+
+### P1. Endpoint audit before canonical database uniqueness
+
+The shared MTA hostname canonicalizer now parses bracketed and unbracketed IPv6
+using the platform URL parser, canonicalizes equivalent IP spellings and IDN
+hostnames, and rejects malformed hostnames and embedded ports. Focused checks
+passed in the isolated Node 22/TypeScript harness; Node 26/Vitest acceptance
+remains outstanding.
+
+Run `pnpm --filter @nexus/db server:endpoint:audit` against a read-only
+PostgreSQL account to get only summary counts. The command performs no UPDATE
+or DELETE and returns exit code 2 if invalid, noncanonical, or colliding
+endpoints were detected. Detailed addresses and IDs require BOTH
+`NEXUS_SERVER_ENDPOINT_AUDIT_ACK=YES` and `--details`; handle output as
+sensitive operational data. This is an operator audit, not an automatic fix.
+
+Outstanding: resolve legacy duplicates and ownership claims case by case,
+then design an indexed database-level uniqueness guard. Audit results are not
+transactionally frozen; rerun immediately before any future migration. Full
+DB acceptance is blocked by CI-001 until hosted runners execute.

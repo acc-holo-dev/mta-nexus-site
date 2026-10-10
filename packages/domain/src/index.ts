@@ -5,3 +5,4 @@ export * from "./upload-limits";
 export * from "./product-types";
 export * from "./release-pagination";
 export * from "./mta-endpoint";
+export * from "./mta-endpoint-audit";

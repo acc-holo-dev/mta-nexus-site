@@ -11,6 +11,7 @@
     "seed": "tsx src/seed.ts",
     "mail:dispatch": "tsx scripts/run-account-mail-dispatcher.ts",
     "scenario:list": "tsx scripts/run-scenario-lab.ts list",
+    "server:endpoint:audit": "tsx scripts/audit-server-endpoints.ts",
     "scenario:create": "tsx scripts/run-scenario-lab.ts apply",
     "scenario:cleanup": "tsx scripts/run-scenario-lab.ts cleanup",
     "push:dispatch": "tsx scripts/run-web-push-dispatcher.ts",
