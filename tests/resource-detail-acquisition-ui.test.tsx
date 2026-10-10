@@ -1,7 +1,8 @@
-import React from "react";
+import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { LocaleProvider } from "../apps/web/src/components/locale-context";
 
 const state = vi.hoisted(() => ({
   user: null as null | {
@@ -23,6 +24,10 @@ const productService = vi.hoisted(() => ({
   getProductBuilds: vi.fn(async () => state.builds),
   getDependencyResolution: vi.fn(async () => null),
   getReverseDependencySummary: vi.fn(async () => null),
+}));
+
+vi.mock("../apps/web/src/lib/services/resource-management-service", () => ({
+  resourceManagementService: { publicVariants: vi.fn(async () => null) },
 }));
 
 vi.mock("next/headers", () => ({
@@ -147,6 +152,10 @@ import { contentService } from "../apps/web/src/lib/services/content-service";
 import { authService } from "../apps/web/src/lib/services/auth-service";
 import { getRequestLocale } from "../apps/web/src/lib/i18n-server";
 
+function renderPage(element: React.ReactNode) {
+  return renderToStaticMarkup(<LocaleProvider locale={state.locale}>{element}</LocaleProvider>);
+}
+
 function deferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (error: unknown) => void;
@@ -235,7 +244,7 @@ describe("resource detail acquisition behavior", () => {
       expect(authService.getSession).toHaveBeenCalledExactlyOnceWith("session-token");
     } finally {
       locale.resolve("en");
-      expect(renderToStaticMarkup(await page)).toContain("Detail Resource");
+      expect(renderPage(await page)).toContain("Detail Resource");
     }
   });
 
@@ -261,7 +270,7 @@ describe("resource detail acquisition behavior", () => {
     } finally {
       management.resolve(canManage);
       entitlement.resolve(false);
-      const html = renderToStaticMarkup(await page);
+      const html = renderPage(await page);
       if (canManage) {
         expect(html).toContain(getDictionary("en").product.managementAccess);
         expect(html).toContain('data-testid="resource-download"');
@@ -312,7 +321,7 @@ describe("resource detail acquisition behavior", () => {
     async (locale) => {
       state.locale = locale;
       const copy = getDictionary(locale).product;
-      const html = renderToStaticMarkup(
+      const html = renderPage(
         await ProductDetailPage({
           params: Promise.resolve({ slug: "detail-resource" }),
         }),
@@ -339,7 +348,7 @@ describe("resource detail acquisition behavior", () => {
     state.product = product(1999);
     const dictionary = getDictionary("en");
 
-    const html = renderToStaticMarkup(
+    const html = renderPage(
       await ProductDetailPage({
         params: Promise.resolve({ slug: "detail-resource" }),
       }),
@@ -360,7 +369,7 @@ describe("resource detail acquisition behavior", () => {
     };
     state.entitled = true;
 
-    const html = renderToStaticMarkup(
+    const html = renderPage(
       await ProductDetailPage({
         params: Promise.resolve({ slug: "detail-resource" }),
       }),
@@ -387,7 +396,7 @@ describe("resource detail acquisition behavior", () => {
     };
     state.canManage = true;
 
-    const html = renderToStaticMarkup(
+    const html = renderPage(
       await ProductDetailPage({
         params: Promise.resolve({ slug: "detail-resource" }),
       }),

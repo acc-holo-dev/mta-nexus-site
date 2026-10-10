@@ -61,4 +61,5 @@ export async function assertBuildModerationAuthority(tx: ResourceTransaction, ac
     .for("share");
   if (actor?.role !== "admin" && actor?.role !== "moderator")
     throw new ForbiddenError("Moderator privilege is required");
+  return actor;
 }

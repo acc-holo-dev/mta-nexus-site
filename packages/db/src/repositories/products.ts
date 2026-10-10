@@ -1,6 +1,7 @@
 import type { SQL } from "drizzle-orm";
 import { eq, desc, asc, and, count, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
 import { safePublishedBuildCondition } from "./build-safety";
+import { assertProductMutationAuthority } from "./product-mutation-authority";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, builds, products, organizations, organizationMembers } from "../schema";
@@ -68,7 +69,13 @@ export class ProductRepository {
     details: Pick<Product, "title" | "shortDescription" | "description" | "tags">,
     audit: Omit<AuditEvent, "createdAt">, expectedUpdatedAt?: Date): Promise<Product | null> {
     return db.transaction(async (tx) => {
-      // Recheck the scope in the mutation, including organization membership.
+      const [parent] = await tx.select({ id: products.id, authorId: products.authorId,
+        organizationId: products.organizationId }).from(products)
+        .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor)))
+        .limit(1).for("no key update");
+      if (!parent) return null;
+      // Hold live organization/user/membership grants through the audited commit.
+      const currentActor = await assertProductMutationAuthority(tx, parent, actor.id);
       const rows = await tx.update(products).set({ title: details.title,
         shortDescription: details.shortDescription, description: details.description,
         tags: details.tags,
@@ -78,7 +85,8 @@ export class ProductRepository {
         .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor),
           expectedUpdatedAt ? sql`date_trunc('milliseconds', ${products.updatedAt}) = ${expectedUpdatedAt.toISOString()}::timestamptz` : undefined)).returning();
       if (!rows[0]) return null;
-      await tx.insert(auditEvents).values(audit);
+      await tx.insert(auditEvents).values({ ...audit, actorId: currentActor.id,
+        actorType: currentActor.role === "admin" ? "admin" : "user" });
       return rows[0] as unknown as Product;
     });
   }

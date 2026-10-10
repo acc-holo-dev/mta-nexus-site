@@ -38,3 +38,6 @@ export * from "./product-lifecycle";
 export * from "./license-controls";
 export { organizationWorkspaceRepository } from "./organization-workspace";
 export { contentDiscussionRepository } from "./content-discussion";
+export * from "./resource-variants";
+export * from "./resource-compatibility";
+export * from "./build-review-download";

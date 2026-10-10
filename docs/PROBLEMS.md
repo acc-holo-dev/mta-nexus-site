@@ -1,5 +1,22 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Resource variants and requirements — 2026-10-10
+
+Migration `0041_resource_variants` adds bounded catalog groups, unique resource
+membership/labels/positions and revision checks. Authors and organization product
+managers can order related free resources, rename variants and remove links with
+transactional audit. Each resource retains independent releases and access;
+this is catalog grouping, not paid SKU checkout or source/DRM delivery modes.
+Public choices require a published safe anchor and individually safe variants.
+Requirements editing preserves build metadata, rejects self-dependencies and
+uses live authority plus product revision checks; existing metadata edits now
+hold those grants through commit. Migration `0042_content_discussion_lookup`
+implements Agent B's content/time/ID pagination index contract. Reviewer delivery rechecks
+current role and exact evidence after storage opens, before streaming bytes.
+PostgreSQL migration/rollback/concurrent execution and browser acceptance remain
+unverified. Paid provider confirmation, SKU purchase, monthly issuance and
+financial holds remain separate unfinished work.
+
 Единственный реестр проблем проекта. Обновлён: 2026-10-10 (после закрытой истории серверов и проверки объединённого main; текущий hosted-runner blocker зафиксирован ниже).
 
 Правила реестра:

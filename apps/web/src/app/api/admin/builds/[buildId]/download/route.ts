@@ -1,7 +1,7 @@
 import { reviewerAttachmentFileName } from "../../../../../../lib/resource-attachment-filename";
-import { ValidationError } from "@nexus/domain";
+import { AppError, ValidationError } from "@nexus/domain";
 import {
-  auditRepository,
+  buildReviewDownloadRepository,
   buildRepository,
 } from "@nexus/db";
 import {
@@ -152,22 +152,7 @@ export async function GET(
 
     try {
       request.signal.throwIfAborted();
-      await auditRepository.record({
-        id: generateId("aud"),
-        actorId: actor.id,
-        actorType:
-          actor.role === "admin"
-            ? "admin"
-            : "user",
-        action:
-          "build.review_artifact_download_started",
-        targetId: build.id,
-        targetType: "build",
-        details: {
-          productId: build.productId,
-          version: build.version,
-        },
-      });
+      await buildReviewDownloadRepository.authorize({ actorId: actor.id, auditId: generateId("aud"), expected: build });
       request.signal.throwIfAborted();
     } catch (error) {
       destroyOpenedStream(stored.stream);
@@ -229,6 +214,10 @@ export async function GET(
         },
         404,
       );
+    }
+
+    if (error instanceof AppError) {
+      return json(context, { error: "Reviewer access or build evidence changed", code: error.code }, error.statusCode);
     }
 
     logRequestEvent({

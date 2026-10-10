@@ -6,6 +6,9 @@ import {
   isValidMtaAddress,
 } from "@nexus/domain";
 import { z } from "zod";
+import { mtaVersionSchema } from "./mta-version";
+export * from "./mta-version";
+export * from "./resource-management";
 export * from "./resource-commerce";
 export * from "./license-control";
 
@@ -27,13 +30,6 @@ export const externalWebUrlSchema = z.string().max(2048).refine(
   (value) => safeExternalWebUrl(value) !== undefined,
   "Use an HTTP or HTTPS URL without credentials or whitespace",
 );
-
-// MTA's sortable release form, for example 1.6.0-9.22279.0.
-export const MTA_VERSION_PATTERN = /^1\.\d+(?:\.\d+)?(?:-\d+(?:\.\d+){1,2})?$/;
-export const mtaVersionSchema = z
-  .string()
-  .max(64)
-  .regex(MTA_VERSION_PATTERN, "Use an MTA version such as 1.6.0 or 1.6.0-9.22279.0");
 
 // --- Auth & User Schemas ---
 export const registerSchema = z.object({

@@ -9,6 +9,7 @@ export type EntityPrefix =
   | "obs"
   | "ins"
   | "prd"
+  | "vgrp"
   | "bld"
   | "ast"
   | "lic"

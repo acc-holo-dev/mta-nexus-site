@@ -38,6 +38,7 @@ vi.mock("@nexus/db", () => {
     sha256Hash: "a".repeat(64),
   };
   return {
+    buildReviewDownloadRepository: { authorize: mocks.audit },
     productRepository: {
       findById: async () => ({ id: "product", slug: "product", status: "published" }),
     },

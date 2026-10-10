@@ -1,5 +1,6 @@
 import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
 import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
+import { getResourceManagementCopy } from "../../../../lib/resource-management-i18n";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -47,6 +48,7 @@ export default async function ManageResourcePage({
     productService.getResourceLifecycleHistory(id, actor),
   ]);
   const commerceCopy = getResourceCommerceCopy(locale);
+  const managementCopy = getResourceManagementCopy(locale);
   return (
     <div className="space-y-8">
       <Link href="/workspace/resources" className="text-sm text-accent underline">
@@ -61,6 +63,10 @@ export default async function ManageResourcePage({
           {copy.preview}
         </Link>
       </header>
+      <nav className="flex flex-wrap gap-4 text-sm text-accent" aria-label={managementCopy.variants}>
+        <Link href={`/workspace/resources/${product.id}/variants`} className="underline">{managementCopy.variants}</Link>
+        <Link href={`/workspace/resources/${product.id}/compatibility`} className="underline">{managementCopy.compatibility}</Link>
+      </nav>
       <ResourceLifecycleControls
         key={`lifecycle:${product.id}:${product.status}:${new Date(product.updatedAt).toISOString()}`}
         product={{

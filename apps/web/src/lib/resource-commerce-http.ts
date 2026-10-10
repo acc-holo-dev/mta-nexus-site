@@ -28,7 +28,7 @@ export async function resourceCommerceRequest(
         ? "moderationAction"
         : request.nextUrl.pathname.includes("/licenses/")
         ? "licenseControl"
-        : request.nextUrl.pathname.includes("/lifecycle")
+        : /\/(lifecycle|variants|compatibility)(?:\/|$)/u.test(request.nextUrl.pathname)
         ? "contentCreation"
         : "resourceClaim";
       if (!(await consumeRateLimit(policy, actor.id)).success) throw new RateLimitExceededError();

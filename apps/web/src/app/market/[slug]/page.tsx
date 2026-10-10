@@ -1,6 +1,8 @@
 import { AddResourceToCart } from "../../../components/resource-cart-controls";
 import { ResourceDownloadButton } from "../../../components/resource-download-button";
 import { ResourcePreview } from "../../../components/resource-preview";
+import { ResourceVariantChoices } from "../../../components/resource-variant-choices";
+import { resourceManagementService } from "../../../lib/services/resource-management-service";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
 import { notFound } from "next/navigation";
@@ -139,6 +141,7 @@ export default async function ProductDetailPage({
     reviews,
     dependencyResolution,
     reverseDependencySummary,
+    variantGroup,
   ] = await Promise.all([
     managementAccess,
     user
@@ -157,6 +160,7 @@ export default async function ProductDetailPage({
     productService
       .getReverseDependencySummary(product.slug)
       .catch(() => null),
+    isPublished ? resourceManagementService.publicVariants(product.id) : null,
   ]);
   const hasAccess =
     isPublished && (canManageProduct || isLicensed || isAdmin);
@@ -192,6 +196,8 @@ export default async function ProductDetailPage({
       <h1 className="text-3xl font-black tracking-tight text-primary sm:text-4xl">
         {product.title}
       </h1>
+
+      <ResourceVariantChoices group={variantGroup} productId={product.id} locale={locale} />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">

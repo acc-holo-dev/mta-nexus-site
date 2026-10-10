@@ -250,6 +250,31 @@ export const products = pgTable(
   ]
 );
 
+// Variant links carry no access grants. Each resource retains its own releases.
+export const productVariantGroups = pgTable("product_variant_groups", {
+  id: text("id").primaryKey(),
+  anchorProductId: text("anchor_product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  revision: integer("revision").notNull().default(1),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  uniqueIndex("product_variant_anchor_idx").on(table.anchorProductId),
+  check("product_variant_title_check", sql`length(btrim(${table.title})) between 3 and 80`),
+  check("product_variant_revision_check", sql`${table.revision} > 0`),
+]);
+export const productVariantMembers = pgTable("product_variant_members", {
+  productId: text("product_id").primaryKey().references(() => products.id, { onDelete: "cascade" }),
+  groupId: text("group_id").notNull().references(() => productVariantGroups.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  position: integer("position").notNull(),
+}, table => [
+  uniqueIndex("product_variant_position_idx").on(table.groupId, table.position),
+  uniqueIndex("product_variant_label_idx").on(table.groupId, sql`lower(btrim(${table.label}))`),
+  check("product_variant_label_check", sql`length(btrim(${table.label})) between 1 and 60`),
+  check("product_variant_position_check", sql`${table.position} between 0 and 11`),
+]);
+
 // 9. Builds
 export const builds = pgTable("builds", {
   id: text("id").primaryKey(),
@@ -538,6 +563,9 @@ export const comments = pgTable(
     // Nullable product_id keeps article comments independent while enforcing
     // one product review per author for non-null product_id rows.
     uniqueIndex("comments_product_author_idx").on(table.productId, table.authorId),
+    index("comments_content_created_id_idx")
+      .on(table.contentId, table.createdAt.desc(), table.id.desc())
+      .where(sql`${table.productId} IS NULL AND ${table.contentId} IS NOT NULL`),
   ]
 );
 
