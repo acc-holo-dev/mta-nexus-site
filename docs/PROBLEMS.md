@@ -988,3 +988,23 @@ Outstanding: resolve legacy duplicates and ownership claims case by case,
 then design an indexed database-level uniqueness guard. Audit results are not
 transactionally frozen; rerun immediately before any future migration. Full
 DB acceptance is blocked by CI-001 until hosted runners execute.
+
+### P1. Endpoint audit now highlights claims and verified server collisions
+
+The read-only endpoint scanner also fetches ownership scope (personal owner,
+organization owner, unclaimed) and verification flag. The default output keeps
+all IDs and network endpoints private and reports only total invalid, mixed
+ownership, unclaimed, duplicate, cross-ownership and verified-collision counts.
+Detailed owner scopes, server IDs and verified IDs are returned only with
+`--details` and the explicit acknowledgement environment variable.
+
+Any collision involving distinct owners, an unclaimed server and a claimed
+server, or a row with both personal and organization ownership is classified
+as requiring manual attention. Verified listings are highlighted separately
+so owners' verification evidence and server claim challenges are not silently
+transferred. This audit does not authorize automatic normalization or changes
+to license/server ownership.
+
+Remaining: operate on the actual database with a read-only PostgreSQL user,
+compare the report with server claims, then implement a reviewed and reversible
+migration. No DB records have been changed by this development block.

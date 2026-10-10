@@ -4,6 +4,9 @@ export type ServerEndpointAuditRow = Readonly<{
   id: string;
   ipAddress: string;
   port: number;
+  ownerId?: string | null;
+  organizationId?: string | null;
+  isVerified?: boolean;
 }>;
 
 export type ServerEndpointAuditDetail = ServerEndpointAuditRow & Readonly<{
@@ -16,6 +19,8 @@ export type ServerEndpointAuditDetail = ServerEndpointAuditRow & Readonly<{
  */
 export class ServerEndpointAuditCollector {
   private scanned = 0;
+  private mixedOwnershipRows = 0;
+  private unclaimedRows = 0;
   private readonly invalidRows: ServerEndpointAuditDetail[] = [];
   private readonly nonCanonicalRows: ServerEndpointAuditDetail[] = [];
   private readonly groups = new Map<string, ServerEndpointAuditDetail[]>();
@@ -24,6 +29,8 @@ export class ServerEndpointAuditCollector {
     this.scanned += 1;
     const canonicalAddress = normalizeMtaAddress(row.ipAddress);
     const entry = { ...row, canonicalAddress };
+    if (row.ownerId && row.organizationId) this.mixedOwnershipRows += 1;
+    if (!row.ownerId && !row.organizationId) this.unclaimedRows += 1;
     if (
       !isValidMtaAddress(canonicalAddress) ||
       !Number.isInteger(row.port) ||
@@ -41,28 +48,47 @@ export class ServerEndpointAuditCollector {
   }
 
   result() {
+    const scope = (row: ServerEndpointAuditRow): string =>
+      row.organizationId ? `organization:${row.organizationId}` :
+      row.ownerId ? `user:${row.ownerId}` : "unclaimed";
     const collisions = [...this.groups.values()]
       .filter((group) => group.length > 1)
       .sort((a, b) =>
         a[0]!.canonicalAddress.localeCompare(b[0]!.canonicalAddress) ||
         a[0]!.port - b[0]!.port,
       );
+    const collisionDetails = collisions.map((group) => {
+      const ownerScopes = [...new Set(group.map(scope))].sort();
+      return {
+        canonicalAddress: group[0]!.canonicalAddress,
+        port: group[0]!.port,
+        serverIds: group.map((item) => item.id).sort(),
+        ownerScopes,
+        verifiedServerIds: group.filter((item) => item.isVerified).map((item) => item.id).sort(),
+        ownershipConflict: ownerScopes.length > 1 ||
+          group.some((item) => item.ownerId && item.organizationId),
+      };
+    });
     return {
       summary: {
         scanned: this.scanned,
         invalidRows: this.invalidRows.length,
         nonCanonicalRows: this.nonCanonicalRows.length,
+        mixedOwnershipRows: this.mixedOwnershipRows,
+        unclaimedRows: this.unclaimedRows,
         collisionGroups: collisions.length,
         collidingRows: collisions.reduce((total, group) => total + group.length, 0),
+        collisionGroupsWithOwnershipConflict: collisionDetails.filter(
+          (group) => group.ownershipConflict,
+        ).length,
+        collisionGroupsWithVerifiedServers: collisionDetails.filter(
+          (group) => group.verifiedServerIds.length > 0,
+        ).length,
       },
       details: {
         invalidRows: [...this.invalidRows],
         nonCanonicalRows: [...this.nonCanonicalRows],
-        collisions: collisions.map((group) => ({
-          canonicalAddress: group[0]!.canonicalAddress,
-          port: group[0]!.port,
-          serverIds: group.map((item) => item.id).sort(),
-        })),
+        collisions: collisionDetails,
       },
     };
   }

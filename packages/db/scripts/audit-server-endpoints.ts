@@ -25,7 +25,14 @@ async function main(): Promise<void> {
   try {
     while (true) {
       const rows = await db
-        .select({ id: servers.id, ipAddress: servers.ipAddress, port: servers.port })
+        .select({
+          id: servers.id,
+          ipAddress: servers.ipAddress,
+          port: servers.port,
+          ownerId: servers.ownerId,
+          organizationId: servers.organizationId,
+          isVerified: servers.isVerified,
+        })
         .from(servers)
         .where(afterId === null ? undefined : gt(servers.id, afterId))
         .orderBy(asc(servers.id))
@@ -48,6 +55,7 @@ async function main(): Promise<void> {
   if (
     report.summary.invalidRows > 0 ||
     report.summary.nonCanonicalRows > 0 ||
+    report.summary.mixedOwnershipRows > 0 ||
     report.summary.collisionGroups > 0
   ) {
     // Operators must resolve all findings before adopting a unique index.
