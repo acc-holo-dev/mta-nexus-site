@@ -268,3 +268,17 @@ discussion comment, updating its counter, resolving the report and both audit
 entries share one transaction with live role, report-state and text-revision
 checks. Replies remain; product review comments are excluded. Reporter status
 notifications contain no staff notes. All new surfaces support RU/EN.
+
+Commercial plan administration is available at `/admin/commerce/plans` to live
+administrators. RU/EN terms, price, 7/30/90/365-day duration and commission benefits
+are versioned and audited; editing withdraws a published plan until it is reviewed
+and published again. `/subscriptions` lists published announcements and estimates
+integer platform fees from a 10% base with the original 7-day hold. Subscription
+activation, paid checkout and withdrawals remain unavailable.
+
+Buyers can inspect recorded payment attempts and cancel a pending order at
+`/workspace/purchases/[id]/operations`. Cancellation requires no payment attempt
+or ledger reference of any type, compares the displayed order revision and stores
+an idempotent receipt and audit atomically. It creates no refund or entitlement.
+Migrations 0045–0047 add these contracts and Agent B's publication/report indexes;
+apply them before using the new routes.

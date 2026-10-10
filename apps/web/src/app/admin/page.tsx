@@ -36,6 +36,7 @@ import { ContentModerationControls } from "../../components/content-moderation-c
 import { VerificationModerationControls } from "../../components/verification-moderation-controls";
 import { ReportModerationControls } from "../../components/report-moderation-controls";
 import { communityReportCopy } from "../../lib/community-report-copy";
+import { getCommercialCopy } from "../../lib/commercial-i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -150,6 +151,7 @@ export default async function AdminPage({
           <p className="mt-0.5 font-caption text-muted">{copy.description}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          {currentUser.role === "admin" ? <Link href="/admin/commerce/plans" className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary">{getCommercialCopy(locale).admin}</Link> : null}
           <Link
             href="/admin/support"
             className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"

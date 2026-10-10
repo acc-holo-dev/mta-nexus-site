@@ -1245,16 +1245,15 @@ not copied into audit. Product reviews are outside this contract.
 After integration with Agent A's acquisition/activity block, 259 focused unit,
 HTTP, SQL-builder and SSR checks, TypeScript, touched-file Biome and Next compile
 passed. Dependency analysis reports no violations but retains the TypeScript 7
-compatibility warning. Combined Knip currently fails on Agent A's unused exported
-`ResourceActivityService` class in `resource-activity-service.ts`; Agent A should
-remove the unused class export or supply a real consumer. Commercial code was
-preserved rather than changed to silence this diagnostic.
+compatibility warning. Agent A removed the unused `ResourceActivityService` class
+export in the commercial-plan block. Knip was unavailable in that local workspace;
+the combined unused-export check still needs to run in a provisioned environment.
 
 Six prepared PostgreSQL fixtures (deduplication, microsecond traversal, private
 affiliations, concurrent edits, parent removal, live role/rollback) have not run
 locally. Browser interaction, full production generation and production query
-plans remain pending. Agent A owns the following index contract; Agent B adds
-no schema or migration:
+plans remain pending. Agent A implements the following index contract in schema
+and migration 0046; Agent B adds no schema or migration:
 
 ```sql
 CREATE INDEX content_public_feed_time_id_idx
@@ -1290,15 +1289,17 @@ writes direct users to reload their persisted reports.
 
 97 focused unit/HTTP/SQL-builder/SSR checks, TypeScript, touched-file Biome and
 Next webpack compile mode passed. Dependency analysis found no violations but
-retains its TypeScript 7 compatibility warning. Knip still reports Agent A's
-unused `ResourceActivityService` export; this block adds no unused exports.
+retains its TypeScript 7 compatibility warning. The previously reported unused
+`ResourceActivityService` export is removed in Agent A's integrated commerce
+block; rerunning Knip in a provisioned environment remains pending.
 Seven new PostgreSQL fixtures cover deduplication, public scope, privacy,
 orphaned replies, decision races, live roles/audit rollback and product-review
 exclusion. They have not run locally: PostgreSQL, browser interaction and full
 production generation remain pending.
 
-Agent A owns the following index contract. No schema/migration is added by B;
-existing staff status/time queue indexes are reused:
+Agent A implements the following index contract in schema and migration 0047.
+No schema/migration is added by B; existing staff status/time queue indexes are
+reused:
 
 ```sql
 CREATE INDEX reports_reporter_created_id_idx
@@ -1307,3 +1308,30 @@ CREATE INDEX reports_reporter_pending_target_idx
   ON reports (reporter_id, target_type, target_id)
   WHERE status IN ('open', 'under_review');
 ```
+
+### Commercial plans and unpaid order operations
+
+Live administrators manage immutable RU/EN plan snapshots and audited
+draft/published/archived transitions with revision checks. Editing published terms
+withdraws the plan; the public catalog and quote API use only its current published
+revision. Duration is 7/30/90/365 days, separate from monthly resource licenses.
+Commission benefits are configurable from 0–10%; quotes use integer rounding and
+the original 7-day hold. They neither activate subscriptions nor book funds.
+Subscription activation, provider reconciliation, paid checkout and refunds remain
+unimplemented and unavailable.
+
+Buyer-scoped payment archives omit provider references and failure details. Unpaid
+cancellation accepts only a pending order without any payment attempt or ledger
+reference, uses an exact order revision and a durable UUID receipt, and audits in
+the same transaction. PostgreSQL guards serialize financial reference insertion
+against cancellation, including fee references, and prevent reopening cancelled
+orders. Migration 0045 must be applied before enabling these routes.
+
+Local checks after integration: 199 focused contract, SQL-builder, HTTP and SSR
+cases across commerce and community reports; source and
+touched-test TypeScript; touched-file Biome; Next webpack compile mode. These are
+not PostgreSQL or browser acceptance. The existing commerce-state integration
+fixture could not connect to local PostgreSQL (ECONNREFUSED); four new persistence
+and concurrency fixtures are prepared but unrun. Migrations, query plans, browser
+interaction and full production generation remain unverified. Actions were not
+used.

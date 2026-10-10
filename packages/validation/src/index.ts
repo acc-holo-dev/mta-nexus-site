@@ -6,6 +6,7 @@ import {
   isValidMtaAddress,
 } from "@nexus/domain";
 import { z } from "zod";
+export * from "./commercial-plans";
 import { mtaVersionSchema } from "./mta-version";
 export * from "./mta-version";
 export * from "./resource-management";

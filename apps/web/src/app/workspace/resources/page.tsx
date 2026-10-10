@@ -6,6 +6,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { getCommercialCopy } from "../../../lib/commercial-i18n";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -25,7 +26,8 @@ export default async function AuthorResourcesPage({
 }: {
   searchParams: Promise<{ status?: string; page?: string }>;
 }) {
-  const dictionary = getDictionary(await getRequestLocale());
+  const locale = await getRequestLocale();
+  const dictionary = getDictionary(locale);
   const copy = dictionary.authorResources;
   const user = await authService.getSession((await cookies()).get("nexus_session")?.value);
   if (!user)
@@ -56,6 +58,7 @@ export default async function AuthorResourcesPage({
           {dictionary.workspace.publishResource}
         </Link>
       </header>
+      <Link href="/subscriptions" className="inline-block text-sm text-accent underline">{getCommercialCopy(locale).catalog}</Link>
       <nav aria-label={copy.status} className="flex flex-wrap gap-2">
         <Link
           href="/workspace/resources"

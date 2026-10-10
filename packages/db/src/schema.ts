@@ -10,6 +10,8 @@ import {
   type SupportMessageAuthorRole,
   type SupportRelatedType,
   type ResourceCartAcquisition,
+  type CommercialPlanTerms,
+  type CommercialPlanStatus,
 } from "@nexus/domain";
 import { sql } from "drizzle-orm";
 import {
@@ -485,6 +487,64 @@ export const resourceAcquisitionEvents = pgTable("resource_acquisition_events", 
 ]);
 
 // 14. Order Items
+export const commercialPlans = pgTable("commercial_plans", {
+  id: text("id").primaryKey(), slug: text("slug").notNull(),
+  scope: text("scope").$type<"user" | "organization">().notNull(),
+  status: text("status").$type<CommercialPlanStatus>().notNull().default("draft"),
+  revision: integer("revision").notNull().default(1),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  uniqueIndex("commercial_plan_slug_idx").on(table.slug),
+  index("commercial_plan_catalog_idx").on(table.status, table.scope, table.createdAt.desc(), table.id.desc()),
+  check("commercial_plan_scope_check", sql`${table.scope} IN ('user', 'organization')`),
+  check("commercial_plan_status_check", sql`${table.status} IN ('draft', 'published', 'archived')`),
+  check("commercial_plan_revision_check", sql`${table.revision} > 0`),
+  check("commercial_plan_slug_check", sql`length(${table.slug}) BETWEEN 3 AND 80 AND ${table.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`),
+]);
+export const commercialPlanRevisions = pgTable("commercial_plan_revisions", {
+  planId: text("plan_id").notNull().references(() => commercialPlans.id, { onDelete: "restrict" }),
+  revision: integer("revision").notNull(),
+  terms: jsonb("terms").$type<CommercialPlanTerms>().notNull(),
+  status: text("status").$type<CommercialPlanStatus>().notNull(),
+  action: text("action").notNull(), actorId: text("actor_id").notNull(), reason: text("reason").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  primaryKey({ columns: [table.planId, table.revision] }),
+  check("commercial_plan_terms_check", sql`jsonb_typeof(${table.terms}) = 'object'
+    AND (${table.terms}->>'durationDays')::integer IN (7, 30, 90, 365)
+    AND (${table.terms}->>'price')::integer BETWEEN 0 AND 100000000
+    AND (${table.terms}->>'currency') IN ('USD', 'EUR', 'RUB')
+    AND (${table.terms}->>'commissionBps')::integer BETWEEN 0 AND 1000
+    AND length(btrim(${table.terms}->>'titleRu')) BETWEEN 3 AND 100
+    AND length(btrim(${table.terms}->>'titleEn')) BETWEEN 3 AND 100
+    AND length(btrim(${table.terms}->>'descriptionRu')) BETWEEN 10 AND 2000
+    AND length(btrim(${table.terms}->>'descriptionEn')) BETWEEN 10 AND 2000
+    AND jsonb_typeof(${table.terms}->'durationDays') = 'number'
+    AND jsonb_typeof(${table.terms}->'price') = 'number'
+    AND jsonb_typeof(${table.terms}->'commissionBps') = 'number'
+    AND jsonb_typeof(${table.terms}->'currency') = 'string'
+    AND jsonb_typeof(${table.terms}->'titleRu') = 'string'
+    AND jsonb_typeof(${table.terms}->'titleEn') = 'string'
+    AND jsonb_typeof(${table.terms}->'descriptionRu') = 'string'
+    AND jsonb_typeof(${table.terms}->'descriptionEn') = 'string'
+    AND ${table.terms} ?& ARRAY['durationDays', 'price', 'currency', 'commissionBps', 'titleRu', 'titleEn', 'descriptionRu', 'descriptionEn']`),
+  check("commercial_plan_snapshot_check", sql`${table.revision} > 0 AND ${table.status} IN ('draft', 'published', 'archived')
+    AND ${table.action} IN ('create', 'save', 'publish', 'archive', 'restore') AND length(btrim(${table.reason})) BETWEEN 5 AND 1000`),
+]);
+export const orderCancellationReceipts = pgTable("order_cancellation_receipts", {
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  requestId: text("request_id").notNull(),
+  orderId: text("order_id").notNull().references(() => orders.id, { onDelete: "restrict" }),
+  expectedUpdatedAt: timestamp("expected_updated_at", { withTimezone: true }).notNull(),
+  reason: text("reason").notNull(),
+  cancelledAt: timestamp("cancelled_at", { withTimezone: true }).notNull(),
+}, table => [
+  primaryKey({ columns: [table.userId, table.requestId] }),
+  index("order_cancellation_order_idx").on(table.orderId),
+  check("order_cancellation_reason_check", sql`length(btrim(${table.reason})) BETWEEN 5 AND 1000`),
+]);
+
 export const orderItems = pgTable("order_items", {
   id: text("id").primaryKey(),
   orderId: text("order_id")
@@ -511,7 +571,7 @@ export const payments = pgTable("payments", {
   failureReason: text("failure_reason"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, table => [index("payments_order_created_id_idx").on(table.orderId, table.createdAt.desc(), table.id.desc())]);
 
 // 16. Append-Only Financial Ledger
 export const ledgerEntries = pgTable("ledger_entries", {
@@ -524,7 +584,7 @@ export const ledgerEntries = pgTable("ledger_entries", {
   balanceAfter: integer("balance_after").notNull(),
   description: text("description").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, table => [index("ledger_entries_reference_idx").on(table.referenceId, table.referenceType)]);
 
 // 17. Content Engine (Articles, devlogs, announcements, reviews)
 export const content = pgTable(
@@ -557,6 +617,15 @@ export const content = pgTable(
   (table) => [
     uniqueIndex("content_slug_idx").on(table.slug),
     index("content_author_idx").on(table.authorId),
+    index("content_public_feed_time_id_idx")
+      .on(sql`coalesce(${table.publishedAt}, ${table.createdAt}) DESC`, table.id.desc())
+      .where(sql`${table.status} = 'published'`),
+    index("content_public_author_feed_time_id_idx")
+      .on(table.authorId, sql`coalesce(${table.publishedAt}, ${table.createdAt}) DESC`, table.id.desc())
+      .where(sql`${table.status} = 'published'`),
+    index("content_public_org_feed_time_id_idx")
+      .on(table.organizationId, sql`coalesce(${table.publishedAt}, ${table.createdAt}) DESC`, table.id.desc())
+      .where(sql`${table.status} = 'published'`),
     index("content_public_org_published_id_idx")
       .on(table.organizationId, sql`coalesce(${table.publishedAt}, ${table.updatedAt}) DESC`, table.id.desc())
       .where(sql`${table.status} = 'published'`),
@@ -788,6 +857,10 @@ export const reports = pgTable("reports", {
 }, (table) => [
   index("reports_status_created_id_idx").on(table.status, table.createdAt, table.id),
   index("reports_status_resolved_id_idx").on(table.status, table.resolvedAt, table.id),
+  index("reports_reporter_created_id_idx").on(table.reporterId, table.createdAt.desc(), table.id.desc()),
+  index("reports_reporter_pending_target_idx")
+    .on(table.reporterId, table.targetType, table.targetId)
+    .where(sql`${table.status} IN ('open', 'under_review')`),
 ]);
 
 // 25. Unified Support

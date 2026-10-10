@@ -14,3 +14,4 @@ export * from "./resource-commerce";
 export * from "./license-control";
 export * from "./organization-team";
 export * from "./resource-variants";
+export * from "./commercial-plans";

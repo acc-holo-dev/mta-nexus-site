@@ -5,6 +5,7 @@ import { orderRepository } from "@nexus/db";
 import { authService } from "../../../lib/services/auth-service";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getCommercialCopy } from "../../../lib/commercial-i18n";
 import {
   formatHistoryAmount,
   formatHistoryDate,
@@ -42,6 +43,7 @@ export default async function PurchasesHistoryPage({
 
   return (
     <HistoryShell copy={copy} area="purchases">
+      <Link href="/subscriptions" className="inline-block text-sm text-accent underline">{getCommercialCopy(locale).catalog}</Link>
       {result.orders.length === 0 ? (
         <p className="py-12 text-sm text-secondary">{copy.emptyPurchases}</p>
       ) : (

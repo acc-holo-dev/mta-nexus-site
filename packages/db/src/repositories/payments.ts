@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../client";
-import { payments } from "../schema";
+import { orders, payments } from "../schema";
 import type { Payment } from "@nexus/domain";
+import { AppError } from "@nexus/domain";
 
 export class PaymentRepository {
   async findByOrderId(orderId: string): Promise<Payment | null> {
@@ -16,8 +17,27 @@ export class PaymentRepository {
       updatedAt: new Date(),
     };
 
-    const rows = await db.insert(payments).values(values).returning();
-    return rows[0] as unknown as Payment;
+    return db.transaction(async (tx) => {
+      const [order] = await tx
+        .select({
+          status: orders.status,
+          totalAmount: orders.totalAmount,
+          currency: orders.currency,
+        })
+        .from(orders)
+        .where(eq(orders.id, data.orderId))
+        .limit(1)
+        .for("no key update");
+      if (
+        !order ||
+        (order.status !== "pending" && order.status !== "processing") ||
+        data.amount !== order.totalAmount ||
+        data.currency !== order.currency
+      )
+        throw new AppError("Order cannot accept this payment attempt", 409, "ORDER_NOT_PAYABLE");
+      const rows = await tx.insert(payments).values(values).returning();
+      return rows[0] as unknown as Payment;
+    });
   }
 
   async updateStatus(id: string, status: Payment["status"], failureReason?: string): Promise<void> {

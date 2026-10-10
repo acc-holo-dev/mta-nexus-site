@@ -24,17 +24,25 @@ export async function resourceCommerceRequest(
       if (request.headers.get("sec-fetch-site") === "cross-site") {
         throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
       }
-      const policy = request.nextUrl.pathname.startsWith("/api/admin/licenses/")
-        ? "moderationAction"
-        : request.nextUrl.pathname.includes("/licenses/")
-        ? "licenseControl"
-        : /\/(lifecycle|variants|compatibility)(?:\/|$)/u.test(request.nextUrl.pathname)
-        ? "contentCreation"
-        : "resourceClaim";
+      const policy =
+        request.nextUrl.pathname.startsWith("/api/admin/commerce/") ||
+        request.nextUrl.pathname.startsWith("/api/admin/licenses/")
+          ? "moderationAction"
+          : request.nextUrl.pathname.includes("/licenses/")
+            ? "licenseControl"
+            : /\/(lifecycle|variants|compatibility)(?:\/|$)/u.test(request.nextUrl.pathname)
+              ? "contentCreation"
+              : "resourceClaim";
       if (!(await consumeRateLimit(policy, actor.id)).success) throw new RateLimitExceededError();
     }
-    if (!mutation && /\/activity(?:\/|$)|^\/api\/acquisitions$/u.test(request.nextUrl.pathname)) {
-      if (!(await consumeRateLimit("resourceInspection", actor.id)).success) throw new RateLimitExceededError();
+    if (
+      !mutation &&
+      /\/activity(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/operations$/u.test(
+        request.nextUrl.pathname,
+      )
+    ) {
+      if (!(await consumeRateLimit("resourceInspection", actor.id)).success)
+        throw new RateLimitExceededError();
     }
     const result = await operation(actor);
     if (result instanceof Response) {
