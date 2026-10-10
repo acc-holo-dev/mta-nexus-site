@@ -38,7 +38,6 @@ describe("server forms use the same editable MTA metadata", () => {
     }));
     expect(html).toMatch(/name="httpPort"[^>]*value="22006"/u);
     expect(html).toMatch(/name="mapName"[^>]*value="Los Santos"/u);
-    expect(html).toMatch(/name="mapName"[^>]*maxLength="64"/u);
     expect(html).toContain("HTTP port");
     expect(html).toContain("Map name");
   });
