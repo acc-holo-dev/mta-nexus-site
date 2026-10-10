@@ -8,9 +8,16 @@ export function parseSupportIdempotencyKey(value: string | null): string | null 
   return value !== null && uuidV4.test(value) ? value : null;
 }
 
-export function supportMutationFingerprint(input:
-  | { operation: "case"; category: string; subject: string; message: string }
-  | { operation: "reply"; caseId: string; message: string; expectedStatus: string }
+export function supportMutationFingerprint(
+  input:
+    | { operation: "case"; category: string; subject: string; message: string }
+    | {
+        operation: "reply";
+        caseId: string;
+        message: string;
+        expectedStatus: string;
+        expectedUpdatedAt?: string;
+      },
 ): string {
   return createHash("sha256").update(JSON.stringify(input), "utf8").digest("hex");
 }

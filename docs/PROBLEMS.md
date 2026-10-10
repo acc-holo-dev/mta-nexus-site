@@ -1473,3 +1473,49 @@ CREATE TABLE user_profile_preferences (
 Missing rows preserve the current public visibility. Preference writes must use
 the shared `users.updated_at` revision and update it in the same transaction;
 notification preferences must not be repurposed as profile privacy settings.
+
+### Support search, requester lifecycle and private status history — 2026-10-11
+
+`/support` and `/admin/support` now expose shareable, bounded subject/case-number
+search, status/category filters and pagination. Count and page reads use the
+same filter and repeatable-read snapshot; search escapes literal LIKE syntax.
+Staff queue reads recheck the current role inside that snapshot. Private support
+pages check sessions before rendering and use RU/EN no-index metadata.
+
+Requesters may resolve their own case and reopen a resolved case. Staff-closed
+cases require current staff to reopen. Reply/status writes lock the actor and
+case, recheck current authority, retain unrelated context and advance a monotonic
+revision. Current forms send the observed revision; same-status ABA changes are
+rejected. Legacy staff API clients retain their existing status precondition;
+requester status actions require a revision. Idempotent reply retries retain the
+original revision and request key across same-tab recovery, without storing
+private message text. Replays also recheck current private-case access.
+
+Requester inbox notices for staff replies and status changes share the write
+transaction with audit. Optional push enqueue uses a savepoint; a failure cannot
+invalidate the saved inbox/state. Staff queue alerts remain post-commit best
+effort. All new notice previews omit case subjects and message bodies. Closed
+threads remain read-only. An already confirmed creation/reply remains confirmed
+when a subsequent read fails.
+
+GET `/api/support/[id]/activity` exposes twenty-item status history with current
+requester/staff authority and opaque, case-scoped anchors. SQL preserves cursor
+microseconds and allows only status transitions, role labels and timestamps;
+raw audit details and account/network fields never enter the response. Foreign
+or expired anchors fail explicitly. Thread history loads on demand. Both
+languages include filters, lifecycle controls, errors and saved-state recovery.
+
+326 focused checks across 25 files pass after rebasing onto Agent A's resource
+review lifecycle block, covering support and existing organization, verification,
+publication, financial, release-control and resource-review APIs. TypeScript,
+touched-file Biome lint, Knip and Next webpack compile mode pass. Dependency
+analysis reports no violations (634 modules / 2366 edges), with its TypeScript 7
+compatibility warning.
+Eight new PostgreSQL fixtures are prepared for requester transitions, staff
+closure/revocation, competing writes, ABA revisions, replay uniqueness, inbox
+rollback, outbox persistence, notification opt-out and microsecond pagination.
+They remain unrun; live PostgreSQL, browser interaction and full production generation require
+separate verification. This block adds no schema, migration, npm dependency or
+workflow and does not use Actions. Requester notification preference checks use
+the existing transaction-scoped preference lock. The profile-privacy contract
+above still requires integration by Agent A.

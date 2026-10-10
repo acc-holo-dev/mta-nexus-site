@@ -3,8 +3,18 @@
 import { LifeBuoy, MessageSquareText, Plus } from "lucide-react";
 import Link from "next/link";
 import { type FormEvent, useCallback, useEffect, useRef, useState } from "react";
+import { supportHref, type SupportQuery } from "../lib/support-workspace-contract";
+import {
+  SupportClientFailure,
+  supportWorkspaceCopy,
+  supportWorkspaceError,
+} from "../lib/support-workspace-copy";
 import { useNexusLocale } from "./locale-context";
-import { clearSupportRetry, reserveSupportCaseRetry, resolveSupportRetryActorScope } from "../lib/support-retry";
+import {
+  clearSupportRetry,
+  reserveSupportCaseRetry,
+  resolveSupportRetryActorScope,
+} from "../lib/support-retry";
 import {
   confirmSupportCaseCreated,
   parseSupportCasePage,
@@ -12,11 +22,18 @@ import {
   type SupportCaseStatus,
 } from "../lib/support-response";
 
-export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
+export function SupportCenter({
+  staffMode = false,
+  initialFilters = { page: 1, q: "" },
+}: {
+  staffMode?: boolean;
+  initialFilters?: SupportQuery;
+}) {
   const { locale, dictionary } = useNexusLocale();
-  const copy = dictionary.support;
+  const copy = dictionary.support,
+    workspaceCopy = supportWorkspaceCopy(locale);
   const [cases, setCases] = useState<SupportCaseSummary[]>([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(initialFilters.page);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -29,8 +46,10 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
   const [category, setCategory] = useState("account");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [staffStatus, setStaffStatus] = useState<SupportCaseStatus | "all">("all");
-  const [staffCategory, setStaffCategory] = useState("all");
+  const [staffStatus, setStaffStatus] = useState<SupportCaseStatus | "">(
+    initialFilters.status ?? "",
+  );
+  const [staffCategory, setStaffCategory] = useState(initialFilters.category ?? "");
   const loadSequence = useRef(0);
 
   const categories = [
@@ -48,46 +67,57 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
   const categoryLabel = (value: string) =>
     categories.find(([candidate]) => candidate === value)?.[1] ?? value;
 
-  const loadCases = useCallback(async (signal?: AbortSignal) => {
-    const sequence = ++loadSequence.current;
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams({ page: String(page) });
-      if (staffMode) {
-        params.set("scope", "staff");
-        if (staffStatus !== "all") params.set("status", staffStatus);
-        if (staffCategory !== "all") params.set("category", staffCategory);
-      }
-      const response = await fetch(`/api/support?${params.toString()}`, {
-        cache: "no-store",
-        credentials: "same-origin",
-        signal: signal
-          ? AbortSignal.any([signal, AbortSignal.timeout(15_000)])
-          : AbortSignal.timeout(15_000),
-      });
-      if (sequence !== loadSequence.current || signal?.aborted) return;
-      if (response.status === 401) {
-        setAuthRequired(true);
+  const loadCases = useCallback(
+    async (signal?: AbortSignal) => {
+      const sequence = ++loadSequence.current;
+      setLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams({ page: String(page) });
+        if (staffMode) params.set("scope", "staff");
+        if (initialFilters.status) params.set("status", initialFilters.status);
+        if (initialFilters.category) params.set("category", initialFilters.category);
+        if (initialFilters.q) params.set("q", initialFilters.q);
+        const response = await fetch(`/api/support?${params.toString()}`, {
+          cache: "no-store",
+          credentials: "same-origin",
+          signal: signal
+            ? AbortSignal.any([signal, AbortSignal.timeout(15_000)])
+            : AbortSignal.timeout(15_000),
+        });
+        if (sequence !== loadSequence.current || signal?.aborted) return false;
+        if (response.status === 401) {
+          setAuthRequired(true);
+          setCases([]);
+          return false;
+        }
+        const data = await response.json().catch(() => null);
+        if (sequence !== loadSequence.current || signal?.aborted) return false;
+        const validated = parseSupportCasePage(data);
+        if (!response.ok || !validated) throw new Error(copy.loadError);
+        setAuthRequired(false);
+        setCases(validated.cases);
+        setPage(validated.page);
+        setTotalPages(validated.totalPages);
+        return true;
+      } catch {
+        if (sequence !== loadSequence.current || signal?.aborted) return false;
         setCases([]);
-        return;
+        setError(copy.loadError);
+        return false;
+      } finally {
+        if (sequence === loadSequence.current && !signal?.aborted) setLoading(false);
       }
-      const data = await response.json().catch(() => null);
-      if (sequence !== loadSequence.current || signal?.aborted) return;
-      const validated = parseSupportCasePage(data);
-      if (!response.ok || !validated) throw new Error(copy.loadError);
-      setAuthRequired(false);
-      setCases(validated.cases);
-      setPage(validated.page);
-      setTotalPages(validated.totalPages);
-    } catch {
-      if (sequence !== loadSequence.current || signal?.aborted) return;
-      setCases([]);
-      setError(copy.loadError);
-    } finally {
-      if (sequence === loadSequence.current && !signal?.aborted) setLoading(false);
-    }
-  }, [copy.loadError, page, staffMode, staffStatus, staffCategory]);
+    },
+    [
+      copy.loadError,
+      page,
+      staffMode,
+      initialFilters.status,
+      initialFilters.category,
+      initialFilters.q,
+    ],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -130,7 +160,11 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
       const data = await response.json().catch(() => null);
       const created = confirmSupportCaseCreated(response.status, data, { category, subject });
       if (!response.ok || !created) {
-        throw new Error(copy.createError);
+        throw new SupportClientFailure(
+          response.status >= 400 && response.status < 500
+            ? supportWorkspaceError(locale, data?.code ?? response.status)
+            : workspaceCopy.uncertain,
+        );
       }
 
       clearSupportRetry("case", requestKey, { actorScope });
@@ -138,13 +172,9 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
       setSubject("");
       setMessage("");
       setCreatedCaseId(created.id);
-      if (page === 1) {
-        await loadCases();
-      } else {
-        setPage(1);
-      }
-    } catch {
-      setError(copy.createError);
+      if (!(await loadCases())) setError(workspaceCopy.savedRefresh);
+    } catch (caught) {
+      setError(caught instanceof SupportClientFailure ? caught.message : workspaceCopy.uncertain);
     } finally {
       creatingRef.current = false;
       setCreating(false);
@@ -154,11 +184,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
   const basePath = staffMode ? "/admin/support" : "/support";
   const statusLabel = (status: SupportCaseSummary["status"]) =>
-    status === "open"
-      ? copy.open
-      : status === "resolved"
-        ? copy.resolved
-        : copy.closed;
+    status === "open" ? copy.open : status === "resolved" ? copy.resolved : copy.closed;
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -170,9 +196,7 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
         <p className="max-w-3xl text-sm text-muted">
           {staffMode ? copy.staffDescription : copy.description}
         </p>
-        {!staffMode && (
-          <p className="text-xs text-warning">{copy.noGuaranteedSla}</p>
-        )}
+        {!staffMode && <p className="text-xs text-warning">{copy.noGuaranteedSla}</p>}
       </header>
 
       {authRequired ? (
@@ -255,7 +279,14 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
           )}
 
           {createdCaseId && !staffMode && (
-            <Link href={`${basePath}/${encodeURIComponent(createdCaseId)}`} className="block text-sm font-semibold text-accent underline">{copy.yourCases}: {createdCaseId}</Link>
+            <div role="status">
+              <Link
+                href={`${basePath}/${encodeURIComponent(createdCaseId)}`}
+                className="block text-sm font-semibold text-accent underline"
+              >
+                {workspaceCopy.created}: {createdCaseId}
+              </Link>
+            </div>
           )}
 
           {error && (
@@ -267,19 +298,32 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
             </div>
           )}
 
-          {staffMode && (
-            <fieldset className="nexus-panel grid gap-4 p-4 sm:grid-cols-2" aria-label={copy.staffFilters}>
+          <form action={basePath} method="get">
+            <fieldset
+              className="nexus-panel grid gap-4 p-4 sm:grid-cols-2"
+              aria-label={copy.staffFilters}
+            >
+              <label className="block space-y-1.5 sm:col-span-2">
+                <span className="font-label text-secondary">{workspaceCopy.search}</span>
+                <input
+                  type="search"
+                  name="q"
+                  maxLength={120}
+                  defaultValue={initialFilters.q}
+                  className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
+                />
+              </label>
               <label className="block space-y-1.5">
                 <span className="font-label text-secondary">{copy.filterStatus}</span>
                 <select
+                  name="status"
                   value={staffStatus}
                   onChange={(event) => {
-                    setPage(1);
-                    setStaffStatus(event.target.value as SupportCaseStatus | "all");
+                    setStaffStatus(event.target.value as SupportCaseStatus | "");
                   }}
                   className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
                 >
-                  <option value="all">{copy.allStatuses}</option>
+                  <option value="">{copy.allStatuses}</option>
                   <option value="open">{copy.open}</option>
                   <option value="resolved">{copy.resolved}</option>
                   <option value="closed">{copy.closed}</option>
@@ -288,32 +332,55 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
               <label className="block space-y-1.5">
                 <span className="font-label text-secondary">{copy.category}</span>
                 <select
+                  name="category"
                   value={staffCategory}
                   onChange={(event) => {
-                    setPage(1);
                     setStaffCategory(event.target.value);
                   }}
                   className="w-full rounded-lg border border-base bg-surface px-3 py-2 text-sm text-primary"
                 >
-                  <option value="all">{copy.allCategories}</option>
+                  <option value="">{copy.allCategories}</option>
                   {categories.map(([value, label]) => (
-                    <option key={value} value={value}>{label}</option>
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
                   ))}
                 </select>
               </label>
+              <div className="flex flex-wrap gap-4 sm:col-span-2">
+                <button
+                  type="submit"
+                  className="min-h-10 rounded-lg border border-base px-4 text-sm font-semibold text-accent"
+                >
+                  {workspaceCopy.apply}
+                </button>
+                <Link href={basePath} className="min-h-10 py-2 text-sm text-accent underline">
+                  {workspaceCopy.reset}
+                </Link>
+              </div>
             </fieldset>
-          )}
+          </form>
 
-          <section className="space-y-3">
+          <section className="space-y-3" aria-busy={loading}>
             <h2 className="font-heading text-primary">
               {staffMode ? copy.staffQueue : copy.yourCases}
             </h2>
 
             {loading ? (
               <p className="text-sm text-muted">{copy.loading}</p>
+            ) : error ? (
+              <button
+                type="button"
+                onClick={() => void loadCases()}
+                className="min-h-10 text-sm text-accent underline"
+              >
+                {workspaceCopy.reload}
+              </button>
             ) : cases.length === 0 ? (
               <div className="nexus-panel p-5 text-sm text-muted">
-                {copy.empty}
+                {initialFilters.q || initialFilters.category || initialFilters.status
+                  ? workspaceCopy.noMatches
+                  : copy.empty}
               </div>
             ) : (
               cases.map((supportCase) => (
@@ -339,11 +406,8 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
                   </div>
                   <div className="flex flex-wrap items-center gap-3 text-[11px] text-faint">
                     <span>{categoryLabel(supportCase.category)}</span>
-                    <time
-                      dateTime={new Date(supportCase.updatedAt).toISOString()}
-                    >
-                      {copy.updated}:{" "}
-                      {new Date(supportCase.updatedAt).toLocaleString(dateLocale)}
+                    <time dateTime={new Date(supportCase.updatedAt).toISOString()}>
+                      {copy.updated}: {new Date(supportCase.updatedAt).toLocaleString(dateLocale)}
                     </time>
                   </div>
                 </Link>
@@ -356,27 +420,29 @@ export function SupportCenter({ staffMode = false }: { staffMode?: boolean }) {
               aria-label={dictionary.market.paginationLabel}
               className="flex items-center justify-between gap-3"
             >
-              <button
-                type="button"
-                disabled={page <= 1 || loading}
-                onClick={() => setPage((value) => Math.max(1, value - 1))}
-                className="text-sm text-accent underline disabled:opacity-40"
-              >
-                {dictionary.market.previousPage}
-              </button>
+              {page > 1 ? (
+                <Link
+                  href={supportHref(basePath, initialFilters, page - 1)}
+                  className="min-h-9 text-sm text-accent underline"
+                >
+                  {dictionary.market.previousPage}
+                </Link>
+              ) : (
+                <span />
+              )}
               <span className="text-sm text-secondary">
                 {dictionary.market.pageLabel} {page} / {totalPages}
               </span>
-              <button
-                type="button"
-                disabled={page >= totalPages || loading}
-                onClick={() =>
-                  setPage((value) => Math.min(totalPages, value + 1))
-                }
-                className="text-sm text-accent underline disabled:opacity-40"
-              >
-                {dictionary.market.nextPage}
-              </button>
+              {page < totalPages ? (
+                <Link
+                  href={supportHref(basePath, initialFilters, page + 1)}
+                  className="min-h-9 text-sm text-accent underline"
+                >
+                  {dictionary.market.nextPage}
+                </Link>
+              ) : (
+                <span />
+              )}
             </nav>
           )}
         </>

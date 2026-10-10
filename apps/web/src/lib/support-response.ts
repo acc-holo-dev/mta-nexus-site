@@ -5,6 +5,7 @@ export type SupportCaseData = {
   category: string;
   subject: string;
   status: SupportCaseStatus;
+  updatedAt?: string;
 };
 
 export type SupportCaseSummary = SupportCaseData & {
@@ -26,6 +27,8 @@ export type SupportThreadData = {
   messagePage: number;
   messageTotalPages: number;
   messageTotal: number;
+  staff: boolean;
+  requester: boolean;
 };
 
 export type SupportCasePage = {
@@ -46,7 +49,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function isDate(value: unknown): value is string {
   if (typeof value !== "string" || !isoDatePattern.test(value)) return false;
   const timestamp = Date.parse(value);
-  return Number.isFinite(timestamp) && new Date(timestamp).toISOString().slice(0, 19) === value.slice(0, 19);
+  return (
+    Number.isFinite(timestamp) &&
+    new Date(timestamp).toISOString().slice(0, 19) === value.slice(0, 19)
+  );
 }
 
 function isStatus(value: unknown): value is SupportCaseStatus {
@@ -56,34 +62,57 @@ function isStatus(value: unknown): value is SupportCaseStatus {
 function parseCase(value: unknown): SupportCaseData | null {
   if (
     !isRecord(value) ||
-    typeof value.id !== "string" || !caseIdPattern.test(value.id) ||
-    typeof value.category !== "string" || !value.category || value.category.length > 40 ||
-    typeof value.subject !== "string" || !value.subject.trim() || value.subject.length > 120 ||
-    !isStatus(value.status)
-  ) return null;
-  return { id: value.id, category: value.category, subject: value.subject, status: value.status };
+    typeof value.id !== "string" ||
+    !caseIdPattern.test(value.id) ||
+    typeof value.category !== "string" ||
+    !value.category ||
+    value.category.length > 40 ||
+    typeof value.subject !== "string" ||
+    !value.subject.trim() ||
+    value.subject.length > 120 ||
+    !isStatus(value.status) ||
+    (value.updatedAt !== undefined && !isDate(value.updatedAt))
+  )
+    return null;
+  return {
+    id: value.id,
+    category: value.category,
+    subject: value.subject,
+    status: value.status,
+    ...(typeof value.updatedAt === "string" ? { updatedAt: value.updatedAt } : {}),
+  };
 }
 
 function parseSummary(value: unknown): SupportCaseSummary | null {
   const supportCase = parseCase(value);
   if (!supportCase || !isRecord(value) || !isDate(value.updatedAt)) return null;
-  if (value.requesterUsername != null && (typeof value.requesterUsername !== "string" || value.requesterUsername.length > 128)) return null;
+  if (
+    value.requesterUsername != null &&
+    (typeof value.requesterUsername !== "string" || value.requesterUsername.length > 128)
+  )
+    return null;
   return {
     ...supportCase,
     updatedAt: value.updatedAt,
-    ...(typeof value.requesterUsername === "string" ? { requesterUsername: value.requesterUsername } : {}),
+    ...(typeof value.requesterUsername === "string"
+      ? { requesterUsername: value.requesterUsername }
+      : {}),
   };
 }
 
 function parseMessage(value: unknown, caseId: string): SupportMessageData | null {
   if (
     !isRecord(value) ||
-    typeof value.id !== "string" || !messageIdPattern.test(value.id) ||
+    typeof value.id !== "string" ||
+    !messageIdPattern.test(value.id) ||
     value.caseId !== caseId ||
     (value.authorRole !== "requester" && value.authorRole !== "staff") ||
-    typeof value.body !== "string" || !value.body || value.body.length > 4_000 ||
+    typeof value.body !== "string" ||
+    !value.body ||
+    value.body.length > 4_000 ||
     !isDate(value.createdAt)
-  ) return null;
+  )
+    return null;
   return {
     id: value.id,
     caseId,
@@ -94,19 +123,11 @@ function parseMessage(value: unknown, caseId: string): SupportMessageData | null
 }
 
 function parsePositiveInteger(value: unknown): number | null {
-  return typeof value === "number" &&
-    Number.isSafeInteger(value) &&
-    value >= 0
-    ? value
-    : null;
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0 ? value : null;
 }
 
 export function parseSupportCasePage(payload: unknown): SupportCasePage | null {
-  if (
-    !isRecord(payload) ||
-    !Array.isArray(payload.cases) ||
-    payload.cases.length > 100
-  ) {
+  if (!isRecord(payload) || !Array.isArray(payload.cases) || payload.cases.length > 100) {
     return null;
   }
   const page = parsePositiveInteger(payload.page);
@@ -133,7 +154,8 @@ export function parseSupportCasePage(payload: unknown): SupportCasePage | null {
 }
 
 export function parseSupportCaseList(payload: unknown): SupportCaseSummary[] | null {
-  if (!isRecord(payload) || !Array.isArray(payload.cases) || payload.cases.length > 100) return null;
+  if (!isRecord(payload) || !Array.isArray(payload.cases) || payload.cases.length > 100)
+    return null;
   const cases: SupportCaseSummary[] = [];
   for (const row of payload.cases) {
     const supportCase = parseSummary(row);
@@ -153,7 +175,12 @@ export function parseSupportThread(payload: unknown, caseId: string): SupportThr
     return null;
   }
   const supportCase = parseCase(payload.supportCase);
-  if (!supportCase || supportCase.id !== caseId) return null;
+  if (!supportCase || supportCase.id !== caseId || !supportCase.updatedAt) return null;
+  if (
+    (payload.staff !== undefined && typeof payload.staff !== "boolean") ||
+    (payload.requester !== undefined && typeof payload.requester !== "boolean")
+  )
+    return null;
   const messagePage = parsePositiveInteger(payload.messagePage);
   const messageTotalPages = parsePositiveInteger(payload.messageTotalPages);
   const messageTotal = parsePositiveInteger(payload.messageTotal);
@@ -179,6 +206,8 @@ export function parseSupportThread(payload: unknown, caseId: string): SupportThr
     messagePage,
     messageTotalPages,
     messageTotal,
+    staff: payload.staff === true,
+    requester: payload.requester === true,
   };
 }
 
@@ -190,10 +219,12 @@ export function confirmSupportCaseCreated(
   if (status !== 201 || !isRecord(payload) || payload.success !== true) return null;
   const supportCase = parseSummary(payload.supportCase);
   if (
-    !supportCase || (supportCase.status !== "open" && payload.replayed !== true) ||
+    !supportCase ||
+    (supportCase.status !== "open" && payload.replayed !== true) ||
     supportCase.category !== input.category ||
     supportCase.subject !== input.subject.trim()
-  ) return null;
+  )
+    return null;
   return supportCase;
 }
 
@@ -207,10 +238,13 @@ export function confirmSupportReply(
   const supportCase = parseCase(payload.supportCase);
   const message = parseMessage(payload.message, caseId);
   if (
-    !supportCase || supportCase.id !== caseId ||
+    !supportCase ||
+    supportCase.id !== caseId ||
     (supportCase.status !== "open" && payload.replayed !== true) ||
-    !message || message.body !== body.trim()
-  ) return null;
+    !message ||
+    message.body !== body.trim()
+  )
+    return null;
   return { supportCase, message };
 }
 
@@ -219,9 +253,16 @@ export function confirmSupportStatusChanged(
   payload: unknown,
   caseId: string,
   expectedStatus: SupportCaseStatus,
+  previousRevision?: string,
 ): SupportCaseData | null {
   if (status !== 200 || !isRecord(payload) || payload.success !== true) return null;
   const supportCase = parseCase(payload.supportCase);
-  if (!supportCase || supportCase.id !== caseId || supportCase.status !== expectedStatus) return null;
+  if (!supportCase || supportCase.id !== caseId || supportCase.status !== expectedStatus)
+    return null;
+  if (
+    previousRevision &&
+    (!supportCase.updatedAt || Date.parse(supportCase.updatedAt) <= Date.parse(previousRevision))
+  )
+    return null;
   return supportCase;
 }

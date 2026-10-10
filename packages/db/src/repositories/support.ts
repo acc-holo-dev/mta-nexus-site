@@ -1,4 +1,5 @@
-import { and, count, desc, eq, ne } from "drizzle-orm";
+import { and, count, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
+import { AppError } from "@nexus/domain";
 import type {
   AuditEvent,
   SupportCase,
@@ -15,6 +16,10 @@ import {
   supportMutationRequests,
   users,
 } from "../schema";
+import { supportAccess, supportActor } from "./support-access";
+import { supportRequesterNotice } from "./support-requester-notice";
+import { containsPattern } from "./search-pattern";
+const revision = sql`greatest(clock_timestamp(), date_trunc('milliseconds', ${supportCases.updatedAt}) + interval '1 millisecond')`;
 
 export type SupportMutationKey = {
   actorId: string;
@@ -48,7 +53,16 @@ export type SupportReplyMutationResult =
 export type StaffSupportFilters = {
   status?: SupportCaseStatus;
   category?: SupportCaseCategory;
+  query?: string;
 };
+function supportFilters(filters: StaffSupportFilters) {
+  const pattern = filters.query ? containsPattern(filters.query.slice(0, 120)) : undefined;
+  return and(
+    filters.status ? eq(supportCases.status, filters.status) : undefined,
+    filters.category ? eq(supportCases.category, filters.category) : undefined,
+    pattern ? or(ilike(supportCases.subject, pattern), ilike(supportCases.id, pattern)) : undefined,
+  );
+}
 
 export type SupportPage<T> = {
   items: T[];
@@ -60,8 +74,7 @@ export type SupportPage<T> = {
 
 function normalizePage(page: number, total: number, pageSize: number) {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const requested =
-    Number.isSafeInteger(page) && page > 0 ? page : 1;
+  const requested = Number.isSafeInteger(page) && page > 0 ? page : 1;
   return {
     page: Math.min(requested, totalPages),
     totalPages,
@@ -69,9 +82,7 @@ function normalizePage(page: number, total: number, pageSize: number) {
 }
 
 function normalizePageSize(pageSize: number, fallback: number, max: number) {
-  return Number.isSafeInteger(pageSize) && pageSize > 0
-    ? Math.min(pageSize, max)
-    : fallback;
+  return Number.isSafeInteger(pageSize) && pageSize > 0 ? Math.min(pageSize, max) : fallback;
 }
 
 export class SupportCaseRepository {
@@ -79,36 +90,39 @@ export class SupportCaseRepository {
     requesterId: string,
     page = 1,
     pageSize = 25,
+    filters: StaffSupportFilters = {},
   ): Promise<SupportPage<SupportCase>> {
-    const boundedSize = normalizePageSize(pageSize, 25, 100);
-    const [countRow] = await db
-      .select({ total: count() })
-      .from(supportCases)
-      .where(eq(supportCases.requesterId, requesterId));
-    const total = countRow?.total ?? 0;
-    const normalized = normalizePage(page, total, boundedSize);
+    return db.transaction(
+      async (tx) => {
+        const boundedSize = normalizePageSize(pageSize, 25, 100);
+        const [countRow] = await tx
+          .select({ total: count() })
+          .from(supportCases)
+          .where(and(eq(supportCases.requesterId, requesterId), supportFilters(filters)));
+        const total = countRow?.total ?? 0;
+        const normalized = normalizePage(page, total, boundedSize);
 
-    const items = (await db
-      .select()
-      .from(supportCases)
-      .where(eq(supportCases.requesterId, requesterId))
-      .orderBy(desc(supportCases.updatedAt), desc(supportCases.id))
-      .limit(boundedSize)
-      .offset((normalized.page - 1) * boundedSize)) as unknown as SupportCase[];
+        const items = (await tx
+          .select()
+          .from(supportCases)
+          .where(and(eq(supportCases.requesterId, requesterId), supportFilters(filters)))
+          .orderBy(desc(supportCases.updatedAt), desc(supportCases.id))
+          .limit(boundedSize)
+          .offset((normalized.page - 1) * boundedSize)) as unknown as SupportCase[];
 
-    return {
-      items,
-      page: normalized.page,
-      pageSize: boundedSize,
-      total,
-      totalPages: normalized.totalPages,
-    };
+        return {
+          items,
+          page: normalized.page,
+          pageSize: boundedSize,
+          total,
+          totalPages: normalized.totalPages,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
   }
 
-  async listByRequester(
-    requesterId: string,
-    limit = 100,
-  ): Promise<SupportCase[]> {
+  async listByRequester(requesterId: string, limit = 100): Promise<SupportCase[]> {
     const page = await this.pageByRequester(requesterId, 1, limit);
     return page.items;
   }
@@ -117,6 +131,7 @@ export class SupportCaseRepository {
     page = 1,
     pageSize = 25,
     filters: StaffSupportFilters = {},
+    actorId?: string,
   ): Promise<
     SupportPage<{
       supportCase: SupportCase;
@@ -124,42 +139,43 @@ export class SupportCaseRepository {
       requesterDisplayName: string;
     }>
   > {
-    const boundedSize = normalizePageSize(pageSize, 25, 100);
-    const where = and(
-      filters.status ? eq(supportCases.status, filters.status) : undefined,
-      filters.category ? eq(supportCases.category, filters.category) : undefined,
+    return db.transaction(
+      async (tx) => {
+        if (actorId && !(await supportActor(tx, actorId, false)).staff)
+          throw new AppError("Staff required", 403, "FORBIDDEN");
+        const boundedSize = normalizePageSize(pageSize, 25, 100);
+        const where = supportFilters(filters);
+        const [countRow] = await tx.select({ total: count() }).from(supportCases).where(where);
+        const total = countRow?.total ?? 0;
+        const normalized = normalizePage(page, total, boundedSize);
+
+        const items = await tx
+          .select({
+            supportCase: supportCases,
+            requesterUsername: users.username,
+            requesterDisplayName: users.displayName,
+          })
+          .from(supportCases)
+          .innerJoin(users, eq(users.id, supportCases.requesterId))
+          .where(where)
+          .orderBy(desc(supportCases.updatedAt), desc(supportCases.id))
+          .limit(boundedSize)
+          .offset((normalized.page - 1) * boundedSize);
+
+        return {
+          items: items as unknown as Array<{
+            supportCase: SupportCase;
+            requesterUsername: string;
+            requesterDisplayName: string;
+          }>,
+          page: normalized.page,
+          pageSize: boundedSize,
+          total,
+          totalPages: normalized.totalPages,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
     );
-    const [countRow] = await db
-      .select({ total: count() })
-      .from(supportCases)
-      .where(where);
-    const total = countRow?.total ?? 0;
-    const normalized = normalizePage(page, total, boundedSize);
-
-    const items = await db
-      .select({
-        supportCase: supportCases,
-        requesterUsername: users.username,
-        requesterDisplayName: users.displayName,
-      })
-      .from(supportCases)
-      .innerJoin(users, eq(users.id, supportCases.requesterId))
-      .where(where)
-      .orderBy(desc(supportCases.updatedAt), desc(supportCases.id))
-      .limit(boundedSize)
-      .offset((normalized.page - 1) * boundedSize);
-
-    return {
-      items: items as unknown as Array<{
-        supportCase: SupportCase;
-        requesterUsername: string;
-        requesterDisplayName: string;
-      }>,
-      page: normalized.page,
-      pageSize: boundedSize,
-      total,
-      totalPages: normalized.totalPages,
-    };
   }
 
   async listStaff(limit = 100): Promise<
@@ -174,11 +190,7 @@ export class SupportCaseRepository {
   }
 
   async findById(id: string): Promise<SupportCase | null> {
-    const [row] = await db
-      .select()
-      .from(supportCases)
-      .where(eq(supportCases.id, id))
-      .limit(1);
+    const [row] = await db.select().from(supportCases).where(eq(supportCases.id, id)).limit(1);
     return (row as unknown as SupportCase | undefined) ?? null;
   }
 
@@ -199,10 +211,7 @@ export class SupportCaseRepository {
       .select()
       .from(supportCaseMessages)
       .where(eq(supportCaseMessages.caseId, caseId))
-      .orderBy(
-        desc(supportCaseMessages.createdAt),
-        desc(supportCaseMessages.id),
-      )
+      .orderBy(desc(supportCaseMessages.createdAt), desc(supportCaseMessages.id))
       .limit(boundedSize)
       .offset((normalized.page - 1) * boundedSize)) as unknown as SupportCaseMessage[];
 
@@ -265,10 +274,14 @@ export class SupportCaseRepository {
     message: SupportCaseMessage;
   } | null> {
     return db.transaction(async (tx) => {
+      if (audit.actorId !== input.authorId) throw new AppError("Invalid actor", 403, "FORBIDDEN");
+      const { actor, supportCase } = await supportAccess(tx, input.caseId, input.authorId);
+      const authorRole = supportCase.requesterId === actor.id ? "requester" : "staff";
+      if (input.authorRole !== authorRole) throw new AppError("Invalid author", 403, "FORBIDDEN");
       const now = new Date();
       const [updated] = await tx
         .update(supportCases)
-        .set({ status: "open", updatedAt: now })
+        .set({ status: "open", updatedAt: revision })
         .where(
           and(
             eq(supportCases.id, input.caseId),
@@ -293,7 +306,13 @@ export class SupportCaseRepository {
         .returning();
       if (!message) throw new Error("Support message insert did not return a row");
 
-      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      await tx.insert(auditEvents).values({
+        ...audit,
+        actorType: authorRole === "staff" ? "admin" : "user",
+        details: { authorRole, from: supportCase.status, to: "open" },
+        createdAt: now,
+      });
+      if (authorRole === "staff") await supportRequesterNotice(tx, updated, "reply", audit.id);
 
       return {
         supportCase: updated as unknown as SupportCase,
@@ -309,48 +328,48 @@ export class SupportCaseRepository {
   async findMutationReplay(
     request: Pick<SupportMutationKey, "actorId" | "requestKey" | "operation" | "fingerprint">,
   ): Promise<SupportMutationReplay> {
-    const [record] = await db
-      .select()
-      .from(supportMutationRequests)
-      .where(
-        and(
-          eq(supportMutationRequests.actorId, request.actorId),
-          eq(supportMutationRequests.requestKey, request.requestKey),
-        ),
-      )
-      .limit(1);
+    return db.transaction(
+      async (tx) => {
+        const [record] = await tx
+          .select()
+          .from(supportMutationRequests)
+          .where(
+            and(
+              eq(supportMutationRequests.actorId, request.actorId),
+              eq(supportMutationRequests.requestKey, request.requestKey),
+            ),
+          )
+          .limit(1);
 
-    if (!record) return { kind: "missing" };
-    if (record.operation !== request.operation || record.fingerprint !== request.fingerprint) {
-      return { kind: "key_conflict" };
-    }
+        if (!record) return { kind: "missing" };
+        if (record.operation !== request.operation || record.fingerprint !== request.fingerprint) {
+          return { kind: "key_conflict" };
+        }
 
-    const [supportCase] = await db
-      .select()
-      .from(supportCases)
-      .where(eq(supportCases.id, record.caseId))
-      .limit(1);
-    if (!supportCase) throw new Error("Committed support idempotency record has no case");
+        const { supportCase } = await supportAccess(tx, record.caseId, request.actorId, false);
 
-    if (record.operation === "case") {
-      return { kind: "replayed", supportCase: supportCase as unknown as SupportCase };
-    }
-    const [message] = await db
-      .select()
-      .from(supportCaseMessages)
-      .where(
-        and(
-          eq(supportCaseMessages.id, record.messageId),
-          eq(supportCaseMessages.caseId, record.caseId),
-        ),
-      )
-      .limit(1);
-    if (!message) throw new Error("Committed support idempotency record has no message");
-    return {
-      kind: "replayed",
-      supportCase: supportCase as unknown as SupportCase,
-      message: message as unknown as SupportCaseMessage,
-    };
+        if (record.operation === "case") {
+          return { kind: "replayed", supportCase: supportCase as unknown as SupportCase };
+        }
+        const [message] = await tx
+          .select()
+          .from(supportCaseMessages)
+          .where(
+            and(
+              eq(supportCaseMessages.id, record.messageId),
+              eq(supportCaseMessages.caseId, record.caseId),
+            ),
+          )
+          .limit(1);
+        if (!message) throw new Error("Committed support idempotency record has no message");
+        return {
+          kind: "replayed",
+          supportCase: supportCase as unknown as SupportCase,
+          message: message as unknown as SupportCaseMessage,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
   }
 
   /** The key, case, initial message and audit commit atomically. */
@@ -363,6 +382,9 @@ export class SupportCaseRepository {
     if (
       request.operation !== "case" ||
       request.actorId !== supportCase.requesterId ||
+      audit.actorId !== request.actorId ||
+      message.authorId !== request.actorId ||
+      message.authorRole !== "requester" ||
       request.caseId !== supportCase.id ||
       request.messageId !== message.id ||
       message.caseId !== supportCase.id
@@ -371,6 +393,7 @@ export class SupportCaseRepository {
     }
 
     const result = await db.transaction(async (tx) => {
+      await supportActor(tx, request.actorId);
       const now = new Date();
       const [claimed] = await tx
         .insert(supportMutationRequests)
@@ -402,7 +425,8 @@ export class SupportCaseRepository {
 
     if (result.kind === "created") return result;
     const replay = await this.findMutationReplay(request);
-    if (replay.kind === "missing") throw new Error("Missing idempotency reservation after conflict");
+    if (replay.kind === "missing")
+      throw new Error("Missing idempotency reservation after conflict");
     if (replay.kind === "key_conflict") return replay;
     return { kind: "replayed", supportCase: replay.supportCase };
   }
@@ -419,6 +443,7 @@ export class SupportCaseRepository {
       authorRole: SupportMessageAuthorRole;
       body: string;
       expectedStatus: SupportCaseStatus;
+      expectedUpdatedAt?: Date;
     },
     audit: Omit<AuditEvent, "createdAt">,
     request: SupportMutationKey,
@@ -426,6 +451,7 @@ export class SupportCaseRepository {
     if (
       request.operation !== "reply" ||
       request.actorId !== input.authorId ||
+      audit.actorId !== input.authorId ||
       request.caseId !== input.caseId ||
       request.messageId !== input.id
     ) {
@@ -437,6 +463,10 @@ export class SupportCaseRepository {
       | { kind: "created"; supportCase: SupportCase; message: SupportCaseMessage };
     try {
       result = await db.transaction(async (tx) => {
+        const { actor, supportCase } = await supportAccess(tx, input.caseId, input.authorId);
+        const authorRole = supportCase.requesterId === actor.id ? "requester" : "staff";
+        if (input.authorRole !== authorRole)
+          throw new AppError("Invalid support author", 403, "FORBIDDEN");
         const now = new Date();
         const [claimed] = await tx
           .insert(supportMutationRequests)
@@ -444,10 +474,17 @@ export class SupportCaseRepository {
           .onConflictDoNothing()
           .returning({ requestKey: supportMutationRequests.requestKey });
         if (!claimed) return { kind: "duplicate" as const };
+        if (
+          supportCase.status === "closed" ||
+          supportCase.status !== input.expectedStatus ||
+          (input.expectedUpdatedAt &&
+            supportCase.updatedAt.getTime() !== input.expectedUpdatedAt.getTime())
+        )
+          throw new StaleSupportMutation();
 
         const [updated] = await tx
           .update(supportCases)
-          .set({ status: "open", updatedAt: now })
+          .set({ status: "open", updatedAt: revision })
           .where(
             and(
               eq(supportCases.id, input.caseId),
@@ -471,7 +508,13 @@ export class SupportCaseRepository {
           .returning();
         if (!message) throw new Error("Support message insert did not return a row");
 
-        await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+        await tx.insert(auditEvents).values({
+          ...audit,
+          actorType: authorRole === "staff" ? "admin" : "user",
+          details: { authorRole, from: supportCase.status, to: "open" },
+          createdAt: now,
+        });
+        if (authorRole === "staff") await supportRequesterNotice(tx, updated, "reply", audit.id);
         return {
           kind: "created" as const,
           supportCase: updated as unknown as SupportCase,
@@ -485,7 +528,8 @@ export class SupportCaseRepository {
 
     if (result.kind === "created") return result;
     const replay = await this.findMutationReplay(request);
-    if (replay.kind === "missing") throw new Error("Missing idempotency reservation after conflict");
+    if (replay.kind === "missing")
+      throw new Error("Missing idempotency reservation after conflict");
     if (replay.kind === "key_conflict") return replay;
     if (!replay.message) throw new Error("Support reply replay has no message");
     return {
@@ -500,22 +544,36 @@ export class SupportCaseRepository {
     status: SupportCaseStatus,
     audit: Omit<AuditEvent, "createdAt">,
     expectedStatus: SupportCaseStatus,
+    expectedUpdatedAt?: Date,
   ): Promise<SupportCase | null> {
     return db.transaction(async (tx) => {
+      const { actor, supportCase } = await supportAccess(tx, id, audit.actorId);
+      if (
+        !actor.staff &&
+        (!expectedUpdatedAt || supportCase.status === "closed" || status === "closed")
+      )
+        throw new AppError("Staff required for closed cases", 403, "FORBIDDEN");
+      if (
+        supportCase.status !== expectedStatus ||
+        (expectedUpdatedAt && supportCase.updatedAt.getTime() !== expectedUpdatedAt.getTime())
+      )
+        return null;
+      if (supportCase.status === status) return supportCase as SupportCase;
       const now = new Date();
       const [updated] = await tx
         .update(supportCases)
-        .set({ status, updatedAt: now })
-        .where(
-          and(
-            eq(supportCases.id, id),
-            eq(supportCases.status, expectedStatus),
-          ),
-        )
+        .set({ status, updatedAt: revision })
+        .where(and(eq(supportCases.id, id), eq(supportCases.status, expectedStatus)))
         .returning();
       if (!updated) return null;
 
-      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      await tx.insert(auditEvents).values({
+        ...audit,
+        actorType: actor.staff ? "admin" : "user",
+        details: { from: supportCase.status, to: status },
+        createdAt: now,
+      });
+      await supportRequesterNotice(tx, updated, status, audit.id);
       return updated as unknown as SupportCase;
     });
   }

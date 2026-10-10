@@ -20,6 +20,7 @@ type StoredAttempt = {
   key: string;
   digest: string;
   observedStatus: SupportRetryStatus | null;
+  observedUpdatedAt?: string;
   expiresAt: number;
 };
 
@@ -29,6 +30,7 @@ type RetryOptions = {
   storage?: SupportRetryStorage | null;
   now?: number;
   newKey?: () => string;
+  expectedUpdatedAt?: string;
 };
 
 const PREFIX = "nexus:support:retry:v2:";
@@ -39,8 +41,12 @@ const USER_ID = /^usr_[a-f0-9]{24}$/u;
 const inMemory = new Map<string, string>();
 const fallbackStore: SupportRetryStorage = {
   getItem: (key) => inMemory.get(key) ?? null,
-  setItem: (key, value) => { inMemory.set(key, value); },
-  removeItem: (key) => { inMemory.delete(key); },
+  setItem: (key, value) => {
+    inMemory.set(key, value);
+  },
+  removeItem: (key) => {
+    inMemory.delete(key);
+  },
 };
 
 function getStorage(options: RetryOptions): SupportRetryStorage {
@@ -53,7 +59,7 @@ function getStorage(options: RetryOptions): SupportRetryStorage {
 }
 
 function slotFor(actorScope: string, scope: string): string {
-  return PREFIX + actorScope + ":" + scope;
+  return `${PREFIX}${actorScope}:${scope}`;
 }
 
 function isStatus(value: unknown): value is SupportRetryStatus {
@@ -69,12 +75,21 @@ function readAttempt(store: SupportRetryStorage, slot: string, now: number): Sto
     const x = value as Partial<StoredAttempt>;
     if (
       x.version !== 1 ||
-      typeof x.key !== "string" || !UUID_V4.test(x.key) ||
-      typeof x.digest !== "string" || !DIGEST.test(x.digest) ||
+      typeof x.key !== "string" ||
+      !UUID_V4.test(x.key) ||
+      typeof x.digest !== "string" ||
+      !DIGEST.test(x.digest) ||
       (x.observedStatus !== null && !isStatus(x.observedStatus)) ||
-      typeof x.expiresAt !== "number" || !Number.isSafeInteger(x.expiresAt) ||
-      x.expiresAt <= now || x.expiresAt > now + TTL_MS
-    ) return null;
+      (x.observedUpdatedAt !== undefined &&
+        (typeof x.observedUpdatedAt !== "string" ||
+          !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u.test(x.observedUpdatedAt) ||
+          !Number.isFinite(Date.parse(x.observedUpdatedAt)))) ||
+      typeof x.expiresAt !== "number" ||
+      !Number.isSafeInteger(x.expiresAt) ||
+      x.expiresAt <= now ||
+      x.expiresAt > now + TTL_MS
+    )
+      return null;
     return x as StoredAttempt;
   } catch {
     return null;
@@ -110,8 +125,9 @@ export async function resolveSupportRetryActorScope(): Promise<string | null> {
       data?.authenticated !== true ||
       typeof data.user?.id !== "string" ||
       !USER_ID.test(data.user.id)
-    ) return null;
-    return digest("support-retry:v2:" + data.user.id);
+    )
+      return null;
+    return digest(`support-retry:v2:${data.user.id}`);
   } catch {
     return null;
   }
@@ -119,7 +135,7 @@ export async function resolveSupportRetryActorScope(): Promise<string | null> {
 
 async function reserve(
   scope: string,
-  payloadAt: (status: SupportRetryStatus | null) => string,
+  payloadAt: (status: SupportRetryStatus | null, revision?: string) => string,
   observedStatus: SupportRetryStatus | null,
   options: RetryOptions = {},
 ): Promise<SupportRetryAttempt> {
@@ -130,12 +146,12 @@ async function reserve(
   const now = options.now ?? Date.now();
   const old = store && slot ? readAttempt(store, slot, now) : null;
   if (old) {
-    const oldPayload = payloadAt(old.observedStatus);
-    if (await digest(oldPayload) === old.digest) {
+    const oldPayload = payloadAt(old.observedStatus, old.observedUpdatedAt);
+    if ((await digest(oldPayload)) === old.digest) {
       return { key: old.key, payload: oldPayload, recovered: true };
     }
   }
-  const payload = payloadAt(observedStatus);
+  const payload = payloadAt(observedStatus, options.expectedUpdatedAt);
   const key = (options.newKey ?? (() => crypto.randomUUID()))();
   if (!UUID_V4.test(key)) throw new Error("Invalid support retry key generator");
   if (store && slot) {
@@ -144,6 +160,7 @@ async function reserve(
       key,
       digest: await digest(payload),
       observedStatus,
+      ...(options.expectedUpdatedAt ? { observedUpdatedAt: options.expectedUpdatedAt } : {}),
       expiresAt: now + TTL_MS,
     });
   }
@@ -165,24 +182,29 @@ export function reserveSupportReplyRetry(
 ): Promise<SupportRetryAttempt> {
   if (!/^sup_[a-f0-9]{24}$/u.test(caseId)) throw new Error("Invalid support case id");
   return reserve(
-    "reply:" + caseId,
-    (status) => JSON.stringify({ message: normalizedMessage, expectedStatus: status }),
+    `reply:${caseId}`,
+    (status, revision) =>
+      JSON.stringify({
+        message: normalizedMessage,
+        expectedStatus: status,
+        ...(revision ? { expectedUpdatedAt: revision } : {}),
+      }),
     currentStatus,
     options,
   );
 }
 
 /** Do not remove a newer retry slot if an older mutation completes late. */
-export function clearSupportRetry(
-  scope: string,
-  key: string,
-  options: RetryOptions = {},
-): void {
+export function clearSupportRetry(scope: string, key: string, options: RetryOptions = {}): void {
   const actorScope = options.actorScope;
   if (!actorScope || !DIGEST.test(actorScope)) return;
   const store = getStorage(options);
   const slot = slotFor(actorScope, scope);
   const current = readAttempt(store, slot, options.now ?? Date.now());
   if (current?.key !== key) return;
-  try { store.removeItem(slot); } catch { /* Non-persistent storage is optional. */ }
+  try {
+    store.removeItem(slot);
+  } catch {
+    /* Non-persistent storage is optional. */
+  }
 }

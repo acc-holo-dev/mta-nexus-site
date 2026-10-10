@@ -273,6 +273,16 @@ to current owners/admins. Transfers and team access changes store inbox notices
 atomically; optional push delivery uses the existing outbox. These flows support
 RU/EN, stale-version checks and recovery after an uncertain response.
 
+`/support` and `/admin/support` now preserve subject/case-number search,
+status/category filters and pagination in their URLs. Requesters can resolve
+their own case and reopen a resolved case; only current staff can close or reopen
+a staff-closed case. Thread forms submit the observed revision, while durable
+reply retries retain the original revision and request key. Private status
+history is available in each thread through `/api/support/[id]/activity`.
+Requester notices for staff replies and status changes share the authoritative write and
+use the existing push outbox; notification previews omit private case text.
+Both languages include metadata, recovery and confirmed saved-state feedback.
+
 `/discover`, `/developers` and `/organizations` support paginated search and
 public filters through `/api/discover`. `/workspace/saved` manages all four
 existing follow types with private 20-item pages, search and removal, including

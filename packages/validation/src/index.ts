@@ -301,6 +301,7 @@ export const createSupportMessageSchema = z
     message: z.string().trim().min(1).max(4_000),
     // The state seen by the author when composing this reply.
     expectedStatus: z.enum(SUPPORT_CASE_STATUSES),
+    expectedUpdatedAt: z.iso.datetime().optional(),
   })
   .strict();
 
@@ -309,6 +310,7 @@ export const updateSupportCaseStatusSchema = z
     status: z.enum(SUPPORT_CASE_STATUSES),
     // Require the client-observed status as an optimistic concurrency precondition.
     expectedStatus: z.enum(SUPPORT_CASE_STATUSES),
+    expectedUpdatedAt: z.iso.datetime().optional(),
   })
   .strict();
 

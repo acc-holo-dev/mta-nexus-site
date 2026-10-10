@@ -7,6 +7,46 @@ export function formatNotification(
   copy: { approved: string; rejected: string; version: string; notes: string },
   locale: Locale = "en",
 ) {
+  const supportActivity =
+    notification.title === "Support case activity" &&
+    /^Support case (sup_[a-f0-9]{24}): (reply|open|resolved|closed)\.$/u.exec(notification.message);
+  if (supportActivity) {
+    const messages: Record<string, string> =
+      locale === "ru"
+        ? {
+            reply: "Поддержка ответила на ваше обращение.",
+            open: "Обращение переоткрыто.",
+            resolved: "Обращение отмечено решённым.",
+            closed: "Обращение закрыто поддержкой.",
+          }
+        : {
+            reply: "Support replied to your case.",
+            open: "Your case was reopened.",
+            resolved: "Your case was marked as resolved.",
+            closed: "Support closed your case.",
+          };
+    return {
+      title: locale === "ru" ? "Обновление обращения" : "Support case activity",
+      message: messages[supportActivity[2]],
+    };
+  }
+  if (
+    notification.title === "New support case" &&
+    notification.message === "A support case is awaiting review."
+  )
+    return {
+      title: locale === "ru" ? "Новое обращение" : notification.title,
+      message: locale === "ru" ? "Обращение ожидает рассмотрения." : notification.message,
+    };
+  if (
+    notification.title === "Support case updated" &&
+    notification.message === "A support case has a new requester message."
+  )
+    return {
+      title: locale === "ru" ? "Новое сообщение в обращении" : notification.title,
+      message:
+        locale === "ru" ? "Пользователь добавил сообщение в обращение." : notification.message,
+    };
   const organizationAccess =
     notification.title === "Organization access changed" &&
     /^Organization ([a-zA-Z0-9_-]{1,128}): (added|updated|removed|left|ownership_gained|ownership_transferred)\.$/u.exec(

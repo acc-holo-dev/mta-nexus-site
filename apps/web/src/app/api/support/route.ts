@@ -1,6 +1,12 @@
+import { supportQuery } from "../../../lib/support-workspace-contract";
+import {
+  supportPrivateJson,
+  supportMutationGuard,
+  supportFailure,
+} from "../../../lib/support-http";
 import { supportCaseRepository, userRepository } from "@nexus/db";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
-import { createSupportCaseSchema, supportStaffQueueFiltersSchema } from "@nexus/validation";
+import { createSupportCaseSchema } from "@nexus/validation";
 import { after, type NextRequest } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import { parseBoundedJson } from "../../../lib/bounded-json";
@@ -8,109 +14,61 @@ import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
 } from "../../../lib/support-idempotency";
-import {
-  createRequestLogContext,
-  jsonWithRequestId,
-  logRequestEvent,
-} from "../../../lib/observability";
+import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
 import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
-
-function parsePage(value: string | null): number {
-  return value && /^[1-9]\d{0,6}$/u.test(value)
-    ? Number(value)
-    : 1;
-}
-
-function privateJson(
-  context: Parameters<typeof jsonWithRequestId>[0],
-  body: unknown,
-  init: ResponseInit = {},
-) {
-  const headers = new Headers(init.headers);
-  headers.set("Cache-Control", "private, no-store");
-  headers.set("Vary", "Cookie");
-  return jsonWithRequestId(context, body, { ...init, headers });
-}
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
-
   try {
-    const user = await authService.getSession(
-      request.cookies.get("nexus_session")?.value,
-    );
-    if (!user) {
-      return privateJson(
+    const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
+    if (!user)
+      return supportPrivateJson(
         context,
+        request,
         { error: "Authentication required" },
         { status: 401 },
       );
-    }
-
-    if (request.nextUrl.searchParams.get("scope") === "staff") {
-      if (!can(user, "admin.moderation")) {
-        return privateJson(context, { error: "Forbidden" }, { status: 403 });
-      }
-
-      const params = request.nextUrl.searchParams;
-      if (params.getAll("status").length > 1 || params.getAll("category").length > 1) {
-        return privateJson(
-          context,
-          { error: "Invalid support queue filters" },
-          { status: 400 },
-        );
-      }
-      const parsed = supportStaffQueueFiltersSchema.safeParse({
-        ...(params.has("status") ? { status: params.get("status") } : {}),
-        ...(params.has("category") ? { category: params.get("category") } : {}),
-      });
-      if (!parsed.success) {
-        return privateJson(
-          context,
-          { error: "Invalid support queue filters" },
-          { status: 400 },
-        );
-      }
-      const result = await supportCaseRepository.pageStaff(
-        parsePage(params.get("page")),
-        25,
-        parsed.data,
+    const filters = supportQuery(request.nextUrl.searchParams, true);
+    if (!filters)
+      return supportPrivateJson(
+        context,
+        request,
+        { error: "Invalid support queue filters", code: "VALIDATION_ERROR" },
+        { status: 400 },
       );
-      return privateJson(context, {
+    const staff = request.nextUrl.searchParams.get("scope") === "staff";
+    if (staff && !can(user, "admin.moderation"))
+      return supportPrivateJson(context, request, { error: "Forbidden" }, { status: 403 });
+    if (!(await consumeRateLimit("search", user.id)).success)
+      return supportPrivateJson(context, request, { error: "Too many requests" }, { status: 429 });
+    const selection = {
+      ...(filters.status ? { status: filters.status } : {}),
+      ...(filters.category ? { category: filters.category } : {}),
+      ...(filters.q ? { query: filters.q } : {}),
+    };
+    if (staff) {
+      const result = await supportCaseRepository.pageStaff(filters.page, 25, selection, user.id);
+      return supportPrivateJson(context, request, {
         cases: result.items.map((row) => ({
           ...row.supportCase,
           requesterUsername: row.requesterUsername,
-          requesterDisplayName: row.requesterDisplayName,
         })),
         page: result.page,
         totalPages: result.totalPages,
         total: result.total,
       });
     }
-
-    const result = await supportCaseRepository.pageByRequester(
-      user.id,
-      parsePage(request.nextUrl.searchParams.get("page")),
-    );
-    return privateJson(context, {
+    const result = Object.keys(selection).length
+      ? await supportCaseRepository.pageByRequester(user.id, filters.page, 25, selection)
+      : await supportCaseRepository.pageByRequester(user.id, filters.page);
+    return supportPrivateJson(context, request, {
       cases: result.items,
       page: result.page,
       totalPages: result.totalPages,
       total: result.total,
     });
   } catch (error) {
-    logRequestEvent({
-      level: "error",
-      event: "support.case_list_failed",
-      context,
-      status: 500,
-      error,
-    });
-    return privateJson(
-      context,
-      { error: "Could not load support cases" },
-      { status: 500 },
-    );
+    return supportFailure(request, context, error, "support.case_list_failed");
   }
 }
 
@@ -118,43 +76,42 @@ export async function POST(request: NextRequest) {
   const context = createRequestLogContext(request);
 
   try {
-    const user = await authService.getSession(
-      request.cookies.get("nexus_session")?.value,
-    );
+    const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
     if (!user) {
-      return privateJson(
+      return supportPrivateJson(
         context,
+        request,
         { error: "Authentication required" },
         { status: 401 },
       );
     }
 
+    supportMutationGuard(request);
     const body = await parseBoundedJson(request);
     if (!body.ok && body.reason === "too_large") {
-      return privateJson(
+      return supportPrivateJson(
         context,
+        request,
         { error: "Support request body too large", code: "SUPPORT_BODY_TOO_LARGE" },
         { status: 413 },
       );
     }
 
-    const parsed = createSupportCaseSchema.safeParse(
-      body.ok ? body.value : null,
-    );
+    const parsed = createSupportCaseSchema.safeParse(body.ok ? body.value : null);
     if (!parsed.success) {
-      return privateJson(
+      return supportPrivateJson(
         context,
-        { error: "Invalid support case", details: parsed.error.flatten() },
+        request,
+        { error: "Invalid support case", code: "VALIDATION_ERROR" },
         { status: 400 },
       );
     }
 
-    const requestKey = parseSupportIdempotencyKey(
-      request.headers.get("Idempotency-Key"),
-    );
+    const requestKey = parseSupportIdempotencyKey(request.headers.get("Idempotency-Key"));
     if (!requestKey) {
-      return privateJson(
+      return supportPrivateJson(
         context,
+        request,
         { error: "A valid idempotency key is required", code: "SUPPORT_IDEMPOTENCY_KEY_INVALID" },
         { status: 400 },
       );
@@ -174,15 +131,20 @@ export async function POST(request: NextRequest) {
     };
     const existing = await supportCaseRepository.findMutationReplay(scope);
     if (existing.kind === "key_conflict") {
-      return privateJson(
+      return supportPrivateJson(
         context,
-        { error: "Idempotency key was already used for a different request", code: "SUPPORT_IDEMPOTENCY_CONFLICT" },
+        request,
+        {
+          error: "Idempotency key was already used for a different request",
+          code: "SUPPORT_IDEMPOTENCY_CONFLICT",
+        },
         { status: 409 },
       );
     }
     if (existing.kind === "replayed") {
-      return privateJson(
+      return supportPrivateJson(
         context,
+        request,
         { success: true, supportCase: existing.supportCase, replayed: true },
         { status: 201 },
       );
@@ -190,8 +152,9 @@ export async function POST(request: NextRequest) {
 
     const limit = await consumeRateLimit("supportCase", user.id);
     if (!limit.success) {
-      return privateJson(
+      return supportPrivateJson(
         context,
+        request,
         { error: "Too many support cases" },
         { status: 429 },
       );
@@ -228,54 +191,49 @@ export async function POST(request: NextRequest) {
       { ...scope, caseId, messageId },
     );
     if (result.kind === "key_conflict") {
-      return privateJson(
+      return supportPrivateJson(
         context,
-        { error: "Idempotency key was already used for a different request", code: "SUPPORT_IDEMPOTENCY_CONFLICT" },
+        request,
+        {
+          error: "Idempotency key was already used for a different request",
+          code: "SUPPORT_IDEMPOTENCY_CONFLICT",
+        },
         { status: 409 },
       );
     }
     const supportCase = result.supportCase;
-    if (result.kind === "created") after(async () => {
-      try {
-        const moderatorIds = await userRepository.listModeratorIds();
-        await dispatchNotificationsBestEffort(
-          moderatorIds.map((moderatorId) => ({
-            recipientId: moderatorId,
-            title: "New support case",
-            message: supportCase.subject,
-            link: "/admin/support/" + supportCase.id,
-            type: "system" as const,
-            category: "system" as const,
-          })),
-        );
-      } catch (error) {
-        logRequestEvent({
-          level: "warn",
-          event: "support.case_notification_failed",
-          context,
-          status: 201,
-          error,
-        });
-      }
-    });
+    if (result.kind === "created")
+      after(async () => {
+        try {
+          const moderatorIds = await userRepository.listModeratorIds();
+          await dispatchNotificationsBestEffort(
+            moderatorIds.map((moderatorId) => ({
+              recipientId: moderatorId,
+              title: "New support case",
+              message: "A support case is awaiting review.",
+              link: `/admin/support/${supportCase.id}`,
+              type: "system" as const,
+              category: "system" as const,
+            })),
+          );
+        } catch (error) {
+          logRequestEvent({
+            level: "warn",
+            event: "support.case_notification_failed",
+            context,
+            status: 201,
+            error,
+          });
+        }
+      });
 
-    return privateJson(
+    return supportPrivateJson(
       context,
+      request,
       { success: true, supportCase, replayed: result.kind === "replayed" },
       { status: 201 },
     );
   } catch (error) {
-    logRequestEvent({
-      level: "error",
-      event: "support.case_create_failed",
-      context,
-      status: 500,
-      error,
-    });
-    return privateJson(
-      context,
-      { error: "Could not create support case" },
-      { status: 500 },
-    );
+    return supportFailure(request, context, error, "support.case_create_failed");
   }
 }

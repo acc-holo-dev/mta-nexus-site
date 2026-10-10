@@ -46,6 +46,7 @@ export * from "./servers";
 export * from "./sessions";
 export * from "./social";
 export * from "./support";
+export { supportActivityRepository } from "./support-activity";
 export * from "./user-library";
 export * from "./users";
 export * from "./verification";
