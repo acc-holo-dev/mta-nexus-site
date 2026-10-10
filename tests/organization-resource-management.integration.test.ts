@@ -191,6 +191,28 @@ describe("organization resource management integration", () => {
     expect(
       await serverService.canManageServer(created, manager),
     ).toBe(true);
+
+    // The owner-picker is only a hint. Authorization is re-read by the
+    // same transaction that inserts the server and its audit event.
+    await db.delete(organizationMembers).where(and(
+      eq(organizationMembers.organizationId, organizationId),
+      eq(organizationMembers.userId, managerId),
+    ));
+    await expect(serverService.createServer(
+      {
+        name: "Revoked Organization Server",
+        slug: `revoked-org-server-${suffix}`,
+        ipAddress: "198.51.100.223",
+        port: basePort + 2,
+        organizationId,
+        visibility: "private",
+        gameplayTags: [],
+        mediaUrls: [],
+      },
+      manager,
+    )).rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
+    expect(await serverRepository.findBySlug(`revoked-org-server-${suffix}`))
+      .toBeNull();
   });
 
   it("revokes organization resource authority when manage_products membership is removed", async () => {

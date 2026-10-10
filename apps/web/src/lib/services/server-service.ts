@@ -33,26 +33,8 @@ class ServerService {
   ): Promise<Server> {
     if (!can(actor, "server.create")) throw new ForbiddenError("Not authorized to create server");
 
-    if (input.organizationId) {
-      const organization = await organizationRepository.findById(input.organizationId);
-      if (!organization) throw new NotFoundError("Organization", input.organizationId);
-
-      const memberships = await organizationRepository.listUserMemberships(actor.id);
-      const membership = memberships.find(
-        (item) => item.organizationId === input.organizationId,
-      );
-      const canManageServers =
-        organization.ownerId === actor.id ||
-        membership?.role === "owner" ||
-        membership?.role === "admin" ||
-        membership?.permissions.includes("manage_servers");
-
-      if (!canManageServers) {
-        throw new ForbiddenError(
-          "You do not have permission to create servers for this organization",
-        );
-      }
-    }
+    // Organization authority is checked under row locks by createWithAudit.
+    // Do not perform an authorization read outside its database transaction.
 
     const id = generateId("srv");
     const server = await serverRepository.createWithAudit(
@@ -74,23 +56,34 @@ class ServerService {
       },
     );
 
-    await eventBus.publish({
-      id: generateId("evt"),
-      type: "server.created",
-      version: 1,
-      timestamp: new Date().toISOString(),
-      actor: { id: actor.id, type: "user" },
-      aggregateId: id,
-      aggregateType: "server",
-      payload: {
-        serverId: id,
-        name: server.name,
-        ownerId: server.ownerId,
-        organizationId: server.organizationId,
-        ip: server.ipAddress,
-        port: server.port,
-      },
-    });
+    // The server and audit are committed. Best-effort event subscribers
+    // cannot turn a successful creation into a client-visible 500/retry.
+    try {
+      await eventBus.publish({
+        id: generateId("evt"),
+        type: "server.created",
+        version: 1,
+        timestamp: new Date().toISOString(),
+        actor: { id: actor.id, type: "user" },
+        aggregateId: id,
+        aggregateType: "server",
+        payload: {
+          serverId: id,
+          name: server.name,
+          ownerId: server.ownerId,
+          organizationId: server.organizationId,
+          ip: server.ipAddress,
+          port: server.port,
+        },
+      });
+    } catch {
+      // Do not log event payloads, addresses or subscriber error details.
+      console.error("Nexus committed write succeeded but event dispatch failed", {
+        eventType: "server.created",
+        aggregateType: "server",
+        aggregateId: id,
+      });
+    }
 
     return server;
   }

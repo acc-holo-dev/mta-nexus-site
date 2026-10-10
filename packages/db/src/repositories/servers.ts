@@ -2,7 +2,7 @@ import { and, asc, count, desc, eq, exists, gt, ilike, inArray, isNull, ne, or, 
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, organizationMembers, organizations, servers } from "../schema";
-import type { AuditEvent, Server, ServerStatus, ServerVisibility } from "@nexus/domain";
+import { ForbiddenError, NotFoundError, type AuditEvent, type Server, type ServerStatus, type ServerVisibility } from "@nexus/domain";
 
 export type ManagedServerFilters = {
   query?: string;
@@ -273,6 +273,43 @@ export class ServerRepository {
     audit: Omit<AuditEvent, "createdAt">,
   ): Promise<Server> {
     return db.transaction(async (tx) => {
+      if (server.organizationId) {
+        // Lock both authority records until the server and audit commit.
+        // Concurrent organization transfers, role updates and revocations
+        // therefore cannot invalidate a permission read before the write.
+        const [organization] = await tx
+          .select({ ownerId: organizations.ownerId })
+          .from(organizations)
+          .where(eq(organizations.id, server.organizationId))
+          .for("share")
+          .limit(1);
+        if (!organization) {
+          throw new NotFoundError("Organization", server.organizationId);
+        }
+        if (organization.ownerId !== audit.actorId) {
+          const [membership] = await tx
+            .select({
+              role: organizationMembers.role,
+              permissions: organizationMembers.permissions,
+            })
+            .from(organizationMembers)
+            .where(and(
+              eq(organizationMembers.organizationId, server.organizationId),
+              eq(organizationMembers.userId, audit.actorId),
+            ))
+            .for("share")
+            .limit(1);
+          if (!membership || !(
+            membership.role === "owner" ||
+            membership.role === "admin" ||
+            membership.permissions.includes("manage_servers")
+          )) {
+            throw new ForbiddenError(
+              "You do not have permission to create servers for this organization",
+            );
+          }
+        }
+      }
       const now = new Date();
       const rows = await tx
         .insert(servers)

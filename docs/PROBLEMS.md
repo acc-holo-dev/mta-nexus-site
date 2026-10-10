@@ -858,3 +858,20 @@ lookup leaves personal registration usable and organization choice disabled.
   browser registration for an owner and delegated manager, and a scenario
   where organization rights are revoked between option loading and creation.
   CI-001 still prevents exact-SHA hosted acceptance.
+
+### P2. Atomic organization server creation and post-commit events
+
+Server creation now checks organization ownership / manage_servers membership
+inside the same PostgreSQL transaction as the server and audit insert. Share
+locks prevent a concurrent owner transfer or membership permission revocation
+from slipping between the authorization read and durable write. This is a
+separate control from the UI organization selector, which is never authority.
+
+The in-memory server.created event remains best-effort after commit; a handler
+or dispatch failure must not return a false server-registration failure.
+Delivery is not durable and still needs an outbox if guaranteed events become
+a product requirement.
+
+- Remaining acceptance: PostgreSQL role-revocation and concurrent-write
+  tests on the target DB, plus event-dispatch regression tests on Node 26.
+  CI-001 currently prevents hosted exact-SHA execution.
