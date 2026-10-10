@@ -3,7 +3,7 @@ export const RELEASE_UPGRADE_BASELINE_TAG =
 export const RELEASE_UPGRADE_FAILURE_TAG =
   "0027_build_quarantine";
 export const RELEASE_UPGRADE_TARGET_TAG =
-  "0037_server_activity_lookup_index";
+  "0038_server_claim_scope_and_status";
 
 function journalEntries(journal) {
   if (!journal || !Array.isArray(journal.entries)) {

@@ -2,6 +2,9 @@ export const SERVER_ACTIVITY_ACTIONS = [
   "server.created",
   "server.updated",
   "server.claim_challenge_issued",
+  "server.control_proof_recorded",
+  "server.verification_approved",
+  "server.verification_rejected",
 ] as const;
 
 export type ServerActivityAction = (typeof SERVER_ACTIVITY_ACTIONS)[number];

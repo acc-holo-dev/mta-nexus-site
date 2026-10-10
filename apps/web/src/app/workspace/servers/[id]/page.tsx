@@ -6,7 +6,8 @@ import { Server } from "lucide-react";
 import { authService } from "../../../../lib/services/auth-service";
 import { serverService } from "../../../../lib/services/server-service";
 import { ServerDetailsForm } from "../../../../components/server-details-form";
-import { ServerClaimControlPanel } from "../../../../components/server-claim-control-panel";
+import { ServerClaimStatusPanel } from "../../../../components/server-claim-status-panel";
+import { readManagedServerClaimStatus } from "@nexus/db";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getManagedServerCopy } from "../../../../lib/managed-server-view";
@@ -49,6 +50,8 @@ export default async function ServerManagementPage({
   const server = await serverService.getServerById(id);
   if (!server) notFound();
   if (!(await serverService.canManageServer(server, user))) notFound();
+  const claimStatus = await readManagedServerClaimStatus(server.id, user);
+  if (!claimStatus) notFound();
 
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
@@ -76,9 +79,7 @@ export default async function ServerManagementPage({
         </div>
       </div>
 
-      {!server.isVerified && (
-        <ServerClaimControlPanel serverId={server.id} serverName={server.name} />
-      )}
+      <ServerClaimStatusPanel serverId={server.id} serverName={server.name} status={claimStatus} locale={locale} />
 
       <section className="nexus-panel space-y-4 p-5 shadow-nexus-sm sm:p-6">
         <div>

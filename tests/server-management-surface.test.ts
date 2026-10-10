@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
     role: "user",
   } as null | { id: string; username: string; role: string },
   notFoundCalls: 0,
+  claimStatus: vi.fn(),
 }));
 
 const serverService = vi.hoisted(() => ({
@@ -17,12 +18,12 @@ const serverService = vi.hoisted(() => ({
   canManageServer: vi.fn(),
 }));
 
+vi.mock("@nexus/db", () => ({ readManagedServerClaimStatus: state.claimStatus }));
+
 vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({
     get: (name: string) =>
-      name === "nexus_session" && state.user
-        ? { value: "session-token" }
-        : undefined,
+      name === "nexus_session" && state.user ? { value: "session-token" } : undefined,
   })),
 }));
 
@@ -36,13 +37,8 @@ vi.mock("next/navigation", () => ({
 vi.mock("next/link", async () => {
   const React = await import("react");
   return {
-    default: ({
-      href,
-      children
-    }: {
-      href: string;
-      children: ReactNode;
-    }) => React.createElement("a", { href }, children),
+    default: ({ href, children }: { href: string; children: ReactNode }) =>
+      React.createElement("a", { href }, children),
   };
 });
 
@@ -63,23 +59,19 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({
 vi.mock("../apps/web/src/components/server-details-form", async () => {
   const React = await import("react");
   return {
-    ServerDetailsForm: () =>
-      React.createElement("div", { "data-testid": "server-details-form" }),
+    ServerDetailsForm: () => React.createElement("div", { "data-testid": "server-details-form" }),
   };
 });
 
-vi.mock(
-  "../apps/web/src/components/server-claim-control-panel",
-  async () => {
-    const React = await import("react");
-    return {
-      ServerClaimControlPanel: () =>
-        React.createElement("div", {
-          "data-testid": "server-claim-control-panel",
-        }),
-    };
-  },
-);
+vi.mock("../apps/web/src/components/server-claim-control-panel", async () => {
+  const React = await import("react");
+  return {
+    ServerClaimControlPanel: () =>
+      React.createElement("div", {
+        "data-testid": "server-claim-control-panel",
+      }),
+  };
+});
 
 import ServerManagementPage from "../apps/web/src/app/workspace/servers/[id]/page";
 
@@ -102,6 +94,7 @@ describe("server management page behavior", () => {
       username: "manager",
       role: "user",
     };
+    state.claimStatus.mockResolvedValue({ isVerified: false, request: null });
     serverService.getServerById.mockResolvedValue(server);
     serverService.canManageServer.mockResolvedValue(true);
   });
@@ -142,10 +135,7 @@ describe("server management page behavior", () => {
       }),
     ).rejects.toThrow("NEXT_NOT_FOUND");
 
-    expect(serverService.canManageServer).toHaveBeenCalledWith(
-      server,
-      state.user,
-    );
+    expect(serverService.canManageServer).toHaveBeenCalledWith(server, state.user);
     expect(state.notFoundCalls).toBe(1);
   });
 
@@ -156,10 +146,7 @@ describe("server management page behavior", () => {
       }),
     );
 
-    expect(serverService.canManageServer).toHaveBeenCalledWith(
-      server,
-      state.user,
-    );
+    expect(serverService.canManageServer).toHaveBeenCalledWith(server, state.user);
     expect(html).toContain(dictionary.ownerManaged);
     expect(html).toContain(dictionary.ownerManagedDescription);
     expect(html).toContain(dictionary.listingDetails);
@@ -171,6 +158,7 @@ describe("server management page behavior", () => {
   });
 
   it("hides ownership-claim controls once the server is verified", async () => {
+    state.claimStatus.mockResolvedValue({ isVerified: true, request: null });
     serverService.getServerById.mockResolvedValue({
       ...server,
       isVerified: true,
@@ -183,8 +171,32 @@ describe("server management page behavior", () => {
     );
 
     expect(html).toContain('data-testid="server-details-form"');
-    expect(html).not.toContain(
-      'data-testid="server-claim-control-panel"',
+    expect(html).not.toContain('data-testid="server-claim-control-panel"');
+  });
+
+  it("hides challenge controls while any manager's request awaits moderation", async () => {
+    state.claimStatus.mockResolvedValue({
+      isVerified: false,
+      request: {
+        status: "pending",
+        createdAt: new Date("2026-10-10T12:00:00Z"),
+        resolvedAt: null,
+        isRequester: false,
+        proofMatchesServer: false,
+      },
+    });
+    const html = renderToStaticMarkup(
+      await ServerManagementPage({ params: Promise.resolve({ id: "srv_managed" }) }),
     );
+    expect(html).toContain("Awaiting moderation");
+    expect(html).toContain("Request from another manager");
+    expect(html).toContain("no longer matches");
+    expect(html).not.toContain('data-testid="server-claim-control-panel"');
+  });
+  it("fails closed if permissions were revoked before the private status snapshot", async () => {
+    state.claimStatus.mockResolvedValue(null);
+    await expect(
+      ServerManagementPage({ params: Promise.resolve({ id: "srv_managed" }) }),
+    ).rejects.toThrow("NEXT_NOT_FOUND");
   });
 });

@@ -94,7 +94,7 @@ export class AuditRepository {
           .from(auditEvents)
           .leftJoin(
             users,
-            and(eq(auditEvents.actorType, "user"), eq(users.id, auditEvents.actorId)),
+            and(inArray(auditEvents.actorType, ["user", "admin"]), eq(users.id, auditEvents.actorId)),
           )
           .where(
             and(

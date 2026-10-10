@@ -29,3 +29,5 @@ export * from "./account-password-reset";
 
 export * from "./web-push-worker";
 export * from "./web-push-dispatcher";
+
+export * from "./server-claim-status";

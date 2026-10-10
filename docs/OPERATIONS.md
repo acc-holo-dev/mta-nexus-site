@@ -1515,7 +1515,7 @@ Keep these CI artifacts outside the runner before their 14-day retention expires
 | Evidence | What it proves |
 | --- | --- |
 | `core-release-evidence-<sha>-<attempt>` | Repository identity, migrations, lint, types, tests, default production build |
-| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0035; failed DDL and ledger rollback; retry; idempotency; legacy rows, endpoint revision defaults, invalidated legacy proofs, notification inbox indexes and new structured notifications |
+| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0038; failed DDL and ledger rollback; retry; idempotency; legacy rows, endpoint revision defaults, invalidated legacy proofs, notification inbox indexes and new structured notifications |
 | `backup-restore-<sha>-<attempt>` | Destroyed synthetic source restored into new owned volumes; schema, migration ledger, author, resource, trusted build, entitlement, notification and uploads preserved |
 
 Require `status: "PASS"`, the intended `sha`, and all verification/cleanup flags
@@ -1829,13 +1829,13 @@ SQL projects author username/display name only, plus allowed submitted field
 names normalized from audit JSON. It does not return the entire details object,
 address/user-agent, passwords, proof data or field values. Legacy malformed
 `details.fields` values become an empty list. This is recorded listing activity,
-not a complete ownership/verification history or before/after diff.
+not a complete ownership-transfer history or before/after diff. New proof and verification decisions are recorded as server-target events.
 
 Migration `0037_server_activity_lookup_index` adds
 `audit_events_target_created_id_idx` on
 `target_type, target_id, created_at DESC, id DESC`. It is an ordinary transactional
 index creation; allow for its write-lock/build time on a populated production
-audit table. The release-upgrade fixture now targets 0037, preserves an existing
+audit table. The release-upgrade fixture now targets 0038, preserves an existing
 server audit row through failure/retry/rerun, and verifies the exact index order.
 
 Unit SQL, URL-input and rendered RU/EN tests cover access boundaries, bounded
@@ -1846,3 +1846,56 @@ access, orphaned membership and revocation. Run it with the database test projec
 after applying migrations. Real PostgreSQL, migration upgrade, query plans and
 browser/production-build acceptance remain pending until a working target runner
 is available.
+
+
+## Organization server claim lifecycle (migration 0038)
+
+A server claim now records its organization scope as well as its endpoint
+revision when the challenge is issued. The scope snapshot is deliberately not a
+foreign key: deleting an organization must not turn its old proof into valid
+personal ownership proof. A proof with a different current organization, an
+unrecorded legacy scope or a changed address revision cannot be consumed or
+approved. Existing verified badges are not rewritten by this migration.
+
+Challenge issuance, proof consumption and organization approval re-read current
+organization ownership, platform administrator role or owner/admin/`manage_servers`
+membership inside their write transaction. The server is locked for update;
+organization, role and applicable membership are locked for share until the
+transaction ends. Service-layer pre-checks alone do not authorize these writes.
+An approved organization server keeps `organizationId` and clears any legacy
+`ownerId`; its manager does not become a personal owner. Personal claims keep
+assigning the requester, and cannot override another person's ownership.
+
+The management page reads the latest pending/approved/rejected request in a
+read-only repeatable-read snapshot with current management authorization. Its
+projection contains status, submitted/reviewed times, whether the viewer is the
+requester and whether the proof still matches the address/organization. It does
+not expose review notes, proof URLs, tokens, raw request IDs or organization
+snapshots. A pending request suppresses duplicate challenge controls for every
+manager. A confirmed proof refreshes the management status immediately. Moderators may reject a stale/revoked request, allowing a current manager
+to issue fresh proof. Public organization cards do not offer personal claim controls.
+
+Proof submission and approval/rejection insert server-target audit events in the
+same transaction as their authoritative state changes. Private activity includes
+these new events and the public reviewer name when available, without notes or
+proof data. Existing verification-target audit events and the durable resolution
+inbox remain. A failed approval rolls back the decision, badge, audit and inbox;
+repeated resolution emits no duplicate effects. Claim UI errors use RU/EN code
+mappings; unknown response text is omitted. Proof POST uses the existing JSON
+media-type, 32 KiB streamed limit and body-read deadline.
+
+Apply `0038_server_claim_scope_and_status` before using the new code. All older
+challenge rows deliberately have `claim_scope_recorded=false`: an old pending
+request must be rejected before fresh proof is issued. Do not backfill scopes
+from today's server ownership. The target/time/ID status index uses ordinary
+transactional creation. The upgrade rehearsal checks the index and new constraint,
+legacy false/null defaults, row preservation, rollback, retry and rerun.
+
+Focused unit checks cover write ordering, live grants, both ownership types,
+legacy/transferred proof, bounded private SQL, RU/EN status and error rendering,
+HTTP boundaries and public/private controls. The seven PostgreSQL scenarios in
+`tests/server-claim-organization.integration.test.ts` cover persisted organizational
+ownership, revoked permissions, rollback/inbox/audit effects, organization transfer
+and deletion, and legacy proof rejection. They require a migrated disposable DB;
+real PostgreSQL, upgrade rehearsal, browser and production-build acceptance remain
+pending until a working runner is available.

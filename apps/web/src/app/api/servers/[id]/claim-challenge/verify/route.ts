@@ -2,6 +2,7 @@ import { after, type NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { z } from "zod";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -75,9 +76,8 @@ export async function POST(
       );
     }
 
-    const parsed = verifySchema.safeParse(
-      await request.json().catch(() => null),
-    );
+    requireServerJsonContentType(request);
+    const parsed = verifySchema.safeParse(await readBoundedJson(request));
     if (!parsed.success) {
       return json(
         context,

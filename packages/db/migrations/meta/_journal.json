@@ -267,6 +267,13 @@
       "when": 1791619200000,
       "tag": "0037_server_activity_lookup_index",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1791622800000,
+      "tag": "0038_server_claim_scope_and_status",
+      "breakpoints": true
     }
   ]
 }

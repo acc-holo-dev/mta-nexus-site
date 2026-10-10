@@ -70,7 +70,7 @@ export default async function ServerActivityPage({
         <ol className="nexus-panel divide-y divide-border">
           {activity.events.map((event) => {
             const actor =
-              event.actorType !== "user"
+              event.actorType !== "user" && event.actorType !== "admin"
                 ? copy.system
                 : event.actorId === user.id
                   ? copy.you

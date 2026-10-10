@@ -14,7 +14,7 @@ const en = {
   title: "Server activity",
   open: "View activity",
   description:
-    "Registration, listing edits and issued control challenges. Only recorded events are shown.",
+    "Registration, listing edits, control proofs and verification decisions. Only recorded events are shown.",
   private: "This history is available to current server managers and platform administrators.",
   back: "Back to server management",
   empty: "No recorded activity yet.",
@@ -31,6 +31,9 @@ const en = {
     "server.created": "Server registered",
     "server.updated": "Listing updated",
     "server.claim_challenge_issued": "Control challenge issued",
+    "server.control_proof_recorded": "Control proof submitted",
+    "server.verification_approved": "Verification approved",
+    "server.verification_rejected": "Verification rejected",
   } satisfies Record<ServerActivityAction, string>,
   fieldNames: {
     name: "Name",
@@ -56,7 +59,7 @@ const ru: typeof en = {
   title: "История сервера",
   open: "Открыть историю",
   description:
-    "Регистрация, правки карточки и выданные проверки контроля. Показаны только сохранённые события.",
+    "Регистрация, правки карточки, доказательства контроля и решения по подтверждению. Показаны только сохранённые события.",
   private: "Эта история доступна текущим управляющим сервера и администраторам платформы.",
   back: "Назад к управлению сервером",
   empty: "Сохранённых событий пока нет.",
@@ -73,6 +76,9 @@ const ru: typeof en = {
     "server.created": "Сервер зарегистрирован",
     "server.updated": "Карточка обновлена",
     "server.claim_challenge_issued": "Выдана проверка контроля",
+    "server.control_proof_recorded": "Отправлено доказательство контроля",
+    "server.verification_approved": "Подтверждение одобрено",
+    "server.verification_rejected": "Подтверждение отклонено",
   },
   fieldNames: {
     name: "Название",

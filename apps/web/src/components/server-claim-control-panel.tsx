@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { KeyRound, LoaderCircle, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import {
@@ -8,23 +9,26 @@ import {
   parseIssuedServerClaimChallenge,
   type IssuedServerClaimChallenge,
 } from "../lib/server-claim-confirmation";
+import { serverClaimErrorMessage } from "../lib/server-claim-status-view";
 import { privateApiRequest } from "../lib/private-api-request";
 import { useNexusLocale } from "./locale-context";
 
 export function ServerClaimControlPanel({
   serverId,
   serverName,
+  refreshOnSuccess = false,
 }: {
   serverId: string;
   serverName: string;
+  refreshOnSuccess?: boolean;
 }) {
+  const router = useRouter();
   const { locale, dictionary } = useNexusLocale();
   const copy = dictionary.serverClaim;
-  const [challenge, setChallenge] =
-    useState<IssuedServerClaimChallenge | null>(null);
-  const [state, setState] = useState<
-    "idle" | "issuing" | "issued" | "verifying" | "verified"
-  >("idle");
+  const [challenge, setChallenge] = useState<IssuedServerClaimChallenge | null>(null);
+  const [state, setState] = useState<"idle" | "issuing" | "issued" | "verifying" | "verified">(
+    "idle",
+  );
   const [error, setError] = useState<string | null>(null);
   const [requiresLogin, setRequiresLogin] = useState(false);
 
@@ -48,13 +52,9 @@ export function ServerClaimControlPanel({
         setState("idle");
         return;
       }
-      const issued = parseIssuedServerClaimChallenge(
-        response.status,
-        data,
-        serverId,
-      );
+      const issued = parseIssuedServerClaimChallenge(response.status, data, serverId);
       if (!issued) {
-        setError(data?.error || copy.createError);
+        setError(serverClaimErrorMessage(data, locale, copy.createError));
         setState("idle");
         return;
       }
@@ -74,9 +74,7 @@ export function ServerClaimControlPanel({
 
     try {
       const response = await fetch(
-        `/api/servers/${encodeURIComponent(
-          serverId,
-        )}/claim-challenge/verify`,
+        `/api/servers/${encodeURIComponent(serverId)}/claim-challenge/verify`,
         privateApiRequest({
           method: "POST",
           json: {
@@ -92,19 +90,14 @@ export function ServerClaimControlPanel({
         setState("issued");
         return;
       }
-      if (
-        !confirmsServerClaimVerification(
-          response.status,
-          data,
-          challenge.challengeId,
-        )
-      ) {
-        setError(data?.error || copy.proofRejected);
+      if (!confirmsServerClaimVerification(response.status, data, challenge.challengeId)) {
+        setError(serverClaimErrorMessage(data, locale, copy.proofRejected));
         setState("issued");
         return;
       }
 
       setState("verified");
+      if (refreshOnSuccess) router.refresh();
     } catch {
       setError(copy.verifyUnavailable);
       setState("issued");
@@ -118,34 +111,21 @@ export function ServerClaimControlPanel({
           <ShieldCheck className="h-4 w-4" aria-hidden="true" />
           <h2 className="text-sm font-bold">{copy.verifiedTitle}</h2>
         </div>
-        <p className="text-xs leading-relaxed text-muted">
-          {copy.verifiedDescription}
-        </p>
+        <p className="text-xs leading-relaxed text-muted">{copy.verifiedDescription}</p>
         <p className="text-[10px] text-faint">{copy.moderationSeparate}</p>
       </section>
     );
   }
 
   return (
-    <section
-      className="nexus-panel space-y-4 p-5"
-      aria-labelledby="server-control-proof-heading"
-    >
+    <section className="nexus-panel space-y-4 p-5" aria-labelledby="server-control-proof-heading">
       <div className="flex items-start gap-3">
-        <KeyRound
-          className="mt-0.5 h-4 w-4 shrink-0 text-accent"
-          aria-hidden="true"
-        />
+        <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
         <div>
-          <h2
-            id="server-control-proof-heading"
-            className="text-sm font-bold text-primary"
-          >
+          <h2 id="server-control-proof-heading" className="text-sm font-bold text-primary">
             {copy.title}
           </h2>
-          <p className="mt-1 text-xs leading-relaxed text-muted">
-            {copy.description}
-          </p>
+          <p className="mt-1 text-xs leading-relaxed text-muted">{copy.description}</p>
         </div>
       </div>
 
@@ -164,9 +144,7 @@ export function ServerClaimControlPanel({
       ) : (
         <div className="space-y-3">
           <div className="rounded-lg border border-[color:var(--nexus-accent)]/20 bg-accent-soft p-3">
-            <div className="font-label uppercase text-muted">
-              {copy.tokenLabel}
-            </div>
+            <div className="font-label uppercase text-muted">{copy.tokenLabel}</div>
             <code className="mt-2 block select-all break-all font-mono text-sm font-bold text-accent">
               {challenge.token}
             </code>
@@ -182,10 +160,8 @@ export function ServerClaimControlPanel({
 
           <p className="text-[10px] text-faint">
             {copy.expires}{" "}
-            {new Date(challenge.expiresAt).toLocaleString(
-              locale === "ru" ? "ru-RU" : "en-US",
-            )}
-            . {copy.tokenEphemeral}
+            {new Date(challenge.expiresAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US")}.{" "}
+            {copy.tokenEphemeral}
           </p>
 
           <div className="flex flex-wrap gap-2">
@@ -218,21 +194,20 @@ export function ServerClaimControlPanel({
 
       {requiresLogin && (
         <p className="text-xs text-secondary">
-          <Link
-            href="/auth/login"
-            className="font-semibold text-accent hover:underline"
-          >
+          <Link href="/auth/login" className="font-semibold text-accent hover:underline">
             {copy.signIn}
           </Link>{" "}
           {copy.signInHint}
         </p>
       )}
 
-      {error && <p role="alert" className="text-xs text-warning">{error}</p>}
+      {error && (
+        <p role="alert" className="text-xs text-warning">
+          {error}
+        </p>
+      )}
 
-      <p className="text-[10px] leading-relaxed text-faint">
-        {copy.exactEndpoint}
-      </p>
+      <p className="text-[10px] leading-relaxed text-faint">{copy.exactEndpoint}</p>
     </section>
   );
 }

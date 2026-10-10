@@ -44,15 +44,12 @@ vi.mock("../apps/web/src/lib/services/server-service", () => ({
   },
 }));
 
-vi.mock(
-  "../apps/web/src/lib/services/mta-master-directory-service",
-  () => ({
-    matchesMtaEndpoint: mocks.matchesEndpoint,
-    mtaMasterDirectoryService: {
-      getDirectory: vi.fn(async () => state.directory),
-    },
-  }),
-);
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+  matchesMtaEndpoint: mocks.matchesEndpoint,
+  mtaMasterDirectoryService: {
+    getDirectory: vi.fn(async () => state.directory),
+  },
+}));
 
 vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.dispatch,
@@ -139,9 +136,7 @@ describe("server claim service behavior", () => {
   });
 
   it("issues a bounded challenge only after current ownership checks", async () => {
-    await expect(
-      serverClaimService.issueChallenge("srv_1", requester),
-    ).resolves.toMatchObject({
+    await expect(serverClaimService.issueChallenge("srv_1", requester)).resolves.toMatchObject({
       challengeId: "scc_1",
       token,
       server: {
@@ -164,33 +159,37 @@ describe("server claim service behavior", () => {
       token,
       expiresAt: new Date("2026-10-08T00:10:00.000Z"),
       server: {
-        id: "srv_1", name: "Updated Network Endpoint",
-        ipAddress: "198.51.100.100", port: 22100,
+        id: "srv_1",
+        name: "Updated Network Endpoint",
+        ipAddress: "198.51.100.100",
+        port: 22100,
       },
     });
     const challenge = await serverClaimService.issueChallenge("srv_1", requester);
     expect(challenge.server).toEqual({
-      id: "srv_1", name: "Updated Network Endpoint",
-      ipAddress: "198.51.100.100", port: 22100,
+      id: "srv_1",
+      name: "Updated Network Endpoint",
+      ipAddress: "198.51.100.100",
+      port: 22100,
     });
   });
 
   it("rejects verified, foreign-owned and unauthorized organization servers", async () => {
     state.server = server({ isVerified: true });
-    await expect(
-      serverClaimService.issueChallenge("srv_1", requester),
-    ).rejects.toMatchObject({ statusCode: 409 });
+    await expect(serverClaimService.issueChallenge("srv_1", requester)).rejects.toMatchObject({
+      statusCode: 409,
+    });
 
     state.server = server({ ownerId: "usr_other" });
-    await expect(
-      serverClaimService.issueChallenge("srv_1", requester),
-    ).rejects.toMatchObject({ statusCode: 409 });
+    await expect(serverClaimService.issueChallenge("srv_1", requester)).rejects.toMatchObject({
+      statusCode: 409,
+    });
 
     state.server = server({ organizationId: "org_1" });
     state.canManage = false;
-    await expect(
-      serverClaimService.issueChallenge("srv_1", requester),
-    ).rejects.toMatchObject({ statusCode: 403 });
+    await expect(serverClaimService.issueChallenge("srv_1", requester)).rejects.toMatchObject({
+      statusCode: 403,
+    });
 
     expect(mocks.issue).not.toHaveBeenCalled();
   });
@@ -338,11 +337,19 @@ describe("server claim service behavior", () => {
       }),
     ]);
 
-    mocks.dispatch.mockRejectedValueOnce(
-      new Error("notification queue unavailable"),
+    mocks.dispatch.mockRejectedValueOnce(new Error("notification queue unavailable"));
+    await expect(notifyModeratorsOfServerClaim("Nexus Racing")).resolves.toBeUndefined();
+  });
+
+  it("uses organization management authority even when a legacy personal owner is still recorded", async () => {
+    state.server = server({ organizationId: "org_1", ownerId: "usr_legacy" });
+    state.canManage = true;
+    await expect(serverClaimService.issueChallenge("srv_1", requester)).resolves.toHaveProperty(
+      "challengeId",
     );
-    await expect(
-      notifyModeratorsOfServerClaim("Nexus Racing"),
-    ).resolves.toBeUndefined();
+    state.canManage = false;
+    await expect(serverClaimService.issueChallenge("srv_1", requester)).rejects.toMatchObject({
+      statusCode: 403,
+    });
   });
 });

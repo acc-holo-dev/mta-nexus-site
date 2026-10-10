@@ -27,7 +27,7 @@ const state = vi.hoisted(() => ({
     visibility: "public",
     isVerified: false,
     ownerId: null as string | null,
-    organizationId: null,
+    organizationId: null as string | null,
     gameplayTags: [],
     mediaUrls: [],
     maxPlayers: 64,
@@ -278,5 +278,17 @@ describe("server detail behavior", () => {
     expect(mocks.directory).not.toHaveBeenCalled();
     expect(mocks.history).not.toHaveBeenCalled();
     expect(state.notFoundCalls).toBe(1);
+  });
+
+  it("does not offer public personal ownership claims for an organization server", async () => {
+    state.server = { ...state.server, organizationId: "org_1", ownerId: null, isVerified: false };
+    mocks.getServer.mockResolvedValue(state.server);
+    mocks.directory.mockResolvedValue({ isStale: false, servers: [] });
+    mocks.history.mockResolvedValue(null);
+    mocks.updates.mockResolvedValue([]);
+    const html = renderToStaticMarkup(
+      await ServerDetailPage({ params: Promise.resolve({ slug: state.server.slug }) }),
+    );
+    expect(html).not.toContain('data-testid="server-claim"');
   });
 });

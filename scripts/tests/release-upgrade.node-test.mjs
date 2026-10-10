@@ -97,7 +97,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0037_server_activity_lookup_index");
+  assert.equal(plan.targetTag, "0038_server_claim_scope_and_status");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -206,4 +206,16 @@ test("upgrade contract rejects reordered or missing required migrations", () => 
     () => releaseUpgradePlan(missing),
     /missing required migration/u,
   );
+});
+
+test("upgrade keeps legacy claim scopes unbound and indexes private claim status", () => {
+  const migration = readFileSync(new URL("0038_server_claim_scope_and_status.sql", migrationsUrl), "utf8");
+  assert.match(migration, /"claim_scope_recorded" boolean NOT NULL DEFAULT false/u);
+  assert.match(migration, /"claim_organization_id" text/u);
+  assert.doesNotMatch(migration, /REFERENCES|UPDATE|DELETE/u);
+  assert.match(migration, /CREATE INDEX "verification_requests_target_created_id_idx"/u);
+  const rehearsal = readFileSync(script, "utf8");
+  assert.match(rehearsal, /legacyProof\[0\]\.claim_scope_recorded, false/u);
+  assert.match(rehearsal, /legacyProof\[0\]\.claim_organization_id, null/u);
+  assert.match(rehearsal, /serverClaimScopePresent = true/u);
 });

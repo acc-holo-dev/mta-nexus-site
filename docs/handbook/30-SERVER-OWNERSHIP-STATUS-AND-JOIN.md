@@ -123,7 +123,7 @@ routes recheck current access whenever an edit is requested.
 
 Authorized management links to `/workspace/servers/:id/activity`. This RU/EN
 history shows existing server-target audit records for registration, listing
-updates and issued control challenges. Each entry includes a timestamp, public
+updates, issued control challenges, submitted proofs and moderation decisions. Each entry includes a timestamp, public
 author identity when available, and an allowlist of submitted listing field names.
 The field list describes a saved edit request, not a reconstructed before/after
 diff. Raw details, previous/current values, IP/user-agent, credentials and challenge
@@ -139,6 +139,35 @@ Pages show twenty entries and an earlier-activity link. The cursor names a
 server-scoped audit anchor; timestamp comparisons happen inside PostgreSQL so
 microsecond precision and equal-timestamp ID ordering survive pagination.
 A missing/deleted anchor returns an empty page with a latest-activity link.
-Only recorded server-target actions are shown. Verification-target moderator
-decisions, ownership transfers and historical before/after values are not part
-of this first listing-history surface.
+Only recorded server-target actions are shown. New moderation decisions are
+mirrored into this private timeline atomically. Older verification-target events,
+ownership transfers and historical before/after values are not reconstructed.
+
+
+## 16. Implemented organization proof lifecycle and private status
+
+Organization server claims use current organizational rights at issuance,
+proof consumption and moderator approval. The checks happen under transaction
+locks, including delegated `manage_servers` permissions and the current platform
+administrator role. A revoked grant cannot finish the next claim write.
+Approval preserves organization ownership and clears a legacy personal owner;
+it never assigns the organization's manager as a personal server owner.
+
+Every new challenge records the current organization (or an explicit personal
+scope). Changing/deleting that organization invalidates old proof independently
+of the address revision. Migration 0038 leaves older scope snapshots unrecorded,
+so old pending requests need rejection and a new proof. It does not infer proof
+scope from the current server row or remove existing verified badges.
+
+Authorized management shows pending/approved/rejected status, submission and
+review times, and an indication if the proof no longer matches the current
+address or organization. Notes, tokens and internal proof data are omitted.
+A pending request hides new challenge controls across the team; after rejection
+a current manager can try again. Moderation checks current rights before approval
+and can reject a stale request after the original requester has lost access.
+The public organization server page has no personal ownership claim controls.
+
+Proof and decision events appear in private server activity, with public reviewer
+identity when available. All authoritative changes, audit events and the decision
+inbox commit together. These implementation contracts have unit coverage; real
+PostgreSQL, migration, browser and production-build acceptance remain pending.

@@ -4,6 +4,7 @@ import {
   AppError,
   ConflictError,
   NotFoundError,
+  serverClaimMatchesOwnershipScope,
 } from "@nexus/domain";
 import { db } from "../client";
 import {
@@ -12,6 +13,8 @@ import {
   servers,
   verificationRequests,
 } from "../schema";
+
+import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
 
 const CHALLENGE_LIFETIME_MS = 10 * 60_000;
 const TOKEN_PATTERN = /^NXCLAIM-[A-F0-9]{24}$/u;
@@ -59,11 +62,15 @@ export class ServerClaimChallengeRepository {
         .limit(1);
 
       if (!server) throw new NotFoundError("Server", input.serverId);
-      if (server.ownerId && server.ownerId !== input.requesterId) {
+      if (!server.organizationId && server.ownerId && server.ownerId !== input.requesterId) {
         throw new ConflictError("This server is already claimed");
       }
       if (server.isVerified) {
         throw new ConflictError("This server is already verified");
+      }
+
+      if (server.organizationId) {
+        await assertOrganizationServerClaimAuthority(tx, server.organizationId, input.requesterId);
       }
 
       const [pendingVerification] = await tx
@@ -111,6 +118,8 @@ export class ServerClaimChallengeRepository {
         tokenDigest,
         proofVersion: 1,
         endpointRevision: server.endpointRevision,
+        claimScopeRecorded: true,
+        claimOrganizationId: server.organizationId,
         createdAt,
         expiresAt,
       });
@@ -193,11 +202,15 @@ export class ServerClaimChallengeRepository {
         .for("update")
         .limit(1);
       if (!server) throw new NotFoundError("Server", input.serverId);
-      if (server.ownerId && server.ownerId !== input.requesterId) {
+      if (!server.organizationId && server.ownerId && server.ownerId !== input.requesterId) {
         throw new ConflictError("This server is already claimed");
       }
       if (server.isVerified) {
         throw new ConflictError("This server is already verified");
+      }
+
+      if (server.organizationId) {
+        await assertOrganizationServerClaimAuthority(tx, server.organizationId, input.requesterId);
       }
 
       const [challenge] = await tx
@@ -220,6 +233,10 @@ export class ServerClaimChallengeRepository {
         challenge.revokedAt
       ) {
         throw invalidChallenge();
+      }
+
+      if (!serverClaimMatchesOwnershipScope(challenge, server)) {
+        throw new AppError("Server ownership scope changed; issue a new control challenge", 409, "SERVER_CLAIM_SCOPE_CHANGED");
       }
 
       // The lock serializes proof verification with concurrent endpoint edits.
@@ -332,6 +349,16 @@ export class ServerClaimChallengeRepository {
           challengeId: challenge.id,
           sourceFetchedAt: input.sourceFetchedAt.toISOString(),
         },
+        createdAt: consumedAt,
+      });
+
+      await tx.insert(auditEvents).values({
+        id: `${input.auditId}_server`,
+        actorId: input.requesterId,
+        actorType: "user",
+        action: "server.control_proof_recorded",
+        targetId: input.serverId,
+        targetType: "server",
         createdAt: consumedAt,
       });
 

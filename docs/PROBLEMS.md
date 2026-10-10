@@ -1110,3 +1110,35 @@ The combined Node.js 26 `pnpm check:code` passed with 1,933 unit tests,
 warnings; dependency-cruiser retains its TypeScript 7 compatibility warning
 while the configured SWC dependency analysis succeeds. These code results do
 not substitute for PostgreSQL, migration, browser or complete-build acceptance.
+
+
+### Organization server verification lifecycle — 2026-10-10
+
+Fixed organization approval assigning its manager as a personal owner and claim
+writes trusting an earlier service-layer membership read. The repository now
+locks and rechecks current organization ownership, administrator role or delegated
+server grant at issuance, consumption and approval. Organization approval retains
+the organization and clears legacy personal ownership; foreign personal ownership
+still blocks claims. Scope snapshots reject legacy, transferred and deleted-org
+proofs independently of endpoint revision.
+
+Migration 0038 adds explicit scope recording and a bounded target/time/ID status
+index. Legacy scope is false/null and cannot be inferred/backfilled; reject old
+pending requests before issuing new proof. The release-upgrade fixture targets
+0038 and checks rollback, preservation, legacy defaults, constraint and index.
+
+Authorized management now displays pending/approved/rejected requests without
+notes or proof data and hides duplicate challenge controls while pending. Public
+organization cards no longer offer personal claims. Proof/decision server audit
+events commit with state changes and appear in the private timeline; reviewer
+identity is displayed correctly. Claim errors are localized from stable codes,
+and proof JSON is bounded with the existing media-type/size/deadline reader.
+
+New unit scenarios and seven PostgreSQL fixtures cover both ownership types,
+revocation, transfers/deletion, legacy proof, rollback and private projection.
+Real PostgreSQL, upgrade rehearsal, browser and production build remain pending;
+Node.js 26 `pnpm check:code` passed: 2,008 unit tests, 248 tooling tests,
+TypeScript, Knip and configured SWC architecture checks (376 modules / 1,141
+dependencies). Lint retains 55 existing warnings; dependency-cruiser retains
+its TypeScript 7 compatibility warning. These checks do not replace acceptance
+on PostgreSQL or the production runtime.

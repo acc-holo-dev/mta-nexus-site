@@ -188,7 +188,7 @@ export default async function ServerDetailPage({
         </div>
       </div>
 
-      {!server.ownerId && !server.isVerified && (
+      {!server.organizationId && !server.ownerId && !server.isVerified && (
         <ServerClaimControlPanel
           serverId={server.id}
           serverName={server.name}

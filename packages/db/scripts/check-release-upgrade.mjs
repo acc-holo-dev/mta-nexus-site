@@ -48,6 +48,7 @@ const evidence = {
   notificationInboxIndexesPresent: false,
   userLibraryIndexesPresent: false,
   serverActivityIndexPresent: false,
+  serverClaimScopePresent: false,
   supportSchemaPresent: false,
   supportStaffQueueIndexPresent: false,
   supportStaffFilterIndexPresent: false,
@@ -112,7 +113,9 @@ try {
         ? "to_jsonb(t) - 'data'"
         : table === "builds"
           ? "to_jsonb(t) - 'quarantine_previous_status' - 'quarantine_reason' - 'quarantined_at' - 'quarantined_by'"
-          : table === "servers" || table === "server_claim_challenges"
+          : table === "server_claim_challenges"
+            ? "to_jsonb(t) - 'endpoint_revision' - 'claim_scope_recorded' - 'claim_organization_id'"
+            : table === "servers"
             ? "to_jsonb(t) - 'endpoint_revision'"
             : "to_jsonb(t)";
       result[table] = await client.unsafe(
@@ -134,12 +137,16 @@ try {
     WHERE table_schema = 'public' AND table_name = 'notifications' AND column_name = 'data'`;
   assert.equal(columns.length, 0, "Failed migration must roll back its DDL");
   const failedIndexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public'
-    AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx', 'notifications_recipient_created_id_idx', 'notifications_unread_recipient_created_id_idx', 'audit_events_target_created_id_idx')`;
+    AND indexname IN ('products_public_author_created_id_idx', 'products_public_org_created_id_idx', 'content_public_org_published_id_idx', 'notifications_recipient_created_id_idx', 'notifications_unread_recipient_created_id_idx', 'audit_events_target_created_id_idx', 'verification_requests_target_created_id_idx')`;
   assert.equal(failedIndexes.length, 0, "Failed migration must roll back its indexes");
   const failedQuarantineColumns = await client`SELECT column_name FROM information_schema.columns
     WHERE table_schema = 'public' AND table_name = 'builds'
       AND column_name IN ('quarantine_previous_status', 'quarantine_reason', 'quarantined_at', 'quarantined_by')`;
   assert.equal(failedQuarantineColumns.length, 0, "Failed migration must roll back quarantine columns");
+  const failedScopeColumns = await client`SELECT column_name FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'server_claim_challenges'
+      AND column_name IN ('claim_scope_recorded', 'claim_organization_id')`;
+  assert.equal(failedScopeColumns.length, 0, "Failed migration must roll back claim scope columns");
   evidence.failedMigrationRolledBack = true;
 
   evidence.phase = "upgrade";
@@ -233,9 +240,19 @@ try {
 
   const endpoint = await client`SELECT endpoint_revision FROM servers WHERE id = 'upgrade-server'`;
   assert.equal(endpoint[0].endpoint_revision, 0, "Existing servers start at revision zero");
-  const legacyProof = await client`SELECT endpoint_revision FROM server_claim_challenges
+  const legacyProof = await client`SELECT endpoint_revision, claim_scope_recorded, claim_organization_id FROM server_claim_challenges
     WHERE id = 'scc_11111111-1111-4111-8111-111111111111'`;
   assert.equal(legacyProof[0].endpoint_revision, null, "Legacy proof must not receive a current revision");
+  assert.equal(legacyProof[0].claim_scope_recorded, false, "Legacy scope must remain unbound");
+  assert.equal(legacyProof[0].claim_organization_id, null, "Do not infer a legacy organization scope");
+  const claimIndexes = await client`SELECT indexdef FROM pg_indexes WHERE schemaname = 'public'
+    AND indexname = 'verification_requests_target_created_id_idx'`;
+  assert.equal(claimIndexes.length, 1);
+  assert.match(claimIndexes[0].indexdef, /target_type, target_id, created_at DESC, id DESC/u);
+  const scopeConstraints = await client`SELECT conname FROM pg_constraint
+    WHERE conrelid = 'public.server_claim_challenges'::regclass AND conname = 'server_claim_scope_recorded_check'`;
+  assert.equal(scopeConstraints.length, 1);
+  evidence.serverClaimScopePresent = true;
   const revisionConstraints = await client`SELECT conname FROM pg_constraint
     WHERE conrelid IN ('public.servers'::regclass, 'public.server_claim_challenges'::regclass)
       AND conname IN ('servers_endpoint_revision_nonnegative', 'server_claim_endpoint_revision_nonnegative')

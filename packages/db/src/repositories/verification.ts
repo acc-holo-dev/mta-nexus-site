@@ -11,8 +11,10 @@ import {
   serverClaimChallenges,
 } from "../schema";
 import { generateId } from "@nexus/security";
-import { AppError, ConflictError } from "@nexus/domain";
+import { AppError, ConflictError, serverClaimMatchesOwnershipScope } from "@nexus/domain";
 import type { AuditEvent } from "@nexus/domain";
+
+import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
 
 const VALID_TARGET_TYPES = ["user", "developer", "organization", "server"] as const;
 export type VerificationTargetType = (typeof VALID_TARGET_TYPES)[number];
@@ -229,10 +231,19 @@ export class VerificationRepository {
             );
           }
         } else if (request.targetType === "server") {
+          const [server] = await tx.select({
+            ownerId: servers.ownerId, organizationId: servers.organizationId,
+            endpointRevision: servers.endpointRevision, isVerified: servers.isVerified,
+          }).from(servers).where(eq(servers.id, request.targetId)).for("update").limit(1);
+          if (!server || server.isVerified || (!server.organizationId && server.ownerId && server.ownerId !== request.requesterId)) {
+            throw new ConflictError("Server is missing, verified or already owned");
+          }
           const [proof] = await tx
             .select({
               id: serverClaimChallenges.id,
               endpointRevision: serverClaimChallenges.endpointRevision,
+              claimScopeRecorded: serverClaimChallenges.claimScopeRecorded,
+              claimOrganizationId: serverClaimChallenges.claimOrganizationId,
             })
             .from(serverClaimChallenges)
             .where(
@@ -259,13 +270,20 @@ export class VerificationRepository {
             );
           }
 
-          // A server claim is finalized only by moderation. The conditional
-          // ownership update prevents approving a stale request after another
-          // claimant has already become the owner.
+          if (!serverClaimMatchesOwnershipScope(proof, server)) {
+            throw new AppError("Server ownership scope changed; new control proof required", 409, "SERVER_CLAIM_SCOPE_CHANGED");
+          }
+          if (server.endpointRevision !== proof.endpointRevision) {
+            throw new ConflictError("Server endpoint changed; new control proof required");
+          }
+          if (server.organizationId) {
+            await assertOrganizationServerClaimAuthority(tx, server.organizationId, request.requesterId, 409);
+          }
+          // Organization verification never turns its manager into a personal owner.
           const claimed = await tx
             .update(servers)
             .set({
-              ownerId: request.requesterId,
+              ownerId: server.organizationId ? null : request.requesterId,
               isVerified: true,
               updatedAt: new Date(),
             })
@@ -273,7 +291,7 @@ export class VerificationRepository {
               and(
                 eq(servers.id, request.targetId),
                 eq(servers.endpointRevision, proof.endpointRevision),
-                sql`${servers.ownerId} IS NULL OR ${servers.ownerId} = ${request.requesterId}`
+                eq(servers.isVerified, false)
               )
             )
             .returning({ id: servers.id });
@@ -284,6 +302,18 @@ export class VerificationRepository {
             );
           }
         }
+      }
+
+      if (request.targetType === "server") {
+        await tx.insert(auditEvents).values({
+          id: `aud_server_verification_${request.id}`,
+          actorId: input.reviewerId,
+          actorType: "admin",
+          action: input.decision === "approved" ? "server.verification_approved" : "server.verification_rejected",
+          targetId: request.targetId,
+          targetType: "server",
+          createdAt: new Date(),
+        });
       }
 
       if (audit) {

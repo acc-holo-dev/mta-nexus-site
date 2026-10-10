@@ -131,3 +131,13 @@ it("propagates a failed read instead of inventing an empty timeline", async () =
   state.page.mockRejectedValue(new Error("Database unavailable"));
   await expect(render()).rejects.toThrow();
 });
+
+it("shows a moderation decision with its public reviewer identity", async () => {
+  state.page.mockResolvedValue({ server: { id: "server", name: "Server" }, nextCursor: null,
+    events: [{ ...event, action: "server.verification_approved", actorType: "admin", actorDisplayName: "Moderator" }],
+  });
+  const html = await render();
+  expect(html).toContain("Verification approved");
+  expect(html).toContain("Moderator (@editor)");
+  expect(html).not.toContain("By: System");
+});

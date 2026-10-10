@@ -27,7 +27,7 @@ async function assertRequesterCanChallenge(
     throw new ConflictError("This server is already verified");
   }
 
-  if (server.ownerId && server.ownerId !== requester.id) {
+  if (!server.organizationId && server.ownerId && server.ownerId !== requester.id) {
     throw new ConflictError("This server is already claimed");
   }
 

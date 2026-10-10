@@ -837,6 +837,7 @@ export const verificationRequests = pgTable("verification_requests", {
 }, (table) => [
   index("verification_status_created_id_idx").on(table.status, table.createdAt, table.id),
   index("verification_status_resolved_id_idx").on(table.status, table.resolvedAt, table.id),
+  index("verification_requests_target_created_id_idx").on(table.targetType, table.targetId, table.createdAt.desc(), table.id.desc()),
 ]);
 
 
@@ -854,6 +855,9 @@ export const serverClaimChallenges = pgTable(
     proofVersion: integer("proof_version").notNull().default(1),
     // Legacy proof rows are NULL, and cannot be used after migration 0034.
     endpointRevision: integer("endpoint_revision"),
+    // Snapshot, intentionally without an FK: organization deletion must invalidate old proof.
+    claimScopeRecorded: boolean("claim_scope_recorded").notNull().default(false),
+    claimOrganizationId: text("claim_organization_id"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     consumedAt: timestamp("consumed_at", { withTimezone: true }),
@@ -882,6 +886,10 @@ export const serverClaimChallenges = pgTable(
     check(
       "server_claim_endpoint_revision_nonnegative",
       sql`${table.endpointRevision} is null or ${table.endpointRevision} >= 0`,
+    ),
+    check(
+      "server_claim_scope_recorded_check",
+      sql`${table.claimScopeRecorded} or ${table.claimOrganizationId} is null`,
     ),
     check(
       "server_claim_challenge_version_check",

@@ -8,3 +8,5 @@ export * from "./mta-endpoint";
 export * from "./mta-endpoint-audit";
 export * from "./organization-server-permissions";
 export * from "./server-activity";
+
+export * from "./server-claim-scope";
