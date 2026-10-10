@@ -1029,3 +1029,20 @@ Local isolated strict TypeScript compilation and Node.js 22 assertions passed
 for both reporting modes and a 3001-row synthetic dataset. Full Vitest,
 Node.js 26, browser and PostgreSQL integration remain unverified until CI-001
 runner allocation is repaired.
+
+### P1. IPv6 canonicalization fixture and malformed IPv6 dotted variants
+
+Fixed a regression in `tests/mta-address-normalization.test.ts`:
+WHATWG URL hostname canonicalization returns bracketed IPv6
+(`fe80::ABCD` becomes `[fe80::abcd]`), not an unbracketed host.
+The canonicalizer now rejects terminal DNS dots on IPv6 literals
+(including `[::1].`), while continuing to support the DNS-only trailing
+dot convention. Added focused audit regressions for expanded IPv6
+spellings and ownership conflicts.
+
+A dependency-free Node.js test file
+(`scripts/tests/mta-endpoint.node-test.mjs`) is automatically discovered
+by the existing tooling test runner. The isolated Node.js 22 run with
+`--experimental-strip-types` and a strict TypeScript check passed;
+Node.js 26 and full Vitest/PostgreSQL acceptance remain outstanding.
+CI-001 is still a runner-allocation issue, not a test-result verdict.

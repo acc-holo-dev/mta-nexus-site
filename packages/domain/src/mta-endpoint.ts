@@ -6,6 +6,7 @@ function canonicalMtaHost(input: string): string | null {
   const trimmed = input.trim().toLowerCase();
   // A single terminal DNS dot is allowed; repeated dots are malformed.
   if (trimmed.endsWith("..")) return null;
+  const endsInDnsDot = trimmed.endsWith(".");
   const value = trimmed.replace(/\.$/u, "");
   if (
     value.length === 0 ||
@@ -16,6 +17,8 @@ function canonicalMtaHost(input: string): string | null {
   }
 
   if (value.includes(":") || value.includes("[") || value.includes("]")) {
+    // A terminal dot is valid for a DNS name, not an IPv6 literal.
+    if (endsInDnsDot) return null;
     const bracketed = value.startsWith("[") && value.endsWith("]")
       ? value
       : value.includes("[") || value.includes("]")

@@ -40,6 +40,39 @@ describe("read-only MTA endpoint audit", () => {
       .toEqual(["s6", "s7"]);
   });
 
+  it("detects expanded IPv6 aliases within one game port without changing owners", () => {
+    const audit = new ServerEndpointAuditCollector();
+    audit.add({
+      id: "server_owner_a", ipAddress: "FE80:0:0:0:0:0:0:ABCD",
+      port: 22003, ownerId: "owner_a", isVerified: true,
+    });
+    audit.add({
+      id: "server_owner_b", ipAddress: "fe80::abcd",
+      port: 22003, ownerId: "owner_b",
+    });
+    audit.add({
+      id: "server_owner_c", ipAddress: "[fe80::abcd]",
+      port: 22004, ownerId: "owner_c",
+    });
+    const result = audit.result();
+    expect(result.summary).toMatchObject({
+      scanned: 3,
+      nonCanonicalRows: 2,
+      collisionGroups: 1,
+      collidingRows: 2,
+      collisionGroupsWithOwnershipConflict: 1,
+      collisionGroupsWithVerifiedServers: 1,
+    });
+    expect(result.details.collisions).toEqual([{
+      canonicalAddress: "[fe80::abcd]",
+      port: 22003,
+      serverIds: ["server_owner_a", "server_owner_b"],
+      ownerScopes: ["user:owner_a", "user:owner_b"],
+      verifiedServerIds: ["server_owner_a"],
+      ownershipConflict: true,
+    }]);
+  });
+
   it("keeps distinct ports separate and reports a clean canonical collection", () => {
     const audit = new ServerEndpointAuditCollector();
     audit.add({ id: "a", ipAddress: "play.example.com", port: 22003 });

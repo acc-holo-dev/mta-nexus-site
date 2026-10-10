@@ -8,15 +8,27 @@ describe("MTA address canonicalization across directory, forms and persistence",
     ["  PLAY.Example.COM.  ", "play.example.com"],
     ["198.51.100.7", "198.51.100.7"],
     ["[2001:DB8::1]", "[2001:db8::1]"],
-    ["fe80::ABCD", "fe80::abcd"],
+    ["fe80::ABCD", "[fe80::abcd]"],
     ["local-mta", "local-mta"],
     ["127.1", "127.0.0.1"],
     ["2001:0DB8:0000:0000:0000:0000:0000:0001", "[2001:db8::1]"],
     ["bücher.de", "xn--bcher-kva.de"],
+    ["::ffff:192.0.2.1", "[::ffff:c000:201]"],
+    ["example.com.", "example.com"],
   ])("normalizes %s into %s idempotently", (input, expected) => {
     expect(normalizeMtaAddress(input)).toBe(expected);
     expect(normalizeMtaAddress(expected)).toBe(expected);
     expect(isValidMtaAddress(expected)).toBe(true);
+  });
+
+  it("treats raw and bracketed IPv6 as one server endpoint", () => {
+    const raw = normalizeMtaAddress("fe80::ABCD");
+    const bracketed = normalizeMtaAddress("[fe80::abcd]");
+    const expanded = normalizeMtaAddress("fe80:0:0:0:0:0:0:abcd");
+    expect(raw).toBe("[fe80::abcd]");
+    expect(raw).toBe(bracketed);
+    expect(raw).toBe(expanded);
+    expect(isValidMtaAddress(raw)).toBe(true);
   });
 
   it("canonicalizes both registration and partial edits", () => {
@@ -46,6 +58,10 @@ describe("MTA address canonicalization across directory, forms and persistence",
     "play.example..",
     "127.0.0.999",
     "2001:::zzzz",
+    "fe80::abcd.",
+    "[fe80::abcd].",
+    "::1.",
+    "[::1].",
     "[::1]:22003",
     "bad_name.example",
     "host.example:22003",
