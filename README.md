@@ -1,5 +1,12 @@
 # MTA NEXUS
 
+The buyer library now supports private resource collections: create/rename,
+archive/restore, add acquired resources, remove references after lost access,
+search, paginated views and immutable command history/private JSON. Migration
+`0067_library_collections` guards revisions, ownership, quotas and receipts.
+Collection membership never grants files: current access, safe publication and
+selected-version checks continue to apply to every download.
+
 Published zero-price plans can now be activated for a personal account or a managed
 organization. Migration `0066_account_subscriptions` enforces one current period,
 records immutable plan terms and fixed 7/30/90/365-day expiry, and protects terminal

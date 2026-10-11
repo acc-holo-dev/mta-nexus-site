@@ -219,7 +219,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0066_account_subscriptions");
+  assert.equal(plan.targetTag, "0067_library_collections");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -428,4 +428,18 @@ test("account subscriptions preserve free published terms and enforce one curren
   assert.match(migration, /BEFORE INSERT OR UPDATE OR DELETE ON subscription_receipts/u);
   assert.doesNotMatch(migration, /(?:INSERT INTO|UPDATE)\s+(?:payments|orders|licenses|entitlements|ledger_entries)\b/iu);
   assert.match(readFileSync(script, "utf8"), /accountSubscriptionsSchemaPresent = true/u);
+});
+
+
+test("library collections retain private references and immutable command history without granting access", () => {
+  const migration = readFileSync(new URL("0067_library_collections.sql", migrationsUrl), "utf8");
+  for (const table of ["library_collections", "library_collection_items", "library_collection_receipts"]) assert.match(migration, new RegExp(`CREATE TABLE ${table}`));
+  assert.match(migration, /UNIQUE INDEX library_collection_receipts_user_request_idx/u);
+  assert.match(migration, /BEFORE INSERT OR UPDATE OR DELETE ON library_collection_receipts/u);
+  assert.match(migration, /BEFORE INSERT OR UPDATE OR DELETE ON library_collection_items/u);
+  assert.match(migration, /NEW\.revision<>OLD\.revision\+1/u);
+  assert.match(migration, /Archive collections instead of deleting history/u);
+  assert.match(migration, /FOR NO KEY UPDATE/u);
+  assert.doesNotMatch(migration, /INSERT INTO (entitlements|licenses|payments|ledger_entries)/iu);
+  assert.match(readFileSync(script, "utf8"), /libraryCollectionsSchemaPresent = true/u);
 });

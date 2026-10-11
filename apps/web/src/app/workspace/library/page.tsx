@@ -1,3 +1,4 @@
+import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
 import { resourceDeliveriesCopy } from "../../../lib/resource-deliveries-i18n";
 import { resourceReleaseWatchesCopy } from "../../../lib/resource-release-watches-i18n";
@@ -69,6 +70,7 @@ export default async function ResourceLibraryPage({
         <p className="max-w-2xl text-sm text-secondary">{copy.subtitle}</p>
       </header>
 
+      <Link href="/workspace/library/collections" className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{libraryCollectionsCopy(locale).title}</Link>
       <Link href="/workspace/cart" className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceCommerceCopy(locale).openCart}</Link>
       <Link href="/workspace/acquisitions" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceActivityCopy(locale).history}</Link>
       <Link href="/workspace/library/updates" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceReleaseControlCopy(locale).updates}</Link>

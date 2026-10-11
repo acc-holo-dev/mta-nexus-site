@@ -470,6 +470,13 @@
       "when": 1791748500000,
       "tag": "0066_account_subscriptions",
       "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1791753000000,
+      "tag": "0067_library_collections",
+      "breakpoints": true
     }
   ]
 }

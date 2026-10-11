@@ -15,6 +15,7 @@ export * from "./mta-version";
 export * from "./resource-management";
 export * from "./resource-commerce";
 export * from "./license-control";
+export * from "./library-collections";
 
 // Shared by input validation and rendering of legacy public links.
 export function safeExternalWebUrl(value: unknown): string | undefined {

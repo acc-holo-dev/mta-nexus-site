@@ -1,5 +1,22 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Private buyer resource collections — 2026-10-11
+
+Migration `0067` adds personal collections, independent resource references and
+immutable command receipts. Live account checks, owner-scoped reads, owner locks,
+optimistic revisions, exact UUID retries and atomic audits cover create/rename,
+archive/restore/add/remove. Quotas: 30 collections including archives, 200 references
+and 5000 commands per collection; all list/history/candidate views use 20-row pages.
+RU/EN screens add private search and JSON inspection. Lost rights preserve only the
+owner's reference; resource titles/links require effective access and safe publication.
+Download buttons retain existing entitlement checks and exact pinned build selection;
+collections change no payments, licenses, grants, version preferences or balances.
+
+Local focused checks and Next compile are recorded in the Agent A report. Five new
+PostgreSQL fixtures cover concurrent retries/revisions, revoked access, guard
+constraints and rollback on audit failure. Actual migration/locking/trigger acceptance,
+browser interaction and the pinned Node 26 runtime remain unverified here.
+
 ### Real free-plan subscription periods — 2026-10-11
 
 Migration `0066` allows activation only from a current published zero-price plan.

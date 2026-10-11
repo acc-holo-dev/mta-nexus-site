@@ -22,6 +22,7 @@ import {
   type OrderCaseKind, type OrderCaseReviewStatus, type OrderCaseEvidence,
 } from "@nexus/domain";
 import { sql } from "drizzle-orm";
+import type { LibraryCollectionCommand, LibraryCollectionSnapshot, LibraryCollectionStatus } from "@nexus/domain";
 import {
   pgTable,
   text,
@@ -1425,4 +1426,48 @@ export const storageMaintenanceObjects = pgTable("storage_maintenance_objects", 
     (${table.state} <> 'observed' AND ${table.retiredAt} IS NOT NULL AND isfinite(${table.retiredAt}) AND
       ((${table.leaseToken} IS NULL AND ${table.leaseExpiresAt} IS NULL) OR
        (${table.state} = 'retired' AND ${table.leaseToken} ~ '^sml_[a-f0-9]{24}$' AND ${table.leaseExpiresAt} IS NOT NULL AND isfinite(${table.leaseExpiresAt})))),false)`),
+]);
+
+// Private organization of references. Collection membership never grants access.
+export const libraryCollections = pgTable("library_collections", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  status: text("status").$type<LibraryCollectionStatus>().notNull().default("active"),
+  revision: integer("revision").notNull().default(1),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  unique("library_collections_id_user_unique").on(table.id, table.userId),
+  index("library_collections_user_status_time_idx").on(table.userId, table.status, table.updatedAt.desc(), table.id),
+  check("library_collections_name_check", sql`length(${table.name}) BETWEEN 1 AND 80 AND ${table.name} = btrim(${table.name}) AND ${table.name} !~ '[[:cntrl:]]'`),
+  check("library_collections_state_check", sql`${table.status} IN ('active','archived') AND ${table.revision} > 0`),
+  check("library_collections_time_check", sql`isfinite(${table.createdAt}) AND isfinite(${table.updatedAt}) AND ${table.updatedAt} >= ${table.createdAt}`),
+]);
+export const libraryCollectionItems = pgTable("library_collection_items", {
+  collectionId: text("collection_id").notNull().references(() => libraryCollections.id, { onDelete: "cascade" }),
+  productId: text("product_id").notNull(),
+  addedAt: timestamp("added_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  primaryKey({ columns: [table.collectionId, table.productId] }),
+  index("library_collection_items_time_idx").on(table.collectionId, table.addedAt.desc(), table.productId),
+  check("library_collection_items_product_check", sql`${table.productId} ~ '^[A-Za-z0-9_-]{1,160}$'`),
+  check("library_collection_items_time_check", sql`isfinite(${table.addedAt})`),
+]);
+export const libraryCollectionReceipts = pgTable("library_collection_receipts", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  requestId: uuid("request_id").notNull(),
+  collectionId: text("collection_id").notNull(),
+  commandDigest: text("command_digest").notNull(),
+  command: jsonb("command").$type<LibraryCollectionCommand>().notNull(),
+  snapshot: jsonb("snapshot").$type<LibraryCollectionSnapshot>().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  uniqueIndex("library_collection_receipts_user_request_idx").on(table.userId, table.requestId),
+  foreignKey({ columns: [table.collectionId, table.userId], foreignColumns: [libraryCollections.id, libraryCollections.userId] }).onDelete("cascade"),
+  index("library_collection_receipts_history_idx").on(table.collectionId, table.createdAt.desc(), table.id.desc()),
+  check("library_collection_receipts_digest_check", sql`${table.commandDigest} ~ '^[a-f0-9]{64}$'`),
+  check("library_collection_receipts_payload_check", sql`coalesce(jsonb_typeof(${table.command}) = 'object' AND octet_length(${table.command}::text) <= 2048 AND jsonb_typeof(${table.snapshot}) = 'object' AND octet_length(${table.snapshot}::text) <= 2048, false)`),
+  check("library_collection_receipts_time_check", sql`isfinite(${table.createdAt})`),
 ]);

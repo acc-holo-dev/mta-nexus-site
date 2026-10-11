@@ -43,6 +43,7 @@ const evidence = {
   planReviewsSchemaPresent: false,
   resourceCopiesSchemaPresent: false,
   accountSubscriptionsSchemaPresent: false,
+  libraryCollectionsSchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: upgradePlan.baselineTag,
@@ -458,6 +459,13 @@ try {
   assert.equal(Number((await client`SELECT count(*) AS total FROM account_subscriptions`)[0].total),0);
   assert.equal(Number((await client`SELECT count(*) AS total FROM subscription_receipts`)[0].total),0);
   evidence.accountSubscriptionsSchemaPresent = true;
+  assert.equal((await client`SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename IN ('library_collections','library_collection_items','library_collection_receipts')`).length,3);
+  assert.equal((await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('library_collection_guard','library_collection_item_guard','library_collection_receipt_guard')`).length,3);
+  assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname='public' AND indexname IN ('library_collections_user_status_time_idx','library_collection_items_time_idx','library_collection_receipts_user_request_idx','library_collection_receipts_history_idx')`).length,4);
+  assert.equal(Number((await client`SELECT count(*) AS total FROM library_collections`)[0].total),0);
+  assert.equal(Number((await client`SELECT count(*) AS total FROM library_collection_items`)[0].total),0);
+  assert.equal(Number((await client`SELECT count(*) AS total FROM library_collection_receipts`)[0].total),0);
+  evidence.libraryCollectionsSchemaPresent = true;
   const receiptColumns = await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);
   assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'resource_cart_receipt_user_time_idx'`).length, 1);
