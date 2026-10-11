@@ -208,6 +208,10 @@ const copy = {
 } as const;
 export const getLicenseControlCopy = (locale: "ru" | "en") => copy[locale];
 export function licenseActionLabel(locale: "ru" | "en", action: string) {
+  if (action === "license.expired")
+    return locale === "ru" ? "Срок лицензии истёк" : "License expired";
+  if (action === "license.expiring")
+    return locale === "ru" ? "Предупреждение об истечении" : "Expiry warning";
   const actions: Readonly<Record<string, keyof typeof copy.en.actions>> = {
     "license.bound": "bind",
     "license.binding_refreshed": "refresh_binding",

@@ -8,6 +8,7 @@ import { licenseControlService } from "../../../lib/services/license-control-ser
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getLicenseControlCopy } from "../../../lib/license-control-i18n";
 import { getCommerceHistoryCopy } from "../../../lib/commerce-history-i18n";
+import { getLicenseMaintenanceCopy } from "../../../lib/license-maintenance-i18n";
 import {
   effectiveLicenseStatus,
   formatHistoryDate,
@@ -50,6 +51,11 @@ export default async function LicensesModerationPage({
       </Link>
       <h1 className="font-display text-primary">{copy.moderation}</h1>
       <p className="text-sm text-secondary">{copy.policy}</p>
+      {user.role === "admin" && (
+        <Link href="/admin/licenses/maintenance" className="text-sm text-accent underline">
+          {getLicenseMaintenanceCopy(locale).maintenance}
+        </Link>
+      )}
       <form className="flex flex-wrap gap-3">
         <input
           name="q"

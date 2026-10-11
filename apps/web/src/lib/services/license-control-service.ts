@@ -1,9 +1,19 @@
-import { licenseControlsRepository } from "@nexus/db";
+import {
+  licenseControlsRepository,
+  licenseRepository,
+  licenseMaintenanceRepository,
+} from "@nexus/db";
 import { can, createLicenseRuntimeToken, generateId } from "@nexus/security";
-import { ForbiddenError, type User } from "@nexus/domain";
+import { ForbiddenError, type User, type LicenseArchiveFilter } from "@nexus/domain";
 import type { LicenseOwnerCommand, LicenseModerationCommand } from "@nexus/validation";
 
 export const licenseControlService = {
+  archive: (user: User, query: LicenseArchiveFilter & { page: number }) =>
+    licenseRepository.pageUserHistory(user.id, query.page, query),
+  async maintenance(user: User, page = 1) {
+    if (user.role !== "admin") throw new ForbiddenError();
+    return licenseMaintenanceRepository.preview(user.id, page);
+  },
   detail: (user: User, licenseId: string) => licenseControlsRepository.detail(licenseId, user.id),
   servers: (user: User, licenseId: string, page = 1) =>
     licenseControlsRepository.eligibleServers(licenseId, user.id, page),

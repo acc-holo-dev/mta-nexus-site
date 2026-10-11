@@ -1,5 +1,28 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### License term processing, buyer archive and operator queue — 2026-10-11
+
+Migration `0054` adds immutable events keyed by the exact PostgreSQL term, without
+historical backfill. The bounded worker locks/skips one license per transaction,
+warns once within three days and records finite expiry with credential revocation,
+audit and preference-aware inbox notification. Push enqueue uses a savepoint;
+its failure preserves the inbox and expiry transaction. Unknown/non-finite terms,
+original expiry and financial/purchase/access records remain unchanged.
+
+DEV/production Compose includes the worker after app readiness, heartbeat/stall
+health checks and signal shutdown. Standalone execution requires explicit opt-in.
+RU/EN buyer filters, stable pagination and displayed-page CSV use private bounded
+projections; live administrators have a read-only pending/unknown-term queue.
+Runtime and file access recheck expiry independently of worker processing.
+
+TypeScript, 71 focused SQL/HTTP/SSR/contract checks, 19 migration-contract checks,
+Biome and Next.js compile mode pass locally. Both Compose YAML files parse with
+the worker readiness dependency. Four PostgreSQL fixtures are prepared but unrun;
+live migration/locking/rollback, worker/container lifecycle, browser interaction,
+complete production generation and the pinned Node 26 runtime remain unverified.
+Paid settlement, monthly issuance/renewal, subscription activation and an enforced
+MTA DRM client remain unfinished; this block enables none of them.
+
 ### Same-server license recovery and exact-release runtime checks — 2026-10-11
 
 Migration `0053` adds a nullable recorded server owner without backfilling trust.

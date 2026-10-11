@@ -3,18 +3,25 @@ import { NextRequest } from "next/server";
 import { createLicenseRuntimeToken } from "@nexus/security";
 
 const state = vi.hoisted(() => ({
-  user: { id: "usr_a", role: "user" } as { id: string; role: "user" | "moderator" } | null,
+  user: { id: "usr_a", role: "user" } as {
+    id: string;
+    role: "user" | "moderator" | "admin";
+  } | null,
   allowed: true,
   verify: vi.fn(),
   verifyRelease: vi.fn(),
   historyPage: vi.fn(),
   releasePage: vi.fn(),
+  archive: vi.fn(),
+  preview: vi.fn(),
   ownerCommand: vi.fn(),
   moderate: vi.fn(),
   detail: vi.fn(),
   servers: vi.fn(),
 }));
 vi.mock("@nexus/db", () => ({
+  licenseRepository: { pageUserHistory: state.archive },
+  licenseMaintenanceRepository: { preview: state.preview },
   licenseControlsRepository: {
     verify: state.verify,
     verifyRelease: state.verifyRelease,
@@ -36,6 +43,9 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
 import { POST as check } from "../apps/web/src/app/api/licenses/check/route";
 import { POST as checkRelease } from "../apps/web/src/app/api/licenses/check-release/route";
+import { GET as archive } from "../apps/web/src/app/api/licenses/route";
+import { GET as archiveExport } from "../apps/web/src/app/api/licenses/export/route";
+import { GET as maintenance } from "../apps/web/src/app/api/admin/licenses/maintenance/route";
 import { GET as runtimeConfig } from "../apps/web/src/app/api/licenses/[id]/runtime-config/route";
 import { GET as activity } from "../apps/web/src/app/api/licenses/[id]/activity/route";
 import { GET as staffActivity } from "../apps/web/src/app/api/admin/licenses/[id]/activity/route";
@@ -60,6 +70,8 @@ beforeEach(() => {
     state.verifyRelease,
     state.historyPage,
     state.releasePage,
+    state.archive,
+    state.preview,
     state.ownerCommand,
     state.moderate,
     state.detail,
@@ -225,6 +237,73 @@ const release = {
   sha256Hash: "a".repeat(64),
   nonce: "cc98ca86-5a01-4b7f-b2ac-1eabbeff533f",
 };
+it("authenticates archive/export, preserves private filters and rate limits inspection", async () => {
+  const date = new Date(revision);
+  state.archive.mockResolvedValue({
+    licenses: [
+      {
+        id: "lic_a",
+        productTitle: "Resource",
+        effectiveStatus: "expired",
+        model: "single_server",
+        expiresAt: date,
+        createdAt: date,
+        serverBound: true,
+      },
+    ],
+    page: 2,
+    totalPages: 3,
+  });
+  const query = "?page=2&status=expired&binding=bound&term=finite&sort=expires_soon&q=Resource";
+  expect((await archive(new NextRequest(`https://nexus.test/api/licenses${query}`))).status).toBe(
+    200,
+  );
+  expect(state.archive).toHaveBeenCalledWith("usr_a", 2, {
+    page: 2,
+    status: "expired",
+    binding: "bound",
+    term: "finite",
+    sort: "expires_soon",
+    q: "Resource",
+  });
+  const response = await archiveExport(
+    new NextRequest(`https://nexus.test/api/licenses/export${query}`),
+  );
+  expect(response.status).toBe(200);
+  expect(response.headers.get("content-type")).toContain("text/csv");
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe("Cookie");
+  expect(response.headers.get("content-disposition")).toContain("licenses-page-2.csv");
+  const csv = await response.text();
+  expect(csv).toContain("Resource");
+  expect(csv).not.toContain("usr_a");
+  state.allowed = false;
+  expect(
+    (await archiveExport(new NextRequest("https://nexus.test/api/licenses/export"))).status,
+  ).toBe(429);
+});
+it("denies guest archive requests and refuses unbounded or foreign-account filters", async () => {
+  state.user = null;
+  expect((await archive(new NextRequest("https://nexus.test/api/licenses"))).status).toBe(401);
+  state.user = { id: "usr_a", role: "user" };
+  for (const query of ["page=1&page=2", "userId=usr_other", `q=${"x".repeat(121)}`, "limit=100000"])
+    expect(
+      (await archiveExport(new NextRequest(`https://nexus.test/api/licenses/export?${query}`)))
+        .status,
+    ).toBe(400);
+  expect(state.archive).not.toHaveBeenCalled();
+});
+it("restricts term maintenance inspection to admins while rechecking database authority", async () => {
+  const request = new NextRequest("https://nexus.test/api/admin/licenses/maintenance?page=2");
+  expect((await maintenance(request)).status).toBe(403);
+  state.user = { id: "usr_a", role: "moderator" };
+  expect((await maintenance(request)).status).toBe(403);
+  expect(state.preview).not.toHaveBeenCalled();
+  state.user = { id: "usr_a", role: "admin" };
+  state.preview.mockResolvedValue({ items: [], page: 2, totalPages: 2 });
+  expect((await maintenance(request)).status).toBe(200);
+  expect(state.preview).toHaveBeenCalledWith("usr_a", 2);
+});
 it("authenticates release checks solely with a hashed bearer and returns private, correlated output", async () => {
   const token = createLicenseRuntimeToken();
   const result = {

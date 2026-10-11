@@ -5,6 +5,7 @@ import {
   SUPPORT_RELATED_TYPES,
   type ProductType,
   type BuildReviewNotificationData,
+  type LicenseTermNotificationData,
   type SupportCaseCategory,
   type SupportCaseStatus,
   type SupportMessageAuthorRole,
@@ -378,6 +379,7 @@ export const licenses = pgTable(
     uniqueIndex("licenses_key_idx").on(table.key),
     index("licenses_user_idx").on(table.userId),
     index("licenses_product_idx").on(table.productId),
+    index("licenses_finite_term_due_idx").on(table.expiresAt, table.id).where(sql`${table.expiresAt} IS NOT NULL AND ${table.status} IN ('active','suspended','expired')`),
     index("licenses_user_active_library_idx")
       .on(table.userId, table.productId, table.expiresAt, table.createdAt)
       .where(sql`${table.status} = 'active'`),
@@ -409,6 +411,18 @@ export const licenseRuntimeBindings = pgTable("license_runtime_bindings", {
     AND ${table.tokenExpiresAt} > ${table.tokenIssuedAt}
     AND ${table.tokenExpiresAt} <= ${table.tokenIssuedAt} + interval '720 hours'
   )`),
+]);
+
+// No historical events are invented; each processed finite term is recorded once.
+export const licenseTermEvents = pgTable("license_term_events", {
+  licenseId: text("license_id").notNull().references(() => licenses.id, { onDelete: "cascade" }),
+  event: text("event").$type<"expiring" | "expired">().notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  notified: boolean("notified").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  primaryKey({ columns: [table.licenseId, table.event, table.expiresAt] }),
+  check("license_term_event_check", sql`${table.event} IN ('expiring', 'expired')`),
 ]);
 
 // 12. Entitlements
@@ -738,7 +752,7 @@ export const follows = pgTable(
 
 // 21. Notifications
 export const notifications = pgTable("notifications", {
-  data: jsonb("data").$type<BuildReviewNotificationData>(),
+  data: jsonb("data").$type<BuildReviewNotificationData | LicenseTermNotificationData>(),
   id: text("id").primaryKey(),
   recipientId: text("recipient_id")
     .notNull()

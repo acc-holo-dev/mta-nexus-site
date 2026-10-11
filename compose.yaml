@@ -135,6 +135,37 @@ services:
       retries: 8
       start_period: 20s
 
+  license-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    working_dir: /app/packages/db
+    command: ["node", "--import", "tsx", "scripts/run-license-maintenance.ts", "--loop"]
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://nexus:nexus_secret@postgres:5432/mta_nexus
+      NEXUS_LICENSE_MAINTENANCE: "true"
+      NEXUS_LICENSE_MAINTENANCE_BATCH_SIZE: ${NEXUS_LICENSE_MAINTENANCE_BATCH_SIZE:-20}
+      NEXUS_LICENSE_MAINTENANCE_INTERVAL_MS: ${NEXUS_LICENSE_MAINTENANCE_INTERVAL_MS:-60000}
+    volumes:
+      - ./packages/db/src:/app/packages/db/src:ro
+      - ./packages/db/scripts:/app/packages/db/scripts:ro
+      - ./packages/domain/src:/app/packages/domain/src:ro
+      - ./packages/config/src:/app/packages/config/src:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "/app/scripts/check-license-worker-health.mjs"]
+      interval: 15s
+      timeout: 10s
+      retries: 8
+      start_period: 20s
+
 volumes:
   pgdata:
   uploads:

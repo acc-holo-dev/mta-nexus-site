@@ -60,6 +60,7 @@ const evidence = {
   resourceReviewSchemaPresent: false,
   commerceOrderCaseSchemaPresent: false,
   licenseBindingRecoverySchemaPresent: false,
+  licenseTermMaintenanceSchemaPresent: false,
   cleanupComplete: false,
 };
 
@@ -367,6 +368,17 @@ try {
     AND tgname IN ('license_runtime_bindings_guard', 'licenses_context_guard', 'licenses_clear_changed_tokens')`;
   assert.equal(licenseRecoveryTriggers.length, 3);
   evidence.licenseBindingRecoverySchemaPresent = true;
+  const licenseTermIndex =
+    await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'licenses_finite_term_due_idx'`;
+  assert.equal(licenseTermIndex.length, 1);
+  const licenseTermTrigger =
+    await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname = 'license_term_events_guard'`;
+  assert.equal(licenseTermTrigger.length, 1);
+  assert.equal(
+    (await client`SELECT count(*)::integer AS total FROM license_term_events`)[0].total,
+    0,
+  );
+  evidence.licenseTermMaintenanceSchemaPresent = true;
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);

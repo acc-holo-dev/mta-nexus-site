@@ -40,6 +40,20 @@ test("purchase case upgrade adds immutable order context without changing histor
 });
 
 const script = "packages/db/scripts/check-release-upgrade.mjs";
+test("term maintenance upgrade adds exact-term idempotency without rewriting historical licenses", () => {
+  const migration = readFileSync(
+    "packages/db/migrations/0054_license_term_maintenance.sql",
+    "utf8",
+  );
+  assert.match(migration, /PRIMARY KEY \(license_id, event, expires_at\)/u);
+  assert.match(migration, /parent\.expires_at IS DISTINCT FROM NEW\.expires_at/u);
+  assert.match(migration, /NOT isfinite\(NEW\.expires_at\)/u);
+  assert.match(migration, /FOR NO KEY UPDATE/u);
+  assert.match(migration, /Processed license term events are immutable/u);
+  assert.match(migration, /interval '3 days'/u);
+  assert.doesNotMatch(migration, /UPDATE (licenses|payments|orders|entitlements|ledger_entries)/u);
+  assert.match(readFileSync(script, "utf8"), /licenseTermMaintenanceSchemaPresent = true/u);
+});
 const ci = {
   GITHUB_ACTIONS: "true",
   RUNNER_ENVIRONMENT: "github-hosted",
@@ -126,7 +140,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0053_license_binding_recovery");
+  assert.equal(plan.targetTag, "0054_license_term_maintenance");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

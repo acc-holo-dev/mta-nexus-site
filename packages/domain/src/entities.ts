@@ -433,7 +433,7 @@ export interface BuildReviewNotificationData {
 }
 
 export interface Notification {
-  data?: BuildReviewNotificationData | null;
+  data?: BuildReviewNotificationData | import("./license-maintenance").LicenseTermNotificationData | null;
   id: string;
   recipientId: string;
   title: string;

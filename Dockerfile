@@ -41,6 +41,7 @@ RUN pnpm --filter @nexus/db --prod deploy /runtime/db \
     && test -n "$(find /runtime/db/migrations -type f -name '*.sql' -print -quit)" \
     && test -f /runtime/db/scripts/run-account-mail-dispatcher.ts \
     && test -f /runtime/db/scripts/run-web-push-dispatcher.ts \
+    && test -f /runtime/db/scripts/run-license-maintenance.ts \
     && test -f /runtime/db/node_modules/tsx/package.json
 
 FROM node:26-alpine AS runtime
@@ -57,6 +58,7 @@ COPY --from=build /app/scripts/check-account-mail-worker-health.mjs /app/scripts
 COPY --from=build /app/scripts/web-push-worker-health-state.mjs /app/scripts/web-push-worker-health-state.mjs
 COPY --from=build /app/scripts/check-web-push-worker-health.mjs /app/scripts/check-web-push-worker-health.mjs
 COPY --from=build /app/scripts/check-web-push-worker-queue.mjs /app/scripts/check-web-push-worker-queue.mjs
+COPY --from=build /app/scripts/check-license-worker-health.mjs /app/scripts/check-license-worker-health.mjs
 RUN mkdir -p /data/uploads && chown -R node:node /data/uploads
 USER node
 EXPOSE 3000

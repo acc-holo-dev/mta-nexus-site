@@ -47,6 +47,21 @@ This checks a saved release hash and credential, without attesting the calling
 machine or installed files. It grants no downloads and is not source-code DRM.
 Paid license issuance/renewal and an enforced MTA DRM client remain unfinished.
 
+Migration `0054` adds exact-term, immutable processing events. The bounded
+`license-worker` in DEV/production Compose starts after app readiness, warns once
+within three days and marks finite active/suspended terms expired while clearing
+runtime credentials. It preserves recorded expiry, purchases and unknown terms;
+inbox notices respect commerce preferences and reuse the push outbox. Runtime
+and download checks continue to enforce expiry independently of worker progress.
+Standalone execution requires `NEXUS_LICENSE_MAINTENANCE=true`; use
+`pnpm --filter @nexus/db license:maintain --once` or `--loop`.
+
+The RU/EN license archive at `/workspace/licenses` supports search, effective
+status, server-binding and term filters, expiry sorting and a safe CSV of the
+displayed page. Filters survive navigation and export. Only current administrators
+can inspect pending expiry/warning counts and unknown terms at
+`/admin/licenses/maintenance`; the view issues or renews nothing.
+
 Developers edit specialties, portfolio and Discord in `/settings/developer`.
 Public profiles show these contacts and the separate verified-experience flag.
 Changing specialties or portfolio removes that flag. `/workspace/verification`
