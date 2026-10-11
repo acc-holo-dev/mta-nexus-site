@@ -10,6 +10,9 @@ const state = vi.hoisted(() => ({
   discussion: vi.fn(),
   discussionDetail: vi.fn(),
   removeDiscussion: vi.fn(),
+  discussionReports: vi.fn(),
+  history: vi.fn(),
+  restore: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: state.session },
@@ -20,16 +23,23 @@ vi.mock("../apps/web/src/lib/services/organization-workspace-service", () => ({
 vi.mock("../apps/web/src/lib/services/community-moderation-service", () => ({
   communityModerationService: state,
 }));
+vi.mock("../apps/web/src/lib/services/organization-content-service", () => ({
+  organizationContentService: state,
+}));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 
+import { GET as reports } from "../apps/web/src/app/api/admin/community/[id]/discussion/[commentId]/reports/route";
 import {
   GET as detail,
   POST as remove,
 } from "../apps/web/src/app/api/admin/community/[id]/discussion/[commentId]/route";
 import { GET as page } from "../apps/web/src/app/api/admin/community/[id]/discussion/route";
+import { GET as history } from "../apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/history/route";
+import { POST as restore } from "../apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/restore/route";
 import { POST as preview } from "../apps/web/src/app/api/workspace/organizations/[id]/members/batch/preview/route";
 import { POST as batch } from "../apps/web/src/app/api/workspace/organizations/[id]/members/batch/route";
 
+const teamContext = { params: Promise.resolve({ id: "org", contentId: "post" }) };
 const context = { params: Promise.resolve({ id: "org", commentId: "comment" }) };
 const request = (
   method = "GET",
@@ -62,6 +72,9 @@ beforeEach(() => {
     state.discussion,
     state.discussionDetail,
     state.removeDiscussion,
+    state.discussionReports,
+    state.history,
+    state.restore,
   ])
     method.mockResolvedValue({ ok: true });
 });
@@ -143,4 +156,88 @@ it("returns localized stale-command failure with private headers", async () => {
     error: expect.stringContaining("Комментарий изменился"),
   });
   expect(response.headers.get("cache-control")).toBe("private, no-store");
+});
+
+it("provides private scoped organization history and restoration endpoints", async () => {
+  const input = { expectedRevision: "2026-10-11T00:00:00.123456Z" };
+  const read = await history(request(), teamContext),
+    write = await restore(request("POST", "", input), teamContext);
+  expect(read.status).toBe(200);
+  expect(write.status).toBe(200);
+  for (const response of [read, write]) {
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(response.headers.get("vary")).toBe("Cookie");
+  }
+  expect(state.history).toHaveBeenCalledWith(
+    "org",
+    expect.objectContaining({ id: "actor" }),
+    "post",
+    { cursor: undefined },
+  );
+  expect(state.restore).toHaveBeenCalledWith(
+    "org",
+    expect.objectContaining({ id: "actor" }),
+    "post",
+    input,
+  );
+  expect(state.rate).toHaveBeenCalledWith("search", "actor");
+  expect(state.rate).toHaveBeenCalledWith("contentEditing", "actor");
+});
+it("rejects injected scope, unsafe media and oversized restore commands before storage", async () => {
+  expect((await history(request("GET", "?organizationId=foreign"), teamContext)).status).toBe(400);
+  for (const [query, headers, input, status] of [
+    ["?actorId=foreign", {}, {}, 400],
+    ["", { "sec-fetch-site": "cross-site" }, {}, 403],
+    ["", { "content-type": "text/plain" }, {}, 415],
+    ["", {}, { text: "x".repeat(1100) }, 413],
+  ] as const)
+    expect((await restore(request("POST", query, input, headers), teamContext)).status).toBe(
+      status,
+    );
+  expect(state.restore).not.toHaveBeenCalled();
+  expect(state.history).not.toHaveBeenCalled();
+});
+it.each(["reports", "history", "restore"])(
+  "requires session and rate allowance for scoped %s",
+  async (name) => {
+    const call = () =>
+      name === "reports"
+        ? reports(request(), context)
+        : name === "history"
+          ? history(request(), teamContext)
+          : restore(
+              request("POST", "", { expectedRevision: "2026-10-11T00:00:00.123456Z" }),
+              teamContext,
+            );
+    state.session.mockResolvedValue(null);
+    expect((await call()).status).toBe(401);
+    state.session.mockResolvedValue({ id: "actor", role: "moderator" });
+    state.rate.mockResolvedValue({ success: false });
+    expect((await call()).status).toBe(429);
+  },
+);
+it("preserves related-report search/view/category scope and localizes denied recovery without internal messages", async () => {
+  expect((await reports(request("GET", "?q=word&view=history&type=spam"), context)).status).toBe(
+    200,
+  );
+  expect(state.discussionReports).toHaveBeenCalledWith(
+    expect.objectContaining({ id: "actor" }),
+    "org",
+    "comment",
+    expect.objectContaining({ query: "word", view: "history", type: "spam" }),
+  );
+  for (const query of ["?q=a&q=b", "?view=all", "?status=open", "?type=resource", "?cursor=bad"])
+    expect((await reports(request("GET", query), context)).status).toBe(400);
+  state.restore.mockRejectedValueOnce(
+    new AppError("PRIVATE_DETAIL", 403, "PUBLICATION_RESTORE_DENIED"),
+  );
+  const result = await restore(
+    request("POST", "", { expectedRevision: "2026-10-11T00:00:00.123456Z" }),
+    teamContext,
+  );
+  expect(result.status).toBe(403);
+  expect(await result.json()).toMatchObject({
+    code: "PUBLICATION_RESTORE_DENIED",
+    error: expect.stringContaining("архив"),
+  });
 });

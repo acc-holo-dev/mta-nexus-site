@@ -1,10 +1,22 @@
 import { organizationContentRepository } from "@nexus/db";
-import type { User, Content } from "@nexus/domain";
-import { editablePublication as editable } from "./publication-editor-record";
-import { authorContentService } from "./author-content-service";
+import type { Content, User } from "@nexus/domain";
+import type { parseAuthorPublicationHistoryQuery } from "../author-publication-desk-contract";
 import type { parseContentPage } from "../user-platform-contract";
+import { authorContentService } from "./author-content-service";
+import { editablePublication as editable } from "./publication-editor-record";
 
 class OrganizationContentService {
+  history(
+    organizationId: string,
+    actor: User,
+    id: string,
+    filters: NonNullable<ReturnType<typeof parseAuthorPublicationHistoryQuery>>,
+  ) {
+    return authorContentService.history(id, actor, filters, organizationId);
+  }
+  restore(organizationId: string, actor: User, id: string, input: unknown) {
+    return authorContentService.restore(id, input, actor, organizationId);
+  }
   context(organizationId: string, actor: User) {
     return organizationContentRepository.context(organizationId, actor.id);
   }

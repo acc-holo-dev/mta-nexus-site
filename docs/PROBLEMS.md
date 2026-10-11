@@ -16,6 +16,40 @@ holds, resource licenses or entitlements are changed. Paid activation and automa
 renewal remain unavailable. Six disposable PostgreSQL fixtures are prepared but
 unrun here; live migration/locking, browser and Node 26 checks remain outstanding.
 
+### Related discussion reports and team archive recovery — 2026-10-11
+
+Staff report details now link to the private publication/discussion, including
+removed targets with retained report-creation context. A comment's reports screen
+provides twenty-row keyset search by reason, category and pending/history view,
+with microsecond cursors bound to actor, publication, comment and filters. Removed
+comment access requires retained same-publication removal proof. Removing through
+a report reuses the discussion transaction: publication/comment/live-role/report
+locks precede deletion, both audits and the preference-aware author notification.
+Replies remain intact; other reports require separate decisions. Full-text SHA-256
+protects bounded Unicode previews; old untruncated tokens remain compatible.
+
+Organization owners/current admins can inspect shared publication history and
+restore another author's current, proven team archive to a private draft. New
+organization archives record an exact revision proof in existing audit events;
+moderator archives, legacy unproven archives, foreign organization, server-bound
+and commercial publication records cannot be restored in that desk. Restoration
+preserves original authorship/text/counts and atomically records its audit and
+publication notice. Current rights and version are rechecked under locks. RU/EN
+screens expose safe team identity while hiding moderator identity and raw audits.
+
+Focused validation passes 389 unit tests across thirty files, application TypeScript
+including generated Next.js route types, and the Next.js compile build. Root
+TypeScript still reports the existing missing `isSigned` in the commercial
+resource-delivery fixture; unused analysis retains three existing commercial
+exports. No schema or migration changes are included. Contract for Agent A's migration:
+`CREATE INDEX reports_comment_target_created_id_idx ON reports
+(target_id, created_at DESC, id DESC) WHERE target_type = 'comment';`
+Without this index, a large report archive can require a scan despite bounded
+results. Six PostgreSQL fixtures cover restoration races/proof/revocation,
+mandatory-audit rollback, report/removal/notification atomicity, Unicode previews
+and exact cursor ties; they remain unrun without a disposable database. Browser
+interaction and live PostgreSQL locking/query-plan validation remain outstanding.
+
 ### Independent draft copies — 2026-10-11
 
 Migration `0065` records immutable provenance for future free-resource copies.

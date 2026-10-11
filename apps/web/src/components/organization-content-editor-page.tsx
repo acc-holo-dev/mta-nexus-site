@@ -1,15 +1,16 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { AppError } from "@nexus/domain";
-import { AuthorContentForm } from "./author-content-form";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { getRequestLocale } from "../lib/i18n-server";
+import { organizationContentId } from "../lib/organization-content-api";
+import { organizationContentCopy } from "../lib/organization-content-copy";
+import { organizationPublicationHistoryCopy } from "../lib/organization-publication-history-copy";
 import { authService } from "../lib/services/auth-service";
 import { organizationContentService } from "../lib/services/organization-content-service";
-import { getRequestLocale } from "../lib/i18n-server";
-import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
-import { organizationContentCopy } from "../lib/organization-content-copy";
-import { organizationContentId } from "../lib/organization-content-api";
 import { parseEditableContent } from "../lib/user-platform-client";
+import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
+import { AuthorContentForm } from "./author-content-form";
+import { PlatformSignIn } from "./content-catalog-controls";
 export async function OrganizationContentEditorPage({
   id,
   contentId,
@@ -46,6 +47,14 @@ export async function OrganizationContentEditorPage({
         {team.title}
       </Link>
       <h1 className="font-display text-primary">{contentId ? copy.edit : team.new}</h1>
+      {contentId && initial && (
+        <Link
+          href={`${path}/${encodeURIComponent(contentId)}/history`}
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        >
+          {organizationPublicationHistoryCopy(locale).history}
+        </Link>
+      )}
       {result && (!contentId || (initial && initial.organizationId === id)) ? (
         <AuthorContentForm
           key={`${id}:${contentId ?? "new"}:${initial?.updatedAt ?? "new"}`}

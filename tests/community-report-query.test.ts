@@ -1,8 +1,14 @@
+import { createHash } from "node:crypto";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
   failAudit: false,
+  notice: vi.fn(),
+}));
+vi.mock("../packages/db/src/repositories/discussion-moderation-notice", () => ({
+  discussionModerationNotice: state.notice,
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
@@ -23,8 +29,13 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { communityReportsRepository as repository } from "../packages/db/src/repositories/community-reports";
-import { discussionRevision } from "../packages/db/src/repositories/discussion-management";
+import {
+  discussionRevision,
+  moderationDiscussionRevision,
+} from "../packages/db/src/repositories/discussion-management";
+
 const time = "2026-10-10T00:00:00Z";
 const reportRow = [
   "report",
@@ -61,6 +72,7 @@ beforeEach(() => {
   state.queries = [];
   state.rows = [];
   state.failAudit = false;
+  state.notice.mockReset();
 });
 function removalRows(
   extra: { role?: string; finalRole?: string; text?: string; status?: string } = {},
@@ -68,10 +80,20 @@ function removalRows(
   state.rows = [
     [[extra.role ?? "moderator"]],
     [["comment", "comment"]],
-    [["content"]],
-    [["comment", extra.text ?? "Original"]],
+    [["content", "published", "article", "post"]],
+    [
+      [
+        "comment",
+        extra.text ?? "Original",
+        "author",
+        createHash("sha256")
+          .update(extra.text ?? "Original")
+          .digest("hex"),
+        false,
+      ],
+    ],
     [[extra.finalRole ?? "moderator"]],
-    [["report", extra.status ?? "open", "reporter", "comment"]],
+    [["report", extra.status ?? "open", "reporter", "comment", "comment"]],
   ];
 }
 it("uses bounded owner-scoped history with stable ordering and excludes existing commercial review comments", async () => {
@@ -122,14 +144,33 @@ it("limits result rows to twenty and rejects unbounded offsets before querying",
 it("reads owner detail without staff notes and previews only a public noncommercial target", async () => {
   state.rows = [
     [reportRow],
-    [["comment", "article", "Title", "Original", false, "published", "author"]],
+    [
+      [
+        "comment",
+        "article",
+        "Title",
+        "Original",
+        false,
+        "published",
+        "author",
+        "content",
+        createHash("sha256").update("Original").digest("hex"),
+        "content",
+      ],
+    ],
   ];
   const result = await repository.detail({ actorId: "reporter", staff: false }, "report");
   expect(result).not.toHaveProperty("moderatorNotes");
   expect(state.queries[0].params).toContain("reporter");
   expect(state.queries[1].params).toContain("published");
   expect(state.queries[1].sql).toContain('"comments"."product_id" is null');
-  expect(result.target?.revision).toBe(discussionRevision("comment", "Original"));
+  expect(result.target?.revision).toBe(
+    moderationDiscussionRevision(
+      "content",
+      "comment",
+      createHash("sha256").update("Original").digest("hex"),
+    ),
+  );
 });
 it("returns not found for another reporter before reading its target", async () => {
   await expect(
@@ -203,7 +244,7 @@ it("takes a report for review only from open and requires audit success", async 
     [["moderator"]],
     [["comment", "comment"]],
     [["moderator"]],
-    [["report", "open", "reporter", "comment"]],
+    [["report", "open", "reporter", "comment", "comment"]],
   ];
   expect(
     await repository.decide({ ...decision, action: "review", expectedRevision: undefined }),
@@ -214,4 +255,86 @@ it("takes a report for review only from open and requires audit success", async 
   removalRows();
   state.failAudit = true;
   await expect(repository.decide(decision)).rejects.toThrow(/audit_events|audit failure/u);
+});
+
+it("uses the shared archived-discussion removal and transactional author notice, resolving only the reviewed report", async () => {
+  removalRows();
+  state.rows[2] = [["content", "archived", "article", "post"]];
+  await repository.decide({
+    ...decision,
+    expectedRevision: moderationDiscussionRevision(
+      "content",
+      "comment",
+      createHash("sha256").update("Original").digest("hex"),
+    ),
+  });
+  expect(state.notice).toHaveBeenCalledWith(expect.anything(), {
+    auditId: "removal-audit",
+    authorId: "author",
+    commentId: "comment",
+    slug: "article",
+    available: false,
+  });
+  const reports = state.queries.filter((query) => query.sql.startsWith('update "reports"'));
+  expect(reports).toHaveLength(1);
+  expect(reports[0].params.at(-1)).toBe("report");
+  const audit = state.queries.find(
+    (query) =>
+      query.sql.startsWith('insert into "audit_events"') &&
+      query.params.includes("content.comment_removed"),
+  );
+  expect(audit?.params).toContain(
+    JSON.stringify({ contentId: "content", moderator: true, reason: "Spam", reportId: "report" }),
+  );
+});
+it("refuses an old token when legacy text was truncated and accepts its complete scoped digest", async () => {
+  removalRows();
+  state.rows[3][0][4] = true;
+  await expect(repository.decide(decision)).rejects.toMatchObject({ code: "COMMENT_CHANGED" });
+  expect(state.queries.some((query) => /^(insert|update|delete)/u.test(query.sql))).toBe(false);
+  removalRows();
+  state.rows[3][0][4] = true;
+  await repository.decide({
+    ...decision,
+    expectedRevision: moderationDiscussionRevision(
+      "content",
+      "comment",
+      createHash("sha256").update("Original").digest("hex"),
+    ),
+  });
+  expect(state.queries[3].sql).toContain("sha256(convert_to(");
+  expect(state.notice).toHaveBeenCalledTimes(1);
+});
+it("requires the shared moderation notice to succeed and denies report-only mutation without a report lock hook", async () => {
+  removalRows();
+  state.notice.mockRejectedValueOnce(Error("notice failure"));
+  await expect(repository.decide(decision)).rejects.toThrow("notice failure");
+  expect(state.queries.some((query) => query.sql.startsWith('update "reports"'))).toBe(false);
+  const { discussionManagementRepository } = await import(
+    "../packages/db/src/repositories/discussion-management"
+  );
+  state.queries = [];
+  await expect(
+    discussionManagementRepository.mutate({
+      moderationWorkspace: true,
+      actorId: "moderator",
+      reportId: "report",
+      commentId: "comment",
+      expectedRevision: decision.expectedRevision,
+      reason: "Reason",
+      auditId: "audit",
+    }),
+  ).rejects.toMatchObject({ code: "COMMENT_COMMAND_INVALID" });
+  expect(state.queries).toHaveLength(0);
+});
+it("recovers a removed report's staff discussion link only from trusted creation context", async () => {
+  state.rows = [[["moderator"]], [[...reportRow, "reporter", "Private note"]], [], [["content"]]];
+  const detail = await repository.detail({ actorId: "moderator", staff: true }, "report");
+  expect(detail.target).toBeNull();
+  expect(detail.moderationContentId).toBe("content");
+  expect(state.queries[3].params).toEqual(expect.arrayContaining(["report.created", "report"]));
+  expect(state.queries[3].sql).toContain("'article','news'");
+  state.rows = [[reportRow], []];
+  const own = await repository.detail({ actorId: "reporter", staff: false }, "report");
+  expect(own).not.toHaveProperty("moderationContentId");
 });

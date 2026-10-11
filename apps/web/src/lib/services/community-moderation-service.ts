@@ -7,6 +7,7 @@ import { can, generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
 import type { ModerationQuery, moderationCommandSchema } from "../community-moderation-contract";
+import type { DiscussionReportsQuery } from "../discussion-reports-contract";
 import {
   type ModeratedDiscussionQuery,
   moderatedDiscussionRemoveSchema,
@@ -42,6 +43,31 @@ const encode = (result: {
     ? JSON.stringify({ ...result.nextCursor, context: result.context, version: 1 })
     : null;
 class CommunityModerationService {
+  async discussionReports(
+    actor: User,
+    id: string,
+    commentId: string,
+    filters: DiscussionReportsQuery,
+  ) {
+    authority(actor, id);
+    authority(actor, commentId);
+    const result = await repository.discussionReports(actor.id, id, commentId, filters);
+    return {
+      publication: result.publication,
+      commentId: result.commentId,
+      removed: result.removed,
+      items: result.items.map((item) => ({
+        id: item.id,
+        type: item.type,
+        reason: item.reason,
+        status: item.status,
+        createdAt: item.createdAt.toISOString(),
+        resolvedAt: item.resolvedAt?.toISOString() ?? null,
+      })),
+      hasMore: result.hasMore,
+      nextCursor: encode(result),
+    };
+  }
   async discussion(actor: User, id: string, filters: ModeratedDiscussionQuery) {
     authority(actor, id);
     const result = await repository.discussion(actor.id, id, filters);

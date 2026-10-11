@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, comments, content, organizations, servers, users } from "../schema";
+import { auditEvents, comments, content, organizations, reports, servers, users } from "../schema";
 import { moderationDiscussionRevision } from "./discussion-management";
 import { containsPattern } from "./search-pattern";
 
@@ -33,6 +33,99 @@ const summary = {
 const exactTime = (column: typeof content.updatedAt | typeof auditEvents.createdAt) =>
   sql<string>`to_char(${column} at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`;
 class CommunityModerationWorkspaceRepository {
+  async discussionReports(
+    actorId: string,
+    id: string,
+    commentId: string,
+    filters: { query: string; view: "pending" | "history"; type?: string; cursor?: Cursor },
+  ) {
+    return db.transaction(
+      async (tx) => {
+        await staff(tx, actorId);
+        const publication = await this.discussionPublication(tx, id);
+        const context = hash([
+          1,
+          "discussion-reports",
+          actorId,
+          id,
+          commentId,
+          filters.query,
+          filters.view,
+          filters.type ?? "",
+        ]);
+        if (filters.cursor && filters.cursor.context !== context)
+          throw new AppError("Report filters changed", 400, "INVALID_CURSOR");
+        const [comment] = await tx
+          .select({ id: comments.id })
+          .from(comments)
+          .where(
+            and(
+              eq(comments.id, commentId),
+              eq(comments.contentId, id),
+              sql`${comments.productId} is null`,
+            ),
+          )
+          .limit(1);
+        if (!comment) await this.removedDiscussionProof(tx, id, commentId);
+        const pattern = filters.query ? containsPattern(filters.query) : undefined;
+        const rows = await tx
+          .select({
+            id: reports.id,
+            type: reports.type,
+            reason: sql<string>`left(${reports.reason},1000)`,
+            status: reports.status,
+            createdAt: reports.createdAt,
+            resolvedAt: reports.resolvedAt,
+            cursorTime: sql<string>`to_char(${reports.createdAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+          })
+          .from(reports)
+          .where(
+            and(
+              eq(reports.targetType, "comment"),
+              eq(reports.targetId, commentId),
+              inArray(
+                reports.status,
+                filters.view === "pending" ? ["open", "under_review"] : ["resolved", "dismissed"],
+              ),
+              filters.type ? eq(reports.type, filters.type) : undefined,
+              pattern ? ilike(reports.reason, pattern) : undefined,
+              filters.cursor
+                ? sql`(${reports.createdAt},${reports.id}) < (${filters.cursor.createdAt}::timestamptz,${filters.cursor.id})`
+                : undefined,
+            ),
+          )
+          .orderBy(desc(reports.createdAt), desc(reports.id))
+          .limit(21);
+        const items = rows.slice(0, 20),
+          last = items.at(-1);
+        return {
+          publication,
+          commentId,
+          removed: !comment,
+          items,
+          context,
+          hasMore: rows.length > 20,
+          nextCursor: rows.length > 20 && last ? { createdAt: last.cursorTime, id: last.id } : null,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+  private async removedDiscussionProof(tx: Transaction, id: string, commentId: string) {
+    const [removed] = await tx
+      .select({ id: auditEvents.id })
+      .from(auditEvents)
+      .where(
+        and(
+          eq(auditEvents.targetType, "comment"),
+          eq(auditEvents.targetId, commentId),
+          eq(auditEvents.action, "content.comment_removed"),
+          sql`${auditEvents.details}->>'contentId' = ${id}`,
+        ),
+      )
+      .limit(1);
+    if (!removed) throw new NotFoundError("Comment");
+  }
   async discussion(
     actorId: string,
     id: string,
@@ -150,21 +243,7 @@ class CommunityModerationWorkspaceRepository {
             ),
           )
           .limit(1);
-        if (!comment) {
-          const [removed] = await tx
-            .select({ id: auditEvents.id })
-            .from(auditEvents)
-            .where(
-              and(
-                eq(auditEvents.targetType, "comment"),
-                eq(auditEvents.targetId, commentId),
-                eq(auditEvents.action, "content.comment_removed"),
-                sql`${auditEvents.details}->>'contentId' = ${id}`,
-              ),
-            )
-            .limit(1);
-          if (!removed) throw new NotFoundError("Comment");
-        }
+        if (!comment) await this.removedDiscussionProof(tx, id, commentId);
         const rows = await tx
           .select({
             id: auditEvents.id,

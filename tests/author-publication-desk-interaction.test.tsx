@@ -49,9 +49,9 @@ function descendants(node: ReactNode): Element[] {
   const element = node as Element;
   return [element, ...descendants(element.props.children as ReactNode)];
 }
-function render(locale: "en" | "ru" = "en") {
+function render(locale: "en" | "ru" = "en", organizationId?: string) {
   harness.cursor = 0;
-  return descendants(AuthorPublicationRestore({ id: "article", revision, locale }));
+  return descendants(AuthorPublicationRestore({ id: "article", revision, locale, organizationId }));
 }
 function button(nodes: Element[], label: string) {
   const element = nodes.find((node) => node.type === "button" && node.props.children === label);
@@ -172,3 +172,48 @@ it("aborts on navigation and ignores late confirmation", async () => {
   await new Promise((resolve) => setImmediate(resolve));
   expect(harness.refresh).not.toHaveBeenCalled();
 });
+
+it.each(["ru", "en"] as const)(
+  "restores a team archive with a scope-bound acknowledgement in %s",
+  async (locale) => {
+    const { organizationPublicationHistoryCopy } = await import(
+      "../apps/web/src/lib/organization-publication-history-copy"
+    );
+    const copy = organizationPublicationHistoryCopy(locale),
+      labels = authorPublicationDeskCopy(locale);
+    harness.fetch.mockResolvedValue(
+      response({ id: "article", organizationId: "org", status: "draft", revision: next }),
+    );
+    click(render(locale, "org"), labels.restore);
+    await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
+    expect(harness.confirm).toHaveBeenCalledWith(copy.restoreConfirm);
+    expect(harness.fetch.mock.calls[0][0]).toBe(
+      "/api/workspace/organizations/org/content/article/restore",
+    );
+    expect(render(locale, "org").some((node) => node.props.children === copy.restoredNotice)).toBe(
+      true,
+    );
+    expect(
+      render(locale, "org").some(
+        (node) => node.props.href === "/workspace/organizations/org/content/article",
+      ),
+    ).toBe(true);
+  },
+);
+it.each(["foreign", undefined])(
+  "blocks retry after mismatched organization acknowledgement (%s)",
+  async (organizationId) => {
+    harness.fetch.mockResolvedValue(
+      response({ id: "article", organizationId, status: "draft", revision: next }),
+    );
+    const copy = authorPublicationDeskCopy("en");
+    click(render("en", "org"), copy.restore);
+    await vi.waitFor(() =>
+      expect(render("en", "org").some((node) => node.props.role === "alert")).toBe(true),
+    );
+    expect(harness.refresh).not.toHaveBeenCalled();
+    expect(button(render("en", "org"), copy.restore).props.disabled).toBe(true);
+    click(render("en", "org"), copy.restore);
+    expect(harness.fetch).toHaveBeenCalledTimes(1);
+  },
+);

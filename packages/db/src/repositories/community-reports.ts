@@ -1,12 +1,18 @@
-import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, comments, content, reports, users } from "../schema";
-import { discussionRevision } from "./discussion-management";
+import {
+  discussionManagementRepository,
+  moderationDiscussionRevision,
+} from "./discussion-management";
 
 type Session = Pick<typeof db, "select" | "insert" | "update" | "delete" | "execute">;
 type Scope = { actorId: string; staff: boolean };
 type Status = "open" | "under_review" | "resolved" | "dismissed";
+const editorialId = sql<
+  string | null
+>`case when ${content.type} in ('article','news','devlog','update','announcement','post','question','review') and ${content.status} in ('draft','published','archived') then ${content.id} else null end`;
 const fields = {
   id: reports.id,
   targetType: reports.targetType,
@@ -40,6 +46,7 @@ async function targetPreview(tx: Session, targetType: string, targetId: string, 
         truncated: sql<boolean>`length(${content.body}) > 5000`,
         status: content.status,
         author: users.username,
+        moderationContentId: editorialId,
       })
       .from(content)
       .leftJoin(users, eq(users.id, content.authorId))
@@ -52,10 +59,13 @@ async function targetPreview(tx: Session, targetType: string, targetId: string, 
       id: comments.id,
       slug: content.slug,
       title: content.title,
-      text: comments.text,
+      text: sql<string>`left(${comments.text},5000)`,
       truncated: sql<boolean>`length(${comments.text}) > 5000`,
       status: content.status,
       author: users.username,
+      contentId: content.id,
+      digest: sql<string>`encode(sha256(convert_to(${comments.text},'UTF8')),'hex')`,
+      moderationContentId: editorialId,
     })
     .from(comments)
     .innerJoin(content, eq(content.id, comments.contentId))
@@ -69,7 +79,11 @@ async function targetPreview(tx: Session, targetType: string, targetId: string, 
     )
     .limit(1);
   return row
-    ? { ...row, kind: "comment" as const, revision: discussionRevision(row.id, row.text) }
+    ? {
+        ...row,
+        kind: "comment" as const,
+        revision: moderationDiscussionRevision(row.contentId, row.id, row.digest),
+      }
     : null;
 }
 
@@ -212,7 +226,25 @@ class CommunityReportsRepository {
         )
         .limit(1);
       if (!row) throw new NotFoundError("Report");
-      return { ...row, target: await targetPreview(tx, row.targetType, row.targetId, scope.staff) };
+      const target = await targetPreview(tx, row.targetType, row.targetId, scope.staff);
+      let moderationContentId = scope.staff ? (target?.moderationContentId ?? null) : null;
+      if (scope.staff && !target) {
+        const [context] = await tx
+          .select({ id: content.id })
+          .from(auditEvents)
+          .innerJoin(content, sql`${content.id} = ${auditEvents.details}->>'contentId'`)
+          .where(
+            and(
+              eq(auditEvents.targetType, "report"),
+              eq(auditEvents.targetId, id),
+              eq(auditEvents.action, "report.created"),
+              sql`${editorialId} is not null`,
+            ),
+          )
+          .limit(1);
+        moderationContentId = context?.id ?? null;
+      }
+      return { ...row, target, ...(scope.staff ? { moderationContentId } : {}) };
     });
   }
 
@@ -235,84 +267,76 @@ class CommunityReportsRepository {
         .from(reports)
         .where(eq(reports.id, input.id))
         .limit(1);
-      let removed: { id: string; contentId: string } | null = null;
-      if (input.action === "remove_comment") {
+      if (!hint) throw new NotFoundError("Report");
+      type Current = {
+        id: string;
+        status: string;
+        reporterId: string;
+        targetId: string;
+        targetType: string;
+      };
+      let current: Current | undefined;
+      const lockReport = async (commentId?: string) => {
+        const [row] = await tx
+          .select({
+            id: reports.id,
+            status: reports.status,
+            reporterId: reports.reporterId,
+            targetId: reports.targetId,
+            targetType: reports.targetType,
+          })
+          .from(reports)
+          .where(and(eq(reports.id, input.id), communityTarget))
+          .for("update")
+          .limit(1);
+        if (!row) throw new NotFoundError("Report");
+        if (
+          !["open", "under_review"].includes(row.status) ||
+          row.status !== input.expectedStatus ||
+          (input.action === "review" && row.status !== "open") ||
+          (commentId && (row.targetType !== "comment" || row.targetId !== commentId))
+        )
+          throw new AppError("Report changed", 409, "REPORT_STATE_CHANGED");
+        current = row;
+      };
+      const removed = input.action === "remove_comment";
+      if (removed) {
         if (hint?.targetType !== "comment")
           throw new AppError("Not a community comment", 422, "REPORT_TARGET_UNAVAILABLE");
-        const [publication] = await tx
-          .select({ id: content.id })
-          .from(content)
-          .where(sql`${content.id} in
-          (select ${comments.contentId} from ${comments} where ${comments.id} = ${hint.targetId} and ${comments.productId} is null)`)
-          .for("update")
-          .limit(1);
-        if (!publication)
-          throw new AppError("Target unavailable", 409, "REPORT_TARGET_UNAVAILABLE");
-        const [comment] = await tx
-          .select({ id: comments.id, text: comments.text })
-          .from(comments)
-          .where(
-            and(
-              eq(comments.id, hint.targetId),
-              eq(comments.contentId, publication.id),
-              isNull(comments.productId),
-            ),
-          )
-          .for("update")
-          .limit(1);
-        if (!comment) throw new AppError("Target unavailable", 409, "REPORT_TARGET_UNAVAILABLE");
-        if (discussionRevision(comment.id, comment.text) !== input.expectedRevision)
-          throw new AppError("Comment changed", 409, "COMMENT_CHANGED");
-        removed = { id: comment.id, contentId: publication.id };
+        let lockingReport = false;
+        try {
+          await discussionManagementRepository.mutateWithin(
+            tx,
+            {
+              actorId: input.actorId,
+              commentId: hint.targetId,
+              reportId: input.id,
+              moderationWorkspace: true,
+              expectedRevision: input.expectedRevision ?? "",
+              reason: input.notes,
+              auditId: input.removalAuditId,
+            },
+            async (scope) => {
+              lockingReport = true;
+              await lockReport(scope.commentId);
+            },
+          );
+        } catch (error) {
+          if (error instanceof NotFoundError && !lockingReport)
+            throw new AppError("Target unavailable", 409, "REPORT_TARGET_UNAVAILABLE");
+          throw error;
+        }
+      } else {
+        await requireStaff(tx, input.actorId);
+        await lockReport();
       }
-      await requireStaff(tx, input.actorId);
-      const [current] = await tx
-        .select({
-          id: reports.id,
-          status: reports.status,
-          reporterId: reports.reporterId,
-          targetId: reports.targetId,
-        })
-        .from(reports)
-        .where(and(eq(reports.id, input.id), communityTarget))
-        .for("update")
-        .limit(1);
       if (!current) throw new NotFoundError("Report");
-      if (
-        !["open", "under_review"].includes(current.status) ||
-        current.status !== input.expectedStatus ||
-        (input.action === "review" && current.status !== "open")
-      )
-        throw new AppError("Report changed", 409, "REPORT_STATE_CHANGED");
-      if (removed && current.targetId !== removed.id)
-        throw new AppError("Report changed", 409, "REPORT_STATE_CHANGED");
       const status: Status =
         input.action === "review"
           ? "under_review"
           : input.action === "dismiss"
             ? "dismissed"
             : "resolved";
-      if (removed) {
-        await tx.delete(comments).where(eq(comments.id, removed.id));
-        await tx
-          .update(content)
-          .set({ commentCount: sql`greatest(0, ${content.commentCount} - 1)` })
-          .where(eq(content.id, removed.contentId));
-        await tx.insert(auditEvents).values({
-          id: input.removalAuditId,
-          actorId: input.actorId,
-          actorType: "admin",
-          action: "content.comment_removed",
-          targetType: "comment",
-          targetId: removed.id,
-          details: {
-            contentId: removed.contentId,
-            moderator: true,
-            reason: input.notes,
-            reportId: current.id,
-          },
-        });
-      }
       await tx
         .update(reports)
         .set({
@@ -332,7 +356,7 @@ class CommunityReportsRepository {
           notes: input.notes,
           previousStatus: current.status,
           status,
-          removedCommentId: removed?.id ?? null,
+          removedCommentId: removed ? current.targetId : null,
         },
       });
       return {
@@ -340,7 +364,7 @@ class CommunityReportsRepository {
         status,
         action: input.action,
         reporterId: current.reporterId,
-        removed: !!removed,
+        removed,
       };
     });
   }

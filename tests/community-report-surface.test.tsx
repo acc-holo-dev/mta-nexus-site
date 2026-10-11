@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import { AppError } from "@nexus/domain";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   page: vi.fn(),
@@ -20,12 +21,14 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
   communityReportService: mocks,
 }));
-import { CommunityReportScreen } from "../apps/web/src/components/community-report-screen";
-import { CommunityReportList } from "../apps/web/src/components/community-report-list";
+
 import { CommunityReportDetailView } from "../apps/web/src/components/community-report-detail";
 import { CommunityReportForm } from "../apps/web/src/components/community-report-form";
-import { communityReportCopy } from "../apps/web/src/lib/community-report-copy";
+import { CommunityReportList } from "../apps/web/src/components/community-report-list";
+import { CommunityReportScreen } from "../apps/web/src/components/community-report-screen";
 import type { CommunityReportDetail } from "../apps/web/src/lib/community-report-contract";
+import { communityReportCopy } from "../apps/web/src/lib/community-report-copy";
+
 const row: CommunityReportDetail = {
   id: "report",
   targetType: "comment",
@@ -151,4 +154,35 @@ it("binds SSR reads to the current actor and treats another user's report as not
   expect(mocks.page).toHaveBeenCalledWith({ id: "actor", role: "user" }, filters, false);
   mocks.detail.mockRejectedValue(new AppError("private target", 404, "NOT_FOUND"));
   await expect(CommunityReportScreen({ id: "report" })).rejects.toThrow("NOT_FOUND");
+});
+
+it("shows retained staff discussion context after removal and hides unsupported target deletion", () => {
+  const removed = renderToStaticMarkup(
+    <CommunityReportDetailView
+      id="report"
+      initial={{ ...row, target: null, moderationHref: "/admin/community/post/discussion/comment" }}
+      locale="en"
+      staff
+    />,
+  );
+  expect(removed).toContain("/admin/community/post/discussion/comment");
+  expect(removed).not.toContain(communityReportCopy("en").remove_comment);
+  const unsupported = renderToStaticMarkup(
+    <CommunityReportDetailView
+      id="report"
+      initial={{ ...row, moderationHref: null }}
+      locale="en"
+      staff
+    />,
+  );
+  expect(unsupported).not.toContain(communityReportCopy("en").remove_comment);
+  expect(unsupported).toContain(communityReportCopy("en").resolve);
+  const own = renderToStaticMarkup(
+    <CommunityReportDetailView
+      id="report"
+      initial={{ ...row, moderationHref: "/admin/community/post/discussion/comment" }}
+      locale="en"
+    />,
+  );
+  expect(own).not.toContain("/admin/community/post/discussion/comment");
 });

@@ -1,18 +1,19 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { AppError } from "@nexus/domain";
-import { authService } from "../../../../../lib/services/auth-service";
-import { organizationContentService } from "../../../../../lib/services/organization-content-service";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { getUserPlatformCopy, userPlatformError } from "../../../../../lib/user-platform-copy";
-import { organizationContentCopy } from "../../../../../lib/organization-content-copy";
-import { organizationContentId } from "../../../../../lib/organization-content-api";
-import { parseContentPage, writerTypes } from "../../../../../lib/user-platform-contract";
+import { cookies } from "next/headers";
+import Link from "next/link";
 import {
   ContentCatalogControls,
   ContentPageNavigation,
   PlatformSignIn,
 } from "../../../../../components/content-catalog-controls";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { organizationContentId } from "../../../../../lib/organization-content-api";
+import { organizationContentCopy } from "../../../../../lib/organization-content-copy";
+import { organizationPublicationHistoryCopy } from "../../../../../lib/organization-publication-history-copy";
+import { authService } from "../../../../../lib/services/auth-service";
+import { organizationContentService } from "../../../../../lib/services/organization-content-service";
+import { parseContentPage, writerTypes } from "../../../../../lib/user-platform-contract";
+import { getUserPlatformCopy, userPlatformError } from "../../../../../lib/user-platform-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -121,6 +122,12 @@ export default async function OrganizationPublications({
                       className="text-accent underline"
                     >
                       {copy.edit}
+                    </Link>
+                    <Link
+                      href={`${path}/${encodeURIComponent(item.id)}/history`}
+                      className="inline-flex min-h-11 items-center text-accent underline"
+                    >
+                      {organizationPublicationHistoryCopy(locale).history}
                     </Link>
                     {item.status === "published" && (
                       <Link

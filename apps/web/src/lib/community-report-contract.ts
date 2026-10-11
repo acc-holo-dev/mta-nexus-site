@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { createReportSchema } from "@nexus/validation";
+import { z } from "zod";
 export const REPORT_TYPES = createReportSchema.shape.type.options;
 const REPORT_STATUSES = ["open", "under_review", "resolved", "dismissed"] as const;
 export const communityReportCreateSchema = createReportSchema
@@ -104,6 +104,11 @@ export const communityReportDetailSchema = reportSummarySchema.extend({
     })
     .nullable(),
   // Staff notes are never projected for the reporter.
+  moderationHref: z
+    .string()
+    .regex(/^\/admin\/community\/[a-zA-Z0-9_-]+(?:\/discussion\/[a-zA-Z0-9_-]+)?$/u)
+    .nullable()
+    .optional(),
   moderatorNotes: z.string().nullable().optional(),
   reporterId: z.string().optional(),
 });

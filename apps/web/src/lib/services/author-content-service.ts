@@ -55,10 +55,19 @@ class AuthorContentService {
     id: string,
     actor: User,
     filters: NonNullable<ReturnType<typeof parseAuthorPublicationHistoryQuery>>,
+    organizationId?: string,
   ) {
     if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(id)) throw new NotFoundError("Publication");
-    const result = await authorContentRepository.history(id, actor.id, filters.cursor);
+    if (organizationId !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(organizationId))
+      throw new NotFoundError("Organization");
+    const result = await authorContentRepository.history(
+      id,
+      actor.id,
+      filters.cursor,
+      ...(organizationId ? [organizationId] : []),
+    );
     return {
+      ...(organizationId ? { organization: result.organization } : {}),
       item: {
         id: result.item.id,
         title: result.item.title,
@@ -68,6 +77,16 @@ class AuthorContentService {
       },
       olderCursor: result.olderCursor,
       events: result.events.map((event) => ({
+        ...(organizationId
+          ? {
+              identity:
+                !["content.published", "content.archived"].includes(event.action) &&
+                event.actorUsername &&
+                event.actorName
+                  ? { username: event.actorUsername, name: event.actorName }
+                  : null,
+            }
+          : {}),
         id: event.id,
         createdAt: event.createdAt,
         from: event.from,
@@ -76,7 +95,7 @@ class AuthorContentService {
           ? "created"
           : event.action.startsWith("content.edited")
             ? "edited"
-            : event.action === "content.restored_by_author"
+            : event.action.startsWith("content.restored_by_")
               ? "restored"
               : event.action === "content.published"
                 ? "published"
@@ -89,18 +108,26 @@ class AuthorContentService {
       })),
     };
   }
-  async restore(id: string, input: unknown, actor: User) {
+  async restore(id: string, input: unknown, actor: User, organizationId?: string) {
     if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(id)) throw new NotFoundError("Publication");
+    if (organizationId !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(organizationId))
+      throw new NotFoundError("Organization");
     const parsed = authorPublicationRestoreSchema.safeParse(input);
     if (!parsed.success) throw new AppError("Invalid archive revision", 400, "VALIDATION_ERROR");
-    return authorContentRepository.restore(id, actor.id, parsed.data.expectedRevision, {
-      id: generateId("aud"),
-      actorId: actor.id,
-      actorType: "user",
-      action: "content.restored_by_author",
-      targetId: id,
-      targetType: "content",
-    });
+    return authorContentRepository.restore(
+      id,
+      actor.id,
+      parsed.data.expectedRevision,
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: "user",
+        action: organizationId ? "content.restored_by_organization" : "content.restored_by_author",
+        targetId: id,
+        targetType: "content",
+      },
+      ...(organizationId ? [organizationId] : []),
+    );
   }
 
   async get(id: string, actor: User) {

@@ -6,6 +6,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { parseModerationDetailQuery } from "../lib/community-moderation-contract";
 import { moderationCopy } from "../lib/community-moderation-copy";
+import { discussionReportsHref } from "../lib/discussion-reports-contract";
+import { discussionReportsCopy } from "../lib/discussion-reports-copy";
 import { getRequestLocale } from "../lib/i18n-server";
 import {
   moderatedDiscussionDetailSchema,
@@ -154,6 +156,14 @@ export async function ModeratedDiscussionScreen({
               className="inline-flex min-h-11 items-center text-sm text-accent underline"
             >
               {copy.back}
+            </Link>
+          )}
+          {commentId && (
+            <Link
+              href={discussionReportsHref(id, commentId)}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            >
+              {discussionReportsCopy(locale).open}
             </Link>
           )}
         </nav>

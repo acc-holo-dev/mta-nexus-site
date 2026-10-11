@@ -1,22 +1,24 @@
 "use client";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@nexus/ui";
-import type { Locale } from "../lib/i18n";
-import {
-  communityReportDetailSchema,
-  confirmsReportDecision,
-  type CommunityReportDetail,
-  type communityReportDecisionSchema,
-} from "../lib/community-report-contract";
 import type { z } from "zod";
 import {
+  type CommunityReportDetail,
+  type communityReportDecisionSchema,
+  communityReportDetailSchema,
+  confirmsReportDecision,
+} from "../lib/community-report-contract";
+import {
   communityReportCopy,
-  communityReportError,
   communityReportDecisionError,
+  communityReportError,
 } from "../lib/community-report-copy";
+import { discussionReportsCopy } from "../lib/discussion-reports-copy";
+import type { Locale } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
 import { ReportEvidenceLinks } from "./report-evidence-links";
+
 type Decision = z.infer<typeof communityReportDecisionSchema>;
 export function CommunityReportDetailView({
   id,
@@ -225,6 +227,14 @@ export function CommunityReportDetailView({
           <section className="nexus-panel space-y-3 p-5">
             <h2 className="text-lg font-semibold text-primary">{copy.currentTarget}</h2>
             <p className="text-xs text-muted">{copy.currentHint}</p>
+            {staff && report.moderationHref && (
+              <Link
+                href={report.moderationHref}
+                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              >
+                {discussionReportsCopy(locale).link}
+              </Link>
+            )}
             {report.target ? (
               <>
                 <h3 className="break-words text-sm font-semibold text-primary">
@@ -304,7 +314,9 @@ export function CommunityReportDetailView({
                       ...(report.status === "open" ? ["review" as const] : []),
                       "resolve",
                       "dismiss",
-                      ...(report.target?.kind === "comment" && report.target.revision
+                      ...(report.target?.kind === "comment" &&
+                      report.target.revision &&
+                      report.moderationHref !== null
                         ? ["remove_comment" as const]
                         : []),
                     ] as Decision["action"][]

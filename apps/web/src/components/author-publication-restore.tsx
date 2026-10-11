@@ -8,19 +8,37 @@ import {
   authorPublicationDeskError,
 } from "../lib/author-publication-desk-copy";
 import type { Locale } from "../lib/i18n";
+import { confirmedOrganizationPublicationRestore } from "../lib/organization-publication-history-contract";
+import {
+  organizationPublicationHistoryCopy,
+  organizationPublicationHistoryError,
+} from "../lib/organization-publication-history-copy";
 import { platformRequest } from "../lib/user-platform-client";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 export function AuthorPublicationRestore({
   id,
   revision,
   locale,
+  organizationId,
 }: {
   id: string;
   revision: string;
   locale: Locale;
+  organizationId?: string;
 }) {
   const router = useRouter();
-  const copy = authorPublicationDeskCopy(locale),
+  const orgCopy = organizationPublicationHistoryCopy(locale);
+  const copy = {
+      ...authorPublicationDeskCopy(locale),
+      ...(organizationId
+        ? {
+            restoreHelp: orgCopy.restoreHelp,
+            restoreConfirm: orgCopy.restoreConfirm,
+            restoreDenied: orgCopy.restoreDenied,
+            restoredNotice: orgCopy.restoredNotice,
+          }
+        : {}),
+    },
     [busy, setBusy] = useState(false),
     [notice, setNotice] = useState(""),
     [saved, setSaved] = useState(false),
@@ -45,15 +63,22 @@ export function AuthorPublicationRestore({
     controller.current = active;
     try {
       const result = await platformRequest(
-        `/api/workspace/content/${encodeURIComponent(id)}/restore`,
+        organizationId
+          ? `/api/workspace/organizations/${encodeURIComponent(organizationId)}/content/${encodeURIComponent(id)}/restore`
+          : `/api/workspace/content/${encodeURIComponent(id)}/restore`,
         locale,
         "POST",
         { expectedRevision: revision },
         active.signal,
-        authorPublicationDeskError,
+        organizationId ? organizationPublicationHistoryError : authorPublicationDeskError,
       );
       if (!mounted.current) return;
-      if (!confirmedAuthorPublicationRestore(result, id, revision)) throw new Error(copy.uncertain);
+      if (
+        !(organizationId
+          ? confirmedOrganizationPublicationRestore(result, id, organizationId, revision)
+          : confirmedAuthorPublicationRestore(result, id, revision))
+      )
+        throw new Error(copy.uncertain);
       setSaved(true);
       setNotice(copy.restoredNotice);
       router.refresh();
@@ -93,7 +118,11 @@ export function AuthorPublicationRestore({
       {saved ? (
         <Link
           prefetch={false}
-          href={`/workspace/content/${encodeURIComponent(id)}`}
+          href={
+            organizationId
+              ? `/workspace/organizations/${encodeURIComponent(organizationId)}/content/${encodeURIComponent(id)}`
+              : `/workspace/content/${encodeURIComponent(id)}`
+          }
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
         >
           {copy.restored}

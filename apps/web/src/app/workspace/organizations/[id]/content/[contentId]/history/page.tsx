@@ -1,0 +1,22 @@
+import { OrganizationPublicationHistoryScreen } from "../../../../../../../components/organization-publication-history-screen";
+import { getRequestLocale } from "../../../../../../../lib/i18n-server";
+import { organizationPublicationHistoryCopy } from "../../../../../../../lib/organization-publication-history-copy";
+export const dynamic = "force-dynamic";
+export async function generateMetadata() {
+  const copy = organizationPublicationHistoryCopy(await getRequestLocale());
+  return {
+    title: copy.title,
+    description: copy.description,
+    robots: { index: false, follow: false },
+  };
+}
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string; contentId: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const scope = await params;
+  return OrganizationPublicationHistoryScreen({ ...scope, searchParams });
+}

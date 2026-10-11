@@ -1,7 +1,7 @@
 import { communityReportsRepository } from "@nexus/db";
-import { can, generateId } from "@nexus/security";
-import { ForbiddenError } from "@nexus/domain";
 import type { User } from "@nexus/domain";
+import { ForbiddenError } from "@nexus/domain";
+import { can, generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
 import type {
@@ -59,7 +59,7 @@ class CommunityReportService {
         ? {
             kind: row.target.kind,
             title: row.target.title,
-            text: row.target.text.slice(0, 5000),
+            text: Array.from(row.target.text).slice(0, 5000).join(""),
             truncated: row.target.truncated,
             author: row.target.author,
             status: row.target.status,
@@ -70,7 +70,15 @@ class CommunityReportService {
             revision: staff ? row.target.revision : null,
           }
         : null,
-      ...(staff ? { moderatorNotes: row.moderatorNotes ?? null, reporterId: row.reporterId } : {}),
+      ...(staff
+        ? {
+            moderatorNotes: row.moderatorNotes ?? null,
+            reporterId: row.reporterId,
+            moderationHref: row.moderationContentId
+              ? `/admin/community/${encodeURIComponent(row.moderationContentId)}${row.targetType === "comment" ? `/discussion/${encodeURIComponent(row.targetId)}` : ""}`
+              : null,
+          }
+        : {}),
     };
   }
   async decide(actor: User, id: string, input: z.infer<typeof communityReportDecisionSchema>) {
