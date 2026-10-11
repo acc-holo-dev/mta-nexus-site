@@ -2183,3 +2183,64 @@ CREATE INDEX content_moderation_updated_id_idx
   WHERE type IN ('article', 'news', 'devlog', 'update', 'announcement', 'post', 'question', 'review')
     AND status IN ('draft', 'published', 'archived');
 ```
+
+### Historical MTA periods and filtered observation browsing — 2026-10-11
+
+Existing public and managed statistics pages now provide native UTC end-time
+forms and adjacent-period links. The shared strict query contract normalizes
+`endUtc` datetime-local submissions to canonical `end` ISO timestamps, rejects
+simultaneous forms and malformed calendar values, and preserves the chosen end
+when changing duration. The existing repository's ninety-day end bound is shared
+with observation browsing. Session failures on managed statistics receive a safe
+recoverable error, rather than escaping the page renderer.
+
+`/servers/[slug]/observations` and
+`/workspace/servers/[id]/observations`, with matching GET
+`/api/servers/[id]/observations` and private workspace endpoints, browse the
+existing immutable observation model. Search covers remote mode/map/MTA-version
+text; filters distinguish known, unknown and zero player counts and three-state
+password/response data. Twenty-five-row pages select nearest newer or older
+neighbors with exact PostgreSQL UTC microsecond tuple keys. Continuations bind
+to the resolved listing, access kind/account, period and every filter. Removed
+anchors remain usable because continuation carries the original tuple; current
+listing/grant authority is still checked on every request.
+
+The existing server-observation repository and statistics service are extended;
+statistics and browsing share the same current public/managed target selection
+and period validation. Public requests remain public regardless of signed-in
+administrator cookies. Organization grants and actual administrator roles are
+evaluated inside a repeatable-read snapshot. Missing/revoked targets do not
+trigger observation reads. Browsing uses two bounded queries and avoids period
+aggregation or offset scans for each page. Owner identities, endpoints, remote
+source sequences and other collection bookkeeping are absent from DTOs.
+
+GET `/observations/export` counterparts reuse the existing CSV escaping and
+download control, recheck current access, and export only the selected filtered
+page. Exact observed timestamps are retained in APIs, the table and CSV.
+Pagination, duration changes and exports preserve selected filters and bounds;
+new periods and filter changes clear continuation. Later saved observations can
+change results within fixed bounds; no persistent data snapshot is promised.
+Missing telemetry does not establish downtime, and endpoint-revision attribution
+remains unavailable with the existing model. Private collection is not enabled.
+RU/EN metadata, noindex, accessible scrollable tables, forms and
+loading/empty/error/recovery states are included.
+
+178 focused unit/query/HTTP/render checks across fourteen files and touched-file
+Biome pass. Next webpack compile mode passes. TypeScript and Knip still report
+only the existing commercial `isSigned` fixture and
+`ResourceReleaseWorkerRepository` export issues; new source and fixtures add no
+findings. Three additional PostgreSQL fixtures prepare filtered microsecond
+traversal in both directions, deleted-anchor continuation, Unicode bounds,
+half-open/source isolation, current organization/admin revocation and
+account/target/period cursor isolation. They remain unrun without PostgreSQL.
+Browser validation, full production generation and large-catalog query plans
+remain pending. No schema, migration, npm dependency or workflow is changed.
+
+Agent A owns this additional nonunique index contract. The existing
+server/time index remains usable; validate plans before claiming scaling results:
+
+```sql
+CREATE INDEX server_observations_master_server_time_id_idx
+  ON server_observations (server_id, observed_at DESC, id DESC)
+  WHERE source = 'mta_master';
+```

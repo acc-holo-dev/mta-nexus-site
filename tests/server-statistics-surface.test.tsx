@@ -137,3 +137,28 @@ it("localizes private metadata and loading states without embedding listing name
   expect(state.read).not.toHaveBeenCalled();
   expect(renderToStaticMarkup(await ServerStatisticsLoading())).toContain('aria-busy="true"');
 });
+
+it("normalizes the UTC form to the same canonical period used by APIs and exports", async () => {
+  await ServerStatisticsPage({
+    target: { slug: "server" },
+    managed: false,
+    searchParams: { window: "7d", endUtc: "2026-10-01T12:34:56.123" },
+  });
+  expect(state.read).toHaveBeenCalledExactlyOnceWith(
+    { slug: "server" },
+    { kind: "public" },
+    { window: "7d", end: "2026-10-01T12:34:56.123Z" },
+  );
+});
+
+it("shows session infrastructure failures without presenting them as guest or empty data", async () => {
+  state.session.mockRejectedValueOnce(new Error("PRIVATE_AUTH"));
+  const html = renderToStaticMarkup(
+    await ServerStatisticsPage({ target: { id: "server" }, managed: true, searchParams: {} }),
+  );
+  expect(html).toContain('role="alert"');
+  expect(html).toContain('href="/workspace/servers/server/statistics"');
+  expect(html).not.toContain("PRIVATE_AUTH");
+  expect(html).not.toContain("Войдите");
+  expect(state.read).not.toHaveBeenCalled();
+});

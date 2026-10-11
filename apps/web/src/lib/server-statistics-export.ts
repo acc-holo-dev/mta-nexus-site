@@ -1,4 +1,5 @@
 import type { ServerStatisticsResult } from "./services/server-statistics-service";
+import type { ServerObservationBrowserResult } from "./services/server-statistics-service";
 
 export function serverStatisticsIntervals(report: ServerStatisticsResult) {
   const start = new Date(report.windowStart).getTime(),
@@ -41,6 +42,32 @@ function cell(value: string | number | boolean | null) {
   return `"${text.replaceAll('"', '""')}"`;
 }
 
+const observationColumns = [
+  "observation_id",
+  "observed_at_utc",
+  "players",
+  "capacity",
+  "game_mode",
+  "map",
+  "mta_version",
+  "passworded",
+  "responding",
+];
+
+function observationValues(item: ServerStatisticsResult["observations"][number]) {
+  return [
+    item.id,
+    item.observedAt,
+    item.currentPlayers,
+    item.maxPlayers,
+    item.gameMode,
+    item.mapName,
+    item.mtaVersion,
+    item.passworded,
+    item.responding,
+  ];
+}
+
 export function serverStatisticsCsv(
   report: ServerStatisticsResult,
   format: "buckets" | "observations",
@@ -57,17 +84,7 @@ export function serverStatisticsCsv(
           "average_players",
           "max_capacity",
         ]
-      : [
-          "observation_id",
-          "observed_at_utc",
-          "players",
-          "capacity",
-          "game_mode",
-          "map",
-          "mta_version",
-          "passworded",
-          "responding",
-        ];
+      : observationColumns;
   const rows =
     format === "buckets"
       ? serverStatisticsIntervals(report).map((item) => [
@@ -79,21 +96,24 @@ export function serverStatisticsCsv(
           item.averagePlayers,
           item.maxPlayers,
         ])
-      : report.observations
-          .slice(0, 25)
-          .map((item) => [
-            item.id,
-            item.observedAt,
-            item.currentPlayers,
-            item.maxPlayers,
-            item.gameMode,
-            item.mapName,
-            item.mtaVersion,
-            item.passworded,
-            item.responding,
-          ]);
+      : report.observations.slice(0, 25).map(observationValues);
   return `\uFEFF${[
     ["server_id", "window_start_utc", "window_end_utc", "source", ...columns].join(","),
     ...rows.map((row) => [...metadata, ...row].map(cell).join(",")),
   ].join("\r\n")}\r\n`;
+}
+
+export function serverObservationBrowserCsv(report: ServerObservationBrowserResult) {
+  const columns = [
+    "server_id",
+    "window_start_utc",
+    "window_end_utc",
+    "source",
+    ...observationColumns,
+  ];
+  const metadata = [report.server.id, report.windowStart, report.windowEnd, report.source];
+  const rows = report.observations
+    .slice(0, 25)
+    .map((item) => [...metadata, ...observationValues(item)]);
+  return `\uFEFF${[columns.join(","), ...rows.map((row) => row.map(cell).join(","))].join("\r\n")}\r\n`;
 }

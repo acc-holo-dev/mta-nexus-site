@@ -1,13 +1,68 @@
-import { and, count, desc, eq, exists, gte, isNull, lt, lte, or, sql, type SQL } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  exists,
+  gte,
+  ilike,
+  isNotNull,
+  isNull,
+  lt,
+  lte,
+  or,
+  sql,
+  type SQL,
+} from "drizzle-orm";
+import { createHash } from "node:crypto";
 import { db } from "../client";
 import { serverObservations, servers, users } from "../schema";
 import type { Server, ServerObservation } from "@nexus/domain";
 import { AppError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { managedServerScope } from "./server-management-scope";
+import { containsPattern } from "./search-pattern";
 
 export type ServerStatisticsAccess = { kind: "public" } | { kind: "managed"; actorId: string };
 export type ServerStatisticsTarget = { id: string } | { slug: string };
+
+type ObservationTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+async function statisticsTarget(
+  tx: ObservationTransaction,
+  target: ServerStatisticsTarget,
+  access: ServerStatisticsAccess,
+) {
+  const currentAdmin =
+    access.kind === "managed"
+      ? exists(
+          tx
+            .select({ id: users.id })
+            .from(users)
+            .where(and(eq(users.id, access.actorId), eq(users.role, "admin"))),
+        )
+      : undefined;
+  const [server] = await tx
+    .select({
+      id: servers.id,
+      name: servers.name,
+      slug: servers.slug,
+      visibility: servers.visibility,
+      status: servers.status,
+      endpointRevision: servers.endpointRevision,
+    })
+    .from(servers)
+    .where(
+      and(
+        "id" in target ? eq(servers.id, target.id) : eq(servers.slug, target.slug),
+        access.kind === "public"
+          ? or(eq(servers.visibility, "public"), eq(servers.visibility, "unlisted"))
+          : or(currentAdmin, managedServerScope(access.actorId)),
+      ),
+    )
+    .limit(1);
+  return server;
+}
 
 type ObservedEndpoint = Readonly<
   Pick<Server, "ipAddress" | "port"> & { endpointRevision?: number }
@@ -17,6 +72,20 @@ export type RecordServerObservationInput = Omit<ServerObservation, "id" | "creat
 
 function boundedObservationInt(value: number, fallback: number, max: number): number {
   return Number.isFinite(value) ? Math.min(Math.max(Math.floor(value), 1), max) : fallback;
+}
+
+function statisticsBounds(hours: 24 | 168 | 720, suppliedEnd?: Date) {
+  const now = new Date(),
+    end = suppliedEnd ?? now;
+  if (
+    ![24, 168, 720].includes(hours) ||
+    !Number.isFinite(end.getTime()) ||
+    end > now ||
+    now.getTime() - end.getTime() > 90 * 86_400_000
+  )
+    throw new AppError("Invalid observation period", 400, "VALIDATION_ERROR");
+  const start = new Date(end.getTime() - hours * 3_600_000);
+  return { end, start, previousStart: new Date(start.getTime() - hours * 3_600_000) };
 }
 
 type ObservationWindow = {
@@ -44,6 +113,134 @@ type ObservationWindow = {
 };
 
 export class ServerObservationRepository {
+  /** Bounded history browsing avoids recalculating period aggregates for each page. */
+  async pageObservations(
+    target: ServerStatisticsTarget,
+    access: ServerStatisticsAccess,
+    hours: 24 | 168 | 720,
+    options: {
+      end?: Date;
+      query: string;
+      players: "all" | "known" | "unknown" | "zero";
+      password: "all" | "yes" | "no" | "unknown";
+      responding: "all" | "yes" | "no" | "unknown";
+      cursor?: { createdAt: string; id: string; context: string; direction: "older" | "newer" };
+    },
+  ) {
+    const { start, end } = statisticsBounds(hours, options.end);
+    if (
+      options.query.length > 100 ||
+      !["all", "known", "unknown", "zero"].includes(options.players) ||
+      !["all", "yes", "no", "unknown"].includes(options.password) ||
+      !["all", "yes", "no", "unknown"].includes(options.responding) ||
+      (options.cursor && !options.end) ||
+      (access.kind === "managed" && !access.actorId)
+    )
+      throw new AppError("Invalid observation query", 400, "VALIDATION_ERROR");
+    return db.transaction(
+      async (tx) => {
+        const server = await statisticsTarget(tx, target, access);
+        if (!server) return null;
+        const context = createHash("sha256")
+          .update(
+            JSON.stringify([
+              1,
+              "server-observation-browser",
+              server.id,
+              access.kind,
+              access.kind === "managed" ? access.actorId : "",
+              hours,
+              end.toISOString(),
+              options.query,
+              options.players,
+              options.password,
+              options.responding,
+            ]),
+          )
+          .digest("hex");
+        if (options.cursor && options.cursor.context !== context)
+          throw new AppError("Observation filters changed", 400, "INVALID_CURSOR");
+        const flag = (
+          column: typeof serverObservations.passworded | typeof serverObservations.responding,
+          value: "all" | "yes" | "no" | "unknown",
+        ) =>
+          value === "all"
+            ? undefined
+            : value === "unknown"
+              ? isNull(column)
+              : eq(column, value === "yes");
+        const pattern = options.query ? containsPattern(options.query) : undefined,
+          newer = options.cursor?.direction === "newer";
+        const rows = await tx
+          .select({
+            id: serverObservations.id,
+            observedAt: sql<string>`to_char(${serverObservations.observedAt} at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+            currentPlayers: serverObservations.currentPlayers,
+            maxPlayers: serverObservations.maxPlayers,
+            gameMode: sql<string | null>`left(${serverObservations.gameMode},240)`,
+            mapName: sql<string | null>`left(${serverObservations.mapName},240)`,
+            mtaVersion: sql<string | null>`left(${serverObservations.mtaVersion},120)`,
+            passworded: serverObservations.passworded,
+            responding: serverObservations.responding,
+          })
+          .from(serverObservations)
+          .where(
+            and(
+              eq(serverObservations.serverId, server.id),
+              eq(serverObservations.source, "mta_master"),
+              gte(serverObservations.observedAt, start),
+              lt(serverObservations.observedAt, end),
+              options.players === "known"
+                ? isNotNull(serverObservations.currentPlayers)
+                : options.players === "unknown"
+                  ? isNull(serverObservations.currentPlayers)
+                  : options.players === "zero"
+                    ? eq(serverObservations.currentPlayers, 0)
+                    : undefined,
+              flag(serverObservations.passworded, options.password),
+              flag(serverObservations.responding, options.responding),
+              pattern
+                ? or(
+                    ilike(serverObservations.gameMode, pattern),
+                    ilike(serverObservations.mapName, pattern),
+                    ilike(serverObservations.mtaVersion, pattern),
+                  )
+                : undefined,
+              options.cursor
+                ? newer
+                  ? sql`(${serverObservations.observedAt},${serverObservations.id}) > (${options.cursor.createdAt}::timestamptz,${options.cursor.id})`
+                  : sql`(${serverObservations.observedAt},${serverObservations.id}) < (${options.cursor.createdAt}::timestamptz,${options.cursor.id})`
+                : undefined,
+            ),
+          )
+          .orderBy(
+            ...(newer
+              ? [asc(serverObservations.observedAt), asc(serverObservations.id)]
+              : [desc(serverObservations.observedAt), desc(serverObservations.id)]),
+          )
+          .limit(26);
+        const items = rows.slice(0, 25);
+        if (newer) items.reverse();
+        const first = items[0],
+          last = items.at(-1);
+        const point = (row: (typeof items)[number] | undefined) =>
+          row ? { createdAt: row.observedAt, id: row.id } : null;
+        return {
+          server,
+          windowStart: start,
+          windowEnd: end,
+          context,
+          observations: items,
+          nextCursor: (newer ? items.length > 0 : rows.length > 25) ? point(last) : null,
+          previousCursor: (newer ? rows.length > 25 : !!options.cursor && items.length > 0)
+            ? point(first)
+            : null,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
   /** Listing authority, both periods and a bounded observation page share one snapshot. */
   async readStatistics(
     target: ServerStatisticsTarget,
@@ -51,50 +248,16 @@ export class ServerObservationRepository {
     hours: 24 | 168 | 720,
     options: { end?: Date; before?: string } = {},
   ) {
-    const now = new Date();
-    const end = options.end ?? now;
+    const { end, start, previousStart } = statisticsBounds(hours, options.end);
     if (
-      ![24, 168, 720].includes(hours) ||
-      !Number.isFinite(end.getTime()) ||
-      end > now ||
-      now.getTime() - end.getTime() > 90 * 86_400_000 ||
       (options.before !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(options.before)) ||
       (access.kind === "managed" && !access.actorId)
     )
       throw new AppError("Invalid statistics query", 400, "VALIDATION_ERROR");
-    const start = new Date(end.getTime() - hours * 3_600_000);
-    const previousStart = new Date(start.getTime() - hours * 3_600_000);
     const bucketSeconds = hours === 24 ? 3600 : hours === 168 ? 21_600 : 86_400;
     return db.transaction(
       async (tx) => {
-        const currentAdmin =
-          access.kind === "managed"
-            ? exists(
-                tx
-                  .select({ id: users.id })
-                  .from(users)
-                  .where(and(eq(users.id, access.actorId), eq(users.role, "admin"))),
-              )
-            : undefined;
-        const [server] = await tx
-          .select({
-            id: servers.id,
-            name: servers.name,
-            slug: servers.slug,
-            visibility: servers.visibility,
-            status: servers.status,
-            endpointRevision: servers.endpointRevision,
-          })
-          .from(servers)
-          .where(
-            and(
-              "id" in target ? eq(servers.id, target.id) : eq(servers.slug, target.slug),
-              access.kind === "public"
-                ? or(eq(servers.visibility, "public"), eq(servers.visibility, "unlisted"))
-                : or(currentAdmin, managedServerScope(access.actorId)),
-            ),
-          )
-          .limit(1);
+        const server = await statisticsTarget(tx, target, access);
         if (!server) return null;
 
         const base = and(

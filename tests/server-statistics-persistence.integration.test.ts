@@ -113,6 +113,199 @@ it("checks persisted public visibility, current organization grants and live adm
   });
 }, 30_000);
 
+it("traverses filtered exact-time pages in both directions and continues after anchor removal", async () => {
+  await fixture(async (tx, end) => {
+    await tx.execute(sql`INSERT INTO server_observations (id, server_id, source, game_mode, current_players, observed_at)
+      SELECT 'browse_' || lpad(n::text,3,'0'),'public','mta_master','Lua%_',0,
+        date_trunc('milliseconds',${end.toISOString()}::timestamptz-interval '1 hour')+n*interval '1 microsecond'
+      FROM generate_series(1,57) n`);
+    await tx.execute(sql`INSERT INTO server_observations (id,server_id,source,game_mode,observed_at) VALUES
+      ('wildcard','public','mta_master','LuaZZZ',${end.toISOString()}::timestamptz-interval '1 hour'),
+      ('foreign-source','public','mta_query','Lua%_',${end.toISOString()}::timestamptz-interval '1 hour')`);
+    const repository = new ServerObservationRepository(),
+      filters = {
+        end,
+        query: "Lua%_",
+        players: "zero" as const,
+        password: "all" as const,
+        responding: "all" as const,
+      };
+    const first = await repository.pageObservations(
+      { id: "public" },
+      { kind: "public" },
+      24,
+      filters,
+    );
+    if (!first?.nextCursor) throw Error("Expected continuation");
+    expect(first.observations).toHaveLength(25);
+    expect(first.nextCursor.createdAt).toMatch(/\.\d{6}Z$/u);
+    const second = await repository.pageObservations({ id: "public" }, { kind: "public" }, 24, {
+      ...filters,
+      cursor: { ...first.nextCursor, context: first.context, direction: "older" },
+    });
+    if (!second?.previousCursor || !second.nextCursor) throw Error("Expected two-way continuation");
+    const previous = await repository.pageObservations({ id: "public" }, { kind: "public" }, 24, {
+      ...filters,
+      cursor: { ...second.previousCursor, context: second.context, direction: "newer" },
+    });
+    expect(previous?.observations.map((row) => row.id)).toEqual(
+      first.observations.map((row) => row.id),
+    );
+    await tx.execute(sql`DELETE FROM server_observations WHERE id=${first.nextCursor.id}`);
+    const continued = await repository.pageObservations({ id: "public" }, { kind: "public" }, 24, {
+      ...filters,
+      cursor: { ...first.nextCursor, context: first.context, direction: "older" },
+    });
+    expect(continued?.observations.map((row) => row.id)).toEqual(
+      second.observations.map((row) => row.id),
+    );
+    const third = await repository.pageObservations({ id: "public" }, { kind: "public" }, 24, {
+      ...filters,
+      cursor: { ...second.nextCursor, context: second.context, direction: "older" },
+    });
+    const ids = [...first.observations, ...second.observations, ...(third?.observations ?? [])].map(
+      (row) => row.id,
+    );
+    expect(ids).toHaveLength(57);
+    expect(new Set(ids).size).toBe(57);
+    expect(ids[0]).toBe("browse_057");
+    expect(ids.at(-1)).toBe("browse_001");
+    expect(third?.nextCursor).toBeNull();
+  });
+}, 30_000);
+
+it("filters known, zero and unknown telemetry independently and bounds supplementary Unicode text", async () => {
+  await fixture(async (tx, end) => {
+    await tx.execute(sql`INSERT INTO server_observations (id,server_id,source,game_mode,current_players,passworded,responding,observed_at) VALUES
+      ('zero','public','mta_master',${"😀".repeat(500)},0,false,NULL,${end.toISOString()}::timestamptz-interval '1 hour'),
+      ('unknown','public','mta_master','mode',NULL,true,false,${end.toISOString()}::timestamptz-interval '2 hours'),
+      ('known','public','mta_master','mode',12,NULL,true,${end.toISOString()}::timestamptz-interval '3 hours'),
+      ('end','public','mta_master','mode',0,false,NULL,${end.toISOString()}::timestamptz),
+      ('before','public','mta_master','mode',0,false,NULL,${end.toISOString()}::timestamptz-interval '25 hours')`);
+    const repository = new ServerObservationRepository(),
+      filters = {
+        end,
+        query: "",
+        players: "all" as const,
+        password: "all" as const,
+        responding: "all" as const,
+      };
+    const zero = await repository.pageObservations({ id: "public" }, { kind: "public" }, 24, {
+      ...filters,
+      players: "zero",
+      password: "no",
+      responding: "unknown",
+    });
+    expect(zero?.observations.map((row) => row.id)).toEqual(["zero"]);
+    expect(Array.from(zero?.observations[0].gameMode ?? "")).toHaveLength(240);
+    expect(
+      (
+        await repository.pageObservations({ id: "public" }, { kind: "public" }, 24, {
+          ...filters,
+          players: "unknown",
+          password: "yes",
+          responding: "no",
+        })
+      )?.observations.map((row) => row.id),
+    ).toEqual(["unknown"]);
+    expect(
+      (
+        await repository.pageObservations({ id: "public" }, { kind: "public" }, 24, {
+          ...filters,
+          players: "known",
+        })
+      )?.observations.map((row) => row.id),
+    ).toEqual(["zero", "known"]);
+  });
+}, 30_000);
+
+it("rechecks current grants and binds observation continuations to account, target and period", async () => {
+  await fixture(async (tx, end) => {
+    await tx.execute(sql`INSERT INTO server_observations (id,server_id,source,observed_at)
+      SELECT 'private_'||lpad(n::text,3,'0'),'team','mta_master',${end.toISOString()}::timestamptz-interval '1 hour' FROM generate_series(1,26) n`);
+    const repository = new ServerObservationRepository(),
+      filters = {
+        end,
+        query: "",
+        players: "all" as const,
+        password: "all" as const,
+        responding: "all" as const,
+      };
+    expect(
+      await repository.pageObservations({ id: "team" }, { kind: "public" }, 24, filters),
+    ).toBeNull();
+    const first = await repository.pageObservations(
+      { id: "team" },
+      { kind: "managed", actorId: "delegate" },
+      24,
+      filters,
+    );
+    if (!first?.nextCursor) throw Error("Expected continuation");
+    const cursor = { ...first.nextCursor, context: first.context, direction: "older" as const };
+    await expect(
+      repository.pageObservations({ id: "team" }, { kind: "managed", actorId: "owner" }, 24, {
+        ...filters,
+        cursor,
+      }),
+    ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
+    await expect(
+      repository.pageObservations({ id: "team" }, { kind: "managed", actorId: "delegate" }, 168, {
+        ...filters,
+        cursor,
+      }),
+    ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
+    const ownerPage = await repository.pageObservations(
+      { id: "team" },
+      { kind: "managed", actorId: "owner" },
+      24,
+      filters,
+    );
+    if (!ownerPage?.nextCursor) throw Error("Expected owner continuation");
+    await expect(
+      repository.pageObservations({ id: "public" }, { kind: "managed", actorId: "owner" }, 24, {
+        ...filters,
+        cursor: { ...ownerPage.nextCursor, context: ownerPage.context, direction: "older" },
+      }),
+    ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
+    await tx.execute(
+      sql`UPDATE organization_members SET permissions='[]'::jsonb WHERE id='member'`,
+    );
+    expect(
+      await repository.pageObservations(
+        { id: "team" },
+        { kind: "managed", actorId: "delegate" },
+        24,
+        { ...filters, cursor },
+      ),
+    ).toBeNull();
+    expect(
+      await repository.pageObservations(
+        { id: "team" },
+        { kind: "managed", actorId: "admin" },
+        24,
+        filters,
+      ),
+    ).not.toBeNull();
+    await tx.execute(sql`UPDATE users SET role='user' WHERE id='admin'`);
+    expect(
+      await repository.pageObservations(
+        { id: "team" },
+        { kind: "managed", actorId: "admin" },
+        24,
+        filters,
+      ),
+    ).toBeNull();
+    await tx.execute(sql`UPDATE servers SET visibility='public' WHERE id='team'`);
+    expect(
+      await repository.pageObservations({ id: "team" }, { kind: "public" }, 24, filters),
+    ).not.toBeNull();
+    await tx.execute(sql`UPDATE servers SET visibility='private' WHERE id='team'`);
+    expect(
+      await repository.pageObservations({ id: "team" }, { kind: "public" }, 24, filters),
+    ).toBeNull();
+  });
+}, 30_000);
+
 it("keeps adjacent periods disjoint, computes full aggregates and excludes other sources and future observations", async () => {
   await fixture(async (tx, end) => {
     await tx.execute(sql`INSERT INTO server_observations (id, server_id, source, current_players, max_players, observed_at) VALUES

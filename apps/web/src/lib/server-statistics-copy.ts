@@ -40,6 +40,13 @@ const en = {
   latest: "Newest observations in this period",
   refresh: "Refresh period",
   windows: "Observation period",
+  endUtc: "Period ends at (UTC)",
+  choosePeriod: "Open this period",
+  periodScope:
+    "Choose an end within the last 90 days. The selected duration is counted back from this UTC time.",
+  adjacent: "Adjacent observation periods",
+  previousPeriod: "Previous period",
+  nextPeriod: "Next period",
   period24h: "24 hours",
   period7d: "7 days",
   period30d: "30 days",
@@ -108,6 +115,13 @@ const ru: typeof en = {
   latest: "Новые наблюдения этого периода",
   refresh: "Обновить период",
   windows: "Период наблюдений",
+  endUtc: "Конец периода (UTC)",
+  choosePeriod: "Открыть этот период",
+  periodScope:
+    "Выберите конец за последние 90 дней. Длительность отсчитывается назад от этого времени UTC.",
+  adjacent: "Соседние периоды наблюдений",
+  previousPeriod: "Предыдущий период",
+  nextPeriod: "Следующий период",
   period24h: "24 часа",
   period7d: "7 дней",
   period30d: "30 дней",
@@ -140,7 +154,7 @@ export function serverStatisticsError(locale: Locale, code: unknown) {
   if (code === "UNAUTHORIZED") return copy.signIn;
   if (code === "NOT_FOUND") return copy.notFound;
   if (code === "FORBIDDEN") return copy.forbidden;
-  if (code === "RATE_LIMITED") return copy.limit;
+  if (code === "RATE_LIMITED" || code === "RATE_LIMIT_EXCEEDED") return copy.limit;
   if (code === "VALIDATION_ERROR") return copy.invalid;
   if (code === "SERVER_OBSERVATION_PAGE_EXPIRED") return copy.expired;
   return copy.unavailable;

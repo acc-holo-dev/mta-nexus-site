@@ -7,6 +7,8 @@ import { serverStatisticsHref } from "../lib/server-statistics-contract";
 import { serverStatisticsIntervals } from "../lib/server-statistics-export";
 import { serverHistoryBarPercent } from "../lib/server-history-presentation";
 import { ServerStatisticsExportButton } from "./server-statistics-export-button";
+import { ServerObservationPeriodControls } from "./server-observation-period-controls";
+import { serverObservationBrowserCopy } from "../lib/server-observation-browser-copy";
 
 function StatisticsScrollArea({
   labelledBy,
@@ -70,30 +72,12 @@ export function ServerStatisticsPanel({
         <p className="break-words text-lg font-semibold text-primary">{report.server.name}</p>
         <p className="text-sm text-muted">{copy.description}</p>
         {managed && <p className="text-xs text-muted">{copy.private}</p>}
-        <nav aria-label={copy.windows} className="flex flex-wrap gap-2">
-          {(
-            [
-              ["24h", copy.period24h],
-              ["7d", copy.period7d],
-              ["30d", copy.period30d],
-            ] as const
-          ).map(([window, label]) => (
-            <Link
-              key={window}
-              href={serverStatisticsHref(path, { window })}
-              aria-current={report.window === window ? "page" : undefined}
-              className={`min-h-11 rounded-lg border border-base px-3 py-2 text-sm font-semibold ${report.window === window ? "bg-accent-soft text-accent" : "bg-inset text-secondary"}`}
-            >
-              {label}
-            </Link>
-          ))}
-          <Link
-            href={serverStatisticsHref(path, { window: report.window })}
-            className="min-h-11 px-3 py-2 text-sm text-accent underline"
-          >
-            {copy.refresh}
-          </Link>
-        </nav>
+        <ServerObservationPeriodControls
+          path={path}
+          window={report.window}
+          end={report.windowEnd}
+          locale={locale}
+        />
         <p className="text-xs text-muted">
           {copy.snapshot}: <time dateTime={report.windowEnd}>{time(report.windowEnd)} UTC</time>
         </p>
@@ -203,6 +187,15 @@ export function ServerStatisticsPanel({
           {copy.observations}
         </h2>
         <p className="text-sm text-muted">{copy.observationsScope}</p>
+        <Link
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          href={serverStatisticsHref(
+            `${managed ? `/workspace/servers/${encodeURIComponent(report.server.id)}` : `/servers/${encodeURIComponent(report.server.slug)}`}/observations`,
+            state,
+          )}
+        >
+          {serverObservationBrowserCopy(locale).open}
+        </Link>
         {report.observations.length === 0 ? (
           <p className="text-sm text-muted">{before ? copy.endOfPage : copy.empty}</p>
         ) : (

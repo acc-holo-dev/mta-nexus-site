@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { AppError } from "@nexus/domain";
+import { AppError, type User } from "@nexus/domain";
 import type { ServerStatisticsTarget } from "@nexus/db";
 import { authService } from "../lib/services/auth-service";
 import {
@@ -37,9 +37,30 @@ export async function ServerStatisticsPage({
 }) {
   const locale = await getRequestLocale(),
     copy = serverStatisticsCopy(locale);
-  const user = managed
-    ? await authService.getSession((await cookies()).get("nexus_session")?.value)
-    : null;
+  const path =
+    managed && "id" in target
+      ? `/workspace/servers/${encodeURIComponent(target.id)}/statistics`
+      : "slug" in target
+        ? `/servers/${encodeURIComponent(target.slug)}/statistics`
+        : "/servers";
+  let user: User | null = null;
+  try {
+    user = managed
+      ? await authService.getSession((await cookies()).get("nexus_session")?.value)
+      : null;
+  } catch {
+    return (
+      <div className="nexus-panel space-y-3 p-5">
+        <h1 className="text-xl font-bold text-primary">{copy.title}</h1>
+        <p role="alert" className="text-sm text-danger">
+          {copy.unavailable}
+        </p>
+        <a href={path} className="inline-flex min-h-11 items-center text-sm text-accent underline">
+          {copy.retry}
+        </a>
+      </div>
+    );
+  }
   if (managed && !user)
     return (
       <div className="mx-auto max-w-md space-y-4 py-20 text-center">
@@ -52,12 +73,6 @@ export async function ServerStatisticsPage({
         </Link>
       </div>
     );
-  const path =
-    managed && "id" in target
-      ? `/workspace/servers/${encodeURIComponent(target.id)}/statistics`
-      : "slug" in target
-        ? `/servers/${encodeURIComponent(target.slug)}/statistics`
-        : "/servers";
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(searchParams))
     for (const item of Array.isArray(value) ? value : value === undefined ? [] : [value])
