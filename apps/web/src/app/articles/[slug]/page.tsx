@@ -1,24 +1,23 @@
-import { safeExternalWebUrl } from "@nexus/validation";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import type { Metadata } from "next";
-import { ArrowLeft } from "lucide-react";
-import { ContentReactions } from "../../../components/content-reactions";
-import { contentReactionService } from "../../../lib/services/content-reaction-service";
-import { Avatar } from "@nexus/ui";
-import { contentService } from "../../../lib/services/content-service";
-import { authService } from "../../../lib/services/auth-service";
-import { ContentDiscussion } from "../../../components/content-discussion";
-import { getDiscussionCopy } from "../../../lib/content-discussion-copy";
-import { discussionError } from "../../../lib/content-discussion-copy";
-import { parseDiscussionQuery } from "../../../lib/content-discussion-contract";
 import { AppError } from "@nexus/domain";
-import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
+import { can } from "@nexus/security";
+import { Avatar } from "@nexus/ui";
+import { safeExternalWebUrl } from "@nexus/validation";
+import { ArrowLeft } from "lucide-react";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { CommunityReportForm } from "../../../components/community-report-form";
+import { ContentDiscussion } from "../../../components/content-discussion";
+import { ContentReactions } from "../../../components/content-reactions";
+import { parseDiscussionQuery } from "../../../lib/content-discussion-contract";
+import { discussionError, getDiscussionCopy } from "../../../lib/content-discussion-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
-import { cookies } from "next/headers";
-import { CommunityReportForm } from "../../../components/community-report-form";
-import { can } from "@nexus/security";
+import { authService } from "../../../lib/services/auth-service";
+import { contentReactionService } from "../../../lib/services/content-reaction-service";
+import { contentService } from "../../../lib/services/content-service";
+import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 
 export const dynamic = "force-dynamic";
 
@@ -171,7 +170,7 @@ export default async function ArticleDetailPage({
 
       {viewer?.id !== article.authorId && (
         <CommunityReportForm
-          key={`${article.id}:${viewer?.id ?? "guest"}`}
+          key={`report:${article.id}:${viewer?.id ?? "guest"}`}
           targetType="content"
           targetId={article.id}
           locale={locale}
@@ -193,7 +192,7 @@ export default async function ArticleDetailPage({
       </div>
 
       <ContentReactions
-        key={`${article.id}:${viewer?.id ?? "guest"}`}
+        key={`reactions:${article.id}:${viewer?.id ?? "guest"}`}
         contentId={article.id}
         slug={article.slug}
         initial={reactions}
