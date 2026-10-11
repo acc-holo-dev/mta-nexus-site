@@ -1,5 +1,16 @@
 # MTA NEXUS
 
+Publishers can now manage an uploaded resource gallery: up to eight static
+PNG/JPEG/WebP images, captions, ordering and a first-image cover. Canonical PNG
+conversion strips source metadata and has byte/pixel/concurrency limits; scanning
+must succeed before storage. Migration `0060_resource_media` preserves existing
+external previews until gallery edits, makes stored image identity immutable,
+and returns gallery/editorial changes to draft for renewed moderation. Private
+RU/EN author/staff screens and public marketplace galleries use live access checks;
+image delivery verifies full stored bytes before emitting PNG, with no-store headers.
+Removed references and uncertain commits retain private storage objects for a future
+orphan sweep. Live PostgreSQL and browser verification remain required.
+
 Version uploads now inspect standard stored/deflated ZIP packages before scanning
 or storage. Unsafe paths, duplicate/link entries, inconsistent headers, CRC failures,
 unsupported features and bounded inflation failures reject the upload. Migration

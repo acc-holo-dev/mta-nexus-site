@@ -27,3 +27,4 @@ export * from "./resource-build-workspace";
 export * from "./order-cases";
 export * from "./content-reactions";
 export * from "./build-package-evidence";
+export * from "./resource-media";

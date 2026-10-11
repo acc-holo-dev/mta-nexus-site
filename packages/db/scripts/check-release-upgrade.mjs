@@ -36,6 +36,7 @@ let client;
 let created = false;
 const evidence = {
   buildPackageEvidenceSchemaPresent: false,
+  resourceMediaSchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: upgradePlan.baselineTag,
@@ -409,6 +410,11 @@ try {
   assert.equal((await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname = 'builds_package_evidence_guard'`).length, 1);
   assert.equal((await client`SELECT package_evidence FROM builds WHERE id = 'upgrade-build'`)[0].package_evidence, null);
   evidence.buildPackageEvidenceSchemaPresent = true;
+  assert.equal((await client`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'resource_media'`).length, 1);
+  assert.equal((await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('resource_media_guard', 'resource_media_changed')`).length, 2);
+  assert.equal((await client`SELECT condeferrable, condeferred FROM pg_constraint WHERE conname = 'resource_media_product_position_unique'`)[0].condeferred, true);
+  assert.equal((await client`SELECT count(*)::int AS total FROM resource_media`)[0].total, 0);
+  evidence.resourceMediaSchemaPresent = true;
   const receiptColumns = await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);
   assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'resource_cart_receipt_user_time_idx'`).length, 1);

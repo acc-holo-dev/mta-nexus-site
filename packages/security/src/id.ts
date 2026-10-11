@@ -14,6 +14,7 @@ export type EntityPrefix =
   | "cplan"
   | "bld"
   | "ast"
+  | "rmi"
   | "lic"
   | "ent"
   | "ord"

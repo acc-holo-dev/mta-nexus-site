@@ -1,3 +1,4 @@
+vi.mock("@nexus/db", () => ({ resourceMediaRepository: { publicItems: async () => [], managed: async () => ({ items: [] }) } }));
 import type React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";

@@ -35,7 +35,7 @@ export async function resourceCommerceRequest(
               ? "reviewSubmission"
               : request.nextUrl.pathname.includes("/licenses/")
                 ? "licenseControl"
-                : /\/(lifecycle|variants|compatibility|builds)(?:\/|$)/u.test(
+                : /\/(lifecycle|variants|compatibility|builds|media)(?:\/|$)/u.test(
                       request.nextUrl.pathname,
                     )
                   ? "contentCreation"
@@ -44,7 +44,7 @@ export async function resourceCommerceRequest(
     }
     if (
       !mutation &&
-      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/resources\/cart\/(?:review|receipts)(?:\/|$)|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/(?:operations|support)$|^\/api\/licenses\/[^/]+\/runtime-config$|^\/api\/licenses(?:$|\/export$)|^\/api\/workspace\/resources$|^\/api\/products\/[^/]+\/history$|^\/api\/admin\/licenses\/maintenance$|^\/api\/order-cases(?:\/|$)|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:watches|downloads|releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:moderation|deliveries|builds\/[^/]+(?:\/package(?:\/files)?)?)$/u.test(
+      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/resources\/cart\/(?:review|receipts)(?:\/|$)|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/(?:operations|support)$|^\/api\/licenses\/[^/]+\/runtime-config$|^\/api\/licenses(?:$|\/export$)|^\/api\/workspace\/resources$|^\/api\/products\/[^/]+\/history$|^\/api\/admin\/licenses\/maintenance$|^\/api\/order-cases(?:\/|$)|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:watches|downloads|releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:media|moderation|deliveries|builds\/[^/]+(?:\/package(?:\/files)?)?)$/u.test(
         request.nextUrl.pathname,
       )
     ) {

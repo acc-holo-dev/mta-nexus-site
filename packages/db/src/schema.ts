@@ -30,6 +30,7 @@ import {
   jsonb,
   index,
   uniqueIndex,
+  unique,
   primaryKey,
   check,
 } from "drizzle-orm/pg-core";
@@ -263,6 +264,27 @@ export const products = pgTable(
     index("products_featured_idx").on(table.isFeatured),
   ]
 );
+
+// Only canonical PNG images are stored here; the first ordered image is the cover.
+export const resourceMedia = pgTable("resource_media", {
+  id: text("id").primaryKey(),
+  productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  storageKey: text("storage_key").notNull().unique(),
+  sha256Hash: text("sha256_hash").notNull(),
+  fileSizeBytes: integer("file_size_bytes").notNull(),
+  width: integer("width").notNull(), height: integer("height").notNull(),
+  scanner: text("scanner").notNull(), scannedAt: timestamp("scanned_at", { withTimezone: true }).notNull(),
+  caption: text("caption").notNull().default(""),
+  position: integer("position").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  // Migration 0060 makes this constraint deferred to permit atomic order swaps.
+  unique("resource_media_product_position_unique").on(table.productId, table.position),
+  unique("resource_media_product_hash_unique").on(table.productId, table.sha256Hash),
+  check("resource_media_identity_check", sql`${table.id} ~ '^rmi_[A-Za-z0-9_-]{1,100}$' AND ${table.storageKey} ~ '^assets/[A-Za-z0-9_-]{1,128}/ast_[A-Za-z0-9_-]+\\.png$' AND ${table.sha256Hash} ~ '^[a-f0-9]{64}$' AND ${table.fileSizeBytes} BETWEEN 1 AND 4194304 AND ${table.width} BETWEEN 1 AND 1920 AND ${table.height} BETWEEN 1 AND 1920 AND length(btrim(${table.scanner})) BETWEEN 1 AND 100 AND ${table.scanner} <> 'disabled'`),
+  check("resource_media_caption_check", sql`length(${table.caption}) <= 160`),
+  check("resource_media_position_check", sql`${table.position} BETWEEN 0 AND 7`),
+]);
 
 // Variant links carry no access grants. Each resource retains its own releases.
 export const productVariantGroups = pgTable("product_variant_groups", {

@@ -1,3 +1,4 @@
+import { resourceMediaCopy } from "../../../../lib/resource-media-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -54,6 +55,7 @@ export default async function ResourceModerationDetail({
       <p role="note" className="text-sm text-secondary">
         {copy.moderationNote}
       </p>
+      <Link href={`/admin/resources/${encodeURIComponent(id)}/media`} className="text-accent underline">{resourceMediaCopy(locale).title}</Link>
       <ResourceModerationControls
         key={`${id}:${product.updatedAt.toISOString()}`}
         product={{ id, status: product.status, updatedAt: product.updatedAt.toISOString() }}

@@ -1,9 +1,12 @@
+import { resourceMediaRepository } from "@nexus/db";
+import { ResourceGallery } from "../../../components/resource-gallery";
 import { AddResourceToCart } from "../../../components/resource-cart-controls";
 import { ResourceDownloadButton } from "../../../components/resource-download-button";
 import { ResourcePreview } from "../../../components/resource-preview";
 import { ResourceVariantChoices } from "../../../components/resource-variant-choices";
 import { resourceManagementService } from "../../../lib/services/resource-management-service";
-import { safeExternalWebUrl } from "@nexus/validation";
+import { safeResourceImageUrl } from "../../../lib/resource-image-url";
+import { config } from "@nexus/config";
 import { PRODUCT_PUBLISHING_KEYS } from "../../../lib/product-type-labels";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -93,7 +96,8 @@ export async function generateMetadata({
 
   const description =
     product.shortDescription || product.description.slice(0, 155);
-  const thumbnailUrl = safeExternalWebUrl(product.thumbnailUrl);
+  const previewUrl = safeResourceImageUrl(product.thumbnailUrl);
+  const thumbnailUrl = previewUrl?.startsWith("/") ? new URL(previewUrl, config.NEXT_PUBLIC_APP_URL).href : previewUrl;
 
   return {
     title: product.title,
@@ -142,6 +146,7 @@ export default async function ProductDetailPage({
     dependencyResolution,
     reverseDependencySummary,
     variantGroup,
+    gallery,
   ] = await Promise.all([
     managementAccess,
     user
@@ -161,6 +166,7 @@ export default async function ProductDetailPage({
       .getReverseDependencySummary(product.slug)
       .catch(() => null),
     isPublished ? resourceManagementService.publicVariants(product.id) : null,
+    isPublished ? resourceMediaRepository.publicItems(product.id) : managementAccess.then(async (allowed) => allowed && user ? (await resourceMediaRepository.managed(product.id, user.id)).items : []),
   ]);
   const hasAccess =
     isPublished && (canManageProduct || isLicensed || isAdmin);
@@ -211,6 +217,8 @@ export default async function ProductDetailPage({
               </span>
             </div>
           </div>
+
+          <ResourceGallery items={gallery} title={product.title} locale={locale} />
 
           <section className="nexus-panel space-y-4 p-6">
             <h2 className="border-b border-base pb-3 text-base font-bold text-primary">

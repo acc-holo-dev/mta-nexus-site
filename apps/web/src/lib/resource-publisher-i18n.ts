@@ -44,6 +44,9 @@ const copy = {
     historyNote:
       "Private recorded events; historical entries are not backfilled. This history does not restore an earlier description.",
     actions: {
+      "product.media.add": "Gallery image uploaded",
+      "product.media.save": "Gallery order or captions saved",
+      "product.media.remove": "Gallery image removed",
       "product.created": "Resource created",
       "product.details_updated": "Description or tags saved",
       "product.compatibility_updated": "Requirements saved",
@@ -97,6 +100,9 @@ const copy = {
     historyNote:
       "Закрытые записанные события; исторические записи не создаются задним числом. Этот журнал не восстанавливает прежнее описание.",
     actions: {
+      "product.media.add": "Изображение галереи загружено",
+      "product.media.save": "Порядок или подписи галереи сохранены",
+      "product.media.remove": "Изображение галереи удалено",
       "product.created": "Ресурс создан",
       "product.details_updated": "Описание или теги сохранены",
       "product.compatibility_updated": "Требования сохранены",

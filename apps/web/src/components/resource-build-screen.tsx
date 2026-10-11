@@ -1,3 +1,4 @@
+import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -65,6 +66,7 @@ export async function ResourceBuildScreen({
       {product.metadataReviewRequired && (
         <p className="text-sm text-warning">{publisherCopy.reviewRequired}</p>
       )}
+      {staff && <Link href={`/admin/resources/${encodeURIComponent(productId)}/media`} className="text-accent underline">{resourceMediaCopy(locale).title}</Link>}
       {staff && (
         <section className="nexus-panel space-y-3 p-5" aria-label={publisherCopy.description}>
           <p className="text-sm text-muted">{publisherCopy.reviewNote}</p>

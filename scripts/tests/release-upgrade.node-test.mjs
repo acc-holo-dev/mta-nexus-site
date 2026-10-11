@@ -10,6 +10,17 @@ import {
   releaseUpgradePlan,
 } from "../../packages/db/scripts/release-upgrade-contract.mjs";
 
+test("gallery upgrade protects artifact identity, deferred ordering and future moderation", () => {
+  const migration = readFileSync("packages/db/migrations/0060_resource_media.sql", "utf8");
+  assert.match(migration, /DEFERRABLE INITIALLY DEFERRED/u);
+  assert.match(migration, /Gallery artifact identity is immutable/u);
+  assert.match(migration, /FOR NO KEY UPDATE/u);
+  assert.match(migration, /metadata_review_required = true, status = 'draft'/u);
+  assert.match(migration, /NEW\.thumbnail_url, NEW\.screenshots/u);
+  assert.doesNotMatch(migration, /UPDATE (orders|payments|licenses|entitlements)|INSERT INTO resource_media/u);
+  assert.match(readFileSync(script, "utf8"), /resourceMediaSchemaPresent = true/u);
+});
+
 test("package evidence upgrade preserves unknown historical bytes and immutable new reports", () => {
   const migration = readFileSync("packages/db/migrations/0059_build_package_evidence.sql", "utf8");
   assert.match(migration, /ADD COLUMN package_evidence jsonb/u);
@@ -196,7 +207,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0059_build_package_evidence");
+  assert.equal(plan.targetTag, "0060_resource_media");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

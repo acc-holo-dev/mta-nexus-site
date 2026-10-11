@@ -1,5 +1,37 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Resource gallery, scanned canonical previews and renewed moderation — 2026-10-11
+
+Migration `0060` introduces up to eight publisher-scoped immutable image artifacts,
+deferred unique positions for atomic swaps and parent-first gallery guards. New
+uploads, ordering, captions and removal withdraw publication and pending build
+observations. Existing external preview values are not backfilled or changed until
+editing. Gallery commands use observed product revisions and commit audit together;
+private publisher history includes localized gallery actions. No access grants,
+financial, license or subscription states are changed.
+
+RU/EN author editing, first-image cover selection, read-only staff review and
+marketplace galleries use current management/moderation grants. PNG/JPEG/WebP inputs
+are bounded to 5 MiB, 4096 per dimension and 16 million pixels, fully decoded and
+converted to static PNG within 1920 per dimension / 4 MiB, with source metadata
+stripped and two concurrent conversions. Animated/unsupported inputs are refused;
+the existing scanner must approve canonical output before immutable private storage.
+Public image reads require a published free resource with a genuinely clean build;
+private reads use live author/organization/staff authority. Full length/hash checks,
+four-read concurrency, timeout, cancellation, nosniff and private no-store prevent
+unverified bytes or cached withdrawn images from being served by the endpoint.
+Original image bytes are never stored. Removed references, failed cleanup and
+uncertain DB commits retain private objects; an orphan cleanup sweep remains open.
+
+102 focused decoder/SQL/HTTP/service/SSR/regression checks, 25 local migration
+contract checks, TypeScript, touched-source Biome lint and Next.js webpack compile
+mode pass. Four PostgreSQL fixtures are prepared for deferred cover swaps,
+publication withdrawal, live rights, audit rollback, immutable identity, concurrent
+revision conflicts and removed IDs, but remain unrun without PostgreSQL. Browser
+editing, live migration/locking, scanner/storage and pinned Node 26 verification
+remain outstanding. Workflows were not used or changed.
+
+
 ### Bounded package inspection and private file comparisons — 2026-10-11
 
 Migration `0059` adds nullable, immutable package evidence with exact artifact

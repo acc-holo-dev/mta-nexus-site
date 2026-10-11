@@ -421,6 +421,13 @@
       "when": 1791743100000,
       "tag": "0059_build_package_evidence",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1791743400000,
+      "tag": "0060_resource_media",
+      "breakpoints": true
     }
   ]
 }

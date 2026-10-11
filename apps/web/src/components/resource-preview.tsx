@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { safeExternalWebUrl } from "@nexus/validation";
+import { safeResourceImageUrl } from "../lib/resource-image-url";
 
 export function ResourcePreview({ src, title, fallback, priority = false }: {
   src?: string | null;
@@ -9,7 +9,7 @@ export function ResourcePreview({ src, title, fallback, priority = false }: {
   fallback: string;
   priority?: boolean;
 }) {
-  const url = safeExternalWebUrl(src);
+  const url = safeResourceImageUrl(src);
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   if (!url || failedUrl === url) {
     return <div className="flex h-full w-full items-center justify-center text-sm text-faint">{fallback}</div>;

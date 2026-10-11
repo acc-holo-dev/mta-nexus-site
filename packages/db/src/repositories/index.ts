@@ -75,3 +75,4 @@ export { organizationTeamDirectoryRepository } from "./organization-team-directo
 export { communityModerationWorkspaceRepository } from "./community-moderation-workspace";
 
 export * from "./build-package-comparison";
+export * from "./resource-media";
