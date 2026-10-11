@@ -6,6 +6,7 @@ import {
   LIBRARY_COLLECTION_LIMIT,
   type LibraryCollectionCommand,
   type LibraryCollectionCopyPreview,
+  type LibraryReleaseFilter,
   type LibraryCollectionReceipt,
   type LibraryCollectionSnapshot,
   NotFoundError,
@@ -27,6 +28,7 @@ import { safePublishedBuildCondition } from "./build-safety";
 import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
 import { historyPageBounds } from "./history-pagination";
 import { containsPattern } from "./search-pattern";
+import { readLibraryReleasePage } from "./library-release-page";
 import { effectiveUserDownloadSources } from "./user-library";
 
 const fail = (code: string) => new AppError("Collection command is unavailable", 409, code);
@@ -188,6 +190,50 @@ export class LibraryCollectionsRepository {
         q,
         candidates,
         itemLimit: LIBRARY_COLLECTION_ITEM_LIMIT,
+      };
+    }, readOptions);
+  }
+  async releases(
+    userId: string,
+    id: string,
+    page = 1,
+    filter: LibraryReleaseFilter = "all",
+    q = "",
+  ) {
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: Reject control characters in private searches.
+    const controls = /[\u0000-\u001f\u007f]/u.test(q);
+    if (
+      !libraryCollectionIdSchema.safeParse(id).success ||
+      controls ||
+      !["all", "updates", "pinned", "unavailable"].includes(filter) ||
+      !Number.isInteger(page) ||
+      page < 1 ||
+      page > 9999 ||
+      q.length > 80
+    )
+      throw new AppError("Invalid collection releases", 400, "COLLECTION_INVALID");
+    return db.transaction(async (tx) => {
+      await liveUser(tx, userId);
+      const current = await owned(tx, userId, id);
+      const collection: LibraryCollectionSnapshot = {
+        id: current.id,
+        name: current.name,
+        status: current.status,
+        revision: current.revision,
+      };
+      const [snapshot] = await tx.execute<{ observedAt: Date | string; itemCount: number }>(
+        sql`SELECT transaction_timestamp() AS "observedAt", (SELECT count(*)::integer FROM ${members} WHERE ${members.collectionId}=${id}) AS "itemCount"`,
+      );
+      const timestamp = new Date(snapshot?.observedAt ?? "");
+      if (!Number.isFinite(timestamp.getTime()))
+        throw new AppError("Invalid database snapshot", 500, "COLLECTION_SNAPSHOT_INVALID");
+      const result = await readLibraryReleasePage(tx, userId, page, filter, q.trim(), id);
+      return {
+        schemaVersion: 1 as const,
+        collection,
+        generatedAt: timestamp.toISOString(),
+        itemCount: Number(snapshot.itemCount),
+        ...result,
       };
     }, readOptions);
   }

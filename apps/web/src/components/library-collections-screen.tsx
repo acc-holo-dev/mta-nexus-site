@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
 import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
 import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
 import { getRequestLocale } from "../lib/i18n-server";
@@ -275,6 +276,11 @@ export async function LibraryCollectionsScreen({
           <p role="note" className="rounded border border-base p-4">
             {c.archivedNote}
           </p>
+        )}
+        {!adding && (
+          <Link href={collectionHref(id, "releases")} className="text-accent underline">
+            {collectionReleasesCopy(locale).title}
+          </Link>
         )}
         {!adding && (
           <Link href={`${collectionHref(id)}/versions`} className="text-accent underline">

@@ -14,7 +14,7 @@ import {
   resourceLibrarySelections as selections,
   users,
 } from "../schema";
-import { effectiveUserDownloadSources } from "./user-library";
+import { readLibraryReleasePage } from "./library-release-page";
 import { safePublishedBuildCondition } from "./build-safety";
 import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
 import { historyPageBounds } from "./history-pagination";
@@ -71,73 +71,7 @@ export class ResourceLibrarySelectionsRepository {
   async page(userId: string, requestedPage = 1, filter: LibraryReleaseFilter = "all") {
     return db.transaction(
       async (tx) => {
-        const sources = sql`${effectiveUserDownloadSources(userId, new Date())}, release_rows AS (
-        SELECT owned.resource_id AS "productId", owned.added_at AS "addedAt",
-          coalesce(pref.revision, 0) AS revision, coalesce(pref.mode, 'latest') AS mode,
-          CASE WHEN product.status = 'published' AND latest.id IS NOT NULL THEN product.title END AS title,
-          CASE WHEN product.status = 'published' AND latest.id IS NOT NULL THEN product.slug END AS slug,
-          CASE WHEN product.status = 'published' THEN latest.id END AS "latestBuildId",
-          CASE WHEN product.status = 'published' THEN latest.version END AS "latestVersion",
-          CASE WHEN product.status = 'published' THEN selected.id END AS "selectedBuildId",
-          CASE WHEN product.status = 'published' THEN selected.version END AS "selectedVersion",
-          CASE WHEN product.status <> 'published' OR product.id IS NULL OR latest.id IS NULL THEN 'unavailable'
-            WHEN pref.mode = 'fixed' AND selected.id IS NULL THEN 'selection_unavailable'
-            WHEN pref.mode = 'fixed' AND selected.id <> latest.id THEN 'update_available'
-            WHEN pref.mode = 'fixed' THEN 'pinned' ELSE 'latest' END AS state,
-          CASE WHEN product.status = 'published' THEN latest.created_at ELSE owned.added_at END AS sort_time
-        FROM owned LEFT JOIN ${products} product ON product.id = owned.resource_id
-        LEFT JOIN ${selections} pref ON pref.user_id = ${userId} AND pref.product_id = owned.resource_id
-        LEFT JOIN LATERAL (
-          SELECT ${builds.id} AS id, ${builds.version} AS version, ${builds.createdAt} AS created_at FROM ${builds}
-          WHERE ${safePublishedBuildCondition(sql`product.id`)}
-          ORDER BY ${builds.createdAt} DESC, ${builds.id} DESC LIMIT 1
-        ) latest ON true
-        LEFT JOIN LATERAL (
-          SELECT ${builds.id} AS id, ${builds.version} AS version FROM ${builds}
-          WHERE ${safePublishedBuildCondition(sql`product.id`)} AND ${builds.id} = pref.build_id LIMIT 1
-        ) selected ON true
-      )`;
-        const totals = await tx.execute<{
-          all: number;
-          updates: number;
-          pinned: number;
-          unavailable: number;
-        }>(sql`${sources}
-        SELECT count(*)::integer AS "all", count(*) FILTER (WHERE state = 'update_available')::integer AS updates,
-          count(*) FILTER (WHERE mode = 'fixed')::integer AS pinned,
-          count(*) FILTER (WHERE state IN ('unavailable', 'selection_unavailable'))::integer AS unavailable FROM release_rows`);
-        const row = totals[0],
-          counts = {
-            all: Number(row?.all ?? 0),
-            updates: Number(row?.updates ?? 0),
-            pinned: Number(row?.pinned ?? 0),
-            unavailable: Number(row?.unavailable ?? 0),
-          };
-        const bounds = historyPageBounds(counts[filter], requestedPage);
-        const condition =
-          filter === "updates"
-            ? sql`state = 'update_available'`
-            : filter === "pinned"
-              ? sql`mode = 'fixed'`
-              : filter === "unavailable"
-                ? sql`state IN ('unavailable', 'selection_unavailable')`
-                : sql`true`;
-        const rows = await tx.execute<{
-          productId: string;
-          addedAt: Date;
-          revision: number;
-          mode: "latest" | "fixed";
-          title: string | null;
-          slug: string | null;
-          latestBuildId: string | null;
-          latestVersion: string | null;
-          selectedBuildId: string | null;
-          selectedVersion: string | null;
-          state: "latest" | "pinned" | "update_available" | "selection_unavailable" | "unavailable";
-        }>(sql`${sources}
-        SELECT "productId", "addedAt", revision, mode, title, slug, "latestBuildId", "latestVersion", "selectedBuildId", "selectedVersion", state
-        FROM release_rows WHERE ${condition} ORDER BY sort_time DESC NULLS LAST, "productId" ASC LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}`);
-        return { items: rows, counts, filter, ...bounds };
+        return readLibraryReleasePage(tx, userId, requestedPage, filter);
       },
       { isolationLevel: "repeatable read", accessMode: "read only" },
     );

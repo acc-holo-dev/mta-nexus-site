@@ -2826,3 +2826,39 @@ stale reviews/committed replay, required-audit rollback and foreign-source/parti
 guards. They remain unrun without disposable PostgreSQL. Live migration/locking,
 browser interaction and pinned Node 26 validation remain outstanding. GitHub Actions
 are neither run nor inspected.
+
+### Collection release overview and shared safe projections — 2026-10-12
+
+`/workspace/library/collections/[id]/releases` compares selected fixed builds with
+latest safe published builds. RU/EN controls offer strict all/updates/pinned/unavailable
+filters, literal accessible-name search, twenty-row pagination, exact selected-build
+downloads, individual version recovery and navigation to reviewed batch controls.
+Counts follow the search; pinned overlaps update/unavailable categories. The full
+collection reference count is reported separately. Search/filter/page are retained
+in pagination and private JSON exports; clearing search preserves only the filter.
+Archived collections remain readable but do not offer group mutation navigation.
+
+A shared release projection serves the general library and collection overview.
+Collection ownership and the live account are checked before release queries. A
+read-only repeatable-read transaction binds collection revision, full reference
+count, grants, preferences, safe artifacts, filtered counts/items and the database
+timestamp. Expiry now uses `transaction_timestamp()` in both release projections.
+Collection references are left-joined with effective rights: revoked/deleted entries
+remain unavailable, with title/slug/build IDs/versions masked. A withdrawn fixed
+selection with an available clean replacement is `selection_unavailable`, never an
+automatic download fallback. Build comparisons use identities, not version labels.
+Membership, rights, preferences, payments, receipts and artifact state are not changed.
+
+Private authenticated API/export routes reuse inspection rate limits, no-store and
+cookie variance. Filters/duplicates/scope injection are rejected; exports are bounded
+to 512 KiB with JSON attachment/nosniff headers. Five bounded SQL queries serve each
+collection page regardless of its item count; no per-item service fetches are added.
+Existing collection and publication indexes are reused; no schema/migration is added.
+
+Focused verification passes 239 tests across fifteen files, changed-file Biome and
+web TypeScript and Next compile. Root TypeScript retains
+pre-existing missing `fast-check` declarations and the old missing `isSigned` delivery
+fixture. Three PostgreSQL fixtures cover identity-based updates/withdrawn pins,
+revoked-reference masking/search and archive/foreign-staff inspection. They remain
+unrun without disposable PostgreSQL; actual SQL/query plans, browser interaction and
+pinned Node 26 validation remain open. GitHub Actions are neither run nor inspected.

@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   history: vi.fn(),
   copyPreview: vi.fn(),
+  releases: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
@@ -25,9 +26,12 @@ vi.mock("@nexus/db", () => ({
     detail: state.detail,
     history: state.history,
     copyPreview: state.copyPreview,
+    releases: state.releases,
   },
 }));
 
+import { GET as releases } from "../apps/web/src/app/api/library/collections/[id]/releases/route";
+import { GET as releasesExport } from "../apps/web/src/app/api/library/collections/[id]/releases/export/route";
 import { GET as copyPreview } from "../apps/web/src/app/api/library/collections/[id]/copy/route";
 import { GET as candidates } from "../apps/web/src/app/api/library/collections/[id]/candidates/route";
 import { GET as history } from "../apps/web/src/app/api/library/collections/[id]/history/route";
@@ -55,6 +59,11 @@ beforeEach(() => {
   state.page.mockResolvedValue({ items: [] });
   state.detail.mockResolvedValue({ items: [] });
   state.history.mockResolvedValue({ items: [] });
+  state.releases.mockResolvedValue({
+    items: [],
+    collection: { id: "lcol_a" },
+    generatedAt: "2026-10-12T00:00:00.000Z",
+  });
   state.copyPreview.mockResolvedValue({
     source: { id: "lcol_a", name: "Core", status: "active", revision: 4 },
     itemCount: 200,
@@ -251,4 +260,27 @@ it("routes copies through creation only and binds authority to the session", asy
     ).status,
   ).toBe(403);
   expect(state.command).not.toHaveBeenCalled();
+});
+it("serves scoped private release inspection and bounded attachment exports", async () => {
+  const path = `${base}/lcol_a/releases`;
+  const response = await releases(request(`${path}?page=2&filter=updates&q=core`), context);
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toContain("no-store");
+  expect(state.releases).toHaveBeenCalledWith("usr_a", "lcol_a", 2, "updates", "core");
+  const download = await releasesExport(request(`${path}/export`), context);
+  expect(download.headers.get("content-disposition")).toContain("attachment");
+  expect(download.headers.get("x-content-type-options")).toBe("nosniff");
+  state.releases.mockResolvedValue({ text: "x".repeat(512 * 1024) });
+  expect((await releasesExport(request(`${path}/export`), context)).status).toBe(413);
+});
+it("rejects unauthenticated, spoofed and over-rate release inspections before reading data", async () => {
+  const path = `${base}/lcol_a/releases`;
+  expect((await releases(request(`${path}?userId=other`), context)).status).toBe(400);
+  expect(state.releases).not.toHaveBeenCalled();
+  state.actor = null;
+  expect((await releasesExport(request(`${path}/export`), context)).status).toBe(401);
+  state.actor = { id: "usr_a", role: "user" };
+  state.rate.mockResolvedValue({ success: false });
+  expect((await releases(request(path), context)).status).toBe(429);
+  expect(state.releases).not.toHaveBeenCalled();
 });

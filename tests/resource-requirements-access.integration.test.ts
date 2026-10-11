@@ -14,7 +14,7 @@ import {
   userRepository,
   users,
 } from "@nexus/db";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { expect, it } from "vitest";
 import { inspectBuildPackage } from "../apps/web/src/lib/services/build-package-inspection";
 import archives from "./fixtures/build-packages.json";
@@ -248,15 +248,13 @@ it("previews an exact unpublished build only within its authorized product", asy
 // not SQL mocks. Existing fixture publication and access policies remain enabled.
 async function batchFixture() {
   const f = await fixture();
-  await db
-    .insert(entitlements)
-    .values({
-      id: `ent_req_batch_${f.key}`,
-      subjectType: "user",
-      subjectId: f.buyer,
-      permission: "product.download",
-      resourceId: f.ids[1],
-    });
+  await db.insert(entitlements).values({
+    id: `ent_req_batch_${f.key}`,
+    subjectType: "user",
+    subjectId: f.buyer,
+    permission: "product.download",
+    resourceId: f.ids[1],
+  });
   const collectionId = `lcol_req_${f.key}`;
   const creation = await libraryCollectionsRepository.command({
     userId: f.buyer,
@@ -369,6 +367,103 @@ it("rejects previously reviewed batches after access revocation without making g
     expect(
       (await librarySelectionBatchesRepository.history(f.buyer, f.collectionId)).items,
     ).toHaveLength(0);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("collection release overview distinguishes pinned updates and withdrawn selections", async () => {
+  const f = await batchFixture();
+  try {
+    await f.apply();
+    await f.publishReplacement();
+    const replacement = `bld_req_${f.key}_replacement`;
+    const result = await libraryCollectionsRepository.releases(
+      f.buyer,
+      f.collectionId,
+      1,
+      "updates",
+    );
+    expect(result.itemCount).toBe(2);
+    expect(result.counts).toMatchObject({ all: 2, updates: 1, pinned: 2, unavailable: 0 });
+    expect(result.items[0]).toMatchObject({
+      productId: f.ids[0],
+      state: "update_available",
+      selectedBuildId: `bld_req_${f.key}_0`,
+      latestBuildId: replacement,
+    });
+    await db
+      .update(builds)
+      .set({ status: "deprecated" })
+      .where(eq(builds.id, `bld_req_${f.key}_0`));
+    const unavailable = await libraryCollectionsRepository.releases(
+      f.buyer,
+      f.collectionId,
+      1,
+      "unavailable",
+    );
+    expect(unavailable.items[0]).toMatchObject({
+      state: "selection_unavailable",
+      selectedBuildId: null,
+      selectedVersion: null,
+      latestBuildId: replacement,
+    });
+  } finally {
+    await f.cleanup();
+  }
+});
+it("collection release overview retains revoked references without exposing build metadata or title searches", async () => {
+  const f = await batchFixture();
+  try {
+    await f.apply();
+    const rootId = f.ids[0];
+    if (!rootId) throw new Error("Missing root resource");
+    await db
+      .delete(entitlements)
+      .where(and(eq(entitlements.subjectId, f.buyer), eq(entitlements.resourceId, rootId)));
+    const result = await libraryCollectionsRepository.releases(f.buyer, f.collectionId);
+    expect(result.counts).toMatchObject({ all: 2, unavailable: 1 });
+    const hidden = result.items.find((item) => item.productId === f.ids[0]);
+    expect(hidden).toMatchObject({
+      hasAccess: false,
+      title: null,
+      slug: null,
+      state: "unavailable",
+      latestBuildId: null,
+      latestVersion: null,
+      selectedBuildId: null,
+      selectedVersion: null,
+    });
+    const searched = await libraryCollectionsRepository.releases(
+      f.buyer,
+      f.collectionId,
+      1,
+      "all",
+      "Requirements 0",
+    );
+    expect(searched.items).toHaveLength(0);
+    expect(searched.itemCount).toBe(2);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("collection release overview permits archived inspection and refuses foreign staff scope", async () => {
+  const f = await batchFixture();
+  try {
+    await libraryCollectionsRepository.command({
+      userId: f.buyer,
+      collectionId: f.collectionId,
+      command: { requestId: randomUUID(), action: "archive", expectedRevision: 3 },
+      newCollectionId: "unused",
+      receiptId: `lcr_arch_${f.key}`,
+      auditId: `aud_arch_${f.key}`,
+    });
+    expect(await libraryCollectionsRepository.releases(f.buyer, f.collectionId)).toMatchObject({
+      collection: { status: "archived", revision: 4 },
+      itemCount: 2,
+    });
+    await expect(
+      libraryCollectionsRepository.releases(f.staff, f.collectionId),
+    ).rejects.toMatchObject({ statusCode: 404 });
   } finally {
     await f.cleanup();
   }

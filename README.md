@@ -1,5 +1,13 @@
 # MTA NEXUS
 
+Collections now provide a private release overview: compare pinned and latest safe
+builds, filter updates/fixed/unavailable selections, search accessible names and
+export a twenty-row JSON page. Current access, collection membership, counts and
+versions are read in one database-clock snapshot. Lost references remain visible
+without resource metadata; withdrawn pins never silently fall back to another build.
+The RU/EN overview links to existing individual and reviewed group version controls.
+Archived collections remain inspectable. No migration or automatic update is required.
+
 Private collections can now be copied in full, including up to 200 retained
 references from active or archived sources. The source review binds its revision,
 count and exact composition; the new collection is independent and starts active.

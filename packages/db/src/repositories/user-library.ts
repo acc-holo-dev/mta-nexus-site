@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { sql, type SQL } from "drizzle-orm";
 import { db } from "../client";
 import { builds, entitlements, licenses, products, resourceLibrarySelections as selections } from "../schema";
 import { trustedCleanScanCondition, safePublishedBuildCondition } from "./build-safety";
@@ -47,7 +47,7 @@ type ItemRow = {
  * license tables to paginate in memory. Both entitlement and legacy license
  * fallback match EntitlementRepository.hasEntitlement's expiry/status gates.
  */
-export function effectiveUserDownloadSources(userId: string, now: Date) {
+export function effectiveUserDownloadSources(userId: string, now: Date | SQL) {
   return sql`
       WITH owned AS (
         SELECT grant_rows.resource_id, MAX(grant_rows.added_at) AS added_at

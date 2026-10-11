@@ -1,5 +1,5 @@
 import { libraryCollectionsRepository } from "@nexus/db";
-import { AppError, type User } from "@nexus/domain";
+import { AppError, type LibraryReleaseFilter, type User } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { collectionId } from "../library-collections-query";
@@ -13,6 +13,18 @@ export const libraryCollectionsService = {
       query.page,
       query.q,
       candidates,
+    ),
+  releases: (
+    actor: User,
+    id: string,
+    query: { page: number; filter: LibraryReleaseFilter; q: string },
+  ) =>
+    libraryCollectionsRepository.releases(
+      actor.id,
+      collectionId(id),
+      query.page,
+      query.filter,
+      query.q,
     ),
   copyPreview: (actor: User, id: string) =>
     libraryCollectionsRepository.copyPreview(actor.id, collectionId(id)),

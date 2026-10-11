@@ -35,3 +35,18 @@ export function resourceModerationTarget(
     ? "suspended"
     : null;
 }
+
+export type LibraryReleaseItem = {
+  productId: string;
+  addedAt: Date;
+  hasAccess: boolean;
+  revision: number;
+  mode: "latest" | "fixed";
+  title: string | null;
+  slug: string | null;
+  latestBuildId: string | null;
+  latestVersion: string | null;
+  selectedBuildId: string | null;
+  selectedVersion: string | null;
+  state: LibraryReleaseState;
+};
