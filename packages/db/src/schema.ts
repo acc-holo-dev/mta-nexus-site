@@ -4,6 +4,7 @@ import {
   SUPPORT_CASE_STATUSES,
   SUPPORT_RELATED_TYPES,
   type ProductType,
+  type BuildPackageEvidence,
   type BuildReviewNotificationData,
   type LicenseTermNotificationData,
   type ResourceDeliveryStatus, type ResourceDeliveryError,
@@ -313,7 +314,31 @@ export const builds = pgTable("builds", {
   quarantinedAt: timestamp("quarantined_at", { withTimezone: true }),
   quarantinedBy: text("quarantined_by").references(() => users.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  packageEvidence: jsonb("package_evidence").$type<BuildPackageEvidence>(),
 }, (table) => [
+  check("builds_package_evidence_check", sql`
+  ${table.packageEvidence} IS NULL OR COALESCE((
+    jsonb_typeof(${table.packageEvidence}) = 'object' AND
+    octet_length(${table.packageEvidence}::text) <= 1048576 AND
+    ${table.packageEvidence}->>'schemaVersion' = '1' AND
+    ${table.packageEvidence}->>'inspector' = 'nexus-package-v1' AND
+    ${table.packageEvidence}->>'format' IN ('zip', 'rar', '7z', 'lua') AND
+    ${table.packageEvidence}->>'sha256Hash' = ${table.sha256Hash} AND ${table.sha256Hash} ~ '^[a-f0-9]{64}$' AND
+    ${table.packageEvidence}->>'fileSizeBytes' = ${table.fileSizeBytes}::text AND ${table.fileSizeBytes} > 0 AND
+    jsonb_typeof(${table.packageEvidence}->'inspectedAt') = 'string' AND
+    length(${table.packageEvidence}->>'inspectedAt') BETWEEN 20 AND 40 AND
+    ((${table.packageEvidence}->>'format' = 'zip' AND ${table.packageEvidence}->>'status' = 'checked' AND
+      jsonb_typeof(${table.packageEvidence}->'archive') = 'object' AND
+      CASE WHEN jsonb_typeof(${table.packageEvidence}->'files') = 'array' THEN
+        jsonb_array_length(${table.packageEvidence}->'files') BETWEEN 0 AND 1000 AND
+        ${table.packageEvidence}->'archive'->>'files' = jsonb_array_length(${table.packageEvidence}->'files')::text
+      ELSE false END AND
+      ${table.packageEvidence}->>'manifestStatus' IN ('single', 'missing', 'multiple') AND
+      ((${table.packageEvidence}->>'manifestStatus' = 'single' AND jsonb_typeof(${table.packageEvidence}->'manifest') = 'object') OR
+       (${table.packageEvidence}->>'manifestStatus' IN ('missing', 'multiple') AND ${table.packageEvidence}->'manifest' = 'null'::jsonb))) OR
+     (${table.packageEvidence}->>'format' IN ('rar', '7z', 'lua') AND ${table.packageEvidence}->>'status' = 'not_inspected' AND
+      ${table.packageEvidence}->>'manifestStatus' = 'not_inspected' AND ${table.packageEvidence}->'archive' = 'null'::jsonb AND ${table.packageEvidence}->'manifest' = 'null'::jsonb AND ${table.packageEvidence}->'files' = 'null'::jsonb))
+  ), false)`),
   uniqueIndex("builds_product_version_idx").on(table.productId, table.version),
   check("builds_revision_check", sql`${table.revision} > 0`),
   index("builds_product_status_idx").on(table.productId, table.status),

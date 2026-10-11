@@ -10,6 +10,7 @@ import {
   getSupportedBuildExtension,
 } from "../lib/build-file-validation";
 import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
+import { buildPackageCopy } from "../lib/build-package-i18n";
 import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
 import {
   authorBuildUploadRequest,
@@ -264,6 +265,11 @@ export function AuthorResourceForms({
       if (!response.ok) {
         setUploadError(
           body?.code === "PRODUCT_STATE_CHANGED" ? resourceCommerceError(locale, body.code) : getResourceSubmissionErrorMessage(body?.code, {
+            packageInvalid: buildPackageCopy(locale).invalid,
+            packageUnsupported: buildPackageCopy(locale).unsupported,
+            packageUnsafePath: buildPackageCopy(locale).path,
+            packageLimitExceeded: buildPackageCopy(locale).limit,
+            packageInspectorBusy: buildPackageCopy(locale).busy,
             fileTooLarge: publishing.buildFileTooLarge.replace("{maxFileSize}", "64"),
             malwareDetected: publishing.scannerMalwareDetected,
             scanLimitExceeded: publishing.scannerLimitExceeded,

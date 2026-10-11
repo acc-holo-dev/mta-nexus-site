@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { productService } from "../../../../../lib/services/product-service";
 import { buildScannerService } from "../../../../../lib/services/build-scanner-service";
+import { inspectBuildPackage } from "../../../../../lib/services/build-package-inspection";
 import { authService } from "../../../../../lib/services/auth-service";
 import { MAX_FILE_SIZE_BYTES, storageService } from "@nexus/storage";
 import { consumeRateLimit } from "@nexus/security";
@@ -190,6 +191,7 @@ export async function POST(
       );
     }
 
+    const packageEvidence = await inspectBuildPackage({ bytes: fileBytes, format: extension, signal: request.signal });
     const scan = await buildScannerService.scan({ bytes: fileBytes, fileName: safeFileName });
     if (scan.status === "malicious") {
       logRequestEvent({
@@ -256,6 +258,8 @@ export async function POST(
     });
 
     try {
+      if (asset.sha256Hash !== packageEvidence.sha256Hash || asset.sizeBytes !== packageEvidence.fileSizeBytes)
+        throw new AppError("Stored artifact does not match inspected bytes", 503, "BUILD_PACKAGE_IDENTITY_CONFLICT");
       const build = await productService.releaseBuild(
         {
           productId,
@@ -270,6 +274,7 @@ export async function POST(
           scanStatus: scan.status,
           scanner: scan.scanner,
           scannedAt: scan.scannedAt,
+          packageEvidence,
         },
         user
       );
@@ -309,7 +314,7 @@ export async function POST(
     if (error instanceof AppError) {
       return privateJson(context, 
         { error: error.message, code: error.code },
-        { status: error.statusCode }
+        { status: error.statusCode, ...(error.code === "BUILD_PACKAGE_INSPECTOR_BUSY" ? { headers: { "Retry-After": "5" } } : {}) }
       );
     }
     return privateJson(context, { error: "Could not publish build" }, { status: 500 });

@@ -31,6 +31,7 @@ const buildProjection = {
   scannedAt: builds.scannedAt,
   isSigned: builds.isSigned,
   createdAt: builds.createdAt,
+  packageEvidence: builds.packageEvidence,
 };
 const historyActions = [
   "build.submitted_for_review",

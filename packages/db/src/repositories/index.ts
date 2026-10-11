@@ -73,3 +73,5 @@ export { publicVerificationHistoryRepository } from "./public-verification-histo
 export { publicContextTrustRepository, type PublicContextKind } from "./public-context-trust";
 export { organizationTeamDirectoryRepository } from "./organization-team-directory";
 export { communityModerationWorkspaceRepository } from "./community-moderation-workspace";
+
+export * from "./build-package-comparison";

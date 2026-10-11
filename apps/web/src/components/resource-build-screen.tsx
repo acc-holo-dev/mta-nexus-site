@@ -10,6 +10,8 @@ import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i
 import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
 import { ResourceBuildControls } from "./resource-build-controls";
 import { BuildModerationControls } from "./build-moderation-controls";
+import { buildPackageCopy } from "../lib/build-package-i18n";
+import { BuildPackageEvidencePanel } from "./build-package-evidence";
 export async function ResourceBuildScreen({
   productId,
   buildId,
@@ -128,6 +130,9 @@ export async function ResourceBuildScreen({
           <p className="whitespace-pre-wrap break-words text-secondary">{build.releaseNotes}</p>
         </section>
       )}
+      <Link href={`/${staff ? "admin/resources" : "workspace/resources"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`} className="text-sm text-accent underline">{buildPackageCopy(locale).inventory}</Link>
+      <BuildPackageEvidencePanel evidence={build.packageEvidence} locale={locale}
+        reportHref={`/api/${staff ? "admin/resources" : "products"}/${encodeURIComponent(productId)}/builds/${encodeURIComponent(buildId)}/package`} />
       {staff ? (
         build.status === "pending_review" &&
         product.status !== "archived" &&

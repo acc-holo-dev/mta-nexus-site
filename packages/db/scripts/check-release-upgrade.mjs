@@ -35,6 +35,7 @@ const admin = postgres(url.toString(), { max: 1, onnotice: () => {} });
 let client;
 let created = false;
 const evidence = {
+  buildPackageEvidenceSchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: upgradePlan.baselineTag,
@@ -404,6 +405,10 @@ try {
   assert.equal((await client`SELECT count(*)::integer AS total FROM resource_release_events`)[0].total, 0);
   assert.equal((await client`SELECT count(*)::integer AS total FROM resource_release_watches`)[0].total, 0);
   evidence.resourceReleaseWatchesSchemaPresent = true;
+  assert.equal((await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'builds' AND column_name = 'package_evidence'`).length, 1);
+  assert.equal((await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname = 'builds_package_evidence_guard'`).length, 1);
+  assert.equal((await client`SELECT package_evidence FROM builds WHERE id = 'upgrade-build'`)[0].package_evidence, null);
+  evidence.buildPackageEvidenceSchemaPresent = true;
   const receiptColumns = await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);
   assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'resource_cart_receipt_user_time_idx'`).length, 1);

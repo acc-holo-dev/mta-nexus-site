@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { buildRepository } from "@nexus/db";
 import { ResourceDownloadButton } from "../../../../components/resource-download-button";
+import { BuildPackageSummaryPanel } from "../../../../components/build-package-evidence";
 import { formatHistoryDate } from "../../../../lib/commerce-history-format";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import {
@@ -145,6 +146,8 @@ export default async function PublicResourceVersionsPage({
                   {release.releaseNotes?.trim() || copy.noNotes}
                 </p>
               </div>
+
+              <BuildPackageSummaryPanel summary={release.packageSummary} locale={locale} />
 
               {canDownload && (
                 <ResourceDownloadButton

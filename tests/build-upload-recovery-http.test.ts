@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+import packageFixtures from "./fixtures/build-packages.json";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { AppError, ForbiddenError } from "@nexus/domain";
@@ -18,7 +20,7 @@ import { POST } from "../apps/web/src/app/api/products/[id]/builds/route";
 
 function request() {
   const form = new FormData();
-  form.set("file", new File([new Uint8Array([0x50, 0x4b, 3, 4, 1, 2, 3, 4])], "resource.zip"));
+  form.set("file", new File([new Uint8Array(Buffer.from(packageFixtures.stored, "base64"))], "resource.zip"));
   form.set("version", "v1.2.3");
   form.set("releaseNotes", " Retry notes ");
   form.set("mtaVersionTarget", "1.6.0");
@@ -32,7 +34,7 @@ describe("exact build upload retry HTTP", () => {
     vi.resetAllMocks();
     mocks.authorize.mockResolvedValue({ id: "prd_target", price: 0 });
     mocks.scan.mockResolvedValue({ status: "clean", scanner: "clamav", scannedAt: new Date() });
-    mocks.upload.mockResolvedValue({ key: "new/retry.zip", sha256Hash: "a".repeat(64), sizeBytes: 8 });
+    mocks.upload.mockResolvedValue({ key: "new/retry.zip", sha256Hash: createHash("sha256").update(Buffer.from(packageFixtures.stored, "base64")).digest("hex"), sizeBytes: Buffer.from(packageFixtures.stored, "base64").length });
     mocks.release.mockRejectedValue(new AppError("This resource version already exists", 409, "BUILD_VERSION_EXISTS"));
     mocks.recover.mockResolvedValue(existing);
   });
@@ -47,7 +49,7 @@ describe("exact build upload retry HTTP", () => {
     expect(mocks.remove).toHaveBeenCalledWith("new/retry.zip");
     expect(mocks.remove.mock.invocationCallOrder[0]).toBeLessThan(mocks.recover.mock.invocationCallOrder[0]);
     expect(mocks.recover).toHaveBeenCalledWith({ productId: "prd_target", version: "1.2.3", releaseNotes: " Retry notes ",
-      mtaVersionTarget: "1.6.0", sha256Hash: "a".repeat(64), fileSizeBytes: 8, fileName: "resource.zip", mimeType: "application/zip",
+      mtaVersionTarget: "1.6.0", sha256Hash: createHash("sha256").update(Buffer.from(packageFixtures.stored, "base64")).digest("hex"), fileSizeBytes: Buffer.from(packageFixtures.stored, "base64").length, fileName: "resource.zip", mimeType: "application/zip",
     }, { id: "usr_author", role: "developer" });
     expect(mocks.release).toHaveBeenCalledTimes(1);
   });

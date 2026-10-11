@@ -1,5 +1,38 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Bounded package inspection and private file comparisons — 2026-10-11
+
+Migration `0059` adds nullable, immutable package evidence with exact artifact
+hash/size and bounded JSON guards. Earlier builds retain unknown evidence.
+The upload route checks stored/deflated ZIP headers, descriptors, duplicate/link
+and unsafe paths, every entry CRC and bounded inflation before malware scanning.
+Two active ZIP inspections per application process limit decompression concurrency;
+busy requests fail before persistence and may retry. Storage identity is checked
+again before the existing atomic build/audit path, including exact-upload retries.
+The private report has a pre-storage byte budget. The imported Date serializer
+keeps numeric PostgreSQL OIDs consistent with its driver types.
+RAR/7z/Lua are explicitly structurally uninspected and still follow scanner gates.
+
+Recorded per-file SHA-256 enables private version comparison and JSON export.
+RU/EN author/staff screens, bounded filters, pagination and authenticated APIs hold
+live personal/organization/moderator authority. Baselines cannot cross products;
+missing earlier inventories produce no invented delta. Public release history
+projects aggregate counts without internal paths, ACL names or raw manifest text.
+Existing bounded best-effort `meta.xml` inspection reports declaration/reference
+notes, not XML validity, resource execution, malware absence or source protection.
+No payment, grant, license or subscription state changes in this block.
+
+175 focused package/SQL/HTTP/SSR/upload/lifecycle checks and 24 local migration
+contract checks pass. TypeScript, touched-source Biome and Next.js webpack compile
+mode pass. Four disposable
+PostgreSQL fixtures cover actual inventories/deltas, immutable byte evidence,
+revoked authority, historical uncertainty and audit rollback; they remain unrun.
+Live PostgreSQL migration/locking, browser interaction, scanner/storage integration,
+MTA execution and the pinned Node 26 runtime still need verification. Paid provider
+settlement, monthly issuance/renewal, subscriptions and enforced DRM remain open.
+Workflows were not used or changed.
+
+
 ### Reviewed free-cart acquisitions and immutable buyer receipts — 2026-10-11
 
 Migration `0058` adds nullable review evidence, a private time index and an

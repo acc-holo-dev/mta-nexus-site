@@ -1,4 +1,5 @@
 import type { ProductType } from "./product-types";
+import type { BuildPackageEvidence } from "./build-package-evidence";
 
 // Domain State Enums & Types
 
@@ -249,6 +250,7 @@ export interface Product {
 }
 
 export interface Build {
+  packageEvidence?: BuildPackageEvidence | null;
   id: string;
   /** Populated by PostgreSQL; optional only for legacy in-memory fixtures. */
   revision?: number;

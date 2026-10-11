@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+import packageFixtures from "./fixtures/build-packages.json";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { ForbiddenError, NotFoundError } from "@nexus/domain";
@@ -100,12 +102,13 @@ function oversizedChunkedRequest() {
 }
 
 function validChunkedRequest() {
-  const body = new TextEncoder().encode(
-    '--nexus-boundary\r\nContent-Disposition: form-data; name="version"\r\n\r\n1.2.3\r\n' +
+  const body = Buffer.concat([
+    Buffer.from('--nexus-boundary\r\nContent-Disposition: form-data; name="version"\r\n\r\n1.2.3\r\n' +
       '--nexus-boundary\r\nContent-Disposition: form-data; name="file"; filename="resource.zip"\r\n' +
-      'Content-Type: application/zip\r\n\r\nPK\u0003\u0004\u0001\u0002\u0003\u0004\r\n' +
-      '--nexus-boundary--\r\n',
-  );
+      'Content-Type: application/zip\r\n\r\n'),
+    Buffer.from(packageFixtures.stored, "base64"),
+    Buffer.from('\r\n--nexus-boundary--\r\n'),
+  ]);
   const chunks = [body.slice(0, 23), body.slice(23, 71), body.slice(71)];
 
   return new NextRequest(
@@ -277,8 +280,8 @@ describe("build upload authorization HTTP preflight", () => {
     });
     uploadAsset.mockResolvedValueOnce({
       key: "assets/usr_attacker/resource.zip",
-      sha256Hash: "a".repeat(64),
-      sizeBytes: 8,
+      sha256Hash: createHash("sha256").update(Buffer.from(packageFixtures.stored, "base64")).digest("hex"),
+      sizeBytes: Buffer.from(packageFixtures.stored, "base64").length,
     });
     releaseBuild.mockResolvedValueOnce({
       id: "bld_target",

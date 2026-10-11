@@ -1,7 +1,7 @@
 import { productRepository, buildRepository, organizationRepository, productLifecycleRepository } from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
-import type { Product, Build, User, ProductType, NexusDomainEvent, ResourceLifecycleAction } from "@nexus/domain";
+import type { Product, Build, User, ProductType, NexusDomainEvent, ResourceLifecycleAction, BuildPackageEvidence } from "@nexus/domain";
 import { buildProductDependencyResolution } from "../product-dependency-resolution";
 import { buildReverseDependencySummary, reverseDependencyLimits } from "../reverse-dependency-summary";
 import { isUniqueConstraintViolation } from "../postgres-error";
@@ -313,6 +313,7 @@ export class ProductService {
       scanStatus: Build["scanStatus"];
       scanner?: string;
       scannedAt?: Date;
+      packageEvidence?: BuildPackageEvidence;
     },
     actor: User
   ): Promise<Build> {
@@ -343,6 +344,7 @@ export class ProductService {
           scannedAt: input.scannedAt,
           // Signing is a separate release-pipeline step; never claim a user upload is signed.
           isSigned: false,
+          packageEvidence: input.packageEvidence,
         },
         {
           id: auditId,

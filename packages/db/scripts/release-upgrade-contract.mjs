@@ -3,7 +3,7 @@ export const RELEASE_UPGRADE_BASELINE_TAG =
 export const RELEASE_UPGRADE_FAILURE_TAG =
   "0027_build_quarantine";
 export const RELEASE_UPGRADE_TARGET_TAG =
-  "0058_resource_cart_receipts";
+  "0059_build_package_evidence";
 
 function journalEntries(journal) {
   if (!journal || !Array.isArray(journal.entries)) {

@@ -1,4 +1,5 @@
 import type { BuildScanStatus, BuildStatus } from "./entities";
+import type { BuildPackageEvidence } from "./build-package-evidence";
 
 export type ResourceBuildCommand =
   | { action: "save"; expectedRevision: number; releaseNotes: string; mtaVersionTarget: string }
@@ -6,6 +7,7 @@ export type ResourceBuildCommand =
 
 /** Private workspace projection. Storage locations and scanner credentials never leave the server. */
 export interface ResourceBuildView {
+  packageEvidence?: BuildPackageEvidence | null;
   id: string;
   productId: string;
   version: string;

@@ -15,11 +15,9 @@ const SEVEN_ZIP_SIGNATURE = [0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c] as const;
 
 export const MAX_BUILD_FILE_SIZE_BYTES = MAX_UPLOAD_FILE_SIZE_BYTES;
 
-const SUPPORTED_BUILD_EXTENSIONS = new Set(["zip", "rar", "7z", "lua"]);
-
-export function getSupportedBuildExtension(fileName: string): string | null {
+export function getSupportedBuildExtension(fileName: string): "zip" | "rar" | "7z" | "lua" | null {
   const extension = fileName.split(".").pop()?.toLowerCase();
-  return extension && SUPPORTED_BUILD_EXTENSIONS.has(extension) ? extension : null;
+  return extension === "zip" || extension === "rar" || extension === "7z" || extension === "lua" ? extension : null;
 }
 
 export function exceedsBuildFileSizeLimit(sizeBytes: number): boolean {

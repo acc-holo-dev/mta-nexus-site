@@ -17,6 +17,7 @@ import {
 } from "../lib/pending-resource-draft";
 import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
 import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-message";
+import { buildPackageCopy } from "../lib/build-package-i18n";
 import { useNexusLocale } from "./locale-context";
 import { ResourceSubmissionSuccess } from "./resource-submission-success";
 import { MtaMetaInspectorPanel } from "./mta-meta-inspector-panel";
@@ -34,6 +35,11 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
   const buildFileTooLarge = copy.buildFileTooLarge.replace("{maxFileSize}", maxFileSizeMb);
   const buildFileRequirements = copy.buildFileRequirements.replace("{maxFileSize}", maxFileSizeMb);
   const publishingErrorMessages = {
+    packageInvalid: buildPackageCopy(locale).invalid,
+    packageUnsupported: buildPackageCopy(locale).unsupported,
+    packageUnsafePath: buildPackageCopy(locale).path,
+    packageLimitExceeded: buildPackageCopy(locale).limit,
+    packageInspectorBusy: buildPackageCopy(locale).busy,
     fileTooLarge: buildFileTooLarge,
     malwareDetected: copy.scannerMalwareDetected,
     scanLimitExceeded: copy.scannerLimitExceeded,

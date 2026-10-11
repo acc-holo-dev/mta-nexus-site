@@ -1,5 +1,22 @@
 # MTA NEXUS
 
+Version uploads now inspect standard stored/deflated ZIP packages before scanning
+or storage. Unsafe paths, duplicate/link entries, inconsistent headers, CRC failures,
+unsupported features and bounded inflation failures reject the upload. Migration
+`0059_build_package_evidence` records immutable evidence bound to the exact file
+hash/size, including per-file SHA-256 and bounded static `meta.xml` notes. Other
+supported formats explicitly remain structurally uninspected; older builds receive
+no inferred report. The malware scan and moderation gates still apply.
+
+Publisher/staff version screens link to a private JSON report and file comparison
+at `.../builds/[buildId]/package`. Filters show added/removed/changed/unchanged files,
+20 per page, under live personal/organization/moderator grants. Default comparison
+uses an earlier safe published version; missing inventories remain unknown.
+Public release history receives only counts and aggregate notes. No source paths,
+ACL names, raw XML or file contents cross that public projection. Static package
+inspection does not prove MTA execution, complete XML validity or source-code DRM.
+
+
 MTA NEXUS is a player-first Multi Theft Auto: San Andreas platform for live server discovery, community updates, and safe free-resource distribution.
 
 **Current repository version:** `1.2.0-beta.3`  

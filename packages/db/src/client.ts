@@ -22,7 +22,7 @@ export const db = drizzle(queryClient, { schema });
 // Drizzle clobbered, leaving its result-parsing behaviour untouched.
 const dateAwareSerializer = (value: unknown): unknown =>
   value instanceof Date ? value.toISOString() : value;
-for (const type of ["1184", "1082", "1083", "1114", "1182", "1185", "1115", "1231"]) {
+for (const type of [1184, 1082, 1083, 1114, 1182, 1185, 1115, 1231]) {
   if (queryClient.options.serializers[type]) {
     queryClient.options.serializers[type] = dateAwareSerializer;
   }

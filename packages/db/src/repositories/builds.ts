@@ -6,7 +6,7 @@ import { db } from "../client";
 import { assertProductMutationAuthority, assertBuildModerationAuthority } from "./product-mutation-authority";
 import { auditEvents, builds, products, users, organizations, organizationMembers, notificationPreferences, notifications, resourceReleaseEvents } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
-import { AppError, releaseHistoryPageBounds } from "@nexus/domain";
+import { AppError, releaseHistoryPageBounds, buildPackageSummary } from "@nexus/domain";
 
 export type PendingReviewBuild = Build & {
   productTitle: string;
@@ -194,6 +194,7 @@ export class BuildRepository {
     const [summary] = await db.select({ total: count() }).from(builds).where(condition);
     const bounds = releaseHistoryPageBounds(summary?.total ?? 0, requestedPage);
     const releases = await db.select({
+      packageEvidence: builds.packageEvidence,
       id: builds.id,
       version: builds.version,
       releaseNotes: builds.releaseNotes,
@@ -210,7 +211,7 @@ export class BuildRepository {
     }).from(builds).where(condition)
       .orderBy(desc(builds.createdAt), desc(builds.id))
       .limit(bounds.pageSize).offset(bounds.offset);
-    return { releases, ...bounds };
+    return { releases: releases.map(({ packageEvidence, ...release }) => ({ ...release, packageSummary: buildPackageSummary(packageEvidence) })), ...bounds };
   }
 
   /**
