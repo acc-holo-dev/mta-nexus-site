@@ -18,6 +18,9 @@ export class CommerceService {
   async getResourceCart(user: User) {
     return resourceCartRepository.get(user.id);
   }
+  async reviewResourceCart(user: User) {
+    return resourceCartRepository.review(user.id);
+  }
 
   async addResourceToCart(user: User, productId: string) {
     await resourceCartRepository.add(user.id, productId);
@@ -27,11 +30,17 @@ export class CommerceService {
     await resourceCartRepository.remove(user.id, productId);
   }
 
-  async acquireResourceCart(user: User, productIds: string[], requestId: string) {
+  async acquireResourceCart(
+    user: User,
+    productIds: string[],
+    requestId: string,
+    reviewDigest: string,
+  ) {
     return resourceCartRepository.acquire({
       userId: user.id,
       productIds,
       requestId,
+      reviewDigest,
       entitlementIds: productIds.map(() => generateId("ent")),
       auditId: generateId("aud"),
     });
@@ -56,10 +65,7 @@ export class CommerceService {
     resourceId: string,
     permission: string,
   ): Promise<boolean> {
-    return entitlementRepository.hasEntitlement(
-      subject,
-      resourceId,
-      permission);
+    return entitlementRepository.hasEntitlement(subject, resourceId, permission);
   }
 }
 

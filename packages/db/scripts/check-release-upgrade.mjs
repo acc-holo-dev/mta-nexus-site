@@ -64,6 +64,7 @@ const evidence = {
   resourceMetadataReviewSchemaPresent: false,
   resourceDeliveryReceiptsSchemaPresent: false,
   resourceReleaseWatchesSchemaPresent: false,
+  resourceCartReceiptsSchemaPresent: false,
   cleanupComplete: false,
 };
 
@@ -403,6 +404,11 @@ try {
   assert.equal((await client`SELECT count(*)::integer AS total FROM resource_release_events`)[0].total, 0);
   assert.equal((await client`SELECT count(*)::integer AS total FROM resource_release_watches`)[0].total, 0);
   evidence.resourceReleaseWatchesSchemaPresent = true;
+  const receiptColumns = await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
+  assert.equal(receiptColumns.length, 2);
+  assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'resource_cart_receipt_user_time_idx'`).length, 1);
+  assert.equal((await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname = 'resource_cart_acquisitions_guard'`).length, 1);
+  evidence.resourceCartReceiptsSchemaPresent = true;
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);

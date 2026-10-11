@@ -43,6 +43,7 @@ export * from "./resource-compatibility";
 export * from "./resource-download-authorization";
 export * from "./resource-deliveries";
 export * from "./resource-release-watches";
+export * from "./resource-cart-receipts";
 export * from "./resource-library-selections";
 export * from "./resource-moderation";
 export * from "./resource-variants";

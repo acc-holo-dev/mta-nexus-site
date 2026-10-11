@@ -20,6 +20,7 @@ export * from "./commercial-plans";
 export * from "./resource-release-control";
 export * from "./resource-deliveries";
 export * from "./resource-release-watches";
+export * from "./resource-cart-receipts";
 export * from "./financial-journal";
 export * from "./resource-reviews";
 export * from "./resource-build-workspace";

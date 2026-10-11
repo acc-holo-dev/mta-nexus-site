@@ -82,7 +82,7 @@ it("replays a durable acquisition without rereading the cart or mutating grants"
     kind: "free_resource_acquisition" as const,
     acquired: [{ productId: "prd_a", alreadyClaimed: false }],
   };
-  state.results = [[], [[["prd_a"], result]]];
+  state.results = [[], [[["prd_a"], result, "a".repeat(64)]]];
   expect(
     await cart.acquire({
       userId: "usr_a",
@@ -90,8 +90,9 @@ it("replays a durable acquisition without rereading the cart or mutating grants"
       requestId: "key",
       entitlementIds: ["ent_a"],
       auditId: "aud_a",
+      reviewDigest: "a".repeat(64),
     }),
-  ).toEqual(result);
+  ).toEqual({ ...result, requestId: "key" });
   expect(state.queries).toHaveLength(2);
   expect(state.queries[1].sql).toContain('"resource_cart_acquisitions"');
   expect(state.queries[1].params).toContain("usr_a");
@@ -105,6 +106,7 @@ it("refuses receipt key reuse for another selection", async () => {
       requestId: "key",
       entitlementIds: ["ent_a"],
       auditId: "aud_a",
+      reviewDigest: "a".repeat(64),
     }),
   ).rejects.toMatchObject({ code: "RESOURCE_CART_REQUEST_CONFLICT" });
   expect(state.queries).toHaveLength(2);
@@ -118,6 +120,7 @@ it("detects a second tab's added item before any grant is inserted", async () =>
       requestId: "key",
       entitlementIds: ["ent_a"],
       auditId: "aud_a",
+      reviewDigest: "a".repeat(64),
     }),
   ).rejects.toMatchObject({ code: "RESOURCE_CART_CHANGED" });
   expect(state.queries.some((query) => query.sql.startsWith("insert"))).toBe(false);

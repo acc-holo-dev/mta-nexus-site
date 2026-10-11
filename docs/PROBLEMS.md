@@ -1,5 +1,34 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Reviewed free-cart acquisitions and immutable buyer receipts — 2026-10-11
+
+Migration `0058` adds nullable review evidence, a private time index and an
+immutable receipt guard, without backfilling earlier version facts. The cart now
+requires a separate preview of approved builds, hashes/sizes and declared MTA
+requirements. Its digest detects changes and grants no authority. Stable parent,
+account and exact-build locks precede a repeated review and the existing grant
+path. Grants, provenance, audit, cart cleanup and receipt commit together. Request
+keys bind the exact selection/review; confirmed retries survive a cleared cart.
+Existing finite licenses retain their source and recorded expiry.
+
+RU/EN receipt archive/detail pages, authenticated rate-limited APIs, 7/30/90/365-day
+and evidence filters and bounded-page CSV distinguish earlier missing evidence.
+Frozen public snapshots survive resource removal, without reading current private
+titles. Exact-version retry independently checks current grants and artifact
+identity, then uses the existing secure delivery route. The client preserves an
+uncertain request, blocks cart changes until confirmation and cancels stale reads
+on unmount. Receipts confirm free library operations, not payments or file delivery;
+requirements remain author declarations and download pins are unchanged.
+
+77 focused unit/query/HTTP/SSR checks, TypeScript, touched-file Biome and 23 local
+migration-contract checks pass. Next webpack compile mode passes. Four prepared
+PostgreSQL fixtures cover concurrent retries, stale approved-version review,
+immutable evidence, resource/account deletion and audit rollback; they remain
+unrun without PostgreSQL. Browser interaction, live migration/locking and the
+pinned Node 26 runtime still require verification. Paid settlement, paid monthly
+issuance/renewal, subscription activation and enforced MTA DRM remain unfinished.
+Workflows were not used or modified.
+
 ### Private delivery evidence and publisher version totals — 2026-10-11
 
 Migration `0056` adds immutable receipt identity and a single terminal transition,

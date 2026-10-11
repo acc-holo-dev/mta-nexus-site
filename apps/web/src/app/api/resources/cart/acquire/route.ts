@@ -14,6 +14,7 @@ export function POST(request: NextRequest) {
       actor,
       parsed.data.productIds,
       parsed.data.requestId,
+      parsed.data.reviewDigest,
     );
   });
 }

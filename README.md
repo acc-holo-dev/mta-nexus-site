@@ -9,6 +9,18 @@ MTA NEXUS is a player-first Multi Theft Auto: San Andreas platform for live serv
 
 ## Local development / Локальная разработка
 
+Migration `0058` adds reviewed free-cart receipts. In `/workspace/cart`, inspect
+the approved builds, archive hashes/sizes and declared MTA requirements before
+confirming. Acquisition compares that exact review under the resource/build
+locks and refuses a changed selection. The request key also binds the review;
+an uncertain result can safely retry the same request after the cart clears.
+`/workspace/acquisitions/receipts` provides RU/EN 7/30/90/365-day and evidence
+filters, twenty-item pages, displayed-page CSV and immutable receipt details.
+Recorded public snapshots survive resource deletion; exact-version downloads
+still require current access and a safe build. Earlier receipts retain absent
+version evidence. This records free library operations, without confirming file
+delivery or activating paid checkout. Saved download pins remain unchanged.
+
 Migration `0057` adds opt-in notices for future approved resource versions.
 Buyers enable them on the version page and manage up to 100 active watches at
 `/workspace/library/watches` in RU/EN. Each approval records durable work; retained

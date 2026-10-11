@@ -10,6 +10,18 @@ import {
   releaseUpgradePlan,
 } from "../../packages/db/scripts/release-upgrade-contract.mjs";
 
+test("cart receipt migration preserves earlier uncertainty and immutable account-scoped evidence", () => {
+  const migration = readFileSync("packages/db/migrations/0058_resource_cart_receipts.sql", "utf8");
+  assert.match(migration, /ADD COLUMN review_digest text/u);
+  assert.match(migration, /ADD COLUMN review_snapshot jsonb/u);
+  assert.match(migration, /review_digest IS NOT NULL AND review_digest ~/u);
+  assert.match(migration, /BEFORE UPDATE OR DELETE/u);
+  assert.match(migration, /EXISTS \(SELECT 1 FROM users WHERE id = OLD.user_id\)/u);
+  assert.match(migration, /resource_cart_receipt_user_time_idx/u);
+  assert.doesNotMatch(migration, /UPDATE (resource_cart_acquisitions|orders|payments|licenses|entitlements)|INSERT INTO resource_cart_acquisitions/u);
+  assert.match(readFileSync(script, "utf8"), /resourceCartReceiptsSchemaPresent = true/u);
+});
+
 test("license recovery upgrade preserves historical uncertainty, original term and durable server identity", () => {
   const migration = readFileSync("packages/db/migrations/0053_license_binding_recovery.sql", "utf8");
   assert.match(migration, /ADD COLUMN server_owner_id text/u);
@@ -171,7 +183,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0057_resource_release_watches");
+  assert.equal(plan.targetTag, "0058_resource_cart_receipts");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

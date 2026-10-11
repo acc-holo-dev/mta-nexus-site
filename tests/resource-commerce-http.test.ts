@@ -112,10 +112,10 @@ it("enforces account rate limits before reading commands", async () => {
 });
 it("passes the exact reviewed cart and receipt key to acquisition", async () => {
   const response = await acquire(
-    request("resources/cart/acquire", "POST", { productIds: ["prd_a"], requestId }),
+    request("resources/cart/acquire", "POST", { productIds: ["prd_a"], requestId, reviewDigest: "a".repeat(64) }),
   );
   expect(response.status).toBe(200);
-  expect(mocks.acquire).toHaveBeenCalledWith(mocks.user, ["prd_a"], requestId);
+  expect(mocks.acquire).toHaveBeenCalledWith(mocks.user, ["prd_a"], requestId, "a".repeat(64));
   expect(await response.json()).toMatchObject({ kind: "free_resource_acquisition" });
 });
 it.each([
@@ -132,7 +132,7 @@ it("returns safe state conflicts without private repository data", async () => {
     new AppError("private storage key", 409, "RESOURCE_CART_CHANGED", { private: "secret" }),
   );
   const response = await acquire(
-    request("resources/cart/acquire", "POST", { productIds: ["prd_a"], requestId }),
+    request("resources/cart/acquire", "POST", { productIds: ["prd_a"], requestId, reviewDigest: "a".repeat(64) }),
   );
   expect(response.status).toBe(409);
   expect(await response.json()).toEqual({ code: "RESOURCE_CART_CHANGED" });

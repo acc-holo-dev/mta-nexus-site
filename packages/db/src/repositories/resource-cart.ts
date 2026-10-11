@@ -4,6 +4,8 @@ import {
   RESOURCE_CART_LIMIT,
   type ResourceCart,
   type ResourceCartAcquisition,
+  type ResourceCartReceiptItem,
+  type ResourceCartReviewItem,
 } from "@nexus/domain";
 import { db } from "../client";
 import {
@@ -14,18 +16,57 @@ import {
   products,
   resourceCartItems,
   resourceCartAcquisitions,
+  users,
 } from "../schema";
 import { trustedCleanScanCondition } from "./build-safety";
-import {
-  claimFreeResourceInTransaction,
-  type ResourceTransaction,
-} from "./entitlements";
+import { claimFreeResourceInTransaction, type ResourceTransaction } from "./entitlements";
+import { readResourceCartReview } from "./resource-cart-review";
 
 async function lockCart(tx: ResourceTransaction, userId: string) {
   await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`resource-cart:${userId}`}))`);
 }
 
+function assertReviewedItem(
+  item: ResourceCartReviewItem | undefined,
+): asserts item is ResourceCartReviewItem & {
+  title: string;
+  slug: string;
+  buildId: string;
+  version: string;
+  sha256Hash: string;
+  fileSizeBytes: number;
+  dependencies: string[];
+} {
+  if (
+    !item?.available ||
+    typeof item.title !== "string" ||
+    typeof item.slug !== "string" ||
+    typeof item.buildId !== "string" ||
+    typeof item.version !== "string" ||
+    typeof item.sha256Hash !== "string" ||
+    !/^[a-f0-9]{64}$/u.test(item.sha256Hash) ||
+    typeof item.fileSizeBytes !== "number" ||
+    !Number.isSafeInteger(item.fileSizeBytes) ||
+    item.fileSizeBytes < 1 ||
+    item.fileSizeBytes > 67108864 ||
+    !Array.isArray(item.dependencies) ||
+    item.dependencies.length > 25 ||
+    item.dependencies.some((value) => typeof value !== "string" || value.length > 120)
+  )
+    throw new AppError(
+      "Reviewed resource evidence is unavailable",
+      409,
+      "RESOURCE_CART_REVIEW_CHANGED",
+    );
+}
+
 export class ResourceCartRepository {
+  async review(userId: string) {
+    return db.transaction((tx) => readResourceCartReview(tx, userId), {
+      isolationLevel: "repeatable read",
+      accessMode: "read only",
+    });
+  }
   async get(userId: string): Promise<ResourceCart> {
     const now = new Date();
     const available = sql<boolean>`(${products.status} = 'published' and ${products.price} = 0
@@ -112,13 +153,15 @@ export class ResourceCartRepository {
     productIds: string[];
     entitlementIds: string[];
     auditId: string;
+    reviewDigest: string;
   }): Promise<ResourceCartAcquisition> {
     const ids = [...input.productIds].sort();
     if (
       !ids.length ||
       ids.length > RESOURCE_CART_LIMIT ||
       new Set(ids).size !== ids.length ||
-      input.entitlementIds.length !== ids.length
+      input.entitlementIds.length !== ids.length ||
+      !/^[a-f0-9]{64}$/u.test(input.reviewDigest ?? "")
     ) {
       throw new AppError("Invalid cart acquisition", 400, "RESOURCE_CART_INVALID");
     }
@@ -128,6 +171,7 @@ export class ResourceCartRepository {
         .select({
           productIds: resourceCartAcquisitions.productIds,
           result: resourceCartAcquisitions.result,
+          reviewDigest: resourceCartAcquisitions.reviewDigest,
         })
         .from(resourceCartAcquisitions)
         .where(
@@ -138,14 +182,17 @@ export class ResourceCartRepository {
         )
         .limit(1);
       if (receipt) {
-        if (JSON.stringify(receipt.productIds) !== JSON.stringify(ids)) {
+        if (
+          JSON.stringify(receipt.productIds) !== JSON.stringify(ids) ||
+          receipt.reviewDigest !== input.reviewDigest
+        ) {
           throw new AppError(
             "Acquisition request ID was reused for another cart",
             409,
             "RESOURCE_CART_REQUEST_CONFLICT",
           );
         }
-        return receipt.result;
+        return { ...receipt.result, requestId: input.requestId };
       }
       const cart = await tx
         .select({ productId: resourceCartItems.productId })
@@ -153,7 +200,7 @@ export class ResourceCartRepository {
         .where(eq(resourceCartItems.userId, input.userId))
         .orderBy(asc(resourceCartItems.productId));
       // A changed cart must be reviewed; never silently include a second tab's items.
-      const currentIds = cart.map(row => row.productId).sort();
+      const currentIds = cart.map((row) => row.productId).sort();
       if (currentIds.length !== ids.length || currentIds.some((id, i) => id !== ids[i])) {
         throw new AppError("Cart changed; reload before acquiring", 409, "RESOURCE_CART_CHANGED");
       }
@@ -169,8 +216,39 @@ export class ResourceCartRepository {
         .where(inArray(products.id, ids))
         .orderBy(asc(products.id))
         .for("no key update");
+      const [user] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, input.userId))
+        .limit(1)
+        .for("share");
+      if (!user) throw new AppError("Account is unavailable", 401, "UNAUTHORIZED");
+      // Publication/removal commands take the same parent locks. Hold exact
+      // selected builds too, then recompute the review under those locks before
+      // issuing any grant. The client digest is never a source of authority.
+      const observed = await readResourceCartReview(tx, input.userId);
+      if (!observed.reviewDigest || observed.reviewDigest !== input.reviewDigest)
+        throw new AppError("Reviewed resources changed", 409, "RESOURCE_CART_REVIEW_CHANGED");
+      for (const item of observed.items) assertReviewedItem(item);
+      await tx
+        .select({ id: builds.id })
+        .from(builds)
+        .where(
+          inArray(
+            builds.id,
+            observed.items.flatMap((item) => (item.buildId ? [item.buildId] : [])),
+          ),
+        )
+        .orderBy(asc(builds.id))
+        .for("share");
+      const checked = await readResourceCartReview(tx, input.userId);
+      if (checked.reviewDigest !== input.reviewDigest)
+        throw new AppError("Reviewed resources changed", 409, "RESOURCE_CART_REVIEW_CHANGED");
       const acquired: ResourceCartAcquisition["acquired"] = [];
+      const reviewSnapshot: ResourceCartReceiptItem[] = [];
       for (const [index, productId] of ids.entries()) {
+        const item = checked.items.find((row) => row.productId === productId);
+        assertReviewedItem(item);
         const result = await claimFreeResourceInTransaction(tx, {
           entitlementId: input.entitlementIds[index],
           userId: input.userId,
@@ -179,21 +257,39 @@ export class ResourceCartRepository {
           requestId: input.requestId,
         });
         acquired.push({ productId, alreadyClaimed: result.alreadyClaimed });
-      }
-      await tx
-        .insert(auditEvents)
-        .values({
-          id: input.auditId,
-          actorId: input.userId,
-          actorType: "user",
-          action: "resource.cart_acquired",
-          targetId: input.userId,
-          targetType: "resource_cart",
-          details: {
-            productIds: ids,
-            newlyAcquired: acquired.filter((item) => !item.alreadyClaimed).length,
-          },
+        reviewSnapshot.push({
+          productId,
+          title: item.title,
+          slug: item.slug,
+          buildId: item.buildId,
+          version: item.version,
+          sha256Hash: item.sha256Hash,
+          fileSizeBytes: item.fileSizeBytes,
+          mtaMinVersion: item.mtaMinVersion,
+          dependencies: item.dependencies,
+          alreadyClaimed: result.alreadyClaimed,
+          accessSource: result.accessSource,
+          recordedExpiresAt:
+            (result.accessSource === "license"
+              ? result.license.expiresAt
+              : result.entitlement.expiresAt
+            )?.toISOString() ?? null,
         });
+      }
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: input.userId,
+        actorType: "user",
+        action: "resource.cart_acquired",
+        targetId: input.userId,
+        targetType: "resource_cart",
+        details: {
+          productIds: ids,
+          requestId: input.requestId,
+          reviewDigest: input.reviewDigest,
+          newlyAcquired: acquired.filter((item) => !item.alreadyClaimed).length,
+        },
+      });
       await tx
         .delete(resourceCartItems)
         .where(
@@ -202,10 +298,21 @@ export class ResourceCartRepository {
             inArray(resourceCartItems.productId, ids),
           ),
         );
-      const result: ResourceCartAcquisition = { kind: "free_resource_acquisition", acquired };
+      const result: ResourceCartAcquisition = {
+        kind: "free_resource_acquisition",
+        acquired,
+        requestId: input.requestId,
+      };
       await tx
         .insert(resourceCartAcquisitions)
-        .values({ userId: input.userId, requestId: input.requestId, productIds: ids, result });
+        .values({
+          userId: input.userId,
+          requestId: input.requestId,
+          productIds: ids,
+          result,
+          reviewDigest: input.reviewDigest,
+          reviewSnapshot,
+        });
       return result;
     });
   }

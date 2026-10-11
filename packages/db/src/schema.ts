@@ -13,6 +13,7 @@ import {
   type SupportMessageAuthorRole,
   type SupportRelatedType,
   type ResourceCartAcquisition,
+  type ResourceCartReceiptItem,
   type CommercialPlanTerms,
   type CommercialPlanStatus,
   type OrderCaseKind, type OrderCaseReviewStatus, type OrderCaseEvidence,
@@ -485,9 +486,16 @@ export const resourceCartAcquisitions = pgTable(
     requestId: text("request_id").notNull(),
     productIds: jsonb("product_ids").$type<string[]>().notNull(),
     result: jsonb("result").$type<ResourceCartAcquisition>().notNull(),
+    reviewDigest: text("review_digest"),
+    reviewSnapshot: jsonb("review_snapshot").$type<ResourceCartReceiptItem[]>(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [primaryKey({ columns: [table.userId, table.requestId] })],
+  (table) => [primaryKey({ columns: [table.userId, table.requestId] }),
+    index("resource_cart_receipt_user_time_idx").on(table.userId, table.createdAt.desc(), table.requestId.desc()),
+    check("resource_cart_review_digest_check", sql`(${table.reviewDigest} IS NULL AND ${table.reviewSnapshot} IS NULL) OR
+      (${table.reviewDigest} IS NOT NULL AND ${table.reviewDigest} ~ '^[a-f0-9]{64}$' AND ${table.reviewSnapshot} IS NOT NULL AND
+        CASE WHEN jsonb_typeof(${table.reviewSnapshot}) = 'array' THEN jsonb_array_length(${table.reviewSnapshot}) BETWEEN 1 AND 20 ELSE false END)`),
+  ],
 );
 
 /** Provenance of new free grants. Historical licenses/payments are not backfilled. */

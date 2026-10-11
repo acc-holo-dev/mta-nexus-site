@@ -42,4 +42,5 @@ export type ResourceCart = { items: ResourceCartItem[]; limit: number };
 export type ResourceCartAcquisition = {
   kind: "free_resource_acquisition";
   acquired: { productId: string; alreadyClaimed: boolean }[];
+  requestId?: string;
 };
