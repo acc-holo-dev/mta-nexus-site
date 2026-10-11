@@ -40,6 +40,16 @@ test("purchase case upgrade adds immutable order context without changing histor
 });
 
 const script = "packages/db/scripts/check-release-upgrade.mjs";
+test("release watches upgrade adds future-only evidence and monotonic private progress", () => {
+  const migration = readFileSync("packages/db/migrations/0057_resource_release_watches.sql", "utf8");
+  assert.match(migration, /build_id text NOT NULL UNIQUE REFERENCES builds/u);
+  assert.match(migration, /NEW\.last_sequence < OLD\.last_sequence/u);
+  assert.match(migration, /NEW\.revision <> OLD\.revision \+ 1/u);
+  assert.match(migration, /artifact\.scan_status <> 'clean'/u);
+  assert.match(migration, /resource\.metadata_review_required/u);
+  assert.doesNotMatch(migration, /INSERT INTO resource_release_events|UPDATE (products|licenses|orders|payments|entitlements|ledger_entries)/u);
+  assert.match(readFileSync(script, "utf8"), /resourceReleaseWatchesSchemaPresent = true/u);
+});
 test("delivery upgrade preserves uncertainty and guards immutable terminal evidence", () => {
   const migration = readFileSync("packages/db/migrations/0056_resource_delivery_receipts.sql", "utf8");
   assert.match(migration, /OLD\.status <> 'started'/u);
@@ -161,7 +171,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0056_resource_delivery_receipts");
+  assert.equal(plan.targetTag, "0057_resource_release_watches");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

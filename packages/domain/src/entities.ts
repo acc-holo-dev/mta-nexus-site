@@ -435,7 +435,7 @@ export interface BuildReviewNotificationData {
 }
 
 export interface Notification {
-  data?: BuildReviewNotificationData | import("./license-maintenance").LicenseTermNotificationData | null;
+  data?: BuildReviewNotificationData | import("./license-maintenance").LicenseTermNotificationData | import("./resource-release-watches").ResourceReleaseNoticeData | null;
   id: string;
   recipientId: string;
   title: string;

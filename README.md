@@ -9,6 +9,18 @@ MTA NEXUS is a player-first Multi Theft Auto: San Andreas platform for live serv
 
 ## Local development / Локальная разработка
 
+Migration `0057` adds opt-in notices for future approved resource versions.
+Buyers enable them on the version page and manage up to 100 active watches at
+`/workspace/library/watches` in RU/EN. Each approval records durable work; retained
+artifacts reviewed again do not repeat release notices. Delivery rechecks live
+access, the exact safe published build and commerce notification preferences.
+Revoked or expired access disables the watch. Re-enabling starts after current
+events; historical releases are not sent, and download pins remain unchanged.
+The bounded `resource-release-worker` starts after app readiness in both Compose
+environments and uses the existing inbox and optional Web Push outbox.
+Standalone execution requires `NEXUS_RESOURCE_RELEASE_WORKER=true`; run
+`pnpm --filter @nexus/db resource:notify --once` or `--loop`.
+
 Migration `0056` records private resource delivery receipts at the final live
 authorization gate. `/workspace/library/downloads` provides RU/EN status and
 7/30/90/365-day filters, bounded page CSV, exact-version receipts and retries

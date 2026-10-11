@@ -1,6 +1,7 @@
 import type { Notification } from "@nexus/domain";
 import type { Locale } from "./i18n";
 import { licenseTermNotification } from "./license-maintenance-i18n";
+import { resourceReleaseNotification } from "./resource-release-watches-i18n";
 
 /** Localize structured review notices; older notifications keep their stored text. */
 export function formatNotification(
@@ -10,6 +11,8 @@ export function formatNotification(
 ) {
   const termNotice = licenseTermNotification(notification.data, locale);
   if (termNotice) return termNotice;
+  const releaseNotice = resourceReleaseNotification(notification.data, locale);
+  if (releaseNotice) return releaseNotice;
   if (
     notification.title === "Publication reaction" &&
     /^Publication ([a-zA-Z0-9_-]{1,128}): reaction\.$/u.test(notification.message)

@@ -44,7 +44,7 @@ export async function resourceCommerceRequest(
     }
     if (
       !mutation &&
-      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/(?:operations|support)$|^\/api\/licenses\/[^/]+\/runtime-config$|^\/api\/licenses(?:$|\/export$)|^\/api\/workspace\/resources$|^\/api\/products\/[^/]+\/history$|^\/api\/admin\/licenses\/maintenance$|^\/api\/order-cases(?:\/|$)|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:downloads|releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:moderation|deliveries|builds\/[^/]+)$/u.test(
+      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/(?:operations|support)$|^\/api\/licenses\/[^/]+\/runtime-config$|^\/api\/licenses(?:$|\/export$)|^\/api\/workspace\/resources$|^\/api\/products\/[^/]+\/history$|^\/api\/admin\/licenses\/maintenance$|^\/api\/order-cases(?:\/|$)|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:watches|downloads|releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:moderation|deliveries|builds\/[^/]+)$/u.test(
         request.nextUrl.pathname,
       )
     ) {

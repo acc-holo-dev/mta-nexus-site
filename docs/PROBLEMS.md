@@ -1939,3 +1939,31 @@ CREATE INDEX reactions_content_reader_target_latest_idx
   ON reactions (user_id, target_id, created_at DESC, id DESC)
   WHERE target_type = 'content';
 ```
+
+### Buyer notices for future resource releases — 2026-10-11
+
+Migration `0057` records immutable exact-build release events in successful
+moderation transactions and private, revision-checked buyer watches. Enrollment
+requires live library access and a safe published version, starts after existing
+events and is limited to 100 active watches per account. Retained-artifact
+reapproval does not repeat a release. Disabling remains possible after access
+loss. RU/EN version controls, a filtered twenty-row watch archive and authenticated
+bounded APIs expose neither internal progress nor other buyers.
+
+A bounded standalone worker runs after app readiness in DEV/production Compose.
+Parent/account/grant/watch and notification-preference locks serialize delivery
+with publication, access revocation and opt-out. It rechecks the exact build and
+finite grant expiry before writing inbox, progress and audit atomically. Lost
+access disables the watch; unavailable builds or disabled preferences consume the
+event without replaying it later. Optional push enqueue uses a savepoint, so
+queue degradation preserves inbox delivery. Health heartbeat and signal handling
+are included. Watches grant no access and change no download pin or financial
+state. Existing publications are not backfilled.
+
+73 focused checks across twelve unit/query/HTTP/render files, TypeScript,
+touched-file Biome, 22 local migration-contract checks and Next webpack compile
+mode pass. Four new PostgreSQL fixtures cover concurrent delivery, baseline and
+retained-artifact reapproval, opt-out, access revocation, immutable event guards
+and approval rollback. They remain unrun without PostgreSQL. Docker execution,
+browser interaction, external push dispatch and the pinned Node 26 runtime still
+require verification. No workflow was used or modified.

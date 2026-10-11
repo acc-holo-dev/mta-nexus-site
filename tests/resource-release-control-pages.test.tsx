@@ -28,6 +28,10 @@ vi.mock("next/link", async () => {
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
+vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
+  resourceReleaseWatchesService: { detail: async (_user: unknown, productId: string) => ({ productId, revision: 0, enabled: false, updatedAt: null }) },
+}));
+vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({ ResourceReleaseWatchControl: () => <span>Release watch</span> }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { page: state.updates, detail: state.versions },

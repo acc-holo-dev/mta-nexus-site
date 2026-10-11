@@ -7,6 +7,7 @@ import {
   type BuildReviewNotificationData,
   type LicenseTermNotificationData,
   type ResourceDeliveryStatus, type ResourceDeliveryError,
+  type ResourceReleaseNoticeData,
   type SupportCaseCategory,
   type SupportCaseStatus,
   type SupportMessageAuthorRole,
@@ -21,6 +22,7 @@ import {
   pgTable,
   text,
   integer,
+  bigint, bigserial,
   boolean,
   timestamp,
   jsonb,
@@ -756,7 +758,7 @@ export const follows = pgTable(
 
 // 21. Notifications
 export const notifications = pgTable("notifications", {
-  data: jsonb("data").$type<BuildReviewNotificationData | LicenseTermNotificationData>(),
+  data: jsonb("data").$type<BuildReviewNotificationData | LicenseTermNotificationData | ResourceReleaseNoticeData>(),
   id: text("id").primaryKey(),
   recipientId: text("recipient_id")
     .notNull()
@@ -1219,4 +1221,30 @@ export const resourceDeliveryReceipts = pgTable("resource_delivery_receipts", {
   check("resource_delivery_source_check", sql`${table.accessSource} IN ('manager','entitlement','license')`),
   check("resource_delivery_state_check", sql`(${table.status} = 'started' AND ${table.bytesSent} = 0 AND ${table.finishedAt} IS NULL AND ${table.errorCode} IS NULL) OR (${table.status} = 'served' AND ${table.bytesSent} = ${table.expectedBytes} AND ${table.finishedAt} IS NOT NULL AND ${table.errorCode} IS NULL) OR (${table.status} = 'cancelled' AND ${table.finishedAt} IS NOT NULL AND ${table.errorCode} IS NULL) OR (${table.status} = 'failed' AND ${table.finishedAt} IS NOT NULL AND ${table.errorCode} IS NOT NULL AND ${table.errorCode} IN ('storage_error','size_mismatch','hash_mismatch'))`),
   check("resource_delivery_time_check", sql`isfinite(${table.startedAt}) AND (${table.finishedAt} IS NULL OR (isfinite(${table.finishedAt}) AND ${table.finishedAt} >= ${table.startedAt}))`),
+]);
+
+export const resourceReleaseEvents = pgTable("resource_release_events", {
+  sequence: bigserial("sequence", { mode: "bigint" }).primaryKey(),
+  productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  buildId: text("build_id").notNull().unique().references(() => builds.id, { onDelete: "cascade" }),
+  version: text("version").notNull(), sha256Hash: text("sha256_hash").notNull(),
+  fileSizeBytes: integer("file_size_bytes").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  index("resource_release_product_sequence_idx").on(table.productId, table.sequence),
+  check("resource_release_events_sha256_hash_check", sql`${table.sha256Hash} ~ '^[a-f0-9]{64}$'`),
+  check("resource_release_events_file_size_bytes_check", sql`${table.fileSizeBytes} BETWEEN 1 AND 67108864`),
+]);
+export const resourceReleaseWatches = pgTable("resource_release_watches", {
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  productId: text("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  enabled: boolean("enabled").notNull(), revision: integer("revision").notNull(),
+  lastSequence: bigint("last_sequence", { mode: "bigint" }).notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  primaryKey({ columns: [table.userId, table.productId] }),
+  index("resource_release_watch_user_time_idx").on(table.userId, table.updatedAt.desc(), table.productId),
+  index("resource_release_watch_pending_idx").on(table.productId, table.lastSequence, table.userId).where(sql`${table.enabled}`),
+  check("resource_release_watches_revision_check", sql`${table.revision} > 0`),
+  check("resource_release_watches_last_sequence_check", sql`${table.lastSequence} >= 0`),
 ]);

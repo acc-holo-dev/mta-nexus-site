@@ -4,7 +4,7 @@ import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { db } from "../client";
 import { assertProductMutationAuthority, assertBuildModerationAuthority } from "./product-mutation-authority";
-import { auditEvents, builds, products, users, organizations, organizationMembers, notificationPreferences, notifications } from "../schema";
+import { auditEvents, builds, products, users, organizations, organizationMembers, notificationPreferences, notifications, resourceReleaseEvents } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
 import { AppError, releaseHistoryPageBounds } from "@nexus/domain";
 
@@ -490,6 +490,12 @@ export class BuildRepository {
           }),
         );
       }
+      // Durable work for opted-in buyers; never fan out inside moderation. A
+      // retained artifact reviewed again keeps its original event identity.
+      if (decision === "approve") await tx.insert(resourceReleaseEvents).values({
+        productId: reviewed.productId, buildId: reviewed.id, version: reviewed.version,
+        sha256Hash: reviewed.sha256Hash, fileSizeBytes: reviewed.fileSizeBytes,
+      }).onConflictDoNothing({ target: resourceReleaseEvents.buildId });
       return reviewed as unknown as Build;
     });
   }

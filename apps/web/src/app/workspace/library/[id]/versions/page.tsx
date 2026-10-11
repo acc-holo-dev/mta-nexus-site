@@ -5,6 +5,9 @@ import { notFound } from "next/navigation";
 import { AppError } from "@nexus/domain";
 import { LibraryReleaseSelectionControls } from "../../../../../components/library-release-selection-controls";
 import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
+import { ResourceReleaseWatchControl } from "../../../../../components/resource-release-watch-control";
+import { resourceReleaseWatchesCopy } from "../../../../../lib/resource-release-watches-i18n";
+import { resourceReleaseWatchesService } from "../../../../../lib/services/resource-release-watches-service";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryReleaseService } from "../../../../../lib/services/resource-release-control-service";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
@@ -46,6 +49,10 @@ export default async function LibraryVersionsPage({
       throw error;
     });
   const current = result.selection.mode === "fixed" ? result.selected : result.latest;
+  const watch = await resourceReleaseWatchesService.detail(user, id).catch((error) => {
+    if (error instanceof AppError && error.statusCode === 404) notFound();
+    throw error;
+  });
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <Link href="/workspace/library/updates" className="text-sm text-accent underline">
@@ -76,6 +83,13 @@ export default async function LibraryVersionsPage({
         selectedBuildId={result.selection.buildId}
         versions={result.versions.map((version) => ({ id: version.id, version: version.version }))}
       />
+      <section className="nexus-panel space-y-3 p-5">
+        <h2 className="font-semibold text-primary">{resourceReleaseWatchesCopy(locale).title}</h2>
+        <p className="text-sm text-secondary">{resourceReleaseWatchesCopy(locale).note}</p>
+        <p className="text-xs text-muted">{resourceReleaseWatchesCopy(locale).pinned}</p>
+        <ResourceReleaseWatchControl key={`${id}:${watch.revision}`} watch={watch} available={Boolean(result.latest)} />
+        <Link href="/workspace/library/watches" className="inline-block text-sm text-accent underline">{resourceReleaseWatchesCopy(locale).title}</Link>
+      </section>
       {result.versions.length ? (
         <ol className="space-y-3">
           {result.versions.map((version) => (

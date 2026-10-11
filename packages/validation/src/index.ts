@@ -8,6 +8,7 @@ import {
 import { z } from "zod";
 export * from "./commercial-plans";
 export * from "./resource-release-control";
+export * from "./resource-release-watches";
 import { mtaVersionSchema } from "./mta-version";
 export * from "./mta-version";
 export * from "./resource-management";

@@ -10,6 +10,7 @@
     "migrate": "tsx src/migrate.ts",
     "seed": "tsx src/seed.ts",
     "mail:dispatch": "tsx scripts/run-account-mail-dispatcher.ts",
+    "resource:notify": "tsx scripts/run-resource-release-worker.ts",
     "license:maintain": "tsx scripts/run-license-maintenance.ts",
     "scenario:list": "tsx scripts/run-scenario-lab.ts list",
     "server:endpoint:audit": "tsx scripts/audit-server-endpoints.ts",

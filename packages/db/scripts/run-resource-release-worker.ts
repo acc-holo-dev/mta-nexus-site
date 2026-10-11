@@ -1,0 +1,80 @@
+import { rename, rm, writeFile } from "node:fs/promises";
+import { setTimeout as delay } from "node:timers/promises";
+import { resourceReleaseWorkerOptions } from "../src/resource-release-worker-config";
+
+const healthFile = "/tmp/nexus-resource-release-worker-health.json",
+  temporary = `${healthFile}.${process.pid}.tmp`;
+async function main() {
+  // Validate authorization/configuration before creating a database pool.
+  const options = resourceReleaseWorkerOptions(process.env, process.argv.slice(2));
+  const [{ resourceReleaseWorkerRepository }, { closeDatabaseConnection }] = await Promise.all([
+    import("../src/repositories/resource-release-worker"),
+    import("../src/client"),
+  ]);
+  const controller = new AbortController();
+  const stop = () => controller.abort();
+  process.once("SIGINT", stop);
+  process.once("SIGTERM", stop);
+  let status = "starting",
+    lastProgressAt = new Date().toISOString(),
+    failure: unknown = null,
+    writing = Promise.resolve();
+  function health() {
+    writing = writing
+      .then(async () => {
+        await writeFile(
+          temporary,
+          JSON.stringify({
+            status,
+            heartbeatAt: new Date().toISOString(),
+            lastProgressAt,
+            limit: options.limit,
+            intervalMs: options.intervalMs,
+          }),
+          { mode: 0o600 },
+        );
+        await rename(temporary, healthFile);
+      })
+      .catch((error: unknown) => {
+        failure = error;
+      });
+    return writing;
+  }
+  const heartbeat = options.loop ? setInterval(() => void health(), 15000) : null;
+  try {
+    do {
+      if (failure) throw failure;
+      const result = await resourceReleaseWorkerRepository.runBatch(
+        options.limit,
+        controller.signal,
+      );
+      lastProgressAt = new Date().toISOString();
+      status = controller.signal.aborted ? "stopping" : "ready";
+      if (options.loop) await health();
+      process.stdout.write(`${JSON.stringify({ status, ...result })}\n`);
+      if (!options.loop || controller.signal.aborted) break;
+      try {
+        await delay(result.examined === options.limit ? 1000 : options.intervalMs, undefined, {
+          signal: controller.signal,
+        });
+      } catch (error) {
+        if (!controller.signal.aborted) throw error;
+      }
+    } while (!controller.signal.aborted);
+  } finally {
+    if (heartbeat) clearInterval(heartbeat);
+    process.removeListener("SIGINT", stop);
+    process.removeListener("SIGTERM", stop);
+    status = "stopping";
+    if (options.loop) await health();
+    await closeDatabaseConnection();
+    await rm(temporary, { force: true });
+  }
+  if (failure) throw failure;
+}
+main().catch(() => {
+  process.stderr.write(
+    "Resource release worker failed; inspect configuration and database health.\n",
+  );
+  process.exitCode = 1;
+});
