@@ -1,6 +1,6 @@
-import { and, desc, eq, exists, ilike, or } from "drizzle-orm";
-import { AppError, grantsServerManagement, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Content } from "@nexus/domain";
+import { AppError, grantsServerManagement, NotFoundError } from "@nexus/domain";
+import { and, desc, eq, exists, ilike, or } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
@@ -10,10 +10,11 @@ import {
   servers,
   users,
 } from "../schema";
-import { contentSummaryColumns, type ContentPageFilters } from "./content-summary";
-import { managedServerScope } from "./server-management-scope";
-import { containsPattern } from "./search-pattern";
+import { type ContentPageFilters, contentSummaryColumns } from "./content-summary";
 import { publicationNotice } from "./publication-notice";
+import { containsPattern } from "./search-pattern";
+import { managedServerScope } from "./server-management-scope";
+
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const identity = { id: servers.id, name: servers.name, slug: servers.slug };
 /** Called after locking publication; locks current listing and grants until commit. */
@@ -60,7 +61,7 @@ export async function serverContentAccess(tx: Transaction, serverId: string, act
     throw new AppError("Server manager required", 403, "FORBIDDEN");
   return server;
 }
-async function context(tx: Transaction, serverId: string, actorId: string) {
+export async function serverContentContext(tx: Transaction, serverId: string, actorId: string) {
   const [server] = await tx
     .select(identity)
     .from(servers)
@@ -85,11 +86,11 @@ async function context(tx: Transaction, serverId: string, actorId: string) {
 const snapshot = { isolationLevel: "repeatable read", accessMode: "read only" } as const;
 class ServerContentRepository {
   context(serverId: string, actorId: string) {
-    return db.transaction((tx) => context(tx, serverId, actorId), snapshot);
+    return db.transaction((tx) => serverContentContext(tx, serverId, actorId), snapshot);
   }
   page(serverId: string, actorId: string, filters: ContentPageFilters = {}) {
     return db.transaction(async (tx) => {
-      const server = await context(tx, serverId, actorId);
+      const server = await serverContentContext(tx, serverId, actorId);
       const page = Number.isSafeInteger(filters.page)
         ? Math.min(Math.max(filters.page ?? 1, 1), 9999)
         : 1;
@@ -121,7 +122,7 @@ class ServerContentRepository {
   }
   get(serverId: string, actorId: string, id: string) {
     return db.transaction(async (tx) => {
-      const server = await context(tx, serverId, actorId);
+      const server = await serverContentContext(tx, serverId, actorId);
       const [row] = await tx
         .select()
         .from(content)

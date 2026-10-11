@@ -49,9 +49,11 @@ function descendants(node: ReactNode): Element[] {
   const element = node as Element;
   return [element, ...descendants(element.props.children as ReactNode)];
 }
-function render(locale: "en" | "ru" = "en", organizationId?: string) {
+function render(locale: "en" | "ru" = "en", organizationId?: string, serverId?: string) {
   harness.cursor = 0;
-  return descendants(AuthorPublicationRestore({ id: "article", revision, locale, organizationId }));
+  return descendants(
+    AuthorPublicationRestore({ id: "article", revision, locale, organizationId, serverId }),
+  );
 }
 function button(nodes: Element[], label: string) {
   const element = nodes.find((node) => node.type === "button" && node.props.children === label);
@@ -217,3 +219,43 @@ it.each(["foreign", undefined])(
     expect(harness.fetch).toHaveBeenCalledTimes(1);
   },
 );
+
+it.each(["ru", "en"] as const)(
+  "restores an exact server archive to a confirmed draft in %s",
+  async (locale) => {
+    const { serverPublicationHistoryCopy } = await import(
+      "../apps/web/src/lib/server-publication-history-copy"
+    );
+    const copy = serverPublicationHistoryCopy(locale),
+      labels = authorPublicationDeskCopy(locale);
+    harness.fetch.mockResolvedValue(
+      response({ id: "article", serverId: "srv", status: "draft", revision: next }),
+    );
+    click(render(locale, undefined, "srv"), labels.restore);
+    await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
+    expect(harness.fetch.mock.calls[0][0]).toBe(
+      "/api/workspace/servers/srv/content/article/restore",
+    );
+    expect(harness.confirm).toHaveBeenCalledWith(copy.restoreConfirm);
+    expect(
+      render(locale, undefined, "srv").some((node) => node.props.children === copy.restoredNotice),
+    ).toBe(true);
+    expect(
+      render(locale, undefined, "srv").some(
+        (node) => node.props.href === "/workspace/servers/srv/content/article",
+      ),
+    ).toBe(true);
+  },
+);
+it("requires reload on a scope-mismatched server restore acknowledgement", async () => {
+  harness.fetch.mockResolvedValue(
+    response({ id: "article", serverId: "foreign", status: "draft", revision: next }),
+  );
+  const copy = authorPublicationDeskCopy("en");
+  click(render("en", undefined, "srv"), copy.restore);
+  await vi.waitFor(() =>
+    expect(render("en", undefined, "srv").some((node) => node.props.role === "alert")).toBe(true),
+  );
+  expect(harness.refresh).not.toHaveBeenCalled();
+  expect(button(render("en", undefined, "srv"), copy.restore).props.disabled).toBe(true);
+});

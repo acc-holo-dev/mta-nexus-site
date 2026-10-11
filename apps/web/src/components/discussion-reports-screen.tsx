@@ -19,6 +19,7 @@ import { moderatedDiscussionError } from "../lib/moderated-discussion-copy";
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
 import { platformFieldClass } from "../lib/user-platform-client";
+import { DiscussionReportBatch } from "./discussion-report-batch";
 export async function DiscussionReportsScreen({
   id,
   commentId,
@@ -141,32 +142,14 @@ export async function DiscussionReportsScreen({
           {copy.apply}
         </Button>
       </form>
-      {data.items.length ? (
-        <ul className="space-y-3">
-          {data.items.map((item) => (
-            <li key={item.id} className="nexus-panel space-y-3 p-5">
-              <p className="text-sm font-semibold text-primary">
-                {labels[item.type]} · {labels[item.status]}
-              </p>
-              <p className="whitespace-pre-wrap break-words text-sm text-primary">{item.reason}</p>
-              <time dateTime={item.createdAt} className="text-xs text-muted">
-                {new Date(item.createdAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
-                  timeZone: "UTC",
-                  timeZoneName: "short",
-                })}
-              </time>
-              <Link
-                href={`/admin/reports/${encodeURIComponent(item.id)}`}
-                className="flex min-h-11 items-center text-sm text-accent underline"
-              >
-                {copy.review}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="nexus-panel p-5 text-muted">{copy.empty}</p>
-      )}
+      <DiscussionReportBatch
+        key={`${id}:${commentId}:${filters?.query}:${filters?.view}:${filters?.type}:${filters?.cursor?.id}:${data.removed}:${data.items.map((item) => `${item.id}:${item.status}:${item.createdAt}`).join("|")}`}
+        contentId={id}
+        commentId={commentId}
+        items={data.items}
+        locale={locale}
+        allowActions={filters?.view === "pending"}
+      />
       <nav className="flex flex-wrap gap-4" aria-label={copy.title}>
         <Link
           prefetch={false}

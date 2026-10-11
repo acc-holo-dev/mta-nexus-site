@@ -26,8 +26,8 @@ export async function publicationNotice(
       .where(eq(servers.id, item.serverId))
       .for("share")
       .limit(1);
-    if (server?.organizationId) organizationId = server.organizationId;
-    else if (server?.ownerId)
+    organizationId = server?.organizationId ?? undefined;
+    if (server?.ownerId && !server.organizationId)
       recipients.set(
         server.ownerId,
         `/workspace/servers/${encodeURIComponent(item.serverId)}/content/${encodeURIComponent(item.id)}`,

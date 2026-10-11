@@ -1,18 +1,19 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { AppError } from "@nexus/domain";
-import { authService } from "../../../../../lib/services/auth-service";
-import { serverContentService } from "../../../../../lib/services/server-content-service";
-import { getRequestLocale } from "../../../../../lib/i18n-server";
-import { getUserPlatformCopy, userPlatformError } from "../../../../../lib/user-platform-copy";
-import { serverContentCopy } from "../../../../../lib/server-content-copy";
-import { serverContentId } from "../../../../../lib/server-content-api";
-import { parseContentPage, writerTypes } from "../../../../../lib/user-platform-contract";
+import { cookies } from "next/headers";
+import Link from "next/link";
 import {
   ContentCatalogControls,
   ContentPageNavigation,
   PlatformSignIn,
 } from "../../../../../components/content-catalog-controls";
+import { getRequestLocale } from "../../../../../lib/i18n-server";
+import { serverContentId } from "../../../../../lib/server-content-api";
+import { serverContentCopy } from "../../../../../lib/server-content-copy";
+import { serverPublicationHistoryCopy } from "../../../../../lib/server-publication-history-copy";
+import { authService } from "../../../../../lib/services/auth-service";
+import { serverContentService } from "../../../../../lib/services/server-content-service";
+import { parseContentPage, writerTypes } from "../../../../../lib/user-platform-contract";
+import { getUserPlatformCopy, userPlatformError } from "../../../../../lib/user-platform-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -121,6 +122,12 @@ export default async function ServerPublications({
                       className="text-accent underline"
                     >
                       {copy.edit}
+                    </Link>
+                    <Link
+                      href={`${path}/${encodeURIComponent(item.id)}/history`}
+                      className="inline-flex min-h-11 items-center text-accent underline"
+                    >
+                      {serverPublicationHistoryCopy(locale).history}
                     </Link>
                     {item.status === "published" && (
                       <Link

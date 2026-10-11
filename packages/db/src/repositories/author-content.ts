@@ -20,13 +20,14 @@ import {
 import { organizationWorkspaceAccess } from "./organization-workspace";
 import { publicationNotice } from "./publication-notice";
 import { containsPattern } from "./search-pattern";
-import { serverContentAccess } from "./server-content";
+import { serverContentAccess, serverContentContext } from "./server-content";
 
 type ContentEditFields = Pick<Content, "title" | "body" | "tags"> &
   Pick<Content, "excerpt" | "coverImageUrl">;
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 type DeskCursor = { createdAt: string; id: string; context: string; direction: "older" | "newer" };
 const deskTypes = ["article", "news", "devlog", "update", "announcement", "post", "question"];
+const serverDeskTypes = deskTypes.slice(0, 5);
 const historyActions = [
   "content.created",
   "content.created_by_organization",
@@ -41,14 +42,17 @@ const historyActions = [
   "content.archived",
   "content.restored_by_author",
   "content.restored_by_organization",
+  "content.restored_by_server",
 ];
 const exactRevision = sql<string>`to_char(${content.updatedAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`;
 const hash = (parts: unknown[]) => createHash("sha256").update(JSON.stringify(parts)).digest("hex");
 const source = sql<string>`case when ${content.serverId} is not null then 'server' when ${content.organizationId} is not null then 'organization' else 'personal' end`;
-function recoverable(actorId: string, organizationId?: string) {
-  const archive = organizationId
-    ? sql`${auditEvents.action} = 'content.archived_by_organization' and ${auditEvents.details}->>'organizationId' = ${organizationId}`
-    : sql`${auditEvents.actorId} = ${actorId} and ${auditEvents.action} = 'content.archived_by_author'`;
+function recoverable(actorId: string, organizationId?: string, serverId?: string) {
+  const archive = serverId
+    ? sql`${auditEvents.action} = 'content.archived_by_server' and ${auditEvents.details}->>'serverId' = ${serverId}`
+    : organizationId
+      ? sql`${auditEvents.action} = 'content.archived_by_organization' and ${auditEvents.details}->>'organizationId' = ${organizationId}`
+      : sql`${auditEvents.actorId} = ${actorId} and ${auditEvents.action} = 'content.archived_by_author'`;
   return sql<boolean>`${content.status} = 'archived' and exists (select 1 from ${auditEvents} where ${auditEvents.targetType} = 'content' and ${auditEvents.targetId} = ${content.id} and (${archive}) and ${auditEvents.actorType} = 'user' and ${auditEvents.details}->>'to' = 'archived' and ${auditEvents.details}->>'restoreRevision' = ${exactRevision} and not exists (select 1 from audit_events staff_archive where staff_archive.target_type = 'content' and staff_archive.target_id = ${auditEvents.targetId} and staff_archive.action = 'content.archived' and staff_archive.created_at >= ${auditEvents.createdAt}))`;
 }
 async function organizationEditorialAccess(
@@ -207,20 +211,31 @@ class AuthorContentRepository {
       { isolationLevel: "repeatable read", accessMode: "read only" },
     );
   }
-  async history(id: string, authorId: string, cursor?: DeskCursor, organizationId?: string) {
+  async history(
+    id: string,
+    authorId: string,
+    cursor?: DeskCursor,
+    organizationId?: string,
+    serverId?: string,
+  ) {
+    if (organizationId && serverId)
+      throw new AppError("Ambiguous publication scope", 400, "VALIDATION_ERROR");
     const context = hash(
-      organizationId
-        ? [1, "organization-publication-history", authorId, organizationId, id]
-        : [1, "author-publication-history", authorId, id],
+      serverId
+        ? [1, "server-publication-history", authorId, serverId, id]
+        : organizationId
+          ? [1, "organization-publication-history", authorId, organizationId, id]
+          : [1, "author-publication-history", authorId, id],
     );
-    if (!organizationId && cursor && cursor.context !== context)
+    if (!organizationId && !serverId && cursor && cursor.context !== context)
       throw new AppError("History context changed", 400, "INVALID_CURSOR");
     return db.transaction(
       async (tx) => {
+        const server = serverId ? await serverContentContext(tx, serverId, authorId) : null;
         const organization = organizationId
           ? (await organizationEditorialAccess(tx, organizationId, authorId)).organization
           : null;
-        if (organizationId && cursor && cursor.context !== context)
+        if ((organizationId || serverId) && cursor && cursor.context !== context)
           throw new AppError("History context changed", 400, "INVALID_CURSOR");
         const [item] = await tx
           .select({
@@ -228,26 +243,30 @@ class AuthorContentRepository {
             title: sql<string>`left(${content.title},200)`,
             status: content.status,
             revision: exactRevision,
-            recoverable: recoverable(authorId, organizationId),
+            recoverable: recoverable(authorId, organizationId, serverId),
           })
           .from(content)
           .where(
             and(
               eq(content.id, id),
-              organizationId
-                ? eq(content.organizationId, organizationId)
-                : eq(content.authorId, authorId),
-              organizationId
-                ? sql`${content.serverId} is null and ${content.productId} is null`
-                : undefined,
-              inArray(content.type, deskTypes),
+              serverId
+                ? eq(content.serverId, serverId)
+                : organizationId
+                  ? eq(content.organizationId, organizationId)
+                  : eq(content.authorId, authorId),
+              serverId
+                ? sql`${content.productId} is null`
+                : organizationId
+                  ? sql`${content.serverId} is null and ${content.productId} is null`
+                  : undefined,
+              inArray(content.type, serverId ? serverDeskTypes : deskTypes),
             ),
           )
           .limit(1);
         if (!item) throw new NotFoundError("Publication");
         const rows = await tx
           .select({
-            ...(organizationId
+            ...(organizationId || serverId
               ? {
                   actorUsername: sql<
                     string | null
@@ -284,6 +303,7 @@ class AuthorContentRepository {
         const events = rows.slice(0, 20),
           last = events.at(-1);
         return {
+          ...(server ? { server: { id: server.id, name: server.name } } : {}),
           ...(organization
             ? { organization: { id: organization.id, name: organization.name } }
             : {}),
@@ -310,7 +330,10 @@ class AuthorContentRepository {
     expectedRevision: string,
     audit: Omit<AuditEvent, "createdAt">,
     organizationId?: string,
+    serverId?: string,
   ) {
+    if (organizationId && serverId)
+      throw new AppError("Ambiguous publication scope", 400, "VALIDATION_ERROR");
     return db.transaction(async (tx) => {
       const [current] = await tx
         .select({ ...getTableColumns(content), revision: exactRevision })
@@ -318,25 +341,30 @@ class AuthorContentRepository {
         .where(
           and(
             eq(content.id, id),
-            organizationId
-              ? eq(content.organizationId, organizationId)
-              : eq(content.authorId, authorId),
-            inArray(content.type, deskTypes),
-            organizationId
-              ? sql`${content.serverId} is null and ${content.productId} is null`
-              : undefined,
+            serverId
+              ? eq(content.serverId, serverId)
+              : organizationId
+                ? eq(content.organizationId, organizationId)
+                : eq(content.authorId, authorId),
+            inArray(content.type, serverId ? serverDeskTypes : deskTypes),
+            serverId
+              ? sql`${content.productId} is null`
+              : organizationId
+                ? sql`${content.serverId} is null and ${content.productId} is null`
+                : undefined,
           ),
         )
         .for("update")
         .limit(1);
       if (!current) throw new NotFoundError("Publication");
+      if (serverId) await serverContentAccess(tx, serverId, authorId);
       if (organizationId) await organizationEditorialAccess(tx, organizationId, authorId, true);
       if (current.status !== "archived" || current.revision !== expectedRevision)
         throw new AppError("Publication changed", 409, "CONFLICT");
       const [proof] = await tx
         .select({ id: content.id })
         .from(content)
-        .where(and(eq(content.id, id), recoverable(authorId, organizationId)))
+        .where(and(eq(content.id, id), recoverable(authorId, organizationId, serverId)))
         .limit(1);
       if (!proof)
         throw new AppError(
@@ -344,8 +372,8 @@ class AuthorContentRepository {
           403,
           "PUBLICATION_RESTORE_DENIED",
         );
-      if (current.serverId) await serverContentAccess(tx, current.serverId, authorId);
-      if (current.organizationId && !organizationId)
+      if (current.serverId && !serverId) await serverContentAccess(tx, current.serverId, authorId);
+      if (current.organizationId && !organizationId && !serverId)
         await authorOrganizationAccess(tx, current.organizationId, authorId);
       const [updated] = await tx
         .update(content)
@@ -361,10 +389,19 @@ class AuthorContentRepository {
         ...audit,
         actorId: authorId,
         actorType: "user",
-        action: organizationId ? "content.restored_by_organization" : "content.restored_by_author",
+        action: serverId
+          ? "content.restored_by_server"
+          : organizationId
+            ? "content.restored_by_organization"
+            : "content.restored_by_author",
         targetId: id,
         targetType: "content",
-        details: { from: "archived", to: "draft", ...(organizationId ? { organizationId } : {}) },
+        details: {
+          from: "archived",
+          to: "draft",
+          ...(organizationId ? { organizationId } : {}),
+          ...(serverId ? { serverId } : {}),
+        },
         createdAt: new Date(),
       });
       await publicationNotice(tx, updated as unknown as Content, authorId, "restored", audit.id);
@@ -373,6 +410,7 @@ class AuthorContentRepository {
         status: "draft" as const,
         revision: updated.revision,
         ...(organizationId ? { organizationId } : {}),
+        ...(serverId ? { serverId } : {}),
       };
     });
   }
@@ -496,7 +534,10 @@ class AuthorContentRepository {
           ...(fields === null &&
           deskTypes.includes(current.type) &&
           (audit.action === "content.archived_by_author" ||
-            (organizationId && audit.action === "content.archived_by_organization"))
+            (organizationId && audit.action === "content.archived_by_organization") ||
+            (serverId &&
+              serverDeskTypes.includes(current.type) &&
+              audit.action === "content.archived_by_server"))
             ? { restoreRevision: updated.archiveRevision }
             : {}),
         },

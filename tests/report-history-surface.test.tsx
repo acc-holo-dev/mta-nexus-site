@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "token" }) }) }));
 vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
   notFound: () => {
     throw Error("NOT_FOUND_BOUNDARY");
   },
@@ -21,13 +22,20 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 vi.mock("../apps/web/src/lib/services/community-moderation-service", () => ({
   communityModerationService: state,
 }));
+vi.mock("../apps/web/src/lib/services/server-content-service", () => ({
+  serverContentService: state,
+}));
 vi.mock("../apps/web/src/lib/services/organization-content-service", () => ({
   organizationContentService: state,
 }));
 vi.mock("../apps/web/src/components/author-publication-restore", () => ({
-  AuthorPublicationRestore: ({ organizationId }: { organizationId?: string }) => (
-    <div data-restore={organizationId} />
-  ),
+  AuthorPublicationRestore: ({
+    organizationId,
+    serverId,
+  }: {
+    organizationId?: string;
+    serverId?: string;
+  }) => <div data-restore={organizationId ?? serverId} />,
 }));
 
 import { DiscussionReportsScreen as Reports } from "../apps/web/src/components/discussion-reports-screen";
@@ -185,4 +193,47 @@ it("rejects duplicate filters before either private data source", async () => {
     ),
   ).toContain('role="alert"');
   expect(state.history).not.toHaveBeenCalled();
+});
+
+it.each(["ru", "en"] as const)(
+  "renders private server history, recovery and scoped pagination in %s",
+  async (locale) => {
+    state.locale = locale;
+    const { organization: _organization, ...data } = history;
+    state.history.mockResolvedValue({ ...data, server: { id: "srv", name: "Server" } });
+    const { ServerPublicationHistoryScreen } = await import(
+      "../apps/web/src/components/server-publication-history-screen"
+    );
+    const { serverPublicationHistoryCopy } = await import(
+      "../apps/web/src/lib/server-publication-history-copy"
+    );
+    const html = renderToStaticMarkup(
+      await ServerPublicationHistoryScreen({ id: "srv", contentId: "post" }),
+    );
+    expect(html).toContain(serverPublicationHistoryCopy(locale).title);
+    expect(html).toContain('data-restore="srv"');
+    expect(html).toContain("/workspace/servers/srv/content/post/history?cursor=continuation");
+    expect(html).toContain("/users/editor");
+    expect(html).not.toContain("/workspace/organizations");
+  },
+);
+it("refuses mismatched server DTOs and suppresses restore without current archive proof", async () => {
+  const { ServerPublicationHistoryScreen } = await import(
+    "../apps/web/src/components/server-publication-history-screen"
+  );
+  const { organization: _organization, ...data } = history;
+  state.history.mockResolvedValue({ ...data, server: { id: "foreign", name: "Private server" } });
+  expect(
+    renderToStaticMarkup(await ServerPublicationHistoryScreen({ id: "srv", contentId: "post" })),
+  ).not.toContain("Private title");
+  state.history.mockResolvedValue({
+    ...data,
+    item: { ...data.item, recoverable: false },
+    server: { id: "srv", name: "Server" },
+  });
+  const html = renderToStaticMarkup(
+    await ServerPublicationHistoryScreen({ id: "srv", contentId: "post" }),
+  );
+  expect(html).not.toContain("data-restore");
+  expect(html).toContain("/support");
 });

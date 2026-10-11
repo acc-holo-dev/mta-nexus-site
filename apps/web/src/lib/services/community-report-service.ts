@@ -1,6 +1,6 @@
 import { communityReportsRepository } from "@nexus/db";
 import type { User } from "@nexus/domain";
-import { ForbiddenError } from "@nexus/domain";
+import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { can, generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
@@ -9,6 +9,7 @@ import type {
   communityReportCreateSchema,
   communityReportDecisionSchema,
 } from "../community-report-contract";
+import { reportBatchCommandInput, reportBatchPreviewInput } from "../report-batch-contract";
 
 function summary(
   row: Awaited<ReturnType<typeof communityReportsRepository.page>>["items"][number],
@@ -29,6 +30,63 @@ function summary(
   };
 }
 class CommunityReportService {
+  private batchScope(actor: User, contentId: string, commentId: string) {
+    this.scope(actor, true);
+    if ([contentId, commentId].some((id) => !/^[a-zA-Z0-9_-]{1,128}$/u.test(id)))
+      throw new NotFoundError("Discussion");
+  }
+  async previewDiscussionBatch(actor: User, contentId: string, commentId: string, input: unknown) {
+    this.batchScope(actor, contentId, commentId);
+    const parsed = reportBatchPreviewInput.safeParse(input);
+    if (!parsed.success) throw new AppError("Invalid report batch", 400, "REPORT_BATCH_INVALID");
+    const result = await communityReportsRepository.previewDiscussionBatch(
+      actor.id,
+      contentId,
+      commentId,
+      parsed.data,
+    );
+    return {
+      contentId: result.contentId,
+      commentId: result.commentId,
+      action: result.action,
+      notes: result.notes,
+      previewRevision: result.previewRevision,
+      publication: {
+        id: result.publication.id,
+        title: result.publication.title,
+        status: result.publication.status,
+      },
+      comment: result.comment
+        ? {
+            id: result.comment.id,
+            text: result.comment.text,
+            truncated: result.comment.truncated,
+            revision: result.comment.revision,
+          }
+        : null,
+      items: result.items.map((item) => ({
+        id: item.id,
+        type: item.type,
+        reason: item.reason,
+        before: item.before,
+        after: item.after,
+        createdAt: item.createdAt.toISOString(),
+      })),
+    };
+  }
+  async decideDiscussionBatch(actor: User, contentId: string, commentId: string, input: unknown) {
+    this.batchScope(actor, contentId, commentId);
+    const parsed = reportBatchCommandInput.safeParse(input);
+    if (!parsed.success) throw new AppError("Invalid report batch", 400, "REPORT_BATCH_INVALID");
+    return communityReportsRepository.decideDiscussionBatch(
+      actor.id,
+      contentId,
+      commentId,
+      parsed.data,
+      parsed.data.items.map(() => generateId("aud")),
+    );
+  }
+
   private scope(actor: User, staff: boolean) {
     if (staff && !can(actor, "admin.moderation")) throw new ForbiddenError();
     return { actorId: actor.id, staff };

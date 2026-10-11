@@ -56,7 +56,12 @@ class AuthorContentService {
     actor: User,
     filters: NonNullable<ReturnType<typeof parseAuthorPublicationHistoryQuery>>,
     organizationId?: string,
+    serverId?: string,
   ) {
+    if (organizationId && serverId)
+      throw new AppError("Ambiguous publication scope", 400, "VALIDATION_ERROR");
+    if (serverId !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(serverId))
+      throw new NotFoundError("Server");
     if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(id)) throw new NotFoundError("Publication");
     if (organizationId !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(organizationId))
       throw new NotFoundError("Organization");
@@ -64,10 +69,14 @@ class AuthorContentService {
       id,
       actor.id,
       filters.cursor,
-      ...(organizationId ? [organizationId] : []),
+      ...((serverId ? [undefined, serverId] : organizationId ? [organizationId] : []) as
+        | []
+        | [string]
+        | [undefined, string]),
     );
     return {
       ...(organizationId ? { organization: result.organization } : {}),
+      ...(serverId ? { server: result.server } : {}),
       item: {
         id: result.item.id,
         title: result.item.title,
@@ -77,7 +86,7 @@ class AuthorContentService {
       },
       olderCursor: result.olderCursor,
       events: result.events.map((event) => ({
-        ...(organizationId
+        ...(organizationId || serverId
           ? {
               identity:
                 !["content.published", "content.archived"].includes(event.action) &&
@@ -108,7 +117,17 @@ class AuthorContentService {
       })),
     };
   }
-  async restore(id: string, input: unknown, actor: User, organizationId?: string) {
+  async restore(
+    id: string,
+    input: unknown,
+    actor: User,
+    organizationId?: string,
+    serverId?: string,
+  ) {
+    if (organizationId && serverId)
+      throw new AppError("Ambiguous publication scope", 400, "VALIDATION_ERROR");
+    if (serverId !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(serverId))
+      throw new NotFoundError("Server");
     if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(id)) throw new NotFoundError("Publication");
     if (organizationId !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(organizationId))
       throw new NotFoundError("Organization");
@@ -122,11 +141,18 @@ class AuthorContentService {
         id: generateId("aud"),
         actorId: actor.id,
         actorType: "user",
-        action: organizationId ? "content.restored_by_organization" : "content.restored_by_author",
+        action: serverId
+          ? "content.restored_by_server"
+          : organizationId
+            ? "content.restored_by_organization"
+            : "content.restored_by_author",
         targetId: id,
         targetType: "content",
       },
-      ...(organizationId ? [organizationId] : []),
+      ...((serverId ? [undefined, serverId] : organizationId ? [organizationId] : []) as
+        | []
+        | [string]
+        | [undefined, string]),
     );
   }
 

@@ -2896,3 +2896,46 @@ cover combined individual/group history and revocation, foreign staff isolation 
 malformed-audit privacy. They remain unrun without disposable PostgreSQL; live migration,
 query-plan/locking checks, browser interaction and pinned Node 26 validation remain open.
 GitHub Actions are neither run nor inspected.
+
+
+### Reviewed report batches and server publication recovery — 2026-10-12
+
+The private discussion report workspace now previews and confirms decisions on
+up to 20 explicitly selected pending cases. Review, resolution and dismissal
+reuse the existing report service; deletion remains an individually reviewed
+comment command. Scope-bound previews cover the complete comment text and report
+state, current publication context, moderator identity, action and notes. Writers
+recheck live roles and lock the publication, comment and selected reports in a
+stable order before one bounded update and a mandatory audit for every case.
+Unselected reports, discussion replies and counters are retained. Reporter status
+notifications use the existing preference-aware, bounded best-effort dispatcher
+once after the committed batch; their delivery is not part of report atomicity.
+
+Server editorial workspaces link to private publication history and recover proven
+server-editor archives as drafts. History uses bounded, versioned cursor pages
+and narrow public team identities; reviewer identities and audit details stay
+private. Restoration reuses the author publication repository, rechecks current
+server/team grants under locks, validates the observed revision and retained
+archive proof, and records its audit and inbox notices in the same transaction.
+Legacy archives without proof and later moderator archives remain protected.
+Original author, text, slug and discussion survive restoration. Notices follow
+the server's current team/owner, including after transfer to personal ownership.
+Organization and server history screens share one implementation and retain RU/EN,
+loading, empty, safe error, confirmation and mobile states. No schema, migration,
+dependency, commercial contract or workflow changed.
+
+714 focused unit/HTTP/SQL-builder/SSR/interaction checks across 59 files pass,
+including organization, discussion, publication, resource-copy and subscription
+regressions. Web TypeScript including generated routes, Biome, diff checks and
+Next webpack compile mode pass. Root TypeScript retains only the upstream missing
+`isSigned` resource-delivery fixture; Knip retains its three commercial exports.
+Six additional PostgreSQL fixtures prepare selected-case atomicity, complete
+Unicode text changes, concurrent confirmations/restores, revoked delegation,
+moderator protection and mandatory-audit rollback; they remain unrun without a
+disposable database. Live browser interaction and production page generation
+remain to be verified.
+
+After rebasing on Agent A's seven library blocks, 953 focused checks across
+80 files pass. All 109 upstream source/schema/migration/test files and the full
+upstream problem notes are preserved. The integrated web compile and type checks
+pass; the existing root fixture and three unused commercial exports remain.

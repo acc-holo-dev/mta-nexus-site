@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   callbacks: [] as (() => Promise<void>)[],
   moderators: vi.fn(),
@@ -11,7 +12,12 @@ vi.mock("@nexus/db", () => ({ userRepository: { listModeratorIds: mocks.moderato
 vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.dispatch,
 }));
-import { queueCommunityReportNotice } from "../apps/web/src/lib/services/community-report-notifications";
+
+import {
+  queueCommunityReportBatchNotices,
+  queueCommunityReportNotice,
+} from "../apps/web/src/lib/services/community-report-notifications";
+
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.callbacks = [];
@@ -53,4 +59,25 @@ it("contains delivery failures after report storage and emits only a safe diagno
   } finally {
     warning.mockRestore();
   }
+});
+
+it("dispatches bounded selected-report statuses in one deferred batch without moderator fanout", async () => {
+  queueCommunityReportBatchNotices([
+    { id: "a", reporterId: "first", status: "resolved" },
+    { id: "b", reporterId: "second", status: "dismissed" },
+  ]);
+  expect(mocks.callbacks).toHaveLength(1);
+  expect(mocks.dispatch).not.toHaveBeenCalled();
+  await mocks.callbacks[0]();
+  expect(mocks.dispatch).toHaveBeenCalledTimes(1);
+  expect(mocks.moderators).not.toHaveBeenCalled();
+  expect(mocks.dispatch).toHaveBeenCalledWith([
+    expect.objectContaining({
+      recipientId: "first",
+      link: "/workspace/reports/a",
+      message: "Report status: resolved.",
+    }),
+    expect.objectContaining({ recipientId: "second", link: "/workspace/reports/b" }),
+  ]);
+  expect(() => queueCommunityReportBatchNotices([])).toThrow(RangeError);
 });

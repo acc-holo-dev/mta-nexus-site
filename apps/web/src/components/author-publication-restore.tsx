@@ -13,6 +13,11 @@ import {
   organizationPublicationHistoryCopy,
   organizationPublicationHistoryError,
 } from "../lib/organization-publication-history-copy";
+import { confirmedServerPublicationRestore } from "../lib/server-publication-history-contract";
+import {
+  serverPublicationHistoryCopy,
+  serverPublicationHistoryError,
+} from "../lib/server-publication-history-copy";
 import { platformRequest } from "../lib/user-platform-client";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 export function AuthorPublicationRestore({
@@ -20,17 +25,21 @@ export function AuthorPublicationRestore({
   revision,
   locale,
   organizationId,
+  serverId,
 }: {
   id: string;
   revision: string;
   locale: Locale;
   organizationId?: string;
+  serverId?: string;
 }) {
   const router = useRouter();
-  const orgCopy = organizationPublicationHistoryCopy(locale);
+  const orgCopy = serverId
+    ? serverPublicationHistoryCopy(locale)
+    : organizationPublicationHistoryCopy(locale);
   const copy = {
       ...authorPublicationDeskCopy(locale),
-      ...(organizationId
+      ...(organizationId || serverId
         ? {
             restoreHelp: orgCopy.restoreHelp,
             restoreConfirm: orgCopy.restoreConfirm,
@@ -63,20 +72,28 @@ export function AuthorPublicationRestore({
     controller.current = active;
     try {
       const result = await platformRequest(
-        organizationId
-          ? `/api/workspace/organizations/${encodeURIComponent(organizationId)}/content/${encodeURIComponent(id)}/restore`
-          : `/api/workspace/content/${encodeURIComponent(id)}/restore`,
+        serverId
+          ? `/api/workspace/servers/${encodeURIComponent(serverId)}/content/${encodeURIComponent(id)}/restore`
+          : organizationId
+            ? `/api/workspace/organizations/${encodeURIComponent(organizationId)}/content/${encodeURIComponent(id)}/restore`
+            : `/api/workspace/content/${encodeURIComponent(id)}/restore`,
         locale,
         "POST",
         { expectedRevision: revision },
         active.signal,
-        organizationId ? organizationPublicationHistoryError : authorPublicationDeskError,
+        serverId
+          ? serverPublicationHistoryError
+          : organizationId
+            ? organizationPublicationHistoryError
+            : authorPublicationDeskError,
       );
       if (!mounted.current) return;
       if (
-        !(organizationId
-          ? confirmedOrganizationPublicationRestore(result, id, organizationId, revision)
-          : confirmedAuthorPublicationRestore(result, id, revision))
+        !(serverId
+          ? confirmedServerPublicationRestore(result, id, serverId, revision)
+          : organizationId
+            ? confirmedOrganizationPublicationRestore(result, id, organizationId, revision)
+            : confirmedAuthorPublicationRestore(result, id, revision))
       )
         throw new Error(copy.uncertain);
       setSaved(true);
@@ -119,9 +136,11 @@ export function AuthorPublicationRestore({
         <Link
           prefetch={false}
           href={
-            organizationId
-              ? `/workspace/organizations/${encodeURIComponent(organizationId)}/content/${encodeURIComponent(id)}`
-              : `/workspace/content/${encodeURIComponent(id)}`
+            serverId
+              ? `/workspace/servers/${encodeURIComponent(serverId)}/content/${encodeURIComponent(id)}`
+              : organizationId
+                ? `/workspace/organizations/${encodeURIComponent(organizationId)}/content/${encodeURIComponent(id)}`
+                : `/workspace/content/${encodeURIComponent(id)}`
           }
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
         >

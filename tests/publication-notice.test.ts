@@ -140,3 +140,19 @@ it("notifies the current context owner of an author's restore using only a priva
   expect(formatNotification(notice, copy, "en").message).toContain("remains private");
   expect(formatNotification(notice, copy, "ru").message).toContain("остаётся непубличной");
 });
+
+it("notifies the current personal server owner and never its former organization", async () => {
+  state.rows = [[["current-owner", null]], []];
+  await publicationNotice(
+    db as unknown as Tx,
+    { ...item, organizationId: "former-org", serverId: "srv" },
+    "author",
+    "restored",
+    "audit",
+  );
+  expect(state.queries.some((query) => query.sql.includes('from "organizations"'))).toBe(false);
+  expect(inserts()).toHaveLength(1);
+  expect(inserts()[0].params).toContain("current-owner");
+  expect(inserts()[0].params).toContain("/workspace/servers/srv/content/item");
+  expect(JSON.stringify(state.queries)).not.toContain("former-org");
+});

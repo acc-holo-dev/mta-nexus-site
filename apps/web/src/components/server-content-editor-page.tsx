@@ -1,15 +1,16 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { AppError } from "@nexus/domain";
-import { AuthorContentForm } from "./author-content-form";
-import { PlatformSignIn } from "./content-catalog-controls";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { getRequestLocale } from "../lib/i18n-server";
+import { serverContentId } from "../lib/server-content-api";
+import { serverContentCopy } from "../lib/server-content-copy";
+import { serverPublicationHistoryCopy } from "../lib/server-publication-history-copy";
 import { authService } from "../lib/services/auth-service";
 import { serverContentService } from "../lib/services/server-content-service";
-import { getRequestLocale } from "../lib/i18n-server";
-import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
-import { serverContentCopy } from "../lib/server-content-copy";
-import { serverContentId } from "../lib/server-content-api";
 import { parseEditableContent } from "../lib/user-platform-client";
+import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
+import { AuthorContentForm } from "./author-content-form";
+import { PlatformSignIn } from "./content-catalog-controls";
 export async function ServerContentEditorPage({
   id,
   contentId,
@@ -46,12 +47,22 @@ export async function ServerContentEditorPage({
       </Link>
       <h1 className="font-display text-primary">{contentId ? copy.edit : team.new}</h1>
       {result && (!contentId || (initial && initial.serverId === id)) ? (
-        <AuthorContentForm
-          key={`${id}:${contentId ?? "new"}:${initial?.updatedAt ?? "new"}`}
-          locale={locale}
-          initial={initial ?? undefined}
-          server={result.server}
-        />
+        <>
+          {contentId && (
+            <Link
+              href={`${path}/${encodeURIComponent(contentId)}/history`}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            >
+              {serverPublicationHistoryCopy(locale).history}
+            </Link>
+          )}
+          <AuthorContentForm
+            key={`${id}:${contentId ?? "new"}:${initial?.updatedAt ?? "new"}`}
+            locale={locale}
+            initial={initial ?? undefined}
+            server={result.server}
+          />
+        </>
       ) : (
         <div className="nexus-panel space-y-3 p-5">
           <p role="alert" className="text-sm text-danger">
