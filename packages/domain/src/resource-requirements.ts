@@ -90,6 +90,7 @@ export function compareRequirementMta(
 }
 export function buildResourceRequirementsReport(input: {
   rootSlug: string;
+  rootSlugs?: string[];
   nodes: ResourceRequirementNode[];
   targetMta?: string;
   scope: ResourceRequirementsScope;
@@ -147,7 +148,7 @@ export function buildResourceRequirementsReport(input: {
     active.pop();
     order.push(slug);
   }
-  visit(input.rootSlug, 0);
+  for (const slug of input.rootSlugs ?? [input.rootSlug]) visit(slug, 0);
   if (limited) issues.push({ code: "limit", slug: input.rootSlug });
   const blockers = issues.filter(
     (issue) => !["mta_unknown", "package_review"].includes(issue.code),

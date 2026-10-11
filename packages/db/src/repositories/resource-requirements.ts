@@ -1,5 +1,7 @@
 import {
   buildResourceRequirementsReport,
+  buildCollectionRequirementsReport,
+  LIBRARY_COLLECTION_ITEM_LIMIT,
   NotFoundError,
   RESOURCE_REQUIREMENTS_MAX_DEPTH,
   RESOURCE_REQUIREMENTS_MAX_NODES,
@@ -7,9 +9,16 @@ import {
   type ResourceRequirementsScope,
   requirementDeclarations,
 } from "@nexus/domain";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "../client";
-import { builds, products, resourceLibrarySelections as selections, users } from "../schema";
+import {
+  builds,
+  products,
+  resourceLibrarySelections as selections,
+  users,
+  libraryCollections as collections,
+  libraryCollectionItems as members,
+} from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
 import type { ResourceTransaction } from "./entitlements";
 import {
@@ -99,7 +108,97 @@ async function readNodes(
     };
   });
 }
+async function expandNodes(
+  tx: ResourceTransaction,
+  actorId: string,
+  roots: ResourceRequirementNode[],
+  rootSlugs: string[],
+  library: boolean,
+  observedAt: Date,
+) {
+  const nodes = [...roots];
+  const discovered = new Set(rootSlugs);
+  let frontier = nodes.flatMap((node) => node.dependencies),
+    truncated = false;
+  for (let depth = 1; frontier.length && depth <= RESOURCE_REQUIREMENTS_MAX_DEPTH; depth++) {
+    const next = [...new Set(frontier)].filter((slug) => !discovered.has(slug)).sort();
+    if (next.length > RESOURCE_REQUIREMENTS_MAX_NODES - discovered.size) truncated = true;
+    const batch = next.slice(0, RESOURCE_REQUIREMENTS_MAX_NODES - discovered.size);
+    for (const slug of batch) discovered.add(slug);
+    if (!batch.length) break;
+    const layer = await readNodes(tx, actorId, batch, null, library, observedAt);
+    nodes.push(...layer);
+    frontier = layer.flatMap((node) => node.dependencies);
+  }
+  if (frontier.some((slug) => !discovered.has(slug))) truncated = true;
+  return { nodes, truncated };
+}
 export class ResourceRequirementsRepository {
+  async collectionReport(input: { actorId: string; collectionId: string; targetMta?: string }) {
+    return db.transaction(
+      async (tx) => {
+        await tx.execute(sql`set local statement_timeout = '10s'`);
+        await tx.execute(sql`set local lock_timeout = '5s'`);
+        const [actor] = await tx
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.id, input.actorId))
+          .limit(1);
+        if (!actor) throw new NotFoundError("Library account");
+        const [collection] = await tx
+          .select({
+            id: collections.id,
+            name: collections.name,
+            status: collections.status,
+            revision: collections.revision,
+          })
+          .from(collections)
+          .where(and(eq(collections.id, input.collectionId), eq(collections.userId, input.actorId)))
+          .limit(1);
+        if (!collection) throw new NotFoundError("Collection");
+        const [time] = await tx.execute<{ observedAt: string }>(
+          sql`select date_trunc('milliseconds',transaction_timestamp())::text as "observedAt"`,
+        );
+        const observedAt = new Date(time?.observedAt ?? "");
+        if (!Number.isFinite(observedAt.getTime()))
+          throw new Error("Collection snapshot time unavailable");
+        // Mask roots before graph traversal. A retained reference is never download authority.
+        const entries = await tx.execute<{ slug: string | null }>(
+          sql`${effectiveUserDownloadSources(input.actorId, observedAt)}
+        SELECT CASE WHEN owned.resource_id IS NOT NULL AND p.status='published' AND p.price=0
+          AND EXISTS (SELECT 1 FROM ${builds} WHERE ${safePublishedBuildCondition(sql`p.id`)})
+          THEN p.slug END AS slug
+        FROM ${members} member LEFT JOIN owned ON owned.resource_id=member.product_id
+        LEFT JOIN ${products} p ON p.id=member.product_id
+        WHERE member.collection_id=${collection.id}
+        ORDER BY member.product_id LIMIT ${LIBRARY_COLLECTION_ITEM_LIMIT + 1}`,
+        );
+        const eligible = [
+          ...new Set(entries.flatMap((entry) => (entry.slug ? [entry.slug] : []))),
+        ].sort();
+        const rootSlugs = eligible.slice(0, RESOURCE_REQUIREMENTS_MAX_NODES);
+        const roots = rootSlugs.length
+          ? await readNodes(tx, input.actorId, rootSlugs, null, true, observedAt)
+          : [];
+        const expanded = await expandNodes(tx, input.actorId, roots, rootSlugs, true, observedAt);
+        return buildCollectionRequirementsReport({
+          collection,
+          itemCount: entries.length,
+          unavailableItemCount: entries.filter((entry) => entry.slug === null).length,
+          rootSlugs,
+          nodes: expanded.nodes,
+          targetMta: input.targetMta,
+          generatedAt: observedAt.toISOString(),
+          truncated:
+            expanded.truncated ||
+            eligible.length > rootSlugs.length ||
+            entries.length > LIBRARY_COLLECTION_ITEM_LIMIT,
+        });
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
   async report(input: {
     actorId: string;
     productId: string;
@@ -153,34 +252,21 @@ export class ResourceRequirementsRepository {
           (input.buildId && !nodes[0].build)
         )
           throw new NotFoundError("Resource requirements");
-        const discovered = new Set([product.slug]);
-        let frontier = nodes[0].dependencies,
-          truncated = false;
-        for (let depth = 1; frontier.length && depth <= RESOURCE_REQUIREMENTS_MAX_DEPTH; depth++) {
-          const next = [...new Set(frontier)].filter((slug) => !discovered.has(slug)).sort();
-          if (next.length > RESOURCE_REQUIREMENTS_MAX_NODES - discovered.size) truncated = true;
-          const batch = next.slice(0, RESOURCE_REQUIREMENTS_MAX_NODES - discovered.size);
-          for (const slug of batch) discovered.add(slug);
-          if (!batch.length) break;
-          const layer = await readNodes(
-            tx,
-            input.actorId,
-            batch,
-            null,
-            input.scope === "library",
-            observedAt,
-          );
-          nodes.push(...layer);
-          frontier = layer.flatMap((node) => node.dependencies);
-        }
-        if (frontier.some((slug) => !discovered.has(slug))) truncated = true;
+        const expanded = await expandNodes(
+          tx,
+          input.actorId,
+          nodes,
+          [product.slug],
+          input.scope === "library",
+          observedAt,
+        );
         return buildResourceRequirementsReport({
           rootSlug: product.slug,
-          nodes,
+          nodes: expanded.nodes,
           targetMta: input.targetMta,
           scope: input.scope,
           generatedAt: observedAt.toISOString(),
-          truncated,
+          truncated: expanded.truncated,
         });
       },
       { isolationLevel: "repeatable read" },

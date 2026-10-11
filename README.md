@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+Private collections now include a whole-collection readiness report, an MTA
+version check and private JSON export. Shared dependencies and selected builds
+are checked together in one read-only database snapshot, with bounded graph
+traversal and masked unavailable members. Open a collection and choose
+**Collection readiness**; downloads still independently verify current access.
+
 The buyer library now supports private resource collections: create/rename,
 archive/restore, add acquired resources, remove references after lost access,
 search, paginated views and immutable command history/private JSON. Migration

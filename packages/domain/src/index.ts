@@ -36,3 +36,5 @@ export * from "./plan-reviews";
 export * from "./resource-copy";
 export * from "./subscriptions";
 export * from "./library-collections";
+
+export * from "./collection-requirements";

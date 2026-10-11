@@ -2702,3 +2702,25 @@ concurrent confirmation, Unicode full-text hashing and audit rollback; they rema
 unrun without a disposable database. Live browser interaction and production
 page generation remain outstanding. Root TypeScript still has the upstream
 missing `isSigned` delivery fixture; Knip retains three commercial exports.
+
+### Collection-wide resource readiness — 2026-10-11
+
+Collection owners can inspect `/workspace/library/collections/[id]/requirements`
+and private, rate-limited GET/JSON-export APIs. One read-only repeatable-read
+snapshot binds the collection revision, membership, effective access and chosen
+library builds. Root metadata is masked before graph expansion when access,
+free publication or safe-build availability is missing. Shared dependencies are
+batch-loaded by layer, with the existing 48-node/eight-level limits; withheld
+members and truncation block whole-collection readiness and suppress its order.
+Archived collections remain inspectable. Membership never grants download rights.
+
+RU/EN screens reuse the single-resource diagnostic body, preserving explicit
+publisher/moderator scopes and independent download authorization. No migration,
+provider, dependency or workflow changed. 115 focused domain/HTTP/SQL-builder/SSR
+checks, changed-file Biome lint and web TypeScript pass. Next webpack compile
+mode passes with a 6 GiB Node heap; production generation, real PostgreSQL,
+browser interaction and Node 26 remain unverified. The installed environment
+has Node 24/pnpm 11 and lacks `@swc/core` and `fast-check`; focused checks use a
+scratch Vitest configuration with the same aliases and automatic JSX transform.
+Root TypeScript additionally retains the pre-existing missing `isSigned` fixture
+in `resource-deliveries.integration.test.ts`. GitHub Actions were not used.
