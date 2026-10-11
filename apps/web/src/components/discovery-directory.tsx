@@ -12,6 +12,9 @@ import { discoveryCopy } from "../lib/discovery-copy";
 import { getDictionary, type Locale } from "../lib/i18n";
 import { discoveryService } from "../lib/services/discovery-service";
 import { authService } from "../lib/services/auth-service";
+import { discoveryStreamCopy, discoveryStreamError } from "../lib/discovery-stream-copy";
+import { AppError } from "@nexus/domain";
+import { discoveryStreamHref, type DiscoveryStreamQuery } from "../lib/discovery-stream-contract";
 import {
   indexMtaObservations,
   mtaMasterDirectoryService,
@@ -21,10 +24,12 @@ export function DirectoryFilters({
   state,
   locale,
   path = "/discover",
+  stream = false,
 }: {
   state: DiscoverQuery;
   locale: Locale;
   path?: string;
+  stream?: boolean;
 }) {
   const copy = discoveryCopy(locale);
   const dictionary = getDictionary(locale).discover;
@@ -40,7 +45,7 @@ export function DirectoryFilters({
         method="get"
         className="nexus-panel space-y-4 p-4"
       >
-        {path === "/discover" && <input type="hidden" name="type" value={state.type} />}
+        {(path === "/discover" || stream) && <input type="hidden" name="type" value={state.type} />}
         <div className="flex flex-wrap items-end gap-3">
           <label className="min-w-48 flex-1 space-y-1 text-xs text-secondary">
             {dictionary.searchLabel}
@@ -53,7 +58,7 @@ export function DirectoryFilters({
               placeholder={dictionary.searchPlaceholder}
             />
           </label>
-          {names && (
+          {names && !stream && (
             <label className="space-y-1 text-xs text-secondary">
               {copy.sort}
               <select name="sort" defaultValue={state.sort} className={field}>
@@ -82,7 +87,7 @@ export function DirectoryFilters({
             {dictionary.searchButton}
           </button>
           <Link
-            href={discoverHref({ type: state.type }, path)}
+            href={stream ? `${path}?type=${state.type}` : discoverHref({ type: state.type }, path)}
             className="min-h-11 content-center text-sm text-accent underline"
           >
             {copy.reset}
@@ -113,19 +118,35 @@ export async function DirectoryResults({
   state,
   locale,
   path = "/discover",
+  stream,
 }: {
   state: DiscoverQuery;
   locale: Locale;
   path?: string;
+  stream?: DiscoveryStreamQuery;
 }) {
   const copy = discoveryCopy(locale);
   const dictionary = getDictionary(locale).discover;
-  const result = await discoveryService.page(state).catch(() => null);
+  let loadError = copy.unavailable;
+  const result = await (stream
+    ? discoveryService.stream(stream)
+    : discoveryService.page(state)
+  ).catch((failure: unknown) => {
+    if (stream)
+      loadError = discoveryStreamError(
+        locale,
+        failure instanceof AppError ? failure.code : "INTERNAL_ERROR",
+      );
+    return null;
+  });
   if (!result)
     return (
       <div role="alert" className="nexus-panel space-y-3 p-5 text-danger">
-        <p>{copy.unavailable}</p>
-        <Link className="text-accent underline" href={discoverHref(state, path)}>
+        <p>{loadError}</p>
+        <Link
+          className="text-accent underline"
+          href={stream ? discoveryStreamHref(stream) : discoverHref(state, path)}
+        >
           {dictionary.searchButton}
         </Link>
       </div>
@@ -250,35 +271,64 @@ export async function DirectoryResults({
             ))}
         </div>
       )}
-      {(result.page > 1 || result.hasMore) && (
-        <nav
-          aria-label={copy.pages}
-          className="flex items-center justify-between gap-3 border-t border-base pt-4"
-        >
-          {result.page > 1 ? (
+      {stream && "nextCursor" in result ? (
+        <nav aria-label={copy.pages} className="flex flex-wrap gap-4 border-t border-base pt-4">
+          <a
+            href={discoveryStreamHref(stream)}
+            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          >
+            {discoveryStreamCopy(locale).latest}
+          </a>
+          {"previousCursor" in result && typeof result.previousCursor === "string" && (
             <Link
-              className="min-h-11 content-center text-sm text-accent"
-              href={discoverHref({ ...state, page: result.page - 1 }, path)}
+              prefetch={false}
+              href={discoveryStreamHref(stream, result.previousCursor)}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
             >
-              {copy.previous}
+              {discoveryStreamCopy(locale).newer}
             </Link>
-          ) : (
-            <span />
           )}
-          <span className="text-sm text-muted">
-            {copy.page} {result.page}
-          </span>
-          {result.hasMore ? (
+          {typeof result.nextCursor === "string" && (
             <Link
-              className="min-h-11 content-center text-sm text-accent"
-              href={discoverHref({ ...state, page: result.page + 1 }, path)}
+              prefetch={false}
+              href={discoveryStreamHref(stream, result.nextCursor)}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
             >
-              {copy.next}
+              {discoveryStreamCopy(locale).older}
             </Link>
-          ) : (
-            <span />
           )}
         </nav>
+      ) : (
+        (result.page > 1 || result.hasMore) && (
+          <nav
+            aria-label={copy.pages}
+            className="flex items-center justify-between gap-3 border-t border-base pt-4"
+          >
+            {result.page > 1 ? (
+              <Link
+                className="min-h-11 content-center text-sm text-accent"
+                href={discoverHref({ ...state, page: result.page - 1 }, path)}
+              >
+                {copy.previous}
+              </Link>
+            ) : (
+              <span />
+            )}
+            <span className="text-sm text-muted">
+              {copy.page} {result.page}
+            </span>
+            {result.hasMore ? (
+              <Link
+                className="min-h-11 content-center text-sm text-accent"
+                href={discoverHref({ ...state, page: result.page + 1 }, path)}
+              >
+                {copy.next}
+              </Link>
+            ) : (
+              <span />
+            )}
+          </nav>
+        )
       )}
     </div>
   );

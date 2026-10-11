@@ -12,6 +12,7 @@ import { ForbiddenError, NotFoundError, AppError } from "@nexus/domain";
 import type { Content, Comment, User, Product, Server } from "@nexus/domain";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { encodeDiscussionCursor } from "../content-discussion-contract";
+import { PUBLICATION_TYPES } from "../publication-feed-contract";
 type DiscussionCursor = { createdAt: string; id: string };
 import { editorialTypes, communityTypes, type parseContentPage } from "../user-platform-contract";
 
@@ -177,6 +178,7 @@ export class ContentService {
     actor: User,
     notes?: string,
     expectedUpdatedAt?: Date,
+    publicationOnly = false,
   ): Promise<Content> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError("Moderator privilege is required to moderate content");
@@ -184,15 +186,18 @@ export class ContentService {
 
     const current = await contentRepository.findById(contentId);
     if (!current) throw new NotFoundError("Content", contentId);
+    if (publicationOnly && !(PUBLICATION_TYPES as readonly string[]).includes(current.type))
+      throw new NotFoundError("Publication");
 
-    if (expectedUpdatedAt && current.updatedAt.getTime() !== expectedUpdatedAt.getTime()) throw new AppError("Content changed before moderation", 409, "CONTENT_STATE_CHANGED");
+    if (expectedUpdatedAt && current.updatedAt.getTime() !== expectedUpdatedAt.getTime())
+      throw new AppError("Content changed before moderation", 409, "CONTENT_STATE_CHANGED");
 
     const targetStatus: Content["status"] = decision === "publish" ? "published" : "archived";
     if (current.status === targetStatus) {
       throw new AppError(`Content is already ${targetStatus}`, 409, "CONTENT_ALREADY_IN_STATE");
     }
 
-    const updated = await contentRepository.moderateStatusWithAudit(
+    const args = [
       contentId,
       targetStatus,
       current.status,
@@ -206,7 +211,10 @@ export class ContentService {
         details: { from: current.status, to: targetStatus, notes },
       },
       expectedUpdatedAt ?? new Date(current.updatedAt),
-    );
+    ] as const;
+    const updated = publicationOnly
+      ? await contentRepository.moderateStatusWithAudit(...args, true)
+      : await contentRepository.moderateStatusWithAudit(...args);
     if (!updated) {
       throw new AppError(
         "Content changed before moderation completed",

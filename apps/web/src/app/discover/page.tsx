@@ -16,6 +16,8 @@ import {
 } from "../../lib/discover-query";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
+import { discoveryStreamCopy } from "../../lib/discovery-stream-copy";
+import { discoveryStreamHref } from "../../lib/discovery-stream-contract";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +86,17 @@ export default async function DiscoverPage({
       </nav>
 
       <DirectoryFilters state={state} locale={locale} />
+      {["servers", "creators", "organizations"].includes(state.type) && (
+        <Link
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          href={discoveryStreamHref({
+            ...state,
+            type: state.type as "servers" | "creators" | "organizations",
+          })}
+        >
+          {discoveryStreamCopy(locale).title}
+        </Link>
+      )}
       {results}
     </div>
   );

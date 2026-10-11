@@ -72,3 +72,4 @@ export { discussionWorkspaceRepository } from "./discussion-workspace";
 export { publicVerificationHistoryRepository } from "./public-verification-history";
 export { publicContextTrustRepository, type PublicContextKind } from "./public-context-trust";
 export { organizationTeamDirectoryRepository } from "./organization-team-directory";
+export { communityModerationWorkspaceRepository } from "./community-moderation-workspace";

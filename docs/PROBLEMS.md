@@ -2119,3 +2119,67 @@ CREATE INDEX servers_public_organization_idx
   ON servers (organization_id)
   WHERE status = 'active' AND visibility = 'public';
 ```
+
+### Discovery stream and publication moderation workspace — 2026-10-11
+
+`/discover/stream` and GET `/api/discover/stream` reuse the existing public
+directory repository, cards, follow-state batch and official MTA observation
+service. Server, creator and organization catalogs now support twenty-four-item
+keyset pages, nearest newer/older navigation, exact PostgreSQL microsecond tie
+keys and entity/filter-bound continuations without offsets or numbered-page
+caps. Search, verification and server language/region/mode filters persist in
+links. The existing numbered/alphabetical directories remain available. Public
+server projections omit internal owners, organization IDs and observation
+bookkeeping; public endpoints remain available for official observation matching.
+Visibility and active-state gates apply to every page.
+
+`/admin/community`, `/admin/community/[id]`, GET `/api/admin/community` and
+GET/POST `/api/admin/community/[id]` provide a staff publication queue with
+search, exact author, type and status filters; bounded full-text review; public
+author/context links; and retained publish/archive decisions. Queue and history
+pages use twenty-item exact cursors bound to the current staff account and
+filters/target. Repeatable read-only snapshots recheck the current database
+role before selecting private material. Commercial content, hidden server
+context, account secrets and raw audit metadata are excluded from the DTOs.
+Existing audit indexes serve decision history.
+
+Decisions reuse existing content moderation, mandatory audit and preference-aware
+author notices in one transaction. Current staff privilege, publication scope and
+the observed revision are checked again under the write lock. Legacy texts above
+100,000 Unicode characters receive an explicit partial-preview warning and
+cannot be published; archiving remains possible. PostgreSQL character limits and
+JavaScript UTF-16 validation agree for supplementary Unicode text. The existing
+moderation buttons are also repaired: a boolean pending ref previously disabled
+them permanently. Exact saved-state acknowledgement precedes success; conflicts,
+network errors and uncertain replies block further writes until saved state is
+reloaded. Duplicate clicks, cancellation and unmount abortion are covered.
+
+RU/EN metadata, forms, navigation, private noindex and loading/error/empty/success
+states are included. 213 focused unit/query/HTTP/render/interaction checks across
+twenty-two files and touched-file Biome pass. Next webpack compile mode passes;
+full production generation and browser validation remain pending. TypeScript
+still reports the existing `isSigned` commercial fixture error, and Knip reports
+the existing `ResourceReleaseWorkerRepository` export; this block introduces no
+additional findings. Five PostgreSQL fixtures prepare exact multi-page traversal,
+private server isolation, live staff revocation, history filtering, locked
+publication scope, Unicode review limits and mandatory-audit rollback. They
+remain unrun without PostgreSQL. No schema, migration, dependency or workflow is
+changed.
+
+Agent A owns these additional nonunique index contracts; validate query plans
+against production-sized catalogs before claiming scale characteristics:
+
+```sql
+CREATE INDEX servers_public_created_id_idx
+  ON servers (created_at DESC, id DESC)
+  WHERE visibility = 'public' AND status = 'active';
+CREATE INDEX users_creator_created_id_idx
+  ON users (created_at DESC, id DESC)
+  WHERE role IN ('developer', 'admin');
+CREATE INDEX organizations_created_id_idx
+  ON organizations (created_at DESC, id DESC);
+CREATE INDEX content_moderation_updated_id_idx
+  ON content (updated_at DESC, id DESC)
+  WHERE type IN ('article', 'news', 'devlog', 'update', 'announcement', 'post', 'question', 'review')
+    AND status IN ('draft', 'published', 'archived');
+```

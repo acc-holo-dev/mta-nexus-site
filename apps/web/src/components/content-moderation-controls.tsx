@@ -2,16 +2,27 @@
 
 import { Archive, LoaderCircle, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
 import { useNexusLocale } from "./locale-context";
+import {
+  confirmsModerationCommand,
+  moderationDetailHref,
+} from "../lib/community-moderation-contract";
+import { moderationCopy, moderationError } from "../lib/community-moderation-copy";
 
 export function ContentModerationControls({
   contentId,
   expectedUpdatedAt,
+  status,
+  workspace = false,
+  truncated = false,
 }: {
   contentId: string;
   expectedUpdatedAt: string;
+  status?: string;
+  workspace?: boolean;
+  truncated?: boolean;
 }) {
   const router = useRouter();
   const { dictionary, locale } = useNexusLocale();
@@ -19,11 +30,29 @@ export function ContentModerationControls({
   const [notes, setNotes] = useState("");
   const [pending, setPending] = useState<"publish" | "archive" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [blocked, setBlocked] = useState(false),
+    [saved, setSaved] = useState(false);
+  const alive = useRef(true),
+    controller = useRef<AbortController | null>(null);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+      controller.current?.abort();
+    };
+  }, []);
   const requestPending = useRef(false);
   const hasNotes = notes.trim().length >= 3;
 
   async function moderate(action: "publish" | "archive") {
-    if (!hasNotes || requestPending.current) return;
+    if (
+      !hasNotes ||
+      requestPending.current ||
+      blocked ||
+      (action === "publish" && (status === "published" || truncated)) ||
+      (action === "archive" && status === "archived")
+    )
+      return;
 
     const confirmed = window.confirm(
       action === "publish" ? copy.publishContentConfirm : copy.archiveContentConfirm,
@@ -33,40 +62,57 @@ export function ContentModerationControls({
     requestPending.current = true;
     setPending(action);
     setError(null);
+    const request = new AbortController();
+    controller.current = request;
     try {
-      const response = await fetch("/api/admin/actions", {
-        method: "POST",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          targetType: "content",
-          targetId: contentId,
-          action,
-          notes: notes.trim(),
-          expectedUpdatedAt,
-        }),
-        signal: AbortSignal.timeout(10_000),
-      });
+      const response = await fetch(
+        workspace ? `/api/admin/community/${encodeURIComponent(contentId)}` : "/api/admin/actions",
+        {
+          method: "POST",
+          cache: "no-store",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...(!workspace ? { targetType: "content", targetId: contentId } : {}),
+            action,
+            notes: notes.trim(),
+            expectedUpdatedAt,
+          }),
+          signal: AbortSignal.any([request.signal, AbortSignal.timeout(10_000)]),
+        },
+      );
       const data = await response.json().catch(() => null);
-      if (!confirmsAdminAction(response.status, data, contentId, action)) {
+      if (!alive.current) return;
+      if (
+        !(workspace
+          ? response.ok && confirmsModerationCommand(data, contentId, action, expectedUpdatedAt)
+          : confirmsAdminAction(response.status, data, contentId, action))
+      ) {
+        setBlocked(true);
         setError(
-          data?.code === "CONTENT_STATE_CHANGED"
-            ? locale === "ru"
-              ? "Публикация изменилась. Загрузите и проверьте новую версию перед решением."
-              : "The publication changed. Reload and review the new version before deciding."
-            : copy.contentFailed,
+          workspace
+            ? moderationError(locale, response.ok ? "UNCONFIRMED" : data?.code)
+            : data?.code === "CONTENT_STATE_CHANGED"
+              ? locale === "ru"
+                ? "Публикация изменилась. Загрузите и проверьте новую версию перед решением."
+                : "The publication changed. Reload and review the new version before deciding."
+              : copy.contentFailed,
         );
         return;
       }
 
       setNotes("");
+      setBlocked(true);
+      setSaved(true);
       router.refresh();
     } catch {
-      setError(copy.contentUnavailable);
+      if (alive.current) {
+        setBlocked(true);
+        setError(workspace ? moderationCopy(locale).uncertain : copy.contentUnavailable);
+      }
     } finally {
       requestPending.current = false;
-      setPending(null);
+      if (alive.current) setPending(null);
     }
   }
 
@@ -75,7 +121,7 @@ export function ContentModerationControls({
       <label className="block space-y-1">
         <span className="font-label uppercase text-muted">{copy.reviewNote}</span>
         <textarea
-          disabled={pending !== null}
+          disabled={pending !== null || blocked}
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
           minLength={3}
@@ -89,7 +135,7 @@ export function ContentModerationControls({
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          disabled={!hasNotes || requestPending.current !== null}
+          disabled={!hasNotes || pending !== null || blocked || status === "published" || truncated}
           onClick={() => void moderate("publish")}
           className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[color:var(--nexus-success)]/25 bg-success-soft px-3 py-2 text-[11px] font-semibold text-success transition-colors hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
         >
@@ -103,7 +149,7 @@ export function ContentModerationControls({
 
         <button
           type="button"
-          disabled={!hasNotes || requestPending.current !== null}
+          disabled={!hasNotes || pending !== null || blocked || status === "archived"}
           onClick={() => void moderate("archive")}
           className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-base bg-surface px-3 py-2 text-[11px] font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
         >
@@ -117,6 +163,19 @@ export function ContentModerationControls({
       </div>
 
       {!hasNotes && <p className="text-[10px] text-faint">{copy.reviewNoteHint}</p>}
+      {saved && (
+        <p role="status" className="text-sm text-success">
+          {moderationCopy(locale).saved}
+        </p>
+      )}
+      {saved && (
+        <a
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          href={workspace ? moderationDetailHref(contentId) : "/admin"}
+        >
+          {moderationCopy(locale).reload}
+        </a>
+      )}
       {error && (
         <div className="space-y-2">
           <p role="alert" className="text-[11px] text-danger">

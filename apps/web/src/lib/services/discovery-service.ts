@@ -8,6 +8,9 @@ import {
   authorContentRepository,
 } from "@nexus/db";
 import { safeExternalWebUrl } from "@nexus/validation";
+import { createHash } from "node:crypto";
+import { AppError } from "@nexus/domain";
+import type { DiscoveryStreamQuery } from "../discovery-stream-contract";
 import type { DiscoverQuery } from "../discover-query";
 import { DISCOVER_CONTENT_TYPES } from "../discover-query";
 import { productService } from "./product-service";
@@ -43,18 +46,74 @@ class DiscoveryService {
       });
       return { ...result, hasMore: result.hasMore && input.page < 1000, type: "content" as const };
     }
+    return this.directory(input);
+  }
+  async stream(input: DiscoveryStreamQuery) {
+    const context = createHash("sha256")
+      .update(
+        JSON.stringify([
+          1,
+          "discovery-stream",
+          input.type,
+          input.query,
+          input.verified,
+          input.language,
+          input.region,
+          input.gameMode,
+        ]),
+      )
+      .digest("hex");
+    if (input.cursor && input.cursor.context !== context)
+      throw new AppError("Directory filters changed", 400, "INVALID_CURSOR");
+    const result = await this.directory({ ...input, keyset: true });
+    return {
+      ...result,
+      nextCursor: result.nextCursor
+        ? JSON.stringify({ ...result.nextCursor, context, version: 1, direction: "older" })
+        : null,
+      previousCursor: result.previousCursor
+        ? JSON.stringify({ ...result.previousCursor, context, version: 1, direction: "newer" })
+        : null,
+    };
+  }
+  private async directory(
+    input: DiscoverQuery & { keyset?: boolean; cursor?: DiscoveryStreamQuery["cursor"] },
+  ) {
     if (input.type === "creators") {
       const result = await publicDirectoryRepository.pageCreators(input);
-      return { ...result, type: "creators" as const, items: result.items.map(item => ({ ...item, avatarUrl: safeExternalWebUrl(item.avatarUrl) ?? null })) };
+      return {
+        ...result,
+        type: "creators" as const,
+        items: result.items.map((item) => ({
+          ...item,
+          avatarUrl: safeExternalWebUrl(item.avatarUrl) ?? null,
+        })),
+      };
     }
     if (input.type === "organizations") {
       const result = await publicDirectoryRepository.pageOrganizations(input);
-      return { ...result, type: "organizations" as const, items: result.items.map(item => ({ ...item, logoUrl: safeExternalWebUrl(item.logoUrl) ?? null })) };
+      return {
+        ...result,
+        type: "organizations" as const,
+        items: result.items.map((item) => ({
+          ...item,
+          logoUrl: safeExternalWebUrl(item.logoUrl) ?? null,
+        })),
+      };
     }
     const result = await publicDirectoryRepository.pageServers(input);
-    return { ...result, type: "servers" as const, items: result.items.map(item => ({ ...item,
-      bannerUrl: safeExternalWebUrl(item.bannerUrl) ?? undefined, logoUrl: safeExternalWebUrl(item.logoUrl) ?? undefined,
-    })) };
+    return {
+      ...result,
+      type: "servers" as const,
+      items: result.items.map((item) => ({
+        ...item,
+        bannerUrl: safeExternalWebUrl(item.bannerUrl) ?? undefined,
+        description: item.description ?? undefined,
+        gameMode: item.gameMode ?? undefined,
+        maxPlayers: item.maxPlayers ?? undefined,
+        logoUrl: safeExternalWebUrl(item.logoUrl) ?? undefined,
+      })),
+    };
   }
   async search(
     query: string,

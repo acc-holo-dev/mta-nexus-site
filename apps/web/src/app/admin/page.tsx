@@ -36,6 +36,7 @@ import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
 import { BuildQuarantineControls } from "../../components/build-quarantine-controls";
 import { ContentModerationControls } from "../../components/content-moderation-controls";
+import { moderationCopy } from "../../lib/community-moderation-copy";
 import { VerificationModerationControls } from "../../components/verification-moderation-controls";
 import { ReportModerationControls } from "../../components/report-moderation-controls";
 import { communityReportCopy } from "../../lib/community-report-copy";
@@ -555,6 +556,7 @@ export default async function AdminPage({
         <SectionHeader
           title={copy.communityQueue}
           description={`${pendingContentCount} ${copy.draftsAwaitingModeration}`}
+          action={<Link className="inline-flex min-h-11 items-center text-xs text-accent underline" href="/admin/community">{moderationCopy(locale).title}</Link>}
         />
         <div className="space-y-2.5">
           {pendingContent.length > 0 ? (

@@ -11,7 +11,7 @@ export function ServerCard({
   observation,
   isStale = false,
 }: {
-  server: Server;
+  server: Pick<Server, "id" | "slug" | "name" | "description" | "gameMode" | "bannerUrl" | "maxPlayers" | "isVerified">;
   locale?: Locale;
   observation?: MtaMasterServer | null;
   isStale?: boolean;

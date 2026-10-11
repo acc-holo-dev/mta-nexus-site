@@ -257,18 +257,69 @@ export class ContentRepository {
     expectedStatus: Content["status"],
     audit: Omit<AuditEvent, "createdAt">,
     expectedUpdatedAt?: Date,
+    publicationOnly = false,
   ): Promise<Content | null> {
     return db.transaction(async (tx) => {
-      const [current] = await tx.select().from(content).where(eq(content.id, id)).for("update").limit(1);
+      const [current] = await tx
+        .select()
+        .from(content)
+        .where(eq(content.id, id))
+        .for("update")
+        .limit(1);
       if (!current) return null;
-      const [actor] = await tx.select({ role: users.role }).from(users).where(eq(users.id, audit.actorId ?? "")).for("share").limit(1);
-      if (!actor || !["admin", "moderator"].includes(actor.role)) throw new AppError("Current moderator privilege required", 403, "FORBIDDEN");
-      if (current.status !== expectedStatus || (expectedUpdatedAt && current.updatedAt.getTime() !== expectedUpdatedAt.getTime())) return null;
+      const [actor] = await tx
+        .select({ role: users.role })
+        .from(users)
+        .where(eq(users.id, audit.actorId ?? ""))
+        .for("share")
+        .limit(1);
+      if (!actor || !["admin", "moderator"].includes(actor.role))
+        throw new AppError("Current moderator privilege required", 403, "FORBIDDEN");
+      if (
+        publicationOnly &&
+        ![
+          "article",
+          "news",
+          "devlog",
+          "update",
+          "announcement",
+          "post",
+          "question",
+          "review",
+        ].includes(current.type)
+      )
+        throw new AppError("Publication unavailable", 404, "NOT_FOUND");
+      if (
+        current.status !== expectedStatus ||
+        (expectedUpdatedAt && current.updatedAt.getTime() !== expectedUpdatedAt.getTime())
+      )
+        return null;
+      if (publicationOnly && status === "published" && current.body.length > 100000) {
+        let characters = 0;
+        for (const _character of current.body) {
+          if (++characters > 100000)
+            throw new AppError("Full review unavailable", 422, "CONTENT_REVIEW_TOO_LARGE");
+        }
+      }
       const now = new Date();
-      const [updated] = await tx.update(content).set({ status, publishedAt: status === "published" ? now : null, updatedAt: sql`greatest(clock_timestamp(), date_trunc('milliseconds', ${content.updatedAt}) + interval '1 millisecond')` }).where(eq(content.id, id)).returning();
+      const [updated] = await tx
+        .update(content)
+        .set({
+          status,
+          publishedAt: status === "published" ? now : null,
+          updatedAt: sql`greatest(clock_timestamp(), date_trunc('milliseconds', ${content.updatedAt}) + interval '1 millisecond')`,
+        })
+        .where(eq(content.id, id))
+        .returning();
       if (!updated) return null;
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });
-      await publicationNotice(tx, updated as unknown as Content, audit.actorId, status === "published" ? "published" : "archived", audit.id);
+      await publicationNotice(
+        tx,
+        updated as unknown as Content,
+        audit.actorId,
+        status === "published" ? "published" : "archived",
+        audit.id,
+      );
       return updated as unknown as Content;
     });
   }
