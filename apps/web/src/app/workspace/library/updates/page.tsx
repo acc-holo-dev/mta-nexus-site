@@ -1,3 +1,4 @@
+import { libraryReleaseHistoryCopy } from "../../../../lib/library-release-history-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -24,6 +25,9 @@ export default async function LibraryUpdatesPage({
   if (!user)
     return (
       <section className="space-y-4 py-16 text-center">
+        <Link href="/workspace/library/version-history" className="text-accent underline">
+          {libraryReleaseHistoryCopy(locale).title}
+        </Link>
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
         <Link href="/auth/login" className="text-accent underline">
           {copy.signIn}

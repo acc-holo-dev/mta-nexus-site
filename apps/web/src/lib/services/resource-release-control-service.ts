@@ -2,6 +2,7 @@ import { resourceLibrarySelectionsRepository, resourceModerationRepository } fro
 import {
   ForbiddenError,
   type LibraryReleaseCommand,
+  type LibraryReleaseHistoryQuery,
   type LibraryReleaseFilter,
   type ProductStatus,
   type ResourceModerationCommand,
@@ -12,6 +13,8 @@ function moderator(user: User) {
   if (user.role !== "admin" && user.role !== "moderator") throw new ForbiddenError();
 }
 export const libraryReleaseService = {
+  history: (user: User, query: LibraryReleaseHistoryQuery) =>
+    resourceLibrarySelectionsRepository.history(user.id, query),
   page: (user: User, page = 1, filter: LibraryReleaseFilter = "all") =>
     resourceLibrarySelectionsRepository.page(user.id, page, filter),
   detail: (user: User, productId: string, page = 1) =>

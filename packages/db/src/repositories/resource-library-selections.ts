@@ -14,6 +14,7 @@ import {
   resourceLibrarySelections as selections,
   users,
 } from "../schema";
+import { readLibraryReleaseHistory } from "./library-release-history";
 import { readLibraryReleasePage } from "./library-release-page";
 import { safePublishedBuildCondition } from "./build-safety";
 import { lockUserDownloadAccess, type ResourceTransaction } from "./entitlements";
@@ -68,6 +69,7 @@ function currentAccess(expiresAt: Date | null, productId: string) {
     throw new NotFoundError("Library resource", productId);
 }
 export class ResourceLibrarySelectionsRepository {
+  history = readLibraryReleaseHistory;
   async page(userId: string, requestedPage = 1, filter: LibraryReleaseFilter = "all") {
     return db.transaction(
       async (tx) => {

@@ -1,5 +1,13 @@
 # MTA NEXUS
 
+The buyer library now exposes private version-selection history across individual
+and group changes. Filter by a resource and 7/30/90/365 days, inspect twenty-row pages
+and export bounded JSON. Only the current user's recorded choices are projected;
+raw audit details, IPs and user agents are excluded. Lost access preserves recorded
+IDs while current titles/release labels require safe publication and effective access.
+Migration `0071_library_selection_history_index` adds the scoped history index.
+The history screen records past choices without restoring versions or granting files.
+
 Collections now provide a private release overview: compare pinned and latest safe
 builds, filter updates/fixed/unavailable selections, search accessible names and
 export a twenty-row JSON page. Current access, collection membership, counts and

@@ -40,3 +40,5 @@ export * from "./library-collections";
 export * from "./collection-requirements";
 
 export * from "./library-selection-batches";
+
+export * from "./library-release-history";

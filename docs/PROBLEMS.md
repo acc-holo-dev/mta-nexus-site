@@ -2862,3 +2862,37 @@ fixture. Three PostgreSQL fixtures cover identity-based updates/withdrawn pins,
 revoked-reference masking/search and archive/foreign-staff inspection. They remain
 unrun without disposable PostgreSQL; actual SQL/query plans, browser interaction and
 pinned Node 26 validation remain open. GitHub Actions are neither run nor inspected.
+
+### Private individual and group selection history — 2026-10-12
+
+`/workspace/library/version-history` projects the current buyer's own
+`library.release_selected` actions from both individual and reviewed group commands.
+RU/EN navigation from release/version screens, strict resource/7/30/90/365-day filters,
+twenty-row pages and bounded private JSON exports make recorded choices inspectable.
+No new action, preference change, restoration, receipt, license or grant is created.
+Recorded latest choices have no historical build identity; the interface displays only
+the recorded mode/revision. Fixed choices retain their recorded opaque build ID.
+Current resource labels are explicitly identified as current metadata.
+
+A live account and actor/type/action/target scope precede history reads. One read-only
+repeatable-read snapshot binds database time, the closed period, counts, selected
+records and effective publication/access metadata. Recorded IDs remain inspectable
+after rights loss or resource deletion; title/slug/release labels and management links
+require current access and safe publication. Raw audits are never returned: SQL selects
+only four recorded detail fields and the domain parser exposes mode/build/revision and
+an origin label. IPs, user agents, batch receipt IDs and unknown private fields are not
+exported. Malformed historical details retain a neutral entry without inferred changes.
+
+Migration `0071` adds a partial actor/time/ID index for these actions. Its trusted
+predicate is literal SQL so generic prepared plans can use it. Existing audit retention
+is unchanged. Four bounded queries read each page, with resource metadata joined only
+after limiting the recorded events. Authenticated API/export routes reuse inspection
+rate limits, private/no-store/Cookie variance and 512-KiB attachment/nosniff controls.
+
+Focused verification passes 260 tests across nineteen files, web TypeScript,
+changed-file Biome and Next compile. Root TypeScript retains pre-existing missing `fast-check`
+declarations and the old missing `isSigned` delivery fixture. Three PostgreSQL fixtures
+cover combined individual/group history and revocation, foreign staff isolation and
+malformed-audit privacy. They remain unrun without disposable PostgreSQL; live migration,
+query-plan/locking checks, browser interaction and pinned Node 26 validation remain open.
+GitHub Actions are neither run nor inspected.

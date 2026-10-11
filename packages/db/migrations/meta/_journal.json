@@ -498,6 +498,13 @@
       "when": 1791760200000,
       "tag": "0070_library_collection_copies",
       "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1791763200000,
+      "tag": "0071_library_selection_history_index",
+      "breakpoints": true
     }
   ]
 }

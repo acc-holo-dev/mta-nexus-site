@@ -1,4 +1,5 @@
-import {resourceRequirementsCopy} from "../../../../../lib/resource-requirements-i18n";
+import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
+import { libraryReleaseHistoryCopy } from "../../../../../lib/library-release-history-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -37,6 +38,12 @@ export default async function LibraryVersionsPage({
   if (!user)
     return (
       <section className="space-y-4 py-16 text-center">
+        <Link
+          href={`/workspace/library/version-history?${new URLSearchParams({ productId: id })}`}
+          className="text-accent underline"
+        >
+          {libraryReleaseHistoryCopy(locale).title}
+        </Link>
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
         <Link href="/auth/login" className="text-accent underline">
           {copy.signIn}
@@ -76,7 +83,12 @@ export default async function LibraryVersionsPage({
       {current ? (
         <ResourceDownloadButton productId={id} version={current.version} buildId={current.id} />
       ) : null}
-      <Link href={`/workspace/library/${encodeURIComponent(id)}/requirements`} className="text-accent underline">{resourceRequirementsCopy(locale).title}</Link>
+      <Link
+        href={`/workspace/library/${encodeURIComponent(id)}/requirements`}
+        className="text-accent underline"
+      >
+        {resourceRequirementsCopy(locale).title}
+      </Link>
       <LibraryReleaseSelectionControls
         key={`${id}:${result.selection.revision}`}
         productId={id}
@@ -89,8 +101,17 @@ export default async function LibraryVersionsPage({
         <h2 className="font-semibold text-primary">{resourceReleaseWatchesCopy(locale).title}</h2>
         <p className="text-sm text-secondary">{resourceReleaseWatchesCopy(locale).note}</p>
         <p className="text-xs text-muted">{resourceReleaseWatchesCopy(locale).pinned}</p>
-        <ResourceReleaseWatchControl key={`${id}:${watch.revision}`} watch={watch} available={Boolean(result.latest)} />
-        <Link href="/workspace/library/watches" className="inline-block text-sm text-accent underline">{resourceReleaseWatchesCopy(locale).title}</Link>
+        <ResourceReleaseWatchControl
+          key={`${id}:${watch.revision}`}
+          watch={watch}
+          available={Boolean(result.latest)}
+        />
+        <Link
+          href="/workspace/library/watches"
+          className="inline-block text-sm text-accent underline"
+        >
+          {resourceReleaseWatchesCopy(locale).title}
+        </Link>
       </section>
       {result.versions.length ? (
         <ol className="space-y-3">

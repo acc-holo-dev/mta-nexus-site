@@ -1044,6 +1044,8 @@ export const auditEvents = pgTable("audit_events", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [
   index("audit_events_target_created_id_idx").on(table.targetType, table.targetId, table.createdAt.desc(), table.id.desc()),
+  index("audit_events_library_selection_history_idx").on(table.actorId, table.createdAt.desc(), table.id.desc())
+    .where(sql`${table.actorType} = 'user' AND ${table.targetType} = 'product' AND ${table.action} = 'library.release_selected'`),
   index("audit_events_download_activity_idx").on(table.targetId, table.createdAt.desc(), table.id.desc())
     .where(sql`${table.targetType} = 'product' AND ${table.action} = 'product.download_started'`),
 ]);

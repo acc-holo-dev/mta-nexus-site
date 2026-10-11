@@ -1,6 +1,7 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import {
   libraryCollectionsRepository,
+  auditEvents,
   librarySelectionBatchesRepository,
   librarySelectionBatchReceipts,
   resourceLibrarySelectionsRepository,
@@ -464,6 +465,94 @@ it("collection release overview permits archived inspection and refuses foreign 
     await expect(
       libraryCollectionsRepository.releases(f.staff, f.collectionId),
     ).rejects.toMatchObject({ statusCode: 404 });
+  } finally {
+    await f.cleanup();
+  }
+});
+it("private selection history combines individual and batch states and survives revoked rights", async () => {
+  const f = await batchFixture();
+  try {
+    const rootId = f.ids[0];
+    if (!rootId) throw new Error("Missing root resource");
+    await f.apply();
+    await resourceLibrarySelectionsRepository.command({
+      userId: f.buyer,
+      productId: rootId,
+      command: { mode: "latest", expectedRevision: 1 },
+      auditId: `aud_individual_${f.key}`,
+    });
+    const query = { page: 1, days: 7 as const, productId: rootId };
+    const report = await resourceLibrarySelectionsRepository.history(f.buyer, query);
+    expect(report.total).toBe(2);
+    expect(report.items.map((item) => item.source).sort()).toEqual(["batch", "individual"]);
+    expect(
+      report.items.some(
+        (item) => item.selection?.revision === 2 && item.selection.mode === "latest",
+      ),
+    ).toBe(true);
+    await db.delete(entitlements).where(eq(entitlements.subjectId, f.buyer));
+    const masked = await resourceLibrarySelectionsRepository.history(f.buyer, query);
+    expect(masked.total).toBe(2);
+    expect(
+      masked.items.every(
+        (item) =>
+          item.currentTitle === null &&
+          item.currentSlug === null &&
+          item.buildVersion === null &&
+          !item.hasCurrentAccess,
+      ),
+    ).toBe(true);
+    expect(masked.items.some((item) => item.selection?.buildId === `bld_req_${f.key}_0`)).toBe(
+      true,
+    );
+  } finally {
+    await f.cleanup();
+  }
+});
+it("private selection history does not widen staff inspection to another buyer's choices", async () => {
+  const f = await batchFixture();
+  try {
+    await f.apply();
+    expect(
+      (await resourceLibrarySelectionsRepository.history(f.staff, { page: 1, days: 7 })).items,
+    ).toHaveLength(0);
+    expect(
+      (await resourceLibrarySelectionsRepository.history(f.buyer, { page: 1, days: 7 })).items,
+    ).toHaveLength(2);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("malformed historical details retain a neutral entry without exporting raw private audit data", async () => {
+  const f = await batchFixture();
+  try {
+    const rootId = f.ids[0];
+    if (!rootId) throw new Error("Missing root resource");
+    await db
+      .insert(auditEvents)
+      .values({
+        id: `aud_legacy_${f.key}`,
+        actorId: f.buyer,
+        actorType: "user",
+        action: "library.release_selected",
+        targetType: "product",
+        targetId: rootId,
+        ipAddress: "192.0.2.99",
+        userAgent: "PRIVATE USER AGENT",
+        details: {
+          mode: ["fixed"],
+          buildId: "bld_private",
+          revision: 1,
+          privateNote: "PRIVATE DETAILS",
+        },
+      });
+    const report = await resourceLibrarySelectionsRepository.history(f.buyer, { page: 1, days: 7 });
+    expect(report.items[0]).toMatchObject({
+      selection: null,
+      source: "unknown",
+      buildVersion: null,
+    });
+    expect(JSON.stringify(report)).not.toMatch(/PRIVATE|192\.0\.2\.99|bld_private/u);
   } finally {
     await f.cleanup();
   }
