@@ -1,23 +1,25 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import {
   canChangeOrganizationMember,
   canManageOrganization,
   type OrganizationTeamRole,
 } from "@nexus/domain";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import type { Locale } from "../lib/i18n";
+import { organizationBatchCopy } from "../lib/organization-batch-copy";
+import { confirmsOrganizationMemberMutation } from "../lib/organization-member-confirmation";
 import {
-  organizationTeamHref,
-  organizationTeamPageSchema,
   type OrganizationTeamPage,
   type OrganizationTeamQuery,
+  organizationTeamHref,
+  organizationTeamPageSchema,
 } from "../lib/organization-team-contract";
 import { organizationTeamCopy } from "../lib/organization-team-copy";
-import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { organizationRequest } from "../lib/organization-workspace-client";
-import { confirmsOrganizationMemberMutation } from "../lib/organization-member-confirmation";
+import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { OrganizationMemberEditor } from "./organization-member-editor";
+import { OrganizationTeamBatch } from "./organization-team-batch";
 export function OrganizationTeamDirectory({
   initial,
   filters,
@@ -129,6 +131,58 @@ export function OrganizationTeamDirectory({
         </Link>
       ) : (
         <p className="text-sm text-muted">{team.readOnly}</p>
+      )}
+      {canManageOrganization(data.role) && (
+        <OrganizationTeamBatch
+          key={data.organization.updatedAt}
+          data={data}
+          actorId={actorId}
+          locale={locale}
+          disabled={pending || blocked}
+          acquire={() => {
+            if (guard.current || blocked) return false;
+            guard.current = true;
+            setPending(true);
+            setError("");
+            setMessage("");
+            return true;
+          }}
+          release={() => {
+            guard.current = false;
+            if (alive.current) setPending(false);
+          }}
+          onFailure={(problem) => {
+            if (alive.current) {
+              setBlocked(true);
+              setError(problem);
+            }
+          }}
+          onCommitted={async (organization, signal) => {
+            if (!alive.current) return;
+            setMessage(organizationBatchCopy(locale).saved);
+            const refreshed = organizationTeamPageSchema.safeParse(
+              await organizationRequest(
+                organizationTeamHref(
+                  data.organization.id,
+                  filters,
+                  filters.cursor ? JSON.stringify(filters.cursor) : null,
+                  true,
+                ),
+                locale,
+                "GET",
+                undefined,
+                signal,
+              ),
+            );
+            if (
+              !refreshed.success ||
+              refreshed.data.organization.id !== organization.id ||
+              Date.parse(refreshed.data.organization.updatedAt) < Date.parse(organization.updatedAt)
+            )
+              throw new Error(copy.uncertain);
+            if (alive.current) setData(refreshed.data);
+          }}
+        />
       )}
       {data.members.length ? (
         <ul className="space-y-3">

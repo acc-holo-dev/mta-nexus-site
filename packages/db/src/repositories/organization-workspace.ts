@@ -1,4 +1,9 @@
-import type { AuditEvent, OrganizationTeamRole } from "@nexus/domain";
+import { createHash } from "node:crypto";
+import type {
+  AuditEvent,
+  OrganizationMemberBatchAction,
+  OrganizationTeamRole,
+} from "@nexus/domain";
 import {
   AppError,
   canChangeOrganizationMember,
@@ -6,7 +11,7 @@ import {
   NotFoundError,
   withServerManagementPermission,
 } from "@nexus/domain";
-import { and, asc, desc, eq, exists, getTableColumns, ilike, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, exists, getTableColumns, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, organizationMembers, organizations, users } from "../schema";
 import { storeOrganizationAccessNotice } from "./organization-access-notice";
@@ -59,6 +64,132 @@ async function writable(tx: Transaction, id: string, actorId: string, expected: 
     throw new AppError("Organization changed", 409, "CONFLICT");
   return current;
 }
+type BatchInput = {
+  userIds: string[];
+  change: OrganizationMemberBatchAction;
+  expectedUpdatedAt: Date;
+};
+async function batchPlan(
+  tx: Transaction,
+  id: string,
+  actorId: string,
+  input: BatchInput,
+  write: boolean,
+) {
+  if (
+    input.userIds.length < 1 ||
+    input.userIds.length > 20 ||
+    new Set(input.userIds).size !== input.userIds.length ||
+    input.userIds.some((value) => !/^[a-zA-Z0-9_-]{1,128}$/u.test(value))
+  )
+    throw new AppError("Invalid batch selection", 400, "VALIDATION_ERROR");
+  const current = await organizationWorkspaceAccess(tx, id, actorId, write ? true : "share");
+  if (!canManageOrganization(current.role)) throw new AppError("Access denied", 403, "FORBIDDEN");
+  if (current.organization.updatedAt.getTime() !== input.expectedUpdatedAt.getTime())
+    throw new AppError("Organization changed", 409, "CONFLICT");
+  // Lock once in stable order. No member may disappear, change role or move scope between review and write.
+  const members = await tx
+    .select({
+      id: organizationMembers.id,
+      userId: organizationMembers.userId,
+      role: organizationMembers.role,
+      permissions: organizationMembers.permissions,
+      username: users.username,
+      displayName: users.displayName,
+    })
+    .from(organizationMembers)
+    .innerJoin(users, eq(users.id, organizationMembers.userId))
+    .where(
+      and(
+        eq(organizationMembers.organizationId, id),
+        inArray(organizationMembers.userId, input.userIds),
+      ),
+    )
+    .orderBy(asc(organizationMembers.userId))
+    .for(write ? "update" : "share", { of: organizationMembers });
+  if (members.length !== input.userIds.length)
+    throw new AppError("Member not found", 404, "MEMBER_NOT_FOUND");
+  const plan = members.map((member) => {
+    const requestedRole = input.change.action === "role" ? input.change.role : null;
+    if (
+      !canChangeOrganizationMember(
+        current.role,
+        member.role,
+        requestedRole,
+        member.userId === actorId,
+        member.userId === current.organization.ownerId,
+      )
+    )
+      throw new AppError("Role is protected", 403, "MEMBER_PROTECTED");
+    const role = requestedRole ?? member.role;
+    const enabled =
+      input.change.action === "server_access"
+        ? input.change.enabled
+        : member.permissions.includes("manage_servers");
+    const removed = input.change.action === "remove";
+    return {
+      member,
+      role,
+      enabled,
+      removed,
+      changed:
+        removed ||
+        role !== member.role ||
+        enabled !== member.permissions.includes("manage_servers"),
+    };
+  });
+  const previewRevision = createHash("sha256")
+    .update(
+      JSON.stringify([
+        1,
+        "organization-member-batch",
+        actorId,
+        id,
+        current.organization.updatedAt.toISOString(),
+        input.change,
+        members.map((member) => [
+          member.id,
+          member.userId,
+          member.role,
+          member.permissions,
+          member.username,
+          member.displayName,
+        ]),
+      ]),
+    )
+    .digest("hex");
+  return { current, plan, previewRevision };
+}
+function batchPreview(result: Awaited<ReturnType<typeof batchPlan>>) {
+  return {
+    organizationId: result.current.organization.id,
+    expectedUpdatedAt: result.current.organization.updatedAt.toISOString(),
+    previewRevision: result.previewRevision,
+    changedCount: result.plan.filter((value) => value.changed).length,
+    members: result.plan.map(({ member, role, enabled, removed, changed }) => ({
+      userId: member.userId,
+      username: member.username,
+      displayName: member.displayName,
+      before: {
+        role: member.role,
+        managesServers: member.permissions.includes("manage_servers"),
+        effectiveServerAccess:
+          member.role === "admin" ||
+          (["member", "developer"].includes(member.role) &&
+            member.permissions.includes("manage_servers")),
+      },
+      after: removed
+        ? null
+        : {
+            role,
+            managesServers: enabled,
+            effectiveServerAccess:
+              role === "admin" || (["member", "developer"].includes(role) && enabled),
+          },
+      changed,
+    })),
+  };
+}
 async function record(tx: Transaction, id: string, audit: Audit, details: Record<string, unknown>) {
   const [updated] = await tx
     .update(organizations)
@@ -70,6 +201,93 @@ async function record(tx: Transaction, id: string, audit: Audit, details: Record
 }
 
 class OrganizationWorkspaceRepository {
+  async previewMembers(id: string, actorId: string, input: BatchInput) {
+    return db.transaction(async (tx) =>
+      batchPreview(await batchPlan(tx, id, actorId, input, false)),
+    );
+  }
+  async batchMembers(
+    id: string,
+    actorId: string,
+    input: BatchInput & { previewRevision: string },
+    audits: Audit[],
+  ) {
+    return db.transaction(async (tx) => {
+      const result = await batchPlan(tx, id, actorId, input, true);
+      if (input.previewRevision !== result.previewRevision)
+        throw new AppError("Team review changed", 409, "CONFLICT");
+      const changed = result.plan.filter((value) => value.changed);
+      if (!changed.length) throw new AppError("No team changes", 409, "BATCH_NO_CHANGES");
+      if (
+        audits.length !== input.userIds.length ||
+        new Set(audits.map((audit) => audit.id)).size !== audits.length
+      )
+        throw new AppError("Invalid batch audit", 400, "VALIDATION_ERROR");
+      const ids = changed.map((value) => value.member.id);
+      if (input.change.action === "remove") {
+        await tx
+          .delete(organizationMembers)
+          .where(
+            and(eq(organizationMembers.organizationId, id), inArray(organizationMembers.id, ids)),
+          );
+      } else {
+        await tx
+          .update(organizationMembers)
+          .set({
+            role: sql`case ${organizationMembers.id} ${sql.join(
+              changed.map((value) => sql`when ${value.member.id} then ${value.role}`),
+              sql` `,
+            )} else ${organizationMembers.role} end`,
+            permissions: sql`case ${organizationMembers.id} ${sql.join(
+              changed.map(
+                (value) =>
+                  sql`when ${value.member.id} then ${JSON.stringify(input.change.action === "server_access" ? withServerManagementPermission(value.member.permissions, value.enabled) : value.member.permissions)}::jsonb`,
+              ),
+              sql` `,
+            )} else ${organizationMembers.permissions} end`,
+          })
+          .where(
+            and(eq(organizationMembers.organizationId, id), inArray(organizationMembers.id, ids)),
+          );
+      }
+      const [organization] = await tx
+        .update(organizations)
+        .set({ updatedAt: revision })
+        .where(eq(organizations.id, id))
+        .returning();
+      const events = changed.map((value) => ({
+        ...audits[input.userIds.indexOf(value.member.userId)],
+        actorId,
+        actorType: "user" as const,
+        targetType: "organization",
+        targetId: id,
+        action: value.removed ? "organization.member_removed" : "organization.member_updated",
+        createdAt: new Date(),
+        details: {
+          userId: value.member.userId,
+          from: value.member.role,
+          to: value.removed ? null : value.role,
+          ...(value.removed ? {} : { managesServers: value.enabled }),
+        },
+      }));
+      await tx.insert(auditEvents).values(events);
+      for (let index = 0; index < changed.length; index++) {
+        const value = changed[index];
+        await storeOrganizationAccessNotice(
+          tx,
+          organization,
+          value.member.userId,
+          value.removed ? "removed" : "updated",
+          events[index].id,
+        );
+      }
+      return {
+        organization,
+        changedUserIds: changed.map((value) => value.member.userId),
+        previewRevision: result.previewRevision,
+      };
+    });
+  }
   async pageMine(actorId: string, requestedPage = 1, query = "") {
     const page = boundedPage(requestedPage);
     const pattern = query.trim() ? containsPattern(query.trim().slice(0, 120)) : undefined;

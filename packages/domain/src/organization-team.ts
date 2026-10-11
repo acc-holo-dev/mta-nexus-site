@@ -1,6 +1,10 @@
 /** Team administration never creates ownership grants or edits unrelated permission flags. */
 export const organizationTeamRoles = ["admin", "developer", "member"] as const;
 export type OrganizationTeamRole = (typeof organizationTeamRoles)[number];
+export type OrganizationMemberBatchAction =
+  | { action: "role"; role: OrganizationTeamRole }
+  | { action: "server_access"; enabled: boolean }
+  | { action: "remove" };
 export function canManageOrganization(role: string) {
   return role === "owner" || role === "admin";
 }

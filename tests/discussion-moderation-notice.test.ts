@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -33,9 +34,11 @@ vi.mock("../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
+
+import { formatNotification } from "../apps/web/src/lib/notification-copy";
 import { db } from "../packages/db/src/client";
 import { discussionModerationNotice } from "../packages/db/src/repositories/discussion-moderation-notice";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const item = { auditId: "audit", authorId: "author", commentId: "comment", slug: "guide" },
   insert = () => state.queries.find((q) => q.sql.startsWith("insert"));
@@ -105,3 +108,9 @@ it.each(["en", "ru"] as const)(
     expect(result.message).not.toContain("comment:");
   },
 );
+
+it("links unavailable publications to the author's private discussion workspace", async () => {
+  await discussionModerationNotice(db as unknown as Tx, { ...item, available: false });
+  expect(insert()?.params).toContain("/workspace/discussions");
+  expect(insert()?.params).not.toContain("/articles/guide#discussion");
+});

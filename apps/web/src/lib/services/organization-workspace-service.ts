@@ -5,6 +5,10 @@ import { generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
 import {
+  organizationBatchCommandInput,
+  organizationBatchPreviewInput,
+} from "../organization-batch-contract";
+import {
   memberAddSchema,
   memberRemoveSchema,
   memberUpdateSchema,
@@ -42,6 +46,23 @@ function audit(user: User, id: string, action: string) {
   };
 }
 class OrganizationWorkspaceService {
+  async previewMembers(id: string, input: unknown, user: User) {
+    const fields = parse(organizationBatchPreviewInput, input);
+    return organizationWorkspaceRepository.previewMembers(id, user.id, {
+      ...fields,
+      expectedUpdatedAt: new Date(fields.expectedUpdatedAt),
+    });
+  }
+  async batchMembers(id: string, input: unknown, user: User) {
+    const fields = parse(organizationBatchCommandInput, input);
+    const result = await organizationWorkspaceRepository.batchMembers(
+      id,
+      user.id,
+      { ...fields, expectedUpdatedAt: new Date(fields.expectedUpdatedAt) },
+      fields.userIds.map(() => audit(user, id, "organization.member_updated")),
+    );
+    return { ...result, organization: editableOrganization(result.organization) };
+  }
   async list(user: User, page: number, query: string) {
     const result = await organizationWorkspaceRepository.pageMine(user.id, page, query);
     return {

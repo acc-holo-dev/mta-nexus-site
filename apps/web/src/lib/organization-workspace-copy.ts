@@ -1,4 +1,5 @@
 import type { Locale } from "./i18n";
+import { organizationBatchCopy } from "./organization-batch-copy";
 import { userPlatformError } from "./user-platform-copy";
 
 const en = {
@@ -133,6 +134,8 @@ export const getOrganizationCopy = (locale: Locale) => (locale === "ru" ? ru : e
 export function organizationError(locale: Locale, code: unknown) {
   const copy = getOrganizationCopy(locale);
   switch (code) {
+    case "BATCH_NO_CHANGES":
+      return organizationBatchCopy(locale).noChanges;
     case "CONFLICT":
       return copy.errorConflict;
     case "MEMBER_EXISTS":

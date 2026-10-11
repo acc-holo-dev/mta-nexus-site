@@ -1,10 +1,18 @@
-import { communityModerationWorkspaceRepository as repository } from "@nexus/db";
+import {
+  discussionManagementRepository,
+  communityModerationWorkspaceRepository as repository,
+} from "@nexus/db";
 import { AppError, ForbiddenError, NotFoundError, type User } from "@nexus/domain";
-import { can } from "@nexus/security";
+import { can, generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { z } from "zod";
-import type { moderationCommandSchema, ModerationQuery } from "../community-moderation-contract";
+import type { ModerationQuery, moderationCommandSchema } from "../community-moderation-contract";
+import {
+  type ModeratedDiscussionQuery,
+  moderatedDiscussionRemoveSchema,
+} from "../moderated-discussion-contract";
 import { contentService } from "./content-service";
+
 function authority(actor: User, id?: string) {
   if (!can(actor, "admin.moderation")) throw new ForbiddenError();
   if (id !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(id))
@@ -34,6 +42,69 @@ const encode = (result: {
     ? JSON.stringify({ ...result.nextCursor, context: result.context, version: 1 })
     : null;
 class CommunityModerationService {
+  async discussion(actor: User, id: string, filters: ModeratedDiscussionQuery) {
+    authority(actor, id);
+    const result = await repository.discussion(actor.id, id, filters);
+    return {
+      publication: result.publication,
+      items: result.items.map((item) => ({
+        id: item.id,
+        text: item.text,
+        createdAt: item.createdAt.toISOString(),
+        author: item.username && item.name ? { username: item.username, name: item.name } : null,
+      })),
+      hasMore: result.hasMore,
+      nextCursor: encode(result),
+    };
+  }
+  async discussionDetail(
+    actor: User,
+    id: string,
+    commentId: string,
+    cursor?: ModeratedDiscussionQuery["cursor"],
+  ) {
+    authority(actor, id);
+    authority(actor, commentId);
+    const result = await repository.discussionDetail(actor.id, id, commentId, cursor),
+      row = result.comment;
+    return {
+      publication: result.publication,
+      comment: row
+        ? {
+            id: row.id,
+            text: row.text,
+            truncated: row.truncated,
+            revision: row.revision,
+            createdAt: row.createdAt.toISOString(),
+            author: row.username && row.name ? { username: row.username, name: row.name } : null,
+            parent: row.parent,
+          }
+        : null,
+      history: result.history.map((event) => ({
+        id: event.id,
+        action: event.action,
+        moderator: event.moderator,
+        reason: event.reason,
+        createdAt: event.createdAt.toISOString(),
+      })),
+      hasMore: result.hasMore,
+      nextCursor: encode(result),
+    };
+  }
+  async removeDiscussion(actor: User, id: string, commentId: string, input: unknown) {
+    authority(actor, id);
+    authority(actor, commentId);
+    const parsed = moderatedDiscussionRemoveSchema.safeParse(input);
+    if (!parsed.success) throw new AppError("Invalid removal command", 400, "VALIDATION_ERROR");
+    return discussionManagementRepository.mutate({
+      actorId: actor.id,
+      contentId: id,
+      commentId,
+      moderationWorkspace: true,
+      ...parsed.data,
+      auditId: generateId("aud"),
+    });
+  }
   async page(actor: User, filters: ModerationQuery) {
     authority(actor);
     const result = await repository.page(actor.id, filters);

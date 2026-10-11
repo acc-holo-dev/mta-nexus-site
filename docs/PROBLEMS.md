@@ -2608,3 +2608,30 @@ fields remain optional and page behavior is unchanged. Direct SSR fixtures pass
 an empty props object where appropriate. The web application's complete
 TypeScript check, including generated route types, passes. After this fix,
 299 targeted checks across 33 files pass.
+
+
+### Reviewed team batches and private discussion moderation — 2026-10-11
+
+The existing organization team directory now reviews and saves groups of up to
+20 current members: role changes, delegated server access or removal. Preview
+tokens bind actor, organization revision, selected identities, complete grants
+and the exact command. Organization-first locks recheck every selected member
+before one group write; existing per-member audits and access notices commit
+with the shared revision. Unrelated commercial permission flags are retained.
+
+Current moderators can search publication discussions, review bounded comments
+and same-publication reply context, remove the reviewed full-text version with
+a reason, and read retained activity after deletion. Drafts and archived
+publications are supported; product comments and unsupported content are excluded.
+Live role checks, scoped SHA-256 versions, mandatory audits, retained replies and
+preference-aware notices reuse the existing mutation and notification services.
+Archived-comment notices link to the author's private discussion workspace.
+
+RU/EN interfaces, metadata, loading/empty/error/success states and private API
+responses are implemented without schema changes. Targeted unit, HTTP, SQL-builder,
+SSR and interaction checks pass, as do the web TypeScript check, Biome and Next
+webpack compile mode. Six PostgreSQL fixtures prepare atomicity, grant preservation,
+concurrent confirmation, Unicode full-text hashing and audit rollback; they remain
+unrun without a disposable database. Live browser interaction and production
+page generation remain outstanding. Root TypeScript still has the upstream
+missing `isSigned` delivery fixture; Knip retains three commercial exports.

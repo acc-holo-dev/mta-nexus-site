@@ -4,10 +4,17 @@ import type { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 export async function discussionModerationNotice(
   tx: Transaction,
-  input: { auditId: string; authorId: string; commentId: string; slug: string },
+  input: {
+    auditId: string;
+    authorId: string;
+    commentId: string;
+    slug: string;
+    available?: boolean;
+  },
 ) {
   await lockNotificationPreferencesForUsers(tx, [input.authorId]);
   const [preference] = await tx
@@ -26,7 +33,10 @@ export async function discussionModerationNotice(
       recipientId: input.authorId,
       title: "Discussion moderation",
       message: `Comment ${input.commentId}: removed.`,
-      link: `/articles/${encodeURIComponent(input.slug)}#discussion`,
+      link:
+        input.available === false
+          ? "/workspace/discussions"
+          : `/articles/${encodeURIComponent(input.slug)}#discussion`,
       type: "content",
       category: "content",
       isRead: false,

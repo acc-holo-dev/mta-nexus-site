@@ -1,22 +1,23 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
-import { can } from "@nexus/security";
 import { AppError } from "@nexus/domain";
+import { can } from "@nexus/security";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import {
+  moderationDetailHref,
+  moderationDetailSchema,
+  moderationHref,
+  moderationPageSchema,
+  parseModerationDetailQuery,
+  parseModerationQuery,
+} from "../lib/community-moderation-contract";
+import { moderationCopy, moderationError } from "../lib/community-moderation-copy";
+import { discoveryCopy } from "../lib/discovery-copy";
 import { getRequestLocale } from "../lib/i18n-server";
+import { moderatedDiscussionCopy } from "../lib/moderated-discussion-copy";
+import { PUBLICATION_TYPES } from "../lib/publication-feed-contract";
 import { authService } from "../lib/services/auth-service";
 import { communityModerationService } from "../lib/services/community-moderation-service";
-import { moderationCopy, moderationError } from "../lib/community-moderation-copy";
-import {
-  moderationDetailSchema,
-  moderationPageSchema,
-  parseModerationQuery,
-  parseModerationDetailQuery,
-  moderationHref,
-  moderationDetailHref,
-} from "../lib/community-moderation-contract";
-import { PUBLICATION_TYPES } from "../lib/publication-feed-contract";
-import { discoveryCopy } from "../lib/discovery-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
 import { ContentModerationControls } from "./content-moderation-controls";
 export async function CommunityModerationScreen({
@@ -172,6 +173,12 @@ export async function CommunityModerationScreen({
         </section>
         <section className="nexus-panel space-y-4 p-5">
           <p className="text-sm text-muted">{copy.description}</p>
+          <Link
+            href={`/admin/community/${encodeURIComponent(id)}/discussion`}
+            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          >
+            {moderatedDiscussionCopy(locale).open}
+          </Link>
           <ContentModerationControls
             key={`${actor.id}:${item.id}:${item.updatedAt}`}
             contentId={item.id}
