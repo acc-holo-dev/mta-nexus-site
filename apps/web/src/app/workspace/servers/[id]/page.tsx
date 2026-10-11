@@ -12,6 +12,7 @@ import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getManagedServerCopy } from "../../../../lib/managed-server-view";
 import { getServerActivityCopy, serverActivityHref } from "../../../../lib/server-activity-view";
+import { serverStatisticsCopy } from "../../../../lib/server-statistics-copy";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -66,8 +67,17 @@ export default async function ServerManagementPage({
         <p className="mt-1 font-mono text-sm text-muted">
           {server.ipAddress}:{server.port}
         </p>
-        <Link href={serverActivityHref(server.id)} className="mt-3 inline-block text-sm font-semibold text-accent hover:underline">
+        <Link
+          href={serverActivityHref(server.id)}
+          className="mt-3 inline-block text-sm font-semibold text-accent hover:underline"
+        >
           {activityCopy.open}
+        </Link>
+        <Link
+          href={`/workspace/servers/${encodeURIComponent(server.id)}/statistics`}
+          className="ml-4 mt-3 inline-block text-sm font-semibold text-accent hover:underline"
+        >
+          {serverStatisticsCopy(locale).open}
         </Link>
       </div>
 
@@ -79,7 +89,12 @@ export default async function ServerManagementPage({
         </div>
       </div>
 
-      <ServerClaimStatusPanel serverId={server.id} serverName={server.name} status={claimStatus} locale={locale} />
+      <ServerClaimStatusPanel
+        serverId={server.id}
+        serverName={server.name}
+        status={claimStatus}
+        locale={locale}
+      />
 
       <section className="nexus-panel space-y-4 p-5 shadow-nexus-sm sm:p-6">
         <div>

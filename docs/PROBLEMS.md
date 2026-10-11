@@ -1459,8 +1459,8 @@ browser interaction and full production generation still require verification.
 This block changes no schema, migrations, npm dependencies or workflows and
 does not use Actions.
 
-Pending profile-privacy schema contract for Agent A (privacy controls are not
-implemented until this shared model is integrated):
+Profile-privacy schema contract (integrated by Agent A in migration 0051;
+preference UI/API and public visibility filtering remain to be implemented):
 
 ```sql
 CREATE TABLE user_profile_preferences (
@@ -1517,8 +1517,8 @@ rollback, outbox persistence, notification opt-out and microsecond pagination.
 They remain unrun; live PostgreSQL, browser interaction and full production generation require
 separate verification. This block adds no schema, migration, npm dependency or
 workflow and does not use Actions. Requester notification preference checks use
-the existing transaction-scoped preference lock. The profile-privacy contract
-above still requires integration by Agent A.
+the existing transaction-scoped preference lock. The profile-privacy model above
+is now integrated by Agent A in migration 0051; its user-facing flow is pending.
 
 ### Resource version workspace — 2026-10-11 (Agent A)
 
@@ -1542,3 +1542,44 @@ fallback, audit rollback and the demo repair scope. They remain unrun without Po
 TypeScript, focused unit/HTTP/render checks, Biome lint, local upgrade-contract checks and
 Next webpack compile mode pass. Live database/browser and full production generation remain
 unverified; migration 0051 must be applied before serving these routes. No Actions were used.
+
+### MTA observation statistics, period comparison and CSV — 2026-10-11
+
+`/servers/[slug]/statistics` and `/workspace/servers/[id]/statistics` expose
+adjacent 24-hour, seven-day and thirty-day observation periods, complete SQL
+aggregates, UTC interval charts and newest-first 25-row observation pages.
+Listing visibility, current organization grants / personal ownership and the
+actual administrator role are evaluated in the same repeatable-read snapshot
+as both periods, buckets and samples. Public access never inherits a privileged
+session. Private statistics include only previously collected observations;
+the existing collector still excludes inactive/private listings.
+
+New GET `/api/servers/[id]/statistics` and its `/export` endpoint have matching
+private workspace endpoints under `/api/workspace/servers/[id]/statistics`.
+Strict bounded queries reject duplicate/unknown filters and require a fixed
+period end for cursors. Supplied period ends are limited to the last ninety days.
+Period boundaries are half-open and adjacent; anchors resolve within the same
+listing, source and period at PostgreSQL microsecond precision. Missing or
+foreign anchors fail explicitly. Later inserted observations may change results
+within fixed period boundaries; no persistent data snapshot is promised.
+
+Interval CSV covers the entire selected period, including unknown empty
+intervals. Observation CSV exports only the displayed page. Both preserve the
+chosen bounds and recheck current access. Remote text is bounded and CSV formula
+prefixes are escaped. Download controls confirm CSV responses and show localized
+errors. RU/EN covers metadata, loading, empty/error states, table navigation and
+export actions; horizontal tables are keyboard-focusable. Average player counts
+are per observation, not duration-weighted uptime. History follows the listing
+across endpoint edits because the existing observation model lacks revision
+provenance; the interface explicitly explains this limitation.
+
+395 focused unit checks in 35 files pass after integrating Agent A's version
+workspace block. TypeScript, touched-file Biome lint and Next webpack compile
+mode pass. Knip now reports two unused commerce exports from that integration:
+`RetireBuildForm` and `ResourceBuildWorkspaceRepository`; they remain for Agent A
+to review. An existing resource-delivery database fixture could not start because
+PostgreSQL refused the connection. Three new PostgreSQL fixtures are prepared for
+persisted access revocation, disjoint aggregates and microsecond pagination;
+they remain unrun. Browser interaction, live PostgreSQL and full production
+generation require separate verification. This block adds no schema, migration,
+npm dependency, collector or workflow and does not use Actions.

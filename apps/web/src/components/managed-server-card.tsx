@@ -3,6 +3,7 @@ import { StatusBadge } from "@nexus/ui";
 import type { ManagedServerItem } from "@nexus/db";
 import type { Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
+import { serverStatisticsCopy } from "../lib/server-statistics-copy";
 import { mtaLiveStatus, type MtaMasterServer } from "../lib/services/mta-master-directory-service";
 
 export function ManagedServerCard({
@@ -75,6 +76,12 @@ export function ManagedServerCard({
               {copy.view}
             </Link>
           )}
+          <Link
+            href={`/workspace/servers/${encodeURIComponent(server.id)}/statistics`}
+            className="hover:underline"
+          >
+            {serverStatisticsCopy(locale).open}
+          </Link>
         </div>
       </div>
     </article>

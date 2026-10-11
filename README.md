@@ -15,6 +15,13 @@ return to moderator review; archived entries remain read-only. `/articles` and
 `/community` support URL-preserving search, type filters and bounded pagination.
 Public name, biography and avatar are editable in `/settings` in both RU/EN.
 
+Detailed MTA observations are available at `/servers/[slug]/statistics` and,
+for current managers, `/workspace/servers/[id]/statistics`. Compare adjacent
+24-hour, seven-day or thirty-day periods, browse 25 observations per page, and
+download complete interval CSV or the displayed observation page. Empty intervals
+remain unknown; observations do not measure uptime. These RU/EN views reuse the
+existing collector and observation model and require no new migration.
+
 Developers edit specialties, portfolio and Discord in `/settings/developer`.
 Public profiles show these contacts and the separate verified-experience flag.
 Changing specialties or portfolio removes that flag. `/workspace/verification`

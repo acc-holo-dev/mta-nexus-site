@@ -19,6 +19,7 @@ import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
 import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
 import { cache } from "react";
 
 export const dynamic = "force-dynamic";
@@ -173,7 +174,13 @@ export default async function ServerDetailPage({
             )}
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap md:max-w-md md:justify-end">
+            <Link
+              href={`/servers/${encodeURIComponent(server.slug)}/statistics?window=${historyWindow}`}
+              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-base bg-inset px-4 py-3 text-sm font-semibold text-accent"
+            >
+              {serverStatisticsCopy(locale).open}
+            </Link>
             <ServerFollowButton
               serverId={server.id}
               serverName={server.name}

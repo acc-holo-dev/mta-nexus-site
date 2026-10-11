@@ -23,32 +23,28 @@ vi.mock("next/link", async () => {
 vi.mock("../apps/web/src/components/account-controls", async () => {
   const ReactModule = await import("react");
   return {
-    AccountControls: () =>
-      ReactModule.createElement("span", { "data-mock": "AccountControls" }),
+    AccountControls: () => ReactModule.createElement("span", { "data-mock": "AccountControls" }),
   };
 });
 
 vi.mock("../apps/web/src/components/locale-switcher", async () => {
   const ReactModule = await import("react");
   return {
-    LocaleSwitcher: () =>
-      ReactModule.createElement("span", { "data-mock": "LocaleSwitcher" }),
+    LocaleSwitcher: () => ReactModule.createElement("span", { "data-mock": "LocaleSwitcher" }),
   };
 });
 
 vi.mock("../apps/web/src/components/notification-bell", async () => {
   const ReactModule = await import("react");
   return {
-    NotificationBell: () =>
-      ReactModule.createElement("span", { "data-mock": "NotificationBell" }),
+    NotificationBell: () => ReactModule.createElement("span", { "data-mock": "NotificationBell" }),
   };
 });
 
 vi.mock("../apps/web/src/components/theme-toggle", async () => {
   const ReactModule = await import("react");
   return {
-    ThemeToggle: () =>
-      ReactModule.createElement("span", { "data-mock": "ThemeToggle" }),
+    ThemeToggle: () => ReactModule.createElement("span", { "data-mock": "ThemeToggle" }),
   };
 });
 
@@ -79,11 +75,27 @@ describe("discover surface behavior", () => {
       parseDiscoverQuery({
         type: ["resources", "servers"],
         q: ["  vehicle pack  ", "ignored"],
+        verified: "1",
+        sort: "name",
+        language: "ru",
+        region: "EU",
+        gameMode: "rp",
+        contentType: "article",
       }),
-    ).toEqual({ type: "resources", query: "vehicle pack" });
-    expect(
-      discoverHref({ type: "organizations", query: "  nexus studio  " }),
-    ).toBe("/discover?type=organizations&q=nexus+studio");
+    ).toEqual({
+      type: "resources",
+      query: "vehicle pack",
+      page: 1,
+      verified: false,
+      sort: "newest",
+      language: "",
+      region: "",
+      gameMode: "",
+      contentType: "",
+    });
+    expect(discoverHref({ type: "organizations", query: "  nexus studio  " })).toBe(
+      "/discover?type=organizations&q=nexus+studio",
+    );
   });
 
   it("renders discover in both desktop ecosystem navigation and navbar search", () => {
@@ -94,9 +106,7 @@ describe("discover surface behavior", () => {
         onToggle: () => undefined,
       }),
     );
-    const navbar = renderToStaticMarkup(
-      React.createElement(Navbar, { locale: "en" }),
-    );
+    const navbar = renderToStaticMarkup(React.createElement(Navbar, { locale: "en" }));
 
     expect(sidebar).toContain('href="/discover"');
     expect(navbar).toContain('href="/discover"');

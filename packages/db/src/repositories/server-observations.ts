@@ -1,22 +1,22 @@
-import { and, count, desc, eq, gte, isNull, lt, lte, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, exists, gte, isNull, lt, lte, or, sql, type SQL } from "drizzle-orm";
 import { db } from "../client";
-import { serverObservations, servers } from "../schema";
+import { serverObservations, servers, users } from "../schema";
 import type { Server, ServerObservation } from "@nexus/domain";
+import { AppError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
+import { managedServerScope } from "./server-management-scope";
+
+export type ServerStatisticsAccess = { kind: "public" } | { kind: "managed"; actorId: string };
+export type ServerStatisticsTarget = { id: string } | { slug: string };
 
 type ObservedEndpoint = Readonly<
   Pick<Server, "ipAddress" | "port"> & { endpointRevision?: number }
 >;
 
-export type RecordServerObservationInput = Omit<
-  ServerObservation,
-  "id" | "createdAt"
->;
+export type RecordServerObservationInput = Omit<ServerObservation, "id" | "createdAt">;
 
 function boundedObservationInt(value: number, fallback: number, max: number): number {
-  return Number.isFinite(value)
-    ? Math.min(Math.max(Math.floor(value), 1), max)
-    : fallback;
+  return Number.isFinite(value) ? Math.min(Math.max(Math.floor(value), 1), max) : fallback;
 }
 
 type ObservationWindow = {
@@ -44,6 +44,177 @@ type ObservationWindow = {
 };
 
 export class ServerObservationRepository {
+  /** Listing authority, both periods and a bounded observation page share one snapshot. */
+  async readStatistics(
+    target: ServerStatisticsTarget,
+    access: ServerStatisticsAccess,
+    hours: 24 | 168 | 720,
+    options: { end?: Date; before?: string } = {},
+  ) {
+    const now = new Date();
+    const end = options.end ?? now;
+    if (
+      ![24, 168, 720].includes(hours) ||
+      !Number.isFinite(end.getTime()) ||
+      end > now ||
+      now.getTime() - end.getTime() > 90 * 86_400_000 ||
+      (options.before !== undefined && !/^[a-zA-Z0-9_-]{1,128}$/u.test(options.before)) ||
+      (access.kind === "managed" && !access.actorId)
+    )
+      throw new AppError("Invalid statistics query", 400, "VALIDATION_ERROR");
+    const start = new Date(end.getTime() - hours * 3_600_000);
+    const previousStart = new Date(start.getTime() - hours * 3_600_000);
+    const bucketSeconds = hours === 24 ? 3600 : hours === 168 ? 21_600 : 86_400;
+    return db.transaction(
+      async (tx) => {
+        const currentAdmin =
+          access.kind === "managed"
+            ? exists(
+                tx
+                  .select({ id: users.id })
+                  .from(users)
+                  .where(and(eq(users.id, access.actorId), eq(users.role, "admin"))),
+              )
+            : undefined;
+        const [server] = await tx
+          .select({
+            id: servers.id,
+            name: servers.name,
+            slug: servers.slug,
+            visibility: servers.visibility,
+            status: servers.status,
+            endpointRevision: servers.endpointRevision,
+          })
+          .from(servers)
+          .where(
+            and(
+              "id" in target ? eq(servers.id, target.id) : eq(servers.slug, target.slug),
+              access.kind === "public"
+                ? or(eq(servers.visibility, "public"), eq(servers.visibility, "unlisted"))
+                : or(currentAdmin, managedServerScope(access.actorId)),
+            ),
+          )
+          .limit(1);
+        if (!server) return null;
+
+        const base = and(
+          eq(serverObservations.serverId, server.id),
+          eq(serverObservations.source, "mta_master"),
+        );
+        const current = and(
+          base,
+          gte(serverObservations.observedAt, start),
+          lt(serverObservations.observedAt, end),
+        );
+        const number = (value: unknown): number | null => (value == null ? null : Number(value));
+        const peak = sql<number | null>`max(${serverObservations.currentPlayers})`.mapWith(number);
+        const average = sql<
+          number | null
+        >`round(avg(${serverObservations.currentPlayers}), 1)`.mapWith(number);
+        const totals = {
+          observationCount: count(),
+          knownPlayerCount: count(serverObservations.currentPlayers),
+          observedFrom: sql<Date | null>`min(${serverObservations.observedAt})`.mapWith(
+            serverObservations.observedAt,
+          ),
+          observedTo: sql<Date | null>`max(${serverObservations.observedAt})`.mapWith(
+            serverObservations.observedAt,
+          ),
+          peakPlayers: peak,
+          averagePlayers: average,
+        };
+        const period = sql<
+          "current" | "previous"
+        >`case when ${serverObservations.observedAt} >= ${start.toISOString()} then 'current' else 'previous' end`.as(
+          "period",
+        );
+        const summaries = await tx
+          .select({ period, ...totals })
+          .from(serverObservations)
+          .where(
+            and(
+              base,
+              gte(serverObservations.observedAt, previousStart),
+              lt(serverObservations.observedAt, end),
+            ),
+          )
+          .groupBy(sql`"period"`);
+        const empty = {
+          observationCount: 0,
+          knownPlayerCount: 0,
+          observedFrom: null,
+          observedTo: null,
+          peakPlayers: null,
+          averagePlayers: null,
+        };
+        const summaryFor = (value: "current" | "previous") => {
+          const row = summaries.find((item) => item.period === value);
+          if (!row) return empty;
+          const { period: _period, ...summary } = row;
+          return summary;
+        };
+        const bucket =
+          sql<Date>`to_timestamp(floor(extract(epoch from ${serverObservations.observedAt}) / ${bucketSeconds}) * ${bucketSeconds})`
+            .mapWith(serverObservations.observedAt)
+            .as("bucket_at");
+        const buckets = await tx
+          .select({
+            bucketAt: bucket,
+            ...totals,
+            maxPlayers: sql<number | null>`max(${serverObservations.maxPlayers})`.mapWith(number),
+          })
+          .from(serverObservations)
+          .where(current)
+          .groupBy(sql`"bucket_at"`)
+          .orderBy(sql`"bucket_at"`);
+        let older: SQL | undefined;
+        if (options.before) {
+          const [anchor] = await tx
+            .select({
+              id: serverObservations.id,
+              time: sql<string>`to_char(${serverObservations.observedAt} at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+            })
+            .from(serverObservations)
+            .where(and(current, eq(serverObservations.id, options.before)))
+            .limit(1);
+          if (!anchor)
+            throw new AppError("Observation page expired", 404, "SERVER_OBSERVATION_PAGE_EXPIRED");
+          older = sql`(${serverObservations.observedAt}, ${serverObservations.id}) < (${anchor.time}::timestamptz, ${anchor.id})`;
+        }
+        const rows = await tx
+          .select({
+            id: serverObservations.id,
+            observedAt: serverObservations.observedAt,
+            currentPlayers: serverObservations.currentPlayers,
+            maxPlayers: serverObservations.maxPlayers,
+            gameMode: serverObservations.gameMode,
+            mapName: serverObservations.mapName,
+            mtaVersion: serverObservations.mtaVersion,
+            passworded: serverObservations.passworded,
+            responding: serverObservations.responding,
+          })
+          .from(serverObservations)
+          .where(and(current, older))
+          .orderBy(desc(serverObservations.observedAt), desc(serverObservations.id))
+          .limit(26);
+        const observations = rows.slice(0, 25);
+        return {
+          server,
+          windowStart: start,
+          windowEnd: end,
+          previousStart,
+          bucketSeconds,
+          summary: summaryFor("current"),
+          previousSummary: summaryFor("previous"),
+          buckets,
+          observations,
+          nextCursor: rows.length > 25 ? (observations.at(-1)?.id ?? null) : null,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
   async record(input: RecordServerObservationInput): Promise<ServerObservation>;
   async record(
     input: RecordServerObservationInput,

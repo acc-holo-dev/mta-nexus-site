@@ -7,6 +7,7 @@ import {
 } from "../lib/server-history-presentation";
 import type { ServerHistoryResult } from "../lib/services/server-history-service";
 import { getDictionary, type Locale } from "../lib/i18n";
+import { serverStatisticsCopy } from "../lib/server-statistics-copy";
 
 function metric(value: number | null) {
   return value == null ? "—" : String(value);
@@ -85,6 +86,12 @@ export function ServerHistoryPanel({
             {label}
           </Link>
         ))}
+        <Link
+          href={`/servers/${encodeURIComponent(history.server.slug)}/statistics?window=${history.window}`}
+          className="rounded-lg border border-base px-3 py-2 text-xs font-semibold text-accent"
+        >
+          {serverStatisticsCopy(locale).open}
+        </Link>
       </nav>
       <p className="text-xs text-muted">{copy.summaryScope}</p>
 
