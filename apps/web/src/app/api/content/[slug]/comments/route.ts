@@ -11,10 +11,11 @@ import { authService } from "../../../../../lib/services/auth-service";
 import { dispatchNotificationsBestEffort } from "../../../../../lib/services/notification-dispatch-service";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { resolveLocale } from "../../../../../lib/i18n";
+import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { discussionError } from "../../../../../lib/content-discussion-copy";
 import {
   discussionCommentSchema,
-  parseDiscussionCursor,
+  parseDiscussionQuery,
 } from "../../../../../lib/content-discussion-contract";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
@@ -25,11 +26,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { slug } = await params;
     if (!validSlug(slug)) throw new NotFoundError("Content");
-    const cursor = parseDiscussionCursor(request.nextUrl.searchParams);
-    if (cursor === null) throw new AppError("Invalid cursor", 400, "INVALID_CURSOR");
+    const filters = parseDiscussionQuery(request.nextUrl.searchParams);
+    if (!filters) throw new AppError("Invalid cursor", 400, "INVALID_CURSOR");
+    if (!(await consumeRateLimit("search", getTrustedRequestIp(request))).success) throw new RateLimitExceededError();
     const article = await contentService.getArticleBySlug(slug, { incrementView: false });
     if (!article) throw new NotFoundError("Content");
-    return NextResponse.json(await contentService.pageDiscussion(article.id, cursor), {
+    const page = filters.query || filters.focusId
+      ? await contentService.pageDiscussion(article.id, filters.cursor, { query: filters.query, focusId: filters.focusId })
+      : await contentService.pageDiscussion(article.id, filters.cursor);
+    return NextResponse.json(page, {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {
@@ -99,7 +104,7 @@ export async function POST(
               message: `@${user.username} commented on “${article.title}”.`,
               type: "content",
               category: "content",
-              link: `/articles/${encodeURIComponent(article.slug)}#comment-${encodeURIComponent(comment.id)}`,
+              link: `/articles/${encodeURIComponent(article.slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`,
             })),
           );
         } catch (error) {

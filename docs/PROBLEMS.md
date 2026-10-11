@@ -1534,7 +1534,8 @@ They remain unrun; live PostgreSQL, browser interaction and full production gene
 separate verification. This block adds no schema, migration, npm dependency or
 workflow and does not use Actions. Requester notification preference checks use
 the existing transaction-scoped preference lock. The profile-privacy model above
-is now integrated by Agent A in migration 0051; its user-facing flow is pending.
+is now integrated by Agent A in migration 0051; its user-facing flow is completed
+in the profile privacy block below.
 
 ### Resource version workspace — 2026-10-11 (Agent A)
 
@@ -1641,3 +1642,46 @@ they remain unrun because PostgreSQL is unavailable in this environment. Browser
 interaction and full production generation still require verification. Schema,
 commercial contracts, dependencies and workflows are unchanged; Actions are not
 used.
+
+### Organization editorial workspace and discussion discovery — 2026-10-11
+
+`/workspace/organizations/[id]/content`, `/new` and `/[contentId]` provide a
+private RU/EN editorial workspace for the actual owner and current team
+administrators. The bounded searchable list includes all organization authors,
+status/type filters and page navigation. Editors can create, edit and archive
+team publications using the existing writer schemas and publication policy.
+Editorial changes return material to moderator review; posts and questions
+publish immediately. Attribution, permanent slug, linked context, counters and
+existing discussion remain intact. Archived publications stay read-only.
+
+GET/POST `/api/workspace/organizations/[id]/content` and GET/PATCH/DELETE on its
+`/[contentId]` endpoint bind scope to the session and path, reject injected
+filters, enforce bounded JSON and rates, and return private no-store responses.
+Reads use a repeatable-read access snapshot. Mutations reuse the author editing
+transaction, content-first locking, current organization authority, observed
+status/version, monotonic revisions and atomic audit. Legacy owner memberships
+never establish ownership; the older publication-create flow now rechecks
+organization rights within persistence. Platform administration grants no
+automatic access to team drafts. The shared editor confirms saved fields and
+team identity, exposes saved-state recovery and explains uncertain writes.
+
+Article discussion search matches text and public author names with literal
+wildcard escaping, before the twenty-row keyset limit. Search continuations
+bind to the exact article/query and retain PostgreSQL microseconds.
+`/articles/[slug]?comment=[id]#comment-[id]` server-loads the selected comment and
+older context even beyond the first page, highlights it and continues normally.
+Comment/parent permalinks and new notification links use this route; existing
+hash-only notifications resolve on the client. Removed, foreign or unpublished
+focused comments return a localized error with latest-discussion recovery.
+Public comment GET rejects mixed/duplicate/unknown selectors, rate-limits
+lookup and never increases article views. Public reads omit private identities.
+
+249 focused unit, query, HTTP and server-render checks across 20 files pass,
+including existing privacy, personal publication and organization regressions.
+TypeScript, touched-file Biome lint, Knip and Next webpack compile mode pass.
+Seven new PostgreSQL fixtures cover cross-author edits, live rights, concurrent
+team/author edits, audit rollback, archive preservation, focused microsecond
+paging, literal search and unavailable targets. They remain unrun because
+PostgreSQL is unavailable here. Browser interaction and full production
+generation require verification. No schema, migration, commerce contract,
+dependency or workflow changed; Actions were not used.

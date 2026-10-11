@@ -68,8 +68,13 @@ export class ContentService {
     return parent?.contentId === contentId && !parent.productId ? parent.authorId : null;
   }
 
-  async pageDiscussion(contentId: string, cursor?: DiscussionCursor) {
-    const result = await contentDiscussionRepository.page(contentId, cursor);
+  async pageDiscussion(contentId: string, cursor?: DiscussionCursor & { contentId?: string; query?: string }, options: { query?: string; focusId?: string } = {}) {
+    if (cursor && (options.query || cursor.contentId || cursor.query) &&
+      (cursor.contentId !== contentId || cursor.query !== options.query))
+      throw new AppError("Invalid comment page", 400, "INVALID_CURSOR");
+    const result = options.query || options.focusId
+      ? await contentDiscussionRepository.page(contentId, cursor, options)
+      : await contentDiscussionRepository.page(contentId, cursor);
     return {
       items: result.items.map((row) => ({
         id: row.id,
@@ -90,7 +95,9 @@ export class ContentService {
           row.parentText !== null ? { text: row.parentText, username: row.parentUsername } : null,
       })),
       hasMore: result.hasMore,
-      nextCursor: result.nextCursor ? encodeDiscussionCursor(result.nextCursor) : null,
+      nextCursor: result.nextCursor ? options.query
+        ? JSON.stringify({ ...result.nextCursor, contentId, query: options.query })
+        : encodeDiscussionCursor(result.nextCursor) : null,
     };
   }
 

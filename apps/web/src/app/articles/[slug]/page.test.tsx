@@ -1,5 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
+vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
 import type { Content } from "@nexus/domain";
 import { createContentSchema } from "@nexus/validation";
 const state = vi.hoisted(() => ({ cover: "", locale: "en" as "en" | "ru" }));
@@ -24,7 +25,7 @@ vi.mock("../../../lib/services/content-service", () => ({
   },
 }));
 vi.mock("../../../lib/services/auth-service", () => ({
-  authService: { getUserById: async () => null },
+  authService: { getUserById: async () => null, getSession: async () => null },
 }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../../../components/content-discussion", () => ({ ContentDiscussion: () => null }));

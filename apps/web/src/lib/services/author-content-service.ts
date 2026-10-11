@@ -1,4 +1,4 @@
-import { authorContentRepository, contentRepository } from "@nexus/db";
+import { authorContentRepository, contentRepository, organizationContentRepository } from "@nexus/db";
 import { AppError, NotFoundError, ValidationError } from "@nexus/domain";
 import type { User } from "@nexus/domain";
 import { generateId } from "@nexus/security";
@@ -18,18 +18,22 @@ class AuthorContentService {
       coverImageUrl: safeExternalWebUrl(item.coverImageUrl) ? item.coverImageUrl : undefined,
     };
   }
-  async create(input: unknown, actor: User) {
+  async create(input: unknown, actor: User, organizationId?: string) {
     const parsed = writerCreateSchema.safeParse(input);
     if (!parsed.success) throw new ValidationError("Invalid publication");
     const status =
       parsed.data.type === "post" || parsed.data.type === "question" ? "published" : "draft";
     const id = generateId("cnt");
     try {
-      return await contentRepository.createWithAudit(
+      const save = organizationId
+        ? (data: Parameters<typeof contentRepository.createWithAudit>[0], audit: Parameters<typeof contentRepository.createWithAudit>[1]) => organizationContentRepository.create(organizationId, actor.id, data, audit)
+        : contentRepository.createWithAudit.bind(contentRepository);
+      return await save(
         {
           ...parsed.data,
           id,
           authorId: actor.id,
+          ...(organizationId ? { organizationId } : {}),
           status,
           viewCount: 0,
           likeCount: 0,
@@ -40,10 +44,10 @@ class AuthorContentService {
           id: generateId("aud"),
           actorId: actor.id,
           actorType: "user",
-          action: "content.created",
+          action: organizationId ? "content.created_by_organization" : "content.created",
           targetId: id,
           targetType: "content",
-          details: { status, type: parsed.data.type },
+          details: { status, type: parsed.data.type, ...(organizationId ? { organizationId } : {}) },
         },
       );
     } catch (error) {
@@ -53,7 +57,7 @@ class AuthorContentService {
       throw error;
     }
   }
-  async update(id: string, input: unknown, actor: User, archive = false) {
+  async update(id: string, input: unknown, actor: User, archive = false, organizationId?: string) {
     const parsed = (archive ? writerArchiveSchema : writerUpdateSchema).safeParse(input);
     if (!parsed.success) throw new ValidationError("Invalid publication update");
     return authorContentRepository.mutate(
@@ -66,10 +70,14 @@ class AuthorContentService {
         id: generateId("aud"),
         actorId: actor.id,
         actorType: "user",
-        action: archive ? "content.archived_by_author" : "content.edited_by_author",
+        action: organizationId
+          ? archive ? "content.archived_by_organization" : "content.edited_by_organization"
+          : archive ? "content.archived_by_author" : "content.edited_by_author",
         targetId: id,
         targetType: "content",
+        ...(organizationId ? { details: { organizationId } } : {}),
       },
+      ...((organizationId ? [organizationId] : []) as [] | [string]),
     );
   }
 }

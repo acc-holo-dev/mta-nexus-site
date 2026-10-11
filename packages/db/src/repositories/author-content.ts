@@ -1,15 +1,16 @@
 import { and, desc, eq, inArray, or, ilike, sql, getTableColumns } from "drizzle-orm";
-import { AppError, NotFoundError } from "@nexus/domain";
+import { AppError, canManageOrganization, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Content } from "@nexus/domain";
 import { db } from "../client";
 import { auditEvents, content, organizations, organizationMembers } from "../schema";
 import { containsPattern } from "./search-pattern";
+import { organizationWorkspaceAccess } from "./organization-workspace";
 
 export type ContentSummary = Pick<
   Content,
   "id" | "slug" | "title" | "excerpt" | "type" | "status" | "commentCount" | "updatedAt"
 >;
-type ContentPageFilters = {
+export type ContentPageFilters = {
   page?: number;
   query?: string;
   type?: Content["type"];
@@ -17,7 +18,7 @@ type ContentPageFilters = {
 };
 type ContentEditFields = Pick<Content, "title" | "body" | "tags"> &
   Pick<Content, "excerpt" | "coverImageUrl">;
-const summaryColumns = {
+export const contentSummaryColumns = {
   id: content.id,
   slug: content.slug,
   title: content.title,
@@ -37,7 +38,7 @@ class AuthorContentRepository {
       ? containsPattern(filters.query.trim().slice(0, 120))
       : undefined;
     const rows = await db
-      .select(summaryColumns)
+      .select(contentSummaryColumns)
       .from(content)
       .where(
         and(
@@ -73,15 +74,25 @@ class AuthorContentRepository {
     expectedStatus: Content["status"],
     fields: ContentEditFields | null,
     audit: Omit<AuditEvent, "createdAt">,
+    organizationId?: string,
   ): Promise<Content> {
     return db.transaction(async (tx) => {
       const [current] = await tx
         .select()
         .from(content)
-        .where(and(eq(content.id, id), eq(content.authorId, authorId)))
+        .where(and(eq(content.id, id), organizationId
+          ? eq(content.organizationId, organizationId)
+          : eq(content.authorId, authorId)))
         .for("update")
         .limit(1);
       if (!current) throw new NotFoundError("Content");
+      // Organization editors share the same content-first lock order and mutation
+      // rules as authors. A platform role never substitutes for current team rights.
+      if (organizationId) {
+        const access = await organizationWorkspaceAccess(tx, organizationId, authorId, true);
+        if (!canManageOrganization(access.role))
+          throw new AppError("Organization editor required", 403, "FORBIDDEN");
+      }
       if (current.status === "archived")
         throw new AppError("Content is archived", 409, "CONTENT_ARCHIVED");
       if (
@@ -90,7 +101,7 @@ class AuthorContentRepository {
       ) {
         throw new AppError("Content changed", 409, "CONFLICT");
       }
-      if (current.organizationId) {
+      if (current.organizationId && !organizationId) {
         const [org] = await tx
           .select({ ownerId: organizations.ownerId })
           .from(organizations)
@@ -110,7 +121,7 @@ class AuthorContentRepository {
             )
             .for("share")
             .limit(1);
-          if (!member || !["owner", "admin", "developer"].includes(member.role)) {
+          if (!member || !["admin", "developer"].includes(member.role)) {
             throw new AppError("Organization permission revoked", 403, "FORBIDDEN");
           }
         }
@@ -142,7 +153,7 @@ class AuthorContentRepository {
         .returning();
       await tx
         .insert(auditEvents)
-        .values({ ...audit, details: { from: current.status, to: status }, createdAt: new Date() });
+        .values({ ...audit, details: { ...audit.details, from: current.status, to: status }, createdAt: new Date() });
       return updated as unknown as Content;
     });
   }

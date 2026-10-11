@@ -1,6 +1,7 @@
 import type { Locale } from "./i18n";
 import { userPlatformError } from "./user-platform-copy";
 const en = {
+  search: "Search comments or authors", applySearch: "Search", noMatches: "No matching comments.", focusMissing: "This comment is unavailable. Open the latest discussion.", permalink: "Link to comment", focused: "Selected comment",
   edit: "Edit", remove: "Remove", confirmRemove: "Confirm removal", removeNote: "The comment will be removed. Replies will remain.",
   saveEdit: "Save changes", cancelEdit: "Cancel", edited: "Comment updated.", removed: "Comment removed.",
   changed: "This comment changed. Reload the discussion before editing or removing it.", reason: "Moderation reason", reasonRequired: "Provide a moderation reason.",
@@ -32,6 +33,7 @@ const en = {
   latest: "Show latest comments",
 };
 const ru: Record<keyof typeof en, string> = {
+  search: "Поиск по комментариям и авторам", applySearch: "Найти", noMatches: "Подходящих комментариев нет.", focusMissing: "Этот комментарий недоступен. Откройте новые сообщения обсуждения.", permalink: "Ссылка на комментарий", focused: "Выбранный комментарий",
   edit: "Редактировать", remove: "Удалить", confirmRemove: "Подтвердить удаление", removeNote: "Комментарий будет удалён. Ответы сохранятся.",
   saveEdit: "Сохранить изменения", cancelEdit: "Отмена", edited: "Комментарий обновлён.", removed: "Комментарий удалён.",
   changed: "Комментарий изменился. Перезагрузите обсуждение перед редактированием или удалением.", reason: "Причина модерации", reasonRequired: "Укажите причину модерации.",
@@ -64,6 +66,7 @@ const ru: Record<keyof typeof en, string> = {
 };
 export const getDiscussionCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function discussionError(locale: Locale, code: unknown) {
+  if (code === "COMMENT_FOCUS_NOT_FOUND") return getDiscussionCopy(locale).focusMissing;
   if (code === "COMMENT_COMMAND_INVALID") return getDiscussionCopy(locale).invalidCommand;
   if (code === "COMMENT_CHANGED") return getDiscussionCopy(locale).changed;
   if (code === "COMMENT_REASON_REQUIRED") return getDiscussionCopy(locale).reasonRequired;

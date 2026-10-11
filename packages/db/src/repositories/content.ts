@@ -1,6 +1,7 @@
 import { eq, asc, desc, and, count, sql, inArray, ilike, or, isNull } from "drizzle-orm";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
+import { organizationWorkspaceAccess } from "./organization-workspace";
 import { resourceReviewsRepository } from "./resource-reviews";
 import { auditEvents, content, comments } from "../schema";
 import { AppError, NotFoundError } from "@nexus/domain";
@@ -296,6 +297,11 @@ export class ContentRepository {
     audit: Omit<AuditEvent, "createdAt">,
   ): Promise<Content> {
     return db.transaction(async (tx) => {
+      if (data.organizationId) {
+        const access = await organizationWorkspaceAccess(tx, data.organizationId, data.authorId, true);
+        if (!["owner", "admin", "developer"].includes(access.role))
+          throw new AppError("Organization publication rights revoked", 403, "FORBIDDEN");
+      }
       const now = new Date();
       const rows = await tx
         .insert(content)

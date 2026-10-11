@@ -221,7 +221,6 @@ export async function POST(request: NextRequest) {
       );
       const canManageOrganization =
         organization.ownerId === user.id ||
-        membership?.role === "owner" ||
         membership?.role === "admin" ||
         membership?.role === "developer";
 

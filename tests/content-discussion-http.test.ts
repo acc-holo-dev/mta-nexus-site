@@ -105,6 +105,24 @@ it("persists a reply before notifying both distinct recipients", async () => {
     "author",
     "parentAuthor",
   ]);
+  expect(mocks.notify.mock.calls[0][0][0].link).toBe("/articles/article?comment=comment#comment-comment");
+});
+it("passes normalized text search and focused comment selectors without recording views", async () => {
+  expect((await GET(request("GET", undefined, "?q=%20Lua%20"), context)).status).toBe(200);
+  expect(mocks.page).toHaveBeenLastCalledWith("content", undefined, { query: "Lua", focusId: undefined });
+  expect((await GET(request("GET", undefined, "?comment=older"), context)).status).toBe(200);
+  expect(mocks.page).toHaveBeenLastCalledWith("content", undefined, { query: "", focusId: "older" });
+});
+it.each(["?q=one&q=two", "?comment=x&comment=y", "?comment=x&q=Lua", "?comment=x&cursor=x", "?actorId=victim", `?q=${"x".repeat(121)}`])(
+  "rejects invalid discovery selectors %s before querying", async (query) => {
+    expect((await GET(request("GET", undefined, query), context)).status).toBe(400);
+    expect(mocks.article).not.toHaveBeenCalled();
+  },
+);
+it("rate-limits public discussion lookup before loading its article", async () => {
+  mocks.rate.mockResolvedValue({ success: false });
+  expect((await GET(request("GET", undefined, "?q=Lua"), context)).status).toBe(429);
+  expect(mocks.article).not.toHaveBeenCalled();
 });
 it("deduplicates parent and content authors and omits self notifications", async () => {
   mocks.parent.mockResolvedValue("author");

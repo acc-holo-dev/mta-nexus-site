@@ -180,7 +180,7 @@ it("does not permit editing another author's record", async () => {
   expect(state.queries[0].params).toContain("usr_other");
   expect(state.queries).toHaveLength(1);
 });
-it.each(["owner", "admin", "developer"])(
+it.each(["admin", "developer"])(
   "rechecks the organization's %s role under shared locks",
   async (role) => {
     state.rows = [
@@ -196,7 +196,7 @@ it.each(["owner", "admin", "developer"])(
     expect(state.queries[2].params).toEqual(["org_1", "usr_1", 1]);
   },
 );
-it.each([null, "member"])(
+it.each([null, "member", "owner"])(
   "blocks absent or revoked organizational edit rights (%s)",
   async (role) => {
     state.rows = [[row({ organizationId: "org_1" })], [["usr_other_owner"]], role ? [[role]] : []];

@@ -24,6 +24,7 @@ export * from "./notifications";
 export * from "./order-operations";
 export * from "./orders";
 export { organizationGovernanceRepository } from "./organization-governance";
+export { organizationContentRepository } from "./organization-content";
 export { organizationWorkspaceRepository } from "./organization-workspace";
 export * from "./organizations";
 export * from "./payments";

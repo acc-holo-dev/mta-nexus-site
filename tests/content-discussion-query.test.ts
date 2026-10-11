@@ -80,6 +80,24 @@ it("preserves microseconds and uses the last visible row as the next cursor", as
   expect(result.nextCursor).toEqual({ id: "cmt_19", createdAt: "2026-10-10T12:00:00.000123Z" });
   expect(result.hasMore).toBe(true);
 });
+it("searches public text and author names with literal wildcard escaping before limiting", async () => {
+  await contentDiscussionRepository.page("content", undefined, { query: "%_" });
+  expect(state.queries[0].params).toEqual(["published", "content", "%\\%\\_%", "%\\%\\_%", "%\\%\\_%", 21]);
+  expect(state.queries[0].sql).toContain('"comments"."text" ilike');
+  expect(state.queries[0].sql).toContain('"users"."username" ilike');
+  expect(state.queries[0].sql).not.toMatch(/email|password_hash/u);
+});
+it("anchors focused pages to a public comment in the exact discussion using its precise stored timestamp", async () => {
+  state.rows = [[["older", "2026-10-11T00:00:00.000123Z"]], []];
+  await contentDiscussionRepository.page("content", undefined, { focusId: "older" });
+  expect(state.queries[0].params).toEqual(["published", "older", "content", 1]);
+  expect(state.queries[1].params).toEqual(["published", "content", "2026-10-11T00:00:00.000123Z", "older", 21]);
+  expect(state.queries[1].sql).toContain("<=");
+});
+it("rejects an unavailable focus before reading unrelated comment rows", async () => {
+  await expect(contentDiscussionRepository.page("content", undefined, { focusId: "missing" })).rejects.toMatchObject({ code: "COMMENT_FOCUS_NOT_FOUND" });
+  expect(state.queries).toHaveLength(1);
+});
 it.each(["draft", "archived"])(
   "rejects a %s target inside the persistence transaction",
   async (status) => {

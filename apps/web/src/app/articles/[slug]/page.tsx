@@ -8,6 +8,9 @@ import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
 import { ContentDiscussion } from "../../../components/content-discussion";
 import { getDiscussionCopy } from "../../../lib/content-discussion-copy";
+import { discussionError } from "../../../lib/content-discussion-copy";
+import { parseDiscussionQuery } from "../../../lib/content-discussion-contract";
+import { AppError } from "@nexus/domain";
 import { getUserPlatformCopy } from "../../../lib/user-platform-copy";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
@@ -47,7 +50,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ArticleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ArticleDetailPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
   const { slug } = await params;
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
@@ -60,9 +63,22 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
   const isCommunity = article.type === "post" || article.type === "question";
   const coverImageUrl = safeExternalWebUrl(article.coverImageUrl);
+  const requested = await searchParams ?? {}, discussionParams = new URLSearchParams();
+  for (const key of ["q", "comment"]) {
+    const value = requested[key];
+    if (Array.isArray(value)) for (const part of value) discussionParams.append(key, part);
+    else if (value !== undefined) discussionParams.set(key, value);
+  }
+  const filters = parseDiscussionQuery(discussionParams);
+  let discussionFailure = filters ? "" : discussionError(locale, "INVALID_CURSOR");
   const [author, discussion, viewer] = await Promise.all([
     authService.getUserById(article.authorId),
-    contentService.pageDiscussion(article.id).catch(() => null),
+    filters ? (filters.query || filters.focusId
+      ? contentService.pageDiscussion(article.id, undefined, { query: filters.query, focusId: filters.focusId })
+      : contentService.pageDiscussion(article.id)).catch((error: unknown) => {
+        discussionFailure = error instanceof AppError ? discussionError(locale, error.code) : getDiscussionCopy(locale).unavailable;
+        return null;
+      }) : null,
     authService.getSession((await cookies()).get("nexus_session")?.value).catch(() => null),
   ]);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
@@ -157,13 +173,16 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
       </div>
 
       <ContentDiscussion
-        key={`${article.id}:${viewer?.id ?? "anonymous"}:${viewer?.role ?? ""}`}
+        key={`${article.id}:${viewer?.id ?? "anonymous"}:${viewer?.role ?? ""}:${filters?.query ?? ""}:${filters?.focusId ?? ""}`}
         viewer={viewer ? { id: viewer.id, canModerate: can(viewer, "admin.moderation") } : null}
         slug={article.slug}
         contentId={article.id}
         locale={locale}
         count={article.commentCount}
         initial={discussion}
+        initialQuery={filters?.query}
+        initialFocus={filters?.focusId}
+        initialError={discussionFailure}
       />
     </article>
   );

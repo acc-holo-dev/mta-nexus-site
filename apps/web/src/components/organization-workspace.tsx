@@ -1,4 +1,5 @@
 "use client";
+import { organizationContentCopy } from "../lib/organization-content-copy";
 import type { OrganizationTeamRole } from "@nexus/domain";
 import {
   canChangeOrganizationMember,
@@ -185,6 +186,12 @@ export function OrganizationWorkspacePanel({
           setMessage(copy.saved);
         }}
       />
+      {manageable && (
+        <Link className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/content`}>
+          {organizationContentCopy(locale).title}
+        </Link>
+      )}
       {manageable && (
         <Link
           className="inline-flex min-h-9 items-center text-sm text-accent underline"
