@@ -73,7 +73,6 @@ describe("server management access is scoped to one live organization", () => {
 
   it.each([
     { role: "admin", permissions: [] },
-    { role: "owner", permissions: [] },
     { role: "member", permissions: ["manage_servers"] },
   ])("allows one scoped delegated membership: %j", async ({ role, permissions }) => {
     mocks.member.mockResolvedValue({
@@ -88,6 +87,7 @@ describe("server management access is scoped to one live organization", () => {
 
   it.each([
     null,
+    { organizationId: "org_1", role: "owner", permissions: ["manage_servers"] },
     { organizationId: "org_1", role: "member", permissions: [] },
     { organizationId: "org_1", role: "member", permissions: ["manage_products"] },
     { organizationId: "org_other", role: "admin", permissions: [] },

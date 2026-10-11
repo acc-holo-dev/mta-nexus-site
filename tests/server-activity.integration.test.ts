@@ -134,7 +134,7 @@ it("reads scoped private activity on PostgreSQL without losing tied or microseco
           }),
         ).toBeNull();
         expect(await repository.pageForManagedServer("org-server", actor)).not.toBeNull();
-        for (const role of ["owner", "admin"]) {
+        for (const role of ["admin"]) {
           await tx.execute(
             sql`UPDATE organization_members SET role = ${role}, permissions = '[]'::jsonb WHERE id = 'grant'`,
           );

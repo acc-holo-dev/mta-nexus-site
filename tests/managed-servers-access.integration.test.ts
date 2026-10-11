@@ -57,7 +57,7 @@ it("checks personal and organization management scope with bounded pages on Post
         const organizationRepository = new OrganizationRepository();
         const choices = await organizationRepository.listServerManageableByUser("actor");
         expect(choices.map((item) => item.id).sort()).toEqual([
-          "org-admin", "org-owned", "org-permission", "org-role-owner",
+          "org-admin", "org-owned", "org-permission",
         ]);
         expect(choices[0]).toEqual({
           id: expect.any(String), name: expect.any(String), slug: expect.any(String),
@@ -79,16 +79,16 @@ it("checks personal and organization management scope with bounded pages on Post
               (server) => server.id,
             ),
           );
-        expect(new Set(all).size).toBe(135);
+        expect(new Set(all).size).toBe(134);
         expect(all).toEqual([...all].sort().reverse());
         expect(all).not.toContain("ordinary-member-server");
+        expect(all).not.toContain("org-role-owner-server");
         expect(all).not.toContain("unrelated-server");
         expect(all).not.toContain("unowned-server");
         expect(all).toEqual(
           expect.arrayContaining([
             "org-owned-server",
             "org-admin-server",
-            "org-role-owner-server",
             "org-permission-server",
           ]),
         );

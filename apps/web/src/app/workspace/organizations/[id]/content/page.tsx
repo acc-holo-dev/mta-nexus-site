@@ -58,6 +58,7 @@ export default async function OrganizationPublications({
             {result ? `: ${result.organization.name}` : ""}
           </h1>
           <p className="mt-2 text-sm text-muted">{team.description}</p>
+          <p className="mt-2 text-sm text-muted">{team.notice}</p>
         </div>
         {result && (
           <Link

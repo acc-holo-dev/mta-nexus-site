@@ -54,8 +54,8 @@ export class OrganizationRepository {
           eq(organizationMembers.organizationId, organizations.id),
           eq(organizationMembers.userId, userId),
           or(
-            inArray(organizationMembers.role, ["owner", "admin"]),
-            sql`${organizationMembers.permissions} @> ${JSON.stringify(["manage_servers"])}::jsonb`,
+            eq(organizationMembers.role, "admin"),
+            and(inArray(organizationMembers.role, ["member", "developer"]), sql`${organizationMembers.permissions} @> ${JSON.stringify(["manage_servers"])}::jsonb`),
           ),
         ))),
       ))

@@ -34,10 +34,10 @@ export async function organizationWorkspaceAccess(
   tx: Transaction,
   id: string,
   actorId: string,
-  lock = false,
+  lock: boolean | "share" = false,
 ) {
   const query = tx.select().from(organizations).where(eq(organizations.id, id)).limit(1);
-  const [organization] = await (lock ? query.for("update") : query);
+  const [organization] = await (lock ? query.for(lock === "share" ? "share" : "update") : query);
   if (!organization) throw new NotFoundError("Organization");
   if (organization.ownerId === actorId) return { organization, role: "owner" };
   const membershipQuery = tx

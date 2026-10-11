@@ -13,6 +13,7 @@ import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getManagedServerCopy } from "../../../../lib/managed-server-view";
 import { getServerActivityCopy, serverActivityHref } from "../../../../lib/server-activity-view";
 import { serverStatisticsCopy } from "../../../../lib/server-statistics-copy";
+import { serverContentCopy } from "../../../../lib/server-content-copy";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -57,6 +58,7 @@ export default async function ServerManagementPage({
   return (
     <div className="mx-auto max-w-4xl space-y-6 py-8">
       <div>
+        <Link href={`/workspace/servers/${encodeURIComponent(server.id)}/content`} className="mb-3 inline-flex min-h-11 items-center text-sm font-semibold text-accent hover:underline">{serverContentCopy(locale).title}</Link>
         <Link
           href="/workspace/servers"
           className="text-xs font-semibold text-accent hover:underline"

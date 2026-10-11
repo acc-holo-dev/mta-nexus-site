@@ -7,6 +7,31 @@ export function formatNotification(
   copy: { approved: string; rejected: string; version: string; notes: string },
   locale: Locale = "en",
 ) {
+  const publication =
+    notification.title === "Publication activity" &&
+    /^Publication ([a-zA-Z0-9_-]{1,128}): (created|edited|published|archived)\.$/u.exec(
+      notification.message,
+    );
+  if (publication) {
+    const messages: Record<string, string> =
+      locale === "ru"
+        ? {
+            created: "Создана публикация в вашем контексте.",
+            edited: "Публикация изменена. Статьи и новости возвращены на модерацию.",
+            published: "Модератор опубликовал материал.",
+            archived: "Публикация перенесена в архив.",
+          }
+        : {
+            created: "A publication was created in your context.",
+            edited: "The publication changed. Editorial content returned to moderation.",
+            published: "A moderator published the material.",
+            archived: "The publication was archived.",
+          };
+    return {
+      title: locale === "ru" ? "Обновление публикации" : "Publication activity",
+      message: messages[publication[2]],
+    };
+  }
   const supportActivity =
     notification.title === "Support case activity" &&
     /^Support case (sup_[a-f0-9]{24}): (reply|open|resolved|closed)\.$/u.exec(notification.message);

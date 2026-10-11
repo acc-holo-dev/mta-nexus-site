@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({
   transactions: [] as unknown[],
   failAudit: false,
 }));
+vi.mock("../packages/db/src/repositories/publication-notice", () => ({ publicationNotice: vi.fn() }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
@@ -152,7 +153,7 @@ it("uses the shared author mutation, content-first lock order and live team righ
   expect(state.queries[0].params).toEqual(["content", "org", 1]);
   expect(state.queries.slice(0, 3).map((q) => q.sql)).toEqual([
     expect.stringContaining("for update"),
-    expect.stringContaining("for update"),
+    expect.stringContaining("for share"),
     expect.stringContaining("for share"),
   ]);
   const set = writes()[0].sql.split(" set ")[1].split(" where ")[0];

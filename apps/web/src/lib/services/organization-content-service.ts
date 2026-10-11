@@ -1,22 +1,9 @@
 import { organizationContentRepository } from "@nexus/db";
 import type { User, Content } from "@nexus/domain";
-import { safeExternalWebUrl } from "@nexus/validation";
+import { editablePublication as editable } from "./publication-editor-record";
 import { authorContentService } from "./author-content-service";
 import type { parseContentPage } from "../user-platform-contract";
-const editable = (row: Content) => ({
-  id: row.id,
-  slug: row.slug,
-  title: row.title,
-  body: row.body,
-  excerpt: row.excerpt ?? "",
-  coverImageUrl: safeExternalWebUrl(row.coverImageUrl) ?? "",
-  tags: row.tags,
-  type: row.type,
-  status: row.status,
-  authorId: row.authorId,
-  organizationId: row.organizationId,
-  updatedAt: new Date(row.updatedAt).toISOString(),
-});
+
 class OrganizationContentService {
   context(organizationId: string, actor: User) {
     return organizationContentRepository.context(organizationId, actor.id);

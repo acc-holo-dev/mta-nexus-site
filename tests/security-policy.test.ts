@@ -77,7 +77,6 @@ describe("Security Policy Engine can()", () => {
     expect(can(regularUser, "server.delete", orgServer)).toBe(false);
 
     for (const membership of [
-      { organizationId: "org_1", role: "owner", permissions: [] },
       { organizationId: "org_1", role: "admin", permissions: [] },
       { organizationId: "org_1", role: "member", permissions: ["manage_servers"] },
     ]) {
@@ -88,6 +87,7 @@ describe("Security Policy Engine can()", () => {
     for (const membership of [
       { organizationId: "org_1", role: "member", permissions: ["manage_products"] },
       { organizationId: "org_else", role: "admin", permissions: [] },
+      { organizationId: "org_1", role: "owner", permissions: ["manage_servers"] },
       { organizationId: "org_1", role: "member", permissions: [] },
     ]) {
       expect(can(regularUser, "server.manage", orgServer, {

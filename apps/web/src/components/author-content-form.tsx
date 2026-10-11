@@ -4,9 +4,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@nexus/ui";
 import type { Locale } from "../lib/i18n";
+import { serverContentCopy, serverContentMutationError } from "../lib/server-content-copy";
 import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
-import { writerTypes, contentFieldsSchema } from "../lib/user-platform-contract";
-import { organizationContentCopy, organizationContentMutationError } from "../lib/organization-content-copy";
+import { writerTypes, editorialTypes, contentFieldsSchema } from "../lib/user-platform-contract";
+import {
+  organizationContentCopy,
+  organizationContentMutationError,
+} from "../lib/organization-content-copy";
 import {
   parseEditableContent,
   platformRequest,
@@ -18,10 +22,12 @@ export function AuthorContentForm({
   locale,
   initial,
   organization,
+  server,
 }: {
   locale: Locale;
   initial?: EditableContent;
   organization?: { id: string; name: string };
+  server?: { id: string; name: string };
 }) {
   const copy = getUserPlatformCopy(locale);
   const router = useRouter();
@@ -32,8 +38,16 @@ export function AuthorContentForm({
   const formRef = useRef<HTMLFormElement>(null);
   const pending = useRef(false);
   const archived = saved?.status === "archived";
-  const workspacePath = organization ? `/workspace/organizations/${encodeURIComponent(organization.id)}/content` : "/workspace/content";
-  const apiPath = organization ? `/api/workspace/organizations/${encodeURIComponent(organization.id)}/content` : "/api/workspace/content";
+  const workspacePath = server
+    ? `/workspace/servers/${encodeURIComponent(server.id)}/content`
+    : organization
+      ? `/workspace/organizations/${encodeURIComponent(organization.id)}/content`
+      : "/workspace/content";
+  const apiPath = server
+    ? `/api/workspace/servers/${encodeURIComponent(server.id)}/content`
+    : organization
+      ? `/api/workspace/organizations/${encodeURIComponent(organization.id)}/content`
+      : "/api/workspace/content";
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,7 +89,11 @@ export function AuthorContentForm({
         saved ? "PATCH" : "POST",
         input,
         undefined,
-        organization ? organizationContentMutationError : userPlatformError,
+        server
+          ? serverContentMutationError
+          : organization
+            ? organizationContentMutationError
+            : userPlatformError,
       );
       const confirmed = parseEditableContent(result.content);
       const expectedType = saved?.type ?? String(form.get("type"));
@@ -85,6 +103,7 @@ export function AuthorContentForm({
         result.success !== true ||
         !confirmed ||
         (organization && confirmed.organizationId !== organization.id) ||
+        (server && confirmed.serverId !== server.id) ||
         (saved &&
           (confirmed.id !== saved.id ||
             confirmed.slug !== saved.slug ||
@@ -98,7 +117,13 @@ export function AuthorContentForm({
         confirmed.coverImageUrl !== fields.coverImageUrl ||
         JSON.stringify(confirmed.tags) !== JSON.stringify(fields.tags)
       )
-        throw new Error((organization ? organizationContentMutationError : userPlatformError)(locale, "UNCONFIRMED"));
+        throw new Error(
+          (server
+            ? serverContentMutationError
+            : organization
+              ? organizationContentMutationError
+              : userPlatformError)(locale, "UNCONFIRMED"),
+        );
       if (!saved) {
         router.replace(`${workspacePath}/${encodeURIComponent(confirmed.id)}`);
         router.refresh();
@@ -125,7 +150,11 @@ export function AuthorContentForm({
         "DELETE",
         { expectedUpdatedAt: saved.updatedAt, expectedStatus: saved.status },
         undefined,
-        organization ? organizationContentMutationError : userPlatformError,
+        server
+          ? serverContentMutationError
+          : organization
+            ? organizationContentMutationError
+            : userPlatformError,
       );
       const confirmed = parseEditableContent(result.content);
       if (
@@ -133,10 +162,17 @@ export function AuthorContentForm({
         !confirmed ||
         confirmed.id !== saved.id ||
         (organization && confirmed.organizationId !== organization.id) ||
+        (server && confirmed.serverId !== server.id) ||
         confirmed.status !== "archived" ||
         Date.parse(confirmed.updatedAt) <= Date.parse(saved.updatedAt)
       )
-        throw new Error((organization ? organizationContentMutationError : userPlatformError)(locale, "UNCONFIRMED"));
+        throw new Error(
+          (server
+            ? serverContentMutationError
+            : organization
+              ? organizationContentMutationError
+              : userPlatformError)(locale, "UNCONFIRMED"),
+        );
       setSaved(confirmed);
       setNotice({ text: copy.archivedNote, error: false });
       router.refresh();
@@ -149,7 +185,16 @@ export function AuthorContentForm({
   }
   return (
     <div className="space-y-4">
-      {organization && <p className="text-sm text-secondary">{organizationContentCopy(locale).context}: <strong>{organization.name}</strong></p>}
+      {server && (
+        <p className="text-sm text-secondary">
+          {serverContentCopy(locale).context}: <strong>{server.name}</strong>
+        </p>
+      )}
+      {organization && (
+        <p className="text-sm text-secondary">
+          {organizationContentCopy(locale).context}: <strong>{organization.name}</strong>
+        </p>
+      )}
       <p className="rounded-lg border border-base bg-inset p-4 text-sm text-muted">
         {archived ? copy.archivedNote : copy.reviewNote}
       </p>
@@ -188,9 +233,12 @@ export function AuthorContentForm({
               {copy.retry}
             </button>
           )}
-          {notice.error && organization && !saved && (
-            <Link href={workspacePath} className="inline-flex min-h-11 items-center text-sm text-accent underline">
-              {organizationContentCopy(locale).title}
+          {notice.error && (organization || server) && !saved && (
+            <Link
+              href={workspacePath}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            >
+              {server ? serverContentCopy(locale).title : organizationContentCopy(locale).title}
             </Link>
           )}
         </div>
@@ -208,7 +256,7 @@ export function AuthorContentForm({
               <label className="block space-y-1 text-sm text-secondary">
                 <span>{copy.type}</span>
                 <select name="type" className={platformFieldClass}>
-                  {writerTypes.map((type) => (
+                  {(server ? editorialTypes : writerTypes).map((type) => (
                     <option key={type} value={type}>
                       {copy[type]}
                     </option>

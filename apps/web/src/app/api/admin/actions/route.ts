@@ -33,7 +33,7 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
   z.object({ targetType: z.literal("report"), targetId: z.string().min(1), action: z.enum(["resolve", "dismiss"]), notes: z.string().trim().min(3).max(2000) }),
   z.object({ targetType: z.literal("verification"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().trim().min(3).max(2000) }),
   z.object({ targetType: z.literal("build"), targetId: z.string().min(1), action: z.enum(["approve", "reject", "quarantine", "restore"]), notes: z.string().trim().min(3).max(2000), expectedRevision: z.number().int().min(1).max(2147483646).optional() }),
-  z.object({ targetType: z.literal("content"), targetId: z.string().min(1), action: z.enum(["publish", "archive"]), notes: z.string().max(2000).optional() }),
+  z.object({ targetType: z.literal("content"), targetId: z.string().min(1).max(128), action: z.enum(["publish", "archive"]), notes: z.string().trim().min(3).max(2000), expectedUpdatedAt: z.iso.datetime() }).strict(),
 ]);
 
 export async function POST(request: NextRequest) {
@@ -179,6 +179,7 @@ export async function POST(request: NextRequest) {
         action,
         user,
         notes,
+        new Date(parsed.data.expectedUpdatedAt),
       );
       if (action === "publish" && moderated.serverId) {
         after(async () => {

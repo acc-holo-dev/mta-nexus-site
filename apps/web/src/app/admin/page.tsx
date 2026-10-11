@@ -598,7 +598,7 @@ export default async function AdminPage({
                     </div>
                   </details>
                 </div>
-                <ContentModerationControls contentId={item.id} />
+                <ContentModerationControls key={`${item.id}:${item.updatedAt.toISOString()}`} contentId={item.id} expectedUpdatedAt={item.updatedAt.toISOString()} />
               </div>
             ))
           ) : (

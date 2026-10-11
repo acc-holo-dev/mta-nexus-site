@@ -5,6 +5,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
 }));
+vi.mock("../packages/db/src/repositories/publication-notice", () => ({ publicationNotice: vi.fn() }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {

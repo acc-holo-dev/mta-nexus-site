@@ -2,8 +2,10 @@ import { eq, asc, desc, and, count, sql, inArray, ilike, or, isNull } from "driz
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { organizationWorkspaceAccess } from "./organization-workspace";
+import { serverContentAccess } from "./server-content";
+import { publicationNotice } from "./publication-notice";
 import { resourceReviewsRepository } from "./resource-reviews";
-import { auditEvents, content, comments } from "../schema";
+import { auditEvents, content, comments, users } from "../schema";
 import { AppError, NotFoundError } from "@nexus/domain";
 import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
@@ -253,30 +255,19 @@ export class ContentRepository {
     status: Content["status"],
     expectedStatus: Content["status"],
     audit: Omit<AuditEvent, "createdAt">,
+    expectedUpdatedAt?: Date,
   ): Promise<Content | null> {
     return db.transaction(async (tx) => {
+      const [current] = await tx.select().from(content).where(eq(content.id, id)).for("update").limit(1);
+      if (!current) return null;
+      const [actor] = await tx.select({ role: users.role }).from(users).where(eq(users.id, audit.actorId ?? "")).for("share").limit(1);
+      if (!actor || !["admin", "moderator"].includes(actor.role)) throw new AppError("Current moderator privilege required", 403, "FORBIDDEN");
+      if (current.status !== expectedStatus || (expectedUpdatedAt && current.updatedAt.getTime() !== expectedUpdatedAt.getTime())) return null;
       const now = new Date();
-      const rows = await tx
-        .update(content)
-        .set({
-          status,
-          publishedAt: status === "published" ? now : null,
-          updatedAt: now,
-        })
-        .where(
-          and(
-            eq(content.id, id),
-            eq(content.status, expectedStatus),
-          ),
-        )
-        .returning();
-      const updated = rows[0];
+      const [updated] = await tx.update(content).set({ status, publishedAt: status === "published" ? now : null, updatedAt: sql`greatest(clock_timestamp(), date_trunc('milliseconds', ${content.updatedAt}) + interval '1 millisecond')` }).where(eq(content.id, id)).returning();
       if (!updated) return null;
-
-      await tx.insert(auditEvents).values({
-        ...audit,
-        createdAt: now,
-      });
+      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      await publicationNotice(tx, updated as unknown as Content, audit.actorId, status === "published" ? "published" : "archived", audit.id);
       return updated as unknown as Content;
     });
   }
@@ -297,8 +288,9 @@ export class ContentRepository {
     audit: Omit<AuditEvent, "createdAt">,
   ): Promise<Content> {
     return db.transaction(async (tx) => {
+      if (data.serverId) await serverContentAccess(tx, data.serverId, data.authorId);
       if (data.organizationId) {
-        const access = await organizationWorkspaceAccess(tx, data.organizationId, data.authorId, true);
+        const access = await organizationWorkspaceAccess(tx, data.organizationId, data.authorId, "share");
         if (!["owner", "admin", "developer"].includes(access.role))
           throw new AppError("Organization publication rights revoked", 403, "FORBIDDEN");
       }
@@ -311,6 +303,7 @@ export class ContentRepository {
       if (!created) throw new Error("Content insert did not return a row");
 
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      await publicationNotice(tx, created as unknown as Content, data.authorId, "created", audit.id);
       return created as unknown as Content;
     });
   }

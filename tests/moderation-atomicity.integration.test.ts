@@ -199,7 +199,7 @@ describe("moderation atomicity integration", () => {
       email: `content_atomic_${suffix}@nexus.test`,
       username: `content_atomic_${suffix}`,
       displayName: "Content Atomic Author",
-      role: "developer",
+      role: "moderator",
     });
     await contentRepository.create({
       id: contentId,

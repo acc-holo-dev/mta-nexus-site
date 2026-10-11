@@ -5,29 +5,16 @@ import { db } from "../client";
 import { auditEvents, content, organizations, organizationMembers } from "../schema";
 import { containsPattern } from "./search-pattern";
 import { organizationWorkspaceAccess } from "./organization-workspace";
+import { serverContentAccess } from "./server-content";
+import { publicationNotice } from "./publication-notice";
 
-export type ContentSummary = Pick<
-  Content,
-  "id" | "slug" | "title" | "excerpt" | "type" | "status" | "commentCount" | "updatedAt"
->;
-export type ContentPageFilters = {
-  page?: number;
-  query?: string;
-  type?: Content["type"];
-  status?: Content["status"];
-};
+import {
+  contentSummaryColumns,
+  type ContentSummary,
+  type ContentPageFilters,
+} from "./content-summary";
 type ContentEditFields = Pick<Content, "title" | "body" | "tags"> &
   Pick<Content, "excerpt" | "coverImageUrl">;
-export const contentSummaryColumns = {
-  id: content.id,
-  slug: content.slug,
-  title: content.title,
-  excerpt: content.excerpt,
-  type: content.type,
-  status: content.status,
-  commentCount: content.commentCount,
-  updatedAt: content.updatedAt,
-};
 
 class AuthorContentRepository {
   async pageByAuthor(authorId: string, filters: ContentPageFilters = {}) {
@@ -75,21 +62,32 @@ class AuthorContentRepository {
     fields: ContentEditFields | null,
     audit: Omit<AuditEvent, "createdAt">,
     organizationId?: string,
+    serverId?: string,
   ): Promise<Content> {
     return db.transaction(async (tx) => {
       const [current] = await tx
         .select()
         .from(content)
-        .where(and(eq(content.id, id), organizationId
-          ? eq(content.organizationId, organizationId)
-          : eq(content.authorId, authorId)))
+        .where(
+          and(
+            eq(content.id, id),
+            serverId
+              ? eq(content.serverId, serverId)
+              : organizationId
+                ? eq(content.organizationId, organizationId)
+                : eq(content.authorId, authorId),
+          ),
+        )
         .for("update")
         .limit(1);
       if (!current) throw new NotFoundError("Content");
       // Organization editors share the same content-first lock order and mutation
       // rules as authors. A platform role never substitutes for current team rights.
+      if (serverId && organizationId)
+        throw new AppError("Ambiguous publication scope", 400, "VALIDATION_FAILED");
+      if (current.serverId) await serverContentAccess(tx, current.serverId, authorId);
       if (organizationId) {
-        const access = await organizationWorkspaceAccess(tx, organizationId, authorId, true);
+        const access = await organizationWorkspaceAccess(tx, organizationId, authorId, "share");
         if (!canManageOrganization(access.role))
           throw new AppError("Organization editor required", 403, "FORBIDDEN");
       }
@@ -101,7 +99,7 @@ class AuthorContentRepository {
       ) {
         throw new AppError("Content changed", 409, "CONFLICT");
       }
-      if (current.organizationId && !organizationId) {
+      if (current.organizationId && !organizationId && !serverId) {
         const [org] = await tx
           .select({ ownerId: organizations.ownerId })
           .from(organizations)
@@ -153,7 +151,18 @@ class AuthorContentRepository {
         .returning();
       await tx
         .insert(auditEvents)
-        .values({ ...audit, details: { ...audit.details, from: current.status, to: status }, createdAt: new Date() });
+        .values({
+          ...audit,
+          details: { ...audit.details, from: current.status, to: status },
+          createdAt: new Date(),
+        });
+      await publicationNotice(
+        tx,
+        updated as unknown as Content,
+        authorId,
+        fields ? "edited" : "archived",
+        audit.id,
+      );
       return updated as unknown as Content;
     });
   }

@@ -176,6 +176,7 @@ export class ContentService {
     decision: "publish" | "archive",
     actor: User,
     notes?: string,
+    expectedUpdatedAt?: Date,
   ): Promise<Content> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError("Moderator privilege is required to moderate content");
@@ -183,6 +184,8 @@ export class ContentService {
 
     const current = await contentRepository.findById(contentId);
     if (!current) throw new NotFoundError("Content", contentId);
+
+    if (expectedUpdatedAt && current.updatedAt.getTime() !== expectedUpdatedAt.getTime()) throw new AppError("Content changed before moderation", 409, "CONTENT_STATE_CHANGED");
 
     const targetStatus: Content["status"] = decision === "publish" ? "published" : "archived";
     if (current.status === targetStatus) {
@@ -202,6 +205,7 @@ export class ContentService {
         targetType: "content",
         details: { from: current.status, to: targetStatus, notes },
       },
+      expectedUpdatedAt ?? new Date(current.updatedAt),
     );
     if (!updated) {
       throw new AppError(

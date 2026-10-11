@@ -1685,3 +1685,54 @@ paging, literal search and unavailable targets. They remain unrun because
 PostgreSQL is unavailable here. Browser interaction and full production
 generation require verification. No schema, migration, commerce contract,
 dependency or workflow changed; Actions were not used.
+
+### Managed server publications, editorial notices and reviewed revisions — 2026-10-11
+
+`/workspace/servers/[id]/content`, `/new` and `/[contentId]` give current server
+managers an all-author editorial list, title/slug search, type/status filters,
+pagination, creation, editing and archiving. Server-management pages and cards
+link to it. GET/POST on `/api/workspace/servers/[id]/content` and GET/PATCH/DELETE
+on `/[contentId]` use the existing private API wrapper, strict bounded filters,
+JSON limits, rates and localized errors. The shared editor confirms server
+identity, saved fields and newer revision, with explicit uncertain-write recovery.
+New server material accepts editorial types only and enters moderator review.
+
+Read authority and bounded projections share a repeatable-read snapshot. Writes
+reuse publication schemas, the author mutation, content-first locks and observed
+status/version. Actual personal/organization owners, current administrators and
+explicit `manage_servers` delegates are checked on the server; the platform-admin
+override reads the actual account role. Legacy author and organization editors
+also recheck linked-server authority. Creation forces current server organization,
+authorship, draft state and empty counters. Editing preserves author, slug, linked
+context and discussion; archived material is read-only. Stale membership `owner`
+roles and unknown roles no longer grant server management, consistently across
+policy, managed-list SQL and server-organization choices. Ownership uses the
+actual organization row. Publication-only organization access uses share locks
+to avoid lock upgrades and preserve the server/organization ordering.
+
+Publication creation, edits, archives and moderator decisions now store
+status-only inbox notices atomically with content and audit. Recipients are the
+original author and actual context owner, deduplicated with the actor omitted;
+this does not broadcast drafts to the whole team. Existing content preferences
+are locked and checked, absent rows retain default delivery. Notice identities
+derive from audit/recipient, include no draft body or moderation notes, and link
+to the recipient's author/team/server workspace. Existing push outbox enqueue
+uses a savepoint, so push degradation cannot erase a committed inbox notice.
+RU/EN notification presentation and workspace explanations are included. Existing
+public server-follower fanout remains unchanged and best effort after publication.
+
+Content actions on `/api/admin/actions` now require the reviewed `expectedUpdatedAt`
+and a note. The moderator UI supplies its displayed revision and offers reload
+after stale or uncertain decisions. Persistence locks content and the live
+moderator role, checks status/version, advances revision monotonically and stores
+the notice. A parallel draft-to-draft edit cannot publish unreviewed text. Product,
+build and other commercial action contracts are unchanged.
+
+275 focused unit/query/HTTP/render checks across 27 files pass. TypeScript,
+touched-file Biome lint, Knip and Next webpack compile mode pass. Five new
+PostgreSQL fixtures cover persisted delegated creation and notices, competing
+team/author edits with preference opt-out, revoked server access, concurrent
+review/edit and revoked moderator authority, and rollback after inbox failure.
+They remain unrun without PostgreSQL; browser interaction and full production
+generation still require verification. No schema, migration, dependency or
+workflow changed; Actions were not used.

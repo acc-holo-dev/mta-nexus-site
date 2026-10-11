@@ -86,7 +86,6 @@ describe("atomic server create authority", () => {
   });
 
   it.each([
-    { role: "owner", permissions: [] },
     { role: "admin", permissions: [] },
     { role: "member", permissions: ["manage_servers"] },
   ])("accepts delegated rights under locked membership: %j", async (membership) => {
@@ -99,6 +98,7 @@ describe("atomic server create authority", () => {
 
   it.each([
     null,
+    { role: "owner", permissions: ["manage_servers"] },
     { role: "member", permissions: [] },
     { role: "developer", permissions: ["view_servers"] },
   ])("rejects absent or revoked membership before any inserts: %j", async (membership) => {

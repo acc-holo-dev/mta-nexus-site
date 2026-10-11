@@ -127,7 +127,6 @@ describe("owner updates revalidate authority inside the write transaction", () =
   });
 
   it.each([
-    { role: "owner", permissions: [] },
     { role: "admin", permissions: [] },
     { role: "member", permissions: ["manage_servers"] },
   ])("allows locked delegate permissions: %j", async (membership) => {
@@ -141,7 +140,7 @@ describe("owner updates revalidate authority inside the write transaction", () =
     expect(state.audited).toHaveLength(1);
   });
 
-  it.each([null, { role: "member", permissions: [] }])(
+  it.each([null, { role: "member", permissions: [] }, { role: "owner", permissions: ["manage_servers"] }])(
     "rejects revoked or missing delegated authority: %j",
     async (membership) => {
       if (!state.server) throw new Error("Missing fixture");

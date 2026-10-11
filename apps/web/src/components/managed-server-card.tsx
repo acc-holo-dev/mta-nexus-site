@@ -4,6 +4,7 @@ import type { ManagedServerItem } from "@nexus/db";
 import type { Locale } from "../lib/i18n";
 import { getManagedServerCopy } from "../lib/managed-server-view";
 import { serverStatisticsCopy } from "../lib/server-statistics-copy";
+import { serverContentCopy } from "../lib/server-content-copy";
 import { mtaLiveStatus, type MtaMasterServer } from "../lib/services/mta-master-directory-service";
 
 export function ManagedServerCard({
@@ -65,6 +66,7 @@ export function ManagedServerCard({
           )}
         </div>
         <div className="flex flex-wrap gap-3 text-xs font-semibold text-accent">
+          <Link href={`/workspace/servers/${encodeURIComponent(server.id)}/content`} className="hover:underline">{serverContentCopy(locale).title}</Link>
           <Link
             href={`/workspace/servers/${encodeURIComponent(server.id)}`}
             className="hover:underline"

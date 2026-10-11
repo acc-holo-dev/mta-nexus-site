@@ -4,8 +4,9 @@ import type { AuditEvent, Content } from "@nexus/domain";
 import { db } from "../client";
 import { auditEvents, content, users } from "../schema";
 import { organizationWorkspaceAccess } from "./organization-workspace";
-import { contentSummaryColumns, type ContentPageFilters } from "./author-content";
+import { contentSummaryColumns, type ContentPageFilters } from "./content-summary";
 import { containsPattern } from "./search-pattern";
+import { publicationNotice } from "./publication-notice";
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 async function access(tx: Transaction, organizationId: string, actorId: string, lock = false) {
   const result = await organizationWorkspaceAccess(tx, organizationId, actorId, lock);
@@ -90,10 +91,11 @@ class OrganizationContentRepository {
       const now = new Date();
       const [created] = await tx
         .insert(content)
-        .values({ ...data, organizationId, authorId: actorId, createdAt: now, updatedAt: now })
+        .values({ ...data, organizationId, authorId: actorId, serverId: null, productId: null, createdAt: now, updatedAt: now })
         .returning();
       if (!created) throw new Error("Content insert did not return a row");
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      await publicationNotice(tx, created as unknown as Content, actorId, "created", audit.id);
       return created as unknown as Content;
     });
   }

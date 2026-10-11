@@ -97,6 +97,7 @@ describe("content moderation behavior", () => {
         action: "content.published",
         details: { from: "draft", to: "published", notes: "Reviewed" },
       }),
+      new Date("2026-01-01T00:00:00.000Z"),
     );
   });
 
@@ -113,6 +114,7 @@ describe("content moderation behavior", () => {
       "archived",
       "published",
       expect.objectContaining({ action: "content.archived" }),
+      new Date("2026-01-01T00:00:00.000Z"),
     );
   });
 
@@ -124,5 +126,9 @@ describe("content moderation behavior", () => {
       statusCode: 409,
       code: "CONTENT_STATE_CHANGED",
     });
+  });
+  it("rejects a changed reviewed revision before persistence or notifications", async () => {
+    await expect(service.moderateContent("cnt_1", "publish", moderator, "Reviewed", new Date("2026-01-01T00:00:00.001Z"))).rejects.toMatchObject({ code: "CONTENT_STATE_CHANGED" });
+    expect(mocks.moderate).not.toHaveBeenCalled();
   });
 });

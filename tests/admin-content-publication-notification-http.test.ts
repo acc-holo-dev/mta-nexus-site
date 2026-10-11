@@ -95,7 +95,7 @@ vi.mock("@nexus/security", () => ({
 import { NextRequest } from "next/server";
 import { POST } from "../apps/web/src/app/api/admin/actions/route";
 
-function request(action: "publish" | "archive") {
+function request(action: "publish" | "archive", extra: Record<string, unknown> = {}) {
   return new NextRequest("http://nexus.test/api/admin/actions", {
     method: "POST",
     headers: {
@@ -103,10 +103,12 @@ function request(action: "publish" | "archive") {
       cookie: "nexus_session=test-session",
     },
     body: JSON.stringify({
+      expectedUpdatedAt: "2026-10-11T00:00:00.000Z",
       targetType: "content",
       targetId: "cnt_1",
       action,
       notes: "Reviewed",
+      ...extra,
     }),
   });
 }
@@ -165,4 +167,11 @@ describe("content publication side effects", () => {
     expect(afterMock).not.toHaveBeenCalled();
     expect(notifyFollowers).not.toHaveBeenCalled();
   });
+});
+
+it.each([{ expectedUpdatedAt: undefined }, { expectedUpdatedAt: "invalid" }, { notes: " " }, { expectedStatus: "draft" }])("requires the observed content revision, notes and strict authority fields %j", async (extra) => {
+  const response = await POST(request("publish", extra));
+  expect(response.status).toBe(400);
+  expect(moderateContent).not.toHaveBeenCalled();
+  expect(notifyFollowers).not.toHaveBeenCalled();
 });
