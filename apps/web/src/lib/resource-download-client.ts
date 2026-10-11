@@ -29,7 +29,7 @@ export async function fetchResourceDownload(
   onProgress: (received: number, total: number | null) => void,
   request: typeof fetch = fetch,
   buildId?: string,
-): Promise<{ blob: Blob; fileName: string }> {
+): Promise<{ blob: Blob; fileName: string; receiptId: string | null }> {
   signal.throwIfAborted();
   const active = new AbortController();
   const cancel = () => active.abort(signal.reason);
@@ -73,7 +73,7 @@ async function readResourceDownload(
   request: typeof fetch,
   onTransferComplete: () => void,
   buildId?: string,
-): Promise<{ blob: Blob; fileName: string }> {
+): Promise<{ blob: Blob; fileName: string; receiptId: string | null }> {
   signal.throwIfAborted();
   const response = await request(resourceDownloadUrl(productId, buildId), {
     credentials: "same-origin",
@@ -179,5 +179,7 @@ async function readResourceDownload(
   );
   signal.throwIfAborted();
   if (!validHash) throw new ResourceDownloadError("failed");
-  return { blob, fileName };
+  const receipt = response.headers.get("X-Resource-Delivery-Id");
+  const receiptId = receipt && /^dlv_[A-Za-z0-9_-]{1,124}$/u.test(receipt) ? receipt : null;
+  return { blob, fileName, receiptId };
 }

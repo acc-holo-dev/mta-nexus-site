@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Download } from "lucide-react";
 import { useNexusLocale } from "./locale-context";
+import { resourceDeliveriesCopy } from "../lib/resource-deliveries-i18n";
 import {
   fetchResourceDownload,
   ResourceDownloadError,
@@ -19,7 +20,7 @@ export function ResourceDownloadButton({
   version: string;
   buildId?: string;
 }) {
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
   const copy = dictionary.product;
   const active = useRef<AbortController | null>(null);
   const downloadUrl = useRef<string | null>(null);
@@ -27,6 +28,7 @@ export function ResourceDownloadButton({
   const [progress, setProgress] = useState<number | null>(null);
   const [failure, setFailure] = useState<DownloadFailure | null>(null);
   const [notice, setNotice] = useState<"cancelled" | "saved" | null>(null);
+  const [receipt, setReceipt] = useState<{ id: string; productId: string; buildId?: string; version: string } | null>(null);
   useEffect(
     () => () => {
       active.current?.abort();
@@ -44,6 +46,7 @@ export function ResourceDownloadButton({
     setBusy(true);
     setFailure(null);
     setNotice(null);
+    setReceipt(null);
     setProgress(null);
     try {
       const result = await fetchResourceDownload(
@@ -78,6 +81,7 @@ export function ResourceDownloadButton({
         }, 60_000);
       }
       setNotice("saved");
+      if (result.receiptId) setReceipt({ id: result.receiptId, productId, buildId, version });
     } catch (error) {
       if (active.current !== controller) return;
       if (controller.signal.aborted) setNotice("cancelled");
@@ -134,6 +138,11 @@ export function ResourceDownloadButton({
           {notice === "cancelled" ? copy.downloadCancelled : copy.downloadHandedOff}
         </p>
       )}
+      {receipt && receipt.productId === productId && receipt.buildId === buildId && receipt.version === version ? (
+        <Link href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`} className="text-sm text-accent underline">
+          {resourceDeliveriesCopy(locale).details}
+        </Link>
+      ) : null}
     </div>
   );
 }

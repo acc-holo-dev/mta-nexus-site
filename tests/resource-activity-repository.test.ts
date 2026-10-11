@@ -197,7 +197,7 @@ it("denies a revoked license at the final gate without emitting a start audit", 
     [],
   ];
   await expect(
-    downloads.authorize({ actorId: "usr_buyer", auditId: "aud_a", expected, pinned: false }),
+    downloads.authorize({ actorId: "usr_buyer", auditId: "aud_a", receiptId: "dlv_a", expected, pinned: false }),
   ).rejects.toMatchObject({ statusCode: 403 });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
   expect(state.queries.at(-1)?.params).toContain("active");
@@ -215,12 +215,12 @@ it("audits a licensed transfer only after locking current access and unchanged a
     [],
   ];
   expect(
-    await downloads.authorize({ actorId: "usr_buyer", auditId: "aud_a", expected, pinned: true }),
-  ).toEqual({ slug: "resource" });
+    await downloads.authorize({ actorId: "usr_buyer", auditId: "aud_a", receiptId: "dlv_a", expected, pinned: true }),
+  ).toEqual({ slug: "resource", receiptId: "dlv_a" });
   const audit = state.queries.at(-1);
   expect(audit?.params).toContain("product.download_started");
   expect(audit?.params).toContain(
-    JSON.stringify({ buildId: "bld_a", version: "1.0.0", pinned: true, accessSource: "license" }),
+    JSON.stringify({ buildId: "bld_a", version: "1.0.0", pinned: true, accessSource: "license", receiptId: "dlv_a" }),
   );
   expect(state.queries[4].sql).not.toContain('"key"');
   expect(state.queries[5].sql).toContain("for share");
@@ -240,7 +240,7 @@ it.each([
     [buildRow(change)],
   ];
   await expect(
-    downloads.authorize({ actorId: "usr_author", auditId: "aud_a", expected, pinned: false }),
+    downloads.authorize({ actorId: "usr_author", auditId: "aud_a", receiptId: "dlv_a", expected, pinned: false }),
   ).rejects.toMatchObject({ code: "BUILD_STATE_CHANGED" });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
@@ -254,7 +254,7 @@ it("rechecks expiry after waiting for artifact locks", async () => {
     [buildRow()],
   ];
   await expect(
-    downloads.authorize({ actorId: "usr_buyer", auditId: "aud_a", expected, pinned: false }),
+    downloads.authorize({ actorId: "usr_buyer", auditId: "aud_a", receiptId: "dlv_a", expected, pinned: false }),
   ).rejects.toMatchObject({ statusCode: 403 });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
@@ -262,7 +262,7 @@ it("rechecks expiry after waiting for artifact locks", async () => {
 it("rejects a resource archived during storage preparation", async () => {
   state.results = [[["prd_a", "resource", "archived", "usr_author", null]]];
   await expect(
-    downloads.authorize({ actorId: "usr_author", auditId: "aud_a", expected, pinned: false }),
+    downloads.authorize({ actorId: "usr_author", auditId: "aud_a", receiptId: "dlv_a", expected, pinned: false }),
   ).rejects.toMatchObject({ code: "NOT_FOUND" });
   expect(state.queries).toHaveLength(1);
 });

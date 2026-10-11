@@ -6,6 +6,7 @@ import {
   type ProductType,
   type BuildReviewNotificationData,
   type LicenseTermNotificationData,
+  type ResourceDeliveryStatus, type ResourceDeliveryError,
   type SupportCaseCategory,
   type SupportCaseStatus,
   type SupportMessageAuthorRole,
@@ -1193,4 +1194,29 @@ export const commerceOrderCases = pgTable("commerce_order_cases", {
   check("commerce_order_cases_snapshot_check", sql`coalesce(jsonb_typeof(${table.snapshot}) = 'object'
     AND ${table.snapshot}->>'confirmation' = 'recorded_only'
     AND jsonb_typeof(${table.snapshot}->'payments') = 'array' AND jsonb_array_length(${table.snapshot}->'payments') <= 20, false)`),
+]);
+
+// Private server evidence; resource/build snapshots confer no access.
+export const resourceDeliveryReceipts = pgTable("resource_delivery_receipts", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  resourceId: text("resource_id").notNull(), buildId: text("build_id").notNull(),
+  version: text("version").notNull(), sha256Hash: text("sha256_hash").notNull(),
+  expectedBytes: integer("expected_bytes").notNull(), pinned: boolean("pinned").notNull(),
+  accessSource: text("access_source").$type<"manager" | "entitlement" | "license">().notNull(),
+  status: text("status").$type<ResourceDeliveryStatus>().notNull().default("started"),
+  bytesSent: integer("bytes_sent").notNull().default(0),
+  errorCode: text("error_code").$type<ResourceDeliveryError>(),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+  finishedAt: timestamp("finished_at", { withTimezone: true }),
+}, table => [
+  index("resource_delivery_user_time_id_idx").on(table.userId, table.startedAt.desc(), table.id.desc()),
+  index("resource_delivery_user_status_time_id_idx").on(table.userId, table.status, table.startedAt.desc(), table.id.desc()),
+  index("resource_delivery_user_resource_time_id_idx").on(table.userId, table.resourceId, table.startedAt.desc(), table.id.desc()),
+  index("resource_delivery_resource_time_id_idx").on(table.resourceId, table.startedAt.desc(), table.id.desc()),
+  check("resource_delivery_size_check", sql`${table.expectedBytes} BETWEEN 1 AND 67108864 AND ${table.bytesSent} BETWEEN 0 AND ${table.expectedBytes}`),
+  check("resource_delivery_hash_check", sql`${table.sha256Hash} ~ '^[a-f0-9]{64}$'`),
+  check("resource_delivery_source_check", sql`${table.accessSource} IN ('manager','entitlement','license')`),
+  check("resource_delivery_state_check", sql`(${table.status} = 'started' AND ${table.bytesSent} = 0 AND ${table.finishedAt} IS NULL AND ${table.errorCode} IS NULL) OR (${table.status} = 'served' AND ${table.bytesSent} = ${table.expectedBytes} AND ${table.finishedAt} IS NOT NULL AND ${table.errorCode} IS NULL) OR (${table.status} = 'cancelled' AND ${table.finishedAt} IS NOT NULL AND ${table.errorCode} IS NULL) OR (${table.status} = 'failed' AND ${table.finishedAt} IS NOT NULL AND ${table.errorCode} IS NOT NULL AND ${table.errorCode} IN ('storage_error','size_mismatch','hash_mismatch'))`),
+  check("resource_delivery_time_check", sql`isfinite(${table.startedAt}) AND (${table.finishedAt} IS NULL OR (isfinite(${table.finishedAt}) AND ${table.finishedAt} >= ${table.startedAt}))`),
 ]);

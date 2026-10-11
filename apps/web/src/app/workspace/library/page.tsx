@@ -1,4 +1,5 @@
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
+import { resourceDeliveriesCopy } from "../../../lib/resource-deliveries-i18n";
 import { getResourceCommerceCopy } from "../../../lib/resource-commerce-i18n";
 import { getResourceActivityCopy } from "../../../lib/resource-activity-i18n";
 import { getResourceReleaseControlCopy } from "../../../lib/resource-release-control-i18n";
@@ -69,6 +70,7 @@ export default async function ResourceLibraryPage({
       <Link href="/workspace/cart" className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceCommerceCopy(locale).openCart}</Link>
       <Link href="/workspace/acquisitions" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceActivityCopy(locale).history}</Link>
       <Link href="/workspace/library/updates" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceReleaseControlCopy(locale).updates}</Link>
+      <Link href="/workspace/library/downloads" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{resourceDeliveriesCopy(locale).title}</Link>
       <Link href="/workspace/library/reviews" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{resourceReviewCopy(locale).own}</Link>
       <nav aria-label={copy.title} className="flex flex-wrap gap-2">
         {filters.map((value) => (

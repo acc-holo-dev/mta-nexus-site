@@ -9,6 +9,15 @@ MTA NEXUS is a player-first Multi Theft Auto: San Andreas platform for live serv
 
 ## Local development / Локальная разработка
 
+Migration `0056` records private resource delivery receipts at the final live
+authorization gate. `/workspace/library/downloads` provides RU/EN status and
+7/30/90/365-day filters, bounded page CSV, exact-version receipts and retries
+subject to current access. Streaming checks emitted size and SHA-256 and records
+server completion, cancellation or failure. Completion does not confirm browser
+file saving; interrupted result persistence remains unconfirmed. Authors see
+version aggregates without buyer identities at `/workspace/resources/[id]/deliveries`.
+Historical start audits are not converted into successful delivery evidence.
+
 Authors manage articles, news and discussions at `/workspace/content`: creation,
 version-checked edits, status/search/type filters and archival. Editorial edits
 return to moderator review; archived entries remain read-only. `/articles` and

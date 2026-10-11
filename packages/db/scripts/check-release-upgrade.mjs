@@ -62,6 +62,7 @@ const evidence = {
   licenseBindingRecoverySchemaPresent: false,
   licenseTermMaintenanceSchemaPresent: false,
   resourceMetadataReviewSchemaPresent: false,
+  resourceDeliveryReceiptsSchemaPresent: false,
   cleanupComplete: false,
 };
 
@@ -388,6 +389,12 @@ try {
   assert.equal(metadataTriggers.length, 2);
   assert.equal((await client`SELECT count(*)::integer AS total FROM products WHERE metadata_review_required`)[0].total, 0);
   evidence.resourceMetadataReviewSchemaPresent = true;
+  const deliveryIndexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname IN ('resource_delivery_user_time_id_idx','resource_delivery_user_status_time_id_idx','resource_delivery_user_resource_time_id_idx','resource_delivery_resource_time_id_idx')`;
+  assert.equal(deliveryIndexes.length, 4);
+  const deliveryTriggers = await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname = 'resource_delivery_receipts_guard'`;
+  assert.equal(deliveryTriggers.length, 1);
+  assert.equal((await client`SELECT count(*)::integer AS total FROM resource_delivery_receipts`)[0].total, 0);
+  evidence.resourceDeliveryReceiptsSchemaPresent = true;
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);

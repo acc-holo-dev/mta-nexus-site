@@ -1,5 +1,27 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Private delivery evidence and publisher version totals — 2026-10-11
+
+Migration `0056` adds immutable receipt identity and a single terminal transition,
+with account-deletion cascade, bounded indexes and no historical backfill. The
+live download authorization transaction creates the receipt and start audit
+together. The response stream checks emitted length/hash, handles cancellation
+and storage errors, and persists terminal evidence with audit through idempotent
+CAS. Result-write failure preserves uncertainty; server completion does not prove
+browser saving. Existing access, publication and scanner checks remain mandatory.
+
+RU/EN buyer history, exact-version retry, individual receipt and displayed-page
+CSV use account-scoped projections. Unavailable resources expose no current
+editorial metadata or retry. Publisher version totals support 7/30/90/365 days
+and require current personal/organization authority, with no buyer identities.
+Four disposable PostgreSQL fixtures cover atomic rollback, concurrent terminal
+results, immutable evidence and withdrawn/deleted resources; they remain unrun.
+TypeScript, 156 focused stream/SQL/HTTP/SSR/client checks, 21 migration-contract
+checks, Biome on 35 changed source files and Next.js compile mode pass locally.
+Live migration/locking, browser behavior and the pinned Node 26 runtime require
+verification. Paid settlement, monthly licensing, subscriptions and MTA DRM
+remain unfinished.
+
 ### Resource editorial review and publisher inventory — 2026-10-11
 
 Migration `0055` protects future editorial changes: titles, descriptions, tags and

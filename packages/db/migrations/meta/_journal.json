@@ -393,6 +393,13 @@
       "when": 1791741900000,
       "tag": "0055_resource_metadata_review",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1791742200000,
+      "tag": "0056_resource_delivery_receipts",
+      "breakpoints": true
     }
   ]
 }

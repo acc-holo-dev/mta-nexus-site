@@ -40,6 +40,16 @@ test("purchase case upgrade adds immutable order context without changing histor
 });
 
 const script = "packages/db/scripts/check-release-upgrade.mjs";
+test("delivery upgrade preserves uncertainty and guards immutable terminal evidence", () => {
+  const migration = readFileSync("packages/db/migrations/0056_resource_delivery_receipts.sql", "utf8");
+  assert.match(migration, /OLD\.status <> 'started'/u);
+  assert.match(migration, /NEW\.status NOT IN \('served','cancelled','failed'\)/u);
+  assert.match(migration, /NEW\.finished_at := greatest\(clock_timestamp\(\), OLD\.started_at\)/u);
+  assert.match(migration, /error_code IS NOT NULL AND error_code IN/u);
+  assert.match(migration, /expected_bytes BETWEEN 1 AND 67108864/u);
+  assert.doesNotMatch(migration, /UPDATE (orders|payments|licenses|entitlements|ledger_entries|audit_events)|INSERT INTO resource_delivery_receipts/u);
+  assert.match(readFileSync(script, "utf8"), /resourceDeliveryReceiptsSchemaPresent = true/u);
+});
 test("editorial metadata upgrade withdraws stale review without backfilling publication trust", () => {
   const migration = readFileSync("packages/db/migrations/0055_resource_metadata_review.sql", "utf8");
   assert.match(migration, /metadata_review_required boolean NOT NULL DEFAULT false/u);
@@ -151,7 +161,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0055_resource_metadata_review");
+  assert.equal(plan.targetTag, "0056_resource_delivery_receipts");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

@@ -2,6 +2,7 @@ import { ResourceLifecycleControls } from "../../../../components/resource-lifec
 import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
 import { getResourceManagementCopy } from "../../../../lib/resource-management-i18n";
 import { getResourceActivityCopy } from "../../../../lib/resource-activity-i18n";
+import { resourceDeliveriesCopy } from "../../../../lib/resource-deliveries-i18n";
 import { getResourceReleaseControlCopy } from "../../../../lib/resource-release-control-i18n";
 import { getResourcePublisherCopy } from "../../../../lib/resource-publisher-i18n";
 import Link from "next/link";
@@ -87,6 +88,9 @@ export default async function ManageResourcePage({
         </Link>
         <Link href={`/workspace/resources/${product.id}/history`} className="underline">
           {publisherCopy.history}
+        </Link>
+        <Link href={`/workspace/resources/${product.id}/deliveries`} className="underline">
+          {resourceDeliveriesCopy(locale).publisherTitle}
         </Link>
       </nav>
       <ResourceLifecycleControls

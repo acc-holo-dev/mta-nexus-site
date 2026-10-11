@@ -1,14 +1,14 @@
 import { eq } from "drizzle-orm";
 import { AppError, ForbiddenError, NotFoundError, type Build } from "@nexus/domain";
 import { db } from "../client";
-import { auditEvents, builds, products, users } from "../schema";
+import { auditEvents, builds, products, users, resourceDeliveryReceipts } from "../schema";
 import { lockUserDownloadAccess } from "./entitlements";
 import { assertProductMutationAuthority } from "./product-mutation-authority";
 
 export class ResourceDownloadAuthorizationRepository {
   /** Final gate after opening storage. Locks live access and exact build evidence
    * through the start audit; revocation denies subsequent transfers. */
-  async authorize(input: { actorId: string; auditId: string; expected: Build; pinned: boolean }) {
+  async authorize(input: { actorId: string; auditId: string; receiptId: string; expected: Build; pinned: boolean }) {
     return db.transaction(async (tx) => {
       const [product] = await tx
         .select({
@@ -73,6 +73,11 @@ export class ResourceDownloadAuthorizationRepository {
         throw new AppError("Build changed; reload before downloading", 409, "BUILD_STATE_CHANGED");
       if (accessExpiresAt && new Date(accessExpiresAt).getTime() <= Date.now())
         throw new ForbiddenError("Current download access is required");
+      await tx.insert(resourceDeliveryReceipts).values({
+        id: input.receiptId, userId: input.actorId, resourceId: product.id,
+        buildId: build.id, version: build.version, sha256Hash: build.sha256Hash,
+        expectedBytes: build.fileSizeBytes, pinned: input.pinned, accessSource,
+      });
       await tx
         .insert(auditEvents)
         .values({
@@ -87,9 +92,10 @@ export class ResourceDownloadAuthorizationRepository {
             version: build.version,
             pinned: input.pinned,
             accessSource,
+            receiptId: input.receiptId,
           },
         });
-      return { slug: product.slug };
+      return { slug: product.slug, receiptId: input.receiptId };
     });
   }
 }

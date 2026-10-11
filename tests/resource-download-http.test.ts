@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { Readable } from "node:stream";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
@@ -35,6 +36,7 @@ const state = vi.hoisted(() => ({
 }));
 
 const auditRecord = vi.hoisted(() => vi.fn(async (_input?: unknown) => undefined));
+const deliveryFinish = vi.hoisted(() => vi.fn(async (_input?: unknown) => null));
 const downloadStream = vi.hoisted(() => vi.fn());
 const findLatestPublishedBuild = vi.hoisted(() => vi.fn());
 const findPinnedPublishedBuild = vi.hoisted(() => vi.fn());
@@ -65,11 +67,12 @@ vi.mock("@nexus/db", () => ({
     findLatestPublishedByProduct: findLatestPublishedBuild,
     findPublishedByProductAndId: findPinnedPublishedBuild,
   },
+  resourceDeliveriesRepository: { finish: deliveryFinish },
   auditRepository: {
     record: auditRecord,
   },
   resourceDownloadAuthorizationRepository: {
-    authorize: async (input: unknown) => { await auditRecord(input); return { slug: state.product?.slug ?? "http-resource" }; },
+    authorize: async (input: unknown) => { await auditRecord(input); return { slug: state.product?.slug ?? "http-resource", receiptId: "dlv_http" }; },
   },
 }));
 
@@ -127,7 +130,7 @@ describe("resource download HTTP contract", () => {
       scanner: "test-scanner",
       scannedAt: new Date(),
       storageKey: "assets/http-resource.zip",
-      sha256Hash: "a".repeat(64),
+      sha256Hash: createHash("sha256").update("nexus-build").digest("hex"),
       fileName: "http-resource.zip",
       fileSizeBytes: Buffer.byteLength("nexus-build"),
       mimeType: "application/zip",
@@ -166,6 +169,19 @@ describe("resource download HTTP contract", () => {
       error: "Authentication required to download resource builds",
     });
     expect(downloadStream).not.toHaveBeenCalled();
+  });
+  it("records cancellation if the signal aborts after durable authorization but before headers", async () => {
+    const abort = new AbortController();
+    auditRecord.mockImplementationOnce(async () => { abort.abort(); });
+    const response = await GET(new NextRequest("http://nexus.test/api/products/prd_http/download", { signal: abort.signal }), context);
+    expect(response.status).toBe(499);
+    expect(deliveryFinish).toHaveBeenCalledWith(expect.objectContaining({ userId: "usr_player", receiptId: "dlv_http", result: { status: "cancelled", bytesSent: 0, errorCode: null } }));
+  });
+  it("records cancellation of an unread response without claiming a full transfer", async () => {
+    const response = await GET(request(), context);
+    expect(response.headers.get("X-Resource-Delivery-Id")).toBe("dlv_http");
+    await response.body?.cancel();
+    expect(deliveryFinish).toHaveBeenCalledWith(expect.objectContaining({ result: { status: "cancelled", bytesSent: 0, errorCode: null } }));
   });
 
   it("returns 404 for an unpublished resource even with entitlement", async () => {
@@ -351,7 +367,7 @@ describe("resource download HTTP contract", () => {
     const response = await GET(request(), context);
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("X-Content-SHA256")).toBe("a".repeat(64));
+    expect(response.headers.get("X-Content-SHA256")).toBe(createHash("sha256").update("nexus-build").digest("hex"));
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
     expect(response.headers.get("X-Request-Id")).toMatch(
@@ -365,6 +381,7 @@ describe("resource download HTTP contract", () => {
       'filename="http-resource-1.2.3.zip"',
     );
     expect(Buffer.from(await response.arrayBuffer()).toString("utf8")).toBe("nexus-build");
+    expect(deliveryFinish).toHaveBeenCalledWith(expect.objectContaining({ result: { status: "served", bytesSent: 11, errorCode: null } }));
     expect(downloadStream).toHaveBeenCalledWith("assets/http-resource.zip", expect.any(AbortSignal));
     expect(auditRecord).toHaveBeenCalledTimes(1);
     expect(auditRecord).toHaveBeenCalledWith(
@@ -406,7 +423,7 @@ describe("pinned historical build downloads", () => {
       scanner: "test-scanner",
       scannedAt: new Date(),
       storageKey: "assets/old-resource.zip",
-      sha256Hash: "a".repeat(64),
+      sha256Hash: createHash("sha256").update("historical").digest("hex"),
       fileName: "historical-resource.zip",
       fileSizeBytes: Buffer.byteLength("historical"),
       mimeType: "application/zip",
@@ -432,7 +449,7 @@ describe("pinned historical build downloads", () => {
     const response = await GET(pinned(), context);
     expect(response.status).toBe(200);
     expect(response.headers.get("X-Resource-Build-Id")).toBe("bld_historical_1");
-    expect(response.headers.get("X-Content-SHA256")).toBe("a".repeat(64));
+    expect(response.headers.get("X-Content-SHA256")).toBe(createHash("sha256").update("historical").digest("hex"));
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Content-Disposition")).toContain("http-resource-1.0.0.zip");
     expect(findPinnedPublishedBuild).toHaveBeenCalledWith("prd_http", "bld_historical_1");

@@ -16,6 +16,11 @@ const response = (body = "archive", headers: Record<string, string> = {}) =>
   } });
 
 describe("browser resource download preparation", () => {
+  it.each(["dlv_receipt", "../private", "usr_other", "dlv_bad\n", ""])("accepts only safe optional receipt links after byte verification: %j", async (id) => {
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(response("archive", { "X-Resource-Delivery-Id": id.replaceAll("\n", "%0A") }));
+    const result = await fetchResourceDownload("prd_a", controller().signal, vi.fn(), fetcher);
+    expect(result.receiptId).toBe(id === "dlv_receipt" ? id : null);
+  });
   it("fetches privately and returns complete bytes with the server filename", async () => {
     const fetcher = vi
       .fn<typeof fetch>()
@@ -398,7 +403,7 @@ describe("explicit version download URL", () => {
 
 describe("SHA-256 verification before saving", () => {
 
-  it.each([null, "invalid", "a".repeat(63), "a".repeat(65), "a".repeat(64) + ", " + "b".repeat(64)])(
+  it.each([null, "invalid", "a".repeat(63), "a".repeat(65), `${"a".repeat(64)}, ${"b".repeat(64)}`])(
     "rejects invalid digest headers before reading archive bytes: %s",
     async (digest) => {
       const cancelled = vi.fn();

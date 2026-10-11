@@ -13,7 +13,8 @@ import {
   assertBuildDownloadMetadata,
   BuildArtifactMismatchError,
 } from "../../../../../lib/build-download-metadata";
-import { toDownloadWebStream } from "../../../../../lib/download-web-stream";
+import { resourceDeliveryStream } from "../../../../../lib/resource-delivery-stream";
+import { resourceDeliveriesService } from "../../../../../lib/services/resource-deliveries-service";
 import {
   REQUEST_ID_HEADER,
   createRequestLogContext,
@@ -185,11 +186,15 @@ export async function GET(
         selectedBuild,
       );
 
-    let authorized: { slug: string };
+    let authorized: { slug: string; receiptId: string } | undefined;
+    const recordFailure = (error: unknown) => logRequestEvent({
+      level: "error", event: "product.download_receipt_failed", context, error,
+    });
     try {
       request.signal.throwIfAborted();
       authorized = await resourceDownloadAuthorizationRepository.authorize({
         auditId: generateId("aud"),
+        receiptId: generateId("dlv"),
         actorId: user.id,
         expected: selectedBuild,
         pinned: selection.kind === "pinned",
@@ -197,11 +202,19 @@ export async function GET(
       request.signal.throwIfAborted();
     } catch (error) {
       destroyOpenedStream(stored.stream);
+      if (authorized) await resourceDeliveriesService.finish(user.id, authorized.receiptId, {
+        status: "cancelled", bytesSent: 0, errorCode: null,
+      }).catch(recordFailure);
       throw error;
     }
 
-    const stream =
-      toDownloadWebStream(stored.stream);
+    const receiptId = authorized.receiptId;
+    const stream = resourceDeliveryStream({
+      source: stored.stream, expectedBytes: contentLength, sha256Hash: selectedBuild.sha256Hash,
+      signal: request.signal,
+      finish: (result) => resourceDeliveriesService.finish(user.id, receiptId, result),
+      recordFailure,
+    });
     const fileName = resourceAttachmentFileName(
       authorized.slug,
       selectedBuild.version,
@@ -220,6 +233,7 @@ export async function GET(
         "X-Content-SHA256":
           selectedBuild.sha256Hash,
         "X-Resource-Build-Id": selectedBuild.id,
+        "X-Resource-Delivery-Id": authorized.receiptId,
         ...privateHeaders,
         "X-Content-Type-Options": "nosniff",
         [REQUEST_ID_HEADER]: context.requestId,

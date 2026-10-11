@@ -26,6 +26,7 @@ export type EntityPrefix =
   | "fol"
   | "not"
   | "aud"
+  | "dlv"
   | "rpt"
   | "mod"
   | "ses"
