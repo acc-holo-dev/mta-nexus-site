@@ -1,9 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import {
-  buildRepository,
-  productRepository,
-  userRepository,
-} from "@nexus/db";
+import { buildRepository, productRepository, userRepository } from "@nexus/db";
 
 describe("published build/currentVersion consistency", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -85,6 +81,7 @@ describe("published build/currentVersion consistency", () => {
         targetId: newerBuildId,
         targetType: "build",
       },
+      1,
     );
     expect(newer?.status).toBe("published");
 
@@ -99,13 +96,12 @@ describe("published build/currentVersion consistency", () => {
         targetId: olderBuildId,
         targetType: "build",
       },
+      1,
     );
     expect(older?.status).toBe("published");
 
     const product = await productRepository.findById(productId);
-    const latest = await buildRepository.findLatestPublishedByProduct(
-      productId,
-    );
+    const latest = await buildRepository.findLatestPublishedByProduct(productId);
 
     expect(latest?.id).toBe(newerBuildId);
     expect(latest?.version).toBe("2.0.0");
@@ -169,52 +165,54 @@ describe("published build/currentVersion consistency", () => {
     });
 
     await Promise.all([
-      buildRepository.moderatePending(firstId, "approve", {
-        id: `aud_concurrent_a_${suffix}`,
-        actorId: authorId,
-        actorType: "admin",
-        action: "build.approved",
-        targetId: firstId,
-        targetType: "build",
-      }),
-      buildRepository.moderatePending(secondId, "approve", {
-        id: `aud_concurrent_z_${suffix}`,
-        actorId: authorId,
-        actorType: "admin",
-        action: "build.approved",
-        targetId: secondId,
-        targetType: "build",
-      }),
+      buildRepository.moderatePending(
+        firstId,
+        "approve",
+        {
+          id: `aud_concurrent_a_${suffix}`,
+          actorId: authorId,
+          actorType: "admin",
+          action: "build.approved",
+          targetId: firstId,
+          targetType: "build",
+        },
+        1,
+      ),
+      buildRepository.moderatePending(
+        secondId,
+        "approve",
+        {
+          id: `aud_concurrent_z_${suffix}`,
+          actorId: authorId,
+          actorType: "admin",
+          action: "build.approved",
+          targetId: secondId,
+          targetType: "build",
+        },
+        1,
+      ),
     ]);
 
     const product = await productRepository.findById(concurrentProductId);
-    const latest = await buildRepository.findLatestPublishedByProduct(
-      concurrentProductId,
-    );
+    const latest = await buildRepository.findLatestPublishedByProduct(concurrentProductId);
 
     expect(latest?.id).toBe(secondId);
     expect(product?.currentVersion).toBe(latest?.version);
   });
 
   it("moves currentVersion to the same fallback that download will resolve after retirement", async () => {
-    const retired = await buildRepository.retireAndRefreshProduct(
-      newerBuildId,
-      "published",
-      {
-        id: `aud_retire_${suffix}`,
-        actorId: authorId,
-        actorType: "admin",
-        action: "build.retired",
-        targetId: newerBuildId,
-        targetType: "build",
-      },
-    );
+    const retired = await buildRepository.retireAndRefreshProduct(newerBuildId, "published", {
+      id: `aud_retire_${suffix}`,
+      actorId: authorId,
+      actorType: "admin",
+      action: "build.retired",
+      targetId: newerBuildId,
+      targetType: "build",
+    });
     expect(retired?.status).toBe("retired");
 
     const product = await productRepository.findById(productId);
-    const latest = await buildRepository.findLatestPublishedByProduct(
-      productId,
-    );
+    const latest = await buildRepository.findLatestPublishedByProduct(productId);
 
     expect(latest?.id).toBe(olderBuildId);
     expect(latest?.version).toBe("1.0.0");

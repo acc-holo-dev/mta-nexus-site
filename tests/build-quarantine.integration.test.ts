@@ -1,10 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import {
-  auditRepository,
-  buildRepository,
-  productRepository,
-  userRepository,
-} from "@nexus/db";
+import { auditRepository, buildRepository, productRepository, userRepository } from "@nexus/db";
 
 describe("build quarantine lifecycle", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -70,14 +65,19 @@ describe("build quarantine lifecycle", () => {
         scannedAt: new Date(),
         isSigned: false,
       });
-      await buildRepository.moderatePending(id, "approve", {
-        id: `aud_approve_${id}`,
-        actorId: moderatorId,
-        actorType: "admin",
-        action: "build.approved",
-        targetId: id,
-        targetType: "build",
-      });
+      await buildRepository.moderatePending(
+        id,
+        "approve",
+        {
+          id: `aud_approve_${id}`,
+          actorId: moderatorId,
+          actorType: "admin",
+          action: "build.approved",
+          targetId: id,
+          targetType: "build",
+        },
+        1,
+      );
     }
   });
 
@@ -113,18 +113,15 @@ describe("build quarantine lifecycle", () => {
   });
 
   it("restores only through the trusted-clean publication path and clears live quarantine metadata", async () => {
-    const restored = await buildRepository.restoreQuarantinedAndRefreshProduct(
-      newBuildId,
-      {
-        id: `aud_restore_${suffix}`,
-        actorId: moderatorId,
-        actorType: "admin",
-        action: "build.quarantine_restored",
-        targetId: newBuildId,
-        targetType: "build",
-        details: { reason: "Investigation cleared the build" },
-      },
-    );
+    const restored = await buildRepository.restoreQuarantinedAndRefreshProduct(newBuildId, {
+      id: `aud_restore_${suffix}`,
+      actorId: moderatorId,
+      actorType: "admin",
+      action: "build.quarantine_restored",
+      targetId: newBuildId,
+      targetType: "build",
+      details: { reason: "Investigation cleared the build" },
+    });
 
     expect(restored).toMatchObject({
       status: "published",
@@ -140,13 +137,13 @@ describe("build quarantine lifecycle", () => {
     expect(product?.currentVersion).toBe("2.0.0");
 
     const audit = await auditRepository.listRecent(100);
-    expect(audit.some((event) =>
-      event.targetId === newBuildId &&
-      event.action === "build.quarantined"
-    )).toBe(true);
-    expect(audit.some((event) =>
-      event.targetId === newBuildId &&
-      event.action === "build.quarantine_restored"
-    )).toBe(true);
+    expect(
+      audit.some((event) => event.targetId === newBuildId && event.action === "build.quarantined"),
+    ).toBe(true);
+    expect(
+      audit.some(
+        (event) => event.targetId === newBuildId && event.action === "build.quarantine_restored",
+      ),
+    ).toBe(true);
   });
 });

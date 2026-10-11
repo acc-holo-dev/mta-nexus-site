@@ -97,7 +97,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0050_resource_review_lifecycle");
+  assert.equal(plan.targetTag, "0051_resource_build_workspace");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -229,4 +229,19 @@ test("review upgrade preserves legacy evidence and indexes separate commercial q
   const rehearsal = readFileSync(script, "utf8");
   assert.match(rehearsal, /legacyReview\[0\]\.review_access_source, null/u);
   assert.match(rehearsal, /resourceReviewSchemaPresent = true/u);
+});
+
+
+test("build workspace upgrade preserves identity and adds monotonic revisions and profile preferences", () => {
+  const migration = readFileSync(new URL("0051_resource_build_workspace.sql", migrationsUrl), "utf8");
+  assert.match(migration, /ADD COLUMN revision integer NOT NULL DEFAULT 1/u);
+  assert.match(migration, /NEW\.revision := OLD\.revision \+ 1/u);
+  assert.match(migration, /Uploaded build identity is immutable/u);
+  assert.match(migration, /OLD\.status IN \('draft', 'rejected'\)/u);
+  assert.match(migration, /CREATE TABLE user_profile_preferences/u);
+  assert.match(migration, /show_professional_contacts boolean NOT NULL DEFAULT true/u);
+  const rehearsal = readFileSync(new URL("../../packages/db/scripts/check-release-upgrade.mjs", import.meta.url), "utf8");
+  assert.match(rehearsal, /- 'revision'/u);
+  assert.match(rehearsal, /resourceBuildWorkspaceSchemaPresent/u);
+  assert.equal((rehearsal.match(/VALUES \('upgrade-review'/gu) ?? []).length, 1);
 });

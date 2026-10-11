@@ -384,7 +384,7 @@ export class ProductService {
     return build;
   }
   async reviewBuild(
-    input: { buildId: string; decision: "approve" | "reject"; notes?: string },
+    input: { buildId: string; decision: "approve" | "reject"; notes?: string; expectedRevision: number },
     actor: User
   ): Promise<Build> {
     if (!can(actor, "admin.moderation")) {
@@ -397,6 +397,9 @@ export class ProductService {
       throw new AppError("Only pending builds can be reviewed", 409, "BUILD_NOT_PENDING_REVIEW");
     }
 
+    if (!Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 1 || build.revision !== input.expectedRevision) {
+      throw new AppError("Build changed; reload before reviewing", 409, "BUILD_REVISION_CONFLICT");
+    }
     const product = await productRepository.findById(build.productId);
     if (!product) throw new NotFoundError("Product", build.productId);
     if (
@@ -421,8 +424,8 @@ export class ProductService {
       action: input.decision === "approve" ? "build.approved" : "build.rejected",
       targetId: build.id,
       targetType: "build",
-      details: { productId: product.id, version: build.version, notes: input.notes },
-    });
+      details: { productId: product.id, version: build.version, notes: input.notes, expectedRevision: input.expectedRevision },
+    }, input.expectedRevision);
     if (!reviewed) {
       throw new AppError(
         "Build state changed before moderation completed",

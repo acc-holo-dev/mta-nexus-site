@@ -115,7 +115,7 @@ try {
       const rowJson = table === "notifications"
         ? "to_jsonb(t) - 'data'"
         : table === "builds"
-          ? "to_jsonb(t) - 'quarantine_previous_status' - 'quarantine_reason' - 'quarantined_at' - 'quarantined_by'"
+          ? "to_jsonb(t) - 'quarantine_previous_status' - 'quarantine_reason' - 'quarantined_at' - 'quarantined_by' - 'revision'"
           : table === "server_claim_challenges"
             ? "to_jsonb(t) - 'endpoint_revision' - 'claim_scope_recorded' - 'claim_organization_id'"
             : table === "servers"
@@ -338,6 +338,15 @@ try {
     AND conname IN ('comments_review_status_check', 'comments_review_revision_check', 'comments_review_source_check', 'comments_review_target_check')`;
   assert.equal(reviewConstraints.length, 4);
   evidence.resourceReviewSchemaPresent = true;
+  const versionRevision = await client`SELECT revision FROM builds WHERE id = 'upgrade-build'`;
+  assert.equal(versionRevision[0].revision, 1);
+  const buildTrigger = await client`SELECT tgname FROM pg_trigger WHERE tgrelid = 'public.builds'::regclass
+    AND tgname = 'builds_workspace_revision' AND NOT tgisinternal`;
+  assert.equal(buildTrigger.length, 1);
+  const privacyColumns = await client`SELECT column_name FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'user_profile_preferences'`;
+  assert.equal(privacyColumns.length, 3);
+  evidence.resourceBuildWorkspaceSchemaPresent = true;
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);
@@ -354,8 +363,6 @@ try {
   const data = { kind: "build_review", decision: "approve", resourceTitle: "Existing resource", version: "1.0.0", notes: "Reviewed" };
   // Drizzle changes this client's JSON serializers. Bind serialized JSON as
   // text and cast explicitly instead of using postgres.js's original json helper.
-  await client`INSERT INTO comments (id, product_id, author_id, text, is_verified_purchase, rating)
-    VALUES ('upgrade-review', 'upgrade-resource', 'upgrade-user', 'Preserved legacy review', true, NULL)`;
   await client`INSERT INTO notifications (id, recipient_id, title, message, data)
     VALUES ('upgrade-new-notification', 'upgrade-user', 'Review', 'Approved', ${JSON.stringify(data)}::jsonb)`;
   const added = await client`SELECT data FROM notifications WHERE id = 'upgrade-new-notification'`;

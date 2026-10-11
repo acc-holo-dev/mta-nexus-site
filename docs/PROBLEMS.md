@@ -1519,3 +1519,26 @@ separate verification. This block adds no schema, migration, npm dependency or
 workflow and does not use Actions. Requester notification preference checks use
 the existing transaction-scoped preference lock. The profile-privacy contract
 above still requires integration by Agent A.
+
+### Resource version workspace — 2026-10-11 (Agent A)
+
+Draft/rejected metadata edits, pending-review withdrawal, clean-archive resubmission and
+revision-checked retirement now have private RU/EN pages and bounded JSON APIs. Current
+personal/organization authority is locked with the product/build; state, product version
+fallback and audit commit together. Other pending/published builds keep their proper scope.
+Approval/rejection requires the reviewer-observed revision, preventing pending-state ABA.
+Migration 0051 adds automatic revisions for existing writers and immutable upload identity;
+only the two exact development fixture identities retain their explicit seed metadata repair.
+Version history is bounded to the latest 20 events and omits account/network/storage fields.
+Uncertain client acknowledgements require reloading persisted state.
+
+The Agent B `user_profile_preferences` schema contract above is fulfilled by migration 0051
+and the exported `userProfilePreferences` table. Preference UI/API and visibility filtering
+remain Agent B's scope; writes must advance the shared `users.updated_at` revision atomically.
+The upgrade rehearsal now targets 0051, preserves legacy build/review rows, and checks the
+trigger/privacy schema; a duplicate legacy-review insert in the rehearsal was fixed.
+Six PostgreSQL fixtures cover ABA moderation, competing edits, immutable identity, pending
+fallback, audit rollback and the demo repair scope. They remain unrun without PostgreSQL.
+TypeScript, focused unit/HTTP/render checks, Biome lint, local upgrade-contract checks and
+Next webpack compile mode pass. Live database/browser and full production generation remain
+unverified; migration 0051 must be applied before serving these routes. No Actions were used.

@@ -56,7 +56,7 @@ describe("free resource delivery lifecycle", () => {
         screenshots: [],
         compatibility: { mtaMinVersion: "1.6.0" },
       },
-      author
+      author,
     );
   });
 
@@ -90,14 +90,19 @@ describe("free resource delivery lifecycle", () => {
         scanner: "integration-fixture",
         scannedAt: new Date(),
       },
-      author
+      author,
     );
     expect(build.status).toBe("pending_review");
     expect(build.isSigned).toBe(false);
 
     const approved = await productService.reviewBuild(
-      { buildId: build.id, decision: "approve", notes: "Archive verified for closed beta" },
-      moderator
+      {
+        buildId: build.id,
+        expectedRevision: Number(build.revision),
+        decision: "approve",
+        notes: "Archive verified for closed beta",
+      },
+      moderator,
     );
     expect(approved.status).toBe("published");
 

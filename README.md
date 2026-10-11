@@ -351,3 +351,10 @@ idempotent immutable batches, separate currency balancing, sorted order/account
 locks and PostgreSQL-computed balances. Apply migration `0049_financial_journal`.
 Paid checkout, automatic commissions, seven-day hold allocation and payouts remain
 disabled; a balanced journal is accounting evidence, not provider settlement.
+
+Resource version workspaces: publishers can withdraw a pending version, edit draft/rejected
+release notes and MTA targets, resubmit a provenance-backed clean archive, and retire a
+version at `/workspace/resources/[id]/builds/[buildId]`. Staff inspect the bounded decision
+history at `/admin/resources/[id]/builds/[buildId]`. Author commands and approval/rejection
+require the observed build revision; migration `0051_resource_build_workspace` is required.
+Uploaded archives/version identifiers stay immutable. Changing files requires a new upload.

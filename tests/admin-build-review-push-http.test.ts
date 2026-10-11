@@ -10,9 +10,7 @@ const reviewBuild = vi.hoisted(() =>
 );
 
 vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>(
-    "next/server",
-  );
+  const actual = await vi.importActual<typeof import("next/server")>("next/server");
   return { ...actual, after: afterMock };
 });
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -34,10 +32,9 @@ vi.mock("../apps/web/src/lib/services/product-service", () => ({
 vi.mock("../apps/web/src/lib/services/content-service", () => ({
   contentService: { moderateContent: vi.fn() },
 }));
-vi.mock(
-  "../apps/web/src/lib/services/server-follow-notification-service",
-  () => ({ notifyServerFollowersOfPublishedContent: vi.fn() }),
-);
+vi.mock("../apps/web/src/lib/services/server-follow-notification-service", () => ({
+  notifyServerFollowersOfPublishedContent: vi.fn(),
+}));
 vi.mock("@nexus/db", () => ({
   productRepository: {
     updateWithAudit: vi.fn(),
@@ -70,6 +67,7 @@ function request(action: "approve" | "reject" | "quarantine") {
     body: JSON.stringify({
       targetType: "build",
       targetId: "bld_1",
+      expectedRevision: 1,
       action,
       notes: "Reviewed build",
     }),
@@ -90,6 +88,7 @@ describe("build review durable push scheduling", () => {
         {
           buildId: "bld_1",
           decision: action,
+          expectedRevision: 1,
           notes: "Reviewed build",
         },
         expect.objectContaining({ id: "usr_mod" }),

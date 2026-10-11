@@ -413,7 +413,12 @@ export default async function AdminPage({
                           : "warning"
                     }
                   />
+                  <Link href={`/admin/resources/${build.productId}/builds/${build.id}`} className="text-accent underline text-xs">
+                    {locale === "ru" ? "Версия и история решений" : "Version and decision history"}
+                  </Link>
                   <BuildModerationControls
+                    key={`${build.id}:${build.revision}`}
+                    expectedRevision={build.revision}
                     buildId={build.id}
                     scanStatus={build.scanStatus}
                     hasScanProvenance={Boolean(

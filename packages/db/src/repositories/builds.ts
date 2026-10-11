@@ -54,8 +54,11 @@ export class BuildRepository {
           "build.retired",
           "build.quarantined",
           "build.quarantine_restored",
+          "build.metadata_saved",
+          "build.review_withdrawn",
+          "build.review_resubmitted",
         ])))
-      .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id)) : [];
+      .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id)).limit(200) : [];
     return { builds: rows as unknown as Build[], decisions, page, totalPages };
   }
 
@@ -297,8 +300,11 @@ export class BuildRepository {
   async moderatePending(
     id: string,
     decision: "approve" | "reject",
-    audit: Omit<AuditEvent, "createdAt">
+    audit: Omit<AuditEvent, "createdAt">,
+    expectedRevision: number,
   ): Promise<Build | null> {
+    if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1)
+      throw new AppError("Observed build revision is required", 400, "BUILD_REVISION_REQUIRED");
     return db.transaction(async (tx) => {
       const [target] = await tx
         .select({ productId: builds.productId })
@@ -330,9 +336,11 @@ export class BuildRepository {
           ? and(
               eq(builds.id, id),
               eq(builds.status, "pending_review"),
+              eq(builds.revision, expectedRevision),
               trustedCleanScanCondition(),
             )
-          : and(eq(builds.id, id), eq(builds.status, "pending_review"));
+          : and(eq(builds.id, id), eq(builds.status, "pending_review"),
+              eq(builds.revision, expectedRevision));
 
       const rows = await tx
         .update(builds)

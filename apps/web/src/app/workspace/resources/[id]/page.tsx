@@ -11,7 +11,8 @@ import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
-import { AuthorResourceForms, RetireBuildForm } from "../../../../components/author-resource-forms";
+import { getResourceBuildWorkspaceCopy } from "../../../../lib/resource-build-workspace-i18n";
+import { AuthorResourceForms } from "../../../../components/author-resource-forms";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -43,13 +44,11 @@ export default async function ManageResourcePage({
   const product = await productService.getManagedProduct(id, actor);
   if (!product) notFound();
   const [history, lifecycleHistory] = await Promise.all([
-    productService.getManagedHistory(
-    id,
-    actor,
-    Number((await searchParams).page ?? 1)),
+    productService.getManagedHistory(id, actor, Number((await searchParams).page ?? 1)),
     productService.getResourceLifecycleHistory(id, actor),
   ]);
   const commerceCopy = getResourceCommerceCopy(locale);
+  const buildCopy = getResourceBuildWorkspaceCopy(locale);
   const managementCopy = getResourceManagementCopy(locale);
   return (
     <div className="space-y-8">
@@ -65,11 +64,22 @@ export default async function ManageResourcePage({
           {copy.preview}
         </Link>
       </header>
-      <nav className="flex flex-wrap gap-4 text-sm text-accent" aria-label={managementCopy.variants}>
-        <Link href={`/workspace/resources/${product.id}/variants`} className="underline">{managementCopy.variants}</Link>
-        <Link href={`/workspace/resources/${product.id}/compatibility`} className="underline">{managementCopy.compatibility}</Link>
-        <Link href={`/workspace/resources/${product.id}/activity`} className="underline">{getResourceActivityCopy(locale).analytics}</Link>
-        <Link href={`/workspace/resources/${product.id}/moderation`} className="underline">{getResourceReleaseControlCopy(locale).moderationHistory}</Link>
+      <nav
+        className="flex flex-wrap gap-4 text-sm text-accent"
+        aria-label={managementCopy.variants}
+      >
+        <Link href={`/workspace/resources/${product.id}/variants`} className="underline">
+          {managementCopy.variants}
+        </Link>
+        <Link href={`/workspace/resources/${product.id}/compatibility`} className="underline">
+          {managementCopy.compatibility}
+        </Link>
+        <Link href={`/workspace/resources/${product.id}/activity`} className="underline">
+          {getResourceActivityCopy(locale).analytics}
+        </Link>
+        <Link href={`/workspace/resources/${product.id}/moderation`} className="underline">
+          {getResourceReleaseControlCopy(locale).moderationHistory}
+        </Link>
       </nav>
       <ResourceLifecycleControls
         key={`lifecycle:${product.id}:${product.status}:${new Date(product.updatedAt).toISOString()}`}
@@ -160,15 +170,8 @@ export default async function ManageResourcePage({
                   >
                     <p>
                       {copy.notes} ·{" "}
-                      {decision.action === "build.approved"
-                        ? copy.buildLabels.published
-                        : decision.action === "build.rejected"
-                          ? copy.buildLabels.rejected
-                          : decision.action === "build.quarantined"
-                            ? copy.buildLabels.quarantined
-                            : decision.action === "build.quarantine_restored"
-                              ? copy.quarantineRestored
-                              : copy.buildLabels.retired}
+                      {buildCopy.actions[decision.action as keyof typeof buildCopy.actions] ??
+                        decision.action}
                     </p>
                     <p className="whitespace-pre-wrap break-words">
                       {typeof decision.details?.notes === "string"
@@ -179,9 +182,12 @@ export default async function ManageResourcePage({
                     </p>
                   </div>
                 ))}
-              {build.status !== "retired" && build.status !== "quarantined" && (
-                <RetireBuildForm productId={id} buildId={build.id} version={build.version} />
-              )}
+              <Link
+                href={`/workspace/resources/${id}/builds/${build.id}`}
+                className="text-sm text-accent underline"
+              >
+                {buildCopy.manage}
+              </Link>
             </li>
           ))}
         </ul>

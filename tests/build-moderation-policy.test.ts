@@ -68,6 +68,7 @@ function build(overrides: Partial<Build> = {}): Build {
   return {
     id: "bld_1",
     productId: "prd_1",
+    revision: 1,
     version: "1.0.0",
     releaseNotes: "Release",
     status: "pending_review",
@@ -107,7 +108,7 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", decision: "approve", notes: "Reviewed" },
+        { buildId: "bld_1", expectedRevision: 1, decision: "approve", notes: "Reviewed" },
         moderator,
       ),
     ).rejects.toMatchObject({ statusCode: 403 });
@@ -119,7 +120,7 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", decision: "approve", notes: "Reviewed" },
+        { buildId: "bld_1", expectedRevision: 1, decision: "approve", notes: "Reviewed" },
         moderator,
       ),
     ).rejects.toMatchObject({
@@ -138,7 +139,7 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", decision: "approve", notes: "Reviewed" },
+        { buildId: "bld_1", expectedRevision: 1, decision: "approve", notes: "Reviewed" },
         moderator,
       ),
     ).rejects.toMatchObject({
@@ -153,7 +154,7 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", decision: "reject", notes: "Reviewed" },
+        { buildId: "bld_1", expectedRevision: 1, decision: "reject", notes: "Reviewed" },
         moderator,
       ),
     ).rejects.toMatchObject({
@@ -212,7 +213,12 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", decision: "approve", notes: "Reviewed clean build" },
+        {
+          buildId: "bld_1",
+          expectedRevision: 1,
+          decision: "approve",
+          notes: "Reviewed clean build",
+        },
         moderator,
       ),
     ).resolves.toBe(reviewed);
@@ -224,6 +230,7 @@ describe("build moderation service behavior", () => {
         action: "build.approved",
         details: expect.objectContaining({ notes: "Reviewed clean build" }),
       }),
+      1,
     );
     expect(publishSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -239,7 +246,7 @@ describe("build moderation service behavior", () => {
 
     await expect(
       service.reviewBuild(
-        { buildId: "bld_1", decision: "reject", notes: "Rejected" },
+        { buildId: "bld_1", expectedRevision: 1, decision: "reject", notes: "Rejected" },
         moderator,
       ),
     ).resolves.toBe(reviewed);

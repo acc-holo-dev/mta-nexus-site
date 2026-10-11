@@ -248,6 +248,8 @@ export interface Product {
 
 export interface Build {
   id: string;
+  /** Populated by PostgreSQL; optional only for legacy in-memory fixtures. */
+  revision?: number;
   productId: string;
   version: string;
   releaseNotes?: string;

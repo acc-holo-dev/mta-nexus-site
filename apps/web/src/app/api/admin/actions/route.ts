@@ -32,7 +32,7 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
   z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional(), expectedUpdatedAt: z.string().max(40).optional() }),
   z.object({ targetType: z.literal("report"), targetId: z.string().min(1), action: z.enum(["resolve", "dismiss"]), notes: z.string().trim().min(3).max(2000) }),
   z.object({ targetType: z.literal("verification"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().trim().min(3).max(2000) }),
-  z.object({ targetType: z.literal("build"), targetId: z.string().min(1), action: z.enum(["approve", "reject", "quarantine", "restore"]), notes: z.string().trim().min(3).max(2000) }),
+  z.object({ targetType: z.literal("build"), targetId: z.string().min(1), action: z.enum(["approve", "reject", "quarantine", "restore"]), notes: z.string().trim().min(3).max(2000), expectedRevision: z.number().int().min(1).max(2147483646).optional() }),
   z.object({ targetType: z.literal("content"), targetId: z.string().min(1), action: z.enum(["publish", "archive"]), notes: z.string().max(2000).optional() }),
 ]);
 
@@ -62,6 +62,9 @@ export async function POST(request: NextRequest) {
     if (!parsed.success) {
       return json({ error: "Invalid moderation action", details: parsed.error.format() }, 400 );
     }
+    if (parsed.data.targetType === "build" &&
+      (parsed.data.action === "approve" || parsed.data.action === "reject") && parsed.data.expectedRevision === undefined)
+      throw new AppError("Observed build revision is required", 400, "BUILD_REVISION_REQUIRED");
     const { targetType, targetId, action, notes } = parsed.data;
 
     const makeAudit = () => ({
@@ -155,6 +158,7 @@ export async function POST(request: NextRequest) {
             buildId: targetId,
             decision: action,
             notes,
+            expectedRevision: parsed.data.expectedRevision as number,
           },
           user,
         );

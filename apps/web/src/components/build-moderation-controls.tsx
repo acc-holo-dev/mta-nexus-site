@@ -2,33 +2,35 @@
 
 import { Download, LoaderCircle, ShieldCheck, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { confirmsAdminAction } from "../lib/admin-action-confirmation";
 import { buildModerationUiState } from "../lib/build-moderation-ui";
+import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
 import { useNexusLocale } from "./locale-context";
 
 export function BuildModerationControls({
   buildId,
   scanStatus,
   hasScanProvenance,
+  expectedRevision,
 }: {
   buildId: string;
   scanStatus: string;
   hasScanProvenance: boolean;
+  expectedRevision?: number;
 }) {
   const router = useRouter();
-  const { dictionary } = useNexusLocale();
+  const { dictionary, locale } = useNexusLocale();
+  const versionCopy = getResourceBuildWorkspaceCopy(locale);
+  const busy = useRef(false);
+  const [uncertain, setUncertain] = useState(false);
   const copy = dictionary.admin;
   const [notes, setNotes] = useState("");
   const [pending, setPending] = useState<"approve" | "reject" | null>(null);
+  const [confirmedWrite, setConfirmedWrite] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const {
-    hasNotes,
-    hasTrustedCleanScan,
-    canApprove,
-    canReject,
-  } = buildModerationUiState({
+  const { hasNotes, hasTrustedCleanScan, canApprove, canReject } = buildModerationUiState({
     scanStatus,
     hasScanProvenance,
     notes,
@@ -36,17 +38,24 @@ export function BuildModerationControls({
   });
 
   async function moderate(action: "approve" | "reject") {
-    if (pending || !hasNotes || (action === "approve" && !hasTrustedCleanScan)) {
+    if (
+      busy.current ||
+      uncertain ||
+      !expectedRevision ||
+      confirmedWrite ||
+      pending ||
+      !hasNotes ||
+      (action === "approve" && !hasTrustedCleanScan)
+    ) {
       return;
     }
 
     const confirmed = window.confirm(
-      action === "approve"
-        ? copy.approveBuildConfirm
-        : copy.rejectBuildConfirm,
+      action === "approve" ? copy.approveBuildConfirm : copy.rejectBuildConfirm,
     );
     if (!confirmed) return;
 
+    busy.current = true;
     setPending(action);
     setError(null);
     try {
@@ -60,19 +69,24 @@ export function BuildModerationControls({
           targetId: buildId,
           action,
           notes: notes.trim(),
+          expectedRevision,
         }),
         signal: AbortSignal.timeout(10_000),
       });
       const data = await response.json().catch(() => null);
       if (!confirmsAdminAction(response.status, data, buildId, action)) {
-        setError(data?.error || copy.buildFailed);
+        setError(response.status === 409 ? versionCopy.conflict : copy.buildFailed);
+        if (response.status !== 429) setUncertain(true);
         return;
       }
+      setConfirmedWrite(true);
       setNotes("");
       router.refresh();
     } catch {
-      setError(copy.buildUnavailable);
+      setError(versionCopy.failed);
+      setUncertain(true);
     } finally {
+      busy.current = false;
       setPending(null);
     }
   }
@@ -109,7 +123,7 @@ export function BuildModerationControls({
 
         <button
           type="button"
-          disabled={!canApprove}
+          disabled={uncertain || !expectedRevision || confirmedWrite || !canApprove}
           onClick={() => void moderate("approve")}
           className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[color:var(--nexus-success)]/25 bg-success-soft px-3 py-2 text-[11px] font-semibold text-success transition-colors hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
         >
@@ -123,7 +137,7 @@ export function BuildModerationControls({
 
         <button
           type="button"
-          disabled={!canReject}
+          disabled={uncertain || !expectedRevision || confirmedWrite || !canReject}
           onClick={() => void moderate("reject")}
           className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-[color:var(--nexus-danger)]/25 bg-danger-soft px-3 py-2 text-[11px] font-semibold text-danger transition-colors hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
         >
@@ -136,7 +150,20 @@ export function BuildModerationControls({
         </button>
       </div>
 
-      {error && <p role="alert" className="text-[11px] text-danger">{error}</p>}
+      {error && (
+        <p role="alert" className="text-[11px] text-danger">
+          {error}
+        </p>
+      )}
+      {uncertain && (
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="text-accent underline"
+        >
+          {versionCopy.reload}
+        </button>
+      )}
       {!hasNotes && (
         <p className="text-[10px] text-faint" aria-live="polite">
           {copy.reviewNoteHint}

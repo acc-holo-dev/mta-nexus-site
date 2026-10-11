@@ -282,6 +282,7 @@ export const productVariantMembers = pgTable("product_variant_members", {
 // 9. Builds
 export const builds = pgTable("builds", {
   id: text("id").primaryKey(),
+  revision: integer("revision").notNull().default(1),
   productId: text("product_id")
     .notNull()
     .references(() => products.id, { onDelete: "cascade" }),
@@ -305,6 +306,7 @@ export const builds = pgTable("builds", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [
   uniqueIndex("builds_product_version_idx").on(table.productId, table.version),
+  check("builds_revision_check", sql`${table.revision} > 0`),
   index("builds_product_status_idx").on(table.productId, table.status),
   index("builds_status_created_id_idx").on(table.status, table.createdAt, table.id),
   check(
@@ -1143,3 +1145,10 @@ export const serverClaimChallenges = pgTable(
     ),
   ],
 );
+
+// Shared privacy model; preference writes must also advance users.updatedAt.
+export const userProfilePreferences = pgTable("user_profile_preferences", {
+  userId: text("user_id").primaryKey().references(() => users.id, { onDelete: "cascade" }),
+  showActivity: boolean("show_activity").notNull().default(true),
+  showProfessionalContacts: boolean("show_professional_contacts").notNull().default(true),
+});

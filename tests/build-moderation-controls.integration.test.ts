@@ -14,15 +14,12 @@ import { GET as downloadReviewerArtifact } from "../apps/web/src/app/api/admin/b
 import { POST as moderate } from "../apps/web/src/app/api/admin/actions/route";
 
 function getRequest(token: string, buildId: string) {
-  return new NextRequest(
-    `http://nexus.test/api/admin/builds/${buildId}/download`,
-    {
-      method: "GET",
-      headers: {
-        cookie: `nexus_session=${token}`,
-      },
+  return new NextRequest(`http://nexus.test/api/admin/builds/${buildId}/download`, {
+    method: "GET",
+    headers: {
+      cookie: `nexus_session=${token}`,
     },
-  );
+  });
 }
 
 function moderationRequest(
@@ -39,6 +36,7 @@ function moderationRequest(
     },
     body: JSON.stringify({
       targetType: "build",
+      expectedRevision: 1,
       targetId: buildId,
       action,
       ...(notes === undefined ? {} : { notes }),
@@ -156,10 +154,9 @@ describe("build moderation route integration", () => {
     });
 
     try {
-      const ordinary = await downloadReviewerArtifact(
-        getRequest(userToken, cleanBuildId),
-        { params: Promise.resolve({ buildId: cleanBuildId }) },
-      );
+      const ordinary = await downloadReviewerArtifact(getRequest(userToken, cleanBuildId), {
+        params: Promise.resolve({ buildId: cleanBuildId }),
+      });
       expect(ordinary.status).toBe(403);
 
       const nonCleanDownload = await downloadReviewerArtifact(
@@ -168,8 +165,7 @@ describe("build moderation route integration", () => {
       );
       expect(nonCleanDownload.status).toBe(422);
       expect(await nonCleanDownload.json()).toEqual({
-        error:
-          "Reviewer download requires a provenance-backed clean malware scan",
+        error: "Reviewer download requires a provenance-backed clean malware scan",
       });
 
       const reviewerDownload = await downloadReviewerArtifact(
@@ -177,47 +173,26 @@ describe("build moderation route integration", () => {
         { params: Promise.resolve({ buildId: cleanBuildId }) },
       );
       expect(reviewerDownload.status).toBe(200);
-      expect(reviewerDownload.headers.get("Content-Type")).toBe(
-        "application/octet-stream",
-      );
-      expect(reviewerDownload.headers.get("Content-Disposition")).toContain(
-        "attachment;",
-      );
-      expect(reviewerDownload.headers.get("X-Content-SHA256")).toBe(
-        asset.sha256Hash,
-      );
-      expect(reviewerDownload.headers.get("Cache-Control")).toBe(
-        "private, no-store",
-      );
+      expect(reviewerDownload.headers.get("Content-Type")).toBe("application/octet-stream");
+      expect(reviewerDownload.headers.get("Content-Disposition")).toContain("attachment;");
+      expect(reviewerDownload.headers.get("X-Content-SHA256")).toBe(asset.sha256Hash);
+      expect(reviewerDownload.headers.get("Cache-Control")).toBe("private, no-store");
       expect(reviewerDownload.headers.get("Vary")).toBe("Cookie");
-      expect(
-        Buffer.from(await reviewerDownload.arrayBuffer()),
-      ).toEqual(bytes);
+      expect(Buffer.from(await reviewerDownload.arrayBuffer())).toEqual(bytes);
 
       const reviewerAudits = await db
         .select()
         .from(auditEvents)
         .where(eq(auditEvents.targetId, cleanBuildId));
       expect(
-        reviewerAudits.some(
-          (audit) =>
-            audit.action ===
-            "build.review_artifact_download_started",
-        ),
+        reviewerAudits.some((audit) => audit.action === "build.review_artifact_download_started"),
       ).toBe(true);
       expect(
-        reviewerAudits.some(
-          (audit) =>
-            audit.action === "build.review_artifact_downloaded",
-        ),
+        reviewerAudits.some((audit) => audit.action === "build.review_artifact_downloaded"),
       ).toBe(false);
 
       const missingNote = await moderate(
-        moderationRequest(
-          moderatorToken,
-          cleanBuildId,
-          "approve",
-        ),
+        moderationRequest(moderatorToken, cleanBuildId, "approve"),
       );
       expect(missingNote.status).toBe(400);
 
@@ -249,14 +224,11 @@ describe("build moderation route integration", () => {
         targetId: cleanBuildId,
       });
 
-      expect(
-        (await buildRepository.findById(cleanBuildId))?.status,
-      ).toBe("published");
+      expect((await buildRepository.findById(cleanBuildId))?.status).toBe("published");
 
-      const afterReview = await downloadReviewerArtifact(
-        getRequest(moderatorToken, cleanBuildId),
-        { params: Promise.resolve({ buildId: cleanBuildId }) },
-      );
+      const afterReview = await downloadReviewerArtifact(getRequest(moderatorToken, cleanBuildId), {
+        params: Promise.resolve({ buildId: cleanBuildId }),
+      });
       expect(afterReview.status).toBe(409);
       expect(await afterReview.json()).toEqual({
         error: "Build is not available for moderator evidence review",
@@ -276,18 +248,14 @@ describe("build moderation route integration", () => {
         action: "quarantine",
         targetId: cleanBuildId,
       });
-      expect((await buildRepository.findById(cleanBuildId))?.status).toBe(
-        "quarantined",
-      );
+      expect((await buildRepository.findById(cleanBuildId))?.status).toBe("quarantined");
 
       const quarantineEvidence = await downloadReviewerArtifact(
         getRequest(moderatorToken, cleanBuildId),
         { params: Promise.resolve({ buildId: cleanBuildId }) },
       );
       expect(quarantineEvidence.status).toBe(200);
-      expect(quarantineEvidence.headers.get("Cache-Control")).toBe(
-        "private, no-store",
-      );
+      expect(quarantineEvidence.headers.get("Cache-Control")).toBe("private, no-store");
       expect(Buffer.from(await quarantineEvidence.arrayBuffer())).toEqual(bytes);
 
       const restored = await moderate(
@@ -304,9 +272,7 @@ describe("build moderation route integration", () => {
         action: "restore",
         targetId: cleanBuildId,
       });
-      expect((await buildRepository.findById(cleanBuildId))?.status).toBe(
-        "published",
-      );
+      expect((await buildRepository.findById(cleanBuildId))?.status).toBe("published");
     } finally {
       await storageService.deleteAsset(asset.key);
     }
@@ -381,27 +347,14 @@ describe("build moderation route integration", () => {
 
     const [approve, reject] = await Promise.all([
       moderate(
-        moderationRequest(
-          moderatorToken,
-          buildId,
-          "approve",
-          "Approve after clean review.",
-        ),
+        moderationRequest(moderatorToken, buildId, "approve", "Approve after clean review."),
       ),
       moderate(
-        moderationRequest(
-          moderatorToken,
-          buildId,
-          "reject",
-          "Reject after independent review.",
-        ),
+        moderationRequest(moderatorToken, buildId, "reject", "Reject after independent review."),
       ),
     ]);
 
-    expect([approve.status, reject.status].sort((a, b) => a - b)).toEqual([
-      200,
-      409,
-    ]);
+    expect([approve.status, reject.status].sort((a, b) => a - b)).toEqual([200, 409]);
 
     const loser = approve.status === 409 ? approve : reject;
     // The loser is rejected either by the pending-review pre-check or by the
@@ -421,15 +374,10 @@ describe("build moderation route integration", () => {
       expect(product?.status).toBe("draft");
     }
 
-    const audits = await db
-      .select()
-      .from(auditEvents)
-      .where(eq(auditEvents.targetId, buildId));
+    const audits = await db.select().from(auditEvents).where(eq(auditEvents.targetId, buildId));
 
     const buildDecisionAudits = audits.filter(
-      (audit) =>
-        audit.action === "build.approved" ||
-        audit.action === "build.rejected",
+      (audit) => audit.action === "build.approved" || audit.action === "build.rejected",
     );
     expect(buildDecisionAudits).toHaveLength(1);
     expect(buildDecisionAudits[0]?.actorId).toBe(moderatorId);

@@ -99,15 +99,13 @@ async function fixture() {
 it("commits approval and one author notification atomically, even with simultaneous replay", async () => {
   const f = await fixture();
   const results = await Promise.all([
-    buildRepository.moderatePending(f.buildId, "approve", f.audit("a")),
-    buildRepository.moderatePending(f.buildId, "approve", f.audit("b")),
+    buildRepository.moderatePending(f.buildId, "approve", f.audit("a"), 1),
+    buildRepository.moderatePending(f.buildId, "approve", f.audit("b"), 1),
   ]);
   expect(results.filter(Boolean)).toHaveLength(1);
   const notices = await notificationRepository.listByUser(f.authorId);
   expect(notices).toHaveLength(1);
-  await expect(
-    notificationRepository.listBuildReviewByBuildId(f.buildId),
-  ).resolves.toEqual([
+  await expect(notificationRepository.listBuildReviewByBuildId(f.buildId)).resolves.toEqual([
     expect.objectContaining({
       id: notices[0]?.id,
       recipientId: f.authorId,
@@ -130,12 +128,7 @@ it("commits approval and one author notification atomically, even with simultane
     db
       .select()
       .from(webPushOutbox)
-      .where(
-        eq(
-          webPushOutbox.notificationId,
-          notices[0]!.id,
-        ),
-      ),
+      .where(eq(webPushOutbox.notificationId, String(notices[0]?.id))),
   ).resolves.toEqual([
     expect.objectContaining({
       subscriptionId: f.subscriptionId,
@@ -151,10 +144,15 @@ it("keeps a rejection successful when system notifications are disabled", async 
   const f = await fixture();
   await notificationRepository.updatePreferences(f.authorId, { systemEnabled: false });
   expect(
-    await buildRepository.moderatePending(f.buildId, "reject", {
-      ...f.audit(),
-      action: "build.rejected",
-    }),
+    await buildRepository.moderatePending(
+      f.buildId,
+      "reject",
+      {
+        ...f.audit(),
+        action: "build.rejected",
+      },
+      1,
+    ),
   ).toMatchObject({ status: "rejected" });
   expect(await notificationRepository.listByUser(f.authorId)).toEqual([]);
   expect(
@@ -172,7 +170,9 @@ it("rolls back build, product and audit when notification storage fails, then pe
     message: "Existing ID",
     type: "system",
   });
-  await expect(buildRepository.moderatePending(f.buildId, "approve", f.audit())).rejects.toThrow();
+  await expect(
+    buildRepository.moderatePending(f.buildId, "approve", f.audit(), 1),
+  ).rejects.toThrow();
   expect(await buildRepository.findById(f.buildId)).toMatchObject({ status: "pending_review" });
   expect(await productRepository.findById(f.productId)).toMatchObject({
     status: "draft",
@@ -183,7 +183,7 @@ it("rolls back build, product and audit when notification storage fails, then pe
   );
   const { notifications } = await import("../packages/db/src/schema");
   await db.delete(notifications).where(eq(notifications.id, id));
-  expect(await buildRepository.moderatePending(f.buildId, "approve", f.audit())).toMatchObject({
+  expect(await buildRepository.moderatePending(f.buildId, "approve", f.audit(), 1)).toMatchObject({
     status: "published",
   });
   expect(await notificationRepository.listByUser(f.authorId)).toHaveLength(1);
@@ -204,17 +204,15 @@ it("notifies current organization managers once, respecting revocation and prefe
   await db
     .insert(organizations)
     .values({ id: orgId, name: "Review team", slug: orgId, ownerId: `${f.authorId}_owner` });
-  await db
-    .insert(organizationMembers)
-    .values(
-      roles.map((role) => ({
-        id: `mem_${f.buildId}_${role}`,
-        organizationId: orgId,
-        userId: `${f.authorId}_${role}`,
-        role: role === "admin" ? "admin" : "member",
-        permissions: role === "manager" || role === "reader" ? ["manage_products"] : [],
-      })),
-    );
+  await db.insert(organizationMembers).values(
+    roles.map((role) => ({
+      id: `mem_${f.buildId}_${role}`,
+      organizationId: orgId,
+      userId: `${f.authorId}_${role}`,
+      role: role === "admin" ? "admin" : "member",
+      permissions: role === "manager" || role === "reader" ? ["manage_products"] : [],
+    })),
+  );
   const { products } = await import("../packages/db/src/schema");
   await db.update(products).set({ organizationId: orgId }).where(eq(products.id, f.productId));
   await db
@@ -227,10 +225,15 @@ it("notifies current organization managers once, respecting revocation and prefe
       ),
     );
   await notificationRepository.updatePreferences(`${f.authorId}_admin`, { systemEnabled: false });
-  await buildRepository.moderatePending(f.buildId, "reject", {
-    ...f.audit(),
-    action: "build.rejected",
-  });
+  await buildRepository.moderatePending(
+    f.buildId,
+    "reject",
+    {
+      ...f.audit(),
+      action: "build.rejected",
+    },
+    1,
+  );
   expect(await notificationRepository.listByUser(f.authorId)).toEqual([]);
   for (const role of roles)
     expect(await notificationRepository.listByUser(`${f.authorId}_${role}`)).toHaveLength(

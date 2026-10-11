@@ -199,14 +199,19 @@ it("requires a clean draft for resubmission and prevents archived moderation", a
   state.queries = [];
   state.results = [[["prd_a"]], [["prd_a", "archived", "usr_a", null]], [["moderator"]]];
   await expect(
-    new BuildRepository().moderatePending("bld_a", "approve", {
-      id: "aud_a",
-      actorId: "usr_moderator",
-      actorType: "user",
-      action: "build.approved",
-      targetId: "bld_a",
-      targetType: "build",
-    }),
+    new BuildRepository().moderatePending(
+      "bld_a",
+      "approve",
+      {
+        id: "aud_a",
+        actorId: "usr_moderator",
+        actorType: "user",
+        action: "build.approved",
+        targetId: "bld_a",
+        targetType: "build",
+      },
+      1,
+    ),
   ).rejects.toMatchObject({ code: "PRODUCT_STATE_CHANGED" });
   expect(state.queries.some((query) => query.sql.startsWith("update"))).toBe(false);
 });

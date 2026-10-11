@@ -33,14 +33,14 @@ export async function resourceCommerceRequest(
             ? "reviewSubmission"
           : request.nextUrl.pathname.includes("/licenses/")
             ? "licenseControl"
-            : /\/(lifecycle|variants|compatibility)(?:\/|$)/u.test(request.nextUrl.pathname)
+            : /\/(lifecycle|variants|compatibility|builds)(?:\/|$)/u.test(request.nextUrl.pathname)
               ? "contentCreation"
               : "resourceClaim";
       if (!(await consumeRateLimit(policy, actor.id)).success) throw new RateLimitExceededError();
     }
     if (
       !mutation &&
-      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/operations$|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/moderation$/u.test(
+      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/operations$|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:moderation|builds\/[^/]+)$/u.test(
         request.nextUrl.pathname,
       )
     ) {
