@@ -2,13 +2,17 @@ import type { Content } from "@nexus/domain";
 import { Newspaper } from "lucide-react";
 import { ArticleCard } from "./article-card";
 import { getDictionary, type Locale } from "../lib/i18n";
+import Link from "next/link";
+import { publicationCopy } from "../lib/publication-feed-copy";
 
 export function ServerUpdatesPanel({
   updates,
   locale = "en",
+  serverSlug,
 }: {
   updates: readonly Content[] | null;
   locale?: Locale;
+  serverSlug?: string;
 }) {
   const copy = getDictionary(locale).serverUpdates;
 
@@ -25,27 +29,25 @@ export function ServerUpdatesPanel({
           </h2>
           <p className="mt-1 text-xs text-muted">{copy.description}</p>
         </div>
-        <span className="font-label uppercase text-faint">
-          {copy.moderated}
-        </span>
+        <span className="font-label uppercase text-faint">{copy.moderated}</span>
       </div>
+      {serverSlug && (
+        <Link
+          href={`/servers/${encodeURIComponent(serverSlug)}/updates`}
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        >
+          {publicationCopy(locale).allUpdates}
+        </Link>
+      )}
 
       {updates === null ? (
-        <div className="nexus-panel p-5 text-xs text-warning">
-          {copy.unavailable}
-        </div>
+        <div className="nexus-panel p-5 text-xs text-warning">{copy.unavailable}</div>
       ) : updates.length === 0 ? (
-        <div className="nexus-panel p-5 text-xs text-faint">
-          {copy.empty}
-        </div>
+        <div className="nexus-panel p-5 text-xs text-faint">{copy.empty}</div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {updates.map((update) => (
-            <ArticleCard
-              key={update.id}
-              article={update}
-              locale={locale}
-            />
+            <ArticleCard key={update.id} article={update} locale={locale} />
           ))}
         </div>
       )}

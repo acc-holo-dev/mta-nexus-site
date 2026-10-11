@@ -1,9 +1,8 @@
-"use client";
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Avatar } from "@nexus/ui";
 import {
-  publicationPageSchema,
+  publicationHref,
+  SERVER_PUBLICATION_TYPES,
   PUBLICATION_TYPES,
   PUBLICATION_SOURCES,
   type PublicationPage,
@@ -11,92 +10,29 @@ import {
 } from "../lib/publication-feed-contract";
 import { publicationCopy, publicationError } from "../lib/publication-feed-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
-import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+import { platformFieldClass } from "../lib/user-platform-client";
 import type { Locale } from "../lib/i18n";
 export function PublicationFeed({
   initial,
   filters,
   locale,
   path,
-  apiPath,
   following = false,
+  server = false,
+  errorCode,
 }: {
   initial: PublicationPage | null;
   filters: PublicationQuery;
   locale: Locale;
   path: string;
-  apiPath: string;
   following?: boolean;
+  server?: boolean;
+  errorCode?: string;
 }) {
   const copy = publicationCopy(locale),
     types = getUserPlatformCopy(locale);
-  const [page, setPage] = useState(initial),
-    [error, setError] = useState(initial ? "" : copy.error);
-  const [pending, setPending] = useState(false),
-    [history, setHistory] = useState<(string | null)[]>([]);
-  const cursor = useRef<string | null>(null),
-    busy = useRef(false),
-    alive = useRef(true),
-    controller = useRef<AbortController | null>(null);
-  useEffect(() => {
-    alive.current = true;
-    return () => {
-      alive.current = false;
-      controller.current?.abort();
-    };
-  }, []);
-  async function load(direction: "latest" | "next" | "previous") {
-    if (
-      busy.current ||
-      (direction === "next" && !page?.nextCursor) ||
-      (direction === "previous" && !history.length)
-    )
-      return;
-    busy.current = true;
-    setPending(true);
-    setError("");
-    const next =
-      direction === "latest"
-        ? null
-        : direction === "next"
-          ? (page?.nextCursor ?? null)
-          : (history.at(-1) ?? null);
-    const request = new AbortController();
-    controller.current = request;
-    const params = new URLSearchParams();
-    if (filters.query) params.set("q", filters.query);
-    if (filters.type) params.set("type", filters.type);
-    if (following && filters.source) params.set("source", filters.source);
-    if (next) params.set("cursor", next);
-    try {
-      const parsed = publicationPageSchema.safeParse(
-        await platformRequest(
-          `${apiPath}?${params}`,
-          locale,
-          "GET",
-          undefined,
-          request.signal,
-          publicationError,
-        ),
-      );
-      if (!parsed.success) throw new Error(copy.error);
-      if (!alive.current) return;
-      setHistory(
-        direction === "latest"
-          ? []
-          : direction === "previous"
-            ? history.slice(0, -1)
-            : [...history, cursor.current],
-      );
-      cursor.current = next;
-      setPage(parsed.data);
-    } catch (failure) {
-      if (alive.current) setError(failure instanceof Error ? failure.message : copy.error);
-    } finally {
-      busy.current = false;
-      if (alive.current) setPending(false);
-    }
-  }
+  const page = initial,
+    error = initial ? "" : errorCode ? publicationError(locale, errorCode) : copy.error;
   const button =
     "min-h-11 rounded-lg border border-base px-3 text-sm font-semibold text-accent disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-accent";
   const typeLabel = (type: (typeof PUBLICATION_TYPES)[number]) =>
@@ -112,13 +48,14 @@ export function PublicationFeed({
             type="search"
             maxLength={100}
             defaultValue={filters.query}
+            placeholder={copy.queryHint}
           />
         </label>
         <label className="space-y-1 text-xs text-secondary">
           {copy.type}
           <select name="type" defaultValue={filters.type ?? ""} className={platformFieldClass}>
             <option value="">{copy.all}</option>
-            {PUBLICATION_TYPES.map((type) => (
+            {(server ? SERVER_PUBLICATION_TYPES : PUBLICATION_TYPES).map((type) => (
               <option key={type} value={type}>
                 {typeLabel(type)}
               </option>
@@ -142,6 +79,26 @@ export function PublicationFeed({
             </select>
           </label>
         )}
+        <label className="min-w-40 flex-1 space-y-1 text-xs text-secondary">
+          {copy.author}
+          <input
+            className={platformFieldClass}
+            name="author"
+            maxLength={128}
+            defaultValue={filters.author ?? ""}
+            autoCapitalize="none"
+            spellCheck={false}
+          />
+        </label>
+        <label className="min-w-32 flex-1 space-y-1 text-xs text-secondary">
+          {copy.tag}
+          <input
+            className={platformFieldClass}
+            name="tag"
+            maxLength={30}
+            defaultValue={filters.tag ?? ""}
+          />
+        </label>
         <button type="submit" className={button}>
           {copy.search}
         </button>
@@ -154,7 +111,7 @@ export function PublicationFeed({
           {error}
         </p>
       )}
-      <div aria-busy={pending} className="space-y-4">
+      <div className="space-y-4">
         {page?.items.map((item) => (
           <article key={item.id} className="nexus-panel space-y-3 p-5">
             <header className="flex flex-wrap items-center gap-3">
@@ -165,9 +122,17 @@ export function PublicationFeed({
               />
               <Link
                 href={`/users/${encodeURIComponent(item.author.username)}`}
+                prefetch={false}
                 className="break-words text-sm font-semibold text-accent"
               >
                 {item.author.name} (@{item.author.username})
+              </Link>
+              <Link
+                href={publicationHref(path, { ...filters, author: item.author.username })}
+                className="text-xs text-accent underline"
+                prefetch={false}
+              >
+                {copy.onlyAuthor}
               </Link>
               <time dateTime={item.publishedAt} className="ml-auto text-xs text-muted">
                 {new Date(item.publishedAt).toLocaleString(locale === "ru" ? "ru-RU" : "en-US", {
@@ -184,6 +149,7 @@ export function PublicationFeed({
                     <Link
                       key={context.href}
                       href={context.href}
+                      prefetch={false}
                       className="break-words text-accent underline"
                     >
                       {context.name}
@@ -192,13 +158,33 @@ export function PublicationFeed({
               )}
             </div>
             <h2 className="break-words text-lg font-bold text-primary">
-              <Link className="hover:underline" href={`/articles/${encodeURIComponent(item.slug)}`}>
+              <Link
+                className="hover:underline"
+                href={`/articles/${encodeURIComponent(item.slug)}`}
+                prefetch={false}
+              >
                 {item.title}
               </Link>
             </h2>
             <p className="whitespace-pre-wrap break-words text-sm text-secondary">{item.excerpt}</p>
+            {item.tags?.length > 0 && (
+              <ul className="flex flex-wrap gap-2" aria-label={copy.tag}>
+                {Array.from(new Set(item.tags)).map((tag) => (
+                  <li key={tag}>
+                    <Link
+                      href={publicationHref(path, { ...filters, tag })}
+                      prefetch={false}
+                      className="inline-flex min-h-8 items-center break-all rounded-md border border-base px-2 text-xs text-accent"
+                    >
+                      #{tag}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
             <Link
               href={`/articles/${encodeURIComponent(item.slug)}#discussion`}
+              prefetch={false}
               className="text-xs text-accent underline"
             >
               {copy.comments}: {item.commentCount}
@@ -208,7 +194,11 @@ export function PublicationFeed({
         {page && !page.items.length && (
           <div className="nexus-panel space-y-3 p-8 text-center text-sm text-muted">
             <p>
-              {filters.query || filters.type || filters.source ? copy.emptyFiltered : copy.empty}
+              {filters.cursor
+                ? copy.emptyPage
+                : filters.query || filters.type || filters.source || filters.author || filters.tag
+                  ? copy.emptyFiltered
+                  : copy.empty}
             </p>
             {following && (
               <>
@@ -222,33 +212,38 @@ export function PublicationFeed({
         )}
       </div>
       <nav aria-label={copy.activity} className="flex flex-wrap gap-3">
-        <button
-          type="button"
-          className={button}
-          disabled={pending}
-          onClick={() => void load("latest")}
-        >
-          {pending ? copy.loading : copy.latest}
-        </button>
-        {history.length > 0 && (
-          <button
-            type="button"
-            className={button}
-            disabled={pending}
-            onClick={() => void load("previous")}
+        {page?.previousCursor && (
+          <Link
+            href={publicationHref(path, filters, page.previousCursor)}
+            className={`${button} inline-flex items-center`}
+            prefetch={false}
           >
             {copy.previous}
-          </button>
+          </Link>
+        )}
+        <a href={publicationHref(path, filters)} className={`${button} inline-flex items-center`}>
+          {copy.latest}
+        </a>
+        {error && (
+          <a
+            href={publicationHref(
+              path,
+              filters,
+              filters.cursor ? JSON.stringify(filters.cursor) : null,
+            )}
+            className={`${button} inline-flex items-center`}
+          >
+            {copy.retry}
+          </a>
         )}
         {page?.hasMore && (
-          <button
-            type="button"
-            className={button}
-            disabled={pending}
-            onClick={() => void load("next")}
+          <Link
+            href={publicationHref(path, filters, page.nextCursor)}
+            className={`${button} inline-flex items-center`}
+            prefetch={false}
           >
             {copy.next}
-          </button>
+          </Link>
         )}
         {following && (
           <Link

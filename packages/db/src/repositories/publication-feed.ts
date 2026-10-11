@@ -1,18 +1,30 @@
-import { and, desc, eq, exists, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, exists, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { builds, content, follows, organizations, products, servers, userProfilePreferences, users } from "../schema";
+import {
+  builds,
+  content,
+  follows,
+  organizations,
+  products,
+  servers,
+  userProfilePreferences,
+  users,
+} from "../schema";
 import { containsPattern } from "./search-pattern";
 import { trustedCleanScanCondition } from "./build-safety";
 
 export type PublicationScope =
   | { kind: "following"; actorId: string }
   | { kind: "user"; id: string }
-  | { kind: "organization"; id: string };
+  | { kind: "organization"; id: string }
+  | { kind: "server"; id: string };
 type PublicationFilters = {
   query?: string;
   type?: string;
   source?: "user" | "organization" | "server" | "product";
-  cursor?: { createdAt: string; id: string };
+  author?: string;
+  tag?: string;
+  cursor?: { createdAt: string; id: string; direction?: "older" | "newer" };
 };
 const publicTypes = [
   "article",
@@ -27,6 +39,7 @@ const publicTypes = [
 const publishedTime = sql`coalesce(${content.publishedAt}, ${content.createdAt})`;
 const publicServer = and(eq(servers.visibility, "public"), eq(servers.status, "active"));
 const activityVisible = sql<boolean>`coalesce(${userProfilePreferences.showActivity}, true)`;
+const serverTypes = ["article", "news", "devlog", "update", "announcement"];
 function publicProduct() {
   return and(
     eq(products.status, "published"),
@@ -46,13 +59,21 @@ function publicProduct() {
   );
 }
 class PublicationFeedRepository {
-  async resolvePublicScope(kind: "user" | "organization", handle: string) {
+  async resolvePublicScope(kind: "user" | "organization" | "server", handle: string) {
     if (kind === "user") {
       const [row] = await db
         .select({ id: users.id, name: users.displayName })
         .from(users)
         .leftJoin(userProfilePreferences, eq(userProfilePreferences.userId, users.id))
         .where(and(eq(users.username, handle), activityVisible))
+        .limit(1);
+      return row ?? null;
+    }
+    if (kind === "server") {
+      const [row] = await db
+        .select({ id: servers.id, name: servers.name })
+        .from(servers)
+        .where(and(eq(servers.slug, handle), publicServer))
         .limit(1);
       return row ?? null;
     }
@@ -90,10 +111,13 @@ class PublicationFeedRepository {
           : or(...Object.values(sources))
         : scope.kind === "user"
           ? and(eq(content.authorId, scope.id), activityVisible)
-          : eq(content.organizationId, scope.id);
+          : scope.kind === "server"
+            ? eq(servers.id, scope.id)
+            : eq(content.organizationId, scope.id);
     const pattern = filters.query?.trim()
       ? containsPattern(filters.query.trim().slice(0, 100))
       : undefined;
+    const newer = filters.cursor?.direction === "newer";
     const rows = await db
       .select({
         id: content.id,
@@ -115,6 +139,9 @@ class PublicationFeedRepository {
         serverSlug: servers.slug,
         productName: products.title,
         productSlug: products.slug,
+        tags: sql<
+          string[]
+        >`(select coalesce(jsonb_agg(left(tag.value, 30)), '[]'::jsonb) from (select value from jsonb_array_elements_text(${content.tags}) limit 10) tag)`,
       })
       .from(content)
       .innerJoin(users, eq(users.id, content.authorId))
@@ -125,30 +152,48 @@ class PublicationFeedRepository {
       .where(
         and(
           eq(content.status, "published"),
-          inArray(content.type, publicTypes),
+          inArray(content.type, scope.kind === "server" ? serverTypes : publicTypes),
           scopeCondition,
           filters.type ? eq(content.type, filters.type) : undefined,
+          filters.author
+            ? sql`lower(${users.username}) = ${filters.author.toLowerCase()}`
+            : undefined,
+          filters.tag
+            ? sql`exists (select 1 from jsonb_array_elements_text(${content.tags}) as tag(value) where lower(tag.value) = ${filters.tag.toLowerCase()})`
+            : undefined,
           pattern
             ? or(
                 ilike(content.title, pattern),
                 ilike(content.excerpt, pattern),
                 ilike(content.body, pattern),
+                ilike(users.username, pattern),
+                ilike(users.displayName, pattern),
                 sql`exists (select 1 from jsonb_array_elements_text(${content.tags}) as tag(value) where tag.value ilike ${pattern})`,
               )
             : undefined,
           filters.cursor
-            ? sql`(${publishedTime}, ${content.id}) < (${filters.cursor.createdAt}::timestamptz, ${filters.cursor.id})`
+            ? newer
+              ? sql`(${publishedTime}, ${content.id}) > (${filters.cursor.createdAt}::timestamptz, ${filters.cursor.id})`
+              : sql`(${publishedTime}, ${content.id}) < (${filters.cursor.createdAt}::timestamptz, ${filters.cursor.id})`
             : undefined,
         ),
       )
-      .orderBy(desc(publishedTime), desc(content.id))
+      .orderBy(
+        newer ? asc(publishedTime) : desc(publishedTime),
+        newer ? asc(content.id) : desc(content.id),
+      )
       .limit(21);
-    const items = rows.slice(0, 20),
+    const items = rows.slice(0, 20);
+    if (newer) items.reverse();
+    const first = items[0],
       last = items.at(-1);
+    const hasMore = newer ? items.length > 0 : rows.length > 20;
+    const hasPrevious = newer ? rows.length > 20 : !!filters.cursor && items.length > 0;
     return {
       items,
-      hasMore: rows.length > 20,
-      nextCursor: rows.length > 20 && last ? { createdAt: last.cursorTime, id: last.id } : null,
+      hasMore,
+      nextCursor: hasMore && last ? { createdAt: last.cursorTime, id: last.id } : null,
+      previousCursor: hasPrevious && first ? { createdAt: first.cursorTime, id: first.id } : null,
     };
   }
 }

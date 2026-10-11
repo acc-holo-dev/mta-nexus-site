@@ -1,11 +1,10 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PublicationFeed } from "../../../components/publication-feed";
-import { publicationPageQuery } from "../../../lib/publication-feed-contract";
+import { publicationFeedView } from "../../../lib/publication-feed-view";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
-import { publicationFeedService } from "../../../lib/services/publication-feed-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const copy = publicationCopy(await getRequestLocale());
@@ -32,10 +31,10 @@ export default async function FollowingFeedPage({
         </Link>
       </div>
     );
-  const filters = publicationPageQuery(await searchParams);
-  const initial = await publicationFeedService
-    .page({ kind: "following", actorId: actor.id }, filters)
-    .catch(() => null);
+  const { filters, initial, errorCode } = await publicationFeedView(
+    { kind: "following", actorId: actor.id },
+    await searchParams,
+  );
   return (
     <div className="space-y-6">
       <header>
@@ -48,7 +47,7 @@ export default async function FollowingFeedPage({
         filters={filters}
         locale={locale}
         path="/workspace/feed"
-        apiPath="/api/workspace/feed"
+        errorCode={errorCode}
         following
       />
     </div>

@@ -10,7 +10,11 @@ import {
 } from "../apps/web/src/lib/content-discussion-contract";
 import { confirmsDiscussionMutation } from "../apps/web/src/lib/discussion-mutation-confirmation";
 import { publicationCopy } from "../apps/web/src/lib/publication-feed-copy";
-import { getDiscussionCopy, discussionError, discussionMutationError } from "../apps/web/src/lib/content-discussion-copy";
+import {
+  getDiscussionCopy,
+  discussionError,
+  discussionMutationError,
+} from "../apps/web/src/lib/content-discussion-copy";
 it.each([
   "?type=bad",
   "?source=bad",
@@ -24,7 +28,13 @@ it.each([
   expect(parsePublicationQuery(new URLSearchParams(query))).toBeNull();
 });
 it("retains exact microsecond cursor and canonical trimmed filters", () => {
-  const cursor = { createdAt: "2026-10-10T12:00:00.123456Z", id: "publication" };
+  const cursor = {
+    createdAt: "2026-10-10T12:00:00.123456Z",
+    id: "publication",
+    version: 1,
+    context: "a".repeat(64),
+    direction: "older",
+  };
   expect(
     parsePublicationQuery(
       new URLSearchParams({
@@ -108,6 +118,10 @@ it("has matching complete RU/EN keys and localized conflict feedback", () => {
   expect(Object.keys(publicationCopy("ru"))).toEqual(Object.keys(publicationCopy("en")));
   expect(Object.keys(getDiscussionCopy("ru"))).toEqual(Object.keys(getDiscussionCopy("en")));
   expect(discussionError("ru", "COMMENT_CHANGED")).toBe(getDiscussionCopy("ru").changed);
-  expect(discussionMutationError("ru", "INTERNAL_ERROR")).toBe(getDiscussionCopy("ru").writeUnavailable);
-  expect(discussionError("en", "COMMENT_COMMAND_INVALID")).toBe(getDiscussionCopy("en").invalidCommand);
+  expect(discussionMutationError("ru", "INTERNAL_ERROR")).toBe(
+    getDiscussionCopy("ru").writeUnavailable,
+  );
+  expect(discussionError("en", "COMMENT_COMMAND_INVALID")).toBe(
+    getDiscussionCopy("en").invalidCommand,
+  );
 });

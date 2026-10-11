@@ -41,9 +41,7 @@ export async function generateMetadata({
 
   const description =
     server.description?.slice(0, 155) ||
-    (server.gameMode
-      ? `${server.gameMode} ${copy.serverFallback}`
-      : copy.serverFallback);
+    (server.gameMode ? `${server.gameMode} ${copy.serverFallback}` : copy.serverFallback);
 
   return {
     title: server.name,
@@ -66,7 +64,11 @@ export default async function ServerDetailPage({
   searchParams?: Promise<{ history?: string | string[] }>;
 }) {
   const { slug } = await params;
-  const [locale, server, query] = await Promise.all([getRequestLocale(), getServer(slug), searchParams]);
+  const [locale, server, query] = await Promise.all([
+    getRequestLocale(),
+    getServer(slug),
+    searchParams,
+  ]);
   const historyWindow = parseServerHistoryWindow(query?.history);
   const dictionary = getDictionary(locale);
   const copy = dictionary.serverDetail;
@@ -77,8 +79,10 @@ export default async function ServerDetailPage({
   const websiteUrl = safeExternalWebUrl(server.websiteUrl);
   const discordUrl = safeExternalWebUrl(server.discordUrl);
   const rulesUrl = safeExternalWebUrl(server.rulesUrl);
-  const mediaUrls = (server.mediaUrls ?? []).slice(0, 8)
-    .map(safeExternalWebUrl).filter((url): url is string => url !== undefined);
+  const mediaUrls = (server.mediaUrls ?? [])
+    .slice(0, 8)
+    .map(safeExternalWebUrl)
+    .filter((url): url is string => url !== undefined);
 
   const [directory, history, serverUpdates] = await Promise.all([
     mtaMasterDirectoryService.getDirectory().catch(() => null),
@@ -86,9 +90,7 @@ export default async function ServerDetailPage({
     contentService.listServerUpdates(server.id, 6).catch(() => null),
   ]);
 
-  const observedServer = directory?.servers.find((item) =>
-    matchesMtaEndpoint(server, item),
-  );
+  const observedServer = directory?.servers.find((item) => matchesMtaEndpoint(server, item));
   const directoryIsStale = directory?.isStale ?? false;
 
   const liveStatus = mtaLiveStatus(observedServer, directoryIsStale);
@@ -110,10 +112,7 @@ export default async function ServerDetailPage({
   return (
     <div className="space-y-8">
       <div className="flex items-center gap-2 text-xs text-muted">
-        <Link
-          href="/servers"
-          className="transition-colors hover:text-primary"
-        >
+        <Link href="/servers" className="transition-colors hover:text-primary">
           {copy.breadcrumb}
         </Link>
         <span aria-hidden="true">/</span>
@@ -126,12 +125,12 @@ export default async function ServerDetailPage({
             <>
               {/* biome-ignore lint/performance/noImgElement: server-controlled remote banner stays outside the trusted image-optimizer allowlist. */}
               <img
-              src={server.bannerUrl}
-              alt={server.name}
-              width={1600}
-              height={640}
-              fetchPriority="high"
-              decoding="async"
+                src={server.bannerUrl}
+                alt={server.name}
+                width={1600}
+                height={640}
+                fetchPriority="high"
+                decoding="async"
                 className="h-full w-full object-cover"
               />
             </>
@@ -145,10 +144,7 @@ export default async function ServerDetailPage({
               <span
                 className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-numeric text-xs font-bold ${statusClass}`}
               >
-                <span
-                  className={`h-2 w-2 rounded-full ${dotClass}`}
-                  aria-hidden="true"
-                />
+                <span className={`h-2 w-2 rounded-full ${dotClass}`} aria-hidden="true" />
                 <span>
                   {liveStatus === "online"
                     ? serverCopy.online
@@ -158,19 +154,12 @@ export default async function ServerDetailPage({
                 </span>
               </span>
               {server.isVerified && (
-                <TrustBadge
-                  variant="verifiedServer"
-                  label={copy.verifiedIdentity}
-                />
+                <TrustBadge variant="verifiedServer" label={copy.verifiedIdentity} />
               )}
             </div>
-            <h1 className="text-2xl font-black text-primary md:text-4xl">
-              {server.name}
-            </h1>
+            <h1 className="text-2xl font-black text-primary md:text-4xl">{server.name}</h1>
             {server.description && (
-              <p className="max-w-2xl text-xs leading-relaxed text-muted">
-                {server.description}
-              </p>
+              <p className="max-w-2xl text-xs leading-relaxed text-muted">{server.description}</p>
             )}
           </div>
 
@@ -181,10 +170,7 @@ export default async function ServerDetailPage({
             >
               {serverStatisticsCopy(locale).open}
             </Link>
-            <ServerFollowButton
-              serverId={server.id}
-              serverName={server.name}
-            />
+            <ServerFollowButton serverId={server.id} serverName={server.name} />
             <a
               href={connectUri}
               className="inline-flex min-h-11 items-center justify-center rounded-lg bg-success-solid px-6 py-3 text-sm font-bold text-white shadow-nexus transition-opacity hover:opacity-90"
@@ -196,10 +182,7 @@ export default async function ServerDetailPage({
       </div>
 
       {!server.organizationId && !server.ownerId && !server.isVerified && (
-        <ServerClaimControlPanel
-          serverId={server.id}
-          serverName={server.name}
-        />
+        <ServerClaimControlPanel serverId={server.id} serverName={server.name} />
       )}
 
       {(server.language ||
@@ -286,21 +269,17 @@ export default async function ServerDetailPage({
 
       <ServerHistoryPanel history={history} locale={locale} />
 
-      <ServerUpdatesPanel updates={serverUpdates} locale={locale} />
+      <ServerUpdatesPanel updates={serverUpdates} locale={locale} serverSlug={server.slug} />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="nexus-panel space-y-4 p-6">
           <div className="flex items-center justify-between text-xs text-muted">
-            <span className="font-semibold uppercase tracking-wider">
-              {copy.livePlayerLoad}
-            </span>
+            <span className="font-semibold uppercase tracking-wider">{copy.livePlayerLoad}</span>
             <Users className="h-4 w-4 text-success" aria-hidden="true" />
           </div>
           <div className="text-3xl font-black text-primary">
             {currentPlayers ?? "—"}{" "}
-            <span className="text-base font-normal text-faint">
-              / {maxPlayers ?? "—"}
-            </span>
+            <span className="text-base font-normal text-faint">/ {maxPlayers ?? "—"}</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-inset">
             <div
@@ -308,14 +287,8 @@ export default async function ServerDetailPage({
               style={{ width: `${occupancyPercent}%` }}
             />
           </div>
-          {!observedServer && (
-            <div className="text-[11px] text-faint">{copy.noObservation}</div>
-          )}
-          {directoryIsStale && (
-            <div className="text-[11px] text-warning">
-              {copy.staleSnapshot}
-            </div>
-          )}
+          {!observedServer && <div className="text-[11px] text-faint">{copy.noObservation}</div>}
+          {directoryIsStale && <div className="text-[11px] text-warning">{copy.staleSnapshot}</div>}
         </div>
 
         <div className="nexus-panel space-y-3 p-6">
@@ -334,13 +307,9 @@ export default async function ServerDetailPage({
           </div>
           <div className="flex items-center gap-2">
             <Cpu className="h-4 w-4 text-accent" aria-hidden="true" />
-            <span className="text-sm font-semibold text-primary">
-              {copy.officialDirectory}
-            </span>
+            <span className="text-sm font-semibold text-primary">{copy.officialDirectory}</span>
           </div>
-          <div className="text-[11px] leading-relaxed text-muted">
-            {copy.runtimeDescription}
-          </div>
+          <div className="text-[11px] leading-relaxed text-muted">{copy.runtimeDescription}</div>
         </div>
       </div>
     </div>

@@ -80,6 +80,44 @@ it("reads public activity anonymously with a narrow resolved scope", async () =>
   );
   expect(mocks.rate).toHaveBeenCalledWith("search", "trusted-ip");
 });
+it("reads anonymous server publications with bounded author and tag filters", async () => {
+  const response = await activity(request("GET", undefined, "?type=update&author=Writer&tag=MTA"), {
+    params: Promise.resolve({ kind: "server", handle: "mta-server" }),
+  });
+  expect(response.status).toBe(200);
+  expect(mocks.resolve).toHaveBeenCalledWith("server", "mta-server");
+  expect(mocks.page).toHaveBeenCalledWith(
+    { kind: "server", id: "profile" },
+    expect.objectContaining({ type: "update", author: "Writer", tag: "MTA" }),
+  );
+  expect(response.headers.get("cache-control")).toBe("no-store");
+});
+it.each([
+  "?type=post",
+  "?type=review",
+  "?source=server",
+  "?author=one&author=two",
+  "?tag=a&tag=b",
+  "?ownerId=victim",
+])("rejects invalid server archive filters %s before scope lookup", async (query) => {
+  const response = await activity(request("GET", undefined, query), {
+    params: Promise.resolve({ kind: "server", handle: "mta-server" }),
+  });
+  expect(response.status).toBe(400);
+  expect(mocks.resolve).not.toHaveBeenCalled();
+  expect(mocks.page).not.toHaveBeenCalled();
+});
+it("returns a localized recovery error when cursor context no longer matches", async () => {
+  mocks.page.mockRejectedValue(new AppError("Secret context mismatch", 400, "INVALID_CURSOR"));
+  const response = await activity(request(), {
+    params: Promise.resolve({ kind: "server", handle: "mta-server" }),
+  });
+  expect(response.status).toBe(400);
+  const payload = await response.json();
+  expect(payload.code).toBe("INVALID_CURSOR");
+  expect(payload.error).toMatch(/Некорректные/u);
+  expect(JSON.stringify(payload)).not.toContain("Secret context");
+});
 it("rejects invalid public kinds and follow-only filters", async () => {
   expect(
     (await activity(request(), { params: Promise.resolve({ kind: "product", handle: "writer" }) }))

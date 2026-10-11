@@ -1,18 +1,54 @@
 import { publicationFeedRepository } from "@nexus/db";
-import { NotFoundError } from "@nexus/domain";
+import { AppError, NotFoundError } from "@nexus/domain";
+import { createHash } from "node:crypto";
 import { safeExternalWebUrl } from "@nexus/validation";
 import type { PublicationScope } from "@nexus/db";
-import { encodeDiscussionCursor } from "../content-discussion-contract";
-import type { PublicationQuery, PublicationPage } from "../publication-feed-contract";
+import {
+  SERVER_PUBLICATION_TYPES,
+  type PublicationQuery,
+  type PublicationPage,
+} from "../publication-feed-contract";
 class PublicationFeedService {
-  async resolve(kind: "user" | "organization", handle: string) {
-    if (!handle || handle.length > 128 || /[\s/]/u.test(handle) || [...handle].some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127))
+  async resolve(kind: "user" | "organization" | "server", handle: string) {
+    if (
+      !handle ||
+      handle.length > 128 ||
+      /[\s/]/u.test(handle) ||
+      [...handle].some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127)
+    )
       throw new NotFoundError("Profile");
     const profile = await publicationFeedRepository.resolvePublicScope(kind, handle);
     if (!profile) throw new NotFoundError("Profile");
     return profile;
   }
   async page(scope: PublicationScope, query: PublicationQuery): Promise<PublicationPage> {
+    if (
+      (scope.kind !== "following" && query.source) ||
+      (scope.kind === "server" &&
+        query.type &&
+        !(SERVER_PUBLICATION_TYPES as readonly string[]).includes(query.type))
+    )
+      throw new AppError("Invalid publication filters", 400, "VALIDATION_ERROR");
+    const contextHash = createHash("sha256")
+      .update(
+        JSON.stringify([
+          1,
+          scope.kind,
+          scope.kind === "following" ? scope.actorId : scope.id,
+          query.query,
+          query.type ?? "",
+          query.source ?? "",
+          query.author?.toLowerCase() ?? "",
+          query.tag?.toLowerCase() ?? "",
+        ]),
+      )
+      .digest("hex");
+    if (query.cursor && query.cursor.context !== contextHash)
+      throw new AppError(
+        "Publication page belongs to different filters or source",
+        400,
+        "INVALID_CURSOR",
+      );
     const page = await publicationFeedRepository.page(scope, query);
     const context = (name: string | null, handle: string | null, path: string) =>
       name && handle ? { name, href: `/${path}/${encodeURIComponent(handle)}` } : null;
@@ -34,9 +70,25 @@ class PublicationFeedService {
         organization: context(row.organizationName, row.organizationSlug, "organizations"),
         server: context(row.serverName, row.serverSlug, "servers"),
         product: context(row.productName, row.productSlug, "market"),
+        tags: (row.tags ?? []).slice(0, 10).map((tag) => tag.slice(0, 30)),
       })),
       hasMore: page.hasMore,
-      nextCursor: page.nextCursor ? encodeDiscussionCursor(page.nextCursor) : null,
+      nextCursor: page.nextCursor
+        ? JSON.stringify({
+            ...page.nextCursor,
+            version: 1,
+            context: contextHash,
+            direction: "older",
+          })
+        : null,
+      previousCursor: page.previousCursor
+        ? JSON.stringify({
+            ...page.previousCursor,
+            version: 1,
+            context: contextHash,
+            direction: "newer",
+          })
+        : null,
     };
   }
 }

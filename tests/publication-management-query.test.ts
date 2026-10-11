@@ -114,6 +114,117 @@ it.each(["user", "organization"] as const)(
     expect(state.queries[0].sql.split(" from ")[0]).not.toMatch(/email|owner_id|role|password/u);
   },
 );
+it("resolves servers only while active and public without exposing endpoint or ownership", async () => {
+  await feed.resolvePublicScope("server", "my-server");
+  expect(state.queries).toHaveLength(1);
+  expect(state.queries[0].params).toEqual(["my-server", "public", "active", 1]);
+  expect(state.queries[0].sql.split(" from ")[0]).not.toMatch(
+    /ip_address|port|owner|organization_id/u,
+  );
+});
+it("filters the live public server, editorial type, exact author and literal tag before the page limit", async () => {
+  await feed.page(
+    { kind: "server", id: "server" },
+    { type: "news", author: "Writer", tag: "%_", query: "%_" },
+  );
+  const query = state.queries[0];
+  expect(query.params).toEqual(
+    expect.arrayContaining([
+      "server",
+      "public",
+      "active",
+      "article",
+      "news",
+      "devlog",
+      "update",
+      "announcement",
+      "writer",
+      "%_",
+      "%\\%\\_%",
+      21,
+    ]),
+  );
+  expect(query.sql).toContain('"servers"."id" =');
+  expect(query.sql).toContain('lower("users"."username")');
+  expect(query.sql).toContain('"users"."display_name" ilike');
+  expect(query.sql).toContain("lower(tag.value)");
+  expect(query.sql).toContain("limit 10");
+  expect(query.sql).not.toContain("offset");
+  expect(query.sql).not.toContain('coalesce("user_profile_preferences"."show_activity", true)');
+});
+it("seeks newer keys in ascending order and presents the nearest twenty newest-first", async () => {
+  const time = "2026-10-11T00:00:00.123456Z";
+  state.rows = [
+    Array.from({ length: 21 }, (_, index) => [
+      `content-${String(index).padStart(2, "0")}`,
+      "slug",
+      "Title",
+      "news",
+      "Excerpt",
+      null,
+      0,
+      time,
+      time,
+      "author",
+      "writer",
+      "Writer",
+      null,
+      null,
+      null,
+      "Server",
+      "server",
+      null,
+      null,
+      [],
+    ]),
+  ];
+  const page = await feed.page(
+    { kind: "server", id: "server" },
+    { cursor: { createdAt: time, id: "boundary", direction: "newer" } },
+  );
+  expect(state.queries[0].sql).toMatch(/\) > \(/u);
+  expect(state.queries[0].sql).toMatch(/order by coalesce.+ asc, "content"\."id" asc limit/u);
+  expect(page.items.map((row) => row.id)).toEqual(
+    Array.from({ length: 20 }, (_, index) => `content-${String(19 - index).padStart(2, "0")}`),
+  );
+  expect(page.previousCursor).toEqual({ createdAt: time, id: "content-19" });
+  expect(page.nextCursor).toEqual({ createdAt: time, id: "content-00" });
+});
+it("offers previous navigation from the first exact key of an older page", async () => {
+  const time = "2026-10-11T00:00:00.123456Z";
+  state.rows = [
+    [
+      [
+        "only",
+        "slug",
+        "Title",
+        "news",
+        "Excerpt",
+        null,
+        0,
+        time,
+        time,
+        "author",
+        "writer",
+        "Writer",
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        [],
+      ],
+    ],
+  ];
+  const page = await feed.page(
+    { kind: "server", id: "server" },
+    { cursor: { createdAt: time, id: "older" } },
+  );
+  expect(page.hasMore).toBe(false);
+  expect(page.previousCursor).toEqual({ createdAt: time, id: "only" });
+});
 const command = (extra = {}) => ({
   slug: "article",
   commentId: "comment",

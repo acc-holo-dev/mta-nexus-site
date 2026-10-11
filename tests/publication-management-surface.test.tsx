@@ -50,6 +50,7 @@ const row: PublicationPage["items"][number] = {
   organization: { name: "Team", href: "/organizations/team" },
   server: null,
   product: null,
+  tags: ["Lua"],
 };
 const initial: PublicationPage = { items: [row], hasMore: true, nextCursor: "cursor" };
 const comment = {
@@ -92,7 +93,6 @@ it.each(["en", "ru"] as const)(
         filters={publicationPageQuery({ source: "organization", q: "Lua" })}
         locale={locale}
         path="/workspace/feed"
-        apiPath="/api/workspace/feed"
         following
       />,
     );
@@ -113,7 +113,6 @@ it("distinguishes unavailable reads, filtered empty results and empty following 
     filters: publicationPageQuery(),
     locale: "en" as const,
     path: "/workspace/feed",
-    apiPath: "/api/workspace/feed",
     following: true,
   };
   const failure = renderToStaticMarkup(<PublicationFeed {...props} initial={null} />);
@@ -145,7 +144,43 @@ it("uses authenticated SSR scope and presents login for anonymous feed", async (
   expect(html).toContain('href="/auth/login"');
   expect(mocks.page).not.toHaveBeenCalled();
 });
-it("reads public author activity with no follow-source authority and a profile link", async () => {
+it("restores a filtered following-feed page from its URL and rejects duplicate page parameters", async () => {
+  const cursor = {
+    createdAt: "2026-10-11T00:00:00.123456Z",
+    id: "publication",
+    context: "a".repeat(64),
+    version: 1,
+    direction: "older",
+  };
+  await FollowingPage({
+    searchParams: Promise.resolve({
+      source: "server",
+      q: "MTA",
+      author: "writer",
+      tag: "Lua",
+      cursor: JSON.stringify(cursor),
+    }),
+  });
+  expect(mocks.page).toHaveBeenCalledWith(
+    { kind: "following", actorId: "author" },
+    expect.objectContaining({
+      source: "server",
+      query: "MTA",
+      author: "writer",
+      tag: "Lua",
+      cursor,
+    }),
+  );
+  mocks.page.mockClear();
+  const invalid = renderToStaticMarkup(
+    await FollowingPage({
+      searchParams: Promise.resolve({ cursor: [JSON.stringify(cursor), JSON.stringify(cursor)] }),
+    }),
+  );
+  expect(invalid).toContain(publicationCopy("en").invalid);
+  expect(mocks.page).not.toHaveBeenCalled();
+});
+it("rejects follow-only filters on public author activity and offers recovery", async () => {
   const html = renderToStaticMarkup(
     await UserActivity({
       params: Promise.resolve({ username: "writer" }),
@@ -154,10 +189,8 @@ it("reads public author activity with no follow-source authority and a profile l
   );
   expect(html).toContain('href="/users/writer"');
   expect(html).not.toContain('name="source"');
-  expect(mocks.page).toHaveBeenCalledWith(
-    { kind: "user", id: "author" },
-    expect.objectContaining({ source: undefined }),
-  );
+  expect(mocks.page).not.toHaveBeenCalled();
+  expect(html).toContain(publicationCopy("en").invalid);
 });
 it.each(["en", "ru"] as const)(
   "exposes edit/remove only to the author and removal to moderators in %s",

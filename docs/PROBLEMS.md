@@ -1736,3 +1736,49 @@ review/edit and revoked moderator authority, and rollback after inbox failure.
 They remain unrun without PostgreSQL; browser interaction and full production
 generation still require verification. No schema, migration, dependency or
 workflow changed; Actions were not used.
+
+### Public server publication archive and durable feed navigation — 2026-10-11
+
+`/servers/[slug]/updates` exposes the complete moderated server archive through
+the existing publication feed, linked from the six-item server preview. Public
+scope resolution and every publication query require an active, public server.
+GET `/api/activity/server/[handle]` reuses the public activity API with strict
+filters, bounded cursors, rate limiting, safe RU/EN errors and no-store responses.
+The archive allows only editorial types; drafts and community-only server posts
+are excluded. Public user activity privacy and commercial resource availability
+predicates retain their existing behavior.
+
+All public user/organization/server archives and `/workspace/feed` now support
+author username and exact tag filters, author-name text search and links from
+authors/tags to the filtered archive. Filters run before the 21-row sentinel
+limit. Summaries include at most ten thirty-character tags and public author
+fields, without full bodies, account details or server endpoints.
+
+Older/newer keysets preserve microsecond timestamps and ID tie breaks. Versioned
+continuations bind to the actual scope ID, session account for following feeds,
+and normalized filters. Reusing a cursor under another scope or filter fails
+before querying. Page URLs retain filters and cursors for reload, sharing and
+browser history. SSR and API use the same strict parser; invalid pages provide
+localized recovery without querying publications. Loading, filtered empty,
+unavailable and stale-empty page states are localized. Navigation is rendered
+as working links; latest/retry perform fresh reads, and result links disable
+automatic prefetch. Concurrent retraction may leave an empty page, with latest
+page recovery; this is a live feed, not a frozen catalog snapshot.
+
+203 focused checks across twenty unit/query/HTTP/render files, TypeScript,
+touched-file Biome, Knip and Next webpack compile pass. Five new PostgreSQL
+fixtures cover bidirectional equal-microsecond traversal, pre-limit filters,
+revoked public scope, privacy/projections and cursor scope integrity. They remain
+unrun without PostgreSQL. Browser interaction and full production generation
+still require verification. No schema, migration, dependency or workflow changed;
+Actions were not used.
+
+Agent A owns the following performance index contract. It is not yet integrated;
+the archive works on the existing schema, but large-server query plans still need
+verification after the index is added:
+
+```sql
+CREATE INDEX content_public_server_feed_time_id_idx
+  ON content (server_id, (coalesce(published_at, created_at)) DESC, id DESC)
+  WHERE status = 'published';
+```

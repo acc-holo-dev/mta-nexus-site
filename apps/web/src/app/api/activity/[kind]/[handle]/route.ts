@@ -19,15 +19,20 @@ export async function GET(
   const context = createRequestLogContext(request);
   try {
     const { kind, handle } = await params;
-    if (kind !== "user" && kind !== "organization") throw new NotFoundError("Profile");
-    const query = parsePublicationQuery(request.nextUrl.searchParams, false);
+    if (kind !== "user" && kind !== "organization" && kind !== "server")
+      throw new NotFoundError("Profile");
+    const query = parsePublicationQuery(request.nextUrl.searchParams, false, kind === "server");
     if (!query) throw new AppError("Invalid filters", 400, "VALIDATION_ERROR");
     if (!(await consumeRateLimit("search", getTrustedRequestIp(request))).success)
       throw new RateLimitExceededError();
     const profile = await publicationFeedService.resolve(kind, handle);
-    return jsonWithRequestId(context, await publicationFeedService.page({ kind, id: profile.id }, query), {
-      headers: { "Cache-Control": "no-store", Vary: "Cookie" },
-    });
+    return jsonWithRequestId(
+      context,
+      await publicationFeedService.page({ kind, id: profile.id }, query),
+      {
+        headers: { "Cache-Control": "no-store", Vary: "Cookie" },
+      },
+    );
   } catch (error) {
     const known = error instanceof AppError,
       code = known ? error.code : "INTERNAL_ERROR";
