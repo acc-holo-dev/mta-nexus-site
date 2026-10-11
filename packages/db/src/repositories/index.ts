@@ -67,3 +67,5 @@ export { resourceBuildWorkspaceRepository } from "./resource-build-workspace";
 export { orderCasesRepository } from "./order-cases";
 export { contentReactionsRepository } from "./content-reactions";
 export { publicUserTrustRepository } from "./public-user-trust";
+export { discussionWorkspaceRepository } from "./discussion-workspace";
+export { publicVerificationHistoryRepository } from "./public-verification-history";

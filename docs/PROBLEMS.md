@@ -1967,3 +1967,66 @@ retained-artifact reapproval, opt-out, access revocation, immutable event guards
 and approval rollback. They remain unrun without PostgreSQL. Docker execution,
 browser interaction, external push dispatch and the pinned Node 26 runtime still
 require verification. No workflow was used or modified.
+
+### Own discussions and recorded verification approvals — 2026-10-11
+
+`/workspace/discussions` and `/workspace/discussions/[id]`, backed by GET
+`/api/workspace/discussions` and GET/PATCH/DELETE `/api/workspace/discussions/[id]`,
+provide a private, searchable cabinet of the session user's publication comments.
+Availability filters, twenty-item keyset pages and account/filter-bound cursors
+preserve exact database microseconds. SQL excludes product reviews and other
+authors, masks unavailable publication titles/slugs/types, and gates title search
+on the same public predicate. Legacy oversized comments have bounded previews,
+a full-text revision and removal without editing. Invalid or repeated parameters,
+client identity/context overrides and oversized mutation bodies are rejected.
+
+Own commands reuse the existing content-first locked discussion mutation. Live
+account and ownership checks occur again under locks; administrators cannot use
+the private cabinet to manage another author's comments. Public text editing uses
+revision comparison; own removal remains available for draft/archived parents.
+Replies survive deletion and the guarded counter does not change publication
+revision/status/time. Exact-target confirmation precedes UI success. Failed or
+uncertain mutations require saved-state recovery. RU/EN screens, errors, loading,
+empty states, metadata and workspace/mobile/discussion navigation are included.
+
+Moderator removal now writes a content-preference-aware author notice in the
+deletion/audit transaction. Previews contain no comment text, publication title
+or private moderation reason. Self removal produces no notice. Stable operation
+IDs avoid duplicate delivery; push enqueue is isolated in the existing savepoint
+pattern. Mandatory audit/inbox failures reject the authoritative operation.
+
+`/users/[username]/trust/history` and GET `/api/users/[username]/trust/history`
+expose only retained, dated, approved identity/developer requests. Current flags
+and twenty historical records are read in one read-only repeatable snapshot.
+Optional type filters and subject/filter-bound cursors use exact resolved time
+and opaque public record keys. Evidence, application IDs, reviewer identities,
+notes, pending/rejected requests and commercial data are not selected or emitted.
+Current flags are displayed separately: an old approval does not establish current
+verification, and an absent record does not imply a rejection or misconduct.
+This is not a full lifecycle ledger; deleted/reclassified legacy records cannot
+be reconstructed from the existing schema.
+
+After rebasing on Agent A's release-watch work, 386 focused unit/query/HTTP/render
+checks across 32 files and touched-file Biome pass. TypeScript and Knip passed
+before integration; the combined main is currently blocked by an upstream
+missing `isSigned` fixture field in `tests/resource-deliveries.integration.test.ts`
+and an unused exported `ResourceReleaseWorkerRepository` class. Agent A owns
+those commercial files; this change preserves them. Next webpack compile mode
+is checked separately. Six PostgreSQL
+fixtures prepare archived removal/reply preservation, private-context masking,
+concurrent revision edits/live roles, atomic moderation notices/opt-out, audit
+rollback and microsecond own/history traversal. They remain unrun without a
+local PostgreSQL instance. Browser interaction, full production generation and
+large-catalog query plans still need verification. No schema, migrations,
+dependencies or workflows changed; Actions were not used.
+
+Agent A owns these additional nonunique index contracts. No migration is created:
+
+```sql
+CREATE INDEX comments_publication_author_time_id_idx
+  ON comments (author_id, created_at DESC, id DESC)
+  WHERE product_id IS NULL AND content_id IS NOT NULL;
+CREATE INDEX verification_public_approval_target_time_key_idx
+  ON verification_requests (target_type, target_id, resolved_at DESC, (md5(id)) DESC)
+  WHERE status = 'approved' AND resolved_at IS NOT NULL;
+```

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
+import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
 import { Avatar, Button } from "@nexus/ui";
 import type { Locale } from "../lib/i18n";
 import { getDiscussionCopy, discussionError } from "../lib/content-discussion-copy";
@@ -56,10 +57,14 @@ export function ContentDiscussion({
   const path = `/api/content/${encodeURIComponent(slug)}/comments`;
   useEffect(() => {
     alive.current = true;
-    return () => { alive.current = false; readController.current?.abort(); };
+    return () => {
+      alive.current = false;
+      readController.current?.abort();
+    };
   }, []);
   useEffect(() => {
-    if (focusedId) document.getElementById(`comment-${focusedId}`)?.scrollIntoView({ block: "center" });
+    if (focusedId)
+      document.getElementById(`comment-${focusedId}`)?.scrollIntoView({ block: "center" });
   }, [focusedId]);
   // biome-ignore lint/correctness/useExhaustiveDependencies: Resolve legacy notification hashes once per mounted article; new links are loaded on the server.
   useEffect(() => {
@@ -84,7 +89,8 @@ export function ContentDiscussion({
     if (query) params.set("q", query);
     if (focusId) params.set("comment", focusId);
     if (cursor) params.set("cursor", cursor);
-    const controller = new AbortController(); readController.current = controller;
+    const controller = new AbortController();
+    readController.current = controller;
     try {
       const response = await fetch(
         `${path}${params.size ? `?${params}` : ""}`,
@@ -123,7 +129,8 @@ export function ContentDiscussion({
       }));
       return true;
     } catch (caught) {
-      if (alive.current && !controller.signal.aborted) setReadError(caught instanceof Error ? caught.message : copy.unavailable);
+      if (alive.current && !controller.signal.aborted)
+        setReadError(caught instanceof Error ? caught.message : copy.unavailable);
       return false;
     } finally {
       readGuard.current = false;
@@ -166,13 +173,45 @@ export function ContentDiscussion({
   }
   return (
     <section id="discussion" className="nexus-panel space-y-5 p-5 sm:p-6">
+      {viewer && (
+        <Link
+          href="/workspace/discussions"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        >
+          {ownDiscussionCopy(locale).title}
+        </Link>
+      )}
       <h2 className="font-heading text-primary">
         {copy.title} ({displayCount})
       </h2>
-      <search aria-label={copy.search}><form onSubmit={(event) => { event.preventDefault(); void load(false, search.trim()); }} className="flex flex-wrap items-end gap-3">
-        <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary"><span>{copy.search}</span><input type="search" maxLength={120} value={search} onChange={(event) => setSearch(event.target.value)} className={platformFieldClass} disabled={loading || submitting || !!managingId} /></label>
-        <Button type="submit" variant="secondary" disabled={loading || submitting || !!managingId}>{copy.applySearch}</Button>
-      </form></search>
+      <search aria-label={copy.search}>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            void load(false, search.trim());
+          }}
+          className="flex flex-wrap items-end gap-3"
+        >
+          <label className="min-w-0 flex-1 space-y-1 text-sm text-secondary">
+            <span>{copy.search}</span>
+            <input
+              type="search"
+              maxLength={120}
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className={platformFieldClass}
+              disabled={loading || submitting || !!managingId}
+            />
+          </label>
+          <Button
+            type="submit"
+            variant="secondary"
+            disabled={loading || submitting || !!managingId}
+          >
+            {copy.applySearch}
+          </Button>
+        </form>
+      </search>
       <form onSubmit={submit} className="space-y-3" aria-busy={submitting}>
         {reply && (
           <div className="flex flex-wrap items-center gap-3 rounded-lg bg-accent-soft p-3 text-sm text-secondary">
@@ -205,13 +244,19 @@ export function ContentDiscussion({
           />
         </label>
         <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" isLoading={submitting} disabled={text.trim().length < 2 || loading || !!managingId}>
+          <Button
+            type="submit"
+            isLoading={submitting}
+            disabled={text.trim().length < 2 || loading || !!managingId}
+          >
             {submitting ? copy.publishing : copy.publish}
           </Button>
           <span className="text-xs text-muted">{text.length}/5000</span>
-          {!viewer && <Link className="text-xs text-accent underline" href="/auth/login">
-            {copy.signIn}
-          </Link>}
+          {!viewer && (
+            <Link className="text-xs text-accent underline" href="/auth/login">
+              {copy.signIn}
+            </Link>
+          )}
         </div>
         {writeError && (
           <p role="alert" className="text-sm text-danger">
@@ -224,7 +269,11 @@ export function ContentDiscussion({
           </p>
         )}
       </form>
-      {managementSuccess && <p role="status" className="text-sm text-accent">{managementSuccess}</p>}
+      {managementSuccess && (
+        <p role="status" className="text-sm text-accent">
+          {managementSuccess}
+        </p>
+      )}
       <div className="space-y-3" aria-busy={loading}>
         {page?.items.map((comment) => (
           <article
@@ -258,7 +307,10 @@ export function ContentDiscussion({
             </header>
             {comment.parentId && (
               <blockquote className="border-l-2 border-base pl-3 text-xs text-muted">
-                <Link className="text-accent underline" href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.parentId)}#comment-${encodeURIComponent(comment.parentId)}`}>
+                <Link
+                  className="text-accent underline"
+                  href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.parentId)}#comment-${encodeURIComponent(comment.parentId)}`}
+                >
                   {copy.parent}{" "}
                   {comment.parent?.username ? `@${comment.parent.username}` : copy.missingParent}
                 </Link>
@@ -268,8 +320,20 @@ export function ContentDiscussion({
             <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
               {comment.text}
             </p>
-            <Link className="inline-flex min-h-11 items-center text-xs text-accent underline" href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`}>{copy.permalink}</Link>
-            {viewer?.id !== comment.author?.id && <CommunityReportForm targetType="comment" targetId={comment.id} locale={locale} authenticated={!!viewer} />}
+            <Link
+              className="inline-flex min-h-11 items-center text-xs text-accent underline"
+              href={`/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`}
+            >
+              {copy.permalink}
+            </Link>
+            {viewer?.id !== comment.author?.id && (
+              <CommunityReportForm
+                targetType="comment"
+                targetId={comment.id}
+                locale={locale}
+                authenticated={!!viewer}
+              />
+            )}
             <button
               className="text-xs text-accent underline"
               type="button"
@@ -286,23 +350,62 @@ export function ContentDiscussion({
             >
               {copy.reply}
             </button>
-            {viewer && comment.revision && (viewer.id === comment.author?.id || viewer.canModerate) && <DiscussionCommentActions
-              comment={comment} own={viewer.id === comment.author?.id} slug={slug} contentId={contentId} locale={locale}
-              disabled={loading || submitting || (!!managingId && managingId !== comment.id)}
-              onPending={(pending) => { writeGuard.current = pending; managementGuard.current = pending; setManagingId(pending ? comment.id : null); if (pending) setManagementSuccess(""); }}
-              onSaved={(value, revision) => {
-                setPage((current) => current ? { ...current, items: current.items
-                  .filter((item) => value !== undefined || item.id !== comment.id)
-                  .map((item) => item.id === comment.id ? { ...item, text: value as string, revision }
-                    : item.parentId === comment.id ? { ...item, parent: value === undefined ? null : { text: value.slice(0, 160), username: comment.author?.username ?? null } } : item) } : current);
-                if (value === undefined) { setDisplayCount((current) => Math.max(0, current - 1)); if (reply?.id === comment.id) setReply(null); }
-                setManagementSuccess(value === undefined ? copy.removed : copy.edited);
-              }}
-            />}
+            {viewer &&
+              comment.revision &&
+              (viewer.id === comment.author?.id || viewer.canModerate) && (
+                <DiscussionCommentActions
+                  comment={comment}
+                  own={viewer.id === comment.author?.id}
+                  slug={slug}
+                  contentId={contentId}
+                  locale={locale}
+                  disabled={loading || submitting || (!!managingId && managingId !== comment.id)}
+                  onPending={(pending) => {
+                    writeGuard.current = pending;
+                    managementGuard.current = pending;
+                    setManagingId(pending ? comment.id : null);
+                    if (pending) setManagementSuccess("");
+                  }}
+                  onSaved={(value, revision) => {
+                    setPage((current) =>
+                      current
+                        ? {
+                            ...current,
+                            items: current.items
+                              .filter((item) => value !== undefined || item.id !== comment.id)
+                              .map((item) =>
+                                item.id === comment.id
+                                  ? { ...item, text: value as string, revision }
+                                  : item.parentId === comment.id
+                                    ? {
+                                        ...item,
+                                        parent:
+                                          value === undefined
+                                            ? null
+                                            : {
+                                                text: value.slice(0, 160),
+                                                username: comment.author?.username ?? null,
+                                              },
+                                      }
+                                    : item,
+                              ),
+                          }
+                        : current,
+                    );
+                    if (value === undefined) {
+                      setDisplayCount((current) => Math.max(0, current - 1));
+                      if (reply?.id === comment.id) setReply(null);
+                    }
+                    setManagementSuccess(value === undefined ? copy.removed : copy.edited);
+                  }}
+                />
+              )}
           </article>
         ))}
       </div>
-      {page && !page.items.length && <p className="text-sm text-muted">{activeQuery.current ? copy.noMatches : copy.first}</p>}
+      {page && !page.items.length && (
+        <p className="text-sm text-muted">{activeQuery.current ? copy.noMatches : copy.first}</p>
+      )}
       {readError && (
         <p role="alert" className="text-sm text-danger">
           {readError}

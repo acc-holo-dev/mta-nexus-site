@@ -3,6 +3,7 @@ import { Avatar } from "@nexus/ui";
 import type { Locale } from "../lib/i18n";
 import type { PublicUserTrust } from "../lib/public-user-trust-contract";
 import { trustCopy } from "../lib/public-user-trust-copy";
+import { approvalCopy } from "../lib/public-verification-history-copy";
 export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; locale: Locale }) {
   const copy = trustCopy(locale),
     profile = `/users/${encodeURIComponent(data.user.username)}`;
@@ -22,6 +23,12 @@ export function PublicUserTrustPanel({ data, locale }: { data: PublicUserTrust; 
         {copy.back}
       </Link>
       <header className="nexus-panel space-y-3 p-6">
+        <Link
+          href={`${profile}/trust/history`}
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        >
+          {approvalCopy(locale).title}
+        </Link>
         <div className="flex items-center gap-3">
           <Avatar
             src={data.user.avatarUrl ?? undefined}

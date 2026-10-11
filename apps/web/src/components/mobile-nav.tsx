@@ -27,6 +27,7 @@ import { getOrganizationCopy } from "../lib/organization-workspace-copy";
 import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { publicationCopy } from "../lib/publication-feed-copy";
 import { reactionCopy } from "../lib/content-reaction-copy";
+import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
 import { communityReportCopy } from "../lib/community-report-copy";
 import { verificationCopy } from "../lib/verification-workspace-copy";
 import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
@@ -49,6 +50,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
   ];
 
   const moreItems = [
+    { href: "/workspace/discussions", label: ownDiscussionCopy(locale).title, icon: MessageSquare },
     { href: "/workspace/reactions", label: reactionCopy(locale).my, icon: MessageSquare },
     { href: "/workspace/verification", label: verificationCopy(locale).title, icon: ShieldCheck },
     { href: "/settings/developer", label: verificationCopy(locale).profile, icon: Code2 },

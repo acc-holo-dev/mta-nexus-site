@@ -3,6 +3,10 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
   failAudit: false,
+  notice: vi.fn(),
+}));
+vi.mock("../packages/db/src/repositories/discussion-moderation-notice", () => ({
+  discussionModerationNotice: state.notice,
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
@@ -32,6 +36,7 @@ beforeEach(() => {
   state.queries = [];
   state.rows = [];
   state.failAudit = false;
+  state.notice.mockReset();
 });
 it.each(["user", "organization", "server", "product"] as const)(
   "scopes feed to actor and selected %s subscriptions in one bounded query",
@@ -275,6 +280,12 @@ it("allows a live moderator to remove another comment with a reason and a guarde
   expect(state.queries.at(-1)?.params).toContain("content.comment_removed");
   expect(JSON.stringify(state.queries.at(-1)?.params)).toContain("Spam");
   expect(JSON.stringify(state.queries.at(-1)?.params)).not.toContain("Original");
+  expect(state.notice).toHaveBeenCalledWith(expect.anything(), {
+    auditId: "audit",
+    authorId: "other",
+    commentId: "comment",
+    slug: "article",
+  });
 });
 it("denies moderator edits and removal without reason", async () => {
   rows("other", "moderator");

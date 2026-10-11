@@ -1,10 +1,24 @@
 import type { Locale } from "./i18n";
 import { userPlatformError } from "./user-platform-copy";
 const en = {
-  search: "Search comments or authors", applySearch: "Search", noMatches: "No matching comments.", focusMissing: "This comment is unavailable. Open the latest discussion.", permalink: "Link to comment", focused: "Selected comment",
-  edit: "Edit", remove: "Remove", confirmRemove: "Confirm removal", removeNote: "The comment will be removed. Replies will remain.",
-  saveEdit: "Save changes", cancelEdit: "Cancel", edited: "Comment updated.", removed: "Comment removed.",
-  changed: "This comment changed. Reload the discussion before editing or removing it.", reason: "Moderation reason", reasonRequired: "Provide a moderation reason.",
+  reloadSaved: "Reload saved comment",
+  search: "Search comments or authors",
+  applySearch: "Search",
+  noMatches: "No matching comments.",
+  focusMissing: "This comment is unavailable. Open the latest discussion.",
+  permalink: "Link to comment",
+  focused: "Selected comment",
+  edit: "Edit",
+  remove: "Remove",
+  confirmRemove: "Confirm removal",
+  removeNote: "The comment will be removed. Replies will remain.",
+  saveEdit: "Save changes",
+  cancelEdit: "Cancel",
+  edited: "Comment updated.",
+  removed: "Comment removed.",
+  changed: "This comment changed. Reload the discussion before editing or removing it.",
+  reason: "Moderation reason",
+  reasonRequired: "Provide a moderation reason.",
   invalidCommand: "Invalid comment action. Reload the discussion and try again.",
   writeUnavailable:
     "Could not confirm the comment. Check the latest discussion before trying again.",
@@ -33,11 +47,26 @@ const en = {
   latest: "Show latest comments",
 };
 const ru: Record<keyof typeof en, string> = {
-  search: "Поиск по комментариям и авторам", applySearch: "Найти", noMatches: "Подходящих комментариев нет.", focusMissing: "Этот комментарий недоступен. Откройте новые сообщения обсуждения.", permalink: "Ссылка на комментарий", focused: "Выбранный комментарий",
-  edit: "Редактировать", remove: "Удалить", confirmRemove: "Подтвердить удаление", removeNote: "Комментарий будет удалён. Ответы сохранятся.",
-  saveEdit: "Сохранить изменения", cancelEdit: "Отмена", edited: "Комментарий обновлён.", removed: "Комментарий удалён.",
-  changed: "Комментарий изменился. Перезагрузите обсуждение перед редактированием или удалением.", reason: "Причина модерации", reasonRequired: "Укажите причину модерации.",
-  invalidCommand: "Некорректное действие с комментарием. Перезагрузите обсуждение и повторите попытку.",
+  reloadSaved: "Загрузить сохранённый комментарий",
+  search: "Поиск по комментариям и авторам",
+  applySearch: "Найти",
+  noMatches: "Подходящих комментариев нет.",
+  focusMissing: "Этот комментарий недоступен. Откройте новые сообщения обсуждения.",
+  permalink: "Ссылка на комментарий",
+  focused: "Выбранный комментарий",
+  edit: "Редактировать",
+  remove: "Удалить",
+  confirmRemove: "Подтвердить удаление",
+  removeNote: "Комментарий будет удалён. Ответы сохранятся.",
+  saveEdit: "Сохранить изменения",
+  cancelEdit: "Отмена",
+  edited: "Комментарий обновлён.",
+  removed: "Комментарий удалён.",
+  changed: "Комментарий изменился. Перезагрузите обсуждение перед редактированием или удалением.",
+  reason: "Причина модерации",
+  reasonRequired: "Укажите причину модерации.",
+  invalidCommand:
+    "Некорректное действие с комментарием. Перезагрузите обсуждение и повторите попытку.",
   writeUnavailable:
     "Не удалось подтвердить комментарий. Проверьте новые сообщения перед повторной отправкой.",
   backCommunity: "К сообществу",
@@ -66,6 +95,7 @@ const ru: Record<keyof typeof en, string> = {
 };
 export const getDiscussionCopy = (locale: Locale) => (locale === "ru" ? ru : en);
 export function discussionError(locale: Locale, code: unknown) {
+  if (code === "DISCUSSION_UNAVAILABLE") return getDiscussionCopy(locale).changed;
   if (code === "COMMENT_FOCUS_NOT_FOUND") return getDiscussionCopy(locale).focusMissing;
   if (code === "COMMENT_COMMAND_INVALID") return getDiscussionCopy(locale).invalidCommand;
   if (code === "COMMENT_CHANGED") return getDiscussionCopy(locale).changed;
@@ -77,6 +107,7 @@ export function discussionError(locale: Locale, code: unknown) {
   return userPlatformError(locale, code);
 }
 export function discussionMutationError(locale: Locale, code: unknown) {
-  if (code === "INTERNAL_ERROR" || code === "UNCONFIRMED") return getDiscussionCopy(locale).writeUnavailable;
+  if (code === "INTERNAL_ERROR" || code === "UNCONFIRMED")
+    return getDiscussionCopy(locale).writeUnavailable;
   return discussionError(locale, code);
 }

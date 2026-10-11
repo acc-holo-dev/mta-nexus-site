@@ -14,6 +14,9 @@ export function DiscussionCommentActions({
   disabled,
   onPending,
   onSaved,
+  endpoint,
+  recoveryHref,
+  editable = true,
 }: {
   comment: DiscussionPage["items"][number];
   own: boolean;
@@ -23,6 +26,9 @@ export function DiscussionCommentActions({
   disabled: boolean;
   onPending: (pending: boolean) => void;
   onSaved: (text?: string, revision?: string) => void;
+  endpoint?: string;
+  recoveryHref?: string;
+  editable?: boolean;
 }) {
   const copy = getDiscussionCopy(locale);
   const [mode, setMode] = useState<"edit" | "remove" | null>(null),
@@ -36,6 +42,7 @@ export function DiscussionCommentActions({
   const busy = useRef(false),
     alive = useRef(true),
     controller = useRef<AbortController | null>(null);
+  const [blocked, setBlocked] = useState(false);
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -44,7 +51,16 @@ export function DiscussionCommentActions({
     };
   }, []);
   async function submit() {
-    if (busy.current || disabled || !mode || !revision || stale) return;
+    if (
+      busy.current ||
+      disabled ||
+      blocked ||
+      !mode ||
+      !revision ||
+      stale ||
+      (mode === "edit" && !editable)
+    )
+      return;
     const value = mode === "edit" ? text.trim() : undefined;
     if (value !== undefined && (value.length < 2 || value.length > 5000)) {
       setError(copy.invalid);
@@ -62,7 +78,8 @@ export function DiscussionCommentActions({
     controller.current = request;
     try {
       const result = await platformRequest(
-        `/api/content/${encodeURIComponent(slug)}/comments/${encodeURIComponent(comment.id)}`,
+        endpoint ??
+          `/api/content/${encodeURIComponent(slug)}/comments/${encodeURIComponent(comment.id)}`,
         locale,
         mode === "edit" ? "PATCH" : "DELETE",
         {
@@ -78,8 +95,10 @@ export function DiscussionCommentActions({
       setMode(null);
       onSaved(value, result.revision);
     } catch (failure) {
-      if (alive.current)
+      if (alive.current) {
+        setBlocked(true);
         setError(failure instanceof Error ? failure.message : copy.writeUnavailable);
+      }
     } finally {
       busy.current = false;
       onPending(false);
@@ -92,11 +111,11 @@ export function DiscussionCommentActions({
     <div className="space-y-3" aria-busy={pending}>
       {!mode ? (
         <div className="flex flex-wrap gap-3">
-          {own && (
+          {own && editable && (
             <button
               type="button"
               className={button}
-              disabled={disabled}
+              disabled={disabled || blocked}
               onClick={() => {
                 setText(comment.text);
                 setRevision(comment.revision);
@@ -110,7 +129,7 @@ export function DiscussionCommentActions({
           <button
             type="button"
             className={button}
-            disabled={disabled}
+            disabled={disabled || blocked}
             onClick={() => {
               setRevision(comment.revision);
               setError("");
@@ -162,7 +181,11 @@ export function DiscussionCommentActions({
             </>
           )}
           <div className="flex flex-wrap gap-3">
-            <button type="submit" className={button} disabled={pending || disabled || stale}>
+            <button
+              type="submit"
+              className={button}
+              disabled={pending || disabled || stale || blocked}
+            >
               {mode === "edit" ? copy.saveEdit : copy.confirmRemove}
             </button>
             <button
@@ -180,6 +203,17 @@ export function DiscussionCommentActions({
         <p role="alert" className="text-sm text-danger">
           {stale ? copy.changed : error}
         </p>
+      )}
+      {(blocked || stale) && (
+        <a
+          href={
+            recoveryHref ??
+            `/articles/${encodeURIComponent(slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`
+          }
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        >
+          {copy.reloadSaved}
+        </a>
       )}
     </div>
   );

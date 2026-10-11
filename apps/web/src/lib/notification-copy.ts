@@ -14,6 +14,17 @@ export function formatNotification(
   const releaseNotice = resourceReleaseNotification(notification.data, locale);
   if (releaseNotice) return releaseNotice;
   if (
+    notification.title === "Discussion moderation" &&
+    /^Comment ([a-zA-Z0-9_-]{1,128}): removed\.$/u.test(notification.message)
+  )
+    return {
+      title: locale === "ru" ? "Модерация обсуждения" : "Discussion moderation",
+      message:
+        locale === "ru"
+          ? "Модератор удалил ваш комментарий. Ответы сохранены."
+          : "A moderator removed your comment. Replies remain.",
+    };
+  if (
     notification.title === "Publication reaction" &&
     /^Publication ([a-zA-Z0-9_-]{1,128}): reaction\.$/u.test(notification.message)
   )
