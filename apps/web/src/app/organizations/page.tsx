@@ -11,7 +11,7 @@ export default async function OrganizationsPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-} = {}) {
+}) {
   const locale = await getRequestLocale();
   const copy = discoveryCopy(locale);
   const state = parseDiscoverQuery({ ...(await searchParams), type: "organizations" });

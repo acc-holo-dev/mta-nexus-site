@@ -32,7 +32,7 @@ beforeEach(() => {
   state.page.mockResolvedValue({ items: [], hasMore: false, nextCursor: null });
 });
 it("renders a sign-in boundary without reading saved follows", async () => {
-  expect(renderToStaticMarkup(await SavedPage())).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await SavedPage({}))).toContain('href="/auth/login"');
   expect(state.page).not.toHaveBeenCalled();
 });
 it.each(["en", "ru"] as const)(
@@ -58,7 +58,7 @@ it.each(["en", "ru"] as const)(
 it("distinguishes a failed initial read from an empty saved list", async () => {
   state.actor = { id: "actor" };
   state.page.mockRejectedValue(new Error("database-secret"));
-  const html = renderToStaticMarkup(await SavedPage());
+  const html = renderToStaticMarkup(await SavedPage({}));
   expect(html).toContain('data-loaded="false"');
   expect(html).not.toContain("database-secret");
 });

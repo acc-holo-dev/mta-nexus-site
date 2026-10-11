@@ -188,7 +188,7 @@ it("rejects unknown and duplicate private filters before reading publication dat
 it("requires a session on the desk and history without exposing target titles", async () => {
   state.actor = null;
   for (const page of [
-    await Desk(),
+    await Desk({}),
     await History({ params: Promise.resolve({ id: "article" }) }),
   ]) {
     const html = renderToStaticMarkup(page);
@@ -200,7 +200,7 @@ it("requires a session on the desk and history without exposing target titles", 
 });
 it("distinguishes auth, unavailable and forbidden-target errors from empty histories", async () => {
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH_DETAILS"));
-  const desk = renderToStaticMarkup(await Desk());
+  const desk = renderToStaticMarkup(await Desk({}));
   expect(desk).toContain('role="alert"');
   expect(desk).not.toContain("PRIVATE_AUTH_DETAILS");
   expect(desk).not.toContain(authorPublicationDeskCopy("en").empty);
@@ -287,7 +287,7 @@ it("isolates a selected feed to the signed-in actor and hides auth failures", as
     expect.objectContaining({ source: "server", target: "selected" }),
   );
   state.session.mockRejectedValueOnce(Error("PRIVATE_AUTH_DETAILS"));
-  const html = renderToStaticMarkup(await Following());
+  const html = renderToStaticMarkup(await Following({}));
   expect(html).toContain('role="alert"');
   expect(html).not.toContain("PRIVATE_AUTH_DETAILS");
   expect(html).toContain('href="/workspace/feed"');

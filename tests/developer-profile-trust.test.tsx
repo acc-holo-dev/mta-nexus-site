@@ -121,7 +121,7 @@ describe("creator directory trust behavior", () => {
 
   it("renders a bounded directory with honest identity labels", async () => {
     directoryPage.mockResolvedValue({ type: "creators", items: state.developers, page: 1, hasMore: false });
-    const html = renderToStaticMarkup(await DevelopersPage());
+    const html = renderToStaticMarkup(await DevelopersPage({}));
     const copy = getDictionary("en").discover;
 
     expect(directoryPage).toHaveBeenCalledWith(expect.objectContaining({ type: "creators", page: 1 }));

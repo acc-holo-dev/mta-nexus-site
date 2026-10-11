@@ -42,6 +42,7 @@ import { VerificationModerationControls } from "../../components/verification-mo
 import { ReportModerationControls } from "../../components/report-moderation-controls";
 import { communityReportCopy } from "../../lib/community-report-copy";
 import { verificationCopy } from "../../lib/verification-workspace-copy";
+import { verificationApplicationsCopy } from "../../lib/verification-applications-copy";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { getCommercialCopy } from "../../lib/commercial-i18n";
 
@@ -250,6 +251,11 @@ export default async function AdminPage({
                   {request.notes && (
                     <p className="font-caption text-faint">{request.notes}</p>
                   )}
+                  {request.evidenceUpdated && (
+                    <p className="text-xs text-secondary">
+                      {verificationApplicationsCopy(locale).updated}
+                    </p>
+                  )}
                   {request.targetUsername && (
                     <Link
                       href={`/users/${encodeURIComponent(request.targetUsername)}`}
@@ -315,7 +321,11 @@ export default async function AdminPage({
                     }
                   />
                   {request.status === "pending" && (
-                    <VerificationModerationControls requestId={request.id} />
+                    <VerificationModerationControls
+                      key={`${request.id}:${request.applicationRevision}`}
+                      requestId={request.id}
+                      applicationRevision={request.applicationRevision}
+                    />
                   )}
                 </div>
               </div>

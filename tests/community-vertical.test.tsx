@@ -153,7 +153,7 @@ describe("community topic submission behavior", () => {
     ];
     listCommunityTopics.mockResolvedValue({ items: state.topics, page: 1, hasMore: false });
 
-    const html = renderToStaticMarkup(await CommunityPage());
+    const html = renderToStaticMarkup(await CommunityPage({}));
 
     expect(listCommunityTopics).toHaveBeenCalledWith({ page: 1, query: "" });
     expect(html).toContain('href="/community/new"');

@@ -68,7 +68,7 @@ describe("closed-beta workspace behavior", () => {
   });
 
   it("does not read a private saved collection for an anonymous visitor", async () => {
-    const page = await SavedPage();
+    const page = await SavedPage({});
 
     expect(page).toBeTruthy();
     expect(repos.follows).not.toHaveBeenCalled();
@@ -84,7 +84,7 @@ describe("closed-beta workspace behavior", () => {
       username: "saved",
       role: "user",
     };
-    await SavedPage();
+    await SavedPage({});
     expect(repos.saved).toHaveBeenCalledWith("usr_saved", {
       query: "",
       type: undefined,
@@ -106,7 +106,7 @@ describe("closed-beta workspace behavior", () => {
     ]);
     repos.servers.mockResolvedValue([]);
 
-    await SavedPage();
+    await SavedPage({});
 
     expect(repos.directory).not.toHaveBeenCalled();
   });

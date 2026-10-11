@@ -1,25 +1,27 @@
 "use client";
-import Link from "next/link";
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { z } from "zod";
 import { Button } from "@nexus/ui";
 import { safeExternalWebUrl } from "@nexus/validation";
+import Link from "next/link";
+import { type FormEvent, useEffect, useRef, useState } from "react";
+import { z } from "zod";
 import type { Locale } from "../lib/i18n";
+import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+import { verificationApplicationsCopy } from "../lib/verification-applications-copy";
 import {
   VERIFICATION_TYPES,
+  type VerificationOverview,
+  type VerificationQuery,
+  type VerificationTargets,
   verificationApplicationSchema,
   verificationOverviewSchema,
   verificationTargetsSchema,
-  type VerificationOverview,
-  type VerificationTargets,
-  type VerificationQuery,
 } from "../lib/verification-workspace-contract";
 import {
   verificationCopy,
   verificationError,
   verificationMutationError,
 } from "../lib/verification-workspace-copy";
-import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
+
 type Target = { type: "user" | "developer" | "organization"; id: string; name: string };
 export function VerificationWorkspace({
   initial,
@@ -357,7 +359,7 @@ export function VerificationWorkspace({
               </p>
               <Link
                 className="text-sm text-accent underline"
-                href={`/workspace/verification?view=pending&type=${target.type}#verification-${encodeURIComponent(savedId)}`}
+                href={`/workspace/verification/${encodeURIComponent(savedId)}`}
               >
                 {copy.title}
               </Link>
@@ -421,7 +423,13 @@ export function VerificationWorkspace({
         </Link>
       </section>
       <section className="space-y-4">
-        <nav className="flex gap-3" aria-label={copy.title}>
+        <nav className="flex flex-wrap gap-3" aria-label={copy.title}>
+          <Link
+            href="/workspace/verification/history"
+            className="min-h-11 rounded-md border border-base px-3 py-2 text-sm text-accent"
+          >
+            {verificationApplicationsCopy(locale).title}
+          </Link>
           {(["pending", "history"] as const).map((view) => (
             <Link
               key={view}
@@ -469,6 +477,13 @@ export function VerificationWorkspace({
               <span className="text-xs text-secondary">{copy[application.status]}</span>
             </div>
             <p className="break-all text-xs text-muted">{application.targetId}</p>
+            <Link
+              prefetch={false}
+              href={`/workspace/verification/${encodeURIComponent(application.id)}`}
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            >
+              {verificationApplicationsCopy(locale).open}
+            </Link>
             <p className="whitespace-pre-wrap break-words text-sm text-secondary">
               {application.notes}
             </p>

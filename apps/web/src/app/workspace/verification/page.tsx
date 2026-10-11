@@ -1,15 +1,15 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { VerificationWorkspace } from "../../../components/verification-workspace";
+import { getRequestLocale } from "../../../lib/i18n-server";
 import { authService } from "../../../lib/services/auth-service";
 import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
-import { getRequestLocale } from "../../../lib/i18n-server";
-import { verificationCopy } from "../../../lib/verification-workspace-copy";
 import {
-  verificationPageQuery,
   verificationOverviewSchema,
+  verificationPageQuery,
   verificationTargetsSchema,
 } from "../../../lib/verification-workspace-contract";
+import { verificationCopy } from "../../../lib/verification-workspace-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -21,10 +21,19 @@ export default async function VerificationPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-} = {}) {
+}) {
   const locale = await getRequestLocale(),
-    copy = verificationCopy(locale),
+    copy = verificationCopy(locale);
+  let actor: Awaited<ReturnType<typeof authService.getSession>>;
+  try {
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <p role="alert" className="nexus-panel p-6 text-sm text-danger">
+        {copy.unavailable}
+      </p>
+    );
+  }
   if (!actor)
     return (
       <div className="nexus-panel space-y-4 p-8">

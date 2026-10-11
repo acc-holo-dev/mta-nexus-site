@@ -185,6 +185,10 @@ control-challenge flow. Moderators review current profile/authority context at
 `/admin`; profile revisions, live roles and independent approval are checked in
 the same transaction as the decision, audit and requester notification. Both
 languages include errors, metadata, saved-state recovery and navigation.
+`/workspace/verification/history` searches own applications with bounded keyset
+navigation. Private application cards let authors replace pending evidence and
+resubmit their current professional profile; moderators decide the observed
+evidence revision. MTA proofs and resolved applications remain read-only.
 
 Recommended zero-host-dependency path: Docker Compose. Host Node.js, pnpm and PostgreSQL are not required.
 

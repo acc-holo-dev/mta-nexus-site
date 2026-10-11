@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import { AppError, type User } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   own: vi.fn(),
   update: vi.fn(),
@@ -9,13 +10,18 @@ const mocks = vi.hoisted(() => ({
   targets: vi.fn(),
   createRequest: vi.fn(),
   resolveRequest: vi.fn(),
+  applications: vi.fn(),
+  application: vi.fn(),
+  amend: vi.fn(),
 }));
 vi.mock("@nexus/db", () => ({
   developerProfileRepository: mocks,
   verificationRepository: mocks,
   verificationWorkspaceRepository: mocks,
 }));
+
 import { verificationWorkspaceService as service } from "../apps/web/src/lib/services/verification-workspace-service";
+
 const actor = { id: "actor", role: "developer" } as User,
   time = new Date("2026-10-10T00:00:00Z");
 beforeEach(() => {
@@ -147,4 +153,94 @@ it("gates moderation in the service and propagates pending-state conflicts witho
       reviewNotes: "Reviewed",
     }),
   ).toEqual({ id: "request", status: "approved" });
+});
+it("keeps application detail and event DTOs private and sanitizes proof links", async () => {
+  mocks.application.mockResolvedValue({
+    row: {
+      id: "request",
+      targetType: "developer",
+      targetId: "PRIVATE",
+      status: "pending",
+      proofUrl: "javascript:alert(1)",
+      notes: "Evidence",
+      reviewNotes: "Feedback",
+      truncated: false,
+      createdAt: time.toISOString(),
+      resolvedAt: null,
+      eventId: "PRIVATE",
+      submittedProfileRevision: "PRIVATE",
+      requesterId: "PRIVATE",
+      reviewerId: "PRIVATE",
+    },
+    revision: "a".repeat(64),
+    profileState: "changed",
+    events: [
+      {
+        id: "audit",
+        action: "verification.application_updated",
+        createdAt: time.toISOString(),
+        actorId: "PRIVATE",
+        details: { notes: "PRIVATE" },
+      },
+    ],
+    hasEarlierEvents: false,
+  });
+  const result = await service.application(actor, "request");
+  expect(result).toMatchObject({ editable: true, proofUrl: null, profileState: "changed" });
+  expect(JSON.stringify(result)).not.toContain("PRIVATE");
+  expect(mocks.application).toHaveBeenCalledWith("actor", "request");
+});
+it("validates own amendment before storage and owns all authority and audit fields", async () => {
+  const input = {
+    expectedRevision: "a".repeat(64),
+    proofUrl: "https://example.test/proof",
+    notes: "Updated evidence",
+  };
+  await expect(
+    service.amend(actor, "request", { ...input, requesterId: "victim" }),
+  ).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
+  expect(mocks.amend).not.toHaveBeenCalled();
+  await expect(service.amend(actor, "../../victim", input)).rejects.toMatchObject({
+    code: "NOT_FOUND",
+  });
+  await service.amend(actor, "request", input);
+  expect(mocks.amend).toHaveBeenCalledWith(
+    "actor",
+    "request",
+    input,
+    expect.objectContaining({
+      id: expect.any(String),
+      actorId: "actor",
+      actorType: "user",
+      action: "verification.application_updated",
+      targetId: "request",
+      targetType: "verification",
+    }),
+  );
+});
+it("returns only own bounded history summaries and passes filters with actor scope", async () => {
+  const filters = {
+    query: "word",
+    type: "developer" as const,
+    status: "pending" as const,
+    cursor: undefined,
+  };
+  mocks.applications.mockResolvedValue({
+    items: [
+      {
+        id: "request",
+        targetType: "developer",
+        status: "pending",
+        notes: "Excerpt",
+        createdAt: time.toISOString(),
+        resolvedAt: time,
+        proofUrl: "PRIVATE",
+        reviewerId: "PRIVATE",
+      },
+    ],
+    olderCursor: null,
+    newerCursor: null,
+  });
+  expect(JSON.stringify(await service.applications(actor, filters))).not.toContain("PRIVATE");
+  expect(mocks.applications).toHaveBeenCalledWith("actor", filters);
 });

@@ -16,7 +16,7 @@ export async function generateMetadata() {
   return { title: copy.title, description: copy.description };
 }
 
-export default async function CommunityPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> } = {}) {
+export default async function CommunityPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const copy = dictionary.community;

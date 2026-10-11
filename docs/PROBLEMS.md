@@ -1749,8 +1749,9 @@ cards include current professional context; decisions recheck live staff and
 organization authority, refuse self approval and compare the submitted profile
 fingerprint stored in the existing request audit. Resolution, audit and requester
 inbox remain transactional; MTA proof/scope checks remain intact. Existing pending
-developer applications without a profile fingerprint must be rejected and
-resubmitted rather than automatically approved.
+developer applications without a profile fingerprint cannot be automatically
+approved. They can now submit their current profile through the pending-evidence
+update described below.
 
 129 focused contract, service, HTTP, SQL-builder and SSR checks pass, including
 existing MTA control-proof and community-report regressions. After rebasing on
@@ -2549,3 +2550,61 @@ CREATE INDEX content_author_publication_updated_id_idx
   WHERE type IN ('article','news','devlog','update','announcement','post','question')
     AND status IN ('draft','published','archived');
 ```
+
+
+### Private verification evidence updates and searchable applications — 2026-10-11
+
+`/workspace/verification/history` and its authenticated GET API search only the
+requester's applications by explanation, feedback or ID, status and type.
+Keyset pages fetch 21 rows for 20 summaries, preserve microseconds and original
+submission order, bind account/filters and select nearest newer rows without
+an anchor lookup. Existing requester and audit target indexes are reused;
+large-catalog query plans still require measurement.
+
+Private `/workspace/verification/[id]` and GET/PATCH API expose bounded evidence,
+feedback, current/submitted professional-profile comparison and twenty latest
+retained submission/update/decision events. Reviewer identities, account fields,
+IP addresses, raw audit details and profile fingerprints are excluded. Activity
+is retained event history, not historical copies of evidence text.
+
+Authors can replace pending identity, developer or organization evidence using
+the observed revision. The transaction locks the own request before checking
+current target/organization authority and the professional profile. It replaces
+only URL/explanation and writes a mandatory immutable audit identity with a
+monotonically ordered timestamp and current profile fingerprint. Submission
+date, status, target, badges and commercial scores remain intact. Foreign,
+resolved and MTA-control applications cannot use this command. Clients confirm,
+coalesce writes, validate exact acknowledgements, ignore late navigation replies
+and require reload after uncertain outcomes.
+
+Moderator cards carry the same evidence revision. A stale decision rolls back
+before target mutation, resolution audit and inbox notification; amended
+applications also reject unversioned legacy moderator commands. Untouched
+legacy applications retain the existing decision contract. Independent approval,
+live reviewer/target authority, profile matching and MTA ownership checks remain.
+New RU/EN pages provide metadata, loading, empty, error and mobile form states.
+No table, migration, dependency or workflow changed.
+
+170 focused unit/HTTP/SQL-builder/SSR/interaction checks across 19 files pass.
+New verification files pass Biome; existing shared pages/tests retain unrelated
+formatting and pass lint. Next webpack compile mode passes; full production
+page generation was not run.
+Six PostgreSQL fixtures prepare current-profile resubmission, stale-decision
+rollback, concurrent commands, mandatory-audit rollback, revoked team authority
+and exact bidirectional traversal; they remain unrun without PostgreSQL.
+Browser interaction and full production page generation remain to be verified.
+Root TypeScript retains only the existing missing `isSigned` delivery fixture;
+Knip retains three upstream commercial exports (`packageInspectionLimits`,
+`storageListSchema`, `ResourceReleaseWorkerRepository`).
+
+After rebasing on Agent A's resource-copy block, 214 focused checks across
+23 files pass, including its copy contracts, HTTP, repository and page regressions.
+
+
+The additional Next generated-route typecheck exposed optional default page
+arguments incompatible with Next's PageProps contract. Thirteen noncommercial
+catalog/community/workspace pages now receive the required props object; query
+fields remain optional and page behavior is unchanged. Direct SSR fixtures pass
+an empty props object where appropriate. The web application's complete
+TypeScript check, including generated route types, passes. After this fix,
+299 targeted checks across 33 files pass.

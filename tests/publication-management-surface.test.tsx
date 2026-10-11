@@ -143,7 +143,7 @@ it("uses authenticated SSR scope and presents login for anonymous feed", async (
   );
   mocks.session.mockResolvedValue(null);
   mocks.page.mockClear();
-  const html = renderToStaticMarkup(await FollowingPage());
+  const html = renderToStaticMarkup(await FollowingPage({}));
   expect(html).toContain('href="/auth/login"');
   expect(mocks.page).not.toHaveBeenCalled();
 });

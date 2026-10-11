@@ -22,7 +22,7 @@ export default async function OwnDiscussionsPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-} = {}) {
+}) {
   const locale = await getRequestLocale(),
     copy = ownDiscussionCopy(locale);
   let authFailed = false;

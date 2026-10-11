@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { externalWebUrlSchema, safeExternalWebUrl } from "@nexus/validation";
+import { z } from "zod";
 export const VERIFICATION_TYPES = ["user", "developer", "organization", "server"] as const;
 export const developerProfileUpdateSchema = z
   .object({
@@ -38,6 +38,10 @@ export const verificationDecisionSchema = z
   .object({
     decision: z.enum(["approved", "rejected"]),
     reviewNotes: z.string().trim().min(3).max(2000),
+    expectedApplicationRevision: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/u)
+      .optional(),
   })
   .strict();
 export function parseVerificationQuery(params: URLSearchParams, targets = false) {

@@ -25,7 +25,7 @@ export default async function NotificationCenterPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-} = {}) {
+}) {
   const locale = await getRequestLocale(),
     copy = notificationInboxCopy(locale),
     params = new URLSearchParams();

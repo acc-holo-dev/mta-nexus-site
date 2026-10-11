@@ -19,7 +19,7 @@ export default async function SavedPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-} = {}) {
+}) {
   const locale = await getRequestLocale();
   const copy = followCopy(locale);
   const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);

@@ -16,7 +16,7 @@ export default async function ReactionsPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-} = {}) {
+}) {
   const locale = await getRequestLocale(),
     copy = reactionCopy(locale),
     actor = await authService.getSession((await cookies()).get("nexus_session")?.value);

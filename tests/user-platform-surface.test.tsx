@@ -78,7 +78,7 @@ it.each(["ru", "en"] as Locale[])(
 it("renders service failure separately from an empty feed and hides internal text", async () => {
   state.locale = "en";
   state.failed = true;
-  const html = renderToStaticMarkup(await ArticlesPage());
+  const html = renderToStaticMarkup(await ArticlesPage({}));
   expect(html).toContain('role="alert"');
   expect(html).toContain(getUserPlatformCopy("en").unavailable);
   expect(html).not.toContain("DB private details");

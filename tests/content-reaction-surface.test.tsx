@@ -138,7 +138,7 @@ it.each(["en", "ru"] as const)(
 );
 it("does not fetch private reactions for an anonymous viewer", async () => {
   mocks.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await ReactionsPage())).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await ReactionsPage({}))).toContain('href="/auth/login"');
   expect(mocks.page).not.toHaveBeenCalled();
 });
 it("rejects duplicate/unknown SSR parameters and provides a fresh-state recovery link", async () => {
@@ -149,7 +149,7 @@ it("rejects duplicate/unknown SSR parameters and provides a fresh-state recovery
   expect(mocks.page).not.toHaveBeenCalled();
   expect(html).toContain('href="/workspace/reactions"');
   mocks.page.mockRejectedValue(new AppError("private filter", 400, "INVALID_CURSOR"));
-  expect(renderToStaticMarkup(await ReactionsPage())).toContain(reactionCopy("en").invalid);
+  expect(renderToStaticMarkup(await ReactionsPage({}))).toContain(reactionCopy("en").invalid);
 });
 it.each(["en", "ru"] as const)(
   "explains current trust scope, hidden activity and absent recorded dates in %s",

@@ -28,7 +28,7 @@ export default async function AuthorContentPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-} = {}) {
+}) {
   const locale = await getRequestLocale(),
     copy = authorPublicationDeskCopy(locale),
     labels = getUserPlatformCopy(locale),

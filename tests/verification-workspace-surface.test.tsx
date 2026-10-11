@@ -126,7 +126,7 @@ it("publishes a genuine experience badge only when that flag is verified; suppre
 });
 it("does not load private account data for anonymous sessions or professional settings for unrelated roles", async () => {
   mocks.session.mockResolvedValue(null);
-  expect(renderToStaticMarkup(await VerificationPage())).toContain('href="/auth/login"');
+  expect(renderToStaticMarkup(await VerificationPage({}))).toContain('href="/auth/login"');
   expect(renderToStaticMarkup(await DeveloperSettingsPage())).toContain('href="/auth/login"');
   expect(mocks.overview).not.toHaveBeenCalled();
   mocks.session.mockResolvedValue({ id: "actor", role: "user" });

@@ -19,7 +19,7 @@ export default async function FollowingFeedPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-} = {}) {
+}) {
   const locale = await getRequestLocale(),
     copy = publicationCopy(locale);
   let actor: User | null;

@@ -23,7 +23,7 @@ export default async function StreamPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-} = {}) {
+}) {
   const locale = await getRequestLocale(),
     copy = discoveryStreamCopy(locale),
     dictionary = getDictionary(locale).discover,

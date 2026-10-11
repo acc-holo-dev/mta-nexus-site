@@ -12,7 +12,7 @@ export default async function DevelopersPage({
   searchParams,
 }: {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
-} = {}) {
+}) {
   const locale = await getRequestLocale();
   const copy = getDictionary(locale).developers;
   const state = parseDiscoverQuery({ ...(await searchParams), type: "creators" });

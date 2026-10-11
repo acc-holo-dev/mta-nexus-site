@@ -1,27 +1,31 @@
-import { and, asc, count, eq, desc, getTableColumns, inArray, isNotNull, sql } from "drizzle-orm";
-import { db } from "../client";
-import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
-import {
-  auditEvents,
-  notifications,
-  verificationRequests,
-  users,
-  organizations,
-  servers,
-  serverClaimChallenges,
-  developerProfiles,
-} from "../schema";
-import { generateId } from "@nexus/security";
+import type { AuditEvent } from "@nexus/domain";
 import {
   AppError,
   ConflictError,
   ForbiddenError,
   serverClaimMatchesOwnershipScope,
 } from "@nexus/domain";
-import type { AuditEvent } from "@nexus/domain";
-
+import { generateId } from "@nexus/security";
+import { and, asc, count, desc, eq, getTableColumns, inArray, isNotNull, sql } from "drizzle-orm";
+import { db } from "../client";
+import {
+  auditEvents,
+  developerProfiles,
+  notifications,
+  organizations,
+  serverClaimChallenges,
+  servers,
+  users,
+  verificationRequests,
+} from "../schema";
 import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
+import {
+  verificationApplicationRevision,
+  verificationEvidenceActions,
+  verificationEvidenceSubmission,
+} from "./verification-application-version";
 import { verificationTargetAuthority } from "./verification-authority";
+import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
 
 const VALID_TARGET_TYPES = ["user", "developer", "organization", "server"] as const;
 export type VerificationTargetType = (typeof VALID_TARGET_TYPES)[number];
@@ -193,6 +197,7 @@ export class VerificationRepository {
       view === "pending"
         ? [asc(verificationRequests.createdAt), asc(verificationRequests.id)]
         : [desc(verificationRequests.resolvedAt), desc(verificationRequests.id)];
+    const submission = verificationEvidenceSubmission(db);
     const rows = await db
       .select({
         ...getTableColumns(verificationRequests),
@@ -200,8 +205,11 @@ export class VerificationRepository {
         organizationSlug: organizations.slug,
         currentSpecialties: developerProfiles.specialties,
         currentGithubUrl: developerProfiles.githubUrl,
+        evidenceEventId: submission.id,
+        evidenceAction: submission.action,
       })
       .from(verificationRequests)
+      .leftJoinLateral(submission, sql`true`)
       .leftJoin(
         users,
         and(
@@ -227,7 +235,18 @@ export class VerificationRepository {
       .orderBy(...ordering)
       .limit(pageSize + 1)
       .offset((page - 1) * pageSize);
-    return { requests: rows.slice(0, pageSize), hasMore: rows.length > pageSize };
+    return {
+      requests: rows.slice(0, pageSize).map(({ evidenceEventId, evidenceAction, ...row }) => ({
+        ...row,
+        applicationRevision: verificationApplicationRevision(
+          row.id,
+          row.status,
+          evidenceEventId ?? null,
+        ),
+        evidenceUpdated: evidenceAction === "verification.application_updated",
+      })),
+      hasMore: rows.length > pageSize,
+    };
   }
 
   async listByRequester(requesterId: string) {
@@ -249,6 +268,7 @@ export class VerificationRepository {
       reviewerId: string;
       decision: "approved" | "rejected";
       reviewNotes?: string;
+      expectedApplicationRevision?: string;
     },
     audit?: Omit<AuditEvent, "createdAt">,
   ) {
@@ -276,6 +296,41 @@ export class VerificationRepository {
       const request = rows[0];
       if (!request) return null;
 
+      const [evidence] = await tx
+        .select({
+          id: auditEvents.id,
+          action: auditEvents.action,
+          profileRevision: sql<string | null>`${auditEvents.details}->>'developerProfileRevision'`,
+        })
+        .from(auditEvents)
+        .where(
+          and(
+            eq(auditEvents.targetId, request.id),
+            eq(auditEvents.targetType, "verification"),
+            eq(auditEvents.actorId, request.requesterId),
+            eq(auditEvents.actorType, "user"),
+            inArray(auditEvents.action, verificationEvidenceActions),
+          ),
+        )
+        .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
+        .limit(1);
+      const pendingRevision = verificationApplicationRevision(
+        request.id,
+        "pending",
+        evidence?.id ?? null,
+      );
+      if (
+        (input.expectedApplicationRevision &&
+          input.expectedApplicationRevision !== pendingRevision) ||
+        (!input.expectedApplicationRevision &&
+          evidence?.action === "verification.application_updated")
+      )
+        throw new AppError(
+          "Application evidence changed; reload before deciding",
+          409,
+          "VERIFICATION_APPLICATION_CHANGED",
+        );
+
       if (input.decision === "approved") {
         if (request.requesterId === input.reviewerId)
           throw new AppError("Independent review required", 403, "VERIFICATION_SELF_REVIEW");
@@ -297,22 +352,7 @@ export class VerificationRepository {
             false,
           );
           if (request.targetType === "developer") {
-            const [submission] = await tx
-              .select({ details: auditEvents.details })
-              .from(auditEvents)
-              .where(
-                and(
-                  eq(auditEvents.targetId, request.id),
-                  eq(auditEvents.targetType, "verification"),
-                  eq(auditEvents.action, "verification.requested"),
-                ),
-              )
-              .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
-              .limit(1);
-            if (
-              !currentRevision ||
-              submission?.details?.developerProfileRevision !== currentRevision
-            )
+            if (!currentRevision || evidence?.profileRevision !== currentRevision)
               throw new AppError(
                 "Developer profile changed since submission",
                 409,
@@ -452,18 +492,18 @@ export class VerificationRepository {
           createdAt: new Date(),
         });
       }
-        await tx.insert(auditEvents).values({
-          ...(audit ?? {
-            id: generateId("aud"),
-            actorId: input.reviewerId,
-            actorType: "admin" as const,
-            action: `verification.${input.decision}`,
-            targetType: "verification",
-            targetId: request.id,
-            details: { notes: input.reviewNotes ?? "" },
-          }),
-          createdAt: new Date(),
-        });
+      await tx.insert(auditEvents).values({
+        ...(audit ?? {
+          id: generateId("aud"),
+          actorId: input.reviewerId,
+          actorType: "admin" as const,
+          action: `verification.${input.decision}`,
+          targetType: "verification",
+          targetId: request.id,
+          details: { notes: input.reviewNotes ?? "" },
+        }),
+        createdAt: new Date(),
+      });
 
       const decisionLabel = input.decision === "approved" ? "approved" : "rejected";
       const [resolutionNotification] = await tx

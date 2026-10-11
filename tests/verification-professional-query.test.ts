@@ -1,6 +1,7 @@
 import { getTableColumns } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -30,15 +31,17 @@ vi.mock("../packages/db/src/client", async () => {
 vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
   enqueueWebPushOutboxForNotification: async () => ({ queued: 0, reason: "no_subscriptions" }),
 }));
-import {
-  developerProfileRepository,
-  developerExperienceRevision,
-} from "../packages/db/src/repositories/developer-profile";
-import { verificationWorkspaceRepository } from "../packages/db/src/repositories/verification-workspace";
-import { verificationTargetAuthority } from "../packages/db/src/repositories/verification-authority";
-import { VerificationRepository } from "../packages/db/src/repositories/verification";
+
 import { db } from "../packages/db/src/client";
+import {
+  developerExperienceRevision,
+  developerProfileRepository,
+} from "../packages/db/src/repositories/developer-profile";
+import { VerificationRepository } from "../packages/db/src/repositories/verification";
+import { verificationTargetAuthority } from "../packages/db/src/repositories/verification-authority";
+import { verificationWorkspaceRepository } from "../packages/db/src/repositories/verification-workspace";
 import { verificationRequests } from "../packages/db/src/schema";
+
 const authority = (requesterId: string, type: string, targetId: string, applying: boolean) =>
   db.transaction((tx) => verificationTargetAuthority(tx, requesterId, type, targetId, applying));
 const time = "2026-10-10T00:00:00.000Z",
@@ -208,10 +211,10 @@ function approvalRows(extra: { snapshot?: string; finalRole?: string } = {}) {
   state.rows = [
     [["moderator"]],
     [request()],
+    [["submission", "verification.requested", extra.snapshot ?? revision]],
     [["developer"], ["moderator"]],
     [["developer", true]],
     [[["Lua"], "https://github.com/example", false]],
-    [[{ developerProfileRevision: extra.snapshot ?? revision }]],
     [["developer"]],
     [[extra.finalRole ?? "moderator"]],
     [["notification", "developer"]],
@@ -226,8 +229,8 @@ it("sets the genuine professional flag, audits and delivers one inbox result aft
   });
   expect(result?.status).toBe("approved");
   expect(writes("developer_profiles")[0].params).toEqual([true, "developer"]);
-  expect(state.queries[2].sql).toContain('order by "users"."id" asc');
-  expect(state.queries[2].sql).toContain("for update");
+  expect(state.queries[3].sql).toContain('order by "users"."id" asc');
+  expect(state.queries[3].sql).toContain("for update");
   expect(writes("notifications")).toHaveLength(1);
   expect(writes("notifications")[0].params).toContain("/workspace/verification?view=history");
   expect(writes("audit_events")).toHaveLength(1);

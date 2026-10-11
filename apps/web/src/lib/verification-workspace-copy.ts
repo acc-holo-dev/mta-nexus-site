@@ -1,5 +1,6 @@
 import type { Locale } from "./i18n";
 import { userPlatformError } from "./user-platform-copy";
+
 const en = {
   title: "Verification centre",
   description:
@@ -28,7 +29,7 @@ const en = {
   invalidation:
     "Changing specialties or the portfolio URL removes developer experience verification. Identity verification remains separate.",
   pendingChange:
-    "If a profile changes during review, the application must be rejected and resubmitted with current evidence.",
+    "If your profile changes during review, open your pending application and update its evidence to submit the current profile.",
   proof: "Evidence URL",
   notes: "Explain your experience or authority",
   proofPrivacy:
@@ -56,7 +57,7 @@ const en = {
   changed: "The profile changed. Reload before saving again.",
   authorityChanged: "Your current role or organization rights do not allow this application.",
   profileChanged:
-    "The professional profile changed after submission. Reject this application and request current evidence.",
+    "The professional profile changed after submission. The applicant must update the evidence before approval.",
   selfReview: "Another moderator must approve your application.",
   reviewNotes: "Moderator feedback",
   noApplications: "No applications in this view.",
@@ -107,7 +108,7 @@ const ru: Record<keyof typeof en, string> = {
   invalidation:
     "Изменение специализаций или ссылки на портфолио снимает подтверждение опыта. Подтверждение личности учитывается отдельно.",
   pendingChange:
-    "Если профиль изменится во время рассмотрения, заявку нужно отклонить и подать заново с актуальными доказательствами.",
+    "Если профиль изменится во время рассмотрения, откройте ожидающую заявку и обновите доказательства, чтобы отправить текущий профиль.",
   proof: "Ссылка на доказательства",
   notes: "Опишите опыт или полномочия",
   proofPrivacy:
@@ -136,7 +137,7 @@ const ru: Record<keyof typeof en, string> = {
   changed: "Профиль изменился. Загрузите актуальное состояние перед сохранением.",
   authorityChanged: "Текущая роль или права в организации не позволяют подать эту заявку.",
   profileChanged:
-    "Профессиональный профиль изменился после подачи. Отклоните заявку и запросите актуальные доказательства.",
+    "Профессиональный профиль изменился после подачи. Автор должен обновить доказательства перед одобрением.",
   selfReview: "Вашу заявку должен одобрить другой модератор.",
   reviewNotes: "Комментарий модератора",
   noApplications: "В этом разделе заявок нет.",
@@ -173,6 +174,7 @@ export function verificationError(locale: Locale, code: unknown) {
   if (code === "VERIFICATION_PROFILE_CHANGED") return copy.profileChanged;
   if (code === "VERIFICATION_SELF_REVIEW") return copy.selfReview;
   if (code === "VERIFICATION_STATE_CHANGED") return copy.stateChanged;
+  if (code === "VERIFICATION_APPLICATION_CHANGED") return copy.stateChanged;
   if (code === "CONFLICT") return copy.changed;
   if (code === "INTERNAL_ERROR" || code === "UNCONFIRMED") return copy.unavailable;
   return userPlatformError(locale, code);
