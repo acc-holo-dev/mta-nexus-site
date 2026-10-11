@@ -1,6 +1,6 @@
 import { and, desc, eq, exists, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { builds, content, follows, organizations, products, servers, users } from "../schema";
+import { builds, content, follows, organizations, products, servers, userProfilePreferences, users } from "../schema";
 import { containsPattern } from "./search-pattern";
 import { trustedCleanScanCondition } from "./build-safety";
 
@@ -26,6 +26,7 @@ const publicTypes = [
 ];
 const publishedTime = sql`coalesce(${content.publishedAt}, ${content.createdAt})`;
 const publicServer = and(eq(servers.visibility, "public"), eq(servers.status, "active"));
+const activityVisible = sql<boolean>`coalesce(${userProfilePreferences.showActivity}, true)`;
 function publicProduct() {
   return and(
     eq(products.status, "published"),
@@ -46,11 +47,19 @@ function publicProduct() {
 }
 class PublicationFeedRepository {
   async resolvePublicScope(kind: "user" | "organization", handle: string) {
-    const table = kind === "user" ? users : organizations;
+    if (kind === "user") {
+      const [row] = await db
+        .select({ id: users.id, name: users.displayName })
+        .from(users)
+        .leftJoin(userProfilePreferences, eq(userProfilePreferences.userId, users.id))
+        .where(and(eq(users.username, handle), activityVisible))
+        .limit(1);
+      return row ?? null;
+    }
     const [row] = await db
-      .select({ id: table.id, name: kind === "user" ? users.displayName : organizations.name })
-      .from(table)
-      .where(eq(kind === "user" ? users.username : organizations.slug, handle))
+      .select({ id: organizations.id, name: organizations.name })
+      .from(organizations)
+      .where(eq(organizations.slug, handle))
       .limit(1);
     return row ?? null;
   }
@@ -67,7 +76,7 @@ class PublicationFeedRepository {
           ),
         );
     const sources = {
-      user: inArray(content.authorId, ids("user")),
+      user: and(inArray(content.authorId, ids("user")), activityVisible),
       organization: inArray(content.organizationId, ids("organization")),
       server: inArray(servers.id, ids("server")),
       product: inArray(products.id, ids("product")),
@@ -80,7 +89,7 @@ class PublicationFeedRepository {
           ? sources[filters.source]
           : or(...Object.values(sources))
         : scope.kind === "user"
-          ? eq(content.authorId, scope.id)
+          ? and(eq(content.authorId, scope.id), activityVisible)
           : eq(content.organizationId, scope.id);
     const pattern = filters.query?.trim()
       ? containsPattern(filters.query.trim().slice(0, 100))
@@ -109,6 +118,7 @@ class PublicationFeedRepository {
       })
       .from(content)
       .innerJoin(users, eq(users.id, content.authorId))
+      .leftJoin(userProfilePreferences, eq(userProfilePreferences.userId, users.id))
       .leftJoin(organizations, eq(organizations.id, content.organizationId))
       .leftJoin(servers, and(eq(servers.id, content.serverId), publicServer))
       .leftJoin(products, and(eq(products.id, content.productId), publicProduct()))

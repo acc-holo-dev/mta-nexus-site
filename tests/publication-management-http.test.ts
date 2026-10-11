@@ -69,7 +69,9 @@ it("reads public activity anonymously with a narrow resolved scope", async () =>
   mocks.session.mockResolvedValue(null);
   const response = await activity(request("GET", undefined, "?type=news"), profile);
   expect(response.status).toBe(200);
-  expect(response.headers.get("cache-control")).toBe("public, max-age=15");
+  expect(response.headers.get("cache-control")).toBe("no-store");
+  expect(response.headers.get("vary")).toBe("Cookie");
+  expect(response.headers.get("x-request-id")).toBeTruthy();
   expect(mocks.session).not.toHaveBeenCalled();
   expect(mocks.resolve).toHaveBeenCalledWith("user", "writer");
   expect(mocks.page).toHaveBeenCalledWith(

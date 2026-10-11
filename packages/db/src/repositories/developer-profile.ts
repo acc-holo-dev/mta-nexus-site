@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
 import { db } from "../client";
-import { auditEvents, developerProfiles, users } from "../schema";
+import { auditEvents, developerProfiles, userProfilePreferences, users } from "../schema";
 export const developerExperienceRevision = (
   profile: { specialties: string[]; githubUrl: string | null } | null,
 ) =>
@@ -18,9 +18,14 @@ const publicFields = {
 class DeveloperProfileRepository {
   async publicProfile(userId: string) {
     const [row] = await db
-      .select(publicFields)
+      .select({
+        ...publicFields,
+        githubUrl: sql<string | null>`case when coalesce(${userProfilePreferences.showProfessionalContacts}, true) then ${developerProfiles.githubUrl} else null end`,
+        discordTag: sql<string | null>`case when coalesce(${userProfilePreferences.showProfessionalContacts}, true) then ${developerProfiles.discordTag} else null end`,
+      })
       .from(developerProfiles)
       .innerJoin(users, eq(users.id, developerProfiles.userId))
+      .leftJoin(userProfilePreferences, eq(userProfilePreferences.userId, users.id))
       .where(and(eq(users.id, userId), inArray(users.role, ["developer", "admin"])))
       .limit(1);
     return row ?? null;

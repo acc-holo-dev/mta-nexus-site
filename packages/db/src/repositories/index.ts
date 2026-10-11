@@ -30,6 +30,7 @@ export * from "./payments";
 export * from "./product-lifecycle";
 export * from "./products";
 export { publicDirectoryRepository } from "./public-directory";
+export { profilePrivacyRepository } from "./profile-privacy";
 export { type PublicationScope, publicationFeedRepository } from "./publication-feed";
 export * from "./reports";
 export * from "./resource-activity";

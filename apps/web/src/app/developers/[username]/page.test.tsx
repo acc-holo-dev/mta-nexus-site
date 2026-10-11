@@ -4,6 +4,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
+  showActivity: true,
   user: {
     id: "author",
     username: "creator",
@@ -26,6 +27,9 @@ vi.mock("../../../lib/services/auth-service", () => ({
 }));
 vi.mock("@nexus/db", () => ({ productRepository: { pagePublishedFreeByAuthor: state.products } }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/services/profile-privacy-service", () => ({
+  profilePrivacyService: { visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }) },
+}));
 vi.mock("../../../components/product-card", () => ({
   ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
@@ -48,6 +52,7 @@ const params = () => ({ params: Promise.resolve({ username: "creator" }) });
 
 beforeEach(() => {
   state.locale = "en";
+  state.showActivity = true;
   state.user = {
     id: "author",
     username: "creator",
@@ -141,4 +146,12 @@ it("does not offer navigation for an empty portfolio", async () => {
   const html = renderToStaticMarkup(await Page(params()));
   expect(html).not.toContain('rel="next"');
   expect(html).not.toContain('rel="prev"');
+});
+it("hides personal activity links without hiding published resources", async () => {
+  state.showActivity = false;
+  const html = renderToStaticMarkup(await Page(params()));
+  expect(html).not.toContain('href="/users/creator/activity"');
+  expect(html).toContain("published resource");
+  state.showActivity = true;
+  expect(renderToStaticMarkup(await Page(params()))).toContain('href="/users/creator/activity"');
 });

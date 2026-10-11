@@ -1476,7 +1476,7 @@ This block changes no schema, migrations, npm dependencies or workflows and
 does not use Actions.
 
 Profile-privacy schema contract (integrated by Agent A in migration 0051;
-preference UI/API and public visibility filtering remain to be implemented):
+settings, API and public filtering implemented by Agent B — see below):
 
 ```sql
 CREATE TABLE user_profile_preferences (
@@ -1599,3 +1599,45 @@ persisted access revocation, disjoint aggregates and microsecond pagination;
 they remain unrun. Browser interaction, live PostgreSQL and full production
 generation require separate verification. This block adds no schema, migration,
 npm dependency, collector or workflow and does not use Actions.
+
+### Profile privacy, protected public feeds and professional contacts — 2026-10-11
+
+`/settings/privacy` and GET/PATCH `/api/account/privacy` use the existing
+`user_profile_preferences` model from migration 0051. Reads and writes bind to
+the current session user, reject supplied scope and extra fields, rate-limit
+requests and return private no-store responses. Saving locks the user, checks
+the shared `users.updated_at` version, upserts both choices, advances that
+version monotonically and records an audit in one transaction. Concurrent
+ordinary, professional and privacy profile editors share the same version.
+Missing preference rows retain legacy public visibility. No new migration or
+notification preference is introduced.
+
+The RU/EN editor loads saved choices, confirms the returned identity, exact
+booleans and newer revision before reporting success, and provides explicit
+saved-state recovery after conflicts, unreadable responses or uncertain writes.
+Settings and professional-profile navigation link to it. The private page and
+personal activity page have noindex metadata. Public user/developer profiles
+omit the personal feed link when disabled; direct personal activity resolution
+returns not found. The feed query independently rechecks visibility on each
+page and excludes hidden user subscriptions from selected and combined
+following feeds. Public activity API responses no longer retain a shared cache.
+
+Professional public reads redact portfolio URL and Discord in SQL. Private
+editing, specialties, verified experience and commerce counters remain intact.
+These controls restrict personal aggregation and structured professional
+contacts; published content is still public through direct links, community
+and explicitly followed organization/server/resource contexts. They do not
+delete existing notifications or revoke information a visitor already received.
+The interface explains the public-content scope before saving.
+
+220 focused unit checks across 22 files pass after integrating Agent A's
+order-linked support block, including 162 checks for profile/feed/verification
+scenarios. TypeScript, touched-file Biome lint, Knip and Next webpack compile
+mode pass; Agent A removed the previously documented unused commerce exports.
+Five new PostgreSQL fixtures cover persisted defaults
+and restoration, public contact redaction, direct/following/context activity,
+concurrent shared-version writers and transactional rollback after audit failure;
+they remain unrun because PostgreSQL is unavailable in this environment. Browser
+interaction and full production generation still require verification. Schema,
+commercial contracts, dependencies and workflows are unchanged; Actions are not
+used.

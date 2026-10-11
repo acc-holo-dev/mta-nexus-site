@@ -1,6 +1,7 @@
 import { FollowButton } from "../../../components/follow-button";
 import { DeveloperExperience } from "../../../components/developer-experience";
 import { verificationWorkspaceService } from "../../../lib/services/verification-workspace-service";
+import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
 import Link from "next/link";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
@@ -56,9 +57,10 @@ export default async function DeveloperProfilePage({
 
   const query = await searchParams;
   const requestedPage = parseProfilePage(query?.page);
-  const [result, professional] = await Promise.all([
+  const [result, professional, visibility] = await Promise.all([
     productRepository.pagePublishedFreeByAuthor(user.id, requestedPage, 24),
     verificationWorkspaceService.publicProfile(user.id).catch(() => null),
+    profilePrivacyService.visibility(user.id),
   ]);
   const authorProducts = result.products;
   const profilePath = `/developers/${encodeURIComponent(user.username)}`;
@@ -88,12 +90,12 @@ export default async function DeveloperProfilePage({
               {user.bio || copy.bioFallback}
             </p>
             <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
-            <Link
+            {visibility.showActivity && <Link
               href={`/users/${encodeURIComponent(user.username)}/activity`}
               className="inline-flex min-h-11 items-center text-sm text-accent underline"
             >
               {publicationCopy(locale).activity}
-            </Link>
+            </Link>}
           </div>
         </div>
 

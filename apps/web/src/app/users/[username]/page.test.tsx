@@ -5,6 +5,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
   locale: "en" as "en" | "ru",
   exists: true,
+  showActivity: true,
   products: vi.fn(),
   servers: vi.fn(),
   directory: vi.fn(),
@@ -26,6 +27,9 @@ vi.mock("@nexus/db", () => ({
   serverRepository: { pageActivePublicByOwner: state.servers },
 }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
+vi.mock("../../../lib/services/profile-privacy-service", () => ({
+  profilePrivacyService: { visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }) },
+}));
 vi.mock("../../../lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: state.directory },
   indexMtaObservations: () => () => undefined,
@@ -59,6 +63,7 @@ const input = (page?: string | string[]) => ({
 beforeEach(() => {
   state.locale = "en";
   state.exists = true;
+  state.showActivity = true;
   state.products.mockReset();
   state.servers.mockReset();
   state.directory.mockReset();
@@ -160,4 +165,12 @@ it("uses the stored user identity for canonical metadata", async () => {
     title: "Member (@member)",
     alternates: { canonical: "/users/member" },
   });
+});
+it("hides the direct activity link while keeping public resources available", async () => {
+  state.showActivity = false;
+  const html = renderToStaticMarkup(await Page(input()));
+  expect(html).not.toContain('href="/users/member/activity"');
+  expect(html).toContain("Second-page resource");
+  state.showActivity = true;
+  expect(renderToStaticMarkup(await Page(input()))).toContain('href="/users/member/activity"');
 });

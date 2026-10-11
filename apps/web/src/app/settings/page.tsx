@@ -7,6 +7,7 @@ import { Button } from "@nexus/ui";
 import { ContextSwitcher } from "../../components/context-switcher";
 import { WebPushSettings } from "../../components/web-push-settings";
 import { PublicProfileForm } from "../../components/public-profile-form";
+import { profilePrivacyCopy } from "../../lib/profile-privacy-copy";
 import { useNexusLocale } from "../../components/locale-context";
 import {
   confirmedNotificationPreferences,
@@ -472,6 +473,9 @@ export default function SettingsPage() {
 
       <ContextSwitcher />
       <PublicProfileForm />
+      <Link href="/settings/privacy" className="inline-flex min-h-11 items-center text-sm text-accent underline">
+        {profilePrivacyCopy(locale).title}
+      </Link>
 
       <section
         aria-labelledby="notification-heading"

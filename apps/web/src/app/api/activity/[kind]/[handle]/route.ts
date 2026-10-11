@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { AppError, NotFoundError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
 import { parsePublicationQuery } from "../../../../../lib/publication-feed-contract";
@@ -11,6 +11,7 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
+export const dynamic = "force-dynamic";
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ kind: string; handle: string }> },
@@ -24,8 +25,8 @@ export async function GET(
     if (!(await consumeRateLimit("search", getTrustedRequestIp(request))).success)
       throw new RateLimitExceededError();
     const profile = await publicationFeedService.resolve(kind, handle);
-    return NextResponse.json(await publicationFeedService.page({ kind, id: profile.id }, query), {
-      headers: { "Cache-Control": "public, max-age=15" },
+    return jsonWithRequestId(context, await publicationFeedService.page({ kind, id: profile.id }, query), {
+      headers: { "Cache-Control": "no-store", Vary: "Cookie" },
     });
   } catch (error) {
     const known = error instanceof AppError,

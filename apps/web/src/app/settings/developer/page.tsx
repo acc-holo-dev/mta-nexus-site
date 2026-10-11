@@ -6,6 +6,7 @@ import { verificationWorkspaceService } from "../../../lib/services/verification
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { verificationCopy } from "../../../lib/verification-workspace-copy";
 import { editableDeveloperSchema } from "../../../lib/verification-workspace-contract";
+import { profilePrivacyCopy } from "../../../lib/profile-privacy-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   return {
@@ -38,6 +39,7 @@ export default async function DeveloperSettingsPage() {
         <p className="mt-2 text-sm text-muted">{copy.profileDescription}</p>
       </header>
       <DeveloperProfileEditor key={actor.id} initial={initial} locale={locale} />
+      <Link href="/settings/privacy" className="inline-flex min-h-11 items-center text-sm text-accent underline">{profilePrivacyCopy(locale).title}</Link>
     </div>
   );
 }
