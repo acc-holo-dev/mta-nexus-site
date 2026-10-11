@@ -1,5 +1,12 @@
 # MTA NEXUS
 
+Collections now support reviewed version batches: choose up to 20 existing
+members, preview exact selected builds, then atomically pin them or follow
+latest releases across the library. Migration `0068_library_selection_batches`
+retains immutable, private operation receipts and paginated JSON history.
+Changes in membership, selections, available builds or access invalidate review;
+ambiguous retries reuse the same command without applying a second batch.
+
 Private collections now include a whole-collection readiness report, an MTA
 version check and private JSON export. Shared dependencies and selected builds
 are checked together in one read-only database snapshot, with bounded graph

@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 
 export type EntityPrefix =
+  | "lsbr"
   | "lcol"
   | "lcr"
   | "rea"

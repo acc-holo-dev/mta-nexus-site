@@ -2724,3 +2724,42 @@ has Node 24/pnpm 11 and lacks `@swc/core` and `fast-check`; focused checks use a
 scratch Vitest configuration with the same aliases and automatic JSX transform.
 Root TypeScript additionally retains the pre-existing missing `isSigned` fixture
 in `resource-deliveries.integration.test.ts`. GitHub Actions were not used.
+
+### Reviewed library version batches — 2026-10-12
+
+`/workspace/library/collections/[id]/versions` reviews and confirms up to twenty
+existing members. Pinning retains each currently selected safe build; following
+latest clears the fixed preference and can recover a withdrawn pin when a safe
+latest release exists. Choices affect the whole personal library. Preview binds
+actor, collection revision, complete previous/next selections and artifact
+identity. The read-committed apply command acquires the existing collection and
+per-resource selection advisory locks in stable order, freezes membership,
+products, selected preference rows, access sources and target builds, then
+rechecks access against the database clock and rebuilds the exact preview.
+Guarded upserts, per-resource audits, immutable receipt and mandatory batch audit
+commit together. A stale preview rejects the group; a repeated UUID replays the
+original receipt without applying changes again. Membership and access grants
+are never created by this command. These are library preferences, not installation.
+
+Migration `0068_library_selection_batches` adds owned receipts, request/history
+indexes, bounded payload/quota checks and an immutable guard matching committed
+selection states and successor revisions. Retained history stores identifiers
+and revisions without resource titles, descriptions or storage URLs. History
+pages and bounded JSON exports recheck the current collection owner; archiving
+prevents new batches but keeps prior operations readable. The RU/EN form freezes
+commands after ambiguous outcomes, validates exact acknowledgements and requires
+explicit review confirmation. Failed fixed selections can be switched to latest
+without silently choosing a replacement during pinning.
+
+130 focused contract/HTTP/SQL-builder/SSR/interaction and neighboring regression
+checks pass. Changed-file Biome lint, web TypeScript (including generated routes)
+and Next webpack compile mode pass. Drizzle loads all 69 migration entries and
+five statements in the new migration; this is not PostgreSQL execution evidence.
+Four real PostgreSQL fixtures prepare duplicate concurrency, stale individual
+selections, mandatory-audit rollback and revoked-access refusal; they remain
+unrun without a disposable database. Browser interaction, production generation
+and Node 26 remain unverified. Root TypeScript retains only the previously
+reported missing `fast-check` dependency errors and the missing `isSigned`
+delivery fixture. No provider, payment, license, dependency or Actions workflow
+changed. Focused checks use the previously documented scratch Vitest config
+because the installed environment also lacks `@swc/core`.

@@ -1,5 +1,9 @@
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import {
+  libraryCollectionsRepository,
+  librarySelectionBatchesRepository,
+  librarySelectionBatchReceipts,
+  resourceLibrarySelectionsRepository,
   buildRepository,
   builds,
   db,
@@ -235,6 +239,136 @@ it("previews an exact unpublished build only within its authorized product", asy
     await expect(
       repo.report({ ...f.query, actorId: f.owner, scope: "publisher", buildId }),
     ).rejects.toMatchObject({ statusCode: 404 });
+  } finally {
+    await f.cleanup();
+  }
+});
+
+// Requires disposable PostgreSQL migrated through 0068. Real locking/rollback,
+// not SQL mocks. Existing fixture publication and access policies remain enabled.
+async function batchFixture() {
+  const f = await fixture();
+  await db
+    .insert(entitlements)
+    .values({
+      id: `ent_req_batch_${f.key}`,
+      subjectType: "user",
+      subjectId: f.buyer,
+      permission: "product.download",
+      resourceId: f.ids[1],
+    });
+  const collectionId = `lcol_req_${f.key}`;
+  const creation = await libraryCollectionsRepository.command({
+    userId: f.buyer,
+    command: { action: "create", name: "Batch fixture", requestId: randomUUID() },
+    newCollectionId: collectionId,
+    receiptId: `lcr_req_${f.key}_0`,
+    auditId: `aud_req_col_${f.key}_0`,
+  });
+  for (let i = 0; i < 2; i++)
+    await libraryCollectionsRepository.command({
+      userId: f.buyer,
+      collectionId,
+      command: {
+        action: "add",
+        productId: f.ids[i],
+        expectedRevision: i + 1,
+        requestId: randomUUID(),
+      },
+      newCollectionId: collectionId,
+      receiptId: `lcr_req_${f.key}_${i + 1}`,
+      auditId: `aud_req_col_${f.key}_${i + 1}`,
+    });
+  const choice = { mode: "fixed" as const, productIds: f.ids.slice(0, 2).sort() };
+  const preview = await librarySelectionBatchesRepository.preview(
+    f.buyer,
+    creation.receipt.collection.id,
+    choice,
+  );
+  const command = { ...choice, requestId: randomUUID(), previewDigest: preview.previewDigest };
+  const apply = (auditId = `aud_batch_${randomUUID()}`) =>
+    librarySelectionBatchesRepository.command({
+      userId: f.buyer,
+      collectionId,
+      command,
+      receiptId: `lsbr_${randomUUID()}`,
+      auditId,
+    });
+  return { ...f, collectionId, command, apply };
+}
+it("applies concurrent duplicate batch confirmations exactly once with immutable history", async () => {
+  const f = await batchFixture();
+  try {
+    const results = await Promise.all([f.apply(), f.apply(), f.apply()]);
+    expect(results.filter((r) => !r.replayed)).toHaveLength(1);
+    expect(new Set(results.map((r) => r.receipt.id)).size).toBe(1);
+    const rows = await db.select().from(selections).where(eq(selections.userId, f.buyer));
+    expect(rows).toHaveLength(2);
+    expect(rows.every((r) => r.revision === 1 && r.mode === "fixed")).toBe(true);
+    const receipt = results[0].receipt;
+    await expect(
+      db
+        .update(librarySelectionBatchReceipts)
+        .set({ snapshot: receipt.snapshot })
+        .where(eq(librarySelectionBatchReceipts.id, receipt.id)),
+    ).rejects.toThrow();
+    await expect(
+      db
+        .delete(librarySelectionBatchReceipts)
+        .where(eq(librarySelectionBatchReceipts.id, receipt.id)),
+    ).rejects.toThrow();
+    expect(
+      (await librarySelectionBatchesRepository.history(f.buyer, f.collectionId)).items,
+    ).toHaveLength(1);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("rejects a batch reviewed before an individual selection changed", async () => {
+  const f = await batchFixture();
+  try {
+    await resourceLibrarySelectionsRepository.command({
+      userId: f.buyer,
+      productId: f.ids[0],
+      command: { mode: "fixed", buildId: `bld_req_${f.key}_0`, expectedRevision: 0 },
+      auditId: `aud_single_${f.key}`,
+    });
+    await expect(f.apply()).rejects.toMatchObject({ code: "SELECTION_BATCH_CHANGED" });
+    expect(await db.select().from(selections).where(eq(selections.userId, f.buyer))).toHaveLength(
+      1,
+    );
+    expect(
+      (await librarySelectionBatchesRepository.history(f.buyer, f.collectionId)).items,
+    ).toHaveLength(0);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("rolls all selections and receipt back when the mandatory batch audit fails", async () => {
+  const f = await batchFixture();
+  try {
+    await expect(f.apply(`aud_req_${f.key}_0`)).rejects.toThrow();
+    expect(await db.select().from(selections).where(eq(selections.userId, f.buyer))).toHaveLength(
+      0,
+    );
+    expect(
+      (await librarySelectionBatchesRepository.history(f.buyer, f.collectionId)).items,
+    ).toHaveLength(0);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("rejects previously reviewed batches after access revocation without making grants", async () => {
+  const f = await batchFixture();
+  try {
+    await db.delete(entitlements).where(eq(entitlements.subjectId, f.buyer));
+    await expect(f.apply()).rejects.toMatchObject({ code: "SELECTION_BATCH_UNAVAILABLE" });
+    expect(await db.select().from(selections).where(eq(selections.userId, f.buyer))).toHaveLength(
+      0,
+    );
+    expect(
+      (await librarySelectionBatchesRepository.history(f.buyer, f.collectionId)).items,
+    ).toHaveLength(0);
   } finally {
     await f.cleanup();
   }

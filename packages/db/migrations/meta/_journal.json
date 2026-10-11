@@ -477,6 +477,13 @@
       "when": 1791753000000,
       "tag": "0067_library_collections",
       "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1791756600000,
+      "tag": "0068_library_selection_batches",
+      "breakpoints": true
     }
   ]
 }

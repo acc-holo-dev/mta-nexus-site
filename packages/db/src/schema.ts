@@ -21,6 +21,7 @@ import {
   type CommercialPlanStatus,
   type OrderCaseKind, type OrderCaseReviewStatus, type OrderCaseEvidence,
 } from "@nexus/domain";
+import type { LibrarySelectionBatchCommand, LibrarySelectionBatchSnapshot } from "@nexus/domain";
 import { sql } from "drizzle-orm";
 import type { LibraryCollectionCommand, LibraryCollectionSnapshot, LibraryCollectionStatus } from "@nexus/domain";
 import {
@@ -1470,4 +1471,21 @@ export const libraryCollectionReceipts = pgTable("library_collection_receipts", 
   check("library_collection_receipts_digest_check", sql`${table.commandDigest} ~ '^[a-f0-9]{64}$'`),
   check("library_collection_receipts_payload_check", sql`coalesce(jsonb_typeof(${table.command}) = 'object' AND octet_length(${table.command}::text) <= 2048 AND jsonb_typeof(${table.snapshot}) = 'object' AND octet_length(${table.snapshot}::text) <= 2048, false)`),
   check("library_collection_receipts_time_check", sql`isfinite(${table.createdAt})`),
+]);
+
+// Immutable receipts store selection identities, never private resource metadata or file URLs.
+export const librarySelectionBatchReceipts = pgTable("library_selection_batch_receipts", {
+  id: text("id").primaryKey(), userId: text("user_id").notNull().references(() => users.id, {onDelete:"cascade"}),
+  requestId: uuid("request_id").notNull(), collectionId: text("collection_id").notNull(),
+  commandDigest: text("command_digest").notNull(),
+  command: jsonb("command").$type<LibrarySelectionBatchCommand>().notNull(),
+  snapshot: jsonb("snapshot").$type<LibrarySelectionBatchSnapshot>().notNull(),
+  createdAt: timestamp("created_at",{withTimezone:true}).notNull().defaultNow(),
+}, table => [
+  uniqueIndex("library_selection_batch_receipts_request_idx").on(table.userId,table.requestId),
+  foreignKey({columns:[table.collectionId,table.userId],foreignColumns:[libraryCollections.id,libraryCollections.userId]}).onDelete("cascade"),
+  index("library_selection_batch_receipts_history_idx").on(table.collectionId,table.createdAt.desc(),table.id.desc()),
+  check("library_selection_batch_receipts_digest_check",sql`${table.commandDigest} ~ '^[a-f0-9]{64}$'`),
+  check("library_selection_batch_receipts_payload_check",sql`coalesce(jsonb_typeof(${table.command})='object' AND octet_length(${table.command}::text)<=8192 AND jsonb_typeof(${table.snapshot})='object' AND octet_length(${table.snapshot}::text)<=32768,false)`),
+  check("library_selection_batch_receipts_time_check",sql`isfinite(${table.createdAt})`),
 ]);

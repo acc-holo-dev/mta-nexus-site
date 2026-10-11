@@ -84,3 +84,4 @@ export * from "./plan-reviews";
 export * from "./resource-copies";
 export * from "./subscriptions";
 export * from "./library-collections";
+export * from "./library-selection-batches";

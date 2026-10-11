@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { collectionRequirementsCopy } from "../lib/collection-requirements-i18n";
+import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
 import { getRequestLocale } from "../lib/i18n-server";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import {
@@ -222,6 +223,9 @@ export async function LibraryCollectionsScreen({
             {c.archivedNote}
           </p>
         )}
+        {!adding && <Link href={`${collectionHref(id)}/versions`} className="text-accent underline">
+          {librarySelectionBatchesCopy(locale).title}
+        </Link>}
         {!adding && <Link href={`${collectionHref(id)}/requirements`} className="text-accent underline">
           {collectionRequirementsCopy(locale).title}
         </Link>}
