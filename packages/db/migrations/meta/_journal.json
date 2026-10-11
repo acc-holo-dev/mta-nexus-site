@@ -463,6 +463,13 @@
       "when": 1791744900000,
       "tag": "0065_resource_draft_copies",
       "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1791748500000,
+      "tag": "0066_account_subscriptions",
+      "breakpoints": true
     }
   ]
 }

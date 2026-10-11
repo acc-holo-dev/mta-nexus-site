@@ -635,6 +635,38 @@ export const commercialPlanRevisions = pgTable("commercial_plan_revisions", {
   check("commercial_plan_snapshot_check", sql`${table.revision} > 0 AND ${table.status} IN ('draft', 'published', 'archived')
     AND ${table.action} IN ('create', 'save', 'publish', 'archive', 'restore') AND length(btrim(${table.reason})) BETWEEN 5 AND 1000`),
 ]);
+export const accountSubscriptions = pgTable("account_subscriptions", {
+  id: text("id").primaryKey(),
+  subjectType: text("subject_type").$type<"user" | "organization">().notNull(),
+  subjectId: text("subject_id").notNull(), actorId: text("actor_id").notNull(),
+  planId: text("plan_id").notNull(), planRevision: integer("plan_revision").notNull(),
+  termsSnapshot: jsonb("terms_snapshot").$type<unknown>().notNull().default(sql`NULL`),
+  status: text("status").$type<"active" | "expired" | "cancelled">().notNull().default("active"),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull().defaultNow(),
+  cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+}, (table) => [
+  foreignKey({columns:[table.planId,table.planRevision],foreignColumns:[commercialPlanRevisions.planId,commercialPlanRevisions.revision]}).onDelete("restrict"),
+  uniqueIndex("account_subscriptions_active_idx").on(table.subjectType,table.subjectId).where(sql`${table.status} = 'active'`),
+  index("account_subscriptions_subject_time_idx").on(table.subjectType,table.subjectId,table.startedAt.desc(),table.id.desc()),
+  check("account_subscriptions_subject_type_check",sql`${table.subjectType} IN ('user','organization')`),
+  check("account_subscriptions_status_check",sql`${table.status} IN ('active','expired','cancelled')`),
+  check("account_subscriptions_check",sql`isfinite(${table.startedAt}) AND isfinite(${table.expiresAt}) AND ${table.expiresAt}>${table.startedAt}`),
+  check("account_subscriptions_check1",sql`(${table.status} = 'cancelled') = (${table.cancelledAt} IS NOT NULL)`),
+]);
+export const subscriptionReceipts = pgTable("subscription_receipts", {
+  id: text("id").primaryKey(), actorId: text("actor_id").notNull(), requestId: uuid("request_id").notNull(),
+  subscriptionId: text("subscription_id").notNull().references(() => accountSubscriptions.id, { onDelete: "restrict" }),
+  action: text("action").$type<"activate" | "cancel">().notNull(), commandDigest: text("command_digest").notNull(),
+  snapshot: jsonb("snapshot").$type<unknown>().notNull().default(sql`NULL`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique("subscription_receipts_actor_id_request_id_key").on(table.actorId,table.requestId),
+  index("subscription_receipts_subscription_time_idx").on(table.subscriptionId,table.createdAt.desc(),table.id.desc()),
+  check("subscription_receipts_action_check",sql`${table.action} IN ('activate','cancel')`),
+  check("subscription_receipts_command_digest_check",sql`${table.commandDigest} ~ '^[a-f0-9]{64}$'`),
+]);
+
 export const commercialPlanReviews = pgTable("commercial_plan_reviews", {
   id: text("id").primaryKey(), actorId: text("actor_id").notNull(), requestId: uuid("request_id").notNull(),
   subjectType: text("subject_type").$type<"user" | "organization">().notNull(), subjectId: text("subject_id").notNull(),

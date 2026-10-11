@@ -1,5 +1,21 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Real free-plan subscription periods — 2026-10-11
+
+Migration `0066` allows activation only from a current published zero-price plan.
+A unique active-account index, account/request locks, live financial authority,
+immutable database-generated terms/time and atomic operation receipts/audits
+protect personal and organization periods. Expiry uses database time on reads;
+a new activation retires an expired stored row under the same account lock.
+Existing periods retain their terms after plan changes/withdrawal. Cancellation
+ends benefits immediately and never extends or rewrites the recorded term.
+RU/EN controls, scoped history, private JSON and a current-rate fee estimator are
+connected to real account subscriptions. Benefits currently supply the estimator's
+commission context; no settled fees, profile privileges, payments, balances,
+holds, resource licenses or entitlements are changed. Paid activation and automatic
+renewal remain unavailable. Six disposable PostgreSQL fixtures are prepared but
+unrun here; live migration/locking, browser and Node 26 checks remain outstanding.
+
 ### Independent draft copies — 2026-10-11
 
 Migration `0065` records immutable provenance for future free-resource copies.

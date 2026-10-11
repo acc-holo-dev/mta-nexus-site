@@ -219,7 +219,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0065_resource_draft_copies");
+  assert.equal(plan.targetTag, "0066_account_subscriptions");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -415,4 +415,17 @@ test("draft copy upgrade requires an unreviewed artifact-free target and preserv
   assert.match(migration, /FOR SHARE/u);
   assert.doesNotMatch(migration, /(?:INSERT INTO|UPDATE)\s+(?:payments|orders|licenses|entitlements|ledger_entries|products)\b/iu);
   assert.match(readFileSync(script, "utf8"), /resourceCopiesSchemaPresent = true/u);
+});
+
+test("account subscriptions preserve free published terms and enforce one current period without financial activation", () => {
+  const migration = readFileSync(new URL("0066_account_subscriptions.sql", migrationsUrl), "utf8");
+  assert.match(migration, /WHERE status='active'/u);
+  assert.match(migration, /p\.revision<>NEW\.plan_revision/u);
+  assert.match(migration, /\(v\.terms->>'price'\)::integer<>0/u);
+  assert.match(migration, /date_trunc\('milliseconds',clock_timestamp\(\)\)/u);
+  assert.match(migration, /OLD\.expires_at<=observed/u);
+  assert.match(migration, /OLD\.expires_at>observed/u);
+  assert.match(migration, /BEFORE INSERT OR UPDATE OR DELETE ON subscription_receipts/u);
+  assert.doesNotMatch(migration, /(?:INSERT INTO|UPDATE)\s+(?:payments|orders|licenses|entitlements|ledger_entries)\b/iu);
+  assert.match(readFileSync(script, "utf8"), /accountSubscriptionsSchemaPresent = true/u);
 });

@@ -30,6 +30,8 @@ export async function resourceCommerceRequest(
         request.nextUrl.pathname.startsWith("/api/admin/licenses/") ||
         request.nextUrl.pathname.startsWith("/api/admin/storage/")
           ? "moderationAction"
+          : /^\/api\/subscriptions\/account(?:\/|$)/u.test(request.nextUrl.pathname)
+            ? "contentCreation"
           : /\/orders\/[^/]+\/support$/u.test(request.nextUrl.pathname)
             ? "contentCreation"
             : /\/(reviews|review)(?:\/|$)/u.test(request.nextUrl.pathname)
@@ -45,7 +47,7 @@ export async function resourceCommerceRequest(
     }
     if (
       !mutation &&
-      (/\/products\/[^/]+\/(?:copy|copies)(?:\/|$)/u.test(request.nextUrl.pathname) || /^\/api\/subscriptions\/reviews(?:\/|$)/u.test(request.nextUrl.pathname) || /\/orders\/[^/]+\/terms(?:\/|$)/u.test(request.nextUrl.pathname) || /^\/api\/sales(?:\/|$)/u.test(request.nextUrl.pathname) || /\/requirements(?:\/|$)/u.test(request.nextUrl.pathname) || /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/resources\/cart\/(?:review|receipts)(?:\/|$)|^\/api\/admin\/storage(?:\/|$)|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/(?:operations|support)$|^\/api\/licenses\/[^/]+\/runtime-config$|^\/api\/licenses(?:$|\/export$)|^\/api\/workspace\/resources$|^\/api\/products\/[^/]+\/history$|^\/api\/admin\/licenses\/maintenance$|^\/api\/order-cases(?:\/|$)|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:watches|downloads|releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:media|moderation|deliveries|builds\/[^/]+(?:\/package(?:\/files)?)?)$/u.test(
+      (/^\/api\/subscriptions\/account(?:\/|$)/u.test(request.nextUrl.pathname) || /\/products\/[^/]+\/(?:copy|copies)(?:\/|$)/u.test(request.nextUrl.pathname) || /^\/api\/subscriptions\/reviews(?:\/|$)/u.test(request.nextUrl.pathname) || /\/orders\/[^/]+\/terms(?:\/|$)/u.test(request.nextUrl.pathname) || /^\/api\/sales(?:\/|$)/u.test(request.nextUrl.pathname) || /\/requirements(?:\/|$)/u.test(request.nextUrl.pathname) || /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/resources\/cart\/(?:review|receipts)(?:\/|$)|^\/api\/admin\/storage(?:\/|$)|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/(?:operations|support)$|^\/api\/licenses\/[^/]+\/runtime-config$|^\/api\/licenses(?:$|\/export$)|^\/api\/workspace\/resources$|^\/api\/products\/[^/]+\/history$|^\/api\/admin\/licenses\/maintenance$|^\/api\/order-cases(?:\/|$)|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:watches|downloads|releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:media|moderation|deliveries|builds\/[^/]+(?:\/package(?:\/files)?)?)$/u.test(
         request.nextUrl.pathname,
       ))
     ) {

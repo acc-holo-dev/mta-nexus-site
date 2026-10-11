@@ -1,5 +1,13 @@
 # MTA NEXUS
 
+Published zero-price plans can now be activated for a personal account or a managed
+organization. Migration `0066_account_subscriptions` enforces one current period,
+records immutable plan terms and fixed 7/30/90/365-day expiry, and protects terminal
+states. RU/EN account controls, cancellation, receipts/history/JSON and a private
+fee estimator use live financial grants and idempotent audited transactions.
+Expired or ended plans restore the estimator's base 10%; the seven-day initial
+hold remains separate. Paid activation requires a provider and stays unavailable.
+
 Publishers can copy a managed free resource into an independent unreviewed draft
 with a new title/address and the same publisher. Description, tags, type and
 compatibility are copied; files, versions, approval and commercial rights are not.
