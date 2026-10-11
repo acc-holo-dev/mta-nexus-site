@@ -34,6 +34,8 @@ import {
   uniqueIndex,
   unique,
   primaryKey,
+  foreignKey,
+  uuid,
   check,
 } from "drizzle-orm/pg-core";
 
@@ -617,6 +619,33 @@ export const commercialPlanRevisions = pgTable("commercial_plan_revisions", {
   check("commercial_plan_snapshot_check", sql`${table.revision} > 0 AND ${table.status} IN ('draft', 'published', 'archived')
     AND ${table.action} IN ('create', 'save', 'publish', 'archive', 'restore') AND length(btrim(${table.reason})) BETWEEN 5 AND 1000`),
 ]);
+export const commercialPlanReviews = pgTable("commercial_plan_reviews", {
+  id: text("id").primaryKey(), actorId: text("actor_id").notNull(), requestId: uuid("request_id").notNull(),
+  subjectType: text("subject_type").$type<"user" | "organization">().notNull(), subjectId: text("subject_id").notNull(),
+  planId: text("plan_id").notNull(), planRevision: integer("plan_revision").notNull(),
+  grossAmount: integer("gross_amount").notNull(), currency: text("currency").$type<"USD" | "EUR" | "RUB">().notNull(),
+  // BEFORE INSERT records this value; callers must leave it at the NULL default.
+  termsSnapshot: jsonb("terms_snapshot").$type<CommercialPlanTerms>().notNull().default(sql`NULL`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  foreignKey({columns:[table.planId,table.planRevision],foreignColumns:[commercialPlanRevisions.planId,commercialPlanRevisions.revision]}).onDelete("restrict"),
+  unique("commercial_plan_reviews_actor_id_request_id_key").on(table.actorId,table.requestId),
+  index("commercial_plan_reviews_account_idx").on(table.subjectType,table.subjectId,table.createdAt.desc(),table.id.desc()),
+  check("commercial_plan_reviews_subject_type_check",sql`${table.subjectType} IN ('user','organization')`),
+  check("commercial_plan_reviews_gross_amount_check",sql`${table.grossAmount} BETWEEN 0 AND 100000000`),
+  check("commercial_plan_reviews_currency_check",sql`${table.currency} IN ('USD','EUR','RUB')`),
+  check("commercial_plan_reviews_terms_check",sql`(jsonb_typeof(${table.termsSnapshot}) = 'object'
+    AND ${table.termsSnapshot} ?& ARRAY['titleRu','titleEn','descriptionRu','descriptionEn','price','currency','durationDays','commissionBps']
+    AND jsonb_typeof(${table.termsSnapshot}->'titleRu')='string' AND length(btrim(${table.termsSnapshot}->>'titleRu')) BETWEEN 3 AND 100
+    AND jsonb_typeof(${table.termsSnapshot}->'titleEn')='string' AND length(btrim(${table.termsSnapshot}->>'titleEn')) BETWEEN 3 AND 100
+    AND jsonb_typeof(${table.termsSnapshot}->'descriptionRu')='string' AND length(btrim(${table.termsSnapshot}->>'descriptionRu')) BETWEEN 10 AND 2000
+    AND jsonb_typeof(${table.termsSnapshot}->'descriptionEn')='string' AND length(btrim(${table.termsSnapshot}->>'descriptionEn')) BETWEEN 10 AND 2000
+    AND jsonb_typeof(${table.termsSnapshot}->'price')='number' AND (${table.termsSnapshot}->>'price')::integer BETWEEN 0 AND 100000000
+    AND jsonb_typeof(${table.termsSnapshot}->'commissionBps')='number' AND (${table.termsSnapshot}->>'commissionBps')::integer BETWEEN 0 AND 1000
+    AND jsonb_typeof(${table.termsSnapshot}->'durationDays')='number' AND (${table.termsSnapshot}->>'durationDays')::integer IN (7,30,90,365)
+    AND jsonb_typeof(${table.termsSnapshot}->'currency')='string' AND ${table.termsSnapshot}->>'currency' IN ('USD','EUR','RUB')) IS TRUE`),
+]);
+
 export const orderCancellationReceipts = pgTable("order_cancellation_receipts", {
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   requestId: text("request_id").notNull(),

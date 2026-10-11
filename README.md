@@ -37,6 +37,16 @@ MTA NEXUS is a player-first Multi Theft Auto: San Andreas platform for live serv
 
 ## Local development / Локальная разработка
 
+`/subscriptions` now links to private saved plan reviews for personal and
+organization accounts. Migration `0064_plan_reviews` records the selected
+published version and an illustrative integer fee calculation, with immutable
+terms, atomic audit and exact-request retries. `/workspace/subscriptions/reviews`
+provides 7/30/90/365-day history, twenty-record pages, current-version comparison
+and bounded JSON export. Organization owners/admins share that account's reviews;
+live rights are checked on every read and retry. There is a 500-review account
+limit. A review reserves no price, activates no subscription and changes no funds
+or license rights; the provider integration remains pending.
+
 `/workspace/sales/report` provides private RU/EN reports for the current personal
 or organization portfolio, with resource, currency, 7/30/90/365-day, order and
 payment-record filters. Owners and current organization admins can inspect scoped

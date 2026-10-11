@@ -219,7 +219,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0063_order_terms");
+  assert.equal(plan.targetTag, "0064_plan_reviews");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -389,4 +389,16 @@ test("order terms preserve legacy uncertainty and snapshot only new lines under 
   assert.match(migration, /CREATE TRIGGER order_recorded_economics_guard/u);
   assert.doesNotMatch(migration, /UPDATE order_items|UPDATE (payments|licenses|entitlements|ledger_entries)|INSERT INTO/u);
   assert.match(readFileSync(script, "utf8"), /orderTermsSchemaPresent = true/u);
+});
+
+
+test("plan review upgrade records only future immutable selections without activating commerce", () => {
+  const migration = readFileSync(new URL("0064_plan_reviews.sql", migrationsUrl), "utf8");
+  assert.match(migration, /UNIQUE\(actor_id,request_id\)/u);
+  assert.match(migration, /BEFORE INSERT OR UPDATE OR DELETE/u);
+  assert.match(migration, /NEW\.terms_snapshot IS NOT NULL/u);
+  assert.match(migration, /p\.revision<>NEW\.plan_revision/u);
+  assert.match(migration, /FOR SHARE/u);
+  assert.match(migration, /IS TRUE/u);
+  assert.doesNotMatch(migration, /(?:INSERT INTO|UPDATE)\s+(?:payments|orders|licenses|entitlements|ledger_entries)\b/iu);
 });

@@ -5,6 +5,7 @@ import { commercialPlanService } from "../../lib/services/commercial-plan-servic
 import { getRequestLocale } from "../../lib/i18n-server";
 import { getCommercialCopy } from "../../lib/commercial-i18n";
 import { formatHistoryAmount, parseHistoryPage } from "../../lib/commerce-history-format";
+import { planReviewsCopy } from "../../lib/plan-reviews-i18n";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Subscriptions and commissions | MTA NEXUS" };
@@ -31,6 +32,7 @@ export default async function SubscriptionCatalog({
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <h1 className="font-display text-primary">{copy.catalog}</h1>
+      <Link href="/workspace/subscriptions/reviews" className="text-sm text-accent underline">{planReviewsCopy(locale).history}</Link>
       <p
         role="note"
         className="rounded-lg border border-base bg-surface p-4 text-sm text-secondary"
@@ -76,6 +78,7 @@ export default async function SubscriptionCatalog({
               >
                 {copy.unavailable}
               </button>
+              <Link href={`/workspace/subscriptions/reviews/new?${new URLSearchParams({planId:plan.id,revision:String(plan.revision)})}`} className="block text-sm text-accent underline">{planReviewsCopy(locale).newReview}</Link>
             </li>
           ))}
         </ul>

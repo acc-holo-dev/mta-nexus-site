@@ -1,5 +1,26 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Saved plan selection and version comparison — 2026-10-11
+
+Migration `0064` records future personal/organization plan reviews with immutable
+published terms, an illustrative fee calculation and an atomic audit. Exact
+request retries return the old review after plan withdrawal; changed requests or
+new stale selections fail. Existing financial authority checks restrict shared
+organization reviews to current owners/admins. Account limits and advisory locks
+bound record creation. RU/EN catalog links, selection forms, 7/30/90/365-day
+history, twenty-record pagination, private version comparisons and bounded JSON
+exports reuse existing authentication and rate limits. Uncertain client results
+retry the same frozen selection and require exact response confirmation.
+
+Saved reviews are not subscriptions, guaranteed price reservations or verified
+payment quotes. They apply no commission benefit, hold, payout, resource license
+or access grant. Monthly one-server licensing remains separate from plan durations.
+Prepared PostgreSQL fixtures cover concurrent retries, snapshot immutability,
+plan changes, lost organization authority and audit rollback; a disposable
+database is required and those fixtures remain unrun here. Live PostgreSQL
+migration/locking, browser interaction and Node 26 checks remain outstanding.
+Provider settlement and actual subscription activation remain future work.
+
 ### Recorded order terms and historical seller attribution — 2026-10-11
 
 Migration `0063` records new line terms under stable product/order locks and

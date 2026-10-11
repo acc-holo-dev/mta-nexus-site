@@ -40,6 +40,7 @@ const evidence = {
   storageMaintenanceSchemaPresent: false,
   sellerSalesIndexesPresent: false,
   orderTermsSchemaPresent: false,
+  planReviewsSchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: upgradePlan.baselineTag,
@@ -439,6 +440,11 @@ try {
   assert.equal((await client`SELECT commercial_snapshot FROM order_items WHERE id = 'upgrade-order-line'`)[0].commercial_snapshot,null);
   await assert.rejects(client`UPDATE order_items SET commercial_snapshot = '{"version":1}'::jsonb WHERE id = 'upgrade-order-line'`);
   evidence.orderTermsSchemaPresent = true;
+  assert.equal((await client`SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename='commercial_plan_reviews'`).length,1);
+  assert.equal((await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname='commercial_plan_review_guard'`).length,1);
+  assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname='public' AND indexname='commercial_plan_reviews_account_idx'`).length,1);
+  assert.equal(Number((await client`SELECT count(*) AS total FROM commercial_plan_reviews`)[0].total),0);
+  evidence.planReviewsSchemaPresent = true;
   const receiptColumns = await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);
   assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'resource_cart_receipt_user_time_idx'`).length, 1);
