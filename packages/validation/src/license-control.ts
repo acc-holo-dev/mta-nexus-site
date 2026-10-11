@@ -21,6 +21,14 @@ export const licenseOwnerCommandSchema = z.discriminatedUnion("action", [
     })
     .strict(),
   z.object({ action: z.literal("rotate_token"), expectedUpdatedAt: revision, reason }).strict(),
+  z
+    .object({
+      action: z.literal("refresh_binding"),
+      expectedUpdatedAt: revision,
+      expectedEndpointRevision: z.number().int().min(0).max(2147483647),
+      reason,
+    })
+    .strict(),
   z.object({ action: z.literal("revoke_token"), expectedUpdatedAt: revision, reason }).strict(),
   z.object({ action: z.literal("revoke"), expectedUpdatedAt: revision, reason }).strict(),
 ]);
@@ -32,6 +40,15 @@ export const licenseModerationCommandSchema = z
   })
   .strict();
 export const licenseRuntimeCheckSchema = z.object({ serverId: identifier }).strict();
+export const licenseReleaseCheckSchema = z
+  .object({
+    serverId: identifier,
+    productId: identifier,
+    buildId: identifier,
+    sha256Hash: z.string().regex(/^[a-f0-9]{64}$/u),
+    nonce: z.uuidv4(),
+  })
+  .strict();
 
 export type LicenseOwnerCommand = z.infer<typeof licenseOwnerCommandSchema>;
 export type LicenseModerationCommand = z.infer<typeof licenseModerationCommandSchema>;

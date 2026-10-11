@@ -6,6 +6,9 @@ const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as { id: string; role: "user" | "moderator" } | null,
   allowed: true,
   verify: vi.fn(),
+  verifyRelease: vi.fn(),
+  historyPage: vi.fn(),
+  releasePage: vi.fn(),
   ownerCommand: vi.fn(),
   moderate: vi.fn(),
   detail: vi.fn(),
@@ -14,6 +17,9 @@ const state = vi.hoisted(() => ({
 vi.mock("@nexus/db", () => ({
   licenseControlsRepository: {
     verify: state.verify,
+    verifyRelease: state.verifyRelease,
+    historyPage: state.historyPage,
+    releasePage: state.releasePage,
     ownerCommand: state.ownerCommand,
     moderate: state.moderate,
     detail: state.detail,
@@ -29,6 +35,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 }));
 vi.mock("../apps/web/src/lib/request-client-ip", () => ({ getTrustedRequestIp: () => "unknown" }));
 import { POST as check } from "../apps/web/src/app/api/licenses/check/route";
+import { POST as checkRelease } from "../apps/web/src/app/api/licenses/check-release/route";
+import { GET as runtimeConfig } from "../apps/web/src/app/api/licenses/[id]/runtime-config/route";
+import { GET as activity } from "../apps/web/src/app/api/licenses/[id]/activity/route";
+import { GET as staffActivity } from "../apps/web/src/app/api/admin/licenses/[id]/activity/route";
 import { POST as ownerAction } from "../apps/web/src/app/api/licenses/[id]/actions/route";
 import { POST as moderationAction } from "../apps/web/src/app/api/admin/licenses/[id]/route";
 import { GET as detail } from "../apps/web/src/app/api/licenses/[id]/route";
@@ -47,6 +57,9 @@ beforeEach(() => {
   state.allowed = true;
   for (const mock of [
     state.verify,
+    state.verifyRelease,
+    state.historyPage,
+    state.releasePage,
     state.ownerCommand,
     state.moderate,
     state.detail,
@@ -204,4 +217,189 @@ it("does not reveal another buyer's license detail", async () => {
   expect(state.detail).toHaveBeenCalledWith("lic_a", "usr_a");
   expect(response.status).toBe(404);
   expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+});
+const release = {
+  serverId: "srv_a",
+  productId: "prd_a",
+  buildId: "bld_a",
+  sha256Hash: "a".repeat(64),
+  nonce: "cc98ca86-5a01-4b7f-b2ac-1eabbeff533f",
+};
+it("authenticates release checks solely with a hashed bearer and returns private, correlated output", async () => {
+  const token = createLicenseRuntimeToken();
+  const result = {
+    ...release,
+    valid: true,
+    licenseId: "lic_a",
+    version: "1.0",
+    checkedAt: revision,
+    expiresAt: updated,
+    leaseExpiresAt: "2026-10-10T00:01:00.000Z",
+    recheckAfterSeconds: 30,
+  };
+  state.verifyRelease.mockResolvedValue(result);
+  const response = await checkRelease(
+    request("/api/licenses/check-release", release, {
+      authorization: `Bearer ${token.value}`,
+      "x-request-id": "license-release-probe",
+    }),
+  );
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual(result);
+  expect(state.verifyRelease).toHaveBeenCalledWith(token.digest, release);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe("Authorization");
+  expect(response.headers.get("x-request-id")).toMatch(/^[a-f0-9-]{36}$/u);
+  expect(JSON.stringify(state.verifyRelease.mock.calls)).not.toContain(token.value);
+});
+it("denies cookie-only release checks, invalid bodies, unsafe extensions and unavailable bindings", async () => {
+  expect(
+    (
+      await checkRelease(
+        request("/api/licenses/check-release", release, { cookie: "nexus_session=session" }),
+      )
+    ).status,
+  ).toBe(401);
+  const authorization = `Bearer ${createLicenseRuntimeToken().value}`;
+  for (const extra of [
+    { nonce: "arbitrary" },
+    { productId: "https://other" },
+    { sha256Hash: "wrong" },
+    { expiresAt: updated },
+    { buildId: "x".repeat(5000) },
+  ])
+    expect([413, 422]).toContain(
+      (
+        await checkRelease(
+          request("/api/licenses/check-release", { ...release, ...extra }, { authorization }),
+        )
+      ).status,
+    );
+  expect(state.verifyRelease).not.toHaveBeenCalled();
+  state.verifyRelease.mockResolvedValue(null);
+  const denied = await checkRelease(
+    request("/api/licenses/check-release", release, { authorization }),
+  );
+  expect(denied.status).toBe(401);
+  expect(await denied.json()).toEqual({ valid: false, code: "LICENSE_CHECK_DENIED" });
+  state.allowed = false;
+  expect(
+    (await checkRelease(request("/api/licenses/check-release", release, { authorization }))).status,
+  ).toBe(429);
+});
+it("requires observed endpoint recovery and returns only binding acknowledgement, without a fresh bearer", async () => {
+  const command = {
+    action: "refresh_binding",
+    expectedUpdatedAt: revision,
+    expectedEndpointRevision: 3,
+    reason: "Control proof reapproved",
+  };
+  state.ownerCommand.mockResolvedValue({
+    license: { id: "lic_a", status: "active", serverBound: true, updatedAt: updated },
+    binding: { endpointRevision: 3, tokenRevoked: true },
+  });
+  const response = await ownerAction(request("/api/licenses/lic_a/actions", command), context);
+  expect(response.status).toBe(200);
+  expect(await response.json()).toEqual({
+    license: { id: "lic_a", status: "active", serverBound: true, updatedAt: updated },
+    binding: { endpointRevision: 3, tokenRevoked: true },
+  });
+  expect(state.ownerCommand.mock.calls[0][0]).toMatchObject({
+    actorId: "usr_a",
+    licenseId: "lic_a",
+    command,
+  });
+  expect(state.ownerCommand.mock.calls[0][0].tokenDigest).toBeUndefined();
+  expect(
+    (
+      await ownerAction(
+        request("/api/licenses/lic_a/actions", { ...command, serverId: "srv_other" }),
+        context,
+      )
+    ).status,
+  ).toBe(422);
+});
+it("scopes private configuration and history to the current buyer and paginates staff under live checks", async () => {
+  state.releasePage.mockResolvedValue({
+    licenseId: "lic_a",
+    productId: "prd_a",
+    serverId: "srv_a",
+    items: [],
+    page: 2,
+    pageSize: 20,
+    totalPages: 2,
+    total: 20,
+  });
+  state.historyPage.mockResolvedValue({
+    license: { id: "lic_a", productTitle: "Resource" },
+    items: [],
+    page: 2,
+    totalPages: 2,
+  });
+  const config = await runtimeConfig(
+    new NextRequest("https://nexus.test/api/licenses/lic_a/runtime-config?page=2"),
+    context,
+  );
+  expect(config.status).toBe(200);
+  expect(config.headers.get("cache-control")).toBe("private, no-store");
+  expect(state.releasePage).toHaveBeenCalledWith("lic_a", "usr_a", 2);
+  expect(
+    (
+      await activity(
+        new NextRequest("https://nexus.test/api/licenses/lic_a/activity?page=2"),
+        context,
+      )
+    ).status,
+  ).toBe(200);
+  expect(state.historyPage).toHaveBeenCalledWith("lic_a", "usr_a", false, 2);
+  expect(
+    (
+      await staffActivity(
+        new NextRequest("https://nexus.test/api/admin/licenses/lic_a/activity"),
+        context,
+      )
+    ).status,
+  ).toBe(403);
+  state.user = { id: "usr_a", role: "moderator" };
+  expect(
+    (
+      await staffActivity(
+        new NextRequest("https://nexus.test/api/admin/licenses/lic_a/activity?page=2"),
+        context,
+      )
+    ).status,
+  ).toBe(200);
+  expect(state.historyPage).toHaveBeenCalledWith("lic_a", "usr_a", true, 2);
+});
+it("rejects ambiguous private filters and guests without loading any private configuration", async () => {
+  for (const route of [runtimeConfig, activity]) {
+    expect(
+      (
+        await route(
+          new NextRequest("https://nexus.test/api/licenses/lic_a/runtime-config?page=1&page=2"),
+          context,
+        )
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await route(
+          new NextRequest("https://nexus.test/api/licenses/lic_a/runtime-config?ownerId=usr_other"),
+          context,
+        )
+      ).status,
+    ).toBe(400);
+    state.user = null;
+    expect(
+      (
+        await route(
+          new NextRequest("https://nexus.test/api/licenses/lic_a/runtime-config"),
+          context,
+        )
+      ).status,
+    ).toBe(401);
+    state.user = { id: "usr_a", role: "user" };
+  }
+  expect(state.releasePage).not.toHaveBeenCalled();
+  expect(state.historyPage).not.toHaveBeenCalled();
 });

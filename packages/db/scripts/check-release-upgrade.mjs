@@ -59,6 +59,7 @@ const evidence = {
   webPushOutboxSchemaPresent: false,
   resourceReviewSchemaPresent: false,
   commerceOrderCaseSchemaPresent: false,
+  licenseBindingRecoverySchemaPresent: false,
   cleanupComplete: false,
 };
 
@@ -359,6 +360,13 @@ try {
   assert.equal(orderCaseTriggers.length, 2);
   assert.equal((await client`SELECT count(*)::integer AS total FROM commerce_order_cases`)[0].total, 0);
   evidence.commerceOrderCaseSchemaPresent = true;
+  const licenseOwnerColumn = await client`SELECT column_name FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'license_runtime_bindings' AND column_name = 'server_owner_id'`;
+  assert.equal(licenseOwnerColumn.length, 1);
+  const licenseRecoveryTriggers = await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal
+    AND tgname IN ('license_runtime_bindings_guard', 'licenses_context_guard', 'licenses_clear_changed_tokens')`;
+  assert.equal(licenseRecoveryTriggers.length, 3);
+  evidence.licenseBindingRecoverySchemaPresent = true;
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);

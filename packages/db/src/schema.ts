@@ -389,6 +389,7 @@ export const licenses = pgTable(
 export const licenseRuntimeBindings = pgTable("license_runtime_bindings", {
   licenseId: text("license_id").primaryKey().references(() => licenses.id, { onDelete: "cascade" }),
   serverId: text("server_id").notNull(),
+  serverOwnerId: text("server_owner_id"),
   organizationId: text("organization_id"),
   endpointRevision: integer("endpoint_revision").notNull(),
   tokenDigest: text("token_digest"),

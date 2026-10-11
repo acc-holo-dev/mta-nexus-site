@@ -35,13 +35,25 @@ export default async function LicensePage({ params }: { params: Promise<{ id: st
       <LicenseControlPanel
         key={license.id}
         license={{
-          id: license.id, status: license.status, effectiveStatus: license.effectiveStatus,
-          canActivate: license.canActivate, bindingReady: license.bindingReady, boundServerId: license.boundServerId,
+          id: license.id,
+          status: license.status,
+          effectiveStatus: license.effectiveStatus,
+          canActivate: license.canActivate,
+          bindingReady: license.bindingReady,
+          boundServerId: license.boundServerId,
           updatedAt: license.updatedAt.toISOString(),
           expiresAt: license.expiresAt?.toISOString() ?? null,
+          canRefreshBinding: license.canRefreshBinding,
+          currentEndpointRevision: license.currentEndpointRevision,
         }}
         initialServers={servers}
       />
+      <Link
+        href={`/workspace/licenses/${encodeURIComponent(id)}/history`}
+        className="text-sm text-accent underline"
+      >
+        {getLicenseControlCopy(locale).fullHistory}
+      </Link>
     </div>
   );
 }

@@ -1,5 +1,28 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Same-server license recovery and exact-release runtime checks — 2026-10-11
+
+Migration `0053` adds a nullable recorded server owner without backfilling trust.
+Recovery uses observed license/endpoint revisions, the same saved server/scope,
+current approved control proof and live grants. It clears all credential fields
+and preserves the original finite term. Database guards retain bindings after
+server deletion, reject server/identity/term changes and terminal-state revival,
+and invalidate credentials on status/term changes. Historical unknown bindings
+require explicit owner reconfirmation before another runtime token is issued.
+
+RU/EN owner controls include an exact-release probe using the transient bearer;
+the runtime API checks product/build/hash, echoes the request nonce and returns
+a lease of at most 60 seconds. Private buyer/staff history is paginated by 20.
+This validates saved context and a recorded hash, without authenticating the
+physical caller, inspecting installed files or implementing source-code DRM.
+
+Local TypeScript, 54 focused SQL/HTTP/SSR/contract checks and 18 migration-contract
+checks pass. Four PostgreSQL fixtures cover concurrent recovery, state/identity
+guards, server deletion and audit rollback but remain unrun. Live migration,
+locking/rollback, browser interaction and complete production generation remain
+unverified. Paid issuance/renewal, provider settlement and an enforced MTA client
+are still required; no paid or subscription activation is enabled here.
+
 ### Order-linked commercial support and refund/dispute intake — 2026-10-11
 
 Migration `0052` adds one persistent commercial case per order, immutable intake

@@ -31,6 +31,22 @@ support conversation require migration `0052`. Refund recommendations do not
 execute refunds or change orders, balances, licenses or access. Paid provider
 settlement and financial refund execution remain unfinished.
 
+License owners can reconfirm the same server after an endpoint change at
+`/workspace/licenses/[id]`, once its fresh control proof is approved. Migration
+`0053` records server ownership, protects the original finite term and retained
+server identity, and clears credentials on recovery or status changes. Historical
+bindings with unknown ownership require explicit reconfirmation. Private owner
+and staff history pages show all license events in pages of 20.
+
+The one-time runtime credential panel can check an exact published build using
+`POST /api/licenses/check-release`: bearer token plus `serverId`, `productId`,
+`buildId`, `sha256Hash` and UUID-v4 `nonce`. The server rechecks current license,
+control proof, grants, endpoint, owner and safe release; successful responses echo
+the nonce and expire within 60 seconds or the earlier recorded term/token expiry.
+This checks a saved release hash and credential, without attesting the calling
+machine or installed files. It grants no downloads and is not source-code DRM.
+Paid license issuance/renewal and an enforced MTA DRM client remain unfinished.
+
 Developers edit specialties, portfolio and Discord in `/settings/developer`.
 Public profiles show these contacts and the separate verified-experience flag.
 Changing specialties or portfolio removes that flag. `/workspace/verification`

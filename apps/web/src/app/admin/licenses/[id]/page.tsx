@@ -31,12 +31,22 @@ export default async function ModerateLicensePage({ params }: { params: Promise<
         key={license.id}
         moderation
         license={{
-          id: license.id, status: license.status, effectiveStatus: license.effectiveStatus,
-          canActivate: license.canActivate, bindingReady: license.bindingReady, boundServerId: license.boundServerId,
+          id: license.id,
+          status: license.status,
+          effectiveStatus: license.effectiveStatus,
+          canActivate: license.canActivate,
+          bindingReady: license.bindingReady,
+          boundServerId: license.boundServerId,
           updatedAt: license.updatedAt.toISOString(),
           expiresAt: license.expiresAt?.toISOString() ?? null,
         }}
       />
+      <Link
+        href={`/admin/licenses/${encodeURIComponent(id)}/history`}
+        className="text-sm text-accent underline"
+      >
+        {getLicenseControlCopy(locale).fullHistory}
+      </Link>
     </div>
   );
 }

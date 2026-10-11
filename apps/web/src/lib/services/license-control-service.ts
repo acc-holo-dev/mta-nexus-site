@@ -7,6 +7,12 @@ export const licenseControlService = {
   detail: (user: User, licenseId: string) => licenseControlsRepository.detail(licenseId, user.id),
   servers: (user: User, licenseId: string, page = 1) =>
     licenseControlsRepository.eligibleServers(licenseId, user.id, page),
+  releases: (user: User, licenseId: string, page = 1) =>
+    licenseControlsRepository.releasePage(licenseId, user.id, page),
+  async history(user: User, licenseId: string, page = 1, moderation = false) {
+    if (moderation && !can(user, "admin.moderation")) throw new ForbiddenError();
+    return licenseControlsRepository.historyPage(licenseId, user.id, moderation, page);
+  },
   async ownerCommand(user: User, licenseId: string, command: LicenseOwnerCommand) {
     const token = command.action === "rotate_token" ? createLicenseRuntimeToken() : undefined;
     const result = await licenseControlsRepository.ownerCommand({
@@ -18,6 +24,7 @@ export const licenseControlService = {
     });
     return {
       license: result.license,
+      ...(result.binding ? { binding: result.binding } : {}),
       ...(token && result.tokenExpiresAt
         ? {
             token: { value: token.value, expiresAt: result.tokenExpiresAt.toISOString() },

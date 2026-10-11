@@ -45,6 +45,7 @@ function bindingRow(overrides = {}) {
     serverId: "srv_a",
     organizationId: null,
     endpointRevision: 2,
+    serverOwnerId: "usr_a",
     tokenDigest: "a".repeat(64),
     tokenIssuedAt: revision,
     tokenExpiresAt: future,
@@ -261,7 +262,7 @@ function rotationResults(expiry = future, serverRevision = 2) {
     [["lic_a", "prd_a", "srv_a", "single_server", "active", expiry, revision]],
     [bindingRow()],
     clockRow,
-    [["srv_a", null, serverRevision]],
+    [["srv_a", null, serverRevision, "usr_a"]],
     [["lic_a"]],
     [],
     [["lic_a", "active", updated]],
@@ -322,6 +323,250 @@ it("rejects endpoint revisions changing beneath an existing immutable binding", 
   ).rejects.toMatchObject({ code: "LICENSE_SERVER_CHANGED" });
   expect(state.queries.every((item) => item.sql.startsWith("select"))).toBe(true);
 });
+it("recovers only the same verified server and clears its old token without extending the term", async () => {
+  state.results = rotationResults(future, 3);
+  const result = await repository.ownerCommand({
+    ...owner,
+    command: {
+      action: "refresh_binding",
+      expectedUpdatedAt: revision,
+      expectedEndpointRevision: 3,
+      reason: "Endpoint control reconfirmed",
+    },
+  });
+  expect(result.binding).toEqual({ endpointRevision: 3, tokenRevoked: true });
+  expect(result.tokenExpiresAt).toBeUndefined();
+  const mutation = state.queries.find((item) =>
+    item.sql.startsWith('update "license_runtime_bindings"'),
+  );
+  if (!mutation) throw new Error("Missing binding update");
+  expect(mutation.sql).toContain('"endpoint_revision" =');
+  expect(mutation.sql).toContain('"server_owner_id" =');
+  for (const field of ["token_digest", "token_issued_at", "token_expires_at"])
+    expect(mutation.sql).toContain(`"${field}" =`);
+  expect(mutation.params).toEqual(expect.arrayContaining([3, "usr_a", null]));
+  expect(mutation.sql).not.toContain('"server_id" =');
+  expect(state.queries.find((item) => item.sql.startsWith('update "licenses"'))?.sql).not.toContain(
+    '"expires_at" =',
+  );
+  const audit = state.queries.at(-1);
+  if (!audit) throw new Error("Missing binding audit");
+  expect(audit.params).toContain("license.binding_refreshed");
+  expect(audit.params).toContain(
+    JSON.stringify({
+      reason: "Endpoint control reconfirmed",
+      previousStatus: "active",
+      status: "active",
+      termChanged: false,
+      fromEndpointRevision: 2,
+      toEndpointRevision: 3,
+      tokenRevoked: true,
+    }),
+  );
+});
+it("requires explicit recovery for unknown historical ownership before rotating a credential", async () => {
+  const results = rotationResults();
+  results[5] = [bindingRow({ serverOwnerId: null })];
+  state.results = results;
+  await expect(
+    repository.ownerCommand({
+      ...owner,
+      tokenDigest: "b".repeat(64),
+      command: {
+        action: "rotate_token",
+        expectedUpdatedAt: revision,
+        reason: "Replace server credential",
+      },
+    }),
+  ).rejects.toMatchObject({ code: "LICENSE_SERVER_CHANGED" });
+  expect(state.queries.every((item) => item.sql.startsWith("select"))).toBe(true);
+  state.queries = [];
+  const recovery = rotationResults();
+  recovery[5] = [bindingRow({ serverOwnerId: null })];
+  state.results = recovery;
+  expect(
+    (
+      await repository.ownerCommand({
+        ...owner,
+        command: {
+          action: "refresh_binding",
+          expectedUpdatedAt: revision,
+          expectedEndpointRevision: 2,
+          reason: "Reconfirm historical context",
+        },
+      })
+    ).binding,
+  ).toEqual({ endpointRevision: 2, tokenRevoked: true });
+});
+it("rejects unobserved endpoint changes and transfers of known ownership or organization", async () => {
+  for (const [serverRow, expectedEndpointRevision] of [
+    [["srv_a", null, 3, "usr_a"], 2],
+    [["srv_a", null, 3, "usr_other"], 3],
+    [["srv_a", "org_other", 3, "usr_a"], 3],
+  ] as const) {
+    state.queries = [];
+    const results = rotationResults();
+    results[7] = [[...serverRow]];
+    state.results = results;
+    await expect(
+      repository.ownerCommand({
+        ...owner,
+        command: {
+          action: "refresh_binding",
+          expectedUpdatedAt: revision,
+          expectedEndpointRevision,
+          reason: "Reconfirm current context",
+        },
+      }),
+    ).rejects.toMatchObject({ code: "LICENSE_SERVER_CHANGED" });
+    expect(state.queries.every((item) => item.sql.startsWith("select"))).toBe(true);
+  }
+});
+it("cannot recover without current server control evidence or an unchanged active finite term", async () => {
+  for (const [index, replacement, code] of [
+    [7, [], "LICENSE_SERVER_UNAVAILABLE"],
+    [
+      4,
+      [["lic_a", "prd_a", "srv_a", "single_server", "active", null, revision]],
+      "LICENSE_FINITE_TERM_REQUIRED",
+    ],
+    [4, [["lic_a", "prd_a", "srv_a", "single_server", "active", now, revision]], "LICENSE_EXPIRED"],
+    [
+      4,
+      [["lic_a", "prd_a", "srv_a", "single_server", "revoked", future, revision]],
+      "LICENSE_INACTIVE",
+    ],
+  ] as const) {
+    state.queries = [];
+    const results = rotationResults(future, 3);
+    results[index] = replacement.map((row) => [...row]);
+    state.results = results;
+    await expect(
+      repository.ownerCommand({
+        ...owner,
+        command: {
+          action: "refresh_binding",
+          expectedUpdatedAt: revision,
+          expectedEndpointRevision: 3,
+          reason: "Reconfirm current context",
+        },
+      }),
+    ).rejects.toMatchObject({ code });
+    expect(state.queries.every((item) => item.sql.startsWith("select"))).toBe(true);
+  }
+});
+const releaseCommand = {
+  serverId: "srv_a",
+  productId: "prd_a",
+  buildId: "bld_a",
+  sha256Hash: "b".repeat(64),
+  nonce: "cc98ca86-5a01-4b7f-b2ac-1eabbeff533f",
+};
+it("checks the exact release under current grants, control proof, scan provenance and owner snapshot", async () => {
+  state.results = [
+    [["usr_a"]],
+    [["lic_a", "prd_a", "srv_a", "bld_a", "1.0", releaseCommand.sha256Hash, future, now]],
+  ];
+  const result = await repository.verifyRelease("a".repeat(64), releaseCommand);
+  expect(result).toMatchObject({
+    valid: true,
+    nonce: releaseCommand.nonce,
+    leaseExpiresAt: "2026-10-10T01:01:00.000Z",
+    recheckAfterSeconds: 30,
+  });
+  const query = state.queries[1];
+  expect(query.params).toEqual(
+    expect.arrayContaining([
+      "usr_a",
+      "srv_a",
+      "prd_a",
+      "bld_a",
+      releaseCommand.sha256Hash,
+      "published",
+      "clean",
+    ]),
+  );
+  for (const field of [
+    "server_owner_id",
+    "endpoint_revision",
+    "token_expires_at",
+    "server_claim_challenges",
+    "organization_members",
+    "file_size_bytes",
+    "scanner",
+    "scanned_at",
+  ])
+    expect(query.sql).toContain(field);
+  for (const privateField of ['"licenses"."key"', "storage_key"])
+    expect(query.sql).not.toContain(privateField);
+});
+it("caps the runtime lease at actual token/license expiry and denies unusable release checks", async () => {
+  state.results = [
+    [["usr_a"]],
+    [
+      [
+        "lic_a",
+        "prd_a",
+        "srv_a",
+        "bld_a",
+        "1.0",
+        releaseCommand.sha256Hash,
+        "2026-10-10T01:00:12.000Z",
+        now,
+      ],
+    ],
+  ];
+  expect(await repository.verifyRelease("a".repeat(64), releaseCommand)).toMatchObject({
+    leaseExpiresAt: "2026-10-10T01:00:12.000Z",
+    recheckAfterSeconds: 12,
+  });
+  for (const rows of [[], [["usr_a"]]]) {
+    state.results = [rows, []];
+    expect(await repository.verifyRelease("a".repeat(64), releaseCommand)).toBeNull();
+  }
+  state.results = [
+    [["usr_a"]],
+    [["lic_a", "prd_a", "srv_a", "bld_a", "1.0", releaseCommand.sha256Hash, now, now]],
+  ];
+  expect(await repository.verifyRelease("a".repeat(64), releaseCommand)).toBeNull();
+});
+it("paginates private history using stable ordering and projects no actor IDs or raw details", async () => {
+  state.results = [
+    [["lic_a", "Resource"]],
+    [[41]],
+    [["aud_a", "license.bound", "user", "Reason", null, null, revision]],
+  ];
+  const result = await repository.historyPage("lic_a", "usr_a", false, 2);
+  expect(result).toMatchObject({
+    page: 2,
+    pageSize: 20,
+    total: 41,
+    totalPages: 3,
+    items: [{ fromEndpointRevision: null, toEndpointRevision: null }],
+  });
+  expect(state.queries[0].params).toContain("usr_a");
+  expect(state.queries[2].sql).toContain(
+    'order by "audit_events"."created_at" desc, "audit_events"."id" desc',
+  );
+  expect(state.queries[2].params.slice(-2)).toEqual([20, 20]);
+  expect(state.queries[2].sql).not.toContain('"actor_id"');
+  expect(state.queries[2].sql).toContain("left(");
+  expect(state.options[0]).toEqual({ isolationLevel: "repeatable read", accessMode: "read only" });
+});
+it("denies history and runtime configuration before querying releases or audit for foreign buyers", async () => {
+  state.results = [[]];
+  await expect(repository.historyPage("lic_a", "usr_other")).rejects.toMatchObject({
+    code: "NOT_FOUND",
+  });
+  expect(state.queries).toHaveLength(1);
+  state.queries = [];
+  state.results = [[]];
+  await expect(repository.releasePage("lic_a", "usr_other")).rejects.toMatchObject({
+    code: "NOT_FOUND",
+  });
+  expect(state.queries).toHaveLength(1);
+  expect(state.queries[0].sql).toContain("server_owner_id");
+});
 it("never moves an existing binding to a different server", async () => {
   state.results = rotationResults();
   await expect(
@@ -338,10 +583,18 @@ it("never moves an existing binding to a different server", async () => {
   expect(state.queries.every((item) => item.sql.startsWith("select"))).toBe(true);
 });
 it("keeps a durable binding recorded when a deleted server cleared the legacy foreign key", async () => {
-  state.results = [[["moderator"]], [["lic_a", "active", future, revision, null]], clockRow,
-    [["srv_a"]], [["lic_a", "suspended", updated]], []];
-  const result = await repository.moderate({ ...owner,
-    command: { action: "suspend", expectedUpdatedAt: revision, reason: "Suspend this license" } });
+  state.results = [
+    [["moderator"]],
+    [["lic_a", "active", future, revision, null]],
+    clockRow,
+    [["srv_a"]],
+    [["lic_a", "suspended", updated]],
+    [],
+  ];
+  const result = await repository.moderate({
+    ...owner,
+    command: { action: "suspend", expectedUpdatedAt: revision, reason: "Suspend this license" },
+  });
   expect(result.license.serverBound).toBe(true);
   expect(result.license.status).toBe("suspended");
 });

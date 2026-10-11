@@ -372,6 +372,13 @@
       "when": 1791734400000,
       "tag": "0052_commerce_order_cases",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1791738000000,
+      "tag": "0053_license_binding_recovery",
+      "breakpoints": true
     }
   ]
 }

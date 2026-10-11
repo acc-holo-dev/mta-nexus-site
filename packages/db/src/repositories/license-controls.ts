@@ -16,9 +16,14 @@ import {
   AppError,
   NotFoundError,
   LICENSE_RUNTIME_TOKEN_DAYS,
+  LICENSE_RUNTIME_LEASE_SECONDS,
   canModerateLicense,
 } from "@nexus/domain";
-import type { LicenseOwnerCommand, LicenseModerationCommand } from "@nexus/domain";
+import type {
+  LicenseOwnerCommand,
+  LicenseModerationCommand,
+  LicenseReleaseCheck,
+} from "@nexus/domain";
 import { db } from "../client";
 import {
   auditEvents,
@@ -31,7 +36,7 @@ import {
   users,
   verificationRequests,
 } from "../schema";
-import { trustedCleanScanCondition } from "./build-safety";
+import { trustedCleanScanCondition, safePublishedBuildCondition } from "./build-safety";
 import { historyPageBounds } from "./history-pagination";
 import { managedServerScope } from "./server-management-scope";
 import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
@@ -106,9 +111,42 @@ const detailFields = {
   legacyServerBound: sql<boolean>`${licenses.serverId} IS NOT NULL`,
   boundServerId: bindings.serverId,
   endpointRevision: bindings.endpointRevision,
+  bindingOwnerId: bindings.serverOwnerId,
   tokenExpiresAt: bindings.tokenExpiresAt,
   tokenActive: sql<boolean>`${bindings.tokenDigest} IS NOT NULL AND ${bindings.tokenExpiresAt} > clock_timestamp()`,
 };
+
+function usableBinding(userId: string) {
+  return and(
+    eq(licenses.userId, userId),
+    eq(licenses.serverId, bindings.serverId),
+    eq(licenses.status, "active"),
+    eq(licenses.model, "single_server"),
+    gt(licenses.expiresAt, sql`clock_timestamp()`),
+    eq(servers.endpointRevision, bindings.endpointRevision),
+    eq(servers.ownerId, bindings.serverOwnerId),
+    eq(servers.status, "active"),
+    eq(servers.isVerified, true),
+    sql`${servers.organizationId} IS NOT DISTINCT FROM ${bindings.organizationId}`,
+    managedServerScope(userId),
+    confirmedControlProof(),
+    availableProduct(),
+  );
+}
+
+function visibleLicense(licenseId: string, actorId: string, moderation: boolean) {
+  return and(
+    eq(licenses.id, licenseId),
+    moderation
+      ? exists(
+          db
+            .select({ id: users.id })
+            .from(users)
+            .where(and(eq(users.id, actorId), inArray(users.role, ["admin", "moderator"]))),
+        )
+      : eq(licenses.userId, actorId),
+  );
+}
 
 async function clock(tx: ResourceTransaction) {
   const [row] = await tx.execute(sql`select clock_timestamp()::text as now`);
@@ -133,6 +171,144 @@ async function clearToken(tx: ResourceTransaction, licenseId: string, updatedAt:
 }
 
 export class LicenseControlsRepository {
+  async historyPage(licenseId: string, actorId: string, moderation = false, requestedPage = 1) {
+    return db.transaction(
+      async (tx) => {
+        const [license] = await tx
+          .select({ id: licenses.id, productTitle: products.title })
+          .from(licenses)
+          .innerJoin(products, eq(products.id, licenses.productId))
+          .where(visibleLicense(licenseId, actorId, moderation))
+          .limit(1);
+        if (!license) throw new NotFoundError("License", licenseId);
+        const scope = and(
+          eq(auditEvents.targetType, "license"),
+          eq(auditEvents.targetId, licenseId),
+        );
+        const [summary] = await tx.select({ total: count() }).from(auditEvents).where(scope);
+        const bounds = historyPageBounds(summary?.total ?? 0, requestedPage);
+        const items = await tx
+          .select({
+            id: auditEvents.id,
+            action: auditEvents.action,
+            actorType: auditEvents.actorType,
+            reason: sql<string | null>`left(${auditEvents.details}->>'reason', 1000)`,
+            fromEndpointRevision: sql<
+              number | null
+            >`case when jsonb_typeof(${auditEvents.details}->'fromEndpointRevision') = 'number'
+          then (${auditEvents.details}->>'fromEndpointRevision')::numeric else null end`.mapWith(
+              Number,
+            ),
+            toEndpointRevision: sql<
+              number | null
+            >`case when jsonb_typeof(${auditEvents.details}->'toEndpointRevision') = 'number'
+          then (${auditEvents.details}->>'toEndpointRevision')::numeric else null end`.mapWith(
+              Number,
+            ),
+            createdAt: auditEvents.createdAt,
+          })
+          .from(auditEvents)
+          .where(scope)
+          .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
+          .limit(bounds.pageSize)
+          .offset(bounds.offset);
+        return { license, items, ...bounds };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
+  async releasePage(licenseId: string, actorId: string, requestedPage = 1) {
+    return db.transaction(
+      async (tx) => {
+        const [context] = await tx
+          .select({
+            licenseId: licenses.id,
+            productId: licenses.productId,
+            serverId: bindings.serverId,
+          })
+          .from(licenses)
+          .innerJoin(bindings, eq(bindings.licenseId, licenses.id))
+          .innerJoin(products, eq(products.id, licenses.productId))
+          .innerJoin(servers, eq(servers.id, bindings.serverId))
+          .where(and(eq(licenses.id, licenseId), usableBinding(actorId)))
+          .limit(1);
+        if (!context) throw new NotFoundError("License runtime context", licenseId);
+        const scope = and(
+          safePublishedBuildCondition(context.productId),
+          sql`${builds.sha256Hash} ~ '^[a-f0-9]{64}$'`,
+          gt(builds.fileSizeBytes, 0),
+        );
+        const [summary] = await tx.select({ total: count() }).from(builds).where(scope);
+        const bounds = historyPageBounds(summary?.total ?? 0, requestedPage);
+        const items = await tx
+          .select({ id: builds.id, version: builds.version, sha256Hash: builds.sha256Hash })
+          .from(builds)
+          .where(scope)
+          .orderBy(desc(builds.createdAt), desc(builds.id))
+          .limit(bounds.pageSize)
+          .offset(bounds.offset);
+        return { ...context, items, ...bounds };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
+  /** Release-specific credential check; does not attest the caller or its files. */
+  async verifyRelease(tokenDigest: string, command: LicenseReleaseCheck) {
+    const [subject] = await db
+      .select({ userId: licenses.userId })
+      .from(bindings)
+      .innerJoin(licenses, eq(licenses.id, bindings.licenseId))
+      .where(eq(bindings.tokenDigest, tokenDigest))
+      .limit(1);
+    if (!subject) return null;
+    const [row] = await db
+      .select({
+        licenseId: licenses.id,
+        productId: licenses.productId,
+        serverId: bindings.serverId,
+        buildId: builds.id,
+        version: builds.version,
+        sha256Hash: builds.sha256Hash,
+        expiresAt: sql<string>`least(${licenses.expiresAt}, ${bindings.tokenExpiresAt})::text`,
+        checkedAt: sql<string>`clock_timestamp()::text`,
+      })
+      .from(bindings)
+      .innerJoin(licenses, eq(licenses.id, bindings.licenseId))
+      .innerJoin(products, eq(products.id, licenses.productId))
+      .innerJoin(servers, eq(servers.id, bindings.serverId))
+      .innerJoin(builds, eq(builds.productId, products.id))
+      .where(
+        and(
+          eq(bindings.tokenDigest, tokenDigest),
+          eq(bindings.serverId, command.serverId),
+          eq(products.id, command.productId),
+          eq(builds.id, command.buildId),
+          eq(builds.sha256Hash, command.sha256Hash),
+          gt(bindings.tokenExpiresAt, sql`clock_timestamp()`),
+          usableBinding(subject.userId),
+          safePublishedBuildCondition(command.productId),
+          gt(builds.fileSizeBytes, 0),
+        ),
+      )
+      .limit(1);
+    if (!row) return null;
+    const checked = Date.parse(row.checkedAt),
+      expires = Date.parse(row.expiresAt);
+    if (!Number.isFinite(checked) || !Number.isFinite(expires) || expires <= checked) return null;
+    return {
+      valid: true as const,
+      ...row,
+      nonce: command.nonce,
+      checkedAt: new Date(checked).toISOString(),
+      expiresAt: new Date(expires).toISOString(),
+      leaseExpiresAt: new Date(
+        Math.min(expires, checked + LICENSE_RUNTIME_LEASE_SECONDS * 1000),
+      ).toISOString(),
+      recheckAfterSeconds: Math.min(30, Math.max(1, Math.floor((expires - checked) / 1000))),
+    };
+  }
   async detail(licenseId: string, actorId: string, moderation = false) {
     return db.transaction(
       async (tx) => {
@@ -158,6 +334,7 @@ export class LicenseControlsRepository {
               .select({
                 name: servers.name,
                 revision: servers.endpointRevision,
+                ownerId: servers.ownerId,
                 eligible: sql<boolean>`coalesce((${and(
                   eq(servers.status, "active"),
                   eq(servers.isVerified, true),
@@ -178,7 +355,7 @@ export class LicenseControlsRepository {
             id: auditEvents.id,
             action: auditEvents.action,
             actorType: auditEvents.actorType,
-            reason: sql<string | null>`${auditEvents.details}->>'reason'`,
+            reason: sql<string | null>`left(${auditEvents.details}->>'reason', 1000)`,
             createdAt: auditEvents.createdAt,
           })
           .from(auditEvents)
@@ -188,14 +365,29 @@ export class LicenseControlsRepository {
         const now = await clock(tx);
         const active =
           license.status === "active" && !!license.expiresAt && license.expiresAt > now;
+        const { bindingOwnerId, ...presentation } = license;
         return {
-          ...license,
+          ...presentation,
           effectiveStatus:
             license.status === "active" && license.expiresAt && license.expiresAt <= now
               ? "expired"
               : license.status,
           canActivate: active && license.model === "single_server" && license.productAvailable,
-          bindingReady: !!server && server.eligible && server.revision === license.endpointRevision,
+          bindingReady:
+            !!server &&
+            server.eligible &&
+            server.revision === license.endpointRevision &&
+            !!bindingOwnerId &&
+            server.ownerId === bindingOwnerId,
+          canRefreshBinding:
+            active &&
+            license.model === "single_server" &&
+            license.productAvailable &&
+            !!server &&
+            server.eligible &&
+            (!bindingOwnerId || server.ownerId === bindingOwnerId) &&
+            (!bindingOwnerId || server.revision !== license.endpointRevision),
+          currentEndpointRevision: server?.revision ?? null,
           serverName: server?.name ?? null,
           history,
         };
@@ -308,7 +500,7 @@ export class LicenseControlsRepository {
     tokenDigest?: string;
   }) {
     return db.transaction(async (tx) => {
-      const activating = input.command.action === "bind" || input.command.action === "rotate_token";
+      const activating = ["bind", "refresh_binding", "rotate_token"].includes(input.command.action);
       if (activating) {
         const [preflight] = await tx
           .select({
@@ -373,6 +565,7 @@ export class LicenseControlsRepository {
       let tokenExpiresAt: Date | undefined;
       let serverId = license.serverId;
       let status = license.status;
+      let refreshedEndpointRevision: number | undefined;
       if (activating) {
         const paidExpiry = assertActiveTerm(license, now);
         if (license.model !== "single_server") throw fail("LICENSE_SINGLE_SERVER_REQUIRED");
@@ -388,6 +581,7 @@ export class LicenseControlsRepository {
             id: servers.id,
             organizationId: servers.organizationId,
             revision: servers.endpointRevision,
+            ownerId: servers.ownerId,
           })
           .from(servers)
           .where(
@@ -409,23 +603,42 @@ export class LicenseControlsRepository {
         if (!server || !available) throw fail("LICENSE_SERVER_UNAVAILABLE");
         if (
           binding &&
-          (binding.endpointRevision !== server.revision ||
-            binding.organizationId !== server.organizationId)
+          (binding.organizationId !== server.organizationId ||
+            (binding.serverOwnerId && binding.serverOwnerId !== server.ownerId) ||
+            (input.command.action !== "refresh_binding" &&
+              (binding.endpointRevision !== server.revision || !binding.serverOwnerId)))
         )
           throw fail("LICENSE_SERVER_CHANGED");
         if (input.command.action === "bind") {
           if (binding) throw fail("LICENSE_ALREADY_BOUND");
-          await tx
-            .insert(bindings)
-            .values({
-              licenseId: license.id,
-              serverId: target,
-              organizationId: server.organizationId,
-              endpointRevision: server.revision,
-              createdAt: now,
-              updatedAt: now,
-            });
+          await tx.insert(bindings).values({
+            licenseId: license.id,
+            serverId: target,
+            organizationId: server.organizationId,
+            endpointRevision: server.revision,
+            serverOwnerId: server.ownerId,
+            createdAt: now,
+            updatedAt: now,
+          });
           serverId = target;
+        } else if (input.command.action === "refresh_binding") {
+          if (!binding) throw fail("LICENSE_NOT_BOUND");
+          if (server.revision !== input.command.expectedEndpointRevision)
+            throw fail("LICENSE_SERVER_CHANGED");
+          if (binding.serverOwnerId && binding.endpointRevision === server.revision)
+            throw fail("LICENSE_BINDING_CURRENT");
+          refreshedEndpointRevision = server.revision;
+          await tx
+            .update(bindings)
+            .set({
+              endpointRevision: server.revision,
+              serverOwnerId: server.ownerId,
+              tokenDigest: null,
+              tokenIssuedAt: null,
+              tokenExpiresAt: null,
+              updatedAt: now,
+            })
+            .where(eq(bindings.licenseId, license.id));
         } else {
           if (!input.tokenDigest || !/^[a-f0-9]{64}$/u.test(input.tokenDigest))
             throw new Error("Missing token digest");
@@ -454,23 +667,28 @@ export class LicenseControlsRepository {
         .set({ status, serverId, updatedAt: revision })
         .where(eq(licenses.id, license.id))
         .returning({ id: licenses.id, status: licenses.status, updatedAt: licenses.updatedAt });
-      await tx
-        .insert(auditEvents)
-        .values({
-          id: input.auditId,
-          actorId: input.actorId,
-          actorType: "user",
-          action: `license.${input.command.action === "bind" ? "bound" : input.command.action === "rotate_token" ? "token_rotated" : input.command.action === "revoke_token" ? "token_revoked" : "revoked"}`,
-          targetId: license.id,
-          targetType: "license",
-          details: {
-            reason: input.command.reason,
-            previousStatus: license.status,
-            status,
-            termChanged: false,
-          },
-          createdAt: now,
-        });
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: input.actorId,
+        actorType: "user",
+        action: `license.${input.command.action === "bind" ? "bound" : input.command.action === "refresh_binding" ? "binding_refreshed" : input.command.action === "rotate_token" ? "token_rotated" : input.command.action === "revoke_token" ? "token_revoked" : "revoked"}`,
+        targetId: license.id,
+        targetType: "license",
+        details: {
+          reason: input.command.reason,
+          previousStatus: license.status,
+          status,
+          termChanged: false,
+          ...(input.command.action === "refresh_binding"
+            ? {
+                fromEndpointRevision: binding?.endpointRevision,
+                toEndpointRevision: refreshedEndpointRevision,
+                tokenRevoked: true,
+              }
+            : {}),
+        },
+        createdAt: now,
+      });
       return {
         license: {
           ...updated,
@@ -478,6 +696,11 @@ export class LicenseControlsRepository {
           serverBound: !!(binding || serverId),
         },
         tokenExpiresAt,
+        ...(refreshedEndpointRevision !== undefined
+          ? {
+              binding: { endpointRevision: refreshedEndpointRevision, tokenRevoked: true as const },
+            }
+          : {}),
       };
     });
   }
@@ -521,23 +744,21 @@ export class LicenseControlsRepository {
         .set({ status, updatedAt: revision })
         .where(eq(licenses.id, license.id))
         .returning({ id: licenses.id, status: licenses.status, updatedAt: licenses.updatedAt });
-      await tx
-        .insert(auditEvents)
-        .values({
-          id: input.auditId,
-          actorId: input.actorId,
-          actorType: "admin",
-          action: `license.${input.command.action === "restore" ? "restored" : input.command.action === "suspend" ? "suspended" : "revoked"}`,
-          targetId: license.id,
-          targetType: "license",
-          details: {
-            reason: input.command.reason,
-            previousStatus: license.status,
-            status,
-            termChanged: false,
-          },
-          createdAt: now,
-        });
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: input.actorId,
+        actorType: "admin",
+        action: `license.${input.command.action === "restore" ? "restored" : input.command.action === "suspend" ? "suspended" : "revoked"}`,
+        targetId: license.id,
+        targetType: "license",
+        details: {
+          reason: input.command.reason,
+          previousStatus: license.status,
+          status,
+          termChanged: false,
+        },
+        createdAt: now,
+      });
       return {
         license: {
           ...updated,
@@ -573,19 +794,8 @@ export class LicenseControlsRepository {
         and(
           eq(bindings.tokenDigest, tokenDigest),
           eq(bindings.serverId, serverId),
-          eq(licenses.serverId, bindings.serverId),
-          eq(licenses.userId, subject.userId),
-          eq(licenses.status, "active"),
-          eq(licenses.model, "single_server"),
-          gt(licenses.expiresAt, sql`clock_timestamp()`),
           gt(bindings.tokenExpiresAt, sql`clock_timestamp()`),
-          eq(servers.endpointRevision, bindings.endpointRevision),
-          eq(servers.status, "active"),
-          eq(servers.isVerified, true),
-          sql`${servers.organizationId} IS NOT DISTINCT FROM ${bindings.organizationId}`,
-          managedServerScope(subject.userId),
-          confirmedControlProof(),
-          availableProduct(),
+          usableBinding(subject.userId),
         ),
       )
       .limit(1);

@@ -12,6 +12,7 @@ import { useNexusLocale } from "./locale-context";
 import { privateApiRequest } from "../lib/private-api-request";
 import { getLicenseControlCopy, licenseControlError } from "../lib/license-control-i18n";
 import { confirmedLicenseControl } from "../lib/license-control-confirmation";
+import { LicenseRuntimeProbe } from "./license-runtime-probe";
 
 type ServerPage = { servers: { id: string; name: string }[]; page: number; totalPages: number };
 export type LicensePanelData = {
@@ -23,6 +24,8 @@ export type LicensePanelData = {
   bindingReady: boolean;
   boundServerId: string | null;
   expiresAt: string | null;
+  canRefreshBinding?: boolean;
+  currentEndpointRevision?: number | null;
 };
 
 export function LicenseControlPanel({
@@ -50,6 +53,11 @@ export function LicenseControlPanel({
     : [
         ...(license.canActivate && !license.boundServerId ? ["bind" as const] : []),
         ...(license.canActivate && license.bindingReady ? ["rotate_token" as const] : []),
+        ...(license.canRefreshBinding &&
+        license.currentEndpointRevision !== null &&
+        license.currentEndpointRevision !== undefined
+          ? ["refresh_binding" as const]
+          : []),
         ...(license.boundServerId ? ["revoke_token" as const] : []),
         ...(canModerateLicense(license.status, "revoke") ? ["revoke" as const] : []),
       ];
@@ -63,10 +71,12 @@ export function LicenseControlPanel({
   const [loadingServers, setLoadingServers] = useState(false);
   const [error, setError] = useState("");
   const [completedRevision, setCompletedRevision] = useState("");
+  const [uncertainRevision, setUncertainRevision] = useState("");
   const [secret, setSecret] = useState<{ value: string; expiresAt: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const refreshing =
-    !!completedRevision && Date.parse(license.updatedAt) < Date.parse(completedRevision);
+    (!!completedRevision && Date.parse(license.updatedAt) < Date.parse(completedRevision)) ||
+    uncertainRevision === license.updatedAt;
 
   useEffect(() => {
     if (!secret) return;
@@ -121,6 +131,9 @@ export function LicenseControlPanel({
       reason,
       expectedUpdatedAt: license.updatedAt,
       ...(action === "bind" ? { serverId } : {}),
+      ...(action === "refresh_binding"
+        ? { expectedEndpointRevision: license.currentEndpointRevision }
+        : {}),
     };
     const parsed = moderation
       ? licenseModerationCommandSchema.safeParse(command)
@@ -140,8 +153,20 @@ export function LicenseControlPanel({
         privateApiRequest({ method: "POST", json: parsed.data }),
       );
       const body = await response.json().catch(() => null);
-      if (!response.ok || !confirmedLicenseControl(body, license.id, license.updatedAt, action)) {
+      if (
+        !response.ok ||
+        !confirmedLicenseControl(
+          body,
+          license.id,
+          license.updatedAt,
+          action,
+          license.currentEndpointRevision,
+          license.expiresAt,
+        )
+      ) {
         setError(licenseControlError(locale, body?.code));
+        if (response.status === 409 || response.status < 400 || response.status >= 500)
+          setUncertainRevision(license.updatedAt);
         if (response.status === 409) router.refresh();
         return;
       }
@@ -149,9 +174,14 @@ export function LicenseControlPanel({
       setReason("");
       setConfirmed(false);
       if (body.token) setSecret(body.token);
-      router.refresh();
+      try {
+        router.refresh();
+      } catch {
+        /* Keep the confirmed receipt and one-time token visible. */
+      }
     } catch {
       setError(copy.errors.fallback);
+      setUncertainRevision(license.updatedAt);
     } finally {
       lock.current = false;
       setBusy(false);
@@ -243,6 +273,11 @@ export function LicenseControlPanel({
               </div>
             )}
             {action === "revoke" && <p className="text-sm text-secondary">{copy.revokeNote}</p>}
+            {action === "refresh_binding" && (
+              <p className="text-sm text-secondary">
+                {copy.recoveryNote} · {copy.endpointRevision}: {license.currentEndpointRevision}
+              </p>
+            )}
             <label htmlFor={`${fieldId}-reason`} className="block text-sm text-secondary">
               {copy.reason}
               <textarea
@@ -283,7 +318,7 @@ export function LicenseControlPanel({
       <button
         type="button"
         disabled={busy}
-        onClick={() => router.refresh()}
+        onClick={() => window.location.reload()}
         className="text-sm text-accent underline"
       >
         {copy.refresh}
@@ -327,6 +362,7 @@ export function LicenseControlPanel({
             </button>
           </div>
           <p className="break-words text-xs text-muted">{copy.checkEndpoint}</p>
+          <LicenseRuntimeProbe licenseId={license.id} token={secret.value} locale={locale} />
         </div>
       )}
     </section>

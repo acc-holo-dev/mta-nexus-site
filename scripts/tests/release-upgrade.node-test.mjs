@@ -10,6 +10,23 @@ import {
   releaseUpgradePlan,
 } from "../../packages/db/scripts/release-upgrade-contract.mjs";
 
+test("license recovery upgrade preserves historical uncertainty, original term and durable server identity", () => {
+  const migration = readFileSync("packages/db/migrations/0053_license_binding_recovery.sql", "utf8");
+  assert.match(migration, /ADD COLUMN server_owner_id text/u);
+  assert.doesNotMatch(migration, /UPDATE license_runtime_bindings SET server_owner_id|UPDATE licenses SET|UPDATE (orders|payments|ledger_entries|entitlements)/u);
+  assert.match(migration, /A saved binding cannot be removed while its license exists/u);
+  assert.match(migration, /Bound license identity and original term are immutable/u);
+  assert.match(migration, /NEW\.endpoint_revision < OLD\.endpoint_revision/u);
+  assert.match(migration, /OLD\.server_owner_id IS NOT NULL/u);
+  assert.match(migration, /OLD\.status = 'revoked'/u);
+  assert.match(migration, /OLD\.status = 'expired' AND NEW\.status NOT IN \('expired','revoked'\)/u);
+  assert.match(migration, /AFTER UPDATE OF status, expires_at ON licenses/u);
+  assert.match(migration, /token_digest = NULL, token_issued_at = NULL/u);
+  assert.match(migration, /NEW\.token_expires_at > parent\.expires_at/u);
+  const rehearsal = readFileSync("packages/db/scripts/check-release-upgrade.mjs", "utf8");
+  assert.match(rehearsal, /licenseBindingRecoverySchemaPresent = true/u);
+});
+
 test("purchase case upgrade adds immutable order context without changing historical financial states", () => {
   const migration = readFileSync("packages/db/migrations/0052_commerce_order_cases.sql", "utf8");
   assert.match(migration, /order_id text NOT NULL UNIQUE REFERENCES orders/u);
@@ -109,7 +126,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0052_commerce_order_cases");
+  assert.equal(plan.targetTag, "0053_license_binding_recovery");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

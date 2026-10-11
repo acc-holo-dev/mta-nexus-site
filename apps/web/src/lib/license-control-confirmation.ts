@@ -9,7 +9,21 @@ export function confirmedLicenseControl(
   id: string,
   revision: string,
   action: string,
+  expectedEndpointRevision?: number | null,
+  licenseExpiresAt?: string | null,
 ): body is LicenseControlConfirmation {
+  if (
+    ![
+      "bind",
+      "refresh_binding",
+      "rotate_token",
+      "revoke_token",
+      "revoke",
+      "suspend",
+      "restore",
+    ].includes(action)
+  )
+    return false;
   if (!body || typeof body !== "object") return false;
   const result = body as Partial<LicenseControlConfirmation>;
   const license = result.license;
@@ -34,7 +48,19 @@ export function confirmedLicenseControl(
   if (expected && license.status !== expected) return false;
   if (!expected && !["active", "expired", "revoked", "suspended"].includes(license.status))
     return false;
-  if (action === "bind" && !license.serverBound) return false;
+  if (
+    (action === "bind" || action === "refresh_binding") &&
+    (license.status !== "active" || !license.serverBound)
+  )
+    return false;
+  if (action === "refresh_binding")
+    return (
+      !result.token &&
+      result.binding?.tokenRevoked === true &&
+      Number.isSafeInteger(expectedEndpointRevision) &&
+      expectedEndpointRevision !== null &&
+      result.binding.endpointRevision === expectedEndpointRevision
+    );
   if (action === "rotate_token")
     return (
       license.status === "active" &&
@@ -46,7 +72,8 @@ export function confirmedLicenseControl(
       Number.isFinite(Date.parse(result.token.expiresAt)) &&
       Date.parse(result.token.expiresAt) > Date.now() &&
       Date.parse(result.token.expiresAt) <=
-        Date.parse(license.updatedAt) + LICENSE_RUNTIME_TOKEN_DAYS * 86_400_000
+        Date.parse(license.updatedAt) + LICENSE_RUNTIME_TOKEN_DAYS * 86_400_000 &&
+      (!licenseExpiresAt || Date.parse(result.token.expiresAt) <= Date.parse(licenseExpiresAt))
     );
   return !result.token;
 }

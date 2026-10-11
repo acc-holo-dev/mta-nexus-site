@@ -10,7 +10,7 @@ const copy = {
     policy:
       "Manage an existing license without changing its original term. New paid licenses and renewals require confirmed payment integration.",
     bindingPolicy:
-      "One license binds to one server with an approved control proof. The server and endpoint revision stay fixed; address or ownership changes stop token checks.",
+      "One license stays on one server. After an address change, confirm control again and refresh this binding; the old token is cleared. Changed ownership or organization cannot be moved into the saved binding.",
     tokenPolicy:
       "This bearer token checks the saved license binding over HTTPS. It does not prove the calling machine's identity or protect source code. Keep it on the server and send it only to this site's check API.",
     tokenTerm:
@@ -26,6 +26,7 @@ const copy = {
     changed: "Binding is unavailable or its endpoint/scope changed",
     actions: {
       bind: "Bind server",
+      refresh_binding: "Reconfirm the same server",
       rotate_token: "Create / replace token",
       revoke_token: "Revoke token",
       revoke: "Revoke license",
@@ -53,6 +54,25 @@ const copy = {
     refresh: "Refresh",
     history: "Recent license actions",
     noHistory: "No recorded actions.",
+    fullHistory: "Complete license history",
+    recoveryNote:
+      "Reconfirm the displayed endpoint revision of the same verified server. This records missing historical ownership or a changed address, revokes the old token and preserves the license expiry.",
+    staff: "Staff",
+    owner: "License owner",
+    system: "System",
+    endpointRevision: "Endpoint revision",
+    releaseCheck: "Check a specific release",
+    release: "Resource version",
+    probe: "Check this release",
+    releaseLoading: "Loading eligible releases…",
+    releaseEmpty: "No eligible releases. Refresh the binding and check resource availability.",
+    releaseNote:
+      "This HTTPS check matches your license, server and the recorded release hash. It does not inspect installed files, prove the calling machine or protect source code. The result lasts at most 60 seconds; expiry, revocation and failed checks must stop runtime authorization.",
+    releaseSaved: "The server confirmed this exact release. Runtime authorization expires at",
+    releaseFailed:
+      "The release check could not be confirmed. Treat it as denied; reload current context before retrying.",
+    requestBody: "Request JSON (contains no token)",
+    leaseExpired: "The short runtime authorization has expired. Check again.",
     all: "All statuses",
     search: "Search license or resource",
     searchButton: "Search",
@@ -68,6 +88,8 @@ const copy = {
       LICENSE_SINGLE_SERVER_REQUIRED: "Only single-server licenses support this binding.",
       LICENSE_ALREADY_BOUND: "The license already has a fixed server binding.",
       LICENSE_NOT_BOUND: "Bind a verified server first.",
+      LICENSE_BINDING_CURRENT:
+        "This binding already has the current endpoint and ownership snapshot.",
       LICENSE_SERVER_UNAVAILABLE:
         "Server proof, permissions or resource availability no longer meet the requirements.",
       LICENSE_SERVER_CHANGED:
@@ -91,7 +113,7 @@ const copy = {
     policy:
       "Управление существующей лицензией не меняет её исходный срок. Новые платные лицензии и продление требуют интеграции подтверждённой оплаты.",
     bindingPolicy:
-      "Одна лицензия привязывается к одному серверу с одобренным доказательством контроля. Сервер и ревизия адреса фиксируются; смена адреса или владельца останавливает проверку токена.",
+      "Одна лицензия остаётся на одном сервере. После смены адреса подтвердите контроль заново и обновите привязку; старый токен будет отозван. Смена владельца или организации не переносится в сохранённую привязку.",
     tokenPolicy:
       "Bearer-токен проверяет сохранённую привязку лицензии по HTTPS. Он не доказывает идентичность вызывающей машины и не защищает исходный код. Храните его на сервере и передавайте только API проверки этого сайта.",
     tokenTerm:
@@ -107,6 +129,7 @@ const copy = {
     changed: "Привязка недоступна либо изменился адрес или организация",
     actions: {
       bind: "Привязать сервер",
+      refresh_binding: "Повторно подтвердить тот же сервер",
       rotate_token: "Создать / заменить токен",
       revoke_token: "Отозвать токен",
       revoke: "Отозвать лицензию",
@@ -134,6 +157,25 @@ const copy = {
     refresh: "Обновить",
     history: "Последние действия с лицензией",
     noHistory: "Действий пока нет.",
+    fullHistory: "Полная история лицензии",
+    recoveryNote:
+      "Подтвердите показанную ревизию адреса того же проверенного сервера. Это сохраняет недостающие исторические данные владельца или новый адрес, отзывает старый токен и не меняет срок лицензии.",
+    staff: "Сотрудник",
+    owner: "Владелец лицензии",
+    system: "Система",
+    endpointRevision: "Ревизия адреса",
+    releaseCheck: "Проверить конкретную версию",
+    release: "Версия ресурса",
+    probe: "Проверить версию",
+    releaseLoading: "Загрузка подходящих версий…",
+    releaseEmpty: "Подходящих версий нет. Обновите привязку и проверьте доступность ресурса.",
+    releaseNote:
+      "HTTPS-проверка сопоставляет лицензию, сервер и учётный хеш версии. Она не проверяет установленные файлы, вызывающую машину и не защищает исходный код. Результат действует максимум 60 секунд; истечение, отзыв и ошибки проверки должны останавливать разрешение запуска.",
+    releaseSaved: "Сервер подтвердил эту версию. Разрешение запуска истекает",
+    releaseFailed:
+      "Не удалось подтвердить проверку версии. Считайте её отклонённой; загрузите актуальные данные перед повтором.",
+    requestBody: "JSON запроса (без токена)",
+    leaseExpired: "Короткое разрешение запуска истекло. Выполните проверку снова.",
     all: "Все состояния",
     search: "Поиск лицензии или ресурса",
     searchButton: "Найти",
@@ -149,6 +191,8 @@ const copy = {
       LICENSE_SINGLE_SERVER_REQUIRED: "Привязка доступна только для лицензии на один сервер.",
       LICENSE_ALREADY_BOUND: "У лицензии уже есть фиксированная привязка к серверу.",
       LICENSE_NOT_BOUND: "Сначала привяжите подтверждённый сервер.",
+      LICENSE_BINDING_CURRENT:
+        "В привязке уже сохранены текущая ревизия адреса и данные владельца.",
       LICENSE_SERVER_UNAVAILABLE:
         "Доказательство контроля, права или доступность ресурса больше не соответствуют требованиям.",
       LICENSE_SERVER_CHANGED:
@@ -166,6 +210,7 @@ export const getLicenseControlCopy = (locale: "ru" | "en") => copy[locale];
 export function licenseActionLabel(locale: "ru" | "en", action: string) {
   const actions: Readonly<Record<string, keyof typeof copy.en.actions>> = {
     "license.bound": "bind",
+    "license.binding_refreshed": "refresh_binding",
     "license.token_rotated": "rotate_token",
     "license.token_revoked": "revoke_token",
     "license.revoked": "revoke",
