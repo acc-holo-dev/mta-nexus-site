@@ -12,6 +12,7 @@ import {
   type ResourceCartAcquisition,
   type CommercialPlanTerms,
   type CommercialPlanStatus,
+  type OrderCaseKind, type OrderCaseReviewStatus, type OrderCaseEvidence,
 } from "@nexus/domain";
 import { sql } from "drizzle-orm";
 import {
@@ -1152,3 +1153,26 @@ export const userProfilePreferences = pgTable("user_profile_preferences", {
   showActivity: boolean("show_activity").notNull().default(true),
   showProfessionalContacts: boolean("show_professional_contacts").notNull().default(true),
 });
+
+// Immutable purchase context; correspondence uses the existing support system.
+export const commerceOrderCases = pgTable("commerce_order_cases", {
+  caseId: text("case_id").primaryKey().references(() => supportCases.id, { onDelete: "restrict" }),
+  orderId: text("order_id").notNull().unique("commerce_order_cases_order_id_key").references(() => orders.id, { onDelete: "restrict" }),
+  kind: text("kind").$type<OrderCaseKind>().notNull(),
+  reviewStatus: text("review_status").$type<OrderCaseReviewStatus>().notNull().default("intake"),
+  revision: integer("revision").notNull().default(1),
+  requestedAmount: integer("requested_amount"), currency: text("currency").notNull(),
+  snapshot: jsonb("snapshot").$type<OrderCaseEvidence>().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  index("commerce_order_cases_review_time_id_idx").on(table.reviewStatus, table.createdAt, table.caseId),
+  check("commerce_order_cases_kind_check", sql`${table.kind} IN ('payment_issue','resource_issue','refund_request','dispute')`),
+  check("commerce_order_cases_review_status_check", sql`${table.reviewStatus} IN ('intake','reviewing','awaiting_buyer','refund_recommended','refund_declined','resolved','dismissed')`),
+  check("commerce_order_cases_revision_check", sql`${table.revision} > 0`),
+  check("commerce_order_cases_requested_amount_check", sql`${table.requestedAmount} > 0`),
+  check("commerce_order_cases_amount_kind_check", sql`(${table.kind} = 'refund_request' AND ${table.requestedAmount} IS NOT NULL)
+    OR ${table.kind} = 'dispute' OR (${table.kind} IN ('payment_issue','resource_issue') AND ${table.requestedAmount} IS NULL)`),
+  check("commerce_order_cases_snapshot_check", sql`coalesce(jsonb_typeof(${table.snapshot}) = 'object'
+    AND ${table.snapshot}->>'confirmation' = 'recorded_only'
+    AND jsonb_typeof(${table.snapshot}->'payments') = 'array' AND jsonb_array_length(${table.snapshot}->'payments') <= 20, false)`),
+]);

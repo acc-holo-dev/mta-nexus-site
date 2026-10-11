@@ -29,18 +29,22 @@ export async function resourceCommerceRequest(
         request.nextUrl.pathname.startsWith("/api/admin/commerce/") ||
         request.nextUrl.pathname.startsWith("/api/admin/licenses/")
           ? "moderationAction"
-          : /\/(reviews|review)(?:\/|$)/u.test(request.nextUrl.pathname)
-            ? "reviewSubmission"
-          : request.nextUrl.pathname.includes("/licenses/")
-            ? "licenseControl"
-            : /\/(lifecycle|variants|compatibility|builds)(?:\/|$)/u.test(request.nextUrl.pathname)
-              ? "contentCreation"
-              : "resourceClaim";
+          : /\/orders\/[^/]+\/support$/u.test(request.nextUrl.pathname)
+            ? "contentCreation"
+            : /\/(reviews|review)(?:\/|$)/u.test(request.nextUrl.pathname)
+              ? "reviewSubmission"
+              : request.nextUrl.pathname.includes("/licenses/")
+                ? "licenseControl"
+                : /\/(lifecycle|variants|compatibility|builds)(?:\/|$)/u.test(
+                      request.nextUrl.pathname,
+                    )
+                  ? "contentCreation"
+                  : "resourceClaim";
       if (!(await consumeRateLimit(policy, actor.id)).success) throw new RateLimitExceededError();
     }
     if (
       !mutation &&
-      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/operations$|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:moderation|builds\/[^/]+)$/u.test(
+      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/(?:operations|support)$|^\/api\/order-cases(?:\/|$)|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:moderation|builds\/[^/]+)$/u.test(
         request.nextUrl.pathname,
       )
     ) {

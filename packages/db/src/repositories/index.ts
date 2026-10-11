@@ -57,3 +57,4 @@ export * from "./web-push-subscriptions";
 export * from "./web-push-worker";
 export { resourceReviewsRepository } from "./resource-reviews";
 export { resourceBuildWorkspaceRepository } from "./resource-build-workspace";
+export { orderCasesRepository } from "./order-cases";

@@ -10,6 +10,18 @@ import {
   releaseUpgradePlan,
 } from "../../packages/db/scripts/release-upgrade-contract.mjs";
 
+test("purchase case upgrade adds immutable order context without changing historical financial states", () => {
+  const migration = readFileSync("packages/db/migrations/0052_commerce_order_cases.sql", "utf8");
+  assert.match(migration, /order_id text NOT NULL UNIQUE REFERENCES orders/u);
+  assert.match(migration, /Purchase case context is immutable/u);
+  assert.match(migration, /NEW\.revision := OLD\.revision \+ 1/u);
+  assert.match(migration, /ticket\.requester_id <> parent\.buyer_id/u);
+  assert.match(migration, /recorded_only/u);
+  assert.doesNotMatch(migration, /UPDATE (orders|payments|ledger_entries|licenses|entitlements)|DELETE FROM/u);
+  const rehearsal = readFileSync("packages/db/scripts/check-release-upgrade.mjs", "utf8");
+  assert.match(rehearsal, /commerceOrderCaseSchemaPresent = true/u);
+});
+
 const script = "packages/db/scripts/check-release-upgrade.mjs";
 const ci = {
   GITHUB_ACTIONS: "true",
@@ -97,7 +109,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0051_resource_build_workspace");
+  assert.equal(plan.targetTag, "0052_commerce_order_cases");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

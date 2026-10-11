@@ -58,6 +58,7 @@ const evidence = {
   webPushSubscriptionSchemaPresent: false,
   webPushOutboxSchemaPresent: false,
   resourceReviewSchemaPresent: false,
+  commerceOrderCaseSchemaPresent: false,
   cleanupComplete: false,
 };
 
@@ -347,6 +348,17 @@ try {
     WHERE table_schema = 'public' AND table_name = 'user_profile_preferences'`;
   assert.equal(privacyColumns.length, 3);
   evidence.resourceBuildWorkspaceSchemaPresent = true;
+  const orderCaseColumns = await client`SELECT column_name FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'commerce_order_cases'`;
+  assert.equal(orderCaseColumns.length, 9);
+  const orderCaseIndex = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public'
+    AND indexname = 'commerce_order_cases_review_time_id_idx'`;
+  assert.equal(orderCaseIndex.length, 1);
+  const orderCaseTriggers = await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal
+    AND tgname IN ('commerce_order_cases_context_guard', 'support_cases_commerce_association_guard')`;
+  assert.equal(orderCaseTriggers.length, 2);
+  assert.equal((await client`SELECT count(*)::integer AS total FROM commerce_order_cases`)[0].total, 0);
+  evidence.commerceOrderCaseSchemaPresent = true;
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { HistorySignIn } from "../../../../components/commerce-history-ui";
 import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
 import { getCommercialCopy } from "../../../../lib/commercial-i18n";
+import { orderCaseCopy } from "../../../../lib/order-case-i18n";
 import { authService } from "../../../../lib/services/auth-service";
 import { commerceService } from "../../../../lib/services/commerce-service";
 import { getRequestLocale } from "../../../../lib/i18n-server";
@@ -77,6 +78,7 @@ export default async function OrderDetailsPage({
       <Link href={`/workspace/purchases/${encodeURIComponent(id)}/operations`} className="inline-block text-sm text-accent underline">
         {getCommercialCopy(locale).paymentOperations}
       </Link>
+      <Link href={`/workspace/purchases/${encodeURIComponent(id)}/support`} className="inline-block text-sm text-accent underline">{orderCaseCopy(locale).title}</Link>
       <p
         role="note"
         className="rounded-lg border border-base bg-surface p-4 text-sm text-secondary"

@@ -1,4 +1,5 @@
 import { resourceReviewCopy } from "../../lib/resource-review-i18n";
+import { orderCaseCopy } from "../../lib/order-case-i18n";
 import { ReportEvidenceLinks } from "../../components/report-evidence-links";
 import { getFinancialCopy } from "../../lib/financial-i18n";
 import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";
@@ -617,6 +618,7 @@ export default async function AdminPage({
 
       <section>
         <SectionHeader title={copy.reports} description={copy.caseHistory} />
+        <Link href="/admin/commerce/order-cases" className="mb-3 mr-4 inline-block text-sm text-accent underline">{orderCaseCopy(locale).queue}</Link>
         <Link href="/admin/commerce/reviews" className="mb-3 mr-4 inline-block text-sm text-accent underline">{resourceReviewCopy(locale).queue}</Link>
         <Link href="/admin/reports" className="mb-3 inline-block text-sm text-accent underline">{communityReportCopy(locale).queue}</Link>
         <nav aria-label={copy.reports} className="mb-3 flex gap-2">

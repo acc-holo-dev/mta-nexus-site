@@ -22,6 +22,15 @@ download complete interval CSV or the displayed observation page. Empty interval
 remain unknown; observations do not measure uptime. These RU/EN views reuse the
 existing collector and observation model and require no new migration.
 
+Buyers open order-linked support at `/workspace/purchases/[id]/support` and
+track it at `/workspace/order-cases`; staff review the corresponding private
+queue at `/admin/commerce/order-cases`. RU/EN intake supports payment/resource
+issues, refund requests and disputes. Immutable recorded-order snapshots,
+idempotent intake, revision/evidence checks, review history and the existing
+support conversation require migration `0052`. Refund recommendations do not
+execute refunds or change orders, balances, licenses or access. Paid provider
+settlement and financial refund execution remain unfinished.
+
 Developers edit specialties, portfolio and Discord in `/settings/developer`.
 Public profiles show these contacts and the separate verified-experience flag.
 Changing specialties or portfolio removes that flag. `/workspace/verification`

@@ -1,5 +1,21 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Order-linked commercial support and refund/dispute intake — 2026-10-11
+
+Migration `0052` adds one persistent commercial case per order, immutable intake
+context and shared-support association guards. Buyer and staff RU/EN pages/APIs
+include bounded filters/history, safe recorded-payment snapshots, exact intake
+replay and revision/evidence-checked review. Current staff authority and independent
+review are enforced in the transaction; refund recommendations/declines require
+an administrator. Messages, audit, shared status and requester inbox notification
+are atomic. Recommendations keep the conversation open and execute no finances.
+
+Local TypeScript, 149 focused checks, 17 migration-contract checks, Biome and
+Next.js compile mode pass. Five PostgreSQL fixtures are prepared but unrun;
+live migration/concurrency/rollback, browser interaction and complete production
+generation remain unverified. Paid-provider settlement, financial refunds,
+fee/hold allocations, payout eligibility and subscription activation remain open.
+
 ### Resource review lifecycle and commercial report queue — 2026-10-11
 
 Reviews now publish/edit/withdraw with locked live publisher and acquired-access

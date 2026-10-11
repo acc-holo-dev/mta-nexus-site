@@ -68,7 +68,7 @@ async function lockProduct(
   return product;
 }
 /** Product -> live management grant -> build; shares the upload/moderation lock order. */
-export class ResourceBuildWorkspaceRepository {
+class ResourceBuildWorkspaceRepository {
   async detail(productId: string, buildId: string, actorId: string, staff = false) {
     return db.transaction(async (tx) => {
       const product = await lockProduct(tx, productId, actorId, staff);
