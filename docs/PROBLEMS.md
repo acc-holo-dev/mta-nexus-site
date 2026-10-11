@@ -1,5 +1,36 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Transitive resource preparation and private compatibility reports — 2026-10-11
+
+Buyer `/workspace/library/[id]/requirements`, publisher and moderator requirement
+screens now inspect a bounded graph of current catalog dependency declarations.
+The repository uses one repeatable-read transaction, existing live management /
+moderation authority and effective library grants. Public dependencies require a
+published free product with a trusted safe build; private/unavailable nodes expose
+only previously declared slugs, never their title, ID or further declarations.
+Up to 48 resources and eight levels are inspected; incomplete graphs and cycles
+block a complete ordering. Buyer selections retain fixed-version semantics and
+never silently fall back to latest. Exact private preview builds cannot cross products.
+
+RU/EN reports compare declared minimum MTA versions, retain unknown build precision,
+show exact selected hashes, package-review uncertainty, missing access and size.
+Missing dependencies can be added through the existing reviewed cart; acquired safe
+builds use the existing download component and its independent entitlement/artifact
+checks. Advisory catalog order is not an executable MTA startup script. Read-only
+private rate-limited JSON exports preserve the report snapshot and contain no
+storage keys, source paths, ACL declarations or license/runtime secrets. No rights,
+installation facts, payments, subscriptions or license terms are issued or changed.
+
+Local domain/API/SSR/regression, TypeScript, lint and webpack compile checks cover
+the new surfaces. Disposable PostgreSQL fixtures cover actual graph projections,
+private-node masking, authority, pinned release withdrawal and exact private builds;
+those fixtures require a migrated database and are not run in this environment.
+Live PostgreSQL snapshots/locking, browser cart/download interactions and Node 26
+remain unverified. Declared requirements cannot prove MTA execution or dependency
+compatibility across resource versions; runtime installation verification and version
+ranges remain separate future work.
+
+
 ### Storage inventory and guarded orphan cleanup — 2026-10-11
 
 Migration `0061_storage_maintenance` adds a private observation journal and

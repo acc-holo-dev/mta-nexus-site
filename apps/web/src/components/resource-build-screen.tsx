@@ -1,3 +1,4 @@
+import { resourceRequirementsCopy } from "../lib/resource-requirements-i18n";
 import { resourceMediaCopy } from "../lib/resource-media-i18n";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -63,6 +64,7 @@ export async function ResourceBuildScreen({
           {copy.title} · {copy.statuses[build.status]} · {copy.revision}: {build.revision}
         </p>
       </header>
+      <Link href={`${staff ? "/admin/resources" : "/workspace/resources"}/${encodeURIComponent(productId)}/requirements?buildId=${encodeURIComponent(buildId)}`} className="text-accent underline">{resourceRequirementsCopy(locale).title}</Link>
       {product.metadataReviewRequired && (
         <p className="text-sm text-warning">{publisherCopy.reviewRequired}</p>
       )}

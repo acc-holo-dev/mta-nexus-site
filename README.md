@@ -503,3 +503,17 @@ artifacts with changed content require manual recovery by the operator, never
 an automatic second deletion. No bulk cleanup or background deletion runs.
 Other storage providers fail closed until they implement conditional maintenance.
 Financial holds, grants, license terms and payment states remain unchanged.
+
+
+Resource preparation: `/workspace/library/[id]/requirements` inspects transitive
+catalog dependencies, effective access and pinned/latest release selections.
+Publisher and moderator screens at `/workspace/resources/[id]/requirements` and
+`/admin/resources/[id]/requirements` support exact build previews from the build
+page. All views offer RU/EN diagnostics and private JSON export. The graph stops
+at 48 resources / eight levels and reports cycles, unavailable dependencies,
+missing access, package uncertainty and declared minimum MTA version comparisons.
+A bare MTA release cannot establish a minimum build number. Current catalog
+requirements are not historical version compatibility or proof of installation.
+Acquisition and file delivery continue through the reviewed cart and secure
+per-file download flows; exports grant no rights and contain no artifact storage
+keys, source paths, ACL names or license secrets.

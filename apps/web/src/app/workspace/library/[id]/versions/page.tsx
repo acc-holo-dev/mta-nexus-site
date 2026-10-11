@@ -1,3 +1,4 @@
+import {resourceRequirementsCopy} from "../../../../../lib/resource-requirements-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -75,6 +76,7 @@ export default async function LibraryVersionsPage({
       {current ? (
         <ResourceDownloadButton productId={id} version={current.version} buildId={current.id} />
       ) : null}
+      <Link href={`/workspace/library/${encodeURIComponent(id)}/requirements`} className="text-accent underline">{resourceRequirementsCopy(locale).title}</Link>
       <LibraryReleaseSelectionControls
         key={`${id}:${result.selection.revision}`}
         productId={id}
