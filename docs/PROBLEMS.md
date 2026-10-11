@@ -2059,3 +2059,63 @@ CREATE INDEX verification_public_approval_target_time_key_idx
   ON verification_requests (target_type, target_id, resolved_at DESC, (md5(id)) DESC)
   WHERE status = 'approved' AND resolved_at IS NOT NULL;
 ```
+
+### Public context verification and private organization team directory — 2026-10-11
+
+`/organizations/[slug]/trust`, `/servers/[slug]/trust` and GET
+`/api/trust/[kind]/[slug]` expose current recorded verification, public publication
+counts and retained dated approvals. Organization counts exclude hidden and
+inactive servers; server pages require active public state before approval reads.
+Server affiliation and management context expose no personal owner identity or
+network endpoint. Explicitly qualified correlated counts retain the outer subject
+reference even when Drizzle unqualifies a single-table selection.
+
+One shared read-only repeatable-snapshot approval query now serves users,
+organizations and servers. Twenty-item cursors retain database microseconds and
+opaque tie keys, bound to the resolved subject and context. Existing user cursor
+namespaces remain compatible. Evidence, request IDs, applicants, reviewers,
+notes, pending/rejected applications and commercial records are excluded. Current
+flags remain separate from history: old approvals do not establish current
+ownership or verification; this retained-record view is not a lifecycle ledger.
+
+`/workspace/organizations/[id]/team` and GET
+`/api/workspace/organizations/[id]/team` provide a private team directory with
+public-identity search, role and effective server-access filters, twenty-member
+keyset pages and account/organization/filter-bound microsecond cursors. The
+authoritative current owner is shown separately and excluded from member pages.
+Administrators have effective access without explicit delegation; members and
+developers require `manage_servers`. Stale legacy owner entries confer no owner
+rights and are labeled accordingly. Platform administrators receive no team
+access bypass. Other permission flags and private account fields are not emitted.
+
+Role, delegation and removal use existing revision-checked member APIs, locks,
+audit and transactional access notices. A shared exact-member acknowledgement
+precedes success; the directory then rereads saved filtered data. Failed writes,
+uncertain acknowledgements or failed refreshes block further writes until saved
+state is reloaded. Existing workspace editor, ownership transfer and invitation
+flows remain available through links. RU/EN forms, loading/error/empty/success
+states, metadata, private noindex and public navigation links are included.
+
+After integrating Agent A's reviewed-cart/receipt commit, 300 focused
+unit/query/HTTP/render checks across twenty-three files and touched-file Biome
+pass, including fifty-five commercial regression checks. Next webpack compile
+mode also passes. Six PostgreSQL fixtures prepare public-count isolation, server
+visibility/ownership changes, scoped microsecond approval/member traversal,
+effective delegation updates preserving unrelated permissions, live authority
+and mandatory-audit rollback. They remain unrun without PostgreSQL. TypeScript
+and Knip still report the pre-existing commercial fixture/export issues recorded
+above; the new source and prepared fixtures introduce no remaining type errors.
+Browser interaction, full production generation and large-team/catalog query
+plans require subsequent validation.
+No schema, migration, dependency or workflow was changed.
+
+Agent A owns these additional nonunique index contracts. The earlier public
+approval index already supports the new context pages; no duplicate is needed:
+
+```sql
+CREATE INDEX organization_members_team_time_id_idx
+  ON organization_members (organization_id, created_at DESC, id DESC);
+CREATE INDEX servers_public_organization_idx
+  ON servers (organization_id)
+  WHERE status = 'active' AND visibility = 'public';
+```

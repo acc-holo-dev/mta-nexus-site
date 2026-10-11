@@ -19,6 +19,7 @@ import { ServerUpdatesPanel } from "../../../components/server-updates-panel";
 import { ServerClaimControlPanel } from "../../../components/server-claim-control-panel";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
 import { serverStatisticsCopy } from "../../../lib/server-statistics-copy";
 import { cache } from "react";
 
@@ -170,6 +171,14 @@ export default async function ServerDetailPage({
             >
               {serverStatisticsCopy(locale).open}
             </Link>
+            {server.visibility === "public" && server.status === "active" && (
+              <Link
+                href={`/servers/${encodeURIComponent(server.slug)}/trust`}
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-base px-4 py-3 text-sm font-semibold text-accent"
+              >
+                {contextTrustCopy(locale).title}
+              </Link>
+            )}
             <ServerFollowButton serverId={server.id} serverName={server.name} />
             <a
               href={connectUri}

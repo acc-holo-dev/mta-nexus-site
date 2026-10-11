@@ -1,5 +1,6 @@
 import { FollowButton } from "../../../components/follow-button";
 import Link from "next/link";
+import { contextTrustCopy } from "../../../lib/public-context-trust-copy";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
@@ -128,6 +129,12 @@ export default async function OrganizationProfilePage({
 
             <FollowButton targetType="organization" targetId={organization.id} targetName={organization.name} />
             <Link href={`/organizations/${encodeURIComponent(organization.slug)}/activity`} className="inline-flex min-h-11 items-center text-sm text-accent underline">{publicationCopy(locale).activity}</Link>
+            <Link
+              href={`/organizations/${encodeURIComponent(organization.slug)}/trust`}
+              className="inline-flex min-h-11 items-center text-xs text-accent underline"
+            >
+              {contextTrustCopy(locale).title}
+            </Link>
             {websiteUrl && (
               <a
                 href={websiteUrl}

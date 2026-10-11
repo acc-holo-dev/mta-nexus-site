@@ -70,3 +70,5 @@ export { contentReactionsRepository } from "./content-reactions";
 export { publicUserTrustRepository } from "./public-user-trust";
 export { discussionWorkspaceRepository } from "./discussion-workspace";
 export { publicVerificationHistoryRepository } from "./public-verification-history";
+export { publicContextTrustRepository, type PublicContextKind } from "./public-context-trust";
+export { organizationTeamDirectoryRepository } from "./organization-team-directory";

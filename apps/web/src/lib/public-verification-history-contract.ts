@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { discussionCursorSchema } from "./content-discussion-contract";
-const cursorSchema = discussionCursorSchema
+export const publicApprovalCursorSchema = discussionCursorSchema
   .extend({
     id: z.string().regex(/^[a-f0-9]{32}$/u),
     context: z.string().regex(/^[a-f0-9]{64}$/u),
@@ -16,12 +16,12 @@ export function parseApprovalQuery(params: URLSearchParams) {
     return null;
   const type = params.get("type") || undefined;
   if (type && !["user", "developer"].includes(type)) return null;
-  let cursor: z.infer<typeof cursorSchema> | undefined;
+  let cursor: z.infer<typeof publicApprovalCursorSchema> | undefined;
   if (params.has("cursor")) {
     const raw = params.get("cursor") ?? "";
     if (raw.length > 512) return null;
     try {
-      const parsed = cursorSchema.safeParse(JSON.parse(raw));
+      const parsed = publicApprovalCursorSchema.safeParse(JSON.parse(raw));
       if (!parsed.success) return null;
       cursor = parsed.data;
     } catch {

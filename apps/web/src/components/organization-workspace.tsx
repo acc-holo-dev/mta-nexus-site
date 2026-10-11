@@ -1,4 +1,7 @@
 "use client";
+import { OrganizationMemberEditor } from "./organization-member-editor";
+import { confirmsOrganizationMemberMutation } from "../lib/organization-member-confirmation";
+import { organizationTeamCopy } from "../lib/organization-team-copy";
 import { organizationContentCopy } from "../lib/organization-content-copy";
 import type { OrganizationTeamRole } from "@nexus/domain";
 import {
@@ -77,23 +80,15 @@ export function OrganizationWorkspacePanel({
         ...fields,
         expectedUpdatedAt: data.organization.updatedAt,
       });
-      const organization = editableOrganizationSchema.safeParse(result.organization);
-      if (
-        !organization.success ||
-        organization.data.id !== data.organization.id ||
-        organization.data.ownerId !== data.organization.ownerId ||
-        organization.data.slug !== data.organization.slug ||
-        organization.data.updatedAt === data.organization.updatedAt
-      )
-        throw new Error(copy.unavailable);
-      const confirmed =
-        method === "POST" && result.member && typeof result.member === "object"
-          ? (result.member as Record<string, unknown>)
-          : result;
-      if (Object.entries(expected).some(([key, value]) => confirmed[key] !== value))
-        throw new Error(copy.unavailable);
+      const committed = confirmsOrganizationMemberMutation(
+        result,
+        data.organization,
+        expected,
+        method === "POST",
+      );
+      if (!committed) throw new Error(copy.unavailable);
       // Retain the committed revision even if refreshing the team subsequently fails.
-      setData((current) => ({ ...current, organization: organization.data }));
+      setData((current) => ({ ...current, organization: committed }));
       setMessage(success);
       const filters = new URLSearchParams({ page: String(data.page), q: query });
       try {
@@ -171,6 +166,12 @@ export function OrganizationWorkspacePanel({
   }
   return (
     <div className="space-y-6">
+      <Link
+        href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/team`}
+        className="inline-flex min-h-11 items-center text-sm text-accent underline"
+      >
+        {organizationTeamCopy(locale).title}
+      </Link>
       {!manageable && <p className="nexus-panel p-4 text-sm text-muted">{copy.readOnly}</p>}
       <OrganizationProfileForm
         key={data.organization.updatedAt}
@@ -187,8 +188,10 @@ export function OrganizationWorkspacePanel({
         }}
       />
       {manageable && (
-        <Link className="inline-flex min-h-11 items-center text-sm text-accent underline"
-          href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/content`}>
+        <Link
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          href={`/workspace/organizations/${encodeURIComponent(data.organization.id)}/content`}
+        >
           {organizationContentCopy(locale).title}
         </Link>
       )}
@@ -315,7 +318,7 @@ export function OrganizationWorkspacePanel({
         {data.members.length ? (
           <div className="space-y-3">
             {data.members.map((member) => (
-              <MemberEditor
+              <OrganizationMemberEditor
                 key={`${member.id}:${member.role}:${member.managesServers}`}
                 member={member}
                 locale={locale}
@@ -426,99 +429,4 @@ function teamHref(id: string, page: number, query: string) {
   if (query) params.set("q", query);
   if (page > 1) params.set("page", String(page));
   return `/workspace/organizations/${encodeURIComponent(id)}${params.size ? `?${params}` : ""}`;
-}
-function MemberEditor({
-  member,
-  locale,
-  actorRole,
-  canEdit,
-  busy,
-  onSave,
-  onRemove,
-  onSelectOwner,
-}: {
-  member: OrganizationWorkspace["members"][number];
-  locale: Locale;
-  actorRole: string;
-  canEdit: boolean;
-  busy: boolean;
-  onSave: (role: OrganizationTeamRole, servers: boolean) => Promise<boolean>;
-  onRemove: () => void;
-  onSelectOwner?: () => void;
-}) {
-  const copy = getOrganizationCopy(locale);
-  const [role, setRole] = useState(member.role);
-  const [servers, setServers] = useState(member.managesServers);
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        void onSave(role as OrganizationTeamRole, servers);
-      }}
-      className="space-y-3 rounded-lg border border-base bg-inset p-4"
-    >
-      <div className="flex items-center gap-3">
-        <Avatar
-          src={member.avatarUrl ?? undefined}
-          alt={member.displayName}
-          fallback={member.username}
-        />
-        <Link
-          className="min-w-0 break-words text-sm text-accent"
-          href={`/users/${encodeURIComponent(member.username)}`}
-        >
-          {member.displayName} (@{member.username})
-        </Link>
-        <span className="ml-auto text-xs text-muted">
-          {member.role in copy
-            ? copy[member.role as "admin" | "member" | "developer" | "owner"]
-            : member.role}
-        </span>
-      </div>
-      {canEdit && (
-        <fieldset disabled={busy} className="flex flex-wrap items-end gap-3">
-          <label className="space-y-1 text-sm text-secondary">
-            <span>{copy.role}</span>
-            <select
-              className={platformFieldClass}
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-            >
-              {organizationTeamRoles
-                .filter((value) => actorRole === "owner" || value !== "admin")
-                .map((value) => (
-                  <option key={value} value={value}>
-                    {copy[value]}
-                  </option>
-                ))}
-            </select>
-          </label>
-          <label className="flex items-center gap-2 text-sm text-secondary">
-            <input
-              type="checkbox"
-              checked={servers}
-              onChange={(e) => setServers(e.target.checked)}
-            />
-            {copy.serverAccess}
-          </label>
-          <Button type="submit" size="sm">
-            {copy.updateMember}
-          </Button>
-          <button className="text-sm text-danger underline" type="button" onClick={onRemove}>
-            {copy.remove}
-          </button>
-        </fieldset>
-      )}
-      {onSelectOwner && (
-        <button
-          type="button"
-          disabled={busy}
-          onClick={onSelectOwner}
-          className="min-h-9 text-sm text-accent underline"
-        >
-          {organizationGovernanceCopy(locale).choose}
-        </button>
-      )}
-    </form>
-  );
 }
