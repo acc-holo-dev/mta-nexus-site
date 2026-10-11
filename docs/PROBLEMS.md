@@ -2244,3 +2244,39 @@ CREATE INDEX server_observations_master_server_time_id_idx
   ON server_observations (server_id, observed_at DESC, id DESC)
   WHERE source = 'mta_master';
 ```
+
+
+### Notification history and explicit reading-state selections (Agent B)
+
+`/notifications` now has an authenticated searchable history instead of a fixed
+100-row window. GET `/api/notifications/inbox` returns 25 bounded presentation
+items, a global unread count and older/newer cursors. Existing notification
+storage, preference serialization, delivery/outbox and legacy bell API contracts
+remain in use. Search matches stored titles/messages literally; category and
+read/unread filters share the existing recipient/time/id indexes. Cursors retain
+six fractional timestamp digits and bind account plus normalized filters. Newer
+navigation selects nearest rows before reversing display order. Removed anchors
+need no lookup. Every page is a live view, not a persistent snapshot across requests.
+
+PATCH on the same inbox API accepts 1–25 unique IDs, their observed boolean
+reading state and one explicit desired state. Rows are locked in stable ID order;
+partial ownership, missing rows or changed state reject the complete transaction.
+Only `is_read` changes, with no inbox deletion, new delivery or preference mutation.
+The client validates the exact acknowledgement and rereads the filtered page
+before reporting success. The existing whole-inbox mark-read action remains
+available through its legacy endpoint, with an explicit scope confirmation.
+Failed/uncertain writes or refreshes require a saved
+inbox reload before another mutation. The bell rechecks after local or cross-tab
+invalidation; channel payloads contain only a fixed signal, never user data.
+No table, migration or new index is required. Legacy oversized text/JSON is bounded
+in SQL and presentation DTOs exclude recipient IDs and raw structured payloads.
+
+Focused checks cover SQL isolation/bounds, exact navigation, literal search,
+atomic ownership/state guards, HTTP authentication/CSRF/body limits, localized
+presentation, uncertain replies, cancellation and cross-tab cleanup. Three real
+PostgreSQL fixtures were added for >100-row traversal, legacy limits and atomic
+reading changes; PostgreSQL is unavailable here, so they remain unexecuted.
+Browser interaction and production query plans still need verification. Root
+checks retain the upstream `isSigned` fixture error in
+`tests/resource-deliveries.integration.test.ts:53` and unused
+`ResourceReleaseWorkerRepository` export; Agent B does not alter these contracts.

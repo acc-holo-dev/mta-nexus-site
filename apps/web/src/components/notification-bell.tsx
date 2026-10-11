@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { AlertTriangle, Bell, CheckCheck, ExternalLink, X } from "lucide-react";
-import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
-import { formatNotification } from "../lib/notification-copy";
 import type { Notification } from "@nexus/domain";
-import { useNexusLocale } from "./locale-context";
+import { AlertTriangle, Bell, CheckCheck, ExternalLink, X } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { formatNotification } from "../lib/notification-copy";
+import {
+  announceNotificationInboxChange,
+  observeNotificationInboxChange,
+} from "../lib/notification-inbox-events";
 import { privateApiRequest } from "../lib/private-api-request";
 import { startVisiblePolling } from "../lib/visible-polling";
+import { useNexusLocale } from "./locale-context";
+import { clickedDialogBackdrop, useModalDialog } from "./use-modal-dialog";
 
 export function NotificationBell() {
   const { locale, dictionary } = useNexusLocale();
@@ -24,6 +28,8 @@ export function NotificationBell() {
   const mutationGeneration = useRef(0);
   const stopPolling = useRef<(() => void) | null>(null);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
+
+  useEffect(() => observeNotificationInboxChange(() => setAttempt((value) => value + 1)), []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies(attempt): Explicit refresh trigger; changing it must restart this request.
   useEffect(() => {
@@ -72,7 +78,10 @@ export function NotificationBell() {
     setError(null);
     setAnnouncement(null);
     try {
-      const response = await fetch("/api/notifications/mark-read", privateApiRequest({ method: "POST" }));
+      const response = await fetch(
+        "/api/notifications/mark-read",
+        privateApiRequest({ method: "POST" }),
+      );
       const data = await response.json().catch(() => null);
       if (!response.ok || data?.success !== true || data?.scope !== "all") {
         throw new Error(copy.markError);
@@ -80,7 +89,7 @@ export function NotificationBell() {
 
       // Read the server state again; a notification may arrive during this request.
       setAnnouncement(copy.markedAllRead);
-      setAttempt((value) => value + 1);
+      announceNotificationInboxChange();
     } catch {
       // Recheck the server after an ambiguous response or timeout.
       setAttempt((value) => value + 1);
@@ -200,7 +209,13 @@ export function NotificationBell() {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="truncate text-xs font-semibold text-primary">
-                      {formatNotification(notification, dictionary.buildReviewNotifications, locale).title}
+                      {
+                        formatNotification(
+                          notification,
+                          dictionary.buildReviewNotifications,
+                          locale,
+                        ).title
+                      }
                     </span>
                     <time
                       dateTime={new Date(notification.createdAt).toISOString()}
@@ -210,7 +225,10 @@ export function NotificationBell() {
                     </time>
                   </div>
                   <p className="line-clamp-2 whitespace-pre-wrap break-words font-caption text-muted">
-                    {formatNotification(notification, dictionary.buildReviewNotifications, locale).message}
+                    {
+                      formatNotification(notification, dictionary.buildReviewNotifications, locale)
+                        .message
+                    }
                   </p>
                   {notification.link && (
                     <Link
