@@ -52,6 +52,22 @@ beforeEach(() => {
   state.rows = [];
   state.queries = [];
 });
+it("does not republish unreviewed resource metadata when withdrawing another pending version", async () => {
+  state.rows = [
+    [[...parent.slice(0, 3), "pending_review", ...parent.slice(4), true]],
+    [["usr_a", "developer"]],
+    [build()],
+    [build("draft", 4)],
+    [["0.9.0"]],
+    [],
+    [],
+    [],
+  ];
+  expect(await repo.command(input)).toMatchObject({ status: "draft" });
+  const product = state.queries.find((q) => q.sql.startsWith('update "products"'));
+  expect(product?.params).toContain("draft");
+  expect(product?.params).not.toContain("published");
+});
 it("withdraws atomically and keeps another pending build in review", async () => {
   state.rows = [
     [parent],

@@ -258,6 +258,7 @@ export class BuildRepository {
           status: products.status,
           authorId: products.authorId,
           organizationId: products.organizationId,
+          metadataReviewRequired: products.metadataReviewRequired,
         })
         .from(products)
         .where(eq(products.id, data.productId))
@@ -281,7 +282,7 @@ export class BuildRepository {
         .from(builds)
         .where(safePublishedBuildCondition(data.productId))
         .limit(1);
-      if (!published[0]) {
+      if (!published[0] || parent.metadataReviewRequired) {
         await tx
           .update(products)
           .set({
@@ -318,6 +319,7 @@ export class BuildRepository {
           status: products.status,
           authorId: products.authorId,
           organizationId: products.organizationId,
+          metadataReviewRequired: products.metadataReviewRequired,
         })
         .from(products)
         .where(eq(products.id, target.productId))
@@ -378,6 +380,7 @@ export class BuildRepository {
           .set({
             currentVersion: latestPublished[0].version,
             status: "published",
+            metadataReviewRequired: false,
             updatedAt: new Date(),
           })
           .where(eq(products.id, reviewed.productId));
@@ -393,10 +396,14 @@ export class BuildRepository {
           )
           .orderBy(desc(builds.createdAt), desc(builds.id))
           .limit(1);
+        const pending = parent.metadataReviewRequired ? await tx.select({ version: builds.version }).from(builds)
+          .where(and(eq(builds.productId, reviewed.productId), eq(builds.status, "pending_review")))
+          .orderBy(desc(builds.createdAt), desc(builds.id)).limit(1) : [];
         await tx
           .update(products)
-          .set(fallback[0]
+          .set(fallback[0] && !parent.metadataReviewRequired
             ? { currentVersion: fallback[0].version, status: "published", updatedAt: new Date() }
+            : pending[0] ? { currentVersion: pending[0].version, status: "pending_review", updatedAt: new Date() }
             : { status: "draft", updatedAt: new Date() }
           )
           .where(eq(products.id, reviewed.productId));
@@ -433,7 +440,7 @@ export class BuildRepository {
       // The pending-state compare-and-set above makes a replay a no-op, including delivery.
       const notificationRows = await tx.execute(sql`
         insert into ${notifications} (id, recipient_id, title, message, link, type, category, is_read, data, created_at)
-        select 'ntf_build_review_' || ${reviewed.id} || '_' || ${users.id}, ${users.id},
+        select 'ntf_build_review_' || ${reviewed.id} || '_r' || ${reviewed.revision ?? expectedRevision + 1}::text || '_' || ${users.id}, ${users.id},
           ${title}, ${`${product.title} · ${reviewed.version}${notes ? `\n${notes}` : ""}`},
           ${`/workspace/resources/${product.id}`}, 'system', 'system', false, ${JSON.stringify(data)}::jsonb, now()
         from ${users}
@@ -505,6 +512,7 @@ export class BuildRepository {
           status: products.status,
           authorId: products.authorId,
           organizationId: products.organizationId,
+          metadataReviewRequired: products.metadataReviewRequired,
         })
         .from(products)
         .where(eq(products.id, target.productId))
@@ -546,7 +554,7 @@ export class BuildRepository {
         .update(products)
         .set(parent.status === "archived" || parent.status === "suspended"
           ? { updatedAt: new Date() }
-          : fallback[0]
+          : fallback[0] && !parent.metadataReviewRequired
           ? { currentVersion: fallback[0].version, status: "published", updatedAt: new Date() }
           : { status: "draft", updatedAt: new Date() }
         )
@@ -576,6 +584,7 @@ export class BuildRepository {
           status: products.status,
           authorId: products.authorId,
           organizationId: products.organizationId,
+          metadataReviewRequired: products.metadataReviewRequired,
         })
         .from(products)
         .where(eq(products.id, target.productId))
@@ -659,6 +668,7 @@ export class BuildRepository {
           status: products.status,
           authorId: products.authorId,
           organizationId: products.organizationId,
+          metadataReviewRequired: products.metadataReviewRequired,
         })
         .from(products)
         .where(eq(products.id, target.productId))
@@ -713,7 +723,7 @@ export class BuildRepository {
       await tx
         .update(products)
         .set(
-          product.status === "draft" || product.status === "published"
+          (product.status === "draft" || product.status === "published") && !parent.metadataReviewRequired
             ? {
                 currentVersion: latestPublished[0].version,
                 status: "published",

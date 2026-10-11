@@ -23,8 +23,12 @@ export class ResourceCompatibilityRepository {
       const actor = await assertProductMutationAuthority(tx, product, input.actorId);
       if (new Date(product.updatedAt).toISOString() !== input.expectedUpdatedAt)
         throw new AppError("Resource changed; reload", 409, "PRODUCT_METADATA_CONFLICT");
-      if (product.status === "suspended")
-        throw new AppError("Resource is suspended", 409, "PRODUCT_STATE_CHANGED");
+      if (product.status === "suspended" || product.status === "archived")
+        throw new AppError(
+          "Withdrawn resource metadata is read-only",
+          409,
+          "PRODUCT_STATE_CHANGED",
+        );
       if (input.compatibility.dependencies?.includes(product.slug.toLowerCase()))
         throw new AppError("A resource cannot depend on itself", 400, "RESOURCE_DEPENDENCY_SELF");
       const [updated] = await tx
@@ -39,18 +43,24 @@ export class ResourceCompatibilityRepository {
           id: products.id,
           updatedAt: products.updatedAt,
           compatibility: products.compatibility,
+          status: products.status,
+          metadataReviewRequired: products.metadataReviewRequired,
         });
-      await tx
-        .insert(auditEvents)
-        .values({
-          id: input.auditId,
-          actorId: actor.id,
-          actorType: actor.role === "admin" ? "admin" : "user",
-          targetId: product.id,
-          targetType: "product",
-          action: "product.compatibility_updated",
-          details: { previous: product.compatibility, compatibility: input.compatibility },
-        });
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: actor.id,
+        actorType: actor.role === "admin" ? "admin" : "user",
+        targetId: product.id,
+        targetType: "product",
+        action: "product.compatibility_updated",
+        details: {
+          previous: product.compatibility,
+          compatibility: input.compatibility,
+          previousStatus: product.status,
+          status: updated.status,
+          metadataReviewRequired: updated.metadataReviewRequired,
+        },
+      });
       return updated;
     });
   }

@@ -225,6 +225,8 @@ export interface Product {
   shortDescription?: string;
   type: ProductType;
   status: ProductStatus;
+  /** Future editorial changes withdraw publication until a clean version is reviewed. */
+  metadataReviewRequired?: boolean;
   authorId: string;
   organizationId?: string;
   price: number; // in cents (USD/EUR)

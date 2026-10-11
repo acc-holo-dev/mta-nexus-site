@@ -1,9 +1,17 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 import type { Metadata } from "next";
-import type { Product } from "@nexus/domain";
+import { AppError, type Product } from "@nexus/domain";
 import { authService } from "../../../lib/services/auth-service";
-import { productService } from "../../../lib/services/product-service";
+import { resourcePublisherService } from "../../../lib/services/resource-publisher-service";
+import { ResourcePublisherFilters } from "../../../components/resource-publisher-filters";
+import {
+  resourcePublisherQuery,
+  resourcePublisherUrl,
+  publisherSearchParams,
+} from "../../../lib/resource-publisher-query";
+import { getResourcePublisherCopy } from "../../../lib/resource-publisher-i18n";
+import { notFound } from "next/navigation";
 import { getDictionary } from "../../../lib/i18n";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import { getCommercialCopy } from "../../../lib/commercial-i18n";
@@ -13,18 +21,11 @@ export const metadata: Metadata = {
   title: "Author workspace | MTA NEXUS",
   robots: { index: false, follow: false },
 };
-const statuses: Product["status"][] = [
-  "draft",
-  "pending_review",
-  "published",
-  "suspended",
-  "archived",
-];
 
 export default async function AuthorResourcesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; page?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
@@ -39,11 +40,16 @@ export default async function AuthorResourcesPage({
         </Link>
       </section>
     );
-  const query = await searchParams;
-  const status = statuses.find((value) => value === query.status);
-  const result = await productService.listManagedProducts(user, status, Number(query.page ?? 1));
-  const href = (page: number) =>
-    `/workspace/resources?${new URLSearchParams({ ...(status ? { status } : {}), page: String(page) })}`;
+  let query: ReturnType<typeof resourcePublisherQuery>;
+  try {
+    query = resourcePublisherQuery(publisherSearchParams(await searchParams));
+  } catch (error) {
+    if (error instanceof AppError && error.statusCode === 400) notFound();
+    throw error;
+  }
+  const result = await resourcePublisherService.inventory(user, query);
+  const publisherCopy = getResourcePublisherCopy(locale);
+  const href = (page: number) => resourcePublisherUrl({ ...query, page });
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
@@ -58,31 +64,15 @@ export default async function AuthorResourcesPage({
           {dictionary.workspace.publishResource}
         </Link>
       </header>
-      <Link href="/subscriptions" className="inline-block text-sm text-accent underline">{getCommercialCopy(locale).catalog}</Link>
-      <nav aria-label={copy.status} className="flex flex-wrap gap-2">
-        <Link
-          href="/workspace/resources"
-          aria-current={!status ? "page" : undefined}
-          className="rounded-md border border-base px-3 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white"
-        >
-          {copy.all}
-        </Link>
-        {statuses.map((value) => (
-          <Link
-            key={value}
-            href={`/workspace/resources?status=${value}`}
-            aria-current={status === value ? "page" : undefined}
-            className="rounded-md border border-base px-3 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white"
-          >
-            {copy.statusLabels[value]}
-          </Link>
-        ))}
-      </nav>
-      {result.products.length === 0 ? (
+      <Link href="/subscriptions" className="inline-block text-sm text-accent underline">
+        {getCommercialCopy(locale).catalog}
+      </Link>
+      <ResourcePublisherFilters query={query} statusCounts={result.statusCounts} locale={locale} />
+      {result.items.length === 0 ? (
         <p className="py-10 text-secondary">{copy.empty}</p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
-          {result.products.map((product) => (
+          {result.items.map((product) => (
             <li key={product.id} className="min-w-0 rounded-lg border border-base bg-surface p-5">
               <Link
                 href={`/workspace/resources/${product.id}`}
@@ -91,9 +81,19 @@ export default async function AuthorResourcesPage({
                 {product.title}
               </Link>
               <p className="mt-2 text-sm text-secondary">
-                {copy.statusLabels[product.status]} · {product.currentVersion}
+                {copy.statusLabels[product.status as Product["status"]]} · {product.currentVersion}
               </p>
               <p className="mt-2 break-words text-sm text-muted">{product.shortDescription}</p>
+              <p className="mt-2 text-sm text-secondary">
+                {publisherCopy.readiness[product.readiness]} · {publisherCopy.versions}:{" "}
+                {product.buildCount}
+              </p>
+              <p className="mt-2 text-xs text-muted">
+                {product.scope === "personal" ? publisherCopy.personal : publisherCopy.organization}
+              </p>
+              {product.metadataReviewRequired && (
+                <p className="mt-2 text-sm text-warning">{publisherCopy.reviewRequired}</p>
+              )}
             </li>
           ))}
         </ul>

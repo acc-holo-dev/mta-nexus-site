@@ -40,6 +40,17 @@ test("purchase case upgrade adds immutable order context without changing histor
 });
 
 const script = "packages/db/scripts/check-release-upgrade.mjs";
+test("editorial metadata upgrade withdraws stale review without backfilling publication trust", () => {
+  const migration = readFileSync("packages/db/migrations/0055_resource_metadata_review.sql", "utf8");
+  assert.match(migration, /metadata_review_required boolean NOT NULL DEFAULT false/u);
+  assert.match(migration, /NEW\.status := 'draft'/u);
+  assert.match(migration, /NEW\.is_featured := false/u);
+  assert.match(migration, /OLD\.status IN \('archived','suspended'\)/u);
+  assert.match(migration, /UPDATE builds SET status = 'draft' WHERE product_id = NEW\.id AND status = 'pending_review'/u);
+  assert.match(migration, /products_metadata_review_state_check/u);
+  assert.doesNotMatch(migration, /UPDATE products|UPDATE (licenses|entitlements|payments|orders|ledger_entries)/u);
+  assert.match(readFileSync(script,"utf8"), /resourceMetadataReviewSchemaPresent = true/u);
+});
 test("term maintenance upgrade adds exact-term idempotency without rewriting historical licenses", () => {
   const migration = readFileSync(
     "packages/db/migrations/0054_license_term_maintenance.sql",
@@ -140,7 +151,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0054_license_term_maintenance");
+  assert.equal(plan.targetTag, "0055_resource_metadata_review");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

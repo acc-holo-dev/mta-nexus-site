@@ -146,6 +146,7 @@ export async function PATCH(
 
     const revision =
       request.headers.get("if-match");
+    if (revision === null) return privateJson(context, { code: "PRODUCT_METADATA_REVISION_REQUIRED" }, 428);
     let expectedUpdatedAt: Date | undefined;
     if (revision !== null) {
       if (
@@ -218,6 +219,8 @@ export async function PATCH(
           product.shortDescription,
         description: product.description,
         tags: product.tags,
+        status: product.status,
+        metadataReviewRequired: product.metadataReviewRequired === true,
         updatedAt: product.updatedAt,
       },
     });

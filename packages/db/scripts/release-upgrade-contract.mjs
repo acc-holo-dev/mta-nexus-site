@@ -3,7 +3,7 @@ export const RELEASE_UPGRADE_BASELINE_TAG =
 export const RELEASE_UPGRADE_FAILURE_TAG =
   "0027_build_quarantine";
 export const RELEASE_UPGRADE_TARGET_TAG =
-  "0054_license_term_maintenance";
+  "0055_resource_metadata_review";
 
 function journalEntries(journal) {
   if (!journal || !Array.isArray(journal.entries)) {

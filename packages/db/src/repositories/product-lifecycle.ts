@@ -74,16 +74,16 @@ export class ProductLifecycleRepository {
           .where(
             and(
               eq(builds.productId, product.id),
-              eq(builds.status, "draft"),
+              inArray(builds.status, ["draft", "published"]),
               trustedCleanScanCondition(),
             ),
           )
-          .orderBy(desc(builds.createdAt), desc(builds.id))
+          .orderBy(sql`case when ${builds.status} = 'draft' then 0 else 1 end`, desc(builds.createdAt), desc(builds.id))
           .limit(1)
           .for("update");
         if (!candidate)
           throw new AppError(
-            "Upload a clean resource version before submission",
+            "A clean draft or retained published version is required before submission",
             422,
             "RESOURCE_REVIEW_BUILD_REQUIRED",
           );

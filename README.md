@@ -62,6 +62,20 @@ displayed page. Filters survive navigation and export. Only current administrato
 can inspect pending expiry/warning counts and unknown terms at
 `/admin/licenses/maintenance`; the view issues or renews nothing.
 
+Resource publishers now search/filter `/workspace/resources` by type, publisher
+scope, status and actual clean-version readiness. Filters and counts survive
+pagination. `/workspace/resources/[id]/history` shows the complete recorded
+editorial/publication history in private pages of 20, without backfilling events.
+
+Migration `0055` withdraws publication after future title, description, tag or
+requirement changes and returns pending versions to drafts with new revisions.
+Archived/suspended metadata is read-only. Submit a retained clean published
+archive when no eligible draft exists; re-uploading the same version is unnecessary.
+Only a new successful review clears the editorial requirement. Rejection, version
+retirement and quarantine restoration keep it withdrawn. Reviewers inspect the
+description/requirements on the version detail page; repeated decisions notify
+once per reviewed revision. Files, grants and financial records remain intact.
+
 Developers edit specialties, portfolio and Discord in `/settings/developer`.
 Public profiles show these contacts and the separate verified-experience flag.
 Changing specialties or portfolio removes that flag. `/workspace/verification`

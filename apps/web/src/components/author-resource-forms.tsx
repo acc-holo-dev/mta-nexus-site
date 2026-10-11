@@ -4,6 +4,7 @@ import { useEffect, useId, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { editProductDetailsSchema } from "@nexus/validation";
 import { useNexusLocale } from "./locale-context";
+import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
 import {
   exceedsBuildFileSizeLimit,
   getSupportedBuildExtension,
@@ -162,7 +163,7 @@ export function AuthorResourceForms({
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (saving || !ready || conflict || refreshPending) return;
+    if (uploadBlocked || saving || !ready || conflict || refreshPending) return;
     const form = new FormData(event.currentTarget);
     const parsed = editProductDetailsSchema.safeParse({
       title: form.get("title"),
@@ -191,6 +192,11 @@ export function AuthorResourceForms({
       );
       const body = await response.json().catch(() => null);
       if (!response.ok) {
+        if (body?.code === "PRODUCT_STATE_CHANGED" || body?.code === "PRODUCT_METADATA_REVISION_REQUIRED") {
+          setError(resourceCommerceError(locale, body.code));
+          router.refresh();
+          return;
+        }
         if (body?.code === "PRODUCT_METADATA_CONFLICT") {
           setError(copy.metadataConflict);
           router.refresh();
@@ -324,7 +330,8 @@ export function AuthorResourceForms({
         className="space-y-4 rounded-lg border border-base bg-surface p-5"
       >
         <h2 className="text-xl font-semibold text-primary">{copy.edit}</h2>
-        <fieldset disabled={saving || !ready || Boolean(conflict) || refreshPending} className="space-y-4">
+        <p className="text-sm text-secondary">{uploadBlocked ? getResourcePublisherCopy(locale).readonly : getResourcePublisherCopy(locale).editNote}</p>
+        <fieldset disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending} className="space-y-4">
           <label className="block space-y-1 text-sm text-secondary">
             <span>{publishing.title}</span>
             <input
@@ -377,7 +384,7 @@ export function AuthorResourceForms({
             {copy.saved}
           </p>
         )}
-        <button type="submit" disabled={saving || !ready || Boolean(conflict) || refreshPending} className={buttonClass}>
+        <button type="submit" disabled={uploadBlocked || saving || !ready || Boolean(conflict) || refreshPending} className={buttonClass}>
           {saving ? copy.saving : copy.save}
         </button>
       </form>

@@ -53,7 +53,7 @@ export default async function ResourceCompatibilityPage({
           id: product.id,
           updatedAt: new Date(product.updatedAt).toISOString(),
           compatibility: product.compatibility,
-          suspended: product.status === "suspended",
+          suspended: product.status === "suspended" || product.status === "archived",
         }}
       />
       <ProductDependencyList

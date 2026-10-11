@@ -34,7 +34,6 @@ import { adminService } from "../../lib/services/admin-service";
 import { authService } from "../../lib/services/auth-service";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { BuildModerationControls } from "../../components/build-moderation-controls";
 import { BuildQuarantineControls } from "../../components/build-quarantine-controls";
 import { ContentModerationControls } from "../../components/content-moderation-controls";
 import { VerificationModerationControls } from "../../components/verification-moderation-controls";
@@ -417,15 +416,6 @@ export default async function AdminPage({
                   <Link href={`/admin/resources/${build.productId}/builds/${build.id}`} className="text-accent underline text-xs">
                     {locale === "ru" ? "Версия и история решений" : "Version and decision history"}
                   </Link>
-                  <BuildModerationControls
-                    key={`${build.id}:${build.revision}`}
-                    expectedRevision={build.revision}
-                    buildId={build.id}
-                    scanStatus={build.scanStatus}
-                    hasScanProvenance={Boolean(
-                      build.scanner?.trim() && build.scannedAt,
-                    )}
-                  />
                 </div>
               </div>
             ))

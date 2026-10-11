@@ -76,12 +76,14 @@ export class ProductRepository {
     audit: Omit<AuditEvent, "createdAt">, expectedUpdatedAt?: Date): Promise<Product | null> {
     return db.transaction(async (tx) => {
       const [parent] = await tx.select({ id: products.id, authorId: products.authorId,
-        organizationId: products.organizationId }).from(products)
+        organizationId: products.organizationId, status: products.status }).from(products)
         .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor)))
         .limit(1).for("no key update");
       if (!parent) return null;
       // Hold live organization/user/membership grants through the audited commit.
       const currentActor = await assertProductMutationAuthority(tx, parent, actor.id);
+      if (parent.status === "archived" || parent.status === "suspended")
+        throw new AppError("Withdrawn resource metadata is read-only", 409, "PRODUCT_STATE_CHANGED");
       const rows = await tx.update(products).set({ title: details.title,
         shortDescription: details.shortDescription, description: details.description,
         tags: details.tags,
@@ -92,7 +94,9 @@ export class ProductRepository {
           expectedUpdatedAt ? sql`date_trunc('milliseconds', ${products.updatedAt}) = ${expectedUpdatedAt.toISOString()}::timestamptz` : undefined)).returning();
       if (!rows[0]) return null;
       await tx.insert(auditEvents).values({ ...audit, actorId: currentActor.id,
-        actorType: currentActor.role === "admin" ? "admin" : "user" });
+        actorType: currentActor.role === "admin" ? "admin" : "user",
+        details: { ...audit.details, previousStatus: parent.status, status: rows[0].status,
+          metadataReviewRequired: rows[0].metadataReviewRequired } });
       return rows[0] as unknown as Product;
     });
   }

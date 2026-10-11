@@ -10,6 +10,7 @@ import {
   resourceManagementError,
 } from "../lib/resource-management-i18n";
 import { useNexusLocale } from "./locale-context";
+import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
 
 export function ResourceCompatibilityForm({
   product,
@@ -80,6 +81,11 @@ export function ResourceCompatibilityForm({
   return (
     <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
       <p className="text-sm text-secondary">{copy.compatibilityNote}</p>
+      <p className="text-sm text-secondary">
+        {product.suspended
+          ? getResourcePublisherCopy(locale).readonly
+          : getResourcePublisherCopy(locale).editNote}
+      </p>
       <label htmlFor={`${field}-mta`} className="block text-sm text-secondary">
         {copy.mta}
       </label>

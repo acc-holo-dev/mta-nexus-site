@@ -1,5 +1,30 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Resource editorial review and publisher inventory — 2026-10-11
+
+Migration `0055` protects future editorial changes: titles, descriptions, tags and
+requirements withdraw publication and invalidate every pending build observation.
+Existing published artifacts/grants remain stored. The internal review requirement
+survives rejection, retirement and quarantine restoration, and clears only on new
+successful build review. State revisions advance monotonically; counter/rating
+repair alone retains the existing metadata revision. Archived/suspended metadata
+is read-only and HTTP editing requires the observed `If-Match` revision.
+
+Publishers can resubmit a clean retained published archive without another upload.
+Notification identity now includes the reviewed build revision, so repeated review
+cycles cannot collide. The staff version screen includes the editorial evidence;
+the shared admin queue links to that complete review instead of inline decisions.
+RU/EN inventory filters/search/readiness/counts and bounded private event history
+use current management grants and stable snapshots/projections. History does not
+restore earlier text or invent missing events.
+
+132 focused checks, TypeScript, 20 migration-contract checks, touched-file Biome
+and Next.js compile mode pass locally. Four PostgreSQL fixtures cover withdrawal,
+stale review, repeated resubmission, fallback and audit rollback but remain unrun.
+Live migration/locking/rollback, browser interaction, Docker, full production
+generation and the pinned Node 26 runtime remain unverified. Paid settlement,
+monthly license issuance/renewal, subscriptions and enforced MTA DRM remain open.
+
 ### License term processing, buyer archive and operator queue — 2026-10-11
 
 Migration `0054` adds immutable events keyed by the exact PostgreSQL term, without

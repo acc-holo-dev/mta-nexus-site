@@ -31,7 +31,7 @@ const copy = {
     restoreNote:
       "Restoring creates a draft. Previously public versions must pass moderation again before downloads resume.",
     submitNote:
-      "Submit the latest clean draft version for moderator review. Rejected, retired and quarantined versions cannot be resubmitted here.",
+      "Submit the latest clean draft or a retained published version for a new review. Rejected, retired and quarantined versions cannot be resubmitted here.",
     blocked: "This resource is suspended. Contact support to resolve the moderation restriction.",
     reason: "Reason",
     confirm: "I understand the effect of this action",
@@ -50,6 +50,8 @@ const copy = {
       UNAUTHORIZED: "Your session expired. Sign in and try again.",
       FORBIDDEN: "You do not have permission to perform this action.",
       RATE_LIMIT_EXCEEDED: "Too many operations. Wait a little and try again.",
+      PRODUCT_METADATA_REVISION_REQUIRED:
+        "Reload the resource before saving; an observed revision is required.",
       PRODUCT_METADATA_CONFLICT:
         "The resource changed. Reload the page and review the current state.",
       PRODUCT_STATE_CHANGED:
@@ -90,7 +92,7 @@ const copy = {
     restoreNote:
       "Ресурс вернётся в черновики. Ранее опубликованные версии должны пройти модерацию заново, прежде чем скачивание возобновится.",
     submitNote:
-      "Отправьте последнюю чистую версию черновика на проверку. Отклонённые, отозванные и карантинные версии нельзя отправить повторно здесь.",
+      "Отправьте последнюю чистую версию черновика или сохранённую опубликованную версию на новую проверку. Отклонённые, отозванные и карантинные версии нельзя отправить повторно здесь.",
     blocked: "Ресурс заблокирован модерацией. Обратитесь в поддержку для снятия ограничения.",
     reason: "Причина",
     confirm: "Я понимаю последствия этого действия",
@@ -109,6 +111,8 @@ const copy = {
       UNAUTHORIZED: "Сессия истекла. Войдите и повторите попытку.",
       FORBIDDEN: "У вас нет прав на это действие.",
       RATE_LIMIT_EXCEEDED: "Слишком много операций. Подождите немного и повторите попытку.",
+      PRODUCT_METADATA_REVISION_REQUIRED:
+        "Обновите ресурс перед сохранением: требуется прочитанная ревизия.",
       PRODUCT_METADATA_CONFLICT:
         "Ресурс изменился. Перезагрузите страницу и проверьте текущее состояние.",
       PRODUCT_STATE_CHANGED:

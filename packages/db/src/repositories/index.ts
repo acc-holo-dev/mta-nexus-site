@@ -20,6 +20,7 @@ export { followWorkspaceRepository } from "./follow-workspace";
 export * from "./ledger";
 export * from "./license-controls";
 export * from "./license-maintenance";
+export * from "./resource-publisher";
 export * from "./licenses";
 export * from "./notifications";
 export * from "./order-operations";

@@ -3,6 +3,7 @@ import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n"
 import { getResourceManagementCopy } from "../../../../lib/resource-management-i18n";
 import { getResourceActivityCopy } from "../../../../lib/resource-activity-i18n";
 import { getResourceReleaseControlCopy } from "../../../../lib/resource-release-control-i18n";
+import { getResourcePublisherCopy } from "../../../../lib/resource-publisher-i18n";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
@@ -50,6 +51,7 @@ export default async function ManageResourcePage({
   const commerceCopy = getResourceCommerceCopy(locale);
   const buildCopy = getResourceBuildWorkspaceCopy(locale);
   const managementCopy = getResourceManagementCopy(locale);
+  const publisherCopy = getResourcePublisherCopy(locale);
   return (
     <div className="space-y-8">
       <Link href="/workspace/resources" className="text-sm text-accent underline">
@@ -64,6 +66,9 @@ export default async function ManageResourcePage({
           {copy.preview}
         </Link>
       </header>
+      {product.metadataReviewRequired && (
+        <p className="text-sm text-warning">{publisherCopy.reviewRequired}</p>
+      )}
       <nav
         className="flex flex-wrap gap-4 text-sm text-accent"
         aria-label={managementCopy.variants}
@@ -79,6 +84,9 @@ export default async function ManageResourcePage({
         </Link>
         <Link href={`/workspace/resources/${product.id}/moderation`} className="underline">
           {getResourceReleaseControlCopy(locale).moderationHistory}
+        </Link>
+        <Link href={`/workspace/resources/${product.id}/history`} className="underline">
+          {publisherCopy.history}
         </Link>
       </nav>
       <ResourceLifecycleControls

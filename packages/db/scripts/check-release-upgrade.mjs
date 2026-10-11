@@ -61,6 +61,7 @@ const evidence = {
   commerceOrderCaseSchemaPresent: false,
   licenseBindingRecoverySchemaPresent: false,
   licenseTermMaintenanceSchemaPresent: false,
+  resourceMetadataReviewSchemaPresent: false,
   cleanupComplete: false,
 };
 
@@ -115,7 +116,9 @@ try {
     for (const table of ["users", "products", "builds", "entitlements", "notifications", "servers", "server_claim_challenges", "audit_events", "comments"]) {
       // Remove only fields introduced after the frozen baseline so existing
       // legacy-row values remain byte-for-byte comparable across the upgrade.
-      const rowJson = table === "notifications"
+      const rowJson = table === "products"
+        ? "to_jsonb(t) - 'metadata_review_required'"
+        : table === "notifications"
         ? "to_jsonb(t) - 'data'"
         : table === "builds"
           ? "to_jsonb(t) - 'quarantine_previous_status' - 'quarantine_reason' - 'quarantined_at' - 'quarantined_by' - 'revision'"
@@ -379,6 +382,12 @@ try {
     0,
   );
   evidence.licenseTermMaintenanceSchemaPresent = true;
+  const metadataColumn = await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'products' AND column_name = 'metadata_review_required'`;
+  assert.equal(metadataColumn.length, 1);
+  const metadataTriggers = await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('products_metadata_review', 'products_metadata_withdraw_pending')`;
+  assert.equal(metadataTriggers.length, 2);
+  assert.equal((await client`SELECT count(*)::integer AS total FROM products WHERE metadata_review_required`)[0].total, 0);
+  evidence.resourceMetadataReviewSchemaPresent = true;
   assert.equal(await rows(), beforeRows);
   const old = await client`SELECT data, is_read FROM notifications WHERE id = 'upgrade-notification'`;
   assert.equal(old[0].data, null);

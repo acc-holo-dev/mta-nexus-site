@@ -7,6 +7,7 @@ import { resourceBuildWorkspaceService } from "../lib/services/resource-build-wo
 import { getRequestLocale } from "../lib/i18n-server";
 import { getDictionary } from "../lib/i18n";
 import { getResourceBuildWorkspaceCopy } from "../lib/resource-build-workspace-i18n";
+import { getResourcePublisherCopy } from "../lib/resource-publisher-i18n";
 import { ResourceBuildControls } from "./resource-build-controls";
 import { BuildModerationControls } from "./build-moderation-controls";
 export async function ResourceBuildScreen({
@@ -40,6 +41,7 @@ export async function ResourceBuildScreen({
     throw error;
   }
   const { product, build, history } = detail;
+  const publisherCopy = getResourcePublisherCopy(locale);
   const trustedScan =
     build.scanStatus === "clean" && Boolean(build.scanner?.trim() && build.scannedAt);
   return (
@@ -58,6 +60,35 @@ export async function ResourceBuildScreen({
           {copy.title} · {copy.statuses[build.status]} · {copy.revision}: {build.revision}
         </p>
       </header>
+      {product.metadataReviewRequired && (
+        <p className="text-sm text-warning">{publisherCopy.reviewRequired}</p>
+      )}
+      {staff && (
+        <section className="nexus-panel space-y-3 p-5" aria-label={publisherCopy.description}>
+          <p className="text-sm text-muted">{publisherCopy.reviewNote}</p>
+          <h2 className="text-xl font-semibold text-primary">{publisherCopy.description}</h2>
+          {product.shortDescription && (
+            <p className="whitespace-pre-wrap break-words text-secondary">
+              {product.shortDescription}
+            </p>
+          )}
+          <p className="whitespace-pre-wrap break-words text-secondary">{product.description}</p>
+          <p className="break-words text-sm text-secondary">
+            {publisherCopy.tags}: {(product.tags ?? []).join(", ") || "—"}
+          </p>
+          <h3 className="font-semibold text-primary">{publisherCopy.requirements}</h3>
+          <p className="text-sm text-secondary">
+            MTA: {product.compatibility?.mtaMinVersion || "—"}
+          </p>
+          <ul className="list-inside list-disc text-sm text-secondary">
+            {(product.compatibility?.dependencies ?? []).map((slug) => (
+              <li key={slug} className="break-words">
+                {slug}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <dl className="grid gap-3 rounded-lg border border-base p-5 text-sm">
         <div>
           <dt>{copy.file}</dt>

@@ -85,12 +85,26 @@ it.each(["en", "ru"] as const)(
   },
 );
 it("renders revision-bound staff controls and the artifact link", async () => {
+  state.detail.mockResolvedValue({
+    ...detail,
+    product: {
+      ...detail.product,
+      metadataReviewRequired: true,
+      description: "<script>Editorial evidence</script>",
+      shortDescription: "Reviewed summary",
+      tags: ["lua"],
+      compatibility: { mtaMinVersion: "1.6.0", dependencies: ["resource-dependency"] },
+    },
+  });
   const html = renderToStaticMarkup(
     await ResourceBuildScreen({ productId: "prd_a", buildId: "bld_a", staff: true }),
   );
   expect(state.detail).toHaveBeenCalledWith("prd_a", "bld_a", state.actor, true);
   expect(html).toContain("/api/admin/builds/bld_a/download");
   expect(html).not.toContain("Withdraw from review");
+  expect(html).toContain("&lt;script&gt;Editorial evidence&lt;/script&gt;");
+  expect(html).toContain("resource-dependency");
+  expect(html).toContain("Editorial review required");
 });
 it.each([403, 404])("hides inaccessible detail on %s", async (status) => {
   state.detail.mockRejectedValue(new AppError("private", status, "FORBIDDEN"));

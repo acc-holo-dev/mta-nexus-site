@@ -220,6 +220,7 @@ export const products = pgTable(
     organizationId: text("organization_id").references(() => organizations.id, {
       onDelete: "set null",
     }),
+    metadataReviewRequired: boolean("metadata_review_required").notNull().default(false),
     price: integer("price").notNull().default(0), // in cents
     currency: text("currency").notNull().default("USD"),
     licenseModel: text("license_model").notNull().default("single_server"),
@@ -246,6 +247,8 @@ export const products = pgTable(
     index("products_moderation_status_updated_id_idx").on(table.status, table.updatedAt.desc(), table.id.desc()),
     index("products_moderation_updated_id_idx").on(table.updatedAt.desc(), table.id.desc()),
     index("products_author_idx").on(table.authorId),
+    index("products_managed_updated_id_idx").on(table.updatedAt.desc(), table.id.desc()).where(sql`${table.price} = 0`),
+    check("products_metadata_review_state_check", sql`NOT ${table.metadataReviewRequired} OR ${table.status} <> 'published'`),
     index("products_public_author_created_id_idx")
       .on(table.authorId, table.createdAt.desc(), table.id.desc())
       .where(sql`${table.status} = 'published' AND ${table.price} = 0`),

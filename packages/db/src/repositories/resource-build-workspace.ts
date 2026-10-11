@@ -57,6 +57,11 @@ async function lockProduct(
       status: products.status,
       authorId: products.authorId,
       organizationId: products.organizationId,
+      metadataReviewRequired: products.metadataReviewRequired,
+      description: products.description,
+      shortDescription: products.shortDescription,
+      tags: products.tags,
+      compatibility: products.compatibility,
     })
     .from(products)
     .where(eq(products.id, productId))
@@ -104,6 +109,11 @@ class ResourceBuildWorkspaceRepository {
           title: product.title,
           slug: product.slug,
           status: product.status,
+          metadataReviewRequired: product.metadataReviewRequired,
+          description: product.description,
+          shortDescription: product.shortDescription,
+          tags: product.tags,
+          compatibility: product.compatibility,
         },
         build: build as ResourceBuildView,
         history,
@@ -193,7 +203,12 @@ class ResourceBuildWorkspaceRepository {
         await tx
           .update(products)
           .set({
-            status: published ? "published" : pending ? "pending_review" : "draft",
+            status:
+              published && !product.metadataReviewRequired
+                ? "published"
+                : pending
+                  ? "pending_review"
+                  : "draft",
             ...(published || pending ? { currentVersion: (published ?? pending).version } : {}),
             updatedAt: sql`greatest(date_trunc('milliseconds', clock_timestamp()), ${products.updatedAt} + interval '1 millisecond')`,
           })
@@ -205,27 +220,25 @@ class ResourceBuildWorkspaceRepository {
         submit: "build.review_resubmitted",
         retire: "build.retired",
       }[input.command.action];
-      await tx
-        .insert(auditEvents)
-        .values({
-          id: input.auditId,
-          actorId: input.actorId,
-          actorType: "user",
-          action,
-          targetType: "build",
-          targetId: current.id,
-          details: {
-            productId: product.id,
-            version: current.version,
-            previousStatus: current.status,
-            status,
-            previousRevision: current.revision,
-            revision: updated.revision,
-            ...(input.command.action !== "save"
-              ? { reason: input.command.reason }
-              : { fields: ["releaseNotes", "mtaVersionTarget"] }),
-          },
-        });
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: input.actorId,
+        actorType: "user",
+        action,
+        targetType: "build",
+        targetId: current.id,
+        details: {
+          productId: product.id,
+          version: current.version,
+          previousStatus: current.status,
+          status,
+          previousRevision: current.revision,
+          revision: updated.revision,
+          ...(input.command.action !== "save"
+            ? { reason: input.command.reason }
+            : { fields: ["releaseNotes", "mtaVersionTarget"] }),
+        },
+      });
       return updated as ResourceBuildView;
     });
   }
