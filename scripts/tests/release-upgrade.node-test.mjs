@@ -219,7 +219,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0061_storage_maintenance");
+  assert.equal(plan.targetTag, "0062_seller_sales_indexes");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -366,4 +366,14 @@ test("build workspace upgrade preserves identity and adds monotonic revisions an
   assert.match(rehearsal, /- 'revision'/u);
   assert.match(rehearsal, /resourceBuildWorkspaceSchemaPresent/u);
   assert.equal((rehearsal.match(/VALUES \('upgrade-review'/gu) ?? []).length, 1);
+});
+
+
+test("sales upgrade adds portfolio indexes without rewriting historical commerce", () => {
+  const migration = readFileSync(new URL("0062_seller_sales_indexes.sql", migrationsUrl), "utf8");
+  assert.match(migration, /CREATE INDEX products_sales_org_id_idx/u);
+  assert.match(migration, /CREATE INDEX order_items_product_order_id_idx/u);
+  assert.doesNotMatch(migration, /UPDATE|DELETE|INSERT|ALTER TABLE/u);
+  const rehearsal = readFileSync(script, "utf8");
+  assert.match(rehearsal, /sellerSalesIndexesPresent = true/u);
 });

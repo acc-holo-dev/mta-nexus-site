@@ -38,6 +38,7 @@ const evidence = {
   buildPackageEvidenceSchemaPresent: false,
   resourceMediaSchemaPresent: false,
   storageMaintenanceSchemaPresent: false,
+  sellerSalesIndexesPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: upgradePlan.baselineTag,
@@ -421,6 +422,9 @@ try {
   assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname IN ('storage_maintenance_state_modified_idx','builds_storage_key_idx','assets_storage_key_idx')`).length,3);
   assert.equal((await client`SELECT count(*)::int AS total FROM storage_maintenance_objects`)[0].total,0);
   evidence.storageMaintenanceSchemaPresent = true;
+  const salesIndexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname IN ('products_sales_org_id_idx','order_items_product_order_id_idx')`;
+  assert.equal(salesIndexes.length, 2);
+  evidence.sellerSalesIndexesPresent = true;
   const receiptColumns = await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);
   assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'resource_cart_receipt_user_time_idx'`).length, 1);

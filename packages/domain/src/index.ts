@@ -30,3 +30,4 @@ export * from "./build-package-evidence";
 export * from "./resource-media";
 export * from "./storage-maintenance";
 export * from "./resource-requirements";
+export * from "./seller-sales";

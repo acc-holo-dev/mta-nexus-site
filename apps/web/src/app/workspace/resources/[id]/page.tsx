@@ -1,3 +1,4 @@
+import { sellerSalesCopy } from "../../../../lib/seller-sales-i18n";
 import { resourceMediaCopy } from "../../../../lib/resource-media-i18n";
 import { ResourceLifecycleControls } from "../../../../components/resource-lifecycle-controls";
 import { getResourceCommerceCopy } from "../../../../lib/resource-commerce-i18n";
@@ -75,6 +76,7 @@ export default async function ManageResourcePage({
         className="flex flex-wrap gap-4 text-sm text-accent"
         aria-label={managementCopy.variants}
       >
+        <Link href={`/workspace/sales/report?${new URLSearchParams({ productId: product.id, ...(product.organizationId ? { organizationId: product.organizationId } : {}) })}`} className="underline">{sellerSalesCopy(locale).title}</Link>
         <Link href={`/workspace/resources/${product.id}/media`} className="underline">{resourceMediaCopy(locale).title}</Link>
         <Link href={`/workspace/resources/${product.id}/variants`} className="underline">
           {managementCopy.variants}

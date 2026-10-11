@@ -78,3 +78,4 @@ export * from "./build-package-comparison";
 export * from "./resource-media";
 export * from "./storage-maintenance";
 export * from "./resource-requirements";
+export * from "./seller-sales";

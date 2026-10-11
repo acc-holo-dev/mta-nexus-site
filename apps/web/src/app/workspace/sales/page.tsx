@@ -1,3 +1,4 @@
+import { sellerSalesCopy } from "../../../lib/seller-sales-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getFinancialCopy } from "../../../lib/financial-i18n";
@@ -42,6 +43,7 @@ export default async function SalesHistoryPage({
 
   return (
     <HistoryShell copy={copy} area="sales">
+      <Link href="/workspace/sales/report" className="text-sm text-accent underline">{sellerSalesCopy(locale).title}</Link>
       <Link href="/workspace/finance" className="text-sm text-accent underline">{getFinancialCopy(locale).title}</Link>
       <p role="note" className="text-sm text-muted">{copy.grossNotice}</p>
       {result.sales.length === 0 ? (

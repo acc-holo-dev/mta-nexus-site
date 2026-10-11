@@ -12,7 +12,8 @@ import {
 import { historyPageBounds } from "./history-pagination";
 import type { ResourceTransaction } from "./entitlements";
 
-async function account(tx: ResourceTransaction, userId: string, organizationId?: string) {
+/** Shared live financial-account policy: product-management grants do not apply. */
+export async function lockFinancialAccountAuthority(tx: ResourceTransaction, userId: string, organizationId?: string) {
   const [organization] = organizationId
     ? await tx
         .select({ id: organizations.id, ownerId: organizations.ownerId, name: organizations.name })
@@ -70,7 +71,7 @@ export class FinancialStatementsRepository {
   async statement(userId: string, page = 1, currency?: string, organizationId?: string) {
     return db.transaction(
       async (tx) => {
-        const scope = await account(tx, userId, organizationId);
+        const scope = await lockFinancialAccountAuthority(tx, userId, organizationId);
         const condition = and(
           eq(ledger.accountId, scope.id),
           currency ? eq(ledger.currency, currency) : undefined,

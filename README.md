@@ -37,6 +37,16 @@ MTA NEXUS is a player-first Multi Theft Auto: San Andreas platform for live serv
 
 ## Local development / Локальная разработка
 
+`/workspace/sales/report` provides private RU/EN reports for the current personal
+or organization portfolio, with resource, currency, 7/30/90/365-day, order and
+payment-record filters. Owners and current organization admins can inspect scoped
+line details, per-currency totals, UTC periods and displayed-page CSV. Payment
+attempts never multiply line values; unknown currencies are not summed. Labels
+describe database evidence, not external provider verification or available funds.
+Historical seller attribution was not recorded and is not inferred. Migration
+`0062_seller_sales_indexes` adds two lookup indexes without rewriting old orders.
+
+
 Migration `0058` adds reviewed free-cart receipts. In `/workspace/cart`, inspect
 the approved builds, archive hashes/sizes and declared MTA requirements before
 confirming. Acquisition compares that exact review under the resource/build

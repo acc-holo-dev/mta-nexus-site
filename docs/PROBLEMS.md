@@ -1,5 +1,33 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+
+### Seller portfolio reports and organizational sales access — 2026-10-11
+
+Private RU/EN `/workspace/sales/report` now supports personal and organization
+portfolios, product/currency/order/evidence filters and 7/30/90/365-day windows.
+Bounded line details, displayed-page CSV, distinct-order counts, exact integer
+per-currency values and UTC period summaries reuse the existing orders/payments.
+One repeatable-read transaction checks live user and organization owner/admin
+rights; product management and global moderation alone grant no financial access.
+Payment attempts are aggregated before line totals, multiple/mismatched captures
+require review, and unsupported currencies retain counts without mixed sums.
+No buyer identity, provider transaction/failure details or unrelated order lines
+are projected. Private APIs use existing auth/rate limits and no-store; exports
+neutralize spreadsheet/control input. Migration `0062` adds two scoped indexes,
+with no historical backfill or financial, license, subscription or grant writes.
+
+This is a current-portfolio observation. Historical seller ownership/titles were
+not frozen on order lines; the report states that limitation explicitly. Capture,
+refund and dispute labels describe database records, not external confirmation.
+Gross line values cannot prove refunded amounts, commission, net proceeds, holds
+or available payouts. Paid provider settlement and immutable seller-at-sale
+snapshots remain future work. Local TypeScript, focused API/SQL/SSR regressions,
+upgrade contracts and webpack compile checks cover these surfaces. Four prepared
+PostgreSQL fixtures require a disposable migrated database and remain unrun;
+live migration/query plans/locking, browser interactions and Node 26 verification
+remain outstanding. Actions and global dictionaries were not changed.
+
+
 ### Transitive resource preparation and private compatibility reports — 2026-10-11
 
 Buyer `/workspace/library/[id]/requirements`, publisher and moderator requirement

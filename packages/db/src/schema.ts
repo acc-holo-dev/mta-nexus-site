@@ -255,6 +255,7 @@ export const products = pgTable(
     index("products_moderation_status_updated_id_idx").on(table.status, table.updatedAt.desc(), table.id.desc()),
     index("products_moderation_updated_id_idx").on(table.updatedAt.desc(), table.id.desc()),
     index("products_author_idx").on(table.authorId),
+    index("products_sales_org_id_idx").on(table.organizationId, table.id).where(sql`${table.organizationId} IS NOT NULL`),
     index("products_managed_updated_id_idx").on(table.updatedAt.desc(), table.id.desc()).where(sql`${table.price} = 0`),
     check("products_metadata_review_state_check", sql`NOT ${table.metadataReviewRequired} OR ${table.status} <> 'published'`),
     index("products_public_author_created_id_idx")
@@ -639,7 +640,10 @@ export const orderItems = pgTable("order_items", {
     .references(() => products.id, { onDelete: "restrict" }),
   unitPrice: integer("unit_price").notNull(),
   currency: text("currency").notNull().default("USD"),
-}, table => [index("order_items_order_id_item_id_idx").on(table.orderId, table.id)]);
+}, table => [
+  index("order_items_order_id_item_id_idx").on(table.orderId, table.id),
+  index("order_items_product_order_id_idx").on(table.productId, table.orderId, table.id),
+]);
 
 // Library preferences carry no access grant and never represent installation.
 export const resourceLibrarySelections = pgTable("resource_library_selections", {
