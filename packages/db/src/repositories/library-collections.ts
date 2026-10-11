@@ -10,7 +10,7 @@ import {
   NotFoundError,
 } from "@nexus/domain";
 import { libraryCollectionCommandSchema, libraryCollectionIdSchema } from "@nexus/validation";
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
@@ -247,7 +247,66 @@ export class LibraryCollectionsRepository {
           command.action === "restore" ? current.status !== "archived" : current.status !== "active"
         )
           throw fail("COLLECTION_ARCHIVED");
-        if (command.action === "add") {
+        if (command.action === "add-many") {
+          // Lock resources and grants in canonical order. Do not write a partial batch.
+          const accessTerms: { productId: string; expiresAt: Date | null }[] = [];
+          for (const productId of command.productIds) {
+            const [product] = await tx
+              .select({ id: products.id })
+              .from(products)
+              .where(eq(products.id, productId))
+              .limit(1)
+              .for("share");
+            const access = product
+              ? await lockUserDownloadAccess(tx, input.userId, productId)
+              : null;
+            if (!access) throw new NotFoundError("Library resource", productId);
+            accessTerms.push({ productId, expiresAt: access.expiresAt });
+          }
+          const present = await tx
+            .select({ productId: members.productId })
+            .from(members)
+            .where(
+              and(
+                eq(members.collectionId, current.id),
+                inArray(members.productId, command.productIds),
+              ),
+            );
+          const presentIds = new Set(present.map((item) => item.productId));
+          const missing = command.productIds.filter((id) => !presentIds.has(id));
+          const [total] = await tx
+            .select({ total: count() })
+            .from(members)
+            .where(eq(members.collectionId, current.id));
+          if ((total?.total ?? 0) + missing.length > LIBRARY_COLLECTION_ITEM_LIMIT)
+            throw fail("COLLECTION_ITEM_LIMIT");
+          // Recheck every expiry against database time after all potentially blocking locks.
+          const [term] = await tx.execute<{ valid: boolean }>(
+            sql`select ${sql.join(
+              accessTerms.map((access) =>
+                access.expiresAt === null
+                  ? sql`true`
+                  : sql`${access.expiresAt}::timestamptz > clock_timestamp()`,
+              ),
+              sql` AND `,
+            )} AS valid`,
+          );
+          if (term?.valid !== true) throw fail("COLLECTION_ACCESS_CHANGED");
+          if (missing.length)
+            await tx
+              .insert(members)
+              .values(missing.map((productId) => ({ collectionId: current.id, productId })));
+        } else if (command.action === "remove-many") {
+          // References can be cleaned up even after resource deletion or revoked access.
+          await tx
+            .delete(members)
+            .where(
+              and(
+                eq(members.collectionId, current.id),
+                inArray(members.productId, command.productIds),
+              ),
+            );
+        } else if (command.action === "add") {
           const [product] = await tx
             .select({ id: products.id })
             .from(products)
@@ -332,7 +391,9 @@ export class LibraryCollectionsRepository {
           revision: collection.revision,
           ...(command.action === "add" || command.action === "remove"
             ? { productId: command.productId }
-            : {}),
+            : "productIds" in command
+              ? { productIds: command.productIds }
+              : {}),
         },
       });
       return { receipt: publicReceipt(record), replayed: false };

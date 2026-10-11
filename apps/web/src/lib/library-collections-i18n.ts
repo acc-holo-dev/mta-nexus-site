@@ -10,6 +10,11 @@ const en = {
   restore: "Restore",
   add: "Add to collection",
   remove: "Remove from collection",
+  "add-many": "Add selected resources",
+  "remove-many": "Remove selected references",
+  batchLimit: "Select up to 20 resources on this page. The whole operation commits together.",
+  batchConfirm: "I confirm this selection and operation.",
+  selected: "Selected",
   candidates: "Add acquired resources",
   history: "Change history",
   active: "Active",
@@ -72,6 +77,11 @@ const ru: typeof en = {
   restore: "Восстановить",
   add: "Добавить в коллекцию",
   remove: "Убрать из коллекции",
+  "add-many": "Добавить выбранные ресурсы",
+  "remove-many": "Убрать выбранные записи",
+  batchLimit: "Выберите до 20 ресурсов на этой странице. Операция применяется целиком.",
+  batchConfirm: "Подтверждаю выбранные записи и действие.",
+  selected: "Выбрано",
   candidates: "Добавить полученные ресурсы",
   history: "История изменений",
   active: "Активные",
@@ -142,6 +152,7 @@ export function libraryCollectionError(locale: "ru" | "en", code: unknown) {
   )
     return c.quota;
   if (code === "UNAUTHORIZED") return c.signInRequired;
-  if (code === "NOT_FOUND" || code === "FORBIDDEN") return c.forbidden;
+  if (code === "NOT_FOUND" || code === "FORBIDDEN" || code === "COLLECTION_ACCESS_CHANGED")
+    return c.forbidden;
   return c.retry;
 }

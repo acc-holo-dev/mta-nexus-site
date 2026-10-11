@@ -15,7 +15,7 @@ export function LibraryCollectionCommandForm({
 }: {
   locale: "ru" | "en";
   collection?: LibraryCollectionSnapshot;
-  action?: LibraryCollectionCommand["action"];
+  action?: Exclude<LibraryCollectionCommand["action"], "add-many" | "remove-many">;
   productId?: string;
 }) {
   const c = libraryCollectionsCopy(locale),

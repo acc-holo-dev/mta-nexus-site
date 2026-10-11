@@ -161,3 +161,47 @@ it("returns conflicts and masked missing resources without internal fields", asy
   expect(response.status).toBe(409);
   expect(await response.json()).toEqual({ code: "COLLECTION_CONFLICT" });
 });
+it("accepts a canonical private batch larger than the old body limit", async () => {
+  const productIds = Array.from(
+    { length: 20 },
+    (_, i) => `prd_${String(i).padStart(2, "0")}_${"a".repeat(153)}`,
+  ).reverse();
+  const response = await command(
+    post({ requestId, action: "add-many", productIds, expectedRevision: 2 }, `${base}/lcol_a`),
+    context,
+  );
+  expect(response.status).toBe(200);
+  expect(state.command).toHaveBeenCalledWith(
+    expect.objectContaining({
+      userId: "usr_a",
+      collectionId: "lcol_a",
+      command: {
+        requestId,
+        action: "add-many",
+        productIds: [...productIds].sort(),
+        expectedRevision: 2,
+      },
+    }),
+  );
+  expect(response.headers.get("cache-control")).toContain("no-store");
+});
+it("rejects oversized batches and injected ownership before repository writes", async () => {
+  for (const body of [
+    {
+      requestId,
+      action: "remove-many",
+      expectedRevision: 2,
+      productIds: Array.from({ length: 21 }, (_, i) => `prd_${i}`),
+    },
+    {
+      requestId,
+      action: "add-many",
+      expectedRevision: 2,
+      productIds: ["prd_a"],
+      userId: "usr_other",
+    },
+    { requestId, action: "remove-many", expectedRevision: 2, productIds: ["prd_a", "prd_a"] },
+  ])
+    expect((await command(post(body, `${base}/lcol_a`), context)).status).toBe(400);
+  expect(state.command).not.toHaveBeenCalled();
+});

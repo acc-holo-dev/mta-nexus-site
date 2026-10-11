@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, LIBRARY_COLLECTION_COMMAND_BYTES } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { collectionsQuery } from "../../../../../lib/library-collections-query";
@@ -19,7 +19,7 @@ export function POST(request: NextRequest, { params }: { params: Promise<{ id: s
       throw new AppError("Unexpected mutation query", 400, "COLLECTION_INVALID");
     return libraryCollectionsService.command(
       actor,
-      await readBoundedJson(request, 2048),
+      await readBoundedJson(request, LIBRARY_COLLECTION_COMMAND_BYTES),
       (await params).id,
     );
   });

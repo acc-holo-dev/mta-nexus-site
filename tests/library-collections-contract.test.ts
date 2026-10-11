@@ -145,3 +145,59 @@ it("keeps own RU/EN copy and actionable state errors", () => {
   expect(libraryCollectionError("ru", "COLLECTION_CONFLICT")).toContain("изменилась");
   expect(libraryCollectionError("en", "COLLECTION_ITEM_LIMIT")).toContain("limit");
 });
+it.each(["add-many", "remove-many"] as const)(
+  "canonicalizes and strictly bounds %s commands",
+  (action) => {
+    const command = { requestId, action, productIds: ["prd_b", "prd_a"], expectedRevision: 4 };
+    expect(libraryCollectionCommandSchema.parse(command)).toMatchObject({
+      productIds: ["prd_a", "prd_b"],
+    });
+    for (const productIds of [
+      [],
+      ["prd_a", "prd_a"],
+      ["../unsafe"],
+      Array.from({ length: 21 }, (_, i) => `prd_${i}`),
+    ])
+      expect(libraryCollectionCommandSchema.safeParse({ ...command, productIds }).success).toBe(
+        false,
+      );
+    expect(
+      libraryCollectionCommandSchema.safeParse({ ...command, productId: "prd_a" }).success,
+    ).toBe(false);
+    const parsed = libraryCollectionCommandSchema.parse(command);
+    const body = {
+      replayed: true,
+      receipt: {
+        id: "lcr_a",
+        requestId,
+        command: parsed,
+        collection: { ...current, revision: 5 },
+        createdAt: "2026-10-11T00:00:00.000Z",
+      },
+    };
+    expect(confirmedCollectionCommand(body, parsed, current)).toBe(current.id);
+    expect(
+      confirmedCollectionCommand(
+        {
+          ...body,
+          receipt: { ...body.receipt, command: { ...parsed, productIds: ["prd_other"] } },
+        },
+        parsed,
+        current,
+      ),
+    ).toBeNull();
+  },
+);
+it("accepts twenty maximum-length references within the bounded command body", () => {
+  const command = libraryCollectionCommandSchema.parse({
+    requestId,
+    action: "add-many",
+    expectedRevision: 4,
+    productIds: Array.from(
+      { length: 20 },
+      (_, i) => `prd_${String(i).padStart(2, "0")}_${"a".repeat(153)}`,
+    ),
+  });
+  expect(Buffer.byteLength(JSON.stringify(command))).toBeLessThan(8192);
+  expect(Buffer.byteLength(JSON.stringify(command))).toBeGreaterThan(2048);
+});

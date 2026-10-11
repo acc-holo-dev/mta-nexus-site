@@ -1469,7 +1469,7 @@ export const libraryCollectionReceipts = pgTable("library_collection_receipts", 
   foreignKey({ columns: [table.collectionId, table.userId], foreignColumns: [libraryCollections.id, libraryCollections.userId] }).onDelete("cascade"),
   index("library_collection_receipts_history_idx").on(table.collectionId, table.createdAt.desc(), table.id.desc()),
   check("library_collection_receipts_digest_check", sql`${table.commandDigest} ~ '^[a-f0-9]{64}$'`),
-  check("library_collection_receipts_payload_check", sql`coalesce(jsonb_typeof(${table.command}) = 'object' AND octet_length(${table.command}::text) <= 2048 AND jsonb_typeof(${table.snapshot}) = 'object' AND octet_length(${table.snapshot}::text) <= 2048, false)`),
+  check("library_collection_receipts_payload_check", sql`coalesce(jsonb_typeof(${table.command}) = 'object' AND octet_length(${table.command}::text) <= 8192 AND jsonb_typeof(${table.snapshot}) = 'object' AND octet_length(${table.snapshot}::text) <= 2048, false)`),
   check("library_collection_receipts_time_check", sql`isfinite(${table.createdAt})`),
 ]);
 

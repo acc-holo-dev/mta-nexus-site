@@ -11,6 +11,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn() }),
   notFound: () => {
     throw new Error("NEXT_NOT_FOUND");
   },
@@ -196,4 +197,30 @@ it("rejects spoofed account controls before service invocation", async () => {
   const html = await screen("list", { userId: "other" });
   expect(html).toContain("Check the name");
   expect(state.page).not.toHaveBeenCalled();
+});
+it("offers bulk cleanup for lost-access references and no batch mutations in archives", async () => {
+  const html = await screen("detail");
+  expect(html).toContain("Remove selected references");
+  expect(html).toContain("Select up to 20 resources");
+  expect(html).toContain("prd_hidden</code>");
+  const result = await state.detail();
+  state.detail.mockResolvedValue({ ...result, collection: { ...collection, status: "archived" } });
+  expect(await screen("detail")).not.toContain("Remove selected references");
+});
+it("renders all recorded batch IDs without retrieving current private resource metadata", async () => {
+  const result = await state.history();
+  state.history.mockResolvedValue({
+    ...result,
+    items: [
+      {
+        ...result.items[0],
+        command: { action: "remove-many", productIds: ["prd_old_a", "prd_old_b"] },
+      },
+    ],
+  });
+  const html = await screen("history");
+  expect(html).toContain("Remove selected references");
+  expect(html).toContain("prd_old_a");
+  expect(html).toContain("prd_old_b");
+  expect(state.detail).not.toHaveBeenCalled();
 });

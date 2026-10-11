@@ -1,5 +1,13 @@
 # MTA NEXUS
 
+Collections now support atomic membership batches: select up to 20 acquired
+resources to add, or remove up to 20 private references together, including
+unavailable resources. RU/EN controls require explicit confirmation; uncertain
+results retry the same UUID and canonical command. Migration
+`0069_library_collection_batches` preserves old receipts and validates bounded
+batch IDs against final membership. Quotas, current access, collection revision,
+receipt and mandatory audit are checked within the same transaction.
+
 Collections now support reviewed version batches: choose up to 20 existing
 members, preview exact selected builds, then atomically pin them or follow
 latest releases across the library. Migration `0068_library_selection_batches`

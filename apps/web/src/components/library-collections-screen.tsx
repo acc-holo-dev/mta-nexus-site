@@ -14,6 +14,7 @@ import {
 } from "../lib/library-collections-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
+import { LibraryCollectionBatchForm } from "./library-collection-batch";
 import { LibraryCollectionCommandForm } from "./library-collection-command";
 import { ResourceDownloadButton } from "./resource-download-button";
 
@@ -157,6 +158,15 @@ export async function LibraryCollectionsScreen({
                 <p className="break-words">
                   {item.collection.name} · {c[item.collection.status]}
                 </p>
+                {"productIds" in item.command && (
+                  <ul className="space-y-1 text-sm">
+                    {item.command.productIds.map((id) => (
+                      <li key={id} className="break-all">
+                        {id}
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 {"productId" in item.command && (
                   <p className="break-all text-sm">{item.command.productId}</p>
                 )}
@@ -223,12 +233,16 @@ export async function LibraryCollectionsScreen({
             {c.archivedNote}
           </p>
         )}
-        {!adding && <Link href={`${collectionHref(id)}/versions`} className="text-accent underline">
-          {librarySelectionBatchesCopy(locale).title}
-        </Link>}
-        {!adding && <Link href={`${collectionHref(id)}/requirements`} className="text-accent underline">
-          {collectionRequirementsCopy(locale).title}
-        </Link>}
+        {!adding && (
+          <Link href={`${collectionHref(id)}/versions`} className="text-accent underline">
+            {librarySelectionBatchesCopy(locale).title}
+          </Link>
+        )}
+        {!adding && (
+          <Link href={`${collectionHref(id)}/requirements`} className="text-accent underline">
+            {collectionRequirementsCopy(locale).title}
+          </Link>
+        )}
         {!adding && (
           <section className="nexus-panel grid gap-5 p-5 sm:grid-cols-2">
             {collection.status === "active" ? (
@@ -296,6 +310,15 @@ export async function LibraryCollectionsScreen({
           {c.items}: {result.total} · {c.ready}: {result.ready}
         </p>
         {!result.items.length && <p>{c.emptyItems}</p>}
+        {collection.status === "active" && result.items.length > 0 && (
+          <LibraryCollectionBatchForm
+            key={`batch:${collection.revision}:${adding}:${result.page}:${result.q}`}
+            locale={locale}
+            collection={snapshot}
+            action={adding ? "add-many" : "remove-many"}
+            items={result.items.filter((item) => !adding || !item.inCollection)}
+          />
+        )}
         <ol className="grid gap-4 md:grid-cols-2">
           {result.items.map((item) => (
             <li key={item.productId} className="nexus-panel space-y-3 p-5">

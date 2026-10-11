@@ -2763,3 +2763,33 @@ reported missing `fast-check` dependency errors and the missing `isSigned`
 delivery fixture. No provider, payment, license, dependency or Actions workflow
 changed. Focused checks use the previously documented scratch Vitest config
 because the installed environment also lacks `@swc/core`.
+
+### Atomic collection membership batches — 2026-10-12
+
+Collection detail/candidate screens now support explicit RU/EN batch confirmation
+for up to twenty references on the current page. Commands normalize IDs before
+hashing; duplicates, injected scope and oversized arrays are rejected. Owner locks,
+optimistic revisions, collection/history quotas and immutable UUID receipts reuse
+the existing command protocol. Adding locks all resources and effective grants in
+canonical order and rechecks their expiry against database time before any writes;
+missing or revoked access cancels the whole batch. Already-present references count
+only once toward the 200-member quota. Bulk removal works after access loss or
+resource deletion. Membership, one successor revision, one receipt and the mandatory
+audit commit together. Downloads and version preferences retain their existing rules.
+
+Migration `0069` expands bounded commands to 8192 bytes and replaces the receipt
+guard while retaining prior single-resource commands/receipts. It validates strict
+batch shape, unique 1..20 string IDs and the resulting membership for each ID. Client
+controls freeze the exact command after first submission, coalesce concurrent clicks
+and accept only a complete matching acknowledgement. Private history renders IDs
+without looking up current resource metadata. No new entitlement, license, balance,
+payment, installation or version selection is created.
+
+Focused verification passes 170 tests across thirteen files. Web TypeScript and
+changed-file Biome checks and Next compile pass. Root
+TypeScript retains pre-existing missing `fast-check` declarations and the old missing
+`isSigned` delivery fixture. Five additional PostgreSQL fixtures cover concurrent
+canonical retries, revoked access, mandatory-audit rollback, stale cleanup/archived
+replay and malformed receipt guards. Those fixtures and live migration/locking are
+unrun here without disposable PostgreSQL; browser interaction and pinned Node 26
+validation remain outstanding. GitHub Actions are neither run nor inspected.
