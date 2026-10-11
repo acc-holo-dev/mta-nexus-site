@@ -1,22 +1,23 @@
 "use client";
-import { useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@nexus/ui";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { type FormEvent, useRef, useState } from "react";
+import { authorPublicationDeskCopy } from "../lib/author-publication-desk-copy";
 import type { Locale } from "../lib/i18n";
-import { serverContentCopy, serverContentMutationError } from "../lib/server-content-copy";
-import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
-import { writerTypes, editorialTypes, contentFieldsSchema } from "../lib/user-platform-contract";
 import {
   organizationContentCopy,
   organizationContentMutationError,
 } from "../lib/organization-content-copy";
+import { serverContentCopy, serverContentMutationError } from "../lib/server-content-copy";
 import {
-  parseEditableContent,
-  platformRequest,
-  platformFieldClass,
   type EditableContent,
+  parseEditableContent,
+  platformFieldClass,
+  platformRequest,
 } from "../lib/user-platform-client";
+import { contentFieldsSchema, editorialTypes, writerTypes } from "../lib/user-platform-contract";
+import { getUserPlatformCopy, userPlatformError } from "../lib/user-platform-copy";
 
 export function AuthorContentForm({
   locale,
@@ -200,6 +201,15 @@ export function AuthorContentForm({
       </p>
       {saved && (
         <div className="flex flex-wrap items-center gap-4 text-sm">
+          {!server && !organization && (
+            <Link
+              prefetch={false}
+              href={`/workspace/content/${encodeURIComponent(saved.id)}/history`}
+              className="inline-flex min-h-11 items-center text-accent underline"
+            >
+              {authorPublicationDeskCopy(locale).history}
+            </Link>
+          )}
           <span className="text-secondary">
             {copy.status}: {copy[saved.status]}
           </span>

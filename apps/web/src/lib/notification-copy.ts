@@ -37,7 +37,7 @@ export function formatNotification(
     };
   const publication =
     notification.title === "Publication activity" &&
-    /^Publication ([a-zA-Z0-9_-]{1,128}): (created|edited|published|archived)\.$/u.exec(
+    /^Publication ([a-zA-Z0-9_-]{1,128}): (created|edited|published|archived|restored)\.$/u.exec(
       notification.message,
     );
   if (publication) {
@@ -48,12 +48,14 @@ export function formatNotification(
             edited: "Публикация изменена. Статьи и новости возвращены на модерацию.",
             published: "Модератор опубликовал материал.",
             archived: "Публикация перенесена в архив.",
+            restored: "Публикация восстановлена в черновик и остаётся непубличной.",
           }
         : {
             created: "A publication was created in your context.",
             edited: "The publication changed. Editorial content returned to moderation.",
             published: "A moderator published the material.",
             archived: "The publication was archived.",
+            restored: "The publication was restored to a draft and remains private.",
           };
     return {
       title: locale === "ru" ? "Обновление публикации" : "Publication activity",

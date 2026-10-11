@@ -1,9 +1,10 @@
+import type { User } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { PublicationFeed } from "../../../components/publication-feed";
-import { publicationFeedView } from "../../../lib/publication-feed-view";
-import { publicationCopy } from "../../../lib/publication-feed-copy";
 import { getRequestLocale } from "../../../lib/i18n-server";
+import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { publicationFeedView } from "../../../lib/publication-feed-view";
 import { authService } from "../../../lib/services/auth-service";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
@@ -21,7 +22,25 @@ export default async function FollowingFeedPage({
 } = {}) {
   const locale = await getRequestLocale(),
     copy = publicationCopy(locale);
-  const actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  let actor: User | null;
+  try {
+    actor = await authService.getSession((await cookies()).get("nexus_session")?.value);
+  } catch {
+    return (
+      <div className="nexus-panel space-y-4 p-8">
+        <h1 className="text-2xl font-bold text-primary">{copy.title}</h1>
+        <p role="alert" className="text-sm text-danger">
+          {copy.error}
+        </p>
+        <Link
+          href="/workspace/feed"
+          className="inline-flex min-h-11 items-center text-accent underline"
+        >
+          {copy.retry}
+        </Link>
+      </div>
+    );
+  }
   if (!actor)
     return (
       <div className="nexus-panel space-y-4 p-8">

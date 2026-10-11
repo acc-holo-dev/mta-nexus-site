@@ -1,17 +1,19 @@
 "use client";
-import Link from "next/link";
 import { Avatar } from "@nexus/ui";
 import { ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import type { Locale } from "../lib/i18n";
+import { confirmsFollowMutation } from "../lib/follow-confirmation";
 import {
   FOLLOW_TYPES,
-  followPageSchema,
   type FollowPage,
   type FollowTargetType,
+  followPageSchema,
 } from "../lib/follow-workspace-contract";
 import { followCopy, followError } from "../lib/follow-workspace-copy";
-import { confirmsFollowMutation } from "../lib/follow-confirmation";
+import type { Locale } from "../lib/i18n";
+import { publicationHref } from "../lib/publication-feed-contract";
+import { publicationCopy } from "../lib/publication-feed-copy";
 import { platformRequest } from "../lib/user-platform-client";
 
 export function FollowWorkspace({
@@ -227,6 +229,21 @@ export function FollowWorkspace({
               </div>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3">
+              {item.href && item.targetType !== "product" && (
+                <Link
+                  prefetch={false}
+                  href={publicationHref("/workspace/feed", {
+                    query: "",
+                    type: undefined,
+                    source: item.targetType,
+                    target: item.targetId,
+                    cursor: undefined,
+                  })}
+                  className="inline-flex min-h-11 items-center text-xs text-accent underline"
+                >
+                  {publicationCopy(locale).targetFeed}
+                </Link>
+              )}
               <time dateTime={item.createdAt} className="text-xs text-faint">
                 {copy.savedAt}:{" "}
                 {new Date(item.createdAt).toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US", {

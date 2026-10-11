@@ -36,8 +36,9 @@ const en = {
     "Articles and news enter moderator review. Editing published editorial content returns it to review. Questions and discussions publish immediately.",
   archive: "Archive publication",
   archiveConfirm:
-    "Archive this publication? It will no longer be publicly available. Restoring it requires a moderator.",
-  archivedNote: "Archived publications are read-only. Contact support to request restoration.",
+    "Archive this publication? It will no longer be publicly available. Restoration conditions are shown in your author status history.",
+  archivedNote:
+    "Archived publications are read-only. Open the author status history for restoration conditions or contact support.",
   publicView: "Open public page",
   back: "Back to publications",
   empty: "No matching publications yet.",
@@ -109,9 +110,9 @@ const ru: typeof en = {
     "Статьи и новости проходят проверку модератором. Правка опубликованного редакционного материала возвращает его на проверку. Вопросы и обсуждения публикуются сразу.",
   archive: "В архив",
   archiveConfirm:
-    "Архивировать публикацию? Она исчезнет из публичного доступа. Восстановление возможно через модератора.",
+    "Архивировать публикацию? Она исчезнет из публичного доступа. Условия восстановления доступны в истории статусов кабинета автора.",
   archivedNote:
-    "Архивные публикации доступны только для чтения. Для восстановления обратитесь в поддержку.",
+    "Архивные публикации доступны только для чтения. Откройте историю статусов для условий восстановления или обратитесь в поддержку.",
   publicView: "Открыть публичную страницу",
   back: "К моим публикациям",
   empty: "Подходящих публикаций пока нет.",

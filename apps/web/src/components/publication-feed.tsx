@@ -1,17 +1,17 @@
-import Link from "next/link";
 import { Avatar } from "@nexus/ui";
+import Link from "next/link";
+import type { Locale } from "../lib/i18n";
 import {
-  publicationHref,
-  SERVER_PUBLICATION_TYPES,
-  PUBLICATION_TYPES,
   PUBLICATION_SOURCES,
+  PUBLICATION_TYPES,
   type PublicationPage,
   type PublicationQuery,
+  publicationHref,
+  SERVER_PUBLICATION_TYPES,
 } from "../lib/publication-feed-contract";
 import { publicationCopy, publicationError } from "../lib/publication-feed-copy";
-import { getUserPlatformCopy } from "../lib/user-platform-copy";
 import { platformFieldClass } from "../lib/user-platform-client";
-import type { Locale } from "../lib/i18n";
+import { getUserPlatformCopy } from "../lib/user-platform-copy";
 export function PublicationFeed({
   initial,
   filters,
@@ -39,7 +39,25 @@ export function PublicationFeed({
     type === "review" ? (locale === "ru" ? "Обзор" : "Review") : types[type];
   return (
     <div className="space-y-5">
+      {following && filters.target && (
+        <p className="nexus-panel flex flex-wrap items-center gap-3 p-4 text-sm text-muted">
+          <span>{copy.targetSelected}</span>
+          <Link
+            prefetch={false}
+            href={publicationHref(path, { ...filters, target: undefined, cursor: undefined })}
+            className="inline-flex min-h-11 items-center text-accent underline"
+          >
+            {copy.clearTarget}
+          </Link>
+        </p>
+      )}
       <form action={path} method="get" className="nexus-panel flex flex-wrap items-end gap-3 p-4">
+        {following && filters.target && (
+          <>
+            <input type="hidden" name="target" value={filters.target} />
+            <input type="hidden" name="source" value={filters.source} />
+          </>
+        )}
         <label className="min-w-48 flex-1 space-y-1 text-xs text-secondary">
           {copy.query}
           <input
@@ -62,7 +80,7 @@ export function PublicationFeed({
             ))}
           </select>
         </label>
-        {following && (
+        {following && !filters.target && (
           <label className="space-y-1 text-xs text-secondary">
             {copy.source}
             <select
@@ -194,11 +212,13 @@ export function PublicationFeed({
         {page && !page.items.length && (
           <div className="nexus-panel space-y-3 p-8 text-center text-sm text-muted">
             <p>
-              {filters.cursor
-                ? copy.emptyPage
-                : filters.query || filters.type || filters.source || filters.author || filters.tag
-                  ? copy.emptyFiltered
-                  : copy.empty}
+              {filters.target && !filters.cursor
+                ? copy.emptyTarget
+                : filters.cursor
+                  ? copy.emptyPage
+                  : filters.query || filters.type || filters.source || filters.author || filters.tag
+                    ? copy.emptyFiltered
+                    : copy.empty}
             </p>
             {following && (
               <>

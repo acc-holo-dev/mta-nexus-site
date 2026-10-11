@@ -2453,3 +2453,62 @@ Browser interaction and production query plans still need verification. Root
 checks retain the upstream `isSigned` fixture error in
 `tests/resource-deliveries.integration.test.ts:53` and unused
 `ResourceReleaseWorkerRepository` export; Agent B does not alter these contracts.
+
+### Private author publication desk, retained history and guarded restoration (Agent B)
+
+`/workspace/content` now searches an author's seven noncommercial publication
+types by literal title/URL/text/tag, exact tag, status and personal/organization/
+server context. GET `/api/workspace/content/desk` supplies twenty bounded summaries
+and bidirectional keyset navigation; the legacy content API remains compatible.
+Continuation binds account and normalized filters, retains microseconds, needs
+no anchor lookup and selects nearest newer rows before reversing display order.
+Pages show current state; editing can move a row to the latest changes.
+
+`/workspace/content/[id]/history` and its authenticated GET API expose only a
+whitelist of retained creation/edit/status events, bounded titles, timestamps
+and recognized statuses. Authorship is checked before reading audit history.
+Moderator identities, notes, IPs, raw details and unrelated audits stay private.
+This is status history, not historical copies of publication text.
+
+POST `/api/workspace/content/[id]/restore` locks the current authored content
+first, checks an exact observed archived revision and requires a retained
+`content.archived_by_author` audit with matching `restoreRevision`. Only new
+archives through the author action receive this proof. Legacy/team archives,
+later moderation archives and changed versions cannot be restored this way.
+Current organization/server rights are rechecked under existing shared locks.
+Restoration writes only draft status, clears public time and advances the
+version; body, slug, counters and replies remain. Audit and context-owner inbox
+notice are transactional; optional push retains existing savepoint isolation.
+The client confirms scope, coalesces repeated clicks, validates an exact advancing
+draft acknowledgement, refreshes history and requires reload after uncertainty.
+
+Saved people/organization/server follows link to `/workspace/feed?source=...&target=...`.
+Existing publication predicates recheck the signed-in user's exact current follow
+and public visibility on every request. Cursor context includes the selected
+target, filters/forms keep it, and an explicit link returns to all follows of
+that type. Unfollowed/hidden targets yield a safe empty state. Product targeting
+is unavailable; existing broad feed and commercial visibility rules are unchanged.
+RU/EN metadata/messages, noindex, accessible forms and loading/error/recovery
+states are included. Six real PostgreSQL fixtures prepare preservation,
+audit rollback, archive provenance, revoked rights, exact traversal and follow
+privacy; they remain unrun without PostgreSQL. Browser interaction and production
+plans still require verification. No table, migration, dependency or workflow is changed.
+
+After integration with eight newer main commits, 295 focused checks across
+twenty-one files and touched-file Biome pass. Next webpack compile mode passes;
+full production page generation was not run. The already-declared sharp 0.35.4
+dependency was installed locally for integration checks without changing its
+manifest or lockfile. Root TypeScript retains only the `isSigned` delivery
+fixture error. Knip reports three upstream commercial exports:
+`packageInspectionLimits`, `storageListSchema`, and
+`ResourceReleaseWorkerRepository`; none belong to this block.
+
+Agent A owns this nonunique index contract; retain the existing author index and
+verify large-author query plans before claiming scale results:
+
+```sql
+CREATE INDEX content_author_publication_updated_id_idx
+  ON content (author_id, updated_at DESC, id DESC)
+  WHERE type IN ('article','news','devlog','update','announcement','post','question')
+    AND status IN ('draft','published','archived');
+```

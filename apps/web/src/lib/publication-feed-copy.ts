@@ -1,6 +1,12 @@
 import type { Locale } from "./i18n";
 import { userPlatformError } from "./user-platform-copy";
+
 const en = {
+  targetFeed: "Publications from this follow",
+  targetSelected: "Showing one selected follow",
+  clearTarget: "Show all follows of this type",
+  emptyTarget:
+    "No public publications from this selected follow. It may be unavailable or no longer followed.",
   title: "Following feed",
   description: "Public publications from the people, teams, servers and resources you follow.",
   activity: "Publications",
@@ -41,6 +47,11 @@ const en = {
   invalid: "Invalid publication filters or page. Reload the feed.",
 };
 const ru: Record<keyof typeof en, string> = {
+  targetFeed: "Публикации этой подписки",
+  targetSelected: "Показана одна выбранная подписка",
+  clearTarget: "Показать все подписки этого типа",
+  emptyTarget:
+    "У выбранной подписки нет доступных публичных публикаций. Источник может быть недоступен или вы уже отписались от него.",
   title: "Лента подписок",
   description:
     "Публичные публикации авторов, команд, серверов и ресурсов, на которые вы подписаны.",

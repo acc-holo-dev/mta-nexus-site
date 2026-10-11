@@ -10,8 +10,8 @@ import {
   userProfilePreferences,
   users,
 } from "../schema";
-import { containsPattern } from "./search-pattern";
 import { trustedCleanScanCondition } from "./build-safety";
+import { containsPattern } from "./search-pattern";
 
 export type PublicationScope =
   | { kind: "following"; actorId: string }
@@ -24,6 +24,7 @@ type PublicationFilters = {
   source?: "user" | "organization" | "server" | "product";
   author?: string;
   tag?: string;
+  target?: string;
   cursor?: { createdAt: string; id: string; direction?: "older" | "newer" };
 };
 const publicTypes = [
@@ -94,6 +95,7 @@ class PublicationFeedRepository {
           and(
             eq(follows.followerId, scope.kind === "following" ? scope.actorId : ""),
             eq(follows.targetType, type),
+            filters.target ? eq(follows.targetId, filters.target) : undefined,
           ),
         );
     const sources = {

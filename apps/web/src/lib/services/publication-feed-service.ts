@@ -1,13 +1,14 @@
+import { createHash } from "node:crypto";
+import type { PublicationScope } from "@nexus/db";
 import { publicationFeedRepository } from "@nexus/db";
 import { AppError, NotFoundError } from "@nexus/domain";
-import { createHash } from "node:crypto";
 import { safeExternalWebUrl } from "@nexus/validation";
-import type { PublicationScope } from "@nexus/db";
 import {
-  SERVER_PUBLICATION_TYPES,
-  type PublicationQuery,
   type PublicationPage,
+  type PublicationQuery,
+  SERVER_PUBLICATION_TYPES,
 } from "../publication-feed-contract";
+
 class PublicationFeedService {
   async resolve(kind: "user" | "organization" | "server", handle: string) {
     if (
@@ -22,6 +23,13 @@ class PublicationFeedService {
     return profile;
   }
   async page(scope: PublicationScope, query: PublicationQuery): Promise<PublicationPage> {
+    if (
+      query.target &&
+      (scope.kind !== "following" ||
+        !["user", "organization", "server"].includes(query.source ?? "") ||
+        !/^[a-zA-Z0-9_-]{1,128}$/u.test(query.target))
+    )
+      throw new AppError("Invalid followed target", 400, "VALIDATION_ERROR");
     if (
       (scope.kind !== "following" && query.source) ||
       (scope.kind === "server" &&
@@ -40,6 +48,7 @@ class PublicationFeedService {
           query.source ?? "",
           query.author?.toLowerCase() ?? "",
           query.tag?.toLowerCase() ?? "",
+          ...(query.target ? [query.target] : []),
         ]),
       )
       .digest("hex");

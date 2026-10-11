@@ -4,17 +4,105 @@ import {
   organizationContentRepository,
   serverContentRepository,
 } from "@nexus/db";
-import { AppError, NotFoundError, ValidationError } from "@nexus/domain";
 import type { User } from "@nexus/domain";
+import { AppError, NotFoundError, ValidationError } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
 import {
+  type AuthorPublicationDeskQuery,
+  authorPublicationRestoreSchema,
+  type parseAuthorPublicationHistoryQuery,
+} from "../author-publication-desk-contract";
+import {
+  writerArchiveSchema,
   writerCreateSchema,
   writerUpdateSchema,
-  writerArchiveSchema,
 } from "../user-platform-contract";
 
 class AuthorContentService {
+  async desk(actor: User, filters: AuthorPublicationDeskQuery) {
+    const result = await authorContentRepository.desk(actor.id, filters);
+    return {
+      olderCursor: result.olderCursor,
+      newerCursor: result.newerCursor,
+      items: result.items.map((item) => ({
+        id: item.id,
+        slug: item.slug,
+        title: item.title,
+        type: item.type as Exclude<AuthorPublicationDeskQuery["type"], "all">,
+        status: item.status as "draft" | "published" | "archived",
+        excerpt: item.excerpt,
+        updatedAt: item.updatedAt,
+        commentCount: Math.max(0, item.commentCount),
+        source: item.source as "personal" | "organization" | "server",
+        recoverable: item.recoverable,
+        tags: item.tags,
+        organization:
+          item.organizationName && item.organizationSlug
+            ? {
+                name: item.organizationName,
+                href: `/organizations/${encodeURIComponent(item.organizationSlug)}`,
+              }
+            : null,
+        server:
+          item.serverName && item.serverSlug
+            ? { name: item.serverName, href: `/servers/${encodeURIComponent(item.serverSlug)}` }
+            : null,
+      })),
+    };
+  }
+  async history(
+    id: string,
+    actor: User,
+    filters: NonNullable<ReturnType<typeof parseAuthorPublicationHistoryQuery>>,
+  ) {
+    if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(id)) throw new NotFoundError("Publication");
+    const result = await authorContentRepository.history(id, actor.id, filters.cursor);
+    return {
+      item: {
+        id: result.item.id,
+        title: result.item.title,
+        status: result.item.status,
+        revision: result.item.revision,
+        recoverable: result.item.recoverable,
+      },
+      olderCursor: result.olderCursor,
+      events: result.events.map((event) => ({
+        id: event.id,
+        createdAt: event.createdAt,
+        from: event.from,
+        to: event.to,
+        kind: event.action.startsWith("content.created")
+          ? "created"
+          : event.action.startsWith("content.edited")
+            ? "edited"
+            : event.action === "content.restored_by_author"
+              ? "restored"
+              : event.action === "content.published"
+                ? "published"
+                : "archived",
+        actor: ["content.published", "content.archived"].includes(event.action)
+          ? "moderation"
+          : event.action.endsWith("_by_server") || event.action.endsWith("_by_organization")
+            ? "team"
+            : "author",
+      })),
+    };
+  }
+  async restore(id: string, input: unknown, actor: User) {
+    if (!/^[a-zA-Z0-9_-]{1,128}$/u.test(id)) throw new NotFoundError("Publication");
+    const parsed = authorPublicationRestoreSchema.safeParse(input);
+    if (!parsed.success) throw new AppError("Invalid archive revision", 400, "VALIDATION_ERROR");
+    return authorContentRepository.restore(id, actor.id, parsed.data.expectedRevision, {
+      id: generateId("aud"),
+      actorId: actor.id,
+      actorType: "user",
+      action: "content.restored_by_author",
+      targetId: id,
+      targetType: "content",
+    });
+  }
+
   async get(id: string, actor: User) {
     const item = await authorContentRepository.findAuthored(id, actor.id);
     if (!item) throw new NotFoundError("Content");

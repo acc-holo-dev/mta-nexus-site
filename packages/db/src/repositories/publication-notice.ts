@@ -1,17 +1,18 @@
 import { createHash } from "node:crypto";
-import { eq, inArray } from "drizzle-orm";
 import type { Content } from "@nexus/domain";
+import { eq, inArray } from "drizzle-orm";
 import type { db } from "../client";
 import { notificationPreferences, notifications, organizations, servers } from "../schema";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
+
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 /** Author and actual context owners receive status-only notices. At most three recipients. */
 export async function publicationNotice(
   tx: Transaction,
   item: Pick<Content, "id" | "authorId" | "organizationId" | "serverId">,
   actorId: string | undefined,
-  event: "created" | "edited" | "published" | "archived",
+  event: "created" | "edited" | "published" | "archived" | "restored",
   auditId: string,
 ) {
   if (item.authorId === actorId && !item.organizationId && !item.serverId) return;

@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -34,9 +35,11 @@ vi.mock("../packages/db/src/client", async () => {
   });
   return { db: proxy };
 });
+
+import { formatNotification } from "../apps/web/src/lib/notification-copy";
 import { db } from "../packages/db/src/client";
 import { publicationNotice } from "../packages/db/src/repositories/publication-notice";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
+
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const item = { id: "item", authorId: "author", organizationId: "org", serverId: undefined };
 const inserts = () => state.queries.filter((q) => q.sql.startsWith('insert into "notifications"'));
@@ -112,7 +115,7 @@ it("isolates push errors after the inbox write", async () => {
   expect(state.savepoints).toBe(1);
   warn.mockRestore();
 });
-it.each(["created", "edited", "published", "archived"])(
+it.each(["created", "edited", "published", "archived", "restored"])(
   "localizes template %s in RU and EN while leaving unrelated notices intact",
   (event) => {
     const copy = { approved: "", rejected: "", version: "", notes: "" },
@@ -126,3 +129,14 @@ it.each(["created", "edited", "published", "archived"])(
     });
   },
 );
+it("notifies the current context owner of an author's restore using only a private editor link and localized draft status", async () => {
+  state.rows = [[["owner"]], []];
+  await publicationNotice(db as unknown as Tx, item, "author", "restored", "restore-audit");
+  expect(inserts()).toHaveLength(1);
+  expect(inserts()[0].params).toContain("/workspace/organizations/org/content/item");
+  expect(inserts()[0].params).toContain("Publication item: restored.");
+  const notice = { title: "Publication activity", message: "Publication item: restored." },
+    copy = { approved: "", rejected: "", version: "", notes: "" };
+  expect(formatNotification(notice, copy, "en").message).toContain("remains private");
+  expect(formatNotification(notice, copy, "ru").message).toContain("остаётся непубличной");
+});

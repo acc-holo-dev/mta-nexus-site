@@ -29,7 +29,7 @@ export function parsePublicationQuery(params: URLSearchParams, following = true,
   if (
     [...params.keys()].some(
       (key) =>
-        !["q", "type", "source", "cursor", "author", "tag"].includes(key) ||
+        !["q", "type", "source", "cursor", "author", "tag", "target"].includes(key) ||
         params.getAll(key).length !== 1,
     )
   )
@@ -39,6 +39,14 @@ export function parsePublicationQuery(params: URLSearchParams, following = true,
     query = params.getAll("q");
   const author = params.get("author")?.trim() ?? "",
     tag = params.get("tag")?.trim() ?? "";
+  const target = params.get("target");
+  if (
+    target !== null &&
+    (!following ||
+      !["user", "organization", "server"].includes(source[0] ?? "") ||
+      !/^[a-zA-Z0-9_-]{1,128}$/u.test(target))
+  )
+    return null;
   if (
     (query[0]?.length ?? 0) > 100 ||
     (params.get("author")?.length ?? 0) > 128 ||
@@ -78,6 +86,7 @@ export function parsePublicationQuery(params: URLSearchParams, following = true,
     source: (source[0] || undefined) as (typeof PUBLICATION_SOURCES)[number] | undefined,
     ...(author ? { author } : {}),
     ...(tag ? { tag } : {}),
+    ...(target ? { target } : {}),
     cursor,
   };
 }
@@ -98,7 +107,7 @@ export function parsePublicationPageQuery(
 export function publicationHref(path: string, filters: PublicationQuery, cursor?: string | null) {
   const params = new URLSearchParams();
   if (filters.query) params.set("q", filters.query);
-  for (const key of ["type", "source", "author", "tag"] as const)
+  for (const key of ["type", "source", "author", "tag", "target"] as const)
     if (filters[key]) params.set(key, filters[key]);
   if (cursor) params.set("cursor", cursor);
   return params.size ? `${path}?${params}` : path;
