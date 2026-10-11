@@ -1,5 +1,21 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Independent draft copies — 2026-10-11
+
+Migration `0065` records immutable provenance for future free-resource copies.
+The transaction holds live source/publisher/actor grants, compares reviewed
+metadata, preserves author/organization and resets publication/trust/economics.
+Request retries return the original receipt only while both resources remain
+manageable. New targets require their own files, scanning and moderation.
+Source-wide locks bound creation to 50 receipts; target/receipt/two audits commit
+atomically. RU/EN forms, bounded 7/30/90/365-day history, private recorded details
+and JSON exports reuse authentication, rate limits and response confirmation.
+Five prepared PostgreSQL fixtures cover retry races, immutability, stale reviews,
+revoked organization grants, audit rollback and global slug conflicts; they remain
+unrun without a disposable database. Live migration/locking, browser interactions
+and Node 26 validation remain outstanding. This feature creates no payment,
+license, entitlement or subscription and does not copy artifact approval.
+
 ### Saved plan selection and version comparison — 2026-10-11
 
 Migration `0064` records future personal/organization plan reviews with immutable

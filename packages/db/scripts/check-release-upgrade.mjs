@@ -41,6 +41,7 @@ const evidence = {
   sellerSalesIndexesPresent: false,
   orderTermsSchemaPresent: false,
   planReviewsSchemaPresent: false,
+  resourceCopiesSchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: upgradePlan.baselineTag,
@@ -445,6 +446,11 @@ try {
   assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname='public' AND indexname='commercial_plan_reviews_account_idx'`).length,1);
   assert.equal(Number((await client`SELECT count(*) AS total FROM commercial_plan_reviews`)[0].total),0);
   evidence.planReviewsSchemaPresent = true;
+  assert.equal((await client`SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename='resource_draft_copies'`).length,1);
+  assert.equal((await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname='resource_draft_copy_guard'`).length,1);
+  assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname='public' AND indexname='resource_draft_copies_source_idx'`).length,1);
+  assert.equal(Number((await client`SELECT count(*) AS total FROM resource_draft_copies`)[0].total),0);
+  evidence.resourceCopiesSchemaPresent = true;
   const receiptColumns = await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);
   assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'resource_cart_receipt_user_time_idx'`).length, 1);

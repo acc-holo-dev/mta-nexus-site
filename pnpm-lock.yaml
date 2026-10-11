@@ -303,6 +303,9 @@ importers:
       '@nexus/security':
         specifier: workspace:*
         version: link:../security
+      '@nexus/validation':
+        specifier: workspace:*
+        version: link:../validation
       drizzle-orm:
         specifier: ^0.45.3
         version: 0.45.3(postgres@3.4.9)

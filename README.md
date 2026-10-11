@@ -1,5 +1,12 @@
 # MTA NEXUS
 
+Publishers can copy a managed free resource into an independent unreviewed draft
+with a new title/address and the same publisher. Description, tags, type and
+compatibility are copied; files, versions, approval and commercial rights are not.
+Migration `0065_resource_draft_copies` adds immutable creation receipts. Live grants,
+source review digests, bounded quotas and idempotent retries protect creation;
+RU/EN author screens offer private history and JSON exports.
+
 Publishers can now manage an uploaded resource gallery: up to eight static
 PNG/JPEG/WebP images, captions, ordering and a first-image cover. Canonical PNG
 conversion strips source metadata and has byte/pixel/concurrency limits; scanning

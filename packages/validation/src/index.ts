@@ -10,6 +10,7 @@ export * from "./commercial-plans";
 export * from "./resource-release-control";
 export * from "./resource-release-watches";
 import { mtaVersionSchema } from "./mta-version";
+import { resourceCompatibilitySchema } from "./resource-management";
 export * from "./mta-version";
 export * from "./resource-management";
 export * from "./resource-commerce";
@@ -333,6 +334,16 @@ export const editProductDetailsSchema = z.object({
   shortDescription: z.string().trim().max(250),
   description: z.string().trim().min(10).max(10_000),
   tags: z.array(z.string().trim().min(1).max(30)).max(20),
+}).strict();
+export const resourceCopyMetadataSchema = editProductDetailsSchema.omit({ title: true }).extend({
+  type: z.enum(PRODUCT_TYPES),
+  compatibility: resourceCompatibilitySchema.shape.compatibility,
+}).strict();
+export const resourceCopyCommandSchema = z.object({
+  requestId: z.string().uuid(),
+  reviewDigest: z.string().regex(/^[a-f0-9]{64}$/u),
+  title: editProductDetailsSchema.shape.title,
+  slug: z.string().trim().min(3).max(120).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u),
 }).strict();
 export * from "./resource-reviews";
 export * from "./resource-build-workspace";

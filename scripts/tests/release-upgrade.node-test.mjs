@@ -219,7 +219,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0064_plan_reviews");
+  assert.equal(plan.targetTag, "0065_resource_draft_copies");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -401,4 +401,18 @@ test("plan review upgrade records only future immutable selections without activ
   assert.match(migration, /FOR SHARE/u);
   assert.match(migration, /IS TRUE/u);
   assert.doesNotMatch(migration, /(?:INSERT INTO|UPDATE)\s+(?:payments|orders|licenses|entitlements|ledger_entries)\b/iu);
+});
+
+test("draft copy upgrade requires an unreviewed artifact-free target and preserves immutable receipts", () => {
+  const migration = readFileSync(new URL("0065_resource_draft_copies.sql", migrationsUrl), "utf8");
+  assert.match(migration, /UNIQUE\(actor_id,request_id\)/u);
+  assert.match(migration, /BEFORE INSERT OR UPDATE OR DELETE/u);
+  assert.match(migration, /NEW\.snapshot IS NOT NULL/u);
+  assert.match(migration, /target\.status<>'draft'/u);
+  assert.match(migration, /NOT target\.metadata_review_required/u);
+  assert.match(migration, /target\.organization_id IS DISTINCT FROM source\.organization_id/u);
+  assert.match(migration, /EXISTS\(SELECT 1 FROM builds/u);
+  assert.match(migration, /FOR SHARE/u);
+  assert.doesNotMatch(migration, /(?:INSERT INTO|UPDATE)\s+(?:payments|orders|licenses|entitlements|ledger_entries|products)\b/iu);
+  assert.match(readFileSync(script, "utf8"), /resourceCopiesSchemaPresent = true/u);
 });

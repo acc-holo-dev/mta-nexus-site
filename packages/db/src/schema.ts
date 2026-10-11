@@ -270,6 +270,22 @@ export const products = pgTable(
   ]
 );
 
+export const resourceDraftCopies = pgTable("resource_draft_copies", {
+  id: text("id").primaryKey(),
+  actorId: text("actor_id").notNull(),
+  requestId: uuid("request_id").notNull(),
+  sourceProductId: text("source_product_id").notNull(),
+  targetProductId: text("target_product_id").notNull().unique(),
+  commandDigest: text("command_digest").notNull(),
+  snapshot: jsonb("snapshot").$type<unknown>().notNull().default(sql`NULL`),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique("resource_draft_copies_actor_id_request_id_key").on(table.actorId, table.requestId),
+  index("resource_draft_copies_source_idx").on(table.sourceProductId, table.createdAt.desc(), table.id.desc()),
+  check("resource_draft_copies_command_digest_check", sql`${table.commandDigest} ~ '^[a-f0-9]{64}$'`),
+  check("resource_draft_copies_check", sql`${table.sourceProductId} <> ${table.targetProductId}`),
+]);
+
 // Only canonical PNG images are stored here; the first ordered image is the cover.
 export const resourceMedia = pgTable("resource_media", {
   id: text("id").primaryKey(),
