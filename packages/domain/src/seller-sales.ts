@@ -9,6 +9,7 @@ export const SELLER_SALES_EVIDENCE = [
 export type SellerSaleEvidence = (typeof SELLER_SALES_EVIDENCE)[number];
 export type SellerSalesQuery = {
   page: number;
+  attribution?: "portfolio" | "recorded";
   days: "all" | 7 | 30 | 90 | 365;
   status: "completed" | "refunded" | "all";
   evidence: "all" | SellerSaleEvidence;
@@ -26,6 +27,8 @@ export type SellerSale = {
   currency: string;
   createdAt: Date;
   evidence: SellerSaleEvidence;
+  inCurrentPortfolio?: boolean;
+  titleSource?: "current" | "recorded";
 };
 export type SellerSalesTotal = {
   currency: string;

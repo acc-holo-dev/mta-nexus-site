@@ -38,7 +38,7 @@ export function SellerSalesReportView({
         </p>
       </header>
       <p role="note" className="rounded-lg border border-base p-4 text-sm text-secondary">
-        {c.notice}
+        {query.attribution === "recorded" ? c.recordedNotice : c.notice}
       </p>
       <p role="note" className="text-sm text-secondary">
         {c.paymentNotice}
@@ -54,6 +54,17 @@ export function SellerSalesReportView({
         method="get"
         className="nexus-panel grid gap-4 p-5 sm:grid-cols-3"
       >
+        <label className="space-y-1 text-sm">
+          <span>{c.attribution}</span>
+          <select
+            name="attribution"
+            defaultValue={query.attribution ?? "portfolio"}
+            className="block w-full rounded border border-base bg-surface p-2"
+          >
+            <option value="portfolio">{c.portfolio}</option>
+            <option value="recorded">{c.recorded}</option>
+          </select>
+        </label>
         {query.organizationId ? (
           <input type="hidden" name="organizationId" value={query.organizationId} />
         ) : null}
@@ -136,6 +147,7 @@ export function SellerSalesReportView({
               status: "completed",
               evidence: "all",
               organizationId: query.organizationId,
+              attribution: query.attribution,
             })}
             className="text-sm text-accent underline"
           >
@@ -200,7 +212,7 @@ export function SellerSalesReportView({
                 {c.statuses[sale.status]} · {c.evidence[sale.evidence]}
               </p>
               <Link
-                href={sellerSaleUrl(sale.id, query.organizationId)}
+                href={sellerSaleUrl(sale.id, query.organizationId, query.attribution)}
                 className="text-sm text-accent underline"
               >
                 {c.details}

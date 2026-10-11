@@ -1,5 +1,10 @@
 const copies = {
   en: {
+    attribution: "Seller attribution",
+    portfolio: "Current portfolio",
+    recorded: "Seller recorded with the line",
+    recordedNotice:
+      "This view uses the seller and resource title recorded when each order line was inserted. Current ownership does not move these lines between sellers. Earlier lines without snapshots are excluded. This is not provider settlement evidence.",
     title: "Sales report",
     detail: "Sale line",
     back: "Back to sales",
@@ -59,6 +64,11 @@ const copies = {
     },
   },
   ru: {
+    attribution: "Принадлежность продажи",
+    portfolio: "Текущие ресурсы",
+    recorded: "Продавец при записи строки",
+    recordedNotice:
+      "Этот режим использует продавца и название при записи строки заказа. Изменение текущего владельца не переносит строки между продавцами. Старые строки без снимков исключены. Это не подтверждение расчётов внешнего провайдера.",
     title: "Отчёт о продажах",
     detail: "Строка продажи",
     back: "К продажам",

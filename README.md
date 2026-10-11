@@ -43,8 +43,20 @@ payment-record filters. Owners and current organization admins can inspect scope
 line details, per-currency totals, UTC periods and displayed-page CSV. Payment
 attempts never multiply line values; unknown currencies are not summed. Labels
 describe database evidence, not external provider verification or available funds.
-Historical seller attribution was not recorded and is not inferred. Migration
+Earlier seller attribution was not recorded and is not inferred. Migration
 `0062_seller_sales_indexes` adds two lookup indexes without rewriting old orders.
+
+Migration `0063_order_terms` freezes new order-line product titles, seller identity,
+line prices and declared license model at insertion. Stored 10% commission and
+seven-day hold values describe the baseline, not applied fees or available funds.
+Buyer order details and admin reconciliation link to private RU/EN terms reports
+with integrity checks, twenty-line pages and bounded JSON exports. Legacy terms
+remain unknown; snapshots do not confirm payment or grant download/license rights.
+Pending-order creation validates locked catalog prices and safe releases, records
+an atomic audit, and permits only exact retries of the same pending request.
+Seller reports can select recorded seller attribution, retaining frozen titles
+after catalog ownership changes; earlier lines without snapshots are excluded.
+Paid checkout remains closed. Live PostgreSQL migration/race checks remain required.
 
 
 Migration `0058` adds reviewed free-cart receipts. In `/workspace/cart`, inspect

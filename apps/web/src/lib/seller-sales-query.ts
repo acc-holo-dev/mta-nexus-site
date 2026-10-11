@@ -8,9 +8,16 @@ export function sellerSalesId(value: string) {
 export function sellerSalesQuery(params: URLSearchParams): SellerSalesQuery {
   for (const key of params.keys())
     if (
-      !["page", "days", "status", "evidence", "currency", "organizationId", "productId"].includes(
-        key,
-      ) ||
+      ![
+        "page",
+        "days",
+        "status",
+        "evidence",
+        "currency",
+        "organizationId",
+        "productId",
+        "attribution",
+      ].includes(key) ||
       params.getAll(key).length !== 1
     )
       throw invalid();
@@ -19,18 +26,22 @@ export function sellerSalesQuery(params: URLSearchParams): SellerSalesQuery {
     status = params.get("status") ?? "completed",
     evidence = params.get("evidence") ?? "all";
   if (
+    page.trim() !== page ||
     !/^[1-9][0-9]{0,3}$/u.test(page) ||
     !["all", "7", "30", "90", "365"].includes(days) ||
     !["all", "completed", "refunded"].includes(status) ||
     !["all", ...SELLER_SALES_EVIDENCE].includes(evidence)
   )
     throw invalid();
+  const attribution = params.get("attribution");
+  if (attribution !== null && !["portfolio", "recorded"].includes(attribution)) throw invalid();
   const currency = params.get("currency"),
     organizationId = params.get("organizationId"),
     productId = params.get("productId");
   if (currency !== null && !["USD", "EUR", "RUB"].includes(currency)) throw invalid();
   return {
     page: Number(page),
+    ...(attribution ? { attribution: attribution as SellerSalesQuery["attribution"] } : {}),
     days: days === "all" ? "all" : (Number(days) as SellerSalesQuery["days"]),
     status: status as SellerSalesQuery["status"],
     evidence: evidence as SellerSalesQuery["evidence"],
@@ -59,11 +70,32 @@ export function sellerSalesUrl(query: SellerSalesQuery, page = query.page, scope
     status: query.status,
     evidence: query.evidence,
   });
-  for (const key of ["currency", "organizationId", "productId"] as const)
+  for (const key of ["currency", "organizationId", "productId", "attribution"] as const)
     if (query[key]) params.set(key, query[key]);
   if (scopePage !== undefined) params.set("scopePage", String(scopePage));
   return `/workspace/sales/report?${params}`;
 }
-export function sellerSaleUrl(id: string, organizationId?: string) {
-  return `/workspace/sales/report/${encodeURIComponent(id)}${organizationId ? `?${new URLSearchParams({ organizationId })}` : ""}`;
+export function sellerSaleUrl(
+  id: string,
+  organizationId?: string,
+  attribution?: "portfolio" | "recorded",
+) {
+  const params = new URLSearchParams({
+    ...(organizationId ? { organizationId } : {}),
+    ...(attribution ? { attribution } : {}),
+  });
+  return `/workspace/sales/report/${encodeURIComponent(id)}${params.size ? `?${params}` : ""}`;
+}
+
+export function sellerSalesDetailQuery(params: URLSearchParams) {
+  for (const key of params.keys())
+    if (!["organizationId", "attribution"].includes(key) || params.getAll(key).length !== 1)
+      throw invalid();
+  const organizationId = params.get("organizationId"),
+    attribution = params.get("attribution");
+  if (attribution !== null && !["portfolio", "recorded"].includes(attribution)) throw invalid();
+  return {
+    organizationId: organizationId === null ? undefined : sellerSalesId(organizationId),
+    attribution: attribution === null ? undefined : (attribution as "portfolio" | "recorded"),
+  };
 }

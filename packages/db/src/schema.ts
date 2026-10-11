@@ -640,9 +640,11 @@ export const orderItems = pgTable("order_items", {
     .references(() => products.id, { onDelete: "restrict" }),
   unitPrice: integer("unit_price").notNull(),
   currency: text("currency").notNull().default("USD"),
+  commercialSnapshot: jsonb("commercial_snapshot").$type<import("@nexus/domain").OrderLineTerms>(),
 }, table => [
   index("order_items_order_id_item_id_idx").on(table.orderId, table.id),
   index("order_items_product_order_id_idx").on(table.productId, table.orderId, table.id),
+  index("order_items_recorded_seller_idx").on(sql`(${table.commercialSnapshot}->'seller'->>'type')`, sql`(${table.commercialSnapshot}->'seller'->>'id')`, table.orderId, table.id).where(sql`${table.commercialSnapshot} IS NOT NULL`),
 ]);
 
 // Library preferences carry no access grant and never represent installation.

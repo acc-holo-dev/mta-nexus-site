@@ -1,9 +1,10 @@
-import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
-import { orders, orderItems, products, builds, entitlements, licenses } from "../schema";
-import type { Order, OrderItem } from "@nexus/domain";
+import { orders, orderItems, products, builds, entitlements, licenses, users, auditEvents } from "../schema";
+import { AppError, readOrderLineTerms, validatePendingOrder, type Order, type OrderItem } from "@nexus/domain";
+import { createHash } from "node:crypto";
 import { historyPageBounds } from "./history-pagination";
-import { trustedCleanScanCondition } from "./build-safety";
+import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
 
 export class OrderRepository {
   /** Buyer-scoped receipt: historical line prices and current access are separate. */
@@ -147,6 +148,7 @@ export class OrderRepository {
   }
 
   async create(order: Omit<Order, "createdAt" | "updatedAt">): Promise<Order> {
+    const items = validatePendingOrder(order);
     const values = {
       id: order.id,
       orderNumber: order.orderNumber,
@@ -158,9 +160,131 @@ export class OrderRepository {
       updatedAt: new Date(),
     };
 
-    await db.transaction(async (tx) => {
+    const committed = await db.transaction(async (tx) => {
+      await tx.execute(sql`set local lock_timeout = '5s'`);
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`order-create:${order.id}`}))`);
+      const [existing] = await tx
+        .select({
+          id: orders.id,
+          orderNumber: orders.orderNumber,
+          buyerId: orders.buyerId,
+          status: orders.status,
+          totalAmount: orders.totalAmount,
+          currency: orders.currency,
+          createdAt: orders.createdAt,
+          updatedAt: orders.updatedAt,
+        })
+        .from(orders)
+        .where(eq(orders.id, order.id))
+        .limit(1)
+        .for("no key update");
+      if (existing) {
+        if (
+          existing.buyerId !== order.buyerId ||
+          existing.orderNumber !== order.orderNumber ||
+          existing.currency !== order.currency ||
+          existing.totalAmount !== order.totalAmount
+        )
+          throw new AppError("Order request changed", 409, "ORDER_REQUEST_CONFLICT");
+        if (existing.status !== "pending")
+          throw new AppError("Order state changed", 409, "ORDER_STATE_CHANGED");
+        const [buyer] = await tx
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.id, order.buyerId))
+          .limit(1)
+          .for("share");
+        if (!buyer) throw new AppError("Buyer unavailable", 404, "NOT_FOUND");
+        const previous = await tx
+          .select({
+            id: orderItems.id,
+            productId: orderItems.productId,
+            unitPrice: orderItems.unitPrice,
+            currency: orderItems.currency,
+            snapshot: orderItems.commercialSnapshot,
+          })
+          .from(orderItems)
+          .where(eq(orderItems.orderId, order.id))
+          .orderBy(asc(orderItems.productId));
+        if (
+          previous.length !== items.length ||
+          previous.some(
+            (line) =>
+              !items.some(
+                (item) =>
+                  item.id === line.id &&
+                  item.productId === line.productId &&
+                  item.unitPrice === line.unitPrice &&
+                  item.currency === line.currency,
+              ),
+          )
+        )
+          throw new AppError("Order request changed", 409, "ORDER_REQUEST_CONFLICT");
+        if (
+          previous.some((line) => {
+            const terms = readOrderLineTerms(line.snapshot);
+            return (
+              !terms ||
+              terms.product.id !== line.productId ||
+              terms.line.unitPrice !== line.unitPrice ||
+              terms.line.currency !== line.currency
+            );
+          })
+        )
+          throw new AppError("Legacy order terms are unknown", 409, "ORDER_TERMS_UNKNOWN");
+        return existing;
+      }
+      const resources = await tx
+        .select({
+          id: products.id,
+          status: products.status,
+          price: products.price,
+          currency: products.currency,
+          licenseModel: products.licenseModel,
+        })
+        .from(products)
+        .where(
+          inArray(
+            products.id,
+            items.map((item) => item.productId),
+          ),
+        )
+        .orderBy(asc(products.id))
+        .for("share");
+      if (
+        resources.length !== items.length ||
+        resources.some((resource) => {
+          const item = items.find((line) => line.productId === resource.id);
+          return (
+            !item ||
+            resource.status !== "published" ||
+            resource.price !== item.unitPrice ||
+            resource.currency !== item.currency ||
+            (resource.price > 0 && resource.licenseModel !== "single_server")
+          );
+        })
+      )
+        throw new AppError("Catalog terms changed", 409, "ORDER_CATALOG_CHANGED");
+      const [buyer] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, order.buyerId))
+        .limit(1)
+        .for("share");
+      if (!buyer) throw new AppError("Buyer unavailable", 404, "NOT_FOUND");
+      for (const item of items) {
+        const [safe] = await tx
+          .select({ id: builds.id })
+          .from(builds)
+          .where(safePublishedBuildCondition(item.productId))
+          .orderBy(desc(builds.createdAt), desc(builds.id))
+          .limit(1)
+          .for("share");
+        if (!safe)
+          throw new AppError("Published release unavailable", 409, "ORDER_CATALOG_CHANGED");
+      }
       await tx.insert(orders).values(values);
-      for (const item of order.items) {
+      for (const item of items) {
         await tx.insert(orderItems).values({
           id: item.id,
           orderId: order.id,
@@ -169,16 +293,42 @@ export class OrderRepository {
           currency: item.currency,
         });
       }
+      await tx.insert(auditEvents).values({
+        id: `aud_order_${createHash("sha256").update(order.id).digest("hex")}`,
+        actorId: order.buyerId,
+        actorType: "user",
+        action: "order.terms_recorded",
+        targetId: order.id,
+        targetType: "order",
+        details: {
+          snapshotVersion: 1,
+          itemCount: items.length,
+          totalAmount: order.totalAmount,
+          currency: order.currency,
+        },
+      });
+      const [record] = await tx
+        .select({ createdAt: orders.createdAt, updatedAt: orders.updatedAt })
+        .from(orders)
+        .where(eq(orders.id, order.id))
+        .limit(1);
+      if (!record) throw new AppError("Order could not be recorded", 409, "ORDER_TERMS_CHANGED");
+      return record;
     });
 
-    return { ...order, createdAt: values.createdAt, updatedAt: values.updatedAt };
+    return { ...order, createdAt: committed.createdAt, updatedAt: committed.updatedAt };
   }
 
   async updateStatus(id: string, status: Order["status"]): Promise<void> {
-    await db
-      .update(orders)
-      .set({ status, updatedAt: new Date() })
-      .where(eq(orders.id, id));
+    // Use the audited unpaid cancellation operation; future financial transitions
+    // must be implemented by verified provider settlement, never this old primitive.
+    void id;
+    void status;
+    throw new AppError(
+      "An audited commercial operation is required",
+      409,
+      "ORDER_CONFIRMATION_REQUIRED",
+    );
   }
 
   /**

@@ -128,3 +128,15 @@ it("does not expose provider errors in generic failures", async () => {
   expect(res.status).toBe(500);
   expect(await res.json()).toEqual({ code: "RESOURCE_COMMERCE_FAILED" });
 });
+
+it("recorded seller selection is bounded and carried into line reads", async () => {
+  const response = await report(request("?attribution=recorded"));
+  expect(response.status).toBe(200);
+  expect(state.report).toHaveBeenCalledWith(
+    state.actor,
+    expect.objectContaining({ attribution: "recorded" }),
+  );
+  await detail(request("/itm_a?attribution=recorded&organizationId=org_a"), context);
+  expect(state.detail).toHaveBeenCalledWith(state.actor, "itm_a", "org_a", "recorded");
+  expect((await detail(request("/itm_a?attribution=paid"), context)).status).toBe(400);
+});

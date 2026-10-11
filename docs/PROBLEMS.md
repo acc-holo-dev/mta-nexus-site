@@ -1,5 +1,28 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Recorded order terms and historical seller attribution — 2026-10-11
+
+Migration `0063` records new line terms under stable product/order locks and
+protects snapshots, line economics and parent economics from later edits.
+Historical rows are deliberately not backfilled. Pending creation validates
+catalog prices, safe releases, currency and exact integer sums; an advisory lock
+serializes request retries, mismatched retries fail, and the creation audit is
+atomic. The obsolete unaudited status primitive refuses financial transitions.
+Buyer/admin RU/EN terms screens and bounded JSON exports show frozen titles,
+seller identity, declared license model and baseline 10%/seven-day hold alongside
+separate per-currency integrity observations. Live buyer/admin authority is
+checked; moderators receive no additional order access. Seller reports offer a
+recorded-at-insertion mode that excludes legacy lines and preserves original
+seller/title after catalog changes. Global dictionaries and Actions are untouched.
+
+Snapshots confirm neither payment nor applied fees, refund amounts, available
+balances, license issuance or file delivery. Paid provider settlement remains
+closed. Local TypeScript, focused domain/repository/API/SSR regressions and upgrade
+contracts cover these changes. Six prepared disposable PostgreSQL fixtures cover
+immutability, authority, stale repeatable-read economics writes, concurrent exact
+retries and audit rollback; they remain unrun here. Live migration/locking/query
+plans, browser interactions and Node 26 verification remain outstanding.
+
 
 ### Seller portfolio reports and organizational sales access — 2026-10-11
 
@@ -16,12 +39,12 @@ are projected. Private APIs use existing auth/rate limits and no-store; exports
 neutralize spreadsheet/control input. Migration `0062` adds two scoped indexes,
 with no historical backfill or financial, license, subscription or grant writes.
 
-This is a current-portfolio observation. Historical seller ownership/titles were
-not frozen on order lines; the report states that limitation explicitly. Capture,
+The default is a current-portfolio observation. Earlier seller ownership/titles
+were not frozen; migration `0063` adds a separate future-only recorded mode. Capture,
 refund and dispute labels describe database records, not external confirmation.
 Gross line values cannot prove refunded amounts, commission, net proceeds, holds
-or available payouts. Paid provider settlement and immutable seller-at-sale
-snapshots remain future work. Local TypeScript, focused API/SQL/SSR regressions,
+or available payouts. Paid provider settlement remains future work. Local
+TypeScript, focused API/SQL/SSR regressions,
 upgrade contracts and webpack compile checks cover these surfaces. Four prepared
 PostgreSQL fixtures require a disposable migrated database and remain unrun;
 live migration/query plans/locking, browser interactions and Node 26 verification

@@ -219,7 +219,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0062_seller_sales_indexes");
+  assert.equal(plan.targetTag, "0063_order_terms");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
@@ -376,4 +376,17 @@ test("sales upgrade adds portfolio indexes without rewriting historical commerce
   assert.doesNotMatch(migration, /UPDATE|DELETE|INSERT|ALTER TABLE/u);
   const rehearsal = readFileSync(script, "utf8");
   assert.match(rehearsal, /sellerSalesIndexesPresent = true/u);
+});
+
+
+test("order terms preserve legacy uncertainty and snapshot only new lines under stable parent locks", () => {
+  const migration = readFileSync(new URL("0063_order_terms.sql", migrationsUrl), "utf8");
+  assert.match(migration, /ADD COLUMN commercial_snapshot jsonb;/u);
+  assert.match(migration, /FOR NO KEY UPDATE/u);
+  assert.match(migration, /FOR SHARE/u);
+  assert.match(migration, /UPDATE orders SET updated_at/u);
+  assert.match(migration, /legacy terms cannot be backfilled/u);
+  assert.match(migration, /CREATE TRIGGER order_recorded_economics_guard/u);
+  assert.doesNotMatch(migration, /UPDATE order_items|UPDATE (payments|licenses|entitlements|ledger_entries)|INSERT INTO/u);
+  assert.match(readFileSync(script, "utf8"), /orderTermsSchemaPresent = true/u);
 });

@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import { formatFinancialMinor } from "../../../../../lib/financial-i18n";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import { sellerSalesCopy, sellerSalesTime } from "../../../../../lib/seller-sales-i18n";
-import { sellerSalesUrl } from "../../../../../lib/seller-sales-query";
+import { sellerSalesDetailQuery, sellerSalesUrl } from "../../../../../lib/seller-sales-query";
 import { authService } from "../../../../../lib/services/auth-service";
 import { sellerSalesService } from "../../../../../lib/services/seller-sales-service";
 export const dynamic = "force-dynamic";
@@ -38,13 +38,22 @@ export default async function SellerSalePage({
         </Link>
       </section>
     );
-  if (
-    Object.keys(query).some((key) => key !== "organizationId") ||
-    (query.organizationId !== undefined && typeof query.organizationId !== "string")
-  )
+  const values = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (Array.isArray(value)) notFound();
+    if (value !== undefined) values.set(key, value);
+  }
+  let selectors: ReturnType<typeof sellerSalesDetailQuery>;
+  try {
+    selectors = sellerSalesDetailQuery(values);
+  } catch {
     notFound();
-  const organizationId = query.organizationId as string | undefined;
-  const result = await sellerSalesService.detail(actor, id, organizationId).catch((error) => {
+  }
+  const { organizationId, attribution } = selectors;
+  const result = await (attribution
+    ? sellerSalesService.detail(actor, id, organizationId, attribution)
+    : sellerSalesService.detail(actor, id, organizationId)
+  ).catch((error) => {
     if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
     throw error;
   });
@@ -58,6 +67,7 @@ export default async function SellerSalePage({
           status: "all",
           evidence: "all",
           organizationId,
+          attribution,
         })}
         className="text-sm text-accent underline"
       >
@@ -67,7 +77,7 @@ export default async function SellerSalePage({
       <h2 className="break-words text-xl">{sale.productTitle}</h2>
       <p className="text-secondary">{scope.name ?? c.personal}</p>
       <p role="note" className="text-sm text-secondary">
-        {c.notice}
+        {attribution === "recorded" ? c.recordedNotice : c.notice}
       </p>
       <p role="note" className="text-sm text-secondary">
         {c.paymentNotice}
@@ -88,12 +98,14 @@ export default async function SellerSalePage({
           </div>
         ))}
       </dl>
-      <Link
-        href={`/workspace/resources/${encodeURIComponent(sale.productId)}`}
-        className="text-sm text-accent underline"
-      >
-        {c.manage}
-      </Link>
+      {sale.inCurrentPortfolio !== false ? (
+        <Link
+          href={`/workspace/resources/${encodeURIComponent(sale.productId)}`}
+          className="text-sm text-accent underline"
+        >
+          {c.manage}
+        </Link>
+      ) : null}
     </div>
   );
 }

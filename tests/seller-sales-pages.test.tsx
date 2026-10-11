@@ -172,3 +172,27 @@ it("detail refuses unknown, repeated and unavailable account selectors", async (
     Detail({ params: Promise.resolve({ id: "itm_other" }), searchParams: Promise.resolve({}) }),
   ).rejects.toThrow("NEXT_NOT_FOUND");
 });
+
+it("recorded attribution stays in exports/details and hides management for former owners", async () => {
+  const html = renderToStaticMarkup(
+    await Page({
+      searchParams: Promise.resolve({ attribution: "recorded", organizationId: "org_a" }),
+    }),
+  );
+  expect(html).toContain(sellerSalesCopy("en").recordedNotice);
+  expect(html).toContain("attribution=recorded");
+  const detail = await state.detail();
+  state.detail.mockResolvedValue({
+    ...detail,
+    sale: { ...detail.sale, inCurrentPortfolio: false, titleSource: "recorded" },
+  });
+  const line = renderToStaticMarkup(
+    await Detail({
+      params: Promise.resolve({ id: "itm_a" }),
+      searchParams: Promise.resolve({ organizationId: "org_a", attribution: "recorded" }),
+    }),
+  );
+  expect(state.detail).toHaveBeenCalledWith(state.actor, "itm_a", "org_a", "recorded");
+  expect(line).not.toContain("/workspace/resources/prd_a");
+  expect(line).toContain("attribution=recorded");
+});

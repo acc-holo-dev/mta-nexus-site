@@ -442,6 +442,13 @@
       "when": 1791744000000,
       "tag": "0062_seller_sales_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1791744300000,
+      "tag": "0063_order_terms",
+      "breakpoints": true
     }
   ]
 }

@@ -24,11 +24,18 @@ function portfolio(actorId: string, organizationId?: string) {
     ? sql`p.organization_id = ${organizationId}`
     : sql`p.author_id = ${actorId} AND p.organization_id IS NULL`;
 }
+function recordedSeller(actorId: string, organizationId?: string) {
+  return sql`i.commercial_snapshot IS NOT NULL AND i.commercial_snapshot->>'version' = '1'
+    AND i.commercial_snapshot->'seller'->>'type' = ${organizationId ? "organization" : "user"}
+    AND i.commercial_snapshot->'seller'->>'id' = ${organizationId ?? actorId}`;
+}
 /** Aggregate every payment attempt once per order; never multiply line values by attempts. */
 function source(actorId: string, query: SellerSalesQuery, observedAt: Date) {
   const { cutoff } = sellerSalesWindow(query.days, observedAt);
   return sql`WITH scoped AS (
-    SELECT i.id, i.product_id AS "productId", left(p.title,200) AS "productTitle",
+    SELECT i.id, i.product_id AS "productId", CASE WHEN ${query.attribution === "recorded"} THEN i.commercial_snapshot->'product'->>'title' ELSE left(p.title,200) END AS "productTitle",
+      coalesce((${portfolio(actorId, query.organizationId)}),false) AS "inCurrentPortfolio",
+      CASE WHEN ${query.attribution === "recorded"} THEN 'recorded' ELSE 'current' END AS "titleSource",
       left(o.order_number,128) AS "orderNumber",o.status,i.unit_price AS "unitPrice",
       left(i.currency,16) AS currency,o.created_at AS "createdAt",o.id AS "orderId",
       CASE
@@ -49,7 +56,7 @@ function source(actorId: string, query: SellerSalesQuery, observedAt: Date) {
       count(*) FILTER (WHERE status = 'disputed')::int AS disputes,
       coalesce(bool_or(amount <> o.total_amount OR currency <> o.currency),false) AS mismatch
       FROM ${payments} WHERE order_id = o.id) pay
-    WHERE ${portfolio(actorId, query.organizationId)} AND o.status IN ('completed','refunded')
+    WHERE ${query.attribution === "recorded" ? recordedSeller(actorId, query.organizationId) : portfolio(actorId, query.organizationId)} AND o.status IN ('completed','refunded')
       AND (${query.status} = 'all' OR o.status = ${query.status})
       AND (${cutoff}::timestamptz IS NULL OR o.created_at >= ${cutoff})
       AND o.created_at <= ${observedAt}
@@ -57,7 +64,7 @@ function source(actorId: string, query: SellerSalesQuery, observedAt: Date) {
       ${query.productId ? sql`AND p.id = ${query.productId}` : sql``}
   ), filtered AS (SELECT * FROM scoped WHERE ${query.evidence} = 'all' OR evidence = ${query.evidence})`;
 }
-const saleProjection = sql`id,"productId","productTitle","orderNumber",status,"unitPrice",currency,"createdAt",evidence`;
+const saleProjection = sql`id,"productId","productTitle","orderNumber",status,"unitPrice",currency,"createdAt",evidence,"inCurrentPortfolio","titleSource"`;
 const currencyGroup = sql`CASE WHEN currency IN ('USD','EUR','RUB') THEN currency ELSE 'OTHER' END`;
 type SaleRow = Omit<SellerSale, "createdAt"> & { createdAt: string | Date };
 function projectSale(row: SaleRow): SellerSale {
@@ -76,6 +83,8 @@ function projectSale(row: SaleRow): SellerSale {
     currency: row.currency,
     createdAt,
     evidence: row.evidence,
+    inCurrentPortfolio: row.inCurrentPortfolio,
+    titleSource: row.titleSource,
   };
 }
 export class SellerSalesRepository {
@@ -108,7 +117,9 @@ export class SellerSalesRepository {
         const scope = await lockFinancialAccountAuthority(tx, actorId, query.organizationId);
         const [product] = query.productId
           ? await tx.execute<{ id: string; title: string }>(
-              sql`SELECT p.id,left(p.title,200) AS title FROM ${products} p WHERE p.id = ${query.productId} AND ${portfolio(actorId, query.organizationId)}`,
+              query.attribution === "recorded"
+                ? sql`SELECT i.product_id AS id,i.commercial_snapshot->'product'->>'title' AS title FROM ${orderItems} i INNER JOIN ${orders} o ON o.id = i.order_id WHERE i.product_id = ${query.productId} AND ${recordedSeller(actorId, query.organizationId)} AND o.status IN ('completed','refunded') ORDER BY o.created_at DESC,i.id DESC LIMIT 1`
+                : sql`SELECT p.id,left(p.title,200) AS title FROM ${products} p WHERE p.id = ${query.productId} AND ${portfolio(actorId, query.organizationId)}`,
             )
           : [];
         if (query.productId && !product) throw new NotFoundError("Sales resource", query.productId);
@@ -148,7 +159,12 @@ export class SellerSalesRepository {
       { isolationLevel: "repeatable read" },
     );
   }
-  async detail(actorId: string, itemId: string, organizationId?: string) {
+  async detail(
+    actorId: string,
+    itemId: string,
+    organizationId?: string,
+    attribution?: "portfolio" | "recorded",
+  ) {
     return db.transaction(
       async (tx) => {
         await tx.execute(sql`set local statement_timeout = '10s'`);
@@ -157,7 +173,7 @@ export class SellerSalesRepository {
           observedAt = new Date();
         const cte = source(
           actorId,
-          { page: 1, days: "all", status: "all", evidence: "all", organizationId },
+          { page: 1, days: "all", status: "all", evidence: "all", organizationId, attribution },
           observedAt,
         );
         const [sale] = await tx.execute<SaleRow>(

@@ -1,0 +1,93 @@
+const copies = {
+  en: {
+    title: "Recorded order terms",
+    back: "Back to order",
+    lines: "Order lines",
+    legacy: "No recorded snapshot",
+    recorded: "Recorded line terms",
+    unrecognized: "Snapshot not recognized",
+    date: "Snapshot recorded (UTC)",
+    observed: "Report observed (UTC)",
+    product: "Resource",
+    seller: "Recorded seller",
+    user: "Personal seller",
+    organization: "Organization seller",
+    linePrice: "Recorded line value",
+    baseline: "Platform baseline at recording",
+    commission: "Base commission",
+    hold: "Initial hold policy",
+    license: "Catalog license declaration",
+    days: "days",
+    total: "Order total",
+    amountMismatch: "Line values do not reconcile to the order total",
+    currencyMismatch: "Line currency differs from order currency",
+    negativeValues: "Negative order or line values",
+    unsupportedCurrency: "Unsupported recorded currency",
+    clear: "No value/currency discrepancy detected",
+    stored: "Stored snapshots",
+    check: "Record consistency",
+    export: "Export this page (JSON)",
+    previous: "Previous",
+    next: "Next",
+    page: "Page",
+    of: "of",
+    signIn: "Sign in",
+    signInRequired: "Sign in to view order terms",
+    invalid: "Invalid report page.",
+    empty: "No order lines recorded.",
+    notice:
+      "Snapshots record the resource title, seller and line value when a line is inserted. They survive later resource changes. Older lines retain unknown terms; current catalog data cannot reconstruct them. Baseline commission and hold rules do not prove an applied fee, held funds, provider capture, refund or license issuance. License declarations do not grant a license or change its term. Paid checkout remains unavailable.",
+    consistencyNotice:
+      "Checks compare stored order totals and line values only. They do not verify payment, delivery, access or external settlement. No currency conversion is performed.",
+  },
+  ru: {
+    title: "Зафиксированные условия заказа",
+    back: "К заказу",
+    lines: "Строки заказа",
+    legacy: "Снимок условий не записан",
+    recorded: "Условия строки зафиксированы",
+    unrecognized: "Снимок не распознан",
+    date: "Условия записаны (UTC)",
+    observed: "Отчёт просмотрен (UTC)",
+    product: "Ресурс",
+    seller: "Зафиксированный продавец",
+    user: "Личный продавец",
+    organization: "Продавец-организация",
+    linePrice: "Стоимость строки по записи",
+    baseline: "Базовые правила платформы при записи",
+    commission: "Базовая комиссия",
+    hold: "Первоначальный срок удержания",
+    license: "Лицензионная модель в каталоге",
+    days: "дней",
+    total: "Сумма заказа",
+    amountMismatch: "Стоимость строк не согласована с суммой заказа",
+    currencyMismatch: "Валюта строки отличается от валюты заказа",
+    negativeValues: "Отрицательная сумма заказа или строки",
+    unsupportedCurrency: "Неподдерживаемая валюта в записи",
+    clear: "Расхождений сумм и валют не обнаружено",
+    stored: "Сохранённые снимки",
+    check: "Согласованность записей",
+    export: "Скачать эту страницу (JSON)",
+    previous: "Назад",
+    next: "Далее",
+    page: "Страница",
+    of: "из",
+    signIn: "Войти",
+    signInRequired: "Войдите для просмотра условий заказа",
+    invalid: "Некорректная страница отчёта.",
+    empty: "Строки заказа отсутствуют.",
+    notice:
+      "Снимок фиксирует название ресурса, продавца и стоимость при добавлении строки. Последующие изменения ресурса его не меняют. У старых строк условия неизвестны: текущий каталог не позволяет восстановить их. Базовая комиссия и срок удержания не подтверждают применённую комиссию, удержанные средства, списание, возврат или выдачу лицензии. Запись лицензионной модели не выдаёт лицензию и не меняет её срок. Платное оформление пока недоступно.",
+    consistencyNotice:
+      "Проверки сопоставляют только записанные суммы заказа и его строк. Они не подтверждают оплату, доставку, доступ или внешние расчёты. Пересчёта валют нет.",
+  },
+};
+export function orderTermsCopy(locale: string) {
+  return copies[locale === "ru" ? "ru" : "en"];
+}
+
+export function orderTermsLicenseLabel(locale: string, model: string) {
+  if (model === "single_server")
+    return locale === "ru" ? "Одна лицензия — один сервер" : "One license, one server";
+  return locale === "ru" ? "Историческая декларация модели" : "Historical model declaration";
+}

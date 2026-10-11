@@ -14,9 +14,9 @@ import {
 import { and, eq, inArray } from "drizzle-orm";
 import { expect, it } from "vitest";
 
-// Disposable PostgreSQL migrated through 0062. Synthetic payment records are fixtures only;
+// Disposable PostgreSQL migrated through 0063. Synthetic payment records are fixtures only;
 // they never exercise provider settlement, entitlements, licenses or storage.
-async function fixture() {
+async function fixture(unsupportedCurrency = false) {
   const key = randomBytes(8).toString("hex"),
     owner = `usr_sales_owner_${key}`,
     member = `usr_sales_member_${key}`,
@@ -35,15 +35,13 @@ async function fixture() {
   await db
     .insert(organizations)
     .values({ id: org, name: "Sales organization", slug: org, ownerId: owner });
-  await db
-    .insert(organizationMembers)
-    .values({
-      id: `om_sales_${key}`,
-      organizationId: org,
-      userId: member,
-      role: "admin",
-      permissions: ["manage_products"],
-    });
+  await db.insert(organizationMembers).values({
+    id: `om_sales_${key}`,
+    organizationId: org,
+    userId: member,
+    role: "admin",
+    permissions: ["manage_products"],
+  });
   const personal = `prd_sales_personal_${key}`,
     team = `prd_sales_org_${key}`,
     foreign = `prd_sales_other_${key}`,
@@ -53,17 +51,15 @@ async function fixture() {
     [team, other, org],
     [foreign, other, null],
   ] as const)
-    await db
-      .insert(products)
-      .values({
-        id,
-        authorId,
-        organizationId,
-        title: id,
-        description: "Sales fixture",
-        slug: id,
-        type: "script",
-      });
+    await db.insert(products).values({
+      id,
+      authorId,
+      organizationId,
+      title: id,
+      description: "Sales fixture",
+      slug: id,
+      type: "script",
+    });
   const free = `ord_sales_free_${key}`,
     paid = `ord_sales_paid_${key}`,
     foreignOrder = `ord_sales_other_${key}`,
@@ -105,7 +101,13 @@ async function fixture() {
   await db.insert(orderItems).values([
     { id: freeLine, orderId: free, productId: personal, unitPrice: 0, currency: "USD" },
     { id: teamLine, orderId: paid, productId: team, unitPrice: 100, currency: "USD" },
-    { id: personalLine, orderId: paid, productId: personal, unitPrice: 200, currency: "USD" },
+    {
+      id: personalLine,
+      orderId: paid,
+      productId: personal,
+      unitPrice: 200,
+      currency: unsupportedCurrency ? "XYZ" : "USD",
+    },
     { id: foreignLine, orderId: foreignOrder, productId: foreign, unitPrice: 500, currency: "RUB" },
   ]);
   await db.insert(payments).values([
@@ -210,16 +212,14 @@ it("revocation and product-management permissions do not grant financial access"
 it("filters duplicate captures for review without changing values or financial state", async () => {
   const f = await fixture();
   try {
-    await db
-      .insert(payments)
-      .values({
-        id: `pay_sales_${f.key}_duplicate`,
-        orderId: f.paid,
-        amount: 300,
-        currency: "USD",
-        provider: "fixture",
-        status: "completed",
-      });
+    await db.insert(payments).values({
+      id: `pay_sales_${f.key}_duplicate`,
+      orderId: f.paid,
+      amount: 300,
+      currency: "USD",
+      provider: "fixture",
+      status: "completed",
+    });
     const team = await repo.report(f.owner, {
       ...query,
       organizationId: f.org,
@@ -250,9 +250,8 @@ it("filters duplicate captures for review without changing values or financial s
   }
 });
 it("aggregates supported currencies separately and leaves unknown currency values unsummed", async () => {
-  const f = await fixture();
+  const f = await fixture(true);
   try {
-    await db.update(orderItems).set({ currency: "XYZ" }).where(eq(orderItems.id, f.personalLine));
     const report = await repo.report(f.owner, query);
     expect(report.totals).toContainEqual({
       currency: "OTHER",

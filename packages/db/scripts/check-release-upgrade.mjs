@@ -39,6 +39,7 @@ const evidence = {
   resourceMediaSchemaPresent: false,
   storageMaintenanceSchemaPresent: false,
   sellerSalesIndexesPresent: false,
+  orderTermsSchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: upgradePlan.baselineTag,
@@ -118,9 +119,14 @@ try {
     VALUES ('scc_11111111-1111-4111-8111-111111111111', 'upgrade-server', 'upgrade-user',
       ${"b".repeat(64)}, now() + interval '1 hour')`;
 
+  await client`INSERT INTO orders (id,order_number,buyer_id,status,total_amount,currency)
+    VALUES ('upgrade-order','UPGRADE-ORDER','upgrade-user','pending',0,'USD')`;
+  await client`INSERT INTO order_items (id,order_id,product_id,unit_price,currency)
+    VALUES ('upgrade-order-line','upgrade-order','upgrade-resource',0,'USD')`;
+
   const rows = async () => {
     const result = {};
-    for (const table of ["users", "products", "builds", "entitlements", "notifications", "servers", "server_claim_challenges", "audit_events", "comments"]) {
+    for (const table of ["users", "products", "builds", "entitlements", "notifications", "servers", "server_claim_challenges", "audit_events", "comments", "orders", "order_items"]) {
       // Remove only fields introduced after the frozen baseline so existing
       // legacy-row values remain byte-for-byte comparable across the upgrade.
       const rowJson = table === "products"
@@ -135,6 +141,8 @@ try {
             ? "to_jsonb(t) - 'endpoint_revision'"
             : table === "comments"
             ? "to_jsonb(t) - 'review_status' - 'review_revision' - 'review_updated_at' - 'review_access_source' - 'review_moderation_reason'"
+            : table === "order_items"
+            ? "to_jsonb(t) - 'commercial_snapshot'"
             : "to_jsonb(t)";
       result[table] = await client.unsafe(
         `SELECT ${rowJson} AS row FROM "${table}" t ORDER BY id`,
@@ -425,6 +433,12 @@ try {
   const salesIndexes = await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname IN ('products_sales_org_id_idx','order_items_product_order_id_idx')`;
   assert.equal(salesIndexes.length, 2);
   evidence.sellerSalesIndexesPresent = true;
+  assert.equal((await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'order_items' AND column_name = 'commercial_snapshot'`).length,1);
+  assert.equal((await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('order_line_terms_guard','order_recorded_economics_guard')`).length,2);
+  assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'order_items_recorded_seller_idx'`).length,1);
+  assert.equal((await client`SELECT commercial_snapshot FROM order_items WHERE id = 'upgrade-order-line'`)[0].commercial_snapshot,null);
+  await assert.rejects(client`UPDATE order_items SET commercial_snapshot = '{"version":1}'::jsonb WHERE id = 'upgrade-order-line'`);
+  evidence.orderTermsSchemaPresent = true;
   const receiptColumns = await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);
   assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'resource_cart_receipt_user_time_idx'`).length, 1);
