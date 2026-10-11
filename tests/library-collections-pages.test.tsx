@@ -8,6 +8,7 @@ const state = vi.hoisted(() => ({
   page: vi.fn(),
   detail: vi.fn(),
   history: vi.fn(),
+  copyPreview: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
@@ -31,7 +32,12 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 }));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
-  libraryCollectionsService: { page: state.page, detail: state.detail, history: state.history },
+  libraryCollectionsService: {
+    page: state.page,
+    detail: state.detail,
+    history: state.history,
+    copyPreview: state.copyPreview,
+  },
 }));
 vi.mock("../apps/web/src/components/library-collection-command", () => ({
   LibraryCollectionCommandForm: ({
@@ -67,8 +73,8 @@ const date = new Date("2026-10-11T00:00:00Z"),
   },
   bounds = { page: 1, totalPages: 2, total: 21, pageSize: 20, offset: 0 };
 const screen = async (
-  view: "list" | "detail" | "add" | "history" = "list",
-  values: Record<string, string> = {},
+  view: "list" | "detail" | "add" | "history" | "copy" = "list",
+  values: Record<string, string | undefined> = {},
 ) =>
   renderToStaticMarkup(
     await LibraryCollectionsScreen({
@@ -119,6 +125,11 @@ beforeEach(() => {
     candidates: false,
     itemLimit: 200,
   });
+  state.copyPreview.mockResolvedValue({
+    source: collection,
+    itemCount: 200,
+    sourceDigest: "a".repeat(64),
+  });
   state.history.mockResolvedValue({
     ...bounds,
     collection,
@@ -135,7 +146,7 @@ beforeEach(() => {
 });
 it("authenticates all views before repository access", async () => {
   state.actor = null;
-  for (const view of ["list", "detail", "add", "history"] as const)
+  for (const view of ["list", "detail", "add", "history", "copy"] as const)
     expect(await screen(view)).toContain("Sign in to manage");
   expect(state.page).not.toHaveBeenCalled();
   expect(state.detail).not.toHaveBeenCalled();
@@ -222,5 +233,50 @@ it("renders all recorded batch IDs without retrieving current private resource m
   expect(html).toContain("Remove selected references");
   expect(html).toContain("prd_old_a");
   expect(html).toContain("prd_old_b");
+  expect(state.detail).not.toHaveBeenCalled();
+});
+it.each(["active", "archived"] as const)(
+  "reviews every reference from an %s source without resource lookup",
+  async (status) => {
+    state.copyPreview.mockResolvedValue({
+      source: { ...collection, status },
+      itemCount: 200,
+      sourceDigest: "a".repeat(64),
+    });
+    const html = await screen("copy");
+    expect(html).toContain("Copy collection");
+    expect(html).toContain("Resources: 200");
+    expect(html).toContain('data-action="duplicate"');
+    expect(html).toContain("including unavailable resources");
+    expect(html).toContain("/api/library/collections/lcol_a/copy");
+    expect(state.copyPreview).toHaveBeenCalledWith(state.actor, "lcol_a");
+    expect(state.detail).not.toHaveBeenCalled();
+  },
+);
+it("rejects filters and paging on the full-copy review", async () => {
+  for (const values of [{ q: "partial" }, { page: "2" }, { userId: "usr_other" }])
+    expect(await screen("copy", values)).toContain("Check the name");
+  expect(state.copyPreview).not.toHaveBeenCalled();
+});
+it("shows immutable copy provenance without loading the current source or resource metadata", async () => {
+  const result = await state.history();
+  state.history.mockResolvedValue({
+    ...result,
+    items: [
+      {
+        ...result.items[0],
+        command: {
+          action: "duplicate",
+          sourceCollectionId: "lcol_origin",
+          expectedRevision: 7,
+          expectedItemCount: 200,
+        },
+      },
+    ],
+  });
+  const html = await screen("history");
+  expect(html).toContain("Source collection: lcol_origin");
+  expect(html).toContain("Resources: 200");
+  expect(state.copyPreview).not.toHaveBeenCalled();
   expect(state.detail).not.toHaveBeenCalled();
 });

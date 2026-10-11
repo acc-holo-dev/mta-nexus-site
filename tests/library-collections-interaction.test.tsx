@@ -39,7 +39,10 @@ function nodes(node: ReactNode): Element[] {
   return [e, ...nodes(e.props.children as ReactNode)];
 }
 const collection = { id: "lcol_a", name: "Core", status: "active" as const, revision: 4 };
-const render = (action: "create" | "archive" | "remove" = "remove") => {
+const render = (
+  action: "create" | "archive" | "remove" | "duplicate" = "remove",
+  preview = { source: collection, itemCount: 200, sourceDigest: "a".repeat(64) },
+) => {
   h.cursor = 0;
   return nodes(
     LibraryCollectionCommandForm({
@@ -47,6 +50,7 @@ const render = (action: "create" | "archive" | "remove" = "remove") => {
       action,
       ...(action === "create" ? {} : { collection }),
       productId: "prd_a",
+      ...(action === "duplicate" ? { copyPreview: preview } : {}),
     }),
   );
 };
@@ -124,4 +128,61 @@ it("prevents rapid double submission and never retries a confirmed command", asy
   await pending;
   await submit(render());
   expect(h.fetch).toHaveBeenCalledOnce();
+});
+it("confirms a full source copy and retries exactly before navigating to its new collection", async () => {
+  await submit(render("duplicate"));
+  expect(h.fetch).not.toHaveBeenCalled();
+  const checkbox = render("duplicate").find(
+    (n) => n.type === "input" && n.props.type === "checkbox",
+  );
+  if (!checkbox) throw new Error("Missing copy confirmation");
+  (checkbox.props.onChange as (e: unknown) => void)({ target: { checked: true } });
+  h.fetch.mockRejectedValueOnce(new Error("response lost"));
+  await submit(render("duplicate"));
+  expect(h.fetch.mock.calls[0]?.[0]).toBe("/api/library/collections");
+  const init = h.fetch.mock.calls[0]?.[1] as RequestInit,
+    command = JSON.parse(String(init.body));
+  expect(command).toMatchObject({
+    action: "duplicate",
+    name: "Core",
+    sourceCollectionId: collection.id,
+    expectedRevision: 4,
+    expectedItemCount: 200,
+    sourceDigest: "a".repeat(64),
+  });
+  expect(h.push).not.toHaveBeenCalled();
+  h.fetch.mockResolvedValueOnce(
+    success(command, { id: "lcol_copy", name: "Core", status: "active", revision: 1 }),
+  );
+  await submit(render("duplicate"));
+  expect(h.fetch.mock.calls[1]?.[1].body).toBe(init.body);
+  expect(h.push).toHaveBeenCalledWith("/workspace/library/collections/lcol_copy");
+  expect(h.refresh).toHaveBeenCalledOnce();
+});
+it("rejects a source/preview mismatch before a copy request", async () => {
+  const preview = {
+    source: { ...collection, id: "lcol_other" },
+    itemCount: 2,
+    sourceDigest: "a".repeat(64),
+  };
+  const checkbox = render("duplicate", preview).find(
+    (n) => n.type === "input" && n.props.type === "checkbox",
+  );
+  if (!checkbox) throw new Error("Missing confirmation");
+  (checkbox.props.onChange as (e: unknown) => void)({ target: { checked: true } });
+  await submit(render("duplicate", preview));
+  expect(h.fetch).not.toHaveBeenCalled();
+});
+it("does not navigate on a copy acknowledgement naming the source as its target", async () => {
+  const checkbox = render("duplicate").find(
+    (n) => n.type === "input" && n.props.type === "checkbox",
+  );
+  if (!checkbox) throw new Error("Missing confirmation");
+  (checkbox.props.onChange as (e: unknown) => void)({ target: { checked: true } });
+  h.fetch.mockImplementationOnce(async (_: string, init: RequestInit) =>
+    success(JSON.parse(String(init.body)), { ...collection, revision: 1 }),
+  );
+  await submit(render("duplicate"));
+  expect(h.push).not.toHaveBeenCalled();
+  expect(h.refresh).not.toHaveBeenCalled();
 });

@@ -46,6 +46,16 @@ export function confirmedCollectionCommand(
       next.revision === 1
       ? next.id
       : null;
+  if (expected.data.action === "duplicate")
+    return current &&
+      current.id === expected.data.sourceCollectionId &&
+      current.revision === expected.data.expectedRevision &&
+      next.id !== current.id &&
+      next.name === expected.data.name &&
+      next.status === "active" &&
+      next.revision === 1
+      ? next.id
+      : null;
   if (!current || next.id !== current.id || next.revision !== expected.data.expectedRevision + 1)
     return null;
   const name = expected.data.action === "rename" ? expected.data.name : current.name;

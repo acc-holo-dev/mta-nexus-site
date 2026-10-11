@@ -1,4 +1,4 @@
-import { LIBRARY_COLLECTION_BATCH_LIMIT } from "@nexus/domain";
+import { LIBRARY_COLLECTION_BATCH_LIMIT, LIBRARY_COLLECTION_ITEM_LIMIT } from "@nexus/domain";
 import { z } from "zod";
 
 const requestId = z
@@ -19,6 +19,17 @@ const productIds = z
   .transform((ids) => [...ids].sort());
 export const libraryCollectionCommandSchema = z.discriminatedUnion("action", [
   z.object({ requestId, action: z.literal("create"), name }).strict(),
+  z
+    .object({
+      requestId,
+      action: z.literal("duplicate"),
+      name,
+      sourceCollectionId: libraryCollectionIdSchema,
+      expectedRevision: z.number().int().min(1).max(2_147_483_647),
+      expectedItemCount: z.number().int().min(0).max(LIBRARY_COLLECTION_ITEM_LIMIT),
+      sourceDigest: z.string().regex(/^[a-f0-9]{64}$/u),
+    })
+    .strict(),
   z.object({ requestId, action: z.literal("rename"), name, expectedRevision }).strict(),
   z.object({ requestId, action: z.literal("archive"), expectedRevision }).strict(),
   z.object({ requestId, action: z.literal("restore"), expectedRevision }).strict(),

@@ -201,3 +201,81 @@ it("accepts twenty maximum-length references within the bounded command body", (
   expect(Buffer.byteLength(JSON.stringify(command))).toBeLessThan(8192);
   expect(Buffer.byteLength(JSON.stringify(command))).toBeGreaterThan(2048);
 });
+it("binds an independent copy to reviewed source, count, digest, UUID and new name", () => {
+  const command = {
+    requestId,
+    action: "duplicate" as const,
+    sourceCollectionId: current.id,
+    expectedRevision: 4,
+    expectedItemCount: 200,
+    sourceDigest: "a".repeat(64),
+    name: "Copy",
+  };
+  expect(libraryCollectionCommandSchema.parse(command)).toEqual(command);
+  for (const change of [
+    { sourceCollectionId: "../other" },
+    { sourceDigest: "a".repeat(63) },
+    { sourceDigest: "A".repeat(64) },
+    { expectedItemCount: 201 },
+    { expectedItemCount: -1 },
+    { expectedItemCount: 0.5 },
+    { expectedRevision: 0 },
+    { userId: "usr_other" },
+    { productIds: ["prd_a"] },
+  ])
+    expect(libraryCollectionCommandSchema.safeParse({ ...command, ...change }).success).toBe(false);
+  const body = {
+    replayed: true,
+    receipt: {
+      id: "lcr_copy",
+      requestId,
+      command,
+      collection: { id: "lcol_copy", name: "Copy", status: "active", revision: 1 },
+      createdAt: "2026-10-12T00:00:00.000Z",
+    },
+  };
+  expect(confirmedCollectionCommand(body, command, current)).toBe("lcol_copy");
+  for (const change of [
+    { id: current.id },
+    { revision: 2 },
+    { status: "archived" },
+    { name: "Other" },
+  ])
+    expect(
+      confirmedCollectionCommand(
+        {
+          ...body,
+          receipt: { ...body.receipt, collection: { ...body.receipt.collection, ...change } },
+        },
+        command,
+        current,
+      ),
+    ).toBeNull();
+  expect(confirmedCollectionCommand(body, command, { ...current, revision: 5 })).toBeNull();
+  expect(confirmedCollectionCommand(body, command)).toBeNull();
+  for (const change of [
+    { sourceCollectionId: "lcol_other" },
+    { expectedItemCount: 199 },
+    { sourceDigest: "b".repeat(64) },
+  ])
+    expect(
+      confirmedCollectionCommand(
+        { ...body, receipt: { ...body.receipt, command: { ...command, ...change } } },
+        command,
+        current,
+      ),
+    ).toBeNull();
+});
+it("permits an empty copy and a source at the terminal integer revision", () => {
+  expect(
+    libraryCollectionCommandSchema.safeParse({
+      requestId,
+      action: "duplicate",
+      sourceCollectionId: current.id,
+      expectedRevision: 2_147_483_647,
+      expectedItemCount: 0,
+      sourceDigest: "a".repeat(64),
+      name: "Empty",
+    }).success,
+  ).toBe(true);
+});

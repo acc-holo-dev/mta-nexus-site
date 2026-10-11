@@ -5,6 +5,11 @@ const en = {
     "Group resources you have acquired. Collections are private and do not grant download rights.",
   name: "Collection name",
   create: "Create collection",
+  duplicate: "Copy collection",
+  copyNote:
+    "Create an independent active collection with every reference from this revision, including unavailable resources. Version preferences and download rights are shared through your library and are not copied or changed.",
+  copyConfirm: "I confirm the source revision and the full collection contents shown above.",
+  source: "Source collection",
   rename: "Rename",
   archive: "Archive",
   restore: "Restore",
@@ -72,6 +77,11 @@ const ru: typeof en = {
     "Группируйте полученные ресурсы. Коллекции доступны только вам и не предоставляют права на скачивание.",
   name: "Название коллекции",
   create: "Создать коллекцию",
+  duplicate: "Скопировать коллекцию",
+  copyNote:
+    "Создайте отдельную активную коллекцию со всеми записями этой редакции, включая недоступные ресурсы. Выбор версий и права на скачивание действуют во всей библиотеке и при копировании не изменяются.",
+  copyConfirm: "Подтверждаю редакцию источника и полный состав коллекции, указанный выше.",
+  source: "Исходная коллекция",
   rename: "Переименовать",
   archive: "В архив",
   restore: "Восстановить",

@@ -2793,3 +2793,36 @@ canonical retries, revoked access, mandatory-audit rollback, stale cleanup/archi
 replay and malformed receipt guards. Those fixtures and live migration/locking are
 unrun here without disposable PostgreSQL; browser interaction and pinned Node 26
 validation remain outstanding. GitHub Actions are neither run nor inspected.
+
+### Independent full collection copies — 2026-10-12
+
+Owners can review `/workspace/library/collections/[id]/copy` and create a separately
+named active collection from every retained reference in an active or archived
+source. The read-only repeatable-read review returns only the source's private label,
+state, revision, count and a SHA-256 digest of the full canonical reference set; it
+looks up no product metadata or grants. Copy creation uses the existing owner lock,
+live account check, source row lock and archive-inclusive 30-collection quota. Under
+those locks it rechecks the reviewed revision, state/name, count and exact reference
+set before creating the target and inserting all up to 200 references. Target,
+membership, immutable receipt and required provenance audit commit together. Source
+membership/revision/history is unchanged. Lost-access references remain copyable;
+no title, artifact, entitlement, license, payment or version selection is copied.
+Version preferences and download authorization retain their library-wide scope.
+
+Migration `0070` replaces only the existing receipt guard. Copy receipts require an
+owned distinct source, its exact revision/count and equality of source/target member
+sets in both directions; other commands and old receipt replay behavior remain
+supported. RU/EN controls require explicit review confirmation, freeze the complete
+command after submission and navigate only after validating the new target identity.
+Private JSON previews reject filters/paging; recorded history shows source ID,
+revision and count without reading the current source. Exact UUID retries replay the
+original target receipt after later source or target changes, without another copy.
+
+Focused verification passes 189 tests across thirteen files, changed-file Biome,
+web TypeScript and Next compile. Root TypeScript retains pre-existing missing `fast-check` declarations
+and the old missing `isSigned` delivery fixture. Five new PostgreSQL fixtures cover
+concurrent retries, all 200 archived/lost-access references and independent edits,
+stale reviews/committed replay, required-audit rollback and foreign-source/partial-copy
+guards. They remain unrun without disposable PostgreSQL. Live migration/locking,
+browser interaction and pinned Node 26 validation remain outstanding. GitHub Actions
+are neither run nor inspected.

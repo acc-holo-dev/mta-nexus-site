@@ -14,11 +14,16 @@ export const libraryCollectionsService = {
       query.q,
       candidates,
     ),
+  copyPreview: (actor: User, id: string) =>
+    libraryCollectionsRepository.copyPreview(actor.id, collectionId(id)),
   history: (actor: User, id: string, page: number) =>
     libraryCollectionsRepository.history(actor.id, collectionId(id), page),
   command(actor: User, input: unknown, id?: string) {
     const parsed = libraryCollectionCommandSchema.safeParse(input);
-    if (!parsed.success || (parsed.data.action === "create") !== (id === undefined))
+    if (
+      !parsed.success ||
+      (parsed.data.action === "create" || parsed.data.action === "duplicate") !== (id === undefined)
+    )
       throw new AppError("Invalid collection command", 400, "COLLECTION_INVALID");
     return libraryCollectionsRepository.command({
       userId: actor.id,

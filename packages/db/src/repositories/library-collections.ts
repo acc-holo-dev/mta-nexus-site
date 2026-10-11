@@ -5,6 +5,7 @@ import {
   LIBRARY_COLLECTION_ITEM_LIMIT,
   LIBRARY_COLLECTION_LIMIT,
   type LibraryCollectionCommand,
+  type LibraryCollectionCopyPreview,
   type LibraryCollectionReceipt,
   type LibraryCollectionSnapshot,
   NotFoundError,
@@ -74,6 +75,32 @@ async function owned(tx: ResourceTransaction, userId: string, id: string, lock =
   return collection;
 }
 const readOptions = { isolationLevel: "repeatable read", accessMode: "read only" } as const;
+
+async function copySource(
+  tx: ResourceTransaction,
+  userId: string,
+  id: string,
+  lock = false,
+): Promise<LibraryCollectionCopyPreview & { productIds: string[] }> {
+  const sourceRow = await owned(tx, userId, id, lock);
+  const source: LibraryCollectionSnapshot = {
+    id: sourceRow.id,
+    name: sourceRow.name,
+    status: sourceRow.status,
+    revision: sourceRow.revision,
+  };
+  const rows = await tx
+    .select({ productId: members.productId })
+    .from(members)
+    .where(eq(members.collectionId, id))
+    .limit(LIBRARY_COLLECTION_ITEM_LIMIT + 1);
+  if (rows.length > LIBRARY_COLLECTION_ITEM_LIMIT) throw fail("COLLECTION_ITEM_LIMIT");
+  const productIds = rows.map((row) => row.productId).sort();
+  const sourceDigest = createHash("sha256")
+    .update(JSON.stringify({ source, productIds }))
+    .digest("hex");
+  return { source, itemCount: productIds.length, sourceDigest, productIds };
+}
 
 /** All entries are references. Current entitlement and clean publication are
  * independently projected; membership never widens download authorization. */
@@ -164,6 +191,15 @@ export class LibraryCollectionsRepository {
       };
     }, readOptions);
   }
+  async copyPreview(userId: string, id: string): Promise<LibraryCollectionCopyPreview> {
+    if (!libraryCollectionIdSchema.safeParse(id).success)
+      throw new AppError("Invalid collection", 400, "COLLECTION_INVALID");
+    return db.transaction(async (tx) => {
+      await liveUser(tx, userId);
+      const { productIds: _ids, ...preview } = await copySource(tx, userId, id);
+      return preview;
+    }, readOptions);
+  }
   async history(userId: string, id: string, page = 1) {
     return db.transaction(async (tx) => {
       await liveUser(tx, userId);
@@ -192,7 +228,8 @@ export class LibraryCollectionsRepository {
     const parsed = libraryCollectionCommandSchema.safeParse(input.command);
     if (
       !parsed.success ||
-      (parsed.data.action === "create") !== !input.collectionId ||
+      (parsed.data.action === "create" || parsed.data.action === "duplicate") !==
+        !input.collectionId ||
       (input.collectionId && !libraryCollectionIdSchema.safeParse(input.collectionId).success)
     )
       throw new AppError("Invalid collection command", 400, "COLLECTION_INVALID");
@@ -221,7 +258,19 @@ export class LibraryCollectionsRepository {
         return { receipt: publicReceipt(previous), replayed: true };
       }
       let collection: LibraryCollectionSnapshot;
-      if (command.action === "create") {
+      if (command.action === "create" || command.action === "duplicate") {
+        let copy: Awaited<ReturnType<typeof copySource>> | undefined;
+        if (command.action === "duplicate") {
+          if (input.newCollectionId === command.sourceCollectionId)
+            throw fail("COLLECTION_CONFLICT");
+          copy = await copySource(tx, input.userId, command.sourceCollectionId, true);
+          if (
+            copy.source.revision !== command.expectedRevision ||
+            copy.itemCount !== command.expectedItemCount ||
+            copy.sourceDigest !== command.sourceDigest
+          )
+            throw fail("COLLECTION_CONFLICT");
+        }
         const [summary] = await tx
           .select({ total: count() })
           .from(collections)
@@ -232,6 +281,10 @@ export class LibraryCollectionsRepository {
           .values({ id: input.newCollectionId, userId: input.userId, name: command.name })
           .returning(fields);
         collection = created;
+        if (copy?.productIds.length)
+          await tx
+            .insert(members)
+            .values(copy.productIds.map((productId) => ({ collectionId: created.id, productId })));
       } else {
         if (!input.collectionId)
           throw new AppError("Missing collection", 400, "COLLECTION_INVALID");
@@ -393,7 +446,14 @@ export class LibraryCollectionsRepository {
             ? { productId: command.productId }
             : "productIds" in command
               ? { productIds: command.productIds }
-              : {}),
+              : command.action === "duplicate"
+                ? {
+                    sourceCollectionId: command.sourceCollectionId,
+                    sourceRevision: command.expectedRevision,
+                    itemCount: command.expectedItemCount,
+                    sourceDigest: command.sourceDigest,
+                  }
+                : {}),
         },
       });
       return { receipt: publicReceipt(record), replayed: false };

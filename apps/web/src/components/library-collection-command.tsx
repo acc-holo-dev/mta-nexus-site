@@ -1,5 +1,9 @@
 "use client";
-import type { LibraryCollectionCommand, LibraryCollectionSnapshot } from "@nexus/domain";
+import type {
+  LibraryCollectionCommand,
+  LibraryCollectionSnapshot,
+  LibraryCollectionCopyPreview,
+} from "@nexus/domain";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useRef, useState } from "react";
@@ -12,18 +16,22 @@ export function LibraryCollectionCommandForm({
   collection,
   action = "create",
   productId,
+  copyPreview,
 }: {
   locale: "ru" | "en";
   collection?: LibraryCollectionSnapshot;
   action?: Exclude<LibraryCollectionCommand["action"], "add-many" | "remove-many">;
   productId?: string;
+  copyPreview?: LibraryCollectionCopyPreview;
 }) {
   const c = libraryCollectionsCopy(locale),
     router = useRouter(),
     field = useId();
   const pending = useRef<LibraryCollectionCommand | null>(null),
     lock = useRef(false);
-  const [name, setName] = useState(action === "rename" ? (collection?.name ?? "") : ""),
+  const [name, setName] = useState(
+      action === "rename" || action === "duplicate" ? (collection?.name ?? "") : "",
+    ),
     [checked, setChecked] = useState(false),
     [busy, setBusy] = useState(false),
     [frozen, setFrozen] = useState(false),
@@ -32,7 +40,19 @@ export function LibraryCollectionCommandForm({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (lock.current || saved) return;
-    if (action === "archive" && !checked) {
+    if ((action === "archive" || action === "duplicate") && !checked) {
+      setError(c.invalid);
+      return;
+    }
+    if (
+      action === "duplicate" &&
+      (!collection ||
+        !copyPreview ||
+        copyPreview.source.id !== collection.id ||
+        copyPreview.source.name !== collection.name ||
+        copyPreview.source.status !== collection.status ||
+        copyPreview.source.revision !== collection.revision)
+    ) {
       setError(c.invalid);
       return;
     }
@@ -40,9 +60,16 @@ export function LibraryCollectionCommandForm({
       pending.current ?? {
         requestId: crypto.randomUUID(),
         action,
-        ...(action === "create" || action === "rename" ? { name } : {}),
+        ...(action === "create" || action === "rename" || action === "duplicate" ? { name } : {}),
         ...(action !== "create" ? { expectedRevision: collection?.revision } : {}),
         ...(action === "add" || action === "remove" ? { productId } : {}),
+        ...(action === "duplicate"
+          ? {
+              sourceCollectionId: copyPreview?.source.id,
+              expectedItemCount: copyPreview?.itemCount,
+              sourceDigest: copyPreview?.sourceDigest,
+            }
+          : {}),
       },
     );
     if (!parsed.success) {
@@ -56,7 +83,7 @@ export function LibraryCollectionCommandForm({
     setError("");
     try {
       const response = await fetch(
-        `/api/library/collections${collection ? `/${encodeURIComponent(collection.id)}` : ""}`,
+        `/api/library/collections${collection && action !== "duplicate" ? `/${encodeURIComponent(collection.id)}` : ""}`,
         privateApiRequest({ method: "POST", json: parsed.data }),
       );
       const body = await response.json().catch(() => null),
@@ -66,7 +93,7 @@ export function LibraryCollectionCommandForm({
         return;
       }
       setSaved(true);
-      if (action === "create") router.push(collectionHref(id));
+      if (action === "create" || action === "duplicate") router.push(collectionHref(id));
       router.refresh();
     } catch {
       setError(c.retry);
@@ -77,7 +104,7 @@ export function LibraryCollectionCommandForm({
   }
   return (
     <form onSubmit={submit} className="space-y-3">
-      {(action === "create" || action === "rename") && (
+      {(action === "create" || action === "rename" || action === "duplicate") && (
         <label htmlFor={field} className="block space-y-1">
           <span className="text-sm">{c.name}</span>
           <input
@@ -91,7 +118,7 @@ export function LibraryCollectionCommandForm({
           />
         </label>
       )}
-      {action === "archive" && (
+      {(action === "archive" || action === "duplicate") && (
         <label className="flex items-start gap-2 text-sm">
           <input
             type="checkbox"
@@ -100,7 +127,7 @@ export function LibraryCollectionCommandForm({
             disabled={busy || frozen || saved}
             required
           />
-          {c.archiveConfirm}
+          {action === "duplicate" ? c.copyConfirm : c.archiveConfirm}
         </label>
       )}
       <button

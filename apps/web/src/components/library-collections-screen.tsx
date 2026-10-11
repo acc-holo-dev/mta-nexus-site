@@ -53,7 +53,7 @@ export async function LibraryCollectionsScreen({
   searchParams,
   params,
 }: {
-  view?: "list" | "detail" | "add" | "history";
+  view?: "list" | "detail" | "add" | "history" | "copy";
   searchParams: Promise<Query>;
   params?: Promise<{ id: string }>;
 }) {
@@ -75,6 +75,8 @@ export async function LibraryCollectionsScreen({
       </section>
     );
   try {
+    if (view === "copy" && collectionPageParams(queryValues).size)
+      throw new AppError("Unexpected copy query", 400, "COLLECTION_INVALID");
     const query = collectionsQuery(
       collectionPageParams(queryValues),
       view === "list" ? "list" : view === "history" ? "history" : "detail",
@@ -139,6 +141,41 @@ export async function LibraryCollectionsScreen({
       );
     }
     const id = collectionId(path?.id ?? "");
+    if (view === "copy") {
+      const preview = await service.copyPreview(actor, id);
+      return (
+        <div className="mx-auto max-w-2xl space-y-6 py-8">
+          <Link href={collectionHref(id)} className="text-accent underline">
+            {c.back}
+          </Link>
+          <h1 className="font-display">{c.duplicate}</h1>
+          <p className="break-words">
+            {c.source}: {preview.source.name}
+          </p>
+          <p>
+            {c[preview.source.status]} · {c.revision}: {preview.source.revision} · {c.items}:{" "}
+            {preview.itemCount}
+          </p>
+          <p role="note" className="text-sm text-secondary">
+            {c.copyNote}
+          </p>
+          <p className="text-sm text-muted">{c.limit}</p>
+          <LibraryCollectionCommandForm
+            key={`copy:${id}:${preview.source.revision}:${preview.sourceDigest}`}
+            locale={locale}
+            collection={preview.source}
+            copyPreview={preview}
+            action="duplicate"
+          />
+          <a
+            href={`/api/library/collections/${encodeURIComponent(id)}/copy`}
+            className="text-sm text-accent underline"
+          >
+            {c.json}
+          </a>
+        </div>
+      );
+    }
     if (view === "history") {
       const result = await service.history(actor, id, query.page);
       return (
@@ -158,6 +195,12 @@ export async function LibraryCollectionsScreen({
                 <p className="break-words">
                   {item.collection.name} · {c[item.collection.status]}
                 </p>
+                {item.command.action === "duplicate" && (
+                  <p className="break-all text-sm">
+                    {c.source}: {item.command.sourceCollectionId} · {c.revision}:{" "}
+                    {item.command.expectedRevision} · {c.items}: {item.command.expectedItemCount}
+                  </p>
+                )}
                 {"productIds" in item.command && (
                   <ul className="space-y-1 text-sm">
                     {item.command.productIds.map((id) => (
@@ -276,6 +319,9 @@ export async function LibraryCollectionsScreen({
               {c.candidates}
             </Link>
           )}
+          <Link href={collectionHref(id, "copy")} className="text-accent underline">
+            {c.duplicate}
+          </Link>
           <Link href={collectionHref(id, "history")} className="text-accent underline">
             {c.history}
           </Link>

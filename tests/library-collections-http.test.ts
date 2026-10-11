@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
   page: vi.fn(),
   detail: vi.fn(),
   history: vi.fn(),
+  copyPreview: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
@@ -23,9 +24,11 @@ vi.mock("@nexus/db", () => ({
     page: state.page,
     detail: state.detail,
     history: state.history,
+    copyPreview: state.copyPreview,
   },
 }));
 
+import { GET as copyPreview } from "../apps/web/src/app/api/library/collections/[id]/copy/route";
 import { GET as candidates } from "../apps/web/src/app/api/library/collections/[id]/candidates/route";
 import { GET as history } from "../apps/web/src/app/api/library/collections/[id]/history/route";
 import {
@@ -52,6 +55,11 @@ beforeEach(() => {
   state.page.mockResolvedValue({ items: [] });
   state.detail.mockResolvedValue({ items: [] });
   state.history.mockResolvedValue({ items: [] });
+  state.copyPreview.mockResolvedValue({
+    source: { id: "lcol_a", name: "Core", status: "active", revision: 4 },
+    itemCount: 200,
+    sourceDigest: "a".repeat(64),
+  });
 });
 it("requires a signed-in account for all six private operations", async () => {
   state.actor = null;
@@ -203,5 +211,44 @@ it("rejects oversized batches and injected ownership before repository writes", 
     { requestId, action: "remove-many", expectedRevision: 2, productIds: ["prd_a", "prd_a"] },
   ])
     expect((await command(post(body, `${base}/lcol_a`), context)).status).toBe(400);
+  expect(state.command).not.toHaveBeenCalled();
+});
+it("authenticates and privately bounds complete copy previews", async () => {
+  const path = `${base}/lcol_a/copy`;
+  const response = await copyPreview(request(path), context);
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toContain("no-store");
+  expect(await response.json()).toMatchObject({ source: { id: "lcol_a" }, itemCount: 200 });
+  expect(state.copyPreview).toHaveBeenCalledWith("usr_a", "lcol_a");
+  vi.clearAllMocks();
+  expect((await copyPreview(request(`${path}?q=partial`), context)).status).toBe(400);
+  expect(state.copyPreview).not.toHaveBeenCalled();
+  state.actor = null;
+  expect((await copyPreview(request(path), context)).status).toBe(401);
+});
+it("routes copies through creation only and binds authority to the session", async () => {
+  const body = {
+    requestId,
+    action: "duplicate",
+    name: "Independent copy",
+    sourceCollectionId: "lcol_a",
+    expectedRevision: 4,
+    expectedItemCount: 200,
+    sourceDigest: "a".repeat(64),
+  };
+  expect((await create(post(body))).status).toBe(200);
+  expect(state.command).toHaveBeenCalledWith(
+    expect.objectContaining({ userId: "usr_a", collectionId: undefined, command: body }),
+  );
+  vi.clearAllMocks();
+  expect((await command(post(body, `${base}/lcol_a`), context)).status).toBe(400);
+  expect((await create(post({ ...body, userId: "usr_other" }))).status).toBe(400);
+  expect(
+    (
+      await create(
+        post(body, base, { "content-type": "application/json", "sec-fetch-site": "cross-site" }),
+      )
+    ).status,
+  ).toBe(403);
   expect(state.command).not.toHaveBeenCalled();
 });

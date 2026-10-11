@@ -12,11 +12,24 @@ export type LibraryCollectionSnapshot = {
 };
 export type LibraryCollectionCommand = { requestId: string } & (
   | { action: "create"; name: string }
+  | {
+      action: "duplicate";
+      name: string;
+      sourceCollectionId: string;
+      expectedRevision: number;
+      expectedItemCount: number;
+      sourceDigest: string;
+    }
   | { action: "rename"; name: string; expectedRevision: number }
   | { action: "archive" | "restore"; expectedRevision: number }
   | { action: "add" | "remove"; productId: string; expectedRevision: number }
   | { action: "add-many" | "remove-many"; productIds: string[]; expectedRevision: number }
 );
+export type LibraryCollectionCopyPreview = {
+  source: LibraryCollectionSnapshot;
+  itemCount: number;
+  sourceDigest: string;
+};
 export type LibraryCollectionReceipt = {
   id: string;
   requestId: string;

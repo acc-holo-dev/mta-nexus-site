@@ -71,7 +71,9 @@ const insertedReceipt = (command: LibraryCollectionCommand, snapshot = collectio
 const input = (command: LibraryCollectionCommand = create) => ({
   userId: "usr_a",
   command,
-  ...(command.action === "create" ? {} : { collectionId: "lcol_a" }),
+  ...(command.action === "create" || command.action === "duplicate"
+    ? {}
+    : { collectionId: "lcol_a" }),
   newCollectionId: "lcol_a",
   receiptId: "lcr_a",
   auditId: "aud_a",
@@ -473,4 +475,137 @@ it("removes a batch without grants and replays the canonical receipt after revoc
     receipt: { collection: snapshot },
   });
   expect(sqlText()).not.toMatch(/insert into|delete from|update /u);
+});
+const copyCommand = (
+  source = { ...collection, id: "lcol_source" },
+  productIds = ["prd_a", "prd_b"],
+) => ({
+  requestId,
+  action: "duplicate" as const,
+  name: "Copy",
+  sourceCollectionId: source.id,
+  expectedRevision: source.revision,
+  expectedItemCount: productIds.length,
+  sourceDigest: createHash("sha256")
+    .update(JSON.stringify({ source, productIds: [...productIds].sort() }))
+    .digest("hex"),
+});
+it("previews all owned references with a bounded snapshot and no resource metadata lookup", async () => {
+  state.rows = [[["usr_a"]], [collectionRow()], [["prd_b"], ["prd_a"]]];
+  const preview = await repo.copyPreview("usr_a", "lcol_a");
+  expect(preview).toEqual({
+    source: collection,
+    itemCount: 2,
+    sourceDigest: copyCommand(collection).sourceDigest,
+  });
+  expect(sqlText()).not.toMatch(/from "(?:products|entitlements|licenses|builds)"/u);
+  expect(state.queries.at(-1)?.params).toEqual(["lcol_a", 201]);
+  expect(state.options[0]).toEqual({ isolationLevel: "repeatable read", accessMode: "read only" });
+});
+it.each(["active", "archived"] as const)(
+  "creates an independent full copy from an %s source",
+  async (status) => {
+    const source = { ...collection, id: "lcol_source", status },
+      command = copyCommand(source),
+      snapshot = { ...collection, name: "Copy" };
+    state.rows = [
+      ...prefix(),
+      [collectionRow(source)],
+      [["prd_b"], ["prd_a"]],
+      [[29]],
+      [collectionRow(snapshot)],
+      [],
+      [insertedReceipt(command, snapshot)],
+      [],
+    ];
+    const result = await repo.command(input(command));
+    expect(result).toMatchObject({ replayed: false, receipt: { command, collection: snapshot } });
+    expect(
+      state.queries.find((q) => q.sql.includes('insert into "library_collection_items"'))?.params,
+    ).toEqual(["lcol_a", "prd_a", "lcol_a", "prd_b"]);
+    expect(sqlText()).toContain("for no key update");
+    expect(sqlText()).not.toMatch(
+      /update "library_collections"|from "(?:products|entitlements|licenses)"/u,
+    );
+    expect(state.rows).toHaveLength(0);
+  },
+);
+it("copies an empty source without inserting members", async () => {
+  const source = { ...collection, id: "lcol_source" },
+    command = copyCommand(source, []),
+    snapshot = { ...collection, name: "Copy" };
+  state.rows = [
+    ...prefix(),
+    [collectionRow(source)],
+    [],
+    [[0]],
+    [collectionRow(snapshot)],
+    [insertedReceipt(command, snapshot)],
+    [],
+  ];
+  await repo.command(input(command));
+  expect(sqlText()).not.toContain('insert into "library_collection_items"');
+  expect(state.rows).toHaveLength(0);
+});
+it("rejects changed source revision, name, state, count or exact composition before creating a target", async () => {
+  const source = { ...collection, id: "lcol_source" },
+    command = copyCommand(source);
+  for (const [snapshot, ids] of [
+    [{ ...source, revision: 2 }, ["prd_a", "prd_b"]],
+    [{ ...source, name: "Other" }, ["prd_a", "prd_b"]],
+    [{ ...source, status: "archived" }, ["prd_a", "prd_b"]],
+    [source, ["prd_a"]],
+    [source, ["prd_a", "prd_c"]],
+  ] as const) {
+    state.queries = [];
+    state.rows = [...prefix(), [collectionRow(snapshot)], ids.map((id) => [id])];
+    await expect(repo.command(input(command))).rejects.toMatchObject({
+      code: "COLLECTION_CONFLICT",
+    });
+    expect(sqlText()).not.toContain("insert into");
+  }
+});
+it("requires live source ownership and preserves the archive-inclusive collection quota", async () => {
+  const command = copyCommand();
+  state.rows = [...prefix(), []];
+  await expect(repo.command(input(command))).rejects.toMatchObject({ statusCode: 404 });
+  state.queries = [];
+  state.rows = [
+    ...prefix(),
+    [collectionRow({ id: "lcol_source" })],
+    [["prd_a"], ["prd_b"]],
+    [[30]],
+  ];
+  await expect(repo.command(input(command))).rejects.toMatchObject({ code: "COLLECTION_LIMIT" });
+  expect(sqlText()).not.toContain("insert into");
+});
+it("replays a copy by its immutable target receipt without rereading the changed source", async () => {
+  const command = copyCommand(),
+    snapshot = { ...collection, name: "Copy" };
+  state.rows = [
+    [],
+    [],
+    [],
+    [["usr_a"]],
+    [recordRow(record(command, snapshot))],
+    [collectionRow({ status: "archived", revision: 3 })],
+  ];
+  expect(await repo.command(input(command))).toMatchObject({
+    replayed: true,
+    receipt: { collection: snapshot },
+  });
+  expect(state.queries.some((q) => q.params.includes("lcol_source"))).toBe(false);
+  expect(sqlText()).not.toMatch(/insert into|update /u);
+});
+it("rejects copy commands sent to an update scope and target/source identity collision", async () => {
+  const command = copyCommand();
+  await expect(
+    repo.command({ ...input(command), collectionId: "lcol_source" }),
+  ).rejects.toMatchObject({ code: "COLLECTION_INVALID" });
+  expect(state.queries).toHaveLength(0);
+  state.rows = prefix();
+  await expect(
+    repo.command({ ...input(command), newCollectionId: "lcol_source" }),
+  ).rejects.toMatchObject({ code: "COLLECTION_CONFLICT" });
+  expect(sqlText()).not.toContain("insert into");
 });

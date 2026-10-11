@@ -192,28 +192,24 @@ async function batchFixture() {
   const f = await fixture(),
     productId = `${f.productId}_b`,
     grantId = `${f.grantId}_b`;
-  await db
-    .insert(products)
-    .values({
-      id: productId,
-      title: "Second private resource",
-      slug: productId,
-      description: "Fixture",
-      shortDescription: "Fixture",
-      type: "script",
-      authorId: f.other,
-      status: "draft",
-      price: 0,
-    });
-  await db
-    .insert(entitlements)
-    .values({
-      id: grantId,
-      subjectType: "user",
-      subjectId: f.userId,
-      permission: "product.download",
-      resourceId: productId,
-    });
+  await db.insert(products).values({
+    id: productId,
+    title: "Second private resource",
+    slug: productId,
+    description: "Fixture",
+    shortDescription: "Fixture",
+    type: "script",
+    authorId: f.other,
+    status: "draft",
+    price: 0,
+  });
+  await db.insert(entitlements).values({
+    id: grantId,
+    subjectType: "user",
+    subjectId: f.userId,
+    permission: "product.download",
+    resourceId: productId,
+  });
   const created = await f.command({ requestId: randomUUID(), action: "create", name: "Batch" }),
     id = created.receipt.collection.id;
   return { ...f, id, productIds: [f.productId, productId].sort(), secondGrantId: grantId };
@@ -317,17 +313,173 @@ it("database receipts reject batch duplicates and mismatched final membership", 
   ]) {
     const requestId = randomUUID();
     await expect(
-      db
-        .insert(libraryCollectionReceipts)
-        .values({
-          id: `lcr_${randomUUID()}`,
-          userId: f.userId,
-          requestId,
-          collectionId: f.id,
-          commandDigest: "a".repeat(64),
-          command: { requestId, action: "add-many", productIds, expectedRevision: 1 },
-          snapshot: { id: f.id, name: "Batch", status: "active", revision: 2 },
-        }),
+      db.insert(libraryCollectionReceipts).values({
+        id: `lcr_${randomUUID()}`,
+        userId: f.userId,
+        requestId,
+        collectionId: f.id,
+        commandDigest: "a".repeat(64),
+        command: { requestId, action: "add-many", productIds, expectedRevision: 1 },
+        snapshot: { id: f.id, name: "Batch", status: "active", revision: 2 },
+      }),
     ).rejects.toThrow();
   }
+});
+
+// Copy acceptance requires disposable PostgreSQL migrated through 0070.
+async function copyFixture() {
+  const f = await fixture(),
+    created = await f.command({ requestId: randomUUID(), action: "create", name: "Source" }),
+    sourceId = created.receipt.collection.id;
+  const prepare = async () => {
+    const preview = await collections.copyPreview(f.userId, sourceId);
+    return {
+      requestId: randomUUID(),
+      action: "duplicate" as const,
+      name: "Independent copy",
+      sourceCollectionId: sourceId,
+      expectedRevision: preview.source.revision,
+      expectedItemCount: preview.itemCount,
+      sourceDigest: preview.sourceDigest,
+    };
+  };
+  return { ...f, sourceId, prepare };
+}
+it("concurrent copy retries create one independent target, receipt and audit", async () => {
+  const f = await copyFixture();
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    f.sourceId,
+  );
+  const command = await f.prepare(),
+    results = await Promise.all([f.command(command), f.command(command), f.command(command)]);
+  expect(results.filter((result) => !result.replayed)).toHaveLength(1);
+  expect(new Set(results.map((result) => result.receipt.collection.id)).size).toBe(1);
+  const targetId = results[0]?.receipt.collection.id;
+  if (!targetId) throw new Error("Missing copy target");
+  expect(targetId).not.toBe(f.sourceId);
+  expect((await collections.detail(f.userId, targetId)).total).toBe(1);
+  expect((await collections.detail(f.userId, f.sourceId)).collection.revision).toBe(2);
+  expect((await collections.history(f.userId, targetId)).items).toHaveLength(1);
+  expect(
+    await db
+      .select()
+      .from(auditEvents)
+      .where(
+        and(
+          eq(auditEvents.actorId, f.userId),
+          eq(auditEvents.action, "library.collection_duplicate"),
+        ),
+      ),
+  ).toHaveLength(1);
+});
+it("copies all 200 archived references after access loss and keeps subsequent membership independent", async () => {
+  const f = await copyFixture(),
+    productIds = Array.from({ length: 200 }, (_, i) => `${f.productId}_ref_${i}`);
+  // Populate retained references through the existing member quota guards.
+  await db
+    .insert(libraryCollectionItems)
+    .values(productIds.map((productId) => ({ collectionId: f.sourceId, productId })));
+  await f.command({ requestId: randomUUID(), action: "archive", expectedRevision: 1 }, f.sourceId);
+  await db.delete(entitlements).where(eq(entitlements.subjectId, f.userId));
+  const command = await f.prepare(),
+    result = await f.command(command),
+    targetId = result.receipt.collection.id;
+  expect(result.receipt.collection).toMatchObject({ status: "active", revision: 1 });
+  expect(command.expectedItemCount).toBe(200);
+  expect((await collections.detail(f.userId, targetId)).total).toBe(200);
+  expect(
+    (await collections.detail(f.userId, targetId)).items.every(
+      (item) => item.title === null && !item.hasAccess && !item.downloadable,
+    ),
+  ).toBe(true);
+  const firstProductId = productIds[0];
+  if (!firstProductId) throw new Error("Missing copied reference");
+  await f.command(
+    { requestId: randomUUID(), action: "remove", productId: firstProductId, expectedRevision: 1 },
+    targetId,
+  );
+  expect((await collections.detail(f.userId, targetId)).total).toBe(199);
+  const source = await collections.detail(f.userId, f.sourceId);
+  expect(source.total).toBe(200);
+  expect(source.collection).toMatchObject({ status: "archived", revision: 2 });
+  expect(
+    await db.select().from(entitlements).where(eq(entitlements.subjectId, f.userId)),
+  ).toHaveLength(0);
+});
+it("a stale copy review creates nothing and a committed retry ignores later source changes", async () => {
+  const f = await copyFixture(),
+    stale = await f.prepare();
+  await f.command(
+    { requestId: randomUUID(), action: "rename", name: "Changed", expectedRevision: 1 },
+    f.sourceId,
+  );
+  await expect(f.command(stale)).rejects.toMatchObject({ code: "COLLECTION_CONFLICT" });
+  expect(
+    await db.select().from(libraryCollections).where(eq(libraryCollections.userId, f.userId)),
+  ).toHaveLength(1);
+  const command = await f.prepare(),
+    result = await f.command(command);
+  await f.command({ requestId: randomUUID(), action: "archive", expectedRevision: 2 }, f.sourceId);
+  expect(await f.command(command)).toMatchObject({
+    replayed: true,
+    receipt: { id: result.receipt.id },
+  });
+});
+it("mandatory audit failure rolls back the target, copied members and receipt together", async () => {
+  const f = await copyFixture(),
+    auditId = `aud_${randomUUID()}`;
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    f.sourceId,
+    auditId,
+  );
+  const command = await f.prepare();
+  await expect(f.command(command, undefined, auditId)).rejects.toThrow();
+  expect(
+    await db.select().from(libraryCollections).where(eq(libraryCollections.userId, f.userId)),
+  ).toHaveLength(1);
+  expect(
+    await db
+      .select()
+      .from(libraryCollectionReceipts)
+      .where(eq(libraryCollectionReceipts.requestId, command.requestId)),
+  ).toHaveLength(0);
+  expect((await collections.detail(f.userId, f.sourceId)).total).toBe(1);
+});
+it("ownership and database content guards reject a foreign source and a partial-copy receipt", async () => {
+  const f = await copyFixture();
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    f.sourceId,
+  );
+  const command = await f.prepare();
+  await expect(collections.copyPreview(f.other, f.sourceId)).rejects.toMatchObject({
+    statusCode: 404,
+  });
+  await expect(
+    collections.command({
+      userId: f.other,
+      command,
+      newCollectionId: `lcol_${randomUUID()}`,
+      receiptId: `lcr_${randomUUID()}`,
+      auditId: `aud_${randomUUID()}`,
+    }),
+  ).rejects.toMatchObject({ statusCode: 404 });
+  const empty = await f.command({
+    requestId: randomUUID(),
+    action: "create",
+    name: "Independent copy",
+  });
+  await expect(
+    db.insert(libraryCollectionReceipts).values({
+      id: `lcr_${randomUUID()}`,
+      userId: f.userId,
+      requestId: command.requestId,
+      collectionId: empty.receipt.collection.id,
+      commandDigest: "a".repeat(64),
+      command,
+      snapshot: empty.receipt.collection,
+    }),
+  ).rejects.toThrow();
 });

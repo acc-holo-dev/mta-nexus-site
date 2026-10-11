@@ -1,5 +1,13 @@
 # MTA NEXUS
 
+Private collections can now be copied in full, including up to 200 retained
+references from active or archived sources. The source review binds its revision,
+count and exact composition; the new collection is independent and starts active.
+Migration `0070_library_collection_copies` validates source ownership and exact
+copied membership for immutable receipts. RU/EN confirmation, private JSON review,
+recorded provenance, same-UUID retries and atomic audits reuse existing limits.
+Copying references leaves library-wide version preferences and resource rights intact.
+
 Collections now support atomic membership batches: select up to 20 acquired
 resources to add, or remove up to 20 private references together, including
 unavailable resources. RU/EN controls require explicit confirmation; uncertain
