@@ -1,5 +1,31 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Storage inventory and guarded orphan cleanup — 2026-10-11
+
+Migration `0061_storage_maintenance` adds a private observation journal and
+permanent retirement barriers. RU/EN `/admin/storage` discovers bounded local
+upload windows, shows age/reference eligibility and confirmed deleted bytes,
+and provides per-object cleanup with explicit confirmation and revision checks.
+Live admin authority, references from all build/gallery/assets states, seven-day
+storage age, advisory-lock coordination, audit and retry leases are checked.
+Late inserts cannot attach retired keys. Observations never backfill old purchases
+or grant rights. No financial/license state, provider upload flow or Actions changed.
+
+The local adapter checks actual bytes and descriptor identity, refuses symlinks
+and hardlinks, preserves changed artifacts and resumes exact staged objects after
+an interrupted rename. Discovery skips temporary/unknown names, caps directory
+entries and hash bytes, and must be rescanned if directory membership changes.
+Missing files do not count as successful deletion. Retired keys never return to
+service; changed staged artifacts require separate manual operator recovery.
+
+Local verification covers filesystem replacement/cancellation/retry, service
+ordering, strict private API requests, RU/EN screens, upgrade contracts and
+TypeScript. PostgreSQL retirement/race/audit fixtures are supplied but require a
+disposable migrated database; live browser/operator storage and Node 26 checks
+remain unverified here. Cloud-provider conditional deletion and automatic
+inventory scheduling remain future work, with no automatic deletion enabled.
+
+
 ### Resource gallery, scanned canonical previews and renewed moderation — 2026-10-11
 
 Migration `0060` introduces up to eight publisher-scoped immutable image artifacts,
@@ -21,7 +47,7 @@ private reads use live author/organization/staff authority. Full length/hash che
 four-read concurrency, timeout, cancellation, nosniff and private no-store prevent
 unverified bytes or cached withdrawn images from being served by the endpoint.
 Original image bytes are never stored. Removed references, failed cleanup and
-uncertain DB commits retain private objects; an orphan cleanup sweep remains open.
+uncertain DB commits retain private objects; bounded administrator cleanup is now available (see storage maintenance below).
 
 102 focused decoder/SQL/HTTP/service/SSR/regression checks, 25 local migration
 contract checks, TypeScript, touched-source Biome lint and Next.js webpack compile

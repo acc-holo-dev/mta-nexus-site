@@ -480,3 +480,26 @@ version at `/workspace/resources/[id]/builds/[buildId]`. Staff inspect the bound
 history at `/admin/resources/[id]/builds/[buildId]`. Author commands and approval/rejection
 require the observed build revision; migration `0051_resource_build_workspace` is required.
 Uploaded archives/version identifiers stay immutable. Changing files requires a new upload.
+
+
+Storage maintenance (migration `0061_storage_maintenance`): admins can discover
+local private upload objects at `/admin/storage`, inspect references and age,
+and confirm cleanup of a single object. Discovery visits at most 100 directory
+entries and hashes at most 128 MiB per window; offsets stop at 10,000 entries.
+Directory changes can shift windows, so rescan rather than treating discovery
+as a complete atomic inventory. Unknown names, temporary files, symlinks,
+hardlinks and unsafe artifacts are preserved. The storage root must be trusted.
+
+Cleanup requires seven days of file age and no references from **any** build,
+gallery or `assets` record. A transaction retires the key permanently before
+filesystem removal; database triggers reject late references and stale snapshot binding writes
+(new bindings require READ COMMITTED). Deletion rechecks
+the captured inode, device, timestamps, size and SHA-256. A changed object is
+preserved and a missing object does not count as freed bytes. Interrupted
+operations retain a two-minute lease and can be retried after it expires;
+request loss may leave an unknown outcome until refreshed. Failed removal is
+retryable; changed/deleted/missing outcomes are terminal. Staged `.cleanup`
+artifacts with changed content require manual recovery by the operator, never
+an automatic second deletion. No bulk cleanup or background deletion runs.
+Other storage providers fail closed until they implement conditional maintenance.
+Financial holds, grants, license terms and payment states remain unchanged.

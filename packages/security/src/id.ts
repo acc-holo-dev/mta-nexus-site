@@ -15,6 +15,8 @@ export type EntityPrefix =
   | "bld"
   | "ast"
   | "rmi"
+  | "smo"
+  | "sml"
   | "lic"
   | "ent"
   | "ord"

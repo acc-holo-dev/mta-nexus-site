@@ -300,6 +300,9 @@ importers:
       '@nexus/domain':
         specifier: workspace:*
         version: link:../domain
+      '@nexus/security':
+        specifier: workspace:*
+        version: link:../security
       drizzle-orm:
         specifier: ^0.45.3
         version: 0.45.3(postgres@3.4.9)

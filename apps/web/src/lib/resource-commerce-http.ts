@@ -27,7 +27,8 @@ export async function resourceCommerceRequest(
       const policy =
         request.nextUrl.pathname.startsWith("/api/admin/resources/") ||
         request.nextUrl.pathname.startsWith("/api/admin/commerce/") ||
-        request.nextUrl.pathname.startsWith("/api/admin/licenses/")
+        request.nextUrl.pathname.startsWith("/api/admin/licenses/") ||
+        request.nextUrl.pathname.startsWith("/api/admin/storage/")
           ? "moderationAction"
           : /\/orders\/[^/]+\/support$/u.test(request.nextUrl.pathname)
             ? "contentCreation"
@@ -44,7 +45,7 @@ export async function resourceCommerceRequest(
     }
     if (
       !mutation &&
-      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/resources\/cart\/(?:review|receipts)(?:\/|$)|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/(?:operations|support)$|^\/api\/licenses\/[^/]+\/runtime-config$|^\/api\/licenses(?:$|\/export$)|^\/api\/workspace\/resources$|^\/api\/products\/[^/]+\/history$|^\/api\/admin\/licenses\/maintenance$|^\/api\/order-cases(?:\/|$)|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:watches|downloads|releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:media|moderation|deliveries|builds\/[^/]+(?:\/package(?:\/files)?)?)$/u.test(
+      /\/activity(?:\/|$)|^\/api\/finance(?:\/|$)|^\/api\/acquisitions$|^\/api\/resources\/cart\/(?:review|receipts)(?:\/|$)|^\/api\/admin\/storage(?:\/|$)|^\/api\/admin\/commerce\/|^\/api\/orders\/[^/]+\/(?:operations|support)$|^\/api\/licenses\/[^/]+\/runtime-config$|^\/api\/licenses(?:$|\/export$)|^\/api\/workspace\/resources$|^\/api\/products\/[^/]+\/history$|^\/api\/admin\/licenses\/maintenance$|^\/api\/order-cases(?:\/|$)|^\/api\/admin\/resources(?:\/|$)|^\/api\/library\/(?:watches|downloads|releases|reviews|review)(?:\/|$)|^\/api\/review-reports(?:\/|$)|^\/api\/products\/[^/]+\/(?:media|moderation|deliveries|builds\/[^/]+(?:\/package(?:\/files)?)?)$/u.test(
         request.nextUrl.pathname,
       )
     ) {

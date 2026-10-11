@@ -10,6 +10,18 @@ import {
   releaseUpgradePlan,
 } from "../../packages/db/scripts/release-upgrade-contract.mjs";
 
+test("storage maintenance adds permanent guarded retirement without touching historic objects", () => {
+ const migration = readFileSync("packages/db/migrations/0061_storage_maintenance.sql","utf8");
+ assert.match(migration,/CREATE TABLE storage_maintenance_objects/u);
+ assert.match(migration,/pg_advisory_xact_lock/u);
+ assert.match(migration,/New storage references require a current snapshot/u);
+ assert.match(migration,/Storage retirement barrier is permanent/u);
+ assert.match(migration,/OLD.modified_at > clock_timestamp\(\) - interval '7 days'/u);
+ for (const table of ["builds","resource_media","assets"]) assert.match(migration,new RegExp(`BEFORE INSERT OR UPDATE OF storage_key ON ${table}`,"u"));
+ assert.doesNotMatch(migration,/DELETE FROM|INSERT INTO storage_maintenance_objects|UPDATE (orders|payments|licenses|entitlements|ledger)/u);
+ assert.match(readFileSync(script,"utf8"),/storageMaintenanceSchemaPresent = true/u);
+});
+
 test("gallery upgrade protects artifact identity, deferred ordering and future moderation", () => {
   const migration = readFileSync("packages/db/migrations/0060_resource_media.sql", "utf8");
   assert.match(migration, /DEFERRABLE INITIALLY DEFERRED/u);
@@ -207,7 +219,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0060_resource_media");
+  assert.equal(plan.targetTag, "0061_storage_maintenance");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

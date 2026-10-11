@@ -76,3 +76,4 @@ export { communityModerationWorkspaceRepository } from "./community-moderation-w
 
 export * from "./build-package-comparison";
 export * from "./resource-media";
+export * from "./storage-maintenance";

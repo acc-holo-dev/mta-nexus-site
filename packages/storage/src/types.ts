@@ -1,4 +1,4 @@
-import type { UploadStatus } from "@nexus/domain";
+import type { StorageObjectIdentity, StorageRemovalResult, UploadStatus } from "@nexus/domain";
 
 export interface StorageObjectMeta {
   key: string;
@@ -25,6 +25,10 @@ export interface StorageProvider {
   delete(key: string): Promise<void>;
   getSignedDownloadUrl(key: string, expiresInSeconds?: number): Promise<string>;
   exists(key: string): Promise<boolean>;
+  // Optional capabilities. Unsupported providers fail closed rather than using another root.
+  listAssetNamespaces?(offset: number, signal?: AbortSignal): Promise<{ owners: string[]; nextOffset: number | null; limited: boolean }>;
+  discoverAssetNamespace?(ownerId: string, offset: number, signal?: AbortSignal): Promise<{ objects: StorageObjectIdentity[]; skipped: number; nextOffset: number | null; limited: boolean }>;
+  removeMaintenanceObject?(identity: StorageObjectIdentity, objectId: string, signal?: AbortSignal): Promise<StorageRemovalResult>;
 }
 
 export interface UploadRecord {

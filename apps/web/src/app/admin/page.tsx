@@ -1,3 +1,4 @@
+import { storageMaintenanceCopy } from "../../lib/storage-maintenance-i18n";
 import { resourceReviewCopy } from "../../lib/resource-review-i18n";
 import { orderCaseCopy } from "../../lib/order-case-i18n";
 import { ReportEvidenceLinks } from "../../components/report-evidence-links";
@@ -610,6 +611,7 @@ export default async function AdminPage({
 
       <section>
         <SectionHeader title={copy.reports} description={copy.caseHistory} />
+        <Link href="/admin/storage" className="mb-3 mr-4 inline-block text-sm text-accent underline">{storageMaintenanceCopy(locale).title}</Link>
         <Link href="/admin/commerce/order-cases" className="mb-3 mr-4 inline-block text-sm text-accent underline">{orderCaseCopy(locale).queue}</Link>
         <Link href="/admin/commerce/reviews" className="mb-3 mr-4 inline-block text-sm text-accent underline">{resourceReviewCopy(locale).queue}</Link>
         <Link href="/admin/reports" className="mb-3 inline-block text-sm text-accent underline">{communityReportCopy(locale).queue}</Link>

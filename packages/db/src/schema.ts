@@ -4,6 +4,8 @@ import {
   SUPPORT_CASE_STATUSES,
   SUPPORT_RELATED_TYPES,
   type ProductType,
+  type StorageObjectIdentity,
+  type StorageMaintenanceState,
   type BuildPackageEvidence,
   type BuildReviewNotificationData,
   type LicenseTermNotificationData,
@@ -363,6 +365,7 @@ export const builds = pgTable("builds", {
   ), false)`),
   uniqueIndex("builds_product_version_idx").on(table.productId, table.version),
   check("builds_revision_check", sql`${table.revision} > 0`),
+  index("builds_storage_key_idx").on(table.storageKey),
   index("builds_product_status_idx").on(table.productId, table.status),
   index("builds_status_created_id_idx").on(table.status, table.createdAt, table.id),
   check(
@@ -407,7 +410,7 @@ export const assets = pgTable("assets", {
   status: text("status").notNull().default("ready"),
   isPrivate: boolean("is_private").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (table) => [index("assets_storage_key_idx").on(table.storageKey)]);
 
 // 11. Licenses
 export const licenses = pgTable(
@@ -1302,4 +1305,41 @@ export const resourceReleaseWatches = pgTable("resource_release_watches", {
   index("resource_release_watch_pending_idx").on(table.productId, table.lastSequence, table.userId).where(sql`${table.enabled}`),
   check("resource_release_watches_revision_check", sql`${table.revision} > 0`),
   check("resource_release_watches_last_sequence_check", sql`${table.lastSequence} >= 0`),
+]);
+
+export const storageMaintenanceObjects = pgTable("storage_maintenance_objects", {
+  id: text("id").primaryKey(),
+  storageKey: text("storage_key").notNull().unique(),
+  identity: jsonb("identity").$type<StorageObjectIdentity>().notNull(),
+  modifiedAt: timestamp("modified_at", { withTimezone: true }).notNull(),
+  state: text("state").$type<StorageMaintenanceState>().notNull().default("observed"),
+  revision: integer("revision").notNull().default(1),
+  observedAt: timestamp("observed_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  retiredAt: timestamp("retired_at", { withTimezone: true }),
+  leaseToken: text("lease_token"),
+  leaseExpiresAt: timestamp("lease_expires_at", { withTimezone: true }),
+  requestedBy: text("requested_by").references(() => users.id, { onDelete: "set null" }),
+  resultCode: text("result_code"),
+}, (table) => [
+  index("storage_maintenance_state_modified_idx").on(table.state, table.modifiedAt, table.id),
+  check("storage_maintenance_objects_id_check", sql`${table.id} ~ '^smo_[a-f0-9]{24}$'`),
+  check("storage_maintenance_objects_modified_at_check", sql`isfinite(${table.modifiedAt})`),
+  check("storage_maintenance_objects_revision_check", sql`${table.revision} > 0`),
+  check("storage_maintenance_objects_state_check", sql`${table.state} IN ('observed','retired','deleted','missing','changed','failed')`),
+  check("storage_maintenance_objects_result_code_check", sql`${table.resultCode} IS NULL OR length(${table.resultCode}) <= 80`),
+  check("storage_maintenance_identity_check", sql`COALESCE(
+    jsonb_typeof(${table.identity}) = 'object' AND octet_length(${table.identity}::text) <= 2048 AND
+    ${table.storageKey} ~ '^assets/[A-Za-z0-9_-]{1,128}/ast_[A-Za-z0-9_-]{1,100}\\.(zip|rar|7z|lua|luac|dff|txd|col|png|jpg|jpeg|webp|json|map)$' AND
+    jsonb_typeof(${table.identity}->'sizeBytes') = 'number' AND
+    (${table.identity}->>'modifiedAt')::timestamptz = ${table.modifiedAt} AND
+    ${table.identity}->>'key' = ${table.storageKey} AND ${table.identity}->>'sha256Hash' ~ '^[a-f0-9]{64}$' AND
+    (${table.identity}->>'sizeBytes')::bigint BETWEEN 1 AND 67108864 AND
+    ${table.identity}->>'device' ~ '^[0-9]+$' AND ${table.identity}->>'inode' ~ '^[0-9]+$' AND
+    ${table.identity}->>'mtimeNs' ~ '^-?[0-9]+$' AND ${table.identity}->>'ctimeNs' ~ '^-?[0-9]+$',false)`),
+  check("storage_maintenance_retirement_check", sql`COALESCE(
+    (${table.state} = 'observed' AND ${table.retiredAt} IS NULL AND ${table.leaseToken} IS NULL AND ${table.leaseExpiresAt} IS NULL) OR
+    (${table.state} <> 'observed' AND ${table.retiredAt} IS NOT NULL AND isfinite(${table.retiredAt}) AND
+      ((${table.leaseToken} IS NULL AND ${table.leaseExpiresAt} IS NULL) OR
+       (${table.state} = 'retired' AND ${table.leaseToken} ~ '^sml_[a-f0-9]{24}$' AND ${table.leaseExpiresAt} IS NOT NULL AND isfinite(${table.leaseExpiresAt})))),false)`),
 ]);

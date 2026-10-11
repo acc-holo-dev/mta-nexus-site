@@ -23,6 +23,7 @@
   "dependencies": {
     "@nexus/config": "workspace:*",
     "@nexus/domain": "workspace:*",
+    "@nexus/security": "workspace:*",
     "drizzle-orm": "^0.45.3",
     "postgres": "^3.4.9",
     "tsx": "^4.23.15"

@@ -37,6 +37,7 @@ let created = false;
 const evidence = {
   buildPackageEvidenceSchemaPresent: false,
   resourceMediaSchemaPresent: false,
+  storageMaintenanceSchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: upgradePlan.baselineTag,
@@ -415,6 +416,11 @@ try {
   assert.equal((await client`SELECT condeferrable, condeferred FROM pg_constraint WHERE conname = 'resource_media_product_position_unique'`)[0].condeferred, true);
   assert.equal((await client`SELECT count(*)::int AS total FROM resource_media`)[0].total, 0);
   evidence.resourceMediaSchemaPresent = true;
+  assert.equal((await client`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'storage_maintenance_objects'`).length,1);
+  assert.equal((await client`SELECT tgname FROM pg_trigger WHERE NOT tgisinternal AND tgname IN ('storage_tombstone_guard','builds_storage_reference_guard','media_storage_reference_guard','assets_storage_reference_guard')`).length,4);
+  assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname IN ('storage_maintenance_state_modified_idx','builds_storage_key_idx','assets_storage_key_idx')`).length,3);
+  assert.equal((await client`SELECT count(*)::int AS total FROM storage_maintenance_objects`)[0].total,0);
+  evidence.storageMaintenanceSchemaPresent = true;
   const receiptColumns = await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);
   assert.equal((await client`SELECT indexname FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'resource_cart_receipt_user_time_idx'`).length, 1);

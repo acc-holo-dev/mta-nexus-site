@@ -1,3 +1,5 @@
+import { listAssetNamespaces, discoverAssetNamespace, removeMaintenanceObject } from "./local-maintenance";
+import type { StorageObjectIdentity } from "@nexus/domain";
 import fs from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
 import path from "node:path";
@@ -240,6 +242,16 @@ export class LocalStorageProvider implements StorageProvider {
       }
       throw error;
     }
+  }
+
+  listAssetNamespaces(offset: number, signal?: AbortSignal) {
+    return listAssetNamespaces(this.withParent.bind(this), offset, signal);
+  }
+  discoverAssetNamespace(ownerId: string, offset: number, signal?: AbortSignal) {
+    return discoverAssetNamespace(this.withParent.bind(this), ownerId, offset, signal);
+  }
+  removeMaintenanceObject(identity: StorageObjectIdentity, objectId: string, signal?: AbortSignal) {
+    return removeMaintenanceObject(this.withParent.bind(this), identity, objectId, signal);
   }
 
   async getSignedDownloadUrl(key: string, _expiresInSeconds = 3600): Promise<string> {
