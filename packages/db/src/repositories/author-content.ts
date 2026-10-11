@@ -7,6 +7,7 @@ import { containsPattern } from "./search-pattern";
 import { organizationWorkspaceAccess } from "./organization-workspace";
 import { serverContentAccess } from "./server-content";
 import { publicationNotice } from "./publication-notice";
+import { contentHelpfulCount } from "./content-reaction-count";
 
 import {
   contentSummaryColumns,
@@ -149,13 +150,11 @@ class AuthorContentRepository {
         })
         .where(eq(content.id, id))
         .returning();
-      await tx
-        .insert(auditEvents)
-        .values({
-          ...audit,
-          details: { ...audit.details, from: current.status, to: status },
-          createdAt: new Date(),
-        });
+      await tx.insert(auditEvents).values({
+        ...audit,
+        details: { ...audit.details, from: current.status, to: status },
+        createdAt: new Date(),
+      });
       await publicationNotice(
         tx,
         updated as unknown as Content,
@@ -177,7 +176,11 @@ class AuthorContentRepository {
       ? containsPattern(filters.query.trim().slice(0, 120))
       : undefined;
     const rows = await db
-      .select({ ...getTableColumns(content), body: sql<string>`left(${content.body}, 350)` })
+      .select({
+        ...getTableColumns(content),
+        body: sql<string>`left(${content.body}, 350)`,
+        likeCount: contentHelpfulCount(),
+      })
       .from(content)
       .where(
         and(

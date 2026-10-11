@@ -4,6 +4,7 @@ import { verificationWorkspaceService } from "../../../lib/services/verification
 import { profilePrivacyService } from "../../../lib/services/profile-privacy-service";
 import Link from "next/link";
 import { publicationCopy } from "../../../lib/publication-feed-copy";
+import { trustCopy } from "../../../lib/public-user-trust-copy";
 import { ProfileResourcePagination } from "../../../components/profile-resource-pagination";
 import { parseProfilePage } from "../../../lib/profile-pagination";
 import { notFound } from "next/navigation";
@@ -90,12 +91,20 @@ export default async function DeveloperProfilePage({
               {user.bio || copy.bioFallback}
             </p>
             <FollowButton targetType="user" targetId={user.id} targetName={user.displayName} />
-            {visibility.showActivity && <Link
-              href={`/users/${encodeURIComponent(user.username)}/activity`}
+            <Link
+              href={`/users/${encodeURIComponent(user.username)}/trust`}
               className="inline-flex min-h-11 items-center text-sm text-accent underline"
             >
-              {publicationCopy(locale).activity}
-            </Link>}
+              {trustCopy(locale).title}
+            </Link>
+            {visibility.showActivity && (
+              <Link
+                href={`/users/${encodeURIComponent(user.username)}/activity`}
+                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              >
+                {publicationCopy(locale).activity}
+              </Link>
+            )}
           </div>
         </div>
 

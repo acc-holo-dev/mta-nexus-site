@@ -7,6 +7,17 @@ export function formatNotification(
   copy: { approved: string; rejected: string; version: string; notes: string },
   locale: Locale = "en",
 ) {
+  if (
+    notification.title === "Publication reaction" &&
+    /^Publication ([a-zA-Z0-9_-]{1,128}): reaction\.$/u.test(notification.message)
+  )
+    return {
+      title: locale === "ru" ? "Реакция на публикацию" : "Publication reaction",
+      message:
+        locale === "ru"
+          ? "Читатель оставил реакцию на вашу публикацию."
+          : "A reader reacted to your publication.",
+    };
   const publication =
     notification.title === "Publication activity" &&
     /^Publication ([a-zA-Z0-9_-]{1,128}): (created|edited|published|archived)\.$/u.exec(

@@ -29,6 +29,18 @@ vi.mock("../../../lib/services/auth-service", () => ({
 }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../../../components/content-discussion", () => ({ ContentDiscussion: () => null }));
+vi.mock("../../../lib/services/content-reaction-service", () => ({
+  contentReactionService: {
+    state: async () => ({
+      contentId: "article",
+      slug: "guide",
+      authenticated: false,
+      self: false,
+      reaction: null,
+      counts: { helpful: 0, thanks: 0, insight: 0 },
+    }),
+  },
+}));
 import Page, { generateMetadata } from "./page";
 import { ArticleCard } from "../../../components/article-card";
 const input = () => ({ params: Promise.resolve({ slug: "guide" }) });

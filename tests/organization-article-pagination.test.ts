@@ -15,7 +15,8 @@ vi.mock("../packages/db/src/client", () => ({
       from: () => ({
         where: (condition: SQL) => {
           state.conditions.push(condition);
-          if (selection) return Promise.resolve([{ total: state.total }]);
+          if (selection && typeof selection === "object" && "total" in selection)
+            return Promise.resolve([{ total: state.total }]);
           return {
             orderBy: (...order: SQL[]) => {
               state.order = order;
@@ -55,7 +56,17 @@ it("uses identical organization/public/editorial conditions for the total and pa
   expect(state.offset).toBe(24);
   const queries = state.conditions.map((condition) => dialect.sqlToQuery(condition));
   expect(queries[0]).toEqual(queries[1]);
-  expect(queries[0].params).toEqual(expect.arrayContaining(["organization", "published", "article", "news", "devlog", "update", "announcement"]));
+  expect(queries[0].params).toEqual(
+    expect.arrayContaining([
+      "organization",
+      "published",
+      "article",
+      "news",
+      "devlog",
+      "update",
+      "announcement",
+    ]),
+  );
   expect(queries[0].sql).toContain('"content"."organization_id"');
   expect(queries[0].sql).toContain('"content"."type" in');
   expect(state.order.map((order) => dialect.sqlToQuery(order).sql)).toEqual([
@@ -65,7 +76,9 @@ it("uses identical organization/public/editorial conditions for the total and pa
 });
 
 it("clamps stale page links to the final available page", async () => {
-  expect(await repository.pagePublishedEditorialByOrganization("organization", 999999, 24)).toMatchObject({
+  expect(
+    await repository.pagePublishedEditorialByOrganization("organization", 999999, 24),
+  ).toMatchObject({
     page: 3,
     totalPages: 3,
   });
@@ -87,10 +100,11 @@ it.each([
   [-2, -10, 1],
   [Infinity, 1000, 100],
 ])("bounds page %s and page size %s", async (page, size, expectedSize) => {
-  expect(await repository.pagePublishedEditorialByOrganization("organization", page, size)).toMatchObject({
+  expect(
+    await repository.pagePublishedEditorialByOrganization("organization", page, size),
+  ).toMatchObject({
     page: 1,
     pageSize: expectedSize,
   });
   expect(state.offset).toBe(0);
 });
-

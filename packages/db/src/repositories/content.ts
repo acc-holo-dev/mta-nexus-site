@@ -1,4 +1,5 @@
-import { eq, asc, desc, and, count, sql, inArray, ilike, or, isNull } from "drizzle-orm";
+import { eq, asc, desc, and, count, sql, inArray, ilike, or, isNull, getTableColumns } from "drizzle-orm";
+import { contentHelpfulCount } from "./content-reaction-count";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { organizationWorkspaceAccess } from "./organization-workspace";
@@ -40,7 +41,7 @@ export class ContentRepository {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 50)
       : 50;
-    const rows = await db.select().from(content).where(and(
+    const rows = await db.select({ ...getTableColumns(content), likeCount: contentHelpfulCount() }).from(content).where(and(
       eq(content.status, "published"),
       or(
         ilike(content.title, pattern),
@@ -61,7 +62,7 @@ export class ContentRepository {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 50)
       : 50;
-    const rows = await db.select().from(content).where(and(
+    const rows = await db.select({ ...getTableColumns(content), likeCount: contentHelpfulCount() }).from(content).where(and(
       eq(content.status, "published"),
       inArray(content.type, types),
       or(
@@ -75,7 +76,7 @@ export class ContentRepository {
 
   async listPublished(limit = 50): Promise<Content[]> {
         const rows = await db
-      .select()
+      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
       .from(content)
       .where(eq(content.status, "published"))
       .orderBy(desc(content.createdAt))
@@ -98,7 +99,7 @@ export class ContentRepository {
     const total = summary?.total ?? 0;
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
     const page = Math.min(requested, totalPages);
-    const rows = await db.select().from(content).where(condition)
+    const rows = await db.select({ ...getTableColumns(content), likeCount: contentHelpfulCount() }).from(content).where(condition)
       .orderBy(desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`), desc(content.id))
       .limit(pageSize).offset((page - 1) * pageSize);
     return { items: rows as unknown as Content[], total, page, pageSize, totalPages };
@@ -113,7 +114,7 @@ export class ContentRepository {
       : 100;
 
     const rows = await db
-      .select()
+      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
       .from(content)
       .where(
         and(
@@ -132,7 +133,7 @@ export class ContentRepository {
   async listPublishedByTypes(types: Content["type"][], limit = 50): Promise<Content[]> {
     if (types.length === 0) return [];
     const rows = await db
-      .select()
+      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
       .from(content)
       .where(and(eq(content.status, "published"), inArray(content.type, types)))
       .orderBy(desc(content.updatedAt))
@@ -156,7 +157,7 @@ export class ContentRepository {
       : 6;
 
     const rows = await db
-      .select()
+      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
       .from(content)
       .where(
         and(
@@ -186,7 +187,7 @@ export class ContentRepository {
     options: { incrementView?: boolean } = {}
   ): Promise<Content | null> {
     const rows = await db
-      .select()
+      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
       .from(content)
       .where(and(eq(content.slug, slug), eq(content.status, "published")))
       .limit(1);

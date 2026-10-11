@@ -16,6 +16,7 @@ import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";
 import { getLibraryCopy } from "../../lib/library-view";
 import { getManagedServerCopy } from "../../lib/managed-server-view";
 import { ManagedServerCard } from "../../components/managed-server-card";
+import { reactionCopy } from "../../lib/content-reaction-copy";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -92,6 +93,12 @@ export default async function WorkspacePage() {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <Link
+            href="/workspace/reactions"
+            className="inline-flex min-h-11 items-center rounded-md border border-base px-4 text-xs font-semibold text-secondary hover:text-primary"
+          >
+            {reactionCopy(locale).my}
+          </Link>
           <Link
             href="/workspace/resources"
             className="rounded-md border border-base px-4 py-2 text-xs font-semibold text-secondary hover:text-primary"

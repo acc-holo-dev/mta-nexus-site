@@ -36,6 +36,9 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
 import FollowingPage from "../apps/web/src/app/workspace/feed/page";
 import UserActivity from "../apps/web/src/app/users/[username]/activity/page";
 import ArticlePage from "../apps/web/src/app/articles/[slug]/page";
+vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
+  contentReactionService: { state: async () => null },
+}));
 const time = "2026-10-10T12:00:00.000Z";
 const row: PublicationPage["items"][number] = {
   id: "content",

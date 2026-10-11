@@ -16,6 +16,9 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getUserById: async () => null, getSession: async () => null },
 }));
 import Page from "../apps/web/src/app/articles/[slug]/page";
+vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
+  contentReactionService: { state: async () => null },
+}));
 import { ContentDiscussion } from "../apps/web/src/components/content-discussion";
 const item = {
   id: "older",

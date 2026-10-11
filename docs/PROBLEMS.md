@@ -1782,3 +1782,67 @@ CREATE INDEX content_public_server_feed_time_id_idx
   ON content (server_id, (coalesce(published_at, created_at)) DESC, id DESC)
   WHERE status = 'published';
 ```
+
+### Publication reactions and public trust signals — 2026-10-11
+
+`/articles/[slug]` now supports helpful, thanks and insight reactions through
+GET/PUT `/api/content/[slug]/reactions`. PUT saves an explicit desired state
+(including removal), so retries do not toggle votes. Publication-first locking,
+an actor/target advisory lock and live-account checks serialize changes without
+new schema. Authors cannot react to their own publications; old self votes can
+be removed and never contribute to counts. Draft, archived and unsupported
+targets reject public commands. Legacy duplicate rows are normalized on writes;
+reads count only the latest supported reaction per reader. Public article/card
+helpful counts derive from actual rows, including account cascade deletion,
+instead of seed values or an outdated cache. Counter maintenance does not change
+publication revision, status or publication time, or developer reputation.
+
+Changes persist with audit and a status-only author notice in the transaction.
+Content preferences use the existing lock and default delivery policy. Stable
+actor/publication notice IDs prevent repeat inbox/push delivery on retries,
+switches and removal/re-addition while the inbox row exists. Push enqueue uses a
+savepoint; inbox/audit failure rejects the authoritative operation. Notification
+previews expose no publication title/body or reacting account identity.
+
+`/workspace/reactions` and GET `/api/workspace/reactions` provide title search,
+reaction filters, twenty-item keyset pages and exact microsecond continuation.
+Cursors bind to account and normalized filters. SSR and API reject unknown or
+repeated parameters. Missing/nonpublic targets have null title/slug/type in SQL.
+DELETE `/api/workspace/reactions/[id]` removes only the current user's reaction,
+including orphan rows; its response contains no target metadata. Unknown own
+targets are idempotent no-ops. Interfaces wait for exact-target confirmation,
+show loading/error/success states and require saved-state recovery after an
+uncertain result. Workspace/mobile navigation, metadata and all copy use RU/EN.
+
+`/users/[username]/trust` and GET `/api/users/[username]/trust`, linked from user
+and developer profiles, expose a single narrow snapshot: current identity and
+role-eligible developer verification, latest recorded approval dates only for
+active badges, account creation, current organization ownership and active public
+server ownership with verified subsets. Publication totals and activity links
+honor profile privacy. Evidence, reviewer/notes, rejected/pending requests,
+default reputation scores, commercial records and unsupported sanction/history
+claims are absent. The page explains the source and scope of each signal; it
+does not claim a complete historical record or guarantees of quality.
+
+216 focused checks across 28 unit/query/HTTP/render files pass, alongside
+TypeScript, touched-file Biome lint, Knip and Next webpack compile mode. Seven
+new PostgreSQL fixtures cover concurrent retries and notice deduplication,
+legacy duplicates/self votes, unavailable-target cleanup, audit rollback and
+preference opt-out, microsecond pagination/account-bound cursors, trust privacy
+and live roles/ownership, and helpful counts after account deletion. PostgreSQL
+fixtures remain unrun in this environment; browser interaction and full
+production generation still need verification. No schema, migrations,
+dependencies or workflows changed. Actions were not used.
+
+Agent A owns these nonunique performance index contracts. No conflicting
+migration is introduced; large-catalog PostgreSQL plans need verification after
+integration. A unique index would require separate legacy-row cleanup first.
+
+```sql
+CREATE INDEX reactions_content_target_reader_latest_idx
+  ON reactions (target_id, user_id, created_at DESC, id DESC)
+  WHERE target_type = 'content';
+CREATE INDEX reactions_content_reader_target_latest_idx
+  ON reactions (user_id, target_id, created_at DESC, id DESC)
+  WHERE target_type = 'content';
+```

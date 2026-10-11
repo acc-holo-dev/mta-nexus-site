@@ -8,6 +8,7 @@ const state = vi.hoisted(() => ({
 }));
 
 const repos = vi.hoisted(() => ({
+  saved: vi.fn(),
   follows: vi.fn(),
   products: vi.fn(),
   servers: vi.fn(),
@@ -15,19 +16,20 @@ const repos = vi.hoisted(() => ({
 }));
 
 vi.mock("next/navigation", () => ({
-  redirect: (target: string) => { state.redirects.push(target); },
+  redirect: (target: string) => {
+    state.redirects.push(target);
+  },
 }));
 
 vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({
     get: (name: string) =>
-      name === "nexus_session" && state.session
-        ? { value: "session-token" }
-        : undefined,
+      name === "nexus_session" && state.session ? { value: "session-token" } : undefined,
   })),
 }));
 
 vi.mock("@nexus/db", () => ({
+  followWorkspaceRepository: { page: repos.saved },
   socialRepository: { listFollows: repos.follows },
   productRepository: { listPublishedFreeByIds: repos.products },
   serverRepository: { listActivePublicByIds: repos.servers },
@@ -59,6 +61,7 @@ describe("closed-beta workspace behavior", () => {
     state.session = null;
     state.redirects.length = 0;
     repos.follows.mockResolvedValue([]);
+    repos.saved.mockResolvedValue({ items: [], hasMore: false, nextCursor: null });
     repos.products.mockResolvedValue([]);
     repos.servers.mockResolvedValue([]);
     repos.directory.mockResolvedValue({ servers: [], isStale: false });
@@ -69,29 +72,27 @@ describe("closed-beta workspace behavior", () => {
 
     expect(page).toBeTruthy();
     expect(repos.follows).not.toHaveBeenCalled();
+    expect(repos.saved).not.toHaveBeenCalled();
     expect(repos.products).not.toHaveBeenCalled();
     expect(repos.servers).not.toHaveBeenCalled();
     expect(repos.directory).not.toHaveBeenCalled();
   });
 
-  it("loads only saved IDs through the public/free repository selectors", async () => {
+  it("loads a bounded saved page through the session-scoped repository", async () => {
     state.session = {
       id: "usr_saved",
       username: "saved",
       role: "user",
     };
-    repos.follows.mockResolvedValue([
-      { followerId: "usr_saved", targetType: "product", targetId: "prd_b" },
-      { followerId: "usr_saved", targetType: "server", targetId: "srv_a" },
-      { followerId: "usr_saved", targetType: "product", targetId: "prd_a" },
-      { followerId: "usr_saved", targetType: "user", targetId: "usr_other" },
-    ]);
-
     await SavedPage();
-
-    expect(repos.follows).toHaveBeenCalledWith("usr_saved");
-    expect(repos.products).toHaveBeenCalledWith(["prd_b", "prd_a"]);
-    expect(repos.servers).toHaveBeenCalledWith(["srv_a"]);
+    expect(repos.saved).toHaveBeenCalledWith("usr_saved", {
+      query: "",
+      type: undefined,
+      cursor: undefined,
+    });
+    expect(repos.follows).not.toHaveBeenCalled();
+    expect(repos.products).not.toHaveBeenCalled();
+    expect(repos.servers).not.toHaveBeenCalled();
   });
 
   it("does not call the master directory when no saved public servers survive filtering", async () => {

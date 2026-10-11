@@ -2,7 +2,9 @@ import { safeExternalWebUrl } from "@nexus/validation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowLeft, ThumbsUp } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { ContentReactions } from "../../../components/content-reactions";
+import { contentReactionService } from "../../../lib/services/content-reaction-service";
 import { Avatar } from "@nexus/ui";
 import { contentService } from "../../../lib/services/content-service";
 import { authService } from "../../../lib/services/auth-service";
@@ -50,7 +52,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function ArticleDetailPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function ArticleDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { slug } = await params;
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
@@ -63,7 +71,8 @@ export default async function ArticleDetailPage({ params, searchParams }: { para
 
   const isCommunity = article.type === "post" || article.type === "question";
   const coverImageUrl = safeExternalWebUrl(article.coverImageUrl);
-  const requested = await searchParams ?? {}, discussionParams = new URLSearchParams();
+  const requested = (await searchParams) ?? {},
+    discussionParams = new URLSearchParams();
   for (const key of ["q", "comment"]) {
     const value = requested[key];
     if (Array.isArray(value)) for (const part of value) discussionParams.append(key, part);
@@ -73,15 +82,25 @@ export default async function ArticleDetailPage({ params, searchParams }: { para
   let discussionFailure = filters ? "" : discussionError(locale, "INVALID_CURSOR");
   const [author, discussion, viewer] = await Promise.all([
     authService.getUserById(article.authorId),
-    filters ? (filters.query || filters.focusId
-      ? contentService.pageDiscussion(article.id, undefined, { query: filters.query, focusId: filters.focusId })
-      : contentService.pageDiscussion(article.id)).catch((error: unknown) => {
-        discussionFailure = error instanceof AppError ? discussionError(locale, error.code) : getDiscussionCopy(locale).unavailable;
-        return null;
-      }) : null,
+    filters
+      ? (filters.query || filters.focusId
+          ? contentService.pageDiscussion(article.id, undefined, {
+              query: filters.query,
+              focusId: filters.focusId,
+            })
+          : contentService.pageDiscussion(article.id)
+        ).catch((error: unknown) => {
+          discussionFailure =
+            error instanceof AppError
+              ? discussionError(locale, error.code)
+              : getDiscussionCopy(locale).unavailable;
+          return null;
+        })
+      : null,
     authService.getSession((await cookies()).get("nexus_session")?.value).catch(() => null),
   ]);
   const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
+  const reactions = await contentReactionService.state(article.slug, viewer?.id).catch(() => null);
   const formattedDate = new Date(article.createdAt).toLocaleDateString(dateLocale, {
     month: "long",
     day: "numeric",
@@ -150,7 +169,15 @@ export default async function ArticleDetailPage({ params, searchParams }: { para
         {article.body}
       </div>
 
-      {viewer?.id !== article.authorId && <CommunityReportForm key={`${article.id}:${viewer?.id ?? "guest"}`} targetType="content" targetId={article.id} locale={locale} authenticated={!!viewer} />}
+      {viewer?.id !== article.authorId && (
+        <CommunityReportForm
+          key={`${article.id}:${viewer?.id ?? "guest"}`}
+          targetType="content"
+          targetId={article.id}
+          locale={locale}
+          authenticated={!!viewer}
+        />
+      )}
 
       <div className="nexus-panel flex flex-wrap items-center justify-between gap-4 p-4">
         <div className="flex flex-wrap items-center gap-2">
@@ -163,14 +190,15 @@ export default async function ArticleDetailPage({ params, searchParams }: { para
             </span>
           ))}
         </div>
-
-        <div className="inline-flex items-center gap-1.5 rounded-lg border border-base bg-inset px-3 py-1.5 text-xs font-semibold text-secondary">
-          <ThumbsUp className="h-3.5 w-3.5 text-warning" aria-hidden="true" />
-          <span>
-            {article.likeCount} {copy.upvotes}
-          </span>
-        </div>
       </div>
+
+      <ContentReactions
+        key={`${article.id}:${viewer?.id ?? "guest"}`}
+        contentId={article.id}
+        slug={article.slug}
+        initial={reactions}
+        locale={locale}
+      />
 
       <ContentDiscussion
         key={`${article.id}:${viewer?.id ?? "anonymous"}:${viewer?.role ?? ""}:${filters?.query ?? ""}:${filters?.focusId ?? ""}`}
