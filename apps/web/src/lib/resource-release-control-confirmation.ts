@@ -7,8 +7,24 @@ export function confirmedLibraryRelease(
   productId: string,
   command: LibraryReleaseCommand,
 ) {
-  if (!record(value) || value.productId !== productId || !record(value.selection)) return false;
+  if (
+    !record(value) ||
+    Object.keys(value).length !== 2 ||
+    value.productId !== productId ||
+    !record(value.selection)
+  )
+    return false;
   const selection = value.selection;
+  const timestamp = selection.updatedAt;
+  const validTime =
+    typeof timestamp === "string" &&
+    Number.isFinite(Date.parse(timestamp)) &&
+    new Date(timestamp).toISOString() === timestamp;
+  if (
+    Object.keys(selection).length !== 4 ||
+    !(validTime || (timestamp === null && selection.revision === 0 && command.mode === "latest"))
+  )
+    return false;
   return (
     (selection.revision === command.expectedRevision ||
       selection.revision === command.expectedRevision + 1) &&

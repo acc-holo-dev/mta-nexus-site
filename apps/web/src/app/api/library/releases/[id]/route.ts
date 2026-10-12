@@ -16,6 +16,8 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
 }
 export function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, true, async (actor) => {
+    if (request.nextUrl.searchParams.size !== 0)
+      throw new AppError("Invalid library selection query", 400, "RESOURCE_CONTROL_INVALID");
     const command = libraryReleaseCommandSchema.safeParse(await readBoundedJson(request, 2048));
     if (!command.success)
       throw new AppError("Invalid library selection", 400, "RESOURCE_CONTROL_INVALID");

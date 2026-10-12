@@ -3021,3 +3021,35 @@ uses two workers. These are build settings, with no application authorization or
 runtime route changes. The merged tree is recompiled separately from test workers;
 GitHub Actions remain untouched. Both concurrent server/community commits are
 preserved; the only rebase conflict was independent documentation append operations.
+
+
+## Individual library selection recovery (2026-10-12)
+
+A lost or malformed selection response previously allowed a different choice with the
+same displayed revision even though the first command might have committed. Controls
+now freeze mode/build/revision before sending, coalesce pending clicks, disable other
+choices and offer an exact retry or full state reload. Definitive 400/401/403/404/409
+responses require reloading; rate limits, server errors and lost acknowledgements keep
+the original request. This is preference-state replay under the existing revision
+contract, not a new immutable command receipt. A later intervening change conflicts.
+Acknowledgements require the exact resource, selection fields, canonical timestamp
+(or the untouched latest revision-zero state), requested mode/build and current or next
+revision. Selection POST rejects query parameters as well as extra command fields.
+
+The repository independently validates the strict command, reads clock_timestamp after
+all selection/build locks, rechecks expiry and derives monotonic timestamps from that
+observation. Upserts guard an existing revision; when no preference was observed, an
+unexpected conflicting insert is rejected instead of overwriting it. Mandatory audit
+and selection remain in the same transaction. No schema migration is required.
+
+Focused interaction/contract/repository/HTTP/page checks cover both locales, exact
+retries, duplicate clicks, malformed acknowledgements, definitive/retryable errors,
+clock skew after blocking locks, unknown database time, revision and insert races.
+Three disposable-PostgreSQL fixtures cover single replay/audit uniqueness, competing
+revision-zero commands and rollback on audit failure; these remain unrun in this
+environment. Live PostgreSQL locking, browser interaction and Node 26 validation remain
+open. GitHub Actions are neither run nor inspected.
+
+Verification: 163 focused tests across 14 files pass; changed-file Biome, web TypeScript
+and Next compile pass (44s compilation, two page workers). Root TypeScript reports only
+existing missing fast-check types and the old isSigned delivery fixture omission.

@@ -6,6 +6,7 @@ import {
   type LibraryReleaseFilter,
   type LibraryReleaseSelection,
 } from "@nexus/domain";
+import { libraryReleaseCommandSchema } from "@nexus/validation";
 import { db } from "../client";
 import {
   auditEvents,
@@ -148,12 +149,15 @@ export class ResourceLibrarySelectionsRepository {
     command: LibraryReleaseCommand;
     auditId: string;
   }) {
+    const parsed = libraryReleaseCommandSchema.safeParse(input.command);
+    if (!parsed.success)
+      throw new AppError("Invalid library selection", 400, "RESOURCE_CONTROL_INVALID");
+    const command = parsed.data;
     return db.transaction(async (tx) => {
       await tx.execute(
         sql`select pg_advisory_xact_lock(hashtext(${`library-selection:${input.userId}:${input.productId}`}))`,
       );
-      const { product, access } = await owned(tx, input.userId, input.productId),
-        command = input.command;
+      const { product, access } = await owned(tx, input.userId, input.productId);
       const [existing] = await tx
         .select(selectionFields)
         .from(selections)
@@ -178,10 +182,19 @@ export class ResourceLibrarySelectionsRepository {
         !(same && previous.revision === command.expectedRevision + 1)
       )
         throw fail("LIBRARY_RELEASE_CONFLICT");
-      currentAccess(access.expiresAt, product.id);
+      // clock_timestamp advances while row/advisory locks are being awaited.
+      const [clock] = await tx.execute<{ observedAt: string }>(
+        sql`select date_trunc('milliseconds',clock_timestamp())::text AS "observedAt"`,
+      );
+      const observedAt = new Date(clock?.observedAt ?? "");
+      if (!Number.isFinite(observedAt.getTime())) throw fail("LIBRARY_RELEASE_TIME_UNKNOWN");
+      if (access.expiresAt && access.expiresAt <= observedAt)
+        throw new NotFoundError("Library resource", product.id);
       if (same) return { productId: product.id, selection: previous };
       const revision = previous.revision + 1,
-        updatedAt = new Date(Math.max(Date.now(), (previous.updatedAt?.getTime() ?? 0) + 1));
+        updatedAt = new Date(
+          Math.max(observedAt.getTime(), (previous.updatedAt?.getTime() ?? 0) + 1),
+        );
       const [selection] = await tx
         .insert(selections)
         .values({
@@ -195,6 +208,7 @@ export class ResourceLibrarySelectionsRepository {
         .onConflictDoUpdate({
           target: [selections.userId, selections.productId],
           set: { mode: command.mode, buildId, revision, updatedAt },
+          setWhere: existing ? eq(selections.revision, previous.revision) : sql`false`,
         })
         .returning(selectionFields);
       if (!selection) throw fail("LIBRARY_RELEASE_CONFLICT");

@@ -19,6 +19,10 @@ const copy = {
       "Latest mode follows the newest approved, clean publication. Fixed mode keeps your selected release until you change it. A withdrawn release is never silently replaced.",
     selectSaved: "Download preference confirmed.",
     saving: "Saving…",
+    retrySame: "Retry the same request",
+    reloadState: "Reload current state",
+    pendingNote:
+      "A request was sent. Confirm its result by retrying the same choice or reloading before making another choice.",
     empty: "No resources match this filter.",
     noVersions: "No approved version is currently available.",
     privateResource: "Resource unavailable",
@@ -90,6 +94,10 @@ const copy = {
       "Режим последней версии использует самый новый одобренный чистый выпуск. Фиксированный режим сохраняет выбранный выпуск до вашего изменения. Недоступный выпуск не заменяется автоматически.",
     selectSaved: "Версия для скачивания подтверждена.",
     saving: "Сохранение…",
+    retrySame: "Повторить тот же запрос",
+    reloadState: "Обновить текущее состояние",
+    pendingNote:
+      "Запрос отправлен. Подтвердите результат повтором того же выбора или обновите состояние перед другим выбором.",
     empty: "Нет ресурсов по этому фильтру.",
     noVersions: "Одобренных доступных версий сейчас нет.",
     privateResource: "Ресурс недоступен",

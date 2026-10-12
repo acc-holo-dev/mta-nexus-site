@@ -91,7 +91,7 @@ it("confirms the requested resource and build, including a harmless replay", () 
   const command = { mode: "fixed" as const, expectedRevision: 2, buildId: "bld_a" };
   const result = {
     productId: "prd_a",
-    selection: { revision: 3, mode: "fixed", buildId: "bld_a" },
+    selection: { revision: 3, mode: "fixed", buildId: "bld_a", updatedAt: revision },
   };
   expect(confirmedLibraryRelease(result, "prd_a", command)).toBe(true);
   expect(
@@ -124,4 +124,21 @@ it("never confirms a restored publication or a generic success response", () => 
     { product: { ...product, updatedAt: revision } },
   ])
     expect(confirmedResourceModeration(value, "prd_a", command)).toBe(false);
+});
+
+it("requires a complete canonical selection acknowledgement", () => {
+  const command = { mode: "latest" as const, expectedRevision: 0 };
+  const result = {
+    productId: "prd_a",
+    selection: { revision: 0, mode: "latest", buildId: null, updatedAt: null },
+  };
+  expect(confirmedLibraryRelease(result, "prd_a", command)).toBe(true);
+  for (const value of [
+    { ...result, extra: true },
+    { ...result, selection: { ...result.selection, extra: true } },
+    { ...result, selection: { revision: 0, mode: "latest", buildId: null } },
+    { ...result, selection: { ...result.selection, revision: 1 } },
+    { ...result, selection: { ...result.selection, updatedAt: "2026-02-30T00:00:00.000Z" } },
+  ])
+    expect(confirmedLibraryRelease(value, "prd_a", command)).toBe(false);
 });

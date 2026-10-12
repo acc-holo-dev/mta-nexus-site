@@ -621,3 +621,75 @@ it("publisher and staff roles do not confer buyer comparison access", async () =
     await f.cleanup();
   }
 });
+
+it("replays a lost single-selection response once without another audit", async () => {
+  const f = await fixture();
+  try {
+    const input = {
+      userId: f.buyer,
+      productId: f.ids[0] ?? "",
+      command: { mode: "fixed" as const, buildId: `bld_req_${f.key}_0`, expectedRevision: 0 },
+      auditId: `aud_single_${f.key}`,
+    };
+    const first = await resourceLibrarySelectionsRepository.command(input);
+    const retry = await resourceLibrarySelectionsRepository.command({
+      ...input,
+      auditId: `aud_retry_${f.key}`,
+    });
+    expect(retry).toEqual(first);
+    expect(first.selection.revision).toBe(1);
+    const events = await db
+      .select()
+      .from(auditEvents)
+      .where(
+        and(eq(auditEvents.actorId, f.buyer), eq(auditEvents.action, "library.release_selected")),
+      );
+    expect(events).toHaveLength(1);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("serializes competing single selections so one revision cannot overwrite another", async () => {
+  const f = await fixture();
+  try {
+    await f.publishReplacement();
+    const outcomes = await Promise.allSettled(
+      [`bld_req_${f.key}_0`, `bld_req_${f.key}_replacement`].map((buildId, index) =>
+        resourceLibrarySelectionsRepository.command({
+          userId: f.buyer,
+          productId: f.ids[0] ?? "",
+          command: { mode: "fixed", buildId, expectedRevision: 0 },
+          auditId: `aud_race_${f.key}_${index}`,
+        }),
+      ),
+    );
+    expect(outcomes.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+    const rejected = outcomes.find((r) => r.status === "rejected");
+    expect(rejected && rejected.status === "rejected" ? rejected.reason : null).toMatchObject({
+      code: "LIBRARY_RELEASE_CONFLICT",
+    });
+    const rows = await db.select().from(selections).where(eq(selections.userId, f.buyer));
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.revision).toBe(1);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("rolls a single selection back if its mandatory audit cannot be written", async () => {
+  const f = await fixture();
+  try {
+    await expect(
+      resourceLibrarySelectionsRepository.command({
+        userId: f.buyer,
+        productId: f.ids[0] ?? "",
+        command: { mode: "fixed", buildId: `bld_req_${f.key}_0`, expectedRevision: 0 },
+        auditId: `aud_req_${f.key}_0`,
+      }),
+    ).rejects.toThrow();
+    expect(await db.select().from(selections).where(eq(selections.userId, f.buyer))).toHaveLength(
+      0,
+    );
+  } finally {
+    await f.cleanup();
+  }
+});

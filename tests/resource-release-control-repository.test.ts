@@ -48,6 +48,7 @@ const command = {
   reason: "Reviewed clean evidence",
 };
 const modInput = { actorId: "usr_mod", productId: "prd_a", command, auditId: "aud_a" };
+const clockRows = [{ observedAt: stamp }];
 const ownedRows = (status = "published", expiry: string | null = null) => [
   [],
   [["prd_a", "PRIVATE TITLE", "private-slug", status]],
@@ -63,7 +64,7 @@ beforeEach(() => {
 });
 afterEach(() => vi.useRealTimers());
 it("locks live buyer rights and a cleared build before saving a preference with audit", async () => {
-  state.results = [...ownedRows(), [], [["bld_a"]], [[1, "fixed", "bld_a", stamp]], []];
+  state.results = [...ownedRows(), [], [["bld_a"]], clockRows, [[1, "fixed", "bld_a", stamp]], []];
   expect(await library.command(input)).toMatchObject({
     productId: "prd_a",
     selection: { revision: 1, mode: "fixed", buildId: "bld_a" },
@@ -115,7 +116,7 @@ it("a stale preference cannot overwrite another device's selection", async () =>
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
 it("an exact command replay keeps its revision and creates no duplicate audit", async () => {
-  state.results = [...ownedRows(), [[1, "fixed", "bld_a", stamp]], [["bld_a"]]];
+  state.results = [...ownedRows(), [[1, "fixed", "bld_a", stamp]], [["bld_a"]], clockRows];
   expect(await library.command(input)).toMatchObject({ selection: { revision: 1 } });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
@@ -123,6 +124,7 @@ it("can clear a withdrawn preference while a resource is suspended, without gran
   state.results = [
     ...ownedRows("suspended"),
     [[3, "fixed", "withdrawn", stamp]],
+    clockRows,
     [[4, "latest", null, "2026-10-10T12:00:00.001Z"]],
     [],
   ];
@@ -133,13 +135,8 @@ it("can clear a withdrawn preference while a resource is suspended, without gran
 });
 it("rechecks expiry after waiting on a build lock", async () => {
   state.results = [...ownedRows("published", "2026-10-10T12:00:00.001Z"), [], [["bld_a"]]];
-  // Advance the clock when the build query runs, after the entitlement is read.
-  const shift = state.results.shift.bind(state.results);
-  vi.spyOn(state.results, "shift").mockImplementation(() => {
-    if (state.queries.at(-1)?.sql.includes('from "builds"'))
-      vi.setSystemTime(new Date(now.getTime() + 2));
-    return shift();
-  });
+  state.results.push([{ observedAt: "2026-10-10T12:00:00.002Z" }]);
+  // Application time remains behind the database clock after a blocking lock.
   await expect(library.command(input)).rejects.toMatchObject({ statusCode: 404 });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
@@ -246,24 +243,103 @@ it("uses actual current admin authority for private resource reads", async () =>
   expect(query.params).toContain("usr_stale_admin");
 });
 it("legacy feature changes require a live staff grant and advance the moderation revision", async () => {
-  const audit = { id: "aud_a", actorId: "usr_mod", actorType: "admin" as const, action: "admin.feature", targetType: "product", targetId: "prd_a" };
+  const audit = {
+    id: "aud_a",
+    actorId: "usr_mod",
+    actorType: "admin" as const,
+    action: "admin.feature",
+    targetType: "product",
+    targetId: "prd_a",
+  };
   state.results = [[["prd_a"]], [["user"]]];
-  await expect(new ProductRepository().updateWithAudit("prd_a", { isFeatured: true }, audit)).rejects.toMatchObject({ statusCode: 403 });
-  expect(state.queries.some(query => query.sql.startsWith("update"))).toBe(false);
+  await expect(
+    new ProductRepository().updateWithAudit("prd_a", { isFeatured: true }, audit),
+  ).rejects.toMatchObject({ statusCode: 403 });
+  expect(state.queries.some((query) => query.sql.startsWith("update"))).toBe(false);
   state.queries = [];
   state.results = [[["prd_a"]], [["moderator"]], [], []];
   await new ProductRepository().updateWithAudit("prd_a", { isFeatured: true }, audit);
-  expect(state.queries.find(query => query.sql.startsWith("update"))?.sql).toContain("interval '1 millisecond'");
+  expect(state.queries.find((query) => query.sql.startsWith("update"))?.sql).toContain(
+    "interval '1 millisecond'",
+  );
 });
 it("main library reads a fixed cleared build and retains the unavailable state after withdrawal", async () => {
-  state.results = [[{ all: 2, ready: 1, unavailable: 1 }], [
-    { resourceId: "prd_a", title: "Title", slug: "slug", version: "1.0.0", downloadable: true, selectionMode: "fixed", buildId: "bld_a", addedAt: now },
-    { resourceId: "prd_b", title: null, slug: null, version: null, downloadable: false, selectionMode: "fixed", buildId: "withdrawn", addedAt: now },
-  ]];
+  state.results = [
+    [{ all: 2, ready: 1, unavailable: 1 }],
+    [
+      {
+        resourceId: "prd_a",
+        title: "Title",
+        slug: "slug",
+        version: "1.0.0",
+        downloadable: true,
+        selectionMode: "fixed",
+        buildId: "bld_a",
+        addedAt: now,
+      },
+      {
+        resourceId: "prd_b",
+        title: null,
+        slug: null,
+        version: null,
+        downloadable: false,
+        selectionMode: "fixed",
+        buildId: "withdrawn",
+        addedAt: now,
+      },
+    ],
+  ];
   const result = await new UserLibraryRepository().pageByUser("usr_a");
-  expect(result.items[0]).toMatchObject({ version: "1.0.0", buildId: "bld_a", selectionMode: "fixed", downloadable: true });
-  expect(result.items[1]).toMatchObject({ version: null, buildId: null, selectionMode: "fixed", downloadable: false });
+  expect(result.items[0]).toMatchObject({
+    version: "1.0.0",
+    buildId: "bld_a",
+    selectionMode: "fixed",
+    downloadable: true,
+  });
+  expect(result.items[1]).toMatchObject({
+    version: null,
+    buildId: null,
+    selectionMode: "fixed",
+    downloadable: false,
+  });
   const sql = state.queries.at(-1)?.sql;
   expect(sql).toContain('"resource_library_selections"."mode"');
   expect(sql).toContain('"builds"."id" = "resource_library_selections"."build_id"');
+});
+
+it("fails closed when the database clock cannot be read", async () => {
+  state.results = [...ownedRows(), [], [["bld_a"]], [{ observedAt: "invalid" }]];
+  await expect(library.command(input)).rejects.toMatchObject({
+    code: "LIBRARY_RELEASE_TIME_UNKNOWN",
+  });
+  expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
+});
+it("rejects malformed repository commands before taking locks", async () => {
+  await expect(
+    library.command({ ...input, command: { ...fixed, expectedRevision: 1.5 } }),
+  ).rejects.toMatchObject({ statusCode: 400 });
+  expect(state.queries).toHaveLength(0);
+});
+it("does not overwrite an unexpected insert race or write its audit", async () => {
+  state.results = [...ownedRows(), [], [["bld_a"]], clockRows, []];
+  await expect(library.command(input)).rejects.toMatchObject({ code: "LIBRARY_RELEASE_CONFLICT" });
+  expect(state.queries.at(-1)?.sql).toContain("where false");
+  expect(state.queries.some((q) => q.sql.includes('insert into "audit_events"'))).toBe(false);
+});
+it("guards an existing revision and advances a future timestamp monotonically", async () => {
+  state.results = [
+    ...ownedRows(),
+    [[3, "latest", null, "2026-10-11T12:00:00.000Z"]],
+    [["bld_a"]],
+    clockRows,
+    [[4, "fixed", "bld_a", "2026-10-11T12:00:00.001Z"]],
+    [],
+  ];
+  await library.command({ ...input, command: { ...fixed, expectedRevision: 3 } });
+  const query = state.queries.find((q) =>
+    q.sql.startsWith('insert into "resource_library_selections"'),
+  );
+  expect(query?.sql).toContain('where "resource_library_selections"."revision" =');
+  expect(query?.params).toContain("2026-10-11T12:00:00.001Z");
+  expect(query?.params.at(-1)).toBe(3);
 });

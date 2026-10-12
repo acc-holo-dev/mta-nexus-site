@@ -193,3 +193,13 @@ it("requires the current moderation revision and a bounded reason", async () => 
     expect((await moderate(post("/api/admin/resources/prd_a", value), context)).status).toBe(400);
   expect(state.staffCommand).not.toHaveBeenCalled();
 });
+
+it.each(["?userId=other", "?page=1", "?mode=latest", "?buildId=bld_other&buildId=bld_a"])(
+  "rejects selection query injection %s",
+  async (query) => {
+    const response = await select(post(`/api/library/releases/prd_a${query}`, fixed), context);
+    expect(response.status).toBe(400);
+    privateResponse(response);
+    expect(state.libraryCommand).not.toHaveBeenCalled();
+  },
+);

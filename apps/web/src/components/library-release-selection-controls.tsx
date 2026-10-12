@@ -25,16 +25,20 @@ export function LibraryReleaseSelectionControls({
   const { locale } = useNexusLocale(),
     copy = getResourceReleaseControlCopy(locale),
     router = useRouter(),
-    lock = useRef(false);
-  const [busy, setBusy] = useState(false),
+    lock = useRef(false),
+    frozen = useRef<LibraryReleaseCommand | null>(null);
+  const [pending, setPending] = useState<LibraryReleaseCommand | null>(null),
+    [blocked, setBlocked] = useState(false),
+    [busy, setBusy] = useState(false),
     [saved, setSaved] = useState(false),
     [error, setError] = useState("");
-  async function send(buildId?: string) {
-    if (lock.current || saved) return;
-    const command: LibraryReleaseCommand = buildId
-      ? { mode: "fixed", buildId, expectedRevision: revision }
-      : { mode: "latest", expectedRevision: revision };
+  async function send(command: LibraryReleaseCommand) {
+    if (lock.current || saved || blocked) return;
+    if (frozen.current && JSON.stringify(frozen.current) !== JSON.stringify(command)) return;
+    frozen.current ??= command;
+    command = frozen.current;
     lock.current = true;
+    setPending(command);
     setBusy(true);
     setError("");
     try {
@@ -45,7 +49,7 @@ export function LibraryReleaseSelectionControls({
       const value = await response.json().catch(() => null);
       if (!response.ok || !confirmedLibraryRelease(value, productId, command)) {
         setError(resourceReleaseControlError(locale, value?.code));
-        if (response.status === 409 || response.status === 404) router.refresh();
+        if ([400, 401, 403, 404, 409].includes(response.status)) setBlocked(true);
         return;
       }
       setSaved(true);
@@ -64,8 +68,8 @@ export function LibraryReleaseSelectionControls({
       </p>
       <button
         type="button"
-        disabled={busy || saved || mode === "latest"}
-        onClick={() => void send()}
+        disabled={busy || saved || pending !== null || mode === "latest"}
+        onClick={() => void send({ mode: "latest", expectedRevision: revision })}
         className="rounded-md border border-base px-4 py-2 text-sm"
       >
         {busy ? copy.saving : copy.useLatest}
@@ -75,8 +79,15 @@ export function LibraryReleaseSelectionControls({
           <li key={version.id}>
             <button
               type="button"
-              onClick={() => void send(version.id)}
-              disabled={busy || saved || (mode === "fixed" && selectedBuildId === version.id)}
+              onClick={() =>
+                void send({ mode: "fixed", buildId: version.id, expectedRevision: revision })
+              }
+              disabled={
+                busy ||
+                saved ||
+                pending !== null ||
+                (mode === "fixed" && selectedBuildId === version.id)
+              }
               className="rounded-md border border-base px-4 py-2 text-sm"
             >
               {copy.choose}: {version.version}
@@ -84,6 +95,29 @@ export function LibraryReleaseSelectionControls({
           </li>
         ))}
       </ul>
+      {pending && !saved ? (
+        <div className="space-y-3">
+          <p className="text-sm text-muted">{copy.pendingNote}</p>
+          {!blocked ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void send(pending)}
+              className="rounded-md border border-base px-4 py-2 text-sm"
+            >
+              {copy.retrySame}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => window.location.reload()}
+            className="rounded-md border border-base px-4 py-2 text-sm"
+          >
+            {copy.reloadState}
+          </button>
+        </div>
+      ) : null}
       {error ? (
         <p role="alert" className="text-sm text-danger">
           {error}

@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+Individual version choices now retain the exact submitted command when a response is
+lost or cannot be verified. RU/EN controls offer a precise retry or a full state reload
+before another choice. Definitive rejections require reloading. Single selection writes
+recheck expiry against the database clock after locks, protect revision updates and
+reject unexpected insert races without an audit or preference overwrite.
+
 Buyers can now compare two exact, currently accessible safe releases before changing
 version preferences. RU/EN comparison shows archive identity/size, published notes,
 declared MTA/signing metadata and the established public package summary. The summary
