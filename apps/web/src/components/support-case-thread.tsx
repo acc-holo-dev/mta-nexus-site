@@ -11,6 +11,7 @@ import {
   supportWorkspaceError,
 } from "../lib/support-workspace-copy";
 import { useNexusLocale } from "./locale-context";
+import { supportMessageCopy } from "../lib/support-message-discovery-copy";
 import {
   clearSupportRetry,
   reserveSupportReplyRetry,
@@ -319,6 +320,12 @@ export function SupportCaseThread({
           locale={locale}
           onChangeStatus={(status) => void updateStatus(status)}
         />
+        <Link
+          href={`${backHref}/${caseId}/messages`}
+          className="inline-flex min-h-9 items-center text-sm text-accent underline"
+        >
+          {supportMessageCopy(locale).title}
+        </Link>
       </header>
 
       {success && (
@@ -347,6 +354,7 @@ export function SupportCaseThread({
         {messages.map((message) => (
           <article
             key={message.id}
+            id={`message-${message.id}`}
             className={`rounded-xl border p-4 ${
               message.authorRole === "staff"
                 ? "border-[color:var(--nexus-accent)]/25 bg-accent-soft"
@@ -357,9 +365,9 @@ export function SupportCaseThread({
               <span className="text-xs font-bold text-primary">
                 {message.authorRole === "staff"
                   ? copy.staff
-                  : staffMode
-                    ? copy.requester
-                    : copy.you}
+                  : capabilities.requester
+                    ? copy.you
+                    : copy.requester}
               </span>
               <time
                 dateTime={new Date(message.createdAt).toISOString()}
@@ -371,6 +379,12 @@ export function SupportCaseThread({
             <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-secondary">
               {message.body}
             </p>
+            <Link
+              href={`${backHref}/${caseId}/messages?focus=${message.id}#message-${message.id}`}
+              className="mt-2 inline-flex min-h-9 items-center text-xs text-accent underline"
+            >
+              {supportMessageCopy(locale).link}
+            </Link>
           </article>
         ))}
       </section>

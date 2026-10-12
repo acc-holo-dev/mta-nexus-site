@@ -4,6 +4,7 @@ import {
   supportFailure,
 } from "../../../../lib/support-http";
 import { supportCaseRepository, userRepository } from "@nexus/db";
+import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
 import { createSupportMessageSchema, updateSupportCaseStatusSchema } from "@nexus/validation";
 import { after, type NextRequest } from "next/server";
@@ -15,10 +16,6 @@ import {
 } from "../../../../lib/support-idempotency";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { dispatchNotificationsBestEffort } from "../../../../lib/services/notification-dispatch-service";
-
-function parsePage(value: string | null): number {
-  return value && /^[1-9]\d{0,6}$/u.test(value) ? Number(value) : 1;
-}
 
 async function loadAuthorizedCase(request: NextRequest, id: string) {
   const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
@@ -49,8 +46,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
-    const access = await loadAuthorizedCase(request, id);
-    if (!access.user) {
+    const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
+    if (!user) {
       return supportPrivateJson(
         context,
         request,
@@ -58,19 +55,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         { status: 401 },
       );
     }
-    if (!access.supportCase) {
-      return supportPrivateJson(
-        context,
-        request,
-        { error: "Support case not found" },
-        { status: 404 },
-      );
-    }
-
-    const messages = await supportCaseRepository.pageMessages(
+    const values = request.nextUrl.searchParams.getAll("messagePage");
+    if (values.length > 1 || (values.length === 1 && !/^[1-9]\d{0,6}$/u.test(values[0] ?? "")))
+      throw new AppError("Invalid message page", 400, "VALIDATION_ERROR");
+    if (!(await consumeRateLimit("search", user.id)).success) throw new RateLimitExceededError();
+    const access = await supportCaseRepository.authorizedThread(
       id,
-      parsePage(request.nextUrl.searchParams.get("messagePage")),
+      user.id,
+      values[0] ? Number(values[0]) : 1,
     );
+    const messages = access.messages;
     return supportPrivateJson(context, request, {
       supportCase: access.supportCase,
       messages: messages.items,
@@ -78,7 +72,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       messageTotalPages: messages.totalPages,
       messageTotal: messages.total,
       staff: access.staff,
-      requester: access.supportCase.requesterId === access.user.id,
+      requester: access.requester,
     });
   } catch (error) {
     return supportFailure(request, context, error, "support.case_read_failed");
