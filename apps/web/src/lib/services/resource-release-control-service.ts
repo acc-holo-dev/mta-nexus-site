@@ -2,6 +2,7 @@ import { resourceLibrarySelectionsRepository, resourceModerationRepository } fro
 import {
   ForbiddenError,
   type LibraryReleaseCommand,
+  type LibraryReleaseComparisonQuery,
   type LibraryReleaseHistoryQuery,
   type LibraryReleaseFilter,
   type ProductStatus,
@@ -13,6 +14,8 @@ function moderator(user: User) {
   if (user.role !== "admin" && user.role !== "moderator") throw new ForbiddenError();
 }
 export const libraryReleaseService = {
+  compare: (user: User, productId: string, query: LibraryReleaseComparisonQuery) =>
+    resourceLibrarySelectionsRepository.compare(user.id, productId, query),
   history: (user: User, query: LibraryReleaseHistoryQuery) =>
     resourceLibrarySelectionsRepository.history(user.id, query),
   page: (user: User, page = 1, filter: LibraryReleaseFilter = "all") =>

@@ -1,5 +1,16 @@
 # MTA NEXUS
 
+Buyers can now compare two exact, currently accessible safe releases before changing
+version preferences. RU/EN comparison shows archive identity/size, published notes,
+declared MTA/signing metadata and the established public package summary. The summary
+is bound to each artifact's recorded hash/size; missing or malformed evidence remains
+unknown. Version screens link from the current selected release to another release,
+preserve the return page, support reversing the pair and offer bounded private JSON.
+No private file inventory, ACL declarations, storage keys or automatic selection change
+is exposed. Both releases and current resource rights are rechecked for every report.
+Webpack memory optimizations and two build workers also bound compilation/route
+collection memory in constrained environments.
+
 The buyer library now exposes private version-selection history across individual
 and group changes. Filter by a resource and 7/30/90/365 days, inspect twenty-row pages
 and export bounded JSON. Only the current user's recorded choices are projected;

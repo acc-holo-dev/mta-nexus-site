@@ -1,4 +1,5 @@
 import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
+import { libraryReleaseComparisonCopy } from "../../../../../lib/library-release-comparison-i18n";
 import { libraryReleaseHistoryCopy } from "../../../../../lib/library-release-history-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -124,6 +125,14 @@ export default async function LibraryVersionsPage({
                   {formatHistoryDate(version.createdAt, locale)}
                 </time>
               </p>
+              {current && current.id !== version.id && (
+                <Link
+                  href={`/workspace/library/${encodeURIComponent(id)}/versions/compare?${new URLSearchParams({ from: current.id, to: version.id, returnPage: String(result.page) })}`}
+                  className="text-accent underline"
+                >
+                  {libraryReleaseComparisonCopy(locale).title}
+                </Link>
+              )}
               {version.releaseNotes ? (
                 <p className="whitespace-pre-wrap break-words text-sm text-secondary">
                   {version.releaseNotes}

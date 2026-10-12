@@ -5,6 +5,8 @@ const repositoryRoot = fileURLToPath(new URL("../../", import.meta.url));
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Keep compilation and route collection within constrained build environments.
+  experimental: { cpus: 2, webpackMemoryOptimizations: true },
   // Stable Compose service DNS is used by dev-network/browser verification. Keep
   // the historical default container name for existing local stacks as well.
   allowedDevOrigins: ["app", "nexus-local-app-1"],

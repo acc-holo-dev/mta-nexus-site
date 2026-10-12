@@ -528,24 +528,22 @@ it("malformed historical details retain a neutral entry without exporting raw pr
   try {
     const rootId = f.ids[0];
     if (!rootId) throw new Error("Missing root resource");
-    await db
-      .insert(auditEvents)
-      .values({
-        id: `aud_legacy_${f.key}`,
-        actorId: f.buyer,
-        actorType: "user",
-        action: "library.release_selected",
-        targetType: "product",
-        targetId: rootId,
-        ipAddress: "192.0.2.99",
-        userAgent: "PRIVATE USER AGENT",
-        details: {
-          mode: ["fixed"],
-          buildId: "bld_private",
-          revision: 1,
-          privateNote: "PRIVATE DETAILS",
-        },
-      });
+    await db.insert(auditEvents).values({
+      id: `aud_legacy_${f.key}`,
+      actorId: f.buyer,
+      actorType: "user",
+      action: "library.release_selected",
+      targetType: "product",
+      targetId: rootId,
+      ipAddress: "192.0.2.99",
+      userAgent: "PRIVATE USER AGENT",
+      details: {
+        mode: ["fixed"],
+        buildId: "bld_private",
+        revision: 1,
+        privateNote: "PRIVATE DETAILS",
+      },
+    });
     const report = await resourceLibrarySelectionsRepository.history(f.buyer, { page: 1, days: 7 });
     expect(report.items[0]).toMatchObject({
       selection: null,
@@ -553,6 +551,72 @@ it("malformed historical details retain a neutral entry without exporting raw pr
       buildVersion: null,
     });
     expect(JSON.stringify(report)).not.toMatch(/PRIVATE|192\.0\.2\.99|bld_private/u);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("release comparison observes two exact published artifacts without exposing private package evidence", async () => {
+  const f = await fixture();
+  try {
+    const rootId = f.ids[0];
+    if (!rootId) throw new Error("Missing resource");
+    await f.publishReplacement();
+    const report = await resourceLibrarySelectionsRepository.compare(f.buyer, rootId, {
+      from: `bld_req_${f.key}_0`,
+      to: `bld_req_${f.key}_replacement`,
+      returnPage: 2,
+    });
+    expect(report).toMatchObject({
+      artifactState: "same",
+      returnPage: 2,
+      metadataChanges: { version: true },
+      from: { version: "1.0.0" },
+      to: { version: "2.0.0" },
+    });
+    expect(report.from.packageSummary).not.toBeNull();
+    expect(JSON.stringify(report)).not.toMatch(
+      /storageKey|packageEvidence|aclRights|referencesTruncated.*path/u,
+    );
+  } finally {
+    await f.cleanup();
+  }
+});
+it("release comparison rejects revoked rights, withdrawn artifacts and foreign releases", async () => {
+  const f = await fixture();
+  try {
+    const rootId = f.ids[0];
+    if (!rootId) throw new Error("Missing resource");
+    await f.publishReplacement();
+    const query = { from: `bld_req_${f.key}_0`, to: `bld_req_${f.key}_replacement`, returnPage: 1 };
+    await expect(
+      resourceLibrarySelectionsRepository.compare(f.buyer, rootId, {
+        ...query,
+        to: `bld_req_${f.key}_1`,
+      }),
+    ).rejects.toMatchObject({ statusCode: 404 });
+    await db.update(builds).set({ status: "deprecated" }).where(eq(builds.id, query.from));
+    await expect(
+      resourceLibrarySelectionsRepository.compare(f.buyer, rootId, query),
+    ).rejects.toMatchObject({ statusCode: 404 });
+    await db.delete(entitlements).where(eq(entitlements.subjectId, f.buyer));
+    await expect(
+      resourceLibrarySelectionsRepository.compare(f.buyer, rootId, query),
+    ).rejects.toMatchObject({ statusCode: 404 });
+  } finally {
+    await f.cleanup();
+  }
+});
+it("publisher and staff roles do not confer buyer comparison access", async () => {
+  const f = await fixture();
+  try {
+    const rootId = f.ids[0];
+    if (!rootId) throw new Error("Missing resource");
+    await f.publishReplacement();
+    const query = { from: `bld_req_${f.key}_0`, to: `bld_req_${f.key}_replacement`, returnPage: 1 };
+    for (const actorId of [f.owner, f.staff])
+      await expect(
+        resourceLibrarySelectionsRepository.compare(actorId, rootId, query),
+      ).rejects.toMatchObject({ statusCode: 404 });
   } finally {
     await f.cleanup();
   }

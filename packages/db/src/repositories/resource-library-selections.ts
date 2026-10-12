@@ -14,6 +14,7 @@ import {
   resourceLibrarySelections as selections,
   users,
 } from "../schema";
+import { readLibraryReleaseComparison } from "./library-release-comparison";
 import { readLibraryReleaseHistory } from "./library-release-history";
 import { readLibraryReleasePage } from "./library-release-page";
 import { safePublishedBuildCondition } from "./build-safety";
@@ -70,6 +71,7 @@ function currentAccess(expiresAt: Date | null, productId: string) {
 }
 export class ResourceLibrarySelectionsRepository {
   history = readLibraryReleaseHistory;
+  compare = readLibraryReleaseComparison;
   async page(userId: string, requestedPage = 1, filter: LibraryReleaseFilter = "all") {
     return db.transaction(
       async (tx) => {

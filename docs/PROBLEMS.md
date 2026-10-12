@@ -2979,3 +2979,45 @@ mandatory-audit rollback and tied microsecond traversal; they remain unrun witho
 a disposable database. Browser interaction and production page generation remain
 outstanding. Existing PostgreSQL activity fixtures now seed and revoke a real
 administrator role rather than relying on a supplied role string.
+
+### Private buyer release comparison — 2026-10-12
+
+Version screens now link the current selected safe build to another safe published
+release at `/workspace/library/[id]/versions/compare`. Exact from/to IDs and the bounded
+return page are validated; swapping reverses the comparison and exports preserve the
+same pair. RU/EN tables/cards display archive SHA-256/size/name/MIME, publication time,
+notes, declared MTA target/signing flag and only the existing public package summary.
+No preference, entitlement, receipt, license, payment or artifact state is changed;
+comparison has no download or selection mutation controls. Labels make no assumptions
+about semantic version ordering, runtime compatibility or changed internal files.
+
+A live account, effective grants/legacy licenses at database time, published product
+and both same-product trusted-clean published builds are required. Four bounded queries
+run in one read-only repeatable-read snapshot. Missing, withdrawn or foreign releases
+cancel the entire comparison; publisher/staff roles confer no buyer-access bypass.
+Outputs whitelist release fields: inventory paths, ACL/dependency declarations, full
+package evidence, storage keys and private moderation/audit data are excluded. Package
+summaries require the v1 inspector and matching artifact hash/size; malformed summary
+counts or absent evidence yield unknown instead of inferred zero/unchanged state.
+Equal archive hashes with unequal sizes are reported as inconsistent observations.
+Notes are capped at 10000 characters with an explicit truncation flag; exact stored
+metadata differences remain separately recorded. Package count differences are summary
+observations and do not identify changed files or certify execution/DRM.
+
+Authenticated private API/export routes reuse inspection limits, no-store/Cookie variance,
+512-KiB JSON attachment bounds and nosniff. Existing build/access indexes are reused;
+no migration/schema change is included. Focused verification passes 275 tests across
+23 files; changed-file Biome, web TypeScript and isolated Next compile pass.
+Root TypeScript retains pre-existing missing `fast-check` declarations
+and the old missing `isSigned` delivery fixture. Three PostgreSQL fixtures cover exact
+artifact comparison/public-summary privacy, revoked/withdrawn/foreign releases and
+publisher/staff access isolation. They remain unrun without disposable PostgreSQL;
+live query/locking, browser interaction and pinned Node 26 validation remain open.
+GitHub Actions are neither run nor inspected.
+
+The merged build worker was killed under the environment's 8-GiB memory limit.
+Next's supported Webpack memory optimizations are now enabled and route collection
+uses two workers. These are build settings, with no application authorization or
+runtime route changes. The merged tree is recompiled separately from test workers;
+GitHub Actions remain untouched. Both concurrent server/community commits are
+preserved; the only rebase conflict was independent documentation append operations.
