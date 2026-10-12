@@ -49,11 +49,21 @@ it("compares only same-resource safe releases in one entitled database-clock sna
   h.rows = [
     [["usr_a"]],
     [{ observedAt: date }],
-    [{ id: "prd_a", title: "Owned resource", slug: "owned" }],
+    [
+      {
+        id: "prd_a",
+        title: "Owned resource",
+        slug: "owned",
+        revision: 0,
+        mode: "latest",
+        buildId: null,
+      },
+    ],
     [build("bld_b", "b".repeat(64)), build("bld_a")],
   ];
   expect(await readLibraryReleaseComparison("usr_a", "prd_a", query)).toMatchObject({
     generatedAt: date,
+    selection: { revision: 0, mode: "latest", buildId: null },
     returnPage: 2,
     artifactState: "different",
     from: { id: "bld_a" },
@@ -86,7 +96,7 @@ it("fails the whole comparison when a release is withdrawn, foreign or has inval
   h.rows = [
     [["usr_a"]],
     [{ observedAt: date }],
-    [{ id: "prd_a", title: "Owned", slug: "owned" }],
+    [{ id: "prd_a", title: "Owned", slug: "owned", revision: 0, mode: "latest", buildId: null }],
     [build("bld_a")],
   ];
   await expect(readLibraryReleaseComparison("usr_a", "prd_a", query)).rejects.toMatchObject({
@@ -95,7 +105,7 @@ it("fails the whole comparison when a release is withdrawn, foreign or has inval
   h.rows = [
     [["usr_a"]],
     [{ observedAt: date }],
-    [{ id: "prd_a", title: "Owned", slug: "owned" }],
+    [{ id: "prd_a", title: "Owned", slug: "owned", revision: 0, mode: "latest", buildId: null }],
     [build("bld_a"), build("bld_b", "invalid")],
   ];
   await expect(readLibraryReleaseComparison("usr_a", "prd_a", query)).rejects.toMatchObject({
@@ -110,4 +120,31 @@ it("rejects direct invalid scopes before opening a transaction", async () => {
     readLibraryReleaseComparison("usr_a", "prd_a", { ...query, to: "bld_a" }),
   ).rejects.toMatchObject({ code: "RESOURCE_CONTROL_INVALID" });
   expect(h.queries).toHaveLength(0);
+});
+
+it("includes only the actor's current preference without another query or metadata leak", async () => {
+  h.rows = [
+    [["usr_a"]],
+    [{ observedAt: date }],
+    [
+      {
+        id: "prd_a",
+        title: "Owned",
+        slug: "owned",
+        revision: 4,
+        mode: "fixed",
+        buildId: "bld_old",
+        private: "SECRET",
+      },
+    ],
+    [build("bld_a"), build("bld_b")],
+  ];
+  const result = await readLibraryReleaseComparison("usr_a", "prd_a", query);
+  expect(result.selection).toEqual({ revision: 4, mode: "fixed", buildId: "bld_old" });
+  expect(result.product).toEqual({ id: "prd_a", title: "Owned", slug: "owned" });
+  expect(JSON.stringify(result)).not.toContain("SECRET");
+  expect(h.queries).toHaveLength(4);
+  expect(h.queries[2].sql).toContain('LEFT JOIN "resource_library_selections" preference');
+  expect(h.queries[2].sql).toContain("preference.user_id=");
+  expect(h.queries[2].params.filter((v) => v === "usr_a")).toHaveLength(3);
 });

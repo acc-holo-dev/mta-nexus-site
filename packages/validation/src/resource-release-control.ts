@@ -6,6 +6,13 @@ export const libraryReleaseCommandSchema = z.discriminatedUnion("mode", [
     .object({
       mode: z.literal("fixed"),
       expectedRevision: revision,
+      reviewedArtifact: z
+        .object({
+          sha256Hash: z.string().regex(/^[a-f0-9]{64}$/u),
+          fileSizeBytes: z.number().int().positive().max(Number.MAX_SAFE_INTEGER),
+        })
+        .strict()
+        .optional(),
       buildId: z
         .string()
         .min(1)

@@ -1,9 +1,12 @@
 const en = {
   title: "Compare releases",
+  chooseCompared: "Fix the compared release for downloads",
+  alreadySelected: "This release is already your fixed download choice.",
+  confirmChoice: "I reviewed this comparison and want to use this exact archive for downloads.",
   field: "Property",
   from: "Reference release",
   to: "Compared release",
-  note: "Compare two currently accessible, safe published releases. Summary counts do not identify changed files or prove compatibility, execution or DRM. Missing package evidence remains unknown. No version preference is changed.",
+  note: "Compare two currently accessible, safe published releases. Summary counts do not identify changed files or prove compatibility, execution or DRM. Missing package evidence remains unknown. Comparing alone does not change your version preference.",
   same: "Recorded archive hash and size match",
   different: "Recorded archives differ",
   inconsistent: "Archive hash and size observations conflict",
@@ -46,10 +49,13 @@ const en = {
 };
 const ru: typeof en = {
   title: "Сравнить выпуски",
+  chooseCompared: "Закрепить сравниваемый выпуск для скачивания",
+  alreadySelected: "Этот выпуск уже закреплён для скачивания.",
+  confirmChoice: "Я изучил сравнение и хочу использовать именно этот архив для скачивания.",
   field: "Параметр",
   from: "Опорный выпуск",
   to: "Сравниваемый выпуск",
-  note: "Сравнение двух доступных безопасных опубликованных выпусков. Сводные счётчики не показывают изменённые файлы и не доказывают совместимость, работоспособность или DRM. Отсутствующие данные проверки остаются неизвестными. Выбор версии не изменяется.",
+  note: "Сравнение двух доступных безопасных опубликованных выпусков. Сводные счётчики не показывают изменённые файлы и не доказывают совместимость, работоспособность или DRM. Отсутствующие данные проверки остаются неизвестными. Само сравнение не меняет выбранную версию.",
   same: "Записанные хеш и размер архивов совпадают",
   different: "Записанные архивы различаются",
   inconsistent: "Данные о хеше и размере архивов противоречат друг другу",

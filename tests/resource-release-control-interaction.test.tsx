@@ -37,6 +37,8 @@ function nodes(n: ReactNode): Element[] {
   if (Array.isArray(n)) return n.flatMap(nodes);
   if (!n || typeof n !== "object" || !("props" in n)) return [];
   const e = n as Element;
+  if (typeof e.type === "function")
+    return [e, ...nodes((e.type as (props: unknown) => ReactNode)(e.props))];
   return [e, ...nodes(e.props.children as ReactNode)];
 }
 function render() {

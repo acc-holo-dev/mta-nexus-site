@@ -1,3 +1,4 @@
+import { LibraryReleaseComparisonSelection } from "./library-release-comparison-selection";
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -121,6 +122,18 @@ export async function LibraryReleaseComparisonScreen({
         ))}
       </div>
       <p className="text-secondary">{c.countsNote}</p>
+      <LibraryReleaseComparisonSelection
+        key={`${path.id}:${result.selection.revision}:${result.to.id}:${result.to.sha256Hash}:${result.to.fileSizeBytes}`}
+        productId={path.id}
+        locale={locale}
+        selection={result.selection}
+        target={{
+          id: result.to.id,
+          version: result.to.version,
+          sha256Hash: result.to.sha256Hash,
+          fileSizeBytes: result.to.fileSizeBytes,
+        }}
+      />
       <p className="text-sm">
         {c.generated}: <time dateTime={result.generatedAt}>{result.generatedAt}</time>
       </p>

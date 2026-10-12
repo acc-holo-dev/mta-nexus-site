@@ -6,7 +6,7 @@ import {
 } from "@nexus/domain";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
-import { builds, products, users } from "../schema";
+import { builds, products, users, resourceLibrarySelections as selections } from "../schema";
 import { effectiveUserDownloadSources } from "./user-library";
 import { safePublishedBuildCondition } from "./build-safety";
 export async function readLibraryReleaseComparison(
@@ -44,8 +44,14 @@ export async function readLibraryReleaseComparison(
         id: string;
         title: string;
         slug: string;
+        revision: number;
+        mode: "latest" | "fixed";
+        buildId: string | null;
       }>(sql`${effectiveUserDownloadSources(userId, sql`transaction_timestamp()`)}
-      SELECT product.id,left(product.title,200) AS title,product.slug FROM owned JOIN ${products} product ON product.id=owned.resource_id
+      SELECT product.id,left(product.title,200) AS title,product.slug,
+        COALESCE(preference.revision,0) AS revision,COALESCE(preference.mode,'latest') AS mode,preference.build_id AS "buildId"
+        FROM owned JOIN ${products} product ON product.id=owned.resource_id
+        LEFT JOIN ${selections} preference ON preference.product_id=product.id AND preference.user_id=${userId}
       WHERE product.id=${productId} AND product.status='published' LIMIT 1`);
       if (!product) throw new NotFoundError("Library resource", productId);
       const rows = await tx
@@ -79,7 +85,8 @@ export async function readLibraryReleaseComparison(
           throw new AppError("Invalid artifact identity", 500, "LIBRARY_COMPARISON_INVALID");
       return {
         schemaVersion: 1 as const,
-        product,
+        product: { id: product.id, title: product.title, slug: product.slug },
+        selection: { revision: product.revision, mode: product.mode, buildId: product.buildId },
         generatedAt: date.toISOString(),
         returnPage: query.returnPage,
         ...compareLibraryReleases(from, to),

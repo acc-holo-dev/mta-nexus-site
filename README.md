@@ -6,6 +6,13 @@ before another choice. Definitive rejections require reloading. Single selection
 recheck expiry against the database clock after locks, protect revision updates and
 reject unexpected insert races without an audit or preference overwrite.
 
+Comparison now offers an explicit, reviewed choice of its target release for downloads.
+The comparison snapshots the actor's preference revision alongside the releases;
+a confirmation checkbox binds the choice to the displayed archive hash and size.
+Saving rechecks those observations, clean publication and current access under locks.
+Lost responses retain the same reviewed command through the shared selection recovery.
+Comparing or exporting alone does not alter the preference or grant a file.
+
 Buyers can now compare two exact, currently accessible safe releases before changing
 version preferences. RU/EN comparison shows archive identity/size, published notes,
 declared MTA/signing metadata and the established public package summary. The summary

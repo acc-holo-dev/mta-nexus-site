@@ -343,3 +343,39 @@ it("guards an existing revision and advances a future timestamp monotonically", 
   expect(query?.params).toContain("2026-10-11T12:00:00.001Z");
   expect(query?.params.at(-1)).toBe(3);
 });
+
+it.each([
+  { sha256Hash: "b".repeat(64), fileSizeBytes: 100 },
+  { sha256Hash: "a".repeat(64), fileSizeBytes: 101 },
+])("rejects a reviewed archive identity that changed %j", async (reviewedArtifact) => {
+  state.results = [...ownedRows(), [], [["bld_a", "a".repeat(64), 100]]];
+  await expect(
+    library.command({ ...input, command: { ...fixed, reviewedArtifact } }),
+  ).rejects.toMatchObject({ code: "LIBRARY_RELEASE_REVIEW_CHANGED" });
+  expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
+  expect(state.queries.at(-1)?.sql).toContain("for share");
+});
+it("saves and replays an exact reviewed archive without duplicating audit", async () => {
+  const reviewedArtifact = { sha256Hash: "a".repeat(64), fileSizeBytes: 100 };
+  state.results = [
+    ...ownedRows(),
+    [],
+    [["bld_a", reviewedArtifact.sha256Hash, 100]],
+    clockRows,
+    [[1, "fixed", "bld_a", stamp]],
+    [],
+  ];
+  const first = await library.command({ ...input, command: { ...fixed, reviewedArtifact } });
+  expect(first.selection).toMatchObject({ mode: "fixed", buildId: "bld_a", revision: 1 });
+  state.queries = [];
+  state.results = [
+    ...ownedRows(),
+    [[1, "fixed", "bld_a", stamp]],
+    [["bld_a", reviewedArtifact.sha256Hash, 100]],
+    clockRows,
+  ];
+  expect(await library.command({ ...input, command: { ...fixed, reviewedArtifact } })).toEqual(
+    first,
+  );
+  expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
+});

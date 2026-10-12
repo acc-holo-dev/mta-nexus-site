@@ -3098,3 +3098,38 @@ PostgreSQL. Browser interaction and production page generation remain outstandin
 After rebasing on Agent A's release comparison and selection recovery, 543 checks
 across 46 files pass. All 28 upstream files and complete problem notes are preserved.
 The follow domain type includes editorial content without changing stored schema.
+
+
+## Reviewed version choice from release comparison (2026-10-12)
+
+The comparison screen now offers an explicit target-release choice, superseding the
+initial comparison-only interface. The read-only comparison snapshot includes the
+actor's current selection revision/mode/build ID via an actor-scoped left join in the
+existing owned-product query. Product fields remain explicitly projected; no extra
+query, schema migration or write is needed to compare/export.
+
+RU/EN controls show the target version/hash/byte size and require acknowledgement before
+submitting a fixed choice. A reviewed fixed command optionally carries a strict
+reviewedArtifact (lowercase SHA-256, positive safe-integer bytes); latest mode rejects
+that field. The repository rechecks identity on the exact same-product published clean
+build under a share lock before checking selection revision, final database-time access
+and writing the preference/audit. Changed identity yields LIBRARY_RELEASE_REVIEW_CHANGED;
+an intervening preference change conflicts. Existing unreviewed version controls and
+batch commands keep their contracts. Preference replay is still state/revision based,
+with no immutable single-command receipt or implied installation, compatibility, access,
+DRM, entitlement, payment or license change.
+
+Both single-choice surfaces share request locking, frozen-command retries, strict
+acknowledgement and reload/error handling. The comparison control is keyed to resource,
+revision and target archive identity to reset review state after a new snapshot. An
+already fixed target displays its state without another confirmation. Missing access,
+unsafe/withdrawn targets and stale/changed reviewed identities never substitute a newer
+release. Two PostgreSQL fixtures cover compare->choose->replay->updated snapshot and
+intervening-choice/revoked-access rejection; these remain unrun without a disposable
+PostgreSQL instance. Browser interaction and Node 26 validation remain open. The concurrent
+discussion-watch commit dded0df is preserved. GitHub Actions are neither run nor inspected.
+
+Verification: 225 focused tests across 19 files pass, including individual recovery,
+comparison selection, selection batches and the preserved discussion-watch checks.
+Changed-file Biome, web TypeScript and the merged Next compile pass. Root TypeScript
+retains only the existing fast-check type errors and old missing isSigned fixture.

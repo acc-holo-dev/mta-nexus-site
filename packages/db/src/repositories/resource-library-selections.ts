@@ -169,12 +169,22 @@ export class ResourceLibrarySelectionsRepository {
       if (command.mode === "fixed") {
         if (product.status !== "published") throw fail("LIBRARY_RELEASE_UNAVAILABLE");
         const [build] = await tx
-          .select({ id: builds.id })
+          .select({
+            id: builds.id,
+            sha256Hash: builds.sha256Hash,
+            fileSizeBytes: builds.fileSizeBytes,
+          })
           .from(builds)
           .where(and(safePublishedBuildCondition(product.id), eq(builds.id, command.buildId)))
           .limit(1)
           .for("share");
         if (!build) throw fail("LIBRARY_RELEASE_UNAVAILABLE");
+        if (
+          command.reviewedArtifact &&
+          (build.sha256Hash !== command.reviewedArtifact.sha256Hash ||
+            build.fileSizeBytes !== command.reviewedArtifact.fileSizeBytes)
+        )
+          throw fail("LIBRARY_RELEASE_REVIEW_CHANGED");
       }
       const same = previous.mode === command.mode && previous.buildId === buildId;
       if (

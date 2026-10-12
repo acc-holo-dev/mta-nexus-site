@@ -16,7 +16,11 @@ export type LibraryReleaseSelection = {
 };
 export type LibraryReleaseCommand = { expectedRevision: number } & (
   | { mode: "latest" }
-  | { mode: "fixed"; buildId: string }
+  | {
+      mode: "fixed";
+      buildId: string;
+      reviewedArtifact?: { sha256Hash: string; fileSizeBytes: number };
+    }
 );
 export type ResourceModerationCommand = {
   action: "suspend" | "release";

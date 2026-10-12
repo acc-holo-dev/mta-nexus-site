@@ -65,6 +65,8 @@ const copy = {
       RESOURCE_CONTROL_INVALID: "Check the selected release and request details.",
       RESOURCE_MODERATION_INVALID: "Provide a reason, confirmation and current resource revision.",
       LIBRARY_RELEASE_CONFLICT: "Your preference changed. Reload before selecting a version.",
+      LIBRARY_RELEASE_REVIEW_CHANGED:
+        "The reviewed archive changed. Reload the comparison before choosing it.",
       LIBRARY_RELEASE_UNAVAILABLE: "This release is withdrawn or no longer cleared for delivery.",
       PRODUCT_METADATA_CONFLICT: "The resource changed. Reload before continuing.",
       PRODUCT_STATE_CHANGED: "This action is unavailable in the current resource state.",
@@ -140,6 +142,8 @@ const copy = {
       RESOURCE_CONTROL_INVALID: "Проверьте выбранный выпуск и параметры запроса.",
       RESOURCE_MODERATION_INVALID: "Укажите причину, подтверждение и актуальную версию ресурса.",
       LIBRARY_RELEASE_CONFLICT: "Настройка изменилась. Обновите страницу перед выбором версии.",
+      LIBRARY_RELEASE_REVIEW_CHANGED:
+        "Архив изменился после сравнения. Обновите сравнение перед выбором.",
       LIBRARY_RELEASE_UNAVAILABLE: "Выпуск снят с публикации или больше не разрешён к выдаче.",
       PRODUCT_METADATA_CONFLICT: "Ресурс изменился. Обновите страницу перед продолжением.",
       PRODUCT_STATE_CHANGED: "Действие недоступно в текущем состоянии ресурса.",

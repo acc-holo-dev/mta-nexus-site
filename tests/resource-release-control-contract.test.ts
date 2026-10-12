@@ -142,3 +142,31 @@ it("requires a complete canonical selection acknowledgement", () => {
   ])
     expect(confirmedLibraryRelease(value, "prd_a", command)).toBe(false);
 });
+
+it("accepts an exact reviewed archive only for fixed choices", () => {
+  const reviewedArtifact = { sha256Hash: "a".repeat(64), fileSizeBytes: 100 };
+  expect(
+    libraryReleaseCommandSchema.parse({
+      mode: "fixed",
+      expectedRevision: 3,
+      buildId: "bld_a",
+      reviewedArtifact,
+    }),
+  ).toMatchObject({ reviewedArtifact });
+  for (const value of [
+    { mode: "latest", expectedRevision: 3, reviewedArtifact },
+    ...[
+      { sha256Hash: "A".repeat(64) },
+      { fileSizeBytes: 0 },
+      { fileSizeBytes: 1.5 },
+      { fileSizeBytes: Number.MAX_SAFE_INTEGER + 1 },
+      { storageKey: "private" },
+    ].map((change) => ({
+      mode: "fixed",
+      expectedRevision: 3,
+      buildId: "bld_a",
+      reviewedArtifact: { ...reviewedArtifact, ...change },
+    })),
+  ])
+    expect(libraryReleaseCommandSchema.safeParse(value).success).toBe(false);
+});

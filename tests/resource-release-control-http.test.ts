@@ -203,3 +203,19 @@ it.each(["?userId=other", "?page=1", "?mode=latest", "?buildId=bld_other&buildId
     expect(state.libraryCommand).not.toHaveBeenCalled();
   },
 );
+
+it("passes the reviewed artifact through the session-bound selection endpoint", async () => {
+  const command = {
+    ...fixed,
+    reviewedArtifact: { sha256Hash: "a".repeat(64), fileSizeBytes: 100 },
+  };
+  const response = await select(post("/api/library/releases/prd_a", command), context);
+  expect(response.status).toBe(200);
+  expect(state.libraryCommand).toHaveBeenCalledWith({
+    userId: "usr_a",
+    productId: "prd_a",
+    command,
+    auditId: "aud_a",
+  });
+  privateResponse(response);
+});

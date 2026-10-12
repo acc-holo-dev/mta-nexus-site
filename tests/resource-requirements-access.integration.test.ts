@@ -693,3 +693,101 @@ it("rolls a single selection back if its mandatory audit cannot be written", asy
     await f.cleanup();
   }
 });
+
+it("selects the exact comparison target with its observed preference revision and archive identity", async () => {
+  const f = await fixture();
+  try {
+    await f.publishReplacement();
+    const productId = f.ids[0] ?? "";
+    const comparison = await resourceLibrarySelectionsRepository.compare(f.buyer, productId, {
+      from: `bld_req_${f.key}_0`,
+      to: `bld_req_${f.key}_replacement`,
+      returnPage: 1,
+    });
+    expect(comparison.selection).toEqual({ revision: 0, mode: "latest", buildId: null });
+    const command = {
+      mode: "fixed" as const,
+      buildId: comparison.to.id,
+      expectedRevision: comparison.selection.revision,
+      reviewedArtifact: {
+        sha256Hash: comparison.to.sha256Hash,
+        fileSizeBytes: comparison.to.fileSizeBytes,
+      },
+    };
+    const selected = await resourceLibrarySelectionsRepository.command({
+      userId: f.buyer,
+      productId,
+      command,
+      auditId: `aud_compared_${f.key}`,
+    });
+    expect(selected.selection).toMatchObject({
+      mode: "fixed",
+      revision: 1,
+      buildId: comparison.to.id,
+    });
+    const replay = await resourceLibrarySelectionsRepository.command({
+      userId: f.buyer,
+      productId,
+      command,
+      auditId: `aud_compared_retry_${f.key}`,
+    });
+    expect(replay).toEqual(selected);
+    const snapshot = await resourceLibrarySelectionsRepository.compare(f.buyer, productId, {
+      from: comparison.from.id,
+      to: comparison.to.id,
+      returnPage: 1,
+    });
+    expect(snapshot.selection).toEqual({ revision: 1, mode: "fixed", buildId: comparison.to.id });
+  } finally {
+    await f.cleanup();
+  }
+});
+it("rejects a comparison choice after an intervening selection or revoked access", async () => {
+  const f = await fixture();
+  try {
+    await f.publishReplacement();
+    const productId = f.ids[0] ?? "";
+    const comparison = await resourceLibrarySelectionsRepository.compare(f.buyer, productId, {
+      from: `bld_req_${f.key}_0`,
+      to: `bld_req_${f.key}_replacement`,
+      returnPage: 1,
+    });
+    const command = {
+      mode: "fixed" as const,
+      buildId: comparison.to.id,
+      expectedRevision: comparison.selection.revision,
+      reviewedArtifact: {
+        sha256Hash: comparison.to.sha256Hash,
+        fileSizeBytes: comparison.to.fileSizeBytes,
+      },
+    };
+    await resourceLibrarySelectionsRepository.command({
+      userId: f.buyer,
+      productId,
+      command: { mode: "fixed", buildId: comparison.from.id, expectedRevision: 0 },
+      auditId: `aud_intervening_${f.key}`,
+    });
+    await expect(
+      resourceLibrarySelectionsRepository.command({
+        userId: f.buyer,
+        productId,
+        command,
+        auditId: `aud_stale_review_${f.key}`,
+      }),
+    ).rejects.toMatchObject({ code: "LIBRARY_RELEASE_CONFLICT" });
+    expect(
+      (await db.select().from(selections).where(eq(selections.userId, f.buyer)))[0]?.buildId,
+    ).toBe(comparison.from.id);
+    await db.delete(entitlements).where(eq(entitlements.subjectId, f.buyer));
+    await expect(
+      resourceLibrarySelectionsRepository.command({
+        userId: f.buyer,
+        productId,
+        command: { ...command, expectedRevision: 1 },
+        auditId: `aud_revoked_review_${f.key}`,
+      }),
+    ).rejects.toMatchObject({ statusCode: 404 });
+  } finally {
+    await f.cleanup();
+  }
+});
