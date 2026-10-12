@@ -1,19 +1,19 @@
-import Link from "next/link";
-import { cookies } from "next/headers";
-import { notFound } from "next/navigation";
-import { can } from "@nexus/security";
 import { AppError } from "@nexus/domain";
-import { authService } from "../lib/services/auth-service";
-import { communityReportService } from "../lib/services/community-report-service";
-import { getRequestLocale } from "../lib/i18n-server";
-import { communityReportCopy } from "../lib/community-report-copy";
+import { can } from "@nexus/security";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import {
+  communityReportDetailSchema,
   communityReportPageQuery,
   communityReportPageSchema,
-  communityReportDetailSchema,
 } from "../lib/community-report-contract";
-import { CommunityReportList } from "./community-report-list";
+import { communityReportCopy } from "../lib/community-report-copy";
+import { getRequestLocale } from "../lib/i18n-server";
+import { authService } from "../lib/services/auth-service";
+import { communityReportService } from "../lib/services/community-report-service";
 import { CommunityReportDetailView } from "./community-report-detail";
+import { CommunityReportList } from "./community-report-list";
 export async function CommunityReportScreen({
   staff = false,
   id,
@@ -67,6 +67,21 @@ export async function CommunityReportScreen({
     );
   }
   const filters = communityReportPageQuery(await searchParams);
+  if (!filters)
+    return (
+      <div className="space-y-4">
+        {header}
+        <p role="alert" className="nexus-panel p-5 text-danger">
+          {copy.queryInvalid}
+        </p>
+        <Link
+          href={staff ? "/admin/reports" : "/workspace/reports"}
+          className="text-accent underline"
+        >
+          {copy.reset}
+        </Link>
+      </div>
+    );
   const initial = await communityReportService
     .page(actor, filters, staff)
     .then((value) => communityReportPageSchema.parse(value))

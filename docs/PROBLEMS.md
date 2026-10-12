@@ -3461,3 +3461,60 @@ across 25 focused files (watch/history/collection/support discovery and support 
 pass. Web TypeScript passes after route regeneration, and Next webpack compile-mode
 build exits zero with its route summary. Live PostgreSQL/browser and full production
 generation remain unverified. GitHub Actions were neither run nor inspected.
+
+
+## Community report search and scoped decision receipts (Agent B)
+
+Both `/workspace/reports` and `/admin/reports` now search literal report text or
+report IDs with an 80-character bound, escaped SQL wildcards and retained
+category/target/view/page filters. Search stays inside requester or current staff
+scope and preserves the existing queue ordering and bounded page contract.
+Native search forms reset to page one; pagination and view links retain the query.
+SSR now uses the same strict query parser as the API: duplicate, unknown or
+malformed filters show an explicit recovery state rather than silently changing
+the reviewed scope. Existing reason projections are capped in PostgreSQL.
+
+`/workspace/reports/[id]/history` and `/admin/reports/[id]/history` show persisted
+submission/review/decision events from existing audit records. Report cards link
+to the history. All/7/30/90/365-day and event-group filters, twenty-row keyset
+pages, database-clock cutoffs, scoped anchors and exact PostgreSQL microseconds
+reuse private-history infrastructure and the existing target/time/ID audit index.
+Cursors bind actor, report, audience and filters; reuse across staff/requester
+views, changed filters, future windows or deleted anchors fails explicitly. The
+cutoff fixes event time rather than maintaining a cross-request MVCC snapshot.
+The displayed report status remains current; historical transitions reflect
+recorded evidence and malformed legacy evidence stays neutral.
+
+Requester receipts expose only recorded steps, role labels, validated status
+transitions and strict recorded removal evidence. Staff notes and batch details
+are not selected from PostgreSQL for requester reads. No account identities,
+report target IDs, private reporter text/evidence, IP/user-agent fields or raw
+audit details enter either receipt. Staff receipts require a freshly read
+moderator/admin role and may include bounded decision notes and validated
+1–20-report batch context. Oversized legacy notes are capped in SQL and UTF-16
+without splitting surrogate pairs. Existing community-target and requester scope
+checks are reused; commercial product/server/license targets remain unavailable.
+
+Four private read/export routes under `/api/workspace/reports/[id]/history` and
+`/api/admin/reports/[id]/history` authenticate, limit searches and resolve access
+again for each read/export in a read-only repeatable-read transaction. Exports
+contain the displayed page and retained window, with private/no-store/Cookie
+headers, request IDs, nosniff, fixed filenames and the shared 512-KiB bound. The
+service rejects inconsistent audience/report/filter/cutoff output and narrows
+cursor fields before encoding them. RU/EN metadata, errors, loading/empty states,
+native labeled forms, escaped notes and responsive views use existing components.
+No schema, migration, dependency, workflow or commercial contract changed.
+
+717 unit/HTTP/SQL-builder/SSR/interaction checks across 66 focused files pass,
+including discussion/batch moderation, report notifications, support, profile
+privacy, team governance and integrated release watches. The corrected deleted/
+revoked-staff SQL mock scenarios were also rechecked separately. Web TypeScript
+including generated routes, Next webpack compile-mode build, changed-file Biome
+(three small pre-existing shared files lint-only) and diff checks pass. Root
+TypeScript retains only the upstream delivery fixture's missing `isSigned`; Knip
+retains three upstream commercial exports. Four PostgreSQL fixtures prepare
+actual submission/review/resolution and batch receipts, retained 45-row tied
+traversal, changed/deleted anchors, role revocation, malformed private evidence,
+Unicode bounds, literal search and commercial-target exclusion. They remain
+unrun without disposable PostgreSQL. Browser behavior, live query plans and full
+production page generation remain outstanding. GitHub Actions are not used.

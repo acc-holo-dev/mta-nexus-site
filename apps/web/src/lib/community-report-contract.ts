@@ -25,7 +25,7 @@ export const communityReportDecisionSchema = z
       : value.expectedRevision === undefined,
   );
 export function parseCommunityReportQuery(params: URLSearchParams) {
-  const allowed = ["view", "page", "target", "type"];
+  const allowed = ["view", "page", "target", "type", "q"];
   if (
     [...params.keys()].some((key) => !allowed.includes(key)) ||
     allowed.some((key) => params.getAll(key).length > 1)
@@ -35,11 +35,13 @@ export function parseCommunityReportQuery(params: URLSearchParams) {
     page = params.get("page") || "1";
   const target = params.get("target") || undefined,
     type = params.get("type") || undefined;
+  const rawQuery = params.get("q") ?? "";
   if (
     !["pending", "history"].includes(view) ||
     !/^[1-9]\d{0,3}$/u.test(page) ||
     (target && !["content", "comment"].includes(target)) ||
-    (type && !REPORT_TYPES.includes(type as (typeof REPORT_TYPES)[number]))
+    (type && !REPORT_TYPES.includes(type as (typeof REPORT_TYPES)[number])) ||
+    rawQuery.length > 80
   )
     return null;
   return {
@@ -47,25 +49,19 @@ export function parseCommunityReportQuery(params: URLSearchParams) {
     page: Number(page),
     target: target as "content" | "comment" | undefined,
     type,
+    ...(rawQuery.trim() ? { query: rawQuery.trim() } : {}),
   };
 }
 export type CommunityReportQuery = NonNullable<ReturnType<typeof parseCommunityReportQuery>>;
 export function communityReportPageQuery(
   params: Record<string, string | string[] | undefined> = {},
-): CommunityReportQuery {
+) {
   const normalized = new URLSearchParams();
-  for (const key of ["view", "page", "target", "type"]) {
-    const value = params[key];
-    if (value) normalized.set(key, Array.isArray(value) ? value[0] : value);
+  for (const [key, value] of Object.entries(params)) {
+    if (Array.isArray(value)) for (const item of value) normalized.append(key, item);
+    else if (value !== undefined) normalized.append(key, value);
   }
-  return (
-    parseCommunityReportQuery(normalized) ?? {
-      view: "pending",
-      page: 1,
-      target: undefined,
-      type: undefined,
-    }
-  );
+  return parseCommunityReportQuery(normalized);
 }
 const reportSummarySchema = z.object({
   id: z.string().min(1).max(128),

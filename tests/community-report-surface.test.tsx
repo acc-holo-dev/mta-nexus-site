@@ -137,6 +137,23 @@ it("renders the report entry point with an accessible target-independent label",
     ),
   ).toContain(communityReportCopy("ru").report);
 });
+it("preserves literal query text across pages and displays a strict recovery state for malformed SSR filters", async () => {
+  const html = renderToStaticMarkup(
+    <CommunityReportList
+      initial={{ items: [], hasMore: true, page: 2, view: "pending" }}
+      filters={{ ...filters, query: "100%_" }}
+      locale="en"
+    />,
+  );
+  expect(html).toContain('name="q"');
+  expect(html).toContain("q=100%25_");
+  expect(html).toMatch(/maxlength="80"/iu);
+  const invalid = renderToStaticMarkup(
+    await CommunityReportScreen({ searchParams: Promise.resolve({ q: ["x", "y"] }) }),
+  );
+  expect(invalid).toContain(communityReportCopy("en").queryInvalid);
+  expect(mocks.page).not.toHaveBeenCalled();
+});
 it("does not load private data for anonymous users or nonstaff on staff screens", async () => {
   mocks.session.mockResolvedValue(null);
   expect(renderToStaticMarkup(await CommunityReportScreen({}))).toContain('href="/auth/login"');

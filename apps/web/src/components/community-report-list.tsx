@@ -1,15 +1,15 @@
 "use client";
+import { Button } from "@nexus/ui";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@nexus/ui";
-import type { Locale } from "../lib/i18n";
 import {
-  REPORT_TYPES,
-  communityReportPageSchema,
   type CommunityReportPage,
   type CommunityReportQuery,
+  communityReportPageSchema,
+  REPORT_TYPES,
 } from "../lib/community-report-contract";
 import { communityReportCopy, communityReportError } from "../lib/community-report-copy";
+import type { Locale } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
 export function CommunityReportList({
   initial,
@@ -35,6 +35,7 @@ export function CommunityReportList({
       params = new URLSearchParams({ view: values.view, page: String(values.page) });
     if (values.target) params.set("target", values.target);
     if (values.type) params.set("type", values.type);
+    if (values.query) params.set("q", values.query);
     return `${path}?${params}`;
   }
   async function reload() {
@@ -80,6 +81,20 @@ export function CommunityReportList({
       </nav>
       <form method="GET" action={path} className="nexus-panel flex flex-wrap items-end gap-3 p-4">
         <input type="hidden" name="view" value={filters.view} />
+        <label className="min-w-0 basis-full space-y-1 text-sm text-secondary">
+          <span>{copy.textSearch}</span>
+          <input
+            name="q"
+            type="search"
+            maxLength={80}
+            defaultValue={filters.query ?? ""}
+            className={platformFieldClass}
+            aria-describedby="community-report-search-help"
+          />
+          <span id="community-report-search-help" className="block text-xs text-muted">
+            {copy.searchHint}
+          </span>
+        </label>
         <label className="min-w-40 flex-1 space-y-1 text-sm text-secondary">
           <span>{copy.target}</span>
           <select name="target" defaultValue={filters.target ?? ""} className={platformFieldClass}>

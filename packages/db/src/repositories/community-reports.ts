@@ -1,12 +1,26 @@
 import { createHash } from "node:crypto";
-import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
-import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import {
+  AppError,
+  type ChangeHistoryFilters,
+  ForbiddenError,
+  NotFoundError,
+  REPORT_HISTORY_ACTIONS,
+  REPORT_HISTORY_GROUPS,
+  type ReportHistoryGroup,
+} from "@nexus/domain";
+import { and, asc, desc, eq, ilike, inArray, isNull, or, type SQL, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, comments, content, reports, users } from "../schema";
 import {
   discussionManagementRepository,
   moderationDiscussionRevision,
 } from "./discussion-management";
+import {
+  changeHistoryBounds,
+  changeHistoryContext,
+  changeHistoryWindow,
+} from "./private-change-history-window";
+import { containsPattern } from "./search-pattern";
 
 type Session = Pick<typeof db, "select" | "insert" | "update" | "delete" | "execute">;
 type Scope = { actorId: string; staff: boolean };
@@ -19,7 +33,7 @@ const fields = {
   targetType: reports.targetType,
   targetId: reports.targetId,
   type: reports.type,
-  reason: reports.reason,
+  reason: sql<string>`left(${reports.reason},1000)`,
   evidenceUrls: reports.evidenceUrls,
   status: reports.status,
   createdAt: reports.createdAt,
@@ -105,6 +119,121 @@ function assertDecisionState(status: string, expected: string, action: string) {
     throw new AppError("Report changed", 409, "REPORT_STATE_CHANGED");
 }
 class CommunityReportsRepository {
+  async history(scope: Scope, id: string, filters: ChangeHistoryFilters<ReportHistoryGroup>) {
+    const context = changeHistoryContext(
+      scope.staff ? "community-report-staff-history" : "community-report-own-history",
+      scope.actorId,
+      id,
+      REPORT_HISTORY_GROUPS,
+      filters,
+    );
+    if (filters.query || filters.before)
+      throw new AppError("Invalid report history filters", 400, "CHANGE_HISTORY_FILTER_INVALID");
+    return db.transaction(
+      async (tx) => {
+        if (scope.staff) await requireStaff(tx, scope.actorId, false);
+        const [report] = await tx
+          .select({
+            id: reports.id,
+            targetType: reports.targetType,
+            targetId: reports.targetId,
+            type: reports.type,
+            status: reports.status,
+            reporterId: reports.reporterId,
+          })
+          .from(reports)
+          .where(
+            and(
+              eq(reports.id, id),
+              communityTarget,
+              scope.staff ? undefined : eq(reports.reporterId, scope.actorId),
+            ),
+          )
+          .limit(1);
+        if (!report) throw new NotFoundError("Report");
+        const until = await changeHistoryWindow(tx, filters);
+        const actions =
+          filters.group === "all"
+            ? [...REPORT_HISTORY_ACTIONS]
+            : filters.group === "submission"
+              ? ["report.created"]
+              : filters.group === "review"
+                ? ["report.review"]
+                : ["report.resolve", "report.dismiss", "report.remove_comment"];
+        const where = and(
+          eq(auditEvents.targetType, "report"),
+          eq(auditEvents.targetId, id),
+          inArray(auditEvents.action, actions),
+          changeHistoryBounds(auditEvents.createdAt, filters.period, until),
+        );
+        const time = sql<string>`to_char(${auditEvents.createdAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`;
+        let before: SQL | undefined;
+        if (filters.cursor) {
+          const [anchor] = await tx
+            .select({ id: auditEvents.id, time })
+            .from(auditEvents)
+            .where(and(where, eq(auditEvents.id, filters.cursor.id)))
+            .limit(1);
+          if (!anchor) throw new AppError("Report history expired", 410, "REPORT_HISTORY_EXPIRED");
+          before = sql`(${auditEvents.createdAt},${auditEvents.id}) < (${anchor.time}::timestamptz,${anchor.id})`;
+        }
+        const rows = await tx
+          .select({
+            id: auditEvents.id,
+            action: auditEvents.action,
+            createdAt: time,
+            from: sql<Status | null>`case when ${auditEvents.action}<>'report.created' and ${auditEvents.details}->>'previousStatus' in ('open','under_review','resolved','dismissed') then ${auditEvents.details}->>'previousStatus' else null end`,
+            to: sql<Status | null>`case when ${auditEvents.action}='report.created' then 'open' when ${auditEvents.action}='report.review' and ${auditEvents.details}->>'status'='under_review' then 'under_review' when ${auditEvents.action} in ('report.resolve','report.remove_comment') and ${auditEvents.details}->>'status'='resolved' then 'resolved' when ${auditEvents.action}='report.dismiss' and ${auditEvents.details}->>'status'='dismissed' then 'dismissed' else null end`,
+            by: sql<
+              "requester" | "staff" | "unknown"
+            >`case when ${auditEvents.actorType}='user' and ${auditEvents.actorId}=${report.reporterId} then 'requester' when ${auditEvents.actorType}='admin' then 'staff' else 'unknown' end`,
+            removed: sql<boolean>`coalesce(${auditEvents.action}='report.remove_comment' and ${report.targetType}='comment' and jsonb_typeof(${auditEvents.details}->'removedCommentId')='string' and ${auditEvents.details}->>'removedCommentId'=${report.targetId},false)`,
+            ...(scope.staff
+              ? {
+                  notes: sql<
+                    string | null
+                  >`case when jsonb_typeof(${auditEvents.details}->'notes')='string' then left(${auditEvents.details}->>'notes',2000) else null end`,
+                  batchSize: sql<
+                    number | null
+                  >`case when jsonb_typeof(${auditEvents.details}->'batchSize')='number' and ${auditEvents.details}->>'batchSize' ~ '^([1-9]|1[0-9]|20)$' then (${auditEvents.details}->>'batchSize')::integer else null end`,
+                }
+              : {}),
+          })
+          .from(auditEvents)
+          .where(and(where, before))
+          .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
+          .limit(21);
+        const items = rows.slice(0, 20).map((row) => ({
+          ...row,
+          ...(scope.staff
+            ? {
+                notes: row.notes?.slice(0, 2000).replace(/[\uD800-\uDBFF]$/u, "") ?? null,
+                batchSize: row.batchSize ?? null,
+              }
+            : {}),
+        }));
+        const last = items.at(-1);
+        return {
+          report: {
+            id: report.id,
+            targetType: report.targetType,
+            type: report.type,
+            status: report.status,
+          },
+          audience: scope.staff ? ("staff" as const) : ("requester" as const),
+          period: filters.period,
+          group: filters.group,
+          until,
+          items,
+          hasMore: rows.length > 20,
+          nextCursor:
+            rows.length > 20 && last ? { version: 1 as const, context, until, id: last.id } : null,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
   private async discussionBatchPlan(
     tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
     actorId: string,
@@ -430,10 +559,19 @@ class CommunityReportsRepository {
       page: number;
       target?: "content" | "comment";
       type?: string;
+      query?: string;
     },
   ) {
     if (!Number.isSafeInteger(filters.page) || filters.page < 1 || filters.page > 9999)
       throw new RangeError("Invalid report page");
+    if (
+      filters.query !== undefined &&
+      (typeof filters.query !== "string" ||
+        filters.query.length > 80 ||
+        filters.query !== filters.query.trim())
+    )
+      throw new AppError("Invalid report search", 400, "VALIDATION_ERROR");
+    const pattern = filters.query ? containsPattern(filters.query) : undefined;
     return db.transaction(async (tx) => {
       if (scope.staff) await requireStaff(tx, scope.actorId);
       const rows = await tx
@@ -449,6 +587,7 @@ class CommunityReportsRepository {
             ),
             filters.target ? eq(reports.targetType, filters.target) : undefined,
             filters.type ? eq(reports.type, filters.type) : undefined,
+            pattern ? or(ilike(reports.reason, pattern), ilike(reports.id, pattern)) : undefined,
           ),
         )
         .orderBy(

@@ -2,18 +2,19 @@ import { expect, it } from "vitest";
 import {
   communityReportCreateSchema,
   communityReportDecisionSchema,
-  parseCommunityReportQuery,
   communityReportPageQuery,
   confirmsReportDecision,
+  parseCommunityReportQuery,
 } from "../apps/web/src/lib/community-report-contract";
 import {
   communityReportCopy,
-  communityReportError,
   communityReportDecisionError,
+  communityReportError,
   communityReportMutationError,
 } from "../apps/web/src/lib/community-report-copy";
-import { formatNotification } from "../apps/web/src/lib/notification-copy";
 import { getDictionary } from "../apps/web/src/lib/i18n";
+import { formatNotification } from "../apps/web/src/lib/notification-copy";
+
 const report = {
   targetType: "comment",
   targetId: "comment",
@@ -53,8 +54,9 @@ it("bounds pages and preserves valid filters through SSR", () => {
       new URLSearchParams("page=9999&view=history&target=comment&type=spam"),
     ),
   ).toEqual({ page: 9999, view: "history", target: "comment", type: "spam" });
-  expect(communityReportPageQuery({ page: ["2", "0"], target: "content" }).page).toBe(2);
-  expect(communityReportPageQuery({ page: "invalid", actorId: "victim" }).page).toBe(1);
+  expect(communityReportPageQuery({ page: "2", target: "content" })?.page).toBe(2);
+  expect(communityReportPageQuery({ page: ["2", "0"], target: "content" })).toBeNull();
+  expect(communityReportPageQuery({ page: "invalid", actorId: "victim" })).toBeNull();
 });
 it("requires exact target revision for removal and no irrelevant revisions on other decisions", () => {
   const decision = {

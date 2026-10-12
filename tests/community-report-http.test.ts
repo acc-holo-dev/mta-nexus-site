@@ -1,6 +1,7 @@
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   page: vi.fn(),
@@ -20,10 +21,12 @@ vi.mock("../apps/web/src/lib/services/community-report-notifications", () => ({
   queueCommunityReportNotice: mocks.notice,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
-import { GET as ownList, POST } from "../apps/web/src/app/api/workspace/reports/route";
-import { GET as ownDetail } from "../apps/web/src/app/api/workspace/reports/[id]/route";
+
+import { PATCH, GET as staffDetail } from "../apps/web/src/app/api/admin/reports/[id]/route";
 import { GET as staffList } from "../apps/web/src/app/api/admin/reports/route";
-import { GET as staffDetail, PATCH } from "../apps/web/src/app/api/admin/reports/[id]/route";
+import { GET as ownDetail } from "../apps/web/src/app/api/workspace/reports/[id]/route";
+import { GET as ownList, POST } from "../apps/web/src/app/api/workspace/reports/route";
+
 const actor = { id: "actor", role: "user" },
   context = { params: Promise.resolve({ id: "report" }) };
 const report = {
@@ -167,6 +170,14 @@ it("limits reads and writes before service work", async () => {
   expect(mocks.page).not.toHaveBeenCalled();
   expect(mocks.submit).not.toHaveBeenCalled();
   expect(mocks.decide).not.toHaveBeenCalled();
+});
+it("preserves literal report searches and rejects duplicate or oversized queries", async () => {
+  expect((await ownList(request("GET", undefined, "?q=100%25_"))).status).toBe(200);
+  expect(mocks.page).toHaveBeenCalledWith(actor, expect.objectContaining({ query: "100%_" }));
+  mocks.page.mockClear();
+  for (const query of ["?q=x&q=y", `?q=${"x".repeat(81)}`])
+    expect((await ownList(request("GET", undefined, query))).status).toBe(400);
+  expect(mocks.page).not.toHaveBeenCalled();
 });
 it("returns safe localized unavailable outcomes and rejects malformed detail IDs", async () => {
   mocks.submit.mockRejectedValue(new Error("secret SQL"));

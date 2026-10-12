@@ -14,6 +14,7 @@ import {
   communityReportDecisionError,
   communityReportError,
 } from "../lib/community-report-copy";
+import { reportHistoryCopy } from "../lib/community-report-history-copy";
 import { discussionReportsCopy } from "../lib/discussion-reports-copy";
 import type { Locale } from "../lib/i18n";
 import { platformFieldClass, platformRequest } from "../lib/user-platform-client";
@@ -170,6 +171,12 @@ export function CommunityReportDetailView({
       )}
       {report && (
         <>
+          <Link
+            href={`${path}/history`}
+            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          >
+            {reportHistoryCopy(locale).title}
+          </Link>
           <section className="nexus-panel space-y-4 p-5">
             <h2 className="break-words text-lg font-semibold text-primary">
               {copy[report.targetType]} · {copy[report.type]}

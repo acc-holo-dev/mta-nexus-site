@@ -49,3 +49,4 @@ export * from "./private-change-history";
 export * from "./resource-release-watch-history";
 
 export * from "./support-message-discovery";
+export * from "./community-report-history";
