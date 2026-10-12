@@ -526,6 +526,13 @@
       "when": 1791768600000,
       "tag": "0074_library_collection_item_copies",
       "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1791770400000,
+      "tag": "0075_library_collection_item_moves",
+      "breakpoints": true
     }
   ]
 }

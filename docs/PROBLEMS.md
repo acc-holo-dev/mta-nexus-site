@@ -3701,3 +3701,52 @@ TypeScript sources. Web TypeScript passes after regenerated routes. The isolated
 webpack compile-mode build exits zero with its route summary. Root TypeScript retains
 only the known fast-check/implicit-any and old missing isSigned delivery-fixture errors.
 Live PostgreSQL fixtures/migration, browser and full production generation remain unrun.
+
+
+## Atomic selected-reference moves between collections (2026-10-12)
+
+Active collection screens now link to a dedicated RU/EN move review screen using the
+existing bounded source/destination/overlap reader. The shared transfer control has an
+explicit move mode and removal confirmation; archived or terminal-revision sources are
+readable but cannot submit a move. It retains frozen UUID/body/endpoint/review snapshots,
+strict acknowledgements, duplicate-handler suppression and unmount cancellation. Copying
+from archives still works. Private move review GET remains session-bound, rate limited,
+no-store and strict about page/search/scope selectors. No download controls are added.
+
+The strict move-items command requires mutable expected source and destination revisions
+plus twenty or fewer unique canonical recorded IDs. The destination remains route-bound;
+the user remains session-bound. Shared owner serialization and collection/member locks
+protect both scopes. Both must be active; both logical history quotas and destination
+capacity for only missing entries are checked before writes. Missing destination entries
+are inserted without replacing existing dates, exact selected source entries are removed,
+and both revisions advance with guarded updates before one immutable receipt and required
+audit. Missing rows, stale revisions, partial removals, quota or audit failures abort the
+whole transaction. Orphaned/unavailable references are movable without product/grant reads.
+Saved versions, release watches, download rights and commercial state remain independent.
+
+Move receipts add only recorded source ID/successor revision to the public projection;
+this is a postcondition proved at receipt insertion, rather than current source state.
+Acknowledgement requires the full original command, source successor and destination
+successor. Exact UUID retries return the same receipt after later edits/archive without
+repeating removals. Both own source and destination histories project that same receipt;
+recorded source/destination provenance is shown without foreign-name lookup. The existing
+5000-operation quota now counts incoming and outgoing moves for each collection.
+
+Migration 0075 preserves all prior receipt action/immutability checks while requiring an
+own distinct active source at its successor revision, every reference present in destination
+and absent from source, and both history quotas. A source/user/time/id expression partial
+index matches the reader's literal move-action predicate. No extra receipt/table or mutable
+history row is introduced. Two PostgreSQL fixtures cover orphaned-reference moves with
+concurrent replay, retained duplicate dates and dual history; and rollback of both sides
+on audit failure plus rejection of a false source-removal receipt. They remain unrun without
+a disposable PostgreSQL instance. Live migrations/locking/query plans, browser interaction,
+full production generation and Node 26 validation remain open. GitHub Actions are neither
+run nor inspected.
+
+Verification: 308 focused tests across 27 files pass, covering move/copy receipts,
+repository/HTTP/RU-EN rendering/retries and preserved collection version/preparation/
+release-watch/history flows. Biome lint passes on all 17 touched TypeScript sources,
+and web TypeScript passes again after route regeneration. The isolated Next webpack
+compile-mode build exits zero with its route summary. Root TypeScript retains only
+the known fast-check/implicit-any and old missing isSigned delivery-fixture errors.
+Live PostgreSQL/migration/browser and full production generation remain unrun.

@@ -19,6 +19,13 @@ const result = z
         requestId: z.string().uuid(),
         command: libraryCollectionCommandSchema,
         collection: snapshot,
+        sourceCollection: z
+          .object({
+            id: libraryCollectionIdSchema,
+            revision: z.number().int().min(1).max(2147483647),
+          })
+          .strict()
+          .optional(),
         createdAt: z.string().datetime(),
       })
       .strict(),
@@ -39,6 +46,13 @@ export function confirmedCollectionCommand(
     JSON.stringify(receipt.command) !== JSON.stringify(expected.data)
   )
     return null;
+  if (expected.data.action === "move-items") {
+    if (
+      receipt.sourceCollection?.id !== expected.data.sourceCollectionId ||
+      receipt.sourceCollection.revision !== expected.data.expectedSourceRevision + 1
+    )
+      return null;
+  } else if (receipt.sourceCollection !== undefined) return null;
   if (expected.data.action === "create")
     return !current &&
       next.name === expected.data.name &&

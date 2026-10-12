@@ -75,7 +75,7 @@ const date = new Date("2026-10-11T00:00:00Z"),
   },
   bounds = { page: 1, totalPages: 2, total: 21, pageSize: 20, offset: 0 };
 const screen = async (
-  view: "list" | "detail" | "add" | "history" | "copy" | "copy-items" = "list",
+  view: "list" | "detail" | "add" | "history" | "copy" | "copy-items" | "move-items" = "list",
   values: Record<string, string | undefined> = {},
 ) =>
   renderToStaticMarkup(
@@ -312,5 +312,36 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("q=Core");
     expect(html).not.toContain("data-download");
     expect(html).not.toContain("data-build");
+  },
+);
+
+it.each(["en", "ru"] as const)(
+  "renders explicit removal confirmation on the move review screen in %s",
+  async (locale) => {
+    state.locale = locale;
+    state.copyItemsPage.mockResolvedValue({
+      ...bounds,
+      q: "Core",
+      source: { ...collection, status: "active" },
+      items: [{ productId: "prd_hidden", title: null }],
+      destinations: [
+        {
+          id: "lcol_target",
+          name: "Target",
+          status: "active",
+          revision: 2,
+          itemCount: 199,
+          presentProductIds: [],
+        },
+      ],
+    });
+    const html = await screen("move-items", { q: "Core" });
+    expect(html).toContain(
+      locale === "en" ? "Move selected references" : "Перенести выбранные записи",
+    );
+    expect(html).toContain(locale === "en" ? "I confirm removing" : "Подтверждаю удаление");
+    expect(html).toContain("prd_hidden");
+    expect(html).not.toContain("data-download");
+    expect(html).toContain("/move-items?");
   },
 );

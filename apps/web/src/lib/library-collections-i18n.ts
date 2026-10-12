@@ -7,10 +7,18 @@ const en = {
   create: "Create collection",
   duplicate: "Copy collection",
   "copy-items": "Copy selected references",
+  "move-items": "Move selected references",
+  moveItemsNote:
+    "Move up to 20 references from this active collection into another active collection. They are removed from the source only if the whole operation commits. Existing destination entries keep their dates. Download rights, saved versions and release watches are unchanged.",
+  moveItemsConfirm:
+    "I confirm removing the selected references from the source and keeping them in the destination.",
+  moveSourceUnavailable:
+    "The source cannot be changed. Restore an archived collection before moving references.",
+  sourceSuccessor: "Recorded source revision after moving",
   copyItemsNote:
     "Copy up to 20 references to another active collection. The source may be archived. Unavailable references keep their IDs and hidden titles. Existing destination references are kept once; download rights, saved versions and release watches are unchanged.",
   destination: "Destination collection",
-  noDestination: "Create or restore another collection before copying selected references.",
+  noDestination: "Create or restore another collection to use as a destination.",
   copyItemsConfirm: "I confirm the source and destination revisions and the selected references.",
   additions: "New references to add",
   openDestination: "Open destination collection",
@@ -87,10 +95,18 @@ const ru: typeof en = {
   create: "Создать коллекцию",
   duplicate: "Скопировать коллекцию",
   "copy-items": "Скопировать выбранные записи",
+  "move-items": "Перенести выбранные записи",
+  moveItemsNote:
+    "Перенесите до 20 записей из этой активной коллекции в другую активную коллекцию. Они удалятся из источника только при успешном применении всей операции. Имеющиеся записи назначения сохранят даты добавления. Права на скачивание, выбор версий и подписки на выпуски сохраняются.",
+  moveItemsConfirm:
+    "Подтверждаю удаление выбранных записей из источника и сохранение их в назначении.",
+  moveSourceUnavailable:
+    "Источник нельзя изменить. Восстановите архивную коллекцию перед переносом записей.",
+  sourceSuccessor: "Записанная редакция источника после переноса",
   copyItemsNote:
     "Скопируйте до 20 записей в другую активную коллекцию. Источник может быть в архиве. У недоступных ресурсов сохраняются ID и скрытые названия. Имеющиеся записи назначения не дублируются; права на скачивание, выбор версий и подписки на выпуски сохраняются.",
   destination: "Коллекция назначения",
-  noDestination: "Создайте или восстановите другую коллекцию для копирования выбранных записей.",
+  noDestination: "Создайте или восстановите другую коллекцию назначения.",
   copyItemsConfirm: "Подтверждаю редакции источника и назначения и выбранные записи.",
   additions: "Новых записей для добавления",
   openDestination: "Открыть коллекцию назначения",

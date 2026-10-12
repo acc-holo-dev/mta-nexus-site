@@ -20,7 +20,10 @@ export function LibraryCollectionCommandForm({
 }: {
   locale: "ru" | "en";
   collection?: LibraryCollectionSnapshot;
-  action?: Exclude<LibraryCollectionCommand["action"], "add-many" | "remove-many" | "copy-items">;
+  action?: Exclude<
+    LibraryCollectionCommand["action"],
+    "add-many" | "remove-many" | "copy-items" | "move-items"
+  >;
   productId?: string;
   copyPreview?: LibraryCollectionCopyPreview;
 }) {

@@ -34,6 +34,7 @@ vi.mock("@nexus/db", () => ({
 
 import { GET as releases } from "../apps/web/src/app/api/library/collections/[id]/releases/route";
 import { GET as releasesExport } from "../apps/web/src/app/api/library/collections/[id]/releases/export/route";
+import { GET as moveItemsPage } from "../apps/web/src/app/api/library/collections/[id]/move-items/route";
 import { GET as copyItemsPage } from "../apps/web/src/app/api/library/collections/[id]/copy-items/route";
 import { GET as copyPreview } from "../apps/web/src/app/api/library/collections/[id]/copy/route";
 import { GET as candidates } from "../apps/web/src/app/api/library/collections/[id]/candidates/route";
@@ -320,4 +321,39 @@ it("binds selected-reference copies to the destination route and validates sourc
     { ...body, sourceCollectionId: "../private" },
   ])
     expect((await command(post(bad, `${base}/lcol_a`), context)).status).toBe(400);
+});
+
+it("serves move review through the same private source snapshot and accepts only reviewed mutable source revisions", async () => {
+  state.copyItemsPage.mockResolvedValue({
+    source: { id: "lcol_a", status: "active", revision: 4 },
+    items: [],
+    destinations: [],
+  });
+  const response = await moveItemsPage(request(`${base}/lcol_a/move-items?page=2&q=Core`), context);
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(state.copyItemsPage).toHaveBeenCalledWith("usr_a", "lcol_a", 2, "Core");
+  const body = {
+    requestId,
+    action: "move-items",
+    sourceCollectionId: "lcol_source",
+    expectedSourceRevision: 4,
+    productIds: ["prd_a"],
+    expectedRevision: 1,
+  };
+  expect((await command(post(body, `${base}/lcol_a`), context)).status).toBe(200);
+  expect(state.command).toHaveBeenCalledWith(
+    expect.objectContaining({ userId: "usr_a", collectionId: "lcol_a", command: body }),
+  );
+  expect(
+    (
+      await command(
+        post({ ...body, expectedSourceRevision: 2147483647 }, `${base}/lcol_a`),
+        context,
+      )
+    ).status,
+  ).toBe(400);
+  expect(
+    (await moveItemsPage(request(`${base}/lcol_a/move-items?userId=other`), context)).status,
+  ).toBe(400);
 });

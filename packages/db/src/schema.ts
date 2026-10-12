@@ -1472,6 +1472,8 @@ export const libraryCollectionReceipts = pgTable("library_collection_receipts", 
   uniqueIndex("library_collection_receipts_user_request_idx").on(table.userId, table.requestId),
   foreignKey({ columns: [table.collectionId, table.userId], foreignColumns: [libraryCollections.id, libraryCollections.userId] }).onDelete("cascade"),
   index("library_collection_receipts_history_idx").on(table.collectionId, table.createdAt.desc(), table.id.desc()),
+  index("library_collection_receipts_source_history_idx").on(table.userId, sql`${table.command}->>'sourceCollectionId'`, table.createdAt.desc(), table.id.desc())
+    .where(sql`${table.command}->>'action'='move-items'`),
   check("library_collection_receipts_digest_check", sql`${table.commandDigest} ~ '^[a-f0-9]{64}$'`),
   check("library_collection_receipts_payload_check", sql`coalesce(jsonb_typeof(${table.command}) = 'object' AND octet_length(${table.command}::text) <= 8192 AND jsonb_typeof(${table.snapshot}) = 'object' AND octet_length(${table.snapshot}::text) <= 2048, false)`),
   check("library_collection_receipts_time_check", sql`isfinite(${table.createdAt})`),

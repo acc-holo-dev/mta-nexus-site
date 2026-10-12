@@ -12,7 +12,7 @@ import {
   NotFoundError,
 } from "@nexus/domain";
 import { libraryCollectionCommandSchema, libraryCollectionIdSchema } from "@nexus/validation";
-import { and, asc, count, desc, eq, inArray, ne, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, ne, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
@@ -58,8 +58,25 @@ function publicReceipt(
     requestId: row.requestId,
     command: row.command,
     collection: row.snapshot,
+    ...(row.command.action === "move-items"
+      ? {
+          sourceCollection: {
+            id: row.command.sourceCollectionId,
+            revision: row.command.expectedSourceRevision + 1,
+          },
+        }
+      : {}),
     createdAt: row.createdAt,
   };
+}
+function collectionReceiptScope(userId: string, id: string) {
+  return and(
+    eq(receipts.userId, userId),
+    or(
+      eq(receipts.collectionId, id),
+      sql`${receipts.command}->>'action'='move-items' AND ${receipts.command}->>'sourceCollectionId'=${id}`,
+    ),
+  );
 }
 async function liveUser(tx: ResourceTransaction, userId: string, lock = false) {
   const query = tx.select({ id: users.id }).from(users).where(eq(users.id, userId)).limit(1);
@@ -344,7 +361,7 @@ export class LibraryCollectionsRepository {
     return db.transaction(async (tx) => {
       await liveUser(tx, userId);
       const collection = await owned(tx, userId, id),
-        scope = and(eq(receipts.userId, userId), eq(receipts.collectionId, id));
+        scope = collectionReceiptScope(userId, id);
       const [summary] = await tx.select({ total: count() }).from(receipts).where(scope);
       const bounds = historyPageBounds(summary?.total ?? 0, page);
       const items = await tx
@@ -433,17 +450,26 @@ export class LibraryCollectionsRepository {
         const [summary] = await tx
           .select({ total: count() })
           .from(receipts)
-          .where(eq(receipts.collectionId, current.id));
+          .where(collectionReceiptScope(input.userId, current.id));
         if ((summary?.total ?? 0) >= LIBRARY_COLLECTION_COMMAND_LIMIT)
           throw fail("COLLECTION_HISTORY_LIMIT");
         if (
           command.action === "restore" ? current.status !== "archived" : current.status !== "active"
         )
           throw fail("COLLECTION_ARCHIVED");
-        if (command.action === "copy-items") {
+        if (command.action === "copy-items" || command.action === "move-items") {
           if (command.sourceCollectionId === current.id) throw fail("COLLECTION_CONFLICT");
           const source = await owned(tx, input.userId, command.sourceCollectionId, true);
           if (source.revision !== command.expectedSourceRevision) throw fail("COLLECTION_CONFLICT");
+          if (command.action === "move-items") {
+            if (source.status !== "active") throw fail("COLLECTION_ARCHIVED");
+            const [sourceHistory] = await tx
+              .select({ total: count() })
+              .from(receipts)
+              .where(collectionReceiptScope(input.userId, source.id));
+            if ((sourceHistory?.total ?? 0) >= LIBRARY_COLLECTION_COMMAND_LIMIT)
+              throw fail("COLLECTION_HISTORY_LIMIT");
+          }
           // Copy owned historical references, including deleted resources; no product/grant authority is consulted.
           const selected = await tx
             .select({ productId: members.productId })
@@ -478,6 +504,34 @@ export class LibraryCollectionsRepository {
             await tx
               .insert(members)
               .values(missing.map((productId) => ({ collectionId: current.id, productId })));
+          if (command.action === "move-items") {
+            const removed = await tx
+              .delete(members)
+              .where(
+                and(
+                  eq(members.collectionId, source.id),
+                  inArray(members.productId, command.productIds),
+                ),
+              )
+              .returning({ productId: members.productId });
+            if (removed.length !== command.productIds.length) throw fail("COLLECTION_CONFLICT");
+            const [advanced] = await tx
+              .update(collections)
+              .set({
+                revision: source.revision + 1,
+                updatedAt: sql`greatest(clock_timestamp(),${collections.updatedAt}+interval '1 millisecond')`,
+              })
+              .where(
+                and(
+                  eq(collections.id, source.id),
+                  eq(collections.userId, input.userId),
+                  eq(collections.revision, source.revision),
+                  eq(collections.status, "active"),
+                ),
+              )
+              .returning({ id: collections.id });
+            if (!advanced) throw fail("COLLECTION_CONFLICT");
+          }
         } else if (command.action === "add-many") {
           // Lock resources and grants in canonical order. Do not write a partial batch.
           const accessTerms: { productId: string; expiresAt: Date | null }[] = [];
@@ -627,7 +681,7 @@ export class LibraryCollectionsRepository {
           requestId: command.requestId,
           receiptId: record.id,
           revision: collection.revision,
-          ...(command.action === "copy-items"
+          ...(command.action === "copy-items" || command.action === "move-items"
             ? {
                 sourceCollectionId: command.sourceCollectionId,
                 sourceRevision: command.expectedSourceRevision,

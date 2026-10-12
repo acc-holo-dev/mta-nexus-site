@@ -56,7 +56,7 @@ export async function LibraryCollectionsScreen({
   searchParams,
   params,
 }: {
-  view?: "list" | "detail" | "add" | "history" | "copy" | "copy-items";
+  view?: "list" | "detail" | "add" | "history" | "copy" | "copy-items" | "move-items";
   searchParams: Promise<Query>;
   params?: Promise<{ id: string }>;
 }) {
@@ -144,14 +144,14 @@ export async function LibraryCollectionsScreen({
       );
     }
     const id = collectionId(path?.id ?? "");
-    if (view === "copy-items") {
+    if (view === "copy-items" || view === "move-items") {
       const result = await service.copyItemsPage(actor, id, query);
       return (
         <div className="mx-auto max-w-4xl space-y-6 py-8">
           <Link href={collectionHref(id)} className="text-accent underline">
             {c.back}
           </Link>
-          <h1 className="font-display">{c["copy-items"]}</h1>
+          <h1 className="font-display">{c[view]}</h1>
           <p className="break-words">
             {c.source}: {result.source.name} · {c[result.source.status]} · {c.revision}{" "}
             {result.source.revision}
@@ -172,10 +172,12 @@ export async function LibraryCollectionsScreen({
           </form>
           <LibraryCollectionItemCopyForm
             key={JSON.stringify([
+              view,
               result.source,
               result.items.map((item) => item.productId),
               result.destinations,
             ])}
+            move={view === "move-items"}
             locale={locale}
             source={result.source}
             items={result.items}
@@ -185,14 +187,14 @@ export async function LibraryCollectionsScreen({
             bounds={result}
             locale={locale}
             href={(page) =>
-              collectionHref(id, "copy-items", {
+              collectionHref(id, view, {
                 page: String(page),
                 ...(result.q ? { q: result.q } : {}),
               })
             }
           />
           <a
-            href={`/api/library/collections/${encodeURIComponent(id)}/copy-items?${new URLSearchParams({ page: String(result.page), ...(result.q ? { q: result.q } : {}) })}`}
+            href={`/api/library/collections/${encodeURIComponent(id)}/${view}?${new URLSearchParams({ page: String(result.page), ...(result.q ? { q: result.q } : {}) })}`}
             className="text-accent underline"
           >
             {c.json}
@@ -260,10 +262,21 @@ export async function LibraryCollectionsScreen({
                     {item.command.expectedRevision} · {c.items}: {item.command.expectedItemCount}
                   </p>
                 )}
-                {item.command.action === "copy-items" && (
+                {(item.command.action === "copy-items" || item.command.action === "move-items") && (
                   <p className="break-all text-sm">
                     {c.source}: {item.command.sourceCollectionId} · {c.revision}:{" "}
                     {item.command.expectedSourceRevision}
+                  </p>
+                )}
+                {item.sourceCollection && (
+                  <p className="break-all text-sm">
+                    {c.sourceSuccessor}: {item.sourceCollection.id} ·{" "}
+                    {item.sourceCollection.revision}
+                  </p>
+                )}
+                {item.command.action === "move-items" && (
+                  <p className="break-all text-sm">
+                    {c.destination}: {item.collection.id} · {c.revision} {item.collection.revision}
                   </p>
                 )}
                 {"productIds" in item.command && (
@@ -400,6 +413,11 @@ export async function LibraryCollectionsScreen({
           <Link href={collectionHref(id, "copy")} className="text-accent underline">
             {c.duplicate}
           </Link>
+          {collection.status === "active" && (
+            <Link href={collectionHref(id, "move-items")} className="text-accent underline">
+              {c["move-items"]}
+            </Link>
+          )}
           <Link href={collectionHref(id, "copy-items")} className="text-accent underline">
             {c["copy-items"]}
           </Link>

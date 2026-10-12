@@ -30,6 +30,13 @@ export type LibraryCollectionCommand = { requestId: string } & (
       productIds: string[];
       expectedRevision: number;
     }
+  | {
+      action: "move-items";
+      sourceCollectionId: string;
+      expectedSourceRevision: number;
+      productIds: string[];
+      expectedRevision: number;
+    }
   | { action: "add-many" | "remove-many"; productIds: string[]; expectedRevision: number }
 );
 export type LibraryCollectionCopyPreview = {
@@ -42,6 +49,8 @@ export type LibraryCollectionReceipt = {
   requestId: string;
   command: LibraryCollectionCommand;
   collection: LibraryCollectionSnapshot;
+  /** Source successor proved by the immutable move receipt, rather than current state. */
+  sourceCollection?: { id: string; revision: number };
   createdAt: Date;
 };
 export type LibraryCollectionResult = { receipt: LibraryCollectionReceipt; replayed: boolean };

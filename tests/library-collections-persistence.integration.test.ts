@@ -590,3 +590,116 @@ it("rolls selected copying back on audit failure and rejects receipt proof for a
       }),
   ).rejects.toThrow();
 });
+
+// Move acceptance requires disposable PostgreSQL migrated through 0075.
+it("moves orphaned references exactly once with one receipt in both histories and unchanged destination duplicates", async () => {
+  const f = await copyFixture();
+  const ids: [string, string, string] = [
+    `prd_move_missing_${randomUUID().replaceAll("-", "")}`,
+    `prd_move_missing_${randomUUID().replaceAll("-", "")}`,
+    `prd_move_retained_${randomUUID().replaceAll("-", "")}`,
+  ];
+  await db
+    .insert(libraryCollectionItems)
+    .values(ids.map((productId) => ({ collectionId: f.sourceId, productId })));
+  const target = await f.command({
+    requestId: randomUUID(),
+    action: "create",
+    name: "Move target",
+  });
+  const targetId = target.receipt.collection.id;
+  await db.insert(libraryCollectionItems).values({ collectionId: targetId, productId: ids[0] });
+  const [existing] = await db
+    .select()
+    .from(libraryCollectionItems)
+    .where(eq(libraryCollectionItems.collectionId, targetId));
+  await db.delete(entitlements).where(eq(entitlements.subjectId, f.userId));
+  const body = {
+    requestId: randomUUID(),
+    action: "move-items" as const,
+    sourceCollectionId: f.sourceId,
+    expectedSourceRevision: 1,
+    productIds: ids.slice(0, 2),
+    expectedRevision: 1,
+  };
+  const results = await Promise.all([
+    f.command(body, targetId),
+    f.command(body, targetId),
+    f.command(body, targetId),
+  ]);
+  expect(results.filter((item) => !item.replayed)).toHaveLength(1);
+  expect(new Set(results.map((item) => item.receipt.id)).size).toBe(1);
+  expect(results[0]?.receipt.sourceCollection).toEqual({ id: f.sourceId, revision: 2 });
+  const source = await collections.detail(f.userId, f.sourceId),
+    destination = await collections.detail(f.userId, targetId);
+  expect(source.collection.revision).toBe(2);
+  expect(source.items.map((item) => item.productId)).toEqual([ids[2]]);
+  expect(destination.collection.revision).toBe(2);
+  expect(destination.items).toHaveLength(2);
+  expect(destination.items.find((item) => item.productId === ids[0])?.addedAt).toEqual(
+    existing?.addedAt,
+  );
+  const sourceHistory = await collections.history(f.userId, f.sourceId),
+    targetHistory = await collections.history(f.userId, targetId);
+  expect(sourceHistory.items.find((item) => item.command.action === "move-items")?.id).toBe(
+    results[0]?.receipt.id,
+  );
+  expect(targetHistory.items.find((item) => item.command.action === "move-items")?.id).toBe(
+    results[0]?.receipt.id,
+  );
+  await f.command({ requestId: randomUUID(), action: "archive", expectedRevision: 2 }, f.sourceId);
+  expect((await f.command(body, targetId)).replayed).toBe(true);
+  expect(
+    await db.select().from(entitlements).where(eq(entitlements.subjectId, f.userId)),
+  ).toHaveLength(0);
+});
+it("rolls both sides of a move back after audit failure and rejects a receipt if its source removal was not committed", async () => {
+  const f = await copyFixture();
+  const productId = `prd_move_missing_${randomUUID().replaceAll("-", "")}`;
+  await db.insert(libraryCollectionItems).values({ collectionId: f.sourceId, productId });
+  const duplicateAudit = `aud_move_atomic_${randomUUID()}`;
+  const target = await f.command(
+    { requestId: randomUUID(), action: "create", name: "Atomic move target" },
+    undefined,
+    duplicateAudit,
+  );
+  const id = target.receipt.collection.id;
+  const sourceBefore = await collections.detail(f.userId, f.sourceId),
+    targetBefore = await collections.detail(f.userId, id);
+  const body = {
+    requestId: randomUUID(),
+    action: "move-items" as const,
+    sourceCollectionId: f.sourceId,
+    expectedSourceRevision: 1,
+    productIds: [productId],
+    expectedRevision: 1,
+  };
+  await expect(f.command(body, id, duplicateAudit)).rejects.toThrow();
+  expect(await collections.detail(f.userId, f.sourceId)).toEqual(sourceBefore);
+  expect(await collections.detail(f.userId, id)).toEqual(targetBefore);
+  expect(
+    await db
+      .select()
+      .from(libraryCollectionReceipts)
+      .where(eq(libraryCollectionReceipts.requestId, body.requestId)),
+  ).toHaveLength(0);
+  await db
+    .update(libraryCollections)
+    .set({ revision: 2 })
+    .where(eq(libraryCollections.id, f.sourceId));
+  await db.update(libraryCollections).set({ revision: 2 }).where(eq(libraryCollections.id, id));
+  await db.insert(libraryCollectionItems).values({ collectionId: id, productId });
+  await expect(
+    db
+      .insert(libraryCollectionReceipts)
+      .values({
+        id: `lcr_${randomUUID().replaceAll("-", "")}`,
+        userId: f.userId,
+        requestId: body.requestId,
+        collectionId: id,
+        commandDigest: "a".repeat(64),
+        command: body,
+        snapshot: { id, name: "Atomic move target", status: "active", revision: 2 },
+      }),
+  ).rejects.toThrow();
+});

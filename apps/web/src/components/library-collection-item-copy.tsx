@@ -7,20 +7,23 @@ import { confirmedCollectionCommand } from "../lib/library-collections-confirmat
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
 import { privateApiRequest } from "../lib/private-api-request";
-type CopyCommand = Extract<LibraryCollectionCommand, { action: "copy-items" }>;
+type CopyCommand = Extract<LibraryCollectionCommand, { action: "copy-items" | "move-items" }>;
 type Destination = LibraryCollectionSnapshot & { itemCount: number; presentProductIds: string[] };
 export function LibraryCollectionItemCopyForm({
   source,
   items,
   destinations,
   locale,
+  move = false,
 }: {
   source: LibraryCollectionSnapshot;
   items: { productId: string; title: string | null }[];
   destinations: Destination[];
   locale: "en" | "ru";
+  move?: boolean;
 }) {
-  const c = libraryCollectionsCopy(locale);
+  const c = libraryCollectionsCopy(locale),
+    action = move ? "move-items" : "copy-items";
   const [ids, setIds] = useState<string[]>([]),
     [destinationId, setDestinationId] = useState(""),
     [confirmed, setConfirmed] = useState(false),
@@ -29,6 +32,7 @@ export function LibraryCollectionItemCopyForm({
     [blocked, setBlocked] = useState(false),
     [saved, setSaved] = useState(false),
     [savedDestinationId, setSavedDestinationId] = useState(""),
+    [savedSourceId, setSavedSourceId] = useState(""),
     [error, setError] = useState("");
   const lock = useRef(false),
     settled = useRef(false),
@@ -56,16 +60,26 @@ export function LibraryCollectionItemCopyForm({
     if (lock.current || settled.current) return;
     let request = pending.current;
     if (!request) {
-      if (!confirmed || !destination || overCapacity) return;
+      if (
+        !confirmed ||
+        !destination ||
+        overCapacity ||
+        (move && (source.status !== "active" || source.revision >= 2147483647))
+      )
+        return;
       const parsed = libraryCollectionCommandSchema.safeParse({
         requestId: crypto.randomUUID(),
-        action: "copy-items",
+        action,
         sourceCollectionId: source.id,
         expectedSourceRevision: source.revision,
         expectedRevision: destination.revision,
         productIds: ids,
       });
-      if (!parsed.success || parsed.data.action !== "copy-items") {
+      if (
+        !parsed.success ||
+        (parsed.data.action !== "copy-items" && parsed.data.action !== "move-items") ||
+        parsed.data.action !== action
+      ) {
         setError(c.invalid);
         return;
       }
@@ -109,6 +123,7 @@ export function LibraryCollectionItemCopyForm({
       }
       settled.current = true;
       setSavedDestinationId(request.destination.id);
+      setSavedSourceId(request.command.sourceCollectionId);
       setSaved(true);
     } catch {
       if (active.current === controller) setError(c.retry);
@@ -120,12 +135,14 @@ export function LibraryCollectionItemCopyForm({
       }
     }
   }
+  if (!frozen && move && (source.status !== "active" || source.revision >= 2147483647))
+    return <p role="note">{c.moveSourceUnavailable}</p>;
   if (!destinations.length) return <p role="note">{c.noDestination}</p>;
   if (!items.length) return <p>{c.emptyItems}</p>;
   return (
     <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
       <p role="note" className="text-sm text-secondary">
-        {c.copyItemsNote}
+        {move ? c.moveItemsNote : c.copyItemsNote}
       </p>
       <fieldset disabled={busy || frozen || saved} className="space-y-4">
         <legend>
@@ -195,7 +212,7 @@ export function LibraryCollectionItemCopyForm({
             onChange={(event) => setConfirmed(event.target.checked)}
             required
           />
-          {c.copyItemsConfirm}
+          {move ? c.moveItemsConfirm : c.copyItemsConfirm}
         </label>
       </fieldset>
       {!blocked && !saved && (
@@ -207,7 +224,7 @@ export function LibraryCollectionItemCopyForm({
           aria-busy={busy}
           className="rounded border border-base px-4 py-2 text-sm text-accent disabled:opacity-60"
         >
-          {busy ? c.busy : frozen ? c.retryAction : c["copy-items"]}
+          {busy ? c.busy : frozen ? c.retryAction : c[action]}
         </button>
       )}
       {frozen && !saved && (
@@ -233,6 +250,11 @@ export function LibraryCollectionItemCopyForm({
       {saved && (
         <div className="space-y-2">
           <p role="status">{c.saved}</p>
+          {move && (
+            <a href={collectionHref(savedSourceId)} className="text-accent underline">
+              {c.back}
+            </a>
+          )}
           <a href={collectionHref(savedDestinationId)} className="text-accent underline">
             {c.openDestination}
           </a>

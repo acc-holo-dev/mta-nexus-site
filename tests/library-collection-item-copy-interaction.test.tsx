@@ -39,7 +39,12 @@ function nodes(node: ReactNode): Element[] {
   const e = node as Element;
   return [e, ...nodes(e.props.children as ReactNode)];
 }
-let source = { id: "lcol_source", name: "Archive", status: "archived" as const, revision: 4 };
+let source = {
+  id: "lcol_source",
+  name: "Archive",
+  status: "archived" as "active" | "archived",
+  revision: 4,
+};
 let destinations = [
   {
     id: "lcol_target",
@@ -55,6 +60,7 @@ const items = [
   { productId: "prd_a", title: null },
 ];
 let locale: "en" | "ru" = "en";
+let move = false;
 function firstDestination() {
   const value = destinations[0];
   if (!value) throw new Error("Missing target");
@@ -62,7 +68,7 @@ function firstDestination() {
 }
 function render() {
   h.cursor = 0;
-  return nodes(LibraryCollectionItemCopyForm({ source, destinations, items, locale }));
+  return nodes(LibraryCollectionItemCopyForm({ source, destinations, items, locale, move }));
 }
 function change(node: Element, value: unknown) {
   (node.props.onChange as (e: unknown) => void)({ target: value });
@@ -100,6 +106,14 @@ function success(init: RequestInit, extra = {}) {
         requestId: command.requestId,
         command,
         collection: { id: "lcol_target", name: "Target", status: "active", revision: 3 },
+        ...(command.action === "move-items"
+          ? {
+              sourceCollection: {
+                id: command.sourceCollectionId,
+                revision: command.expectedSourceRevision + 1,
+              },
+            }
+          : {}),
         createdAt: "2026-10-12T00:00:00.000Z",
         ...extra,
       },
@@ -111,6 +125,7 @@ beforeEach(() => {
   h.cursor = 0;
   h.cleanup = null;
   locale = "en";
+  move = false;
   source = { id: "lcol_source", name: "Archive", status: "archived", revision: 4 };
   destinations = [
     {
@@ -236,4 +251,54 @@ it("coalesces duplicate submissions and ignores a successful response after unmo
   resolve(success(init));
   await pending;
   expect(render().some((n) => n.props.role === "status")).toBe(false);
+});
+
+it.each(["en", "ru"] as const)(
+  "moves from an active source with an exact UUID retry and confirms both successors in %s",
+  async (value) => {
+    locale = value;
+    move = true;
+    source = { ...source, status: "active" };
+    reviewed();
+    h.fetch.mockRejectedValueOnce(new Error("lost"));
+    await submit();
+    const init = h.fetch.mock.calls[0][1] as RequestInit;
+    expect(JSON.parse(String(init.body))).toMatchObject({
+      action: "move-items",
+      expectedSourceRevision: 4,
+      expectedRevision: 2,
+      productIds: ["prd_a", "prd_b"],
+    });
+    h.fetch.mockResolvedValueOnce(success(init));
+    await submit();
+    expect(h.fetch.mock.calls[1][1].body).toBe(init.body);
+    expect(render().some((n) => n.props.role === "status")).toBe(true);
+    expect(
+      render()
+        .filter((n) => n.type === "a")
+        .map((n) => n.props.href),
+    ).toEqual([
+      "/workspace/library/collections/lcol_source",
+      "/workspace/library/collections/lcol_target",
+    ]);
+  },
+);
+it("does not offer move submission for an archived source", () => {
+  move = true;
+  expect(
+    render().some((n) => n.props.children === libraryCollectionsCopy("en").moveSourceUnavailable),
+  ).toBe(true);
+  expect(render().some((n) => n.type === "form")).toBe(false);
+  expect(h.fetch).not.toHaveBeenCalled();
+});
+it("does not confirm a destination-only move acknowledgement", async () => {
+  move = true;
+  source = { ...source, status: "active" };
+  reviewed();
+  h.fetch.mockImplementationOnce(async (_url: string, init: RequestInit) =>
+    success(init, { sourceCollection: undefined }),
+  );
+  await submit();
+  expect(render().some((n) => n.props.role === "status")).toBe(false);
+  expect(render().some((n) => n.props.role === "alert")).toBe(true);
 });

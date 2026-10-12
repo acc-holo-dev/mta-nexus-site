@@ -59,6 +59,16 @@ export const libraryCollectionCommandSchema = z.discriminatedUnion("action", [
       expectedRevision,
     })
     .strict(),
+  z
+    .object({
+      requestId,
+      action: z.literal("move-items"),
+      sourceCollectionId: libraryCollectionIdSchema,
+      expectedSourceRevision: expectedRevision,
+      productIds,
+      expectedRevision,
+    })
+    .strict(),
   z.object({ requestId, action: z.literal("add-many"), productIds, expectedRevision }).strict(),
   z.object({ requestId, action: z.literal("remove-many"), productIds, expectedRevision }).strict(),
 ]);

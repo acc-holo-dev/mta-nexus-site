@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+Collections now support reviewed atomic moves of up to twenty references between
+existing active collections. Both revisions advance together, existing destination
+entries keep their dates, and one immutable UUID receipt appears in both histories.
+Source successor evidence is confirmed alongside the destination snapshot. Migration
+`0075_library_collection_item_moves` extends receipt guards and indexes source history.
+
 Collections now support reviewed copying of up to twenty selected references into
 another existing active collection, including unavailable/deleted references and
 archived sources. Both revisions and exact source membership are checked; existing

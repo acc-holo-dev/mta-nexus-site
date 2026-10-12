@@ -326,3 +326,56 @@ it("normalizes selected copy commands and verifies exact source proof in destina
     ),
   ).toHaveLength(1);
 });
+
+it("requires the recorded source successor when confirming a move and excludes terminal source writes", () => {
+  const command = libraryCollectionCommandSchema.parse({
+    requestId,
+    action: "move-items",
+    sourceCollectionId: "lcol_source",
+    expectedSourceRevision: 7,
+    productIds: ["prd_a"],
+    expectedRevision: 4,
+  });
+  const body = {
+    replayed: false,
+    receipt: {
+      id: "lcr_a",
+      requestId,
+      command,
+      collection: { ...current, revision: 5 },
+      createdAt: "2026-10-12T00:00:00.000Z",
+      sourceCollection: { id: "lcol_source", revision: 8 },
+    },
+  };
+  expect(confirmedCollectionCommand(body, command, current)).toBe("lcol_a");
+  for (const sourceCollection of [
+    undefined,
+    { id: "lcol_other", revision: 8 },
+    { id: "lcol_source", revision: 7 },
+  ])
+    expect(
+      confirmedCollectionCommand(
+        { ...body, receipt: { ...body.receipt, sourceCollection } },
+        command,
+        current,
+      ),
+    ).toBeNull();
+  expect(
+    libraryCollectionCommandSchema.safeParse({ ...command, expectedSourceRevision: 2147483647 })
+      .success,
+  ).toBe(false);
+  const migration = readFileSync(
+    "packages/db/migrations/0075_library_collection_item_moves.sql",
+    "utf8",
+  );
+  expect(migration).toContain("Move receipt must prove removal from its source");
+  expect(migration).toContain("source.revision-CASE WHEN action='move-items' THEN 1 ELSE 0 END");
+  expect(migration).toContain("library_collection_receipts_source_history_idx");
+  expect(migration).toContain("user_id=NEW.user_id");
+  const journal = JSON.parse(readFileSync("packages/db/migrations/meta/_journal.json", "utf8"));
+  expect(
+    journal.entries.filter(
+      (entry: { tag: string }) => entry.tag === "0075_library_collection_item_moves",
+    ),
+  ).toHaveLength(1);
+});
