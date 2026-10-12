@@ -9,6 +9,7 @@ import {
   type LibraryReleaseFilter,
   type LibraryCollectionReceipt,
   type LibraryCollectionSnapshot,
+  type LibraryCollectionResult,
   type LibraryResourceCollections,
   NotFoundError,
 } from "@nexus/domain";
@@ -434,340 +435,337 @@ export class LibraryCollectionsRepository {
       return { collection, items: items.map(publicReceipt), ...bounds };
     }, readOptions);
   }
-  async command(input: {
-    userId: string;
-    collectionId?: string;
-    command: LibraryCollectionCommand;
-    newCollectionId: string;
-    receiptId: string;
-    auditId: string;
-  }) {
-    const parsed = libraryCollectionCommandSchema.safeParse(input.command);
+  async command(input: LibraryCollectionCommandInput) {
+    validateCollectionCommand(input);
+    return withLibraryCollectionTransaction(input.userId, (tx) =>
+      applyLibraryCollectionCommand(tx, input),
+    );
+  }
+}
+
+export type LibraryCollectionCommandInput = {
+  userId: string;
+  collectionId?: string;
+  command: LibraryCollectionCommand;
+  newCollectionId: string;
+  receiptId: string;
+  auditId: string;
+  membershipBatchId?: string;
+};
+function validateCollectionCommand(input: LibraryCollectionCommandInput) {
+  const parsed = libraryCollectionCommandSchema.safeParse(input.command);
+  if (
+    !parsed.success ||
+    (parsed.data.action === "create" || parsed.data.action === "duplicate") !==
+      !input.collectionId ||
+    (input.collectionId && !libraryCollectionIdSchema.safeParse(input.collectionId).success)
+  )
+    throw new AppError("Invalid collection command", 400, "COLLECTION_INVALID");
+  return parsed.data;
+}
+export function withLibraryCollectionTransaction<T>(
+  userId: string,
+  run: (tx: ResourceTransaction) => Promise<T>,
+): Promise<T> {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`set local lock_timeout='5s'`);
+    await tx.execute(sql`set local statement_timeout='10s'`);
+    // Serialize quota, command keys and collection mutations for this owner.
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtext(${`library-collections:${userId}`}))`,
+    );
+    await liveUser(tx, userId, true);
+    return run(tx);
+  });
+}
+/** Reuse ordinary guarded collection commands within an already owner-locked transaction. */
+export async function applyLibraryCollectionCommand(
+  tx: ResourceTransaction,
+  input: LibraryCollectionCommandInput,
+): Promise<LibraryCollectionResult> {
+  const command = validateCollectionCommand(input),
+    digest = createHash("sha256").update(JSON.stringify(command)).digest("hex");
+  const [previous] = await tx
+    .select()
+    .from(receipts)
+    .where(and(eq(receipts.userId, input.userId), eq(receipts.requestId, command.requestId)))
+    .limit(1);
+  if (previous) {
     if (
-      !parsed.success ||
-      (parsed.data.action === "create" || parsed.data.action === "duplicate") !==
-        !input.collectionId ||
-      (input.collectionId && !libraryCollectionIdSchema.safeParse(input.collectionId).success)
+      previous.commandDigest !== digest ||
+      (input.collectionId && previous.collectionId !== input.collectionId)
     )
-      throw new AppError("Invalid collection command", 400, "COLLECTION_INVALID");
-    const command = parsed.data,
-      digest = createHash("sha256").update(JSON.stringify(command)).digest("hex");
-    return db.transaction(async (tx) => {
-      await tx.execute(sql`set local lock_timeout='5s'`);
-      await tx.execute(sql`set local statement_timeout='10s'`);
-      // Serialize quota, command keys and collection mutations for this owner.
-      await tx.execute(
-        sql`select pg_advisory_xact_lock(hashtext(${`library-collections:${input.userId}`}))`,
-      );
-      await liveUser(tx, input.userId, true);
-      const [previous] = await tx
-        .select()
-        .from(receipts)
-        .where(and(eq(receipts.userId, input.userId), eq(receipts.requestId, command.requestId)))
-        .limit(1);
-      if (previous) {
-        if (
-          previous.commandDigest !== digest ||
-          (input.collectionId && previous.collectionId !== input.collectionId)
-        )
-          throw fail("COLLECTION_REQUEST_REUSED");
-        await owned(tx, input.userId, previous.collectionId);
-        return { receipt: publicReceipt(previous), replayed: true };
-      }
-      let collection: LibraryCollectionSnapshot;
-      if (command.action === "create" || command.action === "duplicate") {
-        let copy: Awaited<ReturnType<typeof copySource>> | undefined;
-        if (command.action === "duplicate") {
-          if (input.newCollectionId === command.sourceCollectionId)
-            throw fail("COLLECTION_CONFLICT");
-          copy = await copySource(tx, input.userId, command.sourceCollectionId, true);
-          if (
-            copy.source.revision !== command.expectedRevision ||
-            copy.itemCount !== command.expectedItemCount ||
-            copy.sourceDigest !== command.sourceDigest
-          )
-            throw fail("COLLECTION_CONFLICT");
-        }
-        const [summary] = await tx
-          .select({ total: count() })
-          .from(collections)
-          .where(eq(collections.userId, input.userId));
-        if ((summary?.total ?? 0) >= LIBRARY_COLLECTION_LIMIT) throw fail("COLLECTION_LIMIT");
-        const [created] = await tx
-          .insert(collections)
-          .values({ id: input.newCollectionId, userId: input.userId, name: command.name })
-          .returning(fields);
-        collection = created;
-        if (copy?.productIds.length)
-          await tx
-            .insert(members)
-            .values(copy.productIds.map((productId) => ({ collectionId: created.id, productId })));
-      } else {
-        if (!input.collectionId)
-          throw new AppError("Missing collection", 400, "COLLECTION_INVALID");
-        const current = await owned(tx, input.userId, input.collectionId, true);
-        if (current.revision !== command.expectedRevision) throw fail("COLLECTION_CONFLICT");
-        const [summary] = await tx
+      throw fail("COLLECTION_REQUEST_REUSED");
+    await owned(tx, input.userId, previous.collectionId);
+    return { receipt: publicReceipt(previous), replayed: true };
+  }
+  let collection: LibraryCollectionSnapshot;
+  if (command.action === "create" || command.action === "duplicate") {
+    let copy: Awaited<ReturnType<typeof copySource>> | undefined;
+    if (command.action === "duplicate") {
+      if (input.newCollectionId === command.sourceCollectionId) throw fail("COLLECTION_CONFLICT");
+      copy = await copySource(tx, input.userId, command.sourceCollectionId, true);
+      if (
+        copy.source.revision !== command.expectedRevision ||
+        copy.itemCount !== command.expectedItemCount ||
+        copy.sourceDigest !== command.sourceDigest
+      )
+        throw fail("COLLECTION_CONFLICT");
+    }
+    const [summary] = await tx
+      .select({ total: count() })
+      .from(collections)
+      .where(eq(collections.userId, input.userId));
+    if ((summary?.total ?? 0) >= LIBRARY_COLLECTION_LIMIT) throw fail("COLLECTION_LIMIT");
+    const [created] = await tx
+      .insert(collections)
+      .values({ id: input.newCollectionId, userId: input.userId, name: command.name })
+      .returning(fields);
+    collection = created;
+    if (copy?.productIds.length)
+      await tx
+        .insert(members)
+        .values(copy.productIds.map((productId) => ({ collectionId: created.id, productId })));
+  } else {
+    if (!input.collectionId) throw new AppError("Missing collection", 400, "COLLECTION_INVALID");
+    const current = await owned(tx, input.userId, input.collectionId, true);
+    if (current.revision !== command.expectedRevision) throw fail("COLLECTION_CONFLICT");
+    const [summary] = await tx
+      .select({ total: count() })
+      .from(receipts)
+      .where(collectionReceiptScope(input.userId, current.id));
+    if ((summary?.total ?? 0) >= LIBRARY_COLLECTION_COMMAND_LIMIT)
+      throw fail("COLLECTION_HISTORY_LIMIT");
+    if (command.action === "restore" ? current.status !== "archived" : current.status !== "active")
+      throw fail("COLLECTION_ARCHIVED");
+    if (command.action === "copy-items" || command.action === "move-items") {
+      if (command.sourceCollectionId === current.id) throw fail("COLLECTION_CONFLICT");
+      const source = await owned(tx, input.userId, command.sourceCollectionId, true);
+      if (source.revision !== command.expectedSourceRevision) throw fail("COLLECTION_CONFLICT");
+      if (command.action === "move-items") {
+        if (source.status !== "active") throw fail("COLLECTION_ARCHIVED");
+        const [sourceHistory] = await tx
           .select({ total: count() })
           .from(receipts)
-          .where(collectionReceiptScope(input.userId, current.id));
-        if ((summary?.total ?? 0) >= LIBRARY_COLLECTION_COMMAND_LIMIT)
+          .where(collectionReceiptScope(input.userId, source.id));
+        if ((sourceHistory?.total ?? 0) >= LIBRARY_COLLECTION_COMMAND_LIMIT)
           throw fail("COLLECTION_HISTORY_LIMIT");
-        if (
-          command.action === "restore" ? current.status !== "archived" : current.status !== "active"
+      }
+      // Copy owned historical references, including deleted resources; no product/grant authority is consulted.
+      const selected = await tx
+        .select({ productId: members.productId })
+        .from(members)
+        .where(
+          and(eq(members.collectionId, source.id), inArray(members.productId, command.productIds)),
         )
-          throw fail("COLLECTION_ARCHIVED");
-        if (command.action === "copy-items" || command.action === "move-items") {
-          if (command.sourceCollectionId === current.id) throw fail("COLLECTION_CONFLICT");
-          const source = await owned(tx, input.userId, command.sourceCollectionId, true);
-          if (source.revision !== command.expectedSourceRevision) throw fail("COLLECTION_CONFLICT");
-          if (command.action === "move-items") {
-            if (source.status !== "active") throw fail("COLLECTION_ARCHIVED");
-            const [sourceHistory] = await tx
-              .select({ total: count() })
-              .from(receipts)
-              .where(collectionReceiptScope(input.userId, source.id));
-            if ((sourceHistory?.total ?? 0) >= LIBRARY_COLLECTION_COMMAND_LIMIT)
-              throw fail("COLLECTION_HISTORY_LIMIT");
-          }
-          // Copy owned historical references, including deleted resources; no product/grant authority is consulted.
-          const selected = await tx
-            .select({ productId: members.productId })
-            .from(members)
-            .where(
-              and(
-                eq(members.collectionId, source.id),
-                inArray(members.productId, command.productIds),
-              ),
-            )
-            .orderBy(asc(members.productId))
-            .for("share");
-          if (selected.length !== command.productIds.length) throw fail("COLLECTION_CONFLICT");
-          const present = await tx
-            .select({ productId: members.productId })
-            .from(members)
-            .where(
-              and(
-                eq(members.collectionId, current.id),
-                inArray(members.productId, command.productIds),
-              ),
-            );
-          const presentIds = new Set(present.map((item) => item.productId)),
-            missing = command.productIds.filter((id) => !presentIds.has(id));
-          const [total] = await tx
-            .select({ total: count() })
-            .from(members)
-            .where(eq(members.collectionId, current.id));
-          if ((total?.total ?? 0) + missing.length > LIBRARY_COLLECTION_ITEM_LIMIT)
-            throw fail("COLLECTION_ITEM_LIMIT");
-          if (missing.length)
-            await tx
-              .insert(members)
-              .values(missing.map((productId) => ({ collectionId: current.id, productId })));
-          if (command.action === "move-items") {
-            const removed = await tx
-              .delete(members)
-              .where(
-                and(
-                  eq(members.collectionId, source.id),
-                  inArray(members.productId, command.productIds),
-                ),
-              )
-              .returning({ productId: members.productId });
-            if (removed.length !== command.productIds.length) throw fail("COLLECTION_CONFLICT");
-            const [advanced] = await tx
-              .update(collections)
-              .set({
-                revision: source.revision + 1,
-                updatedAt: sql`greatest(clock_timestamp(),${collections.updatedAt}+interval '1 millisecond')`,
-              })
-              .where(
-                and(
-                  eq(collections.id, source.id),
-                  eq(collections.userId, input.userId),
-                  eq(collections.revision, source.revision),
-                  eq(collections.status, "active"),
-                ),
-              )
-              .returning({ id: collections.id });
-            if (!advanced) throw fail("COLLECTION_CONFLICT");
-          }
-        } else if (command.action === "add-many") {
-          // Lock resources and grants in canonical order. Do not write a partial batch.
-          const accessTerms: { productId: string; expiresAt: Date | null }[] = [];
-          for (const productId of command.productIds) {
-            const [product] = await tx
-              .select({ id: products.id })
-              .from(products)
-              .where(eq(products.id, productId))
-              .limit(1)
-              .for("share");
-            const access = product
-              ? await lockUserDownloadAccess(tx, input.userId, productId, sql`clock_timestamp()`)
-              : null;
-            if (!access) throw new NotFoundError("Library resource", productId);
-            accessTerms.push({ productId, expiresAt: access.expiresAt });
-          }
-          const present = await tx
-            .select({ productId: members.productId })
-            .from(members)
-            .where(
-              and(
-                eq(members.collectionId, current.id),
-                inArray(members.productId, command.productIds),
-              ),
-            );
-          const presentIds = new Set(present.map((item) => item.productId));
-          const missing = command.productIds.filter((id) => !presentIds.has(id));
-          const [total] = await tx
-            .select({ total: count() })
-            .from(members)
-            .where(eq(members.collectionId, current.id));
-          if ((total?.total ?? 0) + missing.length > LIBRARY_COLLECTION_ITEM_LIMIT)
-            throw fail("COLLECTION_ITEM_LIMIT");
-          // Recheck every expiry against database time after all potentially blocking locks.
-          const [term] = await tx.execute<{ valid: boolean }>(
-            sql`select ${sql.join(
-              accessTerms.map((access) =>
-                access.expiresAt === null
-                  ? sql`true`
-                  : sql`${access.expiresAt}::timestamptz > clock_timestamp()`,
-              ),
-              sql` AND `,
-            )} AS valid`,
-          );
-          if (term?.valid !== true) throw fail("COLLECTION_ACCESS_CHANGED");
-          if (missing.length)
-            await tx
-              .insert(members)
-              .values(missing.map((productId) => ({ collectionId: current.id, productId })));
-        } else if (command.action === "remove-many") {
-          // References can be cleaned up even after resource deletion or revoked access.
-          await tx
-            .delete(members)
-            .where(
-              and(
-                eq(members.collectionId, current.id),
-                inArray(members.productId, command.productIds),
-              ),
-            );
-        } else if (command.action === "add") {
-          const [product] = await tx
-            .select({ id: products.id })
-            .from(products)
-            .where(eq(products.id, command.productId))
-            .limit(1)
-            .for("share");
-          const access = product
-            ? await lockUserDownloadAccess(
-                tx,
-                input.userId,
-                command.productId,
-                sql`clock_timestamp()`,
-              )
-            : null;
-          if (!access) throw new NotFoundError("Library resource", command.productId);
-          const [member] = await tx
-            .select({ productId: members.productId })
-            .from(members)
-            .where(
-              and(eq(members.collectionId, current.id), eq(members.productId, command.productId)),
-            )
-            .limit(1);
-          if (!member) {
-            const [total] = await tx
-              .select({ total: count() })
-              .from(members)
-              .where(eq(members.collectionId, current.id));
-            if ((total?.total ?? 0) >= LIBRARY_COLLECTION_ITEM_LIMIT)
-              throw fail("COLLECTION_ITEM_LIMIT");
-          }
-          // Recheck expiry against the database clock after acquiring all locks.
-          const [term] = await tx.execute<{ valid: boolean }>(
-            sql`select ${access.expiresAt === null ? sql`true` : sql`${access.expiresAt}::timestamptz > clock_timestamp()`} AS valid`,
-          );
-          if (term?.valid !== true) throw new NotFoundError("Library resource", command.productId);
-          if (!member)
-            await tx
-              .insert(members)
-              .values({ collectionId: current.id, productId: command.productId });
-        } else if (command.action === "remove") {
-          // Lost access does not prevent removal of the owner's private reference.
-          await tx
-            .delete(members)
-            .where(
-              and(eq(members.collectionId, current.id), eq(members.productId, command.productId)),
-            );
-        }
-        const [updated] = await tx
+        .orderBy(asc(members.productId))
+        .for("share");
+      if (selected.length !== command.productIds.length) throw fail("COLLECTION_CONFLICT");
+      const present = await tx
+        .select({ productId: members.productId })
+        .from(members)
+        .where(
+          and(eq(members.collectionId, current.id), inArray(members.productId, command.productIds)),
+        );
+      const presentIds = new Set(present.map((item) => item.productId)),
+        missing = command.productIds.filter((id) => !presentIds.has(id));
+      const [total] = await tx
+        .select({ total: count() })
+        .from(members)
+        .where(eq(members.collectionId, current.id));
+      if ((total?.total ?? 0) + missing.length > LIBRARY_COLLECTION_ITEM_LIMIT)
+        throw fail("COLLECTION_ITEM_LIMIT");
+      if (missing.length)
+        await tx
+          .insert(members)
+          .values(missing.map((productId) => ({ collectionId: current.id, productId })));
+      if (command.action === "move-items") {
+        const removed = await tx
+          .delete(members)
+          .where(
+            and(
+              eq(members.collectionId, source.id),
+              inArray(members.productId, command.productIds),
+            ),
+          )
+          .returning({ productId: members.productId });
+        if (removed.length !== command.productIds.length) throw fail("COLLECTION_CONFLICT");
+        const [advanced] = await tx
           .update(collections)
           .set({
-            name: command.action === "rename" ? command.name : current.name,
-            status: command.action === "archive" ? "archived" : "active",
-            revision: current.revision + 1,
-            updatedAt: sql`greatest(clock_timestamp(),${collections.updatedAt})`,
+            revision: source.revision + 1,
+            updatedAt: sql`greatest(clock_timestamp(),${collections.updatedAt}+interval '1 millisecond')`,
           })
           .where(
             and(
-              eq(collections.id, current.id),
+              eq(collections.id, source.id),
               eq(collections.userId, input.userId),
-              eq(collections.revision, current.revision),
+              eq(collections.revision, source.revision),
+              eq(collections.status, "active"),
             ),
           )
-          .returning(fields);
-        if (!updated) throw fail("COLLECTION_CONFLICT");
-        collection = updated;
+          .returning({ id: collections.id });
+        if (!advanced) throw fail("COLLECTION_CONFLICT");
       }
-      const [record] = await tx
-        .insert(receipts)
-        .values({
-          id: input.receiptId,
-          userId: input.userId,
-          requestId: command.requestId,
-          collectionId: collection.id,
-          commandDigest: digest,
-          command,
-          snapshot: {
-            id: collection.id,
-            name: collection.name,
-            status: collection.status,
-            revision: collection.revision,
-          },
-        })
-        .returning(receiptFields);
-      await tx.insert(auditEvents).values({
-        id: input.auditId,
-        actorId: input.userId,
-        actorType: "user",
-        action: `library.collection_${command.action}`,
-        targetType: "library_collection",
-        targetId: collection.id,
-        details: {
-          requestId: command.requestId,
-          receiptId: record.id,
-          revision: collection.revision,
-          ...(command.action === "copy-items" || command.action === "move-items"
+    } else if (command.action === "add-many") {
+      // Lock resources and grants in canonical order. Do not write a partial batch.
+      const accessTerms: { productId: string; expiresAt: Date | null }[] = [];
+      for (const productId of command.productIds) {
+        const [product] = await tx
+          .select({ id: products.id })
+          .from(products)
+          .where(eq(products.id, productId))
+          .limit(1)
+          .for("share");
+        const access = product
+          ? await lockUserDownloadAccess(tx, input.userId, productId, sql`clock_timestamp()`)
+          : null;
+        if (!access) throw new NotFoundError("Library resource", productId);
+        accessTerms.push({ productId, expiresAt: access.expiresAt });
+      }
+      const present = await tx
+        .select({ productId: members.productId })
+        .from(members)
+        .where(
+          and(eq(members.collectionId, current.id), inArray(members.productId, command.productIds)),
+        );
+      const presentIds = new Set(present.map((item) => item.productId));
+      const missing = command.productIds.filter((id) => !presentIds.has(id));
+      const [total] = await tx
+        .select({ total: count() })
+        .from(members)
+        .where(eq(members.collectionId, current.id));
+      if ((total?.total ?? 0) + missing.length > LIBRARY_COLLECTION_ITEM_LIMIT)
+        throw fail("COLLECTION_ITEM_LIMIT");
+      // Recheck every expiry against database time after all potentially blocking locks.
+      const [term] = await tx.execute<{ valid: boolean }>(
+        sql`select ${sql.join(
+          accessTerms.map((access) =>
+            access.expiresAt === null
+              ? sql`true`
+              : sql`${access.expiresAt}::timestamptz > clock_timestamp()`,
+          ),
+          sql` AND `,
+        )} AS valid`,
+      );
+      if (term?.valid !== true) throw fail("COLLECTION_ACCESS_CHANGED");
+      if (missing.length)
+        await tx
+          .insert(members)
+          .values(missing.map((productId) => ({ collectionId: current.id, productId })));
+    } else if (command.action === "remove-many") {
+      // References can be cleaned up even after resource deletion or revoked access.
+      await tx
+        .delete(members)
+        .where(
+          and(eq(members.collectionId, current.id), inArray(members.productId, command.productIds)),
+        );
+    } else if (command.action === "add") {
+      const [product] = await tx
+        .select({ id: products.id })
+        .from(products)
+        .where(eq(products.id, command.productId))
+        .limit(1)
+        .for("share");
+      const access = product
+        ? await lockUserDownloadAccess(tx, input.userId, command.productId, sql`clock_timestamp()`)
+        : null;
+      if (!access) throw new NotFoundError("Library resource", command.productId);
+      const [member] = await tx
+        .select({ productId: members.productId })
+        .from(members)
+        .where(and(eq(members.collectionId, current.id), eq(members.productId, command.productId)))
+        .limit(1);
+      if (!member) {
+        const [total] = await tx
+          .select({ total: count() })
+          .from(members)
+          .where(eq(members.collectionId, current.id));
+        if ((total?.total ?? 0) >= LIBRARY_COLLECTION_ITEM_LIMIT)
+          throw fail("COLLECTION_ITEM_LIMIT");
+      }
+      // Recheck expiry against the database clock after acquiring all locks.
+      const [term] = await tx.execute<{ valid: boolean }>(
+        sql`select ${access.expiresAt === null ? sql`true` : sql`${access.expiresAt}::timestamptz > clock_timestamp()`} AS valid`,
+      );
+      if (term?.valid !== true) throw new NotFoundError("Library resource", command.productId);
+      if (!member)
+        await tx.insert(members).values({ collectionId: current.id, productId: command.productId });
+    } else if (command.action === "remove") {
+      // Lost access does not prevent removal of the owner's private reference.
+      await tx
+        .delete(members)
+        .where(and(eq(members.collectionId, current.id), eq(members.productId, command.productId)));
+    }
+    const [updated] = await tx
+      .update(collections)
+      .set({
+        name: command.action === "rename" ? command.name : current.name,
+        status: command.action === "archive" ? "archived" : "active",
+        revision: current.revision + 1,
+        updatedAt: sql`greatest(clock_timestamp(),${collections.updatedAt})`,
+      })
+      .where(
+        and(
+          eq(collections.id, current.id),
+          eq(collections.userId, input.userId),
+          eq(collections.revision, current.revision),
+        ),
+      )
+      .returning(fields);
+    if (!updated) throw fail("COLLECTION_CONFLICT");
+    collection = updated;
+  }
+  const [record] = await tx
+    .insert(receipts)
+    .values({
+      id: input.receiptId,
+      userId: input.userId,
+      requestId: command.requestId,
+      collectionId: collection.id,
+      commandDigest: digest,
+      command,
+      snapshot: {
+        id: collection.id,
+        name: collection.name,
+        status: collection.status,
+        revision: collection.revision,
+      },
+    })
+    .returning(receiptFields);
+  await tx.insert(auditEvents).values({
+    id: input.auditId,
+    actorId: input.userId,
+    actorType: "user",
+    action: `library.collection_${command.action}`,
+    targetType: "library_collection",
+    targetId: collection.id,
+    details: {
+      requestId: command.requestId,
+      receiptId: record.id,
+      ...(input.membershipBatchId ? { membershipBatchId: input.membershipBatchId } : {}),
+      revision: collection.revision,
+      ...(command.action === "copy-items" || command.action === "move-items"
+        ? {
+            sourceCollectionId: command.sourceCollectionId,
+            sourceRevision: command.expectedSourceRevision,
+          }
+        : {}),
+      ...(command.action === "add" || command.action === "remove"
+        ? { productId: command.productId }
+        : "productIds" in command
+          ? { productIds: command.productIds }
+          : command.action === "duplicate"
             ? {
                 sourceCollectionId: command.sourceCollectionId,
-                sourceRevision: command.expectedSourceRevision,
+                sourceRevision: command.expectedRevision,
+                itemCount: command.expectedItemCount,
+                sourceDigest: command.sourceDigest,
               }
             : {}),
-          ...(command.action === "add" || command.action === "remove"
-            ? { productId: command.productId }
-            : "productIds" in command
-              ? { productIds: command.productIds }
-              : command.action === "duplicate"
-                ? {
-                    sourceCollectionId: command.sourceCollectionId,
-                    sourceRevision: command.expectedRevision,
-                    itemCount: command.expectedItemCount,
-                    sourceDigest: command.sourceDigest,
-                  }
-                : {}),
-        },
-      });
-      return { receipt: publicReceipt(record), replayed: false };
-    });
-  }
+    },
+  });
+  return { receipt: publicReceipt(record), replayed: false };
 }
+
 export const libraryCollectionsRepository = new LibraryCollectionsRepository();

@@ -1,3 +1,6 @@
+vi.mock("../apps/web/src/components/library-membership-batch", () => ({
+  LibraryMembershipBatchForm: () => <div data-membership-batch="review" />,
+}));
 import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";

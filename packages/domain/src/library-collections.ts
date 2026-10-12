@@ -62,6 +62,27 @@ export type LibraryCollectionReceipt = {
   createdAt: Date;
 };
 export type LibraryCollectionResult = { receipt: LibraryCollectionReceipt; replayed: boolean };
+export type LibraryMembershipBatchCommand = {
+  requestId: string;
+  changes: {
+    collectionId: string;
+    expectedRevision: number;
+    wasInCollection: boolean;
+    inCollection: boolean;
+  }[];
+};
+export type LibraryMembershipBatchReceipt = {
+  id: string;
+  requestId: string;
+  productId: string;
+  command: LibraryMembershipBatchCommand;
+  children: LibraryCollectionReceipt[];
+  createdAt: Date;
+};
+export type LibraryMembershipBatchResult = {
+  receipt: LibraryMembershipBatchReceipt;
+  replayed: boolean;
+};
 export const LIBRARY_COLLECTION_COMPARISON_FILTERS = [
   "all",
   "source-only",

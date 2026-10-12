@@ -18,6 +18,7 @@ const state = vi.hoisted(() => ({
   resourceMemberships: vi.fn(),
   accountHistory: vi.fn(),
   comparison: vi.fn(),
+  membershipBatch: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
@@ -29,6 +30,7 @@ vi.mock("@nexus/security", () => ({
 vi.mock("@nexus/db", () => ({
   readLibraryCollectionHistory: state.accountHistory,
   readLibraryCollectionComparison: state.comparison,
+  applyLibraryMembershipBatch: state.membershipBatch,
   libraryCollectionsRepository: {
     command: state.command,
     page: state.page,
@@ -42,7 +44,10 @@ vi.mock("@nexus/db", () => ({
 }));
 
 import { GET as releases } from "../apps/web/src/app/api/library/collections/[id]/releases/route";
-import { GET as resourceMemberships } from "../apps/web/src/app/api/library/[id]/collections/route";
+import {
+  POST as membershipBatch,
+  GET as resourceMemberships,
+} from "../apps/web/src/app/api/library/[id]/collections/route";
 import { GET as releasesExport } from "../apps/web/src/app/api/library/collections/[id]/releases/export/route";
 import { GET as moveItemsPage } from "../apps/web/src/app/api/library/collections/[id]/move-items/route";
 import { GET as copyItemsPage } from "../apps/web/src/app/api/library/collections/[id]/copy-items/route";
@@ -499,4 +504,56 @@ it("masks foreign destinations without returning their collection metadata", asy
   const response = await comparison(request(`${base}/lcol_a/compare?to=lcol_foreign`), context);
   expect(response.status).toBe(404);
   expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+});
+
+it("applies a strict resource-bound membership batch through the session and content-creation budget", async () => {
+  state.membershipBatch.mockResolvedValue({ replayed: false, receipt: { id: "lmb_a" } });
+  const changes = [
+    { collectionId: "lcol_b", expectedRevision: 4, wasInCollection: true, inCollection: false },
+    { collectionId: "lcol_a", expectedRevision: 2, wasInCollection: false, inCollection: true },
+  ];
+  const path = "/api/library/prd_a/collections",
+    context = { params: Promise.resolve({ id: "prd_a" }) };
+  const response = await membershipBatch(post({ requestId, changes }, path), context);
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(state.rate).toHaveBeenCalledWith("contentCreation", "usr_a");
+  expect(state.membershipBatch).toHaveBeenCalledWith(
+    expect.objectContaining({
+      userId: "usr_a",
+      productId: "prd_a",
+      command: { requestId, changes: [changes[1], changes[0]] },
+      receiptId: "lmb_a",
+      auditId: "aud_a",
+    }),
+  );
+  vi.clearAllMocks();
+  for (const body of [
+    { requestId, changes, userId: "other" },
+    { requestId, changes, productId: "prd_other" },
+    { requestId, changes: [changes[0], changes[0]] },
+    { requestId, changes: [{ ...changes[0], inCollection: true }] },
+  ])
+    expect((await membershipBatch(post(body, path), context)).status).toBe(400);
+  expect(
+    (await membershipBatch(post({ requestId, changes }, `${path}?to=foreign`), context)).status,
+  ).toBe(400);
+  expect(
+    (
+      await membershipBatch(
+        post({ requestId, changes }, path, {
+          "content-type": "application/json",
+          "sec-fetch-site": "cross-site",
+        }),
+        context,
+      )
+    ).status,
+  ).toBe(403);
+  expect(state.membershipBatch).not.toHaveBeenCalled();
+  state.actor = null;
+  expect((await membershipBatch(post({ requestId, changes }, path), context)).status).toBe(401);
+  state.actor = { id: "usr_a", role: "user" };
+  state.rate.mockResolvedValue({ success: false });
+  expect((await membershipBatch(post({ requestId, changes }, path), context)).status).toBe(429);
+  expect(state.membershipBatch).not.toHaveBeenCalled();
 });

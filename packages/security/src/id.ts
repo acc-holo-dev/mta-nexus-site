@@ -4,6 +4,7 @@ export type EntityPrefix =
   | "lsbr"
   | "lcol"
   | "lcr"
+  | "lmb"
   | "rea"
   | "usr"
   | "org"

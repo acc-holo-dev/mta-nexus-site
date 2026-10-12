@@ -23,7 +23,7 @@ import {
 } from "@nexus/domain";
 import type { LibrarySelectionBatchCommand, LibrarySelectionBatchSnapshot } from "@nexus/domain";
 import { sql } from "drizzle-orm";
-import type { LibraryCollectionCommand, LibraryCollectionSnapshot, LibraryCollectionStatus } from "@nexus/domain";
+import type { LibraryCollectionCommand, LibraryCollectionSnapshot, LibraryCollectionStatus, LibraryMembershipBatchCommand } from "@nexus/domain";
 import {
   pgTable,
   text,
@@ -1478,6 +1478,22 @@ export const libraryCollectionReceipts = pgTable("library_collection_receipts", 
   check("library_collection_receipts_digest_check", sql`${table.commandDigest} ~ '^[a-f0-9]{64}$'`),
   check("library_collection_receipts_payload_check", sql`coalesce(jsonb_typeof(${table.command}) = 'object' AND octet_length(${table.command}::text) <= 8192 AND jsonb_typeof(${table.snapshot}) = 'object' AND octet_length(${table.snapshot}::text) <= 2048, false)`),
   check("library_collection_receipts_time_check", sql`isfinite(${table.createdAt})`),
+]);
+
+export const libraryMembershipBatchReceipts = pgTable("library_membership_batch_receipts", {
+  id:text("id").primaryKey(),
+  userId:text("user_id").notNull().references(()=>users.id,{onDelete:"cascade"}),
+  requestId:uuid("request_id").notNull(),
+  productId:text("product_id").notNull(),
+  commandDigest:text("command_digest").notNull(),
+  command:jsonb("command").$type<LibraryMembershipBatchCommand>().notNull(),
+  childReceiptIds:text("child_receipt_ids").array().notNull(),
+  createdAt:timestamp("created_at",{withTimezone:true}).notNull().defaultNow(),
+},table=>[
+  uniqueIndex("library_membership_batches_user_request_idx").on(table.userId,table.requestId),
+  index("library_membership_batches_resource_history_idx").on(table.userId,table.productId,table.createdAt.desc(),table.id.desc()),
+  check("library_membership_batches_shape_check",sql`${table.productId} ~ '^[A-Za-z0-9_-]{1,160}$' AND ${table.commandDigest} ~ '^[a-f0-9]{64}$' AND coalesce(jsonb_typeof(${table.command})='object' AND octet_length(${table.command}::text)<=8192 AND array_ndims(${table.childReceiptIds})=1 AND cardinality(${table.childReceiptIds}) BETWEEN 1 AND 20,false)`),
+  check("library_membership_batches_time_check",sql`isfinite(${table.createdAt})`),
 ]);
 
 // Immutable receipts store selection identities, never private resource metadata or file URLs.

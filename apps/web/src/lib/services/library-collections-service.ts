@@ -2,6 +2,7 @@ import {
   libraryCollectionsRepository,
   readLibraryCollectionHistory,
   readLibraryCollectionComparison,
+  applyLibraryMembershipBatch,
 } from "@nexus/db";
 import {
   AppError,
@@ -11,9 +12,28 @@ import {
   type User,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
-import { libraryCollectionCommandSchema } from "@nexus/validation";
+import {
+  libraryCollectionCommandSchema,
+  libraryMembershipBatchCommandSchema,
+} from "@nexus/validation";
 import { collectionId } from "../library-collections-query";
 export const libraryCollectionsService = {
+  membershipBatch(actor: User, productId: string, input: unknown) {
+    const command = libraryMembershipBatchCommandSchema.safeParse(input);
+    if (!command.success) throw new AppError("Invalid membership batch", 400, "COLLECTION_INVALID");
+    return applyLibraryMembershipBatch({
+      userId: actor.id,
+      productId: collectionId(productId),
+      command: command.data,
+      receiptId: generateId("lmb"),
+      auditId: generateId("aud"),
+      children: command.data.changes.map((change) => ({
+        collectionId: change.collectionId,
+        receiptId: generateId("lcr"),
+        auditId: generateId("aud"),
+      })),
+    });
+  },
   comparison: (actor: User, id: string, query: LibraryCollectionComparisonQuery) =>
     readLibraryCollectionComparison(actor.id, collectionId(id), query),
   accountHistory: (actor: User, query: LibraryCollectionHistoryQuery) =>

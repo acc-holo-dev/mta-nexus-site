@@ -858,3 +858,116 @@ it("compares archived own orphan sets and applies a reviewed missing-reference c
       .comparison?.total,
   ).toBe(0);
 });
+
+// Membership groups require disposable PostgreSQL migrated through 0077.
+async function membershipBatchFixture() {
+  const { applyLibraryMembershipBatch } = await import(
+    "../packages/db/src/repositories/library-membership-batches"
+  );
+  const f = await fixture(),
+    a = await f.command({ requestId: randomUUID(), action: "create", name: "Membership source" }),
+    b = await f.command({
+      requestId: randomUUID(),
+      action: "create",
+      name: "Membership destination",
+    });
+  const source = a.receipt.collection.id,
+    destination = b.receipt.collection.id;
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    source,
+  );
+  const command = {
+    requestId: randomUUID(),
+    changes: [
+      { collectionId: source, expectedRevision: 2, wasInCollection: true, inCollection: false },
+      {
+        collectionId: destination,
+        expectedRevision: 1,
+        wasInCollection: false,
+        inCollection: true,
+      },
+    ],
+  };
+  const apply = (auditId = `aud_${randomUUID()}`) =>
+    applyLibraryMembershipBatch({
+      userId: f.userId,
+      productId: f.productId,
+      command,
+      receiptId: `lmb_${randomUUID().replaceAll("-", "")}`,
+      auditId,
+      children: command.changes.map((change) => ({
+        collectionId: change.collectionId,
+        receiptId: `lcr_${randomUUID().replaceAll("-", "")}`,
+        auditId: `aud_${randomUUID()}`,
+      })),
+    });
+  return { ...f, source, destination, batchCommand:command, apply };
+}
+it("atomically updates resource membership in multiple own collections and replays immutable children after later edits", async () => {
+  const f = await membershipBatchFixture(),
+    results = await Promise.all([f.apply(), f.apply(), f.apply()]);
+  expect(results.filter((result) => !result.replayed)).toHaveLength(1);
+  expect(new Set(results.map((result) => result.receipt.id)).size).toBe(1);
+  expect((await collections.detail(f.userId, f.source)).total).toBe(0);
+  expect((await collections.detail(f.userId, f.destination)).total).toBe(1);
+  await f.command(
+    { requestId: randomUUID(), action: "rename", expectedRevision: 3, name: "Later source" },
+    f.source,
+  );
+  await f.command(
+    { requestId: randomUUID(), action: "archive", expectedRevision: 2 },
+    f.destination,
+  );
+  await db.delete(entitlements).where(eq(entitlements.id, f.grantId));
+  const replay = await f.apply();
+  expect(replay.replayed).toBe(true);
+  expect(replay.receipt).toEqual(results[0]?.receipt);
+  expect(
+    replay.receipt.children.find((child) => child.collection.id === f.source)?.collection.revision,
+  ).toBe(3);
+  expect(
+    (await collections.history(f.userId, f.destination)).items.some(
+      (child) =>
+        child.id ===
+        replay.receipt.children.find((child) => child.collection.id === f.destination)?.id,
+    ),
+  ).toBe(true);
+});
+it("rolls back every membership, revision, child/parent receipt and audit when the required parent audit fails", async () => {
+  const { libraryMembershipBatchReceipts } = await import("../packages/db/src/schema");
+  const f = await membershipBatchFixture();
+  const [existing] = await db
+    .select()
+    .from(auditEvents)
+    .where(eq(auditEvents.actorId, f.userId))
+    .limit(1);
+  if (!existing) throw Error("Missing duplicate audit fixture");
+  const receiptsBefore=await db.select().from(libraryCollectionReceipts).where(eq(libraryCollectionReceipts.userId,f.userId));
+  const auditsBefore=await db.select().from(auditEvents).where(eq(auditEvents.actorId,f.userId));
+  await expect(f.apply(existing.id)).rejects.toThrow();
+  expect(await db.select().from(libraryCollectionReceipts).where(eq(libraryCollectionReceipts.userId,f.userId))).toEqual(receiptsBefore);
+  expect(await db.select().from(auditEvents).where(eq(auditEvents.actorId,f.userId))).toEqual(auditsBefore);
+  expect((await collections.detail(f.userId, f.source)).collection.revision).toBe(2);
+  expect((await collections.detail(f.userId, f.source)).total).toBe(1);
+  expect((await collections.detail(f.userId, f.destination)).collection.revision).toBe(1);
+  expect((await collections.detail(f.userId, f.destination)).total).toBe(0);
+  expect(
+    await db
+      .select()
+      .from(libraryMembershipBatchReceipts)
+      .where(eq(libraryMembershipBatchReceipts.userId, f.userId)),
+  ).toHaveLength(0);
+  const result = await f.apply();
+  await expect(
+    db
+      .update(libraryMembershipBatchReceipts)
+      .set({ productId: "prd_other" })
+      .where(eq(libraryMembershipBatchReceipts.id, result.receipt.id)),
+  ).rejects.toThrow();
+  await expect(
+    db
+      .delete(libraryMembershipBatchReceipts)
+      .where(eq(libraryMembershipBatchReceipts.id, result.receipt.id)),
+  ).rejects.toThrow();
+});

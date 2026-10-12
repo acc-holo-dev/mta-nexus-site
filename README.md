@@ -1,5 +1,14 @@
 # MTA NEXUS
 
+Resource collection memberships now support reviewed atomic updates across up to
+twenty active own collections in one operation, including mixed additions/removals.
+Every reviewed revision and prior membership is checked before mutation, all changes
+share one transaction, and immutable ordinary collection receipts remain in history.
+A parent UUID receipt proves the whole group and supports exact replay after later
+edits/access loss. Additions require current database-time access/capacity; orphaned
+references remain removable. Migration `0077_library_membership_batches` adds guarded
+parent receipts, bounded history and immutable child association.
+
 Own collections now have a private RU/EN comparison view with common/source-only/
 destination-only/unavailable filters and literal accessible-name search. Review twenty
 references per page, then copy or move selected source references using both collection

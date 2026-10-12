@@ -11,6 +11,37 @@ const requestId = z
   .transform((v) => v.toLowerCase());
 const expectedRevision = z.number().int().min(1).max(2_147_483_646);
 export const libraryCollectionIdSchema = z.string().regex(/^[A-Za-z0-9_-]{1,160}$/u);
+export const libraryMembershipBatchCommandSchema = z
+  .object({
+    requestId,
+    changes: z
+      .array(
+        z
+          .object({
+            collectionId: libraryCollectionIdSchema,
+            expectedRevision,
+            wasInCollection: z.boolean(),
+            inCollection: z.boolean(),
+          })
+          .strict()
+          .refine(
+            (change) => change.wasInCollection !== change.inCollection,
+            "Membership must change",
+          ),
+      )
+      .min(1)
+      .max(LIBRARY_COLLECTION_BATCH_LIMIT)
+      .refine(
+        (changes) => new Set(changes.map((change) => change.collectionId)).size === changes.length,
+        "Duplicate collections",
+      )
+      .transform((changes) =>
+        [...changes].sort((a, b) =>
+          a.collectionId < b.collectionId ? -1 : a.collectionId > b.collectionId ? 1 : 0,
+        ),
+      ),
+  })
+  .strict();
 // Reject invisible control characters; names are rendered as text, never HTML.
 // biome-ignore lint/suspicious/noControlCharactersInRegex: Reject control characters in private labels.
 const safeName = /^[^\u0000-\u001f\u007f]*$/u;

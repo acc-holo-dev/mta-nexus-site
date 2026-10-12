@@ -3916,3 +3916,70 @@ and old missing isSigned delivery-fixture errors. Live PostgreSQL and browser re
 Web TypeScript passes on the merged tree before and after generated routes. The isolated
 merged Next webpack compile-mode build exits zero with both comparison routes in its
 summary. Full production generation remains unrun.
+
+
+### 2026-10-12 — Atomic per-resource membership groups
+
+The resource-membership screen now reviews mixed additions/removals across up to twenty
+active own collections, using POST `/api/library/[id]/collections`. Strict canonical UUID
+commands contain distinct collection IDs, reviewed writable revisions, prior membership
+and a different desired membership. Resource identity comes only from the validated route;
+account identity comes only from the session. The route rejects mutation query controls,
+wrong content type/cross-site requests and oversized JSON, consumes the content-creation
+budget and returns private/no-store with Cookie variation. Unchanged/duplicate/oversized
+or injected authority fields fail before repository writes.
+
+Ordinary collection command logic is extracted into reusable transaction-scoped functions
+without changing existing command guards, source checks, immutable receipts or required
+audits. Both ordinary and grouped commands acquire the same owner advisory lock, live-user
+share lock and lock/statement timeouts. A group prechecks every own active revision and
+prior membership under collection/member locks before applying any child. Existing add/
+remove logic then checks per-collection history/capacity, advances exactly one revision,
+records the ordinary immutable receipt and required audit. Child UUIDs use a fixed UUIDv5
+namespace and the parent UUID/collection ID; replayed external child results are rejected.
+Add groups lock an existing product and effective own entitlement/legacy license at database
+clock time, retain ordinary per-add expiry checks and recheck finite expiry after all children.
+Remove-only groups never read product/grants, allowing deleted or lost-access references.
+
+One parent receipt and one mandatory group audit commit with all ordinary receipts/audits,
+memberships and revisions in the same transaction. Canonical digest includes route resource
+identity and command. Same UUID/resource/body returns original immutable children after later
+rename/archive/removal/access loss; changed payload/resource rejects reuse. Replay joins only
+own receipts/current own collection identities, without replacing recorded snapshots or
+requiring resource access. No download/version/watch/commercial state is changed.
+
+Migration 0077 adds a bounded parent table with owner/request uniqueness, resource/time/id
+history index, 5000-group account quota and immutable insert-only guards (account-deletion
+cascade remains allowed). Parent guards bind each distinct reviewed change to an own ordinary
+add/remove child receipt, exact successor/name/status and committed membership. Already
+associated child IDs cannot be adopted by another group. Command/array bounds and strict
+shape/revision checks reject malformed evidence. Product IDs intentionally have no product
+FK, preserving history for deleted resources. Prior-membership review is enforced by the
+transaction coordinator before mutation; the insert guard proves recorded postconditions.
+
+The RU/EN form shows current/desired membership, each reviewed operation/revision and quota,
+requires explicit acknowledgement, disables archive/terminal/full/unowned additions and
+allows lost-access removal. A changed pre-submit snapshot invalidates acknowledgement.
+An uncertain retry freezes original resource endpoint, UUID/body and collection proofs;
+full parent/child acknowledgement is required before success. Missing/extra/foreign children,
+wrong actions/names/revisions or resource mismatch are rejected. Definitive failures require
+reload; duplicate/stale handlers and late responses after unmount are ignored. Saved group
+and ordinary receipt links remain visible; removing the final inaccessible reference keeps
+the receipt visible rather than automatically refreshing into a missing resource page.
+
+Two PostgreSQL fixtures cover concurrent mixed-group replay, later-edit/access-loss replay,
+ordinary history preservation, full rollback of memberships/revisions/child-parent receipts/
+audits on required parent audit failure, and parent immutability. They remain unrun without
+disposable PostgreSQL. Live migration/SQL/locking/query plans, browser interaction, full
+production generation and Node 26 validation remain open. GitHub Actions are neither run
+nor inspected.
+
+Verification: 542 focused tests across 40 files pass, covering canonical group/receipt
+contracts, owner/prestate/quota/access/expiry/replay orchestration, strict HTTP/rate/body
+controls and RU/EN interaction/review/retry/unmount behavior, plus preserved collection
+single/batch/copy/move/comparison/history/version/preparation/release-watch and discussion
+recovery flows. Biome lint passes on all 20 touched TypeScript sources. Web TypeScript
+passes before and after regenerated routes. The isolated Next webpack compile-mode build
+exits zero. Root TypeScript retains only the known fast-check/implicit-any and old missing
+isSigned delivery-fixture errors. Migration 0077, both new PostgreSQL fixtures, browser,
+live SQL/locking/query plans and full production generation remain unrun.

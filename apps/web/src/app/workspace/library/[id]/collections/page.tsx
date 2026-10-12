@@ -1,3 +1,4 @@
+import { LibraryMembershipBatchForm } from "../../../../../components/library-membership-batch";
 import { libraryCollectionHistoryCopy } from "../../../../../lib/library-collection-history-i18n";
 import { AppError } from "@nexus/domain";
 import type { Metadata } from "next";
@@ -94,6 +95,7 @@ export default async function ResourceCollectionsPage({
           </p>
         )}
         {!result.collections.length && <p>{c.empty}</p>}
+        <LibraryMembershipBatchForm key={id} report={result} locale={locale} />
         <ol className="grid gap-4 sm:grid-cols-2">
           {result.collections.map((collection) => {
             const mutable = collection.status === "active" && collection.revision < 2_147_483_647;

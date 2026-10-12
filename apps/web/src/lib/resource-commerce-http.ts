@@ -25,7 +25,7 @@ export async function resourceCommerceRequest(
         throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
       }
       const policy =
-        /^\/api\/library\/collections(?:\/|$)/u.test(request.nextUrl.pathname)
+        (/^\/api\/library\/collections(?:\/|$)/u.test(request.nextUrl.pathname) || /^\/api\/library\/[^/]+\/collections$/u.test(request.nextUrl.pathname))
           ? "contentCreation"
           : request.nextUrl.pathname.startsWith("/api/admin/resources/") ||
         request.nextUrl.pathname.startsWith("/api/admin/commerce/") ||

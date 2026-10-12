@@ -86,6 +86,7 @@ export * from "./subscriptions";
 export * from "./library-collections";
 export { readLibraryCollectionHistory } from "./library-collection-history";
 export { readLibraryCollectionComparison } from "./library-collection-comparison";
+export { applyLibraryMembershipBatch } from "./library-membership-batches";
 export * from "./library-selection-batches";
 export * from "./profile-change-history";
 export { supportMessageDiscoveryRepository } from "./support-message-discovery";

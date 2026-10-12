@@ -540,6 +540,13 @@
       "when": 1791772200000,
       "tag": "0076_library_collection_account_history",
       "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1791774000000,
+      "tag": "0077_library_membership_batches",
+      "breakpoints": true
     }
   ]
 }
