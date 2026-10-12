@@ -14,6 +14,7 @@ export async function replayDiscussionNotifications(
     page: (cursor: ReplayCursor | null) => Promise<Array<ReplayCursor & { contentId: string }>>;
     deliver: (contentId: string, commentId: string) => Promise<{ failed: number }>;
     save: (checkpoint: ReplayCheckpoint) => Promise<void>;
+    shouldStop?: () => boolean;
   },
   limit: number,
 ) {
@@ -21,7 +22,7 @@ export async function replayDiscussionNotifications(
     throw Error("Replay limit must be between 1 and 10000");
   let current = { ...checkpoint };
   let processed = 0;
-  while (!current.completed && processed < limit) {
+  while (!current.completed && processed < limit && !dependencies.shouldStop?.()) {
     const rows = await dependencies.page(current.cursor);
     if (!rows.length) {
       current = { ...current, completed: true };
@@ -29,7 +30,7 @@ export async function replayDiscussionNotifications(
       break;
     }
     for (const row of rows) {
-      if (processed >= limit) break;
+      if (processed >= limit || dependencies.shouldStop?.()) break;
       if (
         row.createdAt < current.from ||
         row.createdAt > current.until ||
