@@ -1,3 +1,4 @@
+import { resourceReleaseWatchCommandSchema } from "@nexus/validation";
 import { readResourceReleaseWatchHistory } from "./resource-release-watch-history";
 import { and, asc, count, desc, eq, ilike, sql } from "drizzle-orm";
 import {
@@ -51,9 +52,18 @@ async function parentAndUser(tx: ResourceTransaction, userId: string, productId:
 function currentAccess(
   access: Awaited<ReturnType<typeof lockUserDownloadAccess>>,
   productId: string,
+  observedAt: Date,
 ) {
-  if (!access || (access.expiresAt && access.expiresAt.getTime() <= Date.now()))
+  if (!access || (access.expiresAt && access.expiresAt <= observedAt))
     throw new NotFoundError("Library resource", productId);
+}
+async function databaseClock(tx: ResourceTransaction) {
+  const [clock] = await tx.execute<{ observedAt: string }>(
+    sql`select date_trunc('milliseconds',clock_timestamp())::text AS "observedAt"`,
+  );
+  const observedAt = new Date(clock?.observedAt ?? "");
+  if (!Number.isFinite(observedAt.getTime())) throw fail("RELEASE_WATCH_CONFLICT");
+  return observedAt;
 }
 function usable(userId: string) {
   return sql<boolean>`coalesce(${products.status} = 'published' and exists (
@@ -73,7 +83,10 @@ export class ResourceReleaseWatchesRepository {
         .from(watches)
         .where(and(eq(watches.userId, userId), eq(watches.productId, productId)))
         .limit(1);
-      if (!watch) currentAccess(await lockUserDownloadAccess(tx, userId, productId), productId);
+      if (!watch) {
+        const access = await lockUserDownloadAccess(tx, userId, productId, sql`clock_timestamp()`);
+        currentAccess(access, productId, await databaseClock(tx));
+      }
       return watch ?? { productId, enabled: false, revision: 0, updatedAt: null };
     });
   }
@@ -83,18 +96,27 @@ export class ResourceReleaseWatchesRepository {
     command: ResourceReleaseWatchCommand;
     auditId: string;
   }) {
+    const parsed = resourceReleaseWatchCommandSchema.safeParse(input.command);
+    if (
+      !parsed.success ||
+      typeof input.productId !== "string" ||
+      !/^[A-Za-z0-9_-]{1,160}$/u.test(input.productId)
+    )
+      throw new AppError("Invalid release preference", 400, "RELEASE_WATCH_INVALID");
+    const command = parsed.data;
     return db.transaction(async (tx) => {
+      await tx.execute(sql`set local lock_timeout='5s'`);
+      await tx.execute(sql`set local statement_timeout='10s'`);
       // Serialize enrollment counts across resources for this account only.
       await tx.execute(
         sql`select pg_advisory_xact_lock(hashtextextended(${`resource-release-watch:${input.userId}`}, 0))`,
       );
-      const product = await parentAndUser(tx, input.userId, input.productId),
-        { command } = input;
+      const product = await parentAndUser(tx, input.userId, input.productId);
       const access = command.enabled
-        ? await lockUserDownloadAccess(tx, input.userId, product.id)
+        ? await lockUserDownloadAccess(tx, input.userId, product.id, sql`clock_timestamp()`)
         : null;
       if (command.enabled) {
-        currentAccess(access, product.id);
+        if (!access) throw new NotFoundError("Library resource", product.id);
         if (product.status !== "published") throw fail("RELEASE_WATCH_UNAVAILABLE");
         const [build] = await tx
           .select({ id: builds.id })
@@ -117,13 +139,15 @@ export class ResourceReleaseWatchesRepository {
         !(previous?.enabled === command.enabled && revision === command.expectedRevision + 1)
       )
         throw fail("RELEASE_WATCH_CONFLICT");
-      if (previous?.enabled === command.enabled)
+      if (previous?.enabled === command.enabled) {
+        if (command.enabled) currentAccess(access, product.id, await databaseClock(tx));
         return {
           productId: previous.productId,
           enabled: previous.enabled,
           revision,
           updatedAt: previous.updatedAt,
         };
+      }
       if (command.enabled) {
         const [total] = await tx
           .select({ total: count() })
@@ -141,8 +165,9 @@ export class ResourceReleaseWatchesRepository {
         (latest?.sequence ?? 0n) > (previous?.lastSequence ?? 0n)
           ? (latest?.sequence ?? 0n)
           : (previous?.lastSequence ?? 0n);
-      if (command.enabled) currentAccess(access, product.id);
-      const updatedAt = new Date(),
+      const observedAt = await databaseClock(tx);
+      if (command.enabled) currentAccess(access, product.id, observedAt);
+      const updatedAt = observedAt,
         values = {
           userId: input.userId,
           productId: product.id,
@@ -156,10 +181,25 @@ export class ResourceReleaseWatchesRepository {
         .values(values)
         .onConflictDoUpdate({
           target: [watches.userId, watches.productId],
-          set: { enabled: command.enabled, revision: revision + 1, lastSequence, updatedAt },
+          set: {
+            enabled: command.enabled,
+            revision: revision + 1,
+            lastSequence: sql`greatest(${watches.lastSequence},excluded.last_sequence)`,
+            updatedAt: sql`greatest(${watches.updatedAt}+interval '1 millisecond',excluded.updated_at)`,
+          },
+          setWhere: previous
+            ? and(eq(watches.revision, previous.revision), eq(watches.enabled, previous.enabled))
+            : sql`false`,
         })
         .returning(fields);
-      if (!watch) throw fail("RELEASE_WATCH_CONFLICT");
+      if (
+        !watch ||
+        watch.productId !== product.id ||
+        watch.enabled !== command.enabled ||
+        watch.revision !== revision + 1 ||
+        !Number.isFinite(watch.updatedAt.getTime())
+      )
+        throw fail("RELEASE_WATCH_CONFLICT");
       await tx.insert(auditEvents).values({
         id: input.auditId,
         actorId: input.userId,

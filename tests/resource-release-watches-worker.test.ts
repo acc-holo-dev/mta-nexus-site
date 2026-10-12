@@ -4,6 +4,7 @@ const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][],
   enqueue: vi.fn(),
+  clock: "2026-10-12T00:00:00.000Z",
 }));
 vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
   enqueueWebPushOutboxForNotification: state.enqueue,
@@ -12,6 +13,7 @@ vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const raw = drizzle(async (sql, params) => {
     state.queries.push({ sql, params });
+    if (sql.includes('AS "observedAt"')) return { rows: [{ observedAt: state.clock }] };
     return { rows: state.rows.shift() ?? [] };
   });
   const db: typeof raw = new Proxy(raw, {
@@ -52,8 +54,8 @@ function rows(enabled = true, safe = true) {
     safe ? [["bld_a"]] : [],
     [],
     [[enabled]],
-    [],
-    [],
+    ...(enabled && safe ? [[]] : []),
+    [["prd_a"]],
     [],
   ];
 }
@@ -61,6 +63,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   state.queries = [];
   state.rows = [];
+  state.clock = "2026-10-12T00:00:00.000Z";
   state.enqueue.mockResolvedValue({ queued: 2, reason: "queued" });
 });
 it("atomically processes one exact release with current rights, preference lock, inbox, progress and audit", async () => {
@@ -110,7 +113,7 @@ it("revoked access disables a watch and advances its revision without notifying"
     [["bld_a"]],
     [],
     [],
-    [],
+    [["prd_a"]],
     [],
   ];
   expect(await worker.runBatch(1)).toMatchObject({ processed: 1, notified: 0, disabled: 1 });
@@ -215,4 +218,37 @@ it("a stale moderation decision creates no release work, inbox or audit", async 
   ).toBeNull();
   expect(state.queries).toHaveLength(4);
   expect(state.queries.some((query) => query.sql.startsWith("insert"))).toBe(false);
+});
+
+it("uses the database clock after preference locking when a grant expires while waiting", async () => {
+  state.rows = rows();
+  state.rows[5] = [["ent_a", "2026-10-12T00:00:00Z"]];
+  state.rows.splice(11, 1); // No notification insert when the final grant is expired.
+  expect(await worker.runBatch(1)).toMatchObject({ processed: 1, notified: 0, disabled: 1 });
+  expect(state.enqueue).not.toHaveBeenCalled();
+  const clockIndex = state.queries.findIndex((q) => q.sql.includes('AS "observedAt"'));
+  const preferenceIndex = state.queries.findIndex((q) =>
+    q.sql.includes('from "notification_preferences"'),
+  );
+  expect(clockIndex).toBeGreaterThan(preferenceIndex);
+  expect(state.queries.find((q) => q.sql.includes('from "entitlements"'))?.sql).toContain(
+    "clock_timestamp()",
+  );
+  const update = state.queries.find((q) => q.sql.startsWith('update "resource_release_watches"'));
+  expect(update?.sql).toContain("greatest");
+  expect(update?.sql).toContain('"last_sequence" =');
+  expect(update?.sql).toContain('"revision" =');
+});
+it("does not emit a processing audit when guarded progress cannot be saved", async () => {
+  state.rows = rows();
+  state.rows[12] = [];
+  await expect(worker.runBatch(1)).rejects.toThrow("Release progress changed");
+  expect(state.queries.some((q) => q.sql.startsWith('insert into "audit_events"'))).toBe(false);
+});
+it("fails closed when the database clock cannot be read", async () => {
+  state.rows = rows();
+  state.clock = "invalid";
+  await expect(worker.runBatch(1)).rejects.toThrow("Release clock unavailable");
+  expect(state.enqueue).not.toHaveBeenCalled();
+  expect(state.queries.some((q) => q.sql.startsWith('insert into "notifications"'))).toBe(false);
 });

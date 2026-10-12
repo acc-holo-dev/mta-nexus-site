@@ -70,7 +70,12 @@ export class ResourceReleaseWorkerRepository {
           .limit(1)
           .for("share", { skipLocked: true });
         if (!user) return { skipped: true, processed: false };
-        const access = await lockUserDownloadAccess(tx, user.id, product.id);
+        const access = await lockUserDownloadAccess(
+          tx,
+          user.id,
+          product.id,
+          sql`clock_timestamp()`,
+        );
         const [watch] = await tx
           .select({ revision: watches.revision, lastSequence: watches.lastSequence })
           .from(watches)
@@ -115,8 +120,13 @@ export class ResourceReleaseWorkerRepository {
           .from(notificationPreferences)
           .where(eq(notificationPreferences.userId, user.id))
           .limit(1);
-        const accessLost =
-          !access || Boolean(access.expiresAt && access.expiresAt.getTime() <= Date.now());
+        // Observe database time after every potentially blocking rights/build/preference lock.
+        const [clock] = await tx.execute<{ observedAt: string }>(
+          sql`select date_trunc('milliseconds',clock_timestamp())::text AS "observedAt"`,
+        );
+        const observedAt = new Date(clock?.observedAt ?? "");
+        if (!Number.isFinite(observedAt.getTime())) throw new Error("Release clock unavailable");
+        const accessLost = !access || Boolean(access.expiresAt && access.expiresAt <= observedAt);
         const notified = !accessLost && Boolean(build) && preference?.enabled !== false;
         let pushJobs = 0,
           pushDegraded = 0;
@@ -146,15 +156,25 @@ export class ResourceReleaseWorkerRepository {
             pushDegraded++;
           }
         }
-        await tx
+        const [progress] = await tx
           .update(watches)
           .set({
             lastSequence: event.sequence,
             enabled: !accessLost,
             revision: accessLost ? watch.revision + 1 : watch.revision,
-            updatedAt: new Date(),
+            updatedAt: sql`greatest(${watches.updatedAt}+interval '1 millisecond',${observedAt.toISOString()}::timestamptz)`,
           })
-          .where(and(eq(watches.userId, user.id), eq(watches.productId, product.id)));
+          .where(
+            and(
+              eq(watches.userId, user.id),
+              eq(watches.productId, product.id),
+              eq(watches.enabled, true),
+              eq(watches.revision, watch.revision),
+              eq(watches.lastSequence, watch.lastSequence),
+            ),
+          )
+          .returning({ productId: watches.productId });
+        if (!progress) throw new Error("Release progress changed");
         await tx.insert(auditEvents).values({
           id: `aud_${randomUUID()}`,
           actorId: "system:resource-release",

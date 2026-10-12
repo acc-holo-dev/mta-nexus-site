@@ -7,9 +7,13 @@ const h = vi.hoisted(() => ({
   refresh: vi.fn(),
   reload: vi.fn(),
   locale: "en",
+  cleanup: null as (() => void) | null,
 }));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
+  useEffect: (effect: () => () => void) => {
+    h.cleanup ??= effect();
+  },
   useState: (initial: unknown) => {
     const i = h.cursor++;
     if (!(i in h.slots)) h.slots[i] = initial;
@@ -79,6 +83,7 @@ function reviewed() {
 beforeEach(() => {
   h.slots = [];
   h.cursor = 0;
+  h.cleanup = null;
   h.locale = "en";
   vi.clearAllMocks();
   vi.stubGlobal("fetch", h.fetch);
@@ -152,4 +157,22 @@ it("coalesces stale duplicate click handlers while a request is in flight", asyn
   resolve({ ok: true, status: 200, json: async () => ack(init) });
   await new Promise((r) => setTimeout(r, 0));
   expect(h.refresh).toHaveBeenCalledOnce();
+});
+
+it("aborts a group command on unmount and ignores the late acknowledgement", async () => {
+  reviewed();
+  let resolve: (value: unknown) => void = () => {};
+  h.fetch.mockImplementationOnce(
+    () =>
+      new Promise((r) => {
+        resolve = r;
+      }),
+  );
+  (button("Stop selected watches").props.onClick as () => void)();
+  const init = h.fetch.mock.calls[0][1] as RequestInit;
+  h.cleanup?.();
+  expect(init.signal?.aborted).toBe(true);
+  resolve({ ok: true, status: 200, json: async () => ack(init) });
+  await new Promise((r) => setTimeout(r, 0));
+  expect(h.refresh).not.toHaveBeenCalled();
 });

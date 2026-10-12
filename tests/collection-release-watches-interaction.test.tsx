@@ -10,6 +10,7 @@ const h = vi.hoisted(() => ({
 }));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
+  useEffect: () => {},
   useState: (initial: unknown) => {
     const i = h.cursor++;
     if (!(i in h.slots)) h.slots[i] = initial;
@@ -43,13 +44,14 @@ const items = [
   { productId: "prd_enabled", enabled: true, revision: 3, title: "Watched", available: true },
 ];
 let activeWatchCount = 4;
+let collectionId = "lcol_a";
 function render() {
   h.cursor = 0;
   return nodes(
     ResourceReleaseWatchBatchControls({
       items,
       locale: h.locale as "en" | "ru",
-      collection: { id: "lcol_a", revision: 3, status: "active" },
+      collection: { id: collectionId, revision: 3, status: "active" },
       activeWatchCount,
     }),
   );
@@ -91,6 +93,7 @@ beforeEach(() => {
   h.cursor = 0;
   h.locale = "en";
   activeWatchCount = 4;
+  collectionId = "lcol_a";
   vi.clearAllMocks();
   vi.stubGlobal("fetch", h.fetch);
   vi.stubGlobal("window", { location: { reload: h.reload } });
@@ -141,4 +144,17 @@ it("requires reload when collection membership changed", async () => {
   ).toBe(false);
   await click("Reload current state");
   expect(h.reload).toHaveBeenCalledOnce();
+});
+
+it("retains the reviewed collection endpoint when props change before a retry", async () => {
+  reviewed();
+  h.fetch.mockRejectedValueOnce(new Error("lost"));
+  await click("Enable selected watches");
+  const [url, init] = h.fetch.mock.calls[0] as [string, RequestInit];
+  collectionId = "lcol_other";
+  h.fetch.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ack(init) });
+  await click("Retry the same request");
+  expect(h.fetch.mock.calls[1][0]).toBe(url);
+  expect(h.fetch.mock.calls[1][1].body).toBe(init.body);
+  expect(h.refresh).toHaveBeenCalledOnce();
 });

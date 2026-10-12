@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   RESOURCE_RELEASE_WATCH_BATCH_LIMIT,
@@ -43,7 +43,17 @@ export function ResourceReleaseWatchBatchControls({
     : RESOURCE_RELEASE_WATCH_BATCH_LIMIT;
   const copy = resourceReleaseWatchesCopy(locale),
     router = useRouter(),
-    lock = useRef(false);
+    lock = useRef(false),
+    settled = useRef(false),
+    active = useRef<AbortController | null>(null),
+    scope = useRef<{ url: string; enabling: boolean } | null>(null);
+  useEffect(
+    () => () => {
+      active.current?.abort();
+      active.current = null;
+    },
+    [],
+  );
   const [selected, setSelected] = useState<string[]>([]),
     [confirmed, setConfirmed] = useState(false),
     [pending, setPending] = useState<
@@ -57,7 +67,14 @@ export function ResourceReleaseWatchBatchControls({
     ResourceReleaseWatchDisableCommand | ResourceReleaseWatchEnableCommand | null
   >(null);
   async function send() {
-    if (lock.current || saved || blocked || (!pending && (!confirmed || !selected.length))) return;
+    if (
+      lock.current ||
+      settled.current ||
+      saved ||
+      blocked ||
+      (!pending && (!confirmed || !selected.length))
+    )
+      return;
     const command = frozen.current ?? {
       ...(collection ? { expectedCollectionRevision: collection.revision } : {}),
       items: eligible
@@ -72,19 +89,30 @@ export function ResourceReleaseWatchBatchControls({
     )
       return;
     frozen.current = command;
+    const requestScope = scope.current ?? {
+      url: collection
+        ? `/api/library/collections/${encodeURIComponent(collection.id)}/watches`
+        : "/api/library/watches/disable",
+      enabling,
+    };
+    scope.current = requestScope;
+    const controller = new AbortController();
+    active.current = controller;
     lock.current = true;
     setPending(command);
     setBusy(true);
     setError("");
     try {
       const response = await fetch(
-        collection
-          ? `/api/library/collections/${encodeURIComponent(collection.id)}/watches`
-          : "/api/library/watches/disable",
-        privateApiRequest({ method: "POST", json: command }),
+        requestScope.url,
+        privateApiRequest({ method: "POST", json: command, signal: controller.signal }),
       );
       const body = await response.json().catch(() => null);
-      if (!response.ok || !confirmedResourceReleaseWatchBatch(body, command, enabling)) {
+      if (active.current !== controller) return;
+      if (
+        !response.ok ||
+        !confirmedResourceReleaseWatchBatch(body, command, requestScope.enabling)
+      ) {
         setError(
           body?.code === "RELEASE_WATCH_LIMIT"
             ? copy.maximum
@@ -94,19 +122,26 @@ export function ResourceReleaseWatchBatchControls({
                 ? copy.conflict
                 : copy.failed,
         );
-        if ([400, 401, 403, 404, 409].includes(response.status)) setBlocked(true);
+        if ([400, 401, 403, 404, 409, 413, 415].includes(response.status)) {
+          settled.current = true;
+          setBlocked(true);
+        }
         return;
       }
+      settled.current = true;
       setSaved(true);
       router.refresh();
     } catch {
-      setError(copy.failed);
+      if (active.current === controller) setError(copy.failed);
     } finally {
-      lock.current = false;
-      setBusy(false);
+      if (active.current === controller) {
+        active.current = null;
+        lock.current = false;
+        setBusy(false);
+      }
     }
   }
-  if (!eligible.length || collection?.status === "archived") return null;
+  if (!pending && (!eligible.length || collection?.status === "archived")) return null;
   return (
     <section className="nexus-panel space-y-4 p-5">
       <h2>{enabling ? copy.enrollTitle : copy.batchTitle}</h2>

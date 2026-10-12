@@ -16,12 +16,15 @@ import {
   resourceReleaseWatches as releaseWatches,
   resourceReleaseEvents as releaseEvents,
   userRepository,
+  notifications,
   users,
 } from "@nexus/db";
-import { and, eq, inArray } from "drizzle-orm";
-import { expect, it } from "vitest";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { expect, it, vi } from "vitest";
 import { inspectBuildPackage } from "../apps/web/src/lib/services/build-package-inspection";
 import archives from "./fixtures/build-packages.json";
+
+import { resourceReleaseWorkerRepository } from "../packages/db/src/repositories/resource-release-worker";
 
 // Requires a disposable PostgreSQL database migrated through 0061. No storage writes.
 async function fixture(privateDependency = false) {
@@ -1065,6 +1068,95 @@ it("keeps malformed watch audit details neutral instead of exposing raw fields o
     expect(JSON.stringify(report)).not.toContain("DO-NOT-EXPORT");
     expect(JSON.stringify(report)).not.toContain("lastSequence");
   } finally {
+    await f.cleanup();
+  }
+});
+
+it("enrolls and delivers finite-access releases using database time despite application clock skew", async () => {
+  const f = await fixture();
+  let clock: ReturnType<typeof vi.spyOn> | undefined;
+  try {
+    await db
+      .update(entitlements)
+      .set({ expiresAt: sql`clock_timestamp()+interval '10 minutes'` })
+      .where(eq(entitlements.subjectId, f.buyer));
+    clock = vi.spyOn(Date, "now").mockReturnValue(new Date("2036-01-01T00:00:00Z").getTime());
+    const start = await resourceReleaseWatchesRepository.command({
+      userId: f.buyer,
+      productId: f.ids[0] ?? "",
+      command: { enabled: true, expectedRevision: 0 },
+      auditId: `aud_watch_clock_${f.key}`,
+    });
+    expect(start).toMatchObject({ enabled: true, revision: 1 });
+    await f.publishReplacement();
+    await resourceReleaseWorkerRepository.runBatch(100);
+    const inbox = await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.recipientId, f.buyer));
+    expect(
+      inbox.filter((row) => (row.data as { kind?: string } | null)?.kind === "resource_release"),
+    ).toHaveLength(1);
+    expect(await resourceReleaseWatchesRepository.detail(f.buyer, f.ids[0] ?? "")).toMatchObject({
+      enabled: true,
+      revision: 1,
+    });
+  } finally {
+    clock?.mockRestore();
+    await db.delete(auditEvents).where(eq(auditEvents.targetId, `${f.buyer}:${f.ids[0]}`));
+    await db.delete(auditEvents).where(eq(auditEvents.actorId, f.buyer));
+    await f.cleanup();
+  }
+});
+it("rolls back an individual watch on audit failure and preserves monotonic update times on retry", async () => {
+  const f = await fixture();
+  try {
+    const input = {
+      userId: f.buyer,
+      productId: f.ids[0] ?? "",
+      auditId: `aud_watch_atomic_${f.key}`,
+    };
+    await resourceReleaseWatchesRepository.command({
+      ...input,
+      command: { enabled: true, expectedRevision: 0 },
+    });
+    await db
+      .update(releaseWatches)
+      .set({ updatedAt: sql`clock_timestamp()+interval '1 hour'` })
+      .where(eq(releaseWatches.userId, f.buyer));
+    const before = await resourceReleaseWatchesRepository.detail(f.buyer, input.productId);
+    await expect(
+      resourceReleaseWatchesRepository.command({
+        ...input,
+        command: { enabled: false, expectedRevision: 1 },
+      }),
+    ).rejects.toThrow();
+    expect(await resourceReleaseWatchesRepository.detail(f.buyer, input.productId)).toEqual(before);
+    const stop = {
+      ...input,
+      auditId: `aud_watch_atomic_stop_${f.key}`,
+      command: { enabled: false, expectedRevision: 1 },
+    };
+    const saved = await resourceReleaseWatchesRepository.command(stop);
+    expect(saved.updatedAt.getTime()).toBeGreaterThan(before.updatedAt?.getTime() ?? 0);
+    expect(
+      await resourceReleaseWatchesRepository.command({
+        ...stop,
+        auditId: `aud_watch_atomic_retry_${f.key}`,
+      }),
+    ).toEqual(saved);
+    const audits = await db
+      .select()
+      .from(auditEvents)
+      .where(
+        and(
+          eq(auditEvents.actorId, f.buyer),
+          eq(auditEvents.action, "library.release_watch_changed"),
+        ),
+      );
+    expect(audits).toHaveLength(2);
+  } finally {
+    await db.delete(auditEvents).where(eq(auditEvents.actorId, f.buyer));
     await f.cleanup();
   }
 });

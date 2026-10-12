@@ -3351,3 +3351,44 @@ after Next generated route types. Next webpack compile-mode build exited success
 with its route summary. Full production generation remains unverified. Root TypeScript
 still reports the previously recorded fast-check/implicit-any and delivery-fixture
 errors; the new PostgreSQL history fixtures remain unrun.
+
+
+## Release-watch command and worker reliability (2026-10-12)
+
+Individual commands now validate the strict schema at the repository boundary, set
+bounded transaction lock/statement waits, and use database time for source selection
+and final finite-access checks after all rights/build/watch locks. Enrollment replays
+also require still-current access. Unexpected insert conflicts cannot overwrite a
+new watch; existing upserts compare the held revision/state and preserve monotonic
+cursor/time values. Required audit failures still roll back the whole command.
+Single-watch reads and writes reject arbitrary query selectors.
+
+Release workers select rights with clock_timestamp and read database time after the
+notification-preference lock. Expiry while waiting prevents inbox/push creation and
+stops the watch; invalid clocks fail closed. Guarded progress writes compare enabled
+state, revision and exact old cursor, and keep update time monotonic. A missing write
+aborts the transaction, including authoritative inbox/outbox changes; no processing
+audit is falsely committed. Existing publication, preference, worker batch limits,
+shutdown checks and skip-locked scope behavior are preserved.
+
+Individual RU/EN controls now freeze the reviewed resource, revision, desired state
+and prior update time. An uncertain result offers only the same command retry or
+reload; a successful acknowledgement must match the exact successor state and a
+valid canonical, increasing timestamp. Definitive failures require reload. Both
+individual and grouped controllers suppress stale duplicate handlers after success
+or rejection, abort requests on unmount and ignore late results. Group retries also
+freeze their collection/global endpoint and acknowledgement mode.
+
+Two additional PostgreSQL fixtures cover finite rights despite application clock
+skew, and single-command audit rollback/monotonic timestamp/exact replay. They remain
+unrun without a disposable PostgreSQL instance. Browser interaction, live locking,
+full production generation and Node 26 validation remain open. No new migration is
+introduced; GitHub Actions are neither run nor inspected.
+
+Verification: 132 focused tests across 19 files pass, covering individual/group
+interaction, repository/worker/HTTP behavior and preserved collection/history flows.
+Biome lint passes for all 12 touched TypeScript sources; web TypeScript also passes
+after Next regenerated route types. The isolated Next webpack compile-mode build
+exits zero with its route summary. Root TypeScript retains only the known missing
+fast-check/implicit-any and old missing isSigned delivery-fixture errors. Live
+PostgreSQL fixtures and browser checks remain unrun.

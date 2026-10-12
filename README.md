@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+Individual and grouped release-watch commands now keep their reviewed resource/scope
+and revisions across uncertain retries. Definitive errors require reload; leaving the
+screen aborts the request and ignores late responses. Single changes and the release
+worker check finite access at database time after waiting for locks, guard saved state
+and keep update timestamps/progress monotonic.
+
 The private release-watch center now provides command history across individual changes,
 bulk stopping and collection enrollment. Inspect 7/30/90/365-day windows, filter recorded
 resource IDs or operation sources, and export a bounded twenty-operation JSON page.

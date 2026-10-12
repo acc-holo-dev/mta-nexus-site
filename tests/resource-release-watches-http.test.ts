@@ -111,3 +111,22 @@ it("refuses rate excess and account selectors on the read archive", async () => 
   expect((await page(new NextRequest("https://nexus.test/api/library/watches"))).status).toBe(429);
   expect(state.page).not.toHaveBeenCalled();
 });
+
+it("rejects query selectors on a single watch read or mutation", async () => {
+  const url = "https://nexus.test/api/library/watches/prd_a?userId=other";
+  expect((await detail(new NextRequest(url), context)).status).toBe(400);
+  expect(
+    (
+      await command(
+        new NextRequest(url, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ enabled: true, expectedRevision: 0 }),
+        }),
+        context,
+      )
+    ).status,
+  ).toBe(400);
+  expect(state.detail).not.toHaveBeenCalled();
+  expect(state.command).not.toHaveBeenCalled();
+});
