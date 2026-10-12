@@ -1,4 +1,5 @@
 import { resourceRequirementsCopy } from "../../../../../lib/resource-requirements-i18n";
+import { libraryCollectionsCopy } from "../../../../../lib/library-collections-i18n";
 import { libraryReleaseComparisonCopy } from "../../../../../lib/library-release-comparison-i18n";
 import { libraryReleaseHistoryCopy } from "../../../../../lib/library-release-history-i18n";
 import type { Metadata } from "next";
@@ -89,6 +90,12 @@ export default async function LibraryVersionsPage({
         className="text-accent underline"
       >
         {resourceRequirementsCopy(locale).title}
+      </Link>
+      <Link
+        href={`/workspace/library/${encodeURIComponent(id)}/collections`}
+        className="text-accent underline"
+      >
+        {libraryCollectionsCopy(locale).resourceCollections}
       </Link>
       <LibraryReleaseSelectionControls
         key={`${id}:${result.selection.revision}`}

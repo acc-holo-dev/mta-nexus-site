@@ -478,6 +478,12 @@ export async function LibraryCollectionsScreen({
                 <p className="text-sm text-muted">{c.unavailableNote}</p>
               )}
               <div className="flex flex-wrap gap-4 text-sm">
+                <Link
+                  href={`/workspace/library/${encodeURIComponent(item.productId)}/collections`}
+                  className="text-accent underline"
+                >
+                  {c.resourceCollections}
+                </Link>
                 {item.slug && (
                   <Link
                     href={`/market/${encodeURIComponent(item.slug)}`}

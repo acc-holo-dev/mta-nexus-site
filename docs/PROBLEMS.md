@@ -3750,3 +3750,51 @@ and web TypeScript passes again after route regeneration. The isolated Next webp
 compile-mode build exits zero with its route summary. Root TypeScript retains only
 the known fast-check/implicit-any and old missing isSigned delivery-fixture errors.
 Live PostgreSQL/migration/browser and full production generation remain unrun.
+
+
+### 2026-10-12 — Private per-resource collection membership management
+
+The private GET `/api/library/[id]/collections` and dynamic RU/EN SSR screen
+`/workspace/library/[id]/collections` inspect all own collections for one resource.
+The reader validates the resource ID, requires a live own user and executes in one
+read-only repeatable-read snapshot. Effective user download entitlement/legacy-license
+expiry is checked at database transaction time. Inspection requires current access to
+an existing product or at least one own recorded membership; foreign/unknown IDs return
+404 before collection inspection. Resource titles require current access, published
+product status and a trusted clean published build. Acquired drafts may still be added
+as references, while deleted products/lost-access resources remain remove-only through
+their existing own references. Neither collection membership nor this view grants files.
+
+The report explicitly projects resource ID/masked title/availability/add capability,
+UTC generation time and at most thirty own collection snapshots/counts/membership flags.
+It excludes owner IDs, grants, build/storage metadata and download controls. The bounded
+collection query uses the existing owner and collection-item indexes; a thirty-first row
+fails closed. Every query selector is rejected, authentication/rate limits precede reads,
+and JSON is private/no-store with Cookie variation. Archived collections remain visible
+without mutations; full active collections still allow removal; terminal revisions are
+read-only. Links from the library, version screen and own collection entries make this
+view reachable, including orphaned references.
+
+The shared single collection controller now freezes UUID/body/endpoint/collection proof
+and reload destination, checks the complete immutable receipt, suppresses stale duplicate
+handlers, aborts on unmount and ignores late responses. Definitive 400/401/403/404/409/413/415
+responses require reload; ambiguous network/malformed confirmation/rate-limit responses
+retain the exact original retry. Archive/full-copy acknowledgements are preserved.
+Single and batch collection additions now select locked effective access at database
+clock time and retain the final database-time expiry check before inserting memberships.
+No new migration, history rewrite or wider command authority is introduced.
+
+An additional PostgreSQL fixture checks draft grouping, foreign denial, lost access,
+product deletion, surviving membership/removal and subsequent 404. It remains unrun
+without disposable PostgreSQL. Live SQL/locking/query plans, browser interaction, full
+production generation and Node 26 validation remain open. GitHub Actions are neither
+run nor inspected.
+
+Verification: 408 focused tests across 29 files pass, covering membership privacy,
+HTTP authority/rate limits/RU-EN rendering, exact retries and preserved collection
+copy/move/batch/version/preparation/release-watch flows. Biome lint passes on all
+16 touched TypeScript sources. Web TypeScript passes before and after regenerated
+routes. The isolated Next webpack compile-mode build exits zero with both new routes
+in its summary. Root TypeScript retains only the known fast-check/implicit-any and
+old missing isSigned delivery-fixture errors. The new PostgreSQL fixture, live
+migrations/database behavior, browser and full production generation remain unrun.

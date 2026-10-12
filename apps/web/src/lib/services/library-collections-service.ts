@@ -4,6 +4,8 @@ import { generateId } from "@nexus/security";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { collectionId } from "../library-collections-query";
 export const libraryCollectionsService = {
+  resourceMemberships: (actor: User, productId: string) =>
+    libraryCollectionsRepository.resourceMemberships(actor.id, collectionId(productId)),
   page: (actor: User, query: { page: number; status: "all" | "active" | "archived" }) =>
     libraryCollectionsRepository.page(actor.id, query.page, query.status),
   detail: (actor: User, id: string, query: { page: number; q: string }, candidates = false) =>

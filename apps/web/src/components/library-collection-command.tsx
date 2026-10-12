@@ -6,7 +6,7 @@ import type {
 } from "@nexus/domain";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useId, useRef, useState } from "react";
+import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
@@ -17,6 +17,7 @@ export function LibraryCollectionCommandForm({
   action = "create",
   productId,
   copyPreview,
+  returnHref,
 }: {
   locale: "ru" | "en";
   collection?: LibraryCollectionSnapshot;
@@ -26,12 +27,28 @@ export function LibraryCollectionCommandForm({
   >;
   productId?: string;
   copyPreview?: LibraryCollectionCopyPreview;
+  returnHref?: string;
 }) {
   const c = libraryCollectionsCopy(locale),
     router = useRouter(),
     field = useId();
-  const pending = useRef<LibraryCollectionCommand | null>(null),
-    lock = useRef(false);
+  const pending = useRef<{
+      command: LibraryCollectionCommand;
+      collection?: LibraryCollectionSnapshot;
+      endpoint: string;
+      reloadHref: string;
+    } | null>(null),
+    lock = useRef(false),
+    settled = useRef(false),
+    active = useRef(true),
+    controller = useRef<AbortController | null>(null);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+      controller.current?.abort();
+    };
+  }, []);
   const [name, setName] = useState(
       action === "rename" || action === "duplicate" ? (collection?.name ?? "") : "",
     ),
@@ -39,15 +56,17 @@ export function LibraryCollectionCommandForm({
     [busy, setBusy] = useState(false),
     [frozen, setFrozen] = useState(false),
     [saved, setSaved] = useState(false),
+    [blocked, setBlocked] = useState(false),
     [error, setError] = useState("");
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (lock.current || saved) return;
-    if ((action === "archive" || action === "duplicate") && !checked) {
+    if (!active.current || lock.current || settled.current) return;
+    if (!pending.current && (action === "archive" || action === "duplicate") && !checked) {
       setError(c.invalid);
       return;
     }
     if (
+      !pending.current &&
       action === "duplicate" &&
       (!collection ||
         !copyPreview ||
@@ -60,7 +79,7 @@ export function LibraryCollectionCommandForm({
       return;
     }
     const parsed = libraryCollectionCommandSchema.safeParse(
-      pending.current ?? {
+      pending.current?.command ?? {
         requestId: crypto.randomUUID(),
         action,
         ...(action === "create" || action === "rename" || action === "duplicate" ? { name } : {}),
@@ -79,30 +98,55 @@ export function LibraryCollectionCommandForm({
       setError(c.invalid);
       return;
     }
-    pending.current = parsed.data;
+    pending.current ??= {
+      command: parsed.data,
+      collection: collection
+        ? {
+            id: collection.id,
+            name: collection.name,
+            status: collection.status,
+            revision: collection.revision,
+          }
+        : undefined,
+      endpoint: `/api/library/collections${collection && action !== "duplicate" ? `/${encodeURIComponent(collection.id)}` : ""}`,
+      reloadHref: returnHref ?? collectionHref(collection?.id),
+    };
+    const attempt = pending.current;
+    const abort = new AbortController();
+    controller.current = abort;
     lock.current = true;
     setBusy(true);
     setFrozen(true);
     setError("");
     try {
       const response = await fetch(
-        `/api/library/collections${collection && action !== "duplicate" ? `/${encodeURIComponent(collection.id)}` : ""}`,
-        privateApiRequest({ method: "POST", json: parsed.data }),
+        attempt.endpoint,
+        privateApiRequest({ method: "POST", json: attempt.command, signal: abort.signal }),
       );
       const body = await response.json().catch(() => null),
-        id = response.ok ? confirmedCollectionCommand(body, parsed.data, collection) : null;
+        id = response.ok
+          ? confirmedCollectionCommand(body, attempt.command, attempt.collection)
+          : null;
+      if (!active.current || abort.signal.aborted) return;
       if (!id) {
+        if ([400, 401, 403, 404, 409, 413, 415].includes(response.status)) {
+          settled.current = true;
+          setBlocked(true);
+        }
         setError(libraryCollectionError(locale, body?.code));
         return;
       }
+      settled.current = true;
       setSaved(true);
-      if (action === "create" || action === "duplicate") router.push(collectionHref(id));
+      if (attempt.command.action === "create" || attempt.command.action === "duplicate")
+        router.push(collectionHref(id));
       router.refresh();
     } catch {
-      setError(c.retry);
+      if (active.current && !abort.signal.aborted) setError(c.retry);
     } finally {
       lock.current = false;
-      setBusy(false);
+      if (active.current && !abort.signal.aborted) setBusy(false);
+      if (controller.current === abort) controller.current = null;
     }
   }
   return (
@@ -135,10 +179,18 @@ export function LibraryCollectionCommandForm({
       )}
       <button
         type="submit"
-        disabled={busy || saved}
+        disabled={busy || saved || blocked}
         className="rounded border border-base px-3 py-2 text-sm text-accent disabled:opacity-60"
       >
-        {busy ? c.busy : saved ? c.saved : frozen && error ? c.retryAction : c[action]}
+        {busy
+          ? c.busy
+          : saved
+            ? c.saved
+            : blocked
+              ? c.reload
+              : frozen && error
+                ? c.retryAction
+                : c[action]}
       </button>
       {frozen && !saved && (
         <p role="note" className="text-xs text-muted">
@@ -150,7 +202,10 @@ export function LibraryCollectionCommandForm({
           <p role="alert" className="text-sm text-warning">
             {error}
           </p>
-          <a href={collectionHref(collection?.id)} className="text-sm text-accent underline">
+          <a
+            href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection?.id)}
+            className="text-sm text-accent underline"
+          >
             {c.reload}
           </a>
         </div>

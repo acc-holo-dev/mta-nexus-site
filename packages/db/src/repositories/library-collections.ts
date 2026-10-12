@@ -9,6 +9,7 @@ import {
   type LibraryReleaseFilter,
   type LibraryCollectionReceipt,
   type LibraryCollectionSnapshot,
+  type LibraryResourceCollections,
   NotFoundError,
 } from "@nexus/domain";
 import { libraryCollectionCommandSchema, libraryCollectionIdSchema } from "@nexus/validation";
@@ -208,6 +209,65 @@ async function readCollectionItems(
 }
 
 export class LibraryCollectionsRepository {
+  async resourceMemberships(
+    userId: string,
+    productId: string,
+  ): Promise<LibraryResourceCollections> {
+    if (!libraryCollectionIdSchema.safeParse(productId).success)
+      throw new AppError("Invalid resource", 400, "COLLECTION_INVALID");
+    return db.transaction(async (tx) => {
+      await liveUser(tx, userId);
+      const [resource] = await tx.execute<
+        LibraryResourceCollections["resource"] & { generatedAt: string }
+      >(sql`
+        ${effectiveUserDownloadSources(userId, sql`transaction_timestamp()`)}, scope AS (
+          SELECT product.id, product.title,
+            (product.id IS NOT NULL AND owned.resource_id IS NOT NULL) AS "canAdd",
+            coalesce(owned.resource_id IS NOT NULL AND product.status='published' AND EXISTS (
+              SELECT 1 FROM ${builds} WHERE ${safePublishedBuildCondition(sql`product.id`)}
+            ),false) AS available
+          FROM (SELECT ${productId}::text AS id) requested
+          LEFT JOIN ${products} product ON product.id=requested.id
+          LEFT JOIN owned ON owned.resource_id=requested.id
+          WHERE (product.id IS NOT NULL AND owned.resource_id IS NOT NULL) OR EXISTS (
+            SELECT 1 FROM ${collections} collection JOIN ${members} member ON member.collection_id=collection.id
+            WHERE collection.user_id=${userId} AND member.product_id=requested.id
+          )
+        )
+        SELECT ${productId}::text AS "productId", CASE WHEN available THEN left(title,200) END AS title,
+          available,"canAdd",to_char(transaction_timestamp() AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "generatedAt"
+        FROM scope LIMIT 1
+      `);
+      if (!resource) throw new NotFoundError("Resource", productId);
+      const rows = await tx
+        .select({
+          id: collections.id,
+          name: collections.name,
+          status: collections.status,
+          revision: collections.revision,
+          itemCount: sql<number>`(SELECT count(*)::integer FROM ${members} WHERE ${members.collectionId}=${collections.id})`,
+          inCollection: sql<boolean>`EXISTS (SELECT 1 FROM ${members} WHERE ${members.collectionId}=${collections.id} AND ${members.productId}=${productId})`,
+        })
+        .from(collections)
+        .where(eq(collections.userId, userId))
+        .orderBy(desc(collections.updatedAt), asc(collections.id))
+        .limit(LIBRARY_COLLECTION_LIMIT + 1);
+      if (rows.length > LIBRARY_COLLECTION_LIMIT) throw fail("COLLECTION_LIMIT");
+      return {
+        schemaVersion: 1,
+        generatedAt: resource.generatedAt,
+        resource: {
+          productId,
+          title: resource.available ? resource.title : null,
+          available: resource.available,
+          canAdd: resource.canAdd,
+        },
+        collections: rows,
+        collectionLimit: LIBRARY_COLLECTION_LIMIT,
+        itemLimit: LIBRARY_COLLECTION_ITEM_LIMIT,
+      };
+    }, readOptions);
+  }
   async page(userId: string, page = 1, status: "all" | "active" | "archived" = "active") {
     return db.transaction(async (tx) => {
       await liveUser(tx, userId);
@@ -543,7 +603,7 @@ export class LibraryCollectionsRepository {
               .limit(1)
               .for("share");
             const access = product
-              ? await lockUserDownloadAccess(tx, input.userId, productId)
+              ? await lockUserDownloadAccess(tx, input.userId, productId, sql`clock_timestamp()`)
               : null;
             if (!access) throw new NotFoundError("Library resource", productId);
             accessTerms.push({ productId, expiresAt: access.expiresAt });
@@ -599,7 +659,12 @@ export class LibraryCollectionsRepository {
             .limit(1)
             .for("share");
           const access = product
-            ? await lockUserDownloadAccess(tx, input.userId, command.productId)
+            ? await lockUserDownloadAccess(
+                tx,
+                input.userId,
+                command.productId,
+                sql`clock_timestamp()`,
+              )
             : null;
           if (!access) throw new NotFoundError("Library resource", command.productId);
           const [member] = await tx

@@ -1,5 +1,13 @@
 # MTA NEXUS
 
+Each acquired resource now has a private RU/EN collection-membership screen showing
+all own collections, counts and revisions. Add/remove uses existing UUID commands;
+known references remain removable after lost access or product deletion, with hidden
+unavailable titles. Archived/full/terminal collections explain their constraints.
+Single collection commands freeze their endpoint and proof across retries, require
+reload after definitive failures and ignore late responses after unmount. No new
+migration is needed; existing collection migrations through `0075` are prerequisites.
+
 Collections now support reviewed atomic moves of up to twenty references between
 existing active collections. Both revisions advance together, existing destination
 entries keep their dates, and one immutable UUID receipt appears in both histories.

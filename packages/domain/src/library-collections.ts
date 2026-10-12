@@ -44,6 +44,14 @@ export type LibraryCollectionCopyPreview = {
   itemCount: number;
   sourceDigest: string;
 };
+export type LibraryResourceCollections = {
+  schemaVersion: 1;
+  generatedAt: string;
+  resource: { productId: string; title: string | null; available: boolean; canAdd: boolean };
+  collections: (LibraryCollectionSnapshot & { itemCount: number; inCollection: boolean })[];
+  collectionLimit: number;
+  itemLimit: number;
+};
 export type LibraryCollectionReceipt = {
   id: string;
   requestId: string;

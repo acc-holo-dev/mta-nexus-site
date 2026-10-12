@@ -1,6 +1,13 @@
 const en = {
   title: "My resource collections",
   library: "Resource library",
+  resourceCollections: "Collections containing this resource",
+  membershipNote:
+    "See all your collections and add or remove this resource. Unavailable references keep their IDs and hidden titles.",
+  notInCollection: "Not in collection",
+  noAddAccess: "Current resource access is required to add a new reference.",
+  fullCollection: "This collection has reached its resource limit.",
+  revisionLocked: "This collection can no longer be changed.",
   subtitle:
     "Group resources you have acquired. Collections are private and do not grant download rights.",
   name: "Collection name",
@@ -89,6 +96,13 @@ const en = {
 const ru: typeof en = {
   title: "Мои коллекции ресурсов",
   library: "Библиотека ресурсов",
+  resourceCollections: "Коллекции с этим ресурсом",
+  membershipNote:
+    "Все ваши коллекции: добавьте ресурс или уберите его запись. У недоступных ресурсов сохраняются ID и скрытые названия.",
+  notInCollection: "Нет в коллекции",
+  noAddAccess: "Для добавления новой записи нужен действующий доступ к ресурсу.",
+  fullCollection: "В коллекции достигнут лимит ресурсов.",
+  revisionLocked: "Эту коллекцию больше нельзя изменять.",
   subtitle:
     "Группируйте полученные ресурсы. Коллекции доступны только вам и не предоставляют права на скачивание.",
   name: "Название коллекции",

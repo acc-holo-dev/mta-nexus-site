@@ -12,6 +12,7 @@ const state = vi.hoisted(() => ({
   copyPreview: vi.fn(),
   copyItemsPage: vi.fn(),
   releases: vi.fn(),
+  resourceMemberships: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
@@ -29,10 +30,12 @@ vi.mock("@nexus/db", () => ({
     copyPreview: state.copyPreview,
     copyItemsPage: state.copyItemsPage,
     releases: state.releases,
+    resourceMemberships: state.resourceMemberships,
   },
 }));
 
 import { GET as releases } from "../apps/web/src/app/api/library/collections/[id]/releases/route";
+import { GET as resourceMemberships } from "../apps/web/src/app/api/library/[id]/collections/route";
 import { GET as releasesExport } from "../apps/web/src/app/api/library/collections/[id]/releases/export/route";
 import { GET as moveItemsPage } from "../apps/web/src/app/api/library/collections/[id]/move-items/route";
 import { GET as copyItemsPage } from "../apps/web/src/app/api/library/collections/[id]/copy-items/route";
@@ -356,4 +359,53 @@ it("serves move review through the same private source snapshot and accepts only
   expect(
     (await moveItemsPage(request(`${base}/lcol_a/move-items?userId=other`), context)).status,
   ).toBe(400);
+});
+
+it("bounds resource collection inspection to the session and rejects every query selector", async () => {
+  const path = "/api/library/prd_a/collections",
+    params = { params: Promise.resolve({ id: "prd_a" }) };
+  state.resourceMemberships.mockResolvedValue({
+    schemaVersion: 1,
+    resource: { productId: "prd_a", title: null, canAdd: false, available: false },
+    collections: [],
+  });
+  const response = await resourceMemberships(request(path), params);
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe("Cookie");
+  expect(state.resourceMemberships).toHaveBeenCalledWith("usr_a", "prd_a");
+  expect(state.rate).toHaveBeenCalledWith("resourceInspection", "usr_a");
+  vi.clearAllMocks();
+  for (const query of [
+    "userId=other",
+    "page=1",
+    "q=private",
+    "status=active",
+    "productId=other",
+    "page=1&page=2",
+  ])
+    expect((await resourceMemberships(request(`${path}?${query}`), params)).status).toBe(400);
+  expect(state.resourceMemberships).not.toHaveBeenCalled();
+  state.actor = null;
+  expect((await resourceMemberships(request(path), params)).status).toBe(401);
+  state.actor = { id: "usr_a", role: "user" };
+  state.rate.mockResolvedValue({ success: false });
+  expect((await resourceMemberships(request(path), params)).status).toBe(429);
+  expect(state.resourceMemberships).not.toHaveBeenCalled();
+});
+it("masks unowned resource failures and rejects malformed resource ids before reading", async () => {
+  const path = "/api/library/prd_a/collections";
+  expect(
+    (await resourceMemberships(request(path), { params: Promise.resolve({ id: "../private" }) }))
+      .status,
+  ).toBe(400);
+  expect(state.resourceMemberships).not.toHaveBeenCalled();
+  state.resourceMemberships.mockRejectedValue(
+    new AppError("foreign resource title", 404, "NOT_FOUND"),
+  );
+  const response = await resourceMemberships(request(path), {
+    params: Promise.resolve({ id: "prd_a" }),
+  });
+  expect(response.status).toBe(404);
+  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
 });

@@ -703,3 +703,49 @@ it("rolls both sides of a move back after audit failure and rejects a receipt if
       }),
   ).rejects.toThrow();
 });
+
+it("inspects draft memberships privately and retains removal after access loss and product deletion", async () => {
+  const f = await fixture();
+  const created = await f.command({
+    requestId: randomUUID(),
+    action: "create",
+    name: "Resource memberships",
+  });
+  const id = created.receipt.collection.id;
+  const before = await collections.resourceMemberships(f.userId, f.productId);
+  expect(before.resource).toEqual({
+    productId: f.productId,
+    title: null,
+    available: false,
+    canAdd: true,
+  });
+  expect(before.collections).toContainEqual(
+    expect.objectContaining({ id, inCollection: false, itemCount: 0 }),
+  );
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    id,
+  );
+  await expect(collections.resourceMemberships(f.other, f.productId)).rejects.toMatchObject({
+    statusCode: 404,
+  });
+  await db.delete(entitlements).where(eq(entitlements.id, f.grantId));
+  await db.delete(products).where(eq(products.id, f.productId));
+  const orphan = await collections.resourceMemberships(f.userId, f.productId);
+  expect(orphan.resource).toEqual({
+    productId: f.productId,
+    title: null,
+    available: false,
+    canAdd: false,
+  });
+  expect(orphan.collections).toContainEqual(
+    expect.objectContaining({ id, inCollection: true, itemCount: 1, revision: 2 }),
+  );
+  await f.command(
+    { requestId: randomUUID(), action: "remove", productId: f.productId, expectedRevision: 2 },
+    id,
+  );
+  await expect(collections.resourceMemberships(f.userId, f.productId)).rejects.toMatchObject({
+    statusCode: 404,
+  });
+});

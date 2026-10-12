@@ -151,6 +151,7 @@ export default async function ResourceLibraryPage({
                 <p className="mt-auto text-sm text-muted">{copy.unavailableReason}</p>
               )}
               <Link href={`/workspace/library/${encodeURIComponent(item.resourceId)}/versions`} className="text-sm text-accent underline">{getResourceReleaseControlCopy(locale).manage}</Link>
+              <Link href={`/workspace/library/${encodeURIComponent(item.resourceId)}/collections`} className="text-sm text-accent underline">{libraryCollectionsCopy(locale).resourceCollections}</Link>
               <Link href={`/workspace/library/review/${encodeURIComponent(item.resourceId)}`} className="text-sm text-accent underline">{resourceReviewCopy(locale).write}</Link>
             </li>
           ))}

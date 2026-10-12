@@ -7,10 +7,14 @@ const h = vi.hoisted(() => ({
   fetch: vi.fn(),
   refresh: vi.fn(),
   push: vi.fn(),
+  cleanup: null as (() => void) | null,
 }));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
   useId: () => "field",
+  useEffect: (effect: () => () => void) => {
+    h.cleanup ??= effect();
+  },
   useState: (initial: unknown) => {
     const i = h.cursor++;
     if (!(i in h.slots)) h.slots[i] = initial;
@@ -42,6 +46,7 @@ const collection = { id: "lcol_a", name: "Core", status: "active" as const, revi
 const render = (
   action: "create" | "archive" | "remove" | "duplicate" = "remove",
   preview = { source: collection, itemCount: 200, sourceDigest: "a".repeat(64) },
+  overrides: Partial<Parameters<typeof LibraryCollectionCommandForm>[0]> = {},
 ) => {
   h.cursor = 0;
   return nodes(
@@ -51,6 +56,7 @@ const render = (
       ...(action === "create" ? {} : { collection }),
       productId: "prd_a",
       ...(action === "duplicate" ? { copyPreview: preview } : {}),
+      ...overrides,
     }),
   );
 };
@@ -75,6 +81,7 @@ const success = (command: unknown, snapshot: unknown) => ({
 beforeEach(() => {
   h.slots = [];
   h.cursor = 0;
+  h.cleanup = null;
   vi.clearAllMocks();
   vi.stubGlobal("fetch", h.fetch);
 });
@@ -185,4 +192,95 @@ it("does not navigate on a copy acknowledgement naming the source as its target"
   await submit(render("duplicate"));
   expect(h.push).not.toHaveBeenCalled();
   expect(h.refresh).not.toHaveBeenCalled();
+});
+
+it.each(["en", "ru"] as const)(
+  "keeps the endpoint, snapshot and resource on an uncertain %s retry after new props",
+  async (locale) => {
+    h.fetch.mockRejectedValueOnce(new Error("lost"));
+    await submit(
+      render("remove", undefined, { locale, returnHref: "/workspace/library/prd_a/collections" }),
+    );
+    const [url, init] = h.fetch.mock.calls[0] as [string, RequestInit];
+    const command = JSON.parse(String(init.body));
+    h.fetch.mockResolvedValueOnce(success(command, { ...collection, revision: 5 }));
+    await submit(
+      render("remove", undefined, {
+        locale,
+        collection: { ...collection, id: "lcol_other", revision: 9 },
+        productId: "prd_other",
+        action: "add",
+      }),
+    );
+    expect(h.fetch.mock.calls[1]?.[0]).toBe(url);
+    expect(h.fetch.mock.calls[1]?.[1].body).toBe(init.body);
+    expect(h.refresh).toHaveBeenCalledOnce();
+    expect(h.push).not.toHaveBeenCalled();
+  },
+);
+it.each([400, 401, 403, 404, 409, 413, 415])(
+  "blocks stale handlers after definitive status %s",
+  async (status) => {
+    const tree = render("remove", undefined, {
+      returnHref: "/workspace/library/prd_a/collections",
+    });
+    h.fetch.mockResolvedValueOnce({
+      ok: false,
+      status,
+      json: async () => ({ code: "COLLECTION_CONFLICT" }),
+    });
+    await submit(tree);
+    await submit(tree);
+    expect(h.fetch).toHaveBeenCalledOnce();
+    const current = render();
+    expect(current.find((n) => n.type === "button")?.props.disabled).toBe(true);
+    expect(current.find((n) => n.type === "a")?.props.href).toBe(
+      "/workspace/library/prd_a/collections",
+    );
+  },
+);
+it("ignores stale handlers after an exact confirmed receipt", async () => {
+  h.fetch.mockImplementationOnce(async (_url: string, init: RequestInit) =>
+    success(JSON.parse(String(init.body)), { ...collection, revision: 5 }),
+  );
+  const tree = render();
+  await submit(tree);
+  await submit(tree);
+  expect(h.fetch).toHaveBeenCalledOnce();
+  expect(h.refresh).toHaveBeenCalledOnce();
+});
+it("aborts on unmount and ignores late confirmation", async () => {
+  let resolve: (value: unknown) => void = () => {};
+  h.fetch.mockImplementationOnce(
+    () =>
+      new Promise((r) => {
+        resolve = r;
+      }),
+  );
+  const tree = render(),
+    pending = submit(tree);
+  const init = h.fetch.mock.calls[0]?.[1] as RequestInit;
+  h.cleanup?.();
+  expect(init.signal?.aborted).toBe(true);
+  resolve(success(JSON.parse(String(init.body)), { ...collection, revision: 5 }));
+  await pending;
+  expect(h.refresh).not.toHaveBeenCalled();
+  expect(h.push).not.toHaveBeenCalled();
+  await submit(tree);
+  expect(h.fetch).toHaveBeenCalledOnce();
+});
+it("retains an exact UUID retry on a rate limit", async () => {
+  h.fetch.mockResolvedValueOnce({
+    ok: false,
+    status: 429,
+    json: async () => ({ code: "RATE_LIMIT_EXCEEDED" }),
+  });
+  await submit(render());
+  const init = h.fetch.mock.calls[0]?.[1] as RequestInit;
+  h.fetch.mockResolvedValueOnce(
+    success(JSON.parse(String(init.body)), { ...collection, revision: 5 }),
+  );
+  await submit(render());
+  expect(h.fetch.mock.calls[1]?.[1].body).toBe(init.body);
+  expect(h.refresh).toHaveBeenCalledOnce();
 });
