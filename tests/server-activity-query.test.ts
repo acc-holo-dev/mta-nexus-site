@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][][],
@@ -26,7 +27,9 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { AuditRepository } from "../packages/db/src/repositories/audit";
+
 const repository = new AuditRepository();
 const actor = { id: "actor", role: "user" as const };
 const event = (id = "aud_2") => [
@@ -51,8 +54,10 @@ it("checks current management rights before reading any server audit rows in a c
   expect(state.config).toEqual({ isolationLevel: "repeatable read", accessMode: "read only" });
   expect(state.queries).toHaveLength(2);
   const scope = state.queries[0];
-  expect(scope.params.filter((value) => value === "actor")).toHaveLength(3);
-  expect(scope.params).toEqual(expect.arrayContaining(["owner", "admin", '["manage_servers"]']));
+  expect(scope.params.filter((value) => value === "actor")).toHaveLength(4);
+  expect(scope.params).toEqual(
+    expect.arrayContaining(["member", "developer", "admin", '["manage_servers"]']),
+  );
   expect(scope.sql).toContain('"servers"."organization_id" is null');
   expect(scope.sql).toContain('"organizations"."id" = "servers"."organization_id"');
   expect(scope.sql).toContain('"organization_members"."organization_id" = "organizations"."id"');
@@ -83,7 +88,8 @@ it("does not read an audit for a missing, unauthorized or revoked server", async
 
 it("preserves the platform administrator override and does not invent a moderator override", async () => {
   await repository.pageForManagedServer("server", { id: "admin", role: "admin" });
-  expect(state.queries[0].sql).not.toContain("exists");
+  expect(state.queries[0].sql).toContain('"users"."role" =');
+  expect(state.queries[0].params).toContain("admin");
   state.queries = [];
   state.results = [[["server", "Server"]], []];
   await repository.pageForManagedServer("server", { id: "moderator", role: "moderator" });

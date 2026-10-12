@@ -9,7 +9,8 @@ export const SERVER_ACTIVITY_ACTIONS = [
 
 export type ServerActivityAction = (typeof SERVER_ACTIVITY_ACTIONS)[number];
 
-// Only field names are exposed, never old/new values or arbitrary audit details.
+// Allowlisted names for server history. Recorded visibility transitions are
+// projected separately; arbitrary field values and audit details stay private.
 export const SERVER_ACTIVITY_FIELDS = [
   "name",
   "description",

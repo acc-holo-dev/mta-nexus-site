@@ -146,8 +146,8 @@ it.each(["owner", "admin", "organization-owner", "delegated"])(
       [full()],
       [["srv", "Server", "server", kind === "owner" ? "actor" : "other", organizationId]],
       [[kind === "admin" ? "admin" : "user"]],
-      ...(organizationId ? [[[kind === "organization-owner" ? "actor" : "other"]]] : []),
-      ...(kind === "delegated" ? [[["developer", ["manage_servers"]]]] : []),
+      ...(organizationId ? [[["org", kind === "organization-owner" ? "actor" : "other"]]] : []),
+      ...(kind === "delegated" ? [[["org", "developer", ["manage_servers"]]]] : []),
       [["post"]],
       [full({ status: "draft", publishedAt: null }, next)],
     ];
@@ -188,8 +188,8 @@ it.each(["member", "developer", "owner", null])(
       [full()],
       [["srv", "Server", "server", "actor", "org"]],
       [["user"]],
-      [["actual-org-owner"]],
-      role ? [[role, []]] : [],
+      [["org", "actual-org-owner"]],
+      role ? [["org", role, []]] : [],
     ];
     await expect(
       repo.restore("post", "actor", time, audit, undefined, "srv"),

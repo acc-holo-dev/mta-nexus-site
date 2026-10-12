@@ -2939,3 +2939,43 @@ After rebasing on Agent A's seven library blocks, 953 focused checks across
 80 files pass. All 109 upstream source/schema/migration/test files and the full
 upstream problem notes are preserved. The integrated web compile and type checks
 pass; the existing root fixture and three unused commercial exports remain.
+
+
+### Reviewed server visibility batches and private activity filters — 2026-10-12
+
+Managed server pages now select up to 20 current personal/organization listings,
+preview visibility and explicitly confirm the reviewed group. Scope-bound versions
+cover listing revisions, displayed states and locked live grants. Selected listings
+lock in ID order; one account read and one read per required authority table protect
+both the batch and existing single listing/editorial writes. A revoked platform
+administrator cannot retain access through a stale session role. Changed listings
+receive one bounded update and a mandatory audit per edit in the same transaction;
+already-matching listings retain their revisions without a fabricated edit event.
+Endpoints, endpoint revisions, ownership, listing status and observations remain.
+
+Existing server activity now has RU/EN period and event-group filters, recorded
+visibility transitions and private twenty-event JSON page exports. Actor labels and
+public profile identities retain attribution without exporting internal actor IDs,
+raw audit details, IPs, agents or proof tokens. Cursor context binds actor, server
+and filters; SQL anchors and a retained database-clock cutoff preserve microsecond
+ordering and page windows. Legacy unfiltered anchors remain supported. Export
+uses the reviewed cutoff and independently checks current authority. Missing grants,
+malformed/repeated filters and storage failures have safe, distinct boundaries.
+Localized metadata, loading/empty/error/success states and mobile controls use the
+existing design system. No schema, migration, dependency, commercial contract or
+workflow changed.
+
+1640 focused unit/HTTP/SQL-builder/SSR/interaction checks across 148 files pass.
+Four final history files pass again after preserving full microsecond timestamps
+in API/export projections. Seven old server-control failures were reproduced on an
+unchanged HEAD export and fixed by accounting for the existing read-only evidence
+lookup in their fixtures; authority and outcome assertions remain intact.
+Web TypeScript including generated routes, Next webpack compile mode, Biome and
+diff checks pass. Root TypeScript retains the upstream missing `isSigned` resource
+fixture; Knip retains only the three upstream commercial exports.
+Six new PostgreSQL fixtures prepare selected-case atomicity, no-op preservation,
+independent telemetry, concurrent confirmation, revoked grants/stale admin roles,
+mandatory-audit rollback and tied microsecond traversal; they remain unrun without
+a disposable database. Browser interaction and production page generation remain
+outstanding. Existing PostgreSQL activity fixtures now seed and revoke a real
+administrator role rather than relying on a supplied role string.

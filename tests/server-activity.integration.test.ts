@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
+
 const active = vi.hoisted(() => ({ db: null as unknown }));
 vi.mock("../packages/db/src/client", async (importOriginal) => {
   const original = await importOriginal<typeof import("../packages/db/src/client")>();
@@ -14,6 +15,7 @@ vi.mock("../packages/db/src/client", async (importOriginal) => {
     }),
   };
 });
+
 import { AuditRepository } from "../packages/db/src/repositories/audit";
 
 it("reads scoped private activity on PostgreSQL without losing tied or microsecond events", async () => {
@@ -39,6 +41,9 @@ it("reads scoped private activity on PostgreSQL without losing tied or microseco
         await tx.execute(sql`INSERT INTO users (id, email, username, display_name, password_hash) VALUES
         ('actor', 'private@example.invalid', 'manager', 'Manager', 'secret_hash'),
         ('editor', 'secret@example.invalid', 'editor', 'Editor', 'secret_editor_hash')`);
+        await tx.execute(
+          sql`INSERT INTO users (id,email,username,display_name,password_hash,role) VALUES ('admin','admin@example.invalid','actual_admin','Admin','secret_hash','admin')`,
+        );
         await tx.execute(sql`INSERT INTO organizations (id, name, slug, owner_id) VALUES
         ('org-owned', 'Owned', 'owned', 'owner'), ('org-member', 'Member', 'member', 'other')`);
         await tx.execute(sql`INSERT INTO organization_members (id, organization_id, user_id, role, permissions) VALUES
@@ -127,6 +132,10 @@ it("reads scoped private activity on PostgreSQL without losing tied or microseco
         expect(
           await repository.pageForManagedServer("personal", { id: "admin", role: "admin" }),
         ).not.toBeNull();
+        await tx.execute(sql`UPDATE users SET role='user' WHERE id='admin'`);
+        expect(
+          await repository.pageForManagedServer("personal", { id: "admin", role: "admin" }),
+        ).toBeNull();
         expect(
           await repository.pageForManagedServer("org-server", {
             id: "legacy-creator",

@@ -1,9 +1,20 @@
-import { and, asc, count, desc, eq, gt, ilike, inArray, ne, or, sql } from "drizzle-orm";
-import { containsPattern } from "./search-pattern";
-import { managedServerScope } from "./server-management-scope";
+import { createHash } from "node:crypto";
+import {
+  AppError,
+  type AuditEvent,
+  ForbiddenError,
+  grantsServerManagement,
+  NotFoundError,
+  type Server,
+  type ServerStatus,
+  type ServerVisibility,
+  type User,
+} from "@nexus/domain";
+import { and, asc, count, desc, eq, exists, gt, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, organizationMembers, organizations, servers } from "../schema";
-import { AppError, ForbiddenError, NotFoundError, grantsServerManagement, type AuditEvent, type Server, type ServerStatus, type ServerVisibility, type User } from "@nexus/domain";
+import { auditEvents, organizationMembers, organizations, servers, users } from "../schema";
+import { containsPattern } from "./search-pattern";
+import { lockServerManagementGrants, managedServerScope } from "./server-management-scope";
 
 export type ManagedServerFilters = {
   query?: string;
@@ -13,10 +24,15 @@ export type ManagedServerFilters = {
 };
 
 const managedServerFields = {
-  id: servers.id, name: servers.name, slug: servers.slug,
-  ipAddress: servers.ipAddress, port: servers.port,
-  organizationId: servers.organizationId, status: servers.status,
-  visibility: servers.visibility, isVerified: servers.isVerified,
+  id: servers.id,
+  name: servers.name,
+  slug: servers.slug,
+  ipAddress: servers.ipAddress,
+  port: servers.port,
+  organizationId: servers.organizationId,
+  status: servers.status,
+  visibility: servers.visibility,
+  isVerified: servers.isVerified,
   updatedAt: servers.updatedAt,
 };
 
@@ -26,10 +42,25 @@ export type ManagedServerItem = Pick<typeof servers.$inferSelect, keyof typeof m
 type PersistedServer = Server & { endpointRevision: number };
 
 type ServerEditableFields = Partial<
-  Pick<Server, "name" | "description" | "websiteUrl" | "discordUrl" |
-    "rulesUrl" | "mediaUrls" | "language" | "region" | "gameplayTags" |
-    "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" |
-    "maxPlayers" | "visibility">
+  Pick<
+    Server,
+    | "name"
+    | "description"
+    | "websiteUrl"
+    | "discordUrl"
+    | "rulesUrl"
+    | "mediaUrls"
+    | "language"
+    | "region"
+    | "gameplayTags"
+    | "ipAddress"
+    | "port"
+    | "httpPort"
+    | "gameMode"
+    | "mapName"
+    | "maxPlayers"
+    | "visibility"
+  >
 >;
 
 /**
@@ -48,56 +79,250 @@ function resetLiveStateForEndpointEdit(updates: ServerEditableFields) {
   if (changes.length === 0) return {};
   const changed = sql.join(changes, sql` OR `);
   return {
-    currentPlayers: sql<number | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.currentPlayers} END`,
+    currentPlayers: sql<
+      number | null
+    >`CASE WHEN (${changed}) THEN NULL ELSE ${servers.currentPlayers} END`,
     lastObservedAt: sql<Date | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.lastObservedAt} END`,
-    observationSource: sql<string | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.observationSource} END`,
+    observationSource: sql<
+      string | null
+    >`CASE WHEN (${changed}) THEN NULL ELSE ${servers.observationSource} END`,
     isVerified: sql<boolean>`CASE WHEN (${changed}) THEN false ELSE ${servers.isVerified} END`,
     endpointRevision: sql<number>`CASE WHEN (${changed}) THEN ${servers.endpointRevision} + 1 ELSE ${servers.endpointRevision} END`,
     ...(updates.maxPlayers === undefined
-      ? { maxPlayers: sql<number | null>`CASE WHEN (${changed}) THEN NULL ELSE ${servers.maxPlayers} END` }
+      ? {
+          maxPlayers: sql<
+            number | null
+          >`CASE WHEN (${changed}) THEN NULL ELSE ${servers.maxPlayers} END`,
+        }
       : {}),
   };
 }
 
 export class ServerRepository {
+  private async visibilityPlan(
+    tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+    actorId: string,
+    input: { serverIds: string[]; visibility: "public" | "unlisted" | "private" },
+    write: boolean,
+  ) {
+    if (
+      !Array.isArray(input.serverIds) ||
+      !input.serverIds.length ||
+      input.serverIds.length > 20 ||
+      new Set(input.serverIds).size !== input.serverIds.length ||
+      input.serverIds.some((id) => !/^[A-Za-z0-9_-]{1,128}$/u.test(id)) ||
+      !["public", "unlisted", "private"].includes(input.visibility)
+    )
+      throw new AppError("Invalid server selection", 400, "SERVER_BATCH_INVALID");
+    const rows = await tx
+      .select({
+        id: servers.id,
+        name: sql<string>`left(${servers.name},200)`,
+        ownerId: servers.ownerId,
+        organizationId: servers.organizationId,
+        status: servers.status,
+        visibility: servers.visibility,
+        revision: sql<string>`to_char(${servers.updatedAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+      })
+      .from(servers)
+      .where(
+        and(
+          inArray(servers.id, [...input.serverIds].sort()),
+          or(
+            managedServerScope(actorId),
+            exists(
+              tx
+                .select({ id: users.id })
+                .from(users)
+                .where(and(eq(users.id, actorId), eq(users.role, "admin"))),
+            ),
+          ),
+        ),
+      )
+      .orderBy(asc(servers.id))
+      .for(write ? "update" : "share");
+    if (rows.length !== input.serverIds.length) throw new NotFoundError("Server");
+    const grants = await lockServerManagementGrants(tx, rows, actorId);
+    if (
+      rows.some(
+        (row) =>
+          !["public", "unlisted", "private"].includes(row.visibility) ||
+          !["active", "inactive", "maintenance", "suspended"].includes(row.status),
+      )
+    )
+      throw new AppError("Server details changed", 409, "SERVER_BATCH_CHANGED");
+    const previewRevision = createHash("sha256")
+      .update(
+        JSON.stringify([1, "server-visibility-batch", actorId, input.visibility, rows, grants]),
+      )
+      .digest("hex");
+    return { rows, previewRevision };
+  }
+  async previewVisibilityBatch(
+    actorId: string,
+    input: { serverIds: string[]; visibility: "public" | "unlisted" | "private" },
+  ) {
+    return db.transaction(async (tx) => {
+      const plan = await this.visibilityPlan(tx, actorId, input, false);
+      return {
+        visibility: input.visibility,
+        previewRevision: plan.previewRevision,
+        items: plan.rows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          status: row.status,
+          organization: !!row.organizationId,
+          before: row.visibility,
+          after: input.visibility,
+          revision: row.revision,
+          changed: row.visibility !== input.visibility,
+        })),
+      };
+    });
+  }
+  async applyVisibilityBatch(
+    actorId: string,
+    input: {
+      serverIds: string[];
+      visibility: "public" | "unlisted" | "private";
+      previewRevision: string;
+    },
+    auditIds: string[],
+  ) {
+    if (
+      !/^[a-f0-9]{64}$/u.test(input.previewRevision) ||
+      !Array.isArray(input.serverIds) ||
+      !Array.isArray(auditIds) ||
+      auditIds.length !== input.serverIds.length ||
+      new Set(auditIds).size !== auditIds.length ||
+      auditIds.some((id) => !/^[A-Za-z0-9_-]{1,128}$/u.test(id))
+    )
+      throw new AppError("Invalid server selection", 400, "SERVER_BATCH_INVALID");
+    return db.transaction(async (tx) => {
+      const plan = await this.visibilityPlan(tx, actorId, input, true);
+      if (plan.previewRevision !== input.previewRevision)
+        throw new AppError("Server review changed", 409, "SERVER_BATCH_CHANGED");
+      const changed = plan.rows.filter((row) => row.visibility !== input.visibility);
+      const stored = changed.length
+        ? await tx
+            .update(servers)
+            .set({
+              visibility: input.visibility,
+              updatedAt: sql`greatest(clock_timestamp(),${servers.updatedAt}+interval '1 millisecond')`,
+            })
+            .where(
+              inArray(
+                servers.id,
+                changed.map((row) => row.id),
+              ),
+            )
+            .returning({
+              id: servers.id,
+              visibility: servers.visibility,
+              revision: sql<string>`to_char(${servers.updatedAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+            })
+        : [];
+      if (
+        stored.length !== changed.length ||
+        new Set(stored.map((row) => row.id)).size !== stored.length ||
+        stored.some(
+          (row) =>
+            row.visibility !== input.visibility ||
+            !changed.some((old) => old.id === row.id && row.revision > old.revision),
+        )
+      )
+        throw new AppError("Server details changed", 409, "SERVER_BATCH_CHANGED");
+      if (changed.length)
+        await tx.insert(auditEvents).values(
+          changed.map((row) => ({
+            id: auditIds[plan.rows.findIndex((item) => item.id === row.id)],
+            actorId,
+            actorType: "user",
+            action: "server.updated",
+            targetType: "server",
+            targetId: row.id,
+            details: {
+              fields: ["visibility"],
+              previousVisibility: row.visibility,
+              visibility: input.visibility,
+              previewRevision: input.previewRevision,
+              batchSize: changed.length,
+            },
+            createdAt: new Date(),
+          })),
+        );
+      return {
+        visibility: input.visibility,
+        previewRevision: input.previewRevision,
+        items: plan.rows.map((row) => ({
+          id: row.id,
+          visibility: input.visibility,
+          changed: row.visibility !== input.visibility,
+          revision: stored.find((item) => item.id === row.id)?.revision ?? row.revision,
+        })),
+      };
+    });
+  }
   /** A private workspace includes personal ownership and existing organization management rights. */
-  async pageManagedByUser(userId: string, requestedPage = 1, filters: ManagedServerFilters = {}, requestedSize = 12) {
+  async pageManagedByUser(
+    userId: string,
+    requestedPage = 1,
+    filters: ManagedServerFilters = {},
+    requestedSize = 12,
+  ) {
     if (!userId) throw new RangeError("A user ID is required for managed servers");
     const pageSize = Number.isFinite(requestedSize)
-      ? Math.min(Math.max(Math.floor(requestedSize), 1), 50) : 12;
+      ? Math.min(Math.max(Math.floor(requestedSize), 1), 50)
+      : 12;
     const requested = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
     const query = typeof filters.query === "string" ? filters.query.trim().slice(0, 120) : "";
     const pattern = query ? containsPattern(query) : undefined;
     const condition = and(
       managedServerScope(userId),
       filters.status && ["active", "inactive", "maintenance", "suspended"].includes(filters.status)
-        ? eq(servers.status, filters.status) : undefined,
+        ? eq(servers.status, filters.status)
+        : undefined,
       filters.visibility && ["public", "unlisted", "private"].includes(filters.visibility)
-        ? eq(servers.visibility, filters.visibility) : undefined,
+        ? eq(servers.visibility, filters.visibility)
+        : undefined,
       filters.verification === "verified" || filters.verification === "unverified"
-        ? eq(servers.isVerified, filters.verification === "verified") : undefined,
+        ? eq(servers.isVerified, filters.verification === "verified")
+        : undefined,
       pattern ? or(ilike(servers.name, pattern), ilike(servers.ipAddress, pattern)) : undefined,
     );
 
-    return db.transaction(async tx => {
-      const [summary] = await tx.select({ total: count() }).from(servers).where(condition);
-      const total = summary?.total;
-      if (total === undefined || !Number.isSafeInteger(total) || total < 0) {
-        throw new RangeError("Invalid managed server total");
-      }
-      const totalPages = Math.max(1, Math.ceil(total / pageSize));
-      const page = Math.min(requested, totalPages);
-      const rows = total === 0 ? [] : await tx.select(managedServerFields).from(servers).where(condition)
-        .orderBy(desc(servers.updatedAt), desc(servers.id)).limit(pageSize).offset((page - 1) * pageSize);
-      return { servers: rows, total, page, pageSize, totalPages };
-    }, { isolationLevel: "repeatable read", accessMode: "read only" });
+    return db.transaction(
+      async (tx) => {
+        const [summary] = await tx.select({ total: count() }).from(servers).where(condition);
+        const total = summary?.total;
+        if (total === undefined || !Number.isSafeInteger(total) || total < 0) {
+          throw new RangeError("Invalid managed server total");
+        }
+        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+        const page = Math.min(requested, totalPages);
+        const rows =
+          total === 0
+            ? []
+            : await tx
+                .select(managedServerFields)
+                .from(servers)
+                .where(condition)
+                .orderBy(desc(servers.updatedAt), desc(servers.id))
+                .limit(pageSize)
+                .offset((page - 1) * pageSize);
+        return { servers: rows, total, page, pageSize, totalPages };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
   }
 
   async pageActivePublicByOwner(ownerId: string, requestedPage = 1, requestedSize = 12) {
     const pageSize = Number.isFinite(requestedSize)
-      ? Math.min(Math.max(Math.floor(requestedSize), 1), 100) : 12;
+      ? Math.min(Math.max(Math.floor(requestedSize), 1), 100)
+      : 12;
     const requested = Number.isFinite(requestedPage)
-      ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER) : 1;
+      ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER)
+      : 1;
     const condition = and(
       eq(servers.ownerId, ownerId),
       eq(servers.visibility, "public"),
@@ -107,31 +332,43 @@ export class ServerRepository {
     const total = summary?.total ?? 0;
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
     const page = Math.min(requested, totalPages);
-    const rows = await db.select().from(servers).where(condition)
+    const rows = await db
+      .select()
+      .from(servers)
+      .where(condition)
       .orderBy(desc(servers.updatedAt), desc(servers.id))
-      .limit(pageSize).offset((page - 1) * pageSize);
+      .limit(pageSize)
+      .offset((page - 1) * pageSize);
     return { servers: rows as unknown as Server[], total, page, pageSize, totalPages };
   }
 
-
   async countActivePublic(): Promise<number> {
-    const [row] = await db.select({ total: count() }).from(servers).where(and(
-      eq(servers.visibility, "public"),
-      eq(servers.status, "active"),
-    ));
+    const [row] = await db
+      .select({ total: count() })
+      .from(servers)
+      .where(and(eq(servers.visibility, "public"), eq(servers.status, "active")));
     return row?.total ?? 0;
   }
 
   async searchActivePublic(term: string, limit = 50): Promise<Server[]> {
     const pattern = containsPattern(term);
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 50)
-      : 50;
-    const rows = await db.select().from(servers).where(and(
-      eq(servers.visibility, "public"),
-      eq(servers.status, "active"),
-      or(ilike(servers.name, pattern), ilike(servers.description, pattern), ilike(servers.gameMode, pattern)),
-    )).orderBy(desc(servers.updatedAt), desc(servers.id)).limit(boundedLimit);
+    const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 50) : 50;
+    const rows = await db
+      .select()
+      .from(servers)
+      .where(
+        and(
+          eq(servers.visibility, "public"),
+          eq(servers.status, "active"),
+          or(
+            ilike(servers.name, pattern),
+            ilike(servers.description, pattern),
+            ilike(servers.gameMode, pattern),
+          ),
+        ),
+      )
+      .orderBy(desc(servers.updatedAt), desc(servers.id))
+      .limit(boundedLimit);
     return rows as unknown as Server[];
   }
 
@@ -139,12 +376,7 @@ export class ServerRepository {
     const query = db
       .select()
       .from(servers)
-      .where(
-        and(
-          eq(servers.visibility, "public"),
-          eq(servers.status, "active")
-        )
-      )
+      .where(and(eq(servers.visibility, "public"), eq(servers.status, "active")))
       .orderBy(desc(servers.updatedAt), desc(servers.id));
     const boundedLimit =
       limit === undefined
@@ -156,7 +388,9 @@ export class ServerRepository {
     return rows as unknown as Server[];
   }
 
-  async listObservable(limit = 501): Promise<Array<Pick<Server, "id" | "ipAddress" | "port"> & { endpointRevision: number }>> {
+  async listObservable(
+    limit = 501,
+  ): Promise<Array<Pick<Server, "id" | "ipAddress" | "port"> & { endpointRevision: number }>> {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 501)
       : 501;
@@ -170,12 +404,7 @@ export class ServerRepository {
         endpointRevision: servers.endpointRevision,
       })
       .from(servers)
-      .where(
-        and(
-          eq(servers.status, "active"),
-          ne(servers.visibility, "private"),
-        ),
-      )
+      .where(and(eq(servers.status, "active"), ne(servers.visibility, "private")))
       // Stable tie-breaking avoids arbitrarily shifting the 501-row
       // sentinel when many listings share the same updated timestamp.
       .orderBy(desc(servers.updatedAt), desc(servers.id))
@@ -195,16 +424,23 @@ export class ServerRepository {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 501)
       : 501;
-    const rows = await db.select({
-      id: servers.id,
-      ipAddress: servers.ipAddress,
-      port: servers.port,
-      endpointRevision: servers.endpointRevision,
-    }).from(servers).where(and(
-      eq(servers.status, "active"),
-      ne(servers.visibility, "private"),
-      afterId ? gt(servers.id, afterId) : undefined,
-    )).orderBy(asc(servers.id)).limit(boundedLimit);
+    const rows = await db
+      .select({
+        id: servers.id,
+        ipAddress: servers.ipAddress,
+        port: servers.port,
+        endpointRevision: servers.endpointRevision,
+      })
+      .from(servers)
+      .where(
+        and(
+          eq(servers.status, "active"),
+          ne(servers.visibility, "private"),
+          afterId ? gt(servers.id, afterId) : undefined,
+        ),
+      )
+      .orderBy(asc(servers.id))
+      .limit(boundedLimit);
     return rows;
   }
 
@@ -218,11 +454,17 @@ export class ServerRepository {
   }
 
   async listActivePublicByOwner(ownerId: string): Promise<Server[]> {
-    const rows = await db.select().from(servers).where(and(
-      eq(servers.ownerId, ownerId),
-      eq(servers.visibility, "public"),
-      eq(servers.status, "active"),
-    )).orderBy(desc(servers.updatedAt), desc(servers.id));
+    const rows = await db
+      .select()
+      .from(servers)
+      .where(
+        and(
+          eq(servers.ownerId, ownerId),
+          eq(servers.visibility, "public"),
+          eq(servers.status, "active"),
+        ),
+      )
+      .orderBy(desc(servers.updatedAt), desc(servers.id));
     return rows as unknown as Server[];
   }
 
@@ -231,12 +473,17 @@ export class ServerRepository {
     if (uniqueIds.length === 0) return [];
     const result: Server[] = [];
     for (let offset = 0; offset < uniqueIds.length; offset += 500) {
-      const rows = await db.select().from(servers).where(and(
-        inArray(servers.id, uniqueIds.slice(offset, offset + 500)),
-        eq(servers.visibility, "public"),
-        eq(servers.status, "active"),
-      ));
-      result.push(...rows as unknown as Server[]);
+      const rows = await db
+        .select()
+        .from(servers)
+        .where(
+          and(
+            inArray(servers.id, uniqueIds.slice(offset, offset + 500)),
+            eq(servers.visibility, "public"),
+            eq(servers.status, "active"),
+          ),
+        );
+      result.push(...(rows as unknown as Server[]));
     }
     return result;
   }
@@ -283,10 +530,12 @@ export class ServerRepository {
               permissions: organizationMembers.permissions,
             })
             .from(organizationMembers)
-            .where(and(
-              eq(organizationMembers.organizationId, server.organizationId),
-              eq(organizationMembers.userId, audit.actorId),
-            ))
+            .where(
+              and(
+                eq(organizationMembers.organizationId, server.organizationId),
+                eq(organizationMembers.userId, audit.actorId),
+              ),
+            )
             .for("share")
             .limit(1);
           if (!grantsServerManagement(membership)) {
@@ -309,10 +558,7 @@ export class ServerRepository {
     });
   }
 
-  async update(
-    id: string,
-    updates: ServerEditableFields
-  ): Promise<Server | null> {
+  async update(id: string, updates: ServerEditableFields): Promise<Server | null> {
     const rows = await db
       .update(servers)
       .set({ ...updates, ...resetLiveStateForEndpointEdit(updates), updatedAt: new Date() })
@@ -347,45 +593,9 @@ export class ServerRepository {
         .limit(1);
 
       if (!stored) throw new NotFoundError("Server", id);
-      if (actor.role !== "admin") {
-        if (!stored.organizationId) {
-          if (stored.ownerId !== actor.id) {
-            throw new ForbiddenError("You do not manage this server");
-          }
-        } else {
-          const [organization] = await tx
-            .select({ ownerId: organizations.ownerId })
-            .from(organizations)
-            .where(eq(organizations.id, stored.organizationId))
-            .for("share")
-            .limit(1);
-          if (!organization) {
-            throw new ForbiddenError("You do not manage this server");
-          }
-          if (organization.ownerId !== actor.id) {
-            const [membership] = await tx
-              .select({
-                role: organizationMembers.role,
-                permissions: organizationMembers.permissions,
-              })
-              .from(organizationMembers)
-              .where(and(
-                eq(organizationMembers.organizationId, stored.organizationId),
-                eq(organizationMembers.userId, actor.id),
-              ))
-              .for("share")
-              .limit(1);
-            if (!grantsServerManagement(membership)) {
-              throw new ForbiddenError("You do not manage this server");
-            }
-          }
-        }
-      }
+      await lockServerManagementGrants(tx, [stored], actor.id);
 
-      if (
-        expectedUpdatedAt &&
-        stored.updatedAt.getTime() !== expectedUpdatedAt.getTime()
-      ) {
+      if (expectedUpdatedAt && stored.updatedAt.getTime() !== expectedUpdatedAt.getTime()) {
         throw new AppError(
           "Server details changed; reload before saving",
           409,
@@ -427,7 +637,6 @@ export class ServerRepository {
       return updated as unknown as Server;
     });
   }
-
 }
 
 export const serverRepository = new ServerRepository();

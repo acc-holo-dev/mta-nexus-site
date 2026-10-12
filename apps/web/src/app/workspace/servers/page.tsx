@@ -1,25 +1,29 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
 import { serverRepository } from "@nexus/db";
-import { authService } from "../../../lib/services/auth-service";
+import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { ManagedServerCard } from "../../../components/managed-server-card";
+import { ManagedServerVisibilityBatch } from "../../../components/managed-server-visibility-batch";
 import { getRequestLocale } from "../../../lib/i18n-server";
 import {
   getManagedServerCopy,
   managedServerHref,
   parseManagedServerQuery,
 } from "../../../lib/managed-server-view";
+import { serverWorkspaceCopy } from "../../../lib/server-workspace-copy";
+import { authService } from "../../../lib/services/auth-service";
 import {
   indexMtaObservations,
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
-import { ManagedServerCard } from "../../../components/managed-server-card";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Managed servers | MTA NEXUS",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: `${getManagedServerCopy(await getRequestLocale()).title} | MTA NEXUS`,
+    robots: { index: false, follow: false },
+  };
+}
 const fieldClass =
   "rounded-lg border border-base bg-inset px-3 py-2 text-sm text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current";
 
@@ -34,18 +38,44 @@ export default async function ManagedServersPage({
     searchParams,
   ]);
   const copy = getManagedServerCopy(locale);
-  const user = await authService.getSession(cookieStore.get("nexus_session")?.value);
+  let failure = "";
+  const user = await authService.getSession(cookieStore.get("nexus_session")?.value).catch(() => {
+    failure = serverWorkspaceCopy(locale).unavailable;
+    return null;
+  });
   if (!user)
     return (
       <section className="mx-auto max-w-xl space-y-4 py-16 text-center">
         <h1 className="font-display text-primary">{copy.signInRequired}</h1>
+        {failure && (
+          <p role="alert" className="text-sm text-danger">
+            {failure}
+          </p>
+        )}
         <Link href="/auth/login" className="text-sm text-accent underline">
           {copy.signIn}
         </Link>
       </section>
     );
   const { filters, page } = parseManagedServerQuery(query);
-  const result = await serverRepository.pageManagedByUser(user.id, page, filters);
+  const result = await serverRepository
+    .pageManagedByUser(user.id, page, filters, 20)
+    .catch(() => null);
+  if (!result)
+    return (
+      <section className="nexus-panel space-y-3 p-5">
+        <h1 className="font-display text-primary">{copy.title}</h1>
+        <p role="alert" className="text-sm text-danger">
+          {serverWorkspaceCopy(locale).unavailable}
+        </p>
+        <a
+          href={managedServerHref(filters, page)}
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        >
+          {serverWorkspaceCopy(locale).reload}
+        </a>
+      </section>
+    );
   const directory =
     result.servers.length > 0
       ? await mtaMasterDirectoryService.getDirectory().catch(() => null)
@@ -155,18 +185,23 @@ export default async function ManagedServersPage({
           {filtered ? copy.emptyFilter : copy.empty}
         </p>
       ) : (
-        <ul className="space-y-3">
-          {result.servers.map((server) => (
-            <li key={server.id}>
+        <ManagedServerVisibilityBatch
+          key={`${result.page}:${JSON.stringify(filters)}:${result.servers.map((server) => `${server.id}:${server.visibility}:${server.updatedAt.toISOString()}`).join(":")}`}
+          locale={locale}
+          items={result.servers.map((server) => ({
+            id: server.id,
+            name: server.name,
+            card: (
               <ManagedServerCard
+                key={server.id}
                 server={server}
                 observation={observationFor(server)}
                 isStale={isStale}
                 locale={locale}
               />
-            </li>
-          ))}
-        </ul>
+            ),
+          }))}
+        />
       )}
       {result.totalPages > 1 && (
         <nav aria-label={copy.page} className="flex flex-wrap items-center gap-4 text-sm">

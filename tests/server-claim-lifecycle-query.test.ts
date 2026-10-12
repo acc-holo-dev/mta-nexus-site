@@ -1,6 +1,7 @@
 import { getTableColumns } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -14,6 +15,14 @@ vi.mock("../packages/db/src/client", async () => {
     // after the existing control-proof checks; keep target fixtures separate.
     if (sql.startsWith('select "role" from "users"') && params[0] === "moderator")
       return { rows: [["moderator"]] };
+    // These retained server-control cases predate application evidence edits.
+    // The new read-only evidence lookup has no row; do not consume target fixtures.
+    if (
+      sql.startsWith("select") &&
+      sql.includes('from "audit_events"') &&
+      params.includes("verification.application_updated")
+    )
+      return { rows: [] };
     return {
       rows:
         sql.startsWith("select") || sql.includes(" returning ") ? (state.rows.shift() ?? []) : [],
@@ -39,10 +48,11 @@ vi.mock("../packages/db/src/client", async () => {
 vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
   enqueueWebPushOutboxForNotification: async () => ({ queued: 0, reason: "no_subscriptions" }),
 }));
-import { ServerClaimChallengeRepository } from "../packages/db/src/repositories/server-claim-challenges";
-import { assertOrganizationServerClaimAuthority } from "../packages/db/src/repositories/server-claim-authority";
-import { VerificationRepository } from "../packages/db/src/repositories/verification";
+
 import { db } from "../packages/db/src/client";
+import { assertOrganizationServerClaimAuthority } from "../packages/db/src/repositories/server-claim-authority";
+import { ServerClaimChallengeRepository } from "../packages/db/src/repositories/server-claim-challenges";
+import { VerificationRepository } from "../packages/db/src/repositories/verification";
 import { serverClaimChallenges, servers, verificationRequests } from "../packages/db/src/schema";
 
 const row = (table: PgTable, values: Record<string, unknown>) =>

@@ -1,29 +1,30 @@
-import { serverRepository, organizationRepository } from "@nexus/db";
-import { generateId, can } from "@nexus/security";
+import { organizationRepository, serverRepository } from "@nexus/db";
+import type { Server, User } from "@nexus/domain";
 import {
   AppError,
-  ForbiddenError,
   eventBus,
+  ForbiddenError,
   isValidMtaAddress,
   normalizeMtaAddress,
 } from "@nexus/domain";
-import type { Server, User } from "@nexus/domain";
+import { can, generateId } from "@nexus/security";
 import { isUniqueConstraintViolation } from "../postgres-error";
+import {
+  serverVisibilityCommand,
+  serverVisibilityInput,
+  serverVisibilityPreviewSchema,
+  serverVisibilityResultSchema,
+} from "../server-workspace-contract";
 
 function throwServerMutationConflict(error: unknown): never {
   if (isUniqueConstraintViolation(error, ["servers_slug_idx", "servers_slug_unique"])) {
     throw new AppError("Server slug is already in use", 409, "SERVER_SLUG_TAKEN");
   }
   if (isUniqueConstraintViolation(error, ["servers_endpoint_idx"])) {
-    throw new AppError(
-      "This server endpoint is already registered",
-      409,
-      "SERVER_ENDPOINT_TAKEN",
-    );
+    throw new AppError("This server endpoint is already registered", 409, "SERVER_ENDPOINT_TAKEN");
   }
   throw error;
 }
-
 
 function canonicalServerAddress(value: string): string {
   const address = normalizeMtaAddress(value);
@@ -36,11 +37,43 @@ function canonicalServerAddress(value: string): string {
 type ServerDetailsUpdate = Partial<
   Pick<
     Server,
-    "name" | "description" | "websiteUrl" | "discordUrl" | "rulesUrl" | "mediaUrls" | "language" | "region" | "gameplayTags" | "ipAddress" | "port" | "httpPort" | "gameMode" | "mapName" | "maxPlayers" | "visibility"
+    | "name"
+    | "description"
+    | "websiteUrl"
+    | "discordUrl"
+    | "rulesUrl"
+    | "mediaUrls"
+    | "language"
+    | "region"
+    | "gameplayTags"
+    | "ipAddress"
+    | "port"
+    | "httpPort"
+    | "gameMode"
+    | "mapName"
+    | "maxPlayers"
+    | "visibility"
   >
 >;
 
 class ServerService {
+  async previewVisibility(actor: User, value: unknown) {
+    const input = serverVisibilityInput.safeParse(value);
+    if (!input.success) throw new AppError("Invalid server selection", 400, "SERVER_BATCH_INVALID");
+    const result = await serverRepository.previewVisibilityBatch(actor.id, input.data);
+    return serverVisibilityPreviewSchema.parse(result);
+  }
+  async saveVisibility(actor: User, value: unknown) {
+    const input = serverVisibilityCommand.safeParse(value);
+    if (!input.success) throw new AppError("Invalid server selection", 400, "SERVER_BATCH_INVALID");
+    const result = await serverRepository.applyVisibilityBatch(
+      actor.id,
+      input.data,
+      input.data.serverIds.map(() => generateId("aud")),
+    );
+    return serverVisibilityResultSchema.parse(result);
+  }
+
   async listServers(limit = 100): Promise<Server[]> {
     return serverRepository.listActivePublic(limit);
   }
@@ -58,8 +91,11 @@ class ServerService {
   }
 
   async createServer(
-    input: Omit<Server, "id" | "status" | "currentPlayers" | "isVerified" | "createdAt" | "updatedAt">,
-    actor: User
+    input: Omit<
+      Server,
+      "id" | "status" | "currentPlayers" | "isVerified" | "createdAt" | "updatedAt"
+    >,
+    actor: User,
   ): Promise<Server> {
     if (!can(actor, "server.create")) throw new ForbiddenError("Not authorized to create server");
 
@@ -153,9 +189,10 @@ class ServerService {
     actor: User,
     expectedUpdatedAt?: Date,
   ): Promise<Server> {
-    const canonicalUpdates = updates.ipAddress === undefined
-      ? updates
-      : { ...updates, ipAddress: canonicalServerAddress(updates.ipAddress) };
+    const canonicalUpdates =
+      updates.ipAddress === undefined
+        ? updates
+        : { ...updates, ipAddress: canonicalServerAddress(updates.ipAddress) };
     try {
       return await serverRepository.updateManagedWithAudit(
         serverId,
@@ -176,7 +213,6 @@ class ServerService {
       throwServerMutationConflict(error);
     }
   }
-
 }
 
 export const serverService = new ServerService();

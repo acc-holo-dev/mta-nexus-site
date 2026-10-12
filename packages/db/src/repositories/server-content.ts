@@ -1,19 +1,12 @@
 import type { AuditEvent, Content } from "@nexus/domain";
-import { AppError, grantsServerManagement, NotFoundError } from "@nexus/domain";
+import { NotFoundError } from "@nexus/domain";
 import { and, desc, eq, exists, ilike, or } from "drizzle-orm";
 import { db } from "../client";
-import {
-  auditEvents,
-  content,
-  organizationMembers,
-  organizations,
-  servers,
-  users,
-} from "../schema";
+import { auditEvents, content, servers, users } from "../schema";
 import { type ContentPageFilters, contentSummaryColumns } from "./content-summary";
 import { publicationNotice } from "./publication-notice";
 import { containsPattern } from "./search-pattern";
-import { managedServerScope } from "./server-management-scope";
+import { lockServerManagementGrants, managedServerScope } from "./server-management-scope";
 
 type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 const identity = { id: servers.id, name: servers.name, slug: servers.slug };
@@ -26,39 +19,7 @@ export async function serverContentAccess(tx: Transaction, serverId: string, act
     .for("share")
     .limit(1);
   if (!server) throw new NotFoundError("Server");
-  const [actor] = await tx
-    .select({ role: users.role })
-    .from(users)
-    .where(eq(users.id, actorId))
-    .for("share")
-    .limit(1);
-  if (!actor) throw new AppError("Account unavailable", 403, "FORBIDDEN");
-  if (actor.role === "admin") return server;
-  if (!server.organizationId) {
-    if (server.ownerId !== actorId) throw new AppError("Server manager required", 403, "FORBIDDEN");
-    return server;
-  }
-  const [org] = await tx
-    .select({ ownerId: organizations.ownerId })
-    .from(organizations)
-    .where(eq(organizations.id, server.organizationId))
-    .for("share")
-    .limit(1);
-  if (!org) throw new AppError("Server organization unavailable", 403, "FORBIDDEN");
-  if (org.ownerId === actorId) return server;
-  const [member] = await tx
-    .select({ role: organizationMembers.role, permissions: organizationMembers.permissions })
-    .from(organizationMembers)
-    .where(
-      and(
-        eq(organizationMembers.organizationId, server.organizationId),
-        eq(organizationMembers.userId, actorId),
-      ),
-    )
-    .for("share")
-    .limit(1);
-  if (!grantsServerManagement(member))
-    throw new AppError("Server manager required", 403, "FORBIDDEN");
+  await lockServerManagementGrants(tx, [server], actorId);
   return server;
 }
 export async function serverContentContext(tx: Transaction, serverId: string, actorId: string) {

@@ -1,5 +1,6 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -31,9 +32,11 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
-import { serverContentRepository as repository } from "../packages/db/src/repositories/server-content";
+
 import { authorContentRepository } from "../packages/db/src/repositories/author-content";
+import { serverContentRepository as repository } from "../packages/db/src/repositories/server-content";
 import { content } from "../packages/db/src/schema";
+
 const time = "2026-10-11T00:00:00.000Z";
 const row = (extra: Record<string, unknown> = {}) =>
   Object.keys(getTableColumns(content)).map(
@@ -133,8 +136,8 @@ it.each(["owner", "member", "developer", "moderator"])(
       [row()],
       [["srv", "Server", "server", null, "org"]],
       [["user"]],
-      [["actual-owner"]],
-      [[role, role === "owner" ? ["manage_servers"] : []]],
+      [["org", "actual-owner"]],
+      [["org", role, role === "owner" ? ["manage_servers"] : []]],
     ];
     await expect(
       authorContentRepository.mutate(
@@ -166,8 +169,8 @@ it("allows delegated server creation and forces current server context, actor, r
   state.rows = [
     [["srv", "Server", "server", null, "org"]],
     [["user"]],
-    [["owner"]],
-    [["member", ["manage_servers"]]],
+    [["org", "owner"]],
+    [["org", "member", ["manage_servers"]]],
     [row({ authorId: "actor", organizationId: "org", status: "draft" })],
   ];
   await repository.create(
