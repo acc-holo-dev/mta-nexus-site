@@ -997,3 +997,74 @@ it("rolls collection enrollment back on audit failure and rejects revoked grants
     await f.cleanup();
   }
 });
+
+it("projects collection enrollment and batch stopping as own watch operations while masking titles after access loss", async () => {
+  const f = await batchFixture();
+  try {
+    const command = {
+      expectedCollectionRevision: 3,
+      items: f.ids.slice(0, 2).map((productId) => ({ productId, expectedRevision: 0 })),
+    };
+    await resourceReleaseWatchesRepository.enableCollectionBatch({
+      userId: f.buyer,
+      collectionId: f.collectionId,
+      command,
+      auditId: `aud_hist_watch_enable_${f.key}`,
+    });
+    await resourceReleaseWatchesRepository.disableBatch({
+      userId: f.buyer,
+      command: { items: command.items.map((item) => ({ ...item, expectedRevision: 1 })) },
+      auditId: `aud_hist_watch_stop_${f.key}`,
+    });
+    const query = { days: 7 as const, page: 1, source: "all" as const, productId: f.ids[0] };
+    const report = await resourceReleaseWatchesRepository.history(f.buyer, query);
+    expect(report.total).toBe(2);
+    expect(report.items.every((item) => item.changes?.length === 2)).toBe(true);
+    expect(
+      report.items.some(
+        (item) => item.source === "collection" && item.changes?.every((change) => change.enabled),
+      ),
+    ).toBe(true);
+    await db.delete(entitlements).where(eq(entitlements.subjectId, f.buyer));
+    const masked = await resourceReleaseWatchesRepository.history(f.buyer, query);
+    expect(masked.total).toBe(2);
+    expect(
+      masked.items
+        .flatMap((item) => item.changes ?? [])
+        .every((change) => change.currentTitle === null && !change.currentAvailable),
+    ).toBe(true);
+    expect(
+      (await resourceReleaseWatchesRepository.history(f.staff, { days: 7, page: 1, source: "all" }))
+        .items,
+    ).toHaveLength(0);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("keeps malformed watch audit details neutral instead of exposing raw fields or inferred state", async () => {
+  const f = await fixture();
+  try {
+    await db
+      .insert(auditEvents)
+      .values({
+        id: `aud_bad_watch_${f.key}`,
+        actorId: f.buyer,
+        actorType: "user",
+        action: "library.release_watch_changed",
+        targetType: "product",
+        targetId: f.ids[0] ?? "",
+        details: { enabled: "false", revision: 1, private: "DO-NOT-EXPORT", lastSequence: "999" },
+      });
+    const report = await resourceReleaseWatchesRepository.history(f.buyer, {
+      days: 7,
+      page: 1,
+      source: "individual",
+    });
+    expect(report.items).toHaveLength(1);
+    expect(report.items[0]).toMatchObject({ source: "unknown", changes: null });
+    expect(JSON.stringify(report)).not.toContain("DO-NOT-EXPORT");
+    expect(JSON.stringify(report)).not.toContain("lastSequence");
+  } finally {
+    await f.cleanup();
+  }
+});

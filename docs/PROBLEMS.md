@@ -3309,3 +3309,45 @@ Changed-file Biome and web TypeScript pass. The first Next compile was killed by
 25.8s and exited zero. Full production generation and live PostgreSQL/browser checks
 remain unrun. Root TypeScript retains only existing missing fast-check types and the
 old missing isSigned delivery fixture.
+
+
+## Private release-watch command history (2026-10-12)
+
+Own watch history now projects individual preference changes, group stops and collection
+enrollment as twenty-operation pages. RU/EN filters cover 7/30/90/365 days, operation source
+and an optional recorded resource ID. Matching a resource retains the complete matching
+operation (at most twenty changes) for group context. Current accessible titles/watch state
+are shown separately from recorded enabled/revision state. History does not restore settings,
+claim delivery, recall notices, grant files or mutate preferences. Worker delivery/automatic
+stop logs remain separate; only the current user's recorded preference commands are included.
+
+The read-only repeatable-read repository checks a live account and database-time window,
+then restricts actor ID/type, known command actions and expected target types. User-targeted
+stop events must target that same user. Current metadata for at most 400 unique recorded IDs
+is fetched in one own-access/safe-publication/watch lookup, without per-change queries. Lost
+rights mask current names/management links while retaining the user's recorded reference IDs
+and own current watch state. Historical collection IDs/revisions are recorded provenance,
+with no current foreign collection names or authority implied.
+
+SQL projects only bounded boolean/numeric fields and arrays of at most twenty capped IDs;
+invalid arrays are not silently truncated into valid operations. Domain parsing requires
+unique valid IDs, positive integer revisions, exact change counts and a verified collection
+revision for enrollment. Malformed evidence yields an unknown operation with no invented
+changes. Raw audit fields, IP/user-agent data, cursors, storage/build evidence and private
+extras never enter the report. Private API/export retains inspection limiting, no-store/Cookie
+variance, attachment/nosniff and a 512-KiB limit. Migration 0072 adds an actor/time/id partial
+index with the same literal user/action predicate used by prepared reader queries; no stored
+commands or worker behavior are changed.
+
+Two PostgreSQL fixtures cover enrollment/stop history with resource-filter group context,
+revoked-rights name masking and other-actor isolation, plus malformed raw-field privacy.
+They remain unrun without a disposable PostgreSQL instance. Live migrations/query plans,
+browser interaction, full production generation and Node 26 validation remain open.
+GitHub Actions are neither run nor inspected.
+
+Release-watch command-history validation: 129 tests across 22 focused files passed;
+lint passed for all 18 touched TypeScript sources, and web TypeScript passed again
+after Next generated route types. Next webpack compile-mode build exited successfully
+with its route summary. Full production generation remains unverified. Root TypeScript
+still reports the previously recorded fast-check/implicit-any and delivery-fixture
+errors; the new PostgreSQL history fixtures remain unrun.

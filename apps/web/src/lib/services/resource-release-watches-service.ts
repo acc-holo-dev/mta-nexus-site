@@ -1,6 +1,7 @@
 import { resourceReleaseWatchesRepository } from "@nexus/db";
 import type {
   ResourceReleaseWatchCommand,
+  ResourceReleaseWatchHistoryQuery,
   ResourceReleaseWatchDisableCommand,
   ResourceReleaseWatchEnableCommand,
   ResourceReleaseWatchFilter,
@@ -8,6 +9,8 @@ import type {
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
 export const resourceReleaseWatchesService = {
+  history: (user: User, query: ResourceReleaseWatchHistoryQuery) =>
+    resourceReleaseWatchesRepository.history(user.id, query),
   detail: (user: User, productId: string) =>
     resourceReleaseWatchesRepository.detail(user.id, productId),
   page: (user: User, page: number, filter: ResourceReleaseWatchFilter, query = "") =>

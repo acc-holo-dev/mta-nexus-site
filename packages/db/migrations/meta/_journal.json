@@ -505,6 +505,13 @@
       "when": 1791763200000,
       "tag": "0071_library_selection_history_index",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1791765000000,
+      "tag": "0072_release_watch_history_index",
+      "breakpoints": true
     }
   ]
 }

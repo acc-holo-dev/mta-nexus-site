@@ -45,3 +45,5 @@ export * from "./library-release-history";
 
 export * from "./library-release-comparison";
 export * from "./private-change-history";
+
+export * from "./resource-release-watch-history";

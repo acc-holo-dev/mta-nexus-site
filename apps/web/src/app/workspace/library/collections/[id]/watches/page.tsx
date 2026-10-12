@@ -1,3 +1,4 @@
+import { resourceReleaseWatchHistoryCopy } from "../../../../../../lib/resource-release-watch-history-i18n";
 import { AppError, RESOURCE_RELEASE_WATCH_LIMIT } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -60,6 +61,12 @@ export default async function Page({
       </p>
       <Link href="/workspace/library/watches" className="text-accent underline">
         {copy.watchCenter}
+      </Link>
+      <Link
+        href="/workspace/library/watches/history?source=collection"
+        className="text-accent underline"
+      >
+        {resourceReleaseWatchHistoryCopy(locale).title}
       </Link>
       {result.collection.status === "archived" && <p role="note">{copy.archivedCollection}</p>}
       <form className="flex flex-wrap items-end gap-3">

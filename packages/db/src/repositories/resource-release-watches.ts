@@ -1,3 +1,4 @@
+import { readResourceReleaseWatchHistory } from "./resource-release-watch-history";
 import { and, asc, count, desc, eq, ilike, sql } from "drizzle-orm";
 import {
   AppError,
@@ -60,6 +61,7 @@ function usable(userId: string) {
   ) and exists (select 1 from ${builds} where ${safePublishedBuildCondition(products.id.getSQL())}), false)`;
 }
 export class ResourceReleaseWatchesRepository {
+  history = readResourceReleaseWatchHistory;
   disableBatch = disableResourceReleaseWatchBatch;
   collectionPage = readCollectionReleaseWatches;
   enableCollectionBatch = enableCollectionReleaseWatches;

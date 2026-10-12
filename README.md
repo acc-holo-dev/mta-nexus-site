@@ -1,5 +1,12 @@
 # MTA NEXUS
 
+The private release-watch center now provides command history across individual changes,
+bulk stopping and collection enrollment. Inspect 7/30/90/365-day windows, filter recorded
+resource IDs or operation sources, and export a bounded twenty-operation JSON page.
+Current labels require current access/safe publication; lost access preserves recorded IDs.
+Malformed evidence remains unknown. Migration `0072_release_watch_history_index` supports
+scoped audit reads. History links to current controls without replaying past operations.
+
 Collections now offer reviewed enrollment in future-release notifications for up to
 20 resources at once. The RU/EN watch screen shows current membership, availability,
 watch state and the account-wide quota; archived collections remain inspectable. Apply

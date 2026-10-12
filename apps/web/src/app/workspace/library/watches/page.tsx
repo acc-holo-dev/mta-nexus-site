@@ -1,4 +1,5 @@
 import { ResourceReleaseWatchBatchControls } from "../../../../components/resource-release-watch-batch-controls";
+import { resourceReleaseWatchHistoryCopy } from "../../../../lib/resource-release-watch-history-i18n";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -68,6 +69,9 @@ export default async function ReleaseWatchesPage({
         {copy.library}
       </Link>
       <h1 className="font-display text-primary">{copy.title}</h1>
+      <Link href="/workspace/library/watches/history" className="text-accent underline">
+        {resourceReleaseWatchHistoryCopy(locale).title}
+      </Link>
       <p role="note" className="text-sm text-secondary">
         {copy.note}
       </p>
