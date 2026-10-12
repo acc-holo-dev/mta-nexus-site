@@ -35,7 +35,20 @@ vi.mock("node:fs/promises", async () => {
   };
 });
 
-import { withDiscussionReplayCheckpoint as withStore } from "../apps/web/scripts/discussion-replay-storage";
+import { withDiscussionReplayCheckpoint } from "../apps/web/scripts/discussion-replay-storage";
+
+const identity = "a".repeat(64);
+// Existing fixtures intentionally exercise operator-approved adoption of version 1.
+const withStore = <T>(
+  path: string,
+  from: string,
+  until: string,
+  run: Parameters<typeof withDiscussionReplayCheckpoint<T>>[4],
+) => withDiscussionReplayCheckpoint(path, from, until, { identity, adoptLegacy: true }, run);
+async function stored() {
+  const value = JSON.parse(await readFile(path, "utf8"));
+  return value.version === 2 ? value.checkpoint : value;
+}
 
 const from = "2026-10-12T00:00:00.000000Z",
   until = "2026-10-12T01:00:00.000000Z";
@@ -65,7 +78,13 @@ it("persists private microsecond page progress, syncs replacement order and relo
   await withStore(path, from, until, async ({ initial: saved, save }) => {
     expect(saved).toEqual(initial);
     const lock = JSON.parse(await readFile(`${path}.lock`, "utf8"));
-    expect(lock).toMatchObject({ version: 1, pid: process.pid, from, until });
+    expect(lock).toMatchObject({
+      version: 2,
+      pid: process.pid,
+      from,
+      until,
+      databaseIdentity: identity,
+    });
     expect((await stat(`${path}.lock`)).mode & 0o777).toBe(0o600);
     await save(progress);
   });
@@ -140,7 +159,7 @@ it.each(["temporary-writeFile", "temporary-sync", "rename"])(
     await expect(withStore(path, from, until, async ({ save }) => save(progress))).rejects.toThrow(
       "Injected",
     );
-    expect(JSON.parse(await readFile(path, "utf8"))).toEqual(initial);
+    expect(await stored()).toEqual(initial);
     expect(await readdir(directory)).toEqual(["replay.json"]);
     fault.stage = "";
     await withStore(path, from, until, async ({ save }) => save(progress));
@@ -170,7 +189,7 @@ it("rejects invalid progress before replacing the last valid file", async () => 
       await save({ ...progress, completed: true });
     }),
   ).rejects.toThrow();
-  expect(JSON.parse(await readFile(path, "utf8"))).toEqual(progress);
+  expect(await stored()).toEqual(progress);
 });
 
 it("resumes a durable audience cursor and repeats only an uncheckpointed page after write failure", async () => {
@@ -190,7 +209,7 @@ it("resumes a durable audience cursor and repeats only an uncheckpointed page af
       await replayDiscussionNotifications(checkpoint, { page, deliver, save }, 1);
     }),
   ).rejects.toThrow("Injected");
-  expect(JSON.parse(await readFile(path, "utf8"))).toEqual(progress);
+  expect(await stored()).toEqual(progress);
   fault.stage = "";
   await withStore(path, from, until, async ({ initial: checkpoint, save }) => {
     const result = await replayDiscussionNotifications(checkpoint, { page, deliver, save }, 1);
@@ -201,4 +220,101 @@ it("resumes a durable audience cursor and repeats only an uncheckpointed page af
     ["publication", "comment", progress.pending.audienceCursor],
     ["publication", "comment", progress.pending.audienceCursor],
   ]);
+});
+
+it("binds new checkpoints and denies foreign database scopes even with legacy adoption", async () => {
+  await withDiscussionReplayCheckpoint(path, from, until, { identity }, async ({ save }) =>
+    save(progress),
+  );
+  const body = await readFile(path, "utf8");
+  expect(JSON.parse(body)).toEqual({
+    version: 2,
+    databaseIdentity: identity,
+    checkpoint: progress,
+  });
+  for (const adoptLegacy of [false, true]) {
+    const run = vi.fn();
+    await expect(
+      withDiscussionReplayCheckpoint(
+        path,
+        from,
+        until,
+        {
+          identity: "b".repeat(64),
+          adoptLegacy,
+        },
+        run,
+      ),
+    ).rejects.toThrow("another database");
+    expect(run).not.toHaveBeenCalled();
+    expect(await readFile(path, "utf8")).toBe(body);
+  }
+});
+
+it("requires deliberate legacy adoption, then preserves exact progress in the bound envelope", async () => {
+  await writeFile(path, JSON.stringify(progress));
+  const callback = vi.fn();
+  await expect(
+    withDiscussionReplayCheckpoint(path, from, until, { identity }, callback),
+  ).rejects.toThrow("adoption");
+  expect(callback).not.toHaveBeenCalled();
+  expect(await stored()).toEqual(progress);
+  await withStore(path, from, until, async ({ initial: saved, save }) => {
+    expect(saved).toEqual(progress);
+    await save(saved);
+  });
+  const value = JSON.parse(await readFile(path, "utf8"));
+  expect(value).toEqual({ version: 2, databaseIdentity: identity, checkpoint: progress });
+  await withDiscussionReplayCheckpoint(
+    path,
+    from,
+    until,
+    { identity },
+    async ({ initial: saved }) => expect(saved).toEqual(progress),
+  );
+});
+
+it.each([
+  { version: 2, databaseIdentity: identity },
+  { version: 2, checkpoint: initial },
+  { version: 2, databaseIdentity: identity, checkpoint: { ...initial, from: until } },
+  { version: 3, databaseIdentity: identity, checkpoint: initial },
+])("rejects damaged bound envelopes without falling back to legacy %#", async (value) => {
+  await writeFile(path, JSON.stringify(value));
+  const run = vi.fn();
+  await expect(withStore(path, from, until, run)).rejects.toThrow();
+  expect(run).not.toHaveBeenCalled();
+  expect(JSON.parse(await readFile(path, "utf8"))).toEqual(value);
+});
+
+it("rejects concurrent saves and never regresses the durable audience cursor", async () => {
+  await withDiscussionReplayCheckpoint(path, from, until, { identity }, async ({ save }) => {
+    const active = save(progress);
+    await expect(save(initial)).rejects.toThrow("Concurrent");
+    await active;
+    await expect(save(initial)).rejects.toThrow("regress");
+    expect(await stored()).toEqual(progress);
+    await save({
+      ...progress,
+      pending: {
+        ...progress.pending,
+        audienceCursor: { ...progress.pending.audienceCursor, id: "follow_51" },
+      },
+    });
+    await expect(save(progress)).rejects.toThrow("regress");
+  });
+  expect((await stored()).pending.audienceCursor.id).toBe("follow_51");
+});
+
+it("rejects invalid identity before creating files", async () => {
+  await expect(
+    withDiscussionReplayCheckpoint(
+      path,
+      from,
+      until,
+      { identity: "private-connection-url" },
+      vi.fn(),
+    ),
+  ).rejects.toThrow("identity");
+  expect(await readdir(directory)).toEqual([]);
 });

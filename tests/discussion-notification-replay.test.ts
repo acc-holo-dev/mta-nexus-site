@@ -149,3 +149,84 @@ it("rejects a stalled cursor and events outside the fixed window", async () => {
   }
   expect(deliver).not.toHaveBeenCalled();
 });
+
+it("counts delivered, suppressed, duplicate and degraded attempts without storing private recipient data", async () => {
+  const result = await replayDiscussionNotifications(
+    initial,
+    {
+      page: async () => rows,
+      deliver: vi
+        .fn()
+        .mockResolvedValueOnce({
+          failed: 0,
+          attempted: 10,
+          stored: 5,
+          suppressed: 2,
+          duplicate: 2,
+          skipped: 1,
+          pushQueued: 3,
+          pushDegraded: 1,
+        })
+        .mockResolvedValueOnce({ failed: 2, attempted: 4, stored: 2 }),
+      save: vi.fn(),
+    },
+    10,
+  );
+  expect(result).toMatchObject({
+    processed: 1,
+    blocked: true,
+    metrics: {
+      deliverySteps: 2,
+      attempted: 14,
+      stored: 7,
+      suppressed: 2,
+      duplicate: 2,
+      skipped: 1,
+      failed: 2,
+      pushQueued: 3,
+      pushDegraded: 1,
+    },
+  });
+  expect(Object.values(result.metrics).every((value) => typeof value === "number")).toBe(true);
+});
+it("includes page metrics even when no comment completes and resets metrics on the next pass", async () => {
+  const page = async () => rows;
+  const deliver = vi
+    .fn()
+    .mockResolvedValue({
+      failed: 0,
+      attempted: 50,
+      duplicate: 50,
+      nextCursor: { createdAt: time, id: "follow_50" },
+    });
+  const save = vi.fn();
+  const result = await replayDiscussionNotifications(initial, { page, deliver, save }, 1);
+  expect(result).toMatchObject({
+    processed: 0,
+    metrics: { deliverySteps: 1, attempted: 50, duplicate: 50 },
+  });
+  const stopped = await replayDiscussionNotifications(
+    result.checkpoint,
+    { page, deliver, save, shouldStop: () => true },
+    1,
+  );
+  expect(Object.values(stopped.metrics)).toEqual(Array(9).fill(0));
+});
+it.each([-1, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])(
+  "denies checkpoint advancement for invalid delivery counter %s",
+  async (failed) => {
+    const save = vi.fn();
+    await expect(
+      replayDiscussionNotifications(
+        initial,
+        {
+          page: async () => rows,
+          deliver: async () => ({ failed }),
+          save,
+        },
+        1,
+      ),
+    ).rejects.toThrow("counters");
+    expect(save).not.toHaveBeenCalled();
+  },
+);

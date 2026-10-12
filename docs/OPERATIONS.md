@@ -934,12 +934,17 @@ the same command/checkpoint until `completed` is true. Each pass handles at most
 the requested number of comments (1–10000), in database pages of at most fifty
 rows. A delivery step handles one follower page (fifty recipients) plus up to two
 direct participants, checked again on every step. A partial event ends the pass
-before the comment budget is reached. Logs contain counts and completion state,
-never comment text or recipient identities.
+before the comment budget is reached. Pass logs include elapsed milliseconds and
+numeric deliverySteps/attempted/stored/suppressed/duplicate/skipped/failed/pushQueued/
+pushDegraded counters, never comment text, database URLs or recipient identities.
+Counters reset per pass and count actual attempts: repeated direct recipients are
+included again, and an unavailable event can increment skipped without an attempt.
+They describe this pass, not unique recipients or guaranteed push delivery.
 
-The version-1 checkpoint stores the fixed window, last fully delivered comment's
-exact timestamp/ID, and optional current comment/follower-page progress. Older
-checkpoints without pending progress remain compatible. It advances only after
+New files use a version-2 envelope containing a database-scope hash and the existing
+version-1 window/cursor state. The fixed window, last fully delivered comment's
+exact timestamp/ID and optional current comment/follower-page progress are retained.
+Progress advances only after
 successful inbox delivery; failure exits a one-shot run with status 1. Restart or
 checkpoint-write failure repeats the uncheckpointed audience page. Existing inbox
 idempotency prevents duplicate notices and preserves read state. Current publication,
@@ -953,8 +958,33 @@ replace the checkpoint and fsync the parent directory before acknowledging progr
 Handled failures clean up temporary files and release the owned lock; failure after
 rename can leave a complete newer checkpoint, which restart validates and reuses.
 An abrupt process/host failure can leave a harmless temporary file. Keep the directory
-private and use a separate checkpoint per database/window; database identity is not
-encoded or automatically checked by this version.
+private and use a separate checkpoint per database/window. The scope hash binds the
+configured hostname/port to the actual current_database name/OID and resolved
+comments/follows relation OIDs. Metadata is read using ordinary PostgreSQL catalog
+access before opening the checkpoint and before each delivery pass. Missing tables
+or a changed scope stop delivery; credential/TLS rotations alone do not change it.
+No connection credentials or raw database metadata are written to the file or logs.
+This protects accidental scope reuse, not cryptographic identification of a database
+cluster; an endpoint routed to another cluster with matching catalog identities may
+not be distinguishable. Endpoint aliases and recreated tables require a new checkpoint.
+Use a stable endpoint and restart recovery after maintenance; existing inbox deduplication
+allows replaying the fixed window into a new checkpoint without resetting read state.
+
+Older standalone version-1 files lack scope evidence. By default they are rejected
+without changing the file or delivering notices. After verifying the original database,
+run the same command once with `--adopt-legacy` to bind and atomically replace the file:
+
+```sh
+pnpm --filter @nexus/web notifications:replay /durable/checkpoints/discussions.json 2026-10-12T00:00:00.000000Z 2026-10-12T06:00:00.000000Z 100 --adopt-legacy
+```
+
+Adoption retains exact progress, including completion and pending audience state.
+The flag never bypasses a mismatched/damaged version-2 file. Later runs do not need it.
+`--worker` and `--adopt-legacy` may appear in either order after the optional budget;
+omitted budget defaults to 100. Duplicate/unknown flags and ambiguous numeric budgets
+are rejected. Saves reject concurrent writes, backwards event/audience progress and
+changing a completed cursor; identical retries and advancing past deleted events remain
+valid. A failed write does not acknowledge in-memory progress.
 
 Exclusive `.lock` creation serializes workers, including symlink aliases of the
 parent directory. Its private metadata records process ID, hostname and window to

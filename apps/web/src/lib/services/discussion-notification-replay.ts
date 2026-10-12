@@ -1,4 +1,19 @@
 export type ReplayCursor = { createdAt: string; id: string };
+const counterNames = [
+  "attempted",
+  "stored",
+  "suppressed",
+  "duplicate",
+  "skipped",
+  "failed",
+  "pushQueued",
+  "pushDegraded",
+] as const;
+type DeliveryCounters = Record<(typeof counterNames)[number], number>;
+type ReplayDeliveryResult = Partial<DeliveryCounters> & {
+  failed: number;
+  nextCursor?: ReplayCursor;
+};
 export type ReplayCheckpoint = {
   version: 1;
   from: string;
@@ -17,7 +32,7 @@ export async function replayDiscussionNotifications(
       contentId: string,
       commentId: string,
       audienceCursor?: ReplayCursor,
-    ) => Promise<{ failed: number; nextCursor?: ReplayCursor }>;
+    ) => Promise<ReplayDeliveryResult>;
     save: (checkpoint: ReplayCheckpoint) => Promise<void>;
     shouldStop?: () => boolean;
   },
@@ -27,6 +42,17 @@ export async function replayDiscussionNotifications(
     throw Error("Replay limit must be between 1 and 10000");
   let current = { ...checkpoint };
   let processed = 0;
+  const metrics: DeliveryCounters & { deliverySteps: number } = {
+    deliverySteps: 0,
+    attempted: 0,
+    stored: 0,
+    suppressed: 0,
+    duplicate: 0,
+    skipped: 0,
+    failed: 0,
+    pushQueued: 0,
+    pushDegraded: 0,
+  };
   while (!current.completed && processed < limit && !dependencies.shouldStop?.()) {
     const rows = await dependencies.page(current.cursor);
     if (!rows.length) {
@@ -54,7 +80,18 @@ export async function replayDiscussionNotifications(
       const result = resume
         ? await dependencies.deliver(row.contentId, row.id, resume)
         : await dependencies.deliver(row.contentId, row.id);
-      if (result.failed) return { checkpoint: current, processed, blocked: true };
+      metrics.deliverySteps++;
+      for (const name of counterNames) {
+        const value = result[name] ?? (name === "failed" ? NaN : 0);
+        if (
+          !Number.isSafeInteger(value) ||
+          value < 0 ||
+          !Number.isSafeInteger(metrics[name] + value)
+        )
+          throw Error("Invalid replay delivery counters");
+        metrics[name] += value;
+      }
+      if (result.failed) return { checkpoint: current, processed, blocked: true, metrics };
       if (result.nextCursor) {
         if (
           resume &&
@@ -64,7 +101,7 @@ export async function replayDiscussionNotifications(
           throw Error("Replay audience cursor did not advance");
         current = { ...current, pending: { ...row, audienceCursor: result.nextCursor } };
         await dependencies.save(current);
-        return { checkpoint: current, processed, blocked: false };
+        return { checkpoint: current, processed, blocked: false, metrics };
       }
       current = {
         ...current,
@@ -75,5 +112,5 @@ export async function replayDiscussionNotifications(
       processed++;
     }
   }
-  return { checkpoint: current, processed, blocked: false };
+  return { checkpoint: current, processed, blocked: false, metrics };
 }

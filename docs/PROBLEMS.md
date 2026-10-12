@@ -1,10 +1,45 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Discussion replay scope binding and operator diagnostics — 2026-10-12
+
+PROVISIONAL engineering choice: version-2 checkpoint envelopes bind the configured
+database endpoint and actual database/comment/follow catalog identities using SHA-256.
+Ordinary catalog reads verify scope at startup and before every pass; no superuser
+metadata function, credentials or raw database names are retained in checkpoints/logs.
+This detects accidental endpoint/database/schema reuse, not every possible routed
+cluster with matching catalog identities. Changed endpoints/recreated tables need
+a new checkpoint. Existing inbox deduplication keeps a new-window replay safe.
+
+Existing version-1 files now require explicit `--adopt-legacy` after operator verification
+of their original database. Adoption validates the original window/progress and replaces
+the file atomically without rewinding it; it cannot bypass a damaged or foreign-scope
+version-2 envelope. Operations records this restart requirement and exact invocation.
+Save guards reject concurrent/regressing progress and reopening/changing completion.
+Per-pass elapsed time and bounded aggregate dispatcher counters expose attempts,
+suppression/duplicates/failures and degraded push without private recipient payloads.
+Counter validation precedes checkpoint advancement; metrics reset on every pass.
+
+381 unit/mock/filesystem checks across 26 files pass on pinned Node 26.10.0, including
+metadata SQL generation, scope stability/mismatch, strict CLI parsing, legacy adoption,
+monotonicity, concurrency, crash recovery, counters and preserved library blocks.
+Root and application TypeScript, changed-source Biome and diff checks pass. One added
+PostgreSQL fixture prepares real scope resolution and restart after checkpoint failure
+with exact inbox deduplication/read-state preservation; it remains unrun without a
+disposable database. Live PostgreSQL/query plans, production execution and power-loss
+acceptance remain open. No schema/migration or delivery preference changes are included;
+transactional fan-out enqueueing/automatic window discovery still require schema-owner
+coordination.
+
+After integrating Agent A's immutable membership-group history, 426 focused checks
+across 29 files and both TypeScript projects pass; the new history/collection flows
+are preserved. The PostgreSQL fixture remains unrun.
+
 ### Bounded discussion replay and durable checkpoints — 2026-10-12
 
 Operator-selected inbox recovery now persists progress inside an event's audience:
 one fifty-follower page plus current direct participants per pass, exact microsecond
-cursors and compatible legacy version-1 checkpoints. Failed pages do not advance;
+cursors and legacy version-1 progress (now requiring explicit adoption as above).
+Failed pages do not advance;
 repeated delivery reuses existing deterministic inbox identities. The fixed-window
 worker retains exponential retry/shutdown behavior. Storage rejects malformed,
 oversized, symlink and foreign-window files, serializes directory aliases with one

@@ -1,4 +1,7 @@
 import { randomUUID } from "node:crypto";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   auditEvents,
   comments,
@@ -13,7 +16,10 @@ import {
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
+import { resolveDiscussionReplayDatabaseIdentity } from "../apps/web/scripts/discussion-replay-database";
+import { withDiscussionReplayCheckpoint } from "../apps/web/scripts/discussion-replay-storage";
 import { notifyDiscussionReplies } from "../apps/web/src/lib/services/discussion-follow-notification-service";
+import { replayDiscussionNotifications } from "../apps/web/src/lib/services/discussion-notification-replay";
 
 const actors: string[] = [];
 afterEach(async () => {
@@ -262,4 +268,86 @@ it("serializes delivery behind an unsubscribe and a publication archive without 
   expect(
     await db.select().from(notifications).where(eq(notifications.recipientId, reader.id)),
   ).toHaveLength(0);
+});
+
+it("resumes bound replay after checkpoint failure without duplicate inbox rows or lost read state", async () => {
+  const owner = await actor(),
+    reader = await actor(),
+    writer = await actor();
+  const item = await publication(owner.id);
+  await subscribe(reader.id, item.id);
+  const event = await reply(item.id, writer.id);
+  const audience = await followsRepository.discussionAudience(item.id, event.id);
+  if (!audience) throw Error("Missing audience");
+  const identity = await resolveDiscussionReplayDatabaseIdentity();
+  const time = audience.createdAt;
+  const directory = await mkdtemp(join(tmpdir(), "nexus-replay-db-"));
+  const path = join(directory, "checkpoint.json");
+  const row = { id: event.id, contentId: item.id, createdAt: time };
+  const page = async (cursor: { id: string } | null) => (cursor ? [] : [row]);
+  const deliver = (contentId: string, commentId: string) =>
+    notifyDiscussionReplies(contentId, commentId, { maxFollowerPages: 1 });
+  try {
+    await expect(
+      withDiscussionReplayCheckpoint(path, time, time, { identity }, async ({ initial, save }) => {
+        await save(initial);
+        await replayDiscussionNotifications(
+          initial,
+          {
+            page,
+            deliver,
+            save: async () => {
+              throw Error("Checkpoint write interrupted");
+            },
+          },
+          10,
+        );
+      }),
+    ).rejects.toThrow("Checkpoint write interrupted");
+    expect(JSON.parse(await readFile(path, "utf8"))).toMatchObject({
+      version: 2,
+      databaseIdentity: identity,
+      checkpoint: { cursor: null, completed: false },
+    });
+    const notices = await db
+      .select()
+      .from(notifications)
+      .where(inArray(notifications.recipientId, [owner.id, reader.id, writer.id]));
+    expect(notices).toHaveLength(2);
+    await notificationRepository.markAsRead(notices[0].id, notices[0].recipientId);
+    await withDiscussionReplayCheckpoint(
+      path,
+      time,
+      time,
+      { identity },
+      async ({ initial, save }) => {
+        const result = await replayDiscussionNotifications(initial, { page, deliver, save }, 10);
+        expect(result).toMatchObject({
+          processed: 1,
+          blocked: false,
+          checkpoint: { completed: true },
+          metrics: { attempted: 2, duplicate: 2, stored: 0, failed: 0 },
+        });
+      },
+    );
+    const after = await db
+      .select()
+      .from(notifications)
+      .where(inArray(notifications.recipientId, [owner.id, reader.id, writer.id]));
+    expect(after).toHaveLength(2);
+    expect(after.find((notice) => notice.id === notices[0].id)?.isRead).toBe(true);
+    await expect(
+      withDiscussionReplayCheckpoint(
+        path,
+        time,
+        time,
+        { identity: "0".repeat(64), adoptLegacy: true },
+        async () => {
+          throw Error("Should not deliver");
+        },
+      ),
+    ).rejects.toThrow("another database");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });

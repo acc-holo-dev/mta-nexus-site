@@ -21,7 +21,10 @@ Interrupted discussion inbox delivery can be replayed over a fixed UTC window wi
 bounded fifty-follower pages and resumable page checkpoints. An optional background
 worker retries failures and drains that window; private atomic checkpoint writes
 flush the file and parent directory. See [Operations](docs/OPERATIONS.md#recovering-discussion-inbox-delivery)
-for invocation, lock inspection and current recovery limits. This does not yet
+for invocation, lock inspection and current recovery limits. New checkpoint files
+are bound to the database/table scope; old files require explicit `--adopt-legacy`.
+Pass logs expose aggregate delivery/retry outcomes without recipient metadata.
+This does not yet
 automatically enqueue or discover pending fan-out after new comment writes.
 
 Own collections now have a private RU/EN comparison view with common/source-only/

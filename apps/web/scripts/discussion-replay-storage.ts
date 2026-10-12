@@ -5,11 +5,20 @@ import { open, realpath, rename, unlink } from "node:fs/promises";
 import { hostname } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import type { ReplayCheckpoint } from "../src/lib/services/discussion-notification-replay";
-import { parseDiscussionReplayCheckpoint } from "../src/lib/services/discussion-replay-checkpoint";
+import {
+  assertDiscussionReplayProgress,
+  parseDiscussionReplayCheckpoint,
+} from "../src/lib/services/discussion-replay-checkpoint";
 
 const maximumBytes = 4096;
 
-async function readCheckpoint(path: string, from: string, until: string) {
+type DatabaseBinding = { identity: string; adoptLegacy?: boolean };
+async function readCheckpoint(
+  path: string,
+  from: string,
+  until: string,
+  database: DatabaseBinding,
+) {
   let file: FileHandle;
   try {
     file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
@@ -29,11 +38,24 @@ async function readCheckpoint(path: string, from: string, until: string) {
       length += bytesRead;
     }
     if (length > maximumBytes) throw Error("Checkpoint file exceeds limit");
-    return parseDiscussionReplayCheckpoint(
-      JSON.parse(buffer.toString("utf8", 0, length)),
-      from,
-      until,
-    );
+    const saved: unknown = JSON.parse(buffer.toString("utf8", 0, length));
+    if (
+      saved &&
+      typeof saved === "object" &&
+      !Array.isArray(saved) &&
+      "version" in saved &&
+      saved.version === 2
+    ) {
+      if (
+        !("databaseIdentity" in saved) ||
+        saved.databaseIdentity !== database.identity ||
+        !("checkpoint" in saved)
+      )
+        throw Error("Checkpoint belongs to another database scope");
+      return parseDiscussionReplayCheckpoint(saved.checkpoint, from, until);
+    }
+    if (!database.adoptLegacy) throw Error("Legacy checkpoint requires explicit adoption");
+    return parseDiscussionReplayCheckpoint(saved, from, until);
   } finally {
     await file.close();
   }
@@ -44,6 +66,7 @@ export async function withDiscussionReplayCheckpoint<T>(
   checkpointName: string,
   from: string,
   until: string,
+  database: DatabaseBinding,
   run: (store: {
     initial: ReplayCheckpoint;
     save: (value: ReplayCheckpoint) => Promise<void>;
@@ -52,6 +75,9 @@ export async function withDiscussionReplayCheckpoint<T>(
   // Validate even a new window before touching files. Canonical directories share one lock.
   const empty = { version: 1, from, until, cursor: null, completed: false };
   parseDiscussionReplayCheckpoint(empty, from, until);
+  if (!/^[a-f0-9]{64}$/.test(database.identity))
+    throw Error("Invalid checkpoint database identity");
+  const binding = { ...database };
   const requested = resolve(checkpointName);
   const directory = await realpath(dirname(requested));
   const path = join(directory, basename(requested));
@@ -59,18 +85,36 @@ export async function withDiscussionReplayCheckpoint<T>(
   const lock = await open(lockPath, "wx", 0o600);
   try {
     await lock.writeFile(
-      JSON.stringify({ version: 1, pid: process.pid, host: hostname(), from, until }),
+      JSON.stringify({
+        version: 2,
+        pid: process.pid,
+        host: hostname(),
+        from,
+        until,
+        databaseIdentity: binding.identity,
+      }),
     );
     await lock.sync();
-    const initial = await readCheckpoint(path, from, until);
+    const initial = await readCheckpoint(path, from, until, binding);
+    let persisted = parseDiscussionReplayCheckpoint(initial, from, until),
+      saving = false;
     const save = async (value: ReplayCheckpoint) => {
+      if (saving) throw Error("Concurrent checkpoint writes are not allowed");
       const normalized = parseDiscussionReplayCheckpoint(value, from, until);
-      const payload = JSON.stringify(normalized);
+      assertDiscussionReplayProgress(persisted, normalized);
+      const payload = JSON.stringify({
+        version: 2,
+        databaseIdentity: binding.identity,
+        checkpoint: normalized,
+      });
       if (Buffer.byteLength(payload) > maximumBytes) throw Error("Checkpoint file exceeds limit");
       // Exclusive, unpredictable creation never truncates a leftover temporary file or symlink.
       const temporary = join(directory, `.${basename(path)}.${randomUUID()}.tmp`);
-      const file = await open(temporary, "wx", 0o600);
+      saving = true;
+      let created = false;
       try {
+        const file = await open(temporary, "wx", 0o600);
+        created = true;
         try {
           await file.writeFile(payload);
           await file.sync();
@@ -85,10 +129,16 @@ export async function withDiscussionReplayCheckpoint<T>(
         } finally {
           await parent.close();
         }
+        persisted = normalized;
       } finally {
-        await unlink(temporary).catch((error: NodeJS.ErrnoException) => {
-          if (error.code !== "ENOENT") throw error;
-        });
+        try {
+          if (created)
+            await unlink(temporary).catch((error: NodeJS.ErrnoException) => {
+              if (error.code !== "ENOENT") throw error;
+            });
+        } finally {
+          saving = false;
+        }
       }
     };
     return await run({ initial, save });

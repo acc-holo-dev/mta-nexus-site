@@ -27,6 +27,31 @@ function after(left: ReplayCursor, right: ReplayCursor) {
     left.createdAt > right.createdAt || (left.createdAt === right.createdAt && left.id > right.id)
   );
 }
+/** A durable checkpoint may stay equal or advance, but never reopen completed work. */
+export function assertDiscussionReplayProgress(previous: ReplayCheckpoint, next: ReplayCheckpoint) {
+  if (
+    previous.from !== next.from ||
+    previous.until !== next.until ||
+    (previous.completed &&
+      (!next.completed ||
+        previous.cursor?.id !== next.cursor?.id ||
+        previous.cursor?.createdAt !== next.cursor?.createdAt))
+  )
+    throw Error("Replay checkpoint cannot change its window or reopen completion");
+  if (previous.cursor && (!next.cursor || after(previous.cursor, next.cursor)))
+    throw Error("Replay checkpoint cursor cannot regress");
+  const pending = previous.pending;
+  if (!pending || next.completed || (next.cursor && !after(pending, next.cursor))) return;
+  if (!next.pending || after(pending, next.pending))
+    throw Error("Replay audience progress cannot regress");
+  if (
+    pending.id === next.pending.id &&
+    pending.createdAt === next.pending.createdAt &&
+    (pending.contentId !== next.pending.contentId ||
+      after(pending.audienceCursor, next.pending.audienceCursor))
+  )
+    throw Error("Replay audience progress cannot regress");
+}
 export function parseDiscussionReplayCheckpoint(
   value: unknown,
   from: string,
