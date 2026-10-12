@@ -1,6 +1,16 @@
 import type { Locale } from "./i18n";
 const en = {
   title: "Release notifications",
+  collectionTitle: "Collection release notifications",
+  enrollTitle: "Enable notifications for selected resources",
+  enrollNote:
+    "Select up to 20 accessible resources. Only releases approved after enrollment are considered. Current collection membership, watch revisions, access and the account limit are checked together.",
+  confirmEnroll:
+    "I confirm enabling notifications about future releases for the selected resources.",
+  applyEnroll: "Enable selected watches",
+  activeCount: "Active watches across your library",
+  archivedCollection: "This collection is archived. Restore it before enrolling resource watches.",
+  watchCenter: "Manage all release watches",
   search: "Search accessible resource titles",
   export: "Export this page as JSON",
   batchTitle: "Stop several release watches",
@@ -43,6 +53,15 @@ const en = {
 };
 const ru: typeof en = {
   title: "Уведомления о версиях",
+  collectionTitle: "Уведомления о выпусках коллекции",
+  enrollTitle: "Включить уведомления для выбранных ресурсов",
+  enrollNote:
+    "Выберите до 20 доступных ресурсов. Учитываются только выпуски, одобренные после включения подписки. Состав коллекции, версии настроек, права доступа и лимит аккаунта проверяются вместе.",
+  confirmEnroll: "Подтверждаю включение уведомлений о будущих выпусках выбранных ресурсов.",
+  applyEnroll: "Включить выбранные подписки",
+  activeCount: "Активные подписки во всей библиотеке",
+  archivedCollection: "Коллекция в архиве. Восстановите её перед включением подписок на ресурсы.",
+  watchCenter: "Управлять всеми подписками на выпуски",
   search: "Поиск по названиям доступных ресурсов",
   export: "Экспортировать эту страницу в JSON",
   batchTitle: "Отключить несколько подписок",

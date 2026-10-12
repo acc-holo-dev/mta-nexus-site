@@ -27,7 +27,12 @@ export const RESOURCE_RELEASE_WATCH_BATCH_LIMIT = 20;
 export type ResourceReleaseWatchDisableCommand = {
   items: { productId: string; expectedRevision: number }[];
 };
-export type ResourceReleaseWatchDisableResult = {
+export type ResourceReleaseWatchBatchResult = {
   items: ResourceReleaseWatch[];
   changedCount: number;
+};
+
+export type ResourceReleaseWatchDisableResult = ResourceReleaseWatchBatchResult;
+export type ResourceReleaseWatchEnableCommand = ResourceReleaseWatchDisableCommand & {
+  expectedCollectionRevision: number;
 };

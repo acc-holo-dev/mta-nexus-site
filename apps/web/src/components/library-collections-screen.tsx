@@ -1,3 +1,4 @@
+import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -278,9 +279,17 @@ export async function LibraryCollectionsScreen({
           </p>
         )}
         {!adding && (
-          <Link href={collectionHref(id, "releases")} className="text-accent underline">
-            {collectionReleasesCopy(locale).title}
-          </Link>
+          <>
+            <Link
+              href={`/workspace/library/collections/${encodeURIComponent(id)}/watches`}
+              className="text-accent underline"
+            >
+              {resourceReleaseWatchesCopy(locale).collectionTitle}
+            </Link>
+            <Link href={collectionHref(id, "releases")} className="text-accent underline">
+              {collectionReleasesCopy(locale).title}
+            </Link>
+          </>
         )}
         {!adding && (
           <Link href={`${collectionHref(id)}/versions`} className="text-accent underline">

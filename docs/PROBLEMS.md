@@ -3260,3 +3260,52 @@ Verification: 150 focused tests across 14 files pass, covering watches/worker/ba
 and the preserved profile/team-history slice. Changed-file Biome, web TypeScript and
 merged Next compile pass. Root TypeScript retains only the existing fast-check type
 errors and old missing isSigned fixture. PostgreSQL/browser checks remain unrun.
+
+
+## Reviewed collection release-watch enrollment (2026-10-12)
+
+Private collection detail and release pages now link to a dedicated RU/EN watch screen.
+Its bounded twenty-row search/filter view reads live owner/collection membership, own watch
+state and account-wide active count in one read-only repeatable-read database-time snapshot.
+Unavailable reference titles are masked; title search only matches available safe publications.
+Archived collections can be inspected, but cannot enroll watches. New references start at
+watch revision zero. Existing enabled watches are displayed without being re-enrolled.
+
+The shared batch controller now has a collection-enrollment mode with explicit confirmation,
+remaining-quota/20-item limits, frozen collection/watch revisions, strict enabled-state
+acknowledgement, precise retries and definitive-error reload. Global batch stopping retains
+its existing disabled-state contract. The strict collection command includes only a reviewed
+collection revision plus unique, canonically sorted product/watch revisions; current session
+and route determine the owner/collection. No client cursor, arbitrary scope or account input
+is accepted. Existing private HTTP transport/rate/body limits apply.
+
+Apply acquires the existing collection-owner lock, then the account watch-enrollment lock,
+checks active ownership/current revision, locks exact selected memberships/products/grant or
+legacy-license sources/safe published builds/watch rows, and checks expiry again at database
+time after waiting. Mixed watch states, changed membership, lost rights, withdrawn builds or
+a 100-watch quota overflow abort the whole batch. One guarded JSON-recordset upsert begins
+new/re-enabled watches after each resource's latest committed event while preserving monotonic
+existing cursor/timestamp state, then writes a required collection batch audit atomically.
+No version preferences, collection membership, entitlements, licenses or payments are changed.
+Old events are not backfilled; existing notice delivery/preferences remain separate gates.
+
+All exact enabled successor states return changedCount=0 without another enrollment/audit;
+this is state confirmation rather than an immutable UUID receipt. Current collection revision,
+access and safety are still required when confirming retries. No migration or worker scheduling
+is introduced. Existing membership, user/watch-time and resource-event indexes are reused.
+Two PostgreSQL fixtures cover baseline enrollment with preserved pins/exact retry uniqueness,
+and audit rollback/revoked access/stale membership rejection; they remain unrun without a
+disposable PostgreSQL instance. Live locks/query plans, browser interaction and Node 26
+validation remain open. GitHub Actions are neither run nor inspected.
+
+The shared access-source lock accepts an optional SQL time expression; only the new
+collection-enrollment caller requests clock_timestamp for initial source selection.
+Other callers retain the default application-time policy, with no unbounded read change.
+
+Verification: 187 focused tests across 19 files pass, covering collection enrollment,
+individual/batch watches, workers, collection pages and existing selection/access flows.
+Changed-file Biome and web TypeScript pass. The first Next compile was killed by the
+8-GiB environment limit; an isolated retry with a 3-GiB heap compiled successfully in
+25.8s and exited zero. Full production generation and live PostgreSQL/browser checks
+remain unrun. Root TypeScript retains only existing missing fast-check types and the
+old missing isSigned delivery fixture.

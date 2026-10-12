@@ -6,6 +6,10 @@ import {
   type ResourceReleaseWatchCommand,
   type ResourceReleaseWatchFilter,
 } from "@nexus/domain";
+import {
+  readCollectionReleaseWatches,
+  enableCollectionReleaseWatches,
+} from "./collection-release-watches";
 import { disableResourceReleaseWatchBatch } from "./resource-release-watch-batches";
 import { db } from "../client";
 import {
@@ -57,6 +61,8 @@ function usable(userId: string) {
 }
 export class ResourceReleaseWatchesRepository {
   disableBatch = disableResourceReleaseWatchBatch;
+  collectionPage = readCollectionReleaseWatches;
+  enableCollectionBatch = enableCollectionReleaseWatches;
   async detail(userId: string, productId: string) {
     return db.transaction(async (tx) => {
       await parentAndUser(tx, userId, productId);

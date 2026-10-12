@@ -4,6 +4,7 @@ const record = (value: unknown): value is Record<string, unknown> =>
 export function confirmedResourceReleaseWatchBatch(
   value: unknown,
   command: ResourceReleaseWatchDisableCommand,
+  enabled = false,
 ) {
   if (
     !record(value) ||
@@ -20,7 +21,7 @@ export function confirmedResourceReleaseWatchBatch(
       record(row) &&
       Object.keys(row).length === 4 &&
       row.productId === requested.productId &&
-      row.enabled === false &&
+      row.enabled === enabled &&
       row.revision === requested.expectedRevision + 1 &&
       typeof row.updatedAt === "string" &&
       Number.isFinite(Date.parse(row.updatedAt)) &&

@@ -1,3 +1,4 @@
+import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { AppError, LIBRARY_RELEASE_FILTERS } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -61,6 +62,12 @@ export async function CollectionReleasesScreen({
         {cc.revision}: {result.collection.revision} · {cc.items}: {result.itemCount}
       </p>
       <p className="text-secondary">{c.note}</p>
+      <Link
+        href={`/workspace/library/collections/${encodeURIComponent(path.id)}/watches`}
+        className="text-accent underline"
+      >
+        {resourceReleaseWatchesCopy(locale).collectionTitle}
+      </Link>
       {result.collection.status === "archived" ? (
         <p role="note">{c.archived}</p>
       ) : (

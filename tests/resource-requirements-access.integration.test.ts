@@ -5,6 +5,7 @@ import {
   librarySelectionBatchesRepository,
   librarySelectionBatchReceipts,
   resourceLibrarySelectionsRepository,
+  resourceReleaseWatchesRepository,
   buildRepository,
   builds,
   db,
@@ -12,6 +13,8 @@ import {
   products,
   resourceRequirementsRepository as repo,
   resourceLibrarySelections as selections,
+  resourceReleaseWatches as releaseWatches,
+  resourceReleaseEvents as releaseEvents,
   userRepository,
   users,
 } from "@nexus/db";
@@ -879,6 +882,117 @@ it("does not preview a foreign or withdrawn release or reuse a revoked buyer gra
     expect(await db.select().from(selections).where(eq(selections.userId, f.buyer))).toHaveLength(
       0,
     );
+  } finally {
+    await f.cleanup();
+  }
+});
+
+it("enrolls collection resources from the current release baseline without changing pinned versions and confirms retries once", async () => {
+  const f = await batchFixture();
+  try {
+    await f.apply();
+    const preferences = await db
+      .select()
+      .from(selections)
+      .where(eq(selections.userId, f.buyer))
+      .orderBy(selections.productId);
+    const items = f.ids.slice(0, 2).map((productId) => ({ productId, expectedRevision: 0 }));
+    const command = { expectedCollectionRevision: 3, items };
+    const result = await resourceReleaseWatchesRepository.enableCollectionBatch({
+      userId: f.buyer,
+      collectionId: f.collectionId,
+      command,
+      auditId: `aud_watch_col_${f.key}`,
+    });
+    expect(result.changedCount).toBe(2);
+    const retry = await resourceReleaseWatchesRepository.enableCollectionBatch({
+      userId: f.buyer,
+      collectionId: f.collectionId,
+      command,
+      auditId: `aud_watch_retry_${f.key}`,
+    });
+    expect(retry.changedCount).toBe(0);
+    expect(retry.items).toEqual(result.items);
+    const watches = await db
+      .select()
+      .from(releaseWatches)
+      .where(eq(releaseWatches.userId, f.buyer));
+    const events = await db
+      .select()
+      .from(releaseEvents)
+      .where(inArray(releaseEvents.productId, f.ids.slice(0, 2)));
+    for (const watch of watches)
+      expect(watch.lastSequence).toBe(
+        events.find((event) => event.productId === watch.productId)?.sequence,
+      );
+    expect(
+      await db
+        .select()
+        .from(selections)
+        .where(eq(selections.userId, f.buyer))
+        .orderBy(selections.productId),
+    ).toEqual(preferences);
+    expect(
+      await db
+        .select()
+        .from(auditEvents)
+        .where(
+          and(
+            eq(auditEvents.actorId, f.buyer),
+            eq(auditEvents.action, "library.collection_release_watches_enabled"),
+          ),
+        ),
+    ).toHaveLength(1);
+  } finally {
+    await f.cleanup();
+  }
+});
+it("rolls collection enrollment back on audit failure and rejects revoked grants or stale membership", async () => {
+  const f = await batchFixture();
+  try {
+    const command = {
+      expectedCollectionRevision: 3,
+      items: f.ids.slice(0, 2).map((productId) => ({ productId, expectedRevision: 0 })),
+    };
+    const input = {
+      userId: f.buyer,
+      collectionId: f.collectionId,
+      command,
+      auditId: `aud_req_${f.key}_0`,
+    };
+    await expect(resourceReleaseWatchesRepository.enableCollectionBatch(input)).rejects.toThrow();
+    expect(
+      await db.select().from(releaseWatches).where(eq(releaseWatches.userId, f.buyer)),
+    ).toHaveLength(0);
+    await db.delete(entitlements).where(eq(entitlements.subjectId, f.buyer));
+    await expect(
+      resourceReleaseWatchesRepository.enableCollectionBatch({
+        ...input,
+        auditId: `aud_revoked_watch_${f.key}`,
+      }),
+    ).rejects.toMatchObject({ code: "RELEASE_WATCH_UNAVAILABLE" });
+    await libraryCollectionsRepository.command({
+      userId: f.buyer,
+      collectionId: f.collectionId,
+      command: {
+        action: "remove",
+        productId: f.ids[1] ?? "",
+        expectedRevision: 3,
+        requestId: randomUUID(),
+      },
+      newCollectionId: f.collectionId,
+      receiptId: `lcr_watch_remove_${f.key}`,
+      auditId: `aud_watch_remove_${f.key}`,
+    });
+    await expect(
+      resourceReleaseWatchesRepository.enableCollectionBatch({
+        ...input,
+        auditId: `aud_stale_watch_${f.key}`,
+      }),
+    ).rejects.toMatchObject({ code: "RELEASE_WATCH_COLLECTION_CONFLICT" });
+    expect(
+      await db.select().from(releaseWatches).where(eq(releaseWatches.userId, f.buyer)),
+    ).toHaveLength(0);
   } finally {
     await f.cleanup();
   }

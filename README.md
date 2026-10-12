@@ -1,5 +1,12 @@
 # MTA NEXUS
 
+Collections now offer reviewed enrollment in future-release notifications for up to
+20 resources at once. The RU/EN watch screen shows current membership, availability,
+watch state and the account-wide quota; archived collections remain inspectable. Apply
+checks collection/watch revisions, locked current access and clean publication together.
+Enrollment skips earlier release events, preserves version pins and supports exact-state
+retry acknowledgement. Collection detail/release screens link to the new watch view.
+
 Release watches now support title search, private twenty-row JSON exports and reviewed
 bulk stop for up to 20 enabled watches, including resources with lost access. Revisions
 are checked together in one audited transaction; mixed/stale states conflict. Uncertain
