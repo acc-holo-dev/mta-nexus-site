@@ -3518,3 +3518,50 @@ traversal, changed/deleted anchors, role revocation, malformed private evidence,
 Unicode bounds, literal search and commercial-target exclusion. They remain
 unrun without disposable PostgreSQL. Browser behavior, live query plans and full
 production page generation remain outstanding. GitHub Actions are not used.
+
+
+## Reviewed group resumption of release watches (2026-10-12)
+
+The global RU/EN watch center now offers reviewed resumption of up to twenty existing,
+available stopped watches. Account-wide active count is returned by an unfiltered own
+subquery in the same read-only snapshot, independent of searched/filter counts. The UI
+uses remaining account capacity, excludes new/unavailable references, confirms the
+selection and uses the existing frozen-scope retry/abort/strict acknowledgement flow.
+Private session-scoped POST /api/library/watches/resume rejects query/authority selectors,
+zero/new-watch revisions, duplicate IDs, oversized bodies and unsafe mutation transport.
+
+Collection enrollment and global resumption share one transactional enrollment engine.
+Collection membership/revision checks are retained for collection callers; global commands
+require a live account and every exact own existing watch. Both modes serialize account
+quota, lock sorted published products/current access sources/safe builds/watch states,
+then recheck finite access at database time. Only all stopped expected states can change;
+all enabled exact successors confirm a retry without another audit. Mixed/stale states,
+withdrawn publication, lost access, quota overflow or required audit failure abort the
+whole batch. Baselines skip current committed release events; cursor/time values remain
+monotonic. Saved versions, collections, entitlements, payments and existing inbox notices
+are preserved. Exact state replay remains a confirmation rather than a UUID receipt.
+
+Global resumption writes an own-user release_watches_resumed audit with only bounded
+resource IDs/revisions/change count. Private history projects it as enabled batch changes,
+with the same actor/target checks, malformed-evidence handling and masked current names.
+Batch filtering includes stop and resume operations without admitting other actors or
+system delivery logs. Migration 0073 replaces the existing partial index with the expanded
+literal four-action predicate; migration 0072 remains unchanged.
+
+Two PostgreSQL fixtures cover resumption baseline/history/no backfill/preserved pins and
+one audit per operation, plus audit rollback and revoked-access rejection. They remain
+unrun without a disposable PostgreSQL instance. Live migration/index plans, browser
+interaction, full production generation and Node 26 validation remain open. GitHub Actions
+are neither run nor inspected.
+
+Verification: 245 focused tests across 29 files pass, including watch resumption,
+existing watch/collection/history paths and the preserved community-report search/
+history slice. Biome lint passes on all 21 touched TypeScript sources, and web
+TypeScript passes. Root TypeScript retains only the recorded fast-check/implicit-any
+and old missing isSigned delivery-fixture errors. A stale generated webpack cache
+had filled the 32-GiB environment; clearing only that cache recovered 28 GiB without
+changing source files. Live PostgreSQL/migration/browser checks remain unrun.
+
+The isolated Next webpack compile-mode build exits zero with its route summary;
+web TypeScript also passes after route regeneration. Full production generation
+remains unverified.

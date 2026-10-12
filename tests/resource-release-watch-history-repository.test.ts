@@ -149,3 +149,27 @@ it("requires a live account and rejects direct invalid scopes before querying", 
   });
   expect(h.queries).toHaveLength(0);
 });
+
+it("includes resume operations in the own-user batch filter without widening target authority", async () => {
+  h.rows = [
+    [["usr_a"]],
+    [{ observedAt: date }],
+    [[1]],
+    [
+      event({
+        action: "library.release_watches_resumed",
+        targetId: "usr_a",
+        payload: { changedCount: 1, items: [{ productId: "prd_a", revision: 3 }] },
+      }),
+    ],
+    [],
+  ];
+  const result = await history("usr_a", { ...query, source: "batch" });
+  expect(result.items[0]).toMatchObject({
+    source: "batch",
+    changes: [{ productId: "prd_a", enabled: true }],
+  });
+  expect(h.queries[2].params).toContain("library.release_watches_resumed");
+  expect(h.queries[2].sql).toContain(`"audit_events"."target_type"`);
+  expect(h.queries[2].sql).toContain(`"audit_events"."target_id"=`);
+});

@@ -11,6 +11,7 @@ import {
 import {
   readCollectionReleaseWatches,
   enableCollectionReleaseWatches,
+  resumeResourceReleaseWatches,
 } from "./collection-release-watches";
 import { disableResourceReleaseWatchBatch } from "./resource-release-watch-batches";
 import { db } from "../client";
@@ -73,6 +74,7 @@ function usable(userId: string) {
 export class ResourceReleaseWatchesRepository {
   history = readResourceReleaseWatchHistory;
   disableBatch = disableResourceReleaseWatchBatch;
+  resumeBatch = resumeResourceReleaseWatches;
   collectionPage = readCollectionReleaseWatches;
   enableCollectionBatch = enableCollectionReleaseWatches;
   async detail(userId: string, productId: string) {
@@ -244,11 +246,17 @@ export class ResourceReleaseWatchesRepository {
             enabled: sql<number>`count(*) filter (where ${watches.enabled})::integer`,
             disabled: sql<number>`count(*) filter (where not ${watches.enabled})::integer`,
             unavailable: sql<number>`count(*) filter (where not ${available})::integer`,
+            activeWatchCount: sql<number>`(select count(*)::integer from ${watches} active where active.user_id=${userId} and active.enabled=true)`,
           })
           .from(watches)
           .leftJoin(products, eq(products.id, watches.productId))
           .where(own);
-        const counts = summary ?? { all: 0, enabled: 0, disabled: 0, unavailable: 0 },
+        const counts = {
+            all: summary?.all ?? 0,
+            enabled: summary?.enabled ?? 0,
+            disabled: summary?.disabled ?? 0,
+            unavailable: summary?.unavailable ?? 0,
+          },
           bounds = historyPageBounds(counts[filter], page);
         const condition =
           filter === "enabled"
@@ -272,7 +280,7 @@ export class ResourceReleaseWatchesRepository {
           .orderBy(desc(watches.updatedAt), asc(watches.productId))
           .limit(bounds.pageSize)
           .offset(bounds.offset);
-        return { items, counts, ...bounds };
+        return { items, counts, activeWatchCount: summary?.activeWatchCount ?? 0, ...bounds };
       },
       { isolationLevel: "repeatable read", accessMode: "read only" },
     );

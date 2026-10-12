@@ -36,7 +36,7 @@ export function recordedResourceReleaseWatchOperation(
     };
   }
   const source =
-    action === "library.release_watches_disabled"
+    action === "library.release_watches_disabled" || action === "library.release_watches_resumed"
       ? "batch"
       : action === "library.collection_release_watches_enabled"
         ? "collection"
@@ -62,7 +62,7 @@ export function recordedResourceReleaseWatchOperation(
     changes: items
       .map((item) => ({
         productId: item.productId as string,
-        enabled: source === "collection",
+        enabled: source === "collection" || action === "library.release_watches_resumed",
         revision: item.revision as number,
       }))
       .sort((a, b) => (a.productId < b.productId ? -1 : a.productId > b.productId ? 1 : 0)),

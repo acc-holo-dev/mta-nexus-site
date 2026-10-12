@@ -3,6 +3,7 @@ import type {
   ResourceReleaseWatchCommand,
   ResourceReleaseWatchHistoryQuery,
   ResourceReleaseWatchDisableCommand,
+  ResourceReleaseWatchResumeCommand,
   ResourceReleaseWatchEnableCommand,
   ResourceReleaseWatchFilter,
   User,
@@ -30,6 +31,12 @@ export const resourceReleaseWatchesService = {
     resourceReleaseWatchesRepository.enableCollectionBatch({
       userId: user.id,
       collectionId,
+      command,
+      auditId: generateId("aud"),
+    }),
+  resumeBatch: (user: User, command: ResourceReleaseWatchResumeCommand) =>
+    resourceReleaseWatchesRepository.resumeBatch({
+      userId: user.id,
       command,
       auditId: generateId("aud"),
     }),

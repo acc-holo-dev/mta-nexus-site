@@ -252,3 +252,15 @@ it("never audits an unexpected insertion conflict", async () => {
   expect(update?.sql).toContain("where false");
   expect(state.queries.some((q) => q.sql.startsWith('insert into "audit_events"'))).toBe(false);
 });
+
+it("reports the account-wide active count independently of searched watch totals", async () => {
+  state.rows = [[[1, 0, 1, 0, 98]], []];
+  const result = await repo.page("usr_a", 1, "disabled", "Core");
+  expect(result).toMatchObject({
+    activeWatchCount: 98,
+    counts: { all: 1, enabled: 0, disabled: 1 },
+  });
+  expect(state.queries).toHaveLength(2);
+  expect(state.queries[0].sql).toContain("active.user_id=");
+  expect(state.queries[0].sql).toContain("active.enabled=true");
+});

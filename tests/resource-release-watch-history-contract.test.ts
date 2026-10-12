@@ -101,3 +101,27 @@ it("registers a literal own-watch audit index suitable for prepared history quer
     ),
   ).toHaveLength(1);
 });
+
+it("records group resume as enabled batch changes and indexes the expanded literal predicate", () => {
+  const value = parse("library.release_watches_resumed", "usr_a", {
+    changedCount: 1,
+    items: [{ productId: "prd_a", revision: 3 }],
+  });
+  expect(value).toEqual({
+    source: "batch",
+    changes: [{ productId: "prd_a", enabled: true, revision: 3 }],
+    collection: null,
+  });
+  const migration = readFileSync(
+    "packages/db/migrations/0073_release_watch_resume_history.sql",
+    "utf8",
+  );
+  expect(migration).toContain("DROP INDEX audit_events_release_watch_history_idx");
+  expect(migration).toContain("library.release_watches_resumed");
+  const journal = JSON.parse(readFileSync("packages/db/migrations/meta/_journal.json", "utf8"));
+  expect(
+    journal.entries.filter(
+      (entry: { tag: string }) => entry.tag === "0073_release_watch_resume_history",
+    ),
+  ).toHaveLength(1);
+});

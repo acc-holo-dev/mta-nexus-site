@@ -36,3 +36,6 @@ export type ResourceReleaseWatchDisableResult = ResourceReleaseWatchBatchResult;
 export type ResourceReleaseWatchEnableCommand = ResourceReleaseWatchDisableCommand & {
   expectedCollectionRevision: number;
 };
+
+/** Resume only reviewed, existing stopped watches; never enroll an unknown reference. */
+export type ResourceReleaseWatchResumeCommand = ResourceReleaseWatchDisableCommand;

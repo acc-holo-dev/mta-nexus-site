@@ -16,6 +16,7 @@ export function ResourceReleaseWatchBatchControls({
   locale,
   collection,
   activeWatchCount = 0,
+  resume = false,
 }: {
   items: {
     productId: string;
@@ -26,11 +27,14 @@ export function ResourceReleaseWatchBatchControls({
   }[];
   collection?: { id: string; revision: number; status: "active" | "archived" };
   activeWatchCount?: number;
+  resume?: boolean;
   locale: Locale;
 }) {
-  const enabling = collection !== undefined;
+  const enabling = collection !== undefined || resume;
   const eligible = items.filter((item) =>
-    enabling ? item.available === true && !item.enabled : item.enabled,
+    enabling
+      ? item.available === true && !item.enabled && (!resume || item.revision >= 1)
+      : item.enabled,
   );
   const capacity = enabling
     ? Math.max(
@@ -92,7 +96,9 @@ export function ResourceReleaseWatchBatchControls({
     const requestScope = scope.current ?? {
       url: collection
         ? `/api/library/collections/${encodeURIComponent(collection.id)}/watches`
-        : "/api/library/watches/disable",
+        : resume
+          ? "/api/library/watches/resume"
+          : "/api/library/watches/disable",
       enabling,
     };
     scope.current = requestScope;
@@ -142,13 +148,17 @@ export function ResourceReleaseWatchBatchControls({
     }
   }
   if (!pending && (!eligible.length || collection?.status === "archived")) return null;
+  const title = resume ? copy.resumeTitle : enabling ? copy.enrollTitle : copy.batchTitle,
+    note = resume ? copy.resumeNote : enabling ? copy.enrollNote : copy.batchNote,
+    confirm = resume ? copy.confirmResume : enabling ? copy.confirmEnroll : copy.confirmBatch,
+    apply = resume ? copy.applyResume : enabling ? copy.applyEnroll : copy.applyBatch;
   return (
     <section className="nexus-panel space-y-4 p-5">
-      <h2>{enabling ? copy.enrollTitle : copy.batchTitle}</h2>
-      <p className="text-sm text-secondary">{enabling ? copy.enrollNote : copy.batchNote}</p>
+      <h2>{title}</h2>
+      <p className="text-sm text-secondary">{note}</p>
       {enabling && capacity === 0 && <p role="note">{copy.maximum}</p>}
       <fieldset disabled={busy || saved || pending !== null} className="space-y-3">
-        <legend className="sr-only">{enabling ? copy.enrollTitle : copy.batchTitle}</legend>
+        <legend className="sr-only">{title}</legend>
         {eligible.map((item) => (
           <label key={item.productId} className="flex items-start gap-3 text-sm">
             <input
@@ -174,7 +184,7 @@ export function ResourceReleaseWatchBatchControls({
             checked={confirmed}
             onChange={(event) => setConfirmed(event.target.checked)}
           />
-          <span>{enabling ? copy.confirmEnroll : copy.confirmBatch}</span>
+          <span>{confirm}</span>
         </label>
       </fieldset>
       {!pending && (
@@ -184,7 +194,7 @@ export function ResourceReleaseWatchBatchControls({
           onClick={() => void send()}
           className="rounded-md border border-base px-4 py-2 text-sm"
         >
-          {enabling ? copy.applyEnroll : copy.applyBatch}
+          {apply}
         </button>
       )}
       {pending && !saved && (

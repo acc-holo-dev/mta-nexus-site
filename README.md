@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+The release-watch center supports reviewed group resumption of up to twenty existing
+stopped watches with current access/safe-publication/revision/quota checks. It skips
+already approved releases, preserves saved version choices and notices, and records
+resumption in private command history. Migration `0073_release_watch_resume_history`
+extends the own-command history index.
+
 Individual and grouped release-watch commands now keep their reviewed resource/scope
 and revisions across uncertain retries. Definitive errors require reload; leaving the
 screen aborts the request and ignores late responses. Single changes and the release

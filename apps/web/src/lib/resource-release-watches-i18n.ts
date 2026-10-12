@@ -1,6 +1,11 @@
 import type { Locale } from "./i18n";
 const en = {
   title: "Release notifications",
+  resumeTitle: "Resume stopped release watches",
+  resumeNote:
+    "Choose up to 20 accessible stopped watches. Current revisions, publication safety, access and the account limit are checked together. Releases already approved are skipped; version choices and existing notices are retained.",
+  confirmResume: "I confirm resuming future release notifications for the selected resources.",
+  applyResume: "Resume selected watches",
   collectionTitle: "Collection release notifications",
   enrollTitle: "Enable notifications for selected resources",
   enrollNote:
@@ -53,6 +58,11 @@ const en = {
 };
 const ru: typeof en = {
   title: "Уведомления о версиях",
+  resumeTitle: "Возобновить отключённые подписки",
+  resumeNote:
+    "Выберите до 20 доступных ресурсов с отключёнными подписками. Текущие версии настроек, безопасная публикация, доступ и лимит аккаунта проверяются вместе. Уже одобренные выпуски пропускаются; выбор версий и созданные уведомления сохраняются.",
+  confirmResume: "Подтверждаю возобновление уведомлений о будущих выпусках выбранных ресурсов.",
+  applyResume: "Возобновить выбранные подписки",
   collectionTitle: "Уведомления о выпусках коллекции",
   enrollTitle: "Включить уведомления для выбранных ресурсов",
   enrollNote:

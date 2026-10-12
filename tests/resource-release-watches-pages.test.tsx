@@ -120,3 +120,26 @@ it("preserves search in filters, pagination and export, and masks unavailable up
   expect(html).toContain("Stop several release watches");
   expect(html).toContain("Resource currently unavailable");
 });
+
+it.each(["en", "ru"] as const)(
+  "shows reviewed resumption and an account-wide active count in %s",
+  async (locale) => {
+    state.locale = locale;
+    const result = await state.page();
+    state.page.mockResolvedValue({
+      ...result,
+      activeWatchCount: 98,
+      items: [{ ...result.items[0], enabled: false }],
+    });
+    const html = renderToStaticMarkup(
+      <LocaleProvider locale={locale}>
+        {await Page({ searchParams: Promise.resolve({ filter: "disabled", query: "Core" }) })}
+      </LocaleProvider>,
+    );
+    expect(html).toContain(
+      locale === "en" ? "Resume stopped release watches" : "Возобновить отключённые подписки",
+    );
+    expect(html).toContain("98 / 100");
+    expect(html).not.toContain("DO_NOT_RENDER");
+  },
+);

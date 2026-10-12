@@ -102,6 +102,22 @@ export default async function ReleaseWatchesPage({
       >
         {copy.export}
       </a>
+      <p className="text-sm text-secondary">
+        {copy.activeCount}: {result.activeWatchCount ?? 0} / 100
+      </p>
+      <ResourceReleaseWatchBatchControls
+        resume
+        activeWatchCount={result.activeWatchCount ?? 0}
+        locale={locale}
+        key={`resume:${JSON.stringify(result.items.map((item) => [item.productId, item.revision, item.enabled, item.available]))}`}
+        items={result.items.map(({ productId, enabled, revision, available, title }) => ({
+          productId,
+          enabled,
+          revision,
+          available,
+          title: available ? title : null,
+        }))}
+      />
       <ResourceReleaseWatchBatchControls
         key={JSON.stringify(
           result.items.map((item) => [item.productId, item.revision, item.enabled]),

@@ -1160,3 +1160,138 @@ it("rolls back an individual watch on audit failure and preserves monotonic upda
     await f.cleanup();
   }
 });
+
+it("resumes reviewed existing watches at current baselines while preserving pins, notices and one audit per operation", async () => {
+  const f = await batchFixture();
+  try {
+    await f.apply();
+    const preferenceRows = await db
+      .select()
+      .from(selections)
+      .where(eq(selections.userId, f.buyer))
+      .orderBy(selections.productId);
+    const ids = f.ids.slice(0, 2);
+    await resourceReleaseWatchesRepository.enableCollectionBatch({
+      userId: f.buyer,
+      collectionId: f.collectionId,
+      auditId: `aud_resume_enroll_${f.key}`,
+      command: {
+        expectedCollectionRevision: 3,
+        items: ids.map((productId) => ({ productId, expectedRevision: 0 })),
+      },
+    });
+    await resourceReleaseWatchesRepository.disableBatch({
+      userId: f.buyer,
+      auditId: `aud_resume_stop_${f.key}`,
+      command: { items: ids.map((productId) => ({ productId, expectedRevision: 1 })) },
+    });
+    await f.publishReplacement();
+    const input = {
+      userId: f.buyer,
+      auditId: `aud_resume_apply_${f.key}`,
+      command: { items: ids.map((productId) => ({ productId, expectedRevision: 2 })) },
+    };
+    const result = await resourceReleaseWatchesRepository.resumeBatch(input);
+    expect(result.changedCount).toBe(2);
+    expect(result.items.every((item) => item.enabled && item.revision === 3)).toBe(true);
+    const rows = await db.select().from(releaseWatches).where(eq(releaseWatches.userId, f.buyer));
+    const events = await db
+      .select()
+      .from(releaseEvents)
+      .where(inArray(releaseEvents.productId, ids));
+    for (const row of rows)
+      expect(row.lastSequence).toBe(
+        events
+          .filter((event) => event.productId === row.productId)
+          .reduce((max, event) => (event.sequence > max ? event.sequence : max), 0n),
+      );
+    expect(
+      (
+        await resourceReleaseWatchesRepository.resumeBatch({
+          ...input,
+          auditId: `aud_resume_retry_${f.key}`,
+        })
+      ).changedCount,
+    ).toBe(0);
+    const history = await resourceReleaseWatchesRepository.history(f.buyer, {
+      page: 1,
+      days: 7,
+      source: "batch",
+    });
+    expect(history.total).toBe(2);
+    expect(history.items.some((item) => item.changes?.every((change) => change.enabled))).toBe(
+      true,
+    );
+    await resourceReleaseWorkerRepository.runBatch(100);
+    expect(
+      await db.select().from(notifications).where(eq(notifications.recipientId, f.buyer)),
+    ).toHaveLength(0);
+    expect(
+      await db
+        .select()
+        .from(selections)
+        .where(eq(selections.userId, f.buyer))
+        .orderBy(selections.productId),
+    ).toEqual(preferenceRows);
+  } finally {
+    await db.delete(auditEvents).where(eq(auditEvents.actorId, f.buyer));
+    await f.cleanup();
+  }
+});
+it("rolls group resumption back on required audit failure and rejects a selected resource after access loss", async () => {
+  const f = await batchFixture();
+  try {
+    const ids = f.ids.slice(0, 2);
+    await resourceReleaseWatchesRepository.enableCollectionBatch({
+      userId: f.buyer,
+      collectionId: f.collectionId,
+      auditId: `aud_resume_atomic_enable_${f.key}`,
+      command: {
+        expectedCollectionRevision: 3,
+        items: ids.map((productId) => ({ productId, expectedRevision: 0 })),
+      },
+    });
+    await resourceReleaseWatchesRepository.disableBatch({
+      userId: f.buyer,
+      auditId: `aud_resume_atomic_stop_${f.key}`,
+      command: { items: ids.map((productId) => ({ productId, expectedRevision: 1 })) },
+    });
+    const before = await db
+      .select()
+      .from(releaseWatches)
+      .where(eq(releaseWatches.userId, f.buyer))
+      .orderBy(releaseWatches.productId);
+    const input = {
+      userId: f.buyer,
+      auditId: `aud_resume_atomic_stop_${f.key}`,
+      command: { items: ids.map((productId) => ({ productId, expectedRevision: 2 })) },
+    };
+    await expect(resourceReleaseWatchesRepository.resumeBatch(input)).rejects.toThrow();
+    expect(
+      await db
+        .select()
+        .from(releaseWatches)
+        .where(eq(releaseWatches.userId, f.buyer))
+        .orderBy(releaseWatches.productId),
+    ).toEqual(before);
+    await db
+      .delete(entitlements)
+      .where(and(eq(entitlements.subjectId, f.buyer), eq(entitlements.resourceId, ids[0] ?? "")));
+    await expect(
+      resourceReleaseWatchesRepository.resumeBatch({
+        ...input,
+        auditId: `aud_resume_lost_${f.key}`,
+      }),
+    ).rejects.toMatchObject({ code: "RELEASE_WATCH_UNAVAILABLE" });
+    expect(
+      await db
+        .select()
+        .from(releaseWatches)
+        .where(eq(releaseWatches.userId, f.buyer))
+        .orderBy(releaseWatches.productId),
+    ).toEqual(before);
+  } finally {
+    await db.delete(auditEvents).where(eq(auditEvents.actorId, f.buyer));
+    await f.cleanup();
+  }
+});

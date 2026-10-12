@@ -1045,7 +1045,7 @@ export const auditEvents = pgTable("audit_events", {
 }, (table) => [
   index("audit_events_target_created_id_idx").on(table.targetType, table.targetId, table.createdAt.desc(), table.id.desc()),
   index("audit_events_release_watch_history_idx").on(table.actorId, table.createdAt.desc(), table.id.desc())
-    .where(sql`${table.actorType} = 'user' AND ${table.action} IN ('library.release_watch_changed','library.release_watches_disabled','library.collection_release_watches_enabled')`),
+    .where(sql`${table.actorType} = 'user' AND ${table.action} IN ('library.release_watch_changed','library.release_watches_disabled','library.release_watches_resumed','library.collection_release_watches_enabled')`),
   index("audit_events_library_selection_history_idx").on(table.actorId, table.createdAt.desc(), table.id.desc())
     .where(sql`${table.actorType} = 'user' AND ${table.targetType} = 'product' AND ${table.action} = 'library.release_selected'`),
   index("audit_events_download_activity_idx").on(table.targetId, table.createdAt.desc(), table.id.desc())

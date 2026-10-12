@@ -45,16 +45,20 @@ export async function readResourceReleaseWatchHistory(
         throw new AppError("Invalid history snapshot", 500, "RELEASE_WATCH_HISTORY_INVALID");
       const actions = {
         individual: "library.release_watch_changed",
-        batch: "library.release_watches_disabled",
+        batch: ["library.release_watches_disabled", "library.release_watches_resumed"],
         collection: "library.collection_release_watches_enabled",
       } as const;
       const scope = and(
         eq(auditEvents.actorId, userId),
-        sql`${auditEvents.actorType}='user' AND ${auditEvents.action} IN ('library.release_watch_changed','library.release_watches_disabled','library.collection_release_watches_enabled')`,
-        sql`((${auditEvents.action}='library.release_watch_changed' AND ${auditEvents.targetType}='product') OR (${auditEvents.action}='library.release_watches_disabled' AND ${auditEvents.targetType}='user' AND ${auditEvents.targetId}=${userId}) OR (${auditEvents.action}='library.collection_release_watches_enabled' AND ${auditEvents.targetType}='library_collection'))`,
+        sql`${auditEvents.actorType}='user' AND ${auditEvents.action} IN ('library.release_watch_changed','library.release_watches_disabled','library.release_watches_resumed','library.collection_release_watches_enabled')`,
+        sql`((${auditEvents.action}='library.release_watch_changed' AND ${auditEvents.targetType}='product') OR (${auditEvents.action} IN ('library.release_watches_disabled','library.release_watches_resumed') AND ${auditEvents.targetType}='user' AND ${auditEvents.targetId}=${userId}) OR (${auditEvents.action}='library.collection_release_watches_enabled' AND ${auditEvents.targetType}='library_collection'))`,
         gte(auditEvents.createdAt, sql`transaction_timestamp()-${query.days}*interval '1 day'`),
         lte(auditEvents.createdAt, sql`transaction_timestamp()`),
-        query.source !== "all" ? eq(auditEvents.action, actions[query.source]) : undefined,
+        query.source === "batch"
+          ? sql`${auditEvents.action} IN (${actions.batch[0]},${actions.batch[1]})`
+          : query.source !== "all"
+            ? eq(auditEvents.action, actions[query.source])
+            : undefined,
         query.productId
           ? sql`((${auditEvents.action}='library.release_watch_changed' AND ${auditEvents.targetId}=${query.productId}) OR (${auditEvents.action}<>'library.release_watch_changed' AND EXISTS(SELECT 1 FROM jsonb_array_elements(${safeItems}) entry WHERE entry->>'productId'=${query.productId})))`
           : undefined,

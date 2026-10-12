@@ -4,12 +4,14 @@ import {
   NotFoundError,
   RESOURCE_RELEASE_WATCH_LIMIT,
   type ResourceReleaseWatchEnableCommand,
+  type ResourceReleaseWatchResumeCommand,
   type ResourceReleaseWatchBatchResult,
   type ResourceReleaseWatchFilter,
 } from "@nexus/domain";
 import {
   libraryCollectionIdSchema,
   resourceReleaseWatchEnableCommandSchema,
+  resourceReleaseWatchResumeCommandSchema,
 } from "@nexus/validation";
 import { db } from "../client";
 import {
@@ -135,39 +137,76 @@ export async function readCollectionReleaseWatches(
     { isolationLevel: "repeatable read", accessMode: "read only" },
   );
 }
-export async function enableCollectionReleaseWatches(input: {
+type EnrollmentInput = { userId: string; auditId: string } & (
+  | { collectionId: string; command: ResourceReleaseWatchEnableCommand }
+  | { collectionId?: undefined; command: ResourceReleaseWatchResumeCommand }
+);
+export function enableCollectionReleaseWatches(input: {
   userId: string;
   collectionId: string;
   command: ResourceReleaseWatchEnableCommand;
   auditId: string;
-}): Promise<ResourceReleaseWatchBatchResult> {
-  const parsed = resourceReleaseWatchEnableCommandSchema.safeParse(input.command);
-  if (!parsed.success || !libraryCollectionIdSchema.safeParse(input.collectionId).success)
+}) {
+  return enrollReleaseWatches(input);
+}
+export function resumeResourceReleaseWatches(input: {
+  userId: string;
+  command: ResourceReleaseWatchResumeCommand;
+  auditId: string;
+}) {
+  if ("collectionId" in input)
+    throw new AppError("Unexpected collection scope", 400, "RELEASE_WATCH_INVALID");
+  return enrollReleaseWatches(input);
+}
+async function enrollReleaseWatches(
+  input: EnrollmentInput,
+): Promise<ResourceReleaseWatchBatchResult> {
+  const inCollection = input.collectionId !== undefined;
+  const parsed = inCollection
+    ? resourceReleaseWatchEnableCommandSchema.safeParse(input.command)
+    : resourceReleaseWatchResumeCommandSchema.safeParse(input.command);
+  if (
+    !parsed.success ||
+    (inCollection && !libraryCollectionIdSchema.safeParse(input.collectionId).success)
+  )
     throw new AppError("Invalid collection watch command", 400, "RELEASE_WATCH_INVALID");
   const command = parsed.data,
     ids = command.items.map((item) => item.productId);
   return db.transaction(async (tx) => {
     await tx.execute(sql`set local lock_timeout='5s'`);
     await tx.execute(sql`set local statement_timeout='10s'`);
-    await tx.execute(
-      sql`select pg_advisory_xact_lock(hashtext(${`library-collections:${input.userId}`}))`,
-    );
+    if (inCollection)
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtext(${`library-collections:${input.userId}`}))`,
+      );
     await tx.execute(
       sql`select pg_advisory_xact_lock(hashtextextended(${`resource-release-watch:${input.userId}`},0))`,
     );
-    const collection = await owner(tx, input.userId, input.collectionId, true);
-    if (
-      collection.status !== "active" ||
-      collection.revision !== command.expectedCollectionRevision
-    )
-      throw fail("RELEASE_WATCH_COLLECTION_CONFLICT");
-    const membership = await tx
-      .select({ productId: members.productId })
-      .from(members)
-      .where(and(eq(members.collectionId, collection.id), inArray(members.productId, ids)))
-      .orderBy(asc(members.productId))
-      .for("share");
-    if (membership.length !== ids.length) throw fail("RELEASE_WATCH_COLLECTION_CONFLICT");
+    let collection: Awaited<ReturnType<typeof owner>> | null = null;
+    if (input.collectionId !== undefined) {
+      collection = await owner(tx, input.userId, input.collectionId, true);
+      if (
+        collection.status !== "active" ||
+        !("expectedCollectionRevision" in command) ||
+        collection.revision !== command.expectedCollectionRevision
+      )
+        throw fail("RELEASE_WATCH_COLLECTION_CONFLICT");
+      const membership = await tx
+        .select({ productId: members.productId })
+        .from(members)
+        .where(and(eq(members.collectionId, collection.id), inArray(members.productId, ids)))
+        .orderBy(asc(members.productId))
+        .for("share");
+      if (membership.length !== ids.length) throw fail("RELEASE_WATCH_COLLECTION_CONFLICT");
+    } else {
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, input.userId))
+        .limit(1)
+        .for("share");
+      if (!actor) throw new NotFoundError("Library account");
+    }
     const productRows = await tx
       .select({ id: products.id, status: products.status })
       .from(products)
@@ -196,6 +235,7 @@ export async function enableCollectionReleaseWatches(input: {
       .where(and(eq(watches.userId, input.userId), inArray(watches.productId, ids)))
       .orderBy(asc(watches.productId))
       .for("no key update");
+    if (!inCollection && previous.length !== ids.length) throw fail();
     const previousById = new Map(previous.map((row) => [row.productId, row]));
     const matching = command.items.every((item) => {
       const row = previousById.get(item.productId);
@@ -275,11 +315,13 @@ export async function enableCollectionReleaseWatches(input: {
       id: input.auditId,
       actorId: input.userId,
       actorType: "user",
-      action: "library.collection_release_watches_enabled",
-      targetType: "library_collection",
-      targetId: collection.id,
+      action: collection
+        ? "library.collection_release_watches_enabled"
+        : "library.release_watches_resumed",
+      targetType: collection ? "library_collection" : "user",
+      targetId: collection?.id ?? input.userId,
       details: {
-        collectionRevision: collection.revision,
+        ...(collection ? { collectionRevision: collection.revision } : {}),
         items: items.map(({ productId, revision }) => ({ productId, revision })),
         changedCount: items.length,
       },

@@ -47,3 +47,5 @@ export const resourceReleaseWatchEnableCommandSchema = z
       ),
   })
   .strict();
+
+export const resourceReleaseWatchResumeCommandSchema = resourceReleaseWatchDisableCommandSchema;
