@@ -1,3 +1,4 @@
+import { libraryCollectionComparisonCopy } from "../lib/library-collection-comparison-i18n";
 import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { AppError } from "@nexus/domain";
@@ -415,6 +416,9 @@ export async function LibraryCollectionsScreen({
           </section>
         )}
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.title}>
+          <Link href={collectionHref(id, "compare")} className="text-accent underline">
+            {libraryCollectionComparisonCopy(locale).title}
+          </Link>
           {!adding && collection.status === "active" && (
             <Link href={collectionHref(id, "add")} className="text-accent underline">
               {c.candidates}

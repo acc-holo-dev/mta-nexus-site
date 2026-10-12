@@ -1,4 +1,8 @@
-import { LIBRARY_COLLECTION_BATCH_LIMIT, LIBRARY_COLLECTION_ITEM_LIMIT } from "@nexus/domain";
+import {
+  LIBRARY_COLLECTION_BATCH_LIMIT,
+  LIBRARY_COLLECTION_ITEM_LIMIT,
+  LIBRARY_COLLECTION_COMPARISON_FILTERS,
+} from "@nexus/domain";
 import { z } from "zod";
 
 const requestId = z
@@ -11,6 +15,27 @@ export const libraryCollectionIdSchema = z.string().regex(/^[A-Za-z0-9_-]{1,160}
 // biome-ignore lint/suspicious/noControlCharactersInRegex: Reject control characters in private labels.
 const safeName = /^[^\u0000-\u001f\u007f]*$/u;
 const name = z.string().trim().min(1).max(80).regex(safeName);
+export const libraryCollectionComparisonQuerySchema = z
+  .object({
+    to: libraryCollectionIdSchema.optional(),
+    page: z.number().int().min(1).max(9999),
+    filter: z.enum(LIBRARY_COLLECTION_COMPARISON_FILTERS),
+    q: z
+      .string()
+      .max(80)
+      .regex(safeName)
+      .transform((value) => value.trim()),
+    transfer: z.enum(["copy", "move"]),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (!value.to && (value.page !== 1 || value.filter !== "all" || value.q !== ""))
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Choose a destination before filtering",
+        path: ["to"],
+      });
+  });
 export const libraryCollectionSnapshotSchema = z
   .object({
     id: libraryCollectionIdSchema,

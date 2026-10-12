@@ -1,5 +1,13 @@
 # MTA NEXUS
 
+Own collections now have a private RU/EN comparison view with common/source-only/
+destination-only/unavailable filters and literal accessible-name search. Review twenty
+references per page, then copy or move selected source references using both collection
+revisions and existing immutable UUID commands. Archived sources remain copyable,
+read-only destinations stay inspectable, and unavailable/deleted references keep masked
+names. Comparison snapshots include bounded counts and own target choices, never file
+metadata or download rights. No new migration is required beyond existing collections.
+
 The private collection command center now inspects all own immutable receipts over
 7/30/90/365-day windows, with operation, participating collection and recorded resource
 filters and bounded JSON-page export. Historical results and current collection/resource

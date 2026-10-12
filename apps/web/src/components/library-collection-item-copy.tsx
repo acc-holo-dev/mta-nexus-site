@@ -15,17 +15,19 @@ export function LibraryCollectionItemCopyForm({
   destinations,
   locale,
   move = false,
+  initialDestinationId = "",
 }: {
   source: LibraryCollectionSnapshot;
   items: { productId: string; title: string | null }[];
   destinations: Destination[];
   locale: "en" | "ru";
   move?: boolean;
+  initialDestinationId?: string;
 }) {
   const c = libraryCollectionsCopy(locale),
     action = move ? "move-items" : "copy-items";
   const [ids, setIds] = useState<string[]>([]),
-    [destinationId, setDestinationId] = useState(""),
+    [destinationId, setDestinationId] = useState(initialDestinationId),
     [confirmed, setConfirmed] = useState(false),
     [busy, setBusy] = useState(false),
     [frozen, setFrozen] = useState(false),
@@ -35,34 +37,43 @@ export function LibraryCollectionItemCopyForm({
     [savedSourceId, setSavedSourceId] = useState(""),
     [error, setError] = useState("");
   const lock = useRef(false),
+    mounted = useRef(true),
     settled = useRef(false),
     active = useRef<AbortController | null>(null),
     pending = useRef<{
       command: CopyCommand;
-      destination: LibraryCollectionSnapshot;
+      destination: Destination;
+      source: LibraryCollectionSnapshot;
       url: string;
     } | null>(null);
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
       active.current?.abort();
       active.current = null;
-    },
-    [],
-  );
-  const destination = destinations.find((item) => item.id === destinationId);
+    };
+  }, []);
+  const destination =
+    pending.current?.destination ?? destinations.find((item) => item.id === destinationId);
+  const shownIds = pending.current?.command.productIds ?? ids;
   const additions = destination
-    ? ids.filter((id) => !destination.presentProductIds.includes(id)).length
+    ? shownIds.filter((id) => !destination.presentProductIds.includes(id)).length
     : 0;
   const overCapacity =
     !!destination && destination.itemCount + additions > LIBRARY_COLLECTION_ITEM_LIMIT;
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (lock.current || settled.current) return;
+    if (!mounted.current || lock.current || settled.current) return;
     let request = pending.current;
     if (!request) {
       if (
         !confirmed ||
         !destination ||
+        destination.id === source.id ||
+        destination.status !== "active" ||
+        destination.revision >= 2147483647 ||
+        ids.some((id) => !items.some((item) => item.productId === id)) ||
         overCapacity ||
         (move && (source.status !== "active" || source.revision >= 2147483647))
       )
@@ -90,6 +101,14 @@ export function LibraryCollectionItemCopyForm({
           name: destination.name,
           status: destination.status,
           revision: destination.revision,
+          itemCount: destination.itemCount,
+          presentProductIds: [...destination.presentProductIds],
+        },
+        source: {
+          id: source.id,
+          name: source.name,
+          status: source.status,
+          revision: source.revision,
         },
         url: `/api/library/collections/${encodeURIComponent(destination.id)}`,
       };
@@ -137,12 +156,20 @@ export function LibraryCollectionItemCopyForm({
   }
   if (!frozen && move && (source.status !== "active" || source.revision >= 2147483647))
     return <p role="note">{c.moveSourceUnavailable}</p>;
-  if (!destinations.length) return <p role="note">{c.noDestination}</p>;
-  if (!items.length) return <p>{c.emptyItems}</p>;
+  if (!destinations.length && !pending.current) return <p role="note">{c.noDestination}</p>;
+  if (!items.length && !pending.current) return <p>{c.emptyItems}</p>;
+  const shownMove = pending.current ? pending.current.command.action === "move-items" : move;
+  const shownItems = pending.current
+    ? pending.current.command.productIds.map(
+        (productId) =>
+          items.find((item) => item.productId === productId) ?? { productId, title: null },
+      )
+    : items;
+  const shownDestinations = pending.current ? [pending.current.destination] : destinations;
   return (
     <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
       <p role="note" className="text-sm text-secondary">
-        {move ? c.moveItemsNote : c.copyItemsNote}
+        {shownMove ? c.moveItemsNote : c.copyItemsNote}
       </p>
       <fieldset disabled={busy || frozen || saved} className="space-y-4">
         <legend>
@@ -151,8 +178,9 @@ export function LibraryCollectionItemCopyForm({
         <label className="grid gap-2">
           {c.destination}
           <select
-            value={destinationId}
+            value={pending.current?.destination.id ?? destinationId}
             onChange={(event) => {
+              if (pending.current || lock.current || settled.current) return;
               setDestinationId(event.target.value);
               setConfirmed(false);
             }}
@@ -160,7 +188,7 @@ export function LibraryCollectionItemCopyForm({
             required
           >
             <option value="">{c.destination}</option>
-            {destinations.map((item) => (
+            {shownDestinations.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.name} · {c.revision} {item.revision} · {item.itemCount} /{" "}
                 {LIBRARY_COLLECTION_ITEM_LIMIT}
@@ -169,7 +197,7 @@ export function LibraryCollectionItemCopyForm({
           </select>
         </label>
         <ul className="space-y-3">
-          {items.map((item) => (
+          {shownItems.map((item) => (
             <li key={item.productId}>
               <label className="flex items-start gap-3">
                 <input
@@ -179,6 +207,7 @@ export function LibraryCollectionItemCopyForm({
                     !ids.includes(item.productId) && ids.length >= LIBRARY_COLLECTION_BATCH_LIMIT
                   }
                   onChange={(event) => {
+                    if (pending.current || lock.current || settled.current) return;
                     const checked = event.target.checked;
                     setIds((previous) =>
                       checked
@@ -209,10 +238,13 @@ export function LibraryCollectionItemCopyForm({
           <input
             type="checkbox"
             checked={confirmed}
-            onChange={(event) => setConfirmed(event.target.checked)}
+            onChange={(event) => {
+              if (!pending.current && !lock.current && !settled.current)
+                setConfirmed(event.target.checked);
+            }}
             required
           />
-          {move ? c.moveItemsConfirm : c.copyItemsConfirm}
+          {shownMove ? c.moveItemsConfirm : c.copyItemsConfirm}
         </label>
       </fieldset>
       {!blocked && !saved && (
@@ -229,6 +261,10 @@ export function LibraryCollectionItemCopyForm({
       )}
       {frozen && !saved && (
         <div className="space-y-2">
+          <p className="break-words text-sm">
+            {c.source}: {pending.current?.source.name} · {c.revision}{" "}
+            {pending.current?.source.revision}
+          </p>
           <p role="note" className="text-sm text-muted">
             {c.frozen}
           </p>
@@ -250,7 +286,7 @@ export function LibraryCollectionItemCopyForm({
       {saved && (
         <div className="space-y-2">
           <p role="status">{c.saved}</p>
-          {move && (
+          {shownMove && (
             <a href={collectionHref(savedSourceId)} className="text-accent underline">
               {c.back}
             </a>

@@ -1,3 +1,4 @@
+import { GET as comparison } from "../apps/web/src/app/api/library/collections/[id]/compare/route";
 import { GET as accountHistory } from "../apps/web/src/app/api/library/collections/history/route";
 import { GET as historyExport } from "../apps/web/src/app/api/library/collections/history/export/route";
 import { AppError } from "@nexus/domain";
@@ -16,6 +17,7 @@ const state = vi.hoisted(() => ({
   releases: vi.fn(),
   resourceMemberships: vi.fn(),
   accountHistory: vi.fn(),
+  comparison: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
@@ -26,6 +28,7 @@ vi.mock("@nexus/security", () => ({
 }));
 vi.mock("@nexus/db", () => ({
   readLibraryCollectionHistory: state.accountHistory,
+  readLibraryCollectionComparison: state.comparison,
   libraryCollectionsRepository: {
     command: state.command,
     page: state.page,
@@ -454,4 +457,46 @@ it("rejects anonymous, spoofed, duplicate and throttled global history reads", a
   state.rate.mockResolvedValue({ success: false });
   expect((await accountHistory(request("/api/library/collections/history"))).status).toBe(429);
   expect(state.accountHistory).not.toHaveBeenCalled();
+});
+
+it("inspects only session-owned collection pairs with private bounded comparison selectors", async () => {
+  state.comparison.mockResolvedValue({ schemaVersion: 1, comparison: null });
+  const path = `${base}/lcol_a/compare`;
+  const response = await comparison(
+    request(`${path}?to=lcol_b&filter=source-only&page=2&q=100%25&transfer=move`),
+    context,
+  );
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(state.comparison).toHaveBeenCalledWith("usr_a", "lcol_a", {
+    to: "lcol_b",
+    filter: "source-only",
+    page: 2,
+    q: "100%",
+    transfer: "move",
+  });
+  expect(state.rate).toHaveBeenCalledWith("resourceInspection", "usr_a");
+  vi.clearAllMocks();
+  for (const query of [
+    "userId=other",
+    "to=lcol_b&to=lcol_c",
+    "filter=common",
+    "to=../private",
+    "to=lcol_b&pageSize=100",
+    "to=lcol_b&transfer=delete",
+  ])
+    expect((await comparison(request(`${path}?${query}`), context)).status).toBe(400);
+  expect(state.comparison).not.toHaveBeenCalled();
+  state.actor = null;
+  expect((await comparison(request(path), context)).status).toBe(401);
+  state.actor = { id: "usr_a", role: "user" };
+  state.rate.mockResolvedValue({ success: false });
+  expect((await comparison(request(path), context)).status).toBe(429);
+  expect(state.comparison).not.toHaveBeenCalled();
+});
+it("masks foreign destinations without returning their collection metadata", async () => {
+  state.comparison.mockRejectedValue(new AppError("Foreign private name", 404, "NOT_FOUND"));
+  const response = await comparison(request(`${base}/lcol_a/compare?to=lcol_foreign`), context);
+  expect(response.status).toBe(404);
+  expect(await response.json()).toEqual({ code: "NOT_FOUND" });
 });

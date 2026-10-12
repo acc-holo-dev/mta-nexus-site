@@ -1,7 +1,12 @@
-import { libraryCollectionsRepository, readLibraryCollectionHistory } from "@nexus/db";
+import {
+  libraryCollectionsRepository,
+  readLibraryCollectionHistory,
+  readLibraryCollectionComparison,
+} from "@nexus/db";
 import {
   AppError,
   type LibraryCollectionHistoryQuery,
+  type LibraryCollectionComparisonQuery,
   type LibraryReleaseFilter,
   type User,
 } from "@nexus/domain";
@@ -9,6 +14,8 @@ import { generateId } from "@nexus/security";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { collectionId } from "../library-collections-query";
 export const libraryCollectionsService = {
+  comparison: (actor: User, id: string, query: LibraryCollectionComparisonQuery) =>
+    readLibraryCollectionComparison(actor.id, collectionId(id), query),
   accountHistory: (actor: User, query: LibraryCollectionHistoryQuery) =>
     readLibraryCollectionHistory(actor.id, query),
   resourceMemberships: (actor: User, productId: string) =>

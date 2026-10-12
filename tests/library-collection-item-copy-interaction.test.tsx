@@ -59,6 +59,8 @@ const items = [
   { productId: "prd_b", title: "Second" },
   { productId: "prd_a", title: null },
 ];
+let entries = items;
+let initialDestinationId = "";
 let locale: "en" | "ru" = "en";
 let move = false;
 function firstDestination() {
@@ -68,7 +70,16 @@ function firstDestination() {
 }
 function render() {
   h.cursor = 0;
-  return nodes(LibraryCollectionItemCopyForm({ source, destinations, items, locale, move }));
+  return nodes(
+    LibraryCollectionItemCopyForm({
+      source,
+      destinations,
+      items: entries,
+      locale,
+      move,
+      initialDestinationId,
+    }),
+  );
 }
 function change(node: Element, value: unknown) {
   (node.props.onChange as (e: unknown) => void)({ target: value });
@@ -126,6 +137,8 @@ beforeEach(() => {
   h.cleanup = null;
   locale = "en";
   move = false;
+  entries = items;
+  initialDestinationId = "";
   source = { id: "lcol_source", name: "Archive", status: "archived", revision: 4 };
   destinations = [
     {
@@ -301,4 +314,48 @@ it("does not confirm a destination-only move acknowledgement", async () => {
   await submit();
   expect(render().some((n) => n.props.role === "status")).toBe(false);
   expect(render().some((n) => n.props.role === "alert")).toBe(true);
+});
+
+it("preselects a reviewed comparison destination while still requiring selection and acknowledgement", async () => {
+  initialDestinationId = "lcol_target";
+  expect(render().find((n) => n.type === "select")?.props.value).toBe("lcol_target");
+  await submit();
+  expect(h.fetch).not.toHaveBeenCalled();
+  check(0);
+  check(2);
+  h.fetch.mockImplementationOnce(async (_url: string, init: RequestInit) => success(init));
+  await submit();
+  expect(h.fetch).toHaveBeenCalledOnce();
+});
+it("retains selected IDs, source proof and destination after comparison props disappear", async () => {
+  reviewed();
+  h.fetch.mockRejectedValueOnce(new Error("lost"));
+  await submit();
+  const init = h.fetch.mock.calls[0]?.[1] as RequestInit;
+  source = { ...source, id: "lcol_other_source", name: "New source", revision: 99 };
+  destinations = [];
+  entries = [];
+  move = true;
+  const tree = render();
+  expect(tree.find((n) => n.type === "select")?.props.value).toBe("lcol_target");
+  expect(tree.filter((n) => n.type === "code").map((n) => n.props.children)).toEqual([
+    "prd_a",
+    "prd_b",
+  ]);
+  h.fetch.mockResolvedValueOnce(success(init));
+  await submit(tree);
+  expect(h.fetch.mock.calls[1]?.[1].body).toBe(init.body);
+  expect(render().some((n) => n.props.role === "status")).toBe(true);
+  expect(
+    render()
+      .filter((n) => n.type === "a")
+      .map((n) => n.props.href),
+  ).toEqual(["/workspace/library/collections/lcol_target"]);
+});
+it("does not restart an old comparison transfer handler after unmount", async () => {
+  reviewed();
+  const tree = render();
+  h.cleanup?.();
+  await submit(tree);
+  expect(h.fetch).not.toHaveBeenCalled();
 });

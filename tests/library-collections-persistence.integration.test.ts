@@ -789,3 +789,72 @@ it("reads whole owner commands by resource/window and retains their masked evide
   expect(history.items.every((item) => item.currentCollection?.revision === 3)).toBe(true);
   expect(history.items.every((item) => item.resources[0]?.currentTitle === null)).toBe(true);
 });
+
+it("compares archived own orphan sets and applies a reviewed missing-reference copy without new rights", async () => {
+  const { readLibraryCollectionComparison } = await import(
+    "../packages/db/src/repositories/library-collection-comparison"
+  );
+  const f = await copyFixture();
+  const ids = [0, 1, 2].map(() => `prd_compare_missing_${randomUUID().replaceAll("-", "")}`) as [
+    string,
+    string,
+    string,
+  ];
+  const target = await f.command({
+    requestId: randomUUID(),
+    action: "create",
+    name: "Comparison destination",
+  });
+  const targetId = target.receipt.collection.id;
+  await db.insert(libraryCollectionItems).values([
+    { collectionId: f.sourceId, productId: ids[0] },
+    { collectionId: f.sourceId, productId: ids[1] },
+    { collectionId: targetId, productId: ids[1] },
+    { collectionId: targetId, productId: ids[2] },
+  ]);
+  await f.command({ requestId: randomUUID(), action: "archive", expectedRevision: 1 }, f.sourceId);
+  const query = { to: targetId, page: 1, filter: "all" as const, q: "", transfer: "copy" as const };
+  const report = await readLibraryCollectionComparison(f.userId, f.sourceId, query);
+  if (!report.comparison) throw new Error("Missing comparison proof");
+  expect(report.comparison?.counts).toEqual({
+    all: 3,
+    sourceOnly: 1,
+    destinationOnly: 1,
+    common: 1,
+    unavailable: 3,
+  });
+  expect(report.comparison?.items.every((item) => item.title === null)).toBe(true);
+  await expect(readLibraryCollectionComparison(f.other, f.sourceId, query)).rejects.toMatchObject({
+    statusCode: 404,
+  });
+  const missing = await readLibraryCollectionComparison(f.userId, f.sourceId, {
+    ...query,
+    filter: "source-only",
+  });
+  if (!missing.comparison) throw new Error("Missing reference selection");
+  expect(missing.comparison.items.map((item) => item.productId)).toEqual([ids[0]]);
+  await f.command(
+    {
+      requestId: randomUUID(),
+      action: "copy-items",
+      sourceCollectionId: f.sourceId,
+      expectedSourceRevision: report.source.revision,
+      expectedRevision: report.comparison.destination.revision,
+      productIds: missing.comparison.items.map((item) => item.productId),
+    },
+    targetId,
+  );
+  const after = await readLibraryCollectionComparison(f.userId, f.sourceId, query);
+  expect(after.comparison?.counts).toMatchObject({
+    all: 3,
+    sourceOnly: 0,
+    destinationOnly: 1,
+    common: 2,
+  });
+  expect(after.source.revision).toBe(report.source.revision);
+  expect(after.comparison?.destination.revision).toBe(report.comparison.destination.revision + 1);
+  expect(
+    (await readLibraryCollectionComparison(f.userId, f.sourceId, { ...query, q: "missing" }))
+      .comparison?.total,
+  ).toBe(0);
+});

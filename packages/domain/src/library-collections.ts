@@ -62,6 +62,51 @@ export type LibraryCollectionReceipt = {
   createdAt: Date;
 };
 export type LibraryCollectionResult = { receipt: LibraryCollectionReceipt; replayed: boolean };
+export const LIBRARY_COLLECTION_COMPARISON_FILTERS = [
+  "all",
+  "source-only",
+  "destination-only",
+  "common",
+  "unavailable",
+] as const;
+export type LibraryCollectionComparisonQuery = {
+  to?: string;
+  page: number;
+  filter: (typeof LIBRARY_COLLECTION_COMPARISON_FILTERS)[number];
+  q: string;
+  transfer: "copy" | "move";
+};
+export type LibraryCollectionComparison = {
+  schemaVersion: 1;
+  generatedAt: string;
+  source: LibraryCollectionSnapshot & { itemCount: number };
+  targets: (LibraryCollectionSnapshot & { itemCount: number })[];
+  itemLimit: number;
+  comparison: null | {
+    destination: LibraryCollectionSnapshot & { itemCount: number };
+    counts: {
+      all: number;
+      sourceOnly: number;
+      destinationOnly: number;
+      common: number;
+      unavailable: number;
+    };
+    items: {
+      productId: string;
+      title: string | null;
+      available: boolean;
+      inSource: boolean;
+      inDestination: boolean;
+    }[];
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+    filter: LibraryCollectionComparisonQuery["filter"];
+    q: string;
+    transfer: LibraryCollectionComparisonQuery["transfer"];
+  };
+};
 export const LIBRARY_COLLECTION_HISTORY_ACTIONS = [
   "all",
   "create",

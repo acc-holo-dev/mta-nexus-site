@@ -3857,3 +3857,62 @@ The isolated Next webpack compile-mode build exits zero with all three new route
 Root TypeScript retains only the known fast-check/implicit-any and old missing isSigned
 delivery-fixture errors. Migration 0076, the new PostgreSQL fixture, live database/query
 plans, browser interaction and full production generation remain unrun.
+
+
+### 2026-10-12 — Private collection comparison and reviewed transfers
+
+The private GET `/api/library/collections/[id]/compare` and RU/EN dynamic SSR
+`/workspace/library/collections/[id]/compare` compare two own collection reference sets.
+Without a destination they show only an own source snapshot and bounded own target choices.
+With a distinct own destination they inspect the union, common/source-only/destination-only/
+unavailable references, literal accessible-name search and twenty references per page.
+Counts cover the complete pair while total/page rows reflect filter/search. Page/filter/
+search controls require a destination; all direct/API selectors are strict, duplicates,
+authority/page-size fields, controls and invalid IDs are rejected. Authentication and
+inspection rate limits precede reads, and JSON is private/no-store with Cookie variation.
+
+The reader requires a live user and uses one read-only repeatable-read transaction.
+A bounded thirty-one-row own collection query includes count/status/revision snapshots
+and fails closed above account/item bounds. Foreign/missing source or destination IDs
+return 404 before product/grant queries. Member union/grouping, counts and pagination stay
+in SQL over the two proven collection IDs; the union is capped by existing two-hundred-item
+collection guards. Current title projection requires effective own user entitlement or
+legacy-license expiry at transaction time, published resource status and a trusted clean
+published build. Unavailable/deleted references remain identified with hidden titles.
+Public projections exclude owner/grant/build/storage metadata and download controls.
+Generated time, both revisions, target counts and row membership share the same snapshot.
+Existing collection owner/member indexes suffice; no migration or write path is added.
+
+The SSR comparison table and counts expose both memberships. Copy/move review selects
+only source references on the current filtered page and preselects the proven destination;
+explicit item selection and acknowledgement remain required. Destination membership/count
+are passed to existing controls so common entries consume no extra capacity, while missing
+references do. Archived sources remain copyable; move requires an active writable source;
+archived/terminal destinations are inspectable without transfer controls. Applying reuses
+the existing UUID/revision/whole-command/audit/guarded transaction contract. It does not
+change download rights, saved versions or release watches. New own-collection links make
+comparison reachable from collection detail/add screens.
+
+The shared copy/move controller now keeps its original destination/count/membership,
+source proof, operation and selected IDs reviewable after props disappear or change.
+Frozen event handlers ignore selection edits and retries use the original endpoint/body;
+late responses remain ignored and stale handlers cannot start a request after unmount.
+Initial destination selection does not bypass review, distinct/active/writable destination
+checks, source membership, twenty-ID bounds or exact receipt acknowledgement.
+
+One PostgreSQL fixture covers archived own orphan sets, overlap/differences/masked search,
+foreign-account denial and applying a reviewed missing-reference copy with unchanged source
+revision and successor destination. It remains unrun without disposable PostgreSQL. Live
+SQL/locking/query plans, existing migrations, browser interaction, full production generation
+and Node 26 validation remain open. GitHub Actions are neither run nor inspected.
+
+Remote commits 907a445 and c580af9 (discussion notification recovery and retry worker)
+were imported exactly and fast-forwarded before applying this block, preserving the other
+session's work. Verification on the combined tree: 510 focused tests across 37 files pass,
+including both preserved discussion-recovery suites and collection comparison/copy/move/
+membership/history/version/preparation/release-watch flows. Biome lint passes on all 17
+touched TypeScript sources. Root TypeScript retains only the known fast-check/implicit-any
+and old missing isSigned delivery-fixture errors. Live PostgreSQL and browser remain unrun.
+Web TypeScript passes on the merged tree before and after generated routes. The isolated
+merged Next webpack compile-mode build exits zero with both comparison routes in its
+summary. Full production generation remains unrun.
