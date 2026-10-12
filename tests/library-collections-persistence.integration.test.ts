@@ -749,3 +749,43 @@ it("inspects draft memberships privately and retains removal after access loss a
     statusCode: 404,
   });
 });
+
+it("reads whole owner commands by resource/window and retains their masked evidence after removal", async () => {
+  const { readLibraryCollectionHistory } = await import(
+    "../packages/db/src/repositories/library-collection-history"
+  );
+  const f = await fixture();
+  const created = await f.command({
+    requestId: randomUUID(),
+    action: "create",
+    name: "History collection",
+  });
+  const id = created.receipt.collection.id;
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    id,
+  );
+  const query = {
+    page: 1,
+    days: 7 as const,
+    action: "all" as const,
+    collectionId: id,
+    productId: f.productId,
+  };
+  const first = await readLibraryCollectionHistory(f.userId, query);
+  expect(first.total).toBe(1);
+  expect(first.items[0]?.resources).toEqual([
+    { productId: f.productId, currentTitle: null, currentAvailable: false },
+  ]);
+  expect((await readLibraryCollectionHistory(f.other, query)).total).toBe(0);
+  await db.delete(entitlements).where(eq(entitlements.id, f.grantId));
+  await f.command(
+    { requestId: randomUUID(), action: "remove", productId: f.productId, expectedRevision: 2 },
+    id,
+  );
+  const history = await readLibraryCollectionHistory(f.userId, query);
+  expect(history.total).toBe(2);
+  expect(history.items.map((item) => item.receipt?.command.action)).toEqual(["remove", "add"]);
+  expect(history.items.every((item) => item.currentCollection?.revision === 3)).toBe(true);
+  expect(history.items.every((item) => item.resources[0]?.currentTitle === null)).toBe(true);
+});

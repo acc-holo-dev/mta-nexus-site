@@ -1,5 +1,13 @@
 # MTA NEXUS
 
+The private collection command center now inspects all own immutable receipts over
+7/30/90/365-day windows, with operation, participating collection and recorded resource
+filters and bounded JSON-page export. Historical results and current collection/resource
+state are displayed separately; unavailable resource titles are masked and unknown proof
+is neutral. Grouped add/remove freezes UUID, destination/revision and reviewed references
+across uncertain retries, requires reload after definitive errors and ignores late replies.
+Migration `0076_library_collection_account_history` adds the owner/time/id read index.
+
 Each acquired resource now has a private RU/EN collection-membership screen showing
 all own collections, counts and revisions. Add/remove uses existing UUID commands;
 known references remain removable after lost access or product deletion, with hidden

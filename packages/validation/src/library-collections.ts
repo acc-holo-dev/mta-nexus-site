@@ -11,6 +11,14 @@ export const libraryCollectionIdSchema = z.string().regex(/^[A-Za-z0-9_-]{1,160}
 // biome-ignore lint/suspicious/noControlCharactersInRegex: Reject control characters in private labels.
 const safeName = /^[^\u0000-\u001f\u007f]*$/u;
 const name = z.string().trim().min(1).max(80).regex(safeName);
+export const libraryCollectionSnapshotSchema = z
+  .object({
+    id: libraryCollectionIdSchema,
+    name: z.string().min(1).max(80).regex(safeName),
+    status: z.enum(["active", "archived"]),
+    revision: z.number().int().min(1).max(2_147_483_647),
+  })
+  .strict();
 const productIds = z
   .array(libraryCollectionIdSchema)
   .min(1)
@@ -72,3 +80,20 @@ export const libraryCollectionCommandSchema = z.discriminatedUnion("action", [
   z.object({ requestId, action: z.literal("add-many"), productIds, expectedRevision }).strict(),
   z.object({ requestId, action: z.literal("remove-many"), productIds, expectedRevision }).strict(),
 ]);
+
+export const libraryCollectionReceiptSchema = z
+  .object({
+    id: libraryCollectionIdSchema,
+    requestId: z.string().uuid(),
+    command: libraryCollectionCommandSchema,
+    collection: libraryCollectionSnapshotSchema,
+    sourceCollection: z
+      .object({
+        id: libraryCollectionIdSchema,
+        revision: z.number().int().min(1).max(2_147_483_647),
+      })
+      .strict()
+      .optional(),
+    createdAt: z.string().datetime(),
+  })
+  .strict();

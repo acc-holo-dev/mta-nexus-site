@@ -84,6 +84,7 @@ export * from "./plan-reviews";
 export * from "./resource-copies";
 export * from "./subscriptions";
 export * from "./library-collections";
+export { readLibraryCollectionHistory } from "./library-collection-history";
 export * from "./library-selection-batches";
 export * from "./profile-change-history";
 export { supportMessageDiscoveryRepository } from "./support-message-discovery";

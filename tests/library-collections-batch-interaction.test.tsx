@@ -5,9 +5,13 @@ const h = vi.hoisted(() => ({
   cursor: 0,
   fetch: vi.fn(),
   refresh: vi.fn(),
+  cleanup: null as (() => void) | null,
 }));
 vi.mock("react", async (original) => ({
   ...(await original<typeof import("react")>()),
+  useEffect: (effect: () => () => void) => {
+    h.cleanup ??= effect();
+  },
   useState: (initial: unknown) => {
     const i = h.cursor++;
     if (!(i in h.slots)) h.slots[i] = initial;
@@ -38,9 +42,15 @@ const collection = { id: "lcol_a", name: "Core", status: "active" as const, revi
     { productId: "prd_b", title: "Second", hasAccess: true },
     { productId: "prd_a", title: null, hasAccess: false },
   ];
-function render(action: "add-many" | "remove-many" = "remove-many", entries = items) {
+function render(
+  action: "add-many" | "remove-many" = "remove-many",
+  entries = items,
+  overrides: Partial<Parameters<typeof LibraryCollectionBatchForm>[0]> = {},
+) {
   h.cursor = 0;
-  return nodes(LibraryCollectionBatchForm({ locale: "en", collection, action, items: entries }));
+  return nodes(
+    LibraryCollectionBatchForm({ locale: "en", collection, action, items: entries, ...overrides }),
+  );
 }
 function check(
   index: number,
@@ -75,6 +85,7 @@ function success(command: unknown, snapshot = { ...collection, revision: 5 }) {
 beforeEach(() => {
   h.slots = [];
   h.cursor = 0;
+  h.cleanup = null;
   vi.clearAllMocks();
   vi.stubGlobal("fetch", h.fetch);
 });
@@ -159,4 +170,75 @@ it("caps selected references at twenty and permits deselecting a selected refere
   expect(render("remove-many", entries).filter((n) => n.type === "input")[20]?.props.disabled).toBe(
     false,
   );
+});
+
+it.each(["en", "ru"] as const)(
+  "freezes the group endpoint and proof across changing %s props",
+  async (locale) => {
+    check(1);
+    check(2);
+    h.fetch.mockRejectedValueOnce(new Error("lost"));
+    await submit(render("remove-many", items, { locale }));
+    const [url, init] = h.fetch.mock.calls[0] as [string, RequestInit];
+    h.fetch.mockResolvedValueOnce(success(JSON.parse(String(init.body))));
+    await submit(
+      render("add-many", [], {
+        locale,
+        collection: { ...collection, id: "lcol_other", revision: 9, status: "archived" },
+      }),
+    );
+    expect(h.fetch.mock.calls[1]?.[0]).toBe(url);
+    expect(h.fetch.mock.calls[1]?.[1].body).toBe(init.body);
+    expect(h.refresh).toHaveBeenCalledOnce();
+  },
+);
+it.each([400, 401, 403, 404, 409, 413, 415])(
+  "blocks stale batch handlers after definitive status %s",
+  async (status) => {
+    check(0);
+    check(2);
+    const tree = render();
+    h.fetch.mockResolvedValueOnce({
+      ok: false,
+      status,
+      json: async () => ({ code: "COLLECTION_CONFLICT" }),
+    });
+    await submit(tree);
+    await submit(tree);
+    expect(h.fetch).toHaveBeenCalledOnce();
+    expect(render().find((n) => n.type === "button")?.props.disabled).toBe(true);
+  },
+);
+it("ignores stale handlers after a confirmed batch", async () => {
+  check(0);
+  check(2);
+  const tree = render();
+  h.fetch.mockImplementationOnce(async (_url: string, init: RequestInit) =>
+    success(JSON.parse(String(init.body))),
+  );
+  await submit(tree);
+  await submit(tree);
+  expect(h.fetch).toHaveBeenCalledOnce();
+  expect(h.refresh).toHaveBeenCalledOnce();
+});
+it("aborts a batch on unmount and ignores its late confirmation", async () => {
+  check(0);
+  check(2);
+  let finish: (v: unknown) => void = () => {};
+  h.fetch.mockImplementationOnce(
+    () =>
+      new Promise((r) => {
+        finish = r;
+      }),
+  );
+  const tree = render(),
+    running = submit(tree),
+    init = h.fetch.mock.calls[0]?.[1] as RequestInit;
+  h.cleanup?.();
+  expect(init.signal?.aborted).toBe(true);
+  finish(success(JSON.parse(String(init.body))));
+  await running;
+  await submit(tree);
+  expect(h.refresh).not.toHaveBeenCalled();
+  expect(h.fetch).toHaveBeenCalledOnce();
 });

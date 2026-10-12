@@ -6,7 +6,7 @@ import {
 } from "@nexus/domain";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
@@ -25,61 +25,124 @@ export function LibraryCollectionBatchForm({
 }) {
   const c = libraryCollectionsCopy(locale),
     router = useRouter(),
-    pending = useRef<LibraryCollectionCommand | null>(null),
-    lock = useRef(false);
+    pending = useRef<{
+      command: Extract<LibraryCollectionCommand, { action: "add-many" | "remove-many" }>;
+      collection: LibraryCollectionSnapshot;
+      endpoint: string;
+    } | null>(null),
+    lock = useRef(false),
+    settled = useRef(false),
+    active = useRef(true),
+    controller = useRef<AbortController | null>(null);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+      controller.current?.abort();
+    };
+  }, []);
   const [ids, setIds] = useState<string[]>([]),
     [checked, setChecked] = useState(false),
     [busy, setBusy] = useState(false),
     [frozen, setFrozen] = useState(false),
     [saved, setSaved] = useState(false),
+    [blocked, setBlocked] = useState(false),
     [error, setError] = useState("");
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (lock.current || saved || collection.status !== "active") return;
-    if (!checked) {
+    if (
+      !active.current ||
+      lock.current ||
+      settled.current ||
+      (!pending.current && collection.status !== "active")
+    )
+      return;
+    if (!pending.current && !checked) {
       setError(c.invalid);
       return;
     }
     const parsed = libraryCollectionCommandSchema.safeParse(
-      pending.current ?? {
+      pending.current?.command ?? {
         requestId: crypto.randomUUID(),
         action,
         productIds: ids,
         expectedRevision: collection.revision,
       },
     );
-    if (!parsed.success) {
+    if (
+      !parsed.success ||
+      (parsed.data.action !== "add-many" && parsed.data.action !== "remove-many")
+    ) {
       setError(c.invalid);
       return;
     }
-    pending.current = parsed.data;
+    pending.current ??= {
+      command: parsed.data,
+      collection: {
+        id: collection.id,
+        name: collection.name,
+        status: collection.status,
+        revision: collection.revision,
+      },
+      endpoint: `/api/library/collections/${encodeURIComponent(collection.id)}`,
+    };
+    const attempt = pending.current,
+      abort = new AbortController();
+    controller.current = abort;
     lock.current = true;
     setBusy(true);
     setFrozen(true);
     setError("");
     try {
       const response = await fetch(
-        `/api/library/collections/${encodeURIComponent(collection.id)}`,
-        privateApiRequest({ method: "POST", json: parsed.data, timeoutMs: 30000 }),
+        attempt.endpoint,
+        privateApiRequest({
+          method: "POST",
+          json: attempt.command,
+          timeoutMs: 30000,
+          signal: abort.signal,
+        }),
       );
       const body = await response.json().catch(() => null);
-      if (!response.ok || !confirmedCollectionCommand(body, parsed.data, collection)) {
+      if (!active.current || abort.signal.aborted) return;
+      if (!response.ok || !confirmedCollectionCommand(body, attempt.command, attempt.collection)) {
+        if ([400, 401, 403, 404, 409, 413, 415].includes(response.status)) {
+          settled.current = true;
+          setBlocked(true);
+        }
         setError(libraryCollectionError(locale, body?.code));
         return;
       }
+      settled.current = true;
       setSaved(true);
       router.refresh();
     } catch {
-      setError(c.retry);
+      if (active.current && !abort.signal.aborted) setError(c.retry);
     } finally {
       lock.current = false;
-      setBusy(false);
+      if (active.current && !abort.signal.aborted) setBusy(false);
+      if (controller.current === abort) controller.current = null;
     }
   }
-  if (!items.length) return null;
+  if (!items.length && !pending.current) return null;
+  const shownAction = pending.current?.command.action ?? action;
+  const shownCollection = pending.current?.collection ?? collection;
+  const shownItems = pending.current
+    ? pending.current.command.productIds.map(
+        (productId) =>
+          items.find((item) => item.productId === productId) ?? {
+            productId,
+            title: null,
+            hasAccess: false,
+          },
+      )
+    : items;
   return (
     <form onSubmit={submit} className="nexus-panel space-y-4 p-5">
-      <h2 className="font-semibold">{c[action]}</h2>
+      <h2 className="font-semibold">{c[shownAction]}</h2>
+      <p className="break-words text-sm">
+        {c.destination}: {shownCollection.name} · {c.revision} {shownCollection.revision}
+      </p>
       <p className="text-sm text-secondary">{c.batchLimit}</p>
       <fieldset
         disabled={busy || frozen || saved || collection.status !== "active"}
@@ -89,17 +152,18 @@ export function LibraryCollectionBatchForm({
           {c.selected}: {ids.length} / {LIBRARY_COLLECTION_BATCH_LIMIT}
         </legend>
         <ul className="space-y-2">
-          {items.map((item) => (
+          {shownItems.map((item) => (
             <li key={item.productId}>
               <label className="flex items-start gap-2 break-words">
                 <input
                   type="checkbox"
                   checked={ids.includes(item.productId)}
                   disabled={
-                    (action === "add-many" && !item.hasAccess) ||
+                    (shownAction === "add-many" && !item.hasAccess) ||
                     (!ids.includes(item.productId) && ids.length >= LIBRARY_COLLECTION_BATCH_LIMIT)
                   }
                   onChange={(e) => {
+                    if (pending.current || lock.current || settled.current) return;
                     const selected = e.target.checked;
                     setIds((previous) =>
                       selected
@@ -124,7 +188,10 @@ export function LibraryCollectionBatchForm({
           <input
             type="checkbox"
             checked={checked}
-            onChange={(e) => setChecked(e.target.checked)}
+            onChange={(e) => {
+              if (!pending.current && !lock.current && !settled.current)
+                setChecked(e.target.checked);
+            }}
             required
           />
           {c.batchConfirm}
@@ -132,10 +199,23 @@ export function LibraryCollectionBatchForm({
       </fieldset>
       <button
         type="submit"
-        disabled={busy || saved || !checked || !ids.length || collection.status !== "active"}
+        disabled={
+          busy ||
+          saved ||
+          blocked ||
+          (!pending.current && (!checked || !ids.length || collection.status !== "active"))
+        }
         className="rounded border border-base px-3 py-2 text-sm text-accent disabled:opacity-60"
       >
-        {busy ? c.busy : saved ? c.saved : frozen ? c.retryAction : c[action]}
+        {busy
+          ? c.busy
+          : saved
+            ? c.saved
+            : blocked
+              ? c.reload
+              : frozen
+                ? c.retryAction
+                : c[shownAction]}
       </button>
       {frozen && !saved && (
         <p role="note" className="text-xs text-muted">
@@ -147,7 +227,10 @@ export function LibraryCollectionBatchForm({
           <p role="alert" className="text-sm text-warning">
             {error}
           </p>
-          <a href={collectionHref(collection.id)} className="text-sm text-accent underline">
+          <a
+            href={collectionHref(pending.current?.collection.id ?? collection.id)}
+            className="text-sm text-accent underline"
+          >
             {c.reload}
           </a>
         </div>

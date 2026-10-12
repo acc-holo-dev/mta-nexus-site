@@ -1,9 +1,16 @@
-import { libraryCollectionsRepository } from "@nexus/db";
-import { AppError, type LibraryReleaseFilter, type User } from "@nexus/domain";
+import { libraryCollectionsRepository, readLibraryCollectionHistory } from "@nexus/db";
+import {
+  AppError,
+  type LibraryCollectionHistoryQuery,
+  type LibraryReleaseFilter,
+  type User,
+} from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { libraryCollectionCommandSchema } from "@nexus/validation";
 import { collectionId } from "../library-collections-query";
 export const libraryCollectionsService = {
+  accountHistory: (actor: User, query: LibraryCollectionHistoryQuery) =>
+    readLibraryCollectionHistory(actor.id, query),
   resourceMemberships: (actor: User, productId: string) =>
     libraryCollectionsRepository.resourceMemberships(actor.id, collectionId(productId)),
   page: (actor: User, query: { page: number; status: "all" | "active" | "archived" }) =>

@@ -62,3 +62,45 @@ export type LibraryCollectionReceipt = {
   createdAt: Date;
 };
 export type LibraryCollectionResult = { receipt: LibraryCollectionReceipt; replayed: boolean };
+export const LIBRARY_COLLECTION_HISTORY_ACTIONS = [
+  "all",
+  "create",
+  "duplicate",
+  "rename",
+  "archive",
+  "restore",
+  "add",
+  "remove",
+  "add-many",
+  "remove-many",
+  "copy-items",
+  "move-items",
+] as const;
+export const LIBRARY_COLLECTION_HISTORY_DAYS = [7, 30, 90, 365] as const;
+export type LibraryCollectionHistoryQuery = {
+  page: number;
+  days: (typeof LIBRARY_COLLECTION_HISTORY_DAYS)[number];
+  action: (typeof LIBRARY_COLLECTION_HISTORY_ACTIONS)[number];
+  collectionId?: string;
+  productId?: string;
+};
+export type LibraryCollectionHistoryPage = {
+  schemaVersion: 1;
+  generatedAt: string;
+  days: LibraryCollectionHistoryQuery["days"];
+  action: LibraryCollectionHistoryQuery["action"];
+  collectionId: string | null;
+  productId: string | null;
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  items: {
+    id: string;
+    createdAt: string;
+    receipt: LibraryCollectionReceipt | null;
+    currentCollection: LibraryCollectionSnapshot | null;
+    currentSource: LibraryCollectionSnapshot | null;
+    resources: { productId: string; currentTitle: string | null; currentAvailable: boolean }[];
+  }[];
+};

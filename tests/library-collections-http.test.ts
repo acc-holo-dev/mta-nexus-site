@@ -1,3 +1,5 @@
+import { GET as accountHistory } from "../apps/web/src/app/api/library/collections/history/route";
+import { GET as historyExport } from "../apps/web/src/app/api/library/collections/history/export/route";
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -13,6 +15,7 @@ const state = vi.hoisted(() => ({
   copyItemsPage: vi.fn(),
   releases: vi.fn(),
   resourceMemberships: vi.fn(),
+  accountHistory: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
@@ -22,6 +25,7 @@ vi.mock("@nexus/security", () => ({
   generateId: (prefix: string) => `${prefix}_a`,
 }));
 vi.mock("@nexus/db", () => ({
+  readLibraryCollectionHistory: state.accountHistory,
   libraryCollectionsRepository: {
     command: state.command,
     page: state.page,
@@ -408,4 +412,46 @@ it("masks unowned resource failures and rejects malformed resource ids before re
   });
   expect(response.status).toBe(404);
   expect(await response.json()).toEqual({ code: "NOT_FOUND" });
+});
+
+it("serves session-scoped whole collection commands and a bounded private attachment", async () => {
+  const path =
+    "/api/library/collections/history?days=90&action=move-items&productId=prd_a&collectionId=lcol_source&page=2";
+  state.accountHistory.mockResolvedValue({ items: [], schemaVersion: 1 });
+  const response = await accountHistory(request(path));
+  expect(response.status).toBe(200);
+  expect(state.accountHistory).toHaveBeenCalledWith("usr_a", {
+    days: 90,
+    action: "move-items",
+    productId: "prd_a",
+    collectionId: "lcol_source",
+    page: 2,
+  });
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(state.rate).toHaveBeenCalledWith("resourceInspection", "usr_a");
+  const exportResponse = await historyExport(request("/api/library/collections/history/export"));
+  expect(exportResponse.headers.get("content-disposition")).toContain(
+    "collection-command-history.json",
+  );
+  expect(exportResponse.headers.get("x-content-type-options")).toBe("nosniff");
+  expect(exportResponse.headers.get("vary")).toBe("Cookie");
+  state.accountHistory.mockResolvedValue({ text: "ж".repeat(270000) });
+  expect((await historyExport(request("/api/library/collections/history/export"))).status).toBe(
+    413,
+  );
+});
+it("rejects anonymous, spoofed, duplicate and throttled global history reads", async () => {
+  state.actor = null;
+  expect((await accountHistory(request("/api/library/collections/history"))).status).toBe(401);
+  expect((await historyExport(request("/api/library/collections/history/export"))).status).toBe(
+    401,
+  );
+  state.actor = { id: "usr_a", role: "user" };
+  for (const q of ["userId=other", "page=1&page=2", "productId=../private", "days=1000"])
+    expect((await accountHistory(request(`/api/library/collections/history?${q}`))).status).toBe(
+      400,
+    );
+  state.rate.mockResolvedValue({ success: false });
+  expect((await accountHistory(request("/api/library/collections/history"))).status).toBe(429);
+  expect(state.accountHistory).not.toHaveBeenCalled();
 });

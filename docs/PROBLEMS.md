@@ -3798,3 +3798,62 @@ routes. The isolated Next webpack compile-mode build exits zero with both new ro
 in its summary. Root TypeScript retains only the known fast-check/implicit-any and
 old missing isSigned delivery-fixture errors. The new PostgreSQL fixture, live
 migrations/database behavior, browser and full production generation remain unrun.
+
+
+### 2026-10-12 — Account collection command history and grouped retry safety
+
+The private `/api/library/collections/history` and attachment `/history/export`, with
+RU/EN SSR `/workspace/library/collections/history`, read the account's own immutable
+collection receipts. Strict filters accept only page (1–9999), 7/30/90/365 days, known
+operation kinds and optional collection/resource IDs. Collection filters match recorded
+destinations or full-copy/selected-copy/move sources; resource filters match explicit
+single IDs or JSON-array containment and return whole operations. A full collection
+copy records count/digest rather than its resource IDs, so it cannot match resource
+filters. The UI explains that distinction. No replay or write control exists in history.
+
+The repository validates direct inputs, requires a live user and uses read-only
+repeatable read with database transaction time, an inclusive bounded historical window
+and deterministic created_at/id order. Counts/page reads always include receipt user_id;
+current collection lookups additionally require the same owner. Each page selects twenty
+bounded receipts, looks up at most forty own collection IDs and at most four hundred
+recorded resource IDs in two bounded queries. Current resource labels require effective
+user entitlement/legacy-license expiry, publication and a trusted clean published build.
+Lost access/deletion preserves recorded resource IDs with hidden titles. Stored snapshots
+and source successors remain recorded evidence; current names/status/revisions are
+separate projections and do not replace history. Unknown/malformed receipt shapes,
+UUID/route mismatches or contradictory successor evidence produce a neutral entry with
+no payload or metadata lookups. Shared strict snapshot/receipt validation now also
+protects existing single/copy/move acknowledgement paths.
+
+Every HTTP read authenticates and rate-limits before repository access, rejects duplicate
+or authority/page-size selectors, and returns private/no-store with Cookie variation.
+JSON attachment encoding is capped at 512 KiB, uses a fixed safe filename and nosniff.
+Links from collection lists, per-collection histories and per-resource memberships preserve
+recorded IDs in filters. Migration 0076 adds (user_id, created_at DESC, id DESC), matching
+the global chronological scope without rewriting receipts or existing source indexes.
+Live query plans/migration behavior have not been evaluated.
+
+Grouped collection add/remove now freezes UUID/canonical body/destination endpoint and
+collection proof across retries. A frozen command remains reviewable by its original
+operation, collection revision and resource IDs even if page props change or entries
+disappear. Definitive 400/401/403/404/409/413/415 errors require reload; ambiguous responses
+retain the identical retry. A settled ref suppresses stale duplicate submissions and an
+unmount abort/late-response guard prevents refresh after leaving. Frozen selection handlers
+ignore changes. Existing archive restrictions, explicit batch acknowledgement, twenty-ID
+limit, whole-command receipts and server access/revision/expiry checks remain in force.
+
+One PostgreSQL fixture covers global resource/window filtering, whole receipt history,
+foreign-account emptiness, lost-access masking and immutable results alongside current
+successor revisions after removal. It remains unrun without disposable PostgreSQL; live
+migrations/locking/query plans, browser interaction, full production generation and Node
+26 validation remain open. GitHub Actions are neither run nor inspected.
+
+Verification: 454 focused tests across 32 files pass, including strict query/receipt
+contracts, owner/snapshot/whole-operation repository behavior, private HTTP/export
+limits, RU/EN rendering and grouped retry/unmount cases, plus preserved collection
+copy/move/membership/version/preparation/release-watch flows. Biome lint passes on all
+21 touched TypeScript sources. Web TypeScript passes before and after generated routes.
+The isolated Next webpack compile-mode build exits zero with all three new routes.
+Root TypeScript retains only the known fast-check/implicit-any and old missing isSigned
+delivery-fixture errors. Migration 0076, the new PostgreSQL fixture, live database/query
+plans, browser interaction and full production generation remain unrun.

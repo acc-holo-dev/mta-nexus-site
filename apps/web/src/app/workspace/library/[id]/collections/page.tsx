@@ -1,3 +1,4 @@
+import { libraryCollectionHistoryCopy } from "../../../../../lib/library-collection-history-i18n";
 import { AppError } from "@nexus/domain";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -68,6 +69,12 @@ export default async function ResourceCollectionsPage({
           )}
         </nav>
         <h1 className="font-display text-primary">{c.resourceCollections}</h1>
+        <Link
+          href={`/workspace/library/collections/history?${new URLSearchParams({ productId: id })}`}
+          className="text-accent underline"
+        >
+          {libraryCollectionHistoryCopy(locale).title}
+        </Link>
         <h2 className="break-words text-xl">
           {result.resource.available ? (result.resource.title ?? c.unavailable) : c.unavailable}
         </h2>

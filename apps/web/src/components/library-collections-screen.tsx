@@ -1,3 +1,4 @@
+import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
@@ -92,6 +93,9 @@ export async function LibraryCollectionsScreen({
             {c.library}
           </Link>
           <h1 className="font-display text-primary">{c.title}</h1>
+          <Link href="/workspace/library/collections/history" className="text-accent underline">
+            {libraryCollectionHistoryCopy(locale).title}
+          </Link>
           <p className="text-sm text-secondary">{c.subtitle}</p>
           <p role="note" className="text-sm text-muted">
             {c.limit}
@@ -247,6 +251,12 @@ export async function LibraryCollectionsScreen({
           <h1 className="font-display text-primary">
             {c.history}: {result.collection.name}
           </h1>
+          <Link
+            href={`/workspace/library/collections/history?${new URLSearchParams({ collectionId: id })}`}
+            className="text-accent underline"
+          >
+            {libraryCollectionHistoryCopy(locale).title}
+          </Link>
           <ol className="space-y-4">
             {result.items.map((item) => (
               <li key={item.id} className="nexus-panel space-y-2 p-4">

@@ -1,35 +1,9 @@
 import type { LibraryCollectionCommand, LibraryCollectionSnapshot } from "@nexus/domain";
-import { libraryCollectionCommandSchema, libraryCollectionIdSchema } from "@nexus/validation";
+import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { z } from "zod";
 
-const snapshot = z
-  .object({
-    id: libraryCollectionIdSchema,
-    name: z.string().min(1).max(80),
-    status: z.enum(["active", "archived"]),
-    revision: z.number().int().positive(),
-  })
-  .strict();
 const result = z
-  .object({
-    replayed: z.boolean(),
-    receipt: z
-      .object({
-        id: libraryCollectionIdSchema,
-        requestId: z.string().uuid(),
-        command: libraryCollectionCommandSchema,
-        collection: snapshot,
-        sourceCollection: z
-          .object({
-            id: libraryCollectionIdSchema,
-            revision: z.number().int().min(1).max(2147483647),
-          })
-          .strict()
-          .optional(),
-        createdAt: z.string().datetime(),
-      })
-      .strict(),
-  })
+  .object({ replayed: z.boolean(), receipt: libraryCollectionReceiptSchema })
   .strict();
 export function confirmedCollectionCommand(
   body: unknown,
