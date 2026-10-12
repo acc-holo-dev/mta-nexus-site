@@ -16,6 +16,7 @@ import {
 } from "../lib/library-collections-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService as service } from "../lib/services/library-collections-service";
+import { LibraryCollectionItemCopyForm } from "./library-collection-item-copy";
 import { LibraryCollectionBatchForm } from "./library-collection-batch";
 import { LibraryCollectionCommandForm } from "./library-collection-command";
 import { ResourceDownloadButton } from "./resource-download-button";
@@ -55,7 +56,7 @@ export async function LibraryCollectionsScreen({
   searchParams,
   params,
 }: {
-  view?: "list" | "detail" | "add" | "history" | "copy";
+  view?: "list" | "detail" | "add" | "history" | "copy" | "copy-items";
   searchParams: Promise<Query>;
   params?: Promise<{ id: string }>;
 }) {
@@ -143,6 +144,62 @@ export async function LibraryCollectionsScreen({
       );
     }
     const id = collectionId(path?.id ?? "");
+    if (view === "copy-items") {
+      const result = await service.copyItemsPage(actor, id, query);
+      return (
+        <div className="mx-auto max-w-4xl space-y-6 py-8">
+          <Link href={collectionHref(id)} className="text-accent underline">
+            {c.back}
+          </Link>
+          <h1 className="font-display">{c["copy-items"]}</h1>
+          <p className="break-words">
+            {c.source}: {result.source.name} · {c[result.source.status]} · {c.revision}{" "}
+            {result.source.revision}
+          </p>
+          <form method="get" className="flex flex-wrap items-end gap-3">
+            <label className="grid gap-1">
+              {c.search}
+              <input
+                name="q"
+                defaultValue={result.q}
+                maxLength={80}
+                className="rounded border border-base bg-inset px-3 py-2"
+              />
+            </label>
+            <button type="submit" className="rounded border border-base px-4 py-2">
+              {c.apply}
+            </button>
+          </form>
+          <LibraryCollectionItemCopyForm
+            key={JSON.stringify([
+              result.source,
+              result.items.map((item) => item.productId),
+              result.destinations,
+            ])}
+            locale={locale}
+            source={result.source}
+            items={result.items}
+            destinations={result.destinations}
+          />
+          <Pagination
+            bounds={result}
+            locale={locale}
+            href={(page) =>
+              collectionHref(id, "copy-items", {
+                page: String(page),
+                ...(result.q ? { q: result.q } : {}),
+              })
+            }
+          />
+          <a
+            href={`/api/library/collections/${encodeURIComponent(id)}/copy-items?${new URLSearchParams({ page: String(result.page), ...(result.q ? { q: result.q } : {}) })}`}
+            className="text-accent underline"
+          >
+            {c.json}
+          </a>
+        </div>
+      );
+    }
     if (view === "copy") {
       const preview = await service.copyPreview(actor, id);
       return (
@@ -201,6 +258,12 @@ export async function LibraryCollectionsScreen({
                   <p className="break-all text-sm">
                     {c.source}: {item.command.sourceCollectionId} · {c.revision}:{" "}
                     {item.command.expectedRevision} · {c.items}: {item.command.expectedItemCount}
+                  </p>
+                )}
+                {item.command.action === "copy-items" && (
+                  <p className="break-all text-sm">
+                    {c.source}: {item.command.sourceCollectionId} · {c.revision}:{" "}
+                    {item.command.expectedSourceRevision}
                   </p>
                 )}
                 {"productIds" in item.command && (
@@ -336,6 +399,9 @@ export async function LibraryCollectionsScreen({
           )}
           <Link href={collectionHref(id, "copy")} className="text-accent underline">
             {c.duplicate}
+          </Link>
+          <Link href={collectionHref(id, "copy-items")} className="text-accent underline">
+            {c["copy-items"]}
           </Link>
           <Link href={collectionHref(id, "history")} className="text-accent underline">
             {c.history}

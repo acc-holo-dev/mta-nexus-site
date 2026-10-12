@@ -26,6 +26,8 @@ export const libraryCollectionsService = {
       query.filter,
       query.q,
     ),
+  copyItemsPage: (actor: User, id: string, query: { page: number; q: string }) =>
+    libraryCollectionsRepository.copyItemsPage(actor.id, collectionId(id), query.page, query.q),
   copyPreview: (actor: User, id: string) =>
     libraryCollectionsRepository.copyPreview(actor.id, collectionId(id)),
   history: (actor: User, id: string, page: number) =>

@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   history: vi.fn(),
   copyPreview: vi.fn(),
+  copyItemsPage: vi.fn(),
   releases: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
@@ -26,12 +27,14 @@ vi.mock("@nexus/db", () => ({
     detail: state.detail,
     history: state.history,
     copyPreview: state.copyPreview,
+    copyItemsPage: state.copyItemsPage,
     releases: state.releases,
   },
 }));
 
 import { GET as releases } from "../apps/web/src/app/api/library/collections/[id]/releases/route";
 import { GET as releasesExport } from "../apps/web/src/app/api/library/collections/[id]/releases/export/route";
+import { GET as copyItemsPage } from "../apps/web/src/app/api/library/collections/[id]/copy-items/route";
 import { GET as copyPreview } from "../apps/web/src/app/api/library/collections/[id]/copy/route";
 import { GET as candidates } from "../apps/web/src/app/api/library/collections/[id]/candidates/route";
 import { GET as history } from "../apps/web/src/app/api/library/collections/[id]/history/route";
@@ -283,4 +286,38 @@ it("rejects unauthenticated, spoofed and over-rate release inspections before re
   state.rate.mockResolvedValue({ success: false });
   expect((await releases(request(path), context)).status).toBe(429);
   expect(state.releases).not.toHaveBeenCalled();
+});
+
+it("serves only session-bound private selected-copy pages and rejects arbitrary source selectors", async () => {
+  state.copyItemsPage.mockResolvedValue({ items: [], destinations: [] });
+  const response = await copyItemsPage(request(`${base}/lcol_a/copy-items?page=2&q=Core`), context);
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe("Cookie");
+  expect(state.copyItemsPage).toHaveBeenCalledWith("usr_a", "lcol_a", 2, "Core");
+  expect(
+    (await copyItemsPage(request(`${base}/lcol_a/copy-items?userId=other`), context)).status,
+  ).toBe(400);
+  state.actor = null;
+  expect((await copyItemsPage(request(`${base}/lcol_a/copy-items`), context)).status).toBe(401);
+});
+it("binds selected-reference copies to the destination route and validates source proof fields", async () => {
+  const body = {
+    requestId,
+    action: "copy-items",
+    sourceCollectionId: "lcol_source",
+    expectedSourceRevision: 4,
+    productIds: ["prd_a"],
+    expectedRevision: 1,
+  };
+  expect((await command(post(body, `${base}/lcol_a`), context)).status).toBe(200);
+  expect(state.command).toHaveBeenCalledWith(
+    expect.objectContaining({ userId: "usr_a", collectionId: "lcol_a", command: body }),
+  );
+  for (const bad of [
+    { ...body, userId: "other" },
+    { ...body, expectedSourceRevision: 0 },
+    { ...body, sourceCollectionId: "../private" },
+  ])
+    expect((await command(post(bad, `${base}/lcol_a`), context)).status).toBe(400);
 });

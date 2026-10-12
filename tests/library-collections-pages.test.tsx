@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
   detail: vi.fn(),
   history: vi.fn(),
   copyPreview: vi.fn(),
+  copyItemsPage: vi.fn(),
 }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => ({ value: "session" }) }) }));
 vi.mock("next/navigation", () => ({
@@ -37,6 +38,7 @@ vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
     detail: state.detail,
     history: state.history,
     copyPreview: state.copyPreview,
+    copyItemsPage: state.copyItemsPage,
   },
 }));
 vi.mock("../apps/web/src/components/library-collection-command", () => ({
@@ -73,7 +75,7 @@ const date = new Date("2026-10-11T00:00:00Z"),
   },
   bounds = { page: 1, totalPages: 2, total: 21, pageSize: 20, offset: 0 };
 const screen = async (
-  view: "list" | "detail" | "add" | "history" | "copy" = "list",
+  view: "list" | "detail" | "add" | "history" | "copy" | "copy-items" = "list",
   values: Record<string, string | undefined> = {},
 ) =>
   renderToStaticMarkup(
@@ -280,3 +282,35 @@ it("shows immutable copy provenance without loading the current source or resour
   expect(state.copyPreview).not.toHaveBeenCalled();
   expect(state.detail).not.toHaveBeenCalled();
 });
+
+it.each(["en", "ru"] as const)(
+  "renders selected-reference copy with source provenance and hidden resource IDs in %s",
+  async (locale) => {
+    state.locale = locale;
+    state.copyItemsPage.mockResolvedValue({
+      ...bounds,
+      q: "Core",
+      source: { ...collection, status: "archived" },
+      items: [{ productId: "prd_hidden", title: null }],
+      destinations: [
+        {
+          id: "lcol_target",
+          name: "Target <name>",
+          status: "active",
+          revision: 2,
+          itemCount: 199,
+          presentProductIds: [],
+        },
+      ],
+    });
+    const html = await screen("copy-items", { page: "2", q: "Core" });
+    expect(html).toContain(
+      locale === "en" ? "Copy selected references" : "Скопировать выбранные записи",
+    );
+    expect(html).toContain("prd_hidden");
+    expect(html).toContain("Target &lt;name&gt;");
+    expect(html).toContain("q=Core");
+    expect(html).not.toContain("data-download");
+    expect(html).not.toContain("data-build");
+  },
+);

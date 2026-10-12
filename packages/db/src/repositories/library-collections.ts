@@ -12,7 +12,7 @@ import {
   NotFoundError,
 } from "@nexus/domain";
 import { libraryCollectionCommandSchema, libraryCollectionIdSchema } from "@nexus/validation";
-import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
@@ -112,11 +112,11 @@ function resourceRows(userId: string, collectionId: string, candidates: boolean)
         LEFT JOIN ${members} member ON member.collection_id=${collectionId} AND member.product_id=owned.resource_id`
     : sql`FROM ${members} member LEFT JOIN owned ON owned.resource_id=member.product_id
         LEFT JOIN ${products} product ON product.id=member.product_id`;
-  return sql`${effectiveUserDownloadSources(userId, new Date())}, resource_rows AS (
+  return sql`${effectiveUserDownloadSources(userId, sql`transaction_timestamp()`)}, resource_rows AS (
     SELECT ${candidates ? sql`owned.resource_id` : sql`member.product_id`} AS "productId",
       ${candidates ? sql`owned.added_at` : sql`member.added_at`} AS "addedAt",
       owned.resource_id IS NOT NULL AS "hasAccess", member.product_id IS NOT NULL AS "inCollection",
-      CASE WHEN owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL THEN product.title END AS title,
+      CASE WHEN owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL THEN left(product.title,200) END AS title,
       CASE WHEN owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL THEN product.slug END AS slug,
       CASE WHEN owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL
         THEN CASE WHEN pref.mode='fixed' THEN selected.version ELSE latest.version END END AS version,
@@ -146,6 +146,50 @@ export type LibraryCollectionItem = {
   hasAccess: boolean;
   inCollection: boolean;
 };
+function validateItemQuery(id: string, page: number, q: string) {
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: Reject controls in private collection search.
+  const controls = typeof q === "string" && /[\u0000-\u001f\u007f]/u.test(q);
+  if (
+    !libraryCollectionIdSchema.safeParse(id).success ||
+    !Number.isInteger(page) ||
+    page < 1 ||
+    page > 9999 ||
+    typeof q !== "string" ||
+    q.length > 80 ||
+    controls
+  )
+    throw new AppError("Invalid collection items", 400, "COLLECTION_INVALID");
+}
+async function readCollectionItems(
+  tx: ResourceTransaction,
+  userId: string,
+  id: string,
+  page: number,
+  q: string,
+  candidates: boolean,
+) {
+  await liveUser(tx, userId);
+  const collection = await owned(tx, userId, id);
+  if (candidates && collection.status !== "active") throw fail("COLLECTION_ARCHIVED");
+  const sources = resourceRows(userId, id, candidates),
+    search = q ? sql`WHERE title ILIKE ${containsPattern(q)}` : sql``;
+  const [summary] = await tx.execute<{ total: number; ready: number }>(sql`${sources}
+        SELECT count(*)::integer AS total, count(*) FILTER(WHERE downloadable)::integer AS ready FROM resource_rows ${search}`);
+  const bounds = historyPageBounds(Number(summary?.total ?? 0), page);
+  const items = await tx.execute<LibraryCollectionItem>(sql`${sources}
+        SELECT "productId","addedAt",title,slug,version,"buildId",downloadable,"hasAccess","inCollection"
+        FROM resource_rows ${search} ORDER BY "addedAt" DESC,"productId" ASC LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}`);
+  return {
+    collection,
+    items,
+    ...bounds,
+    ready: Number(summary?.ready ?? 0),
+    q,
+    candidates,
+    itemLimit: LIBRARY_COLLECTION_ITEM_LIMIT,
+  };
+}
+
 export class LibraryCollectionsRepository {
   async page(userId: string, page = 1, status: "all" | "active" | "archived" = "active") {
     return db.transaction(async (tx) => {
@@ -170,26 +214,76 @@ export class LibraryCollectionsRepository {
     }, readOptions);
   }
   async detail(userId: string, id: string, page = 1, q = "", candidates = false) {
+    validateItemQuery(id, page, q);
+    return db.transaction(
+      (tx) => readCollectionItems(tx, userId, id, page, q.trim(), candidates),
+      readOptions,
+    );
+  }
+  async copyItemsPage(userId: string, id: string, page = 1, q = "") {
+    validateItemQuery(id, page, q);
     return db.transaction(async (tx) => {
-      await liveUser(tx, userId);
-      const collection = await owned(tx, userId, id);
-      if (candidates && collection.status !== "active") throw fail("COLLECTION_ARCHIVED");
-      const sources = resourceRows(userId, id, candidates),
-        search = q ? sql`WHERE title ILIKE ${containsPattern(q)}` : sql``;
-      const [summary] = await tx.execute<{ total: number; ready: number }>(sql`${sources}
-        SELECT count(*)::integer AS total, count(*) FILTER(WHERE downloadable)::integer AS ready FROM resource_rows ${search}`);
-      const bounds = historyPageBounds(Number(summary?.total ?? 0), page);
-      const items = await tx.execute<LibraryCollectionItem>(sql`${sources}
-        SELECT "productId","addedAt",title,slug,version,"buildId",downloadable,"hasAccess","inCollection"
-        FROM resource_rows ${search} ORDER BY "addedAt" DESC,"productId" ASC LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}`);
+      const result = await readCollectionItems(tx, userId, id, page, q.trim(), false);
+      const targets = await tx
+        .select({
+          ...fields,
+          itemCount: sql<number>`(select count(*)::integer from ${members} where ${members.collectionId}=${collections.id})`,
+        })
+        .from(collections)
+        .where(
+          and(
+            eq(collections.userId, userId),
+            eq(collections.status, "active"),
+            sql`${collections.revision}<2147483647`,
+            ne(collections.id, id),
+          ),
+        )
+        .orderBy(asc(collections.name), asc(collections.id))
+        .limit(LIBRARY_COLLECTION_LIMIT + 1);
+      if (targets.length > LIBRARY_COLLECTION_LIMIT) throw fail("COLLECTION_LIMIT");
+      const existing =
+        targets.length && result.items.length
+          ? await tx
+              .select({ collectionId: members.collectionId, productId: members.productId })
+              .from(members)
+              .where(
+                and(
+                  inArray(
+                    members.collectionId,
+                    targets.map((item) => item.id),
+                  ),
+                  inArray(
+                    members.productId,
+                    result.items.map((item) => item.productId),
+                  ),
+                ),
+              )
+          : [];
+      const snapshot = (row: LibraryCollectionSnapshot): LibraryCollectionSnapshot => ({
+        id: row.id,
+        name: row.name,
+        status: row.status,
+        revision: row.revision,
+      });
       return {
-        collection,
-        items,
-        ...bounds,
-        ready: Number(summary?.ready ?? 0),
-        q,
-        candidates,
-        itemLimit: LIBRARY_COLLECTION_ITEM_LIMIT,
+        source: snapshot(result.collection),
+        items: result.items.map((item) => ({
+          productId: item.productId,
+          title: item.hasAccess ? item.title : null,
+        })),
+        destinations: targets.map((item) => ({
+          ...snapshot(item),
+          itemCount: item.itemCount,
+          presentProductIds: existing
+            .filter((ref) => ref.collectionId === item.id)
+            .map((ref) => ref.productId)
+            .sort(),
+        })),
+        page: result.page,
+        pageSize: result.pageSize,
+        total: result.total,
+        totalPages: result.totalPages,
+        q: result.q,
       };
     }, readOptions);
   }
@@ -346,7 +440,45 @@ export class LibraryCollectionsRepository {
           command.action === "restore" ? current.status !== "archived" : current.status !== "active"
         )
           throw fail("COLLECTION_ARCHIVED");
-        if (command.action === "add-many") {
+        if (command.action === "copy-items") {
+          if (command.sourceCollectionId === current.id) throw fail("COLLECTION_CONFLICT");
+          const source = await owned(tx, input.userId, command.sourceCollectionId, true);
+          if (source.revision !== command.expectedSourceRevision) throw fail("COLLECTION_CONFLICT");
+          // Copy owned historical references, including deleted resources; no product/grant authority is consulted.
+          const selected = await tx
+            .select({ productId: members.productId })
+            .from(members)
+            .where(
+              and(
+                eq(members.collectionId, source.id),
+                inArray(members.productId, command.productIds),
+              ),
+            )
+            .orderBy(asc(members.productId))
+            .for("share");
+          if (selected.length !== command.productIds.length) throw fail("COLLECTION_CONFLICT");
+          const present = await tx
+            .select({ productId: members.productId })
+            .from(members)
+            .where(
+              and(
+                eq(members.collectionId, current.id),
+                inArray(members.productId, command.productIds),
+              ),
+            );
+          const presentIds = new Set(present.map((item) => item.productId)),
+            missing = command.productIds.filter((id) => !presentIds.has(id));
+          const [total] = await tx
+            .select({ total: count() })
+            .from(members)
+            .where(eq(members.collectionId, current.id));
+          if ((total?.total ?? 0) + missing.length > LIBRARY_COLLECTION_ITEM_LIMIT)
+            throw fail("COLLECTION_ITEM_LIMIT");
+          if (missing.length)
+            await tx
+              .insert(members)
+              .values(missing.map((productId) => ({ collectionId: current.id, productId })));
+        } else if (command.action === "add-many") {
           // Lock resources and grants in canonical order. Do not write a partial batch.
           const accessTerms: { productId: string; expiresAt: Date | null }[] = [];
           for (const productId of command.productIds) {
@@ -456,8 +588,15 @@ export class LibraryCollectionsRepository {
             revision: current.revision + 1,
             updatedAt: sql`greatest(clock_timestamp(),${collections.updatedAt})`,
           })
-          .where(and(eq(collections.id, current.id), eq(collections.userId, input.userId)))
+          .where(
+            and(
+              eq(collections.id, current.id),
+              eq(collections.userId, input.userId),
+              eq(collections.revision, current.revision),
+            ),
+          )
           .returning(fields);
+        if (!updated) throw fail("COLLECTION_CONFLICT");
         collection = updated;
       }
       const [record] = await tx
@@ -488,6 +627,12 @@ export class LibraryCollectionsRepository {
           requestId: command.requestId,
           receiptId: record.id,
           revision: collection.revision,
+          ...(command.action === "copy-items"
+            ? {
+                sourceCollectionId: command.sourceCollectionId,
+                sourceRevision: command.expectedSourceRevision,
+              }
+            : {}),
           ...(command.action === "add" || command.action === "remove"
             ? { productId: command.productId }
             : "productIds" in command

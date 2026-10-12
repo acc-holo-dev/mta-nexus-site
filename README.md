@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+Collections now support reviewed copying of up to twenty selected references into
+another existing active collection, including unavailable/deleted references and
+archived sources. Both revisions and exact source membership are checked; existing
+destination entries are retained, with immutable UUID receipts and atomic audits.
+Migration `0074_library_collection_item_copies` extends database receipt guards.
+
 The release-watch center supports reviewed group resumption of up to twenty existing
 stopped watches with current access/safe-publication/revision/quota checks. It skips
 already approved releases, preserves saved version choices and notices, and records

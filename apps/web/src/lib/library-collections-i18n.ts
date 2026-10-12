@@ -6,6 +6,14 @@ const en = {
   name: "Collection name",
   create: "Create collection",
   duplicate: "Copy collection",
+  "copy-items": "Copy selected references",
+  copyItemsNote:
+    "Copy up to 20 references to another active collection. The source may be archived. Unavailable references keep their IDs and hidden titles. Existing destination references are kept once; download rights, saved versions and release watches are unchanged.",
+  destination: "Destination collection",
+  noDestination: "Create or restore another collection before copying selected references.",
+  copyItemsConfirm: "I confirm the source and destination revisions and the selected references.",
+  additions: "New references to add",
+  openDestination: "Open destination collection",
   copyNote:
     "Create an independent active collection with every reference from this revision, including unavailable resources. Version preferences and download rights are shared through your library and are not copied or changed.",
   copyConfirm: "I confirm the source revision and the full collection contents shown above.",
@@ -78,6 +86,14 @@ const ru: typeof en = {
   name: "Название коллекции",
   create: "Создать коллекцию",
   duplicate: "Скопировать коллекцию",
+  "copy-items": "Скопировать выбранные записи",
+  copyItemsNote:
+    "Скопируйте до 20 записей в другую активную коллекцию. Источник может быть в архиве. У недоступных ресурсов сохраняются ID и скрытые названия. Имеющиеся записи назначения не дублируются; права на скачивание, выбор версий и подписки на выпуски сохраняются.",
+  destination: "Коллекция назначения",
+  noDestination: "Создайте или восстановите другую коллекцию для копирования выбранных записей.",
+  copyItemsConfirm: "Подтверждаю редакции источника и назначения и выбранные записи.",
+  additions: "Новых записей для добавления",
+  openDestination: "Открыть коллекцию назначения",
   copyNote:
     "Создайте отдельную активную коллекцию со всеми записями этой редакции, включая недоступные ресурсы. Выбор версий и права на скачивание действуют во всей библиотеке и при копировании не изменяются.",
   copyConfirm: "Подтверждаю редакцию источника и полный состав коллекции, указанный выше.",

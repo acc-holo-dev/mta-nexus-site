@@ -519,6 +519,13 @@
       "when": 1791766800000,
       "tag": "0073_release_watch_resume_history",
       "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1791768600000,
+      "tag": "0074_library_collection_item_copies",
+      "breakpoints": true
     }
   ]
 }

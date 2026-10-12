@@ -3651,3 +3651,53 @@ Knip retains its three upstream unused exports and additionally flags Agent A's
 shared disable/resume command-schema export alias as a duplicate. That commercial
 validation contract is preserved. The proposed community target index remains
 unintegrated; PostgreSQL/browser/production-generation validation remains open.
+
+
+## Selected reference copying between existing collections (2026-10-12)
+
+Own collection detail/add screens now link to a dedicated RU/EN selected-copy screen.
+A shared read-only repeatable-read item reader uses database snapshot time and bounded
+current title projection. The copy page reads twenty source references, at most thirty
+other active/writable own destinations and one bounded membership lookup (at most 600
+pairs) to show genuinely missing additions against destination capacity. Archived source
+collections and unavailable/deleted resource references are supported. Unavailable titles
+remain masked; no build evidence, storage identifiers or download controls are returned.
+Read query validation rejects unbounded pages, oversized/control-character searches and
+arbitrary account/scope selectors. The private API retains session/rate/no-store/Cookie
+transport, and source search/pagination remain consistent in the same database snapshot.
+
+The new strict copy-items command includes a UUID, source ID/revision, destination revision
+and canonically sorted unique IDs (one to twenty); the route fixes the destination and
+session fixes the owner. All existing command actions remain valid. Apply takes the shared
+owner advisory lock, locks both owned collections and exact source memberships, checks the
+active destination/revisions/history quota and capacity for missing references only, then
+inserts those missing entries without touching existing dates. Destination revision, an
+immutable receipt and required source-provenance audit commit together. The source remains
+unchanged. No products/grants/files, saved versions, watches or commercial states are changed.
+Exact UUID replays return the original receipt after later source/destination changes;
+reusing a request with different proof or a different destination remains a conflict.
+
+The client reviews destination, IDs, overlap count and both revisions before submission.
+It freezes the UUID/body/endpoint/acknowledgement snapshot for uncertain retries, blocks
+definitive errors until reload, coalesces duplicate handlers, aborts on unmount and ignores
+late responses. Receipt confirmation checks the full canonical source proof and exact
+resulting destination state. Existing history renders recorded source ID/revision and
+reference IDs, without looking up foreign/current source titles. Generic single-command
+controls exclude the dedicated copy-items flow.
+
+Migration 0074 replaces the receipt guard while preserving all earlier action checks and
+immutability. It validates exact selected-copy shape, an own distinct source revision,
+unique bounded IDs, and membership of every reference in both source and destination.
+Two PostgreSQL fixtures cover orphaned-reference copying from archives, deduplication/date
+preservation/concurrent replay and unchanged source/access, plus audit rollback and forged
+receipt proof rejection. They remain unrun without a disposable PostgreSQL instance.
+Live migration/locking/index plans, browser interaction, full production generation and
+Node 26 validation remain open. GitHub Actions are neither run nor inspected.
+
+Verification: 356 focused tests across 29 files pass, covering collection commands,
+copying/retries, selected versions, release overview/preparation/watches and the preserved
+community-report grouping/batch-notice slice. Biome lint passes on all 16 touched
+TypeScript sources. Web TypeScript passes after regenerated routes. The isolated Next
+webpack compile-mode build exits zero with its route summary. Root TypeScript retains
+only the known fast-check/implicit-any and old missing isSigned delivery-fixture errors.
+Live PostgreSQL fixtures/migration, browser and full production generation remain unrun.

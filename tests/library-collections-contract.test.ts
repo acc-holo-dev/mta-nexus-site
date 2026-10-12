@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
 import { confirmedCollectionCommand } from "../apps/web/src/lib/library-collections-confirmation";
 import {
@@ -278,4 +279,50 @@ it("permits an empty copy and a source at the terminal integer revision", () => 
       name: "Empty",
     }).success,
   ).toBe(true);
+});
+
+it("normalizes selected copy commands and verifies exact source proof in destination acknowledgements", () => {
+  const command = libraryCollectionCommandSchema.parse({
+    requestId,
+    action: "copy-items",
+    sourceCollectionId: "lcol_source",
+    expectedSourceRevision: 7,
+    productIds: ["prd_b", "prd_a"],
+    expectedRevision: 4,
+  });
+  expect("productIds" in command && command.productIds).toEqual(["prd_a", "prd_b"]);
+  const body = {
+    replayed: false,
+    receipt: {
+      id: "lcr_a",
+      requestId,
+      command,
+      collection: { ...current, revision: 5 },
+      createdAt: "2026-10-12T00:00:00.000Z",
+    },
+  };
+  expect(confirmedCollectionCommand(body, command, current)).toBe("lcol_a");
+  expect(
+    confirmedCollectionCommand(
+      { ...body, receipt: { ...body.receipt, command: { ...command, expectedSourceRevision: 8 } } },
+      command,
+      current,
+    ),
+  ).toBeNull();
+  const migration = readFileSync(
+    "packages/db/migrations/0074_library_collection_item_copies.sql",
+    "utf8",
+  );
+  expect(migration).toContain("action='copy-items'");
+  expect(migration).toContain("source.revision");
+  expect(migration).toContain("collection_id=source.id AND product_id=");
+  expect(migration).toContain("user_id=NEW.user_id");
+  expect(migration).toContain("receipts are immutable");
+  expect(migration).toContain("BETWEEN 1 AND 20");
+  const journal = JSON.parse(readFileSync("packages/db/migrations/meta/_journal.json", "utf8"));
+  expect(
+    journal.entries.filter(
+      (entry: { tag: string }) => entry.tag === "0074_library_collection_item_copies",
+    ),
+  ).toHaveLength(1);
 });

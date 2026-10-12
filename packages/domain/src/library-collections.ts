@@ -23,6 +23,13 @@ export type LibraryCollectionCommand = { requestId: string } & (
   | { action: "rename"; name: string; expectedRevision: number }
   | { action: "archive" | "restore"; expectedRevision: number }
   | { action: "add" | "remove"; productId: string; expectedRevision: number }
+  | {
+      action: "copy-items";
+      sourceCollectionId: string;
+      expectedSourceRevision: number;
+      productIds: string[];
+      expectedRevision: number;
+    }
   | { action: "add-many" | "remove-many"; productIds: string[]; expectedRevision: number }
 );
 export type LibraryCollectionCopyPreview = {

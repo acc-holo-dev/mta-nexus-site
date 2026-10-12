@@ -483,3 +483,110 @@ it("ownership and database content guards reject a foreign source and a partial-
     }),
   ).rejects.toThrow();
 });
+
+// Selected-copy acceptance requires disposable PostgreSQL migrated through 0074.
+it("copies selected orphaned references from an archived source once while preserving existing destination dates", async () => {
+  const f = await copyFixture();
+  const ids: [string,string] = [
+    `prd_copy_missing_${randomUUID().replaceAll("-", "")}`,
+    `prd_copy_missing_${randomUUID().replaceAll("-", "")}`,
+  ];
+  await db
+    .insert(libraryCollectionItems)
+    .values(ids.map((productId) => ({ collectionId: f.sourceId, productId })));
+  await f.command({ requestId: randomUUID(), action: "archive", expectedRevision: 1 }, f.sourceId);
+  const target = await f.command({ requestId: randomUUID(), action: "create", name: "Target" });
+  const targetId = target.receipt.collection.id;
+  await db.insert(libraryCollectionItems).values({ collectionId: targetId, productId: ids[0] });
+  const [existing] = await db
+    .select()
+    .from(libraryCollectionItems)
+    .where(eq(libraryCollectionItems.collectionId, targetId));
+  await db.delete(entitlements).where(eq(entitlements.subjectId, f.userId));
+  const sourceBefore = await collections.detail(f.userId, f.sourceId);
+  const body = {
+    requestId: randomUUID(),
+    action: "copy-items" as const,
+    sourceCollectionId: f.sourceId,
+    expectedSourceRevision: 2,
+    productIds: ids,
+    expectedRevision: 1,
+  };
+  const results = await Promise.all([
+    f.command(body, targetId),
+    f.command(body, targetId),
+    f.command(body, targetId),
+  ]);
+  expect(results.filter((item) => !item.replayed)).toHaveLength(1);
+  expect(new Set(results.map((item) => item.receipt.id)).size).toBe(1);
+  const after = await db
+    .select()
+    .from(libraryCollectionItems)
+    .where(eq(libraryCollectionItems.collectionId, targetId));
+  expect(after).toHaveLength(2);
+  expect(after.find((item) => item.productId === ids[0])?.addedAt).toEqual(existing?.addedAt);
+  expect(await collections.detail(f.userId, f.sourceId)).toEqual(sourceBefore);
+  expect(
+    await db.select().from(entitlements).where(eq(entitlements.subjectId, f.userId)),
+  ).toHaveLength(0);
+  const page = await collections.copyItemsPage(f.userId, f.sourceId);
+  expect(page.items.every((item) => item.title === null)).toBe(true);
+  await f.command({ requestId: randomUUID(), action: "restore", expectedRevision: 2 }, f.sourceId);
+  await f.command(
+    { requestId: randomUUID(), action: "remove-many", expectedRevision: 3, productIds: ids },
+    f.sourceId,
+  );
+  expect((await f.command(body, targetId)).replayed).toBe(true);
+});
+it("rolls selected copying back on audit failure and rejects receipt proof for a reference outside the source", async () => {
+  const f = await copyFixture();
+  const productId = `prd_copy_missing_${randomUUID().replaceAll("-", "")}`;
+  await db.insert(libraryCollectionItems).values({ collectionId: f.sourceId, productId });
+  const duplicateAudit = `aud_copy_atomic_${randomUUID()}`;
+  const target = await f.command(
+    { requestId: randomUUID(), action: "create", name: "Atomic target" },
+    undefined,
+    duplicateAudit,
+  );
+  const id = target.receipt.collection.id;
+  const body = {
+    requestId: randomUUID(),
+    action: "copy-items" as const,
+    sourceCollectionId: f.sourceId,
+    expectedSourceRevision: 1,
+    productIds: [productId],
+    expectedRevision: 1,
+  };
+  await expect(f.command(body, id, duplicateAudit)).rejects.toThrow();
+  expect((await collections.detail(f.userId, id)).collection.revision).toBe(1);
+  expect(
+    await db
+      .select()
+      .from(libraryCollectionItems)
+      .where(eq(libraryCollectionItems.collectionId, id)),
+  ).toHaveLength(0);
+  expect(
+    await db
+      .select()
+      .from(libraryCollectionReceipts)
+      .where(eq(libraryCollectionReceipts.requestId, body.requestId)),
+  ).toHaveLength(0);
+  await expect(f.command({ ...body, productIds: [f.productId] }, id)).rejects.toMatchObject({
+    code: "COLLECTION_CONFLICT",
+  });
+  await db.update(libraryCollections).set({ revision: 2 }).where(eq(libraryCollections.id, id));
+  await db.insert(libraryCollectionItems).values({ collectionId: id, productId: f.productId });
+  await expect(
+    db
+      .insert(libraryCollectionReceipts)
+      .values({
+        id: `lcr_${randomUUID().replaceAll("-", "")}`,
+        userId: f.userId,
+        requestId: body.requestId,
+        collectionId: id,
+        commandDigest: "a".repeat(64),
+        command: { ...body, productIds: [f.productId] },
+        snapshot: { id, name: "Atomic target", status: "active", revision: 2 },
+      }),
+  ).rejects.toThrow();
+});
