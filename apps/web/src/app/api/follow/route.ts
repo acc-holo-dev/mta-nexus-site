@@ -1,19 +1,19 @@
-import { after, type NextRequest } from "next/server";
-import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { followWorkspaceRepository, socialRepository } from "@nexus/db";
+import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit, generateId } from "@nexus/security";
-import { authService } from "../../../lib/services/auth-service";
-import { userPlatformApi } from "../../../lib/user-platform-api";
+import { after, type NextRequest } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
 import { followCommandSchema } from "../../../lib/follow-workspace-contract";
 import { followError } from "../../../lib/follow-workspace-copy";
 import { resolveLocale } from "../../../lib/i18n";
-import { readBoundedJson, requireServerJsonContentType } from "../../../lib/bounded-json";
-import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
+import { authService } from "../../../lib/services/auth-service";
+import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
+import { userPlatformApi } from "../../../lib/user-platform-api";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 export async function GET(request: NextRequest) {
@@ -33,7 +33,11 @@ export async function GET(request: NextRequest) {
       throw new AppError("Invalid follow target", 400, "VALIDATION_ERROR");
     const actor = await authService.getSession(request.cookies.get("nexus_session")?.value);
     const following = actor
-      ? await socialRepository.isFollowing(actor.id, parsed.data.targetType, parsed.data.targetId)
+      ? parsed.data.targetType === "content"
+        ? (
+            await followWorkspaceRepository.states(actor.id, "content", [parsed.data.targetId])
+          ).includes(parsed.data.targetId)
+        : await socialRepository.isFollowing(actor.id, parsed.data.targetType, parsed.data.targetId)
       : false;
     return jsonWithRequestId(
       context,

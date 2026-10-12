@@ -1,6 +1,7 @@
+import type { Content } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import type { Content } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),
   directory: vi.fn(),
@@ -22,14 +23,16 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
 vi.mock("../apps/web/src/components/product-card", () => ({ ProductCard: () => null }));
 vi.mock("../apps/web/src/components/server-card", () => ({ ServerCard: () => null }));
 vi.mock("../apps/web/src/components/article-card", () => ({ ArticleCard: () => null }));
+
 import { DirectoryFilters, DirectoryResults } from "../apps/web/src/components/discovery-directory";
-import { FollowWorkspace } from "../apps/web/src/components/follow-workspace";
 import { FollowButton } from "../apps/web/src/components/follow-button";
+import { FollowWorkspace } from "../apps/web/src/components/follow-workspace";
 import { LocaleProvider } from "../apps/web/src/components/locale-context";
 import { parseDiscoverQuery } from "../apps/web/src/lib/discover-query";
 import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
-import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
 import type { FollowPage } from "../apps/web/src/lib/follow-workspace-contract";
+import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
+
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.viewer.mockResolvedValue(null);
@@ -248,3 +251,55 @@ it.each([
   expect(html).toContain(`>${label}</div>`);
   expect(html).not.toContain(`>${type}</div>`);
 });
+it.each(["en", "ru"] as const)(
+  "renders saved discussions and a focused latest reply link in %s",
+  (locale) => {
+    const html = renderToStaticMarkup(
+      <FollowWorkspace
+        locale={locale}
+        query=""
+        type="content"
+        initial={{
+          items: [
+            {
+              ...base,
+              id: "discussion",
+              targetType: "content",
+              targetId: "article",
+              href: "/articles/current",
+              title: "Current article",
+              discussion: {
+                replyCount: 8,
+                latestId: "reply",
+                latestAt: "2026-10-12T00:00:00.000123Z",
+              },
+            },
+          ],
+          hasMore: false,
+          nextCursor: null,
+        }}
+      />,
+    );
+    expect(html).toContain(followCopy(locale).content);
+    expect(html).toContain(followCopy(locale).latestReply);
+    expect(html).toContain('href="/articles/current?comment=reply#comment-reply"');
+    expect(html).not.toContain("source=content");
+  },
+);
+it.each(["en", "ru"] as const)(
+  "uses an explicit locale for discussion subscribe controls without requiring a page provider in %s",
+  (locale) => {
+    const html = renderToStaticMarkup(
+      <FollowButton
+        locale={locale}
+        targetType="content"
+        targetId="article"
+        targetName="Article"
+        initial={{ authenticated: true, following: true }}
+      />,
+    );
+    expect(html).toContain('aria-pressed="true"');
+    expect(html).toContain(followCopy(locale).following);
+    expect(html).toContain(`${followCopy(locale).unfollow}: Article`);
+  },
+);

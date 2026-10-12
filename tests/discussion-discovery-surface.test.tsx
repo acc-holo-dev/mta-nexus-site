@@ -1,7 +1,8 @@
+import { AppError } from "@nexus/domain";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
 import { getDiscussionCopy } from "../apps/web/src/lib/content-discussion-copy";
+
 const mocks = vi.hoisted(() => ({
   article: vi.fn(),
   pageDiscussion: vi.fn(),
@@ -15,11 +16,15 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getUserById: async () => null, getSession: async () => null },
 }));
+
 import Page from "../apps/web/src/app/articles/[slug]/page";
+
 vi.mock("../apps/web/src/lib/services/content-reaction-service", () => ({
   contentReactionService: { state: async () => null },
 }));
+
 import { ContentDiscussion } from "../apps/web/src/components/content-discussion";
+
 const item = {
   id: "older",
   text: "Older targeted reply",
@@ -119,3 +124,22 @@ it("renders standalone search error and empty states without requiring browser e
   expect(html).toContain(getDiscussionCopy("ru").noMatches);
   expect(html).toContain(getDiscussionCopy("ru").applySearch);
 });
+it.each(["en", "ru"] as const)(
+  "renders working discussion subscription entry points and settings in %s",
+  (locale) => {
+    const html = renderToStaticMarkup(
+      <ContentDiscussion
+        slug="article"
+        contentId="content"
+        title="Current article"
+        locale={locale}
+        count={0}
+        initial={{ items: [], hasMore: false, nextCursor: null }}
+      />,
+    );
+    expect(html).toContain('href="/workspace/saved?type=content"');
+    expect(html).toContain('href="/settings#notification-heading"');
+    expect(html).toContain('href="/auth/login"');
+    expect(html).not.toContain("Checking");
+  },
+);

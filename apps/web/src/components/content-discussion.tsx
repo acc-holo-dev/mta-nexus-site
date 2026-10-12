@@ -1,19 +1,23 @@
 "use client";
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import Link from "next/link";
-import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
+
 import { Avatar, Button } from "@nexus/ui";
-import type { Locale } from "../lib/i18n";
-import { getDiscussionCopy, discussionError } from "../lib/content-discussion-copy";
-import { discussionPageSchema, type DiscussionPage } from "../lib/content-discussion-contract";
+import Link from "next/link";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { submitContentCommentRequest } from "../lib/content-comment-client";
+import { type DiscussionPage, discussionPageSchema } from "../lib/content-discussion-contract";
+import { discussionError, getDiscussionCopy } from "../lib/content-discussion-copy";
+import { ownDiscussionCopy } from "../lib/discussion-workspace-copy";
+import { followCopy } from "../lib/follow-workspace-copy";
+import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
 import { platformFieldClass } from "../lib/user-platform-client";
-import { DiscussionCommentActions } from "./discussion-comment-actions";
 import { CommunityReportForm } from "./community-report-form";
+import { DiscussionCommentActions } from "./discussion-comment-actions";
+import { FollowButton } from "./follow-button";
 
 export function ContentDiscussion({
   slug,
+  title,
   contentId,
   locale,
   count,
@@ -24,6 +28,7 @@ export function ContentDiscussion({
   initialError = "",
 }: {
   slug: string;
+  title?: string;
   contentId: string;
   locale: Locale;
   count: number;
@@ -173,6 +178,31 @@ export function ContentDiscussion({
   }
   return (
     <section id="discussion" className="nexus-panel space-y-5 p-5 sm:p-6">
+      <div className="nexus-panel space-y-3 p-4">
+        <p className="text-sm text-muted">{followCopy(locale).discussionHelp}</p>
+        <FollowButton
+          targetType="content"
+          targetId={contentId}
+          targetName={title ?? slug}
+          locale={locale}
+          initial={viewer ? undefined : { authenticated: false, following: false }}
+        />
+        <div className="flex flex-wrap gap-4">
+          <Link
+            href="/workspace/saved?type=content"
+            className="inline-flex min-h-11 items-center text-xs text-accent underline"
+          >
+            {followCopy(locale).content}
+          </Link>
+          <Link
+            href="/settings#notification-heading"
+            className="inline-flex min-h-11 items-center text-xs text-accent underline"
+          >
+            {followCopy(locale).notificationSettings}
+          </Link>
+        </div>
+      </div>
+
       {viewer && (
         <Link
           href="/workspace/discussions"

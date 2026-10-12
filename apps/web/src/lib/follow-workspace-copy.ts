@@ -1,12 +1,19 @@
 import type { Locale } from "./i18n";
+
 const en = {
   title: "Saved and followed",
-  description: "Manage the servers, people, organizations and resources you follow.",
+  description: "Manage the servers, people, organizations, resources and discussions you follow.",
   all: "All",
   user: "People",
   organization: "Organizations",
   server: "Servers",
   product: "Resources",
+  content: "Discussions",
+  replies: "Replies",
+  latestReply: "Open latest reply",
+  discussionHelp:
+    "Follow this publication to receive notices about new replies. Automatic notices for your own publications and comments are controlled separately in settings.",
+  notificationSettings: "Notification settings",
   search: "Search your follows",
   submit: "Search",
   clear: "Clear",
@@ -43,12 +50,18 @@ const en = {
 };
 const ru: Record<keyof typeof en, string> = {
   title: "Сохранённое и подписки",
-  description: "Управляйте подписками на серверы, людей, организации и ресурсы.",
+  description: "Управляйте подписками на серверы, людей, организации, ресурсы и обсуждения.",
   all: "Все",
   user: "Люди",
   organization: "Организации",
   server: "Серверы",
   product: "Ресурсы",
+  content: "Обсуждения",
+  replies: "Ответов",
+  latestReply: "Открыть последний ответ",
+  discussionHelp:
+    "Подпишитесь на публикацию для уведомлений о новых ответах. Автоматические уведомления о ваших публикациях и комментариях настраиваются отдельно в настройках.",
+  notificationSettings: "Настройки уведомлений",
   search: "Поиск по подпискам",
   submit: "Найти",
   clear: "Сбросить",

@@ -1,9 +1,11 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "commenter", username: "writer" } as Record<string, unknown> | null,
   after: [] as (() => Promise<unknown>)[],
+  registrationFails: false,
 }));
 const mocks = vi.hoisted(() => ({
   article: vi.fn(),
@@ -15,7 +17,10 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock("next/server", async () => ({
   ...(await vi.importActual<typeof import("next/server")>("next/server")),
-  after: (callback: () => Promise<unknown>) => state.after.push(callback),
+  after: (callback: () => Promise<unknown>) => {
+    if (state.registrationFails) throw Error("runtime-private");
+    state.after.push(callback);
+  },
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
@@ -28,11 +33,13 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
     commentAuthor: mocks.parent,
   },
 }));
-vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
-  dispatchNotificationsBestEffort: mocks.notify,
+vi.mock("../apps/web/src/lib/services/discussion-follow-notification-service", () => ({
+  notifyDiscussionReplies: mocks.notify,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
+
 import { GET, POST } from "../apps/web/src/app/api/content/[slug]/comments/route";
+
 const context = { params: Promise.resolve({ slug: "article" }) };
 function request(method: string, body?: unknown, query = "", locale = "en", headers = {}) {
   return new NextRequest(`http://nexus.test/api/content/article/comments${query}`, {
@@ -49,6 +56,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   state.actor = { id: "commenter", username: "writer" };
   state.after = [];
+  state.registrationFails = false;
   mocks.article.mockResolvedValue({
     id: "content",
     slug: "article",
@@ -89,7 +97,7 @@ it("does not read discussions for drafts or missing content", async () => {
   expect((await GET(request("GET"), context)).status).toBe(404);
   expect(mocks.page).not.toHaveBeenCalled();
 });
-it("persists a reply before notifying both distinct recipients", async () => {
+it("persists a reply before dispatching the stored event to its fresh audience", async () => {
   const response = await POST(
     request("POST", { text: " A useful reply ", parentId: "parent" }),
     context,
@@ -101,35 +109,62 @@ it("persists a reply before notifying both distinct recipients", async () => {
   );
   expect(mocks.notify).not.toHaveBeenCalled();
   await state.after[0]();
-  expect(mocks.notify.mock.calls[0][0].map((v: { recipientId: string }) => v.recipientId)).toEqual([
-    "author",
-    "parentAuthor",
-  ]);
-  expect(mocks.notify.mock.calls[0][0][0].link).toBe("/articles/article?comment=comment#comment-comment");
+  expect(mocks.notify).toHaveBeenCalledExactlyOnceWith("content", "comment");
 });
 it("passes normalized text search and focused comment selectors without recording views", async () => {
   expect((await GET(request("GET", undefined, "?q=%20Lua%20"), context)).status).toBe(200);
-  expect(mocks.page).toHaveBeenLastCalledWith("content", undefined, { query: "Lua", focusId: undefined });
+  expect(mocks.page).toHaveBeenLastCalledWith("content", undefined, {
+    query: "Lua",
+    focusId: undefined,
+  });
   expect((await GET(request("GET", undefined, "?comment=older"), context)).status).toBe(200);
-  expect(mocks.page).toHaveBeenLastCalledWith("content", undefined, { query: "", focusId: "older" });
+  expect(mocks.page).toHaveBeenLastCalledWith("content", undefined, {
+    query: "",
+    focusId: "older",
+  });
 });
-it.each(["?q=one&q=two", "?comment=x&comment=y", "?comment=x&q=Lua", "?comment=x&cursor=x", "?actorId=victim", `?q=${"x".repeat(121)}`])(
-  "rejects invalid discovery selectors %s before querying", async (query) => {
-    expect((await GET(request("GET", undefined, query), context)).status).toBe(400);
-    expect(mocks.article).not.toHaveBeenCalled();
-  },
-);
+it.each([
+  "?q=one&q=two",
+  "?comment=x&comment=y",
+  "?comment=x&q=Lua",
+  "?comment=x&cursor=x",
+  "?actorId=victim",
+  `?q=${"x".repeat(121)}`,
+])("rejects invalid discovery selectors %s before querying", async (query) => {
+  expect((await GET(request("GET", undefined, query), context)).status).toBe(400);
+  expect(mocks.article).not.toHaveBeenCalled();
+});
 it("rate-limits public discussion lookup before loading its article", async () => {
   mocks.rate.mockResolvedValue({ success: false });
   expect((await GET(request("GET", undefined, "?q=Lua"), context)).status).toBe(429);
   expect(mocks.article).not.toHaveBeenCalled();
 });
-it("deduplicates parent and content authors and omits self notifications", async () => {
-  mocks.parent.mockResolvedValue("author");
+it("delegates recipient selection to storage instead of stale request authors", async () => {
+  mocks.article.mockResolvedValue({ id: "content", authorId: "stale-author", slug: "article" });
   await POST(request("POST", { text: "Reply", parentId: "parent" }), context);
   await state.after[0]();
-  expect(mocks.notify.mock.calls[0][0]).toHaveLength(1);
+  expect(mocks.notify).toHaveBeenCalledExactlyOnceWith("content", "comment");
+  expect(mocks.parent).not.toHaveBeenCalled();
 });
+it.each(["registration", "delivery"])(
+  "keeps a saved reply successful after %s failure",
+  async (stage) => {
+    state.registrationFails = stage === "registration";
+    mocks.notify.mockRejectedValue(Error("private-delivery"));
+    const log = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const response = await POST(request("POST", { text: "Saved reply" }), context);
+      expect(response.status).toBe(201);
+      expect(response.headers.get("cache-control")).toBe("private, no-store");
+      expect(await response.json()).toMatchObject({ comment: { id: "comment" } });
+      if (stage === "delivery") await expect(state.after[0]()).resolves.toBeUndefined();
+      expect(mocks.add).toHaveBeenCalledOnce();
+      expect(log).toHaveBeenCalled();
+    } finally {
+      log.mockRestore();
+    }
+  },
+);
 it.each([1, 5001])("rejects comment length %s", async (length) => {
   expect((await POST(request("POST", { text: "x".repeat(length) }), context)).status).toBe(400);
   expect(mocks.add).not.toHaveBeenCalled();

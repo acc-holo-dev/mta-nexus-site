@@ -4,14 +4,15 @@ import {
   parseDiscoverApiQuery,
   parseDiscoverQuery,
 } from "../apps/web/src/lib/discover-query";
+import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
 import {
   followCommandSchema,
   followPageSchema,
   parseFollowQuery,
 } from "../apps/web/src/lib/follow-workspace-contract";
 import { followCopy } from "../apps/web/src/lib/follow-workspace-copy";
-import { discoveryCopy } from "../apps/web/src/lib/discovery-copy";
 import { formatNotification } from "../apps/web/src/lib/notification-copy";
+
 it("preserves all active server filters across canonical page links", () => {
   const state = parseDiscoverQuery({
     type: "servers",
@@ -75,8 +76,11 @@ it("allows only exact target commands and bounded consistent read pages", () => 
       .success,
   ).toBe(false);
   expect(followCommandSchema.safeParse({ targetType: "content", targetId: "target" }).success).toBe(
-    false,
+    true,
   );
+  expect(
+    followCommandSchema.safeParse({ targetType: "content", targetId: "unsafe/path" }).success,
+  ).toBe(false);
   expect(followPageSchema.safeParse({ items: [], hasMore: true, nextCursor: null }).success).toBe(
     false,
   );
@@ -103,3 +107,48 @@ it("localizes persisted follower notifications without interpreting arbitrary me
     message: unknown.message,
   });
 });
+it("checks paired latest-comment selectors in paged saved discussions", () => {
+  const base = {
+    id: "follow",
+    targetType: "content",
+    targetId: "article",
+    createdAt: "2026-10-12T00:00:00.000Z",
+    title: "Article",
+    description: null,
+    image: null,
+    verified: false,
+    href: "/articles/article",
+  };
+  const valid = { replyCount: 4, latestId: "reply", latestAt: "2026-10-12T00:00:00.123456Z" };
+  const page = (discussion: unknown) =>
+    followPageSchema.safeParse({
+      items: [{ ...base, discussion }],
+      hasMore: false,
+      nextCursor: null,
+    }).success;
+  expect(page(valid)).toBe(true);
+  for (const discussion of [
+    { ...valid, replyCount: -1 },
+    { ...valid, latestAt: null },
+    { ...valid, latestId: "invalid/path" },
+    { ...valid, unexpected: "private" },
+  ])
+    expect(page(discussion)).toBe(false);
+  expect(
+    parseFollowQuery(new URLSearchParams({ type: "content", q: " Discussion " })),
+  ).toMatchObject({ type: "content", query: "Discussion" });
+});
+it.each(["follow", "participant"])(
+  "localizes fixed generic %s reply notifications in RU/EN",
+  (kind) => {
+    const message =
+      kind === "follow"
+        ? "A publication you follow has a new reply."
+        : "A discussion you participate in has a new reply.";
+    const notice = { title: "New discussion reply", message, data: null };
+    const copy = { approved: "", rejected: "", version: "", notes: "" };
+    expect(formatNotification(notice, copy, "en")).toEqual({ title: notice.title, message });
+    expect(formatNotification(notice, copy, "ru").title).toBe("Новый ответ в обсуждении");
+    expect(formatNotification(notice, copy, "ru").message).not.toBe(message);
+  },
+);

@@ -228,8 +228,24 @@ export function FollowWorkspace({
                 )}
               </div>
             </div>
+            {item.discussion && item.href && (
+              <div className="space-y-2 text-sm text-muted">
+                <p>
+                  {copy.replies}: {item.discussion.replyCount}
+                </p>
+                {item.discussion.latestId && (
+                  <Link
+                    prefetch={false}
+                    href={`${item.href}?comment=${encodeURIComponent(item.discussion.latestId)}#comment-${encodeURIComponent(item.discussion.latestId)}`}
+                    className="inline-flex min-h-11 items-center text-xs text-accent underline"
+                  >
+                    {copy.latestReply}
+                  </Link>
+                )}
+              </div>
+            )}
             <div className="flex flex-wrap items-center justify-between gap-3">
-              {item.href && item.targetType !== "product" && (
+              {item.href && item.targetType !== "product" && item.targetType !== "content" && (
                 <Link
                   prefetch={false}
                   href={publicationHref("/workspace/feed", {

@@ -4,6 +4,7 @@ import { AppError, NotFoundError } from "@nexus/domain";
 import { and, asc, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
+import { followWorkspaceRepository } from "./follow-workspace";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { containsPattern } from "./search-pattern";
 import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
@@ -182,7 +183,7 @@ export class NotificationRepository {
         NotificationPreferences,
         "followsEnabled" | "contentEnabled" | "serverEnabled" | "commerceEnabled" | "systemEnabled"
       >
-    >
+    >,
   ): Promise<NotificationPreferences> {
     return db.transaction(async (tx) => {
       await lockNotificationPreferencesForUsers(tx, [userId]);
@@ -223,19 +224,11 @@ export class NotificationRepository {
     });
   }
   async findById(id: string): Promise<Notification | null> {
-    const rows = await db
-      .select()
-      .from(notifications)
-      .where(eq(notifications.id, id))
-      .limit(1);
+    const rows = await db.select().from(notifications).where(eq(notifications.id, id)).limit(1);
     return (rows[0] as unknown as Notification | undefined) ?? null;
   }
 
-  async listByUser(
-    recipientId: string,
-    limit = 50,
-    unreadOnly = false
-  ): Promise<Notification[]> {
+  async listByUser(recipientId: string, limit = 50, unreadOnly = false): Promise<Notification[]> {
     const rows = await db
       .select()
       .from(notifications)
@@ -244,19 +237,16 @@ export class NotificationRepository {
           ? and(
               eq(notifications.recipientId, recipientId),
               // Keep the fixed predicate visible to generic plans using the partial index.
-              sql`${notifications.isRead} = false`
+              sql`${notifications.isRead} = false`,
             )
-          : eq(notifications.recipientId, recipientId)
+          : eq(notifications.recipientId, recipientId),
       )
       .orderBy(desc(notifications.createdAt), desc(notifications.id))
       .limit(boundedNotificationLimit(limit, 50, 100));
     return rows as unknown as Notification[];
   }
 
-  async listBuildReviewByBuildId(
-    buildId: string,
-    limit = 32,
-  ): Promise<Notification[]> {
+  async listBuildReviewByBuildId(buildId: string, limit = 32): Promise<Notification[]> {
     const prefix = `ntf_build_review_${buildId}_`;
     const rows = await db
       .select()
@@ -276,24 +266,18 @@ export class NotificationRepository {
     const [result] = await db
       .select({ total: count() })
       .from(notifications)
-      .where(
-        and(
-          eq(notifications.recipientId, recipientId),
-          sql`${notifications.isRead} = false`,
-        ),
-      );
+      .where(and(eq(notifications.recipientId, recipientId), sql`${notifications.isRead} = false`));
     return result.total;
   }
 
-  async createWithPushOutbox(
-    data: Omit<Notification, "createdAt" | "isRead">,
-  ): Promise<{
+  async createWithPushOutbox(data: Omit<Notification, "createdAt" | "isRead">): Promise<{
     notification: Notification | null;
     pushJobs: number;
     pushQueueState: "queued" | "no_subscriptions" | "saturated" | "error";
   }> {
-    const category = data.category ?? (
-      data.type === "order" || data.type === "license"
+    const category =
+      data.category ??
+      ((data.type === "order" || data.type === "license"
         ? "commerce"
         : data.type === "content"
           ? "content"
@@ -301,8 +285,7 @@ export class NotificationRepository {
             ? "server"
             : data.type === "security"
               ? "security"
-              : "system"
-    ) as NotificationCategory;
+              : "system") as NotificationCategory);
     const preferenceKey =
       category === "follow"
         ? "followsEnabled"
@@ -335,68 +318,121 @@ export class NotificationRepository {
         };
       }
 
-      const now = new Date();
-      const values = {
-        ...data,
-        category,
-        isRead: false,
-        createdAt: now,
-      };
+      return this.persistWithin(tx, { ...data, category, isRead: false, createdAt: new Date() });
+    });
+  }
 
-      const [row] = await tx
-        .insert(notifications)
-        .values(values)
-        .returning();
-      if (!row) {
-        throw new Error("Notification insert did not return a row");
-      }
+  private async persistWithin(
+    tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+    values: Omit<Notification, "createdAt" | "isRead"> & {
+      category: NotificationCategory;
+      isRead: false;
+      createdAt: Date;
+    },
+    idempotent = false,
+  ) {
+    const query = tx.insert(notifications).values(values);
+    const [row] = await (idempotent ? query.onConflictDoNothing() : query).returning();
+    if (!row) {
+      if (idempotent)
+        return { notification: null, pushJobs: 0, pushQueueState: "no_subscriptions" as const };
+      throw new Error("Notification insert did not return a row");
+    }
 
-      let pushJobs = 0;
-      let pushQueueState:
-        | "queued"
-        | "no_subscriptions"
-        | "saturated"
-        | "error" = "error";
-      try {
-        const queued = await tx.transaction((pushTx) =>
-          enqueueWebPushOutboxForNotification(
-            pushTx,
-            row.id,
-            row.recipientId,
-          ),
-        );
-        pushJobs = queued.queued;
-        pushQueueState = queued.reason;
-      } catch {
-        // Inbox is authoritative. A queue-local failure rolls back only
-        // the savepoint and must not erase a successfully stored notification.
-      }
+    let pushJobs = 0;
+    let pushQueueState: "queued" | "no_subscriptions" | "saturated" | "error" = "error";
+    try {
+      const queued = await tx.transaction((pushTx) =>
+        enqueueWebPushOutboxForNotification(pushTx, row.id, row.recipientId),
+      );
+      pushJobs = queued.queued;
+      pushQueueState = queued.reason;
+    } catch {
+      // Inbox is authoritative. A queue-local failure rolls back only
+      // the savepoint and must not erase a successfully stored notification.
+    }
 
+    return {
+      notification: row as unknown as Notification,
+      pushJobs,
+      pushQueueState,
+    };
+  }
+  async createDiscussionReplyWithPush(input: {
+    recipientId: string;
+    contentId: string;
+    commentId: string;
+  }) {
+    return db.transaction(async (tx) => {
+      const source = await followWorkspaceRepository.discussionNoticeWithin(
+        tx,
+        input.recipientId,
+        input.contentId,
+        input.commentId,
+      );
+      if (!source)
+        return {
+          state: "skipped" as const,
+          pushJobs: 0,
+          pushQueueState: "no_subscriptions" as const,
+        };
+      await lockNotificationPreferencesForUsers(tx, [input.recipientId]);
+      const [preferences] = await tx
+        .select({
+          follow: notificationPreferences.followsEnabled,
+          content: notificationPreferences.contentEnabled,
+        })
+        .from(notificationPreferences)
+        .where(eq(notificationPreferences.userId, input.recipientId))
+        .limit(1);
+      const category =
+        source.following && preferences?.follow !== false
+          ? "follow"
+          : source.direct && preferences?.content !== false
+            ? "content"
+            : null;
+      if (!category)
+        return {
+          state: "suppressed" as const,
+          pushJobs: 0,
+          pushQueueState: "no_subscriptions" as const,
+        };
+      const stored = await this.persistWithin(
+        tx,
+        {
+          id: source.id,
+          recipientId: input.recipientId,
+          title: "New discussion reply",
+          message:
+            category === "follow"
+              ? "A publication you follow has a new reply."
+              : "A discussion you participate in has a new reply.",
+          link: source.link,
+          type: "content",
+          category,
+          isRead: false,
+          createdAt: new Date(),
+        },
+        true,
+      );
       return {
-        notification: row as unknown as Notification,
-        pushJobs,
-        pushQueueState,
+        state: stored.notification ? ("stored" as const) : ("duplicate" as const),
+        pushJobs: stored.pushJobs,
+        pushQueueState: stored.pushQueueState,
       };
     });
   }
 
-  async create(
-    data: Omit<Notification, "createdAt" | "isRead">,
-  ): Promise<Notification | null> {
+  async create(data: Omit<Notification, "createdAt" | "isRead">): Promise<Notification | null> {
     return (await this.createWithPushOutbox(data)).notification;
   }
 
   async markAsRead(id: string, recipientId: string): Promise<boolean> {
-        // Ownership enforcement: only the recipient can mark their own notification
+    // Ownership enforcement: only the recipient can mark their own notification
     const rows = await db
       .update(notifications)
       .set({ isRead: true })
-      .where(
-        and(
-          eq(notifications.id, id),
-          eq(notifications.recipientId, recipientId)
-        )
-      )
+      .where(and(eq(notifications.id, id), eq(notifications.recipientId, recipientId)))
       .returning({ id: notifications.id });
     return rows.length > 0;
   }
@@ -405,12 +441,7 @@ export class NotificationRepository {
     await db
       .update(notifications)
       .set({ isRead: true })
-      .where(
-        and(
-          eq(notifications.recipientId, recipientId),
-          sql`${notifications.isRead} = false`,
-        ),
-      );
+      .where(and(eq(notifications.recipientId, recipientId), sql`${notifications.isRead} = false`));
   }
 }
 

@@ -200,6 +200,7 @@ export default async function ArticleDetailPage({
       />
 
       <ContentDiscussion
+        title={article.title}
         key={`${article.id}:${viewer?.id ?? "anonymous"}:${viewer?.role ?? ""}:${filters?.query ?? ""}:${filters?.focusId ?? ""}`}
         viewer={viewer ? { id: viewer.id, canModerate: can(viewer, "admin.moderation") } : null}
         slug={article.slug}

@@ -1,22 +1,22 @@
-import { after, type NextRequest, NextResponse } from "next/server";
 import { AppError, NotFoundError, RateLimitExceededError, UnauthorizedError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
+import { after, type NextRequest, NextResponse } from "next/server";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
+import {
+  discussionCommentSchema,
+  parseDiscussionQuery,
+} from "../../../../../lib/content-discussion-contract";
+import { discussionError } from "../../../../../lib/content-discussion-copy";
+import { resolveLocale } from "../../../../../lib/i18n";
 import {
   createRequestLogContext,
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../../../lib/observability";
-import { contentService } from "../../../../../lib/services/content-service";
-import { authService } from "../../../../../lib/services/auth-service";
-import { dispatchNotificationsBestEffort } from "../../../../../lib/services/notification-dispatch-service";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
-import { resolveLocale } from "../../../../../lib/i18n";
 import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
-import { discussionError } from "../../../../../lib/content-discussion-copy";
-import {
-  discussionCommentSchema,
-  parseDiscussionQuery,
-} from "../../../../../lib/content-discussion-contract";
+import { authService } from "../../../../../lib/services/auth-service";
+import { contentService } from "../../../../../lib/services/content-service";
+import { notifyDiscussionReplies } from "../../../../../lib/services/discussion-follow-notification-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 const validSlug = (slug: string) => !!slug && slug.length <= 200 && /^[a-z0-9-]+$/u.test(slug);
@@ -28,12 +28,17 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     if (!validSlug(slug)) throw new NotFoundError("Content");
     const filters = parseDiscussionQuery(request.nextUrl.searchParams);
     if (!filters) throw new AppError("Invalid cursor", 400, "INVALID_CURSOR");
-    if (!(await consumeRateLimit("search", getTrustedRequestIp(request))).success) throw new RateLimitExceededError();
+    if (!(await consumeRateLimit("search", getTrustedRequestIp(request))).success)
+      throw new RateLimitExceededError();
     const article = await contentService.getArticleBySlug(slug, { incrementView: false });
     if (!article) throw new NotFoundError("Content");
-    const page = filters.query || filters.focusId
-      ? await contentService.pageDiscussion(article.id, filters.cursor, { query: filters.query, focusId: filters.focusId })
-      : await contentService.pageDiscussion(article.id, filters.cursor);
+    const page =
+      filters.query || filters.focusId
+        ? await contentService.pageDiscussion(article.id, filters.cursor, {
+            query: filters.query,
+            focusId: filters.focusId,
+          })
+        : await contentService.pageDiscussion(article.id, filters.cursor);
     return NextResponse.json(page, {
       headers: { "Cache-Control": "no-store" },
     });
@@ -83,40 +88,41 @@ export async function POST(
       { contentId: article.id, parentId: parsed.data.parentId, text: parsed.data.text },
       user,
     );
-    // Delivery remains best effort after persistence; a delivery error never retries the write.
-    if (article.authorId !== user.id || parsed.data.parentId)
+    // Notifications follow persistence and cannot turn a saved comment into a retry.
+    try {
       after(async () => {
         try {
-          const parentAuthorId = parsed.data.parentId
-            ? await contentService.commentAuthor(article.id, parsed.data.parentId)
-            : null;
-          const recipients = [
-            ...new Set(
-              [article.authorId, parentAuthorId].filter(
-                (id): id is string => !!id && id !== user.id,
-              ),
-            ),
-          ];
-          await dispatchNotificationsBestEffort(
-            recipients.map((recipientId) => ({
-              recipientId,
-              title: "New article comment",
-              message: `@${user.username} commented on “${article.title}”.`,
-              type: "content",
-              category: "content",
-              link: `/articles/${encodeURIComponent(article.slug)}?comment=${encodeURIComponent(comment.id)}#comment-${encodeURIComponent(comment.id)}`,
-            })),
-          );
-        } catch (error) {
+          const result = await notifyDiscussionReplies(article.id, comment.id);
+          if (result.failed || result.pushDegraded)
+            logRequestEvent({
+              level: "warn",
+              event: "content.comment.notification_failed",
+              context,
+              status: 201,
+              fields: {
+                attempted: result.attempted,
+                stored: result.stored,
+                failed: result.failed,
+                pushDegraded: result.pushDegraded,
+              },
+            });
+        } catch {
           logRequestEvent({
             level: "warn",
             event: "content.comment.notification_failed",
             context,
             status: 201,
-            error,
           });
         }
       });
+    } catch {
+      logRequestEvent({
+        level: "warn",
+        event: "content.comment.notification_registration_failed",
+        context,
+        status: 201,
+      });
+    }
     return jsonWithRequestId(context, { comment }, { status: 201, headers: privateHeaders });
   } catch (error) {
     const known = error instanceof AppError;

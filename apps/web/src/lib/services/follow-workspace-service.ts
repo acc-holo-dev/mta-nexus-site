@@ -2,11 +2,13 @@ import { followWorkspaceRepository } from "@nexus/db";
 import { safeExternalWebUrl } from "@nexus/validation";
 import { encodeDiscussionCursor } from "../content-discussion-contract";
 import type { FollowPage, parseFollowQuery } from "../follow-workspace-contract";
+
 const paths = {
   user: "/users",
   organization: "/organizations",
   server: "/servers",
   product: "/market",
+  content: "/articles",
 } as const;
 class FollowWorkspaceService {
   async page(
@@ -26,6 +28,7 @@ class FollowWorkspaceService {
         description: row.description,
         image: safeExternalWebUrl(row.image) ?? null,
         verified: row.verified,
+        ...(row.targetType === "content" ? { discussion: row.discussion } : {}),
         href:
           row.handle && row.title
             ? `${paths[row.targetType as keyof typeof paths]}/${encodeURIComponent(row.handle)}`

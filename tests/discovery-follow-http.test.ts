@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   actor: { id: "actor", username: "member" } as { id: string; username: string } | null,
   callbacks: [] as (() => Promise<unknown>)[],
@@ -10,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   follows: vi.fn(),
   setFollowing: vi.fn(),
   isFollowing: vi.fn(),
+  states: vi.fn(),
   rate: vi.fn(),
   notifications: vi.fn(),
 }));
@@ -18,7 +20,7 @@ vi.mock("next/server", async (original) => ({
   after: (fn: () => Promise<unknown>) => state.callbacks.push(fn),
 }));
 vi.mock("@nexus/db", () => ({
-  followWorkspaceRepository: { setFollowing: mocks.setFollowing },
+  followWorkspaceRepository: { setFollowing: mocks.setFollowing, states: mocks.states },
   socialRepository: { isFollowing: mocks.isFollowing },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate, generateId: () => "generated" }));
@@ -34,9 +36,11 @@ vi.mock("../apps/web/src/lib/services/follow-workspace-service", () => ({
 vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.notifications,
 }));
+
 import { GET as discover } from "../apps/web/src/app/api/discover/route";
+import { DELETE, GET as followState, POST } from "../apps/web/src/app/api/follow/route";
 import { GET as follows } from "../apps/web/src/app/api/workspace/follows/route";
-import { GET as followState, POST, DELETE } from "../apps/web/src/app/api/follow/route";
+
 function request(path: string, method = "GET", body?: unknown, locale = "en", headers = {}) {
   return new NextRequest(`http://nexus.test${path}`, {
     method,
@@ -56,6 +60,7 @@ beforeEach(() => {
   mocks.discover.mockResolvedValue({ type: "servers", items: [], page: 2, hasMore: false });
   mocks.follows.mockResolvedValue({ items: [], hasMore: false, nextCursor: null });
   mocks.isFollowing.mockResolvedValue(true);
+  mocks.states.mockResolvedValue(["publication"]);
   mocks.setFollowing.mockImplementation(async (_actor, _type, _id, value) => ({
     following: value,
     created: value,
@@ -232,4 +237,63 @@ it("allows removing an unavailable target and translates fresh availability deni
   const denied = await POST(request("/api/follow", "POST", body, "ru"));
   expect(denied.status).toBe(404);
   expect((await denied.json()).error).toMatch(/недоступен/u);
+});
+it("reads only the authenticated reader's discussion subscription state", async () => {
+  const response = await followState(
+    request("/api/follow?targetType=content&targetId=publication&actorId=foreign"),
+  );
+  expect(await response.json()).toMatchObject({
+    authenticated: true,
+    following: true,
+    targetType: "content",
+    targetId: "publication",
+  });
+  expect(mocks.states).toHaveBeenCalledExactlyOnceWith("actor", "content", ["publication"]);
+  expect(mocks.isFollowing).not.toHaveBeenCalled();
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe("Cookie");
+});
+it.each([POST, DELETE])(
+  "persists a desired discussion subscription without creating a profile-follower notice",
+  async (handler) => {
+    const response = await handler(
+      request("/api/follow", handler === POST ? "POST" : "DELETE", {
+        targetType: "content",
+        targetId: "publication",
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      success: true,
+      following: handler === POST,
+      targetType: "content",
+      targetId: "publication",
+    });
+    expect(mocks.setFollowing).toHaveBeenCalledExactlyOnceWith(
+      "actor",
+      "content",
+      "publication",
+      handler === POST,
+      "generated",
+    );
+    expect(state.callbacks).toHaveLength(0);
+  },
+);
+it("never reads content follow state for an anonymous request", async () => {
+  state.actor = null;
+  expect(
+    await (
+      await followState(request("/api/follow?targetType=content&targetId=publication"))
+    ).json(),
+  ).toMatchObject({ authenticated: false, following: false });
+  expect(mocks.states).not.toHaveBeenCalled();
+});
+it("paginates saved discussions within the authenticated reader's own workspace", async () => {
+  const response = await follows(request("/api/workspace/follows?type=content&q=Lua"));
+  expect(response.status).toBe(200);
+  expect(mocks.follows).toHaveBeenCalledExactlyOnceWith("actor", {
+    type: "content",
+    query: "Lua",
+    cursor: undefined,
+  });
 });

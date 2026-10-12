@@ -1,4 +1,5 @@
 import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   creators: vi.fn(),
   organizations: vi.fn(),
@@ -20,9 +21,11 @@ vi.mock("../apps/web/src/lib/services/product-service", () => ({
   productService: { listPublicPage: mocks.products },
 }));
 vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({}));
+
+import { parseDiscoverQuery } from "../apps/web/src/lib/discover-query";
 import { discoveryService } from "../apps/web/src/lib/services/discovery-service";
 import { followWorkspaceService } from "../apps/web/src/lib/services/follow-workspace-service";
-import { parseDiscoverQuery } from "../apps/web/src/lib/discover-query";
+
 beforeEach(() => {
   vi.clearAllMocks();
   for (const fn of Object.values(mocks))
@@ -107,4 +110,37 @@ it("projects saved identity and exact cursor without exposing repository-only fi
   expect(result.items[0].image).toBeNull();
   expect(result.items[0]).not.toHaveProperty("email");
   expect(result.items[0]).not.toHaveProperty("cursorTime");
+});
+it("projects bounded saved discussion counts and focused reply metadata without comment text", async () => {
+  mocks.follows.mockResolvedValue({
+    items: [
+      {
+        id: "follow",
+        targetType: "content",
+        targetId: "article",
+        createdAt: new Date("2026-10-12T00:00:00Z"),
+        title: "Article",
+        handle: "current-slug",
+        description: "Excerpt",
+        image: null,
+        verified: false,
+        discussion: { replyCount: 7, latestId: "latest", latestAt: "2026-10-12T00:00:00.000123Z" },
+        body: "private-body",
+        authorId: "private-author",
+        commentText: "private-comment",
+      },
+    ],
+    hasMore: false,
+    nextCursor: null,
+  });
+  const result = await followWorkspaceService.page("actor", {
+    type: "content",
+    query: "",
+    cursor: undefined,
+  });
+  expect(result.items[0]).toMatchObject({
+    href: "/articles/current-slug",
+    discussion: { replyCount: 7, latestId: "latest", latestAt: "2026-10-12T00:00:00.000123Z" },
+  });
+  expect(JSON.stringify(result)).not.toContain("private-");
 });

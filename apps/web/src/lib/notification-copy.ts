@@ -197,6 +197,22 @@ export function formatNotification(
       message: locale === "ru" ? `Жалоба ${statuses[reportStatus[1]]}.` : notification.message,
     };
   }
+  if (
+    notification.title === "New discussion reply" &&
+    [
+      "A publication you follow has a new reply.",
+      "A discussion you participate in has a new reply.",
+    ].includes(notification.message)
+  )
+    return {
+      title: locale === "ru" ? "Новый ответ в обсуждении" : notification.title,
+      message:
+        locale === "ru"
+          ? notification.message === "A publication you follow has a new reply."
+            ? "В публикации, на которую вы подписаны, появился новый ответ."
+            : "В обсуждении, в котором вы участвуете, появился новый ответ."
+          : notification.message,
+    };
   const follower =
     notification.title === "New Follower" &&
     /^@([a-zA-Z0-9_-]{1,80}) started following your activity\.$/u.exec(notification.message);

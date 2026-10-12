@@ -1,12 +1,13 @@
 "use client";
+import { Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Bookmark, BookmarkCheck, LoaderCircle } from "lucide-react";
+import { confirmsFollowMutation } from "../lib/follow-confirmation";
 import type { FollowTargetType } from "../lib/follow-workspace-contract";
 import { followCopy, followError } from "../lib/follow-workspace-copy";
-import { confirmsFollowMutation } from "../lib/follow-confirmation";
+import type { Locale } from "../lib/i18n";
 import { privateApiRequest } from "../lib/private-api-request";
-import { useNexusLocale } from "./locale-context";
+import { LocaleProvider, useNexusLocale } from "./locale-context";
 
 type InitialFollowState = {
   authenticated: boolean;
@@ -19,21 +20,26 @@ export function FollowButton(props: {
   targetId: string;
   targetName: string;
   initial?: InitialFollowState;
+  locale?: Locale;
 }) {
-  return <FollowControl key={`${props.targetType}:${props.targetId}`} {...props} />;
+  const control = <FollowControl key={`${props.targetType}:${props.targetId}`} {...props} />;
+  return props.locale ? <LocaleProvider locale={props.locale}>{control}</LocaleProvider> : control;
 }
 function FollowControl({
   targetType,
   targetId,
   targetName,
   initial,
+  locale: providedLocale,
 }: {
   targetType: FollowTargetType;
   targetId: string;
   targetName: string;
   initial?: InitialFollowState;
+  locale?: Locale;
 }) {
-  const { locale } = useNexusLocale();
+  const { locale: appLocale } = useNexusLocale();
+  const locale = providedLocale ?? appLocale;
   const copy = followCopy(locale);
   const [state, setState] = useState<
     "checking" | "anonymous" | "self" | "following" | "not-following" | "error"
@@ -54,6 +60,7 @@ function FollowControl({
   const [message, setMessage] = useState("");
   const [attempt, setAttempt] = useState(0);
   const busy = useRef(false);
+  const writeBlocked = useRef(state !== "following" && state !== "not-following");
   const alive = useRef(true);
   const write = useRef<AbortController | null>(null);
   useEffect(() => {
@@ -67,6 +74,7 @@ function FollowControl({
     if (initial && attempt === 0) return;
     let active = true;
     const controller = new AbortController();
+    writeBlocked.current = true;
     setState("checking");
     fetch(
       `/api/follow?${new URLSearchParams({ targetType, targetId })}`,
@@ -82,7 +90,8 @@ function FollowControl({
           data.targetId !== targetId
         )
           throw new Error("Invalid state");
-        if (active)
+        if (active) {
+          writeBlocked.current = !data.authenticated || data.self === true;
           setState(
             !data.authenticated
               ? "anonymous"
@@ -92,6 +101,7 @@ function FollowControl({
                   ? "following"
                   : "not-following",
           );
+        }
       })
       .catch(() => {
         if (active) setState("error");
@@ -102,7 +112,13 @@ function FollowControl({
     };
   }, [targetType, targetId, attempt, initial]);
   async function toggle() {
-    if (busy.current || (state !== "following" && state !== "not-following")) return;
+    if (
+      !alive.current ||
+      busy.current ||
+      writeBlocked.current ||
+      (state !== "following" && state !== "not-following")
+    )
+      return;
     busy.current = true;
     setPending(true);
     setMessage("");
@@ -122,10 +138,12 @@ function FollowControl({
       const data = await response.json().catch(() => null);
       if (!alive.current) return;
       if (response.status === 401) {
+        writeBlocked.current = true;
         setState("anonymous");
         return;
       }
       if (!confirmsFollowMutation(response.status, data, targetType, targetId, desired)) {
+        writeBlocked.current = true;
         setMessage(followError(locale, response.ok ? "UNCONFIRMED" : data?.code));
         setState("error");
         return;
@@ -134,6 +152,7 @@ function FollowControl({
       setMessage(copy.success);
     } catch {
       if (alive.current) {
+        writeBlocked.current = true;
         setState("error");
         setMessage(copy.unconfirmed);
       }

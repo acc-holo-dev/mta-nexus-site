@@ -408,7 +408,8 @@ export class ContentRepository {
     }
     const values = {
       ...data,
-      createdAt: new Date(),
+      // Match content follow timestamps to the database clock across application nodes.
+      createdAt: data.contentId ? sql<Date>`clock_timestamp()` : new Date(),
     };
 
     return db.transaction(async (tx) => {

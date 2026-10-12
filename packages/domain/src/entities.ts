@@ -404,7 +404,7 @@ export interface Reaction {
 export interface Follow {
   id: string;
   followerId: string;
-  targetType: "user" | "server" | "organization" | "product";
+  targetType: "user" | "server" | "organization" | "product" | "content";
   targetId: string;
   createdAt: Date;
 }

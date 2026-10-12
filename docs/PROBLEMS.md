@@ -3053,3 +3053,48 @@ open. GitHub Actions are neither run nor inspected.
 Verification: 163 focused tests across 14 files pass; changed-file Biome, web TypeScript
 and Next compile pass (44s compilation, two page workers). Root TypeScript reports only
 existing missing fast-check types and the old isSigned delivery fixture omission.
+
+
+### Discussion subscriptions and saved reply navigation — 2026-10-12
+
+Public editorial discussions now use the existing desired-state follow API and
+private saved workspace. Readers subscribe/unsubscribe on article pages, filter
+and search saved discussions, see reply counts and open the latest comment with
+its focused permalink. Public-target join predicates mask archived/deleted
+publication metadata while retaining a removable private subscription key.
+RU/EN controls, authentication boundaries, checking/retry/pending/success states,
+notifications settings descriptions and keyboard/mobile controls are connected.
+Uncertain write acknowledgements block another write until state is reread.
+
+New replies dispatch once to distinct current publication/parent participants
+and event-time subscribers, excluding the writer. Fifty-recipient cursor pages,
+exact PostgreSQL microseconds, a database-clock event cutoff and ten concurrent
+transactions bound work without a one-hundred-follower delivery cap. Delivery
+rechecks current public content/comment and subscription under locks, serializes
+unsubscribe and preference changes, and applies separate follow/content flags.
+Deterministic recipient/event inbox IDs retain read state and avoid duplicate
+push jobs on replay. Generic localized notices carry a focused link without
+copying comment text, publication body/title or private author metadata. Existing
+notification/outbox semantics for other categories and product reviews remain.
+A delivery/registration failure cannot turn a saved comment into a retry.
+
+Reply fanout remains best effort after the saved HTTP response; only notifications
+already inserted have durable push outbox jobs. Process interruption or individual
+storage failures have no durable fanout checkpoint/retry worker. The exact Agent A
+index contract is `follows_target_created_id_idx ON follows(target_type, target_id,
+created_at, id)` for large event-time audiences; this block creates no schema or
+migration and currently awaits that index. No new dependency or workflow changed.
+
+449 focused unit/HTTP/SQL-builder/SSR/interaction checks across 38 files pass.
+Web TypeScript including generated routes, Next webpack compile mode, changed-file
+Biome (lint-only for three minimally edited pre-existing unformatted shared files),
+and diff checks pass. Root TypeScript retains only the
+upstream missing `isSigned` resource-delivery fixture; Knip retains three upstream
+commercial exports. Six PostgreSQL fixtures prepare concurrent idempotence,
+archive masking, event-time consent, distinct recipients/preferences, replay/read
+state and unsubscribe/archive serialization; they remain unrun without disposable
+PostgreSQL. Browser interaction and production page generation remain outstanding.
+
+After rebasing on Agent A's release comparison and selection recovery, 543 checks
+across 46 files pass. All 28 upstream files and complete problem notes are preserved.
+The follow domain type includes editorial content without changing stored schema.
