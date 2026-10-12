@@ -9,7 +9,8 @@
     "build:webpack": "next build --webpack",
     "start": "next start",
     "lint": "pnpm --workspace-root exec biome lint apps/web",
-    "server:observations:capture": "tsx scripts/capture-server-observations.ts"
+    "server:observations:capture": "tsx scripts/capture-server-observations.ts",
+    "notifications:replay": "tsx scripts/replay-discussion-notifications.ts"
   },
   "dependencies": {
     "@nexus/config": "workspace:*",
