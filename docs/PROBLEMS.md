@@ -1,5 +1,28 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Bounded discussion replay and durable checkpoints — 2026-10-12
+
+Operator-selected inbox recovery now persists progress inside an event's audience:
+one fifty-follower page plus current direct participants per pass, exact microsecond
+cursors and compatible legacy version-1 checkpoints. Failed pages do not advance;
+repeated delivery reuses existing deterministic inbox identities. The fixed-window
+worker retains exponential retry/shutdown behavior. Storage rejects malformed,
+oversized, symlink and foreign-window files, serializes directory aliases with one
+exclusive lock, writes private exclusive random temporary files and fsyncs both file
+and directory before acknowledging progress. Lock metadata aids manual stale-lock
+inspection without automatic reclamation. Operations contains the canonical command
+guide; the prior standalone guide is consolidated to satisfy documentation policy.
+
+On pinned Node 26.10.0, 286 focused checks in twenty files pass, including fifteen
+real-filesystem/fault-injection cases and preserved collection-comparison tests.
+Application and root TypeScript pass after adding the existing unsigned build flag
+to the old resource-delivery fixture. Changed-source Biome and diff checks pass.
+No schema/migration or user-notification preference changes are made. Real PostgreSQL
+delivery/query plans, the modified database fixture, production runtime and actual
+host/power-loss acceptance remain unrun. Recovery still needs explicitly chosen
+windows/checkpoints per database; transactional enqueueing, automatic discovery,
+distributed leases and repair of degraded push fan-out remain open.
+
 ### Private buyer resource collections — 2026-10-11
 
 Migration `0067` adds personal collections, independent resource references and
@@ -3079,8 +3102,10 @@ notification/outbox semantics for other categories and product reviews remain.
 A delivery/registration failure cannot turn a saved comment into a retry.
 
 Reply fanout remains best effort after the saved HTTP response; only notifications
-already inserted have durable push outbox jobs. Process interruption or individual
-storage failures have no durable fanout checkpoint/retry worker. The exact Agent A
+already inserted have durable push outbox jobs. Interrupted inbox delivery now has
+an operator-selected fixed-window replay and retry worker with per-follower-page
+checkpoints (see Operations). New windows are not discovered automatically and no
+fanout outbox is enqueued transactionally with comment writes. The exact Agent A
 index contract is `follows_target_created_id_idx ON follows(target_type, target_id,
 created_at, id)` for large event-time audiences; this block creates no schema or
 migration and currently awaits that index. No new dependency or workflow changed.

@@ -1,7 +1,29 @@
 import { followWorkspaceRepository, notificationRepository } from "@nexus/db";
+import type { ReplayCursor } from "./discussion-notification-replay";
 /** Finite event-time audience, bounded pages/concurrency, idempotent inbox deliveries. */
-export async function notifyDiscussionReplies(contentId: string, commentId: string) {
-  const result = {
+export async function notifyDiscussionReplies(
+  contentId: string,
+  commentId: string,
+  options?: { cursor?: ReplayCursor; maxFollowerPages: number },
+) {
+  if (
+    options &&
+    (!Number.isSafeInteger(options.maxFollowerPages) ||
+      options.maxFollowerPages < 1 ||
+      options.maxFollowerPages > 100)
+  )
+    throw Error("Invalid follower page budget");
+  const result: Record<
+    | "attempted"
+    | "stored"
+    | "suppressed"
+    | "duplicate"
+    | "skipped"
+    | "failed"
+    | "pushQueued"
+    | "pushDegraded",
+    number
+  > & { nextCursor?: ReplayCursor } = {
     attempted: 0,
     stored: 0,
     suppressed: 0,
@@ -41,7 +63,10 @@ export async function notifyDiscussionReplies(contentId: string, commentId: stri
       return result;
     }
     await deliver(audience.directRecipients);
-    let cursor: { createdAt: string; id: string } | undefined;
+    // Recovery cannot advance past a failed direct recipient.
+    if (options && result.failed) return result;
+    let cursor = options?.cursor;
+    let pages = 0;
     do {
       const page = await followWorkspaceRepository.discussionFollowers(
         contentId,
@@ -50,6 +75,7 @@ export async function notifyDiscussionReplies(contentId: string, commentId: stri
         cursor,
       );
       await deliver(page.items.map((item) => item.recipientId));
+      if (options && result.failed) return result;
       if (
         page.nextCursor &&
         cursor &&
@@ -58,6 +84,11 @@ export async function notifyDiscussionReplies(contentId: string, commentId: stri
       )
         throw Error("Discussion follower cursor did not advance");
       cursor = page.nextCursor ?? undefined;
+      pages++;
+      if (cursor && options && pages >= options.maxFollowerPages) {
+        result.nextCursor = cursor;
+        return result;
+      }
     } while (cursor);
   } catch {
     result.failed++;

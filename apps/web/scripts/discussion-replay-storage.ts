@@ -1,0 +1,102 @@
+import { randomUUID } from "node:crypto";
+import { constants } from "node:fs";
+import type { FileHandle } from "node:fs/promises";
+import { open, realpath, rename, unlink } from "node:fs/promises";
+import { hostname } from "node:os";
+import { basename, dirname, join, resolve } from "node:path";
+import type { ReplayCheckpoint } from "../src/lib/services/discussion-notification-replay";
+import { parseDiscussionReplayCheckpoint } from "../src/lib/services/discussion-replay-checkpoint";
+
+const maximumBytes = 4096;
+
+async function readCheckpoint(path: string, from: string, until: string) {
+  let file: FileHandle;
+  try {
+    file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    return { version: 1, from, until, cursor: null, completed: false } satisfies ReplayCheckpoint;
+  }
+  try {
+    const stat = await file.stat();
+    if (!stat.isFile() || stat.size > maximumBytes) throw Error("Invalid checkpoint file");
+    // A bounded read also rejects a file that grows after stat, without loading it in memory.
+    const buffer = Buffer.alloc(maximumBytes + 1);
+    let length = 0;
+    while (length < buffer.length) {
+      const { bytesRead } = await file.read(buffer, length, buffer.length - length, null);
+      if (!bytesRead) break;
+      length += bytesRead;
+    }
+    if (length > maximumBytes) throw Error("Checkpoint file exceeds limit");
+    return parseDiscussionReplayCheckpoint(
+      JSON.parse(buffer.toString("utf8", 0, length)),
+      from,
+      until,
+    );
+  } finally {
+    await file.close();
+  }
+}
+
+/** Local durable filesystem only. Lock recovery remains an explicit operator action. */
+export async function withDiscussionReplayCheckpoint<T>(
+  checkpointName: string,
+  from: string,
+  until: string,
+  run: (store: {
+    initial: ReplayCheckpoint;
+    save: (value: ReplayCheckpoint) => Promise<void>;
+  }) => Promise<T>,
+): Promise<T> {
+  // Validate even a new window before touching files. Canonical directories share one lock.
+  const empty = { version: 1, from, until, cursor: null, completed: false };
+  parseDiscussionReplayCheckpoint(empty, from, until);
+  const requested = resolve(checkpointName);
+  const directory = await realpath(dirname(requested));
+  const path = join(directory, basename(requested));
+  const lockPath = `${path}.lock`;
+  const lock = await open(lockPath, "wx", 0o600);
+  try {
+    await lock.writeFile(
+      JSON.stringify({ version: 1, pid: process.pid, host: hostname(), from, until }),
+    );
+    await lock.sync();
+    const initial = await readCheckpoint(path, from, until);
+    const save = async (value: ReplayCheckpoint) => {
+      const normalized = parseDiscussionReplayCheckpoint(value, from, until);
+      const payload = JSON.stringify(normalized);
+      if (Buffer.byteLength(payload) > maximumBytes) throw Error("Checkpoint file exceeds limit");
+      // Exclusive, unpredictable creation never truncates a leftover temporary file or symlink.
+      const temporary = join(directory, `.${basename(path)}.${randomUUID()}.tmp`);
+      const file = await open(temporary, "wx", 0o600);
+      try {
+        try {
+          await file.writeFile(payload);
+          await file.sync();
+        } finally {
+          await file.close();
+        }
+        await rename(temporary, path);
+        // Persist the replacement's directory entry before reporting the cursor as saved.
+        const parent = await open(directory, constants.O_RDONLY | constants.O_DIRECTORY);
+        try {
+          await parent.sync();
+        } finally {
+          await parent.close();
+        }
+      } finally {
+        await unlink(temporary).catch((error: NodeJS.ErrnoException) => {
+          if (error.code !== "ENOENT") throw error;
+        });
+      }
+    };
+    return await run({ initial, save });
+  } finally {
+    try {
+      await lock.close();
+    } finally {
+      await unlink(lockPath);
+    }
+  }
+}

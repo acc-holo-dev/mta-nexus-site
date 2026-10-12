@@ -13,6 +13,58 @@ const initial: ReplayCheckpoint = {
   completed: false,
 };
 const rows = ["a", "b", "c"].map((id) => ({ id, createdAt: time, contentId: "content" }));
+it("persists an audience page separately and resumes the same event before advancing", async () => {
+  const audienceCursor = { createdAt: time, id: "follow_50" };
+  const deliver = vi.fn().mockResolvedValueOnce({ failed: 0, nextCursor: audienceCursor });
+  const save = vi.fn(),
+    page = vi.fn(async () => rows);
+  const first = await replayDiscussionNotifications(initial, { page, deliver, save }, 100);
+  expect(first).toMatchObject({
+    processed: 0,
+    blocked: false,
+    checkpoint: {
+      cursor: null,
+      pending: { id: "a", contentId: "content", createdAt: time, audienceCursor },
+    },
+  });
+  deliver.mockResolvedValue({ failed: 0 });
+  const second = await replayDiscussionNotifications(first.checkpoint, { page, deliver, save }, 1);
+  expect(deliver.mock.calls[1]).toEqual(["content", "a", audienceCursor]);
+  expect(second).toMatchObject({
+    processed: 1,
+    checkpoint: { cursor: { id: "a" }, pending: undefined },
+  });
+});
+it("retains a partial event on failure and rejects non-advancing audience cursors", async () => {
+  const audienceCursor = { createdAt: time, id: "follow" };
+  const checkpoint = { ...initial, pending: { ...rows[0], audienceCursor } };
+  const save = vi.fn(),
+    deliver = vi.fn().mockResolvedValue({ failed: 1 });
+  const dependencies = { page: async () => rows, save, deliver };
+  expect(await replayDiscussionNotifications(checkpoint, dependencies, 10)).toMatchObject({
+    blocked: true,
+    checkpoint,
+  });
+  expect(save).not.toHaveBeenCalled();
+  deliver.mockResolvedValue({ failed: 0, nextCursor: audienceCursor });
+  await expect(replayDiscussionNotifications(checkpoint, dependencies, 10)).rejects.toThrow(
+    "audience cursor",
+  );
+});
+it("never applies an orphaned audience cursor to another comment", async () => {
+  const checkpoint = {
+    ...initial,
+    pending: { ...rows[0], audienceCursor: { createdAt: time, id: "follow" } },
+  };
+  const deliver = vi.fn().mockResolvedValue({ failed: 0 });
+  const result = await replayDiscussionNotifications(
+    checkpoint,
+    { page: async () => rows.slice(1), save: vi.fn(), deliver },
+    1,
+  );
+  expect(deliver).toHaveBeenCalledExactlyOnceWith("content", "b");
+  expect(result.checkpoint.pending).toBeUndefined();
+});
 it("resumes a failed event without skipping later recipients or comments", async () => {
   let saved = initial;
   const page = vi.fn(async (cursor) => rows.filter((row) => !cursor || row.id > cursor.id));

@@ -63,6 +63,7 @@ async function fixture() {
     fileSizeBytes: 7,
     sha256Hash: "a".repeat(64),
     storageKey: `private/${key}.zip`,
+    isSigned: false,
   });
   const expected = present(await buildRepository.findById(buildId));
   async function start(

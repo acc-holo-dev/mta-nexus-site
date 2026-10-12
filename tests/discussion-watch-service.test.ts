@@ -137,3 +137,53 @@ it("stops an invalid non-advancing cursor instead of looping indefinitely", asyn
   expect(await notifyDiscussionReplies("article", "comment")).toMatchObject({ failed: 1 });
   expect(mocks.page).toHaveBeenCalledTimes(2);
 });
+
+it("bounds recovery to one follower page and resumes after its exact cursor", async () => {
+  const cursor = { createdAt: stamp, id: "follow_50" };
+  mocks.page.mockResolvedValueOnce({ items: [{ recipientId: "reader" }], nextCursor: cursor });
+  expect(
+    await notifyDiscussionReplies("article", "comment", { maxFollowerPages: 1 }),
+  ).toMatchObject({ failed: 0, nextCursor: cursor });
+  expect(mocks.page).toHaveBeenCalledTimes(1);
+  mocks.page.mockResolvedValueOnce({ items: [{ recipientId: "next" }], nextCursor: null });
+  const result = await notifyDiscussionReplies("article", "comment", {
+    cursor,
+    maxFollowerPages: 1,
+  });
+  expect(result.nextCursor).toBeUndefined();
+  expect(mocks.page.mock.calls[1][3]).toEqual(cursor);
+  expect(mocks.store.mock.calls.map((call) => call[0].recipientId)).toEqual([
+    "owner",
+    "parent",
+    "reader",
+    "owner",
+    "parent",
+    "next",
+  ]);
+});
+it.each(["owner", "reader"])(
+  "does not checkpoint a failed recovery recipient %s",
+  async (recipient) => {
+    mocks.page.mockResolvedValue({
+      items: [{ recipientId: "reader" }],
+      nextCursor: { createdAt: stamp, id: "after" },
+    });
+    mocks.store.mockImplementation(async (input) => {
+      if (input.recipientId === recipient) throw Error("failure");
+      return { state: "stored", pushJobs: 0, pushQueueState: "queued" };
+    });
+    const result = await notifyDiscussionReplies("article", "comment", { maxFollowerPages: 1 });
+    expect(result.failed).toBe(1);
+    expect(result.nextCursor).toBeUndefined();
+    if (recipient === "owner") expect(mocks.page).not.toHaveBeenCalled();
+  },
+);
+it.each([0, -1, 101, 1.5, NaN])(
+  "rejects invalid follower budget %s without dispatch",
+  async (maxFollowerPages) => {
+    await expect(
+      notifyDiscussionReplies("article", "comment", { maxFollowerPages }),
+    ).rejects.toThrow("budget");
+    expect(mocks.audience).not.toHaveBeenCalled();
+  },
+);

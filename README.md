@@ -9,6 +9,13 @@ edits/access loss. Additions require current database-time access/capacity; orph
 references remain removable. Migration `0077_library_membership_batches` adds guarded
 parent receipts, bounded history and immutable child association.
 
+Interrupted discussion inbox delivery can be replayed over a fixed UTC window with
+bounded fifty-follower pages and resumable page checkpoints. An optional background
+worker retries failures and drains that window; private atomic checkpoint writes
+flush the file and parent directory. See [Operations](docs/OPERATIONS.md#recovering-discussion-inbox-delivery)
+for invocation, lock inspection and current recovery limits. This does not yet
+automatically enqueue or discover pending fan-out after new comment writes.
+
 Own collections now have a private RU/EN comparison view with common/source-only/
 destination-only/unavailable filters and literal accessible-name search. Review twenty
 references per page, then copy or move selected source references using both collection

@@ -919,6 +919,71 @@ Required properties include:
 
 Paid commerce remains disabled.
 
+### Recovering discussion inbox delivery
+
+Run from the repository with the target database environment loaded:
+
+```sh
+pnpm --filter @nexus/web notifications:replay /durable/checkpoints/discussions.json 2026-10-12T00:00:00.000000Z 2026-10-12T06:00:00.000000Z 100
+```
+
+The directory must exist on a durable local POSIX filesystem supporting file and
+directory fsync and atomic rename. Both inclusive boundaries use UTC with six
+fractional digits. Choose a window covering interrupted comment requests. Re-run
+the same command/checkpoint until `completed` is true. Each pass handles at most
+the requested number of comments (1–10000), in database pages of at most fifty
+rows. A delivery step handles one follower page (fifty recipients) plus up to two
+direct participants, checked again on every step. A partial event ends the pass
+before the comment budget is reached. Logs contain counts and completion state,
+never comment text or recipient identities.
+
+The version-1 checkpoint stores the fixed window, last fully delivered comment's
+exact timestamp/ID, and optional current comment/follower-page progress. Older
+checkpoints without pending progress remain compatible. It advances only after
+successful inbox delivery; failure exits a one-shot run with status 1. Restart or
+checkpoint-write failure repeats the uncheckpointed audience page. Existing inbox
+idempotency prevents duplicate notices and preserves read state. Current publication,
+subscription and preference checks still apply; unavailable targets are skipped.
+This recovers delivery under current eligibility, not historical consent.
+
+Checkpoint reads are bounded to 4 KiB and reject malformed, foreign-window,
+non-regular and symlink files before delivery. Saves validate the checkpoint,
+create an exclusive random temporary file with mode 0600, flush its data, atomically
+replace the checkpoint and fsync the parent directory before acknowledging progress.
+Handled failures clean up temporary files and release the owned lock; failure after
+rename can leave a complete newer checkpoint, which restart validates and reuses.
+An abrupt process/host failure can leave a harmless temporary file. Keep the directory
+private and use a separate checkpoint per database/window; database identity is not
+encoded or automatically checked by this version.
+
+Exclusive `.lock` creation serializes workers, including symlink aliases of the
+parent directory. Its private metadata records process ID, hostname and window to
+aid inspection; those fields do not prove that a process is alive. A hard termination
+can leave the lock. Remove it only after verifying the prior worker has stopped on
+the recorded host; never automatically reclaim it based on age or PID alone. Do not
+remove the checkpoint to retry a delivery failure.
+
+Append `--worker` after the comment budget to drain the same fixed window:
+
+```sh
+pnpm --filter @nexus/web notifications:replay /durable/checkpoints/discussions.json 2026-10-12T00:00:00.000000Z 2026-10-12T06:00:00.000000Z 100 --worker
+```
+
+Successful incomplete passes wait one second; delivery/database/file failures retry
+with exponential backoff from one second to one minute. Success resets backoff.
+The worker exits after completion. SIGTERM/SIGINT interrupt waits and stop after the
+active follower page is saved; allow shutdown time for that page and its direct
+participants. A persistent failed event intentionally blocks later comments.
+Launch from a service manager with database environment and durable storage.
+
+This command recovers inbox fan-out. It neither discovers new windows nor enqueues
+a transactional fan-out outbox alongside comment writes. Persisted push jobs retain
+their existing push worker; push queue degradation does not block inbox progress and
+duplicate inbox replay does not guarantee repair of missing push jobs. Continuous
+database-backed recovery/leases remain coordinated follow-up work with the schema
+owner. Live PostgreSQL and actual power-loss/filesystem acceptance remain separate
+checks from local fault-injection tests.
+
 ## 4. Backup and recovery
 
 Before a production migration:
