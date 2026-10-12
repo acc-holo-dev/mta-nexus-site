@@ -45,42 +45,36 @@ async function fixture() {
       displayName: userId,
       role,
     });
-  await db
-    .insert(products)
-    .values({
-      id,
-      authorId: owner,
-      title: "Release fixture",
-      description: "Release fixture description",
-      slug: id,
-      type: "script",
-      status: "draft",
-    });
-  await db
-    .insert(entitlements)
-    .values({
-      id: `ent_rw_${key}`,
-      subjectType: "user",
-      subjectId: buyer,
-      resourceId: id,
-      permission: "product.download",
-    });
+  await db.insert(products).values({
+    id,
+    authorId: owner,
+    title: "Release fixture",
+    description: "Release fixture description",
+    slug: id,
+    type: "script",
+    status: "draft",
+  });
+  await db.insert(entitlements).values({
+    id: `ent_rw_${key}`,
+    subjectType: "user",
+    subjectId: buyer,
+    resourceId: id,
+    permission: "product.download",
+  });
   async function release(version: string) {
     const buildId = `bld_rw_${key}_${version.replaceAll(".", "_")}`;
-    await db
-      .insert(builds)
-      .values({
-        id: buildId,
-        productId: id,
-        version,
-        status: "pending_review",
-        scanStatus: "clean",
-        scanner: "integration-scanner",
-        scannedAt: new Date(),
-        storageKey: `fixtures/${key}.zip`,
-        sha256Hash: "a".repeat(64),
-        fileSizeBytes: 7,
-      });
+    await db.insert(builds).values({
+      id: buildId,
+      productId: id,
+      version,
+      status: "pending_review",
+      scanStatus: "clean",
+      scanner: "integration-scanner",
+      scannedAt: new Date(),
+      storageKey: `fixtures/${key}.zip`,
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 7,
+    });
     const audit = {
       id: `aud_rw_${randomBytes(8).toString("hex")}`,
       actorId: staff,
@@ -252,31 +246,27 @@ it("publication events require exact safe evidence, are immutable and roll back 
       db.delete(resourceReleaseEvents).where(eq(resourceReleaseEvents.buildId, release.buildId)),
     ).rejects.toThrow();
     await expect(
-      db
-        .insert(resourceReleaseEvents)
-        .values({
-          productId: f.id,
-          buildId: release.buildId,
-          version: "9.0.0",
-          sha256Hash: present(event).sha256Hash,
-          fileSizeBytes: 7,
-        }),
+      db.insert(resourceReleaseEvents).values({
+        productId: f.id,
+        buildId: release.buildId,
+        version: "9.0.0",
+        sha256Hash: present(event).sha256Hash,
+        fileSizeBytes: 7,
+      }),
     ).rejects.toThrow();
     const buildId = `bld_rw_rollback_${f.key}`;
-    await db
-      .insert(builds)
-      .values({
-        id: buildId,
-        productId: f.id,
-        version: "2.0.0",
-        status: "pending_review",
-        scanStatus: "clean",
-        scanner: "integration-scanner",
-        scannedAt: new Date(),
-        storageKey: "fixtures/rollback.zip",
-        sha256Hash: "a".repeat(64),
-        fileSizeBytes: 7,
-      });
+    await db.insert(builds).values({
+      id: buildId,
+      productId: f.id,
+      version: "2.0.0",
+      status: "pending_review",
+      scanStatus: "clean",
+      scanner: "integration-scanner",
+      scannedAt: new Date(),
+      storageKey: "fixtures/rollback.zip",
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 7,
+    });
     await expect(
       buildRepository.moderatePending(
         buildId,
@@ -291,6 +281,112 @@ it("publication events require exact safe evidence, are immutable and roll back 
       .where(eq(resourceReleaseEvents.buildId, buildId));
     expect(total.total).toBe(0);
     expect(present(await buildRepository.findById(buildId)).status).toBe("pending_review");
+  } finally {
+    await f.cleanup();
+  }
+});
+
+it("stops an exact watch batch after lost access, preserves notices/cursors and confirms retries without another audit", async () => {
+  const a = await fixture(),
+    b = await fixture();
+  try {
+    await a.release("1.0.0");
+    await b.release("1.0.0");
+    await a.start();
+    await db
+      .insert(entitlements)
+      .values({
+        id: `ent_rw_batch_${a.key}`,
+        subjectType: "user",
+        subjectId: a.buyer,
+        permission: "product.download",
+        resourceId: b.id,
+      });
+    await watches.command({
+      userId: a.buyer,
+      productId: b.id,
+      command: { enabled: true, expectedRevision: 0 },
+      auditId: `aud_rw_second_${a.key}`,
+    });
+    await a.release("2.0.0");
+    await worker.runBatch(100);
+    const inbox = await a.inbox();
+    expect(inbox).toHaveLength(1);
+    const before = await db
+      .select({
+        productId: resourceReleaseWatches.productId,
+        lastSequence: resourceReleaseWatches.lastSequence,
+      })
+      .from(resourceReleaseWatches)
+      .where(eq(resourceReleaseWatches.userId, a.buyer))
+      .orderBy(resourceReleaseWatches.productId);
+    await db.delete(entitlements).where(eq(entitlements.subjectId, a.buyer));
+    const command = {
+      items: [
+        { productId: a.id, expectedRevision: 1 },
+        { productId: b.id, expectedRevision: 1 },
+      ],
+    };
+    const result = await watches.disableBatch({
+      userId: a.buyer,
+      command,
+      auditId: `aud_rw_stop_${a.key}`,
+    });
+    expect(result.changedCount).toBe(2);
+    expect(result.items.every((item) => !item.enabled && item.revision === 2)).toBe(true);
+    expect(
+      (await watches.disableBatch({ userId: a.buyer, command, auditId: `aud_rw_retry_${a.key}` }))
+        .changedCount,
+    ).toBe(0);
+    const audits = await db
+      .select()
+      .from(auditEvents)
+      .where(
+        and(
+          eq(auditEvents.actorId, a.buyer),
+          eq(auditEvents.action, "library.release_watches_disabled"),
+        ),
+      );
+    expect(audits).toHaveLength(1);
+    expect(
+      await db
+        .select({
+          productId: resourceReleaseWatches.productId,
+          lastSequence: resourceReleaseWatches.lastSequence,
+        })
+        .from(resourceReleaseWatches)
+        .where(eq(resourceReleaseWatches.userId, a.buyer))
+        .orderBy(resourceReleaseWatches.productId),
+    ).toEqual(before);
+    await a.release("3.0.0");
+    await worker.runBatch(100);
+    expect(await a.inbox()).toEqual(inbox);
+  } finally {
+    await db.delete(auditEvents).where(eq(auditEvents.actorId, a.buyer));
+    await db.delete(entitlements).where(eq(entitlements.subjectId, a.buyer));
+    await a.cleanup();
+    await b.cleanup();
+  }
+});
+it("rolls a watch batch back when the required audit cannot be written", async () => {
+  const f = await fixture();
+  try {
+    await f.release("1.0.0");
+    await f.start();
+    await expect(
+      watches.disableBatch({
+        userId: f.buyer,
+        command: { items: [{ productId: f.id, expectedRevision: 1 }] },
+        auditId: `aud_rw_enroll_${f.key}`,
+      }),
+    ).rejects.toThrow();
+    const [watch] = await db
+      .select()
+      .from(resourceReleaseWatches)
+      .where(
+        and(eq(resourceReleaseWatches.userId, f.buyer), eq(resourceReleaseWatches.productId, f.id)),
+      );
+    expect(watch).toMatchObject({ enabled: true, revision: 1 });
   } finally {
     await f.cleanup();
   }

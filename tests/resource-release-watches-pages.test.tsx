@@ -98,3 +98,25 @@ it("authenticates early and invalid duplicate filters never reach the repository
   ).toContain("Invalid watch filters");
   expect(state.page).not.toHaveBeenCalled();
 });
+
+it("preserves search in filters, pagination and export, and masks unavailable upstream titles", async () => {
+  const result = await state.page();
+  state.page.mockResolvedValue({
+    ...result,
+    items: [{ ...result.items[0], available: false, title: "PRIVATE-TITLE" }],
+  });
+  const html = renderToStaticMarkup(
+    <LocaleProvider locale="en">
+      {
+        await Page({
+          searchParams: Promise.resolve({ filter: "enabled", page: "2", query: "Core" }),
+        })
+      }
+    </LocaleProvider>,
+  );
+  expect(html).not.toContain("PRIVATE-TITLE");
+  expect(html).toContain("query=Core");
+  expect(html).toContain("/api/library/watches/export?filter=enabled&amp;page=2&amp;query=Core");
+  expect(html).toContain("Stop several release watches");
+  expect(html).toContain("Resource currently unavailable");
+});

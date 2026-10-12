@@ -3219,3 +3219,44 @@ After rebasing on Agent A's reviewed comparison selections and preparation previ
 557 checks across 48 files pass. All 29 upstream files and complete problem notes
 are preserved. The integrated web type checks and webpack compile pass; the known
 root fixture omission and three unused commercial exports remain.
+
+
+## Release-watch search, export and reviewed bulk stop (2026-10-12)
+
+The private watch center now supports literal title search (100 characters), filter/count
+pagination capped at 1000 pages, and a bounded twenty-row JSON export. Availability uses
+transaction_timestamp in the existing read-only repeatable-read snapshot. Search predicates
+require current own access and safe publication before matching titles, preventing unavailable
+metadata from affecting search results. Titles are clipped to 200 characters in SQL and masked
+again at the screen/export boundary. Export whitelists watch fields, counts and bounds, excluding
+account IDs, cursor values, storage/audit data and raw extras; it retains inspection rate limits,
+private no-store/Cookie variance, attachment/nosniff and a 512-KiB size limit.
+
+RU/EN bulk controls select up to 20 enabled watches on the displayed page and require explicit
+acknowledgement. The strict command carries only unique product IDs and expected revisions,
+canonicalized by ASCII ID order; clients cannot enable watches, choose another account, change
+worker cursors or send authority fields. The repository validates independently, shares the
+account enrollment advisory lock with single-watch commands, requires a live account and locks
+all owned watch rows before deciding. No current resource grant is required to stop one's own
+watch. All exact enabled revisions are disabled in one guarded JSON-recordset UPDATE, with a
+mandatory batch audit in the same transaction. Database time produces monotonic update timestamps.
+Cursor values, existing notices, resource/version preferences, rights, licenses and payments
+remain untouched. Workers observe row locking and existing notices are not recalled.
+
+An all-disabled exact successor state returns changedCount=0 without another audit; mixed
+current/successor states and intervening changes conflict rather than partially applying.
+This confirms preference state, not an immutable UUID receipt or attribution of prior disable
+operations. Frozen-command retries, strict complete acknowledgements and definitive-error
+reload preserve the reviewed set after uncertain responses. Existing single enrollment and
+notification delivery contracts remain. No migration or worker scheduling is included.
+
+Two disposable-PostgreSQL fixtures cover stopping two own watches after access loss while
+preserving cursors/notices and exact retry audit uniqueness, plus rollback on mandatory audit
+failure. They remain unrun without PostgreSQL; live locks/query plans, browser interaction and
+Node 26 validation remain open. Concurrent profile/team-history commit 1c204b6 is preserved.
+GitHub Actions are neither run nor inspected.
+
+Verification: 150 focused tests across 14 files pass, covering watches/worker/batch flows
+and the preserved profile/team-history slice. Changed-file Biome, web TypeScript and
+merged Next compile pass. Root TypeScript retains only the existing fast-check type
+errors and old missing isSigned fixture. PostgreSQL/browser checks remain unrun.

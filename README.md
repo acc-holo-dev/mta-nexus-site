@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+Release watches now support title search, private twenty-row JSON exports and reviewed
+bulk stop for up to 20 enabled watches, including resources with lost access. Revisions
+are checked together in one audited transaction; mixed/stale states conflict. Uncertain
+results retry the exact selection. Existing notices and processing cursors are retained.
+Search considers only currently accessible safe resources and uses database snapshot time.
+
 Release comparison now links both exact releases to buyer preparation previews. Inspect
 a candidate before choosing it, retain the comparison pair/page while checking an MTA
 version, and export the same private report. Only the root build is previewed; dependency

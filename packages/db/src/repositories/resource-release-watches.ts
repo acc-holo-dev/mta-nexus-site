@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, sql } from "drizzle-orm";
 import {
   AppError,
   NotFoundError,
@@ -6,6 +6,7 @@ import {
   type ResourceReleaseWatchCommand,
   type ResourceReleaseWatchFilter,
 } from "@nexus/domain";
+import { disableResourceReleaseWatchBatch } from "./resource-release-watch-batches";
 import { db } from "../client";
 import {
   auditEvents,
@@ -51,10 +52,11 @@ function currentAccess(
 }
 function usable(userId: string) {
   return sql<boolean>`coalesce(${products.status} = 'published' and exists (
-    ${effectiveUserDownloadSources(userId, new Date())} select 1 from owned where owned.resource_id = ${products.id}
+    ${effectiveUserDownloadSources(userId, sql`transaction_timestamp()`)} select 1 from owned where owned.resource_id = ${products.id}
   ) and exists (select 1 from ${builds} where ${safePublishedBuildCondition(products.id.getSQL())}), false)`;
 }
 export class ResourceReleaseWatchesRepository {
+  disableBatch = disableResourceReleaseWatchBatch;
   async detail(userId: string, productId: string) {
     return db.transaction(async (tx) => {
       await parentAndUser(tx, userId, productId);
@@ -150,25 +152,44 @@ export class ResourceReleaseWatchesRepository {
         })
         .returning(fields);
       if (!watch) throw fail("RELEASE_WATCH_CONFLICT");
-      await tx
-        .insert(auditEvents)
-        .values({
-          id: input.auditId,
-          actorId: input.userId,
-          actorType: "user",
-          action: "library.release_watch_changed",
-          targetType: "product",
-          targetId: product.id,
-          details: { enabled: watch.enabled, revision: watch.revision },
-        });
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: input.userId,
+        actorType: "user",
+        action: "library.release_watch_changed",
+        targetType: "product",
+        targetId: product.id,
+        details: { enabled: watch.enabled, revision: watch.revision },
+      });
       return watch;
     });
   }
-  async page(userId: string, page = 1, filter: ResourceReleaseWatchFilter = "all") {
+  async page(userId: string, page = 1, filter: ResourceReleaseWatchFilter = "all", query = "") {
+    if (
+      typeof query !== "string" ||
+      query.length > 100 ||
+      !Number.isInteger(page) ||
+      page < 1 ||
+      page > 1000 ||
+      !["all", "enabled", "disabled", "unavailable"].includes(filter)
+    )
+      throw new AppError("Invalid watch query", 400, "RELEASE_WATCH_QUERY_INVALID");
+    query = query.trim();
     return db.transaction(
       async (tx) => {
         const available = usable(userId),
-          own = eq(watches.userId, userId);
+          own = and(
+            eq(watches.userId, userId),
+            query
+              ? and(
+                  available,
+                  ilike(
+                    products.title,
+                    `%${query.replace(/[\\%_]/gu, (character) => `\\${character}`)}%`,
+                  ),
+                )
+              : undefined,
+          );
         const [summary] = await tx
           .select({
             all: count(),
@@ -193,7 +214,9 @@ export class ResourceReleaseWatchesRepository {
           .select({
             ...fields,
             available,
-            title: sql<string | null>`case when ${available} then ${products.title} else null end`,
+            title: sql<
+              string | null
+            >`case when ${available} then left(${products.title},200) else null end`,
           })
           .from(watches)
           .leftJoin(products, eq(products.id, watches.productId))

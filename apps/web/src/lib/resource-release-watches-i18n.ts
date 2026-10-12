@@ -1,6 +1,16 @@
 import type { Locale } from "./i18n";
 const en = {
   title: "Release notifications",
+  search: "Search accessible resource titles",
+  export: "Export this page as JSON",
+  batchTitle: "Stop several release watches",
+  batchNote:
+    "Choose up to 20 enabled watches on this page. Current revisions are checked together; unavailable resources can still be stopped. Existing inbox notices are retained.",
+  confirmBatch: "I confirm stopping notifications for the selected resources.",
+  applyBatch: "Stop selected watches",
+  retrySame: "Retry the same request",
+  reloadState: "Reload current state",
+  pendingNote: "The result is unconfirmed. Retry the same selection or reload before changing it.",
   watch: "Notify me about new versions",
   unwatch: "Stop release notifications",
   enabled: "Enabled",
@@ -33,6 +43,17 @@ const en = {
 };
 const ru: typeof en = {
   title: "Уведомления о версиях",
+  search: "Поиск по названиям доступных ресурсов",
+  export: "Экспортировать эту страницу в JSON",
+  batchTitle: "Отключить несколько подписок",
+  batchNote:
+    "Выберите до 20 включённых подписок на этой странице. Текущие версии настроек проверяются вместе; недоступные ресурсы тоже можно отключить. Уведомления, уже созданные в ящике, сохраняются.",
+  confirmBatch: "Подтверждаю отключение уведомлений для выбранных ресурсов.",
+  applyBatch: "Отключить выбранные подписки",
+  retrySame: "Повторить тот же запрос",
+  reloadState: "Обновить текущее состояние",
+  pendingNote:
+    "Результат не подтверждён. Повторите тот же выбор или обновите состояние перед изменением.",
   watch: "Сообщать о новых версиях",
   unwatch: "Отключить уведомления о версиях",
   enabled: "Включены",

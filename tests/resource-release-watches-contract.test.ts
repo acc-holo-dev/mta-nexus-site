@@ -34,6 +34,7 @@ it("strictly bounds queries and preserves filtered navigation", () => {
     "page=0",
     "page=01",
     "page=10000",
+    "page=1001",
     "filter=private",
     "filter=all&filter=enabled",
     "userId=other",

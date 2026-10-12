@@ -1,3 +1,4 @@
+import { ResourceReleaseWatchBatchControls } from "../../../../components/resource-release-watch-batch-controls";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
@@ -55,7 +56,12 @@ export default async function ReleaseWatchesPage({
       </section>
     );
   }
-  const result = await resourceReleaseWatchesService.page(user, query.page, query.filter);
+  const result = await resourceReleaseWatchesService.page(
+    user,
+    query.page,
+    query.filter,
+    query.query,
+  );
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <Link href="/workspace/library" className="text-sm text-accent underline">
@@ -71,11 +77,44 @@ export default async function ReleaseWatchesPage({
       <Link href="/settings" className="text-sm text-accent underline">
         {copy.settings}
       </Link>
+      <form className="flex flex-wrap items-end gap-3">
+        <input type="hidden" name="filter" value={query.filter} />
+        <label className="grid gap-1">
+          {copy.search}
+          <input
+            name="query"
+            defaultValue={query.query}
+            maxLength={100}
+            className="rounded-md border border-base bg-inset px-3 py-2"
+          />
+        </label>
+        <button type="submit" className="rounded-md border border-base px-4 py-2">
+          {copy.search}
+        </button>
+      </form>
+      <a
+        className="text-accent underline"
+        href={`/api/library/watches/export?${new URLSearchParams({ filter: query.filter, page: String(result.page), query: query.query })}`}
+      >
+        {copy.export}
+      </a>
+      <ResourceReleaseWatchBatchControls
+        key={JSON.stringify(
+          result.items.map((item) => [item.productId, item.revision, item.enabled]),
+        )}
+        locale={locale}
+        items={result.items.map(({ productId, enabled, revision, available, title }) => ({
+          productId,
+          enabled,
+          revision,
+          title: available ? title : null,
+        }))}
+      />
       <nav aria-label={copy.title} className="flex flex-wrap gap-3">
         {(["all", "enabled", "disabled", "unavailable"] as const).map((filter) => (
           <Link
             key={filter}
-            href={resourceReleaseWatchesUrl(filter)}
+            href={resourceReleaseWatchesUrl(filter, 1, query.query)}
             aria-current={query.filter === filter ? "page" : undefined}
             className="rounded-md border border-base px-3 py-2 text-sm aria-[current=page]:bg-accent aria-[current=page]:text-white"
           >
@@ -88,7 +127,7 @@ export default async function ReleaseWatchesPage({
           {result.items.map((watch) => (
             <li key={watch.productId} className="nexus-panel space-y-3 p-5">
               <h2 className="break-words font-semibold text-primary">
-                {watch.title ?? copy.privateResource}
+                {watch.available ? (watch.title ?? copy.privateResource) : copy.privateResource}
               </h2>
               <p className="text-sm text-secondary">
                 {watch.enabled ? copy.enabled : copy.disabled}
@@ -128,7 +167,7 @@ export default async function ReleaseWatchesPage({
         <nav aria-label={copy.page} className="flex gap-4 text-sm">
           {result.page > 1 ? (
             <Link
-              href={resourceReleaseWatchesUrl(query.filter, result.page - 1)}
+              href={resourceReleaseWatchesUrl(query.filter, result.page - 1, query.query)}
               className="text-accent underline"
             >
               {copy.previous}
@@ -139,7 +178,7 @@ export default async function ReleaseWatchesPage({
           </span>
           {result.page < result.totalPages ? (
             <Link
-              href={resourceReleaseWatchesUrl(query.filter, result.page + 1)}
+              href={resourceReleaseWatchesUrl(query.filter, result.page + 1, query.query)}
               className="text-accent underline"
             >
               {copy.next}

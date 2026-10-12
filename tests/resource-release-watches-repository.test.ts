@@ -140,3 +140,13 @@ it("bounds list counts and suppresses unavailable metadata without exposing prog
   expect(projection).not.toContain('"resource_release_watches"."last_sequence"');
   expect(projection).not.toContain("storage_key");
 });
+
+it("searches literal accessible titles using one database-time snapshot", async () => {
+  state.rows = [[[0, 0, 0, 0]], []];
+  await repo.page("usr_a", 1, "all", String.raw`a%_\z`);
+  for (const query of state.queries) {
+    expect(query.sql).toContain("transaction_timestamp()");
+    expect(query.sql).toContain("ilike");
+    expect(query.params).toContain(String.raw`%a\%\_\\z%`);
+  }
+});

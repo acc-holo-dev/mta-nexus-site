@@ -5,6 +5,6 @@ import { resourceReleaseWatchesService } from "../../../../lib/services/resource
 export function GET(request: NextRequest) {
   return resourceCommerceRequest(request, false, (user) => {
     const query = resourceReleaseWatchesQuery(request.nextUrl.searchParams);
-    return resourceReleaseWatchesService.page(user, query.page, query.filter);
+    return resourceReleaseWatchesService.page(user, query.page, query.filter, query.query);
   });
 }

@@ -46,7 +46,7 @@ it("serves private session-scoped reads with inspection rate limiting", async ()
   expect(response.status).toBe(200);
   expect(response.headers.get("cache-control")).toBe("private, no-store");
   expect(response.headers.get("vary")).toBe("Cookie");
-  expect(state.page).toHaveBeenCalledWith("usr_a", 2, "enabled");
+  expect(state.page).toHaveBeenCalledWith("usr_a", 2, "enabled", "");
   expect(state.rate).toHaveBeenCalledWith("resourceInspection", "usr_a");
   expect(
     (await detail(new NextRequest("https://nexus.test/api/library/watches/prd_a"), context)).status,

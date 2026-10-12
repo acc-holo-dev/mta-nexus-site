@@ -22,3 +22,12 @@ export type ResourceReleaseWorkerResult = {
   pushJobs: number;
   pushDegraded: number;
 };
+
+export const RESOURCE_RELEASE_WATCH_BATCH_LIMIT = 20;
+export type ResourceReleaseWatchDisableCommand = {
+  items: { productId: string; expectedRevision: number }[];
+};
+export type ResourceReleaseWatchDisableResult = {
+  items: ResourceReleaseWatch[];
+  changedCount: number;
+};
