@@ -3,10 +3,13 @@ import {
   readLibraryCollectionHistory,
   readLibraryCollectionComparison,
   applyLibraryMembershipBatch,
+  readLibraryMembershipHistory,
+  readLibraryMembershipHistoryDetail,
 } from "@nexus/db";
 import {
   AppError,
   type LibraryCollectionHistoryQuery,
+  type LibraryMembershipHistoryQuery,
   type LibraryCollectionComparisonQuery,
   type LibraryReleaseFilter,
   type User,
@@ -18,6 +21,10 @@ import {
 } from "@nexus/validation";
 import { collectionId } from "../library-collections-query";
 export const libraryCollectionsService = {
+  membershipHistory: (actor: User, query: LibraryMembershipHistoryQuery) =>
+    readLibraryMembershipHistory(actor.id, query),
+  membershipReceipt: (actor: User, id: string) =>
+    readLibraryMembershipHistoryDetail(actor.id, collectionId(id)),
   membershipBatch(actor: User, productId: string, input: unknown) {
     const command = libraryMembershipBatchCommandSchema.safeParse(input);
     if (!command.success) throw new AppError("Invalid membership batch", 400, "COLLECTION_INVALID");

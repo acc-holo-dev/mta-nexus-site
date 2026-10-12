@@ -4008,3 +4008,53 @@ passes before and after regenerated routes. The isolated Next webpack compile-mo
 exits zero. Root TypeScript retains only the known fast-check/implicit-any and old missing
 isSigned delivery-fixture errors. Migration 0077, both new PostgreSQL fixtures, browser,
 live SQL/locking/query plans and full production generation remain unrun.
+
+
+## Private resource membership group history — 2026-10-12
+
+Added own-only GET history, JSON-page export and stable receipt detail under
+`/api/library/collections/membership-history`, with RU/EN SSR list/detail under the
+matching workspace path. The saved membership form links directly to its immutable
+parent receipt, including after final inaccessible-reference removal. Own collection
+list, ordinary command history and resource membership screens link to this journal.
+Filters accept only single canonical page/day/operation/collection/resource selectors:
+7/30/90/365 days, whole additions-only/removals-only/mixed groups and twenty parents
+per page. A collection match keeps all recorded children. Detail accepts only the route
+receipt ID, always scoped to the session owner, without time-window or current-access
+requirements. Unknown/foreign receipts return the same missing result before child or
+resource inspection. HTTP reads use resourceInspection rate limits and private/no-store,
+Cookie-varying responses; attachment export has a fixed name, nosniff and 512 KiB cap.
+
+Both read paths require a live user and read-only repeatable-read transaction. Database
+snapshot time controls history windows and effective entitlement/legacy-license expiry.
+Canonical digest and bounded parent associations are checked before one bounded own-child
+query. Shared strict group proof validates every child UUID/action/resource/collection/
+successor revision and exact complete association; malformed or contradictory records
+are neutral and do not trigger current-state metadata queries. The existing mutation
+confirmation reuses the same group proof and retains its frozen reviewed-name checks.
+At most twenty groups expand to four hundred child receipts, one current collection/
+resource-pair lookup and twenty resource labels. Membership joins bind both collection
+and resource, preventing one resource's current state from being applied to another
+resource's group. Recorded child names/revisions and reviewed/result membership remain
+immutable; current own collection name/status/revision/membership is separate. Current
+resource titles require own current access, published product and trusted clean published
+build; inaccessible/deleted resources retain only recorded IDs and masked current labels.
+No raw payloads, grants, storage keys or download controls are exposed. No migration added.
+
+Imported independent remote commit 0b5a2059b714cb878b0f77c0fa8b97fe9ddb45cc exactly,
+retaining durable discussion recovery checkpoint/storage changes and the isSigned test
+fixture fix. The membership-history work is based directly on that main commit.
+
+Verification: 686 focused tests in 55 files pass, including whole-group/privacy/owner/
+clock/malformed-proof/current-membership matching, strict query/HTTP/export limits,
+RU/EN list/detail, stable receipt links and preserved collection commands, comparison,
+preparation/version/watches and discussion recovery/checkpoint/storage/watch flows.
+Biome lint passes on all 24 touched non-integration TypeScript sources. Web TypeScript
+passes before and after the successful isolated Next webpack compile-mode build.
+Root TypeScript retains only known missing
+fast-check/property-test implicit-any errors; the preserved remote delivery fixture now
+includes isSigned. One PostgreSQL fixture covers whole-group filtering, immutable proof
+after rename/archive/product deletion, stable detail after final orphan removal and
+foreign-owner rejection. It remains unrun without disposable PostgreSQL; live SQL/query
+plans, browser behavior, full production generation and Node 26 validation remain open.
+GitHub Actions are neither run nor inspected; this block is committed with [skip ci].

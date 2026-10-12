@@ -1,3 +1,6 @@
+import { GET as membershipHistory } from "../apps/web/src/app/api/library/collections/membership-history/route";
+import { GET as membershipHistoryExport } from "../apps/web/src/app/api/library/collections/membership-history/export/route";
+import { GET as membershipReceipt } from "../apps/web/src/app/api/library/collections/membership-history/[id]/route";
 import { GET as comparison } from "../apps/web/src/app/api/library/collections/[id]/compare/route";
 import { GET as accountHistory } from "../apps/web/src/app/api/library/collections/history/route";
 import { GET as historyExport } from "../apps/web/src/app/api/library/collections/history/export/route";
@@ -19,6 +22,8 @@ const state = vi.hoisted(() => ({
   accountHistory: vi.fn(),
   comparison: vi.fn(),
   membershipBatch: vi.fn(),
+  membershipHistory: vi.fn(),
+  membershipReceipt: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.actor },
@@ -31,6 +36,8 @@ vi.mock("@nexus/db", () => ({
   readLibraryCollectionHistory: state.accountHistory,
   readLibraryCollectionComparison: state.comparison,
   applyLibraryMembershipBatch: state.membershipBatch,
+  readLibraryMembershipHistory: state.membershipHistory,
+  readLibraryMembershipHistoryDetail: state.membershipReceipt,
   libraryCollectionsRepository: {
     command: state.command,
     page: state.page,
@@ -556,4 +563,78 @@ it("applies a strict resource-bound membership batch through the session and con
   state.rate.mockResolvedValue({ success: false });
   expect((await membershipBatch(post({ requestId, changes }, path), context)).status).toBe(429);
   expect(state.membershipBatch).not.toHaveBeenCalled();
+});
+
+it("reads owner-scoped whole membership groups and stable details with private bounded JSON export", async () => {
+  state.membershipHistory.mockResolvedValue({ schemaVersion: 1, items: [] });
+  state.membershipReceipt.mockResolvedValue({ schemaVersion: 1, item: { id: "lmb_a" } });
+  const path = "/api/library/collections/membership-history";
+  const response = await membershipHistory(
+    request(`${path}?days=90&operation=mixed&collectionId=lcol_a&productId=prd_a&page=2`),
+  );
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe("Cookie");
+  expect(state.membershipHistory).toHaveBeenCalledWith("usr_a", {
+    page: 2,
+    days: 90,
+    operation: "mixed",
+    collectionId: "lcol_a",
+    productId: "prd_a",
+  });
+  expect(state.rate).toHaveBeenCalledWith("resourceInspection", "usr_a");
+  const detail = await membershipReceipt(request(`${path}/lmb_a`), {
+    params: Promise.resolve({ id: "lmb_a" }),
+  });
+  expect(detail.status).toBe(200);
+  expect(state.membershipReceipt).toHaveBeenCalledWith("usr_a", "lmb_a");
+  const exported = await membershipHistoryExport(request(`${path}/export`));
+  expect(exported.headers.get("content-disposition")).toContain(
+    "collection-membership-history.json",
+  );
+  expect(exported.headers.get("x-content-type-options")).toBe("nosniff");
+  expect(exported.headers.get("cache-control")).toBe("private, no-store");
+  state.membershipHistory.mockResolvedValue({ text: "ж".repeat(270000) });
+  expect((await membershipHistoryExport(request(`${path}/export`))).status).toBe(413);
+});
+it("rejects anonymous, injected, duplicate and throttled membership reads before repository access", async () => {
+  const path = "/api/library/collections/membership-history";
+  for (const params of [
+    "userId=other",
+    "operation=add",
+    "days=31",
+    "productId=../private",
+    "page=1&page=2",
+  ])
+    expect((await membershipHistory(request(`${path}?${params}`))).status).toBe(400);
+  expect(
+    (
+      await membershipReceipt(request(`${path}/lmb_a?userId=other`), {
+        params: Promise.resolve({ id: "lmb_a" }),
+      })
+    ).status,
+  ).toBe(400);
+  state.actor = null;
+  expect((await membershipHistory(request(path))).status).toBe(401);
+  expect((await membershipHistoryExport(request(`${path}/export`))).status).toBe(401);
+  expect(
+    (
+      await membershipReceipt(request(`${path}/lmb_a`), {
+        params: Promise.resolve({ id: "lmb_a" }),
+      })
+    ).status,
+  ).toBe(401);
+  state.actor = { id: "usr_a", role: "user" };
+  state.rate.mockResolvedValue({ success: false });
+  expect((await membershipHistory(request(path))).status).toBe(429);
+  expect((await membershipHistoryExport(request(`${path}/export`))).status).toBe(429);
+  expect(
+    (
+      await membershipReceipt(request(`${path}/lmb_a`), {
+        params: Promise.resolve({ id: "lmb_a" }),
+      })
+    ).status,
+  ).toBe(429);
+  expect(state.membershipHistory).not.toHaveBeenCalled();
+  expect(state.membershipReceipt).not.toHaveBeenCalled();
 });

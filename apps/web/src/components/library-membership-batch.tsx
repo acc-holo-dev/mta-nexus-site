@@ -1,4 +1,6 @@
 "use client";
+import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
+import { membershipHistoryHref } from "../lib/library-membership-history-query";
 import {
   LIBRARY_COLLECTION_BATCH_LIMIT,
   type LibraryResourceCollections,
@@ -284,6 +286,9 @@ export function LibraryMembershipBatchForm({
       {saved && (
         <div className="space-y-2">
           <p role="status">{h.success}</p>
+          <a href={membershipHistoryHref(saved.id)} className="text-accent underline">
+            {libraryMembershipHistoryCopy(locale).detail}
+          </a>
           <a
             href={`/workspace/library/${encodeURIComponent(pending.current?.productId ?? report.resource.productId)}/collections`}
             className="text-accent underline"

@@ -1,3 +1,5 @@
+import { libraryMembershipHistoryCopy } from "../../../../../lib/library-membership-history-i18n";
+import { membershipHistoryHref } from "../../../../../lib/library-membership-history-query";
 import { LibraryMembershipBatchForm } from "../../../../../components/library-membership-batch";
 import { libraryCollectionHistoryCopy } from "../../../../../lib/library-collection-history-i18n";
 import { AppError } from "@nexus/domain";
@@ -56,6 +58,12 @@ export default async function ResourceCollectionsPage({
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.library}>
           <Link href="/workspace/library" className="text-accent underline">
             {c.library}
+          </Link>
+          <Link
+            href={`${membershipHistoryHref()}?productId=${encodeURIComponent(id)}`}
+            className="text-accent underline"
+          >
+            {libraryMembershipHistoryCopy(locale).history}
           </Link>
           <Link href={collectionHref()} className="text-accent underline">
             {c.title}

@@ -1,3 +1,5 @@
+import { libraryMembershipHistoryCopy } from "../../../../../lib/library-membership-history-i18n";
+import { membershipHistoryHref } from "../../../../../lib/library-membership-history-query";
 import {
   AppError,
   LIBRARY_COLLECTION_HISTORY_ACTIONS,
@@ -52,6 +54,9 @@ export default async function Page({
     return (
       <div className="mx-auto max-w-5xl space-y-6 py-8">
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={h.title}>
+          <Link href={membershipHistoryHref()} className="text-accent underline">
+            {libraryMembershipHistoryCopy(locale).history}
+          </Link>
           <Link href={collectionHref()} className="text-accent underline">
             {c.title}
           </Link>

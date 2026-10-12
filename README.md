@@ -1,5 +1,13 @@
 # MTA NEXUS
 
+Own resource membership groups now have a private RU/EN history, stable receipt detail
+links and bounded JSON-page export. Filters cover 7/30/90/365 days, additions/removals/
+mixed groups, collection and resource IDs; every matching group retains all children.
+Shared strict receipt validation separates immutable names/revisions/membership proofs
+from current own collection state. Lost access or resource deletion masks the current
+resource label without removing historical proof or its stable detail. All reads use an
+owner-scoped, read-only database snapshot. No new migration is required beyond 0077.
+
 Resource collection memberships now support reviewed atomic updates across up to
 twenty active own collections in one operation, including mixed additions/removals.
 Every reviewed revision and prior membership is checked before mutation, all changes

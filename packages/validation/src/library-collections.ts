@@ -153,3 +153,49 @@ export const libraryCollectionReceiptSchema = z
     createdAt: z.string().datetime(),
   })
   .strict();
+
+/** Full immutable group proof; current collection state is deliberately excluded. */
+export const libraryMembershipBatchReceiptSchema = z
+  .object({
+    id: libraryCollectionIdSchema,
+    requestId: z.string().uuid(),
+    productId: libraryCollectionIdSchema,
+    command: libraryMembershipBatchCommandSchema,
+    children: z.array(libraryCollectionReceiptSchema).min(1).max(LIBRARY_COLLECTION_BATCH_LIMIT),
+    createdAt: z.string().datetime(),
+  })
+  .strict()
+  .superRefine((receipt, ctx) => {
+    const invalid = () =>
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Inconsistent membership proof" });
+    if (
+      receipt.requestId !== receipt.command.requestId ||
+      receipt.children.length !== receipt.command.changes.length ||
+      new Set(receipt.children.map((child) => child.id)).size !== receipt.children.length ||
+      new Set(receipt.children.map((child) => child.requestId)).size !== receipt.children.length
+    )
+      invalid();
+    for (const [index, change] of receipt.command.changes.entries()) {
+      const child = receipt.children[index];
+      if (
+        !child ||
+        child.sourceCollection !== undefined ||
+        child.requestId === receipt.requestId ||
+        child.command.requestId !== child.requestId ||
+        (child.command.action !== "add" && child.command.action !== "remove") ||
+        child.command.action !== (change.inCollection ? "add" : "remove") ||
+        child.command.productId !== receipt.productId ||
+        child.command.expectedRevision !== change.expectedRevision ||
+        child.collection.id !== change.collectionId ||
+        child.collection.status !== "active" ||
+        child.collection.revision !== change.expectedRevision + 1
+      )
+        invalid();
+    }
+  });
+export const libraryMembershipBatchResultSchema = z
+  .object({
+    replayed: z.boolean(),
+    receipt: libraryMembershipBatchReceiptSchema,
+  })
+  .strict();

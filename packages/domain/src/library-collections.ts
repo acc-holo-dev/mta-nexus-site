@@ -170,3 +170,46 @@ export type LibraryCollectionHistoryPage = {
     resources: { productId: string; currentTitle: string | null; currentAvailable: boolean }[];
   }[];
 };
+
+export const LIBRARY_MEMBERSHIP_HISTORY_OPERATIONS = [
+  "all",
+  "additions",
+  "removals",
+  "mixed",
+] as const;
+export type LibraryMembershipHistoryQuery = {
+  page: number;
+  days: (typeof LIBRARY_COLLECTION_HISTORY_DAYS)[number];
+  operation: (typeof LIBRARY_MEMBERSHIP_HISTORY_OPERATIONS)[number];
+  collectionId?: string;
+  productId?: string;
+};
+export type LibraryMembershipHistoryItem = {
+  id: string;
+  createdAt: string;
+  receipt: LibraryMembershipBatchReceipt | null;
+  resource: { productId: string; currentTitle: string | null; currentAvailable: boolean } | null;
+  collections: {
+    collectionId: string;
+    current: LibraryCollectionSnapshot | null;
+    inCollection: boolean | null;
+  }[];
+};
+export type LibraryMembershipHistoryDetail = {
+  schemaVersion: 1;
+  generatedAt: string;
+  item: LibraryMembershipHistoryItem;
+};
+export type LibraryMembershipHistoryPage = Omit<
+  LibraryMembershipHistoryQuery,
+  "collectionId" | "productId"
+> & {
+  schemaVersion: 1;
+  generatedAt: string;
+  collectionId: string | null;
+  productId: string | null;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  items: LibraryMembershipHistoryItem[];
+};

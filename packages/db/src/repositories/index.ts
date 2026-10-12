@@ -90,3 +90,8 @@ export { applyLibraryMembershipBatch } from "./library-membership-batches";
 export * from "./library-selection-batches";
 export * from "./profile-change-history";
 export { supportMessageDiscoveryRepository } from "./support-message-discovery";
+
+export {
+  readLibraryMembershipHistory,
+  readLibraryMembershipHistoryDetail,
+} from "./library-membership-history";

@@ -163,6 +163,11 @@ it.each(["en", "ru"] as const)(
     expect(h.fetch.mock.calls[1]?.[1].body).toBe(init.body);
     expect(h.refresh).toHaveBeenCalledOnce();
     expect(render().some((n) => n.props.role === "status")).toBe(true);
+    expect(
+      render().some(
+        (n) => n.props.href === "/workspace/library/collections/membership-history/lmb_a",
+      ),
+    ).toBe(true);
   },
 );
 it("clears review when a collection revision changes before the first request", async () => {

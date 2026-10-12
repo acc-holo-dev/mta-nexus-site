@@ -971,3 +971,59 @@ it("rolls back every membership, revision, child/parent receipt and audit when t
       .where(eq(libraryMembershipBatchReceipts.id, result.receipt.id)),
   ).rejects.toThrow();
 });
+
+it("reads immutable whole membership groups after later collection edits and deletion of the resource, with stable owner-only detail", async () => {
+  const { readLibraryMembershipHistory, readLibraryMembershipHistoryDetail } = await import(
+    "../packages/db/src/repositories/library-membership-history"
+  );
+  const f = await membershipBatchFixture(),
+    saved = await f.apply();
+  await f.command(
+    { requestId: randomUUID(), action: "rename", expectedRevision: 3, name: "Later source" },
+    f.source,
+  );
+  await f.command(
+    { requestId: randomUUID(), action: "archive", expectedRevision: 2 },
+    f.destination,
+  );
+  await db.delete(products).where(eq(products.id, f.productId));
+  const report = await readLibraryMembershipHistory(f.userId, {
+    page: 1,
+    days: 7,
+    operation: "mixed",
+    productId: f.productId,
+    collectionId: f.source,
+  });
+  expect(report.total).toBe(1);
+  expect(report.items[0]?.receipt).toEqual(saved.receipt);
+  expect(report.items[0]?.receipt?.children).toHaveLength(2);
+  expect(report.items[0]?.resource).toEqual({
+    productId: f.productId,
+    currentTitle: null,
+    currentAvailable: false,
+  });
+  expect(report.items[0]?.collections.find((row) => row.collectionId === f.source)).toMatchObject({
+    current: { name: "Later source", revision: 4 },
+    inCollection: false,
+  });
+  expect(
+    report.items[0]?.collections.find((row) => row.collectionId === f.destination),
+  ).toMatchObject({ current: { status: "archived", revision: 3 }, inCollection: true });
+  await f.command(
+    { requestId: randomUUID(), action: "restore", expectedRevision: 3 },
+    f.destination,
+  );
+  await f.command(
+    { requestId: randomUUID(), action: "remove", productId: f.productId, expectedRevision: 4 },
+    f.destination,
+  );
+  await expect(collections.resourceMemberships(f.userId, f.productId)).rejects.toMatchObject({
+    statusCode: 404,
+  });
+  expect(
+    (await readLibraryMembershipHistoryDetail(f.userId, saved.receipt.id)).item.receipt,
+  ).toEqual(saved.receipt);
+  await expect(readLibraryMembershipHistoryDetail(f.other, saved.receipt.id)).rejects.toMatchObject(
+    { statusCode: 404 },
+  );
+});

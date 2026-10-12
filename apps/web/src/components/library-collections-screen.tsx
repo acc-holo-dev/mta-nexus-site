@@ -1,3 +1,5 @@
+import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
+import { membershipHistoryHref } from "../lib/library-membership-history-query";
 import { libraryCollectionComparisonCopy } from "../lib/library-collection-comparison-i18n";
 import { libraryCollectionHistoryCopy } from "../lib/library-collection-history-i18n";
 import { resourceReleaseWatchesCopy } from "../lib/resource-release-watches-i18n";
@@ -94,6 +96,9 @@ export async function LibraryCollectionsScreen({
             {c.library}
           </Link>
           <h1 className="font-display text-primary">{c.title}</h1>
+          <Link href={membershipHistoryHref()} className="text-accent underline">
+            {libraryMembershipHistoryCopy(locale).history}
+          </Link>
           <Link href="/workspace/library/collections/history" className="text-accent underline">
             {libraryCollectionHistoryCopy(locale).title}
           </Link>
