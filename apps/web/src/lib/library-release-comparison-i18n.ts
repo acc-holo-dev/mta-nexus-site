@@ -44,6 +44,7 @@ const en = {
     "Summary evidence is bound to each archive's recorded identity. Equal counts do not mean equal contents.",
   back: "Back to version selection",
   swap: "Swap releases",
+  preparation: "Preview preparation for this release",
   export: "Export comparison JSON",
   generated: "Snapshot time (UTC)",
 };
@@ -93,6 +94,7 @@ const ru: typeof en = {
     "Данные проверки связаны с записанными хешем и размером каждого архива. Равные счётчики не означают одинаковое содержимое.",
   back: "Назад к выбору версии",
   swap: "Поменять выпуски местами",
+  preparation: "Проверить подготовку этого выпуска",
   export: "Экспортировать сравнение в JSON",
   generated: "Время снимка (UTC)",
 };

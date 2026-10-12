@@ -35,14 +35,16 @@ export async function ResourceRequirementsScreen({
   const report = await resourceRequirementsService
     .report(actor.id, productId, scope, query)
     .catch((error: unknown) => {
-      if (error instanceof AppError && [403, 404].includes(error.statusCode)) notFound();
+      if (error instanceof AppError && [400, 403, 404].includes(error.statusCode)) notFound();
       throw error;
     });
   const copy = resourceRequirementsCopy(locale),
     root = report.nodes.find((node) => node.slug === report.rootSlug);
   const back =
     scope === "library"
-      ? `/workspace/library/${encodeURIComponent(productId)}/versions`
+      ? query.returnFrom && query.previewBuildId
+        ? `/workspace/library/${encodeURIComponent(productId)}/versions/compare?${new URLSearchParams({ from: query.returnFrom, to: query.previewBuildId, returnPage: String(query.returnPage ?? 1) })}`
+        : `/workspace/library/${encodeURIComponent(productId)}/versions${query.returnPage ? `?page=${query.returnPage}` : ""}`
       : scope === "publisher"
         ? `/workspace/resources/${encodeURIComponent(productId)}/compatibility`
         : `/admin/resources/${encodeURIComponent(productId)}`;
@@ -61,6 +63,11 @@ export async function ResourceRequirementsScreen({
       <h2 className="break-words">{root?.title}</h2>
       <p className="text-secondary">{copy.note}</p>
       {scope !== "library" && <p className="text-muted">{copy.preview}</p>}
+      {query.previewBuildId && (
+        <p role="note" className="nexus-panel p-4">
+          {copy.libraryPreview}
+        </p>
+      )}
       <form className="nexus-panel flex flex-wrap items-end gap-3 p-4">
         <label className="grid gap-1">
           {copy.target}
@@ -74,12 +81,18 @@ export async function ResourceRequirementsScreen({
           />
         </label>
         {query.buildId && <input type="hidden" name="buildId" value={query.buildId} />}
+        {query.previewBuildId && (
+          <input type="hidden" name="previewBuildId" value={query.previewBuildId} />
+        )}
+        {query.returnFrom && <input type="hidden" name="returnFrom" value={query.returnFrom} />}
+        {query.returnPage && <input type="hidden" name="returnPage" value={query.returnPage} />}
         <button type="submit">{copy.check}</button>
       </form>
       <ResourceRequirementsReportBody
         report={report}
         scope={scope}
         locale={locale}
+        allowDownloads={!query.previewBuildId}
         exportHref={`${api}/export${params.size ? `?${params}` : ""}`}
       />
     </div>

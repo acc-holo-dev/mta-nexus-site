@@ -130,3 +130,29 @@ it("rejects unsupported query parameters before loading data", async () => {
   ).rejects.toThrow("NOT_FOUND");
   expect(state.report).not.toHaveBeenCalled();
 });
+
+it.each(["en", "ru"])(
+  "preserves a read-only preview and comparison return path in %s",
+  async (locale) => {
+    state.locale = locale;
+    const html = renderToStaticMarkup(
+      await screen({
+        productId: "prd_a",
+        scope: "library",
+        raw: { previewBuildId: "bld_b", returnFrom: "bld_a", returnPage: "2", targetMta: "1.6.0" },
+      }),
+    );
+    expect(html).toContain(
+      locale === "ru" ? "Выбор версии не меняется" : "Your version choice is unchanged",
+    );
+    expect(html).toContain("/versions/compare?from=bld_a&amp;to=bld_b&amp;returnPage=2");
+    expect(html).toContain('name="previewBuildId" value="bld_b"');
+    expect(html).toContain('name="returnFrom" value="bld_a"');
+    expect(html).toContain('name="returnPage" value="2"');
+    expect(html).toContain(
+      "/requirements/export?previewBuildId=bld_b&amp;returnFrom=bld_a&amp;returnPage=2&amp;targetMta=1.6.0",
+    );
+    expect(html).not.toContain("data-build=");
+    expect(html).toContain('data-cart="prd_b"');
+  },
+);

@@ -92,6 +92,12 @@ export async function LibraryReleaseComparisonScreen({
             <h2>
               {index === 0 ? c.from : c.to}: {release.version}
             </h2>
+            <Link
+              href={`/workspace/library/${encodeURIComponent(path.id)}/requirements?${new URLSearchParams({ previewBuildId: release.id, returnFrom: index === 0 ? result.to.id : result.from.id, returnPage: String(query.returnPage) })}`}
+              className="text-accent underline"
+            >
+              {c.preparation}
+            </Link>
             <h3>{c.notes}</h3>
             <p className="whitespace-pre-wrap break-words">{release.releaseNotes ?? c.unknown}</p>
             {release.notesTruncated && <p role="note">{c.truncated}</p>}

@@ -791,3 +791,95 @@ it("rejects a comparison choice after an intervening selection or revoked access
     await f.cleanup();
   }
 });
+
+it("previews a candidate release while preserving root and dependency selections and audits", async () => {
+  const f = await batchFixture();
+  try {
+    await f.apply();
+    await f.publishReplacement();
+    const before = await db
+      .select()
+      .from(selections)
+      .where(eq(selections.userId, f.buyer))
+      .orderBy(selections.productId);
+    const audits = await db
+      .select({ id: auditEvents.id })
+      .from(auditEvents)
+      .where(eq(auditEvents.actorId, f.buyer))
+      .orderBy(auditEvents.id);
+    const productId = f.ids[0] ?? "",
+      previewBuildId = `bld_req_${f.key}_replacement`;
+    const current = await repo.report({
+      actorId: f.buyer,
+      productId,
+      scope: "library",
+      targetMta: "1.6.0",
+    });
+    expect(current.nodes.find((node) => node.id === productId)?.build?.id).toBe(
+      `bld_req_${f.key}_0`,
+    );
+    const preview = await repo.report({
+      actorId: f.buyer,
+      productId,
+      scope: "library",
+      targetMta: "1.6.0",
+      previewBuildId,
+    });
+    expect(preview.previewBuildId).toBe(previewBuildId);
+    expect(preview.nodes.find((node) => node.id === productId)).toMatchObject({
+      selection: "preview",
+      build: { id: previewBuildId },
+    });
+    expect(preview.nodes.find((node) => node.id === f.ids[1])).toMatchObject({
+      selection: "fixed",
+      build: { id: `bld_req_${f.key}_1` },
+    });
+    expect(
+      await db
+        .select()
+        .from(selections)
+        .where(eq(selections.userId, f.buyer))
+        .orderBy(selections.productId),
+    ).toEqual(before);
+    expect(
+      await db
+        .select({ id: auditEvents.id })
+        .from(auditEvents)
+        .where(eq(auditEvents.actorId, f.buyer))
+        .orderBy(auditEvents.id),
+    ).toEqual(audits);
+    expect(JSON.stringify(preview)).not.toContain("fixture/req_");
+  } finally {
+    await f.cleanup();
+  }
+});
+it("does not preview a foreign or withdrawn release or reuse a revoked buyer grant", async () => {
+  const f = await fixture();
+  try {
+    await f.publishReplacement();
+    const query = {
+      actorId: f.buyer,
+      productId: f.ids[0] ?? "",
+      scope: "library" as const,
+      targetMta: "1.6.0",
+      previewBuildId: `bld_req_${f.key}_replacement`,
+    };
+    await expect(
+      repo.report({ ...query, previewBuildId: `bld_req_${f.key}_1` }),
+    ).rejects.toMatchObject({ statusCode: 404 });
+    await db
+      .update(builds)
+      .set({ status: "deprecated" })
+      .where(eq(builds.id, query.previewBuildId));
+    await expect(repo.report(query)).rejects.toMatchObject({ statusCode: 404 });
+    await db.delete(entitlements).where(eq(entitlements.subjectId, f.buyer));
+    await expect(
+      repo.report({ ...query, previewBuildId: `bld_req_${f.key}_0` }),
+    ).rejects.toMatchObject({ statusCode: 404 });
+    expect(await db.select().from(selections).where(eq(selections.userId, f.buyer))).toHaveLength(
+      0,
+    );
+  } finally {
+    await f.cleanup();
+  }
+});

@@ -10,10 +10,23 @@ export const resourceRequirementsService = {
     actorId: string,
     productId: string,
     scope: ResourceRequirementsScope,
-    query: { targetMta?: string; buildId?: string },
+    query: {
+      targetMta?: string;
+      buildId?: string;
+      previewBuildId?: string;
+      returnFrom?: string;
+      returnPage?: number;
+    },
   ) {
     if (!/^[A-Za-z0-9_-]{1,160}$/u.test(productId))
       throw new AppError("Invalid resource", 404, "NOT_FOUND");
-    return resourceRequirementsRepository.report({ actorId, productId, scope, ...query });
+    return resourceRequirementsRepository.report({
+      actorId,
+      productId,
+      scope,
+      targetMta: query.targetMta,
+      buildId: query.buildId,
+      previewBuildId: query.previewBuildId,
+    });
   },
 };

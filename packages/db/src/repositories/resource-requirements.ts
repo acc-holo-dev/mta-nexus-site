@@ -1,4 +1,5 @@
 import {
+  AppError,
   buildResourceRequirementsReport,
   buildCollectionRequirementsReport,
   LIBRARY_COLLECTION_ITEM_LIMIT,
@@ -9,7 +10,7 @@ import {
   type ResourceRequirementsScope,
   requirementDeclarations,
 } from "@nexus/domain";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, sql, type SQL } from "drizzle-orm";
 import { db } from "../client";
 import {
   builds,
@@ -52,14 +53,16 @@ async function readNodes(
   slugs: string[],
   privateRoot: string | null,
   library: boolean,
-  observedAt: Date,
+  observedAt: Date | SQL,
   buildId?: string,
+  previewRoot?: { productId: string; buildId: string },
 ) {
   const privateCondition = privateRoot ? sql`p.id = ${privateRoot}` : sql`false`;
+  const previewCondition = previewRoot ? sql`p.id = ${previewRoot.productId}` : sql`false`;
   const rows = await tx.execute<NodeRow>(sql`${effectiveUserDownloadSources(userId, observedAt)}
  SELECT p.id,p.slug,left(p.title,200) AS title,p.status = 'published' AS published,p.compatibility,
  (${library} AND EXISTS (SELECT 1 FROM owned WHERE resource_id = p.id)) AS accessible,
- CASE WHEN ${privateCondition} THEN 'preview' WHEN pref.mode = 'fixed' THEN 'fixed' ELSE 'latest' END AS selection,
+ CASE WHEN ${privateCondition} OR ${previewCondition} THEN 'preview' WHEN pref.mode = 'fixed' THEN 'fixed' ELSE 'latest' END AS selection,
  chosen.id AS "buildId", chosen.version,chosen.sha256_hash AS "sha256Hash",chosen.file_size_bytes AS "fileSizeBytes",
  coalesce(chosen.status = 'published' AND chosen.scan_status = 'clean' AND btrim(chosen.scanner) <> '' AND chosen.scanned_at IS NOT NULL,false) AS safe,
  chosen.mta_version_target AS "mtaTarget",
@@ -73,6 +76,7 @@ async function readNodes(
  LEFT JOIN LATERAL (SELECT * FROM ${builds} WHERE ${builds.productId} = p.id AND
    (${privateCondition} OR ${safePublishedBuildCondition(sql`p.id`)}) AND
    ${builds.id} = CASE WHEN ${privateCondition} THEN coalesce(${buildId ?? null}::text,latest.id)
+     WHEN ${previewCondition} THEN ${previewRoot?.buildId ?? null}::text
      WHEN pref.mode = 'fixed' THEN pref.build_id ELSE latest.id END
    LIMIT 1) chosen ON true
  WHERE p.slug IN (SELECT value FROM jsonb_array_elements_text(${JSON.stringify(slugs)}::jsonb))
@@ -114,7 +118,7 @@ async function expandNodes(
   roots: ResourceRequirementNode[],
   rootSlugs: string[],
   library: boolean,
-  observedAt: Date,
+  observedAt: Date | SQL,
 ) {
   const nodes = [...roots];
   const discovered = new Set(rootSlugs);
@@ -205,13 +209,28 @@ export class ResourceRequirementsRepository {
     scope: ResourceRequirementsScope;
     targetMta?: string;
     buildId?: string;
+    previewBuildId?: string;
   }) {
+    if (
+      !["library", "publisher", "moderator"].includes(input.scope) ||
+      (input.scope === "library" && input.buildId !== undefined) ||
+      (input.previewBuildId !== undefined &&
+        (input.scope !== "library" ||
+          typeof input.previewBuildId !== "string" ||
+          !/^[A-Za-z0-9_-]{1,128}$/u.test(input.previewBuildId)))
+    )
+      throw new AppError("Invalid requirements preview", 400, "INVALID_REQUIREMENTS_QUERY");
     return db.transaction(
       async (tx) => {
-        const observedAt = new Date();
+        const [time] = await tx.execute<{ observedAt: string }>(
+          sql`select date_trunc('milliseconds',transaction_timestamp())::text as "observedAt"`,
+        );
+        const observedAt = new Date(time?.observedAt ?? "");
+        if (!Number.isFinite(observedAt.getTime()))
+          throw new AppError("Requirements snapshot unavailable", 500, "REQUIREMENTS_TIME_UNKNOWN");
         await tx.execute(sql`set local statement_timeout = '10s'`);
         await tx.execute(sql`set local lock_timeout = '5s'`);
-        const [product] = await tx
+        const productQuery = tx
           .select({
             id: products.id,
             slug: products.slug,
@@ -221,15 +240,16 @@ export class ResourceRequirementsRepository {
           })
           .from(products)
           .where(eq(products.id, input.productId))
-          .for("share")
           .limit(1);
+        const [product] = await (input.scope === "library"
+          ? productQuery
+          : productQuery.for("share"));
         if (product?.price !== 0) throw new NotFoundError("Resource");
         if (input.scope === "library") {
           const [actor] = await tx
             .select({ id: users.id })
             .from(users)
             .where(eq(users.id, input.actorId))
-            .for("share")
             .limit(1);
           if (!actor) throw new NotFoundError("Library account");
         }
@@ -243,13 +263,20 @@ export class ResourceRequirementsRepository {
           [product.slug],
           privateRoot,
           input.scope === "library",
-          observedAt,
+          sql`transaction_timestamp()`,
           input.buildId,
+          input.previewBuildId
+            ? { productId: product.id, buildId: input.previewBuildId }
+            : undefined,
         );
         if (
           !nodes[0] ||
           (input.scope === "library" && !nodes[0].accessible) ||
-          (input.buildId && !nodes[0].build)
+          (input.buildId && !nodes[0].build) ||
+          (input.previewBuildId &&
+            (nodes[0].build?.id !== input.previewBuildId ||
+              !nodes[0].build.safe ||
+              !nodes[0].published))
         )
           throw new NotFoundError("Resource requirements");
         const expanded = await expandNodes(
@@ -258,9 +285,9 @@ export class ResourceRequirementsRepository {
           nodes,
           [product.slug],
           input.scope === "library",
-          observedAt,
+          sql`transaction_timestamp()`,
         );
-        return buildResourceRequirementsReport({
+        const report = buildResourceRequirementsReport({
           rootSlug: product.slug,
           nodes: expanded.nodes,
           targetMta: input.targetMta,
@@ -268,8 +295,11 @@ export class ResourceRequirementsRepository {
           generatedAt: observedAt.toISOString(),
           truncated: expanded.truncated,
         });
+        return { ...report, previewBuildId: input.previewBuildId ?? null };
       },
-      { isolationLevel: "repeatable read" },
+      input.scope === "library"
+        ? { isolationLevel: "repeatable read", accessMode: "read only" }
+        : { isolationLevel: "repeatable read" },
     );
   }
 }

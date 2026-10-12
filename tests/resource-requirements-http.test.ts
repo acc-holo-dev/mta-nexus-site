@@ -78,3 +78,44 @@ it("bounds report exports", async () => {
   state.report.mockResolvedValue({ nodes: [{ title: "x".repeat(524289) }] });
   expect((await download(request(), context)).status).toBe(413);
 });
+
+it("previews and exports an exact build with session-bound access and navigation context", async () => {
+  const query = "?previewBuildId=bld_b&returnFrom=bld_a&returnPage=2&targetMta=1.6.0";
+  for (const route of [read, download]) {
+    const response = await route(request(query), context);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(state.report).toHaveBeenLastCalledWith("usr_a", "prd_a", "library", {
+      previewBuildId: "bld_b",
+      returnFrom: "bld_a",
+      returnPage: 2,
+      targetMta: "1.6.0",
+    });
+  }
+});
+it.each([
+  "?previewBuildId=../private",
+  "?previewBuildId=bld_b&previewBuildId=bld_a",
+  "?returnFrom=bld_a",
+  "?returnPage=2",
+  "?previewBuildId=bld_a&returnFrom=bld_a",
+  "?previewBuildId=bld_b&returnPage=01",
+  "?previewBuildId=bld_b&returnPage=1001",
+  "?previewBuildId=bld_b&buildId=bld_a",
+])("rejects malformed preview navigation %s", async (query) => {
+  expect((await read(request(query), context)).status).toBe(400);
+  expect(state.report).not.toHaveBeenCalled();
+});
+it.each([publisher, moderator])(
+  "does not let buyer preview parameters enter a privileged scope",
+  async (route) => {
+    expect((await route(request("?previewBuildId=bld_b"), context)).status).toBe(400);
+    expect(state.report).not.toHaveBeenCalled();
+  },
+);
+it("rate limits preview inspection before loading evidence", async () => {
+  state.rate.mockResolvedValue({ success: false });
+  const response = await read(request("?previewBuildId=bld_b"), context);
+  expect(response.status).toBe(429);
+  expect(state.report).not.toHaveBeenCalled();
+});

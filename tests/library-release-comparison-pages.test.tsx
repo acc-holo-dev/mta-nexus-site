@@ -105,3 +105,13 @@ it("shows an already fixed target without offering another confirmation", async 
     returnPage: 2,
   });
 });
+
+it("links each exact release to preparation and preserves the compared pair and page", async () => {
+  const html = await screen();
+  expect(html).toContain(
+    "/requirements?previewBuildId=bld_a&amp;returnFrom=bld_b&amp;returnPage=2",
+  );
+  expect(html).toContain(
+    "/requirements?previewBuildId=bld_b&amp;returnFrom=bld_a&amp;returnPage=2",
+  );
+});

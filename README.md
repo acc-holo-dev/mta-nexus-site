@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+Release comparison now links both exact releases to buyer preparation previews. Inspect
+a candidate before choosing it, retain the comparison pair/page while checking an MTA
+version, and export the same private report. Only the root build is previewed; dependency
+choices stay current. Preview does not save preferences and offers no download controls.
+Library preparation now uses a read-only database-clock snapshot for effective access.
+
 Individual version choices now retain the exact submitted command when a response is
 lost or cannot be verified. RU/EN controls offer a precise retry or a full state reload
 before another choice. Definitive rejections require reloading. Single selection writes

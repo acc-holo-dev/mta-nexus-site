@@ -5,6 +5,8 @@ export function resourceRequirementsCopy(locale: string) {
         note: "Отчёт проверяет текущие декларации каталога и записанные сведения выбранных сборок. Он не подтверждает установку, запуск MTA или наличие файлов на сервере. Скачивание отдельно проверяет актуальные права и безопасность файла.",
         preview:
           "Предварительная проверка автора/модератора. Права покупателя здесь не оцениваются. Зависимости видны только при доступной публичной публикации.",
+        libraryPreview:
+          "Предварительная проверка указанного выпуска. Выбор версии не меняется. Для зависимостей используются ваши текущие настройки, а декларации каталога относятся к текущему состоянию ресурса. Вернитесь к сравнению для подтверждения выбора; скачивание доступно после отдельной проверки прав.",
         target: "Версия MTA сервера",
         check: "Проверить",
         build: "Сборка",
@@ -56,6 +58,8 @@ export function resourceRequirementsCopy(locale: string) {
         note: "This report checks current catalog declarations and recorded evidence of selected builds. It does not confirm installation, MTA execution or files on your server. Each download independently rechecks current access and artifact safety.",
         preview:
           "Publisher/moderator preview. Buyer access is not assessed here. Dependencies appear only when publicly published and available.",
+        libraryPreview:
+          "Preview of the specified release. Your version choice is unchanged. Dependencies use your current preferences, and catalog declarations describe the resource's current state. Return to comparison to confirm your choice; downloads require a separate access check.",
         target: "Server MTA version",
         check: "Check",
         build: "Build",

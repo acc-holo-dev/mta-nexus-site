@@ -3133,3 +3133,40 @@ Verification: 225 focused tests across 19 files pass, including individual recov
 comparison selection, selection batches and the preserved discussion-watch checks.
 Changed-file Biome, web TypeScript and the merged Next compile pass. Root TypeScript
 retains only the existing fast-check type errors and old missing isSigned fixture.
+
+
+## Exact-release buyer preparation previews (2026-10-12)
+
+Comparison cards now link each exact release into library preparation using previewBuildId.
+The bounded, strictly parsed query optionally preserves returnFrom/returnPage; rechecking
+MTA keeps hidden preview/navigation fields, private JSON export uses the same query, and
+the return link restores the pair with the inspected release as comparison target. Navigation
+fields never reach repository authority decisions. Publisher/moderator buildId remains a
+separate contract; those routes reject buyer preview fields, and library routes still reject
+privileged buildId. Direct repository calls validate preview IDs and scope before querying.
+
+The override affects only the root's chosen ID and preview label, not the publication/clean
+scan predicates or any dependency choice. Root access, publication, same-product exact build
+and trusted clean scan are mandatory; withdrawn, foreign or unsafe candidates fail without
+latest substitution. Dependencies use the buyer's own current pins/latest preferences and
+existing public-catalog traversal rules (48 nodes / 8 levels). Catalog declarations remain
+current product metadata, not a claim about an earlier archive's dependency declarations.
+Report JSON explicitly identifies previewBuildId (null for ordinary reports).
+
+Single library reports now run read-only repeatable-read with transaction_timestamp in
+access-source SQL, replacing application-clock reads and unnecessary product/user share
+locks. Publisher/moderator authority locks remain. Preview inspection does not write
+preferences, audits, receipts, grants, licenses or payments and suppresses report download
+controls; normal preparation/download behavior remains. Downloads always recheck rights
+separately. RU/EN notes distinguish preview, installation and current dependency choices.
+
+Two PostgreSQL fixtures cover a candidate root with unchanged fixed dependency preferences
+and audits, and foreign/withdrawn/revoked-access rejection. They remain unrun without a
+disposable PostgreSQL instance. Live query plans, PostgreSQL execution, browser interaction
+and Node 26 validation remain open. No migration is needed; existing indexes are reused.
+GitHub Actions are neither run nor inspected.
+
+Verification: 109 focused checks across preparation, collection readiness and comparison
+surfaces pass. Changed-file Biome, web TypeScript and Next compile pass. Root TypeScript
+retains only pre-existing missing fast-check types and the old missing isSigned delivery
+fixture. PostgreSQL/browser checks remain explicitly unrun.

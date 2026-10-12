@@ -10,6 +10,7 @@ export function ResourceRequirementsReportBody({
   locale,
   exportHref,
   showState = true,
+  allowDownloads = true,
   suppressEmptyIssues = false,
 }: {
   report: ResourceRequirementsReport;
@@ -17,6 +18,7 @@ export function ResourceRequirementsReportBody({
   locale: string;
   exportHref: string;
   showState?: boolean;
+  allowDownloads?: boolean;
   suppressEmptyIssues?: boolean;
 }) {
   const copy = resourceRequirementsCopy(locale);
@@ -116,13 +118,17 @@ export function ResourceRequirementsReportBody({
                 </Link>
               )}
             </div>
-            {scope === "library" && node.accessible && node.published && node.build?.safe && (
-              <ResourceDownloadButton
-                productId={node.id}
-                buildId={node.build.id}
-                version={node.build.version}
-              />
-            )}
+            {allowDownloads &&
+              scope === "library" &&
+              node.accessible &&
+              node.published &&
+              node.build?.safe && (
+                <ResourceDownloadButton
+                  productId={node.id}
+                  buildId={node.build.id}
+                  version={node.build.version}
+                />
+              )}
           </li>
         ))}
       </ul>
