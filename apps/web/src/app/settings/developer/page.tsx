@@ -1,3 +1,4 @@
+import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { DeveloperProfileEditor } from "../../../components/developer-profile-editor";
@@ -34,6 +35,7 @@ export default async function DeveloperSettingsPage() {
     .catch(() => null);
   return (
     <div className="space-y-6">
+      <ProfileChangeHistoryLink locale={locale} />
       <header>
         <h1 className="text-2xl font-bold text-primary">{copy.profile}</h1>
         <p className="mt-2 text-sm text-muted">{copy.profileDescription}</p>

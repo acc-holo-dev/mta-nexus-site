@@ -1,8 +1,17 @@
 import { organizationGovernanceRepository } from "@nexus/db";
-import { AppError, type User } from "@nexus/domain";
+import {
+  AppError,
+  type ChangeHistoryFilters,
+  type OrganizationChangeGroup,
+  type User,
+} from "@nexus/domain";
 import { generateId } from "@nexus/security";
 import { safeExternalWebUrl } from "@nexus/validation";
-import { ownershipTransferSchema } from "../organization-governance-contract";
+import {
+  organizationChangeHistorySchema,
+  ownershipTransferSchema,
+} from "../organization-governance-contract";
+import { encodeChangeHistoryCursor } from "../private-change-history-query";
 import { editableOrganization } from "./organization-workspace-service";
 
 class OrganizationGovernanceService {
@@ -29,9 +38,24 @@ class OrganizationGovernanceService {
       previousOwnerId: result.previousOwnerId,
     };
   }
-  async history(id: string, actor: User, before?: string) {
-    const result = await organizationGovernanceRepository.history(id, actor.id, before);
-    return {
+  async history(
+    id: string,
+    actor: User,
+    before?: string,
+    filters?: ChangeHistoryFilters<OrganizationChangeGroup>,
+  ) {
+    const result = await (filters
+      ? organizationGovernanceRepository.history(id, actor.id, before, filters)
+      : organizationGovernanceRepository.history(id, actor.id, before));
+    if (
+      filters &&
+      (!("until" in result) ||
+        result.period !== filters.period ||
+        result.group !== filters.group ||
+        result.query !== filters.query)
+    )
+      throw new AppError("History scope changed", 503, "INTERNAL_ERROR");
+    const value = {
       organization: {
         id: result.organization.id,
         name: result.organization.name,
@@ -40,7 +64,8 @@ class OrganizationGovernanceService {
       items: result.items.map((row) => ({
         id: row.id,
         action: row.action,
-        createdAt: row.createdAt.toISOString(),
+        createdAt:
+          typeof row.createdAt === "string" ? row.createdAt : (row.createdAt as Date).toISOString(),
         actorUsername: row.actorUsername,
         actorName: row.actorName,
         subjectUsername: row.subjectUsername,
@@ -51,8 +76,19 @@ class OrganizationGovernanceService {
         fields: row.fields,
       })),
       hasMore: result.hasMore,
-      nextCursor: result.nextCursor,
+      nextCursor:
+        typeof result.nextCursor === "object" && result.nextCursor
+          ? encodeChangeHistoryCursor(result.nextCursor)
+          : result.nextCursor,
+      ...("until" in result
+        ? { until: result.until, period: result.period, group: result.group, query: result.query }
+        : {}),
     };
+    if (!filters) return value;
+    const parsed = organizationChangeHistorySchema.safeParse(value);
+    if (!parsed.success)
+      throw new AppError("Organization history unavailable", 503, "INTERNAL_ERROR");
+    return parsed.data;
   }
 }
 export const organizationGovernanceService = new OrganizationGovernanceService();

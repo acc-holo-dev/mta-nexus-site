@@ -215,6 +215,11 @@ it("does not query private history anonymously or with forged/repeated cursor fi
     params: Promise.resolve({ id: "org" }),
     searchParams: Promise.resolve({ before: "audit" }),
   });
-  expect(mocks.history).toHaveBeenCalledWith("org", { id: "owner", role: "user" }, "audit");
+  expect(mocks.history).toHaveBeenCalledWith(
+    "org",
+    { id: "owner", role: "user" },
+    "audit",
+    expect.objectContaining({ period: "all", group: "all", query: "", before: "audit" }),
+  );
   expect((await generateMetadata()).robots.index).toBe(false);
 });

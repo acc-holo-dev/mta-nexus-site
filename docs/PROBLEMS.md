@@ -3170,3 +3170,52 @@ Verification: 109 focused checks across preparation, collection readiness and co
 surfaces pass. Changed-file Biome, web TypeScript and Next compile pass. Root TypeScript
 retains only pre-existing missing fast-check types and the old missing isSigned delivery
 fixture. PostgreSQL/browser checks remain explicitly unrun.
+
+
+### Private profile journals and filtered organization activity — 2026-10-12
+
+`/settings/history` now shows retained profile, professional and privacy edit
+operations, with event-group and all/7/30/90/365-day filters, twenty-row keyset
+pages, verification-invalidation context and a private JSON page export. Settings,
+professional and privacy editors link to the journal. Existing edit repositories
+already record these operations; no replacement storage or new migration is used.
+The projection returns allowlisted field names, not changed values, account
+contacts, networking data or raw audit details. Recorded save operations do not
+prove every listed field changed. Malformed historical field/verification details
+remain neutral; professional verification flags require the exact recorded boolean.
+
+Organization activity now filters profile/team/ownership events and searches
+current public author/subject names with literal wildcard escaping. Current owner
+or administrator grants are rechecked for reads and exports. Former staff and
+stale owner memberships retain no journal access. Existing unfiltered `before`
+links and the legacy repository response remain supported. Both journals bind
+new versioned cursors to account, target and filters, retain a database-clock
+cutoff and exact PostgreSQL microseconds, resolve anchors within that scope and
+reject deleted, foreign, changed-filter or future windows instead of shifting pages.
+Read-only repeatable-read snapshots use the existing target/time/ID audit index.
+Current-name search results can change after renames or account deletion; the
+cutoff fixes recorded event time rather than retaining a cross-request snapshot.
+
+RU/EN metadata, errors, accessible native filter forms, localized loading, empty
+states, recovery links and mobile layouts reuse existing components. Exports
+reuse authenticated, rate-limited reads, retain the reviewed filters/cutoff and
+provide private/no-store/Cookie headers, nosniff and a 512-KiB attachment bound.
+Exports contain the displayed page, not an unbounded audit archive. No commerce
+contract, schema, dependency or workflow changed.
+
+411 focused unit/HTTP/SQL-builder/SSR checks across 38 files pass, including profile,
+team governance, verification, editorial, discussion subscription and localization
+regressions. Web TypeScript including generated routes, Next webpack compile mode,
+changed-file Biome (lint-only for five minimally edited pre-existing shared files)
+and diff checks pass. Root TypeScript retains only the upstream `isSigned` delivery
+fixture omission; Knip retains three upstream commercial exports. Six PostgreSQL
+fixtures prepare actual persisted edits, malformed-evidence privacy, tied timestamp
+traversal, retained cutoffs/deleted anchors, escaped team searches and revoked
+manager access. They remain unrun without disposable PostgreSQL; browser behavior,
+live query plans and production page generation remain outstanding. GitHub Actions
+are neither run nor inspected.
+
+After rebasing on Agent A's reviewed comparison selections and preparation preview,
+557 checks across 48 files pass. All 29 upstream files and complete problem notes
+are preserved. The integrated web type checks and webpack compile pass; the known
+root fixture omission and three unused commercial exports remain.

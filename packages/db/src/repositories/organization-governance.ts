@@ -1,21 +1,52 @@
-import { AppError, canManageOrganization } from "@nexus/domain";
+import {
+  AppError,
+  type ChangeHistoryCursor,
+  type ChangeHistoryFilters,
+  canManageOrganization,
+  ORGANIZATION_CHANGE_ACTIONS,
+  ORGANIZATION_CHANGE_GROUPS,
+  type OrganizationChangeGroup,
+} from "@nexus/domain";
 import { and, asc, desc, eq, inArray, type SQL, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "../client";
 import { auditEvents, organizationMembers, organizations, users } from "../schema";
 import { storeOrganizationAccessNotice } from "./organization-access-notice";
 import { organizationWorkspaceAccess } from "./organization-workspace";
+import {
+  changeHistoryBounds,
+  changeHistoryContext,
+  changeHistoryWindow,
+} from "./private-change-history-window";
+import { containsPattern } from "./search-pattern";
 
-const actions = [
-  "organization.created",
-  "organization.profile_updated",
-  "organization.member_added",
-  "organization.member_updated",
-  "organization.member_removed",
-  "organization.member_left",
-  "organization.ownership_transferred",
-];
+const actions = ORGANIZATION_CHANGE_ACTIONS;
 const revision = sql`greatest(clock_timestamp(), date_trunc('milliseconds', ${organizations.updatedAt}) + interval '1 millisecond')`;
+type HistoryPage = {
+  organization: { id: string; name: string; slug: string };
+  items: {
+    id: string;
+    action: string;
+    createdAt: string;
+    actorUsername: string | null;
+    actorName: string | null;
+    subjectUsername: string | null;
+    subjectName: string | null;
+    fromRole: string | null;
+    toRole: string | null;
+    managesServers: boolean | null;
+    fields: string[];
+  }[];
+  hasMore: boolean;
+  nextCursor: string | null;
+};
+type FilteredHistoryPage = Omit<HistoryPage, "nextCursor"> & {
+  nextCursor: ChangeHistoryCursor | null;
+  until: string;
+  period: ChangeHistoryFilters<OrganizationChangeGroup>["period"];
+  group: OrganizationChangeGroup;
+  query: string;
+};
 class OrganizationGovernanceRepository {
   async transfer(input: {
     id: string;
@@ -137,7 +168,30 @@ class OrganizationGovernanceRepository {
       };
     });
   }
-  async history(id: string, actorId: string, before?: string) {
+  history(id: string, actorId: string, before?: string): Promise<HistoryPage>;
+  history(
+    id: string,
+    actorId: string,
+    before: string | undefined,
+    filters: ChangeHistoryFilters<OrganizationChangeGroup>,
+  ): Promise<FilteredHistoryPage>;
+  async history(
+    id: string,
+    actorId: string,
+    before?: string,
+    filters?: ChangeHistoryFilters<OrganizationChangeGroup>,
+  ): Promise<HistoryPage | FilteredHistoryPage> {
+    const context = filters
+      ? changeHistoryContext(
+          "organization-change-history",
+          actorId,
+          id,
+          ORGANIZATION_CHANGE_GROUPS,
+          filters,
+        )
+      : undefined;
+    if (filters && before !== filters.before)
+      throw new AppError("History cursor changed", 400, "INVALID_CURSOR");
     if (before && !/^[a-zA-Z0-9_-]{1,128}$/u.test(before))
       throw new AppError("Invalid history cursor", 400, "VALIDATION_ERROR");
     return db.transaction(
@@ -145,38 +199,63 @@ class OrganizationGovernanceRepository {
         const { organization, role } = await organizationWorkspaceAccess(tx, id, actorId);
         if (!canManageOrganization(role))
           throw new AppError("History is private", 403, "FORBIDDEN");
+        const until = filters ? await changeHistoryWindow(tx, filters) : undefined;
+        const group = filters?.group ?? "all";
+        const selectedActions =
+          group === "profile"
+            ? ["organization.created", "organization.profile_updated"]
+            : group === "team"
+              ? [
+                  "organization.member_added",
+                  "organization.member_updated",
+                  "organization.member_removed",
+                  "organization.member_left",
+                ]
+              : group === "ownership"
+                ? ["organization.ownership_transferred"]
+                : [...actions];
+        const subject = alias(users, "organization_activity_subject");
+        const selectedSubject = sql`case when ${auditEvents.action} = 'organization.ownership_transferred' then ${auditEvents.details}->>'newOwnerId' else ${auditEvents.details}->>'userId' end`;
+        const pattern = filters?.query ? containsPattern(filters.query) : undefined;
         const scope = and(
           eq(auditEvents.targetType, "organization"),
           eq(auditEvents.targetId, id),
-          inArray(auditEvents.action, actions),
+          inArray(auditEvents.action, selectedActions),
+          filters && until
+            ? changeHistoryBounds(auditEvents.createdAt, filters.period, until)
+            : undefined,
+          pattern
+            ? sql`(${users.username} ilike ${pattern} or ${users.displayName} ilike ${pattern} or ${subject.username} ilike ${pattern} or ${subject.displayName} ilike ${pattern})`
+            : undefined,
         );
         let older: SQL | undefined;
-        if (before) {
+        const anchorId = filters?.cursor?.id ?? before;
+        if (anchorId) {
           const [anchor] = await tx
             .select({
               id: auditEvents.id,
               time: sql<string>`to_char(${auditEvents.createdAt} at time zone 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
             })
             .from(auditEvents)
-            .where(and(scope, eq(auditEvents.id, before)))
+            .leftJoin(users, eq(users.id, auditEvents.actorId))
+            .leftJoin(subject, eq(subject.id, selectedSubject))
+            .where(and(scope, eq(auditEvents.id, anchorId)))
             .limit(1);
           if (!anchor)
             throw new AppError("History page expired", 404, "ORGANIZATION_HISTORY_EXPIRED");
           older = sql`(${auditEvents.createdAt}, ${auditEvents.id}) < (${anchor.time}::timestamptz, ${anchor.id})`;
         }
-        const subject = alias(users, "organization_activity_subject");
-        const selectedSubject = sql`case when ${auditEvents.action} = 'organization.ownership_transferred' then ${auditEvents.details}->>'newOwnerId' else ${auditEvents.details}->>'userId' end`;
         // Never return raw details, contact/account fields, network metadata, proof,
         // or permission arrays. Legacy details are type/allowlist checked in SQL.
         const rows = await tx
           .select({
             id: auditEvents.id,
             action: auditEvents.action,
-            createdAt: auditEvents.createdAt,
-            actorUsername: users.username,
-            actorName: users.displayName,
-            subjectUsername: subject.username,
-            subjectName: subject.displayName,
+            createdAt: sql<string>`to_char(${auditEvents.createdAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+            actorUsername: sql<string | null>`left(${users.username},128)`,
+            actorName: sql<string | null>`left(${users.displayName},128)`,
+            subjectUsername: sql<string | null>`left(${subject.username},128)`,
+            subjectName: sql<string | null>`left(${subject.displayName},128)`,
             fromRole: sql<
               string | null
             >`case when ${auditEvents.details}->>'from' in ('owner','admin','developer','member') then ${auditEvents.details}->>'from' end`,
@@ -197,12 +276,23 @@ class OrganizationGovernanceRepository {
           .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
           .limit(21);
         const items = rows.slice(0, 20);
-        return {
+        const last = items.at(-1);
+        const page = {
           organization: { id: organization.id, name: organization.name, slug: organization.slug },
           items,
           hasMore: rows.length > 20,
-          nextCursor: rows.length > 20 ? (items.at(-1)?.id ?? null) : null,
         };
+        if (filters && context && until)
+          return {
+            ...page,
+            nextCursor:
+              page.hasMore && last ? { version: 1 as const, context, until, id: last.id } : null,
+            until,
+            period: filters.period,
+            group: filters.group,
+            query: filters.query,
+          };
+        return { ...page, nextCursor: page.hasMore && last ? last.id : null };
       },
       { isolationLevel: "repeatable read", accessMode: "read only" },
     );

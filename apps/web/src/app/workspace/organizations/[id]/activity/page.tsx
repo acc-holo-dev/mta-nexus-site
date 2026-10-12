@@ -4,8 +4,8 @@ import { PlatformSignIn } from "../../../../../components/content-catalog-contro
 import { OrganizationHistoryView } from "../../../../../components/organization-history";
 import { getRequestLocale } from "../../../../../lib/i18n-server";
 import {
-  organizationHistoryCursor,
-  organizationHistorySchema,
+  organizationChangeHistorySchema,
+  parseOrganizationChangeHistoryQuery,
 } from "../../../../../lib/organization-governance-contract";
 import {
   organizationGovernanceCopy,
@@ -40,13 +40,13 @@ export default async function OrganizationHistoryPage({
     if (Array.isArray(value)) for (const item of value) values.append(key, item);
     else if (value !== undefined) values.set(key, value);
   }
-  const filters = organizationHistoryCursor(values);
+  const filters = parseOrganizationChangeHistoryQuery(values);
   let error: string | undefined;
   const data =
     filters && /^[a-zA-Z0-9_-]{1,128}$/u.test(id)
       ? await organizationGovernanceService
-          .history(id, actor, filters.before)
-          .then((result) => organizationHistorySchema.parse(result))
+          .history(id, actor, filters.before, filters)
+          .then((result) => organizationChangeHistorySchema.parse(result))
           .catch((caught) => {
             error = organizationGovernanceError(
               locale,
@@ -61,6 +61,7 @@ export default async function OrganizationHistoryPage({
       id={id}
       data={data}
       before={filters?.before}
+      filters={filters ?? { period: "all", group: "all", query: "" }}
       locale={locale}
       error={error}
     />

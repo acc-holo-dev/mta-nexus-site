@@ -1,3 +1,4 @@
+import { ProfileChangeHistoryLink } from "../../../components/private-change-history-controls";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { ProfilePrivacyEditor } from "../../../components/profile-privacy-editor";
@@ -34,6 +35,7 @@ export default async function PrivacySettingsPage() {
     .catch(() => null);
   return (
     <div className="space-y-6">
+      <ProfileChangeHistoryLink locale={locale} />
       <header className="space-y-2">
         <Link
           href="/settings"

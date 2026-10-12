@@ -85,3 +85,4 @@ export * from "./resource-copies";
 export * from "./subscriptions";
 export * from "./library-collections";
 export * from "./library-selection-batches";
+export * from "./profile-change-history";

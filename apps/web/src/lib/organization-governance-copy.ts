@@ -1,5 +1,6 @@
 import type { Locale } from "./i18n";
 import { organizationError } from "./organization-workspace-copy";
+import { privateChangeHistoryError } from "./private-change-history-copy";
 
 const en = {
   transfer: "Transfer ownership",
@@ -115,6 +116,8 @@ export function organizationGovernanceError(locale: Locale, code: unknown) {
   if (code === "OWNERSHIP_OWNER_REQUIRED") return copy.ownerRequired;
   if (code === "OWNERSHIP_TARGET_INVALID") return copy.targetInvalid;
   if (code === "ORGANIZATION_HISTORY_EXPIRED") return copy.expired;
+  if (["CHANGE_HISTORY_FILTER_INVALID", "INVALID_CURSOR"].includes(String(code)))
+    return privateChangeHistoryError(locale, code);
   if (
     [
       "VALIDATION_ERROR",

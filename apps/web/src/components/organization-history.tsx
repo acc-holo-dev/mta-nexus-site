@@ -1,21 +1,35 @@
+import {
+  type ChangeHistoryFilters,
+  ORGANIZATION_CHANGE_GROUPS,
+  type OrganizationChangeGroup,
+} from "@nexus/domain";
 import Link from "next/link";
 import type { Locale } from "../lib/i18n";
 import type { OrganizationHistory } from "../lib/organization-governance-contract";
 import { organizationGovernanceCopy } from "../lib/organization-governance-copy";
 import { getOrganizationCopy } from "../lib/organization-workspace-copy";
+import { privateChangeHistoryCopy } from "../lib/private-change-history-copy";
+import { changeHistoryHref } from "../lib/private-change-history-query";
+import {
+  PrivateChangeHistoryCutoff,
+  PrivateChangeHistoryFilters,
+} from "./private-change-history-controls";
 export function OrganizationHistoryView({
   data,
   id,
   before,
   locale,
   error,
+  filters = { period: "all", group: "all", query: "" },
 }: {
   data: OrganizationHistory | null;
   id: string;
   before?: string;
   locale: Locale;
   error?: string;
+  filters?: ChangeHistoryFilters<OrganizationChangeGroup>;
 }) {
+  const journal = privateChangeHistoryCopy(locale);
   const copy = organizationGovernanceCopy(locale),
     teamCopy = getOrganizationCopy(locale),
     path = `/workspace/organizations/${encodeURIComponent(id)}/activity`;
@@ -35,13 +49,36 @@ export function OrganizationHistoryView({
       >
         {copy.back}
       </Link>
+      <PrivateChangeHistoryFilters
+        path={path}
+        filters={filters}
+        groups={ORGANIZATION_CHANGE_GROUPS}
+        locale={locale}
+        search
+      />
+      {data?.until && (
+        <div className="space-y-2">
+          <PrivateChangeHistoryCutoff until={data.until} locale={locale} />
+          <a
+            href={changeHistoryHref(
+              `/api/workspace/organizations/${encodeURIComponent(id)}/activity/export`,
+              filters,
+              { until: data.until },
+            )}
+            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          >
+            {journal.export}
+          </a>
+          <p className="text-xs text-muted">{journal.exportHelp}</p>
+        </div>
+      )}
       {!data && (
         <p role="alert" className="nexus-panel p-5 text-sm text-danger">
           {error ?? copy.unavailable}
         </p>
       )}
       {data?.items.length === 0 && (
-        <p className="nexus-panel p-5 text-sm text-muted">{copy.empty}</p>
+        <p className="nexus-panel p-5 text-sm text-muted">{journal.empty}</p>
       )}
       {data?.items.map((item) => (
         <article className="nexus-panel space-y-3 p-5" key={item.id}>
@@ -103,15 +140,22 @@ export function OrganizationHistoryView({
         </article>
       ))}
       <nav className="flex flex-wrap gap-4 text-sm" aria-label={copy.history}>
-        {(before || !data) && (
-          <Link className="min-h-9 py-2 text-accent underline" href={path}>
+        {(before || filters.cursor || filters.until || !data) && (
+          <Link
+            className="min-h-9 py-2 text-accent underline"
+            href={changeHistoryHref(path, filters, { fresh: true })}
+          >
             {copy.latest}
           </Link>
         )}
         {data?.hasMore && data.nextCursor && (
           <Link
             className="min-h-9 py-2 text-accent underline"
-            href={`${path}?before=${encodeURIComponent(data.nextCursor)}`}
+            href={
+              data.until
+                ? changeHistoryHref(path, filters, { cursor: data.nextCursor })
+                : `${path}?before=${encodeURIComponent(data.nextCursor)}`
+            }
           >
             {copy.older}
           </Link>

@@ -75,6 +75,10 @@ beforeEach(() => {
   });
   mocks.history.mockResolvedValue({
     organization: { id: "org", name: "Team", slug: "team" },
+    until: "2026-10-12T00:00:00.123456Z",
+    period: "all",
+    group: "all",
+    query: "",
     items: [],
     hasMore: false,
     nextCursor: null,
@@ -97,7 +101,12 @@ it("binds transfer and private history to the actual session with versioned inpu
   });
   const history = await GET(request("GET", undefined, "?before=audit_1"), context);
   expect(history.status).toBe(200);
-  expect(mocks.history).toHaveBeenCalledWith("org", "owner", "audit_1");
+  expect(mocks.history).toHaveBeenCalledWith(
+    "org",
+    "owner",
+    "audit_1",
+    expect.objectContaining({ period: "all", group: "all", query: "", before: "audit_1" }),
+  );
 });
 it("denies anonymous access and forged actor/owner/commercial fields before storage", async () => {
   mocks.session.mockResolvedValue(null);
@@ -156,11 +165,15 @@ it("returns localized ownership, live-version and expired-history failures witho
 it("projects only safe history DTOs even when storage returns extra contact/audit fields", async () => {
   mocks.history.mockResolvedValue({
     organization: { id: "org", name: "Team", slug: "team", websiteUrl: "PRIVATE" },
+    until: "2026-10-12T00:00:00.123456Z",
+    period: "all",
+    group: "all",
+    query: "",
     items: [
       {
         id: "audit",
         action: "organization.member_left",
-        createdAt: new Date(time),
+        createdAt: "2026-10-11T00:00:00.000123Z",
         actorName: "Owner",
         actorUsername: "owner",
         subjectUsername: "target",

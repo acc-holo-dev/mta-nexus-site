@@ -44,3 +44,4 @@ export * from "./library-selection-batches";
 export * from "./library-release-history";
 
 export * from "./library-release-comparison";
+export * from "./private-change-history";

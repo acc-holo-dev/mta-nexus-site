@@ -1,6 +1,8 @@
+import { CHANGE_HISTORY_PERIODS, ORGANIZATION_CHANGE_GROUPS } from "@nexus/domain";
 import { z } from "zod";
 import type { EditableOrganization } from "./organization-workspace-contract";
 import { editableOrganizationSchema } from "./organization-workspace-contract";
+import { changeHistoryTimeSchema, parseChangeHistoryQuery } from "./private-change-history-query";
 
 const identifier = z.string().regex(/^[a-zA-Z0-9_-]{1,128}$/u);
 export const ownershipTransferSchema = z
@@ -81,7 +83,15 @@ export const organizationHistorySchema = z.object({
     )
     .max(20),
   hasMore: z.boolean(),
-  nextCursor: identifier.nullable(),
+  nextCursor: z
+    .string()
+    .max(2048)
+    .regex(/^[A-Za-z0-9_-]+$/u)
+    .nullable(),
+  until: changeHistoryTimeSchema.optional(),
+  period: z.enum(CHANGE_HISTORY_PERIODS).optional(),
+  group: z.enum(ORGANIZATION_CHANGE_GROUPS).optional(),
+  query: z.string().max(80).optional(),
 });
 export type OrganizationHistory = z.infer<typeof organizationHistorySchema>;
 export function organizationHistoryCursor(params: URLSearchParams) {
@@ -90,3 +100,26 @@ export function organizationHistoryCursor(params: URLSearchParams) {
   const before = params.get("before") || undefined;
   return before && !identifier.safeParse(before).success ? null : { before };
 }
+
+export function parseOrganizationChangeHistoryQuery(params: URLSearchParams) {
+  if ([...params.keys()].every((key) => key === "before") && !organizationHistoryCursor(params))
+    return null;
+  return parseChangeHistoryQuery(params, ORGANIZATION_CHANGE_GROUPS, true, true);
+}
+
+export const organizationChangeHistorySchema = organizationHistorySchema
+  .extend({
+    organization: z
+      .object({ id: identifier, name: z.string().max(200), slug: z.string().max(128) })
+      .strict(),
+    items: organizationHistorySchema.shape.items.element
+      .extend({ createdAt: changeHistoryTimeSchema })
+      .array()
+      .max(20),
+    until: changeHistoryTimeSchema,
+    period: z.enum(CHANGE_HISTORY_PERIODS),
+    group: z.enum(ORGANIZATION_CHANGE_GROUPS),
+    query: z.string().max(80),
+  })
+  .strict()
+  .refine((value) => value.hasMore === (value.nextCursor !== null));
