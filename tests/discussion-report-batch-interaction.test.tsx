@@ -91,10 +91,16 @@ function descendants(node: ReactNode): Element[] {
   const element = node as Element;
   return [element, ...descendants(element.props.children as ReactNode)];
 }
-function render(locale: "ru" | "en" = "en", allowActions = true) {
+function render(locale: "ru" | "en" = "en", allowActions = true, publication = false) {
   harness.cursor = 0;
   return descendants(
-    DiscussionReportBatch({ contentId: "post", commentId: "comment", items, locale, allowActions }),
+    DiscussionReportBatch({
+      contentId: "post",
+      commentId: publication ? null : "comment",
+      items,
+      locale,
+      allowActions,
+    }),
   );
 }
 function button(nodes: Element[], label: string) {
@@ -107,10 +113,10 @@ function click(nodes: Element[], label: string) {
 }
 const response = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
-function select(locale: "ru" | "en" = "en") {
+function select(locale: "ru" | "en" = "en", publication = false) {
   const copy = reportBatchCopy(locale);
-  click(render(locale), copy.selectAll);
-  const textarea = render(locale).find((node) => node.type === "textarea");
+  click(render(locale, true, publication), copy.selectAll);
+  const textarea = render(locale, true, publication).find((node) => node.type === "textarea");
   if (!textarea) throw Error("Missing notes");
   (textarea.props.onChange as (event: unknown) => void)({ target: { value: "Recorded reason" } });
 }
@@ -321,4 +327,62 @@ it("keeps completed-history cards navigable without selection or write controls"
   ).toBe(false);
   expect(nodes.some((node) => node.props.href === "/admin/reports/a")).toBe(true);
   expect(harness.fetch).not.toHaveBeenCalled();
+});
+
+it.each(["ru", "en"] as const)(
+  "reviews and commits publication batches through the shared frozen-selection controller in %s",
+  async (locale) => {
+    const publicationPreview = {
+        ...preview,
+        commentId: null,
+        comment: null,
+        publication: { ...preview.publication, text: "Reviewed publication body", truncated: true },
+      },
+      publicationAck = { ...ack, commentId: null };
+    harness.fetch
+      .mockReset()
+      .mockImplementation((url: string) =>
+        Promise.resolve(response(url.endsWith("/preview") ? publicationPreview : publicationAck)),
+      );
+    select(locale, true);
+    click(render(locale, true, true), reportBatchCopy(locale).preview);
+    await vi.waitFor(() =>
+      expect(
+        render(locale, true, true).some(
+          (node) => node.props.children === reportBatchCopy(locale).confirm,
+        ),
+      ).toBe(true),
+    );
+    expect(harness.fetch.mock.calls[0][0]).toBe("/api/admin/community/post/reports/batch/preview");
+    expect(
+      render(locale, true, true).some(
+        (node) => node.props.children === "Reviewed publication body",
+      ),
+    ).toBe(true);
+    const reviewed = render(locale, true, true);
+    click(reviewed, reportBatchCopy(locale).confirm);
+    await vi.waitFor(() => expect(harness.refresh).toHaveBeenCalledTimes(1));
+    expect(harness.fetch.mock.calls[1][0]).toBe("/api/admin/community/post/reports/batch");
+    expect(JSON.parse(harness.fetch.mock.calls[1][1].body).previewRevision).toBe(token);
+    click(reviewed, reportBatchCopy(locale).confirm);
+    expect(harness.fetch).toHaveBeenCalledTimes(2);
+    expect(
+      render(locale, true, true).some(
+        (node) =>
+          node.props.role === "status" && node.props.children === reportBatchCopy(locale).saved,
+      ),
+    ).toBe(true);
+  },
+);
+
+it("does not accept a comment preview or a foreign acknowledgement as a publication decision", async () => {
+  harness.fetch.mockResolvedValue(response(preview));
+  select("en", true);
+  click(render("en", true, true), reportBatchCopy("en").preview);
+  await vi.waitFor(() =>
+    expect(render("en", true, true).some((node) => node.props.role === "alert")).toBe(true),
+  );
+  expect(
+    render("en", true, true).some((node) => node.props.children === reportBatchCopy("en").confirm),
+  ).toBe(false);
 });

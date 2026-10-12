@@ -14,6 +14,7 @@ import {
   communityReportDecisionError,
   communityReportError,
 } from "../lib/community-report-copy";
+import { reportGroupsCopy } from "../lib/community-report-groups-copy";
 import { reportHistoryCopy } from "../lib/community-report-history-copy";
 import { discussionReportsCopy } from "../lib/discussion-reports-copy";
 import type { Locale } from "../lib/i18n";
@@ -240,6 +241,14 @@ export function CommunityReportDetailView({
                 className="inline-flex min-h-11 items-center text-sm text-accent underline"
               >
                 {discussionReportsCopy(locale).link}
+              </Link>
+            )}
+            {staff && report.moderationHref && (
+              <Link
+                href={`${report.moderationHref}/reports`}
+                className="inline-flex min-h-11 items-center text-sm text-accent underline"
+              >
+                {reportGroupsCopy(locale).inspect}
               </Link>
             )}
             {report.target ? (

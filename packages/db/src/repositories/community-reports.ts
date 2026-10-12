@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import {
   AppError,
   type ChangeHistoryFilters,
+  type CommunityReportGroupFilters,
   ForbiddenError,
   NotFoundError,
   REPORT_HISTORY_ACTIONS,
@@ -119,6 +120,240 @@ function assertDecisionState(status: string, expected: string, action: string) {
     throw new AppError("Report changed", 409, "REPORT_STATE_CHANGED");
 }
 class CommunityReportsRepository {
+  async groups(actorId: string, filters: CommunityReportGroupFilters) {
+    if (
+      !["pending", "history"].includes(filters.view) ||
+      (filters.target && !["content", "comment"].includes(filters.target)) ||
+      (filters.type && !/^[a-z_]{1,40}$/u.test(filters.type)) ||
+      filters.before
+    )
+      throw new AppError("Invalid report group filters", 400, "CHANGE_HISTORY_FILTER_INVALID");
+    const context = changeHistoryContext(
+      `community-report-groups:${filters.view}:${filters.target ?? ""}:${filters.type ?? ""}`,
+      actorId,
+      actorId,
+      ["all"],
+      filters,
+    );
+    return db.transaction(
+      async (tx) => {
+        await requireStaff(tx, actorId, false);
+        const until = await changeHistoryWindow(tx, filters),
+          pattern = filters.query ? containsPattern(filters.query) : undefined;
+        const scope = and(
+          communityTarget,
+          sql`${reports.targetType} in ('content','comment')`,
+          sql`${reports.targetId} ~ '^[A-Za-z0-9_-]{1,128}$'`,
+          inArray(reports.status, ["open", "under_review", "resolved", "dismissed"]),
+          changeHistoryBounds(reports.createdAt, filters.period, until),
+          filters.target ? eq(reports.targetType, filters.target) : undefined,
+          filters.type ? eq(reports.type, filters.type) : undefined,
+          pattern ? or(ilike(reports.reason, pattern), ilike(reports.id, pattern)) : undefined,
+        );
+        const first = sql`min(${reports.createdAt})`,
+          last = sql`max(${reports.createdAt})`;
+        const eligible =
+          filters.view === "pending"
+            ? sql`count(*) filter (where ${reports.status} in ('open','under_review')) > 0`
+            : sql`count(*) filter (where ${reports.status} in ('resolved','dismissed')) > 0`;
+        let after: SQL | undefined;
+        if (filters.cursor) {
+          const [hint] = await tx
+            .select({
+              targetType: reports.targetType,
+              targetId: reports.targetId,
+              time: sql<string>`to_char(${reports.createdAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+            })
+            .from(reports)
+            .where(and(scope, eq(reports.id, filters.cursor.id)))
+            .limit(1);
+          const [anchor] = hint
+            ? await tx
+                .select({
+                  time: sql<string>`to_char(${first} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+                })
+                .from(reports)
+                .where(
+                  and(
+                    scope,
+                    eq(reports.targetType, hint.targetType),
+                    eq(reports.targetId, hint.targetId),
+                  ),
+                )
+                .groupBy(reports.targetType, reports.targetId)
+                .having(eligible)
+                .limit(1)
+            : [];
+          if (!hint || !anchor || hint.time !== anchor.time)
+            throw new AppError("Report group queue changed", 410, "REPORT_GROUPS_EXPIRED");
+          after = sql`(${first},${reports.targetType},${reports.targetId}) > (${anchor.time}::timestamptz,${hint.targetType},${hint.targetId})`;
+        }
+        const rows = await tx
+          .select({
+            targetType: reports.targetType,
+            targetId: reports.targetId,
+            anchorId: sql<string>`substring(min((to_char(${reports.createdAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') || ${reports.id}) collate "C") from 28)`,
+            firstAt: sql<string>`to_char(${first} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+            lastAt: sql<string>`to_char(${last} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`,
+            open: sql`count(*) filter (where ${reports.status}='open')`.mapWith(Number),
+            review: sql`count(*) filter (where ${reports.status}='under_review')`.mapWith(Number),
+            resolved: sql`count(*) filter (where ${reports.status}='resolved')`.mapWith(Number),
+            dismissed: sql`count(*) filter (where ${reports.status}='dismissed')`.mapWith(Number),
+          })
+          .from(reports)
+          .where(scope)
+          .groupBy(reports.targetType, reports.targetId)
+          .having(and(eligible, after))
+          .orderBy(asc(first), asc(reports.targetType), asc(reports.targetId))
+          .limit(21);
+        const page = rows.slice(0, 20),
+          contentIds = page
+            .filter((row) => row.targetType === "content")
+            .map((row) => row.targetId),
+          commentIds = page
+            .filter((row) => row.targetType === "comment")
+            .map((row) => row.targetId);
+        const publications = contentIds.length
+          ? await tx
+              .select({
+                id: content.id,
+                title: sql<string>`left(${content.title},200)`,
+                status: content.status,
+              })
+              .from(content)
+              .where(and(inArray(content.id, contentIds), sql`${editorialId} is not null`))
+          : [];
+        const discussion = commentIds.length
+          ? await tx
+              .select({
+                id: comments.id,
+                contentId: content.id,
+                title: sql<string>`left(${content.title},200)`,
+                text: sql<string>`left(${comments.text},160)`,
+                status: content.status,
+              })
+              .from(comments)
+              .innerJoin(content, eq(content.id, comments.contentId))
+              .where(
+                and(
+                  inArray(comments.id, commentIds),
+                  isNull(comments.productId),
+                  sql`${editorialId} is not null`,
+                ),
+              )
+          : [];
+        const items = page.map((row) => {
+          const publication = publications.find((item) => item.id === row.targetId),
+            comment = discussion.find((item) => item.id === row.targetId);
+          return {
+            ...row,
+            target:
+              row.targetType === "content" && publication
+                ? {
+                    contentId: publication.id,
+                    title: publication.title,
+                    status: publication.status,
+                    text: null,
+                  }
+                : row.targetType === "comment" && comment
+                  ? {
+                      contentId: comment.contentId,
+                      title: comment.title,
+                      status: comment.status,
+                      text: comment.text,
+                    }
+                  : null,
+          };
+        });
+        const tail = page.at(-1);
+        return {
+          period: filters.period,
+          view: filters.view,
+          query: filters.query,
+          target: filters.target ?? null,
+          type: filters.type ?? null,
+          until,
+          items,
+          hasMore: rows.length > 20,
+          nextCursor:
+            rows.length > 20 && tail
+              ? { version: 1 as const, context, until, id: tail.anchorId }
+              : null,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
+  async publicationReports(
+    actorId: string,
+    contentId: string,
+    filters: { view: "pending" | "history"; query: string; type?: string; page: number },
+  ) {
+    if (!/^[A-Za-z0-9_-]{1,128}$/u.test(contentId)) throw new NotFoundError("Publication");
+    if (
+      !Number.isSafeInteger(filters.page) ||
+      filters.page < 1 ||
+      filters.page > 9999 ||
+      !["pending", "history"].includes(filters.view) ||
+      typeof filters.query !== "string" ||
+      filters.query.length > 80 ||
+      filters.query !== filters.query.trim()
+    )
+      throw new AppError("Invalid report filters", 400, "VALIDATION_ERROR");
+    return db.transaction(
+      async (tx) => {
+        await requireStaff(tx, actorId, false);
+        const [publication] = await tx
+          .select({
+            id: content.id,
+            title: sql<string>`left(${content.title},200)`,
+            status: content.status,
+            text: sql<string>`left(${content.body},5000)`,
+            truncated: sql<boolean>`length(${content.body})>5000`,
+          })
+          .from(content)
+          .where(and(eq(content.id, contentId), sql`${editorialId} is not null`))
+          .limit(1);
+        if (!publication) throw new NotFoundError("Publication");
+        const pattern = filters.query ? containsPattern(filters.query) : undefined;
+        const rows = await tx
+          .select({
+            id: reports.id,
+            type: reports.type,
+            reason: sql<string>`left(${reports.reason},1000)`,
+            status: reports.status,
+            createdAt: reports.createdAt,
+            resolvedAt: reports.resolvedAt,
+          })
+          .from(reports)
+          .where(
+            and(
+              eq(reports.targetType, "content"),
+              eq(reports.targetId, contentId),
+              inArray(
+                reports.status,
+                filters.view === "pending" ? ["open", "under_review"] : ["resolved", "dismissed"],
+              ),
+              filters.type ? eq(reports.type, filters.type) : undefined,
+              pattern ? or(ilike(reports.reason, pattern), ilike(reports.id, pattern)) : undefined,
+            ),
+          )
+          .orderBy(desc(reports.createdAt), desc(reports.id))
+          .limit(21)
+          .offset((filters.page - 1) * 20);
+        return {
+          publication,
+          items: rows.slice(0, 20),
+          hasMore: rows.length > 20,
+          page: filters.page,
+          view: filters.view,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
   async history(scope: Scope, id: string, filters: ChangeHistoryFilters<ReportHistoryGroup>) {
     const context = changeHistoryContext(
       scope.staff ? "community-report-staff-history" : "community-report-own-history",
@@ -234,17 +469,17 @@ class CommunityReportsRepository {
     );
   }
 
-  private async discussionBatchPlan(
+  private async targetBatchPlan(
     tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
     actorId: string,
     contentId: string,
-    commentId: string,
+    commentId: string | null,
     input: BatchInput,
     write: boolean,
   ) {
     if (
       !/^[a-zA-Z0-9_-]{1,128}$/u.test(contentId) ||
-      !/^[a-zA-Z0-9_-]{1,128}$/u.test(commentId) ||
+      (commentId !== null && !/^[a-zA-Z0-9_-]{1,128}$/u.test(commentId)) ||
       !Array.isArray(input.items) ||
       !input.items.length ||
       input.items.length > 20 ||
@@ -267,30 +502,40 @@ class CommunityReportsRepository {
         id: content.id,
         status: content.status,
         title: sql<string>`left(${content.title},200)`,
+        ...(commentId === null
+          ? {
+              text: sql<string>`left(${content.body},5000)`,
+              truncated: sql<boolean>`length(${content.body})>5000`,
+              digest: sql<string>`encode(sha256(convert_to(jsonb_build_array(${content.type},${content.title},${content.body},to_char(${content.updatedAt} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"'))::text,'UTF8')),'hex')`,
+            }
+          : {}),
       })
       .from(content)
       .where(and(eq(content.id, contentId), sql`${editorialId} is not null`))
       .for("share")
       .limit(1);
     if (!publication) throw new NotFoundError("Publication");
-    const [comment] = await tx
-      .select({
-        id: comments.id,
-        text: sql<string>`left(${comments.text},5000)`,
-        truncated: sql<boolean>`length(${comments.text}) > 5000`,
-        digest: sql<string>`encode(sha256(convert_to(${comments.text},'UTF8')),'hex')`,
-      })
-      .from(comments)
-      .where(
-        and(
-          eq(comments.id, commentId),
-          eq(comments.contentId, contentId),
-          isNull(comments.productId),
-        ),
-      )
-      .for("share")
-      .limit(1);
-    if (!comment) {
+    const [comment] =
+      commentId !== null
+        ? await tx
+            .select({
+              id: comments.id,
+              text: sql<string>`left(${comments.text},5000)`,
+              truncated: sql<boolean>`length(${comments.text}) > 5000`,
+              digest: sql<string>`encode(sha256(convert_to(${comments.text},'UTF8')),'hex')`,
+            })
+            .from(comments)
+            .where(
+              and(
+                eq(comments.id, commentId),
+                eq(comments.contentId, contentId),
+                isNull(comments.productId),
+              ),
+            )
+            .for("share")
+            .limit(1)
+        : [];
+    if (commentId !== null && !comment) {
       const [proof] = await tx
         .select({ id: auditEvents.id })
         .from(auditEvents)
@@ -320,8 +565,8 @@ class CommunityReportsRepository {
       .from(reports)
       .where(
         and(
-          eq(reports.targetType, "comment"),
-          eq(reports.targetId, commentId),
+          eq(reports.targetType, commentId === null ? "content" : "comment"),
+          eq(reports.targetId, commentId ?? contentId),
           inArray(reports.id, ids),
         ),
       )
@@ -338,13 +583,13 @@ class CommunityReportsRepository {
       .update(
         JSON.stringify([
           1,
-          "discussion-report-batch",
+          commentId === null ? "publication-report-batch" : "discussion-report-batch",
           actorId,
           contentId,
           commentId,
           publication.status,
           publication.title,
-          comment?.digest ?? null,
+          commentId === null ? publication.digest : (comment?.digest ?? null),
           input.action,
           input.notes.trim(),
           rows.map((row) => [row.id, row.digest]),
@@ -373,7 +618,7 @@ class CommunityReportsRepository {
     input: BatchInput,
   ) {
     return db.transaction(async (tx) => {
-      const plan = await this.discussionBatchPlan(tx, actorId, contentId, commentId, input, false);
+      const plan = await this.targetBatchPlan(tx, actorId, contentId, commentId, input, false);
       return {
         contentId,
         commentId,
@@ -400,6 +645,45 @@ class CommunityReportsRepository {
     input: BatchInput & { previewRevision: string },
     auditIds: string[],
   ) {
+    return this.decideTargetBatch(actorId, contentId, commentId, input, auditIds);
+  }
+  async previewPublicationBatch(actorId: string, contentId: string, input: BatchInput) {
+    return db.transaction(async (tx) => {
+      const plan = await this.targetBatchPlan(tx, actorId, contentId, null, input, false);
+      return {
+        contentId,
+        commentId: null,
+        publication: plan.publication,
+        comment: null,
+        action: input.action,
+        notes: input.notes.trim(),
+        previewRevision: plan.previewRevision,
+        items: plan.rows.map((row) => ({
+          id: row.id,
+          type: row.type,
+          reason: row.reason,
+          createdAt: row.createdAt,
+          before: row.status,
+          after: plan.status,
+        })),
+      };
+    });
+  }
+  async decidePublicationBatch(
+    actorId: string,
+    contentId: string,
+    input: BatchInput & { previewRevision: string },
+    auditIds: string[],
+  ) {
+    return this.decideTargetBatch(actorId, contentId, null, input, auditIds);
+  }
+  private async decideTargetBatch(
+    actorId: string,
+    contentId: string,
+    commentId: string | null,
+    input: BatchInput & { previewRevision: string },
+    auditIds: string[],
+  ) {
     if (
       !/^[a-f0-9]{64}$/u.test(input.previewRevision) ||
       !Array.isArray(input.items) ||
@@ -410,7 +694,7 @@ class CommunityReportsRepository {
     )
       throw new AppError("Invalid report batch", 400, "REPORT_BATCH_INVALID");
     return db.transaction(async (tx) => {
-      const plan = await this.discussionBatchPlan(tx, actorId, contentId, commentId, input, true);
+      const plan = await this.targetBatchPlan(tx, actorId, contentId, commentId, input, true);
       if (plan.previewRevision !== input.previewRevision)
         throw new AppError("Report review changed", 409, "REPORT_BATCH_CHANGED");
       const stored = await tx
@@ -422,8 +706,8 @@ class CommunityReportsRepository {
         })
         .where(
           and(
-            eq(reports.targetType, "comment"),
-            eq(reports.targetId, commentId),
+            eq(reports.targetType, commentId === null ? "content" : "comment"),
+            eq(reports.targetId, commentId ?? contentId),
             inArray(
               reports.id,
               plan.rows.map((row) => row.id),

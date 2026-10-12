@@ -26,7 +26,7 @@ export function DiscussionReportBatch({
   allowActions,
 }: {
   contentId: string;
-  commentId: string;
+  commentId: string | null;
   items: z.infer<typeof discussionReportsPageSchema>["items"];
   locale: Locale;
   allowActions: boolean;
@@ -54,7 +54,10 @@ export function DiscussionReportBatch({
     };
   }, []);
   const available = items.filter((item) => ["open", "under_review"].includes(item.status));
-  const path = `/api/admin/community/${encodeURIComponent(contentId)}/discussion/${encodeURIComponent(commentId)}/reports/batch`;
+  const path =
+    commentId === null
+      ? `/api/admin/community/${encodeURIComponent(contentId)}/reports/batch`
+      : `/api/admin/community/${encodeURIComponent(contentId)}/discussion/${encodeURIComponent(commentId)}/reports/batch`;
   function safeMessage(failure: unknown, fallback: string) {
     const message = failure instanceof Error ? failure.message : "";
     return [
@@ -175,8 +178,12 @@ export function DiscussionReportBatch({
       {allowActions && available.length > 0 && (
         <div className="nexus-panel space-y-4 p-5">
           <h2 className="text-lg font-semibold text-primary">{copy.title}</h2>
-          <p className="text-sm text-muted">{copy.help}</p>
-          <p className="text-xs text-muted">{copy.noRemoval}</p>
+          <p className="text-sm text-muted">
+            {commentId === null ? copy.publicationHelp : copy.help}
+          </p>
+          <p className="text-xs text-muted">
+            {commentId === null ? copy.publicationActionHint : copy.noRemoval}
+          </p>
           <fieldset disabled={busy || !!preview || blocked} className="space-y-4">
             <legend className="text-sm text-primary">
               {copy.selected}: {selected.length}
@@ -282,11 +289,20 @@ export function DiscussionReportBatch({
         <div className="nexus-panel space-y-4 p-5">
           <h3 className="font-semibold text-primary">{copy.previewTitle}</h3>
           <p className="break-words text-sm text-primary">{preview.publication.title}</p>
-          <p className="text-sm font-semibold text-primary">{copy.comment}</p>
-          <p className="whitespace-pre-wrap break-words text-sm text-primary">
-            {preview.comment?.text ?? copy.removed}
+          <p className="text-sm font-semibold text-primary">
+            {commentId === null ? copy.publication : copy.comment}
           </p>
-          {preview.comment?.truncated && <p className="text-xs text-muted">{copy.truncated}</p>}
+          <p className="whitespace-pre-wrap break-words text-sm text-primary">
+            {preview.commentId === null && "text" in preview.publication
+              ? preview.publication.text
+              : (preview.comment?.text ?? copy.removed)}
+          </p>
+          {(preview.comment?.truncated ||
+            (preview.commentId === null &&
+              "truncated" in preview.publication &&
+              preview.publication.truncated)) && (
+            <p className="text-xs text-muted">{copy.truncated}</p>
+          )}
           <p className="whitespace-pre-wrap break-words text-sm text-primary">
             {copy.notes}: {preview.notes}
           </p>
@@ -365,7 +381,9 @@ export function DiscussionReportBatch({
           ))}
         </ul>
       ) : (
-        <p className="nexus-panel p-5 text-muted">{discussionReportsCopy(locale).empty}</p>
+        <p className="nexus-panel p-5 text-muted">
+          {commentId === null ? copy.publicationEmpty : discussionReportsCopy(locale).empty}
+        </p>
       )}
     </section>
   );

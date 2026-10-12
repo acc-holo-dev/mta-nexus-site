@@ -11,7 +11,12 @@ export const reportBatchPreviewInput = z
       .max(20)
       .refine((items) => new Set(items.map((item) => item.id)).size === items.length),
     action: z.enum(["review", "resolve", "dismiss"]),
-    notes: z.string().trim().min(3).max(2000),
+    notes: z
+      .string()
+      .trim()
+      .min(3)
+      .max(2000)
+      .refine((value) => !value.includes("\0")),
   })
   .strict()
   .refine(
@@ -63,16 +68,27 @@ const previewSchema = z
       .max(20),
   })
   .strict();
-export type ReportBatchPreview = z.infer<typeof previewSchema>;
+const publicationPreviewSchema = previewSchema
+  .extend({
+    commentId: z.null(),
+    comment: z.null(),
+    publication: previewSchema.shape.publication
+      .extend({ text: boundedText(5000), truncated: z.boolean() })
+      .strict(),
+  })
+  .strict();
+export type ReportBatchPreview =
+  | z.infer<typeof previewSchema>
+  | z.infer<typeof publicationPreviewSchema>;
 const targetStatus = (action: z.infer<typeof reportBatchPreviewInput>["action"]) =>
   action === "review" ? "under_review" : action === "dismiss" ? "dismissed" : "resolved";
 export function confirmsReportBatchPreview(
   value: unknown,
   contentId: string,
-  commentId: string,
+  commentId: string | null,
   input: z.infer<typeof reportBatchPreviewInput>,
 ) {
-  const result = previewSchema.safeParse(value);
+  const result = (commentId === null ? publicationPreviewSchema : previewSchema).safeParse(value);
   if (!result.success) return null;
   const data = result.data;
   if (
@@ -97,7 +113,7 @@ export function confirmsReportBatchPreview(
 export function confirmsReportBatchCommand(
   value: unknown,
   contentId: string,
-  commentId: string,
+  commentId: string | null,
   preview: ReportBatchPreview,
 ) {
   const parsed = z

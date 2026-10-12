@@ -9,6 +9,7 @@ import {
   communityReportPageSchema,
 } from "../lib/community-report-contract";
 import { communityReportCopy } from "../lib/community-report-copy";
+import { reportGroupsCopy } from "../lib/community-report-groups-copy";
 import { getRequestLocale } from "../lib/i18n-server";
 import { authService } from "../lib/services/auth-service";
 import { communityReportService } from "../lib/services/community-report-service";
@@ -42,6 +43,14 @@ export async function CommunityReportScreen({
     <header>
       <h1 className="text-2xl font-bold text-primary">{title}</h1>
       <p className="mt-2 text-sm text-muted">{staff ? copy.queueDescription : copy.description}</p>
+      {staff && !id && (
+        <Link
+          href="/admin/reports/targets"
+          className="inline-flex min-h-11 items-center text-sm text-accent underline"
+        >
+          {reportGroupsCopy(locale).open}
+        </Link>
+      )}
     </header>
   );
   if (id) {

@@ -3565,3 +3565,89 @@ changing source files. Live PostgreSQL/migration/browser checks remain unrun.
 The isolated Next webpack compile-mode build exits zero with its route summary;
 web TypeScript also passes after route regeneration. Full production generation
 remains unverified.
+
+
+## Grouped community queues and publication report batches (Agent B)
+
+`/admin/reports/targets` now groups real community reports by exact publication or
+comment target. SQL aggregates current open/review/resolved/dismissed counts with
+a thirty-day default, all/7/30/90/365-day windows, literal reason/ID search and
+category/target/view filters. Twenty-group keyset pages use an actor/filter-bound
+database-clock cutoff, exact microseconds and immutable earliest matching report
+time plus target kind/ID ordering. Counts remain current rather than representing
+a stored cross-request MVCC snapshot. Anchors are resolved from scoped stored
+reports and current group eligibility, never from client-supplied aggregate times.
+Changed filters/audiences, future windows, deleted anchors or groups no longer in
+the requested view fail with recovery links. Target metadata is fetched in at most
+two bounded queries for the displayed twenty groups; the sentinel is not expanded.
+Unavailable community context stays neutral and links only to an individual case.
+No reporter identities, reasons/evidence arrays or staff notes enter group results.
+
+The group queue and staff report cards link to existing comment/report moderation
+and the new `/admin/community/[id]/reports` publication case screen. This screen
+shows bounded current publication text, filtered twenty-report pages, retained
+search/category/view filters and working preview/confirm batch controls. Its target
+is resolved from an eligible publication and a current database staff role. Group
+counts apply the selected event-time window; the target screens review current
+related cases independently. All screens, errors, metadata, loading/empty/recovery
+states and native labeled forms are localized in RU/EN and reuse existing styling.
+
+`/api/admin/reports/targets` and `/api/admin/community/[id]/reports` provide private,
+authenticated, search-limited reads. Publication `/reports/batch/preview` and
+`/reports/batch` use the same validated selection and atomic write engine as
+discussion batches. One-to-twenty unique pending reports are scoped to the exact
+publication, reviewed with their current reasons, and frozen with a digest of the
+complete publication type/title/body/precise revision plus full selected report
+state. Commit rechecks current roles, target and report versions under matching
+publication/actor/sorted-report locks, updates only reviewed IDs, verifies returning
+identities and inserts a mandatory audit for every decision. Any stale selection,
+body/revision/grant or audit failure rejects/rolls back the batch. Publication
+state itself is handled by the existing moderation screen. Original discussion
+request/response contracts and preview fingerprints remain compatible.
+
+The shared client controller validates publication versus comment previews and
+exact acknowledgements, coalesces rapid handlers, freezes reviewed notes/IDs and
+blocks blind retries after success, conflict or uncertain mutation results. Generic
+requester notices are queued after confirmed storage through the existing service;
+deferred-registration/delivery failures are contained and do not erase a confirmed
+decision. Notifications remain best effort. Saved decisions are visible in the
+existing requester/staff history, including redacted requester receipts and staff
+batch context. New responses omit reporter IDs and internal content/report digests.
+Inputs reject ambiguous parameters, cross-site/non-JSON/oversized mutation bodies,
+control-character searches and zero-byte notes. No schema, migration, dependency,
+workflow or commercial contract changed.
+
+Agent A optimization contract (not migrated by B):
+`CREATE INDEX reports_community_target_created_id_idx ON reports(target_type,
+target_id, created_at, id) WHERE target_type IN ('content','comment');`
+Group readers include the same literal target predicate for prepared-plan partial
+index applicability. Existing indexes remain usable; live aggregate/target query
+plans and large-catalog behavior require PostgreSQL validation.
+
+778 unit/HTTP/SQL-builder/SSR/interaction checks across 70 focused files pass. They
+cover new group filters/counts/cursors/privacy, publication previews and atomic
+decisions, current grants and content/report drift, confirmed client actions, safe
+notification registration, plus discussion/report/support/privacy/team/release-watch
+regressions. Web TypeScript including generated routes, Next webpack compile-mode
+build, changed-file Biome (only the existing shared domain barrel lint-only) and
+diff checks pass. Root TypeScript retains the upstream delivery fixture's missing
+`isSigned`; Knip retains three upstream commercial exports. Four PostgreSQL
+fixtures prepare persisted grouped counts/literal searches/noncommunity exclusion,
+45 tied-group traversal and retained windows, current publication decisions and
+redacted receipts, full-content/grant drift and mandatory-audit rollback. They
+remain unrun without disposable PostgreSQL. Browser behavior, live query plans,
+index integration and full production page generation remain outstanding. GitHub
+Actions are neither run nor inspected.
+
+After rebasing on Agent A's reviewed release-watch resume workflow, 804 checks
+across 73 files pass. All 25 upstream paths, schema/migration bytes and complete
+problem notes remain preserved. Group cursors now seed from the exact earliest
+matching report using a bounded text MIN rather than an unbounded ID array, and
+reject a changed earliest event instead of moving the boundary silently. Web
+TypeScript and the integrated webpack compile-mode build pass; the build required
+a retry with `NODE_OPTIONS=--max-old-space-size=4096` after the default worker heap
+was exhausted. Root TypeScript still has only the known `isSigned` fixture error.
+Knip retains its three upstream unused exports and additionally flags Agent A's
+shared disable/resume command-schema export alias as a duplicate. That commercial
+validation contract is preserved. The proposed community target index remains
+unintegrated; PostgreSQL/browser/production-generation validation remains open.

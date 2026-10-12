@@ -4,9 +4,13 @@ const mocks = vi.hoisted(() => ({
   callbacks: [] as (() => Promise<void>)[],
   moderators: vi.fn(),
   dispatch: vi.fn(),
+  registrationFails: false,
 }));
 vi.mock("next/server", () => ({
-  after: (callback: () => Promise<void>) => mocks.callbacks.push(callback),
+  after: (callback: () => Promise<void>) => {
+    if (mocks.registrationFails) throw Error("PRIVATE_REGISTRATION_FAILURE");
+    return mocks.callbacks.push(callback);
+  },
 }));
 vi.mock("@nexus/db", () => ({ userRepository: { listModeratorIds: mocks.moderators } }));
 vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
@@ -21,6 +25,7 @@ import {
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.callbacks = [];
+  mocks.registrationFails = false;
   mocks.moderators.mockResolvedValue(["mod-1", "mod-2"]);
   mocks.dispatch.mockResolvedValue({ storageFailed: 0 });
 });
@@ -80,4 +85,21 @@ it("dispatches bounded selected-report statuses in one deferred batch without mo
     expect.objectContaining({ recipientId: "second", link: "/workspace/reports/b" }),
   ]);
   expect(() => queueCommunityReportBatchNotices([])).toThrow(RangeError);
+});
+
+it("contains deferred registration failure without turning a stored decision into a failed response", () => {
+  const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+  try {
+    mocks.registrationFails = true;
+    expect(() =>
+      queueCommunityReportBatchNotices([{ id: "report", reporterId: "owner", status: "resolved" }]),
+    ).not.toThrow();
+    expect(JSON.stringify(warning.mock.calls)).toContain(
+      "community_report.notification_registration_failed",
+    );
+    expect(JSON.stringify(warning.mock.calls)).not.toContain("PRIVATE_REGISTRATION_FAILURE");
+    expect(mocks.dispatch).not.toHaveBeenCalled();
+  } finally {
+    warning.mockRestore();
+  }
 });

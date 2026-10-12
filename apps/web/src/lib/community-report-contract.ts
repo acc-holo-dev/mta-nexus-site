@@ -41,7 +41,8 @@ export function parseCommunityReportQuery(params: URLSearchParams) {
     !/^[1-9]\d{0,3}$/u.test(page) ||
     (target && !["content", "comment"].includes(target)) ||
     (type && !REPORT_TYPES.includes(type as (typeof REPORT_TYPES)[number])) ||
-    rawQuery.length > 80
+    rawQuery.length > 80 ||
+    Array.from(rawQuery).some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127)
   )
     return null;
   return {

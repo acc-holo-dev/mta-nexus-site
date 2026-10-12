@@ -30,6 +30,61 @@ function summary(
   };
 }
 class CommunityReportService {
+  async publicationReports(actor: User, contentId: string, filters: CommunityReportQuery) {
+    this.batchScope(actor, contentId, contentId);
+    const result = await communityReportsRepository.publicationReports(actor.id, contentId, {
+      view: filters.view,
+      page: filters.page,
+      type: filters.type,
+      query: filters.query ?? "",
+    });
+    return {
+      ...result,
+      items: result.items.map((item) => ({
+        ...item,
+        createdAt: item.createdAt.toISOString(),
+        resolvedAt: item.resolvedAt?.toISOString() ?? null,
+      })),
+    };
+  }
+  async previewPublicationBatch(actor: User, contentId: string, input: unknown) {
+    this.batchScope(actor, contentId, contentId);
+    const parsed = reportBatchPreviewInput.safeParse(input);
+    if (!parsed.success) throw new AppError("Invalid report batch", 400, "REPORT_BATCH_INVALID");
+    const result = await communityReportsRepository.previewPublicationBatch(
+      actor.id,
+      contentId,
+      parsed.data,
+    );
+    if (
+      typeof result.publication.text !== "string" ||
+      typeof result.publication.truncated !== "boolean"
+    )
+      throw new AppError("Publication review unavailable", 503, "INTERNAL_ERROR");
+    return {
+      ...result,
+      publication: {
+        id: result.publication.id,
+        title: result.publication.title,
+        status: result.publication.status,
+        text: result.publication.text,
+        truncated: result.publication.truncated,
+      },
+      items: result.items.map((item) => ({ ...item, createdAt: item.createdAt.toISOString() })),
+    };
+  }
+  async decidePublicationBatch(actor: User, contentId: string, input: unknown) {
+    this.batchScope(actor, contentId, contentId);
+    const parsed = reportBatchCommandInput.safeParse(input);
+    if (!parsed.success) throw new AppError("Invalid report batch", 400, "REPORT_BATCH_INVALID");
+    return communityReportsRepository.decidePublicationBatch(
+      actor.id,
+      contentId,
+      parsed.data,
+      parsed.data.items.map(() => generateId("aud")),
+    );
+  }
+
   private batchScope(actor: User, contentId: string, commentId: string) {
     this.scope(actor, true);
     if ([contentId, commentId].some((id) => !/^[a-zA-Z0-9_-]{1,128}$/u.test(id)))
