@@ -199,3 +199,54 @@ export const libraryMembershipBatchResultSchema = z
     receipt: libraryMembershipBatchReceiptSchema,
   })
   .strict();
+
+export const libraryCollectionManifestSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    generatedAt: z.string().datetime(),
+    collection: libraryCollectionSnapshotSchema,
+    productIds: z
+      .array(libraryCollectionIdSchema)
+      .max(LIBRARY_COLLECTION_ITEM_LIMIT)
+      .refine((ids) => new Set(ids).size === ids.length, "Duplicate resource references")
+      .transform((ids) => [...ids].sort()),
+  })
+  .strict();
+export const libraryCollectionImportPreviewSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    generatedAt: z.string().datetime(),
+    collection: libraryCollectionSnapshotSchema,
+    itemCount: z.number().int().min(0).max(LIBRARY_COLLECTION_ITEM_LIMIT),
+    itemLimit: z.literal(LIBRARY_COLLECTION_ITEM_LIMIT),
+    batchLimit: z.literal(LIBRARY_COLLECTION_BATCH_LIMIT),
+    items: z
+      .array(
+        z
+          .object({
+            productId: libraryCollectionIdSchema,
+            title: z.string().max(400).nullable(),
+            available: z.boolean(),
+            inCollection: z.boolean(),
+            canAdd: z.boolean(),
+          })
+          .strict(),
+      )
+      .max(LIBRARY_COLLECTION_ITEM_LIMIT),
+  })
+  .strict()
+  .superRefine((preview, ctx) => {
+    if (
+      new Set(preview.items.map((item) => item.productId)).size !== preview.items.length ||
+      preview.items.some(
+        (item) =>
+          (!item.available && item.title !== null) ||
+          (item.canAdd &&
+            (item.inCollection ||
+              preview.collection.status !== "active" ||
+              preview.collection.revision >= 2147483647 ||
+              preview.itemCount >= preview.itemLimit)),
+      )
+    )
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Invalid import preview" });
+  });

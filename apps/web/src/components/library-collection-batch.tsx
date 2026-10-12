@@ -4,7 +4,7 @@ import {
   type LibraryCollectionCommand,
   type LibraryCollectionSnapshot,
 } from "@nexus/domain";
-import { libraryCollectionCommandSchema } from "@nexus/validation";
+import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
@@ -17,11 +17,17 @@ export function LibraryCollectionBatchForm({
   collection,
   action,
   items,
+  maxSelection = LIBRARY_COLLECTION_BATCH_LIMIT,
+  returnHref,
+  onFreeze,
 }: {
   locale: "ru" | "en";
   collection: LibraryCollectionSnapshot;
   action: "add-many" | "remove-many";
   items: { productId: string; title: string | null; hasAccess: boolean }[];
+  maxSelection?: number;
+  returnHref?: string;
+  onFreeze?: () => void;
 }) {
   const c = libraryCollectionsCopy(locale),
     router = useRouter(),
@@ -29,7 +35,9 @@ export function LibraryCollectionBatchForm({
       command: Extract<LibraryCollectionCommand, { action: "add-many" | "remove-many" }>;
       collection: LibraryCollectionSnapshot;
       endpoint: string;
+      reloadHref: string;
     } | null>(null),
+    reviewed = useRef<string | null>(null),
     lock = useRef(false),
     settled = useRef(false),
     active = useRef(true),
@@ -46,8 +54,14 @@ export function LibraryCollectionBatchForm({
     [busy, setBusy] = useState(false),
     [frozen, setFrozen] = useState(false),
     [saved, setSaved] = useState(false),
+    [receiptId, setReceiptId] = useState(""),
     [blocked, setBlocked] = useState(false),
     [error, setError] = useState("");
+  const selectionLimit = Number.isInteger(maxSelection)
+    ? Math.max(0, Math.min(LIBRARY_COLLECTION_BATCH_LIMIT, maxSelection))
+    : 0;
+  const fingerprint = JSON.stringify({ collection, action, selectionLimit, items, ids });
+  const acknowledged = checked && reviewed.current === fingerprint;
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (
@@ -57,7 +71,18 @@ export function LibraryCollectionBatchForm({
       (!pending.current && collection.status !== "active")
     )
       return;
-    if (!pending.current && !checked) {
+    if (
+      !pending.current &&
+      (!acknowledged ||
+        collection.revision >= 2147483647 ||
+        ids.length > selectionLimit ||
+        ids.some(
+          (id) =>
+            !items.some(
+              (item) => item.productId === id && (action !== "add-many" || item.hasAccess),
+            ),
+        ))
+    ) {
       setError(c.invalid);
       return;
     }
@@ -76,6 +101,7 @@ export function LibraryCollectionBatchForm({
       setError(c.invalid);
       return;
     }
+    const fresh = pending.current === null;
     pending.current ??= {
       command: parsed.data,
       collection: {
@@ -85,6 +111,7 @@ export function LibraryCollectionBatchForm({
         revision: collection.revision,
       },
       endpoint: `/api/library/collections/${encodeURIComponent(collection.id)}`,
+      reloadHref: returnHref ?? collectionHref(collection.id),
     };
     const attempt = pending.current,
       abort = new AbortController();
@@ -93,6 +120,7 @@ export function LibraryCollectionBatchForm({
     setBusy(true);
     setFrozen(true);
     setError("");
+    if (fresh) onFreeze?.();
     try {
       const response = await fetch(
         attempt.endpoint,
@@ -114,6 +142,7 @@ export function LibraryCollectionBatchForm({
         return;
       }
       settled.current = true;
+      setReceiptId(libraryCollectionReceiptSchema.parse(body.receipt).id);
       setSaved(true);
       router.refresh();
     } catch {
@@ -145,11 +174,17 @@ export function LibraryCollectionBatchForm({
       </p>
       <p className="text-sm text-secondary">{c.batchLimit}</p>
       <fieldset
-        disabled={busy || frozen || saved || collection.status !== "active"}
+        disabled={
+          busy ||
+          frozen ||
+          saved ||
+          collection.status !== "active" ||
+          collection.revision >= 2147483647
+        }
         className="space-y-3"
       >
         <legend className="text-sm">
-          {c.selected}: {ids.length} / {LIBRARY_COLLECTION_BATCH_LIMIT}
+          {c.selected}: {ids.length} / {selectionLimit}
         </legend>
         <ul className="space-y-2">
           {shownItems.map((item) => (
@@ -160,14 +195,25 @@ export function LibraryCollectionBatchForm({
                   checked={ids.includes(item.productId)}
                   disabled={
                     (shownAction === "add-many" && !item.hasAccess) ||
-                    (!ids.includes(item.productId) && ids.length >= LIBRARY_COLLECTION_BATCH_LIMIT)
+                    (!ids.includes(item.productId) && ids.length >= selectionLimit)
                   }
                   onChange={(e) => {
-                    if (pending.current || lock.current || settled.current) return;
+                    if (!active.current || pending.current || lock.current || settled.current)
+                      return;
                     const selected = e.target.checked;
+                    if (
+                      selected &&
+                      (ids.includes(item.productId) ||
+                        ids.length >= selectionLimit ||
+                        (action === "add-many" && !item.hasAccess))
+                    )
+                      return;
+                    reviewed.current = null;
                     setIds((previous) =>
                       selected
-                        ? [...previous, item.productId]
+                        ? previous.includes(item.productId) || previous.length >= selectionLimit
+                          ? previous
+                          : [...previous, item.productId]
                         : previous.filter((id) => id !== item.productId),
                     );
                     setChecked(false);
@@ -187,10 +233,12 @@ export function LibraryCollectionBatchForm({
         <label className="flex items-start gap-2 text-sm">
           <input
             type="checkbox"
-            checked={checked}
+            checked={acknowledged}
             onChange={(e) => {
-              if (!pending.current && !lock.current && !settled.current)
+              if (active.current && !pending.current && !lock.current && !settled.current) {
+                reviewed.current = e.target.checked ? fingerprint : null;
                 setChecked(e.target.checked);
+              }
             }}
             required
           />
@@ -203,7 +251,12 @@ export function LibraryCollectionBatchForm({
           busy ||
           saved ||
           blocked ||
-          (!pending.current && (!checked || !ids.length || collection.status !== "active"))
+          (!pending.current &&
+            (!acknowledged ||
+              !ids.length ||
+              ids.length > selectionLimit ||
+              collection.status !== "active" ||
+              collection.revision >= 2147483647))
         }
         className="rounded border border-base px-3 py-2 text-sm text-accent disabled:opacity-60"
       >
@@ -228,14 +281,33 @@ export function LibraryCollectionBatchForm({
             {error}
           </p>
           <a
-            href={collectionHref(pending.current?.collection.id ?? collection.id)}
+            href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection.id)}
             className="text-sm text-accent underline"
           >
             {c.reload}
           </a>
         </div>
       )}
-      {saved && <p role="status">{c.saved}</p>}
+      {saved && (
+        <div className="space-y-2">
+          <p role="status">{c.saved}</p>
+          <code className="block break-all text-xs">
+            {c.receipt}: {receiptId}
+          </code>
+          <a
+            href={collectionHref(pending.current?.collection.id ?? collection.id, "history")}
+            className="text-accent underline"
+          >
+            {c.history}
+          </a>
+          <a
+            href={pending.current?.reloadHref ?? returnHref ?? collectionHref(collection.id)}
+            className="text-accent underline"
+          >
+            {c.reload}
+          </a>
+        </div>
+      )}
     </form>
   );
 }

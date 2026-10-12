@@ -1,3 +1,4 @@
+import { libraryCollectionManifestsCopy } from "../lib/library-collection-manifests-i18n";
 import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
 import { membershipHistoryHref } from "../lib/library-membership-history-query";
 import { libraryCollectionComparisonCopy } from "../lib/library-collection-comparison-i18n";
@@ -421,6 +422,15 @@ export async function LibraryCollectionsScreen({
           </section>
         )}
         <nav className="flex flex-wrap gap-4 text-sm" aria-label={c.title}>
+          <a
+            href={`/api/library/collections/${encodeURIComponent(id)}/export`}
+            className="text-accent underline"
+          >
+            {libraryCollectionManifestsCopy(locale).export}
+          </a>
+          <Link href={collectionHref(id, "import")} className="text-accent underline">
+            {libraryCollectionManifestsCopy(locale).title}
+          </Link>
           <Link href={collectionHref(id, "compare")} className="text-accent underline">
             {libraryCollectionComparisonCopy(locale).title}
           </Link>

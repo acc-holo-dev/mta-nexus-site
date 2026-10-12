@@ -213,3 +213,26 @@ export type LibraryMembershipHistoryPage = Omit<
   totalPages: number;
   items: LibraryMembershipHistoryItem[];
 };
+
+export const LIBRARY_COLLECTION_MANIFEST_BYTES = 64 * 1024;
+export type LibraryCollectionManifest = {
+  schemaVersion: 1;
+  generatedAt: string;
+  collection: LibraryCollectionSnapshot;
+  productIds: string[];
+};
+export type LibraryCollectionImportPreview = {
+  schemaVersion: 1;
+  generatedAt: string;
+  collection: LibraryCollectionSnapshot;
+  itemCount: number;
+  itemLimit: number;
+  batchLimit: number;
+  items: {
+    productId: string;
+    title: string | null;
+    available: boolean;
+    inCollection: boolean;
+    canAdd: boolean;
+  }[];
+};

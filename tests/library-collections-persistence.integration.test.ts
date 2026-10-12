@@ -1027,3 +1027,63 @@ it("reads immutable whole membership groups after later collection edits and del
     { statusCode: 404 },
   );
 });
+
+it("exports own orphan references but imports only current own access, then rechecks access atomically when saving", async () => {
+  const { exportLibraryCollection, previewLibraryCollectionImport } = await import(
+    "../packages/db/src/repositories/library-collection-manifests"
+  );
+  const f = await fixture();
+  const source = (
+    await f.command({ requestId: randomUUID(), action: "create", name: "Portable source" })
+  ).receipt.collection.id;
+  const destination = (
+    await f.command({ requestId: randomUUID(), action: "create", name: "Import destination" })
+  ).receipt.collection.id;
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    source,
+  );
+  const manifest = await exportLibraryCollection(f.userId, source);
+  expect(manifest.productIds).toEqual([f.productId]);
+  const preview = await previewLibraryCollectionImport(f.userId, destination, manifest);
+  expect(preview.items[0]).toMatchObject({
+    productId: f.productId,
+    title: null,
+    available: false,
+    canAdd: true,
+    inCollection: false,
+  });
+  await db.delete(entitlements).where(eq(entitlements.id, f.grantId));
+  const request = {
+    requestId: randomUUID(),
+    action: "add-many" as const,
+    expectedRevision: preview.collection.revision,
+    productIds: manifest.productIds,
+  };
+  await expect(f.command(request, destination)).rejects.toMatchObject({ statusCode: 404 });
+  expect((await collections.detail(f.userId, destination)).total).toBe(0);
+  expect((await collections.detail(f.userId, destination)).collection.revision).toBe(1);
+  expect((await collections.history(f.userId, destination)).items).toHaveLength(1);
+  await db
+    .insert(entitlements)
+    .values({
+      id: `ent_col_import_${randomUUID()}`,
+      subjectType: "user",
+      subjectId: f.userId,
+      permission: "product.download",
+      resourceId: f.productId,
+    });
+  const saved = await f.command(request, destination),
+    replay = await f.command(request, destination);
+  expect(replay.replayed).toBe(true);
+  expect(replay.receipt).toEqual(saved.receipt);
+  expect(
+    (await previewLibraryCollectionImport(f.userId, destination, manifest)).items[0],
+  ).toMatchObject({ inCollection: true, canAdd: false });
+  await db.delete(products).where(eq(products.id, f.productId));
+  expect((await exportLibraryCollection(f.userId, source)).productIds).toEqual([f.productId]);
+  expect(
+    (await previewLibraryCollectionImport(f.userId, destination, manifest)).items[0],
+  ).toMatchObject({ title: null, canAdd: false, inCollection: true });
+  await expect(exportLibraryCollection(f.other, source)).rejects.toMatchObject({ statusCode: 404 });
+});

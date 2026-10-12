@@ -1,5 +1,15 @@
 # MTA NEXUS
 
+Private collections now support portable JSON export and reviewed additive import.
+Export includes the complete bounded collection snapshot and up to 200 reference IDs,
+including orphans, without resource titles or access metadata. Import accepts files or
+pasted JSON up to 64 KiB, previews existing references and current own access/capacity,
+then adds up to twenty selected references through existing atomic UUID commands.
+File contents never grant rights; additions recheck access and revisions when saving.
+The shared batch controller invalidates stale review, respects remaining capacity and
+keeps the parent import fixed through uncertain retries, with saved receipt/history links.
+No new migration is required.
+
 Own resource membership groups now have a private RU/EN history, stable receipt detail
 links and bounded JSON-page export. Filters cover 7/30/90/365 days, additions/removals/
 mixed groups, collection and resource IDs; every matching group retains all children.

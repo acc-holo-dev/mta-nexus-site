@@ -95,3 +95,8 @@ export {
   readLibraryMembershipHistory,
   readLibraryMembershipHistoryDetail,
 } from "./library-membership-history";
+
+export {
+  exportLibraryCollection,
+  previewLibraryCollectionImport,
+} from "./library-collection-manifests";

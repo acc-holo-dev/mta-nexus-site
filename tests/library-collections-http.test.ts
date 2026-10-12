@@ -1,3 +1,5 @@
+import { GET as exportManifest } from "../apps/web/src/app/api/library/collections/[id]/export/route";
+import { POST as importPreview } from "../apps/web/src/app/api/library/collections/[id]/import-preview/route";
 import { GET as membershipHistory } from "../apps/web/src/app/api/library/collections/membership-history/route";
 import { GET as membershipHistoryExport } from "../apps/web/src/app/api/library/collections/membership-history/export/route";
 import { GET as membershipReceipt } from "../apps/web/src/app/api/library/collections/membership-history/[id]/route";
@@ -22,6 +24,8 @@ const state = vi.hoisted(() => ({
   accountHistory: vi.fn(),
   comparison: vi.fn(),
   membershipBatch: vi.fn(),
+  exportManifest: vi.fn(),
+  importPreview: vi.fn(),
   membershipHistory: vi.fn(),
   membershipReceipt: vi.fn(),
 }));
@@ -36,6 +40,8 @@ vi.mock("@nexus/db", () => ({
   readLibraryCollectionHistory: state.accountHistory,
   readLibraryCollectionComparison: state.comparison,
   applyLibraryMembershipBatch: state.membershipBatch,
+  exportLibraryCollection: state.exportManifest,
+  previewLibraryCollectionImport: state.importPreview,
   readLibraryMembershipHistory: state.membershipHistory,
   readLibraryMembershipHistoryDetail: state.membershipReceipt,
   libraryCollectionsRepository: {
@@ -637,4 +643,64 @@ it("rejects anonymous, injected, duplicate and throttled membership reads before
   ).toBe(429);
   expect(state.membershipHistory).not.toHaveBeenCalled();
   expect(state.membershipReceipt).not.toHaveBeenCalled();
+});
+
+it("exports own complete manifests privately and previews bounded imported references under fixed session/route identity", async () => {
+  state.exportManifest.mockResolvedValue({ schemaVersion: 1, productIds: ["prd_a"] });
+  state.importPreview.mockResolvedValue({ schemaVersion: 1, items: [] });
+  const response = await exportManifest(request(`${base}/lcol_a/export`), context);
+  expect(response.status).toBe(200);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe("Cookie");
+  expect(response.headers.get("content-disposition")).toContain("resource-collection.json");
+  expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+  expect(state.exportManifest).toHaveBeenCalledWith("usr_a", "lcol_a");
+  const input = {
+    schemaVersion: 1,
+    collection: { id: "lcol_source", name: "Source", status: "active", revision: 4 },
+    generatedAt: "2026-10-12T00:00:00.000Z",
+    productIds: ["prd_a"],
+  };
+  expect((await importPreview(post(input, `${base}/lcol_a/import-preview`), context)).status).toBe(
+    200,
+  );
+  expect(state.importPreview).toHaveBeenCalledWith("usr_a", "lcol_a", input);
+  expect(state.rate).toHaveBeenCalledWith("resourceInspection", "usr_a");
+  expect(state.rate).toHaveBeenCalledWith("contentCreation", "usr_a");
+  state.exportManifest.mockResolvedValue({ text: "ж".repeat(33000) });
+  expect((await exportManifest(request(`${base}/lcol_a/export`), context)).status).toBe(413);
+});
+it("rejects unauthorized, spoofed, cross-site, oversized and throttled manifest requests before repository work", async () => {
+  const path = `${base}/lcol_a/import-preview`;
+  expect((await exportManifest(request(`${base}/lcol_a/export?page=1`), context)).status).toBe(400);
+  expect((await importPreview(post({}, `${path}?userId=other`), context)).status).toBe(400);
+  expect(
+    (await importPreview(post({}, path, { "content-type": "text/plain" }), context)).status,
+  ).toBe(415);
+  expect(
+    (
+      await importPreview(
+        post({}, path, { "content-type": "application/json", "sec-fetch-site": "cross-site" }),
+        context,
+      )
+    ).status,
+  ).toBe(403);
+  expect((await importPreview(post({ text: "ж".repeat(33000) }, path), context)).status).toBe(413);
+  expect(
+    (
+      await importPreview(
+        post({}, path, { "content-type": "application/json", "content-length": "65537" }),
+        context,
+      )
+    ).status,
+  ).toBe(413);
+  state.actor = null;
+  expect((await exportManifest(request(`${base}/lcol_a/export`), context)).status).toBe(401);
+  expect((await importPreview(post({}, path), context)).status).toBe(401);
+  state.actor = { id: "usr_a", role: "user" };
+  state.rate.mockResolvedValue({ success: false });
+  expect((await exportManifest(request(`${base}/lcol_a/export`), context)).status).toBe(429);
+  expect((await importPreview(post({}, path), context)).status).toBe(429);
+  expect(state.exportManifest).not.toHaveBeenCalled();
+  expect(state.importPreview).not.toHaveBeenCalled();
 });

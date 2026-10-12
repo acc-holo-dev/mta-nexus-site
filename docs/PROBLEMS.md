@@ -4093,3 +4093,62 @@ after rename/archive/product deletion, stable detail after final orphan removal 
 foreign-owner rejection. It remains unrun without disposable PostgreSQL; live SQL/query
 plans, browser behavior, full production generation and Node 26 validation remain open.
 GitHub Actions are neither run nor inspected; this block is committed with [skip ci].
+
+
+## Portable private collection manifests and reviewed import — 2026-10-12
+
+Added full owner-only collection JSON attachment export and bounded read-only import
+preview under `/api/library/collections/[id]/export` and `/import-preview`, plus RU/EN
+workspace file/paste/review flow at `/workspace/library/collections/[id]/import`.
+Collection management links both operations. Export stores schemaVersion, database
+snapshot time, own collection name/status/revision and every sorted reference ID up to
+200, including deleted/lost-access references. It excludes resource labels, access and
+storage metadata. Fixed attachment name, nosniff, private/no-store Cookie-varying HTTP
+responses and 64 KiB ceilings prevent dynamic filename or unbounded payload handling.
+
+The strict shared manifest schema rejects duplicate/invalid IDs, oversized reference
+lists, unexpected metadata, invalid timestamps or collection snapshots. File collection
+identity/name/time is untrusted input and never authorizes a collection or resource.
+Preview authenticates against the session owner and route target before inspecting
+references, uses a read-only repeatable-read database transaction and current database
+snapshot time, and selects only current own access, existing membership and masked safe
+published labels. Unknown/deleted/unowned references never reveal names. Existing target
+references remain visible even after access loss and cannot be selected as additions.
+Draft/unsafe acquired resources may retain references with masked labels, matching
+existing add command semantics; availability never implies download authorization.
+Archived/full/terminal collections remain inspectable but cannot receive additions.
+All returned metadata is explicit and bounded; no source collection/grant/file reads
+are authorized by the manifest. Empty files require no resource metadata query.
+
+The client bounds file sizes and UTF-8 pasted bytes before parsing/sending, validates
+server preview target identity and exact complete sorted reference correspondence, and
+ignores stale async file/preview results after edits or unmount. File changes abort an
+active preview and invalidate the old result. Explicit reviewed additions use the
+existing atomic add-many UUID command, capped at twenty and remaining capacity.
+The shared batch controller now verifies selected eligibility/capacity at submission,
+invalidates acknowledgement when collection/choices/limits change, ignores disabled or
+unmounted stale handlers and freezes the parent once the first mutation starts.
+Uncertain retries keep the same route/body/UUID/collection proof; definitive failures
+require reload. Saved receipt ID and ordinary history/reload links stay visible.
+Version preferences, watches and download rights are not imported or changed.
+No migration or new mutation persistence is introduced.
+
+Imported independent remote commit a291eab205b842e8aa3a700651305b74ec8acac9 exactly,
+retaining database-scoped discussion recovery checkpoints, outcome reporting, CLI/storage
+changes and their tests. This block is based directly on that main commit.
+
+Verification: 786 focused tests across 61 files pass, including manifest shape/bounds,
+owner/time/privacy/export/import repository orchestration, strict HTTP/rate/body controls,
+RU/EN import SSR, file/paste/cancellation/stale-response/malformed-preview behavior,
+capacity/review/frozen-retry receipt handling, and preserved collection commands/history/
+comparison/membership/preparation/version/watches plus discussion replay/checkpoint/
+database/options/storage/watch flows. Biome lint passes on all 18 touched non-integration
+TypeScript sources; web TypeScript passes before and after regenerated route types.
+The isolated Next webpack compile-mode build exits zero and produces fresh server
+artifacts for export, import-preview and import routes. Root TypeScript
+retains only known missing fast-check/property-test implicit-any errors. One PostgreSQL
+fixture covers orphan-preserving export, own import eligibility, live access revocation
+before save with no partial state, same UUID replay, existing membership after deletion
+and foreign-owner export rejection. It remains unrun without disposable PostgreSQL.
+Live SQL/query plans, browser behavior, full production generation and Node 26 validation
+remain open. GitHub Actions are neither run nor inspected; commits include [skip ci].

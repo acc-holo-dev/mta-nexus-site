@@ -242,3 +242,60 @@ it("aborts a batch on unmount and ignores its late confirmation", async () => {
   expect(h.refresh).not.toHaveBeenCalled();
   expect(h.fetch).toHaveBeenCalledOnce();
 });
+
+it("invalidates pre-submit acknowledgement when the reviewed snapshot changes", async () => {
+  check(0);
+  check(2);
+  const changed = render("remove-many", items, { collection: { ...collection, revision: 5 } });
+  expect(changed.filter((n) => n.type === "input")[2]?.props.checked).toBe(false);
+  await submit(changed);
+  expect(h.fetch).not.toHaveBeenCalled();
+});
+it("respects import capacity, exposes stable receipt and freezes the parent once across uncertain retry", async () => {
+  const entries = items.map((item) => ({ ...item, hasAccess: true })),
+    onFreeze = vi.fn(),
+    props = {
+      maxSelection: 1,
+      returnHref: "/workspace/library/collections/lcol_a/import",
+      onFreeze,
+    };
+  const first = render("add-many", entries, props).filter((n) => n.type === "input")[0];
+  if (!first) throw Error("Missing choice");
+  (first.props.onChange as (e: unknown) => void)({ target: { checked: true } });
+  const tree = render("add-many", entries, props),
+    inputs = tree.filter((n) => n.type === "input");
+  expect(inputs[1]?.props.disabled).toBe(true);
+  const ack = inputs[2];
+  if (!ack) throw Error("Missing acknowledgement");
+  (ack.props.onChange as (e: unknown) => void)({ target: { checked: true } });
+  h.fetch.mockRejectedValueOnce(Error("lost"));
+  await submit(render("add-many", entries, props));
+  expect(onFreeze).toHaveBeenCalledOnce();
+  const init = h.fetch.mock.calls[0]?.[1] as RequestInit;
+  h.fetch.mockResolvedValueOnce(success(JSON.parse(String(init.body))));
+  await submit(render("add-many", entries, props));
+  expect(onFreeze).toHaveBeenCalledOnce();
+  expect(
+    render("add-many", entries, props).some(
+      (n) => n.props.href === "/workspace/library/collections/lcol_a/import",
+    ),
+  ).toBe(true);
+  expect(
+    render("add-many", entries, props).some(
+      (n) => n.props.href === "/workspace/library/collections/lcol_a/history",
+    ),
+  ).toBe(true);
+});
+it("does not allow a stale checkbox handler to bypass disabled access or selection capacity", async () => {
+  const inputs = render("add-many", items, { maxSelection: 0 }).filter((n) => n.type === "input");
+  const first = inputs[0],
+    second = inputs[1];
+  if (!first || !second) throw Error("Missing choice");
+  (first.props.onChange as (e: unknown) => void)({ target: { checked: true } });
+  (second.props.onChange as (e: unknown) => void)({ target: { checked: true } });
+  expect(
+    render("add-many", items, { maxSelection: 0 }).filter((n) => n.type === "input")[0]?.props
+      .checked,
+  ).toBe(false);
+  expect(h.fetch).not.toHaveBeenCalled();
+});
