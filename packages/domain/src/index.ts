@@ -47,3 +47,5 @@ export * from "./library-release-comparison";
 export * from "./private-change-history";
 
 export * from "./resource-release-watch-history";
+
+export * from "./support-message-discovery";

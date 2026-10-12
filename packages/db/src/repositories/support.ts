@@ -199,15 +199,43 @@ export class SupportCaseRepository {
     page = 1,
     pageSize = 100,
   ): Promise<SupportPage<SupportCaseMessage>> {
+    return db.transaction(
+      (tx) => this.pageMessagesWithin(tx, caseId, page, pageSize),
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
+  async authorizedThread(caseId: string, actorId: string, page = 1) {
+    return db.transaction(
+      async (tx) => {
+        const { actor, supportCase } = await supportAccess(tx, caseId, actorId, false);
+        const messages = await this.pageMessagesWithin(tx, caseId, page, 100);
+        return {
+          supportCase,
+          messages,
+          staff: actor.staff,
+          requester: supportCase.requesterId === actor.id,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
+  }
+
+  private async pageMessagesWithin(
+    tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+    caseId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<SupportPage<SupportCaseMessage>> {
     const boundedSize = normalizePageSize(pageSize, 100, 100);
-    const [countRow] = await db
+    const [countRow] = await tx
       .select({ total: count() })
       .from(supportCaseMessages)
       .where(eq(supportCaseMessages.caseId, caseId));
     const total = countRow?.total ?? 0;
     const normalized = normalizePage(page, total, boundedSize);
 
-    const newestFirst = (await db
+    const newestFirst = (await tx
       .select()
       .from(supportCaseMessages)
       .where(eq(supportCaseMessages.caseId, caseId))

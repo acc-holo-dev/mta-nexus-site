@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import { SUPPORT_JSON_MAX_BYTES } from "../../../lib/bounded-json";
+import { AppError } from "@nexus/domain";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
@@ -14,6 +15,7 @@ const mocks = vi.hoisted(() => ({
   pageStaff: vi.fn(),
   findById: vi.fn(),
   pageMessages: vi.fn(),
+  authorizedThread: vi.fn(),
   createIdempotentCase: vi.fn(),
   addIdempotentMessage: vi.fn(),
   findMutationReplay: vi.fn(),
@@ -49,6 +51,7 @@ vi.mock("@nexus/db", () => ({
     pageStaff: mocks.pageStaff,
     findById: mocks.findById,
     pageMessages: mocks.pageMessages,
+    authorizedThread: mocks.authorizedThread,
     createIdempotentCase: mocks.createIdempotentCase,
     addIdempotentMessage: mocks.addIdempotentMessage,
     findMutationReplay: mocks.findMutationReplay,
@@ -310,13 +313,10 @@ describe("support HTTP authorization and privacy", () => {
     expect(mocks.pageByRequester).not.toHaveBeenCalled();
   });
 
-  it("does not expose another user's thread unless the viewer is staff", async () => {
+  it("uses current repository permissions instead of staff claims in the session", async () => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
-    mocks.findById.mockResolvedValue({
-      id: caseId,
-      requesterId: "usr_other",
-      status: "open",
-    });
+    mocks.can.mockReturnValue(true);
+    mocks.authorizedThread.mockRejectedValue(new AppError("Hidden", 404, "NOT_FOUND"));
 
     const request = new NextRequest(`https://nexus.test/api/support/${caseId}`);
     const hidden = await getCase(request, params);
@@ -324,18 +324,24 @@ describe("support HTTP authorization and privacy", () => {
     expectPrivate(hidden);
     expect(mocks.pageMessages).not.toHaveBeenCalled();
 
-    mocks.can.mockReturnValue(true);
-    mocks.pageMessages.mockResolvedValue({
-      items: [{ id: "spm_1", body: "private" }],
-      page: 1,
-      pageSize: 100,
-      total: 1,
-      totalPages: 1,
+    mocks.authorizedThread.mockResolvedValue({
+      supportCase: { id: caseId, status: "open" },
+      staff: true,
+      requester: false,
+      messages: {
+        items: [{ id: "spm_1", body: "private" }],
+        page: 1,
+        pageSize: 100,
+        total: 1,
+        totalPages: 1,
+      },
     });
     const allowed = await getCase(request, params);
     expect(allowed.status).toBe(200);
     expectPrivate(allowed);
-    expect(mocks.pageMessages).toHaveBeenCalledWith(caseId, 1);
+    expect(mocks.authorizedThread).toHaveBeenCalledWith(caseId, "usr_member", 1);
+    expect(mocks.findById).not.toHaveBeenCalled();
+    expect(mocks.can).not.toHaveBeenCalled();
   });
 
   it("rejects invalid page queries before reading private cases", async () => {
@@ -348,17 +354,11 @@ describe("support HTTP authorization and privacy", () => {
 
   it("passes a bounded message page into the repository", async () => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
-    mocks.findById.mockResolvedValue({
-      id: caseId,
-      requesterId: "usr_member",
-      status: "open",
-    });
-    mocks.pageMessages.mockResolvedValue({
-      items: [],
-      page: 7,
-      pageSize: 100,
-      total: 601,
-      totalPages: 7,
+    mocks.authorizedThread.mockResolvedValue({
+      supportCase: { id: caseId, status: "open" },
+      staff: false,
+      requester: true,
+      messages: { items: [], page: 7, pageSize: 100, total: 601, totalPages: 7 },
     });
 
     const response = await getCase(
@@ -366,12 +366,38 @@ describe("support HTTP authorization and privacy", () => {
       params,
     );
     expect(response.status).toBe(200);
-    expect(mocks.pageMessages).toHaveBeenCalledWith(caseId, 7);
+    expect(mocks.authorizedThread).toHaveBeenCalledWith(caseId, "usr_member", 7);
     expect(await response.json()).toMatchObject({
       messagePage: 7,
       messageTotalPages: 7,
       messageTotal: 601,
     });
+  });
+
+  it.each([
+    "messagePage=0",
+    "messagePage=-1",
+    "messagePage=1&messagePage=2",
+    "messagePage=10000000",
+    "messagePage=1e2",
+  ])("rejects malformed private message pagination %s", async (query) => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    const response = await getCase(
+      new NextRequest(`https://nexus.test/api/support/${caseId}?${query}`),
+      params,
+    );
+    expect(response.status).toBe(400);
+    expectPrivate(response);
+    expect(mocks.authorizedThread).not.toHaveBeenCalled();
+  });
+
+  it("limits private thread reads before loading message bodies", async () => {
+    mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+    mocks.rate.mockResolvedValue({ success: false });
+    const response = await getCase(new NextRequest(`https://nexus.test/api/support/${caseId}`), params);
+    expect(response.status).toBe(429);
+    expectPrivate(response);
+    expect(mocks.authorizedThread).not.toHaveBeenCalled();
   });
 
   it("rejects client-forged related entity context before persistence", async () => {

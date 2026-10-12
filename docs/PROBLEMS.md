@@ -3351,3 +3351,63 @@ after Next generated route types. Next webpack compile-mode build exited success
 with its route summary. Full production generation remains unverified. Root TypeScript
 still reports the previously recorded fast-check/implicit-any and delivery-fixture
 errors; the new PostgreSQL history fixtures remain unrun.
+
+
+## Private support message discovery and fresh read permissions (Agent B)
+
+`/support/[id]/messages` and `/admin/support/[id]/messages` now search the actual
+private conversation by literal text and recorded requester/staff role. Native
+GET forms retain shareable filters, and existing thread headers/messages link to
+the explorer and focused message permalinks. Focused old messages are highlighted
+and can be followed in both chronological directions. Twenty-message keyset pages
+retain a database-clock cutoff, exact PostgreSQL microseconds and an actor/case/
+filter context; foreign, removed, changed-filter and future anchors fail explicitly.
+The page uses the existing case/time/ID index, bounded projections and scoped
+EXISTS checks instead of whole-thread counts or offset scans. The cutoff excludes
+subsequent ordinary replies; it is not a persistent cross-request MVCC snapshot.
+
+`/api/support/[id]/messages` and `/export` authenticate, apply search limits and
+recheck live requester/staff authority inside a read-only repeatable-read
+transaction. The staff page additionally requires a current staff role, including
+when the viewer owns the case. The private JSON download contains the selected
+page and preserved filter window, not the complete conversation. It retains
+private/no-store/Cookie headers, request IDs, nosniff, a fixed filename and the
+shared 512-KiB bound. New projections exclude staff/account identities, linked
+commercial context and networking/audit data. Legacy oversized text is bounded
+in SQL and again at the UTF-16 contract boundary without splitting a surrogate
+pair, with an explicit truncation label. The service rejects inconsistent case,
+focus or retained cutoff results instead of accepting a misleading success.
+
+The existing `/api/support/[id]` GET now delegates to `authorizedThread`, resolving
+the current database role and case before reading messages. Authorization, count
+and the compatible 100-message offset page share one read snapshot. Revoked
+moderators can no longer rely on a stale session claim to read another user's
+thread. Duplicate/malformed message-page parameters fail before storage and
+private reads are rate-limited. Existing reply/status/idempotency and linked
+commerce contracts remain intact. Thread author labels use actual requester
+capability rather than the page's navigation mode. No schema, migration,
+dependency, workflow or commerce implementation changed.
+
+RU/EN metadata, errors, loading/empty/recovery states, native labeled controls,
+escaped text, focused anchors and mobile layouts reuse the existing design system.
+445 focused checks across 33 unit/HTTP/SQL-builder/SSR files pass, covering support,
+private edit journals, team governance, profile privacy and discussion subscriptions.
+Web TypeScript and changed-file Biome/diff checks pass. Root TypeScript retains
+only the upstream resource-delivery fixture's missing `isSigned`; Knip retains
+three upstream commercial exports. Four PostgreSQL fixtures prepare persisted
+45-row tied-timestamp traversal, forward/backward retained windows, new replies,
+literal wildcard searches, exact focused links, revoked staff, scoped/deleted
+anchors and legacy Unicode bounds. These fixtures remain unrun without disposable
+PostgreSQL. Browser behavior, live query plans and production page generation
+remain outstanding. GitHub Actions are neither run nor inspected.
+
+The completed Next webpack compile-mode build also passes with the new support
+routes; generated-route TypeScript is rechecked after integration.
+
+After rebasing on Agent A's release-watch search/export/stop batches, collection
+enrollment and private command history, 553 checks across 51 files pass. All 51
+upstream paths are retained byte-for-byte except the shared domain export barrel
+and problem notes, whose complete upstream content remains a prefix. The integrated
+webpack compile-mode build exits successfully, web TypeScript including generated
+routes and changed-file Biome/diff checks pass. The known root fixture omission
+and three unused commercial exports remain. No PostgreSQL fixture or Actions ran.
