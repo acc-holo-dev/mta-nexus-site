@@ -17,15 +17,14 @@ const stop = () => controller.abort();
 process.once("SIGTERM", stop);
 process.once("SIGINT", stop);
 async function main() {
-  const { checkpointName, from, until, limit, worker, adoptLegacy } = discussionReplayOptions(
-    process.argv.slice(2),
-  );
-  const identity = await resolveDiscussionReplayDatabaseIdentity();
+  const { checkpointName, from, until, limit, worker, adoptLegacy, repairPush } =
+    discussionReplayOptions(process.argv.slice(2));
+  const identity = await resolveDiscussionReplayDatabaseIdentity(repairPush);
   await withDiscussionReplayCheckpoint(
     checkpointName,
     from,
     until,
-    { identity, adoptLegacy },
+    { identity, adoptLegacy, deliveryPolicy: repairPush ? "inbox-and-pending-push" : "inbox" },
     async (store) => {
       let checkpoint = store.initial;
       const save = async (value: ReplayCheckpoint) => {
@@ -35,7 +34,7 @@ async function main() {
       await save(checkpoint);
       const run = async () => {
         const started = performance.now();
-        if ((await resolveDiscussionReplayDatabaseIdentity()) !== identity)
+        if ((await resolveDiscussionReplayDatabaseIdentity(repairPush)) !== identity)
           throw Error("Replay database scope changed during recovery");
         const result = await replayDiscussionNotifications(
           checkpoint,
@@ -61,7 +60,11 @@ async function main() {
                 .orderBy(asc(comments.createdAt), asc(comments.id))
                 .limit(50),
             deliver: (contentId, commentId, cursor) =>
-              notifyDiscussionReplies(contentId, commentId, { cursor, maxFollowerPages: 1 }),
+              notifyDiscussionReplies(contentId, commentId, {
+                cursor,
+                maxFollowerPages: 1,
+                ...(repairPush ? { repairPush: true } : {}),
+              }),
             save,
             shouldStop: () => controller.signal.aborted,
           },

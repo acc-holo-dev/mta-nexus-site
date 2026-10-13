@@ -50,8 +50,10 @@ const data = {
   createdAt: "2026-10-12T00:00:00.000Z",
   data: null,
 };
-const row = () =>
-  Object.keys(getTableColumns(notifications)).map((key) => data[key as keyof typeof data]);
+const row = (overrides: Record<string, unknown> = {}) =>
+  Object.keys(getTableColumns(notifications)).map(
+    (key) => ({ ...data, ...overrides })[key as keyof typeof data],
+  );
 beforeEach(() => {
   vi.resetAllMocks();
   state.queries = [];
@@ -61,7 +63,7 @@ beforeEach(() => {
   mocks.push.mockResolvedValue({ queued: 2, reason: "queued" });
 });
 it("serializes preferences after rechecking live source rights and stores a generic notice in the existing outbox", async () => {
-  state.rows = [[], [row()]];
+  state.rows = [[], [row()], [[data.id]]];
   expect(await repository.createDiscussionReplyWithPush(input)).toEqual({
     state: "stored",
     pushJobs: 2,
@@ -99,10 +101,13 @@ it.each([
   "uses explicit follow %s and direct participation %s under their separate preferences",
   async (following, direct, followEnabled, contentEnabled, category) => {
     mocks.source.mockResolvedValue({ following, direct, id: data.id, link: data.link });
-    state.rows = [[[followEnabled, contentEnabled]], [row()]];
+    state.rows = [[[followEnabled, contentEnabled]], [row()], [[data.id]]];
     const result = await repository.createDiscussionReplyWithPush(input);
     expect(result.state).toBe(category ? "stored" : "suppressed");
-    if (category) expect(state.queries.at(-1)?.params).toContain(category);
+    if (category)
+      expect(state.queries.find((query) => query.sql.startsWith("insert"))?.params).toContain(
+        category,
+      );
     else {
       expect(state.queries).toHaveLength(2);
       expect(mocks.push).not.toHaveBeenCalled();
@@ -163,4 +168,88 @@ it("preserves ordinary notification insertion semantics used by other modules", 
   expect(state.queries.at(-1)?.sql).not.toContain("on conflict");
   expect(mocks.source).not.toHaveBeenCalled();
   expect(mocks.push).not.toHaveBeenCalled();
+});
+
+const receipt = (state: string) => ({
+  kind: "discussion_push",
+  discussionPush: { version: 1, state },
+});
+it("stores pending proof with database time and commits admission proof alongside jobs", async () => {
+  state.rows = [[], [row()], [[data.id]]];
+  await repository.createDiscussionReplyWithPush(input);
+  const insert = state.queries.find((query) => query.sql.startsWith("insert"));
+  expect(insert?.sql).toContain("clock_timestamp()");
+  expect(insert?.params).toContain(JSON.stringify(receipt("pending")));
+  const update = state.queries.find((query) => query.sql.startsWith("update"));
+  expect(update?.params).toContain(JSON.stringify(receipt("queued")));
+  expect(update?.sql).not.toContain('"is_read" =');
+});
+it("repairs only a proven pending unread reply under source, preference and notice locks", async () => {
+  state.rows = [[], [], [row({ data: receipt("pending") })], [[data.id]]];
+  expect(await repository.createDiscussionReplyWithPush({ ...input, repairPush: true })).toEqual({
+    state: "duplicate",
+    pushJobs: 2,
+    pushQueueState: "queued",
+  });
+  expect(mocks.push).toHaveBeenCalledExactlyOnceWith(expect.anything(), data.id, "reader", true);
+  const lookup = state.queries.find((query) => query.sql.includes('from "notifications"'));
+  expect(lookup?.sql).toContain("for update");
+  expect(lookup?.sql).toContain("interval '24 hours' > clock_timestamp()");
+  expect(lookup?.params).toEqual([data.id, "reader", "content"]);
+  expect(state.queries.filter((query) => query.sql.startsWith("update"))).toHaveLength(1);
+});
+it.each([
+  null,
+  receipt("queued"),
+  receipt("unavailable"),
+  receipt("unknown"),
+  { ...receipt("pending"), extra: "unproven" },
+])(
+  "never guesses repair eligibility from a missing, settled or damaged admission receipt %#",
+  async (proof) => {
+    state.rows = [[], [], [row({ data: proof })]];
+    expect(
+      await repository.createDiscussionReplyWithPush({ ...input, repairPush: true }),
+    ).toMatchObject({ state: "duplicate", pushJobs: 0 });
+    expect(mocks.push).not.toHaveBeenCalled();
+    expect(state.queries.some((query) => query.sql.startsWith("update"))).toBe(false);
+  },
+);
+it("never reopens a read notice or switches its original preference category", async () => {
+  for (const original of [
+    row({ data: receipt("pending"), isRead: true }),
+    row({ data: receipt("pending"), category: "content" }),
+  ]) {
+    state.rows = [[], [], [original]];
+    await repository.createDiscussionReplyWithPush({ ...input, repairPush: true });
+  }
+  expect(mocks.push).not.toHaveBeenCalled();
+});
+it.each(["saturated", "error", "proof-error"])(
+  "retains pending evidence when repair encounters %s",
+  async (failure) => {
+    state.rows = [[], [], [row({ data: receipt("pending") })]];
+    if (failure === "error") mocks.push.mockRejectedValue(Error("queue detail"));
+    else if (failure === "saturated")
+      mocks.push.mockResolvedValue({ queued: 0, reason: "saturated" });
+    // With proof-error the UPDATE returns no row, causing the jobs/proof savepoint to fail.
+    const result = await repository.createDiscussionReplyWithPush({ ...input, repairPush: true });
+    expect(result).toMatchObject({
+      state: "duplicate",
+      pushJobs: 0,
+      pushQueueState: failure === "saturated" ? "saturated" : "error",
+    });
+    expect(state.transactions).toBe(2);
+    expect(state.queries.filter((query) => query.sql.startsWith("update"))).toHaveLength(
+      failure === "proof-error" ? 1 : 0,
+    );
+  },
+);
+it("settles unavailable devices without renewing a pending notice's consent", async () => {
+  state.rows = [[], [], [row({ data: receipt("pending") })], [[data.id]]];
+  mocks.push.mockResolvedValue({ queued: 0, reason: "no_subscriptions" });
+  expect(
+    await repository.createDiscussionReplyWithPush({ ...input, repairPush: true }),
+  ).toMatchObject({ state: "duplicate", pushQueueState: "no_subscriptions" });
+  expect(state.queries.at(-1)?.params).toContain(JSON.stringify(receipt("unavailable")));
 });

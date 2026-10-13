@@ -436,8 +436,12 @@ export interface BuildReviewNotificationData {
   notes: string;
 }
 
+export interface DiscussionPushNotificationData {
+  kind: "discussion_push";
+  discussionPush: { version: 1; state: "pending" | "queued" | "unavailable" };
+}
 export interface Notification {
-  data?: BuildReviewNotificationData | import("./license-maintenance").LicenseTermNotificationData | import("./resource-release-watches").ResourceReleaseNoticeData | null;
+  data?: BuildReviewNotificationData | import("./license-maintenance").LicenseTermNotificationData | import("./resource-release-watches").ResourceReleaseNoticeData | DiscussionPushNotificationData | null;
   id: string;
   recipientId: string;
   title: string;

@@ -11,8 +11,12 @@ import {
   followWorkspaceRepository as followsRepository,
   notificationRepository,
   notifications,
+  sessionRepository,
   userRepository,
   users,
+  webPushOutbox,
+  webPushSubscriptionRepository,
+  webPushSubscriptions,
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
@@ -20,6 +24,7 @@ import { resolveDiscussionReplayDatabaseIdentity } from "../apps/web/scripts/dis
 import { withDiscussionReplayCheckpoint } from "../apps/web/scripts/discussion-replay-storage";
 import { notifyDiscussionReplies } from "../apps/web/src/lib/services/discussion-follow-notification-service";
 import { replayDiscussionNotifications } from "../apps/web/src/lib/services/discussion-notification-replay";
+import { discussionPushReceipt } from "../packages/db/src/repositories/discussion-push-receipt";
 
 const actors: string[] = [];
 afterEach(async () => {
@@ -349,5 +354,135 @@ it("resumes bound replay after checkpoint failure without duplicate inbox rows o
     ).rejects.toThrow("another database");
   } finally {
     await rm(directory, { recursive: true, force: true });
+  }
+});
+
+it("rolls optional jobs back with their failed receipt, then repairs once without adding late devices or renewing TTL", async () => {
+  const owner = await actor(),
+    reader = await actor(),
+    item = await publication(owner.id);
+  await subscribe(reader.id, item.id);
+  const token = randomUUID().replaceAll("-", "");
+  const sessionId = `ses_repair_${token}`,
+    earlyId = `wps_early_${token}`,
+    lateId = `wps_late_${token}`;
+  await sessionRepository.create({
+    id: sessionId,
+    userId: reader.id,
+    token,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
+  const addDevice = (id: string) =>
+    webPushSubscriptionRepository.upsert({
+      id,
+      userId: reader.id,
+      sessionId,
+      endpoint: `https://push.example.invalid/${id}`,
+      p256dh: "a".repeat(87),
+      auth: "b".repeat(22),
+      expirationAt: null,
+    });
+  await addDevice(earlyId);
+  await db
+    .update(webPushSubscriptions)
+    .set({ createdAt: sql`clock_timestamp() - interval '1 minute'` })
+    .where(eq(webPushSubscriptions.id, earlyId));
+  const event = await reply(item.id, owner.id);
+  const functionName = `repair_proof_${token}`,
+    triggerName = `repair_proof_trigger_${token}`;
+  if (!/^[A-Za-z0-9_]+$/.test(reader.id)) throw Error("Unsafe fixture identifier");
+  try {
+    await db.execute(
+      sql.raw(`CREATE FUNCTION ${functionName}() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN
+      IF NEW.recipient_id = '${reader.id}' AND NEW.data->'discussionPush'->>'state' = 'queued' THEN
+        RAISE EXCEPTION 'fixture proof failure'; END IF; RETURN NEW; END $$`),
+    );
+    await db.execute(
+      sql.raw(
+        `CREATE TRIGGER ${triggerName} BEFORE UPDATE ON notifications FOR EACH ROW EXECUTE FUNCTION ${functionName}()`,
+      ),
+    );
+    const first = await notificationRepository.createDiscussionReplyWithPush({
+      recipientId: reader.id,
+      contentId: item.id,
+      commentId: event.id,
+    });
+    expect(first).toMatchObject({ state: "stored", pushJobs: 0, pushQueueState: "error" });
+    const [notice] = await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.recipientId, reader.id));
+    expect(discussionPushReceipt(notice.data)).toBe("pending");
+    expect(
+      await db.select().from(webPushOutbox).where(eq(webPushOutbox.notificationId, notice.id)),
+    ).toHaveLength(0);
+    await db.execute(sql.raw(`DROP TRIGGER ${triggerName} ON notifications`));
+    await db.execute(sql.raw(`DROP FUNCTION ${functionName}()`));
+    await addDevice(lateId);
+    await db
+      .update(webPushSubscriptions)
+      .set({ createdAt: sql`${notice.createdAt}::timestamptz + interval '1 second'` })
+      .where(eq(webPushSubscriptions.id, lateId));
+    await notificationRepository.updatePreferences(reader.id, { followsEnabled: false });
+    expect(
+      (
+        await notificationRepository.createDiscussionReplyWithPush({
+          recipientId: reader.id,
+          contentId: item.id,
+          commentId: event.id,
+          repairPush: true,
+        })
+      ).state,
+    ).toBe("suppressed");
+    await notificationRepository.updatePreferences(reader.id, { followsEnabled: true });
+    const recovered = await Promise.all(
+      Array.from({ length: 4 }, () =>
+        notificationRepository.createDiscussionReplyWithPush({
+          recipientId: reader.id,
+          contentId: item.id,
+          commentId: event.id,
+          repairPush: true,
+        }),
+      ),
+    );
+    expect(recovered.reduce((sum, value) => sum + value.pushJobs, 0)).toBe(1);
+    expect(recovered.every((value) => value.state === "duplicate")).toBe(true);
+    const jobs = await db
+      .select()
+      .from(webPushOutbox)
+      .where(eq(webPushOutbox.notificationId, notice.id));
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0].subscriptionId).toBe(earlyId);
+    const [deadline] = await db.execute(
+      sql`select o.expires_at = n.created_at + interval '24 hours' as exact from web_push_outbox o inner join notifications n on n.id = o.notification_id where n.id = ${notice.id}`,
+    );
+    expect(deadline.exact).toBe(true);
+    await db.delete(webPushOutbox).where(eq(webPushOutbox.notificationId, notice.id));
+    expect(
+      (
+        await notificationRepository.createDiscussionReplyWithPush({
+          recipientId: reader.id,
+          contentId: item.id,
+          commentId: event.id,
+          repairPush: true,
+        })
+      ).pushJobs,
+    ).toBe(0);
+    const [settled] = await db.select().from(notifications).where(eq(notifications.id, notice.id));
+    expect(discussionPushReceipt(settled.data)).toBe("queued");
+    await notificationRepository.markAsRead(notice.id, reader.id);
+    expect(
+      (
+        await notificationRepository.createDiscussionReplyWithPush({
+          recipientId: reader.id,
+          contentId: item.id,
+          commentId: event.id,
+          repairPush: true,
+        })
+      ).pushJobs,
+    ).toBe(0);
+  } finally {
+    await db.execute(sql.raw(`DROP TRIGGER IF EXISTS ${triggerName} ON notifications`));
+    await db.execute(sql.raw(`DROP FUNCTION IF EXISTS ${functionName}()`));
   }
 });

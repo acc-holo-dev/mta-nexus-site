@@ -1,12 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { and, count, eq, gt, isNull, or, sql } from "drizzle-orm";
 import { db } from "../client";
-import {
-  sessions,
-  webPushOutbox,
-  webPushQueueGate,
-  webPushSubscriptions,
-} from "../schema";
+import { sessions, webPushOutbox, webPushQueueGate, webPushSubscriptions } from "../schema";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -30,7 +25,10 @@ export async function enqueueWebPushOutboxForNotification(
   tx: Tx,
   notificationId: string,
   recipientId: string,
+  recovery = false,
 ): Promise<WebPushOutboxEnqueueResult> {
+  // Repair never opts in a later device or renews the original 24-hour push horizon.
+  const originalTime = sql`(select n.created_at from notifications n where n.id = ${notificationId} and n.recipient_id = ${recipientId})`;
   const subscriptions = await tx
     .select({ id: webPushSubscriptions.id })
     .from(webPushSubscriptions)
@@ -38,6 +36,9 @@ export async function enqueueWebPushOutboxForNotification(
     .where(
       and(
         eq(webPushSubscriptions.userId, recipientId),
+        recovery
+          ? sql`${webPushSubscriptions.createdAt} <= ${originalTime} and ${originalTime} + ${WEB_PUSH_OUTBOX_TTL_HOURS} * interval '1 hour' > clock_timestamp()`
+          : undefined,
         gt(sessions.expiresAt, sql`clock_timestamp()`),
         or(
           isNull(webPushSubscriptions.expirationAt),
@@ -81,17 +82,16 @@ export async function enqueueWebPushOutboxForNotification(
     attempts: 0,
     availableAt: sql`clock_timestamp()`,
     createdAt: sql`clock_timestamp()`,
-    expiresAt: sql`clock_timestamp() + ${WEB_PUSH_OUTBOX_TTL_HOURS} * interval '1 hour'`,
+    expiresAt: recovery
+      ? sql`${originalTime} + ${WEB_PUSH_OUTBOX_TTL_HOURS} * interval '1 hour'`
+      : sql`clock_timestamp() + ${WEB_PUSH_OUTBOX_TTL_HOURS} * interval '1 hour'`,
   }));
 
   const inserted = await tx
     .insert(webPushOutbox)
     .values(rows)
     .onConflictDoNothing({
-      target: [
-        webPushOutbox.notificationId,
-        webPushOutbox.subscriptionId,
-      ],
+      target: [webPushOutbox.notificationId, webPushOutbox.subscriptionId],
     })
     .returning({ id: webPushOutbox.id });
 
@@ -150,9 +150,7 @@ export class WebPushOutboxRepository {
       oldestAgeSeconds: Number(row.oldest_age_seconds),
     };
     if (
-      !Object.values(result).every(
-        (value) => Number.isInteger(value) && value >= 0,
-      ) ||
+      !Object.values(result).every((value) => Number.isInteger(value) && value >= 0) ||
       result.capacity < 1 ||
       result.due > result.pending ||
       result.leased > result.pending

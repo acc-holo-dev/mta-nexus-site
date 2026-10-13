@@ -318,3 +318,49 @@ it("rejects invalid identity before creating files", async () => {
   ).rejects.toThrow("identity");
   expect(await readdir(directory)).toEqual([]);
 });
+
+it("binds repair checkpoints to their delivery policy and refuses prior inbox progress", async () => {
+  await withDiscussionReplayCheckpoint(path, from, until, { identity }, async ({ save }) =>
+    save(progress),
+  );
+  await expect(
+    withDiscussionReplayCheckpoint(
+      path,
+      from,
+      until,
+      { identity, deliveryPolicy: "inbox-and-pending-push" },
+      vi.fn(),
+    ),
+  ).rejects.toThrow("policy");
+  await rm(path);
+  await withDiscussionReplayCheckpoint(
+    path,
+    from,
+    until,
+    { identity, deliveryPolicy: "inbox-and-pending-push" },
+    async ({ save }) => save(initial),
+  );
+  expect(JSON.parse(await readFile(path, "utf8"))).toMatchObject({
+    deliveryPolicy: "inbox-and-pending-push",
+  });
+  await expect(
+    withDiscussionReplayCheckpoint(path, from, until, { identity }, vi.fn()),
+  ).rejects.toThrow("policy");
+  await withDiscussionReplayCheckpoint(
+    path,
+    from,
+    until,
+    { identity, deliveryPolicy: "inbox-and-pending-push" },
+    async ({ initial: saved }) => expect(saved).toEqual(initial),
+  );
+  await writeFile(path, JSON.stringify(initial));
+  await expect(
+    withDiscussionReplayCheckpoint(
+      path,
+      from,
+      until,
+      { identity, deliveryPolicy: "inbox-and-pending-push", adoptLegacy: true },
+      vi.fn(),
+    ),
+  ).rejects.toThrow("inbox-only");
+});

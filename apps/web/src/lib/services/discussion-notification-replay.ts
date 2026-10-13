@@ -8,6 +8,7 @@ const counterNames = [
   "failed",
   "pushQueued",
   "pushDegraded",
+  "pushPending",
 ] as const;
 type DeliveryCounters = Record<(typeof counterNames)[number], number>;
 type ReplayDeliveryResult = Partial<DeliveryCounters> & {
@@ -52,6 +53,7 @@ export async function replayDiscussionNotifications(
     failed: 0,
     pushQueued: 0,
     pushDegraded: 0,
+    pushPending: 0,
   };
   while (!current.completed && processed < limit && !dependencies.shouldStop?.()) {
     const rows = await dependencies.page(current.cursor);
@@ -91,7 +93,8 @@ export async function replayDiscussionNotifications(
           throw Error("Invalid replay delivery counters");
         metrics[name] += value;
       }
-      if (result.failed) return { checkpoint: current, processed, blocked: true, metrics };
+      if (result.failed || result.pushPending)
+        return { checkpoint: current, processed, blocked: true, metrics };
       if (result.nextCursor) {
         if (
           resume &&

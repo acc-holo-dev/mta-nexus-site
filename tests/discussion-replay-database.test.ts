@@ -40,3 +40,30 @@ it("propagates unavailable database rather than creating an unbound fallback ide
   await expect(resolve()).rejects.toThrow("DB unavailable");
   expect(mocks.url).not.toHaveBeenCalled();
 });
+
+it("binds every repair-specific relation and refuses missing outbox scope", async () => {
+  mocks.execute.mockResolvedValue([
+    {
+      ...scope,
+      notificationsOid: "100",
+      preferencesOid: "101",
+      subscriptionsOid: "102",
+      outboxOid: "103",
+      gateOid: "104",
+      sessionsOid: "105",
+    },
+  ]);
+  expect(await resolve(true)).not.toBe(discussionReplayDatabaseIdentity(url, scope));
+  const query = new PgDialect().sqlToQuery(mocks.execute.mock.calls[0][0]);
+  for (const name of [
+    "notifications",
+    "notification_preferences",
+    "web_push_subscriptions",
+    "web_push_outbox",
+    "web_push_queue_gate",
+    "sessions",
+  ])
+    expect(query.sql).toContain(`pg_catalog.to_regclass('${name}')`);
+  mocks.execute.mockResolvedValue([{ ...scope }]);
+  await expect(resolve(true)).rejects.toThrow("scope");
+});

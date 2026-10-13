@@ -1,5 +1,40 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Proven pending discussion Web Push admission recovery — 2026-10-13
+
+New discussion notices use database time and a typed `discussion_push` JSON receipt.
+Pending inbox rows survive optional queue failure; queue jobs and queued/unavailable
+admission proof commit together in a savepoint. Losing proof rolls optional jobs back.
+Explicit `--repair-push` replay locks only the matching recipient's unread, unexpired
+pending notice after source/preference checks. It preserves text/category/link/read
+state, requires the original category still be eligible and never reopens queued,
+unavailable, legacy or damaged evidence. Already consumed jobs cannot be re-enqueued
+from queued evidence. This proves admission only, not provider/browser delivery.
+
+Recovery retains serialized capacity/unique jobs, selects at most 64 current devices
+created before the original notice and uses its original database-time +24-hour expiry.
+Current sessions/devices must remain valid; no late enrollment or renewed deadline is
+introduced. Repair saturation/errors keep `pushPending` and the current audience page;
+ordinary inbox-only replay still tolerates degraded push. Fresh repair checkpoints bind
+the delivery policy and six additional table identities; prior inbox progress or legacy
+adoption cannot skip repair work. Operations contains the exact invocation/limits.
+
+429 focused tests in 29 files pass, including strict receipts, SQL generation, failed
+proof, bounded queue recovery, retry/metrics/policy compatibility and Agent A's portable
+collection import/export/history flows. Root/application TypeScript, changed-source
+Biome and diff checks pass on Node 26.10.0. The JSON domain/schema typings are extended;
+no DDL or migration is introduced. One prepared disposable-PostgreSQL fixture injects
+receipt-update failure to verify job rollback, then concurrent repair, preferences,
+late-device exclusion, exact deadline and no resend after physical job deletion. It
+remains unrun here without PostgreSQL; live savepoints/locking/query plans and actual
+provider execution remain unverified. No automatic fan-out discovery, legacy guessing,
+delivery guarantee or rewrite of ordinary notification categories is included.
+
+After integrating Agent A's reviewed collection reconciliation and migration 0078,
+565 tests across 34 files, both TypeScript projects, changed-source Biome and diff
+checks pass. The upstream reconciliation files/receipts are preserved; the new
+PostgreSQL recovery fixture remains unrun.
+
 ### Discussion replay scope binding and operator diagnostics — 2026-10-12
 
 PROVISIONAL engineering choice: version-2 checkpoint envelopes bind the configured
@@ -56,7 +91,8 @@ No schema/migration or user-notification preference changes are made. Real Postg
 delivery/query plans, the modified database fixture, production runtime and actual
 host/power-loss acceptance remain unrun. Recovery still needs explicitly chosen
 windows/checkpoints per database; transactional enqueueing, automatic discovery,
-distributed leases and repair of degraded push fan-out remain open.
+distributed leases and recovery of legacy/unproven push gaps remain open. Explicit
+pending-push recovery is now implemented for new admission receipts (see Operations).
 
 ### Private buyer resource collections — 2026-10-11
 

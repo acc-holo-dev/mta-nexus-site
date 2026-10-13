@@ -4,6 +4,7 @@ import { AppError, NotFoundError } from "@nexus/domain";
 import { and, asc, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { notificationPreferences, notifications } from "../schema";
+import { discussionPushReceipt, withDiscussionPushReceipt } from "./discussion-push-receipt";
 import { followWorkspaceRepository } from "./follow-workspace";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { containsPattern } from "./search-pattern";
@@ -362,6 +363,7 @@ export class NotificationRepository {
     recipientId: string;
     contentId: string;
     commentId: string;
+    repairPush?: boolean;
   }) {
     return db.transaction(async (tx) => {
       const source = await followWorkspaceRepository.discussionNoticeWithin(
@@ -397,7 +399,7 @@ export class NotificationRepository {
           pushJobs: 0,
           pushQueueState: "no_subscriptions" as const,
         };
-      const stored = await this.persistWithin(
+      const stored = await this.persistDiscussionWithin(
         tx,
         {
           id: source.id,
@@ -413,7 +415,11 @@ export class NotificationRepository {
           isRead: false,
           createdAt: new Date(),
         },
-        true,
+        input.repairPush === true,
+        [
+          source.following && preferences?.follow !== false ? "follow" : null,
+          source.direct && preferences?.content !== false ? "content" : null,
+        ].filter((value) => value !== null),
       );
       return {
         state: stored.notification ? ("stored" as const) : ("duplicate" as const),
@@ -421,6 +427,84 @@ export class NotificationRepository {
         pushQueueState: stored.pushQueueState,
       };
     });
+  }
+
+  private async persistDiscussionWithin(
+    tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+    values: Omit<Notification, "createdAt" | "isRead"> & {
+      category: NotificationCategory;
+      isRead: false;
+      createdAt: Date;
+    },
+    repair: boolean,
+    eligibleCategories: string[],
+  ) {
+    const [created] = await tx
+      .insert(notifications)
+      .values({
+        ...values,
+        createdAt: sql`clock_timestamp()`,
+        data: withDiscussionPushReceipt("pending"),
+      })
+      .onConflictDoNothing()
+      .returning();
+    let row = created;
+    if (!row && repair) {
+      const [existing] = await tx
+        .select()
+        .from(notifications)
+        .where(
+          and(
+            eq(notifications.id, values.id),
+            eq(notifications.recipientId, values.recipientId),
+            eq(notifications.type, "content"),
+            sql`${notifications.createdAt} + interval '24 hours' > clock_timestamp()`,
+          ),
+        )
+        .for("update");
+      if (
+        existing &&
+        !existing.isRead &&
+        eligibleCategories.includes(existing.category) &&
+        discussionPushReceipt(existing.data) === "pending"
+      )
+        row = existing;
+    }
+    if (!row)
+      return { notification: null, pushJobs: 0, pushQueueState: "no_subscriptions" as const };
+    let pushJobs = 0;
+    let pushQueueState: "queued" | "no_subscriptions" | "saturated" | "error" = "error";
+    try {
+      const queued = await tx.transaction(async (pushTx) => {
+        const admission = created
+          ? await enqueueWebPushOutboxForNotification(pushTx, row.id, row.recipientId)
+          : await enqueueWebPushOutboxForNotification(pushTx, row.id, row.recipientId, true);
+        if (admission.reason !== "saturated") {
+          const proof = await pushTx
+            .update(notifications)
+            .set({
+              data: withDiscussionPushReceipt(
+                admission.reason === "queued" ? "queued" : "unavailable",
+              ),
+            })
+            .where(
+              and(eq(notifications.id, row.id), eq(notifications.recipientId, row.recipientId)),
+            )
+            .returning({ id: notifications.id });
+          if (proof.length !== 1) throw Error("Discussion push admission proof was not stored");
+        }
+        return admission;
+      });
+      pushJobs = queued.queued;
+      pushQueueState = queued.reason;
+    } catch {
+      // Pending proof survives; optional jobs/proof roll back together at the savepoint.
+    }
+    return {
+      notification: created ? (created as unknown as Notification) : null,
+      pushJobs,
+      pushQueueState,
+    };
   }
 
   async create(data: Omit<Notification, "createdAt" | "isRead">): Promise<Notification | null> {

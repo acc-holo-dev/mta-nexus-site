@@ -1009,10 +1009,54 @@ Launch from a service manager with database environment and durable storage.
 This command recovers inbox fan-out. It neither discovers new windows nor enqueues
 a transactional fan-out outbox alongside comment writes. Persisted push jobs retain
 their existing push worker; push queue degradation does not block inbox progress and
-duplicate inbox replay does not guarantee repair of missing push jobs. Continuous
-database-backed recovery/leases remain coordinated follow-up work with the schema
+ordinary duplicate inbox replay does not repair missing push jobs. Use the explicit
+pending-push recovery mode below for new proven failures. Continuous database-backed
+recovery/leases remain coordinated follow-up work with the schema
 owner. Live PostgreSQL and actual power-loss/filesystem acceptance remain separate
 checks from local fault-injection tests.
+
+#### Recovering proven missing discussion push jobs
+
+New discussion notifications record a private, typed `discussion_push` admission
+receipt in their existing JSON data. `pending` means optional enqueue never committed;
+`queued` means queue admission and its receipt committed in one savepoint; `unavailable`
+means there was no eligible device. A queue/proof failure rolls that savepoint back
+while retaining the inbox row and pending receipt. This is queue evidence, not proof
+of provider delivery. Ordinary notification categories keep their existing semantics.
+
+To recover missing queue admission, choose the interrupted reply window and a **new**
+checkpoint, then enable the explicit mode:
+
+```sh
+pnpm --filter @nexus/web notifications:replay /durable/checkpoints/discussion-push.json 2026-10-13T00:00:00.000000Z 2026-10-13T06:00:00.000000Z 100 --repair-push --worker
+```
+
+The recovery dispatcher rechecks current publication/comment availability, event-time
+follows/direct participation and preferences before locking the original notification.
+Only unread, unexpired notices with exact pending evidence and their original eligible
+category may be repaired. It changes no inbox text/link/category/read state. Unknown or
+legacy evidence is skipped because a missing physical job may already have been sent.
+Queued/unavailable receipts never reopen; deletion after provider acceptance cannot
+cause another enqueue. Existing jobs remain owned by the push worker.
+
+Recovery selects at most 64 currently valid devices created no later than the original
+notification's database timestamp. It retains session/subscription expiry checks,
+serialized queue capacity and the notification/subscription unique key. Repaired jobs
+expire at the original timestamp plus 24 hours, with no extension after delays. Devices
+registered later are excluded. No eligible device settles the receipt as unavailable.
+Read/expired notices and revoked preferences/source rights cannot create a repair job.
+These are enqueue-time checks; provider acceptance and later read/preference changes
+retain the existing push worker's behavior.
+
+Repair-mode saturation or optional queue/proof errors increment `pushPending` and block
+the audience-page checkpoint even when inbox delivery already succeeded. The worker
+retries from that page with its existing backoff; normal inbox mode remains non-blocking
+for degraded push. Push counters report admissions, never guaranteed browser delivery.
+The checkpoint policy and database fingerprint include this mode and all six push-related
+relations. Inbox checkpoints and legacy adoption cannot be used to skip repair work;
+resume a repair-mode file with the same flag. Schema/table recreation changes its scope.
+There is no automatic background discovery, global pending-notice scan or legacy backfill.
+No database migration is required: the existing JSON column gains a typed receipt only.
 
 ## 4. Backup and recovery
 

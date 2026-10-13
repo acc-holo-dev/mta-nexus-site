@@ -191,14 +191,12 @@ it("counts delivered, suppressed, duplicate and degraded attempts without storin
 });
 it("includes page metrics even when no comment completes and resets metrics on the next pass", async () => {
   const page = async () => rows;
-  const deliver = vi
-    .fn()
-    .mockResolvedValue({
-      failed: 0,
-      attempted: 50,
-      duplicate: 50,
-      nextCursor: { createdAt: time, id: "follow_50" },
-    });
+  const deliver = vi.fn().mockResolvedValue({
+    failed: 0,
+    attempted: 50,
+    duplicate: 50,
+    nextCursor: { createdAt: time, id: "follow_50" },
+  });
   const save = vi.fn();
   const result = await replayDiscussionNotifications(initial, { page, deliver, save }, 1);
   expect(result).toMatchObject({
@@ -210,7 +208,7 @@ it("includes page metrics even when no comment completes and resets metrics on t
     { page, deliver, save, shouldStop: () => true },
     1,
   );
-  expect(Object.values(stopped.metrics)).toEqual(Array(9).fill(0));
+  expect(Object.values(stopped.metrics).every((value) => value === 0)).toBe(true);
 });
 it.each([-1, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])(
   "denies checkpoint advancement for invalid delivery counter %s",
@@ -230,3 +228,28 @@ it.each([-1, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])(
     expect(save).not.toHaveBeenCalled();
   },
 );
+
+it("blocks before advancing an inbox-complete event whose push admission is pending", async () => {
+  const save = vi.fn(),
+    deliver = vi.fn().mockResolvedValue({ failed: 0, pushPending: 1, duplicate: 2, attempted: 2 });
+  const first = await replayDiscussionNotifications(
+    initial,
+    { page: async () => rows, deliver, save },
+    1,
+  );
+  expect(first).toMatchObject({
+    blocked: true,
+    processed: 0,
+    checkpoint: initial,
+    metrics: { pushPending: 1, failed: 0 },
+  });
+  expect(save).not.toHaveBeenCalled();
+  deliver.mockResolvedValue({ failed: 0, pushPending: 0, pushQueued: 1 });
+  expect(
+    await replayDiscussionNotifications(
+      first.checkpoint,
+      { page: async () => rows, deliver, save },
+      1,
+    ),
+  ).toMatchObject({ blocked: false, processed: 1, metrics: { pushQueued: 1 } });
+});

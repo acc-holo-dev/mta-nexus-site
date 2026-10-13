@@ -13,7 +13,7 @@ export function discussionReplayOptions(args: string[]) {
   if (limit < 1 || limit > 10000) throw Error("Invalid replay budget");
   if (
     new Set(rest).size !== rest.length ||
-    rest.some((flag) => !["--worker", "--adopt-legacy"].includes(flag))
+    rest.some((flag) => !["--worker", "--adopt-legacy", "--repair-push"].includes(flag))
   )
     throw Error("Invalid replay flags");
   return {
@@ -23,13 +23,20 @@ export function discussionReplayOptions(args: string[]) {
     limit,
     worker: rest.includes("--worker"),
     adoptLegacy: rest.includes("--adopt-legacy"),
+    repairPush: rest.includes("--repair-push"),
   };
 }
 
 /** Stable across credential/TLS rotations; binds the configured endpoint and actual relation scope. */
 export function discussionReplayDatabaseIdentity(
   databaseUrl: string,
-  scope: { databaseName: unknown; databaseOid: unknown; commentsOid: unknown; followsOid: unknown },
+  scope: {
+    databaseName: unknown;
+    databaseOid: unknown;
+    commentsOid: unknown;
+    followsOid: unknown;
+    repairRelationOids?: unknown[];
+  },
 ) {
   let endpoint: URL;
   try {
@@ -65,6 +72,13 @@ export function discussionReplayDatabaseIdentity(
         oid(scope.databaseOid),
         oid(scope.commentsOid),
         oid(scope.followsOid),
+        ...(scope.repairRelationOids === undefined
+          ? []
+          : (() => {
+              if (!Array.isArray(scope.repairRelationOids) || scope.repairRelationOids.length !== 6)
+                throw Error("Invalid replay repair database scope");
+              return ["pending-push-v1", ...scope.repairRelationOids.map(oid)];
+            })()),
       ]),
     )
     .digest("hex");

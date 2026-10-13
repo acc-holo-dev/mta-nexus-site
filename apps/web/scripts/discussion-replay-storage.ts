@@ -12,7 +12,11 @@ import {
 
 const maximumBytes = 4096;
 
-type DatabaseBinding = { identity: string; adoptLegacy?: boolean };
+type DatabaseBinding = {
+  identity: string;
+  adoptLegacy?: boolean;
+  deliveryPolicy?: "inbox" | "inbox-and-pending-push";
+};
 async function readCheckpoint(
   path: string,
   from: string,
@@ -52,9 +56,13 @@ async function readCheckpoint(
         !("checkpoint" in saved)
       )
         throw Error("Checkpoint belongs to another database scope");
+      const policy = "deliveryPolicy" in saved ? saved.deliveryPolicy : "inbox";
+      if (policy !== (database.deliveryPolicy ?? "inbox"))
+        throw Error("Checkpoint delivery policy does not match");
       return parseDiscussionReplayCheckpoint(saved.checkpoint, from, until);
     }
-    if (!database.adoptLegacy) throw Error("Legacy checkpoint requires explicit adoption");
+    if (!database.adoptLegacy || database.deliveryPolicy === "inbox-and-pending-push")
+      throw Error("Legacy checkpoint requires explicit inbox-only adoption");
     return parseDiscussionReplayCheckpoint(saved, from, until);
   } finally {
     await file.close();
@@ -78,6 +86,11 @@ export async function withDiscussionReplayCheckpoint<T>(
   if (!/^[a-f0-9]{64}$/.test(database.identity))
     throw Error("Invalid checkpoint database identity");
   const binding = { ...database };
+  if (
+    binding.deliveryPolicy !== undefined &&
+    !["inbox", "inbox-and-pending-push"].includes(binding.deliveryPolicy)
+  )
+    throw Error("Invalid checkpoint delivery policy");
   const requested = resolve(checkpointName);
   const directory = await realpath(dirname(requested));
   const path = join(directory, basename(requested));
@@ -92,6 +105,9 @@ export async function withDiscussionReplayCheckpoint<T>(
         from,
         until,
         databaseIdentity: binding.identity,
+        ...(binding.deliveryPolicy === "inbox-and-pending-push"
+          ? { deliveryPolicy: binding.deliveryPolicy }
+          : {}),
       }),
     );
     await lock.sync();
@@ -105,6 +121,9 @@ export async function withDiscussionReplayCheckpoint<T>(
       const payload = JSON.stringify({
         version: 2,
         databaseIdentity: binding.identity,
+        ...(binding.deliveryPolicy === "inbox-and-pending-push"
+          ? { deliveryPolicy: binding.deliveryPolicy }
+          : {}),
         checkpoint: normalized,
       });
       if (Buffer.byteLength(payload) > maximumBytes) throw Error("Checkpoint file exceeds limit");

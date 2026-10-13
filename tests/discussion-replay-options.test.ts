@@ -18,6 +18,7 @@ it("preserves existing invocation and accepts explicit worker/adoption with or w
     limit: 100,
     worker: false,
     adoptLegacy: false,
+    repairPush: false,
   });
   expect(options([...args, "50", "--worker", "--adopt-legacy"])).toMatchObject({
     limit: 50,
@@ -81,4 +82,23 @@ it("rejects invalid configuration without exposing connection values", () => {
   for (const endpoint of ["PRIVATE_PASSWORD", "https://worker:PRIVATE_PASSWORD@db.example"])
     expect(() => identity(endpoint, scope)).toThrow("Invalid replay database endpoint");
   expect(() => identity(url, { ...scope, databaseName: "" })).toThrow("scope");
+});
+
+it("accepts bounded explicit push-repair flags and binds every repair relation", () => {
+  expect(options([...args, "--repair-push", "--worker"])).toMatchObject({
+    repairPush: true,
+    worker: true,
+    limit: 100,
+  });
+  expect(() => options([...args, "--repair-push", "--repair-push"])).toThrow();
+  const repairRelationOids = ["100", "101", "102", "103", "104", "105"];
+  const value = identity(url, { ...scope, repairRelationOids });
+  expect(value).not.toBe(identity(url, scope));
+  expect(
+    identity(url, { ...scope, repairRelationOids: ["100", "101", "102", "103", "104", "106"] }),
+  ).not.toBe(value);
+  expect(() => identity(url, { ...scope, repairRelationOids: ["100"] })).toThrow();
+  expect(() =>
+    identity(url, { ...scope, repairRelationOids: ["100", "101", "102", "103", "104", undefined] }),
+  ).toThrow();
 });

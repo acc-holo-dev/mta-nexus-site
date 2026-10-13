@@ -10,6 +10,12 @@ the original proof after later edits or lost access. Private history matches eit
 side and displays the whole operation. Migration `0078_library_collection_reconciliation`
 retains previous receipt guards and adds bounded disjoint membership postconditions.
 
+New discussion notices retain transactional push-admission receipts. Explicit
+`notifications:replay ... --repair-push` recovers only proven pending, unread,
+unexpired notices under current access/preferences, without repeating queued pushes
+or enrolling later devices. Repair uses a new scope/policy-bound checkpoint; queue
+failures retain the current audience page. See [Operations](docs/OPERATIONS.md#recovering-proven-missing-discussion-push-jobs).
+
 Private collections now support portable JSON export and reviewed additive import.
 Export includes the complete bounded collection snapshot and up to 200 reference IDs,
 including orphans, without resource titles or access metadata. Import accepts files or

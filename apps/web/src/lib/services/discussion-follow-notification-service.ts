@@ -4,13 +4,14 @@ import type { ReplayCursor } from "./discussion-notification-replay";
 export async function notifyDiscussionReplies(
   contentId: string,
   commentId: string,
-  options?: { cursor?: ReplayCursor; maxFollowerPages: number },
+  options?: { cursor?: ReplayCursor; maxFollowerPages: number; repairPush?: boolean },
 ) {
   if (
     options &&
     (!Number.isSafeInteger(options.maxFollowerPages) ||
       options.maxFollowerPages < 1 ||
-      options.maxFollowerPages > 100)
+      options.maxFollowerPages > 100 ||
+      (options.repairPush !== undefined && typeof options.repairPush !== "boolean"))
   )
     throw Error("Invalid follower page budget");
   const result: Record<
@@ -23,7 +24,7 @@ export async function notifyDiscussionReplies(
     | "pushQueued"
     | "pushDegraded",
     number
-  > & { nextCursor?: ReplayCursor } = {
+  > & { nextCursor?: ReplayCursor; pushPending?: number } = {
     attempted: 0,
     stored: 0,
     suppressed: 0,
@@ -41,6 +42,7 @@ export async function notifyDiscussionReplies(
             recipientId,
             contentId,
             commentId,
+            ...(options?.repairPush ? { repairPush: true } : {}),
           }),
         ),
       );
@@ -52,7 +54,10 @@ export async function notifyDiscussionReplies(
         }
         result[item.value.state]++;
         result.pushQueued += item.value.pushJobs;
-        if (["saturated", "error"].includes(item.value.pushQueueState)) result.pushDegraded++;
+        if (["saturated", "error"].includes(item.value.pushQueueState)) {
+          result.pushDegraded++;
+          if (options?.repairPush) result.pushPending = (result.pushPending ?? 0) + 1;
+        }
       }
     }
   }
@@ -64,7 +69,7 @@ export async function notifyDiscussionReplies(
     }
     await deliver(audience.directRecipients);
     // Recovery cannot advance past a failed direct recipient.
-    if (options && result.failed) return result;
+    if (options && (result.failed || result.pushPending)) return result;
     let cursor = options?.cursor;
     let pages = 0;
     do {
@@ -75,7 +80,7 @@ export async function notifyDiscussionReplies(
         cursor,
       );
       await deliver(page.items.map((item) => item.recipientId));
-      if (options && result.failed) return result;
+      if (options && (result.failed || result.pushPending)) return result;
       if (
         page.nextCursor &&
         cursor &&

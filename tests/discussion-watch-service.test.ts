@@ -187,3 +187,33 @@ it.each([0, -1, 101, 1.5, NaN])(
     expect(mocks.audience).not.toHaveBeenCalled();
   },
 );
+
+it.each(["owner", "reader"])(
+  "retains the recovery page while pending push admission for %s fails",
+  async (recipient) => {
+    mocks.page.mockResolvedValue({
+      items: [{ recipientId: "reader" }],
+      nextCursor: { id: "after", createdAt: stamp },
+    });
+    mocks.store.mockImplementation(async (input) => ({
+      state: "duplicate",
+      pushJobs: 0,
+      pushQueueState: input.recipientId === recipient ? "saturated" : "queued",
+    }));
+    const result = await notifyDiscussionReplies("article", "comment", {
+      maxFollowerPages: 1,
+      repairPush: true,
+    });
+    expect(result).toMatchObject({ failed: 0, pushPending: 1, pushDegraded: 1 });
+    expect(result.nextCursor).toBeUndefined();
+    expect(mocks.store.mock.calls.every(([input]) => input.repairPush === true)).toBe(true);
+    if (recipient === "owner") expect(mocks.page).not.toHaveBeenCalled();
+  },
+);
+it("keeps ordinary inbox replay non-blocking for degraded push", async () => {
+  mocks.store.mockResolvedValue({ state: "duplicate", pushJobs: 0, pushQueueState: "error" });
+  const result = await notifyDiscussionReplies("article", "comment", { maxFollowerPages: 1 });
+  expect(result).toMatchObject({ failed: 0, pushDegraded: 2 });
+  expect(result.pushPending).toBeUndefined();
+  expect(mocks.store.mock.calls.every(([input]) => input.repairPush === undefined)).toBe(true);
+});

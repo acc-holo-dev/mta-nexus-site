@@ -901,7 +901,7 @@ export const follows = pgTable(
 
 // 21. Notifications
 export const notifications = pgTable("notifications", {
-  data: jsonb("data").$type<BuildReviewNotificationData | LicenseTermNotificationData | ResourceReleaseNoticeData>(),
+  data: jsonb("data").$type<BuildReviewNotificationData | LicenseTermNotificationData | ResourceReleaseNoticeData | import("@nexus/domain").DiscussionPushNotificationData>(),
   id: text("id").primaryKey(),
   recipientId: text("recipient_id")
     .notNull()
