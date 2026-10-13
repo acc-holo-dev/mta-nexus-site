@@ -1,3 +1,5 @@
+import { collectionInventoryHref } from "../../../lib/library-collection-inventory-query";
+import { libraryCollectionInventoryCopy } from "../../../lib/library-collection-inventory-i18n";
 import { libraryCollectionsCopy } from "../../../lib/library-collections-i18n";
 import { resourceReviewCopy } from "../../../lib/resource-review-i18n";
 import { resourceDeliveriesCopy } from "../../../lib/resource-deliveries-i18n";
@@ -70,14 +72,57 @@ export default async function ResourceLibraryPage({
         <p className="max-w-2xl text-sm text-secondary">{copy.subtitle}</p>
       </header>
 
-      <Link href="/workspace/library/collections" className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{libraryCollectionsCopy(locale).title}</Link>
-      <Link href="/workspace/cart" className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceCommerceCopy(locale).openCart}</Link>
-      <Link href="/workspace/acquisitions" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceActivityCopy(locale).history}</Link>
-      <Link href="/workspace/library/updates" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{getResourceReleaseControlCopy(locale).updates}</Link>
-      <Link href="/workspace/library/downloads" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{resourceDeliveriesCopy(locale).title}</Link>
-      <Link href="/workspace/library/watches" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{resourceReleaseWatchesCopy(locale).title}</Link>
-        <Link href="/workspace/acquisitions/receipts" className="text-sm text-accent underline">{resourceCartReceiptsCopy(locale).title}</Link>
-      <Link href="/workspace/library/reviews" className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent">{resourceReviewCopy(locale).own}</Link>
+      <Link
+        href="/workspace/library/collections"
+        className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
+      >
+        {libraryCollectionsCopy(locale).title}
+      </Link>
+      <Link
+        href={collectionInventoryHref()}
+        className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
+      >
+        {libraryCollectionInventoryCopy(locale).inventory}
+      </Link>
+      <Link
+        href="/workspace/cart"
+        className="inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
+      >
+        {getResourceCommerceCopy(locale).openCart}
+      </Link>
+      <Link
+        href="/workspace/acquisitions"
+        className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
+      >
+        {getResourceActivityCopy(locale).history}
+      </Link>
+      <Link
+        href="/workspace/library/updates"
+        className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
+      >
+        {getResourceReleaseControlCopy(locale).updates}
+      </Link>
+      <Link
+        href="/workspace/library/downloads"
+        className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
+      >
+        {resourceDeliveriesCopy(locale).title}
+      </Link>
+      <Link
+        href="/workspace/library/watches"
+        className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
+      >
+        {resourceReleaseWatchesCopy(locale).title}
+      </Link>
+      <Link href="/workspace/acquisitions/receipts" className="text-sm text-accent underline">
+        {resourceCartReceiptsCopy(locale).title}
+      </Link>
+      <Link
+        href="/workspace/library/reviews"
+        className="ml-3 inline-block rounded-lg border border-base px-4 py-2 text-sm text-accent"
+      >
+        {resourceReviewCopy(locale).own}
+      </Link>
       <nav aria-label={copy.title} className="flex flex-wrap gap-2">
         {filters.map((value) => (
           <Link
@@ -150,25 +195,48 @@ export default async function ResourceLibraryPage({
               ) : (
                 <p className="mt-auto text-sm text-muted">{copy.unavailableReason}</p>
               )}
-              <Link href={`/workspace/library/${encodeURIComponent(item.resourceId)}/versions`} className="text-sm text-accent underline">{getResourceReleaseControlCopy(locale).manage}</Link>
-              <Link href={`/workspace/library/${encodeURIComponent(item.resourceId)}/collections`} className="text-sm text-accent underline">{libraryCollectionsCopy(locale).resourceCollections}</Link>
-              <Link href={`/workspace/library/review/${encodeURIComponent(item.resourceId)}`} className="text-sm text-accent underline">{resourceReviewCopy(locale).write}</Link>
+              <Link
+                href={`/workspace/library/${encodeURIComponent(item.resourceId)}/versions`}
+                className="text-sm text-accent underline"
+              >
+                {getResourceReleaseControlCopy(locale).manage}
+              </Link>
+              <Link
+                href={`/workspace/library/${encodeURIComponent(item.resourceId)}/collections`}
+                className="text-sm text-accent underline"
+              >
+                {libraryCollectionsCopy(locale).resourceCollections}
+              </Link>
+              <Link
+                href={`/workspace/library/review/${encodeURIComponent(item.resourceId)}`}
+                className="text-sm text-accent underline"
+              >
+                {resourceReviewCopy(locale).write}
+              </Link>
             </li>
           ))}
         </ol>
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-4 text-sm text-secondary">
-        <p>{copy.showing} {result.items.length} {copy.of} {result.total}</p>
+        <p>
+          {copy.showing} {result.items.length} {copy.of} {result.total}
+        </p>
         {result.totalPages > 1 && (
           <nav aria-label={copy.page} className="flex flex-wrap items-center gap-4">
-            {result.page > 1
-              ? <Link href={libraryHref(filter, result.page - 1)} className="text-accent underline">{copy.previous}</Link>
-              : null}
-            <span>{copy.page} {result.page} {copy.of} {result.totalPages}</span>
-            {result.page < result.totalPages
-              ? <Link href={libraryHref(filter, result.page + 1)} className="text-accent underline">{copy.next}</Link>
-              : null}
+            {result.page > 1 ? (
+              <Link href={libraryHref(filter, result.page - 1)} className="text-accent underline">
+                {copy.previous}
+              </Link>
+            ) : null}
+            <span>
+              {copy.page} {result.page} {copy.of} {result.totalPages}
+            </span>
+            {result.page < result.totalPages ? (
+              <Link href={libraryHref(filter, result.page + 1)} className="text-accent underline">
+                {copy.next}
+              </Link>
+            ) : null}
           </nav>
         )}
       </div>

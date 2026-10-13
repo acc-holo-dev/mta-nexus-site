@@ -6,6 +6,15 @@ and preview reject windows ending after PostgreSQL time. Workers retry recognize
 temporary database/network failures and stop on scope, permission, schema or checkpoint
 errors. See [Operations](docs/OPERATIONS.md#previewing-a-discussion-recovery-window).
 
+The private collection inventory now finds resources across every own collection,
+deduplicates reference IDs and shows all current active/archived memberships with
+revisions and entry dates. Literal accessible-title/recorded-ID search, collection/status
+scopes and available/unavailable/shared filters retain whole membership lists.
+Unavailable labels stay masked while orphan IDs remain manageable. A twenty-resource
+page includes links to membership management, own collection details and comparison,
+plus bounded private JSON export. Counts and effective access share one database-time
+read-only snapshot. No migration or mutation is introduced.
+
 Private collection commands now have stable receipt detail and bounded JSON export.
 Reconciliation receipts offer reviewed inverse additions/removals under current own
 collection state and access. Already restored references stay unchanged, unrelated

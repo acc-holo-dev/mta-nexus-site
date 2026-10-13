@@ -1342,3 +1342,77 @@ it("rechecks restoration addition access before removing current references and 
     ),
   ).toMatchObject({ status: "no-access", currentTitle: null });
 });
+
+it("finds whole own resource memberships across active/archived collections and orphan references without private title search leakage", async () => {
+  const { readLibraryCollectionInventory } = await import(
+    "../packages/db/src/repositories/library-collection-inventory"
+  );
+  const f = await fixture(),
+    fresh = await fixture();
+  const a = (
+      await f.command({ requestId: randomUUID(), action: "create", name: "Inventory active" })
+    ).receipt.collection.id,
+    b = (await f.command({ requestId: randomUUID(), action: "create", name: "Inventory archived" }))
+      .receipt.collection.id;
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    a,
+  );
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    b,
+  );
+  await f.command({ requestId: randomUUID(), action: "archive", expectedRevision: 2 }, b);
+  await db
+    .insert(entitlements)
+    .values({
+      id: `ent_inventory_${randomUUID()}`,
+      subjectType: "user",
+      subjectId: f.userId,
+      permission: "product.download",
+      resourceId: fresh.productId,
+    });
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: fresh.productId, expectedRevision: 2 },
+    a,
+  );
+  await db.delete(products).where(eq(products.id, fresh.productId));
+  const query = { page: 1, status: "all" as const, filter: "all" as const, q: "" },
+    report = await readLibraryCollectionInventory(f.userId, query);
+  expect(report.counts).toEqual({
+    resources: 2,
+    references: 3,
+    available: 0,
+    unavailable: 2,
+    shared: 1,
+  });
+  expect(report.items.every((item) => item.title === null)).toBe(true);
+  const scoped = await readLibraryCollectionInventory(f.userId, {
+    ...query,
+    collectionId: a,
+    status: "active",
+    filter: "shared",
+  });
+  expect(scoped.total).toBe(1);
+  expect(new Set(scoped.items[0]?.memberships.map((row) => row.id))).toEqual(new Set([a, b]));
+  expect(
+    (await readLibraryCollectionInventory(f.userId, { ...query, q: "Private resource" })).total,
+  ).toBe(0);
+  expect(
+    (await readLibraryCollectionInventory(f.userId, { ...query, q: fresh.productId })).items[0]
+      ?.productId,
+  ).toBe(fresh.productId);
+  expect((await readLibraryCollectionInventory(f.other, query)).items).toEqual([]);
+  await expect(
+    readLibraryCollectionInventory(f.other, { ...query, collectionId: a }),
+  ).rejects.toMatchObject({ statusCode: 404 });
+  expect(
+    (
+      await readLibraryCollectionInventory(f.userId, {
+        ...query,
+        collectionId: b,
+        status: "active",
+      })
+    ).total,
+  ).toBe(0);
+});

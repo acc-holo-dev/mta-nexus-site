@@ -102,3 +102,5 @@ export {
 } from "./library-collection-manifests";
 
 export { readLibraryCollectionReceiptDetail } from "./library-collection-receipt-detail";
+
+export { readLibraryCollectionInventory } from "./library-collection-inventory";

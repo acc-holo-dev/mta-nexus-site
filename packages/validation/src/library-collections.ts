@@ -2,6 +2,7 @@ import {
   LIBRARY_COLLECTION_BATCH_LIMIT,
   LIBRARY_COLLECTION_ITEM_LIMIT,
   LIBRARY_COLLECTION_COMPARISON_FILTERS,
+  LIBRARY_COLLECTION_INVENTORY_FILTERS,
 } from "@nexus/domain";
 import { z } from "zod";
 
@@ -323,3 +324,17 @@ export const libraryCollectionReconcilePreviewSchema = z
     )
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Invalid reconciliation preview" });
   });
+
+export const libraryCollectionInventoryQuerySchema = z
+  .object({
+    page: z.number().int().min(1).max(9999),
+    status: z.enum(["all", "active", "archived"]),
+    filter: z.enum(LIBRARY_COLLECTION_INVENTORY_FILTERS),
+    q: z
+      .string()
+      .max(80)
+      .regex(safeName)
+      .transform((value) => value.trim()),
+    collectionId: libraryCollectionIdSchema.optional(),
+  })
+  .strict();

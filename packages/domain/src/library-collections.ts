@@ -281,3 +281,38 @@ export type LibraryCollectionReceiptDetail = {
     status: "ready" | "already-restored" | "no-access" | "read-only";
   }[];
 };
+
+export const LIBRARY_COLLECTION_INVENTORY_FILTERS = [
+  "all",
+  "available",
+  "unavailable",
+  "shared",
+] as const;
+export type LibraryCollectionInventoryQuery = {
+  page: number;
+  status: "all" | "active" | "archived";
+  filter: (typeof LIBRARY_COLLECTION_INVENTORY_FILTERS)[number];
+  q: string;
+  collectionId?: string;
+};
+export type LibraryCollectionInventory = LibraryCollectionInventoryQuery & {
+  schemaVersion: 1;
+  generatedAt: string;
+  collections: (LibraryCollectionSnapshot & { itemCount: number })[];
+  counts: {
+    resources: number;
+    references: number;
+    available: number;
+    unavailable: number;
+    shared: number;
+  };
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  items: {
+    productId: string;
+    title: string | null;
+    available: boolean;
+    memberships: (LibraryCollectionSnapshot & { addedAt: string })[];
+  }[];
+};

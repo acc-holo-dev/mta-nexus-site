@@ -4373,3 +4373,72 @@ disposable PostgreSQL. Live SQL/query plans, browser behavior, full production g
 and Node 26 validation remain open. Existing migration 0078 remains required for the
 reconciliation command; no live migration was applied. GitHub Actions are neither run nor
 inspected; this block uses [skip ci].
+
+
+## Private cross-collection resource inventory — 2026-10-13
+
+Added own-only GET inventory and bounded JSON-page export under
+`/api/library/collections/resources`, with RU/EN SSR at the matching workspace path.
+Library and collection management link this resource finder. Strict selectors cover
+page 1..9999, all/active/archived collection status, exact own collection ID, all/available/
+unavailable/shared resource filters and at most eighty literal search characters.
+Unknown/duplicate/owner/organization/unbounded selectors reject before repository work.
+Authentication and resourceInspection rate limiting scope the actor; JSON/export remains
+private/no-store, Cookie-varying, fixed-filename, nosniff and capped at 512 KiB.
+Unknown/foreign collection filters return the same missing result before product or
+access metadata reads. No download, mutation or cross-account control is added.
+
+One read-only repeatable-read transaction requires a live user and database snapshot
+clock. Up to thirty own collection snapshots and per-collection counts are validated
+before scanning resources; corrupted quotas/identities/clocks/counts fail closed. The
+owner membership join groups at most 6000 references into distinct resource IDs. Status
+and collection conditions must match the same participating collection; filters select
+resources and never trim other own memberships from the returned row. Contradictory or
+empty structural scopes return without product/grant queries. Counts describe resources/
+references/availability/shared memberships in the structural scope; final total applies
+resource filter and search. Results paginate twenty IDs in stable ID order. One bounded
+owner join fetches at most 600 memberships for that page, preserving current own names,
+statuses/revisions and reference added dates. Count/identity/uniqueness/finite-time mismatches
+reject instead of trusting malformed joined rows. No per-resource collection query loop.
+
+Current labels/availability require own effective entitlement/legacy license at database
+transaction time, published product and trusted clean published build. Unknown/deleted/
+lost-access titles are masked while own recorded resource IDs remain searchable and
+manageable. Search uses escaped literal ILIKE on masked title or recorded ID, so raw
+unavailable product titles cannot match through counts. Saved version preferences and
+download checks remain on the resource page. All output fields are explicit; grants,
+storage keys, build/file metadata and actor identity are excluded. The SSR lists every
+own participating collection, allows direct membership management even for orphans,
+shows version navigation only for available resources and compares the first two known
+own collections when a resource is shared. Filter/pagination/export links preserve
+canonical selectors, metadata is localized and noindex/nofollow. No migration required.
+
+Imported remote commits 3aa909ad6531ae958c77c1c9b4b267b0b629c1d5 and
+9ea19fde207ae7183d5f0d56448d4751c25c859c exactly, preserving independent recovery runner
+and evidence/documentation changes. Workflow runs/statuses were not requested or inspected.
+Before publication, also imported 0f7a3f022e34cb824dade9511a29588abaa2beb0 exactly,
+preserving the independent closed-window discussion preview and permanent-failure
+worker handling. Both README introductions are retained. This block is based directly
+on that remote main commit.
+
+Verification: 962 focused tests in 75 files pass, including whole membership projections,
+strict selectors and direct repository bounds, owner/live-user/database-time scope,
+masked labels, literal wildcard search, structural empty/contradictory scopes, export/rate/
+HTTP controls, RU/EN inventory/links/pagination/authentication, plus preserved collection/
+receipt/restoration/reconcile/import/membership/comparison/version/preparation/watch and
+discussion/push recovery flows. Biome lint passes on all sixteen touched non-integration
+TypeScript sources. Web TypeScript passes before and after regenerated routes.
+The isolated Next webpack compile-mode build exits zero with inventory/export APIs and
+the private inventory page. Root TypeScript retains only
+known missing fast-check/property-test implicit-any errors. One PostgreSQL fixture covers
+whole active/archived memberships, shared filtering, orphan management, unavailable-title
+search masking, literal resource-ID lookup and foreign-owner scope. It remains unrun
+without disposable PostgreSQL. Live SQL/query plans, browser behavior, full production
+generation and Node 26 validation remain open. Existing recovery runner startup evidence
+is preserved without claiming its checks passed. GitHub Actions are neither run nor
+inspected by this block; the publication commit uses [skip ci].
+
+After integrating 0f7a3f0, the combined focused suite passes 1033 tests in 76 files,
+including the new discussion recovery command/preview/failure cases. Web TypeScript
+passes on the combined tree. The successful inventory compile-mode build above was
+completed before this CLI/worker-only integration; it was not repeated afterward.

@@ -1,3 +1,5 @@
+import { collectionInventoryHref } from "../lib/library-collection-inventory-query";
+import { libraryCollectionInventoryCopy } from "../lib/library-collection-inventory-i18n";
 import {
   collectionReceiptHref,
   libraryCollectionReceiptsCopy,
@@ -103,6 +105,9 @@ export async function LibraryCollectionsScreen({
           <h1 className="font-display text-primary">{c.title}</h1>
           <Link href={membershipHistoryHref()} className="text-accent underline">
             {libraryMembershipHistoryCopy(locale).history}
+          </Link>
+          <Link href={collectionInventoryHref()} className="text-accent underline">
+            {libraryCollectionInventoryCopy(locale).inventory}
           </Link>
           <Link href="/workspace/library/collections/history" className="text-accent underline">
             {libraryCollectionHistoryCopy(locale).title}
@@ -450,6 +455,9 @@ export async function LibraryCollectionsScreen({
           </Link>
           <Link href={collectionHref(id, "import")} className="text-accent underline">
             {libraryCollectionManifestsCopy(locale).title}
+          </Link>
+          <Link href={collectionInventoryHref(id)} className="text-accent underline">
+            {libraryCollectionInventoryCopy(locale).inventory}
           </Link>
           <Link href={collectionHref(id, "compare")} className="text-accent underline">
             {libraryCollectionComparisonCopy(locale).title}
