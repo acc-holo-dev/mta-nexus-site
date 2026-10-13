@@ -11,6 +11,10 @@ import { confirmedCollectionCommand } from "../lib/library-collections-confirmat
 import { libraryCollectionError, libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { collectionHref } from "../lib/library-collections-query";
 import { privateApiRequest } from "../lib/private-api-request";
+import {
+  collectionReceiptHref,
+  libraryCollectionReceiptsCopy,
+} from "../lib/library-collection-receipts-i18n";
 
 export function LibraryCollectionBatchForm({
   locale,
@@ -294,6 +298,9 @@ export function LibraryCollectionBatchForm({
           <code className="block break-all text-xs">
             {c.receipt}: {receiptId}
           </code>
+          <a href={collectionReceiptHref(receiptId)} className="text-accent underline">
+            {libraryCollectionReceiptsCopy(locale).open}
+          </a>
           <a
             href={collectionHref(pending.current?.collection.id ?? collection.id, "history")}
             className="text-accent underline"

@@ -1,3 +1,7 @@
+import {
+  collectionReceiptHref,
+  libraryCollectionReceiptsCopy,
+} from "../../../../../lib/library-collection-receipts-i18n";
 import { libraryMembershipHistoryCopy } from "../../../../../lib/library-membership-history-i18n";
 import { membershipHistoryHref } from "../../../../../lib/library-membership-history-query";
 import {
@@ -143,6 +147,9 @@ export default async function Page({
               command = receipt?.command;
             return (
               <li key={item.id} className="nexus-panel space-y-3 p-5">
+                <Link href={collectionReceiptHref(item.id)} className="text-accent underline">
+                  {libraryCollectionReceiptsCopy(locale).open}
+                </Link>
                 <h2 className="font-semibold">{command ? c[command.action] : h.unknown}</h2>
                 <p className="text-sm">
                   {h.time}: <time dateTime={item.createdAt}>{item.createdAt}</time>

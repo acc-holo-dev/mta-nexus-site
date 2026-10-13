@@ -75,7 +75,14 @@ let report = fixture(),
   locale: "ru" | "en" = "en";
 function render() {
   h.cursor = 0;
-  return nodes(LibraryCollectionReconcileForm({ preview: report, locale, onFreeze: freeze }));
+  return nodes(
+    LibraryCollectionReconcileForm({
+      preview: report,
+      locale,
+      onFreeze: freeze,
+      returnHref: "/workspace/library/collections/receipts/lcr_original",
+    }),
+  );
 }
 function check(i: number, checked = true) {
   const input = render().filter((n) => n.type === "input")[i];
@@ -148,6 +155,14 @@ it.each(["en", "ru"] as const)(
     expect(h.fetch.mock.calls[1]?.[1].body).toBe(init.body);
     expect(freeze).toHaveBeenCalledOnce();
     expect(h.refresh).toHaveBeenCalledOnce();
+    expect(
+      render().some((n) => n.props.href === "/workspace/library/collections/receipts/lcr_original"),
+    ).toBe(true);
+    expect(
+      render().some(
+        (n) => n.props.href === "/workspace/library/collections/receipts/lcr_reconcile",
+      ),
+    ).toBe(true);
     expect(
       render().some((n) => n.props.href === "/workspace/library/collections/lcol_a/history"),
     ).toBe(true);

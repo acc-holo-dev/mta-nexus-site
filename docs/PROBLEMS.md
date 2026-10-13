@@ -4252,3 +4252,66 @@ revision and receipts on required audit failure. They remain unrun without dispo
 PostgreSQL. Migration 0078 is not applied to a live database. Live SQL/query plans, browser,
 full production generation and Node 26 validation remain open. GitHub Actions are neither
 run nor inspected; this block uses [skip ci].
+
+
+## Private receipt details and selected reconciliation restoration — 2026-10-13
+
+Added stable owner-only receipt GET and bounded JSON attachment export under
+`/api/library/collections/receipts/[id]`, plus RU/EN SSR detail at the matching workspace
+path. Links are available in own collection/account command histories and successful
+batch/reconciliation controls. Detail accepts only its route receipt ID, without a time
+window or owner/collection/resource query selectors. Authentication and resourceInspection
+rate limiting precede reads; JSON/export remain private/no-store and vary by Cookie.
+Export has a fixed filename, nosniff and 512 KiB cap. Unknown/foreign IDs return the same
+404 before current collection/resource lookup. Invalid own proof is neutral without raw
+payload, grant or storage metadata. Shared recorded receipt proof now verifies finite
+time and, for detail, canonical command digest plus original request/collection/successor
+identity. Ordinary history reuses the same shape/successor checks.
+
+A single read-only repeatable-read transaction requires a live user and uses database
+snapshot time. Original names/status/revisions/commands remain separate from current own
+collection state. Only `reconcile-items` proves the exact prior membership needed for an
+inverse; create/rename/archive/add/remove/copy/move receipts remain inspectable without
+invented restoration semantics. Reconciliation detail reads at most 201 current references
+and current labels/access for its at most twenty affected resources. Labels require own
+current entitlement/legacy access, published product and trusted clean published build;
+deleted/inaccessible titles are masked. Current own references are retained independently
+of resource availability. Restore choices include only original removals still absent
+with current own access, and original additions still present. Already desired states,
+missing access and archived/terminal read-only conditions are explicit. Unrelated later
+references have neither change flag and are never offered for removal. At most 220 current/
+affected IDs are returned for planning; no metadata query expands to unrelated resources.
+A full current collection may have a projected inverse above capacity; the review blocks
+that selection and does not sacrifice unrelated references to make room.
+
+Selected inverse changes use the existing strict atomic reconciliation command and new
+UUID/receipt/audit. Its current revision/prestate/capacity/access and post-write finite
+expiry guards are rechecked at application; original receipt replay does not masquerade
+as an inverse. No additional persistence or migration is introduced beyond 0078. The
+original receipt remains immutable and the inverse has its own independently inspectable
+receipt. A client wrapper captures the reviewed preview and original receipt return path
+once mutation starts, so a server refresh with no remaining differences does not unmount
+the saved/uncertain form. Existing frozen route/body/UUID/collection proof, explicit review,
+late/unmounted/settled guards and exact immutable acknowledgement remain intact. Version
+preferences, watches and download rights are not restored or altered.
+
+Imported independent remote commit d19cdb6c830fa99f81980d5d885ab75bf9c053af exactly,
+retaining proven-missing push-admission recovery, receipt/query changes and tests. This
+block is based directly on that main commit.
+
+Verification: 919 focused tests in 71 files pass, covering owner/time/digest/unknown-proof/
+privacy/bounded inverse plans, already desired/no-access/read-only/capacity states,
+strict detail/export HTTP controls, RU/EN SSR, stable receipt/reload links and frozen
+wrapper behavior, plus preserved collection/membership/import/reconcile/history/version/
+preparation/watch and discussion/push recovery flows. Biome lint passes on all twenty
+touched non-integration TypeScript sources. Web TypeScript passes before and after
+regenerated routes. The isolated Next webpack compile-mode build exits zero with
+receipt detail/export APIs and the private receipt page.
+Root TypeScript retains only known missing fast-check/property-test implicit-any errors.
+Two PostgreSQL fixtures cover inverse application/replay, preservation of unrelated later
+references and dates, original proof stability, same-owner/foreign scope and access loss
+before apply without partial membership/revision/receipt changes. They remain unrun without
+disposable PostgreSQL. Live SQL/query plans, browser behavior, full production generation
+and Node 26 validation remain open. Existing migration 0078 remains required for the
+reconciliation command; no live migration was applied. GitHub Actions are neither run nor
+inspected; this block uses [skip ci].

@@ -3,6 +3,7 @@ import {
   readLibraryCollectionHistory,
   readLibraryCollectionComparison,
   applyLibraryMembershipBatch,
+  readLibraryCollectionReceiptDetail,
   exportLibraryCollection,
   previewLibraryCollectionImport,
   readLibraryMembershipHistory,
@@ -23,6 +24,8 @@ import {
 } from "@nexus/validation";
 import { collectionId } from "../library-collections-query";
 export const libraryCollectionsService = {
+  receiptDetail: (actor: User, id: string) =>
+    readLibraryCollectionReceiptDetail(actor.id, collectionId(id)),
   exportManifest: (actor: User, id: string) => exportLibraryCollection(actor.id, collectionId(id)),
   reconcilePreview: (actor: User, id: string, input: unknown) =>
     previewLibraryCollectionImport(actor.id, collectionId(id), input, true),

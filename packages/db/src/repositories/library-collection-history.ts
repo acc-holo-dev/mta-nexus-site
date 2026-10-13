@@ -1,3 +1,4 @@
+import { recordedCollectionReceipt } from "./library-collection-receipt-proof";
 import {
   AppError,
   collectionCommandProductIds,
@@ -8,7 +9,7 @@ import {
   type LibraryCollectionHistoryPage,
   type LibraryCollectionReceipt,
 } from "@nexus/domain";
-import { libraryCollectionIdSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
+import { libraryCollectionIdSchema } from "@nexus/validation";
 import { and, count, desc, eq, gte, inArray, lte, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
@@ -34,62 +35,6 @@ export function validateLibraryCollectionHistoryQuery(query: LibraryCollectionHi
     )
   )
     throw new AppError("Invalid collection history query", 400, "COLLECTION_INVALID");
-}
-function recorded(row: {
-  id: string;
-  requestId: string;
-  collectionId: string;
-  command: unknown;
-  snapshot: unknown;
-  createdAt: Date | string;
-}): LibraryCollectionReceipt | null {
-  const command = row.command as {
-    action?: unknown;
-    sourceCollectionId?: unknown;
-    expectedSourceRevision?: unknown;
-  } | null;
-  const parsed = libraryCollectionReceiptSchema.safeParse({
-    id: row.id,
-    requestId: row.requestId,
-    command: row.command,
-    collection: row.snapshot,
-    createdAt: new Date(row.createdAt).toISOString(),
-    ...(command?.action === "move-items"
-      ? {
-          sourceCollection: {
-            id: command.sourceCollectionId,
-            revision:
-              typeof command.expectedSourceRevision === "number"
-                ? command.expectedSourceRevision + 1
-                : null,
-          },
-        }
-      : {}),
-  });
-  if (
-    !parsed.success ||
-    parsed.data.requestId !== parsed.data.command.requestId ||
-    parsed.data.collection.id !== row.collectionId
-  )
-    return null;
-  const { command: proof, collection: snapshot } = parsed.data;
-  if (proof.action === "create" || proof.action === "duplicate") {
-    if (
-      snapshot.revision !== 1 ||
-      snapshot.status !== "active" ||
-      snapshot.name !== proof.name ||
-      (proof.action === "duplicate" && proof.sourceCollectionId === snapshot.id)
-    )
-      return null;
-  } else if (
-    snapshot.revision !== proof.expectedRevision + 1 ||
-    snapshot.status !== (proof.action === "archive" ? "archived" : "active") ||
-    (proof.action === "rename" && snapshot.name !== proof.name) ||
-    ((proof.action === "copy-items" || proof.action === "move-items") &&
-      proof.sourceCollectionId === snapshot.id)
-  )
-    return null;
-  return { ...parsed.data, createdAt: new Date(parsed.data.createdAt) };
 }
 function resourceIds(receipt: LibraryCollectionReceipt | null) {
   return receipt ? collectionCommandProductIds(receipt.command) : [];
@@ -155,7 +100,7 @@ export async function readLibraryCollectionHistory(
       const parsed = rows.map((row) => ({
         id: row.id,
         createdAt: new Date(row.createdAt).toISOString(),
-        receipt: recorded(row),
+        receipt: recordedCollectionReceipt(row),
       }));
       const productIds = [...new Set(parsed.flatMap((row) => resourceIds(row.receipt)))];
       const collectionIds = [

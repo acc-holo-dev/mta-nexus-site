@@ -1,3 +1,7 @@
+import {
+  collectionReceiptHref,
+  libraryCollectionReceiptsCopy,
+} from "../lib/library-collection-receipts-i18n";
 import { libraryCollectionManifestsCopy } from "../lib/library-collection-manifests-i18n";
 import { libraryMembershipHistoryCopy } from "../lib/library-membership-history-i18n";
 import { membershipHistoryHref } from "../lib/library-membership-history-query";
@@ -267,6 +271,9 @@ export async function LibraryCollectionsScreen({
           <ol className="space-y-4">
             {result.items.map((item) => (
               <li key={item.id} className="nexus-panel space-y-2 p-4">
+                <Link href={collectionReceiptHref(item.id)} className="text-accent underline">
+                  {libraryCollectionReceiptsCopy(locale).open}
+                </Link>
                 <h2 className="font-semibold">
                   {c[item.command.action]} · {c.revision} {item.collection.revision}
                 </h2>

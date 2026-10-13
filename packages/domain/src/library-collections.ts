@@ -259,3 +259,25 @@ export function collectionCommandProductIds(command: LibraryCollectionCommand): 
         ? [command.productId]
         : [];
 }
+
+/** Current reviewed changes; availability and recorded evidence are independent. */
+export type LibraryCollectionChangesPreview = Omit<LibraryCollectionImportPreview, "items"> & {
+  items: (LibraryCollectionImportPreview["items"][number] & { canRemove: boolean })[];
+};
+export type LibraryCollectionReceiptDetail = {
+  schemaVersion: 1;
+  generatedAt: string;
+  id: string;
+  createdAt: string;
+  receipt: LibraryCollectionReceipt | null;
+  currentCollection: LibraryCollectionSnapshot | null;
+  restoration: LibraryCollectionChangesPreview | null;
+  resources: {
+    productId: string;
+    currentTitle: string | null;
+    currentAvailable: boolean;
+    inCollection: boolean;
+    restoreAction: "add" | "remove";
+    status: "ready" | "already-restored" | "no-access" | "read-only";
+  }[];
+};

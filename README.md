@@ -1,5 +1,14 @@
 # MTA NEXUS
 
+Private collection commands now have stable receipt detail and bounded JSON export.
+Reconciliation receipts offer reviewed inverse additions/removals under current own
+collection state and access. Already restored references stay unchanged, unrelated
+later references/dates are retained, and missing access blocks restoring a reference.
+Selected inverses use existing atomic UUID reconciliation commands with new receipts;
+immutable original proof remains readable. The review survives uncertain retries and
+server refresh after no inverse differences remain. No additional migration is required
+beyond `0078_library_collection_reconciliation`.
+
 Private collections can now be reconciled against portable JSON with a reviewed
 selection of missing references to add and extra own references to remove. Up to
 twenty mixed changes commit atomically with one revision, immutable receipt and

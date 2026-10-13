@@ -1,5 +1,5 @@
 "use client";
-import type { LibraryCollectionCommand, LibraryCollectionReconcilePreview } from "@nexus/domain";
+import type { LibraryCollectionCommand, LibraryCollectionChangesPreview } from "@nexus/domain";
 import { libraryCollectionCommandSchema, libraryCollectionReceiptSchema } from "@nexus/validation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
@@ -8,15 +8,21 @@ import { libraryCollectionManifestsCopy } from "../lib/library-collection-manife
 import { collectionHref } from "../lib/library-collections-query";
 import { confirmedCollectionCommand } from "../lib/library-collections-confirmation";
 import { privateApiRequest } from "../lib/private-api-request";
+import {
+  collectionReceiptHref,
+  libraryCollectionReceiptsCopy,
+} from "../lib/library-collection-receipts-i18n";
 type Command = Extract<LibraryCollectionCommand, { action: "reconcile-items" }>;
 export function LibraryCollectionReconcileForm({
   preview,
   locale,
   onFreeze,
+  returnHref,
 }: {
-  preview: LibraryCollectionReconcilePreview;
+  preview: LibraryCollectionChangesPreview;
   locale: "en" | "ru";
   onFreeze: () => void;
+  returnHref?: string;
 }) {
   const c = libraryCollectionsCopy(locale),
     m = libraryCollectionManifestsCopy(locale),
@@ -35,8 +41,9 @@ export function LibraryCollectionReconcileForm({
     controller = useRef<AbortController | null>(null),
     pending = useRef<{
       command: Command;
-      preview: LibraryCollectionReconcilePreview;
+      preview: LibraryCollectionChangesPreview;
       endpoint: string;
+      reloadHref: string;
     } | null>(null);
   useEffect(() => {
     mounted.current = true;
@@ -94,6 +101,7 @@ export function LibraryCollectionReconcileForm({
           items: preview.items.map((item) => ({ ...item })),
         },
         endpoint: `/api/library/collections/${encodeURIComponent(preview.collection.id)}`,
+        reloadHref: returnHref ?? collectionHref(preview.collection.id, "reconcile"),
       };
       onFreeze();
     }
@@ -234,7 +242,11 @@ export function LibraryCollectionReconcileForm({
       {error && <p role="alert">{error}</p>}
       {(error || saved) && (
         <a
-          href={collectionHref(shown.collection.id, "reconcile")}
+          href={
+            pending.current?.reloadHref ??
+            returnHref ??
+            collectionHref(shown.collection.id, "reconcile")
+          }
           className="text-accent underline"
         >
           {c.reload}
@@ -246,6 +258,9 @@ export function LibraryCollectionReconcileForm({
           <code className="block break-all text-xs">
             {c.receipt}: {saved}
           </code>
+          <a href={collectionReceiptHref(saved)} className="text-accent underline">
+            {libraryCollectionReceiptsCopy(locale).open}
+          </a>
           <a
             href={collectionHref(shown.collection.id, "history")}
             className="text-accent underline"

@@ -1,3 +1,5 @@
+import { GET as receiptDetail } from "../apps/web/src/app/api/library/collections/receipts/[id]/route";
+import { GET as receiptExport } from "../apps/web/src/app/api/library/collections/receipts/[id]/export/route";
 import { POST as reconcilePreview } from "../apps/web/src/app/api/library/collections/[id]/reconcile-preview/route";
 import { GET as exportManifest } from "../apps/web/src/app/api/library/collections/[id]/export/route";
 import { POST as importPreview } from "../apps/web/src/app/api/library/collections/[id]/import-preview/route";
@@ -25,6 +27,7 @@ const state = vi.hoisted(() => ({
   accountHistory: vi.fn(),
   comparison: vi.fn(),
   membershipBatch: vi.fn(),
+  receiptDetail: vi.fn(),
   exportManifest: vi.fn(),
   importPreview: vi.fn(),
   membershipHistory: vi.fn(),
@@ -41,6 +44,7 @@ vi.mock("@nexus/db", () => ({
   readLibraryCollectionHistory: state.accountHistory,
   readLibraryCollectionComparison: state.comparison,
   applyLibraryMembershipBatch: state.membershipBatch,
+  readLibraryCollectionReceiptDetail: state.receiptDetail,
   exportLibraryCollection: state.exportManifest,
   previewLibraryCollectionImport: state.importPreview,
   readLibraryMembershipHistory: state.membershipHistory,
@@ -746,4 +750,38 @@ it("uses the existing atomic command endpoint for strict reconciliation bodies",
     (await command(post({ ...body, removeProductIds: ["prd_new"] }, `${base}/lcol_a`), context))
       .status,
   ).toBe(400);
+});
+
+it("inspects and exports owner-scoped immutable receipts privately without accepting identity selectors", async () => {
+  const path = `${base}/receipts/lcr_a`,
+    ctx = { params: Promise.resolve({ id: "lcr_a" }) };
+  state.receiptDetail.mockResolvedValue({ schemaVersion: 1, id: "lcr_a" });
+  const response = await receiptDetail(request(path), ctx);
+  expect(response.status).toBe(200);
+  expect(state.receiptDetail).toHaveBeenCalledWith("usr_a", "lcr_a");
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe("Cookie");
+  expect(state.rate).toHaveBeenCalledWith("resourceInspection", "usr_a");
+  const exported = await receiptExport(request(`${path}/export`), ctx);
+  expect(exported.headers.get("content-disposition")).toContain("collection-receipt.json");
+  expect(exported.headers.get("x-content-type-options")).toBe("nosniff");
+  expect(exported.headers.get("cache-control")).toBe("private, no-store");
+  state.receiptDetail.mockResolvedValue({ text: "ж".repeat(270000) });
+  expect((await receiptExport(request(`${path}/export`), ctx)).status).toBe(413);
+});
+it("rejects anonymous, injected and throttled receipt detail/export before database access", async () => {
+  const path = `${base}/receipts/lcr_a`,
+    ctx = { params: Promise.resolve({ id: "lcr_a" }) };
+  for (const handler of [receiptDetail, receiptExport]) {
+    expect((await handler(request(`${path}?userId=other`), ctx)).status).toBe(400);
+    expect((await handler(request(`${path}?page=1`), ctx)).status).toBe(400);
+  }
+  state.actor = null;
+  expect((await receiptDetail(request(path), ctx)).status).toBe(401);
+  expect((await receiptExport(request(`${path}/export`), ctx)).status).toBe(401);
+  state.actor = { id: "usr_a", role: "user" };
+  state.rate.mockResolvedValue({ success: false });
+  expect((await receiptDetail(request(path), ctx)).status).toBe(429);
+  expect((await receiptExport(request(`${path}/export`), ctx)).status).toBe(429);
+  expect(state.receiptDetail).not.toHaveBeenCalled();
 });

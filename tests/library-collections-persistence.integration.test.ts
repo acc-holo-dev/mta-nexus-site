@@ -1203,3 +1203,142 @@ it("rolls back removals, additions, revision and receipt when the required recon
       .where(eq(libraryCollectionReceipts.collectionId, f.id)),
   ).toEqual(receiptsBefore);
 });
+
+// Uses the existing 0078 reconciliation command; no additional migration.
+async function restorationFixture() {
+  const f = await fixture(),
+    fresh = await fixture(),
+    later = await fixture();
+  const id = (
+    await f.command({ requestId: randomUUID(), action: "create", name: "Restore source" })
+  ).receipt.collection.id;
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    id,
+  );
+  for (const productId of [fresh.productId, later.productId])
+    await db
+      .insert(entitlements)
+      .values({
+        id: `ent_restore_${randomUUID()}`,
+        subjectType: "user",
+        subjectId: f.userId,
+        permission: "product.download",
+        resourceId: productId,
+      });
+  const original = await f.command(
+    {
+      requestId: randomUUID(),
+      action: "reconcile-items",
+      expectedRevision: 2,
+      addProductIds: [fresh.productId],
+      removeProductIds: [f.productId],
+    },
+    id,
+  );
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: later.productId, expectedRevision: 3 },
+    id,
+  );
+  return { ...f, id, original, freshId: fresh.productId, laterId: later.productId };
+}
+it("restores only recorded reconciliation differences, retaining later unrelated references/dates and original proof", async () => {
+  const { readLibraryCollectionReceiptDetail } = await import(
+    "../packages/db/src/repositories/library-collection-receipt-detail"
+  );
+  const f = await restorationFixture();
+  const detail = await readLibraryCollectionReceiptDetail(f.userId, f.original.receipt.id);
+  expect(detail.receipt).toEqual(f.original.receipt);
+  const plan = detail.restoration;
+  if (!plan) throw Error("Missing restoration plan");
+  expect(plan.collection.revision).toBe(4);
+  expect(plan.items.find((item) => item.productId === f.laterId)).toMatchObject({
+    inCollection: true,
+    canAdd: false,
+    canRemove: false,
+  });
+  const [laterBefore] = await db
+    .select()
+    .from(libraryCollectionItems)
+    .where(
+      and(
+        eq(libraryCollectionItems.collectionId, f.id),
+        eq(libraryCollectionItems.productId, f.laterId),
+      ),
+    );
+  const inverse = {
+    requestId: randomUUID(),
+    action: "reconcile-items" as const,
+    expectedRevision: plan.collection.revision,
+    addProductIds: plan.items.filter((item) => item.canAdd).map((item) => item.productId),
+    removeProductIds: plan.items.filter((item) => item.canRemove).map((item) => item.productId),
+  };
+  const saved = await f.command(inverse, f.id),
+    replay = await f.command(inverse, f.id);
+  expect(replay.replayed).toBe(true);
+  expect(replay.receipt).toEqual(saved.receipt);
+  const members = await db
+    .select()
+    .from(libraryCollectionItems)
+    .where(eq(libraryCollectionItems.collectionId, f.id));
+  expect(new Set(members.map((item) => item.productId))).toEqual(new Set([f.productId, f.laterId]));
+  expect(members.find((item) => item.productId === f.laterId)).toEqual(laterBefore);
+  const refreshed = await readLibraryCollectionReceiptDetail(f.userId, f.original.receipt.id);
+  expect(refreshed.receipt).toEqual(f.original.receipt);
+  expect(refreshed.resources.every((item) => item.status === "already-restored")).toBe(true);
+  expect(refreshed.restoration?.items.every((item) => !item.canAdd && !item.canRemove)).toBe(true);
+  expect((await readLibraryCollectionReceiptDetail(f.userId, saved.receipt.id)).receipt).toEqual(
+    saved.receipt,
+  );
+  await expect(
+    readLibraryCollectionReceiptDetail(f.other, f.original.receipt.id),
+  ).rejects.toMatchObject({ statusCode: 404 });
+});
+it("rechecks restoration addition access before removing current references and leaves no partial inverse receipt", async () => {
+  const { readLibraryCollectionReceiptDetail } = await import(
+    "../packages/db/src/repositories/library-collection-receipt-detail"
+  );
+  const f = await restorationFixture(),
+    detail = await readLibraryCollectionReceiptDetail(f.userId, f.original.receipt.id),
+    plan = detail.restoration;
+  if (!plan) throw Error("Missing plan");
+  const before = await db
+      .select()
+      .from(libraryCollectionItems)
+      .where(eq(libraryCollectionItems.collectionId, f.id)),
+    receiptsBefore = await db
+      .select()
+      .from(libraryCollectionReceipts)
+      .where(eq(libraryCollectionReceipts.collectionId, f.id));
+  await db.delete(entitlements).where(eq(entitlements.id, f.grantId));
+  await expect(
+    f.command(
+      {
+        requestId: randomUUID(),
+        action: "reconcile-items",
+        expectedRevision: plan.collection.revision,
+        addProductIds: [f.productId],
+        removeProductIds: [f.freshId],
+      },
+      f.id,
+    ),
+  ).rejects.toMatchObject({ statusCode: 404 });
+  expect(
+    await db
+      .select()
+      .from(libraryCollectionItems)
+      .where(eq(libraryCollectionItems.collectionId, f.id)),
+  ).toEqual(before);
+  expect(
+    await db
+      .select()
+      .from(libraryCollectionReceipts)
+      .where(eq(libraryCollectionReceipts.collectionId, f.id)),
+  ).toEqual(receiptsBefore);
+  expect((await collections.detail(f.userId, f.id)).collection.revision).toBe(4);
+  expect(
+    (await readLibraryCollectionReceiptDetail(f.userId, f.original.receipt.id)).resources.find(
+      (item) => item.productId === f.productId,
+    ),
+  ).toMatchObject({ status: "no-access", currentTitle: null });
+});
