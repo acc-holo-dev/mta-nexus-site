@@ -16,6 +16,18 @@ Real execution is now routed through the disposable CI job. Its exact commit/art
 must be inspected before claiming PostgreSQL acceptance. Production/provider/power-loss
 verification remains a separate gate.
 
+Execution was requested on exact SHA `3aa909ad6531ae958c77c1c9b4b267b0b629c1d5`:
+the dedicated [run 38380948863](https://github.com/acc-holo-dev/mta-nexus-site/actions/runs/38380948863)
+and shared CI run 38380949499 both completed with failure before recorded execution.
+The dedicated job reports zero steps, no retained log blob and no artifacts; its
+PostgreSQL service/migrations/tests therefore have no acceptance evidence. The
+underlying startup reason is not exposed by the currently available connector
+endpoints; do not diagnose a SQL failure or infer a billing cause without its annotation.
+Repeat the dedicated workflow after the hosted-runner startup blocker is resolved,
+or run the guarded command against a non-root local disposable PostgreSQL 18 server.
+Local checks passed four guard/report tests plus 64 focused unit tests; actual database
+acceptance remains OPEN.
+
 ### Proven pending discussion Web Push admission recovery — 2026-10-13
 
 New discussion notices use database time and a typed `discussion_push` JSON receipt.

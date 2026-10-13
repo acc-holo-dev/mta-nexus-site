@@ -1086,6 +1086,12 @@ a missing, stale, skipped or partial report cannot become green. GitHub retains 
 artifacts for fourteen days. This verifies SQL/transactions/concurrency in this fixture
 scope, not production topology, delivery providers or power-loss behavior.
 
+A workflow conclusion without recorded steps or evidence is **not executed**, rather
+than PostgreSQL acceptance. Inspect the job's startup annotation when no log exists;
+the available API may not expose that annotation. Do not repeatedly rerun identical
+jobs without resolving a startup blocker, and do not mark the database gate green
+from successful local mock tests.
+
 Local runtimes mapped only to UID 0 may be unable to start native PostgreSQL. Do not
 disable PostgreSQL's root refusal or use production data to work around that condition;
 use this disposable CI service or a normal non-root local PostgreSQL installation.
