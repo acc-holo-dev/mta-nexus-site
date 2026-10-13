@@ -1,3 +1,4 @@
+import { POST as reconcilePreview } from "../apps/web/src/app/api/library/collections/[id]/reconcile-preview/route";
 import { GET as exportManifest } from "../apps/web/src/app/api/library/collections/[id]/export/route";
 import { POST as importPreview } from "../apps/web/src/app/api/library/collections/[id]/import-preview/route";
 import { GET as membershipHistory } from "../apps/web/src/app/api/library/collections/membership-history/route";
@@ -703,4 +704,46 @@ it("rejects unauthorized, spoofed, cross-site, oversized and throttled manifest 
   expect((await importPreview(post({}, path), context)).status).toBe(429);
   expect(state.exportManifest).not.toHaveBeenCalled();
   expect(state.importPreview).not.toHaveBeenCalled();
+});
+
+it("previews reconciliation with fixed owner/target and rejects extra selectors or oversized/cross-site bodies", async () => {
+  state.importPreview.mockResolvedValue({ schemaVersion: 1, items: [] });
+  const path = `${base}/lcol_a/reconcile-preview`,
+    file = {
+      schemaVersion: 1,
+      generatedAt: "2026-10-13T00:00:00.000Z",
+      collection: { id: "lcol_source", name: "Source", status: "active", revision: 1 },
+      productIds: ["prd_a"],
+    };
+  expect((await reconcilePreview(post(file, path), context)).status).toBe(200);
+  expect(state.importPreview).toHaveBeenCalledWith("usr_a", "lcol_a", file, true);
+  expect((await reconcilePreview(post(file, `${path}?userId=other`), context)).status).toBe(400);
+  expect(
+    (
+      await reconcilePreview(
+        post(file, path, { "content-type": "application/json", "sec-fetch-site": "cross-site" }),
+        context,
+      )
+    ).status,
+  ).toBe(403);
+  expect((await reconcilePreview(post({ text: "ж".repeat(33000) }, path), context)).status).toBe(
+    413,
+  );
+});
+it("uses the existing atomic command endpoint for strict reconciliation bodies", async () => {
+  const body = {
+    requestId,
+    action: "reconcile-items",
+    expectedRevision: 4,
+    addProductIds: ["prd_new"],
+    removeProductIds: ["prd_old"],
+  };
+  expect((await command(post(body, `${base}/lcol_a`), context)).status).toBe(200);
+  expect(state.command).toHaveBeenCalledWith(
+    expect.objectContaining({ userId: "usr_a", collectionId: "lcol_a", command: body }),
+  );
+  expect(
+    (await command(post({ ...body, removeProductIds: ["prd_new"] }, `${base}/lcol_a`), context))
+      .status,
+  ).toBe(400);
 });

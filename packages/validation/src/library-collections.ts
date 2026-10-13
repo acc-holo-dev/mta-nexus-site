@@ -81,61 +81,91 @@ const productIds = z
   .max(LIBRARY_COLLECTION_BATCH_LIMIT)
   .refine((ids) => new Set(ids).size === ids.length, "Duplicate references")
   .transform((ids) => [...ids].sort());
-export const libraryCollectionCommandSchema = z.discriminatedUnion("action", [
-  z.object({ requestId, action: z.literal("create"), name }).strict(),
-  z
-    .object({
-      requestId,
-      action: z.literal("duplicate"),
-      name,
-      sourceCollectionId: libraryCollectionIdSchema,
-      expectedRevision: z.number().int().min(1).max(2_147_483_647),
-      expectedItemCount: z.number().int().min(0).max(LIBRARY_COLLECTION_ITEM_LIMIT),
-      sourceDigest: z.string().regex(/^[a-f0-9]{64}$/u),
-    })
-    .strict(),
-  z.object({ requestId, action: z.literal("rename"), name, expectedRevision }).strict(),
-  z.object({ requestId, action: z.literal("archive"), expectedRevision }).strict(),
-  z.object({ requestId, action: z.literal("restore"), expectedRevision }).strict(),
-  z
-    .object({
-      requestId,
-      action: z.literal("add"),
-      productId: libraryCollectionIdSchema,
-      expectedRevision,
-    })
-    .strict(),
-  z
-    .object({
-      requestId,
-      action: z.literal("remove"),
-      productId: libraryCollectionIdSchema,
-      expectedRevision,
-    })
-    .strict(),
-  z
-    .object({
-      requestId,
-      action: z.literal("copy-items"),
-      sourceCollectionId: libraryCollectionIdSchema,
-      expectedSourceRevision: z.number().int().min(1).max(2_147_483_647),
-      productIds,
-      expectedRevision,
-    })
-    .strict(),
-  z
-    .object({
-      requestId,
-      action: z.literal("move-items"),
-      sourceCollectionId: libraryCollectionIdSchema,
-      expectedSourceRevision: expectedRevision,
-      productIds,
-      expectedRevision,
-    })
-    .strict(),
-  z.object({ requestId, action: z.literal("add-many"), productIds, expectedRevision }).strict(),
-  z.object({ requestId, action: z.literal("remove-many"), productIds, expectedRevision }).strict(),
-]);
+const reconcileIds = z
+  .array(libraryCollectionIdSchema)
+  .max(LIBRARY_COLLECTION_BATCH_LIMIT)
+  .refine((ids) => new Set(ids).size === ids.length, "Duplicate references")
+  .transform((ids) => [...ids].sort());
+export const libraryCollectionCommandSchema = z
+  .discriminatedUnion("action", [
+    z.object({ requestId, action: z.literal("create"), name }).strict(),
+    z
+      .object({
+        requestId,
+        action: z.literal("duplicate"),
+        name,
+        sourceCollectionId: libraryCollectionIdSchema,
+        expectedRevision: z.number().int().min(1).max(2_147_483_647),
+        expectedItemCount: z.number().int().min(0).max(LIBRARY_COLLECTION_ITEM_LIMIT),
+        sourceDigest: z.string().regex(/^[a-f0-9]{64}$/u),
+      })
+      .strict(),
+    z.object({ requestId, action: z.literal("rename"), name, expectedRevision }).strict(),
+    z.object({ requestId, action: z.literal("archive"), expectedRevision }).strict(),
+    z.object({ requestId, action: z.literal("restore"), expectedRevision }).strict(),
+    z
+      .object({
+        requestId,
+        action: z.literal("add"),
+        productId: libraryCollectionIdSchema,
+        expectedRevision,
+      })
+      .strict(),
+    z
+      .object({
+        requestId,
+        action: z.literal("remove"),
+        productId: libraryCollectionIdSchema,
+        expectedRevision,
+      })
+      .strict(),
+    z
+      .object({
+        requestId,
+        action: z.literal("copy-items"),
+        sourceCollectionId: libraryCollectionIdSchema,
+        expectedSourceRevision: z.number().int().min(1).max(2_147_483_647),
+        productIds,
+        expectedRevision,
+      })
+      .strict(),
+    z
+      .object({
+        requestId,
+        action: z.literal("move-items"),
+        sourceCollectionId: libraryCollectionIdSchema,
+        expectedSourceRevision: expectedRevision,
+        productIds,
+        expectedRevision,
+      })
+      .strict(),
+    z.object({ requestId, action: z.literal("add-many"), productIds, expectedRevision }).strict(),
+    z
+      .object({ requestId, action: z.literal("remove-many"), productIds, expectedRevision })
+      .strict(),
+    z
+      .object({
+        requestId,
+        action: z.literal("reconcile-items"),
+        addProductIds: reconcileIds,
+        removeProductIds: reconcileIds,
+        expectedRevision,
+      })
+      .strict(),
+  ])
+  .superRefine((command, ctx) => {
+    if (
+      command.action === "reconcile-items" &&
+      (command.addProductIds.length + command.removeProductIds.length < 1 ||
+        command.addProductIds.length + command.removeProductIds.length >
+          LIBRARY_COLLECTION_BATCH_LIMIT ||
+        command.addProductIds.some((id) => command.removeProductIds.includes(id)))
+    )
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Reconciliation needs one to twenty distinct changes",
+      });
+  });
 
 export const libraryCollectionReceiptSchema = z
   .object({
@@ -249,4 +279,47 @@ export const libraryCollectionImportPreviewSchema = z
       )
     )
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Invalid import preview" });
+  });
+
+export const libraryCollectionReconcilePreviewSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    generatedAt: z.string().datetime(),
+    collection: libraryCollectionSnapshotSchema,
+    itemCount: z.number().int().min(0).max(LIBRARY_COLLECTION_ITEM_LIMIT),
+    itemLimit: z.literal(LIBRARY_COLLECTION_ITEM_LIMIT),
+    batchLimit: z.literal(LIBRARY_COLLECTION_BATCH_LIMIT),
+    items: z
+      .array(
+        z
+          .object({
+            productId: libraryCollectionIdSchema,
+            title: z.string().max(400).nullable(),
+            available: z.boolean(),
+            inCollection: z.boolean(),
+            inManifest: z.boolean(),
+            canAdd: z.boolean(),
+            canRemove: z.boolean(),
+          })
+          .strict(),
+      )
+      .max(LIBRARY_COLLECTION_ITEM_LIMIT * 2),
+  })
+  .strict()
+  .superRefine((preview, ctx) => {
+    const writable =
+      preview.collection.status === "active" && preview.collection.revision < 2147483647;
+    if (
+      new Set(preview.items.map((item) => item.productId)).size !== preview.items.length ||
+      preview.items.filter((item) => item.inCollection).length !== preview.itemCount ||
+      preview.items.filter((item) => item.inManifest).length > LIBRARY_COLLECTION_ITEM_LIMIT ||
+      preview.items.some(
+        (item) =>
+          (!item.inCollection && !item.inManifest) ||
+          (!item.available && item.title !== null) ||
+          (item.canAdd && (!writable || item.inCollection || !item.inManifest)) ||
+          item.canRemove !== (writable && item.inCollection && !item.inManifest),
+      )
+    )
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Invalid reconciliation preview" });
   });

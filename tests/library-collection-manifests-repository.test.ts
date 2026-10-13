@@ -210,3 +210,74 @@ it("rejects invalid database time or count rather than trusting manifest metadat
     { code: "COLLECTION_SNAPSHOT_INVALID" },
   );
 });
+
+it("reviews the whole own/file union for selected reconciliation even when the collection is full", async () => {
+  const ids = Array.from({ length: 200 }, (_, i) => `prd_old_${i}`);
+  state.rows = [
+    ...prefix(),
+    [[200]],
+    ids.map((id) => [id]),
+    [
+      {
+        productId: "prd_new",
+        title: "Accessible",
+        available: true,
+        hasAccess: true,
+        inCollection: false,
+      },
+      {
+        productId: ids[0],
+        title: "PRIVATE",
+        available: false,
+        hasAccess: false,
+        inCollection: true,
+      },
+    ],
+  ];
+  const report = await previewLibraryCollectionImport(
+    "usr_a",
+    "lcol_a",
+    { ...manifest(), productIds: ["prd_new", ids[0]] },
+    true,
+  );
+  expect(report.items).toHaveLength(201);
+  expect(report.items.find((row) => row.productId === "prd_new")).toMatchObject({
+    canAdd: true,
+    inManifest: true,
+    inCollection: false,
+    canRemove: false,
+  });
+  expect(report.items.find((row) => row.productId === ids[0])).toMatchObject({
+    canRemove: false,
+    inManifest: true,
+    title: null,
+  });
+  expect(report.items.filter((row) => row.canRemove)).toHaveLength(199);
+  expect(JSON.stringify(report)).not.toContain("PRIVATE");
+  expect(state.queries).toHaveLength(6);
+  expect(state.queries[4]?.params.at(-1)).toBe(201);
+});
+it("allows reviewing an empty file as explicit removable differences and rejects inconsistent own counts", async () => {
+  state.rows = [...prefix(), [[1]], [["prd_orphan"]], []];
+  const report = await previewLibraryCollectionImport(
+    "usr_a",
+    "lcol_a",
+    { ...manifest(), productIds: [] },
+    true,
+  );
+  expect(report.items).toEqual([
+    {
+      productId: "prd_orphan",
+      title: null,
+      available: false,
+      inCollection: true,
+      inManifest: false,
+      canAdd: false,
+      canRemove: true,
+    },
+  ]);
+  state.rows = [...prefix(), [[2]], [["prd_orphan"]]];
+  await expect(
+    previewLibraryCollectionImport("usr_a", "lcol_a", manifest(), true),
+  ).rejects.toMatchObject({ code: "COLLECTION_SNAPSHOT_INVALID" });
+});

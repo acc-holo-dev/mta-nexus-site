@@ -1,5 +1,13 @@
 const en = {
   title: "Import resource references",
+  reconcileTitle: "Reconcile collection with JSON",
+  reconcileNote:
+    "Compare the file with this collection. Choose missing references to add and references absent from the file to remove. Up to 20 selected changes commit together; unselected references keep their dates. The file never grants resource access.",
+  removeCandidate: "In collection, absent from file",
+  reconcileConfirm:
+    "I confirm the selected additions and removals and the reviewed collection revision.",
+  planned: "Reference count after selected changes",
+  noChanges: "No selectable differences for this collection.",
   export: "Export collection JSON",
   choose: "Choose a collection JSON file",
   paste: "Or paste collection JSON",
@@ -20,6 +28,13 @@ const en = {
 };
 const ru: typeof en = {
   title: "Импорт ссылок на ресурсы",
+  reconcileTitle: "Сверить коллекцию с JSON",
+  reconcileNote:
+    "Сравните файл с этой коллекцией. Выберите недостающие ссылки для добавления и ссылки вне файла для удаления. До 20 выбранных изменений сохраняются вместе; даты остальных записей сохраняются. Файл не даёт прав на ресурсы.",
+  removeCandidate: "В коллекции, отсутствует в файле",
+  reconcileConfirm: "Подтверждаю выбранные добавления и удаления и проверенную ревизию коллекции.",
+  planned: "Ссылок после выбранных изменений",
+  noChanges: "Для этой коллекции нет доступных различий.",
   export: "Экспорт коллекции JSON",
   choose: "Выберите JSON-файл коллекции",
   paste: "Или вставьте JSON коллекции",

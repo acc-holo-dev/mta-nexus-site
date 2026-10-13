@@ -5,6 +5,7 @@ import {
   LIBRARY_COLLECTION_BATCH_LIMIT,
   type LibraryCollectionManifest,
   type LibraryCollectionImportPreview,
+  type LibraryCollectionReconcilePreview,
 } from "@nexus/domain";
 import { libraryCollectionIdSchema, libraryCollectionManifestSchema } from "@nexus/validation";
 import { and, asc, count, eq, sql } from "drizzle-orm";
@@ -74,11 +75,23 @@ export async function exportLibraryCollection(
   }, options);
 }
 /** An imported manifest is untrusted reference input, never ownership or download authority. */
+export function previewLibraryCollectionImport(
+  userId: string,
+  id: string,
+  input: unknown,
+): Promise<LibraryCollectionImportPreview>;
+export function previewLibraryCollectionImport(
+  userId: string,
+  id: string,
+  input: unknown,
+  reconcile: true,
+): Promise<LibraryCollectionReconcilePreview>;
 export async function previewLibraryCollectionImport(
   userId: string,
   id: string,
   input: unknown,
-): Promise<LibraryCollectionImportPreview> {
+  reconcile = false,
+): Promise<LibraryCollectionImportPreview | LibraryCollectionReconcilePreview> {
   validateId(id);
   const parsed = libraryCollectionManifestSchema.safeParse(input);
   if (!parsed.success) throw new AppError("Invalid collection manifest", 400, "COLLECTION_INVALID");
@@ -95,7 +108,26 @@ export async function previewLibraryCollectionImport(
       itemCount > LIBRARY_COLLECTION_ITEM_LIMIT
     )
       throw new AppError("Invalid collection size", 500, "COLLECTION_SNAPSHOT_INVALID");
-    const rows = parsed.data.productIds.length
+    const currentRefs = reconcile
+      ? await tx
+          .select({ productId: members.productId })
+          .from(members)
+          .where(eq(members.collectionId, id))
+          .orderBy(asc(members.productId))
+          .limit(LIBRARY_COLLECTION_ITEM_LIMIT + 1)
+      : [];
+    if (
+      reconcile &&
+      (currentRefs.length !== itemCount ||
+        currentRefs.some((row) => !libraryCollectionIdSchema.safeParse(row.productId).success))
+    )
+      throw new AppError("Invalid collection snapshot", 500, "COLLECTION_SNAPSHOT_INVALID");
+    const existingIds = new Set(currentRefs.map((row) => row.productId)),
+      manifestIds = new Set(parsed.data.productIds);
+    const productIds = reconcile
+      ? [...new Set([...parsed.data.productIds, ...existingIds])].sort()
+      : parsed.data.productIds;
+    const rows = productIds.length
       ? await tx.execute<{
           productId: string;
           title: string | null;
@@ -103,7 +135,7 @@ export async function previewLibraryCollectionImport(
           inCollection: boolean;
           hasAccess: boolean;
         }>(sql`
-      ${effectiveUserDownloadSources(userId, sql`transaction_timestamp()`)}, refs AS (SELECT value AS id FROM jsonb_array_elements_text(${JSON.stringify(parsed.data.productIds)}::jsonb))
+      ${effectiveUserDownloadSources(userId, sql`transaction_timestamp()`)}, refs AS (SELECT value AS id FROM jsonb_array_elements_text(${JSON.stringify(productIds)}::jsonb))
       SELECT refs.id AS "productId", CASE WHEN owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL THEN left(product.title,200) END AS title,
         coalesce(owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL,false) AS available,
         member.product_id IS NOT NULL AS "inCollection", owned.resource_id IS NOT NULL AND product.id IS NOT NULL AS "hasAccess"
@@ -116,23 +148,30 @@ export async function previewLibraryCollectionImport(
     const writable =
       snapshot.collection.status === "active" &&
       snapshot.collection.revision < 2147483647 &&
-      itemCount < LIBRARY_COLLECTION_ITEM_LIMIT;
+      (reconcile || itemCount < LIBRARY_COLLECTION_ITEM_LIMIT);
     return {
       schemaVersion: 1,
       ...snapshot,
       itemCount,
       itemLimit: LIBRARY_COLLECTION_ITEM_LIMIT,
       batchLimit: LIBRARY_COLLECTION_BATCH_LIMIT,
-      items: parsed.data.productIds.map((productId) => {
+      items: productIds.map((productId) => {
         const row = byId.get(productId),
           available = row?.available === true,
-          inCollection = row?.inCollection === true;
+          inCollection = reconcile ? existingIds.has(productId) : row?.inCollection === true;
         return {
           productId,
           title: available ? row.title : null,
           available,
           inCollection,
-          canAdd: writable && row?.hasAccess === true && !inCollection,
+          canAdd:
+            writable && row?.hasAccess === true && !inCollection && manifestIds.has(productId),
+          ...(reconcile
+            ? {
+                inManifest: manifestIds.has(productId),
+                canRemove: writable && inCollection && !manifestIds.has(productId),
+              }
+            : {}),
         };
       }),
     };

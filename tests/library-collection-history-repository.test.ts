@@ -178,3 +178,25 @@ it("rejects an invalid database clock and handles empty history without extra lo
   });
   expect(state.queries).toHaveLength(4);
 });
+
+it("matches either side of a reconciliation resource filter and returns the whole immutable operation", async () => {
+  const proof = {
+    requestId,
+    action: "reconcile-items",
+    expectedRevision: 1,
+    addProductIds: ["prd_a"],
+    removeProductIds: ["prd_b"],
+  };
+  state.rows = [...prefix(), [row(proof)], [], []];
+  const report = await readLibraryCollectionHistory("usr_a", {
+    ...query,
+    action: "reconcile-items",
+    productId: "prd_b",
+  });
+  expect(report.items[0]?.resources.map((resource) => resource.productId)).toEqual([
+    "prd_a",
+    "prd_b",
+  ]);
+  expect(sqlText()).toContain("removeProductIds");
+  expect(sqlText()).toContain("addProductIds");
+});

@@ -30,6 +30,7 @@ vi.mock("react", async (original) => ({
 }));
 
 import { LibraryCollectionImport } from "../apps/web/src/components/library-collection-import";
+import { LibraryCollectionReconcileForm } from "../apps/web/src/components/library-collection-reconcile";
 import { LibraryCollectionBatchForm } from "../apps/web/src/components/library-collection-batch";
 import { libraryCollectionManifestsCopy } from "../apps/web/src/lib/library-collection-manifests-i18n";
 type Element = ReactElement<Record<string, unknown>>;
@@ -59,10 +60,11 @@ const preview = () => ({
     { productId: "prd_c", title: null, available: false, inCollection: false, canAdd: false },
   ],
 });
-let locale: "en" | "ru" = "en";
+let locale: "en" | "ru" = "en",
+  reconcile = false;
 function render() {
   h.cursor = 0;
-  return nodes(LibraryCollectionImport({ collection, locale }));
+  return nodes(LibraryCollectionImport({ collection, locale, reconcile }));
 }
 function textarea(text = JSON.stringify(manifest())) {
   const node = render().find((n) => n.type === "textarea");
@@ -88,6 +90,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.stubGlobal("fetch", h.fetch);
   locale = "en";
+  reconcile = false;
 });
 afterEach(() => vi.unstubAllGlobals());
 it.each(["en", "ru"] as const)(
@@ -247,4 +250,50 @@ it("prevents concurrent preview submissions through stale handlers", async () =>
   expect(h.fetch).toHaveBeenCalledOnce();
   finish(response());
   await running;
+});
+
+it("binds reconciliation preview to exact file IDs while retaining extra own removable references", async () => {
+  reconcile = true;
+  textarea();
+  const result = {
+    ...preview(),
+    itemCount: 2,
+    items: [
+      ...preview().items.map((item) => ({ ...item, inManifest: true, canRemove: false })),
+      {
+        productId: "prd_old",
+        title: null,
+        available: false,
+        inCollection: true,
+        inManifest: false,
+        canAdd: false,
+        canRemove: true,
+      },
+    ],
+  };
+  h.fetch.mockResolvedValueOnce({ ok: true, json: async () => result });
+  await inspect();
+  expect(h.fetch.mock.calls[0]?.[0]).toBe("/api/library/collections/lcol_a/reconcile-preview");
+  expect(render().find((n) => n.type === LibraryCollectionReconcileForm)?.props.preview).toEqual(
+    result,
+  );
+  expect(child()).toBeUndefined();
+});
+it("rejects reconciliation replies that invent extra file references or contradict current membership count", async () => {
+  reconcile = true;
+  textarea();
+  const result = {
+    ...preview(),
+    itemCount: 1,
+    items: preview().items.map((item) => ({ ...item, inManifest: true, canRemove: false })),
+  };
+  result.items.push({
+    ...result.items[0],
+    productId: "prd_foreign",
+    inManifest: true,
+  } as (typeof result.items)[number]);
+  h.fetch.mockResolvedValueOnce({ ok: true, json: async () => result });
+  await inspect();
+  expect(render().find((n) => n.type === LibraryCollectionReconcileForm)).toBeUndefined();
+  expect(render().some((n) => n.props.role === "alert")).toBe(true);
 });

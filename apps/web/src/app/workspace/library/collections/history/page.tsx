@@ -200,6 +200,16 @@ export default async function Page({
                         {receipt.sourceCollection.revision}
                       </p>
                     )}
+                    {command?.action === "reconcile-items" && (
+                      <div>
+                        <p>
+                          {c.add}: {command.addProductIds.join(", ") || "—"}
+                        </p>
+                        <p>
+                          {c.remove}: {command.removeProductIds.join(", ") || "—"}
+                        </p>
+                      </div>
+                    )}
                     {command?.action === "duplicate" && (
                       <>
                         <p>

@@ -296,6 +296,16 @@ export async function LibraryCollectionsScreen({
                     {c.destination}: {item.collection.id} · {c.revision} {item.collection.revision}
                   </p>
                 )}
+                {item.command.action === "reconcile-items" && (
+                  <div>
+                    <p>
+                      {c.add}: {item.command.addProductIds.join(", ") || "—"}
+                    </p>
+                    <p>
+                      {c.remove}: {item.command.removeProductIds.join(", ") || "—"}
+                    </p>
+                  </div>
+                )}
                 {"productIds" in item.command && (
                   <ul className="space-y-1 text-sm">
                     {item.command.productIds.map((id) => (
@@ -428,6 +438,9 @@ export async function LibraryCollectionsScreen({
           >
             {libraryCollectionManifestsCopy(locale).export}
           </a>
+          <Link href={collectionHref(id, "reconcile")} className="text-accent underline">
+            {libraryCollectionManifestsCopy(locale).reconcileTitle}
+          </Link>
           <Link href={collectionHref(id, "import")} className="text-accent underline">
             {libraryCollectionManifestsCopy(locale).title}
           </Link>

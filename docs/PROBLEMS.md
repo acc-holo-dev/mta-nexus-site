@@ -4152,3 +4152,67 @@ before save with no partial state, same UUID replay, existing membership after d
 and foreign-owner export rejection. It remains unrun without disposable PostgreSQL.
 Live SQL/query plans, browser behavior, full production generation and Node 26 validation
 remain open. GitHub Actions are neither run nor inspected; commits include [skip ci].
+
+
+## Reviewed atomic collection reconciliation — 2026-10-13
+
+Added private RU/EN JSON reconciliation at `/workspace/library/collections/[id]/reconcile`
+and bounded POST `/api/library/collections/[id]/reconcile-preview`. The existing file/paste
+controller shares export/import parsing, strict byte limits, cancellation and stale-result
+handling. A read-only repeatable-read own snapshot expands only the bounded union of up to
+200 file IDs and 200 existing target references. Target membership comes from the own
+collection read, independent of resource availability; unavailable titles stay masked.
+Common references are retained, missing acquired references are selectable for addition,
+and own references absent from the file are selectable for removal. Full collections can
+review additions provided selected removals keep the resulting count within 200. Archived
+or terminal collections are inspectable but read only. The file's owner/name/revision/time
+never grants target ownership or resource access. Unknown/foreign target rejects before
+reference metadata reads. The strict response contract checks union uniqueness/current
+count, file correspondence, access labels and change eligibility.
+
+New canonical `reconcile-items` command contains disjoint sorted addProductIds and
+removeProductIds, one UUID and expected collection revision. Exactly one to twenty combined
+changes are permitted, including addition-only or removal-only operations. The existing
+owner advisory lock, live-user lock, timeouts, history quota and transaction are reused.
+Every addition must be absent and every removal present under own member locks before any
+writes. Net capacity is checked before product/grant reads or removals. Additions lock
+existing products and effective own entitlement/legacy license at database clock time;
+removal-only commands never read product/grants and work for orphan references. Removals
+then additions, one successor revision, immutable receipt and required audit share the
+transaction. Finite access expiry is rechecked after all writes, including potentially
+blocking receipt/audit insertion; failure rolls the whole operation back. Same UUID/body/
+target returns original proof before mutable state or access checks; changed reuse rejects.
+Unselected membership dates and preferences/watches/download rights remain unchanged.
+
+Migration 0078 replaces the receipt guard while retaining all previous creation/copy/move/
+state/history/immutability/account-cascade checks. It adds strict reconciliation arrays,
+combined limit, uniqueness/disjointness and exact committed add/remove membership checks.
+The coordinator proves reviewed prestate before mutation; the SQL guard proves committed
+postconditions. Existing table, parent membership receipt and public command limits remain
+unchanged. The guard still writes the committed snapshot and database timestamp.
+
+The review form shows each addition/removal, total combined selection and projected count,
+requires explicit acknowledgement of the current revision, and invalidates review after
+snapshot/selection changes. First submit freezes the parent file/preview and original
+UUID/body/route/snapshot; uncertain retries use that exact request. Definitive failures
+require reload, stale/unmounted/settled handlers cannot send again, late replies are ignored,
+and success requires exact immutable command/successor acknowledgement. Receipt ID and
+private history links remain visible after refresh. Command history filters either added
+or removed resource IDs and keeps the full operation with current masked labels separate
+from historical proof; collection history displays both lists explicitly.
+
+Verification: 817 focused tests across 63 files pass, including command/receipt/migration
+shape, bounded own reconciliation preview, strict HTTP/selector/body/rate controls, full
+collection net swaps, prestate/capacity/access/expiry/audit/replay orchestration, RU/EN
+SSR/review/retry/late-response flows and preserved import/export/membership/comparison/
+collection/version/preparation/watch/discussion recovery flows. Biome lint passes on all
+24 touched non-integration TypeScript sources. Web TypeScript passes before and after
+regenerated route types. The isolated Next webpack compile-mode build exits zero,
+including the new reconcile-preview API and private reconciliation page.
+Root TypeScript retains only known missing fast-check/property-test implicit-any errors.
+Two PostgreSQL fixtures cover concurrent full-collection swaps, immutable replay after
+rename/archive/access loss, whole history/foreign-owner scope and rollback of members,
+revision and receipts on required audit failure. They remain unrun without disposable
+PostgreSQL. Migration 0078 is not applied to a live database. Live SQL/query plans, browser,
+full production generation and Node 26 validation remain open. GitHub Actions are neither
+run nor inspected; this block uses [skip ci].

@@ -3,10 +3,12 @@ import {
   LIBRARY_COLLECTION_MANIFEST_BYTES,
   type LibraryCollectionSnapshot,
   type LibraryCollectionImportPreview,
+  type LibraryCollectionReconcilePreview,
 } from "@nexus/domain";
 import {
   libraryCollectionManifestSchema,
   libraryCollectionImportPreviewSchema,
+  libraryCollectionReconcilePreviewSchema,
 } from "@nexus/validation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { libraryCollectionManifestsCopy } from "../lib/library-collection-manifests-i18n";
@@ -14,21 +16,27 @@ import { libraryCollectionsCopy, libraryCollectionError } from "../lib/library-c
 import { collectionHref } from "../lib/library-collections-query";
 import { privateApiRequest } from "../lib/private-api-request";
 import { LibraryCollectionBatchForm } from "./library-collection-batch";
+import { LibraryCollectionReconcileForm } from "./library-collection-reconcile";
 export function LibraryCollectionImport({
   collection,
   locale,
+  reconcile = false,
 }: {
   collection: LibraryCollectionSnapshot;
   locale: "ru" | "en";
+  reconcile?: boolean;
 }) {
   const c = libraryCollectionsCopy(locale),
     m = libraryCollectionManifestsCopy(locale);
   const [source, setSource] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [preview, setPreview] = useState<LibraryCollectionImportPreview | null>(null),
+    [preview, setPreview] = useState<
+      LibraryCollectionImportPreview | LibraryCollectionReconcilePreview | null
+    >(null),
     [frozen, setFrozen] = useState(false);
-  const active = useRef(true),
+  const mode = useRef(reconcile).current,
+    active = useRef(true),
     generation = useRef(0),
     locked = useRef(false),
     controller = useRef<AbortController | null>(null);
@@ -96,7 +104,7 @@ export function LibraryCollectionImport({
     setBusy(true);
     try {
       const response = await fetch(
-        `/api/library/collections/${encodeURIComponent(destination)}/import-preview`,
+        `/api/library/collections/${encodeURIComponent(destination)}/${mode ? "reconcile-preview" : "import-preview"}`,
         privateApiRequest({ method: "POST", json: manifest.data, signal: abort.signal }),
       );
       const body = await response.json().catch(() => null);
@@ -107,13 +115,18 @@ export function LibraryCollectionImport({
         abort.signal.aborted
       )
         return;
-      const result = libraryCollectionImportPreviewSchema.safeParse(body);
+      const result = mode
+        ? libraryCollectionReconcilePreviewSchema.safeParse(body)
+        : libraryCollectionImportPreviewSchema.safeParse(body);
       if (
         !response.ok ||
         !result.success ||
         result.data.collection.id !== destination ||
-        JSON.stringify(result.data.items.map((item) => item.productId)) !==
-          JSON.stringify(manifest.data.productIds)
+        JSON.stringify(
+          result.data.items
+            .filter((item) => !mode || ("inManifest" in item && item.inManifest))
+            .map((item) => item.productId),
+        ) !== JSON.stringify(manifest.data.productIds)
       ) {
         setError(response.ok ? c.retry : libraryCollectionError(locale, body?.code));
         return;
@@ -131,7 +144,7 @@ export function LibraryCollectionImport({
   }
   return (
     <div className="space-y-6">
-      <p>{m.note}</p>
+      <p>{mode ? m.reconcileNote : m.note}</p>
       <form onSubmit={inspect} className="nexus-panel space-y-4 p-5">
         <fieldset disabled={frozen} className="space-y-3">
           <label className="grid gap-1">
@@ -188,26 +201,47 @@ export function LibraryCollectionImport({
               <li key={item.productId} className="break-words border-t border-base pt-2">
                 <p>{item.available ? (item.title ?? c.unavailable) : c.unavailable}</p>
                 <code className="block break-all text-xs">{item.productId}</code>
-                <p>{item.inCollection ? m.present : item.canAdd ? m.eligible : m.blocked}</p>
+                <p>
+                  {mode && "canRemove" in item && item.canRemove
+                    ? m.removeCandidate
+                    : item.inCollection
+                      ? m.present
+                      : item.canAdd
+                        ? m.eligible
+                        : m.blocked}
+                </p>
               </li>
             ))}
           </ul>
-          <LibraryCollectionBatchForm
-            key={`${preview.collection.id}:${preview.collection.revision}:${preview.generatedAt}`}
-            locale={locale}
-            collection={preview.collection}
-            action="add-many"
-            items={preview.items
-              .filter((item) => item.canAdd)
-              .map((item) => ({ productId: item.productId, title: item.title, hasAccess: true }))}
-            maxSelection={Math.min(preview.batchLimit, preview.itemLimit - preview.itemCount)}
-            returnHref={collectionHref(preview.collection.id, "import")}
-            onFreeze={() => {
-              locked.current = true;
-              controller.current?.abort();
-              setFrozen(true);
-            }}
-          />
+          {mode ? (
+            <LibraryCollectionReconcileForm
+              key={`${preview.collection.id}:${preview.collection.revision}:${preview.generatedAt}`}
+              locale={locale}
+              preview={preview as LibraryCollectionReconcilePreview}
+              onFreeze={() => {
+                locked.current = true;
+                controller.current?.abort();
+                setFrozen(true);
+              }}
+            />
+          ) : (
+            <LibraryCollectionBatchForm
+              key={`${preview.collection.id}:${preview.collection.revision}:${preview.generatedAt}`}
+              locale={locale}
+              collection={preview.collection}
+              action="add-many"
+              items={preview.items
+                .filter((item) => item.canAdd)
+                .map((item) => ({ productId: item.productId, title: item.title, hasAccess: true }))}
+              maxSelection={Math.min(preview.batchLimit, preview.itemLimit - preview.itemCount)}
+              returnHref={collectionHref(preview.collection.id, "import")}
+              onFreeze={() => {
+                locked.current = true;
+                controller.current?.abort();
+                setFrozen(true);
+              }}
+            />
+          )}
         </section>
       )}
     </div>

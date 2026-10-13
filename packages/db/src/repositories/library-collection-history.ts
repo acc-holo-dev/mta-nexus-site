@@ -1,5 +1,6 @@
 import {
   AppError,
+  collectionCommandProductIds,
   NotFoundError,
   LIBRARY_COLLECTION_HISTORY_ACTIONS,
   LIBRARY_COLLECTION_HISTORY_DAYS,
@@ -91,14 +92,7 @@ function recorded(row: {
   return { ...parsed.data, createdAt: new Date(parsed.data.createdAt) };
 }
 function resourceIds(receipt: LibraryCollectionReceipt | null) {
-  const command = receipt?.command;
-  return command
-    ? "productIds" in command
-      ? command.productIds
-      : "productId" in command
-        ? [command.productId]
-        : []
-    : [];
+  return receipt ? collectionCommandProductIds(receipt.command) : [];
 }
 export async function readLibraryCollectionHistory(
   userId: string,
@@ -138,6 +132,7 @@ export async function readLibraryCollectionHistory(
           ? or(
               sql`${receipts.command}->>'action' IN ('add','remove') AND ${receipts.command}->>'productId'=${query.productId}`,
               sql`${receipts.command}->>'action' IN ('add-many','remove-many','copy-items','move-items') AND ${receipts.command}->'productIds' @> ${JSON.stringify([query.productId])}::jsonb`,
+              sql`${receipts.command}->>'action'='reconcile-items' AND (${receipts.command}->'addProductIds' @> ${JSON.stringify([query.productId])}::jsonb OR ${receipts.command}->'removeProductIds' @> ${JSON.stringify([query.productId])}::jsonb)`,
             )
           : undefined,
       );

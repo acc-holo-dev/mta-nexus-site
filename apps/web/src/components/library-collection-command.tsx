@@ -23,7 +23,7 @@ export function LibraryCollectionCommandForm({
   collection?: LibraryCollectionSnapshot;
   action?: Exclude<
     LibraryCollectionCommand["action"],
-    "add-many" | "remove-many" | "copy-items" | "move-items"
+    "add-many" | "remove-many" | "copy-items" | "move-items" | "reconcile-items"
   >;
   productId?: string;
   copyPreview?: LibraryCollectionCopyPreview;

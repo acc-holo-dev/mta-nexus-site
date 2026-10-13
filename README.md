@@ -1,5 +1,15 @@
 # MTA NEXUS
 
+Private collections can now be reconciled against portable JSON with a reviewed
+selection of missing references to add and extra own references to remove. Up to
+twenty mixed changes commit atomically with one revision, immutable receipt and
+required audit; full collections can swap references within net capacity. The file
+never grants rights: additions recheck current own access, removals allow orphans,
+and finite expiry is checked after all required writes. Exact UUID replay preserves
+the original proof after later edits or lost access. Private history matches either
+side and displays the whole operation. Migration `0078_library_collection_reconciliation`
+retains previous receipt guards and adds bounded disjoint membership postconditions.
+
 Private collections now support portable JSON export and reviewed additive import.
 Export includes the complete bounded collection snapshot and up to 200 reference IDs,
 including orphans, without resource titles or access metadata. Import accepts files or

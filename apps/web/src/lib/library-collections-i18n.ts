@@ -15,6 +15,7 @@ const en = {
   duplicate: "Copy collection",
   "copy-items": "Copy selected references",
   "move-items": "Move selected references",
+  "reconcile-items": "Apply selected composition changes",
   moveItemsNote:
     "Move up to 20 references from this active collection into another active collection. They are removed from the source only if the whole operation commits. Existing destination entries keep their dates. Download rights, saved versions and release watches are unchanged.",
   moveItemsConfirm:
@@ -110,6 +111,7 @@ const ru: typeof en = {
   duplicate: "Скопировать коллекцию",
   "copy-items": "Скопировать выбранные записи",
   "move-items": "Перенести выбранные записи",
+  "reconcile-items": "Применить изменения состава",
   moveItemsNote:
     "Перенесите до 20 записей из этой активной коллекции в другую активную коллекцию. Они удалятся из источника только при успешном применении всей операции. Имеющиеся записи назначения сохранят даты добавления. Права на скачивание, выбор версий и подписки на выпуски сохраняются.",
   moveItemsConfirm:

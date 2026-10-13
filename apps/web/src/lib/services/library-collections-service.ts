@@ -24,6 +24,8 @@ import {
 import { collectionId } from "../library-collections-query";
 export const libraryCollectionsService = {
   exportManifest: (actor: User, id: string) => exportLibraryCollection(actor.id, collectionId(id)),
+  reconcilePreview: (actor: User, id: string, input: unknown) =>
+    previewLibraryCollectionImport(actor.id, collectionId(id), input, true),
   importPreview: (actor: User, id: string, input: unknown) =>
     previewLibraryCollectionImport(actor.id, collectionId(id), input),
   membershipHistory: (actor: User, query: LibraryMembershipHistoryQuery) =>

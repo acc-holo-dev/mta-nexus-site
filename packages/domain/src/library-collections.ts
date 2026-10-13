@@ -37,6 +37,12 @@ export type LibraryCollectionCommand = { requestId: string } & (
       productIds: string[];
       expectedRevision: number;
     }
+  | {
+      action: "reconcile-items";
+      addProductIds: string[];
+      removeProductIds: string[];
+      expectedRevision: number;
+    }
   | { action: "add-many" | "remove-many"; productIds: string[]; expectedRevision: number }
 );
 export type LibraryCollectionCopyPreview = {
@@ -141,6 +147,7 @@ export const LIBRARY_COLLECTION_HISTORY_ACTIONS = [
   "remove-many",
   "copy-items",
   "move-items",
+  "reconcile-items",
 ] as const;
 export const LIBRARY_COLLECTION_HISTORY_DAYS = [7, 30, 90, 365] as const;
 export type LibraryCollectionHistoryQuery = {
@@ -236,3 +243,19 @@ export type LibraryCollectionImportPreview = {
     canAdd: boolean;
   }[];
 };
+
+export type LibraryCollectionReconcilePreview = Omit<LibraryCollectionImportPreview, "items"> & {
+  items: (LibraryCollectionImportPreview["items"][number] & {
+    inManifest: boolean;
+    canRemove: boolean;
+  })[];
+};
+export function collectionCommandProductIds(command: LibraryCollectionCommand): string[] {
+  return command.action === "reconcile-items"
+    ? [...command.addProductIds, ...command.removeProductIds].sort()
+    : "productIds" in command
+      ? command.productIds
+      : "productId" in command
+        ? [command.productId]
+        : [];
+}

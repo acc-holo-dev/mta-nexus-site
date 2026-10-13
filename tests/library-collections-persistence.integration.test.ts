@@ -1087,3 +1087,119 @@ it("exports own orphan references but imports only current own access, then rech
   ).toMatchObject({ title: null, canAdd: false, inCollection: true });
   await expect(exportLibraryCollection(f.other, source)).rejects.toMatchObject({ statusCode: 404 });
 });
+
+// Requires disposable PostgreSQL migrated through 0078.
+async function reconciliationFixture() {
+  const f = await fixture(),
+    fresh = await fixture();
+  const id = (await f.command({ requestId: randomUUID(), action: "create", name: "Reconcile" }))
+    .receipt.collection.id;
+  await f.command(
+    { requestId: randomUUID(), action: "add", productId: f.productId, expectedRevision: 1 },
+    id,
+  );
+  await db.delete(products).where(eq(products.id, f.productId));
+  const grant = `ent_reconcile_${randomUUID()}`;
+  await db
+    .insert(entitlements)
+    .values({
+      id: grant,
+      subjectType: "user",
+      subjectId: f.userId,
+      permission: "product.download",
+      resourceId: fresh.productId,
+    });
+  await db
+    .insert(libraryCollectionItems)
+    .values(
+      Array.from({ length: 199 }, (_, i) => ({ collectionId: id, productId: `prd_orphan_${i}` })),
+    );
+  const command = {
+    requestId: randomUUID(),
+    action: "reconcile-items" as const,
+    expectedRevision: 2,
+    addProductIds: [fresh.productId],
+    removeProductIds: [f.productId],
+  };
+  return { ...f, id, grant, reviewed: command, freshProductId: fresh.productId };
+}
+it("atomically swaps references in a full collection and replays original proof after edits/archive/access loss", async () => {
+  const f = await reconciliationFixture(),
+    results = await Promise.all([
+      f.command(f.reviewed, f.id),
+      f.command(f.reviewed, f.id),
+      f.command(f.reviewed, f.id),
+    ]);
+  expect(results.filter((result) => !result.replayed)).toHaveLength(1);
+  expect(new Set(results.map((result) => result.receipt.id)).size).toBe(1);
+  expect((await collections.detail(f.userId, f.id)).total).toBe(200);
+  const members = await db
+    .select({ id: libraryCollectionItems.productId })
+    .from(libraryCollectionItems)
+    .where(eq(libraryCollectionItems.collectionId, f.id));
+  expect(members.some((row) => row.id === f.productId)).toBe(false);
+  expect(members.some((row) => row.id === f.freshProductId)).toBe(true);
+  await f.command(
+    { requestId: randomUUID(), action: "rename", name: "Later", expectedRevision: 3 },
+    f.id,
+  );
+  await f.command({ requestId: randomUUID(), action: "archive", expectedRevision: 4 }, f.id);
+  await db.delete(entitlements).where(eq(entitlements.id, f.grant));
+  const replay = await f.command(f.reviewed, f.id);
+  expect(replay.replayed).toBe(true);
+  expect(replay.receipt).toEqual(results[0]?.receipt);
+  const { readLibraryCollectionHistory } = await import(
+    "../packages/db/src/repositories/library-collection-history"
+  );
+  const history = await readLibraryCollectionHistory(f.userId, {
+    page: 1,
+    days: 7,
+    action: "reconcile-items",
+    productId: f.productId,
+  });
+  expect(history.items[0]?.receipt).toEqual(replay.receipt);
+  expect(history.items[0]?.resources).toHaveLength(2);
+  await expect(
+    collections.command({
+      userId: f.other,
+      collectionId: f.id,
+      command: { ...f.reviewed, requestId: randomUUID() },
+      newCollectionId: `lcol_${randomUUID()}`,
+      receiptId: `lcr_${randomUUID()}`,
+      auditId: `aud_${randomUUID()}`,
+    }),
+  ).rejects.toMatchObject({ statusCode: 404 });
+});
+
+it("rolls back removals, additions, revision and receipt when the required reconciliation audit fails", async () => {
+  const f = await reconciliationFixture();
+  const [audit] = await db
+    .select()
+    .from(auditEvents)
+    .where(eq(auditEvents.actorId, f.userId))
+    .limit(1);
+  if (!audit) throw Error("Missing audit fixture");
+  const before = await db
+    .select()
+    .from(libraryCollectionItems)
+    .where(eq(libraryCollectionItems.collectionId, f.id));
+  const receiptsBefore = await db
+    .select()
+    .from(libraryCollectionReceipts)
+    .where(eq(libraryCollectionReceipts.collectionId, f.id));
+  await expect(f.command(f.reviewed, f.id, audit.id)).rejects.toThrow();
+  const after = await db
+    .select()
+    .from(libraryCollectionItems)
+    .where(eq(libraryCollectionItems.collectionId, f.id));
+  expect(after.sort((a, b) => a.productId.localeCompare(b.productId))).toEqual(
+    before.sort((a, b) => a.productId.localeCompare(b.productId)),
+  );
+  expect((await collections.detail(f.userId, f.id)).collection.revision).toBe(2);
+  expect(
+    await db
+      .select()
+      .from(libraryCollectionReceipts)
+      .where(eq(libraryCollectionReceipts.collectionId, f.id)),
+  ).toEqual(receiptsBefore);
+});

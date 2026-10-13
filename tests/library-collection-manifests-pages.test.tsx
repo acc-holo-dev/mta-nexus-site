@@ -1,3 +1,6 @@
+import ReconcilePage, {
+  generateMetadata as reconcileMetadata,
+} from "../apps/web/src/app/workspace/library/collections/[id]/reconcile/page";
 import { AppError } from "@nexus/domain";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -92,3 +95,21 @@ it("maps missing or foreign collection to the same unavailable page", async () =
   state.history.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
   await expect(screen({}, "lcol_foreign")).rejects.toThrow("NEXT_NOT_FOUND");
 });
+
+it.each(["en", "ru"] as const)(
+  "renders the private reconciliation page with localized metadata in %s",
+  async (locale) => {
+    state.locale = locale;
+    const html = renderToStaticMarkup(
+      await ReconcilePage({
+        params: Promise.resolve({ id: "lcol_a" }),
+        searchParams: Promise.resolve({}),
+      }),
+    );
+    expect(html).toContain(libraryCollectionManifestsCopy(locale).reconcileTitle);
+    expect(await reconcileMetadata()).toMatchObject({
+      title: `${libraryCollectionManifestsCopy(locale).reconcileTitle} | MTA NEXUS`,
+      robots: { index: false, follow: false },
+    });
+  },
+);

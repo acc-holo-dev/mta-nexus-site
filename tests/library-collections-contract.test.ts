@@ -379,3 +379,46 @@ it("requires the recorded source successor when confirming a move and excludes t
     ),
   ).toHaveLength(1);
 });
+
+it("canonicalizes one to twenty disjoint reconciliation changes and confirms the exact immutable successor", () => {
+  const input = {
+    requestId,
+    action: "reconcile-items",
+    expectedRevision: 4,
+    addProductIds: ["prd_b", "prd_a"],
+    removeProductIds: ["prd_old"],
+  };
+  const command = libraryCollectionCommandSchema.parse(input);
+  expect(command).toEqual({ ...input, addProductIds: ["prd_a", "prd_b"] });
+  const current = { id: "lcol_a", name: "Core", status: "active" as const, revision: 4 };
+  const body = {
+    replayed: true,
+    receipt: {
+      id: "lcr_a",
+      requestId,
+      command,
+      collection: { ...current, revision: 5 },
+      createdAt: "2026-10-13T00:00:00.000Z",
+    },
+  };
+  expect(confirmedCollectionCommand(body, command, current)).toBe("lcol_a");
+  expect(
+    confirmedCollectionCommand(
+      {
+        ...body,
+        receipt: { ...body.receipt, command: { ...input, removeProductIds: ["prd_other"] } },
+      },
+      command,
+      current,
+    ),
+  ).toBeNull();
+  for (const value of [
+    { ...input, addProductIds: [], removeProductIds: [] },
+    { ...input, addProductIds: ["prd_old"] },
+    { ...input, addProductIds: ["prd_a", "prd_a"] },
+    { ...input, ownerId: "other" },
+    { ...input, expectedRevision: 2147483647 },
+    { ...input, addProductIds: Array.from({ length: 20 }, (_, i) => `prd_${i}`) },
+  ])
+    expect(libraryCollectionCommandSchema.safeParse(value).success).toBe(false);
+});

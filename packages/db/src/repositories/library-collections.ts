@@ -499,6 +499,7 @@ export async function applyLibraryCollectionCommand(
     await owned(tx, input.userId, previous.collectionId);
     return { receipt: publicReceipt(previous), replayed: true };
   }
+  const reconciliationTerms: { expiresAt: Date | null }[] = [];
   let collection: LibraryCollectionSnapshot;
   if (command.action === "create" || command.action === "duplicate") {
     let copy: Awaited<ReturnType<typeof copySource>> | undefined;
@@ -607,6 +608,60 @@ export async function applyLibraryCollectionCommand(
           .returning({ id: collections.id });
         if (!advanced) throw fail("COLLECTION_CONFLICT");
       }
+    } else if (command.action === "reconcile-items") {
+      const changes = [...command.addProductIds, ...command.removeProductIds].sort();
+      const present = await tx
+        .select({ productId: members.productId })
+        .from(members)
+        .where(and(eq(members.collectionId, current.id), inArray(members.productId, changes)))
+        .orderBy(asc(members.productId))
+        .for("share");
+      const ids = new Set(present.map((row) => row.productId));
+      if (
+        command.addProductIds.some((id) => ids.has(id)) ||
+        command.removeProductIds.some((id) => !ids.has(id))
+      )
+        throw fail("COLLECTION_CONFLICT");
+      const [total] = await tx
+        .select({ total: count() })
+        .from(members)
+        .where(eq(members.collectionId, current.id));
+      if (
+        (total?.total ?? 0) - command.removeProductIds.length + command.addProductIds.length >
+        LIBRARY_COLLECTION_ITEM_LIMIT
+      )
+        throw fail("COLLECTION_ITEM_LIMIT");
+      for (const productId of command.addProductIds) {
+        const [product] = await tx
+          .select({ id: products.id })
+          .from(products)
+          .where(eq(products.id, productId))
+          .limit(1)
+          .for("share");
+        const access = product
+          ? await lockUserDownloadAccess(tx, input.userId, productId, sql`clock_timestamp()`)
+          : null;
+        if (!access) throw new NotFoundError("Library resource", productId);
+        reconciliationTerms.push({ expiresAt: access.expiresAt });
+      }
+      if (command.removeProductIds.length) {
+        const removed = await tx
+          .delete(members)
+          .where(
+            and(
+              eq(members.collectionId, current.id),
+              inArray(members.productId, command.removeProductIds),
+            ),
+          )
+          .returning({ productId: members.productId });
+        if (removed.length !== command.removeProductIds.length) throw fail("COLLECTION_CONFLICT");
+      }
+      if (command.addProductIds.length)
+        await tx
+          .insert(members)
+          .values(
+            command.addProductIds.map((productId) => ({ collectionId: current.id, productId })),
+          );
     } else if (command.action === "add-many") {
       // Lock resources and grants in canonical order. Do not write a partial batch.
       const accessTerms: { productId: string; expiresAt: Date | null }[] = [];
@@ -751,20 +806,36 @@ export async function applyLibraryCollectionCommand(
             sourceRevision: command.expectedSourceRevision,
           }
         : {}),
-      ...(command.action === "add" || command.action === "remove"
-        ? { productId: command.productId }
-        : "productIds" in command
-          ? { productIds: command.productIds }
-          : command.action === "duplicate"
-            ? {
-                sourceCollectionId: command.sourceCollectionId,
-                sourceRevision: command.expectedRevision,
-                itemCount: command.expectedItemCount,
-                sourceDigest: command.sourceDigest,
-              }
-            : {}),
+      ...(command.action === "reconcile-items"
+        ? { addProductIds: command.addProductIds, removeProductIds: command.removeProductIds }
+        : command.action === "add" || command.action === "remove"
+          ? { productId: command.productId }
+          : "productIds" in command
+            ? { productIds: command.productIds }
+            : command.action === "duplicate"
+              ? {
+                  sourceCollectionId: command.sourceCollectionId,
+                  sourceRevision: command.expectedRevision,
+                  itemCount: command.expectedItemCount,
+                  sourceDigest: command.sourceDigest,
+                }
+              : {}),
     },
   });
+  // Check finite grants after membership, successor, receipt and required audit writes.
+  if (reconciliationTerms.length) {
+    const [term] = await tx.execute<{ valid: boolean }>(
+      sql`select ${sql.join(
+        reconciliationTerms.map((access) =>
+          access.expiresAt === null
+            ? sql`true`
+            : sql`${access.expiresAt}::timestamptz > clock_timestamp()`,
+        ),
+        sql` AND `,
+      )} AS valid`,
+    );
+    if (term?.valid !== true) throw fail("COLLECTION_ACCESS_CHANGED");
+  }
   return { receipt: publicReceipt(record), replayed: false };
 }
 
