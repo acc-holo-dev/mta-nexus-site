@@ -1,4 +1,5 @@
 "use client";
+import { libraryReleaseCommandSchema } from "@nexus/validation";
 import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
 import { useLibraryReleaseCommand, LibraryReleaseCommandStatus } from "./library-release-command";
 import { useNexusLocale } from "./locale-context";
@@ -13,7 +14,7 @@ export function LibraryReleaseSelectionControls({
   revision: number;
   mode: "latest" | "fixed";
   selectedBuildId: string | null;
-  versions: { id: string; version: string }[];
+  versions: { id: string; version: string; sha256Hash: string; fileSizeBytes: number }[];
 }) {
   const { locale } = useNexusLocale();
   const copy = getResourceReleaseControlCopy(locale);
@@ -33,25 +34,38 @@ export function LibraryReleaseSelectionControls({
         {busy ? copy.saving : copy.useLatest}
       </button>
       <ul className="flex flex-wrap gap-3">
-        {versions.map((version) => (
-          <li key={version.id}>
-            <button
-              type="button"
-              onClick={() =>
-                void send({ mode: "fixed", buildId: version.id, expectedRevision: revision })
-              }
-              disabled={
-                busy ||
-                saved ||
-                pending !== null ||
-                (mode === "fixed" && selectedBuildId === version.id)
-              }
-              className="rounded-md border border-base px-4 py-2 text-sm"
-            >
-              {copy.choose}: {version.version}
-            </button>
-          </li>
-        ))}
+        {versions.map((version) => {
+          const command = {
+            mode: "fixed" as const,
+            buildId: version.id,
+            expectedRevision: revision,
+            reviewedArtifact: {
+              sha256Hash: version.sha256Hash,
+              fileSizeBytes: version.fileSizeBytes,
+            },
+          };
+          const valid = libraryReleaseCommandSchema.safeParse(command).success;
+          return (
+            <li key={version.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (valid) void send(command);
+                }}
+                disabled={
+                  busy ||
+                  saved ||
+                  pending !== null ||
+                  !valid ||
+                  (mode === "fixed" && selectedBuildId === version.id)
+                }
+                className="rounded-md border border-base px-4 py-2 text-sm"
+              >
+                {copy.choose}: {version.version}
+              </button>
+            </li>
+          );
+        })}
       </ul>
       <LibraryReleaseCommandStatus state={state} locale={locale} />
     </section>

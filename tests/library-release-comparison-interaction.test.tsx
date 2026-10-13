@@ -3,6 +3,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 const h = vi.hoisted(() => ({
   slots: [] as unknown[],
   cursor: 0,
+  cleanup: undefined as (() => void) | undefined,
   fetch: vi.fn(),
   refresh: vi.fn(),
   reload: vi.fn(),
@@ -19,6 +20,13 @@ vi.mock("react", async (original) => ({
         h.slots[i] = typeof v === "function" ? (v as (p: unknown) => unknown)(h.slots[i]) : v;
       },
     ];
+  },
+  useEffect: (effect: () => () => void) => {
+    const i = h.cursor++;
+    if (!(i in h.slots)) {
+      h.slots[i] = true;
+      h.cleanup = effect();
+    }
   },
   useRef: (initial: unknown) => {
     const i = h.cursor++;
@@ -42,7 +50,7 @@ function nodes(n: ReactNode): Element[] {
     return [e, ...nodes((e.type as (p: unknown) => ReactNode)(e.props))];
   return [e, ...nodes(e.props.children as ReactNode)];
 }
-const target = { id: "bld_b", version: "2", sha256Hash: "b".repeat(64), fileSizeBytes: 100 };
+let target = { id: "bld_b", version: "2", sha256Hash: "b".repeat(64), fileSizeBytes: 100 };
 let selection = {
   revision: 3,
   mode: "latest" as "latest" | "fixed",
@@ -70,8 +78,10 @@ function confirm() {
 }
 beforeEach(() => {
   h.slots = [];
+  h.cleanup = undefined;
   h.cursor = 0;
   h.locale = "en";
+  target = { id: "bld_b", version: "2", sha256Hash: "b".repeat(64), fileSizeBytes: 100 };
   selection = { revision: 3, mode: "latest", buildId: null };
   vi.clearAllMocks();
   vi.stubGlobal("fetch", h.fetch);
@@ -144,4 +154,35 @@ it("does not send a command for an already fixed target", () => {
   expect(render().some((n) => n.type === "input")).toBe(false);
   expect(render().some((n) => n.props.role === "status")).toBe(true);
   expect(h.fetch).not.toHaveBeenCalled();
+});
+it("requires renewed acknowledgement when comparison metadata changes and ignores the old handler", async () => {
+  confirm();
+  const stale = button(libraryReleaseComparisonCopy("en").chooseCompared).props
+    .onClick as () => void;
+  target = { ...target, sha256Hash: "c".repeat(64), fileSizeBytes: 101 };
+  selection = { ...selection, revision: 8 };
+  expect(button(libraryReleaseComparisonCopy("en").chooseCompared).props.disabled).toBe(true);
+  stale();
+  expect(h.fetch).not.toHaveBeenCalled();
+  confirm();
+  h.fetch.mockRejectedValueOnce(Error("unknown response"));
+  await click(libraryReleaseComparisonCopy("en").chooseCompared);
+  expect(JSON.parse(String(h.fetch.mock.calls[0]?.[1].body))).toMatchObject({
+    expectedRevision: 8,
+    reviewedArtifact: { sha256Hash: "c".repeat(64), fileSizeBytes: 101 },
+  });
+});
+it("captures reviewed values instead of following later mutation of caller-owned objects", async () => {
+  confirm();
+  const apply = button(libraryReleaseComparisonCopy("en").chooseCompared).props
+    .onClick as () => void;
+  target.sha256Hash = "c".repeat(64);
+  selection.revision = 8;
+  h.fetch.mockRejectedValueOnce(Error("unknown response"));
+  apply();
+  await new Promise((r) => setTimeout(r, 0));
+  expect(JSON.parse(String(h.fetch.mock.calls[0]?.[1].body))).toMatchObject({
+    expectedRevision: 3,
+    reviewedArtifact: { sha256Hash: "b".repeat(64), fileSizeBytes: 100 },
+  });
 });

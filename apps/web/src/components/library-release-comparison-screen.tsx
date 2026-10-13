@@ -129,7 +129,7 @@ export async function LibraryReleaseComparisonScreen({
       </div>
       <p className="text-secondary">{c.countsNote}</p>
       <LibraryReleaseComparisonSelection
-        key={`${path.id}:${result.selection.revision}:${result.to.id}:${result.to.sha256Hash}:${result.to.fileSizeBytes}`}
+        key={path.id}
         productId={path.id}
         locale={locale}
         selection={result.selection}

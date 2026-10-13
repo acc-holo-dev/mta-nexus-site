@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+Individual version choices now retain their exact resource/command across uncertain
+retries and server refreshes. Compared-release acknowledgement is tied to the displayed
+archive and preference snapshot; ordinary fixed choices also recheck the displayed
+SHA-256 and size. Late responses after unmount cannot refresh another page. Confirmed
+or rejected requests cannot be sent again by an old handler; a fresh review follows reload.
+
 The notification center now filters history over fixed 7/30/90/365-day UTC windows.
 Window boundaries use database time and travel with older/newer cursors; latest resets
 the anchor while existing unbounded history links keep working. Private JSON export

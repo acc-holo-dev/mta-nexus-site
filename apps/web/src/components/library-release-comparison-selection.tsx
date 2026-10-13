@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { libraryReleaseComparisonCopy } from "../lib/library-release-comparison-i18n";
 import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
 import { LibraryReleaseCommandStatus, useLibraryReleaseCommand } from "./library-release-command";
@@ -17,16 +17,22 @@ export function LibraryReleaseComparisonSelection({
   const copy = libraryReleaseComparisonCopy(locale);
   const control = getResourceReleaseControlCopy(locale);
   const state = useLibraryReleaseCommand(productId, locale);
-  const [confirmed, setConfirmed] = useState(false);
+  const reviewSelection = { ...selection }, artifact = { ...target };
+  const fingerprint = JSON.stringify([productId, reviewSelection.revision, reviewSelection.mode, reviewSelection.buildId,
+    artifact.id, artifact.version, artifact.sha256Hash, artifact.fileSizeBytes]);
+  const current = useRef(fingerprint);
+  current.current = fingerprint;
+  const [acknowledged, setAcknowledged] = useState<string | null>(null);
+  const confirmed = acknowledged === fingerprint;
   const selected = selection.mode === "fixed" && selection.buildId === target.id;
   const disabled = state.busy || state.saved || state.pending !== null || selected;
   function apply() {
-    if (!confirmed || disabled) return;
+    if (!confirmed || disabled || current.current !== fingerprint) return;
     void state.send({
       mode: "fixed",
-      buildId: target.id,
-      expectedRevision: selection.revision,
-      reviewedArtifact: { sha256Hash: target.sha256Hash, fileSizeBytes: target.fileSizeBytes },
+      buildId: artifact.id,
+      expectedRevision: reviewSelection.revision,
+      reviewedArtifact: { sha256Hash: artifact.sha256Hash, fileSizeBytes: artifact.fileSizeBytes },
     });
   }
   return (
@@ -52,7 +58,9 @@ export function LibraryReleaseComparisonSelection({
               type="checkbox"
               checked={confirmed}
               disabled={disabled}
-              onChange={(event) => setConfirmed(event.target.checked)}
+              onChange={(event) => {
+                if (current.current === fingerprint) setAcknowledged(event.target.checked ? fingerprint : null);
+              }}
             />
             <span>{copy.confirmChoice}</span>
           </label>

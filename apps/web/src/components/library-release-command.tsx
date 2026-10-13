@@ -1,9 +1,15 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { LibraryReleaseCommand } from "@nexus/domain";
 import { privateApiRequest } from "../lib/private-api-request";
 import { confirmedLibraryRelease } from "../lib/resource-release-control-confirmation";
+import {
+  freezeLibraryReleaseRequest,
+  matchesLibraryReleaseRequest,
+  type FrozenLibraryReleaseRequest,
+} from "../lib/library-release-request";
 import {
   getResourceReleaseControlCopy,
   resourceReleaseControlError,
@@ -12,42 +18,87 @@ export function useLibraryReleaseCommand(productId: string, locale: string) {
   const copy = getResourceReleaseControlCopy(locale),
     router = useRouter(),
     lock = useRef(false),
-    frozen = useRef<LibraryReleaseCommand | null>(null);
+    frozen = useRef<FrozenLibraryReleaseRequest | null>(null),
+    active = useRef(true),
+    attempt = useRef(0),
+    controller = useRef<AbortController | null>(null),
+    terminal = useRef(false),
+    currentProduct = useRef(productId);
+  currentProduct.current = productId;
   const [pending, setPending] = useState<LibraryReleaseCommand | null>(null),
     [blocked, setBlocked] = useState(false),
     [busy, setBusy] = useState(false),
     [saved, setSaved] = useState(false),
     [error, setError] = useState("");
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+      attempt.current++;
+      controller.current?.abort();
+      controller.current = null;
+      lock.current = false;
+    };
+  }, []);
   async function send(command: LibraryReleaseCommand) {
-    if (lock.current || saved || blocked) return;
-    if (frozen.current && JSON.stringify(frozen.current) !== JSON.stringify(command)) return;
-    frozen.current ??= command;
-    command = frozen.current;
+    if (!active.current || lock.current || terminal.current) return;
+    if (!frozen.current) {
+      // Ignore a handler retained from a different resource before the first send.
+      if (currentProduct.current !== productId) return;
+      frozen.current = freezeLibraryReleaseRequest(productId, command);
+      if (!frozen.current) {
+        setError(resourceReleaseControlError(locale, "RESOURCE_CONTROL_INVALID"));
+        return;
+      }
+    } else if (!matchesLibraryReleaseRequest(frozen.current, command)) return;
+    const request = frozen.current,
+      abort = new AbortController(),
+      version = ++attempt.current;
+    controller.current = abort;
+    const current = () =>
+      active.current && attempt.current === version && controller.current === abort;
     lock.current = true;
-    setPending(command);
+    setPending(request.command);
     setBusy(true);
     setError("");
     try {
       const response = await fetch(
-        `/api/library/releases/${encodeURIComponent(productId)}`,
-        privateApiRequest({ method: "POST", json: command }),
+        `/api/library/releases/${encodeURIComponent(request.productId)}`,
+        privateApiRequest({ method: "POST", json: JSON.parse(request.body), signal: abort.signal }),
       );
       const value = await response.json().catch(() => null);
-      if (!response.ok || !confirmedLibraryRelease(value, productId, command)) {
+      if (!current()) return;
+      if (!response.ok || !confirmedLibraryRelease(value, request.productId, request.command)) {
         setError(resourceReleaseControlError(locale, value?.code));
-        if ([400, 401, 403, 404, 409].includes(response.status)) setBlocked(true);
+        if ([400, 401, 403, 404, 409].includes(response.status)) {
+          terminal.current = true;
+          setBlocked(true);
+        }
         return;
       }
+      terminal.current = true;
       setSaved(true);
       router.refresh();
     } catch {
-      setError(copy.errors.fallback);
+      if (current()) setError(copy.errors.fallback);
     } finally {
-      setBusy(false);
-      lock.current = false;
+      if (current()) {
+        setBusy(false);
+        lock.current = false;
+        controller.current = null;
+      }
     }
   }
-  return { pending, blocked, busy, saved, error, send };
+  return {
+    pending,
+    pendingProductId: frozen.current?.productId,
+    pendingHref: frozen.current?.href,
+    blocked,
+    busy,
+    saved,
+    error,
+    send,
+  };
 }
 export function LibraryReleaseCommandStatus({
   state,
@@ -56,10 +107,40 @@ export function LibraryReleaseCommandStatus({
   state: ReturnType<typeof useLibraryReleaseCommand>;
   locale: string;
 }) {
-  const { pending, blocked, busy, saved, error, send } = state;
+  const { pending, pendingProductId, pendingHref, blocked, busy, saved, error, send } = state;
   const copy = getResourceReleaseControlCopy(locale);
   return (
     <>
+      {pending && pendingHref ? (
+        <div className="space-y-2 text-sm">
+          <Link href={pendingHref} className="break-all text-accent underline">
+            {copy.pendingResource}: {pendingProductId}
+          </Link>
+          <p>
+            {copy.revision}: {pending.expectedRevision}
+          </p>
+          {pending.mode === "fixed" ? (
+            <>
+              <p>
+                {copy.pendingBuild}: <code className="break-all">{pending.buildId}</code>
+              </p>
+              {pending.reviewedArtifact ? (
+                <>
+                  <p>
+                    {copy.pendingHash}:{" "}
+                    <code className="break-all">{pending.reviewedArtifact.sha256Hash}</code>
+                  </p>
+                  <p>
+                    {copy.pendingSize}: {pending.reviewedArtifact.fileSizeBytes}
+                  </p>
+                </>
+              ) : null}
+            </>
+          ) : (
+            <p>{copy.latest}</p>
+          )}
+        </div>
+      ) : null}
       {pending && !saved ? (
         <div className="space-y-3">
           <p className="text-sm text-muted">{copy.pendingNote}</p>
@@ -89,9 +170,18 @@ export function LibraryReleaseCommandStatus({
         </p>
       ) : null}
       {saved ? (
-        <p role="status" className="text-sm text-success">
-          {copy.selectSaved}
-        </p>
+        <div className="space-y-2">
+          <p role="status" className="text-sm text-success">
+            {copy.selectSaved}
+          </p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="text-sm text-accent underline"
+          >
+            {copy.reloadState}
+          </button>
+        </div>
       ) : null}
     </>
   );

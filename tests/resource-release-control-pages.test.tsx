@@ -29,9 +29,18 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => state.user },
 }));
 vi.mock("../apps/web/src/lib/services/resource-release-watches-service", () => ({
-  resourceReleaseWatchesService: { detail: async (_user: unknown, productId: string) => ({ productId, revision: 0, enabled: false, updatedAt: null }) },
+  resourceReleaseWatchesService: {
+    detail: async (_user: unknown, productId: string) => ({
+      productId,
+      revision: 0,
+      enabled: false,
+      updatedAt: null,
+    }),
+  },
 }));
-vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({ ResourceReleaseWatchControl: () => <span>Release watch</span> }));
+vi.mock("../apps/web/src/components/resource-release-watch-control", () => ({
+  ResourceReleaseWatchControl: () => <span>Release watch</span>,
+}));
 vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
   libraryReleaseService: { page: state.updates, detail: state.versions },
@@ -52,8 +61,16 @@ vi.mock("../apps/web/src/components/resource-download-button", () => ({
   ),
 }));
 vi.mock("../apps/web/src/components/library-release-selection-controls", () => ({
-  LibraryReleaseSelectionControls: ({ revision }: { revision: number }) => (
-    <span data-revision={revision}>Preference</span>
+  LibraryReleaseSelectionControls: ({
+    revision,
+    versions,
+  }: {
+    revision: number;
+    versions: unknown;
+  }) => (
+    <span data-revision={revision} data-choices={JSON.stringify(versions)}>
+      Preference
+    </span>
   ),
 }));
 vi.mock("../apps/web/src/components/resource-moderation-controls", () => ({
@@ -103,6 +120,8 @@ beforeEach(() => {
         id: "bld_latest",
         version: "2.0.0",
         releaseNotes: "<script>unsafe text</script>",
+        sha256Hash: "a".repeat(64),
+        fileSizeBytes: 100,
         createdAt: now,
         storageKey: "PRIVATE-FILE",
       },
@@ -186,6 +205,9 @@ it("downloads only the explicitly selected cleared release", async () => {
   expect(html).not.toContain('data-download="bld_latest"');
   expect(html).toContain("&lt;script&gt;unsafe text&lt;/script&gt;");
   expect(html).toContain('data-revision="3"');
+  expect(html).toContain("a".repeat(64));
+  expect(html).toContain("fileSizeBytes&quot;:100");
+  expect(html).not.toContain("PRIVATE-FILE");
 });
 it("masks unavailable resource metadata even if an upstream DTO includes it", async () => {
   const list = await state.updates();

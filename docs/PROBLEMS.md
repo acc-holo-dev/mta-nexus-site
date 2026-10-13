@@ -4518,3 +4518,54 @@ and equivalence with the existing release overview. It remains unrun here. Live 
 plans, browser/download handoff, full production generation and Node 26 validation remain
 open. No live migration applied. GitHub Actions are neither run nor inspected; this block
 uses [skip ci].
+
+## Individual version request lifetime and archive binding — 2026-10-13
+
+The individual release controller previously froze only a command object, used the
+current product prop for retries and relied on render-state flags for settlement.
+It had no unmount/late-response guard. Version and comparison pages keyed controls
+by changing preference/artifact snapshots, discarding uncertain requests on refresh.
+Comparison acknowledgement was a boolean; ordinary fixed choices did not send the
+displayed archive identity. These gaps were confirmed from the current source.
+
+The first valid send now captures a validated, cloned/frozen resource, command, body
+and inspection href. Retries use the original route and canonical bytes. Old pre-send
+handlers from a different resource are ignored. A synchronous terminal guard prevents
+old handlers from sending after success or definitive rejection. Each attempt owns an
+abort controller and generation; cleanup aborts transport and excludes late UI/error/
+refresh updates. Aborting a POST does not assert that the server rolled back a write.
+Malformed/unknown acknowledgements remain unresolved; 400/401/403/404/409 still require
+reload, while network/429/5xx failures retain the same reviewed request.
+
+Controls retain one product key across server preference/artifact refreshes. Comparison
+acknowledgement fingerprints product, current choice/revision and displayed build/version/
+hash/size, so changed data needs fresh confirmation before a first send. Rendered primitive
+values are captured rather than following later mutation of caller objects. Pending or
+confirmed proof displays the original resource, revision, build and reviewed identity;
+reload starts a fresh review. Version-list fixed commands include safe-public-build hash
+and size, already rechecked by the existing command transaction. Invalid/missing archive
+identity disables a fixed choice instead of submitting an unreviewed command. The private
+detail projection adds only these two public artifact fields, without file locations.
+Download instances on the version page are keyed by product/build/version. No new
+endpoint, migration, preference semantics, entitlement or download authority is added.
+
+Recovered the exact 2327-file snapshot of remote 30a540e6b1b581775ec108fdfab18379ffa16618,
+including the independent fixed notification-period/export block, after scratch loss.
+Opaque workflow objects were preserved without running or inspecting Actions. Frozen
+dependency installation succeeded with Node 26.11.1 and pnpm 12.4.2, with no dependency,
+lockfile or engine changes. Complete root TypeScript now passes with fast-check installed.
+
+Verification: 1136 focused tests in 79 files pass; all twelve touched TypeScript files
+pass Biome lint. Complete root TypeScript and generated web-route TypeScript pass after
+the Node 26 build as well. Full unit run: 6263 pass, eight fail in seven files. The same eight
+failures were reproduced on an unchanged detached snapshot of published 30a540e; no new
+unit failures were introduced. Affected baseline files: author-managed-resource-query,
+build-download-metadata, build-review-continuity, build-visibility-policy (two cases),
+publication-management-query, safe-published-build-invariant and content-comments.
+The full unit contour remains open rather than being recorded as green.
+Next webpack compile-mode build completes under a consistent Node 26 PATH; BUILD_ID,
+server manifests and compiled version/comparison pages were checked for fresh timestamps
+after the invocation. An earlier Node 26 invocation with mixed PATH exited zero without
+a complete console report and is not counted as verification. Node 24 also completed
+compile mode. PostgreSQL/browser/download handoff and full production generation remain
+unrun here. Publication uses [skip ci]; no live migration applied.

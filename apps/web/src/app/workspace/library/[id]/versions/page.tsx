@@ -83,7 +83,12 @@ export default async function LibraryVersionsPage({
         {current?.version ?? copy.unavailable}
       </p>
       {current ? (
-        <ResourceDownloadButton productId={id} version={current.version} buildId={current.id} />
+        <ResourceDownloadButton
+          key={`${id}:${current.id}:${current.version}`}
+          productId={id}
+          version={current.version}
+          buildId={current.id}
+        />
       ) : null}
       <Link
         href={`/workspace/library/${encodeURIComponent(id)}/requirements`}
@@ -98,12 +103,17 @@ export default async function LibraryVersionsPage({
         {libraryCollectionsCopy(locale).resourceCollections}
       </Link>
       <LibraryReleaseSelectionControls
-        key={`${id}:${result.selection.revision}`}
+        key={id}
         productId={id}
         revision={result.selection.revision}
         mode={result.selection.mode}
         selectedBuildId={result.selection.buildId}
-        versions={result.versions.map((version) => ({ id: version.id, version: version.version }))}
+        versions={result.versions.map((version) => ({
+          id: version.id,
+          version: version.version,
+          sha256Hash: version.sha256Hash,
+          fileSizeBytes: version.fileSizeBytes,
+        }))}
       />
       <section className="nexus-panel space-y-3 p-5">
         <h2 className="font-semibold text-primary">{resourceReleaseWatchesCopy(locale).title}</h2>

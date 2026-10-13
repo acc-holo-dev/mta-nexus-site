@@ -29,6 +29,8 @@ const publicBuild = {
   version: builds.version,
   releaseNotes: builds.releaseNotes,
   createdAt: builds.createdAt,
+  sha256Hash: builds.sha256Hash,
+  fileSizeBytes: builds.fileSizeBytes,
 };
 const selectionFields = {
   revision: selections.revision,

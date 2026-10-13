@@ -23,6 +23,10 @@ const copy = {
     reloadState: "Reload current state",
     pendingNote:
       "A request was sent. Confirm its result by retrying the same choice or reloading before making another choice.",
+    pendingResource: "Resource for this request",
+    pendingBuild: "Requested build",
+    pendingHash: "Reviewed SHA-256",
+    pendingSize: "Reviewed archive size (bytes)",
     empty: "No resources match this filter.",
     noVersions: "No approved version is currently available.",
     privateResource: "Resource unavailable",
@@ -100,6 +104,10 @@ const copy = {
     reloadState: "Обновить текущее состояние",
     pendingNote:
       "Запрос отправлен. Подтвердите результат повтором того же выбора или обновите состояние перед другим выбором.",
+    pendingResource: "Ресурс этого запроса",
+    pendingBuild: "Запрошенная сборка",
+    pendingHash: "Проверенный SHA-256",
+    pendingSize: "Проверенный размер архива (байт)",
     empty: "Нет ресурсов по этому фильтру.",
     noVersions: "Одобренных доступных версий сейчас нет.",
     privateResource: "Ресурс недоступен",

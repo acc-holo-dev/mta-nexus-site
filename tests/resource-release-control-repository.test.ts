@@ -171,6 +171,21 @@ it("does not reveal titles or releases in a suspended buyer detail", async () =>
   });
   expect(state.queries.some((q) => q.sql.includes('from "builds"'))).toBe(false);
 });
+it("projects reviewed archive identities for safe buyer choices without private file locations", async () => {
+  const release = ["bld_a", "1.0.0", "Notes", stamp, "a".repeat(64), 100];
+  state.results = [...ownedRows().slice(1), [], [release], [[1]], [release]];
+  const detail = await library.detail("usr_a", "prd_a");
+  expect(detail.versions[0]).toMatchObject({
+    id: "bld_a",
+    sha256Hash: "a".repeat(64),
+    fileSizeBytes: 100,
+  });
+  const queries = state.queries.filter((q) => q.sql.includes('from "builds"'));
+  expect(queries).toHaveLength(3);
+  expect(queries[0]?.sql).toContain('"sha256_hash"');
+  expect(queries[0]?.sql).toContain('"file_size_bytes"');
+  expect(queries.every((q) => !q.sql.includes('"storage_key"'))).toBe(true);
+});
 it("releasing a restriction drafts published/pending versions and preserves quarantine", async () => {
   state.results = [
     [product("suspended")],
