@@ -10,6 +10,11 @@ import {
 } from "../lib/notification-inbox-contract";
 import { notificationInboxCopy, notificationInboxError } from "../lib/notification-inbox-copy";
 import { announceNotificationInboxChange } from "../lib/notification-inbox-events";
+import {
+  fetchNotificationInboxExport,
+  INBOX_EXPORT_FILE_NAME,
+  NotificationInboxExportError,
+} from "../lib/notification-inbox-export-client";
 import { useNexusLocale } from "./locale-context";
 export function NotificationInbox({
   initialPage,
@@ -23,17 +28,22 @@ export function NotificationInbox({
   const [page, setPage] = useState(initialPage),
     [selected, setSelected] = useState<string[]>([]),
     [busy, setBusy] = useState(false),
+    [exporting, setExporting] = useState(false),
     [blocked, setBlocked] = useState(false),
     [error, setError] = useState(""),
     [announcement, setAnnouncement] = useState("");
   const pending = useRef(false),
     controller = useRef<AbortController | null>(null),
-    mounted = useRef(true);
+    mounted = useRef(true),
+    downloadUrl = useRef<string | null>(null),
+    downloadTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => {
     mounted.current = true;
     return () => {
       mounted.current = false;
       controller.current?.abort();
+      clearTimeout(downloadTimer.current);
+      if (downloadUrl.current) URL.revokeObjectURL(downloadUrl.current);
     };
   }, []);
   const readHref = notificationInboxHref(
@@ -52,6 +62,60 @@ export function NotificationInbox({
     if (!response.ok || !parsed.success)
       throw new Error(notificationInboxError(locale, data?.code));
     return parsed.data;
+  }
+  async function exportPage() {
+    if (!mounted.current || pending.current || blocked) return;
+    pending.current = true;
+    setBusy(true);
+    setExporting(true);
+    setError("");
+    setAnnouncement("");
+    const active = new AbortController();
+    controller.current = active;
+    const timeout = AbortSignal.timeout(15000);
+    const signal = AbortSignal.any([active.signal, timeout]);
+    try {
+      const blob = await fetchNotificationInboxExport(
+        { ...filters, at: page.window?.until ?? filters.at },
+        locale,
+        signal,
+      );
+      if (!mounted.current) return;
+      signal.throwIfAborted();
+      clearTimeout(downloadTimer.current);
+      if (downloadUrl.current) URL.revokeObjectURL(downloadUrl.current);
+      const url = URL.createObjectURL(blob);
+      downloadUrl.current = url;
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = INBOX_EXPORT_FILE_NAME;
+      try {
+        document.body.appendChild(link);
+        link.click();
+        setAnnouncement(copy.exportReady);
+      } finally {
+        link.remove();
+        downloadTimer.current = setTimeout(() => {
+          URL.revokeObjectURL(url);
+          if (downloadUrl.current === url) downloadUrl.current = null;
+        }, 1000);
+      }
+    } catch (failure) {
+      if (mounted.current)
+        setError(
+          timeout.aborted
+            ? copy.exportTimeout
+            : failure instanceof NotificationInboxExportError
+              ? notificationInboxError(locale, failure.code)
+              : copy.exportFailed,
+        );
+    } finally {
+      pending.current = false;
+      if (mounted.current) {
+        setBusy(false);
+        setExporting(false);
+      }
+    }
   }
   async function refresh() {
     if (pending.current) return;
@@ -105,7 +169,10 @@ export function NotificationInbox({
           signal,
           ...(entireInbox
             ? {}
-            : { headers: { "Content-Type": "application/json" }, body: JSON.stringify(command) }),
+            : {
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(command),
+              }),
         },
       );
       const data = await response.json().catch(() => null);
@@ -174,6 +241,10 @@ export function NotificationInbox({
               filters.cursor ? JSON.stringify(filters.cursor) : undefined,
             )}
             download="nexus-notification-page.json"
+            onClick={(event) => {
+              event.preventDefault();
+              void exportPage();
+            }}
             className="inline-flex min-h-11 items-center text-sm text-accent underline"
           >
             {copy.export}
@@ -183,7 +254,7 @@ export function NotificationInbox({
       </div>
       {busy && (
         <p role="status" className="text-sm text-muted">
-          {copy.loading}
+          {exporting ? copy.exportLoading : copy.loading}
         </p>
       )}
       {announcement && (

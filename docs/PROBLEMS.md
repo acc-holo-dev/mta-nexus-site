@@ -4569,3 +4569,26 @@ after the invocation. An earlier Node 26 invocation with mixed PATH exited zero 
 a complete console report and is not counted as verification. Node 24 also completed
 compile mode. PostgreSQL/browser/download handoff and full production generation remain
 unrun here. Publication uses [skip ci]; no live migration applied.
+
+## Verified notification page download and recoverable errors — 2026-10-13
+
+The notification export previously navigated directly to the attachment endpoint, so
+expired sessions, rate limits and server failures could open/download error JSON rather
+than show a recoverable inbox error. JavaScript now prepares a bounded verified file and
+reports RU/EN errors in place. The ordinary link remains the progressive fallback.
+Strict report/locale/filter/window and per-item state/category/time checks exclude expanded
+or mismatched payloads. Streaming uses a fixed 1 MiB buffer; malformed UTF-8, partial or
+redirected responses and invalid attachment headers are rejected. A 15-second timeout,
+reader cancellation, navigation guards, duplicate-click coalescing and Blob URL cleanup
+bound the request lifetime. Selection and read state survive export and failure; no
+notification mutation or new endpoint/schema is introduced.
+
+Verification on Node 26.11.1 / pnpm 12.4.2: 206 focused tests in ten files pass, covering
+stream/contract failures, HTTP privacy/rate/auth, preserved history/filter queries, localized
+SSR, download preparation, retry, selection, timeout and navigation handlers. Strict
+TypeScript passes for all five changed TypeScript sources and their imported dependencies;
+Biome check passes for the same files. The target dependency graph was recovered from
+published 15df21bf3e511ee80f0540e3a908c47065715b8b after scratch loss. Full repository
+TypeScript, full unit suite, Next build, browser download/disk handoff and PostgreSQL
+execution were not run for this block. No live migration or deployment was performed.
+Publication uses [skip ci]; GitHub Actions were not run or inspected.

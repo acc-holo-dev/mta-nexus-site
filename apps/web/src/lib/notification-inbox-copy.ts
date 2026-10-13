@@ -24,6 +24,10 @@ const en = {
   export: "Export this page as JSON",
   exportHelp:
     "Exports up to 25 saved notifications under these filters, not only the selection. Links and internal delivery data are omitted.",
+  exportLoading: "Preparing notification export…",
+  exportReady: "The notification file is ready for download.",
+  exportFailed: "The export could not be verified. Try again.",
+  exportTimeout: "The export took too long. Try again.",
   exportTooLarge: "This page is too large to export. Narrow your filters and try again.",
   all: "All",
   read: "Read",
@@ -87,6 +91,10 @@ const ru: typeof en = {
   export: "Экспорт этой страницы в JSON",
   exportHelp:
     "Экспортирует до 25 сохранённых уведомлений под текущими фильтрами, а не только выбранные. Ссылки и внутренние данные доставки не включаются.",
+  exportLoading: "Подготовка экспорта уведомлений…",
+  exportReady: "Файл уведомлений готов к скачиванию.",
+  exportFailed: "Не удалось проверить экспорт. Попробуйте ещё раз.",
+  exportTimeout: "Экспорт занял слишком много времени. Попробуйте ещё раз.",
   exportTooLarge: "Эта страница слишком велика для экспорта. Уточните фильтры и попробуйте снова.",
   all: "Все",
   read: "Прочитанные",
@@ -146,6 +154,8 @@ export function notificationInboxError(locale: Locale, code: unknown) {
       return copy.invalid;
     case "RATE_LIMIT_EXCEEDED":
       return copy.limited;
+    case "EXPORT_FAILED":
+      return copy.exportFailed;
     case "EXPORT_TOO_LARGE":
       return copy.exportTooLarge;
     default:
