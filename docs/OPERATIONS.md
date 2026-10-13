@@ -1058,6 +1058,38 @@ resume a repair-mode file with the same flag. Schema/table recreation changes it
 There is no automatic background discovery, global pending-notice scan or legacy backfill.
 No database migration is required: the existing JSON column gains a typed receipt only.
 
+#### Dedicated real PostgreSQL recovery verification
+
+`.github/workflows/discussion-recovery.yml` runs the seven real database suites for
+discussion subscriptions/replay, preference serialization, outbox admission/capacity
+and push worker leases/concurrency against a fresh PostgreSQL 18 service. It runs on
+relevant `main` pushes and supports manual dispatch; code publication for this gate
+must omit `[skip ci]`. The job uses fixture-only credentials, read-only repository
+permissions and a ten-minute timeout. It deploys no application and contacts no real
+push provider. Source-sensitive changes remain covered by the existing full CI too.
+
+The same command is `node scripts/verify-discussion-recovery.mjs`. Create a new empty
+loopback database named `mta_nexus_recovery` or `nexus_recovery_` followed by 8–32
+lowercase alphanumeric characters, explicitly set its `DATABASE_URL`, `NODE_ENV=test`
+and `NEXUS_DISCUSSION_RECOVERY_DB_ACK=disposable`. Use a clean checkout of the intended
+commit, with installed workspace dependencies and the pinned Node version. Do not
+point it at normal development/production data. The command never drops/recreates a
+database: it rejects non-loopback/default/ambiguous names, a mismatched actual database,
+non-18 server versions and existing user tables before applying current migrations.
+
+It records the exact commit, Node/server versions, migration digest, current stage and
+test counts in `artifacts/discussion-recovery.json`, with the complete Vitest JSON in
+`artifacts/discussion-recovery-tests.json`. Environment URLs/credentials are excluded.
+Each invocation invalidates older evidence even if environment validation fails.
+Passing status requires all seven expected files and every reported assertion to pass;
+a missing, stale, skipped or partial report cannot become green. GitHub retains both
+artifacts for fourteen days. This verifies SQL/transactions/concurrency in this fixture
+scope, not production topology, delivery providers or power-loss behavior.
+
+Local runtimes mapped only to UID 0 may be unable to start native PostgreSQL. Do not
+disable PostgreSQL's root refusal or use production data to work around that condition;
+use this disposable CI service or a normal non-root local PostgreSQL installation.
+
 ## 4. Backup and recovery
 
 Before a production migration:

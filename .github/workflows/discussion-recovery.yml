@@ -1,0 +1,73 @@
+name: Discussion recovery PostgreSQL
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/discussion-recovery.yml
+      - scripts/verify-discussion-recovery.mjs
+      - scripts/tests/discussion-recovery-verification.node-test.mjs
+      - apps/web/scripts/discussion-replay-*.ts
+      - apps/web/scripts/replay-discussion-notifications.ts
+      - apps/web/src/lib/services/discussion-*.ts
+      - packages/db/src/repositories/notifications.ts
+      - packages/db/src/repositories/discussion-push-receipt.ts
+      - packages/db/src/repositories/follow-workspace.ts
+      - packages/db/src/repositories/web-push-*.ts
+      - packages/db/src/schema.ts
+      - packages/db/migrations/**
+      - tests/discussion-*.integration.test.ts
+      - tests/web-push-*.integration.test.ts
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: discussion-recovery-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: nexus
+          POSTGRES_PASSWORD: recovery_ci_only
+          POSTGRES_DB: mta_nexus_recovery
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U nexus -d mta_nexus_recovery"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgres://nexus:recovery_ci_only@localhost:5432/mta_nexus_recovery
+      NEXUS_DISCUSSION_RECOVERY_DB_ACK: disposable
+      AUTH_SECRET: ci-only-discussion-recovery-secret-long-enough
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      STORAGE_PROVIDER: local
+      STORAGE_LOCAL_PATH: ./temp/recovery-uploads
+      EMAIL_PROVIDER: log
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - name: Install pinned pnpm under the selected Node runtime
+        run: npm install --global pnpm@12.4.2 --no-audit --no-fund
+      - run: pnpm install --frozen-lockfile
+      - name: Verify target guards
+        run: node --test scripts/tests/discussion-recovery-verification.node-test.mjs
+      - name: Migrate and verify real recovery behavior
+        run: node scripts/verify-discussion-recovery.mjs
+      - name: Preserve exact commit evidence
+        if: always()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: discussion-recovery-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            artifacts/discussion-recovery.json
+            artifacts/discussion-recovery-tests.json
+          if-no-files-found: warn
+          retention-days: 14

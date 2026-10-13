@@ -1,5 +1,21 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Dedicated discussion recovery PostgreSQL gate — 2026-10-13
+
+The new scoped GitHub workflow starts a fresh PostgreSQL 18 service, applies current
+migrations and runs seven existing database suites for discussion replay/preference
+locking, push admission/capacity and worker lease/concurrency behavior. The reusable
+runner requires an explicitly acknowledged empty loopback test database and a clean
+exact commit, records its migration digest and rejects mismatched versions/data before
+mutation. It invalidates stale evidence and requires complete passing file/assertion
+counts. Repository credentials are not persisted; evidence omits database URLs/secrets.
+Four local safety/metadata/report checks pass on Node 26.10.0. Native PostgreSQL 18.4
+binaries were obtained for this session, but the runtime maps only UID 0 and prohibits
+switching users; native execution was not attempted by disabling PostgreSQL's root guard.
+Real execution is now routed through the disposable CI job. Its exact commit/artifacts
+must be inspected before claiming PostgreSQL acceptance. Production/provider/power-loss
+verification remains a separate gate.
+
 ### Proven pending discussion Web Push admission recovery — 2026-10-13
 
 New discussion notices use database time and a typed `discussion_push` JSON receipt.
