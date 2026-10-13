@@ -21,25 +21,74 @@ export class NotificationRepository {
       query: string;
       state: "all" | "read" | "unread";
       category: string;
-      cursor?: { createdAt: string; id: string; context: string; direction: "older" | "newer" };
+      period?: "all" | "7" | "30" | "90" | "365";
+      at?: string;
+      cursor?: {
+        createdAt: string;
+        id: string;
+        context: string;
+        direction: "older" | "newer";
+        asOf?: string;
+      };
     },
   ) {
-    const context = createHash("sha256")
-      .update(
-        JSON.stringify([
-          1,
-          "notification-inbox",
-          recipientId,
-          filters.query,
-          filters.state,
-          filters.category,
-        ]),
-      )
-      .digest("hex");
-    if (filters.cursor && filters.cursor.context !== context)
+    const period = filters.period ?? "all";
+    const at = filters.at ?? filters.cursor?.asOf;
+    const validTimestamp = (value: string) => {
+      if (!/^(?!0000)\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}Z$/u.test(value)) return false;
+      const parsed = new Date(value);
+      return Number.isFinite(parsed.getTime()) && parsed.toISOString() === `${value.slice(0, 23)}Z`;
+    };
+    if (
+      !["all", "7", "30", "90", "365"].includes(period) ||
+      (at !== undefined && !validTimestamp(at)) ||
+      (period === "all" && at !== undefined) ||
+      (period !== "all" && filters.cursor && !filters.cursor.asOf) ||
+      (filters.at && filters.cursor?.asOf && filters.at !== filters.cursor.asOf)
+    )
+      throw new AppError("Invalid inbox window", 400, "INVALID_CURSOR");
+    const contextFor = (asOf?: string) =>
+      createHash("sha256")
+        .update(
+          JSON.stringify([
+            period === "all" ? 1 : 2,
+            "notification-inbox",
+            recipientId,
+            filters.query,
+            filters.state,
+            filters.category,
+            ...(period === "all" ? [] : [period, asOf]),
+          ]),
+        )
+        .digest("hex");
+    if (filters.cursor && filters.cursor.context !== contextFor(at))
       throw new AppError("Inbox context changed", 400, "INVALID_CURSOR");
     return db.transaction(
       async (tx) => {
+        let window: { from: string; until: string } | undefined;
+        if (period !== "all") {
+          const anchor = sql`coalesce(${at ?? null}::timestamptz,statement_timestamp())`;
+          const timestamp = (value: ReturnType<typeof sql>) =>
+            sql<string>`to_char(${value} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`;
+          const [clock] = await tx
+            .select({
+              serverNow: timestamp(sql`statement_timestamp()`),
+              from: timestamp(sql`${anchor} - ${Number(period)} * interval '24 hours'`),
+              until: timestamp(anchor),
+            })
+            .from(sql`(select 1) as inbox_clock`);
+          if (
+            !clock ||
+            !validTimestamp(clock.serverNow) ||
+            !validTimestamp(clock.from) ||
+            !validTimestamp(clock.until)
+          )
+            throw new AppError("Inbox clock unavailable", 503, "INTERNAL_ERROR");
+          if (clock.until > clock.serverNow || clock.from > clock.until)
+            throw new AppError("Inbox window is in the future", 400, "INVALID_CURSOR");
+          window = { from: clock.from, until: clock.until };
+        }
+        const context = contextFor(window?.until);
         const pattern = filters.query ? containsPattern(filters.query) : undefined;
         const newer = filters.cursor?.direction === "newer";
         const rows = await tx
@@ -62,6 +111,9 @@ export class NotificationRepository {
           .where(
             and(
               eq(notifications.recipientId, recipientId),
+              window
+                ? sql`${notifications.createdAt} >= ${window.from}::timestamptz AND ${notifications.createdAt} <= ${window.until}::timestamptz`
+                : undefined,
               filters.state === "unread"
                 ? sql`${notifications.isRead} = false`
                 : filters.state === "read"
@@ -103,6 +155,7 @@ export class NotificationRepository {
                 context,
                 direction,
                 version: 1,
+                ...(window ? { asOf: window.until } : {}),
               })
             : null;
         return {
@@ -110,6 +163,7 @@ export class NotificationRepository {
           unreadCount: unread?.total ?? 0,
           olderCursor: point(items.at(-1), "older", newer ? !!filters.cursor : rows.length > 25),
           newerCursor: point(items[0], "newer", newer ? rows.length > 25 : !!filters.cursor),
+          ...(window ? { window } : {}),
         };
       },
       { isolationLevel: "repeatable read", accessMode: "read only" },

@@ -43,10 +43,133 @@ const row = (id: string, time = "2026-10-11T00:00:00.123456Z") => [
   false,
   time,
 ];
+const asOf = "2026-10-13T00:00:00.123456Z",
+  windowFrom = "2026-10-06T00:00:00.123456Z";
+const periodHash = (period = "7", anchor = asOf, actor = "actor") =>
+  createHash("sha256")
+    .update(JSON.stringify([2, "notification-inbox", actor, "", "all", "all", period, anchor]))
+    .digest("hex");
 beforeEach(() => {
   state.queries = [];
   state.rows = [];
   state.options = [];
+});
+it.each(["7", "30", "90", "365"] as const)(
+  "anchors period %s in a single read-only database snapshot without host-clock arithmetic",
+  async (period) => {
+    state.rows = [
+      [[asOf, windowFrom, asOf]],
+      Array.from({ length: 26 }, (_, n) => row(`id_${26 - n}`)),
+      [["30"]],
+    ];
+    const page = await repo.pageInbox("actor", { ...filters, period });
+    expect(page.window).toEqual({ from: windowFrom, until: asOf });
+    expect(page.items).toHaveLength(25);
+    expect(page.unreadCount).toBe(30);
+    expect(JSON.parse(page.olderCursor ?? "")).toMatchObject({
+      context: periodHash(period),
+      asOf,
+      version: 1,
+    });
+    expect(state.options).toEqual([{ isolationLevel: "repeatable read", accessMode: "read only" }]);
+    expect(state.queries).toHaveLength(3);
+    expect(state.queries[0].sql).toContain("statement_timestamp()");
+    expect(state.queries[0].sql).toContain("interval '24 hours'");
+    expect(state.queries[0].params).toEqual([null, Number(period), null]);
+    expect(state.queries[1].params).toEqual(["actor", windowFrom, asOf, 26]);
+    expect(state.queries[1].sql).toMatch(/>= .*::timestamptz.*<= .*::timestamptz/);
+    expect(state.queries[2].params).toEqual(["actor"]);
+    expect(state.queries[2].sql).not.toContain("timestamptz");
+  },
+);
+it.each(["older", "newer"] as const)(
+  "retains the original period through %s navigation after the database clock advances",
+  async (direction) => {
+    const later = "2026-10-14T00:00:00.123456Z";
+    state.rows = [[[later, windowFrom, asOf]], [row("one")], [["2"]]];
+    const cursor = {
+      id: "anchor",
+      createdAt: "2026-10-11T00:00:00.123456Z",
+      direction,
+      context: periodHash(),
+      asOf,
+    };
+    const page = await repo.pageInbox("actor", { ...filters, period: "7", cursor });
+    expect(page.window).toEqual({ from: windowFrom, until: asOf });
+    expect(state.queries[0].params).toEqual([asOf, 7, asOf]);
+    expect(state.queries[1].params).toEqual([
+      "actor",
+      windowFrom,
+      asOf,
+      cursor.createdAt,
+      "anchor",
+      26,
+    ]);
+  },
+);
+it("uses an explicit first-page anchor for export without depending on a cursor row", async () => {
+  state.rows = [[[asOf, windowFrom, asOf]], [], [["0"]]];
+  expect((await repo.pageInbox("actor", { ...filters, period: "7", at: asOf })).window).toEqual({
+    from: windowFrom,
+    until: asOf,
+  });
+  expect(state.queries[0].params).toEqual([asOf, 7, asOf]);
+  expect(state.queries[1].sql).not.toContain('("notifications"."created_at","notifications"."id")');
+});
+it.each(["period", "anchor", "actor", "missing-anchor", "different-at"])(
+  "rejects a changed %s cursor context before SQL",
+  async (change) => {
+    const cursor = {
+      id: "anchor",
+      createdAt: asOf,
+      direction: "older" as const,
+      context: periodHash(),
+      asOf:
+        change === "missing-anchor"
+          ? undefined
+          : change === "anchor"
+            ? "2026-10-13T00:00:00.123455Z"
+            : asOf,
+    };
+    await expect(
+      repo.pageInbox(change === "actor" ? "foreign" : "actor", {
+        ...filters,
+        period: change === "period" ? "30" : "7",
+        cursor,
+        ...(change === "different-at" ? { at: "2026-10-13T00:00:00.123455Z" } : {}),
+      }),
+    ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
+    expect(state.queries).toHaveLength(0);
+  },
+);
+it("rejects a future anchored period before selecting private messages or unread counts", async () => {
+  state.rows = [[["2026-10-13T00:00:00.123455Z", windowFrom, asOf]]];
+  await expect(
+    repo.pageInbox("actor", { ...filters, period: "7", at: asOf }),
+  ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
+  expect(state.queries).toHaveLength(1);
+});
+it.each([{ period: "1" }, { period: "all", at: asOf }, { period: "7", at: "bad" }])(
+  "fails invalid window scope %j before SQL",
+  async (input) => {
+    await expect(
+      repo.pageInbox("actor", { ...filters, ...input } as Parameters<typeof repo.pageInbox>[1]),
+    ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
+    expect(state.queries).toHaveLength(0);
+  },
+);
+it.each(
+  [
+    [null, windowFrom, asOf],
+    [asOf, "bad", asOf],
+    [asOf, windowFrom, null],
+  ].map((clock) => ({ clock })),
+)("refuses invalid database-clock metadata %# without reading the inbox", async ({ clock }) => {
+  state.rows = [[clock]];
+  await expect(repo.pageInbox("actor", { ...filters, period: "7" })).rejects.toMatchObject({
+    code: "INTERNAL_ERROR",
+  });
+  expect(state.queries).toHaveLength(1);
 });
 it("bounds two read queries in a read-only snapshot with deterministic exact ordering", async () => {
   state.rows = [Array.from({ length: 26 }, (_, n) => row(`id_${26 - n}`)), [["27"]]];

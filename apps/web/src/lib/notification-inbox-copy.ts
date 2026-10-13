@@ -15,6 +15,16 @@ const en = {
   reset: "Reset",
   state: "Reading status",
   category: "Category",
+  period: "Period",
+  period7: "Last 7 days",
+  period30: "Last 30 days",
+  period90: "Last 90 days",
+  period365: "Last 365 days",
+  window: "Fixed period (UTC)",
+  export: "Export this page as JSON",
+  exportHelp:
+    "Exports up to 25 saved notifications under these filters, not only the selection. Links and internal delivery data are omitted.",
+  exportTooLarge: "This page is too large to export. Narrow your filters and try again.",
   all: "All",
   read: "Read",
   unread: "Unread",
@@ -68,6 +78,16 @@ const ru: typeof en = {
   reset: "Сбросить",
   state: "Прочитанное состояние",
   category: "Категория",
+  period: "Период",
+  period7: "За 7 дней",
+  period30: "За 30 дней",
+  period90: "За 90 дней",
+  period365: "За 365 дней",
+  window: "Закреплённый период (UTC)",
+  export: "Экспорт этой страницы в JSON",
+  exportHelp:
+    "Экспортирует до 25 сохранённых уведомлений под текущими фильтрами, а не только выбранные. Ссылки и внутренние данные доставки не включаются.",
+  exportTooLarge: "Эта страница слишком велика для экспорта. Уточните фильтры и попробуйте снова.",
   all: "Все",
   read: "Прочитанные",
   unread: "Непрочитанные",
@@ -126,6 +146,8 @@ export function notificationInboxError(locale: Locale, code: unknown) {
       return copy.invalid;
     case "RATE_LIMIT_EXCEEDED":
       return copy.limited;
+    case "EXPORT_TOO_LARGE":
+      return copy.exportTooLarge;
     default:
       return copy.unavailable;
   }

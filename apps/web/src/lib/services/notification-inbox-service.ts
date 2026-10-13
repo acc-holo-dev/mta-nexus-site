@@ -8,6 +8,7 @@ import {
   INBOX_CATEGORIES,
   type NotificationInboxQuery,
   notificationInboxCommandSchema,
+  notificationInboxPageSchema,
 } from "../notification-inbox-contract";
 
 function safeLink(value: string | null) {
@@ -50,6 +51,35 @@ class NotificationInboxService {
         };
       }),
     };
+  }
+  async exportPage(actorId: string, filters: NotificationInboxQuery, locale: Locale) {
+    const page = notificationInboxPageSchema.parse(await this.page(actorId, filters, locale));
+    const report = {
+      version: 1,
+      scope: "notification-inbox-page",
+      locale,
+      filters: {
+        query: filters.query,
+        state: filters.state,
+        category: filters.category,
+        period: filters.period ?? "all",
+      },
+      window: page.window ?? null,
+      items: page.items.map(({ id, title, message, category, isRead, createdAt, truncated }) => ({
+        id,
+        title,
+        message,
+        category,
+        isRead,
+        createdAt,
+        truncated,
+      })),
+      hasOlder: !!page.olderCursor,
+      hasNewer: !!page.newerCursor,
+    };
+    if (Buffer.byteLength(JSON.stringify(report), "utf8") > 1024 * 1024)
+      throw new AppError("Inbox export exceeds byte limit", 413, "EXPORT_TOO_LARGE");
+    return report;
   }
   async command(actorId: string, value: z.infer<typeof notificationInboxCommandSchema>) {
     const parsed = notificationInboxCommandSchema.safeParse(value);

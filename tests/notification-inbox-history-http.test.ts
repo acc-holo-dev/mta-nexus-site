@@ -50,7 +50,14 @@ it("authenticates the history and keeps its response private with filters and lo
   expect(response.headers.get("vary")).toBe("Cookie");
   expect(state.page).toHaveBeenCalledWith(
     "actor",
-    { query: "word", state: "unread", category: "content", cursor: undefined },
+    {
+      query: "word",
+      state: "unread",
+      category: "content",
+      period: "all",
+      at: undefined,
+      cursor: undefined,
+    },
     "ru",
   );
 });

@@ -38,7 +38,7 @@ export function NotificationInbox({
   }, []);
   const readHref = notificationInboxHref(
     "/api/notifications/inbox",
-    filters,
+    { ...filters, at: page.window?.until ?? filters.at },
     filters.cursor ? JSON.stringify(filters.cursor) : undefined,
   );
   async function read(signal: AbortSignal) {
@@ -142,12 +142,45 @@ export function NotificationInbox({
     }
   }
   const disabled = busy || blocked;
+  const displayDate = (value: string) =>
+    new Intl.DateTimeFormat(locale === "ru" ? "ru-RU" : "en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone: "UTC",
+    }).format(new Date(value));
   return (
     <section className="space-y-4" aria-busy={busy} aria-label={copy.title}>
       <p className="text-sm text-muted">
         {copy.totalUnread}: <strong className="text-primary">{page.unreadCount}</strong>
       </p>
       <p className="text-xs text-muted">{copy.live}</p>
+      {page.window && (
+        <p className="text-xs text-muted">
+          {copy.window}: <time dateTime={page.window.from}>{displayDate(page.window.from)}</time>
+          {" — "}
+          <time dateTime={page.window.until}>{displayDate(page.window.until)}</time>
+        </p>
+      )}
+      <div className="nexus-panel space-y-2 p-4">
+        {busy || blocked ? (
+          <span aria-disabled="true" className="text-sm text-muted">
+            {copy.export}
+          </span>
+        ) : (
+          <a
+            href={notificationInboxHref(
+              "/api/notifications/inbox/export",
+              { ...filters, at: page.window?.until ?? filters.at },
+              filters.cursor ? JSON.stringify(filters.cursor) : undefined,
+            )}
+            download="nexus-notification-page.json"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          >
+            {copy.export}
+          </a>
+        )}
+        <p className="text-xs text-muted">{copy.exportHelp}</p>
+      </div>
       {busy && (
         <p role="status" className="text-sm text-muted">
           {copy.loading}
@@ -215,7 +248,11 @@ export function NotificationInbox({
       </div>
       {!page.items.length && (
         <p className="nexus-panel p-6 text-sm text-muted">
-          {filters.cursor || filters.query || filters.category !== "all" || filters.state !== "all"
+          {filters.cursor ||
+          filters.query ||
+          filters.category !== "all" ||
+          filters.state !== "all" ||
+          (filters.period && filters.period !== "all")
             ? copy.emptyFiltered
             : copy.empty}
         </p>

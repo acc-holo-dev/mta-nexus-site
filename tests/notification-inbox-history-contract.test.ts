@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   confirmedNotificationInboxCommand,
   INBOX_CATEGORIES,
+  INBOX_PERIODS,
   notificationInboxCommandSchema,
   notificationInboxHref,
   notificationInboxPageSchema,
@@ -15,6 +16,82 @@ const point = {
   direction: "older",
   version: 1,
 };
+const asOf = "2026-10-13T09:00:00.123456Z";
+it.each(INBOX_PERIODS)("round trips the supported inbox period %s", (period) => {
+  const filters = parseNotificationInboxQuery(new URLSearchParams({ period }));
+  expect(filters?.period).toBe(period);
+  if (!filters) throw Error("Missing filters");
+  expect(
+    parseNotificationInboxQuery(
+      new URL(notificationInboxHref("/notifications", filters), "https://nexus.test").searchParams,
+    ),
+  ).toEqual(filters);
+});
+it("carries a fixed period through cursors and allows exporting its first page with the same anchor", () => {
+  const cursor = { ...point, asOf };
+  const filters = parseNotificationInboxQuery(
+    new URLSearchParams({ period: "7", at: asOf, cursor: JSON.stringify(cursor) }),
+  );
+  expect(filters).toMatchObject({ period: "7", at: asOf, cursor });
+  if (!filters) throw Error("Missing filters");
+  expect(
+    parseNotificationInboxQuery(
+      new URL(
+        notificationInboxHref("/notifications", filters, JSON.stringify(cursor)),
+        "https://nexus.test",
+      ).searchParams,
+    ),
+  ).toEqual(filters);
+  expect(notificationInboxHref("/notifications", { ...filters, at: undefined })).not.toContain(
+    "at=",
+  );
+  expect(parseNotificationInboxQuery(new URLSearchParams({ period: "7", at: asOf }))).toMatchObject(
+    { period: "7", at: asOf },
+  );
+});
+it.each([
+  { period: "0" },
+  { period: "1" },
+  { period: "366" },
+  { period: "7.0" },
+  { period: "" },
+  { period: "all", at: asOf },
+  { period: "7", at: "2026-10-13T09:00:00.123Z" },
+  { period: "7", at: "2026-02-30T09:00:00.123456Z" },
+  { period: "7", at: "0000-01-01T00:00:00.000000Z" },
+  { period: "7", cursor: JSON.stringify(point) },
+  { period: "all", cursor: JSON.stringify({ ...point, asOf }) },
+  {
+    period: "7",
+    at: asOf,
+    cursor: JSON.stringify({ ...point, asOf: "2026-10-13T09:00:00.123455Z" }),
+  },
+])("rejects inconsistent or unbounded period/anchor query %j", (query) => {
+  expect(
+    parseNotificationInboxQuery(new URLSearchParams(query as Record<string, string>)),
+  ).toBeNull();
+});
+it.each(["period=7&period=30", `period=7&at=${asOf}&at=${asOf}`])(
+  "rejects duplicate window filters %s",
+  (query) => {
+    expect(parseNotificationInboxQuery(new URLSearchParams(query))).toBeNull();
+  },
+);
+it("validates exact ordered window metadata without extra private fields", () => {
+  const page = { items: [], unreadCount: 0, olderCursor: null, newerCursor: null };
+  expect(
+    notificationInboxPageSchema.safeParse({
+      ...page,
+      window: { from: point.createdAt, until: asOf },
+    }).success,
+  ).toBe(true);
+  for (const window of [
+    { from: asOf, until: point.createdAt },
+    { from: point.createdAt, until: "bad" },
+    { from: point.createdAt, until: asOf, recipientId: "PRIVATE" },
+  ])
+    expect(notificationInboxPageSchema.safeParse({ ...page, window }).success).toBe(false);
+});
 describe("notification inbox navigation and commands", () => {
   it("normalizes a query and round trips a filter-bound exact cursor", () => {
     const input = parseNotificationInboxQuery(

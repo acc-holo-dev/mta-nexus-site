@@ -38,6 +38,7 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain('name="q"');
     expect(html).toContain('name="category"');
     expect(html).toContain('name="state"');
+    expect(html).toContain('name="period"');
     expect(html).toContain("needle");
     expect(html).toContain(locale === "ru" ? "Выбрать эту страницу" : "Select this page");
     expect(html).toContain(
@@ -47,6 +48,30 @@ it.each(["en", "ru"] as const)(
     expect(renderToStaticMarkup(await Loading())).toContain(
       locale === "ru" ? "Обновление уведомлений" : "Refreshing notifications",
     );
+  },
+);
+it.each(["en", "ru"] as const)(
+  "shows a human UTC period and an anchored bounded export in %s",
+  async (locale) => {
+    state.locale = locale;
+    const from = "2026-10-06T00:00:00.123456Z",
+      until = "2026-10-13T00:00:00.123456Z";
+    state.page.mockResolvedValue({
+      items: [],
+      unreadCount: 0,
+      olderCursor: null,
+      newerCursor: null,
+      window: { from, until },
+    });
+    const html = await render({ period: "7", at: until });
+    expect(html).toContain(locale === "ru" ? "Закреплённый период (UTC)" : "Fixed period (UTC)");
+    expect(html).toContain(`dateTime="${from}"`);
+    expect(html).toContain('download="nexus-notification-page.json"');
+    expect(html).toContain(
+      `/api/notifications/inbox/export?period=7&amp;at=${encodeURIComponent(until)}`,
+    );
+    expect(html).toContain(locale === "ru" ? "а не только выбранные" : "not only the selection");
+    expect(html).toContain('href="/notifications?period=7"');
   },
 );
 it("shows sign-in when the session is absent without reading another inbox", async () => {

@@ -1,5 +1,12 @@
 # MTA NEXUS
 
+The notification center now filters history over fixed 7/30/90/365-day UTC windows.
+Window boundaries use database time and travel with older/newer cursors; latest resets
+the anchor while existing unbounded history links keep working. Private JSON export
+returns one current page (up to 25 notices, 1 MiB) with localized visible text and read
+state, omitting destination links and internal delivery data. See
+[Operations](docs/OPERATIONS.md#notification-history-periods-and-page-export).
+
 Discussion recovery now offers a bounded `--dry-run` source preview in a read-only
 database snapshot, without checkpoint access or notification/push writes. Delivery
 and preview reject windows ending after PostgreSQL time. Workers retry recognized

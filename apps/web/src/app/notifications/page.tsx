@@ -6,6 +6,7 @@ import { NotificationInbox } from "../../components/notification-inbox";
 import { getRequestLocale } from "../../lib/i18n-server";
 import {
   INBOX_CATEGORIES,
+  INBOX_PERIODS,
   notificationInboxHref,
   parseNotificationInboxQuery,
 } from "../../lib/notification-inbox-contract";
@@ -116,6 +117,20 @@ export default async function NotificationCenterPage({
               ))}
             </select>
           </label>
+          <label className="space-y-1 text-xs text-muted">
+            {copy.period}
+            <select
+              name="period"
+              defaultValue={filters?.period ?? "all"}
+              className="nexus-input block min-h-11"
+            >
+              {INBOX_PERIODS.map((period) => (
+                <option key={period} value={period}>
+                  {period === "all" ? copy.all : copy[`period${period}`]}
+                </option>
+              ))}
+            </select>
+          </label>
           <button
             type="submit"
             className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
@@ -132,7 +147,11 @@ export default async function NotificationCenterPage({
       )}
       <Link
         prefetch={false}
-        href={filters ? notificationInboxHref("/notifications", filters) : "/notifications"}
+        href={
+          filters
+            ? notificationInboxHref("/notifications", { ...filters, at: undefined })
+            : "/notifications"
+        }
         className="inline-flex min-h-11 items-center text-sm text-accent underline"
       >
         {copy.latest}

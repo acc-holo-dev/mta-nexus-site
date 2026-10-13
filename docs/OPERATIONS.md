@@ -919,6 +919,44 @@ Required properties include:
 
 Paid commerce remains disabled.
 
+### Notification history periods and page export
+
+`/notifications` offers All, 7, 30, 90 and 365-day periods alongside literal stored-text
+search, category and reading-state filters. A limited period starts at PostgreSQL
+statement time and includes both boundaries, with each day equal to 24 hours.
+Older/newer navigation, saved-state reload and page export retain those exact UTC
+boundaries. Latest matching notifications and submitting the filter form open a new
+window. The displayed dates are localized; machine timestamps/cursors retain six
+fractional digits. This fixes the date window, not a snapshot of contents/read flags
+across requests: later edits, deletion or backdated rows can still change results.
+The global unread counter and explicit whole-inbox mark-read scope remain global.
+
+GET `/api/notifications/inbox` accepts optional `period=all|7|30|90|365` and `at`
+(an exact UTC timestamp). `at` is only valid for limited periods; future anchors are
+rejected. Limited-period cursors carry `asOf` and bind the account, normalized filters,
+period and anchor. A supplied `at` must match the cursor's `asOf`. Existing All-history
+cursor contexts stay compatible. Each limited page performs a clock query, bounded
+25+1 row query and global unread count in one read-only repeatable-read transaction.
+No new schema/index is introduced; inspect actual plans before claiming performance.
+
+The Export this page as JSON link reads GET `/api/notifications/inbox/export` under the
+same authentication, filters and shared history search-rate key. It retains the current
+period anchor even on the first page. The file is generated from current saved state,
+not a frozen browser copy or the selected-only list. It contains version/scope/locale,
+normalized filters, period boundaries if present, up to 25 localized presentation items,
+and older/newer availability booleans. Notice IDs, visible text, category, read flags,
+timestamps and truncation flags are included; destination URLs, recipient IDs, raw
+notification JSON, push/device data, cursor contexts and global counts are omitted.
+Exports never mark anything read and cannot replay or import notifications.
+
+The response uses private/no-store, Cookie variance, nosniff and a fixed JSON attachment
+filename. Actual UTF-8 JSON bytes are limited to 1 MiB; oversize returns localized 413
+`EXPORT_TOO_LARGE`, without partial output or an attachment success header. Narrow the
+filters if needed. Auth/rate/query/database errors also remain private failures.
+The client disables export while a reading update is pending or unconfirmed; reload
+saved state before making another change or exporting. Downloads require an actual
+browser check; SQL isolation/time-boundary execution requires disposable PostgreSQL.
+
 ### Recovering discussion inbox delivery
 
 Run from the repository with the target database environment loaded:

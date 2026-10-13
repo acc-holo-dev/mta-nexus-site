@@ -90,6 +90,59 @@ it("traverses more than 100 own equal-time notifications in both directions with
     ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
   });
 });
+it("pins inclusive seven-day boundaries to database time across pages and rejects changed/future anchors without reading flags", async () => {
+  await fixture(async (tx) => {
+    const [clock] = await tx.execute(sql`select
+      to_char(statement_timestamp() at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as anchor,
+      to_char((statement_timestamp() - interval '7 days') at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as start,
+      to_char((statement_timestamp() + interval '1 day') at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as future`);
+    const at = clock.anchor as string,
+      from = clock.start as string;
+    await tx.execute(sql`insert into notifications (id,recipient_id,title,message,created_at) values
+      ('upper','actor','Boundary','Message',${at}::timestamptz),
+      ('lower','actor','Boundary','Message',${from}::timestamptz),
+      ('past','actor','Excluded','Message',${from}::timestamptz - interval '1 microsecond'),
+      ('later','actor','Excluded','Message',${at}::timestamptz + interval '1 microsecond'),
+      ('foreign','other','Private','Private',${at}::timestamptz)`);
+    await tx.execute(sql`insert into notifications (id,recipient_id,title,message,created_at)
+      select 'inside_' || lpad(n::text,2,'0'),'actor','Inside','Message',${at}::timestamptz - n * interval '1 minute' from generate_series(1,30) n`);
+    const query = { ...filters, period: "7" as const, at };
+    const first = await repository.pageInbox("actor", query);
+    expect(first.window).toEqual({ from, until: at });
+    expect(first.items).toHaveLength(25);
+    expect(first.unreadCount).toBe(34);
+    const cursor = JSON.parse(first.olderCursor ?? "");
+    expect(cursor.asOf).toBe(at);
+    const second = await repository.pageInbox("actor", { ...filters, period: "7", cursor });
+    expect(second.window).toEqual(first.window);
+    const seen = [...first.items, ...second.items].map((item) => item.id);
+    expect(seen).toHaveLength(32);
+    expect(new Set(seen).size).toBe(32);
+    expect(seen).toContain("upper");
+    expect(seen).toContain("lower");
+    expect(seen).not.toContain("past");
+    expect(seen).not.toContain("later");
+    expect(seen).not.toContain("foreign");
+    expect(
+      (
+        await repository.pageInbox("actor", {
+          ...filters,
+          period: "7",
+          cursor: JSON.parse(second.newerCursor ?? ""),
+        })
+      ).items.map((item) => item.id),
+    ).toEqual(first.items.map((item) => item.id));
+    await expect(
+      repository.pageInbox("actor", { ...query, period: "30", cursor }),
+    ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
+    await expect(
+      repository.pageInbox("actor", { ...query, at: clock.future as string }),
+    ).rejects.toMatchObject({ code: "INVALID_CURSOR" });
+    expect((await repository.pageInbox("actor", query)).items.every((item) => !item.isRead)).toBe(
+      true,
+    );
+  });
+});
 it("filters literal search and category, bounds legacy Unicode text and preserves unknown structured data privately", async () => {
   await fixture(async (tx) => {
     await tx.execute(

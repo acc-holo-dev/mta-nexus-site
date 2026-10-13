@@ -1,5 +1,36 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Fixed notification-history periods and private page export — 2026-10-13
+
+The notification center now has All/7/30/90/365-day filters in RU/EN. Limited windows
+use exact PostgreSQL statement time and inclusive UTC boundaries; cursor/explicit
+first-page anchors keep those bounds through navigation, reload and export. Context
+binds actor/search/state/category/period/anchor, rejects mismatch/future dates and keeps
+previous All-history cursors compatible. Contents/read flags remain live across requests;
+this fixes a date range, not a persistent snapshot. Existing unread counts and explicit
+whole-inbox marking retain global scope. Queries use current recipient/time/id indexes
+without migration and run in read-only repeatable-read snapshots.
+
+Own JSON-page export reuses localized bounded presentation data, returns up to 25
+items and verifies a one-MiB UTF-8 JSON limit. It includes notice IDs/text/category/read
+flags/timestamps/truncation plus filters/window and continuation booleans. Destination
+links, recipients, raw payloads, push data and cursor context are absent. The endpoint
+shares the history read rate budget and private headers, applies a fixed attachment
+name only on success and never changes read state. Pending/uncertain client mutations
+disable download until saved-state reload. Empty results remain valid; database failures
+cannot become fake empty exports. Operations documents invocation and current limits.
+
+After preserving Agent A's release-drift collection inventory, 594 focused tests across
+34 files plus four runner guard/report checks pass; root and
+application TypeScript pass on Node 26.10.0. Tests cover exact cursor/window context,
+clock/future/error handling, old history compatibility, Unicode/escaping byte bounds,
+privacy/download headers/auth/rate failures and RU/EN/saved-state UI behavior. A real
+PostgreSQL fixture adds inclusive lower/upper microsecond edges, foreign ownership,
+two-way pagination, fixed anchors and unchanged read flags. It remains unrun under the
+documented hosted-runner startup blocker. The scoped recovery gate now includes this
+history suite (eight suites total); PostgreSQL/query plans and real browser download
+acceptance remain OPEN. This block does not repair delivery or add schema/DDL.
+
 ### Discussion replay read-only preview and permanent-error shutdown — 2026-10-13
 
 The recovery CLI now accepts `--dry-run` in ordinary inbox and pending-push repair

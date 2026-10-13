@@ -272,6 +272,19 @@ clean-scanned version submissions, API approval/rejection by a moderator, author
 review notes, RU/mobile layout and final-public-version retirement. Existing claim and
 64 MiB download acceptance remains in the same run. It does not test external mail delivery.
 
+## Notification history periods and page export
+
+The private notification center also supports bounded history periods and one-page
+JSON export. Limited periods use exact database-time UTC anchors, 24-hour day arithmetic
+and inclusive bounds; cursor context includes account/filters/period/anchor. The older
+All-history context remains compatible. Every request is a read-only repeatable-read
+snapshot, while only the date window stays fixed across navigation; contents/read state
+remain live. Global unread counts and whole-inbox mutations keep their existing scope.
+Exports reuse presentation localization/limits and current own reads, return at most
+25 items and 1 MiB of UTF-8 JSON, and omit raw data/recipient/destination/push metadata.
+No delivery, read-state mutation or new schema is involved. Operations contains the
+query/cursor/download contract and actual PostgreSQL/browser verification limits.
+
 ## Build review notifications
 
 Build approval/rejection now inserts system notifications in the same PostgreSQL

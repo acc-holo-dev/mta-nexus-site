@@ -8,6 +8,7 @@ export const INBOX_CATEGORIES = [
   "system",
   "security",
 ] as const;
+export const INBOX_PERIODS = ["all", "7", "30", "90", "365"] as const;
 const id = z
   .string()
   .min(1)
@@ -23,25 +24,31 @@ const cursorSchema = discussionCursorSchema
     context: z.string().regex(/^[a-f0-9]{64}$/u),
     direction: z.enum(["older", "newer"]),
     version: z.literal(1),
+    asOf: discussionCursorSchema.shape.createdAt
+      .refine((value) => /\.\d{6}Z$/u.test(value))
+      .optional(),
   })
   .strict();
 export function parseNotificationInboxQuery(params: URLSearchParams) {
   if (
     [...params.keys()].some(
       (key) =>
-        !["q", "state", "category", "cursor"].includes(key) || params.getAll(key).length !== 1,
+        !["q", "state", "category", "period", "at", "cursor"].includes(key) ||
+        params.getAll(key).length !== 1,
     )
   )
     return null;
   const raw = params.get("q") ?? "",
     query = raw.trim(),
     state = params.get("state") || "all",
-    category = params.get("category") || "all";
+    category = params.get("category") || "all",
+    period = params.get("period") ?? "all";
   if (
     raw.length > 100 ||
     Array.from(raw).some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127) ||
     !["all", "read", "unread"].includes(state) ||
-    (category !== "all" && !(INBOX_CATEGORIES as readonly string[]).includes(category))
+    (category !== "all" && !(INBOX_CATEGORIES as readonly string[]).includes(category)) ||
+    !(INBOX_PERIODS as readonly string[]).includes(period)
   )
     return null;
   let cursor: z.infer<typeof cursorSchema> | undefined;
@@ -56,16 +63,30 @@ export function parseNotificationInboxQuery(params: URLSearchParams) {
       return null;
     }
   }
+  let at: string | undefined;
+  if (params.has("at")) {
+    const parsed = cursorSchema.shape.createdAt.safeParse(params.get("at"));
+    if (!parsed.success || parsed.data.startsWith("0000")) return null;
+    at = parsed.data;
+  }
+  if (
+    (period === "all" && (at !== undefined || cursor?.asOf !== undefined)) ||
+    (period !== "all" && cursor && !cursor.asOf) ||
+    (cursor?.asOf && (cursor.asOf.startsWith("0000") || (at !== undefined && at !== cursor.asOf)))
+  )
+    return null;
   return {
     query,
     state: state as "all" | "read" | "unread",
     category: category as "all" | (typeof INBOX_CATEGORIES)[number],
     cursor,
+    period: period as (typeof INBOX_PERIODS)[number],
+    at,
   };
 }
 type ParsedQuery = NonNullable<ReturnType<typeof parseNotificationInboxQuery>>;
-export type NotificationInboxQuery = Omit<ParsedQuery, "cursor"> &
-  Partial<Pick<ParsedQuery, "cursor">>;
+export type NotificationInboxQuery = Omit<ParsedQuery, "cursor" | "period" | "at"> &
+  Partial<Pick<ParsedQuery, "cursor" | "period" | "at">>;
 export function notificationInboxHref(
   path: string,
   filters: NotificationInboxQuery,
@@ -75,6 +96,8 @@ export function notificationInboxHref(
   if (filters.query) params.set("q", filters.query);
   if (filters.state !== "all") params.set("state", filters.state);
   if (filters.category !== "all") params.set("category", filters.category);
+  if (filters.period && filters.period !== "all") params.set("period", filters.period);
+  if (filters.at && filters.period && filters.period !== "all") params.set("at", filters.at);
   if (cursor) params.set("cursor", cursor);
   return `${path}${params.size ? `?${params}` : ""}`;
 }
@@ -109,6 +132,14 @@ export const notificationInboxPageSchema = z
     unreadCount: z.number().int().nonnegative(),
     olderCursor: z.string().max(2048).nullable(),
     newerCursor: z.string().max(2048).nullable(),
+    window: z
+      .object({
+        from: cursorSchema.shape.createdAt,
+        until: cursorSchema.shape.createdAt,
+      })
+      .strict()
+      .refine((value) => value.from <= value.until)
+      .optional(),
   })
   .strict();
 export type NotificationInboxPage = z.infer<typeof notificationInboxPageSchema>;

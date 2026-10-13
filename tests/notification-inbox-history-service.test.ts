@@ -95,3 +95,104 @@ it("rejects an unbounded command before the repository", async () => {
   ).rejects.toMatchObject({ code: "VALIDATION_ERROR" });
   expect(state.command).not.toHaveBeenCalled();
 });
+it.each(["ru", "en"] as const)(
+  "exports a localized explicit own page in %s without private payloads, destination tokens or cursor context",
+  async (locale) => {
+    const window = { from: "2026-10-06T00:00:00.123456Z", until: "2026-10-13T00:00:00.123456Z" };
+    state.page.mockResolvedValue({
+      items: [
+        {
+          ...item,
+          recipientId: "PRIVATE_RECIPIENT",
+          link: "/destination?secret=PRIVATE_LINK",
+          data: { PRIVATE_PUSH_DATA: "secret" },
+        },
+      ],
+      window,
+      unreadCount: 1,
+      olderCursor: "PRIVATE_CONTEXT",
+      newerCursor: null,
+    });
+    const query = { ...filters, period: "7" as const, at: window.until };
+    const result = await notificationInboxService.exportPage("actor", query, locale);
+    expect(state.page).toHaveBeenCalledExactlyOnceWith("actor", query);
+    expect(state.command).not.toHaveBeenCalled();
+    expect(result).toMatchObject({
+      version: 1,
+      scope: "notification-inbox-page",
+      locale,
+      filters: { ...filters, period: "7" },
+      window,
+      hasOlder: true,
+      hasNewer: false,
+    });
+    expect(result.items[0].title).toBe(
+      locale === "ru" ? "Реакция на публикацию" : "Publication reaction",
+    );
+    expect(Object.keys(result.items[0])).toEqual([
+      "id",
+      "title",
+      "message",
+      "category",
+      "isRead",
+      "createdAt",
+      "truncated",
+    ]);
+    expect(JSON.stringify(result)).not.toMatch(/PRIVATE|recipientId|link|data|unreadCount|Cursor/);
+  },
+);
+it("exports a valid empty page without inventing notices or a selected-only scope", async () => {
+  state.page.mockResolvedValue({
+    items: [],
+    unreadCount: 99,
+    olderCursor: null,
+    newerCursor: "next",
+  });
+  expect(await notificationInboxService.exportPage("actor", filters, "en")).toMatchObject({
+    items: [],
+    window: null,
+    hasOlder: false,
+    hasNewer: true,
+    filters: { period: "all" },
+  });
+});
+it("requires the bounded canonical page contract before exporting unexpected repository data", async () => {
+  state.page.mockResolvedValue({
+    items: Array.from({ length: 26 }, (_, n) => ({ ...item, id: String(n) })),
+    unreadCount: 26,
+    olderCursor: null,
+    newerCursor: null,
+  });
+  await expect(notificationInboxService.exportPage("actor", filters, "en")).rejects.toThrow();
+});
+it("retains Unicode/truncation proof within the byte budget and rejects worst-case JSON escaping above one MiB", async () => {
+  state.page.mockResolvedValue({
+    items: Array.from({ length: 25 }, (_, n) => ({
+      ...item,
+      id: String(n),
+      title: "😀".repeat(512),
+      message: "😀".repeat(8192),
+    })),
+    unreadCount: 25,
+    olderCursor: null,
+    newerCursor: null,
+  });
+  const unicode = await notificationInboxService.exportPage("actor", filters, "en");
+  expect(Buffer.byteLength(JSON.stringify(unicode), "utf8")).toBeLessThanOrEqual(1024 * 1024);
+  expect(JSON.stringify(unicode)).not.toContain("\uFFFD");
+  state.page.mockResolvedValue({
+    items: Array.from({ length: 25 }, (_, n) => ({
+      ...item,
+      id: String(n),
+      title: "Legacy",
+      message: "\u0001".repeat(8192),
+    })),
+    unreadCount: 25,
+    olderCursor: null,
+    newerCursor: null,
+  });
+  await expect(notificationInboxService.exportPage("actor", filters, "en")).rejects.toMatchObject({
+    statusCode: 413,
+    code: "EXPORT_TOO_LARGE",
+  });
+});

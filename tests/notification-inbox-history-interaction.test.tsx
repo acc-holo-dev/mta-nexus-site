@@ -97,6 +97,27 @@ afterEach(() => {
   for (const cleanup of harness.cleanups) cleanup();
   vi.unstubAllGlobals();
 });
+it("keeps download read-only and makes it unavailable during an uncertain update until saved-state reload", async () => {
+  const download = () =>
+    render().find(
+      (node) => node.type === "a" && node.props.download === "nexus-notification-page.json",
+    );
+  expect(download()?.props.href).toBe(
+    "/api/notifications/inbox/export?q=topic&state=unread&category=content",
+  );
+  expect(harness.fetch).not.toHaveBeenCalled();
+  harness.fetch
+    .mockReset()
+    .mockResolvedValueOnce(response({ code: "NOTIFICATION_STATE_CHANGED" }, 409))
+    .mockResolvedValueOnce(response(initialPage));
+  click(render(), "Mark as read");
+  expect(download()).toBeUndefined();
+  await vi.waitFor(() => expect(render().some((node) => node.props.role === "alert")).toBe(true));
+  expect(download()).toBeUndefined();
+  click(render(), "Reload saved inbox");
+  await vi.waitFor(() => expect(download()).toBeDefined());
+  expect(harness.announce).not.toHaveBeenCalled();
+});
 it("saves a single observed notification then reads the filtered inbox before showing success", async () => {
   click(render(), "Mark as read");
   await vi.waitFor(() =>

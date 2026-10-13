@@ -16,6 +16,7 @@ on:
       - packages/db/src/schema.ts
       - packages/db/migrations/**
       - tests/discussion-*.integration.test.ts
+      - tests/notification-inbox-history.integration.test.ts
       - tests/web-push-*.integration.test.ts
   workflow_dispatch:
 permissions:
