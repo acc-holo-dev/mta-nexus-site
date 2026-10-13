@@ -1,5 +1,35 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Discussion replay read-only preview and permanent-error shutdown — 2026-10-13
+
+The recovery CLI now accepts `--dry-run` in ordinary inbox and pending-push repair
+policies. A single read-only repeatable-read snapshot checks relation scope and the
+database clock, then fetches at most budget + 1 matching source comments using the
+same bounds/order as delivery. Aggregate output caps the source count, marks remaining
+rows and omits IDs/text/connection values. Preview ignores checkpoint progress/path,
+never calls checkpoint storage or notification dispatch and rejects worker/adoption
+flags. Its source count includes already delivered/ineligible comments; it does not
+estimate recipient eligibility, notices, missing push jobs or guaranteed delivery.
+
+Both modes reject an ending boundary after PostgreSQL statement time at exact
+microsecond precision; delivery checks before checkpoint access and every pass.
+Workers retain exponential backoff for explicit blocked outcomes and recognized
+temporary SQLSTATE/network failures through bounded driver cause wrappers. Thrown
+scope/auth/schema/permission/invariant/unknown errors now exit instead of looping;
+durable checkpoint write failures always stop even with a timeout-like I/O code.
+Logs remain aggregate/redacted and existing progress remains retained. Delayed or
+backdated commits still require a separate overlapping window; no snapshot barrier
+or automatic transactional fan-out is claimed. No schema/migration change is needed.
+
+638 focused checks across 35 files plus four verification-runner safety/report checks,
+root/application TypeScript, changed-source Biome and diff checks pass on Node 26.10.0.
+The additional disposable-PostgreSQL fixture covers tied timestamp ordering, exact
+inclusive microsecond bounds, capped preview counts and no inbox/push writes. It is
+prepared but remains unrun: the documented hosted-runner startup blocker below is
+unresolved. This block is published with `[skip ci]` to avoid repeating that blocked
+startup; live PostgreSQL read-only behavior/query plans and provider delivery remain
+OPEN. Local mock/SQL-builder/filesystem checks are not database acceptance evidence.
+
 ### Dedicated discussion recovery PostgreSQL gate — 2026-10-13
 
 The new scoped GitHub workflow starts a fresh PostgreSQL 18 service, applies current

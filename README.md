@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+Discussion recovery now offers a bounded `--dry-run` source preview in a read-only
+database snapshot, without checkpoint access or notification/push writes. Delivery
+and preview reject windows ending after PostgreSQL time. Workers retry recognized
+temporary database/network failures and stop on scope, permission, schema or checkpoint
+errors. See [Operations](docs/OPERATIONS.md#previewing-a-discussion-recovery-window).
+
 Private collection commands now have stable receipt detail and bounded JSON export.
 Reconciliation receipts offer reviewed inverse additions/removals under current own
 collection state and access. Already restored references stay unchanged, unrelated

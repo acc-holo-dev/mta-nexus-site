@@ -929,8 +929,13 @@ pnpm --filter @nexus/web notifications:replay /durable/checkpoints/discussions.j
 
 The directory must exist on a durable local POSIX filesystem supporting file and
 directory fsync and atomic rename. Both inclusive boundaries use UTC with six
-fractional digits. Choose a window covering interrupted comment requests. Re-run
-the same command/checkpoint until `completed` is true. Each pass handles at most
+fractional digits. Choose a window covering interrupted comment requests.
+The ending boundary must be at or before PostgreSQL's current statement time, checked
+at startup before opening any checkpoint and again before each pass. A future window
+is rejected even if its saved checkpoint says completed. This uses exact microseconds,
+not the host's millisecond clock. The window does not freeze later/backdated commits:
+for delayed writes use a new overlapping completed-time window and inbox deduplication.
+Re-run the same command/checkpoint until `completed` is true. Each pass handles at most
 the requested number of comments (1–10000), in database pages of at most fifty
 rows. A delivery step handles one follower page (fifty recipients) plus up to two
 direct participants, checked again on every step. A partial event ends the pass
@@ -999,8 +1004,14 @@ Append `--worker` after the comment budget to drain the same fixed window:
 pnpm --filter @nexus/web notifications:replay /durable/checkpoints/discussions.json 2026-10-12T00:00:00.000000Z 2026-10-12T06:00:00.000000Z 100 --worker
 ```
 
-Successful incomplete passes wait one second; delivery/database/file failures retry
-with exponential backoff from one second to one minute. Success resets backoff.
+Successful incomplete passes wait one second. Explicit blocked delivery outcomes and
+recognized temporary database/network errors retry with exponential backoff from one
+second to one minute; success resets backoff. Driver/Drizzle cause wrappers are inspected
+without printing their messages. Serialization/deadlock/lock/timeout, temporary server
+capacity/restart and connection failures are retryable. Thrown authentication, missing table or
+column, permission, unknown invariant and filesystem/checkpoint failures stop with
+status 1; a changed scope or regressed database clock also stops before another page.
+Inspect and fix those failures before restarting; the existing checkpoint is retained.
 The worker exits after completion. SIGTERM/SIGINT interrupt waits and stop after the
 active follower page is saved; allow shutdown time for that page and its direct
 participants. A persistent failed event intentionally blocks later comments.
@@ -1014,6 +1025,32 @@ pending-push recovery mode below for new proven failures. Continuous database-ba
 recovery/leases remain coordinated follow-up work with the schema
 owner. Live PostgreSQL and actual power-loss/filesystem acceptance remain separate
 checks from local fault-injection tests.
+
+#### Previewing a discussion recovery window
+
+Append `--dry-run` to the same command; a checkpoint argument is still required for
+consistent CLI syntax but its path is neither read, validated, locked nor created:
+
+```sh
+pnpm --filter @nexus/web notifications:replay /durable/checkpoints/discussions.json 2026-10-12T00:00:00.000000Z 2026-10-12T06:00:00.000000Z 100 --dry-run
+pnpm --filter @nexus/web notifications:replay /durable/checkpoints/discussion-push.json 2026-10-12T00:00:00.000000Z 2026-10-12T06:00:00.000000Z 100 --repair-push --dry-run
+```
+
+Preview checks the selected delivery-policy relation scope and closed window, then
+uses the delivery source query in one `repeatable read`, `read only` transaction.
+It fetches at most budget + 1 rows and returns only window/server timestamps, policy,
+budget, `matchingComments`, `hasMore`, `dryRun: true` and `checkpoint: "ignored"`.
+`matchingComments` is capped at the budget; `hasMore: true` means additional matching
+source rows exist, not a full count. No recipient/source IDs, text or connection values
+are printed. `--worker` and `--adopt-legacy` are incompatible with preview.
+
+This reports the whole requested source window, including already delivered or now
+ineligible comments, independently of checkpoint progress. It does not inspect follower
+eligibility, pending receipts or devices and cannot estimate notices/push jobs or promise
+delivery. Notification dispatch, queue admission and checkpoint writes are never called.
+Run the regular command separately after inspecting the preview; it rechecks scope/time
+and current eligibility. Query plans, live read-only execution and database clocks still
+require the disposable PostgreSQL verification gate.
 
 #### Recovering proven missing discussion push jobs
 

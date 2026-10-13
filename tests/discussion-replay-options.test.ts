@@ -19,6 +19,7 @@ it("preserves existing invocation and accepts explicit worker/adoption with or w
     worker: false,
     adoptLegacy: false,
     repairPush: false,
+    dryRun: false,
   });
   expect(options([...args, "50", "--worker", "--adopt-legacy"])).toMatchObject({
     limit: 50,
@@ -31,6 +32,20 @@ it("preserves existing invocation and accepts explicit worker/adoption with or w
     adoptLegacy: true,
   });
   expect(options([...args, "10000"])).toMatchObject({ limit: 10000 });
+});
+it("accepts explicit preview in either delivery policy, without adopting or running a worker", () => {
+  expect(options([...args, "--dry-run"])).toMatchObject({ dryRun: true, limit: 100 });
+  expect(options([...args, "10000", "--repair-push", "--dry-run"])).toMatchObject({
+    dryRun: true,
+    repairPush: true,
+    limit: 10000,
+  });
+  for (const flags of [
+    ["--dry-run", "--dry-run"],
+    ["--dry-run", "--worker"],
+    ["--adopt-legacy", "--dry-run"],
+  ])
+    expect(() => options([...args, ...flags])).toThrow();
 });
 it.each(["0", "10001", "-1", "1.5", "NaN", "Infinity", "0x10", "1e2", "", " 10"])(
   "rejects ambiguous or invalid budget %s",

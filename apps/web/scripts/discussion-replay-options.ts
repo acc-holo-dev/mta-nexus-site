@@ -13,9 +13,16 @@ export function discussionReplayOptions(args: string[]) {
   if (limit < 1 || limit > 10000) throw Error("Invalid replay budget");
   if (
     new Set(rest).size !== rest.length ||
-    rest.some((flag) => !["--worker", "--adopt-legacy", "--repair-push"].includes(flag))
+    rest.some(
+      (flag) => !["--worker", "--adopt-legacy", "--repair-push", "--dry-run"].includes(flag),
+    )
   )
     throw Error("Invalid replay flags");
+  if (
+    rest.includes("--dry-run") &&
+    rest.some((flag) => ["--worker", "--adopt-legacy"].includes(flag))
+  )
+    throw Error("Preview cannot run a worker or adopt a checkpoint");
   return {
     checkpointName,
     from,
@@ -24,6 +31,7 @@ export function discussionReplayOptions(args: string[]) {
     worker: rest.includes("--worker"),
     adoptLegacy: rest.includes("--adopt-legacy"),
     repairPush: rest.includes("--repair-push"),
+    dryRun: rest.includes("--dry-run"),
   };
 }
 

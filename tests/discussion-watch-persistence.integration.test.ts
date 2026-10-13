@@ -20,7 +20,11 @@ import {
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
-import { resolveDiscussionReplayDatabaseIdentity } from "../apps/web/scripts/discussion-replay-database";
+import {
+  previewDiscussionReplay,
+  readDiscussionReplayPage,
+  resolveDiscussionReplayDatabaseIdentity,
+} from "../apps/web/scripts/discussion-replay-database";
 import { withDiscussionReplayCheckpoint } from "../apps/web/scripts/discussion-replay-storage";
 import { notifyDiscussionReplies } from "../apps/web/src/lib/services/discussion-follow-notification-service";
 import { replayDiscussionNotifications } from "../apps/web/src/lib/services/discussion-notification-replay";
@@ -84,6 +88,69 @@ const subscribe = (actorId: string, contentId: string) =>
   followsRepository.setFollowing(actorId, "content", contentId, true, `fol_${randomUUID()}`);
 const deliver = (recipientId: string, contentId: string, commentId: string) =>
   notificationRepository.createDiscussionReplyWithPush({ recipientId, contentId, commentId });
+it("previews inclusive microsecond boundaries with bounded tied rows and no inbox/push writes", async () => {
+  const owner = await actor(),
+    reader = await actor(),
+    item = await publication(owner.id);
+  await subscribe(reader.id, item.id);
+  const first = await reply(item.id, owner.id),
+    second = await reply(item.id, owner.id),
+    outside = await reply(item.id, owner.id);
+  const [clock] = await db.execute(sql`select
+    to_char((clock_timestamp() - interval '1 hour') at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as boundary,
+    to_char((clock_timestamp() + interval '1 day') at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') as future`);
+  const boundary = clock.boundary as string,
+    future = clock.future as string;
+  await db
+    .update(comments)
+    .set({ createdAt: sql`${boundary}::timestamptz` })
+    .where(inArray(comments.id, [first.id, second.id]));
+  await db
+    .update(comments)
+    .set({ createdAt: sql`${boundary}::timestamptz + interval '1 microsecond'` })
+    .where(eq(comments.id, outside.id));
+  const expected = [first.id, second.id].sort();
+  const page = await readDiscussionReplayPage(boundary, boundary, null);
+  expect(page.map((row) => row.id)).toEqual(expected);
+  expect(
+    (
+      await readDiscussionReplayPage(boundary, boundary, { createdAt: boundary, id: expected[0] })
+    ).map((row) => row.id),
+  ).toEqual([expected[1]]);
+  expect(
+    await previewDiscussionReplay({ from: boundary, until: boundary, limit: 1, repairPush: true }),
+  ).toMatchObject({
+    dryRun: true,
+    deliveryPolicy: "inbox-and-pending-push",
+    matchingComments: 1,
+    hasMore: true,
+    checkpoint: "ignored",
+  });
+  const complete = await previewDiscussionReplay({
+    from: boundary,
+    until: boundary,
+    limit: 2,
+    repairPush: false,
+  });
+  expect(complete).toMatchObject({ matchingComments: 2, hasMore: false });
+  expect(JSON.stringify(complete)).not.toMatch(/secret marker|usr_|cnt_|cmt_|postgres/);
+  await expect(
+    previewDiscussionReplay({ from: boundary, until: future, limit: 2, repairPush: false }),
+  ).rejects.toThrow("database time");
+  expect(
+    await db
+      .select()
+      .from(notifications)
+      .where(inArray(notifications.recipientId, [owner.id, reader.id])),
+  ).toHaveLength(0);
+  expect(
+    await db
+      .select({ id: webPushOutbox.id })
+      .from(webPushOutbox)
+      .innerJoin(notifications, eq(notifications.id, webPushOutbox.notificationId))
+      .where(inArray(notifications.recipientId, [owner.id, reader.id])),
+  ).toHaveLength(0);
+});
 it("persists idempotent own subscriptions, exposes latest public replies, masks archived metadata and removes its private key", async () => {
   const owner = await actor(),
     reader = await actor(),

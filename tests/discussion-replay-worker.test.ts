@@ -1,16 +1,22 @@
 import { expect, it, vi } from "vitest";
 import { replayDiscussionNotifications } from "../apps/web/src/lib/services/discussion-notification-replay";
-import { runDiscussionReplayWorker } from "../apps/web/src/lib/services/discussion-replay-worker";
+import {
+  DiscussionReplayPermanentError,
+  isRetryableDiscussionReplayFailure,
+  runDiscussionReplayWorker,
+} from "../apps/web/src/lib/services/discussion-replay-worker";
 
 const complete = { blocked: false, checkpoint: { completed: true } };
 const pending = { blocked: false, checkpoint: { completed: false } };
 it("retries failures with bounded backoff, resetting after a successful batch", async () => {
   const run = vi
     .fn()
-    .mockRejectedValueOnce(Error("PRIVATE_PROVIDER_DETAIL"))
+    .mockRejectedValueOnce(Object.assign(Error("PRIVATE_PROVIDER_DETAIL"), { code: "40001" }))
     .mockResolvedValueOnce({ ...pending, blocked: true })
     .mockResolvedValueOnce(pending)
-    .mockRejectedValueOnce(Error("retry"))
+    .mockRejectedValueOnce(
+      Error("wrapped query", { cause: Object.assign(Error("retry"), { code: "ECONNRESET" }) }),
+    )
     .mockResolvedValueOnce(complete);
   const wait = vi.fn().mockResolvedValue(undefined),
     reportFailure = vi.fn();
@@ -20,6 +26,96 @@ it("retries failures with bounded backoff, resetting after a successful batch", 
   expect(wait.mock.calls.map((call) => call[0])).toEqual([1000, 2000, 1000, 1000]);
   expect(reportFailure).toHaveBeenCalledTimes(3);
   expect(reportFailure.mock.calls.every((call) => call.length === 0)).toBe(true);
+});
+it.each([
+  "08000",
+  "08001",
+  "08003",
+  "08006",
+  "08007",
+  "40001",
+  "40P01",
+  "53100",
+  "53200",
+  "53300",
+  "55P03",
+  "57014",
+  "57P01",
+  "57P02",
+  "57P03",
+  "ECONNRESET",
+  "ECONNREFUSED",
+  "ETIMEDOUT",
+  "EPIPE",
+  "ENETUNREACH",
+  "EHOSTUNREACH",
+  "EAI_AGAIN",
+  "CONNECT_TIMEOUT",
+  "CONNECTION_CLOSED",
+  "CONNECTION_DESTROYED",
+])("retries recognized temporary failure %s through the driver wrapper", (code) => {
+  const error = Object.assign(Error("PRIVATE_PROVIDER_DETAIL"), { code });
+  expect(isRetryableDiscussionReplayFailure(error)).toBe(true);
+  expect(isRetryableDiscussionReplayFailure(Error("query", { cause: error }))).toBe(true);
+});
+it.each([
+  "28P01",
+  "42501",
+  "42P01",
+  "42703",
+  "23505",
+  "08004",
+  "08P01",
+  "53400",
+  "ENOSPC",
+  "EACCES",
+  "ENOENT",
+  "ENOTFOUND",
+  "UNKNOWN",
+  40001,
+])(
+  "stops permanent/configuration/filesystem failure %s without retry or private logs",
+  async (code) => {
+    const error = Object.assign(Error("PRIVATE_PROVIDER_DETAIL"), { code });
+    const run = vi.fn().mockRejectedValue(error),
+      wait = vi.fn(),
+      reportFailure = vi.fn();
+    await expect(
+      runDiscussionReplayWorker({ run, wait, reportFailure, stopped: () => false }),
+    ).rejects.toBe(error);
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(wait).not.toHaveBeenCalled();
+    expect(reportFailure).not.toHaveBeenCalled();
+  },
+);
+it("stops unknown invariant errors and bounded/cyclic malformed cause chains", async () => {
+  const error = Error("Replay database scope changed during recovery");
+  const run = vi.fn().mockRejectedValue(error),
+    wait = vi.fn(),
+    reportFailure = vi.fn();
+  await expect(
+    runDiscussionReplayWorker({ run, wait, reportFailure, stopped: () => false }),
+  ).rejects.toBe(error);
+  expect(wait).not.toHaveBeenCalled();
+  expect(reportFailure).not.toHaveBeenCalled();
+  const cyclic: { cause?: unknown } = {};
+  cyclic.cause = cyclic;
+  const temporary = { code: "40001" };
+  expect(isRetryableDiscussionReplayFailure(cyclic)).toBe(false);
+  expect(isRetryableDiscussionReplayFailure({ cause: { cause: { cause: temporary } } })).toBe(true);
+  expect(
+    isRetryableDiscussionReplayFailure({ cause: { cause: { cause: { cause: temporary } } } }),
+  ).toBe(false);
+  expect(isRetryableDiscussionReplayFailure({ code: "EACCES", cause: temporary })).toBe(false);
+  const checkpointFailure = new DiscussionReplayPermanentError("checkpoint", {
+    cause: Object.assign(Error("PRIVATE_FILE_PATH"), { code: "ETIMEDOUT" }),
+  });
+  expect(isRetryableDiscussionReplayFailure(checkpointFailure)).toBe(false);
+  expect(isRetryableDiscussionReplayFailure(Error("wrapper", { cause: checkpointFailure }))).toBe(
+    false,
+  );
+  for (const value of [null, undefined, "40001", 40001, {}, Error("unknown")])
+    expect(isRetryableDiscussionReplayFailure(value)).toBe(false);
 });
 it("caps repeated failures at one minute and stops without another delivery", async () => {
   let stopped = false;
