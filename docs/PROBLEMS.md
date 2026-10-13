@@ -4442,3 +4442,48 @@ After integrating 0f7a3f0, the combined focused suite passes 1033 tests in 76 fi
 including the new discussion recovery command/preview/failure cases. Web TypeScript
 passes on the combined tree. The successful inventory compile-mode build above was
 completed before this CLI/worker-only integration; it was not repeated afterward.
+
+## Version drift across private collection memberships — 2026-10-13
+
+Extended the private resource inventory with an optional strict `release` selector:
+all/attention/updates/pinned/selection-unavailable/latest. Existing URLs default to all.
+Resource, collection/status, literal search and version conditions compose before bounded
+twenty-resource pagination; returned resources retain all own memberships. Version counts
+use the structural collection/status scope before resource/search/version filters. Shared
+resources count once. Attention includes inaccessible resources, missing selected builds
+and safe-release updates; pinned counts withhold inaccessible stored preferences.
+
+One shared SQL projection now serves collection/library release pages and inventory. It
+joins only the caller's preferences, selects the latest trusted-clean published build in
+createdAt/ID descending order and resolves a fixed build only within the same product and
+safety policy. Lateral build reads require current own access and published product; inventory
+restricts the structural resource set before these joins. Effective rights and observed
+choices retain the existing database-time read-only repeatable-read snapshot. No N+1 query
+loop, new schema, migration, preference write or collection command is added.
+
+An explicit validated DTO exposes only accessible own choice mode/revision, safe build
+IDs and bounded version labels. Inaccessible preferences/builds are null even if malformed
+transport supplies them. Invalid accessible IDs/revisions/state/build pairs or contradictory
+version counts fail closed. A withdrawn fixed build has no effective build; the safe latest
+release is separately visible and is never substituted as a chosen download.
+
+RU/EN inventory links the exact chosen build to comparison, supported free-resource
+requirements preview and existing download controls. Requirements links are withheld for
+unsupported paid-resource reports. Download components are keyed by product/build/version
+so a changed snapshot aborts the old instance; existing download access/build/integrity
+checks and receipt handling remain authoritative. Filters survive pagination and private
+bounded JSON-page export. The snapshot export explains that it grants no access and does
+not install resources or alter preferences. Collection release pages link to this inventory.
+
+Verification: 1049 focused tests in 76 files pass, including preserved collection/version/
+comparison/preparation/download-related flows and discussion recovery. Biome lint passes
+on all sixteen touched TypeScript files. Web TypeScript passes before and after the build; isolated
+Next webpack compile-mode build exits zero. Root TypeScript has only the existing 23
+missing fast-check/property-test implicit-any diagnostics, with no new type errors.
+One disposable-PostgreSQL fixture covers all visible version states, selected-build
+withdrawal, current own preference isolation, deduplication across active/archived
+memberships, literal wildcard search, lost-access masking, unchanged collection revisions
+and equivalence with the existing release overview. It remains unrun here. Live SQL/query
+plans, browser/download handoff, full production generation and Node 26 validation remain
+open. No live migration applied. GitHub Actions are neither run nor inspected; this block
+uses [skip ci].

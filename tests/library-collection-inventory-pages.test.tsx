@@ -27,6 +27,21 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({ getRequestLocale: async () =
 vi.mock("../apps/web/src/lib/services/library-collections-service", () => ({
   libraryCollectionsService: { inventory: state.history },
 }));
+vi.mock("../apps/web/src/components/resource-download-button", () => ({
+  ResourceDownloadButton: ({
+    productId,
+    buildId,
+    version,
+  }: {
+    productId: string;
+    buildId: string;
+    version: string;
+  }) => (
+    <button type="button" data-product={productId} data-build={buildId}>
+      {version}
+    </button>
+  ),
+}));
 
 import Page, {
   dynamic,
@@ -42,10 +57,12 @@ const report = () => ({
   page: 2,
   status: "active",
   filter: "shared",
+  release: "updates",
   q: "%_",
   collectionId: "lcol_a",
   collections: [a, b],
   counts: { resources: 41, references: 42, available: 40, unavailable: 1, shared: 1 },
+  releaseCounts: { latest: 39, pinned: 1, updates: 1, selectionUnavailable: 0, attention: 2 },
   pageSize: 20,
   total: 41,
   totalPages: 3,
@@ -54,6 +71,14 @@ const report = () => ({
       productId: "prd_a",
       title: "Accessible & title",
       available: true,
+      release: {
+        state: "update_available",
+        mode: "fixed",
+        revision: 2,
+        canReviewRequirements: true,
+        latest: { buildId: "bld_new", version: "2.0.0" },
+        effective: { buildId: "bld_pin", version: "1.0.0" },
+      },
       memberships: [
         { ...a, addedAt: date },
         { ...b, addedAt: date },
@@ -67,7 +92,19 @@ const report = () => ({
     },
   ],
 });
-const values = { page: "2", status: "active", filter: "shared", q: "%_", collectionId: "lcol_a" };
+const values = {
+  page: "2",
+  status: "active",
+  filter: "shared",
+  q: "%_",
+  collectionId: "lcol_a",
+  release: "updates",
+};
+function availableItem() {
+  const item = report().items[0];
+  if (!item?.release) throw Error("Missing release fixture");
+  return { ...item, release: item.release };
+}
 const screen = async (query: Record<string, string | string[] | undefined> = values) =>
   renderToStaticMarkup(await Page({ searchParams: Promise.resolve(query) }));
 beforeEach(() => {
@@ -91,15 +128,21 @@ it.each(["en", "ru"] as const)(
     expect(html).toContain("/workspace/library/prd_a/collections");
     expect(html).toContain("/workspace/library/prd_orphan/collections");
     expect(html).toContain("/workspace/library/prd_a/versions");
+    expect(html).toContain('data-product="prd_a" data-build="bld_pin"');
+    expect(html).not.toContain('data-build="bld_new"');
+    expect(html).toContain("/prd_a/requirements?previewBuildId=bld_pin");
+    expect(html).toContain("/prd_a/versions/compare?from=bld_pin&amp;to=bld_new");
+    expect(html).toContain(v.releaseStates.update_available);
+    expect(html).toContain(v.snapshotNote);
     expect(html).not.toContain("/workspace/library/prd_orphan/versions");
     expect(html).not.toContain("/download");
     expect(html).toContain("/workspace/library/collections/lcol_a/compare?to=lcol_b");
     expect(html).toContain("/api/library/collections/resources/export?");
     expect(html).toContain(
-      "page=1&amp;status=active&amp;filter=shared&amp;q=%25_&amp;collectionId=lcol_a",
+      "page=1&amp;status=active&amp;filter=shared&amp;q=%25_&amp;collectionId=lcol_a&amp;release=updates",
     );
     expect(html).toContain(
-      "page=3&amp;status=active&amp;filter=shared&amp;q=%25_&amp;collectionId=lcol_a",
+      "page=3&amp;status=active&amp;filter=shared&amp;q=%25_&amp;collectionId=lcol_a&amp;release=updates",
     );
     expect(state.history).toHaveBeenCalledWith(state.actor, {
       page: 2,
@@ -107,6 +150,7 @@ it.each(["en", "ru"] as const)(
       filter: "shared",
       q: "%_",
       collectionId: "lcol_a",
+      release: "updates",
     });
     expect(dynamic).toBe("force-dynamic");
     expect(await generateMetadata()).toEqual({
@@ -135,4 +179,49 @@ it("shows empty results and masks absent/foreign collection scopes", async () =>
   expect(await screen()).toContain(libraryCollectionInventoryCopy("en").empty);
   state.history.mockRejectedValue(new AppError("PRIVATE", 404, "NOT_FOUND"));
   await expect(screen()).rejects.toThrow("NEXT_NOT_FOUND");
+});
+it("keeps a missing pinned choice inspectable without comparison, preparation or fallback download", async () => {
+  const result = report();
+  state.history.mockResolvedValue({
+    ...result,
+    items: [
+      {
+        ...availableItem(),
+        release: { ...availableItem().release, state: "selection_unavailable", effective: null },
+      },
+    ],
+  });
+  const html = await screen();
+  expect(html).toContain(libraryCollectionInventoryCopy("en").selectionMissing);
+  expect(html).toContain("/prd_a/versions");
+  expect(html).not.toContain("data-build=");
+  expect(html).not.toContain("/versions/compare?");
+  expect(html).not.toContain("/requirements?");
+});
+it("withholds release metadata and controls for lost access even if malformed transport includes a release", async () => {
+  const result = report();
+  result.items = [{ ...availableItem(), available: false }];
+  state.history.mockResolvedValue(result);
+  const html = await screen();
+  expect(html).not.toContain("bld_pin");
+  expect(html).not.toContain("bld_new");
+  expect(html).not.toContain("1.0.0");
+  expect(html).not.toContain("/requirements?");
+  expect(html).toContain("/prd_a/collections");
+});
+it("does not link an unsupported paid requirements report while retaining exact build review and download", async () => {
+  const result = report();
+  state.history.mockResolvedValue({
+    ...result,
+    items: [
+      {
+        ...availableItem(),
+        release: { ...availableItem().release, canReviewRequirements: false },
+      },
+    ],
+  });
+  const html = await screen();
+  expect(html).not.toContain("/requirements?");
+  expect(html).toContain("/versions/compare?from=bld_pin&amp;to=bld_new");
+  expect(html).toContain('data-build="bld_pin"');
 });

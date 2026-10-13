@@ -101,6 +101,9 @@ it.each(["en", "ru"])(
     expect(html).toContain("/prd_withdrawn/versions");
     expect(html).toContain("2.0.0");
     expect(html).toContain("1.0.0");
+    expect(html).toContain(
+      "/workspace/library/collections/resources?collectionId=lcol_a&amp;release=attention",
+    );
   },
 );
 it("preserves filters/search in navigation and export while clear resets the search", async () => {

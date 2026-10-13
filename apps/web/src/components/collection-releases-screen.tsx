@@ -10,6 +10,8 @@ import { collectionReleasesCopy } from "../lib/collection-releases-i18n";
 import { libraryCollectionsCopy } from "../lib/library-collections-i18n";
 import { librarySelectionBatchesCopy } from "../lib/library-selection-batches-i18n";
 import { getResourceReleaseControlCopy } from "../lib/resource-release-control-i18n";
+import { libraryCollectionInventoryCopy } from "../lib/library-collection-inventory-i18n";
+import { collectionInventoryHref } from "../lib/library-collection-inventory-query";
 import { authService } from "../lib/services/auth-service";
 import { libraryCollectionsService } from "../lib/services/library-collections-service";
 import { ResourceDownloadButton } from "./resource-download-button";
@@ -62,6 +64,9 @@ export async function CollectionReleasesScreen({
         {cc.revision}: {result.collection.revision} · {cc.items}: {result.itemCount}
       </p>
       <p className="text-secondary">{c.note}</p>
+      <Link href={collectionInventoryHref(path.id, "attention")} className="text-accent underline">
+        {libraryCollectionInventoryCopy(locale).versionOverview}
+      </Link>
       <Link
         href={`/workspace/library/collections/${encodeURIComponent(path.id)}/watches`}
         className="text-accent underline"

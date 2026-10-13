@@ -8,10 +8,13 @@ it("defaults to all own references and round-trips exact filters and literal sea
     page: 1,
     status: "all",
     filter: "all",
+    release: "all",
     q: "",
   });
   const query = libraryCollectionInventoryQuery(
-    new URLSearchParams("page=2&status=archived&filter=shared&q=%25_%5C&collectionId=lcol_a"),
+    new URLSearchParams(
+      "page=2&status=archived&filter=shared&q=%25_%5C&collectionId=lcol_a&release=updates",
+    ),
   );
   expect(
     libraryCollectionInventoryQuery(new URLSearchParams(libraryCollectionInventorySuffix(query))),
@@ -30,6 +33,9 @@ it.each([
   "q=%00",
   "pageSize=1000",
   "productId=prd_a",
+  "release=private",
+  "release=all&release=updates",
+  "release=",
 ])("rejects ambiguous, injected or unsupported selector %s", (value) =>
   expect(() => libraryCollectionInventoryQuery(new URLSearchParams(value))).toThrow(),
 );

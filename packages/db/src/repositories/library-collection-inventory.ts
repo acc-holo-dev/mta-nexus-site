@@ -18,10 +18,10 @@ import {
   libraryCollections as collections,
   libraryCollectionItems as members,
   products,
-  builds,
 } from "../schema";
 import { effectiveUserDownloadSources } from "./user-library";
-import { safePublishedBuildCondition } from "./build-safety";
+import { libraryReleaseProjection } from "./library-release-projection";
+import { inventoryReleaseSnapshot, type InventoryReleaseRow } from "./library-inventory-release";
 import { historyPageBounds } from "./history-pagination";
 import { containsPattern } from "./search-pattern";
 const invalidSnapshot = () =>
@@ -101,6 +101,13 @@ export async function readLibraryCollectionInventory(
         return {
           ...base,
           counts: { resources: 0, references: 0, available: 0, unavailable: 0, shared: 0 },
+          releaseCounts: {
+            latest: 0,
+            pinned: 0,
+            updates: 0,
+            selectionUnavailable: 0,
+            attention: 0,
+          },
           page: 1,
           pageSize: 20,
           total: 0,
@@ -109,15 +116,17 @@ export async function readLibraryCollectionInventory(
         };
       const matchCollection = query.collectionId ? sql`c.id=${query.collectionId}` : sql`true`;
       const matchStatus = query.status === "all" ? sql`true` : sql`c.status=${query.status}`;
+      const projection = libraryReleaseProjection(userId, sql`refs.id`);
       const resources = sql`${effectiveUserDownloadSources(userId, sql`transaction_timestamp()`)}, refs AS (
       SELECT member.product_id AS id,count(*)::integer AS "membershipCount",bool_or(${matchCollection} AND ${matchStatus}) AS "inSelected"
       FROM ${members} member JOIN ${collections} c ON c.id=member.collection_id WHERE c.user_id=${userId} GROUP BY member.product_id
     ), resource_rows AS (
       SELECT refs.id AS "productId",refs."membershipCount",refs."inSelected",
         CASE WHEN owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL THEN left(product.title,200) END AS title,
-        coalesce(owned.resource_id IS NOT NULL AND product.status='published' AND latest.id IS NOT NULL,false) AS available
+        ${projection.available} AS available,${projection.columns}
       FROM refs LEFT JOIN owned ON owned.resource_id=refs.id LEFT JOIN ${products} product ON product.id=refs.id
-      LEFT JOIN LATERAL (SELECT ${builds.id} AS id FROM ${builds} WHERE ${safePublishedBuildCondition(sql`product.id`)} LIMIT 1) latest ON true
+      ${projection.joins}
+      WHERE refs."inSelected"
     )`;
       const scope = sql`"inSelected"`;
       const filter = {
@@ -126,10 +135,19 @@ export async function readLibraryCollectionInventory(
         unavailable: sql`NOT available`,
         shared: sql`"membershipCount">1`,
       }[query.filter];
+      const releaseFilter = {
+        all: sql`true`,
+        attention: sql`state IN ('unavailable','selection_unavailable','update_available')`,
+        updates: sql`state='update_available'`,
+        pinned: sql`available AND mode='fixed'`,
+        "selection-unavailable": sql`state='selection_unavailable'`,
+        latest: sql`state='latest'`,
+      }[query.release];
+      const matched = sql`${filter} AND ${releaseFilter}`;
       const search = query.q
         ? sql` AND (title ILIKE ${containsPattern(query.q)} OR "productId" ILIKE ${containsPattern(query.q)})`
         : sql``;
-      const where = sql`${scope} AND ${filter}${search}`;
+      const where = sql`${scope} AND ${matched}${search}`;
       const [summary] = await tx.execute<{
         resources: number;
         references: number;
@@ -137,8 +155,21 @@ export async function readLibraryCollectionInventory(
         unavailable: number;
         shared: number;
         total: number;
+        releaseLatest: number;
+        releasePinned: number;
+        releaseUpdates: number;
+        selectionUnavailable: number;
+        attention: number;
       }>(sql`${resources}
-      SELECT count(*)::integer AS resources,coalesce(sum("membershipCount"),0)::integer AS "references",count(*) FILTER(WHERE available)::integer AS available,count(*) FILTER(WHERE NOT available)::integer AS unavailable,count(*) FILTER(WHERE "membershipCount">1)::integer AS shared,count(*) FILTER(WHERE ${filter}${search})::integer AS total FROM resource_rows WHERE ${scope}`);
+      SELECT count(*)::integer AS resources,coalesce(sum("membershipCount"),0)::integer AS "references",
+        count(*) FILTER(WHERE available)::integer AS available,count(*) FILTER(WHERE NOT available)::integer AS unavailable,
+        count(*) FILTER(WHERE "membershipCount">1)::integer AS shared,
+        count(*) FILTER(WHERE state='latest')::integer AS "releaseLatest",
+        count(*) FILTER(WHERE available AND mode='fixed')::integer AS "releasePinned",
+        count(*) FILTER(WHERE state='update_available')::integer AS "releaseUpdates",
+        count(*) FILTER(WHERE state='selection_unavailable')::integer AS "selectionUnavailable",
+        count(*) FILTER(WHERE state IN ('unavailable','selection_unavailable','update_available'))::integer AS attention,
+        count(*) FILTER(WHERE ${matched}${search})::integer AS total FROM resource_rows WHERE ${scope}`);
       const counts = {
           resources: Number(summary?.resources ?? 0),
           references: Number(summary?.references ?? 0),
@@ -146,25 +177,39 @@ export async function readLibraryCollectionInventory(
           unavailable: Number(summary?.unavailable ?? 0),
           shared: Number(summary?.shared ?? 0),
         },
+        releaseCounts = {
+          latest: Number(summary?.releaseLatest ?? 0),
+          pinned: Number(summary?.releasePinned ?? 0),
+          updates: Number(summary?.releaseUpdates ?? 0),
+          selectionUnavailable: Number(summary?.selectionUnavailable ?? 0),
+          attention: Number(summary?.attention ?? 0),
+        },
         total = Number(summary?.total ?? 0);
       if (
-        [...Object.values(counts), total].some(
+        [...Object.values(counts), ...Object.values(releaseCounts), total].some(
           (value) => !Number.isSafeInteger(value) || value < 0 || value > referenceLimit,
         ) ||
         counts.available + counts.unavailable !== counts.resources ||
         counts.shared > counts.resources ||
         counts.references < counts.resources ||
-        total > counts.resources
+        total > counts.resources ||
+        releaseCounts.latest + releaseCounts.pinned !== counts.available ||
+        releaseCounts.updates + releaseCounts.selectionUnavailable > releaseCounts.pinned ||
+        releaseCounts.attention !==
+          counts.unavailable + releaseCounts.updates + releaseCounts.selectionUnavailable
       )
         throw invalidSnapshot();
       const bounds = historyPageBounds(total, query.page);
-      const rows = await tx.execute<{
-        productId: string;
-        title: string | null;
-        available: boolean;
-        membershipCount: number;
-      }>(sql`${resources}
-      SELECT "productId",title,available,"membershipCount" FROM resource_rows WHERE ${where} ORDER BY "productId" ASC LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}`);
+      const rows = await tx.execute<
+        InventoryReleaseRow & {
+          productId: string;
+          title: string | null;
+          available: boolean;
+          membershipCount: number;
+        }
+      >(sql`${resources}
+      SELECT "productId",title,available,"membershipCount",mode,revision,state,"canReviewRequirements","latestBuildId","latestVersion","selectedBuildId","selectedVersion"
+      FROM resource_rows WHERE ${where} ORDER BY "productId" ASC LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}`);
       if (
         rows.length > bounds.pageSize ||
         new Set(rows.map((row) => row.productId)).size !== rows.length ||
@@ -224,12 +269,14 @@ export async function readLibraryCollectionInventory(
           productId: row.productId,
           title: row.available === true && typeof row.title === "string" ? row.title : null,
           available: row.available === true,
+          release: inventoryReleaseSnapshot(row),
           memberships,
         };
       });
       return {
         ...base,
         counts,
+        releaseCounts,
         page: bounds.page,
         pageSize: bounds.pageSize,
         total: bounds.total,

@@ -1,6 +1,6 @@
 const en = {
   title: "Resources across my collections",
-  note: "Find your resource references across all private collections. Filters select resources; each result retains every collection containing it. Current access controls resource labels and availability. Versions and downloads are checked on the resource page.",
+  note: "Find resources and version changes across all private collections. Each result retains every collection containing it. Availability means a safe published release exists under current access; a missing pinned version never falls back to the latest release. Downloads recheck access and the exact build.",
   search: "Search accessible names or recorded resource IDs",
   status: "Collection status",
   collection: "In collection",
@@ -19,10 +19,36 @@ const en = {
   manage: "Manage resource memberships",
   compare: "Compare these collections",
   inventory: "Find across collections",
+  releaseFilter: "Version state",
+  versionOverview: "Version changes across my collections",
+  releaseFilters: {
+    all: "All version states",
+    attention: "Needs attention",
+    updates: "Updates available",
+    pinned: "Pinned versions",
+    "selection-unavailable": "Pinned build unavailable",
+    latest: "Follow latest",
+  },
+  releaseStates: {
+    latest: "Follow latest safe release",
+    pinned: "Pinned to the latest safe release",
+    update_available: "A newer safe release is available",
+    selection_unavailable: "The pinned build is unavailable",
+  },
+  countNote:
+    "Summary counts cover the selected collections and their status, before resource, version and search filters. Shared resources count once; all their own memberships remain visible.",
+  latestVersion: "Latest safe release",
+  effectiveVersion: "Chosen release",
+  selectionMissing: "No usable chosen build. Review available versions before choosing another.",
+  compareVersions: "Compare chosen and latest releases",
+  preparation: "Review this exact release",
+  preferenceRevision: "Version choice revision",
+  snapshotNote:
+    "This JSON page records the observed choices and memberships. It does not grant access, install resources or change version preferences.",
 };
 const ru: typeof en = {
   title: "Ресурсы во всех моих коллекциях",
-  note: "Поиск ссылок на ресурсы во всех приватных коллекциях. Фильтры выбирают ресурсы; результат показывает все коллекции с каждой ссылкой. Названия и доступность отражают текущий доступ. Версии и загрузка проверяются на странице ресурса.",
+  note: "Поиск ресурсов и изменений версий во всех приватных коллекциях. Результат показывает все коллекции с каждой ссылкой. Доступность означает наличие безопасной публикации при текущих правах; недоступная закреплённая версия не заменяется последней. Загрузка заново проверяет права и точную сборку.",
   search: "Поиск по доступным названиям или записанным ID ресурсов",
   status: "Состояние коллекций",
   collection: "В коллекции",
@@ -41,6 +67,32 @@ const ru: typeof en = {
   manage: "Управлять вхождением ресурса",
   compare: "Сравнить эти коллекции",
   inventory: "Найти во всех коллекциях",
+  releaseFilter: "Состояние версий",
+  versionOverview: "Изменения версий во всех моих коллекциях",
+  releaseFilters: {
+    all: "Все состояния версий",
+    attention: "Требуют внимания",
+    updates: "Есть обновления",
+    pinned: "Закреплённые версии",
+    "selection-unavailable": "Закреплённая сборка недоступна",
+    latest: "Следовать последней",
+  },
+  releaseStates: {
+    latest: "Следовать последней безопасной публикации",
+    pinned: "Закреплена последняя безопасная публикация",
+    update_available: "Есть более новая безопасная публикация",
+    selection_unavailable: "Закреплённая сборка недоступна",
+  },
+  countNote:
+    "Сводка учитывает выбранные коллекции и их состояние до фильтров ресурсов, версий и поиска. Общий ресурс считается один раз; все его вхождения в свои коллекции остаются видны.",
+  latestVersion: "Последняя безопасная публикация",
+  effectiveVersion: "Выбранная публикация",
+  selectionMissing: "Выбранная сборка недоступна. Изучите доступные версии перед новым выбором.",
+  compareVersions: "Сравнить выбранную и последнюю публикации",
+  preparation: "Проверить эту точную публикацию",
+  preferenceRevision: "Ревизия выбора версии",
+  snapshotNote:
+    "Эта страница JSON сохраняет наблюдаемые версии и вхождения. Она не даёт прав доступа, не устанавливает ресурсы и не меняет выбор версий.",
 };
 export function libraryCollectionInventoryCopy(locale: "ru" | "en") {
   return locale === "ru" ? ru : en;

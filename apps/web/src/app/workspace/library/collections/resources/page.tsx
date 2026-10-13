@@ -1,4 +1,8 @@
-import { AppError, LIBRARY_COLLECTION_INVENTORY_FILTERS } from "@nexus/domain";
+import {
+  AppError,
+  LIBRARY_COLLECTION_INVENTORY_FILTERS,
+  LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS,
+} from "@nexus/domain";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -17,6 +21,7 @@ import {
 } from "../../../../../lib/library-collections-i18n";
 import { authService } from "../../../../../lib/services/auth-service";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
+import { ResourceDownloadButton } from "../../../../../components/resource-download-button";
 export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -115,6 +120,20 @@ export default async function Page({
               ))}
             </select>
           </label>
+          <label className="grid gap-1">
+            {v.releaseFilter}
+            <select
+              name="release"
+              defaultValue={report.release}
+              className="rounded border border-base bg-surface p-2"
+            >
+              {LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS.map((release) => (
+                <option key={release} value={release}>
+                  {v.releaseFilters[release]}
+                </option>
+              ))}
+            </select>
+          </label>
           <button type="submit" className="rounded border border-base px-3 py-2">
             {v.apply}
           </button>
@@ -132,6 +151,27 @@ export default async function Page({
             ),
           )}
         </dl>
+        <p className="text-sm text-secondary">{v.countNote}</p>
+        <nav aria-label={v.releaseFilter} className="flex flex-wrap gap-4">
+          {(["attention", "updates", "pinned", "selection-unavailable", "latest"] as const).map(
+            (release) => (
+              <Link
+                key={release}
+                href={`${collectionInventoryHref()}?${libraryCollectionInventorySuffix({ ...query, page: 1, release })}`}
+                aria-current={release === report.release ? "page" : undefined}
+                className="text-accent underline"
+              >
+                {v.releaseFilters[release]} (
+                {
+                  report.releaseCounts[
+                    release === "selection-unavailable" ? "selectionUnavailable" : release
+                  ]
+                }
+                )
+              </Link>
+            ),
+          )}
+        </nav>
         <p>
           {c.items}: {report.total} ·{" "}
           <time dateTime={report.generatedAt}>{report.generatedAt}</time>
@@ -142,12 +182,14 @@ export default async function Page({
         >
           {v.export}
         </a>
+        <p className="text-sm text-secondary">{v.snapshotNote}</p>
         {!report.items.length && <p>{v.empty}</p>}
         <ol className="space-y-4">
           {report.items.map((item) => {
             const first = item.memberships[0],
               second = item.memberships[1],
-              resourceHref = `/workspace/library/${encodeURIComponent(item.productId)}`;
+              resourceHref = `/workspace/library/${encodeURIComponent(item.productId)}`,
+              release = item.available ? item.release : null;
             return (
               <li key={item.productId} className="nexus-panel space-y-3 p-5">
                 <h2 className="break-words font-semibold">
@@ -158,6 +200,52 @@ export default async function Page({
                   {item.available ? v.available : v.unavailable} · {v.memberships}:{" "}
                   {item.memberships.length}
                 </p>
+                {release && (
+                  <section
+                    className="space-y-2 border-t border-base pt-3"
+                    aria-label={v.releaseFilter}
+                  >
+                    <p className="font-semibold">{v.releaseStates[release.state]}</p>
+                    <p>
+                      {v.latestVersion}: <span className="break-all">{release.latest.version}</span>
+                    </p>
+                    <p className="text-xs">
+                      {v.preferenceRevision}: {release.revision}
+                    </p>
+                    {release.effective ? (
+                      <>
+                        <p>
+                          {v.effectiveVersion}:{" "}
+                          <span className="break-all">{release.effective.version}</span>
+                        </p>
+                        {release.canReviewRequirements && (
+                          <Link
+                            href={`${resourceHref}/requirements?${new URLSearchParams({ previewBuildId: release.effective.buildId })}`}
+                            className="text-accent underline"
+                          >
+                            {v.preparation}
+                          </Link>
+                        )}
+                        {release.effective.buildId !== release.latest.buildId && (
+                          <Link
+                            href={`${resourceHref}/versions/compare?${new URLSearchParams({ from: release.effective.buildId, to: release.latest.buildId })}`}
+                            className="block text-accent underline"
+                          >
+                            {v.compareVersions}
+                          </Link>
+                        )}
+                        <ResourceDownloadButton
+                          key={`${item.productId}:${release.effective.buildId}:${release.effective.version}`}
+                          productId={item.productId}
+                          version={release.effective.version}
+                          buildId={release.effective.buildId}
+                        />
+                      </>
+                    ) : (
+                      <p role="note">{v.selectionMissing}</p>
+                    )}
+                  </section>
+                )}
                 <div className="flex flex-wrap gap-4">
                   <Link href={`${resourceHref}/collections`} className="text-accent underline">
                     {v.manage}

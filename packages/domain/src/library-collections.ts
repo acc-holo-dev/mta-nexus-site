@@ -294,8 +294,27 @@ export type LibraryCollectionInventoryQuery = {
   filter: (typeof LIBRARY_COLLECTION_INVENTORY_FILTERS)[number];
   q: string;
   collectionId?: string;
+  release?: (typeof LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS)[number];
 };
-export type LibraryCollectionInventory = LibraryCollectionInventoryQuery & {
+export const LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS = [
+  "all",
+  "attention",
+  "updates",
+  "pinned",
+  "selection-unavailable",
+  "latest",
+] as const;
+export type LibraryCollectionInventoryRelease = {
+  state: "latest" | "pinned" | "update_available" | "selection_unavailable";
+  mode: "latest" | "fixed";
+  revision: number;
+  canReviewRequirements: boolean;
+  latest: { buildId: string; version: string };
+  /** The effective chosen build; missing fixed versions never fall back to latest. */
+  effective: { buildId: string; version: string } | null;
+};
+export type LibraryCollectionInventory = Omit<LibraryCollectionInventoryQuery, "release"> & {
+  release: (typeof LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS)[number];
   schemaVersion: 1;
   generatedAt: string;
   collections: (LibraryCollectionSnapshot & { itemCount: number })[];
@@ -309,10 +328,19 @@ export type LibraryCollectionInventory = LibraryCollectionInventoryQuery & {
   pageSize: number;
   total: number;
   totalPages: number;
+  /** Same collection/status scope as counts, before resource/search/release filters. */
+  releaseCounts: {
+    latest: number;
+    pinned: number;
+    updates: number;
+    selectionUnavailable: number;
+    attention: number;
+  };
   items: {
     productId: string;
     title: string | null;
     available: boolean;
+    release: LibraryCollectionInventoryRelease | null;
     memberships: (LibraryCollectionSnapshot & { addedAt: string })[];
   }[];
 };

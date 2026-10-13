@@ -5,7 +5,7 @@ export function libraryCollectionInventoryQuery(
 ): LibraryCollectionInventoryQuery {
   for (const key of params.keys())
     if (
-      !["page", "status", "filter", "q", "collectionId"].includes(key) ||
+      !["page", "status", "filter", "q", "collectionId", "release"].includes(key) ||
       params.getAll(key).length !== 1
     )
       throw new AppError("Invalid inventory query", 400, "COLLECTION_INVALID");
@@ -18,6 +18,7 @@ export function libraryCollectionInventoryQuery(
     filter: params.get("filter") ?? "all",
     q: params.get("q") ?? "",
     collectionId: params.get("collectionId") || undefined,
+    release: params.get("release") ?? "all",
   });
   if (!parsed.success) throw new AppError("Invalid inventory query", 400, "COLLECTION_INVALID");
   return parsed.data;
@@ -29,7 +30,16 @@ export function libraryCollectionInventorySuffix(query: LibraryCollectionInvento
     filter: query.filter,
     ...(query.q ? { q: query.q } : {}),
     ...(query.collectionId ? { collectionId: query.collectionId } : {}),
+    ...(query.release && query.release !== "all" ? { release: query.release } : {}),
   }).toString();
 }
-export const collectionInventoryHref = (collectionId?: string) =>
-  `/workspace/library/collections/resources${collectionId ? `?${new URLSearchParams({ collectionId })}` : ""}`;
+export function collectionInventoryHref(
+  collectionId?: string,
+  release?: LibraryCollectionInventoryQuery["release"],
+) {
+  const params = new URLSearchParams({
+    ...(collectionId ? { collectionId } : {}),
+    ...(release && release !== "all" ? { release } : {}),
+  });
+  return `/workspace/library/collections/resources${params.size ? `?${params}` : ""}`;
+}

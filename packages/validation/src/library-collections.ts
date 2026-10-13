@@ -3,6 +3,7 @@ import {
   LIBRARY_COLLECTION_ITEM_LIMIT,
   LIBRARY_COLLECTION_COMPARISON_FILTERS,
   LIBRARY_COLLECTION_INVENTORY_FILTERS,
+  LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS,
 } from "@nexus/domain";
 import { z } from "zod";
 
@@ -330,6 +331,7 @@ export const libraryCollectionInventoryQuerySchema = z
     page: z.number().int().min(1).max(9999),
     status: z.enum(["all", "active", "archived"]),
     filter: z.enum(LIBRARY_COLLECTION_INVENTORY_FILTERS),
+    release: z.enum(LIBRARY_COLLECTION_INVENTORY_RELEASE_FILTERS).default("all"),
     q: z
       .string()
       .max(80)

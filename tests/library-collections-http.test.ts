@@ -794,7 +794,7 @@ it("reads and exports private resource inventory under fixed session identity an
   const path = `${base}/resources`;
   state.inventory.mockResolvedValue({ schemaVersion: 1, items: [] });
   const response = await inventory(
-    request(`${path}?page=2&status=active&filter=shared&q=%25&collectionId=lcol_a`),
+    request(`${path}?page=2&status=active&filter=shared&q=%25&collectionId=lcol_a&release=pinned`),
   );
   expect(response.status).toBe(200);
   expect(response.headers.get("cache-control")).toBe("private, no-store");
@@ -805,6 +805,7 @@ it("reads and exports private resource inventory under fixed session identity an
     filter: "shared",
     q: "%",
     collectionId: "lcol_a",
+    release: "pinned",
   });
   expect(state.rate).toHaveBeenCalledWith("resourceInspection", "usr_a");
   const exported = await inventoryExport(request(`${path}/export`));
@@ -816,7 +817,14 @@ it("reads and exports private resource inventory under fixed session identity an
 });
 it("rejects anonymous, spoofed, duplicated and throttled inventory reads before repository work", async () => {
   const path = `${base}/resources`;
-  for (const q of ["userId=other", "page=1&page=2", "collectionId=../private", "filter=ready"])
+  for (const q of [
+    "userId=other",
+    "page=1&page=2",
+    "collectionId=../private",
+    "filter=ready",
+    "release=all&release=updates",
+    "release=private",
+  ])
     expect((await inventory(request(`${path}?${q}`))).status).toBe(400);
   state.actor = null;
   expect((await inventory(request(path))).status).toBe(401);

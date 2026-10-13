@@ -13,7 +13,14 @@ scopes and available/unavailable/shared filters retain whole membership lists.
 Unavailable labels stay masked while orphan IDs remain manageable. A twenty-resource
 page includes links to membership management, own collection details and comparison,
 plus bounded private JSON export. Counts and effective access share one database-time
-read-only snapshot. No migration or mutation is introduced.
+read-only snapshot. No migration or collection/version mutation is introduced.
+
+The inventory also tracks own latest/fixed version choices across collection memberships.
+Version filters find updates, pinned choices, missing selected builds and resources needing
+attention without duplicating shared resources. Exact chosen builds link to comparison,
+supported preparation reports and the existing permission/integrity-checked download flow.
+Unavailable choices never silently fall back to latest. The private JSON page includes
+observed version choices and memberships; it does not install or change preferences.
 
 Private collection commands now have stable receipt detail and bounded JSON export.
 Reconciliation receipts offer reviewed inverse additions/removals under current own
