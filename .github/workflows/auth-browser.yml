@@ -27,7 +27,7 @@ jobs:
       with:
         node-version-file: .nvmrc
     - name: Restore shared production image by exact commit
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ runner.temp }}/production.tar
         key: nexus-production-image-${{ runner.os }}-${{ github.sha }}

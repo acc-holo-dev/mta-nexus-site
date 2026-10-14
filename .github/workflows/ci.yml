@@ -283,7 +283,7 @@ jobs:
         cache-to: type=gha,mode=max,scope=nexus-production
         provenance: false
     - name: Cache shared production image by exact commit
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v6
       with:
         path: ${{ runner.temp }}/production.tar
         key: nexus-production-image-${{ runner.os }}-${{ github.sha }}
@@ -309,7 +309,7 @@ jobs:
       with:
         node-version-file: .nvmrc
     - name: Restore shared production image by exact commit
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ runner.temp }}/production.tar
         key: nexus-production-image-${{ runner.os }}-${{ github.sha }}
@@ -480,7 +480,7 @@ jobs:
       with:
         node-version-file: .nvmrc
     - name: Restore shared production image by exact commit
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ runner.temp }}/production.tar
         key: nexus-production-image-${{ runner.os }}-${{ github.sha }}
@@ -547,7 +547,7 @@ jobs:
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
     - name: Restore shared production image by exact commit
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v6
       with:
         path: ${{ runner.temp }}/production.tar
         key: nexus-production-image-${{ runner.os }}-${{ github.sha }}
