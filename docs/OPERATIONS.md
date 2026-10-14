@@ -953,9 +953,21 @@ The response uses private/no-store, Cookie variance, nosniff and a fixed JSON at
 filename. Actual UTF-8 JSON bytes are limited to 1 MiB; oversize returns localized 413
 `EXPORT_TOO_LARGE`, without partial output or an attachment success header. Narrow the
 filters if needed. Auth/rate/query/database errors also remain private failures.
-The client disables export while a reading update is pending or unconfirmed; reload
-saved state before making another change or exporting. Downloads require an actual
-browser check; SQL isolation/time-boundary execution requires disposable PostgreSQL.
+The client keeps the ordinary attachment link as a progressive fallback. With JavaScript,
+export fetches the current saved page and reports authentication, rate, size, timeout and
+validation failures in the inbox in RU/EN instead of navigating to an error JSON file.
+Before creating a download, it verifies the fixed filename, JSON MIME, complete decoded
+UTF-8 bytes (at most 1 MiB), strict presentation-only report shape, current locale/filters,
+period anchor, unique item IDs and matching item state/category/time bounds. Redirects,
+partial responses, internal fields and malformed data cannot become a downloaded file.
+Compressed wire lengths are not treated as decoded lengths. A fixed buffer bounds memory
+independently of stream chunk count. A 15-second deadline and navigation cleanup cancel
+both transport and stalled reader; Blob URLs are released after handoff or on unmount.
+Export preserves selection/read state, coalesces repeated clicks and serializes against
+reads/writes. Failure permits export retry; unresolved reading updates still require saved
+state reload before export. A ready announcement means file preparation, not proof of a
+disk save. Downloads require an actual browser check; SQL isolation/time-boundary execution
+requires disposable PostgreSQL.
 
 ### Recovering discussion inbox delivery
 
