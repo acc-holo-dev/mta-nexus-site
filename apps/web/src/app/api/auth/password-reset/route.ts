@@ -1,3 +1,5 @@
+import { readAuthJson } from "../../../../lib/auth-request-body";
+import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
 import { randomInt } from "node:crypto";
 import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
@@ -22,24 +24,28 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 
 
 export async function POST(request: NextRequest) {
+  const rejected = rejectUnsafeBrowserRequest(request);
+  if (rejected) return rejected;
   const context = createRequestLogContext(request);
   const startedAt = performance.now();
   const targetMs = passwordResetTargetMs(
     randomInt(0, PASSWORD_RESET_REQUEST_FLOOR_JITTER_MS + 1),
   );
-  const parsed = requestPasswordResetSchema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) {
-    return json(context, { error: "Enter a valid email address." }, 400);
-  }
-
   try {
+    const parsed = requestPasswordResetSchema.safeParse(await readAuthJson(request));
+    if (!parsed.success) {
+      return json(context, { error: "Enter a valid email address." }, 400);
+    }
     await authService.requestPasswordReset({
       email: parsed.data.email,
       ip: getTrustedRequestIp(request),
     });
     await waitForPasswordResetFloor(startedAt, targetMs);
     return json(context, PASSWORD_RESET_NEUTRAL_RESPONSE, 202);
-  } catch {
+  } catch (error: unknown) {
+    if (error instanceof AppError && [400, 408, 413, 415].includes(error.statusCode)) {
+      return json(context, { error: "Invalid request body", code: error.code }, error.statusCode);
+    }
     // Missing dedicated keys or shared persistence failure makes recovery
     // unavailable for every address; do not expose account-specific detail.
     logRequestEvent({
@@ -54,17 +60,24 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const rejected = rejectUnsafeBrowserRequest(request);
+  if (rejected) return rejected;
   const context = createRequestLogContext(request);
-  const parsed = confirmPasswordResetSchema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return json(context, { error: "Invalid or expired password reset" }, 400);
   try {
+    const parsed = confirmPasswordResetSchema.safeParse(await readAuthJson(request));
+    if (!parsed.success) return json(context, { error: "Invalid or expired password reset" }, 400);
     await authService.confirmPasswordReset({
       ...parsed.data,
       ip: getTrustedRequestIp(request),
     });
     return json(context, { success: true });
   } catch (error: unknown) {
-    if (error instanceof AppError) return json(context, { error: "Invalid or expired password reset" }, 400);
+    if (error instanceof AppError) {
+      if ([400, 408, 413, 415].includes(error.statusCode)) {
+        return json(context, { error: "Invalid request body", code: error.code }, error.statusCode);
+      }
+      return json(context, { error: "Invalid or expired password reset" }, 400);
+    }
     logRequestEvent({
       level: "error",
       event: "auth.password_reset.confirm_failed",
@@ -75,3 +88,4 @@ export async function PATCH(request: NextRequest) {
     return json(context, { error: "Could not reset the password. Request a new link and try again." }, 503);
   }
 }
+

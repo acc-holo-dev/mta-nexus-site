@@ -1,3 +1,4 @@
+import { SESSION_LIFETIME_SECONDS } from "../session-policy";
 import {
   userRepository,
   sessionRepository,
@@ -58,7 +59,7 @@ class AuthService {
     const userId = generateId("usr");
     const passwordHash = await hashPassword(input.password);
     const token = generateSessionToken();
-    const expiresAt = new Date(Date.now() + 86400000 * 14);
+    const expiresAt = new Date(Date.now() + SESSION_LIFETIME_SECONDS * 1000);
 
     try {
       const user = await authRepository.registerAccount({
@@ -109,7 +110,7 @@ class AuthService {
     }
 
     const token = generateSessionToken();
-    const expiresAt = new Date(Date.now() + 86400000 * 14);
+    const expiresAt = new Date(Date.now() + SESSION_LIFETIME_SECONDS * 1000);
 
     await authRepository.createLoginSession(
       {
@@ -407,3 +408,4 @@ class AuthService {
 }
 
 export const authService = new AuthService();
+

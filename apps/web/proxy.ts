@@ -1,4 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { rejectUnsafeBrowserRequest } from "./src/lib/browser-request-guard";
+import { isLicenseRuntimeRequest } from "./src/lib/browser-request-policy";
 import {
   appendVaryHeader,
   isOfflineCacheablePublicPath,
@@ -7,6 +9,10 @@ import {
 } from "./src/lib/offline-cache-policy";
 
 export function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/api/") && !isLicenseRuntimeRequest(request.nextUrl.pathname)) {
+    const rejected = rejectUnsafeBrowserRequest(request);
+    if (rejected) return rejected;
+  }
   const response = NextResponse.next();
 
   if (
@@ -31,9 +37,11 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/api/:path*",
     "/articles/:path*",
     "/copyright",
     "/privacy",
     "/terms",
   ],
 };
+

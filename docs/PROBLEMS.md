@@ -1,5 +1,69 @@
 # PROBLEMS — реестр открытых проблем MTA NEXUS
 
+### Request entry point, CSRF and auth transport — 2026-10-14
+
+Review found no request-provenance enforcement in the inspected auth handlers;
+Proxy matched only the public offline-cache surface. Browser API mutations now
+check an explicit canonical origin, Fetch Metadata and an Origin/Referer fallback
+before reading bodies or resolving identity. Same-site sibling subdomains and
+missing provenance fail closed. Production never derives trust from Host or
+forwarded headers; invalid origin configuration returns a private correlated 503.
+Configuration validation rejects credentials, paths, query strings and fragments.
+Development supports HTTP loopback/known Compose aliases on the configured port.
+The exact `/api/licenses/check` and `/api/licenses/check-release` paths retain their
+existing independent bearer-only boundary. An Authorization header on another API
+does not bypass CSRF. Auth handlers repeat the guard independently of Proxy;
+other browser API handlers currently rely on the global Proxy for this check.
+Existing authorization/session checks remain in the handlers and repositories.
+
+Auth JSON bodies require application/json and an actual streamed 8-KiB ceiling
+with a ten-second read deadline. Invalid lengths, excessive payloads and unsupported
+encodings return client errors before authentication mutations. Issuance, password
+rotation and logout share host-only cookie attributes. The fourteen-day lifetime is
+shared separately from HTTP cookie scope so services do not import transport policy.
+Existing random bearer tokens, SHA-256 persistence, server-side expiry and confirmed
+logout semantics remain intact. No session-format or database migration is introduced.
+
+Validation: 43 native Node policy/cookie checks and 36 isolated HTTP/config checks passed
+on Node 24.19.0. The HTTP harness used real cached Next.js 16.3.4 Request/Response,
+actual auth schema excerpts/errors/readers and mocked auth services/rate limits/IP.
+Changed TypeScript syntax and targeted configuration validation were checked with
+cached TypeScript 5.9.3/Zod 3.25.76. These are focused checks, not acceptance on the
+pinned Node 26/Next 16.3.5/TypeScript 7 dependencies. The committed Vitest HTTP suite,
+full typecheck/build, PostgreSQL and browser acceptance remain OPEN; GitHub Actions
+were neither inspected nor dispatched. Publish with [skip ci] under the existing limit.
+
+Next decisions, in order:
+
+1. Move the same HTTP guard into a common browser route adapter, including multipart
+   routes, so new endpoints cannot silently depend on Proxy-only CSRF enforcement.
+   Keep bearer/machine routes in an explicit independent adapter. Review safe-method
+   handlers for business writes; CSRF-safe GET must not execute user commands.
+2. Build one authenticated request identity/DTO boundary; scope reuse to a request,
+   never a global session cache. Recheck session/authority inside high-risk mutation
+   transactions and define fresh-auth requirements for staff actions, withdrawals,
+   account recovery and security changes. Review context switching under session
+   revocation before changing its repository contract.
+3. Evaluate Better Auth as an adapter migration, with explicit tests for current
+   digest-only tokens, immediate revocation, organization authority, audit and mail
+   transactions. Its cookie-cache revocation delay is incompatible with immediate
+   checks on privileged paths; do not enable it by default. Add WebAuthn/passkeys
+   through a maintained implementation once recovery/credential-removal rules exist.
+4. Continue data/API review with actor-bound commands, public/private DTOs and
+   transaction invariants. Existing mail/push outboxes must be reviewed rather than
+   replaced blindly; verify commit-to-delivery guarantees where in-process events
+   still cross a transaction boundary. Then verify proxy configuration, recovery,
+   queue health and deployment behavior in ops.
+
+Primary references: OWASP CSRF Prevention, Session Management, Passkey Security;
+Next.js App Router Authentication; Better Auth Security and Session Management.
+https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html
+https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html
+https://cheatsheetseries.owasp.org/cheatsheets/Passkey_Security_Cheat_Sheet.html
+https://nextjs.org/docs/app/guides/authentication
+https://better-auth.com/docs/reference/security
+https://better-auth.com/docs/concepts/session-management
+
 ### Fixed notification-history periods and private page export — 2026-10-13
 
 The notification center now has All/7/30/90/365-day filters in RU/EN. Limited windows

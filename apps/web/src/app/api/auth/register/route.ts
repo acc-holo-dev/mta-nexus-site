@@ -1,3 +1,7 @@
+import { SESSION_LIFETIME_SECONDS } from "../../../../lib/session-policy";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
+import { readAuthJson } from "../../../../lib/auth-request-body";
+import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
 import { type NextRequest, NextResponse } from "next/server";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
@@ -19,6 +23,8 @@ function json(body: unknown, status = 200) {
 }
 
 export async function POST(request: NextRequest) {
+  const rejected = rejectUnsafeBrowserRequest(request);
+  if (rejected) return rejected;
   const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
@@ -33,7 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json().catch(() => null);
+    const body = await readAuthJson(request);
     const parsed = registerSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -49,12 +55,9 @@ export async function POST(request: NextRequest) {
     const { user, token } = await authService.register(parsed.data);
 
     const response = json({ success: true, user }, 201);
-    response.cookies.set("nexus_session", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 14,
-      path: "/",
+    response.cookies.set(SESSION_COOKIE_NAME, token, {
+      ...sessionCookieOptions(),
+      maxAge: SESSION_LIFETIME_SECONDS,
     });
 
     return response;
@@ -76,3 +79,4 @@ export async function POST(request: NextRequest) {
     return json({ error: "Failed to register" }, 500);
   }
 }
+

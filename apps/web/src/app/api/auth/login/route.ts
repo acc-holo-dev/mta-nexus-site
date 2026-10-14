@@ -1,3 +1,7 @@
+import { SESSION_LIFETIME_SECONDS } from "../../../../lib/session-policy";
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
+import { readAuthJson } from "../../../../lib/auth-request-body";
+import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
 import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { loginSchema } from "@nexus/validation";
@@ -28,6 +32,8 @@ function json(
 }
 
 export async function POST(request: NextRequest) {
+  const rejected = rejectUnsafeBrowserRequest(request);
+  if (rejected) return rejected;
   const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
@@ -49,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json().catch(() => null);
+    const body = await readAuthJson(request);
     const parsed = loginSchema.safeParse(body);
 
     if (!parsed.success) {
@@ -66,12 +72,9 @@ export async function POST(request: NextRequest) {
     const { user, token } = await authService.login(parsed.data);
 
     const response = json(context, { success: true, user });
-    response.cookies.set("nexus_session", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 14,
-      path: "/",
+    response.cookies.set(SESSION_COOKIE_NAME, token, {
+      ...sessionCookieOptions(),
+      maxAge: SESSION_LIFETIME_SECONDS,
     });
 
     return response;
@@ -94,3 +97,4 @@ export async function POST(request: NextRequest) {
     return json(context, { error: "Failed to log in" }, 500);
   }
 }
+

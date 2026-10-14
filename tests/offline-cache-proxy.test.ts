@@ -54,8 +54,9 @@ describe("public offline cache proxy contract", () => {
     ).toBeNull();
   });
 
-  it("keeps the Next.js matcher constrained to the same public surface", () => {
+  it("matches the browser API boundary and the public offline surface", () => {
     expect(config.matcher).toEqual([
+      "/api/:path*",
       "/articles/:path*",
       "/copyright",
       "/privacy",
@@ -63,3 +64,4 @@ describe("public offline cache proxy contract", () => {
     ]);
   });
 });
+

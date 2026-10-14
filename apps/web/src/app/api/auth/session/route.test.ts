@@ -44,6 +44,7 @@ function request(method = "GET") {
     {
       method,
       headers: {
+        origin: "https://nexus.test",
         cookie: "nexus_session=session-token",
       },
     },
@@ -119,3 +120,4 @@ describe("current auth session HTTP contract", () => {
     expect(failed.headers.get("set-cookie")).toBeNull();
   });
 });
+

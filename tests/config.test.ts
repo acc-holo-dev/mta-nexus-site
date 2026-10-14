@@ -21,6 +21,17 @@ function vapidKeyPair() {
 }
 
 describe("production configuration", () => {
+  it.each([
+    "https://user:password@nexus.test",
+    "https://nexus.test/app",
+    "https://nexus.test?override=1",
+    "https://nexus.test/#fragment",
+    "ftp://nexus.test",
+  ])("rejects a non-canonical browser origin %s before serving requests", (url) => {
+    expect(() => getEnvConfig({ NODE_ENV: "test", NEXT_PUBLIC_APP_URL: url })).toThrow(
+      "Invalid configuration parameters",
+    );
+  });
   it("fails closed when production secrets and providers are missing", () => {
     expect(() => getEnvConfig({ NODE_ENV: "production" })).toThrow(
       "Invalid configuration parameters"
@@ -237,3 +248,4 @@ describe("MTA master mirror configuration", () => {
     ).toThrow("Invalid configuration parameters");
   });
 });
+

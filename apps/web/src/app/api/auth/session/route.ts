@@ -1,3 +1,5 @@
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
+import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
 import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import {
@@ -51,6 +53,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const rejected = rejectUnsafeBrowserRequest(request);
+  if (rejected) return rejected;
   const context = createRequestLogContext(request);
 
   try {
@@ -58,11 +62,8 @@ export async function DELETE(request: NextRequest) {
     if (token) await authService.logout(token);
 
     const response = json(context, { success: true });
-    response.cookies.set("nexus_session", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
+    response.cookies.set(SESSION_COOKIE_NAME, "", {
+      ...sessionCookieOptions(),
       maxAge: 0,
       expires: new Date(0),
     });
@@ -85,3 +86,4 @@ export async function DELETE(request: NextRequest) {
     );
   }
 }
+

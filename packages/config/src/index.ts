@@ -213,7 +213,16 @@ export const envSchema = z
   .object({
     NODE_ENV: z.enum(["development", "test", "production"]),
     PORT: z.coerce.number().int().positive().max(65535),
-    NEXT_PUBLIC_APP_URL: z.string().url(),
+    NEXT_PUBLIC_APP_URL: z.string().url().refine((value) => {
+      try {
+        const url = new URL(value);
+        return (url.protocol === "http:" || url.protocol === "https:") &&
+          !url.username && !url.password && url.pathname === "/" &&
+          !url.search && !url.hash;
+      } catch {
+        return false;
+      }
+    }, "Application URL must be an HTTP(S) origin without credentials, path, query or fragment"),
     DATABASE_URL: z.string().min(1),
     AUTH_SECRET: z.string().min(32),
     DISCORD_CLIENT_ID: z.string(),
@@ -397,3 +406,4 @@ export function getEnvConfig(env: Record<string, string | undefined> = process.e
 }
 
 export const config = getEnvConfig();
+

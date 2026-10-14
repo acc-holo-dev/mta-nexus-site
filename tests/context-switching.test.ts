@@ -105,6 +105,7 @@ function postRequest(body: unknown) {
     {
       method: "POST",
       headers: {
+        origin: "https://nexus.test",
         "content-type": "application/json",
         cookie: "nexus_session=context-token",
       },
@@ -296,3 +297,4 @@ describe("account context switching HTTP contract", () => {
     );
   });
 });
+

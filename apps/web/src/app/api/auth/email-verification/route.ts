@@ -1,3 +1,5 @@
+import { readAuthJson } from "../../../../lib/auth-request-body";
+import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
 import { type NextRequest, NextResponse } from "next/server";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
@@ -38,12 +40,14 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const rejected = rejectUnsafeBrowserRequest(request);
+  if (rejected) return rejected;
   const context = createRequestLogContext(request);
   try {
     const current = await actor(request);
     if (!current) return json({ error: "Authentication required" }, 401);
     const parsed = requestRecoveryEmailVerificationSchema.safeParse(
-      await request.json().catch(() => null),
+      await readAuthJson(request),
     );
     if (!parsed.success) {
       return json({ error: "Email verification validation failed", details: parsed.error.format() }, 400);
@@ -74,12 +78,14 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const rejected = rejectUnsafeBrowserRequest(request);
+  if (rejected) return rejected;
   const context = createRequestLogContext(request);
   try {
     const current = await actor(request);
     if (!current) return json({ error: "Authentication required" }, 401);
     const parsed = confirmRecoveryEmailVerificationSchema.safeParse(
-      await request.json().catch(() => null),
+      await readAuthJson(request),
     );
     if (!parsed.success) return json({ error: "Invalid or expired email confirmation" }, 400);
     const result = await authService.confirmRecoveryEmailVerification({
@@ -101,3 +107,4 @@ export async function PATCH(request: NextRequest) {
     return json({ error: "Could not confirm this email. Please try again later." }, 503);
   }
 }
+

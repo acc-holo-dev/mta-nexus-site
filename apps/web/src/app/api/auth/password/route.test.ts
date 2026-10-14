@@ -32,7 +32,7 @@ import { POST } from "./route";
 function request(body: unknown, cookie = "nexus_session=ses_current") {
   return new NextRequest("http://nexus.test/api/auth/password", {
     method: "POST",
-    headers: { "content-type": "application/json", cookie },
+    headers: { origin: "http://nexus.test", "content-type": "application/json", cookie },
     body: JSON.stringify(body),
   });
 }
@@ -107,3 +107,4 @@ describe("password change HTTP contract", () => {
     expect(serialized).not.toContain(validBody.newPassword);
   });
 });
+

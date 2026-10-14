@@ -1,3 +1,6 @@
+import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
+import { readAuthJson } from "../../../../lib/auth-request-body";
+import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
 import { type NextRequest, NextResponse } from "next/server";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
@@ -12,6 +15,8 @@ function json(body: unknown, status = 200) {
 }
 
 export async function POST(request: NextRequest) {
+  const rejected = rejectUnsafeBrowserRequest(request);
+  if (rejected) return rejected;
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -22,7 +27,7 @@ export async function POST(request: NextRequest) {
     if (!rateLimit.success) {
       return json({ error: "Too many password change attempts. Please try again later." }, 429);
     }
-    const parsed = changePasswordSchema.safeParse(await request.json().catch(() => null));
+    const parsed = changePasswordSchema.safeParse(await readAuthJson(request));
     if (!parsed.success) {
       return json({ error: "Password change validation failed", details: parsed.error.format() }, 400);
     }
@@ -33,12 +38,9 @@ export async function POST(request: NextRequest) {
       currentToken: token,
     });
     const response = json({ success: true, revokedSessionCount: changed.revokedSessionCount });
-    response.cookies.set("nexus_session", changed.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+    response.cookies.set(SESSION_COOKIE_NAME, changed.token, {
+      ...sessionCookieOptions(),
       expires: changed.expiresAt,
-      path: "/",
     });
     return response;
   } catch (error: unknown) {
@@ -56,3 +58,4 @@ export async function POST(request: NextRequest) {
     return json({ error: "Could not confirm the password change. Sign in again before retrying." }, 503);
   }
 }
+

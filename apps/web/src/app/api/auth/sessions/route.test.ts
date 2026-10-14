@@ -58,7 +58,7 @@ function listRequest() {
 function request(body: unknown) {
   return new NextRequest("http://nexus.test/api/auth/sessions", {
     method: "DELETE",
-    headers: { "content-type": "application/json", cookie: "nexus_session=token_owner" },
+    headers: { origin: "http://nexus.test", "content-type": "application/json", cookie: "nexus_session=token_owner" },
     body: JSON.stringify(body),
   });
 }
@@ -188,3 +188,4 @@ describe("session revocation command matrix", () => {
     expect(revokeOthers).not.toHaveBeenCalled();
   });
 });
+
