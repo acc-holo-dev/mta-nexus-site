@@ -66,12 +66,20 @@ it("scopes the total and rows to manageable free resources before pagination", a
   expect(queries[0].sql).toContain("manage_products");
   expect(queries[0].sql).not.toContain('"builds"');
 });
-it("gives administrators the same override as the existing policy", async () => {
-  await repository.pageManaged({ id: "admin", role: "admin" });
-  const query = dialect.sqlToQuery(state.conditions[0]);
-  expect(query.params).toEqual([0]);
-  expect(query.sql).not.toContain("manage_products");
-});
+it.each(["admin", "moderator", "developer", "user"] as const)(
+  "rechecks the live administrator role for a caller claiming %s",
+  async (role) => {
+    await repository.pageManaged({ id: "actor", role });
+    const queries = state.conditions.map((condition) => dialect.sqlToQuery(condition));
+    expect(queries[0]).toEqual(queries[1]);
+    expect(queries[0].params).toEqual(["actor", "actor", "actor", "actor", 0]);
+    expect(queries[0].sql).toContain(
+      'exists (select 1 from "users" where "users"."id" = $1 and "users"."role" = \'admin\')',
+    );
+    expect(queries[0].sql).toContain("manage_products");
+    expect(queries[0].sql).toContain('"products"."organization_id" is null');
+  },
+);
 it.each([NaN, Infinity, -1, 999999])("bounds requested page %s", async (page) => {
   const result = await repository.pageManaged({ id: "author", role: "developer" }, undefined, page);
   expect(result.page).toBe(page === 999999 ? 3 : 1);

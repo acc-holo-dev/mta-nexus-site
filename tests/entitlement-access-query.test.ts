@@ -118,6 +118,10 @@ it("keeps the safe published build gate before checking or creating a claim", as
   expect(state.queries[2].params).toContain("clean");
   expect(state.queries[2].sql).toContain('"builds"."scanner" is not null');
   expect(state.queries[2].sql).toContain('"builds"."scanned_at" is not null');
+  expect(state.queries[1].sql).toContain("for no key update");
+  expect(state.queries[2].sql).toContain("for share");
+  expect(state.queries[2].sql).toContain("btrim(\"builds\".\"scanner\") <> ''");
+  expect(state.queries.some((query) => /^(insert|update|delete)/u.test(query.sql))).toBe(false);
 });
 
 const grantRow = ["existing-entitlement", "user", "user", "product.download", "resource", null, "{}", now.toISOString()];

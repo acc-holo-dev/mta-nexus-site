@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   listPublishedByProduct: vi.fn(),
   listByProduct: vi.fn(),
   can: vi.fn(),
+  hasManagementAccess: vi.fn(),
   findOrganizationById: vi.fn(),
   listUserMemberships: vi.fn(),
 }));
@@ -13,6 +14,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@nexus/db", () => ({
   productRepository: {
     findBySlug: mocks.findBySlug,
+    hasManagementAccess: mocks.hasManagementAccess,
     findPublishedFreeBySlugs: vi.fn(async () => []),
     listPublishedFreeDependingOnSlug: vi.fn(async () => []),
   },
@@ -71,9 +73,7 @@ describe("resource build visibility behavior", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.listPublishedByProduct.mockResolvedValue([
-      { id: "bld_public", status: "published" },
-    ]);
+    mocks.listPublishedByProduct.mockResolvedValue([{ id: "bld_public", status: "published" }]);
     mocks.listByProduct.mockResolvedValue([
       { id: "bld_public", status: "published" },
       { id: "bld_pending", status: "pending_review" },
@@ -81,28 +81,23 @@ describe("resource build visibility behavior", () => {
     mocks.listUserMemberships.mockResolvedValue([]);
     mocks.findOrganizationById.mockResolvedValue(null);
     mocks.can.mockReturnValue(false);
+    mocks.hasManagementAccess.mockResolvedValue(false);
   });
 
   it("uses the published-only repository path for public build history", async () => {
-    await expect(
-      service.getProductBuilds("prd_visibility"),
-    ).resolves.toEqual([
+    await expect(service.getProductBuilds("prd_visibility")).resolves.toEqual([
       expect.objectContaining({
         id: "bld_public",
         status: "published",
       }),
     ]);
 
-    expect(mocks.listPublishedByProduct).toHaveBeenCalledWith(
-      "prd_visibility",
-    );
+    expect(mocks.listPublishedByProduct).toHaveBeenCalledWith("prd_visibility");
     expect(mocks.listByProduct).not.toHaveBeenCalled();
   });
 
   it("uses full lifecycle history only when caller explicitly has inspection access", async () => {
-    await expect(
-      service.getProductBuilds("prd_visibility", true),
-    ).resolves.toEqual([
+    await expect(service.getProductBuilds("prd_visibility", true)).resolves.toEqual([
       expect.objectContaining({ id: "bld_public" }),
       expect.objectContaining({
         id: "bld_pending",
@@ -110,9 +105,7 @@ describe("resource build visibility behavior", () => {
       }),
     ]);
 
-    expect(mocks.listByProduct).toHaveBeenCalledWith(
-      "prd_visibility",
-    );
+    expect(mocks.listByProduct).toHaveBeenCalledWith("prd_visibility");
     expect(mocks.listPublishedByProduct).not.toHaveBeenCalled();
   });
 
@@ -120,48 +113,44 @@ describe("resource build visibility behavior", () => {
     const draft = product();
     mocks.findBySlug.mockResolvedValue(draft);
 
-    await expect(
-      service.getProductPreviewBySlug(draft.slug, null),
-    ).resolves.toBeNull();
+    await expect(service.getProductPreviewBySlug(draft.slug, null)).resolves.toBeNull();
 
-    await expect(
-      service.getProductPreviewBySlug(
-        draft.slug,
-        outsider,
-      ),
-    ).resolves.toBeNull();
+    expect(mocks.hasManagementAccess).not.toHaveBeenCalled();
 
-    expect(mocks.can).toHaveBeenCalledWith(
-      outsider,
-      "product.update",
-      draft,
-    );
+    await expect(service.getProductPreviewBySlug(draft.slug, outsider)).resolves.toBeNull();
+
+    expect(mocks.hasManagementAccess).toHaveBeenCalledExactlyOnceWith(draft.id, outsider);
+    expect(mocks.can).not.toHaveBeenCalled();
   });
 
   it("allows an authorized manager to preview a non-published resource", async () => {
     const draft = product();
     mocks.findBySlug.mockResolvedValue(draft);
-    mocks.can.mockReturnValue(true);
+    mocks.hasManagementAccess.mockResolvedValue(true);
 
-    await expect(
-      service.getProductPreviewBySlug(
-        draft.slug,
-        outsider,
-      ),
-    ).resolves.toBe(draft);
+    await expect(service.getProductPreviewBySlug(draft.slug, outsider)).resolves.toBe(draft);
+    expect(mocks.hasManagementAccess).toHaveBeenCalledExactlyOnceWith(draft.id, outsider);
+  });
+
+  it("propagates a failed live access lookup without returning the draft", async () => {
+    const draft = product();
+    mocks.findBySlug.mockResolvedValue(draft);
+    mocks.hasManagementAccess.mockRejectedValue(new Error("Database unavailable"));
+    mocks.can.mockReturnValue(true);
+    await expect(service.getProductPreviewBySlug(draft.slug, outsider)).rejects.toThrow(
+      "Database unavailable",
+    );
+    expect(mocks.can).not.toHaveBeenCalled();
   });
 
   it("never exposes a legacy paid resource through preview access", async () => {
     const paid = product({ price: 1000 });
     mocks.findBySlug.mockResolvedValue(paid);
     mocks.can.mockReturnValue(true);
+    mocks.hasManagementAccess.mockResolvedValue(true);
 
-    await expect(
-      service.getProductPreviewBySlug(
-        paid.slug,
-        outsider,
-      ),
-    ).resolves.toBeNull();
+    await expect(service.getProductPreviewBySlug(paid.slug, outsider)).resolves.toBeNull();
     expect(mocks.can).not.toHaveBeenCalled();
+    expect(mocks.hasManagementAccess).not.toHaveBeenCalled();
   });
 });

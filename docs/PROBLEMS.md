@@ -4569,3 +4569,48 @@ after the invocation. An earlier Node 26 invocation with mixed PATH exited zero 
 a complete console report and is not counted as verification. Node 24 also completed
 compile mode. PostgreSQL/browser/download handoff and full production generation remain
 unrun here. Publication uses [skip ci]; no live migration applied.
+
+## Unit baseline recovery and executable resource policy checks — 2026-10-14
+
+Recovered the exact published 15df21bf3e511ee80f0540e3a908c47065715b8b snapshot after
+scratch loss, preserving opaque workflow objects without running or inspecting Actions.
+Frozen installation uses Node 26.11.1 and pnpm 12.4.2; dependencies, lockfile and engines
+are unchanged. The same eight failures in seven files reproduce before this block.
+
+All eight failures came from stale test contracts/fixtures rather than a production
+regression requiring relaxed guards. Managed-resource SQL no longer trusts a caller's
+admin role: count and rows recheck the current users role and retain ownership/membership
+alternatives. Preview tests mock the live repository access lookup, cover a failed lookup
+and verify that guests/legacy paid resources do not consult private management access.
+Comment removal notices explicitly expect the current publication availability flag.
+Product feedback tests now exercise the review command with a rating, verify that article
+writes are bypassed, and reject missing rating, mixed targets and reply targets before
+any persistence. The review repository remains responsible for eligibility/rating rules.
+
+The download success fixture previously paired bytes `data` with an invented SHA-256 of
+64 `a` characters. The public stream correctly rejected it at EOF. The fixture now hashes
+the actual payload and supplies/finishes a delivery receipt. HTTP checks verify served
+receipt identity, cancellation after authorization, and a failed hash-mismatch receipt
+when provider metadata matches but delivered bytes differ. Completion still requires
+draining the response; metadata agreement alone is insufficient. Existing pre-delivery
+corruption, missing archive and abort coverage is retained.
+
+Replaced source-text checks with calls to the build repository and compiled Drizzle SQL.
+Submitting a newer build leaves a safe public release/current product version untouched
+when metadata does not need review; missing safe publication or changed metadata moves
+the product to pending review. Archived/suspended parents and lost live authority stop
+before writes. Predicate checks validate bound IDs, correlated product expressions and
+trusted scan provenance; actual attached schema checks retain the publication/scan rules.
+Free-claim negative coverage explicitly checks the product/build locks and absence of
+insert/update/delete after the shared availability guard rejects. SQL proxies verify
+branch/query construction and do not establish PostgreSQL rollback/concurrency behavior.
+
+No runtime application changes, endpoint, migration, entitlement rule or new preview
+permission is introduced. Real PostgreSQL, browser/download handoff and full production
+generation remain outside this unit-only verification block. Publication uses [skip ci].
+
+Verification: final complete unit project passes 6286 tests in 593 files under Node 26,
+including the additional HTTP post-metadata hash-mismatch case. All eight touched
+TypeScript files pass Biome lint without diagnostics. Complete root TypeScript passes
+both a forced check and the final incremental check; git diff --check passes. No tests
+are skipped or excluded to clear the eight failures. The prior full-unit blocker is closed.

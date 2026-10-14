@@ -9,6 +9,11 @@ const captured = vi.hoisted(() => ({
   updateTable: null as unknown,
   updateValues: null as Record<string, unknown> | null,
   updateWhere: null as SQL | null,
+  review: vi.fn(),
+}));
+
+vi.mock("./resource-reviews", () => ({
+  resourceReviewsRepository: { command: captured.review },
 }));
 
 vi.mock("../client", () => ({
@@ -72,6 +77,7 @@ describe("article comment persistence", () => {
     captured.updateTable = null;
     captured.updateValues = null;
     captured.updateWhere = null;
+    captured.review.mockReset();
   });
 
   it("stores comment, increments article count and writes audit in one transaction", async () => {
@@ -109,17 +115,54 @@ describe("article comment persistence", () => {
     expect(captured.updateWhere).toBeTruthy();
   });
 
-  it("does not touch article counters for non-article comments", async () => {
+  it("routes rated product feedback through the review command without article writes", async () => {
     const repository = new ContentRepository();
-    await repository.addComment({
+    captured.review.mockResolvedValue({ id: "cmt_product", ratingCount: 1, ratingAverage: 5 });
+    const created = await repository.addComment({
       id: "cmt_product",
       productId: "prd_1",
       authorId: "usr_1",
-      text: "Product discussion",
+      text: " Product review ",
+      rating: 5,
       isVerifiedPurchase: false,
     });
-    expect(captured.transactionCalls).toBe(1);
-    expect(captured.inserts).toEqual([comments]);
+    expect(captured.review).toHaveBeenCalledExactlyOnceWith({
+      actorId: "usr_1",
+      productId: "prd_1",
+      reviewId: "cmt_product",
+      auditId: "aud_cmt_product",
+      command: { action: "save", expectedRevision: 0, text: " Product review ", rating: 5 },
+    });
+    expect(created).toMatchObject({
+      id: "cmt_product",
+      productId: "prd_1",
+      text: "Product review",
+      rating: 5,
+      isVerifiedPurchase: true,
+    });
+    expect(captured.transactionCalls).toBe(0);
+    expect(captured.inserts).toEqual([]);
+    expect(captured.updateTable).toBeNull();
+  });
+
+  it.each([
+    { rating: undefined },
+    { rating: 5, contentId: "cnt_1" },
+    { rating: 5, parentId: "cmt_parent" },
+  ])("rejects invalid product review targets before any write: %j", async (target) => {
+    await expect(
+      new ContentRepository().addComment({
+        id: "cmt_product",
+        productId: "prd_1",
+        authorId: "usr_1",
+        text: "Review",
+        isVerifiedPurchase: false,
+        ...target,
+      }),
+    ).rejects.toMatchObject({ code: "REVIEW_INVALID" });
+    expect(captured.review).not.toHaveBeenCalled();
+    expect(captured.transactionCalls).toBe(0);
+    expect(captured.inserts).toEqual([]);
     expect(captured.updateTable).toBeNull();
   });
 });

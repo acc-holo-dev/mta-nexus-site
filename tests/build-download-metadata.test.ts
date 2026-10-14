@@ -1,4 +1,5 @@
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { LocalStorageProvider } from "../packages/storage/src/local-provider";
@@ -7,7 +8,7 @@ import { NextRequest } from "next/server";
 import { ValidationError } from "@nexus/domain";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ download: vi.fn(), audit: vi.fn(), hash: "a".repeat(64) }));
+const mocks = vi.hoisted(() => ({ download: vi.fn(), audit: vi.fn(), finish: vi.fn(), hash: "" }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: async () => ({ id: "admin", role: "admin" }) },
 }));
@@ -39,7 +40,13 @@ vi.mock("@nexus/db", () => {
   };
   return {
     buildReviewDownloadRepository: { authorize: mocks.audit },
-    resourceDownloadAuthorizationRepository: { authorize: async (input: unknown) => { await mocks.audit(input); return { slug: "product" }; } },
+    resourceDownloadAuthorizationRepository: {
+      authorize: async (input: unknown) => {
+        await mocks.audit(input);
+        return { slug: "product", receiptId: "receipt" };
+      },
+    },
+    resourceDeliveriesRepository: { finish: mocks.finish },
     productRepository: {
       findById: async () => ({ id: "product", slug: "product", status: "published" }),
     },
@@ -65,9 +72,10 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
       : publicDownload(req, { params: Promise.resolve({ id: "product" }) });
   };
   beforeEach(() => {
-    mocks.hash = "a".repeat(64);
+    mocks.hash = createHash("sha256").update("data").digest("hex");
     mocks.download.mockReset();
     mocks.audit.mockReset();
+    mocks.finish.mockReset();
   });
   it.each([0, 3, 5])("rejects size %s before auditing or delivering bytes", async (sizeBytes) => {
     const stream = Readable.from(Buffer.from("data"));
@@ -76,9 +84,7 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
     expect(response.status).toBe(409);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(await response.json()).toMatchObject({ code: "BUILD_ARTIFACT_MISMATCH" });
     expect(stream.destroyed).toBe(true);
     expect(mocks.audit).not.toHaveBeenCalled();
@@ -135,12 +141,36 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
     const response = await request();
     expect(response.status).toBe(200);
     expect(response.headers.get("Content-Length")).toBe("4");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(await response.text()).toBe("data");
     expect(mocks.audit).toHaveBeenCalledOnce();
+    if (!reviewer) {
+      expect(response.headers.get("X-Resource-Delivery-Id")).toBe("receipt");
+      expect(mocks.finish).toHaveBeenCalledExactlyOnceWith({
+        userId: "admin",
+        receiptId: "receipt",
+        auditId: "audit",
+        result: { status: "served", bytesSent: 4, errorCode: null },
+      });
+    } else expect(mocks.finish).not.toHaveBeenCalled();
   });
+  if (!reviewer)
+    it("rejects changed response bytes despite matching provider metadata and records a failed receipt", async () => {
+      const stream = Readable.from(Buffer.from("oops"));
+      mocks.download.mockResolvedValue({ stream, meta: { sizeBytes: 4, sha256Hash: mocks.hash } });
+      const response = await request();
+      expect(response.status).toBe(200);
+      expect(response.headers.get("X-Resource-Delivery-Id")).toBe("receipt");
+      await expect(response.text()).rejects.toThrow("integrity check");
+      expect(mocks.audit).toHaveBeenCalledOnce();
+      expect(mocks.finish).toHaveBeenCalledExactlyOnceWith({
+        userId: "admin",
+        receiptId: "receipt",
+        auditId: "audit",
+        result: { status: "failed", bytesSent: 4, errorCode: "hash_mismatch" },
+      });
+      expect(stream.destroyed).toBe(true);
+    });
   it.each([false, true])(
     "checks actual local bytes before delivery (corrupted=%s)",
     async (corrupted) => {
@@ -178,23 +208,31 @@ describe.each([false, true])("download metadata (reviewer=%s)", (reviewer) => {
     const response = await request(controller.signal);
     expect(response.status).toBe(499);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(await response.json()).toMatchObject({ code: "DOWNLOAD_CANCELLED" });
     expect(stream.destroyed).toBe(true);
     expect(mocks.audit).not.toHaveBeenCalled();
+    expect(mocks.finish).not.toHaveBeenCalled();
   });
 
   it("closes a prepared stream if cancellation arrives during audit", async () => {
     const controller = new AbortController();
     const stream = Readable.from(Buffer.from("data"));
     mocks.download.mockResolvedValue({ stream, meta: { sizeBytes: 4, sha256Hash: mocks.hash } });
-    mocks.audit.mockImplementation(async () => { controller.abort(); });
+    mocks.audit.mockImplementation(async () => {
+      controller.abort();
+    });
     const response = await request(controller.signal);
     expect(response.status).toBe(499);
     expect(stream.destroyed).toBe(true);
     expect(mocks.audit).toHaveBeenCalledOnce();
+    if (!reviewer)
+      expect(mocks.finish).toHaveBeenCalledExactlyOnceWith({
+        userId: "admin",
+        receiptId: "receipt",
+        auditId: "audit",
+        result: { status: "cancelled", bytesSent: 0, errorCode: null },
+      });
+    else expect(mocks.finish).not.toHaveBeenCalled();
   });
-
 });

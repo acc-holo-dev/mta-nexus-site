@@ -1,5 +1,11 @@
 # MTA NEXUS
 
+The unit baseline is green again after correcting eight stale checks and fixtures.
+Resource tests now exercise live management authorization, actual download bytes and
+delivery receipts, and the publication/metadata-review branches of the build repository.
+Safe publication predicates and schema constraints are checked through generated SQL;
+the shared free-claim guard still prevents writes without a safe published build.
+
 Individual version choices now retain their exact resource/command across uncertain
 retries and server refreshes. Compared-release acknowledgement is tied to the displayed
 archive and preference snapshot; ordinary fixed choices also recheck the displayed
