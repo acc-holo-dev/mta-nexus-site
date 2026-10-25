@@ -17,12 +17,17 @@ it("enforces author and organization authority in PostgreSQL, including revocati
     await tx.execute(
       sql`CREATE TEMP TABLE organization_members (organization_id text, user_id text, role text, permissions jsonb) ON COMMIT DROP`,
     );
+    // Shadow users so admin scope rechecks the fixture row, not production users.
+    await tx.execute(sql`CREATE TEMP TABLE users (id text, role text) ON COMMIT DROP`);
     await tx.execute(sql`INSERT INTO organizations VALUES ('org', 'org-owner')`);
     await tx.execute(
       sql`INSERT INTO products VALUES ('personal', 'author', null), ('team', 'author', 'org'), ('other', 'other', null)`,
     );
     await tx.execute(
       sql`INSERT INTO organization_members VALUES ('org', 'manager', 'member', '["manage_products"]'), ('org', 'reader', 'member', '[]'), ('org', 'org-admin', 'admin', '[]')`,
+    );
+    await tx.execute(
+      sql`INSERT INTO users VALUES ('author', 'developer'), ('org-owner', 'developer'), ('manager', 'developer'), ('org-admin', 'developer'), ('reader', 'developer'), ('unrelated', 'admin'), ('other', 'developer')`,
     );
     const accessible = async (
       id: string,
