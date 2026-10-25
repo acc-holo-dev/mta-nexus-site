@@ -20,7 +20,16 @@ const routes = [
 ];
 const sourceFiles = new Set([
   ...routes.map(([route]) => resolve(sourceRoot, "app", route, "page.tsx")),
-  ...["i18n.ts", "i18n-server.ts", "profile-pagination.ts"].map(file => resolve(sourceRoot, "lib", file)),
+  ...[
+    "i18n.ts",
+    "i18n-server.ts",
+    "profile-pagination.ts",
+    "public-user-trust-copy.ts",
+    "public-context-trust-copy.ts",
+    "publication-feed-copy.ts",
+    "verification-workspace-copy.ts",
+    "server-statistics-copy.ts",
+  ].map(file => resolve(sourceRoot, "lib", file)),
 ]);
 const emptyPage = async () => ({ products: [], servers: [], items: [], total: 0, page: 1, totalPages: 1 });
 const read = async (kind, key) => {
@@ -46,6 +55,24 @@ const mocks = {
     contentRepository: { pagePublishedEditorialByOrganization: emptyPage },
   },
   "auth-service": { authService: { getUserByUsername: key => read("user", key) } },
+  "verification-workspace-service": {
+    verificationWorkspaceService: {
+      publicProfile: async () => ({
+        specialties: ["scripting"],
+        githubUrl: null,
+        discordTag: null,
+        verifiedDeveloper: false,
+      }),
+    },
+  },
+  "profile-privacy-service": {
+    profilePrivacyService: {
+      visibility: async () => ({
+        showActivity: true,
+        showProfessionalContacts: true,
+      }),
+    },
+  },
   "server-service": { serverService: { getServerBySlug: key => read("server", key) } },
   "mta-master-directory-service": {
     mtaMasterDirectoryService: { getDirectory: async () => null },

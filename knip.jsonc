@@ -6,14 +6,21 @@
       "entry": ["scripts/**/*.{mjs,ts}", "tests/**/*.test.{ts,tsx}", "playwright.ci.config.mjs"],
       "project": ["scripts/**/*.{mjs,ts}", "tests/**/*.{ts,tsx}", "*.{mjs,cjs,ts}"],
       // Browser checks install Playwright into an isolated prefix in the shell runners.
-      "ignoreDependencies": ["@playwright/test", "@axe-core/playwright"],
+      // `postgres` is consumed by root operational scripts via the @nexus/db workspace install.
+      "ignoreDependencies": ["@playwright/test", "@axe-core/playwright", "postgres"],
       // OpenSSL is an OS dependency of the closed TLS provider test.
       "ignoreBinaries": ["openssl"]
     },
     "apps/web": {
       "entry": ["scripts/**/*.ts"],
       "project": ["src/**/*.{ts,tsx,css}", "scripts/**/*.ts"],
-      "next": true
+      "next": true,
+      "ignoreIssues": {
+        "src/lib/auth-request-body.ts": ["exports"],
+        "src/lib/browser-request-policy.ts": ["exports"],
+        "src/lib/services/build-package-inspection.ts": ["exports"],
+        "src/lib/storage-maintenance-query.ts": ["exports"]
+      }
     },
     "packages/*": {
       "project": ["src/**/*.{ts,tsx}"]
@@ -22,7 +29,18 @@
       // The worker integration test starts this fixture through a computed fork path.
       "entry": ["scripts/**/*.{ts,mjs}", "src/repositories/account-mail-worker.fixture.ts"],
       "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mjs}"],
-      "drizzle": true
+      "drizzle": true,
+      "ignoreIssues": {
+        "src/repositories/library-collection-history.ts": ["exports"],
+        "src/repositories/library-membership-history.ts": ["exports"],
+        "src/repositories/resource-release-worker.ts": ["exports"]
+      }
+    },
+    "packages/validation": {
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignoreIssues": {
+        "src/resource-release-watches.ts": ["duplicates"]
+      }
     }
   }
 }

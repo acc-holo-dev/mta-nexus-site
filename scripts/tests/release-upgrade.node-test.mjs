@@ -219,7 +219,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0067_library_collections");
+  assert.equal(plan.targetTag, "0078_library_collection_reconciliation");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),
