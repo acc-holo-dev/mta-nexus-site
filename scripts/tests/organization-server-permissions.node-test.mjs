@@ -3,7 +3,8 @@ import { test } from "node:test";
 import { grantsServerManagement } from "../../packages/domain/src/organization-server-permissions.ts";
 
 for (const [label, membership, allowed] of [
-  ["organization owner role", { role: "owner", permissions: [] }, true],
+  // Owner authority is proven via the organization row, not this membership helper.
+  ["organization owner role", { role: "owner", permissions: [] }, false],
   ["organization admin role", { role: "admin", permissions: [] }, true],
   ["delegated server manager", { role: "member", permissions: ["manage_servers"] }, true],
   ["developer with explicit delegation", { role: "developer", permissions: ["manage_servers"] }, true],
