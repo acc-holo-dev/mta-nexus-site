@@ -195,9 +195,14 @@ async function readCollectionItems(
   const [summary] = await tx.execute<{ total: number; ready: number }>(sql`${sources}
         SELECT count(*)::integer AS total, count(*) FILTER(WHERE downloadable)::integer AS ready FROM resource_rows ${search}`);
   const bounds = historyPageBounds(Number(summary?.total ?? 0), page);
-  const items = await tx.execute<LibraryCollectionItem>(sql`${sources}
+  const rows = await tx.execute<LibraryCollectionItem>(sql`${sources}
         SELECT "productId","addedAt",title,slug,version,"buildId",downloadable,"hasAccess","inCollection"
         FROM resource_rows ${search} ORDER BY "addedAt" DESC,"productId" ASC LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}`);
+  // postgres.js may return timestamptz as string; callers and contracts expect Date.
+  const items = rows.map((item) => ({
+    ...item,
+    addedAt: item.addedAt instanceof Date ? item.addedAt : new Date(item.addedAt),
+  }));
   return {
     collection,
     items,
