@@ -18,6 +18,7 @@ import {
   MultipartBodyTooLargeError,
   parseMultipartFormDataWithLimit,
 } from "../../../../../lib/bounded-multipart";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
 const BUILD_FILE_SIZE_LIMIT_MB = MAX_FILE_SIZE_BYTES / (1024 * 1024);
 const BUILD_MIME_TYPES: Record<string, string> = {
@@ -55,10 +56,10 @@ const buildMetadataSchema = z.object({
   mtaVersionTarget: mtaVersionSchema.optional().or(z.literal("")),
 });
 
-export async function POST(
+export const POST = withBrowserMutation(async (
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+  { params }: { params: Promise<{ id: string }> },
+) => {
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -319,4 +320,4 @@ export async function POST(
     }
     return privateJson(context, { error: "Could not publish build" }, { status: 500 });
   }
-}
+});

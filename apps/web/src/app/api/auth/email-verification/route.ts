@@ -1,5 +1,5 @@
 import { readAuthJson } from "../../../../lib/auth-request-body";
-import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { type NextRequest, NextResponse } from "next/server";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
@@ -39,9 +39,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
-  const rejected = rejectUnsafeBrowserRequest(request);
-  if (rejected) return rejected;
+export const POST = withBrowserMutation(async (request: NextRequest) => {
+
   const context = createRequestLogContext(request);
   try {
     const current = await actor(request);
@@ -75,11 +74,10 @@ export async function POST(request: NextRequest) {
     });
     return json({ error: "Could not start email verification. Please try again later." }, 503);
   }
-}
+});
 
-export async function PATCH(request: NextRequest) {
-  const rejected = rejectUnsafeBrowserRequest(request);
-  if (rejected) return rejected;
+export const PATCH = withBrowserMutation(async (request: NextRequest) => {
+
   const context = createRequestLogContext(request);
   try {
     const current = await actor(request);
@@ -106,5 +104,5 @@ export async function PATCH(request: NextRequest) {
     });
     return json({ error: "Could not confirm this email. Please try again later." }, 503);
   }
-}
+});
 

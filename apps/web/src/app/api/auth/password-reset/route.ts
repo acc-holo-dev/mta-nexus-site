@@ -1,5 +1,5 @@
 import { readAuthJson } from "../../../../lib/auth-request-body";
-import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { randomInt } from "node:crypto";
 import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
@@ -23,9 +23,8 @@ function json(context: RequestLogContext, body: unknown, status = 200) {
 }
 
 
-export async function POST(request: NextRequest) {
-  const rejected = rejectUnsafeBrowserRequest(request);
-  if (rejected) return rejected;
+export const POST = withBrowserMutation(async (request: NextRequest) => {
+
   const context = createRequestLogContext(request);
   const startedAt = performance.now();
   const targetMs = passwordResetTargetMs(
@@ -57,11 +56,10 @@ export async function POST(request: NextRequest) {
     await waitForPasswordResetFloor(startedAt, targetMs);
     return json(context, { error: "Password reset is temporarily unavailable. Please try again later." }, 503);
   }
-}
+});
 
-export async function PATCH(request: NextRequest) {
-  const rejected = rejectUnsafeBrowserRequest(request);
-  if (rejected) return rejected;
+export const PATCH = withBrowserMutation(async (request: NextRequest) => {
+
   const context = createRequestLogContext(request);
   try {
     const parsed = confirmPasswordResetSchema.safeParse(await readAuthJson(request));
@@ -87,5 +85,5 @@ export async function PATCH(request: NextRequest) {
     });
     return json(context, { error: "Could not reset the password. Request a new link and try again." }, 503);
   }
-}
+});
 

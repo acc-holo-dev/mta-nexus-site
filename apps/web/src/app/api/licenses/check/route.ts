@@ -2,12 +2,11 @@ import type { NextRequest } from "next/server";
 import { licenseControlsRepository } from "@nexus/db";
 import { ValidationError } from "@nexus/domain";
 import { licenseRuntimeCheckSchema } from "@nexus/validation";
-import { licenseRuntimeRequest } from "../../../../lib/license-runtime-http";
+import { withLicenseBearerRoute } from "../../../../lib/license-bearer-route-adapter";
 import { readBoundedJson } from "../../../../lib/bounded-json";
-export function POST(request: NextRequest) {
-  return licenseRuntimeRequest(request, async (digest) => {
-    const parsed = licenseRuntimeCheckSchema.safeParse(await readBoundedJson(request, 1024));
-    if (!parsed.success) throw new ValidationError("Invalid license check");
-    return licenseControlsRepository.verify(digest, parsed.data.serverId);
-  });
-}
+
+export const POST = withLicenseBearerRoute(async (digest, request: NextRequest) => {
+  const parsed = licenseRuntimeCheckSchema.safeParse(await readBoundedJson(request, 1024));
+  if (!parsed.success) throw new ValidationError("Invalid license check");
+  return licenseControlsRepository.verify(digest, parsed.data.serverId);
+});

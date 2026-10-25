@@ -1,7 +1,7 @@
 import { SESSION_LIFETIME_SECONDS } from "../../../../lib/session-policy";
 import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
 import { readAuthJson } from "../../../../lib/auth-request-body";
-import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { type NextRequest, NextResponse } from "next/server";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
@@ -22,9 +22,8 @@ function json(body: unknown, status = 200) {
   });
 }
 
-export async function POST(request: NextRequest) {
-  const rejected = rejectUnsafeBrowserRequest(request);
-  if (rejected) return rejected;
+export const POST = withBrowserMutation(async (request: NextRequest) => {
+
   const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
@@ -78,5 +77,5 @@ export async function POST(request: NextRequest) {
     });
     return json({ error: "Failed to register" }, 500);
   }
-}
+});
 
