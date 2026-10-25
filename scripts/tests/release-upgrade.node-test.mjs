@@ -43,7 +43,12 @@ test("package evidence upgrade preserves unknown historical bytes and immutable 
   assert.match(migration, /NEW\.package_evidence IS DISTINCT FROM OLD\.package_evidence/u);
   assert.match(migration, /BEFORE UPDATE ON builds/u);
   assert.doesNotMatch(migration, /UPDATE (builds|products|orders|payments)|DELETE FROM|INSERT INTO/u);
-  assert.match(readFileSync(script, "utf8"), /buildPackageEvidenceSchemaPresent = true/u);
+  const rehearsal = readFileSync(script, "utf8");
+  assert.match(rehearsal, /buildPackageEvidenceSchemaPresent = true/u);
+  assert.match(
+    rehearsal,
+    /to_jsonb\(t\) - 'quarantine_previous_status' - 'quarantine_reason' - 'quarantined_at' - 'quarantined_by' - 'revision' - 'package_evidence'/u,
+  );
 });
 
 test("cart receipt migration preserves earlier uncertainty and immutable account-scoped evidence", () => {
