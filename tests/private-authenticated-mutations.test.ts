@@ -21,17 +21,22 @@ describe("private authenticated mutation responses", () => {
   });
 
   it("keeps login and registration session cookies hardened", () => {
+    const cookiePolicy = read("apps/web/src/lib/session-cookie.ts");
+    expect(cookiePolicy).toContain("httpOnly: true");
+    expect(cookiePolicy).toContain(
+      'secure: process.env.NODE_ENV === "production"',
+    );
+    expect(cookiePolicy).toContain('sameSite: "lax"');
+    expect(cookiePolicy).toContain('path: "/"');
+
     for (const path of [
       "apps/web/src/app/api/auth/login/route.ts",
       "apps/web/src/app/api/auth/register/route.ts",
     ]) {
       const source = read(path);
-      expect(source).toContain('httpOnly: true');
-      expect(source).toContain(
-        'secure: process.env.NODE_ENV === "production"',
-      );
-      expect(source).toContain('sameSite: "lax"');
-      expect(source).toContain('path: "/"');
+      expect(source).toContain("sessionCookieOptions");
+      expect(source).toContain("SESSION_COOKIE_NAME");
+      expect(source).toContain("...sessionCookieOptions()");
     }
   });
 
