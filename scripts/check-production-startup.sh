@@ -103,6 +103,8 @@ push_worker=$("${pc[@]}" ps -q push-worker)
 [[ -n $push_worker ]]
 [[ $("${pc[@]}" exec -T app id -u) != 0 ]]
 [[ $("${pc[@]}" exec -T push-worker id -u) != 0 ]]
+[[ $("${pc[@]}" exec -T license-worker id -u) != 0 ]]
+[[ $("${pc[@]}" exec -T resource-release-worker id -u) != 0 ]]
 [[ "$(docker inspect --format '{{.HostConfig.ReadonlyRootfs}}' "$push_worker")" == true ]]
 [[ "$(docker inspect --format '{{.HostConfig.PidsLimit}}' "$push_worker")" == 128 ]]
 [[ "$(docker inspect --format '{{json .HostConfig.CapDrop}}' "$push_worker")" == '["ALL"]' ]]
@@ -172,7 +174,7 @@ NODE
 echo 'PASS: push-worker process crash is supervised, restarted and healthy without restarting app/postgres'
 fi
 phase=private-ports
-for service in app push-worker postgres clamav; do
+for service in app push-worker license-worker resource-release-worker postgres clamav; do
   id=$("${pc[@]}" ps -q "$service")
   [[ -n $id && -z $(docker port "$id") ]]
 done

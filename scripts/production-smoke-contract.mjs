@@ -36,7 +36,7 @@ export function assertIsolatedProduction(config, project, caddyFile) {
   assert.equal(config.name, project);
   assert.deepEqual(
     Object.keys(config.services).sort(),
-    ['app', 'caddy', 'clamav', 'postgres', 'push-worker'],
+    ['app', 'caddy', 'clamav', 'license-worker', 'postgres', 'push-worker', 'resource-release-worker'],
   );
   assert.equal(config.services.app.environment.NODE_ENV, 'production');
   assert.equal(config.services.app.environment.NEXT_PUBLIC_APP_URL, 'https://nexus-ci.test');
@@ -60,6 +60,12 @@ export function assertIsolatedProduction(config, project, caddyFile) {
     'push-worker must keep a 75-second graceful stop budget',
   );
   assert(pushWorker.tmpfs?.some((entry) => String(entry).startsWith('/tmp:')));
+  for (const name of ['license-worker', 'resource-release-worker']) {
+    const worker = config.services[name];
+    assert.equal(worker.image, config.services.app.image);
+    assert.equal(worker.user, 'node');
+    assert.equal(worker.init, true);
+  }
   for (const [name, service] of Object.entries(config.services)) {
     assert(!service.privileged && !service.container_name && !service.network_mode);
     if (name === 'push-worker') {

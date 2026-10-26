@@ -38,6 +38,18 @@ const fixture = () => ({
       stop_grace_period: '1m15s',
       tmpfs: ['/tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777'],
     },
+    'license-worker': {
+      image: 'nexus-ci:test',
+      restart: 'no',
+      user: 'node',
+      init: true,
+    },
+    'resource-release-worker': {
+      image: 'nexus-ci:test',
+      restart: 'no',
+      user: 'node',
+      init: true,
+    },
     postgres: { restart: 'no' }, clamav: { restart: 'no' },
     caddy: { restart: 'no', ports: [
       { host_ip: '127.0.0.1', published: '8080', target: 80 },

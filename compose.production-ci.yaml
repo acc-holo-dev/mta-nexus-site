@@ -12,6 +12,12 @@ services:
       ACCOUNT_RECOVERY_ABUSE_KEY: ${NEXUS_CI_ACCOUNT_RECOVERY_ABUSE_KEY:?use scripts/check-production-startup.sh}
   push-worker:
     image: ${NEXUS_CI_IMAGE:?use scripts/check-production-startup.sh}
+  license-worker:
+    image: ${NEXUS_CI_IMAGE:?use scripts/check-production-startup.sh}
+    restart: "no"
+  resource-release-worker:
+    image: ${NEXUS_CI_IMAGE:?use scripts/check-production-startup.sh}
+    restart: "no"
   postgres:
     restart: "no"
   clamav:
