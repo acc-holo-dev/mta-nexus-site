@@ -7,10 +7,11 @@ import {
   editableProfile,
 } from "../../../../lib/services/public-profile-service";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 export function GET(request: NextRequest) {
   return userPlatformApi(request, async (user) => ({ profile: editableProfile(user) }));
 }
-export function PATCH(request: NextRequest) {
+export const PATCH = withBrowserMutation((request: NextRequest) => {
   return userPlatformApi(request, async (user) => {
     if (!(await consumeRateLimit("profileEditing", user.id)).success)
       throw new RateLimitExceededError();
@@ -20,4 +21,4 @@ export function PATCH(request: NextRequest) {
       profile: await publicProfileService.update(await readBoundedJson(request, 16 * 1024), user),
     };
   });
-}
+});

@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { AppError } from "@nexus/domain";
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
@@ -29,6 +29,7 @@ vi.mock("@nexus/db", () => ({
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 import { GET as overview, POST } from "../apps/web/src/app/api/workspace/verification/route";
 import { GET as targets } from "../apps/web/src/app/api/workspace/verification/targets/route";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { GET as own, PATCH as update } from "../apps/web/src/app/api/account/developer/route";
 import { PATCH as decide } from "../apps/web/src/app/api/admin/verification/[id]/route";
 const actor = { id: "actor", role: "developer" },
@@ -50,6 +51,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
   return new NextRequest(`https://nexus.test/api/workspace/verification${query}`, {
     method,
     headers: {
+      ...browserMutationHeaders(),
       cookie: "nexus_session=test;nexus_locale=ru",
       "content-type": "application/json",
       ...headers,
@@ -59,6 +61,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   mocks.session.mockResolvedValue(actor);
   mocks.rate.mockResolvedValue({ success: true });
   mocks.overview.mockResolvedValue({});
@@ -72,6 +75,9 @@ beforeEach(() => {
     status: "pending",
   });
   mocks.decide.mockResolvedValue({ id: "ver_application", status: "approved" });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("binds private reads to the current session and keeps history/organization queries separate", async () => {
   const response = await overview(request("GET", undefined, "?view=history&type=developer&page=2"));

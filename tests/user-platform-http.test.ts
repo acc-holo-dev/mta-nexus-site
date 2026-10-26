@@ -1,4 +1,4 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 const now = new Date("2026-10-10T12:00:00Z");
@@ -27,6 +27,7 @@ vi.mock("@nexus/security", () => ({
   consumeRateLimit: mocks.rate,
   generateId: (prefix: string) => `${prefix}_generated`,
 }));
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import {
   GET as profileGet,
   PATCH as profilePatch,
@@ -51,6 +52,7 @@ function request(method: string, body?: unknown, locale = "en", headers = {}) {
   return new NextRequest("http://nexus.test/api/workspace/content?page=2&q=hello&status=draft", {
     method,
     headers: {
+      ...browserMutationHeaders(),
       cookie: `nexus_session=test; nexus_locale=${locale}`,
       "content-type": "application/json",
       ...headers,
@@ -60,6 +62,7 @@ function request(method: string, body?: unknown, locale = "en", headers = {}) {
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   state.user = {
     id: "usr_author",
     username: "author",
@@ -93,6 +96,9 @@ beforeEach(() => {
     ...fields,
     updatedAt: new Date(now.getTime() + 1),
   }));
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it.each(["en", "ru"])("uses private cache and a safe account projection in %s", async (locale) => {
   const response = await profileGet(request("GET", undefined, locale));
