@@ -26,7 +26,6 @@ apps/web/src/app/api/library/review/[id]/route.ts
 apps/web/src/app/api/library/watches/[id]/route.ts
 apps/web/src/app/api/library/watches/disable/route.ts
 apps/web/src/app/api/library/watches/resume/route.ts
-apps/web/src/app/api/licenses/[id]/actions/route.ts
 apps/web/src/app/api/notifications/inbox/route.ts
 apps/web/src/app/api/notifications/mark-read/route.ts
 apps/web/src/app/api/notifications/preferences/route.ts
