@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "actor", username: "member" } as { id: string; username: string } | null,
@@ -45,6 +46,7 @@ function request(path: string, method = "GET", body?: unknown, locale = "en", he
   return new NextRequest(`http://nexus.test${path}`, {
     method,
     headers: {
+      ...browserMutationHeaders(),
       cookie: `nexus_session=test;nexus_locale=${locale}`,
       "content-type": "application/json",
       ...headers,
@@ -54,6 +56,7 @@ function request(path: string, method = "GET", body?: unknown, locale = "en", he
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   state.actor = { id: "actor", username: "member" };
   state.callbacks = [];
   mocks.rate.mockResolvedValue({ success: true });
@@ -65,6 +68,9 @@ beforeEach(() => {
     following: value,
     created: value,
   }));
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("serves anonymous paginated Discovery using category-specific normalized filters", async () => {
   state.actor = null;
