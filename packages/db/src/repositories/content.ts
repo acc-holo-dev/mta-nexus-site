@@ -5,6 +5,7 @@ import { db } from "../client";
 import { organizationWorkspaceAccess } from "./organization-workspace";
 import { serverContentAccess } from "./server-content";
 import { publicationNotice } from "./publication-notice";
+import { lockInitiatingSession } from "./initiating-session";
 import { resourceReviewsRepository } from "./resource-reviews";
 import { auditEvents, content, comments, users } from "../schema";
 import { AppError, NotFoundError } from "@nexus/domain";
@@ -256,6 +257,7 @@ export class ContentRepository {
     status: Content["status"],
     expectedStatus: Content["status"],
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
     expectedUpdatedAt?: Date,
     publicationOnly = false,
   ): Promise<Content | null> {
@@ -275,6 +277,7 @@ export class ContentRepository {
         .limit(1);
       if (!actor || !["admin", "moderator"].includes(actor.role))
         throw new AppError("Current moderator privilege required", 403, "FORBIDDEN");
+      await lockInitiatingSession(tx, audit.actorId ?? "", currentToken);
       if (
         publicationOnly &&
         ![

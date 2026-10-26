@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { buildRepository, productRepository, userRepository } from "@nexus/db";
+import { buildRepository, productRepository, sessionRepository, userRepository } from "@nexus/db";
 
 describe("published build/currentVersion consistency", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -24,6 +24,12 @@ describe("published build/currentVersion consistency", () => {
       username: `build_consistency_staff_${suffix}`,
       displayName: "Build Consistency Staff",
       role: "admin",
+    });
+    await sessionRepository.create({
+      id: `ses_${staffId}`,
+      userId: staffId,
+      token: `tok_${staffId}`,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
 
     await productRepository.create({
@@ -91,7 +97,7 @@ describe("published build/currentVersion consistency", () => {
         targetType: "build",
       },
       1,
-    );
+    `tok_${staffId}`);
     expect(newer?.status).toBe("published");
 
     const older = await buildRepository.moderatePending(
@@ -106,7 +112,7 @@ describe("published build/currentVersion consistency", () => {
         targetType: "build",
       },
       1,
-    );
+    `tok_${staffId}`);
     expect(older?.status).toBe("published");
 
     const product = await productRepository.findById(productId);
@@ -186,7 +192,7 @@ describe("published build/currentVersion consistency", () => {
           targetType: "build",
         },
         1,
-      ),
+      `tok_${staffId}`),
       buildRepository.moderatePending(
         secondId,
         "approve",
@@ -199,7 +205,7 @@ describe("published build/currentVersion consistency", () => {
           targetType: "build",
         },
         1,
-      ),
+      `tok_${staffId}`),
     ]);
 
     const product = await productRepository.findById(concurrentProductId);

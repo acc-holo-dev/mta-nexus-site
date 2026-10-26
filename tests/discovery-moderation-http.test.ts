@@ -106,7 +106,7 @@ const valid = {
 it("saves a strict observed-version command under session identity", async () => {
   const response = await command(request("/api/admin/community/item", valid), context);
   expect(response.status).toBe(200);
-  expect(mocks.command).toHaveBeenCalledWith(actor, "item", valid);
+  expect(mocks.command).toHaveBeenCalledWith(actor, "item", valid, "token");
   expect(mocks.rate).toHaveBeenCalledWith("moderationAction", "actor");
 });
 it.each([

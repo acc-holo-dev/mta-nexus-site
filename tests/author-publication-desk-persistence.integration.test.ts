@@ -4,6 +4,7 @@ import {
   contentRepository,
   db,
   publicationFeedRepository as feed,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
 import type { Content, User } from "@nexus/domain";
@@ -158,6 +159,12 @@ it("denies retained legacy and team archives and never reverses a subsequent mod
   const actor = await user(),
     moderator = await user();
   await db.update(users).set({ role: "moderator" }).where(eq(users.id, moderator.id));
+  await sessionRepository.create({
+    id: `ses_${moderator.id}`,
+    userId: moderator.id,
+    token: `tok_${moderator.id}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   const legacy = await publication(actor),
     team = await publication(actor),
     item = await publication(actor);
@@ -182,6 +189,7 @@ it("denies retained legacy and team archives and never reverses a subsequent mod
       ...audit(moderator, item, "content.archived"),
       details: { from: "archived", to: "archived", notes: "PRIVATE_STAFF_REASON" },
     },
+    `tok_${moderator.id}`,
     current.updatedAt,
     true,
   );

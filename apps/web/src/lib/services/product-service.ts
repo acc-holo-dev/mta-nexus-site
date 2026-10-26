@@ -392,7 +392,8 @@ export class ProductService {
   }
   async reviewBuild(
     input: { buildId: string; decision: "approve" | "reject"; notes?: string; expectedRevision: number },
-    actor: User
+    actor: User,
+    currentToken: string,
   ): Promise<Build> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError("Moderator privilege is required to review builds");
@@ -432,7 +433,7 @@ export class ProductService {
       targetId: build.id,
       targetType: "build",
       details: { productId: product.id, version: build.version, notes: input.notes, expectedRevision: input.expectedRevision },
-    }, input.expectedRevision);
+    }, input.expectedRevision, currentToken);
     if (!reviewed) {
       throw new AppError(
         "Build state changed before moderation completed",
@@ -465,6 +466,7 @@ export class ProductService {
   async quarantineBuild(
     input: { buildId: string; reason: string },
     actor: User,
+    currentToken: string,
   ): Promise<Build> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError(
@@ -500,6 +502,7 @@ export class ProductService {
           previousStatus: build.status,
         },
       },
+      currentToken,
     );
     if (!quarantined) {
       throw new AppError(
@@ -514,6 +517,7 @@ export class ProductService {
   async restoreQuarantinedBuild(
     input: { buildId: string; reason: string },
     actor: User,
+    currentToken: string,
   ): Promise<Build> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError(
@@ -559,6 +563,7 @@ export class ProductService {
           quarantineReason: build.quarantineReason,
         },
       },
+      currentToken,
     );
     if (!restored) {
       throw new AppError(

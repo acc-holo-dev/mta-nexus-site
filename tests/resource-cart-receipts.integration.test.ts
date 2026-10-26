@@ -7,6 +7,7 @@ import {
   resourceCartRepository as cart,
   resourceCartReceiptsRepository as receipts,
   buildRepository,
+  sessionRepository,
 } from "@nexus/db";
 import {
   auditEvents,
@@ -37,6 +38,12 @@ async function fixture() {
       displayName: id,
       role,
     });
+  await sessionRepository.create({
+    id: `ses_${staff}`,
+    userId: staff,
+    token: `tok_${staff}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   await db
     .insert(products)
     .values({
@@ -103,7 +110,7 @@ async function fixture() {
         targetId: next,
       },
       1,
-    );
+    `tok_${staff}`);
     if (!reviewed) throw new Error("Missing approved release");
     return next;
   }

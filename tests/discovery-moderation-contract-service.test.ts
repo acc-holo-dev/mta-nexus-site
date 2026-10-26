@@ -223,8 +223,16 @@ it("routes decisions through existing content moderation with observed revision 
     notes: "Reviewed",
     expectedUpdatedAt: date.toISOString(),
   };
-  const saved = await moderation.command(actor, "item", command);
-  expect(mocks.command).toHaveBeenCalledWith("item", "publish", actor, "Reviewed", date, true);
+  const saved = await moderation.command(actor, "item", command, "staff-session");
+  expect(mocks.command).toHaveBeenCalledWith(
+    "item",
+    "publish",
+    actor,
+    "staff-session",
+    "Reviewed",
+    date,
+    true,
+  );
   expect(saved).toEqual({
     id: "item",
     action: "publish",
@@ -255,7 +263,7 @@ it("blocks publishing an incomplete legacy preview without issuing a write", asy
       action: "publish",
       notes: "Reviewed",
       expectedUpdatedAt: date.toISOString(),
-    }),
+    }, "staff-session"),
   ).rejects.toMatchObject({ code: "CONTENT_REVIEW_TOO_LARGE" });
   expect(mocks.command).not.toHaveBeenCalled();
 });

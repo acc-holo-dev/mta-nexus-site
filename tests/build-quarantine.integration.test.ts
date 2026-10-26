@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { auditRepository, buildRepository, productRepository, userRepository } from "@nexus/db";
+import { auditRepository, buildRepository, productRepository, sessionRepository, userRepository } from "@nexus/db";
 
 describe("build quarantine lifecycle", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -16,6 +16,12 @@ describe("build quarantine lifecycle", () => {
       username: `quarantine_mod_${suffix}`,
       displayName: "Quarantine Moderator",
       role: "admin",
+    });
+    await sessionRepository.create({
+      id: `ses_${moderatorId}`,
+      userId: moderatorId,
+      token: `tok_${moderatorId}`,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
     await userRepository.create({
       id: authorId,
@@ -77,7 +83,7 @@ describe("build quarantine lifecycle", () => {
           targetType: "build",
         },
         1,
-      );
+      `tok_${moderatorId}`);
     }
   });
 
@@ -95,7 +101,7 @@ describe("build quarantine lifecycle", () => {
         targetType: "build",
         details: { reason: "Suspicious behavior under investigation" },
       },
-    );
+    `tok_${moderatorId}`);
 
     expect(quarantined).toMatchObject({
       status: "quarantined",
@@ -121,7 +127,7 @@ describe("build quarantine lifecycle", () => {
       targetId: newBuildId,
       targetType: "build",
       details: { reason: "Investigation cleared the build" },
-    });
+    }, `tok_${moderatorId}`);
 
     expect(restored).toMatchObject({
       status: "published",

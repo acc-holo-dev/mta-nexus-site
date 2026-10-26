@@ -66,7 +66,7 @@ describe("content moderation behavior", () => {
   it("requires moderator permission before content lookup", async () => {
     mocks.can.mockReturnValue(false);
     await expect(
-      service.moderateContent("cnt_1", "publish", moderator, "Reviewed"),
+      service.moderateContent("cnt_1", "publish", moderator, "staff-session", "Reviewed"),
     ).rejects.toMatchObject({ statusCode: 403 });
     expect(mocks.findById).not.toHaveBeenCalled();
   });
@@ -74,7 +74,7 @@ describe("content moderation behavior", () => {
   it("rejects a repeated transition to the same state", async () => {
     mocks.findById.mockResolvedValue(content("published"));
     await expect(
-      service.moderateContent("cnt_1", "publish", moderator, "Replay"),
+      service.moderateContent("cnt_1", "publish", moderator, "staff-session", "Replay"),
     ).rejects.toMatchObject({
       statusCode: 409,
       code: "CONTENT_ALREADY_IN_STATE",
@@ -87,7 +87,7 @@ describe("content moderation behavior", () => {
     mocks.moderate.mockResolvedValue(updated);
 
     await expect(
-      service.moderateContent("cnt_1", "publish", moderator, "Reviewed"),
+      service.moderateContent("cnt_1", "publish", moderator, "staff-session", "Reviewed"),
     ).resolves.toBe(updated);
     expect(mocks.moderate).toHaveBeenCalledWith(
       "cnt_1",
@@ -97,7 +97,9 @@ describe("content moderation behavior", () => {
         action: "content.published",
         details: { from: "draft", to: "published", notes: "Reviewed" },
       }),
+      "staff-session",
       new Date("2026-01-01T00:00:00.000Z"),
+      false,
     );
   });
 
@@ -107,28 +109,30 @@ describe("content moderation behavior", () => {
     mocks.moderate.mockResolvedValue(updated);
 
     await expect(
-      service.moderateContent("cnt_1", "archive", moderator, "Retired"),
+      service.moderateContent("cnt_1", "archive", moderator, "staff-session", "Retired"),
     ).resolves.toBe(updated);
     expect(mocks.moderate).toHaveBeenCalledWith(
       "cnt_1",
       "archived",
       "published",
       expect.objectContaining({ action: "content.archived" }),
+      "staff-session",
       new Date("2026-01-01T00:00:00.000Z"),
+      false,
     );
   });
 
   it("maps a lost compare-and-set to CONTENT_STATE_CHANGED", async () => {
     mocks.moderate.mockResolvedValue(null);
     await expect(
-      service.moderateContent("cnt_1", "publish", moderator, "Reviewed"),
+      service.moderateContent("cnt_1", "publish", moderator, "staff-session", "Reviewed"),
     ).rejects.toMatchObject({
       statusCode: 409,
       code: "CONTENT_STATE_CHANGED",
     });
   });
   it("rejects a changed reviewed revision before persistence or notifications", async () => {
-    await expect(service.moderateContent("cnt_1", "publish", moderator, "Reviewed", new Date("2026-01-01T00:00:00.001Z"))).rejects.toMatchObject({ code: "CONTENT_STATE_CHANGED" });
+    await expect(service.moderateContent("cnt_1", "publish", moderator, "staff-session", "Reviewed", new Date("2026-01-01T00:00:00.001Z"))).rejects.toMatchObject({ code: "CONTENT_STATE_CHANGED" });
     expect(mocks.moderate).not.toHaveBeenCalled();
   });
 });

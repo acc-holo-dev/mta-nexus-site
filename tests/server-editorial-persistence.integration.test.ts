@@ -3,6 +3,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
 import {
   db,
+  sessionRepository,
   userRepository,
   serverContentRepository as editorial,
   authorContentRepository as author,
@@ -50,6 +51,12 @@ async function fixture() {
     moderator = await actor("moderator"),
     orgId = `org_${randomUUID()}`,
     serverId = `srv_${randomUUID()}`;
+  await sessionRepository.create({
+    id: `ses_${moderator.id}`,
+    userId: moderator.id,
+    token: `tok_${moderator.id}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   orgs.push(orgId);
   serverIds.push(serverId);
   await db
@@ -231,6 +238,7 @@ it("never publishes an unreviewed parallel draft and rechecks the moderator's li
       "published",
       "draft",
       audit(f.moderator.id, f.item.id, "content.published"),
+      `tok_${f.moderator.id}`,
       f.item.updatedAt,
     ),
     author.mutate(
@@ -258,6 +266,7 @@ it("never publishes an unreviewed parallel draft and rechecks the moderator's li
       "archived",
       stored.status,
       audit(f.moderator.id, f.item.id, "content.archived"),
+      `tok_${f.moderator.id}`,
       stored.updatedAt,
     ),
   ).rejects.toMatchObject({ code: "FORBIDDEN" });

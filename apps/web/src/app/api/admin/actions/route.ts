@@ -156,6 +156,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
       }
     } else if (targetType === "build") {
+      if (!token) return json({ error: "Authentication required" }, 401);
       if (action === "approve" || action === "reject") {
         await productService.reviewBuild(
           {
@@ -165,23 +166,26 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
             expectedRevision: parsed.data.expectedRevision as number,
           },
           user,
+          token,
         );
       } else if (action === "quarantine") {
         await productService.quarantineBuild({
           buildId: targetId,
           reason: notes,
-        }, user);
+        }, user, token);
       } else {
         await productService.restoreQuarantinedBuild({
           buildId: targetId,
           reason: notes,
-        }, user);
+        }, user, token);
       }
     } else if (targetType === "content") {
+      if (!token) return json({ error: "Authentication required" }, 401);
       const moderated = await contentService.moderateContent(
         targetId,
         action,
         user,
+        token,
         notes,
         new Date(parsed.data.expectedUpdatedAt),
       );
