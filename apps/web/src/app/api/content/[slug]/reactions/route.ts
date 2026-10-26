@@ -9,6 +9,7 @@ import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { reactionCommandSchema } from "../../../../../lib/content-reaction-contract";
 import { reactionError } from "../../../../../lib/content-reaction-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 const validQuery = (request: NextRequest) => {
   if (request.nextUrl.searchParams.size)
     throw new AppError("Unexpected filters", 400, "VALIDATION_ERROR");
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     true,
   );
 }
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
+export const PUT = withBrowserMutation(async (request: NextRequest, { params }: { params: Promise<{ slug: string }> }) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -42,4 +43,4 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     200,
     reactionError,
   );
-}
+});

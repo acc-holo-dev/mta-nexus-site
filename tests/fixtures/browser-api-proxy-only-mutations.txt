@@ -8,10 +8,6 @@ apps/web/src/app/api/admin/commerce/reviews/[id]/route.ts
 apps/web/src/app/api/admin/storage/discovery/route.ts
 apps/web/src/app/api/admin/storage/objects/[id]/cleanup/route.ts
 apps/web/src/app/api/checkout/route.ts
-apps/web/src/app/api/content/[slug]/comments/[id]/route.ts
-apps/web/src/app/api/content/[slug]/comments/route.ts
-apps/web/src/app/api/content/[slug]/reactions/route.ts
-apps/web/src/app/api/content/route.ts
 apps/web/src/app/api/orders/[id]/cancel/route.ts
 apps/web/src/app/api/orders/[id]/support/route.ts
 apps/web/src/app/api/reports/route.ts

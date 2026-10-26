@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   user: null as null | { id: string; role: string },
@@ -54,7 +55,7 @@ import { GET, POST } from "../apps/web/src/app/api/content/route";
 function request(body: Record<string, unknown>, token = "session") {
   const req = new NextRequest("http://nexus.test/api/content", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
     body: JSON.stringify(body),
   });
   if (token) req.cookies.set("nexus_session", token);
@@ -75,6 +76,7 @@ function body(overrides: Record<string, unknown> = {}) {
 describe("community content API behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    stubBrowserMutationOrigin();
     state.user = { id: "usr_writer", role: "developer" };
     state.canModerate = false;
     mocks.rateLimit.mockResolvedValue({ success: true });
@@ -86,6 +88,10 @@ describe("community content API behavior", () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     }));
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("bounds public reads and returns explicitly public cache headers", async () => {

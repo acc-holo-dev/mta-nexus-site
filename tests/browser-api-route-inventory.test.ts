@@ -83,6 +83,10 @@ const REQUIRED_BROWSER = [
   "apps/web/src/app/api/notifications/mark-read/route.ts",
   "apps/web/src/app/api/notifications/preferences/route.ts",
   "apps/web/src/app/api/notifications/push/route.ts",
+  "apps/web/src/app/api/content/route.ts",
+  "apps/web/src/app/api/content/[slug]/comments/route.ts",
+  "apps/web/src/app/api/content/[slug]/comments/[id]/route.ts",
+  "apps/web/src/app/api/content/[slug]/reactions/route.ts",
   "apps/web/src/app/api/admin/actions/route.ts",
   "apps/web/src/app/api/admin/reports/[id]/route.ts",
   "apps/web/src/app/api/admin/resources/[id]/route.ts",
@@ -133,7 +137,7 @@ describe("browser API route adapter inventory", () => {
     return { rel, source, kind: classify(rel, source) };
   });
 
-  it("keeps auth, account, uploads, license owner actions, resource publish and claim, product editing, reviews, server registration, server content, library collections, library watches and releases, organization writes, server visibility, follow, notifications, and staff moderation on the shared browser adapter", () => {
+  it("keeps auth, account, uploads, license owner actions, resource publish and claim, product editing, reviews, server registration, server content, library collections, library watches and releases, organization writes, server visibility, follow, notifications, public content, and staff moderation on the shared browser adapter", () => {
     for (const rel of REQUIRED_BROWSER) {
       const route = routes.find((entry) => entry.rel === rel);
       expect(route, rel).toBeTruthy();
