@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   session: vi.fn(),
@@ -28,6 +29,7 @@ const request = (
   new NextRequest(`https://nexus.test/api/notifications/inbox${query}`, {
     method,
     headers: {
+      ...(method === "GET" ? {} : browserMutationHeaders()),
       cookie: "nexus_session=token; nexus_locale=ru",
       ...(body !== undefined ? { "content-type": "application/json" } : {}),
       ...headers,
@@ -36,10 +38,14 @@ const request = (
   });
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   state.session.mockResolvedValue({ id: "actor" });
   state.rate.mockResolvedValue({ success: true });
   state.page.mockResolvedValue({ items: [], unreadCount: 0, olderCursor: null, newerCursor: null });
   state.command.mockResolvedValue({ ids: ["owned"], isRead: true });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("authenticates the history and keeps its response private with filters and locale", async () => {
   const response = await GET(
@@ -105,7 +111,11 @@ it("requires JSON and enforces a streamed byte limit before parsing", async () =
   });
   const req = new NextRequest("https://nexus.test/api/notifications/inbox", {
     method: "PATCH",
-    headers: { "content-type": "application/json", cookie: "nexus_session=token; nexus_locale=ru" },
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      cookie: "nexus_session=token; nexus_locale=ru",
+    },
     body,
     duplex: "half",
   } as ConstructorParameters<typeof NextRequest>[1]);
@@ -121,7 +131,11 @@ it("does not accept command query strings or malformed JSON", async () => {
       await PATCH(
         new NextRequest("https://nexus.test/api/notifications/inbox", {
           method: "PATCH",
-          headers: { "content-type": "application/json", cookie: "nexus_session=token" },
+          headers: {
+            ...browserMutationHeaders(),
+            "content-type": "application/json",
+            cookie: "nexus_session=token",
+          },
           body: "{",
         }),
       )

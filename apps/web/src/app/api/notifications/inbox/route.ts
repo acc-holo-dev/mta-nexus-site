@@ -10,6 +10,7 @@ import {
 import { notificationInboxError } from "../../../../lib/notification-inbox-copy";
 import { notificationInboxService } from "../../../../lib/services/notification-inbox-service";
 import { userPlatformApi } from "../../../../lib/user-platform-api";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
     notificationInboxError,
   );
 }
-export async function PATCH(request: NextRequest) {
+export const PATCH = withBrowserMutation(async (request: NextRequest) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -45,4 +46,4 @@ export async function PATCH(request: NextRequest) {
     200,
     notificationInboxError,
   );
-}
+});

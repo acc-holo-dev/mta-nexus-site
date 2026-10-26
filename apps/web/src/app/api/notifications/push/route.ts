@@ -15,6 +15,7 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../lib/observability";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -120,7 +121,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
 
   try {
@@ -225,9 +226,9 @@ export async function POST(request: NextRequest) {
       500,
     );
   }
-}
+});
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
 
   try {
@@ -317,4 +318,4 @@ export async function DELETE(request: NextRequest) {
       500,
     );
   }
-}
+});
