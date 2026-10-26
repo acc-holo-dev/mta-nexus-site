@@ -32,7 +32,7 @@ build_id="bld_resource_browser_$short"
 product_slug="j5-browser-resource-$short"
 paid_product_id="prd_paid_resource_browser_$short"
 paid_product_slug="j5-paid-browser-resource-$short"
-paid_product_title="J5 Paid Browser Resource"
+paid_product_title="J5 Paid Browser Resource $short"
 claim_server_id="srv_claim_browser_$short"
 claim_server_slug="claim-browser-$short"
 claim_server_name="Claim Browser Fixture $short"
@@ -187,6 +187,13 @@ if (!/^ci-resource-browser\/[a-f0-9]+\.zip$/.test(key) || !/^[a-f0-9]{64}$/.test
 process.stdout.write(readFileSync('scripts/fixtures/public-portfolio.sql', 'utf8').replaceAll('__STORAGE_KEY__', key).replaceAll('__SHA256__', hash));
 NODE
 )
+sql "
+DELETE FROM builds WHERE product_id LIKE 'prd_portfolio_%';
+DELETE FROM products WHERE id LIKE 'prd_portfolio_%' OR author_id IN ('usr_portfolio_ci','usr_portfolio_other_ci');
+DELETE FROM content WHERE id LIKE 'cnt_portfolio_%';
+DELETE FROM organizations WHERE id IN ('org_portfolio_ci','org_portfolio_other_ci');
+DELETE FROM users WHERE id IN ('usr_portfolio_ci','usr_portfolio_other_ci');
+" > /dev/null
 sql "$portfolio_sql" > /dev/null
 
 # Create real password accounts, then grant disposable CI roles directly in the fixture DB.

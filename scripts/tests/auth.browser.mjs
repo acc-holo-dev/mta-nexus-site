@@ -441,7 +441,10 @@ check('D4-01 anonymous neutral request and one-time password reset', async () =>
   await guest.page.getByLabel('Confirm new password', { exact: true }).fill(resetPassword);
   await guest.page.getByRole('button', { name: 'Reset password', exact: true }).focus();
   await guest.page.keyboard.press('Enter');
-  await expect(guest.page.getByText('Password reset. All existing sessions were signed out.', { exact: true })).toBeVisible();
+  await expect(guest.page.getByText(
+    'Password reset. All existing sessions were signed out. Sign in with your new password.',
+    { exact: true },
+  )).toBeVisible();
   assert(await guest.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
     'Reset page should not overflow a narrow viewport');
 

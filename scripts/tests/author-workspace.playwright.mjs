@@ -32,11 +32,12 @@ async function logout(page) {
   const status = await page.evaluate(async () => (await fetch("/api/auth/session", { method: "DELETE" })).status);
   assert.equal(status, 200);
 }
-async function moderate(page, buildId, action, notes) {
+async function moderate(page, buildId, action, notes, expectedRevision) {
+  assert.equal(typeof expectedRevision, "number");
   const result = await page.evaluate(async (body) => {
     const response = await fetch("/api/admin/actions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     return { status: response.status, body: await response.json() };
-  }, { targetType: "build", targetId: buildId, action, notes });
+  }, { targetType: "build", targetId: buildId, action, notes, expectedRevision });
   assert.equal(result.status, 200, JSON.stringify(result.body));
 }
 
@@ -340,11 +341,13 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   const forbidden = await outsider.evaluate(async (id) => (await fetch(`/api/products/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: "{}" })).status, product.id);
   assert.equal(forbidden, 404);
   evidence.push("Unauthenticated and unrelated moderator access denied.");
-  await moderate(outsider, build.id, "approve", "Approved author acceptance version one.");
-  const repeated = await outsider.evaluate(async (buildId) => (await fetch("/api/admin/actions", {
+  await moderate(outsider, build.id, "approve", "Approved author acceptance version one.", build.revision);
+  const repeated = await outsider.evaluate(async ({ buildId, expectedRevision }) => (await fetch("/api/admin/actions", {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ targetType: "build", targetId: buildId, action: "approve", notes: "Repeat approval" }),
-  })).status, build.id);
+    body: JSON.stringify({
+      targetType: "build", targetId: buildId, action: "approve", notes: "Repeat approval", expectedRevision,
+    }),
+  })).status, { buildId: build.id, expectedRevision: build.revision });
   assert.equal(repeated, 409);
   await page.goto("/notifications");
   const approvalCard = page.locator("article").filter({ has: page.getByRole("heading", { name: "Resource version approved", exact: true }) });
@@ -423,7 +426,7 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await expect.poll(() => page.evaluate(key => sessionStorage.getItem(key), draftKey)).toBe(null);
   assert(await page.evaluate(keys => keys.every(key => sessionStorage.getItem(key) !== null), foreignKeys));
   evidence.push("A genuine upload cleared its own submitted draft and file while preserving unrelated scoped drafts.");
-  await moderate(outsider, second.id, "reject", "Rejected second version: update the manifest.");
+  await moderate(outsider, second.id, "reject", "Rejected second version: update the manifest.", second.revision);
   await page.goto("/notifications");
   await expect(page.getByRole("heading", { name: "Resource version rejected", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Mark all as read", exact: true }).click();
