@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
@@ -49,19 +50,24 @@ function expectPrivate(response: Response) {
 function request(body: unknown) {
   return new NextRequest("http://nexus.test/api/products", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { ...browserMutationHeaders(), "content-type": "application/json" },
     body: JSON.stringify(body),
   });
 }
 
 describe("resource creation HTTP errors", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
     mocks.getSession.mockResolvedValue({
       id: "usr_creator",
       role: "developer",
     });
     mocks.consumeRateLimit.mockResolvedValue({ success: true });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("returns a stable code for invalid resource details before creation", async () => {

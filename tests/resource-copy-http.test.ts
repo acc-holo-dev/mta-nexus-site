@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -41,9 +42,18 @@ const request = (path: string, init?: ConstructorParameters<typeof NextRequest>[
 const post = (
   body: unknown = command,
   query = "",
-  headers: Record<string, string> = { "content-type": "application/json" },
-) => request(`${base}/copy${query}`, { method: "POST", body: JSON.stringify(body), headers });
+  headers: Record<string, string> = {},
+) =>
+  request(`${base}/copy${query}`, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+  });
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.actor = { id: "usr_a", role: "user" };
   state.rate.mockResolvedValue({ success: true });

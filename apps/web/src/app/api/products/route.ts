@@ -13,6 +13,7 @@ import { authService } from "../../../lib/services/auth-service";
 import { productService } from "../../../lib/services/product-service";
 import { parseMarketQuery } from "../../../lib/market-query";
 import { isUniqueConstraintViolation } from "../../../lib/postgres-error";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -146,7 +147,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
 
   try {
@@ -306,4 +307,4 @@ export async function POST(request: NextRequest) {
       500,
     );
   }
-}
+});
