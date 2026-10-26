@@ -63,9 +63,9 @@ export async function GET(
       title: product.title,
       slug: product.slug,
       type: product.type,
-      price: 0,
-      currency: "USD",
-      licenseModel: "unlimited",
+      price: product.price,
+      currency: product.currency || "USD",
+      licenseModel: product.licenseModel,
       currentVersion: product.currentVersion,
       thumbnailUrl: product.thumbnailUrl,
     });

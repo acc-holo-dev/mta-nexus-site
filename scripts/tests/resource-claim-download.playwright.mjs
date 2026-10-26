@@ -347,7 +347,12 @@ test("J5 claim -> workspace -> download exact published build", async ({
           cancel() { window.nexusDownloadCancelled = true; },
         });
         return Promise.resolve(new Response(body, {
-          headers: { "Content-Length": "8", "Content-Type": "application/zip" },
+          headers: {
+            "Content-Length": "8",
+            "Content-Type": "application/zip",
+            // Download client rejects responses without a checksum before progress updates.
+            "X-Content-SHA256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          },
         }));
       };
     }, productId);

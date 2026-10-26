@@ -462,9 +462,16 @@ for (const locale of ["en", "ru"]) {
       probe.remove();
       return result;
     });
-    assert.equal(reducedMotion.animationDuration, "0.01ms");
+    const durationMs = (value) => {
+      const match = String(value).trim().match(/^(-?[\d.eE+-]+)(ms|s)$/u);
+      assert(match, `unexpected CSS duration: ${value}`);
+      const amount = Number(match[1]);
+      assert(Number.isFinite(amount), `unexpected CSS duration: ${value}`);
+      return match[2] === "s" ? amount * 1000 : amount;
+    };
+    assert.equal(durationMs(reducedMotion.animationDuration), 0.01);
     assert.equal(reducedMotion.animationIterationCount, "1");
-    assert.equal(reducedMotion.transitionDuration, "0.01ms");
+    assert.equal(durationMs(reducedMotion.transitionDuration), 0.01);
     assert.equal(reducedMotion.scrollBehavior, "auto");
     evidence.push(
       `${locale}: reduced-motion media query stops repeated animation, shortens transitions and disables smooth scrolling`,
@@ -1061,9 +1068,16 @@ for (const locale of ["en", "ru"]) {
     await expect(settingsLink).toBeFocused();
 
     await page.goto("/support");
-    const supportCategory = page.getByLabel(dictionary.support.category);
-    const supportSubject = page.getByLabel(dictionary.support.subject);
-    const supportMessage = page.getByLabel(dictionary.support.message);
+    const supportForm = page.locator("form").filter({
+      has: page.getByRole("heading", {
+        level: 2,
+        name: dictionary.support.newCase,
+        exact: true,
+      }),
+    });
+    const supportCategory = supportForm.getByLabel(dictionary.support.category);
+    const supportSubject = supportForm.getByLabel(dictionary.support.subject);
+    const supportMessage = supportForm.getByLabel(dictionary.support.message);
     await supportCategory.focus();
     await page.keyboard.press("Tab");
     await expect(supportSubject).toBeFocused();

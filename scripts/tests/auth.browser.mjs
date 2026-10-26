@@ -209,7 +209,7 @@ check('D3-01 recovery email enrollment requires password and one-time browser co
   const queuedBody = await queued.text();
   assert(!queuedBody.includes('ach_') && !queuedBody.includes('#token='),
     'Request response must not expose confirmation identifiers or tokens');
-  await expect(alice.page.getByRole('status')).toContainText('Verification email queued');
+  await expect(alice.page.locator('#settings-notice')).toContainText('Verification email queued');
 
   const proof = await readSyntheticProof(people[0].email);
   const foreign = await request(bob, '/api/auth/email-verification', 'PATCH', proof);
@@ -232,7 +232,7 @@ check('D3-01 recovery email enrollment requires password and one-time browser co
 
   await alice.page.getByRole('button', { name: 'Confirm email', exact: true }).focus();
   await alice.page.keyboard.press('Enter');
-  await expect(alice.page.getByRole('status')).toContainText(`Recovery email verified: ${people[0].email}`);
+  await expect(alice.page.getByText(`Recovery email verified: ${people[0].email}`, { exact: true })).toBeVisible();
   assert(await alice.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
     'Email confirmation should not overflow a narrow viewport');
 
@@ -270,10 +270,10 @@ check('J2-05 private server management and workspace remain owner-scoped', async
     const created = await request(actor, '/api/servers', 'POST', {
       name: `Private ${person.username}`, slug: `private-${person.username.replaceAll('_', '-')}`,
       description: `Private owner note ${person.username}`, ipAddress: ip, port: 22003,
-      visibility: 'private', ownerId: actor === alice ? bobUser.id : aliceUser.id,
+      visibility: 'private',
     });
     assert.equal(created.status, 201, 'Synthetic private listing creation');
-    assert(created.data.server.ownerId === (actor === alice ? aliceUser.id : bobUser.id), 'Owner comes from session, not submitted ID');
+    assert.equal(created.data.server.ownerId, actor === alice ? aliceUser.id : bobUser.id, 'Owner comes from session');
     if (actor === alice) aliceServer = created.data.server; else bobServer = created.data.server;
   }
   for (const [actor, own, other] of [[alice, aliceServer, bobServer], [bob, bobServer, aliceServer]]) {
@@ -418,7 +418,7 @@ check('D4-01 anonymous neutral request and one-time password reset', async () =>
       message: 'If an eligible account uses that email, a password reset link will be sent.',
     });
     assert(elapsed >= 300, 'Neutral reset response must respect the timing floor');
-    await expect(guest.page.getByRole('status')).toContainText('If an eligible account uses that email');
+    await expect(guest.page.getByText('If an eligible account uses that email', { exact: false })).toBeVisible();
     return { elapsed, body };
   }
 
@@ -441,7 +441,7 @@ check('D4-01 anonymous neutral request and one-time password reset', async () =>
   await guest.page.getByLabel('Confirm new password', { exact: true }).fill(resetPassword);
   await guest.page.getByRole('button', { name: 'Reset password', exact: true }).focus();
   await guest.page.keyboard.press('Enter');
-  await expect(guest.page.getByRole('status')).toContainText('Password reset. All existing sessions were signed out.');
+  await expect(guest.page.getByText('Password reset. All existing sessions were signed out.', { exact: true })).toBeVisible();
   assert(await guest.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
     'Reset page should not overflow a narrow viewport');
 

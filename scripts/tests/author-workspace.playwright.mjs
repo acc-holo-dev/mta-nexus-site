@@ -278,14 +278,18 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   // Another authenticated client changes this same resource after our draft.
   const draftRevision = await page.evaluate(key => JSON.parse(sessionStorage.getItem(key)).baseUpdatedAt, draftKey);
   const concurrentTitle = `${title} changed elsewhere`;
-  const concurrent = await page.evaluate(async ({ id, title, original }) => {
+  const concurrent = await page.evaluate(async ({ id, title, original, revision }) => {
     const response = await fetch(`/api/products/${id}`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" },
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "If-Match": JSON.stringify(new Date(revision).toISOString()),
+      },
       body: JSON.stringify({ title, shortDescription: original.shortDescription ?? "",
         description: original.description, tags: original.tags ?? [] }),
     });
     return { status: response.status, body: await response.json() };
-  }, { id: product.id, title: concurrentTitle, original: product });
+  }, { id: product.id, title: concurrentTitle, original: product, revision: draftRevision });
   assert.equal(concurrent.status, 200, JSON.stringify(concurrent.body));
   assert.equal(concurrent.body.product.title, concurrentTitle);
   const staleResponse = page.waitForResponse(response => response.url() === metadataUrl && response.request().method() === "PATCH");
