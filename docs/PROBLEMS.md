@@ -12,8 +12,11 @@ Configuration validation rejects credentials, paths, query strings and fragments
 Development supports HTTP loopback/known Compose aliases on the configured port.
 The exact `/api/licenses/check` and `/api/licenses/check-release` paths retain their
 existing independent bearer-only boundary. An Authorization header on another API
-does not bypass CSRF. Auth handlers repeat the guard independently of Proxy;
-other browser API handlers currently rely on the global Proxy for this check.
+does not bypass CSRF. Auth handlers and multipart build upload now use the shared
+`withBrowserMutation` adapter (still repeated independently of Proxy). Exact license
+runtime checks use `withLicenseBearerRoute`. Remaining browser mutation handlers are
+inventoried as Proxy-only in `tests/fixtures/browser-api-proxy-only-mutations.txt`
+and must migrate onto the adapter rather than growing that allowlist.
 Existing authorization/session checks remain in the handlers and repositories.
 
 Auth JSON bodies require application/json and an actual streamed 8-KiB ceiling
@@ -35,9 +38,9 @@ were neither inspected nor dispatched. Publish with [skip ci] under the existing
 
 Next decisions, in order:
 
-1. Move the same HTTP guard into a common browser route adapter, including multipart
-   routes, so new endpoints cannot silently depend on Proxy-only CSRF enforcement.
-   Keep bearer/machine routes in an explicit independent adapter. Review safe-method
+1. ~~Move the same HTTP guard into a common browser route adapter, including multipart
+   routes~~ — adapter landed (`withBrowserMutation` / `withLicenseBearerRoute`); finish
+   migrating Proxy-only mutation allowlist entries onto it. Review safe-method
    handlers for business writes; CSRF-safe GET must not execute user commands.
 2. Build one authenticated request identity/DTO boundary; scope reuse to a request,
    never a global session cache. Recheck session/authority inside high-risk mutation

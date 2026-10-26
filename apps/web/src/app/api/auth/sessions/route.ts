@@ -1,5 +1,5 @@
 import { readAuthJson } from "../../../../lib/auth-request-body";
-import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { consumeRateLimit } from "@nexus/security";
@@ -69,9 +69,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest) {
-  const rejected = rejectUnsafeBrowserRequest(request);
-  if (rejected) return rejected;
+export const DELETE = withBrowserMutation(async (request: NextRequest) => {
+
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -184,5 +183,5 @@ export async function DELETE(request: NextRequest) {
       503,
     );
   }
-}
+});
 

@@ -1,5 +1,5 @@
 import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
-import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import {
@@ -52,9 +52,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest) {
-  const rejected = rejectUnsafeBrowserRequest(request);
-  if (rejected) return rejected;
+export const DELETE = withBrowserMutation(async (request: NextRequest) => {
+
   const context = createRequestLogContext(request);
 
   try {
@@ -85,5 +84,5 @@ export async function DELETE(request: NextRequest) {
       503,
     );
   }
-}
+});
 

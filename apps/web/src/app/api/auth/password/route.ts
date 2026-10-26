@@ -1,6 +1,6 @@
 import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
 import { readAuthJson } from "../../../../lib/auth-request-body";
-import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { type NextRequest, NextResponse } from "next/server";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
@@ -14,9 +14,8 @@ function json(body: unknown, status = 200) {
   });
 }
 
-export async function POST(request: NextRequest) {
-  const rejected = rejectUnsafeBrowserRequest(request);
-  if (rejected) return rejected;
+export const POST = withBrowserMutation(async (request: NextRequest) => {
+
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -57,5 +56,5 @@ export async function POST(request: NextRequest) {
     });
     return json({ error: "Could not confirm the password change. Sign in again before retrying." }, 503);
   }
-}
+});
 

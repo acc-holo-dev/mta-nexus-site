@@ -1,7 +1,7 @@
 import { SESSION_LIFETIME_SECONDS } from "../../../../lib/session-policy";
 import { SESSION_COOKIE_NAME, sessionCookieOptions } from "../../../../lib/session-cookie";
 import { readAuthJson } from "../../../../lib/auth-request-body";
-import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import type { NextRequest } from "next/server";
 import { authService } from "../../../../lib/services/auth-service";
 import { loginSchema } from "@nexus/validation";
@@ -31,9 +31,8 @@ function json(
   });
 }
 
-export async function POST(request: NextRequest) {
-  const rejected = rejectUnsafeBrowserRequest(request);
-  if (rejected) return rejected;
+export const POST = withBrowserMutation(async (request: NextRequest) => {
+
   const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
@@ -96,5 +95,5 @@ export async function POST(request: NextRequest) {
     });
     return json(context, { error: "Failed to log in" }, 500);
   }
-}
+});
 

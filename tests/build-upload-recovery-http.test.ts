@@ -3,6 +3,7 @@ import packageFixtures from "./fixtures/build-packages.json";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { AppError, ForbiddenError } from "@nexus/domain";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const mocks = vi.hoisted(() => ({
   authorize: vi.fn(), release: vi.fn(), recover: vi.fn(), upload: vi.fn(), remove: vi.fn(), scan: vi.fn(),
@@ -24,7 +25,9 @@ function request() {
   form.set("version", "v1.2.3");
   form.set("releaseNotes", " Retry notes ");
   form.set("mtaVersionTarget", "1.6.0");
-  return new NextRequest("http://nexus.test/api/products/prd_target/builds", { method: "POST", body: form });
+  return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
+    method: "POST", headers: browserMutationHeaders(), body: form,
+  });
 }
 const context = { params: Promise.resolve({ id: "prd_target" }) };
 const existing = { id: "bld_original", productId: "prd_target", version: "1.2.3", status: "pending_review", storageKey: "secret/old.zip" };
@@ -32,6 +35,7 @@ const existing = { id: "bld_original", productId: "prd_target", version: "1.2.3"
 describe("exact build upload retry HTTP", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    stubBrowserMutationOrigin();
     mocks.authorize.mockResolvedValue({ id: "prd_target", price: 0 });
     mocks.scan.mockResolvedValue({ status: "clean", scanner: "clamav", scannedAt: new Date() });
     mocks.upload.mockResolvedValue({ key: "new/retry.zip", sha256Hash: createHash("sha256").update(Buffer.from(packageFixtures.stored, "base64")).digest("hex"), sizeBytes: Buffer.from(packageFixtures.stored, "base64").length });

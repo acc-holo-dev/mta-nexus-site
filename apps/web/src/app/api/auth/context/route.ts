@@ -1,5 +1,5 @@
 import { readAuthJson } from "../../../../lib/auth-request-body";
-import { rejectUnsafeBrowserRequest } from "../../../../lib/browser-request-guard";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { authService } from "../../../../lib/services/auth-service";
@@ -163,9 +163,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
-  const rejected = rejectUnsafeBrowserRequest(request);
-  if (rejected) return rejected;
+export const POST = withBrowserMutation(async (request: NextRequest) => {
+
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -245,5 +244,5 @@ export async function POST(request: NextRequest) {
       500,
     );
   }
-}
+});
 
