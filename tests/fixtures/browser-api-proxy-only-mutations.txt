@@ -33,7 +33,5 @@ apps/web/src/app/api/workspace/content/route.ts
 apps/web/src/app/api/workspace/discussions/[id]/route.ts
 apps/web/src/app/api/workspace/reactions/[id]/route.ts
 apps/web/src/app/api/workspace/reports/route.ts
-apps/web/src/app/api/workspace/servers/visibility/preview/route.ts
-apps/web/src/app/api/workspace/servers/visibility/route.ts
 apps/web/src/app/api/workspace/verification/[id]/route.ts
 apps/web/src/app/api/workspace/verification/route.ts

@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "actor", role: "user" } as { id: string; role: string } | null,
@@ -39,6 +40,7 @@ const request = (
   new NextRequest(`https://nexus.test/api/workspace/servers/visibility${query}`, {
     method,
     headers: {
+      ...browserMutationHeaders(),
       cookie: "nexus_session=token; nexus_locale=ru",
       "content-type": "application/json",
       ...headers,
@@ -47,6 +49,7 @@ const request = (
   });
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   state.actor = { id: "actor", role: "user" };
   state.rate.mockResolvedValue({ success: true });
   state.browseRate.mockResolvedValue(undefined);
@@ -60,6 +63,9 @@ beforeEach(() => {
     events: [],
     nextCursor: null,
   });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it.each([preview, save])(
   "authenticates, bounds and rates a private JSON visibility operation",

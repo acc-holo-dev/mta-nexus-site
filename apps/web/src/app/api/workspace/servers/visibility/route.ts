@@ -5,7 +5,8 @@ import { readBoundedJson, requireServerJsonContentType } from "../../../../../li
 import { serverWorkspaceError } from "../../../../../lib/server-workspace-copy";
 import { serverService } from "../../../../../lib/services/server-service";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
-export function POST(request: NextRequest) {
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+export const POST = withBrowserMutation((request: NextRequest) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -19,4 +20,4 @@ export function POST(request: NextRequest) {
     200,
     serverWorkspaceError,
   );
-}
+});
