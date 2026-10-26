@@ -8,10 +8,11 @@ import { serverContentId, serverContentRate } from "../../../../../../../../lib/
 import { serverPublicationHistoryError } from "../../../../../../../../lib/server-publication-history-copy";
 import { serverContentService } from "../../../../../../../../lib/services/server-content-service";
 import { userPlatformApi } from "../../../../../../../../lib/user-platform-api";
-export function POST(
+import { withBrowserMutation } from "../../../../../../../../lib/browser-route-adapter";
+export const POST = withBrowserMutation((
   request: NextRequest,
   { params }: { params: Promise<{ id: string; contentId: string }> },
-) {
+) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -30,4 +31,4 @@ export function POST(
     200,
     serverPublicationHistoryError,
   );
-}
+});
