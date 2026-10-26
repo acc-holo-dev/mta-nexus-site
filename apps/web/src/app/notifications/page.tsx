@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { AppError } from "@nexus/domain";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { NotificationCenterTabs } from "../../components/notification-center-tabs";
 import { NotificationInbox } from "../../components/notification-inbox";
 import { getRequestLocale } from "../../lib/i18n-server";
 import {
@@ -72,106 +73,108 @@ export default async function NotificationCenterPage({
           {copy.settings}
         </Link>
       </header>
-      {authenticated && (
-        <form
-          action="/notifications"
-          method="get"
-          className="nexus-panel flex flex-wrap items-end gap-3 p-4"
-        >
-          <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
-            {copy.query}
-            <input
-              type="search"
-              name="q"
-              maxLength={100}
-              defaultValue={filters?.query ?? ""}
-              className="nexus-input block min-h-11 w-full"
-            />
-          </label>
-          <label className="space-y-1 text-xs text-muted">
-            {copy.state}
-            <select
-              name="state"
-              defaultValue={filters?.state ?? "all"}
-              className="nexus-input block min-h-11"
-            >
-              {(["all", "unread", "read"] as const).map((state) => (
-                <option key={state} value={state}>
-                  {copy[state]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="space-y-1 text-xs text-muted">
-            {copy.category}
-            <select
-              name="category"
-              defaultValue={filters?.category ?? "all"}
-              className="nexus-input block min-h-11"
-            >
-              <option value="all">{copy.all}</option>
-              {INBOX_CATEGORIES.map((category) => (
-                <option key={category} value={category}>
-                  {copy[category]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="space-y-1 text-xs text-muted">
-            {copy.period}
-            <select
-              name="period"
-              defaultValue={filters?.period ?? "all"}
-              className="nexus-input block min-h-11"
-            >
-              {INBOX_PERIODS.map((period) => (
-                <option key={period} value={period}>
-                  {period === "all" ? copy.all : copy[`period${period}`]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="submit"
-            className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
+      <NotificationCenterTabs>
+        {authenticated && (
+          <form
+            action="/notifications"
+            method="get"
+            className="nexus-panel flex flex-wrap items-end gap-3 p-4"
           >
-            {copy.search}
-          </button>
-          <Link
-            href="/notifications"
-            className="inline-flex min-h-11 items-center text-sm text-accent underline"
-          >
-            {copy.reset}
-          </Link>
-        </form>
-      )}
-      <Link
-        prefetch={false}
-        href={
-          filters
-            ? notificationInboxHref("/notifications", { ...filters, at: undefined })
-            : "/notifications"
-        }
-        className="inline-flex min-h-11 items-center text-sm text-accent underline"
-      >
-        {copy.latest}
-      </Link>
-      {error && (
-        <p role="alert" className="nexus-panel p-4 text-sm text-danger">
-          {error}
-        </p>
-      )}
-      {!authenticated && error === copy.unauthorized && (
+            <label className="min-w-40 flex-1 space-y-1 text-xs text-muted">
+              {copy.query}
+              <input
+                type="search"
+                name="q"
+                maxLength={100}
+                defaultValue={filters?.query ?? ""}
+                className="nexus-input block min-h-11 w-full"
+              />
+            </label>
+            <label className="space-y-1 text-xs text-muted">
+              {copy.state}
+              <select
+                name="state"
+                defaultValue={filters?.state ?? "all"}
+                className="nexus-input block min-h-11"
+              >
+                {(["all", "unread", "read"] as const).map((state) => (
+                  <option key={state} value={state}>
+                    {copy[state]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-1 text-xs text-muted">
+              {copy.category}
+              <select
+                name="category"
+                defaultValue={filters?.category ?? "all"}
+                className="nexus-input block min-h-11"
+              >
+                <option value="all">{copy.all}</option>
+                {INBOX_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {copy[category]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="space-y-1 text-xs text-muted">
+              {copy.period}
+              <select
+                name="period"
+                defaultValue={filters?.period ?? "all"}
+                className="nexus-input block min-h-11"
+              >
+                {INBOX_PERIODS.map((period) => (
+                  <option key={period} value={period}>
+                    {period === "all" ? copy.all : copy[`period${period}`]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="submit"
+              className="min-h-11 rounded-lg bg-accent px-4 text-sm font-semibold text-white"
+            >
+              {copy.search}
+            </button>
+            <Link
+              href="/notifications"
+              className="inline-flex min-h-11 items-center text-sm text-accent underline"
+            >
+              {copy.reset}
+            </Link>
+          </form>
+        )}
         <Link
-          href="/auth/login"
+          prefetch={false}
+          href={
+            filters
+              ? notificationInboxHref("/notifications", { ...filters, at: undefined })
+              : "/notifications"
+          }
           className="inline-flex min-h-11 items-center text-sm text-accent underline"
         >
-          {copy.signIn}
+          {copy.latest}
         </Link>
-      )}
-      {page && filters && (
-        <NotificationInbox key={randomUUID()} initialPage={page} filters={filters} />
-      )}
+        {error && (
+          <p role="alert" className="nexus-panel p-4 text-sm text-danger">
+            {error}
+          </p>
+        )}
+        {!authenticated && error === copy.unauthorized && (
+          <Link
+            href="/auth/login"
+            className="inline-flex min-h-11 items-center text-sm text-accent underline"
+          >
+            {copy.signIn}
+          </Link>
+        )}
+        {page && filters && (
+          <NotificationInbox key={randomUUID()} initialPage={page} filters={filters} />
+        )}
+      </NotificationCenterTabs>
     </div>
   );
 }
