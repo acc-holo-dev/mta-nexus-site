@@ -50,6 +50,21 @@ beforeEach(() => {
 });
 
 describe("report decisions over HTTP", () => {
+  it("does not resolve a report when the initiating session cookie is missing", async () => {
+    const req = new NextRequest("https://nexus.test/api/admin/actions", {
+      method: "POST",
+      body: JSON.stringify({
+        targetType: "report",
+        targetId: "rpt_1",
+        action: "resolve",
+        notes: "Reviewed supporting evidence",
+      }),
+      headers: browserMutationHeaders({ "Content-Type": "application/json" }),
+    });
+    expect((await POST(req)).status).toBe(401);
+    expect(mocks.resolve).not.toHaveBeenCalled();
+  });
+
   it("blocks unauthorized decisions and empty reasons before writing", async () => {
     mocks.authorized = false;
     expect((await POST(request())).status).toBe(403);
@@ -66,7 +81,7 @@ describe("report decisions over HTTP", () => {
     expect(await response.json()).toEqual({ success: true, action: "dismiss", targetId: "rpt_1" });
     expect(mocks.resolve).toHaveBeenCalledWith("rpt_1", "dismissed", "Duplicated claim", expect.objectContaining({
       actorId: "mod_1", action: "admin.dismiss", details: { notes: "Duplicated claim" },
-    }));
+    }), "session");
   });
 
   it("distinguishes a missing report from a decision already made", async () => {
