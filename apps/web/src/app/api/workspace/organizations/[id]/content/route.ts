@@ -1,12 +1,14 @@
 import type { NextRequest } from "next/server";
-import { userPlatformApi } from "../../../../../../lib/user-platform-api";
-import { organizationContentService } from "../../../../../../lib/services/organization-content-service";
+import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import {
-  organizationContentId,
   organizationContentFilters,
+  organizationContentId,
   organizationContentRate,
 } from "../../../../../../lib/organization-content-api";
-import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
+import { organizationContentService } from "../../../../../../lib/services/organization-content-service";
+import { userPlatformApi } from "../../../../../../lib/user-platform-api";
+
 type Context = { params: Promise<{ id: string }> };
 export function GET(request: NextRequest, context: Context) {
   return userPlatformApi(request, async (actor) => {
@@ -16,7 +18,7 @@ export function GET(request: NextRequest, context: Context) {
     return organizationContentService.page(id, actor, filters);
   });
 }
-export function POST(request: NextRequest, context: Context) {
+export const POST = withBrowserMutation((request: NextRequest, context: Context) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -35,4 +37,4 @@ export function POST(request: NextRequest, context: Context) {
     },
     201,
   );
-}
+});

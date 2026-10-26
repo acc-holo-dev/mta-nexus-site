@@ -1,13 +1,10 @@
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
 const apiRoot = path.join(repoRoot, "apps/web/src/app/api");
-const allowlistPath = path.join(
-  repoRoot,
-  "tests/fixtures/browser-api-proxy-only-mutations.txt",
-);
+const allowlistPath = path.join(repoRoot, "tests/fixtures/browser-api-proxy-only-mutations.txt");
 
 const MUTATION =
   /export\s+(?:async\s+)?function\s+(POST|PUT|PATCH|DELETE)\b|export\s+const\s+(POST|PUT|PATCH|DELETE)\s*=/;
@@ -64,6 +61,17 @@ const REQUIRED_BROWSER = [
   "apps/web/src/app/api/library/collections/[id]/versions/route.ts",
   "apps/web/src/app/api/library/collections/[id]/versions/preview/route.ts",
   "apps/web/src/app/api/library/collections/[id]/watches/route.ts",
+  "apps/web/src/app/api/workspace/organizations/route.ts",
+  "apps/web/src/app/api/workspace/organizations/[id]/route.ts",
+  "apps/web/src/app/api/workspace/organizations/[id]/leave/route.ts",
+  "apps/web/src/app/api/workspace/organizations/[id]/ownership/route.ts",
+  "apps/web/src/app/api/workspace/organizations/[id]/members/route.ts",
+  "apps/web/src/app/api/workspace/organizations/[id]/members/[userId]/route.ts",
+  "apps/web/src/app/api/workspace/organizations/[id]/members/batch/route.ts",
+  "apps/web/src/app/api/workspace/organizations/[id]/members/batch/preview/route.ts",
+  "apps/web/src/app/api/workspace/organizations/[id]/content/route.ts",
+  "apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/route.ts",
+  "apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/restore/route.ts",
   "apps/web/src/app/api/admin/actions/route.ts",
   "apps/web/src/app/api/admin/reports/[id]/route.ts",
   "apps/web/src/app/api/admin/resources/[id]/route.ts",
@@ -114,7 +122,7 @@ describe("browser API route adapter inventory", () => {
     return { rel, source, kind: classify(rel, source) };
   });
 
-  it("keeps auth, account, uploads, license owner actions, resource publish and claim, product editing, reviews, server registration, server content, library collections, and staff moderation on the shared browser adapter", () => {
+  it("keeps auth, account, uploads, license owner actions, resource publish and claim, product editing, reviews, server registration, server content, library collections, organization writes, and staff moderation on the shared browser adapter", () => {
     for (const rel of REQUIRED_BROWSER) {
       const route = routes.find((entry) => entry.rel === rel);
       expect(route, rel).toBeTruthy();
