@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a" } as { id: string } | null,
   preview: vi.fn(),
@@ -30,18 +31,22 @@ function request(section = "", method = "POST", headers: Record<string, string> 
     `http://nexus.test/api/library/collections/lcol_a/versions${section}${query}`,
     {
       method,
-      headers: { "content-type": "application/json", ...headers },
+      headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
       ...(method === "POST" ? { body: JSON.stringify(body) } : {}),
     },
   );
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   state.actor = { id: "usr_a" };
   state.rate.mockResolvedValue({ success: true });
   state.preview.mockResolvedValue({ previewDigest: "a".repeat(64) });
   state.command.mockResolvedValue({ replayed: false });
   state.history.mockResolvedValue({ items: [] });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it.each([apply, review, history, download])(
   "requires authentication for every batch surface",
