@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { UnauthorizedError } from "@nexus/domain";
 import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
 import { readBoundedJson } from "../../../../../../../lib/bounded-json";
 import { resourceCommerceRequest } from "../../../../../../../lib/resource-commerce-http";
@@ -12,7 +13,14 @@ export const POST = withBrowserMutation((
   { params }: { params: Promise<{ id: string }> },
 ) => {
   return resourceCommerceRequest(request, true, async (actor) => {
+    const token = request.cookies.get("nexus_session")?.value;
+    if (!token) throw new UnauthorizedError();
     const command = storageParse(storageCleanupSchema, await readBoundedJson(request));
-    return storageMaintenanceService.cleanup(actor.id, (await params).id, command.expectedRevision);
+    return storageMaintenanceService.cleanup(
+      actor.id,
+      token,
+      (await params).id,
+      command.expectedRevision,
+    );
   });
 });

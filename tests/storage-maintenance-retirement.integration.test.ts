@@ -4,6 +4,7 @@ import {
   auditEvents,
   db,
   storageMaintenanceObjects as objects,
+  sessionRepository,
   storageMaintenanceRepository as repo,
   userRepository,
   users,
@@ -16,6 +17,7 @@ import { expect, it, vi } from "vitest";
 async function fixture() {
   const suffix = randomBytes(8).toString("hex"),
     actor = `usr_smo_${suffix}`,
+    token = `tok_${suffix}`,
     key = `assets/${actor}/ast_${suffix}.zip`;
   await userRepository.create({
     id: actor,
@@ -24,8 +26,14 @@ async function fixture() {
     email: `${actor}@example.invalid`,
     displayName: actor,
   });
+  await sessionRepository.create({
+    id: `ses_${suffix}`,
+    userId: actor,
+    token,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   const modifiedAt = new Date(Date.now() - 8 * 86400000).toISOString();
-  await repo.observe(actor, [
+  await repo.observe(actor, token, [
     {
       key,
       modifiedAt,
@@ -50,7 +58,7 @@ async function fixture() {
     isPrivate: true,
   };
   if (!object) throw new Error("Expected observation");
-  return { actor, key, object, asset };
+  return { actor, token, key, object, asset };
 }
 async function cleanup(f: Awaited<ReturnType<typeof fixture>>) {
   await db.delete(assets).where(eq(assets.ownerId, f.actor));
@@ -62,11 +70,11 @@ it("protects any asset reference, including error/private records, and refuses s
   const f = await fixture();
   try {
     await db.insert(assets).values(f.asset);
-    await expect(repo.retire(f.actor, f.object.id, 1)).rejects.toMatchObject({
+    await expect(repo.retire(f.actor, f.token, f.object.id, 1)).rejects.toMatchObject({
       code: "STORAGE_REFERENCED",
     });
     await db.delete(assets).where(eq(assets.id, f.asset.id));
-    await expect(repo.retire(f.actor, f.object.id, 2)).rejects.toMatchObject({
+    await expect(repo.retire(f.actor, f.token, f.object.id, 2)).rejects.toMatchObject({
       code: "STORAGE_REVISION_CONFLICT",
     });
     expect((await repo.detail(f.actor, f.object.id)).state).toBe("observed");
@@ -78,8 +86,8 @@ it("makes a retired key permanent and serializes concurrent cleanup leases", asy
   const f = await fixture();
   try {
     const attempts = await Promise.allSettled([
-      repo.retire(f.actor, f.object.id, 1),
-      repo.retire(f.actor, f.object.id, 1),
+      repo.retire(f.actor, f.token, f.object.id, 1),
+      repo.retire(f.actor, f.token, f.object.id, 1),
     ]);
     expect(attempts.filter((v) => v.status === "fulfilled")).toHaveLength(1);
     const result = attempts.find((v) => v.status === "fulfilled");
@@ -93,7 +101,7 @@ it("makes a retired key permanent and serializes concurrent cleanup leases", asy
         .set({ retiredAt: null, state: "observed" })
         .where(eq(objects.id, f.object.id)),
     ).rejects.toThrow();
-    expect(await repo.retire(f.actor, f.object.id, 1)).toMatchObject({
+    expect(await repo.retire(f.actor, f.token, f.object.id, 1)).toMatchObject({
       terminal: true,
       state: "deleted",
     });
@@ -118,7 +126,7 @@ it("waits for an in-flight reference commit and then refuses retirement", async 
       await gate;
     });
     await ready;
-    const retirement = repo.retire(f.actor, f.object.id, 1);
+    const retirement = repo.retire(f.actor, f.token, f.object.id, 1);
     release();
     await insert;
     await expect(retirement).rejects.toMatchObject({ code: "STORAGE_REFERENCED" });
@@ -146,7 +154,7 @@ it("rolls retirement and its barrier back when audit insertion fails", async () 
         prefix === "aud" ? collision : `${prefix}_${randomBytes(12).toString("hex")}`,
       );
     try {
-      await expect(repo.retire(f.actor, f.object.id, 1)).rejects.toThrow();
+      await expect(repo.retire(f.actor, f.token, f.object.id, 1)).rejects.toThrow();
     } finally {
       spy.mockRestore();
     }
@@ -166,7 +174,7 @@ it("uses a live admin role and protects the seven day grace", async () => {
       .update(objects)
       .set({ modifiedAt: now, identity: { ...f.object.identity, modifiedAt: now.toISOString() } })
       .where(eq(objects.id, f.object.id));
-    await expect(repo.retire(f.actor, f.object.id, 1)).rejects.toMatchObject({
+    await expect(repo.retire(f.actor, f.token, f.object.id, 1)).rejects.toMatchObject({
       code: "STORAGE_RECENT",
     });
     await db.update(users).set({ role: "moderator" }).where(eq(users.id, f.actor));
@@ -183,7 +191,7 @@ it("rejects new references from stale repeatable-read snapshots", async () => {
       db.transaction(
         async (tx) => {
           await tx.select().from(objects).where(eq(objects.id, f.object.id));
-          const job = await repo.retire(f.actor, f.object.id, 1);
+          const job = await repo.retire(f.actor, f.token, f.object.id, 1);
           if (job.terminal) throw new Error("Expected retirement");
           await tx.insert(assets).values(f.asset);
         },

@@ -3,18 +3,21 @@ import {
   ForbiddenError,
   NotFoundError,
   STORAGE_ORPHAN_GRACE_DAYS,
+  UnauthorizedError,
   type StorageMaintenanceState,
   type StorageObjectIdentity,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
-import { and, asc, count, eq, sql } from "drizzle-orm";
+import { and, asc, count, eq, gt, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
+  sessions,
   storageMaintenanceObjects as objects,
   users,
 } from "../schema";
 import { historyPageBounds } from "./history-pagination";
+import { digestSessionToken } from "./sessions";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 async function admin(tx: Tx, actorId: string) {
@@ -25,6 +28,22 @@ async function admin(tx: Tx, actorId: string) {
     .for("share")
     .limit(1);
   if (actor?.role !== "admin") throw new ForbiddenError();
+}
+// User share lock first, then the initiating session, matching revocation order.
+async function lockInitiatingSession(tx: Tx, actorId: string, token: string) {
+  const [current] = await tx
+    .select({ id: sessions.id, expiresAt: sessions.expiresAt })
+    .from(sessions)
+    .where(and(
+      eq(sessions.userId, actorId),
+      eq(sessions.token, digestSessionToken(token)),
+      gt(sessions.expiresAt, new Date()),
+    ))
+    .for("update");
+  const expiresAt = current ? new Date(current.expiresAt).getTime() : Number.NaN;
+  if (!current || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+    throw new UnauthorizedError("Authentication required");
+  }
 }
 function references() {
   // Fully qualify both sides: drizzle strips table prefixes in nested exists,
@@ -93,9 +112,10 @@ export class StorageMaintenanceRepository {
       return item;
     });
   }
-  async observe(actorId: string, identities: StorageObjectIdentity[]) {
+  async observe(actorId: string, currentToken: string, identities: StorageObjectIdentity[]) {
     return db.transaction(async (tx) => {
       await admin(tx, actorId);
+      await lockInitiatingSession(tx, actorId, currentToken);
       for (const identity of [...identities].sort((a, b) => a.key.localeCompare(b.key))) {
         await tx
           .insert(objects)
@@ -129,12 +149,13 @@ export class StorageMaintenanceRepository {
       return { observed: identities.length };
     });
   }
-  async retire(actorId: string, id: string, expectedRevision: number) {
+  async retire(actorId: string, currentToken: string, id: string, expectedRevision: number) {
     return db.transaction(
       async (tx) => {
         await tx.execute(sql`set local lock_timeout = '5s'`);
         await tx.execute(sql`set local statement_timeout = '10s'`);
         await admin(tx, actorId);
+        await lockInitiatingSession(tx, actorId, currentToken);
         const [item] = await tx
           .select()
           .from(objects)
