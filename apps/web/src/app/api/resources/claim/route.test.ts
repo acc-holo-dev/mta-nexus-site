@@ -1,5 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../../../../../../../tests/browser-mutation-headers";
 
 const authState = vi.hoisted(() => ({
   user: null as null | {
@@ -52,6 +56,7 @@ function request(body: unknown) {
   return new NextRequest("http://nexus.test/api/resources/claim", {
     method: "POST",
     headers: {
+      ...browserMutationHeaders(),
       "content-type": "application/json",
     },
     body: JSON.stringify(body),
@@ -60,6 +65,7 @@ function request(body: unknown) {
 
 describe("free resource claim HTTP contract", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     authState.user = {
       id: "usr_http",
       email: "http@nexus.test",
@@ -68,6 +74,10 @@ describe("free resource claim HTTP contract", () => {
       role: "user",
     };
     claimState.alreadyClaimed = false;
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("returns 201 for the first successful claim", async () => {
