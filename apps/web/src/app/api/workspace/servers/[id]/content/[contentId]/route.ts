@@ -10,6 +10,7 @@ import {
   readBoundedJson,
   requireServerJsonContentType,
 } from "../../../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
 type Context = { params: Promise<{ id: string; contentId: string }> };
 export function GET(request: NextRequest, context: Context) {
   return userPlatformApi(request, async (actor) => {
@@ -37,5 +38,9 @@ function mutate(request: NextRequest, context: Context, archive: boolean) {
     };
   });
 }
-export const PATCH = (request: NextRequest, context: Context) => mutate(request, context, false);
-export const DELETE = (request: NextRequest, context: Context) => mutate(request, context, true);
+export const PATCH = withBrowserMutation((request: NextRequest, context: Context) =>
+  mutate(request, context, false),
+);
+export const DELETE = withBrowserMutation((request: NextRequest, context: Context) =>
+  mutate(request, context, true),
+);

@@ -7,6 +7,7 @@ import {
   serverContentRate,
 } from "../../../../../../lib/server-content-api";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 type Context = { params: Promise<{ id: string }> };
 export function GET(request: NextRequest, context: Context) {
   return userPlatformApi(request, async (actor) => {
@@ -16,7 +17,7 @@ export function GET(request: NextRequest, context: Context) {
     return serverContentService.page(id, actor, filters);
   });
 }
-export function POST(request: NextRequest, context: Context) {
+export const POST = withBrowserMutation((request: NextRequest, context: Context) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -35,4 +36,4 @@ export function POST(request: NextRequest, context: Context) {
     },
     201,
   );
-}
+});
