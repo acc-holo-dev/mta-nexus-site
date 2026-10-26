@@ -43,12 +43,12 @@ beforeEach(() => {
 });
 it("checks the live role before any provider or retirement operation", async () => {
   state.admin.mockRejectedValue(new ForbiddenError());
-  await expect(service.cleanup("usr_a", "smo_a", 1)).rejects.toMatchObject({ statusCode: 403 });
+  await expect(service.cleanup("usr_a", "tok_a", "smo_a", 1)).rejects.toMatchObject({ statusCode: 403 });
   expect(state.retire).not.toHaveBeenCalled();
   expect(state.remove).not.toHaveBeenCalled();
 });
 it("commits retirement before touching filesystem bytes", async () => {
-  await service.cleanup("usr_a", "smo_a", 1);
+  await service.cleanup("usr_a", "tok_a", "smo_a", 1);
   expect(state.retire.mock.invocationCallOrder[0]).toBeLessThan(
     state.remove.mock.invocationCallOrder[0] ?? 0,
   );
@@ -59,45 +59,45 @@ it("commits retirement before touching filesystem bytes", async () => {
 });
 it("does not delete after a refused or uncertain retirement", async () => {
   state.retire.mockRejectedValue(new Error("commit unknown"));
-  await expect(service.cleanup("usr_a", "smo_a", 1)).rejects.toThrow();
+  await expect(service.cleanup("usr_a", "tok_a", "smo_a", 1)).rejects.toThrow();
   expect(state.remove).not.toHaveBeenCalled();
 });
 it.each(["missing", "changed"])(
   "records %s without translating it into successful deletion",
   async (outcome) => {
     state.remove.mockResolvedValue(outcome);
-    expect(await service.cleanup("usr_a", "smo_a", 1)).toEqual({ state: outcome });
+    expect(await service.cleanup("usr_a", "tok_a", "smo_a", 1)).toEqual({ state: outcome });
   },
 );
 it("records a retryable failure without exposing filesystem errors", async () => {
   state.remove.mockRejectedValue(new Error("private /root/storage"));
-  expect(await service.cleanup("usr_a", "smo_a", 1)).toEqual({ state: "failed" });
+  expect(await service.cleanup("usr_a", "tok_a", "smo_a", 1)).toEqual({ state: "failed" });
 });
 it("propagates uncertainty when recording the outcome fails", async () => {
   state.finish.mockRejectedValue(new Error("DB transport"));
-  await expect(service.cleanup("usr_a", "smo_a", 1)).rejects.toThrow("DB transport");
+  await expect(service.cleanup("usr_a", "tok_a", "smo_a", 1)).rejects.toThrow("DB transport");
   expect(state.remove).toHaveBeenCalledTimes(1);
 });
 it("returns a terminal result idempotently without deleting again", async () => {
   state.retire.mockResolvedValue({ terminal: true, state: "deleted" });
-  expect(await service.cleanup("usr_a", "smo_a", 1)).toEqual({ state: "deleted" });
+  expect(await service.cleanup("usr_a", "tok_a", "smo_a", 1)).toEqual({ state: "deleted" });
   expect(state.remove).not.toHaveBeenCalled();
 });
 it("fails closed for an unsupported adapter before retirement", async () => {
   state.provider = {};
-  await expect(service.cleanup("usr_a", "smo_a", 1)).rejects.toMatchObject({
+  await expect(service.cleanup("usr_a", "tok_a", "smo_a", 1)).rejects.toMatchObject({
     code: "STORAGE_MAINTENANCE_UNSUPPORTED",
   });
   expect(state.retire).not.toHaveBeenCalled();
 });
 it("persists provider observations only after an actual bounded discovery", async () => {
-  expect(await service.discover("usr_a", "usr_b", 0)).toEqual({
+  expect(await service.discover("usr_a", "tok_a", "usr_b", 0)).toEqual({
     observed: 0,
     skipped: 2,
     nextOffset: null,
     limited: false,
   });
-  expect(state.observe).toHaveBeenCalledWith("usr_a", []);
+  expect(state.observe).toHaveBeenCalledWith("usr_a", "tok_a", []);
   expect(state.discover.mock.invocationCallOrder[0]).toBeLessThan(
     state.observe.mock.invocationCallOrder[0] ?? 0,
   );

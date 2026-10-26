@@ -30,6 +30,7 @@ function request(path: string, body?: unknown, headers: Record<string, string> =
   return new NextRequest(`http://nexus.test/api/admin/storage${path}`, {
     method: body === undefined ? "GET" : "POST",
     headers: {
+      cookie: "nexus_session=storage-token",
       ...(body === undefined ? {} : browserMutationHeaders()),
       "content-type": "application/json",
       ...headers,
@@ -92,8 +93,20 @@ it("passes the authenticated actor and expected revision to the cleanup service"
       )
     ).status,
   ).toBe(200);
-  expect(state.cleanup).toHaveBeenCalledWith("usr_admin", "smo_a", 2);
+  expect(state.cleanup).toHaveBeenCalledWith("usr_admin", "storage-token", "smo_a", 2);
   expect(state.rate).toHaveBeenCalledWith("moderationAction", "usr_admin");
+});
+it("does not clean up without the initiating session cookie", async () => {
+  const response = await cleanup(
+    new NextRequest("http://nexus.test/api/admin/storage/objects/smo_a/cleanup", {
+      method: "POST",
+      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+      body: JSON.stringify({ expectedRevision: 1, confirmation: "delete_unreferenced" }),
+    }),
+    context,
+  );
+  expect(response.status).toBe(401);
+  expect(state.cleanup).not.toHaveBeenCalled();
 });
 it("blocks cross-site cleanup", async () => {
   expect(

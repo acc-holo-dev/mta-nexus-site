@@ -297,6 +297,13 @@ accepts a current password for email verification and a recovery challenge for
 password reset. It stays unavailable for admin, moderator, and two-factor
 accounts. Security changes still require the current password.
 
+Admin storage discovery and retirement recheck the initiating session inside
+the write transaction. The admin role share lock stays first, then the current
+session is locked. A missing, expired, or revoked session is unauthorized and
+does not record an observation or retire an object. Cleanup completion still
+records the removal outcome after the bytes are already gone, including when
+the operator's role changed during that removal. Role rules are unchanged.
+
 For simultaneous contributors, keep source edits in separate worktrees and record
 the main SHA used as the base. Before publication, re-read main; if it advanced,
 preserve the new commits, integrate overlapping changes and validate the combined

@@ -11,7 +11,7 @@ export const storageMaintenanceService = {
       throw new AppError("Unsupported storage maintenance", 503, "STORAGE_MAINTENANCE_UNSUPPORTED");
     return provider.listAssetNamespaces(offset, signal);
   },
-  async discover(actorId: string, ownerId: string, offset: number, signal?: AbortSignal) {
+  async discover(actorId: string, currentToken: string, ownerId: string, offset: number, signal?: AbortSignal) {
     await storageMaintenanceRepository.assertAdmin(actorId);
     const provider = getStorageProvider();
     if (!provider.discoverAssetNamespace)
@@ -22,15 +22,15 @@ export const storageMaintenanceService = {
       signal ? AbortSignal.any([signal, AbortSignal.timeout(15000)]) : AbortSignal.timeout(15000),
     );
     signal?.throwIfAborted();
-    const result = await storageMaintenanceRepository.observe(actorId, page.objects);
+    const result = await storageMaintenanceRepository.observe(actorId, currentToken, page.objects);
     return { ...result, skipped: page.skipped, nextOffset: page.nextOffset, limited: page.limited };
   },
-  async cleanup(actorId: string, id: string, expectedRevision: number) {
+  async cleanup(actorId: string, currentToken: string, id: string, expectedRevision: number) {
     await storageMaintenanceRepository.assertAdmin(actorId);
     const provider = getStorageProvider();
     if (!provider.removeMaintenanceObject)
       throw new AppError("Unsupported storage maintenance", 503, "STORAGE_MAINTENANCE_UNSUPPORTED");
-    const job = await storageMaintenanceRepository.retire(actorId, id, expectedRevision);
+    const job = await storageMaintenanceRepository.retire(actorId, currentToken, id, expectedRevision);
     if (job.terminal) return { state: job.state };
     // Request cancellation after retirement must not interrupt recording the outcome.
     let result: StorageRemovalResult | "failed";
