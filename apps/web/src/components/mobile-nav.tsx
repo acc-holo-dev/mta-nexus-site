@@ -84,7 +84,10 @@ export function MobileNav({ locale }: { locale: Locale }) {
       ? pathname === href
       : pathname === href || pathname.startsWith(`${href}/`);
 
-  const moreActive = moreItems.some((item) => isActive(item.href));
+  const moreActive =
+    pathname === "/workspace" ||
+    pathname.startsWith("/workspace/") ||
+    moreItems.some((item) => isActive(item.href));
 
   return (
     <nav
