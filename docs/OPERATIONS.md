@@ -284,10 +284,18 @@ the initiating session inside the context transaction. The user row is locked fi
 then the current session, matching revocation lock order, and only then are membership
 and the context write considered. A missing, expired, or revoked session is unauthorized
 and does not change `activeContextId` or write the switch audit. The raw token is a
-bound digest in that lock and is not returned. Fresh-auth step-up for staff actions,
-withdrawals, and account recovery is still undefined. The pg-proxy tests cover the
+bound digest in that lock and is not returned. The pg-proxy tests cover the
 lock order, a no-op personal switch, membership denial, and a dead session; they are
 not a PostgreSQL concurrency proof.
+
+Fresh-auth requirements are explicit. A live session satisfies none of staff
+actions, withdrawals, account recovery, or security changes. Staff actions and
+withdrawals accept only a same-request current-password proof that must be
+rechecked inside the mutation. No withdrawal route exists, and existing staff
+moderation routes are not moved onto that proof here. Ordinary account recovery
+accepts a current password for email verification and a recovery challenge for
+password reset. It stays unavailable for admin, moderator, and two-factor
+accounts. Security changes still require the current password.
 
 For simultaneous contributors, keep source edits in separate worktrees and record
 the main SHA used as the base. Before publication, re-read main; if it advanced,

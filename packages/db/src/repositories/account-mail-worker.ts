@@ -1,4 +1,5 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { ordinaryRecoveryEligible } from "@nexus/security";
 import { and, eq, gt, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, sessions, users } from "../schema";
@@ -575,8 +576,11 @@ export class AccountMailWorkerRepository {
       eq(accountMailOutbox.challengeId, hint.challengeId))).for("update");
     if (!mail) return null;
     const now = await clock(tx); // AFTER every potential lock wait.
-    if (!proof || !state || !user.passwordHash || user.twoFactorEnabled || ["admin", "moderator"].includes(user.role)
-      || !contextValid || proof.userId !== user.id || proof.email !== user.email
+    if (!proof || !state || !ordinaryRecoveryEligible({
+      role: user.role,
+      twoFactorEnabled: user.twoFactorEnabled,
+      hasPassword: Boolean(user.passwordHash),
+    }) || !contextValid || proof.userId !== user.id || proof.email !== user.email
       || proof.credentialVersion !== state.credentialVersion || proof.consumedAt || proof.revokedAt
       || proof.purpose !== snapshot.purpose || proof.bindingId !== snapshot.bindingId
       || proof.initiatingSessionDigest !== snapshot.initiatingSessionDigest

@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { ordinaryRecoveryEligible } from "@nexus/security";
 import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import { auditEvents, users } from "../schema";
@@ -37,8 +38,11 @@ export class AccountEmailEnrollmentRepository {
       email: user.email,
       verified,
       verifiedAt: verified && binding ? binding.verifiedAt : null,
-      eligible: Boolean(user.passwordHash) && !user.twoFactorEnabled
-        && !["admin", "moderator"].includes(user.role),
+      eligible: ordinaryRecoveryEligible({
+        role: user.role,
+        twoFactorEnabled: user.twoFactorEnabled,
+        hasPassword: Boolean(user.passwordHash),
+      }),
     };
   }
 

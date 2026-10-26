@@ -1,5 +1,6 @@
 export * from "./id";
 export * from "./password";
+export * from "./fresh-auth-policy";
 export * from "./policy";
 export * from "./ratelimit";
 export * from "./rate-limit-policy";
