@@ -1,5 +1,9 @@
 import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
@@ -74,7 +78,10 @@ function postRequest(
     "https://nexus.test/api/verification",
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        ...browserMutationHeaders(),
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(body),
     },
   );
@@ -101,6 +108,7 @@ function expectPrivate(response: Response) {
 }
 
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.afterCallbacks.length = 0;
   state.user = { id: "u_1", isVerified: false };
@@ -127,6 +135,10 @@ beforeEach(() => {
   });
   mocks.findOrganization.mockResolvedValue(null);
   mocks.memberships.mockResolvedValue([]);
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("verification HTTP behavior", () => {

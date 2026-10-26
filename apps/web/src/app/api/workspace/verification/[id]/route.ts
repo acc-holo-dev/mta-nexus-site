@@ -2,6 +2,7 @@ import { AppError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
 import { verificationApplicationsError } from "../../../../../lib/verification-applications-copy";
 import { verificationRate } from "../../../../../lib/verification-workspace-api";
@@ -20,7 +21,7 @@ export function GET(request: NextRequest, context: Context) {
     verificationApplicationsError,
   );
 }
-export function PATCH(request: NextRequest, context: Context) {
+export const PATCH = withBrowserMutation((request: NextRequest, context: Context) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -37,4 +38,4 @@ export function PATCH(request: NextRequest, context: Context) {
     200,
     verificationApplicationsError,
   );
-}
+});
