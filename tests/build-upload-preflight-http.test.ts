@@ -3,6 +3,7 @@ import packageFixtures from "./fixtures/build-packages.json";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { ForbiddenError, NotFoundError } from "@nexus/domain";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const preflight = vi.hoisted(() => vi.fn());
 const releaseBuild = vi.hoisted(() => vi.fn());
@@ -58,7 +59,7 @@ function invalidBodyRequest() {
     "http://nexus.test/api/products/prd_target/builds",
     {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: browserMutationHeaders({ "content-type": "application/json" }),
       body: JSON.stringify({ intentionally: "not multipart" }),
     },
   );
@@ -69,10 +70,10 @@ function oversizedDeclaredRequest() {
     "http://nexus.test/api/products/prd_target/builds",
     {
       method: "POST",
-      headers: {
+      headers: browserMutationHeaders({
         "content-type": "multipart/form-data; boundary=nexus-boundary",
         "content-length": String(65 * 1024 * 1024 + 1),
-      },
+      }),
       body: "small test body",
     },
   );
@@ -92,9 +93,9 @@ function oversizedChunkedRequest() {
     "http://nexus.test/api/products/prd_target/builds",
     {
       method: "POST",
-      headers: {
+      headers: browserMutationHeaders({
         "content-type": "multipart/form-data; boundary=nexus-boundary",
-      },
+      }),
       body,
       duplex: "half",
     } as unknown as ConstructorParameters<typeof NextRequest>[1],
@@ -115,9 +116,9 @@ function validChunkedRequest() {
     "http://nexus.test/api/products/prd_target/builds",
     {
       method: "POST",
-      headers: {
+      headers: browserMutationHeaders({
         "content-type": "multipart/form-data; boundary=nexus-boundary",
-      },
+      }),
       body: new ReadableStream<Uint8Array>({
         start(controller) {
           for (const chunk of chunks) controller.enqueue(chunk);
@@ -136,6 +137,7 @@ const context = {
 describe("build upload authorization HTTP preflight", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    stubBrowserMutationOrigin();
   });
 
   it("returns 403 before multipart parsing or expensive upload work for an unmanaged target", async () => {
@@ -214,9 +216,9 @@ describe("build upload authorization HTTP preflight", () => {
       "http://nexus.test/api/products/prd_target/builds",
       {
         method: "POST",
-        headers: {
+        headers: browserMutationHeaders({
           "content-type": "multipart/form-data; boundary=nexus-boundary",
-        },
+        }),
         body: "not a multipart body",
       },
     );

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import packageFixtures from "./fixtures/build-packages.json";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const scan = vi.hoisted(() => vi.fn());
 const uploadAsset = vi.hoisted(() => vi.fn());
@@ -67,7 +68,7 @@ function uploadRequest(mtaVersionTarget?: string) {
     "http://nexus.test/api/products/prd_scanner/builds",
     {
       method: "POST",
-      headers: { cookie: "nexus_session=tok_scanner" },
+      headers: browserMutationHeaders({ cookie: "nexus_session=tok_scanner" }),
       body: form,
     },
   );
@@ -80,6 +81,7 @@ const context = {
 describe("build upload scanner HTTP behavior", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    stubBrowserMutationOrigin();
     preflight.mockResolvedValue({
       id: "prd_scanner",
       price: 0,
@@ -105,7 +107,9 @@ describe("build upload scanner HTTP behavior", () => {
     const form = new FormData();
     form.set("file", new File([new Uint8Array(Buffer.from(packageFixtures.traversal, "base64"))], "resource.zip"));
     form.set("version", "1.0.0");
-    const response = await POST(new NextRequest("http://nexus.test/api/products/prd_scanner/builds", { method: "POST", body: form }), context);
+    const response = await POST(new NextRequest("http://nexus.test/api/products/prd_scanner/builds", {
+      method: "POST", headers: browserMutationHeaders(), body: form,
+    }), context);
     expect(response.status).toBe(422);
     expect(await response.json()).toMatchObject({ code: "BUILD_PACKAGE_UNSAFE_PATH" });
     expect(scan).not.toHaveBeenCalled(); expect(uploadAsset).not.toHaveBeenCalled(); expect(releaseBuild).not.toHaveBeenCalled();

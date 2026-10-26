@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest, NextResponse } from "next/server";
-import { withBrowserMutation } from "../apps/web/src/lib/browser-route-adapter";
-import { withLicenseBearerRoute } from "../apps/web/src/lib/license-bearer-route-adapter";
+import {
+  BROWSER_ROUTE_ADAPTER,
+  withBrowserMutation,
+} from "../apps/web/src/lib/browser-route-adapter";
+import {
+  LICENSE_BEARER_ROUTE_ADAPTER,
+  withLicenseBearerRoute,
+} from "../apps/web/src/lib/license-bearer-route-adapter";
 
 const licenseRuntimeRequest = vi.hoisted(() =>
   vi.fn(async (_request: NextRequest, operation: (digest: string) => Promise<unknown | null>) => {
@@ -24,6 +30,13 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.restoreAllMocks();
+});
+
+describe("route adapter markers", () => {
+  it("keeps the stable inventory ids", () => {
+    expect(BROWSER_ROUTE_ADAPTER).toBe("browser-csrf-v1");
+    expect(LICENSE_BEARER_ROUTE_ADAPTER).toBe("license-bearer-v1");
+  });
 });
 
 describe("withBrowserMutation", () => {
