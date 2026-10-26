@@ -12,6 +12,7 @@ import {
   type RequestLogContext,
 } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -42,7 +43,7 @@ function contentLengthTooLarge(
   );
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
 
   try {
@@ -154,4 +155,4 @@ export async function POST(request: NextRequest) {
       422,
     );
   }
-}
+});

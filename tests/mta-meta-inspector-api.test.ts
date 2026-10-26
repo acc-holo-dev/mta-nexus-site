@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { NextRequest } from "next/server";
 import { metaInspectionLimits } from "../apps/web/src/lib/mta-meta-inspector";
 import { getRateLimitPolicy } from "../packages/security/src/rate-limit-policy";
@@ -36,6 +37,7 @@ function request(
     {
       method: "POST",
       headers: {
+        ...browserMutationHeaders(),
         "content-type": contentType,
         cookie: "nexus_session=test-session",
         ...extraHeaders,
@@ -52,7 +54,12 @@ function expectPrivate(response: Response) {
 }
 
 describe("resource meta inspector HTTP behavior", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
     state.user = {
       id: "usr_inspector",
