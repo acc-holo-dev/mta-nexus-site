@@ -102,7 +102,10 @@ const makeRequest = (path: string, method: string, body?: string) =>
   new NextRequest(`http://nexus.test${path}`, {
     method,
     headers: {
-      ...(path.startsWith("/api/follow") && method !== "GET" ? browserMutationHeaders() : {}),
+      ...((path.startsWith("/api/follow") && method !== "GET") ||
+      path.startsWith("/api/notifications/")
+        ? browserMutationHeaders()
+        : {}),
       "content-type": "application/json",
     },
     ...(body === undefined ? {} : { body }),

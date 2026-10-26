@@ -1,5 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_notifications" } as { id: string } | null,
@@ -100,6 +104,7 @@ function request(
     {
       method,
       headers: {
+        ...(method === "GET" ? {} : browserMutationHeaders()),
         cookie:
           "nexus_session=notification-token",
         ...(body === undefined
@@ -133,10 +138,15 @@ function expectPrivateCorrelation(
 describe("notification API request correlation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    stubBrowserMutationOrigin();
     state.user = { id: "usr_notifications" };
     state.sessionId = "ses_notifications";
     state.allowed = true;
     state.fail = false;
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("correlates inbox and anonymous inbox reads", async () => {

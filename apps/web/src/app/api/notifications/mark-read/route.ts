@@ -9,6 +9,7 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../../lib/observability";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -26,7 +27,7 @@ function json(
   });
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -113,4 +114,4 @@ export async function POST(request: NextRequest) {
       500,
     );
   }
-}
+});
