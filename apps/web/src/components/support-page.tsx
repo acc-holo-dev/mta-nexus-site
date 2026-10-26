@@ -23,10 +23,33 @@ export async function SupportPageSurface({
   id?: string;
 }) {
   const locale = await getRequestLocale(),
-    copy = supportWorkspaceCopy(locale);
+    copy = supportWorkspaceCopy(locale),
+    support = getDictionary(locale).support;
   const store = await cookies(),
     actor = await authService.getSession(store.get("nexus_session")?.value);
-  if (!actor) return <PlatformSignIn locale={locale} />;
+  if (!actor) {
+    // Case detail stays a plain sign-in gate; the list keeps the Support H1 the
+    // shell a11y acceptance asserts for guests on /support.
+    if (id !== undefined) return <PlatformSignIn locale={locale} />;
+    return (
+      <div className="mx-auto max-w-5xl space-y-8">
+        <header className="space-y-2 border-b border-base pb-6">
+          <h1 className="font-display text-primary">{support.title}</h1>
+          <p className="max-w-3xl text-sm text-muted">{support.description}</p>
+          <p className="text-xs text-warning">{support.noGuaranteedSla}</p>
+        </header>
+        <div className="nexus-panel space-y-3 p-5">
+          <p className="text-sm text-secondary">{support.authRequired}</p>
+          <Link
+            href="/auth/login"
+            className="inline-flex rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
+          >
+            {support.signIn}
+          </Link>
+        </div>
+      </div>
+    );
+  }
   if (staff && !can(actor, "admin.moderation"))
     return (
       <p role="alert" className="nexus-panel p-5 text-danger">
