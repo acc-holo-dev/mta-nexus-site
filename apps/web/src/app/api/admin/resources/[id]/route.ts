@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { AppError, ForbiddenError } from "@nexus/domain";
+import { AppError, ForbiddenError, UnauthorizedError } from "@nexus/domain";
 import { resourceModerationCommandSchema } from "@nexus/validation";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
@@ -26,6 +26,8 @@ export const POST = withBrowserMutation((
     );
     if (!command.success)
       throw new AppError("Invalid resource moderation", 400, "RESOURCE_MODERATION_INVALID");
-    return resourceModerationService.command(actor, (await params).id, command.data);
+    const token = request.cookies.get("nexus_session")?.value;
+    if (!token) throw new UnauthorizedError();
+    return resourceModerationService.command(actor, (await params).id, command.data, token);
   });
 });

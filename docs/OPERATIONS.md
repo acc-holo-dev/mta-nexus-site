@@ -304,6 +304,13 @@ does not record an observation or retire an object. Cleanup completion still
 records the removal outcome after the bytes are already gone, including when
 the operator's role changed during that removal. Role rules are unchanged.
 
+Product feature, unfeature, suspend, and release on `/api/admin/actions` recheck
+the initiating session inside those write transactions, after the existing staff
+role share lock. The same suspend/release transaction is used by
+`/api/admin/resources/[id]`. A missing, expired, or revoked session is
+unauthorized and does not change the product. Report resolution, verification
+decisions, build review, and content moderation are unchanged.
+
 For simultaneous contributors, keep source edits in separate worktrees and record
 the main SHA used as the base. Before publication, re-read main; if it advanced,
 preserve the new commits, integrate overlapping changes and validate the combined

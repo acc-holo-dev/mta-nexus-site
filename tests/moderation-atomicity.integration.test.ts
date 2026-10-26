@@ -163,7 +163,7 @@ describe("moderation atomicity integration", () => {
     const suspendedProduct = await productRepository.findById(publishedId);
     if (!suspendedProduct) throw new Error("Expected suspended resource fixture");
     await expect(resourceModerationRepository.command({
-      actorId: adminId, productId: publishedId, auditId: suspensionAudit.id,
+      actorId: adminId, productId: publishedId, auditId: suspensionAudit.id, currentToken: token,
       command: { action: "release", reason: "Must roll back every transition.", expectedUpdatedAt: suspendedProduct.updatedAt.toISOString() },
     })).rejects.toBeTruthy();
     expect((await productRepository.findById(publishedId))?.status).toBe("suspended");

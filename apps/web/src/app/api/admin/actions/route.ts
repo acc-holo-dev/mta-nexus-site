@@ -80,10 +80,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     if (targetType === "product") {
       if (action === "feature" || action === "unfeature") {
+        if (!token) return json({ error: "Authentication required" }, 401);
         const updated = await productRepository.updateWithAudit(
           targetId,
           { isFeatured: action === "feature" },
           makeAudit(),
+          token,
         );
         if (!updated) {
           return json(
@@ -98,7 +100,8 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           reason: notes,
         });
         if (!command.success) throw new AppError("A current resource revision and moderation reason are required", 400, "RESOURCE_MODERATION_INVALID");
-        await resourceModerationService.command(user, targetId, command.data);
+        if (!token) return json({ error: "Authentication required" }, 401);
+        await resourceModerationService.command(user, targetId, command.data, token);
       }
     } else if (targetType === "report") {
       if (action === "resolve" || action === "dismiss") {

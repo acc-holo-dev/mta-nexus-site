@@ -1,6 +1,7 @@
 import type { SQL } from "drizzle-orm";
 import { eq, desc, asc, and, count, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
 import { assertProductMutationAuthority, assertBuildModerationAuthority } from "./product-mutation-authority";
+import { lockInitiatingSession } from "./initiating-session";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
 import { auditEvents, builds, products, organizations, organizationMembers, users } from "../schema";
@@ -342,11 +343,13 @@ export class ProductRepository {
     id: string,
     updates: Partial<Product>,
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
   ): Promise<Product | null> {
     return db.transaction(async (tx) => {
       const [parent] = await tx.select({ id: products.id }).from(products)
         .where(eq(products.id, id)).limit(1).for("no key update");
       await assertBuildModerationAuthority(tx, audit.actorId);
+      await lockInitiatingSession(tx, audit.actorId, currentToken);
       if (!parent) return null;
       const now = new Date();
       const rows = await tx
@@ -366,22 +369,22 @@ export class ProductRepository {
   }
 
   /** Legacy entry point: suspension still uses the shared live moderation gate. */
-  async suspendPublished(id: string, audit?: Omit<AuditEvent, "createdAt">): Promise<Product | null> {
+  async suspendPublished(id: string, audit: Omit<AuditEvent, "createdAt"> | undefined, currentToken: string): Promise<Product | null> {
     if (!audit) throw new AppError("An audited moderation reason is required", 400, "RESOURCE_MODERATION_INVALID");
     const product = await this.findById(id);
     if (product?.status !== "published") return null;
-    await resourceModerationRepository.command({ actorId: audit.actorId, productId: id, auditId: audit.id,
+    await resourceModerationRepository.command({ actorId: audit.actorId, productId: id, auditId: audit.id, currentToken,
       command: { action: "suspend", expectedUpdatedAt: product.updatedAt.toISOString(), reason: typeof audit.details?.notes === "string" ? audit.details.notes : "" } });
     return this.findById(id);
   }
 
   /** Legacy name retained; restored resources now return to draft for review. */
-  async restoreSuspendedWithPublishedBuild(id: string, audit?: Omit<AuditEvent, "createdAt">): Promise<"restored" | "not_found" | "invalid_state" | "no_published_build"> {
+  async restoreSuspendedWithPublishedBuild(id: string, audit: Omit<AuditEvent, "createdAt"> | undefined, currentToken: string): Promise<"restored" | "not_found" | "invalid_state" | "no_published_build"> {
     if (!audit) throw new AppError("An audited moderation reason is required", 400, "RESOURCE_MODERATION_INVALID");
     const product = await this.findById(id);
     if (!product) return "not_found";
     if (product.status !== "suspended") return "invalid_state";
-    await resourceModerationRepository.command({ actorId: audit.actorId, productId: id, auditId: audit.id,
+    await resourceModerationRepository.command({ actorId: audit.actorId, productId: id, auditId: audit.id, currentToken,
       command: { action: "release", expectedUpdatedAt: product.updatedAt.toISOString(), reason: typeof audit.details?.notes === "string" ? audit.details.notes : "" } });
     return "restored";
   }

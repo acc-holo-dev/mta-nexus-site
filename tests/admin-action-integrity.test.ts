@@ -162,6 +162,7 @@ describe("moderation action integrity", () => {
           targetId: "prd_missing",
           targetType: "product",
         }),
+        "test-session",
       );
     },
   );
@@ -195,6 +196,7 @@ describe("moderation action integrity", () => {
     expect(moderation.command).toHaveBeenCalledWith(
       expect.objectContaining({ id: "usr_mod" }), "prd_missing",
       { action: "release", reason: "Moderation evidence.", expectedUpdatedAt: "2026-10-10T12:00:00.000Z" },
+      "test-session",
     );
     expect(product.restoreSuspendedWithPublishedBuild).not.toHaveBeenCalled();
   });
