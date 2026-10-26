@@ -41,13 +41,14 @@ export const resourceModerationService = {
   },
   publisherHistory: (user: User, productId: string, page = 1) =>
     resourceModerationRepository.publisherHistory(user.id, productId, page),
-  command(user: User, productId: string, command: ResourceModerationCommand) {
+  command(user: User, productId: string, command: ResourceModerationCommand, currentToken: string) {
     moderator(user);
     return resourceModerationRepository.command({
       actorId: user.id,
       productId,
       command,
       auditId: generateId("aud"),
+      currentToken,
     });
   },
 };

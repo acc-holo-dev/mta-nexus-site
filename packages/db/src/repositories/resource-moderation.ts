@@ -12,6 +12,7 @@ import {
   assertBuildModerationAuthority,
   assertProductMutationAuthority,
 } from "./product-mutation-authority";
+import { lockInitiatingSession } from "./initiating-session";
 import { containsPattern } from "./search-pattern";
 import { historyPageBounds } from "./history-pagination";
 import type { ResourceTransaction } from "./entitlements";
@@ -114,6 +115,7 @@ export class ResourceModerationRepository {
     productId: string;
     command: ResourceModerationCommand;
     auditId: string;
+    currentToken: string;
   }) {
     return db.transaction(async (tx) => {
       const [product] = await tx
@@ -123,6 +125,7 @@ export class ResourceModerationRepository {
         .limit(1)
         .for("no key update");
       await assertBuildModerationAuthority(tx, input.actorId);
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       if (!product) throw new NotFoundError("Resource", input.productId);
       const command = input.command,
         target = resourceModerationTarget(product.status as ProductStatus, command.action);

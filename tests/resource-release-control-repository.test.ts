@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
@@ -47,7 +48,15 @@ const command = {
   expectedUpdatedAt: stamp,
   reason: "Reviewed clean evidence",
 };
-const modInput = { actorId: "usr_mod", productId: "prd_a", command, auditId: "aud_a" };
+const modToken = "raw-mod-token";
+const liveSession = [["ses_mod", "2099-01-01T00:00:00.000Z"]];
+const modInput = {
+  actorId: "usr_mod",
+  productId: "prd_a",
+  command,
+  auditId: "aud_a",
+  currentToken: modToken,
+};
 const clockRows = [{ observedAt: stamp }];
 const ownedRows = (status = "published", expiry: string | null = null) => [
   [],
@@ -190,6 +199,7 @@ it("releasing a restriction drafts published/pending versions and preserves quar
   state.results = [
     [product("suspended")],
     [["moderator"]],
+    liveSession,
     [["bld_a"], ["bld_b"]],
     [],
     [product("draft", "2026-10-10T12:00:00.001Z")],
@@ -214,16 +224,18 @@ it.each(["developer", "user"])(
   },
 );
 it("rejects stale moderation before changing any builds or writing an audit", async () => {
-  state.results = [[product("suspended", "2026-10-10T12:00:00.001Z")], [["admin"]]];
+  state.results = [[product("suspended", "2026-10-10T12:00:00.001Z")], [["admin"]], liveSession];
   await expect(moderation.command(modInput)).rejects.toMatchObject({
     code: "PRODUCT_METADATA_CONFLICT",
   });
-  expect(state.queries).toHaveLength(2);
+  expect(state.queries).toHaveLength(3);
+  expect(state.queries.some((query) => query.sql.startsWith("update"))).toBe(false);
 });
 it("suspension changes availability without destroying releases or acquired rights", async () => {
   state.results = [
     [product()],
     [["admin"]],
+    liveSession,
     [product("suspended", "2026-10-10T12:00:00.001Z")],
     [],
   ];
@@ -268,15 +280,41 @@ it("legacy feature changes require a live staff grant and advance the moderation
   };
   state.results = [[["prd_a"]], [["user"]]];
   await expect(
-    new ProductRepository().updateWithAudit("prd_a", { isFeatured: true }, audit),
+    new ProductRepository().updateWithAudit("prd_a", { isFeatured: true }, audit, modToken),
   ).rejects.toMatchObject({ statusCode: 403 });
   expect(state.queries.some((query) => query.sql.startsWith("update"))).toBe(false);
   state.queries = [];
-  state.results = [[["prd_a"]], [["moderator"]], [], []];
-  await new ProductRepository().updateWithAudit("prd_a", { isFeatured: true }, audit);
+  state.results = [[["prd_a"]], [["moderator"]], liveSession, [], []];
+  await new ProductRepository().updateWithAudit("prd_a", { isFeatured: true }, audit, modToken);
   expect(state.queries.find((query) => query.sql.startsWith("update"))?.sql).toContain(
     "interval '1 millisecond'",
   );
+  const sessionQuery = state.queries.find((query) => query.sql.includes('"sessions"'));
+  expect(sessionQuery?.sql).toContain("for update");
+  expect(sessionQuery?.params).toContain(createHash("sha256").update(modToken).digest("hex"));
+  expect(sessionQuery?.params).not.toContain(modToken);
+});
+it("refuses a product moderation write when the initiating session is missing or expired", async () => {
+  const audit = {
+    id: "aud_a",
+    actorId: "usr_mod",
+    actorType: "admin" as const,
+    action: "admin.feature",
+    targetType: "product",
+    targetId: "prd_a",
+  };
+  state.results = [[["prd_a"]], [["moderator"]]];
+  await expect(
+    new ProductRepository().updateWithAudit("prd_a", { isFeatured: true }, audit, modToken),
+  ).rejects.toThrow("Authentication required");
+  expect(state.queries.some((query) => query.sql.startsWith("update"))).toBe(false);
+  const selection = state.queries[2]?.sql.split(" from ")[0] ?? "";
+  expect(selection).toContain('"expires_at"');
+  expect(selection).not.toContain('"token"');
+  state.queries = [];
+  state.results = [[product()], [["admin"]], [["ses_mod", "2000-01-01T00:00:00.000Z"]]];
+  await expect(moderation.command(modInput)).rejects.toThrow("Authentication required");
+  expect(state.queries.some((query) => query.sql.startsWith("update"))).toBe(false);
 });
 it("main library reads a fixed cleared build and retains the unavailable state after withdrawal", async () => {
   state.results = [

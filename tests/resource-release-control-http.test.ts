@@ -61,7 +61,12 @@ function get(path: string) {
 function post(path: string, body: unknown, headers = {}) {
   return new NextRequest(`https://nexus.test${path}`, {
     method: "POST",
-    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+    headers: {
+      cookie: "nexus_session=staff-token",
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      ...headers,
+    },
     body: JSON.stringify(body),
   });
 }
@@ -173,6 +178,7 @@ it("routes moderator commands through the repository's live authority check", as
     productId: "prd_a",
     command: decision,
     auditId: "aud_a",
+    currentToken: "staff-token",
   });
   expect(response.status).toBe(403);
   expect(await response.json()).toEqual({ code: "FORBIDDEN" });
