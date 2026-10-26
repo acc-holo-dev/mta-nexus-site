@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { AppError } from "@nexus/domain";
 const mocks = vi.hoisted(() => ({
   stream: vi.fn(),
@@ -30,6 +31,7 @@ function request(path: string, body?: unknown, headers: Record<string, string> =
   return new NextRequest(`https://nexus.test${path}`, {
     method: body === undefined ? "GET" : "POST",
     headers: {
+      ...browserMutationHeaders(),
       cookie: "nexus_session=token; nexus_locale=ru",
       ...(body === undefined ? {} : { "Content-Type": "application/json" }),
       ...headers,
@@ -37,7 +39,11 @@ function request(path: string, body?: unknown, headers: Record<string, string> =
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
 }
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   mocks.session.mockResolvedValue(actor);
   mocks.rate.mockResolvedValue({ success: true });

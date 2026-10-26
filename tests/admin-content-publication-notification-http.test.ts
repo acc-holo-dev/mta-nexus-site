@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   moderated: {
@@ -98,10 +99,10 @@ import { POST } from "../apps/web/src/app/api/admin/actions/route";
 function request(action: "publish" | "archive", extra: Record<string, unknown> = {}) {
   return new NextRequest("http://nexus.test/api/admin/actions", {
     method: "POST",
-    headers: {
+    headers: browserMutationHeaders({
       "content-type": "application/json",
       cookie: "nexus_session=test-session",
-    },
+    }),
     body: JSON.stringify({
       expectedUpdatedAt: "2026-10-11T00:00:00.000Z",
       targetType: "content",
@@ -113,8 +114,16 @@ function request(action: "publish" | "archive", extra: Record<string, unknown> =
   });
 }
 
+beforeEach(() => {
+  stubBrowserMutationOrigin();
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
+
 describe("content publication side effects", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
     state.afterCallbacks.length = 0;
     state.moderated = {
@@ -125,6 +134,9 @@ describe("content publication side effects", () => {
       title: "Update 1",
       authorId: "usr_author",
     };
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("schedules server follower fanout after a successful publish response", async () => {

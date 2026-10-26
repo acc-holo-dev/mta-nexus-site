@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   session: vi.fn(),
@@ -57,6 +58,7 @@ const request = (
   new NextRequest(`https://nexus.test/api/example${query}`, {
     method,
     headers: {
+      ...browserMutationHeaders(),
       cookie: "nexus_session=token; nexus_locale=ru",
       ...(body === undefined ? {} : { "content-type": "application/json" }),
       ...headers,
@@ -69,7 +71,11 @@ const input = {
   notes: "Recorded reason",
   previewRevision: "a".repeat(64),
 };
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.session.mockResolvedValue({ id: "staff", role: "moderator" });
   state.rate.mockResolvedValue({ success: true });

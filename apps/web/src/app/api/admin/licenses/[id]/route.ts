@@ -4,11 +4,15 @@ import { licenseModerationCommandSchema } from "@nexus/validation";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { licenseControlService } from "../../../../../lib/services/license-control-service";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
-export function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+export const POST = withBrowserMutation((
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) => {
   return resourceCommerceRequest(request, true, async (user) => {
     const parsed = licenseModerationCommandSchema.safeParse(await readBoundedJson(request, 4096));
     if (!parsed.success) throw new ValidationError("Invalid license moderation command");
     return licenseControlService.moderate(user, (await context.params).id, parsed.data);
   });
-}
+});

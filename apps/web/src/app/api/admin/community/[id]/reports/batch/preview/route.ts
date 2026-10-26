@@ -8,7 +8,11 @@ import { reportRateLimit } from "../../../../../../../../lib/community-report-ap
 import { reportBatchError } from "../../../../../../../../lib/report-batch-copy";
 import { communityReportService } from "../../../../../../../../lib/services/community-report-service";
 import { userPlatformApi } from "../../../../../../../../lib/user-platform-api";
-export function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+import { withBrowserMutation } from "../../../../../../../../lib/browser-route-adapter";
+export const POST = withBrowserMutation((
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -25,4 +29,4 @@ export function POST(request: NextRequest, { params }: { params: Promise<{ id: s
     200,
     reportBatchError,
   );
-}
+});

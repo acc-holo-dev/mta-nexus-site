@@ -6,7 +6,11 @@ import { verificationDecisionSchema } from "../../../../../lib/verification-work
 import { verificationRate } from "../../../../../lib/verification-workspace-api";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 import { verificationWorkspaceService } from "../../../../../lib/services/verification-workspace-service";
-export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
+export const PATCH = withBrowserMutation(async (
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -22,4 +26,4 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
     200,
     verificationDecisionError,
   );
-}
+});

@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   resolution: {
@@ -81,10 +82,10 @@ import { POST } from "../apps/web/src/app/api/admin/actions/route";
 function request(action: "approve" | "reject") {
   return new NextRequest("http://nexus.test/api/admin/actions", {
     method: "POST",
-    headers: {
+    headers: browserMutationHeaders({
       "content-type": "application/json",
       cookie: "nexus_session=test-session",
-    },
+    }),
     body: JSON.stringify({
       targetType: "verification",
       targetId: "ver_1",
@@ -96,12 +97,16 @@ function request(action: "approve" | "reject") {
 
 describe("verification resolution durable push scheduling", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
     state.resolution = {
       id: "ver_1",
       requesterId: "usr_requester",
       status: "approved",
     };
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it.each(["approve", "reject"] as const)(

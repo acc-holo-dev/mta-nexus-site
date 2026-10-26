@@ -9,6 +9,7 @@ import { moderationError } from "../../../../../lib/community-moderation-copy";
 import { reportRateLimit } from "../../../../../lib/community-report-api";
 import { communityModerationService } from "../../../../../lib/services/community-moderation-service";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: NextRequest, { params }: Context) {
   return userPlatformApi(
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest, { params }: Context) {
     moderationError,
   );
 }
-export async function POST(request: NextRequest, { params }: Context) {
+export const POST = withBrowserMutation(async (request: NextRequest, { params }: Context) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -39,4 +40,4 @@ export async function POST(request: NextRequest, { params }: Context) {
     200,
     moderationError,
   );
-}
+});

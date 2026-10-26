@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const mocks = vi.hoisted(() => ({
   user: { id: "mod_1" } as { id: string } | null,
@@ -30,13 +31,17 @@ function request(action = "resolve", notes = "Reviewed supporting evidence") {
   const req = new NextRequest("https://nexus.test/api/admin/actions", {
     method: "POST",
     body: JSON.stringify({ targetType: "report", targetId: "rpt_1", action, notes }),
-    headers: { "Content-Type": "application/json" },
+    headers: browserMutationHeaders({ "Content-Type": "application/json" }),
   });
   req.cookies.set("nexus_session", "session");
   return req;
 }
 
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   mocks.user = { id: "mod_1" };
   mocks.authorized = true;
   mocks.rate.mockReset().mockResolvedValue({ success: true });
