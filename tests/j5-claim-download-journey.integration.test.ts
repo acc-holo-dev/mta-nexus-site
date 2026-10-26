@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import {
   buildRepository,
   productRepository,
@@ -11,6 +12,9 @@ import { POST as claimResource } from "../apps/web/src/app/api/resources/claim/r
 import { GET as downloadResource } from "../apps/web/src/app/api/products/[id]/download/route";
 
 describe("J5 free resource claim-to-download journey", () => {
+  beforeEach(() => {
+    stubBrowserMutationOrigin();
+  });
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -115,6 +119,7 @@ describe("J5 free resource claim-to-download journey", () => {
         new NextRequest("http://nexus.test/api/resources/claim", {
           method: "POST",
           headers: {
+            ...browserMutationHeaders(),
             "content-type": "application/json",
             cookie: `nexus_session=${sessionToken}`,
             "x-nexus-proxy-secret": proxySecret,

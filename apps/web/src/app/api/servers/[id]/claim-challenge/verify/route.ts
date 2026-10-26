@@ -14,6 +14,7 @@ import {
   notifyModeratorsOfServerClaim,
   serverClaimService,
 } from "../../../../../../lib/services/server-claim-service";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -43,10 +44,10 @@ const verifySchema = z
   })
   .strict();
 
-export async function POST(
+export const POST = withBrowserMutation(async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
-) {
+) => {
   const context = createRequestLogContext(request);
   try {
     const sessionToken =
@@ -183,4 +184,4 @@ export async function POST(
       500,
     );
   }
-}
+});

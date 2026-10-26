@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { AppError } from "@nexus/domain";
 
 const mocks = vi.hoisted(() => ({
@@ -42,11 +43,15 @@ function request(
 ) {
   return new NextRequest(`http://nexus.test/api/${path}`, {
     method,
-    headers: { "content-type": "application/json", ...headers },
+    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
     ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
   });
 }
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.resetAllMocks();
   mocks.user = { id: "usr_a" };
   mocks.rate.mockResolvedValue({ success: true });

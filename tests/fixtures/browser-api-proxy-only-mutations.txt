@@ -32,10 +32,8 @@ apps/web/src/app/api/notifications/preferences/route.ts
 apps/web/src/app/api/notifications/push/route.ts
 apps/web/src/app/api/orders/[id]/cancel/route.ts
 apps/web/src/app/api/orders/[id]/support/route.ts
-apps/web/src/app/api/products/[id]/builds/[buildId]/route.ts
 apps/web/src/app/api/products/[id]/compatibility/route.ts
 apps/web/src/app/api/products/[id]/copy/route.ts
-apps/web/src/app/api/products/[id]/lifecycle/route.ts
 apps/web/src/app/api/products/[id]/reviews/[reviewId]/report/route.ts
 apps/web/src/app/api/products/[id]/reviews/route.ts
 apps/web/src/app/api/products/[id]/route.ts
@@ -44,9 +42,6 @@ apps/web/src/app/api/products/route.ts
 apps/web/src/app/api/reports/route.ts
 apps/web/src/app/api/resources/cart/acquire/route.ts
 apps/web/src/app/api/resources/cart/route.ts
-apps/web/src/app/api/resources/claim/route.ts
-apps/web/src/app/api/servers/[id]/claim-challenge/route.ts
-apps/web/src/app/api/servers/[id]/claim-challenge/verify/route.ts
 apps/web/src/app/api/servers/[id]/route.ts
 apps/web/src/app/api/servers/route.ts
 apps/web/src/app/api/subscriptions/account/route.ts

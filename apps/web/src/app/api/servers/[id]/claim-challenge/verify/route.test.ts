@@ -1,4 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../../../../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
@@ -75,29 +79,41 @@ import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { POST } from "./route";
 
-function request(overrides: NonNullable<ConstructorParameters<typeof NextRequest>[1]> = {}) {
+function request(
+  overrides: {
+    headers?: Record<string, string>;
+    body?: string;
+  } = {},
+) {
+  const { headers: headerOverrides, ...rest } = overrides;
   return new NextRequest("https://nexus.test/api/servers/srv_1/claim-challenge/verify", {
     method: "POST",
     headers: {
-      "content-type": "application/json",
+      ...browserMutationHeaders(),
       cookie: "nexus_session=test-session",
+      ...(headerOverrides ?? { "content-type": "application/json" }),
     },
     body: JSON.stringify({
       challengeId: "scc_00000000-0000-0000-0000-000000000001",
       token: "NXCLAIM-ABCDEF0123456789ABCDEF01",
     }),
-    ...overrides,
+    ...rest,
   });
 }
 
 describe("server claim moderator notification side effects", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
     state.afterCallbacks.length = 0;
     state.failVerification = false;
     state.authenticated = true;
     state.rateLimited = false;
     state.verificationError = null;
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("returns durable proof before scheduling moderator inbox/push delivery", async () => {
@@ -158,7 +174,7 @@ describe("server claim moderator notification side effects", () => {
       code: "REQUEST_BODY_TOO_LARGE",
     },
     { headers: { "content-type": "application/json" }, body: "not-json", status: 400 },
-  ] as Array<{ headers: HeadersInit; body: string; status: number; code?: string }>)(
+  ] as Array<{ headers: Record<string, string>; body: string; status: number; code?: string }>)(
     "rejects unreadable or oversized proof before verification: $status $code",
     async ({ headers, body, status, code }) => {
       const response = await POST(request({ headers, body }), {
