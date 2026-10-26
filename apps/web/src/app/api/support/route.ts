@@ -14,6 +14,7 @@ import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
 } from "../../../lib/support-idempotency";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
 import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
@@ -72,7 +73,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
 
   try {
@@ -236,4 +237,4 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return supportFailure(request, context, error, "support.case_create_failed");
   }
-}
+});

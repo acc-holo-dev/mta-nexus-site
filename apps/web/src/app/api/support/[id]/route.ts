@@ -14,6 +14,7 @@ import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
 } from "../../../../lib/support-idempotency";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { dispatchNotificationsBestEffort } from "../../../../lib/services/notification-dispatch-service";
 
@@ -79,7 +80,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withBrowserMutation(async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   const context = createRequestLogContext(request);
 
   try {
@@ -307,9 +311,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   } catch (error) {
     return supportFailure(request, context, error, "support.message_create_failed");
   }
-}
+});
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const PATCH = withBrowserMutation(async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   const context = createRequestLogContext(request);
 
   try {
@@ -412,4 +419,4 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   } catch (error) {
     return supportFailure(request, context, error, "support.case_status_failed");
   }
-}
+});

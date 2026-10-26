@@ -14,8 +14,6 @@ apps/web/src/app/api/resources/cart/acquire/route.ts
 apps/web/src/app/api/resources/cart/route.ts
 apps/web/src/app/api/subscriptions/account/route.ts
 apps/web/src/app/api/subscriptions/reviews/route.ts
-apps/web/src/app/api/support/[id]/route.ts
-apps/web/src/app/api/support/route.ts
 apps/web/src/app/api/verification/route.ts
 apps/web/src/app/api/workspace/verification/[id]/route.ts
 apps/web/src/app/api/workspace/verification/route.ts
