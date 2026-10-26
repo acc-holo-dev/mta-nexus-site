@@ -121,15 +121,17 @@ it("uses separate live staff authority for admin detail", async () => {
 });
 it.each(["approve", "reject"])("requires the displayed revision for %s", async (action) => {
   const body = { targetType: "build", targetId: "bld_a", action, notes: "Reviewed evidence" };
-  const response = await moderate(req(body, {}, "/api/admin/actions", "POST"));
+  const headers = { cookie: "nexus_session=staff-token" };
+  const response = await moderate(req(body, headers, "/api/admin/actions", "POST"));
   expect(response.status).toBe(400);
   expect(mocks.review).not.toHaveBeenCalled();
   expect(
-    (await moderate(req({ ...body, expectedRevision: 3 }, {}, "/api/admin/actions", "POST")))
+    (await moderate(req({ ...body, expectedRevision: 3 }, headers, "/api/admin/actions", "POST")))
       .status,
   ).toBe(200);
   expect(mocks.review).toHaveBeenCalledWith(
     { buildId: "bld_a", decision: action, notes: "Reviewed evidence", expectedRevision: 3 },
     actor,
+    "staff-token",
   );
 });

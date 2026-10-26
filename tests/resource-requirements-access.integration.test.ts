@@ -18,6 +18,7 @@ import {
   resourceReleaseEvents as releaseEvents,
   userRepository,
   notifications,
+  sessions,
   users,
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
@@ -1087,6 +1088,10 @@ it("enrolls and delivers finite-access releases using database time despite appl
       .update(entitlements)
       .set({ expiresAt: sql`clock_timestamp()+interval '10 minutes'` })
       .where(eq(entitlements.subjectId, f.buyer));
+    await db
+      .update(sessions)
+      .set({ expiresAt: new Date("2099-01-01T00:00:00Z") })
+      .where(eq(sessions.userId, f.staff));
     clock = vi.spyOn(Date, "now").mockReturnValue(new Date("2036-01-01T00:00:00Z").getTime());
     const start = await resourceReleaseWatchesRepository.command({
       userId: f.buyer,
