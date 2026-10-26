@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   user: {
@@ -53,7 +54,7 @@ function request(body: unknown) {
     "http://nexus.test/api/products/prd_1/builds/bld_1",
     {
       method: "PATCH",
-      headers: { "content-type": "application/json" },
+      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
       body: JSON.stringify(body),
     },
   );
@@ -66,7 +67,12 @@ const context = {
 };
 
 describe("build retirement HTTP behavior", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
     state.user = {
       id: "usr_owner",

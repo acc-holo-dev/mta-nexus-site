@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import {
   buildRepository,
   entitlementRepository,
@@ -19,6 +20,7 @@ function claimRequest(
     {
       method: "POST",
       headers: {
+        ...browserMutationHeaders(),
         "content-type": "application/json",
         "x-forwarded-for": `198.51.100.${requestId.length + 10}`,
         ...(token ? { cookie: `nexus_session=${token}` } : {}),
@@ -29,6 +31,13 @@ function claimRequest(
 }
 
 describe("free resource claim route integration", () => {
+  beforeEach(() => {
+    stubBrowserMutationOrigin();
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("returns 201, then 200 idempotently, and refuses later unpublished claims", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
     const authorId = `usr_claim_http_author_${suffix}`;

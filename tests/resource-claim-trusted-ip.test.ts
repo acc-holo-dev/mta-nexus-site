@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { consumeRateLimit } from "@nexus/security";
 
 vi.mock("@nexus/security", async (importOriginal) => ({
@@ -45,6 +46,7 @@ function request(headers: Record<string, string>) {
     {
       method: "POST",
       headers: {
+        ...browserMutationHeaders(),
         "content-type": "application/json",
         cookie:
           "nexus_session=claim-ip-session",
@@ -59,6 +61,7 @@ function request(headers: Record<string, string>) {
 
 describe("resource claim trusted request IP", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
   });
 

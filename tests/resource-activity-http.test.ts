@@ -1,7 +1,8 @@
 import { Readable } from "node:stream";
 import { NextRequest } from "next/server";
 import { AppError, ForbiddenError, NotFoundError } from "@nexus/domain";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { resourceActivityCsv } from "../apps/web/src/lib/resource-activity-csv";
 import {
   parseAcquisitionHistoryQuery,
@@ -77,7 +78,11 @@ const activity = {
 function request(path: string) {
   return new NextRequest(`https://nexus.test${path}`);
 }
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.user = { id: "usr_a", role: "user" };
   state.allowed = true;
@@ -167,7 +172,7 @@ it("returns preserved license access without a fabricated entitlement", async ()
   const response = await claim(
     new NextRequest("https://nexus.test/api/resources/claim", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
       body: JSON.stringify({ productId: "prd_a" }),
     }),
   );
@@ -193,7 +198,11 @@ it.each([
   ],
 ] as const)("guards single claims before business mutations", async (headers, body, status) => {
   const response = await claim(
-    new NextRequest("https://nexus.test/api/resources/claim", { method: "POST", headers, body }),
+    new NextRequest("https://nexus.test/api/resources/claim", {
+      method: "POST",
+      headers: { ...browserMutationHeaders(), ...headers },
+      body,
+    }),
   );
   expect(response.status).toBe(status);
   expect(state.claim).not.toHaveBeenCalled();

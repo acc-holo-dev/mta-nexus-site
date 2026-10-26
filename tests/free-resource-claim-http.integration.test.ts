@@ -1,5 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import {
   buildRepository,
   entitlementRepository,
@@ -10,6 +11,9 @@ import {
 import { POST as claimResource } from "../apps/web/src/app/api/resources/claim/route";
 
 describe("free resource claim HTTP integration", () => {
+  beforeEach(() => {
+    stubBrowserMutationOrigin();
+  });
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -86,6 +90,7 @@ describe("free resource claim HTTP integration", () => {
       new NextRequest("http://nexus.test/api/resources/claim", {
         method: "POST",
         headers: {
+          ...browserMutationHeaders(),
           "content-type": "application/json",
           "x-nexus-proxy-secret": proxySecret,
           "x-real-ip": clientIp,
@@ -147,6 +152,7 @@ describe("free resource claim HTTP integration", () => {
       new NextRequest("http://nexus.test/api/resources/claim", {
         method: "POST",
         headers: {
+          ...browserMutationHeaders(),
           "content-type": "application/json",
           "x-nexus-proxy-secret": proxySecret,
           "x-real-ip": clientIp,
