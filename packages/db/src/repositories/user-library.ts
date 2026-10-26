@@ -157,7 +157,8 @@ export class UserLibraryRepository {
     return {
       items: rows.map(row => ({
         resourceId: row.resourceId,
-        addedAt: row.addedAt,
+        // postgres.js may return timestamptz as string from raw sql execute.
+        addedAt: row.addedAt instanceof Date ? row.addedAt : new Date(row.addedAt),
         title: row.title,
         slug: row.slug,
         version: row.version,

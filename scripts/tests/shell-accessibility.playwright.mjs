@@ -383,10 +383,18 @@ async function assertVisibleFocusIndicator(locator, label) {
       style.outlineStyle !== "none" &&
       outlineWidth >= 2 &&
       !transparent.has(style.outlineColor);
-    const hasBoxShadow =
-      Boolean(style.boxShadow) &&
-      style.boxShadow !== "none" &&
-      !style.boxShadow.includes("0px 0px 0px 0px");
+    // Do not reject a visible 2px ring just because another layer is 0px 0px 0px 0px.
+    const hasBoxShadow = (() => {
+      const boxShadow = style.boxShadow;
+      if (!boxShadow || boxShadow === "none") return false;
+      for (const layer of boxShadow.split(/,(?![^(]*\))/u)) {
+        const lengths = [...layer.matchAll(/(-?\d*\.?\d+)px/gu)].map((match) =>
+          Number(match[1]),
+        );
+        if (lengths.some((value) => Math.abs(value) > 0)) return true;
+      }
+      return false;
+    })();
 
     return {
       focused: document.activeElement === element,

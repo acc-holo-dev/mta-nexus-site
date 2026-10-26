@@ -22,9 +22,10 @@ export function ManagedServerCard({
   const copy = getManagedServerCopy(locale);
   const live = mtaLiveStatus(observation, isStale);
   const players = !isStale && observation?.players != null ? observation.players : null;
-  const updated = server.updatedAt.toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US", {
-    timeZone: "UTC",
-  });
+  const updated = new Date(server.updatedAt).toLocaleDateString(
+    locale === "ru" ? "ru-RU" : "en-US",
+    { timeZone: "UTC" },
+  );
   return (
     <article className="nexus-panel flex flex-wrap items-start justify-between gap-4 p-4">
       <div className="min-w-0 space-y-2">

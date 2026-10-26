@@ -164,8 +164,8 @@ export default async function ResourceLibraryPage({
 
               <p className="text-xs text-muted">
                 {copy.added}{" "}
-                <time dateTime={item.addedAt.toISOString()}>
-                  {formatHistoryDate(item.addedAt, locale)}
+                <time dateTime={new Date(item.addedAt).toISOString()}>
+                  {formatHistoryDate(new Date(item.addedAt), locale)}
                 </time>
               </p>
 
