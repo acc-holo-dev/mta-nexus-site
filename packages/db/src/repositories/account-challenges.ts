@@ -1,6 +1,7 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import { UnauthorizedError } from "@nexus/domain";
+import { ordinaryRecoveryEligible } from "@nexus/security";
 import { db } from "../client";
 import { auditEvents, sessions, users } from "../schema";
 import { accountAuthState, accountRecoveryBindings, authChallenges } from "../account-recovery-schema";
@@ -112,8 +113,12 @@ class AccountChallengeRepository {
     const [user] = await tx.select({ id: users.id, email: users.email, passwordHash: users.passwordHash,
       role: users.role, twoFactorEnabled: users.twoFactorEnabled })
       .from(users).where(eq(users.id, input.userId)).for("update");
-    // Privileged/MFA enrollment remains an explicit rollout decision, not a bypass.
-    if (!user?.passwordHash || user.twoFactorEnabled || ["admin", "moderator"].includes(user.role)) throw invalid();
+    // Privileged and 2FA accounts are not eligible for this ordinary recovery proof.
+    if (!user || !ordinaryRecoveryEligible({
+      role: user.role,
+      twoFactorEnabled: user.twoFactorEnabled,
+      hasPassword: Boolean(user.passwordHash),
+    })) throw invalid();
     await tx.insert(accountAuthState).values({ userId: user.id }).onConflictDoNothing();
     const [state] = await tx.select().from(accountAuthState)
       .where(eq(accountAuthState.userId, user.id)).for("update");
