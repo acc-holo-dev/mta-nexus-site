@@ -21,7 +21,14 @@ export function assertProductionUploadBodyLimit(source) {
   assert(declared, 'Production proxy must reject declared oversized bodies before upstream handling');
   assert.equal(Number(declared[1]), PRODUCTION_UPLOAD_ENVELOPE_BYTES, "Declared length limit must equal the 65 MiB build-upload envelope");
   assert.match(source, /respond @oversized_body "Request body too large" 413/u);
+}
 
+export function assertProductionOfflineCacheVary(source) {
+  assert.match(
+    source,
+    /reverse_proxy\s+app:3000\s*\{[\s\S]*?header_down\s+\+Vary\s+Cookie/u,
+    'Production proxy must re-attach Vary: Cookie after Next App Router responses',
+  );
 }
 
 // Preserve every production proxy directive; change only the test CA policy.

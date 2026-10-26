@@ -36,11 +36,13 @@ export NEXUS_CI_CADDYFILE="$work/Caddyfile"
 node --input-type=module <<'NODE'
 import { readFileSync, writeFileSync } from 'node:fs';
 import {
+  assertProductionOfflineCacheVary,
   assertProductionUploadBodyLimit,
   localCertificateConfig,
 } from './scripts/production-smoke-contract.mjs';
 const productionCaddy = readFileSync('deploy/Caddyfile', 'utf8');
 assertProductionUploadBodyLimit(productionCaddy);
+assertProductionOfflineCacheVary(productionCaddy);
 writeFileSync(
   process.env.NEXUS_CI_CADDYFILE,
   localCertificateConfig(productionCaddy),

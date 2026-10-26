@@ -27,6 +27,8 @@ export function proxy(request: NextRequest) {
     PUBLIC_OFFLINE_CACHE_HEADER,
     PUBLIC_OFFLINE_CACHE_MARKER,
   );
+  // App Router may replace Proxy Vary with RSC fields; production Caddy
+  // re-attaches Cookie on proxied responses (deploy/Caddyfile).
   response.headers.set(
     "Vary",
     appendVaryHeader(response.headers.get("Vary"), "Cookie"),

@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import {
   PRODUCTION_UPLOAD_ENVELOPE_BYTES,
+  assertProductionOfflineCacheVary,
   assertProductionUploadBodyLimit,
   localCertificateConfig,
   assertIsolatedProduction,
@@ -112,6 +113,19 @@ test('requires matching declared-length and streaming limits', () => {
   assert.doesNotThrow(() => assertProductionUploadBodyLimit(source));
   assert.throws(() => assertProductionUploadBodyLimit(source.replace('> 68157440', '> 68157441')));
   assert.throws(() => assertProductionUploadBodyLimit(source.replace('respond @oversized_body "Request body too large" 413', '')));
+});
+
+test('re-attaches Vary Cookie at the production proxy', () => {
+  const source = readFileSync('deploy/Caddyfile', 'utf8');
+  assert.doesNotThrow(() => assertProductionOfflineCacheVary(source));
+  assert.throws(
+    () => assertProductionOfflineCacheVary(source.replace('header_down +Vary Cookie', 'header_down +Vary Accept-Encoding')),
+    /Vary: Cookie/u,
+  );
+  assert.throws(
+    () => assertProductionOfflineCacheVary(source.replace('header_down +Vary Cookie', '')),
+    /Vary: Cookie/u,
+  );
 });
 
 test('live smoke checks both sides of the declared upload boundary', () => {
