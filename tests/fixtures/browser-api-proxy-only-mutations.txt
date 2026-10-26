@@ -12,7 +12,6 @@ apps/web/src/app/api/content/[slug]/comments/[id]/route.ts
 apps/web/src/app/api/content/[slug]/comments/route.ts
 apps/web/src/app/api/content/[slug]/reactions/route.ts
 apps/web/src/app/api/content/route.ts
-apps/web/src/app/api/follow/route.ts
 apps/web/src/app/api/notifications/inbox/route.ts
 apps/web/src/app/api/notifications/mark-read/route.ts
 apps/web/src/app/api/notifications/preferences/route.ts

@@ -14,6 +14,7 @@ import {
 import { authService } from "../../../lib/services/auth-service";
 import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 import { userPlatformApi } from "../../../lib/user-platform-api";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 export async function GET(request: NextRequest) {
@@ -116,9 +117,5 @@ function mutation(request: NextRequest, following: boolean) {
     followError,
   );
 }
-export function POST(request: NextRequest) {
-  return mutation(request, true);
-}
-export function DELETE(request: NextRequest) {
-  return mutation(request, false);
-}
+export const POST = withBrowserMutation((request: NextRequest) => mutation(request, true));
+export const DELETE = withBrowserMutation((request: NextRequest) => mutation(request, false));
