@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { AppError } from "@nexus/domain";
 import { profilePrivacyCopy } from "../apps/web/src/lib/profile-privacy-copy";
 const mocks = vi.hoisted(() => ({
@@ -15,6 +15,7 @@ vi.mock("../apps/web/src/lib/services/profile-privacy-service", () => ({
   profilePrivacyService: { own: mocks.own, update: mocks.update },
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { GET, PATCH } from "../apps/web/src/app/api/account/privacy/route";
 const actor = { id: "actor", role: "user" };
 const input = {
@@ -33,6 +34,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
   return new NextRequest(`https://nexus.test/api/account/privacy${query}`, {
     method,
     headers: {
+      ...browserMutationHeaders(),
       cookie: "nexus_session=test;nexus_locale=ru",
       "content-type": "application/json",
       ...headers,
@@ -42,10 +44,14 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   mocks.session.mockResolvedValue(actor);
   mocks.rate.mockResolvedValue({ success: true });
   mocks.own.mockResolvedValue(preferences);
   mocks.update.mockResolvedValue(preferences);
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("reads and saves only the live session actor and returns private confirmation headers", async () => {
   const read = await GET(request());
@@ -102,7 +108,10 @@ it("requires same-site bounded JSON and rejects malformed JSON without writes", 
       await PATCH(
         new NextRequest("https://nexus.test/api/account/privacy", {
           method: "PATCH",
-          headers: { cookie: "nexus_session=test", "content-type": "application/json" },
+          headers: browserMutationHeaders({
+            cookie: "nexus_session=test",
+            "content-type": "application/json",
+          }),
           body: "{",
         }),
       )

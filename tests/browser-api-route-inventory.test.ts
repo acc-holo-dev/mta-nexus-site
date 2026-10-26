@@ -31,6 +31,9 @@ const REQUIRED_BROWSER = [
   "apps/web/src/app/api/auth/context/route.ts",
   "apps/web/src/app/api/auth/email-verification/route.ts",
   "apps/web/src/app/api/auth/password-reset/route.ts",
+  "apps/web/src/app/api/account/profile/route.ts",
+  "apps/web/src/app/api/account/privacy/route.ts",
+  "apps/web/src/app/api/account/developer/route.ts",
   "apps/web/src/app/api/products/[id]/builds/route.ts",
 ] as const;
 
@@ -71,7 +74,7 @@ describe("browser API route adapter inventory", () => {
     return { rel, source, kind: classify(rel, source) };
   });
 
-  it("keeps auth mutations and multipart build upload on the shared browser adapter", () => {
+  it("keeps auth, account, and multipart build upload on the shared browser adapter", () => {
     for (const rel of REQUIRED_BROWSER) {
       const route = routes.find((entry) => entry.rel === rel);
       expect(route, rel).toBeTruthy();

@@ -7,6 +7,7 @@ import {
 } from "../../../../lib/verification-workspace-copy";
 import { developerProfileUpdateSchema } from "../../../../lib/verification-workspace-contract";
 import { requireServerJsonContentType, readBoundedJson } from "../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { verificationRate } from "../../../../lib/verification-workspace-api";
 import { verificationWorkspaceService } from "../../../../lib/services/verification-workspace-service";
 export async function GET(request: NextRequest) {
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
     verificationError,
   );
 }
-export async function PATCH(request: NextRequest) {
+export const PATCH = withBrowserMutation((request: NextRequest) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -33,4 +34,4 @@ export async function PATCH(request: NextRequest) {
     200,
     verificationMutationError,
   );
-}
+});

@@ -9,6 +9,7 @@ import {
 } from "../../../../lib/profile-privacy-copy";
 import { profilePrivacyService } from "../../../../lib/services/profile-privacy-service";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 
 export const dynamic = "force-dynamic";
 const validQuery = (request: NextRequest) => {
@@ -27,7 +28,7 @@ export function GET(request: NextRequest) {
     profilePrivacyError,
   );
 }
-export function PATCH(request: NextRequest) {
+export const PATCH = withBrowserMutation((request: NextRequest) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -42,4 +43,4 @@ export function PATCH(request: NextRequest) {
     200,
     profilePrivacyMutationError,
   );
-}
+});
