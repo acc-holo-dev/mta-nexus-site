@@ -10,11 +10,8 @@ import { generateId } from "@nexus/security";
 import { and, asc, count, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
-  assets,
   auditEvents,
-  builds,
   storageMaintenanceObjects as objects,
-  resourceMedia,
   users,
 } from "../schema";
 import { historyPageBounds } from "./history-pagination";
@@ -29,10 +26,13 @@ async function admin(tx: Tx, actorId: string) {
     .limit(1);
   if (actor?.role !== "admin") throw new ForbiddenError();
 }
-function references(key = objects.storageKey) {
-  return sql<boolean>`(exists(select 1 from ${builds} where ${builds.storageKey} = ${key}) OR
-    exists(select 1 from ${resourceMedia} where ${resourceMedia.storageKey} = ${key}) OR
-    exists(select 1 from ${assets} where ${assets.storageKey} = ${key}))`;
+function references() {
+  // Fully qualify both sides: drizzle strips table prefixes in nested exists,
+  // so ${builds.storageKey} = ${objects.storageKey} becomes "storage_key" = "storage_key"
+  // and any builds/media/assets row marks every object referenced.
+  return sql<boolean>`(exists(select 1 from builds where builds.storage_key = storage_maintenance_objects.storage_key) OR
+    exists(select 1 from resource_media where resource_media.storage_key = storage_maintenance_objects.storage_key) OR
+    exists(select 1 from assets where assets.storage_key = storage_maintenance_objects.storage_key))`;
 }
 function eligible() {
   return sql<boolean>`${objects.retiredAt} is null AND ${objects.modifiedAt} <= clock_timestamp() - ${STORAGE_ORPHAN_GRACE_DAYS} * interval '1 day' AND NOT ${references()}`;

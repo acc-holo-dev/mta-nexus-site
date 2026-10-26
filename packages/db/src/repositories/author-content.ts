@@ -48,12 +48,15 @@ const exactRevision = sql<string>`to_char(${content.updatedAt} at time zone 'UTC
 const hash = (parts: unknown[]) => createHash("sha256").update(JSON.stringify(parts)).digest("hex");
 const source = sql<string>`case when ${content.serverId} is not null then 'server' when ${content.organizationId} is not null then 'organization' else 'personal' end`;
 function recoverable(actorId: string, organizationId?: string, serverId?: string) {
+  // Qualify audit_events columns by name: drizzle strips table prefixes for the
+  // outer content select, so ${auditEvents.targetId} = ${content.id} becomes
+  // "target_id" = "id" and compares audit_events.id to itself (always false).
   const archive = serverId
-    ? sql`${auditEvents.action} = 'content.archived_by_server' and ${auditEvents.details}->>'serverId' = ${serverId}`
+    ? sql`audit_events.action = 'content.archived_by_server' and audit_events.details->>'serverId' = ${serverId}`
     : organizationId
-      ? sql`${auditEvents.action} = 'content.archived_by_organization' and ${auditEvents.details}->>'organizationId' = ${organizationId}`
-      : sql`${auditEvents.actorId} = ${actorId} and ${auditEvents.action} = 'content.archived_by_author'`;
-  return sql<boolean>`${content.status} = 'archived' and exists (select 1 from ${auditEvents} where ${auditEvents.targetType} = 'content' and ${auditEvents.targetId} = ${content.id} and (${archive}) and ${auditEvents.actorType} = 'user' and ${auditEvents.details}->>'to' = 'archived' and ${auditEvents.details}->>'restoreRevision' = ${exactRevision} and not exists (select 1 from audit_events staff_archive where staff_archive.target_type = 'content' and staff_archive.target_id = ${auditEvents.targetId} and staff_archive.action = 'content.archived' and staff_archive.created_at >= ${auditEvents.createdAt}))`;
+      ? sql`audit_events.action = 'content.archived_by_organization' and audit_events.details->>'organizationId' = ${organizationId}`
+      : sql`audit_events.actor_id = ${actorId} and audit_events.action = 'content.archived_by_author'`;
+  return sql<boolean>`${content.status} = 'archived' and exists (select 1 from audit_events where audit_events.target_type = 'content' and audit_events.target_id = content.id and (${archive}) and audit_events.actor_type = 'user' and audit_events.details->>'to' = 'archived' and audit_events.details->>'restoreRevision' = ${exactRevision} and not exists (select 1 from audit_events staff_archive where staff_archive.target_type = 'content' and staff_archive.target_id = audit_events.target_id and staff_archive.action = 'content.archived' and staff_archive.created_at >= audit_events.created_at))`;
 }
 async function organizationEditorialAccess(
   tx: Transaction,
@@ -525,22 +528,27 @@ class AuthorContentRepository {
         .where(eq(content.id, id))
         .returning({ ...getTableColumns(content), archiveRevision: exactRevision });
       if (!updated) throw new AppError("Content changed", 409, "CONFLICT");
+      const archiveProof =
+        fields === null &&
+        deskTypes.includes(current.type) &&
+        (audit.action === "content.archived_by_author" ||
+          (organizationId && audit.action === "content.archived_by_organization") ||
+          (serverId &&
+            serverDeskTypes.includes(current.type) &&
+            audit.action === "content.archived_by_server"));
+      const baseDetails = {
+        ...(audit.details ?? {}),
+        from: current.status,
+        to: status,
+      };
+      // Bind base details as JSON text, then append restoreRevision with the same
+      // to_char expression exactRevision uses — avoids JS Date microsecond loss.
+      const details = archiveProof
+        ? sql`(${JSON.stringify(baseDetails)}::jsonb) || jsonb_build_object('restoreRevision', to_char((select c.updated_at from content c where c.id = ${id}) at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"'))`
+        : baseDetails;
       await tx.insert(auditEvents).values({
         ...audit,
-        details: {
-          ...audit.details,
-          from: current.status,
-          to: status,
-          ...(fields === null &&
-          deskTypes.includes(current.type) &&
-          (audit.action === "content.archived_by_author" ||
-            (organizationId && audit.action === "content.archived_by_organization") ||
-            (serverId &&
-              serverDeskTypes.includes(current.type) &&
-              audit.action === "content.archived_by_server"))
-            ? { restoreRevision: updated.archiveRevision }
-            : {}),
-        },
+        details,
         createdAt: new Date(),
       });
       await publicationNotice(

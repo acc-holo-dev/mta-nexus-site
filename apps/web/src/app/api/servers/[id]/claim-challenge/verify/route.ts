@@ -110,22 +110,49 @@ export async function POST(
       user,
     );
 
-    after(async () => {
+    // Verification already committed — never fail the HTTP response because
+    // Next.js `after()` is unavailable (e.g. direct route invocation in tests).
+    try {
+      after(async () => {
+        try {
+          await notifyModeratorsOfServerClaim(
+            moderatorNotification.serverName,
+          );
+        } catch (error) {
+          logRequestEvent({
+            level: "warn",
+            event:
+              "server.claim_challenge.notification_failed",
+            context,
+            status: 201,
+            error,
+          });
+        }
+      });
+    } catch (error) {
+      logRequestEvent({
+        level: "warn",
+        event:
+          "server.claim_challenge.after_unavailable",
+        context,
+        status: 201,
+        error,
+      });
       try {
         await notifyModeratorsOfServerClaim(
           moderatorNotification.serverName,
         );
-      } catch (error) {
+      } catch (notifyError) {
         logRequestEvent({
           level: "warn",
           event:
             "server.claim_challenge.notification_failed",
           context,
           status: 201,
-          error,
+          error: notifyError,
         });
       }
-    });
+    }
 
     return json(context, result, 201);
   } catch (error: unknown) {
