@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 const state = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),
@@ -22,22 +23,26 @@ vi.mock("@nexus/db", () => ({
 import { GET as page } from "../apps/web/src/app/api/library/watches/route";
 import { GET as detail, POST as command } from "../apps/web/src/app/api/library/watches/[id]/route";
 const context = { params: Promise.resolve({ id: "prd_a" }) };
-const request = (
-  body: unknown,
-  headers: Record<string, string> = { "content-type": "application/json" },
-) =>
+const request = (body: unknown, headers?: Record<string, string>) =>
   new NextRequest("https://nexus.test/api/library/watches/prd_a", {
     method: "POST",
-    headers,
+    headers: {
+      ...browserMutationHeaders(),
+      ...(headers ?? { "content-type": "application/json" }),
+    },
     body: JSON.stringify(body),
   });
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   state.user = { id: "usr_a" };
   state.rate.mockResolvedValue({ success: true });
   state.page.mockResolvedValue({ items: [] });
   state.detail.mockResolvedValue({ enabled: false });
   state.command.mockResolvedValue({ productId: "prd_a", enabled: true, revision: 1 });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("serves private session-scoped reads with inspection rate limiting", async () => {
   const response = await page(
@@ -120,7 +125,7 @@ it("rejects query selectors on a single watch read or mutation", async () => {
       await command(
         new NextRequest(url, {
           method: "POST",
-          headers: { "content-type": "application/json" },
+          headers: { ...browserMutationHeaders(), "content-type": "application/json" },
           body: JSON.stringify({ enabled: true, expectedRevision: 0 }),
         }),
         context,
