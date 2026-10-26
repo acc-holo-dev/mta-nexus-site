@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   session: vi.fn(),
@@ -39,6 +40,7 @@ const request = (
   new NextRequest(`https://nexus.test/api/workspace/verification/history${query}`, {
     method,
     headers: {
+      ...(method === "GET" ? {} : browserMutationHeaders()),
       cookie: "nexus_session=token; nexus_locale=ru",
       ...(body !== undefined ? { "content-type": "application/json" } : {}),
       ...headers,
@@ -47,11 +49,15 @@ const request = (
   });
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   state.session.mockResolvedValue({ id: "actor" });
   state.rate.mockResolvedValue({ success: true });
   state.applications.mockResolvedValue({ items: [], olderCursor: null, newerCursor: null });
   state.application.mockResolvedValue({});
   state.amend.mockResolvedValue({ id: "request", status: "pending", revision: "b".repeat(64) });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("returns authenticated private history with normalized search filters", async () => {
   const response = await history(request("GET", "?q=word&type=developer&status=pending"));

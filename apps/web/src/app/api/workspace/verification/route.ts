@@ -1,6 +1,7 @@
 import { after, type NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { userRepository } from "@nexus/db";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { userPlatformApi } from "../../../../lib/user-platform-api";
 import {
   verificationError,
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     verificationError,
   );
 }
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
   return userPlatformApi(
     request,
@@ -68,4 +69,4 @@ export async function POST(request: NextRequest) {
     201,
     verificationMutationError,
   );
-}
+});

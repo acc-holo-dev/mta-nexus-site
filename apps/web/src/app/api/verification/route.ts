@@ -17,6 +17,7 @@ import {
   logRequestEvent,
   type RequestLogContext,
 } from "../../../lib/observability";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { authService } from "../../../lib/services/auth-service";
 import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
@@ -93,7 +94,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
   try {
     const token =
@@ -357,4 +358,4 @@ export async function POST(request: NextRequest) {
       500,
     );
   }
-}
+});
