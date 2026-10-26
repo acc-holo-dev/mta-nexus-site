@@ -5,6 +5,7 @@ import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-ht
 import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { resourceControlPageQuery } from "../../../../../lib/resource-release-control-query";
 import { libraryReleaseService } from "../../../../../lib/services/resource-release-control-service";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) =>
     libraryReleaseService.detail(
@@ -14,7 +15,7 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
     ),
   );
 }
-export function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withBrowserMutation((request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   return resourceCommerceRequest(request, true, async (actor) => {
     if (request.nextUrl.searchParams.size !== 0)
       throw new AppError("Invalid library selection query", 400, "RESOURCE_CONTROL_INVALID");
@@ -23,4 +24,4 @@ export function POST(request: NextRequest, { params }: { params: Promise<{ id: s
       throw new AppError("Invalid library selection", 400, "RESOURCE_CONTROL_INVALID");
     return libraryReleaseService.command(actor, (await params).id, command.data);
   });
-}
+});

@@ -61,6 +61,10 @@ const REQUIRED_BROWSER = [
   "apps/web/src/app/api/library/collections/[id]/versions/route.ts",
   "apps/web/src/app/api/library/collections/[id]/versions/preview/route.ts",
   "apps/web/src/app/api/library/collections/[id]/watches/route.ts",
+  "apps/web/src/app/api/library/releases/[id]/route.ts",
+  "apps/web/src/app/api/library/watches/[id]/route.ts",
+  "apps/web/src/app/api/library/watches/disable/route.ts",
+  "apps/web/src/app/api/library/watches/resume/route.ts",
   "apps/web/src/app/api/workspace/organizations/route.ts",
   "apps/web/src/app/api/workspace/organizations/[id]/route.ts",
   "apps/web/src/app/api/workspace/organizations/[id]/leave/route.ts",
@@ -122,7 +126,7 @@ describe("browser API route adapter inventory", () => {
     return { rel, source, kind: classify(rel, source) };
   });
 
-  it("keeps auth, account, uploads, license owner actions, resource publish and claim, product editing, reviews, server registration, server content, library collections, organization writes, and staff moderation on the shared browser adapter", () => {
+  it("keeps auth, account, uploads, license owner actions, resource publish and claim, product editing, reviews, server registration, server content, library collections, library watches and releases, organization writes, and staff moderation on the shared browser adapter", () => {
     for (const rel of REQUIRED_BROWSER) {
       const route = routes.find((entry) => entry.rel === rel);
       expect(route, rel).toBeTruthy();

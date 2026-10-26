@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 const h = vi.hoisted(() => ({
   user: { id: "usr_a" } as { id: string } | null,
   rate: vi.fn(),
@@ -21,15 +22,16 @@ const get = (query = "") =>
 const post = (
   body: unknown = command,
   query = "",
-  headers: Record<string, string> = { "content-type": "application/json" },
+  headers: Record<string, string> = {},
 ) =>
   new NextRequest(`https://nexus.test/api/library/watches/disable${query}`, {
     method: "POST",
-    headers,
+    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
     body: JSON.stringify(body),
   });
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   h.user = { id: "usr_a" };
   h.rate.mockResolvedValue({ success: true });
   h.disable.mockResolvedValue({ items: [], changedCount: 1 });
@@ -53,6 +55,9 @@ beforeEach(() => {
     total: 1,
     lastSequence: 123n,
   });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("authenticates both operations before reaching repositories", async () => {
   h.user = null;
