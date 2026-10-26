@@ -1,7 +1,11 @@
 import { NextRequest } from "next/server";
 import { SUPPORT_JSON_MAX_BYTES } from "../../../lib/bounded-json";
 import { AppError } from "@nexus/domain";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
@@ -70,6 +74,7 @@ import { GET as getCase, PATCH as updateCase, POST as addMessage } from "./[id]/
 const caseId = `sup_${"a".repeat(24)}`;
 const params = { params: Promise.resolve({ id: caseId }) };
 const supportHeaders = {
+  ...browserMutationHeaders(),
   "content-type": "application/json",
   "Idempotency-Key": "12345678-1234-4234-8234-123456789abc",
 };
@@ -81,6 +86,7 @@ function expectPrivate(response: Response) {
 }
 
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   for (const mock of Object.values(mocks)) mock.mockReset();
   state.afterCallbacks.length = 0;
@@ -138,6 +144,10 @@ beforeEach(() => {
     storageFailed: 0,
     pushQueued: 1,
   });
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("support HTTP authorization and privacy", () => {
@@ -926,7 +936,7 @@ describe("durable support request replays", () => {
     const response = await createCase(
       new NextRequest("https://nexus.test/api/support", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
         body: JSON.stringify({
           category: "account",
           subject: "Missing key",
