@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { expect, it } from "vitest";
 import {
   db,
+  sessionRepository,
   userRepository,
   buildRepository,
   builds,
@@ -33,6 +34,12 @@ async function fixture() {
       username: id,
       displayName: id,
     });
+  await sessionRepository.create({
+    id: `ses_${moderator}`,
+    userId: moderator,
+    token: `tok_${moderator}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   await db.insert(products).values({
     id: productId,
     authorId: owner,
@@ -92,7 +99,7 @@ async function fixture() {
       targetId: old.build.id,
     },
     1,
-  );
+  `tok_${moderator}`);
   const current = await submit("current", "updated", "2.0.0");
   const query = { actorId: owner, productId, buildId: current.build.id, baselineId: old.build.id };
   async function cleanup() {

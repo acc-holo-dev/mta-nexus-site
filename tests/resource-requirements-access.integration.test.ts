@@ -7,6 +7,7 @@ import {
   resourceLibrarySelectionsRepository,
   resourceReleaseWatchesRepository,
   buildRepository,
+  sessionRepository,
   builds,
   db,
   entitlements,
@@ -44,6 +45,12 @@ async function fixture(privateDependency = false) {
       username: id,
       displayName: id,
     });
+  await sessionRepository.create({
+    id: `ses_${staff}`,
+    userId: staff,
+    token: `tok_${staff}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   const ids = [`prd_req_root_${key}`, `prd_req_dep_${key}`, `prd_req_hidden_${key}`],
     slugs = ids.map((id) => id.replaceAll("_", "-"));
   const evidence = await inspectBuildPackage({
@@ -105,7 +112,7 @@ async function fixture(privateDependency = false) {
           targetId: build.id,
         },
         1,
-      );
+      `tok_${staff}`);
   }
   await db.insert(entitlements).values({
     id: `ent_req_${key}`,
@@ -155,7 +162,7 @@ async function fixture(privateDependency = false) {
         targetId: build.id,
       },
       1,
-    );
+    `tok_${staff}`);
   }
   async function cleanup() {
     await db.delete(entitlements).where(eq(entitlements.subjectId, buyer));

@@ -9,6 +9,7 @@ import {
   userRepository,
   productRepository,
   buildRepository,
+  sessionRepository,
   resourceBuildWorkspaceRepository as repo,
 } from "@nexus/db";
 async function fixture(status: "pending_review" | "rejected" | "draft" = "pending_review") {
@@ -28,6 +29,12 @@ async function fixture(status: "pending_review" | "rejected" | "draft" = "pendin
       username: id,
       displayName: id,
     });
+  await sessionRepository.create({
+    id: `ses_${staffId}`,
+    userId: staffId,
+    token: `tok_${staffId}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   await productRepository.create({
     id: productId,
     authorId: actorId,
@@ -100,14 +107,14 @@ it("withdraws, edits and resubmits without allowing an ABA approval", async () =
     targetType: "build",
     targetId: f.buildId,
   };
-  expect(await buildRepository.moderatePending(f.buildId, "approve", audit, 1)).toBeNull();
+  expect(await buildRepository.moderatePending(f.buildId, "approve", audit, 1, `tok_${f.staffId}`)).toBeNull();
   expect(
     await buildRepository.moderatePending(
       f.buildId,
       "approve",
       { ...audit, id: `${f.auditId}_new` },
       4,
-    ),
+    `tok_${f.staffId}`),
   ).toMatchObject({ status: "published", revision: 5 });
   expect((await productRepository.findById(f.productId))?.status).toBe("published");
   const events = await db

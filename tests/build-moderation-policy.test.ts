@@ -110,6 +110,7 @@ describe("build moderation service behavior", () => {
       service.reviewBuild(
         { buildId: "bld_1", expectedRevision: 1, decision: "approve", notes: "Reviewed" },
         moderator,
+        "staff-session",
       ),
     ).rejects.toMatchObject({ statusCode: 403 });
     expect(mocks.findBuild).not.toHaveBeenCalled();
@@ -122,6 +123,7 @@ describe("build moderation service behavior", () => {
       service.reviewBuild(
         { buildId: "bld_1", expectedRevision: 1, decision: "approve", notes: "Reviewed" },
         moderator,
+        "staff-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 409,
@@ -141,6 +143,7 @@ describe("build moderation service behavior", () => {
       service.reviewBuild(
         { buildId: "bld_1", expectedRevision: 1, decision: "approve", notes: "Reviewed" },
         moderator,
+        "staff-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 422,
@@ -156,6 +159,7 @@ describe("build moderation service behavior", () => {
       service.reviewBuild(
         { buildId: "bld_1", expectedRevision: 1, decision: "reject", notes: "Reviewed" },
         moderator,
+        "staff-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 409,
@@ -220,6 +224,7 @@ describe("build moderation service behavior", () => {
           notes: "Reviewed clean build",
         },
         moderator,
+        "staff-session",
       ),
     ).resolves.toBe(reviewed);
 
@@ -231,6 +236,7 @@ describe("build moderation service behavior", () => {
         details: expect.objectContaining({ notes: "Reviewed clean build" }),
       }),
       1,
+      "staff-session",
     );
     expect(publishSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -248,6 +254,7 @@ describe("build moderation service behavior", () => {
       service.reviewBuild(
         { buildId: "bld_1", expectedRevision: 1, decision: "reject", notes: "Rejected" },
         moderator,
+        "staff-session",
       ),
     ).resolves.toBe(reviewed);
     expect(publishSpy).not.toHaveBeenCalled();

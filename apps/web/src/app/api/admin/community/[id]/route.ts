@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { AppError } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
 import {
   parseModerationDetailQuery,
@@ -35,7 +35,9 @@ export const POST = withBrowserMutation(async (request: NextRequest, { params }:
       const parsed = moderationCommandSchema.safeParse(await readBoundedJson(request, 16384));
       if (!parsed.success)
         throw new AppError("Invalid moderation command", 400, "VALIDATION_ERROR");
-      return communityModerationService.command(actor, (await params).id, parsed.data);
+      const token = request.cookies.get("nexus_session")?.value;
+      if (!token) throw new UnauthorizedError();
+      return communityModerationService.command(actor, (await params).id, parsed.data, token);
     },
     200,
     moderationError,

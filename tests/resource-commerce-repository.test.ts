@@ -200,7 +200,7 @@ it("requires a clean draft for resubmission and prevents archived moderation", a
   });
   expect(state.queries[2].sql).toContain('"builds"."scan_status"');
   state.queries = [];
-  state.results = [[["prd_a"]], [["prd_a", "archived", "usr_a", null]], [["moderator"]]];
+  state.results = [[["prd_a"]], [["prd_a", "archived", "usr_a", null]], [["moderator"]], [["ses_staff", "2099-01-01T00:00:00.000Z"]]];
   await expect(
     new BuildRepository().moderatePending(
       "bld_a",
@@ -214,6 +214,7 @@ it("requires a clean draft for resubmission and prevents archived moderation", a
         targetType: "build",
       },
       1,
+      "staff-session",
     ),
   ).rejects.toMatchObject({ code: "PRODUCT_STATE_CHANGED" });
   expect(state.queries.some((query) => query.sql.startsWith("update"))).toBe(false);

@@ -1,6 +1,6 @@
 import type { Readable } from "node:stream";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { buildRepository, userRepository } from "@nexus/db";
+import { buildRepository, sessionRepository, userRepository } from "@nexus/db";
 import { storageService } from "@nexus/storage";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
 import { productService } from "../apps/web/src/lib/services/product-service";
@@ -37,6 +37,12 @@ describe("free resource delivery lifecycle", () => {
       username: `delivery_moderator_${suffix}`,
       displayName: "Delivery Moderator",
       role: "moderator",
+    });
+    await sessionRepository.create({
+      id: `ses_${moderator.id}`,
+      userId: moderator.id,
+      token: `tok_${moderator.id}`,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
 
     product = await productService.createProduct(
@@ -103,6 +109,7 @@ describe("free resource delivery lifecycle", () => {
         notes: "Archive verified for closed beta",
       },
       moderator,
+      `tok_${moderator.id}`,
     );
     expect(approved.status).toBe("published");
 

@@ -4,6 +4,7 @@ import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { db } from "../client";
 import { assertProductMutationAuthority, assertBuildModerationAuthority } from "./product-mutation-authority";
+import { lockInitiatingSession } from "./initiating-session";
 import { auditEvents, builds, products, users, organizations, organizationMembers, notificationPreferences, notifications, resourceReleaseEvents } from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
 import { AppError, releaseHistoryPageBounds, buildPackageSummary } from "@nexus/domain";
@@ -304,6 +305,7 @@ export class BuildRepository {
     decision: "approve" | "reject",
     audit: Omit<AuditEvent, "createdAt">,
     expectedRevision: number,
+    currentToken: string,
   ): Promise<Build | null> {
     if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1)
       throw new AppError("Observed build revision is required", 400, "BUILD_REVISION_REQUIRED");
@@ -328,6 +330,7 @@ export class BuildRepository {
         .for("no key update");
       if (!parent) return null;
       await assertBuildModerationAuthority(tx, audit.actorId);
+      await lockInitiatingSession(tx, audit.actorId, currentToken);
       if (parent.status === "archived" || parent.status === "suspended") {
         throw new AppError("Resource is withdrawn from publication", 409, "PRODUCT_STATE_CHANGED");
       }
@@ -577,6 +580,7 @@ export class BuildRepository {
     actorId: string,
     reason: string,
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
       const [target] = await tx
@@ -599,7 +603,7 @@ export class BuildRepository {
         .for("no key update");
       if (!parent) return null;
       await assertBuildModerationAuthority(tx, audit.actorId);
-
+      await lockInitiatingSession(tx, audit.actorId, currentToken);
 
       const now = new Date();
       const rows = await tx
@@ -661,6 +665,7 @@ export class BuildRepository {
   async restoreQuarantinedAndRefreshProduct(
     id: string,
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
       const [target] = await tx
@@ -683,7 +688,7 @@ export class BuildRepository {
         .for("no key update");
       if (!parent) return null;
       await assertBuildModerationAuthority(tx, audit.actorId);
-
+      await lockInitiatingSession(tx, audit.actorId, currentToken);
 
       const now = new Date();
       const rows = await tx

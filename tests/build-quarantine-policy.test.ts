@@ -76,6 +76,7 @@ describe("build quarantine service behavior", () => {
       service.quarantineBuild(
         { buildId: "bld_1", reason: "Investigation" },
         moderator,
+        "staff-session",
       ),
     ).rejects.toMatchObject({ statusCode: 403 });
     expect(mocks.findBuild).not.toHaveBeenCalled();
@@ -88,6 +89,7 @@ describe("build quarantine service behavior", () => {
       service.quarantineBuild(
         { buildId: "bld_1", reason: "Investigation" },
         moderator,
+        "staff-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 409,
@@ -103,6 +105,7 @@ describe("build quarantine service behavior", () => {
       service.quarantineBuild(
         { buildId: "bld_1", reason: "Investigation" },
         moderator,
+        "staff-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 409,
@@ -117,6 +120,7 @@ describe("build quarantine service behavior", () => {
       service.restoreQuarantinedBuild(
         { buildId: "bld_1", reason: "Cleared" },
         moderator,
+        "staff-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 409,
@@ -142,6 +146,7 @@ describe("build quarantine service behavior", () => {
       service.restoreQuarantinedBuild(
         { buildId: "bld_1", reason: "Cleared" },
         moderator,
+        "staff-session",
       ),
     ).rejects.toMatchObject({
       statusCode: 422,
@@ -164,6 +169,7 @@ describe("build quarantine service behavior", () => {
       service.restoreQuarantinedBuild(
         { buildId: "bld_1", reason: "Cleared" },
         moderator,
+        "staff-session",
       ),
     ).resolves.toBe(restored);
     expect(mocks.restore).toHaveBeenCalledWith(
@@ -174,6 +180,7 @@ describe("build quarantine service behavior", () => {
           quarantineReason: "Investigation",
         }),
       }),
+      "staff-session",
     );
   });
 });

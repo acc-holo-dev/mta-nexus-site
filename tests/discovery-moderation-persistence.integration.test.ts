@@ -9,6 +9,7 @@ import {
   content,
   auditEvents,
   notifications,
+  sessionRepository,
   userRepository,
   publicDirectoryRepository as directory,
   communityModerationWorkspaceRepository as workspace,
@@ -244,6 +245,12 @@ it("preserves atomic audit/author notice semantics, live roles, publication scop
     moderator = await actor("moderator"),
     publication = await item(author.id),
     duplicate = audit(moderator.id, publication.id);
+  await sessionRepository.create({
+    id: `ses_${moderator.id}`,
+    userId: moderator.id,
+    token: `tok_${moderator.id}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   await db.insert(auditEvents).values(duplicate);
   await expect(
     moderation.moderateStatusWithAudit(
@@ -251,6 +258,7 @@ it("preserves atomic audit/author notice semantics, live roles, publication scop
       "published",
       "draft",
       duplicate,
+      `tok_${moderator.id}`,
       publication.updatedAt,
       true,
     ),
@@ -266,6 +274,7 @@ it("preserves atomic audit/author notice semantics, live roles, publication scop
       "published",
       "draft",
       audit(moderator.id, publication.id),
+      `tok_${moderator.id}`,
       publication.updatedAt,
       true,
     ),
@@ -281,6 +290,7 @@ it("preserves atomic audit/author notice semantics, live roles, publication scop
       "published",
       "draft",
       audit(moderator.id, publication.id),
+      `tok_${moderator.id}`,
       publication.updatedAt,
       true,
     ),
@@ -296,6 +306,7 @@ it("preserves atomic audit/author notice semantics, live roles, publication scop
       "published",
       "draft",
       audit(moderator.id, publication.id),
+      `tok_${moderator.id}`,
       publication.updatedAt,
       true,
     ),
@@ -307,6 +318,7 @@ it("preserves atomic audit/author notice semantics, live roles, publication scop
       "archived",
       "published",
       audit(moderator.id, publication.id),
+      `tok_${moderator.id}`,
       undefined,
       true,
     ),

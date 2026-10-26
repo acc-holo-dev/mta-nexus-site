@@ -208,6 +208,12 @@ describe("moderation atomicity integration", () => {
       displayName: "Content Atomic Author",
       role: "moderator",
     });
+    await sessionRepository.create({
+      id: `ses_${authorId}`,
+      userId: authorId,
+      token: `tok_${authorId}`,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    });
     await contentRepository.create({
       id: contentId,
       title: "Atomic moderation content",
@@ -245,6 +251,7 @@ describe("moderation atomicity integration", () => {
           targetId: contentId,
           targetType: "content",
         },
+        `tok_${authorId}`,
       ),
     ).rejects.toBeTruthy();
 

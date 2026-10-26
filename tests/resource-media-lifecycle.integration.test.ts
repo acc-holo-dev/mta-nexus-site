@@ -7,6 +7,7 @@ import {
   products,
   resourceMediaRepository as repo,
   resourceMedia,
+  sessionRepository,
   userRepository,
   users,
 } from "@nexus/db";
@@ -35,6 +36,12 @@ async function fixture() {
       username: id,
       displayName: id,
     });
+  await sessionRepository.create({
+    id: `ses_${moderator}`,
+    userId: moderator,
+    token: `tok_${moderator}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   await db.insert(products).values({
     id: productId,
     authorId: owner,
@@ -106,7 +113,7 @@ async function fixture() {
         targetId: buildId,
       },
       1,
-    );
+    `tok_${moderator}`);
   }
   async function cleanup() {
     await db.delete(products).where(eq(products.id, productId));

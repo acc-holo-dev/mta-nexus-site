@@ -309,7 +309,11 @@ the initiating session inside those write transactions, after the existing staff
 role share lock. The same suspend/release transaction is used by
 `/api/admin/resources/[id]`. A missing, expired, or revoked session is
 unauthorized and does not change the product. Report resolution, verification
-decisions, build review, and content moderation are unchanged.
+decisions are unchanged. Build review, quarantine, restore, and content
+moderation on `/api/admin/actions` recheck the initiating session after the
+staff role lock and before the write. Community publication commands share the
+content transaction and pass the same cookie. A missing, expired, or revoked
+session does not approve, reject, quarantine, restore, publish, or archive.
 
 For simultaneous contributors, keep source edits in separate worktrees and record
 the main SHA used as the base. Before publication, re-read main; if it advanced,

@@ -50,6 +50,8 @@ const row = (extra: Record<string, unknown> = {}) =>
         }) as Record<string, unknown>
       )[key] ?? null,
   );
+const token = "staff-session";
+const liveSession = [["ses_staff", "2099-01-01T00:00:00.000Z"]];
 const audit = {
   id: "audit",
   actorId: "mod",
@@ -67,6 +69,7 @@ it("locks content then current moderator authority, versions the update and stor
   state.rows = [
     [row()],
     [["moderator"]],
+    liveSession,
     [row({ status: "published", updatedAt: "2026-10-11T00:00:00.001Z" })],
   ];
   expect(
@@ -75,13 +78,16 @@ it("locks content then current moderator authority, versions the update and stor
       "published",
       "draft",
       audit,
+      token,
       new Date(time),
     ),
   ).toMatchObject({ status: "published" });
   expect(state.queries[0].sql).toContain("for update");
   expect(state.queries[1].sql).toContain("for share");
-  expect(state.queries[2].sql).toContain("interval '1 millisecond'");
-  expect(state.queries[3].sql).toContain('insert into "audit_events"');
+  expect(state.queries[2].sql).toContain('"sessions"');
+  expect(state.queries[2].sql).toContain("for update");
+  expect(state.queries[3].sql).toContain("interval '1 millisecond'");
+  expect(state.queries[4].sql).toContain('insert into "audit_events"');
   expect(state.notice).toHaveBeenCalledWith(
     expect.anything(),
     expect.objectContaining({ id: "item" }),
@@ -100,6 +106,7 @@ it.each(["user", "developer", "server_owner", null])(
         "published",
         "draft",
         audit,
+        token,
         new Date(time),
       ),
     ).rejects.toMatchObject({ code: "FORBIDDEN" });
@@ -110,13 +117,14 @@ it.each(["user", "developer", "server_owner", null])(
 it.each([{ status: "archived" }, { updatedAt: "2026-10-11T00:00:00.001Z" }])(
   "rejects status changes and draft-to-draft edits without publishing new text %j",
   async (extra) => {
-    state.rows = [[row(extra)], [["admin"]]];
+    state.rows = [[row(extra)], [["admin"]], liveSession];
     expect(
       await contentRepository.moderateStatusWithAudit(
         "item",
         "published",
         "draft",
         audit,
+        token,
         new Date(time),
       ),
     ).toBeNull();
@@ -125,13 +133,14 @@ it.each([{ status: "archived" }, { updatedAt: "2026-10-11T00:00:00.001Z" }])(
   },
 );
 it("rechecks the noncommercial publication scope under the authoritative content lock", async () => {
-  state.rows = [[row({ type: "resource" })], [["moderator"]]];
+  state.rows = [[row({ type: "resource" })], [["moderator"]], liveSession];
   await expect(
     contentRepository.moderateStatusWithAudit(
       "item",
       "published",
       "draft",
       audit,
+      token,
       new Date(time),
       true,
     ),
@@ -140,13 +149,14 @@ it("rechecks the noncommercial publication scope under the authoritative content
   expect(state.notice).not.toHaveBeenCalled();
 });
 it("rejects incomplete legacy publishing under lock, while permitting complete Unicode text at the preview boundary", async () => {
-  state.rows = [[row({ body: "x".repeat(100001) })], [["moderator"]]];
+  state.rows = [[row({ body: "x".repeat(100001) })], [["moderator"]], liveSession];
   await expect(
     contentRepository.moderateStatusWithAudit(
       "item",
       "published",
       "draft",
       audit,
+      token,
       new Date(time),
       true,
     ),
@@ -155,6 +165,7 @@ it("rejects incomplete legacy publishing under lock, while permitting complete U
   state.rows = [
     [row({ body: "😀".repeat(60000) })],
     [["moderator"]],
+    liveSession,
     [row({ status: "published" })],
   ];
   expect(
@@ -163,6 +174,7 @@ it("rejects incomplete legacy publishing under lock, while permitting complete U
       "published",
       "draft",
       audit,
+      token,
       new Date(time),
       true,
     ),

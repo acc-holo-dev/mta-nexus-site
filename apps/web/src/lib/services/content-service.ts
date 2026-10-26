@@ -176,6 +176,7 @@ export class ContentService {
     contentId: string,
     decision: "publish" | "archive",
     actor: User,
+    currentToken: string,
     notes?: string,
     expectedUpdatedAt?: Date,
     publicationOnly = false,
@@ -197,7 +198,7 @@ export class ContentService {
       throw new AppError(`Content is already ${targetStatus}`, 409, "CONTENT_ALREADY_IN_STATE");
     }
 
-    const args = [
+    const updated = await contentRepository.moderateStatusWithAudit(
       contentId,
       targetStatus,
       current.status,
@@ -210,11 +211,10 @@ export class ContentService {
         targetType: "content",
         details: { from: current.status, to: targetStatus, notes },
       },
+      currentToken,
       expectedUpdatedAt ?? new Date(current.updatedAt),
-    ] as const;
-    const updated = publicationOnly
-      ? await contentRepository.moderateStatusWithAudit(...args, true)
-      : await contentRepository.moderateStatusWithAudit(...args);
+      publicationOnly,
+    );
     if (!updated) {
       throw new AppError(
         "Content changed before moderation completed",

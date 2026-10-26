@@ -169,7 +169,7 @@ class CommunityModerationService {
       nextCursor: encode(result),
     };
   }
-  async command(actor: User, id: string, input: z.infer<typeof moderationCommandSchema>) {
+  async command(actor: User, id: string, input: z.infer<typeof moderationCommandSchema>, currentToken: string) {
     authority(actor, id);
     if (input.action === "publish") {
       const review = await repository.detail(actor.id, id);
@@ -180,6 +180,7 @@ class CommunityModerationService {
       id,
       input.action,
       actor,
+      currentToken,
       input.notes,
       new Date(input.expectedUpdatedAt),
       true,

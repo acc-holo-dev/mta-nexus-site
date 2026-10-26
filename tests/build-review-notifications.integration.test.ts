@@ -41,6 +41,12 @@ async function fixture() {
     token: `review-session-${suffix}`,
     expiresAt: new Date(Date.now() + 60 * 60 * 1000),
   });
+  await sessionRepository.create({
+    id: `ses_mod_${suffix}`,
+    userId: moderatorId,
+    token: `tok_mod_${suffix}`,
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+  });
   await webPushSubscriptionRepository.upsert({
     id: subscriptionId,
     userId: authorId,
@@ -98,6 +104,7 @@ async function fixture() {
   return {
     authorId,
     moderatorId,
+    token: `tok_mod_${suffix}`,
     productId,
     buildId,
     subscriptionId,
@@ -108,8 +115,8 @@ async function fixture() {
 it("commits approval and one author notification atomically, even with simultaneous replay", async () => {
   const f = await fixture();
   const results = await Promise.all([
-    buildRepository.moderatePending(f.buildId, "approve", f.audit("a"), 1),
-    buildRepository.moderatePending(f.buildId, "approve", f.audit("b"), 1),
+    buildRepository.moderatePending(f.buildId, "approve", f.audit("a"), 1, f.token),
+    buildRepository.moderatePending(f.buildId, "approve", f.audit("b"), 1, f.token),
   ]);
   expect(results.filter(Boolean)).toHaveLength(1);
   const notices = await notificationRepository.listByUser(f.authorId);
@@ -161,7 +168,7 @@ it("keeps a rejection successful when system notifications are disabled", async 
         action: "build.rejected",
       },
       1,
-    ),
+    f.token),
   ).toMatchObject({ status: "rejected" });
   expect(await notificationRepository.listByUser(f.authorId)).toEqual([]);
   expect(
@@ -180,7 +187,7 @@ it("rolls back build, product and audit when notification storage fails, then pe
     type: "system",
   });
   await expect(
-    buildRepository.moderatePending(f.buildId, "approve", f.audit(), 1),
+    buildRepository.moderatePending(f.buildId, "approve", f.audit(), 1, f.token),
   ).rejects.toThrow();
   expect(await buildRepository.findById(f.buildId)).toMatchObject({ status: "pending_review" });
   expect(await productRepository.findById(f.productId)).toMatchObject({
@@ -192,7 +199,7 @@ it("rolls back build, product and audit when notification storage fails, then pe
   );
   const { notifications } = await import("../packages/db/src/schema");
   await db.delete(notifications).where(eq(notifications.id, id));
-  expect(await buildRepository.moderatePending(f.buildId, "approve", f.audit(), 1)).toMatchObject({
+  expect(await buildRepository.moderatePending(f.buildId, "approve", f.audit(), 1, f.token)).toMatchObject({
     status: "published",
   });
   expect(await notificationRepository.listByUser(f.authorId)).toHaveLength(1);
@@ -242,7 +249,7 @@ it("notifies current organization managers once, respecting revocation and prefe
       action: "build.rejected",
     },
     1,
-  );
+  f.token);
   expect(await notificationRepository.listByUser(f.authorId)).toEqual([]);
   for (const role of roles)
     expect(await notificationRepository.listByUser(`${f.authorId}_${role}`)).toHaveLength(

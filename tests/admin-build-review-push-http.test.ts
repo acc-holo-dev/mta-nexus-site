@@ -97,6 +97,7 @@ describe("build review durable push scheduling", () => {
           notes: "Reviewed build",
         },
         expect.objectContaining({ id: "usr_mod" }),
+        "test-session",
       );
       expect(afterMock).not.toHaveBeenCalled();
     },
