@@ -42,6 +42,13 @@ describe("verification resolution notifications", () => {
         token: `verify-result-session-${suffix}`,
         expiresAt: new Date(Date.now() + 60 * 60 * 1000),
       });
+      const reviewerToken = `tok_${reviewerId}`;
+      await sessionRepository.create({
+        id: `ses_${reviewerId}`,
+        userId: reviewerId,
+        token: reviewerToken,
+        expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+      });
       await webPushSubscriptionRepository.upsert({
         id: subscriptionId,
         userId: requesterId,
@@ -65,6 +72,7 @@ describe("verification resolution notifications", () => {
           id: request.id,
           reviewerId,
           decision,
+          currentToken: reviewerToken,
           reviewNotes: "Reviewed integration fixture.",
         });
       expect(resolved).toMatchObject({
@@ -110,6 +118,7 @@ describe("verification resolution notifications", () => {
           id: request.id,
           reviewerId,
           decision,
+          currentToken: reviewerToken,
           reviewNotes: "Replay must be a no-op.",
         });
       expect(replay).toBeNull();

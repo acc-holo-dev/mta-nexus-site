@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { AppError } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
 import { verificationDecisionError } from "../../../../../lib/verification-workspace-copy";
 import { verificationDecisionSchema } from "../../../../../lib/verification-workspace-contract";
@@ -20,8 +20,10 @@ export const PATCH = withBrowserMutation(async (
       requireServerJsonContentType(request);
       const parsed = verificationDecisionSchema.safeParse(await readBoundedJson(request));
       if (!parsed.success) throw new AppError("Invalid decision", 400, "VALIDATION_ERROR");
+      const token = request.cookies.get("nexus_session")?.value;
+      if (!token) throw new UnauthorizedError();
       await verificationRate(actor.id, "moderationAction");
-      return verificationWorkspaceService.decide(actor, id, parsed.data);
+      return verificationWorkspaceService.decide(actor, id, parsed.data, token);
     },
     200,
     verificationDecisionError,

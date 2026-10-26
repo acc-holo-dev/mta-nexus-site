@@ -5,6 +5,7 @@ import {
   serverClaimChallenges,
   serverClaimChallengeRepository,
   serverRepository,
+  sessionRepository,
   userRepository,
   verificationRepository,
   verificationRequests,
@@ -31,6 +32,13 @@ async function fixture() {
     displayName: "Endpoint Proof Reviewer",
     role: "moderator",
   });
+  const reviewerToken = `tok_${reviewerId}`;
+  await sessionRepository.create({
+    id: `ses_${reviewerId}`,
+    userId: reviewerId,
+    token: reviewerToken,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   await serverRepository.create({
     id: serverId,
     slug: `endpoint-proof-${suffix.replace(/_/gu, "-")}`,
@@ -44,7 +52,7 @@ async function fixture() {
     mediaUrls: [],
   });
   const endpoint = { ipAddress: "198.51.100.77", port };
-  return { suffix, requesterId, reviewerId, serverId, endpoint };
+  return { suffix, requesterId, reviewerId, reviewerToken, serverId, endpoint };
 }
 
 async function issue(target: Awaited<ReturnType<typeof fixture>>) {
@@ -129,6 +137,7 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
       id: completed.verificationRequest.id,
       reviewerId: target.reviewerId,
       decision: "approved",
+      currentToken: target.reviewerToken,
     })).rejects.toMatchObject({ statusCode: 409 });
     const [request] = await db.select().from(verificationRequests)
       .where(eq(verificationRequests.id, completed.verificationRequest.id));
@@ -188,6 +197,7 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
       id: completed.verificationRequest.id,
       reviewerId: target.reviewerId,
       decision: "approved",
+      currentToken: target.reviewerToken,
     })).rejects.toMatchObject({ statusCode: 409 });
     const [request] = await db.select().from(verificationRequests)
       .where(eq(verificationRequests.id, completed.verificationRequest.id));
@@ -207,6 +217,7 @@ describe("server control proof is bound to game endpoint revision (PostgreSQL)",
       id: completed.verificationRequest.id,
       reviewerId: target.reviewerId,
       decision: "approved",
+      currentToken: target.reviewerToken,
     });
     expect(approved?.status).toBe("approved");
     const server = await serverRepository.findById(target.serverId);

@@ -272,6 +272,7 @@ it.each([undefined, input.expectedRevision])(
   async (expectedApplicationRevision) => {
     state.rows = [
       [["moderator"]],
+      [["ses_staff", "2099-01-01T00:00:00.000Z"]],
       [request({ status: "approved" })],
       [["updated-submission", "verification.application_updated", stamp]],
     ];
@@ -281,6 +282,7 @@ it.each([undefined, input.expectedRevision])(
         reviewerId: "reviewer",
         decision: "approved",
         expectedApplicationRevision,
+        currentToken: "staff-session",
       }),
     ).rejects.toMatchObject({ code: "VERIFICATION_APPLICATION_CHANGED" });
     expect(writes("users")).toHaveLength(0);
@@ -292,6 +294,7 @@ it.each([undefined, input.expectedRevision])(
 it("accepts a fresh version and profile stamp from amended evidence for independent approval", async () => {
   state.rows = [
     [["moderator"]],
+    [["ses_staff", "2099-01-01T00:00:00.000Z"]],
     [request({ status: "approved" })],
     [["updated-submission", "verification.application_updated", stamp]],
     [["actor"], ["reviewer"]],
@@ -308,6 +311,7 @@ it("accepts a fresh version and profile stamp from amended evidence for independ
         reviewerId: "reviewer",
         decision: "approved",
         expectedApplicationRevision: version("request", "pending", "updated-submission"),
+        currentToken: "staff-session",
       })
     )?.status,
   ).toBe("approved");

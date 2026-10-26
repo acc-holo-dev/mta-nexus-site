@@ -4,6 +4,7 @@ import {
   db,
   organizations,
   organizationRepository,
+  sessionRepository,
   userRepository,
   notificationRepository,
   verificationRepository,
@@ -31,6 +32,13 @@ describe("verification stale target approval", () => {
       displayName: "Verification Reviewer",
       role: "moderator",
     });
+    const reviewerToken = `tok_${reviewerId}`;
+    await sessionRepository.create({
+      id: `ses_${reviewerId}`,
+      userId: reviewerId,
+      token: reviewerToken,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+    });
     await organizationRepository.create({
       id: organizationId,
       name: "Stale Verification Organization",
@@ -54,6 +62,7 @@ describe("verification stale target approval", () => {
         id: request.id,
         reviewerId,
         decision: "approved",
+        currentToken: reviewerToken,
         reviewNotes: "Should fail closed.",
       }),
     ).rejects.toMatchObject({

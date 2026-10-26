@@ -12,6 +12,7 @@ import {
   serverClaimChallenges,
   serverClaimChallengeRepository,
   servers,
+  sessionRepository,
   users,
   verificationRepository,
   verificationRequests,
@@ -36,6 +37,12 @@ async function fixture() {
     await db
       .insert(users)
       .values({ id, email: `${id}@example.invalid`, username: id, displayName: role, role });
+  await sessionRepository.create({
+    id: `ses_${reviewer}`,
+    userId: reviewer,
+    token: `tok_${reviewer}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   for (const id of [organization, otherOrganization])
     await db
       .insert(organizations)
@@ -89,6 +96,7 @@ async function fixture() {
       id: requestId,
       reviewerId: reviewer,
       decision: "approved",
+      currentToken: `tok_${reviewer}`,
     });
   const revoke = () =>
     db
@@ -223,6 +231,7 @@ it("rolls back approval after revocation, but permits rejection and a new owner 
     id: f.requestId,
     reviewerId: f.reviewer,
     decision: "rejected",
+    currentToken: `tok_${f.reviewer}`,
   });
   expect(
     await readManagedServerClaimStatus(f.serverId, { id: f.owner, role: "user" }),

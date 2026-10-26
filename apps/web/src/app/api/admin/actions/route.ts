@@ -129,12 +129,14 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     } else if (targetType === "verification") {
       // Verification can only be granted through the moderation workflow
       if (action === "approve" || action === "reject") {
+        if (!token) return json({ error: "Authentication required" }, 401);
         const resolved = await verificationRepository.resolveRequest(
           {
             id: targetId,
             reviewerId: user.id,
             decision: action === "approve" ? "approved" : "rejected",
             reviewNotes: notes,
+            currentToken: token,
           },
           makeAudit(),
         );
