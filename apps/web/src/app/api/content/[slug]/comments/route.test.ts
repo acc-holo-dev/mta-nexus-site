@@ -10,19 +10,16 @@ const afterMock = vi.hoisted(() =>
     state.afterCallbacks.push(callback);
   }),
 );
-const dispatchNotifications = vi.hoisted(() =>
+const notifyDiscussionReplies = vi.hoisted(() =>
   vi.fn(async () => ({
-    requested: 1,
+    attempted: 1,
     stored: 1,
-    storageFailed: 0,
-    push: {
-      notifications: 1,
-      attempted: 0,
-      delivered: 0,
-      failed: 0,
-      stale: 0,
-      deliveryErrors: 0,
-    },
+    suppressed: 0,
+    duplicate: 0,
+    skipped: 0,
+    failed: 0,
+    pushQueued: 0,
+    pushDegraded: 0,
   })),
 );
 const getArticle = vi.hoisted(() =>
@@ -68,13 +65,12 @@ vi.mock("../../../../../lib/services/content-service", () => ({
   },
 }));
 
-
 vi.mock("@nexus/security", () => ({
   consumeRateLimit: vi.fn(async () => ({ success: true })),
 }));
 
-vi.mock("../../../../../lib/services/notification-dispatch-service", () => ({
-  dispatchNotificationsBestEffort: dispatchNotifications,
+vi.mock("../../../../../lib/services/discussion-follow-notification-service", () => ({
+  notifyDiscussionReplies,
 }));
 
 import { NextRequest } from "next/server";
@@ -118,18 +114,13 @@ describe("article comment notification side effects", () => {
     expectPrivate(response);
     expect(addComment).toHaveBeenCalledOnce();
     expect(afterMock).toHaveBeenCalledOnce();
-    expect(dispatchNotifications).not.toHaveBeenCalled();
+    expect(notifyDiscussionReplies).not.toHaveBeenCalled();
 
     await state.afterCallbacks[0]?.();
-    expect(dispatchNotifications).toHaveBeenCalledWith([
-      expect.objectContaining({
-        recipientId: "usr_author",
-        category: "content",
-      }),
-    ]);
+    expect(notifyDiscussionReplies).toHaveBeenCalledWith("cnt_1", "cmt_1");
   });
 
-  it("does not schedule a self-notification for the article author", async () => {
+  it("still schedules after() for self-comments; audience suppression is in notify", async () => {
     state.articleAuthorId = "usr_commenter";
     const response = await POST(request(), {
       params: Promise.resolve({ slug: "article-one" }),
@@ -137,6 +128,9 @@ describe("article comment notification side effects", () => {
 
     expect(response.status).toBe(201);
     expectPrivate(response);
-    expect(afterMock).not.toHaveBeenCalled();
+    expect(afterMock).toHaveBeenCalledOnce();
+    expect(notifyDiscussionReplies).not.toHaveBeenCalled();
+    await state.afterCallbacks[0]?.();
+    expect(notifyDiscussionReplies).toHaveBeenCalledWith("cnt_1", "cmt_1");
   });
 });

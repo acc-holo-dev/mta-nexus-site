@@ -274,7 +274,14 @@ it("records exact recovery proof only for a new author archive and keeps private
     action: "content.archived_by_author",
   });
   expect(result).not.toHaveProperty("archiveRevision");
+  // restoreRevision is appended in SQL via to_char so micros match recoverable().
   expect(state.queries[2].params).toContain(
+    JSON.stringify({ from: "published", to: "archived" }),
+  );
+  expect(state.queries[2].sql).toContain("jsonb_build_object");
+  expect(state.queries[2].sql).toContain("restoreRevision");
+  expect(state.queries[2].sql).toContain("to_char");
+  expect(state.queries[2].params).not.toContain(
     JSON.stringify({ from: "published", to: "archived", restoreRevision: next }),
   );
 });

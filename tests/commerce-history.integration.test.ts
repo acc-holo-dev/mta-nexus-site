@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import {
   db, licenses, orders, orderItems, products, users,
   licenseRepository, orderRepository, productRepository, userRepository,
@@ -58,11 +58,13 @@ describe("private historical commerce queries (PostgreSQL)", () => {
       }
 
       const sameTimestamp = new Date("2026-10-09T00:00:00.000Z");
+      // order_line_terms_guard rejects new lines once an order is cancelled or has
+      // payments/ledger refs — insert lines while pending, then settle status.
       await db.insert(orders).values(orderIds.map((id, index) => ({
         id,
         orderNumber: `HIST-${suffix}-${index}`,
         buyerId: index < 23 ? buyerA : buyerB,
-        status: index === 5 ? "cancelled" : "completed",
+        status: "pending",
         totalAmount: 12345,
         currency: "USD",
         createdAt: sameTimestamp,
@@ -75,6 +77,12 @@ describe("private historical commerce queries (PostgreSQL)", () => {
         unitPrice: 12345,
         currency: "USD",
       })));
+      for (const [index, id] of orderIds.entries()) {
+        await db.update(orders).set({
+          status: index === 5 ? "cancelled" : "completed",
+          updatedAt: sameTimestamp,
+        }).where(eq(orders.id, id));
+      }
 
       await db.insert(licenses).values(licenseIds.map((id, index) => ({
         id,

@@ -231,7 +231,8 @@ it("denies revoked roles and rolls back target/counter/report when either audit 
 });
 it("excludes commercial review comments from submission, community queues and removal", async () => {
   const f = await fixture(),
-    productId = id("prd");
+    productId = id("prd"),
+    reviewId = id("cmt");
   productIds.push(productId);
   await db
     .insert(products)
@@ -243,8 +244,22 @@ it("excludes commercial review comments from submission, community queues and re
       type: "script",
       authorId: f.author.id,
     });
-  await db.update(comments).set({ productId }).where(eq(comments.id, f.comment.id));
-  await expect(repository.submit(submission(f))).rejects.toMatchObject({ code: "NOT_FOUND" });
+  // comments_review_target_check: product_id requires a review-shaped row
+  // (content_id/parent_id null, rating when published) — never stamp onto a content comment.
+  const [review] = await db
+    .insert(comments)
+    .values({
+      id: reviewId,
+      productId,
+      authorId: f.author.id,
+      text: "Commercial review",
+      rating: 5,
+    })
+    .returning();
+  const reviewFixture = { ...f, comment: review };
+  await expect(repository.submit(submission(reviewFixture))).rejects.toMatchObject({
+    code: "NOT_FOUND",
+  });
   const reportId = id("rpt");
   await db
     .insert(reports)
@@ -252,7 +267,7 @@ it("excludes commercial review comments from submission, community queues and re
       id: reportId,
       reporterId: f.reporter.id,
       targetType: "comment",
-      targetId: f.comment.id,
+      targetId: review.id,
       type: "abuse",
       reason: "Legacy commercial report",
     });
@@ -260,8 +275,8 @@ it("excludes commercial review comments from submission, community queues and re
     (await repository.page({ actorId: f.moderator.id, staff: true }, { view: "pending", page: 1 }))
       .items,
   ).toHaveLength(0);
-  await expect(repository.decide(decision(f, reportId))).rejects.toMatchObject({
+  await expect(repository.decide(decision(reviewFixture, reportId))).rejects.toMatchObject({
     code: "REPORT_TARGET_UNAVAILABLE",
   });
-  expect(await db.select().from(comments).where(eq(comments.id, f.comment.id))).toHaveLength(1);
+  expect(await db.select().from(comments).where(eq(comments.id, review.id))).toHaveLength(1);
 });

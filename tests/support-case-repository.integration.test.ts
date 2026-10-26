@@ -238,6 +238,7 @@ it("serializes reply-vs-status races without losing the moderation decision", as
 it("filters staff queue totals, categories and pages in PostgreSQL", async () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
   const requesterId = `usr_filter_${suffix}`;
+  const staffId = `usr_filter_staff_${suffix}`;
   const openId = `sup_filter_open_${suffix}`;
   const closedId = `sup_filter_closed_${suffix}`;
   const otherId = `sup_filter_other_${suffix}`;
@@ -247,6 +248,13 @@ it("filters staff queue totals, categories and pages in PostgreSQL", async () =>
     username: `sf_${suffix}`,
     displayName: "Filtered queue requester",
     role: "user",
+  });
+  await userRepository.create({
+    id: staffId,
+    email: `support-filter-staff-${suffix}@nexus.test`,
+    username: `sf_staff_${suffix}`,
+    displayName: "Filtered queue staff",
+    role: "moderator",
   });
   const beforeOpen = await supportCaseRepository.pageStaff(1, 25, { category: "integration", status: "open" });
   const beforeClosed = await supportCaseRepository.pageStaff(1, 25, { category: "integration", status: "closed" });
@@ -262,7 +270,7 @@ it("filters staff queue totals, categories and pages in PostgreSQL", async () =>
   }
   const transitioned = await supportCaseRepository.updateStatus(
     closedId, "closed",
-    { id: `aud_closed_${suffix}`, actorId: requesterId, actorType: "admin", action: "support.case.status_changed", targetId: closedId, targetType: "support_case" },
+    { id: `aud_closed_${suffix}`, actorId: staffId, actorType: "admin", action: "support.case.status_changed", targetId: closedId, targetType: "support_case" },
     "open",
   );
   expect(transitioned?.status).toBe("closed");

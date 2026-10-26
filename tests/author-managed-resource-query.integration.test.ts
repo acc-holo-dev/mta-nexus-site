@@ -43,8 +43,12 @@ it("enforces author and organization authority in PostgreSQL, including revocati
     expect(await accessible("manager")).toEqual(["team"]);
     expect(await accessible("org-admin")).toEqual(["team"]);
     expect(await accessible("reader")).toEqual([]);
-    expect(await accessible("unrelated", "moderator")).toEqual([]);
+    // Live users.role wins: claimed moderator still sees admin scope for 'unrelated'.
+    expect(await accessible("unrelated", "moderator")).toEqual(["other", "personal", "team"]);
     expect(await accessible("unrelated", "admin")).toEqual(["other", "personal", "team"]);
+    // Claimed admin must not short-circuit when the live row is not admin.
+    await tx.execute(sql`UPDATE users SET role = 'developer' WHERE id = 'unrelated'`);
+    expect(await accessible("unrelated", "admin")).toEqual([]);
     await tx.execute(
       sql`UPDATE organization_members SET permissions = '[]' WHERE user_id = 'manager'`,
     );

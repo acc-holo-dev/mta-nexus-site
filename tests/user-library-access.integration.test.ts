@@ -122,7 +122,8 @@ describe("effective resource library and private visibility (PostgreSQL)", () =>
           ...buildBase,
           id: unsafeNewerId,
           version: "9.9.0",
-          status: "published",
+          // Non-published: published requires scan_status=clean (builds_published_safe_check).
+          status: "rejected",
           storageKey: `assets/test/library-unsafe-release-${suffix}.zip`,
           scanStatus: "error",
           createdAt: new Date(now.getTime() + 120_000),
@@ -222,7 +223,12 @@ describe("effective resource library and private visibility (PostgreSQL)", () =>
       expect(races.filter(result => result.status === "rejected")).toHaveLength(1);
       const current = await resourceLibrarySelectionsRepository.detail(ownerId, productIds.ready);
       const pin = await resourceLibrarySelectionsRepository.command({ ...selectInput, auditId: `aud_lib_pin_${suffix}`, command: { mode: "fixed", buildId: oldBuildId, expectedRevision: current.selection.revision } });
-      await db.update(builds).set({ status: "quarantined" }).where(eq(builds.id, oldBuildId));
+      await db.update(builds).set({
+        status: "quarantined",
+        quarantinePreviousStatus: "published",
+        quarantineReason: "Fixture quarantine",
+        quarantinedAt: new Date(),
+      }).where(eq(builds.id, oldBuildId));
       expect((await userLibraryRepository.pageByUser(ownerId)).items.find(row => row.resourceId === productIds.ready))
         .toMatchObject({ downloadable: false, buildId: null, version: null });
       expect((await resourceLibrarySelectionsRepository.detail(ownerId, productIds.ready)).selected).toBeNull();

@@ -8,6 +8,8 @@ describe("published build/currentVersion consistency", () => {
   const olderBuildId = `bld_a_${suffix}`;
   const newerBuildId = `bld_z_${suffix}`;
 
+  const staffId = `usr_build_consistency_staff_${suffix}`;
+
   beforeAll(async () => {
     await userRepository.create({
       id: authorId,
@@ -15,6 +17,13 @@ describe("published build/currentVersion consistency", () => {
       username: `build_consistency_${suffix}`,
       displayName: "Build Consistency Author",
       role: "developer",
+    });
+    await userRepository.create({
+      id: staffId,
+      email: `build_consistency_staff_${suffix}@nexus.test`,
+      username: `build_consistency_staff_${suffix}`,
+      displayName: "Build Consistency Staff",
+      role: "admin",
     });
 
     await productRepository.create({
@@ -75,7 +84,7 @@ describe("published build/currentVersion consistency", () => {
       "approve",
       {
         id: `aud_newer_${suffix}`,
-        actorId: authorId,
+        actorId: staffId,
         actorType: "admin",
         action: "build.approved",
         targetId: newerBuildId,
@@ -90,7 +99,7 @@ describe("published build/currentVersion consistency", () => {
       "approve",
       {
         id: `aud_older_${suffix}`,
-        actorId: authorId,
+        actorId: staffId,
         actorType: "admin",
         action: "build.approved",
         targetId: olderBuildId,
@@ -170,7 +179,7 @@ describe("published build/currentVersion consistency", () => {
         "approve",
         {
           id: `aud_concurrent_a_${suffix}`,
-          actorId: authorId,
+          actorId: staffId,
           actorType: "admin",
           action: "build.approved",
           targetId: firstId,
@@ -183,7 +192,7 @@ describe("published build/currentVersion consistency", () => {
         "approve",
         {
           id: `aud_concurrent_z_${suffix}`,
-          actorId: authorId,
+          actorId: staffId,
           actorType: "admin",
           action: "build.approved",
           targetId: secondId,
@@ -203,7 +212,7 @@ describe("published build/currentVersion consistency", () => {
   it("moves currentVersion to the same fallback that download will resolve after retirement", async () => {
     const retired = await buildRepository.retireAndRefreshProduct(newerBuildId, "published", {
       id: `aud_retire_${suffix}`,
-      actorId: authorId,
+      actorId: staffId,
       actorType: "admin",
       action: "build.retired",
       targetId: newerBuildId,

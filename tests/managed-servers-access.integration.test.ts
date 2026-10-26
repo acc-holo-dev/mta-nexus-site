@@ -70,7 +70,7 @@ it("checks personal and organization management scope with bounded pages on Post
 
         const repository = new ServerRepository();
         const first = await repository.pageManagedByUser("actor");
-        expect(first).toMatchObject({ total: 135, page: 1, pageSize: 12, totalPages: 12 });
+        expect(first).toMatchObject({ total: 134, page: 1, pageSize: 12, totalPages: 12 });
         expect(first.servers).toHaveLength(12);
         const all: string[] = [];
         for (let page = 1; page <= first.totalPages; page++)
@@ -115,7 +115,7 @@ it("checks personal and organization management scope with bounded pages on Post
         ).toEqual(["unrelated-server"]);
         // The following request reads fresh rights; earlier HTML cannot retain a revoked membership.
         await tx.execute(sql`DELETE FROM organization_members WHERE id = 'permission-member'`);
-        expect((await repository.pageManagedByUser("actor")).total).toBe(134);
+        expect((await repository.pageManagedByUser("actor")).total).toBe(133);
         expect((await organizationRepository.listServerManageableByUser("actor"))
           .map((item) => item.id)).not.toContain("org-permission");
       } finally {

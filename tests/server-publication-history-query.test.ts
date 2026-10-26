@@ -274,6 +274,9 @@ it("records microsecond recovery proof for a new server-editor archive", async (
     "srv",
   );
   expect(state.queries.at(-1)?.params).toContain(
-    JSON.stringify({ serverId: "srv", from: "published", to: "archived", restoreRevision: next }),
+    JSON.stringify({ serverId: "srv", from: "published", to: "archived" }),
   );
+  expect(state.queries.at(-1)?.sql).toContain("jsonb_build_object");
+  expect(state.queries.at(-1)?.sql).toContain("restoreRevision");
+  expect(state.queries.at(-1)?.sql).toContain("to_char");
 });

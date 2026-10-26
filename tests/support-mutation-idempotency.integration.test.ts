@@ -58,10 +58,15 @@ describe("durable support mutation idempotency", () => {
   it("replays a committed reply after closing without a second message or audit", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
     const actorId = `usr_idem_reply_${suffix}`;
+    const staffId = `usr_idem_reply_staff_${suffix}`;
     const caseId = `sup_idem_reply_${suffix}`;
     await userRepository.create({
       id: actorId, email: `reply_${suffix}@nexus.test`, username: `reply_${suffix}`,
       displayName: "Reply Idempotency User", role: "user",
+    });
+    await userRepository.create({
+      id: staffId, email: `reply_staff_${suffix}@nexus.test`, username: `reply_staff_${suffix}`,
+      displayName: "Reply Idempotency Staff", role: "moderator",
     });
     await supportCaseRepository.createWithInitialMessage(
       { id: caseId, requesterId: actorId, category: "account", subject: "Retry case", status: "open" },
@@ -90,7 +95,7 @@ describe("durable support mutation idempotency", () => {
 
     const closed = await supportCaseRepository.updateStatus(
       caseId, "closed",
-      { id: `aud_closed_${suffix}`, actorId, actorType: "admin", action: "support.case.status_changed", targetId: caseId, targetType: "support_case" },
+      { id: `aud_closed_${suffix}`, actorId: staffId, actorType: "admin", action: "support.case.status_changed", targetId: caseId, targetType: "support_case" },
       "open",
     );
     expect(closed?.status).toBe("closed");

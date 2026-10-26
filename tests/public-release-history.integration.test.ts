@@ -72,7 +72,8 @@ describe("published build archive (PostgreSQL)", () => {
       await buildRepository.create({
         ...common, id: unsafeId, version: "2.0.0",
         storageKey: "test/private/unsafe.zip",
-        status: "published",
+        // Non-published: published requires scan_status=clean (builds_published_safe_check).
+        status: "rejected",
         scanStatus: "error", scanner: undefined, scannedAt: undefined,
       });
       await buildRepository.create({
@@ -85,6 +86,8 @@ describe("published build archive (PostgreSQL)", () => {
         storageKey: "test/private/quarantined.zip",
         status: "quarantined",
         quarantinePreviousStatus: "published",
+        quarantineReason: "Fixture quarantine",
+        quarantinedAt: new Date("2026-10-09T12:00:00Z"),
       });
       await buildRepository.create({
         ...common, id: otherId, productId: otherProductId,

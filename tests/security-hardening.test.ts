@@ -9,6 +9,7 @@ import {
   licenseRepository,
   buildRepository,
   orderRepository,
+  developerProfileRepository,
 } from "@nexus/db";
 import { commerceService } from "../apps/web/src/lib/services/commerce-service";
 import type { User, Product } from "@nexus/domain";
@@ -216,10 +217,21 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
   });
 
   it("Verification workflow: isVerified can only be granted through moderation approval", async () => {
+    const previous = await developerProfileRepository.own(author.id);
+    await developerProfileRepository.update({
+      actorId: author.id,
+      expectedUpdatedAt: previous.updatedAt,
+      specialties: ["Lua"],
+      githubUrl: "https://example.test/github",
+      discordTag: "sec-fixture",
+      profileId: `dev_sec_${ts}`,
+      auditId: `aud_sec_prof_${ts}`,
+    });
     const request = await verificationRepository.createRequest({
       requesterId: author.id,
       targetType: "developer",
       targetId: author.id,
+      proofUrl: "https://example.test/developer-portfolio",
       notes: "Requesting developer verification",
     });
     expect(request.status).toBe("pending");
@@ -246,6 +258,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       requesterId: author.id,
       targetType: "developer",
       targetId: author.id,
+      proofUrl: "https://example.test/developer-portfolio-resubmit",
       notes: "Resubmitted with portfolio proof",
     });
     const approved = await verificationRepository.resolveRequest({
