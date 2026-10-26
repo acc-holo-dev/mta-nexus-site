@@ -507,7 +507,9 @@ export function RetireBuildForm({
   }
   return (
     <details className="text-sm text-secondary">
-      <summary className="cursor-pointer">{copy.retire}</summary>
+      <summary className="cursor-pointer">
+        {copy.retire} · {version}
+      </summary>
       <form onSubmit={retire} className="mt-3 space-y-3">
         <p>{copy.retireHint}</p>
         <div className="block space-y-1">
