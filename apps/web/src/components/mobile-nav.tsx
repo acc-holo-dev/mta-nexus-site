@@ -84,7 +84,10 @@ export function MobileNav({ locale }: { locale: Locale }) {
       ? pathname === href
       : pathname === href || pathname.startsWith(`${href}/`);
 
-  const moreActive = moreItems.some((item) => isActive(item.href));
+  const moreActive =
+    pathname === "/workspace" ||
+    pathname.startsWith("/workspace/") ||
+    moreItems.some((item) => isActive(item.href));
 
   return (
     <nav
@@ -152,7 +155,7 @@ export function MobileNav({ locale }: { locale: Locale }) {
               type="button"
               aria-label={dictionary.nav.closeMore}
               onClick={() => setIsMoreOpen(false)}
-              className="rounded-md p-1.5 text-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-[var(--nexus-accent)]"
+              className="rounded-md p-1.5 text-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nexus-accent)]"
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>

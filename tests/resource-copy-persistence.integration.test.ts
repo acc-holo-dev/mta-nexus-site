@@ -138,17 +138,27 @@ it("receipts stay immutable after source/target edits and cannot be supplied by 
     .update(products)
     .set({ description: "Later changed source description", updatedAt: new Date() })
     .where(eq(products.id, f.sourceId));
+  // Title edits force draft via metadata-review trigger; archive status alone afterward.
   await db
     .update(products)
-    .set({ title: "Later target title", status: "archived" })
+    .set({ title: "Later target title" })
+    .where(eq(products.id, saved.receipt.target.id));
+  await db
+    .update(products)
+    .set({ status: "archived" })
+    .where(eq(products.id, saved.receipt.target.id));
+  const [liveTarget] = await db
+    .select({ status: products.status })
+    .from(products)
     .where(eq(products.id, saved.receipt.target.id));
   expect(await copies.detail(f.actor, f.sourceId, saved.receipt.id)).toMatchObject({
     receipt: {
       target: { title: f.command.title },
       metadata: { description: "Original resource description" },
     },
-    targetStatus: "archived",
+    targetStatus: liveTarget?.status,
   });
+  expect(liveTarget?.status).toBe("archived");
   expect((await copies.create(f.actor, f.sourceId, f.command)).replayed).toBe(true);
   await expect(
     copies.create(f.actor, f.sourceId, {

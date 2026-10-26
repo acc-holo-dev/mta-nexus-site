@@ -17,7 +17,7 @@ import { productService } from "../../../../lib/services/product-service";
 import { getDictionary } from "../../../../lib/i18n";
 import { getRequestLocale } from "../../../../lib/i18n-server";
 import { getResourceBuildWorkspaceCopy } from "../../../../lib/resource-build-workspace-i18n";
-import { AuthorResourceForms } from "../../../../components/author-resource-forms";
+import { AuthorResourceForms, RetireBuildForm } from "../../../../components/author-resource-forms";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -201,6 +201,17 @@ export default async function ManageResourcePage({
                     </p>
                   </div>
                 ))}
+              {build.status !== "retired" &&
+                build.status !== "quarantined" &&
+                Number.isInteger(build.revision) &&
+                (build.revision ?? 0) >= 1 && (
+                  <RetireBuildForm
+                    productId={id}
+                    buildId={build.id}
+                    version={build.version}
+                    revision={build.revision as number}
+                  />
+                )}
               <Link
                 href={`/workspace/resources/${id}/builds/${build.id}`}
                 className="text-sm text-accent underline"

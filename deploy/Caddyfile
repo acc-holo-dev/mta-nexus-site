@@ -26,5 +26,8 @@
     header_up X-Forwarded-For {remote_host}
     header_up X-Real-IP {remote_host}
     header_up X-Nexus-Proxy-Secret {$TRUSTED_PROXY_SECRET}
+    # Next App Router replaces Proxy-set Vary with RSC fields. Always re-attach
+    # Cookie so anonymous/session document variants diverge at the edge.
+    header_down +Vary Cookie
   }
 }

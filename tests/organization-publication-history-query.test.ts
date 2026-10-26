@@ -257,9 +257,11 @@ it("records exact team recovery proof when archiving and never changes the origi
       organizationId: "org",
       from: "published",
       to: "archived",
-      restoreRevision: next,
     }),
   );
+  expect(state.queries.at(-1)?.sql).toContain("jsonb_build_object");
+  expect(state.queries.at(-1)?.sql).toContain("restoreRevision");
+  expect(state.queries.at(-1)?.sql).toContain("to_char");
   expect(state.notice).toHaveBeenCalledWith(
     expect.anything(),
     expect.objectContaining({ authorId: "original-author" }),

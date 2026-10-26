@@ -21,7 +21,14 @@ export function assertProductionUploadBodyLimit(source) {
   assert(declared, 'Production proxy must reject declared oversized bodies before upstream handling');
   assert.equal(Number(declared[1]), PRODUCTION_UPLOAD_ENVELOPE_BYTES, "Declared length limit must equal the 65 MiB build-upload envelope");
   assert.match(source, /respond @oversized_body "Request body too large" 413/u);
+}
 
+export function assertProductionOfflineCacheVary(source) {
+  assert.match(
+    source,
+    /reverse_proxy\s+app:3000\s*\{[\s\S]*?header_down\s+\+Vary\s+Cookie/u,
+    'Production proxy must re-attach Vary: Cookie after Next App Router responses',
+  );
 }
 
 // Preserve every production proxy directive; change only the test CA policy.
@@ -36,10 +43,18 @@ export function assertIsolatedProduction(config, project, caddyFile) {
   assert.equal(config.name, project);
   assert.deepEqual(
     Object.keys(config.services).sort(),
-    ['app', 'caddy', 'clamav', 'postgres', 'push-worker'],
+    ['app', 'caddy', 'clamav', 'license-worker', 'postgres', 'push-worker', 'resource-release-worker'],
   );
   assert.equal(config.services.app.environment.NODE_ENV, 'production');
-  assert.equal(config.services.app.environment.NEXT_PUBLIC_APP_URL, 'https://nexus-ci.test');
+  assert.equal(
+    config.services.app.environment.NEXT_PUBLIC_APP_URL,
+    'https://nexus-ci.test:8443',
+    'CI canonical origin must include the published HTTPS port browsers send in Origin',
+  );
+  assert.equal(
+    config.services['push-worker'].environment.NEXT_PUBLIC_APP_URL,
+    'https://nexus-ci.test:8443',
+  );
   assert.equal(config.services.app.environment.BUILD_SCANNER, 'clamav');
   assert.equal(config.services.app.environment.EMAIL_PROVIDER, 'disabled');
   assert.equal(config.services.app.build.target, 'runtime');
@@ -60,6 +75,12 @@ export function assertIsolatedProduction(config, project, caddyFile) {
     'push-worker must keep a 75-second graceful stop budget',
   );
   assert(pushWorker.tmpfs?.some((entry) => String(entry).startsWith('/tmp:')));
+  for (const name of ['license-worker', 'resource-release-worker']) {
+    const worker = config.services[name];
+    assert.equal(worker.image, config.services.app.image);
+    assert.equal(worker.user, 'node');
+    assert.equal(worker.init, true);
+  }
   for (const [name, service] of Object.entries(config.services)) {
     assert(!service.privileged && !service.container_name && !service.network_mode);
     if (name === 'push-worker') {

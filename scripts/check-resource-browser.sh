@@ -32,7 +32,7 @@ build_id="bld_resource_browser_$short"
 product_slug="j5-browser-resource-$short"
 paid_product_id="prd_paid_resource_browser_$short"
 paid_product_slug="j5-paid-browser-resource-$short"
-paid_product_title="J5 Paid Browser Resource"
+paid_product_title="J5 Paid Browser Resource $short"
 claim_server_id="srv_claim_browser_$short"
 claim_server_slug="claim-browser-$short"
 claim_server_name="Claim Browser Fixture $short"
@@ -56,6 +56,45 @@ expected_sha=$(sha256sum "$payload_file" | awk '{print $1}')
 file_size=$(wc -c < "$payload_file" | tr -d ' ')
 
 "${pc[@]}" exec -T app sh -c 'mkdir -p /data/uploads/ci-resource-browser && cat > "/data/uploads/'"$storage_key"'"' < "$payload_file"
+
+# Idempotent reseed: clear prior resource-browser + portfolio fixtures (fixed and short-id rows).
+sql "
+DELETE FROM entitlements WHERE resource_id LIKE 'prd_resource_browser_%'
+  OR resource_id LIKE 'prd_paid_resource_browser_%'
+  OR resource_id LIKE 'prd_portfolio_%'
+  OR resource_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
+DELETE FROM resource_release_watches WHERE product_id LIKE 'prd_resource_browser_%'
+  OR product_id LIKE 'prd_paid_resource_browser_%'
+  OR product_id LIKE 'prd_portfolio_%'
+  OR product_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
+DELETE FROM resource_release_events WHERE product_id LIKE 'prd_resource_browser_%'
+  OR product_id LIKE 'prd_paid_resource_browser_%'
+  OR product_id LIKE 'prd_portfolio_%'
+  OR product_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
+DELETE FROM library_collection_items WHERE product_id LIKE 'prd_resource_browser_%'
+  OR product_id LIKE 'prd_paid_resource_browser_%'
+  OR product_id LIKE 'prd_portfolio_%'
+  OR product_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
+DELETE FROM licenses WHERE product_id LIKE 'prd_resource_browser_%'
+  OR product_id LIKE 'prd_paid_resource_browser_%'
+  OR product_id LIKE 'prd_portfolio_%'
+  OR product_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
+DELETE FROM builds WHERE product_id LIKE 'prd_resource_browser_%'
+  OR product_id LIKE 'prd_paid_resource_browser_%'
+  OR product_id LIKE 'prd_portfolio_%'
+  OR product_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
+DELETE FROM products WHERE id LIKE 'prd_resource_browser_%'
+  OR id LIKE 'prd_paid_resource_browser_%'
+  OR id LIKE 'prd_portfolio_%'
+  OR slug LIKE 'author-cabinet-%'
+  OR author_id LIKE 'usr_resource_browser_%'
+  OR author_id IN ('usr_portfolio_ci','usr_portfolio_other_ci');
+DELETE FROM servers WHERE id LIKE 'srv_claim_browser_%' OR slug LIKE 'claim-browser-%';
+DELETE FROM content WHERE id LIKE 'cnt_portfolio_%';
+DELETE FROM organizations WHERE id IN ('org_portfolio_ci','org_portfolio_other_ci');
+DELETE FROM users WHERE id LIKE 'usr_resource_browser_%'
+  OR id IN ('usr_portfolio_ci','usr_portfolio_other_ci');
+" > /dev/null
 
 sql "
 INSERT INTO users (
@@ -197,7 +236,11 @@ echo "::add-mask::$NEXUS_AUTHOR_BROWSER_PASSWORD"
 for role in developer moderator; do
   if [[ "$role" == developer ]]; then account_email="$NEXUS_AUTHOR_BROWSER_EMAIL"; else account_email="$NEXUS_MODERATOR_BROWSER_EMAIL"; fi
   account_json=$(ACCOUNT_EMAIL="$account_email" ACCOUNT_USERNAME="cabinet_${role}_$short" node -e 'process.stdout.write(JSON.stringify({email:process.env.ACCOUNT_EMAIL,username:process.env.ACCOUNT_USERNAME,password:process.env.NEXUS_AUTHOR_BROWSER_PASSWORD}))')
-  "${https[@]}" --fail -H 'Content-Type: application/json' --data "$account_json" "https://$domain:8443/api/auth/register" > "$work/cabinet-$role.json"
+  "${https[@]}" --fail \
+    -H 'Content-Type: application/json' \
+    -H "Origin: https://$domain:8443" \
+    --data "$account_json" \
+    "https://$domain:8443/api/auth/register" > "$work/cabinet-$role.json"
   sql "UPDATE users SET role = '$role' WHERE email = '$account_email';" > /dev/null
 done
 

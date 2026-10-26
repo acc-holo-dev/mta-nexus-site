@@ -73,7 +73,7 @@ BEGIN
           RAISE EXCEPTION 'Invalid selected collection copy shape' USING ERRCODE='23514';
         END IF;
         SELECT * INTO source FROM library_collections WHERE id=NEW.command->>'sourceCollectionId' AND user_id=NEW.user_id FOR SHARE;
-        IF source.id IS NULL OR source.id=c.id OR (NEW.command->>'expectedSourceRevision')::numeric<>source.revision-CASE WHEN action='move-items' THEN 1 ELSE 0 END THEN
+        IF source.id IS NULL OR source.id=c.id OR (NEW.command->>'expectedSourceRevision')::numeric<>source.revision-(CASE WHEN action='move-items' THEN 1 ELSE 0 END) THEN
           RAISE EXCEPTION 'Selected collection transfer must match its owned source revision' USING ERRCODE='23514';
         END IF;
         IF action='move-items' AND (source.status<>'active' OR (SELECT count(*) FROM library_collection_receipts r WHERE r.user_id=NEW.user_id AND (r.collection_id=source.id OR (r.command->>'action'='move-items' AND r.command->>'sourceCollectionId'=source.id)))>=5000) THEN

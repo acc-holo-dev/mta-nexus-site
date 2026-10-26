@@ -369,7 +369,13 @@ it("requires the recorded source successor when confirming a move and excludes t
     "utf8",
   );
   expect(migration).toContain("Move receipt must prove removal from its source");
-  expect(migration).toContain("source.revision-CASE WHEN action='move-items' THEN 1 ELSE 0 END");
+  // Parentheses are required: bare `revision-CASE ... END THEN` is a PL/pgSQL parse error.
+  expect(migration).toContain(
+    "source.revision-(CASE WHEN action='move-items' THEN 1 ELSE 0 END)",
+  );
+  expect(migration).not.toContain(
+    "source.revision-CASE WHEN action='move-items' THEN 1 ELSE 0 END THEN",
+  );
   expect(migration).toContain("library_collection_receipts_source_history_idx");
   expect(migration).toContain("user_id=NEW.user_id");
   const journal = JSON.parse(readFileSync("packages/db/migrations/meta/_journal.json", "utf8"));

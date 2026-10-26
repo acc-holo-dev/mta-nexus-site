@@ -33,6 +33,7 @@ function jsonRequest(path, body) {
     const json = JSON.stringify(body);
     const req = request({ ...options, path, method: "POST", headers: {
       "Content-Type": "application/json", "Content-Length": Buffer.byteLength(json),
+      Origin: "https://nexus-ci.test:8443",
       ...(cookie ? { Cookie: cookie } : {}),
     } }, res => {
       const chunks = [];

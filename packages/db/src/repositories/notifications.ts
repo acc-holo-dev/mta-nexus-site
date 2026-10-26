@@ -68,8 +68,10 @@ export class NotificationRepository {
         let window: { from: string; until: string } | undefined;
         if (period !== "all") {
           const anchor = sql`coalesce(${at ?? null}::timestamptz,statement_timestamp())`;
+          // Parenthesize ${value}: bare `expr at time zone` binds AT TIME ZONE to an
+          // interval operand when value is `anchor - n * interval '24 hours'`.
           const timestamp = (value: ReturnType<typeof sql>) =>
-            sql<string>`to_char(${value} at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`;
+            sql<string>`to_char((${value}) at time zone 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"')`;
           const [clock] = await tx
             .select({
               serverNow: timestamp(sql`statement_timestamp()`),

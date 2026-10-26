@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, eq, gt, lt, lte, or, isNull, sql } from "drizzle-orm";
 import { describe, expect, it, vi } from "vitest";
 import {
   db,
@@ -8,6 +8,8 @@ import {
   userRepository,
   webPushOutbox,
   webPushSubscriptionRepository,
+  webPushWorkerRepository,
+  WEB_PUSH_MAX_ATTEMPTS,
 } from "@nexus/db";
 import { WebPushDispatcher } from "../packages/db/src/repositories/web-push-dispatcher";
 import type {
@@ -83,9 +85,46 @@ describe("Web Push concurrent worker soak", () => {
       },
     );
 
+    // Scope candidates to this fixture subscription so leftover outbox rows
+    // from concurrent suites cannot inflate accepted counts.
+    const scopedWorker = {
+      candidates: async (limit = 20) => {
+        const rows = await db
+          .select({ id: webPushOutbox.id })
+          .from(webPushOutbox)
+          .where(
+            and(
+              eq(webPushOutbox.subscriptionId, subscriptionId),
+              lte(webPushOutbox.availableAt, sql`clock_timestamp()`),
+              or(
+                isNull(webPushOutbox.leaseExpiresAt),
+                lte(webPushOutbox.leaseExpiresAt, sql`clock_timestamp()`),
+              ),
+              gt(webPushOutbox.expiresAt, sql`clock_timestamp()`),
+              lt(webPushOutbox.attempts, WEB_PUSH_MAX_ATTEMPTS),
+            ),
+          )
+          .orderBy(webPushOutbox.availableAt, webPushOutbox.id)
+          .limit(limit);
+        return rows.map((row) => row.id);
+      },
+      claim: (id: string) => webPushWorkerRepository.claim(id),
+      prepare: (lease: Parameters<typeof webPushWorkerRepository.prepare>[0]) =>
+        webPushWorkerRepository.prepare(lease),
+      settle: (
+        ...args: Parameters<typeof webPushWorkerRepository.settle>
+      ) => webPushWorkerRepository.settle(...args),
+      discardStaleSubscription: (
+        ...args: Parameters<
+          typeof webPushWorkerRepository.discardStaleSubscription
+        >
+      ) => webPushWorkerRepository.discardStaleSubscription(...args),
+      discardUnavailable: async () => 0,
+    };
+
     const workers = Array.from(
       { length: 4 },
-      () => new WebPushDispatcher({ sender }),
+      () => new WebPushDispatcher({ sender, worker: scopedWorker }),
     );
     const summaries = await Promise.all(
       workers.map((dispatcher) =>

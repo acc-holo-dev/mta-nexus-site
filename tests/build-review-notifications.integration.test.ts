@@ -16,6 +16,7 @@ import { auditEvents, builds, organizationMembers, organizations } from "../pack
 async function fixture() {
   const suffix = randomBytes(6).toString("hex");
   const authorId = `usr_review_${suffix}`;
+  const moderatorId = `usr_review_mod_${suffix}`;
   const productId = `prd_review_${suffix}`;
   const buildId = `bld_review_${suffix}`;
   const sessionId = `ses_review_${suffix}`;
@@ -26,6 +27,13 @@ async function fixture() {
     username: `review_${suffix}`,
     displayName: "Review Author",
     role: "developer",
+  });
+  await userRepository.create({
+    id: moderatorId,
+    email: `mod_${suffix}@example.invalid`,
+    username: `review_mod_${suffix}`,
+    displayName: "Review Moderator",
+    role: "moderator",
   });
   await sessionRepository.create({
     id: sessionId,
@@ -80,7 +88,7 @@ async function fixture() {
   });
   const audit = (suffix = "decision") => ({
     id: `aud_${buildId}_${suffix}`,
-    actorId: authorId,
+    actorId: moderatorId,
     actorType: "admin" as const,
     action: "build.approved",
     targetId: buildId,
@@ -89,6 +97,7 @@ async function fixture() {
   });
   return {
     authorId,
+    moderatorId,
     productId,
     buildId,
     subscriptionId,
@@ -162,7 +171,7 @@ it("keeps a rejection successful when system notifications are disabled", async 
 
 it("rolls back build, product and audit when notification storage fails, then permits retry", async () => {
   const f = await fixture();
-  const id = `ntf_build_review_${f.buildId}_${f.authorId}`;
+  const id = `ntf_build_review_${f.buildId}_r2_${f.authorId}`;
   await notificationRepository.create({
     id,
     recipientId: f.authorId,

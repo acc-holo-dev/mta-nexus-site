@@ -3,6 +3,7 @@ import { mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { randomBytes, createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
+import { notificationInboxCopy } from "../../apps/web/src/lib/notification-inbox-copy.ts";
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
@@ -32,12 +33,43 @@ async function logout(page) {
   const status = await page.evaluate(async () => (await fetch("/api/auth/session", { method: "DELETE" })).status);
   assert.equal(status, 200);
 }
-async function moderate(page, buildId, action, notes) {
+async function moderate(page, buildId, action, notes, expectedRevision) {
+  assert.equal(typeof expectedRevision, "number");
   const result = await page.evaluate(async (body) => {
     const response = await fetch("/api/admin/actions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     return { status: response.status, body: await response.json() };
-  }, { targetType: "build", targetId: buildId, action, notes });
+  }, { targetType: "build", targetId: buildId, action, notes, expectedRevision });
   assert.equal(result.status, 200, JSON.stringify(result.body));
+}
+
+/** Metadata edits withdraw pending builds to draft and bump revision; re-queue before moderation. */
+async function ensurePendingReview(page, productId, buildId) {
+  const detail = await page.evaluate(async ({ productId, buildId }) => {
+    const response = await fetch(`/api/products/${productId}/builds/${buildId}`);
+    return { status: response.status, body: await response.json() };
+  }, { productId, buildId });
+  assert.equal(detail.status, 200, JSON.stringify(detail.body));
+  const live = detail.body.build;
+  assert.equal(typeof live?.revision, "number", JSON.stringify(detail.body));
+  if (live.status === "pending_review") return live;
+  assert.equal(live.status, "draft", JSON.stringify(live));
+  const submitted = await page.evaluate(async ({ productId, buildId, expectedRevision }) => {
+    const response = await fetch(`/api/products/${productId}/builds/${buildId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "submit",
+        expectedRevision,
+        reason: "Resubmit after metadata edits for acceptance review.",
+      }),
+    });
+    return { status: response.status, body: await response.json() };
+  }, { productId, buildId, expectedRevision: live.revision });
+  assert.equal(submitted.status, 200, JSON.stringify(submitted.body));
+  const build = submitted.body.build;
+  assert.equal(build?.status, "pending_review", JSON.stringify(submitted.body));
+  assert.equal(typeof build.revision, "number");
+  return build;
 }
 
 test("author creates, edits, submits versions, reads moderation and retires a publication", async ({ page, browser }) => {
@@ -49,7 +81,8 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("dialog", async (dialog) => {
-    if (dialog.type() === "beforeunload") await dialog.accept();
+    // Inbox mark-all and similar confirmations must proceed; only dismiss unknown prompts.
+    if (dialog.type() === "beforeunload" || dialog.type() === "confirm") await dialog.accept();
     else {
       errors.push(`Unexpected ${dialog.type()} dialog: ${dialog.message()}`);
       await dialog.dismiss();
@@ -278,14 +311,18 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   // Another authenticated client changes this same resource after our draft.
   const draftRevision = await page.evaluate(key => JSON.parse(sessionStorage.getItem(key)).baseUpdatedAt, draftKey);
   const concurrentTitle = `${title} changed elsewhere`;
-  const concurrent = await page.evaluate(async ({ id, title, original }) => {
+  const concurrent = await page.evaluate(async ({ id, title, original, revision }) => {
     const response = await fetch(`/api/products/${id}`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" },
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "If-Match": JSON.stringify(new Date(revision).toISOString()),
+      },
       body: JSON.stringify({ title, shortDescription: original.shortDescription ?? "",
         description: original.description, tags: original.tags ?? [] }),
     });
     return { status: response.status, body: await response.json() };
-  }, { id: product.id, title: concurrentTitle, original: product });
+  }, { id: product.id, title: concurrentTitle, original: product, revision: draftRevision });
   assert.equal(concurrent.status, 200, JSON.stringify(concurrent.body));
   assert.equal(concurrent.body.product.title, concurrentTitle);
   const staleResponse = page.waitForResponse(response => response.url() === metadataUrl && response.request().method() === "PATCH");
@@ -336,11 +373,16 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   const forbidden = await outsider.evaluate(async (id) => (await fetch(`/api/products/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: "{}" })).status, product.id);
   assert.equal(forbidden, 404);
   evidence.push("Unauthenticated and unrelated moderator access denied.");
-  await moderate(outsider, build.id, "approve", "Approved author acceptance version one.");
-  const repeated = await outsider.evaluate(async (buildId) => (await fetch("/api/admin/actions", {
+  // Metadata saves withdraw pending builds to draft and bump revision; re-queue before approve.
+  const pendingFirst = await ensurePendingReview(page, product.id, build.id);
+  evidence.push("After metadata edits, the withdrawn first build was resubmitted for review at its live revision.");
+  await moderate(outsider, pendingFirst.id, "approve", "Approved author acceptance version one.", pendingFirst.revision);
+  const repeated = await outsider.evaluate(async ({ buildId, expectedRevision }) => (await fetch("/api/admin/actions", {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ targetType: "build", targetId: buildId, action: "approve", notes: "Repeat approval" }),
-  })).status, build.id);
+    body: JSON.stringify({
+      targetType: "build", targetId: buildId, action: "approve", notes: "Repeat approval", expectedRevision,
+    }),
+  })).status, { buildId: pendingFirst.id, expectedRevision: pendingFirst.revision });
   assert.equal(repeated, 409);
   await page.goto("/notifications");
   const approvalCard = page.locator("article").filter({ has: page.getByRole("heading", { name: "Resource version approved", exact: true }) });
@@ -419,10 +461,13 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await expect.poll(() => page.evaluate(key => sessionStorage.getItem(key), draftKey)).toBe(null);
   assert(await page.evaluate(keys => keys.every(key => sessionStorage.getItem(key) !== null), foreignKeys));
   evidence.push("A genuine upload cleared its own submitted draft and file while preserving unrelated scoped drafts.");
-  await moderate(outsider, second.id, "reject", "Rejected second version: update the manifest.");
+  await moderate(outsider, second.id, "reject", "Rejected second version: update the manifest.", second.revision);
   await page.goto("/notifications");
   await expect(page.getByRole("heading", { name: "Resource version rejected", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Mark all as read", exact: true }).click();
+  const inboxCopy = notificationInboxCopy("en");
+  const markAll = page.getByRole("button", { name: inboxCopy.markAllRead, exact: true });
+  await expect(markAll).toBeVisible();
+  await markAll.click();
   await expect.poll(async () => page.evaluate(async () => (await (await fetch("/api/notifications")).json()).unreadCount)).toBe(0);
   await page.getByRole("button", { name: "Language", exact: true }).click();
   await page.reload();

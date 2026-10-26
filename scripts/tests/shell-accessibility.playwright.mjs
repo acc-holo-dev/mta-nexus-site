@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { getDictionary } from "../../apps/web/src/lib/i18n.ts";
+import { discoveryCopy } from "../../apps/web/src/lib/discovery-copy.ts";
 import { assertAxeAccessibility } from "../axe-accessibility.mjs";
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
@@ -383,10 +384,18 @@ async function assertVisibleFocusIndicator(locator, label) {
       style.outlineStyle !== "none" &&
       outlineWidth >= 2 &&
       !transparent.has(style.outlineColor);
-    const hasBoxShadow =
-      Boolean(style.boxShadow) &&
-      style.boxShadow !== "none" &&
-      !style.boxShadow.includes("0px 0px 0px 0px");
+    // Do not reject a visible 2px ring just because another layer is 0px 0px 0px 0px.
+    const hasBoxShadow = (() => {
+      const boxShadow = style.boxShadow;
+      if (!boxShadow || boxShadow === "none") return false;
+      for (const layer of boxShadow.split(/,(?![^(]*\))/u)) {
+        const lengths = [...layer.matchAll(/(-?\d*\.?\d+)px/gu)].map((match) =>
+          Number(match[1]),
+        );
+        if (lengths.some((value) => Math.abs(value) > 0)) return true;
+      }
+      return false;
+    })();
 
     return {
       focused: document.activeElement === element,
@@ -429,6 +438,7 @@ for (const locale of ["en", "ru"]) {
     test.setTimeout(120_000);
     const dictionary = getDictionary(locale);
     const discoverCopy = dictionary.discover;
+    const directoryCopy = discoveryCopy(locale);
     await page.emulateMedia({ reducedMotion: "reduce" });
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
@@ -454,9 +464,16 @@ for (const locale of ["en", "ru"]) {
       probe.remove();
       return result;
     });
-    assert.equal(reducedMotion.animationDuration, "0.01ms");
+    const durationMs = (value) => {
+      const match = String(value).trim().match(/^(-?[\d.eE+-]+)(ms|s)$/u);
+      assert(match, `unexpected CSS duration: ${value}`);
+      const amount = Number(match[1]);
+      assert(Number.isFinite(amount), `unexpected CSS duration: ${value}`);
+      return match[2] === "s" ? amount * 1000 : amount;
+    };
+    assert.equal(durationMs(reducedMotion.animationDuration), 0.01);
     assert.equal(reducedMotion.animationIterationCount, "1");
-    assert.equal(reducedMotion.transitionDuration, "0.01ms");
+    assert.equal(durationMs(reducedMotion.transitionDuration), 0.01);
     assert.equal(reducedMotion.scrollBehavior, "auto");
     evidence.push(
       `${locale}: reduced-motion media query stops repeated animation, shortens transitions and disables smooth scrolling`,
@@ -496,15 +513,19 @@ for (const locale of ["en", "ru"]) {
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/discover\?type=resources(?:&.*)?$/u);
 
+    // Landmark uses discovery-copy filter label; the searchbox is named by discover.searchLabel.
     const discoverSearch = page.getByRole("search", {
-      name: discoverCopy.searchLabel,
+      name: directoryCopy.filter,
       exact: true,
     });
+    await expect(discoverSearch).toBeVisible();
     const input = discoverSearch.getByRole("searchbox", {
       name: discoverCopy.searchLabel,
       exact: true,
     });
-    await input.focus();
+    await expect(input).toBeVisible();
+    await expect(input).toBeEnabled();
+    await input.click();
     await expect(input).toBeFocused();
     await input.fill(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE);
     await page.keyboard.press("Enter");
@@ -1053,9 +1074,16 @@ for (const locale of ["en", "ru"]) {
     await expect(settingsLink).toBeFocused();
 
     await page.goto("/support");
-    const supportCategory = page.getByLabel(dictionary.support.category);
-    const supportSubject = page.getByLabel(dictionary.support.subject);
-    const supportMessage = page.getByLabel(dictionary.support.message);
+    const supportForm = page.locator("form").filter({
+      has: page.getByRole("heading", {
+        level: 2,
+        name: dictionary.support.newCase,
+        exact: true,
+      }),
+    });
+    const supportCategory = supportForm.getByLabel(dictionary.support.category);
+    const supportSubject = supportForm.getByLabel(dictionary.support.subject);
+    const supportMessage = supportForm.getByLabel(dictionary.support.message);
     await supportCategory.focus();
     await page.keyboard.press("Tab");
     await expect(supportSubject).toBeFocused();

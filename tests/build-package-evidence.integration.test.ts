@@ -145,9 +145,14 @@ it("retains immutable byte evidence across metadata edits and rejects report/has
         .set({ sha256Hash: "0".repeat(64) })
         .where(eq(builds.id, f.current.build.id)),
     ).rejects.toThrow();
+    // release_notes may change only when OLD.status in (draft,rejected) and NEW=draft.
     await db
       .update(builds)
-      .set({ status: "draft", releaseNotes: "Editorial correction" })
+      .set({ status: "draft" })
+      .where(eq(builds.id, f.current.build.id));
+    await db
+      .update(builds)
+      .set({ releaseNotes: "Editorial correction" })
       .where(eq(builds.id, f.current.build.id));
     expect(
       (await db.select().from(builds).where(eq(builds.id, f.current.build.id)))[0]?.packageEvidence,

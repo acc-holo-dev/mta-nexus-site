@@ -43,7 +43,12 @@ test("package evidence upgrade preserves unknown historical bytes and immutable 
   assert.match(migration, /NEW\.package_evidence IS DISTINCT FROM OLD\.package_evidence/u);
   assert.match(migration, /BEFORE UPDATE ON builds/u);
   assert.doesNotMatch(migration, /UPDATE (builds|products|orders|payments)|DELETE FROM|INSERT INTO/u);
-  assert.match(readFileSync(script, "utf8"), /buildPackageEvidenceSchemaPresent = true/u);
+  const rehearsal = readFileSync(script, "utf8");
+  assert.match(rehearsal, /buildPackageEvidenceSchemaPresent = true/u);
+  assert.match(
+    rehearsal,
+    /to_jsonb\(t\) - 'quarantine_previous_status' - 'quarantine_reason' - 'quarantined_at' - 'quarantined_by' - 'revision' - 'package_evidence'/u,
+  );
 });
 
 test("cart receipt migration preserves earlier uncertainty and immutable account-scoped evidence", () => {
@@ -219,7 +224,7 @@ test("upgrade contract tracks the latest real migration journal", () => {
 test("upgrade contract requires the filtered staff queue migration", () => {
   const journal = JSON.parse(readFileSync(journalUrl, "utf8"));
   const plan = releaseUpgradePlan(journal);
-  assert.equal(plan.targetTag, "0067_library_collections");
+  assert.equal(plan.targetTag, "0078_library_collection_reconciliation");
 
   const indexMigration = readFileSync(
     new URL("0032_support_staff_filter_index.sql", migrationsUrl),

@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import {
   PRODUCTION_UPLOAD_ENVELOPE_BYTES,
+  assertProductionOfflineCacheVary,
   assertProductionUploadBodyLimit,
   localCertificateConfig,
   assertIsolatedProduction,
@@ -18,7 +19,7 @@ const fixture = () => ({
       build: { target: 'runtime' },
       environment: {
         NODE_ENV: 'production',
-        NEXT_PUBLIC_APP_URL: 'https://nexus-ci.test',
+        NEXT_PUBLIC_APP_URL: 'https://nexus-ci.test:8443',
         BUILD_SCANNER: 'clamav',
         EMAIL_PROVIDER: 'disabled',
       },
@@ -28,7 +29,11 @@ const fixture = () => ({
       image: 'nexus-ci:test',
       restart: 'unless-stopped',
       user: 'node',
-      environment: { HOME: '/tmp', TMPDIR: '/tmp' },
+      environment: {
+        HOME: '/tmp',
+        TMPDIR: '/tmp',
+        NEXT_PUBLIC_APP_URL: 'https://nexus-ci.test:8443',
+      },
       read_only: true,
       init: true,
       cap_drop: ['ALL'],
@@ -37,6 +42,18 @@ const fixture = () => ({
       stop_signal: 'SIGTERM',
       stop_grace_period: '1m15s',
       tmpfs: ['/tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777'],
+    },
+    'license-worker': {
+      image: 'nexus-ci:test',
+      restart: 'no',
+      user: 'node',
+      init: true,
+    },
+    'resource-release-worker': {
+      image: 'nexus-ci:test',
+      restart: 'no',
+      user: 'node',
+      init: true,
     },
     postgres: { restart: 'no' }, clamav: { restart: 'no' },
     caddy: { restart: 'no', ports: [
@@ -102,12 +119,30 @@ test('requires matching declared-length and streaming limits', () => {
   assert.throws(() => assertProductionUploadBodyLimit(source.replace('respond @oversized_body "Request body too large" 413', '')));
 });
 
+test('re-attaches Vary Cookie at the production proxy', () => {
+  const source = readFileSync('deploy/Caddyfile', 'utf8');
+  assert.doesNotThrow(() => assertProductionOfflineCacheVary(source));
+  assert.throws(
+    () => assertProductionOfflineCacheVary(source.replace('header_down +Vary Cookie', 'header_down +Vary Accept-Encoding')),
+    /Vary: Cookie/u,
+  );
+  assert.throws(
+    () => assertProductionOfflineCacheVary(source.replace('header_down +Vary Cookie', '')),
+    /Vary: Cookie/u,
+  );
+});
+
 test('live smoke checks both sides of the declared upload boundary', () => {
   const source = readFileSync('scripts/check-production-startup.sh', 'utf8');
   assert.match(source, /truncate -s \$\(\(proxy_upload_limit \+ 1\)\)/u);
   assert.match(source, /truncate -s "\$proxy_upload_limit"/u);
   assert.match(source, /\[\[ \$at_limit_code == 405 \]\]/u);
   assert.match(source, /\[\[ \$oversized_code == 413 \]\]/u);
+  assert.match(
+    source,
+    /Origin: https:\/\/\$domain:8443/u,
+    'exact-limit health POST must present the published HTTPS Origin so CSRF does not mask the 405',
+  );
 });
 
 test('production smoke proves offline-cache opt-in disappears when a session cookie is present', () => {

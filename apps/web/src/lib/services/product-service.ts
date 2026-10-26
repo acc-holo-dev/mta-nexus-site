@@ -152,8 +152,13 @@ export class ProductService {
 
   async getProductById(id: string): Promise<Product | null> {
     const product = await productRepository.findById(id);
-    if (product?.price !== 0 || product.status !== "published") {
+    if (!product || product.status !== "published") {
       return null;
+    }
+    // Paid listings stay off the public market, but ID lookups must still
+    // surface published paid metadata so /acquire can fail closed.
+    if (product.price !== 0) {
+      return product;
     }
     const build = await buildRepository.findLatestPublishedByProduct(product.id);
     return build ? product : null;

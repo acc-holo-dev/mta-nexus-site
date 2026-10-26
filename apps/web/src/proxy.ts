@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { rejectUnsafeBrowserRequest } from "./src/lib/browser-request-guard";
-import { isLicenseRuntimeRequest } from "./src/lib/browser-request-policy";
+import { rejectUnsafeBrowserRequest } from "./lib/browser-request-guard";
+import { isLicenseRuntimeRequest } from "./lib/browser-request-policy";
 import {
   appendVaryHeader,
   isOfflineCacheablePublicPath,
   PUBLIC_OFFLINE_CACHE_HEADER,
   PUBLIC_OFFLINE_CACHE_MARKER,
-} from "./src/lib/offline-cache-policy";
+} from "./lib/offline-cache-policy";
 
 export function proxy(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/api/") && !isLicenseRuntimeRequest(request.nextUrl.pathname)) {
@@ -27,6 +27,8 @@ export function proxy(request: NextRequest) {
     PUBLIC_OFFLINE_CACHE_HEADER,
     PUBLIC_OFFLINE_CACHE_MARKER,
   );
+  // App Router may replace Proxy Vary with RSC fields; production Caddy
+  // re-attaches Cookie on proxied responses (deploy/Caddyfile).
   response.headers.set(
     "Vary",
     appendVaryHeader(response.headers.get("Vary"), "Cookie"),
@@ -44,4 +46,3 @@ export const config = {
     "/terms",
   ],
 };
-

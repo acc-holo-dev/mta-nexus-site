@@ -23,6 +23,8 @@ function hasSafePublishedBuild() {
 
 /** Same scope for listing, private reads and audited metadata writes. */
 export function managedProductCondition(actor: Pick<User, "id" | "role">): SQL {
+  // Admin scope is always rechecked against the live users row — never trust a
+  // claimed actor.role alone (session may be stale relative to role changes).
   return sql`(
     exists (select 1 from ${users} where ${users.id} = ${actor.id} and ${users.role} = 'admin')
     or (${products.organizationId} is null and ${products.authorId} = ${actor.id})

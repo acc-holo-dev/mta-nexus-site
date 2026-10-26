@@ -114,9 +114,10 @@ describe("Web Push worker repository", () => {
       .select({ availableAt: webPushOutbox.availableAt })
       .from(webPushOutbox)
       .where(eq(webPushOutbox.id, f.jobId));
-    expect(deferred?.availableAt.getTime()).toBeGreaterThan(
-      Date.now() + 45_000,
-    );
+    // Attempt-1 backoff is BACKOFF_MS[0]=5000 with jitter ~0.8–1.2 → ~4–6s.
+    const deferredAt = deferred?.availableAt.getTime() ?? 0;
+    expect(deferredAt).toBeGreaterThan(Date.now() + 3_000);
+    expect(deferredAt).toBeLessThan(Date.now() + 10_000);
 
     await db
       .update(webPushOutbox)

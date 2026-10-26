@@ -103,15 +103,25 @@ describe("public resource availability", () => {
     },
   );
 
-  it.each([
-    product({ status: "draft" }),
-    product({ price: 100 }),
-  ])("rejects non-public products before build lookup", async (value) => {
+  it("rejects draft products before build lookup", async () => {
+    const value = product({ status: "draft" });
     productRepository.findBySlug.mockResolvedValue(value);
     productRepository.findById.mockResolvedValue(value);
 
     await expect(service.getProductBySlug(value.slug)).resolves.toBeNull();
     await expect(service.getProductById(value.id)).resolves.toBeNull();
+    expect(
+      buildRepository.findLatestPublishedByProduct,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("keeps paid products off slug market lookup but exposes them by id for acquire", async () => {
+    const value = product({ price: 100 });
+    productRepository.findBySlug.mockResolvedValue(value);
+    productRepository.findById.mockResolvedValue(value);
+
+    await expect(service.getProductBySlug(value.slug)).resolves.toBeNull();
+    await expect(service.getProductById(value.id)).resolves.toEqual(value);
     expect(
       buildRepository.findLatestPublishedByProduct,
     ).not.toHaveBeenCalled();

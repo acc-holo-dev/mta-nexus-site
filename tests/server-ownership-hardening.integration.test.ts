@@ -173,7 +173,7 @@ describe("server ownership hardening integration", () => {
     );
     expect(outsiderUpdate.status).toBe(403);
     expect(await outsiderUpdate.json()).toMatchObject({
-      error: "You do not manage this server",
+      error: "Server manager required",
     });
   });
 

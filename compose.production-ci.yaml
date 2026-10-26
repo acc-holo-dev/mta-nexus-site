@@ -7,11 +7,21 @@ services:
       target: runtime
     restart: "no"
     environment:
+      # Published TLS is :8443 → :443; browser Origin includes the client port.
+      NEXT_PUBLIC_APP_URL: https://nexus-ci.test:8443
       ACCOUNT_MAIL_KEY_ID: ci
       ACCOUNT_MAIL_KEY: ${NEXUS_CI_ACCOUNT_MAIL_KEY:?use scripts/check-production-startup.sh}
       ACCOUNT_RECOVERY_ABUSE_KEY: ${NEXUS_CI_ACCOUNT_RECOVERY_ABUSE_KEY:?use scripts/check-production-startup.sh}
   push-worker:
     image: ${NEXUS_CI_IMAGE:?use scripts/check-production-startup.sh}
+    environment:
+      NEXT_PUBLIC_APP_URL: https://nexus-ci.test:8443
+  license-worker:
+    image: ${NEXUS_CI_IMAGE:?use scripts/check-production-startup.sh}
+    restart: "no"
+  resource-release-worker:
+    image: ${NEXUS_CI_IMAGE:?use scripts/check-production-startup.sh}
+    restart: "no"
   postgres:
     restart: "no"
   clamav:

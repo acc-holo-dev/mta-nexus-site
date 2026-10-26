@@ -347,7 +347,12 @@ test("J5 claim -> workspace -> download exact published build", async ({
           cancel() { window.nexusDownloadCancelled = true; },
         });
         return Promise.resolve(new Response(body, {
-          headers: { "Content-Length": "8", "Content-Type": "application/zip" },
+          headers: {
+            "Content-Length": "8",
+            "Content-Type": "application/zip",
+            // Download client rejects responses without a checksum before progress updates.
+            "X-Content-SHA256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          },
         }));
       };
     }, productId);
@@ -484,7 +489,12 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({
     await expect(summary.getByText("Resource", { exact: true })).toBeVisible();
     await expect(summary.getByText("Price", { exact: true })).toBeVisible();
     await expect(summary.getByText("Version", { exact: true })).toBeVisible();
-    await expect(summary.getByText("$25.00", { exact: true })).toBeVisible();
+    // Price and Library cost both render the same amount.
+    await expect(summary.getByText("$25.00", { exact: true })).toHaveCount(2);
+    await expect(
+      summary.locator("div").filter({ has: page.getByText("Price", { exact: true }) })
+        .getByText("$25.00", { exact: true }),
+    ).toBeVisible();
 
     for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: 844 });

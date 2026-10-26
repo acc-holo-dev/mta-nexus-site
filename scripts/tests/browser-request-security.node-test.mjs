@@ -38,6 +38,12 @@ test("supports legacy same-origin Referer and modern metadata-only requests", ()
   assert.equal(decide({ "sec-fetch-site": "same-origin" }).allowed, true);
   assert.equal(decide({ origin: "https://nexus.test" }).allowed, true);
 });
+test("published non-default HTTPS ports must match the canonical origin exactly", () => {
+  const ci = { NEXT_PUBLIC_APP_URL: "https://nexus-ci.test:8443" };
+  assert.equal(decide({ origin: "https://nexus-ci.test:8443" }, "POST", ci).allowed, true);
+  assert.equal(decide({ origin: "https://nexus-ci.test" }, "POST", ci).allowed, false);
+  assert.equal(decide({ origin: "https://nexus-ci.test:8443" }).allowed, false);
+});
 for (const referer of ["https://evil.test/settings", "null", "https://nexus.test.evil.test", "https://user@nexus.test/path"]) {
   test(`rejects invalid Referer fallback ${referer}`, () => {
     assert.equal(decide({ referer, "sec-fetch-site": "same-origin" }).allowed, false);

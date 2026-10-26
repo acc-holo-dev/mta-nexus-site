@@ -15,6 +15,7 @@ import { getRequestLocale } from "../../lib/i18n-server";
 import { getCommerceHistoryCopy } from "../../lib/commerce-history-i18n";
 import { getLibraryCopy } from "../../lib/library-view";
 import { getManagedServerCopy } from "../../lib/managed-server-view";
+import { formatHistoryDate } from "../../lib/commerce-history-format";
 import { ManagedServerCard } from "../../components/managed-server-card";
 import { reactionCopy } from "../../lib/content-reaction-copy";
 import { ownDiscussionCopy } from "../../lib/discussion-workspace-copy";
@@ -80,8 +81,6 @@ export default async function WorkspacePage() {
       const observation = liveByServerId.get(server.id);
       return mtaLiveStatus(observation, false) === "offline" || observation?.players != null;
     });
-  const dateLocale = locale === "ru" ? "ru-RU" : "en-US";
-
   return (
     <div className="space-y-8">
       <header className="flex flex-col justify-between gap-4 border-b border-base pb-6 md:flex-row md:items-center">
@@ -207,7 +206,9 @@ export default async function WorkspacePage() {
                     </div>
                     <div className="text-xs text-faint">
                       {dictionary.workspace.added}{" "}
-                      {entitlement.addedAt.toLocaleDateString(dateLocale)}
+                      <time dateTime={new Date(entitlement.addedAt).toISOString()}>
+                        {formatHistoryDate(new Date(entitlement.addedAt), locale)}
+                      </time>
                     </div>
                   </div>
                   {entitlement.downloadable && entitlement.slug && (
