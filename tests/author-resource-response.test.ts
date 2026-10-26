@@ -119,6 +119,7 @@ describe("author resource client mutation policy", () => {
     const signal = new AbortController().signal;
     const request = authorBuildRetireRequest(
       "No longer supported",
+      3,
       signal,
     );
 
@@ -131,6 +132,7 @@ describe("author resource client mutation policy", () => {
       },
       body: JSON.stringify({
         action: "retire",
+        expectedRevision: 3,
         reason: "No longer supported",
       }),
       signal,

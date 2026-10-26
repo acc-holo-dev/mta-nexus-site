@@ -13,6 +13,7 @@ import { getResourceSubmissionErrorMessage } from "../lib/publishing-error-messa
 import { buildPackageCopy } from "../lib/build-package-i18n";
 import { getResourceCommerceCopy, resourceCommerceError } from "../lib/resource-commerce-i18n";
 import {
+  authorBuildRetireRequest,
   authorBuildUploadRequest,
   authorDetailsMutationRequest,
 } from "../lib/author-resource-requests";
@@ -23,7 +24,7 @@ import {
   type AuthorDetailsDraft, type AuthorResourceDraft,
 } from "../lib/author-resource-draft";
 import {
-  confirmedAuthorDetails, confirmedAuthorBuild,
+  confirmedAuthorDetails, confirmedAuthorBuild, confirmedRetiredBuild,
 } from "../lib/author-resource-response";
 
 const inputClass =
@@ -461,5 +462,71 @@ export function AuthorResourceForms({
         </button>
       </form>
     </div>
+  );
+}
+
+export function RetireBuildForm({
+  productId,
+  buildId,
+  version,
+  revision,
+}: {
+  productId: string;
+  buildId: string;
+  version: string;
+  revision: number;
+}) {
+  const { dictionary } = useNexusLocale();
+  const copy = dictionary.authorResources;
+  const router = useRouter();
+  const reasonId = useId();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+  async function retire(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (pending) return;
+    const reason = String(new FormData(event.currentTarget).get("reason") ?? "").trim();
+    setPending(true);
+    setError("");
+    try {
+      const response = await fetch(
+        `/api/products/${productId}/builds/${buildId}`,
+        authorBuildRetireRequest(reason, revision, AbortSignal.timeout(15_000)),
+      );
+      const body = await response.json().catch(() => null);
+      if (!confirmedRetiredBuild(response.status, body, productId, buildId)) {
+        setError(copy.retireFailed);
+        return;
+      }
+      router.refresh();
+    } catch {
+      setError(copy.retireFailed);
+    } finally {
+      setPending(false);
+    }
+  }
+  return (
+    <details className="text-sm text-secondary">
+      <summary className="cursor-pointer">{copy.retire}</summary>
+      <form onSubmit={retire} className="mt-3 space-y-3">
+        <p>{copy.retireHint}</p>
+        <div className="block space-y-1">
+          <label htmlFor={reasonId}>{copy.retireReason}</label>
+          <textarea
+            id={reasonId}
+            name="reason"
+            required
+            minLength={3}
+            maxLength={2000}
+            disabled={pending}
+            className={inputClass}
+          />
+        </div>
+        {error && <p role="alert">{error}</p>}
+        <button type="submit" disabled={pending} className={buttonClass}>
+          {pending ? copy.retiring : copy.retire}
+        </button>
+      </form>
+    </details>
   );
 }

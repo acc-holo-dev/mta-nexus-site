@@ -30,6 +30,7 @@ export function authorBuildUploadRequest(
 
 export function authorBuildRetireRequest(
   reason: string,
+  expectedRevision: number,
   signal: AbortSignal,
 ): RequestInit {
   return privateRequest({
@@ -39,6 +40,7 @@ export function authorBuildRetireRequest(
     },
     body: JSON.stringify({
       action: "retire",
+      expectedRevision,
       reason,
     }),
     signal,
