@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { Readable } from "node:stream";
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import images from "./fixtures/resource-images.json";
 
 const state = vi.hoisted(() => ({
@@ -43,10 +44,15 @@ function uploadRequest(revision = stamp, fields?: (form: FormData) => void) {
   fields?.(form);
   return new NextRequest("https://nexus.test/api/products/prd_a/media", {
     method: "POST",
+    headers: browserMutationHeaders(),
     body: form,
   });
 }
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.actor = { id: "usr_a" };
   state.rate.mockResolvedValue({ success: true });
@@ -118,7 +124,7 @@ it("read and reorder endpoints use existing inspection/content rate policies", a
   expect(state.rate).toHaveBeenCalledWith("resourceInspection", "usr_a");
   const request = new NextRequest("https://nexus.test/api/products/prd_a/media", {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: browserMutationHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({ action: "save", expectedUpdatedAt: stamp, items: [] }),
   });
   expect((await PATCH(request, context)).status).toBe(200);

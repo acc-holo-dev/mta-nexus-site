@@ -5,6 +5,7 @@ import { readBoundedJson } from "../../../../../lib/bounded-json";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { resourceMediaUpload } from "../../../../../lib/resource-media-upload-http";
 import { resourceMediaService } from "../../../../../lib/services/resource-media-service";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: NextRequest, context: Context) {
@@ -12,14 +13,14 @@ export async function GET(request: NextRequest, context: Context) {
     resourceMediaService.managed((await context.params).id, actor.id),
   );
 }
-export async function POST(request: NextRequest, context: Context) {
+export const POST = withBrowserMutation(async (request: NextRequest, context: Context) => {
   return resourceMediaUpload(request, (await context.params).id);
-}
-export async function PATCH(request: NextRequest, context: Context) {
+});
+export const PATCH = withBrowserMutation(async (request: NextRequest, context: Context) => {
   return resourceCommerceRequest(request, true, async (actor) => {
     const parsed = resourceMediaCommandSchema.safeParse(await readBoundedJson(request));
     if (!parsed.success)
       throw new AppError("Invalid gallery command", 400, "RESOURCE_MEDIA_INVALID");
     return resourceMediaService.command((await context.params).id, actor.id, parsed.data);
   });
-}
+});
