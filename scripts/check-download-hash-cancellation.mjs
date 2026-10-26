@@ -42,8 +42,13 @@ let cookie;
 async function post(path, input) {
   const response = await fetch(`http://127.0.0.1:${port}${path}`, {
     method: "POST", signal: AbortSignal.timeout(10_000),
-    headers: { "Content-Type": "application/json", "x-nexus-proxy-secret": process.env.TRUSTED_PROXY_SECRET,
-      "x-real-ip": "127.0.0.7", ...(cookie ? { Cookie: cookie } : {}) }, body: JSON.stringify(input),
+    headers: {
+      "Content-Type": "application/json",
+      Origin: process.env.NEXUS_BROWSER_BASE_URL || "https://nexus-ci.test:8443",
+      "x-nexus-proxy-secret": process.env.TRUSTED_PROXY_SECRET,
+      "x-real-ip": "127.0.0.7",
+      ...(cookie ? { Cookie: cookie } : {}),
+    }, body: JSON.stringify(input),
   });
   assert.equal(response.status, 201, `Expected successful ${path}`);
   await response.json();

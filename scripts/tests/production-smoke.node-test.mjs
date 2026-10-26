@@ -19,7 +19,7 @@ const fixture = () => ({
       build: { target: 'runtime' },
       environment: {
         NODE_ENV: 'production',
-        NEXT_PUBLIC_APP_URL: 'https://nexus-ci.test',
+        NEXT_PUBLIC_APP_URL: 'https://nexus-ci.test:8443',
         BUILD_SCANNER: 'clamav',
         EMAIL_PROVIDER: 'disabled',
       },
@@ -29,7 +29,11 @@ const fixture = () => ({
       image: 'nexus-ci:test',
       restart: 'unless-stopped',
       user: 'node',
-      environment: { HOME: '/tmp', TMPDIR: '/tmp' },
+      environment: {
+        HOME: '/tmp',
+        TMPDIR: '/tmp',
+        NEXT_PUBLIC_APP_URL: 'https://nexus-ci.test:8443',
+      },
       read_only: true,
       init: true,
       cap_drop: ['ALL'],
@@ -136,8 +140,8 @@ test('live smoke checks both sides of the declared upload boundary', () => {
   assert.match(source, /\[\[ \$oversized_code == 413 \]\]/u);
   assert.match(
     source,
-    /Origin: https:\/\/\$domain/u,
-    'exact-limit health POST must present the canonical Origin so CSRF does not mask the 405',
+    /Origin: https:\/\/\$domain:8443/u,
+    'exact-limit health POST must present the published HTTPS Origin so CSRF does not mask the 405',
   );
 });
 

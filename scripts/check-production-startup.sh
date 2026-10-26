@@ -252,7 +252,7 @@ truncate -s "$proxy_upload_limit" "$work/oversized-request.bin"
 at_limit_code=$("${https[@]}" \
   -H 'Content-Type: application/octet-stream' \
   -H 'Expect: 100-continue' \
-  -H "Origin: https://$domain" \
+  -H "Origin: https://$domain:8443" \
   --data-binary @"$work/oversized-request.bin" \
   -o /dev/null -w '%{http_code}' "https://$domain:8443/api/health")
 [[ $at_limit_code == 405 ]] || { echo "FAIL: exact-limit health POST expected HTTP 405, got $at_limit_code" >&2; exit 1; }

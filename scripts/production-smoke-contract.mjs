@@ -46,7 +46,15 @@ export function assertIsolatedProduction(config, project, caddyFile) {
     ['app', 'caddy', 'clamav', 'license-worker', 'postgres', 'push-worker', 'resource-release-worker'],
   );
   assert.equal(config.services.app.environment.NODE_ENV, 'production');
-  assert.equal(config.services.app.environment.NEXT_PUBLIC_APP_URL, 'https://nexus-ci.test');
+  assert.equal(
+    config.services.app.environment.NEXT_PUBLIC_APP_URL,
+    'https://nexus-ci.test:8443',
+    'CI canonical origin must include the published HTTPS port browsers send in Origin',
+  );
+  assert.equal(
+    config.services['push-worker'].environment.NEXT_PUBLIC_APP_URL,
+    'https://nexus-ci.test:8443',
+  );
   assert.equal(config.services.app.environment.BUILD_SCANNER, 'clamav');
   assert.equal(config.services.app.environment.EMAIL_PROVIDER, 'disabled');
   assert.equal(config.services.app.build.target, 'runtime');

@@ -197,7 +197,11 @@ echo "::add-mask::$NEXUS_AUTHOR_BROWSER_PASSWORD"
 for role in developer moderator; do
   if [[ "$role" == developer ]]; then account_email="$NEXUS_AUTHOR_BROWSER_EMAIL"; else account_email="$NEXUS_MODERATOR_BROWSER_EMAIL"; fi
   account_json=$(ACCOUNT_EMAIL="$account_email" ACCOUNT_USERNAME="cabinet_${role}_$short" node -e 'process.stdout.write(JSON.stringify({email:process.env.ACCOUNT_EMAIL,username:process.env.ACCOUNT_USERNAME,password:process.env.NEXUS_AUTHOR_BROWSER_PASSWORD}))')
-  "${https[@]}" --fail -H 'Content-Type: application/json' --data "$account_json" "https://$domain:8443/api/auth/register" > "$work/cabinet-$role.json"
+  "${https[@]}" --fail \
+    -H 'Content-Type: application/json' \
+    -H "Origin: https://$domain:8443" \
+    --data "$account_json" \
+    "https://$domain:8443/api/auth/register" > "$work/cabinet-$role.json"
   sql "UPDATE users SET role = '$role' WHERE email = '$account_email';" > /dev/null
 done
 
