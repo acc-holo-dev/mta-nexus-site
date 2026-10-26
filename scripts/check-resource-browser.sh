@@ -61,25 +61,32 @@ file_size=$(wc -c < "$payload_file" | tr -d ' ')
 sql "
 DELETE FROM entitlements WHERE resource_id LIKE 'prd_resource_browser_%'
   OR resource_id LIKE 'prd_paid_resource_browser_%'
-  OR resource_id LIKE 'prd_portfolio_%';
+  OR resource_id LIKE 'prd_portfolio_%'
+  OR resource_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
 DELETE FROM resource_release_watches WHERE product_id LIKE 'prd_resource_browser_%'
   OR product_id LIKE 'prd_paid_resource_browser_%'
-  OR product_id LIKE 'prd_portfolio_%';
+  OR product_id LIKE 'prd_portfolio_%'
+  OR product_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
 DELETE FROM resource_release_events WHERE product_id LIKE 'prd_resource_browser_%'
   OR product_id LIKE 'prd_paid_resource_browser_%'
-  OR product_id LIKE 'prd_portfolio_%';
+  OR product_id LIKE 'prd_portfolio_%'
+  OR product_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
 DELETE FROM library_collection_items WHERE product_id LIKE 'prd_resource_browser_%'
   OR product_id LIKE 'prd_paid_resource_browser_%'
-  OR product_id LIKE 'prd_portfolio_%';
+  OR product_id LIKE 'prd_portfolio_%'
+  OR product_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
 DELETE FROM licenses WHERE product_id LIKE 'prd_resource_browser_%'
   OR product_id LIKE 'prd_paid_resource_browser_%'
-  OR product_id LIKE 'prd_portfolio_%';
+  OR product_id LIKE 'prd_portfolio_%'
+  OR product_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
 DELETE FROM builds WHERE product_id LIKE 'prd_resource_browser_%'
   OR product_id LIKE 'prd_paid_resource_browser_%'
-  OR product_id LIKE 'prd_portfolio_%';
+  OR product_id LIKE 'prd_portfolio_%'
+  OR product_id IN (SELECT id FROM products WHERE slug LIKE 'author-cabinet-%');
 DELETE FROM products WHERE id LIKE 'prd_resource_browser_%'
   OR id LIKE 'prd_paid_resource_browser_%'
   OR id LIKE 'prd_portfolio_%'
+  OR slug LIKE 'author-cabinet-%'
   OR author_id LIKE 'usr_resource_browser_%'
   OR author_id IN ('usr_portfolio_ci','usr_portfolio_other_ci');
 DELETE FROM servers WHERE id LIKE 'srv_claim_browser_%' OR slug LIKE 'claim-browser-%';

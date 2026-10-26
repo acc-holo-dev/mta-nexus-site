@@ -3,6 +3,7 @@ import { mkdir, writeFile, readFile, rm } from "node:fs/promises";
 import { randomBytes, createHash } from "node:crypto";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
+import { notificationInboxCopy } from "../../apps/web/src/lib/notification-inbox-copy.ts";
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
 assert.equal(process.env.NEXUS_BROWSER_BASE_URL, "https://nexus-ci.test:8443");
@@ -80,7 +81,8 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("dialog", async (dialog) => {
-    if (dialog.type() === "beforeunload") await dialog.accept();
+    // Inbox mark-all and similar confirmations must proceed; only dismiss unknown prompts.
+    if (dialog.type() === "beforeunload" || dialog.type() === "confirm") await dialog.accept();
     else {
       errors.push(`Unexpected ${dialog.type()} dialog: ${dialog.message()}`);
       await dialog.dismiss();
@@ -462,7 +464,10 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   await moderate(outsider, second.id, "reject", "Rejected second version: update the manifest.", second.revision);
   await page.goto("/notifications");
   await expect(page.getByRole("heading", { name: "Resource version rejected", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Mark all as read", exact: true }).click();
+  const inboxCopy = notificationInboxCopy("en");
+  const markAll = page.getByRole("button", { name: inboxCopy.markAllRead, exact: true });
+  await expect(markAll).toBeVisible();
+  await markAll.click();
   await expect.poll(async () => page.evaluate(async () => (await (await fetch("/api/notifications")).json()).unreadCount)).toBe(0);
   await page.getByRole("button", { name: "Language", exact: true }).click();
   await page.reload();

@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { getDictionary } from "../../apps/web/src/lib/i18n.ts";
+import { discoveryCopy } from "../../apps/web/src/lib/discovery-copy.ts";
 import { assertAxeAccessibility } from "../axe-accessibility.mjs";
 assert.equal(process.env.GITHUB_ACTIONS, "true");
 assert.equal(process.env.RUNNER_ENVIRONMENT, "github-hosted");
@@ -437,6 +438,7 @@ for (const locale of ["en", "ru"]) {
     test.setTimeout(120_000);
     const dictionary = getDictionary(locale);
     const discoverCopy = dictionary.discover;
+    const directoryCopy = discoveryCopy(locale);
     await page.emulateMedia({ reducedMotion: "reduce" });
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
@@ -511,8 +513,9 @@ for (const locale of ["en", "ru"]) {
     await page.keyboard.press("Enter");
     await expect(page).toHaveURL(/\/discover\?type=resources(?:&.*)?$/u);
 
+    // Landmark uses discovery-copy filter label; the searchbox is named by discover.searchLabel.
     const discoverSearch = page.getByRole("search", {
-      name: discoverCopy.searchLabel,
+      name: directoryCopy.filter,
       exact: true,
     });
     await expect(discoverSearch).toBeVisible();
