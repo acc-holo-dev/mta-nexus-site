@@ -440,6 +440,13 @@ describe("MTA server control challenge integration", () => {
       displayName: "Legacy Claim Reviewer",
       role: "moderator",
     });
+    const reviewerToken = `tok_${reviewerId}`;
+    await sessionRepository.create({
+      id: `ses_${reviewerId}`,
+      userId: reviewerId,
+      token: reviewerToken,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+    });
     await serverRepository.create({
       id: serverId,
       name: "Legacy Pending Claim",
@@ -468,6 +475,7 @@ describe("MTA server control challenge integration", () => {
         id: requestId,
         reviewerId,
         decision: "approved",
+        currentToken: reviewerToken,
         reviewNotes: "Must not approve without durable control proof.",
       }),
     ).rejects.toMatchObject({
@@ -490,6 +498,7 @@ describe("MTA server control challenge integration", () => {
       id: requestId,
       reviewerId,
       decision: "rejected",
+      currentToken: reviewerToken,
       reviewNotes: "Re-submit through the live control challenge.",
     });
     expect(rejected?.status).toBe("rejected");

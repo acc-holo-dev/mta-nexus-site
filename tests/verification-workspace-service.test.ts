@@ -132,15 +132,25 @@ it("refuses forged self targets before creating a request and reports duplicate 
 });
 it("gates moderation in the service and propagates pending-state conflicts without false confirmations", async () => {
   await expect(
-    service.decide(actor, "request", { decision: "approved", reviewNotes: "Reviewed" }),
+    service.decide(
+      actor,
+      "request",
+      { decision: "approved", reviewNotes: "Reviewed" },
+      "staff-token",
+    ),
   ).rejects.toMatchObject({ code: "FORBIDDEN" });
   expect(mocks.resolveRequest).not.toHaveBeenCalled();
   mocks.resolveRequest.mockResolvedValue(null);
   await expect(
-    service.decide({ ...actor, role: "moderator" }, "request", {
-      decision: "approved",
-      reviewNotes: "Reviewed",
-    }),
+    service.decide(
+      { ...actor, role: "moderator" },
+      "request",
+      {
+        decision: "approved",
+        reviewNotes: "Reviewed",
+      },
+      "staff-token",
+    ),
   ).rejects.toMatchObject({ code: "VERIFICATION_STATE_CHANGED" });
   mocks.resolveRequest.mockResolvedValue({
     id: "request",
@@ -148,11 +158,25 @@ it("gates moderation in the service and propagates pending-state conflicts witho
     requesterId: "PRIVATE",
   });
   expect(
-    await service.decide({ ...actor, role: "moderator" }, "request", {
-      decision: "approved",
-      reviewNotes: "Reviewed",
-    }),
+    await service.decide(
+      { ...actor, role: "moderator" },
+      "request",
+      {
+        decision: "approved",
+        reviewNotes: "Reviewed",
+      },
+      "staff-token",
+    ),
   ).toEqual({ id: "request", status: "approved" });
+  expect(mocks.resolveRequest).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      id: "request",
+      reviewerId: "actor",
+      decision: "approved",
+      currentToken: "staff-token",
+    }),
+    expect.objectContaining({ actorId: "actor", action: "verification.approved" }),
+  );
 });
 it("keeps application detail and event DTOs private and sanitizes proof links", async () => {
   mocks.application.mockResolvedValue({

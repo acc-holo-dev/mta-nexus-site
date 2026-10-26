@@ -173,10 +173,15 @@ class VerificationWorkspaceService {
     }
     return { id: row.id, targetType: row.targetType, targetId: row.targetId, status: row.status };
   }
-  async decide(actor: User, id: string, input: z.infer<typeof verificationDecisionSchema>) {
+  async decide(
+    actor: User,
+    id: string,
+    input: z.infer<typeof verificationDecisionSchema>,
+    currentToken: string,
+  ) {
     if (!can(actor, "admin.moderation")) throw new ForbiddenError();
     const row = await verificationRepository.resolveRequest(
-      { ...input, id, reviewerId: actor.id },
+      { ...input, id, reviewerId: actor.id, currentToken },
       {
         id: generateId("aud"),
         actorId: actor.id,

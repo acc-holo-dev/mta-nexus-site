@@ -1,6 +1,7 @@
+import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import { AppError } from "@nexus/domain";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   rate: vi.fn(),
@@ -27,11 +28,13 @@ vi.mock("@nexus/db", () => ({
   notificationRepository: {},
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
+
+import { GET as own, PATCH as update } from "../apps/web/src/app/api/account/developer/route";
+import { PATCH as decide } from "../apps/web/src/app/api/admin/verification/[id]/route";
 import { GET as overview, POST } from "../apps/web/src/app/api/workspace/verification/route";
 import { GET as targets } from "../apps/web/src/app/api/workspace/verification/targets/route";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
-import { GET as own, PATCH as update } from "../apps/web/src/app/api/account/developer/route";
-import { PATCH as decide } from "../apps/web/src/app/api/admin/verification/[id]/route";
+
 const actor = { id: "actor", role: "developer" },
   context = { params: Promise.resolve({ id: "ver_application" }) };
 const application = {
@@ -98,6 +101,14 @@ it("binds private reads to the current session and keeps history/organization qu
   await own(request());
   expect(mocks.ownProfile).toHaveBeenCalledWith(actor);
 });
+it("refuses a verification decision when the initiating session cookie is missing", async () => {
+  const response = await decide(
+    request("PATCH", decision, "", { cookie: "nexus_locale=ru" }),
+    context,
+  );
+  expect(response.status).toBe(401);
+  expect(mocks.decide).not.toHaveBeenCalled();
+});
 it("blocks anonymous requests and forged/repeated/unbounded filters before service work", async () => {
   mocks.session.mockResolvedValue(null);
   expect((await overview(request())).status).toBe(401);
@@ -133,7 +144,8 @@ it("requires bounded same-site JSON for every mutation", async () => {
   for (const action of [
     (body: unknown, headers: Record<string, string>) => POST(request("POST", body, "", headers)),
     (body: unknown, headers: Record<string, string>) => update(request("PATCH", body, "", headers)),
-    (body: unknown, headers: Record<string, string>) => decide(request("PATCH", body, "", headers), context),
+    (body: unknown, headers: Record<string, string>) =>
+      decide(request("PATCH", body, "", headers), context),
   ]) {
     expect((await action({}, { "sec-fetch-site": "cross-site" })).status).toBe(403);
     expect((await action({}, { "content-type": "text/plain" })).status).toBe(415);
@@ -146,10 +158,15 @@ it("requires bounded same-site JSON for every mutation", async () => {
 it("confirms moderation results and rejects malformed decisions/id without writes", async () => {
   const response = await decide(request("PATCH", decision), context);
   expect(await response.json()).toEqual({ id: "ver_application", status: "approved" });
-  expect(mocks.decide).toHaveBeenCalledWith(actor, "ver_application", {
-    ...decision,
-    reviewNotes: "Reviewed evidence",
-  });
+  expect(mocks.decide).toHaveBeenCalledWith(
+    actor,
+    "ver_application",
+    {
+      ...decision,
+      reviewNotes: "Reviewed evidence",
+    },
+    "test",
+  );
   expect(
     (await decide(request("PATCH", { ...decision, reviewerId: "admin" }), context)).status,
   ).toBe(400);

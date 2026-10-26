@@ -126,6 +126,7 @@ describe("verification resolution durable push scheduling", () => {
           reviewerId: "usr_mod",
           decision: action === "approve" ? "approved" : "rejected",
           reviewNotes: "Verification evidence reviewed.",
+          currentToken: "test-session",
         },
         expect.objectContaining({
           targetId: "ver_1",
@@ -135,6 +136,23 @@ describe("verification resolution durable push scheduling", () => {
       expect(afterMock).not.toHaveBeenCalled();
     },
   );
+
+  it("does not resolve verification when the initiating session cookie is missing", async () => {
+    const response = await POST(
+      new NextRequest("http://nexus.test/api/admin/actions", {
+        method: "POST",
+        headers: browserMutationHeaders({ "content-type": "application/json" }),
+        body: JSON.stringify({
+          targetType: "verification",
+          targetId: "ver_1",
+          action: "approve",
+          notes: "Verification evidence reviewed.",
+        }),
+      }),
+    );
+    expect(response.status).toBe(401);
+    expect(resolveRequest).not.toHaveBeenCalled();
+  });
 
   it("does not schedule HTTP-side work when compare-and-set loses", async () => {
     state.resolution = null;

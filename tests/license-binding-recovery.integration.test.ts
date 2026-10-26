@@ -6,6 +6,7 @@ import {
   licenseControlsRepository as repo,
   serverClaimChallengeRepository,
   serverRepository,
+  sessionRepository,
   userRepository,
   verificationRepository,
 } from "@nexus/db";
@@ -47,6 +48,7 @@ async function prove(serverId: string, actorId: string, reviewerId: string) {
     id: completed.verificationRequest.id,
     reviewerId,
     decision: "approved",
+    currentToken: `tok_${reviewerId}`,
   });
 }
 async function fixture() {
@@ -67,6 +69,12 @@ async function fixture() {
       username: userId,
       displayName: "License recovery fixture",
     });
+  await sessionRepository.create({
+    id: `ses_${reviewerId}`,
+    userId: reviewerId,
+    token: `tok_${reviewerId}`,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
   await serverRepository.create({
     id: serverId,
     name: "Recovery server",

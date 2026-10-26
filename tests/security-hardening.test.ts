@@ -6,6 +6,7 @@ import {
   contentRepository,
   socialRepository,
   verificationRepository,
+  sessionRepository,
   licenseRepository,
   buildRepository,
   orderRepository,
@@ -53,6 +54,12 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       username: `sec_admin_${ts}`,
       displayName: "Security Admin",
       role: "admin",
+    });
+    await sessionRepository.create({
+      id: `ses_sec_admin_${ts}`,
+      userId: admin.id,
+      token: `tok_${admin.id}`,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
     });
 
     product = await productRepository.create({
@@ -240,6 +247,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     const rejected = await verificationRepository.resolveRequest({
       id: request.id,
       reviewerId: admin.id,
+      currentToken: `tok_${admin.id}`,
       decision: "rejected",
       reviewNotes: "Insufficient proof",
     });
@@ -249,6 +257,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     const secondAttempt = await verificationRepository.resolveRequest({
       id: request.id,
       reviewerId: admin.id,
+      currentToken: `tok_${admin.id}`,
       decision: "approved",
     });
     expect(secondAttempt).toBeNull();
@@ -264,6 +273,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     const approved = await verificationRepository.resolveRequest({
       id: request2.id,
       reviewerId: admin.id,
+      currentToken: `tok_${admin.id}`,
       decision: "approved",
       reviewNotes: "Portfolio verified",
     });

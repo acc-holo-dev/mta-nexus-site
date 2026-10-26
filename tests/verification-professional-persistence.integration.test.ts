@@ -9,6 +9,7 @@ import {
   notificationRepository,
   organizationMembers,
   organizationRepository,
+  sessionRepository,
   users,
   userRepository,
   verificationRepository,
@@ -24,6 +25,16 @@ async function fixture(role: "developer" | "moderator" = "developer") {
     role,
   });
   return id;
+}
+async function staffSession(reviewerId: string) {
+  const token = `tok_${reviewerId}`;
+  await sessionRepository.create({
+    id: `ses_${reviewerId}`,
+    userId: reviewerId,
+    token,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
+  return token;
 }
 async function save(
   actorId: string,
@@ -51,7 +62,8 @@ const application = (id: string) =>
   });
 it("allows experience verification after identity approval and atomically stores the genuine flag, audit and inbox", async () => {
   const id = await fixture(),
-    reviewerId = await fixture("moderator");
+    reviewerId = await fixture("moderator"),
+    token = await staffSession(reviewerId);
   await save(id);
   await db.update(users).set({ isVerified: true }).where(eq(users.id, id));
   const request = await application(id);
@@ -60,6 +72,7 @@ it("allows experience verification after identity approval and atomically stores
     reviewerId,
     decision: "approved",
     reviewNotes: "Evidence reviewed",
+    currentToken: token,
   });
   expect((await developerProfileRepository.own(id)).verifiedDeveloper).toBe(true);
   expect(
@@ -110,12 +123,18 @@ it("serializes duplicate applications and concurrent shared-profile-version save
 });
 it("rolls back stale experience approval and keeps the request pending without a notification or resolution audit", async () => {
   const id = await fixture(),
-    reviewerId = await fixture("moderator");
+    reviewerId = await fixture("moderator"),
+    token = await staffSession(reviewerId);
   await save(id);
   const request = await application(id);
   await save(id, { githubUrl: "https://github.com/changed" });
   await expect(
-    verificationRepository.resolveRequest({ id: request.id, reviewerId, decision: "approved" }),
+    verificationRepository.resolveRequest({
+      id: request.id,
+      reviewerId,
+      decision: "approved",
+      currentToken: token,
+    }),
   ).rejects.toMatchObject({ code: "VERIFICATION_PROFILE_CHANGED" });
   expect(await verificationRepository.findById(request.id)).toMatchObject({
     status: "pending",
@@ -139,23 +158,36 @@ it("rolls back stale experience approval and keeps the request pending without a
     reviewerId,
     decision: "rejected",
     reviewNotes: "Resubmit current profile",
+    currentToken: token,
   });
   expect(await verificationRepository.findById(request.id)).toMatchObject({ status: "rejected" });
 });
 it("rejects own approval and current-role revocation without committing the pending-state transition", async () => {
   const id = await fixture("moderator"),
-    reviewerId = await fixture("moderator");
+    reviewerId = await fixture("moderator"),
+    selfToken = await staffSession(id),
+    token = await staffSession(reviewerId);
   const request = await verificationRepository.createRequest({
     requesterId: id,
     targetType: "user",
     targetId: id,
   });
   await expect(
-    verificationRepository.resolveRequest({ id: request.id, reviewerId: id, decision: "approved" }),
+    verificationRepository.resolveRequest({
+      id: request.id,
+      reviewerId: id,
+      decision: "approved",
+      currentToken: selfToken,
+    }),
   ).rejects.toMatchObject({ code: "VERIFICATION_SELF_REVIEW" });
   await db.update(users).set({ role: "user" }).where(eq(users.id, reviewerId));
   await expect(
-    verificationRepository.resolveRequest({ id: request.id, reviewerId, decision: "approved" }),
+    verificationRepository.resolveRequest({
+      id: request.id,
+      reviewerId,
+      decision: "approved",
+      currentToken: token,
+    }),
   ).rejects.toMatchObject({ code: "FORBIDDEN" });
   expect(await verificationRepository.findById(request.id)).toMatchObject({ status: "pending" });
   expect(
@@ -166,6 +198,7 @@ it("rechecks revoked organization administration at approval and allows an indep
   const ownerId = await fixture(),
     managerId = await fixture(),
     reviewerId = await fixture("moderator"),
+    token = await staffSession(reviewerId),
     organizationId = `org_${randomUUID()}`;
   await organizationRepository.create({
     id: organizationId,
@@ -191,9 +224,19 @@ it("rechecks revoked organization administration at approval and allows an indep
       ),
     );
   await expect(
-    verificationRepository.resolveRequest({ id: request.id, reviewerId, decision: "approved" }),
+    verificationRepository.resolveRequest({
+      id: request.id,
+      reviewerId,
+      decision: "approved",
+      currentToken: token,
+    }),
   ).rejects.toMatchObject({ code: "VERIFICATION_AUTHORITY_CHANGED" });
   expect(await verificationRepository.findById(request.id)).toMatchObject({ status: "pending" });
-  await verificationRepository.resolveRequest({ id: request.id, reviewerId, decision: "rejected" });
+  await verificationRepository.resolveRequest({
+    id: request.id,
+    reviewerId,
+    decision: "rejected",
+    currentToken: token,
+  });
   expect(await verificationRepository.findById(request.id)).toMatchObject({ status: "rejected" });
 });

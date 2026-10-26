@@ -18,6 +18,7 @@ import {
   users,
   verificationRequests,
 } from "../schema";
+import { lockInitiatingSession } from "./initiating-session";
 import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
 import {
   verificationApplicationRevision,
@@ -269,6 +270,7 @@ export class VerificationRepository {
       decision: "approved" | "rejected";
       reviewNotes?: string;
       expectedApplicationRevision?: string;
+      currentToken: string;
     },
     audit?: Omit<AuditEvent, "createdAt">,
   ) {
@@ -277,9 +279,11 @@ export class VerificationRepository {
         .select({ role: users.role })
         .from(users)
         .where(eq(users.id, input.reviewerId))
+        .for("share")
         .limit(1);
       if (!liveReviewer || !["admin", "moderator"].includes(liveReviewer.role))
         throw new ForbiddenError();
+      await lockInitiatingSession(tx, input.reviewerId, input.currentToken);
       const rows = await tx
         .update(verificationRequests)
         .set({

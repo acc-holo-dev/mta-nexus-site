@@ -4,11 +4,22 @@ import {
   db,
   serverClaimChallengeRepository,
   servers,
+  sessionRepository,
   userRepository,
   verificationRepository,
   verificationRequests,
 } from "@nexus/db";
 
+async function staffSession(reviewerId: string) {
+  const token = `tok_${reviewerId}`;
+  await sessionRepository.create({
+    id: `ses_${reviewerId}`,
+    userId: reviewerId,
+    token,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
+  return token;
+}
 function disposablePort(offset: number) {
   return 20_000 + ((Date.now() + process.pid + offset) % 30_000);
 }
@@ -84,6 +95,7 @@ describe("server claim moderation ownership CAS", () => {
       id: verificationId,
       reviewerId,
       decision: "approved",
+      currentToken: await staffSession(reviewerId),
       reviewNotes: "Verified control proof.",
     });
     expect(resolved).toMatchObject({
@@ -146,6 +158,7 @@ describe("server claim moderation ownership CAS", () => {
         id: verificationId,
         reviewerId,
         decision: "approved",
+        currentToken: await staffSession(reviewerId),
         reviewNotes: "Must fail without proof.",
       }),
     ).rejects.toMatchObject({
@@ -230,6 +243,7 @@ describe("server claim moderation ownership CAS", () => {
         id: verificationId,
         reviewerId,
         decision: "approved",
+        currentToken: await staffSession(reviewerId),
         reviewNotes: "Ownership changed before moderation.",
       }),
     ).rejects.toMatchObject({

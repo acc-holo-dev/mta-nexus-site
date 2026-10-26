@@ -15,6 +15,9 @@ vi.mock("../packages/db/src/client", async () => {
     // after the existing control-proof checks; keep target fixtures separate.
     if (sql.startsWith('select "role" from "users"') && params[0] === "moderator")
       return { rows: [["moderator"]] };
+    // The initiating-session lock is not part of the claim-target fixtures.
+    if (sql.includes('from "sessions"') && sql.includes("for update"))
+      return { rows: [["ses_moderator", "2099-01-01T00:00:00.000Z"]] };
     // These retained server-control cases predate application evidence edits.
     // The new read-only evidence lookup has no row; do not consume target fixtures.
     if (
@@ -114,6 +117,7 @@ const consume = () =>
   });
 const approve = () =>
   verificationRepository.resolveRequest({
+    currentToken: "tok_moderator",
     id: "ver_a",
     reviewerId: "moderator",
     decision: "approved",
@@ -220,6 +224,14 @@ it("approves an organization proof without transferring it to a personal owner",
     [["ntf", "manager"]],
   ];
   await approve();
+  const sessionLock = state.queries.findIndex(
+    (query) => query.sql.includes('from "sessions"') && query.sql.includes("for update"),
+  );
+  const decision = state.queries.findIndex((query) =>
+    query.sql.startsWith('update "verification_requests"'),
+  );
+  expect(sessionLock).toBeGreaterThanOrEqual(0);
+  expect(sessionLock).toBeLessThan(decision);
   const update = writes("servers")[0];
   expect(update.params[0]).toBeNull();
   expect(update.sql).not.toContain('"organization_id" =');
@@ -288,6 +300,7 @@ it.each([
 it("lets moderators close a stale request without requiring the former requester's authority", async () => {
   state.rows = [[request({ status: "rejected" })], [["ntf", "manager"]]];
   await verificationRepository.resolveRequest({
+    currentToken: "tok_moderator",
     id: "ver_a",
     reviewerId: "moderator",
     decision: "rejected",

@@ -8,6 +8,7 @@ import {
   organizationMembers,
   organizationRepository,
   verificationWorkspaceRepository as repo,
+  sessionRepository,
   userRepository,
   verificationRepository,
   verificationRequests,
@@ -26,6 +27,16 @@ async function user(role: "developer" | "moderator" = "developer") {
     role,
   });
   return id;
+}
+async function staffSession(reviewerId: string) {
+  const token = `tok_${reviewerId}`;
+  await sessionRepository.create({
+    id: `ses_${reviewerId}`,
+    userId: reviewerId,
+    token,
+    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+  });
+  return token;
 }
 async function profile(actorId: string, specialties = ["Lua"]) {
   const previous = await developerProfileRepository.own(actorId);
@@ -86,6 +97,7 @@ const resolutionAudits = (id: string) =>
 it("rebinds changed professional evidence to a current locked profile before independent approval, without changing original submission time or commercial scores", async () => {
   const actorId = await user(),
     reviewerId = await user("moderator"),
+    token = await staffSession(reviewerId),
     application = await request(actorId),
     before = await repo.application(actorId, application.id);
   await profile(actorId, ["TypeScript"]);
@@ -100,6 +112,7 @@ it("rebinds changed professional evidence to a current locked profile before ind
     id: application.id,
     reviewerId,
     decision: "approved",
+    currentToken: token,
     expectedApplicationRevision: saved.revision,
   });
   expect((await developerProfileRepository.own(actorId)).verifiedDeveloper).toBe(true);
@@ -116,6 +129,7 @@ it("rebinds changed professional evidence to a current locked profile before ind
 it("rolls back stale and legacy unbound decisions after amendments, then accepts a fresh independent rejection", async () => {
   const actorId = await user(),
     reviewerId = await user("moderator"),
+    token = await staffSession(reviewerId),
     application = await request(actorId),
     before = await repo.application(actorId, application.id),
     saved = await amend(actorId, application.id, before.revision);
@@ -126,6 +140,7 @@ it("rolls back stale and legacy unbound decisions after amendments, then accepts
           id: application.id,
           reviewerId,
           decision,
+          currentToken: token,
           expectedApplicationRevision,
         }),
       ).rejects.toMatchObject({ code: "VERIFICATION_APPLICATION_CHANGED" });
@@ -142,6 +157,7 @@ it("rolls back stale and legacy unbound decisions after amendments, then accepts
     id: application.id,
     reviewerId,
     decision: "rejected",
+    currentToken: token,
     expectedApplicationRevision: saved.revision,
   });
   expect(await verificationRepository.findById(application.id)).toMatchObject({
@@ -154,6 +170,7 @@ it("rolls back stale and legacy unbound decisions after amendments, then accepts
 it("serializes two replacements of the same evidence version and a replacement racing with a moderator decision", async () => {
   const actorId = await user(),
     reviewerId = await user("moderator"),
+    token = await staffSession(reviewerId),
     application = await request(actorId),
     before = await repo.application(actorId, application.id);
   const replacements = await Promise.allSettled([
@@ -171,6 +188,7 @@ it("serializes two replacements of the same evidence version and a replacement r
         id: application.id,
         reviewerId,
         decision: "rejected",
+        currentToken: token,
         expectedApplicationRevision: current.revision,
       }),
     ]);

@@ -210,6 +210,7 @@ function approvalRows(extra: { snapshot?: string; finalRole?: string } = {}) {
   });
   state.rows = [
     [["moderator"]],
+    [["ses_staff", "2099-01-01T00:00:00.000Z"]],
     [request()],
     [["submission", "verification.requested", extra.snapshot ?? revision]],
     [["developer"], ["moderator"]],
@@ -226,11 +227,15 @@ it("sets the genuine professional flag, audits and delivers one inbox result aft
     id: "ver_request",
     reviewerId: "moderator",
     decision: "approved",
+    currentToken: "staff-session",
   });
   expect(result?.status).toBe("approved");
   expect(writes("developer_profiles")[0].params).toEqual([true, "developer"]);
-  expect(state.queries[3].sql).toContain('order by "users"."id" asc');
-  expect(state.queries[3].sql).toContain("for update");
+  expect(state.queries[1].sql).toContain('from "sessions"');
+  expect(state.queries[1].sql).toContain("for update");
+  expect(state.queries[1].params).toContain("moderator");
+  expect(state.queries[4].sql).toContain('order by "users"."id" asc');
+  expect(state.queries[4].sql).toContain("for update");
   expect(writes("notifications")).toHaveLength(1);
   expect(writes("notifications")[0].params).toContain("/workspace/verification?view=history");
   expect(writes("audit_events")).toHaveLength(1);
@@ -242,6 +247,7 @@ it("refuses changed or legacy missing profile revisions before setting verified 
       id: "ver_request",
       reviewerId: "moderator",
       decision: "approved",
+      currentToken: "staff-session",
     }),
   ).rejects.toMatchObject({ code: "VERIFICATION_PROFILE_CHANGED" });
   expect(writes("developer_profiles")).toHaveLength(0);
@@ -254,6 +260,7 @@ it("rejects a revoked reviewer both before processing and before audit/notificat
       id: "ver_request",
       reviewerId: "moderator",
       decision: "approved",
+      currentToken: "staff-session",
     }),
   ).rejects.toMatchObject({ code: "FORBIDDEN" });
   expect(writes("verification_requests")).toHaveLength(0);
@@ -264,28 +271,52 @@ it("rejects a revoked reviewer both before processing and before audit/notificat
       id: "ver_request",
       reviewerId: "moderator",
       decision: "approved",
+      currentToken: "staff-session",
     }),
   ).rejects.toMatchObject({ code: "FORBIDDEN" });
   expect(writes("audit_events")).toHaveLength(0);
   expect(writes("notifications")).toHaveLength(0);
 });
+it("refuses a missing or expired initiating session before changing the request", async () => {
+  for (const session of [[], [["ses_staff", "2000-01-01T00:00:00.000Z"]]] as unknown[][][]) {
+    state.queries = [];
+    state.rows = [[["moderator"]], session];
+    await expect(
+      new VerificationRepository().resolveRequest({
+        id: "ver_request",
+        reviewerId: "moderator",
+        decision: "approved",
+        currentToken: "staff-session",
+      }),
+    ).rejects.toMatchObject({ statusCode: 401, code: "UNAUTHORIZED" });
+    expect(writes("verification_requests")).toHaveLength(0);
+    expect(writes("audit_events")).toHaveLength(0);
+    expect(writes("notifications")).toHaveLength(0);
+  }
+});
 it("prevents self approval and retains pending-state compare-and-set", async () => {
-  state.rows = [[["moderator"]], [request({ requesterId: "moderator" })]];
+  state.rows = [
+    [["moderator"]],
+    [["ses_staff", "2099-01-01T00:00:00.000Z"]],
+    [request({ requesterId: "moderator" })],
+  ];
   await expect(
     new VerificationRepository().resolveRequest({
       id: "ver_request",
       reviewerId: "moderator",
       decision: "approved",
+      currentToken: "staff-session",
     }),
   ).rejects.toMatchObject({ code: "VERIFICATION_SELF_REVIEW" });
   expect(writes("developer_profiles")).toHaveLength(0);
   state.queries = [];
-  state.rows = [[["moderator"]], []];
+  state.rows = [[["moderator"]], [["ses_staff", "2099-01-01T00:00:00.000Z"]], []];
   expect(
     await new VerificationRepository().resolveRequest({
       id: "ver_request",
       reviewerId: "moderator",
       decision: "approved",
+      currentToken: "staff-session",
     }),
   ).toBeNull();
   expect(writes("verification_requests")[0].params).toContain("pending");
