@@ -12,6 +12,7 @@ import {
 } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
 import { serverService } from "../../../../lib/services/server-service";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -40,10 +41,10 @@ const serverUpdateSchema = updateServerSchema
     "At least one editable field is required",
   );
 
-export async function PATCH(
+export const PATCH = withBrowserMutation(async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
-) {
+) => {
   const context = createRequestLogContext(request);
   try {
     const token =
@@ -108,4 +109,4 @@ export async function PATCH(
       appError?.statusCode || 500,
     );
   }
-}
+});

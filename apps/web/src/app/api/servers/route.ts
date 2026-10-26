@@ -18,6 +18,7 @@ import {
   mtaMasterDirectoryService,
 } from "../../../lib/services/mta-master-directory-service";
 import { serverService } from "../../../lib/services/server-service";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { mtaDirectoryHttpCacheControl } from "../../../lib/mta-directory-cache";
 
 // Reject unexpected authority fields instead of silently stripping them.
@@ -121,7 +122,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
   try {
     const ip = getTrustedRequestIp(request);
@@ -198,4 +199,4 @@ export async function POST(request: NextRequest) {
       appError?.statusCode || 500,
     );
   }
-}
+});
