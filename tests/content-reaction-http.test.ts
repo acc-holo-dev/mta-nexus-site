@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { AppError } from "@nexus/domain";
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
@@ -40,6 +41,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
   return new NextRequest(`https://nexus.test/api${query}`, {
     method,
     headers: {
+      ...(method === "GET" ? {} : browserMutationHeaders()),
       cookie: "nexus_session=test;nexus_locale=ru",
       "content-type": "application/json",
       ...headers,
@@ -49,6 +51,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   mocks.session.mockResolvedValue(actor);
   mocks.rate.mockResolvedValue({ success: true });
   mocks.state.mockResolvedValue({ reaction: "thanks" });
@@ -56,6 +59,9 @@ beforeEach(() => {
   mocks.page.mockResolvedValue({ items: [] });
   mocks.remove.mockResolvedValue({ contentId: "content", removed: true });
   mocks.trust.mockResolvedValue({ identity: { verified: true } });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("reads personalized counts privately with no-store headers and trusted-IP limits", async () => {
   const response = await state(request(), publication);

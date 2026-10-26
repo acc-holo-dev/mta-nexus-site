@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import {
   productRepository,
   serverRepository,
@@ -12,6 +13,7 @@ function contentRequest(token: string, body: Record<string, unknown>) {
   return new NextRequest("http://nexus.test/api/content", {
     method: "POST",
     headers: {
+      ...browserMutationHeaders(),
       "content-type": "application/json",
       cookie: `nexus_session=${token}`,
     },
@@ -20,6 +22,12 @@ function contentRequest(token: string, body: Record<string, unknown>) {
 }
 
 describe("linked content target authorization integration", () => {
+  beforeEach(() => {
+    stubBrowserMutationOrigin();
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
   it("rejects foreign server/resource links and accepts the real owner", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
     // Slugs only allow [a-z0-9-], so derive a slug-safe variant for URL fields.

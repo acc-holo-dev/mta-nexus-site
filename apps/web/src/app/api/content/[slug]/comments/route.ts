@@ -17,6 +17,7 @@ import { getTrustedRequestIp } from "../../../../../lib/request-client-ip";
 import { authService } from "../../../../../lib/services/auth-service";
 import { contentService } from "../../../../../lib/services/content-service";
 import { notifyDiscussionReplies } from "../../../../../lib/services/discussion-follow-notification-service";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 const validSlug = (slug: string) => !!slug && slug.length <= 200 && /^[a-z0-9-]+$/u.test(slug);
@@ -64,10 +65,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     );
   }
 }
-export async function POST(
+export const POST = withBrowserMutation(async (
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
-) {
+) => {
   const context = createRequestLogContext(request);
   const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
   try {
@@ -141,4 +142,4 @@ export async function POST(
       { status: known ? error.statusCode : 503, headers: privateHeaders },
     );
   }
-}
+});

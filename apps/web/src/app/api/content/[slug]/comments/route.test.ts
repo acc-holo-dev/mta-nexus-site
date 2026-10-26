@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const state = vi.hoisted(() => ({
   afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
@@ -74,6 +74,10 @@ vi.mock("../../../../../lib/services/discussion-follow-notification-service", ()
 }));
 
 import { NextRequest } from "next/server";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../../../../../../../../tests/browser-mutation-headers";
 import { POST } from "./route";
 
 function expectPrivate(response: Response) {
@@ -90,6 +94,7 @@ function request() {
     {
       method: "POST",
       headers: {
+        ...browserMutationHeaders(),
         "content-type": "application/json",
         cookie: "nexus_session=test-session",
       },
@@ -101,8 +106,13 @@ function request() {
 describe("article comment notification side effects", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    stubBrowserMutationOrigin();
     state.afterCallbacks.length = 0;
     state.articleAuthorId = "usr_author";
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("returns the committed comment before author inbox and push delivery", async () => {

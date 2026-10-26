@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { AppError } from "@nexus/domain";
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
@@ -32,6 +33,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
   return new NextRequest(`http://nexus.test/api/workspace/feed${query}`, {
     method,
     headers: {
+      ...(method === "GET" ? {} : browserMutationHeaders()),
       cookie: "nexus_session=test;nexus_locale=ru",
       "content-type": "application/json",
       ...headers,
@@ -41,11 +43,15 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   mocks.session.mockResolvedValue(actor);
   mocks.rate.mockResolvedValue({ success: true });
   mocks.resolve.mockResolvedValue({ id: "profile", name: "Writer" });
   mocks.page.mockResolvedValue({ items: [], hasMore: false, nextCursor: null });
   mocks.manage.mockResolvedValue({ contentId: "content", commentId: "comment", removed: true });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("reads a private feed using only session identity with no-store headers", async () => {
   const response = await following(request("GET", undefined, "?source=user&type=post&q=Lua"));

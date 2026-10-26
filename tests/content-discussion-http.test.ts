@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "commenter", username: "writer" } as Record<string, unknown> | null,
@@ -45,6 +46,7 @@ function request(method: string, body?: unknown, query = "", locale = "en", head
   return new NextRequest(`http://nexus.test/api/content/article/comments${query}`, {
     method,
     headers: {
+      ...(method === "GET" ? {} : browserMutationHeaders()),
       cookie: `nexus_locale=${locale};nexus_session=test`,
       "content-type": "application/json",
       ...headers,
@@ -54,6 +56,7 @@ function request(method: string, body?: unknown, query = "", locale = "en", head
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   state.actor = { id: "commenter", username: "writer" };
   state.after = [];
   state.registrationFails = false;
@@ -72,6 +75,9 @@ beforeEach(() => {
   mocks.parent.mockResolvedValue("parentAuthor");
   mocks.rate.mockResolvedValue({ success: true });
   mocks.notify.mockResolvedValue({ stored: 1 });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("allows anonymous paged public reads without increasing views", async () => {
   state.actor = null;

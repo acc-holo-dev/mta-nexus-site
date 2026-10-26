@@ -9,6 +9,7 @@ import {
   discussionRemoveSchema,
 } from "../../../../../../lib/content-discussion-contract";
 import { discussionMutationError } from "../../../../../../lib/content-discussion-copy";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 type Context = { params: Promise<{ slug: string; id: string }> };
 async function mutate(request: NextRequest, context: Context, remove: boolean) {
   return userPlatformApi(
@@ -30,5 +31,9 @@ async function mutate(request: NextRequest, context: Context, remove: boolean) {
     discussionMutationError,
   );
 }
-export const PATCH = (request: NextRequest, context: Context) => mutate(request, context, false);
-export const DELETE = (request: NextRequest, context: Context) => mutate(request, context, true);
+export const PATCH = withBrowserMutation((request: NextRequest, context: Context) =>
+  mutate(request, context, false),
+);
+export const DELETE = withBrowserMutation((request: NextRequest, context: Context) =>
+  mutate(request, context, true),
+);
