@@ -515,11 +515,14 @@ for (const locale of ["en", "ru"]) {
       name: discoverCopy.searchLabel,
       exact: true,
     });
+    await expect(discoverSearch).toBeVisible();
     const input = discoverSearch.getByRole("searchbox", {
       name: discoverCopy.searchLabel,
       exact: true,
     });
-    await input.focus();
+    await expect(input).toBeVisible();
+    await expect(input).toBeEnabled();
+    await input.click();
     await expect(input).toBeFocused();
     await input.fill(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE);
     await page.keyboard.press("Enter");

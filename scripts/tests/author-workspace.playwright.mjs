@@ -41,6 +41,36 @@ async function moderate(page, buildId, action, notes, expectedRevision) {
   assert.equal(result.status, 200, JSON.stringify(result.body));
 }
 
+/** Metadata edits withdraw pending builds to draft and bump revision; re-queue before moderation. */
+async function ensurePendingReview(page, productId, buildId) {
+  const detail = await page.evaluate(async ({ productId, buildId }) => {
+    const response = await fetch(`/api/products/${productId}/builds/${buildId}`);
+    return { status: response.status, body: await response.json() };
+  }, { productId, buildId });
+  assert.equal(detail.status, 200, JSON.stringify(detail.body));
+  const live = detail.body.build;
+  assert.equal(typeof live?.revision, "number", JSON.stringify(detail.body));
+  if (live.status === "pending_review") return live;
+  assert.equal(live.status, "draft", JSON.stringify(live));
+  const submitted = await page.evaluate(async ({ productId, buildId, expectedRevision }) => {
+    const response = await fetch(`/api/products/${productId}/builds/${buildId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "submit",
+        expectedRevision,
+        reason: "Resubmit after metadata edits for acceptance review.",
+      }),
+    });
+    return { status: response.status, body: await response.json() };
+  }, { productId, buildId, expectedRevision: live.revision });
+  assert.equal(submitted.status, 200, JSON.stringify(submitted.body));
+  const build = submitted.body.build;
+  assert.equal(build?.status, "pending_review", JSON.stringify(submitted.body));
+  assert.equal(typeof build.revision, "number");
+  return build;
+}
+
 test("author creates, edits, submits versions, reads moderation and retires a publication", async ({ page, browser }) => {
   test.setTimeout(180_000);
   const nonce = randomBytes(6).toString("hex");
@@ -341,13 +371,16 @@ test("author creates, edits, submits versions, reads moderation and retires a pu
   const forbidden = await outsider.evaluate(async (id) => (await fetch(`/api/products/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: "{}" })).status, product.id);
   assert.equal(forbidden, 404);
   evidence.push("Unauthenticated and unrelated moderator access denied.");
-  await moderate(outsider, build.id, "approve", "Approved author acceptance version one.", build.revision);
+  // Metadata saves withdraw pending builds to draft and bump revision; re-queue before approve.
+  const pendingFirst = await ensurePendingReview(page, product.id, build.id);
+  evidence.push("After metadata edits, the withdrawn first build was resubmitted for review at its live revision.");
+  await moderate(outsider, pendingFirst.id, "approve", "Approved author acceptance version one.", pendingFirst.revision);
   const repeated = await outsider.evaluate(async ({ buildId, expectedRevision }) => (await fetch("/api/admin/actions", {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       targetType: "build", targetId: buildId, action: "approve", notes: "Repeat approval", expectedRevision,
     }),
-  })).status, { buildId: build.id, expectedRevision: build.revision });
+  })).status, { buildId: pendingFirst.id, expectedRevision: pendingFirst.revision });
   assert.equal(repeated, 409);
   await page.goto("/notifications");
   const approvalCard = page.locator("article").filter({ has: page.getByRole("heading", { name: "Resource version approved", exact: true }) });

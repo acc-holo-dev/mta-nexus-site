@@ -57,6 +57,38 @@ file_size=$(wc -c < "$payload_file" | tr -d ' ')
 
 "${pc[@]}" exec -T app sh -c 'mkdir -p /data/uploads/ci-resource-browser && cat > "/data/uploads/'"$storage_key"'"' < "$payload_file"
 
+# Idempotent reseed: clear prior resource-browser + portfolio fixtures (fixed and short-id rows).
+sql "
+DELETE FROM entitlements WHERE resource_id LIKE 'prd_resource_browser_%'
+  OR resource_id LIKE 'prd_paid_resource_browser_%'
+  OR resource_id LIKE 'prd_portfolio_%';
+DELETE FROM resource_release_watches WHERE product_id LIKE 'prd_resource_browser_%'
+  OR product_id LIKE 'prd_paid_resource_browser_%'
+  OR product_id LIKE 'prd_portfolio_%';
+DELETE FROM resource_release_events WHERE product_id LIKE 'prd_resource_browser_%'
+  OR product_id LIKE 'prd_paid_resource_browser_%'
+  OR product_id LIKE 'prd_portfolio_%';
+DELETE FROM library_collection_items WHERE product_id LIKE 'prd_resource_browser_%'
+  OR product_id LIKE 'prd_paid_resource_browser_%'
+  OR product_id LIKE 'prd_portfolio_%';
+DELETE FROM licenses WHERE product_id LIKE 'prd_resource_browser_%'
+  OR product_id LIKE 'prd_paid_resource_browser_%'
+  OR product_id LIKE 'prd_portfolio_%';
+DELETE FROM builds WHERE product_id LIKE 'prd_resource_browser_%'
+  OR product_id LIKE 'prd_paid_resource_browser_%'
+  OR product_id LIKE 'prd_portfolio_%';
+DELETE FROM products WHERE id LIKE 'prd_resource_browser_%'
+  OR id LIKE 'prd_paid_resource_browser_%'
+  OR id LIKE 'prd_portfolio_%'
+  OR author_id LIKE 'usr_resource_browser_%'
+  OR author_id IN ('usr_portfolio_ci','usr_portfolio_other_ci');
+DELETE FROM servers WHERE id LIKE 'srv_claim_browser_%' OR slug LIKE 'claim-browser-%';
+DELETE FROM content WHERE id LIKE 'cnt_portfolio_%';
+DELETE FROM organizations WHERE id IN ('org_portfolio_ci','org_portfolio_other_ci');
+DELETE FROM users WHERE id LIKE 'usr_resource_browser_%'
+  OR id IN ('usr_portfolio_ci','usr_portfolio_other_ci');
+" > /dev/null
+
 sql "
 INSERT INTO users (
   id, email, username, display_name, role, created_at, updated_at
@@ -187,13 +219,6 @@ if (!/^ci-resource-browser\/[a-f0-9]+\.zip$/.test(key) || !/^[a-f0-9]{64}$/.test
 process.stdout.write(readFileSync('scripts/fixtures/public-portfolio.sql', 'utf8').replaceAll('__STORAGE_KEY__', key).replaceAll('__SHA256__', hash));
 NODE
 )
-sql "
-DELETE FROM builds WHERE product_id LIKE 'prd_portfolio_%';
-DELETE FROM products WHERE id LIKE 'prd_portfolio_%' OR author_id IN ('usr_portfolio_ci','usr_portfolio_other_ci');
-DELETE FROM content WHERE id LIKE 'cnt_portfolio_%';
-DELETE FROM organizations WHERE id IN ('org_portfolio_ci','org_portfolio_other_ci');
-DELETE FROM users WHERE id IN ('usr_portfolio_ci','usr_portfolio_other_ci');
-" > /dev/null
 sql "$portfolio_sql" > /dev/null
 
 # Create real password accounts, then grant disposable CI roles directly in the fixture DB.
