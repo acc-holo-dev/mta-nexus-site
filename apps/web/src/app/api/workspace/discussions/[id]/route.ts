@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
 import { discussionWorkspaceService } from "../../../../../lib/services/discussion-workspace-service";
 import { ownDiscussionError } from "../../../../../lib/discussion-workspace-copy";
@@ -44,5 +45,9 @@ async function mutate(request: NextRequest, context: Context, remove: boolean) {
     ownDiscussionError,
   );
 }
-export const PATCH = (request: NextRequest, context: Context) => mutate(request, context, false);
-export const DELETE = (request: NextRequest, context: Context) => mutate(request, context, true);
+export const PATCH = withBrowserMutation((request: NextRequest, context: Context) =>
+  mutate(request, context, false),
+);
+export const DELETE = withBrowserMutation((request: NextRequest, context: Context) =>
+  mutate(request, context, true),
+);

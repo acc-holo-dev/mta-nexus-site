@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { authorContentRepository } from "@nexus/db";
 import { consumeRateLimit } from "@nexus/security";
 import { RateLimitExceededError } from "@nexus/domain";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { userPlatformApi } from "../../../../lib/user-platform-api";
 import { parseContentPage } from "../../../../lib/user-platform-contract";
 import { authorContentService } from "../../../../lib/services/author-content-service";
@@ -12,7 +13,7 @@ export function GET(request: NextRequest) {
     authorContentRepository.pageByAuthor(user.id, parseContentPage(request.nextUrl.searchParams)),
   );
 }
-export function POST(request: NextRequest) {
+export const POST = withBrowserMutation((request: NextRequest) => {
   return userPlatformApi(
     request,
     async (user) => {
@@ -27,4 +28,4 @@ export function POST(request: NextRequest) {
     },
     201,
   );
-}
+});

@@ -18,11 +18,6 @@ apps/web/src/app/api/subscriptions/reviews/route.ts
 apps/web/src/app/api/support/[id]/route.ts
 apps/web/src/app/api/support/route.ts
 apps/web/src/app/api/verification/route.ts
-apps/web/src/app/api/workspace/content/[id]/restore/route.ts
-apps/web/src/app/api/workspace/content/[id]/route.ts
-apps/web/src/app/api/workspace/content/route.ts
-apps/web/src/app/api/workspace/discussions/[id]/route.ts
-apps/web/src/app/api/workspace/reactions/[id]/route.ts
 apps/web/src/app/api/workspace/reports/route.ts
 apps/web/src/app/api/workspace/verification/[id]/route.ts
 apps/web/src/app/api/workspace/verification/route.ts

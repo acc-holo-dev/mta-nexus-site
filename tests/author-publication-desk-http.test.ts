@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   session: vi.fn(),
@@ -32,6 +33,7 @@ const request = (
   new NextRequest(`https://nexus.test/api/workspace/content/desk${query}`, {
     method,
     headers: {
+      ...(method === "GET" ? {} : browserMutationHeaders()),
       cookie: "nexus_session=token; nexus_locale=ru",
       ...(body !== undefined ? { "content-type": "application/json" } : {}),
       ...headers,
@@ -40,11 +42,15 @@ const request = (
   });
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   state.session.mockResolvedValue({ id: "actor" });
   state.rate.mockResolvedValue({ success: true });
   state.desk.mockResolvedValue({ items: [], olderCursor: null, newerCursor: null });
   state.history.mockResolvedValue({});
   state.restore.mockResolvedValue({ id: "article", status: "draft", revision });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("keeps the authenticated author desk private and passes normalized filters", async () => {
   const response = await desk(
