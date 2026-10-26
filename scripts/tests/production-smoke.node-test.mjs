@@ -134,6 +134,11 @@ test('live smoke checks both sides of the declared upload boundary', () => {
   assert.match(source, /truncate -s "\$proxy_upload_limit"/u);
   assert.match(source, /\[\[ \$at_limit_code == 405 \]\]/u);
   assert.match(source, /\[\[ \$oversized_code == 413 \]\]/u);
+  assert.match(
+    source,
+    /Origin: https:\/\/\$domain/u,
+    'exact-limit health POST must present the canonical Origin so CSRF does not mask the 405',
+  );
 });
 
 test('production smoke proves offline-cache opt-in disappears when a session cookie is present', () => {

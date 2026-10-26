@@ -246,10 +246,13 @@ oversized_code=$("${https[@]}" \
   "https://$domain:8443/api/health")
 [[ $oversized_code == 413 ]] || { echo "FAIL: oversized request expected HTTP 413, got $oversized_code" >&2; exit 1; }
 # At the exact ceiling the proxy must let the upstream reject unsupported POST.
+# Send the canonical Origin so browser CSRF allows the request through; health
+# still has no POST handler (405). Cross-origin POSTs remain 403 at the Proxy.
 truncate -s "$proxy_upload_limit" "$work/oversized-request.bin"
 at_limit_code=$("${https[@]}" \
   -H 'Content-Type: application/octet-stream' \
   -H 'Expect: 100-continue' \
+  -H "Origin: https://$domain" \
   --data-binary @"$work/oversized-request.bin" \
   -o /dev/null -w '%{http_code}' "https://$domain:8443/api/health")
 [[ $at_limit_code == 405 ]] || { echo "FAIL: exact-limit health POST expected HTTP 405, got $at_limit_code" >&2; exit 1; }
