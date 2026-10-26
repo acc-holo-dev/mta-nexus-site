@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   create: vi.fn(),
@@ -23,14 +24,22 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
 import { POST } from "../apps/web/src/app/api/servers/route";
 
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.user = { id: "usr_test", role: "user" };
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("server registration request-body safety", () => {
   const send = (body: unknown) => POST(new NextRequest("https://nexus.test/api/servers", {
     method: "POST",
-    headers: { "Content-Type": "application/json", cookie: "nexus_session=valid" },
+    headers: {
+      ...browserMutationHeaders(),
+      "Content-Type": "application/json",
+      cookie: "nexus_session=valid",
+    },
     body: JSON.stringify(body),
   }));
 
@@ -49,7 +58,7 @@ describe("server registration request-body safety", () => {
   ])("rejects %s even when it contains valid JSON", async (type) => {
     const response = await POST(new NextRequest("https://nexus.test/api/servers", {
       method: "POST",
-      headers: { "Content-Type": type, cookie: "nexus_session=valid" },
+      headers: { ...browserMutationHeaders(), "Content-Type": type, cookie: "nexus_session=valid" },
       body: JSON.stringify({
         name: "Nexus", slug: "nexus", ipAddress: "203.0.113.7",
       }),

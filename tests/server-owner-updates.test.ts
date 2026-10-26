@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { NextRequest } from "next/server";
 
 const state = vi.hoisted(() => ({
@@ -42,6 +43,7 @@ function request(body: unknown) {
     {
       method: "PATCH",
       headers: {
+        ...browserMutationHeaders(),
         "content-type": "application/json",
         cookie:
           "nexus_session=server-owner-token",
@@ -71,12 +73,17 @@ function expectPrivateCorrelation(
 
 describe("server owner update HTTP contract", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
     state.user = {
       id: "usr_server_owner",
       role: "developer",
     };
     state.allowed = true;
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("updates only the strict public-card schema", async () => {
@@ -134,7 +141,11 @@ describe("server owner update HTTP contract", () => {
   it("rejects unsupported PATCH media types before any server update", async () => {
     const response = await PATCH(new NextRequest("https://nexus.test/api/servers/srv_1", {
       method: "PATCH",
-      headers: { "content-type": "text/plain", cookie: "nexus_session=server-owner-token" },
+      headers: {
+        ...browserMutationHeaders(),
+        "content-type": "text/plain",
+        cookie: "nexus_session=server-owner-token",
+      },
       body: JSON.stringify({ name: "Tampered server" }),
     }), routeContext);
     expect(response.status).toBe(415);

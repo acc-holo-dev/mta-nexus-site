@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import {
   db,
   organizationMembers,
@@ -22,6 +23,7 @@ function jsonRequest(
   return new NextRequest(url, {
     method,
     headers: {
+      ...browserMutationHeaders(),
       "content-type": "application/json",
       cookie: `nexus_session=${token}`,
     },
@@ -30,6 +32,13 @@ function jsonRequest(
 }
 
 describe("server ownership hardening integration", () => {
+  beforeEach(() => {
+    stubBrowserMutationOrigin();
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("registers through the trusted request-IP wrapper in test runtime", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
     // Server slugs only allow [a-z0-9-], so derive a slug-safe variant.
