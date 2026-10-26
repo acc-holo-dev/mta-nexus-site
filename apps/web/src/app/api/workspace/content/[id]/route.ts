@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { consumeRateLimit } from "@nexus/security";
 import { NotFoundError, RateLimitExceededError } from "@nexus/domain";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
 import { authorContentService } from "../../../../../lib/services/author-content-service";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
@@ -27,5 +28,9 @@ function mutate(request: NextRequest, context: Context, archive: boolean) {
     };
   });
 }
-export const PATCH = (request: NextRequest, context: Context) => mutate(request, context, false);
-export const DELETE = (request: NextRequest, context: Context) => mutate(request, context, true);
+export const PATCH = withBrowserMutation((request: NextRequest, context: Context) =>
+  mutate(request, context, false),
+);
+export const DELETE = withBrowserMutation((request: NextRequest, context: Context) =>
+  mutate(request, context, true),
+);

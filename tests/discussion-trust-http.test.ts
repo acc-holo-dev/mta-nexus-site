@@ -1,6 +1,7 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   page: vi.fn(),
@@ -37,6 +38,7 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
   return new NextRequest(`https://nexus.test/api${query}`, {
     method,
     headers: {
+      ...(method === "GET" ? {} : browserMutationHeaders()),
       cookie: "nexus_session=test;nexus_locale=ru",
       "content-type": "application/json",
       ...headers,
@@ -46,12 +48,16 @@ function request(method = "GET", body?: unknown, query = "", headers = {}) {
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   mocks.session.mockResolvedValue(actor);
   mocks.rate.mockResolvedValue({ success: true });
   mocks.page.mockResolvedValue({ items: [] });
   mocks.own.mockResolvedValue({ id: "comment" });
   mocks.mutate.mockResolvedValue({ commentId: "comment", removed: true });
   mocks.approvals.mockResolvedValue({ items: [] });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("scopes private page/detail to session and marks both responses private/no-store", async () => {
   const response = await page(request("GET", undefined, "?q=Lua&availability=unavailable"));

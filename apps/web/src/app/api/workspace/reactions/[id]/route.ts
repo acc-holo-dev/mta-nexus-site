@@ -2,15 +2,16 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
 import { consumeRateLimit } from "@nexus/security";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import { userPlatformApi } from "../../../../../lib/user-platform-api";
 import { reactionError } from "../../../../../lib/content-reaction-copy";
 import { contentReactionService } from "../../../../../lib/services/content-reaction-service";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../lib/bounded-json";
 const command = z.object({}).strict();
-export async function DELETE(
+export const DELETE = withBrowserMutation(async (
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
-) {
+) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -26,4 +27,4 @@ export async function DELETE(
     200,
     reactionError,
   );
-}
+});

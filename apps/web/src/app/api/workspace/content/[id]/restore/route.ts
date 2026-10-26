@@ -4,8 +4,12 @@ import type { NextRequest } from "next/server";
 import { authorPublicationDeskError } from "../../../../../../lib/author-publication-desk-copy";
 import { readBoundedJson, requireServerJsonContentType } from "../../../../../../lib/bounded-json";
 import { authorContentService } from "../../../../../../lib/services/author-content-service";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import { userPlatformApi } from "../../../../../../lib/user-platform-api";
-export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withBrowserMutation(async (
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -23,4 +27,4 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     200,
     authorPublicationDeskError,
   );
-}
+});
