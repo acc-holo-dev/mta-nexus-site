@@ -279,6 +279,16 @@ and independent lookups. HTTP/SSR tests assert one identity request per surface;
 three Web Push cases reject absent identities before subscription reads/writes.
 These checks are not real PostgreSQL concurrency or browser acceptance.
 
+Context switching uses that same identity lookup on the mutation route, then rechecks
+the initiating session inside the context transaction. The user row is locked first,
+then the current session, matching revocation lock order, and only then are membership
+and the context write considered. A missing, expired, or revoked session is unauthorized
+and does not change `activeContextId` or write the switch audit. The raw token is a
+bound digest in that lock and is not returned. Fresh-auth step-up for staff actions,
+withdrawals, and account recovery is still undefined. The pg-proxy tests cover the
+lock order, a no-op personal switch, membership denial, and a dead session; they are
+not a PostgreSQL concurrency proof.
+
 For simultaneous contributors, keep source edits in separate worktrees and record
 the main SHA used as the base. Before publication, re-read main; if it advanced,
 preserve the new commits, integrate overlapping changes and validate the combined

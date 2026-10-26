@@ -168,9 +168,9 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
-    const user = await authService.getSession(token);
+    const authenticated = await authService.getSessionIdentity(token);
 
-    if (!user) {
+    if (!authenticated || !token) {
       return json(
         context,
         { error: "Authentication required" },
@@ -178,6 +178,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
+    const { user } = authenticated;
     const rateLimit = await consumeRateLimit(
       "sessionManagement",
       user.id,
@@ -211,6 +212,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       await authService.switchContext(
         user.id,
         parsed.data.contextId,
+        token,
       );
 
     return json(context, {

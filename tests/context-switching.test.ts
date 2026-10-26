@@ -17,6 +17,9 @@ const state = vi.hoisted(() => ({
 const getSession = vi.hoisted(() =>
   vi.fn(async () => state.user),
 );
+const getSessionIdentity = vi.hoisted(() =>
+  vi.fn(async () => (state.user ? { user: state.user, sessionId: "ses_context" } : null)),
+);
 const switchContext = vi.hoisted(() =>
   vi.fn(async (_userId: string, contextId: string) => ({
     ...state.user,
@@ -64,6 +67,7 @@ const findSummaries = vi.hoisted(() =>
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: {
     getSession,
+    getSessionIdentity,
     switchContext,
   },
 }));
@@ -291,10 +295,23 @@ describe("account context switching HTTP contract", () => {
       success: true,
       activeContextId: "org_member",
     });
+    expect(getSessionIdentity).toHaveBeenCalledOnce();
+    expect(getSessionIdentity).toHaveBeenCalledWith("context-token");
+    expect(getSession).not.toHaveBeenCalled();
     expect(switchContext).toHaveBeenCalledWith(
       "usr_context",
       "org_member",
+      "context-token",
     );
+  });
+
+  it("does not switch context without a session identity", async () => {
+    state.user = null;
+    const response = await POST(postRequest({ contextId: "org_member" }));
+    expect(response.status).toBe(401);
+    expectPrivateCorrelation(response);
+    expect(getSessionIdentity).toHaveBeenCalledWith("context-token");
+    expect(switchContext).not.toHaveBeenCalled();
   });
 });
 
