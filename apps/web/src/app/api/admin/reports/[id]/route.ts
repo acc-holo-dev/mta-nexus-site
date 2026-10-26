@@ -10,6 +10,7 @@ import { requireServerJsonContentType, readBoundedJson } from "../../../../../li
 import { communityReportDecisionSchema } from "../../../../../lib/community-report-contract";
 import { communityReportService } from "../../../../../lib/services/community-report-service";
 import { queueCommunityReportNotice } from "../../../../../lib/services/community-report-notifications";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: NextRequest, context: Context) {
   return userPlatformApi(
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest, context: Context) {
     communityReportError,
   );
 }
-export async function PATCH(request: NextRequest, context: Context) {
+export const PATCH = withBrowserMutation(async (request: NextRequest, context: Context) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -44,4 +45,4 @@ export async function PATCH(request: NextRequest, context: Context) {
     200,
     communityReportDecisionError,
   );
-}
+});

@@ -1,4 +1,5 @@
 import { after, type NextRequest, NextResponse } from "next/server";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
 import { AppError } from "@nexus/domain";
 import { z } from "zod";
@@ -36,7 +37,7 @@ const adminActionSchema = z.discriminatedUnion("targetType", [
   z.object({ targetType: z.literal("content"), targetId: z.string().min(1).max(128), action: z.enum(["publish", "archive"]), notes: z.string().trim().min(3).max(2000), expectedUpdatedAt: z.iso.datetime() }).strict(),
 ]);
 
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -207,4 +208,4 @@ export async function POST(request: NextRequest) {
     });
     return json({ error: "Failed to execute administrative action" }, 500 );
   }
-}
+});

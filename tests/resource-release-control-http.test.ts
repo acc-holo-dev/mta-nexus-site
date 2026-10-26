@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { AppError, NotFoundError } from "@nexus/domain";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   allowed: true,
@@ -60,7 +61,7 @@ function get(path: string) {
 function post(path: string, body: unknown, headers = {}) {
   return new NextRequest(`https://nexus.test${path}`, {
     method: "POST",
-    headers: { "content-type": "application/json", ...headers },
+    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
     body: JSON.stringify(body),
   });
 }
@@ -68,7 +69,11 @@ function privateResponse(response: Response) {
   expect(response.headers.get("Cache-Control")).toBe("private, no-store");
   expect(response.headers.get("Vary")).toBe("Cookie");
 }
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.user = { id: "usr_a", role: "user" };
   state.allowed = true;

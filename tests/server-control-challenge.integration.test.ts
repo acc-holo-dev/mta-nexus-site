@@ -1,4 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { NextRequest } from "next/server";
 import { eq } from "drizzle-orm";
 
@@ -52,15 +53,21 @@ function post(
 ) {
   return new NextRequest(url, {
     method: "POST",
-    headers: {
+    headers: browserMutationHeaders({
       ...(body ? { "content-type": "application/json" } : {}),
       cookie: `nexus_session=${token}`,
-    },
+    }),
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 }
 
 describe("MTA server control challenge integration", () => {
+  beforeEach(() => {
+    stubBrowserMutationOrigin();
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
   it("requires a fresh live name token and creates exactly one moderation request", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
     const userId = `usr_control_${suffix}`;

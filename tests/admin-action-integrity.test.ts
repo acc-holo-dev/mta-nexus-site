@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { AppError, NotFoundError } from "@nexus/domain";
 
 const product = vi.hoisted(() => ({
@@ -87,10 +88,10 @@ function request(
 ) {
   return new NextRequest("http://nexus.test/api/admin/actions", {
     method: "POST",
-    headers: {
+    headers: browserMutationHeaders({
       "content-type": "application/json",
       cookie: "nexus_session=test-session",
-    },
+    }),
     body: JSON.stringify({
       targetType,
       targetId,
@@ -103,6 +104,7 @@ function request(
 
 describe("moderation action integrity", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
     moderation.command.mockReset().mockRejectedValue(new NotFoundError("Product", "prd_missing"));
     product.updateWithAudit.mockResolvedValue(null);
@@ -114,17 +116,26 @@ describe("moderation action integrity", () => {
     report.resolve.mockResolvedValue(false);
     report.findById.mockResolvedValue(null);
   });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
 
   it("requires a revision and refuses a cross-site legacy restore", async () => {
     for (const crossSite of [false, true]) {
-      const headers = new Headers({ "content-type": "application/json" });
+      const headers = new Headers(
+        browserMutationHeaders({ "content-type": "application/json" }),
+      );
       if (crossSite) headers.set("sec-fetch-site", "cross-site");
       const response = await POST(new NextRequest("http://nexus.test/api/admin/actions", {
         method: "POST", headers,
         body: JSON.stringify({ targetType: "product", targetId: "prd_a", action: "restore", notes: "Reviewed evidence" }),
       }));
       expect(response.status).toBe(crossSite ? 403 : 400);
-      expectPrivate(response);
+      if (crossSite) {
+        expect(await response.json()).toMatchObject({ code: "CSRF_REJECTED" });
+      } else {
+        expectPrivate(response);
+      }
     }
     expect(moderation.command).not.toHaveBeenCalled();
     expect(product.restoreSuspendedWithPublishedBuild).not.toHaveBeenCalled();

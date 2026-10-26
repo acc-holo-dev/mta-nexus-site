@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { eq } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import {
@@ -30,10 +31,10 @@ function moderationRequest(
 ) {
   return new NextRequest("http://nexus.test/api/admin/actions", {
     method: "POST",
-    headers: {
+    headers: browserMutationHeaders({
       "content-type": "application/json",
       cookie: `nexus_session=${token}`,
-    },
+    }),
     body: JSON.stringify({
       targetType: "build",
       expectedRevision: 1,
@@ -45,6 +46,12 @@ function moderationRequest(
 }
 
 describe("build moderation route integration", () => {
+  beforeEach(() => {
+    stubBrowserMutationOrigin();
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
   it("gates reviewer bytes and preserves build moderation HTTP semantics", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
     const authorId = `usr_build_author_${suffix}`;

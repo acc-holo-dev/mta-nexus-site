@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const afterMock = vi.hoisted(() => vi.fn());
 const reviewBuild = vi.hoisted(() =>
@@ -60,10 +61,10 @@ import { POST } from "../apps/web/src/app/api/admin/actions/route";
 function request(action: "approve" | "reject" | "quarantine") {
   return new NextRequest("http://nexus.test/api/admin/actions", {
     method: "POST",
-    headers: {
+    headers: browserMutationHeaders({
       "content-type": "application/json",
       cookie: "nexus_session=test-session",
-    },
+    }),
     body: JSON.stringify({
       targetType: "build",
       targetId: "bld_1",
@@ -76,7 +77,11 @@ function request(action: "approve" | "reject" | "quarantine") {
 
 describe("build review durable push scheduling", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it.each(["approve", "reject"] as const)(

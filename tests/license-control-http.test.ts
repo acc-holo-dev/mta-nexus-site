@@ -1,4 +1,5 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { NextRequest } from "next/server";
 import { createLicenseRuntimeToken } from "@nexus/security";
 
@@ -58,11 +59,15 @@ const updated = "2026-10-10T01:00:00.000Z";
 function request(path: string, body: unknown, headers: Record<string, string> = {}) {
   return new NextRequest(`https://nexus.test${path}`, {
     method: "POST",
-    headers: { "content-type": "application/json", ...headers },
+    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
     body: JSON.stringify(body),
   });
 }
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   state.user = { id: "usr_a", role: "user" };
   state.allowed = true;
   for (const mock of [
