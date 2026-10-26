@@ -1,5 +1,9 @@
 import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
@@ -64,6 +68,7 @@ const privateResponse = (response: Response) => {
 };
 
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.afterCallbacks.length = 0;
   mocks.session.mockResolvedValue(null);
@@ -86,6 +91,10 @@ beforeEach(() => {
     },
   });
   mocks.createWithAudit.mockResolvedValue({ report: { id: "rpt_test", status: "open" }, created: true });
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("report privacy and durable success", () => {
@@ -122,7 +131,7 @@ describe("report privacy and durable success", () => {
     mocks.dispatch.mockRejectedValue(new Error("Notification unavailable"));
     const response = await POST(new NextRequest("https://nexus.test/api/reports", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
       body: JSON.stringify({
         targetType: "product", targetId: "prd_test", type: "scam",
         reason: "The resource is misrepresented",
@@ -152,7 +161,7 @@ describe("report privacy and durable success", () => {
     mocks.session.mockResolvedValue({ id: "member_1" });
     const response = await POST(new NextRequest("https://nexus.test/api/reports", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
       body: JSON.stringify({
         targetType: "product", targetId: "prd_test", type: "scam",
         reason: "The resource requires moderator review",
@@ -177,7 +186,7 @@ describe("report privacy and durable success", () => {
     mocks.createWithAudit.mockRejectedValue(new Error("DB transaction aborted"));
     const response = await POST(new NextRequest("https://nexus.test/api/reports", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
       body: JSON.stringify({ targetType: "product", targetId: "prd_test", type: "scam", reason: "This is a fraudulent resource" }),
     }));
     expect(response.status).toBe(500);
@@ -193,7 +202,7 @@ describe("report privacy and durable success", () => {
     });
     const response = await POST(new NextRequest("https://nexus.test/api/reports", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
       body: JSON.stringify({ targetType: "product", targetId: "prd_test", type: "scam", reason: "Already reported fraudulent resource" }),
     }));
     expect(response.status).toBe(409);
@@ -212,7 +221,7 @@ describe("report privacy and durable success", () => {
     ]) {
       const response = await POST(new NextRequest("https://nexus.test/api/reports", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
         body: JSON.stringify({
           targetType: "product", targetId: "prd_test", type: "scam",
           reason: "An unsafe resource submission", ...input,
