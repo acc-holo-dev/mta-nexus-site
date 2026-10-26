@@ -10,6 +10,7 @@ import {
 import { createReportSchema } from "@nexus/validation";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
 
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../lib/observability";
 import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -176,4 +177,4 @@ export async function POST(request: NextRequest) {
     });
     return privateJson(context, { error: "Failed to submit report" }, { status: 500 });
   }
-}
+});

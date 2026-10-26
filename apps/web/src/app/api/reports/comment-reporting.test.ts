@@ -1,5 +1,9 @@
 import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
@@ -56,6 +60,7 @@ function request(targetId = "cmt_1") {
   return new NextRequest("https://nexus.test/api/reports", {
     method: "POST",
     headers: {
+      ...browserMutationHeaders(),
       "content-type": "application/json",
       cookie: "nexus_session=test",
     },
@@ -70,6 +75,7 @@ function request(targetId = "cmt_1") {
 
 describe("comment abuse reporting", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
     state.afterCallbacks.length = 0;
     mocks.session.mockResolvedValue({ id: "usr_reporter" });
@@ -93,6 +99,10 @@ describe("comment abuse reporting", () => {
         deliveryErrors: 0,
       },
     });
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("creates a report only after the comment target exists", async () => {
@@ -125,6 +135,7 @@ describe("comment abuse reporting", () => {
       new NextRequest("https://nexus.test/api/reports", {
         method: "POST",
         headers: {
+          ...browserMutationHeaders(),
           "content-type": "application/json",
           cookie: "nexus_session=test",
         },

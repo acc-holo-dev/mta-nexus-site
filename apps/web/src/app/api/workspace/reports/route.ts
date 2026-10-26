@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { userPlatformApi } from "../../../../lib/user-platform-api";
 import {
   communityReportError,
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
     communityReportError,
   );
 }
-export async function POST(request: NextRequest) {
+export const POST = withBrowserMutation(async (request: NextRequest) => {
   return userPlatformApi(
     request,
     async (actor) => {
@@ -38,4 +39,4 @@ export async function POST(request: NextRequest) {
     200,
     communityReportMutationError,
   );
-}
+});
