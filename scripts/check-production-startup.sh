@@ -139,24 +139,29 @@ app_before=$("${pc[@]}" ps -q app)
 postgres_before=$("${pc[@]}" ps -q postgres)
 worker_before=$("${pc[@]}" ps -q push-worker)
 restart_before=$(docker inspect --format '{{.RestartCount}}' "$worker_before")
-health_pid_before=$("${pc[@]}" exec -T push-worker node --input-type=module -e "import {readFileSync} from 'node:fs'; const h=JSON.parse(readFileSync('/tmp/nexus-web-push-worker-health.json','utf8')); process.stdout.write(String(h.pid));")
-worker_child=$(docker top "$worker_before" -eo pid,args | awk '/run-web-push-dispatcher\.ts/ {print $1; exit}')
-[[ $worker_child =~ ^[0-9]+$ && $worker_child -gt 1 ]]
-sudo kill -KILL "$worker_child"
+started_before=$(docker inspect --format '{{.State.StartedAt}}' "$worker_before")
+# docker kill marks a manual stop and suppresses unless-stopped restart.
+# Signal the container's host PID (init) to simulate a process crash, matching
+# the mail-worker rehearsal. Do not compare in-container health snapshot PIDs:
+# the PID namespace reuses the same numbers across supervised restarts.
+worker_pid=$(docker inspect --format '{{.State.Pid}}' "$worker_before")
+[[ $worker_pid =~ ^[0-9]+$ && $worker_pid -gt 1 ]]
+sudo kill -KILL "$worker_pid"
 
 recovered=0
 for attempt in $(seq 1 120); do
   sleep 0.25
   worker_now=$("${pc[@]}" ps -q push-worker 2>/dev/null || true)
   [[ -n $worker_now ]] || continue
+  running=$(docker inspect --format '{{.State.Running}}' "$worker_now" 2>/dev/null || true)
+  [[ $running == true ]] || continue
   restart_now=$(docker inspect --format '{{.RestartCount}}' "$worker_now" 2>/dev/null || echo 0)
   if [[ $restart_now -le $restart_before ]]; then continue; fi
+  started_now=$(docker inspect --format '{{.State.StartedAt}}' "$worker_now" 2>/dev/null || true)
+  [[ -n $started_now && $started_now != "$started_before" ]] || continue
   if "${pc[@]}" exec -T push-worker node /app/scripts/check-web-push-worker-health.mjs >/dev/null 2>&1; then
-    health_pid_after=$("${pc[@]}" exec -T push-worker node --input-type=module -e "import {readFileSync} from 'node:fs'; const h=JSON.parse(readFileSync('/tmp/nexus-web-push-worker-health.json','utf8')); process.stdout.write(String(h.pid));")
-    if [[ $health_pid_after != "$health_pid_before" ]]; then
-      recovered=1
-      break
-    fi
+    recovered=1
+    break
   fi
 done
 [[ $recovered == 1 ]]
