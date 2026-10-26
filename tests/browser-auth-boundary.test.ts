@@ -26,7 +26,7 @@ import { POST as password } from "../apps/web/src/app/api/auth/password/route";
 import { POST as context } from "../apps/web/src/app/api/auth/context/route";
 import { POST as emailRequest, PATCH as emailConfirm } from "../apps/web/src/app/api/auth/email-verification/route";
 import { POST as resetRequest, PATCH as resetConfirm } from "../apps/web/src/app/api/auth/password-reset/route";
-import { proxy } from "../apps/web/proxy";
+import { proxy } from "../apps/web/src/proxy";
 
 const mutations = [
   ["login", "POST", login], ["register", "POST", register],

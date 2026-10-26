@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
-import { config, proxy } from "../apps/web/proxy";
+import { config, proxy } from "../apps/web/src/proxy";
 
 function request(
   pathname: string,
