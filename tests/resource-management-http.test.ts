@@ -1,7 +1,8 @@
 import { Readable } from "node:stream";
 import { AppError, NotFoundError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "developer" } as null | {
@@ -63,11 +64,15 @@ function request(path: string, body?: unknown, headers: Record<string, string> =
       : {
           method: "POST",
           body: JSON.stringify(body),
-          headers: { "content-type": "application/json", ...headers },
+          headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
         },
   );
 }
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.user = { id: "usr_a", role: "developer" };
   state.allowed = true;

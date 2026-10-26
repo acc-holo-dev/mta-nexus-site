@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { AppError } from "@nexus/domain";
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
@@ -25,13 +26,18 @@ function request(body: unknown, revision: string | null = '"2026-10-04T20:00:00.
     method: "PATCH",
     body: JSON.stringify(body),
     headers: {
+      ...browserMutationHeaders(),
       "Content-Type": "application/json",
       ...(revision !== null ? { "If-Match": revision } : {}),
     },
   });
 }
 const params = { params: Promise.resolve({ id: "resource" }) };
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.resetAllMocks();
   mocks.getSession.mockResolvedValue(actor);
   mocks.getManagedProduct.mockResolvedValue({ id: "resource" });

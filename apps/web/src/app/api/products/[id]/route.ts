@@ -11,6 +11,7 @@ import {
 } from "../../../../lib/observability";
 import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 
 const privateHeaders = {
   "Cache-Control": "private, no-store",
@@ -91,14 +92,14 @@ export async function GET(
   }
 }
 
-export async function PATCH(
+export const PATCH = withBrowserMutation(async (
   request: NextRequest,
   {
     params,
   }: {
     params: Promise<{ id: string }>;
   },
-) {
+) => {
   const context = createRequestLogContext(request);
 
   try {
@@ -248,4 +249,4 @@ export async function PATCH(
       500,
     );
   }
-}
+});
