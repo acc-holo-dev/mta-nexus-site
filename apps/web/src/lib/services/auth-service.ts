@@ -369,7 +369,7 @@ class AuthService {
     });
   }
 
-  async switchContext(userId: string, contextId: string): Promise<User> {
+  async switchContext(userId: string, contextId: string, currentToken: string): Promise<User> {
     const nextContextId = contextId.trim();
     if (!nextContextId) throw new ForbiddenError("A context is required");
 
@@ -377,6 +377,7 @@ class AuthService {
       userId,
       contextId: nextContextId,
       auditId: generateId("aud"),
+      currentToken,
     });
     return toPublicUser(updated);
   }

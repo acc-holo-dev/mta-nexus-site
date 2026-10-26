@@ -117,13 +117,17 @@ export class AuthRepository {
     userId: string;
     contextId: string;
     auditId: string;
+    currentToken: string;
   }): Promise<User> {
     return db.transaction(async (tx) => {
       // Serialize changes to this user's active context. Authorization is checked
       // after the user lock, together with the context write and audit insertion.
+      // The initiating session is rechecked after that same lock: a route-level
+      // identity read can be stale if the session was revoked while waiting.
       const [user] = await tx.select(publicUserColumns).from(users)
         .where(eq(users.id, data.userId)).for("update");
       if (!user) throw new NotFoundError("User", data.userId);
+      await this.lockCurrentSession(tx, data.userId, data.currentToken);
 
       if (data.contextId !== "personal") {
         // SHARE locks hold owner changes, organization deletion and membership
@@ -213,21 +217,27 @@ export class AuthRepository {
     });
   }
 
+  private async lockCurrentSession(tx: AuthTransaction, userId: string, token: string) {
+    const [current] = await tx.select({ id: sessions.id, expiresAt: sessions.expiresAt })
+      .from(sessions).where(and(
+        eq(sessions.userId, userId),
+        eq(sessions.token, digestSessionToken(token)),
+        gt(sessions.expiresAt, new Date()),
+      )).for("update");
+    const expiresAt = current ? new Date(current.expiresAt).getTime() : Number.NaN;
+    if (!current || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+      throw new UnauthorizedError("Authentication required");
+    }
+    return current;
+  }
+
   private async lockSessionActor(tx: AuthTransaction, userId: string, token: string) {
     // Match login/password-change lock order: user first, then current session.
     // Recheck AFTER any lock wait; the route's earlier authorization may be stale.
     const [user] = await tx.select({ id: users.id }).from(users)
       .where(eq(users.id, userId)).for("update");
     if (!user) throw new UnauthorizedError("Authentication required");
-    const [current] = await tx.select({ id: sessions.id, expiresAt: sessions.expiresAt })
-      .from(sessions).where(and(
-        eq(sessions.userId, userId), eq(sessions.token, digestSessionToken(token)),
-        gt(sessions.expiresAt, new Date())
-      )).for("update");
-    if (!current || current.expiresAt.getTime() <= Date.now()) {
-      throw new UnauthorizedError("Authentication required");
-    }
-    return current;
+    return this.lockCurrentSession(tx, userId, token);
   }
 
   async revokeSession(token: string, audit: AuditWrite): Promise<void> {

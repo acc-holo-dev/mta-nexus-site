@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { getTableColumns } from "drizzle-orm";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { users } from "../packages/db/src/schema";
@@ -47,6 +48,11 @@ const expected = {
   twoFactorEnabled: true, activeContextId: "personal", createdAt: now, updatedAt: now,
 };
 const session = { id: "session", userId: "user-1", token: "raw-token", expiresAt: new Date(now.getTime() + 1000) };
+const tokenDigest = createHash("sha256").update("raw-token").digest("hex");
+const liveSession = (expiresAt = new Date(now.getTime() + 60_000)) => ["ses_1", expiresAt.toISOString()];
+const contextSwitch = (contextId: string) => auth.switchContext({
+  userId: "user-1", contextId, auditId: "audit", currentToken: "raw-token",
+});
 const audit = { id: "audit", actorId: "user-1", actorType: "user" as const, action: "user.registered", targetId: "user-1", targetType: "user" };
 beforeEach(() => {
   state.queries = []; state.results = []; state.failure = null;
@@ -120,30 +126,65 @@ it("registers a user, session and audit while returning no password hash", async
   expect(state.queries[2].sql).toMatch(/^insert into "audit_events" /);
 });
 it("keeps the locked no-op personal context credential-free", async () => {
-  state.results = [[row()]];
-  expect(await auth.switchContext({ userId: "user-1", contextId: "personal", auditId: "audit" })).toMatchObject(expected);
-  expect(state.queries).toHaveLength(1);
+  state.results = [[row()], [liveSession()]];
+  expect(await contextSwitch("personal")).toMatchObject(expected);
+  expect(state.queries).toHaveLength(2);
   expect(state.queries[0].sql).toContain("for update");
   expect(state.queries[0].sql).not.toContain('"password_hash"');
+  expect(state.queries[1].sql).not.toContain('"password_hash"');
+  expect(state.queries[1].params).not.toContain("raw-token");
 });
 it("checks a current owner under locks, writes context and audit, and returns no credential", async () => {
-  state.results = [[row()], [["user-1"]], [row({ activeContextId: "organization" })], []];
-  const result = await auth.switchContext({ userId: "user-1", contextId: "organization", auditId: "audit" });
+  state.results = [[row()], [liveSession()], [["user-1"]], [row({ activeContextId: "organization" })], []];
+  const result = await contextSwitch("organization");
   expect(result).toMatchObject({ id: "user-1", activeContextId: "organization" });
   expect(result).not.toHaveProperty("passwordHash");
-  expect(state.queries).toHaveLength(4);
+  expect(state.queries).toHaveLength(5);
   expect(state.queries[0].sql).toContain("for update");
-  expect(state.queries[1].sql).toContain("for share");
-  expect(state.queries[2].sql).toMatch(/^update "users" /);
-  expect(state.queries[3].sql).toMatch(/^insert into "audit_events" /);
+  expect(state.queries[1].sql).toContain('"sessions"');
+  expect(state.queries[1].sql).toContain("for update");
+  expect(state.queries[2].sql).toContain("for share");
+  expect(state.queries[3].sql).toMatch(/^update "users" /);
+  expect(state.queries[4].sql).toMatch(/^insert into "audit_events" /);
   for (const query of state.queries) expect(query.sql).not.toContain('"password_hash"');
 });
 it("requires current membership before a non-owned context mutation", async () => {
-  state.results = [[row()], [["other-owner"]], []];
-  await expect(auth.switchContext({ userId: "user-1", contextId: "organization", auditId: "audit" })).rejects.toThrow("Not authorized");
-  expect(state.queries).toHaveLength(3);
-  expect(state.queries[2].sql).toContain("for share");
+  state.results = [[row()], [liveSession()], [["other-owner"]], []];
+  await expect(contextSwitch("organization")).rejects.toThrow("Not authorized");
+  expect(state.queries).toHaveLength(4);
+  expect(state.queries[1].sql).toContain('"sessions"');
+  expect(state.queries[3].sql).toContain("for share");
   expect(state.queries.every(query => !query.sql.startsWith("update "))).toBe(true);
+});
+it("rechecks the initiating session before a context write and fails closed when it is gone", async () => {
+  state.results = [[row()]];
+  await expect(contextSwitch("organization")).rejects.toThrow("Authentication required");
+  expect(state.queries).toHaveLength(2);
+  expect(state.queries[0].sql).toContain("for update");
+  expect(state.queries[1].sql).toContain('"sessions"');
+  expect(state.queries[1].sql).toContain("for update");
+  const selection = state.queries[1].sql.split(" from ")[0];
+  expect(selection).toContain('"id"');
+  expect(selection).toContain('"expires_at"');
+  expect(selection).not.toContain('"token"');
+  expect(selection).not.toContain('"ip_address"');
+  expect(selection).not.toContain('"user_agent"');
+  expect(state.queries[1].params).toContain(tokenDigest);
+  expect(state.queries[1].params).not.toContain("raw-token");
+  expect(state.queries.every(query => !query.sql.startsWith("update ") && !query.sql.startsWith("insert "))).toBe(true);
+});
+it("locks a live session and still skips a no-op personal context write", async () => {
+  state.results = [[row()], [liveSession()]];
+  await expect(contextSwitch("personal")).resolves.toMatchObject(expected);
+  expect(state.queries).toHaveLength(2);
+  expect(state.queries[1].sql).toContain('"sessions"');
+  expect(state.queries[1].params).toContain(tokenDigest);
+  expect(state.queries.every(query => !query.sql.startsWith("update ") && !query.sql.startsWith("insert "))).toBe(true);
+});
+it("does not switch context when the locked session is already expired", async () => {
+  state.results = [[row()], [liveSession(new Date(now.getTime()))]];
+  await expect(contextSwitch("organization")).rejects.toThrow("Authentication required");
+  expect(state.queries.every(query => !query.sql.startsWith("update ") && !query.sql.startsWith("insert "))).toBe(true);
 });
 it.each(["stored-credential", "changed-credential"])("retains the locked password revalidation for a login against %s", async password => {
   state.results = [[[password]], [], []];
