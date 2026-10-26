@@ -1,5 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import {
+  browserMutationHeaders,
+  stubBrowserMutationOrigin,
+} from "../../../../../../tests/browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
@@ -97,18 +101,26 @@ function expectPrivate(response: Response) {
 const makeRequest = (path: string, method: string, body?: string) =>
   new NextRequest(`http://nexus.test${path}`, {
     method,
-    headers: { "content-type": "application/json" },
+    headers: {
+      ...(path.startsWith("/api/follow") && method !== "GET" ? browserMutationHeaders() : {}),
+      "content-type": "application/json",
+    },
     ...(body === undefined ? {} : { body }),
   });
 
 describe("social and notification HTTP state contract", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    stubBrowserMutationOrigin();
     state.afterCallbacks.length = 0;
     state.user = { id: "usr_1", username: "tester" };
     state.follow = { id: "fol_1", followerId: "usr_1", targetType: "user", targetId: "usr_2" };
     state.following = true;
     state.notificationFails = false;
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("keeps anonymous and authenticated follow-state reads private", async () => {
