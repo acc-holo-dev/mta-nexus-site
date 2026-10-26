@@ -316,7 +316,9 @@ session does not approve, reject, quarantine, restore, publish, or archive.
 Verification decisions on `/api/admin/actions` and `/api/admin/verification/[id]`
 recheck the initiating session after the staff role share lock and before the
 write. A missing, expired, or revoked session does not approve or reject the
-request. Report resolution is unchanged.
+request. Report resolution on `/api/admin/actions` share-locks the actor, then
+rechecks the initiating session before the write. A missing, expired, or revoked
+session does not resolve or dismiss the report. The role check stays on the route.
 
 For simultaneous contributors, keep source edits in separate worktrees and record
 the main SHA used as the base. Before publication, re-read main; if it advanced,

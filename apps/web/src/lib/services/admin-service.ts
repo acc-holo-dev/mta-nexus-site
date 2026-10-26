@@ -63,6 +63,7 @@ class AdminService {
       moderatorNotes: string;
     },
     actor: User,
+    currentToken: string,
   ): Promise<Report> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError("Moderator access required");
@@ -81,6 +82,7 @@ class AdminService {
         targetType: "report",
         details: { notes: input.moderatorNotes },
       },
+      currentToken,
     );
     if (!report) throw new NotFoundError("Report", reportId);
 

@@ -1,7 +1,8 @@
 import { and, asc, count, eq, desc, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, reports } from "../schema";
+import { auditEvents, reports, users } from "../schema";
 import type { AuditEvent, Report } from "@nexus/domain";
+import { lockInitiatingSession } from "./initiating-session";
 
 export class ReportRepository {
   async countOpen(): Promise<number> {
@@ -93,8 +94,18 @@ export class ReportRepository {
     status: "resolved" | "dismissed",
     moderatorNotes: string,
     audit: Omit<AuditEvent, "createdAt">,
+    currentToken: string,
   ): Promise<Report | null> {
     return db.transaction(async (tx) => {
+      // Share-lock the actor before the session so revocation cannot deadlock.
+      // The role predicate stays at the route.
+      await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, audit.actorId))
+        .limit(1)
+        .for("share");
+      await lockInitiatingSession(tx, audit.actorId, currentToken);
       const now = new Date();
       const rows = await tx
         .update(reports)

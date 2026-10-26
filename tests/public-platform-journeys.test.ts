@@ -5,6 +5,7 @@ import {
   socialRepository,
   notificationRepository,
   reportRepository,
+  sessionRepository,
   contentRepository,
   buildRepository,
 } from "@nexus/db";
@@ -24,6 +25,12 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
       username: `player_${ts}`,
       displayName: "Journey Player",
       role: "user",
+    });
+    await sessionRepository.create({
+      id: `ses_pl_${ts}`,
+      userId: playerUser.id,
+      token: `tok_${playerUser.id}`,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
     });
 
     devUser = await userRepository.create({
@@ -205,7 +212,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
       targetId: report.id,
       targetType: "report",
       details: { notes: "Case verified and closed" },
-    });
+    }, `tok_${playerUser.id}`);
     expect(resolved?.status).toBe("resolved");
   });
 });

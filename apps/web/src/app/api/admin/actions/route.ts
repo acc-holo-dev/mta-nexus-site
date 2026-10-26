@@ -105,11 +105,13 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       }
     } else if (targetType === "report") {
       if (action === "resolve" || action === "dismiss") {
+        if (!token) return json({ error: "Authentication required" }, 401);
         const resolved = await reportRepository.resolve(
           targetId,
           action === "resolve" ? "resolved" : "dismissed",
           notes,
           makeAudit(),
+          token,
         );
         if (!resolved) {
           const current = await reportRepository.findById(targetId);

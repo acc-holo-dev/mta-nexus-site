@@ -264,7 +264,7 @@ it("removal, aggregate repair, report resolution and audit share one transaction
 it("generic report reads and resolution exclude commercial review cases", async () => {
   const { ReportRepository } = await import("../packages/db/src/repositories/reports");
   const legacy = new ReportRepository();
-  state.rows = [[], [], [], []];
+  state.rows = [[], [], [], [["usr_a"]], [["ses_a", "2099-01-01T00:00:00.000Z"]], []];
   await legacy.countOpen();
   await legacy.listPage("pending", 1);
   await legacy.findById("rpt_a");
@@ -275,9 +275,12 @@ it("generic report reads and resolution exclude commercial review cases", async 
     action: "report.resolved",
     targetId: "rpt_a",
     targetType: "report",
-  });
-  expect(state.queries).toHaveLength(4);
+  }, "staff-token");
+  expect(state.queries).toHaveLength(6);
+  expect(state.queries.some((query) => query.sql.startsWith('update "reports"'))).toBe(true);
   expect(
-    state.queries.every((query) => query.sql.includes(`"reports"."target_type" <> 'review'`)),
+    state.queries
+      .filter((query) => query.sql.includes('"reports"'))
+      .every((query) => query.sql.includes(`"reports"."target_type" <> 'review'`)),
   ).toBe(true);
 });

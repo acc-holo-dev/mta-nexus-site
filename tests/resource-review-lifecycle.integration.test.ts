@@ -12,6 +12,7 @@ import {
   auditEvents,
   resourceReviewsRepository as repo,
   reportRepository,
+  sessionRepository,
 } from "@nexus/db";
 
 it("persists review revisions, grant expiry, live moderation, atomic rollback and aggregate integrity", async () => {
@@ -35,6 +36,12 @@ it("persists review revisions, grant expiry, live moderation, atomic rollback an
           role: actor === staff ? "moderator" : actor === publisher ? "developer" : "user",
         })),
       );
+    await sessionRepository.create({
+      id: `ses_${staff}`,
+      userId: staff,
+      token: `tok_${staff}`,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+    });
     await db
       .insert(products)
       .values({
@@ -159,7 +166,7 @@ it("persists review revisions, grant expiry, live moderation, atomic rollback an
         action: "report.resolved",
         targetId: id("rpt"),
         targetType: "report",
-      }),
+      }, `tok_${staff}`),
     ).toBeNull();
     const decide = (expectedRevision: number) =>
       repo.decide({

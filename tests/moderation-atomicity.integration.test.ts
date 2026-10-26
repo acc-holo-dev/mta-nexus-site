@@ -280,6 +280,13 @@ describe("moderation atomicity integration", () => {
       displayName: "Report Atomic Moderator",
       role: "moderator",
     });
+    const moderatorToken = `tok_${moderatorId}`;
+    await sessionRepository.create({
+      id: `ses_${moderatorId}`,
+      userId: moderatorId,
+      token: moderatorToken,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+    });
 
     await reportRepository.create({
       id: reportId,
@@ -304,6 +311,7 @@ describe("moderation atomicity integration", () => {
         targetId: reportId,
         targetType: "report",
       },
+      moderatorToken,
     );
     expect(resolved?.status).toBe("resolved");
 
@@ -319,6 +327,7 @@ describe("moderation atomicity integration", () => {
         targetId: reportId,
         targetType: "report",
       },
+      moderatorToken,
     );
     expect(second).toBeNull();
 
