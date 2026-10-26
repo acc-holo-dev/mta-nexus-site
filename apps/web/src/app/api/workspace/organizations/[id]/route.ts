@@ -1,11 +1,13 @@
 import type { NextRequest } from "next/server";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
   organizationApi,
-  organizationInput,
   organizationId,
+  organizationInput,
 } from "../../../../../lib/organization-workspace-api";
-import { organizationWorkspaceService } from "../../../../../lib/services/organization-workspace-service";
 import { parseOrganizationPage } from "../../../../../lib/organization-workspace-contract";
+import { organizationWorkspaceService } from "../../../../../lib/services/organization-workspace-service";
+
 type Context = { params: Promise<{ id: string }> };
 export function GET(request: NextRequest, context: Context) {
   return organizationApi(request, async (user) => {
@@ -14,7 +16,7 @@ export function GET(request: NextRequest, context: Context) {
     return organizationWorkspaceService.get(organizationId(id), user, filters.page, filters.query);
   });
 }
-export function PATCH(request: NextRequest, context: Context) {
+export const PATCH = withBrowserMutation((request: NextRequest, context: Context) => {
   return organizationApi(request, async (user) => ({
     organization: await organizationWorkspaceService.update(
       organizationId((await context.params).id),
@@ -22,4 +24,4 @@ export function PATCH(request: NextRequest, context: Context) {
       user,
     ),
   }));
-}
+});

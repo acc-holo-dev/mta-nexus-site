@@ -1,6 +1,8 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+
 const state = vi.hoisted(() => ({
   actor: { id: "owner", role: "user" } as Record<string, unknown> | null,
 }));
@@ -22,17 +24,19 @@ vi.mock("@nexus/security", () => ({
   consumeRateLimit: mocks.rate,
   generateId: (p: string) => `${p}_new`,
 }));
+
 import { POST as leave } from "../apps/web/src/app/api/workspace/organizations/[id]/leave/route";
-import { GET as list, POST as create } from "../apps/web/src/app/api/workspace/organizations/route";
-import {
-  GET as workspace,
-  PATCH as profile,
-} from "../apps/web/src/app/api/workspace/organizations/[id]/route";
-import { POST as add } from "../apps/web/src/app/api/workspace/organizations/[id]/members/route";
 import {
   PATCH as change,
   DELETE as remove,
 } from "../apps/web/src/app/api/workspace/organizations/[id]/members/[userId]/route";
+import { POST as add } from "../apps/web/src/app/api/workspace/organizations/[id]/members/route";
+import {
+  PATCH as profile,
+  GET as workspace,
+} from "../apps/web/src/app/api/workspace/organizations/[id]/route";
+import { POST as create, GET as list } from "../apps/web/src/app/api/workspace/organizations/route";
+
 const version = "2026-10-10T12:00:00.000Z";
 const fields = { name: "Team", description: "Description", logoUrl: "", websiteUrl: "" };
 const stored = {
@@ -49,6 +53,7 @@ function request(method: string, body?: unknown, locale = "en", headers = {}) {
   return new NextRequest("http://nexus.test/api/workspace/organizations?page=2&q=team", {
     method,
     headers: {
+      ...browserMutationHeaders(),
       cookie: `nexus_session=test;nexus_locale=${locale}`,
       "content-type": "application/json",
       ...headers,
@@ -56,7 +61,11 @@ function request(method: string, body?: unknown, locale = "en", headers = {}) {
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
 }
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.actor = { id: "owner", role: "user" };
   mocks.rate.mockResolvedValue({ success: true });

@@ -1,10 +1,12 @@
 import type { NextRequest } from "next/server";
+import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
 import {
   organizationApi,
-  organizationInput,
   organizationId,
+  organizationInput,
 } from "../../../../../../../lib/organization-workspace-api";
 import { organizationWorkspaceService } from "../../../../../../../lib/services/organization-workspace-service";
+
 type Context = { params: Promise<{ id: string; userId: string }> };
 function mutation(request: NextRequest, context: Context, remove: boolean) {
   return organizationApi(request, async (user) => {
@@ -18,9 +20,9 @@ function mutation(request: NextRequest, context: Context, remove: boolean) {
     );
   });
 }
-export function PATCH(request: NextRequest, context: Context) {
-  return mutation(request, context, false);
-}
-export function DELETE(request: NextRequest, context: Context) {
-  return mutation(request, context, true);
-}
+export const PATCH = withBrowserMutation((request: NextRequest, context: Context) =>
+  mutation(request, context, false),
+);
+export const DELETE = withBrowserMutation((request: NextRequest, context: Context) =>
+  mutation(request, context, true),
+);

@@ -31,17 +31,6 @@ apps/web/src/app/api/workspace/content/[id]/restore/route.ts
 apps/web/src/app/api/workspace/content/[id]/route.ts
 apps/web/src/app/api/workspace/content/route.ts
 apps/web/src/app/api/workspace/discussions/[id]/route.ts
-apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/restore/route.ts
-apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/route.ts
-apps/web/src/app/api/workspace/organizations/[id]/content/route.ts
-apps/web/src/app/api/workspace/organizations/[id]/leave/route.ts
-apps/web/src/app/api/workspace/organizations/[id]/members/[userId]/route.ts
-apps/web/src/app/api/workspace/organizations/[id]/members/batch/preview/route.ts
-apps/web/src/app/api/workspace/organizations/[id]/members/batch/route.ts
-apps/web/src/app/api/workspace/organizations/[id]/members/route.ts
-apps/web/src/app/api/workspace/organizations/[id]/ownership/route.ts
-apps/web/src/app/api/workspace/organizations/[id]/route.ts
-apps/web/src/app/api/workspace/organizations/route.ts
 apps/web/src/app/api/workspace/reactions/[id]/route.ts
 apps/web/src/app/api/workspace/reports/route.ts
 apps/web/src/app/api/workspace/servers/visibility/preview/route.ts

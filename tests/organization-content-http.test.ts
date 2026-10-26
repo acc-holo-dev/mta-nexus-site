@@ -1,6 +1,8 @@
-import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   rate: vi.fn(),
@@ -16,15 +18,17 @@ vi.mock("../apps/web/src/lib/services/organization-content-service", () => ({
   organizationContentService: mocks,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
+
+import {
+  DELETE,
+  GET,
+  PATCH,
+} from "../apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/route";
 import {
   GET as list,
   POST,
 } from "../apps/web/src/app/api/workspace/organizations/[id]/content/route";
-import {
-  GET,
-  PATCH,
-  DELETE,
-} from "../apps/web/src/app/api/workspace/organizations/[id]/content/[contentId]/route";
+
 const actor = { id: "actor", role: "user" },
   context = { params: Promise.resolve({ id: "org", contentId: "content" }) };
 const input = {
@@ -40,13 +44,18 @@ const request = (method = "GET", body?: unknown, query = "", headers = {}) =>
   new NextRequest(`https://nexus.test/api/workspace/organizations/org/content${query}`, {
     method,
     headers: {
+      ...browserMutationHeaders(),
       cookie: "nexus_session=session;nexus_locale=ru",
       "content-type": "application/json",
       ...headers,
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   mocks.session.mockResolvedValue(actor);
   mocks.rate.mockResolvedValue({ success: true });
