@@ -7,6 +7,7 @@ import { resourceReviewService } from "../../../../../lib/services/resource-revi
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { resourceReviewQuery } from "../../../../../lib/resource-review-query";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 import {
   createRequestLogContext,
   jsonWithRequestId,
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return jsonWithRequestId(context, { code: "REVIEWS_UNAVAILABLE" }, { status: 503, headers });
   }
 }
-export function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withBrowserMutation((request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   return resourceCommerceRequest(request, true, async (actor) => {
     const body = resourceReviewCreateSchema.safeParse(await readBoundedJson(request, 16384));
     if (!body.success) throw new AppError("Invalid review", 400, "REVIEW_INVALID");
@@ -60,4 +61,4 @@ export function POST(request: NextRequest, { params }: { params: Promise<{ id: s
       { status: 201 },
     );
   });
-}
+});

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
   allowed: true,
@@ -57,9 +58,13 @@ const request = (url: string, body?: unknown, headers: Record<string, string> = 
   new NextRequest(`https://nexus.test${url}`, {
     method: body === undefined ? "GET" : "POST",
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    headers: { "Content-Type": "application/json", ...headers },
+    headers: { ...browserMutationHeaders(), "Content-Type": "application/json", ...headers },
   });
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.actor = { id: "usr_a", role: "user" };
   state.allowed = true;

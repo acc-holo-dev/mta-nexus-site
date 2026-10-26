@@ -22,7 +22,6 @@ apps/web/src/app/api/library/collections/[id]/versions/route.ts
 apps/web/src/app/api/library/collections/[id]/watches/route.ts
 apps/web/src/app/api/library/collections/route.ts
 apps/web/src/app/api/library/releases/[id]/route.ts
-apps/web/src/app/api/library/review/[id]/route.ts
 apps/web/src/app/api/library/watches/[id]/route.ts
 apps/web/src/app/api/library/watches/disable/route.ts
 apps/web/src/app/api/library/watches/resume/route.ts
@@ -32,8 +31,6 @@ apps/web/src/app/api/notifications/preferences/route.ts
 apps/web/src/app/api/notifications/push/route.ts
 apps/web/src/app/api/orders/[id]/cancel/route.ts
 apps/web/src/app/api/orders/[id]/support/route.ts
-apps/web/src/app/api/products/[id]/reviews/[reviewId]/report/route.ts
-apps/web/src/app/api/products/[id]/reviews/route.ts
 apps/web/src/app/api/reports/route.ts
 apps/web/src/app/api/resources/cart/acquire/route.ts
 apps/web/src/app/api/resources/cart/route.ts
