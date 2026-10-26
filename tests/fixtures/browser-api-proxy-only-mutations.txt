@@ -13,14 +13,6 @@ apps/web/src/app/api/content/[slug]/comments/route.ts
 apps/web/src/app/api/content/[slug]/reactions/route.ts
 apps/web/src/app/api/content/route.ts
 apps/web/src/app/api/follow/route.ts
-apps/web/src/app/api/library/[id]/collections/route.ts
-apps/web/src/app/api/library/collections/[id]/import-preview/route.ts
-apps/web/src/app/api/library/collections/[id]/reconcile-preview/route.ts
-apps/web/src/app/api/library/collections/[id]/route.ts
-apps/web/src/app/api/library/collections/[id]/versions/preview/route.ts
-apps/web/src/app/api/library/collections/[id]/versions/route.ts
-apps/web/src/app/api/library/collections/[id]/watches/route.ts
-apps/web/src/app/api/library/collections/route.ts
 apps/web/src/app/api/library/releases/[id]/route.ts
 apps/web/src/app/api/library/watches/[id]/route.ts
 apps/web/src/app/api/library/watches/disable/route.ts

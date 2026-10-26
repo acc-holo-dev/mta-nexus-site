@@ -1,4 +1,5 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 const h = vi.hoisted(() => ({
@@ -25,19 +26,23 @@ const get = (query = "") =>
 const post = (
   body: unknown = command,
   query = "",
-  headers: Record<string, string> = { "content-type": "application/json" },
+  headers: Record<string, string> = {},
 ) =>
   new NextRequest(`https://nexus.test/api/library/collections/lcol_a/watches${query}`, {
     method: "POST",
-    headers,
+    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
     body: JSON.stringify(body),
   });
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   h.user = { id: "usr_a" };
   h.rate.mockResolvedValue({ success: true });
   h.page.mockResolvedValue({ items: [] });
   h.enable.mockResolvedValue({ items: [], changedCount: 1 });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("authenticates collection reads and writes before calling repositories", async () => {
   h.user = null;

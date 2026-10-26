@@ -3,6 +3,7 @@ import { readBoundedJson } from "../../../../../lib/bounded-json";
 import type { NextRequest } from "next/server";
 import { resourceCommerceRequest } from "../../../../../lib/resource-commerce-http";
 import { libraryCollectionsService } from "../../../../../lib/services/library-collections-service";
+import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return resourceCommerceRequest(request, false, async (actor) => {
@@ -11,7 +12,7 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
     return libraryCollectionsService.resourceMemberships(actor, (await params).id);
   });
 }
-export function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withBrowserMutation((request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   return resourceCommerceRequest(request, true, async (actor) => {
     if (request.nextUrl.searchParams.size)
       throw new AppError("Unexpected membership mutation query", 400, "COLLECTION_INVALID");
@@ -21,4 +22,4 @@ export function POST(request: NextRequest, { params }: { params: Promise<{ id: s
       await readBoundedJson(request, LIBRARY_COLLECTION_COMMAND_BYTES),
     );
   });
-}
+});

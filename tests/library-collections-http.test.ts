@@ -13,7 +13,8 @@ import { GET as accountHistory } from "../apps/web/src/app/api/library/collectio
 import { GET as historyExport } from "../apps/web/src/app/api/library/collections/history/export/route";
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -90,10 +91,16 @@ const request = (path: string, init?: ConstructorParameters<typeof NextRequest>[
 const post = (
   body: unknown = { requestId, action: "create", name: "Core" },
   path = base,
-  headers: Record<string, string> = { "content-type": "application/json" },
-) => request(path, { method: "POST", body: JSON.stringify(body), headers });
+  headers: Record<string, string> = {},
+) =>
+  request(path, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+  });
 beforeEach(() => {
   vi.clearAllMocks();
+  stubBrowserMutationOrigin();
   state.actor = { id: "usr_a", role: "user" };
   state.rate.mockResolvedValue({ success: true });
   state.command.mockResolvedValue({ receipt: { id: "lcr_a" }, replayed: false });
@@ -110,6 +117,9 @@ beforeEach(() => {
     itemCount: 200,
     sourceDigest: "a".repeat(64),
   });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("requires a signed-in account for all six private operations", async () => {
   state.actor = null;
