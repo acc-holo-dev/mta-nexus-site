@@ -1,6 +1,7 @@
 import { ForbiddenError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_admin" } as { id: string } | null,
@@ -28,11 +29,16 @@ const context = { params: Promise.resolve({ id: "smo_a" }) };
 function request(path: string, body?: unknown, headers: Record<string, string> = {}) {
   return new NextRequest(`http://nexus.test/api/admin/storage${path}`, {
     method: body === undefined ? "GET" : "POST",
-    headers: { "content-type": "application/json", ...headers },
+    headers: {
+      ...(body === undefined ? {} : browserMutationHeaders()),
+      "content-type": "application/json",
+      ...headers,
+    },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
 }
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.actor = { id: "usr_admin" };
   state.rate.mockResolvedValue({ success: true });
@@ -40,6 +46,9 @@ beforeEach(() => {
   state.namespaces.mockResolvedValue({ owners: [] });
   state.discover.mockResolvedValue({ observed: 1 });
   state.cleanup.mockResolvedValue({ state: "deleted" });
+});
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 it("rejects signed-out discovery and inventory before touching the service", async () => {
   state.actor = null;
