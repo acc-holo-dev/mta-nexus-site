@@ -26,11 +26,11 @@ describe("local storage symlink confinement", () => {
     await fs.symlink(path.join(outside, "missing"), path.join(root, "dangling"));
     for (const dir of ["outside", "dangling"]) {
       await expect(
-        provider.put(dir + "/attack.zip", Buffer.from("attack"), "application/zip"),
+        provider.put(`${dir}/attack.zip`, Buffer.from("attack"), "application/zip"),
       ).rejects.toThrow();
-      await expect(provider.get(dir + "/secret.zip")).rejects.toThrow();
-      await expect(provider.exists(dir + "/secret.zip")).rejects.toThrow();
-      await expect(provider.delete(dir + "/secret.zip")).rejects.toThrow();
+      await expect(provider.get(`${dir}/secret.zip`)).rejects.toThrow();
+      await expect(provider.exists(`${dir}/secret.zip`)).rejects.toThrow();
+      await expect(provider.delete(`${dir}/secret.zip`)).rejects.toThrow();
     }
     expect(await fs.readFile(path.join(outside, "secret.zip"), "utf8")).toBe(
       "outside confidential bytes",

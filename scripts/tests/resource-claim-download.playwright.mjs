@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { createHash, randomBytes } from "node:crypto";
 import { createReadStream } from "node:fs";
 import { mkdir, rm, stat, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
 import { createRequire } from "node:module";
+import { join, resolve } from "node:path";
 import { startBrowserMemoryProbe } from "../browser-memory.mjs";
 
 assert.equal(process.env.GITHUB_ACTIONS, "true");
@@ -31,7 +31,6 @@ const productId = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_ID;
 const productSlug = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_SLUG;
 const productTitle = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE;
 const paidProductId = process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_ID;
-const paidProductSlug = process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_SLUG;
 const paidProductTitle = process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_TITLE;
 const expectedSha256 = process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256;
 const expectedSize = Number(process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SIZE);

@@ -201,7 +201,7 @@ async function assertAdvancedAriaSemantics(page, label) {
           problems.push("missing aria-controls");
         } else {
           const panel = document.getElementById(controls);
-          if (!panel || panel.getAttribute("role") !== "tabpanel") {
+          if (panel?.getAttribute("role") !== "tabpanel") {
             problems.push("aria-controls does not reference a tabpanel");
           }
         }

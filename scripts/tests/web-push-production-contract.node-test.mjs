@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 function read(relative) {
-  return readFileSync(new URL("../../" + relative, import.meta.url), "utf8");
+  return readFileSync(new URL(`../../${relative}`, import.meta.url), "utf8");
 }
 
 test("production image contains the durable Web Push worker runtime", () => {
@@ -17,7 +17,7 @@ test("production image contains the durable Web Push worker runtime", () => {
 test("production compose runs Web Push as a separate healthy process", () => {
   const compose = read("compose.production.yaml");
 
-  assert.match(compose, /\n  push-worker:\n/);
+  assert.match(compose, /\n {2}push-worker:\n/);
   assert.match(compose, /scripts\/run-web-push-dispatcher\.ts/);
   assert.match(compose, /check-web-push-worker-health\.mjs/);
   assert.match(compose, /WEB_PUSH_VAPID_PUBLIC_KEY:/);

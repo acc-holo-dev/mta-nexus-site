@@ -1,4 +1,3 @@
-import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Avatar } from "../packages/ui/src/avatar";

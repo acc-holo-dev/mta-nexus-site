@@ -226,7 +226,7 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
       const original = await serverRepository.findById(serverId);
       if (!original) throw new Error("Missing server");
       const outdated = { ipAddress: original.ipAddress, port: original.port };
-      await serverRepository.update(serverId, { ipAddress: "updated." + outdated.ipAddress });
+      await serverRepository.update(serverId, { ipAddress: `updated.${outdated.ipAddress}` });
       const result = await serverObservationRepository.record(
         sample(serverId, "2026-10-09T13:00:00.000Z", 97),
         outdated,
@@ -244,7 +244,7 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
       const original = await serverRepository.findById(serverId);
       if (!original) throw new Error("Missing server");
       const fetchedAt = "2026-10-09T16:00:00.000Z";
-      const alternateHost = "backup." + original.ipAddress;
+      const alternateHost = `backup.${original.ipAddress}`;
       const directory = {
         fetchedAt,
         isStale: false,
@@ -276,7 +276,7 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
         observationFor(secondEndpoint),
         secondEndpoint,
       );
-      expect(second?.sourceSequence).toBe(fetchedAt + "#endpoint-revision=1");
+      expect(second?.sourceSequence).toBe(`${fetchedAt}#endpoint-revision=1`);
       expect(second?.currentPlayers).toBe(22);
       expect((await liveState(serverId))?.currentPlayers).toBe(22);
 
@@ -288,7 +288,7 @@ describe("MTA observation freshness (real PostgreSQL)", () => {
         observationFor(thirdEndpoint),
         thirdEndpoint,
       );
-      expect(third?.sourceSequence).toBe(fetchedAt + "#endpoint-revision=2");
+      expect(third?.sourceSequence).toBe(`${fetchedAt}#endpoint-revision=2`);
       expect(third?.currentPlayers).toBe(11);
       expect((await liveState(serverId))?.currentPlayers).toBe(11);
 

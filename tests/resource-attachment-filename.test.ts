@@ -20,8 +20,8 @@ describe("safe download response filenames", () => {
       ".json",
       ".map",
     ]) {
-      expect(resourceAttachmentFileName("script", "1.2.3", "asset" + ext)).toBe(
-        "script-1.2.3" + ext,
+      expect(resourceAttachmentFileName("script", "1.2.3", `asset${ext}`)).toBe(
+        `script-1.2.3${ext}`,
       );
     }
     expect(resourceAttachmentFileName("script", "1.2.3", "IMAGE.PNG")).toBe("script-1.2.3.png");

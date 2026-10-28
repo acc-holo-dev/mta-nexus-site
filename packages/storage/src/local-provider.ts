@@ -1,15 +1,15 @@
+import crypto from "node:crypto";
+import { constants as fsConstants } from "node:fs";
+import fs from "node:fs/promises";
+import path from "node:path";
+import type { StorageObjectIdentity } from "@nexus/domain";
+import { ConflictError, MAX_UPLOAD_FILE_SIZE_BYTES, ValidationError } from "@nexus/domain";
 import {
-  listAssetNamespaces,
   discoverAssetNamespace,
+  listAssetNamespaces,
   removeMaintenanceObject,
 } from "./local-maintenance";
-import type { StorageObjectIdentity } from "@nexus/domain";
-import fs from "node:fs/promises";
-import { constants as fsConstants } from "node:fs";
-import path from "node:path";
-import crypto from "node:crypto";
-import { ConflictError, MAX_UPLOAD_FILE_SIZE_BYTES, ValidationError } from "@nexus/domain";
-import type { StorageProvider, StorageObjectMeta, VerifiedStorageReadMeta } from "./types";
+import type { StorageObjectMeta, StorageProvider, VerifiedStorageReadMeta } from "./types";
 
 type DirectoryHandle = Awaited<ReturnType<typeof fs.open>>;
 
@@ -33,7 +33,7 @@ export class LocalStorageProvider implements StorageProvider {
     }
     const resolved = path.resolve(this.baseDir, key);
     const relative = path.relative(this.baseDir, resolved);
-    if (relative === ".." || relative.startsWith(".." + path.sep) || path.isAbsolute(relative)) {
+    if (relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
       throw new Error("Storage key escapes the configured storage directory");
     }
     const parts = key.split("/");
@@ -51,7 +51,7 @@ export class LocalStorageProvider implements StorageProvider {
    */
   private entryPath(parent: DirectoryHandle, name: string): string {
     const fdRoot = process.platform === "darwin" ? "/dev/fd" : "/proc/self/fd";
-    return fdRoot + "/" + parent.fd + "/" + name;
+    return `${fdRoot}/${parent.fd}/${name}`;
   }
 
   private async withParent<T>(
@@ -61,7 +61,8 @@ export class LocalStorageProvider implements StorageProvider {
   ): Promise<T> {
     const resolved = this.resolvePath(key);
     const parts = path.relative(this.baseDir, resolved).split(path.sep);
-    const leaf = parts.pop()!;
+    const leaf = parts.pop();
+    if (!leaf) throw new Error("Invalid storage key");
     if (!fsConstants.O_NOFOLLOW || !fsConstants.O_DIRECTORY) {
       throw new Error("Secure local storage requires directory and no-follow filesystem support");
     }
@@ -103,7 +104,7 @@ export class LocalStorageProvider implements StorageProvider {
     const bytes = Buffer.from(data);
     const hash = crypto.createHash("sha256").update(bytes).digest("hex");
     return this.withParent(key, true, async (filePath) => {
-      const temporary = filePath + "." + crypto.randomUUID() + ".tmp";
+      const temporary = `${filePath}.${crypto.randomUUID()}.tmp`;
       const handle = await fs.open(
         temporary,
         fsConstants.O_WRONLY | fsConstants.O_CREAT | fsConstants.O_EXCL | fsConstants.O_NOFOLLOW,

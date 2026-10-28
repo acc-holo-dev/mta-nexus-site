@@ -50,7 +50,7 @@ for (const status of [201, 410, 503]) {
   const result = await sender(
     {
       ...subscription,
-      endpoint: "https://push.example.net/subscriptions/" + status,
+      endpoint: `https://push.example.net/subscriptions/${status}`,
     },
     {
       title: "MTA NEXUS",
@@ -82,4 +82,4 @@ try {
   timeoutRejected = true;
 }
 
-process.stdout.write(JSON.stringify({ statuses, timeoutRejected, retryAfterMs }) + "\n");
+process.stdout.write(`${JSON.stringify({ statuses, timeoutRejected, retryAfterMs })}\n`);

@@ -5,8 +5,8 @@ import { resolve } from "node:path";
 import test from "node:test";
 import {
   EXTERNAL_RELEASE_EVIDENCE_SPECS,
-  REQUIRED_RELEASE_GATES,
   executeReleaseCommand,
+  REQUIRED_RELEASE_GATES,
   repositoryStayedStable,
   summarizeExternalEvidence,
   summarizeReleaseEvidence,
@@ -30,7 +30,15 @@ test("CI runs separate test projects and reports the selected verification scope
     Object.keys(pkg.scripts)
       .filter((name) => pattern.test(name))
       .sort(),
-    ["analyze:architecture", "analyze:unused", "lint", "test:tooling", "test:unit", "typecheck"],
+    [
+      "analyze:architecture",
+      "analyze:unused",
+      "format:check",
+      "lint",
+      "test:tooling",
+      "test:unit",
+      "typecheck",
+    ],
   );
   assert.match(pkg.scripts["check:code"], /--sequential --no-bail/u);
   assert.match(pkg.scripts["test:unit"], /--project unit\b/u);
@@ -43,7 +51,10 @@ test("CI runs separate test projects and reports the selected verification scope
 
 test("core release evidence requires every named gate including lint and typecheck", () => {
   const pkg = JSON.parse(read("package.json"));
-  assert.equal(pkg.scripts.check, "pnpm lint && pnpm typecheck && pnpm test && pnpm build");
+  assert.equal(
+    pkg.scripts.check,
+    "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+  );
 
   assert.deepEqual(REQUIRED_RELEASE_GATES, [
     "repository_identity",

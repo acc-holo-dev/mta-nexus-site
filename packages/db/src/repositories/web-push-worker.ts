@@ -2,8 +2,8 @@ import { createHash, randomBytes } from "node:crypto";
 import { and, eq, gt, inArray, isNull, lt, lte, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import { notifications, sessions, webPushOutbox, webPushSubscriptions } from "../schema";
-import { normalizeWebPushPayload } from "../web-push-runtime";
 import type { WebPushNotificationPayload } from "../web-push-runtime";
+import { normalizeWebPushPayload } from "../web-push-runtime";
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -178,19 +178,20 @@ export class WebPushWorkerRepository {
       if (!row) return null;
       const now = await clock(tx);
       const subscriptionExpiresAt = row.subscription.expirationAt;
+      const leaseExpiresAt = row.outbox.leaseExpiresAt;
 
       const owns =
         row.outbox.attempts === lease.attempt &&
         row.outbox.leaseTokenDigest === digest &&
-        row.outbox.leaseExpiresAt !== null &&
-        row.outbox.leaseExpiresAt.getTime() === lease.expiresAt.getTime();
+        leaseExpiresAt !== null &&
+        leaseExpiresAt.getTime() === lease.expiresAt.getTime();
       const valid =
         row.outbox.expiresAt > now &&
         row.sessionExpiresAt > now &&
         row.subscription.userId === row.notification.recipientId &&
         (subscriptionExpiresAt === null || subscriptionExpiresAt > now);
 
-      if (!owns) return null;
+      if (!owns || leaseExpiresAt === null) return null;
       if (!valid) {
         await tx.delete(webPushOutbox).where(eq(webPushOutbox.id, lease.id));
         return null;
@@ -201,7 +202,7 @@ export class WebPushWorkerRepository {
           row.outbox.expiresAt.getTime(),
           row.sessionExpiresAt.getTime(),
           subscriptionExpiresAt?.getTime() ?? Number.MAX_SAFE_INTEGER,
-          row.outbox.leaseExpiresAt!.getTime(),
+          leaseExpiresAt.getTime(),
         ),
       );
       if (validUntil <= now) return null;

@@ -190,7 +190,7 @@ function boundedText(value: unknown, maxLength: number): string | undefined {
 
 function safeNotificationTarget(value: unknown): string | undefined {
   const bounded = boundedText(value, 2048);
-  if (!bounded || !bounded.startsWith("/") || bounded.startsWith("//")) {
+  if (!bounded?.startsWith("/") || bounded.startsWith("//")) {
     return undefined;
   }
   try {

@@ -73,8 +73,8 @@ describe("bounded published build archive", () => {
 
   it("never composes a request URL from an invalid build selector", () => {
     expect(validDownloadBuildId("bld_abc")).toBe(true);
-    expect(validDownloadBuildId("bld_" + "a".repeat(120))).toBe(true);
-    expect(validDownloadBuildId("bld_" + "a".repeat(121))).toBe(false);
+    expect(validDownloadBuildId(`bld_${"a".repeat(120)}`)).toBe(true);
+    expect(validDownloadBuildId(`bld_${"a".repeat(121)}`)).toBe(false);
     expect(resourceDownloadUrl("product/id", "bld_version")).toBe(
       "/api/products/product%2Fid/download?buildId=bld_version",
     );

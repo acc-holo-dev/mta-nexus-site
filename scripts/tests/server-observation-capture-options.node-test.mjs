@@ -40,7 +40,7 @@ test("rejects opaque cursors that are empty or contain invalid characters", () =
     "not-an-id",
     "srv_hello world",
     "srv_../etc",
-    "srv_" + "x".repeat(200),
+    `srv_${"x".repeat(200)}`,
   ]) {
     assert.throws(
       () =>

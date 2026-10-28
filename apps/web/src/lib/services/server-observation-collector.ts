@@ -65,7 +65,8 @@ export async function captureKnownServerObservations(options?: {
 
   for (let page = 0; page < maxPages; page++) {
     const knownServers = pageRows.slice(0, limit);
-    if (knownServers.length === 0) {
+    const lastServer = knownServers.at(-1);
+    if (!lastServer) {
       nextCursor = null;
       break;
     }
@@ -104,7 +105,7 @@ export async function captureKnownServerObservations(options?: {
     knownServersCount += knownServers.length;
     matchedServers += candidates.length;
     recordAttempts += recordable.length;
-    cursor = knownServers[knownServers.length - 1]!.id;
+    cursor = lastServer.id;
     listingHasMore = pageRows.length > limit;
     // Stale snapshots cannot prove that any current observation was written.
     // Reporting an afterId for them would let an operator skip untouched

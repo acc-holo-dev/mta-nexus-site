@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { describe, expect, it } from "vitest";
 import { buildMasterObservationCandidates } from "../apps/web/src/lib/services/server-observation-matching";
 
@@ -70,11 +71,13 @@ describe("server observation collector", () => {
         directory,
       );
       expect(rows).toHaveLength(1);
-      return rows[0]!;
+      const [row] = rows;
+      assert.ok(row);
+      return row;
     };
     expect(collect(0).sourceSequence).toBe(fetchedAt);
-    expect(collect(1).sourceSequence).toBe(fetchedAt + "#endpoint-revision=1");
-    expect(collect(2).sourceSequence).toBe(fetchedAt + "#endpoint-revision=2");
+    expect(collect(1).sourceSequence).toBe(`${fetchedAt}#endpoint-revision=1`);
+    expect(collect(2).sourceSequence).toBe(`${fetchedAt}#endpoint-revision=2`);
     expect(collect(2).observedAt.toISOString()).toBe(fetchedAt);
     expect(collect(1).currentPlayers).toBe(12);
     expect(collect(1).sourceSequence).not.toBe(collect(2).sourceSequence);

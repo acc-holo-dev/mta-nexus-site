@@ -48,7 +48,7 @@ if (typeof evidenceSha256 !== "string" || evidenceSha256 !== expected) {
 
 const leaked = forbiddenKeys(evidence);
 if (leaked.length) {
-  fail("sensitive capability fields are present: " + leaked.join(", "));
+  fail(`sensitive capability fields are present: ${leaked.join(", ")}`);
 }
 
 if (

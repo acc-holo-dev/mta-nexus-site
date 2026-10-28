@@ -3,10 +3,10 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { LocaleProvider } from "./locale-context";
 import { NotificationBell } from "./notification-bell";
 
-const effects = vi.hoisted(() => [] as Array<() => void | (() => void)>);
+const effects = vi.hoisted(() => [] as Array<import("react").EffectCallback>);
 vi.mock("react", async (importOriginal) => ({
   ...(await importOriginal<typeof import("react")>()),
-  useEffect: (setup: () => void | (() => void)) => {
+  useEffect: (setup: import("react").EffectCallback) => {
     effects.push(setup);
   },
 }));

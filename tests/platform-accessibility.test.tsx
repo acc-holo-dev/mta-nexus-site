@@ -1,4 +1,3 @@
-import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { Circle } from "lucide-react";
 import { describe, expect, it } from "vitest";

@@ -16,7 +16,7 @@ describe("support request idempotency contract", () => {
       "12345678-1234-1234-8234-123456789abc",
       "12345678-1234-4234-0234-123456789abc",
       key.toUpperCase(),
-      key + " ",
+      `${key} `,
     ]) {
       expect(parseSupportIdempotencyKey(value)).toBeNull();
     }

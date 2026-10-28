@@ -1,5 +1,5 @@
-import { asc, gt } from "drizzle-orm";
 import { ServerEndpointAuditCollector } from "@nexus/domain";
+import { asc, gt } from "drizzle-orm";
 
 async function main(): Promise<void> {
   const options = new Set(process.argv.slice(2));
@@ -42,8 +42,9 @@ async function main(): Promise<void> {
             .limit(500);
 
           for (const row of rows) audit.add(row);
-          if (rows.length < 500) break;
-          afterId = rows[rows.length - 1]!.id;
+          const lastRow = rows.at(-1);
+          if (rows.length < 500 || !lastRow) break;
+          afterId = lastRow.id;
         }
       },
       {
@@ -60,7 +61,7 @@ async function main(): Promise<void> {
   // Private server IDs and network addresses never appear in the default
   // output, including when the audit discovers a collision.
   process.stdout.write(
-    JSON.stringify(details ? report : { summary: report.summary }, null, 2) + "\n",
+    `${JSON.stringify(details ? report : { summary: report.summary }, null, 2)}\n`,
   );
   if (
     report.summary.invalidRows > 0 ||
@@ -76,7 +77,7 @@ async function main(): Promise<void> {
 main().catch((error: unknown) => {
   // Do not print connection strings or raw database errors.
   process.stderr.write(
-    "MTA endpoint audit failed (" + (error instanceof Error ? error.name : "UnknownError") + ")\n",
+    `MTA endpoint audit failed (${error instanceof Error ? error.name : "UnknownError"})\n`,
   );
   process.exitCode = 1;
 });

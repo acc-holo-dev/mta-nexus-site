@@ -374,7 +374,7 @@ try {
   }
 
   if (!cleanupSucceeded) {
-    process.stderr.write("web-push-soak cleanup failed for fixture namespace " + suffix + "\n");
+    process.stderr.write(`web-push-soak cleanup failed for fixture namespace ${suffix}\n`);
     process.exitCode = 1;
   }
 }

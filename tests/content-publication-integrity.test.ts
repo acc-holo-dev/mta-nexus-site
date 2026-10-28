@@ -25,7 +25,7 @@ describe("published content detail HTTP behavior", () => {
     "rejects invalid public slug %j before service lookup",
     async (slug) => {
       const response = await GET(
-        new NextRequest("http://nexus.test/api/content/" + encodeURIComponent(slug)),
+        new NextRequest(`http://nexus.test/api/content/${encodeURIComponent(slug)}`),
         { params: Promise.resolve({ slug }) },
       );
       expect(response.status).toBe(404);

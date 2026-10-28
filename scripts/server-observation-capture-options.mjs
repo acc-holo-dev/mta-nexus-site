@@ -6,11 +6,11 @@
 function boundedInt(raw, fallback, max, name) {
   if (raw === undefined || raw === "") return fallback;
   if (typeof raw !== "string" || !/^[1-9][0-9]*$/u.test(raw)) {
-    throw new RangeError(name + " must be a positive integer");
+    throw new RangeError(`${name} must be a positive integer`);
   }
   const parsed = Number(raw);
   if (!Number.isSafeInteger(parsed) || parsed > max) {
-    throw new RangeError(name + " exceeds the safety limit of " + max);
+    throw new RangeError(`${name} exceeds the safety limit of ${max}`);
   }
   return parsed;
 }

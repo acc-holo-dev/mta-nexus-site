@@ -185,7 +185,7 @@ export class ProductService {
 
   async getProductById(id: string): Promise<Product | null> {
     const product = await productRepository.findById(id);
-    if (!product || product.status !== "published") {
+    if (product?.status !== "published") {
       return null;
     }
     // Paid listings stay off the public market, but ID lookups must still

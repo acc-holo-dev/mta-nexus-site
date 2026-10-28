@@ -24,7 +24,7 @@ export function resourceAttachmentFileName(
   // Leave sufficient room for separators and the extension under 200 chars.
   const safeSlug = safePart(slug, "resource", 95);
   const safeVersion = safePart(version, "release", 90);
-  return safeSlug + "-" + safeVersion + ext;
+  return `${safeSlug}-${safeVersion}${ext}`;
 }
 
 /**

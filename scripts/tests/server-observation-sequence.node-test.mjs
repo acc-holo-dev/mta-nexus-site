@@ -14,8 +14,8 @@ test("records each endpoint revision separately within the same master snapshot"
     observationSequenceForEndpoint(SNAPSHOT, revision),
   );
   assert.equal(new Set(ids).size, ids.length);
-  assert.equal(ids[1], SNAPSHOT + "#endpoint-revision=1");
-  assert.equal(ids[2], SNAPSHOT + "#endpoint-revision=2");
+  assert.equal(ids[1], `${SNAPSHOT}#endpoint-revision=1`);
+  assert.equal(ids[2], `${SNAPSHOT}#endpoint-revision=2`);
   assert.equal(observationSequenceForEndpoint(SNAPSHOT, 2), ids[2]);
 });
 

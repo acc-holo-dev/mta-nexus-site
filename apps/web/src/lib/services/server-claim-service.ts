@@ -33,7 +33,7 @@ export async function notifyModeratorsOfServerClaim(serverName: string): Promise
       moderatorIds.map((moderatorId) => ({
         recipientId: moderatorId,
         title: "Server ownership proof requires review",
-        message: "MTA control proof verified for " + serverName,
+        message: `MTA control proof verified for ${serverName}`,
         link: "/admin",
         type: "security" as const,
         category: "security" as const,

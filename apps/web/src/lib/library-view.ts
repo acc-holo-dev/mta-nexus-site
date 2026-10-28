@@ -71,5 +71,5 @@ export function libraryHref(filter: UserLibraryFilter, page: number) {
   if (filter !== "all") params.set("filter", filter);
   if (page > 1) params.set("page", String(page));
   const query = params.toString();
-  return `/workspace/library${query ? "?" + query : ""}`;
+  return `/workspace/library${query ? `?${query}` : ""}`;
 }

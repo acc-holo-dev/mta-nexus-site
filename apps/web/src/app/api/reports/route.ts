@@ -168,7 +168,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
             event: "moderation.report_notification_failed",
             context,
             status: 201,
-            error: new Error(dispatch.storageFailed + " moderator notification deliveries failed"),
+            error: new Error(`${dispatch.storageFailed} moderator notification deliveries failed`),
           });
         }
       } catch (error) {

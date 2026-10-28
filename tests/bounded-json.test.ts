@@ -21,13 +21,13 @@ function streamed(parts: Uint8Array[], headers?: Record<string, string>): Reques
 
 describe("bounded JSON body parsing", () => {
   it("parses small bodies and protects the exact byte boundary", async () => {
-    const body = '"' + "a".repeat(30) + '"';
+    const body = `"${"a".repeat(30)}"`;
     expect(await parseBoundedJson(new Request(url, { method: "POST", body }), 32)).toEqual({
       ok: true,
       value: "a".repeat(30),
     });
     expect(
-      await parseBoundedJson(new Request(url, { method: "POST", body: body + " " }), 32),
+      await parseBoundedJson(new Request(url, { method: "POST", body: `${body} ` }), 32),
     ).toEqual({
       ok: false,
       reason: "too_large",

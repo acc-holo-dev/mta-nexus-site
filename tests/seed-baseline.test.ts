@@ -1,3 +1,4 @@
+import assert from "node:assert/strict";
 import { getTableName, type SQL } from "drizzle-orm";
 import { PgDialect, type PgTable } from "drizzle-orm/pg-core";
 import { beforeEach, expect, it, vi } from "vitest";
@@ -113,12 +114,13 @@ it("ships a baseline with no auto-fetched remote media", () => {
 it("repairs only exact legacy demo media and preserves custom replacements", async () => {
   await seedBaseline(fixtures());
 
-  const user = state.rows.users.find((row) => row.id === "usr_admin_001")!;
-  const customUser = state.rows.users.find((row) => row.id === "usr_dev_001")!;
-  const organization = state.rows.organizations.find((row) => row.id === "org_horizon")!;
-  const server = state.rows.servers.find((row) => row.id === "srv_drift_01")!;
-  const product = state.rows.products.find((row) => row.id === "prd_inv_pro")!;
-  const article = state.rows.content.find((row) => row.id === "cnt_art_001")!;
+  const user = state.rows.users.find((row) => row.id === "usr_admin_001");
+  const customUser = state.rows.users.find((row) => row.id === "usr_dev_001");
+  const organization = state.rows.organizations.find((row) => row.id === "org_horizon");
+  const server = state.rows.servers.find((row) => row.id === "srv_drift_01");
+  const product = state.rows.products.find((row) => row.id === "prd_inv_pro");
+  const article = state.rows.content.find((row) => row.id === "cnt_art_001");
+  assert.ok(user && customUser && organization && server && product && article);
 
   user.avatarUrl = "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_admin";
   customUser.avatarUrl = "https://media.example/custom.svg";

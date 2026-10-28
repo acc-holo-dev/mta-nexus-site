@@ -1,8 +1,9 @@
-import { mkdtemp, rm, readdir } from "node:fs/promises";
+import assert from "node:assert/strict";
+import { mkdtemp, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Readable } from "node:stream";
-import { beforeEach, afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { LocalStorageProvider } from "../packages/storage/src/local-provider";
 
 const state = vi.hoisted(() => ({ provider: null as LocalStorageProvider | null, next: 0 }));
@@ -13,6 +14,7 @@ vi.mock("../packages/storage/src/provider-factory", () => ({
   },
 }));
 vi.mock("@nexus/security", () => ({ generateId: () => `ast_test_${++state.next}` }));
+
 import { StorageService } from "../packages/storage/src/storage-service";
 
 let root: string;
@@ -97,7 +99,8 @@ it("opens a download once, without an existence preflight race", async () => {
     mimeType: "application/zip",
     userId: "usr_owner",
   });
-  const provider = state.provider!;
+  const provider = state.provider;
+  assert.ok(provider);
   const preflight = vi
     .spyOn(provider, "exists")
     .mockRejectedValue(new Error("exists must not be called"));
@@ -121,7 +124,7 @@ it.each([".luac", ".dff", ".txd", ".col", ".png", ".jpg", ".jpeg", ".webp", ".js
     const bytes = Buffer.from("asset bytes");
     const asset = await service.uploadAsset({
       data: bytes,
-      fileName: "payload" + ext,
+      fileName: `payload${ext}`,
       mimeType: "application/octet-stream",
       userId: "usr_owner",
     });
@@ -137,7 +140,8 @@ it.each([".luac", ".dff", ".txd", ".col", ".png", ".jpg", ".jpeg", ".webp", ".js
 // adapter completion and the caller resuming after its await.
 it("destroys an opened provider stream when cancellation wins the return race", async () => {
   const controller = new AbortController();
-  const provider = state.provider!;
+  const provider = state.provider;
+  assert.ok(provider);
   const stream = Readable.from([Buffer.from("pending content")]);
   const key = "assets/usr_owner/stale.zip";
   const get = vi.spyOn(provider, "get").mockImplementation(async () => {
@@ -157,7 +161,8 @@ it("destroys an opened provider stream when cancellation wins the return race", 
 it.each(["key", "sizeBytes", "sha256Hash"] as const)(
   "rejects incorrect %s returned by an upload provider and cleans up the new object",
   async (field) => {
-    const provider = state.provider!;
+    const provider = state.provider;
+    assert.ok(provider);
     const originalPut = provider.put.bind(provider);
     vi.spyOn(provider, "put").mockImplementation(async (...args) => {
       const meta = await originalPut(...args);
@@ -192,7 +197,8 @@ it.each(["key", "sizeBytes", "sha256Hash"] as const)(
       mimeType: "application/zip",
       userId: "usr_owner",
     });
-    const provider = state.provider!;
+    const provider = state.provider;
+    assert.ok(provider);
     const originalGet = provider.get.bind(provider);
     let openedStream: Readable | undefined;
     vi.spyOn(provider, "get").mockImplementation(async (...args) => {

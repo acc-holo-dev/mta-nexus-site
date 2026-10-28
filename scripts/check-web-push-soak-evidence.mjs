@@ -31,7 +31,7 @@ if (typeof evidenceSha256 !== "string" || evidenceSha256 !== expected) {
 }
 
 if (evidence?.verdict?.passed !== true) {
-  fail("soak verdict is not passed: " + JSON.stringify(evidence?.verdict?.failures ?? []));
+  fail(`soak verdict is not passed: ${JSON.stringify(evidence?.verdict?.failures ?? [])}`);
 }
 
 if (

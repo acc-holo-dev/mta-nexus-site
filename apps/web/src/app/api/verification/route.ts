@@ -212,7 +212,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           moderatorIds.map((moderatorId) => ({
             recipientId: moderatorId,
             title: "New verification request",
-            message: parsed.data.targetType + " verification requested for " + parsed.data.targetId,
+            message: `${parsed.data.targetType} verification requested for ${parsed.data.targetId}`,
             link: "/admin?verificationView=pending&verificationPage=1",
             type: "security" as const,
           })),

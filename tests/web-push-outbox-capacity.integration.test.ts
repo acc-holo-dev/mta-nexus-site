@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { count, eq, inArray, sql } from "drizzle-orm";
+import { count, inArray, sql } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import {
   db,
