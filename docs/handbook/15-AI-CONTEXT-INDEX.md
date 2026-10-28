@@ -1,31 +1,15 @@
-# Task-directed context map
+# Карта предметных областей
 
-Start at [AGENTS.md](../../AGENTS.md), run `pnpm agent:brief`, then read the selected
-[queue task](59-DEVELOPMENT-QUEUE.md). The old sequential 16-document read order is
-replaced by this map. Open only relevant headings, callers, contracts and tests.
-Use `rg -n` for decisions/paths, then read the matching section. Broaden when a
-cross-domain invariant requires it. No summary overrides source evidence.
-
-| Task area | First source locations | Domain decisions to consult |
+| Область | Код | Решения |
 |---|---|---|
-| Auth/session/privacy | `apps/web/src/lib/services/auth-service.ts`, `packages/security/src`, `packages/db/src/repositories/auth.ts`, HTTP adapters | [Account lifecycle](38-ACCOUNT-AUTH-AND-LIFECYCLE.md), [security](04-TRUST-SAFETY-SECURITY.md) |
-| Free resource publishing/download | `apps/web/src/lib/services/product-service.ts`, `packages/db/src/repositories/builds.ts`, `packages/storage/src` | [Product lifecycle](23-MARKETPLACE-PRODUCT-LIFECYCLE.md), [delivery](34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md) |
-| Library/cart/collections | `apps/web/src/app/workspace`, library services and repositories | [Buyer screens](46-BUYER-CART-PURCHASE-LIBRARY-SCREENS.md), [access](28-CART-LICENSES-AND-ACCESS-RIGHTS.md) |
-| Servers/ownership | `apps/web/src/lib/services/mta-master-directory-service.ts`, server services/repositories | [Server policy](30-SERVER-OWNERSHIP-STATUS-AND-JOIN.md), [owner screens](48-SERVER-OWNER-SCREENS.md) |
-| Organizations/context | organization services/repositories, auth context routes | [Organization policy](31-ORGANIZATION-COMMERCE-AND-MESSAGING-POLICY.md), [screens](49-ORGANIZATION-SCREENS.md) |
-| Community/notifications | content/discussion/follow services, inbox/push/mail repositories and workers | [Community](19-COMMUNITY-AND-RETENTION.md), [notifications](41-PWA-THEMES-ACCESSIBILITY-AND-NOTIFICATIONS.md) |
-| Moderation/reports/trust | admin/report/verification routes, matching services/repositories | [Casework](40-STAFF-CASEWORK-GOVERNANCE-AND-QUEUES.md), [trust](53-TRUST-PUBLIC-HISTORY-AND-CONTENT-MODERATION.md) |
-| UI style/navigation | `packages/ui/src`, `apps/web/src/app/globals.css`, `apps/web/src/lib/i18n.ts`, neighboring screen | [Design](05-UX-AND-DESIGN.md), [role map](43-ROLE-SURFACE-MAP.md), relevant screen chapter 44–51 |
-| Data/migrations | `packages/db/src`, `packages/db/migrations`, matching integration test | [Data model](08-DOMAIN-AND-DATA-MODEL.md), [architecture](../ARCHITECTURE.md) |
-| Dependencies/CI/runtime | manifests, lockfile, `.nvmrc`, `scripts/ci-policy.mjs`, workflows | [Operations](../OPERATIONS.md), [launch gates](32-LAUNCH-ONBOARDING-AND-PRODUCTION-GATES.md) |
-| Future commerce/licensing | existing commerce/license services and repositories | [Decisions](13-DECISION-REGISTER.md), [economics](52-PLAN-ECONOMICS-COMMISSION-AND-HOLDS.md), [licenses](54-LICENSE-MODELS-FORENSICS-AND-REVOCATION.md) |
+| Авторизация и безопасность | `apps/web/src/lib/services/auth-service.ts`, `packages/security`, `packages/db/src/repositories/auth.ts` | [Учётная запись](38-ACCOUNT-AUTH-AND-LIFECYCLE.md), [безопасность](04-TRUST-SAFETY-SECURITY.md) |
+| Ресурсы и доставка | product/build services, `packages/storage`, репозитории builds | [Жизненный цикл](23-MARKETPLACE-PRODUCT-LIFECYCLE.md), [доставка](34-PRODUCT-PAGE-DEPENDENCIES-AND-DELIVERY.md) |
+| Библиотека и корзина | library/cart services и репозитории | [Доступ](28-CART-LICENSES-AND-ACCESS-RIGHTS.md), [сценарии](46-BUYER-CART-PURCHASE-LIBRARY-SCREENS.md) |
+| Серверы и организации | server/organization services и репозитории | [Серверы](30-SERVER-OWNERSHIP-STATUS-AND-JOIN.md), [организации](49-ORGANIZATION-SCREENS.md) |
+| Сообщество и уведомления | content/discussion/follow services, workers | [Сообщество](19-COMMUNITY-AND-RETENTION.md), [уведомления](41-PWA-THEMES-ACCESSIBILITY-AND-NOTIFICATIONS.md) |
+| Модерация и доверие | report/admin/verification services и репозитории | [Модерация](40-STAFF-CASEWORK-GOVERNANCE-AND-QUEUES.md), [доверие](53-TRUST-PUBLIC-HISTORY-AND-CONTENT-MODERATION.md) |
+| Интерфейс | `packages/ui`, `globals.css`, i18n | [Дизайн](05-UX-AND-DESIGN.md), [роли](43-ROLE-SURFACE-MAP.md) |
+| База и эксплуатация | `packages/db`, migrations, `scripts`, CI | [Модель данных](08-DOMAIN-AND-DATA-MODEL.md), [эксплуатация](../OPERATIONS.md) |
+| Будущая коммерция | commerce/license services и репозитории | [Решения](13-DECISION-REGISTER.md), [экономика](52-PLAN-ECONOMICS-COMMISSION-AND-HOLDS.md), [лицензии](54-LICENSE-MODELS-FORENSICS-AND-REVOCATION.md) |
 
-For any area, find existing tests by filename and imported symbol; inspect all applicable
-security and transaction boundaries. Public/private DTOs and current authority deserve
-more context than cosmetic changes. Broader product research starts at the
-[handbook introduction](00-README.md), not at legacy material.
-
-[Source precedence](58-SOURCE-OF-TRUTH-AND-REPO-HANDOFF.md) governs current versus target.
-[Workflow](60-AGENT-WORKFLOW.md) covers two agents, standards, checks and a reusable prompt.
-[PROBLEMS](../PROBLEMS.md) is the single defect registry: read matching entries, not every
-historical record. Do not treat dated test claims as validation of today's changes.
+Открывайте только относящиеся к задаче разделы. Проверяйте код и тесты: спецификация может описывать целевое состояние.

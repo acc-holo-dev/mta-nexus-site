@@ -1,331 +1,42 @@
-# MTA NEXUS Architecture / Архитектура
+# Архитектура MTA NEXUS
 
-This document is the durable technical source of truth for the repository.  
-Этот документ — постоянный технический источник истины для репозитория.
+## Форма системы
 
-## 1. Product boundary / Граница продукта
+Модульный монолит: Next.js 16 и React 19 в `apps/web`, PostgreSQL 18 и Drizzle в `packages/db`. Проект рассчитан на одну инстанцию приложения. Redis, микросервисы и внешние очереди не добавляются без подтверждённой необходимости.
 
-The closed-beta core is intentionally small:
+## Границы
 
-- live public MTA server discovery;
-- account and session management;
-- community content, follows and notifications;
-- server ownership workflows;
-- free resource publishing, moderation, claiming and private binary delivery.
+| Слой | Ответственность |
+|---|---|
+| `apps/web/src/app` | Страницы и HTTP: разбор запросов, происхождение, формирование ответа и безопасные заголовки. |
+| `apps/web/src/lib/services` | Пользовательские операции, оркестрация и правила сценария. |
+| `packages/db` | PostgreSQL-схемы, forward-only миграции, репозитории и транзакции. |
+| `packages/domain` | Независимые доменные типы, ошибки, правила и события. |
+| `packages/validation` | Общие схемы входных данных. |
+| `packages/security` | Авторизация, идентификаторы, сессии и ограничения запросов. |
+| `packages/storage` | Приватное хранение и проверка целостности файлов. |
+| `packages/config` | Проверка параметров окружения. |
+| `packages/ui` | Общие элементы интерфейса без импортов серверных пакетов. |
 
-Paid commerce is disabled until payment, legal, refund and payout operations are designed and accepted.
+Пакеты не импортируют приложение; domain не зависит от остальных пакетов. `dependency-cruiser` проверяет границы и циклы, но его предупреждение о совместимости с TypeScript 7 требует учёта. HTTP-обработчик не должен становиться вторым репозиторием или обходить общие проверки.
 
-## 2. Runtime shape / Runtime-архитектура
+## Безопасность и данные
 
-MTA NEXUS is a modular monolith:
+- Права проверяются по действующей сессии, текущему владельцу и членству организации. Историческое авторство не даёт постоянного доступа. Действия, требующие свежей авторизации, повторно проверяют её внутри транзакции.
+- Изменяющие browser API-запросы проверяют происхождение и используют общий адаптер `withBrowserMutation`; bearer-only маршруты лицензий имеют отдельную границу. Приватные ответы не кэшируются публично.
+- Доступная для скачивания сборка должна быть опубликована и иметь чистый результат сканирования, идентификатор сканера и время проверки. Скачивание повторно проверяет разрешение и целостность артефакта. Отсутствие или ошибка проверки не считаются безопасным результатом.
+- Файлы приватны. Ключи генерируются приложением и не перезаписываются; локальная публикация выполняется атомарно. Размер и SHA-256 сверяются с метаданными. Аудит начала передачи не является доказательством завершённого скачивания.
+- Связанные изменения данных и обязательный аудит выполняются транзакционно. Повтор команды не должен создавать дубликаты или менять исходный смысл. Новые изменения схемы — только новые миграции; откат кода не откатывает БД.
+- Каталог серверов получает данные из внешнего MTA master list. Вход ограничен по размеру, количеству и времени; устаревшие данные помечаются и не продлеваются бесконечно.
 
-- **Next.js 16 / React 19** in `apps/web`;
-- **PostgreSQL 18 / Drizzle** in `packages/db`;
-- domain types and events in `packages/domain`;
-- authorization/rate limiting in `packages/security`;
-- private file storage in `packages/storage`;
-- shared presentation primitives in `packages/ui`;
-- runtime environment validation in `packages/config`;
-- request schemas in `packages/validation`.
+## Интерфейс
 
-The closed beta assumes one application instance. Do not introduce distributed infrastructure, Redis, queues, microservices or Kubernetes without a measured requirement.
+Используйте `@nexus/ui`, семантические токены `globals.css` и существующую локализацию. RU/EN, светлая и тёмная темы, мобильная ширина и клавиатура — части контракта. Показывайте loading, empty, error и подтверждённый success; не изображайте успешную операцию до ответа сервера.
 
-## 3. Correctness invariants / Инварианты корректности
+## Граница продукта
 
-### Resource safety
+Закрытая бета поддерживает распространение бесплатных ресурсов. Платные покупки, реальные выплаты и production DRM не включены. Утверждённые будущие решения — в [реестре](handbook/13-DECISION-REGISTER.md); текущую реализацию проверяйте в коде.
 
-A build is considered publicly downloadable only when all of these are true:
+## Проверка изменений
 
-```text
-status = published
-scanStatus = clean
-scanner is present and non-empty
-scannedAt is present
-```
-
-The same predicate is shared by public build listing, latest-build resolution, moderation fallbacks, product restoration and free-resource claiming. The download route repeats the provenance check before opening storage as defense in depth.
-
-Migration `0020_build_safety_invariants.sql` repairs legacy unsafe publication state fail-closed and adds database constraints so an unsafe build cannot remain `published`.
-
-### Product version consistency
-
-For every published product with a safe build:
-
-```text
-product.currentVersion =
-  newest safe published build ordered by createdAt DESC, id DESC
-```
-
-Approval, rejection fallback, retirement fallback and restoration preserve this rule transactionally.
-
-### Claims and entitlements
-
-A free claim:
-
-1. locks the user/product claim key inside the database transaction;
-2. requires a published free product;
-3. requires a safe downloadable build;
-4. reuses an active entitlement on retries;
-5. creates at most one active claim for the serialized path;
-6. increments `salesCount` only for a newly created claim.
-
-Expired entitlements are not accepted by authorization checks. License fallback requires an active, non-expired license.
-
-### External MTA directory
-
-The public MTA master list is read as a bounded stream (8 MiB maximum) and parsed with a 10,000-server limit. An oversized response is cancelled before further chunks are read. A failed refresh may serve the last successful snapshot for at most 15 minutes, marked stale. Retries are spaced by 10 seconds during an outage without extending that deadline.
-
-Публичный список MTA читается потоком с ограничением 8 МиБ и максимумом 10 000 серверов. При ошибке обновления прежний снимок доступен не более 15 минут и помечается устаревшим.
-
-### Authorization
-
-Authorization is evaluated from current actor context, resource ownership and organization membership. Historical `authorId`/owner attribution is not a permanent bypass after ownership changes.
-
-A context switch locks the user and the relevant organization/membership row, checks current access, updates `activeContextId` and records `user.context_switched` in one PostgreSQL transaction. Audit insertion failure rolls the context update back. A repeated switch to the same context creates no new audit event. Resource actions must still check their own authorization at execution time.
-
-При смене контекста проверка доступа, запись выбранного контекста и аудит выполняются в одной транзакции. Ошибка аудита откатывает изменение; доступ к ресурсу всегда проверяется заново при самом действии.
-
-### Audit semantics
-
-Audit event names describe what is actually known. For binary responses, the pre-stream events are `*_download_started`; response creation is not represented as completed delivery.
-
-## 4. RU/EN UI foundation
-
-The global shell resolves `en` or `ru` from the `nexus_locale` cookie. The locale controls:
-
-- document language and metadata;
-- global navigation;
-- footer;
-- home page;
-- global not-found/error messaging;
-- mobile navigation;
-- free-resource catalog and cards;
-- workspace;
-- public server directory;
-- login and registration.
-
-Remaining feature-specific copy must migrate into the same dictionary incrementally. Do not introduce a second localization mechanism.
-
-## 5. UI architecture
-
-Desktop uses the persistent sidebar and top navigation. Mobile uses a fixed bottom navigation so primary product areas remain reachable below the `lg` breakpoint.
-
-UI code should use semantic design tokens from `globals.css` and shared primitives from `@nexus/ui`, not hard-coded theme colors.
-
-## 6. Data and migrations
-
-Schema changes require a forward migration. Migrations are append-only after they reach shared environments. A code rollback does not imply a database rollback.
-
-Never attach an existing PostgreSQL data directory to a different PostgreSQL major version as an upgrade procedure. Use a tested dump/restore or supported `pg_upgrade` process.
-
-## 7. Repository policy
-
-`main` is the only maintained development line. CI, browser workflows and Dependabot target `main`. Short-lived external automation branches may exist while a tool is operating, but product development must not depend on a permanent `dev` branch.
-
-## Resource integrity and development fixtures
-
-`packages/domain/src/product-types.ts` owns `PRODUCT_TYPES` and `ProductType`.
-Input validation, catalog filters, publishing options and database typing use
-that registry. Exhaustive translation mappings cover all nine types in English
-and Russian. Migration `0024_product_type_invariant` maps only the historical
-`tool` alias to `plugin`, then adds a CHECK constraint; unknown values fail the
-migration instead of receiving an arbitrary classification.
-
-Development seeding separates deterministic archive preparation (`seed-archive`),
-declarative records (`seed-data`) and transactional persistence (`seed-baseline`).
-A transaction-scoped advisory lock serializes seed writers; existing fixture rows
-are locked and checked for identity before missing IDs are inserted. Unique-key
-collisions abort the transaction. Existing user edits are preserved. The explicit
-repair mode changes only size/hash for matching demo builds. Audit writes belong
-to the same transaction, and no-op reruns do not create audit noise. Filesystem
-preparation is outside the transaction and never overwrites conflicting bytes.
-A rollback can leave reusable fixture files but cannot publish partial DB rows.
-
-Public and reviewer delivery share a metadata guard before download-started audit
-writes. A known storage size/hash mismatch produces private HTTP 409 with
-`BUILD_ARTIFACT_MISMATCH`, and closes the stream. Missing bytes produce 404.
-Local storage obtains metadata and the stream from the same open file handle, so
-pathname replacement cannot switch the streamed file after stat. Local reads
-compute SHA-256 with a 64 KiB buffer before delivery and verify size/timestamps
-again after hashing. Both download routes reject same-size corruption against the
-recorded hash before auditing a download. This adds a full disk read before the
-response, without buffering the entire archive. A privileged external writer can
-still modify the same inode after verification; storage is not a tamper-proof
-snapshot. Providers without metadata retain the recorded content-length fallback.
-
-Local uploads snapshot caller-owned bytes, write a private temporary file, flush
-and close it, then atomically publish it using a hard link. Existing keys always
-raise a conflict, even for identical content. Concurrent writers cannot overwrite
-the winner; failed writes/publications remove their temporary file. New releases
-must use new keys, as `StorageService.uploadAsset` already does. This is an atomic
-publication guarantee, not a cross-filesystem/database transaction or a complete
-power-loss durability guarantee.
-
-Download cancellation propagates from the HTTP request through StorageService to
-local storage. Hash preparation checks the signal before opening and between
-64 KiB reads, closing the descriptor on failure. A prepared stream listens for
-abort and closes without emitting an unhandled error while audit is pending; its
-listener is removed on stream close. Routes check cancellation before and after
-audit and return private 499 `DOWNLOAD_CANCELLED` if no response has started.
-An audit already written during cancellation remains a download-started event,
-not evidence of completed delivery. This does not interrupt an in-flight OS read
-or database operation; it stops subsequent work at the next cancellation check.
-
-Asset keys use `assets/<validated-owner-id>/<generated-asset-id>.<extension>`.
-The original filename is kept in build metadata, never in filesystem components.
-This bounds key components even for long or non-ASCII names and leaves room for
-atomic-upload temporary suffixes. Owner IDs are restricted to 1–128 ASCII letters,
-digits, underscores or hyphens. Existing stored keys remain readable; no migration
-or file rename is needed.
-
-The resource detail download control uses a same-origin authenticated fetch so
-HTTP failures stay on the product page with RU/EN messages. The client bounds
-received bytes to the upload limit, checks declared length, and saves only a
-complete response. It rejects HTML/JSON error pages and partial status responses.
-An AbortController cancels on user request or unmount. Browser download handoff
-uses a temporary object URL, revoked after handoff, replacement or unmount.
-The UI reports handoff rather than claiming that the browser saved a file.
-This bounded Blob approach buffers up to 64 MiB of payload, with additional
-browser allocation overhead; it is not intended for unbounded large downloads.
-
-The download client also binds abort directly to its body reader so cancellation
-can release a pending read on wrapped streams. Reader cancellation is best-effort:
-a stalled/rejected cleanup promise must not keep the UI busy or replace the
-original HTTP failure. The reader lock and abort listener are released on exit.
-Already-aborted requests do not start a fetch.
-
-Developer profile releases use a bounded author-scoped page query (24 per page),
-with a separate total under identical public/free/safe-build conditions. Stable
-ordering is created_at DESC, id DESC. The repository bounds page size to 100 and
-clamps requested pages to the counted final page. Counts and rows use separate
-statements, so concurrent publication/moderation can change the result between
-them; no snapshot-consistency guarantee is made. Other callers of the existing
-full author-list method retain their current behavior.
-
-Public user profiles also use the bounded author-resource page query. Both user
-and developer profiles share parameter parsing and a server-rendered pagination
-component with localized labels and a resources-section anchor. Resource totals
-remain independent of page size. User-owned servers use a separate owner-scoped
-active/public page query (12 per page), ordered by updated_at DESC, id DESC.
-Count and page share the same visibility conditions. The `page` and `serverPage`
-parameters are preserved independently by navigation, with links targeting the
-corresponding section. Live-directory enrichment only runs when the selected
-server page contains rows, and directory failures leave the known public servers
-visible. Count and row queries do not promise snapshot consistency.
-
-Organization resource portfolios use the same bounded free/published/safe-build
-pagination implementation as author portfolios, scoped by organization ID before
-counting and limiting. Pages contain 24 resources; the displayed total comes from
-the matching count query. The shared profile navigation uses `page` and anchors
-the resource section. Count and rows are separate queries, not a snapshot.
-
-Organization editorial content is paged separately in batches of 12 via
-`articlePage`. Organization, published status and the five editorial types
-(article, news, devlog, update, announcement) are applied in SQL to both count
-and rows. Ordering uses publication time (falling back to update time), then ID.
-Shared navigation preserves the clamped page of the other section; empty sections
-have no navigation. This removes the former first-100 in-memory article filter.
-
-Organization profiles generate localized metadata from their stored name, slug
-and description without loading resource/article portfolios. Descriptions are
-trimmed and bounded to 155 characters; blank descriptions use localized copy.
-Missing organization and user metadata explicitly opts out of indexing. Canonical
-profile paths encode the stored slug/username and omit pagination parameters.
-
-Public organization websites and server website/Discord/rules/media URLs share an
-HTTP(S)-only policy in `@nexus/validation`. Input schemas reject credentials,
-control characters, whitespace, backslashes and oversized URLs. Public pages also
-apply the policy to stored values, hiding invalid legacy links without mutating
-the database. Optional link fields still accept empty strings for clearing.
-The helper is a browser-link policy, not an SSRF defense or a remote-host trust
-check; MTA connection URIs are separate and unchanged.
-
-Report evidence uses the same external HTTP(S) URL policy at the API schema and
-moderator rendering boundary. Rejected evidence fails before report/audit writes
-or notifications. The evidence component hides invalid legacy URLs, normalizes
-and deduplicates links, limits legacy arrays to five entries and omits empty
-labels. New-tab links retain noopener/noreferrer and localized accessible labels.
-
-Article cover URLs use the shared HTTP(S) policy at content submission and when
-rendering cards, article detail pages and Open Graph metadata. Invalid legacy
-covers are omitted consistently; an empty or omitted cover remains valid. This
-validates the URL syntax and scheme, not the remote image content or availability.
-
-## Author resource workspace
-
-`/workspace/resources` lists manageable free resources, including unpublished drafts,
-with status filters and 24-item pages. `/workspace/resources/[id]` edits only title,
-short description, description and tags, submits another build through the existing
-bounded upload / ClamAV / private-storage pipeline, and shows 20-item version pages
-with moderation and retirement notes. The workspace and submission result link to it.
-Both pages are private, dynamic and excluded from indexing; client props omit storage keys.
-
-List, private reads and metadata writes share one SQL authorization scope: personal
-ownership, organization ownership, an organization owner/admin membership or the
-`manage_products` permission. Organization resources do not grant access through
-historical authorship. Administrator maintenance access follows the existing policy.
-Metadata writes recheck scope in the UPDATE and insert their audit record in the same
-transaction. PATCH rejects unknown fields, including ownership, status, price and slug.
-
-The disposable Resource browser workflow includes real author creation, metadata edits,
-clean-scanned version submissions, API approval/rejection by a moderator, author-visible
-review notes, RU/mobile layout and final-public-version retirement. Existing claim and
-64 MiB download acceptance remains in the same run. It does not test external mail delivery.
-
-## Notification history periods and page export
-
-The private notification center also supports bounded history periods and one-page
-JSON export. Limited periods use exact database-time UTC anchors, 24-hour day arithmetic
-and inclusive bounds; cursor context includes account/filters/period/anchor. The older
-All-history context remains compatible. Every request is a read-only repeatable-read
-snapshot, while only the date window stays fixed across navigation; contents/read state
-remain live. Global unread counts and whole-inbox mutations keep their existing scope.
-Exports reuse presentation localization/limits and current own reads, return at most
-25 items and 1 MiB of UTF-8 JSON, and omit raw data/recipient/destination/push metadata.
-No delivery, read-state mutation or new schema is involved. Operations contains the
-query/cursor/download contract and actual PostgreSQL/browser verification limits.
-
-## Build review notifications
-
-Build approval/rejection now inserts system notifications in the same PostgreSQL
-transaction as the build transition, product synchronization and audit. A failed
-notification insert rolls back that decision; a replay cannot deliver another notice.
-Recipients are resolved from current personal ownership or organization ownership /
-owner-admin membership / `manage_products`, without relying on historical authorship.
-Users with system notifications disabled are excluded. Organization recipients are
-selected in one set-based INSERT, so membership lists are not silently truncated.
-
-Migration `0025_build_review_notifications` adds nullable JSON data to notifications.
-Existing plain-text rows keep their display fallback. Structured review notices carry
-the decision, resource title, version and moderator notes; the center and bell render
-RU/EN labels at display time. Links lead to the private author workspace. Comments
-remain plain text, with line breaks and wrapping. This feature sends in-app notices;
-it does not enqueue or send external email.
-
-PostgreSQL integration acceptance covers concurrent replay, delivery opt-out, revoked
-organization permissions and notification-write rollback/retry. The production browser
-journey checks review notices, resource links, RU/mobile presentation, read state and
-database delivery counts alongside the complete author publication flow.
-
-## Keyboard and responsive shell acceptance
-
-The command palette and notification menu use native modal `dialog` elements.
-Shared lifecycle handling restores the previous connected focus target on close;
-the browser makes the underlying page inert, and explicit Tab/Shift+Tab wrapping
-keeps keyboard focus inside at the first/last control. Escape, explicit
-close controls and backdrop dismissal close the same modal state. Opening the
-notification menu triggers an uncached refresh rather than waiting for its poll.
-
-Search exposes a labeled combobox, a connected listbox and selected options through
-`aria-activedescendant`. Arrow navigation clamps against the current result count,
-Enter activates the selected command or real search result, and the active row
-scrolls into view without moving focus out of the input. Closed dialogs leave no
-hidden focus targets. Mobile navigation uses short RU/EN resource/workspace labels.
-
-The disposable Resource browser workflow also checks keyboard and responsive shell
-behavior: skip-to-content, Ctrl+K, Tab/Shift+Tab containment, Escape/backdrop focus
-return, arrow selection and real public resource search. Six guest routes (market,
-workspace, author resources, notifications, settings and login) are checked in RU/EN
-at 320, 390 and 1280 px for horizontal overflow, localized headings, field labels
-and active mobile navigation. A short mobile viewport and reduced-motion setting
-are included. This is scoped Chromium acceptance, not a full WCAG/screen-reader audit.
+Поведение и пограничные случаи проверяются unit/HTTP-тестами; транзакции и конкуренция — отдельной PostgreSQL БД; пользовательские пути — браузерными тестами. Инфраструктурные изменения и релиз требуют полного соответствующего CI. Подробные команды: [эксплуатация](OPERATIONS.md). Оставшиеся пробелы: [проблемы](PROBLEMS.md).

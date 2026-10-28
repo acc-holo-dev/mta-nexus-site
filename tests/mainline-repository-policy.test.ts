@@ -64,7 +64,6 @@ describe("mainline repository policy", () => {
       "11-AI-AGENT-HANDOFF.md",
       "13-DECISION-REGISTER.md",
       "58-SOURCE-OF-TRUTH-AND-REPO-HANDOFF.md",
-      "MANIFEST-SHA256.md",
     ]));
 
     const readme = read("README.md");
@@ -84,5 +83,12 @@ describe("mainline repository policy", () => {
     const readme = read("README.md");
     expect(readme).toMatch(/\*\*Active development branch:\*\* `main` only\./);
     expect(readme).not.toContain("--branch dev");
+  });
+
+  it("assigns a unique identifier to each recorded product decision", () => {
+    const register = read("docs/handbook/13-DECISION-REGISTER.md");
+    const ids = [...register.matchAll(/^\|\s*([A-Z]+-\d+)\s*\|/gm)].map((match) => match[1]);
+    expect(ids.length).toBeGreaterThan(0);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });

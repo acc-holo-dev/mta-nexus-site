@@ -2,7 +2,21 @@ import { configDefaults, defineConfig } from "vitest/config";
 import path from "node:path";
 import { classifyTests } from "./scripts/test-projects.mjs";
 
-const testFiles = classifyTests(__dirname);
+// The focused runner passes explicit files so a small change does not require
+// classifying every test and its import graph. Normal runs still discover all tests.
+const focused = process.env.NEXUS_FOCUSED_TEST_FILES;
+const focusedFiles: unknown = focused ? JSON.parse(focused) : undefined;
+const explicitFiles = process.argv.filter((arg) => /\.(test|spec)\.[cm]?[jt]sx?$/u.test(arg));
+if (
+  focusedFiles !== undefined &&
+  (!Array.isArray(focusedFiles) ||
+    focusedFiles.length === 0 ||
+    !focusedFiles.every((file) => typeof file === "string" && explicitFiles.includes(file)) ||
+    explicitFiles.some((file) => !focusedFiles.includes(file)))
+) {
+  throw new Error("Focused test selection must match the explicit Vitest file arguments");
+}
+const testFiles = classifyTests(__dirname, focusedFiles as string[] | undefined);
 
 export default defineConfig({
   // Match Next.js: JSX uses the automatic React runtime, including shared packages.

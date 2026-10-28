@@ -78,17 +78,6 @@ Production operation will eventually need at least:
 
 These capabilities are requirements, not approval of a particular vendor.
 
-## 6. OPEN: vendor selection authority
+## 6. Выбор инструментов наблюдаемости
 
-Round 9 question 30 was not understood/approved by the owner.
-
-Therefore **OPEN**:
-
-> May an AI agent choose concrete production observability vendors/tools as a reversible `PROVISIONAL` engineering decision, or must it ask the owner before binding production to those services?
-
-Until resolved:
-
-- AI may implement provider-neutral interfaces;
-- AI may use local/dev open-source tooling provisionally;
-- AI must not present a paid third-party production monitoring vendor as owner-approved;
-- credentials/contracts/data-export to external observability providers remain a production gate.
+AI может выбрать поставщика или инструменты как обратимое предварительное техническое решение, сохранив необходимые функции наблюдаемости (Decision Register E-011 и OBS-010). Такой выбор не является разрешением на production-развёртывание, заключение договора, использование credentials или передачу данных внешнему сервису.

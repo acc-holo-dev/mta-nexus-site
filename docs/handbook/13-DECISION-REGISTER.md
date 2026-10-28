@@ -1,6 +1,6 @@
 # MTA NEXUS — Decision Register
 
-> Статус: v0.11, 2026-10-06 — owner interview rounds 1–10 incorporated and handbook integrated into `main`.
+> Утверждённые решения и открытые вопросы. Текущее поведение проверяйте в коде и миграциях.
 > Этот файл нужен людям и AI-агентам: он отделяет решения от current implementation, legacy и ещё открытых деталей.
 
 ## Статусы
@@ -130,7 +130,7 @@
 | DRM-005 | CONFIRMED | Purchase → License → Installation/Server → Activation → Lease | Server/installation binding |
 | DRM-006 | CONFIRMED | Offline grace = 7 days | After grace protected resource hard-stops |
 | DRM-007 | CONFIRMED | DRM seller opt-in per product; runtime universal/reusable | No recompilation per customer/server |
-| DRM-008 | OPEN | Watermark/forensics | Round 2 answer clarified module universality, not forensic policy |
+| DRM-008 | CONFIRMED | Seller может включить forensic watermarking | Доказательство для расследования, не автоматическое обвинение; см. DRM-014 и DRM-015 |
 
 ## I. Community / Trust
 
@@ -159,25 +159,11 @@
 | AI-008 | CONFIRMED | Destructive production data and production deployment remain human gates | High-risk boundary |
 | AI-009 | CONFIRMED | Реальные payment/legal activation changes remain human gate | Development foundation allowed |
 
-## K. Следующие решения, которые нужно получить
+## Выбор порядка разработки
 
-Rounds 1–6 закрыли product strategy, monetization direction, trust, marketplace lifecycle, cart/billing UX, server/org ownership, messaging, public launch, dashboards, product page, security center, identity и navigation. Следующий уровень — **точная screen-level спецификация по ролям и policies вокруг lifecycle edge cases**:
-
-```text
-ROLE UI             Guest/User/Buyer/Seller/Server Owner/Org/Staff exact screens and actions
-WORKSPACE IA        exact tabs, empty states, mobile behavior and context switching
-SUBSCRIPTIONS       exact tier names, quotas, prices, expiry/downgrade/vanity-username behavior
-NOTIFICATIONS       event matrix, channel defaults, Telegram/Discord bot actions
-SUPPORT             routing, SLA, escalation, evidence/attachment policy
-CONTENT             exact pre-moderation matrix, authoring permissions, forum hierarchy
-ACCOUNT LIFECYCLE   deletion, suspension, data export, retention and ownership transfer on exit
-DRM FORENSICS       seller-opt-in forensic watermarking CONFIRMED; evidence only, no automatic ban
-API TIMING          when authenticated partner/Pro API actually ships
-PRODUCTION          hosting, object storage/CDN, observability and release acceptance
-LEGAL/FINANCE       launch jurisdictions, PSP/MoR contracts, KYC/tax/refund wording
-```
-
-Owner explicitly does not require a fixed implementation priority between Community, Marketplace, Server and DRM tracks. Engineering may choose dependency/risk-driven order and parallelize coherent work.
+Владелец не установил жёсткий порядок между направлениями Community, Marketplace,
+Server и DRM. Выбирайте задачи по зависимостям, риску и пользе. Подтверждённые
+решения ниже не означают готовность соответствующих функций в текущем коде.
 
 ## L. Как обновлять register
 
@@ -188,7 +174,7 @@ Owner explicitly does not require a fixed implementation priority between Commun
 5. При конфликте owner target и current runtime явно хранить оба слоя, а не стирать один из них.
 
 
-## M. Owner review Round 3 — confirmed decisions
+## Администрирование, доверие и подписки
 
 | ID | Статус | Решение | Комментарий |
 |---|---|---|---|
@@ -223,20 +209,7 @@ Owner explicitly does not require a fixed implementation priority between Commun
 | RES-001 | CONFIRMED | Marketplace supports open-source and closed-source products | Source can be separate higher-priced SKU/license |
 | AI-010 | CONFIRMED | AI may choose safe reversible unresolved details as PROVISIONAL | Record decision and continue; high-risk/irreversible gates remain human |
 
-## N. Remaining high-value open decisions after Round 4
-
-```text
-BUSINESS/LEGAL      launch jurisdictions, providers, currencies, tax/VAT/invoicing
-PRICING             exact tier names/prices, inventory capacity, included quotas
-PAYOUTS             fee allocation, reserves, settlement timings, seller KYC onboarding
-MODERATION          SLA/escalation thresholds, exact blacklist eligibility, appeal deadlines
-VERIFICATION        per-type evidence thresholds and renewal/revocation periods
-DRM FORENSICS       optional leak watermark/fingerprinting design
-MESSAGING           contact defaults, attachment policy, block/privacy/retention
-PRODUCTION          hosting, object storage/CDN, observability and release acceptance
-```
-
-## O. Marketplace product rules — Round 4
+## Правила marketplace
 
 | ID | Статус | Решение | Комментарий |
 |---|---|---|---|
@@ -258,7 +231,7 @@ PRODUCTION          hosting, object storage/CDN, observability and release accep
 | MP-016 | CONFIRMED | Seller/Publishing Agreement принимается перед первой продажей | Точный legal текст — отдельный human/legal gate |
 | MP-017 | CONFIRMED | Отдельной продуктовой age-policy не вводим сейчас | Закон/PSP/юрисдикция могут всё равно требовать возрастные ограничения |
 
-## P. Servers / Organizations / Profiles — Round 4
+## Серверы, организации и профили
 
 | ID | Статус | Решение | Комментарий |
 |---|---|---|---|
@@ -272,7 +245,7 @@ PRODUCTION          hosting, object storage/CDN, observability and release accep
 | SO-008 | CONFIRMED | Organizations имеют invites, granular permissions, ownership transfer, billing owner, audit log | Full team governance |
 | SO-009 | CONFIRMED | Публичность профиля настраивается пользователем | Activity/purchases/servers/resources/org memberships etc. |
 
-## Q. Community / discovery — Round 4
+## Сообщество и поиск
 
 | ID | Статус | Решение | Комментарий |
 |---|---|---|---|
@@ -289,14 +262,14 @@ PRODUCTION          hosting, object storage/CDN, observability and release accep
 | CD-011 | CONFIRMED | Daily-return surface — персонализированный mix news/servers/market/community/notifications | Homepage/feed goal |
 | CD-012 | CONFIRMED | Успех измеряется общей системой ecosystem metrics | Active users + servers + sellers + GMV + community activity + meaningful time |
 
-## R. Enforcement / transparency — Round 4
+## Модерация и прозрачность
 
 | ID | Статус | Решение | Комментарий |
 |---|---|---|---|
 | ENF-001 | CONFIRMED | SCAM/BLACKLIST verdict бессрочен до пересмотра | Appeal/manual review может изменить решение |
 | ENF-002 | CONFIRMED | Public Transparency page нужна | Aggregate bans/appeals/scam/malware/disputes etc.; no unnecessary PII |
 
-## Q. Owner review Round 6 — confirmed decisions
+## Интерфейс, идентичность и доступ
 
 | ID | Статус | Решение | Комментарий |
 |---|---|---|---|
@@ -336,12 +309,12 @@ PRODUCTION          hosting, object storage/CDN, observability and release accep
 | OPS-001 | CONFIRMED | Отдельная public NEXUS Status Page сейчас не нужна | Internal observability/incident response всё равно required |
 | NAV-001 | CONFIRMED | Top-level navigation: Home / Servers / Market / Community / Messages / Notifications / Workspace/Profile | Discover remains required secondary/top-level surface |
 
-### Round 6 interpretation notes
+### Уточнения по доступу
 
 - Ответ `R6-33: Только` интерпретирован как **только authenticated partner/Pro API при первом внешнем API**, а не anonymous read-only API для всех. Это согласуется с `R6-32: API keys/webhooks не нужны к первой commercial release`.
 - Ответ Round 6 про username сохраняет **immutable ID first + entitlement-bound vanity username**. Round 7 уточнил lifecycle: смена vanity username допускается как отдельная платная операция, а historical identity/audit всё равно остаётся anchored на immutable User ID.
 
-## N. Owner review Round 7 — confirmed decisions
+## Учётные записи, staff и безопасность
 
 | ID | Статус | Решение | Комментарий |
 |---|---|---|---|
@@ -357,7 +330,7 @@ PRODUCTION          hosting, object storage/CDN, observability and release accep
 | LIC-002 | CONFIRMED | Unbound paid license activation window = 30 days | Not indefinite |
 | LIC-003 | CONFIRMED | Trial binds to one server and has short/limited entitlement | Anti-abuse required |
 | DL-001 | CONFIRMED | Download page exposes SHA-256/scan/signature/provenance details | Manual verification surface |
-| SUP-001 | CONFIRMED | Support/dispute attachments allowed with scan/type controls | Images/text/logs/safe archives |
+| SUP-012 | CONFIRMED | Support/dispute attachments allowed with scan/type controls | Images/text/logs/safe archives |
 | PUB-001 | CONFIRMED | Publish Wizard fixed staged flow | Basic -> Delivery -> Files -> Dependencies -> Media -> Price -> DRM -> Support -> Preview -> Submit |
 | KYC-001 | CONFIRMED | Seller can draft before KYC; KYC required before first payout | Provider may require earlier |
 | PUB-002 | CONFIRMED | Auto-publish requires clean risk state and can be revoked by staff | Safety gates remain mandatory |
@@ -371,8 +344,8 @@ PRODUCTION          hosting, object storage/CDN, observability and release accep
 | ORG-002 | CONFIRMED | Permission templates + granular custom capabilities | Owner/Admin/Developer/Support/Finance/Content |
 | ORG-003 | CONFIRMED | Critical org actions require re-auth + audit | Ownership/payout/finance rights/deletion |
 | ORG-004 | CONFIRMED | Invite links with expiry/max uses required | Personal invites remain |
-| ADM-007 | CONFIRMED | One senior Trust/Admin can issue SCAM/BLACKLIST verdict | Evidence/audit/appeal mandatory |
-| FIN-001 | CONFIRMED | No universal dual-control requirement for large refunds/manual payout corrections | Provider/risk policy may add later |
+| ADM-008 | CONFIRMED | One senior Trust/Admin can issue SCAM/BLACKLIST verdict | Evidence/audit/appeal mandatory |
+| FIN-002 | CONFIRMED | No universal dual-control requirement for large refunds/manual payout corrections | Provider/risk policy may add later |
 | MOD-001 | CONFIRMED | Moderation case has unified timeline | report -> evidence -> action -> appeal -> final/public reason |
 | MOD-002 | CONFIRMED | Staff notes have internal/user/public audiences | Prevent accidental disclosure |
 | MOD-003 | CONFIRMED | Staff queues have priority/escalation | Critical Malware/Payment/Scam/Appeal/Normal |
@@ -380,31 +353,13 @@ PRODUCTION          hosting, object storage/CDN, observability and release accep
 | NOTIF-002 | CONFIRMED | Security/payment/legal notices cannot be fully disabled | Community/marketing configurable |
 | MSG-001 | CONFIRMED | DM attachments allowed with safe type/scan policy | No ordinary executable delivery |
 | PWA-001 | CONFIRMED | Installable PWA + Web Push + offline shell target public release | State changes still server-authoritative |
-| UX-004 | CONFIRMED | Light/Dark/System themes | Release target |
+| UX-006 | CONFIRMED | Light/Dark/System themes | Release target |
 | A11Y-001 | CONFIRMED | WCAG 2.2 AA target for key account/commerce flows | Higher than current baseline |
 | UX-005 | CONFIRMED | Mobile bottom nav Home/Servers/Market/Community/More | Messages/Notifications/Workspace in More/header |
 | DATA-001 | CONFIRMED | Retention differs by record type/legal purpose | No single TTL |
-| SEC-001 | CONFIRMED | User-facing Activity & Security Log required | Login/session/purchase/license/ownership critical actions |
+| SEC-005 | CONFIRMED | User-facing Activity & Security Log required | Login/session/purchase/license/ownership critical actions |
 
-## O. Remaining owner-level design questions after Round 7
-
-The next round should focus on **screen-level role interfaces and exact daily workflows**, not repeat settled architecture:
-
-- Guest/Home/Discover exact modules and CTAs;
-- User/Profile/Community exact screens;
-- Buyer Library and purchase detail IA;
-- Seller dashboard exact cards/tables/primary actions;
-- Server Owner dashboard exact navigation/page builder/status workflows;
-- Organization workspace context switching and billing/admin separation;
-- Moderator/Support/Finance/Admin queue screens and action confirmations;
-- exact subscription products/quotas/prices;
-- support routing/SLA wording;
-- content/forum hierarchy and premode matrix;
-- API shipping milestone;
-- production hosting/CDN/observability vendor choices;
-- legal launch jurisdictions/PSP contracts remain human business gates.
-
-## P. Owner review Round 8 — screen-level confirmed decisions
+## Решения по пользовательским экранам
 
 | ID | Статус | Решение | Комментарий |
 |---|---|---|---|
@@ -415,7 +370,7 @@ The next round should focus on **screen-level role interfaces and exact daily wo
 | PROF-001 | CONFIRMED | Profile tabs: Overview/Activity/Resources/Servers/Organizations/Reviews/Achievements | Public-safe data only |
 | PROF-002 | CONFIRMED | Public Activity is a feed/timeline | Underlying privacy/visibility governs entries |
 | PROF-003 | CONFIRMED | Separate public Trust/Reputation tab | Shows evidence/history rather than a single reputation score |
-| COM-001 | CONFIRMED | Community IA: Feed/Forum/Articles/Events/Groups | Managed server/org hubs supported |
+| COM-003 | CONFIRMED | Community IA: Feed/Forum/Articles/Events/Groups | Managed server/org hubs supported |
 | BUY-002 | CONFIRMED | Buyer landing is action-oriented | Purchases, pending activation, updates, support/disputes, wishlist |
 | BUY-003 | CONFIRMED | Purchase detail uses tabs | Overview/Downloads/License/Updates/Support/Invoice/Dispute |
 | LIC-004 | CONFIRMED | 30-day activation deadline reminders at 7/3/1 days | Notification channels per user policy |
@@ -424,7 +379,7 @@ The next round should focus on **screen-level role interfaces and exact daily wo
 | SEL-002 | CONFIRMED | Seller Products table approved columns | Status/version/price/sales/rating/support/DRM/update/risk |
 | PUB-005 | CONFIRMED | Publish Wizard is full-page | Not modal/drawer |
 | ANA-002 | CONFIRMED | Seller Analytics includes funnel/source/comparison/revenue/refunds/downloads/updates | Date-range capable |
-| ADS-001 | CONFIRMED | Dedicated Promotions Manager required | Fixed-price boosts/featured/campaign history |
+| ADS-002 | CONFIRMED | Dedicated Promotions Manager required | Fixed-price boosts/featured/campaign history |
 | SUP-003 | CONFIRMED | Seller Support is unified inbox | Pre-sale + buyer context |
 | SRV-004 | CONFIRMED | Server Dashboard approved live/analytics/action modules | Live, 24h/7d, joins, follows, trust, incidents |
 | SRV-005 | CONFIRMED | Server page builder is visual block editor | Desktop/mobile preview; safe sandboxed blocks |
@@ -443,7 +398,7 @@ The next round should focus on **screen-level role interfaces and exact daily wo
 | SYS-001 | CONFIRMED | Emergency Super Admin tools live in separate `System` area | reason + re-auth + audit |
 | PRICE-001 | CONFIRMED | Single public `/pricing` compares product families | Creator/Server/Organization/NEXUS bundle |
 | PRICE-002 | CONFIRMED | Commission/hold-time/plan advantages disclosed transparently | No hidden economics |
-| SUB-001 | CONFIRMED | Plan-only automation/promotions stop on expiry; config retained | Resubscribe without rebuilding setup |
+| SUB-014 | CONFIRMED | Plan-only automation/promotions stop on expiry; config retained | Resubscribe without rebuilding setup |
 | ID-003 | CONFIRMED | Vanity username grace after entitlement expiry = 7 days | Then slug released |
 | PWA-002 | CONFIRMED | Offline PWA blocks state-changing sensitive actions | Explicit Offline state |
 | ERR-001 | CONFIRMED | Production errors expose correlation/request ID, never stack trace | Support-safe diagnostics |
@@ -465,17 +420,17 @@ The next round should focus on **screen-level role interfaces and exact daily wo
 | TRUST-001 | CONFIRMED | Dedicated public Trust/Reputation profile tab | Evidence set, not one opaque score |
 | TRUST-002 | CONFIRMED | Exact successful sales/deals counts may be public | Privacy-sensitive financial amounts remain private |
 | TRUST-003 | CONFIRMED | Finalized public moderation history is retained historically | Internal notes/evidence/security-sensitive detail stay restricted |
-| MOD-001 | CONFIRMED | First forum topic from a new account requires premoderation | Healthy history may unlock immediate publish |
-| MOD-002 | CONFIRMED | Paid ads/featured content require content-policy review before display | Payment never buys policy bypass |
-| MOD-003 | CONFIRMED | Articles/guides are trust-tiered | Low/new trust premoderated; established healthy authors use post-moderation |
+| MOD-007 | CONFIRMED | First forum topic from a new account requires premoderation | Healthy history may unlock immediate publish |
+| MOD-008 | CONFIRMED | Paid ads/featured content require content-policy review before display | Payment never buys policy bypass |
+| MOD-009 | CONFIRMED | Articles/guides are trust-tiered | Low/new trust premoderated; established healthy authors use post-moderation |
 | MOD-004 | CONFIRMED | Claimed-server news/devlogs may publish immediately without active risk flags | Still reportable/reviewable |
 | MOD-005 | CONFIRMED | Events/contests limited to eligible actors with selective moderation | Verified/server/org/staff or explicitly allowed actors |
 | MOD-006 | CONFIRMED | Quotas/limits exist across all trust levels | Trust may raise limits but does not create unlimited bypass, including finance/security |
 | LIC-010 | CONFIRMED | Products may use perpetual or time-limited licenses/subscriptions | Seller chooses allowed commercial model |
 | LIC-011 | CONFIRMED | Perpetual DRM license is indefinite after valid activation | 7-day offline lease grace is connectivity tolerance, not license expiry |
-| DRM-010 | CONFIRMED | Seller-opt-in forensic watermark/fingerprint layer | Individual package/marker without per-customer runtime recompilation |
-| DRM-011 | CONFIRMED | Leak marker is evidence, not automatic guilt | Staff investigation/case required |
-| DRM-012 | CONFIRMED | Seller sees leak suspicion/status but not detection algorithms/raw sensitive signals | Protect anti-abuse system |
+| DRM-014 | CONFIRMED | Seller-opt-in forensic watermark/fingerprint layer | Individual package/marker without per-customer runtime recompilation |
+| DRM-015 | CONFIRMED | Leak marker is evidence, not automatic guilt | Staff investigation/case required |
+| DRM-016 | CONFIRMED | Seller sees leak suspicion/status but not detection algorithms/raw sensitive signals | Protect anti-abuse system |
 | DRM-013 | CONFIRMED | Seller license revoke requires formalized allowed reason | No arbitrary one-click revoke |
 | SUP-010 | CONFIRMED | NEXUS does not promise hard public hourly SLA before a staffed operation exists | Critical security remains highest priority |
 | SUP-011 | CONFIRMED | Seller promises support duration, not mandatory response-time SLA | Product may advertise stronger voluntary terms later |
@@ -483,9 +438,9 @@ The next round should focus on **screen-level role interfaces and exact daily wo
 | PAY-010 | CONFIRMED | Payment layer remains provider-agnostic until production business/legal gate | Jurisdiction/legal entity/PSP contracts selected later |
 | STOR-010 | CONFIRMED | Production commercial files use private object storage + signed CDN URLs | Local filesystem dev/test fallback only |
 | SCAN-010 | CONFIRMED | ClamAV is baseline behind pluggable scanner/reputation adapters | Additional engines may be added without changing product workflow |
-| OBS-010 | OPEN | Who may choose the concrete production observability vendors | Required observability functions are known; owner did not understand/approve R9-30 |
+| OBS-010 | CONFIRMED | AI may choose observability vendors as a reversible provisional technical decision | Production deployment, contracts and credentials remain separately controlled; see E-011 |
 
-## S. Remaining owner-level questions after Round 9
+## Оставшиеся продуктовые и эксплуатационные вопросы
 
 The handbook now covers the core product, business, trust, licensing, moderation and role-screen contracts. Remaining owner decisions are narrow and should not block ordinary implementation:
 
@@ -496,6 +451,4 @@ The handbook now covers the core product, business, trust, licensing, moderation
 - real payment provider contracts and supported payment methods by launch country;
 - exact retention durations once jurisdiction is chosen;
 - exact production hosting/email/object-storage/CDN vendors;
-- `OBS-010`: whether AI may provisionally choose reversible observability vendors/tools;
-- final repository documentation policy needed to merge this handbook into `main`;
 - final brand slogan and a single North Star metric if the project wants one.

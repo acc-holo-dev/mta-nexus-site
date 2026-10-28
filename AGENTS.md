@@ -1,73 +1,22 @@
-# MTA NEXUS: agent entry point
+# Правила разработки MTA NEXUS
 
-Build a coherent MTA community product. Complete one useful, verifiable task at a time.
+Работайте над одной законченной задачей в существующем checkout. Сначала проверьте `git status`, найдите связанные код и тесты через `rg`, прочитайте только применимые разделы [архитектуры](docs/ARCHITECTURE.md), [эксплуатации](docs/OPERATIONS.md), [проблем](docs/PROBLEMS.md) и [продуктовых решений](docs/handbook/13-DECISION-REGISTER.md). При необходимости откройте [карту областей](docs/handbook/15-AI-CONTEXT-INDEX.md). Не читайте весь handbook для каждой задачи.
 
-## Start with a small context
+Указания владельца имеют приоритет. Реальное поведение подтверждается кодом, миграциями и выполненными проверками; целевые функции не выдаются за работающие. Сохраняйте текущие изменения пользователя. Не создавайте worktree без запроса. Достаточно одного агента.
 
-1. Run `node scripts/agent-context.mjs` from the repository root. It is read-only,
-   needs no installed dependencies and reports HEAD, changes and task order.
-2. Read the selected task in [the queue](docs/handbook/59-DEVELOPMENT-QUEUE.md).
-   Use [the context map](docs/handbook/15-AI-CONTEXT-INDEX.md) to find only relevant
-   code, tests and handbook sections. Search with `rg` before opening large files.
-3. Check current changes and recent commits in the affected area. Preserve others'
-   work. Use this checkout; cloud tasks are isolated. Create no worktree unless asked.
-4. Before editing, state the outcome, affected files and verification. Read more when
-   authorization, state transitions, shared contracts or evidence are unclear.
+## Границы архитектуры
 
-Do not read the whole handbook, README or PROBLEMS on every task. Do not reload an
-unchanged file already read in this session. Summaries are navigation aids: verify
-behavior in code. The initial context budget is not a limit on necessary investigation.
+- HTTP-маршруты разбирают запрос и вызывают сервисы; бизнес-правила находятся в сервисах и доменных модулях, работа с БД — в репозиториях. Переиспользуйте действующие схемы, адаптеры и обработку ошибок.
+- Пакеты не импортируют приложение; domain не зависит от остальных пакетов. Не добавляйте инфраструктуру без конкретной необходимости.
+- Проверяйте действующие сессию, права и принадлежность на сервере. Приватные данные и ошибки не становятся публичными.
+- Публичный ресурс требует опубликованной версии и подтверждённой чистой проверки с идентификатором сканера и временем. Не обходите проверку при загрузке или скачивании.
+- Критические изменения данных и аудит выполняются в одной транзакции. Сохраняйте безопасные повторы, ограничения входных данных и forward-only миграции. Не используйте production-данные в тестах.
+- Интерфейс: общие компоненты `@nexus/ui`, токены `globals.css`, RU/EN, клавиатура, мобильные экраны, понятные loading/empty/error/success. Успех показывается после подтверждения сервера.
 
-## Authority and current product
+## Изменение и проверка
 
-Current user instructions govern the task. For product intent, use owner-confirmed
-decisions and [source precedence](docs/handbook/58-SOURCE-OF-TRUTH-AND-REPO-HANDOFF.md).
-Code, migrations and executed checks establish current behavior. Label target and
-provisional behavior honestly; legacy material is historical evidence.
+Используйте Biome и стиль соседнего кода; не форматируйте несвязанные файлы. Устраняйте дублирование только с сохранением поведения. Новые тесты должны проверять поведение и риски, а не повторять реализацию. Для связанных файлов используйте `pnpm test:focus путь/к/файлу.test.ts`; тесты БД требуют явного указания отдельной базы, как описано в README. Полный набор и release-gates запускайте, когда этого требуют характер изменения или выпуск. Не пропускайте и не ослабляйте проверки ради зелёного результата.
 
-Closed beta currently supports free resources. Paid commerce/DRM are approved targets,
-not enabled production features. Preserve these invariants:
+Работайте самостоятельно в обратимых технических решениях. Production-развёртывание, разрушительные операции с данными и реальные платежи требуют отдельного решения. Владелец запретил публикацию; не отправляйте изменения и не публикуйте среду до изменения этого указания.
 
-- Downloadable builds are published, clean and have scanner identity/timestamp.
-- Check current session, ownership and organization authority; keep private data private.
-- Critical writes and their audit are transactional; retries preserve intended commands.
-- Migrations are forward-only after sharing; use disposable databases for tests.
-- RU/EN, keyboard access, responsive UI and truthful server-confirmed results are required.
-
-Choose reversible development details and next tasks autonomously. Record material
-provisional decisions with their reason. Ask only for missing decisions that block work
-or cross an existing production, destructive-data, real-money or legal boundary.
-The owner's current instruction prohibits publication: do not push, deploy or publish
-environment changes until that instruction is changed. Local coherent commits are allowed.
-
-## One style, one finished slice
-
-Use Biome from `biome.json` on touched files. Follow neighboring code and existing
-request adapters, validation schemas, services, repositories, `@nexus/ui`, semantic
-theme tokens and RU/EN dictionary. Do not create a second pattern for the same behavior.
-Keep loading/empty/error/success, permission failures and uncertain retries consistent.
-Avoid unrelated formatting, new dependencies without a need, speculative frameworks
-and parallel implementations. See [workflow](docs/handbook/60-AGENT-WORKFLOW.md) for detail.
-
-For commits use `type(scope): outcome` in English: feat, fix, refactor, test, docs,
-chore or perf. One logical change; task ID and actual validation in the body.
-Only the integrating agent stages/commits. Never use blanket staging in a shared tree.
-
-## Verify and hand off
-
-Run focused behavioral tests during development, then the required CI gates for the
-combined change. The brief's CI scope is advisory and never authorizes skipping gates.
-Do not repeat expensive unchanged checks without a reason. Never weaken assertions to
-make a test pass or treat skipped/unrun checks as passed. `pnpm agent:check` validates
-the short context and handbook inventory; `pnpm agent:manifest` refreshes its hashes.
-
-Keep the queue short: outcome, owner, dependencies, next step, validation, blockers.
-PROBLEMS remains the only defect registry; link to it rather than duplicate it.
-Record evidence against the tested commit or base+diff; do not inherit a previous pass
-after relevant changes. Clear generated debris you created, preserving pre-existing files.
-Final report: outcome, checks, remaining risk/blocker and next task.
-
-Two-agent execution starts after preparation. Then one agent owns implementation and
-integration; the other reviews the diff and behavioral evidence. Follow the workflow's
-ownership and handoff rules. Agents work only while their execution sessions run;
-these files do not create a background scheduler.
+Коммит: `type(scope): результат` на английском, одна логическая задача. В итоге сообщите результат, выполненные проверки, оставшиеся ограничения. История изменений хранится в Git, а не в рабочих документах.
