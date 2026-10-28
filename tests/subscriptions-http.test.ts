@@ -46,7 +46,11 @@ const post = (
 ) =>
   request(base + query, {
     method: "POST",
-    headers: { ...browserMutationHeaders(), ...headers },
+    headers: {
+      ...browserMutationHeaders(),
+      cookie: "nexus_session=subscription-token",
+      ...headers,
+    },
     body: JSON.stringify(body),
   });
 beforeEach(() => {
@@ -70,13 +74,23 @@ it("requires authentication before every private subscription operation", async 
 it("binds actor identity and accepts only validated activation/cancellation commands", async () => {
   const res = await POST(post({ ...activation, organizationId: "org_a" }));
   expect(res.status).toBe(200);
-  expect(state.command).toHaveBeenCalledWith("usr_a", { ...activation, organizationId: "org_a" });
+  expect(state.command).toHaveBeenCalledWith(
+    "usr_a",
+    { ...activation, organizationId: "org_a" },
+    "subscription-token",
+  );
   expect((await POST(post(cancellation))).status).toBe(200);
   for (const key of ["actorId", "subjectId", "price", "status", "terms", "expiresAt", "paymentId"])
     expect((await POST(post({ ...activation, [key]: "bad" }))).status).toBe(400);
   expect(res.headers.get("cache-control")).toBe("private, no-store");
   expect(res.headers.get("vary")).toBe("Cookie");
   expect(state.rate).toHaveBeenCalledWith("contentCreation", "usr_a");
+});
+it("rejects a missing initiating cookie before reading a body from a cached actor", async () => {
+  const req = post(activation, "", { "content-type": "application/json", cookie: "" });
+  expect((await POST(req)).status).toBe(401);
+  expect(req.bodyUsed).toBe(false);
+  expect(state.command).not.toHaveBeenCalled();
 });
 it("refuses cross-site writes, oversized bodies and ambiguous parameters", async () => {
   expect(

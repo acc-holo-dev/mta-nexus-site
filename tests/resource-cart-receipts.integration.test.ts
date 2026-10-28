@@ -44,6 +44,12 @@ async function fixture() {
     token: `tok_${staff}`,
     expiresAt: new Date(Date.now() + 60 * 60 * 1000),
   });
+  await sessionRepository.create({
+    id: `ses_${buyer}`,
+    userId: buyer,
+    token: `tok_${buyer}`,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   await db.insert(products).values({
     id: productId,
     authorId: owner,
@@ -71,6 +77,7 @@ async function fixture() {
   if (!review.reviewDigest) throw new Error("Missing review");
   const input = {
     userId: buyer,
+    currentToken: `tok_${buyer}`,
     requestId: randomUUID(),
     productIds: [productId],
     entitlementIds: [`ent_cr_${key}`],

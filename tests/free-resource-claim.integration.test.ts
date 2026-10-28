@@ -3,6 +3,7 @@ import {
   buildRepository,
   entitlementRepository,
   productRepository,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
 
@@ -36,6 +37,12 @@ describe("free resource claim idempotency", () => {
       role: "user",
     });
 
+    await sessionRepository.create({
+      id: `ses_claim_${suffix}`,
+      userId,
+      token: `token_${userId}`,
+      expiresAt: new Date(Date.now() + 3600000),
+    });
     await productRepository.create({
       id: productId,
       title: "Free Claim Resource",
@@ -78,6 +85,7 @@ describe("free resource claim idempotency", () => {
     const attempts = await Promise.all(
       Array.from({ length: 10 }, (_, index) =>
         entitlementRepository.claimFreeResource({
+          currentToken: `token_${userId}`,
           entitlementId: `ent_claim_${index}_${suffix}`,
           userId,
           productId,
@@ -119,6 +127,7 @@ describe("free resource claim idempotency", () => {
 
   it("returns the same entitlement on a later retry without incrementing salesCount", async () => {
     const first = await entitlementRepository.claimFreeResource({
+      currentToken: `token_${userId}`,
       entitlementId: `ent_late_retry_${suffix}`,
       userId,
       productId,

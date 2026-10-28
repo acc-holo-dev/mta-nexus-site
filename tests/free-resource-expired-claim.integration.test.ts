@@ -3,6 +3,7 @@ import {
   buildRepository,
   entitlementRepository,
   productRepository,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
 
@@ -27,6 +28,12 @@ describe("expired free resource claims", () => {
       username: `expired_claim_${suffix}`,
       displayName: "Expired Claim User",
       role: "user",
+    });
+    await sessionRepository.create({
+      id: `ses_expired_${suffix}`,
+      userId,
+      token: `token_${userId}`,
+      expiresAt: new Date(Date.now() + 3600000),
     });
     await productRepository.create({
       id: productId,
@@ -86,6 +93,7 @@ describe("expired free resource claims", () => {
     const attempts = await Promise.all(
       Array.from({ length: 10 }, (_, index) =>
         entitlementRepository.claimFreeResource({
+          currentToken: `token_${userId}`,
           entitlementId: `ent_renewed_${index}_${suffix}`,
           userId,
           productId,
@@ -129,6 +137,7 @@ describe("expired free resource claims", () => {
     expect(afterRenewal?.salesCount).toBe(1);
 
     const retry = await entitlementRepository.claimFreeResource({
+      currentToken: `token_${userId}`,
       entitlementId: `ent_late_retry_${suffix}`,
       userId,
       productId,

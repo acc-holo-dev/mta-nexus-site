@@ -172,11 +172,20 @@ it("returns preserved license access without a fabricated entitlement", async ()
   const response = await claim(
     new NextRequest("https://nexus.test/api/resources/claim", {
       method: "POST",
-      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+      headers: {
+        ...browserMutationHeaders(),
+        "content-type": "application/json",
+        cookie: "nexus_session=resource-activity-session",
+      },
       body: JSON.stringify({ productId: "prd_a" }),
     }),
   );
   expect(response.status).toBe(200);
+  expect(state.claim).toHaveBeenCalledWith({
+    user: state.user,
+    productId: "prd_a",
+    currentToken: "resource-activity-session",
+  });
   expect(await response.json()).toEqual({
     entitlement: null,
     alreadyClaimed: true,
@@ -200,7 +209,11 @@ it.each([
   const response = await claim(
     new NextRequest("https://nexus.test/api/resources/claim", {
       method: "POST",
-      headers: { ...browserMutationHeaders(), ...headers },
+      headers: {
+        ...browserMutationHeaders(),
+        cookie: "nexus_session=resource-activity-session",
+        ...headers,
+      },
       body,
     }),
   );

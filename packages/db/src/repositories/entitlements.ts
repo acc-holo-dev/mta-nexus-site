@@ -1,15 +1,39 @@
 import { and, desc, eq, gt, isNull, or, sql, type SQL } from "drizzle-orm";
 import { db } from "../client";
-import { builds, entitlements, licenses, products, resourceAcquisitionEvents } from "../schema";
+import type { ResourceTransaction } from "../transaction";
+import {
+  builds,
+  entitlements,
+  licenses,
+  products,
+  resourceAcquisitionEvents,
+  users,
+} from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
-import { NotFoundError, ValidationError } from "@nexus/domain";
+import { NotFoundError, UnauthorizedError, ValidationError } from "@nexus/domain";
+import { lockInitiatingSession } from "./initiating-session";
 import type {
   Entitlement,
   FreeResourceClaimResult,
   ResourceAcquisitionSource,
 } from "@nexus/domain";
 
-export type ResourceTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+export type { ResourceTransaction } from "../transaction";
+
+export async function lockResourceAcquisitionSession(
+  tx: ResourceTransaction,
+  userId: string,
+  currentToken: string,
+) {
+  const [user] = await tx
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1)
+    .for("share");
+  if (!user) throw new UnauthorizedError("Authentication required");
+  await lockInitiatingSession(tx, userId, currentToken);
+}
 
 /** Existing effective download policy, held through a transactional command. */
 export async function lockUserDownloadAccess(
@@ -86,6 +110,7 @@ export async function claimFreeResourceInTransaction(
     entitlementId: string;
     userId: string;
     productId: string;
+    currentToken: string;
     source?: ResourceAcquisitionSource;
     requestId?: string;
   },
@@ -112,6 +137,7 @@ export async function claimFreeResourceInTransaction(
     .for("share");
 
   if (existingRows[0]) {
+    await lockResourceAcquisitionSession(tx, input.userId, input.currentToken);
     return {
       entitlement: existingRows[0] as unknown as Entitlement,
       alreadyClaimed: true,
@@ -135,6 +161,8 @@ export async function claimFreeResourceInTransaction(
     .orderBy(desc(licenses.expiresAt), desc(licenses.createdAt), desc(licenses.id))
     .limit(1)
     .for("share");
+  // Recheck after the availability and access-row waits, including replay.
+  await lockResourceAcquisitionSession(tx, input.userId, input.currentToken);
   if (legacy)
     return { entitlement: null, alreadyClaimed: true, accessSource: "license", license: legacy };
 
@@ -253,7 +281,9 @@ export class EntitlementRepository {
     entitlementId: string;
     userId: string;
     productId: string;
+    currentToken: string;
   }): Promise<FreeResourceClaimResult> {
+    if (!input.currentToken) throw new UnauthorizedError("Authentication required");
     return db.transaction(async (tx) => {
       return claimFreeResourceInTransaction(tx, input);
     });

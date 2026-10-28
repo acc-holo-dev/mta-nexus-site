@@ -167,10 +167,22 @@ it("records cart acquisition provenance in the same grant transaction", async ()
     createdAt: now.toISOString(),
   };
   const grant = Object.keys(getTableColumns(entitlements)).map((key) => value[key] ?? null);
-  state.results = [[], [["published", 0]], [["bld_a"]], [], [], [grant], [], []];
+  state.results = [
+    [],
+    [["published", 0]],
+    [["bld_a"]],
+    [],
+    [],
+    [["usr_buyer"]],
+    [["ses_buyer", "2099-01-01T00:00:00.000Z"]],
+    [grant],
+    [],
+    [],
+  ];
   await db.transaction((tx) =>
     claimFreeResourceInTransaction(tx, {
       userId: "usr_buyer",
+      currentToken: "buyer-session",
       productId: "prd_a",
       entitlementId: "ent_a",
       source: "cart",

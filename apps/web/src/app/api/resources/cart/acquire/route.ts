@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
 import { resourceCartAcquisitionSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../lib/bounded-json";
@@ -8,6 +8,8 @@ import { commerceService } from "../../../../../lib/services/commerce-service";
 
 export const POST = withBrowserMutation(function POST(request: NextRequest) {
   return resourceCommerceRequest(request, true, async (actor) => {
+    const token = request.cookies.get("nexus_session")?.value;
+    if (!token) throw new UnauthorizedError("Authentication required");
     const parsed = resourceCartAcquisitionSchema.safeParse(await readBoundedJson(request, 4096));
     if (!parsed.success)
       throw new AppError("Invalid cart acquisition", 400, "RESOURCE_CART_INVALID");
@@ -16,6 +18,7 @@ export const POST = withBrowserMutation(function POST(request: NextRequest) {
       parsed.data.productIds,
       parsed.data.requestId,
       parsed.data.reviewDigest,
+      token,
     );
   });
 });

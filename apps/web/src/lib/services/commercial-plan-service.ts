@@ -55,9 +55,10 @@ export const commercialPlanService = {
 export const orderOperationsService = {
   detail: (user: User, orderId: string, page = 1) =>
     orderOperationsRepository.buyerDetail(user.id, orderId, page),
-  cancel: (user: User, orderId: string, command: OrderCancellationCommand) =>
+  cancel: (user: User, orderId: string, command: OrderCancellationCommand, currentToken: string) =>
     orderOperationsRepository.cancel({
       buyerId: user.id,
+      currentToken,
       orderId,
       command,
       auditId: generateId("aud"),

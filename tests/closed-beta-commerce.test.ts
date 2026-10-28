@@ -62,10 +62,13 @@ describe("closed-beta commerce behavior", () => {
       role: "user",
     } as User;
 
-    await expect(service.claimFreeResource({ user, productId: "prd_1" })).resolves.toMatchObject({
+    await expect(
+      service.claimFreeResource({ user, productId: "prd_1", currentToken: "claim-token" }),
+    ).resolves.toMatchObject({
       alreadyClaimed: false,
     });
     expect(mocks.claimFreeResource).toHaveBeenCalledWith({
+      currentToken: "claim-token",
       entitlementId: "ent_test",
       userId: "usr_1",
       productId: "prd_1",

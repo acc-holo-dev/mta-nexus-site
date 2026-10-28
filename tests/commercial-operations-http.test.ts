@@ -229,9 +229,21 @@ it("takes cancellation ownership only from the session and returns a durable tim
   const response = await cancel(request("/api/orders/ord_a/cancel", cancellation), ctx);
   expect(response.status).toBe(200);
   expect(state.cancel).toHaveBeenCalledWith(
-    expect.objectContaining({ buyerId: "usr_a", orderId: "ord_a", command: cancellation }),
+    expect.objectContaining({
+      buyerId: "usr_a",
+      currentToken: "plan-admin-token",
+      orderId: "ord_a",
+      command: cancellation,
+    }),
   );
   expect(await response.json()).toMatchObject({ cancelledAt: "2026-10-10T12:00:00.001Z" });
+});
+it("requires the cancellation cookie before parsing a body even with a cached actor", async () => {
+  const input = request("/api/orders/ord_a/cancel", cancellation);
+  input.cookies.delete("nexus_session");
+  expect((await cancel(input, ctx)).status).toBe(401);
+  expect(input.bodyUsed).toBe(false);
+  expect(state.cancel).not.toHaveBeenCalled();
 });
 it("does not disclose internal reconciliation details", async () => {
   state.cancel.mockRejectedValue(

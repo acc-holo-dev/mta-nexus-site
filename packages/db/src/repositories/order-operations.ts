@@ -1,19 +1,22 @@
-import { and, count, desc, eq, sql } from "drizzle-orm";
 import {
   AppError,
   NotFoundError,
   type OrderCancellationCommand,
   type OrderCancellationReceipt,
+  UnauthorizedError,
 } from "@nexus/domain";
+import { and, count, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
   ledgerEntries,
-  orderCancellationReceipts as receipts,
   orders,
   payments,
+  orderCancellationReceipts as receipts,
+  users,
 } from "../schema";
 import { historyPageBounds } from "./history-pagination";
+import { lockInitiatingSession } from "./initiating-session";
 
 const fail = (code: string) =>
   new AppError("Order operation cannot be applied without reconciliation", 409, code);
@@ -68,10 +71,12 @@ export class OrderOperationsRepository {
   }
   async cancel(input: {
     buyerId: string;
+    currentToken: string;
     orderId: string;
     command: OrderCancellationCommand;
     auditId: string;
   }): Promise<OrderCancellationReceipt> {
+    if (!input.currentToken) throw new UnauthorizedError();
     return db.transaction(async (tx) => {
       const command = input.command;
       await tx.execute(
@@ -84,6 +89,13 @@ export class OrderOperationsRepository {
         .limit(1)
         .for("no key update");
       if (!order) throw new NotFoundError("Order", input.orderId);
+      const [buyer] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, input.buyerId))
+        .for("share");
+      if (!buyer) throw new UnauthorizedError();
+      await lockInitiatingSession(tx, input.buyerId, input.currentToken);
       const [receipt] = await tx
         .select({
           orderId: receipts.orderId,

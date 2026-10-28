@@ -5,7 +5,8 @@ const state = vi.hoisted(() => ({
   options: [] as unknown[],
   claim: vi.fn(),
 }));
-vi.mock("../packages/db/src/repositories/entitlements", () => ({
+vi.mock("../packages/db/src/repositories/entitlements", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../packages/db/src/repositories/entitlements")>()),
   claimFreeResourceInTransaction: state.claim,
 }));
 vi.mock("../packages/db/src/client", async () => {
@@ -46,6 +47,7 @@ const row = {
 };
 const input = {
   userId: "usr_a",
+  currentToken: "cart-token",
   productIds: ["prd_a"],
   requestId,
   entitlementIds: ["ent_a"],
@@ -170,10 +172,20 @@ it("exact receipt replay survives a cleared cart and refuses a different review"
     acquired: [{ productId: "prd_a", alreadyClaimed: false }],
     requestId,
   };
-  state.rows = [[], [[["prd_a"], result, "a".repeat(64)]]];
+  state.rows = [
+    [],
+    [[["prd_a"], result, "a".repeat(64)]],
+    [["usr_a"]],
+    [["ses", "2099-01-01T00:00:00Z"]],
+  ];
   expect(await cart.acquire({ ...input, reviewDigest: "a".repeat(64) })).toEqual(result);
-  expect(state.queries).toHaveLength(2);
-  state.rows = [[], [[["prd_a"], result, "a".repeat(64)]]];
+  expect(state.queries).toHaveLength(4);
+  state.rows = [
+    [],
+    [[["prd_a"], result, "a".repeat(64)]],
+    [["usr_a"]],
+    [["ses", "2099-01-01T00:00:00Z"]],
+  ];
   await expect(cart.acquire({ ...input, reviewDigest: "b".repeat(64) })).rejects.toMatchObject({
     code: "RESOURCE_CART_REQUEST_CONFLICT",
   });

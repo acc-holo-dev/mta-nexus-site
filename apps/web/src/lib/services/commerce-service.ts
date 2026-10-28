@@ -35,9 +35,11 @@ export class CommerceService {
     productIds: string[],
     requestId: string,
     reviewDigest: string,
+    currentToken: string,
   ) {
     return resourceCartRepository.acquire({
       userId: user.id,
+      currentToken,
       productIds,
       requestId,
       reviewDigest,
@@ -49,10 +51,12 @@ export class CommerceService {
   async claimFreeResource(input: {
     user: User;
     productId: string;
+    currentToken: string;
   }): Promise<FreeResourceClaimResult> {
     return entitlementRepository.claimFreeResource({
       entitlementId: generateId("ent"),
       userId: input.user.id,
+      currentToken: input.currentToken,
       productId: input.productId,
     });
   }

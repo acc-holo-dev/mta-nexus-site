@@ -1,7 +1,7 @@
 import { and, eq, gt } from "drizzle-orm";
 import { UnauthorizedError } from "@nexus/domain";
 import { sessions } from "../schema";
-import type { ResourceTransaction } from "./entitlements";
+import type { ResourceTransaction } from "../transaction";
 import { digestSessionToken } from "./sessions";
 
 // Caller locks the actor first. This locks the initiating session before a write.
