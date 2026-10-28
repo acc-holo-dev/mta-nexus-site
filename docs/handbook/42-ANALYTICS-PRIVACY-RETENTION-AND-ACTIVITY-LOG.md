@@ -1,6 +1,6 @@
 # MTA NEXUS — Analytics, Privacy, Retention и Activity Log
 
-> Статус: OWNER DECISION / TARGET SPEC, Round 7.
+> Статус: OWNER DECISION / TARGET SPEC.
 
 ## 1. Analytics principle
 

@@ -1,7 +1,6 @@
 # Guest, Home and Discover — Screen Specification
 
 Status: **OWNER-CONFIRMED / TARGET**  
-Source: Round 8 owner interview, 2026-10-06.
 
 ## 1. Purpose
 

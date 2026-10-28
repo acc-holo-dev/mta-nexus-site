@@ -172,7 +172,7 @@ Refund — не кнопка продавца «вернуть вне систе
 - dozens of unrelated digital categories;
 - DRM that requires per-customer recompilation.
 
-## 15. Round 5 — cart, license scope и post-sale access
+## 15. cart, license scope и post-sale access
 
 ### 15.1 Cart first
 
@@ -246,7 +246,7 @@ OWNER DECISION: вечный redownload после delist **не гаранти�
 
 NEXUS может прекращать hosting/download entitlement, но не заявляет технически невозможное «удаление» уже скачанных open-source/closed binaries у пользователя. DRM-protected runtime behavior определяется license policy отдельно.
 
-## 16. Round 7 — publishing/KYC/archive clarifications
+## 16. publishing/KYC/archive clarifications
 
 - Seller может создавать draft и готовить listing до KYC/provider onboarding.
 - KYC/provider seller onboarding обязателен **до первой выплаты** и может потребоваться раньше, если этого требует PSP/legal model.

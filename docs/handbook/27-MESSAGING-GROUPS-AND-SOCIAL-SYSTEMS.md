@@ -92,7 +92,7 @@ Exact eligibility configurable. Это не право, покупаемое о�
 
 Limits снимаются через account age, verified email/security, нормальную историю использования и policy-defined trust signals, а не только оплатой.
 
-## 8. Round 5 — messaging policy
+## 8. messaging policy
 
 ### 8.1 Default DM policy — delegated decision
 
@@ -126,7 +126,7 @@ DECISION: поддерживаются invite-only/private groups и community s
 
 OWNER DECISION: NEXUS не строит собственные voice/video calls. Для синхронной коммуникации используются внешние integrations/links (например Discord/Telegram), а продукт фокусируется на async messaging, support, deals и community.
 
-## 13. Round 7 — messaging and outbound channel scope
+## 13. messaging and outbound channel scope
 
 На текущем target этапе official notification delivery:
 

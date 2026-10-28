@@ -4,7 +4,7 @@
 
 Эта глава определяет коммерческий путь от выбора нескольких товаров до выдачи прав и поведение доступа после delist/seller ban.
 
-Статус: **TARGET / OWNER DECISIONS Round 5**. Текущая closed beta paid commerce не активна.
+Статус: **TARGET / OWNER-CONFIRMED**. Текущая closed beta paid commerce не активна.
 
 ## 2. Cart model
 
@@ -96,9 +96,7 @@ Seller обязан видеть это правило до delist confirmation.
 
 ## 9. DRM edge after access window
 
-OPEN: что делать с already-active DRM license после окончания 30-дневного окна delist/seller ban.
-
-До отдельного решения запрещено случайно превращать 30-day hosting rule в automatic DRM kill switch или, наоборот, обещать eternal lease.
+Уже активированная DRM-license сохраняет договорный срок после закрытия окна скачивания: perpetual остаётся бессрочной, fixed-term/subscription действует до оплаченного окончания. Malware/legal/security revocation может иметь приоритет. Окно хранения, срок лицензии и 7-day offline lease grace имеют разные значения; см. LIC-011 и [модель лицензий](54-LICENSE-MODELS-FORENSICS-AND-REVOCATION.md).
 
 ## 10. Audit requirements
 
@@ -115,7 +113,7 @@ Audit events минимум:
 - download attempt after window;
 - security/legal override.
 
-## 12. Round 7 — guest cart, activation deadline и download trust
+## 12. guest cart, activation deadline и download trust
 
 ### 12.1 Guest cart
 

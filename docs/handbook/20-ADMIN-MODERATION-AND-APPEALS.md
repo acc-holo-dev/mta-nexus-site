@@ -1,6 +1,6 @@
 # 20. Admin, moderation и appeals
 
-> Статус: OWNER DECISIONS round 3 + target design. Current `/admin` already has moderation queues, but this chapter describes the broader target operating model.
+> Статус: OWNER-CONFIRMED TARGET. Current `/admin` already has moderation queues, but this chapter describes the broader target operating model.
 
 ## 1. Principle
 
@@ -102,7 +102,7 @@ Every privileged mutation should record actor, target, capability used, action, 
 
 CURRENT NEXUS already contains reports, moderation cases, verification and build review concepts plus `/admin` queues. TARGET expands these into specialized operational departments and formal appeal/trust-label workflows.
 
-## 16. Round 7 — case governance
+## 16. case governance
 
 ### 16.1 SCAM / BLACKLIST authority
 

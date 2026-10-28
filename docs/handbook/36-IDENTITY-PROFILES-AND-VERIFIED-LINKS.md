@@ -1,6 +1,6 @@
 # MTA NEXUS — Identity, Public Profiles и Verified Links
 
-> Статус: OWNER DECISION / TARGET SPEC, Round 6.
+> Статус: OWNER DECISION / TARGET SPEC.
 
 ## 1. Primary identity
 
@@ -114,7 +114,7 @@ Search/admin tools должны уметь находить пользовате
 - SCAM removal;
 - review authenticity.
 
-## 9. Round 7 — authentication и social identity boundary
+## 9. authentication и social identity boundary
 
 OWNER DECISION:
 

@@ -1,6 +1,6 @@
 # MTA NEXUS — Workspace, Dashboards и Library
 
-> Статус: OWNER DECISION / TARGET SPEC, Round 6.
+> Статус: OWNER DECISION / TARGET SPEC.
 
 ## 1. Основной принцип
 

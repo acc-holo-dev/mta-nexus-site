@@ -129,12 +129,7 @@ Workspace surfaces:
 
 Super Admin не должен работать «без правил». Он имеет cross-domain capabilities для emergency/maintenance/governance, но destructive production actions и real-payment activation остаются explicit human gates with audit.
 
-## Next specification step
-
-Следующий owner round должен определить exact navigation, cards, tables, primary CTA, empty/error states и cross-role context switching для каждой из этих поверхностей.
-
-
-## v0.9 screen specifications
+## Screen specifications
 
 This map is the authorization/role overview. Exact screen composition is defined in:
 

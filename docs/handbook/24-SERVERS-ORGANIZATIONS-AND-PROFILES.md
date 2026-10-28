@@ -139,7 +139,7 @@ Target profile supports:
 
 Paid plans могут давать дополнительные visual customization options, но не trust status.
 
-## 10. Round 5 — ownership, status и commerce-enabled organizations
+## 10. ownership, status и commerce-enabled organizations
 
 ### 10.1 Claim proof
 
@@ -197,10 +197,10 @@ DECISION: Organization имеет собственный billing profile, а н�
 
 Конкретные KYC/legal requirements определяет provider/jurisdiction перед activation.
 
-## 15. Round 6 — profile identity model
+## 15. profile identity model
 
 Public profiles are enabled by default for deliberately public fields, while purchases, email, payment, session/device, IP and private membership data remain private.
 
-Every account has an immutable User ID. A paid subscription may add a vanity username/custom public slug. The vanity value does not replace immutable IDs in audit/payment/ownership records and cannot imitate staff/trust labels. Changing an already selected vanity username is a separate paid operation under Round 7; immutable IDs remain authoritative in audit/payment/ownership records.
+Every account has an immutable User ID. A paid subscription may add a vanity username/custom public slug. The vanity value does not replace immutable IDs in audit/payment/ownership records and cannot imitate staff/trust labels. Changing an already selected vanity username is a separate paid operation under the approved policy; immutable IDs remain authoritative in audit/payment/ownership records.
 
 Verified external links (GitHub, Discord, domain/site and supported identities) prove account/domain control only; they are not a quality endorsement.

@@ -6,7 +6,7 @@ Status: **OWNER-CONFIRMED / TARGET**
 
 Primary tabs:
 
-`Overview / Activity / Resources / Servers / Organizations / Reviews / Achievements`
+`Overview / Activity / Resources / Servers / Organizations / Reviews / Achievements / Trust`
 
 The profile is public by default for explicitly public fields. Payment, security, private ownership records, private purchases and internal moderation data are never exposed by default.
 
@@ -40,14 +40,14 @@ Shows eligible public reviews written by the user, subject to moderation and ent
 
 Community achievements, seasonal badges and awards may be shown. They must not be purchasable as trust signals.
 
-## 2. Trust / Reputation page — OPEN
+## 2. Trust / Reputation page
 
-Round 9 confirms a separate public `Trust/Reputation` profile tab. It aggregates verified evidence, exact successful sales/deals counts, verified reviews/badges and finalized public moderation history without exposing private amounts, internal notes or sensitive evidence.
+The approved target includes a separate public `Trust/Reputation` profile tab. It aggregates verified evidence, exact successful sales/deals counts, verified reviews/badges and finalized public moderation history without exposing private amounts, internal notes or sensitive evidence.
 
-Current rule:
+Target rule:
 
 - trust signals may appear contextually in Overview, Marketplace, Reviews and moderation surfaces;
-- do not create a mandatory dedicated public Trust tab until owner approval;
+- provide the approved dedicated public Trust/Reputation tab;
 - public sanctions and verification state still follow their already-approved disclosure rules.
 
 ## 3. Community `/community`
@@ -99,10 +99,3 @@ Vanity username:
 - is released after grace if entitlement is not restored;
 - changing an already-selected vanity username is a separate paid operation;
 - historical identity/audit remains anchored to immutable ID.
-
-
-## Round 9 — Trust tab contract
-
-Public profile navigation includes a dedicated `Trust / Reputation` tab.
-
-It should present verifiable signals and historical state, not a single synthesized score. Exact successful sales/deals counts may be shown. Finalized public moderation history remains visible with status (active/expired/overturned/etc.), while internal evidence and private financial/security data remain hidden.

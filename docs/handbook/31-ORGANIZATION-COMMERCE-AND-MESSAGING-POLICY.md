@@ -67,7 +67,7 @@ Invite-only groups/spaces поддерживаются. Group privacy не от�
 
 Voice/video calls не входят в NEXUS scope. External Discord/Telegram links/integrations are preferred.
 
-## 12. Round 7 — organization permission templates и critical actions
+## 12. organization permission templates и critical actions
 
 Organization использует одновременно готовые permission templates и granular capabilities.
 

@@ -1,6 +1,6 @@
 # MTA NEXUS — Account, Authentication и Lifecycle
 
-> Статус: OWNER DECISION / TARGET SPEC, Round 7.
+> Статус: OWNER DECISION / TARGET SPEC.
 
 ## 1. Guest boundary
 

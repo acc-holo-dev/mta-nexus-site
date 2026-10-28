@@ -1,6 +1,6 @@
 # MTA NEXUS — Home, Discover, Navigation и Feeds
 
-> Статус: OWNER DECISION / TARGET SPEC, Round 6.
+> Статус: OWNER DECISION / TARGET SPEC.
 
 ## CURRENT mobile navigation status — 2026-10-07
 
@@ -130,7 +130,7 @@ Notifications — самостоятельная top-level surface, но Home м
 
 Пользователь должен понимать, что NEXUS — единая экосистема, уже по Home и navigation. Нельзя делать Market визуально единственным центром продукта или прятать Community/Servers за второстепенными ссылками.
 
-## 11. Round 7 — mobile navigation
+## 11. mobile navigation
 
 OWNER DECISION: mobile bottom navigation:
 

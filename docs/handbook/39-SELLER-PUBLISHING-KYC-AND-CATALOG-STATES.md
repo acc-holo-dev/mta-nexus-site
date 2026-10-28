@@ -1,6 +1,6 @@
 # MTA NEXUS — Seller Publishing, KYC и Catalog States
 
-> Статус: OWNER DECISION / TARGET SPEC, Round 7.
+> Статус: OWNER DECISION / TARGET SPEC.
 
 ## 1. Publish Wizard
 

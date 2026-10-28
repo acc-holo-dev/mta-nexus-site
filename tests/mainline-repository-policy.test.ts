@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { describe, expect, it } from "vitest";
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
@@ -57,9 +57,9 @@ describe("mainline repository policy", () => {
     expect(handbook).toEqual(
       expect.arrayContaining([
         "00-README.md",
-        "11-AI-AGENT-HANDOFF.md",
+        "10-ROADMAP.md",
         "13-DECISION-REGISTER.md",
-        "58-SOURCE-OF-TRUTH-AND-REPO-HANDOFF.md",
+        "15-AI-CONTEXT-INDEX.md",
       ]),
     );
 

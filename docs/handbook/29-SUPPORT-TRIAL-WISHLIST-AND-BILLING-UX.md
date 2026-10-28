@@ -111,7 +111,7 @@ Purchase history содержит provider-backed financial documents where avai
 
 NEXUS предпочитает PSP/MoR/marketplace tax capabilities. Custom tax logic добавляется только после реальной business/legal необходимости и expert review.
 
-## 9. Round 6 — support access and priority
+## 9. support access and priority
 
 Any registered user may open a pre-sale support question where the product/seller policy allows it. Buyer/claimer cases can attach purchase/license context automatically. Direct seller messaging remains a parallel communication surface; dispute evidence should stay in the structured case when a dispute exists.
 
@@ -119,7 +119,7 @@ A seller subscription may provide faster operational routing/support from NEXUS,
 
 OWNER DECISION: seller response time/support satisfaction is not a mandatory public reputation signal. It may remain private/internal analytics.
 
-## 15. Round 7 — support/dispute evidence attachments
+## 15. support/dispute evidence attachments
 
 Support и dispute могут принимать evidence attachments:
 
