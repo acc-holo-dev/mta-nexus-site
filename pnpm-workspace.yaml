@@ -8,6 +8,11 @@ verifyDepsBeforeRun: warn
 allowBuilds:
   '@swc/core': true
   esbuild: true
+packageExtensions:
+  # Dependency-cruiser cannot yet use the TypeScript 7 compiler API.
+  "dependency-cruiser@18.5.0":
+    dependencies:
+      typescript: "6.0.3"
 overrides:
   "@esbuild-kit/core-utils>esbuild": "0.28.2"
   # Vitest accepts Vite 7 and 8; keep the existing major while applying security fixes.
