@@ -61,7 +61,9 @@ COPY --from=build /app/scripts/check-web-push-worker-health.mjs /app/scripts/che
 COPY --from=build /app/scripts/check-web-push-worker-queue.mjs /app/scripts/check-web-push-worker-queue.mjs
 COPY --from=build /app/scripts/check-license-worker-health.mjs /app/scripts/check-license-worker-health.mjs
 COPY --from=build /app/scripts/check-resource-release-worker-health.mjs /app/scripts/check-resource-release-worker-health.mjs
-RUN mkdir -p /data/uploads && chown -R node:node /data/uploads
+# Checkouts restored with a restrictive umask may contain mode-600 source files.
+# Runtime code stays root-owned but must be readable by the non-root process.
+RUN chmod -R a+rX /app && mkdir -p /data/uploads && chown -R node:node /data/uploads
 USER node
 EXPOSE 3000
 # Execute installed runtime tools directly; no package manager is needed in this image.
