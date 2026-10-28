@@ -1,6 +1,8 @@
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
-import { beforeEach, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+
 const state = vi.hoisted(() => ({
   user: { id: "usr_a", role: "admin" } as null | {
     id: string;
@@ -32,16 +34,18 @@ vi.mock("@nexus/security", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@nexus/security")>()),
   consumeRateLimit: vi.fn(async () => ({ success: state.allowed })),
 }));
-import { GET as catalog } from "../apps/web/src/app/api/commerce/plans/route";
-import { GET as estimate } from "../apps/web/src/app/api/commerce/estimate/route";
+
+import { consumeRateLimit } from "@nexus/security";
+import { POST as edit } from "../apps/web/src/app/api/admin/commerce/plans/[id]/route";
 import {
   GET as adminPage,
   POST as create,
 } from "../apps/web/src/app/api/admin/commerce/plans/route";
-import { POST as edit } from "../apps/web/src/app/api/admin/commerce/plans/[id]/route";
-import { GET as detail } from "../apps/web/src/app/api/orders/[id]/operations/route";
+import { GET as estimate } from "../apps/web/src/app/api/commerce/estimate/route";
+import { GET as catalog } from "../apps/web/src/app/api/commerce/plans/route";
 import { POST as cancel } from "../apps/web/src/app/api/orders/[id]/cancel/route";
-import { consumeRateLimit } from "@nexus/security";
+import { GET as detail } from "../apps/web/src/app/api/orders/[id]/operations/route";
+
 const ctx = { params: Promise.resolve({ id: "ord_a" }) },
   planCtx = { params: Promise.resolve({ id: "cplan_a" }) };
 const terms = {
@@ -66,11 +70,12 @@ const request = (path: string, body?: unknown, headers?: Record<string, string>)
       ? undefined
       : {
           method: "POST",
-          headers: { "content-type": "application/json", ...headers },
+          headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
           body: JSON.stringify(body),
         },
   );
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.user = { id: "usr_a", role: "admin" };
   state.allowed = true;
@@ -236,4 +241,8 @@ it("requires login before fetching the buyer archive or cancelling", async () =>
   expect((await cancel(request("/api/orders/ord_a/cancel", cancellation), ctx)).status).toBe(401);
   expect(state.detail).not.toHaveBeenCalled();
   expect(state.cancel).not.toHaveBeenCalled();
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });

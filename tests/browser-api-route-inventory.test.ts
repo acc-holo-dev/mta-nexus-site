@@ -1,23 +1,11 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
+import { parseSync } from "@swc/core";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
 const apiRoot = path.join(repoRoot, "apps/web/src/app/api");
-const allowlistPath = path.join(repoRoot, "tests/fixtures/browser-api-proxy-only-mutations.txt");
-
-const MUTATION =
-  /export\s+(?:async\s+)?function\s+(POST|PUT|PATCH|DELETE)\b|export\s+const\s+(POST|PUT|PATCH|DELETE)\s*=/;
-const BROWSER_MARKERS = [
-  "withBrowserMutation",
-  "rejectUnsafeBrowserRequest",
-  "BROWSER_ROUTE_ADAPTER",
-] as const;
-const BEARER_MARKERS = [
-  "withLicenseBearerRoute",
-  "licenseRuntimeRequest",
-  "LICENSE_BEARER_ROUTE_ADAPTER",
-] as const;
+const MUTATION_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 const REQUIRED_BROWSER = [
   "apps/web/src/app/api/auth/login/route.ts",
@@ -130,25 +118,82 @@ function listRouteFiles(dir: string): string[] {
   return out;
 }
 
-function classify(source: string) {
-  if (!MUTATION.test(source)) return "safe-only" as const;
-  if (BROWSER_MARKERS.some((marker) => source.includes(marker))) return "browser" as const;
-  if (BEARER_MARKERS.some((marker) => source.includes(marker))) return "bearer" as const;
-  return "proxy-only" as const;
-}
-
-function parseAllowlist(raw: string): string[] {
-  return raw
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line && !line.startsWith("#"));
+function mutationAdapters(source: string, file: string) {
+  const ast = parseSync(source, { syntax: "typescript" });
+  const imports = new Map<string, "browser" | "bearer">();
+  for (const node of ast.body) {
+    if (node.type !== "ImportDeclaration") continue;
+    const target = path.resolve(
+      path.dirname(file),
+      node.source.value.endsWith(".ts") ? node.source.value : `${node.source.value}.ts`,
+    );
+    for (const specifier of node.specifiers) {
+      if (specifier.type !== "ImportSpecifier" || specifier.isTypeOnly || node.typeOnly) continue;
+      const name = specifier.imported?.value ?? specifier.local.value;
+      if (
+        name === "withBrowserMutation" &&
+        target === path.join(repoRoot, "apps/web/src/lib/browser-route-adapter.ts")
+      )
+        imports.set(specifier.local.value, "browser");
+      if (
+        name === "withLicenseBearerRoute" &&
+        target === path.join(repoRoot, "apps/web/src/lib/license-bearer-route-adapter.ts")
+      )
+        imports.set(specifier.local.value, "bearer");
+    }
+  }
+  const handlers: { method: string; adapter: "browser" | "bearer" | null }[] = [];
+  for (const node of ast.body) {
+    if (node.type === "ExportAllDeclaration") handlers.push({ method: "*", adapter: null });
+    if (node.type === "ExportNamedDeclaration") {
+      for (const specifier of node.specifiers) {
+        if (specifier.type === "ExportSpecifier") {
+          const method = specifier.exported?.value ?? specifier.orig.value;
+          if (MUTATION_METHODS.has(method)) handlers.push({ method, adapter: null });
+        }
+      }
+    }
+    if (node.type !== "ExportDeclaration") continue;
+    const declaration = node.declaration;
+    if (
+      declaration.type === "FunctionDeclaration" &&
+      MUTATION_METHODS.has(declaration.identifier.value)
+    )
+      handlers.push({ method: declaration.identifier.value, adapter: null });
+    if (declaration.type !== "VariableDeclaration") continue;
+    for (const variable of declaration.declarations) {
+      if (variable.id.type !== "Identifier") {
+        handlers.push({ method: "<destructured>", adapter: null });
+        continue;
+      }
+      if (!MUTATION_METHODS.has(variable.id.value)) continue;
+      const call = variable.init;
+      const adapter =
+        declaration.kind === "const" &&
+        call?.type === "CallExpression" &&
+        call.callee.type === "Identifier"
+          ? (imports.get(call.callee.value) ?? null)
+          : null;
+      handlers.push({ method: variable.id.value, adapter });
+    }
+  }
+  return handlers;
 }
 
 describe("browser API route adapter inventory", () => {
   const routes = listRouteFiles(apiRoot).map((full) => {
     const rel = path.relative(repoRoot, full).split(path.sep).join("/");
     const source = readFileSync(full, "utf8");
-    return { rel, source, kind: classify(source) };
+    const handlers = mutationAdapters(source, full);
+    const kind =
+      handlers.length === 0
+        ? "safe-only"
+        : handlers.every((handler) => handler.adapter === "browser")
+          ? "browser"
+          : handlers.every((handler) => handler.adapter === "bearer")
+            ? "bearer"
+            : "unprotected";
+    return { rel, source, kind, handlers };
   });
 
   it("keeps auth, account, uploads, license owner actions, resource publish and claim, product editing, reviews, server registration, server content, library collections, library watches and releases, organization writes, server visibility, follow, notifications, public content, author desk, report creates, support cases, verification, admin storage, and staff moderation on the shared browser adapter", () => {
@@ -170,15 +215,36 @@ describe("browser API route adapter inventory", () => {
     }
   });
 
-  it("inventories Proxy-only mutation handlers without growing the allowlist silently", () => {
-    const allowlist = parseAllowlist(readFileSync(allowlistPath, "utf8"));
-    const proxyOnly = routes
-      .filter((entry) => entry.kind === "proxy-only")
-      .map((entry) => entry.rel)
-      .sort();
-    expect(proxyOnly).toEqual([...allowlist].sort());
-    // Guardrail: new mutation endpoints must use withBrowserMutation (or the bearer adapter),
-    // not extend this Proxy-only list.
-    expect(proxyOnly.length).toBeLessThanOrEqual(allowlist.length);
+  it("requires every exported mutation to use its actual shared adapter without exceptions", () => {
+    for (const route of routes) {
+      for (const handler of route.handlers) {
+        const bearer = (REQUIRED_BEARER as readonly string[]).includes(route.rel);
+        expect(handler.adapter, `${route.rel} ${handler.method}`).toBe(
+          bearer ? "bearer" : "browser",
+        );
+        if (bearer) expect(handler.method).toBe("POST");
+      }
+    }
+  });
+
+  it("detects mixed methods, markers in comments, fake adapters and indirect exports", () => {
+    const file = path.join(apiRoot, "demo/route.ts");
+    const wrapped =
+      'import { withBrowserMutation as guard } from "../../../lib/browser-route-adapter"; export const POST = guard(async () => new Response());';
+    expect(mutationAdapters(`${wrapped} export function DELETE() {}`, file)).toEqual([
+      { method: "POST", adapter: "browser" },
+      { method: "DELETE", adapter: null },
+    ]);
+    for (const source of [
+      "// withBrowserMutation\nexport function POST() {}",
+      'import { withBrowserMutation } from "./fake"; export const POST = withBrowserMutation(() => new Response());',
+      'export { command as POST } from "./other";',
+      'export * from "./other";',
+      "export const { POST } = commands;",
+    ]) {
+      const handlers = mutationAdapters(source, file);
+      expect(handlers.length).toBeGreaterThan(0);
+      expect(handlers.every((handler) => handler.adapter === null)).toBe(true);
+    }
   });
 });

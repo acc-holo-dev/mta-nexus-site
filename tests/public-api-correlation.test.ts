@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const contentState = vi.hoisted(() => ({
   article: {
@@ -43,6 +44,7 @@ import { GET as mtaGET } from "../apps/web/src/app/api/mta/servers/route";
 
 describe("public and disabled API correlation boundaries", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
     contentState.article = {
       id: "cnt_article",
@@ -101,7 +103,10 @@ describe("public and disabled API correlation boundaries", () => {
 
   it("returns correlated no-store closed-beta checkout failures", async () => {
     const response = await checkoutPOST(
-      new NextRequest("https://nexus.test/api/checkout", { method: "POST" }),
+      new NextRequest("https://nexus.test/api/checkout", {
+        method: "POST",
+        headers: browserMutationHeaders(),
+      }),
     );
 
     expect(response.status).toBe(503);
@@ -123,4 +128,8 @@ describe("public and disabled API correlation boundaries", () => {
       playersOnline: 15,
     });
   });
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });

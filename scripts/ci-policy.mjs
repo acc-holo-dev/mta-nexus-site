@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { readFileSync, appendFileSync } from "node:fs";
+import { appendFileSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 // Changes to deployment, dependencies and trust boundaries require full acceptance.
@@ -17,7 +17,8 @@ const fullAcceptancePaths = [
   /^apps\/web\/next\.config\.(?:mjs|ts)$/,
   /^packages\/(?:config|security|storage)\//,
   /^apps\/web\/src\/app\/api\/auth\//,
-  /^tests\/(?:mainline-repository-policy|j4-production-upload-integration)\.test\.ts$/,
+  /^apps\/web\/src\/lib\/(?:browser-(?:request-policy|request-guard|route-adapter)|license-bearer-route-adapter)\.ts$/,
+  /^tests\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,
 ];
 
 export function classifyChanges(files, { explicitFull = false, release = false } = {}) {
