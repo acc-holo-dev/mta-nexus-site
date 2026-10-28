@@ -29,6 +29,36 @@ import { EntitlementRepository } from "../packages/db/src/repositories/entitleme
 
 const repository = new EntitlementRepository();
 const now = new Date("2026-10-09T10:00:00Z");
+function queryMatching(pattern: RegExp) {
+  const query = state.queries.find((item) => pattern.test(item.sql));
+  if (!query) throw new Error(`Missing expected query: ${pattern.source}`);
+  return query;
+}
+function expectQueryOrder(...queries: (typeof state.queries)[number][]) {
+  for (let index = 1; index < queries.length; index++)
+    expect(state.queries.indexOf(queries[index - 1])).toBeLessThan(
+      state.queries.indexOf(queries[index]),
+    );
+}
+function expectAcquisitionAuthorizationOrder() {
+  const parent = queryMatching(/^select "id" from "products" /u);
+  const availability = queryMatching(/^select "status", "price" from "products" /u);
+  const build = queryMatching(/^select "id" from "builds" /u);
+  const actor = queryMatching(/^select "id" from "users" /u);
+  const session = queryMatching(/^select "id", "expires_at" from "sessions" /u);
+  expect(actor.sql).toContain("for share");
+  expect(session.sql).toContain("for update");
+  const accessQueries = state.queries.filter((query) =>
+    / from "(?:entitlements|licenses)" /u.test(query.sql),
+  );
+  expect(accessQueries.length).toBeGreaterThan(0);
+  for (const query of accessQueries) {
+    expect(query.sql).toContain("for share");
+    expectQueryOrder(parent, availability, build, query, actor, session);
+  }
+  return session;
+}
+
 beforeEach(() => {
   state.queries = [];
   state.results = [];
@@ -150,7 +180,7 @@ it.each([
   [[["draft", 0]], "was not found"],
   [[["published", 500]], "Only free resources can be claimed without a payment provider"],
 ])("reads only status and price and rejects an unavailable claim", async (productRows, message) => {
-  state.results = [[], productRows as unknown[][]];
+  state.results = [[], [["resource"]], productRows as unknown[][]];
   await expect(
     repository.claimFreeResource({
       currentToken: "claim-token",
@@ -159,15 +189,21 @@ it.each([
       productId: "resource",
     }),
   ).rejects.toThrow(message);
-  expect(state.queries).toHaveLength(2);
-  expect(state.queries[0].sql).toContain("pg_advisory_xact_lock(hashtext($1))");
-  expect(state.queries[0].params).toEqual(["free-resource:user:resource"]);
-  expect(state.queries[1].sql).toMatch(/^select "status", "price" from "products" /);
-  expect(state.queries[1].params).toEqual(["resource", 1]);
+  const advisory = queryMatching(/pg_advisory_xact_lock\(hashtext\(\$1\)\)/u);
+  expect(advisory.params).toEqual(["free-resource:user:resource"]);
+  const parent = queryMatching(/^select "id" from "products" /u);
+  expect(parent.sql).toContain("for no key update");
+  const availability = queryMatching(/^select "status", "price" from "products" /u);
+  expect(availability.params).toEqual(["resource", 1]);
+  expectQueryOrder(advisory, parent, availability);
+  expect(
+    state.queries.some((query) => / from "(?:builds|entitlements|licenses)" /u.test(query.sql)),
+  ).toBe(false);
+  expect(state.queries.some((query) => /^(insert|update|delete)/u.test(query.sql))).toBe(false);
 });
 
 it("keeps the safe published build gate before checking or creating a claim", async () => {
-  state.results = [[], [["published", 0]], []];
+  state.results = [[], [["resource"]], [["published", 0]], []];
   await expect(
     repository.claimFreeResource({
       currentToken: "claim-token",
@@ -176,16 +212,18 @@ it("keeps the safe published build gate before checking or creating a claim", as
       productId: "resource",
     }),
   ).rejects.toThrow("Resource is not currently available for download");
-  expect(state.queries).toHaveLength(3);
-  expect(state.queries[2].sql).toMatch(/^select "id" from "builds" /);
-  expect(state.queries[2].params).toContain("resource");
-  expect(state.queries[2].params).toContain("published");
-  expect(state.queries[2].params).toContain("clean");
-  expect(state.queries[2].sql).toContain('"builds"."scanner" is not null');
-  expect(state.queries[2].sql).toContain('"builds"."scanned_at" is not null');
-  expect(state.queries[1].sql).toContain("for no key update");
-  expect(state.queries[2].sql).toContain("for share");
-  expect(state.queries[2].sql).toContain('btrim("builds"."scanner") <> \'\'');
+  const availability = queryMatching(/^select "status", "price" from "products" /u);
+  const build = queryMatching(/^select "id" from "builds" /u);
+  expect(build.params).toEqual(expect.arrayContaining(["resource", "published", "clean"]));
+  expect(build.sql).toContain('"builds"."scanner" is not null');
+  expect(build.sql).toContain('"builds"."scanned_at" is not null');
+  expect(availability.sql).toContain("for no key update");
+  expect(build.sql).toContain("for share");
+  expect(build.sql).toContain('btrim("builds"."scanner") <> \'\'');
+  expectQueryOrder(availability, build);
+  expect(state.queries.some((query) => / from "(?:entitlements|licenses)" /u.test(query.sql))).toBe(
+    false,
+  );
   expect(state.queries.some((query) => /^(insert|update|delete)/u.test(query.sql))).toBe(false);
 });
 
@@ -202,6 +240,7 @@ const grantRow = [
 it("returns an existing full grant after the projected product and safe build checks", async () => {
   state.results = [
     [],
+    [["resource"]],
     [["published", 0]],
     [["safe-build"]],
     [grantRow],
@@ -228,9 +267,11 @@ it("returns an existing full grant after the projected product and safe build ch
       createdAt: now,
     },
   });
-  expect(state.queries).toHaveLength(6);
-  expect(state.queries[3].sql).toContain('"metadata"');
-  expect(state.queries[3].params).toEqual([
+  const availability = queryMatching(/^select "status", "price" from "products" /u);
+  const build = queryMatching(/^select "id" from "builds" /u);
+  const grant = queryMatching(/^select .* from "entitlements" /u);
+  expect(grant.sql).toContain('"metadata"');
+  expect(grant.params).toEqual([
     "user",
     "user",
     "resource",
@@ -238,7 +279,11 @@ it("returns an existing full grant after the projected product and safe build ch
     now.toISOString(),
     1,
   ]);
-  expect(state.queries[3].sql).toContain('"entitlements"."expires_at" > $5');
+  expect(grant.sql).toContain('"entitlements"."expires_at" > $5');
+  expectQueryOrder(availability, build, grant);
+  expectAcquisitionAuthorizationOrder();
+  expect(state.queries.some((query) => / from "licenses" /u.test(query.sql))).toBe(false);
+  expect(state.queries.some((query) => /^(insert|update|delete)/u.test(query.sql))).toBe(false);
 });
 
 it("locks a finite grant's legacy fallback before the actor and initiating session", async () => {
@@ -246,6 +291,7 @@ it("locks a finite grant's legacy fallback before the actor and initiating sessi
   finiteGrant[5] = "2026-11-01T10:00:00Z";
   state.results = [
     [],
+    [["resource"]],
     [["published", 0]],
     [["safe-build"]],
     [finiteGrant],
@@ -261,12 +307,13 @@ it("locks a finite grant's legacy fallback before the actor and initiating sessi
       productId: "resource",
     }),
   ).toMatchObject({ alreadyClaimed: true, accessSource: "entitlement" });
-  expect(state.queries).toHaveLength(7);
-  expect(state.queries[4].sql).toMatch(/^select "product_id", "expires_at" from "licenses" /);
-  expect(state.queries[4].sql).toContain("for share");
-  expect(state.queries[4].sql).not.toContain('"key"');
-  expect(state.queries[5].sql).toContain('from "users"');
-  expect(state.queries[6].sql).toContain('from "sessions"');
+  const grant = queryMatching(/^select .* from "entitlements" /u);
+  const legacy = queryMatching(/^select "product_id", "expires_at" from "licenses" /u);
+  expect(legacy.sql).toContain("for share");
+  expect(legacy.sql).not.toContain('"key"');
+  expectQueryOrder(grant, legacy);
+  expectAcquisitionAuthorizationOrder();
+  expect(state.queries.some((query) => /^(insert|update|delete)/u.test(query.sql))).toBe(false);
 });
 
 it("creates a full grant and increments the counter only after all preflight checks", async () => {
@@ -274,6 +321,7 @@ it("creates a full grant and increments the counter only after all preflight che
   newRow[0] = "new-entitlement";
   state.results = [
     [],
+    [["resource"]],
     [["published", 0]],
     [["safe-build"]],
     [],
@@ -295,14 +343,16 @@ it("creates a full grant and increments the counter only after all preflight che
     alreadyClaimed: false,
     entitlement: { id: "new-entitlement", resourceId: "resource" },
   });
-  expect(state.queries).toHaveLength(10);
-  expect(state.queries[7].sql).toMatch(/^insert into "entitlements" /);
-  expect(state.queries[7].sql).toContain('returning "id", "subject_type"');
-  expect(state.queries[8].sql).toMatch(/^insert into "resource_acquisition_events" /);
-  expect(state.queries[8].params).toContain("new-entitlement");
-  expect(state.queries[8].params).toContain("direct");
-  expect(state.queries[9].sql).toContain('"products"."sales_count" + 1');
-  expect(state.queries[9].params).toContain("resource");
+  const session = expectAcquisitionAuthorizationOrder();
+  const grant = queryMatching(/^insert into "entitlements" /u);
+  expect(grant.sql).toContain('returning "id", "subject_type"');
+  const event = queryMatching(/^insert into "resource_acquisition_events" /u);
+  expect(event.params).toContain("new-entitlement");
+  expect(event.params).toContain("direct");
+  const counter = queryMatching(/^update "products" /u);
+  expect(counter.sql).toContain('"products"."sales_count" + 1');
+  expect(counter.params).toContain("resource");
+  expectQueryOrder(session, grant, event, counter);
 });
 
 it.each([new Date("2026-11-01T10:00:00Z"), null])(
@@ -310,6 +360,7 @@ it.each([new Date("2026-11-01T10:00:00Z"), null])(
   async (expiresAt) => {
     state.results = [
       [],
+      [["resource"]],
       [["published", 0]],
       [["safe-build"]],
       [],
@@ -330,9 +381,8 @@ it.each([new Date("2026-11-01T10:00:00Z"), null])(
       accessSource: "license",
       license: { productId: "resource", expiresAt },
     });
-    expect(state.queries).toHaveLength(7);
-    const query = state.queries[4];
-    expect(query.sql).toMatch(/^select "product_id", "expires_at" from "licenses" /);
+    const query = queryMatching(/^select "product_id", "expires_at" from "licenses" /u);
+    expectAcquisitionAuthorizationOrder();
     expect(query.sql).toContain("for share");
     expect(query.sql).not.toContain('"key"');
     expect(query.params).toContain("active");

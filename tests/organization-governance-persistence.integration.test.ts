@@ -85,6 +85,13 @@ async function fixture(role: "member" | "admin" = "member") {
   const owner = await actor(),
     target = await actor(),
     id = `org_ogov_${randomUUID()}`;
+  const currentToken = `org-owner-${randomUUID()}`;
+  await sessionRepository.create({
+    id: `ses_${randomUUID()}`,
+    userId: owner.id,
+    token: currentToken,
+    expiresAt: new Date(Date.now() + 3_600_000),
+  });
   orgIds.push(id);
   const org = await teams.create(
     id,
@@ -103,12 +110,16 @@ async function fixture(role: "member" | "admin" = "member") {
     `mem_${randomUUID()}`,
     audit(owner, id, "organization.member_added"),
   );
-  return { owner, target, org: added.organization };
+  return { owner, target, currentToken, org: added.organization };
 }
-const transfer = ({ org, owner, target }: Awaited<ReturnType<typeof fixture>>, extra = {}) =>
+const transfer = (
+  { org, owner, target, currentToken }: Awaited<ReturnType<typeof fixture>>,
+  extra = {},
+) =>
   governance.transfer({
     id: org.id,
     actorId: owner.id,
+    currentToken,
     targetId: target.id,
     targetUsername: target.username,
     confirmationSlug: org.slug,

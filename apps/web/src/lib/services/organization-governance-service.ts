@@ -3,6 +3,7 @@ import {
   AppError,
   type ChangeHistoryFilters,
   type OrganizationChangeGroup,
+  UnauthorizedError,
   type User,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
@@ -15,7 +16,8 @@ import { encodeChangeHistoryCursor } from "../private-change-history-query";
 import { editableOrganization } from "./organization-workspace-service";
 
 class OrganizationGovernanceService {
-  async transfer(id: string, actor: User, input: unknown) {
+  async transfer(id: string, actor: User, input: unknown, currentToken: string) {
+    if (!currentToken) throw new UnauthorizedError();
     const parsed = ownershipTransferSchema.safeParse(input);
     if (!parsed.success) throw new AppError("Invalid transfer", 400, "VALIDATION_ERROR");
     const result = await organizationGovernanceRepository.transfer({
@@ -23,6 +25,7 @@ class OrganizationGovernanceService {
       expectedUpdatedAt: new Date(parsed.data.expectedUpdatedAt),
       id,
       actorId: actor.id,
+      currentToken,
       memberId: generateId("mem"),
       auditId: generateId("aud"),
     });

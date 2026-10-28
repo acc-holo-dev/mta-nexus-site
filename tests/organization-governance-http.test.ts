@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
@@ -101,6 +101,7 @@ it("binds transfer and private history to the actual session with versioned inpu
     targetUsername: "target",
     expectedUpdatedAt: new Date(time),
     actorId: "owner",
+    currentToken: "test",
     id: "org",
     memberId: "mem_new",
     auditId: "aud_new",
@@ -114,6 +115,22 @@ it("binds transfer and private history to the actual session with versioned inpu
     expect.objectContaining({ period: "all", group: "all", query: "", before: "audit_1" }),
   );
 });
+it("rejects a missing initiating cookie before reading the body even with a stale resolved actor", async () => {
+  const incoming = request("POST", transfer, "", { cookie: "nexus_locale=ru" });
+  const read = vi.spyOn(incoming, "json");
+  expect((await POST(incoming, context)).status).toBe(401);
+  expect(read).not.toHaveBeenCalled();
+  expect(incoming.bodyUsed).toBe(false);
+  expect(mocks.rate).not.toHaveBeenCalled();
+  expect(mocks.transfer).not.toHaveBeenCalled();
+});
+it("propagates a transactional session rejection without confirming a transfer", async () => {
+  mocks.transfer.mockRejectedValue(new UnauthorizedError("private session details"));
+  const response = await POST(request("POST", transfer), context);
+  expect(response.status).toBe(401);
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(await response.json()).toMatchObject({ code: "UNAUTHORIZED" });
+});
 it("denies anonymous access and forged actor/owner/commercial fields before storage", async () => {
   mocks.session.mockResolvedValue(null);
   expect((await POST(request("POST", transfer), context)).status).toBe(401);
@@ -124,6 +141,7 @@ it("denies anonymous access and forged actor/owner/commercial fields before stor
     { ownerId: "victim" },
     { formerOwnerRole: "owner" },
     { permissions: ["manage_products"] },
+    { currentToken: "forged-token" },
   ])
     expect((await POST(request("POST", { ...transfer, ...extra }), context)).status).toBe(400);
   for (const query of ["?actorId=owner", "?before=a&before=b", "?limit=1000"])

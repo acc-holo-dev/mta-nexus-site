@@ -59,7 +59,12 @@ const updated = "2026-10-10T01:00:00.000Z";
 function request(path: string, body: unknown, headers: Record<string, string> = {}) {
   return new NextRequest(`https://nexus.test${path}`, {
     method: "POST",
-    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      cookie: "nexus_session=initiating-session",
+      ...headers,
+    },
     body: JSON.stringify(body),
   });
 }
@@ -204,6 +209,7 @@ it("returns a rotation bearer once while the repository receives only its digest
   );
   const body = await response.json();
   expect(body.token.value).toMatch(/^nxlt_[A-Za-z0-9_-]{43}$/u);
+  expect(state.ownerCommand.mock.calls[0][0].currentToken).toBe("initiating-session");
   expect(state.ownerCommand.mock.calls[0][0].tokenDigest).toMatch(/^[a-f0-9]{64}$/u);
   expect(JSON.stringify(state.ownerCommand.mock.calls)).not.toContain(body.token.value);
   expect(response.headers.get("cache-control")).toBe("private, no-store");
@@ -393,6 +399,7 @@ it("requires observed endpoint recovery and returns only binding acknowledgement
     licenseId: "lic_a",
     command,
   });
+  expect(state.ownerCommand.mock.calls[0][0].currentToken).toBe("initiating-session");
   expect(state.ownerCommand.mock.calls[0][0].tokenDigest).toBeUndefined();
   expect(
     (
@@ -486,4 +493,45 @@ it("rejects ambiguous private filters and guests without loading any private con
   }
   expect(state.releasePage).not.toHaveBeenCalled();
   expect(state.historyPage).not.toHaveBeenCalled();
+});
+
+it("passes the initiating cookie separately from license credentials to moderation", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  state.moderate.mockResolvedValue({ license: { id: "lic_a", status: "suspended" } });
+  const response = await moderationAction(
+    request("/api/admin/licenses/lic_a", {
+      action: "suspend",
+      expectedUpdatedAt: revision,
+      reason: "Suspend this license",
+    }),
+    context,
+  );
+  expect(response.status).toBe(200);
+  expect(state.moderate).toHaveBeenCalledWith(
+    expect.objectContaining({
+      actorId: "usr_a",
+      currentToken: "initiating-session",
+    }),
+  );
+  expect(state.moderate.mock.calls[0][0]).not.toHaveProperty("tokenDigest");
+});
+it("requires the initiating cookie before consuming owner or moderation command bodies", async () => {
+  state.user = { id: "usr_a", role: "moderator" };
+  for (const [route, path] of [
+    [ownerAction, "/api/licenses/lic_a/actions"],
+    [moderationAction, "/api/admin/licenses/lic_a"],
+  ] as const) {
+    const req = request(path, {}, { cookie: "" });
+    if (!req.body) throw new Error("Missing command body");
+    const read = vi.spyOn(req.body, "getReader");
+    const response = await route(req, context);
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ code: "UNAUTHORIZED" });
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(response.headers.get("vary")).toBe("Cookie");
+    expect(read).not.toHaveBeenCalled();
+    expect(req.bodyUsed).toBe(false);
+  }
+  expect(state.ownerCommand).not.toHaveBeenCalled();
+  expect(state.moderate).not.toHaveBeenCalled();
 });

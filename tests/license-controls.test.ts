@@ -32,12 +32,20 @@ vi.mock("../packages/db/src/client", async () => {
 });
 import { licenseRuntimeBindings } from "../packages/db/src/schema";
 import { LicenseControlsRepository } from "../packages/db/src/repositories/license-controls";
+import { digestSessionToken } from "../packages/db/src/repositories/sessions";
 const repository = new LicenseControlsRepository();
 const revision = "2026-10-10T00:00:00.000Z";
 const now = "2026-10-10T01:00:00.000Z";
 const future = "2026-10-20T00:00:00.000Z";
 const updated = "2026-10-10T01:00:00.001Z";
-const owner = { licenseId: "lic_a", actorId: "usr_a", auditId: "aud_a" };
+const owner = {
+  licenseId: "lic_a",
+  actorId: "usr_a",
+  auditId: "aud_a",
+  currentToken: "session-owner",
+};
+const actorRow = [["usr_a"]];
+const sessionRow = [["ses_a", "2099-01-01T00:00:00.000Z"]];
 const clockRow = [{ now }] as unknown as unknown[][];
 function bindingRow(overrides = {}) {
   const row: Record<string, unknown> = {
@@ -157,6 +165,8 @@ it("revokes only the owner's license, clears the token, and audits without exten
   state.results = [
     [["lic_a", "prd_a", "srv_a", "single_server", "active", future, revision]],
     [bindingRow()],
+    actorRow,
+    sessionRow,
     clockRow,
     [],
     [["lic_a", "revoked", updated]],
@@ -181,7 +191,13 @@ it("cannot restore a revoked license or a suspended license past its paid term",
     ["suspended", null, "LICENSE_FINITE_TERM_REQUIRED"],
   ] as const) {
     state.queries = [];
-    state.results = [[["moderator"]], [["lic_a", status, expiry, revision, "srv_a"]], clockRow];
+    state.results = [
+      [["lic_a", status, expiry, revision, "srv_a"]],
+      [],
+      [["moderator"]],
+      sessionRow,
+      clockRow,
+    ];
     await expect(
       repository.moderate({
         ...owner,
@@ -261,6 +277,8 @@ function rotationResults(expiry = future, serverRevision = 2) {
     [["srv_a"]],
     [["lic_a", "prd_a", "srv_a", "single_server", "active", expiry, revision]],
     [bindingRow()],
+    actorRow,
+    sessionRow,
     clockRow,
     [["srv_a", null, serverRevision, "usr_a"]],
     [["lic_a"]],
@@ -294,6 +312,11 @@ it("rotates under parent locks, caps expiry to the original license, and stores 
     '"expires_at" =',
   );
   expect(JSON.stringify(result)).not.toContain("b".repeat(64));
+  const session = state.queries.find((item) => item.sql.includes('from "sessions"'));
+  expect(session?.sql).toContain("for update");
+  expect(session?.params).toContain(digestSessionToken(owner.currentToken));
+  expect(session?.params).not.toContain(owner.currentToken);
+  expect(session?.params).not.toContain("b".repeat(64));
 });
 it("caps a runtime token at thirty days even when a historical term is longer", async () => {
   state.results = rotationResults("2027-01-01T00:00:00.000Z");
@@ -406,7 +429,7 @@ it("rejects unobserved endpoint changes and transfers of known ownership or orga
   ] as const) {
     state.queries = [];
     const results = rotationResults();
-    results[7] = [[...serverRow]];
+    results[9] = [[...serverRow]];
     state.results = results;
     await expect(
       repository.ownerCommand({
@@ -424,7 +447,7 @@ it("rejects unobserved endpoint changes and transfers of known ownership or orga
 });
 it("cannot recover without current server control evidence or an unchanged active finite term", async () => {
   for (const [index, replacement, code] of [
-    [7, [], "LICENSE_SERVER_UNAVAILABLE"],
+    [9, [], "LICENSE_SERVER_UNAVAILABLE"],
     [
       4,
       [["lic_a", "prd_a", "srv_a", "single_server", "active", null, revision]],
@@ -584,8 +607,10 @@ it("never moves an existing binding to a different server", async () => {
 });
 it("keeps a durable binding recorded when a deleted server cleared the legacy foreign key", async () => {
   state.results = [
-    [["moderator"]],
     [["lic_a", "active", future, revision, null]],
+    [["lic_a"]],
+    [["moderator"]],
+    sessionRow,
     clockRow,
     [["srv_a"]],
     [["lic_a", "suspended", updated]],
@@ -597,4 +622,20 @@ it("keeps a durable binding recorded when a deleted server cleared the legacy fo
   });
   expect(result.license.serverBound).toBe(true);
   expect(result.license.status).toBe("suspended");
+});
+
+it("rejects missing initiating tokens before opening owner or moderation transactions", async () => {
+  const input = {
+    ...owner,
+    currentToken: "",
+    command: {
+      action: "revoke" as const,
+      expectedUpdatedAt: revision,
+      reason: "Revoke this license",
+    },
+  };
+  await expect(repository.ownerCommand(input)).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  await expect(repository.moderate(input)).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  expect(state.queries).toHaveLength(0);
+  expect(state.options).toHaveLength(0);
 });

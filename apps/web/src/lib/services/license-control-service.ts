@@ -23,11 +23,17 @@ export const licenseControlService = {
     if (moderation && !can(user, "admin.moderation")) throw new ForbiddenError();
     return licenseControlsRepository.historyPage(licenseId, user.id, moderation, page);
   },
-  async ownerCommand(user: User, licenseId: string, command: LicenseOwnerCommand) {
+  async ownerCommand(
+    user: User,
+    licenseId: string,
+    command: LicenseOwnerCommand,
+    currentToken: string,
+  ) {
     const token = command.action === "rotate_token" ? createLicenseRuntimeToken() : undefined;
     const result = await licenseControlsRepository.ownerCommand({
       licenseId,
       actorId: user.id,
+      currentToken,
       command,
       auditId: generateId("aud"),
       tokenDigest: token?.digest,
@@ -50,11 +56,17 @@ export const licenseControlService = {
     if (!can(user, "admin.moderation")) throw new ForbiddenError();
     return licenseControlsRepository.detail(licenseId, user.id, true);
   },
-  async moderate(user: User, licenseId: string, command: LicenseModerationCommand) {
+  async moderate(
+    user: User,
+    licenseId: string,
+    command: LicenseModerationCommand,
+    currentToken: string,
+  ) {
     if (!can(user, "admin.moderation")) throw new ForbiddenError();
     return licenseControlsRepository.moderate({
       licenseId,
       actorId: user.id,
+      currentToken,
       command,
       auditId: generateId("aud"),
     });
