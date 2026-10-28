@@ -4,10 +4,10 @@ import { planReviewCommandSchema } from "@nexus/validation";
 import { planReviewId } from "../plan-reviews-query";
 export const planReviewsService = {
   plan: (id: string) => commercialPlanRepository.published(planReviewId(id)),
-  save(actor: User, input: unknown) {
+  save(actor: User, input: unknown, currentToken: string) {
     const parsed = planReviewCommandSchema.safeParse(input);
     if (!parsed.success) throw new AppError("Invalid plan review", 400, "PLAN_REVIEW_INVALID");
-    return planReviewsRepository.save(actor.id, parsed.data);
+    return planReviewsRepository.save(actor.id, parsed.data, currentToken);
   },
   page: (
     actor: User,

@@ -49,6 +49,13 @@ async function fixture(scope: "user" | "organization" = "user") {
     token: currentToken,
     expiresAt: new Date(Date.now() + 3600000),
   });
+  const actorToken = `plan-actor-token-${key}`;
+  await sessionRepository.create({
+    id: `ses_prev_actor_${key}`,
+    userId: actor,
+    token: actorToken,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   const terms = {
     titleRu: "Тариф обзора",
     titleEn: "Review plan",
@@ -87,12 +94,12 @@ async function fixture(scope: "user" | "organization" = "user") {
     currency: "RUB" as const,
     ...(scope === "organization" ? { organizationId: org } : {}),
   };
-  return { actor, other, admin, planId, org, terms, command, key, currentToken };
+  return { actor, other, admin, planId, org, terms, command, key, currentToken, actorToken };
 }
 it("concurrent exact requests commit one immutable review and one audit", async () => {
   const f = await fixture();
   const receipts = await Promise.all(
-    Array.from({ length: 4 }, () => reviews.save(f.actor, f.command)),
+    Array.from({ length: 4 }, () => reviews.save(f.actor, f.command, f.actorToken)),
   );
   expect(new Set(receipts.map((r) => r.review.id)).size).toBe(1);
   expect(receipts.filter((r) => !r.replayed)).toHaveLength(1);
@@ -102,13 +109,15 @@ it("concurrent exact requests commit one immutable review and one audit", async 
     await db.select().from(commercialPlanReviews).where(eq(commercialPlanReviews.id, id)),
   ).toHaveLength(1);
   expect(await db.select().from(auditEvents).where(eq(auditEvents.targetId, id))).toHaveLength(1);
-  await expect(reviews.save(f.actor, { ...f.command, grossAmount: 10001 })).rejects.toMatchObject({
+  await expect(
+    reviews.save(f.actor, { ...f.command, grossAmount: 10001 }, f.actorToken),
+  ).rejects.toMatchObject({
     code: "PLAN_REVIEW_CONFLICT",
   });
 });
 it("terms survive plan changes/withdrawal and cannot be edited or supplied by callers", async () => {
   const f = await fixture(),
-    saved = await reviews.save(f.actor, f.command),
+    saved = await reviews.save(f.actor, f.command, f.actorToken),
     id = saved.review.id;
   await expect(
     db
@@ -158,17 +167,17 @@ it("terms survive plan changes/withdrawal and cannot be edited or supplied by ca
     review: { terms: { price: 900 } },
     current: { revision: 4, terms: { price: 1000 } },
   });
-  expect(await reviews.save(f.actor, f.command)).toMatchObject({
+  expect(await reviews.save(f.actor, f.command, f.actorToken)).toMatchObject({
     replayed: true,
     review: { terms: { price: 900 } },
   });
   await expect(
-    reviews.save(f.actor, { ...f.command, requestId: randomUUID() }),
+    reviews.save(f.actor, { ...f.command, requestId: randomUUID() }, f.actorToken),
   ).rejects.toMatchObject({ code: "PLAN_REVIEW_PLAN_CHANGED" });
 });
 it("organization reviews are shared with current managers and revoked rights block retry/read", async () => {
   const f = await fixture("organization"),
-    saved = await reviews.save(f.actor, f.command);
+    saved = await reviews.save(f.actor, f.command, f.actorToken);
   expect((await reviews.detail(f.other, saved.review.id, f.org)).review.terms).toEqual(f.terms);
   await expect(reviews.detail(f.actor, saved.review.id)).rejects.toMatchObject({ statusCode: 404 });
   await db
@@ -177,7 +186,9 @@ it("organization reviews are shared with current managers and revoked rights blo
     .where(
       and(eq(organizationMembers.organizationId, f.org), eq(organizationMembers.userId, f.actor)),
     );
-  await expect(reviews.save(f.actor, f.command)).rejects.toMatchObject({ statusCode: 404 });
+  await expect(reviews.save(f.actor, f.command, f.actorToken)).rejects.toMatchObject({
+    statusCode: 404,
+  });
   await expect(reviews.detail(f.actor, saved.review.id, f.org)).rejects.toMatchObject({
     statusCode: 404,
   });
@@ -194,7 +205,7 @@ it("an audit collision rolls back the new review", async () => {
     targetType: "commercial_plan_review",
     details: {},
   });
-  await expect(reviews.save(f.actor, f.command)).rejects.toThrow();
+  await expect(reviews.save(f.actor, f.command, f.actorToken)).rejects.toThrow();
   expect(
     await db.select().from(commercialPlanReviews).where(eq(commercialPlanReviews.id, id)),
   ).toHaveLength(0);

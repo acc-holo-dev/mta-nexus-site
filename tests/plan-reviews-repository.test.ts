@@ -61,14 +61,28 @@ const row = [
   date,
 ];
 const plan = ["cplan_a", "plan", "user", "published", 2, date, date];
+const session = [["ses_current", new Date(Date.now() + 3600000).toISOString()]];
 beforeEach(() => {
   state.queries = [];
   state.rows = [];
   state.options = [];
 });
 it("records a bounded selection and audit atomically, using database-generated terms", async () => {
-  state.rows = [[], [], [], [["usr_a"]], [], [plan], [[terms, "published"]], [], [[0]], [row], []];
-  const result = await repo.save("usr_a", command);
+  state.rows = [
+    [],
+    [],
+    [],
+    [["usr_a"]],
+    [],
+    [plan],
+    [[terms, "published"]],
+    [],
+    session,
+    [[0]],
+    [row],
+    [],
+  ];
+  const result = await repo.save("usr_a", command, "review-token");
   expect(result).toMatchObject({
     replayed: false,
     review: {
@@ -85,17 +99,22 @@ it("records a bounded selection and audit atomically, using database-generated t
     },
   });
   expect(state.queries[5].sql).toContain("for share");
-  expect(state.queries[9].sql).toContain('"terms_snapshot"');
-  expect(state.queries[9].sql).toContain("default");
-  expect(state.queries[10].sql).toContain('insert into "audit_events"');
+  expect(state.queries[8].sql).toContain('from "sessions"');
+  expect(state.queries[8].sql).toContain("for update");
+  expect(state.queries[10].sql).toContain('"terms_snapshot"');
+  expect(state.queries[10].sql).toContain("default");
+  expect(state.queries[11].sql).toContain('insert into "audit_events"');
   expect(state.queries.map((q) => q.sql).join("\n")).not.toMatch(
     /insert into "(?:orders|payments|ledger_entries|licenses|entitlements)"/u,
   );
 });
 it("an exact retry returns the original receipt even after plan withdrawal, without new writes", async () => {
-  state.rows = [[], [], [], [["usr_a"]], [row]];
-  expect(await repo.save("usr_a", command)).toMatchObject({ replayed: true, review: { terms } });
-  expect(state.queries).toHaveLength(5);
+  state.rows = [[], [], [], [["usr_a"]], [row], session];
+  expect(await repo.save("usr_a", command, "review-token")).toMatchObject({
+    replayed: true,
+    review: { terms },
+  });
+  expect(state.queries).toHaveLength(6);
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
 it.each([
@@ -104,10 +123,12 @@ it.each([
   { expectedRevision: 3 },
   { planId: "cplan_b" },
 ])("rejects key reuse with changed terms %j", async (change) => {
-  state.rows = [[], [], [], [["usr_a"]], [row]];
-  await expect(repo.save("usr_a", { ...command, ...change })).rejects.toMatchObject({
-    code: "PLAN_REVIEW_CONFLICT",
-  });
+  state.rows = [[], [], [], [["usr_a"]], [row], session];
+  await expect(repo.save("usr_a", { ...command, ...change }, "review-token")).rejects.toMatchObject(
+    {
+      code: "PLAN_REVIEW_CONFLICT",
+    },
+  );
 });
 it.each(
   [
@@ -118,7 +139,7 @@ it.each(
   ].map((rows) => ({ rows })),
 )("refuses stale/unpublished/wrong-scope plans", async ({ rows }) => {
   state.rows = [[], [], [], [["usr_a"]], [], rows];
-  await expect(repo.save("usr_a", command)).rejects.toMatchObject({
+  await expect(repo.save("usr_a", command, "review-token")).rejects.toMatchObject({
     code: "PLAN_REVIEW_PLAN_CHANGED",
   });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
@@ -130,11 +151,15 @@ it("checks live financial authority before reading another organization's review
 });
 it("refuses a missing live actor before reading a saved request", async () => {
   state.rows = [[], [], [], []];
-  await expect(repo.save("usr_a", command)).rejects.toMatchObject({ statusCode: 403 });
+  await expect(repo.save("usr_a", command, "review-token")).rejects.toMatchObject({
+    statusCode: 403,
+  });
 });
 it("caps durable reviews at 500 under the account advisory lock", async () => {
-  state.rows = [[], [], [], [["usr_a"]], [], [plan], [[terms, "published"]], [], [[500]]];
-  await expect(repo.save("usr_a", command)).rejects.toMatchObject({ code: "PLAN_REVIEW_LIMIT" });
+  state.rows = [[], [], [], [["usr_a"]], [], [plan], [[terms, "published"]], [], session, [[500]]];
+  await expect(repo.save("usr_a", command, "review-token")).rejects.toMatchObject({
+    code: "PLAN_REVIEW_LIMIT",
+  });
   expect(state.queries[7].params).toContain("plan-review-account:user:usr_a");
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
@@ -167,4 +192,16 @@ it("bounds account history by date and stable twenty-record pages", async () => 
   expect(state.queries[4].params.slice(-2)).toEqual([20, 20]);
   expect(state.queries[3].params).toContain("usr_a");
   expect(state.queries[3].params.filter((p) => p instanceof Date)).toHaveLength(2);
+});
+
+it("rejects a missing token before opening a transaction", async () => {
+  await expect(repo.save("usr_a", command, "")).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  expect(state.queries).toHaveLength(0);
+});
+it("reauthorizes the initiating session before returning an exact replay", async () => {
+  state.rows = [[], [], [], [["usr_a"]], [row], []];
+  await expect(repo.save("usr_a", command, "revoked-token")).rejects.toMatchObject({
+    code: "UNAUTHORIZED",
+  });
+  expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });
