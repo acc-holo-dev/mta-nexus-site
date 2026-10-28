@@ -9,7 +9,6 @@ import { reportId, reportRateLimit } from "../../../../../lib/community-report-a
 import { requireServerJsonContentType, readBoundedJson } from "../../../../../lib/bounded-json";
 import { communityReportDecisionSchema } from "../../../../../lib/community-report-contract";
 import { communityReportService } from "../../../../../lib/services/community-report-service";
-import { queueCommunityReportNotice } from "../../../../../lib/services/community-report-notifications";
 import { withBrowserMutation } from "../../../../../lib/browser-route-adapter";
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: NextRequest, context: Context) {
@@ -34,7 +33,6 @@ export const PATCH = withBrowserMutation(async (request: NextRequest, context: C
       if (!parsed.success) throw new AppError("Invalid decision", 400, "VALIDATION_ERROR");
       await reportRateLimit(actor.id, "moderationAction");
       const result = await communityReportService.decide(actor, id, parsed.data);
-      queueCommunityReportNotice(result);
       return {
         id: result.id,
         action: result.action,

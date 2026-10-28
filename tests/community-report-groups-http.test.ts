@@ -10,7 +10,6 @@ const mock = vi.hoisted(() => ({
   publicationReports: vi.fn(),
   previewPublicationBatch: vi.fn(),
   decidePublicationBatch: vi.fn(),
-  notice: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mock.session },
@@ -27,9 +26,6 @@ vi.mock("@nexus/db", () => ({
     previewPublicationBatch: mock.previewPublicationBatch,
     decidePublicationBatch: mock.decidePublicationBatch,
   },
-}));
-vi.mock("../apps/web/src/lib/services/community-report-notifications", () => ({
-  queueCommunityReportBatchNotices: mock.notice,
 }));
 
 import { POST as preview } from "../apps/web/src/app/api/admin/community/[id]/reports/batch/preview/route";
@@ -209,7 +205,7 @@ it("previews a normalized publication decision and hides its full private digest
   });
   expect(mock.decidePublicationBatch).not.toHaveBeenCalled();
 });
-it("confirms stored publication batches, narrows reporter fields and queues generic notices only after success", async () => {
+it("confirms scoped publication batches without leaking reporter fields", async () => {
   const command = { ...input, previewRevision: "a".repeat(64) },
     response = await commit(request("POST", command), context);
   expect(response.status).toBe(200);
@@ -220,14 +216,10 @@ it("confirms stored publication batches, narrows reporter fields and queues gene
     previewRevision: "a".repeat(64),
     items: [{ id: "report", status: "resolved" }],
   });
-  expect(mock.notice).toHaveBeenCalledExactlyOnceWith([
-    { id: "report", status: "resolved", reporterId: "PRIVATE_REPORTER" },
-  ]);
   mock.decidePublicationBatch.mockRejectedValue(
     new AppError("private text", 409, "REPORT_BATCH_CHANGED"),
   );
   expect((await commit(request("POST", command), context)).status).toBe(409);
-  expect(mock.notice).toHaveBeenCalledTimes(1);
 });
 it("requires bounded same-site JSON and rejects unknown fields or mutation query parameters", async () => {
   for (const [headers, body, query, status] of [

@@ -22,6 +22,8 @@ import {
 } from "./private-change-history-window";
 import { listCommunityReportGroups } from "./private-community-report-groups";
 import { communityTarget, editorialId, requireStaff } from "./private-community-report-scope";
+import { notificationRepository } from "./notifications";
+import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { containsPattern } from "./search-pattern";
 
 type Session = Pick<typeof db, "select" | "insert" | "update" | "delete" | "execute">;
@@ -105,6 +107,38 @@ function assertDecisionState(status: string, expected: string, action: string) {
     (action === "review" && status !== "open")
   )
     throw new AppError("Report changed", 409, "REPORT_STATE_CHANGED");
+}
+
+async function persistDecisionNotice(
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  input: { auditId: string; id: string; reporterId: string; status: Status },
+) {
+  const result = await notificationRepository.createWithPushOutboxWithin(
+    tx,
+    {
+      id: `ntf_report_${createHash("sha256")
+        .update(JSON.stringify([input.auditId, input.reporterId]))
+        .digest("hex")}`,
+      recipientId: input.reporterId,
+      title: "Community report status",
+      message: `Report status: ${input.status}.`,
+      link: `/workspace/reports/${encodeURIComponent(input.id)}`,
+      type: "security",
+      category: "security",
+    },
+    true,
+  );
+  if (
+    result.notification &&
+    (result.pushQueueState === "saturated" || result.pushQueueState === "error")
+  )
+    console.warn(
+      JSON.stringify({
+        event: "notification.push_outbox_degraded",
+        producer: "community_report",
+        reason: result.pushQueueState,
+      }),
+    );
 }
 class CommunityReportsRepository {
   groups(actorId: string, filters: CommunityReportGroupFilters) {
@@ -569,6 +603,19 @@ class CommunityReportsRepository {
           },
         })),
       );
+      // Lock the whole bounded audience before the first notice can acquire the
+      // push queue gate. Report-ID order need not match preference-lock order.
+      await lockNotificationPreferencesForUsers(
+        tx,
+        plan.rows.map((row) => row.reporterId),
+      );
+      for (const [index, row] of plan.rows.entries())
+        await persistDecisionNotice(tx, {
+          auditId: auditIds[index],
+          id: row.id,
+          reporterId: row.reporterId,
+          status: plan.status,
+        });
       return {
         contentId,
         commentId,
@@ -764,7 +811,7 @@ class CommunityReportsRepository {
     removalAuditId: string;
   }) {
     return db.transaction(async (tx) => {
-      // Recheck stale sessions before inspecting a target; the final role lock
+      // Recheck the current staff role before inspecting a target; the final role lock
       // follows publication/comment locks so discussion writers cannot deadlock.
       await requireStaff(tx, input.actorId, false);
       const [hint] = await tx
@@ -799,6 +846,7 @@ class CommunityReportsRepository {
         if (commentId && (row.targetType !== "comment" || row.targetId !== commentId))
           throw new AppError("Report changed", 409, "REPORT_STATE_CHANGED");
         current = row;
+        return row;
       };
       const removed = input.action === "remove_comment";
       if (removed) {
@@ -819,7 +867,10 @@ class CommunityReportsRepository {
             },
             async (scope) => {
               lockingReport = true;
-              await lockReport(scope.commentId);
+              const report = await lockReport(scope.commentId);
+              // Removal also stores an author notice. Acquire both recipients
+              // before that notice takes the shared push queue gate.
+              await lockNotificationPreferencesForUsers(tx, [scope.authorId, report.reporterId]);
             },
           );
         } catch (error) {
@@ -854,6 +905,12 @@ class CommunityReportsRepository {
           status,
           removedCommentId: removed ? current.targetId : null,
         },
+      });
+      await persistDecisionNotice(tx, {
+        auditId: input.auditId,
+        id: current.id,
+        reporterId: current.reporterId,
+        status,
       });
       return {
         id: current.id,

@@ -6,9 +6,15 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][][],
   failAudit: false,
   notice: vi.fn(),
+  reportNotice: vi.fn(),
 }));
 vi.mock("../packages/db/src/repositories/discussion-moderation-notice", () => ({
   discussionModerationNotice: state.notice,
+}));
+vi.mock("../packages/db/src/repositories/notifications", () => ({
+  notificationRepository: {
+    createWithPushOutboxWithin: state.reportNotice,
+  },
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
@@ -73,6 +79,7 @@ beforeEach(() => {
   state.rows = [];
   state.failAudit = false;
   state.notice.mockReset();
+  state.reportNotice.mockReset().mockResolvedValue({ notification: null });
 });
 function removalRows(
   extra: { role?: string; finalRole?: string; text?: string; status?: string } = {},
@@ -285,6 +292,26 @@ it("uses the shared archived-discussion removal and transactional author notice,
   );
   expect(audit?.params).toContain(
     JSON.stringify({ contentId: "content", moderator: true, reason: "Spam", reportId: "report" }),
+  );
+});
+it("locks both author and reporter preferences in order before either removal notice can queue push", async () => {
+  removalRows();
+  state.rows[3][0][2] = "z-author";
+  state.rows[5][0][2] = "a-reporter";
+  state.notice.mockImplementation(() => {
+    const locks = state.queries.filter((query) => query.sql.includes("pg_advisory_xact_lock"));
+    expect(locks.map((query) => query.params[0])).toEqual([
+      "nexus:notification-preference:v1:a-reporter",
+      "nexus:notification-preference:v1:z-author",
+    ]);
+    expect(state.reportNotice).not.toHaveBeenCalled();
+  });
+  await repository.decide(decision);
+  expect(state.notice).toHaveBeenCalledOnce();
+  expect(state.reportNotice).toHaveBeenCalledWith(
+    expect.anything(),
+    expect.objectContaining({ recipientId: "a-reporter", category: "security" }),
+    true,
   );
 });
 it("refuses an old token when legacy text was truncated and accepts its complete scoped digest", async () => {

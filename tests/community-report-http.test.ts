@@ -142,7 +142,7 @@ it.each([
   expect((await POST(request("POST", body))).status).toBe(400);
   expect(mocks.submit).not.toHaveBeenCalled();
 });
-it("confirms moderation writes without leaking reporter identity and queues safe outcome notices", async () => {
+it("confirms moderation writes without leaking reporter identity or deferring a second outcome notice", async () => {
   const response = await PATCH(request("PATCH", decision), context);
   expect(response.status).toBe(200);
   expect(await response.json()).toEqual({
@@ -152,7 +152,7 @@ it("confirms moderation writes without leaking reporter identity and queues safe
     removed: true,
   });
   expect(mocks.decide).toHaveBeenCalledWith(actor, "report", { ...decision, notes: "Spam" });
-  expect(mocks.notice).toHaveBeenCalledWith(expect.objectContaining({ reporterId: "reporter" }));
+  expect(mocks.notice).not.toHaveBeenCalled();
 });
 it("propagates live authority, ownership and CAS errors without internal details or false notifications", async () => {
   for (const [code, status] of [

@@ -7,7 +7,6 @@ const state = vi.hoisted(() => ({
   session: vi.fn(),
   previewDiscussionBatch: vi.fn(),
   decideDiscussionBatch: vi.fn(),
-  notices: vi.fn(),
   rate: vi.fn(),
   previewMembers: vi.fn(),
   batchMembers: vi.fn(),
@@ -34,9 +33,6 @@ vi.mock("@nexus/security", () => ({ consumeRateLimit: state.rate }));
 
 vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
   communityReportService: state,
-}));
-vi.mock("../apps/web/src/lib/services/community-report-notifications", () => ({
-  queueCommunityReportBatchNotices: state.notices,
 }));
 vi.mock("../apps/web/src/lib/services/server-content-service", () => ({
   serverContentService: state,
@@ -90,7 +86,7 @@ beforeEach(() => {
   state.history.mockResolvedValue({ ok: true });
   state.restore.mockResolvedValue({ ok: true });
 });
-it("provides private batch review and confirmed scoped commands, queues only selected case notices", async () => {
+it("binds private batch review and confirmed commands to the session actor and publication scope", async () => {
   const review = await preview(request("POST", "", input), discussion),
     command = await batch(request("POST", "", input), discussion);
   expect(review.status).toBe(200);
@@ -118,9 +114,6 @@ it("provides private batch review and confirmed scoped commands, queues only sel
     previewRevision: "a".repeat(64),
     items: [{ id: "report", status: "resolved" }],
   });
-  expect(state.notices).toHaveBeenCalledWith([
-    { id: "report", status: "resolved", reporterId: "private-reporter", notes: "private" },
-  ]);
   expect(state.rate).toHaveBeenCalledWith("moderationAction", "staff");
 });
 it("rejects injected queries, unsafe request media, cross-site commands and unbounded batches before service writes", async () => {
@@ -135,7 +128,6 @@ it("rejects injected queries, unsafe request media, cross-site commands and unbo
   }
   expect(state.previewDiscussionBatch).not.toHaveBeenCalled();
   expect(state.decideDiscussionBatch).not.toHaveBeenCalled();
-  expect(state.notices).not.toHaveBeenCalled();
 });
 it.each(["preview", "batch", "history", "restore"])(
   "requires a current session and rate allowance for %s",
@@ -156,10 +148,9 @@ it.each(["preview", "batch", "history", "restore"])(
     state.session.mockResolvedValue({ id: "staff", role: "moderator" });
     state.rate.mockResolvedValue({ success: false });
     expect((await call()).status).toBe(429);
-    expect(state.notices).not.toHaveBeenCalled();
   },
 );
-it("returns a safe localized preview conflict without sending notifications", async () => {
+it("returns a localized review conflict without private details", async () => {
   state.decideDiscussionBatch.mockRejectedValue(
     new AppError("PRIVATE_DETAIL", 409, "REPORT_BATCH_CHANGED"),
   );
@@ -169,7 +160,6 @@ it("returns a safe localized preview conflict without sending notifications", as
     code: "REPORT_BATCH_CHANGED",
     error: expect.stringContaining("изменились"),
   });
-  expect(state.notices).not.toHaveBeenCalled();
 });
 it("scopes server history and draft restoration, rejects duplicate cursors and authority query injection", async () => {
   const read = await history(request(), server),

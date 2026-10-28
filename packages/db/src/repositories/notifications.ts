@@ -332,6 +332,16 @@ export class NotificationRepository {
     pushJobs: number;
     pushQueueState: "queued" | "no_subscriptions" | "saturated" | "error";
   }> {
+    return db.transaction((tx) => this.createWithPushOutboxWithin(tx, data));
+  }
+
+  // A caller writing several recipients must lock their preferences in sorted
+  // order before the first notice can acquire the shared push queue gate.
+  async createWithPushOutboxWithin(
+    tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+    data: Omit<Notification, "createdAt" | "isRead">,
+    idempotent = false,
+  ) {
     const category =
       data.category ??
       ((data.type === "order" || data.type === "license"
@@ -356,27 +366,29 @@ export class NotificationRepository {
                 ? "systemEnabled"
                 : null;
 
-    return await db.transaction(async (tx) => {
-      await lockNotificationPreferencesForUsers(tx, [data.recipientId]);
-      const preferenceRows = await tx
-        .select()
-        .from(notificationPreferences)
-        .where(eq(notificationPreferences.userId, data.recipientId))
-        .limit(1);
-      const preferences =
-        (preferenceRows[0] as unknown as NotificationPreferences | undefined) ??
-        this.defaultPreferences(data.recipientId);
+    await lockNotificationPreferencesForUsers(tx, [data.recipientId]);
+    const preferenceRows = await tx
+      .select()
+      .from(notificationPreferences)
+      .where(eq(notificationPreferences.userId, data.recipientId))
+      .limit(1);
+    const preferences =
+      (preferenceRows[0] as unknown as NotificationPreferences | undefined) ??
+      this.defaultPreferences(data.recipientId);
 
-      if (preferenceKey && !preferences[preferenceKey]) {
-        return {
-          notification: null,
-          pushJobs: 0,
-          pushQueueState: "no_subscriptions" as const,
-        };
-      }
+    if (preferenceKey && !preferences[preferenceKey]) {
+      return {
+        notification: null,
+        pushJobs: 0,
+        pushQueueState: "no_subscriptions" as const,
+      };
+    }
 
-      return this.persistWithin(tx, { ...data, category, isRead: false, createdAt: new Date() });
-    });
+    return this.persistWithin(
+      tx,
+      { ...data, category, isRead: false, createdAt: new Date() },
+      idempotent,
+    );
   }
 
   private async persistWithin(

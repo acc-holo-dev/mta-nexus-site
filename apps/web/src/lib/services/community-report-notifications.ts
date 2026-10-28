@@ -4,35 +4,19 @@ import { dispatchNotificationsBestEffort } from "./notification-dispatch-service
 
 type ReportNotice = {
   id: string;
-  status?: string;
-  reporterId?: string;
 };
-function queueNotices(reports: ReportNotice[]) {
+export function queueCommunityReportNotice(report: ReportNotice) {
   try {
     after(async () => {
       try {
-        const moderators = reports.some((report) => !report.reporterId)
-          ? await userRepository.listModeratorIds()
-          : [];
-        const inputs = reports.flatMap((report) =>
-          report.reporterId
-            ? [
-                {
-                  recipientId: report.reporterId,
-                  title: "Community report status",
-                  message: `Report status: ${report.status}.`,
-                  link: `/workspace/reports/${encodeURIComponent(report.id)}`,
-                  type: "security" as const,
-                },
-              ]
-            : moderators.map((recipientId) => ({
-                recipientId,
-                title: "New community report",
-                message: "A community report is awaiting review.",
-                link: `/admin/reports/${encodeURIComponent(report.id)}`,
-                type: "security" as const,
-              })),
-        );
+        const moderators = await userRepository.listModeratorIds();
+        const inputs = moderators.map((recipientId) => ({
+          recipientId,
+          title: "New community report",
+          message: "A community report is awaiting review.",
+          link: `/admin/reports/${encodeURIComponent(report.id)}`,
+          type: "security" as const,
+        }));
         const result = await dispatchNotificationsBestEffort(inputs);
         if (result.storageFailed)
           console.warn(
@@ -48,14 +32,4 @@ function queueNotices(reports: ReportNotice[]) {
   } catch {
     console.warn(JSON.stringify({ event: "community_report.notification_registration_failed" }));
   }
-}
-
-export function queueCommunityReportNotice(report: ReportNotice) {
-  queueNotices([report]);
-}
-export function queueCommunityReportBatchNotices(
-  reports: { id: string; status: string; reporterId: string }[],
-) {
-  if (!reports.length || reports.length > 20) throw new RangeError("Invalid report notices");
-  queueNotices(reports);
 }

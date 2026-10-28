@@ -7,6 +7,11 @@ const state = vi.hoisted(() => ({
   config: undefined as unknown,
   failAudit: false,
 }));
+vi.mock("../packages/db/src/repositories/notifications", () => ({
+  notificationRepository: {
+    createWithPushOutboxWithin: async () => ({ notification: null }),
+  },
+}));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
   const database = drizzle(async (sql, params) => {
