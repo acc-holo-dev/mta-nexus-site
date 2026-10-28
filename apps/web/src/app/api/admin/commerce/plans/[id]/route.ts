@@ -1,4 +1,4 @@
-import { AppError, ForbiddenError } from "@nexus/domain";
+import { AppError, ForbiddenError, UnauthorizedError } from "@nexus/domain";
 import { commercialPlanCommandSchema } from "@nexus/validation";
 import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../../../lib/bounded-json";
@@ -25,10 +25,12 @@ export const POST = withBrowserMutation(function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   return resourceCommerceRequest(request, true, async (actor) => {
+    const token = request.cookies.get("nexus_session")?.value;
+    if (!token) throw new UnauthorizedError();
     if (actor.role !== "admin") throw new ForbiddenError();
     const parsed = commercialPlanCommandSchema.safeParse(await readBoundedJson(request, 16384));
     if (!parsed.success || parsed.data.action === "create")
       throw new AppError("Invalid commercial plan", 400, "COMMERCIAL_PLAN_INVALID");
-    return commercialPlanService.command(actor, parsed.data, (await params).id);
+    return commercialPlanService.command(actor, parsed.data, token, (await params).id);
   });
 });

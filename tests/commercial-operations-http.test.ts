@@ -70,7 +70,12 @@ const request = (path: string, body?: unknown, headers?: Record<string, string>)
       ? undefined
       : {
           method: "POST",
-          headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+          headers: {
+            ...browserMutationHeaders(),
+            cookie: "nexus_session=plan-admin-token",
+            "content-type": "application/json",
+            ...headers,
+          },
           body: JSON.stringify(body),
         },
   );
@@ -185,6 +190,7 @@ it("passes the actual actor and a validated draft command with private response 
   expect(state.command).toHaveBeenCalledWith(
     expect.objectContaining({
       actorId: "usr_a",
+      currentToken: "plan-admin-token",
       planId: expect.stringMatching(/^cplan_/u),
       command: expect.objectContaining({ action: "create", terms }),
     }),
@@ -245,4 +251,32 @@ it("requires login before fetching the buyer archive or cancelling", async () =>
 
 afterEach(() => {
   vi.unstubAllEnvs();
+});
+
+it("requires the initiating cookie even when the cached actor is an administrator", async () => {
+  for (const handler of [create, edit]) {
+    const input = request("/api/admin/commerce/plans/cplan_a", {
+      action: "publish",
+      expectedRevision: 1,
+      reason: "Review terms",
+    });
+    input.cookies.delete("nexus_session");
+    expect((await handler(input, planCtx)).status).toBe(401);
+    expect(input.bodyUsed).toBe(false);
+  }
+  expect(state.command).not.toHaveBeenCalled();
+});
+
+it("forwards the initiating cookie for an existing plan command", async () => {
+  const command = { action: "publish", expectedRevision: 2, reason: "Approve current terms" };
+  const response = await edit(request("/api/admin/commerce/plans/cplan_a", command), planCtx);
+  expect(response.status).toBe(200);
+  expect(state.command).toHaveBeenCalledWith(
+    expect.objectContaining({
+      actorId: "usr_a",
+      currentToken: "plan-admin-token",
+      planId: "cplan_a",
+      command,
+    }),
+  );
 });

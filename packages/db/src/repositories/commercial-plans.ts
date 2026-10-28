@@ -1,22 +1,24 @@
-import { and, count, desc, eq } from "drizzle-orm";
 import {
   AppError,
-  ForbiddenError,
-  NotFoundError,
-  commercialPlanTransition,
   type CommercialPlan,
   type CommercialPlanCommand,
   type CommercialPlanTerms,
+  commercialPlanTransition,
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
 } from "@nexus/domain";
+import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
   commercialPlans as plans,
-  commercialPlanRevisions as versions,
   users,
+  commercialPlanRevisions as versions,
 } from "../schema";
-import { historyPageBounds } from "./history-pagination";
 import type { ResourceTransaction } from "./entitlements";
+import { historyPageBounds } from "./history-pagination";
+import { lockInitiatingSession } from "./initiating-session";
 
 async function administrator(tx: ResourceTransaction, actorId: string) {
   const [actor] = await tx
@@ -160,13 +162,15 @@ export class CommercialPlanRepository {
   }
   async command(input: {
     actorId: string;
+    currentToken: string;
     planId: string;
     auditId: string;
     command: CommercialPlanCommand;
   }) {
+    if (!input.currentToken) throw new UnauthorizedError();
     try {
       return await db.transaction(async (tx) => {
-        // Existing plan -> live user grant. Creates only need the live user grant.
+        // Existing plan -> live actor -> initiating session. Creates omit the plan lock.
         const [root] =
           input.command.action === "create"
             ? []
@@ -177,6 +181,7 @@ export class CommercialPlanRepository {
                 .limit(1)
                 .for("no key update");
         await administrator(tx, input.actorId);
+        await lockInitiatingSession(tx, input.actorId, input.currentToken);
         const command = input.command,
           now = new Date();
         if (command.action === "create") {

@@ -7,6 +7,7 @@ import {
   organizations,
   commercialPlanRepository as plans,
   planReviewsRepository as reviews,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
 import { and, eq } from "drizzle-orm";
@@ -41,6 +42,13 @@ async function fixture(scope: "user" | "organization" = "user") {
       .insert(organizationMembers)
       .values({ id: `member_${key}`, organizationId: org, userId: actor, role: "admin" });
   }
+  const currentToken = `plan-token-${key}`;
+  await sessionRepository.create({
+    id: `ses_prev_${key}`,
+    userId: admin,
+    token: currentToken,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   const terms = {
     titleRu: "Тариф обзора",
     titleEn: "Review plan",
@@ -52,6 +60,7 @@ async function fixture(scope: "user" | "organization" = "user") {
     commissionBps: 750,
   };
   await plans.command({
+    currentToken,
     actorId: admin,
     planId,
     auditId: `aud_create_prev_${key}`,
@@ -64,6 +73,7 @@ async function fixture(scope: "user" | "organization" = "user") {
     },
   });
   await plans.command({
+    currentToken,
     actorId: admin,
     planId,
     auditId: `aud_publish_prev_${key}`,
@@ -77,7 +87,7 @@ async function fixture(scope: "user" | "organization" = "user") {
     currency: "RUB" as const,
     ...(scope === "organization" ? { organizationId: org } : {}),
   };
-  return { actor, other, admin, planId, org, terms, command, key };
+  return { actor, other, admin, planId, org, terms, command, key, currentToken };
 }
 it("concurrent exact requests commit one immutable review and one audit", async () => {
   const f = await fixture();
@@ -124,6 +134,7 @@ it("terms survive plan changes/withdrawal and cannot be edited or supplied by ca
     }),
   ).rejects.toThrow();
   await plans.command({
+    currentToken: f.currentToken,
     actorId: f.admin,
     planId: f.planId,
     auditId: `aud_save_prev_${f.key}`,
@@ -136,6 +147,7 @@ it("terms survive plan changes/withdrawal and cannot be edited or supplied by ca
   });
   expect((await reviews.detail(f.actor, id)).state).toBe("unavailable");
   await plans.command({
+    currentToken: f.currentToken,
     actorId: f.admin,
     planId: f.planId,
     auditId: `aud_republish_prev_${f.key}`,

@@ -1,7 +1,13 @@
 import { randomUUID } from "node:crypto";
+import {
+  commercialPlanRepository,
+  db,
+  orderOperationsRepository,
+  sessionRepository,
+  userRepository,
+} from "@nexus/db";
 import { and, count, eq } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
-import { db, userRepository, commercialPlanRepository, orderOperationsRepository } from "@nexus/db";
 import {
   auditEvents,
   commercialPlanRevisions,
@@ -16,7 +22,8 @@ import {
 describe("commercial operation persistence and concurrency", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`,
     buyer = `usr_commerce_${suffix}`,
-    admin = `usr_plan_${suffix}`;
+    admin = `usr_plan_${suffix}`,
+    currentToken = `plan-token-${suffix}`;
   beforeAll(async () => {
     for (const [id, role] of [
       [buyer, "user"],
@@ -29,6 +36,12 @@ describe("commercial operation persistence and concurrency", () => {
         username: id,
         displayName: "Commercial fixture",
       });
+    await sessionRepository.create({
+      id: `ses_plan_${suffix}`,
+      userId: admin,
+      token: currentToken,
+      expiresAt: new Date(Date.now() + 3600000),
+    });
   });
   async function pending(name: string) {
     const id = `ord_${name}_${suffix}`;
@@ -165,6 +178,7 @@ describe("commercial operation persistence and concurrency", () => {
         commissionBps: 750,
       };
     await commercialPlanRepository.command({
+      currentToken,
       actorId: admin,
       planId,
       auditId: `aud_create_${suffix}`,
@@ -177,6 +191,7 @@ describe("commercial operation persistence and concurrency", () => {
       },
     });
     await commercialPlanRepository.command({
+      currentToken,
       actorId: admin,
       planId,
       auditId: `aud_publish_${suffix}`,
@@ -184,6 +199,7 @@ describe("commercial operation persistence and concurrency", () => {
     });
     await expect(
       commercialPlanRepository.command({
+        currentToken,
         actorId: admin,
         planId,
         auditId: `aud_stale_${suffix}`,
