@@ -1,5 +1,6 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -13,6 +14,7 @@ vi.mock("../packages/db/src/client", async () => {
     state.queries.push({ sql, params });
     if (state.failTable && sql.startsWith(`insert into "${state.failTable}"`))
       throw new Error("storage failed");
+    if (sql.includes('from "sessions"')) return { rows: [["session", "2099-01-01T00:00:00.000Z"]] };
     return {
       rows:
         sql.startsWith("select") || sql.includes(" returning ") ? (state.rows.shift() ?? []) : [],
@@ -34,9 +36,11 @@ vi.mock("../packages/db/src/client", async () => {
 vi.mock("../packages/db/src/repositories/web-push-outbox", () => ({
   enqueueWebPushOutboxForNotification: state.push,
 }));
+
 import { supportCaseRepository as cases } from "../packages/db/src/repositories/support";
 import { supportActivityRepository as activity } from "../packages/db/src/repositories/support-activity";
 import { supportCases } from "../packages/db/src/schema";
+
 const id = `sup_${"a".repeat(24)}`,
   time = "2026-10-11T00:00:00.000Z",
   later = "2026-10-11T00:00:01.000Z";
@@ -78,7 +82,14 @@ beforeEach(() => {
 });
 it("resolves an own case under actor/case locks and saves audit plus a generic transactional notice", async () => {
   state.rows = [[["owner", "user"]], [row()], [row({ status: "resolved", updatedAt: later })]];
-  const result = await cases.updateStatus(id, "resolved", audit, "open", new Date(time));
+  const result = await cases.updateStatus(
+    id,
+    "resolved",
+    audit,
+    "open",
+    "current-token",
+    new Date(time),
+  );
   expect(result?.status).toBe("resolved");
   expect(state.queries[0].sql).toContain("for share");
   expect(state.queries[1].sql).toContain("for update");
@@ -101,9 +112,9 @@ it.each(["open", "resolved"] as const)(
       [row({ status: from })],
       [row({ status, updatedAt: later })],
     ];
-    expect((await cases.updateStatus(id, status, audit, from, new Date(time)))?.status).toBe(
-      status,
-    );
+    expect(
+      (await cases.updateStatus(id, status, audit, from, "current-token", new Date(time)))?.status,
+    ).toBe(status);
   },
 );
 it.each([
@@ -120,6 +131,7 @@ it.each([
         input.status,
         audit,
         input.from,
+        "current-token",
         input.version ? new Date(input.version) : undefined,
       ),
     ).rejects.toMatchObject({ statusCode: 403 });
@@ -129,13 +141,20 @@ it.each([
 it("denies an unrelated user, including a moderator whose role was revoked before the write", async () => {
   state.rows = [[["staff", "user"]], [row()]];
   await expect(
-    cases.updateStatus(id, "closed", { ...audit, actorId: "staff" }, "open"),
+    cases.updateStatus(id, "closed", { ...audit, actorId: "staff" }, "open", "current-token"),
   ).rejects.toMatchObject({ statusCode: 404 });
   expect(writes("support_cases")).toHaveLength(0);
 });
 it("allows live staff to close cases and produces a staff-attributed audit", async () => {
   state.rows = [[["staff", "moderator"]], [row()], [row({ status: "closed", updatedAt: later })]];
-  await cases.updateStatus(id, "closed", { ...audit, actorId: "staff" }, "open", new Date(time));
+  await cases.updateStatus(
+    id,
+    "closed",
+    { ...audit, actorId: "staff" },
+    "open",
+    "current-token",
+    new Date(time),
+  );
   expect(writes("audit_events")[0].params).toContain("admin");
 });
 it.each(["status", "revision"])(
@@ -145,7 +164,9 @@ it.each(["status", "revision"])(
       [["owner", "user"]],
       [row(stale === "status" ? { status: "resolved" } : { updatedAt: later })],
     ];
-    expect(await cases.updateStatus(id, "resolved", audit, "open", new Date(time))).toBeNull();
+    expect(
+      await cases.updateStatus(id, "resolved", audit, "open", "current-token", new Date(time)),
+    ).toBeNull();
     expect(writes("support_cases")).toHaveLength(0);
     expect(writes("notifications")).toHaveLength(0);
   },
@@ -153,7 +174,8 @@ it.each(["status", "revision"])(
 it("rechecks authority and revision for a no-op without creating duplicate audit or notices", async () => {
   state.rows = [[["owner", "user"]], [row({ status: "resolved" })]];
   expect(
-    (await cases.updateStatus(id, "resolved", audit, "resolved", new Date(time)))?.status,
+    (await cases.updateStatus(id, "resolved", audit, "resolved", "current-token", new Date(time)))
+      ?.status,
   ).toBe("resolved");
   expect(writes("support_cases")).toHaveLength(0);
   expect(writes("notifications")).toHaveLength(0);
@@ -165,7 +187,7 @@ it.each(["audit_events", "notifications"])(
     state.rows = [[["owner", "user"]], [row()], [row({ status: "resolved", updatedAt: later })]];
     state.failTable = table;
     await expect(
-      cases.updateStatus(id, "resolved", audit, "open", new Date(time)),
+      cases.updateStatus(id, "resolved", audit, "open", "current-token", new Date(time)),
     ).rejects.toMatchObject({ cause: expect.objectContaining({ message: "storage failed" }) });
   },
 );
@@ -173,9 +195,10 @@ it("isolates optional push failure after authoritative inbox storage", async () 
   state.rows = [[["owner", "user"]], [row()], [row({ status: "resolved", updatedAt: later })]];
   state.push.mockRejectedValue(new Error("push unavailable"));
   const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
-  expect((await cases.updateStatus(id, "resolved", audit, "open", new Date(time)))?.status).toBe(
-    "resolved",
-  );
+  expect(
+    (await cases.updateStatus(id, "resolved", audit, "open", "current-token", new Date(time)))
+      ?.status,
+  ).toBe("resolved");
   expect(writes("notifications")).toHaveLength(1);
   expect(warning).toHaveBeenCalled();
   warning.mockRestore();
@@ -206,7 +229,14 @@ it("persists staff replies, reservation, audit and requester notification under 
     [["message", id, "staff", "staff", "Sensitive reply", later]],
   ];
   expect(
-    (await cases.addIdempotentMessage(reply, { ...audit, actorId: "staff" }, request)).kind,
+    (
+      await cases.addIdempotentMessage(
+        reply,
+        { ...audit, actorId: "staff" },
+        request,
+        "current-token",
+      )
+    ).kind,
   ).toBe("created");
   expect(writes("support_mutation_requests")).toHaveLength(1);
   expect(writes("notifications")).toHaveLength(1);
@@ -216,17 +246,29 @@ it("persists staff replies, reservation, audit and requester notification under 
 it("refuses forged staff author labels even for an authorized requester", async () => {
   state.rows = [[["owner", "user"]], [row()]];
   await expect(
-    cases.addIdempotentMessage({ ...reply, authorId: "owner" }, audit, {
-      ...request,
-      actorId: "owner",
-    }),
+    cases.addIdempotentMessage(
+      { ...reply, authorId: "owner" },
+      audit,
+      {
+        ...request,
+        actorId: "owner",
+      },
+      "current-token",
+    ),
   ).rejects.toMatchObject({ statusCode: 403 });
   expect(writes("support_mutation_requests")).toHaveLength(0);
 });
 it("returns stale when a same-status case revision changed without writing a reply", async () => {
   state.rows = [[["staff", "moderator"]], [row({ updatedAt: later })], [["request"]]];
   expect(
-    (await cases.addIdempotentMessage(reply, { ...audit, actorId: "staff" }, request)).kind,
+    (
+      await cases.addIdempotentMessage(
+        reply,
+        { ...audit, actorId: "staff" },
+        request,
+        "current-token",
+      )
+    ).kind,
   ).toBe("stale");
   expect(writes("support_case_messages")).toHaveLength(0);
 });
@@ -295,9 +337,10 @@ it("honors system-notification opt-out under the existing preference lock withou
     [row({ status: "resolved", updatedAt: later })],
     [[false]],
   ];
-  expect((await cases.updateStatus(id, "resolved", audit, "open", new Date(time)))?.status).toBe(
-    "resolved",
-  );
+  expect(
+    (await cases.updateStatus(id, "resolved", audit, "open", "current-token", new Date(time)))
+      ?.status,
+  ).toBe("resolved");
   expect(state.queries.some((q) => q.sql.includes("pg_advisory_xact_lock"))).toBe(true);
   expect(writes("notifications")).toHaveLength(0);
   expect(state.push).not.toHaveBeenCalled();

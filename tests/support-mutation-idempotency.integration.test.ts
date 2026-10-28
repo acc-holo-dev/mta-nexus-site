@@ -1,5 +1,11 @@
+import { randomUUID as sessionUUID } from "node:crypto";
+import {
+  auditRepository,
+  supportCaseRepository,
+  sessionRepository as supportSessions,
+  userRepository,
+} from "@nexus/db";
 import { describe, expect, it } from "vitest";
-import { auditRepository, supportCaseRepository, userRepository } from "@nexus/db";
 import { supportMutationFingerprint } from "../apps/web/src/lib/support-idempotency";
 
 describe("durable support mutation idempotency", () => {
@@ -27,7 +33,7 @@ describe("durable support mutation idempotency", () => {
       message: "Create a case only once despite concurrent requests.",
     });
 
-    const build = (id: string, userId: string) => {
+    const build = async (id: string, userId: string) => {
       const messageId = `spm_${id}`;
       return supportCaseRepository.createIdempotentCase(
         { id, requesterId: userId, category: "account", subject: "Same request", status: "open" },
@@ -47,6 +53,7 @@ describe("durable support mutation idempotency", () => {
           targetType: "support_case",
         },
         { actorId: userId, requestKey, operation: "case", fingerprint, caseId: id, messageId },
+        await initiatingToken(userId),
       );
     };
     const [left, right] = await Promise.all([
@@ -94,6 +101,7 @@ describe("durable support mutation idempotency", () => {
         caseId: `sup_idem_collision_${suffix}`,
         messageId: `spm_collision_${suffix}`,
       },
+      await initiatingToken(actorId),
     );
     expect(collision.kind).toBe("key_conflict");
     expect(await supportCaseRepository.findById(`sup_idem_collision_${suffix}`)).toBeNull();
@@ -156,7 +164,7 @@ describe("durable support mutation idempotency", () => {
       message: "Please retry exactly once.",
       expectedStatus: "open",
     });
-    const send = (messageId: string) =>
+    const send = async (messageId: string) =>
       supportCaseRepository.addIdempotentMessage(
         {
           id: messageId,
@@ -175,6 +183,7 @@ describe("durable support mutation idempotency", () => {
           targetType: "support_case",
         },
         { actorId, requestKey: key, operation: "reply", fingerprint, caseId, messageId },
+        await initiatingToken(actorId),
       );
     const [first, second] = await Promise.all([
       send(`spm_reply_a_${suffix}`),
@@ -200,6 +209,7 @@ describe("durable support mutation idempotency", () => {
         targetType: "support_case",
       },
       "open",
+      await initiatingToken(staffId),
     );
     expect(closed?.status).toBe("closed");
     const replayed = await send(`spm_reply_retry_${suffix}`);
@@ -214,3 +224,14 @@ describe("durable support mutation idempotency", () => {
     expect(audits.filter((event) => event.targetId === caseId)).toHaveLength(1);
   });
 });
+
+async function initiatingToken(userId: string) {
+  const token = sessionUUID();
+  await supportSessions.create({
+    id: `ses_${sessionUUID()}`,
+    userId,
+    token,
+    expiresAt: new Date(Date.now() + 3_600_000),
+  });
+  return token;
+}

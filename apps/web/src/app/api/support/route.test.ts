@@ -1,11 +1,11 @@
-import { NextRequest } from "next/server";
-import { SUPPORT_JSON_MAX_BYTES } from "../../../lib/bounded-json";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   browserMutationHeaders,
   stubBrowserMutationOrigin,
 } from "../../../../../../tests/browser-mutation-headers";
+import { SUPPORT_JSON_MAX_BYTES } from "../../../lib/bounded-json";
 
 const state = vi.hoisted(() => ({
   afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
@@ -68,12 +68,13 @@ vi.mock("../../../lib/services/notification-dispatch-service", () => ({
   dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 
-import { GET as listCases, POST as createCase } from "./route";
-import { GET as getCase, PATCH as updateCase, POST as addMessage } from "./[id]/route";
+import { POST as addMessage, GET as getCase, PATCH as updateCase } from "./[id]/route";
+import { POST as createCase, GET as listCases } from "./route";
 
 const caseId = `sup_${"a".repeat(24)}`;
 const params = { params: Promise.resolve({ id: caseId }) };
 const supportHeaders = {
+  cookie: "nexus_session=initiating-token",
   ...browserMutationHeaders(),
   "content-type": "application/json",
   "Idempotency-Key": "12345678-1234-4234-8234-123456789abc",
@@ -151,6 +152,31 @@ afterEach(() => {
 });
 
 describe("support HTTP authorization and privacy", () => {
+  it.each([
+    ["create", "POST", createCase],
+    ["reply", "POST", addMessage],
+    ["status", "PATCH", updateCase],
+  ] as const)(
+    "rejects %s without a cookie before session lookup or body reads",
+    async (_name, method, handler) => {
+      mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
+      const headers = new Headers(supportHeaders);
+      headers.delete("cookie");
+      const request = new NextRequest(`https://nexus.test/api/support/${caseId}`, {
+        method,
+        headers,
+        body: JSON.stringify({ message: "Untrusted body" }),
+      });
+      const response = await handler(request, params);
+      expect(response.status).toBe(401);
+      expectPrivate(response);
+      expect(request.bodyUsed).toBe(false);
+      expect(mocks.session).not.toHaveBeenCalled();
+      expect(mocks.findById).not.toHaveBeenCalled();
+      expect(mocks.findMutationReplay).not.toHaveBeenCalled();
+    },
+  );
+
   it("rejects oversized support creation before persistence or notifications", async () => {
     mocks.session.mockResolvedValue({ id: "usr_member", role: "user" });
     const response = await createCase(
@@ -467,6 +493,7 @@ describe("support HTTP authorization and privacy", () => {
         targetId: caseId,
       }),
       expect.objectContaining({ actorId: "usr_member", operation: "case", caseId }),
+      "initiating-token",
     );
   });
 
@@ -626,6 +653,7 @@ describe("support HTTP authorization and privacy", () => {
       }),
       expect.any(Object),
       expect.objectContaining({ actorId: "usr_member", operation: "reply", caseId }),
+      "initiating-token",
     );
     expect(afterMock).not.toHaveBeenCalled();
   });
@@ -698,6 +726,7 @@ describe("support HTTP authorization and privacy", () => {
       expect.objectContaining({ caseId, expectedStatus: "resolved" }),
       expect.any(Object),
       expect.objectContaining({ actorId: "usr_member", operation: "reply", caseId }),
+      "initiating-token",
     );
     expect(afterMock).toHaveBeenCalledOnce();
   });
@@ -797,6 +826,8 @@ describe("concurrent support moderation", () => {
       "resolved",
       expect.any(Object),
       "resolved",
+      "initiating-token",
+      undefined,
     );
     expect(afterMock).not.toHaveBeenCalled();
   });
@@ -817,7 +848,14 @@ describe("concurrent support moderation", () => {
     expect(response.status).toBe(409);
     expectPrivate(response);
     expect((await response.json()).code).toBe("SUPPORT_STATUS_CONFLICT");
-    expect(mocks.updateStatus).toHaveBeenCalledWith(caseId, "closed", expect.any(Object), "open");
+    expect(mocks.updateStatus).toHaveBeenCalledWith(
+      caseId,
+      "closed",
+      expect.any(Object),
+      "open",
+      "initiating-token",
+      undefined,
+    );
     expect(afterMock).not.toHaveBeenCalled();
   });
 });
@@ -939,7 +977,11 @@ describe("durable support request replays", () => {
     const response = await createCase(
       new NextRequest("https://nexus.test/api/support", {
         method: "POST",
-        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+        headers: {
+          ...browserMutationHeaders(),
+          cookie: supportHeaders.cookie,
+          "content-type": "application/json",
+        },
         body: JSON.stringify({
           category: "account",
           subject: "Missing key",
@@ -992,6 +1034,7 @@ describe("support requester workspace lifecycle", () => {
         status,
         expect.objectContaining({ actorId: "usr_member", actorType: "user" }),
         from,
+        "initiating-token",
         new Date(version),
       );
       expect(afterMock).not.toHaveBeenCalled();

@@ -1,5 +1,3 @@
-import { and, count, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
-import { AppError } from "@nexus/domain";
 import type {
   AuditEvent,
   SupportCase,
@@ -8,6 +6,8 @@ import type {
   SupportCaseStatus,
   SupportMessageAuthorRole,
 } from "@nexus/domain";
+import { AppError } from "@nexus/domain";
+import { and, count, desc, eq, ilike, ne, or, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   auditEvents,
@@ -16,9 +16,11 @@ import {
   supportMutationRequests,
   users,
 } from "../schema";
+import { lockInitiatingSession } from "./initiating-session";
+import { containsPattern } from "./search-pattern";
 import { supportAccess, supportActor } from "./support-access";
 import { supportRequesterNotice } from "./support-requester-notice";
-import { containsPattern } from "./search-pattern";
+
 const revision = sql`greatest(clock_timestamp(), date_trunc('milliseconds', ${supportCases.updatedAt}) + interval '1 millisecond')`;
 
 export type SupportMutationKey = {
@@ -350,54 +352,57 @@ export class SupportCaseRepository {
   }
 
   /**
-   * Read-only replay lookup. A key is scoped to the authenticated actor,
+   * Reauthorize replay commands under the same actor/case/session locks as writes.
+   * A key is scoped to the authenticated actor,
    * never only to the shared support case.
    */
   async findMutationReplay(
     request: Pick<SupportMutationKey, "actorId" | "requestKey" | "operation" | "fingerprint">,
+    currentToken: string,
   ): Promise<SupportMutationReplay> {
-    return db.transaction(
-      async (tx) => {
-        const [record] = await tx
-          .select()
-          .from(supportMutationRequests)
-          .where(
-            and(
-              eq(supportMutationRequests.actorId, request.actorId),
-              eq(supportMutationRequests.requestKey, request.requestKey),
-            ),
-          )
-          .limit(1);
+    return db.transaction(async (tx) => {
+      await supportActor(tx, request.actorId);
+      const [record] = await tx
+        .select()
+        .from(supportMutationRequests)
+        .where(
+          and(
+            eq(supportMutationRequests.actorId, request.actorId),
+            eq(supportMutationRequests.requestKey, request.requestKey),
+          ),
+        )
+        .limit(1);
 
-        if (!record) return { kind: "missing" };
-        if (record.operation !== request.operation || record.fingerprint !== request.fingerprint) {
-          return { kind: "key_conflict" };
-        }
+      if (!record) {
+        await lockInitiatingSession(tx, request.actorId, currentToken);
+        return { kind: "missing" };
+      }
+      const { supportCase } = await supportAccess(tx, record.caseId, request.actorId);
+      await lockInitiatingSession(tx, request.actorId, currentToken);
+      if (record.operation !== request.operation || record.fingerprint !== request.fingerprint) {
+        return { kind: "key_conflict" };
+      }
 
-        const { supportCase } = await supportAccess(tx, record.caseId, request.actorId, false);
-
-        if (record.operation === "case") {
-          return { kind: "replayed", supportCase: supportCase as unknown as SupportCase };
-        }
-        const [message] = await tx
-          .select()
-          .from(supportCaseMessages)
-          .where(
-            and(
-              eq(supportCaseMessages.id, record.messageId),
-              eq(supportCaseMessages.caseId, record.caseId),
-            ),
-          )
-          .limit(1);
-        if (!message) throw new Error("Committed support idempotency record has no message");
-        return {
-          kind: "replayed",
-          supportCase: supportCase as unknown as SupportCase,
-          message: message as unknown as SupportCaseMessage,
-        };
-      },
-      { isolationLevel: "repeatable read", accessMode: "read only" },
-    );
+      if (record.operation === "case") {
+        return { kind: "replayed", supportCase: supportCase as unknown as SupportCase };
+      }
+      const [message] = await tx
+        .select()
+        .from(supportCaseMessages)
+        .where(
+          and(
+            eq(supportCaseMessages.id, record.messageId),
+            eq(supportCaseMessages.caseId, record.caseId),
+          ),
+        )
+        .limit(1);
+      if (!message) throw new Error("Committed support idempotency record has no message");
+      return {
+        kind: "replayed",
+        supportCase: supportCase as unknown as SupportCase,
+        message: message as unknown as SupportCaseMessage,
+      };
+    });
   }
 
   /** The key, case, initial message and audit commit atomically. */
@@ -406,6 +411,7 @@ export class SupportCaseRepository {
     message: Omit<SupportCaseMessage, "createdAt">,
     audit: Omit<AuditEvent, "createdAt">,
     request: SupportMutationKey,
+    currentToken: string,
   ): Promise<SupportCaseMutationResult> {
     if (
       request.operation !== "case" ||
@@ -422,6 +428,7 @@ export class SupportCaseRepository {
 
     const result = await db.transaction(async (tx) => {
       await supportActor(tx, request.actorId);
+      await lockInitiatingSession(tx, request.actorId, currentToken);
       const now = new Date();
       const [claimed] = await tx
         .insert(supportMutationRequests)
@@ -429,6 +436,9 @@ export class SupportCaseRepository {
         .onConflictDoNothing()
         .returning({ requestKey: supportMutationRequests.requestKey });
       if (!claimed) return { kind: "duplicate" as const };
+      // A different browser session can hold this reservation until rollback.
+      // Recheck wall-clock expiry after that wait; our session row is already locked.
+      await lockInitiatingSession(tx, request.actorId, currentToken);
 
       const [created] = await tx
         .insert(supportCases)
@@ -452,7 +462,7 @@ export class SupportCaseRepository {
     });
 
     if (result.kind === "created") return result;
-    const replay = await this.findMutationReplay(request);
+    const replay = await this.findMutationReplay(request, currentToken);
     if (replay.kind === "missing")
       throw new Error("Missing idempotency reservation after conflict");
     if (replay.kind === "key_conflict") return replay;
@@ -475,6 +485,7 @@ export class SupportCaseRepository {
     },
     audit: Omit<AuditEvent, "createdAt">,
     request: SupportMutationKey,
+    currentToken: string,
   ): Promise<SupportReplyMutationResult> {
     if (
       request.operation !== "reply" ||
@@ -492,6 +503,7 @@ export class SupportCaseRepository {
     try {
       result = await db.transaction(async (tx) => {
         const { actor, supportCase } = await supportAccess(tx, input.caseId, input.authorId);
+        await lockInitiatingSession(tx, input.authorId, currentToken);
         const authorRole = supportCase.requesterId === actor.id ? "requester" : "staff";
         if (input.authorRole !== authorRole)
           throw new AppError("Invalid support author", 403, "FORBIDDEN");
@@ -502,6 +514,7 @@ export class SupportCaseRepository {
           .onConflictDoNothing()
           .returning({ requestKey: supportMutationRequests.requestKey });
         if (!claimed) return { kind: "duplicate" as const };
+        await lockInitiatingSession(tx, request.actorId, currentToken);
         if (
           supportCase.status === "closed" ||
           supportCase.status !== input.expectedStatus ||
@@ -555,7 +568,7 @@ export class SupportCaseRepository {
     }
 
     if (result.kind === "created") return result;
-    const replay = await this.findMutationReplay(request);
+    const replay = await this.findMutationReplay(request, currentToken);
     if (replay.kind === "missing")
       throw new Error("Missing idempotency reservation after conflict");
     if (replay.kind === "key_conflict") return replay;
@@ -572,10 +585,12 @@ export class SupportCaseRepository {
     status: SupportCaseStatus,
     audit: Omit<AuditEvent, "createdAt">,
     expectedStatus: SupportCaseStatus,
+    currentToken: string,
     expectedUpdatedAt?: Date,
   ): Promise<SupportCase | null> {
     return db.transaction(async (tx) => {
       const { actor, supportCase } = await supportAccess(tx, id, audit.actorId);
+      await lockInitiatingSession(tx, actor.id, currentToken);
       if (
         !actor.staff &&
         (!expectedUpdatedAt || supportCase.status === "closed" || status === "closed")
