@@ -20,11 +20,8 @@ import {
   users,
 } from "../schema";
 import { trustedCleanScanCondition } from "./build-safety";
-import {
-  claimFreeResourceInTransaction,
-  lockResourceAcquisitionSession,
-  type ResourceTransaction,
-} from "./entitlements";
+import { claimFreeResourcesInTransaction, lockResourceAcquisitionSession } from "./entitlements";
+import type { ResourceTransaction } from "../transaction";
 import { readResourceCartReview } from "./resource-cart-review";
 import { lockInitiatingSession } from "./initiating-session";
 
@@ -247,13 +244,6 @@ export class ResourceCartRepository {
         .where(inArray(products.id, ids))
         .orderBy(asc(products.id))
         .for("no key update");
-      const [user] = await tx
-        .select({ id: users.id })
-        .from(users)
-        .where(eq(users.id, input.userId))
-        .limit(1)
-        .for("share");
-      if (!user) throw new AppError("Account is unavailable", 401, "UNAUTHORIZED");
       // Publication/removal commands take the same parent locks. Hold exact
       // selected builds too, then recompute the review under those locks before
       // issuing any grant. The client digest is never a source of authority.
@@ -275,19 +265,23 @@ export class ResourceCartRepository {
       const checked = await readResourceCartReview(tx, input.userId);
       if (checked.reviewDigest !== input.reviewDigest)
         throw new AppError("Reviewed resources changed", 409, "RESOURCE_CART_REVIEW_CHANGED");
+      const results = await claimFreeResourcesInTransaction(tx, {
+        userId: input.userId,
+        currentToken: input.currentToken,
+        resources: ids.map((productId, index) => ({
+          productId,
+          entitlementId: input.entitlementIds[index],
+        })),
+        source: "cart",
+        requestId: input.requestId,
+      });
       const acquired: ResourceCartAcquisition["acquired"] = [];
       const reviewSnapshot: ResourceCartReceiptItem[] = [];
       for (const [index, productId] of ids.entries()) {
         const item = checked.items.find((row) => row.productId === productId);
         assertReviewedItem(item);
-        const result = await claimFreeResourceInTransaction(tx, {
-          entitlementId: input.entitlementIds[index],
-          userId: input.userId,
-          currentToken: input.currentToken,
-          productId,
-          source: "cart",
-          requestId: input.requestId,
-        });
+        const result = results[index];
+        if (!result) throw new Error("Missing prepared cart result");
         acquired.push({ productId, alreadyClaimed: result.alreadyClaimed });
         reviewSnapshot.push({
           productId,

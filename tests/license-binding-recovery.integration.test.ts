@@ -69,12 +69,13 @@ async function fixture() {
       username: userId,
       displayName: "License recovery fixture",
     });
-  await sessionRepository.create({
-    id: `ses_${reviewerId}`,
-    userId: reviewerId,
-    token: `tok_${reviewerId}`,
-    expiresAt: new Date("2099-01-01T00:00:00.000Z"),
-  });
+  for (const userId of [actorId, reviewerId])
+    await sessionRepository.create({
+      id: `ses_${userId}`,
+      userId,
+      token: `tok_${userId}`,
+      expiresAt: new Date("2099-01-01T00:00:00.000Z"),
+    });
   await serverRepository.create({
     id: serverId,
     name: "Recovery server",
@@ -134,7 +135,12 @@ async function fixture() {
   return { ...f, token: await rotate(f) };
 }
 function input(f: { licenseId: string; actorId: string }) {
-  return { licenseId: f.licenseId, actorId: f.actorId, auditId: id("aud") };
+  return {
+    licenseId: f.licenseId,
+    actorId: f.actorId,
+    auditId: id("aud"),
+    currentToken: `tok_${f.actorId}`,
+  };
 }
 async function revision(f: { licenseId: string }) {
   const [license] = await db.select().from(licenses).where(eq(licenses.id, f.licenseId));

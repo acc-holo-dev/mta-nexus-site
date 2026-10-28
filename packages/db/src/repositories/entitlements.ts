@@ -3,8 +3,13 @@ import type {
   FreeResourceClaimResult,
   ResourceAcquisitionSource,
 } from "@nexus/domain";
-import { NotFoundError, UnauthorizedError, ValidationError } from "@nexus/domain";
-import { and, desc, eq, gt, isNull, or, type SQL, sql } from "drizzle-orm";
+import {
+  NotFoundError,
+  RESOURCE_CART_LIMIT,
+  UnauthorizedError,
+  ValidationError,
+} from "@nexus/domain";
+import { and, asc, desc, eq, gt, inArray, isNull, or, type SQL, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   builds,
@@ -103,21 +108,15 @@ export async function assertFreeResourceAvailable(
   }
 }
 
-/** The cart and single-resource path use the same grants and replay lock. */
-export async function claimFreeResourceInTransaction(
-  tx: ResourceTransaction,
-  input: {
-    entitlementId: string;
-    userId: string;
-    productId: string;
-    currentToken: string;
-    source?: ResourceAcquisitionSource;
-    requestId?: string;
-  },
-): Promise<FreeResourceClaimResult> {
-  const lockKey = `free-resource:${input.userId}:${input.productId}`;
-  await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${lockKey}))`);
+type FreeResourceClaim = {
+  entitlementId: string;
+  userId: string;
+  productId: string;
+  source?: ResourceAcquisitionSource;
+  requestId?: string;
+};
 
+async function prepareFreeResourceClaim(tx: ResourceTransaction, input: FreeResourceClaim) {
   await assertFreeResourceAvailable(tx, input.productId);
 
   const observedAt = new Date();
@@ -159,10 +158,15 @@ export async function claimFreeResourceInTransaction(
           .orderBy(desc(licenses.expiresAt), desc(licenses.createdAt), desc(licenses.id))
           .limit(1)
           .for("share");
-  await lockResourceAcquisitionSession(tx, input.userId, input.currentToken);
-  // Use wall time after every access, actor and session wait, not the selection
-  // timestamp (or PostgreSQL's transaction-start now()).
-  const now = new Date();
+  return { input, existing, legacy };
+}
+
+async function writeFreeResourceClaim(
+  tx: ResourceTransaction,
+  prepared: Awaited<ReturnType<typeof prepareFreeResourceClaim>>,
+  now: Date,
+): Promise<FreeResourceClaimResult> {
+  const { input, existing, legacy } = prepared;
   const isCurrent = (access: { expiresAt: Date | null }) =>
     access.expiresAt === null || access.expiresAt.getTime() > now.getTime();
   if (existing && isCurrent(existing)) {
@@ -209,6 +213,82 @@ export async function claimFreeResourceInTransaction(
     alreadyClaimed: false,
     accessSource: "entitlement",
   };
+}
+
+/** Prepare every access lock before the one mandatory initiating-session check. */
+export async function claimFreeResourcesInTransaction(
+  tx: ResourceTransaction,
+  input: {
+    userId: string;
+    currentToken: string;
+    resources: { entitlementId: string; productId: string }[];
+    source?: ResourceAcquisitionSource;
+    requestId?: string;
+  },
+): Promise<FreeResourceClaimResult[]> {
+  if (!input.currentToken) throw new UnauthorizedError("Authentication required");
+  const ordered = [...input.resources].sort((a, b) =>
+    a.productId < b.productId ? -1 : a.productId > b.productId ? 1 : 0,
+  );
+  if (
+    !ordered.length ||
+    ordered.length > RESOURCE_CART_LIMIT ||
+    new Set(ordered.map((item) => item.productId)).size !== ordered.length
+  )
+    throw new ValidationError("Invalid free resource acquisition");
+  for (const item of ordered) {
+    const key = `free-resource:${input.userId}:${item.productId}`;
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${key}))`);
+  }
+  // Hold all parent rows before any build or access row, in stable order.
+  await tx
+    .select({ id: products.id })
+    .from(products)
+    .where(
+      inArray(
+        products.id,
+        ordered.map((item) => item.productId),
+      ),
+    )
+    .orderBy(asc(products.id))
+    .for("no key update");
+  const prepared = [];
+  for (const item of ordered)
+    prepared.push(
+      await prepareFreeResourceClaim(tx, {
+        ...item,
+        userId: input.userId,
+        source: input.source,
+        requestId: input.requestId,
+      }),
+    );
+  await lockResourceAcquisitionSession(tx, input.userId, input.currentToken);
+  // Re-evaluate finite grants after every access, actor and session wait.
+  const now = new Date();
+  const results = new Map<string, FreeResourceClaimResult>();
+  for (const item of prepared)
+    results.set(item.input.productId, await writeFreeResourceClaim(tx, item, now));
+  return input.resources.map((item) => {
+    const result = results.get(item.productId);
+    if (!result) throw new Error("Missing prepared resource result");
+    return result;
+  });
+}
+
+/** Single-resource and cart commands share the same mandatory auth and grant rule. */
+export async function claimFreeResourceInTransaction(
+  tx: ResourceTransaction,
+  input: FreeResourceClaim & { currentToken: string },
+): Promise<FreeResourceClaimResult> {
+  const [result] = await claimFreeResourcesInTransaction(tx, {
+    userId: input.userId,
+    currentToken: input.currentToken,
+    resources: [{ entitlementId: input.entitlementId, productId: input.productId }],
+    source: input.source,
+    requestId: input.requestId,
+  });
+  if (!result) throw new Error("Missing resource claim result");
+  return result;
 }
 
 export class EntitlementRepository {

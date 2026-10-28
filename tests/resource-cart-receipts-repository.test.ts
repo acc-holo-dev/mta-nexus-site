@@ -7,7 +7,7 @@ const state = vi.hoisted(() => ({
 }));
 vi.mock("../packages/db/src/repositories/entitlements", async (importOriginal) => ({
   ...(await importOriginal<typeof import("../packages/db/src/repositories/entitlements")>()),
-  claimFreeResourceInTransaction: state.claim,
+  claimFreeResourcesInTransaction: state.claim,
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
@@ -58,11 +58,13 @@ beforeEach(() => {
   state.rows = [];
   state.queries = [];
   state.options = [];
-  state.claim.mockResolvedValue({
-    accessSource: "entitlement",
-    alreadyClaimed: false,
-    entitlement: { expiresAt: null },
-  });
+  state.claim.mockResolvedValue([
+    {
+      accessSource: "entitlement",
+      alreadyClaimed: false,
+      entitlement: { expiresAt: null },
+    },
+  ]);
 });
 async function preview() {
   state.rows = [[row]];
@@ -72,20 +74,7 @@ async function preview() {
   return result.reviewDigest;
 }
 function acquireRows(review = row, recheck = row) {
-  return [
-    [],
-    [],
-    [["prd_a"]],
-    [],
-    [["prd_a"]],
-    [["usr_a"]],
-    [review],
-    [["bld_a"]],
-    [recheck],
-    [],
-    [],
-    [],
-  ];
+  return [[], [], [["prd_a"]], [], [["prd_a"]], [review], [["bld_a"]], [recheck], [], [], []];
 }
 it("reviews only the actor's narrow current public evidence in a stable snapshot", async () => {
   state.rows = [[row]];
@@ -108,8 +97,7 @@ it("records exact reviewed evidence, result and receipt key atomically without f
     acquired: [{ productId: "prd_a", alreadyClaimed: false }],
   });
   expect(state.queries[4].sql).toContain("for no key update");
-  expect(state.queries[5].sql).toContain("for share");
-  expect(state.queries[7].sql).toContain("for share");
+  expect(state.queries[6].sql).toContain("for share");
   expect(state.claim).toHaveBeenCalledOnce();
   const persisted = state.queries.at(-1);
   if (!persisted) throw new Error("Missing receipt insert");
@@ -157,12 +145,14 @@ it("rechecks after the selected build lock and preserves finite legacy access fa
   expect(state.claim).not.toHaveBeenCalled();
   state.rows = acquireRows();
   state.queries = [];
-  state.claim.mockResolvedValueOnce({
-    accessSource: "license",
-    alreadyClaimed: true,
-    entitlement: null,
-    license: { expiresAt: new Date("2026-11-01T00:00:00Z") },
-  });
+  state.claim.mockResolvedValueOnce([
+    {
+      accessSource: "license",
+      alreadyClaimed: true,
+      entitlement: null,
+      license: { expiresAt: new Date("2026-11-01T00:00:00Z") },
+    },
+  ]);
   await cart.acquire({ ...input, reviewDigest });
   expect(String(state.queries.at(-1)?.params)).toContain("2026-11-01T00:00:00.000Z");
 });

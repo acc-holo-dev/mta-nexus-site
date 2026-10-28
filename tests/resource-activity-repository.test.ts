@@ -169,6 +169,7 @@ it("records cart acquisition provenance in the same grant transaction", async ()
   const grant = Object.keys(getTableColumns(entitlements)).map((key) => value[key] ?? null);
   state.results = [
     [],
+    [["prd_a"]],
     [["published", 0]],
     [["bld_a"]],
     [],

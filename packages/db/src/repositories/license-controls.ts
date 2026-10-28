@@ -15,6 +15,7 @@ import {
 import {
   AppError,
   NotFoundError,
+  UnauthorizedError,
   LICENSE_RUNTIME_TOKEN_DAYS,
   LICENSE_RUNTIME_LEASE_SECONDS,
   canModerateLicense,
@@ -42,7 +43,8 @@ import { managedServerScope } from "./server-management-scope";
 import { assertOrganizationServerClaimAuthority } from "./server-claim-authority";
 import { assertBuildModerationAuthority } from "./product-mutation-authority";
 import { containsPattern } from "./search-pattern";
-import type { ResourceTransaction } from "./entitlements";
+import type { ResourceTransaction } from "../transaction";
+import { lockInitiatingSession } from "./initiating-session";
 
 const fail = (code: string) =>
   new AppError("License operation is not currently permitted", 409, code);
@@ -495,10 +497,12 @@ export class LicenseControlsRepository {
   async ownerCommand(input: {
     licenseId: string;
     actorId: string;
+    currentToken: string;
     command: LicenseOwnerCommand;
     auditId: string;
     tokenDigest?: string;
   }) {
+    if (!input.currentToken) throw new UnauthorizedError("Authentication required");
     return db.transaction(async (tx) => {
       const activating = ["bind", "refresh_binding", "rotate_token"].includes(input.command.action);
       if (activating) {
@@ -561,6 +565,16 @@ export class LicenseControlsRepository {
         .where(eq(bindings.licenseId, license.id))
         .for("update")
         .limit(1);
+      // Access rows precede the current actor and initiating session, matching
+      // the direct and multi-resource acquisition paths.
+      const [actor] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, input.actorId))
+        .for("share")
+        .limit(1);
+      if (!actor) throw new UnauthorizedError("Authentication required");
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       const now = await clock(tx);
       let tokenExpiresAt: Date | undefined;
       let serverId = license.serverId;
@@ -708,11 +722,12 @@ export class LicenseControlsRepository {
   async moderate(input: {
     licenseId: string;
     actorId: string;
+    currentToken: string;
     command: LicenseModerationCommand;
     auditId: string;
   }) {
+    if (!input.currentToken) throw new UnauthorizedError("Authentication required");
     return db.transaction(async (tx) => {
-      await assertBuildModerationAuthority(tx, input.actorId);
       const [license] = await tx
         .select({
           id: licenses.id,
@@ -728,6 +743,13 @@ export class LicenseControlsRepository {
       if (!license) throw new NotFoundError("License", input.licenseId);
       if (license.updatedAt.toISOString() !== input.command.expectedUpdatedAt)
         throw fail("LICENSE_CONFLICT");
+      await tx
+        .select({ licenseId: bindings.licenseId })
+        .from(bindings)
+        .where(eq(bindings.licenseId, license.id))
+        .for("update");
+      await assertBuildModerationAuthority(tx, input.actorId);
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       if (!canModerateLicense(license.status, input.command.action)) throw fail("LICENSE_INACTIVE");
       const now = await clock(tx);
       if (input.command.action !== "revoke")

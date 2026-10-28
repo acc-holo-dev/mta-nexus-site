@@ -20,6 +20,8 @@ test("dependency, runtime and trust-boundary changes require full acceptance", (
     "packages/db/src/repositories/community-reports.ts",
     "packages/db/src/repositories/notifications.ts",
     "packages/db/src/repositories/discussion-management.ts",
+    "packages/db/src/repositories/organization-governance.ts",
+    "packages/db/src/repositories/license-controls.ts",
     "packages/storage/src/local-provider.ts",
     "packages/config/src/env.ts",
     "apps/web/next.config.mjs",
