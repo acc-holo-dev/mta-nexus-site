@@ -661,7 +661,7 @@ Keep these CI artifacts outside the runner before their 14-day retention expires
 | Evidence | What it proves |
 | --- | --- |
 | `core-release-evidence-<sha>-<attempt>` | Repository identity, migrations, lint, types, tests, default production build |
-| `release-upgrade-<sha>-<attempt>` | Real Drizzle upgrade from schema 0024 to 0038; failed DDL and ledger rollback; retry; idempotency; legacy rows, endpoint revision defaults, invalidated legacy proofs, notification inbox indexes and new structured notifications |
+| `release-upgrade-<sha>-<attempt>` | Drizzle upgrade from the configured baseline to the current migration target; failed DDL and ledger rollback; retry, idempotency and preservation checks |
 | `backup-restore-<sha>-<attempt>` | Destroyed synthetic source restored into new owned volumes; schema, migration ledger, author, resource, trusted build, entitlement, notification and uploads preserved |
 
 Require `status: "PASS"`, the intended `sha`, and all verification/cleanup flags
@@ -669,8 +669,8 @@ to be true in the upgrade and restore reports. A downloaded report alone is not
 success. These reports extend the core release evidence; they are separate required
 workflow steps, not additional gates silently inferred by the core JSON summary.
 
-The upgrade fixture intentionally pins 0024 → 0030 and fails when another migration
-is added. It verifies the Support tables, Web Push subscriptions, durable outbox
+The upgrade fixture pins its baseline and latest target in [`release-upgrade-contract.mjs`](../packages/db/scripts/release-upgrade-contract.mjs) and fails when another migration
+is added without updating that contract. It verifies the Support tables, Web Push subscriptions, durable outbox
 tables/indexes, queue-gate seed, legacy-row preservation, rollback/retry and
 idempotent rerun. Review and extend it with the next release's old-schema fixtures
 and data-changing effects. Its injected failure is synthetic and is appended to
