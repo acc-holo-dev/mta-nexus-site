@@ -1,25 +1,25 @@
-import {
-  supportPrivateJson,
-  supportMutationGuard,
-  supportFailure,
-} from "../../../../lib/support-http";
 import { supportCaseRepository, userRepository } from "@nexus/db";
 import { AppError, RateLimitExceededError } from "@nexus/domain";
-import { generateId, can, consumeRateLimit } from "@nexus/security";
+import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createSupportMessageSchema, updateSupportCaseStatusSchema } from "@nexus/validation";
 import { after, type NextRequest } from "next/server";
-import { authService } from "../../../../lib/services/auth-service";
 import { parseBoundedJson } from "../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
+import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
+import { authService } from "../../../../lib/services/auth-service";
+import { dispatchNotificationsBestEffort } from "../../../../lib/services/notification-dispatch-service";
+import {
+  supportFailure,
+  supportMutationGuard,
+  supportPrivateJson,
+} from "../../../../lib/support-http";
 import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
 } from "../../../../lib/support-idempotency";
-import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
-import { createRequestLogContext, logRequestEvent } from "../../../../lib/observability";
-import { dispatchNotificationsBestEffort } from "../../../../lib/services/notification-dispatch-service";
 
-async function loadAuthorizedCase(request: NextRequest, id: string) {
-  const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
+async function loadAuthorizedCase(currentToken: string | undefined, id: string) {
+  const user = currentToken ? await authService.getSession(currentToken) : null;
   if (!user) return { user: null, supportCase: null, staff: false };
 
   const supportCase = await supportCaseRepository.findById(id);
@@ -93,8 +93,9 @@ export const POST = withBrowserMutation(
           { error: "Support case not found" },
           { status: 404 },
         );
-      const access = await loadAuthorizedCase(request, id);
-      if (!access.user) {
+      const currentToken = request.cookies.get("nexus_session")?.value;
+      const access = await loadAuthorizedCase(currentToken, id);
+      if (!access.user || !currentToken) {
         return supportPrivateJson(
           context,
           request,
@@ -157,7 +158,7 @@ export const POST = withBrowserMutation(
         operation: "reply" as const,
         fingerprint,
       };
-      const previous = await supportCaseRepository.findMutationReplay(scope);
+      const previous = await supportCaseRepository.findMutationReplay(scope, currentToken);
       if (previous.kind === "key_conflict") {
         return supportPrivateJson(
           context,
@@ -238,6 +239,7 @@ export const POST = withBrowserMutation(
           details: { authorRole },
         },
         { ...scope, caseId: id, messageId },
+        currentToken,
       );
 
       if (result.kind === "key_conflict") {
@@ -325,8 +327,9 @@ export const PATCH = withBrowserMutation(
           { error: "Support case not found" },
           { status: 404 },
         );
-      const access = await loadAuthorizedCase(request, id);
-      if (!access.user) {
+      const currentToken = request.cookies.get("nexus_session")?.value;
+      const access = await loadAuthorizedCase(currentToken, id);
+      if (!access.user || !currentToken) {
         return supportPrivateJson(
           context,
           request,
@@ -404,9 +407,8 @@ export const PATCH = withBrowserMutation(
           },
         },
         parsed.data.expectedStatus,
-        ...(parsed.data.expectedUpdatedAt
-          ? ([new Date(parsed.data.expectedUpdatedAt)] as const)
-          : []),
+        currentToken,
+        parsed.data.expectedUpdatedAt ? new Date(parsed.data.expectedUpdatedAt) : undefined,
       );
       if (!supportCase) {
         return supportPrivateJson(

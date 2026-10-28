@@ -43,6 +43,9 @@ function healthy(overrides = {}) {
     queueLeased: 1,
     queueCapacity: 10_000,
     queueOldestAgeSeconds: 12,
+    reportPending: 0,
+    reportFailed: 0,
+    reportOldestAgeSeconds: 0,
     queueAlert: "ok",
     queueAlertReasons: [],
     queueAlertThresholds: {
@@ -115,6 +118,9 @@ test("rejects impossible queue counters and invalid capacity", () => {
   assert.notEqual(run(healthy({ queueLeased: 5, queuePending: 4 })), 0);
   assert.notEqual(run(healthy({ queueCapacity: 50_001 })), 0);
   assert.notEqual(run(healthy({ configured: "true" })), 0);
+  assert.notEqual(run(healthy({ reportPending: undefined })), 0);
+  assert.notEqual(run(healthy({ reportFailed: -1 })), 0);
+  assert.notEqual(run(healthy({ reportOldestAgeSeconds: "invalid" })), 0);
 });
 
 test("rejects inconsistent queue alert metadata", () => {

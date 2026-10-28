@@ -42,7 +42,7 @@ const post = (
 ) =>
   request(base + query, {
     method: "POST",
-    headers: { ...browserMutationHeaders(), ...headers },
+    headers: { ...browserMutationHeaders(), cookie: "nexus_session=plan-review-token", ...headers },
     body: JSON.stringify(body),
   });
 beforeEach(() => {
@@ -64,15 +64,28 @@ it("requires a signed-in session for all review surfaces", async () => {
 it("fixes actor identity and validates request bodies before repository writes", async () => {
   const res = await POST(post({ ...command, organizationId: "org_a" }));
   expect(res.status).toBe(200);
-  expect(state.save).toHaveBeenCalledWith("usr_a", { ...command, organizationId: "org_a" });
+  expect(state.save).toHaveBeenCalledWith(
+    "usr_a",
+    { ...command, organizationId: "org_a" },
+    "plan-review-token",
+  );
   expect(res.headers.get("cache-control")).toBe("private, no-store");
   expect(state.rate).toHaveBeenCalledWith("reviewSubmission", "usr_a");
   for (const body of [
     { ...command, actorId: "usr_other" },
     { ...command, grossAmount: -1 },
     { ...command, terms: {} },
+    { ...command, currentToken: "forged-token" },
   ])
     expect((await POST(post(body))).status).toBe(400);
+});
+it("rejects a missing initiating cookie before consuming the request body", async () => {
+  const req = post(command, "", { "content-type": "application/json", cookie: "" });
+  const body = vi.spyOn(req, "text");
+  expect((await POST(req)).status).toBe(401);
+  expect(body).not.toHaveBeenCalled();
+  expect(req.bodyUsed).toBe(false);
+  expect(state.save).not.toHaveBeenCalled();
 });
 it("blocks cross-site, wrong content types, oversized bodies and ambiguous POST queries", async () => {
   expect(

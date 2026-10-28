@@ -10,16 +10,12 @@ const mocks = vi.hoisted(() => ({
   submit: vi.fn(),
   decide: vi.fn(),
   rate: vi.fn(),
-  notice: vi.fn(),
 }));
 vi.mock("../apps/web/src/lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
 }));
 vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
   communityReportService: mocks,
-}));
-vi.mock("../apps/web/src/lib/services/community-report-notifications", () => ({
-  queueCommunityReportNotice: mocks.notice,
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 
@@ -108,17 +104,15 @@ it("blocks anonymous access, forged actor scope and repeated filters", async () 
   expect(mocks.page).not.toHaveBeenCalled();
   expect(mocks.decide).not.toHaveBeenCalled();
 });
-it("normalizes writes and notifies only after a new report is confirmed by storage", async () => {
+it("normalizes writes and returns the confirmed result for a new or duplicate report", async () => {
   expect((await POST(request("POST", report))).status).toBe(200);
   expect(mocks.submit).toHaveBeenCalledWith(actor, {
     ...report,
     reason: "Abuse details",
     evidenceUrls: [],
   });
-  expect(mocks.notice).toHaveBeenCalledTimes(1);
   mocks.submit.mockResolvedValue({ id: "report", created: false });
   expect((await POST(request("POST", report))).status).toBe(200);
-  expect(mocks.notice).toHaveBeenCalledTimes(1);
 });
 it("requires same-site JSON and bounded bodies for both mutations", async () => {
   for (const [headers, body, status] of [
@@ -152,7 +146,6 @@ it("confirms moderation writes without leaking reporter identity or deferring a 
     removed: true,
   });
   expect(mocks.decide).toHaveBeenCalledWith(actor, "report", { ...decision, notes: "Spam" });
-  expect(mocks.notice).not.toHaveBeenCalled();
 });
 it("propagates live authority, ownership and CAS errors without internal details or false notifications", async () => {
   for (const [code, status] of [
@@ -166,7 +159,6 @@ it("propagates live authority, ownership and CAS errors without internal details
     expect(response.status).toBe(status);
     expect((await response.json()).error).not.toContain("private detail");
   }
-  expect(mocks.notice).not.toHaveBeenCalled();
 });
 it("limits reads and writes before service work", async () => {
   mocks.rate.mockResolvedValue({ success: false });

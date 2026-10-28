@@ -22,6 +22,9 @@ function snapshot(overrides = {}) {
     queueLeased: 1,
     queueCapacity: 10_000,
     queueOldestAgeSeconds: 12,
+    reportPending: 0,
+    reportFailed: 0,
+    reportOldestAgeSeconds: 0,
     queueAlert: "ok",
     queueAlertReasons: [],
     queueAlertThresholds: { pendingPercent: 80, dueJobs: 100, oldestAgeSeconds: 900 },
@@ -84,6 +87,27 @@ test("alerts when delivery is disabled while jobs remain", () => {
     }),
   );
   assert.equal(result.status, 2);
+});
+
+test("alerts on report fanout failures and backlog even without VAPID", () => {
+  const result = run(
+    snapshot({
+      configured: false,
+      queuePending: 0,
+      queueDue: 0,
+      queueLeased: 0,
+      reportPending: 2,
+      reportFailed: 1,
+      reportOldestAgeSeconds: 900,
+      queueAlert: "alert",
+      queueAlertReasons: ["report_delivery_failed", "report_delivery_backlog"],
+    }),
+  );
+  assert.equal(result.status, 2);
+  const value = JSON.parse(result.stdout);
+  assert.equal(value.reportPending, 2);
+  assert.equal(value.reportFailed, 1);
+  assert.equal(value.reportOldestAgeSeconds, 900);
 });
 
 test("fails closed for stale or inconsistent snapshot", () => {

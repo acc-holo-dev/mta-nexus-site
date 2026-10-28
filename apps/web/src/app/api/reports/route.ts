@@ -1,4 +1,4 @@
-import { after, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { authService } from "../../../lib/services/auth-service";
 import {
   contentRepository,
@@ -16,7 +16,6 @@ import {
   jsonWithRequestId,
   logRequestEvent,
 } from "../../../lib/observability";
-import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
@@ -144,43 +143,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
     const report = result.report;
-
-    after(async () => {
-      try {
-        const moderators = await userRepository.listModeratorIds();
-        const dispatch = await dispatchNotificationsBestEffort(
-          moderators.map((moderatorId) => ({
-            recipientId: moderatorId,
-            title: "New report requires review",
-            message:
-              parsed.data.type +
-              " report for " +
-              parsed.data.targetType +
-              ":" +
-              parsed.data.targetId,
-            link: "/admin",
-            type: "security" as const,
-          })),
-        );
-        if (dispatch.storageFailed) {
-          logRequestEvent({
-            level: "warn",
-            event: "moderation.report_notification_failed",
-            context,
-            status: 201,
-            error: new Error(`${dispatch.storageFailed} moderator notification deliveries failed`),
-          });
-        }
-      } catch (error) {
-        logRequestEvent({
-          level: "warn",
-          event: "moderation.report_notification_failed",
-          context,
-          status: 201,
-          error,
-        });
-      }
-    });
 
     return privateJson(context, { success: true, report }, { status: 201 });
   } catch (error: unknown) {

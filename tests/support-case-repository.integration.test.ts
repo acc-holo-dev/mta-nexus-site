@@ -1,5 +1,10 @@
+import { randomUUID as sessionUUID } from "node:crypto";
+import {
+  supportCaseRepository,
+  sessionRepository as supportSessions,
+  userRepository,
+} from "@nexus/db";
 import { describe, expect, it } from "vitest";
-import { supportCaseRepository, userRepository } from "@nexus/db";
 
 describe("support case repository", () => {
   it("persists threads, status changes and requester isolation", async () => {
@@ -99,6 +104,7 @@ describe("support case repository", () => {
             targetType: "support_case",
           },
           "open",
+          await initiatingToken(staffId),
         )
       )?.status,
     ).toBe("closed");
@@ -115,6 +121,7 @@ describe("support case repository", () => {
         targetType: "support_case",
       },
       "open",
+      await initiatingToken(staffId),
     );
     expect(staleUpdate).toBeNull();
     expect((await supportCaseRepository.findById(caseId))?.status).toBe("closed");
@@ -219,6 +226,7 @@ it("serializes reply-vs-status races without losing the moderation decision", as
         targetType: "support_case",
       },
       "open",
+      await initiatingToken(staffId),
     ),
   ]);
 
@@ -296,6 +304,7 @@ it("filters staff queue totals, categories and pages in PostgreSQL", async () =>
       targetType: "support_case",
     },
     "open",
+    await initiatingToken(staffId),
   );
   expect(transitioned?.status).toBe("closed");
   const open = await supportCaseRepository.pageStaff(1, 25, {
@@ -420,3 +429,14 @@ it("paginates support cases and keeps message pages bounded newest-first", async
   expect(latest.items.map((item) => item.body)).toEqual(["Paged message 3", "Paged message 4"]);
   expect(older.items.map((item) => item.body)).toEqual(["Paged message 1", "Paged message 2"]);
 });
+
+async function initiatingToken(userId: string) {
+  const token = sessionUUID();
+  await supportSessions.create({
+    id: `ses_${sessionUUID()}`,
+    userId,
+    token,
+    expiresAt: new Date(Date.now() + 3_600_000),
+  });
+  return token;
+}

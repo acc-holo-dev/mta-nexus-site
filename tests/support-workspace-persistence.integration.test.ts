@@ -1,21 +1,23 @@
-import { createHash, randomUUID } from "node:crypto";
-import { and, eq, inArray, sql } from "drizzle-orm";
-import { afterEach, expect, it } from "vitest";
+import { createHash, randomUUID, randomUUID as sessionUUID } from "node:crypto";
 import {
   auditEvents,
+  supportCaseRepository as cases,
   db,
-  notifications,
   notificationPreferences,
+  notifications,
   sessionRepository,
   supportActivityRepository,
   supportCaseMessages,
-  supportCaseRepository as cases,
   supportCases,
+  sessionRepository as supportSessions,
   userRepository,
   users,
   webPushOutbox,
   webPushSubscriptionRepository,
 } from "@nexus/db";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { afterEach, expect, it } from "vitest";
+
 const userIds: string[] = [],
   caseIds: string[] = [];
 function required<T>(value: T | null | undefined): T {
@@ -95,6 +97,7 @@ it("persists requester resolution/reopening, private status history and generic 
     "resolved",
     audit(f.supportCase.id, f.owner.id),
     "open",
+    await initiatingToken(f.owner.id),
     f.supportCase.updatedAt,
   );
   const opened = await cases.updateStatus(
@@ -102,6 +105,7 @@ it("persists requester resolution/reopening, private status history and generic 
     "open",
     audit(f.supportCase.id, f.owner.id),
     "resolved",
+    await initiatingToken(f.owner.id),
     required(resolved).updatedAt,
   );
   expect(required(opened).updatedAt.getTime()).toBeGreaterThan(
@@ -129,6 +133,7 @@ it("respects staff closure and live role revocation for status, history and repl
     "closed",
     audit(f.supportCase.id, f.staff.id),
     "open",
+    await initiatingToken(f.staff.id),
     f.supportCase.updatedAt,
   );
   await expect(
@@ -137,6 +142,7 @@ it("respects staff closure and live role revocation for status, history and repl
       "open",
       audit(f.supportCase.id, f.owner.id),
       "closed",
+      await initiatingToken(f.owner.id),
       required(closed).updatedAt,
     ),
   ).rejects.toMatchObject({ statusCode: 403 });
@@ -147,6 +153,7 @@ it("respects staff closure and live role revocation for status, history and repl
       "open",
       audit(f.supportCase.id, f.staff.id),
       "closed",
+      await initiatingToken(f.staff.id),
       required(closed).updatedAt,
     ),
   ).rejects.toMatchObject({ statusCode: 404 });
@@ -162,6 +169,7 @@ it("serializes competing requester transitions and refuses same-status revision 
       "resolved",
       audit(f.supportCase.id, f.owner.id),
       "open",
+      await initiatingToken(f.owner.id),
       f.supportCase.updatedAt,
     ),
     cases.updateStatus(
@@ -169,6 +177,7 @@ it("serializes competing requester transitions and refuses same-status revision 
       "resolved",
       audit(f.supportCase.id, f.owner.id),
       "open",
+      await initiatingToken(f.owner.id),
       f.supportCase.updatedAt,
     ),
   ]);
@@ -179,6 +188,7 @@ it("serializes competing requester transitions and refuses same-status revision 
     "open",
     audit(f.supportCase.id, f.staff.id),
     "resolved",
+    await initiatingToken(f.staff.id),
     current.updatedAt,
   );
   expect(
@@ -187,6 +197,7 @@ it("serializes competing requester transitions and refuses same-status revision 
       "closed",
       audit(f.supportCase.id, f.staff.id),
       "open",
+      await initiatingToken(f.staff.id),
       f.supportCase.updatedAt,
     ),
   ).toBeNull();
@@ -216,6 +227,7 @@ it("replays an authorized committed reply after closure without duplicating mess
     input,
     audit(f.supportCase.id, f.staff.id, "support.message.created"),
     request,
+    await initiatingToken(f.staff.id),
   );
   expect(first.kind).toBe("created");
   if (first.kind !== "created") throw new Error("Reply did not persist");
@@ -224,12 +236,14 @@ it("replays an authorized committed reply after closure without duplicating mess
     "closed",
     audit(f.supportCase.id, f.staff.id),
     "open",
+    await initiatingToken(f.staff.id),
     first.supportCase.updatedAt,
   );
   const replay = await cases.addIdempotentMessage(
     input,
     audit(f.supportCase.id, f.staff.id, "support.message.created"),
     request,
+    await initiatingToken(f.staff.id),
   );
   expect(replay.kind).toBe("replayed");
   expect(
@@ -246,7 +260,9 @@ it("replays an authorized committed reply after closure without duplicating mess
     );
   expect(notices).toHaveLength(1);
   await db.update(users).set({ role: "user" }).where(eq(users.id, f.staff.id));
-  await expect(cases.findMutationReplay(request)).rejects.toMatchObject({ statusCode: 404 });
+  await expect(
+    cases.findMutationReplay(request, await initiatingToken(request.actorId)),
+  ).rejects.toMatchObject({ statusCode: 404 });
 });
 it("rolls back the case and audit when authoritative inbox storage fails", async () => {
   const f = await fixture(),
@@ -269,6 +285,7 @@ it("rolls back the case and audit when authoritative inbox storage fails", async
       "resolved",
       audit(f.supportCase.id, f.owner.id, "support.case.status_changed", auditId),
       "open",
+      await initiatingToken(f.owner.id),
       f.supportCase.updatedAt,
     ),
   ).rejects.toThrow();
@@ -319,6 +336,7 @@ it("queues status push delivery in the same transaction as the receipt", async (
     "resolved",
     audit(f.supportCase.id, f.owner.id),
     "open",
+    await initiatingToken(f.owner.id),
     f.supportCase.updatedAt,
   );
   const [notice] = await db
@@ -342,6 +360,7 @@ it("honors persisted system-notification opt-out while keeping the authoritative
         "resolved",
         audit(f.supportCase.id, f.owner.id),
         "open",
+        await initiatingToken(f.owner.id),
         f.supportCase.updatedAt,
       )
     )?.status,
@@ -350,3 +369,14 @@ it("honors persisted system-notification opt-out while keeping the authoritative
     await db.select().from(notifications).where(eq(notifications.recipientId, f.owner.id)),
   ).toEqual([]);
 });
+
+async function initiatingToken(userId: string) {
+  const token = sessionUUID();
+  await supportSessions.create({
+    id: `ses_${sessionUUID()}`,
+    userId,
+    token,
+    expiresAt: new Date(Date.now() + 3_600_000),
+  });
+  return token;
+}

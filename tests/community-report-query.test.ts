@@ -185,7 +185,7 @@ it("returns not found for another reporter before reading its target", async () 
   ).rejects.toMatchObject({ code: "NOT_FOUND" });
   expect(state.queries).toHaveLength(1);
 });
-it("serializes duplicate submissions, gates publication/comment under share locks and audits once", async () => {
+it("serializes duplicate submissions and stores their audit and delivery source once", async () => {
   state.rows = [[], [["content", "author"]], [["author"]], []];
   expect(await repository.submit(submission)).toEqual({ id: "report", created: true });
   expect(state.queries[0].sql).toContain("pg_advisory_xact_lock");
@@ -195,7 +195,16 @@ it("serializes duplicate submissions, gates publication/comment under share lock
   expect(state.queries[3].params).toEqual(
     expect.arrayContaining(["reporter", "comment", "open", "under_review"]),
   );
-  expect(state.queries.at(-1)?.params).toContain("report.created");
+  const audits = state.queries.filter((query) =>
+    query.sql.startsWith('insert into "audit_events"'),
+  );
+  const deliveries = state.queries.filter((query) =>
+    query.sql.startsWith('insert into "report_notification_deliveries"'),
+  );
+  expect(audits).toHaveLength(1);
+  expect(audits[0].params).toContain("report.created");
+  expect(deliveries).toHaveLength(1);
+  expect(deliveries[0].params).toEqual(expect.arrayContaining(["report", true]));
   state.queries = [];
   state.rows = [[], [["content", "author"]], [["author"]], [["existing-report"]]];
   expect(await repository.submit(submission)).toEqual({ id: "existing-report", created: false });

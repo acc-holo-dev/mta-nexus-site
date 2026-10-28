@@ -24,9 +24,6 @@ vi.mock("../apps/web/src/lib/services/notification-dispatch-service", () => ({
 vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
   communityReportService: { page: vi.fn(), submit: vi.fn() },
 }));
-vi.mock("../apps/web/src/lib/services/community-report-notifications", () => ({
-  queueCommunityReportNotice: vi.fn(),
-}));
 
 import { POST as createPublicReport } from "../apps/web/src/app/api/reports/route";
 import { POST as createWorkspaceReport } from "../apps/web/src/app/api/workspace/reports/route";

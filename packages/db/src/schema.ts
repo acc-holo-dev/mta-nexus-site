@@ -73,6 +73,9 @@ export const users = pgTable(
     uniqueIndex("users_email_idx").on(table.email),
     uniqueIndex("users_username_idx").on(table.username),
     index("users_role_idx").on(table.role),
+    index("users_report_notification_recipient_idx")
+      .on(table.id, table.createdAt)
+      .where(sql`${table.role} IN ('moderator', 'admin')`),
   ],
 );
 
@@ -1422,6 +1425,28 @@ export const reports = pgTable(
     index("reports_reporter_pending_target_idx")
       .on(table.reporterId, table.targetType, table.targetId)
       .where(sql`${table.status} IN ('open', 'under_review')`),
+  ],
+);
+
+// Durable moderator inbox fanout for newly created reports.
+export const reportNotificationDeliveries = pgTable(
+  "report_notification_deliveries",
+  {
+    reportId: text("report_id")
+      .primaryKey()
+      .references(() => reports.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+    community: boolean("community").notNull().default(false),
+    lastRecipientId: text("last_recipient_id"),
+    availableAt: timestamp("available_at", { withTimezone: true }).notNull().defaultNow(),
+    attempts: integer("attempts").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("report_notification_deliveries_due_idx")
+      .on(table.availableAt, table.reportId)
+      .where(sql`${table.completedAt} IS NULL AND ${table.attempts} < 5`),
+    check("report_notification_deliveries_attempts_bounds", sql`${table.attempts} BETWEEN 0 AND 5`),
   ],
 );
 

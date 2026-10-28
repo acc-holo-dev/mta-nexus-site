@@ -1,4 +1,4 @@
-import { AppError } from "@nexus/domain";
+import { AppError, UnauthorizedError } from "@nexus/domain";
 import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../lib/bounded-json";
 import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
@@ -12,8 +12,10 @@ export function GET(request: NextRequest) {
 }
 export const POST = withBrowserMutation(function POST(request: NextRequest) {
   return resourceCommerceRequest(request, true, async (actor) => {
+    const currentToken = request.cookies.get("nexus_session")?.value;
+    if (!currentToken) throw new UnauthorizedError();
     if (request.nextUrl.searchParams.size)
       throw new AppError("Invalid plan review query", 400, "PLAN_REVIEW_INVALID");
-    return planReviewsService.save(actor, await readBoundedJson(request, 4096));
+    return planReviewsService.save(actor, await readBoundedJson(request, 4096), currentToken);
   });
 });

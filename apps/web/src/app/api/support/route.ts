@@ -1,22 +1,22 @@
-import { supportQuery } from "../../../lib/support-workspace-contract";
-import {
-  supportPrivateJson,
-  supportMutationGuard,
-  supportFailure,
-} from "../../../lib/support-http";
 import { supportCaseRepository, userRepository } from "@nexus/db";
-import { generateId, can, consumeRateLimit } from "@nexus/security";
+import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { createSupportCaseSchema } from "@nexus/validation";
 import { after, type NextRequest } from "next/server";
-import { authService } from "../../../lib/services/auth-service";
 import { parseBoundedJson } from "../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../lib/browser-route-adapter";
+import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
+import { authService } from "../../../lib/services/auth-service";
+import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
+import {
+  supportFailure,
+  supportMutationGuard,
+  supportPrivateJson,
+} from "../../../lib/support-http";
 import {
   parseSupportIdempotencyKey,
   supportMutationFingerprint,
 } from "../../../lib/support-idempotency";
-import { withBrowserMutation } from "../../../lib/browser-route-adapter";
-import { createRequestLogContext, logRequestEvent } from "../../../lib/observability";
-import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
+import { supportQuery } from "../../../lib/support-workspace-contract";
 
 export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
@@ -77,8 +77,9 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
 
   try {
-    const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
-    if (!user) {
+    const currentToken = request.cookies.get("nexus_session")?.value;
+    const user = currentToken ? await authService.getSession(currentToken) : null;
+    if (!user || !currentToken) {
       return supportPrivateJson(
         context,
         request,
@@ -130,7 +131,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       operation: "case" as const,
       fingerprint,
     };
-    const existing = await supportCaseRepository.findMutationReplay(scope);
+    const existing = await supportCaseRepository.findMutationReplay(scope, currentToken);
     if (existing.kind === "key_conflict") {
       return supportPrivateJson(
         context,
@@ -190,6 +191,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         },
       },
       { ...scope, caseId, messageId },
+      currentToken,
     );
     if (result.kind === "key_conflict") {
       return supportPrivateJson(

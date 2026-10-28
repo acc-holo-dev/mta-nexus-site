@@ -7,6 +7,7 @@ import {
   type PlanReviewCommand,
   type PlanReviewDetail,
   readPlanReviewTerms,
+  UnauthorizedError,
 } from "@nexus/domain";
 import { and, count, desc, eq, sql } from "drizzle-orm";
 import { db } from "../client";
@@ -19,6 +20,7 @@ import {
 import type { ResourceTransaction } from "./entitlements";
 import { lockFinancialAccountAuthority } from "./financial-statements";
 import { historyPageBounds } from "./history-pagination";
+import { lockInitiatingSession } from "./initiating-session";
 
 const conflict = () => new AppError("Plan review request changed", 409, "PLAN_REVIEW_CONFLICT");
 const changed = () => new AppError("Published plan changed", 409, "PLAN_REVIEW_PLAN_CHANGED");
@@ -48,7 +50,8 @@ async function limits(tx: ResourceTransaction) {
   await tx.execute(sql`set local statement_timeout = '10s'`);
 }
 export class PlanReviewsRepository {
-  async save(actorId: string, command: PlanReviewCommand) {
+  async save(actorId: string, command: PlanReviewCommand, currentToken: string) {
+    if (!currentToken) throw new UnauthorizedError();
     const requestId = command.requestId.toLowerCase();
     return db.transaction(
       async (tx) => {
@@ -65,6 +68,7 @@ export class PlanReviewsRepository {
         const subjectType = command.organizationId ? "organization" : "user",
           subjectId = command.organizationId ?? actorId;
         if (prior) {
+          await lockInitiatingSession(tx, actorId, currentToken);
           if (
             prior.subjectType !== subjectType ||
             prior.subjectId !== subjectId ||
@@ -98,6 +102,8 @@ export class PlanReviewsRepository {
         await tx.execute(
           sql`select pg_advisory_xact_lock(hashtext(${`plan-review-account:${subjectType}:${subjectId}`}))`,
         );
+        // All account, plan and advisory waits precede the final session check.
+        await lockInitiatingSession(tx, actorId, currentToken);
         const [total] = await tx
           .select({ total: count() })
           .from(reviews)

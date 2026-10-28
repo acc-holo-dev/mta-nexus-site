@@ -43,6 +43,7 @@ const evidence = {
   resourceCopiesSchemaPresent: false,
   accountSubscriptionsSchemaPresent: false,
   libraryCollectionsSchemaPresent: false,
+  reportNotificationDeliverySchemaPresent: false,
   status: "FAIL",
   sha: process.env.GITHUB_SHA ?? null,
   baseline: upgradePlan.baselineTag,
@@ -113,6 +114,8 @@ try {
     VALUES ('upgrade-review', 'upgrade-resource', 'upgrade-user', 'Preserved legacy review', true, NULL)`;
   await client`INSERT INTO notifications (id, recipient_id, title, message, link, is_read)
     VALUES ('upgrade-notification', 'upgrade-user', 'Legacy title', 'Legacy message', '/workspace', true)`;
+  await client`INSERT INTO reports (id, reporter_id, target_type, target_id, type, reason)
+    VALUES ('upgrade-report', 'upgrade-user', 'product', 'upgrade-resource', 'abuse', 'Existing complaint')`;
   await client`INSERT INTO servers (id, name, slug, ip_address, port, owner_id)
     VALUES ('upgrade-server', 'Existing server', 'upgrade-server', '198.51.100.70', 22003, 'upgrade-user')`;
   await client`INSERT INTO audit_events (id, actor_id, action, target_id, target_type, details)
@@ -135,6 +138,7 @@ try {
       "builds",
       "entitlements",
       "notifications",
+      "reports",
       "servers",
       "server_claim_challenges",
       "audit_events",
@@ -673,6 +677,27 @@ try {
     0,
   );
   evidence.libraryCollectionsSchemaPresent = true;
+  const reportDeliveryIndexes = await client`SELECT indexname FROM pg_indexes
+    WHERE schemaname = 'public' AND indexname IN (
+      'report_notification_deliveries_due_idx', 'users_report_notification_recipient_idx'
+    )`;
+  assert.equal(reportDeliveryIndexes.length, 2);
+  assert.equal(
+    (await client`SELECT count(*)::integer AS total FROM report_notification_deliveries`)[0].total,
+    0,
+    "Upgrade must preserve historical reports without inventing delivery progress",
+  );
+  await assert.rejects(
+    client`INSERT INTO report_notification_deliveries (report_id, created_at, attempts)
+      VALUES ('upgrade-report', clock_timestamp(), 6)`,
+    (error) => error.code === "23514",
+  );
+  await assert.rejects(
+    client`INSERT INTO report_notification_deliveries (report_id, created_at)
+      VALUES ('upgrade-report-missing', clock_timestamp())`,
+    (error) => error.code === "23503",
+  );
+  evidence.reportNotificationDeliverySchemaPresent = true;
   const receiptColumns =
     await client`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'resource_cart_acquisitions' AND column_name IN ('review_digest','review_snapshot')`;
   assert.equal(receiptColumns.length, 2);

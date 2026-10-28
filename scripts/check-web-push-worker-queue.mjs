@@ -15,6 +15,9 @@ try {
       queueLeased: snapshot.queueLeased,
       queueCapacity: snapshot.queueCapacity,
       queueOldestAgeSeconds: snapshot.queueOldestAgeSeconds,
+      reportPending: snapshot.reportPending,
+      reportFailed: snapshot.reportFailed,
+      reportOldestAgeSeconds: snapshot.reportOldestAgeSeconds,
       thresholds: snapshot.queueAlertThresholds,
     })}\n`,
   );

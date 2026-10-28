@@ -5,32 +5,15 @@ import {
   stubBrowserMutationOrigin,
 } from "../../../../../../tests/browser-mutation-headers";
 
-const state = vi.hoisted(() => ({
-  afterCallbacks: [] as Array<() => unknown | Promise<unknown>>,
-}));
-const afterMock = vi.hoisted(() =>
-  vi.fn((callback: () => unknown | Promise<unknown>) => {
-    state.afterCallbacks.push(callback);
-  }),
-);
 const mocks = vi.hoisted(() => ({
   session: vi.fn(),
   rate: vi.fn(),
   findComment: vi.fn(),
   createWithAudit: vi.fn(),
-  moderators: vi.fn(),
-  dispatch: vi.fn(),
 }));
 
-vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>("next/server");
-  return { ...actual, after: afterMock };
-});
 vi.mock("../../../lib/services/auth-service", () => ({
   authService: { getSession: mocks.session },
-}));
-vi.mock("../../../lib/services/notification-dispatch-service", () => ({
-  dispatchNotificationsBestEffort: mocks.dispatch,
 }));
 vi.mock("@nexus/security", () => ({
   can: vi.fn(() => false),
@@ -50,7 +33,6 @@ vi.mock("@nexus/db", () => ({
   },
   userRepository: {
     findById: vi.fn(),
-    listModeratorIds: mocks.moderators,
   },
 }));
 
@@ -77,27 +59,12 @@ describe("comment abuse reporting", () => {
   beforeEach(() => {
     stubBrowserMutationOrigin();
     vi.clearAllMocks();
-    state.afterCallbacks.length = 0;
     mocks.session.mockResolvedValue({ id: "usr_reporter" });
     mocks.rate.mockResolvedValue({ success: true });
     mocks.findComment.mockResolvedValue({ id: "cmt_1" });
     mocks.createWithAudit.mockResolvedValue({
       created: true,
       report: { id: "rpt_test", status: "open" },
-    });
-    mocks.moderators.mockResolvedValue([]);
-    mocks.dispatch.mockResolvedValue({
-      requested: 0,
-      stored: 0,
-      storageFailed: 0,
-      push: {
-        notifications: 0,
-        attempted: 0,
-        delivered: 0,
-        failed: 0,
-        stale: 0,
-        deliveryErrors: 0,
-      },
     });
   });
 
@@ -127,7 +94,6 @@ describe("comment abuse reporting", () => {
       error: "Report target was not found",
     });
     expect(mocks.createWithAudit).not.toHaveBeenCalled();
-    expect(afterMock).not.toHaveBeenCalled();
   });
 
   it("rejects unsupported target types before target lookup", async () => {
