@@ -7,6 +7,8 @@ const ALERT_REASONS = [
   "capacity_pressure",
   "due_backlog",
   "oldest_job_age",
+  "report_delivery_failed",
+  "report_delivery_backlog",
 ];
 
 function inRange(value, min, max) {
@@ -25,6 +27,13 @@ function expectedAlertReasons(input) {
     input.queueOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds
   )
     reasons.push("oldest_job_age");
+  if (input.reportFailed > 0) reasons.push("report_delivery_failed");
+  if (
+    input.reportPending >= input.queueAlertThresholds.dueJobs ||
+    (input.reportPending > 0 &&
+      input.reportOldestAgeSeconds >= input.queueAlertThresholds.oldestAgeSeconds)
+  )
+    reasons.push("report_delivery_backlog");
   return reasons;
 }
 
@@ -46,6 +55,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
   const queueLeased = Number(data?.queueLeased);
   const queueCapacity = Number(data?.queueCapacity);
   const queueOldestAgeSeconds = Number(data?.queueOldestAgeSeconds);
+  const reportPending = Number(data?.reportPending);
+  const reportFailed = Number(data?.reportFailed);
+  const reportOldestAgeSeconds = Number(data?.reportOldestAgeSeconds);
   const queueAlertThresholds = Object.freeze({
     pendingPercent: Number(data?.queueAlertThresholds?.pendingPercent),
     dueJobs: Number(data?.queueAlertThresholds?.dueJobs),
@@ -61,6 +73,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     queueDue <= queuePending &&
     queueLeased <= queuePending &&
     queuePending <= queueCapacity;
+  const reportStateValid = [reportPending, reportFailed, reportOldestAgeSeconds].every(
+    (value) => Number.isSafeInteger(value) && value >= 0,
+  );
 
   const thresholdsValid =
     inRange(queueAlertThresholds.pendingPercent, 1, 99) &&
@@ -80,6 +95,7 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     !Number.isSafeInteger(batch) ||
     batch < 0 ||
     !queueStateValid ||
+    !reportStateValid ||
     !thresholdsValid ||
     now - heartbeatAt > staleAfterMs ||
     now - progressAt > progressStaleAfterMs
@@ -93,6 +109,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     queueDue,
     queueCapacity,
     queueOldestAgeSeconds,
+    reportPending,
+    reportFailed,
+    reportOldestAgeSeconds,
     queueAlertThresholds,
   });
   const expectedStatus = expectedReasons.length > 0 ? "alert" : "ok";
@@ -124,6 +143,9 @@ export async function readWebPushWorkerHealthSnapshot(options = {}) {
     queueLeased,
     queueCapacity,
     queueOldestAgeSeconds,
+    reportPending,
+    reportFailed,
+    reportOldestAgeSeconds,
     queueAlert: expectedStatus,
     queueAlertReasons: Object.freeze([...reasons]),
     queueAlertThresholds,

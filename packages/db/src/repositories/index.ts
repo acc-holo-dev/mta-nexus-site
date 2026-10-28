@@ -81,6 +81,7 @@ export * from "./resource-requirements";
 export * from "./seller-sales";
 export * from "./order-terms";
 export * from "./plan-reviews";
+export * from "./report-notification-delivery";
 export * from "./resource-copies";
 export * from "./subscriptions";
 export * from "./library-collections";

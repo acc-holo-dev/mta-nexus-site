@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { PgDialect } from "drizzle-orm/pg-core";
 import type { SQL } from "drizzle-orm";
 import type { AuditEvent, Report } from "@nexus/domain";
-import { auditEvents, reports } from "../packages/db/src/schema";
+import { auditEvents, reports, reportNotificationDeliveries } from "../packages/db/src/schema";
 
 const captured = vi.hoisted(() => ({
   inserts: [] as unknown[],
@@ -86,13 +86,13 @@ describe("report write and notification lookup", () => {
     };
     const result = await new ReportRepository().createWithAudit(data, audit);
     expect(result).toMatchObject({ report: { id: "rpt_1" }, created: true });
-    expect(captured.inserts).toEqual([reports, auditEvents]);
+    expect(captured.inserts).toEqual([reports, auditEvents, reportNotificationDeliveries]);
     if (!captured.lock) throw new Error("Expected report advisory lock to be captured");
     expect(new PgDialect().sqlToQuery(captured.lock).sql).toContain("pg_advisory_xact_lock");
 
     const duplicate = await new ReportRepository().createWithAudit(data, audit);
     expect(duplicate).toMatchObject({ report: { id: "rpt_1" }, created: false });
-    expect(captured.inserts).toEqual([reports, auditEvents]);
+    expect(captured.inserts).toEqual([reports, auditEvents, reportNotificationDeliveries]);
   });
 
   it("fetches only moderator IDs and does not hydrate account data", async () => {

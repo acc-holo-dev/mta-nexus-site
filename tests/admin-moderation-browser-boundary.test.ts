@@ -29,10 +29,6 @@ vi.mock("../apps/web/src/lib/services/community-moderation-service", () => ({
 vi.mock("../apps/web/src/lib/services/community-report-service", () => ({
   communityReportService: {},
 }));
-vi.mock("../apps/web/src/lib/services/community-report-notifications", () => ({
-  queueCommunityReportNotice: vi.fn(),
-  queueCommunityReportBatchNotices: vi.fn(),
-}));
 vi.mock("../apps/web/src/lib/services/license-control-service", () => ({
   licenseControlService: {},
 }));

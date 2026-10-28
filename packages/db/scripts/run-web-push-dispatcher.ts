@@ -5,11 +5,13 @@ import {
   closeDatabaseConnection,
   createWebPushHttpSender,
   WebPushDispatcher,
+  reportNotificationDeliveryRepository,
   webPushOutboxRepository,
   webPushWorkerRepository,
 } from "../src/index";
 
-const HEALTH_FILE = "/tmp/nexus-web-push-worker-health.json";
+const HEALTH_FILE =
+  process.env.NEXUS_WEB_PUSH_HEALTH_FILE || "/tmp/nexus-web-push-worker-health.json";
 const HEALTH_TMP = `${HEALTH_FILE}.${process.pid}.tmp`;
 const HEARTBEAT_INTERVAL_MS = 15_000;
 const STALE_AFTER_MS = 60_000;
@@ -53,7 +55,9 @@ type QueueAlertReason =
   | "delivery_disabled_with_pending_jobs"
   | "capacity_pressure"
   | "due_backlog"
-  | "oldest_job_age";
+  | "oldest_job_age"
+  | "report_delivery_failed"
+  | "report_delivery_backlog";
 
 const controller = new AbortController();
 let stopping = false;
@@ -70,6 +74,9 @@ let healthQueueDue = 0;
 let healthQueueLeased = 0;
 let healthQueueCapacity = 0;
 let healthQueueOldestAgeSeconds = 0;
+let reportPending = 0;
+let reportFailed = 0;
+let reportOldestAgeSeconds = 0;
 let healthQueueAlertReasons: QueueAlertReason[] = [];
 let lastQueueAlertSignature = "";
 
@@ -113,6 +120,12 @@ function updateQueueAlertState() {
   if (healthQueueDue >= QUEUE_ALERT_DUE_JOBS) reasons.push("due_backlog");
   if (healthQueuePending > 0 && healthQueueOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
     reasons.push("oldest_job_age");
+  if (reportFailed > 0) reasons.push("report_delivery_failed");
+  if (
+    reportPending >= QUEUE_ALERT_DUE_JOBS ||
+    (reportPending > 0 && reportOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
+  )
+    reasons.push("report_delivery_backlog");
 
   const previousSignature = lastQueueAlertSignature;
   const nextSignature = reasons.join(",");
@@ -127,6 +140,9 @@ function updateQueueAlertState() {
     queueLeased: healthQueueLeased,
     queueCapacity: healthQueueCapacity,
     queueOldestAgeSeconds: healthQueueOldestAgeSeconds,
+    reportPending,
+    reportFailed,
+    reportOldestAgeSeconds,
     thresholds: queueAlertThresholds(),
   };
   if (reasons.length > 0) emit({ status: "queue-alert", reasons, ...queue });
@@ -159,6 +175,9 @@ async function writeHealthSnapshot() {
     queueLeased: healthQueueLeased,
     queueCapacity: healthQueueCapacity,
     queueOldestAgeSeconds: healthQueueOldestAgeSeconds,
+    reportPending,
+    reportFailed,
+    reportOldestAgeSeconds,
     queueAlert: healthQueueAlertReasons.length > 0 ? "alert" : "ok",
     queueAlertReasons: healthQueueAlertReasons,
     queueAlertThresholds: queueAlertThresholds(),
@@ -187,6 +206,10 @@ async function refreshQueueStats() {
   healthQueueLeased = stats.leased;
   healthQueueCapacity = stats.capacity;
   healthQueueOldestAgeSeconds = stats.oldestAgeSeconds;
+  const reports = await reportNotificationDeliveryRepository.stats();
+  reportPending = reports.pending;
+  reportFailed = reports.failed;
+  reportOldestAgeSeconds = reports.oldestAgeSeconds;
   updateQueueAlertState();
 }
 
@@ -249,9 +272,17 @@ try {
     healthBatch += 1;
     let activity = 0;
 
+    const reports = await reportNotificationDeliveryRepository.processNext(BATCH_SIZE);
+    if (reports.state !== "idle") {
+      activity += 1;
+      emit({ status: "report-delivery", batch: healthBatch, ...reports });
+    }
+    markProgress();
+    if (controller.signal.aborted) break;
+
     if (dispatcher) {
       const result = await dispatcher.runBatch(BATCH_SIZE, controller.signal, markProgress);
-      activity =
+      activity +=
         result.accepted +
         result.retried +
         result.discarded +
@@ -269,7 +300,7 @@ try {
       }
     } else {
       const cleaned = await webPushWorkerRepository.discardUnavailable(BATCH_SIZE);
-      activity = cleaned;
+      activity += cleaned;
       if (cleaned > 0) {
         emit({
           status: "maintenance",

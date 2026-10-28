@@ -242,6 +242,56 @@ Required properties include:
 
 Paid commerce remains disabled.
 
+### Recovering report inbox delivery
+
+New generic and community reports persist a `report_notification_deliveries` row
+with the report and creation audit. Migration 0079 does not backfill historical
+reports. The existing push worker processes one page of at most twenty recipients
+per loop, including when VAPID is absent. It considers accounts created by the
+event timestamp and checks their current moderator/admin role on each page.
+The audience is not a historical role snapshot: later promotions behind the
+saved cursor do not replay old reports. Generic notices link to `/admin`;
+community notices link to their case. Notifications contain no complaint text.
+
+Inbox insertion and the recipient cursor commit together. The job lock uses
+`SKIP LOCKED`; recipient locks use `NOWAIT` so a locked account retries the whole
+page instead of silently skipping a recipient. A process interruption rolls back
+the current page. Retry does not duplicate notices or reset their read state.
+Five consecutive failed pages stop automatic retries; a successful page resets
+that failure counter. Retry delays are 5, 10, 20 and 40 seconds.
+
+Inspect the same aggregate worker probe used for push:
+
+```sh
+node scripts/check-web-push-worker-queue.mjs
+```
+
+`reportPending`, `reportFailed` and `reportOldestAgeSeconds` describe unfinished
+inbox fanout. `report_delivery_failed` and `report_delivery_backlog` produce alert
+exit code 2 while process liveness remains a separate check. Backlog uses the
+existing due-job and age thresholds. Logs contain counts and states only.
+
+After diagnosing the database/lock failure, retry one failed source on the
+intended database, retaining its cursor:
+
+```sql
+SELECT report_id, attempts, available_at
+FROM report_notification_deliveries
+WHERE completed_at IS NULL AND attempts = 5
+ORDER BY available_at, report_id
+LIMIT 20;
+
+UPDATE report_notification_deliveries
+SET attempts = 0, available_at = clock_timestamp()
+WHERE report_id = 'rpt_REPLACE_WITH_VERIFIED_ID'
+  AND attempts = 5 AND completed_at IS NULL
+RETURNING report_id;
+```
+
+Do not reset every source or delete inbox rows. Optional push admission can still
+return `saturated`/`error`; the page logs `pushDeferred` and retains the inbox.
+Completion of report fanout confirms inbox processing, not external push delivery.
+
 ### Recovering discussion inbox delivery
 
 Run from the repository with the target database environment loaded:

@@ -1,6 +1,6 @@
 import { and, asc, count, eq, desc, inArray, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, reports, users } from "../schema";
+import { auditEvents, reports, reportNotificationDeliveries, users } from "../schema";
 import type { AuditEvent, Report } from "@nexus/domain";
 import { lockInitiatingSession } from "./initiating-session";
 
@@ -112,17 +112,18 @@ export class ReportRepository {
         .limit(1);
       if (existing) return { report: existing as unknown as Report, created: false };
 
-      const now = new Date();
       const [report] = await tx
         .insert(reports)
         .values({
           ...data,
-          createdAt: now,
+          createdAt: sql`clock_timestamp()`,
           resolvedAt: null,
         })
         .returning();
       if (!report) throw new Error("Report insert did not return a row");
-      await tx.insert(auditEvents).values({ ...audit, createdAt: now });
+      const createdAt = sql`(select ${reports.createdAt} from ${reports} where ${reports.id} = ${report.id})`;
+      await tx.insert(auditEvents).values({ ...audit, createdAt });
+      await tx.insert(reportNotificationDeliveries).values({ reportId: report.id, createdAt });
       return { report: report as unknown as Report, created: true };
     });
   }

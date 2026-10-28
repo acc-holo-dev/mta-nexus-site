@@ -10,7 +10,14 @@ import {
 } from "@nexus/domain";
 import { and, asc, desc, eq, ilike, inArray, isNull, or, type SQL, sql } from "drizzle-orm";
 import { db } from "../client";
-import { auditEvents, comments, content, reports, users } from "../schema";
+import {
+  auditEvents,
+  comments,
+  content,
+  reports,
+  reportNotificationDeliveries,
+  users,
+} from "../schema";
 import {
   discussionManagementRepository,
   moderationDiscussionRevision,
@@ -695,7 +702,9 @@ class CommunityReportsRepository {
         reason: input.reason,
         evidenceUrls: input.evidenceUrls,
         status: "open",
+        createdAt: sql`clock_timestamp()`,
       });
+      const createdAt = sql`(select ${reports.createdAt} from ${reports} where ${reports.id} = ${input.id})`;
       await tx.insert(auditEvents).values({
         id: input.auditId,
         actorId: input.actorId,
@@ -704,7 +713,11 @@ class CommunityReportsRepository {
         targetType: "report",
         targetId: input.id,
         details: { targetType: input.targetType, contentId: publication.id, type: input.type },
+        createdAt,
       });
+      await tx
+        .insert(reportNotificationDeliveries)
+        .values({ reportId: input.id, createdAt, community: true });
       return { id: input.id, created: true };
     });
   }

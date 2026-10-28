@@ -10,7 +10,6 @@ import { communityReportCreateSchema } from "../../../../lib/community-report-co
 import { requireServerJsonContentType, readBoundedJson } from "../../../../lib/bounded-json";
 import { AppError } from "@nexus/domain";
 import { communityReportService } from "../../../../lib/services/community-report-service";
-import { queueCommunityReportNotice } from "../../../../lib/services/community-report-notifications";
 export async function GET(request: NextRequest) {
   return userPlatformApi(
     request,
@@ -31,10 +30,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       const parsed = communityReportCreateSchema.safeParse(await readBoundedJson(request));
       if (!parsed.success) throw new AppError("Invalid report", 400, "VALIDATION_ERROR");
       await reportRateLimit(actor.id, "report");
-      const result = await communityReportService.submit(actor, parsed.data);
-      // An idempotent duplicate is a confirmed result, not a second notification.
-      if (result.created) queueCommunityReportNotice(result);
-      return result;
+      return communityReportService.submit(actor, parsed.data);
     },
     200,
     communityReportMutationError,
