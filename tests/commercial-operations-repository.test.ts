@@ -52,7 +52,14 @@ const command = {
   expectedUpdatedAt: now,
   reason: "No longer needed",
 };
-const input = { buyerId: "usr_buyer", orderId: "ord_a", command, auditId: "aud_a" };
+const input = {
+  buyerId: "usr_buyer",
+  currentToken: "buyer-token",
+  orderId: "ord_a",
+  command,
+  auditId: "aud_a",
+};
+const buyerAuthorization = [[["usr_buyer"]], [["ses_buyer", "2099-01-01T00:00:00.000Z"]]];
 function root(status = "draft", revision = 2) {
   const record: Record<string, unknown> = {
     id: "cplan_a",
@@ -208,7 +215,17 @@ it("bounds payment archive and never selects provider transactions, failures or 
     expect(query?.sql).not.toContain(`"${column}"`);
 });
 it("cancels once and saves the durable result with atomic audit, without access or refund writes", async () => {
-  state.results = [[], [["ord_a", "pending", now]], [], [], [], [[cancelled]], [], []];
+  state.results = [
+    [],
+    [["ord_a", "pending", now]],
+    ...buyerAuthorization,
+    [],
+    [],
+    [],
+    [[cancelled]],
+    [],
+    [],
+  ];
   expect(await operations.cancel(input)).toEqual({
     kind: "unpaid_order_cancelled",
     orderId: "ord_a",
@@ -217,9 +234,15 @@ it("cancels once and saves the durable result with atomic audit, without access 
   });
   expect(state.queries[0].sql).toContain("pg_advisory_xact_lock");
   expect(state.queries[1].sql).toContain("for no key update");
-  expect(state.queries[5].sql).toContain("date_trunc('milliseconds'");
-  expect(state.queries[6].sql).toContain('insert into "order_cancellation_receipts"');
-  expect(state.queries[7].params).toContain("order.unpaid_cancelled");
+  expect(state.queries[2].sql).toContain('from "users"');
+  expect(state.queries[2].sql).toContain("for share");
+  expect(state.queries[3].sql).toContain('from "sessions"');
+  expect(state.queries[3].sql).toContain("for update");
+  expect(state.queries[3].params).toContain(digestSessionToken(input.currentToken));
+  expect(state.queries[3].params).not.toContain(input.currentToken);
+  expect(state.queries[7].sql).toContain("date_trunc('milliseconds'");
+  expect(state.queries[8].sql).toContain('insert into "order_cancellation_receipts"');
+  expect(state.queries[9].params).toContain("order.unpaid_cancelled");
   expect(
     state.queries.some((q) =>
       /insert into "(?:licenses|entitlements|ledger_entries|payments)"/u.test(q.sql),
@@ -230,10 +253,11 @@ it("replays the exact stored cancellation without checking changed status or wri
   state.results = [
     [],
     [["ord_a", "cancelled", cancelled]],
+    ...buyerAuthorization,
     [["ord_a", now, command.reason, cancelled]],
   ];
   expect(await operations.cancel(input)).toMatchObject({ cancelledAt: new Date(cancelled) });
-  expect(state.queries).toHaveLength(3);
+  expect(state.queries).toHaveLength(5);
 });
 it.each([{ reason: "Different reason" }, { expectedUpdatedAt: cancelled }])(
   "rejects reuse of a receipt key with different intent %j",
@@ -241,6 +265,7 @@ it.each([{ reason: "Different reason" }, { expectedUpdatedAt: cancelled }])(
     state.results = [
       [],
       [["ord_a", "cancelled", cancelled]],
+      ...buyerAuthorization,
       [["ord_a", now, command.reason, cancelled]],
     ];
     return expect(
@@ -251,25 +276,32 @@ it.each([{ reason: "Different reason" }, { expectedUpdatedAt: cancelled }])(
 it.each(["processing", "completed", "refunded", "cancelled", "failed"])(
   "does not cancel an order in %s state",
   (status) => {
-    state.results = [[], [["ord_a", status, now]], []];
+    state.results = [[], [["ord_a", status, now]], ...buyerAuthorization, []];
     return expect(operations.cancel(input)).rejects.toMatchObject({ code: "ORDER_STATE_CHANGED" });
   },
 );
 it("requires reconciliation even for a failed payment attempt", async () => {
-  state.results = [[], [["ord_a", "pending", now]], [], [["pay_failed"]], []];
+  state.results = [
+    [],
+    [["ord_a", "pending", now]],
+    ...buyerAuthorization,
+    [],
+    [["pay_failed"]],
+    [],
+  ];
   await expect(operations.cancel(input)).rejects.toMatchObject({
     code: "ORDER_RECONCILIATION_REQUIRED",
   });
   expect(state.queries.some((q) => q.sql.startsWith("update"))).toBe(false);
 });
 it("requires reconciliation for an order financial entry without a payment attempt", async () => {
-  state.results = [[], [["ord_a", "pending", now]], [], [], [["ledger_a"]]];
+  state.results = [[], [["ord_a", "pending", now]], ...buyerAuthorization, [], [], [["ledger_a"]]];
   await expect(operations.cancel(input)).rejects.toMatchObject({
     code: "ORDER_RECONCILIATION_REQUIRED",
   });
 });
 it("does not write a receipt after a failed compare-and-swap", async () => {
-  state.results = [[], [["ord_a", "pending", now]], [], [], [], []];
+  state.results = [[], [["ord_a", "pending", now]], ...buyerAuthorization, [], [], [], []];
   await expect(operations.cancel(input)).rejects.toMatchObject({ code: "ORDER_STATE_CHANGED" });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });

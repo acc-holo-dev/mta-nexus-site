@@ -4,6 +4,7 @@ import {
   buildRepository,
   entitlementRepository,
   productRepository,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
 import type { Product, User } from "@nexus/domain";
@@ -29,6 +30,13 @@ describe("safe resource acquisition", () => {
       username: `claim_author_${suffix}`,
       displayName: "Claim Author",
       role: "developer",
+    });
+
+    await sessionRepository.create({
+      id: `ses_claim_${player.id}`,
+      userId: player.id,
+      token: `tok_${player.id}`,
+      expiresAt: new Date(Date.now() + 3600000),
     });
 
     const base = {
@@ -83,10 +91,12 @@ describe("safe resource acquisition", () => {
   it("claims a free resource idempotently", async () => {
     const first = await commerceService.claimFreeResource({
       user: player,
+      currentToken: `tok_${player.id}`,
       productId: freeResource.id,
     });
     const second = await commerceService.claimFreeResource({
       user: player,
+      currentToken: `tok_${player.id}`,
       productId: freeResource.id,
     });
 
@@ -118,7 +128,11 @@ describe("safe resource acquisition", () => {
 
   it("rejects a paid resource through the free claim path", async () => {
     await expect(
-      commerceService.claimFreeResource({ user: player, productId: paidResource.id }),
+      commerceService.claimFreeResource({
+        user: player,
+        productId: paidResource.id,
+        currentToken: `tok_${player.id}`,
+      }),
     ).rejects.toMatchObject({ statusCode: 422 });
   });
 });

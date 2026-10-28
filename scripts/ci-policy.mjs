@@ -16,7 +16,7 @@ const fullAcceptancePaths = [
   /^\.(?:nvmrc|node-version)$/,
   /^apps\/web\/next\.config\.(?:mjs|ts)$/,
   /^packages\/(?:config|security|storage)\//,
-  /^packages\/db\/src\/repositories\/(?:initiating-session|commercial-plans)\.ts$/,
+  /^packages\/db\/src\/repositories\/(?:initiating-session|commercial-plans|order-operations|subscriptions|entitlements|resource-cart)\.ts$/,
   /^apps\/web\/src\/app\/api\/auth\//,
   /^apps\/web\/src\/lib\/(?:browser-(?:request-policy|request-guard|route-adapter)|license-bearer-route-adapter)\.ts$/,
   /^tests\/(?:mainline-repository-policy|j4-production-upload-integration|browser-api-route-inventory)\.test\.ts$/,

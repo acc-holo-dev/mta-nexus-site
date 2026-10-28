@@ -13,6 +13,7 @@ import {
   readSubscriptionSnapshot,
   type SubscriptionCommand,
   type SubscriptionReceipt,
+  UnauthorizedError,
 } from "@nexus/domain";
 import { subscriptionCommandSchema } from "@nexus/validation";
 import { and, count, desc, eq, sql } from "drizzle-orm";
@@ -27,6 +28,7 @@ import {
 import type { ResourceTransaction } from "./entitlements";
 import { lockFinancialAccountAuthority } from "./financial-statements";
 import { historyPageBounds } from "./history-pagination";
+import { lockInitiatingSession } from "./initiating-session";
 
 const fail = (code: string) => new AppError("Subscription operation unavailable", 409, code);
 const hash = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
@@ -105,7 +107,8 @@ function conflictCode(error: unknown): string | null {
   return null;
 }
 export class SubscriptionsRepository {
-  async command(actorId: string, input: SubscriptionCommand) {
+  async command(actorId: string, input: SubscriptionCommand, currentToken: string) {
+    if (!currentToken) throw new UnauthorizedError();
     const parsed = subscriptionCommandSchema.safeParse(input);
     if (!parsed.success)
       throw new AppError("Invalid subscription command", 400, "SUBSCRIPTION_INVALID");
@@ -148,12 +151,12 @@ export class SubscriptionsRepository {
             .where(and(eq(receipts.actorId, actorId), eq(receipts.requestId, requestId)))
             .limit(1);
           if (prior) {
+            await lockInitiatingSession(tx, actorId, currentToken);
             if (prior.commandDigest !== digest) throw fail("SUBSCRIPTION_REQUEST_CONFLICT");
             const receipt = subscriptionReceipt(prior);
             assertScope(receipt.subscription, actorId, command.organizationId);
             return { receipt, replayed: true };
           }
-          const observedAt = await clock(tx);
           let saved: SubscriptionRow | undefined;
           if (command.action === "activate") {
             const [plan] = await tx
@@ -184,6 +187,10 @@ export class SubscriptionsRepository {
               )
               .limit(1)
               .for("update");
+            // Lock the session after resource locks, matching plan administration.
+            // Revocation or expiry during either wait must prevent every write.
+            await lockInitiatingSession(tx, actorId, currentToken);
+            const observedAt = await clock(tx);
             if (current) {
               if (projection(current, observedAt).status === "active")
                 throw fail("SUBSCRIPTION_ALREADY_ACTIVE");
@@ -230,6 +237,8 @@ export class SubscriptionsRepository {
               .limit(1)
               .for("update");
             if (!current) throw new NotFoundError("Subscription");
+            await lockInitiatingSession(tx, actorId, currentToken);
+            const observedAt = await clock(tx);
             if (projection(current, observedAt).status !== "active")
               throw fail("SUBSCRIPTION_STATE_CHANGED");
             [saved] = await tx

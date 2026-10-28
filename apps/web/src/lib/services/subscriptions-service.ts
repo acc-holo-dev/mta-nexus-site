@@ -9,11 +9,11 @@ import { subscriptionId } from "../subscriptions-query";
 export const subscriptionsService = {
   plan: (id: string) => commercialPlanRepository.published(subscriptionId(id)),
   scopes: (actor: User, page = 1) => financialStatementsRepository.scopes(actor.id, page),
-  command(actor: User, input: unknown) {
+  command(actor: User, input: unknown, currentToken: string) {
     const parsed = subscriptionCommandSchema.safeParse(input);
     if (!parsed.success)
       throw new AppError("Invalid subscription command", 400, "SUBSCRIPTION_INVALID");
-    return subscriptionsRepository.command(actor.id, parsed.data);
+    return subscriptionsRepository.command(actor.id, parsed.data, currentToken);
   },
   dashboard: (actor: User, organizationId?: string) =>
     subscriptionsRepository.dashboard(actor.id, organizationId),

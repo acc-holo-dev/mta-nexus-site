@@ -51,6 +51,7 @@ vi.mock("@nexus/security", () => ({
 }));
 
 import { POST } from "./route";
+import { commerceService } from "../../../../lib/services/commerce-service";
 
 function request(body: unknown) {
   return new NextRequest("http://nexus.test/api/resources/claim", {
@@ -58,6 +59,7 @@ function request(body: unknown) {
     headers: {
       ...browserMutationHeaders(),
       "content-type": "application/json",
+      cookie: "nexus_session=claim-token",
     },
     body: JSON.stringify(body),
   });
@@ -94,6 +96,9 @@ describe("free resource claim HTTP contract", () => {
         permission: "product.download",
       },
     });
+    expect(commerceService.claimFreeResource).toHaveBeenCalledWith(
+      expect.objectContaining({ currentToken: "claim-token", productId: "prd_http" }),
+    );
   });
 
   it("returns 200 for an idempotent retry", async () => {
@@ -125,6 +130,15 @@ describe("free resource claim HTTP contract", () => {
     expect(await response.json()).toEqual({
       error: "Authentication required",
     });
+  });
+
+  it("rejects a cached actor without its cookie before consuming the command", async () => {
+    vi.mocked(commerceService.claimFreeResource).mockClear();
+    const pending = request({ productId: "prd_http" });
+    pending.cookies.delete("nexus_session");
+    expect((await POST(pending)).status).toBe(401);
+    expect(pending.bodyUsed).toBe(false);
+    expect(commerceService.claimFreeResource).not.toHaveBeenCalled();
   });
 
   it("returns 400 for an invalid body before calling the claim service", async () => {

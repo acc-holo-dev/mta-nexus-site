@@ -45,6 +45,13 @@ describe("free resource delivery lifecycle", () => {
       expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
 
+    await sessionRepository.create({
+      id: `ses_claim_${player.id}`,
+      userId: player.id,
+      token: `tok_${player.id}`,
+      expiresAt: new Date(Date.now() + 3600000),
+    });
+
     product = await productService.createProduct(
       {
         title: "Delivery Test Resource",
@@ -118,6 +125,7 @@ describe("free resource delivery lifecycle", () => {
 
     const claim = await commerceService.claimFreeResource({
       user: player,
+      currentToken: `tok_${player.id}`,
       productId: product.id,
     });
     expect(claim.alreadyClaimed).toBe(false);

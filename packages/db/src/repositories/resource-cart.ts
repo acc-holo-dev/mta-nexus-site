@@ -6,6 +6,7 @@ import {
   type ResourceCartAcquisition,
   type ResourceCartReceiptItem,
   type ResourceCartReviewItem,
+  UnauthorizedError,
 } from "@nexus/domain";
 import { db } from "../client";
 import {
@@ -19,7 +20,11 @@ import {
   users,
 } from "../schema";
 import { trustedCleanScanCondition } from "./build-safety";
-import { claimFreeResourceInTransaction, type ResourceTransaction } from "./entitlements";
+import {
+  claimFreeResourceInTransaction,
+  lockResourceAcquisitionSession,
+  type ResourceTransaction,
+} from "./entitlements";
 import { readResourceCartReview } from "./resource-cart-review";
 
 async function lockCart(tx: ResourceTransaction, userId: string) {
@@ -149,12 +154,14 @@ export class ResourceCartRepository {
   /** All-or-nothing free acquisition. Never creates orders, payments, or funds. */
   async acquire(input: {
     userId: string;
+    currentToken: string;
     requestId: string;
     productIds: string[];
     entitlementIds: string[];
     auditId: string;
     reviewDigest: string;
   }): Promise<ResourceCartAcquisition> {
+    if (!input.currentToken) throw new UnauthorizedError("Authentication required");
     const ids = [...input.productIds].sort();
     if (
       !ids.length ||
@@ -182,6 +189,7 @@ export class ResourceCartRepository {
         )
         .limit(1);
       if (receipt) {
+        await lockResourceAcquisitionSession(tx, input.userId, input.currentToken);
         if (
           JSON.stringify(receipt.productIds) !== JSON.stringify(ids) ||
           receipt.reviewDigest !== input.reviewDigest
@@ -252,6 +260,7 @@ export class ResourceCartRepository {
         const result = await claimFreeResourceInTransaction(tx, {
           entitlementId: input.entitlementIds[index],
           userId: input.userId,
+          currentToken: input.currentToken,
           productId,
           source: "cart",
           requestId: input.requestId,

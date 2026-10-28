@@ -43,7 +43,12 @@ function request(
 ) {
   return new NextRequest(`http://nexus.test/api/${path}`, {
     method,
-    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      cookie: "nexus_session=cart-token",
+      ...headers,
+    },
     ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
   });
 }
@@ -124,8 +129,20 @@ it("passes the exact reviewed cart and receipt key to acquisition", async () => 
     }),
   );
   expect(response.status).toBe(200);
-  expect(mocks.acquire).toHaveBeenCalledWith(mocks.user, ["prd_a"], requestId, "a".repeat(64));
+  expect(mocks.acquire).toHaveBeenCalledWith(
+    mocks.user,
+    ["prd_a"],
+    requestId,
+    "a".repeat(64),
+    "cart-token",
+  );
   expect(await response.json()).toMatchObject({ kind: "free_resource_acquisition" });
+});
+it("rejects a cached actor without its cookie before reading the cart command", async () => {
+  const pending = request("resources/cart/acquire", "POST", {}, { cookie: "" });
+  expect((await acquire(pending)).status).toBe(401);
+  expect(pending.bodyUsed).toBe(false);
+  expect(mocks.acquire).not.toHaveBeenCalled();
 });
 it.each([
   { productIds: ["prd_a", "prd_a"], requestId },

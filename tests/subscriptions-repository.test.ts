@@ -50,6 +50,8 @@ import {
   terms,
 } from "./subscriptions-fixtures";
 
+const currentToken = "subscription-current-token";
+const sessionRow = () => [["ses_subscription", new Date(Date.now() + 3600000).toISOString()]];
 const repo = new SubscriptionsRepository(),
   hash = (v: unknown) => createHash("sha256").update(JSON.stringify(v)).digest("hex");
 const grant = {
@@ -91,20 +93,33 @@ beforeEach(() => {
 it("activates with stable request/account locks and database-generated terms and dates", async () => {
   state.rows = [
     ...mutationHead(),
-    [[date.toISOString()]],
     [planValues()],
     [[terms, "published"]],
     [],
+    sessionRow(),
+    [[date.toISOString()]],
     [[0]],
     [grantValues()],
     [receiptValues()],
     [],
   ];
-  const result = await repo.command("usr_a", activation);
+  const result = await repo.command("usr_a", activation, currentToken);
   expect(result.replayed).toBe(false);
   expect(result.receipt.subscription.terms).toEqual(terms);
   expect(state.options).toEqual([{ isolationLevel: "read committed" }]);
   expect(state.queries.filter((q) => q.sql.includes("pg_advisory_xact_lock"))).toHaveLength(2);
+  const sessionQuery = state.queries.find((q) => q.sql.includes('from "sessions"'));
+  expect(sessionQuery?.sql).toContain("for update");
+  expect(sessionQuery?.params).toContain(createHash("sha256").update(currentToken).digest("hex"));
+  expect(sessionQuery?.params).not.toContain(currentToken);
+  const subscriptionLock = state.queries.findIndex(
+    (q) => q.sql.includes('from "account_subscriptions"') && q.sql.includes("for update"),
+  );
+  const sessionLock = state.queries.findIndex((q) => q.sql.includes('from "sessions"'));
+  expect(sessionLock).toBeGreaterThan(subscriptionLock);
+  expect(sessionLock).toBeLessThan(
+    state.queries.findIndex((q) => /^(?:insert|update|delete)/u.test(q.sql)),
+  );
   expect(writes()).toHaveLength(3);
   expect(writes()[0]?.sql).toContain('"account_subscriptions"');
   expect(writes()[0]?.params).not.toContain(JSON.stringify(terms));
@@ -113,27 +128,29 @@ it("activates with stable request/account locks and database-generated terms and
     state.queries.some((q) => /payments|licenses|ledger_entries|entitlements/u.test(q.sql)),
   ).toBe(false);
 });
+it("rejects an absent initiating token without opening a transaction", async () => {
+  await expect(repo.command("usr_a", activation, "")).rejects.toMatchObject({
+    code: "UNAUTHORIZED",
+  });
+  expect(state.options).toEqual([]);
+  expect(state.queries).toEqual([]);
+});
 it("replays an exact request without requiring the plan to remain published", async () => {
-  state.rows = [[], [], [], [], [["usr_a"]], [receiptValues()]];
-  expect((await repo.command("usr_a", activation)).replayed).toBe(true);
+  state.rows = [[], [], [], [], [["usr_a"]], [receiptValues()], sessionRow()];
+  expect((await repo.command("usr_a", activation, currentToken)).replayed).toBe(true);
   expect(writes()).toHaveLength(0);
   expect(state.queries.some((q) => q.sql.includes('from "commercial_plans"'))).toBe(false);
 });
 it("rejects reused requests with changed plan revisions", async () => {
-  state.rows = [[], [], [], [], [["usr_a"]], [receiptValues()]];
-  await expect(repo.command("usr_a", { ...activation, expectedRevision: 3 })).rejects.toMatchObject(
-    { code: "SUBSCRIPTION_REQUEST_CONFLICT" },
-  );
+  state.rows = [[], [], [], [], [["usr_a"]], [receiptValues()], sessionRow()];
+  await expect(
+    repo.command("usr_a", { ...activation, expectedRevision: 3 }, currentToken),
+  ).rejects.toMatchObject({ code: "SUBSCRIPTION_REQUEST_CONFLICT" });
   expect(writes()).toHaveLength(0);
 });
 it("rejects paid terms before reading or modifying any subscription", async () => {
-  state.rows = [
-    ...mutationHead(),
-    [[date.toISOString()]],
-    [planValues()],
-    [[{ ...terms, price: 1000 }, "published"]],
-  ];
-  await expect(repo.command("usr_a", activation)).rejects.toMatchObject({
+  state.rows = [...mutationHead(), [planValues()], [[{ ...terms, price: 1000 }, "published"]]];
+  await expect(repo.command("usr_a", activation, currentToken)).rejects.toMatchObject({
     code: "SUBSCRIPTION_PAYMENT_REQUIRED",
   });
   expect(writes()).toHaveLength(0);
@@ -143,8 +160,8 @@ it("refuses stale plan versions and a mismatched account scope", async () => {
     { ...plan, revision: 3 },
     { ...plan, scope: "organization" as const },
   ]) {
-    state.rows = [...mutationHead(), [[date.toISOString()]], [planValues(changed as typeof plan)]];
-    await expect(repo.command("usr_a", activation)).rejects.toMatchObject({
+    state.rows = [...mutationHead(), [planValues(changed as typeof plan)]];
+    await expect(repo.command("usr_a", activation, currentToken)).rejects.toMatchObject({
       code: "SUBSCRIPTION_PLAN_CHANGED",
     });
   }
@@ -153,12 +170,13 @@ it("refuses stale plan versions and a mismatched account scope", async () => {
 it("does not allow overlapping active periods", async () => {
   state.rows = [
     ...mutationHead(),
-    [[date.toISOString()]],
     [planValues()],
     [[terms, "published"]],
     [grantValues()],
+    sessionRow(),
+    [[date.toISOString()]],
   ];
-  await expect(repo.command("usr_a", activation)).rejects.toMatchObject({
+  await expect(repo.command("usr_a", activation, currentToken)).rejects.toMatchObject({
     code: "SUBSCRIPTION_ALREADY_ACTIVE",
   });
   expect(writes()).toHaveLength(0);
@@ -166,10 +184,11 @@ it("does not allow overlapping active periods", async () => {
 it("retires an expired row before creating a new period and records expiry atomically", async () => {
   state.rows = [
     ...mutationHead(),
-    [[expiresAt.toISOString()]],
     [planValues()],
     [[terms, "published"]],
     [grantValues()],
+    sessionRow(),
+    [[expiresAt.toISOString()]],
     [],
     [],
     [[1]],
@@ -177,7 +196,7 @@ it("retires an expired row before creating a new period and records expiry atomi
     [receiptValues()],
     [],
   ];
-  expect((await repo.command("usr_a", activation)).replayed).toBe(false);
+  expect((await repo.command("usr_a", activation, currentToken)).replayed).toBe(false);
   expect(writes()[0]?.sql).toContain('update "account_subscriptions"');
   expect(writes()[0]?.params).toContain("expired");
   expect(writes()[1]?.params).toContain("commerce.subscription_expired");
@@ -192,22 +211,23 @@ it("ends a live period and appends a cancellation receipt without changing its t
     };
   state.rows = [
     ...mutationHead(),
-    [[cancelledAt.toISOString()]],
     [grantValues()],
+    sessionRow(),
+    [[cancelledAt.toISOString()]],
     [grantValues(ended)],
     [receiptValues(saved)],
     [],
   ];
-  expect((await repo.command("usr_a", cancellation)).receipt.subscription.cancelledAt).toEqual(
-    cancelledAt,
-  );
+  expect(
+    (await repo.command("usr_a", cancellation, currentToken)).receipt.subscription.cancelledAt,
+  ).toEqual(cancelledAt);
   expect(writes()[0]?.sql).toContain('set "status"');
   expect(writes()[0]?.params).toContain("cancelled");
   expect(writes()[0]?.params).not.toContain(JSON.stringify(terms));
 });
 it("refuses late cancellation and never changes expired benefits", async () => {
-  state.rows = [...mutationHead(), [[expiresAt.toISOString()]], [grantValues()]];
-  await expect(repo.command("usr_a", cancellation)).rejects.toMatchObject({
+  state.rows = [...mutationHead(), [grantValues()], sessionRow(), [[expiresAt.toISOString()]]];
+  await expect(repo.command("usr_a", cancellation, currentToken)).rejects.toMatchObject({
     code: "SUBSCRIPTION_STATE_CHANGED",
   });
   expect(writes()).toHaveLength(0);
@@ -215,13 +235,14 @@ it("refuses late cancellation and never changes expired benefits", async () => {
 it("enforces the bounded period quota while leaving cancellation independent", async () => {
   state.rows = [
     ...mutationHead(),
-    [[date.toISOString()]],
     [planValues()],
     [[terms, "published"]],
     [],
+    sessionRow(),
+    [[date.toISOString()]],
     [[500]],
   ];
-  await expect(repo.command("usr_a", activation)).rejects.toMatchObject({
+  await expect(repo.command("usr_a", activation, currentToken)).rejects.toMatchObject({
     code: "SUBSCRIPTION_LIMIT",
   });
   expect(writes()).toHaveLength(0);
@@ -237,7 +258,7 @@ it("checks live financial authority before reading retry receipts", async () => 
     [["developer"]],
   ];
   await expect(
-    repo.command("usr_a", { ...activation, organizationId: "org_a" }),
+    repo.command("usr_a", { ...activation, organizationId: "org_a" }, currentToken),
   ).rejects.toMatchObject({ code: "NOT_FOUND" });
   expect(state.queries.some((q) => q.sql.includes('from "subscription_receipts"'))).toBe(false);
 });

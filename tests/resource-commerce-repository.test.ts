@@ -82,10 +82,16 @@ it("replays a durable acquisition without rereading the cart or mutating grants"
     kind: "free_resource_acquisition" as const,
     acquired: [{ productId: "prd_a", alreadyClaimed: false }],
   };
-  state.results = [[], [[["prd_a"], result, "a".repeat(64)]]];
+  state.results = [
+    [],
+    [[["prd_a"], result, "a".repeat(64)]],
+    [["usr_a"]],
+    [["ses", "2099-01-01T00:00:00Z"]],
+  ];
   expect(
     await cart.acquire({
       userId: "usr_a",
+      currentToken: "cart-token",
       productIds: ["prd_a"],
       requestId: "key",
       entitlementIds: ["ent_a"],
@@ -93,15 +99,21 @@ it("replays a durable acquisition without rereading the cart or mutating grants"
       reviewDigest: "a".repeat(64),
     }),
   ).toEqual({ ...result, requestId: "key" });
-  expect(state.queries).toHaveLength(2);
+  expect(state.queries).toHaveLength(4);
   expect(state.queries[1].sql).toContain('"resource_cart_acquisitions"');
   expect(state.queries[1].params).toContain("usr_a");
 });
 it("refuses receipt key reuse for another selection", async () => {
-  state.results = [[], [[["prd_other"], { kind: "free_resource_acquisition", acquired: [] }]]];
+  state.results = [
+    [],
+    [[["prd_other"], { kind: "free_resource_acquisition", acquired: [] }]],
+    [["usr_a"]],
+    [["ses", "2099-01-01T00:00:00Z"]],
+  ];
   await expect(
     cart.acquire({
       userId: "usr_a",
+      currentToken: "cart-token",
       productIds: ["prd_a"],
       requestId: "key",
       entitlementIds: ["ent_a"],
@@ -109,13 +121,14 @@ it("refuses receipt key reuse for another selection", async () => {
       reviewDigest: "a".repeat(64),
     }),
   ).rejects.toMatchObject({ code: "RESOURCE_CART_REQUEST_CONFLICT" });
-  expect(state.queries).toHaveLength(2);
+  expect(state.queries).toHaveLength(4);
 });
 it("detects a second tab's added item before any grant is inserted", async () => {
   state.results = [[], [], [["prd_a"], ["prd_b"]]];
   await expect(
     cart.acquire({
       userId: "usr_a",
+      currentToken: "cart-token",
       productIds: ["prd_a"],
       requestId: "key",
       entitlementIds: ["ent_a"],

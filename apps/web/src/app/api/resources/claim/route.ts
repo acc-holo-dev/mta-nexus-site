@@ -44,7 +44,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
-    if (!user) {
+    if (!user || !token) {
       return json(context, { error: "Authentication required" }, 401);
     }
 
@@ -65,6 +65,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
     const result = await commerceService.claimFreeResource({
       user,
+      currentToken: token,
       productId: parsed.data.productId,
     });
 

@@ -23,6 +23,7 @@ describe("commercial operation persistence and concurrency", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`,
     buyer = `usr_commerce_${suffix}`,
     admin = `usr_plan_${suffix}`,
+    buyerToken = `buyer-token-${suffix}`,
     currentToken = `plan-token-${suffix}`;
   beforeAll(async () => {
     for (const [id, role] of [
@@ -36,6 +37,12 @@ describe("commercial operation persistence and concurrency", () => {
         username: id,
         displayName: "Commercial fixture",
       });
+    await sessionRepository.create({
+      id: `ses_buyer_${suffix}`,
+      userId: buyer,
+      token: buyerToken,
+      expiresAt: new Date(Date.now() + 3600000),
+    });
     await sessionRepository.create({
       id: `ses_plan_${suffix}`,
       userId: admin,
@@ -88,6 +95,7 @@ describe("commercial operation persistence and concurrency", () => {
       Array.from({ length: 6 }, (_, index) =>
         orderOperationsRepository.cancel({
           buyerId: buyer,
+          currentToken: buyerToken,
           orderId: order.id,
           command,
           auditId: `aud_replay_${index}_${suffix}`,
@@ -125,6 +133,7 @@ describe("commercial operation persistence and concurrency", () => {
     const results = await Promise.allSettled([
       orderOperationsRepository.cancel({
         buyerId: buyer,
+        currentToken: buyerToken,
         orderId: order.id,
         command,
         auditId: `aud_race_${suffix}`,
@@ -152,6 +161,7 @@ describe("commercial operation persistence and concurrency", () => {
     await expect(
       orderOperationsRepository.cancel({
         buyerId: buyer,
+        currentToken: buyerToken,
         orderId: order.id,
         command: {
           requestId: randomUUID(),

@@ -154,6 +154,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
     // 2. Claim the free resource
     const claim = await commerceService.claimFreeResource({
       user: playerUser,
+      currentToken: `tok_${playerUser.id}`,
       productId: testProduct.id,
     });
 
@@ -172,6 +173,7 @@ describe("Nexus 1.2 Public Platform Journeys", () => {
   it("Review & Rating Journey: Submit verified review through the serialized aggregate path", async () => {
     await commerceService.claimFreeResource({
       user: playerUser,
+      currentToken: `tok_${playerUser.id}`,
       productId: testProduct.id,
     });
 

@@ -62,6 +62,13 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
       expiresAt: new Date("2099-01-01T00:00:00.000Z"),
     });
 
+    await sessionRepository.create({
+      id: `ses_claim_${userB.id}`,
+      userId: userB.id,
+      token: `tok_${userB.id}`,
+      expiresAt: new Date(Date.now() + 3600000),
+    });
+
     product = await productRepository.create({
       id: `prd_sec_${ts}`,
       title: "Security Test Product",
@@ -155,6 +162,7 @@ describe("Nexus 1.3 Security & Trust Hardening", () => {
     // After purchase, user B can review
     await commerceService.claimFreeResource({
       user: userB,
+      currentToken: `tok_${userB.id}`,
       productId: reviewProduct.id,
     });
 
