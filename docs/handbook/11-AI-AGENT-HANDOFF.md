@@ -1,6 +1,8 @@
 # MTA NEXUS — инструкция для AI-агента, продолжающего разработку
 
-> Статус: обязательный handoff-контекст handbook v0.2; owner review round 1 incorporated.  
+> Сессионный порядок обновлён 2026-10-28: начинайте с [AGENTS.md](../../AGENTS.md),
+> [очереди](59-DEVELOPMENT-QUEUE.md) и [карты контекста](15-AI-CONTEXT-INDEX.md).
+> Этот подробный документ читается по теме; текущая процедура — [workflow](60-AGENT-WORKFLOW.md).
 > Цель: не дать следующему агенту потерять продуктовый замысел, перепутать legacy с current scope или разрушить уже закреплённые safety-инварианты.
 
 ## 1. Миссия агента
@@ -41,17 +43,16 @@ main
 
 ## 3. Источники истины и их приоритет
 
-При конфликте использовать такой порядок:
+Для продуктового намерения действует [утверждённый порядок](58-SOURCE-OF-TRUTH-AND-REPO-HANDOFF.md):
 
-```text
-1. Current executable code + database migrations
-2. Current tests/CI behavior
-3. Current repository README/docs/ARCHITECTURE.md/docs/OPERATIONS.md/docs/PROBLEMS.md
-4. Owner decisions recorded in this handbook / Decision Register
-5. Recent conversation context
-6. Legacy MTA-MARKET-PLATFORM documents
-7. Ideas/speculation
-```
+1. текущие инструкции владельца и утверждённые решения handbook;
+2. security/data-инварианты;
+3. текущая реализация, миграции, тесты и техническая документация;
+4. legacy-материалы.
+
+Код и выполненные проверки устанавливают фактическое поведение. Целевой функционал
+не считается реализованным только из-за продуктового решения. При расхождении
+планировать безопасную миграцию, а не менять смысл решения или выдумывать готовность.
 
 ### Legacy warning
 
@@ -140,18 +141,14 @@ Claim/download не обходят этот инвариант.
 
 ## 6. Первый шаг в новой сессии
 
-Перед изменениями:
+1. Запустить `node scripts/agent-context.mjs`, проверить HEAD и рабочие изменения.
+2. Продолжить активную или взять следующую доступную задачу из очереди.
+3. Прочитать относящиеся к ней решения, код, тесты и разделы операционной документации.
+4. Проверить recent commits в этой области и определить проверяемый результат.
 
-1. получить latest `main`;
-2. проверить working tree;
-3. прочитать current `README.md`;
-4. прочитать `docs/PROBLEMS.md`;
-5. прочитать relevant часть `docs/ARCHITECTURE.md`/`OPERATIONS.md`;
-6. посмотреть latest commits вокруг target area;
-7. найти существующие tests для target area;
-8. только затем планировать изменение.
-
-Не доверять handbook snapshot, если main ушёл вперёд.
+Не читать README, PROBLEMS и весь handbook повторно без причины. Не выполнять
+автоматический pull/reset поверх чужой работы. Текущий checkout проверяется прежде
+синхронизации; устаревший снимок документа не доказывает состояние текущего кода.
 
 ---
 
@@ -348,13 +345,11 @@ NEXUS должен ощущаться единым продуктом, а не �
 
 ## 17. Documentation discipline
 
-Current repository intentionally ограничивал число long-form docs.
-
-Этот handbook — продуктовый handoff layer, который владелец может позже встроить/консолидировать.
-
-Не создавай новый `.md` для каждого маленького решения.
-
-Текущий repository-policy test ограничивает состав long-form docs. Не копируй этот handbook целиком в `docs/` без отдельного owner-approved изменения documentation policy и соответствующего теста.
+Handbook уже интегрирован. Три корневых документа `docs/` остаются каноническими:
+Architecture, Operations, Problems. Операционная очередь внутри handbook ссылается на
+Problems и не дублирует реестр дефектов. Подробные логи хранить в ignored `artifacts/`.
+Не создавать отдельный документ для каждого небольшого решения. После правок handbook
+обновлять manifest через `pnpm agent:manifest` и выполнять `pnpm agent:check`.
 
 Если durable truth изменилась:
 
@@ -501,9 +496,9 @@ P8: license/DRM foundation after stable purchase primitives
 
 Перед крупной задачей агенту полезно дать:
 
-- этот handbook;
+- выбранный task packet из [workflow](60-AGENT-WORKFLOW.md);
 - repository access;
-- current `docs/PROBLEMS.md`;
+- только относящиеся к задаче решения и записи `docs/PROBLEMS.md`;
 - exact objective;
 - allowed/destructive boundaries;
 - whether GitHub push is authorized;

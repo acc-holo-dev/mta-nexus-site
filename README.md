@@ -1,5 +1,9 @@
 # MTA NEXUS
 
+For agent development, start with [AGENTS.md](AGENTS.md) and `pnpm agent:brief`.
+The [execution queue](docs/handbook/59-DEVELOPMENT-QUEUE.md) selects the next task;
+read detailed product documentation by task, not in full on every session.
+
 The unit baseline is green again after correcting eight stale checks and fixtures.
 Resource tests now exercise live management authorization, actual download bytes and
 delivery receipts, and the publication/metadata-review branches of the build repository.

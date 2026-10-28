@@ -4,6 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "agent:brief": "node scripts/agent-context.mjs",
+    "agent:check": "node scripts/agent-context.mjs --check",
+    "agent:manifest": "node scripts/agent-context.mjs --refresh-manifest",
     "dev": "pnpm dev:docker",
     "build": "pnpm --filter @nexus/web build",
     "build:webpack": "pnpm --filter @nexus/web build:webpack",

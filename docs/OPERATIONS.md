@@ -1347,7 +1347,14 @@ A workflow object that exists but ran zero steps is not release evidence.
 
 ### 7.4 Mandatory next-development stages
 
-Codex should execute the stages below in order. Each stage must leave `main` better than it found it and should finish with tests or executable evidence.
+Current task sequencing is maintained in the [development queue](handbook/59-DEVELOPMENT-QUEUE.md)
+under the [agent workflow](handbook/60-AGENT-WORKFLOW.md). The dated stage progress below
+is historical evidence, not a mandatory full-document read on every task or proof about
+the current SHA. Required verification and production gates still apply.
+
+The stages below retain the release capabilities and historical acceptance criteria;
+use the current queue for implementation order. Each slice must leave the repository
+better than it found it and finish with tests or executable evidence.
 
 #### Stage 1 — Repository hygiene and single-main enforcement — DONE 2026-09-29
 

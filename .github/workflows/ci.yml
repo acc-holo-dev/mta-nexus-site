@@ -36,6 +36,8 @@ jobs:
       uses: actions/setup-node@v7
       with:
         node-version-file: .nvmrc
+    - name: Validate agent context and handbook inventory
+      run: node scripts/agent-context.mjs --check
     - name: Classify changes
       id: scope
       run: node scripts/ci-policy.mjs

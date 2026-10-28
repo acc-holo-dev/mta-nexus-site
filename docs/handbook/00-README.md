@@ -1,5 +1,9 @@
 # MTA NEXUS — Project Handbook
 
+Для разработки начните с [AGENTS.md](../../AGENTS.md), [очереди](59-DEVELOPMENT-QUEUE.md)
+и [карты контекста](15-AI-CONTEXT-INDEX.md). Полный handbook читается по необходимости;
+[рабочая процедура](60-AGENT-WORKFLOW.md) задаёт порядок взаимодействия агентов.
+
 **Статус:** product/engineering specification / owner review rounds 1–10 incorporated; integrated into `main`  
 **Срез:** 2026-10-06  
 **Текущий репозиторий:** `acc-holo-dev/mta-nexus-site`  
