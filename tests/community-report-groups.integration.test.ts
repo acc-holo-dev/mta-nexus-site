@@ -11,6 +11,7 @@ import {
 } from "@nexus/db";
 import { eq, inArray, sql } from "drizzle-orm";
 import { afterEach, expect, it } from "vitest";
+import { sessionRepository } from "../packages/db/src/repositories/sessions";
 
 const actors: string[] = [],
   publications: string[] = [],
@@ -41,7 +42,14 @@ async function actor(role: "user" | "moderator" = "user") {
     role,
   });
   actors.push(row.id);
-  return row;
+  const currentToken = randomUUID();
+  await sessionRepository.create({
+    id: randomUUID(),
+    userId: row.id,
+    token: currentToken,
+    expiresAt: new Date(Date.now() + 60_000),
+  });
+  return { ...row, currentToken };
 }
 async function publication(authorId: string) {
   const key = id("cnt");
@@ -174,6 +182,7 @@ it("stores all reviewed publication decisions atomically, records history and pr
     post,
     { ...input, previewRevision: preview.previewRevision },
     input.items.map(() => id("aud")),
+    staff.currentToken,
   );
   expect(result.items.every((item) => item.status === "resolved")).toBe(true);
   expect((await db.select().from(content).where(eq(content.id, post)))[0].status).toBe("published");
@@ -209,6 +218,7 @@ it("rejects full-publication edits and revoked grants after preview and rolls ba
       post,
       { ...input, previewRevision: preview.previewRevision },
       [id("aud")],
+      staff.currentToken,
     ),
   ).rejects.toMatchObject({ code: "REPORT_BATCH_CHANGED" });
   const reviewed = await repo.previewPublicationBatch(staff.id, post, input),
@@ -227,6 +237,7 @@ it("rejects full-publication edits and revoked grants after preview and rolls ba
       post,
       { ...input, previewRevision: reviewed.previewRevision },
       [duplicate],
+      staff.currentToken,
     ),
   ).rejects.toThrow();
   expect((await db.select().from(reports).where(eq(reports.id, key)))[0].status).toBe("open");
@@ -237,6 +248,7 @@ it("rejects full-publication edits and revoked grants after preview and rolls ba
       post,
       { ...input, previewRevision: reviewed.previewRevision },
       [id("aud")],
+      staff.currentToken,
     ),
   ).rejects.toMatchObject({ statusCode: 403 });
 });

@@ -1,12 +1,13 @@
 import { randomUUID } from "node:crypto";
-import { afterEach, expect, it } from "vitest";
-import { and, eq, inArray, sql } from "drizzle-orm";
 import {
   db,
-  communityReportsRepository as repository,
   discussionRevision,
+  communityReportsRepository as repository,
   userRepository,
 } from "@nexus/db";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { afterEach, expect, it } from "vitest";
+import { sessionRepository } from "../packages/db/src/repositories/sessions";
 import {
   auditEvents,
   comments,
@@ -15,6 +16,7 @@ import {
   reports,
   users,
 } from "../packages/db/src/schema";
+
 const actors: string[] = [],
   productIds: string[] = [];
 const id = (prefix: string) => `${prefix}_report_${randomUUID()}`;
@@ -35,7 +37,14 @@ async function actor(role = "user") {
     role,
   });
   actors.push(row.id);
-  return row;
+  const currentToken = randomUUID();
+  await sessionRepository.create({
+    id: randomUUID(),
+    userId: row.id,
+    token: currentToken,
+    expiresAt: new Date(Date.now() + 60_000),
+  });
+  return { ...row, currentToken };
 }
 async function fixture() {
   const author = await actor(),
@@ -79,6 +88,7 @@ function decision(f: Awaited<ReturnType<typeof fixture>>, reportId: string) {
   return {
     id: reportId,
     actorId: f.moderator.id,
+    currentToken: f.moderator.currentToken,
     expectedStatus: "open" as const,
     action: "remove_comment" as const,
     notes: "Spam removed",

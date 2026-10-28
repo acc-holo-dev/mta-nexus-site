@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import { beforeEach, expect, it, vi } from "vitest";
 
+vi.mock("../packages/db/src/repositories/initiating-session", () => ({
+  lockInitiatingSession: vi.fn(),
+}));
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -124,6 +128,7 @@ it("changes all and only reviewed identities in one update and one mandatory aud
     "comment",
     { ...input, previewRevision: preview.previewRevision },
     ["audit-a", "audit-b"],
+    "session",
   );
   expect(result).toMatchObject({
     contentId: "post",
@@ -186,6 +191,7 @@ it("locks the entire reporter audience before the first queue admission, indepen
     "comment",
     { ...input, previewRevision: preview.previewRevision },
     ["audit-a", "audit-b"],
+    "session",
   );
   expect(state.reportNotice).toHaveBeenCalledTimes(2);
 });
@@ -211,6 +217,7 @@ it.each(["actor", "publication", "comment", "notes", "action", "text", "report"]
           previewRevision: preview.previewRevision,
         },
         ["audit-a", "audit-b"],
+        "session",
       ),
     ).rejects.toMatchObject({ code: "REPORT_BATCH_CHANGED" });
     expect(writes()).toHaveLength(0);
@@ -230,6 +237,7 @@ it.each([
       "comment",
       { ...input, previewRevision: "a".repeat(64) },
       ["audit-a", "audit-b"],
+      "session",
     ),
   ).rejects.toMatchObject({ code });
   expect(writes()).toHaveLength(0);
@@ -264,6 +272,7 @@ it("propagates mandatory batch audit failure and rejects unexpected stored state
       "comment",
       { ...input, previewRevision: preview.previewRevision },
       ["audit-a", "audit-b"],
+      "session",
     ),
   ).rejects.toThrow(/audit failure|audit_events/u);
   state.failAudit = false;
@@ -279,6 +288,7 @@ it("propagates mandatory batch audit failure and rejects unexpected stored state
       "comment",
       { ...input, previewRevision: preview.previewRevision },
       ["audit-a", "audit-b"],
+      "session",
     ),
   ).rejects.toMatchObject({ code: "REPORT_STATE_CHANGED" });
 });

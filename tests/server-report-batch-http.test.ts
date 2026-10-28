@@ -106,6 +106,7 @@ it("binds private batch review and confirmed commands to the session actor and p
     "post",
     "comment",
     input,
+    "token",
   );
   expect(await command.json()).toEqual({
     contentId: "post",
@@ -204,4 +205,12 @@ it("localizes protected server archives and refuses invalid listing identifiers 
     (await history(request(), { params: Promise.resolve({ id: "../foreign", contentId: "post" }) }))
       .status,
   ).toBe(404);
+});
+
+it("rejects a missing initiating cookie before reading a discussion batch body", async () => {
+  const req = request("POST", "", input, { cookie: "nexus_locale=ru" });
+  const read = vi.spyOn(req, "body", "get");
+  expect((await batch(req, discussion)).status).toBe(401);
+  expect(read).not.toHaveBeenCalled();
+  expect(state.decideDiscussionBatch).not.toHaveBeenCalled();
 });

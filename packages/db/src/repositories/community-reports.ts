@@ -14,14 +14,17 @@ import {
   auditEvents,
   comments,
   content,
-  reports,
   reportNotificationDeliveries,
+  reports,
   users,
 } from "../schema";
 import {
   discussionManagementRepository,
   moderationDiscussionRevision,
 } from "./discussion-management";
+import { lockInitiatingSession } from "./initiating-session";
+import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
+import { notificationRepository } from "./notifications";
 import {
   changeHistoryBounds,
   changeHistoryContext,
@@ -29,8 +32,6 @@ import {
 } from "./private-change-history-window";
 import { listCommunityReportGroups } from "./private-community-report-groups";
 import { communityTarget, editorialId, requireStaff } from "./private-community-report-scope";
-import { notificationRepository } from "./notifications";
-import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { containsPattern } from "./search-pattern";
 
 type Session = Pick<typeof db, "select" | "insert" | "update" | "delete" | "execute">;
@@ -511,8 +512,9 @@ class CommunityReportsRepository {
     commentId: string,
     input: BatchInput & { previewRevision: string },
     auditIds: string[],
+    currentToken: string,
   ) {
-    return this.decideTargetBatch(actorId, contentId, commentId, input, auditIds);
+    return this.decideTargetBatch(actorId, contentId, commentId, input, auditIds, currentToken);
   }
   async previewPublicationBatch(actorId: string, contentId: string, input: BatchInput) {
     return db.transaction(async (tx) => {
@@ -541,8 +543,9 @@ class CommunityReportsRepository {
     contentId: string,
     input: BatchInput & { previewRevision: string },
     auditIds: string[],
+    currentToken: string,
   ) {
-    return this.decideTargetBatch(actorId, contentId, null, input, auditIds);
+    return this.decideTargetBatch(actorId, contentId, null, input, auditIds, currentToken);
   }
   private async decideTargetBatch(
     actorId: string,
@@ -550,6 +553,7 @@ class CommunityReportsRepository {
     commentId: string | null,
     input: BatchInput & { previewRevision: string },
     auditIds: string[],
+    currentToken: string,
   ) {
     if (
       !/^[a-f0-9]{64}$/u.test(input.previewRevision) ||
@@ -564,6 +568,7 @@ class CommunityReportsRepository {
       const plan = await this.targetBatchPlan(tx, actorId, contentId, commentId, input, true);
       if (plan.previewRevision !== input.previewRevision)
         throw new AppError("Report review changed", 409, "REPORT_BATCH_CHANGED");
+      await lockInitiatingSession(tx, actorId, currentToken);
       const stored = await tx
         .update(reports)
         .set({
@@ -822,6 +827,7 @@ class CommunityReportsRepository {
     expectedRevision?: string;
     auditId: string;
     removalAuditId: string;
+    currentToken: string;
   }) {
     return db.transaction(async (tx) => {
       // Recheck the current staff role before inspecting a target; the final role lock
@@ -881,6 +887,7 @@ class CommunityReportsRepository {
             async (scope) => {
               lockingReport = true;
               const report = await lockReport(scope.commentId);
+              await lockInitiatingSession(tx, input.actorId, input.currentToken);
               // Removal also stores an author notice. Acquire both recipients
               // before that notice takes the shared push queue gate.
               await lockNotificationPreferencesForUsers(tx, [scope.authorId, report.reporterId]);
@@ -894,6 +901,7 @@ class CommunityReportsRepository {
       } else {
         await requireStaff(tx, input.actorId);
         await lockReport();
+        await lockInitiatingSession(tx, input.actorId, input.currentToken);
       }
       if (!current) throw new NotFoundError("Report");
       const status = decisionStatus(input.action);

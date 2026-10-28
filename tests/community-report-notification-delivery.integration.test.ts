@@ -1,15 +1,15 @@
 import { createHash, randomUUID } from "node:crypto";
-import { and, eq, inArray, sql } from "drizzle-orm";
-import { afterEach, expect, it, vi } from "vitest";
 import {
-  communityReportsRepository as repository,
   db,
   discussionRevision,
   notificationRepository,
+  communityReportsRepository as repository,
   sessionRepository,
   userRepository,
   webPushSubscriptionRepository,
 } from "@nexus/db";
+import { and, eq, inArray, sql } from "drizzle-orm";
+import { afterEach, expect, it, vi } from "vitest";
 import {
   auditEvents,
   comments,
@@ -51,7 +51,14 @@ async function actor(role = "user") {
     role,
   });
   actors.push(row.id);
-  return row;
+  const currentToken = randomUUID();
+  await sessionRepository.create({
+    id: randomUUID(),
+    userId: row.id,
+    token: currentToken,
+    expiresAt: new Date(Date.now() + 60_000),
+  });
+  return { ...row, currentToken };
 }
 
 async function fixture() {
@@ -151,6 +158,7 @@ function decision(f: Awaited<ReturnType<typeof fixture>>, reportId: string) {
   return {
     id: reportId,
     actorId: f.moderator.id,
+    currentToken: f.moderator.currentToken,
     expectedStatus: "open" as const,
     action: "review" as const,
     notes: "Private moderator notes",
@@ -275,8 +283,15 @@ it.each(["comment", "content"] as const)(
             f.comment.id,
             command,
             auditIds,
+            f.moderator.currentToken,
           )
-        : repository.decidePublicationBatch(f.moderator.id, f.publication.id, command, auditIds);
+        : repository.decidePublicationBatch(
+            f.moderator.id,
+            f.publication.id,
+            command,
+            auditIds,
+            f.moderator.currentToken,
+          );
     const removeFailure = await failInsert("notifications", "recipient_id", second.id);
     await expect(decide()).rejects.toThrow();
     const reportIds = [firstReport.id, secondReport.id];

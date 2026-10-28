@@ -5,6 +5,7 @@ import {
   db,
   communityModerationWorkspaceRepository as moderation,
   communityReportsRepository as reportsRepository,
+  sessionRepository,
   userRepository,
 } from "@nexus/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
@@ -41,7 +42,14 @@ async function user(role = "user") {
     role,
   });
   actors.push(row.id);
-  return row;
+  const currentToken = randomUUID();
+  await sessionRepository.create({
+    id: randomUUID(),
+    userId: row.id,
+    token: currentToken,
+    expiresAt: new Date(Date.now() + 60_000),
+  });
+  return { ...row, currentToken };
 }
 async function fixture() {
   const original = await user(),
@@ -129,6 +137,7 @@ function decision(
   return {
     id: reportId,
     actorId: f.staff.id,
+    currentToken: f.staff.currentToken,
     expectedStatus: "open" as const,
     action: "remove_comment" as const,
     notes: "Recorded reason",

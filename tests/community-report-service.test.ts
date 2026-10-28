@@ -1,5 +1,6 @@
-import { beforeEach, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
+import { beforeEach, expect, it, vi } from "vitest";
+
 const mocks = vi.hoisted(() => ({
   page: vi.fn(),
   detail: vi.fn(),
@@ -7,7 +8,9 @@ const mocks = vi.hoisted(() => ({
   decide: vi.fn(),
 }));
 vi.mock("@nexus/db", () => ({ communityReportsRepository: mocks }));
+
 import { communityReportService as service } from "../apps/web/src/lib/services/community-report-service";
+
 const actor = { id: "actor", role: "user" } as User,
   moderator = { ...actor, role: "moderator" } as User;
 const row = {
@@ -102,10 +105,17 @@ it("returns target-bound confirmations for new and idempotent report submissions
 });
 it("denies nonstaff writes and passes actor identity and independent audit IDs to the transaction", async () => {
   const input = { action: "resolve" as const, expectedStatus: "open" as const, notes: "Reviewed" };
-  await expect(service.decide(actor, "report", input)).rejects.toMatchObject({ code: "FORBIDDEN" });
+  await expect(service.decide(actor, "report", input, "session")).rejects.toMatchObject({
+    code: "FORBIDDEN",
+  });
   expect(mocks.decide).not.toHaveBeenCalled();
-  await service.decide(moderator, "report", input);
+  await service.decide(moderator, "report", input, "session");
   const command = mocks.decide.mock.calls[0][0];
-  expect(command).toMatchObject({ ...input, actorId: "actor", id: "report" });
+  expect(command).toMatchObject({
+    ...input,
+    actorId: "actor",
+    id: "report",
+    currentToken: "session",
+  });
   expect(command.auditId).not.toBe(command.removalAuditId);
 });

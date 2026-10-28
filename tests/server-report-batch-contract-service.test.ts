@@ -145,26 +145,39 @@ it("enforces session moderation authority and projects only reviewed public case
   const result = await reports.previewDiscussionBatch(actor, "post", "comment", input);
   expect(confirmsReportBatchPreview(result, "post", "comment", input)).not.toBeNull();
   expect(JSON.stringify(result)).not.toMatch(/private|secret|reporterId|authorId|digest/u);
-  await reports.decideDiscussionBatch(actor, "post", "comment", {
-    ...input,
-    previewRevision: token,
-  });
+  await reports.decideDiscussionBatch(
+    actor,
+    "post",
+    "comment",
+    {
+      ...input,
+      previewRevision: token,
+    },
+    "session",
+  );
   expect(state.decideDiscussionBatch).toHaveBeenCalledWith(
     "staff",
     "post",
     "comment",
     { ...input, previewRevision: token },
     [expect.stringMatching(/^aud_/u)],
+    "session",
   );
   await expect(
     reports.previewDiscussionBatch(actor, "../foreign", "comment", input),
   ).rejects.toMatchObject({ code: "NOT_FOUND" });
   await expect(
-    reports.decideDiscussionBatch(actor, "post", "comment", {
-      ...input,
-      previewRevision: token,
-      actorId: "foreign",
-    }),
+    reports.decideDiscussionBatch(
+      actor,
+      "post",
+      "comment",
+      {
+        ...input,
+        previewRevision: token,
+        actorId: "foreign",
+      },
+      "session",
+    ),
   ).rejects.toMatchObject({ code: "REPORT_BATCH_INVALID" });
   expect(state.decideDiscussionBatch).toHaveBeenCalledTimes(1);
 });

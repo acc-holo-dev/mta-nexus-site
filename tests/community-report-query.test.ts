@@ -1,6 +1,10 @@
 import { createHash } from "node:crypto";
 import { beforeEach, expect, it, vi } from "vitest";
 
+vi.mock("../packages/db/src/repositories/initiating-session", () => ({
+  lockInitiatingSession: vi.fn(),
+}));
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   rows: [] as unknown[][][],
@@ -67,6 +71,7 @@ const submission = {
 const decision = {
   id: "report",
   actorId: "moderator",
+  currentToken: "session",
   expectedStatus: "open" as const,
   action: "remove_comment" as const,
   notes: "Spam",
