@@ -6,7 +6,6 @@ import {
 } from "../../../../../../../lib/bounded-json";
 import { reportRateLimit } from "../../../../../../../lib/community-report-api";
 import { reportBatchError } from "../../../../../../../lib/report-batch-copy";
-import { queueCommunityReportBatchNotices } from "../../../../../../../lib/services/community-report-notifications";
 import { communityReportService } from "../../../../../../../lib/services/community-report-service";
 import { userPlatformApi } from "../../../../../../../lib/user-platform-api";
 import { withBrowserMutation } from "../../../../../../../lib/browser-route-adapter";
@@ -24,7 +23,6 @@ export const POST = withBrowserMutation(
           (await params).id,
           await readBoundedJson(request, 8192),
         );
-        queueCommunityReportBatchNotices(result.items);
         return {
           contentId: result.contentId,
           commentId: result.commentId,

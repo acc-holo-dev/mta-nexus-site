@@ -6,9 +6,15 @@ const state = vi.hoisted(() => ({
   rows: [] as unknown[][][],
   failAudit: false,
   notice: vi.fn(),
+  reportNotice: vi.fn(),
 }));
 vi.mock("../packages/db/src/repositories/discussion-moderation-notice", () => ({
   discussionModerationNotice: state.notice,
+}));
+vi.mock("../packages/db/src/repositories/notifications", () => ({
+  notificationRepository: {
+    createWithPushOutboxWithin: state.reportNotice,
+  },
 }));
 vi.mock("../packages/db/src/client", async () => {
   const { drizzle } = await import("drizzle-orm/pg-proxy");
@@ -83,6 +89,7 @@ beforeEach(() => {
   state.queries = [];
   state.rows = [];
   state.failAudit = false;
+  state.reportNotice.mockReset().mockResolvedValue({ notification: null });
 });
 it("previews exact selected report states after live role and content-first locks, without mutation or private fields", async () => {
   rows();
@@ -150,6 +157,37 @@ it("changes all and only reviewed identities in one update and one mandatory aud
       (query) => query.sql.startsWith("delete") || query.sql.startsWith('update "content"'),
     ),
   ).toBe(false);
+});
+it("locks the entire reporter audience before the first queue admission, independently of report order", async () => {
+  const inverseAudience = () => {
+    rows();
+    state.rows[4][0][6] = "z-reporter";
+    state.rows[4][1][6] = "a-reporter";
+  };
+  inverseAudience();
+  const preview = await repo.previewDiscussionBatch("staff", "post", "comment", input);
+  state.queries = [];
+  inverseAudience();
+  state.rows.push([
+    ["a", "resolved"],
+    ["b", "resolved"],
+  ]);
+  state.reportNotice.mockImplementation(async () => {
+    const locks = state.queries.filter((query) => query.sql.includes("pg_advisory_xact_lock"));
+    expect(locks.map((query) => query.params[0])).toEqual([
+      "nexus:notification-preference:v1:a-reporter",
+      "nexus:notification-preference:v1:z-reporter",
+    ]);
+    return { notification: null };
+  });
+  await repo.decideDiscussionBatch(
+    "staff",
+    "post",
+    "comment",
+    { ...input, previewRevision: preview.previewRevision },
+    ["audit-a", "audit-b"],
+  );
+  expect(state.reportNotice).toHaveBeenCalledTimes(2);
 });
 it.each(["actor", "publication", "comment", "notes", "action", "text", "report"])(
   "rejects changed reviewed context (%s) before any write",

@@ -1,6 +1,11 @@
-import { and, desc, eq, gt, isNull, or, sql, type SQL } from "drizzle-orm";
+import type {
+  Entitlement,
+  FreeResourceClaimResult,
+  ResourceAcquisitionSource,
+} from "@nexus/domain";
+import { NotFoundError, UnauthorizedError, ValidationError } from "@nexus/domain";
+import { and, desc, eq, gt, isNull, or, type SQL, sql } from "drizzle-orm";
 import { db } from "../client";
-import type { ResourceTransaction } from "../transaction";
 import {
   builds,
   entitlements,
@@ -9,14 +14,9 @@ import {
   resourceAcquisitionEvents,
   users,
 } from "../schema";
+import type { ResourceTransaction } from "../transaction";
 import { safePublishedBuildCondition } from "./build-safety";
-import { NotFoundError, UnauthorizedError, ValidationError } from "@nexus/domain";
 import { lockInitiatingSession } from "./initiating-session";
-import type {
-  Entitlement,
-  FreeResourceClaimResult,
-  ResourceAcquisitionSource,
-} from "@nexus/domain";
 
 export type { ResourceTransaction } from "../transaction";
 
@@ -120,7 +120,7 @@ export async function claimFreeResourceInTransaction(
 
   await assertFreeResourceAvailable(tx, input.productId);
 
-  const now = new Date();
+  const observedAt = new Date();
   const existingRows = await tx
     .select()
     .from(entitlements)
@@ -130,40 +130,49 @@ export async function claimFreeResourceInTransaction(
         eq(entitlements.subjectId, input.userId),
         eq(entitlements.resourceId, input.productId),
         eq(entitlements.permission, "product.download"),
-        or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, now)),
+        or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, observedAt)),
       ),
     )
+    .orderBy(desc(entitlements.expiresAt), desc(entitlements.createdAt), desc(entitlements.id))
     .limit(1)
     .for("share");
+  const existing = existingRows[0];
 
-  if (existingRows[0]) {
-    await lockResourceAcquisitionSession(tx, input.userId, input.currentToken);
+  // Both paths preserve an active license's original expiry and revocation.
+  // Select only access facts; never serialize license keys or runtime secrets.
+  // A finite grant may expire while later locks wait. Lock its fallback before
+  // the actor/session so expiry never introduces a session -> license lock edge.
+  const [legacy] =
+    existing?.expiresAt === null
+      ? []
+      : await tx
+          .select({ productId: licenses.productId, expiresAt: licenses.expiresAt })
+          .from(licenses)
+          .where(
+            and(
+              eq(licenses.userId, input.userId),
+              eq(licenses.productId, input.productId),
+              eq(licenses.status, "active"),
+              or(isNull(licenses.expiresAt), gt(licenses.expiresAt, observedAt)),
+            ),
+          )
+          .orderBy(desc(licenses.expiresAt), desc(licenses.createdAt), desc(licenses.id))
+          .limit(1)
+          .for("share");
+  await lockResourceAcquisitionSession(tx, input.userId, input.currentToken);
+  // Use wall time after every access, actor and session wait, not the selection
+  // timestamp (or PostgreSQL's transaction-start now()).
+  const now = new Date();
+  const isCurrent = (access: { expiresAt: Date | null }) =>
+    access.expiresAt === null || access.expiresAt.getTime() > now.getTime();
+  if (existing && isCurrent(existing)) {
     return {
-      entitlement: existingRows[0] as unknown as Entitlement,
+      entitlement: existing as unknown as Entitlement,
       alreadyClaimed: true,
       accessSource: "entitlement",
     };
   }
-
-  // Both paths preserve an active license's original expiry and revocation.
-  // Select only access facts; never serialize license keys or runtime secrets.
-  const [legacy] = await tx
-    .select({ productId: licenses.productId, expiresAt: licenses.expiresAt })
-    .from(licenses)
-    .where(
-      and(
-        eq(licenses.userId, input.userId),
-        eq(licenses.productId, input.productId),
-        eq(licenses.status, "active"),
-        or(isNull(licenses.expiresAt), gt(licenses.expiresAt, now)),
-      ),
-    )
-    .orderBy(desc(licenses.expiresAt), desc(licenses.createdAt), desc(licenses.id))
-    .limit(1)
-    .for("share");
-  // Recheck after the availability and access-row waits, including replay.
-  await lockResourceAcquisitionSession(tx, input.userId, input.currentToken);
-  if (legacy)
+  if (legacy && isCurrent(legacy))
     return { entitlement: null, alreadyClaimed: true, accessSource: "license", license: legacy };
 
   const rows = await tx

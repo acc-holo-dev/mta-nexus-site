@@ -29,7 +29,11 @@ class DiscussionManagementRepository {
   async mutateWithin(
     tx: Transaction,
     input: DiscussionMutation,
-    beforeWrite?: (scope: { contentId: string; commentId: string }) => Promise<void>,
+    beforeWrite?: (scope: {
+      contentId: string;
+      commentId: string;
+      authorId: string;
+    }) => Promise<void>,
   ) {
     if (
       (input.reportId &&
@@ -142,7 +146,11 @@ class DiscussionManagementRepository {
       )
     )
       throw new AppError("Comment changed", 409, "COMMENT_CHANGED");
-    await beforeWrite?.({ contentId: publication.id, commentId: current.id });
+    await beforeWrite?.({
+      contentId: publication.id,
+      commentId: current.id,
+      authorId: current.authorId,
+    });
     if (input.text !== undefined) {
       await tx.update(comments).set({ text: input.text }).where(eq(comments.id, current.id));
     } else {

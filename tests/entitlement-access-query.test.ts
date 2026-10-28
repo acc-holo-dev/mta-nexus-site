@@ -24,7 +24,9 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { EntitlementRepository } from "../packages/db/src/repositories/entitlements";
+
 const repository = new EntitlementRepository();
 const now = new Date("2026-10-09T10:00:00Z");
 beforeEach(() => {
@@ -237,6 +239,34 @@ it("returns an existing full grant after the projected product and safe build ch
     1,
   ]);
   expect(state.queries[3].sql).toContain('"entitlements"."expires_at" > $5');
+});
+
+it("locks a finite grant's legacy fallback before the actor and initiating session", async () => {
+  const finiteGrant = [...grantRow];
+  finiteGrant[5] = "2026-11-01T10:00:00Z";
+  state.results = [
+    [],
+    [["published", 0]],
+    [["safe-build"]],
+    [finiteGrant],
+    [["resource", null]],
+    [["user"]],
+    [["ses", "2099-01-01T00:00:00Z"]],
+  ];
+  expect(
+    await repository.claimFreeResource({
+      currentToken: "claim-token",
+      entitlementId: "unused-id",
+      userId: "user",
+      productId: "resource",
+    }),
+  ).toMatchObject({ alreadyClaimed: true, accessSource: "entitlement" });
+  expect(state.queries).toHaveLength(7);
+  expect(state.queries[4].sql).toMatch(/^select "product_id", "expires_at" from "licenses" /);
+  expect(state.queries[4].sql).toContain("for share");
+  expect(state.queries[4].sql).not.toContain('"key"');
+  expect(state.queries[5].sql).toContain('from "users"');
+  expect(state.queries[6].sql).toContain('from "sessions"');
 });
 
 it("creates a full grant and increments the counter only after all preflight checks", async () => {

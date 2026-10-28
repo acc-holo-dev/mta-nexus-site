@@ -140,12 +140,14 @@ it("detects a second tab's added item before any grant is inserted", async () =>
 });
 it("serializes cart capacity and treats duplicate adds as a no-op", async () => {
   state.results = [[], [], [[20]]];
-  await expect(cart.add("usr_a", "prd_a")).rejects.toMatchObject({ code: "RESOURCE_CART_FULL" });
+  await expect(cart.add("usr_a", "prd_a", "cart-token")).rejects.toMatchObject({
+    code: "RESOURCE_CART_FULL",
+  });
   expect(state.queries.some((query) => query.sql.startsWith("insert"))).toBe(false);
   state.queries = [];
-  state.results = [[], [["prd_a"]]];
-  await cart.add("usr_a", "prd_a");
-  expect(state.queries).toHaveLength(2);
+  state.results = [[], [["prd_a"]], [["usr_a"]], [["ses", "2099-01-01T00:00:00Z"]]];
+  await cart.add("usr_a", "prd_a", "cart-token");
+  expect(state.queries).toHaveLength(4);
 });
 it("hides unavailable metadata and scopes every ownership probe to the buyer", async () => {
   await cart.get("usr_a");

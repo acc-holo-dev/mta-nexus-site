@@ -22,12 +22,12 @@ export class CommerceService {
     return resourceCartRepository.review(user.id);
   }
 
-  async addResourceToCart(user: User, productId: string) {
-    await resourceCartRepository.add(user.id, productId);
+  async addResourceToCart(user: User, productId: string, currentToken: string) {
+    await resourceCartRepository.add(user.id, productId, currentToken);
   }
 
-  async removeResourceFromCart(user: User, productId: string) {
-    await resourceCartRepository.remove(user.id, productId);
+  async removeResourceFromCart(user: User, productId: string, currentToken: string) {
+    await resourceCartRepository.remove(user.id, productId, currentToken);
   }
 
   async acquireResourceCart(
