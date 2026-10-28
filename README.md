@@ -17,12 +17,12 @@ docker compose -p nexus-local -f compose.yaml exec app node scripts/check-local-
 
 ## Проверки
 
-- `pnpm check:code` — lint, типы, анализ, unit и tooling-тесты.
+- `pnpm check:code` — форматирование, lint, типы, анализ, unit и tooling-тесты.
 - `pnpm test:unit` — unit-тесты. `pnpm test:database` — последовательные тесты с отдельной тестовой БД.
-- `pnpm test:focus tests/example.test.ts` — только перечисленные файлы. Для тестов БД задайте `DATABASE_URL` отдельной одноразовой базы и `NEXUS_DISPOSABLE_DATABASE=1`; сначала примените к ней миграции.
+- `pnpm test:focus tests/example.test.ts` — только перечисленные Vitest- и `.node-test.mjs`-файлы. Для тестов БД задайте `DATABASE_URL` отдельной одноразовой базы и `NEXUS_DISPOSABLE_DATABASE=1`; сначала примените к ней миграции.
 - `pnpm docs:check` — проверка локальных Markdown-ссылок и разделов.
 - `pnpm build` — production-сборка; параметры окружения для неё указаны в Dockerfile.
-- `pnpm test:isolated` — полный Vitest-набор в одноразовой БД внутри работающего Docker-стека. Команда пересоздаёт тестовую базу: не направляйте её на пользовательские данные.
+- `pnpm test:isolated` — полный Vitest-набор в одноразовой БД внутри работающего Docker-стека. Каждый запуск создаёт свою базу, применяет миграции и удаляет её после проверки, включая неуспешный запуск.
 - `pnpm release:verify` — выполнение релизных проверок и запись свидетельств; команда не развёртывает проект.
 
 Для изменения конкретного модуля сначала запускайте связанные тесты, затем проверки, соответствующие риску. Подробнее: [эксплуатация](docs/OPERATIONS.md).

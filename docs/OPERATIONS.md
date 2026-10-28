@@ -100,34 +100,21 @@ and [SMTP TLS documentation](https://mailpit.axllent.org/docs/configuration/smtp
 
 ## 2. Verification
 
-Moderators review complaints in `/admin`, under **Reports & moderation**. The default queue shows unresolved cases oldest first; **Decision history** shows completed cases newest first. Both views are paged (30 items). A decision requires at least three characters of review context. The report status and audit event commit together; a stale second decision returns HTTP 409. The private `GET /api/reports?view=pending&page=1` endpoint uses the same bounded queue, with `view=history` for completed cases. Run `pnpm test:reports` for focused checks. Do not interpret a notification delivery failure as a failed report submission: a stored complaint remains in the queue.
-
-Модератор обрабатывает жалобы в `/admin` → **Жалобы и модерация**. По умолчанию открытые жалобы идут от старых к новым; история решений показывает последние закрытые случаи. В каждой странице 30 записей. Для решения необходим комментарий от трёх символов; статус и аудит сохраняются одной транзакцией. При повторном решении уже закрытой жалобы API возвращает 409. Быстрая проверка: `pnpm test:reports`.
-
-The **Verification queue** on `/admin` follows the same 30 item paging model, oldest pending requests first and completed decisions in a separate history. Its count covers every pending request, including those beyond the current page. Moderators can open a submitted HTTP(S) proof link before deciding. Concurrent applications for the same target are serialized in the creation transaction; a second pending application receives 409. Submission queries moderator IDs directly for notifications; notification failure after a successful insert does not turn a saved application into a failed response. Run `pnpm test:verification` for focused checks without a database; run `pnpm test:verification:integration` with PostgreSQL available to verify the stale-target transaction behavior.
-
-Очередь верификации в `/admin` показывает все ожидающие заявки постранично, от старых к новым; решения вынесены в историю. Счётчик учитывает все ожидающие заявки. Ссылка на доказательство доступна модератору. Одновременные заявки на один объект сериализуются в транзакции, повторная заявка получает 409. После сохранения заявки сбой уведомлений не превращает успешную подачу в ошибку. Быстрая проверка без базы: `pnpm test:verification`; DB-интеграционная проверка: `pnpm test:verification:integration`.
-
-Resource builds awaiting review and community drafts on `/admin` also show the oldest work first in 30 item pages. Their totals come from dedicated count queries, so the moderator can tell when additional pages exist. Navigating one queue preserves the selected pages and views of the other queues. A draft card exposes its full text in an expandable section before a moderator publishes it. `pnpm test:moderation-queues` checks these read paths and the existing moderation controls. A draft is visible to moderators as soon as it is created; do not use the draft state to store private, unfinished work.
-
-Build cards include the product title and publisher account from the same joined query as the review queue. Published products link to their public resource page; pending products remain labeled as unpublished. The reviewer can compare the full stored SHA-256 with the downloaded artifact response.
-
-Сборки на проверке и черновики сообщества в `/admin` тоже идут от старых к новым, по 30 на страницу. Счётчики показывают общее количество, переход между страницами сохраняет положение в остальных очередях. Перед публикацией модератор может раскрыть полный текст черновика. Проверка: `pnpm test:moderation-queues`. Черновик сразу доступен модераторам; это состояние не подходит для личных незаконченных материалов.
-
-Карточка сборки показывает название ресурса и аккаунт издателя из того же запроса очереди. Опубликованный ресурс открывается по ссылке; неопубликованный явно помечается. Полный SHA-256 можно сверить с заголовком скачанного файла.
-
-When a functioning execution environment is available, the expected project verification path is:
+Run the appropriate scope against a prepared environment. PostgreSQL tests need a disposable database; do not run the full suite against the development database.
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm db:migrate
-pnpm check
-pnpm release:verify
+pnpm check:code
+pnpm docs:check
+pnpm test:isolated  # requires the running Docker development stack
+pnpm build
 ```
+
+`test:isolated` owns a uniquely named database and removes it after success or failure. It never recreates a shared database. For a host-only setup, create a separate database, apply migrations there and set its `DATABASE_URL` before `pnpm test:database`. Product-specific moderation and verification contracts are indexed in the [domain map](handbook/15-AI-CONTEXT-INDEX.md).
 
 ### Test and CI scopes
 
-- `pnpm check:code`: lint, types, package boundaries, unused code, unit and tooling checks; no Docker or PostgreSQL required.
+- `pnpm check:code`: formatting, lint, types, package boundaries, unused code, unit and tooling checks; no Docker or PostgreSQL required.
 - `pnpm test:unit`: isolated unit/mock suites, at most four parallel workers; no database required. Prints the normal reporter and writes timings/results to ignored `artifacts/unit-tests.json`.
 - `pnpm test:database`: real DB/integration suites, sequential files against a disposable PostgreSQL database.
 - `pnpm test:tooling`: standalone Node suites. Compose validators that require rendered JSON remain owned by their infrastructure harnesses.
@@ -135,7 +122,7 @@ pnpm release:verify
 
 The CI unit job and host development use the same `check:code` command. It uses
 the pinned pnpm's [native script selection](https://pnpm.io/cli/run#running-multiple-scripts),
-with an anchored selector for exactly six scripts. `--sequential` bounds memory;
+with an anchored selector for exactly seven scripts. `--sequential` bounds memory;
 `--no-bail` lets independent checks finish after an earlier failure and returns a
 nonzero result if any check failed. The selected checks are independent of order. Unit
 test files still run with four Vitest workers. CI preserves the unit JSON even
@@ -174,7 +161,7 @@ temporary tool directory and Chromium installation. The application dependency
 graph is unchanged by these profiles. Direct package versions are pinned;
 browser-tool transitive dependencies retain npm's normal resolution behavior.
 
-The existing Chromium acceptance now also uses `@axe-core/playwright` 4.13.0 and
+The Chromium acceptance uses `@axe-core/playwright` 4.13.0 and
 `axe-core` 4.13.0. Both are pinned in the isolated browser-tools installations for
 the smoke and resource-browser jobs; they are not application dependencies.
 
@@ -222,7 +209,7 @@ FC_SEED=12345 pnpm test:properties
 Fast-check reports its seed and shrinks a failure to a smaller counterexample.
 The first adoption caught a UTF-8 length error in proxy-marker comparison;
 the exact Latin-1 regression is also covered using real Fetch Headers. Invalid
-markers now return `unknown` before `timingSafeEqual` can throw, while correct
+markers return `unknown` before `timingSafeEqual` can throw, while correct
 markers still use timing-safe byte comparison. This is a bounded property suite,
 not an exhaustive proof of all request handling.
 See the [official fast-check building blocks](https://fast-check.dev/docs/core-blocks/)
@@ -232,7 +219,7 @@ and [Node timingSafeEqual contract](https://nodejs.org/api/crypto.html#cryptotim
 
 Use `pnpm analyze:architecture` and `pnpm analyze:unused` for dependency boundaries and unused code. Dependency-cruiser currently warns about TypeScript 7 compatibility; do not treat its result as complete without resolving that limitation.
 
-`pnpm test:focus <test-file> ...` runs only named files and classifies only their import graphs. Database tests require a disposable `DATABASE_URL`, applied migrations and `NEXUS_DISPOSABLE_DATABASE=1`. Existing grouped commands include `pnpm test:directory`, `pnpm test:resource`, `pnpm test:scanner`, `pnpm test:catalog` and `pnpm test:reports`. These focused checks do not replace full CI or release acceptance.
+`pnpm test:focus <test-file> ...` runs only named Vitest or `.node-test.mjs` files and classifies only the selected Vitest import graphs. Database tests require a disposable `DATABASE_URL`, applied migrations and `NEXUS_DISPOSABLE_DATABASE=1`. Existing grouped commands include `pnpm test:directory`, `pnpm test:resource`, `pnpm test:scanner`, `pnpm test:catalog` and `pnpm test:reports`. These focused checks do not replace full CI or release acceptance.
 
 `pnpm ci:diagnose --run-id <id>` reads one GitHub Actions run and its annotations. It may require an appropriate read-only GitHub credential. A workflow with zero executed steps is not a successful test.
 
@@ -505,7 +492,7 @@ A release is not accepted merely because code exists on `main`. Acceptance requi
 - backup/restore confidence for data-changing releases;
 - explicit deployment decision.
 
-The version `1.2.0-beta.3` represents the consolidated mainline hardening, RU/EN UI completion, free-resource acquisition cleanup, accessibility pass and deterministic DEV startup contract; it is not a statement that public production rollout has occurred.
+Current package version: `1.2.0-beta.3`. Confirm the candidate version in `package.json`; a version string alone does not demonstrate production acceptance.
 
 ## Resource integrity rollout and seed recovery
 
@@ -589,8 +576,7 @@ a web server or disable application configuration validation.
 There is no automatic fallback: a failed default build remains a failed gate.
 CI/release verification continues to execute the default build. Record which
 compiler was used; a successful Webpack build does not establish Turbopack parity,
-service connectivity or runtime/browser acceptance. On 2026-10-03 the explicit
-Webpack build passed locally using test-only configuration and no live database.
+service connectivity or runtime/browser acceptance.
 
 Release evidence explicitly records its required gate names. The summary requires
 repository identity, evidence harness, database migrations, lint, typecheck, tests
