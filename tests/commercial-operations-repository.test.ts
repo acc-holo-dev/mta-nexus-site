@@ -1,5 +1,6 @@
 import { getTableColumns } from "drizzle-orm";
 import { beforeEach, expect, it, vi } from "vitest";
+
 const state = vi.hoisted(() => ({
   queries: [] as { sql: string; params: unknown[] }[],
   results: [] as unknown[][][],
@@ -25,9 +26,11 @@ vi.mock("../packages/db/src/client", async () => {
     }),
   };
 });
+
 import { CommercialPlanRepository } from "../packages/db/src/repositories/commercial-plans";
 import { OrderOperationsRepository } from "../packages/db/src/repositories/order-operations";
 import { PaymentRepository } from "../packages/db/src/repositories/payments";
+import { digestSessionToken } from "../packages/db/src/repositories/sessions";
 import { commercialPlans } from "../packages/db/src/schema";
 
 const plans = new CommercialPlanRepository(),
@@ -93,6 +96,7 @@ it.each(["moderator", "user"])(
     state.results = [[root()], [["usr_admin", role]]];
     await expect(
       plans.command({
+        currentToken: "plan-admin-token",
         actorId: "usr_admin",
         planId: "cplan_a",
         auditId: "aud_a",
@@ -105,21 +109,23 @@ it.each(["moderator", "user"])(
   },
 );
 it("rejects a stale plan revision without altering terms or emitting audit", async () => {
-  state.results = [[root()], [["usr_admin", "admin"]]];
+  state.results = [[root()], [["usr_admin", "admin"]], [["ses_admin", "2099-01-01T00:00:00.000Z"]]];
   await expect(
     plans.command({
+      currentToken: "plan-admin-token",
       actorId: "usr_admin",
       planId: "cplan_a",
       auditId: "aud_a",
       command: { action: "publish", expectedRevision: 1, reason: "Terms checked" },
     }),
   ).rejects.toMatchObject({ code: "COMMERCIAL_PLAN_CONFLICT" });
-  expect(state.queries).toHaveLength(2);
+  expect(state.queries).toHaveLength(3);
 });
 it("editing a published plan appends a draft snapshot and audits within its transaction", async () => {
   state.results = [
     [root("published")],
     [["usr_admin", "admin"]],
+    [["ses_admin", "2099-01-01T00:00:00.000Z"]],
     [[terms]],
     [],
     [],
@@ -128,6 +134,7 @@ it("editing a published plan appends a draft snapshot and audits within its tran
   ];
   expect(
     await plans.command({
+      currentToken: "plan-admin-token",
       actorId: "usr_admin",
       planId: "cplan_a",
       auditId: "aud_a",
@@ -139,24 +146,33 @@ it("editing a published plan appends a draft snapshot and audits within its tran
       },
     }),
   ).toMatchObject({ plan: { status: "draft", revision: 3, price: 2000 } });
-  expect(state.queries[3].sql).toContain('insert into "commercial_plan_revisions"');
-  expect(state.queries[3].params).toContain(JSON.stringify({ ...terms, price: 2000 }));
-  expect(state.queries[5].params).toContain("commerce.plan_save");
+  expect(state.queries[2].sql).toContain('from "sessions"');
+  expect(state.queries[2].sql).toContain("for update");
+  expect(state.queries[2].params).toContain(digestSessionToken("plan-admin-token"));
+  expect(state.queries[2].params).not.toContain("plan-admin-token");
+  expect(state.queries[4].sql).toContain('insert into "commercial_plan_revisions"');
+  expect(state.queries[4].params).toContain(JSON.stringify({ ...terms, price: 2000 }));
+  expect(state.queries[6].params).toContain("commerce.plan_save");
   expect(state.queries.some((q) => q.sql.startsWith('update "commercial_plan_revisions"'))).toBe(
     false,
   );
 });
 it("does not publish directly from archive", async () => {
-  state.results = [[root("archived")], [["usr_admin", "admin"]]];
+  state.results = [
+    [root("archived")],
+    [["usr_admin", "admin"]],
+    [["ses_admin", "2099-01-01T00:00:00.000Z"]],
+  ];
   await expect(
     plans.command({
+      currentToken: "plan-admin-token",
       actorId: "usr_admin",
       planId: "cplan_a",
       auditId: "aud_a",
       command: { action: "publish", expectedRevision: 2, reason: "Terms checked" },
     }),
   ).rejects.toMatchObject({ code: "COMMERCIAL_PLAN_STATE_CHANGED" });
-  expect(state.queries).toHaveLength(2);
+  expect(state.queries).toHaveLength(3);
 });
 it("scopes order ownership before payment queries or receipt lookup", async () => {
   await expect(operations.buyerDetail("usr_other' --", "ord_a")).rejects.toMatchObject({

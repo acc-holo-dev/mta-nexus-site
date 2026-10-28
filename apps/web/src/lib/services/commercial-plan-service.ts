@@ -1,11 +1,11 @@
 import { commercialPlanRepository, orderOperationsRepository } from "@nexus/db";
 import {
   AppError,
-  ForbiddenError,
-  commercialFeeEstimate,
   type CommercialCurrency,
   type CommercialPlanCommand,
   type CommercialPlanStatus,
+  commercialFeeEstimate,
+  ForbiddenError,
   type OrderCancellationCommand,
   type User,
 } from "@nexus/domain";
@@ -39,12 +39,13 @@ export const commercialPlanService = {
     admin(user);
     return commercialPlanRepository.adminDetail(user.id, id, page);
   },
-  command(user: User, command: CommercialPlanCommand, id?: string) {
+  command(user: User, command: CommercialPlanCommand, currentToken: string, id?: string) {
     admin(user);
     if ((command.action === "create") === !!id)
       throw new AppError("Invalid commercial plan command", 400, "COMMERCIAL_PLAN_INVALID");
     return commercialPlanRepository.command({
       actorId: user.id,
+      currentToken,
       planId: id ?? generateId("cplan"),
       auditId: generateId("aud"),
       command,

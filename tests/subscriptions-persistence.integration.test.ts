@@ -6,6 +6,7 @@ import {
   organizationMembers,
   organizations,
   commercialPlanRepository as plans,
+  sessionRepository,
   subscriptionReceipts,
   subscriptionsRepository as subscriptions,
   userRepository,
@@ -42,6 +43,13 @@ async function fixture(organization = false, price = 0) {
       .insert(organizationMembers)
       .values({ id: `member_sub_${key}`, organizationId: org, userId: actor, role: "admin" });
   }
+  const currentToken = `plan-token-${key}`;
+  await sessionRepository.create({
+    id: `ses_sub_${key}`,
+    userId: admin,
+    token: currentToken,
+    expiresAt: new Date(Date.now() + 3600000),
+  });
   const terms = {
     titleRu: "Бесплатный тариф",
     titleEn: "Free fixture plan",
@@ -53,6 +61,7 @@ async function fixture(organization = false, price = 0) {
     commissionBps: 750,
   };
   await plans.command({
+    currentToken,
     actorId: admin,
     planId,
     auditId: `aud_sub_create_${key}`,
@@ -65,6 +74,7 @@ async function fixture(organization = false, price = 0) {
     },
   });
   await plans.command({
+    currentToken,
     actorId: admin,
     planId,
     auditId: `aud_sub_publish_${key}`,
@@ -77,7 +87,7 @@ async function fixture(organization = false, price = 0) {
     expectedRevision: 2,
     ...(organization ? { organizationId: org } : {}),
   };
-  return { key, actor, owner, admin, planId, org, terms, command };
+  return { key, actor, owner, admin, planId, org, terms, command, currentToken };
 }
 it("concurrent exact activation requests create one period, receipt and audit", async () => {
   const f = await fixture(),
@@ -132,6 +142,7 @@ it("terms survive withdrawal, cancellation is idempotent and immediately restore
     saved = await subscriptions.command(f.actor, f.command),
     id = saved.receipt.subscription.id;
   await plans.command({
+    currentToken: f.currentToken,
     actorId: f.admin,
     planId: f.planId,
     auditId: `aud_sub_archive_${f.key}`,
