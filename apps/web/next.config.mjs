@@ -12,6 +12,21 @@ const nextConfig = {
   allowedDevOrigins: ["app", "nexus-local-app-1"],
   output: "standalone",
   outputFileTracingRoot: repositoryRoot,
+  // Dynamic storage/secret paths make tracing conservative. These repository
+  // files are never runtime inputs; migrations/workers are deployed separately.
+  outputFileTracingExcludes: {
+    "/*": [
+      "../../apps/web/src/**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}",
+      "../../packages/**/*.{test,spec}.{ts,tsx,js,jsx,mjs,cjs}",
+      "../../tests/**/*",
+      "../../scripts/tests/**/*",
+      "../../docs/**/*",
+      "../../artifacts/**/*",
+      "../../.git/**/*",
+      "../../.env*",
+      "./.env*",
+    ],
+  },
   transpilePackages: [
     "@nexus/config",
     "@nexus/domain",
