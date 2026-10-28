@@ -17,9 +17,18 @@ export function LibraryReleaseComparisonSelection({
   const copy = libraryReleaseComparisonCopy(locale);
   const control = getResourceReleaseControlCopy(locale);
   const state = useLibraryReleaseCommand(productId, locale);
-  const reviewSelection = { ...selection }, artifact = { ...target };
-  const fingerprint = JSON.stringify([productId, reviewSelection.revision, reviewSelection.mode, reviewSelection.buildId,
-    artifact.id, artifact.version, artifact.sha256Hash, artifact.fileSizeBytes]);
+  const reviewSelection = { ...selection },
+    artifact = { ...target };
+  const fingerprint = JSON.stringify([
+    productId,
+    reviewSelection.revision,
+    reviewSelection.mode,
+    reviewSelection.buildId,
+    artifact.id,
+    artifact.version,
+    artifact.sha256Hash,
+    artifact.fileSizeBytes,
+  ]);
   const current = useRef(fingerprint);
   current.current = fingerprint;
   const [acknowledged, setAcknowledged] = useState<string | null>(null);
@@ -59,7 +68,8 @@ export function LibraryReleaseComparisonSelection({
               checked={confirmed}
               disabled={disabled}
               onChange={(event) => {
-                if (current.current === fingerprint) setAcknowledged(event.target.checked ? fingerprint : null);
+                if (current.current === fingerprint)
+                  setAcknowledged(event.target.checked ? fingerprint : null);
               }}
             />
             <span>{copy.confirmChoice}</span>

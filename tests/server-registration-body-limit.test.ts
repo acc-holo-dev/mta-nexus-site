@@ -33,15 +33,18 @@ afterEach(() => {
 });
 
 describe("server registration request-body safety", () => {
-  const send = (body: unknown) => POST(new NextRequest("https://nexus.test/api/servers", {
-    method: "POST",
-    headers: {
-      ...browserMutationHeaders(),
-      "Content-Type": "application/json",
-      cookie: "nexus_session=valid",
-    },
-    body: JSON.stringify(body),
-  }));
+  const send = (body: unknown) =>
+    POST(
+      new NextRequest("https://nexus.test/api/servers", {
+        method: "POST",
+        headers: {
+          ...browserMutationHeaders(),
+          "Content-Type": "application/json",
+          cookie: "nexus_session=valid",
+        },
+        body: JSON.stringify(body),
+      }),
+    );
 
   it("rejects oversized metadata with a typed 413 and no database write", async () => {
     const response = await send({ name: "Nexus", description: "x".repeat(40_000) });
@@ -56,13 +59,21 @@ describe("server registration request-body safety", () => {
     "application/x-www-form-urlencoded",
     "multipart/form-data; boundary=wrong",
   ])("rejects %s even when it contains valid JSON", async (type) => {
-    const response = await POST(new NextRequest("https://nexus.test/api/servers", {
-      method: "POST",
-      headers: { ...browserMutationHeaders(), "Content-Type": type, cookie: "nexus_session=valid" },
-      body: JSON.stringify({
-        name: "Nexus", slug: "nexus", ipAddress: "203.0.113.7",
+    const response = await POST(
+      new NextRequest("https://nexus.test/api/servers", {
+        method: "POST",
+        headers: {
+          ...browserMutationHeaders(),
+          "Content-Type": type,
+          cookie: "nexus_session=valid",
+        },
+        body: JSON.stringify({
+          name: "Nexus",
+          slug: "nexus",
+          ipAddress: "203.0.113.7",
+        }),
       }),
-    }));
+    );
     expect(response.status).toBe(415);
     expect(await response.json()).toMatchObject({
       code: "UNSUPPORTED_MEDIA_TYPE",
@@ -72,7 +83,10 @@ describe("server registration request-body safety", () => {
 
   it("does not accept JSON that attempts to assign another server owner", async () => {
     const response = await send({
-      name: "Nexus", slug: "nexus", ipAddress: "203.0.113.7", ownerId: "usr_other",
+      name: "Nexus",
+      slug: "nexus",
+      ipAddress: "203.0.113.7",
+      ownerId: "usr_other",
     });
     expect(response.status).toBe(400);
     expect(state.create).not.toHaveBeenCalled();
@@ -80,7 +94,9 @@ describe("server registration request-body safety", () => {
 
   it("rejects invalid organization identifiers without touching persistence", async () => {
     const response = await send({
-      name: "Nexus", slug: "nexus", ipAddress: "203.0.113.7",
+      name: "Nexus",
+      slug: "nexus",
+      ipAddress: "203.0.113.7",
       organizationId: "../other",
     });
     expect(response.status).toBe(400);

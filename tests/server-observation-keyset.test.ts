@@ -14,11 +14,19 @@ vi.mock("../packages/db/src/client", () => ({
       state.selected = selection;
       const chain = {
         from: () => chain,
-        where(condition: SQL) { state.condition = condition; return chain; },
-        orderBy(...ordering: SQL[]) { state.ordering = ordering; return chain; },
+        where(condition: SQL) {
+          state.condition = condition;
+          return chain;
+        },
+        orderBy(...ordering: SQL[]) {
+          state.ordering = ordering;
+          return chain;
+        },
         limit(limit: number) {
           state.limit = limit;
-          return Promise.resolve([{ id: "srv_one", ipAddress: "play.example", port: 22003, endpointRevision: 0 }]);
+          return Promise.resolve([
+            { id: "srv_one", ipAddress: "play.example", port: 22003, endpointRevision: 0 },
+          ]);
         },
       };
       return chain;
@@ -40,9 +48,15 @@ describe("bounded ID-keyset observation page", () => {
     expect(await repo.listObservableAfter(101)).toEqual([
       { id: "srv_one", ipAddress: "play.example", port: 22003, endpointRevision: 0 },
     ]);
-    expect(Object.keys(state.selected ?? {}).sort()).toEqual(["endpointRevision", "id", "ipAddress", "port"]);
-    expect(state.ordering.map(value => dialect.sqlToQuery(value).sql))
-      .toEqual(['"servers"."id" asc']);
+    expect(Object.keys(state.selected ?? {}).sort()).toEqual([
+      "endpointRevision",
+      "id",
+      "ipAddress",
+      "port",
+    ]);
+    expect(state.ordering.map((value) => dialect.sqlToQuery(value).sql)).toEqual([
+      '"servers"."id" asc',
+    ]);
     expect(state.limit).toBe(101);
     const sql = dialect.sqlToQuery(state.condition as SQL);
     expect(sql.params).toEqual(["active", "private"]);
@@ -55,10 +69,14 @@ describe("bounded ID-keyset observation page", () => {
     expect(sql.params).toEqual(["active", "private", "srv_002"]);
   });
 
-  it.each([[NaN,501], [Infinity,501], [-3,1], [9.9,9], [10_000,501]])(
-    "bounds page limit %s to %s", async (requested, expected) => {
-      await repo.listObservableAfter(requested);
-      expect(state.limit).toBe(expected);
-    },
-  );
+  it.each([
+    [NaN, 501],
+    [Infinity, 501],
+    [-3, 1],
+    [9.9, 9],
+    [10_000, 501],
+  ])("bounds page limit %s to %s", async (requested, expected) => {
+    await repo.listObservableAfter(requested);
+    expect(state.limit).toBe(expected);
+  });
 });

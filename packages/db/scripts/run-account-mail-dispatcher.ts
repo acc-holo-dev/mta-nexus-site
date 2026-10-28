@@ -53,10 +53,7 @@ function markProgress() {
 }
 
 function failIfLoopStalled() {
-  if (
-    stopping ||
-    Date.now() - lastProgressAt <= loopStallAfterMs
-  ) {
+  if (stopping || Date.now() - lastProgressAt <= loopStallAfterMs) {
     return;
   }
 
@@ -129,10 +126,7 @@ const queueHealth = (): Promise<void> => {
 
 let failed = false;
 let failurePhase = "configuration";
-watchdogTimer = setInterval(
-  failIfLoopStalled,
-  HEARTBEAT_INTERVAL_MS,
-);
+watchdogTimer = setInterval(failIfLoopStalled, HEARTBEAT_INTERVAL_MS);
 watchdogTimer.unref();
 
 try {
@@ -153,11 +147,7 @@ try {
   };
 
   const guardedDispatcher = {
-    runBatch: async (
-      limit?: number,
-      signal?: AbortSignal,
-      onProgress?: () => void,
-    ) => {
+    runBatch: async (limit?: number, signal?: AbortSignal, onProgress?: () => void) => {
       await assertQueueKeyCoverage();
       onProgress?.();
       return dispatcher.runBatch(limit, signal, onProgress);
@@ -168,9 +158,10 @@ try {
     if (controller.signal.aborted) return;
     const state = await accountMailWorkerRepository.providerGateStatus();
     const blockedUntil = state.blockedUntil?.toISOString() ?? null;
-    const changed = state.blocked !== healthProviderBlocked
-      || blockedUntil !== healthProviderBlockedUntil
-      || state.failureStreak !== healthProviderFailureStreak;
+    const changed =
+      state.blocked !== healthProviderBlocked ||
+      blockedUntil !== healthProviderBlockedUntil ||
+      state.failureStreak !== healthProviderFailureStreak;
     healthProviderBlocked = state.blocked;
     healthProviderBlockedUntil = blockedUntil;
     healthProviderFailureStreak = state.failureStreak;
@@ -282,8 +273,13 @@ try {
         }
       }
 
-      const activity = result.accepted + result.retried + result.discarded
-        + result.skipped + result.unsettled + result.cleaned;
+      const activity =
+        result.accepted +
+        result.retried +
+        result.discarded +
+        result.skipped +
+        result.unsettled +
+        result.cleaned;
       if (activity > 0) {
         emit({
           status: "batch",
@@ -317,11 +313,13 @@ try {
   });
 } catch {
   failed = true;
-  process.stderr.write(`${JSON.stringify({
-    status: "failed",
-    config: fingerprint || undefined,
-    phase: fingerprint ? failurePhase : undefined,
-  })}\n`);
+  process.stderr.write(
+    `${JSON.stringify({
+      status: "failed",
+      config: fingerprint || undefined,
+      phase: fingerprint ? failurePhase : undefined,
+    })}\n`,
+  );
   process.exitCode = 1;
 } finally {
   if (heartbeatTimer) clearInterval(heartbeatTimer);
@@ -341,7 +339,9 @@ try {
     await rm(HEALTH_FILE, { force: true });
   } catch {
     if (!failed) {
-      process.stderr.write(`${JSON.stringify({ status: "failed", config: fingerprint || undefined })}\n`);
+      process.stderr.write(
+        `${JSON.stringify({ status: "failed", config: fingerprint || undefined })}\n`,
+      );
       process.exitCode = 1;
       failed = true;
     }
@@ -351,7 +351,9 @@ try {
     await closeDatabaseConnection();
   } catch {
     if (!failed) {
-      process.stderr.write(`${JSON.stringify({ status: "failed", config: fingerprint || undefined })}\n`);
+      process.stderr.write(
+        `${JSON.stringify({ status: "failed", config: fingerprint || undefined })}\n`,
+      );
       process.exitCode = 1;
     }
   }

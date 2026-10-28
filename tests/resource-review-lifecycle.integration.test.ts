@@ -25,51 +25,45 @@ it("persists review revisions, grant expiry, live moderation, atomic rollback an
     productId = id("prd");
   const actors = [buyer, reporter, publisher, staff];
   try {
-    await db
-      .insert(users)
-      .values(
-        actors.map((actor) => ({
-          id: actor,
-          email: `${actor}@nexus.test`,
-          username: actor,
-          displayName: actor,
-          role: actor === staff ? "moderator" : actor === publisher ? "developer" : "user",
-        })),
-      );
+    await db.insert(users).values(
+      actors.map((actor) => ({
+        id: actor,
+        email: `${actor}@nexus.test`,
+        username: actor,
+        displayName: actor,
+        role: actor === staff ? "moderator" : actor === publisher ? "developer" : "user",
+      })),
+    );
     await sessionRepository.create({
       id: `ses_${staff}`,
       userId: staff,
       token: `tok_${staff}`,
       expiresAt: new Date("2099-01-01T00:00:00.000Z"),
     });
-    await db
-      .insert(products)
-      .values({
-        id: productId,
-        title: "Review lifecycle fixture",
-        slug: id("review"),
-        description: "Private integration fixture",
-        type: "script",
-        authorId: publisher,
-        status: "published",
-        price: 0,
-        currency: "USD",
-        licenseModel: "unlimited",
-      });
-    await db
-      .insert(builds)
-      .values({
-        id: id("bld"),
-        productId,
-        version: "1.0.0",
-        storageKey: "fixtures/review.zip",
-        sha256Hash: "a".repeat(64),
-        fileSizeBytes: 100,
-        status: "published",
-        scanStatus: "clean",
-        scanner: "integration-fixture",
-        scannedAt: new Date(),
-      });
+    await db.insert(products).values({
+      id: productId,
+      title: "Review lifecycle fixture",
+      slug: id("review"),
+      description: "Private integration fixture",
+      type: "script",
+      authorId: publisher,
+      status: "published",
+      price: 0,
+      currency: "USD",
+      licenseModel: "unlimited",
+    });
+    await db.insert(builds).values({
+      id: id("bld"),
+      productId,
+      version: "1.0.0",
+      storageKey: "fixtures/review.zip",
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 100,
+      status: "published",
+      scanStatus: "clean",
+      scanner: "integration-fixture",
+      scannedAt: new Date(),
+    });
     const command = (
       actorId: string,
       expectedRevision: number,
@@ -88,17 +82,15 @@ it("persists review revisions, grant expiry, live moderation, atomic rollback an
       .from(products)
       .where(eq(products.id, productId));
     await expect(command(buyer, 0)).rejects.toMatchObject({ code: "REVIEW_ACCESS_REQUIRED" });
-    await db
-      .insert(entitlements)
-      .values(
-        [buyer, publisher].map((actor, i) => ({
-          id: id(`ent_${i}`),
-          subjectType: "user",
-          subjectId: actor,
-          permission: "product.download",
-          resourceId: productId,
-        })),
-      );
+    await db.insert(entitlements).values(
+      [buyer, publisher].map((actor, i) => ({
+        id: id(`ent_${i}`),
+        subjectType: "user",
+        subjectId: actor,
+        permission: "product.download",
+        resourceId: productId,
+      })),
+    );
     await expect(command(publisher, 0)).rejects.toMatchObject({ code: "REVIEW_ACCESS_REQUIRED" });
     const first = await command(buyer, 0, 5, id("aud_initial"));
     expect(first).toMatchObject({ revision: 1, ratingCount: 1, ratingAverage: 50 });
@@ -159,14 +151,20 @@ it("persists review revisions, grant expiry, live moderation, atomic rollback an
     ).toEqual({ id: id("rpt"), created: false });
     // Generic report resolution cannot bypass the commercial evidence contract.
     expect(
-      await reportRepository.resolve(id("rpt"), "resolved", "Bypass attempt", {
-        id: id("aud_bypass"),
-        actorId: staff,
-        actorType: "admin",
-        action: "report.resolved",
-        targetId: id("rpt"),
-        targetType: "report",
-      }, `tok_${staff}`),
+      await reportRepository.resolve(
+        id("rpt"),
+        "resolved",
+        "Bypass attempt",
+        {
+          id: id("aud_bypass"),
+          actorId: staff,
+          actorType: "admin",
+          action: "report.resolved",
+          targetId: id("rpt"),
+          targetType: "report",
+        },
+        `tok_${staff}`,
+      ),
     ).toBeNull();
     const decide = (expectedRevision: number) =>
       repo.decide({

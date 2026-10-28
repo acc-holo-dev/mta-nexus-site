@@ -14,12 +14,16 @@ const state = vi.hoisted(() => ({
 const directoryPage = vi.hoisted(() => vi.fn());
 
 vi.mock("next/headers", () => ({ cookies: async () => ({ get: () => undefined }) }));
-vi.mock("../apps/web/src/lib/services/auth-service", () => ({ authService: { getSession: async () => null } }));
+vi.mock("../apps/web/src/lib/services/auth-service", () => ({
+  authService: { getSession: async () => null },
+}));
 vi.mock("../apps/web/src/components/follow-button", () => ({ FollowButton: () => null }));
 vi.mock("../apps/web/src/lib/services/discovery-service", () => ({
   discoveryService: { page: directoryPage },
 }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({ indexMtaObservations: () => () => null }));
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+  indexMtaObservations: () => () => null,
+}));
 
 vi.mock("../apps/web/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
@@ -28,25 +32,17 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({
 vi.mock("next/link", async () => {
   const ReactModule = await import("react");
   return {
-    default: ({
-      href,
-      children,
-      ...props
-    }: {
-      href: string;
-      children?: React.ReactNode;
-    }) => ReactModule.createElement("a", { href, ...props }, children),
+    default: ({ href, children, ...props }: { href: string; children?: React.ReactNode }) =>
+      ReactModule.createElement("a", { href, ...props }, children),
   };
 });
 
 vi.mock("@nexus/ui", () => ({
-  Avatar: ({
-    alt,
-    fallback,
-  }: {
-    alt: string;
-    fallback: string;
-  }) => <span role="img" aria-label={alt}>{fallback}</span>,
+  Avatar: ({ alt, fallback }: { alt: string; fallback: string }) => (
+    <span role="img" aria-label={alt}>
+      {fallback}
+    </span>
+  ),
   EmptyState: ({ title }: { title: string }) => <p>{title}</p>,
 }));
 
@@ -120,11 +116,18 @@ describe("creator directory trust behavior", () => {
   });
 
   it("renders a bounded directory with honest identity labels", async () => {
-    directoryPage.mockResolvedValue({ type: "creators", items: state.developers, page: 1, hasMore: false });
+    directoryPage.mockResolvedValue({
+      type: "creators",
+      items: state.developers,
+      page: 1,
+      hasMore: false,
+    });
     const html = renderToStaticMarkup(await DevelopersPage({}));
     const copy = getDictionary("en").discover;
 
-    expect(directoryPage).toHaveBeenCalledWith(expect.objectContaining({ type: "creators", page: 1 }));
+    expect(directoryPage).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "creators", page: 1 }),
+    );
     expect(html).toContain('href="/developers/developer"');
     expect(html).toContain('href="/developers/admin-builder"');
     expect(html).toContain(copy.verified);
@@ -138,9 +141,7 @@ describe("creator directory trust behavior", () => {
     const query = dialect.sqlToQuery(state.queryCondition as SQL);
 
     expect(state.queryLimit).toBe(100);
-    expect(query.params).toEqual(
-      expect.arrayContaining(["developer", "admin"]),
-    );
+    expect(query.params).toEqual(expect.arrayContaining(["developer", "admin"]));
     expect(query.sql).toContain('"users"."role"');
     expect(result).toHaveLength(1);
     expect(result[0]).not.toHaveProperty("passwordHash");

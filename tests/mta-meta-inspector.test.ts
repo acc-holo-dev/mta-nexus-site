@@ -56,9 +56,7 @@ describe("MTA meta.xml inspector", () => {
       },
     ]);
     expect(result.dependencyResources).toEqual(["scoreboard"]);
-    expect(result.exports).toEqual([
-      { function: "getRaceState", type: "shared", http: "true" },
-    ]);
+    expect(result.exports).toEqual([{ function: "getRaceState", type: "shared", http: "true" }]);
     expect(result.minMtaVersion).toEqual({
       client: null,
       server: null,
@@ -79,9 +77,7 @@ describe("MTA meta.xml inspector", () => {
       settingCount: 1,
       aclRightCount: 1,
     });
-    expect(JSON.stringify(result)).not.toMatch(
-      /safe|verified|malware.?free|trusted/iu,
-    );
+    expect(JSON.stringify(result)).not.toMatch(/safe|verified|malware.?free|trusted/iu);
   });
 
   it("ignores tags inside comments and CDATA", () => {
@@ -149,9 +145,7 @@ describe("MTA meta.xml inspector", () => {
 
   it("enforces an input byte limit before inspection", () => {
     const oversized = `<meta><!--${"x".repeat(metaInspectionLimits.maxBytes)}--></meta>`;
-    expect(() => inspectMtaMetaXml(oversized)).toThrowError(
-      /inspection limit/u,
-    );
+    expect(() => inspectMtaMetaXml(oversized)).toThrowError(/inspection limit/u);
   });
 
   it("applies one global limit across repeated nested settings containers", () => {
@@ -189,15 +183,11 @@ describe("MTA meta.xml inspector", () => {
         severity: "warning",
       }),
     );
-    expect(result.issues.length).toBeLessThanOrEqual(
-      metaInspectionLimits.maxIssues,
-    );
+    expect(result.issues.length).toBeLessThanOrEqual(metaInspectionLimits.maxIssues);
   });
 
   it("keeps invalid numeric entities inert instead of throwing RangeError", () => {
-    const result = inspectMtaMetaXml(
-      '<meta><info name="&#999999999999999999999;" /></meta>',
-    );
+    const result = inspectMtaMetaXml('<meta><info name="&#999999999999999999999;" /></meta>');
     expect(result.info?.name).toBe("&#999999999999999999999;");
   });
 
@@ -213,9 +203,7 @@ describe("MTA meta.xml inspector", () => {
   });
 
   it("warns about malformed, missing, conflicting, and repeated minimum versions", () => {
-    const invalid = inspectMtaMetaXml(
-      '<meta><min_mta_version both="1.6.0-preview" /></meta>',
-    );
+    const invalid = inspectMtaMetaXml('<meta><min_mta_version both="1.6.0-preview" /></meta>');
     expect(invalid.issues).toContainEqual(
       expect.objectContaining({ code: "MTA_VERSION_INVALID", severity: "warning" }),
     );

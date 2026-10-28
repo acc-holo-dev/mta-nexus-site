@@ -24,18 +24,20 @@ import RegisterServerPage from "../apps/web/src/app/workspace/servers/new/page";
 
 describe("server forms use the same editable MTA metadata", () => {
   it("renders persisted HTTP port and map in the owner editor", () => {
-    const html = renderToStaticMarkup(createElement(ServerDetailsForm, {
-      server: {
-        id: "srv_1",
-        name: "Nexus Racing",
-        ipAddress: "203.0.113.7",
-        port: 22003,
-        httpPort: 22006,
-        gameMode: "roleplay",
-        mapName: "Los Santos",
-        visibility: "public",
-      },
-    }));
+    const html = renderToStaticMarkup(
+      createElement(ServerDetailsForm, {
+        server: {
+          id: "srv_1",
+          name: "Nexus Racing",
+          ipAddress: "203.0.113.7",
+          port: 22003,
+          httpPort: 22006,
+          gameMode: "roleplay",
+          mapName: "Los Santos",
+          visibility: "public",
+        },
+      }),
+    );
     expect(html).toMatch(/name="httpPort"[^>]*value="22006"/u);
     expect(html).toMatch(/name="mapName"[^>]*value="Los Santos"/u);
     expect(html).toContain("HTTP port");
@@ -43,15 +45,17 @@ describe("server forms use the same editable MTA metadata", () => {
   });
 
   it("defaults a legacy unfilled HTTP port without hiding map editing", () => {
-    const html = renderToStaticMarkup(createElement(ServerDetailsForm, {
-      server: {
-        id: "srv_2",
-        name: "Legacy",
-        ipAddress: "203.0.113.8",
-        port: 22003,
-        visibility: "unlisted",
-      },
-    }));
+    const html = renderToStaticMarkup(
+      createElement(ServerDetailsForm, {
+        server: {
+          id: "srv_2",
+          name: "Legacy",
+          ipAddress: "203.0.113.8",
+          port: 22003,
+          visibility: "unlisted",
+        },
+      }),
+    );
     expect(html).toMatch(/name="httpPort"[^>]*value="22005"/u);
     expect(html).toMatch(/name="mapName"[^>]*value=""/u);
   });

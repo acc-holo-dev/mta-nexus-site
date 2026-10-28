@@ -1,18 +1,11 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import {
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 
-const checker = new URL(
-  "../check-account-mail-worker-health.mjs",
-  import.meta.url,
-);
+const checker = new URL("../check-account-mail-worker-health.mjs", import.meta.url);
 
 function healthy(overrides = {}) {
   const now = new Date().toISOString();
@@ -45,23 +38,17 @@ function healthy(overrides = {}) {
 }
 
 function run(payload) {
-  const root = mkdtempSync(
-    join(tmpdir(), "nexus-mail-health-"),
-  );
+  const root = mkdtempSync(join(tmpdir(), "nexus-mail-health-"));
   const file = join(root, "health.json");
   try {
     writeFileSync(file, JSON.stringify(payload));
-    const result = spawnSync(
-      process.execPath,
-      [checker.pathname],
-      {
-        encoding: "utf8",
-        env: {
-          ...process.env,
-          NEXUS_ACCOUNT_MAIL_HEALTH_FILE: file,
-        },
+    const result = spawnSync(process.execPath, [checker.pathname], {
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        NEXUS_ACCOUNT_MAIL_HEALTH_FILE: file,
       },
-    );
+    });
     assert.ifError(result.error);
     return result.status;
   } finally {
@@ -77,9 +64,7 @@ test("rejects fresh heartbeat with stale dispatcher progress", () => {
   assert.notEqual(
     run(
       healthy({
-        progressAt: new Date(
-          Date.now() - 240_000,
-        ).toISOString(),
+        progressAt: new Date(Date.now() - 240_000).toISOString(),
       }),
     ),
     0,
@@ -90,9 +75,7 @@ test("accepts a scaled progress window for intentionally large batches", () => {
   assert.equal(
     run(
       healthy({
-        progressAt: new Date(
-          Date.now() - 240_000,
-        ).toISOString(),
+        progressAt: new Date(Date.now() - 240_000).toISOString(),
         progressStaleAfterMs: 300_000,
       }),
     ),
@@ -101,16 +84,11 @@ test("accepts a scaled progress window for intentionally large batches", () => {
 });
 
 test("rejects invalid or future progress metadata", () => {
-  assert.notEqual(
-    run(healthy({ progressStaleAfterMs: 60_000 })),
-    0,
-  );
+  assert.notEqual(run(healthy({ progressStaleAfterMs: 60_000 })), 0);
   assert.notEqual(
     run(
       healthy({
-        progressAt: new Date(
-          Date.now() + 60_000,
-        ).toISOString(),
+        progressAt: new Date(Date.now() + 60_000).toISOString(),
       }),
     ),
     0,

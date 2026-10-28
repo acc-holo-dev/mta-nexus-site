@@ -38,9 +38,7 @@ describe("Web Push worker maintenance boundaries", () => {
       sender: vi.fn(async () => ({ statusCode: 201 })),
     });
 
-    await expect(
-      dispatcher.runBatch(20, controller.signal),
-    ).resolves.toMatchObject({
+    await expect(dispatcher.runBatch(20, controller.signal)).resolves.toMatchObject({
       cleaned: 0,
     });
     expect(worker.candidates).not.toHaveBeenCalled();
@@ -67,9 +65,7 @@ describe("Web Push worker maintenance boundaries", () => {
       sender,
     });
 
-    await expect(
-      dispatcher.runBatch(20, controller.signal),
-    ).resolves.toMatchObject({
+    await expect(dispatcher.runBatch(20, controller.signal)).resolves.toMatchObject({
       retried: 1,
       accepted: 0,
       cleaned: 0,
@@ -77,10 +73,7 @@ describe("Web Push worker maintenance boundaries", () => {
 
     expect(worker.prepare).not.toHaveBeenCalled();
     expect(sender).not.toHaveBeenCalled();
-    expect(worker.settle).toHaveBeenCalledWith(
-      lease,
-      "retry",
-    );
+    expect(worker.settle).toHaveBeenCalledWith(lease, "retry");
     expect(worker.discardUnavailable).not.toHaveBeenCalled();
   });
 
@@ -115,19 +108,14 @@ describe("Web Push worker maintenance boundaries", () => {
       sender,
     });
 
-    await expect(
-      dispatcher.runBatch(20, controller.signal),
-    ).resolves.toMatchObject({
+    await expect(dispatcher.runBatch(20, controller.signal)).resolves.toMatchObject({
       retried: 1,
       accepted: 0,
       cleaned: 0,
     });
 
     expect(sender).not.toHaveBeenCalled();
-    expect(worker.settle).toHaveBeenCalledWith(
-      lease,
-      "retry",
-    );
+    expect(worker.settle).toHaveBeenCalledWith(lease, "retry");
     expect(worker.discardUnavailable).not.toHaveBeenCalled();
   });
 });

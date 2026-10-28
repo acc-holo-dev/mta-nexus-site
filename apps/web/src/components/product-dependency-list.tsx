@@ -20,12 +20,8 @@ export function ProductDependencyList({
   if (!resolution) {
     return (
       <div className="space-y-1 text-right">
-        <div className="font-mono text-secondary">
-          {declared.join(", ")}
-        </div>
-        <div className="text-[10px] text-warning">
-          {copy.resolutionUnavailable}
-        </div>
+        <div className="font-mono text-secondary">{declared.join(", ")}</div>
+        <div className="text-[10px] text-warning">{copy.resolutionUnavailable}</div>
       </div>
     );
   }
@@ -47,27 +43,17 @@ export function ProductDependencyList({
           </div>
         ) : dependencyItem.status === "self_reference" ? (
           <div key={dependencyItem.slug}>
-            <span className="font-mono text-warning">
-              {dependencyItem.slug}
-            </span>
-            <span className="ml-1 text-[10px] text-warning">
-              {copy.selfReference}
-            </span>
+            <span className="font-mono text-warning">{dependencyItem.slug}</span>
+            <span className="ml-1 text-[10px] text-warning">{copy.selfReference}</span>
           </div>
         ) : (
           <div key={dependencyItem.slug}>
-            <span className="font-mono text-secondary">
-              {dependencyItem.slug}
-            </span>
-            <span className="ml-1 text-[10px] text-faint">
-              {copy.notFound}
-            </span>
+            <span className="font-mono text-secondary">{dependencyItem.slug}</span>
+            <span className="ml-1 text-[10px] text-faint">{copy.notFound}</span>
           </div>
         ),
       )}
-      <div className="pt-1 text-[10px] text-faint">
-        {copy.resolutionNotice}
-      </div>
+      <div className="pt-1 text-[10px] text-faint">{copy.resolutionNotice}</div>
     </div>
   );
 }

@@ -80,9 +80,11 @@ describe("Security Policy Engine can()", () => {
       { organizationId: "org_1", role: "admin", permissions: [] },
       { organizationId: "org_1", role: "member", permissions: ["manage_servers"] },
     ]) {
-      expect(can(regularUser, "server.manage", orgServer, {
-        organizationMemberships: [membership],
-      })).toBe(true);
+      expect(
+        can(regularUser, "server.manage", orgServer, {
+          organizationMemberships: [membership],
+        }),
+      ).toBe(true);
     }
     for (const membership of [
       { organizationId: "org_1", role: "member", permissions: ["manage_products"] },
@@ -90,9 +92,11 @@ describe("Security Policy Engine can()", () => {
       { organizationId: "org_1", role: "owner", permissions: ["manage_servers"] },
       { organizationId: "org_1", role: "member", permissions: [] },
     ]) {
-      expect(can(regularUser, "server.manage", orgServer, {
-        organizationMemberships: [membership],
-      })).toBe(false);
+      expect(
+        can(regularUser, "server.manage", orgServer, {
+          organizationMemberships: [membership],
+        }),
+      ).toBe(false);
     }
   });
 

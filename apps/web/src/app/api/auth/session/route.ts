@@ -14,11 +14,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -44,16 +40,11 @@ export async function GET(request: NextRequest) {
       status: 503,
       error,
     });
-    return json(
-      context,
-      { error: "Could not check session" },
-      503,
-    );
+    return json(context, { error: "Could not check session" }, 503);
   }
 }
 
 export const DELETE = withBrowserMutation(async (request: NextRequest) => {
-
   const context = createRequestLogContext(request);
 
   try {
@@ -78,11 +69,9 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error:
-          "Could not confirm sign out. Please try again.",
+        error: "Could not confirm sign out. Please try again.",
       },
       503,
     );
   }
 });
-

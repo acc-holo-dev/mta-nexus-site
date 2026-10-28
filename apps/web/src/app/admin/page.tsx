@@ -6,11 +6,7 @@ import { getFinancialCopy } from "../../lib/financial-i18n";
 import { getResourceReleaseControlCopy } from "../../lib/resource-release-control-i18n";
 import { cookies } from "next/headers";
 import Link from "next/link";
-import {
-  buildRepository,
-  contentRepository,
-  verificationRepository,
-} from "@nexus/db";
+import { buildRepository, contentRepository, verificationRepository } from "@nexus/db";
 import { can } from "@nexus/security";
 import {
   AlertTriangle,
@@ -77,9 +73,12 @@ export default async function AdminPage({
   const contentPage = parsePage(query.contentPage);
   const adminHref = (changes: Record<string, string | number>) => {
     const params = new URLSearchParams({
-      reportView, reportPage: String(reportPage),
-      verificationView, verificationPage: String(verificationPage),
-      buildPage: String(buildPage), riskBuildPage: String(riskBuildPage),
+      reportView,
+      reportPage: String(reportPage),
+      verificationView,
+      verificationPage: String(verificationPage),
+      buildPage: String(buildPage),
+      riskBuildPage: String(riskBuildPage),
       contentPage: String(contentPage),
     });
     for (const [key, value] of Object.entries(changes)) params.set(key, String(value));
@@ -101,9 +100,7 @@ export default async function AdminPage({
           <ShieldAlert className="h-7 w-7" aria-hidden="true" />
         </div>
         <h1 className="font-display text-primary">{copy.accessDenied}</h1>
-        <p className="font-caption text-muted">
-          {copy.accessDeniedDescription}
-        </p>
+        <p className="font-caption text-muted">{copy.accessDeniedDescription}</p>
         <Link
           href="/auth/login"
           className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[var(--nexus-accent-hover)]"
@@ -159,9 +156,28 @@ export default async function AdminPage({
           <p className="mt-0.5 font-caption text-muted">{copy.description}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-          {currentUser.role === "admin" ? <Link href="/admin/commerce/plans" className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary">{getCommercialCopy(locale).admin}</Link> : null}
-          <Link href="/admin/resources" className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary">{getResourceReleaseControlCopy(locale).moderation}</Link>
-          {currentUser.role === "admin" ? <Link href="/admin/commerce/reconciliation" className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary">{getFinancialCopy(locale).review}</Link> : null}
+          {currentUser.role === "admin" ? (
+            <Link
+              href="/admin/commerce/plans"
+              className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+            >
+              {getCommercialCopy(locale).admin}
+            </Link>
+          ) : null}
+          <Link
+            href="/admin/resources"
+            className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+          >
+            {getResourceReleaseControlCopy(locale).moderation}
+          </Link>
+          {currentUser.role === "admin" ? (
+            <Link
+              href="/admin/commerce/reconciliation"
+              className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
+            >
+              {getFinancialCopy(locale).review}
+            </Link>
+          ) : null}
           <Link
             href="/admin/support"
             className="rounded-md border border-base bg-surface px-3 py-1.5 text-xs font-semibold text-secondary transition-colors hover:bg-hover hover:text-primary"
@@ -248,9 +264,7 @@ export default async function AdminPage({
                     {copy.requester} {request.requesterId} •{" "}
                     {new Date(request.createdAt).toLocaleDateString(dateLocale)}
                   </p>
-                  {request.notes && (
-                    <p className="font-caption text-faint">{request.notes}</p>
-                  )}
+                  {request.notes && <p className="font-caption text-faint">{request.notes}</p>}
                   {request.evidenceUpdated && (
                     <p className="text-xs text-secondary">
                       {verificationApplicationsCopy(locale).updated}
@@ -304,7 +318,8 @@ export default async function AdminPage({
                   )}
                   {request.resolvedAt && (
                     <p className="font-caption text-faint">
-                      {copy.reportDecidedAt}: {new Date(request.resolvedAt).toLocaleString(dateLocale)}
+                      {copy.reportDecidedAt}:{" "}
+                      {new Date(request.resolvedAt).toLocaleString(dateLocale)}
                     </p>
                   )}
                 </div>
@@ -341,16 +356,25 @@ export default async function AdminPage({
           )}
         </div>
         {(verificationPage > 1 || moreVerifications) && (
-          <nav
-            aria-label={copy.verificationPages}
-            className="mt-3 flex items-center gap-3 text-xs"
-          >
+          <nav aria-label={copy.verificationPages} className="mt-3 flex items-center gap-3 text-xs">
             {verificationPage > 1 && (
-              <Link className="text-accent underline" href={verificationHref(verificationView, verificationPage - 1)}>{copy.previous}</Link>
+              <Link
+                className="text-accent underline"
+                href={verificationHref(verificationView, verificationPage - 1)}
+              >
+                {copy.previous}
+              </Link>
             )}
-            <span className="text-muted">{copy.reportPage} {verificationPage}</span>
+            <span className="text-muted">
+              {copy.reportPage} {verificationPage}
+            </span>
             {moreVerifications && verificationPage < 99_999 && (
-              <Link className="text-accent underline" href={verificationHref(verificationView, verificationPage + 1)}>{copy.next}</Link>
+              <Link
+                className="text-accent underline"
+                href={verificationHref(verificationView, verificationPage + 1)}
+              >
+                {copy.next}
+              </Link>
             )}
           </nav>
         )}
@@ -384,15 +408,24 @@ export default async function AdminPage({
                   </p>
                   <p className="font-caption text-secondary">
                     {build.productStatus === "published" ? (
-                      <Link className="text-accent underline" href={`/market/${encodeURIComponent(build.productSlug)}`}>
+                      <Link
+                        className="text-accent underline"
+                        href={`/market/${encodeURIComponent(build.productSlug)}`}
+                      >
                         {build.productTitle}
                       </Link>
                     ) : (
-                      <>{build.productTitle} · {copy.resourceNotPublished}</>
+                      <>
+                        {build.productTitle} · {copy.resourceNotPublished}
+                      </>
                     )}
                   </p>
                   <p className="font-caption text-muted">
-                    {copy.resourcePublisher}: <Link className="text-accent underline" href={`/users/${encodeURIComponent(build.publisherUsername)}`}>
+                    {copy.resourcePublisher}:{" "}
+                    <Link
+                      className="text-accent underline"
+                      href={`/users/${encodeURIComponent(build.publisherUsername)}`}
+                    >
                       @{build.publisherUsername}
                     </Link>
                   </p>
@@ -409,9 +442,7 @@ export default async function AdminPage({
                     </p>
                   )}
                   {build.releaseNotes && (
-                    <p className="font-caption text-faint">
-                      {build.releaseNotes}
-                    </p>
+                    <p className="font-caption text-faint">{build.releaseNotes}</p>
                   )}
                 </div>
                 <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
@@ -425,7 +456,10 @@ export default async function AdminPage({
                           : "warning"
                     }
                   />
-                  <Link href={`/admin/resources/${build.productId}/builds/${build.id}`} className="text-accent underline text-xs">
+                  <Link
+                    href={`/admin/resources/${build.productId}/builds/${build.id}`}
+                    className="text-accent underline text-xs"
+                  >
                     {locale === "ru" ? "Версия и история решений" : "Version and decision history"}
                   </Link>
                 </div>
@@ -439,9 +473,25 @@ export default async function AdminPage({
         </div>
         {(buildPage > 1 || moreBuilds) && (
           <nav aria-label={copy.buildPages} className="mt-3 flex items-center gap-3 text-xs">
-            {buildPage > 1 && <Link className="text-accent underline" href={adminHref({ buildPage: buildPage - 1 })}>{copy.previous}</Link>}
-            <span className="text-muted">{copy.reportPage} {buildPage}</span>
-            {moreBuilds && buildPage < 99_999 && <Link className="text-accent underline" href={adminHref({ buildPage: buildPage + 1 })}>{copy.next}</Link>}
+            {buildPage > 1 && (
+              <Link
+                className="text-accent underline"
+                href={adminHref({ buildPage: buildPage - 1 })}
+              >
+                {copy.previous}
+              </Link>
+            )}
+            <span className="text-muted">
+              {copy.reportPage} {buildPage}
+            </span>
+            {moreBuilds && buildPage < 99_999 && (
+              <Link
+                className="text-accent underline"
+                href={adminHref({ buildPage: buildPage + 1 })}
+              >
+                {copy.next}
+              </Link>
+            )}
           </nav>
         )}
       </section>
@@ -452,9 +502,7 @@ export default async function AdminPage({
           description={`${quarantinedBuildCount} ${copy.buildsQuarantined}`}
           action={<ShieldAlert className="h-4 w-4 text-danger" />}
         />
-        <p className="mb-3 max-w-3xl font-caption text-muted">
-          {copy.quarantineQueueDescription}
-        </p>
+        <p className="mb-3 max-w-3xl font-caption text-muted">{copy.quarantineQueueDescription}</p>
         <div className="space-y-2.5">
           {riskBuilds.length > 0 ? (
             riskBuilds.map((build) => (
@@ -481,7 +529,9 @@ export default async function AdminPage({
                         {build.productTitle}
                       </Link>
                     ) : (
-                      <>{build.productTitle} · {copy.resourceNotPublished}</>
+                      <>
+                        {build.productTitle} · {copy.resourceNotPublished}
+                      </>
                     )}
                   </p>
                   <p className="font-caption text-muted">
@@ -512,16 +562,14 @@ export default async function AdminPage({
                       )}
                     </>
                   )}
-                  {build.scanStatus === "clean" &&
-                    build.scanner?.trim() &&
-                    build.scannedAt && (
-                      <a
-                        href={`/api/admin/builds/${encodeURIComponent(build.id)}/download`}
-                        className="inline-block text-xs font-semibold text-accent underline"
-                      >
-                        {copy.reviewArtifact}
-                      </a>
-                    )}
+                  {build.scanStatus === "clean" && build.scanner?.trim() && build.scannedAt && (
+                    <a
+                      href={`/api/admin/builds/${encodeURIComponent(build.id)}/download`}
+                      className="inline-block text-xs font-semibold text-accent underline"
+                    >
+                      {copy.reviewArtifact}
+                    </a>
+                  )}
                 </div>
                 <BuildQuarantineControls
                   buildId={build.id}
@@ -536,10 +584,7 @@ export default async function AdminPage({
           )}
         </div>
         {(riskBuildPage > 1 || moreRiskBuilds) && (
-          <nav
-            aria-label={copy.quarantinePages}
-            className="mt-3 flex items-center gap-3 text-xs"
-          >
+          <nav aria-label={copy.quarantinePages} className="mt-3 flex items-center gap-3 text-xs">
             {riskBuildPage > 1 && (
               <Link
                 className="text-accent underline"
@@ -567,7 +612,14 @@ export default async function AdminPage({
         <SectionHeader
           title={copy.communityQueue}
           description={`${pendingContentCount} ${copy.draftsAwaitingModeration}`}
-          action={<Link className="inline-flex min-h-11 items-center text-xs text-accent underline" href="/admin/community">{moderationCopy(locale).title}</Link>}
+          action={
+            <Link
+              className="inline-flex min-h-11 items-center text-xs text-accent underline"
+              href="/admin/community"
+            >
+              {moderationCopy(locale).title}
+            </Link>
+          }
         />
         <div className="space-y-2.5">
           {pendingContent.length > 0 ? (
@@ -581,18 +633,14 @@ export default async function AdminPage({
                     <span className="rounded bg-warning-soft px-2 py-0.5 text-[10px] font-bold uppercase text-warning">
                       {item.type}
                     </span>
-                    <span className="truncate text-xs font-heading text-primary">
-                      {item.title}
-                    </span>
+                    <span className="truncate text-xs font-heading text-primary">{item.title}</span>
                   </div>
                   <p className="font-caption text-muted">
                     {copy.author} {item.authorId} •{" "}
                     {new Date(item.createdAt).toLocaleDateString(dateLocale)}
                   </p>
                   {item.excerpt && (
-                    <p className="truncate font-caption text-faint">
-                      {item.excerpt}
-                    </p>
+                    <p className="truncate font-caption text-faint">{item.excerpt}</p>
                   )}
                   <details className="max-w-prose font-caption text-muted">
                     <summary className="cursor-pointer text-accent">{copy.readDraft}</summary>
@@ -601,7 +649,11 @@ export default async function AdminPage({
                     </div>
                   </details>
                 </div>
-                <ContentModerationControls key={`${item.id}:${item.updatedAt.toISOString()}`} contentId={item.id} expectedUpdatedAt={item.updatedAt.toISOString()} />
+                <ContentModerationControls
+                  key={`${item.id}:${item.updatedAt.toISOString()}`}
+                  contentId={item.id}
+                  expectedUpdatedAt={item.updatedAt.toISOString()}
+                />
               </div>
             ))
           ) : (
@@ -612,19 +664,52 @@ export default async function AdminPage({
         </div>
         {(contentPage > 1 || moreContent) && (
           <nav aria-label={copy.contentPages} className="mt-3 flex items-center gap-3 text-xs">
-            {contentPage > 1 && <Link className="text-accent underline" href={adminHref({ contentPage: contentPage - 1 })}>{copy.previous}</Link>}
-            <span className="text-muted">{copy.reportPage} {contentPage}</span>
-            {moreContent && contentPage < 99_999 && <Link className="text-accent underline" href={adminHref({ contentPage: contentPage + 1 })}>{copy.next}</Link>}
+            {contentPage > 1 && (
+              <Link
+                className="text-accent underline"
+                href={adminHref({ contentPage: contentPage - 1 })}
+              >
+                {copy.previous}
+              </Link>
+            )}
+            <span className="text-muted">
+              {copy.reportPage} {contentPage}
+            </span>
+            {moreContent && contentPage < 99_999 && (
+              <Link
+                className="text-accent underline"
+                href={adminHref({ contentPage: contentPage + 1 })}
+              >
+                {copy.next}
+              </Link>
+            )}
           </nav>
         )}
       </section>
 
       <section>
         <SectionHeader title={copy.reports} description={copy.caseHistory} />
-        <Link href="/admin/storage" className="mb-3 mr-4 inline-block text-sm text-accent underline">{storageMaintenanceCopy(locale).title}</Link>
-        <Link href="/admin/commerce/order-cases" className="mb-3 mr-4 inline-block text-sm text-accent underline">{orderCaseCopy(locale).queue}</Link>
-        <Link href="/admin/commerce/reviews" className="mb-3 mr-4 inline-block text-sm text-accent underline">{resourceReviewCopy(locale).queue}</Link>
-        <Link href="/admin/reports" className="mb-3 inline-block text-sm text-accent underline">{communityReportCopy(locale).queue}</Link>
+        <Link
+          href="/admin/storage"
+          className="mb-3 mr-4 inline-block text-sm text-accent underline"
+        >
+          {storageMaintenanceCopy(locale).title}
+        </Link>
+        <Link
+          href="/admin/commerce/order-cases"
+          className="mb-3 mr-4 inline-block text-sm text-accent underline"
+        >
+          {orderCaseCopy(locale).queue}
+        </Link>
+        <Link
+          href="/admin/commerce/reviews"
+          className="mb-3 mr-4 inline-block text-sm text-accent underline"
+        >
+          {resourceReviewCopy(locale).queue}
+        </Link>
+        <Link href="/admin/reports" className="mb-3 inline-block text-sm text-accent underline">
+          {communityReportCopy(locale).queue}
+        </Link>
         <nav aria-label={copy.reports} className="mb-3 flex gap-2">
           <Link
             href={reportHref("pending", 1)}
@@ -670,20 +755,33 @@ export default async function AdminPage({
                   )}
                   {report.resolvedAt && (
                     <p className="font-caption text-faint">
-                      {copy.reportDecidedAt}: {new Date(report.resolvedAt).toLocaleString(dateLocale)}
+                      {copy.reportDecidedAt}:{" "}
+                      {new Date(report.resolvedAt).toLocaleString(dateLocale)}
                     </p>
                   )}
                 </div>
                 <div className="flex w-full flex-col items-start gap-3 md:w-auto md:items-end">
                   <StatusBadge
                     status={report.status}
-                    tone={report.status === "resolved" ? "success" : report.status === "dismissed" ? "neutral" : "warning"}
+                    tone={
+                      report.status === "resolved"
+                        ? "success"
+                        : report.status === "dismissed"
+                          ? "neutral"
+                          : "warning"
+                    }
                   />
-                  {(report.status === "open" || report.status === "under_review") && (
-                    report.targetType === "review"
-                      ? <Link href={`/admin/commerce/reviews/${encodeURIComponent(report.id)}`} className="text-sm text-accent underline">{resourceReviewCopy(locale).detail}</Link>
-                      : <ReportModerationControls reportId={report.id} />
-                  )}
+                  {(report.status === "open" || report.status === "under_review") &&
+                    (report.targetType === "review" ? (
+                      <Link
+                        href={`/admin/commerce/reviews/${encodeURIComponent(report.id)}`}
+                        className="text-sm text-accent underline"
+                      >
+                        {resourceReviewCopy(locale).detail}
+                      </Link>
+                    ) : (
+                      <ReportModerationControls reportId={report.id} />
+                    ))}
                 </div>
               </div>
             ))
@@ -697,29 +795,30 @@ export default async function AdminPage({
         </div>
         {(reportPage > 1 || moreReports) && (
           <nav aria-label={copy.reportPages} className="mt-3 flex items-center gap-3 text-xs">
-            {reportPage > 1 && <Link className="text-accent underline" href={reportHref(reportView, reportPage - 1)}>{copy.previous}</Link>}
-            <span className="text-muted">{copy.reportPage} {reportPage}</span>
-            {moreReports && reportPage < 99_999 && <Link className="text-accent underline" href={reportHref(reportView, reportPage + 1)}>{copy.next}</Link>}
+            {reportPage > 1 && (
+              <Link className="text-accent underline" href={reportHref(reportView, reportPage - 1)}>
+                {copy.previous}
+              </Link>
+            )}
+            <span className="text-muted">
+              {copy.reportPage} {reportPage}
+            </span>
+            {moreReports && reportPage < 99_999 && (
+              <Link className="text-accent underline" href={reportHref(reportView, reportPage + 1)}>
+                {copy.next}
+              </Link>
+            )}
           </nav>
         )}
       </section>
 
       {canViewAudit && (
         <section>
-          <SectionHeader
-            title={copy.auditLog}
-            description={copy.auditDescription}
-          />
+          <SectionHeader title={copy.auditLog} description={copy.auditDescription} />
           <div className="nexus-panel p-4">
             <DataTable>
               <DataTableHeader
-                columns={[
-                  copy.timestamp,
-                  copy.actor,
-                  copy.action,
-                  copy.target,
-                  copy.ip,
-                ]}
+                columns={[copy.timestamp, copy.actor, copy.action, copy.target, copy.ip]}
               />
               <DataTableBody>
                 {auditLogs.length > 0 ? (
@@ -729,15 +828,11 @@ export default async function AdminPage({
                         {new Date(log.createdAt).toISOString()}
                       </td>
                       <td className="pr-4 text-purple">{log.actorId}</td>
-                      <td className="pr-4 font-semibold text-primary">
-                        {log.action}
-                      </td>
+                      <td className="pr-4 font-semibold text-primary">{log.action}</td>
                       <td className="pr-4 text-muted">
                         {log.targetType}:{log.targetId}
                       </td>
-                      <td className="text-right text-faint">
-                        {log.ipAddress || copy.internal}
-                      </td>
+                      <td className="text-right text-faint">{log.ipAddress || copy.internal}</td>
                     </tr>
                   ))
                 ) : (

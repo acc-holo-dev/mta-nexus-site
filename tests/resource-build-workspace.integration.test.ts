@@ -107,14 +107,17 @@ it("withdraws, edits and resubmits without allowing an ABA approval", async () =
     targetType: "build",
     targetId: f.buildId,
   };
-  expect(await buildRepository.moderatePending(f.buildId, "approve", audit, 1, `tok_${f.staffId}`)).toBeNull();
+  expect(
+    await buildRepository.moderatePending(f.buildId, "approve", audit, 1, `tok_${f.staffId}`),
+  ).toBeNull();
   expect(
     await buildRepository.moderatePending(
       f.buildId,
       "approve",
       { ...audit, id: `${f.auditId}_new` },
       4,
-    `tok_${f.staffId}`),
+      `tok_${f.staffId}`,
+    ),
   ).toMatchObject({ status: "published", revision: 5 });
   expect((await productRepository.findById(f.productId))?.status).toBe("published");
   const events = await db
@@ -216,20 +219,18 @@ it("preserves only the exact known demo metadata-repair scope", async () => {
         "CREATE TRIGGER fixture_revision BEFORE UPDATE ON pg_temp.builds FOR EACH ROW EXECUTE FUNCTION public.nexus_build_workspace_revision()",
       ),
     );
-    await tx
-      .insert(builds)
-      .values({
-        id: "bld_inv_320",
-        productId: "prd_inv_pro",
-        version: "3.2.0",
-        storageKey: "builds/prd_inv_pro/v3.2.0.zip",
-        status: "retired",
-        sha256Hash: "a".repeat(64),
-        fileSizeBytes: 999,
-        scanner: "seed-manual-review",
-        scanStatus: "clean",
-        scannedAt: new Date(),
-      });
+    await tx.insert(builds).values({
+      id: "bld_inv_320",
+      productId: "prd_inv_pro",
+      version: "3.2.0",
+      storageKey: "builds/prd_inv_pro/v3.2.0.zip",
+      status: "retired",
+      sha256Hash: "a".repeat(64),
+      fileSizeBytes: 999,
+      scanner: "seed-manual-review",
+      scanStatus: "clean",
+      scannedAt: new Date(),
+    });
     await tx
       .update(builds)
       .set({ sha256Hash: "b".repeat(64), fileSizeBytes: 512 })

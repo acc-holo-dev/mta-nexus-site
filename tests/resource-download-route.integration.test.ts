@@ -11,15 +11,12 @@ import { storageService } from "@nexus/storage";
 import { GET } from "../apps/web/src/app/api/products/[id]/download/route";
 
 function downloadRequest(token: string, productId: string) {
-  return new NextRequest(
-    `http://nexus.test/api/products/${productId}/download`,
-    {
-      method: "GET",
-      headers: {
-        cookie: `nexus_session=${token}`,
-      },
+  return new NextRequest(`http://nexus.test/api/products/${productId}/download`, {
+    method: "GET",
+    headers: {
+      cookie: `nexus_session=${token}`,
     },
-  );
+  });
 }
 
 describe("resource download route integration", () => {
@@ -124,30 +121,27 @@ describe("resource download route integration", () => {
     });
 
     try {
-      const success = await GET(
-        downloadRequest(entitledToken, productId),
-        { params: Promise.resolve({ id: productId }) },
-      );
+      const success = await GET(downloadRequest(entitledToken, productId), {
+        params: Promise.resolve({ id: productId }),
+      });
       expect(success.status).toBe(200);
       expect(success.headers.get("X-Content-SHA256")).toBe(asset.sha256Hash);
       expect(success.headers.get("Cache-Control")).toBe("private, no-store");
       expect(success.headers.get("Vary")).toBe("Cookie");
       expect(Buffer.from(await success.arrayBuffer())).toEqual(bytes);
 
-      const denied = await GET(
-        downloadRequest(otherToken, productId),
-        { params: Promise.resolve({ id: productId }) },
-      );
+      const denied = await GET(downloadRequest(otherToken, productId), {
+        params: Promise.resolve({ id: productId }),
+      });
       expect(denied.status).toBe(403);
       expect(await denied.json()).toEqual({
         error: "Add this resource to your library before downloading it",
       });
 
       await productRepository.update(productId, { status: "draft" });
-      const unpublished = await GET(
-        downloadRequest(entitledToken, productId),
-        { params: Promise.resolve({ id: productId }) },
-      );
+      const unpublished = await GET(downloadRequest(entitledToken, productId), {
+        params: Promise.resolve({ id: productId }),
+      });
       expect(unpublished.status).toBe(404);
       expect(await unpublished.json()).toEqual({
         error: "Resource not found",
@@ -155,10 +149,9 @@ describe("resource download route integration", () => {
 
       await productRepository.update(productId, { status: "published" });
       await buildRepository.updateStatus(buildId, "retired", "published");
-      const retired = await GET(
-        downloadRequest(entitledToken, productId),
-        { params: Promise.resolve({ id: productId }) },
-      );
+      const retired = await GET(downloadRequest(entitledToken, productId), {
+        params: Promise.resolve({ id: productId }),
+      });
       expect(retired.status).toBe(404);
       expect(await retired.json()).toEqual({
         error: "No published build is available",

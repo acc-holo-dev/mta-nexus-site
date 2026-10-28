@@ -1,7 +1,4 @@
-import {
-  isValidWebPushAuthSecret,
-  isValidWebPushP256PublicKey,
-} from "@nexus/config";
+import { isValidWebPushAuthSecret, isValidWebPushP256PublicKey } from "@nexus/config";
 import { parseWebPushEndpoint } from "./services/web-push-endpoint-policy";
 
 export type ParsedWebPushSubscription = {
@@ -23,9 +20,7 @@ export function parseWebPushVapidPublicKey(value: unknown): string | null {
   return key && isValidWebPushP256PublicKey(key) ? key : null;
 }
 
-export function parseWebPushSubscription(
-  value: unknown,
-): ParsedWebPushSubscription | null {
+export function parseWebPushSubscription(value: unknown): ParsedWebPushSubscription | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
 
   const record = value as Record<string, unknown>;
@@ -65,10 +60,7 @@ export function parseWebPushSubscription(
       return null;
     }
     expirationAt = new Date(expirationTime);
-    if (
-      Number.isNaN(expirationAt.getTime()) ||
-      expirationAt.getTime() <= Date.now()
-    ) {
+    if (Number.isNaN(expirationAt.getTime()) || expirationAt.getTime() <= Date.now()) {
       return null;
     }
   }

@@ -2,15 +2,10 @@ import { describe, expect, it } from "vitest";
 import { NextRequest } from "next/server";
 import { config, proxy } from "../apps/web/src/proxy";
 
-function request(
-  pathname: string,
-  options: { cookie?: string; method?: string } = {},
-) {
+function request(pathname: string, options: { cookie?: string; method?: string } = {}) {
   return new NextRequest(`https://nexus.test${pathname}`, {
     method: options.method ?? "GET",
-    headers: options.cookie
-      ? { Cookie: options.cookie }
-      : undefined,
+    headers: options.cookie ? { Cookie: options.cookie } : undefined,
   });
 }
 
@@ -18,12 +13,8 @@ describe("public offline cache proxy contract", () => {
   it("marks only anonymous GET responses for approved paths", () => {
     const response = proxy(request("/articles/release-notes"));
 
-    expect(
-      response.headers.get("x-nexus-offline-cache"),
-    ).toBe("public-readonly-v1");
-    expect(response.headers.get("vary")?.toLowerCase()).toContain(
-      "cookie",
-    );
+    expect(response.headers.get("x-nexus-offline-cache")).toBe("public-readonly-v1");
+    expect(response.headers.get("vary")?.toLowerCase()).toContain("cookie");
   });
 
   it("fails closed when any session cookie is present", () => {
@@ -33,9 +24,7 @@ describe("public offline cache proxy contract", () => {
       }),
     );
 
-    expect(
-      response.headers.get("x-nexus-offline-cache"),
-    ).toBeNull();
+    expect(response.headers.get("x-nexus-offline-cache")).toBeNull();
   });
 
   it("does not mark non-GET or non-read-only routes", () => {
@@ -47,11 +36,7 @@ describe("public offline cache proxy contract", () => {
       ).headers.get("x-nexus-offline-cache"),
     ).toBeNull();
 
-    expect(
-      proxy(request("/market")).headers.get(
-        "x-nexus-offline-cache",
-      ),
-    ).toBeNull();
+    expect(proxy(request("/market")).headers.get("x-nexus-offline-cache")).toBeNull();
   });
 
   it("matches the browser API boundary and the public offline surface", () => {
@@ -64,4 +49,3 @@ describe("public offline cache proxy contract", () => {
     ]);
   });
 });
-

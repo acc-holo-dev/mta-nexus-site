@@ -1,4 +1,8 @@
-import { listAssetNamespaces, discoverAssetNamespace, removeMaintenanceObject } from "./local-maintenance";
+import {
+  listAssetNamespaces,
+  discoverAssetNamespace,
+  removeMaintenanceObject,
+} from "./local-maintenance";
 import type { StorageObjectIdentity } from "@nexus/domain";
 import fs from "node:fs/promises";
 import { constants as fsConstants } from "node:fs";
@@ -19,22 +23,21 @@ export class LocalStorageProvider implements StorageProvider {
 
   private resolvePath(key: string): string {
     if (
-      !key || key.includes("\0") || key.includes("\\") ||
-      path.isAbsolute(key) || path.win32.isAbsolute(key)
+      !key ||
+      key.includes("\0") ||
+      key.includes("\\") ||
+      path.isAbsolute(key) ||
+      path.win32.isAbsolute(key)
     ) {
       throw new Error("Invalid storage key");
     }
     const resolved = path.resolve(this.baseDir, key);
     const relative = path.relative(this.baseDir, resolved);
-    if (
-      relative === ".." ||
-      relative.startsWith(".." + path.sep) ||
-      path.isAbsolute(relative)
-    ) {
+    if (relative === ".." || relative.startsWith(".." + path.sep) || path.isAbsolute(relative)) {
       throw new Error("Storage key escapes the configured storage directory");
     }
     const parts = key.split("/");
-    if (!relative || parts.some(part => !part || part === "." || part === "..")) {
+    if (!relative || parts.some((part) => !part || part === "." || part === "..")) {
       throw new Error("Invalid storage key");
     }
     return resolved;
@@ -99,7 +102,7 @@ export class LocalStorageProvider implements StorageProvider {
     // Snapshot caller-owned memory before yielding, then publish complete bytes only.
     const bytes = Buffer.from(data);
     const hash = crypto.createHash("sha256").update(bytes).digest("hex");
-    return this.withParent(key, true, async filePath => {
+    return this.withParent(key, true, async (filePath) => {
       const temporary = filePath + "." + crypto.randomUUID() + ".tmp";
       const handle = await fs.open(
         temporary,
@@ -141,7 +144,7 @@ export class LocalStorageProvider implements StorageProvider {
     signal?: AbortSignal,
   ): Promise<{ stream: NodeJS.ReadableStream; meta: VerifiedStorageReadMeta }> {
     signal?.throwIfAborted();
-    return this.withParent(key, false, async filePath => {
+    return this.withParent(key, false, async (filePath) => {
       // NOFOLLOW rejects a leaf symlink, even if it is swapped just before open.
       // NONBLOCK avoids waiting on a hostile FIFO before its type can be checked.
       const handle = await fs.open(
@@ -213,7 +216,7 @@ export class LocalStorageProvider implements StorageProvider {
 
   async delete(key: string): Promise<void> {
     try {
-      await this.withParent(key, false, async filePath => {
+      await this.withParent(key, false, async (filePath) => {
         const stat = await fs.lstat(filePath);
         if (stat.isSymbolicLink()) throw new Error("Symbolic-link storage objects are forbidden");
         if (!stat.isFile()) throw new Error("Storage object is not a regular file");
@@ -221,7 +224,13 @@ export class LocalStorageProvider implements StorageProvider {
         await fs.unlink(filePath);
       });
     } catch (error: unknown) {
-      if (!(error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "ENOENT")) {
+      if (
+        !(
+          error instanceof Error &&
+          "code" in error &&
+          (error as NodeJS.ErrnoException).code === "ENOENT"
+        )
+      ) {
         throw error;
       }
     }
@@ -229,7 +238,7 @@ export class LocalStorageProvider implements StorageProvider {
 
   async exists(key: string): Promise<boolean> {
     try {
-      return await this.withParent(key, false, async filePath => {
+      return await this.withParent(key, false, async (filePath) => {
         const stat = await fs.lstat(filePath);
         if (stat.isSymbolicLink()) throw new Error("Symbolic-link storage objects are forbidden");
         if (!stat.isFile()) return false;
@@ -237,7 +246,11 @@ export class LocalStorageProvider implements StorageProvider {
         return true;
       });
     } catch (error: unknown) {
-      if (error instanceof Error && "code" in error && (error as NodeJS.ErrnoException).code === "ENOENT") {
+      if (
+        error instanceof Error &&
+        "code" in error &&
+        (error as NodeJS.ErrnoException).code === "ENOENT"
+      ) {
         return false;
       }
       throw error;

@@ -12,24 +12,26 @@ export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
 
   try {
-    const directory =
-      await mtaMasterDirectoryService.getDirectory();
+    const directory = await mtaMasterDirectoryService.getDirectory();
     const playersOnline = directory.servers.reduce(
-      (total, server) =>
-        total + (server.players ?? 0),
+      (total, server) => total + (server.players ?? 0),
       0,
     );
 
-    return jsonWithRequestId(context, {
-      source: "mta-master",
-      fetchedAt: directory.fetchedAt,
-      playersOnline,
-      servers: directory.servers,
-    }, {
-      headers: {
-        "Cache-Control": "no-store",
+    return jsonWithRequestId(
+      context,
+      {
+        source: "mta-master",
+        fetchedAt: directory.fetchedAt,
+        playersOnline,
+        servers: directory.servers,
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+    );
   } catch (error) {
     logRequestEvent({
       level: "error",
@@ -41,8 +43,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error:
-          "MTA server directory is temporarily unavailable",
+        error: "MTA server directory is temporarily unavailable",
       },
       {
         status: 503,

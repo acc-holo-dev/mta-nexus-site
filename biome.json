@@ -22,9 +22,7 @@
   },
   "overrides": [
     {
-      "includes": [
-        "apps/web/src/app/api/**"
-      ],
+      "includes": ["apps/web/src/app/api/**"],
       "linter": {
         "rules": {
           "suspicious": {

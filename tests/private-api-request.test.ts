@@ -42,12 +42,7 @@ describe("private browser API request policy", () => {
     expect(request.signal?.aborted).toBe(true);
   });
 
-  it.each([0, 249, 60_001, 1.5, Number.NaN])(
-    "rejects invalid timeout %s",
-    (timeoutMs) => {
-      expect(() => privateApiRequest({ timeoutMs })).toThrow(
-        "Invalid private API timeout",
-      );
-    },
-  );
+  it.each([0, 249, 60_001, 1.5, Number.NaN])("rejects invalid timeout %s", (timeoutMs) => {
+    expect(() => privateApiRequest({ timeoutMs })).toThrow("Invalid private API timeout");
+  });
 });

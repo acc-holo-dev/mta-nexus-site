@@ -1,11 +1,7 @@
 import { Buffer } from "node:buffer";
 import { createECDH } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import {
-  getEnvConfig,
-  readMtaMasterMirrorUrls,
-  readWebPushVapidConfig,
-} from "@nexus/config";
+import { getEnvConfig, readMtaMasterMirrorUrls, readWebPushVapidConfig } from "@nexus/config";
 
 function vapidKeyPair() {
   const ecdh = createECDH("prime256v1");
@@ -34,7 +30,7 @@ describe("production configuration", () => {
   });
   it("fails closed when production secrets and providers are missing", () => {
     expect(() => getEnvConfig({ NODE_ENV: "production" })).toThrow(
-      "Invalid configuration parameters"
+      "Invalid configuration parameters",
     );
   });
 
@@ -88,24 +84,25 @@ describe("production configuration", () => {
         STORAGE_PROVIDER: "local",
         STORAGE_LOCAL_PATH: "./uploads",
         EMAIL_PROVIDER: "log",
-      })
+      }),
     ).toThrow("Invalid configuration parameters");
   });
 
   it("fails closed when production resource scanning is disabled", () => {
-    expect(() => getEnvConfig({
-      NODE_ENV: "production",
-      NEXT_PUBLIC_APP_URL: "https://nexus-mta.com",
-      DATABASE_URL: "postgres://nexus:secret@db:5432/nexus",
-      AUTH_SECRET: "a-production-secret-with-at-least-32-characters",
-      STORAGE_PROVIDER: "local",
-      STORAGE_LOCAL_PATH: "/data/uploads",
-      EMAIL_PROVIDER: "disabled",
-      BUILD_SCANNER: "disabled",
-    })).toThrow("Invalid configuration parameters");
+    expect(() =>
+      getEnvConfig({
+        NODE_ENV: "production",
+        NEXT_PUBLIC_APP_URL: "https://nexus-mta.com",
+        DATABASE_URL: "postgres://nexus:secret@db:5432/nexus",
+        AUTH_SECRET: "a-production-secret-with-at-least-32-characters",
+        STORAGE_PROVIDER: "local",
+        STORAGE_LOCAL_PATH: "/data/uploads",
+        EMAIL_PROVIDER: "disabled",
+        BUILD_SCANNER: "disabled",
+      }),
+    ).toThrow("Invalid configuration parameters");
   });
 });
-
 
 describe("Web Push VAPID configuration", () => {
   const pair = vapidKeyPair();
@@ -147,9 +144,7 @@ describe("Web Push VAPID configuration", () => {
     expect(() =>
       readWebPushVapidConfig({
         ...valid,
-        WEB_PUSH_VAPID_PRIVATE_KEY: Buffer.from(
-          new Uint8Array(32),
-        ).toString("base64url"),
+        WEB_PUSH_VAPID_PRIVATE_KEY: Buffer.from(new Uint8Array(32)).toString("base64url"),
       }),
     ).toThrow("Invalid Web Push VAPID configuration");
 
@@ -179,7 +174,6 @@ describe("Web Push VAPID configuration", () => {
   });
 });
 
-
 describe("MTA master mirror configuration", () => {
   it("accepts up to three distinct public HTTPS endpoints", () => {
     expect(
@@ -187,10 +181,7 @@ describe("MTA master mirror configuration", () => {
         MTA_MASTER_MIRROR_URLS:
           "https://mirror-one.example.com/ase/mta/, https://mirror-two.example.net/master",
       }),
-    ).toEqual([
-      "https://mirror-one.example.com/ase/mta/",
-      "https://mirror-two.example.net/master",
-    ]);
+    ).toEqual(["https://mirror-one.example.com/ase/mta/", "https://mirror-two.example.net/master"]);
   });
 
   it.each([
@@ -214,8 +205,7 @@ describe("MTA master mirror configuration", () => {
   it("rejects duplicates and more than three mirrors", () => {
     expect(() =>
       readMtaMasterMirrorUrls({
-        MTA_MASTER_MIRROR_URLS:
-          "https://one.example.com/x, https://one.example.com/x",
+        MTA_MASTER_MIRROR_URLS: "https://one.example.com/x, https://one.example.com/x",
       }),
     ).toThrow("unique");
 
@@ -248,4 +238,3 @@ describe("MTA master mirror configuration", () => {
     ).toThrow("Invalid configuration parameters");
   });
 });
-

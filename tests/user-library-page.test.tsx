@@ -23,7 +23,11 @@ vi.mock("../apps/web/src/lib/i18n-server", () => ({
 vi.mock("next/link", async () => {
   const React = await import("react");
   return {
-    default: ({ href, children, ...props }: {
+    default: ({
+      href,
+      children,
+      ...props
+    }: {
       href: string;
       children: ReactNode;
       [key: string]: unknown;
@@ -33,22 +37,34 @@ vi.mock("next/link", async () => {
 vi.mock("../apps/web/src/components/resource-download-button", async () => {
   const React = await import("react");
   return {
-    ResourceDownloadButton: ({ productId, version, buildId }: {
+    ResourceDownloadButton: ({
+      productId,
+      version,
+      buildId,
+    }: {
       productId: string;
       version: string;
       buildId?: string;
-    }) => React.createElement("button", {
-      "data-testid": "safe-download", "data-product": productId,
-      "data-version": version, "data-build": buildId,
-    }, "Download"),
+    }) =>
+      React.createElement(
+        "button",
+        {
+          "data-testid": "safe-download",
+          "data-product": productId,
+          "data-version": version,
+          "data-build": buildId,
+        },
+        "Download",
+      ),
   };
 });
 
 import LibraryPage, { metadata } from "../apps/web/src/app/workspace/library/page";
 
 const now = new Date("2026-10-09T00:00:00.000Z");
-const pageProps = (query: { page?: string | string[]; filter?: string | string[] } = {}) =>
-  ({ searchParams: Promise.resolve(query) });
+const pageProps = (query: { page?: string | string[]; filter?: string | string[] } = {}) => ({
+  searchParams: Promise.resolve(query),
+});
 
 describe("private resource library", () => {
   beforeEach(() => {
@@ -56,13 +72,28 @@ describe("private resource library", () => {
     state.locale = "en";
     state.page.mockReset().mockResolvedValue({
       items: [
-        { resourceId: "prd_public", title: "<Resource A>", slug: "resource-a",
-          version: "1.2.0", addedAt: now, downloadable: true },
-        { resourceId: "prd_private", title: "SECRET DRAFT", slug: "secret-url",
-          version: "2.0.0", addedAt: now, downloadable: false },
+        {
+          resourceId: "prd_public",
+          title: "<Resource A>",
+          slug: "resource-a",
+          version: "1.2.0",
+          addedAt: now,
+          downloadable: true,
+        },
+        {
+          resourceId: "prd_private",
+          title: "SECRET DRAFT",
+          slug: "secret-url",
+          version: "2.0.0",
+          addedAt: now,
+          downloadable: false,
+        },
       ],
       counts: { all: 2, ready: 1, unavailable: 1 },
-      total: 2, page: 1, pageSize: 12, totalPages: 1,
+      total: 2,
+      page: 1,
+      pageSize: 12,
+      totalPages: 1,
     });
   });
 
@@ -74,27 +105,53 @@ describe("private resource library", () => {
     expect(state.page).not.toHaveBeenCalled();
   });
 
-  it.each(["en", "ru"] as const)("renders localized safe rights and hides private product details in %s", async locale => {
-    state.locale = locale;
-    const html = renderToStaticMarkup(await LibraryPage(pageProps()));
-    expect(state.page).toHaveBeenCalledWith("usr_player", 1, "all");
-    expect(html).toContain("&lt;Resource A&gt;");
-    expect(html).toContain("data-product=\"prd_public\"");
-    expect(html).not.toContain("data-product=\"prd_private\"");
-    expect(html).not.toContain("SECRET DRAFT");
-    expect(html).not.toContain("secret-url");
-    expect(html).not.toContain("href=\"/market/secret-url\"");
-    expect(html).toContain(locale === "ru" ? "Библиотека ресурсов" : "Resource library");
-    expect(html).toContain("/workspace/library?filter=ready");
-    expect(html).toContain("/market/resource-a/versions");
-    expect(html).not.toContain("/market/secret-url/versions");
-  });
+  it.each(["en", "ru"] as const)(
+    "renders localized safe rights and hides private product details in %s",
+    async (locale) => {
+      state.locale = locale;
+      const html = renderToStaticMarkup(await LibraryPage(pageProps()));
+      expect(state.page).toHaveBeenCalledWith("usr_player", 1, "all");
+      expect(html).toContain("&lt;Resource A&gt;");
+      expect(html).toContain('data-product="prd_public"');
+      expect(html).not.toContain('data-product="prd_private"');
+      expect(html).not.toContain("SECRET DRAFT");
+      expect(html).not.toContain("secret-url");
+      expect(html).not.toContain('href="/market/secret-url"');
+      expect(html).toContain(locale === "ru" ? "Библиотека ресурсов" : "Resource library");
+      expect(html).toContain("/workspace/library?filter=ready");
+      expect(html).toContain("/market/resource-a/versions");
+      expect(html).not.toContain("/market/secret-url/versions");
+    },
+  );
 
   it("honors fixed download selections and keeps withdrawn selections manageable", async () => {
     state.page.mockResolvedValueOnce({
-      items: [{ resourceId: "prd_fixed", title: "Fixed release", slug: "fixed", version: "1.0.0", buildId: "bld_fixed", selectionMode: "fixed", addedAt: now, downloadable: true },
-        { resourceId: "prd_withdrawn", title: null, slug: null, version: null, buildId: null, selectionMode: "fixed", addedAt: now, downloadable: false }],
-      counts: { all: 2, ready: 1, unavailable: 1 }, total: 2, page: 1, totalPages: 1,
+      items: [
+        {
+          resourceId: "prd_fixed",
+          title: "Fixed release",
+          slug: "fixed",
+          version: "1.0.0",
+          buildId: "bld_fixed",
+          selectionMode: "fixed",
+          addedAt: now,
+          downloadable: true,
+        },
+        {
+          resourceId: "prd_withdrawn",
+          title: null,
+          slug: null,
+          version: null,
+          buildId: null,
+          selectionMode: "fixed",
+          addedAt: now,
+          downloadable: false,
+        },
+      ],
+      counts: { all: 2, ready: 1, unavailable: 1 },
+      total: 2,
+      page: 1,
+      totalPages: 1,
     });
     const html = renderToStaticMarkup(await LibraryPage(pageProps()));
     expect(html).toContain('data-build="bld_fixed"');
@@ -107,11 +164,12 @@ describe("private resource library", () => {
     state.page.mockResolvedValueOnce({
       items: [],
       counts: { all: 30, ready: 28, unavailable: 2 },
-      total: 28, page: 2, pageSize: 12, totalPages: 3,
+      total: 28,
+      page: 2,
+      pageSize: 12,
+      totalPages: 3,
     });
-    const html = renderToStaticMarkup(
-      await LibraryPage(pageProps({ filter: "ready", page: "2" })),
-    );
+    const html = renderToStaticMarkup(await LibraryPage(pageProps({ filter: "ready", page: "2" })));
     expect(state.page).toHaveBeenCalledWith("usr_player", 2, "ready");
     expect(html).toContain("filter=ready&amp;page=3");
     expect(html).toContain('href="/workspace/library?filter=ready"');
@@ -121,8 +179,12 @@ describe("private resource library", () => {
 
   it("distinguishes empty library from empty filtered view and keeps the route private", async () => {
     state.page.mockResolvedValueOnce({
-      items: [], counts: { all: 0, ready: 0, unavailable: 0 },
-      total: 0, page: 1, pageSize: 12, totalPages: 1,
+      items: [],
+      counts: { all: 0, ready: 0, unavailable: 0 },
+      total: 0,
+      page: 1,
+      pageSize: 12,
+      totalPages: 1,
     });
     const html = renderToStaticMarkup(await LibraryPage(pageProps()));
     expect(html).toContain("Your resource library is empty.");

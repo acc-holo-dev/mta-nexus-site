@@ -1,7 +1,9 @@
 import type { MetaInspectionIssue } from "./mta-meta-inspector";
 import type { getDictionary } from "./i18n";
 
-type StructuralIssueMessages = ReturnType<typeof getDictionary>["metaInspector"]["structuralIssues"];
+type StructuralIssueMessages = ReturnType<
+  typeof getDictionary
+>["metaInspector"]["structuralIssues"];
 
 const issueMessageKeys: Readonly<Record<string, keyof StructuralIssueMessages>> = {
   UNCLOSED_COMMENT: "unclosedComment",

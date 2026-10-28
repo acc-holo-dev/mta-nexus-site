@@ -12,7 +12,10 @@ class Visibility extends EventTarget {
 function deferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (error: unknown) => void;
-  const promise = new Promise<T>((done, fail) => { resolve = done; reject = fail; });
+  const promise = new Promise<T>((done, fail) => {
+    resolve = done;
+    reject = fail;
+  });
   return { promise, resolve, reject };
 }
 
@@ -69,7 +72,10 @@ describe("visible request polling", () => {
     const old = deferred<string>();
     const fresh = deferred<string>();
     const signals: AbortSignal[] = [];
-    const read = vi.fn((signal: AbortSignal) => { signals.push(signal); return signals.length === 1 ? old.promise : fresh.promise; });
+    const read = vi.fn((signal: AbortSignal) => {
+      signals.push(signal);
+      return signals.length === 1 ? old.promise : fresh.promise;
+    });
     const { visibility, onValue, onError } = poll(read);
     visibility.change("hidden");
     expect(signals[0].aborted).toBe(true);
@@ -97,7 +103,10 @@ describe("visible request polling", () => {
   it("stops requests, timers and listeners on cleanup without surfacing abort failures", async () => {
     const pending = deferred<string>();
     let signal!: AbortSignal;
-    const read = vi.fn((value: AbortSignal) => { signal = value; return pending.promise; });
+    const read = vi.fn((value: AbortSignal) => {
+      signal = value;
+      return pending.promise;
+    });
     const { stop, visibility, onValue, onError } = poll(read);
     stop();
     stop();
@@ -122,9 +131,20 @@ describe("visible request polling", () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
-  it.each([0, -1, 1.5, Number.NaN, 2_147_483_648])("rejects unsafe timer interval %s before starting", intervalMs => {
-    const read = vi.fn(async () => "value");
-    expect(() => startVisiblePolling({ read, onValue: vi.fn(), onError: vi.fn(), visibility: new Visibility(), intervalMs })).toThrow("Invalid polling interval");
-    expect(read).not.toHaveBeenCalled();
-  });
+  it.each([0, -1, 1.5, Number.NaN, 2_147_483_648])(
+    "rejects unsafe timer interval %s before starting",
+    (intervalMs) => {
+      const read = vi.fn(async () => "value");
+      expect(() =>
+        startVisiblePolling({
+          read,
+          onValue: vi.fn(),
+          onError: vi.fn(),
+          visibility: new Visibility(),
+          intervalMs,
+        }),
+      ).toThrow("Invalid polling interval");
+      expect(read).not.toHaveBeenCalled();
+    },
+  );
 });

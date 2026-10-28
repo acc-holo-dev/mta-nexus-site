@@ -6,8 +6,10 @@ vi.mock("@nexus/db", () => ({
   serverRepository: { listObservableAfter: sources.known },
   serverObservationRepository: { record: sources.record },
 }));
-vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async importOriginal => ({
-  ...await importOriginal<typeof import("../apps/web/src/lib/services/mta-master-directory-service")>(),
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", async (importOriginal) => ({
+  ...(await importOriginal<
+    typeof import("../apps/web/src/lib/services/mta-master-directory-service")
+  >()),
   mtaMasterDirectoryService: { getDirectory: sources.directory },
 }));
 import { captureKnownServerObservations } from "../apps/web/src/lib/services/server-observation-collector";
@@ -15,17 +17,23 @@ import { captureKnownServerObservations } from "../apps/web/src/lib/services/ser
 function deferred<T>() {
   let resolve!: (value: T) => void;
   let reject!: (error: unknown) => void;
-  const promise = new Promise<T>((done, fail) => { resolve = done; reject = fail; });
+  const promise = new Promise<T>((done, fail) => {
+    resolve = done;
+    reject = fail;
+  });
   return { promise, resolve, reject };
 }
 function fixture(count: number) {
   const known = Array.from({ length: count }, (_, index) => ({
-    id: `srv_${String(index).padStart(5, "0")}`, ipAddress: `server-${index}.test`, port: 22003,
+    id: `srv_${String(index).padStart(5, "0")}`,
+    ipAddress: `server-${index}.test`,
+    port: 22003,
     endpointRevision: 0,
   }));
   const directory = {
-    fetchedAt: "2026-10-09T00:00:00.000Z", isStale: false,
-    servers: known.map(server => ({ address: server.ipAddress, port: server.port, players: 0 })),
+    fetchedAt: "2026-10-09T00:00:00.000Z",
+    isStale: false,
+    servers: known.map((server) => ({ address: server.ipAddress, port: server.port, players: 0 })),
   };
   sources.known.mockResolvedValue(known);
   sources.directory.mockResolvedValue(directory);
@@ -69,7 +77,7 @@ describe("bounded observation capture", () => {
     sources.record.mockImplementation(async (input: RecordServerObservationInput) => {
       active++;
       peak = Math.max(peak, active);
-      await new Promise(resolve => setTimeout(resolve, 1));
+      await new Promise((resolve) => setTimeout(resolve, 1));
       active--;
       return input;
     });
@@ -78,9 +86,16 @@ describe("bounded observation capture", () => {
       await vi.advanceTimersByTimeAsync(0);
       const initialWrites = sources.record.mock.calls.length;
       await vi.runAllTimersAsync();
-      expect(await capture).toMatchObject({ knownServers: 500, matchedServers: 500, recordAttempts: 500 });
+      expect(await capture).toMatchObject({
+        knownServers: 500,
+        matchedServers: 500,
+        recordAttempts: 500,
+      });
       expect({ initialWrites, peak, active, elapsed: Date.now() }).toEqual({
-        initialWrites: 5, peak: 5, active: 0, elapsed: 100,
+        initialWrites: 5,
+        peak: 5,
+        active: 0,
+        elapsed: 100,
       });
       expect(new Set(sources.record.mock.calls.map(([input]) => input.serverId)).size).toBe(500);
       for (const [input, endpoint] of sources.record.mock.calls) {
@@ -97,34 +112,43 @@ describe("bounded observation capture", () => {
     }
   });
 
-  it.each(["rejection", "synchronous throw"])("drains the active batch after a %s and skips later batches", async failureMode => {
-    fixture(12);
-    const writes = Array.from({ length: 5 }, () => deferred<unknown>());
-    const failure = new Error("Observation write failed");
-    sources.record.mockImplementation((input: RecordServerObservationInput) => {
-      const index = sources.record.mock.calls.length - 1;
-      if (index === 0 && failureMode === "synchronous throw") throw failure;
-      return writes[index]?.promise ?? Promise.resolve(input);
-    });
-    let settled = false;
-    const outcome = captureKnownServerObservations().then(
-      () => { settled = true; return null; },
-      error => { settled = true; return error; },
-    );
-    try {
-      await vi.waitFor(() => expect(sources.record).toHaveBeenCalledTimes(5));
-      if (failureMode === "rejection") writes[0].reject(failure);
-      await Promise.resolve();
-      await Promise.resolve();
-      expect(settled).toBe(false);
-      for (const write of writes.slice(1)) write.resolve(undefined);
-      expect(await outcome).toBe(failure);
-      expect(sources.record).toHaveBeenCalledTimes(5);
-    } finally {
-      for (const write of writes) write.resolve(undefined);
-      await outcome;
-    }
-  });
+  it.each(["rejection", "synchronous throw"])(
+    "drains the active batch after a %s and skips later batches",
+    async (failureMode) => {
+      fixture(12);
+      const writes = Array.from({ length: 5 }, () => deferred<unknown>());
+      const failure = new Error("Observation write failed");
+      sources.record.mockImplementation((input: RecordServerObservationInput) => {
+        const index = sources.record.mock.calls.length - 1;
+        if (index === 0 && failureMode === "synchronous throw") throw failure;
+        return writes[index]?.promise ?? Promise.resolve(input);
+      });
+      let settled = false;
+      const outcome = captureKnownServerObservations().then(
+        () => {
+          settled = true;
+          return null;
+        },
+        (error) => {
+          settled = true;
+          return error;
+        },
+      );
+      try {
+        await vi.waitFor(() => expect(sources.record).toHaveBeenCalledTimes(5));
+        if (failureMode === "rejection") writes[0].reject(failure);
+        await Promise.resolve();
+        await Promise.resolve();
+        expect(settled).toBe(false);
+        for (const write of writes.slice(1)) write.resolve(undefined);
+        expect(await outcome).toBe(failure);
+        expect(sources.record).toHaveBeenCalledTimes(5);
+      } finally {
+        for (const write of writes) write.resolve(undefined);
+        await outcome;
+      }
+    },
+  );
 
   it("drains a pending input read before reporting a directory failure", async () => {
     const data = fixture(2);
@@ -133,7 +157,10 @@ describe("bounded observation capture", () => {
     sources.known.mockReturnValueOnce(known.promise);
     sources.directory.mockRejectedValueOnce(failure);
     let settled = false;
-    const outcome = captureKnownServerObservations().catch(error => { settled = true; return error; });
+    const outcome = captureKnownServerObservations().catch((error) => {
+      settled = true;
+      return error;
+    });
     try {
       await vi.waitFor(() => expect(sources.known).toHaveBeenCalledOnce());
       await Promise.resolve();
@@ -162,25 +189,43 @@ describe("bounded observation capture", () => {
   });
 
   it("keeps missing endpoints unrecorded and retains stale-source diagnostics", async () => {
-    sources.directory.mockResolvedValue({ fetchedAt: "2026-10-09T00:00:00.000Z", isStale: true, servers: [] });
+    sources.directory.mockResolvedValue({
+      fetchedAt: "2026-10-09T00:00:00.000Z",
+      isStale: true,
+      servers: [],
+    });
     expect(await captureKnownServerObservations()).toMatchObject({
-      sourceWasStale: true, matchedServers: 0, notListedServers: 2,
-      recordAttempts: 0, absenceMeansOffline: false,
+      sourceWasStale: true,
+      matchedServers: 0,
+      notListedServers: 2,
+      recordAttempts: 0,
+      absenceMeansOffline: false,
     });
     expect(sources.record).not.toHaveBeenCalled();
   });
 
-  it.each([[NaN, 500], [Infinity, 500], [-3, 1], [1.8, 1], [1000, 500]])("bounds requested limit %s to %s", async (limit, expected) => {
+  it.each([
+    [NaN, 500],
+    [Infinity, 500],
+    [-3, 1],
+    [1.8, 1],
+    [1000, 500],
+  ])("bounds requested limit %s to %s", async (limit, expected) => {
     fixture(501);
     const result = await captureKnownServerObservations({ limit });
     expect(sources.known).toHaveBeenCalledWith(expected + 1, undefined);
-    expect(result).toMatchObject({ knownServers: expected, knownServerLimit: expected, knownServerLimitReached: true, recordAttempts: expected });
+    expect(result).toMatchObject({
+      knownServers: expected,
+      knownServerLimit: expected,
+      knownServerLimitReached: true,
+      recordAttempts: expected,
+    });
     expect(sources.record).toHaveBeenCalledTimes(expected);
   });
   it("covers a large listing in bounded ID-keyset pages with one master snapshot", async () => {
     const { known } = fixture(23);
     sources.known.mockImplementation(async (limit: number, afterId?: string) => {
-      return known.filter(server => !afterId || server.id > afterId).slice(0, limit);
+      return known.filter((server) => !afterId || server.id > afterId).slice(0, limit);
     });
     const result = await captureKnownServerObservations({ limit: 10, maxPages: 3 });
     expect(result).toMatchObject({
@@ -194,7 +239,9 @@ describe("bounded observation capture", () => {
     });
     expect(sources.directory).toHaveBeenCalledTimes(1);
     expect(sources.known.mock.calls).toEqual([
-      [11, undefined], [11, "srv_00009"], [11, "srv_00019"],
+      [11, undefined],
+      [11, "srv_00009"],
+      [11, "srv_00019"],
     ]);
     expect(new Set(sources.record.mock.calls.map(([input]) => input.serverId)).size).toBe(23);
   });
@@ -202,31 +249,40 @@ describe("bounded observation capture", () => {
   it("exposes a resumable cursor when bounded after one page", async () => {
     const { known } = fixture(23);
     sources.known.mockImplementation(async (limit: number, afterId?: string) =>
-      known.filter(server => !afterId || server.id > afterId).slice(0, limit),
+      known.filter((server) => !afterId || server.id > afterId).slice(0, limit),
     );
     const first = await captureKnownServerObservations({ limit: 10 });
     expect(first).toMatchObject({
-      pagesProcessed: 1, knownServers: 10,
-      knownServerLimitReached: true, nextCursor: "srv_00009",
+      pagesProcessed: 1,
+      knownServers: 10,
+      knownServerLimitReached: true,
+      nextCursor: "srv_00009",
     });
     sources.record.mockClear();
     const second = await captureKnownServerObservations({
-      limit: 10, maxPages: 2, afterId: first.nextCursor ?? undefined,
+      limit: 10,
+      maxPages: 2,
+      afterId: first.nextCursor ?? undefined,
     });
     expect(second).toMatchObject({
-      pagesProcessed: 2, knownServers: 13,
-      knownServerLimitReached: false, nextCursor: null,
+      pagesProcessed: 2,
+      knownServers: 13,
+      knownServerLimitReached: false,
+      nextCursor: null,
     });
-    expect([...new Set(sources.record.mock.calls.map(([input]) => input.serverId))])
-      .not.toContain("srv_00000");
+    expect([...new Set(sources.record.mock.calls.map(([input]) => input.serverId))]).not.toContain(
+      "srv_00000",
+    );
   });
 
   it("keeps snapshot identity distinct for servers with different endpoint revisions", async () => {
     const { known } = fixture(3);
-    sources.known.mockResolvedValue(known.map((row, index) => ({
-      ...row,
-      endpointRevision: index,
-    })));
+    sources.known.mockResolvedValue(
+      known.map((row, index) => ({
+        ...row,
+        endpointRevision: index,
+      })),
+    );
     const result = await captureKnownServerObservations();
     expect(result).toMatchObject({ recordAttempts: 3, matchedServers: 3 });
     expect(sources.record.mock.calls.map(([observation]) => observation.sourceSequence)).toEqual([
@@ -234,8 +290,9 @@ describe("bounded observation capture", () => {
       "2026-10-09T00:00:00.000Z#endpoint-revision=1",
       "2026-10-09T00:00:00.000Z#endpoint-revision=2",
     ]);
-    expect(sources.record.mock.calls.map(([, endpoint]) => endpoint?.endpointRevision))
-      .toEqual([0, 1, 2]);
+    expect(sources.record.mock.calls.map(([, endpoint]) => endpoint?.endpointRevision)).toEqual([
+      0, 1, 2,
+    ]);
   });
 
   it("counts skipped old-endpoint captures without treating them as persisted rows", async () => {
@@ -254,7 +311,7 @@ describe("bounded observation capture", () => {
     const { known, directory } = fixture(13);
     sources.directory.mockResolvedValue({ ...directory, isStale: true });
     sources.known.mockImplementation(async (limit: number, afterId?: string) =>
-      known.filter(server => !afterId || server.id > afterId).slice(0, limit),
+      known.filter((server) => !afterId || server.id > afterId).slice(0, limit),
     );
     const checkpoints: string[] = [];
     const result = await captureKnownServerObservations({
@@ -291,32 +348,55 @@ describe("bounded observation capture", () => {
   it("publishes a safe resume checkpoint after each fully committed page", async () => {
     const { known } = fixture(12);
     sources.known.mockImplementation(async (limit: number, afterId?: string) =>
-      known.filter(server => !afterId || server.id > afterId).slice(0, limit),
+      known.filter((server) => !afterId || server.id > afterId).slice(0, limit),
     );
     const checkpoints: Array<{
-      afterId: string; pagesProcessed: number; knownServers: number;
-      recordAttempts: number; hasMore: boolean;
+      afterId: string;
+      pagesProcessed: number;
+      knownServers: number;
+      recordAttempts: number;
+      hasMore: boolean;
     }> = [];
     const result = await captureKnownServerObservations({
       limit: 5,
       maxPages: 3,
-      onPageCompleted: checkpoint => checkpoints.push(checkpoint),
+      onPageCompleted: (checkpoint) => checkpoints.push(checkpoint),
     });
     expect(result).toMatchObject({
-      knownServers: 12, pagesProcessed: 3,
-      recordAttempts: 12, nextCursor: null,
+      knownServers: 12,
+      pagesProcessed: 3,
+      recordAttempts: 12,
+      nextCursor: null,
     });
     expect(checkpoints).toMatchObject([
-      { afterId: "srv_00004", pagesProcessed: 1, knownServers: 5, recordAttempts: 5, hasMore: true },
-      { afterId: "srv_00009", pagesProcessed: 2, knownServers: 10, recordAttempts: 10, hasMore: true },
-      { afterId: "srv_00011", pagesProcessed: 3, knownServers: 12, recordAttempts: 12, hasMore: false },
+      {
+        afterId: "srv_00004",
+        pagesProcessed: 1,
+        knownServers: 5,
+        recordAttempts: 5,
+        hasMore: true,
+      },
+      {
+        afterId: "srv_00009",
+        pagesProcessed: 2,
+        knownServers: 10,
+        recordAttempts: 10,
+        hasMore: true,
+      },
+      {
+        afterId: "srv_00011",
+        pagesProcessed: 3,
+        knownServers: 12,
+        recordAttempts: 12,
+        hasMore: false,
+      },
     ]);
   });
 
   it("does not checkpoint an incomplete page when any write fails", async () => {
     const { known } = fixture(12);
     sources.known.mockImplementation(async (limit: number, afterId?: string) =>
-      known.filter(server => !afterId || server.id > afterId).slice(0, limit),
+      known.filter((server) => !afterId || server.id > afterId).slice(0, limit),
     );
     const checkpoints: string[] = [];
     const failure = new Error("Database write rejected");
@@ -324,11 +404,13 @@ describe("bounded observation capture", () => {
       if (input.serverId === "srv_00006") throw failure;
       return input;
     });
-    await expect(captureKnownServerObservations({
-      limit: 5,
-      maxPages: 3,
-      onPageCompleted: checkpoint => checkpoints.push(checkpoint.afterId),
-    })).rejects.toBe(failure);
+    await expect(
+      captureKnownServerObservations({
+        limit: 5,
+        maxPages: 3,
+        onPageCompleted: (checkpoint) => checkpoints.push(checkpoint.afterId),
+      }),
+    ).rejects.toBe(failure);
     expect(checkpoints).toEqual(["srv_00004"]);
     expect(sources.known).toHaveBeenCalledTimes(2);
     expect(sources.record).toHaveBeenCalledTimes(10);
@@ -337,25 +419,30 @@ describe("bounded observation capture", () => {
   it("keeps the completed checkpoint when loading a later page fails", async () => {
     const { known } = fixture(8);
     const failure = new Error("Next page query failed");
-    sources.known.mockResolvedValueOnce(known.slice(0, 6))
-      .mockRejectedValueOnce(failure);
+    sources.known.mockResolvedValueOnce(known.slice(0, 6)).mockRejectedValueOnce(failure);
     const checkpoints: string[] = [];
-    await expect(captureKnownServerObservations({
-      limit: 5,
-      maxPages: 3,
-      onPageCompleted: checkpoint => checkpoints.push(checkpoint.afterId),
-    })).rejects.toBe(failure);
+    await expect(
+      captureKnownServerObservations({
+        limit: 5,
+        maxPages: 3,
+        onPageCompleted: (checkpoint) => checkpoints.push(checkpoint.afterId),
+      }),
+    ).rejects.toBe(failure);
     expect(checkpoints).toEqual(["srv_00004"]);
     expect(sources.record).toHaveBeenCalledTimes(5);
   });
 
   it("stops safely if the repository returns a repeated or unordered page", async () => {
     const { known } = fixture(15);
-    sources.known.mockResolvedValueOnce(known.slice(0, 11))
+    sources.known
+      .mockResolvedValueOnce(known.slice(0, 11))
       .mockResolvedValueOnce(known.slice(0, 11));
-    await expect(captureKnownServerObservations({
-      limit: 10, maxPages: 2,
-    })).rejects.toThrow("Observation page is not strictly ordered");
+    await expect(
+      captureKnownServerObservations({
+        limit: 10,
+        maxPages: 2,
+      }),
+    ).rejects.toThrow("Observation page is not strictly ordered");
     expect(sources.known).toHaveBeenCalledTimes(2);
     expect(sources.record).toHaveBeenCalledTimes(10);
   });
@@ -363,7 +450,7 @@ describe("bounded observation capture", () => {
   it("limits pages to 20 and fails before reads on invalid cursors", async () => {
     const { known } = fixture(4);
     sources.known.mockImplementation(async (limit: number, afterId?: string) =>
-      known.filter(server => !afterId || server.id > afterId).slice(0, limit),
+      known.filter((server) => !afterId || server.id > afterId).slice(0, limit),
     );
     const capture = await captureKnownServerObservations({ limit: 2, maxPages: Infinity });
     expect(capture.pagesProcessed).toBe(1);
@@ -371,9 +458,11 @@ describe("bounded observation capture", () => {
     for (const invalid of ["", "x".repeat(129)]) {
       sources.directory.mockClear();
       sources.known.mockClear();
-      await expect(captureKnownServerObservations({
-        afterId: invalid,
-      })).rejects.toThrow("Invalid observation capture cursor");
+      await expect(
+        captureKnownServerObservations({
+          afterId: invalid,
+        }),
+      ).rejects.toThrow("Invalid observation capture cursor");
       expect(sources.directory).not.toHaveBeenCalled();
       expect(sources.known).not.toHaveBeenCalled();
     }

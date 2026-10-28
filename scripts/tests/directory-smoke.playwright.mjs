@@ -11,9 +11,7 @@ assert.equal(
   "Only the disposable CI site may be tested",
 );
 
-const require = createRequire(
-  join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"),
-);
+const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { test, expect } = require("@playwright/test");
 
 const routePattern = "**/api/servers/directory?*";
@@ -78,20 +76,18 @@ test("J1 native-runner smoke: honest counts, freshness and connection actions", 
   const response = await page.goto("/servers");
   expect(response?.status()).toBe(200);
 
-  await expect(
-    page.getByRole("heading", { name: "Multi Theft Auto servers" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Multi Theft Auto servers" })).toBeVisible();
 
   const directory = page.getByRole("region", { name: "Server directory" });
-  await expect(
-    page.getByRole("article", { name: "Nexus Drift" }),
-  ).toContainText("12 players / 100 slots");
-  await expect(
-    page.getByRole("article", { name: "Unknown Population" }),
-  ).toContainText("Player count unknown");
-  await expect(
-    page.getByRole("article", { name: "Empty But Known" }),
-  ).toContainText("0 players / 32 slots");
+  await expect(page.getByRole("article", { name: "Nexus Drift" })).toContainText(
+    "12 players / 100 slots",
+  );
+  await expect(page.getByRole("article", { name: "Unknown Population" })).toContainText(
+    "Player count unknown",
+  );
+  await expect(page.getByRole("article", { name: "Empty But Known" })).toContainText(
+    "0 players / 32 slots",
+  );
   await expect(directory).toContainText("Updates are delayed");
   await expect(directory.locator("time")).toHaveAttribute("datetime", fetchedAt);
   await expect(
@@ -107,12 +103,6 @@ test("J1 native-runner smoke: honest counts, freshness and connection actions", 
     }),
   ).toHaveValue("192.0.2.1:22003");
 
-  await expect(
-    page.locator("[data-nextjs-dialog], .vite-error-overlay"),
-  ).toHaveCount(0);
-  assert.deepEqual(
-    browserErrors,
-    [],
-    "Unexpected JavaScript, hydration or console errors",
-  );
+  await expect(page.locator("[data-nextjs-dialog], .vite-error-overlay")).toHaveCount(0);
+  assert.deepEqual(browserErrors, [], "Unexpected JavaScript, hydration or console errors");
 });

@@ -96,12 +96,9 @@ describe("server follower publication notification integration", () => {
       skipped: false,
     });
 
-    const enabledNotifications =
-      await notificationRepository.listByUser(enabledId, 10);
-    const disabledNotifications =
-      await notificationRepository.listByUser(disabledId, 10);
-    const authorNotifications =
-      await notificationRepository.listByUser(authorId, 10);
+    const enabledNotifications = await notificationRepository.listByUser(enabledId, 10);
+    const disabledNotifications = await notificationRepository.listByUser(disabledId, 10);
+    const authorNotifications = await notificationRepository.listByUser(authorId, 10);
 
     expect(enabledNotifications).toHaveLength(1);
     expect(enabledNotifications[0]).toMatchObject({

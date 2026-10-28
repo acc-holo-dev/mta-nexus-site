@@ -14,19 +14,13 @@ export type NotificationPreferences = {
   systemEnabled: boolean;
 };
 
-export function parseNotificationPreferences(
-  value: unknown,
-): NotificationPreferences | null {
+export function parseNotificationPreferences(value: unknown): NotificationPreferences | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return null;
   }
 
   const record = value as Record<string, unknown>;
-  if (
-    !notificationPreferenceKeys.every(
-      (key) => typeof record[key] === "boolean",
-    )
-  ) {
+  if (!notificationPreferenceKeys.every((key) => typeof record[key] === "boolean")) {
     return null;
   }
 
@@ -39,9 +33,7 @@ export function parseNotificationPreferences(
   };
 }
 
-export function confirmedNotificationPreferences(
-  value: unknown,
-): NotificationPreferences | null {
+export function confirmedNotificationPreferences(value: unknown): NotificationPreferences | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return null;
   }

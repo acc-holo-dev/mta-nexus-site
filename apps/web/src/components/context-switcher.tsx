@@ -45,9 +45,7 @@ export function ContextSwitcher() {
         if (cancelled) return;
         setContexts(Array.isArray(data.contexts) ? data.contexts : []);
         setActiveContextId(
-          typeof data.activeContextId === "string"
-            ? data.activeContextId
-            : "personal",
+          typeof data.activeContextId === "string" ? data.activeContextId : "personal",
         );
       })
       .catch(() => {
@@ -107,27 +105,29 @@ export function ContextSwitcher() {
         <p className="mt-1 text-xs text-muted">{copy.description}</p>
       </div>
 
-      {contexts.length > 1 && <label className="block space-y-1.5">
-        <span className="text-xs text-muted">{copy.label}</span>
-        <select
-          value={activeContextId}
-          onChange={(event) => void switchContext(event.target.value)}
-          disabled={saving}
-          className="h-10 w-full rounded-md border border-base bg-inset px-3 text-sm text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] disabled:opacity-60"
-        >
-          {contexts.map((context) => (
-            <option key={context.id} value={context.id}>
-              {context.type === "personal"
-                ? context.name
-                : `${context.name} (${context.role})`}
-            </option>
-          ))}
-        </select>
-      </label>}
+      {contexts.length > 1 && (
+        <label className="block space-y-1.5">
+          <span className="text-xs text-muted">{copy.label}</span>
+          <select
+            value={activeContextId}
+            onChange={(event) => void switchContext(event.target.value)}
+            disabled={saving}
+            className="h-10 w-full rounded-md border border-base bg-inset px-3 text-sm text-primary outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--nexus-accent)] disabled:opacity-60"
+          >
+            {contexts.map((context) => (
+              <option key={context.id} value={context.id}>
+                {context.type === "personal" ? context.name : `${context.name} (${context.role})`}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       {error && (
         <div className="flex flex-wrap items-center gap-3">
-          <p role="alert" className="text-xs text-danger">{error}</p>
+          <p role="alert" className="text-xs text-danger">
+            {error}
+          </p>
           <button
             type="button"
             onClick={() => setReload((value) => value + 1)}
@@ -143,4 +143,3 @@ export function ContextSwitcher() {
     </section>
   );
 }
-

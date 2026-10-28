@@ -17,10 +17,7 @@ export function authorDetailsMutationRequest(
   });
 }
 
-export function authorBuildUploadRequest(
-  body: FormData,
-  signal: AbortSignal,
-): RequestInit {
+export function authorBuildUploadRequest(body: FormData, signal: AbortSignal): RequestInit {
   return privateRequest({
     method: "POST",
     body,

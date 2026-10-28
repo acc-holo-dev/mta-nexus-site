@@ -14,15 +14,22 @@ export function rejectUnsafeBrowserRequest(request: NextRequest) {
     status: decision.status,
     fields: { reason: decision.code },
   });
-  return jsonWithRequestId(context, {
-    error: decision.status === 503 ? "Request security configuration unavailable" : "Request origin is not allowed",
-    code: decision.code,
-  }, {
-    status: decision.status,
-    headers: {
-      "Cache-Control": "private, no-store",
-      Vary: "Cookie, Origin, Referer, Sec-Fetch-Site",
-      "X-Content-Type-Options": "nosniff",
+  return jsonWithRequestId(
+    context,
+    {
+      error:
+        decision.status === 503
+          ? "Request security configuration unavailable"
+          : "Request origin is not allowed",
+      code: decision.code,
     },
-  });
+    {
+      status: decision.status,
+      headers: {
+        "Cache-Control": "private, no-store",
+        Vary: "Cookie, Origin, Referer, Sec-Fetch-Site",
+        "X-Content-Type-Options": "nosniff",
+      },
+    },
+  );
 }

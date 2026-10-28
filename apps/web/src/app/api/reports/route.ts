@@ -11,12 +11,20 @@ import { createReportSchema } from "@nexus/validation";
 import { generateId, can, consumeRateLimit } from "@nexus/security";
 
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
-import { createRequestLogContext, jsonWithRequestId, logRequestEvent } from "../../../lib/observability";
+import {
+  createRequestLogContext,
+  jsonWithRequestId,
+  logRequestEvent,
+} from "../../../lib/observability";
 import { dispatchNotificationsBestEffort } from "../../../lib/services/notification-dispatch-service";
 
 const privateHeaders = { "Cache-Control": "private, no-store", Vary: "Cookie" };
 
-function privateJson(context: Parameters<typeof jsonWithRequestId>[0], body: unknown, init: ResponseInit = {}) {
+function privateJson(
+  context: Parameters<typeof jsonWithRequestId>[0],
+  body: unknown,
+  init: ResponseInit = {},
+) {
   const headers = new Headers(init.headers);
   headers.set("Cache-Control", privateHeaders["Cache-Control"]);
   headers.set("Vary", privateHeaders.Vary);
@@ -60,15 +68,20 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return privateJson(context, { error: "Authentication required to submit report" }, { status: 401 });
+      return privateJson(
+        context,
+        { error: "Authentication required to submit report" },
+        { status: 401 },
+      );
     }
 
     // Abuse protection: limit report spam per user
     const rl = await consumeRateLimit("report", user.id);
     if (!rl.success) {
-      return privateJson(context, 
+      return privateJson(
+        context,
         { error: "Too many reports submitted. Please try again later." },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -76,9 +89,10 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const parsed = createReportSchema.safeParse(body);
 
     if (!parsed.success) {
-      return privateJson(context, 
+      return privateJson(
+        context,
         { error: "Validation error", details: parsed.error.format() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -86,40 +100,45 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(context, { error: "You cannot report your own account" }, { status: 422 });
     }
 
-    const targetExists = parsed.data.targetType === "product"
-      ? await productRepository.findById(parsed.data.targetId)
-      : parsed.data.targetType === "server"
-        ? await serverRepository.findById(parsed.data.targetId)
-        : parsed.data.targetType === "content"
-          ? await contentRepository.findById(parsed.data.targetId)
-          : parsed.data.targetType === "comment"
-            ? await contentRepository.findCommentById(parsed.data.targetId)
-            : await userRepository.findById(parsed.data.targetId);
+    const targetExists =
+      parsed.data.targetType === "product"
+        ? await productRepository.findById(parsed.data.targetId)
+        : parsed.data.targetType === "server"
+          ? await serverRepository.findById(parsed.data.targetId)
+          : parsed.data.targetType === "content"
+            ? await contentRepository.findById(parsed.data.targetId)
+            : parsed.data.targetType === "comment"
+              ? await contentRepository.findCommentById(parsed.data.targetId)
+              : await userRepository.findById(parsed.data.targetId);
     if (!targetExists) {
       return privateJson(context, { error: "Report target was not found" }, { status: 404 });
     }
 
     const reportId = generateId("rpt");
-    const result = await reportRepository.createWithAudit({
-      id: reportId,
-      reporterId: user.id,
-      targetType: parsed.data.targetType,
-      targetId: parsed.data.targetId,
-      type: parsed.data.type,
-      reason: parsed.data.reason,
-      evidenceUrls: parsed.data.evidenceUrls,
-      status: "open",
-    }, {
-      id: generateId("aud"),
-      actorId: user.id,
-      actorType: "user",
-      action: "report.created",
-      targetId: reportId,
-      targetType: "report",
-      details: { type: parsed.data.type, targetType: parsed.data.targetType },
-    });
+    const result = await reportRepository.createWithAudit(
+      {
+        id: reportId,
+        reporterId: user.id,
+        targetType: parsed.data.targetType,
+        targetId: parsed.data.targetId,
+        type: parsed.data.type,
+        reason: parsed.data.reason,
+        evidenceUrls: parsed.data.evidenceUrls,
+        status: "open",
+      },
+      {
+        id: generateId("aud"),
+        actorId: user.id,
+        actorType: "user",
+        action: "report.created",
+        targetId: reportId,
+        targetType: "report",
+        details: { type: parsed.data.type, targetType: parsed.data.targetType },
+      },
+    );
     if (!result.created) {
-      return privateJson(context,
+      return privateJson(
+        context,
         { error: "You already have an open report for this target", reportId: result.report.id },
         { status: 409 },
       );
@@ -149,10 +168,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
             event: "moderation.report_notification_failed",
             context,
             status: 201,
-            error: new Error(
-              dispatch.storageFailed +
-                " moderator notification deliveries failed",
-            ),
+            error: new Error(dispatch.storageFailed + " moderator notification deliveries failed"),
           });
         }
       } catch (error) {

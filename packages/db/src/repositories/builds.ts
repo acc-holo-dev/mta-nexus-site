@@ -3,9 +3,22 @@ import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-
 import { enqueueWebPushOutboxForNotification } from "./web-push-outbox";
 import { lockNotificationPreferencesForUsers } from "./notification-preference-lock";
 import { db } from "../client";
-import { assertProductMutationAuthority, assertBuildModerationAuthority } from "./product-mutation-authority";
+import {
+  assertProductMutationAuthority,
+  assertBuildModerationAuthority,
+} from "./product-mutation-authority";
 import { lockInitiatingSession } from "./initiating-session";
-import { auditEvents, builds, products, users, organizations, organizationMembers, notificationPreferences, notifications, resourceReleaseEvents } from "../schema";
+import {
+  auditEvents,
+  builds,
+  products,
+  users,
+  organizations,
+  organizationMembers,
+  notificationPreferences,
+  notifications,
+  resourceReleaseEvents,
+} from "../schema";
 import type { AuditEvent, Build } from "@nexus/domain";
 import { AppError, releaseHistoryPageBounds, buildPackageSummary } from "@nexus/domain";
 
@@ -21,20 +34,36 @@ export type RiskReviewBuild = PendingReviewBuild;
 
 export class BuildRepository {
   async findExactPendingRetry(
-    input: Pick<Build, "productId" | "version" | "sha256Hash" | "fileSizeBytes" | "fileName" | "mimeType" | "releaseNotes" | "mtaVersionTarget">,
+    input: Pick<
+      Build,
+      | "productId"
+      | "version"
+      | "sha256Hash"
+      | "fileSizeBytes"
+      | "fileName"
+      | "mimeType"
+      | "releaseNotes"
+      | "mtaVersionTarget"
+    >,
   ): Promise<Build | null> {
-    const rows = await db.select().from(builds).where(and(
-      eq(builds.productId, input.productId),
-      eq(builds.version, input.version),
-      eq(builds.status, "pending_review"),
-      trustedCleanScanCondition(),
-      eq(builds.sha256Hash, input.sha256Hash),
-      eq(builds.fileSizeBytes, input.fileSizeBytes),
-      eq(builds.fileName, input.fileName),
-      eq(builds.mimeType, input.mimeType),
-      sql`coalesce(${builds.releaseNotes}, '') = ${input.releaseNotes ?? ""}`,
-      sql`coalesce(${builds.mtaVersionTarget}, '') = ${input.mtaVersionTarget ?? ""}`,
-    )).limit(1);
+    const rows = await db
+      .select()
+      .from(builds)
+      .where(
+        and(
+          eq(builds.productId, input.productId),
+          eq(builds.version, input.version),
+          eq(builds.status, "pending_review"),
+          trustedCleanScanCondition(),
+          eq(builds.sha256Hash, input.sha256Hash),
+          eq(builds.fileSizeBytes, input.fileSizeBytes),
+          eq(builds.fileName, input.fileName),
+          eq(builds.mimeType, input.mimeType),
+          sql`coalesce(${builds.releaseNotes}, '') = ${input.releaseNotes ?? ""}`,
+          sql`coalesce(${builds.mtaVersionTarget}, '') = ${input.mtaVersionTarget ?? ""}`,
+        ),
+      )
+      .limit(1);
     return (rows[0] as unknown as Build) || null;
   }
 
@@ -42,45 +71,84 @@ export class BuildRepository {
     const condition = eq(builds.productId, productId);
     const [summary] = await db.select({ total: count() }).from(builds).where(condition);
     const totalPages = Math.max(1, Math.ceil((summary?.total ?? 0) / 20));
-    const page = Math.min(Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1, totalPages);
-    const rows = await db.select().from(builds).where(condition)
-      .orderBy(desc(builds.createdAt), desc(builds.id)).limit(20).offset((page - 1) * 20);
-    const decisions = rows.length ? await db.select({ id: auditEvents.id, buildId: auditEvents.targetId,
-      action: auditEvents.action, details: auditEvents.details, createdAt: auditEvents.createdAt })
-      .from(auditEvents).where(and(eq(auditEvents.targetType, "build"),
-        inArray(auditEvents.targetId, rows.map((row) => row.id)),
-        inArray(auditEvents.action, [
-          "build.approved",
-          "build.rejected",
-          "build.retired",
-          "build.quarantined",
-          "build.quarantine_restored",
-          "build.metadata_saved",
-          "build.review_withdrawn",
-          "build.review_resubmitted",
-        ])))
-      .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id)).limit(200) : [];
+    const page = Math.min(
+      Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1,
+      totalPages,
+    );
+    const rows = await db
+      .select()
+      .from(builds)
+      .where(condition)
+      .orderBy(desc(builds.createdAt), desc(builds.id))
+      .limit(20)
+      .offset((page - 1) * 20);
+    const decisions = rows.length
+      ? await db
+          .select({
+            id: auditEvents.id,
+            buildId: auditEvents.targetId,
+            action: auditEvents.action,
+            details: auditEvents.details,
+            createdAt: auditEvents.createdAt,
+          })
+          .from(auditEvents)
+          .where(
+            and(
+              eq(auditEvents.targetType, "build"),
+              inArray(
+                auditEvents.targetId,
+                rows.map((row) => row.id),
+              ),
+              inArray(auditEvents.action, [
+                "build.approved",
+                "build.rejected",
+                "build.retired",
+                "build.quarantined",
+                "build.quarantine_restored",
+                "build.metadata_saved",
+                "build.review_withdrawn",
+                "build.review_resubmitted",
+              ]),
+            ),
+          )
+          .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
+          .limit(200)
+      : [];
     return { builds: rows as unknown as Build[], decisions, page, totalPages };
   }
 
   async countPendingReview(): Promise<number> {
-    const [row] = await db.select({ total: count() }).from(builds)
+    const [row] = await db
+      .select({ total: count() })
+      .from(builds)
       .where(eq(builds.status, "pending_review"));
     return row?.total ?? 0;
   }
 
-  async listPendingReviewPage(page: number, pageSize = 30): Promise<{ builds: PendingReviewBuild[]; hasMore: boolean }> {
-    if (!Number.isSafeInteger(page) || page < 1 || page > 99_999 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+  async listPendingReviewPage(
+    page: number,
+    pageSize = 30,
+  ): Promise<{ builds: PendingReviewBuild[]; hasMore: boolean }> {
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      page > 99_999 ||
+      !Number.isSafeInteger(pageSize) ||
+      pageSize < 1 ||
+      pageSize > 100
+    ) {
       throw new RangeError("Invalid build review page");
     }
-    const rows = await db.select({
-      build: builds,
-      productTitle: products.title,
-      productSlug: products.slug,
-      productStatus: products.status,
-      publisherId: users.id,
-      publisherUsername: users.username,
-    }).from(builds)
+    const rows = await db
+      .select({
+        build: builds,
+        productTitle: products.title,
+        productSlug: products.slug,
+        productStatus: products.status,
+        publisherId: users.id,
+        publisherUsername: users.username,
+      })
+      .from(builds)
       .innerJoin(products, eq(builds.productId, products.id))
       .innerJoin(users, eq(products.authorId, users.id))
       .where(eq(builds.status, "pending_review"))
@@ -154,7 +222,7 @@ export class BuildRepository {
   }
 
   async listByProduct(productId: string): Promise<Build[]> {
-        const rows = await db
+    const rows = await db
       .select()
       .from(builds)
       .where(eq(builds.productId, productId))
@@ -194,25 +262,35 @@ export class BuildRepository {
     const condition = safePublishedBuildCondition(productId);
     const [summary] = await db.select({ total: count() }).from(builds).where(condition);
     const bounds = releaseHistoryPageBounds(summary?.total ?? 0, requestedPage);
-    const releases = await db.select({
-      packageEvidence: builds.packageEvidence,
-      id: builds.id,
-      version: builds.version,
-      releaseNotes: builds.releaseNotes,
-      sha256Hash: builds.sha256Hash,
-      fileName: builds.fileName,
-      fileSizeBytes: builds.fileSizeBytes,
-      mimeType: builds.mimeType,
-      mtaVersionTarget: builds.mtaVersionTarget,
-      scanStatus: builds.scanStatus,
-      scanner: builds.scanner,
-      scannedAt: builds.scannedAt,
-      isSigned: builds.isSigned,
-      createdAt: builds.createdAt,
-    }).from(builds).where(condition)
+    const releases = await db
+      .select({
+        packageEvidence: builds.packageEvidence,
+        id: builds.id,
+        version: builds.version,
+        releaseNotes: builds.releaseNotes,
+        sha256Hash: builds.sha256Hash,
+        fileName: builds.fileName,
+        fileSizeBytes: builds.fileSizeBytes,
+        mimeType: builds.mimeType,
+        mtaVersionTarget: builds.mtaVersionTarget,
+        scanStatus: builds.scanStatus,
+        scanner: builds.scanner,
+        scannedAt: builds.scannedAt,
+        isSigned: builds.isSigned,
+        createdAt: builds.createdAt,
+      })
+      .from(builds)
+      .where(condition)
       .orderBy(desc(builds.createdAt), desc(builds.id))
-      .limit(bounds.pageSize).offset(bounds.offset);
-    return { releases: releases.map(({ packageEvidence, ...release }) => ({ ...release, packageSummary: buildPackageSummary(packageEvidence) })), ...bounds };
+      .limit(bounds.pageSize)
+      .offset(bounds.offset);
+    return {
+      releases: releases.map(({ packageEvidence, ...release }) => ({
+        ...release,
+        packageSummary: buildPackageSummary(packageEvidence),
+      })),
+      ...bounds,
+    };
   }
 
   /**
@@ -221,7 +299,9 @@ export class BuildRepository {
    * must be indistinguishable from an unknown version.
    */
   async findPublishedByProductAndId(productId: string, buildId: string): Promise<Build | null> {
-    const [build] = await db.select().from(builds)
+    const [build] = await db
+      .select()
+      .from(builds)
       .where(and(safePublishedBuildCondition(productId), eq(builds.id, buildId)))
       .limit(1);
     return (build as unknown as Build) ?? null;
@@ -240,7 +320,7 @@ export class BuildRepository {
   async updateStatus(
     id: string,
     status: Build["status"],
-    expectedStatus?: Build["status"]
+    expectedStatus?: Build["status"],
   ): Promise<Build | null> {
     const condition = expectedStatus
       ? and(eq(builds.id, id), eq(builds.status, expectedStatus))
@@ -251,7 +331,7 @@ export class BuildRepository {
 
   async submitForReview(
     data: Omit<Build, "createdAt">,
-    audit: Omit<AuditEvent, "createdAt">
+    audit: Omit<AuditEvent, "createdAt">,
   ): Promise<Build> {
     return db.transaction(async (tx) => {
       const [parent] = await tx
@@ -335,7 +415,6 @@ export class BuildRepository {
         throw new AppError("Resource is withdrawn from publication", 409, "PRODUCT_STATE_CHANGED");
       }
 
-
       const targetStatus = decision === "approve" ? "published" : "rejected";
       const reviewCondition =
         decision === "approve"
@@ -345,8 +424,11 @@ export class BuildRepository {
               eq(builds.revision, expectedRevision),
               trustedCleanScanCondition(),
             )
-          : and(eq(builds.id, id), eq(builds.status, "pending_review"),
-              eq(builds.revision, expectedRevision));
+          : and(
+              eq(builds.id, id),
+              eq(builds.status, "pending_review"),
+              eq(builds.revision, expectedRevision),
+            );
 
       const rows = await tx
         .update(builds)
@@ -360,7 +442,12 @@ export class BuildRepository {
         .update(products)
         .set({ updatedAt: sql`${products.updatedAt}` })
         .where(eq(products.id, reviewed.productId))
-        .returning({ id: products.id, title: products.title, authorId: products.authorId, organizationId: products.organizationId });
+        .returning({
+          id: products.id,
+          title: products.title,
+          authorId: products.authorId,
+          organizationId: products.organizationId,
+        });
       if (!lockedProduct[0]) {
         throw new Error("Build product disappeared during moderation");
       }
@@ -392,23 +479,31 @@ export class BuildRepository {
         const fallback = await tx
           .select({ version: builds.version })
           .from(builds)
-          .where(
-            and(
-              safePublishedBuildCondition(reviewed.productId),
-              ne(builds.id, reviewed.id),
-            ),
-          )
+          .where(and(safePublishedBuildCondition(reviewed.productId), ne(builds.id, reviewed.id)))
           .orderBy(desc(builds.createdAt), desc(builds.id))
           .limit(1);
-        const pending = parent.metadataReviewRequired ? await tx.select({ version: builds.version }).from(builds)
-          .where(and(eq(builds.productId, reviewed.productId), eq(builds.status, "pending_review")))
-          .orderBy(desc(builds.createdAt), desc(builds.id)).limit(1) : [];
+        const pending = parent.metadataReviewRequired
+          ? await tx
+              .select({ version: builds.version })
+              .from(builds)
+              .where(
+                and(eq(builds.productId, reviewed.productId), eq(builds.status, "pending_review")),
+              )
+              .orderBy(desc(builds.createdAt), desc(builds.id))
+              .limit(1)
+          : [];
         await tx
           .update(products)
-          .set(fallback[0] && !parent.metadataReviewRequired
-            ? { currentVersion: fallback[0].version, status: "published", updatedAt: new Date() }
-            : pending[0] ? { currentVersion: pending[0].version, status: "pending_review", updatedAt: new Date() }
-            : { status: "draft", updatedAt: new Date() }
+          .set(
+            fallback[0] && !parent.metadataReviewRequired
+              ? { currentVersion: fallback[0].version, status: "published", updatedAt: new Date() }
+              : pending[0]
+                ? {
+                    currentVersion: pending[0].version,
+                    status: "pending_review",
+                    updatedAt: new Date(),
+                  }
+                : { status: "draft", updatedAt: new Date() },
           )
           .where(eq(products.id, reviewed.productId));
       }
@@ -416,8 +511,15 @@ export class BuildRepository {
       await tx.insert(auditEvents).values({ ...audit, createdAt: new Date() });
       const product = lockedProduct[0];
       const notes = typeof audit.details?.notes === "string" ? audit.details.notes : "";
-      const title = decision === "approve" ? "Resource version approved" : "Resource version rejected";
-      const data = { kind: "build_review", decision, resourceTitle: product.title, version: reviewed.version, notes };
+      const title =
+        decision === "approve" ? "Resource version approved" : "Resource version rejected";
+      const data = {
+        kind: "build_review",
+        decision,
+        resourceTitle: product.title,
+        version: reviewed.version,
+        notes,
+      };
       // Resolve current recipients in SQL, without exposing notes to former owners.
       // Lock preference scopes first so a concurrent settings PATCH linearizes
       // before or after this moderation notification, never through a stale read.
@@ -467,11 +569,7 @@ export class BuildRepository {
       for (const row of notificationRows) {
         try {
           const queued = await tx.transaction((pushTx) =>
-            enqueueWebPushOutboxForNotification(
-              pushTx,
-              String(row.id),
-              String(row.recipient_id),
-            ),
+            enqueueWebPushOutboxForNotification(pushTx, String(row.id), String(row.recipient_id)),
           );
           pushQueued += queued.queued;
           if (queued.reason === "saturated") {
@@ -496,10 +594,17 @@ export class BuildRepository {
       }
       // Durable work for opted-in buyers; never fan out inside moderation. A
       // retained artifact reviewed again keeps its original event identity.
-      if (decision === "approve") await tx.insert(resourceReleaseEvents).values({
-        productId: reviewed.productId, buildId: reviewed.id, version: reviewed.version,
-        sha256Hash: reviewed.sha256Hash, fileSizeBytes: reviewed.fileSizeBytes,
-      }).onConflictDoNothing({ target: resourceReleaseEvents.buildId });
+      if (decision === "approve")
+        await tx
+          .insert(resourceReleaseEvents)
+          .values({
+            productId: reviewed.productId,
+            buildId: reviewed.id,
+            version: reviewed.version,
+            sha256Hash: reviewed.sha256Hash,
+            fileSizeBytes: reviewed.fileSizeBytes,
+          })
+          .onConflictDoNothing({ target: resourceReleaseEvents.buildId });
       return reviewed as unknown as Build;
     });
   }
@@ -507,7 +612,7 @@ export class BuildRepository {
   async retireAndRefreshProduct(
     id: string,
     expectedStatus: Build["status"],
-    audit: Omit<AuditEvent, "createdAt">
+    audit: Omit<AuditEvent, "createdAt">,
   ): Promise<Build | null> {
     return db.transaction(async (tx) => {
       const [target] = await tx
@@ -531,7 +636,6 @@ export class BuildRepository {
       if (!parent) return null;
       await assertProductMutationAuthority(tx, parent, audit.actorId);
 
-
       const rows = await tx
         .update(builds)
         .set({ status: "retired" })
@@ -552,21 +656,17 @@ export class BuildRepository {
       const fallback = await tx
         .select({ version: builds.version })
         .from(builds)
-        .where(
-          and(
-            safePublishedBuildCondition(retired.productId),
-            ne(builds.id, retired.id),
-          ),
-        )
+        .where(and(safePublishedBuildCondition(retired.productId), ne(builds.id, retired.id)))
         .orderBy(desc(builds.createdAt), desc(builds.id))
         .limit(1);
       await tx
         .update(products)
-        .set(parent.status === "archived" || parent.status === "suspended"
-          ? { updatedAt: new Date() }
-          : fallback[0] && !parent.metadataReviewRequired
-          ? { currentVersion: fallback[0].version, status: "published", updatedAt: new Date() }
-          : { status: "draft", updatedAt: new Date() }
+        .set(
+          parent.status === "archived" || parent.status === "suspended"
+            ? { updatedAt: new Date() }
+            : fallback[0] && !parent.metadataReviewRequired
+              ? { currentVersion: fallback[0].version, status: "published", updatedAt: new Date() }
+              : { status: "draft", updatedAt: new Date() },
         )
         .where(eq(products.id, retired.productId));
 
@@ -735,7 +835,8 @@ export class BuildRepository {
       await tx
         .update(products)
         .set(
-          (product.status === "draft" || product.status === "published") && !parent.metadataReviewRequired
+          (product.status === "draft" || product.status === "published") &&
+            !parent.metadataReviewRequired
             ? {
                 currentVersion: latestPublished[0].version,
                 status: "published",
@@ -759,7 +860,7 @@ export class BuildRepository {
       createdAt: new Date(),
     };
 
-        const rows = await db.insert(builds).values(values).returning();
+    const rows = await db.insert(builds).values(values).returning();
     return rows[0] as unknown as Build;
   }
 }

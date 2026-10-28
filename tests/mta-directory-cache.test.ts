@@ -29,7 +29,9 @@ describe("master-list HTTP cache freshness budget", () => {
     expect(mtaDirectoryHttpCacheControl(snapshot(0, true), NOW)).toBe("no-store");
     expect(mtaDirectoryHttpCacheControl(null, NOW)).toBe("no-store");
     expect(mtaDirectoryHttpCacheControl(undefined, NOW)).toBe("no-store");
-    expect(mtaDirectoryHttpCacheControl({ fetchedAt: "garbage", isStale: false }, NOW)).toBe("no-store");
+    expect(mtaDirectoryHttpCacheControl({ fetchedAt: "garbage", isStale: false }, NOW)).toBe(
+      "no-store",
+    );
     expect(mtaDirectoryHttpCacheControl(snapshot(-1), NOW)).toBe("no-store");
     expect(mtaDirectoryHttpCacheControl(snapshot(0), Number.NaN)).toBe("no-store");
   });
@@ -42,8 +44,7 @@ describe("master-list HTTP cache freshness budget", () => {
       const maxAgeSeconds = Number(header.match(/max-age=(\d+)/u)?.[1]);
       expect(Number.isSafeInteger(maxAgeSeconds)).toBe(true);
       expect(maxAgeSeconds).toBeLessThanOrEqual(30);
-      expect(ageMs + maxAgeSeconds * 1_000)
-        .toBeLessThanOrEqual(MTA_MASTER_FRESH_TTL_MS);
+      expect(ageMs + maxAgeSeconds * 1_000).toBeLessThanOrEqual(MTA_MASTER_FRESH_TTL_MS);
     }
   });
 });

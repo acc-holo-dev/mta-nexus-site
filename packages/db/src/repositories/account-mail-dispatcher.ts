@@ -45,8 +45,10 @@ export type AccountMailDispatchSummary = Readonly<{
 }>;
 
 function isProviderWideRetry(result: AccountMailTransportResult): boolean {
-  return result.outcome === "retry"
-    && ["connect", "greeting", "ehlo", "starttls", "auth", "mail_from"].includes(result.stage);
+  return (
+    result.outcome === "retry" &&
+    ["connect", "greeting", "ehlo", "starttls", "auth", "mail_from"].includes(result.stage)
+  );
 }
 
 function messageFor(mail: PreparedAccountMail, base: URL): AccountMailTransportInput {
@@ -56,12 +58,14 @@ function messageFor(mail: PreparedAccountMail, base: URL): AccountMailTransportI
   // The secret stays in the fragment so the initial page request/proxy log does
   // not receive it. The future UI must remove the fragment before confirmation.
   url.hash = `token=${encodeURIComponent(mail.token)}`;
-  const subject = mail.purpose === "email_verify"
-    ? "Confirm your MTA NEXUS email"
-    : "Reset your MTA NEXUS password";
-  const text = mail.purpose === "email_verify"
-    ? `Confirm this email address for your MTA NEXUS account:\n\n${url.toString()}\n\nIf you did not request this, ignore this message.`
-    : `Use this link to reset your MTA NEXUS password:\n\n${url.toString()}\n\nIf you did not request this, ignore this message.`;
+  const subject =
+    mail.purpose === "email_verify"
+      ? "Confirm your MTA NEXUS email"
+      : "Reset your MTA NEXUS password";
+  const text =
+    mail.purpose === "email_verify"
+      ? `Confirm this email address for your MTA NEXUS account:\n\n${url.toString()}\n\nIf you did not request this, ignore this message.`
+      : `Use this link to reset your MTA NEXUS password:\n\n${url.toString()}\n\nIf you did not request this, ignore this message.`;
   return {
     recipient: mail.recipient,
     subject,
@@ -80,7 +84,13 @@ export class AccountMailDispatcher {
   #transport: Transport;
   #baseUrl: URL;
 
-  constructor(input: { worker?: Worker; cipher: AccountMailCipher; transport: Transport; appUrl: string; allowLocalHttp?: boolean }) {
+  constructor(input: {
+    worker?: Worker;
+    cipher: AccountMailCipher;
+    transport: Transport;
+    appUrl: string;
+    allowLocalHttp?: boolean;
+  }) {
     if (!input?.cipher || !input?.transport) throw new Error("Invalid account mail dispatcher");
     this.#worker = input.worker ?? accountMailWorkerRepository;
     this.#cipher = input.cipher;
@@ -93,7 +103,8 @@ export class AccountMailDispatcher {
     signal?: AbortSignal,
     onProgress?: () => void,
   ): Promise<AccountMailDispatchSummary> {
-    if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new Error("Invalid dispatch batch limit");
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100)
+      throw new Error("Invalid dispatch batch limit");
     const summary = { accepted: 0, retried: 0, discarded: 0, skipped: 0, unsettled: 0, cleaned: 0 };
     // Shutdown may have arrived while the caller was checking queue key coverage.
     if (signal?.aborted) return Object.freeze(summary);
@@ -122,7 +133,8 @@ export class AccountMailDispatcher {
           throw new Error("Account mail worker key ring is unavailable");
         }
         const settled = await this.#worker.settle(lease, "retry");
-        if (settled) summary.retried++; else summary.unsettled++;
+        if (settled) summary.retried++;
+        else summary.unsettled++;
         onProgress?.();
         continue;
       }
@@ -134,10 +146,10 @@ export class AccountMailDispatcher {
       const result = await this.#transport.send(messageFor(prepared, this.#baseUrl));
 
       if (isProviderWideRetry(result) && this.#worker.deferProviderFailure) {
-        const deferred = await this.#worker.deferProviderFailure(
-          lease,
-          { smtpCode: result.code, stage: result.stage },
-        );
+        const deferred = await this.#worker.deferProviderFailure(lease, {
+          smtpCode: result.code,
+          stage: result.stage,
+        });
         if (deferred) {
           summary.retried++;
           providerDeferred = true;
@@ -148,12 +160,11 @@ export class AccountMailDispatcher {
         break;
       }
 
-      const settled = await this.#worker.settle(
-        lease,
-        result.outcome,
-        undefined,
-        { smtpCode: result.code, uncertain: result.uncertain, stage: result.stage },
-      );
+      const settled = await this.#worker.settle(lease, result.outcome, undefined, {
+        smtpCode: result.code,
+        uncertain: result.uncertain,
+        stage: result.stage,
+      });
       if (!settled) {
         summary.unsettled++;
       } else if (result.outcome === "accepted") {

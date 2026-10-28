@@ -194,7 +194,6 @@ test("invalid NEXUS_DEV_PORT fails without probing an arbitrary port", async () 
   }
 });
 
-
 test("compose validation does not forward application secrets", async () => {
   const root = await fixtureRoot();
   let composeEnvironment;

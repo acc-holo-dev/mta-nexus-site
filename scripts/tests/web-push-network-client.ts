@@ -13,9 +13,7 @@ assert(Number.isSafeInteger(port) && port > 0 && port < 65536);
 const vapid = createECDH("prime256v1");
 vapid.generateKeys();
 const config = {
-  publicKey: vapid
-    .getPublicKey(undefined, "uncompressed")
-    .toString("base64url"),
+  publicKey: vapid.getPublicKey(undefined, "uncompressed").toString("base64url"),
   privateKey: vapid.getPrivateKey().toString("base64url"),
   subject: "mailto:ops@nexus.example.com",
 };
@@ -24,15 +22,11 @@ const receiver = createECDH("prime256v1");
 receiver.generateKeys();
 const subscription = {
   endpoint: "https://push.example.net/subscriptions/201",
-  p256dh: receiver
-    .getPublicKey(undefined, "uncompressed")
-    .toString("base64url"),
+  p256dh: receiver.getPublicKey(undefined, "uncompressed").toString("base64url"),
   auth: Buffer.alloc(16, 7).toString("base64url"),
 };
 
-const localTlsTransport = async (
-  request: WebPushHttpsRequest,
-) =>
+const localTlsTransport = async (request: WebPushHttpsRequest) =>
   await sendWebPushHttpsRequest({
     ...request,
     connectAddress: "127.0.0.1",
@@ -54,19 +48,17 @@ const statuses = [];
 let retryAfterMs: number | undefined;
 for (const status of [201, 410, 503]) {
   const result = await sender(
-        {
-          ...subscription,
-          endpoint:
-            "https://push.example.net/subscriptions/" +
-            status,
-        },
-        {
-          title: "MTA NEXUS",
-          body: "Closed TLS provider acceptance",
-          url: "/notifications",
-          tag: "network-acceptance",
-        },
-      );
+    {
+      ...subscription,
+      endpoint: "https://push.example.net/subscriptions/" + status,
+    },
+    {
+      title: "MTA NEXUS",
+      body: "Closed TLS provider acceptance",
+      url: "/notifications",
+      tag: "network-acceptance",
+    },
+  );
   statuses.push(result.statusCode);
   if (status === 503) {
     retryAfterMs = result.retryAfterMs;
@@ -78,8 +70,7 @@ try {
   await sender(
     {
       ...subscription,
-      endpoint:
-        "https://push.example.net/subscriptions/hang",
+      endpoint: "https://push.example.net/subscriptions/hang",
     },
     {
       title: "MTA NEXUS",
@@ -91,6 +82,4 @@ try {
   timeoutRejected = true;
 }
 
-process.stdout.write(
-  JSON.stringify({ statuses, timeoutRejected, retryAfterMs }) + "\n",
-);
+process.stdout.write(JSON.stringify({ statuses, timeoutRejected, retryAfterMs }) + "\n");

@@ -9,11 +9,14 @@ const directory = await mkdtemp(join(tmpdir(), "nexus-axe-gate-"));
 const modulePath = join(directory, "node_modules/@axe-core/playwright");
 await mkdir(modulePath, { recursive: true });
 await writeFile(join(directory, "package.json"), '{"type":"commonjs"}');
-await writeFile(join(modulePath, "index.js"), `exports.AxeBuilder = class {
+await writeFile(
+  join(modulePath, "index.js"),
+  `exports.AxeBuilder = class {
   constructor({page}) { this.page = page; }
   withTags(tags) { this.page.tags = tags; return this; }
   async analyze() { if (this.page.error) throw this.page.error; return this.page.results; }
-};`);
+};`,
+);
 const originalTools = process.env.NEXUS_BROWSER_TOOLS;
 const originalReport = process.env.NEXUS_BROWSER_REPORT_DIR;
 process.env.NEXUS_BROWSER_TOOLS = directory;
@@ -30,17 +33,31 @@ after(async () => {
 function fixture(overrides = {}) {
   const attachments = [];
   return {
-    page: { results: {
-      testEngine: { name: "axe-core", version: "fixture" },
-      violations: [], incomplete: [], passes: [{ id: "label" }], ...overrides,
-    } },
+    page: {
+      results: {
+        testEngine: { name: "axe-core", version: "fixture" },
+        violations: [],
+        incomplete: [],
+        passes: [{ id: "label" }],
+        ...overrides,
+      },
+    },
     info: { attach: async (name, value) => attachments.push({ name, ...value }) },
     attachments,
   };
 }
 const rule = {
-  id: "button-name", impact: "moderate", help: "Button needs a name", helpUrl: "https://example.invalid/rule",
-  nodes: [{ target: ["#continue"], html: '<button value="PRIVATE-VALUE"></button>', failureSummary: "PRIVATE-VALUE" }],
+  id: "button-name",
+  impact: "moderate",
+  help: "Button needs a name",
+  helpUrl: "https://example.invalid/rule",
+  nodes: [
+    {
+      target: ["#continue"],
+      html: '<button value="PRIVATE-VALUE"></button>',
+      failureSummary: "PRIVATE-VALUE",
+    },
+  ],
 };
 
 test("every violation blocks acceptance after its diagnostic is saved", async () => {
@@ -66,6 +83,9 @@ test("incomplete checks remain visible as review evidence without becoming a fal
 test("engine failures propagate instead of producing an empty passing report", async () => {
   const f = fixture();
   f.page.error = new Error("synthetic engine failure");
-  await assert.rejects(assertAxeAccessibility(f.page, f.info, "engine-failed"), /synthetic engine failure/);
+  await assert.rejects(
+    assertAxeAccessibility(f.page, f.info, "engine-failed"),
+    /synthetic engine failure/,
+  );
   assert.deepEqual(f.attachments, []);
 });

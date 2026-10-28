@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
 
 import { closeDatabaseConnection } from "../src/client";
-import {
-  applyScenario,
-  cleanupScenario,
-  type ScenarioId,
-} from "./scenario-lab-db";
+import { applyScenario, cleanupScenario, type ScenarioId } from "./scenario-lab-db";
 
 if (
   process.env.GITHUB_ACTIONS !== "true" ||

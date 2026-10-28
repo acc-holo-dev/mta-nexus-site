@@ -16,9 +16,7 @@ describe("free resource acquisition compatibility redirect", () => {
       searchParams: Promise.resolve({ productId: "prd free/1" }),
     });
 
-    expect(redirect).toHaveBeenCalledWith(
-      "/acquire?productId=prd%20free%2F1",
-    );
+    expect(redirect).toHaveBeenCalledWith("/acquire?productId=prd%20free%2F1");
   });
 
   it("uses only the first product id from a repeated query parameter", async () => {
@@ -28,9 +26,7 @@ describe("free resource acquisition compatibility redirect", () => {
       }),
     });
 
-    expect(redirect).toHaveBeenCalledWith(
-      "/acquire?productId=prd_first",
-    );
+    expect(redirect).toHaveBeenCalledWith("/acquire?productId=prd_first");
   });
 
   it("redirects an empty legacy checkout to the acquisition landing page", async () => {

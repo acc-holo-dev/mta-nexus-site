@@ -59,11 +59,12 @@ export function ordinaryRecoveryEligible(account: {
 }): boolean {
   const recovery = freshAuthRequirement("account_recovery");
   if (
-    recovery.sessionSatisfies
-    || !recovery.recheckInsideTransaction
-    || !recovery.acceptedProofs.includes("current_password")
-    || !recovery.acceptedProofs.includes("recovery_challenge")
-  ) return false;
+    recovery.sessionSatisfies ||
+    !recovery.recheckInsideTransaction ||
+    !recovery.acceptedProofs.includes("current_password") ||
+    !recovery.acceptedProofs.includes("recovery_challenge")
+  )
+    return false;
   if (!account.hasPassword || account.twoFactorEnabled) return false;
   return account.role !== "admin" && account.role !== "moderator";
 }

@@ -21,19 +21,14 @@ const privateHeaders = {
 };
 
 const publicHeaders = {
-  "Cache-Control":
-    "public, max-age=30, stale-while-revalidate=120",
+  "Cache-Control": "public, max-age=30, stale-while-revalidate=120",
 };
 
 const errorHeaders = {
   "Cache-Control": "no-store",
 };
 
-function privateJson(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function privateJson(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -44,34 +39,21 @@ function matchesCreateRequest(
   product: Product,
   input: z.infer<typeof createProductSchema>,
 ): boolean {
-  const sameList = (
-    left: readonly string[] = [],
-    right: readonly string[] = [],
-  ) =>
-    left.length === right.length &&
-    left.every(
-      (value, index) => value === right[index],
-    );
+  const sameList = (left: readonly string[] = [], right: readonly string[] = []) =>
+    left.length === right.length && left.every((value, index) => value === right[index]);
   const compatibility = product.compatibility ?? {};
-  const requestedCompatibility =
-    input.compatibility ?? {};
+  const requestedCompatibility = input.compatibility ?? {};
 
   return (
     product.title === input.title &&
     product.slug === input.slug &&
     product.description === input.description &&
-    (product.shortDescription ?? undefined) ===
-      input.shortDescription &&
+    (product.shortDescription ?? undefined) === input.shortDescription &&
     product.type === input.type &&
-    (product.organizationId ?? undefined) ===
-      input.organizationId &&
+    (product.organizationId ?? undefined) === input.organizationId &&
     sameList(product.tags, input.tags) &&
-    compatibility.mtaMinVersion ===
-      requestedCompatibility.mtaMinVersion &&
-    sameList(
-      compatibility.dependencies,
-      requestedCompatibility.dependencies,
-    )
+    compatibility.mtaMinVersion === requestedCompatibility.mtaMinVersion &&
+    sameList(compatibility.dependencies, requestedCompatibility.dependencies)
   );
 }
 
@@ -82,39 +64,26 @@ export async function GET(request: NextRequest) {
     const params = request.nextUrl.searchParams;
     const single = (name: string) => {
       const values = params.getAll(name);
-      return values.length === 1
-        ? values[0]
-        : undefined;
+      return values.length === 1 ? values[0] : undefined;
     };
-    const { type, sort, query, page } =
-      parseMarketQuery({
-        type: single("type"),
-        sort: single("sort"),
-        q: single("q"),
-        page: single("page"),
-      });
-    const requestedLimit = Number(
-      single("limit") || "50",
-    );
+    const { type, sort, query, page } = parseMarketQuery({
+      type: single("type"),
+      sort: single("sort"),
+      q: single("q"),
+      page: single("page"),
+    });
+    const requestedLimit = Number(single("limit") || "50");
     const limit = Number.isFinite(requestedLimit)
-      ? Math.min(
-          Math.max(
-            Math.floor(requestedLimit),
-            1,
-          ),
-          100,
-        )
+      ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
       : 50;
 
-    const { products, hasMore } =
-      await productService.listPublicPage({
-        type:
-          type === "all" ? undefined : type,
-        sort,
-        query,
-        page,
-        pageSize: limit,
-      });
+    const { products, hasMore } = await productService.listPublicPage({
+      type: type === "all" ? undefined : type,
+      sort,
+      query,
+      page,
+      pageSize: limit,
+    });
 
     return Response.json(
       {
@@ -136,8 +105,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error:
-          "Resource catalog is temporarily unavailable",
+        error: "Resource catalog is temporarily unavailable",
       },
       {
         status: 503,
@@ -151,8 +119,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
 
   try {
-    const token =
-      request.cookies.get("nexus_session")?.value;
+    const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
       return privateJson(
@@ -165,31 +132,24 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const rateLimit = await consumeRateLimit(
-      "contentCreation",
-      user.id,
-    );
+    const rateLimit = await consumeRateLimit("contentCreation", user.id);
     if (!rateLimit.success) {
       return privateJson(
         context,
         {
-          error:
-            "Resource creation limit exceeded",
+          error: "Resource creation limit exceeded",
           code: "RATE_LIMIT_EXCEEDED",
         },
         429,
       );
     }
 
-    const parsed = createProductSchema.safeParse(
-      await request.json().catch(() => null),
-    );
+    const parsed = createProductSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
       return privateJson(
         context,
         {
-          error:
-            "Invalid resource details",
+          error: "Invalid resource details",
           code: "PRODUCT_METADATA_INVALID",
           details: parsed.error.format(),
         },
@@ -201,8 +161,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       return privateJson(
         context,
         {
-          error:
-            "Paid resources are disabled until a payment provider is configured",
+          error: "Paid resources are disabled until a payment provider is configured",
           code: "PAID_RESOURCES_DISABLED",
         },
         422,
@@ -223,25 +182,17 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         user,
       );
     } catch (error: unknown) {
-      const isDuplicate =
-        isUniqueConstraintViolation(error, [
-          "products_slug_unique",
-          "products_slug_idx",
-        ]);
+      const isDuplicate = isUniqueConstraintViolation(error, [
+        "products_slug_unique",
+        "products_slug_idx",
+      ]);
 
       if (isDuplicate) {
-        const existingDraft =
-          await productService.getProductPreviewBySlug(
-            parsed.data.slug,
-            user,
-          );
+        const existingDraft = await productService.getProductPreviewBySlug(parsed.data.slug, user);
         if (
           existingDraft?.authorId === user.id &&
           existingDraft.status === "draft" &&
-          matchesCreateRequest(
-            existingDraft,
-            parsed.data,
-          )
+          matchesCreateRequest(existingDraft, parsed.data)
         ) {
           return privateJson(
             context,
@@ -257,23 +208,13 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       throw error;
     }
 
-    return privateJson(
-      context,
-      { product },
-      201,
-    );
+    return privateJson(context, { product }, 201);
   } catch (error: unknown) {
-    if (
-      isUniqueConstraintViolation(error, [
-        "products_slug_unique",
-        "products_slug_idx",
-      ])
-    ) {
+    if (isUniqueConstraintViolation(error, ["products_slug_unique", "products_slug_idx"])) {
       return privateJson(
         context,
         {
-          error:
-            "A resource with this slug already exists",
+          error: "A resource with this slug already exists",
           code: "PRODUCT_SLUG_EXISTS",
         },
         409,

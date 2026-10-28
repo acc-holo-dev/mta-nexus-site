@@ -15,9 +15,10 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 
 import { GET } from "../apps/web/src/app/api/workspace/server-organizations/route";
 
-const request = () => new NextRequest("https://nexus.test/api/workspace/server-organizations", {
-  headers: { cookie: "nexus_session=valid" },
-});
+const request = () =>
+  new NextRequest("https://nexus.test/api/workspace/server-organizations", {
+    headers: { cookie: "nexus_session=valid" },
+  });
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -41,9 +42,7 @@ describe("private server organization options endpoint", () => {
     expectPrivate(response);
     expect(state.list).toHaveBeenCalledExactlyOnceWith("usr_actor");
     expect(await response.json()).toEqual({
-      organizations: [
-        { id: "org_owned", name: "Owner organization", slug: "owner-organization" },
-      ],
+      organizations: [{ id: "org_owned", name: "Owner organization", slug: "owner-organization" }],
     });
   });
 

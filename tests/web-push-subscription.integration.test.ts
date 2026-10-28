@@ -1,10 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import {
-  sessionRepository,
-  userRepository,
-  webPushSubscriptionRepository,
-} from "@nexus/db";
+import { sessionRepository, userRepository, webPushSubscriptionRepository } from "@nexus/db";
 
 describe("Web Push active subscription repository", () => {
   it("excludes expired subscriptions and subscriptions bound to expired sessions", async () => {
@@ -51,12 +47,7 @@ describe("Web Push active subscription repository", () => {
         expirationAt,
       });
 
-    await insert(
-      `wps_active_${suffix}`,
-      activeSessionId,
-      `active-${suffix}`,
-      null,
-    );
+    await insert(`wps_active_${suffix}`, activeSessionId, `active-${suffix}`, null);
     await insert(
       `wps_future_${suffix}`,
       activeSessionId,
@@ -76,24 +67,13 @@ describe("Web Push active subscription repository", () => {
       null,
     );
 
-    expect(
-      await webPushSubscriptionRepository.countForSession(
-        userId,
-        activeSessionId,
-      ),
-    ).toBe(2);
-    expect(
-      await webPushSubscriptionRepository.countForSession(
-        userId,
-        expiredSessionId,
-      ),
-    ).toBe(0);
+    expect(await webPushSubscriptionRepository.countForSession(userId, activeSessionId)).toBe(2);
+    expect(await webPushSubscriptionRepository.countForSession(userId, expiredSessionId)).toBe(0);
 
-    const sessionActive =
-      await webPushSubscriptionRepository.listForSession(
-        userId,
-        activeSessionId,
-      );
+    const sessionActive = await webPushSubscriptionRepository.listForSession(
+      userId,
+      activeSessionId,
+    );
     expect(sessionActive.map((item) => item.id).sort()).toEqual(
       [`wps_active_${suffix}`, `wps_future_${suffix}`].sort(),
     );
@@ -104,7 +84,6 @@ describe("Web Push active subscription repository", () => {
     );
   });
 });
-
 
 it("never rebinds an existing push endpoint to another session", async () => {
   const suffix = randomBytes(6).toString("hex");
@@ -179,9 +158,7 @@ it("never rebinds an existing push endpoint to another session", async () => {
     }),
   ).resolves.toEqual({ status: "endpoint_conflict" });
 
-  expect(
-    await webPushSubscriptionRepository.listByUser(firstUserId),
-  ).toEqual([
+  expect(await webPushSubscriptionRepository.listByUser(firstUserId)).toEqual([
     expect.objectContaining({
       endpoint,
       userId: firstUserId,
@@ -189,11 +166,8 @@ it("never rebinds an existing push endpoint to another session", async () => {
       p256dh: "refreshed-key",
     }),
   ]);
-  expect(
-    await webPushSubscriptionRepository.listByUser(secondUserId),
-  ).toEqual([]);
+  expect(await webPushSubscriptionRepository.listByUser(secondUserId)).toEqual([]);
 });
-
 
 it("prunes expired rows and enforces a serialized per-session subscription cap", async () => {
   const suffix = randomBytes(6).toString("hex");
@@ -215,10 +189,7 @@ it("prunes expired rows and enforces a serialized per-session subscription cap",
     expiresAt,
   });
 
-  const add = (
-    id: string,
-    expirationAt: Date | null,
-  ) =>
+  const add = (id: string, expirationAt: Date | null) =>
     webPushSubscriptionRepository.upsertWithResult(
       {
         id,
@@ -236,21 +207,16 @@ it("prunes expired rows and enforces a serialized per-session subscription cap",
     status: "stored",
   });
   await expect(
-    add(
-      `wps_limit_expired_${suffix}`,
-      new Date(Date.now() - 60_000),
-    ),
+    add(`wps_limit_expired_${suffix}`, new Date(Date.now() - 60_000)),
   ).resolves.toMatchObject({ status: "stored" });
 
-  await expect(
-    add(`wps_limit_replacement_${suffix}`, null),
-  ).resolves.toMatchObject({ status: "stored" });
+  await expect(add(`wps_limit_replacement_${suffix}`, null)).resolves.toMatchObject({
+    status: "stored",
+  });
 
-  await expect(
-    add(`wps_limit_blocked_${suffix}`, null),
-  ).resolves.toEqual({ status: "session_limit" });
+  await expect(add(`wps_limit_blocked_${suffix}`, null)).resolves.toEqual({
+    status: "session_limit",
+  });
 
-  expect(
-    await webPushSubscriptionRepository.countForSession(userId, sessionId),
-  ).toBe(2);
+  expect(await webPushSubscriptionRepository.countForSession(userId, sessionId)).toBe(2);
 });

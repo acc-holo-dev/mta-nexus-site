@@ -21,19 +21,12 @@ const state = vi.hoisted(() => ({
   maxActiveCreates: 0,
 }));
 
-const findServer = vi.hoisted(() =>
-  vi.fn(async () => state.server),
-);
-const listFollowers = vi.hoisted(() =>
-  vi.fn(async () => state.followers),
-);
+const findServer = vi.hoisted(() => vi.fn(async () => state.server));
+const listFollowers = vi.hoisted(() => vi.fn(async () => state.followers));
 const createNotification = vi.hoisted(() =>
   vi.fn(async (input: Record<string, unknown>) => {
     state.activeCreates += 1;
-    state.maxActiveCreates = Math.max(
-      state.maxActiveCreates,
-      state.activeCreates,
-    );
+    state.maxActiveCreates = Math.max(state.maxActiveCreates, state.activeCreates);
     try {
       await new Promise<void>((resolve) => {
         setTimeout(resolve, 1);
@@ -112,26 +105,21 @@ describe("server follower notification service", () => {
   it.each([
     ["private", "active"],
     ["public", "suspended"],
-  ] as const)(
-    "skips a %s/%s server",
-    async (visibility, status) => {
-      state.server = {
-        id: "srv_1",
-        name: "Nexus Racing",
-        visibility,
-        status,
-      };
+  ] as const)("skips a %s/%s server", async (visibility, status) => {
+    state.server = {
+      id: "srv_1",
+      name: "Nexus Racing",
+      visibility,
+      status,
+    };
 
-      await expect(
-        notifyServerFollowersOfPublishedContent(content),
-      ).resolves.toMatchObject({
-        attempted: 0,
-        skipped: true,
-      });
-      expect(listFollowers).not.toHaveBeenCalled();
-      expect(createNotification).not.toHaveBeenCalled();
-    },
-  );
+    await expect(notifyServerFollowersOfPublishedContent(content)).resolves.toMatchObject({
+      attempted: 0,
+      skipped: true,
+    });
+    expect(listFollowers).not.toHaveBeenCalled();
+    expect(createNotification).not.toHaveBeenCalled();
+  });
 
   it("bounds fanout, excludes the author and queues push jobs without network delivery", async () => {
     state.followers = [
@@ -157,14 +145,9 @@ describe("server follower notification service", () => {
       })),
     ];
 
-    const result =
-      await notifyServerFollowersOfPublishedContent(content);
+    const result = await notifyServerFollowersOfPublishedContent(content);
 
-    expect(listFollowers).toHaveBeenCalledWith(
-      "server",
-      "srv_1",
-      102,
-    );
+    expect(listFollowers).toHaveBeenCalledWith("server", "srv_1", 102);
     expect(result).toEqual({
       eligibleFollowers: 100,
       attempted: 100,
@@ -179,9 +162,7 @@ describe("server follower notification service", () => {
     expect(state.maxActiveCreates).toBeLessThanOrEqual(10);
     expect(state.maxActiveCreates).toBeGreaterThan(1);
     expect(
-      createNotification.mock.calls.some(
-        ([input]) => input.recipientId === "usr_author",
-      ),
+      createNotification.mock.calls.some(([input]) => input.recipientId === "usr_author"),
     ).toBe(false);
   });
 });

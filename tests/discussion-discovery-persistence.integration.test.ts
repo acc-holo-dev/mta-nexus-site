@@ -72,16 +72,14 @@ it("loads a linked older comment beyond the first page and continues across micr
 it("matches literal wildcard text and public author identity before bounded paging", async () => {
   const f = await fixture();
   const ids = [`cmt_${randomUUID()}`, `cmt_${randomUUID()}`];
-  await db
-    .insert(comments)
-    .values(
-      ids.map((id, i) => ({
-        id,
-        authorId: f.user.id,
-        contentId: f.item.id,
-        text: i ? "Lua discussion" : "Literal %_ token",
-      })),
-    );
+  await db.insert(comments).values(
+    ids.map((id, i) => ({
+      id,
+      authorId: f.user.id,
+      contentId: f.item.id,
+      text: i ? "Lua discussion" : "Literal %_ token",
+    })),
+  );
   expect(
     (await discussion.page(f.item.id, undefined, { query: "%_" })).items.map((row) => row.id),
   ).toEqual([ids[0]]);

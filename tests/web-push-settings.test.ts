@@ -60,17 +60,14 @@ describe("Web Push settings state parser", () => {
   });
 });
 
-
 describe("Web Push endpoint fingerprint", () => {
   it("uses the canonical lowercase SHA-256 hex digest without exposing the endpoint", async () => {
-    const endpoint =
-      "https://push.example.net/subscriptions/high-entropy-capability";
+    const endpoint = "https://push.example.net/subscriptions/high-entropy-capability";
     await expect(endpointFingerprint(endpoint)).resolves.toBe(
       createHash("sha256").update(endpoint, "utf8").digest("hex"),
     );
   });
 });
-
 
 describe("Web Push VAPID rotation detection", () => {
   it("matches the browser applicationServerKey bytes exactly", () => {

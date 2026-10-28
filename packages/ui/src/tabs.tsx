@@ -6,11 +6,7 @@ export interface TabItem {
   badge?: number | string;
 }
 
-export function nextTabIndex(
-  length: number,
-  currentIndex: number,
-  key: string,
-): number | null {
+export function nextTabIndex(length: number, currentIndex: number, key: string): number | null {
   if (length <= 0) return null;
   if (key === "Home") return 0;
   if (key === "End") return length - 1;
@@ -26,22 +22,14 @@ export interface TabsProps {
   className?: string;
 }
 
-export function Tabs({
-  tabs,
-  activeTab,
-  onChange,
-  className,
-}: TabsProps) {
+export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
   const activeIndex = tabs.findIndex((tab) => tab.id === activeTab);
 
   return (
     <div
       role="tablist"
       aria-orientation="horizontal"
-      className={cn(
-        "flex space-x-1 overflow-x-auto border-b border-base pb-px",
-        className,
-      )}
+      className={cn("flex space-x-1 overflow-x-auto border-b border-base pb-px", className)}
     >
       {tabs.map((tab, index) => {
         const isActive = tab.id === activeTab;
@@ -62,9 +50,7 @@ export function Tabs({
               if (!nextTab) return;
               onChange(nextTab.id);
               const controls =
-                event.currentTarget.parentElement?.querySelectorAll<HTMLElement>(
-                  '[role="tab"]',
-                );
+                event.currentTarget.parentElement?.querySelectorAll<HTMLElement>('[role="tab"]');
               controls?.[nextIndex]?.focus();
             }}
             className={cn(

@@ -1,6 +1,4 @@
-export type NotificationReadTarget =
-  | { scope: "all" }
-  | { scope: "single"; id: string };
+export type NotificationReadTarget = { scope: "all" } | { scope: "single"; id: string };
 
 // An empty request body means "all" for existing clients. Malformed JSON,
 // null, arrays and unexpected keys must never silently become a bulk action.

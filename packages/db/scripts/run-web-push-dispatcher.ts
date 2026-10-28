@@ -17,12 +17,7 @@ const LOOP_STALL_AFTER_MS = 180_000;
 const POLL_INTERVAL_MS = 2_000;
 const BATCH_SIZE = 20;
 
-function readQueueAlertThreshold(
-  name: string,
-  fallback: number,
-  min: number,
-  max: number,
-): number {
+function readQueueAlertThreshold(name: string, fallback: number, min: number, max: number): number {
   const raw = process.env[name]?.trim();
   if (!raw) return fallback;
   if (!/^[0-9]+$/u.test(raw)) {
@@ -36,13 +31,22 @@ function readQueueAlertThreshold(
 }
 
 const QUEUE_ALERT_PENDING_PERCENT = readQueueAlertThreshold(
-  "WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT", 80, 1, 99,
+  "WEB_PUSH_QUEUE_ALERT_PENDING_PERCENT",
+  80,
+  1,
+  99,
 );
 const QUEUE_ALERT_DUE_JOBS = readQueueAlertThreshold(
-  "WEB_PUSH_QUEUE_ALERT_DUE_JOBS", 100, 1, 50_000,
+  "WEB_PUSH_QUEUE_ALERT_DUE_JOBS",
+  100,
+  1,
+  50_000,
 );
 const QUEUE_ALERT_OLDEST_AGE_SECONDS = readQueueAlertThreshold(
-  "WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS", 900, 1, 86_400,
+  "WEB_PUSH_QUEUE_ALERT_OLDEST_AGE_SECONDS",
+  900,
+  1,
+  86_400,
 );
 
 type QueueAlertReason =
@@ -78,10 +82,7 @@ function markProgress() {
 }
 
 function failIfLoopStalled() {
-  if (
-    stopping ||
-    Date.now() - lastProgressAt <= LOOP_STALL_AFTER_MS
-  ) {
+  if (stopping || Date.now() - lastProgressAt <= LOOP_STALL_AFTER_MS) {
     return;
   }
 
@@ -107,9 +108,11 @@ function queueAlertThresholds() {
 function updateQueueAlertState() {
   const reasons: QueueAlertReason[] = [];
   if (!configured && healthQueuePending > 0) reasons.push("delivery_disabled_with_pending_jobs");
-  if (healthQueuePending * 100 >= healthQueueCapacity * QUEUE_ALERT_PENDING_PERCENT) reasons.push("capacity_pressure");
+  if (healthQueuePending * 100 >= healthQueueCapacity * QUEUE_ALERT_PENDING_PERCENT)
+    reasons.push("capacity_pressure");
   if (healthQueueDue >= QUEUE_ALERT_DUE_JOBS) reasons.push("due_backlog");
-  if (healthQueuePending > 0 && healthQueueOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS) reasons.push("oldest_job_age");
+  if (healthQueuePending > 0 && healthQueueOldestAgeSeconds >= QUEUE_ALERT_OLDEST_AGE_SECONDS)
+    reasons.push("oldest_job_age");
 
   const previousSignature = lastQueueAlertSignature;
   const nextSignature = reasons.join(",");
@@ -204,10 +207,7 @@ async function delay(ms: number, signal: AbortSignal) {
 }
 
 let failed = false;
-watchdogTimer = setInterval(
-  failIfLoopStalled,
-  HEARTBEAT_INTERVAL_MS,
-);
+watchdogTimer = setInterval(failIfLoopStalled, HEARTBEAT_INTERVAL_MS);
 watchdogTimer.unref();
 
 try {
@@ -250,11 +250,7 @@ try {
     let activity = 0;
 
     if (dispatcher) {
-      const result = await dispatcher.runBatch(
-        BATCH_SIZE,
-        controller.signal,
-        markProgress,
-      );
+      const result = await dispatcher.runBatch(BATCH_SIZE, controller.signal, markProgress);
       activity =
         result.accepted +
         result.retried +
@@ -272,10 +268,7 @@ try {
         });
       }
     } else {
-      const cleaned =
-        await webPushWorkerRepository.discardUnavailable(
-          BATCH_SIZE,
-        );
+      const cleaned = await webPushWorkerRepository.discardUnavailable(BATCH_SIZE);
       activity = cleaned;
       if (cleaned > 0) {
         emit({
@@ -292,10 +285,7 @@ try {
     await queueHealth();
 
     if (once) break;
-    await delay(
-      activity > 0 ? 250 : POLL_INTERVAL_MS,
-      controller.signal,
-    );
+    await delay(activity > 0 ? 250 : POLL_INTERVAL_MS, controller.signal);
   }
 
   await healthWrite;
@@ -310,9 +300,7 @@ try {
   });
 } catch {
   failed = true;
-  process.stderr.write(
-    `${JSON.stringify({ status: "failed", configured })}\n`,
-  );
+  process.stderr.write(`${JSON.stringify({ status: "failed", configured })}\n`);
   process.exitCode = 1;
 } finally {
   if (heartbeatTimer) clearInterval(heartbeatTimer);

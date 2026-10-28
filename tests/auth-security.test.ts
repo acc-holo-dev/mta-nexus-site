@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  generateSessionToken,
-  getClientIp,
-  MemoryRateLimiter,
-} from "@nexus/security";
+import { generateSessionToken, getClientIp, MemoryRateLimiter } from "@nexus/security";
 
 describe("Authentication security primitives", () => {
   it("creates high-entropy URL-safe session tokens", () => {
@@ -17,10 +13,13 @@ describe("Authentication security primitives", () => {
   it("normalizes proxy IP headers and rejects arbitrary values", () => {
     const secret = "trusted-proxy-secret-0123456789abcdef";
     expect(
-      getClientIp(new Headers({
-        "x-nexus-proxy-secret": secret,
-        "x-forwarded-for": "203.0.113.10, 10.0.0.2",
-      }), secret)
+      getClientIp(
+        new Headers({
+          "x-nexus-proxy-secret": secret,
+          "x-forwarded-for": "203.0.113.10, 10.0.0.2",
+        }),
+        secret,
+      ),
     ).toBe("203.0.113.10");
     expect(getClientIp(new Headers({ "x-real-ip": "not-an-ip" }), secret)).toBe("unknown");
     expect(getClientIp(new Headers({ "x-forwarded-for": "203.0.113.10" }), secret)).toBe("unknown");

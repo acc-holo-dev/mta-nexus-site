@@ -15,8 +15,6 @@ describe("server publication notification", () => {
       type: "server",
       category: "server",
     });
-    expect(JSON.stringify(notification)).not.toMatch(
-      /online|offline|uptime|player threshold/iu,
-    );
+    expect(JSON.stringify(notification)).not.toMatch(/online|offline|uptime|player threshold/iu);
   });
 });

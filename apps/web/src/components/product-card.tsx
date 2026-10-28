@@ -5,13 +5,7 @@ import { getDictionary, type Locale } from "../lib/i18n";
 import { PRODUCT_PUBLISHING_KEYS } from "../lib/product-type-labels";
 import { ResourcePreview } from "./resource-preview";
 
-export function ProductCard({
-  product,
-  locale = "en",
-}: {
-  product: Product;
-  locale?: Locale;
-}) {
+export function ProductCard({ product, locale = "en" }: { product: Product; locale?: Locale }) {
   const dictionary = getDictionary(locale);
   const updatedDate = new Date(product.updatedAt).toLocaleDateString(
     locale === "ru" ? "ru-RU" : "en-US",
@@ -24,7 +18,11 @@ export function ProductCard({
       className="group flex flex-col overflow-hidden nexus-panel transition-all hover:border-strong hover:shadow-nexus"
     >
       <div className="relative aspect-video w-full overflow-hidden bg-inset">
-        <ResourcePreview src={product.thumbnailUrl} title={product.title} fallback={dictionary.market.noPreview} />
+        <ResourcePreview
+          src={product.thumbnailUrl}
+          title={product.title}
+          fallback={dictionary.market.noPreview}
+        />
         <div className="absolute left-2 top-2 flex gap-1.5">
           <span className="rounded bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
             {dictionary.publishing[PRODUCT_PUBLISHING_KEYS[product.type]]}
@@ -39,9 +37,7 @@ export function ProductCard({
         <div className="flex items-center justify-between font-caption">
           <div className="flex items-center gap-1 font-semibold text-warning">
             <Star className="h-3.5 w-3.5 fill-current" />
-            <span className="font-numeric">
-              {(product.ratingAverage / 10).toFixed(1)}
-            </span>
+            <span className="font-numeric">{(product.ratingAverage / 10).toFixed(1)}</span>
             <span className="text-faint">({product.ratingCount})</span>
           </div>
           <div className="flex items-center gap-1 text-muted">
@@ -61,9 +57,7 @@ export function ProductCard({
         <div className="flex items-center justify-between border-t border-base pt-2.5 font-caption text-faint">
           <div className="flex min-w-0 items-center gap-1.5">
             <Tag className="h-3 w-3 shrink-0" />
-            <span className="truncate">
-              {product.tags.slice(0, 2).join(", ")}
-            </span>
+            <span className="truncate">{product.tags.slice(0, 2).join(", ")}</span>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <span>

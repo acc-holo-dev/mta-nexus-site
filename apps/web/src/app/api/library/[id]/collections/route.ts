@@ -12,14 +12,16 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
     return libraryCollectionsService.resourceMemberships(actor, (await params).id);
   });
 }
-export const POST = withBrowserMutation((request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-  return resourceCommerceRequest(request, true, async (actor) => {
-    if (request.nextUrl.searchParams.size)
-      throw new AppError("Unexpected membership mutation query", 400, "COLLECTION_INVALID");
-    return libraryCollectionsService.membershipBatch(
-      actor,
-      (await params).id,
-      await readBoundedJson(request, LIBRARY_COLLECTION_COMMAND_BYTES),
-    );
-  });
-});
+export const POST = withBrowserMutation(
+  (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    return resourceCommerceRequest(request, true, async (actor) => {
+      if (request.nextUrl.searchParams.size)
+        throw new AppError("Unexpected membership mutation query", 400, "COLLECTION_INVALID");
+      return libraryCollectionsService.membershipBatch(
+        actor,
+        (await params).id,
+        await readBoundedJson(request, LIBRARY_COLLECTION_COMMAND_BYTES),
+      );
+    });
+  },
+);

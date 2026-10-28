@@ -145,7 +145,8 @@ it("withdraws edited publication and stale pending evidence while retaining file
       "approve",
       { ...audit(f, "stale"), targetId: pending },
       present(observed.revision),
-    `tok_${f.staff}`),
+      `tok_${f.staff}`,
+    ),
   ).toBeNull();
   expect(await buildRepository.findById(f.release)).toMatchObject({
     status: "published",
@@ -172,7 +173,8 @@ it("resubmits the saved published archive and notifies each subsequent reviewed 
         "approve",
         audit(f, `approve${round}`),
         present(pending.revision),
-      `tok_${f.staff}`),
+        `tok_${f.staff}`,
+      ),
     ).toMatchObject({ status: "published" });
     expect(await productRepository.findById(f.id)).toMatchObject({
       status: "published",
@@ -185,7 +187,8 @@ it("resubmits the saved published archive and notifies each subsequent reviewed 
         "approve",
         audit(f, `replay${round}`),
         present(pending.revision),
-      `tok_${f.staff}`),
+        `tok_${f.staff}`,
+      ),
     ).toBeNull();
   }
   expect(await db.select().from(builds).where(eq(builds.productId, f.id))).toHaveLength(1);

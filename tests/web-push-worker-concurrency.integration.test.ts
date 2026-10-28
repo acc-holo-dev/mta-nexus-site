@@ -50,37 +50,30 @@ describe("Web Push concurrent worker soak", () => {
 
     const notificationIds = [];
     for (let index = 0; index < jobs; index += 1) {
-      const notificationId =
-        `not_push_soak_${suffix}_${index}`;
+      const notificationId = `not_push_soak_${suffix}_${index}`;
       notificationIds.push(notificationId);
-      const created =
-        await notificationRepository.createWithPushOutbox({
-          id: notificationId,
-          recipientId: userId,
-          title: "Push soak",
-          message: `Concurrent job ${index}`,
-          link: "/notifications",
-          type: "system",
-          category: "system",
-        });
+      const created = await notificationRepository.createWithPushOutbox({
+        id: notificationId,
+        recipientId: userId,
+        title: "Push soak",
+        message: `Concurrent job ${index}`,
+        link: "/notifications",
+        type: "system",
+        category: "system",
+      });
       expect(created.pushJobs).toBe(1);
     }
 
     const sentTags: string[] = [];
     const sender = vi.fn(
-      async (
-        _subscription: Parameters<WebPushSender>[0],
-        payload: WebPushNotificationPayload,
-      ) => {
+      async (_subscription: Parameters<WebPushSender>[0], payload: WebPushNotificationPayload) => {
         if (!payload.tag) {
           throw new Error("Expected durable notification tag");
         }
         sentTags.push(payload.tag);
         // Yield so candidate/claim overlap is exercised rather than letting one
         // dispatcher synchronously drain every row before peers start.
-        await new Promise((resolve) =>
-          setTimeout(resolve, 1),
-        );
+        await new Promise((resolve) => setTimeout(resolve, 1));
         return { statusCode: 201 };
       },
     );
@@ -111,13 +104,10 @@ describe("Web Push concurrent worker soak", () => {
       claim: (id: string) => webPushWorkerRepository.claim(id),
       prepare: (lease: Parameters<typeof webPushWorkerRepository.prepare>[0]) =>
         webPushWorkerRepository.prepare(lease),
-      settle: (
-        ...args: Parameters<typeof webPushWorkerRepository.settle>
-      ) => webPushWorkerRepository.settle(...args),
+      settle: (...args: Parameters<typeof webPushWorkerRepository.settle>) =>
+        webPushWorkerRepository.settle(...args),
       discardStaleSubscription: (
-        ...args: Parameters<
-          typeof webPushWorkerRepository.discardStaleSubscription
-        >
+        ...args: Parameters<typeof webPushWorkerRepository.discardStaleSubscription>
       ) => webPushWorkerRepository.discardStaleSubscription(...args),
       discardUnavailable: async () => 0,
     };
@@ -126,35 +116,16 @@ describe("Web Push concurrent worker soak", () => {
       { length: 4 },
       () => new WebPushDispatcher({ sender, worker: scopedWorker }),
     );
-    const summaries = await Promise.all(
-      workers.map((dispatcher) =>
-        dispatcher.runBatch(100),
-      ),
-    );
+    const summaries = await Promise.all(workers.map((dispatcher) => dispatcher.runBatch(100)));
 
-    expect(
-      summaries.reduce(
-        (total, summary) => total + summary.accepted,
-        0,
-      ),
-    ).toBe(jobs);
+    expect(summaries.reduce((total, summary) => total + summary.accepted, 0)).toBe(jobs);
     expect(sender).toHaveBeenCalledTimes(jobs);
     expect(sentTags).toHaveLength(jobs);
     expect(new Set(sentTags).size).toBe(jobs);
-    expect(new Set(sentTags)).toEqual(
-      new Set(notificationIds),
-    );
+    expect(new Set(sentTags)).toEqual(new Set(notificationIds));
 
     await expect(
-      db
-        .select()
-        .from(webPushOutbox)
-        .where(
-          eq(
-            webPushOutbox.subscriptionId,
-            subscriptionId,
-          ),
-        ),
+      db.select().from(webPushOutbox).where(eq(webPushOutbox.subscriptionId, subscriptionId)),
     ).resolves.toEqual([]);
   });
 });

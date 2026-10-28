@@ -23,13 +23,7 @@ export interface DialogProps {
   children: React.ReactNode;
 }
 
-export function Dialog({
-  isOpen,
-  onClose,
-  title,
-  description,
-  children,
-}: DialogProps) {
+export function Dialog({ isOpen, onClose, title, description, children }: DialogProps) {
   const titleId = React.useId();
   const descriptionId = React.useId();
   const dialogRef = React.useRef<HTMLDivElement>(null);
@@ -52,34 +46,22 @@ export function Dialog({
     };
   }, [isOpen, onClose]);
 
-  const trapFocus = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key !== "Tab") return;
-      const root = dialogRef.current;
-      if (!root) return;
+  const trapFocus = React.useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Tab") return;
+    const root = dialogRef.current;
+    if (!root) return;
 
-      const targets = Array.from(
-        root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-      ).filter(
-        (element) =>
-          element.getClientRects().length > 0 &&
-          getComputedStyle(element).visibility !== "hidden",
-      );
-      const activeIndex = targets.indexOf(
-        document.activeElement as HTMLElement,
-      );
-      const nextIndex = nextDialogFocusIndex(
-        targets.length,
-        activeIndex,
-        event.shiftKey,
-      );
-      if (nextIndex === null) return;
+    const targets = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+      (element) =>
+        element.getClientRects().length > 0 && getComputedStyle(element).visibility !== "hidden",
+    );
+    const activeIndex = targets.indexOf(document.activeElement as HTMLElement);
+    const nextIndex = nextDialogFocusIndex(targets.length, activeIndex, event.shiftKey);
+    if (nextIndex === null) return;
 
-      event.preventDefault();
-      targets[nextIndex]?.focus();
-    },
-    [],
-  );
+    event.preventDefault();
+    targets[nextIndex]?.focus();
+  }, []);
 
   if (!isOpen) return null;
 
@@ -115,10 +97,7 @@ export function Dialog({
             {title}
           </h3>
           {description && (
-            <p
-              id={descriptionId}
-              className="mt-1 text-sm text-muted"
-            >
+            <p id={descriptionId} className="mt-1 text-sm text-muted">
               {description}
             </p>
           )}

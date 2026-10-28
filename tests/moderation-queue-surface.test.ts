@@ -77,10 +77,7 @@ describe("moderation queue admin boundary", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     state.user = null;
-    mocks.can.mockImplementation(
-      (_user: unknown, action: string) =>
-        action === "admin.access",
-    );
+    mocks.can.mockImplementation((_user: unknown, action: string) => action === "admin.access");
     mocks.health.mockResolvedValue({
       counts: {
         users: 10,
@@ -125,13 +122,9 @@ describe("moderation queue admin boundary", () => {
     };
     mocks.can.mockReturnValue(false);
 
-    const markup = renderToStaticMarkup(
-      await AdminPage({ searchParams: Promise.resolve({}) }),
-    );
+    const markup = renderToStaticMarkup(await AdminPage({ searchParams: Promise.resolve({}) }));
 
-    expect(markup).toContain(
-      getDictionary("en").admin.accessDenied,
-    );
+    expect(markup).toContain(getDictionary("en").admin.accessDenied);
     expect(mocks.listPendingReviewPage).not.toHaveBeenCalled();
     expect(mocks.countPendingReview).not.toHaveBeenCalled();
     expect(mocks.listVerificationPage).not.toHaveBeenCalled();
@@ -155,16 +148,11 @@ describe("moderation queue admin boundary", () => {
     );
     const copy = getDictionary("en").admin;
 
-    expect(mocks.can).toHaveBeenCalledWith(
-      state.user,
-      "admin.access",
-    );
+    expect(mocks.can).toHaveBeenCalledWith(state.user, "admin.access");
     expect(mocks.listPendingReviewPage).toHaveBeenCalledWith(3);
     expect(mocks.countPendingReview).toHaveBeenCalledOnce();
     expect(markup).toContain(copy.resourceBuildQueue);
-    expect(markup).toContain(
-      `7 ${copy.buildsAwaitingReview}`,
-    );
+    expect(markup).toContain(`7 ${copy.buildsAwaitingReview}`);
     expect(markup).toContain(copy.noBuilds);
     expect(markup).toContain(`${copy.reportPage} 3`);
   });
@@ -185,10 +173,7 @@ describe("moderation queue admin boundary", () => {
     expect(mocks.listPendingReviewPage).toHaveBeenCalledWith(1);
 
     vi.clearAllMocks();
-    mocks.can.mockImplementation(
-      (_user: unknown, action: string) =>
-        action === "admin.access",
-    );
+    mocks.can.mockImplementation((_user: unknown, action: string) => action === "admin.access");
     mocks.health.mockResolvedValue({
       counts: {
         users: 0,

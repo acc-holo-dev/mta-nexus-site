@@ -13,11 +13,13 @@ export async function lockInitiatingSession(
   const [current] = await tx
     .select({ id: sessions.id, expiresAt: sessions.expiresAt })
     .from(sessions)
-    .where(and(
-      eq(sessions.userId, actorId),
-      eq(sessions.token, digestSessionToken(token)),
-      gt(sessions.expiresAt, new Date()),
-    ))
+    .where(
+      and(
+        eq(sessions.userId, actorId),
+        eq(sessions.token, digestSessionToken(token)),
+        gt(sessions.expiresAt, new Date()),
+      ),
+    )
     .for("update");
   const expiresAt = current ? new Date(current.expiresAt).getTime() : Number.NaN;
   if (!current || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) {

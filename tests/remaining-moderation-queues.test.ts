@@ -16,17 +16,28 @@ vi.mock("../packages/db/src/client", () => ({
     select: () => ({
       from: () => {
         const query = {
-          innerJoin: () => { captured.joins += 1; return query; },
+          innerJoin: () => {
+            captured.joins += 1;
+            return query;
+          },
           where(filter: SQL) {
             captured.filter = filter;
             return {
               // biome-ignore lint/suspicious/noThenProperty: The Drizzle count query mock must be awaitable.
-              then(resolve: (rows: { total: number }[]) => void) { resolve([{ total: 307 }]); },
+              then(resolve: (rows: { total: number }[]) => void) {
+                resolve([{ total: 307 }]);
+              },
               orderBy(...order: SQL[]) {
                 captured.order = order;
                 const ordered = {
-                  limit(value: number) { captured.limit = value; return ordered; },
-                  offset(value: number) { captured.offset = value; return Promise.resolve(captured.rows); },
+                  limit(value: number) {
+                    captured.limit = value;
+                    return ordered;
+                  },
+                  offset(value: number) {
+                    captured.offset = value;
+                    return Promise.resolve(captured.rows);
+                  },
                 };
                 return ordered;
               },
@@ -74,12 +85,15 @@ describe("remaining moderation queues", () => {
     expect(result.builds).toHaveLength(30);
     expect(captured.joins).toBe(2);
     expect(result.builds[0]).toMatchObject({
-      id: "build-0", productTitle: "Resource 0", publisherUsername: "creator",
+      id: "build-0",
+      productTitle: "Resource 0",
+      publisherUsername: "creator",
     });
     expect(result.hasMore).toBe(true);
     expect(filterParams()).toEqual(["pending_review"]);
     expect(captured.order.map((part) => dialect.sqlToQuery(part).sql)).toEqual([
-      '"builds"."created_at" asc', '"builds"."id" asc',
+      '"builds"."created_at" asc',
+      '"builds"."id" asc',
     ]);
     expect(captured.limit).toBe(31);
     expect(captured.offset).toBe(120);
@@ -95,7 +109,8 @@ describe("remaining moderation queues", () => {
     expect(result.hasMore).toBe(false);
     expect(filterParams()).toEqual(["draft"]);
     expect(captured.order.map((part) => dialect.sqlToQuery(part).sql)).toEqual([
-      '"content"."created_at" asc', '"content"."id" asc',
+      '"content"."created_at" asc',
+      '"content"."id" asc',
     ]);
     expect(captured.offset).toBe(90);
     await expect(repo.listDraftPage(1, 101)).rejects.toThrow(RangeError);

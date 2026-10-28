@@ -38,37 +38,25 @@ vi.mock("@nexus/security", () => ({
 import { PATCH } from "../apps/web/src/app/api/servers/[id]/route";
 
 function request(body: unknown) {
-  return new NextRequest(
-    "https://nexus.test/api/servers/srv_1",
-    {
-      method: "PATCH",
-      headers: {
-        ...browserMutationHeaders(),
-        "content-type": "application/json",
-        cookie:
-          "nexus_session=server-owner-token",
-      },
-      body: JSON.stringify(body),
+  return new NextRequest("https://nexus.test/api/servers/srv_1", {
+    method: "PATCH",
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      cookie: "nexus_session=server-owner-token",
     },
-  );
+    body: JSON.stringify(body),
+  });
 }
 
 const routeContext = {
   params: Promise.resolve({ id: "srv_1" }),
 };
 
-function expectPrivateCorrelation(
-  response: Response,
-) {
-  expect(
-    response.headers.get("cache-control"),
-  ).toBe("private, no-store");
-  expect(response.headers.get("vary")).toBe(
-    "Cookie",
-  );
-  expect(
-    response.headers.get("x-request-id"),
-  ).toMatch(/^[0-9a-f-]{20,}$/u);
+function expectPrivateCorrelation(response: Response) {
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe("Cookie");
+  expect(response.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{20,}$/u);
 }
 
 describe("server owner update HTTP contract", () => {
@@ -139,15 +127,18 @@ describe("server owner update HTTP contract", () => {
   });
 
   it("rejects unsupported PATCH media types before any server update", async () => {
-    const response = await PATCH(new NextRequest("https://nexus.test/api/servers/srv_1", {
-      method: "PATCH",
-      headers: {
-        ...browserMutationHeaders(),
-        "content-type": "text/plain",
-        cookie: "nexus_session=server-owner-token",
-      },
-      body: JSON.stringify({ name: "Tampered server" }),
-    }), routeContext);
+    const response = await PATCH(
+      new NextRequest("https://nexus.test/api/servers/srv_1", {
+        method: "PATCH",
+        headers: {
+          ...browserMutationHeaders(),
+          "content-type": "text/plain",
+          cookie: "nexus_session=server-owner-token",
+        },
+        body: JSON.stringify({ name: "Tampered server" }),
+      }),
+      routeContext,
+    );
     expect(response.status).toBe(415);
     expectPrivateCorrelation(response);
     expect(await response.json()).toMatchObject({ code: "UNSUPPORTED_MEDIA_TYPE" });
@@ -155,10 +146,7 @@ describe("server owner update HTTP contract", () => {
   });
 
   it("rejects an oversized PATCH request before database mutation", async () => {
-    const response = await PATCH(
-      request({ description: "x".repeat(40_000) }),
-      routeContext,
-    );
+    const response = await PATCH(request({ description: "x".repeat(40_000) }), routeContext);
     expect(response.status).toBe(413);
     expectPrivateCorrelation(response);
     expect(await response.json()).toMatchObject({
@@ -210,26 +198,17 @@ describe("server owner update HTTP contract", () => {
       name: "Nexus Racing",
       ownerId: "usr_attacker",
     },
-  ])(
-    "rejects authority/state field injection before the service: %j",
-    async (body) => {
-      const response = await PATCH(
-        request(body),
-        routeContext,
-      );
+  ])("rejects authority/state field injection before the service: %j", async (body) => {
+    const response = await PATCH(request(body), routeContext);
 
-      expect(response.status).toBe(400);
-      expectPrivateCorrelation(response);
-      expect(updateServer).not.toHaveBeenCalled();
-    },
-  );
+    expect(response.status).toBe(400);
+    expectPrivateCorrelation(response);
+    expect(updateServer).not.toHaveBeenCalled();
+  });
 
   it("requires authentication and rate-limit budget before mutation", async () => {
     state.user = null;
-    const anonymous = await PATCH(
-      request({ name: "Nexus Racing" }),
-      routeContext,
-    );
+    const anonymous = await PATCH(request({ name: "Nexus Racing" }), routeContext);
     expect(anonymous.status).toBe(401);
     expectPrivateCorrelation(anonymous);
     expect(updateServer).not.toHaveBeenCalled();
@@ -239,10 +218,7 @@ describe("server owner update HTTP contract", () => {
       role: "developer",
     };
     state.allowed = false;
-    const limited = await PATCH(
-      request({ name: "Nexus Racing" }),
-      routeContext,
-    );
+    const limited = await PATCH(request({ name: "Nexus Racing" }), routeContext);
     expect(limited.status).toBe(429);
     expectPrivateCorrelation(limited);
     expect(updateServer).not.toHaveBeenCalled();

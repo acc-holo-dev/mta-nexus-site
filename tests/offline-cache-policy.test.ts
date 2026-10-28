@@ -38,11 +38,9 @@ describe("public offline cache policy", () => {
 
   it("adds Cookie to Vary without duplicating existing fields", () => {
     expect(appendVaryHeader(null, "Cookie")).toBe("Cookie");
-    expect(
-      appendVaryHeader("RSC, Accept-Encoding", "Cookie"),
-    ).toBe("RSC, Accept-Encoding, Cookie");
-    expect(
-      appendVaryHeader("RSC, cookie, Accept-Encoding", "Cookie"),
-    ).toBe("RSC, cookie, Accept-Encoding");
+    expect(appendVaryHeader("RSC, Accept-Encoding", "Cookie")).toBe("RSC, Accept-Encoding, Cookie");
+    expect(appendVaryHeader("RSC, cookie, Accept-Encoding", "Cookie")).toBe(
+      "RSC, cookie, Accept-Encoding",
+    );
   });
 });

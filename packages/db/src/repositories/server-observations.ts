@@ -399,17 +399,19 @@ export class ServerObservationRepository {
         const [current] = await tx
           .select({ id: servers.id })
           .from(servers)
-          .where(and(
-            eq(servers.id, input.serverId),
-            eq(servers.ipAddress, expectedEndpoint.ipAddress),
-            eq(servers.port, expectedEndpoint.port),
-            // The same host:port can be reused after A -> B -> A.
-            // Capture the revision selected for this server, not just
-            // its network endpoint text.
-            expectedEndpoint.endpointRevision === undefined
-              ? undefined
-              : eq(servers.endpointRevision, expectedEndpoint.endpointRevision),
-          ))
+          .where(
+            and(
+              eq(servers.id, input.serverId),
+              eq(servers.ipAddress, expectedEndpoint.ipAddress),
+              eq(servers.port, expectedEndpoint.port),
+              // The same host:port can be reused after A -> B -> A.
+              // Capture the revision selected for this server, not just
+              // its network endpoint text.
+              expectedEndpoint.endpointRevision === undefined
+                ? undefined
+                : eq(servers.endpointRevision, expectedEndpoint.endpointRevision),
+            ),
+          )
           .for("update")
           .limit(1);
         if (!current) return null;
@@ -439,11 +441,13 @@ export class ServerObservationRepository {
         const [existing] = await tx
           .select()
           .from(serverObservations)
-          .where(and(
-            eq(serverObservations.source, input.source),
-            eq(serverObservations.sourceSequence, input.sourceSequence),
-            eq(serverObservations.serverId, input.serverId),
-          ))
+          .where(
+            and(
+              eq(serverObservations.source, input.source),
+              eq(serverObservations.sourceSequence, input.sourceSequence),
+              eq(serverObservations.serverId, input.serverId),
+            ),
+          )
           .limit(1);
         if (!existing) {
           throw new Error("Conflicting server observation was not found");
@@ -465,21 +469,22 @@ export class ServerObservationRepository {
           lastObservedAt: input.observedAt,
           observationSource: input.source,
         })
-        .where(and(
-          eq(servers.id, input.serverId),
-          // Reject delayed telemetry from the server's previous IP/port.
-          ...(expectedEndpoint ? [
-            eq(servers.ipAddress, expectedEndpoint.ipAddress),
-            eq(servers.port, expectedEndpoint.port),
-            ...(expectedEndpoint.endpointRevision === undefined
-              ? []
-              : [eq(servers.endpointRevision, expectedEndpoint.endpointRevision)]),
-          ] : []),
-          or(
-            isNull(servers.lastObservedAt),
-            lt(servers.lastObservedAt, input.observedAt),
+        .where(
+          and(
+            eq(servers.id, input.serverId),
+            // Reject delayed telemetry from the server's previous IP/port.
+            ...(expectedEndpoint
+              ? [
+                  eq(servers.ipAddress, expectedEndpoint.ipAddress),
+                  eq(servers.port, expectedEndpoint.port),
+                  ...(expectedEndpoint.endpointRevision === undefined
+                    ? []
+                    : [eq(servers.endpointRevision, expectedEndpoint.endpointRevision)]),
+                ]
+              : []),
+            or(isNull(servers.lastObservedAt), lt(servers.lastObservedAt, input.observedAt)),
           ),
-        ));
+        );
 
       return inserted[0] as ServerObservation;
     });
@@ -496,11 +501,7 @@ export class ServerObservationRepository {
     return rows as ServerObservation[];
   }
 
-  async listWindow(
-    serverId: string,
-    hours = 24,
-    limit = 500,
-  ): Promise<ServerObservation[]> {
+  async listWindow(serverId: string, hours = 24, limit = 500): Promise<ServerObservation[]> {
     const boundedHours = boundedObservationInt(hours, 24, 24 * 31);
     const boundedLimit = boundedObservationInt(limit, 500, 500);
     const since = new Date(Date.now() - boundedHours * 3_600_000);
@@ -508,10 +509,7 @@ export class ServerObservationRepository {
       .select()
       .from(serverObservations)
       .where(
-        and(
-          eq(serverObservations.serverId, serverId),
-          gte(serverObservations.observedAt, since),
-        ),
+        and(eq(serverObservations.serverId, serverId), gte(serverObservations.observedAt, since)),
       )
       .orderBy(desc(serverObservations.observedAt), desc(serverObservations.id))
       .limit(boundedLimit);
@@ -531,46 +529,73 @@ export class ServerObservationRepository {
       gte(serverObservations.observedAt, windowStart),
       lte(serverObservations.observedAt, windowEnd),
     );
-    const average = sql<number | null>`round(avg(${serverObservations.currentPlayers}), 1)`
-      .mapWith((value: unknown): number | null => value == null ? null : Number(value));
-    const peak = sql<number | null>`max(${serverObservations.currentPlayers})`
-      .mapWith((value: unknown): number | null => value == null ? null : Number(value));
-    const bucket = sql<Date>`to_timestamp(floor(extract(epoch from ${serverObservations.observedAt}) / ${bucketSeconds}) * ${bucketSeconds})`
-      .mapWith(serverObservations.observedAt).as("bucket_at");
+    const average = sql<number | null>`round(avg(${serverObservations.currentPlayers}), 1)`.mapWith(
+      (value: unknown): number | null => (value == null ? null : Number(value)),
+    );
+    const peak = sql<number | null>`max(${serverObservations.currentPlayers})`.mapWith(
+      (value: unknown): number | null => (value == null ? null : Number(value)),
+    );
+    const bucket =
+      sql<Date>`to_timestamp(floor(extract(epoch from ${serverObservations.observedAt}) / ${bucketSeconds}) * ${bucketSeconds})`
+        .mapWith(serverObservations.observedAt)
+        .as("bucket_at");
 
     // The summary, recent samples and chart buckets must describe the same committed rows.
-    return db.transaction(async (tx) => {
-      const [summary] = await tx.select({
-        observationCount: count(),
-        knownPlayerCount: count(serverObservations.currentPlayers),
-        observedFrom: sql<Date | null>`min(${serverObservations.observedAt})`.mapWith(serverObservations.observedAt),
-        observedTo: sql<Date | null>`max(${serverObservations.observedAt})`.mapWith(serverObservations.observedAt),
-        peakPlayers: peak,
-        averagePlayers: average,
-      }).from(serverObservations).where(filter);
-      if (!summary) throw new Error("Server history aggregate returned no row");
+    return db.transaction(
+      async (tx) => {
+        const [summary] = await tx
+          .select({
+            observationCount: count(),
+            knownPlayerCount: count(serverObservations.currentPlayers),
+            observedFrom: sql<Date | null>`min(${serverObservations.observedAt})`.mapWith(
+              serverObservations.observedAt,
+            ),
+            observedTo: sql<Date | null>`max(${serverObservations.observedAt})`.mapWith(
+              serverObservations.observedAt,
+            ),
+            peakPlayers: peak,
+            averagePlayers: average,
+          })
+          .from(serverObservations)
+          .where(filter);
+        if (!summary) throw new Error("Server history aggregate returned no row");
 
-      const observations = await tx.select().from(serverObservations).where(filter)
-        .orderBy(desc(serverObservations.observedAt), desc(serverObservations.id)).limit(sampleLimit);
-      const buckets = await tx.select({
-        bucketAt: bucket,
-        observationCount: count(),
-        knownPlayerCount: count(serverObservations.currentPlayers),
-        peakPlayers: peak,
-        averagePlayers: average,
-        maxPlayers: sql<number | null>`max(${serverObservations.maxPlayers})`
-          .mapWith((value: unknown): number | null => value == null ? null : Number(value)),
-      }).from(serverObservations).where(filter)
-        // Refer to the SELECT alias: repeated parameterized expressions use different
-        // placeholders and PostgreSQL does not consider them identical GROUP BY keys.
-        .groupBy(sql`"bucket_at"`).orderBy(sql`"bucket_at"`);
+        const observations = await tx
+          .select()
+          .from(serverObservations)
+          .where(filter)
+          .orderBy(desc(serverObservations.observedAt), desc(serverObservations.id))
+          .limit(sampleLimit);
+        const buckets = await tx
+          .select({
+            bucketAt: bucket,
+            observationCount: count(),
+            knownPlayerCount: count(serverObservations.currentPlayers),
+            peakPlayers: peak,
+            averagePlayers: average,
+            maxPlayers: sql<number | null>`max(${serverObservations.maxPlayers})`.mapWith(
+              (value: unknown): number | null => (value == null ? null : Number(value)),
+            ),
+          })
+          .from(serverObservations)
+          .where(filter)
+          // Refer to the SELECT alias: repeated parameterized expressions use different
+          // placeholders and PostgreSQL does not consider them identical GROUP BY keys.
+          .groupBy(sql`"bucket_at"`)
+          .orderBy(sql`"bucket_at"`);
 
-      return {
-        windowStart, windowEnd, bucketSeconds, sampleLimit, summary,
-        observations: (observations as ServerObservation[]).reverse(),
-        buckets,
-      };
-    }, { isolationLevel: "repeatable read", accessMode: "read only" });
+        return {
+          windowStart,
+          windowEnd,
+          bucketSeconds,
+          sampleLimit,
+          summary,
+          observations: (observations as ServerObservation[]).reverse(),
+          buckets,
+        };
+      },
+      { isolationLevel: "repeatable read", accessMode: "read only" },
+    );
   }
 
   async getPeakPlayers(serverId: string, hours = 24): Promise<number | null> {
@@ -580,10 +605,7 @@ export class ServerObservationRepository {
       .select({ peak: sql<number | null>`max(${serverObservations.currentPlayers})` })
       .from(serverObservations)
       .where(
-        and(
-          eq(serverObservations.serverId, serverId),
-          gte(serverObservations.observedAt, since)
-        )
+        and(eq(serverObservations.serverId, serverId), gte(serverObservations.observedAt, since)),
       );
     return rows[0]?.peak == null ? null : Number(rows[0].peak);
   }

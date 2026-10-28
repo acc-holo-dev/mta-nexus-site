@@ -52,48 +52,44 @@ beforeEach(() => {
   vi.clearAllMocks();
   state.user = { id: "usr_a", role: "user" };
   state.locale = "en";
-  state.history
-    .mockReset()
-    .mockResolvedValue({
-      items: [
-        {
-          id: "ent_a",
-          productId: "prd_a",
-          source: "cart",
-          acquiredAt: now,
-          title: "PRIVATE-DRAFT-TITLE",
-          slug: "private-draft",
-          hasCurrentAccess: true,
-          downloadable: false,
-          requestId: "PRIVATE-REQUEST",
-          licenseKey: "PRIVATE-KEY",
-        },
-      ],
-      total: 21,
-      page: 2,
-      totalPages: 2,
-      filter: "cart",
-    });
-  state.report
-    .mockReset()
-    .mockResolvedValue({
-      product: {
-        id: "prd_a",
-        title: "<script>Title</script>",
-        status: "published",
-        privateField: "PRIVATE-PUBLISHER",
+  state.history.mockReset().mockResolvedValue({
+    items: [
+      {
+        id: "ent_a",
+        productId: "prd_a",
+        source: "cart",
+        acquiredAt: now,
+        title: "PRIVATE-DRAFT-TITLE",
+        slug: "private-draft",
+        hasCurrentAccess: true,
+        downloadable: false,
+        requestId: "PRIVATE-REQUEST",
+        licenseKey: "PRIVATE-KEY",
       },
-      days: 7,
-      from: now,
-      through: now,
-      acquisitions: 2,
-      direct: 1,
-      cart: 1,
-      retainedGrants: 2,
-      downloadStarts: 4,
-      timeline: [{ day: "2026-10-10", acquisitions: 2, downloadStarts: 4 }],
-      buyerIdentity: "PRIVATE-BUYER",
-    });
+    ],
+    total: 21,
+    page: 2,
+    totalPages: 2,
+    filter: "cart",
+  });
+  state.report.mockReset().mockResolvedValue({
+    product: {
+      id: "prd_a",
+      title: "<script>Title</script>",
+      status: "published",
+      privateField: "PRIVATE-PUBLISHER",
+    },
+    days: 7,
+    from: now,
+    through: now,
+    acquisitions: 2,
+    direct: 1,
+    cart: 1,
+    retainedGrants: 2,
+    downloadStarts: 4,
+    timeline: [{ day: "2026-10-10", acquisitions: 2, downloadStarts: 4 }],
+    buyerIdentity: "PRIVATE-BUYER",
+  });
 });
 const historyInput = { searchParams: Promise.resolve({ page: "2", source: "cart" }) };
 const activityInput = {

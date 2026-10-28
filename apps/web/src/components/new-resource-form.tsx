@@ -235,12 +235,7 @@ export function NewResourceForm({ actorId }: { actorId: string }) {
   }
 
   if (resultId) {
-    return (
-      <ResourceSubmissionSuccess
-        resultId={resultId}
-        locale={locale}
-      />
-    );
+    return <ResourceSubmissionSuccess resultId={resultId} locale={locale} />;
   }
 
   return (

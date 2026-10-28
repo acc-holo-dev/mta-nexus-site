@@ -26,9 +26,12 @@ test("CI runs separate test projects and reports the selected verification scope
   const selector = pkg.scripts["check:code"].match(/"\/([^"]+)\/"$/u);
   assert.ok(selector, "check:code must select explicit scripts");
   const pattern = new RegExp(selector[1]);
-  assert.deepEqual(Object.keys(pkg.scripts).filter(name => pattern.test(name)).sort(), [
-    "analyze:architecture", "analyze:unused", "lint", "test:tooling", "test:unit", "typecheck",
-  ]);
+  assert.deepEqual(
+    Object.keys(pkg.scripts)
+      .filter((name) => pattern.test(name))
+      .sort(),
+    ["analyze:architecture", "analyze:unused", "lint", "test:tooling", "test:unit", "typecheck"],
+  );
   assert.match(pkg.scripts["check:code"], /--sequential --no-bail/u);
   assert.match(pkg.scripts["test:unit"], /--project unit\b/u);
   assert.match(pkg.scripts["test:unit"], /--outputFile=artifacts\/unit-tests\.json/u);
@@ -40,10 +43,7 @@ test("CI runs separate test projects and reports the selected verification scope
 
 test("core release evidence requires every named gate including lint and typecheck", () => {
   const pkg = JSON.parse(read("package.json"));
-  assert.equal(
-    pkg.scripts.check,
-    "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
-  );
+  assert.equal(pkg.scripts.check, "pnpm lint && pnpm typecheck && pnpm test && pnpm build");
 
   assert.deepEqual(REQUIRED_RELEASE_GATES, [
     "repository_identity",
@@ -85,10 +85,7 @@ test("generated release evidence is not tracked by default", () => {
 test("release command results never serialize stdout or stderr payloads", () => {
   const result = executeReleaseCommand(
     process.execPath,
-    [
-      "-e",
-      "process.stdout.write('secret-out'); process.stderr.write('secret-err')",
-    ],
+    ["-e", "process.stdout.write('secret-out'); process.stderr.write('secret-err')"],
     {
       cwd: process.cwd(),
       env: process.env,
@@ -163,11 +160,13 @@ test("CI keeps selected-scope evidence strict for releases without coupling bran
 test("mail worker CI expects current structured terminal events", () => {
   const workflow = read(".github/workflows/ci.yml");
   const production = read("scripts/check-production-mail-worker.sh");
-  assert.ok(production.includes("export TRUSTED_PROXY_SECRET=disposable-mail-worker-proxy-config-only"));
+  assert.ok(
+    production.includes("export TRUSTED_PROXY_SECRET=disposable-mail-worker-proxy-config-only"),
+  );
   assert.match(workflow, /'"status":"stopped"' \/tmp\/account-mail-once\.json/u);
   assert.match(workflow, /'"status":"stopped"' \/tmp\/account-mail-loop\.json/u);
   for (const text of [workflow, production]) {
-    assert.ok(text.includes("grep -Fxq '{\"status\":\"failed\"}'"));
+    assert.ok(text.includes('grep -Fxq \'{"status":"failed"}\''));
     assert.ok(!text.includes("Account mail dispatcher failed"));
   }
 });
@@ -179,7 +178,10 @@ test("production mail acceptance isolates its queue before seeding and dispatchi
   const seed = script.indexOf("phase=seed-synthetic-mail");
   assert.ok(create > script.indexOf("phase=runner-guard"));
   assert.ok(migrate > create && seed > migrate);
-  assert.match(script, /export DATABASE_URL=postgres:\/\/[^\n]+@localhost:5432\/nexus_mail_acceptance/u);
+  assert.match(
+    script,
+    /export DATABASE_URL=postgres:\/\/[^\n]+@localhost:5432\/nexus_mail_acceptance/u,
+  );
   const workerUrls = [...script.matchAll(/--env DATABASE_URL=([^\s]+)/gu)];
   assert.equal(workerUrls.length, 2);
   for (const [, url] of workerUrls) {
@@ -190,7 +192,10 @@ test("production mail acceptance isolates its queue before seeding and dispatchi
 
 test("mail worker crash probe signals only the inspected container process", () => {
   const script = read("scripts/check-production-mail-worker.sh");
-  const crash = script.slice(script.indexOf("phase=supervised-crash-restart"), script.indexOf("phase=graceful-recreate"));
+  const crash = script.slice(
+    script.indexOf("phase=supervised-crash-restart"),
+    script.indexOf("phase=graceful-recreate"),
+  );
   assert.ok(crash.includes("sleep 10"));
   assert.ok(crash.includes("docker inspect --format '{{.State.Pid}}' \"$worker\""));
   assert.ok(crash.includes('"$worker_pid" -gt 1'));
@@ -203,16 +208,24 @@ test("mail worker crash probe signals only the inspected container process", () 
 test("expected missing-key failures are captured without triggering the ERR trap", () => {
   const script = read("scripts/check-production-mail-worker.sh");
   const section = script.slice(script.indexOf("phase=missing-key-fail-closed"));
-  const command = section.slice(section.indexOf("if docker run"), section.indexOf('test "$code" -ne 0'))
+  const command = section
+    .slice(section.indexOf("if docker run"), section.indexOf('test "$code" -ne 0'))
     .replaceAll("/tmp/nexus-d5-missing.out", "/dev/null")
     .replaceAll("/tmp/nexus-d5-missing.err", "/dev/null");
   assert.ok(command.startsWith("if docker run"));
   for (const exitCode of [0, 1, 125]) {
-    const result = spawnSync("bash", ["-c", `set -Ee
+    const result = spawnSync(
+      "bash",
+      [
+        "-c",
+        `set -Ee
 trap 'exit 99' ERR
 docker() { return ${exitCode}; }
 ${command}
-printf '%s' "$code"`], { encoding: "utf8" });
+printf '%s' "$code"`,
+      ],
+      { encoding: "utf8" },
+    );
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stdout, String(exitCode));
   }

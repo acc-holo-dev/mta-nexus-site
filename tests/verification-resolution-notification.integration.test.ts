@@ -15,8 +15,7 @@ describe("verification resolution notifications", () => {
   it.each(["approved", "rejected"] as const)(
     "stores requester notification and push job atomically when a request is %s",
     async (decision) => {
-      const suffix =
-        `${decision}_${randomBytes(5).toString("hex")}`;
+      const suffix = `${decision}_${randomBytes(5).toString("hex")}`;
       const requesterId = `usr_verify_result_${suffix}`;
       const reviewerId = `usr_verify_result_mod_${suffix}`;
       const sessionId = `ses_verify_result_${suffix}`;
@@ -53,8 +52,7 @@ describe("verification resolution notifications", () => {
         id: subscriptionId,
         userId: requesterId,
         sessionId,
-        endpoint:
-          `https://push.example.invalid/verify-result-${suffix}`,
+        endpoint: `https://push.example.invalid/verify-result-${suffix}`,
         p256dh: "verification-key",
         auth: "verification-auth",
         expirationAt: null,
@@ -67,45 +65,30 @@ describe("verification resolution notifications", () => {
         notes: "Verification result integration fixture.",
       });
 
-      const resolved =
-        await verificationRepository.resolveRequest({
-          id: request.id,
-          reviewerId,
-          decision,
-          currentToken: reviewerToken,
-          reviewNotes: "Reviewed integration fixture.",
-        });
+      const resolved = await verificationRepository.resolveRequest({
+        id: request.id,
+        reviewerId,
+        decision,
+        currentToken: reviewerToken,
+        reviewNotes: "Reviewed integration fixture.",
+      });
       expect(resolved).toMatchObject({
         id: request.id,
         requesterId,
         status: decision,
       });
 
-      const notificationId =
-        `ntf_verification_resolution_${request.id}`;
-      await expect(
-        notificationRepository.findById(notificationId),
-      ).resolves.toMatchObject({
+      const notificationId = `ntf_verification_resolution_${request.id}`;
+      await expect(notificationRepository.findById(notificationId)).resolves.toMatchObject({
         recipientId: requesterId,
-        title:
-          decision === "approved"
-            ? "Verification approved"
-            : "Verification rejected",
+        title: decision === "approved" ? "Verification approved" : "Verification rejected",
         type: "security",
         category: "security",
         isRead: false,
       });
 
       await expect(
-        db
-          .select()
-          .from(webPushOutbox)
-          .where(
-            eq(
-              webPushOutbox.notificationId,
-              notificationId,
-            ),
-          ),
+        db.select().from(webPushOutbox).where(eq(webPushOutbox.notificationId, notificationId)),
       ).resolves.toEqual([
         expect.objectContaining({
           subscriptionId,
@@ -113,31 +96,22 @@ describe("verification resolution notifications", () => {
         }),
       ]);
 
-      const replay =
-        await verificationRepository.resolveRequest({
-          id: request.id,
-          reviewerId,
-          decision,
-          currentToken: reviewerToken,
-          reviewNotes: "Replay must be a no-op.",
-        });
+      const replay = await verificationRepository.resolveRequest({
+        id: request.id,
+        reviewerId,
+        decision,
+        currentToken: reviewerToken,
+        reviewNotes: "Replay must be a no-op.",
+      });
       expect(replay).toBeNull();
 
-      const inbox =
-        await notificationRepository.listByUser(requesterId);
-      expect(
-        inbox.filter((item) => item.id === notificationId),
-      ).toHaveLength(1);
+      const inbox = await notificationRepository.listByUser(requesterId);
+      expect(inbox.filter((item) => item.id === notificationId)).toHaveLength(1);
       expect(
         await db
           .select()
           .from(webPushOutbox)
-          .where(
-            eq(
-              webPushOutbox.notificationId,
-              notificationId,
-            ),
-          ),
+          .where(eq(webPushOutbox.notificationId, notificationId)),
       ).toHaveLength(1);
     },
   );

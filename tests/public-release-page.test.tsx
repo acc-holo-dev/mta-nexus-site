@@ -24,13 +24,21 @@ vi.mock("next/headers", () => ({
   cookies: async () => ({ get: () => ({ value: "session" }) }),
 }));
 vi.mock("next/navigation", () => ({
-  notFound: () => { throw new Error("NEXT_NOT_FOUND"); },
+  notFound: () => {
+    throw new Error("NEXT_NOT_FOUND");
+  },
 }));
 vi.mock("next/link", async () => {
   const React = await import("react");
   return {
-    default: ({ href, children, ...props }: {
-      href: string; children: ReactNode; [key: string]: unknown;
+    default: ({
+      href,
+      children,
+      ...props
+    }: {
+      href: string;
+      children: ReactNode;
+      [key: string]: unknown;
     }) => React.createElement("a", { href, ...props }, children),
   };
 });
@@ -56,20 +64,31 @@ vi.mock("../apps/web/src/components/resource-download-button", async () => {
   const React = await import("react");
   return {
     ResourceDownloadButton: ({
-      productId, version, buildId,
-    }: { productId: string; version: string; buildId: string }) =>
-      React.createElement("button", {
-        "data-resource": productId,
-        "data-version": version,
-        "data-build": buildId,
-      }, "Pinned download"),
+      productId,
+      version,
+      buildId,
+    }: {
+      productId: string;
+      version: string;
+      buildId: string;
+    }) =>
+      React.createElement(
+        "button",
+        {
+          "data-resource": productId,
+          "data-version": version,
+          "data-build": buildId,
+        },
+        "Pinned download",
+      ),
   };
 });
 
 import ReleasePage, { metadata } from "../apps/web/src/app/market/[slug]/versions/page";
 
 const release = {
-  id: "bld_clean_1", version: "1.2.0",
+  id: "bld_clean_1",
+  version: "1.2.0",
   releaseNotes: "New commands\nFix bugs",
   status: "published",
   storageKey: "PRIVATE_STORAGE_PATH",
@@ -100,7 +119,8 @@ describe("public safely published version archive", () => {
       id: "prd_release",
       slug: "safe-release",
       title: "Safe Resource",
-      status: "published", price: 0,
+      status: "published",
+      price: 0,
     };
     state.manager = false;
     state.entitled = false;
@@ -108,12 +128,15 @@ describe("public safely published version archive", () => {
     state.canManage.mockImplementation(async () => state.manager);
     state.checkRight.mockImplementation(async () => state.entitled);
     state.history.mockResolvedValue({
-      releases: [release], page: 1, pageSize: 12,
-      totalPages: 1, total: 1,
+      releases: [release],
+      page: 1,
+      pageSize: 12,
+      totalPages: 1,
+      total: 1,
     });
   });
 
-  it.each(["en", "ru"] as const)("shows public version metadata safely in %s", async locale => {
+  it.each(["en", "ru"] as const)("shows public version metadata safely in %s", async (locale) => {
     state.locale = locale;
     const html = renderToStaticMarkup(await page());
     expect(state.getProduct).toHaveBeenCalledWith("safe-release");
@@ -132,7 +155,10 @@ describe("public safely published version archive", () => {
   it("escapes hostile release notes and never renders executable HTML", async () => {
     state.history.mockResolvedValueOnce({
       releases: [{ ...release, releaseNotes: '<script>alert("danger")</script>' }],
-      page: 1, pageSize: 12, totalPages: 1, total: 1,
+      page: 1,
+      pageSize: 12,
+      totalPages: 1,
+      total: 1,
     });
     const html = renderToStaticMarkup(await page());
     expect(html).not.toContain("<script>");
@@ -145,7 +171,9 @@ describe("public safely published version archive", () => {
     state.entitled = true;
     const html = renderToStaticMarkup(await page());
     expect(state.checkRight).toHaveBeenCalledWith(
-      { type: "user", id: "usr_buyer" }, "prd_release", "product.download",
+      { type: "user", id: "usr_buyer" },
+      "prd_release",
+      "product.download",
     );
     expect(html).toContain('data-build="bld_clean_1"');
     expect(html).toContain('data-resource="prd_release"');
@@ -171,8 +199,11 @@ describe("public safely published version archive", () => {
 
   it("preserves sanitized pagination and marks pages as non-indexable", async () => {
     state.history.mockResolvedValueOnce({
-      releases: [release], page: 2, pageSize: 12,
-      totalPages: 3, total: 25,
+      releases: [release],
+      page: 2,
+      pageSize: 12,
+      totalPages: 3,
+      total: 25,
     });
     const html = renderToStaticMarkup(await page("2"));
     expect(html).toContain('href="/market/safe-release/versions"');

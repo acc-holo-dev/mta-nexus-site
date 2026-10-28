@@ -17,7 +17,9 @@ import { ServerRepository } from "../packages/db/src/repositories/servers";
 
 const repo = new ServerRepository();
 const dialect = new PgDialect();
-beforeEach(() => { state.values = null; });
+beforeEach(() => {
+  state.values = null;
+});
 
 describe("atomic endpoint revision and verification SQL", () => {
   it("keeps editorial-only server updates free of endpoint side effects", async () => {
@@ -38,10 +40,10 @@ describe("atomic endpoint revision and verification SQL", () => {
       expect(sql.params).toContain("play.example.com");
       expect(sql.params).toContain(22003);
     }
-    expect(dialect.sqlToQuery(values?.endpointRevision as SQL).sql)
-      .toContain('"servers"."endpoint_revision" + 1');
-    expect(dialect.sqlToQuery(values?.isVerified as SQL).sql)
-      .toContain("THEN false");
+    expect(dialect.sqlToQuery(values?.endpointRevision as SQL).sql).toContain(
+      '"servers"."endpoint_revision" + 1',
+    );
+    expect(dialect.sqlToQuery(values?.isVerified as SQL).sql).toContain("THEN false");
   });
 
   it("preserves an explicitly edited owner capacity", async () => {

@@ -9,11 +9,7 @@ import { getRequestLocale } from "../../../lib/i18n-server";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminSupportLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default async function AdminSupportLayout({ children }: { children: ReactNode }) {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const token = (await cookies()).get("nexus_session")?.value;
@@ -25,12 +21,8 @@ export default async function AdminSupportLayout({
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-danger-soft text-danger">
           <ShieldAlert className="h-7 w-7" aria-hidden="true" />
         </div>
-        <h1 className="font-display text-primary">
-          {dictionary.admin.accessDenied}
-        </h1>
-        <p className="font-caption text-muted">
-          {dictionary.admin.accessDeniedDescription}
-        </p>
+        <h1 className="font-display text-primary">{dictionary.admin.accessDenied}</h1>
+        <p className="font-caption text-muted">{dictionary.admin.accessDeniedDescription}</p>
         <Link
           href="/auth/login"
           className="inline-block rounded-md bg-accent px-4 py-2 text-xs font-semibold text-white"

@@ -2,9 +2,7 @@ import type { LicenseStatus, OrderStatus } from "@nexus/domain";
 
 /** Never trust a query string to control SQL page size or large offsets. */
 export function parseHistoryPage(value: string | string[] | undefined): number {
-  return typeof value === "string" && /^[1-9][0-9]{0,5}$/u.test(value)
-    ? Number(value)
-    : 1;
+  return typeof value === "string" && /^[1-9][0-9]{0,5}$/u.test(value) ? Number(value) : 1;
 }
 
 /** Display the effective status without mutating a historical license row. */
@@ -18,13 +16,16 @@ export function effectiveLicenseStatus(
     expiresAt instanceof Date &&
     Number.isFinite(expiresAt.getTime()) &&
     expiresAt.getTime() <= now.getTime()
-  ) return "expired";
+  )
+    return "expired";
   return status;
 }
 
 export function formatHistoryDate(value: Date, locale: "en" | "ru"): string {
   return new Intl.DateTimeFormat(locale === "ru" ? "ru-RU" : "en-US", {
-    year: "numeric", month: "short", day: "numeric",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
     timeZone: "UTC",
   }).format(value);
 }
@@ -55,16 +56,12 @@ export function orderStatusLabel(
   status: string,
   labels: Readonly<Record<OrderStatus, string>>,
 ): string {
-  return Object.hasOwn(labels, status)
-    ? labels[status as OrderStatus]
-    : status;
+  return Object.hasOwn(labels, status) ? labels[status as OrderStatus] : status;
 }
 
 export function licenseStatusLabel(
   status: string,
   labels: Readonly<Record<LicenseStatus, string>>,
 ): string {
-  return Object.hasOwn(labels, status)
-    ? labels[status as LicenseStatus]
-    : status;
+  return Object.hasOwn(labels, status) ? labels[status as LicenseStatus] : status;
 }

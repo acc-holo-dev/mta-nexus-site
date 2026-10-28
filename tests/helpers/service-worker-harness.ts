@@ -39,10 +39,7 @@ export function makeServiceWorkerRequest(
   };
 }
 
-export function createServiceWorkerHarness(
-  source: string,
-  options: HarnessOptions = {},
-) {
+export function createServiceWorkerHarness(source: string, options: HarnessOptions = {}) {
   const listeners = new Map<string, ServiceWorkerListener>();
   const fetchCalls: unknown[] = [];
   const cachePuts: Array<{ request: unknown; response: unknown }> = [];
@@ -119,10 +116,7 @@ export function createServiceWorkerHarness(
       },
     },
     registration: {
-      async showNotification(
-        title: string,
-        notificationOptions: Record<string, unknown>,
-      ) {
+      async showNotification(title: string, notificationOptions: Record<string, unknown>) {
         notifications.push({
           title,
           options: notificationOptions,
@@ -142,7 +136,9 @@ export function createServiceWorkerHarness(
     clearTimeout,
   });
 
-  async function dispatchFetch(request: ServiceWorkerRequest): Promise<{ intercepted: boolean; response: unknown }> {
+  async function dispatchFetch(
+    request: ServiceWorkerRequest,
+  ): Promise<{ intercepted: boolean; response: unknown }> {
     const listener = listeners.get("fetch");
     if (!listener) throw new Error("Service worker did not register fetch");
 

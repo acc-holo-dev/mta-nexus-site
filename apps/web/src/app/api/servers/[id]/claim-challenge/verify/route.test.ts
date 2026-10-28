@@ -79,12 +79,7 @@ import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
 import { POST } from "./route";
 
-function request(
-  overrides: {
-    headers?: Record<string, string>;
-    body?: string;
-  } = {},
-) {
+function request(overrides: { headers?: Record<string, string>; body?: string } = {}) {
   const { headers: headerOverrides, ...rest } = overrides;
   return new NextRequest("https://nexus.test/api/servers/srv_1/claim-challenge/verify", {
     method: "POST",

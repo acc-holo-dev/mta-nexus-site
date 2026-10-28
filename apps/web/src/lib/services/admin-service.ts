@@ -16,14 +16,13 @@ class AdminService {
       throw new ForbiddenError("Admin access required");
     }
 
-    const [users, servers, products, publishedContent, reportsOpen] =
-      await Promise.all([
-        userRepository.countAll(),
-        serverRepository.countActivePublic(),
-        productRepository.countPublishedFree(),
-        contentRepository.countPublished(),
-        reportRepository.countOpen(),
-      ]);
+    const [users, servers, products, publishedContent, reportsOpen] = await Promise.all([
+      userRepository.countAll(),
+      serverRepository.countActivePublic(),
+      productRepository.countPublishedFree(),
+      contentRepository.countPublished(),
+      reportRepository.countOpen(),
+    ]);
 
     return {
       status: "healthy",
@@ -48,7 +47,11 @@ class AdminService {
     return auditRepository.listRecent(50);
   }
 
-  async listReports(actor: User, view: "pending" | "history" = "pending", page = 1): Promise<{ reports: Report[]; hasMore: boolean }> {
+  async listReports(
+    actor: User,
+    view: "pending" | "history" = "pending",
+    page = 1,
+  ): Promise<{ reports: Report[]; hasMore: boolean }> {
     if (!can(actor, "admin.moderation")) {
       throw new ForbiddenError("Moderator access required");
     }

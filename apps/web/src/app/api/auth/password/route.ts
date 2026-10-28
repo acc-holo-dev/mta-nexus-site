@@ -10,12 +10,12 @@ import { consumeRateLimit } from "@nexus/security";
 
 function json(body: unknown, status = 200) {
   return NextResponse.json(body, {
-    status, headers: { "Cache-Control": "private, no-store", Vary: "Cookie" },
+    status,
+    headers: { "Cache-Control": "private, no-store", Vary: "Cookie" },
   });
 }
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
-
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
@@ -28,7 +28,10 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
     const parsed = changePasswordSchema.safeParse(await readAuthJson(request));
     if (!parsed.success) {
-      return json({ error: "Password change validation failed", details: parsed.error.format() }, 400);
+      return json(
+        { error: "Password change validation failed", details: parsed.error.format() },
+        400,
+      );
     }
     const changed = await authService.changePassword({
       userId: user.id,
@@ -54,7 +57,9 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 503,
       error,
     });
-    return json({ error: "Could not confirm the password change. Sign in again before retrying." }, 503);
+    return json(
+      { error: "Could not confirm the password change. Sign in again before retrying." },
+      503,
+    );
   }
 });
-

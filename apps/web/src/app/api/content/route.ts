@@ -6,19 +6,11 @@ import {
   type RequestLogContext,
 } from "../../../lib/observability";
 import { authService } from "../../../lib/services/auth-service";
-import {
-  contentRepository,
-  organizationRepository,
-  productRepository,
-} from "@nexus/db";
+import { contentRepository, organizationRepository, productRepository } from "@nexus/db";
 import { serverService } from "../../../lib/services/server-service";
 import { productService } from "../../../lib/services/product-service";
 import { createContentSchema } from "@nexus/validation";
-import {
-  can,
-  consumeRateLimit,
-  generateId,
-} from "@nexus/security";
+import { can, consumeRateLimit, generateId } from "@nexus/security";
 import { withBrowserMutation } from "../../../lib/browser-route-adapter";
 
 const privateHeaders = {
@@ -27,19 +19,14 @@ const privateHeaders = {
 };
 
 const publicHeaders = {
-  "Cache-Control":
-    "public, max-age=30, stale-while-revalidate=120",
+  "Cache-Control": "public, max-age=30, stale-while-revalidate=120",
 };
 
 const errorHeaders = {
   "Cache-Control": "no-store",
 };
 
-function privateJson(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function privateJson(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -50,25 +37,15 @@ export async function GET(request: NextRequest) {
   const context = createRequestLogContext(request);
 
   try {
-    const requestedLimit = Number(
-      request.nextUrl.searchParams.get("limit") ||
-        "50",
-    );
+    const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "50");
     const limit = Number.isFinite(requestedLimit)
-      ? Math.min(
-          Math.max(Math.floor(requestedLimit), 1),
-          100,
-        )
+      ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
       : 50;
-    const content =
-      await contentRepository.listPublished(limit);
+    const content = await contentRepository.listPublished(limit);
 
     // Keep the cacheable public representation free of a unique
     // correlation header; a CDN may replay cached response headers.
-    return Response.json(
-      { content, limit },
-      { headers: publicHeaders },
-    );
+    return Response.json({ content, limit }, { headers: publicHeaders });
   } catch (error) {
     logRequestEvent({
       level: "error",
@@ -80,8 +57,7 @@ export async function GET(request: NextRequest) {
     return jsonWithRequestId(
       context,
       {
-        error:
-          "Published content is temporarily unavailable",
+        error: "Published content is temporarily unavailable",
       },
       { status: 503, headers: errorHeaders },
     );
@@ -91,36 +67,25 @@ export async function GET(request: NextRequest) {
 export const POST = withBrowserMutation(async (request: NextRequest) => {
   const context = createRequestLogContext(request);
   try {
-    const token =
-      request.cookies.get("nexus_session")?.value;
+    const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user) {
-      return privateJson(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
+      return privateJson(context, { error: "Authentication required" }, 401);
     }
 
-    const rateLimit = await consumeRateLimit(
-      "contentCreation",
-      user.id,
-    );
+    const rateLimit = await consumeRateLimit("contentCreation", user.id);
     if (!rateLimit.success) {
       return privateJson(
         context,
         {
-          error:
-            "Content creation limit exceeded",
+          error: "Content creation limit exceeded",
         },
         429,
       );
     }
 
-    const parsed = createContentSchema.safeParse(
-      await request.json().catch(() => null),
-    );
+    const parsed = createContentSchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {
       return privateJson(
         context,
@@ -133,29 +98,16 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     if (parsed.data.serverId) {
-      const linkedServer =
-        await serverService.getServerById(
-          parsed.data.serverId,
-        );
+      const linkedServer = await serverService.getServerById(parsed.data.serverId);
       if (!linkedServer) {
-        return privateJson(
-          context,
-          { error: "Linked server was not found" },
-          404,
-        );
+        return privateJson(context, { error: "Linked server was not found" }, 404);
       }
 
-      if (
-        !(await serverService.canManageServer(
-          linkedServer,
-          user,
-        ))
-      ) {
+      if (!(await serverService.canManageServer(linkedServer, user))) {
         return privateJson(
           context,
           {
-            error:
-              "You do not manage the linked server",
+            error: "You do not manage the linked server",
           },
           403,
         );
@@ -163,32 +115,22 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     if (parsed.data.productId) {
-      const linkedProduct =
-        await productRepository.findById(
-          parsed.data.productId,
-        );
+      const linkedProduct = await productRepository.findById(parsed.data.productId);
       if (!linkedProduct) {
         return privateJson(
           context,
           {
-            error:
-              "Linked resource was not found",
+            error: "Linked resource was not found",
           },
           404,
         );
       }
 
-      if (
-        !(await productService.canManageProduct(
-          linkedProduct,
-          user,
-        ))
-      ) {
+      if (!(await productService.canManageProduct(linkedProduct, user))) {
         return privateJson(
           context,
           {
-            error:
-              "You do not manage the linked resource",
+            error: "You do not manage the linked resource",
           },
           403,
         );
@@ -196,29 +138,20 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     }
 
     if (parsed.data.organizationId) {
-      const organization =
-        await organizationRepository.findById(
-          parsed.data.organizationId,
-        );
+      const organization = await organizationRepository.findById(parsed.data.organizationId);
       if (!organization) {
         return privateJson(
           context,
           {
-            error:
-              "Linked organization was not found",
+            error: "Linked organization was not found",
           },
           404,
         );
       }
 
-      const memberships =
-        await organizationRepository.listUserMemberships(
-          user.id,
-        );
+      const memberships = await organizationRepository.listUserMemberships(user.id);
       const membership = memberships.find(
-        (item) =>
-          item.organizationId ===
-          parsed.data.organizationId,
+        (item) => item.organizationId === parsed.data.organizationId,
       );
       const canManageOrganization =
         organization.ownerId === user.id ||
@@ -229,52 +162,45 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         return privateJson(
           context,
           {
-            error:
-              "You do not manage this organization",
+            error: "You do not manage this organization",
           },
           403,
         );
       }
     }
 
-    const isCommunityTopic =
-      parsed.data.type === "post" ||
-      parsed.data.type === "question";
+    const isCommunityTopic = parsed.data.type === "post" || parsed.data.type === "question";
     const status = isCommunityTopic
       ? "published"
-      : parsed.data.status === "published" &&
-          can(user, "admin.moderation")
+      : parsed.data.status === "published" && can(user, "admin.moderation")
         ? "published"
         : "draft";
 
     const contentId = generateId("cnt");
-    const contentItem =
-      await contentRepository.createWithAudit(
-        {
-          ...parsed.data,
+    const contentItem = await contentRepository.createWithAudit(
+      {
+        ...parsed.data,
+        status,
+        id: contentId,
+        authorId: user.id,
+        viewCount: 0,
+        likeCount: 0,
+        commentCount: 0,
+        ...(status === "published" ? { publishedAt: new Date() } : {}),
+      },
+      {
+        id: generateId("aud"),
+        actorId: user.id,
+        actorType: "user",
+        action: "content.created",
+        targetId: contentId,
+        targetType: "content",
+        details: {
           status,
-          id: contentId,
-          authorId: user.id,
-          viewCount: 0,
-          likeCount: 0,
-          commentCount: 0,
-          ...(status === "published"
-            ? { publishedAt: new Date() }
-            : {}),
+          type: parsed.data.type,
         },
-        {
-          id: generateId("aud"),
-          actorId: user.id,
-          actorType: "user",
-          action: "content.created",
-          targetId: contentId,
-          targetType: "content",
-          details: {
-            status,
-            type: parsed.data.type,
-          },
-        },
-      );
+      },
+    );
 
     return privateJson(
       context,
@@ -292,10 +218,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 500,
       error,
     });
-    return privateJson(
-      context,
-      { error: "Failed to create content" },
-      500,
-    );
+    return privateJson(context, { error: "Failed to create content" }, 500);
   }
 });

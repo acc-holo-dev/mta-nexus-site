@@ -58,9 +58,7 @@ describe("public MTA directory page behavior", () => {
       expect(html).toContain('href="/workspace/servers/new"');
       expect(html).toContain('data-testid="mta-directory"');
       expect(html).toContain(`data-locale="${locale}"`);
-      expect(
-        (html.match(/data-testid="mta-directory"/gu) ?? []).length,
-      ).toBe(1);
+      expect((html.match(/data-testid="mta-directory"/gu) ?? []).length).toBe(1);
     },
   );
 });

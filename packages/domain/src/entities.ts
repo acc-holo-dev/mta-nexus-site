@@ -441,7 +441,12 @@ export interface DiscussionPushNotificationData {
   discussionPush: { version: 1; state: "pending" | "queued" | "unavailable" };
 }
 export interface Notification {
-  data?: BuildReviewNotificationData | import("./license-maintenance").LicenseTermNotificationData | import("./resource-release-watches").ResourceReleaseNoticeData | DiscussionPushNotificationData | null;
+  data?:
+    | BuildReviewNotificationData
+    | import("./license-maintenance").LicenseTermNotificationData
+    | import("./resource-release-watches").ResourceReleaseNoticeData
+    | DiscussionPushNotificationData
+    | null;
   id: string;
   recipientId: string;
   title: string;

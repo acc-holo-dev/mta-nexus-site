@@ -94,9 +94,7 @@ describe("free resource claim HTTP integration", () => {
           "content-type": "application/json",
           "x-nexus-proxy-secret": proxySecret,
           "x-real-ip": clientIp,
-          ...(session
-            ? { cookie: `nexus_session=${session}` }
-            : {}),
+          ...(session ? { cookie: `nexus_session=${session}` } : {}),
         },
         body: JSON.stringify({ productId }),
       });

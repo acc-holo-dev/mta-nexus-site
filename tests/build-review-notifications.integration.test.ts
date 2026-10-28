@@ -168,7 +168,8 @@ it("keeps a rejection successful when system notifications are disabled", async 
         action: "build.rejected",
       },
       1,
-    f.token),
+      f.token,
+    ),
   ).toMatchObject({ status: "rejected" });
   expect(await notificationRepository.listByUser(f.authorId)).toEqual([]);
   expect(
@@ -199,7 +200,9 @@ it("rolls back build, product and audit when notification storage fails, then pe
   );
   const { notifications } = await import("../packages/db/src/schema");
   await db.delete(notifications).where(eq(notifications.id, id));
-  expect(await buildRepository.moderatePending(f.buildId, "approve", f.audit(), 1, f.token)).toMatchObject({
+  expect(
+    await buildRepository.moderatePending(f.buildId, "approve", f.audit(), 1, f.token),
+  ).toMatchObject({
     status: "published",
   });
   expect(await notificationRepository.listByUser(f.authorId)).toHaveLength(1);
@@ -249,7 +252,8 @@ it("notifies current organization managers once, respecting revocation and prefe
       action: "build.rejected",
     },
     1,
-  f.token);
+    f.token,
+  );
   expect(await notificationRepository.listByUser(f.authorId)).toEqual([]);
   for (const role of roles)
     expect(await notificationRepository.listByUser(`${f.authorId}_${role}`)).toHaveLength(

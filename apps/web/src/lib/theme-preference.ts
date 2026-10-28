@@ -3,9 +3,7 @@ export type ResolvedTheme = "light" | "dark";
 
 export const SYSTEM_THEME_QUERY = "(prefers-color-scheme: dark)";
 
-export function parseThemePreference(
-  value: string | null | undefined,
-): ThemePreference {
+export function parseThemePreference(value: string | null | undefined): ThemePreference {
   if (value === "light" || value === "dark" || value === "system") {
     return value;
   }
@@ -24,9 +22,7 @@ export function resolveThemePreference(
   return preference;
 }
 
-export function nextThemePreference(
-  preference: ThemePreference,
-): ThemePreference {
+export function nextThemePreference(preference: ThemePreference): ThemePreference {
   switch (preference) {
     case "system":
       return "light";

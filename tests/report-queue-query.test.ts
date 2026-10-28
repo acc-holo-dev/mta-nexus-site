@@ -17,9 +17,18 @@ vi.mock("../packages/db/src/client", () => ({
         where(condition: SQL) {
           captured.where = condition;
           const query = {
-            orderBy(...order: SQL[]) { captured.order = order; return query; },
-            limit(value: number) { captured.limit = value; return query; },
-            offset(value: number) { captured.offset = value; return Promise.resolve(captured.rows); },
+            orderBy(...order: SQL[]) {
+              captured.order = order;
+              return query;
+            },
+            limit(value: number) {
+              captured.limit = value;
+              return query;
+            },
+            offset(value: number) {
+              captured.offset = value;
+              return Promise.resolve(captured.rows);
+            },
           };
           return query;
         },
@@ -41,7 +50,8 @@ describe("report moderation queue", () => {
     if (!captured.where) throw new Error("Expected pending report filter to be captured");
     expect(dialect.sqlToQuery(captured.where).params).toEqual(["open", "under_review"]);
     expect(captured.order.map((column) => dialect.sqlToQuery(column).sql)).toEqual([
-      '"reports"."created_at" asc', '"reports"."id" asc',
+      '"reports"."created_at" asc',
+      '"reports"."id" asc',
     ]);
     expect(captured.limit).toBe(31);
     expect(captured.offset).toBe(30);
@@ -54,7 +64,8 @@ describe("report moderation queue", () => {
     if (!captured.where) throw new Error("Expected report history filter to be captured");
     expect(dialect.sqlToQuery(captured.where).params).toEqual(["resolved", "dismissed"]);
     expect(captured.order.map((column) => dialect.sqlToQuery(column).sql)).toEqual([
-      '"reports"."resolved_at" desc', '"reports"."id" desc',
+      '"reports"."resolved_at" desc',
+      '"reports"."id" desc',
     ]);
     await expect(new ReportRepository().listPage("pending", 0)).rejects.toThrow(RangeError);
     await expect(new ReportRepository().listPage("pending", 1, 10_000)).rejects.toThrow(RangeError);

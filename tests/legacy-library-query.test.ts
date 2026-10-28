@@ -2,15 +2,22 @@ import { describe, expect, it, vi } from "vitest";
 import { PgDialect } from "drizzle-orm/pg-core";
 import type { SQL } from "drizzle-orm";
 
-const captured = vi.hoisted(() => ({ selection: null as Record<string, unknown> | null, filter: null as SQL | null }));
+const captured = vi.hoisted(() => ({
+  selection: null as Record<string, unknown> | null,
+  filter: null as SQL | null,
+}));
 vi.mock("../packages/db/src/client", () => ({
   db: {
     select(selection: Record<string, unknown>) {
       captured.selection = selection;
-      return { from: () => ({ where: (filter: SQL) => {
-        captured.filter = filter;
-        return Promise.resolve([]);
-      } }) };
+      return {
+        from: () => ({
+          where: (filter: SQL) => {
+            captured.filter = filter;
+            return Promise.resolve([]);
+          },
+        }),
+      };
     },
   },
 }));

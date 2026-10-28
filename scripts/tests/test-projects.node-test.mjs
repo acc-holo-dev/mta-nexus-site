@@ -36,7 +36,8 @@ describe("isolated and shared-database test projects", () => {
       "logic.test.ts": 'import { expect } from "vitest";',
     });
     assert.deepEqual(classifyTests(root), {
-      database: ["direct.test.ts", "indirect.test.ts"], unit: ["logic.test.ts"],
+      database: ["direct.test.ts", "indirect.test.ts"],
+      unit: ["logic.test.ts"],
     });
   });
 
@@ -62,18 +63,28 @@ describe("isolated and shared-database test projects", () => {
   it("does not let commented, quoted or regex mock examples suppress database imports", () => {
     const root = project({
       ...databaseFiles,
-      "line.test.ts": '// vi.mock("@nexus/db", () => ({ db: {} }));\nimport { db } from "@nexus/db";',
-      "block.test.ts": '/* vi.mock("@nexus/db", () => ({ db: {} })); */\nimport { db } from "@nexus/db";',
-      "quoted.test.ts": 'const example = \'vi.mock("@nexus/db", () => ({ db: {} }));\';\nimport { db } from "@nexus/db";',
-      "regex.test.ts": 'const example = /vi.mock("@nexus\\/db", () => ({}))/;\nimport { db } from "@nexus/db";',
+      "line.test.ts":
+        '// vi.mock("@nexus/db", () => ({ db: {} }));\nimport { db } from "@nexus/db";',
+      "block.test.ts":
+        '/* vi.mock("@nexus/db", () => ({ db: {} })); */\nimport { db } from "@nexus/db";',
+      "quoted.test.ts":
+        'const example = \'vi.mock("@nexus/db", () => ({ db: {} }));\';\nimport { db } from "@nexus/db";',
+      "regex.test.ts":
+        'const example = /vi.mock("@nexus\\/db", () => ({}))/;\nimport { db } from "@nexus/db";',
     });
-    assert.deepEqual(classifyTests(root).database, ["block.test.ts", "line.test.ts", "quoted.test.ts", "regex.test.ts"]);
+    assert.deepEqual(classifyTests(root).database, [
+      "block.test.ts",
+      "line.test.ts",
+      "quoted.test.ts",
+      "regex.test.ts",
+    ]);
   });
 
   it("restores the live edge when a full mock is subsequently removed", () => {
     const root = project({
       ...databaseFiles,
-      "unmock.test.ts": 'vi.mock("@nexus/db", () => ({ db: {} })); vi.unmock("@nexus/db"); import { db } from "@nexus/db";',
+      "unmock.test.ts":
+        'vi.mock("@nexus/db", () => ({ db: {} })); vi.unmock("@nexus/db"); import { db } from "@nexus/db";',
     });
     assert.deepEqual(classifyTests(root).database, ["unmock.test.ts"]);
   });
@@ -81,7 +92,7 @@ describe("isolated and shared-database test projects", () => {
   it("serializes opaque dynamic imports inside template interpolations", () => {
     const root = project({
       // biome-ignore lint/suspicious/noTemplateCurlyInString: literal source fixture, evaluated only by the classifier.
-      "template.test.ts": 'const value = `value: ${await import(moduleName)}`;',
+      "template.test.ts": "const value = `value: ${await import(moduleName)}`;",
     });
     assert.deepEqual(classifyTests(root).database, ["template.test.ts"]);
   });
@@ -89,8 +100,10 @@ describe("isolated and shared-database test projects", () => {
   it("keeps partial mocks and importActual in the database project", () => {
     const root = project({
       ...databaseFiles,
-      "partial.test.ts": 'vi.mock("@nexus/db", async (importOriginal) => ({ ...await importOriginal() }));\nimport repo from "./repository";',
-      "actual.test.ts": 'vi.mock("@nexus/db", () => ({ db: {} }));\nconst actual = await vi.importActual<typeof import("@nexus/db")>("@nexus/db");',
+      "partial.test.ts":
+        'vi.mock("@nexus/db", async (importOriginal) => ({ ...await importOriginal() }));\nimport repo from "./repository";',
+      "actual.test.ts":
+        'vi.mock("@nexus/db", () => ({ db: {} }));\nconst actual = await vi.importActual<typeof import("@nexus/db")>("@nexus/db");',
     });
     assert.deepEqual(classifyTests(root).database, ["actual.test.ts", "partial.test.ts"]);
   });
@@ -98,7 +111,8 @@ describe("isolated and shared-database test projects", () => {
   it("does not execute type imports or paths inspected as source text", () => {
     const root = project({
       ...databaseFiles,
-      "types.test.ts": 'import type { db } from "@nexus/db";\nreadFileSync("packages/db/src/client.ts");',
+      "types.test.ts":
+        'import type { db } from "@nexus/db";\nreadFileSync("packages/db/src/client.ts");',
     });
     assert.deepEqual(classifyTests(root).unit, ["types.test.ts"]);
   });
@@ -109,7 +123,11 @@ describe("isolated and shared-database test projects", () => {
       "dynamic.test.ts": "await import(moduleName);",
       "unknown.test.ts": 'import repository from "./not-yet-resolved";',
     });
-    assert.deepEqual(classifyTests(root).database, ["dynamic.test.ts", "future.integration.test.ts", "unknown.test.ts"]);
+    assert.deepEqual(classifyTests(root).database, [
+      "dynamic.test.ts",
+      "future.integration.test.ts",
+      "unknown.test.ts",
+    ]);
   });
 
   it("handles cyclic imports without recursion failures", () => {
@@ -128,7 +146,10 @@ describe("isolated and shared-database test projects", () => {
       "query.test.ts": 'type Repository = typeof import("@nexus/db");',
       "runtime.test.ts": 'const repository = (await import("@nexus/db")) as unknown;',
     });
-    assert.deepEqual(classifyTests(root), { unit: ["query.test.ts"], database: ["runtime.test.ts"] });
+    assert.deepEqual(classifyTests(root), {
+      unit: ["query.test.ts"],
+      database: ["runtime.test.ts"],
+    });
   });
 
   it("follows actual template expressions without treating pure templates as database work", () => {
@@ -146,7 +167,8 @@ describe("isolated and shared-database test projects", () => {
   it("supports typed dynamic mock targets without executing their import", () => {
     const root = project({
       ...databaseFiles,
-      "typed.test.ts": 'vi.mock(import("@nexus/db"), async () => ({ db: {} })); import repo from "./repository";',
+      "typed.test.ts":
+        'vi.mock(import("@nexus/db"), async () => ({ db: {} })); import repo from "./repository";',
     });
     assert.deepEqual(classifyTests(root).unit, ["typed.test.ts"]);
   });
@@ -154,18 +176,26 @@ describe("isolated and shared-database test projects", () => {
   it("does not let a full mock hide a second partial mock or computed importActual", () => {
     const root = project({
       ...databaseFiles,
-      "partial.test.ts": 'vi.mock("@nexus/db", () => ({ db: {} })); vi.mock("@nexus/db", async (original) => ({ ...await original() })); import repo from "./repository";',
-      "computed.test.ts": 'vi.mock("@nexus/db", () => ({ db: {} })); const actual = await vi["importActual"]("@nexus/db");',
-      "unmock.test.ts": 'vi.mock("@nexus/db", () => ({ db: {} })); vi["unmock"]("@nexus/db"); import repo from "./repository";',
+      "partial.test.ts":
+        'vi.mock("@nexus/db", () => ({ db: {} })); vi.mock("@nexus/db", async (original) => ({ ...await original() })); import repo from "./repository";',
+      "computed.test.ts":
+        'vi.mock("@nexus/db", () => ({ db: {} })); const actual = await vi["importActual"]("@nexus/db");',
+      "unmock.test.ts":
+        'vi.mock("@nexus/db", () => ({ db: {} })); vi["unmock"]("@nexus/db"); import repo from "./repository";',
     });
-    assert.deepEqual(classifyTests(root).database, ["computed.test.ts", "partial.test.ts", "unmock.test.ts"]);
+    assert.deepEqual(classifyTests(root).database, [
+      "computed.test.ts",
+      "partial.test.ts",
+      "unmock.test.ts",
+    ]);
   });
 
   it("keeps automocks and non-hoisted mocks conservative", () => {
     const root = project({
       ...databaseFiles,
       "automatic.test.ts": 'vi.mock("@nexus/db"); import repo from "./repository";',
-      "runtime.test.ts": 'vi.doMock("@nexus/db", () => ({ db: {} })); import repo from "./repository";',
+      "runtime.test.ts":
+        'vi.doMock("@nexus/db", () => ({ db: {} })); import repo from "./repository";',
     });
     assert.deepEqual(classifyTests(root).database, ["automatic.test.ts", "runtime.test.ts"]);
   });
@@ -178,7 +208,10 @@ describe("isolated and shared-database test projects", () => {
       "type.test.cts": 'import type repository = require("@nexus/db");',
       "mixed.test.ts": 'import { type db } from "@nexus/db";',
     });
-    assert.deepEqual(classifyTests(root), { unit: ["type.test.cts"], database: ["common.test.cjs", "equals.test.cts", "mixed.test.ts"] });
+    assert.deepEqual(classifyTests(root), {
+      unit: ["type.test.cts"],
+      database: ["common.test.cjs", "equals.test.cts", "mixed.test.ts"],
+    });
   });
 
   it("fails with the source path when syntax cannot be parsed", () => {

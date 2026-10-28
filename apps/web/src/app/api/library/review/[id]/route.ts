@@ -10,10 +10,12 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
     resourceReviewService.ownDetail(actor, (await params).id),
   );
 }
-export const POST = withBrowserMutation((request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-  return resourceCommerceRequest(request, true, async (actor) => {
-    const body = resourceReviewCommandSchema.safeParse(await readBoundedJson(request, 16384));
-    if (!body.success) throw new AppError("Invalid review", 400, "REVIEW_INVALID");
-    return resourceReviewService.command(actor, (await params).id, body.data);
-  });
-});
+export const POST = withBrowserMutation(
+  (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    return resourceCommerceRequest(request, true, async (actor) => {
+      const body = resourceReviewCommandSchema.safeParse(await readBoundedJson(request, 16384));
+      if (!body.success) throw new AppError("Invalid review", 400, "REVIEW_INVALID");
+      return resourceReviewService.command(actor, (await params).id, body.data);
+    });
+  },
+);

@@ -46,7 +46,7 @@ describe("Entitlement Engine hasEntitlement()", () => {
     const has = await entitlementRepository.hasEntitlement(
       { type: "user", id: userId },
       productId,
-      "product.download"
+      "product.download",
     );
     expect(has).toBe(false);
   });
@@ -63,7 +63,7 @@ describe("Entitlement Engine hasEntitlement()", () => {
     const has = await entitlementRepository.hasEntitlement(
       { type: "user", id: userId },
       productId,
-      "module.runtime"
+      "module.runtime",
     );
     expect(has).toBe(true);
   });
@@ -82,7 +82,7 @@ describe("Entitlement Engine hasEntitlement()", () => {
     const has = await entitlementRepository.hasEntitlement(
       { type: "user", id: userId },
       productId,
-      "product.download"
+      "product.download",
     );
     expect(has).toBe(true);
   });
@@ -96,7 +96,12 @@ describe("Entitlement Engine hasEntitlement()", () => {
       displayName: "Multiple License Tester",
       role: "user",
     });
-    const buildLicense = (name: string, status: "active" | "revoked", entitlements: string[], expiresAt?: Date) =>
+    const buildLicense = (
+      name: string,
+      status: "active" | "revoked",
+      entitlements: string[],
+      expiresAt?: Date,
+    ) =>
       licenseRepository.create({
         id: `lic_multi_${name}_${suffix}`,
         key: `NX-MULTI-${name.toUpperCase()}-${suffix.toUpperCase()}`,
@@ -111,16 +116,27 @@ describe("Entitlement Engine hasEntitlement()", () => {
     await buildLicense("first", "active", ["server.run"]);
     await buildLicense("expired", "active", ["module.download"], new Date(Date.now() - 60_000));
     await buildLicense("revoked", "revoked", ["module.download"]);
-    expect(await entitlementRepository.hasEntitlement(
-      { type: "user", id: requesterId }, productId, "module.download",
-    )).toBe(false);
+    expect(
+      await entitlementRepository.hasEntitlement(
+        { type: "user", id: requesterId },
+        productId,
+        "module.download",
+      ),
+    ).toBe(false);
     await buildLicense("second", "active", ["module.download"]);
-    expect(await entitlementRepository.hasEntitlement(
-      { type: "user", id: requesterId }, productId, "module.download",
-    )).toBe(true);
-    expect(await entitlementRepository.hasEntitlement(
-      { type: "user", id: requesterId }, productId, "different.permission",
-    )).toBe(false);
+    expect(
+      await entitlementRepository.hasEntitlement(
+        { type: "user", id: requesterId },
+        productId,
+        "module.download",
+      ),
+    ).toBe(true);
+    expect(
+      await entitlementRepository.hasEntitlement(
+        { type: "user", id: requesterId },
+        productId,
+        "different.permission",
+      ),
+    ).toBe(false);
   });
-
 });

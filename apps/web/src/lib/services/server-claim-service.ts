@@ -1,8 +1,4 @@
-import {
-  serverClaimChallengeRepository,
-  serverRepository,
-  userRepository,
-} from "@nexus/db";
+import { serverClaimChallengeRepository, serverRepository, userRepository } from "@nexus/db";
 import {
   AppError,
   ConflictError,
@@ -12,17 +8,11 @@ import {
   type User,
 } from "@nexus/domain";
 import { generateId } from "@nexus/security";
-import {
-  matchesMtaEndpoint,
-  mtaMasterDirectoryService,
-} from "./mta-master-directory-service";
+import { matchesMtaEndpoint, mtaMasterDirectoryService } from "./mta-master-directory-service";
 import { serverService } from "./server-service";
 import { dispatchNotificationsBestEffort } from "./notification-dispatch-service";
 
-async function assertRequesterCanChallenge(
-  server: Server,
-  requester: User,
-): Promise<void> {
+async function assertRequesterCanChallenge(server: Server, requester: User): Promise<void> {
   if (server.isVerified) {
     throw new ConflictError("This server is already verified");
   }
@@ -31,19 +21,12 @@ async function assertRequesterCanChallenge(
     throw new ConflictError("This server is already claimed");
   }
 
-  if (
-    server.organizationId &&
-    !(await serverService.canManageServer(server, requester))
-  ) {
-    throw new ForbiddenError(
-      "You do not manage the organization linked to this server",
-    );
+  if (server.organizationId && !(await serverService.canManageServer(server, requester))) {
+    throw new ForbiddenError("You do not manage the organization linked to this server");
   }
 }
 
-export async function notifyModeratorsOfServerClaim(
-  serverName: string,
-): Promise<void> {
+export async function notifyModeratorsOfServerClaim(serverName: string): Promise<void> {
   try {
     const moderatorIds = await userRepository.listModeratorIds();
     await dispatchNotificationsBestEffort(
@@ -111,9 +94,7 @@ export const serverClaimService = {
       );
     }
 
-    const observed = directory.servers.find((candidate) =>
-      matchesMtaEndpoint(server, candidate),
-    );
+    const observed = directory.servers.find((candidate) => matchesMtaEndpoint(server, candidate));
     if (!observed || observed.responding === false) {
       throw new AppError(
         "The server must be visible and responding in the official MTA directory before control can be verified.",
@@ -122,10 +103,7 @@ export const serverClaimService = {
       );
     }
 
-    if (
-      typeof observed.name !== "string" ||
-      !observed.name.includes(input.token)
-    ) {
+    if (typeof observed.name !== "string" || !observed.name.includes(input.token)) {
       throw new AppError(
         "The control token is not visible in the current MTA server name.",
         422,
@@ -142,17 +120,16 @@ export const serverClaimService = {
       );
     }
 
-    const completed =
-      await serverClaimChallengeRepository.consumeVerifiedProof({
-        id: input.challengeId,
-        serverId: server.id,
-        requesterId: requester.id,
-        token: input.token,
-        sourceFetchedAt,
-        expectedEndpoint: { ipAddress: server.ipAddress, port: server.port },
-        verificationRequestId: generateId("ver"),
-        auditId: generateId("aud"),
-      });
+    const completed = await serverClaimChallengeRepository.consumeVerifiedProof({
+      id: input.challengeId,
+      serverId: server.id,
+      requesterId: requester.id,
+      token: input.token,
+      sourceFetchedAt,
+      expectedEndpoint: { ipAddress: server.ipAddress, port: server.port },
+      verificationRequestId: generateId("ver"),
+      auditId: generateId("aud"),
+    });
 
     return Object.freeze({
       success: true as const,

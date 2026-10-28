@@ -30,27 +30,23 @@ async function fixture() {
       username: id,
       displayName: "Order support fixture",
     });
-  await db
-    .insert(orders)
-    .values({
-      id: orderId,
-      orderNumber: `case-${suffix}`,
-      buyerId,
-      status: "completed",
-      totalAmount: 1200,
-      currency: "USD",
-    });
-  await db
-    .insert(payments)
-    .values({
-      id: `pay_oc_${suffix}`,
-      orderId,
-      status: "completed",
-      amount: 1200,
-      currency: "USD",
-      provider: "recorded-fixture",
-      providerTransactionId: "must-not-be-projected",
-    });
+  await db.insert(orders).values({
+    id: orderId,
+    orderNumber: `case-${suffix}`,
+    buyerId,
+    status: "completed",
+    totalAmount: 1200,
+    currency: "USD",
+  });
+  await db.insert(payments).values({
+    id: `pay_oc_${suffix}`,
+    orderId,
+    status: "completed",
+    amount: 1200,
+    currency: "USD",
+    provider: "recorded-fixture",
+    providerTransactionId: "must-not-be-projected",
+  });
   const input = {
     orderId,
     actorId: buyerId,
@@ -178,16 +174,14 @@ it("rejects SQL reassociation and immutable intake changes", async () => {
 it("rolls review, shared status, message and notification back when auditing fails", async () => {
   const f = await fixture(),
     input = await reviewInput(f);
-  await db
-    .insert(auditEvents)
-    .values({
-      id: input.auditId,
-      actorId: f.staffId,
-      actorType: "admin",
-      action: "fixture",
-      targetType: "support_case",
-      targetId: f.input.caseId,
-    });
+  await db.insert(auditEvents).values({
+    id: input.auditId,
+    actorId: f.staffId,
+    actorType: "admin",
+    action: "fixture",
+    targetType: "support_case",
+    targetId: f.input.caseId,
+  });
   const before = await repo.detail(f.input.caseId, f.buyerId);
   await expect(repo.review(input)).rejects.toThrow();
   const after = await repo.detail(f.input.caseId, f.buyerId);

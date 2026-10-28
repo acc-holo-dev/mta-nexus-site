@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -23,30 +19,14 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@nexus/config": [
-        "../../packages/config/src"
-      ],
-      "@nexus/domain": [
-        "../../packages/domain/src"
-      ],
-      "@nexus/validation": [
-        "../../packages/validation/src"
-      ],
-      "@nexus/security": [
-        "../../packages/security/src"
-      ],
-      "@nexus/storage": [
-        "../../packages/storage/src"
-      ],
-      "@nexus/db": [
-        "../../packages/db/src"
-      ],
-      "@nexus/ui": [
-        "../../packages/ui/src"
-      ]
+      "@/*": ["./src/*"],
+      "@nexus/config": ["../../packages/config/src"],
+      "@nexus/domain": ["../../packages/domain/src"],
+      "@nexus/validation": ["../../packages/validation/src"],
+      "@nexus/security": ["../../packages/security/src"],
+      "@nexus/storage": ["../../packages/storage/src"],
+      "@nexus/db": ["../../packages/db/src"],
+      "@nexus/ui": ["../../packages/ui/src"]
     }
   },
   "include": [
@@ -56,7 +36,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

@@ -91,16 +91,14 @@ it("rolls back mandatory receipt creation when the start audit cannot commit", a
     id = `dlv_rollback_${f.key}`,
     auditId = `aud_dup_${f.key}`;
   try {
-    await db
-      .insert(auditEvents)
-      .values({
-        id: auditId,
-        action: "fixture",
-        actorId: f.owner,
-        actorType: "user",
-        targetType: "product",
-        targetId: f.productId,
-      });
+    await db.insert(auditEvents).values({
+      id: auditId,
+      action: "fixture",
+      actorId: f.owner,
+      actorType: "user",
+      targetType: "product",
+      targetId: f.productId,
+    });
     await expect(f.start(id, auditId)).rejects.toThrow();
     const [total] = await db
       .select({ total: count() })
@@ -196,15 +194,13 @@ it("a failed terminal audit leaves uncertainty, while invalid terminal evidence 
       .from(resourceDeliveryReceipts)
       .where(eq(resourceDeliveryReceipts.id, id));
     await expect(
-      db
-        .insert(resourceDeliveryReceipts)
-        .values({
-          ...present(old),
-          id: `dlv_fake_${f.key}`,
-          status: "served",
-          bytesSent: 7,
-          finishedAt: new Date(),
-        }),
+      db.insert(resourceDeliveryReceipts).values({
+        ...present(old),
+        id: `dlv_fake_${f.key}`,
+        status: "served",
+        bytesSent: 7,
+        finishedAt: new Date(),
+      }),
     ).rejects.toThrow();
     expect((await receipts.detail(f.owner, id)).finishedAt).toBeNull();
   } finally {

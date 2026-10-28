@@ -85,7 +85,9 @@ it("gates server-rendered support pages before showing private controls", async 
   mocks.session.mockResolvedValue(null);
   const guest = renderToStaticMarkup(await SupportPageSurface({}));
   expect(guest).toContain("/auth/login");
-  expect(guest).toContain(`<h1 class="font-display text-primary">${getDictionary("en").support.title}</h1>`);
+  expect(guest).toContain(
+    `<h1 class="font-display text-primary">${getDictionary("en").support.title}</h1>`,
+  );
   mocks.session.mockResolvedValue({ id: "actor", role: "user" });
   expect(renderToStaticMarkup(await SupportPageSurface({ staff: true }))).toContain(
     supportWorkspaceCopy("en").forbidden,

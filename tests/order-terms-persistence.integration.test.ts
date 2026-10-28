@@ -302,15 +302,13 @@ it("audit failure rolls back new order lines and all recorded terms", async () =
     const id = `ord_audit_${f.key}`,
       line = `itm_audit_${f.key}`;
     f.orderIds.push(id);
-    await db
-      .insert(auditEvents)
-      .values({
-        id: `aud_order_${createHash("sha256").update(id).digest("hex")}`,
-        actorId: f.buyer,
-        action: "fixture.audit_collision",
-        targetId: id,
-        targetType: "order",
-      });
+    await db.insert(auditEvents).values({
+      id: `aud_order_${createHash("sha256").update(id).digest("hex")}`,
+      actorId: f.buyer,
+      action: "fixture.audit_collision",
+      targetId: id,
+      targetType: "order",
+    });
     await expect(
       orderRepository.create({
         id,

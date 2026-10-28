@@ -20,9 +20,28 @@ const evidence = [];
 test.afterAll(async () => {
   const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
   await mkdir(output, { recursive: true });
-  await writeFile(join(output, "shell-results.json"), JSON.stringify({ commit: process.env.GITHUB_SHA, results: evidence,
-    scope: "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, WCAG 2.5.8 control target size, WCAG 2.4.7 visible keyboard focus, logical tabindex order, hidden-focus safety, dialog naming, tab/tabpanel relations, aria-current validity, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification." }, null, 2));
-  await writeFile(join(output, "shell-summary.md"), ["# Keyboard, mobile and locale acceptance", "", ...evidence.map((value) => `- PASS: ${value}`), ""].join("\n"));
+  await writeFile(
+    join(output, "shell-results.json"),
+    JSON.stringify(
+      {
+        commit: process.env.GITHUB_SHA,
+        results: evidence,
+        scope:
+          "Chromium keyboard behavior, responsive widths, localization, visible form labels, ARIA IDREF integrity, button/link/image names, WCAG 2.5.8 control target size, WCAG 2.4.7 visible keyboard focus, logical tabindex order, hidden-focus safety, dialog naming, tab/tabpanel relations, aria-current validity, main/H1 structure and navigation landmark naming. This is scoped acceptance, not a full assistive-technology certification.",
+      },
+      null,
+      2,
+    ),
+  );
+  await writeFile(
+    join(output, "shell-summary.md"),
+    [
+      "# Keyboard, mobile and locale acceptance",
+      "",
+      ...evidence.map((value) => `- PASS: ${value}`),
+      "",
+    ].join("\n"),
+  );
 });
 
 async function assertValidAccessibilityReferences(page, label) {
@@ -32,9 +51,7 @@ async function assertValidAccessibilityReferences(page, label) {
       const id = element.id;
       counts.set(id, (counts.get(id) ?? 0) + 1);
     }
-    const duplicateIds = [...counts.entries()]
-      .filter(([, count]) => count > 1)
-      .map(([id]) => id);
+    const duplicateIds = [...counts.entries()].filter(([, count]) => count > 1).map(([id]) => id);
 
     const missingReferences = [];
     const attributes = [
@@ -65,18 +82,13 @@ async function assertValidAccessibilityReferences(page, label) {
   });
 
   assert.deepEqual(result.duplicateIds, [], `${label}: duplicate DOM ids`);
-  assert.deepEqual(
-    result.missingReferences,
-    [],
-    `${label}: dangling ARIA ID references`,
-  );
+  assert.deepEqual(result.missingReferences, [], `${label}: dangling ARIA ID references`);
 }
 
 async function assertBasicAccessibleNames(page, label) {
   const result = await page.evaluate(() => {
     const visible = (element) =>
-      element.getClientRects().length > 0 &&
-      getComputedStyle(element).visibility !== "hidden";
+      element.getClientRects().length > 0 && getComputedStyle(element).visibility !== "hidden";
 
     const unnamedButtons = [...document.querySelectorAll("button")]
       .filter(visible)
@@ -104,9 +116,7 @@ async function assertBasicAccessibleNames(page, label) {
         if (link.getAttribute("title")?.trim()) return false;
         if (link.textContent?.trim()) return false;
         if (
-          [...link.querySelectorAll("img[alt]")].some((image) =>
-            image.getAttribute("alt")?.trim(),
-          )
+          [...link.querySelectorAll("img[alt]")].some((image) => image.getAttribute("alt")?.trim())
         ) {
           return false;
         }
@@ -119,9 +129,7 @@ async function assertBasicAccessibleNames(page, label) {
       .filter((image) => !image.hasAttribute("alt"))
       .map((image) => image.outerHTML.slice(0, 180));
 
-    const positiveTabIndex = [
-      ...document.querySelectorAll("[tabindex]"),
-    ]
+    const positiveTabIndex = [...document.querySelectorAll("[tabindex]")]
       .filter(visible)
       .filter((element) => element.tabIndex > 0)
       .map((element) => element.outerHTML.slice(0, 180));
@@ -134,21 +142,9 @@ async function assertBasicAccessibleNames(page, label) {
     };
   });
 
-  assert.deepEqual(
-    result.unnamedButtons,
-    [],
-    `${label}: visible buttons without accessible names`,
-  );
-  assert.deepEqual(
-    result.unnamedLinks,
-    [],
-    `${label}: visible links without accessible names`,
-  );
-  assert.deepEqual(
-    result.imagesWithoutAlt,
-    [],
-    `${label}: visible images without alt attributes`,
-  );
+  assert.deepEqual(result.unnamedButtons, [], `${label}: visible buttons without accessible names`);
+  assert.deepEqual(result.unnamedLinks, [], `${label}: visible links without accessible names`);
+  assert.deepEqual(result.imagesWithoutAlt, [], `${label}: visible images without alt attributes`);
   assert.deepEqual(
     result.positiveTabIndex,
     [],
@@ -159,8 +155,7 @@ async function assertBasicAccessibleNames(page, label) {
 async function assertAdvancedAriaSemantics(page, label) {
   const result = await page.evaluate(() => {
     const visible = (element) =>
-      element.getClientRects().length > 0 &&
-      getComputedStyle(element).visibility !== "hidden";
+      element.getClientRects().length > 0 && getComputedStyle(element).visibility !== "hidden";
 
     const focusableSelector = [
       "a[href]",
@@ -168,12 +163,10 @@ async function assertAdvancedAriaSemantics(page, label) {
       "input:not(:disabled)",
       "select:not(:disabled)",
       "textarea:not(:disabled)",
-      "[tabindex]:not([tabindex=\"-1\"])",
+      '[tabindex]:not([tabindex="-1"])',
     ].join(",");
 
-    const focusableInsideHidden = [
-      ...document.querySelectorAll('[aria-hidden="true"]'),
-    ]
+    const focusableInsideHidden = [...document.querySelectorAll('[aria-hidden="true"]')]
       .flatMap((hidden) => {
         const candidates = [];
         if (hidden.matches(focusableSelector)) candidates.push(hidden);
@@ -184,9 +177,7 @@ async function assertAdvancedAriaSemantics(page, label) {
       .map((element) => element.outerHTML.slice(0, 180));
 
     const unnamedDialogs = [
-      ...document.querySelectorAll(
-        'dialog, [role="dialog"], [role="alertdialog"]',
-      ),
+      ...document.querySelectorAll('dialog, [role="dialog"], [role="alertdialog"]'),
     ]
       .filter(visible)
       .filter((dialog) => {
@@ -217,25 +208,14 @@ async function assertAdvancedAriaSemantics(page, label) {
         if (selected !== "true" && selected !== "false") {
           problems.push("aria-selected must be true or false");
         }
-        return problems.map(
-          (problem) =>
-            `${problem}: ${tab.outerHTML.slice(0, 150)}`,
-        );
+        return problems.map((problem) => `${problem}: ${tab.outerHTML.slice(0, 150)}`);
       });
 
     const invalidAriaCurrent = [...document.querySelectorAll("[aria-current]")]
       .filter(visible)
       .filter((element) => {
         const value = element.getAttribute("aria-current");
-        return ![
-          "page",
-          "step",
-          "location",
-          "date",
-          "time",
-          "true",
-          "false",
-        ].includes(value ?? "");
+        return !["page", "step", "location", "date", "time", "true", "false"].includes(value ?? "");
       })
       .map((element) => element.outerHTML.slice(0, 180));
 
@@ -272,14 +252,13 @@ async function assertAdvancedAriaSemantics(page, label) {
 async function assertMinimumControlTargetSize(page, label) {
   const failures = await page.evaluate(() => {
     const visible = (element) =>
-      element.getClientRects().length > 0 &&
-      getComputedStyle(element).visibility !== "hidden";
+      element.getClientRects().length > 0 && getComputedStyle(element).visibility !== "hidden";
 
     const controls = [
       ...document.querySelectorAll(
         [
           "button:not(:disabled)",
-          "input:not([type=\"hidden\"]):not(:disabled)",
+          'input:not([type="hidden"]):not(:disabled)',
           "select:not(:disabled)",
           "textarea:not(:disabled)",
           "summary",
@@ -323,16 +302,13 @@ async function assertMinimumControlTargetSize(page, label) {
 async function assertDocumentStructure(page, label) {
   const result = await page.evaluate(() => {
     const visible = (element) =>
-      element.getClientRects().length > 0 &&
-      getComputedStyle(element).visibility !== "hidden";
+      element.getClientRects().length > 0 && getComputedStyle(element).visibility !== "hidden";
 
     const mains = [...document.querySelectorAll("main")].filter(visible);
-    const visibleHeadings = [
-      ...document.querySelectorAll("h1, h2, h3, h4, h5, h6"),
-    ].filter(visible);
-    const h1s = mains.flatMap((main) =>
-      [...main.querySelectorAll("h1")].filter(visible),
+    const visibleHeadings = [...document.querySelectorAll("h1, h2, h3, h4, h5, h6")].filter(
+      visible,
     );
+    const h1s = mains.flatMap((main) => [...main.querySelectorAll("h1")].filter(visible));
     const emptyHeadings = visibleHeadings
       .filter((heading) => !heading.textContent?.trim())
       .map((heading) => heading.outerHTML.slice(0, 180));
@@ -359,11 +335,7 @@ async function assertDocumentStructure(page, label) {
 
   assert.equal(result.mainCount, 1, `${label}: exactly one visible main`);
   assert.equal(result.h1Count, 1, `${label}: exactly one visible main h1`);
-  assert.deepEqual(
-    result.emptyHeadings,
-    [],
-    `${label}: visible headings require text`,
-  );
+  assert.deepEqual(result.emptyHeadings, [], `${label}: visible headings require text`);
   assert.deepEqual(
     result.unnamedNavs,
     [],
@@ -375,23 +347,15 @@ async function assertVisibleFocusIndicator(locator, label) {
   const result = await locator.evaluate((element) => {
     const style = getComputedStyle(element);
     const outlineWidth = Number.parseFloat(style.outlineWidth) || 0;
-    const transparent = new Set([
-      "transparent",
-      "rgba(0, 0, 0, 0)",
-      "rgba(0,0,0,0)",
-    ]);
+    const transparent = new Set(["transparent", "rgba(0, 0, 0, 0)", "rgba(0,0,0,0)"]);
     const hasOutline =
-      style.outlineStyle !== "none" &&
-      outlineWidth >= 2 &&
-      !transparent.has(style.outlineColor);
+      style.outlineStyle !== "none" && outlineWidth >= 2 && !transparent.has(style.outlineColor);
     // Do not reject a visible 2px ring just because another layer is 0px 0px 0px 0px.
     const hasBoxShadow = (() => {
       const boxShadow = style.boxShadow;
       if (!boxShadow || boxShadow === "none") return false;
       for (const layer of boxShadow.split(/,(?![^(]*\))/u)) {
-        const lengths = [...layer.matchAll(/(-?\d*\.?\d+)px/gu)].map((match) =>
-          Number(match[1]),
-        );
+        const lengths = [...layer.matchAll(/(-?\d*\.?\d+)px/gu)].map((match) => Number(match[1]));
         if (lengths.some((value) => Math.abs(value) > 0)) return true;
       }
       return false;
@@ -421,16 +385,11 @@ async function containedTabbing(page, dialog) {
   for (const key of ["Tab", "Tab", "Tab", "Shift+Tab", "Shift+Tab", "Shift+Tab"]) {
     await page.keyboard.press(key);
     assert(
-      await dialog.evaluate((element) =>
-        element.contains(document.activeElement),
-      ),
+      await dialog.evaluate((element) => element.contains(document.activeElement)),
       `Focus escaped after ${key}`,
     );
     const active = page.locator(":focus");
-    await assertVisibleFocusIndicator(
-      active,
-      `dialog focus after ${key}`,
-    );
+    await assertVisibleFocusIndicator(active, `dialog focus after ${key}`);
   }
 }
 for (const locale of ["en", "ru"]) {
@@ -442,7 +401,15 @@ for (const locale of ["en", "ru"]) {
     await page.emulateMedia({ reducedMotion: "reduce" });
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
-    await context.addCookies([{ name: "nexus_locale", value: locale, url: process.env.NEXUS_BROWSER_BASE_URL, secure: true, sameSite: "Lax" }]);
+    await context.addCookies([
+      {
+        name: "nexus_locale",
+        value: locale,
+        url: process.env.NEXUS_BROWSER_BASE_URL,
+        secure: true,
+        sameSite: "Lax",
+      },
+    ]);
     await page.goto("/market");
     const reducedMotion = await page.evaluate(() => {
       const probe = document.createElement("div");
@@ -465,7 +432,9 @@ for (const locale of ["en", "ru"]) {
       return result;
     });
     const durationMs = (value) => {
-      const match = String(value).trim().match(/^(-?[\d.eE+-]+)(ms|s)$/u);
+      const match = String(value)
+        .trim()
+        .match(/^(-?[\d.eE+-]+)(ms|s)$/u);
       assert(match, `unexpected CSS duration: ${value}`);
       const amount = Number(match[1]);
       assert(Number.isFinite(amount), `unexpected CSS duration: ${value}`);
@@ -488,10 +457,7 @@ for (const locale of ["en", "ru"]) {
       exact: true,
     });
     await expect(skipLink).toBeFocused();
-    await assertVisibleFocusIndicator(
-      skipLink,
-      `${locale} skip link`,
-    );
+    await assertVisibleFocusIndicator(skipLink, `${locale} skip link`);
     await page.keyboard.press("Enter");
     await expect(page.getByRole("main")).toBeFocused();
     await expect(searchTrigger).toBeVisible();
@@ -549,14 +515,19 @@ for (const locale of ["en", "ru"]) {
       `${locale}: skip link and ordinary keyboard search navigation through Discover to a real resource`,
     );
 
-    const bell = page.getByRole("banner").getByRole("button", { name: dictionary.notificationBell.title, exact: true });
+    const bell = page
+      .getByRole("banner")
+      .getByRole("button", { name: dictionary.notificationBell.title, exact: true });
     await expect(bell).toHaveAttribute("aria-expanded", "false");
     await expect(bell).not.toHaveAttribute("aria-controls", /.+/u);
     await bell.focus();
     await page.keyboard.press("Enter");
     await expect(bell).toHaveAttribute("aria-expanded", "true");
     await expect(bell).toHaveAttribute("aria-controls", "notification-popover");
-    const notices = page.getByRole("dialog", { name: dictionary.notificationBell.title, exact: true });
+    const notices = page.getByRole("dialog", {
+      name: dictionary.notificationBell.title,
+      exact: true,
+    });
     await expect(notices).toHaveAttribute("id", "notification-popover");
     await assertAxeAccessibility(page, testInfo, `${locale}-notification-dialog`);
     const noticeClose = notices.getByRole("button", {
@@ -564,26 +535,28 @@ for (const locale of ["en", "ru"]) {
       exact: true,
     });
     await expect(noticeClose).toBeFocused();
-    await assertVisibleFocusIndicator(
-      noticeClose,
-      `${locale} notification dialog close`,
-    );
-    await assertMinimumControlTargetSize(
-      page,
-      `${locale} notification dialog`,
-    );
+    await assertVisibleFocusIndicator(noticeClose, `${locale} notification dialog close`);
+    await assertMinimumControlTargetSize(page, `${locale} notification dialog`);
     await containedTabbing(page, notices);
     await page.keyboard.press("Escape");
     await expect(notices).toHaveCount(0);
     await expect(bell).toHaveAttribute("aria-expanded", "false");
     await expect(bell).not.toHaveAttribute("aria-controls", /.+/u);
     await expect(bell).toBeFocused();
-    evidence.push(`${locale}: notification modal contains focus and restores its trigger on Escape`);
+    evidence.push(
+      `${locale}: notification modal contains focus and restores its trigger on Escape`,
+    );
 
-    const headings = { "/market": dictionary.market.title, "/discover": dictionary.discover.title,
-      "/workspace": dictionary.workspace.signInRequired, "/workspace/resources": dictionary.workspace.signInRequired,
-      "/notifications": dictionary.notifications.title, "/settings": dictionary.settings.signInRequired,
-      "/support": dictionary.support.title, "/auth/login": dictionary.auth.loginTitle };
+    const headings = {
+      "/market": dictionary.market.title,
+      "/discover": dictionary.discover.title,
+      "/workspace": dictionary.workspace.signInRequired,
+      "/workspace/resources": dictionary.workspace.signInRequired,
+      "/notifications": dictionary.notifications.title,
+      "/settings": dictionary.settings.signInRequired,
+      "/support": dictionary.support.title,
+      "/auth/login": dictionary.auth.loginTitle,
+    };
     const routes = Object.keys(headings);
     for (const width of [320, 390, 1280]) {
       await page.setViewportSize({ width, height: 844 });
@@ -591,39 +564,55 @@ for (const locale of ["en", "ru"]) {
         const response = await page.goto(route);
         assert.equal(response.status(), 200, `${locale} ${width} ${route}`);
         await expect(page.locator("html")).toHaveAttribute("lang", locale);
-        await expect(page.getByRole("main").getByRole("heading", { level: 1, name: headings[route], exact: true })).toBeVisible();
-        assert(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `Horizontal overflow: ${locale} ${width} ${route}`);
+        await expect(
+          page
+            .getByRole("main")
+            .getByRole("heading", { level: 1, name: headings[route], exact: true }),
+        ).toBeVisible();
+        assert(
+          await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+          `Horizontal overflow: ${locale} ${width} ${route}`,
+        );
         // Every visible form field needs an accessible label.
-        const unlabeled = await page.locator('main input:not([type="hidden"]), main select, main textarea').evaluateAll((elements) => elements.filter((element) => element.getClientRects().length && !element.getAttribute("aria-label") && !element.getAttribute("aria-labelledby") && !element.labels?.length).map((element) => element.name || element.id));
+        const unlabeled = await page
+          .locator('main input:not([type="hidden"]), main select, main textarea')
+          .evaluateAll((elements) =>
+            elements
+              .filter(
+                (element) =>
+                  element.getClientRects().length &&
+                  !element.getAttribute("aria-label") &&
+                  !element.getAttribute("aria-labelledby") &&
+                  !element.labels?.length,
+              )
+              .map((element) => element.name || element.id),
+          );
         assert.deepEqual(unlabeled, [], `${route} unlabeled fields`);
-        await assertValidAccessibilityReferences(
-          page,
-          `${locale} ${width} ${route}`,
-        );
-        await assertBasicAccessibleNames(
-          page,
-          `${locale} ${width} ${route}`,
-        );
-        await assertAdvancedAriaSemantics(
-          page,
-          `${locale} ${width} ${route}`,
-        );
-        await assertDocumentStructure(
-          page,
-          `${locale} ${width} ${route}`,
-        );
-        await assertMinimumControlTargetSize(
-          page,
-          `${locale} ${width} ${route}`,
-        );
+        await assertValidAccessibilityReferences(page, `${locale} ${width} ${route}`);
+        await assertBasicAccessibleNames(page, `${locale} ${width} ${route}`);
+        await assertAdvancedAriaSemantics(page, `${locale} ${width} ${route}`);
+        await assertDocumentStructure(page, `${locale} ${width} ${route}`);
+        await assertMinimumControlTargetSize(page, `${locale} ${width} ${route}`);
         if (width < 1024) {
-          const navigation = page.getByRole("navigation", { name: dictionary.nav.ecosystem, exact: true });
-          await expect(navigation.getByRole("link", { name: dictionary.nav.mobileMarket, exact: true })).toBeVisible();
-          await expect(navigation.getByRole("button", { name: dictionary.nav.more, exact: true })).toBeVisible();
-          if (route.startsWith("/workspace")) await expect(navigation.getByRole("button", { name: dictionary.nav.more, exact: true })).toHaveAttribute("aria-current", "page");
+          const navigation = page.getByRole("navigation", {
+            name: dictionary.nav.ecosystem,
+            exact: true,
+          });
+          await expect(
+            navigation.getByRole("link", { name: dictionary.nav.mobileMarket, exact: true }),
+          ).toBeVisible();
+          await expect(
+            navigation.getByRole("button", { name: dictionary.nav.more, exact: true }),
+          ).toBeVisible();
+          if (route.startsWith("/workspace"))
+            await expect(
+              navigation.getByRole("button", { name: dictionary.nav.more, exact: true }),
+            ).toHaveAttribute("aria-current", "page");
         }
       }
-      evidence.push(`${locale}: eight core routes at ${width}px, localized headings, labeled fields and mobile current-route state`);
+      evidence.push(
+        `${locale}: eight core routes at ${width}px, localized headings, labeled fields and mobile current-route state`,
+      );
     }
     await page.goto("/notifications");
     const notificationTabs = page.getByRole("tablist", {
@@ -639,17 +628,9 @@ for (const locale of ["en", "ru"]) {
     await expect(allNotificationsTab).toHaveAttribute("aria-selected", "true");
     await page.keyboard.press("ArrowRight");
     await expect(unreadNotificationsTab).toBeFocused();
-    await assertVisibleFocusIndicator(
-      unreadNotificationsTab,
-      `${locale} unread notification tab`,
-    );
-    await expect(unreadNotificationsTab).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
-    const controlledPanelId = await unreadNotificationsTab.getAttribute(
-      "aria-controls",
-    );
+    await assertVisibleFocusIndicator(unreadNotificationsTab, `${locale} unread notification tab`);
+    await expect(unreadNotificationsTab).toHaveAttribute("aria-selected", "true");
+    const controlledPanelId = await unreadNotificationsTab.getAttribute("aria-controls");
     assert(controlledPanelId);
     const notificationPanel = page.getByRole("tabpanel");
     await expect(notificationPanel).toHaveAttribute("id", controlledPanelId);
@@ -681,10 +662,7 @@ for (const locale of ["en", "ru"]) {
     });
     await expect(moreDialog).toHaveAttribute("id", "mobile-more-menu");
     await assertAxeAccessibility(page, testInfo, `${locale}-mobile-menu-dialog`);
-    await assertMinimumControlTargetSize(
-      page,
-      `${locale} mobile More dialog`,
-    );
+    await assertMinimumControlTargetSize(page, `${locale} mobile More dialog`);
     await expect(
       moreDialog.getByRole("link", {
         name: dictionary.nav.explore,
@@ -720,10 +698,7 @@ for (const locale of ["en", "ru"]) {
     await expect(moreButton).toHaveAttribute("aria-expanded", "false");
     await expect(moreButton).not.toHaveAttribute("aria-controls", /.+/u);
     await expect(moreButton).toBeFocused();
-    await assertVisibleFocusIndicator(
-      moreButton,
-      `${locale} mobile More trigger after Escape`,
-    );
+    await assertVisibleFocusIndicator(moreButton, `${locale} mobile More trigger after Escape`);
 
     await page.keyboard.press("Enter");
     const reopenedMoreDialog = page.getByRole("dialog", {
@@ -769,9 +744,7 @@ for (const locale of ["en", "ru"]) {
       }),
     ).toBeVisible();
     assert(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= window.innerWidth,
-      ),
+      await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
       `Horizontal overflow: ${locale} short mobile Discover`,
     );
     assert.deepEqual(errors, []);
@@ -780,7 +753,6 @@ for (const locale of ["en", "ru"]) {
     );
   });
 }
-
 
 async function loginFixture(page) {
   await page.goto("/auth/login");
@@ -803,17 +775,14 @@ async function loginFixture(page) {
 
 async function logoutFixture(page) {
   const status = await page.evaluate(
-    async () =>
-      (await fetch("/api/auth/session", { method: "DELETE" })).status,
+    async () => (await fetch("/api/auth/session", { method: "DELETE" })).status,
   );
   assert.equal(status, 200);
 }
 
 async function assertNoVisibleUnlabeledFields(page, route) {
   const unlabeled = await page
-    .locator(
-      'main input:not([type="hidden"]), main select, main textarea',
-    )
+    .locator('main input:not([type="hidden"]), main select, main textarea')
     .evaluateAll((elements) =>
       elements
         .filter(
@@ -830,9 +799,7 @@ async function assertNoVisibleUnlabeledFields(page, route) {
 
 async function assertNoHorizontalOverflow(page, label) {
   assert(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth,
-    ),
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     `Horizontal overflow: ${label}`,
   );
 }
@@ -875,16 +842,10 @@ for (const locale of ["en", "ru"]) {
     await expect(loginEmail).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(loginPassword).toBeFocused();
-    await assertVisibleFocusIndicator(
-      loginPassword,
-      `${locale} login password`,
-    );
+    await assertVisibleFocusIndicator(loginPassword, `${locale} login password`);
     await page.keyboard.press("Tab");
     await expect(loginSubmit).toBeFocused();
-    await assertVisibleFocusIndicator(
-      loginSubmit,
-      `${locale} login submit`,
-    );
+    await assertVisibleFocusIndicator(loginSubmit, `${locale} login submit`);
     await loginEmail.fill("a11y-unknown@example.invalid");
     await loginPassword.fill("not-the-right-password");
     await loginSubmit.click();
@@ -923,10 +884,7 @@ for (const locale of ["en", "ru"]) {
       await recoveryEmail.focus();
       await page.keyboard.press("Tab");
       await expect(recoverySubmit).toBeFocused();
-      await assertVisibleFocusIndicator(
-        recoverySubmit,
-        `${locale} password recovery submit`,
-      );
+      await assertVisibleFocusIndicator(recoverySubmit, `${locale} password recovery submit`);
       await recoveryEmail.fill("privacy-neutral@example.invalid");
       await recoverySubmit.click();
       await expect(
@@ -936,10 +894,7 @@ for (const locale of ["en", "ru"]) {
       ).toBeVisible();
       await assertNoVisibleUnlabeledFields(page, "/auth/forgot-password");
       await assertAxeAccessibility(page, testInfo, `${locale}-recovery-accepted`);
-      await assertNoHorizontalOverflow(
-        page,
-        `${locale} /auth/forgot-password at 320px`,
-      );
+      await assertNoHorizontalOverflow(page, `${locale} /auth/forgot-password at 320px`);
       evidence.push(
         `${locale}: password recovery is keyboard reachable, privacy-neutral in the UI, status-announced and mobile-safe`,
       );
@@ -1026,28 +981,14 @@ for (const locale of ["en", "ru"]) {
         ).toBeVisible();
         await spec.ready();
         // Scan mobile and desktop once each; the 390px pass retains behavioral checks.
-        if (width !== 390) await assertAxeAccessibility(page, testInfo, `${locale}-${width}-${spec.route}`);
+        if (width !== 390)
+          await assertAxeAccessibility(page, testInfo, `${locale}-${width}-${spec.route}`);
         await assertNoVisibleUnlabeledFields(page, spec.route);
-        await assertValidAccessibilityReferences(
-          page,
-          `${locale} ${width} ${spec.route}`,
-        );
-        await assertBasicAccessibleNames(
-          page,
-          `${locale} ${width} ${spec.route}`,
-        );
-        await assertAdvancedAriaSemantics(
-          page,
-          `${locale} ${width} ${spec.route}`,
-        );
-        await assertDocumentStructure(
-          page,
-          `${locale} ${width} ${spec.route}`,
-        );
-        await assertNoHorizontalOverflow(
-          page,
-          `${locale} ${spec.route} at ${width}px`,
-        );
+        await assertValidAccessibilityReferences(page, `${locale} ${width} ${spec.route}`);
+        await assertBasicAccessibleNames(page, `${locale} ${width} ${spec.route}`);
+        await assertAdvancedAriaSemantics(page, `${locale} ${width} ${spec.route}`);
+        await assertDocumentStructure(page, `${locale} ${width} ${spec.route}`);
+        await assertNoHorizontalOverflow(page, `${locale} ${spec.route} at ${width}px`);
       }
     }
 
@@ -1061,9 +1002,7 @@ for (const locale of ["en", "ru"]) {
       exact: true,
     });
     await expect(webPushRegion).toBeVisible();
-    await expect(
-      webPushRegion.locator('[role="status"], [role="alert"]'),
-    ).toHaveCount(1);
+    await expect(webPushRegion.locator('[role="status"], [role="alert"]')).toHaveCount(1);
 
     await page.goto("/security");
     const settingsLink = page.getByRole("link", {
@@ -1097,9 +1036,7 @@ for (const locale of ["en", "ru"]) {
     await resourceTitle.focus();
     await expect(resourceTitle).toBeFocused();
 
-    await page.goto(
-      `/servers/${process.env.NEXUS_CLAIM_BROWSER_SERVER_SLUG}`,
-    );
+    await page.goto(`/servers/${process.env.NEXUS_CLAIM_BROWSER_SERVER_SLUG}`);
     const claimButton = page.getByRole("button", {
       name: dictionary.serverClaim.create,
       exact: true,

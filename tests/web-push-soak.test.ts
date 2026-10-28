@@ -56,9 +56,7 @@ describe("Web Push production-duration soak contract", () => {
     ["NEXUS_WEB_PUSH_SOAK_BATCH_LIMIT", "101"],
     ["NEXUS_WEB_PUSH_SOAK_RETRY_EVERY", "1"],
   ])("rejects unsafe override %s=%s", (key, value) => {
-    expect(() => readWebPushSoakConfig({ [key]: value })).toThrow(
-      RangeError,
-    );
+    expect(() => readWebPushSoakConfig({ [key]: value })).toThrow(RangeError);
   });
 
   it("passes only when the full duration drains exactly once and exercises retry", () => {

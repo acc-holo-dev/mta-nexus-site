@@ -18,12 +18,7 @@ export function confirmedCreatedServer(
 ): string | null {
   if (status !== 201 || !expectedSlug) return null;
   const server = serverObject(body);
-  if (
-    !server ||
-    typeof server.id !== "string" ||
-    !server.id ||
-    server.slug !== expectedSlug
-  ) {
+  if (!server || typeof server.id !== "string" || !server.id || server.slug !== expectedSlug) {
     return null;
   }
 
@@ -65,9 +60,11 @@ export type ExpectedServerUpdate = Readonly<{
 function matchingField(actual: unknown, expected: unknown): boolean {
   if (expected === undefined) return true;
   if (Array.isArray(expected)) {
-    return Array.isArray(actual) &&
+    return (
+      Array.isArray(actual) &&
       actual.length === expected.length &&
-      expected.every((value, index) => actual[index] === value);
+      expected.every((value, index) => actual[index] === value)
+    );
   }
   return actual === expected;
 }
@@ -82,17 +79,14 @@ export function confirmedUpdatedServer(
   if (!server) return false;
 
   const { expectedUpdatedAt, ...fields } = expected;
-  if (!Object.entries(fields).every(
-    ([key, value]) => matchingField(server[key], value),
-  )) {
+  if (!Object.entries(fields).every(([key, value]) => matchingField(server[key], value))) {
     return false;
   }
 
   if (expectedUpdatedAt !== undefined) {
     const oldRevision = Date.parse(expectedUpdatedAt);
-    const newRevision = typeof server.updatedAt === "string"
-      ? Date.parse(server.updatedAt)
-      : Number.NaN;
+    const newRevision =
+      typeof server.updatedAt === "string" ? Date.parse(server.updatedAt) : Number.NaN;
     // A successful write must return a later authoritative revision.
     if (
       !Number.isFinite(oldRevision) ||

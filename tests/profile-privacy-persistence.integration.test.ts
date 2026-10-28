@@ -94,18 +94,16 @@ it("preserves legacy defaults, persists visibility for every user role, advances
 });
 it("nulls public portfolio and Discord while preserving private contacts, experience and commercial counters", async () => {
   const actor = await fixture();
-  await db
-    .insert(developerProfiles)
-    .values({
-      id: `dev_${randomUUID()}`,
-      userId: actor.id,
-      specialties: ["Lua"],
-      githubUrl: "https://portfolio.test/private",
-      discordTag: "private-discord",
-      verifiedDeveloper: true,
-      reputationScore: 543,
-      completedDealsCount: 8,
-    });
+  await db.insert(developerProfiles).values({
+    id: `dev_${randomUUID()}`,
+    userId: actor.id,
+    specialties: ["Lua"],
+    githubUrl: "https://portfolio.test/private",
+    discordTag: "private-discord",
+    verifiedDeveloper: true,
+    reputationScore: 543,
+    completedDealsCount: 8,
+  });
   expect(await developerProfileRepository.publicProfile(actor.id)).toMatchObject({
     githubUrl: "https://portfolio.test/private",
     discordTag: "private-discord",
@@ -145,25 +143,21 @@ it("closes direct and followed-user activity while retaining published content a
   });
   const contentId = `cnt_privacy_${randomUUID()}`,
     slug = `privacy-${randomUUID()}`;
-  await db
-    .insert(content)
-    .values({
-      id: contentId,
-      slug,
-      title: "Public contextual publication",
-      body: "Published content stays public.",
-      type: "post",
-      authorId: actor.id,
-      organizationId: orgId,
-    });
-  await db
-    .insert(follows)
-    .values({
-      id: `fol_${randomUUID()}`,
-      followerId: follower.id,
-      targetType: "user",
-      targetId: actor.id,
-    });
+  await db.insert(content).values({
+    id: contentId,
+    slug,
+    title: "Public contextual publication",
+    body: "Published content stays public.",
+    type: "post",
+    authorId: actor.id,
+    organizationId: orgId,
+  });
+  await db.insert(follows).values({
+    id: `fol_${randomUUID()}`,
+    followerId: follower.id,
+    targetType: "user",
+    targetId: actor.id,
+  });
   expect(await feed.resolvePublicScope("user", actor.username)).toMatchObject({ id: actor.id });
   expect(
     (await feed.page({ kind: "following", actorId: follower.id })).items.map((row) => row.id),
@@ -184,14 +178,12 @@ it("closes direct and followed-user activity while retaining published content a
   expect(
     (await feed.page({ kind: "organization", id: orgId })).items.map((row) => row.id),
   ).toContain(contentId);
-  await db
-    .insert(follows)
-    .values({
-      id: `fol_${randomUUID()}`,
-      followerId: follower.id,
-      targetType: "organization",
-      targetId: orgId,
-    });
+  await db.insert(follows).values({
+    id: `fol_${randomUUID()}`,
+    followerId: follower.id,
+    targetType: "organization",
+    targetId: orgId,
+  });
   expect(
     (await feed.page({ kind: "following", actorId: follower.id })).items.map((row) => row.id),
   ).toEqual([contentId]);
@@ -251,16 +243,14 @@ it("rolls back preferences and shared revision when the mandatory audit cannot b
   const actor = await fixture(),
     previous = await privacy.own(actor.id),
     auditId = `aud_${randomUUID()}`;
-  await db
-    .insert(auditEvents)
-    .values({
-      id: auditId,
-      actorId: actor.id,
-      actorType: "user",
-      action: "fixture",
-      targetType: "user",
-      targetId: actor.id,
-    });
+  await db.insert(auditEvents).values({
+    id: auditId,
+    actorId: actor.id,
+    actorType: "user",
+    action: "fixture",
+    targetType: "user",
+    targetId: actor.id,
+  });
   await expect(
     privacy.update({
       actorId: actor.id,

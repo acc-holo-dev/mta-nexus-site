@@ -40,11 +40,7 @@ export default function VerifyEmailPage() {
       );
       const data = await response.json().catch(() => null);
 
-      if (
-        !response.ok ||
-        data?.success !== true ||
-        typeof data.email !== "string"
-      ) {
+      if (!response.ok || data?.success !== true || typeof data.email !== "string") {
         if (response.status >= 400 && response.status < 500) {
           setState({ kind: "invalid" });
           return;
@@ -57,10 +53,7 @@ export default function VerifyEmailPage() {
       setState({
         kind: "error",
         proof,
-        message:
-          error instanceof Error && error.message
-            ? error.message
-            : copy.verifyFailed,
+        message: error instanceof Error && error.message ? error.message : copy.verifyFailed,
       });
     }
   }
@@ -73,10 +66,7 @@ export default function VerifyEmailPage() {
       >
         <div className="flex items-center gap-3">
           <MailCheck className="h-5 w-5 text-accent" aria-hidden="true" />
-          <h1
-            id="verify-email-heading"
-            className="font-display text-primary"
-          >
+          <h1 id="verify-email-heading" className="font-display text-primary">
             {copy.verifyTitle}
           </h1>
         </div>
@@ -103,17 +93,13 @@ export default function VerifyEmailPage() {
 
         {(state.kind === "ready" || state.kind === "submitting") && (
           <>
-            <p className="text-sm leading-relaxed text-muted">
-              {copy.verifyDescription}
-            </p>
+            <p className="text-sm leading-relaxed text-muted">{copy.verifyDescription}</p>
             <Button
               type="button"
               isLoading={state.kind === "submitting"}
               onClick={() => void confirm(state.proof)}
             >
-              {state.kind === "submitting"
-                ? copy.confirming
-                : copy.confirmEmail}
+              {state.kind === "submitting" ? copy.confirming : copy.confirmEmail}
             </Button>
           </>
         )}

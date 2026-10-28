@@ -19,7 +19,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const query = resourceReviewQuery(request.nextUrl.searchParams);
     const ip = getTrustedRequestIp(request);
-    if (ip !== "unknown" && !(await consumeRateLimit("resourceInspection", `review-ip:${ip}`)).success)
+    if (
+      ip !== "unknown" &&
+      !(await consumeRateLimit("resourceInspection", `review-ip:${ip}`)).success
+    )
       throw new RateLimitExceededError();
     return jsonWithRequestId(
       context,
@@ -43,22 +46,24 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return jsonWithRequestId(context, { code: "REVIEWS_UNAVAILABLE" }, { status: 503, headers });
   }
 }
-export const POST = withBrowserMutation((request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
-  return resourceCommerceRequest(request, true, async (actor) => {
-    const body = resourceReviewCreateSchema.safeParse(await readBoundedJson(request, 16384));
-    if (!body.success) throw new AppError("Invalid review", 400, "REVIEW_INVALID");
-    const result = await resourceReviewService.command(actor, (await params).id, {
-      action: "save",
-      expectedRevision: 0,
-      ...body.data,
+export const POST = withBrowserMutation(
+  (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    return resourceCommerceRequest(request, true, async (actor) => {
+      const body = resourceReviewCreateSchema.safeParse(await readBoundedJson(request, 16384));
+      if (!body.success) throw new AppError("Invalid review", 400, "REVIEW_INVALID");
+      const result = await resourceReviewService.command(actor, (await params).id, {
+        action: "save",
+        expectedRevision: 0,
+        ...body.data,
+      });
+      return Response.json(
+        {
+          success: true,
+          ...result,
+          newRating: { ratingCount: result.ratingCount, ratingAverage: result.ratingAverage },
+        },
+        { status: 201 },
+      );
     });
-    return Response.json(
-      {
-        success: true,
-        ...result,
-        newRating: { ratingCount: result.ratingCount, ratingAverage: result.ratingAverage },
-      },
-      { status: 201 },
-    );
-  });
-});
+  },
+);

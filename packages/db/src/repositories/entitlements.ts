@@ -3,20 +3,49 @@ import { db } from "../client";
 import { builds, entitlements, licenses, products, resourceAcquisitionEvents } from "../schema";
 import { safePublishedBuildCondition } from "./build-safety";
 import { NotFoundError, ValidationError } from "@nexus/domain";
-import type { Entitlement, FreeResourceClaimResult, ResourceAcquisitionSource } from "@nexus/domain";
+import type {
+  Entitlement,
+  FreeResourceClaimResult,
+  ResourceAcquisitionSource,
+} from "@nexus/domain";
 
 export type ResourceTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 /** Existing effective download policy, held through a transactional command. */
-export async function lockUserDownloadAccess(tx: ResourceTransaction, userId: string, productId: string, observedAt: Date | SQL = new Date()) {
-  const [grant] = await tx.select({ id: entitlements.id, expiresAt: entitlements.expiresAt }).from(entitlements)
-    .where(and(eq(entitlements.subjectType, "user"), eq(entitlements.subjectId, userId),
-      eq(entitlements.resourceId, productId), eq(entitlements.permission, "product.download"),
-      or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, observedAt)))).limit(1).for("share");
+export async function lockUserDownloadAccess(
+  tx: ResourceTransaction,
+  userId: string,
+  productId: string,
+  observedAt: Date | SQL = new Date(),
+) {
+  const [grant] = await tx
+    .select({ id: entitlements.id, expiresAt: entitlements.expiresAt })
+    .from(entitlements)
+    .where(
+      and(
+        eq(entitlements.subjectType, "user"),
+        eq(entitlements.subjectId, userId),
+        eq(entitlements.resourceId, productId),
+        eq(entitlements.permission, "product.download"),
+        or(isNull(entitlements.expiresAt), gt(entitlements.expiresAt, observedAt)),
+      ),
+    )
+    .limit(1)
+    .for("share");
   if (grant) return { source: "entitlement" as const, expiresAt: grant.expiresAt };
-  const [license] = await tx.select({ id: licenses.id, expiresAt: licenses.expiresAt }).from(licenses)
-    .where(and(eq(licenses.userId, userId), eq(licenses.productId, productId), eq(licenses.status, "active"),
-      or(isNull(licenses.expiresAt), gt(licenses.expiresAt, observedAt)))).limit(1).for("share");
+  const [license] = await tx
+    .select({ id: licenses.id, expiresAt: licenses.expiresAt })
+    .from(licenses)
+    .where(
+      and(
+        eq(licenses.userId, userId),
+        eq(licenses.productId, productId),
+        eq(licenses.status, "active"),
+        or(isNull(licenses.expiresAt), gt(licenses.expiresAt, observedAt)),
+      ),
+    )
+    .limit(1)
+    .for("share");
   return license ? { source: "license" as const, expiresAt: license.expiresAt } : null;
 }
 
@@ -95,15 +124,19 @@ export async function claimFreeResourceInTransaction(
   const [legacy] = await tx
     .select({ productId: licenses.productId, expiresAt: licenses.expiresAt })
     .from(licenses)
-    .where(and(
-      eq(licenses.userId, input.userId), eq(licenses.productId, input.productId),
-      eq(licenses.status, "active"),
-      or(isNull(licenses.expiresAt), gt(licenses.expiresAt, now)),
-    ))
+    .where(
+      and(
+        eq(licenses.userId, input.userId),
+        eq(licenses.productId, input.productId),
+        eq(licenses.status, "active"),
+        or(isNull(licenses.expiresAt), gt(licenses.expiresAt, now)),
+      ),
+    )
     .orderBy(desc(licenses.expiresAt), desc(licenses.createdAt), desc(licenses.id))
     .limit(1)
     .for("share");
-  if (legacy) return { entitlement: null, alreadyClaimed: true, accessSource: "license", license: legacy };
+  if (legacy)
+    return { entitlement: null, alreadyClaimed: true, accessSource: "license", license: legacy };
 
   const rows = await tx
     .insert(entitlements)

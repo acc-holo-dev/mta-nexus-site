@@ -41,15 +41,18 @@ const pushRepository = vi.hoisted(() => ({
 vi.mock("../../../lib/services/auth-service", () => ({
   authService: {
     getSession: vi.fn(async () => state.user),
-    getSessionIdentity: vi.fn(async () => state.user && state.sessionId
-      ? { user: state.user, sessionId: state.sessionId } : null),
+    getSessionIdentity: vi.fn(async () =>
+      state.user && state.sessionId ? { user: state.user, sessionId: state.sessionId } : null,
+    ),
     getCurrentSessionId: vi.fn(async () => state.sessionId),
   },
 }));
 
 vi.mock("@nexus/db", async () => {
   // Keep the pure endpoint validator real without importing the database client.
-  const { parseWebPushEndpoint } = await import("../../../../../../packages/db/src/web-push-runtime");
+  const { parseWebPushEndpoint } = await import(
+    "../../../../../../packages/db/src/web-push-runtime"
+  );
   return {
     notificationRepository,
     webPushSubscriptionRepository: pushRepository,
@@ -84,55 +87,29 @@ vi.mock("../../../lib/web-push-subscription", () => ({
 import { GET as inboxGET } from "./route";
 import { authService } from "../../../lib/services/auth-service";
 import { POST as markReadPOST } from "./mark-read/route";
-import {
-  GET as preferencesGET,
-  PATCH as preferencesPATCH,
-} from "./preferences/route";
-import {
-  DELETE as pushDELETE,
-  GET as pushGET,
-  POST as pushPOST,
-} from "./push/route";
+import { GET as preferencesGET, PATCH as preferencesPATCH } from "./preferences/route";
+import { DELETE as pushDELETE, GET as pushGET, POST as pushPOST } from "./push/route";
 
-function request(
-  path: string,
-  method = "GET",
-  body?: unknown,
-) {
-  return new NextRequest(
-    `https://nexus.test${path}`,
-    {
-      method,
-      headers: {
-        ...(method === "GET" ? {} : browserMutationHeaders()),
-        cookie:
-          "nexus_session=notification-token",
-        ...(body === undefined
-          ? {}
-          : {
-              "content-type":
-                "application/json",
-            }),
-      },
+function request(path: string, method = "GET", body?: unknown) {
+  return new NextRequest(`https://nexus.test${path}`, {
+    method,
+    headers: {
+      ...(method === "GET" ? {} : browserMutationHeaders()),
+      cookie: "nexus_session=notification-token",
       ...(body === undefined
         ? {}
-        : { body: JSON.stringify(body) }),
+        : {
+            "content-type": "application/json",
+          }),
     },
-  );
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+  });
 }
 
-function expectPrivateCorrelation(
-  response: Response,
-) {
-  expect(
-    response.headers.get("cache-control"),
-  ).toBe("private, no-store");
-  expect(response.headers.get("vary")).toBe(
-    "Cookie",
-  );
-  expect(
-    response.headers.get("x-request-id"),
-  ).toMatch(/^[0-9a-f-]{20,}$/u);
+function expectPrivateCorrelation(response: Response) {
+  expect(response.headers.get("cache-control")).toBe("private, no-store");
+  expect(response.headers.get("vary")).toBe("Cookie");
+  expect(response.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{20,}$/u);
 }
 
 describe("notification API request correlation", () => {
@@ -150,21 +127,15 @@ describe("notification API request correlation", () => {
   });
 
   it("correlates inbox and anonymous inbox reads", async () => {
-    const authenticated = await inboxGET(
-      request("/api/notifications?limit=6"),
-    );
+    const authenticated = await inboxGET(request("/api/notifications?limit=6"));
     expect(authenticated.status).toBe(200);
     expectPrivateCorrelation(authenticated);
 
     state.user = null;
-    const anonymous = await inboxGET(
-      request("/api/notifications"),
-    );
+    const anonymous = await inboxGET(request("/api/notifications"));
     expect(anonymous.status).toBe(200);
     expectPrivateCorrelation(anonymous);
-    await expect(
-      anonymous.json(),
-    ).resolves.toEqual({
+    await expect(anonymous.json()).resolves.toEqual({
       notifications: [],
       unreadCount: 0,
     });
@@ -172,87 +143,54 @@ describe("notification API request correlation", () => {
 
   it("correlates notification mutation validation and success", async () => {
     const invalid = await markReadPOST(
-      request(
-        "/api/notifications/mark-read",
-        "POST",
-        { unknown: true },
-      ),
+      request("/api/notifications/mark-read", "POST", { unknown: true }),
     );
     expect(invalid.status).toBe(400);
     expectPrivateCorrelation(invalid);
 
-    const success = await markReadPOST(
-      request(
-        "/api/notifications/mark-read",
-        "POST",
-        {},
-      ),
-    );
+    const success = await markReadPOST(request("/api/notifications/mark-read", "POST", {}));
     expect(success.status).toBe(200);
     expectPrivateCorrelation(success);
   });
 
   it("correlates preference reads, validation failures and updates", async () => {
-    const read = await preferencesGET(
-      request(
-        "/api/notifications/preferences",
-      ),
-    );
+    const read = await preferencesGET(request("/api/notifications/preferences"));
     expect(read.status).toBe(200);
     expectPrivateCorrelation(read);
 
     const invalid = await preferencesPATCH(
-      request(
-        "/api/notifications/preferences",
-        "PATCH",
-        { follow: "yes" },
-      ),
+      request("/api/notifications/preferences", "PATCH", { follow: "yes" }),
     );
     expect(invalid.status).toBe(400);
     expectPrivateCorrelation(invalid);
 
     const updated = await preferencesPATCH(
-      request(
-        "/api/notifications/preferences",
-        "PATCH",
-        {
-          followsEnabled: true,
-          contentEnabled: true,
-          serverEnabled: true,
-          systemEnabled: true,
-        },
-      ),
+      request("/api/notifications/preferences", "PATCH", {
+        followsEnabled: true,
+        contentEnabled: true,
+        serverEnabled: true,
+        systemEnabled: true,
+      }),
     );
     expect(updated.status).toBe(200);
     expectPrivateCorrelation(updated);
   });
 
   it("correlates Web Push state, registration and removal", async () => {
-    const read = await pushGET(
-      request("/api/notifications/push"),
-    );
+    const read = await pushGET(request("/api/notifications/push"));
     expect(read.status).toBe(200);
     expectPrivateCorrelation(read);
 
     const registered = await pushPOST(
-      request(
-        "/api/notifications/push",
-        "POST",
-        { endpoint: "fixture" },
-      ),
+      request("/api/notifications/push", "POST", { endpoint: "fixture" }),
     );
     expect(registered.status).toBe(200);
     expectPrivateCorrelation(registered);
 
     const removed = await pushDELETE(
-      request(
-        "/api/notifications/push",
-        "DELETE",
-        {
-          endpoint:
-            "https://push.example.net/subscription",
-        },
-      ),
+      request("/api/notifications/push", "DELETE", {
+        endpoint: "https://push.example.net/subscription",
+      }),
     );
     expect(removed.status).toBe(200);
     expectPrivateCorrelation(removed);
@@ -278,18 +216,12 @@ describe("notification API request correlation", () => {
 
   it("returns correlated private failures without exposing raw errors", async () => {
     state.fail = true;
-    const log = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
     try {
-      const response = await inboxGET(
-        request("/api/notifications"),
-      );
+      const response = await inboxGET(request("/api/notifications"));
       expect(response.status).toBe(500);
       expectPrivateCorrelation(response);
-      expect(
-        JSON.stringify(await response.json()),
-      ).not.toContain("db unavailable");
+      expect(JSON.stringify(await response.json())).not.toContain("db unavailable");
     } finally {
       log.mockRestore();
     }

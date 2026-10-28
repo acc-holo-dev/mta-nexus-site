@@ -5,7 +5,10 @@ import { EmptyState } from "@nexus/ui";
 import { contentService } from "../../lib/services/content-service";
 import { getDictionary } from "../../lib/i18n";
 import { getRequestLocale } from "../../lib/i18n-server";
-import { ContentCatalogControls, ContentPageNavigation } from "../../components/content-catalog-controls";
+import {
+  ContentCatalogControls,
+  ContentPageNavigation,
+} from "../../components/content-catalog-controls";
 import { communityTypes, parseContentPage } from "../../lib/user-platform-contract";
 import { getUserPlatformCopy } from "../../lib/user-platform-copy";
 
@@ -16,12 +19,16 @@ export async function generateMetadata() {
   return { title: copy.title, description: copy.description };
 }
 
-export default async function CommunityPage({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function CommunityPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const locale = await getRequestLocale();
   const dictionary = getDictionary(locale);
   const copy = dictionary.community;
   const platformCopy = getUserPlatformCopy(locale);
-  const { status: _status, ...filters } = parseContentPage(await searchParams ?? {});
+  const { status: _status, ...filters } = parseContentPage((await searchParams) ?? {});
   const result = await contentService.pageCommunity(filters).catch(() => null);
   const topics = result?.items ?? [];
 
@@ -44,10 +51,26 @@ export default async function CommunityPage({ searchParams }: { searchParams?: P
         </Link>
       </header>
 
-      <div className="flex flex-wrap gap-4"><Link href="/workspace/content" className="inline-block text-sm text-accent underline">{platformCopy.studio}</Link><Link href="/workspace/feed" className="inline-block text-sm text-accent underline">{publicationCopy(locale).title}</Link></div>
-      <ContentCatalogControls path="/community" filters={filters} locale={locale} types={communityTypes} />
+      <div className="flex flex-wrap gap-4">
+        <Link href="/workspace/content" className="inline-block text-sm text-accent underline">
+          {platformCopy.studio}
+        </Link>
+        <Link href="/workspace/feed" className="inline-block text-sm text-accent underline">
+          {publicationCopy(locale).title}
+        </Link>
+      </div>
+      <ContentCatalogControls
+        path="/community"
+        filters={filters}
+        locale={locale}
+        types={communityTypes}
+      />
 
-      {!result ? <p role="alert" className="text-sm text-danger">{platformCopy.unavailable}</p> : topics.length > 0 ? (
+      {!result ? (
+        <p role="alert" className="text-sm text-danger">
+          {platformCopy.unavailable}
+        </p>
+      ) : topics.length > 0 ? (
         <section className="space-y-2">
           {topics.map((topic) => (
             <Link
@@ -58,13 +81,9 @@ export default async function CommunityPage({ searchParams }: { searchParams?: P
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <span className="font-label uppercase text-accent">
-                    {topic.type === "question"
-                      ? copy.question
-                      : copy.discussion}
+                    {topic.type === "question" ? copy.question : copy.discussion}
                   </span>
-                  <h2 className="mt-1 truncate font-heading text-primary">
-                    {topic.title}
-                  </h2>
+                  <h2 className="mt-1 truncate font-heading text-primary">{topic.title}</h2>
                   <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
                     {topic.excerpt || topic.body}
                   </p>
@@ -91,7 +110,15 @@ export default async function CommunityPage({ searchParams }: { searchParams?: P
           }
         />
       )}
-      {result && <ContentPageNavigation path="/community" filters={filters} page={result.page} hasMore={result.hasMore} locale={locale} />}
+      {result && (
+        <ContentPageNavigation
+          path="/community"
+          filters={filters}
+          page={result.page}
+          hasMore={result.hasMore}
+          locale={locale}
+        />
+      )}
     </div>
   );
 }

@@ -36,7 +36,8 @@ export const releaseHistoryCopy = {
     next: "Next",
     page: "Page",
     of: "of",
-    warning: "Published status and scanner metadata can change. Every download rechecks current permissions and build safety; a listed version is not a permanent access guarantee.",
+    warning:
+      "Published status and scanner metadata can change. Every download rechecks current permissions and build safety; a listed version is not a permanent access guarantee.",
   },
   ru: {
     title: "История версий",
@@ -62,7 +63,8 @@ export const releaseHistoryCopy = {
     next: "Далее",
     page: "Страница",
     of: "из",
-    warning: "Статус публикации и проверки может измениться. При каждом скачивании заново проверяются права и безопасность сборки; наличие версии в истории не гарантирует постоянный доступ.",
+    warning:
+      "Статус публикации и проверки может измениться. При каждом скачивании заново проверяются права и безопасность сборки; наличие версии в истории не гарантирует постоянный доступ.",
   },
 } as const;
 

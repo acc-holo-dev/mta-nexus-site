@@ -10,7 +10,9 @@ const execFileAsync = promisify(execFile);
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 function parseVersion(value) {
-  const match = String(value ?? "").trim().match(/^v?(\d+)(?:\.(\d+))?(?:\.(\d+))?/u);
+  const match = String(value ?? "")
+    .trim()
+    .match(/^v?(\d+)(?:\.(\d+))?(?:\.(\d+))?/u);
   if (!match) return null;
   return [Number(match[1]), Number(match[2] ?? 0), Number(match[3] ?? 0)];
 }
@@ -59,8 +61,7 @@ function safeCommandEnvironment(source = process.env) {
 }
 
 async function defaultRunCommand(command, args, options = {}) {
-  const executable =
-    process.platform === "win32" && command === "pnpm" ? "pnpm.cmd" : command;
+  const executable = process.platform === "win32" && command === "pnpm" ? "pnpm.cmd" : command;
   try {
     const result = await execFileAsync(executable, args, {
       cwd: options.cwd ?? repositoryRoot,
@@ -127,12 +128,7 @@ export async function collectDoctor(options = {}) {
     memoryGiB: Number((memoryBytes / 1024 ** 3).toFixed(1)),
   };
 
-  for (const relativePath of [
-    "package.json",
-    "pnpm-lock.yaml",
-    "compose.yaml",
-    "Dockerfile",
-  ]) {
+  for (const relativePath of ["package.json", "pnpm-lock.yaml", "compose.yaml", "Dockerfile"]) {
     const present = await pathExists(resolve(root, relativePath));
     addCheck(
       checks,
@@ -176,12 +172,7 @@ export async function collectDoctor(options = {}) {
     } else {
       pinnedNode = nvmPin;
       facts.nodePin = pinnedNode;
-      addCheck(
-        checks,
-        "node-pin",
-        "pass",
-        `Repository host Node pin: ${pinnedNode}.`,
-      );
+      addCheck(checks, "node-pin", "pass", `Repository host Node pin: ${pinnedNode}.`);
     }
   } catch {
     addCheck(
@@ -335,12 +326,7 @@ export async function collectDoctor(options = {}) {
           : "An existing service may already be running; choose another NEXUS_DEV_PORT if needed.",
       );
     } else {
-      addCheck(
-        checks,
-        "dev-port",
-        "warn",
-        `Could not verify availability of 127.0.0.1:${port}.`,
-      );
+      addCheck(checks, "dev-port", "warn", `Could not verify availability of 127.0.0.1:${port}.`);
     }
   }
 

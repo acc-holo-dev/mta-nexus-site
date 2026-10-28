@@ -71,17 +71,16 @@ describe("server claim moderation ownership CAS", () => {
       auditId: `aud_claim_issue_${suffix}`,
     });
     const sourceFetchedAt = await dbFutureTimestamp();
-    const consumed =
-      await serverClaimChallengeRepository.consumeVerifiedProof({
-        id: challenge.id,
-        serverId,
-        requesterId,
-        token: challenge.token,
-        sourceFetchedAt,
-        expectedEndpoint: { ipAddress: "198.51.100.70", port: serverPort },
-        verificationRequestId: verificationId,
-        auditId: `aud_claim_proof_${suffix}`,
-      });
+    const consumed = await serverClaimChallengeRepository.consumeVerifiedProof({
+      id: challenge.id,
+      serverId,
+      requesterId,
+      token: challenge.token,
+      sourceFetchedAt,
+      expectedEndpoint: { ipAddress: "198.51.100.70", port: serverPort },
+      verificationRequestId: verificationId,
+      auditId: `aud_claim_proof_${suffix}`,
+    });
 
     expect(consumed.verificationRequest).toMatchObject({
       id: verificationId,
@@ -103,11 +102,7 @@ describe("server claim moderation ownership CAS", () => {
       status: "approved",
     });
 
-    const [claimed] = await db
-      .select()
-      .from(servers)
-      .where(eq(servers.id, serverId))
-      .limit(1);
+    const [claimed] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
     expect(claimed).toMatchObject({
       ownerId: requesterId,
       isVerified: true,
@@ -170,11 +165,7 @@ describe("server claim moderation ownership CAS", () => {
       .from(verificationRequests)
       .where(eq(verificationRequests.id, verificationId))
       .limit(1);
-    const [unclaimed] = await db
-      .select()
-      .from(servers)
-      .where(eq(servers.id, serverId))
-      .limit(1);
+    const [unclaimed] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
 
     expect(request?.status).toBe("pending");
     expect(request?.reviewerId).toBeFalsy();
@@ -233,10 +224,7 @@ describe("server claim moderation ownership CAS", () => {
       auditId: `aud_claim_race_proof_${suffix}`,
     });
 
-    await db
-      .update(servers)
-      .set({ ownerId: otherOwnerId })
-      .where(eq(servers.id, serverId));
+    await db.update(servers).set({ ownerId: otherOwnerId }).where(eq(servers.id, serverId));
 
     await expect(
       verificationRepository.resolveRequest({
@@ -255,11 +243,7 @@ describe("server claim moderation ownership CAS", () => {
       .from(verificationRequests)
       .where(eq(verificationRequests.id, verificationId))
       .limit(1);
-    const [serverState] = await db
-      .select()
-      .from(servers)
-      .where(eq(servers.id, serverId))
-      .limit(1);
+    const [serverState] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
 
     expect(request?.status).toBe("pending");
     expect(serverState).toMatchObject({

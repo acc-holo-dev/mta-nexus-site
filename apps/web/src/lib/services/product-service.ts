@@ -1,9 +1,25 @@
-import { productRepository, buildRepository, organizationRepository, productLifecycleRepository } from "@nexus/db";
+import {
+  productRepository,
+  buildRepository,
+  organizationRepository,
+  productLifecycleRepository,
+} from "@nexus/db";
 import { generateId, can } from "@nexus/security";
 import { AppError, NotFoundError, ForbiddenError, eventBus } from "@nexus/domain";
-import type { Product, Build, User, ProductType, NexusDomainEvent, ResourceLifecycleAction, BuildPackageEvidence } from "@nexus/domain";
+import type {
+  Product,
+  Build,
+  User,
+  ProductType,
+  NexusDomainEvent,
+  ResourceLifecycleAction,
+  BuildPackageEvidence,
+} from "@nexus/domain";
 import { buildProductDependencyResolution } from "../product-dependency-resolution";
-import { buildReverseDependencySummary, reverseDependencyLimits } from "../reverse-dependency-summary";
+import {
+  buildReverseDependencySummary,
+  reverseDependencyLimits,
+} from "../reverse-dependency-summary";
 import { isUniqueConstraintViolation } from "../postgres-error";
 
 /**
@@ -59,7 +75,6 @@ export class ProductService {
     return productLifecycleRepository.history(productId, actor);
   }
 
-
   async listManagedProducts(actor: User, status?: Product["status"], page = 1) {
     return productRepository.pageManaged(actor, status, page);
   }
@@ -74,17 +89,35 @@ export class ProductService {
     return buildRepository.pageHistory(product.id, page);
   }
 
-  async updateProductDetails(id: string,
-    details: Pick<Product, "title" | "shortDescription" | "description" | "tags">, actor: User, expectedUpdatedAt?: Date) {
-    const product = await productRepository.updateManagedDetails(id, actor, details, {
-      id: generateId("aud"), actorId: actor.id, actorType: actor.role === "admin" ? "admin" : "user",
-      action: "product.details_updated", targetId: id, targetType: "product",
-      details: { fields: ["title", "shortDescription", "description", "tags"] },
-    }, expectedUpdatedAt);
+  async updateProductDetails(
+    id: string,
+    details: Pick<Product, "title" | "shortDescription" | "description" | "tags">,
+    actor: User,
+    expectedUpdatedAt?: Date,
+  ) {
+    const product = await productRepository.updateManagedDetails(
+      id,
+      actor,
+      details,
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: actor.role === "admin" ? "admin" : "user",
+        action: "product.details_updated",
+        targetId: id,
+        targetType: "product",
+        details: { fields: ["title", "shortDescription", "description", "tags"] },
+      },
+      expectedUpdatedAt,
+    );
     if (!product) {
       // Reveal a revision conflict only while the actor still has management access.
-      if (expectedUpdatedAt && await productRepository.findManaged(id, actor)) {
-        throw new AppError("Resource details changed; reload before saving", 409, "PRODUCT_METADATA_CONFLICT");
+      if (expectedUpdatedAt && (await productRepository.findManaged(id, actor))) {
+        throw new AppError(
+          "Resource details changed; reload before saving",
+          409,
+          "PRODUCT_METADATA_CONFLICT",
+        );
       }
       throw new NotFoundError("Product", id);
     }
@@ -112,10 +145,12 @@ export class ProductService {
     });
   }
 
-  async listPublicPage(filters: Omit<ProductFilters, "limit" | "offset"> & {
-    page: number;
-    pageSize: number;
-  }): Promise<{ products: Product[]; hasMore: boolean }> {
+  async listPublicPage(
+    filters: Omit<ProductFilters, "limit" | "offset"> & {
+      page: number;
+      pageSize: number;
+    },
+  ): Promise<{ products: Product[]; hasMore: boolean }> {
     const pageSize = Number.isFinite(filters.pageSize)
       ? Math.min(Math.max(Math.floor(filters.pageSize), 1), 100)
       : 24;
@@ -145,9 +180,7 @@ export class ProductService {
     if (product.status === "published") return product;
     if (!actor) return null;
 
-    return (await this.canManageProduct(product, actor))
-      ? product
-      : null;
+    return (await this.canManageProduct(product, actor)) ? product : null;
   }
 
   async getProductById(id: string): Promise<Product | null> {
@@ -170,40 +203,36 @@ export class ProductService {
       : buildRepository.listPublishedByProduct(productId);
   }
 
-  async getDependencyResolution(
-    product: Pick<Product, "slug" | "compatibility">,
-  ) {
+  async getDependencyResolution(product: Pick<Product, "slug" | "compatibility">) {
     const declared = product.compatibility.dependencies ?? [];
     if (declared.length === 0) {
       return buildProductDependencyResolution(product, []);
     }
 
-    const publishedDependencies =
-      await productRepository.findPublishedFreeBySlugs(declared);
-    return buildProductDependencyResolution(
-      product,
-      publishedDependencies,
-    );
+    const publishedDependencies = await productRepository.findPublishedFreeBySlugs(declared);
+    return buildProductDependencyResolution(product, publishedDependencies);
   }
 
   async getReverseDependencySummary(productSlug: string) {
-    const dependents =
-      await productRepository.listPublishedFreeDependingOnSlug(
-        productSlug,
-        reverseDependencyLimits.query,
-      );
+    const dependents = await productRepository.listPublishedFreeDependingOnSlug(
+      productSlug,
+      reverseDependencyLimits.query,
+    );
     return buildReverseDependencySummary(productSlug, dependents);
   }
 
   async createProduct(
-    input: Omit<Product, "id" | "ratingAverage" | "ratingCount" | "salesCount" | "createdAt" | "updatedAt">,
-    actor: User
+    input: Omit<
+      Product,
+      "id" | "ratingAverage" | "ratingCount" | "salesCount" | "createdAt" | "updatedAt"
+    >,
+    actor: User,
   ): Promise<Product> {
     if (input.price !== 0) {
       throw new AppError(
         "Paid resources are disabled during the closed beta",
         422,
-        "PAID_RESOURCES_DISABLED"
+        "PAID_RESOURCES_DISABLED",
       );
     }
 
@@ -273,30 +302,41 @@ export class ProductService {
     return product;
   }
 
-  async assertCanReleaseBuild(
-    productId: string,
-    actor: User,
-  ): Promise<Product> {
+  async assertCanReleaseBuild(productId: string, actor: User): Promise<Product> {
     const product = await productRepository.findById(productId);
     if (!product) throw new NotFoundError("Product", productId);
     if (product.price !== 0) {
       throw new AppError(
         "Build releases for paid resources are disabled during the closed beta",
         422,
-        "PAID_RESOURCES_DISABLED"
+        "PAID_RESOURCES_DISABLED",
       );
     }
     if (!(await this.canManageProduct(product, actor, "build.release"))) {
       throw new ForbiddenError("Not authorized to publish builds for this product");
     }
     if (product.status === "archived" || product.status === "suspended") {
-      throw new AppError("Restore the resource before uploading a version", 409, "PRODUCT_STATE_CHANGED");
+      throw new AppError(
+        "Restore the resource before uploading a version",
+        409,
+        "PRODUCT_STATE_CHANGED",
+      );
     }
     return product;
   }
 
   async recoverPendingBuildUpload(
-    input: Pick<Build, "productId" | "version" | "sha256Hash" | "fileSizeBytes" | "fileName" | "mimeType" | "releaseNotes" | "mtaVersionTarget">,
+    input: Pick<
+      Build,
+      | "productId"
+      | "version"
+      | "sha256Hash"
+      | "fileSizeBytes"
+      | "fileName"
+      | "mimeType"
+      | "releaseNotes"
+      | "mtaVersionTarget"
+    >,
     actor: User,
   ): Promise<Build | null> {
     // Permissions can change while scanning or uploading; do not reuse preflight access.
@@ -320,12 +360,9 @@ export class ProductService {
       scannedAt?: Date;
       packageEvidence?: BuildPackageEvidence;
     },
-    actor: User
+    actor: User,
   ): Promise<Build> {
-    const product = await this.assertCanReleaseBuild(
-      input.productId,
-      actor,
-    );
+    const product = await this.assertCanReleaseBuild(input.productId, actor);
 
     const buildId = generateId("bld");
     const auditId = generateId("aud");
@@ -359,15 +396,11 @@ export class ProductService {
           targetId: buildId,
           targetType: "build",
           details: { productId: product.id, version: input.version },
-        }
+        },
       );
     } catch (error: unknown) {
       if (isUniqueConstraintViolation(error, ["builds_product_version_idx"])) {
-        throw new AppError(
-          "This resource version already exists",
-          409,
-          "BUILD_VERSION_EXISTS"
-        );
+        throw new AppError("This resource version already exists", 409, "BUILD_VERSION_EXISTS");
       }
       throw error;
     }
@@ -391,7 +424,12 @@ export class ProductService {
     return build;
   }
   async reviewBuild(
-    input: { buildId: string; decision: "approve" | "reject"; notes?: string; expectedRevision: number },
+    input: {
+      buildId: string;
+      decision: "approve" | "reject";
+      notes?: string;
+      expectedRevision: number;
+    },
     actor: User,
     currentToken: string,
   ): Promise<Build> {
@@ -405,40 +443,51 @@ export class ProductService {
       throw new AppError("Only pending builds can be reviewed", 409, "BUILD_NOT_PENDING_REVIEW");
     }
 
-    if (!Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 1 || build.revision !== input.expectedRevision) {
+    if (
+      !Number.isSafeInteger(input.expectedRevision) ||
+      input.expectedRevision < 1 ||
+      build.revision !== input.expectedRevision
+    ) {
       throw new AppError("Build changed; reload before reviewing", 409, "BUILD_REVISION_CONFLICT");
     }
     const product = await productRepository.findById(build.productId);
     if (!product) throw new NotFoundError("Product", build.productId);
     if (
       input.decision === "approve" &&
-      (
-        build.scanStatus !== "clean" ||
-        !build.scanner?.trim() ||
-        !build.scannedAt
-      )
+      (build.scanStatus !== "clean" || !build.scanner?.trim() || !build.scannedAt)
     ) {
       throw new AppError(
         "Only a provenance-backed clean malware scan can be approved",
         422,
-        "BUILD_SCAN_NOT_CLEAN"
+        "BUILD_SCAN_NOT_CLEAN",
       );
     }
 
-    const reviewed = await buildRepository.moderatePending(build.id, input.decision, {
-      id: generateId("aud"),
-      actorId: actor.id,
-      actorType: actor.role === "admin" ? "admin" : "user",
-      action: input.decision === "approve" ? "build.approved" : "build.rejected",
-      targetId: build.id,
-      targetType: "build",
-      details: { productId: product.id, version: build.version, notes: input.notes, expectedRevision: input.expectedRevision },
-    }, input.expectedRevision, currentToken);
+    const reviewed = await buildRepository.moderatePending(
+      build.id,
+      input.decision,
+      {
+        id: generateId("aud"),
+        actorId: actor.id,
+        actorType: actor.role === "admin" ? "admin" : "user",
+        action: input.decision === "approve" ? "build.approved" : "build.rejected",
+        targetId: build.id,
+        targetType: "build",
+        details: {
+          productId: product.id,
+          version: build.version,
+          notes: input.notes,
+          expectedRevision: input.expectedRevision,
+        },
+      },
+      input.expectedRevision,
+      currentToken,
+    );
     if (!reviewed) {
       throw new AppError(
         "Build state changed before moderation completed",
         409,
-        "BUILD_STATE_CHANGED"
+        "BUILD_STATE_CHANGED",
       );
     }
 
@@ -469,9 +518,7 @@ export class ProductService {
     currentToken: string,
   ): Promise<Build> {
     if (!can(actor, "admin.moderation")) {
-      throw new ForbiddenError(
-        "Moderator privilege is required to quarantine builds",
-      );
+      throw new ForbiddenError("Moderator privilege is required to quarantine builds");
     }
 
     const build = await buildRepository.findById(input.buildId);
@@ -520,9 +567,7 @@ export class ProductService {
     currentToken: string,
   ): Promise<Build> {
     if (!can(actor, "admin.moderation")) {
-      throw new ForbiddenError(
-        "Moderator privilege is required to restore quarantined builds",
-      );
+      throw new ForbiddenError("Moderator privilege is required to restore quarantined builds");
     }
 
     const build = await buildRepository.findById(input.buildId);
@@ -577,7 +622,7 @@ export class ProductService {
 
   async retireBuild(
     input: { productId: string; buildId: string; reason?: string },
-    actor: User
+    actor: User,
   ): Promise<Build> {
     const product = await productRepository.findById(input.productId);
     if (!product) throw new NotFoundError("Product", input.productId);
@@ -608,7 +653,6 @@ export class ProductService {
 
     return retired;
   }
-
 }
 
 export const productService = new ProductService();

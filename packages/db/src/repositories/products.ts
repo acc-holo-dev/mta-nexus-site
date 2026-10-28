@@ -1,10 +1,20 @@
 import type { SQL } from "drizzle-orm";
 import { eq, desc, asc, and, count, gte, lte, ilike, or, sql, inArray, ne } from "drizzle-orm";
-import { assertProductMutationAuthority, assertBuildModerationAuthority } from "./product-mutation-authority";
+import {
+  assertProductMutationAuthority,
+  assertBuildModerationAuthority,
+} from "./product-mutation-authority";
 import { lockInitiatingSession } from "./initiating-session";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
-import { auditEvents, builds, products, organizations, organizationMembers, users } from "../schema";
+import {
+  auditEvents,
+  builds,
+  products,
+  organizations,
+  organizationMembers,
+  users,
+} from "../schema";
 import { AppError } from "@nexus/domain";
 import { resourceModerationRepository } from "./resource-moderation";
 import type { AuditEvent, Product, ProductType, User } from "@nexus/domain";
@@ -52,54 +62,111 @@ export interface ProductQueryOptions {
 
 export class ProductRepository {
   async hasManagementAccess(id: string, actor: Pick<User, "id" | "role">): Promise<boolean> {
-    const [row] = await db.select({ id: products.id }).from(products)
-      .where(and(eq(products.id, id), managedProductCondition(actor))).limit(1);
+    const [row] = await db
+      .select({ id: products.id })
+      .from(products)
+      .where(and(eq(products.id, id), managedProductCondition(actor)))
+      .limit(1);
     return !!row;
   }
-  async pageManaged(actor: Pick<User, "id" | "role">, status?: Product["status"], requestedPage = 1) {
-    const condition = and(managedProductCondition(actor), eq(products.price, 0),
-      status ? eq(products.status, status) : undefined);
+  async pageManaged(
+    actor: Pick<User, "id" | "role">,
+    status?: Product["status"],
+    requestedPage = 1,
+  ) {
+    const condition = and(
+      managedProductCondition(actor),
+      eq(products.price, 0),
+      status ? eq(products.status, status) : undefined,
+    );
     const [summary] = await db.select({ total: count() }).from(products).where(condition);
     const total = summary?.total ?? 0;
     const totalPages = Math.max(1, Math.ceil(total / 24));
-    const page = Math.min(Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1, totalPages);
-    const rows = await db.select().from(products).where(condition)
-      .orderBy(desc(products.updatedAt), desc(products.id)).limit(24).offset((page - 1) * 24);
+    const page = Math.min(
+      Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1,
+      totalPages,
+    );
+    const rows = await db
+      .select()
+      .from(products)
+      .where(condition)
+      .orderBy(desc(products.updatedAt), desc(products.id))
+      .limit(24)
+      .offset((page - 1) * 24);
     return { products: rows as unknown as Product[], total, page, totalPages };
   }
 
   async findManaged(id: string, actor: Pick<User, "id" | "role">): Promise<Product | null> {
-    const rows = await db.select().from(products).where(and(eq(products.id, id),
-      eq(products.price, 0), managedProductCondition(actor))).limit(1);
+    const rows = await db
+      .select()
+      .from(products)
+      .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor)))
+      .limit(1);
     return (rows[0] as unknown as Product) ?? null;
   }
 
-  async updateManagedDetails(id: string, actor: Pick<User, "id" | "role">,
+  async updateManagedDetails(
+    id: string,
+    actor: Pick<User, "id" | "role">,
     details: Pick<Product, "title" | "shortDescription" | "description" | "tags">,
-    audit: Omit<AuditEvent, "createdAt">, expectedUpdatedAt?: Date): Promise<Product | null> {
+    audit: Omit<AuditEvent, "createdAt">,
+    expectedUpdatedAt?: Date,
+  ): Promise<Product | null> {
     return db.transaction(async (tx) => {
-      const [parent] = await tx.select({ id: products.id, authorId: products.authorId,
-        organizationId: products.organizationId, status: products.status }).from(products)
+      const [parent] = await tx
+        .select({
+          id: products.id,
+          authorId: products.authorId,
+          organizationId: products.organizationId,
+          status: products.status,
+        })
+        .from(products)
         .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor)))
-        .limit(1).for("no key update");
+        .limit(1)
+        .for("no key update");
       if (!parent) return null;
       // Hold live organization/user/membership grants through the audited commit.
       const currentActor = await assertProductMutationAuthority(tx, parent, actor.id);
       if (parent.status === "archived" || parent.status === "suspended")
-        throw new AppError("Withdrawn resource metadata is read-only", 409, "PRODUCT_STATE_CHANGED");
-      const rows = await tx.update(products).set({ title: details.title,
-        shortDescription: details.shortDescription, description: details.description,
-        tags: details.tags,
-        // Millisecond revisions match JS Dates and advance even within one clock tick.
-        updatedAt: sql`greatest(date_trunc('milliseconds', clock_timestamp()),
-          date_trunc('milliseconds', ${products.updatedAt}) + interval '1 millisecond')` })
-        .where(and(eq(products.id, id), eq(products.price, 0), managedProductCondition(actor),
-          expectedUpdatedAt ? sql`date_trunc('milliseconds', ${products.updatedAt}) = ${expectedUpdatedAt.toISOString()}::timestamptz` : undefined)).returning();
+        throw new AppError(
+          "Withdrawn resource metadata is read-only",
+          409,
+          "PRODUCT_STATE_CHANGED",
+        );
+      const rows = await tx
+        .update(products)
+        .set({
+          title: details.title,
+          shortDescription: details.shortDescription,
+          description: details.description,
+          tags: details.tags,
+          // Millisecond revisions match JS Dates and advance even within one clock tick.
+          updatedAt: sql`greatest(date_trunc('milliseconds', clock_timestamp()),
+          date_trunc('milliseconds', ${products.updatedAt}) + interval '1 millisecond')`,
+        })
+        .where(
+          and(
+            eq(products.id, id),
+            eq(products.price, 0),
+            managedProductCondition(actor),
+            expectedUpdatedAt
+              ? sql`date_trunc('milliseconds', ${products.updatedAt}) = ${expectedUpdatedAt.toISOString()}::timestamptz`
+              : undefined,
+          ),
+        )
+        .returning();
       if (!rows[0]) return null;
-      await tx.insert(auditEvents).values({ ...audit, actorId: currentActor.id,
+      await tx.insert(auditEvents).values({
+        ...audit,
+        actorId: currentActor.id,
         actorType: currentActor.role === "admin" ? "admin" : "user",
-        details: { ...audit.details, previousStatus: parent.status, status: rows[0].status,
-          metadataReviewRequired: rows[0].metadataReviewRequired } });
+        details: {
+          ...audit.details,
+          previousStatus: parent.status,
+          status: rows[0].status,
+          metadataReviewRequired: rows[0].metadataReviewRequired,
+        },
+      });
       return rows[0] as unknown as Product;
     });
   }
@@ -108,15 +175,25 @@ export class ProductRepository {
     return this.pagePublishedFree(eq(products.authorId, authorId), requestedPage, requestedSize);
   }
 
-  async pagePublishedFreeByOrganization(organizationId: string, requestedPage = 1, requestedSize = 24) {
-    return this.pagePublishedFree(eq(products.organizationId, organizationId), requestedPage, requestedSize);
+  async pagePublishedFreeByOrganization(
+    organizationId: string,
+    requestedPage = 1,
+    requestedSize = 24,
+  ) {
+    return this.pagePublishedFree(
+      eq(products.organizationId, organizationId),
+      requestedPage,
+      requestedSize,
+    );
   }
 
   private async pagePublishedFree(scope: SQL, requestedPage: number, requestedSize: number) {
     const pageSize = Number.isFinite(requestedSize)
-      ? Math.min(Math.max(Math.floor(requestedSize), 1), 100) : 24;
+      ? Math.min(Math.max(Math.floor(requestedSize), 1), 100)
+      : 24;
     const requested = Number.isFinite(requestedPage)
-      ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER) : 1;
+      ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER)
+      : 1;
     const condition = and(
       scope,
       eq(products.status, "published"),
@@ -127,18 +204,21 @@ export class ProductRepository {
     const total = summary?.total ?? 0;
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
     const page = Math.min(requested, totalPages);
-    const rows = await db.select().from(products).where(condition)
+    const rows = await db
+      .select()
+      .from(products)
+      .where(condition)
       .orderBy(desc(products.createdAt), desc(products.id))
-      .limit(pageSize).offset((page - 1) * pageSize);
+      .limit(pageSize)
+      .offset((page - 1) * pageSize);
     return { products: rows as unknown as Product[], total, page, pageSize, totalPages };
   }
 
   async countPublishedFree(): Promise<number> {
-    const [row] = await db.select({ total: count() }).from(products).where(and(
-      eq(products.status, "published"),
-      eq(products.price, 0),
-      hasSafePublishedBuild(),
-    ));
+    const [row] = await db
+      .select({ total: count() })
+      .from(products)
+      .where(and(eq(products.status, "published"), eq(products.price, 0), hasSafePublishedBuild()));
     return row?.total ?? 0;
   }
 
@@ -162,21 +242,24 @@ export class ProductRepository {
       if (searchCondition) conditions.push(searchCondition);
     }
 
-    const order = options.sort === "popular"
-      ? desc(products.salesCount)
-      : options.sort === "rating"
-        ? desc(products.ratingAverage)
-        : options.sort === "price_asc"
-          ? asc(products.price)
-          : options.sort === "price_desc"
-            ? desc(products.price)
-            : desc(products.createdAt);
-    const limit = options.limit === undefined || !Number.isFinite(options.limit)
-      ? 100
-      : Math.min(Math.max(Math.floor(options.limit), 1), 101);
-    const offset = options.offset === undefined || !Number.isFinite(options.offset)
-      ? 0
-      : Math.min(Math.max(Math.floor(options.offset), 0), 100_000);
+    const order =
+      options.sort === "popular"
+        ? desc(products.salesCount)
+        : options.sort === "rating"
+          ? desc(products.ratingAverage)
+          : options.sort === "price_asc"
+            ? asc(products.price)
+            : options.sort === "price_desc"
+              ? desc(products.price)
+              : desc(products.createdAt);
+    const limit =
+      options.limit === undefined || !Number.isFinite(options.limit)
+        ? 100
+        : Math.min(Math.max(Math.floor(options.limit), 1), 101);
+    const offset =
+      options.offset === undefined || !Number.isFinite(options.offset)
+        ? 0
+        : Math.min(Math.max(Math.floor(options.offset), 0), 100_000);
 
     const rows = await db
       .select()
@@ -188,10 +271,7 @@ export class ProductRepository {
     return rows as unknown as Product[];
   }
 
-  async listPublishedByOrganization(
-    organizationId: string,
-    limit = 100,
-  ): Promise<Product[]> {
+  async listPublishedByOrganization(organizationId: string, limit = 100): Promise<Product[]> {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 100)
       : 100;
@@ -213,12 +293,18 @@ export class ProductRepository {
   }
 
   async listPublishedFreeByAuthor(authorId: string): Promise<Product[]> {
-    const rows = await db.select().from(products).where(and(
-      eq(products.authorId, authorId),
-      eq(products.status, "published"),
-      eq(products.price, 0),
-      hasSafePublishedBuild(),
-    )).orderBy(desc(products.createdAt), desc(products.id));
+    const rows = await db
+      .select()
+      .from(products)
+      .where(
+        and(
+          eq(products.authorId, authorId),
+          eq(products.status, "published"),
+          eq(products.price, 0),
+          hasSafePublishedBuild(),
+        ),
+      )
+      .orderBy(desc(products.createdAt), desc(products.id));
     return rows as unknown as Product[];
   }
 
@@ -227,34 +313,35 @@ export class ProductRepository {
     if (uniqueIds.length === 0) return [];
     const result: Product[] = [];
     for (let offset = 0; offset < uniqueIds.length; offset += 500) {
-      const rows = await db.select().from(products).where(and(
-        inArray(products.id, uniqueIds.slice(offset, offset + 500)),
-        eq(products.status, "published"),
-        eq(products.price, 0),
-        hasSafePublishedBuild(),
-      ));
-      result.push(...rows as unknown as Product[]);
+      const rows = await db
+        .select()
+        .from(products)
+        .where(
+          and(
+            inArray(products.id, uniqueIds.slice(offset, offset + 500)),
+            eq(products.status, "published"),
+            eq(products.price, 0),
+            hasSafePublishedBuild(),
+          ),
+        );
+      result.push(...(rows as unknown as Product[]));
     }
     return result;
   }
 
   async findById(id: string): Promise<Product | null> {
-        const rows = await db.select().from(products).where(eq(products.id, id)).limit(1);
+    const rows = await db.select().from(products).where(eq(products.id, id)).limit(1);
     return (rows[0] as unknown as Product) || null;
   }
 
   async findBySlug(slug: string): Promise<Product | null> {
-        const rows = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
+    const rows = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
     return (rows[0] as unknown as Product) || null;
   }
 
   async findPublishedFreeBySlugs(slugs: readonly string[]): Promise<Product[]> {
     const normalized = Array.from(
-      new Set(
-        slugs
-          .map((slug) => slug.trim().toLowerCase())
-          .filter(Boolean),
-      ),
+      new Set(slugs.map((slug) => slug.trim().toLowerCase()).filter(Boolean)),
     ).slice(0, 25);
     if (normalized.length === 0) return [];
 
@@ -273,16 +360,11 @@ export class ProductRepository {
     return rows as unknown as Product[];
   }
 
-  async listPublishedFreeDependingOnSlug(
-    dependencySlug: string,
-    limit = 51,
-  ): Promise<Product[]> {
+  async listPublishedFreeDependingOnSlug(dependencySlug: string, limit = 51): Promise<Product[]> {
     const normalized = dependencySlug.trim().toLowerCase();
     if (!normalized) return [];
 
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 51)
-      : 51;
+    const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 51) : 51;
 
     const rows = await db
       .select()
@@ -308,7 +390,7 @@ export class ProductRepository {
       updatedAt: new Date(),
     };
 
-        const rows = await db.insert(products).values(values).returning();
+    const rows = await db.insert(products).values(values).returning();
     return rows[0] as unknown as Product;
   }
 
@@ -331,7 +413,7 @@ export class ProductRepository {
   }
 
   async update(id: string, updates: Partial<Product>): Promise<Product | null> {
-        const rows = await db
+    const rows = await db
       .update(products)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(products.id, id))
@@ -346,15 +428,22 @@ export class ProductRepository {
     currentToken: string,
   ): Promise<Product | null> {
     return db.transaction(async (tx) => {
-      const [parent] = await tx.select({ id: products.id }).from(products)
-        .where(eq(products.id, id)).limit(1).for("no key update");
+      const [parent] = await tx
+        .select({ id: products.id })
+        .from(products)
+        .where(eq(products.id, id))
+        .limit(1)
+        .for("no key update");
       await assertBuildModerationAuthority(tx, audit.actorId);
       await lockInitiatingSession(tx, audit.actorId, currentToken);
       if (!parent) return null;
       const now = new Date();
       const rows = await tx
         .update(products)
-        .set({ ...updates, updatedAt: sql`greatest(date_trunc('milliseconds', clock_timestamp()), date_trunc('milliseconds', ${products.updatedAt}) + interval '1 millisecond')` })
+        .set({
+          ...updates,
+          updatedAt: sql`greatest(date_trunc('milliseconds', clock_timestamp()), date_trunc('milliseconds', ${products.updatedAt}) + interval '1 millisecond')`,
+        })
         .where(eq(products.id, id))
         .returning();
       const updated = rows[0];
@@ -369,26 +458,61 @@ export class ProductRepository {
   }
 
   /** Legacy entry point: suspension still uses the shared live moderation gate. */
-  async suspendPublished(id: string, audit: Omit<AuditEvent, "createdAt"> | undefined, currentToken: string): Promise<Product | null> {
-    if (!audit) throw new AppError("An audited moderation reason is required", 400, "RESOURCE_MODERATION_INVALID");
+  async suspendPublished(
+    id: string,
+    audit: Omit<AuditEvent, "createdAt"> | undefined,
+    currentToken: string,
+  ): Promise<Product | null> {
+    if (!audit)
+      throw new AppError(
+        "An audited moderation reason is required",
+        400,
+        "RESOURCE_MODERATION_INVALID",
+      );
     const product = await this.findById(id);
     if (product?.status !== "published") return null;
-    await resourceModerationRepository.command({ actorId: audit.actorId, productId: id, auditId: audit.id, currentToken,
-      command: { action: "suspend", expectedUpdatedAt: product.updatedAt.toISOString(), reason: typeof audit.details?.notes === "string" ? audit.details.notes : "" } });
+    await resourceModerationRepository.command({
+      actorId: audit.actorId,
+      productId: id,
+      auditId: audit.id,
+      currentToken,
+      command: {
+        action: "suspend",
+        expectedUpdatedAt: product.updatedAt.toISOString(),
+        reason: typeof audit.details?.notes === "string" ? audit.details.notes : "",
+      },
+    });
     return this.findById(id);
   }
 
   /** Legacy name retained; restored resources now return to draft for review. */
-  async restoreSuspendedWithPublishedBuild(id: string, audit: Omit<AuditEvent, "createdAt"> | undefined, currentToken: string): Promise<"restored" | "not_found" | "invalid_state" | "no_published_build"> {
-    if (!audit) throw new AppError("An audited moderation reason is required", 400, "RESOURCE_MODERATION_INVALID");
+  async restoreSuspendedWithPublishedBuild(
+    id: string,
+    audit: Omit<AuditEvent, "createdAt"> | undefined,
+    currentToken: string,
+  ): Promise<"restored" | "not_found" | "invalid_state" | "no_published_build"> {
+    if (!audit)
+      throw new AppError(
+        "An audited moderation reason is required",
+        400,
+        "RESOURCE_MODERATION_INVALID",
+      );
     const product = await this.findById(id);
     if (!product) return "not_found";
     if (product.status !== "suspended") return "invalid_state";
-    await resourceModerationRepository.command({ actorId: audit.actorId, productId: id, auditId: audit.id, currentToken,
-      command: { action: "release", expectedUpdatedAt: product.updatedAt.toISOString(), reason: typeof audit.details?.notes === "string" ? audit.details.notes : "" } });
+    await resourceModerationRepository.command({
+      actorId: audit.actorId,
+      productId: id,
+      auditId: audit.id,
+      currentToken,
+      command: {
+        action: "release",
+        expectedUpdatedAt: product.updatedAt.toISOString(),
+        reason: typeof audit.details?.notes === "string" ? audit.details.notes : "",
+      },
+    });
     return "restored";
   }
-
 }
 
 export const productRepository = new ProductRepository();

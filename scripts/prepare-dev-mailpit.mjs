@@ -5,10 +5,13 @@ import { isAbsolute, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 function prepareKey(path) {
-  if (!existsSync(path)) writeFileSync(path, randomBytes(32).toString("base64url"), { flag: "wx", mode: 0o600 });
+  if (!existsSync(path))
+    writeFileSync(path, randomBytes(32).toString("base64url"), { flag: "wx", mode: 0o600 });
   const value = readFileSync(path, "utf8");
-  if (!/^[A-Za-z0-9_-]{43}$/u.test(value)
-    || Buffer.from(value, "base64url").toString("base64url") !== value) {
+  if (
+    !/^[A-Za-z0-9_-]{43}$/u.test(value) ||
+    Buffer.from(value, "base64url").toString("base64url") !== value
+  ) {
     throw new Error("Invalid persisted development mail key; refusing to rotate it");
   }
   chmodSync(path, 0o600);
@@ -24,19 +27,39 @@ export function prepareDevMailpit(directory, env = process.env) {
   const tlsKeyFile = join(directory, "smtp.key");
   prepareKey(keyFile);
   prepareKey(abuseKeyFile);
-  if (readFileSync(keyFile).equals(readFileSync(abuseKeyFile))) throw new Error("Development mail keys must differ");
+  if (readFileSync(keyFile).equals(readFileSync(abuseKeyFile)))
+    throw new Error("Development mail keys must differ");
 
   let validCertificate = false;
   if (existsSync(certFile) && existsSync(tlsKeyFile)) {
     const cert = new X509Certificate(readFileSync(certFile));
-    validCertificate = cert.checkHost("mailpit") === "mailpit"
-      && cert.checkPrivateKey(createPrivateKey(readFileSync(tlsKeyFile)))
-      && Date.parse(cert.validTo) > Date.now() + 86_400_000;
+    validCertificate =
+      cert.checkHost("mailpit") === "mailpit" &&
+      cert.checkPrivateKey(createPrivateKey(readFileSync(tlsKeyFile))) &&
+      Date.parse(cert.validTo) > Date.now() + 86_400_000;
   }
   if (!validCertificate) {
-    execFileSync("openssl", ["req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "365",
-      "-subj", "/CN=mailpit", "-addext", "subjectAltName=DNS:mailpit",
-      "-keyout", tlsKeyFile, "-out", certFile], { stdio: "ignore" });
+    execFileSync(
+      "openssl",
+      [
+        "req",
+        "-x509",
+        "-newkey",
+        "rsa:2048",
+        "-nodes",
+        "-days",
+        "365",
+        "-subj",
+        "/CN=mailpit",
+        "-addext",
+        "subjectAltName=DNS:mailpit",
+        "-keyout",
+        tlsKeyFile,
+        "-out",
+        certFile,
+      ],
+      { stdio: "ignore" },
+    );
   }
   chmodSync(tlsKeyFile, 0o600);
   chmodSync(certFile, 0o644);

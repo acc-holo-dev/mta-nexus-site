@@ -26,8 +26,10 @@ export function ProfileResourcePagination({
     articles: dictionary.organizations.articles,
     servers: dictionary.profiles.operatedServers,
   };
-  const secondaryParameter = (section === "resources" ? otherSection : section) === "articles"
-    ? "articlePage" : "serverPage";
+  const secondaryParameter =
+    (section === "resources" ? otherSection : section) === "articles"
+      ? "articlePage"
+      : "serverPage";
   const href = (target: number) => {
     const query = new URLSearchParams();
     if (section === "resources") {
@@ -40,10 +42,7 @@ export function ProfileResourcePagination({
     return `${basePath}?${query}#${section}`;
   };
   return (
-    <nav
-      aria-label={labels[section]}
-      className="flex items-center justify-between gap-3"
-    >
+    <nav aria-label={labels[section]} className="flex items-center justify-between gap-3">
       {page > 1 ? (
         <Link href={href(page - 1)} rel="prev" className="text-sm text-accent underline">
           {copy.previousPage}

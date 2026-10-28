@@ -1,9 +1,5 @@
 #!/usr/bin/env node
-import {
-  existsSync,
-  mkdirSync,
-  readFileSync,
-} from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -40,10 +36,7 @@ function runCaptured(command, args) {
   });
   return Object.freeze({
     ok: result.status === 0 && !result.error,
-    output:
-      result.status === 0 && !result.error
-        ? result.stdout.trim()
-        : "",
+    output: result.status === 0 && !result.error ? result.stdout.trim() : "",
   });
 }
 
@@ -89,15 +82,11 @@ const gitVersionResult = runCaptured("git", ["--version"]);
 
 const gitSha = gitShaResult.output || null;
 const branchName =
-  process.env.GITHUB_HEAD_REF ||
-  process.env.GITHUB_REF_NAME ||
-  gitBranchResult.output ||
-  null;
+  process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME || gitBranchResult.output || null;
 const dirty = gitStatusResult.ok ? Boolean(gitStatusResult.output) : true;
 const pnpmVersion = pnpmVersionResult.output || null;
 const gitVersion = gitVersionResult.output || null;
-const githubShaMatches =
-  !process.env.GITHUB_SHA || process.env.GITHUB_SHA === gitSha;
+const githubShaMatches = !process.env.GITHUB_SHA || process.env.GITHUB_SHA === gitSha;
 const identityComplete =
   gitShaResult.ok &&
   gitStatusResult.ok &&
@@ -118,15 +107,11 @@ const gates = [
             "Git/pnpm identity is incomplete or GITHUB_SHA does not match the checked-out commit.",
         },
   ),
-  runGate(
-    "release_evidence_harness",
-    "node",
-    [
-      "--test",
-      "scripts/tests/release-evidence.node-test.mjs",
-      "scripts/tests/release-evidence-surface.node-test.mjs",
-    ],
-  ),
+  runGate("release_evidence_harness", "node", [
+    "--test",
+    "scripts/tests/release-evidence.node-test.mjs",
+    "scripts/tests/release-evidence-surface.node-test.mjs",
+  ]),
   runGate(
     "database_migrations",
     pnpmCommand,
@@ -134,8 +119,7 @@ const gates = [
     process.env.DATABASE_URL
       ? {}
       : {
-          blockedReason:
-            "DATABASE_URL is required to prove migrations against a database.",
+          blockedReason: "DATABASE_URL is required to prove migrations against a database.",
         },
   ),
   runGate("lint", pnpmCommand, ["lint"]),
@@ -145,48 +129,40 @@ const gates = [
 ];
 
 const externalEvidenceSpecs = Object.fromEntries(
-  Object.entries(EXTERNAL_RELEASE_EVIDENCE_SPECS).map(
-    ([name, specification]) => [
-      name,
-      {
-        path: join(root, specification.relativePath),
-        checker: specification.checker,
-      },
-    ],
-  ),
+  Object.entries(EXTERNAL_RELEASE_EVIDENCE_SPECS).map(([name, specification]) => [
+    name,
+    {
+      path: join(root, specification.relativePath),
+      checker: specification.checker,
+    },
+  ]),
 );
 
 const externalEvidence = Object.fromEntries(
-  Object.entries(externalEvidenceSpecs).map(
-    ([name, specification]) => {
-      if (!existsSync(specification.path)) {
-        return [
-          name,
-          Object.freeze({
-            present: false,
-            valid: false,
-            sha256: null,
-          }),
-        ];
-      }
-
-      const verification = runCaptured(
-        process.execPath,
-        [specification.checker, specification.path],
-      );
+  Object.entries(externalEvidenceSpecs).map(([name, specification]) => {
+    if (!existsSync(specification.path)) {
       return [
         name,
         Object.freeze({
-          present: true,
-          valid: verification.ok,
-          sha256: sha256File(specification.path),
+          present: false,
+          valid: false,
+          sha256: null,
         }),
       ];
-    },
-  ),
+    }
+
+    const verification = runCaptured(process.execPath, [specification.checker, specification.path]);
+    return [
+      name,
+      Object.freeze({
+        present: true,
+        valid: verification.ok,
+        sha256: sha256File(specification.path),
+      }),
+    ];
+  }),
 );
-const externalEvidenceSummary =
-  summarizeExternalEvidence(externalEvidence);
+const externalEvidenceSummary = summarizeExternalEvidence(externalEvidence);
 
 const migrationFiles = listMigrationEvidence(migrationsDir);
 // Re-read after all commands and migration hashing: successful gates must not
@@ -201,9 +177,19 @@ const repositoryStable = repositoryStayedStable({
   statusAvailable: finalStatusResult.ok,
   dirty: finalDirty,
 });
-gates.push(runGate("repository_stability", "internal", [], repositoryStable ? {} : {
-  blockedReason: "Repository HEAD changed, the working tree became dirty, or final Git identity is unavailable.",
-}));
+gates.push(
+  runGate(
+    "repository_stability",
+    "internal",
+    [],
+    repositoryStable
+      ? {}
+      : {
+          blockedReason:
+            "Repository HEAD changed, the working tree became dirty, or final Git identity is unavailable.",
+        },
+  ),
+);
 const evidenceCore = {
   schemaVersion: 1,
   scope: "core_application",
@@ -262,10 +248,16 @@ mkdirSync(join(root, "artifacts"), { recursive: true });
 writeReleaseEvidence(outputPath, evidence);
 
 process.stdout.write(
-  "\nRelease evidence: " + outputPath + "\n" +
-  "status=" + evidence.summary.status +
-  " sha=" + (gitSha ?? "unknown") +
-  " evidenceSha256=" + evidence.evidenceSha256 + "\n",
+  "\nRelease evidence: " +
+    outputPath +
+    "\n" +
+    "status=" +
+    evidence.summary.status +
+    " sha=" +
+    (gitSha ?? "unknown") +
+    " evidenceSha256=" +
+    evidence.evidenceSha256 +
+    "\n",
 );
 
 if (!evidence.summary.releaseCandidate) {

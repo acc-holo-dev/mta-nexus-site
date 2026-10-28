@@ -93,23 +93,17 @@ describe("expired free resource claims", () => {
       ),
     );
 
-    const created = attempts.filter(
-      (attempt) => attempt.alreadyClaimed === false,
-    );
-    const reused = attempts.filter(
-      (attempt) => attempt.alreadyClaimed === true,
-    );
+    const created = attempts.filter((attempt) => attempt.alreadyClaimed === false);
+    const reused = attempts.filter((attempt) => attempt.alreadyClaimed === true);
 
     expect(created).toHaveLength(1);
     expect(reused).toHaveLength(9);
 
     const renewedEntitlementId = created[0]?.entitlement?.id;
     expect(renewedEntitlementId).toBeTruthy();
-    expect(
-      attempts.every(
-        (attempt) => attempt.entitlement?.id === renewedEntitlementId,
-      ),
-    ).toBe(true);
+    expect(attempts.every((attempt) => attempt.entitlement?.id === renewedEntitlementId)).toBe(
+      true,
+    );
     expect(created[0]?.entitlement?.expiresAt).toBeFalsy();
 
     expect(
@@ -125,15 +119,11 @@ describe("expired free resource claims", () => {
       id: userId,
     });
     const activeClaims = activeRows.filter(
-      (row) =>
-        row.resourceId === productId &&
-        row.permission === "product.download",
+      (row) => row.resourceId === productId && row.permission === "product.download",
     );
     expect(activeClaims).toHaveLength(1);
     expect(activeClaims[0]?.id).toBe(renewedEntitlementId);
-    expect(activeRows.some((row) => row.id === expiredEntitlementId)).toBe(
-      false,
-    );
+    expect(activeRows.some((row) => row.id === expiredEntitlementId)).toBe(false);
 
     const afterRenewal = await productRepository.findById(productId);
     expect(afterRenewal?.salesCount).toBe(1);

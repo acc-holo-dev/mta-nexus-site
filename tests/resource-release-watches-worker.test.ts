@@ -183,7 +183,9 @@ it.each(["approve", "reject"] as const)(
       targetType: "build",
       targetId: "bld_a",
     };
-    expect(await buildRepository.moderatePending("bld_a", decision, audit, 3, "staff-session")).toMatchObject({
+    expect(
+      await buildRepository.moderatePending("bld_a", decision, audit, 3, "staff-session"),
+    ).toMatchObject({
       id: "bld_a",
     });
     const event = state.queries.find((query) =>
@@ -201,7 +203,13 @@ it.each(["approve", "reject"] as const)(
 );
 
 it("a stale moderation decision creates no release work, inbox or audit", async () => {
-  state.rows = [[["prd_a"]], [["prd_a", "published", "usr_a", null, false]], [["moderator"]], [["ses_staff", "2099-01-01T00:00:00.000Z"]], []];
+  state.rows = [
+    [["prd_a"]],
+    [["prd_a", "published", "usr_a", null, false]],
+    [["moderator"]],
+    [["ses_staff", "2099-01-01T00:00:00.000Z"]],
+    [],
+  ];
   expect(
     await buildRepository.moderatePending(
       "bld_a",

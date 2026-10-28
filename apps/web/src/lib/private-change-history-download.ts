@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 /** A twenty-record export, never an unbounded archive or raw audit dump. */
 export async function privateChangeHistoryDownload(
   response: Response,
-  filename: "profile-history.json" | "organization-activity.json" | "support-messages.json" | "report-history.json",
+  filename:
+    | "profile-history.json"
+    | "organization-activity.json"
+    | "support-messages.json"
+    | "report-history.json",
   unavailable: string,
 ) {
   response.headers.set("X-Content-Type-Options", "nosniff");

@@ -1,4 +1,6 @@
-vi.mock("../../../components/follow-button", () => ({ FollowButton: () => <button type="button">Follow</button> }));
+vi.mock("../../../components/follow-button", () => ({
+  FollowButton: () => <button type="button">Follow</button>,
+}));
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, expect, it, vi } from "vitest";
 
@@ -28,7 +30,9 @@ vi.mock("@nexus/db", () => ({
 }));
 vi.mock("../../../lib/i18n-server", () => ({ getRequestLocale: async () => state.locale }));
 vi.mock("../../../lib/services/profile-privacy-service", () => ({
-  profilePrivacyService: { visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }) },
+  profilePrivacyService: {
+    visibility: async () => ({ showActivity: state.showActivity, showProfessionalContacts: true }),
+  },
 }));
 vi.mock("../../../lib/services/mta-master-directory-service", () => ({
   mtaMasterDirectoryService: { getDirectory: state.directory },
@@ -150,16 +154,19 @@ it("preserves resource and server pages independently", async () => {
   expect(html).toContain("Second-page server");
 });
 
-it.each(["en", "ru"] as const)("excludes missing user profiles from indexing in %s", async (locale) => {
-  state.locale = locale;
-  state.exists = false;
-  expect(await generateMetadata(input())).toEqual({
-    title: getDictionary(locale).profiles.userNotFound,
-    robots: { index: false, follow: false },
-  });
-  expect(state.products).not.toHaveBeenCalled();
-  expect(state.servers).not.toHaveBeenCalled();
-});
+it.each(["en", "ru"] as const)(
+  "excludes missing user profiles from indexing in %s",
+  async (locale) => {
+    state.locale = locale;
+    state.exists = false;
+    expect(await generateMetadata(input())).toEqual({
+      title: getDictionary(locale).profiles.userNotFound,
+      robots: { index: false, follow: false },
+    });
+    expect(state.products).not.toHaveBeenCalled();
+    expect(state.servers).not.toHaveBeenCalled();
+  },
+);
 it("uses the stored user identity for canonical metadata", async () => {
   expect(await generateMetadata(input())).toMatchObject({
     title: "Member (@member)",

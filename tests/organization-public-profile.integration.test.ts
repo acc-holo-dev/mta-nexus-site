@@ -141,20 +141,10 @@ describe("organization public listing integration", () => {
       publishedAt: new Date(),
     });
 
-    const products = await productRepository.listPublishedByOrganization(
-      orgAId,
-      100,
-    );
-    const articles = await contentRepository.listPublishedByOrganization(
-      orgAId,
-      100,
-    );
+    const products = await productRepository.listPublishedByOrganization(orgAId, 100);
+    const articles = await contentRepository.listPublishedByOrganization(orgAId, 100);
 
-    expect(products.map((item) => item.title)).toEqual([
-      "A Published Resource",
-    ]);
-    expect(articles.map((item) => item.title)).toEqual([
-      "A Published Article",
-    ]);
+    expect(products.map((item) => item.title)).toEqual(["A Published Resource"]);
+    expect(articles.map((item) => item.title)).toEqual(["A Published Article"]);
   });
 });

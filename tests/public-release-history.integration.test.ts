@@ -2,7 +2,13 @@ import { randomBytes } from "node:crypto";
 import { inArray } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import {
-  buildRepository, builds, db, productRepository, products, userRepository, users,
+  buildRepository,
+  builds,
+  db,
+  productRepository,
+  products,
+  userRepository,
+  users,
 } from "@nexus/db";
 
 describe("published build archive (PostgreSQL)", () => {
@@ -26,11 +32,19 @@ describe("published build archive (PostgreSQL)", () => {
         role: "developer",
       });
       const base = {
-        authorId, type: "script" as const, status: "published" as const,
-        price: 0, currency: "USD",
-        licenseModel: "unlimited" as const, tags: [],
-        currentVersion: "1.0.0", ratingAverage: 0, ratingCount: 0,
-        salesCount: 0, isFeatured: false, screenshots: [],
+        authorId,
+        type: "script" as const,
+        status: "published" as const,
+        price: 0,
+        currency: "USD",
+        licenseModel: "unlimited" as const,
+        tags: [],
+        currentVersion: "1.0.0",
+        ratingAverage: 0,
+        ratingCount: 0,
+        salesCount: 0,
+        isFeatured: false,
+        screenshots: [],
         compatibility: {},
       };
       await productRepository.create({
@@ -70,19 +84,27 @@ describe("published build archive (PostgreSQL)", () => {
         });
       }
       await buildRepository.create({
-        ...common, id: unsafeId, version: "2.0.0",
+        ...common,
+        id: unsafeId,
+        version: "2.0.0",
         storageKey: "test/private/unsafe.zip",
         // Non-published: published requires scan_status=clean (builds_published_safe_check).
         status: "rejected",
-        scanStatus: "error", scanner: undefined, scannedAt: undefined,
+        scanStatus: "error",
+        scanner: undefined,
+        scannedAt: undefined,
       });
       await buildRepository.create({
-        ...common, id: retiredId, version: "2.0.1",
+        ...common,
+        id: retiredId,
+        version: "2.0.1",
         storageKey: "test/private/retired.zip",
         status: "retired",
       });
       await buildRepository.create({
-        ...common, id: quarantinedId, version: "2.0.2",
+        ...common,
+        id: quarantinedId,
+        version: "2.0.2",
         storageKey: "test/private/quarantined.zip",
         status: "quarantined",
         quarantinePreviousStatus: "published",
@@ -90,7 +112,9 @@ describe("published build archive (PostgreSQL)", () => {
         quarantinedAt: new Date("2026-10-09T12:00:00Z"),
       });
       await buildRepository.create({
-        ...common, id: otherId, productId: otherProductId,
+        ...common,
+        id: otherId,
+        productId: otherProductId,
         version: "3.0.0",
         storageKey: "test/private/unrelated.zip",
         status: "published",
@@ -99,20 +123,27 @@ describe("published build archive (PostgreSQL)", () => {
       const first = await buildRepository.pagePublishedReleases(productId, 1);
       const second = await buildRepository.pagePublishedReleases(productId, 2);
       expect(first).toMatchObject({
-        total: 15, page: 1, totalPages: 2, pageSize: 12,
+        total: 15,
+        page: 1,
+        totalPages: 2,
+        pageSize: 12,
       });
       expect(first.releases).toHaveLength(12);
       expect(second.releases).toHaveLength(3);
-      const observedIds = [...first.releases, ...second.releases].map(row => row.id);
+      const observedIds = [...first.releases, ...second.releases].map((row) => row.id);
       expect(new Set(observedIds).size).toBe(15);
       expect(new Set(observedIds)).toEqual(new Set(safeIds));
-      expect(first.releases.every(row =>
-        !("storageKey" in row) && !("quarantineReason" in row) &&
-        !("quarantinedBy" in row),
-      )).toBe(true);
-      expect(first.releases.every(row =>
-        row.scanStatus === "clean" && row.scanner === "integration-test",
-      )).toBe(true);
+      expect(
+        first.releases.every(
+          (row) =>
+            !("storageKey" in row) && !("quarantineReason" in row) && !("quarantinedBy" in row),
+        ),
+      ).toBe(true);
+      expect(
+        first.releases.every(
+          (row) => row.scanStatus === "clean" && row.scanner === "integration-test",
+        ),
+      ).toBe(true);
       expect((await buildRepository.pagePublishedReleases(productId, 999999)).page).toBe(2);
 
       const selected = await buildRepository.findPublishedByProductAndId(productId, safeIds[0]);
@@ -120,7 +151,9 @@ describe("published build archive (PostgreSQL)", () => {
       expect(await buildRepository.findPublishedByProductAndId(productId, otherId)).toBeNull();
       expect(await buildRepository.findPublishedByProductAndId(productId, unsafeId)).toBeNull();
       expect(await buildRepository.findPublishedByProductAndId(productId, retiredId)).toBeNull();
-      expect(await buildRepository.findPublishedByProductAndId(productId, quarantinedId)).toBeNull();
+      expect(
+        await buildRepository.findPublishedByProductAndId(productId, quarantinedId),
+      ).toBeNull();
 
       await buildRepository.updateStatus(safeIds[0], "retired", "published");
       expect(await buildRepository.findPublishedByProductAndId(productId, safeIds[0])).toBeNull();

@@ -16,11 +16,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -35,23 +31,15 @@ export async function GET(request: NextRequest) {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return json(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
+      return json(context, { error: "Authentication required" }, 401);
     }
 
-    const preferences =
-      await notificationRepository.getPreferences(
-        user.id,
-      );
+    const preferences = await notificationRepository.getPreferences(user.id);
     return json(context, { preferences });
   } catch (error) {
     logRequestEvent({
       level: "error",
-      event:
-        "notifications.preferences_fetch_failed",
+      event: "notifications.preferences_fetch_failed",
       context,
       status: 500,
       error,
@@ -59,8 +47,7 @@ export async function GET(request: NextRequest) {
     return json(
       context,
       {
-        error:
-          "Failed to fetch notification preferences",
+        error: "Failed to fetch notification preferences",
       },
       500,
     );
@@ -74,50 +61,34 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return json(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
+      return json(context, { error: "Authentication required" }, 401);
     }
 
-    const rateLimit = await consumeRateLimit(
-      "notificationMutation",
-      user.id,
-    );
+    const rateLimit = await consumeRateLimit("notificationMutation", user.id);
     if (!rateLimit.success) {
       return json(
         context,
         {
-          error:
-            "Too many preference updates. Please try again shortly.",
+          error: "Too many preference updates. Please try again shortly.",
         },
         429,
       );
     }
 
-    const body = await request
-      .json()
-      .catch(() => ({}));
-    const parsed =
-      notificationPreferencesSchema.safeParse(body);
+    const body = await request.json().catch(() => ({}));
+    const parsed = notificationPreferencesSchema.safeParse(body);
     if (!parsed.success) {
       return json(
         context,
         {
-          error:
-            "Invalid notification preferences",
+          error: "Invalid notification preferences",
           details: parsed.error.format(),
         },
         400,
       );
     }
 
-    const preferences =
-      await notificationRepository.updatePreferences(
-        user.id,
-        parsed.data,
-      );
+    const preferences = await notificationRepository.updatePreferences(user.id, parsed.data);
     return json(context, {
       success: true,
       preferences,
@@ -125,8 +96,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
   } catch (error: unknown) {
     logRequestEvent({
       level: "error",
-      event:
-        "notifications.preferences_update_failed",
+      event: "notifications.preferences_update_failed",
       context,
       status: 500,
       error,
@@ -134,8 +104,7 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error:
-          "Failed to update notification preferences",
+        error: "Failed to update notification preferences",
       },
       500,
     );

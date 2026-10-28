@@ -53,9 +53,7 @@ describe("verification stale target approval", () => {
       notes: "Target will be removed before moderation.",
     });
 
-    await db
-      .delete(organizations)
-      .where(eq(organizations.id, organizationId));
+    await db.delete(organizations).where(eq(organizations.id, organizationId));
 
     await expect(
       verificationRepository.resolveRequest({
@@ -80,9 +78,7 @@ describe("verification stale target approval", () => {
     expect(persisted?.reviewerId).toBeFalsy();
     expect(persisted?.resolvedAt).toBeFalsy();
     expect(
-      await notificationRepository.findById(
-        `ntf_verification_resolution_${request.id}`,
-      ),
+      await notificationRepository.findById(`ntf_verification_resolution_${request.id}`),
     ).toBeNull();
   });
 });

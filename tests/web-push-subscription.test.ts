@@ -120,9 +120,9 @@ describe("Web Push subscription validation", () => {
 
   it("normalizes an expiration timestamp when supplied", () => {
     const expirationTime = Date.UTC(2030, 0, 1);
-    expect(
-      parseWebPushSubscription({ ...valid, expirationTime })?.expirationAt,
-    ).toEqual(new Date(expirationTime));
+    expect(parseWebPushSubscription({ ...valid, expirationTime })?.expirationAt).toEqual(
+      new Date(expirationTime),
+    );
   });
 });
 
@@ -136,12 +136,8 @@ describe("Web Push VAPID public key validation", () => {
     const compressedMarker = new Uint8Array(65).fill(3);
     compressedMarker[0] = 0x03;
 
-    expect(
-      parseWebPushVapidPublicKey(base64Url(new Uint8Array(64).fill(3))),
-    ).toBeNull();
-    expect(
-      parseWebPushVapidPublicKey(base64Url(compressedMarker)),
-    ).toBeNull();
+    expect(parseWebPushVapidPublicKey(base64Url(new Uint8Array(64).fill(3)))).toBeNull();
+    expect(parseWebPushVapidPublicKey(base64Url(compressedMarker))).toBeNull();
     expect(parseWebPushVapidPublicKey("not+base64/value")).toBeNull();
     expect(parseWebPushVapidPublicKey(undefined)).toBeNull();
   });

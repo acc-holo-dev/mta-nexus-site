@@ -8,29 +8,24 @@ function canonicalMtaHost(input: string): string | null {
   if (trimmed.endsWith("..")) return null;
   const endsInDnsDot = trimmed.endsWith(".");
   const value = trimmed.replace(/\.$/u, "");
-  if (
-    value.length === 0 ||
-    value.length > 255 ||
-    !/^[\p{L}\p{N}.:\[\]-]+$/u.test(value)
-  ) {
+  if (value.length === 0 || value.length > 255 || !/^[\p{L}\p{N}.:\[\]-]+$/u.test(value)) {
     return null;
   }
 
   if (value.includes(":") || value.includes("[") || value.includes("]")) {
     // A terminal dot is valid for a DNS name, not an IPv6 literal.
     if (endsInDnsDot) return null;
-    const bracketed = value.startsWith("[") && value.endsWith("]")
-      ? value
-      : value.includes("[") || value.includes("]")
-        ? null
-        : "[" + value + "]";
+    const bracketed =
+      value.startsWith("[") && value.endsWith("]")
+        ? value
+        : value.includes("[") || value.includes("]")
+          ? null
+          : "[" + value + "]";
     if (!bracketed) return null;
     try {
       // URL verifies the entire IPv6 literal and compresses equivalent forms.
       const url = new URL("http://" + bracketed + "/");
-      return url.port === "" && /^\[[0-9a-f:.]+\]$/u.test(url.hostname)
-        ? url.hostname
-        : null;
+      return url.port === "" && /^\[[0-9a-f:.]+\]$/u.test(url.hostname) ? url.hostname : null;
     } catch {
       return null;
     }
@@ -41,10 +36,11 @@ function canonicalMtaHost(input: string): string | null {
     const host = new URL("http://" + value + "/").hostname.replace(/\.$/u, "");
     if (host.length === 0 || host.length > 253) return null;
     const labels = host.split(".");
-    if (labels.some(
-      (label) => label.length > 63 ||
-        !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/u.test(label),
-    )) {
+    if (
+      labels.some(
+        (label) => label.length > 63 || !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/u.test(label),
+      )
+    ) {
       return null;
     }
     return host;

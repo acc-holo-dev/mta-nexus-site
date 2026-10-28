@@ -13,11 +13,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -37,28 +33,16 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const requestedLimit = Number(
-      request.nextUrl.searchParams.get("limit") || "50",
-    );
+    const requestedLimit = Number(request.nextUrl.searchParams.get("limit") || "50");
     const limit = Number.isFinite(requestedLimit)
-      ? Math.min(
-          Math.max(Math.floor(requestedLimit), 1),
-          100,
-        )
+      ? Math.min(Math.max(Math.floor(requestedLimit), 1), 100)
       : 50;
-    const unreadOnly =
-      request.nextUrl.searchParams.get("unreadOnly") ===
-      "true";
+    const unreadOnly = request.nextUrl.searchParams.get("unreadOnly") === "true";
 
-    const [notifications, unreadCount] =
-      await Promise.all([
-        notificationRepository.listByUser(
-          user.id,
-          limit,
-          unreadOnly,
-        ),
-        notificationRepository.countUnread(user.id),
-      ]);
+    const [notifications, unreadCount] = await Promise.all([
+      notificationRepository.listByUser(user.id, limit, unreadOnly),
+      notificationRepository.countUnread(user.id),
+    ]);
 
     return json(context, {
       notifications,
@@ -74,10 +58,6 @@ export async function GET(request: NextRequest) {
       status: 500,
       error,
     });
-    return json(
-      context,
-      { error: "Failed to fetch notifications" },
-      500,
-    );
+    return json(context, { error: "Failed to fetch notifications" }, 500);
   }
 }

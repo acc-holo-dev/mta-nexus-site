@@ -21,6 +21,8 @@ export function collectLibraryEntries(
   }
   for (const license of legacyLicenses) add(license.productId, license.createdAt);
 
-  return [...byResource.values()].sort((a, b) =>
-    b.createdAt.getTime() - a.createdAt.getTime() || a.resourceId.localeCompare(b.resourceId));
+  return [...byResource.values()].sort(
+    (a, b) =>
+      b.createdAt.getTime() - a.createdAt.getTime() || a.resourceId.localeCompare(b.resourceId),
+  );
 }

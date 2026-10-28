@@ -12,14 +12,7 @@
 import { execSync } from "node:child_process";
 import process from "node:process";
 
-const composeArgs = [
-  "docker",
-  "compose",
-  "-p",
-  "nexus-local",
-  "-f",
-  "compose.yaml",
-];
+const composeArgs = ["docker", "compose", "-p", "nexus-local", "-f", "compose.yaml"];
 const composeCommand = composeArgs.join(" ");
 const testDatabase = "mta_nexus_test";
 const testDatabaseUrl = `postgres://nexus:nexus_secret@postgres:5432/${testDatabase}`;

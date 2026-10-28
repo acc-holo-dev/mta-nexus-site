@@ -10,24 +10,17 @@ import {
 } from "@nexus/db";
 import { POST } from "../apps/web/src/app/api/resources/claim/route";
 
-function claimRequest(
-  productId: string,
-  token?: string,
-  requestId = "default",
-) {
-  return new NextRequest(
-    "http://nexus.test/api/resources/claim",
-    {
-      method: "POST",
-      headers: {
-        ...browserMutationHeaders(),
-        "content-type": "application/json",
-        "x-forwarded-for": `198.51.100.${requestId.length + 10}`,
-        ...(token ? { cookie: `nexus_session=${token}` } : {}),
-      },
-      body: JSON.stringify({ productId }),
+function claimRequest(productId: string, token?: string, requestId = "default") {
+  return new NextRequest("http://nexus.test/api/resources/claim", {
+    method: "POST",
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      "x-forwarded-for": `198.51.100.${requestId.length + 10}`,
+      ...(token ? { cookie: `nexus_session=${token}` } : {}),
     },
-  );
+    body: JSON.stringify({ productId }),
+  });
 }
 
 describe("free resource claim route integration", () => {
@@ -137,14 +130,10 @@ describe("free resource claim route integration", () => {
 
     await productRepository.update(productId, { status: "draft" });
 
-    const unpublished = await POST(
-      claimRequest(productId, token, "draft"),
-    );
+    const unpublished = await POST(claimRequest(productId, token, "draft"));
     expect(unpublished.status).toBe(404);
 
-    const anonymous = await POST(
-      claimRequest(productId, undefined, "anonymous"),
-    );
+    const anonymous = await POST(claimRequest(productId, undefined, "anonymous"));
     expect(anonymous.status).toBe(401);
     expect(await anonymous.json()).toEqual({
       error: "Authentication required",

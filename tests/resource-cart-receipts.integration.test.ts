@@ -44,32 +44,28 @@ async function fixture() {
     token: `tok_${staff}`,
     expiresAt: new Date(Date.now() + 60 * 60 * 1000),
   });
-  await db
-    .insert(products)
-    .values({
-      id: productId,
-      authorId: owner,
-      title: "Original receipt title",
-      description: "Receipt fixture description",
-      slug: productId,
-      type: "script",
-      status: "published",
-    });
+  await db.insert(products).values({
+    id: productId,
+    authorId: owner,
+    title: "Original receipt title",
+    description: "Receipt fixture description",
+    slug: productId,
+    type: "script",
+    status: "published",
+  });
   const buildId = `bld_cr_${key}_1`;
-  await db
-    .insert(builds)
-    .values({
-      id: buildId,
-      productId,
-      version: "1.0.0",
-      status: "published",
-      scanStatus: "clean",
-      scanner: "integration",
-      scannedAt: new Date(),
-      storageKey: `fixture/${key}.zip`,
-      sha256Hash: "a".repeat(64),
-      fileSizeBytes: 7,
-    });
+  await db.insert(builds).values({
+    id: buildId,
+    productId,
+    version: "1.0.0",
+    status: "published",
+    scanStatus: "clean",
+    scanner: "integration",
+    scannedAt: new Date(),
+    storageKey: `fixture/${key}.zip`,
+    sha256Hash: "a".repeat(64),
+    fileSizeBytes: 7,
+  });
   await cart.add(buyer, productId);
   const review = await cart.review(buyer);
   if (!review.reviewDigest) throw new Error("Missing review");
@@ -83,21 +79,19 @@ async function fixture() {
   };
   async function release() {
     const next = `bld_cr_${key}_2`;
-    await db
-      .insert(builds)
-      .values({
-        id: next,
-        productId,
-        version: "2.0.0",
-        status: "pending_review",
-        scanStatus: "clean",
-        scanner: "integration",
-        scannedAt: new Date(),
-        storageKey: `fixture/${key}_2.zip`,
-        sha256Hash: "b".repeat(64),
-        fileSizeBytes: 8,
-        createdAt: new Date(Date.now() + 1000),
-      });
+    await db.insert(builds).values({
+      id: next,
+      productId,
+      version: "2.0.0",
+      status: "pending_review",
+      scanStatus: "clean",
+      scanner: "integration",
+      scannedAt: new Date(),
+      storageKey: `fixture/${key}_2.zip`,
+      sha256Hash: "b".repeat(64),
+      fileSizeBytes: 8,
+      createdAt: new Date(Date.now() + 1000),
+    });
     const reviewed = await buildRepository.moderatePending(
       next,
       "approve",
@@ -110,7 +104,8 @@ async function fixture() {
         targetId: next,
       },
       1,
-    `tok_${staff}`);
+      `tok_${staff}`,
+    );
     if (!reviewed) throw new Error("Missing approved release");
     return next;
   }
@@ -233,16 +228,14 @@ it("different simultaneous request keys cannot acquire a cleared cart twice or r
 it("an audit failure rolls back grants/cart/receipt and legacy receipts preserve absent evidence", async () => {
   const f = await fixture();
   try {
-    await db
-      .insert(auditEvents)
-      .values({
-        id: f.input.auditId,
-        actorId: f.buyer,
-        actorType: "user",
-        action: "fixture",
-        targetType: "product",
-        targetId: f.productId,
-      });
+    await db.insert(auditEvents).values({
+      id: f.input.auditId,
+      actorId: f.buyer,
+      actorType: "user",
+      action: "fixture",
+      targetType: "product",
+      targetId: f.productId,
+    });
     await expect(cart.acquire(f.input)).rejects.toThrow();
     expect((await cart.get(f.buyer)).items).toHaveLength(1);
     expect(
@@ -261,17 +254,15 @@ it("an audit failure rolls back grants/cart/receipt and legacy receipts preserve
           .where(eq(resourceCartAcquisitions.userId, f.buyer))
       )[0].n,
     ).toBe(0);
-    await db
-      .insert(resourceCartAcquisitions)
-      .values({
-        userId: f.buyer,
-        requestId: f.input.requestId,
-        productIds: [f.productId],
-        result: {
-          kind: "free_resource_acquisition",
-          acquired: [{ productId: f.productId, alreadyClaimed: false }],
-        },
-      });
+    await db.insert(resourceCartAcquisitions).values({
+      userId: f.buyer,
+      requestId: f.input.requestId,
+      productIds: [f.productId],
+      result: {
+        kind: "free_resource_acquisition",
+        acquired: [{ productId: f.productId, alreadyClaimed: false }],
+      },
+    });
     expect(await receipts.detail(f.buyer, f.input.requestId)).toMatchObject({
       reviewed: false,
       items: [],

@@ -65,81 +65,80 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     );
   }
 }
-export const POST = withBrowserMutation(async (
-  request: NextRequest,
-  { params }: { params: Promise<{ slug: string }> },
-) => {
-  const context = createRequestLogContext(request);
-  const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
-  try {
-    const { slug } = await params;
-    if (!validSlug(slug)) throw new NotFoundError("Content");
-    const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
-    if (!user) throw new UnauthorizedError();
-    if (request.headers.get("sec-fetch-site") === "cross-site")
-      throw new AppError("Cross-site mutation forbidden", 403, "FORBIDDEN");
-    if (!(await consumeRateLimit("commentCreation", user.id)).success)
-      throw new RateLimitExceededError();
-    requireServerJsonContentType(request);
-    const parsed = discussionCommentSchema.safeParse(await readBoundedJson(request, 32 * 1024));
-    if (!parsed.success) throw new AppError("Invalid comment", 400, "VALIDATION_ERROR");
-    const article = await contentService.getArticleBySlug(slug, { incrementView: false });
-    if (!article) throw new NotFoundError("Content");
-    const comment = await contentService.addComment(
-      { contentId: article.id, parentId: parsed.data.parentId, text: parsed.data.text },
-      user,
-    );
-    // Notifications follow persistence and cannot turn a saved comment into a retry.
+export const POST = withBrowserMutation(
+  async (request: NextRequest, { params }: { params: Promise<{ slug: string }> }) => {
+    const context = createRequestLogContext(request);
+    const locale = resolveLocale(request.cookies.get("nexus_locale")?.value);
     try {
-      after(async () => {
-        try {
-          const result = await notifyDiscussionReplies(article.id, comment.id);
-          if (result.failed || result.pushDegraded)
+      const { slug } = await params;
+      if (!validSlug(slug)) throw new NotFoundError("Content");
+      const user = await authService.getSession(request.cookies.get("nexus_session")?.value);
+      if (!user) throw new UnauthorizedError();
+      if (request.headers.get("sec-fetch-site") === "cross-site")
+        throw new AppError("Cross-site mutation forbidden", 403, "FORBIDDEN");
+      if (!(await consumeRateLimit("commentCreation", user.id)).success)
+        throw new RateLimitExceededError();
+      requireServerJsonContentType(request);
+      const parsed = discussionCommentSchema.safeParse(await readBoundedJson(request, 32 * 1024));
+      if (!parsed.success) throw new AppError("Invalid comment", 400, "VALIDATION_ERROR");
+      const article = await contentService.getArticleBySlug(slug, { incrementView: false });
+      if (!article) throw new NotFoundError("Content");
+      const comment = await contentService.addComment(
+        { contentId: article.id, parentId: parsed.data.parentId, text: parsed.data.text },
+        user,
+      );
+      // Notifications follow persistence and cannot turn a saved comment into a retry.
+      try {
+        after(async () => {
+          try {
+            const result = await notifyDiscussionReplies(article.id, comment.id);
+            if (result.failed || result.pushDegraded)
+              logRequestEvent({
+                level: "warn",
+                event: "content.comment.notification_failed",
+                context,
+                status: 201,
+                fields: {
+                  attempted: result.attempted,
+                  stored: result.stored,
+                  failed: result.failed,
+                  pushDegraded: result.pushDegraded,
+                },
+              });
+          } catch {
             logRequestEvent({
               level: "warn",
               event: "content.comment.notification_failed",
               context,
               status: 201,
-              fields: {
-                attempted: result.attempted,
-                stored: result.stored,
-                failed: result.failed,
-                pushDegraded: result.pushDegraded,
-              },
             });
-        } catch {
-          logRequestEvent({
-            level: "warn",
-            event: "content.comment.notification_failed",
-            context,
-            status: 201,
-          });
-        }
-      });
-    } catch {
-      logRequestEvent({
-        level: "warn",
-        event: "content.comment.notification_registration_failed",
+          }
+        });
+      } catch {
+        logRequestEvent({
+          level: "warn",
+          event: "content.comment.notification_registration_failed",
+          context,
+          status: 201,
+        });
+      }
+      return jsonWithRequestId(context, { comment }, { status: 201, headers: privateHeaders });
+    } catch (error) {
+      const known = error instanceof AppError;
+      const code = known ? error.code : "INTERNAL_ERROR";
+      if (!known)
+        logRequestEvent({
+          level: "error",
+          event: "content.comment.create_failed",
+          context,
+          status: 503,
+          error,
+        });
+      return jsonWithRequestId(
         context,
-        status: 201,
-      });
+        { error: discussionError(locale, code), code },
+        { status: known ? error.statusCode : 503, headers: privateHeaders },
+      );
     }
-    return jsonWithRequestId(context, { comment }, { status: 201, headers: privateHeaders });
-  } catch (error) {
-    const known = error instanceof AppError;
-    const code = known ? error.code : "INTERNAL_ERROR";
-    if (!known)
-      logRequestEvent({
-        level: "error",
-        event: "content.comment.create_failed",
-        context,
-        status: 503,
-        error,
-      });
-    return jsonWithRequestId(
-      context,
-      { error: discussionError(locale, code), code },
-      { status: known ? error.statusCode : 503, headers: privateHeaders },
-    );
-  }
-});
+  },
+);

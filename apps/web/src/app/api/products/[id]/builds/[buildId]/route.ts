@@ -7,15 +7,16 @@ import { resourceBuildWorkspaceService } from "../../../../../../lib/services/re
 import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 type Context = { params: Promise<{ id: string; buildId: string }> };
 export function GET(request: NextRequest, { params }: Context) {
-  return resourceCommerceRequest(request, false, async actor => {
+  return resourceCommerceRequest(request, false, async (actor) => {
     const { id, buildId } = await params;
     return resourceBuildWorkspaceService.detail(id, buildId, actor);
   });
 }
 export const PATCH = withBrowserMutation((request: NextRequest, { params }: Context) => {
-  return resourceCommerceRequest(request, true, async actor => {
+  return resourceCommerceRequest(request, true, async (actor) => {
     const parsed = resourceBuildCommandSchema.safeParse(await readBoundedJson(request, 49152));
-    if (!parsed.success) throw new AppError("Invalid version command", 400, "BUILD_COMMAND_INVALID");
+    if (!parsed.success)
+      throw new AppError("Invalid version command", 400, "BUILD_COMMAND_INVALID");
     const { id, buildId } = await params;
     return { build: await resourceBuildWorkspaceService.command(id, buildId, parsed.data, actor) };
   });

@@ -1,12 +1,8 @@
 export type VerificationDecisionAction = "approve" | "reject";
 
-export function normalizeVerificationReviewNotes(
-  value: string,
-): string | null {
+export function normalizeVerificationReviewNotes(value: string): string | null {
   const notes = value.trim();
-  return notes.length >= 3 && notes.length <= 2000
-    ? notes
-    : null;
+  return notes.length >= 3 && notes.length <= 2000 ? notes : null;
 }
 
 export function buildVerificationDecisionPayload(

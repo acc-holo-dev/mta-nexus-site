@@ -16,10 +16,7 @@ export type ReverseDependencySummary = Readonly<{
 
 export function buildReverseDependencySummary(
   sourceProductSlug: string,
-  dependents: readonly Pick<
-    Product,
-    "id" | "slug" | "title" | "type" | "currentVersion"
-  >[],
+  dependents: readonly Pick<Product, "id" | "slug" | "title" | "type" | "currentVersion">[],
 ): ReverseDependencySummary {
   const normalizedSource = sourceProductSlug.trim().toLowerCase();
   const unique = new Map<

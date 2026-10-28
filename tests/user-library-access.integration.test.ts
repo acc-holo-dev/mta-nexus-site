@@ -1,9 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { eq, inArray } from "drizzle-orm";
 import {
-  db, builds, entitlements, licenses, products, users, auditEvents,
-  buildRepository, entitlementRepository, licenseRepository,
-  productRepository, userLibraryRepository, userRepository, resourceLibrarySelectionsRepository,
+  db,
+  builds,
+  entitlements,
+  licenses,
+  products,
+  users,
+  auditEvents,
+  buildRepository,
+  entitlementRepository,
+  licenseRepository,
+  productRepository,
+  userLibraryRepository,
+  userRepository,
+  resourceLibrarySelectionsRepository,
 } from "@nexus/db";
 
 describe("effective resource library and private visibility (PostgreSQL)", () => {
@@ -14,9 +25,10 @@ describe("effective resource library and private visibility (PostgreSQL)", () =>
     const outsiderId = `usr_lib_other_${suffix}`;
     const actors = [authorId, ownerId, outsiderId];
     const productIds = Object.fromEntries(
-      ["ready", "paid", "unsafe", "draft", "other", "expired", "revoked"].map(
-        name => [name, `prd_lib_${name}_${suffix}`],
-      ),
+      ["ready", "paid", "unsafe", "draft", "other", "expired", "revoked"].map((name) => [
+        name,
+        `prd_lib_${name}_${suffix}`,
+      ]),
     );
     const ids = Object.values(productIds);
     const entitlementIds = [
@@ -129,58 +141,123 @@ describe("effective resource library and private visibility (PostgreSQL)", () =>
           createdAt: new Date(now.getTime() + 120_000),
         },
       ]);
-      await db.update(products)
+      await db
+        .update(products)
         .set({ currentVersion: "99.0.0" })
         .where(eq(products.id, productIds.ready));
       await db.insert(entitlements).values([
-        { id: entitlementIds[0], subjectType: "user", subjectId: ownerId,
-          permission: "product.download", resourceId: productIds.ready, createdAt: new Date(now.getTime() - 50_000) },
-        { id: entitlementIds[1], subjectType: "user", subjectId: ownerId,
-          permission: "product.download", resourceId: productIds.ready, createdAt: now },
-        { id: entitlementIds[2], subjectType: "user", subjectId: ownerId,
-          permission: "product.download", resourceId: productIds.unsafe },
-        { id: entitlementIds[3], subjectType: "user", subjectId: ownerId,
-          permission: "product.download", resourceId: productIds.draft },
-        { id: entitlementIds[4], subjectType: "user", subjectId: ownerId,
-          permission: "product.download", resourceId: productIds.expired,
-          expiresAt: new Date(now.getTime() - 60_000) },
-        { id: entitlementIds[5], subjectType: "user", subjectId: ownerId,
-          permission: "product.update", resourceId: productIds.other },
-        { id: entitlementIds[6], subjectType: "user", subjectId: outsiderId,
-          permission: "product.download", resourceId: productIds.other },
+        {
+          id: entitlementIds[0],
+          subjectType: "user",
+          subjectId: ownerId,
+          permission: "product.download",
+          resourceId: productIds.ready,
+          createdAt: new Date(now.getTime() - 50_000),
+        },
+        {
+          id: entitlementIds[1],
+          subjectType: "user",
+          subjectId: ownerId,
+          permission: "product.download",
+          resourceId: productIds.ready,
+          createdAt: now,
+        },
+        {
+          id: entitlementIds[2],
+          subjectType: "user",
+          subjectId: ownerId,
+          permission: "product.download",
+          resourceId: productIds.unsafe,
+        },
+        {
+          id: entitlementIds[3],
+          subjectType: "user",
+          subjectId: ownerId,
+          permission: "product.download",
+          resourceId: productIds.draft,
+        },
+        {
+          id: entitlementIds[4],
+          subjectType: "user",
+          subjectId: ownerId,
+          permission: "product.download",
+          resourceId: productIds.expired,
+          expiresAt: new Date(now.getTime() - 60_000),
+        },
+        {
+          id: entitlementIds[5],
+          subjectType: "user",
+          subjectId: ownerId,
+          permission: "product.update",
+          resourceId: productIds.other,
+        },
+        {
+          id: entitlementIds[6],
+          subjectType: "user",
+          subjectId: outsiderId,
+          permission: "product.download",
+          resourceId: productIds.other,
+        },
       ]);
       await db.insert(licenses).values([
-        { id: licenseIds[0], key: `LIB-PAID-SECRET-${suffix}`,
-          productId: productIds.paid, userId: ownerId, status: "active",
-          model: "single_server", entitlements: [] },
-        { id: licenseIds[1], key: `LIB-REVOKED-SECRET-${suffix}`,
-          productId: productIds.revoked, userId: ownerId, status: "revoked",
-          model: "single_server", entitlements: ["product.download"] },
-        { id: licenseIds[2], key: `LIB-EXPIRED-SECRET-${suffix}`,
-          productId: productIds.expired, userId: ownerId, status: "active",
-          model: "single_server", expiresAt: new Date(now.getTime() - 60_000),
-          entitlements: ["product.download"] },
+        {
+          id: licenseIds[0],
+          key: `LIB-PAID-SECRET-${suffix}`,
+          productId: productIds.paid,
+          userId: ownerId,
+          status: "active",
+          model: "single_server",
+          entitlements: [],
+        },
+        {
+          id: licenseIds[1],
+          key: `LIB-REVOKED-SECRET-${suffix}`,
+          productId: productIds.revoked,
+          userId: ownerId,
+          status: "revoked",
+          model: "single_server",
+          entitlements: ["product.download"],
+        },
+        {
+          id: licenseIds[2],
+          key: `LIB-EXPIRED-SECRET-${suffix}`,
+          productId: productIds.expired,
+          userId: ownerId,
+          status: "active",
+          model: "single_server",
+          expiresAt: new Date(now.getTime() - 60_000),
+          entitlements: ["product.download"],
+        },
       ]);
 
       const owner = await userLibraryRepository.pageByUser(ownerId);
       expect(owner.counts).toEqual({ all: 4, ready: 2, unavailable: 2 });
       expect(owner.total).toBe(4);
       expect(owner.items).toHaveLength(4);
-      expect(new Set(owner.items.map(row => row.resourceId)).size).toBe(4);
-      expect(owner.items.find(row => row.resourceId === productIds.ready))
-        .toMatchObject({ title: "Private title ready", downloadable: true, version: "1.4.0" });
-      expect((await buildRepository.findLatestPublishedByProduct(productIds.ready))?.id)
-        .toBe(latestReadyId);
-      expect(owner.items.find(row => row.resourceId === productIds.paid))
-        .toMatchObject({ title: "Private title paid", downloadable: true });
+      expect(new Set(owner.items.map((row) => row.resourceId)).size).toBe(4);
+      expect(owner.items.find((row) => row.resourceId === productIds.ready)).toMatchObject({
+        title: "Private title ready",
+        downloadable: true,
+        version: "1.4.0",
+      });
+      expect((await buildRepository.findLatestPublishedByProduct(productIds.ready))?.id).toBe(
+        latestReadyId,
+      );
+      expect(owner.items.find((row) => row.resourceId === productIds.paid)).toMatchObject({
+        title: "Private title paid",
+        downloadable: true,
+      });
       for (const name of ["draft", "unsafe"] as const) {
-        const row = owner.items.find(item => item.resourceId === productIds[name]);
+        const row = owner.items.find((item) => item.resourceId === productIds[name]);
         expect(row).toMatchObject({
-          title: null, slug: null, version: null, downloadable: false,
+          title: null,
+          slug: null,
+          version: null,
+          downloadable: false,
         });
       }
       for (const name of ["other", "expired", "revoked"] as const) {
-        expect(owner.items.some(row => row.resourceId === productIds[name])).toBe(false);
+        expect(owner.items.some((row) => row.resourceId === productIds[name])).toBe(false);
       }
 
       const ready = await userLibraryRepository.pageByUser(ownerId, 1, "ready", 1);
@@ -192,53 +269,108 @@ describe("effective resource library and private visibility (PostgreSQL)", () =>
       expect(second.items[0]?.resourceId).not.toBe(ready.items[0]?.resourceId);
       const missing = await userLibraryRepository.pageByUser(ownerId, 99, "unavailable", 12);
       expect(missing).toMatchObject({ total: 2, page: 1, totalPages: 1 });
-      expect(missing.items.every(row => row.downloadable === false)).toBe(true);
+      expect(missing.items.every((row) => row.downloadable === false)).toBe(true);
 
       const outsider = await userLibraryRepository.pageByUser(outsiderId);
       expect(outsider.counts).toEqual({ all: 1, ready: 1, unavailable: 0 });
-      expect(outsider.items.map(row => row.resourceId)).toEqual([productIds.other]);
+      expect(outsider.items.map((row) => row.resourceId)).toEqual([productIds.other]);
       expect((await userLibraryRepository.pageByUser(authorId)).total).toBe(0);
-      expect(await entitlementRepository.hasEntitlement(
-        { type: "user", id: ownerId }, productIds.revoked, "product.download",
-      )).toBe(false);
-      expect(await entitlementRepository.hasEntitlement(
-        { type: "user", id: ownerId }, productIds.paid, "product.download",
-      )).toBe(true);
+      expect(
+        await entitlementRepository.hasEntitlement(
+          { type: "user", id: ownerId },
+          productIds.revoked,
+          "product.download",
+        ),
+      ).toBe(false);
+      expect(
+        await entitlementRepository.hasEntitlement(
+          { type: "user", id: ownerId },
+          productIds.paid,
+          "product.download",
+        ),
+      ).toBe(true);
       expect((await licenseRepository.pageUserHistory(ownerId)).total).toBe(3);
 
       const oldBuildId = `bld_lib_ready_${suffix}`;
-      const selectInput = { userId: ownerId, productId: productIds.ready, auditId: `aud_lib_select_${suffix}`,
-        command: { mode: "fixed" as const, buildId: oldBuildId, expectedRevision: 0 } };
+      const selectInput = {
+        userId: ownerId,
+        productId: productIds.ready,
+        auditId: `aud_lib_select_${suffix}`,
+        command: { mode: "fixed" as const, buildId: oldBuildId, expectedRevision: 0 },
+      };
       const selected = await resourceLibrarySelectionsRepository.command(selectInput);
       expect(selected.selection).toMatchObject({ revision: 1, mode: "fixed", buildId: oldBuildId });
-      expect((await userLibraryRepository.pageByUser(ownerId)).items.find(row => row.resourceId === productIds.ready))
-        .toMatchObject({ version: "1.0.0", buildId: oldBuildId, selectionMode: "fixed", downloadable: true });
-      expect((await resourceLibrarySelectionsRepository.page(ownerId, 1, "updates")).items.map(row => row.productId)).toContain(productIds.ready);
-      expect((await resourceLibrarySelectionsRepository.command(selectInput)).selection.revision).toBe(1);
+      expect(
+        (await userLibraryRepository.pageByUser(ownerId)).items.find(
+          (row) => row.resourceId === productIds.ready,
+        ),
+      ).toMatchObject({
+        version: "1.0.0",
+        buildId: oldBuildId,
+        selectionMode: "fixed",
+        downloadable: true,
+      });
+      expect(
+        (await resourceLibrarySelectionsRepository.page(ownerId, 1, "updates")).items.map(
+          (row) => row.productId,
+        ),
+      ).toContain(productIds.ready);
+      expect(
+        (await resourceLibrarySelectionsRepository.command(selectInput)).selection.revision,
+      ).toBe(1);
       const races = await Promise.allSettled([
-        resourceLibrarySelectionsRepository.command({ ...selectInput, auditId: `aud_lib_race_1_${suffix}`, command: { mode: "latest", expectedRevision: 1 } }),
-        resourceLibrarySelectionsRepository.command({ ...selectInput, auditId: `aud_lib_race_2_${suffix}`, command: { mode: "fixed", buildId: latestReadyId, expectedRevision: 1 } }),
+        resourceLibrarySelectionsRepository.command({
+          ...selectInput,
+          auditId: `aud_lib_race_1_${suffix}`,
+          command: { mode: "latest", expectedRevision: 1 },
+        }),
+        resourceLibrarySelectionsRepository.command({
+          ...selectInput,
+          auditId: `aud_lib_race_2_${suffix}`,
+          command: { mode: "fixed", buildId: latestReadyId, expectedRevision: 1 },
+        }),
       ]);
-      expect(races.filter(result => result.status === "fulfilled")).toHaveLength(1);
-      expect(races.filter(result => result.status === "rejected")).toHaveLength(1);
+      expect(races.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+      expect(races.filter((result) => result.status === "rejected")).toHaveLength(1);
       const current = await resourceLibrarySelectionsRepository.detail(ownerId, productIds.ready);
-      const pin = await resourceLibrarySelectionsRepository.command({ ...selectInput, auditId: `aud_lib_pin_${suffix}`, command: { mode: "fixed", buildId: oldBuildId, expectedRevision: current.selection.revision } });
-      await db.update(builds).set({
-        status: "quarantined",
-        quarantinePreviousStatus: "published",
-        quarantineReason: "Fixture quarantine",
-        quarantinedAt: new Date(),
-      }).where(eq(builds.id, oldBuildId));
-      expect((await userLibraryRepository.pageByUser(ownerId)).items.find(row => row.resourceId === productIds.ready))
-        .toMatchObject({ downloadable: false, buildId: null, version: null });
-      expect((await resourceLibrarySelectionsRepository.detail(ownerId, productIds.ready)).selected).toBeNull();
-      await expect(resourceLibrarySelectionsRepository.command({ ...selectInput, command: { ...selectInput.command, expectedRevision: pin.selection.revision } }))
-        .rejects.toMatchObject({ code: "LIBRARY_RELEASE_UNAVAILABLE" });
+      const pin = await resourceLibrarySelectionsRepository.command({
+        ...selectInput,
+        auditId: `aud_lib_pin_${suffix}`,
+        command: {
+          mode: "fixed",
+          buildId: oldBuildId,
+          expectedRevision: current.selection.revision,
+        },
+      });
+      await db
+        .update(builds)
+        .set({
+          status: "quarantined",
+          quarantinePreviousStatus: "published",
+          quarantineReason: "Fixture quarantine",
+          quarantinedAt: new Date(),
+        })
+        .where(eq(builds.id, oldBuildId));
+      expect(
+        (await userLibraryRepository.pageByUser(ownerId)).items.find(
+          (row) => row.resourceId === productIds.ready,
+        ),
+      ).toMatchObject({ downloadable: false, buildId: null, version: null });
+      expect(
+        (await resourceLibrarySelectionsRepository.detail(ownerId, productIds.ready)).selected,
+      ).toBeNull();
+      await expect(
+        resourceLibrarySelectionsRepository.command({
+          ...selectInput,
+          command: { ...selectInput.command, expectedRevision: pin.selection.revision },
+        }),
+      ).rejects.toMatchObject({ code: "LIBRARY_RELEASE_UNAVAILABLE" });
       await db.delete(entitlements).where(inArray(entitlements.id, entitlementIds.slice(0, 2)));
-      await expect(resourceLibrarySelectionsRepository.detail(ownerId, productIds.ready)).rejects.toMatchObject({ statusCode: 404 });
+      await expect(
+        resourceLibrarySelectionsRepository.detail(ownerId, productIds.ready),
+      ).rejects.toMatchObject({ statusCode: 404 });
       // Saved preferences neither mint a license nor alter existing financial/access records.
       expect((await licenseRepository.pageUserHistory(ownerId)).total).toBe(3);
-
     } finally {
       await db.delete(auditEvents).where(eq(auditEvents.actorId, ownerId));
       await db.delete(licenses).where(inArray(licenses.id, licenseIds));

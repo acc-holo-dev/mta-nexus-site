@@ -1,4 +1,16 @@
-import { eq, asc, desc, and, count, sql, inArray, ilike, or, isNull, getTableColumns } from "drizzle-orm";
+import {
+  eq,
+  asc,
+  desc,
+  and,
+  count,
+  sql,
+  inArray,
+  ilike,
+  or,
+  isNull,
+  getTableColumns,
+} from "drizzle-orm";
 import { contentHelpfulCount } from "./content-reaction-count";
 import { containsPattern } from "./search-pattern";
 import { db } from "../client";
@@ -13,43 +25,66 @@ import type { AuditEvent, Content, Comment } from "@nexus/domain";
 
 export class ContentRepository {
   async countDrafts(): Promise<number> {
-    const [row] = await db.select({ total: count() }).from(content)
+    const [row] = await db
+      .select({ total: count() })
+      .from(content)
       .where(eq(content.status, "draft"));
     return row?.total ?? 0;
   }
 
-  async listDraftPage(page: number, pageSize = 30): Promise<{ items: Content[]; hasMore: boolean }> {
-    if (!Number.isSafeInteger(page) || page < 1 || page > 99_999 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+  async listDraftPage(
+    page: number,
+    pageSize = 30,
+  ): Promise<{ items: Content[]; hasMore: boolean }> {
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      page > 99_999 ||
+      !Number.isSafeInteger(pageSize) ||
+      pageSize < 1 ||
+      pageSize > 100
+    ) {
       throw new RangeError("Invalid content review page");
     }
-    const rows = await db.select().from(content)
+    const rows = await db
+      .select()
+      .from(content)
       .where(eq(content.status, "draft"))
       .orderBy(asc(content.createdAt), asc(content.id))
       .limit(pageSize + 1)
       .offset((page - 1) * pageSize);
-    return { items: rows.slice(0, pageSize) as unknown as Content[], hasMore: rows.length > pageSize };
+    return {
+      items: rows.slice(0, pageSize) as unknown as Content[],
+      hasMore: rows.length > pageSize,
+    };
   }
 
   async countPublished(): Promise<number> {
-    const [row] = await db.select({ total: count() }).from(content).where(
-      eq(content.status, "published"),
-    );
+    const [row] = await db
+      .select({ total: count() })
+      .from(content)
+      .where(eq(content.status, "published"));
     return row?.total ?? 0;
   }
 
   async searchPublished(term: string, limit = 50): Promise<Content[]> {
     const pattern = containsPattern(term);
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 50)
-      : 50;
-    const rows = await db.select({ ...getTableColumns(content), likeCount: contentHelpfulCount() }).from(content).where(and(
-      eq(content.status, "published"),
-      or(
-        ilike(content.title, pattern),
-        ilike(content.body, pattern),
-        sql`exists (select 1 from jsonb_array_elements_text(${content.tags}) as tag(value) where tag.value ilike ${pattern})`,
-      ),
-    )).orderBy(desc(content.createdAt), desc(content.id)).limit(boundedLimit);
+    const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 50) : 50;
+    const rows = await db
+      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .from(content)
+      .where(
+        and(
+          eq(content.status, "published"),
+          or(
+            ilike(content.title, pattern),
+            ilike(content.body, pattern),
+            sql`exists (select 1 from jsonb_array_elements_text(${content.tags}) as tag(value) where tag.value ilike ${pattern})`,
+          ),
+        ),
+      )
+      .orderBy(desc(content.createdAt), desc(content.id))
+      .limit(boundedLimit);
     return rows as unknown as Content[];
   }
 
@@ -60,23 +95,28 @@ export class ContentRepository {
   ): Promise<Content[]> {
     if (types.length === 0) return [];
     const pattern = containsPattern(term);
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 50)
-      : 50;
-    const rows = await db.select({ ...getTableColumns(content), likeCount: contentHelpfulCount() }).from(content).where(and(
-      eq(content.status, "published"),
-      inArray(content.type, types),
-      or(
-        ilike(content.title, pattern),
-        ilike(content.body, pattern),
-        sql`exists (select 1 from jsonb_array_elements_text(${content.tags}) as tag(value) where tag.value ilike ${pattern})`,
-      ),
-    )).orderBy(desc(content.updatedAt), desc(content.id)).limit(boundedLimit);
+    const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 50) : 50;
+    const rows = await db
+      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .from(content)
+      .where(
+        and(
+          eq(content.status, "published"),
+          inArray(content.type, types),
+          or(
+            ilike(content.title, pattern),
+            ilike(content.body, pattern),
+            sql`exists (select 1 from jsonb_array_elements_text(${content.tags}) as tag(value) where tag.value ilike ${pattern})`,
+          ),
+        ),
+      )
+      .orderBy(desc(content.updatedAt), desc(content.id))
+      .limit(boundedLimit);
     return rows as unknown as Content[];
   }
 
   async listPublished(limit = 50): Promise<Content[]> {
-        const rows = await db
+    const rows = await db
       .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
       .from(content)
       .where(eq(content.status, "published"))
@@ -85,12 +125,24 @@ export class ContentRepository {
     return rows as unknown as Content[];
   }
 
-  async pagePublishedEditorialByOrganization(organizationId: string, requestedPage = 1, requestedSize = 12) {
+  async pagePublishedEditorialByOrganization(
+    organizationId: string,
+    requestedPage = 1,
+    requestedSize = 12,
+  ) {
     const pageSize = Number.isFinite(requestedSize)
-      ? Math.min(Math.max(Math.floor(requestedSize), 1), 100) : 12;
+      ? Math.min(Math.max(Math.floor(requestedSize), 1), 100)
+      : 12;
     const requested = Number.isFinite(requestedPage)
-      ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER) : 1;
-    const editorialTypes: Content["type"][] = ["article", "news", "devlog", "update", "announcement"];
+      ? Math.min(Math.max(Math.floor(requestedPage), 1), Number.MAX_SAFE_INTEGER)
+      : 1;
+    const editorialTypes: Content["type"][] = [
+      "article",
+      "news",
+      "devlog",
+      "update",
+      "announcement",
+    ];
     const condition = and(
       eq(content.organizationId, organizationId),
       eq(content.status, "published"),
@@ -100,16 +152,17 @@ export class ContentRepository {
     const total = summary?.total ?? 0;
     const totalPages = Math.max(1, Math.ceil(total / pageSize));
     const page = Math.min(requested, totalPages);
-    const rows = await db.select({ ...getTableColumns(content), likeCount: contentHelpfulCount() }).from(content).where(condition)
+    const rows = await db
+      .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
+      .from(content)
+      .where(condition)
       .orderBy(desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`), desc(content.id))
-      .limit(pageSize).offset((page - 1) * pageSize);
+      .limit(pageSize)
+      .offset((page - 1) * pageSize);
     return { items: rows as unknown as Content[], total, page, pageSize, totalPages };
   }
 
-  async listPublishedByOrganization(
-    organizationId: string,
-    limit = 100,
-  ): Promise<Content[]> {
+  async listPublishedByOrganization(organizationId: string, limit = 100): Promise<Content[]> {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 100)
       : 100;
@@ -117,16 +170,8 @@ export class ContentRepository {
     const rows = await db
       .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
       .from(content)
-      .where(
-        and(
-          eq(content.organizationId, organizationId),
-          eq(content.status, "published"),
-        ),
-      )
-      .orderBy(
-        desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`),
-        desc(content.id),
-      )
+      .where(and(eq(content.organizationId, organizationId), eq(content.status, "published")))
+      .orderBy(desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`), desc(content.id))
       .limit(boundedLimit);
     return rows as unknown as Content[];
   }
@@ -142,10 +187,7 @@ export class ContentRepository {
     return rows as unknown as Content[];
   }
 
-  async listPublishedByServer(
-    serverId: string,
-    limit = 6,
-  ): Promise<Content[]> {
+  async listPublishedByServer(serverId: string, limit = 6): Promise<Content[]> {
     const publicServerUpdateTypes: Content["type"][] = [
       "article",
       "news",
@@ -153,9 +195,7 @@ export class ContentRepository {
       "update",
       "announcement",
     ];
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 12)
-      : 6;
+    const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 12) : 6;
 
     const rows = await db
       .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
@@ -167,9 +207,7 @@ export class ContentRepository {
           inArray(content.type, publicServerUpdateTypes),
         ),
       )
-      .orderBy(
-        desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`),
-      )
+      .orderBy(desc(sql`coalesce(${content.publishedAt}, ${content.updatedAt})`))
       .limit(boundedLimit);
     return rows as unknown as Content[];
   }
@@ -185,7 +223,7 @@ export class ContentRepository {
    */
   async findPublishedBySlug(
     slug: string,
-    options: { incrementView?: boolean } = {}
+    options: { incrementView?: boolean } = {},
   ): Promise<Content | null> {
     const rows = await db
       .select({ ...getTableColumns(content), likeCount: contentHelpfulCount() })
@@ -211,15 +249,12 @@ export class ContentRepository {
 
   async findBySlug(
     slug: string,
-    options: { incrementView?: boolean } = {}
+    options: { incrementView?: boolean } = {},
   ): Promise<Content | null> {
     return this.findPublishedBySlug(slug, options);
   }
 
-  async listByStatus(
-    status: Content["status"],
-    limit = 100
-  ): Promise<Content[]> {
+  async listByStatus(status: Content["status"], limit = 100): Promise<Content[]> {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 100)
       : 100;
@@ -235,7 +270,7 @@ export class ContentRepository {
   async updateStatus(
     id: string,
     status: Content["status"],
-    expectedStatus?: Content["status"]
+    expectedStatus?: Content["status"],
   ): Promise<Content | null> {
     const condition = expectedStatus
       ? and(eq(content.id, id), eq(content.status, expectedStatus))
@@ -334,7 +369,7 @@ export class ContentRepository {
       updatedAt: new Date(),
     };
 
-        const rows = await db.insert(content).values(values).returning();
+    const rows = await db.insert(content).values(values).returning();
     return rows[0] as unknown as Content;
   }
 
@@ -345,7 +380,12 @@ export class ContentRepository {
     return db.transaction(async (tx) => {
       if (data.serverId) await serverContentAccess(tx, data.serverId, data.authorId);
       if (data.organizationId) {
-        const access = await organizationWorkspaceAccess(tx, data.organizationId, data.authorId, "share");
+        const access = await organizationWorkspaceAccess(
+          tx,
+          data.organizationId,
+          data.authorId,
+          "share",
+        );
         if (!["owner", "admin", "developer"].includes(access.role))
           throw new AppError("Organization publication rights revoked", 403, "FORBIDDEN");
       }
@@ -358,23 +398,25 @@ export class ContentRepository {
       if (!created) throw new Error("Content insert did not return a row");
 
       await tx.insert(auditEvents).values({ ...audit, createdAt: now });
-      await publicationNotice(tx, created as unknown as Content, data.authorId, "created", audit.id);
+      await publicationNotice(
+        tx,
+        created as unknown as Content,
+        data.authorId,
+        "created",
+        audit.id,
+      );
       return created as unknown as Content;
     });
   }
 
   async findCommentById(id: string): Promise<Comment | null> {
-    const rows = await db
-      .select()
-      .from(comments)
-      .where(eq(comments.id, id))
-      .limit(1);
+    const rows = await db.select().from(comments).where(eq(comments.id, id)).limit(1);
     return (rows[0] as unknown as Comment) || null;
   }
 
   async listComments(
     target: { contentId?: string; productId?: string },
-    limit = 100
+    limit = 100,
   ): Promise<Comment[]> {
     const boundedLimit = Number.isFinite(limit)
       ? Math.min(Math.max(Math.floor(limit), 1), 100)
@@ -393,7 +435,13 @@ export class ContentRepository {
       const rows = await db
         .select()
         .from(comments)
-        .where(and(eq(comments.productId, target.productId), isNull(comments.contentId), eq(comments.reviewStatus, "published")))
+        .where(
+          and(
+            eq(comments.productId, target.productId),
+            isNull(comments.contentId),
+            eq(comments.reviewStatus, "published"),
+          ),
+        )
         .orderBy(desc(comments.createdAt))
         .limit(boundedLimit);
       return rows as unknown as Comment[];
@@ -406,8 +454,14 @@ export class ContentRepository {
     audit?: Omit<AuditEvent, "createdAt">,
   ): Promise<Comment> {
     if (data.productId) {
-      if (data.contentId || data.parentId || data.rating === undefined) throw new AppError("Invalid review target", 400, "REVIEW_INVALID");
-      return (await this.addProductReview({ ...data, productId: data.productId, rating: data.rating }, audit)).review;
+      if (data.contentId || data.parentId || data.rating === undefined)
+        throw new AppError("Invalid review target", 400, "REVIEW_INVALID");
+      return (
+        await this.addProductReview(
+          { ...data, productId: data.productId, rating: data.rating },
+          audit,
+        )
+      ).review;
     }
     const values = {
       ...data,
@@ -466,15 +520,22 @@ export class ContentRepository {
     data: Omit<Comment, "createdAt"> & { productId: string; rating: number },
     audit?: Omit<AuditEvent, "createdAt">,
   ): Promise<{ review: Comment; ratingCount: number; ratingAverage: number }> {
-    if (data.contentId || data.parentId) throw new AppError("Invalid review target", 400, "REVIEW_INVALID");
+    if (data.contentId || data.parentId)
+      throw new AppError("Invalid review target", 400, "REVIEW_INVALID");
     const result = await resourceReviewsRepository.command({
-      actorId: data.authorId, productId: data.productId, reviewId: data.id,
+      actorId: data.authorId,
+      productId: data.productId,
+      reviewId: data.id,
       auditId: audit?.id ?? `aud_${data.id}`,
       command: { action: "save", expectedRevision: 0, text: data.text, rating: data.rating },
     });
     const review: Comment = {
-      id: result.id, productId: data.productId, authorId: data.authorId,
-      text: data.text.trim(), rating: data.rating, isVerifiedPurchase: true,
+      id: result.id,
+      productId: data.productId,
+      authorId: data.authorId,
+      text: data.text.trim(),
+      rating: data.rating,
+      isVerifiedPurchase: true,
       createdAt: ("review" in result ? result.review?.createdAt : undefined) ?? new Date(),
     };
     return { review, ratingCount: result.ratingCount, ratingAverage: result.ratingAverage };

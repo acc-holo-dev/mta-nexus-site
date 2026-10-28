@@ -30,11 +30,16 @@ export function getResourceSubmissionErrorMessage(
   messages: ResourceSubmissionErrorMessages,
 ): string | undefined {
   switch (code) {
-    case "BUILD_PACKAGE_INVALID": return messages.packageInvalid;
-    case "BUILD_PACKAGE_UNSUPPORTED": return messages.packageUnsupported;
-    case "BUILD_PACKAGE_UNSAFE_PATH": return messages.packageUnsafePath;
-    case "BUILD_PACKAGE_LIMIT_EXCEEDED": return messages.packageLimitExceeded;
-    case "BUILD_PACKAGE_INSPECTOR_BUSY": return messages.packageInspectorBusy;
+    case "BUILD_PACKAGE_INVALID":
+      return messages.packageInvalid;
+    case "BUILD_PACKAGE_UNSUPPORTED":
+      return messages.packageUnsupported;
+    case "BUILD_PACKAGE_UNSAFE_PATH":
+      return messages.packageUnsafePath;
+    case "BUILD_PACKAGE_LIMIT_EXCEEDED":
+      return messages.packageLimitExceeded;
+    case "BUILD_PACKAGE_INSPECTOR_BUSY":
+      return messages.packageInspectorBusy;
     case "BUILD_UPLOAD_TOO_LARGE":
       return messages.fileTooLarge;
     case "BUILD_MALWARE_DETECTED":

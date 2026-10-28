@@ -11,12 +11,22 @@ const options = {
 describe("SMTP authentication configuration", () => {
   it("accepts anonymous delivery and a complete credential pair", () => {
     expect(() => new AccountMailSmtpTransport(options)).not.toThrow();
-    expect(() => new AccountMailSmtpTransport({
-      ...options, username: "", password: "",
-    })).not.toThrow();
-    expect(() => new AccountMailSmtpTransport({
-      ...options, username: "u".repeat(320), password: "p".repeat(1024),
-    })).not.toThrow();
+    expect(
+      () =>
+        new AccountMailSmtpTransport({
+          ...options,
+          username: "",
+          password: "",
+        }),
+    ).not.toThrow();
+    expect(
+      () =>
+        new AccountMailSmtpTransport({
+          ...options,
+          username: "u".repeat(320),
+          password: "p".repeat(1024),
+        }),
+    ).not.toThrow();
   });
 
   it.each([
@@ -31,7 +41,8 @@ describe("SMTP authentication configuration", () => {
       { username: "user", password: `password${control}` },
     ]),
   ])("rejects incomplete, oversized or control-character credentials (%#)", (credentials) => {
-    expect(() => new AccountMailSmtpTransport({ ...options, ...credentials }))
-      .toThrow("Invalid SMTP authentication configuration");
+    expect(() => new AccountMailSmtpTransport({ ...options, ...credentials })).toThrow(
+      "Invalid SMTP authentication configuration",
+    );
   });
 });

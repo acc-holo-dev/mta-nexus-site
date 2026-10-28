@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  WebPushPermanentSubscriptionError,
-} from "@nexus/db";
+import { WebPushPermanentSubscriptionError } from "@nexus/db";
 import {
   isPublicWebPushAddress,
   parseWebPushEndpoint,
@@ -10,9 +8,7 @@ import {
 
 describe("Web Push endpoint policy", () => {
   it("accepts an ordinary HTTPS push-service endpoint", () => {
-    const url = parseWebPushEndpoint(
-      "https://push.example.net/subscriptions/abc?token=1",
-    );
+    const url = parseWebPushEndpoint("https://push.example.net/subscriptions/abc?token=1");
     expect(url.origin).toBe("https://push.example.net");
     expect(url.pathname).toBe("/subscriptions/abc");
   });
@@ -27,9 +23,7 @@ describe("Web Push endpoint policy", () => {
     "https://127.0.0.1/subscriptions/abc",
     "https://[::1]/subscriptions/abc",
   ])("rejects an unsafe endpoint permanently: %s", (endpoint) => {
-    expect(() => parseWebPushEndpoint(endpoint)).toThrow(
-      WebPushPermanentSubscriptionError,
-    );
+    expect(() => parseWebPushEndpoint(endpoint)).toThrow(WebPushPermanentSubscriptionError);
   });
 
   it("classifies public and special-use addresses conservatively", () => {
@@ -59,27 +53,19 @@ describe("Web Push endpoint policy", () => {
 
   it("rejects DNS answers containing any non-public address", async () => {
     await expect(
-      resolveWebPushTarget(
-        "https://push.example.net/subscriptions/abc",
-        async () => [
-          { address: "1.1.1.1", family: 4 },
-          { address: "10.0.0.10", family: 4 },
-        ],
-      ),
-    ).rejects.toBeInstanceOf(
-      WebPushPermanentSubscriptionError,
-    );
+      resolveWebPushTarget("https://push.example.net/subscriptions/abc", async () => [
+        { address: "1.1.1.1", family: 4 },
+        { address: "10.0.0.10", family: 4 },
+      ]),
+    ).rejects.toBeInstanceOf(WebPushPermanentSubscriptionError);
   });
 
   it("pins the connection target to the resolved public address", async () => {
     await expect(
-      resolveWebPushTarget(
-        "https://push.example.net/subscriptions/abc",
-        async (hostname) => {
-          expect(hostname).toBe("push.example.net");
-          return [{ address: "1.1.1.1", family: 4 }];
-        },
-      ),
+      resolveWebPushTarget("https://push.example.net/subscriptions/abc", async (hostname) => {
+        expect(hostname).toBe("push.example.net");
+        return [{ address: "1.1.1.1", family: 4 }];
+      }),
     ).resolves.toMatchObject({
       hostname: "push.example.net",
       address: "1.1.1.1",

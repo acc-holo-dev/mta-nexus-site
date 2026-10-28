@@ -1,11 +1,5 @@
 import assert from "node:assert/strict";
-import {
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import test from "node:test";
@@ -83,16 +77,9 @@ test("created volumes enter cleanup ownership before later validation can fail",
   const registry = [];
 
   assert.throws(() =>
-    registerCreatedVolume(
-      registry,
-      "expected-volume",
-      "token-1",
-      "unexpected-volume",
-    ),
+    registerCreatedVolume(registry, "expected-volume", "token-1", "unexpected-volume"),
   );
-  assert.deepEqual(registry, [
-    { name: "expected-volume", token: "token-1" },
-  ]);
+  assert.deepEqual(registry, [{ name: "expected-volume", token: "token-1" }]);
 });
 
 test("volume ownership labels prevent deleting unrelated Docker volumes", () => {
@@ -150,22 +137,11 @@ test("production storage topology is converted into an isolated PostgreSQL fixtu
     uploadsTarget: "/data/uploads",
   });
 
-  const fixture = makePostgresFixture(
-    spec,
-    "sha256:fixture-image",
-    "owned-pgdata",
-    "secret-token",
-  );
+  const fixture = makePostgresFixture(spec, "sha256:fixture-image", "owned-pgdata", "secret-token");
   assert.equal(fixture.services.postgres.network_mode, "none");
   assert.equal(fixture.services.postgres.restart, "no");
-  assert.equal(
-    fixture.volumes.pgdata.name,
-    "owned-pgdata",
-  );
-  assert.equal(
-    fixture.services.postgres.volumes[0].target,
-    "/var/lib/postgresql/data",
-  );
+  assert.equal(fixture.volumes.pgdata.name, "owned-pgdata");
+  assert.equal(fixture.services.postgres.volumes[0].target, "/var/lib/postgresql/data");
 });
 
 test("backup artifacts use a private filesystem mode", () => {
@@ -187,18 +163,12 @@ test("PASS evidence is impossible while any restore proof is missing", () => {
 
   for (const flag of BACKUP_RESTORE_EVIDENCE_FLAGS) {
     const incomplete = { ...result, [flag]: false };
-    assert.throws(
-      () => assertBackupRestoreEvidence(incomplete),
-      new RegExp(flag, "u"),
-    );
+    assert.throws(() => assertBackupRestoreEvidence(incomplete), new RegExp(flag, "u"));
   }
 });
 
 test("workflow keeps backup restore as a separate disposable job", () => {
-  const workflow = readFileSync(
-    resolve(process.cwd(), ".github/workflows/ci.yml"),
-    "utf8",
-  );
+  const workflow = readFileSync(resolve(process.cwd(), ".github/workflows/ci.yml"), "utf8");
 
   assert.match(workflow, /^ {2}backup-restore:/mu);
   assert.match(workflow, /name: Disposable backup restore/u);

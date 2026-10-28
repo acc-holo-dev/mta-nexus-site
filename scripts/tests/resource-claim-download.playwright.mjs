@@ -22,14 +22,9 @@ assert(process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_TITLE);
 assert(process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_ID);
 assert(process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_SLUG);
 assert(process.env.NEXUS_RESOURCE_BROWSER_PAID_PRODUCT_TITLE);
-assert.match(
-  process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256 ?? "",
-  /^[a-f0-9]{64}$/u,
-);
+assert.match(process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SHA256 ?? "", /^[a-f0-9]{64}$/u);
 
-const require = createRequire(
-  join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"),
-);
+const require = createRequire(join(resolve(process.env.NEXUS_BROWSER_TOOLS), "package.json"));
 const { test, expect } = require("@playwright/test");
 const output = resolve(process.env.NEXUS_BROWSER_REPORT_DIR);
 const productId = process.env.NEXUS_RESOURCE_BROWSER_PRODUCT_ID;
@@ -43,9 +38,7 @@ const expectedSize = Number(process.env.NEXUS_RESOURCE_BROWSER_EXPECTED_SIZE);
 assert.equal(expectedSize, 64 * 1024 * 1024, "Exercise the maximum supported download size");
 async function assertNoHorizontalOverflow(page, label) {
   assert(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth,
-    ),
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     `Horizontal overflow: ${label}`,
   );
 }
@@ -71,10 +64,7 @@ test.afterAll(async () => {
     limitations:
       "Disposable production stack, real auth/database/entitlement/local-storage/download route. Timeout/cancellation use a synthetic stalled fetch and browser clock; they do not simulate a real TCP interruption. Product/build are seeded fixtures; author publishing and moderator approval are covered separately.",
   };
-  await writeFile(
-    join(output, "resource-results.json"),
-    JSON.stringify(report, null, 2),
-  );
+  await writeFile(join(output, "resource-results.json"), JSON.stringify(report, null, 2));
   await writeFile(
     join(output, "resource-summary.md"),
     [
@@ -90,9 +80,7 @@ test.afterAll(async () => {
   );
 });
 
-test("J5 claim -> workspace -> download exact published build", async ({
-  page, browser,
-}) => {
+test("J5 claim -> workspace -> download exact published build", async ({ page, browser }) => {
   const name = "claim published free resource and download exact bytes";
   let status = "FAIL";
   const browserErrors = [];
@@ -101,16 +89,21 @@ test("J5 claim -> workspace -> download exact published build", async ({
   await page.clock.install();
   // A successful HTTP response with undecodable image bytes exercises the
   // preview error event without treating an intentional 404 as a console fault.
-  await page.route("**/ci-preview.png", (route) => route.fulfill({
-    status: 200, contentType: "image/png", body: "Synthetic broken preview",
-  }));
+  await page.route("**/ci-preview.png", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "image/png",
+      body: "Synthetic broken preview",
+    }),
+  );
 
   page.on("pageerror", (error) => browserErrors.push(error.message));
   page.on("console", (message) => {
     if (message.type() !== "error") return;
     // Only the deliberately intercepted download may report the expected 409.
-    const expectedConflict = message.text() ===
-      "Failed to load resource: the server responded with a status of 409 (Conflict)" &&
+    const expectedConflict =
+      message.text() ===
+        "Failed to load resource: the server responded with a status of 409 (Conflict)" &&
       message.location().url ===
         `${process.env.NEXUS_BROWSER_BASE_URL}/api/products/${productId}/download`;
     if (!expectedConflict) browserErrors.push(message.text());
@@ -150,20 +143,13 @@ test("J5 claim -> workspace -> download exact published build", async ({
       await expect(
         page.getByRole("heading", { level: 1, name: productTitle, exact: true }),
       ).toBeVisible();
-      await assertNoHorizontalOverflow(
-        page,
-        `resource detail at ${width}px before acquisition`,
-      );
+      await assertNoHorizontalOverflow(page, `resource detail at ${width}px before acquisition`);
     }
     await page.setViewportSize({ width: 1280, height: 844 });
     await expect(page.getByText("Preview unavailable", { exact: true })).toBeVisible();
     await expect(page.getByRole("img", { name: productTitle, exact: true })).toHaveCount(0);
-    await expect(
-      page.getByRole("link", { name: "Add to library", exact: true }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /Download Build/u }),
-    ).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Add to library", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Download Build/u })).toHaveCount(0);
 
     const addToLibraryLink = page.getByRole("link", {
       name: "Add to library",
@@ -172,9 +158,7 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await addToLibraryLink.focus();
     await expect(addToLibraryLink).toBeFocused();
     await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(
-      new RegExp(`/acquire\\?productId=${productId}$`, "u"),
-    );
+    await expect(page).toHaveURL(new RegExp(`/acquire\\?productId=${productId}$`, "u"));
     await expect(
       page.getByRole("heading", { name: "Add resource to library", exact: true }),
     ).toBeVisible();
@@ -188,8 +172,7 @@ test("J5 claim -> workspace -> download exact published build", async ({
 
     const claimResponsePromise = page.waitForResponse(
       (response) =>
-        response.url().endsWith("/api/resources/claim") &&
-        response.request().method() === "POST",
+        response.url().endsWith("/api/resources/claim") && response.request().method() === "POST",
     );
     const claimButton = page.getByRole("button", {
       name: "Add to library",
@@ -201,9 +184,7 @@ test("J5 claim -> workspace -> download exact published build", async ({
     const claimResponse = await claimResponsePromise;
     assert.equal(claimResponse.status(), 201);
 
-    await expect(
-      page.getByRole("heading", { name: "Resource added", exact: true }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Resource added", exact: true })).toBeVisible();
 
     const openResourceLink = page.getByRole("link", {
       name: "Open resource",
@@ -222,9 +203,7 @@ test("J5 claim -> workspace -> download exact published build", async ({
     ).toBeVisible();
 
     await page.goto("/workspace");
-    await expect(
-      page.getByRole("heading", { name: "Workspace", exact: true }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Workspace", exact: true })).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Resource library", exact: true }),
     ).toBeVisible();
@@ -232,11 +211,13 @@ test("J5 claim -> workspace -> download exact published build", async ({
 
     await page.goto(`/market/${productSlug}`);
     const downloadPattern = "**/api/products/*/download";
-    await page.route(downloadPattern, (route) => route.fulfill({
-      status: 409,
-      contentType: "application/json",
-      body: JSON.stringify({ code: "BUILD_ARTIFACT_MISMATCH" }),
-    }));
+    await page.route(downloadPattern, (route) =>
+      route.fulfill({
+        status: 409,
+        contentType: "application/json",
+        body: JSON.stringify({ code: "BUILD_ARTIFACT_MISMATCH" }),
+      }),
+    );
     const keyboardDownload = page.getByRole("button", {
       name: "Download Build v1.0.0",
       exact: true,
@@ -244,30 +225,33 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await keyboardDownload.focus();
     await expect(keyboardDownload).toBeFocused();
     await page.keyboard.press("Enter");
-    await expect(page.getByRole("alert").filter({ hasText: "This build cannot be downloaded right now" })).toBeVisible();
+    await expect(
+      page.getByRole("alert").filter({ hasText: "This build cannot be downloaded right now" }),
+    ).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`/market/${productSlug}$`, "u"));
     await page.unroute(downloadPattern);
 
     // Stall exactly one download in the browser. Restore fetch immediately so
     // subsequent retries and unrelated requests use the real production stack.
-    const stallNextDownload = () => page.evaluate((id) => {
-      const originalFetch = window.fetch;
-      window.fetch = (input, init) => {
-        if (input !== `/api/products/${encodeURIComponent(id)}/download`) {
-          return originalFetch(input, init);
-        }
-        window.fetch = originalFetch;
-        return new Promise((_resolve, reject) => {
-          const signal = init?.signal;
-          if (!signal) {
-            reject(new Error("Download must provide an AbortSignal"));
-            return;
+    const stallNextDownload = () =>
+      page.evaluate((id) => {
+        const originalFetch = window.fetch;
+        window.fetch = (input, init) => {
+          if (input !== `/api/products/${encodeURIComponent(id)}/download`) {
+            return originalFetch(input, init);
           }
-          if (signal.aborted) reject(signal.reason);
-          else signal.addEventListener("abort", () => reject(signal.reason), { once: true });
-        });
-      };
-    }, productId);
+          window.fetch = originalFetch;
+          return new Promise((_resolve, reject) => {
+            const signal = init?.signal;
+            if (!signal) {
+              reject(new Error("Download must provide an AbortSignal"));
+              return;
+            }
+            if (signal.aborted) reject(signal.reason);
+            else signal.addEventListener("abort", () => reject(signal.reason), { once: true });
+          });
+        };
+      }, productId);
     const downloadButton = page.getByRole("button", { name: "Download Build v1.0.0", exact: true });
     const preparingButton = page.getByRole("button", { name: "Preparing download…", exact: true });
 
@@ -275,7 +259,9 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await downloadButton.click();
     await expect(preparingButton).toBeDisabled();
     await page.clock.fastForward(60_001);
-    await expect(page.getByRole("alert").filter({ hasText: "The download stopped responding" })).toBeVisible();
+    await expect(
+      page.getByRole("alert").filter({ hasText: "The download stopped responding" }),
+    ).toBeVisible();
     await expect(downloadButton).toBeEnabled();
     assert.equal(downloads.length, 0, "Timed-out requests must not save a file");
 
@@ -289,10 +275,14 @@ test("J5 claim -> workspace -> download exact published build", async ({
     await cancelDownload.focus();
     await expect(cancelDownload).toBeFocused();
     await page.keyboard.press("Enter");
-    await expect(page.getByRole("status").filter({ hasText: "Download cancelled. You can try again." })).toBeVisible();
+    await expect(
+      page.getByRole("status").filter({ hasText: "Download cancelled. You can try again." }),
+    ).toBeVisible();
     await expect(downloadButton).toBeEnabled();
     await page.clock.fastForward(60_001);
-    await expect(page.getByRole("alert").filter({ hasText: "The download stopped responding" })).toHaveCount(0);
+    await expect(
+      page.getByRole("alert").filter({ hasText: "The download stopped responding" }),
+    ).toHaveCount(0);
     assert.equal(downloads.length, 0, "Cancelled requests must not save a file");
 
     const stopMemoryProbe = await startBrowserMemoryProbe(browser);
@@ -306,12 +296,9 @@ test("J5 claim -> workspace -> download exact published build", async ({
         })
         .click();
       const download = await downloadPromise;
-  
-      assert.equal(
-        download.suggestedFilename(),
-        `${productSlug}-1.0.0.zip`,
-      );
-  
+
+      assert.equal(download.suggestedFilename(), `${productSlug}-1.0.0.zip`);
+
       const savedPath = join(output, "j5-browser-download.zip");
       await download.saveAs(savedPath);
       await verifyDownloadedFile(savedPath);
@@ -319,10 +306,19 @@ test("J5 claim -> workspace -> download exact published build", async ({
       await page.clock.fastForward(60_001);
     } finally {
       memory = await stopMemoryProbe();
-      await writeFile(join(output, "download-browser-memory.json"), JSON.stringify({
-        commit: process.env.GITHUB_SHA, archiveBytes: expectedSize, ...memory,
-        growthBudgetKiB: 384 * 1024,
-      }, null, 2));
+      await writeFile(
+        join(output, "download-browser-memory.json"),
+        JSON.stringify(
+          {
+            commit: process.env.GITHUB_SHA,
+            archiveBytes: expectedSize,
+            ...memory,
+            growthBudgetKiB: 384 * 1024,
+          },
+          null,
+          2,
+        ),
+      );
     }
     assert(memory.samples.length >= 3, "Sample the actual 64 MiB browser transfer");
     assert(memory.growthKiB < 384 * 1024, "Chromium RSS growth exceeded the regression budget");
@@ -330,50 +326,78 @@ test("J5 claim -> workspace -> download exact published build", async ({
 
     // Exercise the actual language control, including the server-rendered reload.
     await page.getByRole("button", { name: "Language", exact: true }).click();
-    const russianDownload = page.getByRole("button", { name: "Скачать сборку v1.0.0", exact: true });
+    const russianDownload = page.getByRole("button", {
+      name: "Скачать сборку v1.0.0",
+      exact: true,
+    });
     await expect(russianDownload).toBeVisible();
     await expect(page.getByText("Превью недоступно", { exact: true })).toBeVisible();
     await expect(page.getByRole("img", { name: productTitle, exact: true })).toHaveCount(0);
-    const stallMidStream = () => page.evaluate((id) => {
-      const originalFetch = window.fetch;
-      window.fetch = (input, init) => {
-        if (input !== `/api/products/${encodeURIComponent(id)}/download`) {
-          return originalFetch(input, init);
-        }
-        window.fetch = originalFetch;
-        window.nexusDownloadCancelled = false;
-        const body = new ReadableStream({
-          start(stream) { stream.enqueue(new Uint8Array([80, 75, 3, 4])); },
-          cancel() { window.nexusDownloadCancelled = true; },
-        });
-        return Promise.resolve(new Response(body, {
-          headers: {
-            "Content-Length": "8",
-            "Content-Type": "application/zip",
-            // Download client rejects responses without a checksum before progress updates.
-            "X-Content-SHA256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-          },
-        }));
-      };
-    }, productId);
+    const stallMidStream = () =>
+      page.evaluate((id) => {
+        const originalFetch = window.fetch;
+        window.fetch = (input, init) => {
+          if (input !== `/api/products/${encodeURIComponent(id)}/download`) {
+            return originalFetch(input, init);
+          }
+          window.fetch = originalFetch;
+          window.nexusDownloadCancelled = false;
+          const body = new ReadableStream({
+            start(stream) {
+              stream.enqueue(new Uint8Array([80, 75, 3, 4]));
+            },
+            cancel() {
+              window.nexusDownloadCancelled = true;
+            },
+          });
+          return Promise.resolve(
+            new Response(body, {
+              headers: {
+                "Content-Length": "8",
+                "Content-Type": "application/zip",
+                // Download client rejects responses without a checksum before progress updates.
+                "X-Content-SHA256":
+                  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              },
+            }),
+          );
+        };
+      }, productId);
 
     for (const reason of ["timeout", "cancel"]) {
       await stallMidStream();
       await russianDownload.click();
-      await expect(page.getByRole("progressbar", { name: "Прогресс скачивания" })).toHaveAttribute("value", "50");
-      await expect(page.getByRole("button", { name: "Подготовка скачивания…", exact: true })).toBeDisabled();
+      await expect(page.getByRole("progressbar", { name: "Прогресс скачивания" })).toHaveAttribute(
+        "value",
+        "50",
+      );
+      await expect(
+        page.getByRole("button", { name: "Подготовка скачивания…", exact: true }),
+      ).toBeDisabled();
       if (reason === "timeout") {
         await page.clock.fastForward(60_001);
-        await expect(page.getByRole("alert").filter({ hasText: "Скачивание не отвечает" })).toBeVisible();
+        await expect(
+          page.getByRole("alert").filter({ hasText: "Скачивание не отвечает" }),
+        ).toBeVisible();
       } else {
         await page.getByRole("button", { name: "Отменить скачивание", exact: true }).click();
-        await expect(page.getByRole("status").filter({ hasText: "Скачивание отменено. Можно попробовать снова." })).toBeVisible();
+        await expect(
+          page
+            .getByRole("status")
+            .filter({ hasText: "Скачивание отменено. Можно попробовать снова." }),
+        ).toBeVisible();
         await page.clock.fastForward(60_001);
-        await expect(page.getByRole("alert").filter({ hasText: "Скачивание не отвечает" })).toHaveCount(0);
+        await expect(
+          page.getByRole("alert").filter({ hasText: "Скачивание не отвечает" }),
+        ).toHaveCount(0);
       }
       await expect(russianDownload).toBeEnabled();
       await expect(page.getByRole("progressbar", { name: "Прогресс скачивания" })).toHaveCount(0);
-      assert.equal(await page.evaluate(() => window.nexusDownloadCancelled), true, "Partial response reader must be cancelled");
+      assert.equal(
+        await page.evaluate(() => window.nexusDownloadCancelled),
+        true,
+        "Partial response reader must be cancelled",
+      );
       assert.equal(downloads.length, 1, "A partial response must not create another download");
     }
 
@@ -384,43 +408,54 @@ test("J5 claim -> workspace -> download exact published build", async ({
     const russianPath = join(output, "j5-browser-download-ru.zip");
     await russianFile.saveAs(russianPath);
     await verifyDownloadedFile(russianPath);
-    results.push({ name: "RU/EN timeout, cancellation, partial-stream cleanup and exact-byte retries", status: "PASS" });
+    results.push({
+      name: "RU/EN timeout, cancellation, partial-stream cleanup and exact-byte retries",
+      status: "PASS",
+    });
     results.push({
       name: "Keyboard-only free acquisition/download actions and 320/390px reflow",
       status: "PASS",
     });
 
     for (const failure of ["truncated", "stream-error"]) {
-      await page.evaluate(({ id, failure }) => {
-        const originalFetch = window.fetch;
-        window.fetch = (input, init) => {
-          if (input !== `/api/products/${encodeURIComponent(id)}/download`) return originalFetch(input, init);
-          window.fetch = originalFetch;
-          const body = new ReadableStream({
-            start(stream) {
-              stream.enqueue(new Uint8Array([80, 75, 3, 4]));
-              if (failure === "truncated") stream.close();
-              else setTimeout(() => stream.error(new TypeError("Synthetic interrupted stream")), 10);
-            },
-          });
-          return Promise.resolve(new Response(body, {
-            headers: { "Content-Length": "8", "Content-Type": "application/zip" },
-          }));
-        };
-      }, { id: productId, failure });
+      await page.evaluate(
+        ({ id, failure }) => {
+          const originalFetch = window.fetch;
+          window.fetch = (input, init) => {
+            if (input !== `/api/products/${encodeURIComponent(id)}/download`)
+              return originalFetch(input, init);
+            window.fetch = originalFetch;
+            const body = new ReadableStream({
+              start(stream) {
+                stream.enqueue(new Uint8Array([80, 75, 3, 4]));
+                if (failure === "truncated") stream.close();
+                else
+                  setTimeout(() => stream.error(new TypeError("Synthetic interrupted stream")), 10);
+              },
+            });
+            return Promise.resolve(
+              new Response(body, {
+                headers: { "Content-Length": "8", "Content-Type": "application/zip" },
+              }),
+            );
+          };
+        },
+        { id: productId, failure },
+      );
       await russianDownload.click();
       await page.clock.fastForward(20);
-      await expect(page.getByRole("alert").filter({ hasText: "Не удалось завершить скачивание" })).toBeVisible();
+      await expect(
+        page.getByRole("alert").filter({ hasText: "Не удалось завершить скачивание" }),
+      ).toBeVisible();
       await expect(russianDownload).toBeEnabled();
       assert.equal(downloads.length, 2, "Incomplete/error responses must not save a file");
     }
-    results.push({ name: "64 MiB exact-byte downloads and rejection of truncated/error responses", status: "PASS" });
+    results.push({
+      name: "64 MiB exact-byte downloads and rejection of truncated/error responses",
+      status: "PASS",
+    });
 
-    assert.deepEqual(
-      browserErrors,
-      [],
-      "Unexpected JavaScript, hydration or console errors",
-    );
+    assert.deepEqual(browserErrors, [], "Unexpected JavaScript, hydration or console errors");
 
     status = "PASS";
   } finally {
@@ -428,10 +463,7 @@ test("J5 claim -> workspace -> download exact published build", async ({
   }
 });
 
-
-test("J5 paid resource stays fail-closed and accessibly explained", async ({
-  page,
-}) => {
+test("J5 paid resource stays fail-closed and accessibly explained", async ({ page }) => {
   const name = "paid resource closed-beta accessibility without payment mutation";
   let status = "FAIL";
   const mutationRequests = [];
@@ -439,10 +471,7 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({
   page.on("request", (request) => {
     if (
       request.method() !== "GET" &&
-      (
-        request.url().includes("/api/checkout") ||
-        request.url().includes("/api/resources/claim")
-      )
+      (request.url().includes("/api/checkout") || request.url().includes("/api/resources/claim"))
     ) {
       mutationRequests.push({
         method: request.method(),
@@ -452,9 +481,7 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({
   });
 
   try {
-    await page.goto(
-      `/acquire?productId=${encodeURIComponent(paidProductId)}`,
-    );
+    await page.goto(`/acquire?productId=${encodeURIComponent(paidProductId)}`);
     await expect(
       page.getByRole("heading", {
         level: 1,
@@ -462,9 +489,7 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({
         exact: true,
       }),
     ).toBeVisible();
-    await expect(
-      page.getByText(paidProductTitle, { exact: true }),
-    ).toBeVisible();
+    await expect(page.getByText(paidProductTitle, { exact: true })).toBeVisible();
 
     const paidStatus = page.getByRole("status").filter({
       hasText: "Paid resources disabled",
@@ -492,16 +517,15 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({
     // Price and Library cost both render the same amount.
     await expect(summary.getByText("$25.00", { exact: true })).toHaveCount(2);
     await expect(
-      summary.locator("div").filter({ has: page.getByText("Price", { exact: true }) })
+      summary
+        .locator("div")
+        .filter({ has: page.getByText("Price", { exact: true }) })
         .getByText("$25.00", { exact: true }),
     ).toBeVisible();
 
     for (const width of [320, 390]) {
       await page.setViewportSize({ width, height: 844 });
-      await assertNoHorizontalOverflow(
-        page,
-        `paid acquire page at ${width}px`,
-      );
+      await assertNoHorizontalOverflow(page, `paid acquire page at ${width}px`);
     }
 
     await page.getByRole("button", { name: "Language", exact: true }).click();
@@ -522,13 +546,9 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({
       exact: true,
     });
     await expect(russianPaidButton).toBeDisabled();
-    const russianDescribedBy =
-      await russianPaidButton.getAttribute("aria-describedby");
+    const russianDescribedBy = await russianPaidButton.getAttribute("aria-describedby");
     assert(russianDescribedBy);
-    await expect(russianPaidDescription).toHaveAttribute(
-      "id",
-      russianDescribedBy,
-    );
+    await expect(russianPaidDescription).toHaveAttribute("id", russianDescribedBy);
 
     assert.deepEqual(
       mutationRequests,
@@ -537,8 +557,7 @@ test("J5 paid resource stays fail-closed and accessibly explained", async ({
     );
 
     results.push({
-      name:
-        "RU/EN paid-disabled summary, explanation, disabled action and 320/390px reflow",
+      name: "RU/EN paid-disabled summary, explanation, disabled action and 320/390px reflow",
       status: "PASS",
     });
     status = "PASS";

@@ -25,12 +25,16 @@ describe("local storage symlink confinement", () => {
     await fs.symlink(outside, path.join(root, "outside"));
     await fs.symlink(path.join(outside, "missing"), path.join(root, "dangling"));
     for (const dir of ["outside", "dangling"]) {
-      await expect(provider.put(dir + "/attack.zip", Buffer.from("attack"), "application/zip")).rejects.toThrow();
+      await expect(
+        provider.put(dir + "/attack.zip", Buffer.from("attack"), "application/zip"),
+      ).rejects.toThrow();
       await expect(provider.get(dir + "/secret.zip")).rejects.toThrow();
       await expect(provider.exists(dir + "/secret.zip")).rejects.toThrow();
       await expect(provider.delete(dir + "/secret.zip")).rejects.toThrow();
     }
-    expect(await fs.readFile(path.join(outside, "secret.zip"), "utf8")).toBe("outside confidential bytes");
+    expect(await fs.readFile(path.join(outside, "secret.zip"), "utf8")).toBe(
+      "outside confidential bytes",
+    );
     expect(await fs.readdir(outside)).toEqual(["secret.zip"]);
   });
 
@@ -39,9 +43,12 @@ describe("local storage symlink confinement", () => {
     await expect(provider.get("alias.zip")).rejects.toThrow();
     await expect(provider.exists("alias.zip")).rejects.toThrow("Symbolic-link");
     await expect(provider.delete("alias.zip")).rejects.toThrow("Symbolic-link");
-    await expect(provider.put("alias.zip", Buffer.from("overwrite"), "application/zip"))
-      .rejects.toMatchObject({ code: "CONFLICT" });
-    expect(await fs.readFile(path.join(outside, "secret.zip"), "utf8")).toBe("outside confidential bytes");
+    await expect(
+      provider.put("alias.zip", Buffer.from("overwrite"), "application/zip"),
+    ).rejects.toMatchObject({ code: "CONFLICT" });
+    expect(await fs.readFile(path.join(outside, "secret.zip"), "utf8")).toBe(
+      "outside confidential bytes",
+    );
   });
 
   it("rejects cross-boundary hard links", async () => {
@@ -49,7 +56,9 @@ describe("local storage symlink confinement", () => {
     await expect(provider.get("hard.zip")).rejects.toThrow("Hard-linked");
     await expect(provider.exists("hard.zip")).rejects.toThrow("Hard-linked");
     await expect(provider.delete("hard.zip")).rejects.toThrow("Hard-linked");
-    expect(await fs.readFile(path.join(outside, "secret.zip"), "utf8")).toBe("outside confidential bytes");
+    expect(await fs.readFile(path.join(outside, "secret.zip"), "utf8")).toBe(
+      "outside confidential bytes",
+    );
   });
 
   it("does not accept a symlink as the storage root", async () => {
@@ -61,7 +70,13 @@ describe("local storage symlink confinement", () => {
   });
 
   it("blocks traversal and Windows-style paths", async () => {
-    for (const key of ["../outside/attack.zip", "a/../attack.zip", "C:\\Windows\\secret.zip", "a\\b.zip", "a//b.zip"]) {
+    for (const key of [
+      "../outside/attack.zip",
+      "a/../attack.zip",
+      "C:\\Windows\\secret.zip",
+      "a\\b.zip",
+      "a//b.zip",
+    ]) {
       await expect(provider.put(key, Buffer.from("x"), "application/zip")).rejects.toThrow();
     }
     expect(await fs.readdir(root)).toEqual([]);
@@ -100,15 +115,22 @@ describe("local storage symlink confinement", () => {
     });
     await expect(provider.get("archive.zip")).rejects.toThrow();
     expect(swapped).toBe(true);
-    expect(await fs.readFile(path.join(outside, "secret.zip"), "utf8")).toBe("outside confidential bytes");
+    expect(await fs.readFile(path.join(outside, "secret.zip"), "utf8")).toBe(
+      "outside confidential bytes",
+    );
   });
 
   it("keeps regular nested upload, get and delete working", async () => {
-    const created = await provider.put("assets/user/archive.zip", Buffer.from("safe"), "application/zip");
+    const created = await provider.put(
+      "assets/user/archive.zip",
+      Buffer.from("safe"),
+      "application/zip",
+    );
     expect(await provider.exists(created.key)).toBe(true);
     const opened = await provider.get(created.key);
     const chunks: Buffer[] = [];
-    for await (const chunk of opened.stream as AsyncIterable<Buffer>) chunks.push(Buffer.from(chunk));
+    for await (const chunk of opened.stream as AsyncIterable<Buffer>)
+      chunks.push(Buffer.from(chunk));
     expect(Buffer.concat(chunks).toString()).toBe("safe");
     await provider.delete(created.key);
     expect(await provider.exists(created.key)).toBe(false);

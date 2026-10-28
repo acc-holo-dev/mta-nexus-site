@@ -55,9 +55,7 @@ describe("organization owner context switching integration", () => {
       expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
 
-    expect(
-      await organizationRepository.listUserMemberships(ownerId),
-    ).toHaveLength(0);
+    expect(await organizationRepository.listUserMemberships(ownerId)).toHaveLength(0);
 
     const response = await getContexts(
       new NextRequest("http://nexus.test/api/auth/context", {
@@ -108,12 +106,12 @@ describe("organization owner context switching integration", () => {
     expect(repeated).toHaveLength(1);
     expect(repeated[0]).toMatchObject({ role: "owner" });
     await authService.switchContext(ownerId, organizationId, token);
-    const events = await db.select().from(auditEvents).where(
-      and(
-        eq(auditEvents.actorId, ownerId),
-        eq(auditEvents.action, "user.context_switched"),
-      ),
-    );
+    const events = await db
+      .select()
+      .from(auditEvents)
+      .where(
+        and(eq(auditEvents.actorId, ownerId), eq(auditEvents.action, "user.context_switched")),
+      );
     expect(events).toHaveLength(1);
     expect(events[0]?.details).toEqual({
       from: "personal",
@@ -206,13 +204,13 @@ describe("organization owner context switching integration", () => {
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.activeContextId).toBe("personal");
-    await expect(authService.switchContext(memberId, organizationId, token))
-      .rejects.toMatchObject({ statusCode: 403, code: "FORBIDDEN" });
-    expect(
-      body.contexts.some(
-        (context: { id: string }) => context.id === organizationId,
-      ),
-    ).toBe(false);
+    await expect(authService.switchContext(memberId, organizationId, token)).rejects.toMatchObject({
+      statusCode: 403,
+      code: "FORBIDDEN",
+    });
+    expect(body.contexts.some((context: { id: string }) => context.id === organizationId)).toBe(
+      false,
+    );
   });
   it("rolls back a context write when the audit insert fails", async () => {
     const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -242,9 +240,14 @@ describe("organization owner context switching integration", () => {
       token,
       expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     });
-    await expect(authRepository.switchContext({
-      userId, contextId: "personal", auditId, currentToken: token,
-    })).resolves.toMatchObject({ activeContextId: "personal" });
+    await expect(
+      authRepository.switchContext({
+        userId,
+        contextId: "personal",
+        auditId,
+        currentToken: token,
+      }),
+    ).resolves.toMatchObject({ activeContextId: "personal" });
     const orgId = `org_context_atomic_${suffix}`;
     await organizationRepository.create({
       id: orgId,
@@ -252,10 +255,14 @@ describe("organization owner context switching integration", () => {
       slug: `context-atomic-${suffix}`,
       ownerId: userId,
     });
-    await expect(authRepository.switchContext({
-      userId, contextId: orgId, auditId, currentToken: token,
-    })).rejects.toThrow();
+    await expect(
+      authRepository.switchContext({
+        userId,
+        contextId: orgId,
+        auditId,
+        currentToken: token,
+      }),
+    ).rejects.toThrow();
     expect((await userRepository.findById(userId))?.activeContextId).toBe("personal");
   });
-
 });

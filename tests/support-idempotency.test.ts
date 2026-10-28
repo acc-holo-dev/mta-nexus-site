@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { parseSupportIdempotencyKey, supportMutationFingerprint } from "../apps/web/src/lib/support-idempotency";
+import {
+  parseSupportIdempotencyKey,
+  supportMutationFingerprint,
+} from "../apps/web/src/lib/support-idempotency";
 
 describe("support request idempotency contract", () => {
   const key = "12345678-1234-4234-8234-123456789abc";
@@ -30,14 +33,23 @@ describe("support request idempotency contract", () => {
     expect(digest).toMatch(/^[a-f0-9]{64}$/u);
     expect(supportMutationFingerprint({ ...input })).toBe(digest);
     expect(supportMutationFingerprint({ ...input, message: "Changed" })).not.toBe(digest);
-    expect(supportMutationFingerprint({
-      operation: "reply", caseId: "sup_case", message: "Please assist",
-      expectedStatus: "open",
-    })).not.toBe(digest);
+    expect(
+      supportMutationFingerprint({
+        operation: "reply",
+        caseId: "sup_case",
+        message: "Please assist",
+        expectedStatus: "open",
+      }),
+    ).not.toBe(digest);
   });
 
   it("binds reply retry identity to case, message and observed status", () => {
-    const input = { operation: "reply" as const, caseId: "sup_test", message: "Help", expectedStatus: "open" };
+    const input = {
+      operation: "reply" as const,
+      caseId: "sup_test",
+      message: "Help",
+      expectedStatus: "open",
+    };
     const digest = supportMutationFingerprint(input);
     expect(supportMutationFingerprint({ ...input })).toBe(digest);
     expect(supportMutationFingerprint({ ...input, caseId: "sup_other" })).not.toBe(digest);

@@ -1,17 +1,10 @@
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import {
-  Dialog,
-  nextDialogFocusIndex,
-} from "../packages/ui/src/dialog";
+import { Dialog, nextDialogFocusIndex } from "../packages/ui/src/dialog";
 
 function attributeValues(markup: string, attribute: string) {
-  return [
-    ...markup.matchAll(
-      new RegExp(`${attribute}="([^"]+)"`, "gu"),
-    ),
-  ].map((match) => match[1]);
+  return [...markup.matchAll(new RegExp(`${attribute}="([^"]+)"`, "gu"))].map((match) => match[1]);
 }
 
 describe("Dialog accessibility identity", () => {
@@ -53,11 +46,7 @@ describe("Dialog accessibility identity", () => {
 
   it("omits aria-describedby when a dialog has no description", () => {
     const markup = renderToStaticMarkup(
-      <Dialog
-        isOpen
-        onClose={() => undefined}
-        title="Title only"
-      >
+      <Dialog isOpen onClose={() => undefined} title="Title only">
         Body
       </Dialog>,
     );
@@ -66,7 +55,6 @@ describe("Dialog accessibility identity", () => {
     expect(attributeValues(markup, "aria-describedby")).toHaveLength(0);
   });
 });
-
 
 describe("Dialog keyboard focus containment", () => {
   it("wraps forward focus from the last control to the first", () => {

@@ -11,7 +11,10 @@ export function ServerCard({
   observation,
   isStale = false,
 }: {
-  server: Pick<Server, "id" | "slug" | "name" | "description" | "gameMode" | "bannerUrl" | "maxPlayers" | "isVerified">;
+  server: Pick<
+    Server,
+    "id" | "slug" | "name" | "description" | "gameMode" | "bannerUrl" | "maxPlayers" | "isVerified"
+  >;
   locale?: Locale;
   observation?: MtaMasterServer | null;
   isStale?: boolean;
@@ -21,11 +24,13 @@ export function ServerCard({
   const livePlayers = liveStatus === "online" ? observation?.players : undefined;
   const hasLiveData = livePlayers != null;
   const maxPlayers = observation?.maxPlayers ?? server.maxPlayers;
-  const occupancyPercent = hasLiveData && maxPlayers != null && maxPlayers > 0
-    ? Math.round((livePlayers / maxPlayers) * 100)
-    : null;
+  const occupancyPercent =
+    hasLiveData && maxPlayers != null && maxPlayers > 0
+      ? Math.round((livePlayers / maxPlayers) * 100)
+      : null;
   const isOnline = liveStatus === "online";
-  const liveLabel = liveStatus === "online" ? copy.online : liveStatus === "offline" ? copy.offline : copy.unknown;
+  const liveLabel =
+    liveStatus === "online" ? copy.online : liveStatus === "offline" ? copy.offline : copy.unknown;
 
   return (
     <Link
@@ -37,12 +42,12 @@ export function ServerCard({
           <>
             {/* biome-ignore lint/performance/noImgElement: server-controlled remote banner stays outside the trusted image-optimizer allowlist. */}
             <img
-            src={server.bannerUrl}
-            alt={server.name}
-            width={640}
-            height={224}
-            loading="lazy"
-            decoding="async"
+              src={server.bannerUrl}
+              alt={server.name}
+              width={640}
+              height={224}
+              loading="lazy"
+              decoding="async"
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </>
@@ -53,9 +58,7 @@ export function ServerCard({
         <div className="absolute right-2 top-2 flex items-center gap-1.5 rounded-full bg-black/60 px-2 py-0.5 font-numeric text-[11px] font-bold text-white backdrop-blur-sm">
           <span
             className={`h-2 w-2 rounded-full ${
-              isOnline
-                ? "animate-pulse bg-[var(--nexus-success)]"
-                : "bg-[var(--nexus-text-faint)]"
+              isOnline ? "animate-pulse bg-[var(--nexus-success)]" : "bg-[var(--nexus-text-faint)]"
             }`}
             aria-hidden="true"
           />
@@ -64,10 +67,7 @@ export function ServerCard({
 
         {server.isVerified && (
           <div className="absolute bottom-2 left-2">
-            <TrustBadge
-              variant="verifiedServer"
-              label={copy.verifiedServer}
-            />
+            <TrustBadge variant="verifiedServer" label={copy.verifiedServer} />
           </div>
         )}
       </div>
@@ -82,18 +82,14 @@ export function ServerCard({
           <span className="truncate">{server.gameMode || copy.freeroam}</span>
         </div>
 
-        <p className="line-clamp-2 flex-1 font-caption text-muted">
-          {server.description}
-        </p>
+        <p className="line-clamp-2 flex-1 font-caption text-muted">{server.description}</p>
 
         <div className="space-y-1.5 border-t border-base pt-2.5">
           <div className="flex items-center justify-between font-caption">
             <span className="flex items-center gap-1 font-medium text-secondary">
               <Users className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="font-numeric">
-                {hasLiveData
-                  ? `${livePlayers} / ${maxPlayers ?? "?"}`
-                  : copy.unknown}
+                {hasLiveData ? `${livePlayers} / ${maxPlayers ?? "?"}` : copy.unknown}
               </span>
             </span>
             <span className="font-numeric text-faint">
@@ -104,11 +100,7 @@ export function ServerCard({
             <div
               className="h-full rounded-full bg-[var(--nexus-success)] transition-all duration-500"
               style={{
-                width: `${
-                  occupancyPercent == null
-                    ? 0
-                    : Math.min(100, occupancyPercent)
-                }%`,
+                width: `${occupancyPercent == null ? 0 : Math.min(100, occupancyPercent)}%`,
               }}
             />
           </div>

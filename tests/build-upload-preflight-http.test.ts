@@ -55,28 +55,22 @@ vi.mock("@nexus/security", () => ({
 import { POST } from "../apps/web/src/app/api/products/[id]/builds/route";
 
 function invalidBodyRequest() {
-  return new NextRequest(
-    "http://nexus.test/api/products/prd_target/builds",
-    {
-      method: "POST",
-      headers: browserMutationHeaders({ "content-type": "application/json" }),
-      body: JSON.stringify({ intentionally: "not multipart" }),
-    },
-  );
+  return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
+    method: "POST",
+    headers: browserMutationHeaders({ "content-type": "application/json" }),
+    body: JSON.stringify({ intentionally: "not multipart" }),
+  });
 }
 
 function oversizedDeclaredRequest() {
-  return new NextRequest(
-    "http://nexus.test/api/products/prd_target/builds",
-    {
-      method: "POST",
-      headers: browserMutationHeaders({
-        "content-type": "multipart/form-data; boundary=nexus-boundary",
-        "content-length": String(65 * 1024 * 1024 + 1),
-      }),
-      body: "small test body",
-    },
-  );
+  return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
+    method: "POST",
+    headers: browserMutationHeaders({
+      "content-type": "multipart/form-data; boundary=nexus-boundary",
+      "content-length": String(65 * 1024 * 1024 + 1),
+    }),
+    body: "small test body",
+  });
 }
 
 function oversizedChunkedRequest() {
@@ -89,45 +83,41 @@ function oversizedChunkedRequest() {
     },
   });
 
-  return new NextRequest(
-    "http://nexus.test/api/products/prd_target/builds",
-    {
-      method: "POST",
-      headers: browserMutationHeaders({
-        "content-type": "multipart/form-data; boundary=nexus-boundary",
-      }),
-      body,
-      duplex: "half",
-    } as unknown as ConstructorParameters<typeof NextRequest>[1],
-  );
+  return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
+    method: "POST",
+    headers: browserMutationHeaders({
+      "content-type": "multipart/form-data; boundary=nexus-boundary",
+    }),
+    body,
+    duplex: "half",
+  } as unknown as ConstructorParameters<typeof NextRequest>[1]);
 }
 
 function validChunkedRequest() {
   const body = Buffer.concat([
-    Buffer.from('--nexus-boundary\r\nContent-Disposition: form-data; name="version"\r\n\r\n1.2.3\r\n' +
-      '--nexus-boundary\r\nContent-Disposition: form-data; name="file"; filename="resource.zip"\r\n' +
-      'Content-Type: application/zip\r\n\r\n'),
+    Buffer.from(
+      '--nexus-boundary\r\nContent-Disposition: form-data; name="version"\r\n\r\n1.2.3\r\n' +
+        '--nexus-boundary\r\nContent-Disposition: form-data; name="file"; filename="resource.zip"\r\n' +
+        "Content-Type: application/zip\r\n\r\n",
+    ),
     Buffer.from(packageFixtures.stored, "base64"),
-    Buffer.from('\r\n--nexus-boundary--\r\n'),
+    Buffer.from("\r\n--nexus-boundary--\r\n"),
   ]);
   const chunks = [body.slice(0, 23), body.slice(23, 71), body.slice(71)];
 
-  return new NextRequest(
-    "http://nexus.test/api/products/prd_target/builds",
-    {
-      method: "POST",
-      headers: browserMutationHeaders({
-        "content-type": "multipart/form-data; boundary=nexus-boundary",
-      }),
-      body: new ReadableStream<Uint8Array>({
-        start(controller) {
-          for (const chunk of chunks) controller.enqueue(chunk);
-          controller.close();
-        },
-      }),
-      duplex: "half",
-    } as unknown as ConstructorParameters<typeof NextRequest>[1],
-  );
+  return new NextRequest("http://nexus.test/api/products/prd_target/builds", {
+    method: "POST",
+    headers: browserMutationHeaders({
+      "content-type": "multipart/form-data; boundary=nexus-boundary",
+    }),
+    body: new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (const chunk of chunks) controller.enqueue(chunk);
+        controller.close();
+      },
+    }),
+    duplex: "half",
+  } as unknown as ConstructorParameters<typeof NextRequest>[1]);
 }
 
 const context = {
@@ -142,13 +132,9 @@ describe("build upload authorization HTTP preflight", () => {
 
   it("returns 403 before multipart parsing or expensive upload work for an unmanaged target", async () => {
     preflight.mockRejectedValueOnce(
-      new ForbiddenError(
-        "Not authorized to publish builds for this product",
-      ),
+      new ForbiddenError("Not authorized to publish builds for this product"),
     );
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => undefined);
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     try {
       const response = await POST(invalidBodyRequest(), context);
@@ -168,12 +154,8 @@ describe("build upload authorization HTTP preflight", () => {
   });
 
   it("returns 404 before multipart parsing when the product target does not exist", async () => {
-    preflight.mockRejectedValueOnce(
-      new NotFoundError("Product", "prd_target"),
-    );
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => undefined);
+    preflight.mockRejectedValueOnce(new NotFoundError("Product", "prd_target"));
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     try {
       const response = await POST(invalidBodyRequest(), context);
@@ -212,16 +194,13 @@ describe("build upload authorization HTTP preflight", () => {
       id: "prd_target",
       price: 0,
     });
-    const request = new NextRequest(
-      "http://nexus.test/api/products/prd_target/builds",
-      {
-        method: "POST",
-        headers: browserMutationHeaders({
-          "content-type": "multipart/form-data; boundary=nexus-boundary",
-        }),
-        body: "not a multipart body",
-      },
-    );
+    const request = new NextRequest("http://nexus.test/api/products/prd_target/builds", {
+      method: "POST",
+      headers: browserMutationHeaders({
+        "content-type": "multipart/form-data; boundary=nexus-boundary",
+      }),
+      body: "not a multipart body",
+    });
 
     const response = await POST(request, context);
 
@@ -282,7 +261,9 @@ describe("build upload authorization HTTP preflight", () => {
     });
     uploadAsset.mockResolvedValueOnce({
       key: "assets/usr_attacker/resource.zip",
-      sha256Hash: createHash("sha256").update(Buffer.from(packageFixtures.stored, "base64")).digest("hex"),
+      sha256Hash: createHash("sha256")
+        .update(Buffer.from(packageFixtures.stored, "base64"))
+        .digest("hex"),
       sizeBytes: Buffer.from(packageFixtures.stored, "base64").length,
     });
     releaseBuild.mockResolvedValueOnce({
@@ -297,9 +278,7 @@ describe("build upload authorization HTTP preflight", () => {
     const response = await POST(request, context);
 
     expect(response.status).toBe(201);
-    expect(scan).toHaveBeenCalledWith(
-      expect.objectContaining({ fileName: "resource.zip" }),
-    );
+    expect(scan).toHaveBeenCalledWith(expect.objectContaining({ fileName: "resource.zip" }));
     expect(uploadAsset).toHaveBeenCalledTimes(1);
     expect(releaseBuild).toHaveBeenCalledWith(
       expect.objectContaining({ productId: "prd_target", version: "1.2.3" }),

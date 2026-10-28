@@ -27,9 +27,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>(
-    "next/server",
-  );
+  const actual = await vi.importActual<typeof import("next/server")>("next/server");
   return {
     ...actual,
     after: afterMock,
@@ -90,7 +88,10 @@ beforeEach(() => {
       deliveryErrors: 0,
     },
   });
-  mocks.createWithAudit.mockResolvedValue({ report: { id: "rpt_test", status: "open" }, created: true });
+  mocks.createWithAudit.mockResolvedValue({
+    report: { id: "rpt_test", status: "open" },
+    created: true,
+  });
 });
 
 afterEach(() => {
@@ -110,7 +111,12 @@ describe("report privacy and durable success", () => {
     const allowed = await GET(request);
     expect(allowed.status).toBe(200);
     privateResponse(allowed);
-    expect(await allowed.json()).toEqual({ reports: [{ id: "rpt_test" }], hasMore: true, page: 1, view: "pending" });
+    expect(await allowed.json()).toEqual({
+      reports: [{ id: "rpt_test" }],
+      hasMore: true,
+      page: 1,
+      view: "pending",
+    });
     expect(mocks.listPage).toHaveBeenCalledWith("pending", 1);
   });
 
@@ -121,7 +127,9 @@ describe("report privacy and durable success", () => {
     expect(invalid.status).toBe(400);
     privateResponse(invalid);
     expect(mocks.listPage).not.toHaveBeenCalled();
-    const history = await GET(new NextRequest("https://nexus.test/api/reports?view=history&page=2"));
+    const history = await GET(
+      new NextRequest("https://nexus.test/api/reports?view=history&page=2"),
+    );
     expect(history.status).toBe(200);
     expect(mocks.listPage).toHaveBeenCalledWith("history", 2);
   });
@@ -129,14 +137,18 @@ describe("report privacy and durable success", () => {
   it("does not report a committed complaint as failed when moderator notification fails", async () => {
     mocks.session.mockResolvedValue({ id: "member_1" });
     mocks.dispatch.mockRejectedValue(new Error("Notification unavailable"));
-    const response = await POST(new NextRequest("https://nexus.test/api/reports", {
-      method: "POST",
-      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
-      body: JSON.stringify({
-        targetType: "product", targetId: "prd_test", type: "scam",
-        reason: "The resource is misrepresented",
+    const response = await POST(
+      new NextRequest("https://nexus.test/api/reports", {
+        method: "POST",
+        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+        body: JSON.stringify({
+          targetType: "product",
+          targetId: "prd_test",
+          type: "scam",
+          reason: "The resource is misrepresented",
+        }),
       }),
-    }));
+    );
 
     expect(response.status).toBe(201);
     privateResponse(response);
@@ -159,14 +171,18 @@ describe("report privacy and durable success", () => {
 
   it("pushes only successfully stored report notifications after response", async () => {
     mocks.session.mockResolvedValue({ id: "member_1" });
-    const response = await POST(new NextRequest("https://nexus.test/api/reports", {
-      method: "POST",
-      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
-      body: JSON.stringify({
-        targetType: "product", targetId: "prd_test", type: "scam",
-        reason: "The resource requires moderator review",
+    const response = await POST(
+      new NextRequest("https://nexus.test/api/reports", {
+        method: "POST",
+        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+        body: JSON.stringify({
+          targetType: "product",
+          targetId: "prd_test",
+          type: "scam",
+          reason: "The resource requires moderator review",
+        }),
       }),
-    }));
+    );
 
     expect(response.status).toBe(201);
     expect(mocks.dispatch).not.toHaveBeenCalled();
@@ -184,11 +200,18 @@ describe("report privacy and durable success", () => {
   it("does not notify anyone if the report and audit transaction fails", async () => {
     mocks.session.mockResolvedValue({ id: "member_1" });
     mocks.createWithAudit.mockRejectedValue(new Error("DB transaction aborted"));
-    const response = await POST(new NextRequest("https://nexus.test/api/reports", {
-      method: "POST",
-      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
-      body: JSON.stringify({ targetType: "product", targetId: "prd_test", type: "scam", reason: "This is a fraudulent resource" }),
-    }));
+    const response = await POST(
+      new NextRequest("https://nexus.test/api/reports", {
+        method: "POST",
+        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+        body: JSON.stringify({
+          targetType: "product",
+          targetId: "prd_test",
+          type: "scam",
+          reason: "This is a fraudulent resource",
+        }),
+      }),
+    );
     expect(response.status).toBe(500);
     privateResponse(response);
     expect(mocks.listModeratorIds).not.toHaveBeenCalled();
@@ -198,13 +221,21 @@ describe("report privacy and durable success", () => {
   it("returns a conflict for a concurrent duplicate without sending another notification", async () => {
     mocks.session.mockResolvedValue({ id: "member_1" });
     mocks.createWithAudit.mockResolvedValueOnce({
-      report: { id: "rpt_existing", status: "open" }, created: false,
+      report: { id: "rpt_existing", status: "open" },
+      created: false,
     });
-    const response = await POST(new NextRequest("https://nexus.test/api/reports", {
-      method: "POST",
-      headers: { ...browserMutationHeaders(), "content-type": "application/json" },
-      body: JSON.stringify({ targetType: "product", targetId: "prd_test", type: "scam", reason: "Already reported fraudulent resource" }),
-    }));
+    const response = await POST(
+      new NextRequest("https://nexus.test/api/reports", {
+        method: "POST",
+        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+        body: JSON.stringify({
+          targetType: "product",
+          targetId: "prd_test",
+          type: "scam",
+          reason: "Already reported fraudulent resource",
+        }),
+      }),
+    );
     expect(response.status).toBe(409);
     privateResponse(response);
     expect((await response.json()).reportId).toBe("rpt_existing");
@@ -216,17 +247,28 @@ describe("report privacy and durable success", () => {
     mocks.session.mockResolvedValue({ id: "member_1" });
     for (const input of [
       { targetId: "x".repeat(129) },
-      ...["javascript:alert(1)", "data:text/html,bad", "https://user:pass@example.com", "https://example.com/\npath", "https://"].map((url) => ({ evidenceUrls: [url] })),
+      ...[
+        "javascript:alert(1)",
+        "data:text/html,bad",
+        "https://user:pass@example.com",
+        "https://example.com/\npath",
+        "https://",
+      ].map((url) => ({ evidenceUrls: [url] })),
       { evidenceUrls: Array.from({ length: 6 }, (_, i) => `https://example.test/${i}`) },
     ]) {
-      const response = await POST(new NextRequest("https://nexus.test/api/reports", {
-        method: "POST",
-        headers: { ...browserMutationHeaders(), "content-type": "application/json" },
-        body: JSON.stringify({
-          targetType: "product", targetId: "prd_test", type: "scam",
-          reason: "An unsafe resource submission", ...input,
+      const response = await POST(
+        new NextRequest("https://nexus.test/api/reports", {
+          method: "POST",
+          headers: { ...browserMutationHeaders(), "content-type": "application/json" },
+          body: JSON.stringify({
+            targetType: "product",
+            targetId: "prd_test",
+            type: "scam",
+            reason: "An unsafe resource submission",
+            ...input,
+          }),
         }),
-      }));
+      );
       expect(response.status).toBe(400);
       privateResponse(response);
     }

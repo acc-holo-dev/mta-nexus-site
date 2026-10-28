@@ -303,16 +303,14 @@ export class ResourceCartRepository {
         acquired,
         requestId: input.requestId,
       };
-      await tx
-        .insert(resourceCartAcquisitions)
-        .values({
-          userId: input.userId,
-          requestId: input.requestId,
-          productIds: ids,
-          result,
-          reviewDigest: input.reviewDigest,
-          reviewSnapshot,
-        });
+      await tx.insert(resourceCartAcquisitions).values({
+        userId: input.userId,
+        requestId: input.requestId,
+        productIds: ids,
+        result,
+        reviewDigest: input.reviewDigest,
+        reviewSnapshot,
+      });
       return result;
     });
   }

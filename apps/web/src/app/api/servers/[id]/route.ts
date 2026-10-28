@@ -19,11 +19,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -41,72 +37,57 @@ const serverUpdateSchema = updateServerSchema
     "At least one editable field is required",
   );
 
-export const PATCH = withBrowserMutation(async (
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) => {
-  const context = createRequestLogContext(request);
-  try {
-    const token =
-      request.cookies.get("nexus_session")?.value;
-    const user = await authService.getSession(token);
-    if (!user) {
-      return json(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
-    }
+export const PATCH = withBrowserMutation(
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    const context = createRequestLogContext(request);
+    try {
+      const token = request.cookies.get("nexus_session")?.value;
+      const user = await authService.getSession(token);
+      if (!user) {
+        return json(context, { error: "Authentication required" }, 401);
+      }
 
-    const rateLimit = await consumeRateLimit(
-      "serverMutation",
-      user.id,
-    );
-    if (!rateLimit.success) {
-      return json(
-        context,
-        { error: "Server update limit exceeded" },
-        429,
-      );
-    }
+      const rateLimit = await consumeRateLimit("serverMutation", user.id);
+      if (!rateLimit.success) {
+        return json(context, { error: "Server update limit exceeded" }, 429);
+      }
 
-    requireServerJsonContentType(request);
-    const parsed = serverUpdateSchema.safeParse(
-      await readBoundedJson(request),
-    );
-    if (!parsed.success) {
+      requireServerJsonContentType(request);
+      const parsed = serverUpdateSchema.safeParse(await readBoundedJson(request));
+      if (!parsed.success) {
+        return json(
+          context,
+          {
+            error: "Invalid server details",
+            details: parsed.error.format(),
+          },
+          400,
+        );
+      }
+
+      const { id } = await params;
+      const { expectedUpdatedAt, ...updates } = parsed.data;
+      const server = expectedUpdatedAt
+        ? await serverService.updateServer(id, updates, user, new Date(expectedUpdatedAt))
+        : await serverService.updateServer(id, updates, user);
+      return json(context, { server });
+    } catch (error: unknown) {
+      const appError = error instanceof AppError ? error : null;
+      logRequestEvent({
+        level: "error",
+        event: "server.update_failed",
+        context,
+        status: appError?.statusCode || 500,
+        error,
+      });
       return json(
         context,
         {
-          error: "Invalid server details",
-          details: parsed.error.format(),
+          error: appError?.message || "Could not update server",
+          ...(appError ? { code: appError.code } : {}),
         },
-        400,
+        appError?.statusCode || 500,
       );
     }
-
-    const { id } = await params;
-    const { expectedUpdatedAt, ...updates } = parsed.data;
-    const server = expectedUpdatedAt
-      ? await serverService.updateServer(id, updates, user, new Date(expectedUpdatedAt))
-      : await serverService.updateServer(id, updates, user);
-    return json(context, { server });
-  } catch (error: unknown) {
-    const appError = error instanceof AppError ? error : null;
-    logRequestEvent({
-      level: "error",
-      event: "server.update_failed",
-      context,
-      status: appError?.statusCode || 500,
-      error,
-    });
-    return json(
-      context,
-      {
-        error: appError?.message || "Could not update server",
-        ...(appError ? { code: appError.code } : {}),
-      },
-      appError?.statusCode || 500,
-    );
-  }
-});
+  },
+);

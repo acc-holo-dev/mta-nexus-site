@@ -64,11 +64,7 @@ const mutations = [
   ["developer", developerPatch, developerBody, () => verificationWorkspaceService.updateProfile],
 ] as const;
 
-function request(
-  path: string,
-  body: unknown,
-  headers: Record<string, string> = {},
-) {
+function request(path: string, body: unknown, headers: Record<string, string> = {}) {
   return new NextRequest(`https://nexus.test/api/account/${path}`, {
     method: "PATCH",
     headers: {

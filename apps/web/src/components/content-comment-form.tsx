@@ -31,11 +31,7 @@ export function ContentCommentForm({ slug }: { slug: string }) {
       setText("");
       router.refresh();
     } catch (caught) {
-      setError(
-        caught instanceof Error && caught.message
-          ? caught.message
-          : copy.commentError,
-      );
+      setError(caught instanceof Error && caught.message ? caught.message : copy.commentError);
     } finally {
       setSubmitting(false);
     }
@@ -44,9 +40,7 @@ export function ContentCommentForm({ slug }: { slug: string }) {
   return (
     <form onSubmit={submit} className="space-y-3" aria-busy={submitting}>
       <label className="block space-y-1.5">
-        <span className="font-label text-secondary">
-          {copy.joinDiscussion}
-        </span>
+        <span className="font-label text-secondary">{copy.joinDiscussion}</span>
         <textarea
           value={text}
           onChange={(event) => setText(event.target.value)}
@@ -59,17 +53,10 @@ export function ContentCommentForm({ slug }: { slug: string }) {
         />
       </label>
       <div className="flex flex-wrap items-center gap-3">
-        <Button
-          type="submit"
-          size="sm"
-          isLoading={submitting}
-          disabled={text.trim().length < 2}
-        >
+        <Button type="submit" size="sm" isLoading={submitting} disabled={text.trim().length < 2}>
           {submitting ? copy.publishingComment : copy.publishComment}
         </Button>
-        <span className="font-numeric text-[11px] text-faint">
-          {text.length}/5000
-        </span>
+        <span className="font-numeric text-[11px] text-faint">{text.length}/5000</span>
       </div>
       {error && (
         <p role="alert" className="text-xs text-danger">

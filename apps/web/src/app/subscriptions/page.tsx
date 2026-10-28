@@ -33,8 +33,12 @@ export default async function SubscriptionCatalog({
   return (
     <div className="mx-auto max-w-5xl space-y-6 py-8">
       <h1 className="font-display text-primary">{copy.catalog}</h1>
-      <Link href="/workspace/subscriptions" className="text-sm text-accent underline">{subscriptionsCopy(locale).title}</Link>
-      <Link href="/workspace/subscriptions/reviews" className="text-sm text-accent underline">{planReviewsCopy(locale).history}</Link>
+      <Link href="/workspace/subscriptions" className="text-sm text-accent underline">
+        {subscriptionsCopy(locale).title}
+      </Link>
+      <Link href="/workspace/subscriptions/reviews" className="text-sm text-accent underline">
+        {planReviewsCopy(locale).history}
+      </Link>
       <p
         role="note"
         className="rounded-lg border border-base bg-surface p-4 text-sm text-secondary"
@@ -73,8 +77,28 @@ export default async function SubscriptionCatalog({
               <p className="text-xs text-muted">
                 {copy.revision} {plan.revision} · {plan.slug}
               </p>
-              {plan.price === 0 ? <Link href={`/workspace/subscriptions/activate?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision) })}`} className="block text-accent underline">{subscriptionsCopy(locale).activate}</Link> : <button type="button" disabled className="rounded-md border border-base px-4 py-2 text-sm text-muted">{copy.unavailable}</button>}
-              <Link href={`/workspace/subscriptions/reviews/new?${new URLSearchParams({planId:plan.id,revision:String(plan.revision)})}`} className="block text-sm text-accent underline">{planReviewsCopy(locale).newReview}</Link>
+              {plan.price === 0 ? (
+                <Link
+                  href={`/workspace/subscriptions/activate?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision) })}`}
+                  className="block text-accent underline"
+                >
+                  {subscriptionsCopy(locale).activate}
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="rounded-md border border-base px-4 py-2 text-sm text-muted"
+                >
+                  {copy.unavailable}
+                </button>
+              )}
+              <Link
+                href={`/workspace/subscriptions/reviews/new?${new URLSearchParams({ planId: plan.id, revision: String(plan.revision) })}`}
+                className="block text-sm text-accent underline"
+              >
+                {planReviewsCopy(locale).newReview}
+              </Link>
             </li>
           ))}
         </ul>

@@ -86,8 +86,6 @@ describe("product dependency resolution model", () => {
     );
 
     expect(source.dependencies[0]?.status).toBe("available");
-    expect(JSON.stringify(source)).not.toMatch(
-      /compatible|verified|guaranteed/iu,
-    );
+    expect(JSON.stringify(source)).not.toMatch(/compatible|verified|guaranteed/iu);
   });
 });

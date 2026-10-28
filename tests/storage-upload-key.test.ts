@@ -98,7 +98,9 @@ it("opens a download once, without an existence preflight race", async () => {
     userId: "usr_owner",
   });
   const provider = state.provider!;
-  const preflight = vi.spyOn(provider, "exists").mockRejectedValue(new Error("exists must not be called"));
+  const preflight = vi
+    .spyOn(provider, "exists")
+    .mockRejectedValue(new Error("exists must not be called"));
   const opened = await service.getDownloadStream(asset.key);
   expect(preflight).not.toHaveBeenCalled();
   expect(opened.meta.sha256Hash).toBe(asset.sha256Hash);
@@ -108,8 +110,9 @@ it("opens a download once, without an existence preflight race", async () => {
 });
 
 it("maps missing bytes directly from open to a missing asset error", async () => {
-  await expect(service.getDownloadStream("assets/usr_owner/missing.zip"))
-    .rejects.toMatchObject({ code: "VALIDATION_FAILED" });
+  await expect(service.getDownloadStream("assets/usr_owner/missing.zip")).rejects.toMatchObject({
+    code: "VALIDATION_FAILED",
+  });
 });
 
 it.each([".luac", ".dff", ".txd", ".col", ".png", ".jpg", ".jpeg", ".webp", ".json", ".map"])(
@@ -144,8 +147,9 @@ it("destroys an opened provider stream when cancellation wins the return race", 
       meta: { key, sizeBytes: 15, sha256Hash: "a".repeat(64) },
     };
   });
-  await expect(service.getDownloadStream(key, controller.signal))
-    .rejects.toMatchObject({ name: "AbortError" });
+  await expect(service.getDownloadStream(key, controller.signal)).rejects.toMatchObject({
+    name: "AbortError",
+  });
   expect(get).toHaveBeenCalledOnce();
   expect(stream.destroyed).toBe(true);
 });
@@ -167,12 +171,14 @@ it.each(["key", "sizeBytes", "sha256Hash"] as const)(
       }
     });
 
-    await expect(service.uploadAsset({
-      data: Buffer.from("asset integrity check"),
-      fileName: "asset.zip",
-      mimeType: "application/zip",
-      userId: "usr_owner",
-    })).rejects.toMatchObject({ code: "VALIDATION_FAILED" });
+    await expect(
+      service.uploadAsset({
+        data: Buffer.from("asset integrity check"),
+        fileName: "asset.zip",
+        mimeType: "application/zip",
+        userId: "usr_owner",
+      }),
+    ).rejects.toMatchObject({ code: "VALIDATION_FAILED" });
     expect(await readdir(join(root, "assets/usr_owner"))).toEqual([]);
   },
 );
@@ -201,8 +207,9 @@ it.each(["key", "sizeBytes", "sha256Hash"] as const)(
       return { ...result, meta: { ...result.meta, sha256Hash: "not-a-digest" } };
     });
 
-    await expect(service.getDownloadStream(asset.key))
-      .rejects.toMatchObject({ code: "VALIDATION_FAILED" });
+    await expect(service.getDownloadStream(asset.key)).rejects.toMatchObject({
+      code: "VALIDATION_FAILED",
+    });
     expect(openedStream).toBeDefined();
     expect(openedStream?.destroyed).toBe(true);
   },

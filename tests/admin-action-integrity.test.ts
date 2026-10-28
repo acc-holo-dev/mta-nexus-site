@@ -10,7 +10,9 @@ const product = vi.hoisted(() => ({
 }));
 
 const moderation = vi.hoisted(() => ({ command: vi.fn() }));
-vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({ resourceModerationService: moderation }));
+vi.mock("../apps/web/src/lib/services/resource-release-control-service", () => ({
+  resourceModerationService: moderation,
+}));
 
 const report = vi.hoisted(() => ({
   resolve: vi.fn(),
@@ -18,9 +20,7 @@ const report = vi.hoisted(() => ({
 }));
 
 vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>(
-    "next/server",
-  );
+  const actual = await vi.importActual<typeof import("next/server")>("next/server");
   return {
     ...actual,
     after: vi.fn(),
@@ -51,12 +51,9 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
   },
 }));
 
-vi.mock(
-  "../apps/web/src/lib/services/server-follow-notification-service",
-  () => ({
-    notifyServerFollowersOfPublishedContent: vi.fn(),
-  }),
-);
+vi.mock("../apps/web/src/lib/services/server-follow-notification-service", () => ({
+  notifyServerFollowersOfPublishedContent: vi.fn(),
+}));
 
 vi.mock("@nexus/db", () => ({
   productRepository: product,
@@ -81,11 +78,7 @@ function expectPrivate(response: Response) {
   expect(response.headers.get("Vary")).toBe("Cookie");
 }
 
-function request(
-  targetType: "product" | "report",
-  targetId: string,
-  action: string,
-) {
+function request(targetType: "product" | "report", targetId: string, action: string) {
   return new NextRequest("http://nexus.test/api/admin/actions", {
     method: "POST",
     headers: browserMutationHeaders({
@@ -109,9 +102,7 @@ describe("moderation action integrity", () => {
     moderation.command.mockReset().mockRejectedValue(new NotFoundError("Product", "prd_missing"));
     product.updateWithAudit.mockResolvedValue(null);
     product.suspendPublished.mockResolvedValue(null);
-    product.restoreSuspendedWithPublishedBuild.mockResolvedValue(
-      "not_found",
-    );
+    product.restoreSuspendedWithPublishedBuild.mockResolvedValue("not_found");
     product.findById.mockResolvedValue(null);
     report.resolve.mockResolvedValue(false);
     report.findById.mockResolvedValue(null);
@@ -122,14 +113,20 @@ describe("moderation action integrity", () => {
 
   it("requires a revision and refuses a cross-site legacy restore", async () => {
     for (const crossSite of [false, true]) {
-      const headers = new Headers(
-        browserMutationHeaders({ "content-type": "application/json" }),
-      );
+      const headers = new Headers(browserMutationHeaders({ "content-type": "application/json" }));
       if (crossSite) headers.set("sec-fetch-site", "cross-site");
-      const response = await POST(new NextRequest("http://nexus.test/api/admin/actions", {
-        method: "POST", headers,
-        body: JSON.stringify({ targetType: "product", targetId: "prd_a", action: "restore", notes: "Reviewed evidence" }),
-      }));
+      const response = await POST(
+        new NextRequest("http://nexus.test/api/admin/actions", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            targetType: "product",
+            targetId: "prd_a",
+            action: "restore",
+            notes: "Reviewed evidence",
+          }),
+        }),
+      );
       expect(response.status).toBe(crossSite ? 403 : 400);
       if (crossSite) {
         expect(await response.json()).toMatchObject({ code: "CSRF_REJECTED" });
@@ -144,9 +141,7 @@ describe("moderation action integrity", () => {
   it.each(["feature", "unfeature"] as const)(
     "returns 404 when product %s cannot atomically update the target",
     async (action) => {
-      const response = await POST(
-        request("product", "prd_missing", action),
-      );
+      const response = await POST(request("product", "prd_missing", action));
 
       expect(response.status).toBe(404);
       expectPrivate(response);
@@ -168,17 +163,15 @@ describe("moderation action integrity", () => {
   );
 
   it("distinguishes a missing product from a suspend compare-and-set loss", async () => {
-    const missing = await POST(
-      request("product", "prd_missing", "suspend"),
-    );
+    const missing = await POST(request("product", "prd_missing", "suspend"));
     expect(missing.status).toBe(404);
     expectPrivate(missing);
     expect(await missing.json()).toMatchObject({ code: "NOT_FOUND" });
 
-    moderation.command.mockRejectedValueOnce(new AppError("Resource state changed", 409, "PRODUCT_STATE_CHANGED"));
-    const stale = await POST(
-      request("product", "prd_existing", "suspend"),
+    moderation.command.mockRejectedValueOnce(
+      new AppError("Resource state changed", 409, "PRODUCT_STATE_CHANGED"),
     );
+    const stale = await POST(request("product", "prd_existing", "suspend"));
     expect(stale.status).toBe(409);
     expectPrivate(stale);
     expect(await stale.json()).toMatchObject({
@@ -187,24 +180,25 @@ describe("moderation action integrity", () => {
   });
 
   it("returns 404 when restore reports that the product does not exist", async () => {
-    const response = await POST(
-      request("product", "prd_missing", "restore"),
-    );
+    const response = await POST(request("product", "prd_missing", "restore"));
 
     expect(response.status).toBe(404);
     expect(await response.json()).toMatchObject({ code: "NOT_FOUND" });
     expect(moderation.command).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "usr_mod" }), "prd_missing",
-      { action: "release", reason: "Moderation evidence.", expectedUpdatedAt: "2026-10-10T12:00:00.000Z" },
+      expect.objectContaining({ id: "usr_mod" }),
+      "prd_missing",
+      {
+        action: "release",
+        reason: "Moderation evidence.",
+        expectedUpdatedAt: "2026-10-10T12:00:00.000Z",
+      },
       "test-session",
     );
     expect(product.restoreSuspendedWithPublishedBuild).not.toHaveBeenCalled();
   });
 
   it("distinguishes a missing report from a moderation race", async () => {
-    const missing = await POST(
-      request("report", "rpt_missing", "resolve"),
-    );
+    const missing = await POST(request("report", "rpt_missing", "resolve"));
     expect(missing.status).toBe(404);
     expect(await missing.json()).toEqual({
       error: "Report not found",
@@ -214,9 +208,7 @@ describe("moderation action integrity", () => {
       id: "rpt_existing",
       status: "open",
     });
-    const stale = await POST(
-      request("report", "rpt_existing", "dismiss"),
-    );
+    const stale = await POST(request("report", "rpt_existing", "dismiss"));
     expect(stale.status).toBe(409);
     expect(await stale.json()).toMatchObject({
       code: "REPORT_STATE_CHANGED",

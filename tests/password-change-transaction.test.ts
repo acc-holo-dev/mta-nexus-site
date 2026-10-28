@@ -6,8 +6,12 @@ import { authService } from "../apps/web/src/lib/services/auth-service";
 const oldPassword = "Synthetic-old-password-005b!";
 const nextPassword = "Synthetic-new-password-005b!";
 const audit = (userId: string, id = generateId("aud")) => ({
-  id, actorId: userId, actorType: "user" as const,
-  action: "user.password_changed", targetId: userId, targetType: "user",
+  id,
+  actorId: userId,
+  actorType: "user" as const,
+  action: "user.password_changed",
+  targetId: userId,
+  targetType: "user",
 });
 async function account() {
   const username = `pw_${generateId("usr").slice(-18)}`;
@@ -23,8 +27,14 @@ async function account() {
 describe("password change transaction", () => {
   it("wrong current password preserves credentials and both sessions", async () => {
     const a = await account();
-    await expect(authService.changePassword({ userId: a.user.id, currentToken: a.token,
-      currentPassword: "Incorrect-current-password", newPassword: nextPassword })).rejects.toThrow("Current password is incorrect");
+    await expect(
+      authService.changePassword({
+        userId: a.user.id,
+        currentToken: a.token,
+        currentPassword: "Incorrect-current-password",
+        newPassword: nextPassword,
+      }),
+    ).rejects.toThrow("Current password is incorrect");
     expect((await userRepository.findByEmail(a.input.email))?.passwordHash).toBe(a.hash);
     expect((await authService.getSession(a.token))?.id).toBe(a.user.id);
     expect((await authService.getSession(a.otherToken))?.id).toBe(a.user.id);
@@ -34,8 +44,12 @@ describe("password change transaction", () => {
     const a = await account();
     const before = await sessionRepository.findValidSession(a.token);
     if (!before) throw new Error("Expected current session fixture");
-    const result = await authService.changePassword({ userId: a.user.id, currentToken: a.token,
-      currentPassword: oldPassword, newPassword: nextPassword });
+    const result = await authService.changePassword({
+      userId: a.user.id,
+      currentToken: a.token,
+      currentPassword: oldPassword,
+      newPassword: nextPassword,
+    });
     expect(result.revokedSessionCount).toBe(1);
     expect(result.token !== a.token).toBe(true);
     expect(result.expiresAt.getTime()).toBe(new Date(before.session.expiresAt).getTime());
@@ -43,14 +57,22 @@ describe("password change transaction", () => {
     expect(await authService.getSession(a.otherToken)).toBeNull();
     expect((await authService.getSession(result.token))?.id).toBe(a.user.id);
     await expect(authService.login(a.input)).rejects.toThrow("Invalid email or password");
-    expect((await authService.login({ ...a.input, password: nextPassword })).user.id).toBe(a.user.id);
+    expect((await authService.login({ ...a.input, password: nextPassword })).user.id).toBe(
+      a.user.id,
+    );
   });
 
   it("does not accept another account's session even with the victim's password", async () => {
     const a = await account();
     const b = await account();
-    await expect(authService.changePassword({ userId: a.user.id, currentToken: b.token,
-      currentPassword: oldPassword, newPassword: nextPassword })).rejects.toThrow("Authentication required");
+    await expect(
+      authService.changePassword({
+        userId: a.user.id,
+        currentToken: b.token,
+        currentPassword: oldPassword,
+        newPassword: nextPassword,
+      }),
+    ).rejects.toThrow("Authentication required");
     expect((await userRepository.findByEmail(a.input.email))?.passwordHash).toBe(a.hash);
     expect((await authService.getSession(a.otherToken))?.id).toBe(a.user.id);
     expect((await authService.getSession(b.token))?.id).toBe(b.user.id);
@@ -61,9 +83,16 @@ describe("password change transaction", () => {
     const existing = audit(a.user.id);
     await auditRepository.record(existing);
     const nextToken = generateSessionToken();
-    await expect(authRepository.changePassword({ userId: a.user.id,
-      expectedPasswordHash: a.hash, passwordHash: await hashPassword(nextPassword),
-      currentToken: a.token, nextToken, audit: existing })).rejects.toThrow();
+    await expect(
+      authRepository.changePassword({
+        userId: a.user.id,
+        expectedPasswordHash: a.hash,
+        passwordHash: await hashPassword(nextPassword),
+        currentToken: a.token,
+        nextToken,
+        audit: existing,
+      }),
+    ).rejects.toThrow();
     expect((await userRepository.findByEmail(a.input.email))?.passwordHash).toBe(a.hash);
     expect((await authService.getSession(a.token))?.id).toBe(a.user.id);
     expect((await authService.getSession(a.otherToken))?.id).toBe(a.user.id);
@@ -75,10 +104,18 @@ describe("password change transaction", () => {
     const tokens = [generateSessionToken(), generateSessionToken()];
     const passwords = [nextPassword, "Different-next-password-005b!"];
     const hashes = await Promise.all(passwords.map(hashPassword));
-    const results = await Promise.allSettled(tokens.map((nextToken, i) => authRepository.changePassword({
-      userId: a.user.id, expectedPasswordHash: a.hash, passwordHash: hashes[i],
-      currentToken: i === 0 ? a.token : a.otherToken, nextToken, audit: audit(a.user.id),
-    })));
+    const results = await Promise.allSettled(
+      tokens.map((nextToken, i) =>
+        authRepository.changePassword({
+          userId: a.user.id,
+          expectedPasswordHash: a.hash,
+          passwordHash: hashes[i],
+          currentToken: i === 0 ? a.token : a.otherToken,
+          nextToken,
+          audit: audit(a.user.id),
+        }),
+      ),
+    );
     expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
     expect(results.filter((r) => r.status === "rejected")).toHaveLength(1);
     const winner = results.findIndex((r) => r.status === "fulfilled");
@@ -93,12 +130,25 @@ describe("password change transaction", () => {
 
   it("rejects a login commit whose verified hash became obsolete", async () => {
     const a = await account();
-    await authService.changePassword({ userId: a.user.id, currentToken: a.token,
-      currentPassword: oldPassword, newPassword: nextPassword });
+    await authService.changePassword({
+      userId: a.user.id,
+      currentToken: a.token,
+      currentPassword: oldPassword,
+      newPassword: nextPassword,
+    });
     const lateToken = generateSessionToken();
-    await expect(authRepository.createLoginSession({ id: generateId("ses"), userId: a.user.id,
-      token: lateToken, expiresAt: new Date(Date.now() + 60_000) },
-      { ...audit(a.user.id), action: "user.logged_in" }, a.hash)).rejects.toThrow("Invalid email or password");
+    await expect(
+      authRepository.createLoginSession(
+        {
+          id: generateId("ses"),
+          userId: a.user.id,
+          token: lateToken,
+          expiresAt: new Date(Date.now() + 60_000),
+        },
+        { ...audit(a.user.id), action: "user.logged_in" },
+        a.hash,
+      ),
+    ).rejects.toThrow("Invalid email or password");
     expect(await authService.getSession(lateToken)).toBeNull();
   });
 });

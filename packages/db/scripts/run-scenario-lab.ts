@@ -6,9 +6,7 @@ import {
 
 function printCatalog() {
   process.stdout.write(
-    `${scenarioCatalog
-      .map((scenario) => `${scenario.id}\t${scenario.description}`)
-      .join("\n")}\n`,
+    `${scenarioCatalog.map((scenario) => `${scenario.id}\t${scenario.description}`).join("\n")}\n`,
   );
 }
 
@@ -31,9 +29,7 @@ async function main() {
 
   const { applyScenario, cleanupScenario } = await import("./scenario-lab-db.ts");
   const result =
-    command === "apply"
-      ? await applyScenario(scenario)
-      : await cleanupScenario(scenario);
+    command === "apply" ? await applyScenario(scenario) : await cleanupScenario(scenario);
 
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
 }

@@ -2,10 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const css = readFileSync(
-  resolve(process.cwd(), "apps/web/src/app/globals.css"),
-  "utf8",
-);
+const css = readFileSync(resolve(process.cwd(), "apps/web/src/app/globals.css"), "utf8");
 
 function block(pattern: RegExp): string {
   const match = css.match(pattern);
@@ -14,24 +11,22 @@ function block(pattern: RegExp): string {
 }
 
 function token(source: string, name: string): string {
-  const match = source.match(
-    new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`),
-  );
+  const match = source.match(new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})\\s*;`));
   expect(match?.[1], name).toBeTruthy();
   return match?.[1] ?? "#000000";
 }
 
 function rgb(hex: string): [number, number, number] {
-  return [1, 3, 5].map((offset) =>
-    Number.parseInt(hex.slice(offset, offset + 2), 16) / 255,
-  ) as [number, number, number];
+  return [1, 3, 5].map((offset) => Number.parseInt(hex.slice(offset, offset + 2), 16) / 255) as [
+    number,
+    number,
+    number,
+  ];
 }
 
 function luminance(hex: string): number {
   const [r, g, b] = rgb(hex).map((channel) =>
-    channel <= 0.04045
-      ? channel / 12.92
-      : ((channel + 0.055) / 1.055) ** 2.4,
+    channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
   );
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
@@ -90,10 +85,7 @@ describe("design token contrast", () => {
 
     it(`${theme} solid accent supports white labels and visible focus`, () => {
       const accent = token(source, "--nexus-accent");
-      expect(
-        contrast("#ffffff", accent),
-        "white on solid accent",
-      ).toBeGreaterThanOrEqual(4.5);
+      expect(contrast("#ffffff", accent), "white on solid accent").toBeGreaterThanOrEqual(4.5);
 
       for (const surfaceToken of surfaceTokens) {
         expect(

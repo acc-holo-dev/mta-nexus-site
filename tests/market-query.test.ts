@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { MARKET_PAGE_SIZE, marketHref, parseMarketPage, parseMarketQuery } from "../apps/web/src/lib/market-query";
+import {
+  MARKET_PAGE_SIZE,
+  marketHref,
+  parseMarketPage,
+  parseMarketQuery,
+} from "../apps/web/src/lib/market-query";
 
 describe("free resource catalog navigation", () => {
   it("accepts every visible category, including API resources", () => {
-    expect(parseMarketQuery({ type: "api", sort: "newest", page: "5", q: "  MTA script  " }))
-      .toEqual({ type: "api", sort: "newest", page: 5, query: "MTA script" });
+    expect(
+      parseMarketQuery({ type: "api", sort: "newest", page: "5", q: "  MTA script  " }),
+    ).toEqual({ type: "api", sort: "newest", page: 5, query: "MTA script" });
     expect(parseMarketQuery({ type: "service", sort: "rating" }).type).toBe("service");
   });
 
@@ -30,8 +36,7 @@ describe("free resource catalog navigation", () => {
     expect(parsed.searchParams.get("q")).toBe("100%_ MTA");
     expect(parsed.searchParams.get("page")).toBe("4");
     expect(parsed.searchParams.get("sort")).toBe("rating");
-    expect(marketHref({ type: "all", sort: "popular", query: "", page: 1 }))
-      .not.toContain("page=");
+    expect(marketHref({ type: "all", sort: "popular", query: "", page: 1 })).not.toContain("page=");
     expect(MARKET_PAGE_SIZE).toBeLessThan(100);
   });
 });

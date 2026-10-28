@@ -144,25 +144,21 @@ it("removes private server affiliations and stops matching a revoked public serv
     author = await actor();
   const serverId = `srv_feed_${randomUUID()}`;
   serverIds.push(serverId);
-  await db
-    .insert(servers)
-    .values({
-      id: serverId,
-      name: "Private marker",
-      slug: `feed-${randomUUID()}`,
-      ipAddress: `feed-${randomUUID()}.test`,
-      port: 22003,
-      visibility: "public",
-    });
+  await db.insert(servers).values({
+    id: serverId,
+    name: "Private marker",
+    slug: `feed-${randomUUID()}`,
+    ipAddress: `feed-${randomUUID()}.test`,
+    port: 22003,
+    visibility: "public",
+  });
   await publication(author.id, { serverId });
-  await db
-    .insert(follows)
-    .values({
-      id: `fol_${randomUUID()}`,
-      followerId: follower.id,
-      targetType: "server",
-      targetId: serverId,
-    });
+  await db.insert(follows).values({
+    id: `fol_${randomUUID()}`,
+    followerId: follower.id,
+    targetType: "server",
+    targetId: serverId,
+  });
   expect((await feed.page({ kind: "following", actorId: follower.id })).items).toHaveLength(1);
   await db.update(servers).set({ visibility: "private" }).where(eq(servers.id, serverId));
   expect((await feed.page({ kind: "following", actorId: follower.id })).items).toHaveLength(0);
@@ -213,16 +209,14 @@ it("denies revoked moderator permissions and rolls back writes when audit insert
     management.mutate(command(item, message, moderator.id, { reason: "Spam" })),
   ).rejects.toMatchObject({ code: "FORBIDDEN" });
   const auditId = `aud_feed_${randomUUID()}`;
-  await db
-    .insert(auditEvents)
-    .values({
-      id: auditId,
-      actorId: author.id,
-      actorType: "user",
-      action: "fixture",
-      targetType: "comment",
-      targetId: message.id,
-    });
+  await db.insert(auditEvents).values({
+    id: auditId,
+    actorId: author.id,
+    actorType: "user",
+    action: "fixture",
+    targetType: "comment",
+    targetId: message.id,
+  });
   await expect(
     management.mutate(command(item, message, author.id, { text: "Should roll back", auditId })),
   ).rejects.toThrow();

@@ -121,12 +121,7 @@ export class SessionRepository {
   async deleteOtherSessions(userId: string, currentToken: string): Promise<number> {
     const rows = await db
       .delete(sessions)
-      .where(
-        and(
-          eq(sessions.userId, userId),
-          ne(sessions.token, digestSessionToken(currentToken))
-        )
-      )
+      .where(and(eq(sessions.userId, userId), ne(sessions.token, digestSessionToken(currentToken))))
       .returning({ id: sessions.id });
     return rows.length;
   }

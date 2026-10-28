@@ -1,6 +1,12 @@
 import { sql, type SQL } from "drizzle-orm";
 import { db } from "../client";
-import { builds, entitlements, licenses, products, resourceLibrarySelections as selections } from "../schema";
+import {
+  builds,
+  entitlements,
+  licenses,
+  products,
+  resourceLibrarySelections as selections,
+} from "../schema";
 import { trustedCleanScanCondition, safePublishedBuildCondition } from "./build-safety";
 import { libraryPageBounds, USER_LIBRARY_PAGE_SIZE } from "./library-page-bounds";
 
@@ -70,7 +76,7 @@ export function effectiveUserDownloadSources(userId: string, now: Date | SQL) {
         GROUP BY grant_rows.resource_id
       )
     `;
- }
+}
 
 export class UserLibraryRepository {
   async pageByUser(
@@ -134,11 +140,12 @@ export class UserLibraryRepository {
     if (!total) {
       return { items: [], ...bounds, total, counts, filter: normalizedFilter };
     }
-    const filterClause = normalizedFilter === "ready"
-      ? sql`WHERE ${ready}`
-      : normalizedFilter === "unavailable"
-        ? sql`WHERE NOT (${ready})`
-        : sql``;
+    const filterClause =
+      normalizedFilter === "ready"
+        ? sql`WHERE ${ready}`
+        : normalizedFilter === "unavailable"
+          ? sql`WHERE NOT (${ready})`
+          : sql``;
     const rows = await db.execute<ItemRow>(sql`
       ${sources}
       SELECT owned.resource_id AS "resourceId",
@@ -155,7 +162,7 @@ export class UserLibraryRepository {
       LIMIT ${bounds.pageSize} OFFSET ${bounds.offset}
     `);
     return {
-      items: rows.map(row => ({
+      items: rows.map((row) => ({
         resourceId: row.resourceId,
         // postgres.js may return timestamptz as string from raw sql execute.
         addedAt: row.addedAt instanceof Date ? row.addedAt : new Date(row.addedAt),
@@ -163,7 +170,7 @@ export class UserLibraryRepository {
         slug: row.slug,
         version: row.version,
         downloadable: row.downloadable === true,
-        buildId: row.downloadable === true ? row.buildId ?? null : null,
+        buildId: row.downloadable === true ? (row.buildId ?? null) : null,
         selectionMode: row.selectionMode === "fixed" ? "fixed" : "latest",
       })),
       ...bounds,

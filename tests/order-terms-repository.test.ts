@@ -163,7 +163,14 @@ it("creates only validated pending orders from locked catalog terms and safe bui
 it("stale catalog economics and missing approved releases refuse creation before inserts", async () => {
   state.rows = [[], [], [], [["prd_a", "published", 99, "USD", "single_server"]]];
   await expect(orders.create(input)).rejects.toMatchObject({ code: "ORDER_CATALOG_CHANGED" });
-  state.rows = [[], [], [], [["prd_a", "published", 100, "USD", "single_server"]], [["usr_buyer"]], []];
+  state.rows = [
+    [],
+    [],
+    [],
+    [["prd_a", "published", 100, "USD", "single_server"]],
+    [["usr_buyer"]],
+    [],
+  ];
   await expect(orders.create(input)).rejects.toMatchObject({ code: "ORDER_CATALOG_CHANGED" });
   expect(state.queries.some((q) => q.sql.startsWith("insert"))).toBe(false);
 });

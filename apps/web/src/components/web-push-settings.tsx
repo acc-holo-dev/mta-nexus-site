@@ -26,10 +26,7 @@ export function parsePushServerState(value: unknown): PushServerState | null {
   if (
     typeof record.configured !== "boolean" ||
     typeof record.subscribed !== "boolean" ||
-    !(
-      record.publicKey === null ||
-      typeof record.publicKey === "string"
-    )
+    !(record.publicKey === null || typeof record.publicKey === "string")
   ) {
     return null;
   }
@@ -40,9 +37,7 @@ export function parsePushServerState(value: unknown): PushServerState | null {
   };
 }
 
-export function applicationServerKey(
-  value: string,
-): Uint8Array<ArrayBuffer> {
+export function applicationServerKey(value: string): Uint8Array<ArrayBuffer> {
   const padding = "=".repeat((4 - (value.length % 4)) % 4);
   const base64 = (value + padding).replace(/-/g, "+").replace(/_/g, "/");
   const raw = atob(base64);
@@ -60,16 +55,12 @@ export function matchesApplicationServerKey(
   return actual.every((byte, index) => byte === expected[index]);
 }
 
-export async function endpointFingerprint(
-  endpoint: string,
-): Promise<string> {
+export async function endpointFingerprint(endpoint: string): Promise<string> {
   const digest = await globalThis.crypto.subtle.digest(
     "SHA-256",
     new TextEncoder().encode(endpoint),
   );
-  return Array.from(new Uint8Array(digest), (byte) =>
-    byte.toString(16).padStart(2, "0"),
-  ).join("");
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 async function deleteStoredEndpoint(endpoint: string): Promise<boolean> {
@@ -86,9 +77,7 @@ async function deleteStoredEndpoint(endpoint: string): Promise<boolean> {
 }
 
 async function readPushState(endpoint?: string) {
-  const endpointHash = endpoint
-    ? await endpointFingerprint(endpoint)
-    : null;
+  const endpointHash = endpoint ? await endpointFingerprint(endpoint) : null;
   const url = endpointHash
     ? `/api/notifications/push?endpointHash=${endpointHash}`
     : "/api/notifications/push";
@@ -115,15 +104,17 @@ export function WebPushSettings() {
   useEffect(() => {
     let active = true;
     async function load() {
-      if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+      if (
+        !("serviceWorker" in navigator) ||
+        !("PushManager" in window) ||
+        !("Notification" in window)
+      ) {
         if (active) setStatus("unsupported");
         return;
       }
       try {
-        const registration =
-          await navigator.serviceWorker.getRegistration("/");
-        const localSubscription =
-          await registration?.pushManager.getSubscription();
+        const registration = await navigator.serviceWorker.getRegistration("/");
+        const localSubscription = await registration?.pushManager.getSubscription();
         const state = await readPushState(localSubscription?.endpoint);
         if (!active) return;
         setPublicKey(state.publicKey);
@@ -142,24 +133,20 @@ export function WebPushSettings() {
             state.publicKey,
           )
         ) {
-          await deleteStoredEndpoint(localSubscription.endpoint).catch(
-            () => false,
-          );
+          await deleteStoredEndpoint(localSubscription.endpoint).catch(() => false);
           await localSubscription.unsubscribe().catch(() => false);
           if (active) setStatus("disabled");
           return;
         }
-        setStatus(
-          state.subscribed && localSubscription
-            ? "enabled"
-            : "disabled",
-        );
+        setStatus(state.subscribed && localSubscription ? "enabled" : "disabled");
       } catch {
         if (active) setStatus("error");
       }
     }
     void load();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, []);
 
   async function enable() {
@@ -175,14 +162,9 @@ export function WebPushSettings() {
       let subscription = await registration.pushManager.getSubscription();
       if (
         subscription &&
-        !matchesApplicationServerKey(
-          subscription.options.applicationServerKey,
-          publicKey,
-        )
+        !matchesApplicationServerKey(subscription.options.applicationServerKey, publicKey)
       ) {
-        await deleteStoredEndpoint(subscription.endpoint).catch(
-          () => false,
-        );
+        await deleteStoredEndpoint(subscription.endpoint).catch(() => false);
         await subscription.unsubscribe().catch(() => false);
         subscription = null;
       }
@@ -255,12 +237,17 @@ export function WebPushSettings() {
   }
 
   const description =
-    status === "unsupported" ? copy.webPushUnsupported :
-    status === "unconfigured" ? copy.webPushUnconfigured :
-    status === "denied" ? copy.webPushDenied :
-    status === "enabled" ? copy.webPushEnabled :
-    status === "error" ? copy.webPushError :
-    copy.webPushDescription;
+    status === "unsupported"
+      ? copy.webPushUnsupported
+      : status === "unconfigured"
+        ? copy.webPushUnconfigured
+        : status === "denied"
+          ? copy.webPushDenied
+          : status === "enabled"
+            ? copy.webPushEnabled
+            : status === "error"
+              ? copy.webPushError
+              : copy.webPushDescription;
 
   return (
     <section
@@ -269,10 +256,7 @@ export function WebPushSettings() {
       className="mt-4 flex flex-col gap-3 rounded-lg border border-base bg-inset p-4 sm:flex-row sm:items-center sm:justify-between"
     >
       <div className="min-w-0">
-        <h3
-          id={titleId}
-          className="flex items-center gap-2 text-sm font-semibold text-primary"
-        >
+        <h3 id={titleId} className="flex items-center gap-2 text-sm font-semibold text-primary">
           <BellRing className="h-4 w-4 text-accent" aria-hidden="true" />
           <span>{copy.webPush}</span>
         </h3>

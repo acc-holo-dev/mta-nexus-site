@@ -15,7 +15,10 @@ vi.mock("../apps/web/src/lib/services/resource-media-service", () => ({
   resourceMediaService: {},
 }));
 
-import { PATCH as mediaPatch, POST as mediaUpload } from "../apps/web/src/app/api/products/[id]/media/route";
+import {
+  PATCH as mediaPatch,
+  POST as mediaUpload,
+} from "../apps/web/src/app/api/products/[id]/media/route";
 import { POST as inspectMeta } from "../apps/web/src/app/api/resources/inspect-meta/route";
 
 const context = { params: Promise.resolve({ id: "prd_a" }) };

@@ -78,7 +78,11 @@ export class ProductLifecycleRepository {
               trustedCleanScanCondition(),
             ),
           )
-          .orderBy(sql`case when ${builds.status} = 'draft' then 0 else 1 end`, desc(builds.createdAt), desc(builds.id))
+          .orderBy(
+            sql`case when ${builds.status} = 'draft' then 0 else 1 end`,
+            desc(builds.createdAt),
+            desc(builds.id),
+          )
           .limit(1)
           .for("update");
         if (!candidate)
@@ -104,22 +108,20 @@ export class ProductLifecycleRepository {
         })
         .where(eq(products.id, product.id))
         .returning();
-      await tx
-        .insert(auditEvents)
-        .values({
-          id: input.auditId,
-          actorId: actor.id,
-          actorType: actor.role === "admin" ? "admin" : "user",
-          action: `product.${input.action}`,
-          targetType: "product",
-          targetId: product.id,
-          details: {
-            previousStatus: product.status,
-            status: target,
-            reason: input.reason,
-            submittedBuildId,
-          },
-        });
+      await tx.insert(auditEvents).values({
+        id: input.auditId,
+        actorId: actor.id,
+        actorType: actor.role === "admin" ? "admin" : "user",
+        action: `product.${input.action}`,
+        targetType: "product",
+        targetId: product.id,
+        details: {
+          previousStatus: product.status,
+          status: target,
+          reason: input.reason,
+          submittedBuildId,
+        },
+      });
       return updated as unknown as Product;
     });
   }

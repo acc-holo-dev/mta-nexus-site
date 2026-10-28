@@ -42,9 +42,7 @@ const validResourceInput = {
 function expectPrivate(response: Response) {
   expect(response.headers.get("Cache-Control")).toBe("private, no-store");
   expect(response.headers.get("Vary")).toBe("Cookie");
-  expect(response.headers.get("X-Request-Id")).toMatch(
-    /^[0-9a-f-]{20,}$/u,
-  );
+  expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
 }
 
 function request(body: unknown) {
@@ -125,9 +123,7 @@ describe("resource creation HTTP errors", () => {
     mocks.createProduct.mockRejectedValueOnce(error);
     mocks.getProductPreviewBySlug.mockResolvedValueOnce(existingDraft);
 
-    const response = await POST(
-      request(validResourceInput),
-    );
+    const response = await POST(request(validResourceInput));
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
@@ -141,7 +137,9 @@ describe("resource creation HTTP errors", () => {
   });
 
   it("does not reuse the creator's draft when submitted metadata has changed", async () => {
-    mocks.createProduct.mockRejectedValueOnce({ cause: { code: "23505", constraint_name: "products_slug_unique" } });
+    mocks.createProduct.mockRejectedValueOnce({
+      cause: { code: "23505", constraint_name: "products_slug_unique" },
+    });
     mocks.getProductPreviewBySlug.mockResolvedValueOnce({
       id: "prd_existing_draft",
       ...validResourceInput,
@@ -163,23 +161,25 @@ describe("resource creation HTTP errors", () => {
   });
 
   it("does not reinterpret unrelated unique constraints as a slug conflict", async () => {
-    mocks.createProduct.mockRejectedValueOnce({ cause: { code: "23505", constraint_name: "audit_events_pkey" } });
+    mocks.createProduct.mockRejectedValueOnce({
+      cause: { code: "23505", constraint_name: "audit_events_pkey" },
+    });
     const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
     try {
       const response = await POST(request(validResourceInput));
       expect(response.status).toBe(500);
       expect(await response.json()).toMatchObject({ code: "RESOURCE_CREATION_FAILED" });
       expect(mocks.getProductPreviewBySlug).not.toHaveBeenCalled();
-    } finally { consoleError.mockRestore(); }
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 
   it("does not send internal error details back to the creator", async () => {
     mocks.createProduct.mockRejectedValueOnce(
       new Error("database connection string contains a secret"),
     );
-    const consoleError = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => undefined);
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     try {
       const response = await POST(request(validResourceInput));

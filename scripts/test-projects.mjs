@@ -9,7 +9,8 @@ export function discoverTests(root) {
   const files = [];
   function visit(directory) {
     for (const entry of readdirSync(directory, { withFileTypes: true })) {
-      if (entry.isDirectory() && !ignoredDirectories.has(entry.name)) visit(path.join(directory, entry.name));
+      if (entry.isDirectory() && !ignoredDirectories.has(entry.name))
+        visit(path.join(directory, entry.name));
       else if (entry.isFile() && /\.(test|spec)\.[cm]?[jt]sx?$/.test(entry.name)) {
         files.push(path.relative(root, path.join(directory, entry.name)).split(path.sep).join("/"));
       }
@@ -28,11 +29,34 @@ export function classifyTests(root, files = discoverTests(root)) {
   const parsed = new Map();
   function resolveModule(owner, name) {
     const base = name.startsWith("@nexus/")
-      ? path.join(root, "packages", name.slice(7).split("/")[0], "src", ...name.slice(7).split("/").slice(1))
-      : name.startsWith(".") ? path.resolve(path.dirname(owner), name) : null;
+      ? path.join(
+          root,
+          "packages",
+          name.slice(7).split("/")[0],
+          "src",
+          ...name.slice(7).split("/").slice(1),
+        )
+      : name.startsWith(".")
+        ? path.resolve(path.dirname(owner), name)
+        : null;
     if (!base) return null;
-    return [base, ...[".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", "/index.ts", "/index.tsx", "/index.js"].map((extension) => base + extension)]
-      .find((candidate) => existsSync(candidate) && /\.[cm]?[jt]sx?$/.test(candidate)) ?? null;
+    return (
+      [
+        base,
+        ...[
+          ".ts",
+          ".tsx",
+          ".mts",
+          ".cts",
+          ".js",
+          ".jsx",
+          ".mjs",
+          "/index.ts",
+          "/index.tsx",
+          "/index.js",
+        ].map((extension) => base + extension),
+      ].find((candidate) => existsSync(candidate) && /\.[cm]?[jt]sx?$/.test(candidate)) ?? null
+    );
   }
   function inspect(file) {
     if (parsed.has(file)) return parsed.get(file);
@@ -51,20 +75,27 @@ export function classifyTests(root, files = discoverTests(root)) {
     const mocks = new Set();
     const actual = new Set();
     let unknownImport = false;
-    const literal = node => node?.type === "StringLiteral" ? node.value : null;
-    const importCall = node => node?.type === "CallExpression" && (
-      node.callee.type === "Import" || (node.callee.type === "Identifier" && node.callee.value === "require")
-    );
+    const literal = (node) => (node?.type === "StringLiteral" ? node.value : null);
+    const importCall = (node) =>
+      node?.type === "CallExpression" &&
+      (node.callee.type === "Import" ||
+        (node.callee.type === "Identifier" && node.callee.value === "require"));
     function visit(node) {
       if (!node || typeof node !== "object") return;
-      if (Array.isArray(node)) { for (const child of node) visit(child); return; }
+      if (Array.isArray(node)) {
+        for (const child of node) visit(child);
+        return;
+      }
       // Type queries such as typeof import("@nexus/db") never execute.
       if (node.type === "TsImportType") return;
       if (node.type === "TsImportEqualsDeclaration") {
-        if (!node.isTypeOnly && node.moduleRef.type === "TsExternalModuleReference") imports.push(node.moduleRef.expression.value);
+        if (!node.isTypeOnly && node.moduleRef.type === "TsExternalModuleReference")
+          imports.push(node.moduleRef.expression.value);
         return;
       }
-      if (["ImportDeclaration", "ExportNamedDeclaration", "ExportAllDeclaration"].includes(node.type)) {
+      if (
+        ["ImportDeclaration", "ExportNamedDeclaration", "ExportAllDeclaration"].includes(node.type)
+      ) {
         if (node.source && !node.typeOnly) imports.push(node.source.value);
         return;
       }
@@ -74,24 +105,40 @@ export function classifyTests(root, files = discoverTests(root)) {
         else imports.push(name);
       }
       const callee = node.type === "CallExpression" ? node.callee : null;
-      if (callee?.type === "MemberExpression" && callee.object.type === "Identifier" && callee.object.value === "vi") {
-        const method = callee.property.type === "Identifier" ? callee.property.value : literal(callee.property.expression);
+      if (
+        callee?.type === "MemberExpression" &&
+        callee.object.type === "Identifier" &&
+        callee.object.value === "vi"
+      ) {
+        const method =
+          callee.property.type === "Identifier"
+            ? callee.property.value
+            : literal(callee.property.expression);
         if (method === null) unknownImport = true;
         if (["mock", "doMock", "importActual", "unmock", "doUnmock"].includes(method)) {
           const argument = node.arguments[0]?.expression;
           // Vitest strips the dynamic import in vi.mock(import("..."), factory).
-          const name = method === "mock" && argument?.type === "CallExpression" && argument.callee.type === "Import"
-            ? literal(argument.arguments[0]?.expression) : literal(argument);
+          const name =
+            method === "mock" &&
+            argument?.type === "CallExpression" &&
+            argument.callee.type === "Import"
+              ? literal(argument.arguments[0]?.expression)
+              : literal(argument);
           const target = name === null ? null : resolveModule(file, name);
           if (name === null) unknownImport = true;
           const factory = node.arguments[1]?.expression;
-          if (method === "mock" && factory?.type === "ArrowFunctionExpression" && factory.params.length === 0) {
+          if (
+            method === "mock" &&
+            factory?.type === "ArrowFunctionExpression" &&
+            factory.params.length === 0
+          ) {
             if (target) mocks.add(target);
           } else {
             // Partial/automatic/runtime mocks cannot prove the original module
             // is never evaluated. A later full mock must not erase this edge.
             if (target) actual.add(target);
-            if (name !== null && ["importActual", "mock", "doMock"].includes(method)) imports.push(name);
+            if (name !== null && ["importActual", "mock", "doMock"].includes(method))
+              imports.push(name);
           }
           // Walk factories (including importActual) but not the stripped target.
           for (const argument of node.arguments.slice(1)) visit(argument.expression);

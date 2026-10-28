@@ -1,12 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import { expect, it, vi } from "vitest";
 import type { db as Database } from "../packages/db/src/client";
-import {
-  users,
-  products,
-  builds,
-  auditEvents,
-} from "../packages/db/src/schema";
+import { users, products, builds, auditEvents } from "../packages/db/src/schema";
 import { createSeedData } from "../packages/db/src/seed-data";
 
 type Transaction = Parameters<Parameters<typeof Database.transaction>[0]>[0];
@@ -55,18 +50,25 @@ it("repeats and repairs the seed within isolated PostgreSQL tables", async () =>
           sha256Hash: "b".repeat(64),
         },
       });
-      expect(await seedBaseline(data)).toEqual({ inserted: 13, repairedBuilds: 0, repairedMedia: 0 });
+      expect(await seedBaseline(data)).toEqual({
+        inserted: 13,
+        repairedBuilds: 0,
+        repairedMedia: 0,
+      });
       await tx
         .update(users)
         .set({ passwordHash: "changed", role: "user" })
         .where(eq(users.id, "usr_admin_001"));
-      expect(await seedBaseline(data)).toEqual({ inserted: 0, repairedBuilds: 0, repairedMedia: 0 });
+      expect(await seedBaseline(data)).toEqual({
+        inserted: 0,
+        repairedBuilds: 0,
+        repairedMedia: 0,
+      });
 
       await tx
         .update(users)
         .set({
-          avatarUrl:
-            "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_admin",
+          avatarUrl: "https://api.dicebear.com/7.x/bottts/svg?seed=nexus_admin",
         })
         .where(eq(users.id, "usr_admin_001"));
       await tx
@@ -84,29 +86,19 @@ it("repeats and repairs the seed within isolated PostgreSQL tables", async () =>
         })
         .where(eq(products.id, "prd_inv_pro"));
 
-      expect(
-        await seedBaseline(data, { repairDemoMedia: true }),
-      ).toEqual({
+      expect(await seedBaseline(data, { repairDemoMedia: true })).toEqual({
         inserted: 0,
         repairedBuilds: 0,
         repairedMedia: 2,
       });
-      const [repairedAdmin] = await tx
-        .select()
-        .from(users)
-        .where(eq(users.id, "usr_admin_001"));
-      const [customDev] = await tx
-        .select()
-        .from(users)
-        .where(eq(users.id, "usr_dev_001"));
+      const [repairedAdmin] = await tx.select().from(users).where(eq(users.id, "usr_admin_001"));
+      const [customDev] = await tx.select().from(users).where(eq(users.id, "usr_dev_001"));
       const [repairedProduct] = await tx
         .select()
         .from(products)
         .where(eq(products.id, "prd_inv_pro"));
       expect(repairedAdmin.avatarUrl).toBeNull();
-      expect(customDev.avatarUrl).toBe(
-        "https://media.example/custom.svg",
-      );
+      expect(customDev.avatarUrl).toBe("https://media.example/custom.svg");
       expect(repairedProduct).toMatchObject({
         thumbnailUrl: null,
         screenshots: [],

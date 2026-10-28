@@ -7,7 +7,11 @@ for (const [label, membership, allowed] of [
   ["organization owner role", { role: "owner", permissions: [] }, false],
   ["organization admin role", { role: "admin", permissions: [] }, true],
   ["delegated server manager", { role: "member", permissions: ["manage_servers"] }, true],
-  ["developer with explicit delegation", { role: "developer", permissions: ["manage_servers"] }, true],
+  [
+    "developer with explicit delegation",
+    { role: "developer", permissions: ["manage_servers"] },
+    true,
+  ],
   ["product manager only", { role: "member", permissions: ["manage_products"] }, false],
   ["ordinary member", { role: "member", permissions: [] }, false],
   ["developer without delegation", { role: "developer", permissions: [] }, false],

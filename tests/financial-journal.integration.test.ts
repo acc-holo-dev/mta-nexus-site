@@ -22,19 +22,17 @@ it("enforces exact balances, immutability and per-currency deferred balance in P
           description: "Fixture credit",
         })
         .returning();
-      await tx
-        .insert(ledgerEntries)
-        .values({
-          id: `leg_debit_${suffix}`,
-          batchId: id,
-          accountId: `platform:fixture_${suffix}`,
-          amount: -100,
-          currency: "USD",
-          referenceType: "fee",
-          referenceId: `fixture_${suffix}`,
-          balanceAfter: 999,
-          description: "Fixture debit",
-        });
+      await tx.insert(ledgerEntries).values({
+        id: `leg_debit_${suffix}`,
+        batchId: id,
+        accountId: `platform:fixture_${suffix}`,
+        amount: -100,
+        currency: "USD",
+        referenceType: "fee",
+        referenceId: `fixture_${suffix}`,
+        balanceAfter: 999,
+        description: "Fixture debit",
+      });
       expect(credit.balanceAfter).toBe(100);
       await tx.execute(sql`SET CONSTRAINTS ALL IMMEDIATE`);
       await expect(

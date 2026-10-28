@@ -35,11 +35,7 @@ export const BACKUP_RESTORE_EVIDENCE_FLAGS = Object.freeze([
 ]);
 
 export function assertDisposableRunnerPolicy(env, dockerContext) {
-  assert.equal(
-    env.GITHUB_ACTIONS,
-    "true",
-    "Backup/restore rehearsal requires GitHub Actions",
-  );
+  assert.equal(env.GITHUB_ACTIONS, "true", "Backup/restore rehearsal requires GitHub Actions");
   assert.equal(
     env.RUNNER_ENVIRONMENT,
     "github-hosted",
@@ -47,18 +43,15 @@ export function assertDisposableRunnerPolicy(env, dockerContext) {
   );
   assert(!env.DOCKER_HOST, "Remote Docker hosts are not allowed");
   assert(!env.DOCKER_CONTEXT, "Alternate Docker contexts are not allowed");
-  assert.equal(
-    dockerContext,
-    "default",
-    "Only the default local Docker context is allowed",
-  );
+  assert.equal(dockerContext, "default", "Only the default local Docker context is allowed");
 }
 
 export function createBackupRestoreEnvironment(sourceEnv = process.env) {
   const env = Object.fromEntries(
-    PASSTHROUGH_ENV_KEYS
-      .filter((key) => sourceEnv[key] !== undefined)
-      .map((key) => [key, sourceEnv[key]]),
+    PASSTHROUGH_ENV_KEYS.filter((key) => sourceEnv[key] !== undefined).map((key) => [
+      key,
+      sourceEnv[key],
+    ]),
   );
 
   return {
@@ -74,12 +67,7 @@ export function createBackupRestoreEnvironment(sourceEnv = process.env) {
   };
 }
 
-export function registerCreatedVolume(
-  registry,
-  name,
-  token,
-  createdName,
-) {
+export function registerCreatedVolume(registry, name, token, createdName) {
   registry.push({ name, token });
   assert.equal(createdName, name, "Docker returned an unexpected volume name");
 }
@@ -87,19 +75,13 @@ export function registerCreatedVolume(
 export function createBackupRestoreResult() {
   return {
     status: "FAIL",
-    ...Object.fromEntries(
-      BACKUP_RESTORE_EVIDENCE_FLAGS.map((flag) => [flag, false]),
-    ),
+    ...Object.fromEntries(BACKUP_RESTORE_EVIDENCE_FLAGS.map((flag) => [flag, false])),
   };
 }
 
 export function assertBackupRestoreEvidence(result) {
   for (const flag of BACKUP_RESTORE_EVIDENCE_FLAGS) {
-    assert.equal(
-      result[flag],
-      true,
-      `Backup/restore evidence is incomplete: ${flag}`,
-    );
+    assert.equal(result[flag], true, `Backup/restore evidence is incomplete: ${flag}`);
   }
 }
 
@@ -108,10 +90,7 @@ export function extractBackupRestoreSpec(config) {
   const app = config.services?.app;
   assert(postgres, "postgres service is missing");
   assert(app, "app service is missing");
-  assert.match(
-    postgres.image,
-    /^postgres:18(?:[.-][\w.-]+)?(?:@sha256:[a-f0-9]{64})?$/,
-  );
+  assert.match(postgres.image, /^postgres:18(?:[.-][\w.-]+)?(?:@sha256:[a-f0-9]{64})?$/);
 
   const postgresMounts = postgres.volumes ?? [];
   assert.equal(
@@ -128,14 +107,8 @@ export function extractBackupRestoreSpec(config) {
     "Unexpected PostgreSQL mount target",
   );
 
-  const uploadMounts = (app.volumes ?? []).filter(
-    (mount) => mount.target === "/data/uploads",
-  );
-  assert.equal(
-    uploadMounts.length,
-    1,
-    "Exactly one application uploads mount is required",
-  );
+  const uploadMounts = (app.volumes ?? []).filter((mount) => mount.target === "/data/uploads");
+  assert.equal(uploadMounts.length, 1, "Exactly one application uploads mount is required");
   const uploadMount = uploadMounts[0];
   assert.equal(uploadMount.type, "volume");
   assert.equal(uploadMount.source, "uploads");
@@ -197,9 +170,5 @@ export function makePostgresFixture(spec, imageId, volumeName, token) {
 export function assertOwnedVolume(volume, expectedName, token) {
   assert(volume, "Volume inspection is missing");
   assert.equal(volume.Name, expectedName, "Unexpected volume name");
-  assert.equal(
-    volume.Labels?.[BACKUP_RESTORE_LABEL],
-    token,
-    "Volume ownership label mismatch",
-  );
+  assert.equal(volume.Labels?.[BACKUP_RESTORE_LABEL], token, "Volume ownership label mismatch");
 }

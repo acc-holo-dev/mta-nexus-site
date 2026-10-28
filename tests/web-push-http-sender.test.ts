@@ -16,9 +16,7 @@ function vapidConfig(): WebPushVapidConfig {
   const privateKey = Buffer.alloc(32);
   scalar.copy(privateKey, privateKey.length - scalar.length);
   return {
-    publicKey: ecdh
-      .getPublicKey(undefined, "uncompressed")
-      .toString("base64url"),
+    publicKey: ecdh.getPublicKey(undefined, "uncompressed").toString("base64url"),
     privateKey: privateKey.toString("base64url"),
     subject: "mailto:ops@nexus.example.com",
   };
@@ -29,9 +27,7 @@ function subscription() {
   receiver.generateKeys();
   return {
     endpoint: "https://push.example.net/subscriptions/abc?token=1",
-    p256dh: receiver
-      .getPublicKey(undefined, "uncompressed")
-      .toString("base64url"),
+    p256dh: receiver.getPublicKey(undefined, "uncompressed").toString("base64url"),
     auth: Buffer.alloc(16, 7).toString("base64url"),
   };
 }
@@ -40,15 +36,8 @@ describe("Web Push Retry-After parsing", () => {
   it("supports delta-seconds, HTTP-date and bounded delays", () => {
     const now = Date.UTC(2030, 0, 1, 0, 0, 0);
     expect(parseWebPushRetryAfter("30", now)).toBe(30_000);
-    expect(
-      parseWebPushRetryAfter(
-        new Date(now + 45_000).toUTCString(),
-        now,
-      ),
-    ).toBe(45_000);
-    expect(parseWebPushRetryAfter("999999999", now)).toBe(
-      24 * 60 * 60 * 1_000,
-    );
+    expect(parseWebPushRetryAfter(new Date(now + 45_000).toUTCString(), now)).toBe(45_000);
+    expect(parseWebPushRetryAfter("999999999", now)).toBe(24 * 60 * 60 * 1_000);
     expect(parseWebPushRetryAfter("not-a-date", now)).toBeUndefined();
   });
 });
@@ -73,12 +62,8 @@ describe("Web Push HTTP sender", () => {
 
     expect(prepared.headers.TTL).toBe("30");
     expect(prepared.headers["Content-Encoding"]).toBe("aes128gcm");
-    expect(prepared.headers["Content-Type"]).toBe(
-      "application/octet-stream",
-    );
-    expect(prepared.headers["Content-Length"]).toBe(
-      String(prepared.body.length),
-    );
+    expect(prepared.headers["Content-Type"]).toBe("application/octet-stream");
+    expect(prepared.headers["Content-Length"]).toBe(String(prepared.body.length));
     expect(prepared.headers.Authorization).toMatch(
       new RegExp(`^vapid t=[^.]+\\.[^.]+\\.[^,]+, k=${config.publicKey}$`, "u"),
     );

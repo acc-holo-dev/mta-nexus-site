@@ -8,10 +8,7 @@ import {
   hasExpectedBuildFileFormat,
   MAX_BUILD_FILE_SIZE_BYTES,
 } from "../apps/web/src/lib/build-file-validation";
-import {
-  MAX_BUILD_MULTIPART_OVERHEAD_BYTES,
-  MAX_UPLOAD_FILE_SIZE_BYTES,
-} from "@nexus/domain";
+import { MAX_BUILD_MULTIPART_OVERHEAD_BYTES, MAX_UPLOAD_FILE_SIZE_BYTES } from "@nexus/domain";
 
 const bytes = (...values: number[]) => new Uint8Array(values);
 
@@ -113,7 +110,7 @@ describe("build upload hardening", () => {
   it("checks archive signatures before storage", () => {
     const route = readFileSync(
       resolve(process.cwd(), "apps/web/src/app/api/products/[id]/builds/route.ts"),
-      "utf8"
+      "utf8",
     );
 
     expect(route).toContain("hasExpectedBuildFileFormat");

@@ -17,11 +17,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -34,11 +30,7 @@ export async function GET(request: NextRequest) {
     const token = request.cookies.get("nexus_session")?.value;
     const authenticated = await authService.getSessionIdentity(token);
     if (!authenticated) {
-      return json(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
+      return json(context, { error: "Authentication required" }, 401);
     }
 
     const { user, sessionId: currentSessionId } = authenticated;
@@ -61,8 +53,7 @@ export async function GET(request: NextRequest) {
     return json(
       context,
       {
-        error:
-          "Account settings are temporarily unavailable.",
+        error: "Account settings are temporarily unavailable.",
       },
       503,
     );
@@ -70,55 +61,39 @@ export async function GET(request: NextRequest) {
 }
 
 export const DELETE = withBrowserMutation(async (request: NextRequest) => {
-
   const context = createRequestLogContext(request);
   try {
     const token = request.cookies.get("nexus_session")?.value;
     const authenticated = await authService.getSessionIdentity(token);
     if (!authenticated || !token) {
-      return json(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
+      return json(context, { error: "Authentication required" }, 401);
     }
 
     const { user, sessionId: currentSessionId } = authenticated;
-    const rateLimit = await consumeRateLimit(
-      "sessionManagement",
-      user.id,
-    );
+    const rateLimit = await consumeRateLimit("sessionManagement", user.id);
     if (!rateLimit.success) {
       return json(
         context,
         {
-          error:
-            "Too many session security requests. Please try again shortly.",
+          error: "Too many session security requests. Please try again shortly.",
         },
         429,
       );
     }
 
-    const command = parseSessionRevocation(
-      await readAuthJson(request),
-    );
+    const command = parseSessionRevocation(await readAuthJson(request));
     if (!command) {
       return json(
         context,
         {
-          error:
-            "Provide exactly one session revocation action",
+          error: "Provide exactly one session revocation action",
         },
         400,
       );
     }
 
     if (command.scope === "others") {
-      const revokedCount =
-        await authService.revokeOtherSessions(
-          user.id,
-          token,
-        );
+      const revokedCount = await authService.revokeOtherSessions(user.id, token);
       return json(context, {
         success: true,
         scope: "others",
@@ -130,24 +105,18 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
       return json(
         context,
         {
-          error:
-            "The current session cannot be revoked here; use logout instead",
+          error: "The current session cannot be revoked here; use logout instead",
         },
         409,
       );
     }
 
-    const revoked = await authService.revokeSession(
-      user.id,
-      command.sessionId,
-      token,
-    );
+    const revoked = await authService.revokeSession(user.id, command.sessionId, token);
     if (!revoked) {
       return json(
         context,
         {
-          error:
-            "Session not found or not owned by you",
+          error: "Session not found or not owned by you",
         },
         404,
       );
@@ -160,11 +129,7 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
     });
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json(
-        context,
-        { error: error.message, code: error.code },
-        error.statusCode,
-      );
+      return json(context, { error: error.message, code: error.code }, error.statusCode);
     }
 
     logRequestEvent({
@@ -177,11 +142,9 @@ export const DELETE = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error:
-          "Could not confirm the session update. Reload settings before retrying.",
+        error: "Could not confirm the session update. Reload settings before retrying.",
       },
       503,
     );
   }
 });
-

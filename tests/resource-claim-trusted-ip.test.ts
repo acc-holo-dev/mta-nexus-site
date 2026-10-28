@@ -37,26 +37,21 @@ vi.mock("../apps/web/src/lib/services/commerce-service", () => ({
 
 import { POST } from "../apps/web/src/app/api/resources/claim/route";
 
-const secret =
-  "trusted-claim-proxy-secret-0123456789abcdef";
+const secret = "trusted-claim-proxy-secret-0123456789abcdef";
 
 function request(headers: Record<string, string>) {
-  return new NextRequest(
-    "https://nexus.test/api/resources/claim",
-    {
-      method: "POST",
-      headers: {
-        ...browserMutationHeaders(),
-        "content-type": "application/json",
-        cookie:
-          "nexus_session=claim-ip-session",
-        ...headers,
-      },
-      body: JSON.stringify({
-        productId: "prd_claim_ip",
-      }),
+  return new NextRequest("https://nexus.test/api/resources/claim", {
+    method: "POST",
+    headers: {
+      ...browserMutationHeaders(),
+      "content-type": "application/json",
+      cookie: "nexus_session=claim-ip-session",
+      ...headers,
     },
-  );
+    body: JSON.stringify({
+      productId: "prd_claim_ip",
+    }),
+  });
 }
 
 describe("resource claim trusted request IP", () => {
@@ -79,13 +74,8 @@ describe("resource claim trusted request IP", () => {
     );
 
     expect(response.status).toBe(201);
-    expect(consumeRateLimit).toHaveBeenCalledWith(
-      "resourceClaim",
-      "unknown",
-    );
-    expect(
-      response.headers.get("x-request-id"),
-    ).toMatch(/^[0-9a-f-]{20,}$/u);
+    expect(consumeRateLimit).toHaveBeenCalledWith("resourceClaim", "unknown");
+    expect(response.headers.get("x-request-id")).toMatch(/^[0-9a-f-]{20,}$/u);
   });
 
   it("uses the trusted proxy address only when the marker matches", async () => {
@@ -99,9 +89,6 @@ describe("resource claim trusted request IP", () => {
     );
 
     expect(response.status).toBe(201);
-    expect(consumeRateLimit).toHaveBeenCalledWith(
-      "resourceClaim",
-      "198.51.100.25",
-    );
+    expect(consumeRateLimit).toHaveBeenCalledWith("resourceClaim", "198.51.100.25");
   });
 });

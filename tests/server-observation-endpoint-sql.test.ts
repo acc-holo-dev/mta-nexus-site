@@ -16,20 +16,27 @@ vi.mock("../packages/db/src/client", () => ({
         select: () => {
           const query = {
             from: () => query,
-            where: (where: SQL) => { mock.lockWhere = where; return query; },
-            for: (mode: string) => { mock.lockMode = mode; return query; },
-            limit: async () => mock.lockedMatch ? [{ id: "srv_test" }] : [],
+            where: (where: SQL) => {
+              mock.lockWhere = where;
+              return query;
+            },
+            for: (mode: string) => {
+              mock.lockMode = mode;
+              return query;
+            },
+            limit: async () => (mock.lockedMatch ? [{ id: "srv_test" }] : []),
           };
           return query;
         },
         insert: () => {
           mock.insertCalls++;
           return {
-          values: () => ({
-            onConflictDoNothing: () => ({
-              returning: async () => [{ id: "obs_test" }],
+            values: () => ({
+              onConflictDoNothing: () => ({
+                returning: async () => [{ id: "obs_test" }],
+              }),
             }),
-          })};
+          };
         },
         update: () => ({
           set: () => ({
@@ -84,7 +91,9 @@ describe("endpoint-bound observation UPDATE", () => {
     mock.lockedMatch = true;
     mock.lockWhere = null;
     await repository.record(input, {
-      ipAddress: "play.example.com", port: 22003, endpointRevision: 7,
+      ipAddress: "play.example.com",
+      port: 22003,
+      endpointRevision: 7,
     });
     if (!mock.lockWhere) throw new Error("Missing SQL lock predicate");
     const query = dialect.sqlToQuery(mock.lockWhere);
@@ -110,9 +119,12 @@ describe("endpoint-bound observation UPDATE", () => {
     mock.where = null;
     mock.insertCalls = 0;
     try {
-      await expect(repository.record(input, {
-        ipAddress: "obsolete.example.com", port: 22003,
-      })).resolves.toBeNull();
+      await expect(
+        repository.record(input, {
+          ipAddress: "obsolete.example.com",
+          port: 22003,
+        }),
+      ).resolves.toBeNull();
       expect(mock.lockMode).toBe("update");
       expect(mock.insertCalls).toBe(0);
       expect(mock.where).toBeNull();

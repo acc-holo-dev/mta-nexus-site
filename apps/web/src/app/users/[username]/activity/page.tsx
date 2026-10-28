@@ -3,7 +3,10 @@ import { getRequestLocale } from "../../../../lib/i18n-server";
 import { publicationCopy } from "../../../../lib/publication-feed-copy";
 export const dynamic = "force-dynamic";
 export async function generateMetadata() {
-  return { title: publicationCopy(await getRequestLocale()).activity, robots: { index: false, follow: false } };
+  return {
+    title: publicationCopy(await getRequestLocale()).activity,
+    robots: { index: false, follow: false },
+  };
 }
 export default async function UserActivity({
   params,

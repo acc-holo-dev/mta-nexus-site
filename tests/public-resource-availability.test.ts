@@ -21,9 +21,7 @@ vi.mock("@nexus/security", () => ({
 }));
 
 vi.mock("@nexus/domain", async () => {
-  const actual = await vi.importActual<typeof import("@nexus/domain")>(
-    "@nexus/domain",
-  );
+  const actual = await vi.importActual<typeof import("@nexus/domain")>("@nexus/domain");
   return {
     ...actual,
     eventBus: { publish: vi.fn() },
@@ -78,30 +76,25 @@ describe("public resource availability", () => {
       buildRepository.findLatestPublishedByProduct.mockResolvedValue(null);
 
       await expect(load()).resolves.toBeNull();
-      expect(
-        buildRepository.findLatestPublishedByProduct,
-      ).toHaveBeenCalledWith("prd_public");
+      expect(buildRepository.findLatestPublishedByProduct).toHaveBeenCalledWith("prd_public");
     },
   );
 
   it.each([
     ["slug", () => service.getProductBySlug("public-resource")],
     ["id", () => service.getProductById("prd_public")],
-  ] as const)(
-    "returns published free %s detail when a safe build exists",
-    async (_kind, load) => {
-      const value = product();
-      productRepository.findBySlug.mockResolvedValue(value);
-      productRepository.findById.mockResolvedValue(value);
-      buildRepository.findLatestPublishedByProduct.mockResolvedValue({
-        id: "bld_safe",
-        productId: "prd_public",
-        status: "published",
-      });
+  ] as const)("returns published free %s detail when a safe build exists", async (_kind, load) => {
+    const value = product();
+    productRepository.findBySlug.mockResolvedValue(value);
+    productRepository.findById.mockResolvedValue(value);
+    buildRepository.findLatestPublishedByProduct.mockResolvedValue({
+      id: "bld_safe",
+      productId: "prd_public",
+      status: "published",
+    });
 
-      await expect(load()).resolves.toEqual(value);
-    },
-  );
+    await expect(load()).resolves.toEqual(value);
+  });
 
   it("rejects draft products before build lookup", async () => {
     const value = product({ status: "draft" });
@@ -110,9 +103,7 @@ describe("public resource availability", () => {
 
     await expect(service.getProductBySlug(value.slug)).resolves.toBeNull();
     await expect(service.getProductById(value.id)).resolves.toBeNull();
-    expect(
-      buildRepository.findLatestPublishedByProduct,
-    ).not.toHaveBeenCalled();
+    expect(buildRepository.findLatestPublishedByProduct).not.toHaveBeenCalled();
   });
 
   it("keeps paid products off slug market lookup but exposes them by id for acquire", async () => {
@@ -122,8 +113,6 @@ describe("public resource availability", () => {
 
     await expect(service.getProductBySlug(value.slug)).resolves.toBeNull();
     await expect(service.getProductById(value.id)).resolves.toEqual(value);
-    expect(
-      buildRepository.findLatestPublishedByProduct,
-    ).not.toHaveBeenCalled();
+    expect(buildRepository.findLatestPublishedByProduct).not.toHaveBeenCalled();
   });
 });

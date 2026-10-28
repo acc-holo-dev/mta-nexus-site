@@ -1,9 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import {
-  notificationRepository,
-  userRepository,
-} from "@nexus/db";
+import { notificationRepository, userRepository } from "@nexus/db";
 
 describe("notification preference serialization", () => {
   it("suppresses preference-controlled inbox creation after a confirmed disable", async () => {

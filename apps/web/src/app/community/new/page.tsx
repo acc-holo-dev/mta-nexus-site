@@ -10,9 +10,7 @@ export default async function NewCommunityTopicPage() {
     <div className="mx-auto max-w-3xl space-y-6 py-8">
       <div className="space-y-1.5">
         <h1 className="font-display text-primary">{copy.startTitle}</h1>
-        <p className="max-w-2xl text-sm leading-relaxed text-muted">
-          {copy.startDescription}
-        </p>
+        <p className="max-w-2xl text-sm leading-relaxed text-muted">{copy.startDescription}</p>
       </div>
       <CommunityTopicForm />
     </div>

@@ -32,78 +32,50 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
   });
 }
 
-function destroyOpenedStream(
-  stream: NodeJS.ReadableStream,
-): void {
-  const destroyable =
-    stream as NodeJS.ReadableStream & {
-      destroy?: (error?: Error) => void;
-    };
+function destroyOpenedStream(stream: NodeJS.ReadableStream): void {
+  const destroyable = stream as NodeJS.ReadableStream & {
+    destroy?: (error?: Error) => void;
+  };
   destroyable.destroy?.();
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const context = createRequestLogContext(request);
 
   try {
     const { id: productId } = await params;
-    const token =
-      request.cookies.get("nexus_session")?.value;
+    const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
 
     if (!user) {
       return json(
         context,
         {
-          error:
-            "Authentication required to download resource builds",
+          error: "Authentication required to download resource builds",
         },
         401,
       );
     }
 
-    const rateLimit = await consumeRateLimit(
-      "download",
-      user.id,
-    );
+    const rateLimit = await consumeRateLimit("download", user.id);
     if (!rateLimit.success) {
-      return json(
-        context,
-        { error: "Too many download requests" },
-        429,
-      );
+      return json(context, { error: "Too many download requests" }, 429);
     }
 
-    const product =
-      await productRepository.findById(productId);
+    const product = await productRepository.findById(productId);
     if (!product) {
-      return json(
-        context,
-        { error: "Resource not found" },
-        404,
-      );
+      return json(context, { error: "Resource not found" }, 404);
     }
 
     const isPrivileged =
-      user.role === "admin" ||
-      (await productService.canManageProduct(
-        product,
-        user,
-      ));
+      user.role === "admin" || (await productService.canManageProduct(product, user));
     const hasEntitlement = isPrivileged
       ? false
       : await commerceService.checkEntitlement(
@@ -111,28 +83,16 @@ export async function GET(
           productId,
           "product.download",
         );
-    const access = decideResourceDownloadAccess(
-      product,
-      isPrivileged,
-      hasEntitlement,
-    );
+    const access = decideResourceDownloadAccess(product, isPrivileged, hasEntitlement);
 
     if (!access.allowed) {
-      if (
-        access.reason ===
-        "resource_not_published"
-      ) {
-        return json(
-          context,
-          { error: "Resource not found" },
-          404,
-        );
+      if (access.reason === "resource_not_published") {
+        return json(context, { error: "Resource not found" }, 404);
       }
       return json(
         context,
         {
-          error:
-            "Add this resource to your library before downloading it",
+          error: "Add this resource to your library before downloading it",
         },
         403,
       );
@@ -140,21 +100,17 @@ export async function GET(
 
     const selection = parseDownloadBuildSelection(request.nextUrl.searchParams);
     if (selection.kind === "invalid") {
-      return json(
-        context,
-        { error: "Invalid requested build", code: "BUILD_ID_INVALID" },
-        400,
-      );
+      return json(context, { error: "Invalid requested build", code: "BUILD_ID_INVALID" }, 400);
     }
-    const selectedBuild = selection.kind === "pinned"
-      ? await buildRepository.findPublishedByProductAndId(productId, selection.buildId)
-      : await buildRepository.findLatestPublishedByProduct(productId);
+    const selectedBuild =
+      selection.kind === "pinned"
+        ? await buildRepository.findPublishedByProductAndId(productId, selection.buildId)
+        : await buildRepository.findLatestPublishedByProduct(productId);
     if (!selectedBuild) {
       return json(
         context,
         {
-          error:
-            "No published build is available",
+          error: "No published build is available",
         },
         404,
       );
@@ -168,28 +124,23 @@ export async function GET(
       return json(
         context,
         {
-          error:
-            "Published build is not cleared for delivery",
+          error: "Published build is not cleared for delivery",
         },
         409,
       );
     }
 
-    const stored =
-      await storageService.getDownloadStream(
-        selectedBuild.storageKey,
-        request.signal,
-      );
-    const contentLength =
-      assertBuildDownloadMetadata(
-        stored,
-        selectedBuild,
-      );
+    const stored = await storageService.getDownloadStream(selectedBuild.storageKey, request.signal);
+    const contentLength = assertBuildDownloadMetadata(stored, selectedBuild);
 
     let authorized: { slug: string; receiptId: string } | undefined;
-    const recordFailure = (error: unknown) => logRequestEvent({
-      level: "error", event: "product.download_receipt_failed", context, error,
-    });
+    const recordFailure = (error: unknown) =>
+      logRequestEvent({
+        level: "error",
+        event: "product.download_receipt_failed",
+        context,
+        error,
+      });
     try {
       request.signal.throwIfAborted();
       authorized = await resourceDownloadAuthorizationRepository.authorize({
@@ -202,15 +153,22 @@ export async function GET(
       request.signal.throwIfAborted();
     } catch (error) {
       destroyOpenedStream(stored.stream);
-      if (authorized) await resourceDeliveriesService.finish(user.id, authorized.receiptId, {
-        status: "cancelled", bytesSent: 0, errorCode: null,
-      }).catch(recordFailure);
+      if (authorized)
+        await resourceDeliveriesService
+          .finish(user.id, authorized.receiptId, {
+            status: "cancelled",
+            bytesSent: 0,
+            errorCode: null,
+          })
+          .catch(recordFailure);
       throw error;
     }
 
     const receiptId = authorized.receiptId;
     const stream = resourceDeliveryStream({
-      source: stored.stream, expectedBytes: contentLength, sha256Hash: selectedBuild.sha256Hash,
+      source: stored.stream,
+      expectedBytes: contentLength,
+      sha256Hash: selectedBuild.sha256Hash,
       signal: request.signal,
       finish: (result) => resourceDeliveriesService.finish(user.id, receiptId, result),
       recordFailure,
@@ -224,14 +182,10 @@ export async function GET(
     return new NextResponse(stream, {
       headers: {
         "Content-Type":
-          selectedBuild.mimeType ||
-          stored.meta?.mimeType ||
-          "application/octet-stream",
-        "Content-Disposition":
-          `attachment; filename="${fileName}"`,
+          selectedBuild.mimeType || stored.meta?.mimeType || "application/octet-stream",
+        "Content-Disposition": `attachment; filename="${fileName}"`,
         "Content-Length": String(contentLength),
-        "X-Content-SHA256":
-          selectedBuild.sha256Hash,
+        "X-Content-SHA256": selectedBuild.sha256Hash,
         "X-Resource-Build-Id": selectedBuild.id,
         "X-Resource-Delivery-Id": authorized.receiptId,
         ...privateHeaders,
@@ -251,14 +205,11 @@ export async function GET(
       );
     }
 
-    if (
-      error instanceof BuildArtifactMismatchError
-    ) {
+    if (error instanceof BuildArtifactMismatchError) {
       return json(
         context,
         {
-          error:
-            "Build file does not match its recorded metadata",
+          error: "Build file does not match its recorded metadata",
           code: "BUILD_ARTIFACT_MISMATCH",
         },
         409,
@@ -269,14 +220,14 @@ export async function GET(
       return json(
         context,
         {
-          error:
-            "Resource build file is not available",
+          error: "Resource build file is not available",
         },
         404,
       );
     }
 
-    if (error instanceof AppError) return json(context, { error: error.message, code: error.code }, error.statusCode);
+    if (error instanceof AppError)
+      return json(context, { error: error.message, code: error.code }, error.statusCode);
 
     logRequestEvent({
       level: "error",
@@ -288,8 +239,7 @@ export async function GET(
     return json(
       context,
       {
-        error:
-          "Failed to deliver resource build",
+        error: "Failed to deliver resource build",
       },
       500,
     );

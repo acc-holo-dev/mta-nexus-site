@@ -10,10 +10,7 @@ type BuildScanResult =
   | { status: "error"; scanner: string; scannedAt: Date; reason?: string };
 
 export interface BuildScanner {
-  scan(input: {
-    bytes: Uint8Array;
-    fileName: string;
-  }): Promise<BuildScanResult>;
+  scan(input: { bytes: Uint8Array; fileName: string }): Promise<BuildScanResult>;
 }
 
 /**
@@ -67,10 +64,7 @@ export function createClamAvScanner(options: {
               status: "error",
               scanner: "clamav",
               scannedAt,
-              reason:
-                error instanceof Error
-                  ? error.message
-                  : "Scanner stream failed",
+              reason: error instanceof Error ? error.message : "Scanner stream failed",
             });
           });
         });

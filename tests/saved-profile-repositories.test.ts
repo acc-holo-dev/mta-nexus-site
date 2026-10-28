@@ -29,7 +29,9 @@ const dialect = new PgDialect();
 const queries = () => captured.conditions.map((condition) => dialect.sqlToQuery(condition));
 
 describe("saved items and public profile selections", () => {
-  beforeEach(() => { captured.conditions = []; });
+  beforeEach(() => {
+    captured.conditions = [];
+  });
 
   it("skips empty saved selections and chunks more than 500 IDs without catalog limits", async () => {
     const products = new ProductRepository();

@@ -18,7 +18,7 @@ export class NotFoundError extends AppError {
     super(
       identifier ? `${entity} with ID '${identifier}' was not found` : `${entity} not found`,
       404,
-      "NOT_FOUND"
+      "NOT_FOUND",
     );
   }
 }

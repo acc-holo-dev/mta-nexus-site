@@ -21,11 +21,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -38,150 +34,120 @@ const verifySchema = z
       .string()
       .regex(/^scc_[0-9a-f-]{36}$/u)
       .max(64),
-    token: z
-      .string()
-      .regex(/^NXCLAIM-[A-F0-9]{24}$/u),
+    token: z.string().regex(/^NXCLAIM-[A-F0-9]{24}$/u),
   })
   .strict();
 
-export const POST = withBrowserMutation(async (
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) => {
-  const context = createRequestLogContext(request);
-  try {
-    const sessionToken =
-      request.cookies.get("nexus_session")?.value;
-    const user =
-      await authService.getSession(sessionToken);
-    if (!user) {
-      return json(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
-    }
-
-    const rateLimit = await consumeRateLimit(
-      "serverClaimProof",
-      user.id,
-    );
-    if (!rateLimit.success) {
-      return json(
-        context,
-        {
-          error:
-            "Too many server control proof attempts",
-        },
-        429,
-      );
-    }
-
-    requireServerJsonContentType(request);
-    const parsed = verifySchema.safeParse(await readBoundedJson(request));
-    if (!parsed.success) {
-      return json(
-        context,
-        {
-          error:
-            "Invalid server control proof",
-        },
-        400,
-      );
-    }
-
-    const { id: serverId } = await params;
-    if (!serverId || serverId.length > 128) {
-      return json(
-        context,
-        { error: "Server not found" },
-        404,
-      );
-    }
-
-    const {
-      moderatorNotification,
-      ...result
-    } = await serverClaimService.verifyChallenge(
-      {
-        serverId,
-        challengeId: parsed.data.challengeId,
-        token: parsed.data.token,
-      },
-      user,
-    );
-
-    // Verification already committed — never fail the HTTP response because
-    // Next.js `after()` is unavailable (e.g. direct route invocation in tests).
+export const POST = withBrowserMutation(
+  async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    const context = createRequestLogContext(request);
     try {
-      after(async () => {
-        try {
-          await notifyModeratorsOfServerClaim(
-            moderatorNotification.serverName,
-          );
-        } catch (error) {
-          logRequestEvent({
-            level: "warn",
-            event:
-              "server.claim_challenge.notification_failed",
-            context,
-            status: 201,
-            error,
-          });
-        }
-      });
-    } catch (error) {
-      logRequestEvent({
-        level: "warn",
-        event:
-          "server.claim_challenge.after_unavailable",
-        context,
-        status: 201,
-        error,
-      });
-      try {
-        await notifyModeratorsOfServerClaim(
-          moderatorNotification.serverName,
+      const sessionToken = request.cookies.get("nexus_session")?.value;
+      const user = await authService.getSession(sessionToken);
+      if (!user) {
+        return json(context, { error: "Authentication required" }, 401);
+      }
+
+      const rateLimit = await consumeRateLimit("serverClaimProof", user.id);
+      if (!rateLimit.success) {
+        return json(
+          context,
+          {
+            error: "Too many server control proof attempts",
+          },
+          429,
         );
-      } catch (notifyError) {
+      }
+
+      requireServerJsonContentType(request);
+      const parsed = verifySchema.safeParse(await readBoundedJson(request));
+      if (!parsed.success) {
+        return json(
+          context,
+          {
+            error: "Invalid server control proof",
+          },
+          400,
+        );
+      }
+
+      const { id: serverId } = await params;
+      if (!serverId || serverId.length > 128) {
+        return json(context, { error: "Server not found" }, 404);
+      }
+
+      const { moderatorNotification, ...result } = await serverClaimService.verifyChallenge(
+        {
+          serverId,
+          challengeId: parsed.data.challengeId,
+          token: parsed.data.token,
+        },
+        user,
+      );
+
+      // Verification already committed — never fail the HTTP response because
+      // Next.js `after()` is unavailable (e.g. direct route invocation in tests).
+      try {
+        after(async () => {
+          try {
+            await notifyModeratorsOfServerClaim(moderatorNotification.serverName);
+          } catch (error) {
+            logRequestEvent({
+              level: "warn",
+              event: "server.claim_challenge.notification_failed",
+              context,
+              status: 201,
+              error,
+            });
+          }
+        });
+      } catch (error) {
         logRequestEvent({
           level: "warn",
-          event:
-            "server.claim_challenge.notification_failed",
+          event: "server.claim_challenge.after_unavailable",
           context,
           status: 201,
-          error: notifyError,
+          error,
         });
+        try {
+          await notifyModeratorsOfServerClaim(moderatorNotification.serverName);
+        } catch (notifyError) {
+          logRequestEvent({
+            level: "warn",
+            event: "server.claim_challenge.notification_failed",
+            context,
+            status: 201,
+            error: notifyError,
+          });
+        }
       }
-    }
 
-    return json(context, result, 201);
-  } catch (error: unknown) {
-    if (error instanceof AppError) {
+      return json(context, result, 201);
+    } catch (error: unknown) {
+      if (error instanceof AppError) {
+        return json(
+          context,
+          {
+            error: error.message,
+            code: error.code,
+          },
+          error.statusCode,
+        );
+      }
+      logRequestEvent({
+        level: "error",
+        event: "server.claim_challenge.verify_failed",
+        context,
+        status: 500,
+        error,
+      });
       return json(
         context,
         {
-          error: error.message,
-          code: error.code,
+          error: "Could not verify server control",
         },
-        error.statusCode,
+        500,
       );
     }
-    logRequestEvent({
-      level: "error",
-      event:
-        "server.claim_challenge.verify_failed",
-      context,
-      status: 500,
-      error,
-    });
-    return json(
-      context,
-      {
-        error:
-          "Could not verify server control",
-      },
-      500,
-    );
-  }
-});
+  },
+);

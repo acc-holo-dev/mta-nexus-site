@@ -53,8 +53,13 @@ type SmtpSession = {
 };
 
 function validAddress(value: string): boolean {
-  return typeof value === "string" && value.length >= 3 && value.length <= 320
-    && !/[\r\n]/.test(value) && /^[^\s@<>]+@[^\s@<>]+$/.test(value);
+  return (
+    typeof value === "string" &&
+    value.length >= 3 &&
+    value.length <= 320 &&
+    !/[\r\n]/.test(value) &&
+    /^[^\s@<>]+@[^\s@<>]+$/.test(value)
+  );
 }
 
 function validNetworkHost(value: string): boolean {
@@ -62,29 +67,40 @@ function validNetworkHost(value: string): boolean {
   if (net.isIP(value)) return true;
   const normalized = value.endsWith(".") ? value.slice(0, -1) : value;
   if (!normalized) return false;
-  return normalized.split(".").every((label) =>
-    label.length >= 1 && label.length <= 63
-    && /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/.test(label));
+  return normalized
+    .split(".")
+    .every(
+      (label) =>
+        label.length >= 1 &&
+        label.length <= 63 &&
+        /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/.test(label),
+    );
 }
 
-
 function validateOptions(options: AccountMailSmtpOptions) {
-  if (!options || typeof options !== "object"
-    || !validNetworkHost(options.host)
-    || !Number.isInteger(options.port) || options.port < 1 || options.port > 65535
-    || !validNetworkHost(options.servername)
-    || !validAddress(options.from)
-    || (options.envelopeFrom !== undefined && !validAddress(options.envelopeFrom))
-    || !["implicit_tls", "starttls"].includes(options.mode ?? "implicit_tls")
-    || !["auto", "plain", "login"].includes(options.authMode ?? "auto")) {
+  if (
+    !options ||
+    typeof options !== "object" ||
+    !validNetworkHost(options.host) ||
+    !Number.isInteger(options.port) ||
+    options.port < 1 ||
+    options.port > 65535 ||
+    !validNetworkHost(options.servername) ||
+    !validAddress(options.from) ||
+    (options.envelopeFrom !== undefined && !validAddress(options.envelopeFrom)) ||
+    !["implicit_tls", "starttls"].includes(options.mode ?? "implicit_tls") ||
+    !["auto", "plain", "login"].includes(options.authMode ?? "auto")
+  ) {
     throw new Error("Invalid SMTP transport configuration");
   }
   const { username, password } = options;
   const hasUsername = typeof username === "string" && username.length > 0;
   const hasPassword = typeof password === "string" && password.length > 0;
-  if (hasUsername !== hasPassword
-    || (hasUsername && (username.length > 320 || /[\r\n\0]/.test(username)))
-    || (hasPassword && (password.length > 1024 || /[\r\n\0]/.test(password)))) {
+  if (
+    hasUsername !== hasPassword ||
+    (hasUsername && (username.length > 320 || /[\r\n\0]/.test(username))) ||
+    (hasPassword && (password.length > 1024 || /[\r\n\0]/.test(password)))
+  ) {
     throw new Error("Invalid SMTP authentication configuration");
   }
   const timeout = options.timeoutMs ?? 5_000;
@@ -108,25 +124,39 @@ function classify(
 }
 
 function dotStuff(text: string): string {
-  return text.replace(/\r?\n/g, "\r\n").split("\r\n")
-    .map((line) => line.startsWith(".") ? `.${line}` : line).join("\r\n");
+  return text
+    .replace(/\r?\n/g, "\r\n")
+    .split("\r\n")
+    .map((line) => (line.startsWith(".") ? `.${line}` : line))
+    .join("\r\n");
 }
 
 function hasOversizedDataLine(text: string): boolean {
-  return text.replace(/\r?\n/g, "\n").split("\n").some((line) => {
-    const stuffedBytes = Buffer.byteLength(line, "utf8") + (line.startsWith(".") ? 1 : 0);
-    return stuffedBytes > 998;
-  });
+  return text
+    .replace(/\r?\n/g, "\n")
+    .split("\n")
+    .some((line) => {
+      const stuffedBytes = Buffer.byteLength(line, "utf8") + (line.startsWith(".") ? 1 : 0);
+      return stuffedBytes > 998;
+    });
 }
 
 function validateMessage(input: AccountMailTransportInput) {
-  if (!input || !validAddress(input.recipient)
-    || typeof input.subject !== "string" || input.subject.length < 1 || input.subject.length > 160
-    || /[\r\n]/.test(input.subject)
-    || typeof input.text !== "string" || Buffer.byteLength(input.text, "utf8") > 16_384
-    || hasOversizedDataLine(input.text)
-    || typeof input.messageId !== "string" || !/^ame_[A-Za-z0-9_-]{1,96}$/.test(input.messageId)
-    || !(input.sendBefore instanceof Date) || !Number.isFinite(input.sendBefore.getTime())) {
+  if (
+    !input ||
+    !validAddress(input.recipient) ||
+    typeof input.subject !== "string" ||
+    input.subject.length < 1 ||
+    input.subject.length > 160 ||
+    /[\r\n]/.test(input.subject) ||
+    typeof input.text !== "string" ||
+    Buffer.byteLength(input.text, "utf8") > 16_384 ||
+    hasOversizedDataLine(input.text) ||
+    typeof input.messageId !== "string" ||
+    !/^ame_[A-Za-z0-9_-]{1,96}$/.test(input.messageId) ||
+    !(input.sendBefore instanceof Date) ||
+    !Number.isFinite(input.sendBefore.getTime())
+  ) {
     throw new Error("Invalid account mail message");
   }
 }
@@ -247,9 +277,12 @@ export class AccountMailSmtpTransport {
     const applyTimeout = (target: net.Socket) => {
       target.setTimeout(budget, () => target.destroy(new Error("SMTP inactivity timeout")));
     };
-    const deadlineTimer = setTimeout(() => {
-      socket?.destroy(new Error("SMTP send deadline exceeded"));
-    }, Math.max(1, deadlineAt - Date.now()));
+    const deadlineTimer = setTimeout(
+      () => {
+        socket?.destroy(new Error("SMTP send deadline exceeded"));
+      },
+      Math.max(1, deadlineAt - Date.now()),
+    );
     deadlineTimer.unref();
 
     const ensureWithinDeadline = () => {
@@ -380,10 +413,11 @@ export class AccountMailSmtpTransport {
       }
 
       const envelopeFrom = this.#options.envelopeFrom ?? this.#options.from;
-      const needsSmtpUtf8 = containsNonAscii(this.#options.from)
-        || containsNonAscii(envelopeFrom)
-        || containsNonAscii(input.recipient)
-        || containsNonAscii(input.subject);
+      const needsSmtpUtf8 =
+        containsNonAscii(this.#options.from) ||
+        containsNonAscii(envelopeFrom) ||
+        containsNonAscii(input.recipient) ||
+        containsNonAscii(input.subject);
       const needs8BitMime = containsNonAscii(input.text);
       if (needsSmtpUtf8 && !advertisesCapability(capabilities, "SMTPUTF8")) {
         return { outcome: "discard", uncertain: false, stage: "mail_from" };
@@ -391,10 +425,9 @@ export class AccountMailSmtpTransport {
       if (needs8BitMime && !advertisesCapability(capabilities, "8BITMIME")) {
         return { outcome: "discard", uncertain: false, stage: "mail_from" };
       }
-      const mailParameters = [
-        needsSmtpUtf8 ? "SMTPUTF8" : "",
-        needs8BitMime ? "BODY=8BITMIME" : "",
-      ].filter(Boolean).join(" ");
+      const mailParameters = [needsSmtpUtf8 ? "SMTPUTF8" : "", needs8BitMime ? "BODY=8BITMIME" : ""]
+        .filter(Boolean)
+        .join(" ");
 
       ensureWithinDeadline();
       stage = "mail_from";
@@ -444,7 +477,11 @@ export class AccountMailSmtpTransport {
       result = requireStage(accepted.code, 250, stage);
       if (result) return result;
 
-      try { await command(session, "QUIT"); } catch { /* acceptance already confirmed */ }
+      try {
+        await command(session, "QUIT");
+      } catch {
+        /* acceptance already confirmed */
+      }
       return { outcome: "accepted", uncertain: false, stage: "final_reply", code: accepted.code };
     } catch {
       return { outcome: "retry", uncertain: dataSent, stage };

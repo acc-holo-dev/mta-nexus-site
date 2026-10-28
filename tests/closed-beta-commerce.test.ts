@@ -27,7 +27,9 @@ describe("closed-beta commerce behavior", () => {
   });
 
   it("fails paid checkout closed with a stable public code", async () => {
-    const response = await disabledCheckout(new NextRequest("https://nexus.test/api/checkout", { method: "POST" }));
+    const response = await disabledCheckout(
+      new NextRequest("https://nexus.test/api/checkout", { method: "POST" }),
+    );
 
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({
@@ -55,9 +57,9 @@ describe("closed-beta commerce behavior", () => {
       role: "user",
     } as User;
 
-    await expect(
-      service.claimFreeResource({ user, productId: "prd_1" }),
-    ).resolves.toMatchObject({ alreadyClaimed: false });
+    await expect(service.claimFreeResource({ user, productId: "prd_1" })).resolves.toMatchObject({
+      alreadyClaimed: false,
+    });
     expect(mocks.claimFreeResource).toHaveBeenCalledWith({
       entitlementId: "ent_test",
       userId: "usr_1",
@@ -70,11 +72,7 @@ describe("closed-beta commerce behavior", () => {
     const service = new CommerceService();
 
     await expect(
-      service.checkEntitlement(
-        { type: "user", id: "usr_1" },
-        "prd_1",
-        "product.download",
-      ),
+      service.checkEntitlement({ type: "user", id: "usr_1" }, "prd_1", "product.download"),
     ).resolves.toBe(true);
     expect(mocks.hasEntitlement).toHaveBeenCalledWith(
       { type: "user", id: "usr_1" },

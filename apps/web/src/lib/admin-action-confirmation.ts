@@ -15,9 +15,5 @@ export function confirmsAdminAction(
   }
 
   const value = body as Record<string, unknown>;
-  return (
-    value.success === true &&
-    value.targetId === targetId &&
-    value.action === action
-  );
+  return value.success === true && value.targetId === targetId && value.action === action;
 }

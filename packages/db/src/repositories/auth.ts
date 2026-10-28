@@ -55,13 +55,16 @@ export class AuthRepository {
   async createLoginSession(
     session: SessionWrite,
     audit: AuditWrite,
-    expectedPasswordHash: string
+    expectedPasswordHash: string,
   ): Promise<void> {
     await db.transaction(async (tx) => {
       // Serialize with password changes. Password verification runs before this
       // short transaction; a previously verified, now-obsolete hash cannot log in.
-      const [user] = await tx.select({ passwordHash: users.passwordHash })
-        .from(users).where(eq(users.id, session.userId)).for("update");
+      const [user] = await tx
+        .select({ passwordHash: users.passwordHash })
+        .from(users)
+        .where(eq(users.id, session.userId))
+        .for("update");
       if (!user || user.passwordHash !== expectedPasswordHash) {
         throw new UnauthorizedError("Invalid email or password");
       }
@@ -80,30 +83,46 @@ export class AuthRepository {
   }): Promise<{ revokedSessionCount: number; expiresAt: Date }> {
     return db.transaction(async (tx) => {
       // All password changes and login commits acquire the same user lock first.
-      const [user] = await tx.select({ passwordHash: users.passwordHash })
-        .from(users).where(eq(users.id, data.userId)).for("update");
+      const [user] = await tx
+        .select({ passwordHash: users.passwordHash })
+        .from(users)
+        .where(eq(users.id, data.userId))
+        .for("update");
       if (!user || user.passwordHash !== data.expectedPasswordHash) {
         throw new ConflictError("Your account changed during this request. Please sign in again.");
       }
-      const [current] = await tx.select().from(sessions).where(and(
-        eq(sessions.userId, data.userId),
-        eq(sessions.token, digestSessionToken(data.currentToken)),
-        gt(sessions.expiresAt, new Date())
-      )).for("update");
+      const [current] = await tx
+        .select()
+        .from(sessions)
+        .where(
+          and(
+            eq(sessions.userId, data.userId),
+            eq(sessions.token, digestSessionToken(data.currentToken)),
+            gt(sessions.expiresAt, new Date()),
+          ),
+        )
+        .for("update");
       if (!current || current.expiresAt.getTime() <= Date.now()) {
         throw new UnauthorizedError("Authentication required");
       }
 
-      await tx.update(users).set({ passwordHash: data.passwordHash, updatedAt: new Date() })
+      await tx
+        .update(users)
+        .set({ passwordHash: data.passwordHash, updatedAt: new Date() })
         .where(eq(users.id, data.userId));
-      const revoked = await tx.delete(sessions).where(and(
-        eq(sessions.userId, data.userId), ne(sessions.id, current.id)
-      )).returning({ expiresAt: sessions.expiresAt });
+      const revoked = await tx
+        .delete(sessions)
+        .where(and(eq(sessions.userId, data.userId), ne(sessions.id, current.id)))
+        .returning({ expiresAt: sessions.expiresAt });
       // Keep this browser signed in, but invalidate its previous bearer token.
       // Preserve the original expiry instead of extending the session lifetime.
-      await tx.update(sessions).set({ token: digestSessionToken(data.nextToken) })
+      await tx
+        .update(sessions)
+        .set({ token: digestSessionToken(data.nextToken) })
         .where(eq(sessions.id, current.id));
-      const revokedSessionCount = revoked.filter((row) => row.expiresAt.getTime() > Date.now()).length;
+      const revokedSessionCount = revoked.filter(
+        (row) => row.expiresAt.getTime() > Date.now(),
+      ).length;
       await tx.insert(auditEvents).values({
         ...data.audit,
         details: { revokedSessionCount, currentSessionRotated: true },
@@ -124,26 +143,36 @@ export class AuthRepository {
       // after the user lock, together with the context write and audit insertion.
       // The initiating session is rechecked after that same lock: a route-level
       // identity read can be stale if the session was revoked while waiting.
-      const [user] = await tx.select(publicUserColumns).from(users)
-        .where(eq(users.id, data.userId)).for("update");
+      const [user] = await tx
+        .select(publicUserColumns)
+        .from(users)
+        .where(eq(users.id, data.userId))
+        .for("update");
       if (!user) throw new NotFoundError("User", data.userId);
       await this.lockCurrentSession(tx, data.userId, data.currentToken);
 
       if (data.contextId !== "personal") {
         // SHARE locks hold owner changes, organization deletion and membership
         // revocation until this transaction commits.
-        const [organization] = await tx.select({ ownerId: organizations.ownerId })
-          .from(organizations).where(eq(organizations.id, data.contextId))
+        const [organization] = await tx
+          .select({ ownerId: organizations.ownerId })
+          .from(organizations)
+          .where(eq(organizations.id, data.contextId))
           .for("share");
         if (!organization) {
           throw new ForbiddenError("Not authorized to switch to this organization context");
         }
         if (organization.ownerId !== data.userId) {
-          const [membership] = await tx.select({ id: organizationMembers.id })
-            .from(organizationMembers).where(and(
-              eq(organizationMembers.organizationId, data.contextId),
-              eq(organizationMembers.userId, data.userId),
-            )).for("share");
+          const [membership] = await tx
+            .select({ id: organizationMembers.id })
+            .from(organizationMembers)
+            .where(
+              and(
+                eq(organizationMembers.organizationId, data.contextId),
+                eq(organizationMembers.userId, data.userId),
+              ),
+            )
+            .for("share");
           if (!membership) {
             throw new ForbiddenError("Not authorized to switch to this organization context");
           }
@@ -153,9 +182,11 @@ export class AuthRepository {
       const previousContextId = user.activeContextId ?? "personal";
       if (previousContextId === data.contextId) return toUserWithoutPassword(user);
 
-      const [updated] = await tx.update(users)
+      const [updated] = await tx
+        .update(users)
         .set({ activeContextId: data.contextId, updatedAt: new Date() })
-        .where(eq(users.id, data.userId)).returning(publicUserColumns);
+        .where(eq(users.id, data.userId))
+        .returning(publicUserColumns);
       await tx.insert(auditEvents).values({
         id: data.auditId,
         actorId: data.userId,
@@ -181,14 +212,20 @@ export class AuthRepository {
       if (data.sessionId === current.id) {
         throw new ConflictError("The current session cannot be revoked here; use logout instead");
       }
-      const revoked = await tx.delete(sessions).where(and(
-        eq(sessions.id, data.sessionId), eq(sessions.userId, data.userId)
-      )).returning({ id: sessions.id });
+      const revoked = await tx
+        .delete(sessions)
+        .where(and(eq(sessions.id, data.sessionId), eq(sessions.userId, data.userId)))
+        .returning({ id: sessions.id });
       if (revoked.length === 0) return false;
       await tx.insert(auditEvents).values({
-        id: data.auditId, actorId: data.userId, actorType: "user",
-        action: "user.session_revoked", targetId: data.userId, targetType: "user",
-        details: { sessionId: data.sessionId }, createdAt: new Date(),
+        id: data.auditId,
+        actorId: data.userId,
+        actorType: "user",
+        action: "user.session_revoked",
+        targetId: data.userId,
+        targetType: "user",
+        details: { sessionId: data.sessionId },
+        createdAt: new Date(),
       });
       return true;
     });
@@ -202,28 +239,39 @@ export class AuthRepository {
     return db.transaction(async (tx) => {
       const current = await this.lockSessionActor(tx, data.userId, data.currentToken);
       const cutoff = Date.now();
-      const revoked = await tx.delete(sessions).where(and(
-        eq(sessions.userId, data.userId), ne(sessions.id, current.id)
-      )).returning({ expiresAt: sessions.expiresAt });
+      const revoked = await tx
+        .delete(sessions)
+        .where(and(eq(sessions.userId, data.userId), ne(sessions.id, current.id)))
+        .returning({ expiresAt: sessions.expiresAt });
       if (revoked.length === 0) return 0;
       // Expired rows are removed too, but are not presented as active logins.
       const revokedCount = revoked.filter((row) => row.expiresAt.getTime() > cutoff).length;
       await tx.insert(auditEvents).values({
-        id: data.auditId, actorId: data.userId, actorType: "user",
-        action: "user.other_sessions_revoked", targetId: data.userId, targetType: "user",
-        details: { revokedCount, removedSessionCount: revoked.length }, createdAt: new Date(),
+        id: data.auditId,
+        actorId: data.userId,
+        actorType: "user",
+        action: "user.other_sessions_revoked",
+        targetId: data.userId,
+        targetType: "user",
+        details: { revokedCount, removedSessionCount: revoked.length },
+        createdAt: new Date(),
       });
       return revokedCount;
     });
   }
 
   private async lockCurrentSession(tx: AuthTransaction, userId: string, token: string) {
-    const [current] = await tx.select({ id: sessions.id, expiresAt: sessions.expiresAt })
-      .from(sessions).where(and(
-        eq(sessions.userId, userId),
-        eq(sessions.token, digestSessionToken(token)),
-        gt(sessions.expiresAt, new Date()),
-      )).for("update");
+    const [current] = await tx
+      .select({ id: sessions.id, expiresAt: sessions.expiresAt })
+      .from(sessions)
+      .where(
+        and(
+          eq(sessions.userId, userId),
+          eq(sessions.token, digestSessionToken(token)),
+          gt(sessions.expiresAt, new Date()),
+        ),
+      )
+      .for("update");
     const expiresAt = current ? new Date(current.expiresAt).getTime() : Number.NaN;
     if (!current || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
       throw new UnauthorizedError("Authentication required");
@@ -234,8 +282,11 @@ export class AuthRepository {
   private async lockSessionActor(tx: AuthTransaction, userId: string, token: string) {
     // Match login/password-change lock order: user first, then current session.
     // Recheck AFTER any lock wait; the route's earlier authorization may be stale.
-    const [user] = await tx.select({ id: users.id }).from(users)
-      .where(eq(users.id, userId)).for("update");
+    const [user] = await tx
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.id, userId))
+      .for("update");
     if (!user) throw new UnauthorizedError("Authentication required");
     return this.lockCurrentSession(tx, userId, token);
   }

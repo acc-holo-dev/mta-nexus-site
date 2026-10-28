@@ -40,16 +40,16 @@ export async function GET(request: NextRequest) {
 }
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
-
   const context = createRequestLogContext(request);
   try {
     const current = await actor(request);
     if (!current) return json({ error: "Authentication required" }, 401);
-    const parsed = requestRecoveryEmailVerificationSchema.safeParse(
-      await readAuthJson(request),
-    );
+    const parsed = requestRecoveryEmailVerificationSchema.safeParse(await readAuthJson(request));
     if (!parsed.success) {
-      return json({ error: "Email verification validation failed", details: parsed.error.format() }, 400);
+      return json(
+        { error: "Email verification validation failed", details: parsed.error.format() },
+        400,
+      );
     }
     const result = await authService.requestRecoveryEmailVerification({
       userId: current.user.id,
@@ -57,13 +57,17 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       currentPassword: parsed.data.currentPassword,
     });
     if (result.alreadyVerified) return json({ accepted: false, alreadyVerified: true });
-    return json({
-      accepted: true,
-      alreadyVerified: false,
-      expiresAt: result.expiresAt,
-    }, 202);
+    return json(
+      {
+        accepted: true,
+        alreadyVerified: false,
+        expiresAt: result.expiresAt,
+      },
+      202,
+    );
   } catch (error: unknown) {
-    if (error instanceof AppError) return json({ error: error.message, code: error.code }, error.statusCode);
+    if (error instanceof AppError)
+      return json({ error: error.message, code: error.code }, error.statusCode);
     // Configuration/DB/queue failures may contain secret-bearing context.
     logRequestEvent({
       level: "error",
@@ -77,14 +81,11 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 });
 
 export const PATCH = withBrowserMutation(async (request: NextRequest) => {
-
   const context = createRequestLogContext(request);
   try {
     const current = await actor(request);
     if (!current) return json({ error: "Authentication required" }, 401);
-    const parsed = confirmRecoveryEmailVerificationSchema.safeParse(
-      await readAuthJson(request),
-    );
+    const parsed = confirmRecoveryEmailVerificationSchema.safeParse(await readAuthJson(request));
     if (!parsed.success) return json({ error: "Invalid or expired email confirmation" }, 400);
     const result = await authService.confirmRecoveryEmailVerification({
       userId: current.user.id,
@@ -94,7 +95,8 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
     });
     return json({ success: true, email: result.email, verifiedAt: result.verifiedAt });
   } catch (error: unknown) {
-    if (error instanceof AppError) return json({ error: error.message, code: error.code }, error.statusCode);
+    if (error instanceof AppError)
+      return json({ error: error.message, code: error.code }, error.statusCode);
     logRequestEvent({
       level: "error",
       event: "auth.recovery_email.confirm_failed",
@@ -105,4 +107,3 @@ export const PATCH = withBrowserMutation(async (request: NextRequest) => {
     return json({ error: "Could not confirm this email. Please try again later." }, 503);
   }
 });
-

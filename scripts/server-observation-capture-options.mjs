@@ -17,11 +17,15 @@ function boundedInt(raw, fallback, max, name) {
 
 export function readServerObservationCaptureOptions(env = process.env) {
   const limit = boundedInt(
-    env.NEXUS_SERVER_OBSERVATION_PAGE_LIMIT, 500, 500,
+    env.NEXUS_SERVER_OBSERVATION_PAGE_LIMIT,
+    500,
+    500,
     "NEXUS_SERVER_OBSERVATION_PAGE_LIMIT",
   );
   const maxPages = boundedInt(
-    env.NEXUS_SERVER_OBSERVATION_MAX_PAGES, 1, 20,
+    env.NEXUS_SERVER_OBSERVATION_MAX_PAGES,
+    1,
+    20,
     "NEXUS_SERVER_OBSERVATION_MAX_PAGES",
   );
   const afterId = env.NEXUS_SERVER_OBSERVATION_AFTER_ID;
@@ -32,7 +36,8 @@ export function readServerObservationCaptureOptions(env = process.env) {
     throw new RangeError("NEXUS_SERVER_OBSERVATION_AFTER_ID is invalid");
   }
   return Object.freeze({
-    limit, maxPages,
+    limit,
+    maxPages,
     ...(afterId === undefined ? {} : { afterId }),
   });
 }

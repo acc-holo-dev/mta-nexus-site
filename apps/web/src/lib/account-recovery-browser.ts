@@ -11,9 +11,7 @@ export type ParsedAccountRecoveryLocation = {
 const CHALLENGE_PATTERN = /^ach_[A-Za-z0-9_-]{1,96}$/u;
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/u;
 
-export function parseAccountRecoveryLocation(
-  href: string,
-): ParsedAccountRecoveryLocation {
+export function parseAccountRecoveryLocation(href: string): ParsedAccountRecoveryLocation {
   let url: URL;
   try {
     url = new URL(href);
@@ -22,9 +20,7 @@ export function parseAccountRecoveryLocation(
   }
 
   const challengeId = url.searchParams.get("challenge") ?? "";
-  const fragment = new URLSearchParams(
-    url.hash.startsWith("#") ? url.hash.slice(1) : url.hash,
-  );
+  const fragment = new URLSearchParams(url.hash.startsWith("#") ? url.hash.slice(1) : url.hash);
   const token = fragment.get("token") ?? "";
 
   return {
@@ -42,10 +38,7 @@ export function readAccountRecoveryProofFromWindow(): AccountRecoveryProof | nul
   return parsed.proof;
 }
 
-export function recoveryJsonRequest(
-  method: "POST" | "PATCH",
-  body: unknown,
-): RequestInit {
+export function recoveryJsonRequest(method: "POST" | "PATCH", body: unknown): RequestInit {
   return {
     method,
     cache: "no-store",

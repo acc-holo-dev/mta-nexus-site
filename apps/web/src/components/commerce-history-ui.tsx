@@ -78,13 +78,23 @@ export function HistoryPagination({
   if (totalPages <= 1) return null;
   return (
     <nav aria-label={copy.page} className="flex items-center justify-between gap-4 text-sm">
-      {page > 1
-        ? <Link href={`/workspace/${area}?page=${page - 1}`} className="text-accent underline">{copy.previous}</Link>
-        : <span />}
-      <span className="text-secondary">{copy.page} {page} {copy.of} {totalPages}</span>
-      {page < totalPages
-        ? <Link href={`/workspace/${area}?page=${page + 1}`} className="text-accent underline">{copy.next}</Link>
-        : <span />}
+      {page > 1 ? (
+        <Link href={`/workspace/${area}?page=${page - 1}`} className="text-accent underline">
+          {copy.previous}
+        </Link>
+      ) : (
+        <span />
+      )}
+      <span className="text-secondary">
+        {copy.page} {page} {copy.of} {totalPages}
+      </span>
+      {page < totalPages ? (
+        <Link href={`/workspace/${area}?page=${page + 1}`} className="text-accent underline">
+          {copy.next}
+        </Link>
+      ) : (
+        <span />
+      )}
     </nav>
   );
 }

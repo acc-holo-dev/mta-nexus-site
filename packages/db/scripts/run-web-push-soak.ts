@@ -1,25 +1,9 @@
 import { createHash, randomBytes } from "node:crypto";
-import {
-  mkdir,
-  rename,
-  rm,
-  writeFile,
-} from "node:fs/promises";
+import { mkdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import process from "node:process";
-import {
-  and,
-  count,
-  eq,
-  gt,
-  isNull,
-  like,
-  lt,
-  lte,
-  or,
-  sql,
-} from "drizzle-orm";
+import { and, count, eq, gt, isNull, like, lt, lte, or, sql } from "drizzle-orm";
 import {
   db,
   notificationRepository,
@@ -32,22 +16,12 @@ import {
   webPushWorkerRepository,
 } from "../src/index";
 import { WebPushDispatcher } from "../src/repositories/web-push-dispatcher";
-import {
-  evaluateWebPushSoak,
-  readWebPushSoakConfig,
-} from "../src/repositories/web-push-soak";
-import type {
-  WebPushDispatchSummary,
-} from "../src/repositories/web-push-dispatcher";
-import type {
-  WebPushNotificationPayload,
-  WebPushSender,
-} from "../src/web-push-runtime";
+import { evaluateWebPushSoak, readWebPushSoakConfig } from "../src/repositories/web-push-soak";
+import type { WebPushDispatchSummary } from "../src/repositories/web-push-dispatcher";
+import type { WebPushNotificationPayload, WebPushSender } from "../src/web-push-runtime";
 
 if (process.env.NEXUS_WEB_PUSH_SOAK_ACK !== "YES") {
-  throw new Error(
-    "Refusing Web Push soak without NEXUS_WEB_PUSH_SOAK_ACK=YES",
-  );
+  throw new Error("Refusing Web Push soak without NEXUS_WEB_PUSH_SOAK_ACK=YES");
 }
 
 const config = readWebPushSoakConfig(process.env);
@@ -59,8 +33,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(here, "../../..");
 const evidencePath = resolve(
   repositoryRoot,
-  process.env.NEXUS_WEB_PUSH_SOAK_EVIDENCE_PATH?.trim() ||
-    "artifacts/web-push-soak-evidence.json",
+  process.env.NEXUS_WEB_PUSH_SOAK_EVIDENCE_PATH?.trim() || "artifacts/web-push-soak-evidence.json",
 );
 
 const sleep = (ms: number) =>
@@ -103,25 +76,13 @@ const fixtureWorker = {
       .from(webPushOutbox)
       .where(
         and(
-          like(
-            webPushOutbox.notificationId,
-            `${notificationPrefix}%`,
-          ),
-          lte(
-            webPushOutbox.availableAt,
-            sql`clock_timestamp()`,
-          ),
+          like(webPushOutbox.notificationId, `${notificationPrefix}%`),
+          lte(webPushOutbox.availableAt, sql`clock_timestamp()`),
           or(
             isNull(webPushOutbox.leaseExpiresAt),
-            lte(
-              webPushOutbox.leaseExpiresAt,
-              sql`clock_timestamp()`,
-            ),
+            lte(webPushOutbox.leaseExpiresAt, sql`clock_timestamp()`),
           ),
-          gt(
-            webPushOutbox.expiresAt,
-            sql`clock_timestamp()`,
-          ),
+          gt(webPushOutbox.expiresAt, sql`clock_timestamp()`),
           lt(webPushOutbox.attempts, 5),
         ),
       )
@@ -133,9 +94,7 @@ const fixtureWorker = {
   prepare: webPushWorkerRepository.prepare.bind(webPushWorkerRepository),
   settle: webPushWorkerRepository.settle.bind(webPushWorkerRepository),
   discardStaleSubscription:
-    webPushWorkerRepository.discardStaleSubscription.bind(
-      webPushWorkerRepository,
-    ),
+    webPushWorkerRepository.discardStaleSubscription.bind(webPushWorkerRepository),
   async discardUnavailable() {
     return 0;
   },
@@ -147,10 +106,7 @@ let duplicateAccepts = 0;
 let forcedRetries = 0;
 let senderCalls = 0;
 
-const sender: WebPushSender = async (
-  subscription,
-  payload: WebPushNotificationPayload,
-) => {
+const sender: WebPushSender = async (subscription, payload: WebPushNotificationPayload) => {
   senderCalls += 1;
   const key = `${subscription.endpoint}\0${payload.tag ?? ""}`;
   const attempt = (sendAttempts.get(key) ?? 0) + 1;
@@ -197,51 +153,39 @@ let cleanupSucceeded = true;
 let evidenceCore: Record<string, unknown> | null = null;
 
 async function snapshot() {
-  const [fixture, global] = await Promise.all([
-    fixturePending(),
-    webPushOutboxRepository.stats(),
-  ]);
+  const [fixture, global] = await Promise.all([fixturePending(), webPushOutboxRepository.stats()]);
   maxFixturePending = Math.max(maxFixturePending, fixture);
   maxGlobalPending = Math.max(maxGlobalPending, global.pending);
   maxGlobalDue = Math.max(maxGlobalDue, global.due);
   maxGlobalLeased = Math.max(maxGlobalLeased, global.leased);
-  maxOldestAgeSeconds = Math.max(
-    maxOldestAgeSeconds,
-    global.oldestAgeSeconds,
-  );
+  maxOldestAgeSeconds = Math.max(maxOldestAgeSeconds, global.oldestAgeSeconds);
   return { fixture, global };
 }
 
 async function enqueueWave() {
   const stats = await webPushOutboxRepository.stats();
-  const waveJobs =
-    config.notificationsPerWave * config.subscriptions;
+  const waveJobs = config.notificationsPerWave * config.subscriptions;
   const headroom = stats.capacity - stats.pending;
   if (headroom < waveJobs * 2) {
-    throw new Error(
-      `Insufficient Web Push queue headroom for soak wave: ${headroom}`,
-    );
+    throw new Error(`Insufficient Web Push queue headroom for soak wave: ${headroom}`);
   }
 
   for (let index = 0; index < config.notificationsPerWave; index += 1) {
     const id = `${notificationPrefix}${notificationIndex++}`;
-    const created =
-      await notificationRepository.createWithPushOutbox({
-        id,
-        recipientId: userId,
-        title: "Web Push production-duration soak",
-        message: `Wave ${waves} notification ${index}`,
-        link: "/notifications",
-        type: "system",
-        category: "system",
-      });
+    const created = await notificationRepository.createWithPushOutbox({
+      id,
+      recipientId: userId,
+      title: "Web Push production-duration soak",
+      message: `Wave ${waves} notification ${index}`,
+      link: "/notifications",
+      type: "system",
+      category: "system",
+    });
     if (!created.notification) {
       throw new Error("Soak notification was unexpectedly suppressed");
     }
     if (created.pushQueueState !== "queued") {
-      throw new Error(
-        `Soak outbox enqueue failed: ${created.pushQueueState}`,
-      );
+      throw new Error(`Soak outbox enqueue failed: ${created.pushQueueState}`);
     }
     enqueuedNotifications += 1;
     enqueuedJobs += created.pushJobs;
@@ -251,9 +195,7 @@ async function enqueueWave() {
 
 async function runDispatchRound() {
   const results = await Promise.all(
-    dispatchers.map((dispatcher) =>
-      dispatcher.runBatch(config.batchLimit),
-    ),
+    dispatchers.map((dispatcher) => dispatcher.runBatch(config.batchLimit)),
   );
   for (const result of results) addSummary(result);
 }
@@ -262,11 +204,7 @@ async function writeEvidence(value: unknown) {
   await mkdir(dirname(evidencePath), { recursive: true });
   const temporary = `${evidencePath}.tmp-${process.pid}`;
   try {
-    await writeFile(
-      temporary,
-      `${JSON.stringify(value, null, 2)}\n`,
-      { mode: 0o600 },
-    );
+    await writeFile(temporary, `${JSON.stringify(value, null, 2)}\n`, { mode: 0o600 });
     await rename(temporary, evidencePath);
   } finally {
     await rm(temporary, { force: true }).catch(() => undefined);
@@ -275,12 +213,9 @@ async function writeEvidence(value: unknown) {
 
 try {
   const initial = await webPushOutboxRepository.stats();
-  const minimumHeadroom =
-    config.notificationsPerWave * config.subscriptions * 4;
+  const minimumHeadroom = config.notificationsPerWave * config.subscriptions * 4;
   if (initial.capacity - initial.pending < minimumHeadroom) {
-    throw new Error(
-      "Web Push queue does not have enough free capacity for soak",
-    );
+    throw new Error("Web Push queue does not have enough free capacity for soak");
   }
 
   await userRepository.create({
@@ -295,20 +230,14 @@ try {
     id: sessionId,
     userId,
     token: `push-soak-long-${suffix}`,
-    expiresAt: new Date(
-      Date.now() +
-        config.durationMs +
-        config.drainTimeoutMs +
-        60 * 60 * 1_000,
-    ),
+    expiresAt: new Date(Date.now() + config.durationMs + config.drainTimeoutMs + 60 * 60 * 1_000),
   });
   for (let index = 0; index < config.subscriptions; index += 1) {
     const stored = await webPushSubscriptionRepository.upsert({
       id: `wps_push_soak_long_${suffix}_${index}`,
       userId,
       sessionId,
-      endpoint:
-        `https://push-soak-${index}.example.invalid/${suffix}`,
+      endpoint: `https://push-soak-${index}.example.invalid/${suffix}`,
       p256dh: `soak-p256dh-${suffix}-${index}`,
       auth: `soak-auth-${suffix}-${index}`,
       expirationAt: null,
@@ -422,10 +351,7 @@ try {
       ? currentVerdict
       : {
           passed: false,
-          failures: [
-            ...currentVerdict.failures,
-            "fixture_cleanup_failed",
-          ],
+          failures: [...currentVerdict.failures, "fixture_cleanup_failed"],
         };
     const finalCore = {
       ...evidenceCore,
@@ -435,9 +361,7 @@ try {
       },
       verdict: finalVerdict,
     };
-    const evidenceSha256 = createHash("sha256")
-      .update(JSON.stringify(finalCore))
-      .digest("hex");
+    const evidenceSha256 = createHash("sha256").update(JSON.stringify(finalCore)).digest("hex");
     await writeEvidence({
       ...finalCore,
       evidenceSha256,
@@ -450,11 +374,7 @@ try {
   }
 
   if (!cleanupSucceeded) {
-    process.stderr.write(
-      "web-push-soak cleanup failed for fixture namespace " +
-        suffix +
-        "\n",
-    );
+    process.stderr.write("web-push-soak cleanup failed for fixture namespace " + suffix + "\n");
     process.exitCode = 1;
   }
 }

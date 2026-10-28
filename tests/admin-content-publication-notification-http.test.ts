@@ -18,9 +18,7 @@ const afterMock = vi.hoisted(() =>
     state.afterCallbacks.push(callback);
   }),
 );
-const moderateContent = vi.hoisted(() =>
-  vi.fn(async () => state.moderated),
-);
+const moderateContent = vi.hoisted(() => vi.fn(async () => state.moderated));
 const notifyFollowers = vi.hoisted(() =>
   vi.fn(async () => ({
     attempted: 1,
@@ -30,9 +28,7 @@ const notifyFollowers = vi.hoisted(() =>
 );
 
 vi.mock("next/server", async () => {
-  const actual = await vi.importActual<typeof import("next/server")>(
-    "next/server",
-  );
+  const actual = await vi.importActual<typeof import("next/server")>("next/server");
   return {
     ...actual,
     after: afterMock,
@@ -63,12 +59,9 @@ vi.mock("../apps/web/src/lib/services/content-service", () => ({
   },
 }));
 
-vi.mock(
-  "../apps/web/src/lib/services/server-follow-notification-service",
-  () => ({
-    notifyServerFollowersOfPublishedContent: notifyFollowers,
-  }),
-);
+vi.mock("../apps/web/src/lib/services/server-follow-notification-service", () => ({
+  notifyServerFollowersOfPublishedContent: notifyFollowers,
+}));
 
 vi.mock("@nexus/db", () => ({
   productRepository: {
@@ -181,9 +174,17 @@ describe("content publication side effects", () => {
   });
 });
 
-it.each([{ expectedUpdatedAt: undefined }, { expectedUpdatedAt: "invalid" }, { notes: " " }, { expectedStatus: "draft" }])("requires the observed content revision, notes and strict authority fields %j", async (extra) => {
-  const response = await POST(request("publish", extra));
-  expect(response.status).toBe(400);
-  expect(moderateContent).not.toHaveBeenCalled();
-  expect(notifyFollowers).not.toHaveBeenCalled();
-});
+it.each([
+  { expectedUpdatedAt: undefined },
+  { expectedUpdatedAt: "invalid" },
+  { notes: " " },
+  { expectedStatus: "draft" },
+])(
+  "requires the observed content revision, notes and strict authority fields %j",
+  async (extra) => {
+    const response = await POST(request("publish", extra));
+    expect(response.status).toBe(400);
+    expect(moderateContent).not.toHaveBeenCalled();
+    expect(notifyFollowers).not.toHaveBeenCalled();
+  },
+);

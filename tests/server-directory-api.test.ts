@@ -11,11 +11,7 @@ vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
 }));
 vi.mock("../apps/web/src/lib/observability", () => ({
   createRequestLogContext: () => ({ requestId: "test-request" }),
-  jsonWithRequestId: (
-    context: { requestId: string },
-    body: unknown,
-    init: ResponseInit,
-  ) => {
+  jsonWithRequestId: (context: { requestId: string }, body: unknown, init: ResponseInit) => {
     const headers = new Headers(init.headers);
     headers.set("X-Request-Id", context.requestId);
     return NextResponse.json(body, { ...init, headers });
@@ -33,16 +29,27 @@ beforeEach(() => {
 describe("official MTA directory API", () => {
   it("reads only the requested fifty entries from an unfiltered 10,000-server snapshot", async () => {
     let entryReads = 0;
-    const servers = new Proxy(Array.from({ length: 10_000 }, (_, index) => ({
-      address: `server-${index}.test`, port: 22003, players: index % 32,
-    })), {
-      get(target, key, receiver) {
-        if (typeof key === "string" && /^\d+$/.test(key)) entryReads++;
-        return Reflect.get(target, key, receiver);
+    const servers = new Proxy(
+      Array.from({ length: 10_000 }, (_, index) => ({
+        address: `server-${index}.test`,
+        port: 22003,
+        players: index % 32,
+      })),
+      {
+        get(target, key, receiver) {
+          if (typeof key === "string" && /^\d+$/.test(key)) entryReads++;
+          return Reflect.get(target, key, receiver);
+        },
       },
+    );
+    getDirectory.mockResolvedValue({
+      servers,
+      fetchedAt: "2026-10-09T00:00:00.000Z",
+      isStale: false,
     });
-    getDirectory.mockResolvedValue({ servers, fetchedAt: "2026-10-09T00:00:00.000Z", isStale: false });
-    const response = await GET(new NextRequest("https://nexus.test/api/servers/directory?offset=500&limit=50"));
+    const response = await GET(
+      new NextRequest("https://nexus.test/api/servers/directory?offset=500&limit=50"),
+    );
     const body = await response.json();
     expect(body).toMatchObject({ total: 10_000, offset: 500, limit: 50, isStale: false });
     expect(body.servers).toHaveLength(50);
@@ -62,11 +69,19 @@ describe("official MTA directory API", () => {
       isStale: true,
     });
 
-    const response = await GET(new NextRequest("https://nexus.test/api/servers/directory?query=nexus&minPlayers=10&limit=1&offset=1"));
+    const response = await GET(
+      new NextRequest(
+        "https://nexus.test/api/servers/directory?query=nexus&minPlayers=10&limit=1&offset=1",
+      ),
+    );
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({
-      servers: [{ name: "Nexus 3" }], total: 2, offset: 1, limit: 1,
-      fetchedAt: "2026-09-27T00:00:00.000Z", isStale: true,
+      servers: [{ name: "Nexus 3" }],
+      total: 2,
+      offset: 1,
+      limit: 1,
+      fetchedAt: "2026-09-27T00:00:00.000Z",
+      isStale: true,
     });
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(response.headers.get("X-Request-Id")).toBeNull();
@@ -81,14 +96,14 @@ describe("official MTA directory API", () => {
     });
     const response = await GET(new NextRequest("https://nexus.test/api/servers/directory"));
     expect(response.status).toBe(200);
-    expect(response.headers.get("Cache-Control")).toBe(
-      "public, max-age=30",
-    );
+    expect(response.headers.get("Cache-Control")).toBe("public, max-age=30");
     expect((await response.json()).isStale).toBe(false);
   });
 
   it("rejects invalid pagination without reading the master list", async () => {
-    const response = await GET(new NextRequest("https://nexus.test/api/servers/directory?limit=101"));
+    const response = await GET(
+      new NextRequest("https://nexus.test/api/servers/directory?limit=101"),
+    );
     expect(response.status).toBe(400);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(response.headers.get("X-Request-Id")).toBe("test-request");

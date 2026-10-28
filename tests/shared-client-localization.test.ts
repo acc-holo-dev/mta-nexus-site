@@ -3,8 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { getDictionary } from "../apps/web/src/lib/i18n";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("shared client localization and request hardening", () => {
   it("localizes workspace context switching and hardens both requests", () => {
@@ -23,18 +22,14 @@ describe("shared client localization and request hardening", () => {
   });
 
   it("keeps MTA directory errors in the dictionary and requests uncached data", () => {
-    const source = read(
-      "apps/web/src/components/mta-master-server-directory.tsx",
-    );
+    const source = read("apps/web/src/components/mta-master-server-directory.tsx");
 
     expect(source).toContain("copy.directoryTimeout");
     expect(source).toContain("copy.directoryFetchError");
     expect(source).toContain("copy.publicServersLabel");
     expect(source).toContain('cache: "no-store"');
     expect(source).toContain('credentials: "same-origin"');
-    expect(source).not.toContain(
-      "Каталог MTA слишком долго не отвечал",
-    );
+    expect(source).not.toContain("Каталог MTA слишком долго не отвечал");
 
     const en = getDictionary("en").servers;
     const ru = getDictionary("ru").servers;

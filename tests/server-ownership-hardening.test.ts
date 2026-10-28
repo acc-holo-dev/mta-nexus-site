@@ -2,8 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const read = (path: string) =>
-  readFileSync(resolve(process.cwd(), path), "utf8");
+const read = (path: string) => readFileSync(resolve(process.cwd(), path), "utf8");
 
 describe("server ownership hardening surface", () => {
   it("hardens registration ownership and validates organization identifiers", () => {
@@ -16,18 +15,14 @@ describe("server ownership hardening surface", () => {
 
   it("uses trusted request IP for server registration", () => {
     const route = read("apps/web/src/app/api/servers/route.ts");
-    expect(route).toContain(
-      'import { getTrustedRequestIp } from "../../../lib/request-client-ip"',
-    );
+    expect(route).toContain('import { getTrustedRequestIp } from "../../../lib/request-client-ip"');
     expect(route).toContain("getTrustedRequestIp(request)");
     expect(route).not.toContain("getClientIp(request.headers)");
   });
 
   it("uses one server management contract in service and workspace page", () => {
     const service = read("apps/web/src/lib/services/server-service.ts");
-    const page = read(
-      "apps/web/src/app/workspace/servers/[id]/page.tsx",
-    );
+    const page = read("apps/web/src/app/workspace/servers/[id]/page.tsx");
 
     expect(service).toContain("async canManageServer(");
     expect(service).toContain("if (!organization) return false");
@@ -36,9 +31,9 @@ describe("server ownership hardening surface", () => {
     expect(service).not.toContain("organizationRepository.listUserMemberships(actor.id)");
     expect(service).toContain('can(actor, "server.manage", server, {');
     const orgRepo = read("packages/db/src/repositories/organizations.ts");
-    expect(orgRepo).toContain('eq(organizationMembers.organizationId, organizationId)');
-    expect(orgRepo).toContain('eq(organizationMembers.userId, userId)');
-    expect(orgRepo).toContain('.limit(1)');
+    expect(orgRepo).toContain("eq(organizationMembers.organizationId, organizationId)");
+    expect(orgRepo).toContain("eq(organizationMembers.userId, userId)");
+    expect(orgRepo).toContain(".limit(1)");
     expect(service).toContain("serverRepository.updateManagedWithAudit(");
     expect(service).not.toContain("await this.canManageServer(server, actor)");
     const repo = read("packages/db/src/repositories/servers.ts");
@@ -46,34 +41,22 @@ describe("server ownership hardening surface", () => {
     expect(repo).toContain('for("share")');
     expect(repo).toContain('"SERVER_METADATA_CONFLICT"');
     expect(page).toContain("await serverService.canManageServer(server, user)");
-    expect(page).not.toContain(
-      'server.ownerId !== user.id && user.role !== "admin"',
-    );
+    expect(page).not.toContain('server.ownerId !== user.id && user.role !== "admin"');
   });
 
   it("serializes server claims in the repository and checks pending claims across requesters", () => {
-    const repository = read(
-      "packages/db/src/repositories/verification.ts",
-    );
-    const route = read(
-      "apps/web/src/app/api/verification/route.ts",
-    );
+    const repository = read("packages/db/src/repositories/verification.ts");
+    const route = read("apps/web/src/app/api/verification/route.ts");
 
-    expect(repository).toContain(
-      "pg_advisory_xact_lock",
-    );
-    expect(repository).toContain(
-      "pg_advisory_xact_lock",
-    );
+    expect(repository).toContain("pg_advisory_xact_lock");
+    expect(repository).toContain("pg_advisory_xact_lock");
     // Claim serialization keys on the verification target, not a server-only
     // literal: the same contract now covers user/developer/organization targets.
     const dollar = "$";
     expect(repository).toContain(
       `verification:${dollar}{input.targetType}:${dollar}{input.targetId}`,
     );
-    expect(repository).toContain(
-      "A verification request is already pending",
-    );
+    expect(repository).toContain("A verification request is already pending");
     expect(repository).toContain(
       '"Server endpoint changed or is already owned; new MTA control proof required"',
     );
@@ -81,30 +64,24 @@ describe("server ownership hardening surface", () => {
     // Duplicate pending requests are detected per requester before enqueue;
     // cross-requester pending state stays available on the repository for
     // moderation-side checks.
-    expect(route).toContain(
-      "verificationRepository.findPendingForTarget(",
-    );
+    expect(route).toContain("verificationRepository.findPendingForTarget(");
     expect(route).toContain("error instanceof AppError");
   });
 
   it("preserves private cache semantics on the authenticated verification GET", () => {
-    const route = read(
-      "apps/web/src/app/api/verification/route.ts",
-    );
+    const route = read("apps/web/src/app/api/verification/route.ts");
 
     // Every authenticated response (including 401 and rate limits) goes through
     // the json() helper, so the private no-store headers always apply.
     expect(route).toContain('"Cache-Control": "private, no-store"');
-    expect(route).toContain("Vary: \"Cookie\"");
+    expect(route).toContain('Vary: "Cookie"');
     expect(route).toContain("headers: privateHeaders");
     expect(route).toContain("return json(context, { requests });");
     expect(route).toMatch(/return json\(\s*context,\s*\{ error: "Unauthorized" \},\s*401,?\s*\)/u);
   });
 
   it("does not claim automatic proof or live-ownership acceptance", () => {
-    const route = read(
-      "apps/web/src/app/api/verification/route.ts",
-    );
+    const route = read("apps/web/src/app/api/verification/route.ts");
 
     expect(route).toContain("proofUrl");
     expect(route).not.toContain("ownershipVerified: true");

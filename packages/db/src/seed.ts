@@ -15,14 +15,9 @@ export async function runSeed(options: SeedOptions = {}) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const args = process.argv.slice(2);
-  const allowed = new Set([
-    "--repair-demo-builds",
-    "--repair-demo-media",
-  ]);
+  const allowed = new Set(["--repair-demo-builds", "--repair-demo-media"]);
   if (args.some((arg) => !allowed.has(arg))) {
-    console.error(
-      "Usage: seed [--repair-demo-builds] [--repair-demo-media]",
-    );
+    console.error("Usage: seed [--repair-demo-builds] [--repair-demo-media]");
     process.exit(1);
   }
   runSeed({

@@ -10,12 +10,7 @@ import {
 import { generateId } from "@nexus/security";
 import { and, asc, count, eq, gt, sql } from "drizzle-orm";
 import { db } from "../client";
-import {
-  auditEvents,
-  sessions,
-  storageMaintenanceObjects as objects,
-  users,
-} from "../schema";
+import { auditEvents, sessions, storageMaintenanceObjects as objects, users } from "../schema";
 import { historyPageBounds } from "./history-pagination";
 import { digestSessionToken } from "./sessions";
 
@@ -34,11 +29,13 @@ async function lockInitiatingSession(tx: Tx, actorId: string, token: string) {
   const [current] = await tx
     .select({ id: sessions.id, expiresAt: sessions.expiresAt })
     .from(sessions)
-    .where(and(
-      eq(sessions.userId, actorId),
-      eq(sessions.token, digestSessionToken(token)),
-      gt(sessions.expiresAt, new Date()),
-    ))
+    .where(
+      and(
+        eq(sessions.userId, actorId),
+        eq(sessions.token, digestSessionToken(token)),
+        gt(sessions.expiresAt, new Date()),
+      ),
+    )
     .for("update");
   const expiresAt = current ? new Date(current.expiresAt).getTime() : Number.NaN;
   if (!current || !Number.isFinite(expiresAt) || expiresAt <= Date.now()) {

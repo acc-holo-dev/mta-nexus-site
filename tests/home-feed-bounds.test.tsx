@@ -11,37 +11,19 @@ const mocks = vi.hoisted(() => ({
 vi.mock("next/link", async () => {
   const ReactModule = await import("react");
   return {
-    default: ({
-      href,
-      children,
-      ...props
-    }: {
-      href: string;
-      children?: React.ReactNode;
-    }) => ReactModule.createElement("a", { href, ...props }, children),
+    default: ({ href, children, ...props }: { href: string; children?: React.ReactNode }) =>
+      ReactModule.createElement("a", { href, ...props }, children),
   };
 });
 
 vi.mock("@nexus/ui", () => ({
-  SectionHeader: ({
-    title,
-    action,
-  }: {
-    title: string;
-    action?: React.ReactNode;
-  }) => (
+  SectionHeader: ({ title, action }: { title: string; action?: React.ReactNode }) => (
     <header>
       <h2>{title}</h2>
       {action}
     </header>
   ),
-  StatCard: ({
-    label,
-    value,
-  }: {
-    label: string;
-    value: string | number;
-  }) => (
+  StatCard: ({ label, value }: { label: string; value: string | number }) => (
     <p>
       {label}: {value}
     </p>
@@ -49,29 +31,22 @@ vi.mock("@nexus/ui", () => ({
 }));
 
 vi.mock("../apps/web/src/components/article-card", () => ({
-  ArticleCard: ({ article }: { article: { title: string } }) => (
-    <article>{article.title}</article>
-  ),
+  ArticleCard: ({ article }: { article: { title: string } }) => <article>{article.title}</article>,
 }));
 
 vi.mock("../apps/web/src/components/product-card", () => ({
-  ProductCard: ({ product }: { product: { title: string } }) => (
-    <article>{product.title}</article>
-  ),
+  ProductCard: ({ product }: { product: { title: string } }) => <article>{product.title}</article>,
 }));
 
 vi.mock("../apps/web/src/lib/i18n-server", () => ({
   getRequestLocale: vi.fn(async () => "en"),
 }));
 
-vi.mock(
-  "../apps/web/src/lib/services/mta-master-directory-service",
-  () => ({
-    mtaMasterDirectoryService: {
-      getDirectory: mocks.directory,
-    },
-  }),
-);
+vi.mock("../apps/web/src/lib/services/mta-master-directory-service", () => ({
+  mtaMasterDirectoryService: {
+    getDirectory: mocks.directory,
+  },
+}));
 
 vi.mock("../apps/web/src/lib/services/product-service", () => ({
   productService: {

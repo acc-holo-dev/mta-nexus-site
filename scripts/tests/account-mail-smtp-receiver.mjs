@@ -22,7 +22,9 @@ const server = tls.createServer({ cert, key }, (socket) => {
       return;
     }
     if (recipient.startsWith("slow@")) {
-      setTimeout(() => { if (!socket.destroyed) reply("250 2.0.0 queued"); }, 1500);
+      setTimeout(() => {
+        if (!socket.destroyed) reply("250 2.0.0 queued");
+      }, 1500);
       return;
     }
     reply("250 2.0.0 queued");
@@ -46,7 +48,9 @@ const server = tls.createServer({ cert, key }, (socket) => {
       } else if (/^AUTH PLAIN /i.test(line)) {
         const encoded = line.slice("AUTH PLAIN ".length).trim();
         let decoded = "";
-        try { decoded = Buffer.from(encoded, "base64").toString("utf8"); } catch {}
+        try {
+          decoded = Buffer.from(encoded, "base64").toString("utf8");
+        } catch {}
         const expected = `\0${authUser}\0${authPass}`;
         reply(decoded === expected ? "235 2.7.0 authenticated" : "535 5.7.8 authentication failed");
       } else if (/^MAIL FROM:/i.test(line)) {

@@ -24,28 +24,24 @@ async function fixture(expiry: Date | null, enabled = true) {
     displayName: "Term fixture",
     role: "user",
   });
-  await db
-    .insert(products)
-    .values({
-      id: productId,
-      authorId: userId,
-      title: "Term fixture",
-      slug: productId.replaceAll("_", "-"),
-      description: "Recorded license term fixture",
-      type: "script",
-      status: "draft",
-    });
-  await db
-    .insert(licenses)
-    .values({
-      id: licenseId,
-      userId,
-      productId,
-      key: randomUUID(),
-      model: "single_server",
-      status: "active",
-      expiresAt: expiry,
-    });
+  await db.insert(products).values({
+    id: productId,
+    authorId: userId,
+    title: "Term fixture",
+    slug: productId.replaceAll("_", "-"),
+    description: "Recorded license term fixture",
+    type: "script",
+    status: "draft",
+  });
+  await db.insert(licenses).values({
+    id: licenseId,
+    userId,
+    productId,
+    key: randomUUID(),
+    model: "single_server",
+    status: "active",
+    expiresAt: expiry,
+  });
   await db
     .insert(notificationPreferences)
     .values({ id: `npr_${suffix}`, userId, commerceEnabled: enabled });
@@ -107,14 +103,12 @@ it("requires the exact PostgreSQL term, rejects invented warning dates and dedup
     .set({ expiresAt: sql`clock_timestamp() + interval '1 day' + interval '0.123456 seconds'` })
     .where(eq(licenses.id, f.licenseId));
   await expect(
-    db
-      .insert(licenseTermEvents)
-      .values({
-        licenseId: f.licenseId,
-        event: "expiring",
-        expiresAt: new Date(Date.now() + 86400000),
-        notified: false,
-      }),
+    db.insert(licenseTermEvents).values({
+      licenseId: f.licenseId,
+      event: "expiring",
+      expiresAt: new Date(Date.now() + 86400000),
+      notified: false,
+    }),
   ).rejects.toThrow();
   const exact = {
     licenseId: f.licenseId,
@@ -136,14 +130,12 @@ it("rejects event processing for a non-finite historical term at the database bo
     .set({ status: "expired", expiresAt: sql`'-infinity'::timestamptz` })
     .where(eq(licenses.id, f.licenseId));
   await expect(
-    db
-      .insert(licenseTermEvents)
-      .values({
-        licenseId: f.licenseId,
-        event: "expired",
-        expiresAt: sql`'-infinity'::timestamptz`,
-        notified: false,
-      }),
+    db.insert(licenseTermEvents).values({
+      licenseId: f.licenseId,
+      event: "expired",
+      expiresAt: sql`'-infinity'::timestamptz`,
+      notified: false,
+    }),
   ).rejects.toThrow();
   expect(
     await db.select().from(licenseTermEvents).where(eq(licenseTermEvents.licenseId, f.licenseId)),

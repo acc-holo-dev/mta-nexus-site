@@ -22,7 +22,8 @@ vi.mock("@nexus/security", () => ({
 }));
 vi.mock("@nexus/db", () => ({
   reportRepository: { resolve: mocks.resolve, findById: mocks.findById },
-  productRepository: {}, verificationRepository: {},
+  productRepository: {},
+  verificationRepository: {},
 }));
 
 import { POST } from "../apps/web/src/app/api/admin/actions/route";
@@ -79,14 +80,24 @@ describe("report decisions over HTTP", () => {
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
     expect(await response.json()).toEqual({ success: true, action: "dismiss", targetId: "rpt_1" });
-    expect(mocks.resolve).toHaveBeenCalledWith("rpt_1", "dismissed", "Duplicated claim", expect.objectContaining({
-      actorId: "mod_1", action: "admin.dismiss", details: { notes: "Duplicated claim" },
-    }), "session");
+    expect(mocks.resolve).toHaveBeenCalledWith(
+      "rpt_1",
+      "dismissed",
+      "Duplicated claim",
+      expect.objectContaining({
+        actorId: "mod_1",
+        action: "admin.dismiss",
+        details: { notes: "Duplicated claim" },
+      }),
+      "session",
+    );
   });
 
   it("distinguishes a missing report from a decision already made", async () => {
     mocks.resolve.mockResolvedValue(null);
-    mocks.findById.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: "rpt_1", status: "resolved" });
+    mocks.findById
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: "rpt_1", status: "resolved" });
     expect((await POST(request())).status).toBe(404);
     const stale = await POST(request());
     expect(stale.status).toBe(409);

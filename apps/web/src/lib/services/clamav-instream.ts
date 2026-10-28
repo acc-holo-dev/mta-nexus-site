@@ -1,9 +1,6 @@
 import type { Socket } from "node:net";
 
-export type ClamAvInstreamSocket = Pick<
-  Socket,
-  "write" | "end" | "once" | "off"
->;
+export type ClamAvInstreamSocket = Pick<Socket, "write" | "end" | "once" | "off">;
 
 const CLAMAV_CHUNK_BYTES = 64 * 1024;
 
@@ -33,10 +30,7 @@ function waitForDrain(socket: ClamAvInstreamSocket): Promise<void> {
   });
 }
 
-async function writeChunk(
-  socket: ClamAvInstreamSocket,
-  chunk: string | Uint8Array,
-): Promise<void> {
+async function writeChunk(socket: ClamAvInstreamSocket, chunk: string | Uint8Array): Promise<void> {
   if (socket.write(chunk)) return;
   await waitForDrain(socket);
 }

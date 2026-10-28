@@ -56,7 +56,7 @@ export function mtaLiveStatus(
 
 export function matchesMtaEndpoint(
   editorial: { ipAddress: string; port: number },
-  observation: Pick<MtaMasterServer, "address" | "port">
+  observation: Pick<MtaMasterServer, "address" | "port">,
 ): boolean {
   return (
     editorial.port === observation.port &&
@@ -303,9 +303,7 @@ export async function readBoundedMasterPayload(
       }
       const needed = total + value.byteLength;
       if (needed > bytes.byteLength) {
-        const expanded = new Uint8Array(
-          Math.min(maxBytes, Math.max(needed, bytes.byteLength * 2)),
-        );
+        const expanded = new Uint8Array(Math.min(maxBytes, Math.max(needed, bytes.byteLength * 2)));
         expanded.set(bytes.subarray(0, total));
         bytes = expanded;
       }
@@ -324,10 +322,7 @@ export async function readBoundedMasterPayload(
   return bytes.slice(0, total).buffer;
 }
 
-type MasterFetch = (
-  input: string | URL | Request,
-  init?: RequestInit,
-) => Promise<Response>;
+type MasterFetch = (input: string | URL | Request, init?: RequestInit) => Promise<Response>;
 
 export async function requestMtaMasterDirectoryFromEndpoints(
   endpoints: readonly string[],
@@ -343,9 +338,7 @@ export async function requestMtaMasterDirectoryFromEndpoints(
     if (remainingMs <= 0) break;
 
     try {
-      const endpointSignal = AbortSignal.timeout(
-        Math.min(MASTER_ENDPOINT_TIMEOUT_MS, remainingMs),
-      );
+      const endpointSignal = AbortSignal.timeout(Math.min(MASTER_ENDPOINT_TIMEOUT_MS, remainingMs));
       const response = await fetcher(endpoint, {
         cache: "no-store",
         // Do not redirect operator-approved HTTPS endpoints to another host
@@ -365,7 +358,9 @@ export async function requestMtaMasterDirectoryFromEndpoints(
       }
 
       const payload = await readBoundedMasterPayload(
-        response, MAX_MASTER_PAYLOAD_BYTES, endpointSignal,
+        response,
+        MAX_MASTER_PAYLOAD_BYTES,
+        endpointSignal,
       );
       const servers = parseMtaMasterList(payload)
         .filter((server) => server.responding !== false)
@@ -387,19 +382,12 @@ export async function requestMtaMasterDirectoryFromEndpoints(
 }
 
 function configuredMasterEndpoints(): string[] {
-  const endpoints = [
-    MTA_MASTER_URL,
-    ...readMtaMasterMirrorUrls(),
-  ];
-  return endpoints.filter(
-    (endpoint, index) => endpoints.indexOf(endpoint) === index,
-  );
+  const endpoints = [MTA_MASTER_URL, ...readMtaMasterMirrorUrls()];
+  return endpoints.filter((endpoint, index) => endpoints.indexOf(endpoint) === index);
 }
 
 async function requestDirectory(): Promise<MtaMasterDirectory> {
-  return requestMtaMasterDirectoryFromEndpoints(
-    configuredMasterEndpoints(),
-  );
+  return requestMtaMasterDirectoryFromEndpoints(configuredMasterEndpoints());
 }
 
 export const mtaMasterDirectoryService = {

@@ -1,7 +1,22 @@
 import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
-import { orders, orderItems, products, builds, entitlements, licenses, users, auditEvents } from "../schema";
-import { AppError, readOrderLineTerms, validatePendingOrder, type Order, type OrderItem } from "@nexus/domain";
+import {
+  orders,
+  orderItems,
+  products,
+  builds,
+  entitlements,
+  licenses,
+  users,
+  auditEvents,
+} from "../schema";
+import {
+  AppError,
+  readOrderLineTerms,
+  validatePendingOrder,
+  type Order,
+  type OrderItem,
+} from "@nexus/domain";
 import { createHash } from "node:crypto";
 import { historyPageBounds } from "./history-pagination";
 import { safePublishedBuildCondition, trustedCleanScanCondition } from "./build-safety";
@@ -13,12 +28,12 @@ export class OrderRepository {
       async (tx) => {
         const [order] = await tx
           .select({
-      id: orders.id,
-      orderNumber: orders.orderNumber,
-      status: orders.status,
-      totalAmount: orders.totalAmount,
-      currency: orders.currency,
-      createdAt: orders.createdAt,
+            id: orders.id,
+            orderNumber: orders.orderNumber,
+            status: orders.status,
+            totalAmount: orders.totalAmount,
+            currency: orders.currency,
+            createdAt: orders.createdAt,
             updatedAt: orders.updatedAt,
           })
           .from(orders)
@@ -27,10 +42,10 @@ export class OrderRepository {
         if (!order) return null;
         const [summary] = await tx
           .select({ total: count() })
-      .from(orderItems)
-      .where(eq(orderItems.orderId, order.id));
-    const bounds = historyPageBounds(summary?.total ?? 0, requestedPage);
-    const now = new Date();
+          .from(orderItems)
+          .where(eq(orderItems.orderId, order.id));
+        const bounds = historyPageBounds(summary?.total ?? 0, requestedPage);
+        const now = new Date();
         const available = sql<boolean>`(${products.status} = 'published'
         and exists (select 1 from ${builds} where ${builds.productId} = ${products.id}
           and ${builds.status} = 'published' and ${trustedCleanScanCondition()}))`;
@@ -68,7 +83,6 @@ export class OrderRepository {
     );
   }
 
-
   async findById(id: string): Promise<Order | null> {
     const orderRows = await db.select().from(orders).where(eq(orders.id, id)).limit(1);
     if (!orderRows.length) return null;
@@ -87,16 +101,20 @@ export class OrderRepository {
     const scope = eq(orders.buyerId, buyerId);
     const [summary] = await db.select({ total: count() }).from(orders).where(scope);
     const bounds = historyPageBounds(summary?.total ?? 0, requestedPage);
-    const rows = await db.select({
-      id: orders.id,
-      orderNumber: orders.orderNumber,
-      status: orders.status,
-      totalAmount: orders.totalAmount,
-      currency: orders.currency,
-      createdAt: orders.createdAt,
-    }).from(orders).where(scope)
+    const rows = await db
+      .select({
+        id: orders.id,
+        orderNumber: orders.orderNumber,
+        status: orders.status,
+        totalAmount: orders.totalAmount,
+        currency: orders.currency,
+        createdAt: orders.createdAt,
+      })
+      .from(orders)
+      .where(scope)
       .orderBy(desc(orders.createdAt), desc(orders.id))
-      .limit(bounds.pageSize).offset(bounds.offset);
+      .limit(bounds.pageSize)
+      .offset(bounds.offset);
     return { orders: rows, ...bounds };
   }
 
@@ -111,25 +129,29 @@ export class OrderRepository {
       isNull(products.organizationId),
       eq(orders.status, "completed"),
     );
-    const [summary] = await db.select({ total: count() })
+    const [summary] = await db
+      .select({ total: count() })
       .from(orderItems)
       .innerJoin(orders, eq(orderItems.orderId, orders.id))
       .innerJoin(products, eq(orderItems.productId, products.id))
       .where(scope);
     const bounds = historyPageBounds(summary?.total ?? 0, requestedPage);
-    const rows = await db.select({
-      id: orderItems.id,
-      orderNumber: orders.orderNumber,
-      productTitle: products.title,
-      unitPrice: orderItems.unitPrice,
-      currency: orderItems.currency,
-      createdAt: orders.createdAt,
-    }).from(orderItems)
+    const rows = await db
+      .select({
+        id: orderItems.id,
+        orderNumber: orders.orderNumber,
+        productTitle: products.title,
+        unitPrice: orderItems.unitPrice,
+        currency: orderItems.currency,
+        createdAt: orders.createdAt,
+      })
+      .from(orderItems)
       .innerJoin(orders, eq(orderItems.orderId, orders.id))
       .innerJoin(products, eq(orderItems.productId, products.id))
       .where(scope)
       .orderBy(desc(orders.createdAt), desc(orderItems.id))
-      .limit(bounds.pageSize).offset(bounds.offset);
+      .limit(bounds.pageSize)
+      .offset(bounds.offset);
     return { sales: rows, ...bounds };
   }
 
@@ -351,7 +373,13 @@ export class OrderRepository {
       .from(orderItems)
       .innerJoin(orders, eq(orderItems.orderId, orders.id))
       .innerJoin(products, eq(orderItems.productId, products.id))
-      .where(and(eq(products.authorId, sellerId), isNull(products.organizationId), eq(orders.status, "completed")))
+      .where(
+        and(
+          eq(products.authorId, sellerId),
+          isNull(products.organizationId),
+          eq(orders.status, "completed"),
+        ),
+      )
       .orderBy(desc(orders.createdAt), desc(orderItems.id))
       .limit(Number.isSafeInteger(limit) ? Math.max(1, Math.min(100, limit)) : 100);
 

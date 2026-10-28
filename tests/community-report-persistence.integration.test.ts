@@ -198,16 +198,14 @@ it("denies revoked roles and rolls back target/counter/report when either audit 
   await db.update(users).set({ role: "moderator" }).where(eq(users.id, f.moderator.id));
   for (const field of ["auditId", "removalAuditId"] as const) {
     const duplicateId = id("aud");
-    await db
-      .insert(auditEvents)
-      .values({
-        id: duplicateId,
-        actorId: f.moderator.id,
-        actorType: "admin",
-        action: "fixture",
-        targetType: "report",
-        targetId: report.id,
-      });
+    await db.insert(auditEvents).values({
+      id: duplicateId,
+      actorId: f.moderator.id,
+      actorType: "admin",
+      action: "fixture",
+      targetType: "report",
+      targetId: report.id,
+    });
     await expect(
       repository.decide({ ...decision(f, report.id), [field]: duplicateId }),
     ).rejects.toThrow();
@@ -234,16 +232,14 @@ it("excludes commercial review comments from submission, community queues and re
     productId = id("prd"),
     reviewId = id("cmt");
   productIds.push(productId);
-  await db
-    .insert(products)
-    .values({
-      id: productId,
-      title: "Resource",
-      slug: id("resource"),
-      description: "Fixture",
-      type: "script",
-      authorId: f.author.id,
-    });
+  await db.insert(products).values({
+    id: productId,
+    title: "Resource",
+    slug: id("resource"),
+    description: "Fixture",
+    type: "script",
+    authorId: f.author.id,
+  });
   // comments_review_target_check: product_id requires a review-shaped row
   // (content_id/parent_id null, rating when published) — never stamp onto a content comment.
   const [review] = await db
@@ -261,16 +257,14 @@ it("excludes commercial review comments from submission, community queues and re
     code: "NOT_FOUND",
   });
   const reportId = id("rpt");
-  await db
-    .insert(reports)
-    .values({
-      id: reportId,
-      reporterId: f.reporter.id,
-      targetType: "comment",
-      targetId: review.id,
-      type: "abuse",
-      reason: "Legacy commercial report",
-    });
+  await db.insert(reports).values({
+    id: reportId,
+    reporterId: f.reporter.id,
+    targetType: "comment",
+    targetId: review.id,
+    type: "abuse",
+    reason: "Legacy commercial report",
+  });
   expect(
     (await repository.page({ actorId: f.moderator.id, staff: true }, { view: "pending", page: 1 }))
       .items,

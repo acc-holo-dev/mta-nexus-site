@@ -19,11 +19,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -35,34 +31,26 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
 
   try {
     const ip = getTrustedRequestIp(request);
-    const rateLimit = await consumeRateLimit(
-      "resourceClaim",
-      ip,
-    );
+    const rateLimit = await consumeRateLimit("resourceClaim", ip);
     if (!rateLimit.success) {
       return json(
         context,
         {
-          error:
-            "Too many resource claims. Please try again later.",
+          error: "Too many resource claims. Please try again later.",
         },
         429,
       );
     }
 
-    const token =
-      request.cookies.get("nexus_session")?.value;
+    const token = request.cookies.get("nexus_session")?.value;
     const user = await authService.getSession(token);
     if (!user) {
-      return json(
-        context,
-        { error: "Authentication required" },
-        401,
-      );
+      return json(context, { error: "Authentication required" }, 401);
     }
 
     requireServerJsonContentType(request);
-    if (request.headers.get("sec-fetch-site") === "cross-site") throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
+    if (request.headers.get("sec-fetch-site") === "cross-site")
+      throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
     const parsed = claimResourceSchema.safeParse(await readBoundedJson(request, 2048));
     if (!parsed.success) {
       return json(
@@ -75,21 +63,15 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
     }
 
-    const result =
-      await commerceService.claimFreeResource({
-        user,
-        productId: parsed.data.productId,
-      });
+    const result = await commerceService.claimFreeResource({
+      user,
+      productId: parsed.data.productId,
+    });
 
-    return json(
-      context,
-      result,
-      result.alreadyClaimed ? 200 : 201,
-    );
+    return json(context, result, result.alreadyClaimed ? 200 : 201);
   } catch (error: unknown) {
     const appError =
-      error instanceof Error &&
-      "statusCode" in error
+      error instanceof Error && "statusCode" in error
         ? (error as Error & {
             statusCode: number;
           })
@@ -104,9 +86,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error:
-          appError?.message ||
-          "Resource claim failed",
+        error: appError?.message || "Resource claim failed",
       },
       appError?.statusCode || 500,
     );

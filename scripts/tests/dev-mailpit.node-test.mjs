@@ -15,17 +15,17 @@ function directory(t) {
   return path;
 }
 
-test("mail setup refuses production, unspecified mode and relative directories", t => {
+test("mail setup refuses production, unspecified mode and relative directories", (t) => {
   const path = directory(t);
   assert.throws(() => prepareDevMailpit(path, { NODE_ENV: "production" }), /development-only/);
   assert.throws(() => prepareDevMailpit(path, {}), /development-only/);
   assert.throws(() => prepareDevMailpit("relative", env), /absolute/);
 });
 
-test("repeated startup preserves independent queue keys and the valid TLS certificate", t => {
+test("repeated startup preserves independent queue keys and the valid TLS certificate", (t) => {
   const path = directory(t);
   const files = prepareDevMailpit(path, env);
-  const before = Object.values(files).map(file => readFileSync(file));
+  const before = Object.values(files).map((file) => readFileSync(file));
   assert.notDeepEqual(before[0], before[1]);
   for (const file of [files.keyFile, files.abuseKeyFile]) {
     const key = readFileSync(file, "utf8");
@@ -37,10 +37,13 @@ test("repeated startup preserves independent queue keys and the valid TLS certif
   }
   assert.equal(new X509Certificate(before[2]).checkHost("mailpit"), "mailpit");
   prepareDevMailpit(path, env);
-  assert.deepEqual(Object.values(files).map(file => readFileSync(file)), before);
+  assert.deepEqual(
+    Object.values(files).map((file) => readFileSync(file)),
+    before,
+  );
 });
 
-test("a corrupted queue key fails visibly without rotating existing keys", t => {
+test("a corrupted queue key fails visibly without rotating existing keys", (t) => {
   const path = directory(t);
   const files = prepareDevMailpit(path, env);
   const abuseKey = readFileSync(files.abuseKeyFile);
@@ -50,20 +53,32 @@ test("a corrupted queue key fails visibly without rotating existing keys", t => 
   assert.deepEqual(readFileSync(files.abuseKeyFile), abuseKey);
 });
 
-test("generated CA verifies a real TLS connection and rejects a different server name", async t => {
+test("generated CA verifies a real TLS connection and rejects a different server name", async (t) => {
   const files = prepareDevMailpit(directory(t), env);
   const cert = readFileSync(files.certFile);
-  const server = tls.createServer({ cert, key: readFileSync(files.tlsKeyFile) }, socket => socket.end());
+  const server = tls.createServer({ cert, key: readFileSync(files.tlsKeyFile) }, (socket) =>
+    socket.end(),
+  );
   server.on("tlsClientError", () => {});
   server.listen(0, "127.0.0.1");
   await once(server, "listening");
-  t.after(() => new Promise(resolve => server.close(resolve)));
+  t.after(() => new Promise((resolve) => server.close(resolve)));
   const port = server.address().port;
-  const connect = servername => new Promise((resolve, reject) => {
-    const socket = tls.connect({ host: "127.0.0.1", port, servername, ca: cert, rejectUnauthorized: true });
-    socket.once("error", reject);
-    socket.once("secureConnect", () => { resolve(socket.authorized); socket.destroy(); });
-  });
+  const connect = (servername) =>
+    new Promise((resolve, reject) => {
+      const socket = tls.connect({
+        host: "127.0.0.1",
+        port,
+        servername,
+        ca: cert,
+        rejectUnauthorized: true,
+      });
+      socket.once("error", reject);
+      socket.once("secureConnect", () => {
+        resolve(socket.authorized);
+        socket.destroy();
+      });
+    });
   assert.equal(await connect("mailpit"), true);
   await assert.rejects(connect("wrong-host.invalid"), { code: "ERR_TLS_CERT_ALTNAME_INVALID" });
 });

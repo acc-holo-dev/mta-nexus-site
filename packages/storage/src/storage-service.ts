@@ -107,9 +107,11 @@ export class StorageService {
           throw new ValidationError("Storage provider returned invalid verified metadata");
         }
       } catch (error) {
-        (opened.stream as NodeJS.ReadableStream & {
-          destroy?: () => void;
-        }).destroy?.();
+        (
+          opened.stream as NodeJS.ReadableStream & {
+            destroy?: () => void;
+          }
+        ).destroy?.();
         throw error;
       }
       return opened;

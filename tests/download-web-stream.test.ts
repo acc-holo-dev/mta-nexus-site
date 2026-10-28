@@ -25,21 +25,26 @@ it("backpressures four unread 64 MiB downloads using bytes rather than chunk cou
       expect(fixture.produced()).toBeLessThanOrEqual(256 * 1024);
     }
   } finally {
-    await Promise.all(fixtures.map(async ({ source, web }) => {
-      const errors: Error[] = [];
-      source.on("error", (error) => errors.push(error));
-      const closed = new Promise<void>((resolve) => source.once("close", resolve));
-      await web.cancel();
-      await closed;
-      expect(source.destroyed).toBe(true);
-      expect(errors.every(error => error.name === "AbortError")).toBe(true);
-    }));
+    await Promise.all(
+      fixtures.map(async ({ source, web }) => {
+        const errors: Error[] = [];
+        source.on("error", (error) => errors.push(error));
+        const closed = new Promise<void>((resolve) => source.once("close", resolve));
+        await web.cancel();
+        await closed;
+        expect(source.destroyed).toBe(true);
+        expect(errors.every((error) => error.name === "AbortError")).toBe(true);
+      }),
+    );
   }
 });
 
 it("preserves ordered binary bytes across varied chunks and completes normally", async () => {
   const expected = Buffer.from(Array.from({ length: 200_000 }, (_, i) => i % 251));
-  const source = Readable.from([expected.subarray(0, 3), expected.subarray(3, 99_999), expected.subarray(99_999)], { objectMode: false });
+  const source = Readable.from(
+    [expected.subarray(0, 3), expected.subarray(3, 99_999), expected.subarray(99_999)],
+    { objectMode: false },
+  );
   const actual = Buffer.from(await new Response(toDownloadWebStream(source)).arrayBuffer());
   expect(actual).toEqual(expected);
 });

@@ -1,9 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import {
-  contentRepository,
-  serverRepository,
-  userRepository,
-} from "@nexus/db";
+import { contentRepository, serverRepository, userRepository } from "@nexus/db";
 
 describe("published server update repository integration", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -101,8 +97,6 @@ describe("published server update repository integration", () => {
   it("returns only published moderated update types for the selected server", async () => {
     const rows = await contentRepository.listPublishedByServer(serverId, 6);
 
-    expect(rows.map((row) => row.title)).toEqual([
-      "Published server update",
-    ]);
+    expect(rows.map((row) => row.title)).toEqual(["Published server update"]);
   });
 });

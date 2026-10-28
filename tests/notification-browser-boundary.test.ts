@@ -36,7 +36,10 @@ vi.mock("@nexus/config", () => ({
 import { PATCH as inboxCommand } from "../apps/web/src/app/api/notifications/inbox/route";
 import { POST as markRead } from "../apps/web/src/app/api/notifications/mark-read/route";
 import { PATCH as preferences } from "../apps/web/src/app/api/notifications/preferences/route";
-import { DELETE as pushDelete, POST as pushSubscribe } from "../apps/web/src/app/api/notifications/push/route";
+import {
+  DELETE as pushDelete,
+  POST as pushSubscribe,
+} from "../apps/web/src/app/api/notifications/push/route";
 
 const mutations = [
   ["inbox command", "PATCH", inboxCommand, "getSession"],

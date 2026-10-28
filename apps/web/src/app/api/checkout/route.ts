@@ -1,8 +1,5 @@
 import type { NextRequest } from "next/server";
-import {
-  createRequestLogContext,
-  jsonWithRequestId,
-} from "../../../lib/observability";
+import { createRequestLogContext, jsonWithRequestId } from "../../../lib/observability";
 
 /**
  * Paid checkout is intentionally unavailable in the player-first closed beta.
@@ -13,8 +10,7 @@ export async function POST(request: NextRequest) {
   return jsonWithRequestId(
     context,
     {
-      error:
-        "Paid checkout is not available during the closed beta.",
+      error: "Paid checkout is not available during the closed beta.",
       code: "CHECKOUT_DISABLED",
     },
     {

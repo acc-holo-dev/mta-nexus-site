@@ -26,8 +26,9 @@ beforeEach(() => {
 describe("boolean repository projections", () => {
   it.each([false, true])("checks a follow using only its ID (exists: %s)", async (exists) => {
     state.rows = exists ? [["fol_1"]] : [];
-    await expect(new SocialRepository().isFollowing("usr_1", "server", "srv_1"))
-      .resolves.toBe(exists);
+    await expect(new SocialRepository().isFollowing("usr_1", "server", "srv_1")).resolves.toBe(
+      exists,
+    );
     expect(state.statements).toHaveLength(1);
     const statement = state.statements[0];
     expect(statement?.sql.split(" from ")[0]).toBe('select "id"');
@@ -38,16 +39,20 @@ describe("boolean repository projections", () => {
     expect(statement?.params).toEqual(["usr_1", "server", "srv_1", 1]);
   });
 
-  it.each([false, true])("marks an owned notification read using only its ID (matched: %s)", async (matched) => {
-    state.rows = matched ? [["not_1"]] : [];
-    await expect(new NotificationRepository().markAsRead("not_1", "usr_1"))
-      .resolves.toBe(matched);
-    expect(state.statements).toHaveLength(1);
-    const statement = state.statements[0];
-    expect(statement?.sql).toContain('set "is_read" = $1');
-    expect(statement?.sql).toContain('"notifications"."id" = $2');
-    expect(statement?.sql).toContain('"notifications"."recipient_id" = $3');
-    expect(statement?.sql.split(" returning ")[1]).toBe('"id"');
-    expect(statement?.params).toEqual([true, "not_1", "usr_1"]);
-  });
+  it.each([false, true])(
+    "marks an owned notification read using only its ID (matched: %s)",
+    async (matched) => {
+      state.rows = matched ? [["not_1"]] : [];
+      await expect(new NotificationRepository().markAsRead("not_1", "usr_1")).resolves.toBe(
+        matched,
+      );
+      expect(state.statements).toHaveLength(1);
+      const statement = state.statements[0];
+      expect(statement?.sql).toContain('set "is_read" = $1');
+      expect(statement?.sql).toContain('"notifications"."id" = $2');
+      expect(statement?.sql).toContain('"notifications"."recipient_id" = $3');
+      expect(statement?.sql.split(" returning ")[1]).toBe('"id"');
+      expect(statement?.params).toEqual([true, "not_1", "usr_1"]);
+    },
+  );
 });

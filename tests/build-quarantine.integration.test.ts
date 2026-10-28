@@ -1,5 +1,11 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { auditRepository, buildRepository, productRepository, sessionRepository, userRepository } from "@nexus/db";
+import {
+  auditRepository,
+  buildRepository,
+  productRepository,
+  sessionRepository,
+  userRepository,
+} from "@nexus/db";
 
 describe("build quarantine lifecycle", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -83,7 +89,8 @@ describe("build quarantine lifecycle", () => {
           targetType: "build",
         },
         1,
-      `tok_${moderatorId}`);
+        `tok_${moderatorId}`,
+      );
     }
   });
 
@@ -101,7 +108,8 @@ describe("build quarantine lifecycle", () => {
         targetType: "build",
         details: { reason: "Suspicious behavior under investigation" },
       },
-    `tok_${moderatorId}`);
+      `tok_${moderatorId}`,
+    );
 
     expect(quarantined).toMatchObject({
       status: "quarantined",
@@ -119,15 +127,19 @@ describe("build quarantine lifecycle", () => {
   });
 
   it("restores only through the trusted-clean publication path and clears live quarantine metadata", async () => {
-    const restored = await buildRepository.restoreQuarantinedAndRefreshProduct(newBuildId, {
-      id: `aud_restore_${suffix}`,
-      actorId: moderatorId,
-      actorType: "admin",
-      action: "build.quarantine_restored",
-      targetId: newBuildId,
-      targetType: "build",
-      details: { reason: "Investigation cleared the build" },
-    }, `tok_${moderatorId}`);
+    const restored = await buildRepository.restoreQuarantinedAndRefreshProduct(
+      newBuildId,
+      {
+        id: `aud_restore_${suffix}`,
+        actorId: moderatorId,
+        actorType: "admin",
+        action: "build.quarantine_restored",
+        targetId: newBuildId,
+        targetType: "build",
+        details: { reason: "Investigation cleared the build" },
+      },
+      `tok_${moderatorId}`,
+    );
 
     expect(restored).toMatchObject({
       status: "published",

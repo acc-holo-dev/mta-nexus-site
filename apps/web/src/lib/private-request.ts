@@ -1,6 +1,4 @@
-export function privateRequest(
-  init: RequestInit,
-): RequestInit {
+export function privateRequest(init: RequestInit): RequestInit {
   return {
     ...init,
     cache: "no-store",

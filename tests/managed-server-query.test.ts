@@ -60,7 +60,9 @@ it("uses user-scoped EXISTS checks without multiplying organization matches", as
   expect(state.queries).toHaveLength(2);
   for (const query of state.queries) {
     expect(query.params.filter((value) => value === "actor")).toHaveLength(3);
-    expect(query.params).toEqual(expect.arrayContaining(["admin", "member", "developer", '["manage_servers"]']));
+    expect(query.params).toEqual(
+      expect.arrayContaining(["admin", "member", "developer", '["manage_servers"]']),
+    );
     expect(query.sql).toContain('"servers"."organization_id" is null');
     expect(query.sql).toContain('"organizations"."owner_id"');
     expect(query.sql).toContain('"organization_members"."user_id"');

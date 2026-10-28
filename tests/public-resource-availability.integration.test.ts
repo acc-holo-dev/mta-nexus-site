@@ -1,9 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import {
-  buildRepository,
-  productRepository,
-  userRepository,
-} from "@nexus/db";
+import { buildRepository, productRepository, userRepository } from "@nexus/db";
 
 describe("public resource safe-build catalog scope", () => {
   const suffix = `${Date.now().toString(36)}_${process.pid}`;
@@ -24,8 +20,7 @@ describe("public resource safe-build catalog scope", () => {
       id: productId,
       title: "Public Availability Resource",
       slug,
-      description:
-        "Resource used to prove public catalog safe-build filtering.",
+      description: "Resource used to prove public catalog safe-build filtering.",
       type: "script",
       status: "published",
       authorId,
@@ -46,45 +41,29 @@ describe("public resource safe-build catalog scope", () => {
   async function expectHidden() {
     await expect(
       productRepository.list({ query: "Public Availability Resource" }),
-    ).resolves.not.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: productId }),
-      ]),
-    );
+    ).resolves.not.toEqual(expect.arrayContaining([expect.objectContaining({ id: productId })]));
 
     await expect(
       productRepository.pagePublishedFreeByAuthor(authorId, 1, 24),
     ).resolves.toMatchObject({
-      products: expect.not.arrayContaining([
-        expect.objectContaining({ id: productId }),
-      ]),
+      products: expect.not.arrayContaining([expect.objectContaining({ id: productId })]),
     });
 
-    await expect(
-      productRepository.findPublishedFreeBySlugs([slug]),
-    ).resolves.toEqual([]);
+    await expect(productRepository.findPublishedFreeBySlugs([slug])).resolves.toEqual([]);
   }
 
   async function expectVisible() {
     await expect(
       productRepository.list({ query: "Public Availability Resource" }),
-    ).resolves.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: productId }),
-      ]),
-    );
+    ).resolves.toEqual(expect.arrayContaining([expect.objectContaining({ id: productId })]));
 
     await expect(
       productRepository.pagePublishedFreeByAuthor(authorId, 1, 24),
     ).resolves.toMatchObject({
-      products: expect.arrayContaining([
-        expect.objectContaining({ id: productId }),
-      ]),
+      products: expect.arrayContaining([expect.objectContaining({ id: productId })]),
     });
 
-    await expect(
-      productRepository.findPublishedFreeBySlugs([slug]),
-    ).resolves.toEqual([
+    await expect(productRepository.findPublishedFreeBySlugs([slug])).resolves.toEqual([
       expect.objectContaining({ id: productId }),
     ]);
   }
@@ -94,19 +73,21 @@ describe("public resource safe-build catalog scope", () => {
   });
 
   it("rejects a published clean build without scan provenance at the database boundary", async () => {
-    await expect(buildRepository.create({
-      id: `bld_public_unsafe_${suffix}`,
-      productId,
-      version: "1.0.0",
-      status: "published",
-      storageKey: `assets/test/public-unsafe-${suffix}.zip`,
-      sha256Hash: "a".repeat(64),
-      fileSizeBytes: 16,
-      fileName: "public-unsafe.zip",
-      mimeType: "application/zip",
-      scanStatus: "clean",
-      isSigned: false,
-    })).rejects.toMatchObject({
+    await expect(
+      buildRepository.create({
+        id: `bld_public_unsafe_${suffix}`,
+        productId,
+        version: "1.0.0",
+        status: "published",
+        storageKey: `assets/test/public-unsafe-${suffix}.zip`,
+        sha256Hash: "a".repeat(64),
+        fileSizeBytes: 16,
+        fileName: "public-unsafe.zip",
+        mimeType: "application/zip",
+        scanStatus: "clean",
+        isSigned: false,
+      }),
+    ).rejects.toMatchObject({
       cause: {
         code: "23514",
         constraint_name: "builds_clean_scan_provenance_check",
@@ -154,8 +135,6 @@ describe("public resource safe-build catalog scope", () => {
     });
 
     await expectVisible();
-    await expect(productRepository.countPublishedFree()).resolves.toBeGreaterThan(
-      0,
-    );
+    await expect(productRepository.countPublishedFree()).resolves.toBeGreaterThan(0);
   });
 });

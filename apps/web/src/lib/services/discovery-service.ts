@@ -36,13 +36,24 @@ export type SearchResultType = SearchResultItem["type"];
 class DiscoveryService {
   async page(input: DiscoverQuery) {
     if (input.type === "resources") {
-      const result = await productService.listPublicPage({ query: input.query || undefined,
-        sort: input.query ? "relevance" : "newest", page: input.page, pageSize: 24 });
-      return { type: "resources" as const, items: result.products, page: input.page, hasMore: result.hasMore && input.page < 1000 };
+      const result = await productService.listPublicPage({
+        query: input.query || undefined,
+        sort: input.query ? "relevance" : "newest",
+        page: input.page,
+        pageSize: 24,
+      });
+      return {
+        type: "resources" as const,
+        items: result.products,
+        page: input.page,
+        hasMore: result.hasMore && input.page < 1000,
+      };
     }
     if (input.type === "content") {
       const result = await authorContentRepository.pagePublic([...DISCOVER_CONTENT_TYPES], {
-        query: input.query, page: input.page, type: input.contentType || undefined,
+        query: input.query,
+        page: input.page,
+        type: input.contentType || undefined,
       });
       return { ...result, hasMore: result.hasMore && input.page < 1000, type: "content" as const };
     }
@@ -115,19 +126,13 @@ class DiscoveryService {
       })),
     };
   }
-  async search(
-    query: string,
-    limit = 50,
-    type?: SearchResultType
-  ): Promise<SearchResultItem[]> {
+  async search(query: string, limit = 50, type?: SearchResultType): Promise<SearchResultItem[]> {
     const normalizedQuery = query.trim();
     if (normalizedQuery.length === 0) {
       return [];
     }
 
-    const boundedLimit = Number.isFinite(limit)
-      ? Math.min(Math.max(Math.floor(limit), 1), 50)
-      : 50;
+    const boundedLimit = Number.isFinite(limit) ? Math.min(Math.max(Math.floor(limit), 1), 50) : 50;
     // Each category is filtered before its own LIMIT. A full product category
     // must not hide server matches from a player using the global search.
     const [products, servers, articles, users, organizations] = await Promise.all([
@@ -208,11 +213,11 @@ class DiscoveryService {
         const directory = await mtaMasterDirectoryService.getDirectory();
         if (!directory.isStale) {
           const byId = new Map(servers.map((server) => [server.id, server]));
-          const observationFor = serverResults.length === 1
-            ? (server: { ipAddress: string; port: number }) => directory.servers.find(candidate =>
-                matchesMtaEndpoint(server, candidate),
-              )
-            : indexMtaObservations(directory.servers);
+          const observationFor =
+            serverResults.length === 1
+              ? (server: { ipAddress: string; port: number }) =>
+                  directory.servers.find((candidate) => matchesMtaEndpoint(server, candidate))
+              : indexMtaObservations(directory.servers);
           for (const item of serverResults) {
             const server = byId.get(item.id);
             const observation = server && observationFor(server);

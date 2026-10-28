@@ -90,11 +90,7 @@ describe("reverse dependency repository integration", () => {
   });
 
   it("returns only other published free resources declaring the target slug", async () => {
-    const rows =
-      await productRepository.listPublishedFreeDependingOnSlug(
-        targetSlug,
-        51,
-      );
+    const rows = await productRepository.listPublishedFreeDependingOnSlug(targetSlug, 51);
 
     expect(rows.map((row) => row.slug)).toEqual([publishedSlug]);
   });

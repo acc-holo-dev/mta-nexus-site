@@ -9,9 +9,10 @@ export type ServerEndpointAuditRow = Readonly<{
   isVerified?: boolean;
 }>;
 
-export type ServerEndpointAuditDetail = ServerEndpointAuditRow & Readonly<{
-  canonicalAddress: string;
-}>;
+export type ServerEndpointAuditDetail = ServerEndpointAuditRow &
+  Readonly<{
+    canonicalAddress: string;
+  }>;
 
 type EndpointGroup = {
   canonicalAddress: string;
@@ -27,8 +28,11 @@ type EndpointGroup = {
 };
 
 function ownerScope(row: ServerEndpointAuditRow): string {
-  return row.organizationId ? `organization:${row.organizationId}`
-    : row.ownerId ? `user:${row.ownerId}` : "unclaimed";
+  return row.organizationId
+    ? `organization:${row.organizationId}`
+    : row.ownerId
+      ? `user:${row.ownerId}`
+      : "unclaimed";
 }
 
 /**
@@ -55,8 +59,11 @@ export class ServerEndpointAuditCollector {
     const mixedOwnership = Boolean(row.ownerId && row.organizationId);
     if (mixedOwnership) this.mixedOwnershipRows += 1;
     if (!row.ownerId && !row.organizationId) this.unclaimedRows += 1;
-    const valid = isValidMtaAddress(canonicalAddress) &&
-      Number.isInteger(row.port) && row.port >= 1 && row.port <= 65535;
+    const valid =
+      isValidMtaAddress(canonicalAddress) &&
+      Number.isInteger(row.port) &&
+      row.port >= 1 &&
+      row.port <= 65535;
     if (!valid) {
       this.invalidCount += 1;
       if (this.includeDetails) this.invalidRows.push({ ...row, canonicalAddress });
@@ -79,11 +86,13 @@ export class ServerEndpointAuditCollector {
         hasDifferentOwners: false,
         hasMixedOwnership: mixedOwnership,
         hasVerified: Boolean(row.isVerified),
-        ...(this.includeDetails ? {
-          serverIds: [row.id],
-          ownerScopes: new Set([scope]),
-          verifiedServerIds: row.isVerified ? [row.id] : [],
-        } : {}),
+        ...(this.includeDetails
+          ? {
+              serverIds: [row.id],
+              ownerScopes: new Set([scope]),
+              verifiedServerIds: row.isVerified ? [row.id] : [],
+            }
+          : {}),
       });
       return;
     }
@@ -101,9 +110,7 @@ export class ServerEndpointAuditCollector {
   result() {
     const collisions = [...this.groups.values()]
       .filter((group) => group.count > 1)
-      .sort((a, b) =>
-        a.canonicalAddress.localeCompare(b.canonicalAddress) || a.port - b.port,
-      );
+      .sort((a, b) => a.canonicalAddress.localeCompare(b.canonicalAddress) || a.port - b.port);
     return {
       summary: {
         scanned: this.scanned,
@@ -116,21 +123,21 @@ export class ServerEndpointAuditCollector {
         collisionGroupsWithOwnershipConflict: collisions.filter(
           (group) => group.hasDifferentOwners || group.hasMixedOwnership,
         ).length,
-        collisionGroupsWithVerifiedServers: collisions.filter(
-          (group) => group.hasVerified,
-        ).length,
+        collisionGroupsWithVerifiedServers: collisions.filter((group) => group.hasVerified).length,
       },
       details: {
         invalidRows: [...this.invalidRows],
         nonCanonicalRows: [...this.nonCanonicalRows],
-        collisions: this.includeDetails ? collisions.map((group) => ({
-          canonicalAddress: group.canonicalAddress,
-          port: group.port,
-          serverIds: [...group.serverIds!].sort(),
-          ownerScopes: [...group.ownerScopes!].sort(),
-          verifiedServerIds: [...group.verifiedServerIds!].sort(),
-          ownershipConflict: group.hasDifferentOwners || group.hasMixedOwnership,
-        })) : [],
+        collisions: this.includeDetails
+          ? collisions.map((group) => ({
+              canonicalAddress: group.canonicalAddress,
+              port: group.port,
+              serverIds: [...group.serverIds!].sort(),
+              ownerScopes: [...group.ownerScopes!].sort(),
+              verifiedServerIds: [...group.verifiedServerIds!].sort(),
+              ownershipConflict: group.hasDifferentOwners || group.hasMixedOwnership,
+            }))
+          : [],
       },
     };
   }

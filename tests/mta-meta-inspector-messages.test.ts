@@ -35,8 +35,14 @@ describe("localized MTA manifest diagnostics", () => {
 
     for (const code of codes) {
       const issue = { code, severity: "warning" as const, message: `English fallback ${code}` };
-      const english = getMtaMetaInspectorIssueMessage(issue, getDictionary("en").metaInspector.structuralIssues);
-      const russian = getMtaMetaInspectorIssueMessage(issue, getDictionary("ru").metaInspector.structuralIssues);
+      const english = getMtaMetaInspectorIssueMessage(
+        issue,
+        getDictionary("en").metaInspector.structuralIssues,
+      );
+      const russian = getMtaMetaInspectorIssueMessage(
+        issue,
+        getDictionary("ru").metaInspector.structuralIssues,
+      );
 
       expect(english).not.toContain("English fallback");
       expect(russian).not.toContain("English fallback");
@@ -45,7 +51,11 @@ describe("localized MTA manifest diagnostics", () => {
   });
 
   it("keeps the API message for unknown future diagnostic codes", () => {
-    const issue = { code: "FUTURE_ISSUE", severity: "warning" as const, message: "Fallback message" };
+    const issue = {
+      code: "FUTURE_ISSUE",
+      severity: "warning" as const,
+      message: "Fallback message",
+    };
     expect(
       getMtaMetaInspectorIssueMessage(issue, getDictionary("ru").metaInspector.structuralIssues),
     ).toBe("Fallback message");

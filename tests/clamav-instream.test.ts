@@ -62,12 +62,8 @@ describe("ClamAV INSTREAM writer", () => {
     expect(socket.ended).toBe(true);
     expect(socket.writes).toHaveLength(6);
     expect(socket.writes[0]).toBe("zINSTREAM\0");
-    expect(uint32(writeAt(socket, 1))).toBe(
-      clamAvInstreamLimits.chunkBytes,
-    );
-    expect((socket.writes[2] as Uint8Array).byteLength).toBe(
-      clamAvInstreamLimits.chunkBytes,
-    );
+    expect(uint32(writeAt(socket, 1))).toBe(clamAvInstreamLimits.chunkBytes);
+    expect((socket.writes[2] as Uint8Array).byteLength).toBe(clamAvInstreamLimits.chunkBytes);
     expect(uint32(writeAt(socket, 3))).toBe(3);
     expect((socket.writes[4] as Uint8Array).byteLength).toBe(3);
     expect(uint32(writeAt(socket, 5))).toBe(0);
@@ -88,9 +84,9 @@ describe("ClamAV INSTREAM writer", () => {
   it("rejects when a backpressured socket closes before drain", async () => {
     const socket = new FakeSocket(new Set([2]), true);
 
-    await expect(
-      writeClamAvInstream(asSocket(socket), new Uint8Array([1])),
-    ).rejects.toThrow(/closed before buffered data drained/u);
+    await expect(writeClamAvInstream(asSocket(socket), new Uint8Array([1]))).rejects.toThrow(
+      /closed before buffered data drained/u,
+    );
 
     expect(socket.ended).toBe(false);
   });

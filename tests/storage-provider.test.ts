@@ -16,7 +16,7 @@ describe("Storage Abstraction & Integrity", () => {
 
   it("rejects path traversal outside the storage root", async () => {
     await expect(
-      provider.put("../escaped.zip", Buffer.from("unsafe"), "application/zip")
+      provider.put("../escaped.zip", Buffer.from("unsafe"), "application/zip"),
     ).rejects.toThrow("escapes the configured storage directory");
   });
 
@@ -36,9 +36,11 @@ describe("Storage Abstraction & Integrity", () => {
     expect(stillExists).toBe(false);
   });
   it("fails closed instead of inventing an unauthenticated signed download URL", async () => {
-  await expect(provider.getSignedDownloadUrl("resources/private.zip"))
-    .rejects.toThrow("Local storage cannot issue signed URLs");
-  await expect(provider.getSignedDownloadUrl("../escape.zip"))
-    .rejects.toThrow("escapes the configured storage directory");
+    await expect(provider.getSignedDownloadUrl("resources/private.zip")).rejects.toThrow(
+      "Local storage cannot issue signed URLs",
+    );
+    await expect(provider.getSignedDownloadUrl("../escape.zip")).rejects.toThrow(
+      "escapes the configured storage directory",
+    );
   });
 });

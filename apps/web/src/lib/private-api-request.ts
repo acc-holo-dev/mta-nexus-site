@@ -5,22 +5,14 @@ export type PrivateApiRequestOptions = {
   signal?: AbortSignal;
 };
 
-export function privateApiRequest(
-  options: PrivateApiRequestOptions = {},
-): RequestInit {
+export function privateApiRequest(options: PrivateApiRequestOptions = {}): RequestInit {
   const timeoutMs = options.timeoutMs ?? 10_000;
-  if (
-    !Number.isSafeInteger(timeoutMs) ||
-    timeoutMs < 250 ||
-    timeoutMs > 60_000
-  ) {
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 250 || timeoutMs > 60_000) {
     throw new RangeError("Invalid private API timeout");
   }
 
   const timeoutSignal = AbortSignal.timeout(timeoutMs);
-  const signal = options.signal
-    ? AbortSignal.any([options.signal, timeoutSignal])
-    : timeoutSignal;
+  const signal = options.signal ? AbortSignal.any([options.signal, timeoutSignal]) : timeoutSignal;
   const hasJson = options.json !== undefined;
 
   return {

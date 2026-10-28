@@ -14,8 +14,9 @@ export function libraryPageBounds(
     ? Math.max(1, Math.min(MAX_LIBRARY_PAGE_SIZE, Math.floor(requestedPageSize)))
     : USER_LIBRARY_PAGE_SIZE;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const page = Number.isSafeInteger(requestedPage) && requestedPage > 0
-    ? Math.min(requestedPage, totalPages)
-    : 1;
+  const page =
+    Number.isSafeInteger(requestedPage) && requestedPage > 0
+      ? Math.min(requestedPage, totalPages)
+      : 1;
   return { page, pageSize, totalPages, offset: (page - 1) * pageSize };
 }

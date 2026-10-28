@@ -13,7 +13,11 @@ import { historyPageBounds } from "./history-pagination";
 import type { ResourceTransaction } from "./entitlements";
 
 /** Shared live financial-account policy: product-management grants do not apply. */
-export async function lockFinancialAccountAuthority(tx: ResourceTransaction, userId: string, organizationId?: string) {
+export async function lockFinancialAccountAuthority(
+  tx: ResourceTransaction,
+  userId: string,
+  organizationId?: string,
+) {
   const [organization] = organizationId
     ? await tx
         .select({ id: organizations.id, ownerId: organizations.ownerId, name: organizations.name })

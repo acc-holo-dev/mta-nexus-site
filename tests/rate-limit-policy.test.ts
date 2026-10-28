@@ -3,30 +3,32 @@ import { getRateLimitPolicy, RATE_LIMIT_POLICIES } from "@nexus/security";
 
 describe("risk-based rate limit policy", () => {
   it("defines bounded policies for every protected mutation category", () => {
-    expect(Object.keys(RATE_LIMIT_POLICIES)).toEqual(expect.arrayContaining([
-      "authLogin",
-      "authRegistration",
-      "buildUpload",
-      "download",
-      "follow",
-      "report",
-      "sessionManagement",
-      "passwordChange",
-      "notificationMutation",
-      "resourceClaim",
-      "resourceInspection",
-      "verification",
-      "moderationAction",
-      "serverMutation",
-      "serverClaimProof",
-      "contentCreation",
-      "commentCreation",
-      "commentEditing",
-      "reviewSubmission",
-      "search",
-      "supportCase",
-      "supportMessage",
-    ]));
+    expect(Object.keys(RATE_LIMIT_POLICIES)).toEqual(
+      expect.arrayContaining([
+        "authLogin",
+        "authRegistration",
+        "buildUpload",
+        "download",
+        "follow",
+        "report",
+        "sessionManagement",
+        "passwordChange",
+        "notificationMutation",
+        "resourceClaim",
+        "resourceInspection",
+        "verification",
+        "moderationAction",
+        "serverMutation",
+        "serverClaimProof",
+        "contentCreation",
+        "commentCreation",
+        "commentEditing",
+        "reviewSubmission",
+        "search",
+        "supportCase",
+        "supportMessage",
+      ]),
+    );
 
     for (const policy of Object.values(RATE_LIMIT_POLICIES)) {
       expect(policy.limit).toBeGreaterThan(0);

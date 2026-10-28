@@ -72,7 +72,10 @@ vi.mock("@nexus/db", () => ({
     record: auditRecord,
   },
   resourceDownloadAuthorizationRepository: {
-    authorize: async (input: unknown) => { await auditRecord(input); return { slug: state.product?.slug ?? "http-resource", receiptId: "dlv_http" }; },
+    authorize: async (input: unknown) => {
+      await auditRecord(input);
+      return { slug: state.product?.slug ?? "http-resource", receiptId: "dlv_http" };
+    },
   },
 }));
 
@@ -135,14 +138,9 @@ describe("resource download HTTP contract", () => {
       fileSizeBytes: Buffer.byteLength("nexus-build"),
       mimeType: "application/zip",
     };
-    findLatestPublishedBuild.mockImplementation(
-      async () => state.build,
-    );
-    findPinnedPublishedBuild.mockImplementation(
-      async (productId: string, buildId: string) =>
-        productId === state.build?.productId && buildId === state.build?.id
-          ? state.build
-          : null,
+    findLatestPublishedBuild.mockImplementation(async () => state.build);
+    findPinnedPublishedBuild.mockImplementation(async (productId: string, buildId: string) =>
+      productId === state.build?.productId && buildId === state.build?.id ? state.build : null,
     );
     downloadStream.mockResolvedValue({
       stream: Readable.from(Buffer.from("nexus-build")),
@@ -162,9 +160,7 @@ describe("resource download HTTP contract", () => {
     expect(response.status).toBe(401);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(await response.json()).toEqual({
       error: "Authentication required to download resource builds",
     });
@@ -172,16 +168,29 @@ describe("resource download HTTP contract", () => {
   });
   it("records cancellation if the signal aborts after durable authorization but before headers", async () => {
     const abort = new AbortController();
-    auditRecord.mockImplementationOnce(async () => { abort.abort(); });
-    const response = await GET(new NextRequest("http://nexus.test/api/products/prd_http/download", { signal: abort.signal }), context);
+    auditRecord.mockImplementationOnce(async () => {
+      abort.abort();
+    });
+    const response = await GET(
+      new NextRequest("http://nexus.test/api/products/prd_http/download", { signal: abort.signal }),
+      context,
+    );
     expect(response.status).toBe(499);
-    expect(deliveryFinish).toHaveBeenCalledWith(expect.objectContaining({ userId: "usr_player", receiptId: "dlv_http", result: { status: "cancelled", bytesSent: 0, errorCode: null } }));
+    expect(deliveryFinish).toHaveBeenCalledWith(
+      expect.objectContaining({
+        userId: "usr_player",
+        receiptId: "dlv_http",
+        result: { status: "cancelled", bytesSent: 0, errorCode: null },
+      }),
+    );
   });
   it("records cancellation of an unread response without claiming a full transfer", async () => {
     const response = await GET(request(), context);
     expect(response.headers.get("X-Resource-Delivery-Id")).toBe("dlv_http");
     await response.body?.cancel();
-    expect(deliveryFinish).toHaveBeenCalledWith(expect.objectContaining({ result: { status: "cancelled", bytesSent: 0, errorCode: null } }));
+    expect(deliveryFinish).toHaveBeenCalledWith(
+      expect.objectContaining({ result: { status: "cancelled", bytesSent: 0, errorCode: null } }),
+    );
   });
 
   it("returns 404 for an unpublished resource even with entitlement", async () => {
@@ -196,9 +205,7 @@ describe("resource download HTTP contract", () => {
     expect(response.status).toBe(404);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(await response.json()).toEqual({
       error: "Resource not found",
     });
@@ -213,9 +220,7 @@ describe("resource download HTTP contract", () => {
     expect(response.status).toBe(403);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(await response.json()).toEqual({
       error: "Add this resource to your library before downloading it",
     });
@@ -271,9 +276,7 @@ describe("resource download HTTP contract", () => {
     expect(response.status).toBe(404);
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(await response.json()).toEqual({
       error: "No published build is available",
     });
@@ -317,9 +320,7 @@ describe("resource download HTTP contract", () => {
       expect(response.status).toBe(500);
       expect(response.headers.get("Cache-Control")).toBe("private, no-store");
       expect(response.headers.get("Vary")).toBe("Cookie");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+      expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
       expect(openedStream.destroyed).toBe(true);
     } finally {
       consoleError.mockRestore();
@@ -340,9 +341,7 @@ describe("resource download HTTP contract", () => {
       'filename="http-resource-1.2.3.zip"',
     );
     expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
-    expect(Buffer.from(await response.arrayBuffer()).toString("utf8")).toBe(
-      "nexus-build",
-    );
+    expect(Buffer.from(await response.arrayBuffer()).toString("utf8")).toBe("nexus-build");
   });
 
   it("preserves an allowlisted build extension", async () => {
@@ -367,22 +366,25 @@ describe("resource download HTTP contract", () => {
     const response = await GET(request(), context);
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("X-Content-SHA256")).toBe(createHash("sha256").update("nexus-build").digest("hex"));
+    expect(response.headers.get("X-Content-SHA256")).toBe(
+      createHash("sha256").update("nexus-build").digest("hex"),
+    );
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Vary")).toBe("Cookie");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
-    expect(response.headers.get("X-Request-Id")).toMatch(
-      /^[0-9a-f-]{20,}$/u,
-    );
+    expect(response.headers.get("X-Request-Id")).toMatch(/^[0-9a-f-]{20,}$/u);
     expect(response.headers.get("Content-Disposition")).toContain(
       'filename="http-resource-1.2.3.zip"',
     );
     expect(Buffer.from(await response.arrayBuffer()).toString("utf8")).toBe("nexus-build");
-    expect(deliveryFinish).toHaveBeenCalledWith(expect.objectContaining({ result: { status: "served", bytesSent: 11, errorCode: null } }));
-    expect(downloadStream).toHaveBeenCalledWith("assets/http-resource.zip", expect.any(AbortSignal));
+    expect(deliveryFinish).toHaveBeenCalledWith(
+      expect.objectContaining({ result: { status: "served", bytesSent: 11, errorCode: null } }),
+    );
+    expect(downloadStream).toHaveBeenCalledWith(
+      "assets/http-resource.zip",
+      expect.any(AbortSignal),
+    );
     expect(auditRecord).toHaveBeenCalledTimes(1);
     expect(auditRecord).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -429,15 +431,16 @@ describe("pinned historical build downloads", () => {
       mimeType: "application/zip",
     };
     findLatestPublishedBuild.mockResolvedValue(null);
-    findPinnedPublishedBuild.mockImplementation(
-      async (productId: string, buildId: string) =>
-        productId === "prd_http" && buildId === "bld_historical_1"
-          ? state.build
-          : null,
+    findPinnedPublishedBuild.mockImplementation(async (productId: string, buildId: string) =>
+      productId === "prd_http" && buildId === "bld_historical_1" ? state.build : null,
     );
     downloadStream.mockResolvedValue({
       stream: Readable.from(Buffer.from("historical")),
-      meta: { sizeBytes: Buffer.byteLength("historical"), sha256Hash: state.build?.sha256Hash, mimeType: "application/zip" },
+      meta: {
+        sizeBytes: Buffer.byteLength("historical"),
+        sha256Hash: state.build?.sha256Hash,
+        mimeType: "application/zip",
+      },
     });
   });
 
@@ -449,20 +452,24 @@ describe("pinned historical build downloads", () => {
     const response = await GET(pinned(), context);
     expect(response.status).toBe(200);
     expect(response.headers.get("X-Resource-Build-Id")).toBe("bld_historical_1");
-    expect(response.headers.get("X-Content-SHA256")).toBe(createHash("sha256").update("historical").digest("hex"));
+    expect(response.headers.get("X-Content-SHA256")).toBe(
+      createHash("sha256").update("historical").digest("hex"),
+    );
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
     expect(response.headers.get("Content-Disposition")).toContain("http-resource-1.0.0.zip");
     expect(findPinnedPublishedBuild).toHaveBeenCalledWith("prd_http", "bld_historical_1");
     expect(findLatestPublishedBuild).not.toHaveBeenCalled();
     expect(downloadStream).toHaveBeenCalledWith("assets/old-resource.zip", expect.any(AbortSignal));
     expect(await response.text()).toBe("historical");
-    expect(auditRecord).toHaveBeenCalledWith(expect.objectContaining({
-      expected: expect.objectContaining({
-        id: "bld_historical_1",
-        version: "1.0.0",
+    expect(auditRecord).toHaveBeenCalledWith(
+      expect.objectContaining({
+        expected: expect.objectContaining({
+          id: "bld_historical_1",
+          version: "1.0.0",
+        }),
+        pinned: true,
       }),
-      pinned: true,
-    }));
+    );
   });
 
   it.each([
@@ -471,7 +478,7 @@ describe("pinned historical build downloads", () => {
     "?buildId=",
     "?buildId=lic_secret",
     "?buildId=bld_bad%0Aheader",
-  ])("refuses malformed pinned selectors before storage access: %s", async query => {
+  ])("refuses malformed pinned selectors before storage access: %s", async (query) => {
     const response = await GET(pinned(query), context);
     expect(response.status).toBe(400);
     expect(await response.json()).toMatchObject({ code: "BUILD_ID_INVALID" });

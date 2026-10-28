@@ -11,10 +11,7 @@ const historyQuerySchema = z.object({
   window: z.enum(["24h", "7d", "30d"]).default("24h"),
 });
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const parsed = historyQuerySchema.safeParse({
     window: request.nextUrl.searchParams.get("window") ?? undefined,
   });
@@ -33,10 +30,7 @@ export async function GET(
 
   try {
     const { id } = await params;
-    const history = await serverHistoryService.getHistory(
-      id,
-      parsed.data.window,
-    );
+    const history = await serverHistoryService.getHistory(id, parsed.data.window);
     if (!history) {
       return NextResponse.json(
         { error: "Server not found" },

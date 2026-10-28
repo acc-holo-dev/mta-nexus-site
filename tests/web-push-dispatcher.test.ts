@@ -22,10 +22,7 @@ function lease(id: string): WebPushLease {
   };
 }
 
-function prepared(
-  id: string,
-  subscriptionId = `wps_${id}`,
-): PreparedWebPushJob {
+function prepared(id: string, subscriptionId = `wps_${id}`): PreparedWebPushJob {
   return {
     id,
     notificationId: `not_${id}`,
@@ -48,9 +45,7 @@ function worker(ids: string[]) {
   return {
     candidates: vi.fn(async () => ids),
     claim: vi.fn(async (id: string) => lease(id)),
-    prepare: vi.fn(async (value: WebPushLease) =>
-      prepared(value.id),
-    ),
+    prepare: vi.fn(async (value: WebPushLease) => prepared(value.id)),
     settle: vi.fn(async () => true),
     discardStaleSubscription: vi.fn(async () => true),
     discardUnavailable: vi.fn(async () => 0),
@@ -89,31 +84,14 @@ describe("Web Push dispatcher", () => {
       unsettled: 0,
       cleaned: 0,
     });
-    expect(w.settle).toHaveBeenNthCalledWith(
-      1,
-      expect.anything(),
-      "accepted",
-      201,
-    );
-    expect(w.settle).toHaveBeenNthCalledWith(
-      2,
-      expect.anything(),
-      "retry",
-      503,
-      45_000,
-    );
-    expect(w.settle).toHaveBeenNthCalledWith(
-      3,
-      expect.anything(),
-      "discard",
-      400,
-    );
+    expect(w.settle).toHaveBeenNthCalledWith(1, expect.anything(), "accepted", 201);
+    expect(w.settle).toHaveBeenNthCalledWith(2, expect.anything(), "retry", 503, 45_000);
+    expect(w.settle).toHaveBeenNthCalledWith(3, expect.anything(), "discard", 400);
     expect(w.discardStaleSubscription).toHaveBeenCalledOnce();
   });
 
   it("retries transport exceptions without discarding the subscription", async () => {
-    const id =
-      "wpo_00000000-0000-0000-0000-000000000005";
+    const id = "wpo_00000000-0000-0000-0000-000000000005";
     const w = worker([id]);
     const sender = vi.fn(async () => {
       throw new Error("network down");
@@ -129,18 +107,12 @@ describe("Web Push dispatcher", () => {
       stale: 0,
       discarded: 0,
     });
-    expect(w.settle).toHaveBeenCalledWith(
-      expect.objectContaining({ id }),
-      "retry",
-    );
-    expect(
-      w.discardStaleSubscription,
-    ).not.toHaveBeenCalled();
+    expect(w.settle).toHaveBeenCalledWith(expect.objectContaining({ id }), "retry");
+    expect(w.discardStaleSubscription).not.toHaveBeenCalled();
   });
 
   it("removes unsafe endpoint failures without retrying them", async () => {
-    const id =
-      "wpo_00000000-0000-0000-0000-000000000014";
+    const id = "wpo_00000000-0000-0000-0000-000000000014";
     const w = worker([id]);
     const sender = vi.fn(async () => {
       parseWebPushEndpoint("https://127.0.0.1/push");
@@ -163,13 +135,10 @@ describe("Web Push dispatcher", () => {
   });
 
   it("removes a permanently invalid subscription without retrying it", async () => {
-    const id =
-      "wpo_00000000-0000-0000-0000-000000000009";
+    const id = "wpo_00000000-0000-0000-0000-000000000009";
     const w = worker([id]);
     const sender = vi.fn(async () => {
-      throw new WebPushPermanentSubscriptionError(
-        "unsafe endpoint",
-      );
+      throw new WebPushPermanentSubscriptionError("unsafe endpoint");
     });
 
     await expect(
@@ -183,9 +152,7 @@ describe("Web Push dispatcher", () => {
       discarded: 0,
     });
 
-    expect(
-      w.discardStaleSubscription,
-    ).toHaveBeenCalledWith(
+    expect(w.discardStaleSubscription).toHaveBeenCalledWith(
       expect.objectContaining({ id }),
       `wps_${id}`,
     );
@@ -193,13 +160,10 @@ describe("Web Push dispatcher", () => {
   });
 
   it("discards a permanently invalid payload without deleting the subscription", async () => {
-    const id =
-      "wpo_00000000-0000-0000-0000-000000000010";
+    const id = "wpo_00000000-0000-0000-0000-000000000010";
     const w = worker([id]);
     const sender = vi.fn(async () => {
-      throw new WebPushPermanentPayloadError(
-        "payload too large",
-      );
+      throw new WebPushPermanentPayloadError("payload too large");
     });
 
     await expect(
@@ -213,18 +177,12 @@ describe("Web Push dispatcher", () => {
       discarded: 1,
     });
 
-    expect(w.settle).toHaveBeenCalledWith(
-      expect.objectContaining({ id }),
-      "discard",
-    );
-    expect(
-      w.discardStaleSubscription,
-    ).not.toHaveBeenCalled();
+    expect(w.settle).toHaveBeenCalledWith(expect.objectContaining({ id }), "discard");
+    expect(w.discardStaleSubscription).not.toHaveBeenCalled();
   });
 
   it("never sends a job whose lease window is already too close to expiry", async () => {
-    const id =
-      "wpo_00000000-0000-0000-0000-000000000008";
+    const id = "wpo_00000000-0000-0000-0000-000000000008";
     const w = worker([id]);
     w.prepare.mockResolvedValueOnce({
       ...prepared(id),
@@ -245,10 +203,7 @@ describe("Web Push dispatcher", () => {
     });
 
     expect(sender).not.toHaveBeenCalled();
-    expect(w.settle).toHaveBeenCalledWith(
-      expect.objectContaining({ id }),
-      "retry",
-    );
+    expect(w.settle).toHaveBeenCalledWith(expect.objectContaining({ id }), "retry");
   });
 
   it("stops claiming new jobs after shutdown is requested", async () => {
@@ -272,7 +227,6 @@ describe("Web Push dispatcher", () => {
     expect(w.claim).toHaveBeenCalledTimes(1);
   });
 });
-
 
 it("reports progress throughout a multi-job batch", async () => {
   const ids = [

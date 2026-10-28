@@ -66,10 +66,7 @@ function run() {
       const stderr = Buffer.isBuffer(error.stderr)
         ? error.stderr.toString("utf8")
         : String(error.stderr || error.message);
-      throw new Error(
-        `docker ${args[0]} failed: ${stderr.slice(-5000)}`,
-        { cause: error },
-      );
+      throw new Error(`docker ${args[0]} failed: ${stderr.slice(-5000)}`, { cause: error });
     }
   }
 
@@ -101,29 +98,19 @@ function run() {
     ).trim();
     assert.equal(existing, "", "Refusing to adopt an existing Docker volume");
     const created = String(
-      docker([
-        "volume",
-        "create",
-        "--label",
-        `${BACKUP_RESTORE_LABEL}=${token}`,
-        name,
-      ]),
+      docker(["volume", "create", "--label", `${BACKUP_RESTORE_LABEL}=${token}`, name]),
     ).trim();
 
     // Register cleanup immediately after Docker reports success. Any later
     // assertion must still leave finally() able to remove this exact volume.
     registerCreatedVolume(createdVolumes, name, token, created);
 
-    const inspected = JSON.parse(
-      String(docker(["volume", "inspect", name])),
-    )[0];
+    const inspected = JSON.parse(String(docker(["volume", "inspect", name])))[0];
     assertOwnedVolume(inspected, name, token);
   }
 
   function removeOwnedVolume(name, token) {
-    const inspected = JSON.parse(
-      String(docker(["volume", "inspect", name])),
-    )[0];
+    const inspected = JSON.parse(String(docker(["volume", "inspect", name])))[0];
     assertOwnedVolume(inspected, name, token);
     docker(["volume", "rm", name]);
     const remaining = String(
@@ -133,9 +120,7 @@ function run() {
   }
 
   function helper(imageId, volumeName, token, args) {
-    const inspected = JSON.parse(
-      String(docker(["volume", "inspect", volumeName])),
-    )[0];
+    const inspected = JSON.parse(String(docker(["volume", "inspect", volumeName])))[0];
     assertOwnedVolume(inspected, volumeName, token);
     return docker([
       "run",
@@ -172,9 +157,7 @@ function run() {
     result.productionPostgresImage = spec.postgresImage;
 
     docker(["pull", spec.postgresImage], { timeout: 180_000 });
-    const imageInfo = JSON.parse(
-      String(docker(["image", "inspect", spec.postgresImage])),
-    )[0];
+    const imageInfo = JSON.parse(String(docker(["image", "inspect", spec.postgresImage])))[0];
     const imageId = imageInfo.Id;
     result.postgresImageId = imageId;
     result.postgresRepoDigests = imageInfo.RepoDigests ?? [];
@@ -190,9 +173,7 @@ function run() {
     createOwnedVolume(sourceUploads, sourceToken);
     writeFileSync(
       sourceFixture,
-      JSON.stringify(
-        makePostgresFixture(spec, imageId, sourcePg, sourceToken),
-      ),
+      JSON.stringify(makePostgresFixture(spec, imageId, sourcePg, sourceToken)),
       { mode: 0o600 },
     );
 
@@ -209,13 +190,7 @@ function run() {
       "never",
       "postgres",
     );
-    const sourceContainer = compose(
-      sourceProject,
-      sourceFixture,
-      "ps",
-      "--quiet",
-      "postgres",
-    );
+    const sourceContainer = compose(sourceProject, sourceFixture, "ps", "--quiet", "postgres");
     assert.match(sourceContainer, /^[a-f0-9]{64}$/);
 
     const sql = (container, query) =>
@@ -270,37 +245,53 @@ function run() {
     // schema. The separate upgrade rehearsal executes the Drizzle migrator.
     const journal = JSON.parse(readFileSync(join(migrationsDir, "meta/_journal.json"), "utf8"));
     assert.equal(journal.entries.length, migrationFiles.length);
-    sql(sourceContainer, "CREATE SCHEMA drizzle; CREATE TABLE drizzle.__drizzle_migrations " +
-      "(id serial PRIMARY KEY, hash text NOT NULL, created_at bigint);");
+    sql(
+      sourceContainer,
+      "CREATE SCHEMA drizzle; CREATE TABLE drizzle.__drizzle_migrations " +
+        "(id serial PRIMARY KEY, hash text NOT NULL, created_at bigint);",
+    );
     for (const entry of journal.entries) {
       const hash = sha256(join(migrationsDir, `${entry.tag}.sql`));
       assert(Number.isSafeInteger(entry.when));
-      sql(sourceContainer, "INSERT INTO drizzle.__drizzle_migrations (hash, created_at) " +
-        "VALUES ('" + hash + "', " + entry.when + ");");
+      sql(
+        sourceContainer,
+        "INSERT INTO drizzle.__drizzle_migrations (hash, created_at) " +
+          "VALUES ('" +
+          hash +
+          "', " +
+          entry.when +
+          ");",
+      );
     }
-    const ledger = (container) => sql(container,
-      "SELECT json_agg(t ORDER BY id)::text FROM drizzle.__drizzle_migrations t;");
+    const ledger = (container) =>
+      sql(container, "SELECT json_agg(t ORDER BY id)::text FROM drizzle.__drizzle_migrations t;");
     const sourceLedger = ledger(sourceContainer);
 
     const archiveHash = createHash("sha256").update("archive-probe").digest("hex");
-    sql(sourceContainer,
+    sql(
+      sourceContainer,
       "INSERT INTO users (id, email, username, display_name) VALUES " +
-      "('backup-user', 'backup@example.invalid', 'backup-user', 'Backup author'); " +
-      "INSERT INTO products (id, title, slug, description, type, author_id, status) VALUES " +
-      "('backup-resource', 'Backup resource', 'backup-resource', 'Preserved', 'script', 'backup-user', 'published'); " +
-      "INSERT INTO builds (id, product_id, version, storage_key, sha256_hash, file_size_bytes, " +
-      "status, scan_status, scanner, scanned_at) VALUES " +
-      "('backup-build', 'backup-resource', '1.0.0', 'resources/build.zip', '" + archiveHash +
-      "', 13, 'published', 'clean', 'clamav', now()); " +
-      "INSERT INTO entitlements (id, subject_type, subject_id, permission, resource_id) VALUES " +
-      "('backup-entitlement', 'user', 'backup-user', 'download', 'backup-resource'); " +
-      "INSERT INTO notifications (id, recipient_id, title, message, is_read, data) VALUES " +
-      "('backup-notification', 'backup-user', 'Reviewed', 'Approved', true, " +
-      "'{\"kind\":\"build_review\",\"decision\":\"approve\",\"resourceTitle\":\"Backup resource\",\"version\":\"1.0.0\",\"notes\":\"Reviewed\"}'::jsonb);");
-    const applicationRows = (container) => Object.fromEntries(
-      ["users", "products", "builds", "entitlements", "notifications"].map((table) =>
-        [table, sql(container, `SELECT json_agg(t ORDER BY id)::text FROM ${table} t;`)]),
+        "('backup-user', 'backup@example.invalid', 'backup-user', 'Backup author'); " +
+        "INSERT INTO products (id, title, slug, description, type, author_id, status) VALUES " +
+        "('backup-resource', 'Backup resource', 'backup-resource', 'Preserved', 'script', 'backup-user', 'published'); " +
+        "INSERT INTO builds (id, product_id, version, storage_key, sha256_hash, file_size_bytes, " +
+        "status, scan_status, scanner, scanned_at) VALUES " +
+        "('backup-build', 'backup-resource', '1.0.0', 'resources/build.zip', '" +
+        archiveHash +
+        "', 13, 'published', 'clean', 'clamav', now()); " +
+        "INSERT INTO entitlements (id, subject_type, subject_id, permission, resource_id) VALUES " +
+        "('backup-entitlement', 'user', 'backup-user', 'download', 'backup-resource'); " +
+        "INSERT INTO notifications (id, recipient_id, title, message, is_read, data) VALUES " +
+        "('backup-notification', 'backup-user', 'Reviewed', 'Approved', true, " +
+        '\'{"kind":"build_review","decision":"approve","resourceTitle":"Backup resource","version":"1.0.0","notes":"Reviewed"}\'::jsonb);',
     );
+    const applicationRows = (container) =>
+      Object.fromEntries(
+        ["users", "products", "builds", "entitlements", "notifications"].map((table) => [
+          table,
+          sql(container, `SELECT json_agg(t ORDER BY id)::text FROM ${table} t;`),
+        ]),
+      );
     const sourceApplicationRows = applicationRows(sourceContainer);
 
     const schemaFingerprint = (container) => ({
@@ -320,10 +311,7 @@ function run() {
         ),
       ),
       indexCount: Number(
-        sql(
-          container,
-          "SELECT count(*) FROM pg_indexes WHERE schemaname = 'public';",
-        ),
+        sql(container, "SELECT count(*) FROM pg_indexes WHERE schemaname = 'public';"),
       ),
       constraintCount: Number(
         sql(
@@ -377,11 +365,7 @@ function run() {
     );
     writeFileSync(dbBackup, dump, { mode: PRIVATE_BACKUP_FILE_MODE });
     assert(statSync(dbBackup).size > 0, "Database dump is empty");
-    assert.equal(
-      statSync(dbBackup).mode & 0o777,
-      0o600,
-      "Database backup must remain private",
-    );
+    assert.equal(statSync(dbBackup).mode & 0o777, 0o600, "Database backup must remain private");
 
     const uploadsBackup = join(temp, "uploads.tar.gz");
     // Create on the host first: container tar truncates this inode without
@@ -405,11 +389,7 @@ function run() {
     ]);
     assert(statSync(uploadsBackup).size > 0, "Uploads archive is empty");
     chmodSync(uploadsBackup, PRIVATE_BACKUP_FILE_MODE);
-    assert.equal(
-      statSync(uploadsBackup).mode & 0o777,
-      0o600,
-      "Uploads backup must remain private",
-    );
+    assert.equal(statSync(uploadsBackup).mode & 0o777, 0o600, "Uploads backup must remain private");
 
     result.databaseBackupSha256 = sha256(dbBackup);
     result.uploadsBackupSha256 = sha256(uploadsBackup);
@@ -442,9 +422,7 @@ function run() {
     createOwnedVolume(restoreUploads, restoreToken);
     writeFileSync(
       restoreFixture,
-      JSON.stringify(
-        makePostgresFixture(spec, imageId, restorePg, restoreToken),
-      ),
+      JSON.stringify(makePostgresFixture(spec, imageId, restorePg, restoreToken)),
       { mode: 0o600 },
     );
 
@@ -461,13 +439,7 @@ function run() {
       "never",
       "postgres",
     );
-    const restoreContainer = compose(
-      restoreProject,
-      restoreFixture,
-      "ps",
-      "--quiet",
-      "postgres",
-    );
+    const restoreContainer = compose(restoreProject, restoreFixture, "ps", "--quiet", "postgres");
     assert.match(restoreContainer, /^[a-f0-9]{64}$/);
 
     docker(
@@ -519,8 +491,11 @@ function run() {
     );
     result.applicationSchemaRestored = true;
     result.restoredSchemaFingerprint = restoredSchemaFingerprint;
-    assert.deepEqual(applicationRows(restoreContainer), sourceApplicationRows,
-      "Restored author, resource, trusted build, entitlement and notification must match exactly");
+    assert.deepEqual(
+      applicationRows(restoreContainer),
+      sourceApplicationRows,
+      "Restored author, resource, trusted build, entitlement and notification must match exactly",
+    );
     result.applicationRowsRestored = true;
     assert.equal(ledger(restoreContainer), sourceLedger, "Migration ledger must survive restore");
     result.migrationLedgerRestored = true;
@@ -547,49 +522,34 @@ function run() {
       } catch (error) {
         result.status = "FAIL";
         result.cleanupError =
-          (result.cleanupError ? `${result.cleanupError}; ` : "") +
-          error.message;
+          (result.cleanupError ? `${result.cleanupError}; ` : "") + error.message;
       }
     }
 
     for (const volume of createdVolumes.reverse()) {
       try {
         const exists = String(
-          docker([
-            "volume",
-            "ls",
-            "--quiet",
-            "--filter",
-            `name=^${volume.name}$`,
-          ]),
+          docker(["volume", "ls", "--quiet", "--filter", `name=^${volume.name}$`]),
         ).trim();
         if (exists) removeOwnedVolume(volume.name, volume.token);
       } catch (error) {
         result.status = "FAIL";
         result.cleanupError =
-          (result.cleanupError ? `${result.cleanupError}; ` : "") +
-          error.message;
+          (result.cleanupError ? `${result.cleanupError}; ` : "") + error.message;
       }
     }
 
-    result.cleanupComplete =
-      createdVolumes.every((volume) => {
-        try {
-          return (
-            String(
-              docker([
-                "volume",
-                "ls",
-                "--quiet",
-                "--filter",
-                `name=^${volume.name}$`,
-              ]),
-            ).trim() === ""
-          );
-        } catch {
-          return false;
-        }
-      });
+    result.cleanupComplete = createdVolumes.every((volume) => {
+      try {
+        return (
+          String(
+            docker(["volume", "ls", "--quiet", "--filter", `name=^${volume.name}$`]),
+          ).trim() === ""
+        );
+      } catch {
+        return false;
+      }
+    });
 
     if (!result.cleanupComplete) result.status = "FAIL";
 
@@ -605,8 +565,11 @@ function run() {
     console.log(JSON.stringify(result, null, 2));
     result.sha = process.env.GITHUB_SHA ?? null;
     mkdirSync(join(root, "artifacts"), { recursive: true });
-    writeFileSync(join(root, "artifacts/backup-restore-evidence.json"),
-      `${JSON.stringify(result, null, 2)}\n`, { mode: 0o600 });
+    writeFileSync(
+      join(root, "artifacts/backup-restore-evidence.json"),
+      `${JSON.stringify(result, null, 2)}\n`,
+      { mode: 0o600 },
+    );
     if (process.env.GITHUB_STEP_SUMMARY) {
       appendFileSync(
         process.env.GITHUB_STEP_SUMMARY,
@@ -622,10 +585,7 @@ function run() {
   assert.equal(result.status, "PASS");
 }
 
-if (
-  process.argv[1] &&
-  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
-) {
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     run();
   } catch (error) {

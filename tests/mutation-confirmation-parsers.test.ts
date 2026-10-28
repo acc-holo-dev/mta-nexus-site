@@ -69,17 +69,13 @@ describe("mutation confirmation parsers", () => {
       },
     };
 
-    expect(
-      parseIssuedServerClaimChallenge(201, payload, "srv_1"),
-    ).toEqual({
+    expect(parseIssuedServerClaimChallenge(201, payload, "srv_1")).toEqual({
       challengeId: "scc_1",
       token: "NXCLAIM-ABCDEF0123456789ABCDEF01",
       expiresAt: "2026-10-08T01:00:00.000Z",
     });
 
-    expect(
-      parseIssuedServerClaimChallenge(201, payload, "srv_other"),
-    ).toBeNull();
+    expect(parseIssuedServerClaimChallenge(201, payload, "srv_other")).toBeNull();
     expect(
       parseIssuedServerClaimChallenge(
         201,
@@ -104,12 +100,8 @@ describe("mutation confirmation parsers", () => {
       },
     };
 
-    expect(
-      confirmsServerClaimVerification(201, payload, "scc_1"),
-    ).toBe(true);
-    expect(
-      confirmsServerClaimVerification(201, payload, "scc_other"),
-    ).toBe(false);
+    expect(confirmsServerClaimVerification(201, payload, "scc_1")).toBe(true);
+    expect(confirmsServerClaimVerification(201, payload, "scc_other")).toBe(false);
     expect(
       confirmsServerClaimVerification(
         201,
@@ -120,12 +112,6 @@ describe("mutation confirmation parsers", () => {
         "scc_1",
       ),
     ).toBe(false);
-    expect(
-      confirmsServerClaimVerification(
-        500,
-        payload,
-        "scc_1",
-      ),
-    ).toBe(false);
+    expect(confirmsServerClaimVerification(500, payload, "scc_1")).toBe(false);
   });
 });

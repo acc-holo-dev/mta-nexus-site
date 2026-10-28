@@ -1,10 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import {
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -54,26 +50,18 @@ function evidence(overrides = {}) {
   };
   return {
     ...core,
-    evidenceSha256: createHash("sha256")
-      .update(JSON.stringify(core))
-      .digest("hex"),
+    evidenceSha256: createHash("sha256").update(JSON.stringify(core)).digest("hex"),
   };
 }
 
 function run(value) {
-  const directory = mkdtempSync(
-    join(tmpdir(), "nexus-push-soak-evidence-"),
-  );
+  const directory = mkdtempSync(join(tmpdir(), "nexus-push-soak-evidence-"));
   const path = join(directory, "evidence.json");
   writeFileSync(path, JSON.stringify(value));
-  const result = spawnSync(
-    process.execPath,
-    ["scripts/check-web-push-soak-evidence.mjs", path],
-    {
-      cwd: process.cwd(),
-      encoding: "utf8",
-    },
-  );
+  const result = spawnSync(process.execPath, ["scripts/check-web-push-soak-evidence.mjs", path], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+  });
   rmSync(directory, { recursive: true, force: true });
   return result;
 }

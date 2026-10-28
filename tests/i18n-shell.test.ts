@@ -37,15 +37,16 @@ describe("RU/EN shell foundation", () => {
   it("keeps Russian and English dictionary keys in sync", () => {
     function keys(value: unknown, prefix = ""): string[] {
       if (!value || typeof value !== "object" || Array.isArray(value)) return [];
-      return Object.entries(value).flatMap(([key, child]) => {
-        const path = prefix ? `${prefix}.${key}` : key;
-        return [path, ...keys(child, path)];
-      }).sort();
+      return Object.entries(value)
+        .flatMap(([key, child]) => {
+          const path = prefix ? `${prefix}.${key}` : key;
+          return [path, ...keys(child, path)];
+        })
+        .sort();
     }
 
     expect(keys(getDictionary("ru"))).toEqual(keys(getDictionary("en")));
     expect(getDictionary("ru").workspaceContext.retry).toBe("Повторить");
     expect(getDictionary("en").workspaceContext.retry).toBe("Try again");
   });
-
 });

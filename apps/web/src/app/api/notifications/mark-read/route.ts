@@ -16,11 +16,7 @@ const privateHeaders = {
   Vary: "Cookie",
 };
 
-function json(
-  context: RequestLogContext,
-  body: unknown,
-  status = 200,
-) {
+function json(context: RequestLogContext, body: unknown, status = 200) {
   return jsonWithRequestId(context, body, {
     status,
     headers: privateHeaders,
@@ -34,51 +30,32 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const user = await authService.getSession(token);
 
     if (!user) {
-      return json(
-        context,
-        { error: "Unauthorized" },
-        401,
-      );
+      return json(context, { error: "Unauthorized" }, 401);
     }
 
-    const rateLimit = await consumeRateLimit(
-      "notificationMutation",
-      user.id,
-    );
+    const rateLimit = await consumeRateLimit("notificationMutation", user.id);
     if (!rateLimit.success) {
       return json(
         context,
         {
-          error:
-            "Too many notification updates. Please try again shortly.",
+          error: "Too many notification updates. Please try again shortly.",
         },
         429,
       );
     }
 
-    const target = parseNotificationReadTarget(
-      await request.text(),
-    );
+    const target = parseNotificationReadTarget(await request.text());
     if (!target) {
-      return json(
-        context,
-        { error: "Invalid notification target" },
-        400,
-      );
+      return json(context, { error: "Invalid notification target" }, 400);
     }
 
     if (target.scope === "single") {
-      const updated =
-        await notificationRepository.markAsRead(
-          target.id,
-          user.id,
-        );
+      const updated = await notificationRepository.markAsRead(target.id, user.id);
       if (!updated) {
         return json(
           context,
           {
-            error:
-              "Notification not found or not owned by you",
+            error: "Notification not found or not owned by you",
           },
           404,
         );
@@ -90,9 +67,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       });
     }
 
-    await notificationRepository.markAllAsRead(
-      user.id,
-    );
+    await notificationRepository.markAllAsRead(user.id);
     return json(context, {
       success: true,
       scope: "all",
@@ -108,8 +83,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json(
       context,
       {
-        error:
-          "Failed to mark notifications read",
+        error: "Failed to mark notifications read",
       },
       500,
     );

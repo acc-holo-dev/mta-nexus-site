@@ -52,8 +52,7 @@ describe("trusted request IP security boundary", () => {
     expect(
       getClientIp(
         headers({
-          "x-nexus-proxy-secret":
-            "wrong-proxy-secret-0123456789abcdef",
+          "x-nexus-proxy-secret": "wrong-proxy-secret-0123456789abcdef",
           "x-real-ip": "203.0.113.3",
         }),
         secret,
@@ -81,9 +80,13 @@ describe("trusted request IP security boundary", () => {
     expect(getClientIp(requestHeaders, secret)).toBe("unknown");
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("TRUSTED_PROXY_SECRET", secret);
-    expect(getTrustedRequestIp(new NextRequest("https://nexus.test/", {
-      headers: requestHeaders,
-    }))).toBe("unknown");
+    expect(
+      getTrustedRequestIp(
+        new NextRequest("https://nexus.test/", {
+          headers: requestHeaders,
+        }),
+      ),
+    ).toBe("unknown");
   });
 
   it("uses one stable local identity outside production when the proxy is absent", () => {
@@ -110,9 +113,7 @@ describe("trusted request IP security boundary", () => {
       },
     });
 
-    expect(() => getTrustedRequestIp(request)).toThrow(
-      /Trusted proxy secret is unavailable/u,
-    );
+    expect(() => getTrustedRequestIp(request)).toThrow(/Trusted proxy secret is unavailable/u);
   });
 
   it("passes verified production proxy identity through the wrapper", () => {

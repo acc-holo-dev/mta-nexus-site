@@ -8,11 +8,9 @@ export function LocaleSwitcher({ locale }: { locale: Locale }) {
   const nextLocale: Locale = locale === "en" ? "ru" : "en";
 
   const switchLocale = () => {
-    const secure =
-      window.location.protocol === "https:" ? "; Secure" : "";
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
     // biome-ignore lint/suspicious/noDocumentCookie: locale is a non-sensitive SameSite preference that must be written before reload.
-    document.cookie =
-      `nexus_locale=${nextLocale}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
+    document.cookie = `nexus_locale=${nextLocale}; Path=/; Max-Age=31536000; SameSite=Lax${secure}`;
     window.location.reload();
   };
 

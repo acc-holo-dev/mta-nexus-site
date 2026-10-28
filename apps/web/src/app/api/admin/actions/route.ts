@@ -10,11 +10,7 @@ import { authService } from "../../../../lib/services/auth-service";
 import { productService } from "../../../../lib/services/product-service";
 import { contentService } from "../../../../lib/services/content-service";
 import { notifyServerFollowersOfPublishedContent } from "../../../../lib/services/server-follow-notification-service";
-import {
-  productRepository,
-  reportRepository,
-  verificationRepository,
-} from "@nexus/db";
+import { productRepository, reportRepository, verificationRepository } from "@nexus/db";
 import { can, consumeRateLimit, generateId } from "@nexus/security";
 
 const privateHeaders = {
@@ -30,11 +26,41 @@ function json(body: unknown, status = 200) {
 }
 
 const adminActionSchema = z.discriminatedUnion("targetType", [
-  z.object({ targetType: z.literal("product"), targetId: z.string().min(1), action: z.enum(["feature", "unfeature", "suspend", "restore"]), notes: z.string().max(2000).optional(), expectedUpdatedAt: z.string().max(40).optional() }),
-  z.object({ targetType: z.literal("report"), targetId: z.string().min(1), action: z.enum(["resolve", "dismiss"]), notes: z.string().trim().min(3).max(2000) }),
-  z.object({ targetType: z.literal("verification"), targetId: z.string().min(1), action: z.enum(["approve", "reject"]), notes: z.string().trim().min(3).max(2000) }),
-  z.object({ targetType: z.literal("build"), targetId: z.string().min(1), action: z.enum(["approve", "reject", "quarantine", "restore"]), notes: z.string().trim().min(3).max(2000), expectedRevision: z.number().int().min(1).max(2147483646).optional() }),
-  z.object({ targetType: z.literal("content"), targetId: z.string().min(1).max(128), action: z.enum(["publish", "archive"]), notes: z.string().trim().min(3).max(2000), expectedUpdatedAt: z.iso.datetime() }).strict(),
+  z.object({
+    targetType: z.literal("product"),
+    targetId: z.string().min(1),
+    action: z.enum(["feature", "unfeature", "suspend", "restore"]),
+    notes: z.string().max(2000).optional(),
+    expectedUpdatedAt: z.string().max(40).optional(),
+  }),
+  z.object({
+    targetType: z.literal("report"),
+    targetId: z.string().min(1),
+    action: z.enum(["resolve", "dismiss"]),
+    notes: z.string().trim().min(3).max(2000),
+  }),
+  z.object({
+    targetType: z.literal("verification"),
+    targetId: z.string().min(1),
+    action: z.enum(["approve", "reject"]),
+    notes: z.string().trim().min(3).max(2000),
+  }),
+  z.object({
+    targetType: z.literal("build"),
+    targetId: z.string().min(1),
+    action: z.enum(["approve", "reject", "quarantine", "restore"]),
+    notes: z.string().trim().min(3).max(2000),
+    expectedRevision: z.number().int().min(1).max(2147483646).optional(),
+  }),
+  z
+    .object({
+      targetType: z.literal("content"),
+      targetId: z.string().min(1).max(128),
+      action: z.enum(["publish", "archive"]),
+      notes: z.string().trim().min(3).max(2000),
+      expectedUpdatedAt: z.iso.datetime(),
+    })
+    .strict(),
 ]);
 
 export const POST = withBrowserMutation(async (request: NextRequest) => {
@@ -44,27 +70,28 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     const user = await authService.getSession(token);
 
     if (!user || !can(user, "admin.moderation")) {
-      return json(
-        { error: "Forbidden: Admin or moderator privilege required" },
-        403 
-      );
+      return json({ error: "Forbidden: Admin or moderator privilege required" }, 403);
     }
 
     requireServerJsonContentType(request);
-    if (request.headers.get("sec-fetch-site") === "cross-site") throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
+    if (request.headers.get("sec-fetch-site") === "cross-site")
+      throw new AppError("Cross-site mutation is forbidden", 403, "FORBIDDEN");
 
     // Admin actions are rate limited
     const rl = await consumeRateLimit("moderationAction", user.id);
     if (!rl.success) {
-      return json({ error: "Too many admin actions" }, 429 );
+      return json({ error: "Too many admin actions" }, 429);
     }
 
     const parsed = adminActionSchema.safeParse(await readBoundedJson(request, 32768));
     if (!parsed.success) {
-      return json({ error: "Invalid moderation action", details: parsed.error.format() }, 400 );
+      return json({ error: "Invalid moderation action", details: parsed.error.format() }, 400);
     }
-    if (parsed.data.targetType === "build" &&
-      (parsed.data.action === "approve" || parsed.data.action === "reject") && parsed.data.expectedRevision === undefined)
+    if (
+      parsed.data.targetType === "build" &&
+      (parsed.data.action === "approve" || parsed.data.action === "reject") &&
+      parsed.data.expectedRevision === undefined
+    )
       throw new AppError("Observed build revision is required", 400, "BUILD_REVISION_REQUIRED");
     const { targetType, targetId, action, notes } = parsed.data;
 
@@ -88,10 +115,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           token,
         );
         if (!updated) {
-          return json(
-            { error: "Product not found" },
-            404 ,
-          );
+          return json({ error: "Product not found" }, 404);
         }
       } else {
         const command = resourceModerationCommandSchema.safeParse({
@@ -99,7 +123,12 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           expectedUpdatedAt: parsed.data.expectedUpdatedAt,
           reason: notes,
         });
-        if (!command.success) throw new AppError("A current resource revision and moderation reason are required", 400, "RESOURCE_MODERATION_INVALID");
+        if (!command.success)
+          throw new AppError(
+            "A current resource revision and moderation reason are required",
+            400,
+            "RESOURCE_MODERATION_INVALID",
+          );
         if (!token) return json({ error: "Authentication required" }, 401);
         await resourceModerationService.command(user, targetId, command.data, token);
       }
@@ -116,10 +145,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         if (!resolved) {
           const current = await reportRepository.findById(targetId);
           if (!current) {
-            return json(
-              { error: "Report not found" },
-              404 ,
-            );
+            return json({ error: "Report not found" }, 404);
           }
           throw new AppError(
             "Report state changed before moderation completed",
@@ -146,10 +172,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
         if (!resolved) {
           const current = await verificationRepository.findById(targetId);
           if (!current) {
-            return json(
-              { error: "Verification request not found" },
-              404 ,
-            );
+            return json({ error: "Verification request not found" }, 404);
           }
           throw new AppError(
             "Verification request state changed before moderation completed",
@@ -157,7 +180,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
             "VERIFICATION_STATE_CHANGED",
           );
         }
-
       }
     } else if (targetType === "build") {
       if (!token) return json({ error: "Authentication required" }, 401);
@@ -173,15 +195,23 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
           token,
         );
       } else if (action === "quarantine") {
-        await productService.quarantineBuild({
-          buildId: targetId,
-          reason: notes,
-        }, user, token);
+        await productService.quarantineBuild(
+          {
+            buildId: targetId,
+            reason: notes,
+          },
+          user,
+          token,
+        );
       } else {
-        await productService.restoreQuarantinedBuild({
-          buildId: targetId,
-          reason: notes,
-        }, user, token);
+        await productService.restoreQuarantinedBuild(
+          {
+            buildId: targetId,
+            reason: notes,
+          },
+          user,
+          token,
+        );
       }
     } else if (targetType === "content") {
       if (!token) return json({ error: "Authentication required" }, 401);
@@ -195,9 +225,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       );
       if (action === "publish" && moderated.serverId) {
         after(async () => {
-          await notifyServerFollowersOfPublishedContent(moderated).catch(
-            () => undefined,
-          );
+          await notifyServerFollowersOfPublishedContent(moderated).catch(() => undefined);
         });
       }
     }
@@ -205,10 +233,7 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
     return json({ success: true, action, targetId });
   } catch (error: unknown) {
     if (error instanceof AppError) {
-      return json(
-        { error: error.message, code: error.code },
-        error.statusCode ,
-      );
+      return json({ error: error.message, code: error.code }, error.statusCode);
     }
     logRequestEvent({
       level: "error",
@@ -217,6 +242,6 @@ export const POST = withBrowserMutation(async (request: NextRequest) => {
       status: 500,
       error,
     });
-    return json({ error: "Failed to execute administrative action" }, 500 );
+    return json({ error: "Failed to execute administrative action" }, 500);
   }
 });

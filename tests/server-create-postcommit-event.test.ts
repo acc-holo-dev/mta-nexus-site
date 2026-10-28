@@ -37,15 +37,16 @@ beforeEach(() => {
   mocks.insert.mockImplementation(async (server) => server);
   mocks.managedUpdate.mockReset();
   mocks.managedUpdate.mockImplementation(async (_id, changes) => ({
-    id: "srv_1", ...changes,
+    id: "srv_1",
+    ...changes,
   }));
 });
 
 describe("server creation after durable write", () => {
   it("returns the stored server even when event dispatch rejects", async () => {
-    const publish = vi.spyOn(eventBus, "publish").mockRejectedValueOnce(
-      new Error("subscriber failed with private payload"),
-    );
+    const publish = vi
+      .spyOn(eventBus, "publish")
+      .mockRejectedValueOnce(new Error("subscriber failed with private payload"));
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const stored = await serverService.createServer(input, actor);
     expect(stored).toMatchObject({ id: "srv_test", name: "Test Server" });
@@ -67,38 +68,41 @@ describe("server creation after durable write", () => {
     mocks.insert.mockRejectedValueOnce({
       cause: { code: "23505", constraint },
     });
-    await expect(serverService.createServer(input, actor))
-      .rejects.toMatchObject({ statusCode: 409, code });
+    await expect(serverService.createServer(input, actor)).rejects.toMatchObject({
+      statusCode: 409,
+      code,
+    });
     expect(publish).not.toHaveBeenCalled();
   });
 
   it("handles edit conflicts and delegates authority to the database transaction", async () => {
     const original = new Date("2026-10-10T01:00:00.000Z");
-    await expect(serverService.updateServer(
-      "srv_1", { description: "New" }, actor, original,
-    )).resolves.toMatchObject({ id: "srv_1", description: "New" });
+    await expect(
+      serverService.updateServer("srv_1", { description: "New" }, actor, original),
+    ).resolves.toMatchObject({ id: "srv_1", description: "New" });
     expect(mocks.managedUpdate).toHaveBeenCalledWith(
       "srv_1",
       { description: "New" },
       expect.objectContaining({
-        action: "server.updated", actorId: "usr_1", targetId: "srv_1",
+        action: "server.updated",
+        actorId: "usr_1",
+        targetId: "srv_1",
       }),
       actor,
       original,
     );
     mocks.managedUpdate.mockRejectedValueOnce({
-      code: "23505", constraint_name: "servers_endpoint_idx",
+      code: "23505",
+      constraint_name: "servers_endpoint_idx",
     });
-    await expect(serverService.updateServer("srv_1", { port: 22004 }, actor))
-      .rejects.toMatchObject({ statusCode: 409, code: "SERVER_ENDPOINT_TAKEN" });
+    await expect(serverService.updateServer("srv_1", { port: 22004 }, actor)).rejects.toMatchObject(
+      { statusCode: 409, code: "SERVER_ENDPOINT_TAKEN" },
+    );
   });
 
   it("canonicalizes MTA endpoints for both audited creation and managed edits", async () => {
     const variant = "  PLAY.Example.COM.  ";
-    const created = await serverService.createServer(
-      { ...input, ipAddress: variant },
-      actor,
-    );
+    const created = await serverService.createServer({ ...input, ipAddress: variant }, actor);
     expect(created.ipAddress).toBe("play.example.com");
     expect(mocks.insert).toHaveBeenLastCalledWith(
       expect.objectContaining({ ipAddress: "play.example.com" }),
@@ -121,14 +125,14 @@ describe("server creation after durable write", () => {
   it.each(["", " ", ".", "example.com:22003", "bad..com"])(
     "rejects invalid server address %j before writing",
     async (invalid) => {
-      await expect(serverService.createServer(
-        { ...input, ipAddress: invalid },
-        actor,
-      )).rejects.toMatchObject({ statusCode: 400, code: "INVALID_SERVER_ADDRESS" });
+      await expect(
+        serverService.createServer({ ...input, ipAddress: invalid }, actor),
+      ).rejects.toMatchObject({ statusCode: 400, code: "INVALID_SERVER_ADDRESS" });
       expect(mocks.insert).not.toHaveBeenCalled();
 
-      await expect(serverService.updateServer("srv_1", { ipAddress: invalid }, actor))
-        .rejects.toMatchObject({ statusCode: 400, code: "INVALID_SERVER_ADDRESS" });
+      await expect(
+        serverService.updateServer("srv_1", { ipAddress: invalid }, actor),
+      ).rejects.toMatchObject({ statusCode: 400, code: "INVALID_SERVER_ADDRESS" });
       expect(mocks.managedUpdate).not.toHaveBeenCalled();
     },
   );
@@ -140,9 +144,14 @@ describe("server creation after durable write", () => {
       expect.anything(),
       "user",
     );
-    await serverService.createServer({
-      ...input, organizationId: "org_1", ownerId: "usr_forged",
-    }, actor);
+    await serverService.createServer(
+      {
+        ...input,
+        organizationId: "org_1",
+        ownerId: "usr_forged",
+      },
+      actor,
+    );
     expect(mocks.insert).toHaveBeenLastCalledWith(
       expect.objectContaining({ ownerId: undefined, organizationId: "org_1" }),
       expect.anything(),
@@ -153,8 +162,7 @@ describe("server creation after durable write", () => {
   it("does not dispatch an event if the durable transaction fails", async () => {
     const publish = vi.spyOn(eventBus, "publish").mockResolvedValue();
     mocks.insert.mockRejectedValueOnce(new Error("database unavailable"));
-    await expect(serverService.createServer(input, actor))
-      .rejects.toThrow("database unavailable");
+    await expect(serverService.createServer(input, actor)).rejects.toThrow("database unavailable");
     expect(publish).not.toHaveBeenCalled();
   });
 });

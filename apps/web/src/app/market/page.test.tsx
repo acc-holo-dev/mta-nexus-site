@@ -25,12 +25,18 @@ describe("free resource catalog as rendered for visitors", () => {
       products: [{ id: "p1", title: "Скрипт" }],
       hasMore: true,
     });
-    const html = renderToStaticMarkup(await MarketPage({
-      searchParams: Promise.resolve({ type: "script", sort: "rating", q: "MTA & RPG" }),
-    }));
+    const html = renderToStaticMarkup(
+      await MarketPage({
+        searchParams: Promise.resolve({ type: "script", sort: "rating", q: "MTA & RPG" }),
+      }),
+    );
 
     expect(mocks.listPublicPage).toHaveBeenCalledWith({
-      type: "script", sort: "rating", query: "MTA & RPG", page: 1, pageSize: 24,
+      type: "script",
+      sort: "rating",
+      query: "MTA & RPG",
+      page: 1,
+      pageSize: 24,
     });
     expect(html).toMatch(/<search\b[^>]*aria-label="Поиск ресурсов"/);
     expect(html).toContain("Искать бесплатные ресурсы MTA");
@@ -43,9 +49,11 @@ describe("free resource catalog as rendered for visitors", () => {
   it("explains an exhausted page and offers a way back to the same filtered first page", async () => {
     mocks.locale = "en";
     mocks.listPublicPage.mockResolvedValueOnce({ products: [], hasMore: false });
-    const html = renderToStaticMarkup(await MarketPage({
-      searchParams: Promise.resolve({ type: "api", sort: "newest", page: "3", q: " maps " }),
-    }));
+    const html = renderToStaticMarkup(
+      await MarketPage({
+        searchParams: Promise.resolve({ type: "api", sort: "newest", page: "3", q: " maps " }),
+      }),
+    );
 
     expect(html).toContain("There are no resources on this page.");
     expect(html).toContain("Previous");

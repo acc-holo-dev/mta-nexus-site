@@ -28,7 +28,12 @@ export function ResourceDownloadButton({
   const [progress, setProgress] = useState<number | null>(null);
   const [failure, setFailure] = useState<DownloadFailure | null>(null);
   const [notice, setNotice] = useState<"cancelled" | "saved" | null>(null);
-  const [receipt, setReceipt] = useState<{ id: string; productId: string; buildId?: string; version: string } | null>(null);
+  const [receipt, setReceipt] = useState<{
+    id: string;
+    productId: string;
+    buildId?: string;
+    version: string;
+  } | null>(null);
   useEffect(
     () => () => {
       active.current?.abort();
@@ -138,8 +143,14 @@ export function ResourceDownloadButton({
           {notice === "cancelled" ? copy.downloadCancelled : copy.downloadHandedOff}
         </p>
       )}
-      {receipt && receipt.productId === productId && receipt.buildId === buildId && receipt.version === version ? (
-        <Link href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`} className="text-sm text-accent underline">
+      {receipt &&
+      receipt.productId === productId &&
+      receipt.buildId === buildId &&
+      receipt.version === version ? (
+        <Link
+          href={`/workspace/library/downloads/${encodeURIComponent(receipt.id)}`}
+          className="text-sm text-accent underline"
+        >
           {resourceDeliveriesCopy(locale).details}
         </Link>
       ) : null}

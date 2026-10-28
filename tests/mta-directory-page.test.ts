@@ -123,12 +123,22 @@ describe("MTA directory page selection", () => {
     let nameReads = 0;
     const servers: readonly MtaMasterServer[] = Object.freeze([
       Object.freeze({
-        address: "one.test", port: 22003, players: 5,
-        get name() { nameReads++; return "Nexus Roleplay"; },
+        address: "one.test",
+        port: 22003,
+        players: 5,
+        get name() {
+          nameReads++;
+          return "Nexus Roleplay";
+        },
       }),
       Object.freeze({
-        address: "two.test", port: 22003, players: 2,
-        get name() { nameReads++; return "Nexus Racing"; },
+        address: "two.test",
+        port: 22003,
+        players: 2,
+        get name() {
+          nameReads++;
+          return "Nexus Racing";
+        },
       }),
     ]);
     const options = { minPlayers: 0, limit: 50, offset: 0 };
@@ -145,12 +155,21 @@ describe("MTA directory page selection", () => {
 
   it("does not normalize searchable text during player-only filtering", () => {
     let nameReads = 0;
-    const servers: MtaMasterServer[] = [{
-      address: "one.test", port: 22003, players: 7,
-      get name() { nameReads++; return "Nexus"; },
-    }];
+    const servers: MtaMasterServer[] = [
+      {
+        address: "one.test",
+        port: 22003,
+        players: 7,
+        get name() {
+          nameReads++;
+          return "Nexus";
+        },
+      },
+    ];
     const result = selectMtaDirectoryPage(servers, {
-      minPlayers: 5, limit: 10, offset: 0,
+      minPlayers: 5,
+      limit: 10,
+      offset: 0,
     });
     expect(result.total).toBe(1);
     expect(nameReads).toBe(0);

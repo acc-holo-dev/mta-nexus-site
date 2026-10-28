@@ -1,14 +1,7 @@
 import { constants } from "node:fs";
 import { access } from "node:fs/promises";
 import { notFound } from "next/navigation";
-import {
-  Database,
-  Globe2,
-  HardDrive,
-  Mail,
-  ScanLine,
-  TerminalSquare,
-} from "lucide-react";
+import { Database, Globe2, HardDrive, Mail, ScanLine, TerminalSquare } from "lucide-react";
 import { config } from "@nexus/config";
 import { checkDatabaseConnection } from "@nexus/db";
 import { SectionHeader, StatCard, StatusBadge } from "@nexus/ui";
@@ -38,10 +31,7 @@ export default async function DevelopmentStatusPage() {
   let storageHealthy = true;
   if (config.STORAGE_PROVIDER === "local") {
     try {
-      await access(
-        config.STORAGE_LOCAL_PATH,
-        constants.R_OK | constants.W_OK,
-      );
+      await access(config.STORAGE_LOCAL_PATH, constants.R_OK | constants.W_OK);
       storageStatus = copy.writable;
     } catch {
       storageStatus = copy.unavailable;
@@ -49,10 +39,8 @@ export default async function DevelopmentStatusPage() {
     }
   }
 
-  const scannerStatus =
-    config.BUILD_SCANNER === "disabled" ? copy.disabled : copy.configured;
-  const emailStatus =
-    config.EMAIL_PROVIDER === "disabled" ? copy.disabled : copy.configured;
+  const scannerStatus = config.BUILD_SCANNER === "disabled" ? copy.disabled : copy.configured;
+  const emailStatus = config.EMAIL_PROVIDER === "disabled" ? copy.disabled : copy.configured;
 
   return (
     <div className="space-y-8">
@@ -62,9 +50,7 @@ export default async function DevelopmentStatusPage() {
             <TerminalSquare className="h-6 w-6 text-accent" aria-hidden="true" />
             <span>{copy.title}</span>
           </h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted">
-            {copy.description}
-          </p>
+          <p className="mt-1 max-w-2xl text-sm text-muted">{copy.description}</p>
         </div>
         <StatusBadge status={copy.localOnly} tone="warning" />
       </div>
@@ -114,10 +100,7 @@ export default async function DevelopmentStatusPage() {
         <div className="flex items-center gap-2 text-sm text-secondary">
           <Globe2 className="h-4 w-4 text-accent" aria-hidden="true" />
           <span className="font-semibold text-primary">{copy.appUrl}:</span>
-          <a
-            href={config.NEXT_PUBLIC_APP_URL}
-            className="truncate text-accent hover:underline"
-          >
+          <a href={config.NEXT_PUBLIC_APP_URL} className="truncate text-accent hover:underline">
             {config.NEXT_PUBLIC_APP_URL}
           </a>
         </div>

@@ -40,28 +40,29 @@ describe("support validation", () => {
       createSupportMessageSchema.safeParse({ message: "Thanks", expectedStatus: "open" }).success,
     ).toBe(true);
     expect(
-      createSupportMessageSchema.safeParse({ message: "Follow up", expectedStatus: "resolved" }).success,
+      createSupportMessageSchema.safeParse({ message: "Follow up", expectedStatus: "resolved" })
+        .success,
     ).toBe(true);
-    expect(
-      createSupportMessageSchema.safeParse({ message: "Thanks" }).success,
-    ).toBe(false);
+    expect(createSupportMessageSchema.safeParse({ message: "Thanks" }).success).toBe(false);
     expect(
       createSupportMessageSchema.safeParse({ message: "", expectedStatus: "open" }).success,
     ).toBe(false);
     expect(
-      createSupportMessageSchema.safeParse({ message: "Thanks", expectedStatus: "unknown" }).success,
+      createSupportMessageSchema.safeParse({ message: "Thanks", expectedStatus: "unknown" })
+        .success,
     ).toBe(false);
     expect(
-      updateSupportCaseStatusSchema.safeParse({ status: "resolved", expectedStatus: "open" }).success,
+      updateSupportCaseStatusSchema.safeParse({ status: "resolved", expectedStatus: "open" })
+        .success,
     ).toBe(true);
+    expect(updateSupportCaseStatusSchema.safeParse({ status: "resolved" }).success).toBe(false);
     expect(
-      updateSupportCaseStatusSchema.safeParse({ status: "resolved" }).success,
+      updateSupportCaseStatusSchema.safeParse({ status: "pending", expectedStatus: "open" })
+        .success,
     ).toBe(false);
     expect(
-      updateSupportCaseStatusSchema.safeParse({ status: "pending", expectedStatus: "open" }).success,
-    ).toBe(false);
-    expect(
-      updateSupportCaseStatusSchema.safeParse({ status: "closed", expectedStatus: "pending" }).success,
+      updateSupportCaseStatusSchema.safeParse({ status: "closed", expectedStatus: "pending" })
+        .success,
     ).toBe(false);
   });
 });
@@ -69,9 +70,14 @@ describe("support validation", () => {
 describe("support staff queue filters", () => {
   it("only accepts recognized filters without extra fields", () => {
     expect(supportStaffQueueFiltersSchema.safeParse({}).success).toBe(true);
-    expect(supportStaffQueueFiltersSchema.safeParse({ status: "open", category: "payment" }).success).toBe(true);
+    expect(
+      supportStaffQueueFiltersSchema.safeParse({ status: "open", category: "payment" }).success,
+    ).toBe(true);
     expect(supportStaffQueueFiltersSchema.safeParse({ status: "pending" }).success).toBe(false);
     expect(supportStaffQueueFiltersSchema.safeParse({ category: "" }).success).toBe(false);
-    expect(supportStaffQueueFiltersSchema.safeParse({ category: "payment", requesterId: "usr_victim" }).success).toBe(false);
+    expect(
+      supportStaffQueueFiltersSchema.safeParse({ category: "payment", requesterId: "usr_victim" })
+        .success,
+    ).toBe(false);
   });
 });

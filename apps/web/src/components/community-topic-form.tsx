@@ -41,27 +41,17 @@ export function CommunityTopicForm() {
     try {
       const response = await fetch(
         "/api/content",
-        communityTopicRequest(
-          submission,
-          AbortSignal.timeout(15_000),
-        ),
+        communityTopicRequest(submission, AbortSignal.timeout(15_000)),
       );
       const payload = await response.json().catch(() => null);
-      const path = confirmedCommunityTopicPath(
-        response.status,
-        payload,
-      );
+      const path = confirmedCommunityTopicPath(response.status, payload);
       if (!response.ok || !path) {
         throw new Error(payload?.error || copy.createError);
       }
       router.push(path);
       router.refresh();
     } catch (caught) {
-      setError(
-        caught instanceof Error && caught.message
-          ? caught.message
-          : copy.createError,
-      );
+      setError(caught instanceof Error && caught.message ? caught.message : copy.createError);
       setBusy(false);
     }
   }
@@ -82,13 +72,7 @@ export function CommunityTopicForm() {
 
       <label className="space-y-1.5">
         <span className="font-label text-secondary">{copy.topicTitle}</span>
-        <input
-          name="title"
-          minLength={3}
-          maxLength={200}
-          required
-          className={fieldClass}
-        />
+        <input name="title" minLength={3} maxLength={200} required className={fieldClass} />
       </label>
 
       <label className="space-y-1.5">

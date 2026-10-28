@@ -24,29 +24,26 @@ describe("content discussion form", () => {
     state.locale = "en";
   });
 
-  it.each(["en", "ru"] as const)(
-    "renders the localized protected comment form in %s",
-    (locale) => {
-      state.locale = locale;
-      const html = renderToStaticMarkup(
-        createElement(ContentCommentForm, { slug: "hello world/one" }),
-      );
-      const copy = getDictionary(locale).articles;
-      expect(html).toContain(copy.joinDiscussion);
-      expect(html).toMatch(/minlength="2"/iu);
-      expect(html).toMatch(/maxlength="5000"/iu);
-      expect(html).toContain('required=""');
-      expect(html).toContain(copy.publishComment);
-    },
-  );
+  it.each(["en", "ru"] as const)("renders the localized protected comment form in %s", (locale) => {
+    state.locale = locale;
+    const html = renderToStaticMarkup(
+      createElement(ContentCommentForm, { slug: "hello world/one" }),
+    );
+    const copy = getDictionary(locale).articles;
+    expect(html).toContain(copy.joinDiscussion);
+    expect(html).toMatch(/minlength="2"/iu);
+    expect(html).toMatch(/maxlength="5000"/iu);
+    expect(html).toContain('required=""');
+    expect(html).toContain(copy.publishComment);
+  });
 
   it("POSTs normalized text to the encoded comment endpoint", async () => {
     const fetchImpl = vi.fn(
       async (_url: RequestInfo | URL, _init?: RequestInit) =>
-        new Response(
-          JSON.stringify({ comment: { id: "cmt_confirmed" } }),
-          { status: 201, headers: { "content-type": "application/json" } },
-        ),
+        new Response(JSON.stringify({ comment: { id: "cmt_confirmed" } }), {
+          status: 201,
+          headers: { "content-type": "application/json" },
+        }),
     );
 
     await expect(
@@ -73,11 +70,12 @@ describe("content discussion form", () => {
   });
 
   it("fails closed when the server does not confirm a comment id", async () => {
-    const fetchImpl = vi.fn(async () =>
-      new Response(JSON.stringify({ success: true }), {
-        status: 201,
-        headers: { "content-type": "application/json" },
-      }),
+    const fetchImpl = vi.fn(
+      async () =>
+        new Response(JSON.stringify({ success: true }), {
+          status: 201,
+          headers: { "content-type": "application/json" },
+        }),
     );
     await expect(
       submitContentCommentRequest(

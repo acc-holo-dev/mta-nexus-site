@@ -21,8 +21,9 @@ describe("public MTA observation model", () => {
     const repository = read("packages/db/src/repositories/server-observations.ts");
     const migration = read("packages/db/migrations/0010_public_server_observations.sql");
 
-    expect(schema).toContain('serverObservations = pgTable("server_observations"');
-    expect(schema).toContain('lastObservedAt: timestamp("last_observed_at"');
+    const compactSchema = schema.replace(/\s+/gu, "");
+    expect(compactSchema).toContain('serverObservations=pgTable("server_observations"');
+    expect(compactSchema).toContain('lastObservedAt:timestamp("last_observed_at"');
     expect(repository).toContain(".onConflictDoNothing({");
     expect(repository).toContain("serverObservations.sourceSequence,");
     expect(repository).toContain("getPeakPlayers");

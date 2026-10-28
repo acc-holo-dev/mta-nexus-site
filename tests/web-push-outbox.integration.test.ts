@@ -40,17 +40,9 @@ describe("durable Web Push outbox", () => {
 
     for (const [id, sessionId, expirationAt] of [
       [`wps_outbox_a_${suffix}`, activeSessionId, null],
-      [
-        `wps_outbox_b_${suffix}`,
-        activeSessionId,
-        new Date(Date.now() + 30 * 60 * 1000),
-      ],
+      [`wps_outbox_b_${suffix}`, activeSessionId, new Date(Date.now() + 30 * 60 * 1000)],
       [`wps_outbox_expired_session_${suffix}`, expiredSessionId, null],
-      [
-        `wps_outbox_expired_sub_${suffix}`,
-        activeSessionId,
-        new Date(Date.now() - 30 * 60 * 1000),
-      ],
+      [`wps_outbox_expired_sub_${suffix}`, activeSessionId, new Date(Date.now() - 30 * 60 * 1000)],
     ] as const) {
       await webPushSubscriptionRepository.upsert({
         id,
@@ -86,10 +78,7 @@ describe("durable Web Push outbox", () => {
       .where(eq(webPushOutbox.notificationId, notificationId));
     expect(jobs).toHaveLength(2);
     expect(jobs.map((job) => job.subscriptionId).sort()).toEqual(
-      [
-        `wps_outbox_a_${suffix}`,
-        `wps_outbox_b_${suffix}`,
-      ].sort(),
+      [`wps_outbox_a_${suffix}`, `wps_outbox_b_${suffix}`].sort(),
     );
     expect(jobs.every((job) => job.attempts === 0)).toBe(true);
   });
@@ -145,16 +134,8 @@ describe("durable Web Push outbox", () => {
       db
         .select()
         .from(notifications)
-        .where(
-          and(
-            eq(notifications.id, notificationId),
-            eq(notifications.recipientId, userId),
-          ),
-        ),
-      db
-        .select()
-        .from(webPushOutbox)
-        .where(eq(webPushOutbox.notificationId, notificationId)),
+        .where(and(eq(notifications.id, notificationId), eq(notifications.recipientId, userId))),
+      db.select().from(webPushOutbox).where(eq(webPushOutbox.notificationId, notificationId)),
     ]);
     expect(notificationRows).toEqual([]);
     expect(jobs).toEqual([]);

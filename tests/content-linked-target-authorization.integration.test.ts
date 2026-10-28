@@ -1,12 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
-import {
-  productRepository,
-  serverRepository,
-  sessionRepository,
-  userRepository,
-} from "@nexus/db";
+import { productRepository, serverRepository, sessionRepository, userRepository } from "@nexus/db";
 import { POST } from "../apps/web/src/app/api/content/route";
 
 function contentRequest(token: string, body: Record<string, unknown>) {

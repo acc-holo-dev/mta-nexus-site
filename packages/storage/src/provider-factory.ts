@@ -13,6 +13,6 @@ export function getStorageProvider(): StorageProvider {
   }
 
   throw new Error(
-    "S3 storage is configured but no S3 adapter is installed. Refusing to fall back to local storage."
+    "S3 storage is configured but no S3 adapter is installed. Refusing to fall back to local storage.",
   );
 }
