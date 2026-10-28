@@ -92,12 +92,23 @@ it("binds the basket to the authenticated actor and confirms item changes", asyn
     productId: "prd_a",
     inCart: true,
   });
-  expect(mocks.add).toHaveBeenCalledWith(mocks.user, "prd_a");
+  expect(mocks.add).toHaveBeenCalledWith(mocks.user, "prd_a", "cart-token");
   expect(await (await DELETE(request("resources/cart", "DELETE"))).json()).toEqual({
     productId: "prd_a",
     inCart: false,
   });
+  expect(mocks.remove).toHaveBeenCalledWith(mocks.user, "prd_a", "cart-token");
 });
+it.each(["POST", "DELETE"])(
+  "rejects missing cookies before reading a %s cart body",
+  async (method) => {
+    const pending = request("resources/cart", method, { productId: "prd_a" }, { cookie: "" });
+    expect((await (method === "POST" ? POST : DELETE)(pending)).status).toBe(401);
+    expect(pending.bodyUsed).toBe(false);
+    expect(mocks.add).not.toHaveBeenCalled();
+    expect(mocks.remove).not.toHaveBeenCalled();
+  },
+);
 it.each([
   [{ productId: "prd_a", userId: "usr_other" }, 400],
   [{ productId: "../private" }, 400],

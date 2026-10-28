@@ -72,7 +72,7 @@ async function fixture() {
     sha256Hash: "a".repeat(64),
     fileSizeBytes: 7,
   });
-  await cart.add(buyer, productId);
+  await cart.add(buyer, productId, `tok_${buyer}`);
   const review = await cart.review(buyer);
   if (!review.reviewDigest) throw new Error("Missing review");
   const input = {

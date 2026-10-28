@@ -57,7 +57,7 @@ async function fixture() {
     sha256Hash: "a".repeat(64),
     fileSizeBytes: 7,
   });
-  await cart.add(userId, productId);
+  await cart.add(userId, productId, token);
   const review = await cart.review(userId);
   if (!review.reviewDigest) throw new Error("Missing resource review");
   return {

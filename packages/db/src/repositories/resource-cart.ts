@@ -26,6 +26,7 @@ import {
   type ResourceTransaction,
 } from "./entitlements";
 import { readResourceCartReview } from "./resource-cart-review";
+import { lockInitiatingSession } from "./initiating-session";
 
 async function lockCart(tx: ResourceTransaction, userId: string) {
   await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`resource-cart:${userId}`}))`);
@@ -104,7 +105,8 @@ export class ResourceCartRepository {
     return { items: rows, limit: RESOURCE_CART_LIMIT };
   }
 
-  async add(userId: string, productId: string): Promise<void> {
+  async add(userId: string, productId: string, currentToken: string): Promise<void> {
+    if (!currentToken) throw new UnauthorizedError("Authentication required");
     await db.transaction(async (tx) => {
       await lockCart(tx, userId);
       const [existing] = await tx
@@ -114,7 +116,10 @@ export class ResourceCartRepository {
           and(eq(resourceCartItems.userId, userId), eq(resourceCartItems.productId, productId)),
         )
         .limit(1);
-      if (existing) return;
+      if (existing) {
+        await lockResourceAcquisitionSession(tx, userId, currentToken);
+        return;
+      }
       const [summary] = await tx
         .select({ total: count() })
         .from(resourceCartItems)
@@ -136,13 +141,31 @@ export class ResourceCartRepository {
         .limit(1)
         .for("share");
       if (!product) throw new AppError("Resource is unavailable", 409, "RESOURCE_UNAVAILABLE");
+      await lockResourceAcquisitionSession(tx, userId, currentToken);
       await tx.insert(resourceCartItems).values({ userId, productId }).onConflictDoNothing();
     });
   }
 
-  async remove(userId: string, productId: string): Promise<void> {
+  async remove(userId: string, productId: string, currentToken: string): Promise<void> {
+    if (!currentToken) throw new UnauthorizedError("Authentication required");
     await db.transaction(async (tx) => {
       await lockCart(tx, userId);
+      const [user] = await tx
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1)
+        .for("share");
+      if (!user) throw new UnauthorizedError("Authentication required");
+      // Lock the actor before its cart row; recheck the session after either wait.
+      await tx
+        .select({ productId: resourceCartItems.productId })
+        .from(resourceCartItems)
+        .where(
+          and(eq(resourceCartItems.userId, userId), eq(resourceCartItems.productId, productId)),
+        )
+        .for("update");
+      await lockInitiatingSession(tx, userId, currentToken);
       await tx
         .delete(resourceCartItems)
         .where(
