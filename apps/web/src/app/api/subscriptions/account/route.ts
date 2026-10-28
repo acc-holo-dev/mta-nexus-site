@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { readBoundedJson } from "../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../lib/browser-route-adapter";
 import { resourceCommerceRequest } from "../../../../lib/resource-commerce-http";
 import { subscriptionsService } from "../../../../lib/services/subscriptions-service";
 import { subscriptionsQuery } from "../../../../lib/subscriptions-query";
@@ -11,9 +12,9 @@ export function GET(request: NextRequest) {
     ),
   );
 }
-export function POST(request: NextRequest) {
+export const POST = withBrowserMutation(function POST(request: NextRequest) {
   return resourceCommerceRequest(request, true, async (actor) => {
     subscriptionsQuery(request.nextUrl.searchParams, "empty");
     return subscriptionsService.command(actor, await readBoundedJson(request, 4096));
   });
-}
+});

@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -42,8 +43,14 @@ const post = (
   body: unknown = activation,
   query = "",
   headers: Record<string, string> = { "content-type": "application/json" },
-) => request(base + query, { method: "POST", headers, body: JSON.stringify(body) });
+) =>
+  request(base + query, {
+    method: "POST",
+    headers: { ...browserMutationHeaders(), ...headers },
+    body: JSON.stringify(body),
+  });
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.actor = { id: "usr_a", role: "user" };
   state.rate.mockResolvedValue({ success: true });
@@ -154,4 +161,8 @@ it("returns domain conflicts without claiming activation or exposing internals",
 it("bounds exported bytes", async () => {
   state.detail.mockResolvedValue({ receipt: { ...receipt, description: "x".repeat(40 * 1024) } });
   expect((await download(request(base), context)).status).toBe(409);
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });

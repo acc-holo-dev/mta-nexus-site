@@ -1,6 +1,7 @@
 import { AppError } from "@nexus/domain";
 import { NextRequest } from "next/server";
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const state = vi.hoisted(() => ({
   actor: { id: "usr_a", role: "user" } as { id: string; role: string } | null,
@@ -38,8 +39,14 @@ const post = (
   body: unknown = command,
   query = "",
   headers: Record<string, string> = { "content-type": "application/json" },
-) => request(base + query, { method: "POST", headers, body: JSON.stringify(body) });
+) =>
+  request(base + query, {
+    method: "POST",
+    headers: { ...browserMutationHeaders(), ...headers },
+    body: JSON.stringify(body),
+  });
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.clearAllMocks();
   state.actor = { id: "usr_a", role: "user" };
   state.rate.mockResolvedValue({ success: true });
@@ -124,4 +131,8 @@ it("refuses oversized detail exports without exposing report data", async () => 
   const response = await download(request(base), context);
   expect(response.status).toBe(500);
   expect(await response.json()).toEqual({ code: "RESOURCE_COMMERCE_FAILED" });
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });

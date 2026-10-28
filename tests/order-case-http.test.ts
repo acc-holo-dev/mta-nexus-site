@@ -1,6 +1,8 @@
-import { beforeEach, expect, it, vi } from "vitest";
-import { NextRequest } from "next/server";
 import { AppError } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
+
 const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   rate: vi.fn(),
@@ -15,10 +17,12 @@ vi.mock("../apps/web/src/lib/services/auth-service", () => ({
 }));
 vi.mock("@nexus/security", () => ({ consumeRateLimit: mocks.rate }));
 vi.mock("../apps/web/src/lib/services/order-case-service", () => ({ orderCaseService: mocks }));
-import { GET, POST } from "../apps/web/src/app/api/orders/[id]/support/route";
-import { GET as caseGet } from "../apps/web/src/app/api/order-cases/[id]/route";
-import { GET as queueGet } from "../apps/web/src/app/api/admin/commerce/order-cases/route";
+
 import { POST as reviewPost } from "../apps/web/src/app/api/admin/commerce/order-cases/[id]/route";
+import { GET as queueGet } from "../apps/web/src/app/api/admin/commerce/order-cases/route";
+import { GET as caseGet } from "../apps/web/src/app/api/order-cases/[id]/route";
+import { GET, POST } from "../apps/web/src/app/api/orders/[id]/support/route";
+
 const actor = { id: "usr_a", role: "user" },
   context = { params: Promise.resolve({ id: "ord_a" }) };
 const draft = {
@@ -36,11 +40,12 @@ function request(
 ) {
   return new NextRequest(`http://nexus.test${path}`, {
     method,
-    headers: { "content-type": "application/json", ...headers },
+    headers: { ...browserMutationHeaders(), "content-type": "application/json", ...headers },
     ...(method === "GET" ? {} : { body: JSON.stringify(body) }),
   });
 }
 beforeEach(() => {
+  stubBrowserMutationOrigin();
   vi.resetAllMocks();
   mocks.auth.mockResolvedValue(actor);
   mocks.rate.mockResolvedValue({ success: true });
@@ -125,4 +130,8 @@ it("binds staff review to evidence, case revision and shared conversation revisi
       )
     ).status,
   ).toBe(400);
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });

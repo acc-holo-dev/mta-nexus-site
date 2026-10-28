@@ -1,6 +1,7 @@
-import { NextRequest } from "next/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { User } from "@nexus/domain";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserMutationHeaders, stubBrowserMutationOrigin } from "./browser-mutation-headers";
 
 const mocks = vi.hoisted(() => ({
   claimFreeResource: vi.fn(),
@@ -23,12 +24,16 @@ import { CommerceService } from "../apps/web/src/lib/services/commerce-service";
 
 describe("closed-beta commerce behavior", () => {
   beforeEach(() => {
+    stubBrowserMutationOrigin();
     vi.clearAllMocks();
   });
 
   it("fails paid checkout closed with a stable public code", async () => {
     const response = await disabledCheckout(
-      new NextRequest("https://nexus.test/api/checkout", { method: "POST" }),
+      new NextRequest("https://nexus.test/api/checkout", {
+        method: "POST",
+        headers: browserMutationHeaders(),
+      }),
     );
 
     expect(response.status).toBe(503);
@@ -80,4 +85,8 @@ describe("closed-beta commerce behavior", () => {
       "product.download",
     );
   });
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });

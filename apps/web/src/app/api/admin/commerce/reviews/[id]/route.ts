@@ -1,7 +1,8 @@
 import { AppError, ForbiddenError } from "@nexus/domain";
 import { resourceReviewDecisionSchema } from "@nexus/validation";
-import { readBoundedJson } from "../../../../../../lib/bounded-json";
 import type { NextRequest } from "next/server";
+import { readBoundedJson } from "../../../../../../lib/bounded-json";
+import { withBrowserMutation } from "../../../../../../lib/browser-route-adapter";
 import { resourceCommerceRequest } from "../../../../../../lib/resource-commerce-http";
 import { resourceReviewService } from "../../../../../../lib/services/resource-review-service";
 export function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -9,7 +10,10 @@ export function GET(request: NextRequest, { params }: { params: Promise<{ id: st
     resourceReviewService.reportDetail(actor, true, (await params).id),
   );
 }
-export function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const POST = withBrowserMutation(function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   return resourceCommerceRequest(request, true, async (actor) => {
     if (actor.role !== "admin" && actor.role !== "moderator") throw new ForbiddenError();
     const body = resourceReviewDecisionSchema.safeParse(await readBoundedJson(request, 16384));
@@ -17,4 +21,4 @@ export function POST(request: NextRequest, { params }: { params: Promise<{ id: s
       throw new AppError("Invalid review report decision", 400, "REVIEW_REPORT_INVALID");
     return resourceReviewService.decide(actor, (await params).id, body.data);
   });
-}
+});
