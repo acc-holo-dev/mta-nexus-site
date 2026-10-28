@@ -40,6 +40,7 @@ import { db } from "../packages/db/src/client";
 import { storeOrganizationAccessNotice } from "../packages/db/src/repositories/organization-access-notice";
 import { organizationGovernanceRepository as repository } from "../packages/db/src/repositories/organization-governance";
 import { organizationWorkspaceRepository as workspace } from "../packages/db/src/repositories/organization-workspace";
+import { digestSessionToken } from "../packages/db/src/repositories/sessions";
 import { organizations } from "../packages/db/src/schema";
 
 const time = "2026-10-11T00:00:00.000Z",
@@ -64,6 +65,7 @@ const org = (extra = {}) =>
 const input = {
   id: "org",
   actorId: "owner",
+  currentToken: "raw-owner-token",
   targetId: "target",
   targetUsername: "target",
   confirmationSlug: "team",
@@ -86,7 +88,11 @@ function transferRows(
   state.rows = [
     [org()],
     members,
-    [["target", "target", "Target", null]],
+    [
+      ["owner", "owner", "Owner", null],
+      ["target", "target", "Target", null],
+    ],
+    [["session", new Date(Date.now() + 3_600_000).toISOString()]],
     [org({ ownerId: "target", updatedAt: later })],
   ];
 }
@@ -97,7 +103,7 @@ beforeEach(() => {
   state.failTable = "";
   state.push.mockReset().mockResolvedValue({ queued: 0, reason: "no_subscriptions" });
 });
-it("locks the actual owner and both memberships, preserves grants and changes only owner/revision", async () => {
+it("locks organization, stable memberships and actors, then the owned session before writes", async () => {
   transferRows();
   const result = await repository.transfer(input);
   expect(result).toMatchObject({
@@ -109,8 +115,18 @@ it("locks the actual owner and both memberships, preserves grants and changes on
   expect(state.queries[0].sql).toContain("for update");
   expect(state.queries[1].sql).toContain('order by "organization_members"."user_id" asc');
   expect(state.queries[1].sql).toContain("for update");
-  expect(state.queries[2].params).toEqual(["target", "target", 1]);
+  expect(state.queries[2].params).toEqual(["owner", "target"]);
+  expect(state.queries[2].sql).toContain('order by "users"."id" asc');
   expect(state.queries[2].sql).toContain("for share");
+  expect(state.queries[3].sql).toContain('from "sessions"');
+  expect(state.queries[3].sql).toContain("for update");
+  expect(state.queries[3].params).toEqual([
+    "owner",
+    digestSessionToken(input.currentToken),
+    expect.any(String),
+  ]);
+  expect(state.queries[4].sql).toContain('update "organization_members"');
+  expect(JSON.stringify(state.queries)).not.toContain(input.currentToken);
   for (const update of writes("organization_members")) {
     expect(update.sql).toContain('set "role" =');
     expect(update.sql).not.toContain("permissions");
@@ -165,11 +181,32 @@ it.each([
   expect(writes("organization_members")).toHaveLength(0);
 });
 it("rejects a changed username before transfer rather than resolving another account", async () => {
-  state.rows = [[org()], [["membership", "target", "member"]], []];
+  state.rows = [
+    [org()],
+    [["membership", "target", "member"]],
+    [
+      ["owner", "owner", "Owner", null],
+      ["target", "changed", "Target", null],
+    ],
+  ];
   await expect(repository.transfer(input)).rejects.toMatchObject({
     code: "OWNERSHIP_TARGET_INVALID",
   });
   expect(writes("audit_events")).toHaveLength(0);
+});
+it("rejects a missing token before querying or an absent current session before any write", async () => {
+  await expect(repository.transfer({ ...input, currentToken: "" })).rejects.toMatchObject({
+    code: "UNAUTHORIZED",
+  });
+  expect(state.queries).toHaveLength(0);
+  transferRows();
+  state.rows[3] = [];
+  await expect(repository.transfer(input)).rejects.toMatchObject({ code: "UNAUTHORIZED" });
+  expect(state.queries).toHaveLength(4);
+  expect(writes("organization_members")).toHaveLength(0);
+  expect(writes("organizations")).toHaveLength(0);
+  expect(writes("audit_events")).toHaveLength(0);
+  expect(writes("notifications")).toHaveLength(0);
 });
 it.each(["audit_events", "notifications"])(
   "does not confirm a transfer when authoritative %s storage fails",

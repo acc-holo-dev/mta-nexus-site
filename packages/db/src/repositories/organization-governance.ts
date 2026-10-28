@@ -6,11 +6,14 @@ import {
   ORGANIZATION_CHANGE_ACTIONS,
   ORGANIZATION_CHANGE_GROUPS,
   type OrganizationChangeGroup,
+  UnauthorizedError,
 } from "@nexus/domain";
 import { and, asc, desc, eq, inArray, type SQL, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "../client";
 import { auditEvents, organizationMembers, organizations, users } from "../schema";
+import type { ResourceTransaction } from "../transaction";
+import { lockInitiatingSession } from "./initiating-session";
 import { storeOrganizationAccessNotice } from "./organization-access-notice";
 import { organizationWorkspaceAccess } from "./organization-workspace";
 import {
@@ -47,10 +50,33 @@ type FilteredHistoryPage = Omit<HistoryPage, "nextCursor"> & {
   group: OrganizationChangeGroup;
   query: string;
 };
+async function lockTransferActors(
+  tx: ResourceTransaction,
+  actorId: string,
+  targetId: string,
+  targetUsername: string,
+) {
+  const actors = await tx
+    .select({
+      id: users.id,
+      username: users.username,
+      displayName: users.displayName,
+      avatarUrl: users.avatarUrl,
+    })
+    .from(users)
+    .where(inArray(users.id, [actorId, targetId]))
+    .orderBy(asc(users.id))
+    .for("share");
+  if (!actors.some((actor) => actor.id === actorId)) throw new UnauthorizedError();
+  const target = actors.find((actor) => actor.id === targetId && actor.username === targetUsername);
+  if (!target) throw new AppError("Selected member changed", 409, "OWNERSHIP_TARGET_INVALID");
+  return target;
+}
 class OrganizationGovernanceRepository {
   async transfer(input: {
     id: string;
     actorId: string;
+    currentToken: string;
     targetId: string;
     targetUsername: string;
     confirmationSlug: string;
@@ -59,6 +85,7 @@ class OrganizationGovernanceRepository {
     memberId: string;
     auditId: string;
   }) {
+    if (!input.currentToken) throw new UnauthorizedError();
     return db.transaction(async (tx) => {
       const { organization, role } = await organizationWorkspaceAccess(
         tx,
@@ -78,8 +105,8 @@ class OrganizationGovernanceRepository {
         );
       if (input.targetId === input.actorId)
         throw new AppError("Already owner", 400, "OWNERSHIP_TARGET_INVALID");
-      // Organization writes lock the parent first. Lock affected memberships in a
-      // stable order; preserve every existing custom/commercial permission.
+      // Organization -> stable memberships -> stable current actors -> initiating
+      // session. Recheck after these waits; preserve every existing permission.
       const members = await tx
         .select({
           id: organizationMembers.id,
@@ -98,18 +125,13 @@ class OrganizationGovernanceRepository {
       const targetMember = members.find((member) => member.userId === input.targetId);
       if (!targetMember || !["admin", "developer", "member"].includes(targetMember.role))
         throw new AppError("Current team member required", 409, "OWNERSHIP_TARGET_INVALID");
-      const [target] = await tx
-        .select({
-          id: users.id,
-          username: users.username,
-          displayName: users.displayName,
-          avatarUrl: users.avatarUrl,
-        })
-        .from(users)
-        .where(and(eq(users.id, input.targetId), eq(users.username, input.targetUsername)))
-        .for("share")
-        .limit(1);
-      if (!target) throw new AppError("Selected member changed", 409, "OWNERSHIP_TARGET_INVALID");
+      const target = await lockTransferActors(
+        tx,
+        input.actorId,
+        input.targetId,
+        input.targetUsername,
+      );
+      await lockInitiatingSession(tx, input.actorId, input.currentToken);
       await tx
         .update(organizationMembers)
         .set({ role: "owner" })
